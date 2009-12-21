@@ -115,11 +115,11 @@ procedure TAboutForm.NempCreditsAnchorClicked(Sender: TObject;
 begin
   if Anchor = 'gpl' then
   begin
-      if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'gpl-2.0.txt') then
+      if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'licence.txt') then
         MessageDLG((Error_LGPLFileNotFound), mtError, [mbOK], 0)
       else
         ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'gpl-2.0.txt')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'licence.txt')
                       , nil, nil, SW_SHOWNORMAl);
   end;
 end;
