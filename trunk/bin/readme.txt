@@ -7,12 +7,11 @@
       von Daniel 'Gausi' Gaußmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit Borland Delphi7 Personal
-      Januar 2005 - April 2009
+      Programmiert mit CodeGear Delphi 2009
+      Januar 2005 - Dezember 2009
 
-      Version: 3.3.0
+      Version: 3.9.0
 
-(Note: This file is deprecated!)
 
 -----------------------------------------------------------
 
@@ -67,64 +66,14 @@ Was Nemp NICHT kann:
 
 Lizenzvereinbarungen:
 -----------------------------------------------------------
-Dieses Produkt wurde vom Autor für ausschließlich kostenlose Verbreitung erstellt 
-und veröffentlicht. Es darf unverändert  an jeden weitergegeben werden und auf 
-Homepages zum Download zur Verfügung gestellt werden. In diesem Fall ist eine 
-Benachrichtigung des Autors erwünscht. Es besteht keinerlei Gewährleistung jeglicher 
-Art für das Produkt.
-
-Dieses Produkt umfasst die folgenden Dateien:
-   - nemp.exe (Hauptprogramm)
-   - NempDeskband.dll
-   - faq.htm
-   - lgpl.txt
-   - bass.dll
-   - basswma.dll
-   - bass_fx.dll
-   - KBHook.dll
-   - default.nwl
-   - readme.txt (Diese Datei)
-Außerdem die Ordner
-   - \HTML
-   - \locale
-   - \Skins
-mit weiteren Dateien   
-
-
-Der Autor dieses Produkts übernimmt KEINERLEI Haftung für Schäden jeglicher Art, die 
-durch das Produkt, durch die Nutzung des Produkts, durch die Nichtnutzung des Produkts 
-oder durch hier nicht aufgezählte Schadensmöglichkeiten entstehen. In keinem Fall kann 
-der Autor dieses Produktes für Schäden jeglicher Art verantwortlich gemacht werden.
-Das Produkt wird "so wie es ist" zur Verfügung gestellt. Das Produkt wurde mit 
-großer Sorgfalt geschrieben, jedoch könnte jegliche Funktion, die der Beschreibung 
-des Produkts nach enthalten ist/sein sollte, durch Fehler versagen. Hierfür 
-übernimmt der Autor ebenfalls keine Haftung.
-Die Haftungsbeschränkung gilt nicht für den Fall, dass ein Schaden aufgrund grober 
-Fahrlässigkeit seitens des Autors entstanden ist.
-
-Eine Gewährleistung für eine fehlerfreie Funktionalität des Produkts wird von 
-dem Autor nicht übernommen. Der Autor übernimmt keine Haftung für die Fehlerfreiheit 
-des Produkts, insbesondere nicht dafür, dass das Produkt den Anforderungen und 
-Zwecken des Erwerbers genügt oder mit anderen von ihm ausgewählten Programmen 
-zusammenarbeitet.
-
-Das Programm steht unter dem rechtlichen Schutz der Urheber- und Handelsgesetze 
-des Landes, in dem es veröffentlicht, vervielfältigt bzw. genutzt wird. Die 
-Dekompilierung, Disassemblierung oder Änderung der Software oder der Dokumentation 
-inklusive dieses Dokumentes ist nur für private Zwecke erlaubt. Der Quellcode 
-dieses Produkts kann beim Autor per eMail (mail@gausi.de) angefordert werden. 
-Die Weitergabe des veränderten Produkts oder Teilen davon bedarf der Zustimmung 
-des Autors.
+GPL 2.0 oder später.
 
 
 
 Verwendete Units/Komponenten:
 -----------------------------------------------------------
-- VirtualTreeView und GraphicEx
-  http://www.soft-gems.net/
-
-- TntWare Delphi Unicode Controls
-  http://www.tntware.com/delphicontrols/unicode/            
+- VirtualTreeView
+  http://www.soft-gems.net/       
 
 - MP3-Wiedergabe-Engine: bass.dll
   Download unter http://www.un4seen.com/
@@ -134,16 +83,13 @@ Verwendete Units/Komponenten:
 
 - Teile der AudioToolsLibrary (ATL)
   http://mac.sourceforge.net/atl/
-  http://www.gausi.de/delphi
+  http://www.gausi.de
 
 - SearchTools von Heiko Thiel
   http://www.delphi-forum.de/viewtopic.php?t=48936
 
 - GNU gettext for Delphi
   http://dybdahl.dk/dxgettext/
-
-- Indy 10
-  http://www.indyproject.org/
 
 - TACredits
   http://www.delphipraxis.net/topic114228.html
@@ -163,6 +109,11 @@ Verwendete Units/Komponenten:
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
   
+
+Version 3.9.0 (Preview auf 4.0), Dezember 2009
+----------------------------------------------------------- 
+Liste kommt bei Version 4.0 ;-)
+
 
 
 Version 3.3.0 (Beta2), März 2009
