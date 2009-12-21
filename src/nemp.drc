@@ -1355,7 +1355,7 @@ BEGIN
 	Nemp_RessourceStrings_ErrorLoadingMediaLib,	"An error occured while loading the medialibrary. This should not happen."
 	Nemp_RessourceStrings_Error_HelpFileNotFound,	"The helpfile could not be found."
 	Nemp_RessourceStrings_Error_ReadmeFileNotFound,	"The readme.txt could not be found."
-	Nemp_RessourceStrings_Error_LGPLFileNotFound,	"The lgpl.txt could not be found."
+	Nemp_RessourceStrings_Error_LGPLFileNotFound,	"The licence.txt could not be found."
 	Nemp_RessourceStrings_Error_ID3EditDenied,	"Edit of ID3-Tags denied. You can allow this by Preferences -> System -> Other."
 	Nemp_RessourceStrings_BASS_ERRORSTR_INIT,	"Initialization of the bass.dll failed"
 	Nemp_RessourceStrings_BASS_ERRORSTR_NOTAVAIL,	"Invalid device (no sound)"
@@ -1723,7 +1723,7 @@ END
 /* AuswahlUnit.dfm */
 /* MedienlisteUnit.dfm */
 /* OptionsComplete.dfm */
-/* About.dfm */
+/* C:\Users\Daniel\Delphi-Programmierung\Nemp SVN\nemp\trunk\src\About.dfm */
 /* MultimediaKeys.dfm */
 /* Splash.dfm */
 /* StreamVerwaltung.dfm */

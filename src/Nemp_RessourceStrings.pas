@@ -134,7 +134,7 @@ ErrorLoadingMediaLib = 'An error occured while loading the medialibrary. This sh
 
 Error_HelpFileNotFound = 'The helpfile could not be found.';
 Error_ReadmeFileNotFound = 'The readme.txt could not be found.';
-Error_LGPLFileNotFound = 'The lgpl.txt could not be found.';
+Error_LGPLFileNotFound = 'The licence.txt could not be found.';
 
 Error_ID3EditDenied = 'Edit of ID3-Tags denied. You can allow this by Preferences -> System -> Other.';
 
