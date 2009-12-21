@@ -1,0 +1,233 @@
+body {
+	font-size: 100.01%;
+	font-family: Verdana,Arial,sans-serif;
+	text-align: left;
+	margin: 0px auto;
+	padding-top: 0px;
+	background-color: #202020;
+         font-size: 0.83em;
+	color: #dddddd;
+    	/*width: 240px;*/
+    	max-width: 500px;
+    	min-width: 240px;
+}
+
+
+input.text {width: 98%; }
+input.submit {}
+
+
+a {
+	text-decoration: none;
+	color: #dddddd;
+}
+
+h2 {
+	padding-left: 5px;
+	border-bottom: 2px solid #404040;
+	font-size: 1.3em;
+}
+
+
+div.menu {
+	margin 5px;
+}
+
+div.warning {
+	color: red;
+	padding-bottom: 10px;
+}
+
+div.error {
+	color: red;
+	border: red 2px solid;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	padding: 10px;
+}
+
+div.currenttitle {
+	padding-left: 5px;
+	border-bottom: 1px solid #404040;
+	font-size: 1em;
+	margin-bottom: 10px;
+         text-align: center;
+}
+
+div.currentimage {
+	text-align: center;
+}
+
+
+ul.mainmenu {
+	margin: 0;
+	padding: 10px 0px;
+	text-align: center;
+	background-color: #202020;
+	color: #202020;
+	width: 236;
+	border: 1px solid #dddddd;
+}
+
+ul.mainmenu li {
+	list-style: none;
+	display: inline;
+	color: #202020;
+	background-color: #dddddd;
+	border: 1px solid white;
+	padding: 8px 2px;
+	margin: 2px;
+}
+
+ul.mainmenu a{
+	color: #202020;
+	padding: 8px 20px;
+}
+
+ul.actionmenu {
+	margin-top: 10px;
+	padding: 0;
+}
+
+ul.actionmenu li, .button{
+	list-style: none;
+	color: #202020;
+	background-color: #dddddd;
+	border: 1px solid white;
+	padding: 2px;
+	margin: 2px;
+	text-align: center;
+}
+
+.button{
+	color: #202020;
+	background-color: #dddddd;
+	border: 1px solid white;
+	padding: 8px 20px;
+	margin: 2px;
+         cursor: pointer;
+	text-align: center;
+}
+
+ul.actionmenu li a{
+	color: #202020;
+        display:block;
+	padding-top:5px;
+	padding-bottom:5px;
+
+}
+ul.actionmenu li a:hover{
+	font-weight: bold;
+}
+
+
+ul.playlist {
+	background-color: #202020;
+         margin: 0; padding: 0px;
+}
+
+ul.playlist li{
+         list-style: none;
+         padding-right: 5px;
+         padding-left: 5px;
+         margin:0;
+}
+
+div.playlistentry{
+         color: #dddddd;
+         border-bottom: 1px solid #404040;
+         padding-left: 0px;
+         width: 100%;
+         padding-bottom: 0px;
+         margin-bottom: 0px;
+}
+
+ul.searchresults {
+	background-color: #202020;
+         margin: 0; padding: 0px;
+}
+
+ul.searchresults li{
+         list-style: none;
+         padding-right: 5px;
+         padding-left: 5px;
+         margin:0;
+}
+
+div.playlistentrycurrent{
+        /*	background-color: #404040;*/
+         color: #dddddd;
+         border: 1px solid red;
+         padding-left: 0px;
+         width: 100%;
+         padding-bottom: 0px;
+         margin-bottom: 0px;
+}
+
+div.playlistentry table{
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+div.playlistentry table tr{
+	padding: 0;
+	margin: 0;
+}
+
+ul.details {
+	background-color: #202020;
+         margin: 0; padding: 0px;
+}
+
+ul.details li{
+         list-style: none;
+         padding-right: 5px;
+         padding-left: 5px;
+         margin:0;
+}
+
+
+td.title{
+	color: #dddddd;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+td.title a:hover{
+	color: red;
+	text-decoration: none;
+}
+
+td.duration{
+	width: 20%;
+	text-align: right;
+}
+
+table.filenotfound{
+	text-decoration: line-through;
+}
+
+
+div.playlistcontrol{
+	font-size: 0.7em;
+	text-align: right;
+	width: 100%;
+         clear: both;
+	}
+
+div.playlistcontrol ul{
+	/*background-color: #404040;*/
+	margin: 0; padding: 0px;
+	color: #808080;
+}
+
+div.playlistcontrol ul li {
+	list-style: none;
+	display: inline;
+	margin: 0em;
+	padding-left: 5px;
+	padding-right:0;
+
+}
