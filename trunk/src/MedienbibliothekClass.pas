@@ -1666,8 +1666,14 @@ begin
         oldArtist := AudioFile.Strings[NempSortArray[1]];
         oldAlbum := AudioFile.Strings[NempSortArray[2]];
         oldID := AudioFile.CoverID;
-        AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-        InitCover(AudioFile);
+
+        // GetAudioData within the secondary is a very bad idea.
+        // The cover-stuff will cause some exceptions like OutOfRessources
+        // The Mainthread will do the following at this message:
+        // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+        // InitCover(AudioFile);
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
+
         if  (oldArtist <> AudioFile.Strings[NempSortArray[1]])
             OR (oldAlbum <> AudioFile.Strings[NempSortArray[2]])
             or (oldID <> AudioFile.CoverID)
@@ -2145,9 +2151,11 @@ begin
             //Wenn Da kein Erfolg: Cover-Datei suchen.
             // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
             // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
-            if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
+            //if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
+            if (fLastPath <> aAudioFile.Ordner) then
             begin
-                fLastPath := ExtractFilePath(aAudioFile.Pfad);
+                //fLastPath := ExtractFilePath(aAudioFile.Pfad);
+                fLastPath := aAudioFile.Ordner;
 
                 Coverliste := TStringList.Create;
                 GetCoverListe(aAudioFile, coverliste);
@@ -2160,7 +2168,7 @@ begin
                       if aAudioFile.CoverID = '' then
                       begin
                           // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
-                          // possible soultion: Try the next coverfile.
+                          // possible solution: Try the next coverfile.
                           // Easier: Just use "Default-Cover" and md5(AudioFile.Ordner) as Cover-ID
                           NewCoverName := '';
                           aAudioFile.CoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
@@ -2174,7 +2182,9 @@ begin
                 begin
                   // Kein Cover gefunden
                   fLastCoverName := '';
+
                   flastID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
+                  //flastID := '__'+ (StringReplace(aAudioFile.Ordner, '\', '-', [rfreplaceall]));
                   aAudioFile.CoverID := flastID;
                 end;
                 coverliste.free;
@@ -2235,12 +2245,15 @@ begin
   try
       try
           aGraphic.LoadFromFile(aFilename);
+
+          if SafeResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
+              result := newID;
       except
           // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
           // => silent exception, as this is done during the search for new files.
+          wuppdi;
       end;
-      if SafeResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
-          result := newID;
+
   finally
       aGraphic.Free;
   end;

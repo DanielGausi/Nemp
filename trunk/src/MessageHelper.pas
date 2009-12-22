@@ -556,6 +556,12 @@ begin
                         MedienBib.CurrentThreadFilename := PWideChar(aMsg.LParam);
         end;
 
+        MB_RefreshAudioFile: begin
+            af := TAudioFile(aMsg.LParam);
+            af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating);
+            MedienBib.InitCover(af);
+        end;
+
         MB_LyricUpdateStatus: begin
             // WParam: a string like "(found 5/8)"
             MedienListeStatusLBL.Caption :=
