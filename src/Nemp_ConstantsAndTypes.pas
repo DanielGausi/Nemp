@@ -348,6 +348,9 @@ const
     MB_LyricUpdateStatus = 18;
     // Lyrics/PostProcessor: Send the filename which is currently edited by a thread
     MB_ThreadFileUpdate = 23;
+    // Refresh AudioFile: GetAudiodata in VCL-Thread, as Cover-stuff will create some
+    // Exceptions in secondary threads.
+    MB_RefreshAudioFile = 24;
 
     // Exception im Thread - wahrscheinlich keine Internetverbindung.
     MB_LyricUpdateFailed = 19;

@@ -294,7 +294,11 @@ end;
 
 function Sortieren_Pfad_asc(item1,item2:pointer):integer;
 begin
-  result := AnsiCompareText(TAudioFile(item1).Pfad, TAudioFile(item2).Pfad);
+  result := AnsiCompareText(TAudioFile(item1).Ordner, TAudioFile(item2).Ordner);
+  if result = 0 then
+      result := AnsiCompareText(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
+
+  //result := AnsiCompareText(TAudioFile(item1).Pfad, TAudioFile(item2).Pfad);
 end;
 function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
 begin

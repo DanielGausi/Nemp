@@ -152,7 +152,6 @@ type
   //procedure DrawScrollCoverOLD(aIdx: Integer; aWidth, aHeight: Integer; aTarget: TPicture);
 
 
-
 implementation
 
 uses NempMainUnit, StringHelper, AudioFileHelper;
@@ -352,61 +351,67 @@ var BigBmp, SmallBmp: TBitmap;
     xfactor, yfactor:double;
     aJpg: tJpegImage;
     aStream: TFileStream;
-
-//const COVER_WIDTH = 240;
-//      COVER_HEIGHT = 240;
 begin
+
   result := True;
+
   if Not Overwrite and FileExists(dest) then exit;
 
   BigBmp := TBitmap.Create;
   SmallBmp := TBitmap.Create;
-
   try
-      BigBmp.Assign(aGraphic);
+      try
+          SmallBmp.Width := W;
+          SmallBmp.Height := H;
 
-      SmallBmp.Width := W;
-      SmallBmp.Height := H;
+          if (aGraphic <> NIL) And ((aGraphic.Width > 0) And (aGraphic.Height > 0)) then
+          begin
 
-      if aGraphic <> NIL then
-      begin
-          if (aGraphic.Width = 0) or (aGraphic.Height=0) then exit;
-          xfactor:= (W) / aGraphic.Width;
-          yfactor:= (H) / aGraphic.Height;
-          if xfactor > yfactor then
-            begin
-              SmallBmp.Width := round(aGraphic.Width * yfactor);
-              SmallBmp.Height := round(aGraphic.Height * yfactor);
-            end else
-            begin
-              SmallBmp.Width := round(aGraphic.Width * xfactor);
-              SmallBmp.Height := round(aGraphic.Height * xfactor);
-            end;
+              BigBmp.Assign(aGraphic);
 
-          SetStretchBltMode(SmallBmp.Canvas.Handle, HALFTONE);
-          StretchBlt(SmallBmp.Canvas.Handle, 0 ,0, SmallBmp.Width, SmallBmp.Height, BigBmp.Canvas.Handle, 0, 0, BigBmp.Width, BigBmp.Height, SRCCopy);
-          aJpg := TJpegImage.Create;
-          aJpg.CompressionQuality := 90;
-          aJpg.Assign(Smallbmp);
-          try
-              aStream := TFileStream.Create(dest, fmCreate or fmOpenWrite);
+
+              xfactor:= (W) / aGraphic.Width;
+              yfactor:= (H) / aGraphic.Height;
+              if xfactor > yfactor then
+                begin
+                  SmallBmp.Width := round(aGraphic.Width * yfactor);
+                  SmallBmp.Height := round(aGraphic.Height * yfactor);
+                end else
+                begin
+                  SmallBmp.Width := round(aGraphic.Width * xfactor);
+                  SmallBmp.Height := round(aGraphic.Height * xfactor);
+                end;
+
+              SetStretchBltMode(SmallBmp.Canvas.Handle, HALFTONE);
+              StretchBlt(SmallBmp.Canvas.Handle, 0 ,0, SmallBmp.Width, SmallBmp.Height, BigBmp.Canvas.Handle, 0, 0, BigBmp.Width, BigBmp.Height, SRCCopy);
+              aJpg := TJpegImage.Create;
               try
-                aJpg.SaveToStream(aStream);
+                  aJpg.CompressionQuality := 90;
+                  aJpg.Assign(Smallbmp);
+                  try
+                      aStream := TFileStream.Create(dest, fmCreate or fmOpenWrite);
+                      try
+                        aJpg.SaveToStream(aStream);
+                      finally
+                        aStream.free;
+                      end;
+                  except
+                      // silent Exception. Cover-Saving failed.
+                      if FileExists(dest) then DeleteFile(dest);
+                          result := False;
+                  end;
               finally
-                aStream.free;
+                  aJpg.Free;
               end;
-          except
-              // silent Exception. Cover-Saving failed.
           end;
-
-          aJpg.Free;
+      except
+        if FileExists(dest) then DeleteFile(dest);
+            result := False;
       end;
-  except
-    if FileExists(dest) then DeleteFile(dest);
-    result := False;
+  finally
+      SmallBmp.Free;
+      BigBmp.Free;
   end;
-  SmallBmp.Free;
-  BigBmp.Free;
 end;
 
 function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
@@ -718,13 +723,15 @@ begin
             //fCaption := (aCover.Artist) + #13#10 + (aCover.Album) ;// + ' --- ' + aCover.ID;
             if FileExists(aDir + aCoverID + '.jpg') then
             begin
-                  //aStream := TFileStream.Create(CoverSavePath  + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
+                //aStream := TFileStream.Create(CoverSavePath  + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
                 aJpg := TJpegImage.Create;
                 try
-                  aJpg.LoadFromFile(aDir  + aCoverID + '.jpg');
-                  aCoverBmp.Assign(aJpg);
-                  //aStream.free;
-
+                    try
+                        aJpg.LoadFromFile(aDir  + aCoverID + '.jpg');
+                        aCoverBmp.Assign(aJpg);
+                    except
+                        GetDefaultCover(dcError, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+                    end;
                 finally
                   aJpg.Free;
                 end;
