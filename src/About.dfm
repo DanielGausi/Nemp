@@ -87,6 +87,10 @@ object AboutForm: TAboutForm
         '[url="http://www.delphipraxis.net/topic150591.html"]Windows 7 Co' +
         'ntrols for Delphi[/url]'
       ''
+      
+        '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
+        'l] by Mat'#237'as Andr'#233's Moreno'
+      ''
       '[url="http://www.last.fm/api/intro"]The LastFM API[/url]'
       ''
       '[url="http://www.madshi.net/"]MadExcept[/url] by Mathias Rauen'
