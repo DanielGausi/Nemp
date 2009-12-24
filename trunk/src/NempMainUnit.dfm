@@ -2275,7 +2275,7 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
           TabOrder = 0
-          TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
+          TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
