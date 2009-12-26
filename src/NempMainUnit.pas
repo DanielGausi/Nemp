@@ -2412,7 +2412,8 @@ begin
               filename := '';
         end;
       end;
-  end;
+  end else
+      PlayPauseBtn.Click;
 
   if Not Enqueue then
   begin
@@ -2626,8 +2627,9 @@ var IncomingPChar:PChar;
     mode: Integer;
 begin
   if (MsG.CopyDataStruct.dwData = SecondInstMsgId) AND (SecondInstMsgId <> 0) then
-                  ProcessCommandline(Msg.CopyDataStruct.lpData, False) // False: Nicht Play
-
+  begin
+      ProcessCommandline(Msg.CopyDataStruct.lpData, False) // False: Nicht Play
+  end;
   ;//else
 
   if NOT AcceptApiCommands then inherited
