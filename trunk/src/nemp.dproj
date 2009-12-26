@@ -141,6 +141,14 @@
 			</DCCReference>
 			<DCCReference Include="PostProcessorUtils.pas"/>
 			<DCCReference Include="RatingCtrls.pas"/>
+			<RcItem Include="playlist_3248_ohneAlpha.ico">
+				<ResourceType>Icon</ResourceType>
+				<ResourceId>Icon_2</ResourceId>
+			</RcItem>
+			<RcItem Include="Nemp32_48_ohneAlpha.ico">
+				<ResourceType>Icon</ResourceType>
+				<ResourceId>Icon_1</ResourceId>
+			</RcItem>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -173,7 +181,7 @@
 						<VersionInfo Name="MajorVer">3</VersionInfo>
 						<VersionInfo Name="MinorVer">9</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">319</VersionInfo>
+						<VersionInfo Name="Build">322</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -185,7 +193,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">3.9.0.319</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">3.9.0.322</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2009, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>

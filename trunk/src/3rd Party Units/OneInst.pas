@@ -131,6 +131,8 @@ begin
     Dat.lpData := ParamStrToBlob(Dat.cbData);
     SendMessage(Wnd, WM_COPYDATA, 0, LPARAM(@Dat));
     FreeMemory(Dat.lpData);
+
+
   end;
 end;
 

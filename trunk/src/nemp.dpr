@@ -6,14 +6,14 @@ program nemp;
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
 
+{$R *.dres}
+
 uses
-  {$ifdef madExcept}
   madExcept,
   madLinkDisAsm,
   madListHardware,
   madListProcesses,
   madListModules,
-  {$endif}
   OneInst in '3rd Party Units\OneInst.pas',
   gnuGettext,
   Forms,
