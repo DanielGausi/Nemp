@@ -267,10 +267,16 @@ procedure TNempCoverFlow.fSetCurrentItem(aValue: Integer);
 begin
     //if (aValue >= 0) and (aValue <= fCoverList.Count-1) then
     begin
+        if aValue < 0 then
+            aValue := 0;
+        if aValue > fCoverList.Count - 1 then
+            aValue := fCoverList.Count - 1;
+
         case fMode of
             cm_Classic : fClassicFlow.CurrentItem := aValue;
             cm_OpenGL  : fFlyingCow.CurrentItem := aValue;
         end;
+
         fCurrentitem := aValue;
         if (aValue >= 0) and (aValue <= fCoverList.Count-1) then
         begin
