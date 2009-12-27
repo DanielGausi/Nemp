@@ -9392,10 +9392,13 @@ end;
 procedure TNemp_MainForm.CoverScrollbarChange(Sender: TObject);
 var aCover: tNempCover;
 begin
-    MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
+
 
     if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
     begin
+
+        MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
+
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.ID);
 
