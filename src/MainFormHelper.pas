@@ -63,9 +63,15 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure HandleNewConnectedDrive;
 
-    procedure FillTreeView(MP3Liste: TObjectlist; Index:Integer); overload;
-    procedure FillTreeView(aVST: TVirtualStringTree; MP3Liste: TObjectlist); overload;
-    procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile); overload;
+ //   procedure FillTreeView(MP3Liste: TObjectlist; Index:Integer); overload;
+ //   procedure FillTreeView(aVST: TVirtualStringTree; MP3Liste: TObjectlist); overload;
+    procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
+
+    // Fills the TreeView with 2 Lists (used for Quicksearch)
+    procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
+
+    // Fills the TreeView with 2 Lists and re-select previous selected one
+    procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
 
     function GetObjectAt(form: TForm; x,y: integer): TControl;
     function ObjectIsPlaylist(aName:string): Boolean;
@@ -311,7 +317,7 @@ begin
         end;
     end;
 end;
-
+               (*
 procedure FillTreeView(aVST: TVirtualStringTree; MP3Liste: TObjectlist);
 var i,c: integer;
   aNode,CueNode: PVirtualNode;
@@ -352,10 +358,10 @@ begin
         // VDTCoverTimer neu starten
         VDTCoverTimer.Enabled := True;
     end;
-end;
+end;     *)
 
 
-// Diese Prozedur soll aufgerufgen werden, wenn die Liste nach einem
+// Diese Prozedur soll aufgerufen werden, wenn die Liste nach einem
 // Sortieren neu gefüllt wurde. Es existiert ein Node mit Data=AudioFile!!!
 procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
 var i: integer;
@@ -373,7 +379,7 @@ begin
         end;
         VST.EndUpdate;
 
-        if AudioFile = Nil then exit; // z.B. bei leerer Liste!
+     //   if AudioFile = Nil then exit; // z.B. bei leerer Liste!
 
         // Knoten mit AudioFile suchen und focussieren
         NewNode := VST.GetFirst;
@@ -384,9 +390,18 @@ begin
           if tmpAudioFile <> AudioFile then
           repeat
             NewNode := VST.GetNext(NewNode);
-            Data := VST.GetNodeData(NewNode);
-            tmpAudioFile := Data^.FAudioFile;
+            if assigned(NewNode) then
+            begin
+                Data := VST.GetNodeData(NewNode);
+                tmpAudioFile := Data^.FAudioFile;
+            end;
           until (tmpAudioFile = AudioFile) OR (NewNode=NIL);
+
+          // Ok, we didn't found our AudioFile.
+          // get the first one in the list.
+          if not assigned(NewNode) then
+              NewNode := VST.GetFirst;
+
 
           if assigned(Newnode) then // Nur zur Sicherheit!
           begin
@@ -398,12 +413,78 @@ begin
         end
           else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+
+        // VDTCoverTimer neu starten
+        VDTCoverTimer.Enabled := True;
     end;
 end;
 
+procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
+var i: integer;
+begin
+    with Nemp_MainForm do
+    begin
+        VST.BeginUpdate;
+        VST.Clear;
+        for i:=0 to List1.Count-1 do
+            AddVSTMp3(VST,Nil,TAudioFile(List1.Items[i]));
+
+        if (List1.Count > 0) and (List2.Count > 0) then
+            AddVSTMp3(VST, NIL, Dummy);
+
+        for i:=0 to List2.Count-1 do
+            AddVSTMp3(VST,Nil,TAudioFile(List2.Items[i]));
+
+        VST.EndUpdate;
+        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+    end;
+end;
+
+procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
+var i: integer;
+  NewNode:PVirtualNode;
+  Data:PTreeData;
+  tmpAudioFile: TAudioFile;
+begin
+    FillTreeViewQuickSearch(List1, List2, Dummy);
+    with Nemp_MainForm do
+    begin
+        if oldFile = Nil then exit;
+
+        // Knoten mit AudioFile suchen und focussieren
+        NewNode := VST.GetFirst;
+        if assigned(Newnode) then
+        begin
+          Data := VST.GetNodeData(NewNode);
+          tmpAudioFile := Data^.FAudioFile;
+          if tmpAudioFile <> oldFile then
+          repeat
+            NewNode := VST.GetNext(NewNode);
+            Data := VST.GetNodeData(NewNode);
+            tmpAudioFile := Data^.FAudioFile;
+          until (tmpAudioFile = oldFile) OR (NewNode=NIL);
+
+          if assigned(Newnode) then // Nur zur Sicherheit!
+          begin
+            VST.Selected[NewNode] := True;
+            VST.FocusedNode := NewNode;
+            AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+          end else
+            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+        end
+          else
+            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+
+    end;
+end;
+
+
+           (*
 // diese Prozedur wird aufgerufen, wenn Knoten entfernt wurden (z.B. bei Kategoriewechsel)
 // Dort soll ein Knoten markiert werden, der an der Stelle steht, an dem das erste markiere File
 // stand.
+// Wow. "Kategoriewechsel" ??? This was something from "Gausis mp3-Verwaltung".
+// A little bit deprecated in dezember 2009
 procedure FillTreeView(MP3Liste: TObjectlist; Index:Integer);
 var i: integer;
   NewNode: PVirtualNode;
@@ -450,7 +531,7 @@ begin
           else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
     end;
-end;
+end;     *)
 
 
 function GetObjectAt(form: TForm; x,y: integer): TControl;

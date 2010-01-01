@@ -391,6 +391,7 @@ HeadSetForm_NoAudioFile = 'Select an audiofile in the main window first.';
 MainForm_NoSearchHistory = 'Previous searchs';
 MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 MainForm_LocalQuickSearch     = 'Quicksearch (current list)';
+MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 
 MainForm_BtnEqualizerPresetsSelect = 'Select';
 MainForm_BtnEqualizerPresetsCustom = 'Custom';

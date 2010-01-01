@@ -298,6 +298,7 @@ type
         // wird generiert über Onchange der Vorauswahl, oder aber von der Such-History
         // Achtung: Auf diese NUR IM VCL-HAUPTTHREAD zugreifen !!
         AnzeigeListe: TObjectList; // Speichert die Liste, die gerade im Tree angezeigt wird.
+        AnzeigeListe2: TObjectList; // Speichert zusätzliche QuickSearch-Resultate.
         // Flag, was für Dateien in der Playlist sind
         // Muss bei jeder Änderung der AnzeigeListe gesetzt werden
         // Zusätzlich dürfen Dateien aus der AnzeigeListe ggf. nicht in andere Listen gehängt werden.
@@ -597,6 +598,8 @@ begin
 
   Alben        := TObjectlist.create(False);
   AnzeigeListe := TObjectlist.create(False);
+  AnzeigeListe2 := TObjectlist.create(False);
+
   AnzeigeShowsPlaylistFiles := False;
 
   BibSearcher := TBibSearcher.Create(aWnd);
@@ -690,6 +693,8 @@ begin
   AlleArtists.Free;
   Alben.Free;
   AnzeigeListe.Free;
+  AnzeigeListe2.Free;
+
   UpdateList.Free;
   PlaylistUpdateList.Free;
   ST_Ordnerlist.Free;
@@ -753,6 +758,7 @@ begin
   AlleArtists.Clear;
   Alben.Clear;
   AnzeigeListe.Clear;
+  AnzeigeListe2.Clear;
   AnzeigeShowsPlaylistFiles := False;
 
   BibSearcher.Clear;
@@ -1250,6 +1256,7 @@ begin
       // Oops. Send Warning to MainWindow
       SendMessage(MainWindowHandle, WM_MedienBib, MB_DuplicateWarning, Integer(pWideChar(TAudioFile(tmpMp3ListePfadSort[i]).Pfad)));
       AnzeigeListe.Clear;
+      AnzeigeListe2.Clear;
       AnzeigeListIsCurrentlySorted := False;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
       // Delete Duplicates
@@ -1570,7 +1577,10 @@ var i: Integer;
 begin
     // Delete DeadFiles from AnzeigeListe
     for i := 0 to DeadFiles.Count - 1 do
+    begin
         AnzeigeListe.Extract(TAudioFile(DeadFiles[i]));
+        AnzeigeListe2.Extract(TAudioFile(DeadFiles[i]));
+    end;
     // Delete DeadFiles from BibSearcher
     BibSearcher.RemoveAudioFilesFromLists(DeadFiles);
 end;
@@ -1965,6 +1975,7 @@ begin
   if StatusBibUpdate <> 0 then exit;
 
   AnzeigeListe.Extract(aAudioFile);
+  AnzeigeListe2.Extract(aAudioFile);
   if AnzeigeShowsPlaylistFiles then
   begin
       PlaylistFiles.Extract(aAudioFile);
@@ -2251,7 +2262,7 @@ begin
       except
           // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
           // => silent exception, as this is done during the search for new files.
-          wuppdi;
+          // wuppdi;
       end;
 
   finally
@@ -2807,6 +2818,7 @@ begin
       // Playlist Datei in PlaylistFiles laden.
       PlaylistFiles.Clear;
       AnzeigeListe.Clear;
+      AnzeigeListe2.Clear;
 
       if FileExists(Album) then
       begin
@@ -2823,6 +2835,7 @@ begin
   if Artist = BROWSE_RADIOSTATIONS then
   begin
       AnzeigeListe.Clear;
+      AnzeigeListe2.Clear;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
   end else
   begin
@@ -2866,6 +2879,7 @@ procedure TMedienBibliothek.GenerateAnzeigeListeFromCoverID(aCoverID: String);
 begin
   AnzeigeListIsCurrentlySorted := False;
 
+  AnzeigeListe2.Clear;
   GetTitelListFromCoverID(AnzeigeListe, aCoverID);
 
   AnzeigeShowsPlaylistFiles := False;
@@ -3067,6 +3081,7 @@ end;
 procedure TMedienBibliothek.SortAnzeigeListe;
 begin
   SortAList(AnzeigeListe);
+  SortAList(AnzeigeListe2);
   AnzeigeListIsCurrentlySorted := True;
 end;
 

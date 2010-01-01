@@ -375,8 +375,8 @@ object Nemp_MainForm: TNemp_MainForm
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
+          Color1 = clPurple
+          Color2 = clGreen
         end
         object TabBtn_CoverFlow: TSkinButton
           Tag = 1
@@ -449,7 +449,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = TABPanelAuswahlClick
           DrawMode = dm_Skin
           NumGlyphsX = 5
-          NumGlyphsY = 2
+          NumGlyphsY = 1
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
@@ -2275,6 +2275,7 @@ object Nemp_MainForm: TNemp_MainForm
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
           TabOrder = 0
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
           TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
@@ -2289,6 +2290,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnEdited = VSTEdited
           OnEditing = VSTEditing
           OnEnter = VSTEnter
+          OnFocusChanging = VSTFocusChanging
           OnGetText = VSTGetText
           OnPaintText = VSTPaintText
           OnGetImageIndex = VSTGetImageIndex
@@ -2297,6 +2299,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnHeaderDblClick = VSTHeaderDblClick
           OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
           OnIncrementalSearch = VSTIncrementalSearch
+          OnInitNode = VSTInitNode
           OnKeyDown = VSTKeyDown
           OnKeyUp = PlaylistVSTKeyUp
           OnMouseMove = VSTMouseMove
@@ -2426,7 +2429,7 @@ object Nemp_MainForm: TNemp_MainForm
         28)
       object EDITFastSearch: TEdit
         Left = 32
-        Top = 2
+        Top = 3
         Width = 194
         Height = 21
         AutoSize = False
@@ -2436,7 +2439,7 @@ object Nemp_MainForm: TNemp_MainForm
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 0
         OnEnter = EDITFastSearchEnter
         OnExit = EDITFastSearchExit
         OnKeyPress = EDITFastSearchKeyPress
@@ -2488,18 +2491,29 @@ object Nemp_MainForm: TNemp_MainForm
         Color1 = clBlack
         Color2 = clBlack
       end
-      object CB_MedienBibGlobalQuickSearch: TCheckBox
-        Left = 209
-        Top = 7
-        Width = 12
-        Height = 12
+      object CB_MedienBibGlobalQuickSearch: TSkinButton
+        Left = 206
+        Top = 6
+        Width = 16
+        Height = 16
         Hint = 
           'Search in whole library (checked) or just in the current list (u' +
           'nchecked)'
+        DoubleBuffered = True
+        ParentDoubleBuffered = False
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 0
+        Spacing = 2
+        TabOrder = 1
         OnClick = CB_MedienBibGlobalQuickSearchClick
+        DrawMode = dm_Skin
+        NumGlyphsX = 1
+        NumGlyphsY = 1
+        GlyphLine = 0
+        CustomRegion = False
+        FocusDrawMode = fdm_Windows
+        Color1 = clWhite
+        Color2 = clWhite
       end
     end
   end

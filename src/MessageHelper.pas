@@ -505,12 +505,14 @@ begin
 
         MB_CheckAnzeigeList: begin
             MedienBib.CleanUpDeadFilesFromVCLLists;
-            FillTreeView(VST, MedienBib.AnzeigeListe);
+            //FillTreeView(VST, MedienBib.AnzeigeListe);
+            FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
         end;
 
         MB_ReFillAnzeigeList: begin
-            FillTreeView(VST, MedienBib.AnzeigeListe);
+            //FillTreeView(VST, MedienBib.AnzeigeListe);
+            FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
             if aMsg.LParam <> 0 then
                 MedienListeStatusLBL.Caption := Warning_FileNotFound
@@ -521,6 +523,7 @@ begin
         MB_ShowSearchResults: begin
             srList := TObjectList(aMsg.LParam);
             MedienBib.AnzeigeListe.Clear;
+            MedienBib.AnzeigeListe2.Clear;
             MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
             for i := 0 to srList.Count - 1 do
             begin
@@ -528,10 +531,34 @@ begin
             end;
             MedienBib.AnzeigeListIsCurrentlySorted := False;
             MedienBib.AnzeigeShowsPlaylistFiles := False;
-            FillTreeView(VST, MedienBib.AnzeigeListe);
+            //FillTreeView(VST, MedienBib.AnzeigeListe);
+            FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
         end;
 
+        MB_GetQuickSearchResults: begin
+            srList := TObjectList(aMsg.LParam);
+            MedienBib.AnzeigeListe.Clear;
+            MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
+            for i := 0 to srList.Count - 1 do
+                MedienBib.AnzeigeListe.Add(srList[i]);
+
+            MedienBib.AnzeigeListIsCurrentlySorted := False;
+            MedienBib.AnzeigeShowsPlaylistFiles := False;
+        end;
+        MB_GetAdditionalQuickSearchResults: begin
+            srList := TObjectList(aMsg.LParam);
+            MedienBib.AnzeigeListe2.Clear;
+            MedienBib.AnzeigeListe2.Capacity := srList.Count + 1;
+            for i := 0 to srList.Count - 1 do
+                MedienBib.AnzeigeListe2.Add(srList[i]);
+        end;
+
+        MB_ShowQuickSearchResults: begin
+            af := TAudioFile(aMsg.LParam); // Should be the Dummy-File from BibSearcher
+            FillTreeViewQuickSearch(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2, af);
+            ShowSummary;
+        end;
 
         MB_ProgressRefresh: begin
             AuswahlStatusLbl.Caption := Format((MediaLibrary_RefreshingFiles), [aMsg.LParam]);

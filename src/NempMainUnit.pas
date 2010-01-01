@@ -663,7 +663,7 @@ type
     AuswahlFillPanel: TNempPanel;
     AuswahlStatusLBL: TLabel;
     MedienBibHeaderPanel: TNempPanel;
-    CB_MedienBibGlobalQuickSearch: TCheckBox;
+    CB_MedienBibGlobalQuickSearch: TSkinButton;
     EDITFastSearch: TEdit;
     MedienlisteFillPanel: TNempPanel;
     MedienListeStatusLBL: TLabel;
@@ -1182,6 +1182,11 @@ type
     procedure PanelCoverBrowseAfterPaint(Sender: TObject);
     procedure VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure VSTHeaderDblClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+    procedure VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
+      Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+    procedure VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
+      NewNode: PVirtualNode; OldColumn, NewColumn: TColumnIndex;
+      var Allowed: Boolean);
 
 
   private
@@ -1614,12 +1619,11 @@ begin
         // MedienBib-Einstellungen laden
         MedienBib.LoadFromIni(Ini);
         CB_MedienBibGlobalQuickSearch.OnClick := Nil;
-        CB_MedienBibGlobalQuickSearch.Checked := MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch;
+//////        CB_MedienBibGlobalQuickSearch.Checked := MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch;
         CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;     //Quicksearch (library)
-        if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-          EditFastSearch.Text := MainForm_GlobalQuickSearch
-        else
-          EditFastSearch.Text := MainForm_LocalQuickSearch;
+
+        EditFastSearch.Text := MainForm_GlobalQuickSearch;
+
         VST.ShowHint := MedienBib.ShowHintsInMedialist;
 
         UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
@@ -2863,16 +2867,25 @@ var aNode: PVirtualNode;
     AudioFile: TAudioFile;
 begin
     VDTCover.Clear;
-    if (MedienBib.AnzeigeListe.Count > 0) then
+
+    aNode := VST.FocusedNode;
+    if Assigned(aNode) then
     begin
-        aNode := VST.FocusedNode;
-        if Assigned(aNode) then
+        Data := VST.GetNodeData(aNode);
+        AudioFile := Data^.FAudioFile;
+    end else
+    begin
+        aNode := VST.GetFirst;
+        if assigned(aNode) then
         begin
             Data := VST.GetNodeData(aNode);
             AudioFile := Data^.FAudioFile;
         end else
-            AudioFile := TAudioFile(MedienBib.AnzeigeListe.Items[0]);
+            AudioFile := Nil;
+    end;
 
+    if assigned(AudioFile) then
+    begin
         aNode := AddVDTCover(VDTCover, Nil, AudioFile, True);
         if VDTCover.Height - Integer(VDTCover.Header.Height) < 240 then
             aNode.NodeHeight := VDTCover.Height - Integer(VDTCover.Header.Height)
@@ -2958,7 +2971,11 @@ begin
   else
     VST.Header.SortDirection := sdDescending;
 
-  FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
+  //FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
+
+  FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2,
+      MedienBib.BibSearcher.DummyAudioFile, oldAudioFile);
+
   VST.Enabled := True;
 end;
 
@@ -2983,6 +3000,7 @@ begin
       begin
         Data := VST.GetNodeData(SelectedMP3s[i]);
         MedienBib.AnzeigeListe.Extract(Data^.FAudioFile);
+        MedienBib.AnzeigeListe2.Extract(Data^.FAudioFile);
       end;
       VST.DeleteSelectedNodes;
     end;
@@ -3409,9 +3427,8 @@ var o: TComponent;
   aNode: PVirtualNode;
   canPlay: Boolean;
 begin
-  if LangeAktionWeitermachen then
-  wuppdi;
-
+  if LangeAktionWeitermachen then   exit;
+  
   o := Screen.ActiveForm.ActiveControl;
   if (o <> NIL) AND ((o.Name = 'VST') or (o.Name = 'TabBtn_Medialib')) then
   begin
@@ -3782,48 +3799,61 @@ procedure TNemp_MainForm.VSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode
   Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
 var Data: PTreeData;
 begin
-  Data:=Sender.GetNodeData(Node);
 
-  case VST.Header.Columns[column].Tag of
-    CON_ARTIST    : begin
-                        if Data^.FAudioFile.isStream then
-                          CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                        else
-                          CellText := Data^.FAudioFile.Artist;
-                    end;
-    CON_TITEL     : begin
-                        if Data^.FAudioFile.isStream then
-                          CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                        else
-                          CellText := Data^.FAudioFile.Titel;
-                    end;
-    CON_ALBUM     : begin
-                        if Data^.FAudioFile.isStream then
-                          CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                        else
-                          CellText := Data^.FAudioFile.Album;
-                    end;
-    CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
-    CON_BITRATE   : CellText := inttostr(Data^.FAudioFile.Bitrate);
-    CON_CBR       : if Data^.FAudioFile.vbr then CellText := 'vbr'
-                    else CellText := 'cbr';
-    CON_MODE            : CellText := Data^.FAudioFile.ChannelModeShort;
-    CON_SAMPLERATE      : CellText := Data^.FAudioFile.SamplerateShort;
-    CON_STANDARDCOMMENT : CellText := Data^.FAudioFile.Comment;
-    CON_FILESIZE  : CellText := FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2);
-    CON_PFAD      : CellText := Data^.FAudioFile.Pfad;
-    CON_ORDNER    : CellText := Data^.FAudioFile.Ordner;
-    CON_DATEINAME : CellText := Data^.FAudioFile.Dateiname;
-    CON_YEAR      : CellText := Data^.FAudioFile.Year;
-    CON_GENRE     : CellText := Data^.FAudioFile.genre;
-    CON_LYRICSEXISTING : if Data^.FAudioFile.LyricsExisting then CellText := ''
-                         else CellText := '';
-    CON_TRACKNR   : CellText := IntToStr(Data^.FAudioFile.Track);
-    CON_RATING    : CellText := '';//IntToStr(Data^.FAudioFile.Rating);//'';//
-    CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
-  else CellText := '';
-  end;
+    if (vsDisabled in Node.States) then
+    begin
 
+    if VST.Header.Columns[column].Position = 0 then
+        Celltext := MainForm_MoreSearchresults
+    else
+        CellText := '';
+    end else
+    begin
+
+        Data:=Sender.GetNodeData(Node);
+
+        case VST.Header.Columns[column].Tag of
+          CON_ARTIST    : begin
+                              if Data^.FAudioFile.isStream then
+                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
+                              else
+                                CellText := Data^.FAudioFile.Artist;
+                          end;
+          CON_TITEL     : begin
+                              if Data^.FAudioFile.isStream then
+                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
+                              else
+                                CellText := Data^.FAudioFile.Titel;
+                          end;
+          CON_ALBUM     : begin
+                              if Data^.FAudioFile.isStream then
+                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
+                              else
+                                CellText := Data^.FAudioFile.Album;
+                          end;
+          CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
+          CON_BITRATE   : CellText := inttostr(Data^.FAudioFile.Bitrate);
+          CON_CBR       : if Data^.FAudioFile.vbr then CellText := 'vbr'
+                          else CellText := 'cbr';
+          CON_MODE            : CellText := Data^.FAudioFile.ChannelModeShort;
+          CON_SAMPLERATE      : CellText := Data^.FAudioFile.SamplerateShort;
+          CON_STANDARDCOMMENT : CellText := Data^.FAudioFile.Comment;
+          CON_FILESIZE  : CellText := FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2);
+          CON_PFAD      : CellText := Data^.FAudioFile.Pfad;
+          CON_ORDNER    : CellText := Data^.FAudioFile.Ordner;
+          CON_DATEINAME : CellText := Data^.FAudioFile.Dateiname;
+          CON_YEAR      : CellText := Data^.FAudioFile.Year;
+          CON_GENRE     : CellText := Data^.FAudioFile.genre;
+          CON_LYRICSEXISTING : if Data^.FAudioFile.LyricsExisting then CellText := ''
+                               else CellText := ' ';
+          CON_TRACKNR   : CellText := IntToStr(Data^.FAudioFile.Track);
+          CON_RATING    : CellText := '     ';//IntToStr(Data^.FAudioFile.Rating);//'';//
+          CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
+        else CellText := ' ';
+        end;
+        // Correct CellText for toAutoSpan to a non-empty-string
+        if CellText = '' then Celltext := ' ';
+    end;
 
 end;
 
@@ -3867,22 +3897,28 @@ procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader;
   HitInfo: TVTHeaderHitInfo);
 var oldAudioFile: TAudioFile;
 begin
-  if HitInfo.Button = mbLeft then
+  if (HitInfo.Button = mbLeft) then
   begin
-      oldAudioFile := GetFocussedAudioFile;
-      VST.Enabled := False;
+      if (HitInfo.Column > -1 ) then
+      begin
+          oldAudioFile := GetFocussedAudioFile;
+          VST.Enabled := False;
 
-      MedienBib.AddSorter(VST.Header.Columns[HitInfo.Column].Tag);
-      VST.Header.SortColumn := HitInfo.Column;
-      if MedienBib.SortParams[0].Direction = sd_Ascending then
-          VST.Header.SortDirection := sdAscending
-      else
-          VST.Header.SortDirection := sdDescending;
+          MedienBib.AddSorter(VST.Header.Columns[HitInfo.Column].Tag);
+          VST.Header.SortColumn := HitInfo.Column;
+          if MedienBib.SortParams[0].Direction = sd_Ascending then
+              VST.Header.SortDirection := sdAscending
+          else
+              VST.Header.SortDirection := sdDescending;
 
-      MedienBib.SortAnzeigeListe;
+          MedienBib.SortAnzeigeListe;
 
-      FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
-      VST.Enabled := true;
+          //FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
+          FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2,
+              MedienBib.BibSearcher.DummyAudioFile, oldAudioFile);
+
+          VST.Enabled := true;
+      end;
   end else
   begin
       VST_ColumnPopup.Popup(
@@ -4056,6 +4092,33 @@ begin
         aString := aAudioFile.Artist;
     end;
     Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+end;
+
+procedure TNemp_MainForm.VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
+  Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+begin
+  if (MedienBib.AnzeigeListe.Count > 0) and (Node.Index = MedienBib.AnzeigeListe.Count) then
+    InitialStates:= [ivsDisabled];
+end;
+
+procedure TNemp_MainForm.VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
+  NewNode: PVirtualNode; OldColumn, NewColumn: TColumnIndex;
+  var Allowed: Boolean);
+var tmpNode: PVirtualNode;
+begin
+    if assigned(NewNode) then
+    begin
+        tmpNode := NewNode;
+
+        if (vsDisabled in NewNode.States) then
+            NewNode := NewNode.NextSibling;
+
+        Allowed:= not (vsDisabled in tmpNode.States);
+
+        //NewNode := tmpNode;
+    end
+    else
+        Allowed := True; // or better false ???
 end;
 
 procedure TNemp_MainForm.VSTKeyDown(Sender: TObject; var Key: Word;
@@ -5746,11 +5809,15 @@ begin
   Data := VST.GetNodeData(aNode);
   aPfad := (Data^.FaudioFile).Ordner;
   if Sender=PM_ML_ExtendedShowAllFilesInDir then
+  begin
     MedienBib.AnzeigeListe.Clear;
+    MedienBib.AnzeigeListe2.Clear;
+  end;
 
   MedienBib.GetFilesInDir(aPfad);
 
-  Filltreeview(VST, MedienBib.AnzeigeListe);
+  //Filltreeview(VST, MedienBib.AnzeigeListe);
+  FillTreeView(MedienBib.AnzeigeListe, Nil);
   ShowSummary;
 end;
 
@@ -5883,7 +5950,8 @@ begin
     exit;
   end;
 
-  MedienBib.anzeigeliste.Clear;
+  MedienBib.Anzeigeliste.Clear;
+  MedienBib.AnzeigeListe2.Clear;
   Medienbib.AnzeigeShowsPlaylistFiles := False;
   VST.Clear;
   MedienBib.ReInitCoverSearch;
@@ -7781,12 +7849,7 @@ begin
     EditFastSearch.Font.Color := clGrayText;
     EditFastSearch.Font.Style := [];
     EditFastSearch.OnChange := Nil;
-
-    if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-        EditFastSearch.Text := MainForm_GlobalQuickSearch
-    else
-      EditFastSearch.Text := MainForm_LocalQuickSearch;
-
+    EditFastSearch.Text := MainForm_GlobalQuickSearch;
     EditFastSearch.OnChange := EDITFastSearchChange;
   end;
 end;
@@ -7809,29 +7872,37 @@ end;
 procedure TNemp_MainForm.CB_MedienBibGlobalQuickSearchClick(
   Sender: TObject);
 begin
-  MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch := CB_MedienBibGlobalQuickSearch.Checked;
+///  MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch := CB_MedienBibGlobalQuickSearch.Checked;
 
+
+    EditFastSearch.Font.Color := clGrayText;
+    EditFastSearch.Font.Style := [];
+    EditFastSearch.OnChange := Nil;
+    EditFastSearch.Text := MainForm_GlobalQuickSearch;
+    EditFastSearch.OnChange := EDITFastSearchChange;
+
+    MedienBib.ShowQuickSearchList;
+{
   if EditFastSearch.Font.Color = clGrayText then
   begin
       EditFastSearch.OnChange := Nil;
-      if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-          EditFastSearch.Text := MainForm_GlobalQuickSearch
-      else
-          EditFastSearch.Text := MainForm_LocalQuickSearch;
+      EditFastSearch.Text := MainForm_GlobalQuickSearch;
       EditFastSearch.OnChange := EDITFastSearchChange;
   end else
   begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
           // Je nach letzte Quicksearch oder alles anzeigen
-          if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-              MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-          else
-              MedienBib.ShowQuickSearchList;
+          //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
+          //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
+          //else
+          MedienBib.ShowQuickSearchList;
       end
       else
           DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
   end;
+
+  }
 end;
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
@@ -7842,9 +7913,9 @@ begin
     if Trim(EDITFastSearch.Text)= '' then
     begin
         // Je nach letzte Quicksearch oder alles anzeigen
-        if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-            MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-        else
+        //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
+        //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
+        //else
             MedienBib.ShowQuickSearchList;
     end
     else
@@ -7859,9 +7930,9 @@ begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
           // Je nach letzte Quicksearch oder alles anzeigen
-          if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-              MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-          else
+          //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
+          //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
+          //else
               MedienBib.ShowQuickSearchList;
       end else
           if Length(Trim(EDITFastSearch.Text)) >= 2 then
@@ -8878,6 +8949,8 @@ procedure TNemp_MainForm.VSTEnter(Sender: TObject);
 begin
   AktiverTree := VST;
 end;
+
+
 
 procedure TNemp_MainForm.RepairZOrder;
 begin
