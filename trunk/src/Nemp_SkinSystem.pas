@@ -1200,6 +1200,7 @@ begin
                         True);
                     ControlButtons[j].GlyphLine := ControlButtons[j].GlyphLine;
                 end;
+
                 AssignNemp3Glyph(
                         AuswahlForm.CloseImage,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
@@ -1218,6 +1219,9 @@ begin
 
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
+
+                AssignNemp3Glyph(CB_MedienBibGlobalQuickSearch,  Path + '\BtnQuickSearch', True);
+                CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
 
                 AssignSkinTabGlyphs;
             end;
@@ -2198,13 +2202,25 @@ begin
                 ControlButtons[b].GlyphLine := ControlButtons[b].GlyphLine;
                 ControlButtons[b].RePaint;
             end;
-            DirectionPositionBTN  .drawMode := dm_Windows;
+            DirectionPositionBTN .drawMode := dm_Windows;
             DirectionPositionBTN .NumGlyphs := 1;
             DirectionPositionBTN.NempGlyph.Assign(Nil);
             LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnReverse', True);
             DirectionPositionBTN.NempGlyph.Assign(tmpBitmap);
             DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
             DirectionPositionBTN.Refresh;
+
+
+            CB_MedienBibGlobalQuickSearch .drawMode := dm_Windows;
+            CB_MedienBibGlobalQuickSearch.NumGlyphsX := 1;
+            CB_MedienBibGlobalQuickSearch .NumGlyphs := 1;
+            CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnQuickSearch', True);
+            CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(tmpBitmap);
+            CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
+            CB_MedienBibGlobalQuickSearch.Refresh;
+
+
 
             LoadGraphicFromBaseName(tmpBitmap, BaseDir + DefaultButtonData[ctrlCloseBtn].Name, True);
             AuswahlForm.CloseImage.NempGlyph.Assign(tmpBitmap);

@@ -335,6 +335,14 @@ const
     MB_SearchAutoAbort = 12;
     // Show search results. lParam contains a Pointer to the result-list
     MB_ShowSearchResults = 13;
+    // Show Quicksearch-results
+    // Two Steps: Results from "QuickSearchList" and "Additional results"
+    MB_GetQuickSearchResults = 25;
+    MB_GetAdditionalQuickSearchResults = 26;
+    MB_ShowQuickSearchResults  = 27;
+
+
+
     MB_DeadFilesWarning = 14;
     // Warnung: Duplikate in der Bib gefunden. Das sollte eigentlich nicht mehr vorkommen
     MB_DuplicateWarning = 15;

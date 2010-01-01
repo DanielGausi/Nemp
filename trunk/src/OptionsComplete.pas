@@ -2241,7 +2241,7 @@ begin
       NempCharCodeOptions.AlwaysWriteUnicode := CBAlwaysWriteUnicode.Checked;
   end;
 
-  if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, 1);
+  if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
   if ReDrawPlaylistTree then
   begin
     NempPlaylist.FillPlaylistView;
