@@ -247,7 +247,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnFocusChanged = ArtistsVSTFocusChanged
             OnGetText = StringVSTGetText
             OnPaintText = ArtistsVSTPaintText
-            OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
             OnIncrementalSearch = ArtistsVSTIncrementalSearch
             OnKeyDown = StringVSTKeyDown
             OnResize = ArtistsVSTResize
@@ -303,7 +302,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnFocusChanged = AlbenVSTFocusChanged
             OnGetText = StringVSTGetText
             OnPaintText = ArtistsVSTPaintText
-            OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
             OnIncrementalSearch = ArtistsVSTIncrementalSearch
             OnKeyDown = StringVSTKeyDown
             OnResize = AlbenVSTResize
@@ -2198,6 +2196,7 @@ object Nemp_MainForm: TNemp_MainForm
     Height = 253
     Align = alClient
     BevelOuter = bvNone
+    Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
     object GRPBOXVST: TNempPanel
@@ -2228,18 +2227,19 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 0
         OwnerDraw = False
         object Splitter4: TSplitter
-          Left = 250
+          Left = 400
           Top = 0
           Width = 4
           Height = 215
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
+          ExplicitLeft = 250
           ExplicitHeight = 175
         end
         object VST: TVirtualStringTree
-          Left = 254
+          Left = 404
           Top = 0
-          Width = 583
+          Width = 433
           Height = 215
           Align = alClient
           BevelInner = bvNone
@@ -2364,50 +2364,198 @@ object Nemp_MainForm: TNemp_MainForm
               Position = 18
             end>
         end
-        object VDTCover: TVirtualDrawTree
+        object VDTCover: TNempPanel
+          Tag = 3
           Left = 0
           Top = 0
-          Width = 250
+          Width = 400
           Height = 215
           Align = alLeft
-          BevelInner = bvNone
           BevelOuter = bvNone
-          BorderStyle = bsNone
           Constraints.MinWidth = 20
-          DefaultNodeHeight = 240
-          Header.AutoSizeIndex = 0
-          Header.Background = clWindow
-          Header.DefaultHeight = 17
-          Header.Font.Charset = DEFAULT_CHARSET
-          Header.Font.Color = clWindowText
-          Header.Font.Height = -11
-          Header.Font.Name = 'Tahoma'
-          Header.Font.Style = []
-          Header.Options = [hoDrag, hoVisible]
-          Header.Style = hsXPStyle
-          Indent = 0
-          Margin = 0
           PopupMenu = Medialist_PopupMenu
-          ScrollBarOptions.ScrollBars = ssNone
           TabOrder = 1
-          TabStop = False
-          TreeOptions.MiscOptions = [toAcceptOLEDrop, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
-          TreeOptions.PaintOptions = [toHideFocusRect, toHideSelection, toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-          TreeOptions.SelectionOptions = [toDisableDrawSelection, toSimpleDrawSelection]
-          OnAdvancedHeaderDraw = VDTCoverAdvancedHeaderDraw
-          OnDrawNode = VDTCoverDrawNode
-          OnFreeNode = VDTCoverFreeNode
-          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnClick = VDTCoverClick
           OnResize = VDTCoverResize
-          Columns = <
-            item
-              Margin = 0
-              Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coShowDropMark, coVisible]
-              Position = 0
-              Spacing = 0
-              Width = 250
-              WideText = 'Cover'
-            end>
+          OnPaint = PanelPaint
+          OwnerDraw = False
+          ExplicitLeft = -2
+          object ImgDetailCover: TImage
+            Left = 2
+            Top = 2
+            Width = 150
+            Height = 150
+            Center = True
+            Proportional = True
+            Stretch = True
+            OnClick = VDTCoverClick
+          end
+          object LblBibArtist: TLabel
+            Left = 158
+            Top = 2
+            Width = 65
+            Height = 13
+            Caption = 'LblBibArtist'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibTitle: TLabel
+            Tag = 1
+            Left = 158
+            Top = 21
+            Width = 58
+            Height = 13
+            Caption = 'LblBibTitle'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibAlbum: TLabel
+            Tag = 2
+            Left = 158
+            Top = 40
+            Width = 56
+            Height = 13
+            Caption = 'LblBibAlbum'
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibYear: TLabel
+            Tag = 4
+            Left = 158
+            Top = 78
+            Width = 49
+            Height = 13
+            Caption = 'LblBibYear'
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibTrack: TLabel
+            Tag = 3
+            Left = 158
+            Top = 59
+            Width = 53
+            Height = 13
+            Caption = 'LblBibTrack'
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibGenre: TLabel
+            Tag = 5
+            Left = 158
+            Top = 97
+            Width = 56
+            Height = 13
+            Caption = 'LblBibGenre'
+            ShowAccelChar = False
+            OnClick = LblBibArtistClick
+          end
+          object LblBibDuration: TLabel
+            Left = 158
+            Top = 116
+            Width = 68
+            Height = 13
+            Caption = 'LblBibDuration'
+            ShowAccelChar = False
+          end
+          object LblBibQuality: TLabel
+            Left = 158
+            Top = 135
+            Width = 61
+            Height = 13
+            Caption = 'LblBibQuality'
+            ShowAccelChar = False
+          end
+          object ImgBibRating: TImage
+            Left = 158
+            Top = 154
+            Width = 70
+            Height = 14
+            Transparent = True
+            OnMouseDown = ImgBibRatingMouseDown
+            OnMouseLeave = ImgBibRatingMouseLeave
+            OnMouseMove = ImgBibRatingMouseMove
+          end
+          object EdtBibArtist: TEdit
+            Left = 244
+            Top = 2
+            Width = 121
+            Height = 21
+            TabOrder = 0
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
+          object EdtBibAlbum: TEdit
+            Tag = 2
+            Left = 244
+            Top = 53
+            Width = 121
+            Height = 21
+            TabOrder = 1
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
+          object EdtBibTitle: TEdit
+            Tag = 1
+            Left = 244
+            Top = 29
+            Width = 121
+            Height = 21
+            TabOrder = 2
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
+          object EdtBibYear: TEdit
+            Tag = 4
+            Left = 244
+            Top = 107
+            Width = 121
+            Height = 21
+            NumbersOnly = True
+            TabOrder = 3
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
+          object EdtBibTrack: TEdit
+            Tag = 3
+            Left = 244
+            Top = 80
+            Width = 121
+            Height = 21
+            NumbersOnly = True
+            TabOrder = 4
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
+          object EdtBibGenre: TComboBox
+            Tag = 5
+            Left = 244
+            Top = 134
+            Width = 150
+            Height = 21
+            ItemHeight = 13
+            Sorted = True
+            TabOrder = 5
+            Visible = False
+            OnExit = EdtBibArtistExit
+            OnKeyPress = EdtBibArtistKeyPress
+          end
         end
       end
     end
@@ -3781,8 +3929,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object DragDropTimer: TTimer
     OnTimer = DragDropTimerTimer
-    Left = 24
-    Top = 624
+    Left = 432
+    Top = 672
   end
   object SleepTimer: TTimer
     Enabled = False
@@ -4487,8 +4635,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 250
     OnTimer = VDTCoverTimerTimer
-    Left = 28
-    Top = 569
+    Left = 436
+    Top = 617
   end
   object dwTaskbarThumbnails1: TdwTaskbarThumbnails
     Images = MenuImages
@@ -4509,8 +4657,8 @@ object Nemp_MainForm: TNemp_MainForm
         Tag = 3
       end>
     OnThumbnailClick = dwTaskbarThumbnails1ThumbnailClick
-    Left = 552
-    Top = 616
+    Left = 560
+    Top = 632
   end
   object PlayListOpenDialog: TOpenDialog
     Filter = 
@@ -4553,7 +4701,7 @@ object Nemp_MainForm: TNemp_MainForm
   object Medialist_PopupMenu: TPopupMenu
     Images = MenuImages
     OnPopup = Medialist_PopupMenuPopup
-    Left = 280
+    Left = 456
     Top = 568
     object PM_ML_Play: TMenuItem
       Caption = 'Play (and clear current playlist)'
@@ -5845,7 +5993,7 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object VST_ColumnPopup: TPopupMenu
     OnPopup = VST_ColumnPopupPopup
-    Left = 380
+    Left = 532
     Top = 569
     object N58: TMenuItem
       Caption = '-'
@@ -5978,7 +6126,7 @@ object Nemp_MainForm: TNemp_MainForm
     Hint = 'Nemp - Noch ein mp3-Player'
     PopupMenu = TNAMenu
     OnClick = NempTrayIconClick
-    Left = 632
-    Top = 608
+    Left = 672
+    Top = 632
   end
 end

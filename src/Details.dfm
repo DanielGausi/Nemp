@@ -566,7 +566,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -1188,7 +1188,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbPicturesChange
         end

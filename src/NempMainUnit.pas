@@ -64,7 +64,7 @@ uses
   dwTaskbarComponents, dwTaskbarThumbnails,
   UpdateUtils, uDragFilesSrc,
 
-  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass;
+  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls;
 
 type
 
@@ -154,7 +154,7 @@ type
     VSTSubPanel: TNempPanel;
     VST: TVirtualStringTree;
     Splitter4: TSplitter;
-    VDTCover: TVirtualDrawTree;
+    VDTCover: TNempPanel;
     VDTCoverTimer: TTimer;
     dwTaskbarThumbnails1: TdwTaskbarThumbnails;
     TabBtn_Nemp: TSkinButton;
@@ -715,6 +715,22 @@ type
     PM_P_PartyMode: TMenuItem;
     TabBtn_TagCloud: TSkinButton;
     MM_O_PartyMode: TMenuItem;
+    ImgDetailCover: TImage;
+    LblBibArtist: TLabel;
+    LblBibTitle: TLabel;
+    LblBibAlbum: TLabel;
+    LblBibYear: TLabel;
+    LblBibTrack: TLabel;
+    LblBibGenre: TLabel;
+    LblBibDuration: TLabel;
+    LblBibQuality: TLabel;
+    ImgBibRating: TImage;
+    EdtBibArtist: TEdit;
+    EdtBibAlbum: TEdit;
+    EdtBibTitle: TEdit;
+    EdtBibYear: TEdit;
+    EdtBibTrack: TEdit;
+    EdtBibGenre: TComboBox;
 
     procedure FormCreate(Sender: TObject);
 
@@ -828,6 +844,7 @@ type
     procedure SlideBarButtonStartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure ShowPlayerDetails(aAudioFile: TAudioFile);
+    procedure ShowVSTDetails(aAudioFile: TAudioFile);
     procedure VolButtonStartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure PM_PL_DeleteAllClick(Sender: TObject);
@@ -1078,15 +1095,15 @@ type
     procedure MM_ML_ResetRatingsClick(Sender: TObject);
     procedure Player_PopupMenuPopup(Sender: TObject);
     procedure VST_ColumnPopupPopup(Sender: TObject);
-    procedure VDTCoverDrawNode(Sender: TBaseVirtualTree;
-      const PaintInfo: TVTPaintInfo);
-    procedure VDTCoverFreeNode(Sender: TBaseVirtualTree;
-      Node: PVirtualNode);
-    procedure VDTCoverAdvancedHeaderDraw(Sender: TVTHeader;
-      var PaintInfo: THeaderPaintInfo;
-      const Elements: THeaderPaintElements);
-    procedure VDTCoverResize(Sender: TObject);
-    procedure VDTCoverHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+//    procedure VDTCoverDrawNode(Sender: TBaseVirtualTree;
+//      const PaintInfo: TVTPaintInfo);
+//    procedure VDTCoverFreeNode(Sender: TBaseVirtualTree;
+//      Node: PVirtualNode);
+//    procedure VDTCoverAdvancedHeaderDraw(Sender: TVTHeader;
+//      var PaintInfo: THeaderPaintInfo;
+//      const Elements: THeaderPaintElements);
+//    procedure VDTCoverResize(Sender: TObject);
+//    procedure VDTCoverHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure Splitter4CanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
 
@@ -1187,6 +1204,23 @@ type
     procedure VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
       NewNode: PVirtualNode; OldColumn, NewColumn: TColumnIndex;
       var Allowed: Boolean);
+    procedure VDTCoverResize(Sender: TObject);
+    procedure ImgBibRatingMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure ImgBibRatingMouseLeave(Sender: TObject);
+    procedure ImgBibRatingMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure LblBibArtistClick(Sender: TObject);
+
+    procedure FillBibDetailLabels(aAudioFile: TAudioFile);
+    procedure AdjustEditToLabel(aEdit: TControl; aLabel: TLabel);
+    procedure ShowLabelAgain(aEdit: TControl; aLabel: TLabel);
+    function GetCorrespondingEdit(aLabel: TLabel): TControl;
+    function GetCorrespondingLabel(aEdit: TControl): TLabel;
+
+    procedure EdtBibArtistExit(Sender: TObject);
+    procedure EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
+    procedure VDTCoverClick(Sender: TObject);
 
 
   private
@@ -1288,6 +1322,8 @@ type
 
     AktiverTree: TVirtualStringTree;
     AlphaBlendBMP: TBitmap;
+
+    BibRatingHelper: TRatingHelper;
 
     procedure MinimizeNemp(Sender: TObject);
     procedure DeactivateNemp(Sender: TObject);
@@ -1429,10 +1465,9 @@ begin
     Decimalseparator := '.';
     DragAcceptFiles (Handle, True);
     LangeAktionWeitermachen := False;
-//deleted Oktober, 9, 2008    myFolder := GetShellFolder(CSIDL_PERSONAL);
     VST.NodeDataSize := SizeOf(TTreeData);
 
-    VDTCover.NodeDataSize := SizeOf(TCoverTreeData);
+////    VDTCover.NodeDataSize := SizeOf(TCoverTreeData);
 
     ArtistsVST.NodeDataSize := SizeOf(TStringTreeData);
     ALbenVST.NodeDataSize := SizeOf(TStringTreeData);
@@ -1550,6 +1585,7 @@ begin
     NempPlaylist.Player := NempPlayer;
     NempPlaylist.MainWindowHandle := Handle;
 
+    BibRatingHelper := TRatingHelper.Create;
     MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
@@ -2078,6 +2114,8 @@ begin
   NempWebServer := TNempWebServer.Create(Nemp_MainForm.Handle);
   NempWebServer.SavePath := SavePath;
   NempWebServer.CoverSavePath := MedienBib.CoverSavePath;
+
+  EdtBibGenre.Items := Genres;
   //NempWebServer.LoadfromIni;
   // Das war hier wegen. ServerAutoActivate.
   // Aber: Das sollte eine Eigenschaft der MedienBib sein
@@ -2866,7 +2904,7 @@ var aNode: PVirtualNode;
     Data: PTreeData;
     AudioFile: TAudioFile;
 begin
-    VDTCover.Clear;
+   { VDTCover.Clear;
 
     aNode := VST.FocusedNode;
     if Assigned(aNode) then
@@ -2892,7 +2930,10 @@ begin
         else
             aNode.NodeHeight := 240;
     end;
+    }
 end;
+
+
 
 procedure TNemp_MainForm.VDTCoverTimerTimer(Sender: TObject);
 begin
@@ -3929,7 +3970,7 @@ begin
 end;
 
 
-procedure TNemp_MainForm.VDTCoverHeaderClick(Sender: TVTHeader;
+(*procedure TNemp_MainForm.VDTCoverHeaderClick(Sender: TVTHeader;
   HitInfo: TVTHeaderHitInfo);
 begin
   if HitInfo.Button = mbRight then
@@ -3939,7 +3980,7 @@ begin
       VDTCover.ClientToScreen(Point(HitInfo.x,HitInfo.y)).Y
       );
   end;
-end;
+end;  *)
 
 procedure TNemp_MainForm.MM_ML_SortAscendingClick(Sender: TObject);
 begin
@@ -4304,7 +4345,6 @@ var c,i:integer;
 begin
 
   VDTCoverTimer.Enabled := False;
-  VDTCover.Clear;
 
   c := VST.SelectedCount;
   SelectedMP3s := VST.GetSortedSelection(False);
@@ -4344,18 +4384,293 @@ begin
           AudioFile.FileIsPresent := FileExists(AudioFile.Pfad);
           VST.InvalidateNode(aNode);
       end;
+
+      ShowVSTDetails(AudioFile);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
 
-      aNode := AddVDTCover(VDTCover, Nil, AudioFile);
+
+
+    {  aNode := AddVDTCover(VDTCover, Nil, AudioFile);
       if VDTCover.Height - Integer(VDTCover.Header.Height) < 240 then
           aNode.NodeHeight := VDTCover.Height - Integer(VDTCover.Header.Height)
       else
           aNode.NodeHeight := 240;
-
+}
       VDTCoverTimer.Enabled := True;
   end
 end;
 
+procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
+    function SetString(aString: String; add: String = ''): String;
+    begin
+        if Trim(aString) = '' then
+            result := add + ' N/A'
+        else
+            result := aString;
+    end;
+begin
+    if assigned(aAudioFile) then
+    begin
+        LblBibArtist    .Caption := SetString(aAudioFile.Artist, AudioFileProperty_Artist);
+        LblBibTitle     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
+        LblBibAlbum     .Caption := SetString(aAudioFile.Album, AudioFileProperty_Album);
+        LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
+        LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
+        LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+    end;
+end;
+
+procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile);
+var Coverbmp: TBitmap;
+    tmp: String;
+begin
+  MedienBib.CurrentAudioFile := aAudioFile;
+
+  if aAudioFile = NIL then exit;
+
+  FillBibDetailLabels(aAudioFile);
+
+  EdtBibArtist    .Text := aAudioFile.Artist;
+  EdtBibTitle     .Text := aAudioFile.Titel;
+  EdtBibAlbum     .Text := aAudioFile.Album;
+  EdtBibTrack     .Text := IntToStr(aAudioFile.Track);
+  EdtBibYear      .Text := aAudioFile.Year;
+  if Trim(aAudioFile.Genre) = '' then
+      EdtBibGenre     .Text := 'Other'
+  else
+      EdtBibGenre     .Text := aAudioFile.Genre;
+
+  LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
+                            + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
+
+  if aAudioFile.vbr then
+      tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
+  else
+      tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
+  LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
+
+  BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+
+  // Get Cover
+  Coverbmp := tBitmap.Create;
+  try
+      Coverbmp.Width := 250;
+      Coverbmp.Height := 250;
+
+      // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
+      if GetCover(aAudioFile, Coverbmp) then
+      begin
+          ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
+          ImgDetailCover.Refresh;
+      end;
+  finally
+      Coverbmp.Free;
+  end;
+end;
+
+procedure TNemp_MainForm.VDTCoverClick(Sender: TObject);
+begin
+    // Disable Editing
+    ShowLabelAgain(EdtBibArtist, GetCorrespondingLabel(EdtBibArtist));
+    ShowLabelAgain(EdtBibTitle , GetCorrespondingLabel(EdtBibTitle ));
+    ShowLabelAgain(EdtBibAlbum , GetCorrespondingLabel(EdtBibAlbum ));
+    ShowLabelAgain(EdtBibTrack , GetCorrespondingLabel(EdtBibTrack ));
+    ShowLabelAgain(EdtBibYear  , GetCorrespondingLabel(EdtBibYear  ));
+    ShowLabelAgain(EdtBibGenre , GetCorrespondingLabel(EdtBibGenre ));
+end;
+
+procedure TNemp_MainForm.VDTCoverResize(Sender: TObject);
+var dim: Integer;
+begin
+    // Compute better Imagesize
+    if VDTCover.Height < VDTCover.Width - 100 then
+        dim := VDTCover.Height
+    else
+        dim := VDTCover.Width - 100;
+
+    if dim > 250 then
+        dim := 250;
+
+    ImgDetailCover.Width  := dim;
+    ImgDetailCover.Height := dim;
+
+    LblBibArtist  .left := dim + 8;
+    LblBibTitle   .left := dim + 8;
+    LblBibAlbum   .left := dim + 8;
+    LblBibTrack   .left := dim + 8;
+    LblBibYear    .left := dim + 8;
+    LblBibGenre   .left := dim + 8;
+    LblBibDuration.left := dim + 8;
+    LblBibQuality .left := dim + 8;
+    ImgBibRating  .left := dim + 8;
+
+    // Disable Editing
+    ShowLabelAgain(EdtBibArtist, GetCorrespondingLabel(EdtBibArtist));
+    ShowLabelAgain(EdtBibTitle , GetCorrespondingLabel(EdtBibTitle ));
+    ShowLabelAgain(EdtBibAlbum , GetCorrespondingLabel(EdtBibAlbum ));
+    ShowLabelAgain(EdtBibTrack , GetCorrespondingLabel(EdtBibTrack ));
+    ShowLabelAgain(EdtBibYear  , GetCorrespondingLabel(EdtBibYear  ));
+    ShowLabelAgain(EdtBibGenre , GetCorrespondingLabel(EdtBibGenre ));
+end;
+
+procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if Button = mbLeft  then
+        if Assigned(MedienBib.CurrentAudioFile) then
+        begin
+            MedienBib.CurrentAudioFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+            MedienBib.Changed := True;
+            // Set this rating in all copies of the file in the Playlist
+            NempPlaylist.UnifyRating(MedienBib.CurrentAudioFile.Pfad, MedienBib.CurrentAudioFile.Rating);
+            VST.Invalidate;
+        end;
+end;
+
+procedure TNemp_MainForm.ImgBibRatingMouseLeave(Sender: TObject);
+var aNode: PVirtualNode;
+    Data: PTreeData;
+    AudioFile: TAudioFile;
+begin
+    //aNode := VST.FocusedNode;
+    if Assigned(MedienBib.CurrentAudioFile) then
+    //begin
+    //    Data := VST.GetNodeData(aNode);
+    //    AudioFile := Data^.FAudioFile;
+        BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height)
+    //end
+    else
+        BibRatingHelper.DrawRatingInStarsOnBitmap(128, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+end;
+
+procedure TNemp_MainForm.ImgBibRatingMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var rat: Integer;
+begin
+  // draw stars according to current mouse position
+  rat := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+  BibRatingHelper.DrawRatingInStarsOnBitmap(rat, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+end;
+
+
+// Show the corresponding TEdit and set the Caption
+procedure TNemp_MainForm.AdjustEditToLabel(aEdit: TControl; aLabel: TLabel);
+var w: Integer;
+begin
+    aEdit.Top := aLabel.Top - 4;
+    aEdit.Left := aLabel.Left - 4;
+
+    // Necessary here: (Re)Set aEdit.Text
+    if Assigned(MedienBib.CurrentAudioFile) then
+    begin
+        EdtBibArtist    .Text := MedienBib.CurrentAudioFile.Artist;
+        EdtBibTitle     .Text := MedienBib.CurrentAudioFile.Titel;
+        EdtBibAlbum     .Text := MedienBib.CurrentAudioFile.Album;
+        EdtBibTrack     .Text := IntToStr(MedienBib.CurrentAudioFile.Track);
+        EdtBibYear      .Text := MedienBib.CurrentAudioFile.Year;
+        if Trim(MedienBib.CurrentAudioFile.Genre) = '' then
+            EdtBibGenre     .Text := 'Other'
+        else
+            EdtBibGenre     .Text := MedienBib.CurrentAudioFile.Genre;
+    end;
+
+    if (aEdit is TComboBox) then
+        w := 150
+    else
+    begin
+        w := aLabel.Width + 14;
+        if w < 150 then
+            w := 150;
+    end;
+
+    if w + aEdit.Left > VDTCover.Width then
+        w := VDTCover.Width - aEdit.Left;
+    aEdit.Width := w;
+
+    aLabel.Visible := False;
+    aEdit.Visible := True;
+
+    if (aEdit is TEdit) then
+        (aEdit as TEdit).SetFocus;
+    if (aEdit is TComboBox) then
+        (aEdit as TComboBox).SetFocus;
+end;
+
+// Show the Label, Hide the Edit. Do not Change AudioFile-Information
+procedure TNemp_MainForm.ShowLabelAgain(aEdit: TControl; aLabel: TLabel);
+begin
+    aLabel.Visible := True;
+    LblBibGenre.Visible := True;
+    aEdit.Visible := False;
+end;
+
+function TNemp_MainForm.GetCorrespondingEdit(aLabel: TLabel): TControl;
+begin
+    case aLabel.Tag of
+        0: Result := EdtBibArtist;
+        1: Result := EdtBibTitle;
+        2: Result := EdtBibAlbum;
+        3: Result := EdtBibTrack;
+        4: Result := EdtBibYear;
+        5: Result := EdtBibGenre;
+    else
+         Result := EdtBibArtist;
+    end;
+end;
+function TNemp_MainForm.GetCorrespondingLabel(aEdit: TControl): TLabel;
+begin
+    case aEdit.Tag of
+        0: Result := LblBibArtist;
+        1: Result := LblBibTitle;
+        2: Result := LblBibAlbum;
+        3: Result := LblBibTrack;
+        4: Result := LblBibYear;
+        5: Result := LblBibGenre;
+    else
+         Result := LblBibArtist;
+    end;
+end;
+
+// OnLblClick  : Show the Edit
+// OnEditExit  : Show the Label again, do not Change Information
+// OnKeyEscape : Show the Label again, do not Change Information
+// OnKeyEnter  : Show the Label again, update the Information
+procedure TNemp_MainForm.LblBibArtistClick(Sender: TObject);
+begin
+    AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
+end;
+procedure TNemp_MainForm.EdtBibArtistExit(Sender: TObject);
+begin
+    ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
+end;
+procedure TNemp_MainForm.EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
+begin
+    case Ord(key) of
+        VK_Escape: begin
+              key := #0;
+              ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
+        end;
+        VK_RETURN: begin
+              if Assigned(MedienBib.CurrentAudioFile) then
+              begin
+                  case (Sender as TControl).Tag of
+                      0: MedienBib.CurrentAudioFile.Artist := EdtBibArtist.Text;
+                      1: MedienBib.CurrentAudioFile.Titel  := EdtBibTitle.Text;
+                      2: MedienBib.CurrentAudioFile.Album  := EdtBibAlbum.Text;
+                      3: MedienBib.CurrentAudioFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
+                      4: MedienBib.CurrentAudioFile.Year   := EdtBibYear.Text;
+                      5: MedienBib.CurrentAudioFile.Genre  := EdtBibGenre.Text;
+                  end;
+                  FillBibDetailLabels(MedienBib.CurrentAudioFile);
+                  MedienBib.Changed := True;
+                  NempPlaylist.UnifyRating(MedienBib.CurrentAudioFile.Pfad, MedienBib.CurrentAudioFile.Rating);
+                  VST.Invalidate;
+              end;
+              key := #0;
+              ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
+        end;
+    end;
+end;
 
 
 function TNemp_MainForm.ValidAudioFile(filename: UnicodeString; JustPlay:Boolean):boolean;
@@ -5431,40 +5746,41 @@ procedure TNemp_MainForm.RatingImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var af: TAudioFile;
 begin
-    if assigned(NempPlayer.MainAudioFile) then
-    begin
-        // set the rating
-        NempPlayer.MainAudioFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
-
-        // Set this rating in all copies of the file in the Playlist
-        NempPlaylist.UnifyRating(NempPlayer.MainAudioFile.Pfad, NempPlayer.MainAudioFile.Rating);
-
-        // if possible: Update the library
-        // hm, ok, but: This will create an irritating message in case the file
-        // is not in the library at all...
-        if MedienBib.StatusBibUpdate <= 1 then
+    if Button = mbLeft  then
+        if assigned(NempPlayer.MainAudioFile) then
         begin
-            // get the file in the library
-            af := MedienBib.GetAudioFileWithFilename(NempPlayer.MainAudioFile.Pfad);
-            if assigned(af) then
+            // set the rating
+            NempPlayer.MainAudioFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
+
+            // Set this rating in all copies of the file in the Playlist
+            NempPlaylist.UnifyRating(NempPlayer.MainAudioFile.Pfad, NempPlayer.MainAudioFile.Rating);
+
+            // if possible: Update the library
+            // hm, ok, but: This will create an irritating message in case the file
+            // is not in the library at all...
+            if MedienBib.StatusBibUpdate <= 1 then
             begin
-                if af.Pfad <> MedienBib.CurrentThreadFilename then
+                // get the file in the library
+                af := MedienBib.GetAudioFileWithFilename(NempPlayer.MainAudioFile.Pfad);
+                if assigned(af) then
                 begin
-                    // set the rating
-                    af.Rating := NempPlayer.MainAudioFile.Rating;
-                    // write it to file
-                    af.QuickUpdateTag;
-                    MedienBib.Changed := True;
-                    // tell the postprocessor "already done. :D"
-                    NempPlayer.PostProcessor.ManualRating := True;
-                end else
-                    MessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
-            end;
-        end
-        else
-            MessageDLG(Warning_MedienBibIsBusyRating, mtWarning, [mbOK], 0);
-    end else
-        Spectrum.DrawRating(0);
+                    if af.Pfad <> MedienBib.CurrentThreadFilename then
+                    begin
+                        // set the rating
+                        af.Rating := NempPlayer.MainAudioFile.Rating;
+                        // write it to file
+                        af.QuickUpdateTag;
+                        MedienBib.Changed := True;
+                        // tell the postprocessor "already done. :D"
+                        NempPlayer.PostProcessor.ManualRating := True;
+                    end else
+                        MessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
+                end;
+            end
+            else
+                MessageDLG(Warning_MedienBibIsBusyRating, mtWarning, [mbOK], 0);
+        end else
+            Spectrum.DrawRating(0);
 end;
 
 procedure TNemp_MainForm.RatingImageMouseLeave(Sender: TObject);
@@ -7304,32 +7620,6 @@ begin
 exit;
 end;
 
-procedure TNemp_MainForm.VSTHeaderDrawQueryElements(Sender: TVTHeader;
-  var PaintInfo: THeaderPaintInfo; var Elements: THeaderPaintElements);
-begin
-   with PaintInfo do
-  begin
-    // First check the column member. If it is NoColumn then it's about the header background.
-    if Column = nil then
-      Elements := [hpeBackground] // No other flag is recognized for the header background.
-    else
-    begin
-      // Using the index here ensures a column, regardless of its position, always has the same draw style.
-      // By using the Position member, we could make a certain column place stand out, regardless of the column order.
-      // Don't forget to change the AdvancedHeaderDraw event body accordingly after you changed the indicator here.
-      //case Column.Index of
-      //  0: // Default drawing.
-      //    ;
-      //  1: // Background only customization.
-      Include(Elements, hpeBackground);
-      //  2: // Full customization (well, quite).
-      //    Elements := [hpeBackground, hpeText{, hpeDropMark, hpeHeaderGlyph, hpeSortGlyph}];
-      //end;
-    end;
-  end;
-end;
-
-
 
 procedure TNemp_MainForm.VSTAdvancedHeaderDraw(Sender: TVTHeader;
   var PaintInfo: THeaderPaintInfo; const Elements: THeaderPaintElements);
@@ -7923,6 +8213,10 @@ begin
   end;
 end;
 
+
+
+
+
 procedure TNemp_MainForm.EDITFastSearchChange(Sender: TObject);
 begin
   If MedienBib.BibSearcher.QuickSearchOptions.WhileYouType then
@@ -8162,6 +8456,7 @@ begin
     NempPlayer.Free;
 
     MedienBib.Free;
+    BibRatingHelper.Free;
 
     LanguageList.Free;
     NempUpdater.Free;
@@ -9003,9 +9298,11 @@ begin
           // rechts
           Splitter4.Align := alRight;
           VDTCover.Align := alRight;
-          VDTCover.Visible := True;
+
           Splitter4.Visible := True;
+          VDTCover.Visible := True;
           Splitter4.Left := VST.Width;
+          VDTCover.Left := VST.Width + Splitter4.Width;
         end;
     end;
 end;
@@ -9162,7 +9459,6 @@ end;
 
 procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
 begin
-
   if AutoShowDetailsTMP then
   begin
     if not assigned(FDetails) then
@@ -9558,6 +9854,8 @@ begin
   end;
 end;
 
+
+
 procedure TNemp_MainForm.IMGMedienBibCoverMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -9615,6 +9913,7 @@ begin
   CoverImgDownX := 0;
   CoverImgDownY := 0;
 end;
+
 
 procedure TNemp_MainForm.Lbl_CoverFlowMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -9745,7 +10044,7 @@ begin
       2: VST_ColumnPopupCoverRight.Checked := True;
     end;
 end;
-
+                (*
 procedure TNemp_MainForm.VDTCoverDrawNode(Sender: TBaseVirtualTree;
   const PaintInfo: TVTPaintInfo);
 var data: PCoverTreeData;
@@ -9817,6 +10116,10 @@ begin
   end;
 end;
 
+
+
+
+
 procedure TNemp_MainForm.VDTCoverResize(Sender: TObject);
 var h: Cardinal;
     aNode: PVirtualNode;
@@ -9833,10 +10136,37 @@ begin
       aNode.NodeHeight := h;
 end;
 
+*)
+
+procedure TNemp_MainForm.VSTHeaderDrawQueryElements(Sender: TVTHeader;
+  var PaintInfo: THeaderPaintInfo; var Elements: THeaderPaintElements);
+begin
+   with PaintInfo do
+  begin
+    // First check the column member. If it is NoColumn then it's about the header background.
+    if Column = nil then
+      Elements := [hpeBackground] // No other flag is recognized for the header background.
+    else
+    begin
+      // Using the index here ensures a column, regardless of its position, always has the same draw style.
+      // By using the Position member, we could make a certain column place stand out, regardless of the column order.
+      // Don't forget to change the AdvancedHeaderDraw event body accordingly after you changed the indicator here.
+      //case Column.Index of
+      //  0: // Default drawing.
+      //    ;
+      //  1: // Background only customization.
+      Include(Elements, hpeBackground);
+      //  2: // Full customization (well, quite).
+      //    Elements := [hpeBackground, hpeText{, hpeDropMark, hpeHeaderGlyph, hpeSortGlyph}];
+      //end;
+    end;
+  end;
+end;
+
 procedure TNemp_MainForm.Splitter4CanResize(Sender: TObject;
   var NewSize: Integer; var Accept: Boolean);
 begin
-  Accept := NewSize <= 250;
+  Accept := (NewSize <= 600) And (NewSize >= 130);
 end;
 
 

@@ -385,6 +385,10 @@ type
 
         BibSearcher: TBibSearcher;
 
+        // The Currently selected File in the Treeview.
+        // used for editing-stuff in the detail-panel besides the tree
+        CurrentAudioFile: TAudioFile;
+
 
         NewCoverFlow: TNempCoverFlow;
 

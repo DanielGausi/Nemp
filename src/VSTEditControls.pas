@@ -325,7 +325,7 @@ end;
 
 procedure TRatingEditLink.RatingMouseLeave(Sender: TObject);
 begin
-    FTree.setfocus;
+   // FTree.setfocus;
     CancelEdit;
     FTree.CancelEditNode;
 end;

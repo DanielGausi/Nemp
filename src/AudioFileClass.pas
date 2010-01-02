@@ -1460,6 +1460,7 @@ begin
             ID3v1Tag.WriteToFile(filename);
         end;
 
+        ID3v2Tag.ReadFromFile(filename);
         ID3v2Tag.Artist := Artist;
         ID3v2Tag.Title := Titel;
         ID3v2Tag.Album := Album;
