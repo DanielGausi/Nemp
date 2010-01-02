@@ -864,7 +864,7 @@ begin
         CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
         if not CoverMode in [0,1,2] then CoverMode := 1;
         CoverWidth := ini.ReadInteger('Fenster', 'CoverWidth', 240);
-        if (CoverWidth < 0) or (CoverWidth > 250) then CoverWidth := 250;
+        if (CoverWidth < 0) or (CoverWidth > 600) then CoverWidth := 450;
 
         ArtistAlbenFontSize  := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
         ArtistAlbenRowHeight := ini.ReadInteger('Font','ArtistAlbenRowHeight',12);

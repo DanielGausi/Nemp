@@ -43,7 +43,7 @@ unit MainFormHelper;
 interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
-    AudioFileClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings;
+    AudioFileClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs;
 
 
 // passt die VCL an die Player-Werte an
@@ -400,14 +400,22 @@ begin
           // Ok, we didn't found our AudioFile.
           // get the first one in the list.
           if not assigned(NewNode) then
+          begin
               NewNode := VST.GetFirst;
-
+              // and get the corresponding AudioFile again
+              if assigned(NewNode) then
+              begin
+                  Data := VST.GetNodeData(NewNode);
+                  tmpAudioFile := Data^.FAudioFile;
+              end;
+          end;
 
           if assigned(Newnode) then // Nur zur Sicherheit!
           begin
             VST.Selected[NewNode] := True;
             VST.FocusedNode := NewNode;
             AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+            ShowVSTDetails(tmpAudioFile);
           end else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         end
@@ -468,6 +476,7 @@ begin
           begin
             VST.Selected[NewNode] := True;
             VST.FocusedNode := NewNode;
+            ShowVSTDetails(tmpAudioFile);
             AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
           end else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
@@ -930,9 +939,15 @@ procedure RestoreComboboxes;
 var i: Integer;
 begin
   with Nemp_MainForm do
+  begin
     for i := 0 to ComponentCount - 1 do
       if (Components[i] is TComboBox) then
         (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
+
+    // We need this tag for Editing purposes!
+    EdtBibGenre.Tag := 5;
+  end;
+
 end;
 
 procedure ReTranslateNemp(LanguageCode: String);

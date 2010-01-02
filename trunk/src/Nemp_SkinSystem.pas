@@ -312,7 +312,7 @@ implementation
 
 uses NempMainUnit, OptionsComplete, Hilfsfunktionen, spectrum_vis,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
-    VSTEditControls;
+    VSTEditControls, MedienBibliothekClass;
 
 constructor TNempSkin.create;
 var i: Integer;
@@ -1101,8 +1101,8 @@ begin
   Nemp_MainForm.VST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
   pnlPoint := Nemp_MainForm.VDTCover.ClientToScreen(Point(0,0));
-  Nemp_MainForm.VDTCover.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
-  Nemp_MainForm.VDTCover.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
+//  Nemp_MainForm.VDTCover.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
+//  Nemp_MainForm.VDTCover.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
 end;
 
@@ -1239,8 +1239,8 @@ begin
         else PlaylistVST.Background.Assign(Nil);
       if (UseBackgroundImageMedienliste) then VST.Background.Assign(CompleteBitmap)
         else VST.Background.Assign(Nil);
-      if (UseBackgroundImageMedienliste) then VDTCover.Background.Assign(CompleteBitmap)
-        else VDTCover.Background.Assign(Nil);
+//      if (UseBackgroundImageMedienliste) then VDTCover.Background.Assign(CompleteBitmap)
+//        else VDTCover.Background.Assign(Nil);
       // Scrollbars
       if DisableArtistScrollbar then ArtistsVST.ScrollBarOptions.ScrollBars := ssNone
         else ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
@@ -1263,21 +1263,21 @@ begin
       if UseBlendedSelectionMedienliste then
         VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions + [toUseBlendedSelection]
       else VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      if UseBlendedSelectionMedienliste then
-        VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions + [toUseBlendedSelection]
-      else VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
+//      if UseBlendedSelectionMedienliste then
+//        VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions + [toUseBlendedSelection]
+//      else VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
 
       ArtistsVST.SelectionBlendFactor  := BlendFaktorArtists     ;
       AlbenVST.SelectionBlendFactor    := BlendFaktorAlben       ;
       PlaylistVST.SelectionBlendFactor := BlendFaktorPlaylist    ;
       VST.SelectionBlendFactor         := BlendFaktorMedienliste ;
-      VDTCover.SelectionBlendFactor         := BlendFaktorMedienliste ;
+ //     VDTCover.SelectionBlendFactor         := BlendFaktorMedienliste ;
       // Header
       ArtistsVST.Header.Options := ArtistsVST.Header.Options + [hoOwnerDraw];
       AlbenVST.Header.Options := AlbenVST.Header.Options + [hoOwnerDraw];
       PlaylistVST.Header.Options := PlaylistVST.Header.Options + [hoOwnerDraw];
       VST.Header.Options := VST.Header.Options + [hoOwnerDraw];
-      VDTCover.Header.Options := VST.Header.Options + [hoOwnerDraw];
+//      VDTCover.Header.Options := VST.Header.Options + [hoOwnerDraw];
       // Farben
       for idx := 1 to 4 do
       begin
@@ -1307,7 +1307,7 @@ begin
         DestVST.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx];
         DestVST.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      ;
       end;
-      VDTCover.Color                                  := SkinColorScheme.Tree_Color[4]                        ;
+{      VDTCover.Color                                  := SkinColorScheme.Tree_Color[4]                        ;
       VDTCover.Font.Color                             := SkinColorScheme.Tree_FontColor[4]                    ;
       VDTCover.Header.Background                      := SkinColorScheme.Tree_HeaderBackgroundColor[4]        ;
       VDTCover.Header.Font.Color                      := SkinColorScheme.Tree_HeaderFontColor[4]              ;
@@ -1326,6 +1326,7 @@ begin
       VDTCover.Colors.TreeLineColor                   := SkinColorScheme.Tree_TreeLineColor[4]                ;
       VDTCover.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[4];
       VDTCover.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[4]      ;
+}
   end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen
@@ -1402,6 +1403,7 @@ begin
   // Spectrum-Hintergrund setzen
   UpdateSpectrumGraphics;
   Nemp_MainForm.RepaintVisOnPause;
+
 end;
 
 
@@ -1470,13 +1472,13 @@ begin
       AlbenVST.Background.Assign(Nil);
       PlaylistVST.Background.Assign(Nil);
       VST.Background.Assign(Nil);
-      VDTCover.Background.Assign(Nil);
+//      VDTCover.Background.Assign(Nil);
       // AlphaBlending
       ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-      VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
+//      VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
       // Scrollbars
       ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
       AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
@@ -1487,7 +1489,7 @@ begin
       AlbenVST.Header.Options := AlbenVST.Header.Options - [hoOwnerDraw];
       PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
       VST.Header.Options := VST.Header.Options - [hoOwnerDraw];
-      VDTCover.Header.Options := VST.Header.Options - [hoOwnerDraw];
+//      VDTCover.Header.Options := VST.Header.Options - [hoOwnerDraw];
       // Farben
       for idx := 1 to 5 do
       begin
@@ -1517,7 +1519,7 @@ begin
         DestVST.Colors.UnfocusedSelectionBorderColor   := clBtnFace;
         DestVST.Colors.UnfocusedSelectionColor         := clBtnFace;
       end;
-      VDTCover.Color                                  := clWindow;
+{      VDTCover.Color                                  := clWindow;
       VDTCover.Font.Color                             := clWindowText;
       VDTCover.Header.Background                      := clWindow;
       VDTCover.Header.Font.Color                      := clWindowText;
@@ -1536,7 +1538,7 @@ begin
       VDTCover.Colors.TreeLineColor                   := clBtnShadow;
       VDTCover.Colors.UnfocusedSelectionBorderColor   := clBtnFace;
       VDTCover.Colors.UnfocusedSelectionColor         := clBtnFace;
-
+ }
   end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen
@@ -2165,6 +2167,11 @@ begin
     HalfStarBitmap.Transparent := True;
     RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
 
+    Nemp_MainForm.BibRatingHelper.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
+    if Assigned(MedienBib.CurrentAudioFile) then
+        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height)
+    else
+        Nemp_MainForm.BibRatingHelper.DrawRatingInStarsOnBitmap(128, Nemp_MainForm.ImgBibRating.Picture.Bitmap, Nemp_MainForm.ImgBibRating.Width, Nemp_MainForm.ImgBibRating.Height);
 
     LoadGraphicFromBaseName(SetStarBitmap, BaseDir + 'starset', True);
     LoadGraphicFromBaseName(UnSetStarBitmap, BaseDir + 'starunset', True);
