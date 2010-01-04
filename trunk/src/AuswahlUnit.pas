@@ -293,6 +293,7 @@ begin
       Nemp_MainForm.GRPBOXArtistsAlben.Repaint;
       Nemp_MainForm.PanelCoverBrowse.Repaint;
       Nemp_MainForm.PanelStandardBrowse.Repaint;
+      Nemp_MainForm.PanelTagCloudBrowse.Repaint;
     end;
 
 end;

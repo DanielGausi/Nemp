@@ -24,7 +24,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Left = 312
     Top = 8
     Width = 185
-    Height = 121
+    Height = 89
     Caption = 'Period'
     TabOrder = 1
     object LblConst_PeriodTo: TLabel
@@ -81,14 +81,14 @@ object RandomPlaylistForm: TRandomPlaylistForm
   end
   object GrpBox_Genre: TGroupBox
     Left = 8
-    Top = 136
+    Top = 191
     Width = 489
-    Height = 321
+    Height = 266
     Caption = 'Genres'
     TabOrder = 2
     DesignSize = (
       489
-      321)
+      266)
     object LblConst_Preselection: TLabel
       Left = 200
       Top = 22
@@ -146,7 +146,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Left = 8
     Top = 8
     Width = 297
-    Height = 121
+    Height = 89
     Caption = 'General options'
     TabOrder = 0
     object LblConst_MaxCount: TLabel
@@ -162,23 +162,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 68
       Height = 13
       Caption = 'Get titles from'
-    end
-    object LblConst_Rating: TLabel
-      Left = 8
-      Top = 64
-      Width = 31
-      Height = 13
-      Caption = 'Rating'
-    end
-    object RatingImage: TImage
-      Left = 184
-      Top = 83
-      Width = 70
-      Height = 14
-      Transparent = True
-      OnMouseDown = RatingImageMouseDown
-      OnMouseLeave = RatingImageMouseLeave
-      OnMouseMove = RatingImageMouseMove
     end
     object seMaxCount: TSpinEdit
       Left = 184
@@ -204,22 +187,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Items.Strings = (
         'whole media library'
         'actual listed titles')
-    end
-    object CBRating: TComboBox
-      Left = 8
-      Top = 80
-      Width = 161
-      Height = 21
-      Style = csDropDownList
-      ItemHeight = 13
-      ItemIndex = 1
-      TabOrder = 2
-      Text = 'equal or better than'
-      Items.Strings = (
-        'don'#39't care '
-        'equal or better than'
-        'equal to'
-        'equal or worse than')
     end
   end
   object Btn_Ok: TButton
@@ -259,5 +226,101 @@ object RandomPlaylistForm: TRandomPlaylistForm
       'Play (and delete playlist)'
       'Insert after current position'
       'Insert after current position and play')
+  end
+  object GrpBox_Rating: TGroupBox
+    Left = 312
+    Top = 103
+    Width = 186
+    Height = 82
+    Caption = 'Rating'
+    TabOrder = 6
+    object RatingImage: TImage
+      Left = 8
+      Top = 51
+      Width = 70
+      Height = 14
+      Transparent = True
+      OnMouseDown = RatingImageMouseDown
+      OnMouseLeave = RatingImageMouseLeave
+      OnMouseMove = RatingImageMouseMove
+    end
+    object CBRating: TComboBox
+      Left = 8
+      Top = 24
+      Width = 148
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      ItemIndex = 1
+      TabOrder = 0
+      Text = 'equal or better than'
+      Items.Strings = (
+        'don'#39't care '
+        'equal or better than'
+        'equal to'
+        'equal or worse than')
+    end
+  end
+  object GrpBox_Duration: TGroupBox
+    Left = 8
+    Top = 103
+    Width = 298
+    Height = 82
+    Caption = 'Duration'
+    TabOrder = 7
+    object LblMinLength: TLabel
+      Left = 101
+      Top = 43
+      Width = 25
+      Height = 13
+      Caption = '0m0s'
+    end
+    object LblMaxLength: TLabel
+      Left = 246
+      Top = 43
+      Width = 25
+      Height = 13
+      Caption = '0m0s'
+    end
+    object CBMinLength: TCheckBox
+      Left = 16
+      Top = 16
+      Width = 122
+      Height = 17
+      Caption = 'minimum length'
+      TabOrder = 0
+      OnClick = CBMinLengthClick
+    end
+    object CBMaxLength: TCheckBox
+      Left = 161
+      Top = 16
+      Width = 134
+      Height = 17
+      Caption = 'maximum length'
+      TabOrder = 1
+      OnClick = CBMaxLengthClick
+    end
+    object SE_MinLength: TSpinEdit
+      Left = 32
+      Top = 39
+      Width = 63
+      Height = 22
+      MaxValue = 7200
+      MinValue = 0
+      TabOrder = 2
+      Value = 0
+      OnChange = SE_MinLengthChange
+    end
+    object SE_MaxLength: TSpinEdit
+      Left = 176
+      Top = 39
+      Width = 64
+      Height = 22
+      MaxValue = 7200
+      MinValue = 0
+      TabOrder = 3
+      Value = 0
+      OnChange = SE_MaxLengthChange
+    end
   end
 end

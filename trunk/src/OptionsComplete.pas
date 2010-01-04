@@ -2165,6 +2165,7 @@ begin
 
       Nemp_MainForm.PanelStandardBrowse.Visible := MedienBib.BrowseMode = 0;
       Nemp_MainForm.PanelCoverBrowse.Visible    := MedienBib.BrowseMode = 1;
+      Nemp_MainForm.PanelTagCloudBrowse.Visible := MedienBib.BrowseMode = 2;
 
       Nemp_MainForm.ShowSummary;
   end else

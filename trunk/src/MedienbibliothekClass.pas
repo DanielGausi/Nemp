@@ -70,7 +70,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      //Indys:
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
-     NempCoverFlowClass;
+     NempCoverFlowClass, TagClouds;
 
 
 type
@@ -257,6 +257,7 @@ type
         function CheckYearRange(Year: UnicodeString): Boolean;
         function CheckGenrePL(Genre: UnicodeString): Boolean;
         function CheckRating(aRating: Byte): Boolean;
+        function CheckLength(aLength: Integer): Boolean;
 
         // Synch a List of TDrives with the current situation on the PC
         // i.e. Search the Drive-IDs in the system and adjust the drive-letters
@@ -389,8 +390,9 @@ type
         // used for editing-stuff in the detail-panel besides the tree
         CurrentAudioFile: TAudioFile;
 
-
         NewCoverFlow: TNempCoverFlow;
+
+        TagCloud: TTagCloud;
 
         property StatusBibUpdate   : Integer read GetStatusBibUpdate    write SetStatusBibUpdate;
 
@@ -477,6 +479,7 @@ type
         // 2. Regenerate BrowseLists
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList;       // -"- of CoverLists
+        procedure ReBuildTagCloud;        // -"- of the TagCloud
         procedure RepairBrowseListsAfterDelete; // Rebuild, but sorting is not needed
         procedure RepairBrowseListsAfterChange; // Another Repair-method :?
         // 3. When Browsing the left tree, fill the right tree
@@ -643,6 +646,8 @@ begin
         end;
 
   NewCoverFlow := TNempCoverFlow.Create;// (CFHandle, aWnd);
+
+  TagCloud := TTagCloud.Create;
 end;
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
@@ -705,6 +710,8 @@ begin
   tmpCoverlist.Free;
   Coverlist.Free;
   BibSearcher.Free;
+
+  TagCloud.Free;
 
   inherited Destroy;
 end;
@@ -2537,6 +2544,18 @@ begin
   Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
   GenerateCoverList(Mp3ListeArtistSort, CoverList);
 end;
+
+{
+    --------------------------------------------------------
+    ReBuildTagCloud
+    - update the TagCloud
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.ReBuildTagCloud;
+begin
+    TagCloud.BuildCloud(Mp3ListePfadSort, Nil);
+end;
+
 {
     --------------------------------------------------------
     RepairBrowseListsAfterDelete
@@ -3111,6 +3130,7 @@ begin
       result := False; //PlaylistFillOptions.IncludeNAGenres; // Unbekannte genres auch aufzählen
   end;
 end;
+
 function TMedienBibliothek.CheckYearRange(Year: UnicodeString): Boolean;
 var intYear: Integer;
 begin
@@ -3137,6 +3157,14 @@ begin
         result := False;
     end;
 end;
+function TMedienBibliothek.CheckLength(aLength: Integer): Boolean;
+begin
+    result := ((Not PlaylistFillOptions.UseMinLength) or (aLength >= PlaylistFillOptions.MinLength))
+            AND
+             ((Not PlaylistFillOptions.UseMaxLength) or (aLength <= PlaylistFillOptions.MaxLength))
+end;
+
+
 {
     --------------------------------------------------------
     FillRandomList
@@ -3161,6 +3189,7 @@ begin
     if CheckYearRange(aAudioFile.Year)
         and CheckGenrePL(aAudioFile.Genre)
         and CheckRating(aAudioFile.Rating)
+        and CheckLength(aAudioFile.Duration)
         then
       aList.Add(aAudioFile);
   end;

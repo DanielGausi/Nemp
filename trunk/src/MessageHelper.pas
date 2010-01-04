@@ -475,6 +475,7 @@ begin
           ReFillBrowseTrees(LongBool(aMsg.LParam));
           PanelStandardBrowse.Visible := MedienBib.BrowseMode = 0;
           PanelCoverBrowse.Visible    := MedienBib.BrowseMode = 1;
+          PanelTagCloudBrowse.Visible := MedienBib.BrowseMode = 2;
 
          { if MedienBib.BrowseMode = 1 then
           begin

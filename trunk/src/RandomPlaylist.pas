@@ -75,12 +75,19 @@ type
     Btn_Cancel: TButton;
     LblConst_Preselection: TLabel;
     Btn_Save: TButton;
-    LblConst_Rating: TLabel;
-    RatingImage: TImage;
     cb_Preselection: TComboBox;
     CBWholeBib: TComboBox;
-    CBRating: TComboBox;
     CBInsertMode: TComboBox;
+    GrpBox_Rating: TGroupBox;
+    CBRating: TComboBox;
+    RatingImage: TImage;
+    GrpBox_Duration: TGroupBox;
+    CBMinLength: TCheckBox;
+    CBMaxLength: TCheckBox;
+    SE_MinLength: TSpinEdit;
+    SE_MaxLength: TSpinEdit;
+    LblMinLength: TLabel;
+    LblMaxLength: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cbIgnoreYearClick(Sender: TObject);
     procedure cbIgnoreGenresClick(Sender: TObject);
@@ -95,6 +102,10 @@ type
     procedure RatingImageMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure RatingImageMouseLeave(Sender: TObject);
+    procedure CBMinLengthClick(Sender: TObject);
+    procedure CBMaxLengthClick(Sender: TObject);
+    procedure SE_MinLengthChange(Sender: TObject);
+    procedure SE_MaxLengthChange(Sender: TObject);
   private
     { Private-Deklarationen }
     GenreSettings: Array [0..9] of TGenreSetting;
@@ -156,6 +167,7 @@ var ini: TMemIniFile;
     genresCount, i, j, idx, rat: Integer;
     aGenre, BaseDir: String;
     s,h,u: TBitmap;
+    ltmp: Integer;
 begin
   
   BackupComboboxes;
@@ -198,7 +210,6 @@ begin
     cbIgnoreGenres.Checked := Ini.ReadBool('Allgemein', 'IgnoreGenre', True);
     cbIgnoreGenresClick(Nil);
 
-    
     // Rating gedöns auslesen
     idx := Ini.ReadInteger('Allgemein', 'Rating', 0);
     if (idx >= 0) and (idx <= 3) then
@@ -217,6 +228,27 @@ begin
     //ShowRating(ActualRating);
     //--
 
+    // Duration-settings
+    CBMinLength.Checked := Ini.ReadBool('Duration', 'UseMinLength', True);
+    CBMaxLength.Checked := Ini.ReadBool('Duration', 'UseMaxLength', True);
+    ltmp := Ini.ReadInteger('Duration', 'MinLength', 60);
+    if ltmp < 0 then ltmp := 0;
+    if ltmp > 7200 then ltmp := 7200;
+    SE_MinLength.Value := ltmp;
+    LblMinLength.Caption := SekToZeitString(ltmp);
+    SE_MinLength.Enabled := CBMinLength.Checked;
+    LblMinLength.Enabled := CBMinLength.Checked;
+
+    ltmp := Ini.ReadInteger('Duration', 'MaxLength', 600);
+    if ltmp < 0 then ltmp := 0;
+    if ltmp > 7200 then ltmp := 7200;
+    SE_MaxLength.Value := ltmp;
+    LblMaxLength.Caption := SekToZeitString(ltmp);
+    SE_MaxLength.Enabled := CBMaxLength.Checked;
+    LblMaxLength.Enabled := CBMaxLength.Checked;
+
+
+    // Genre-Settings
     for i := 0 to 9 do
     begin
       if ini.SectionExists('GenreSetting' + IntToStr(i)) then
@@ -272,6 +304,29 @@ begin
   SE_PeriodFrom.Enabled := NOT cbIgnoreYear.Checked;
   SE_PeriodTo  .Enabled := NOT cbIgnoreYear.Checked;
 end;
+
+procedure TRandomPlaylistForm.CBMaxLengthClick(Sender: TObject);
+begin
+    SE_MaxLength.Enabled := CBMaxLength.Checked;
+    LblMaxLength.Enabled := CBMaxLength.Checked;
+end;
+
+procedure TRandomPlaylistForm.CBMinLengthClick(Sender: TObject);
+begin
+    SE_MinLength.Enabled := CBMinLength.Checked;
+    LblMinLength.Enabled := CBMinLength.Checked;
+end;
+
+procedure TRandomPlaylistForm.SE_MaxLengthChange(Sender: TObject);
+begin
+    LblMaxLength.Caption := SekToZeitString(SE_MaxLength.Value);
+end;
+
+procedure TRandomPlaylistForm.SE_MinLengthChange(Sender: TObject);
+begin
+    LblMinLength.Caption := SekToZeitString(SE_MinLength.Value);
+end;
+
 
 procedure TRandomPlaylistForm.cbIgnoreGenresClick(Sender: TObject);
 begin
@@ -372,6 +427,13 @@ begin
      // Rating gedöns speichern
     Ini.WriteInteger('Allgemein', 'Rating', CBRating.ItemIndex);
     ini.WriteInteger('Allgemein', 'RatingValue', ActualRating);
+
+    // Duration-settings
+    Ini.WriteBool('Duration', 'UseMinLength', CBMinLength.Checked);
+    Ini.WriteBool('Duration', 'UseMaxLength', CBMaxLength.Checked);
+    Ini.WriteInteger('Duration', 'MinLength', SE_MinLength.Value);
+    Ini.WriteInteger('Duration', 'MaxLength', SE_MaxLength.Value);
+
     try
         Ini.UpdateFile;
     except
@@ -381,6 +443,7 @@ begin
     ini.Free;
   end;
 end;
+
 
 
 
@@ -409,7 +472,13 @@ begin
       WholeBib      := CBWholeBib.ItemIndex = 0;
       RatingMode    := CBRating.ItemIndex;
       Rating        := ActualRating;
+
+      UseMinLength := CBMinLength.Checked;
+      UseMaxLength := CBMaxLength.Checked;
+      MinLength := SE_MinLength.Value;
+      MaxLength := SE_MaxLength.Value;
   end;
+
   DateiListe := TObjectList.Create(False);
   MedienBib.FillRandomList(DateiListe);
   if Dateiliste.Count <= 10 then

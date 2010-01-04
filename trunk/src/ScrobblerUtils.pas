@@ -46,12 +46,12 @@ unit ScrobblerUtils;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes,
+  Windows, Messages, SysUtils, Variants, Classes, StrUtils,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException,
   Dialogs, md5, StdCtrls, ShellApi, DateUtils, IniFiles, Contnrs, 
 
   AudioFileClass,
-  Systemhelper, Nemp_RessourceStrings;
+  Systemhelper, Nemp_RessourceStrings, Hilfsfunktionen;
 
 const
     UnixStartDate: TDateTime = 25569.0;
@@ -250,6 +250,10 @@ type
             EarliestNextHandshake: TDateTime;
             TimeToWaitInterval: Integer;
 
+            // LastFM allows only 5 calls per Second
+            // The GetTag-Method will be calles very often - so we need a speed-limit here!
+            fLastCall: DWord;
+
             // Setzt fWorking und setzt eine Message ab.
             procedure BeginWork;
             procedure EndWork;
@@ -259,6 +263,10 @@ type
 
             function EncodeSessionKey(PlainKey: String): String;
             function DecodeSessionKey(CryptedKey: String): String;
+
+            // Parse GetTags-RawString (XML-structure)
+            // result: tag1(count1), tag2(count2), ...
+            function ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
 
 
         public
@@ -307,6 +315,14 @@ type
             procedure PlaybackResumed;
 
             procedure AllowHandShakingAgain;
+
+            // Additional Methods
+
+            // Get the Tags for an AudioFile
+            // No Authorization required. No Thread
+            //  - calling function (MedienBib.GetTags?) should create a Thread
+            function GetTags(aAudioFile: tAudioFile): String;
+
     end;
 
 
@@ -473,6 +489,7 @@ begin
     ErrorInARowCount := 0;
     EarliestNextHandshake := Now;
     TimeToWaitInterval := 1;
+    fLastCall := GetTickCount;
 end;
 destructor TNempScrobbler.Destroy;
 begin
@@ -495,6 +512,78 @@ begin
 end;
 
 
+function TNempScrobbler.ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
+var oneTag, name, c: String;
+    tagBegin, tagEnd: Integer;
+    name1, name2, c1, c2: Integer;
+begin
+
+    tagBegin := pos('<tag>', aRawString);
+    tagEnd := pos('</tag>', aRawString);
+    result := '';
+    while (tagBegin <> 0) do
+    begin
+        oneTag := copy(aRawString, tagBegin + 5, tagEnd - tagBegin - 5);
+
+        name1 := pos('<name>', oneTag);
+        name2 := pos('</name>', oneTag);
+        name := copy(oneTag, name1 + 6, name2 - name1 - 6);
+
+        c1 := pos('<count>', oneTag);
+        c2 := pos('</count>', oneTag);
+        c := copy(oneTag, c1 + 7, c2 - c1 - 7);
+
+        result := result + name + '(' + c + '), ';
+
+        tagBegin := posEx('<tag>', aRawString, tagEnd);
+        tagEnd := posEx('</tag>', aRawString, tagEnd + 4);
+    end;
+end;
+
+function TNempScrobbler.GetTags(aAudioFile: tAudioFile): String;
+var url: UTF8String;
+    aIDHttp: TIdHttp;
+    raw: String;
+    n: Dword;
+begin
+    if not assigned(aAudioFile) then
+    begin
+        result := '';
+        exit;
+    end;
+
+    // We MUST NOT call this methode more than 5x per second.
+    // So: Sleep for a while before the next call.
+    // DO NOT Change this - Otherwise Nemp could be banned from LastFM-Services!
+    n := GetTickCount;
+    if n - fLastCall < 250 then  // ok, this will result in 3-4 calls per second.
+        sleep(250);
+
+    fLastCall := GetTickCount;
+    url := 'http://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
+    + '&artist=' + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Artist))
+    + '&track='  + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Titel))
+    + '&api_key=' + api_key;
+
+
+    aIDHttp := TIdHttp.Create;
+    try
+        aIDHttp.ConnectTimeout:= 20000;
+        aIDHttp.ReadTimeout:= 20000;
+        aIDHttp.Request.UserAgent := 'Mozilla/3.0';
+        aIDHttp.HTTPOptions :=  [];
+        try
+            raw := aIDHttp.Get(url);
+        except
+            raw := '';
+        end;
+        result := ParseRawTag(raw, Nil);
+
+
+    finally
+        aIDhttp.Free;
+    end;
+end;
 
 function MD5StringToDigest(const aString: String): TMD5Digest;
 var i: Integer;

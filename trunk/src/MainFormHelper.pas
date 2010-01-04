@@ -866,11 +866,15 @@ begin
             end;
             2: begin
                 // Hier Code für Tagwolke einfügen
+                MedienBib.ReBuildTagCloud;
+                MedienBib.TagCloud.ShowTags(Memo1);
+
             end;
         end;
 
         PanelStandardBrowse.Visible := NewMode = 0;
         PanelCoverBrowse.Visible    := NewMode = 1;
+        PanelTagCloudBrowse.Visible := NewMode = 2;
 
         BeendeLangeAktion;
         FSplash.Close;
@@ -888,6 +892,7 @@ begin
                 // Zeige Browse-Listen
                 PanelCoverBrowse.visible := False;
                 PanelStandardBrowse.Visible := True;
+                PanelTagCloudBrowse.Visible := False;
 
                 PanelStandardBrowse.Left := 4;
                 PanelStandardBrowse.Width := AuswahlPanel.Width - 8;
@@ -898,13 +903,15 @@ begin
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse.GlyphLine := 1;
                 TabBtn_CoverFlow.GlyphLine := 0;
+                TabBtn_TagCloud.GlyphLine := 0;
                 TabBtn_Browse.Refresh;
+                TabBtn_CoverFlow.Refresh;
                 TabBtn_CoverFlow.Refresh;
             end;
             1: begin
                 // Zeige CoverFlow
                 PanelStandardBrowse.Visible := False;
-
+                PanelTagCloudBrowse.Visible := False;
                 PanelCoverBrowse.Visible := True;
 
                 PanelCoverBrowse.Left := 4;
@@ -916,11 +923,31 @@ begin
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse.GlyphLine := 0;
                 TabBtn_CoverFlow.GlyphLine := 1;
+                TabBtn_TagCloud.GlyphLine := 0;
                 TabBtn_Browse.Refresh;
+                TabBtn_CoverFlow.Refresh;
                 TabBtn_CoverFlow.Refresh;
             end;
             2: begin
                 // Hier Code für Tagwolke einfügen
+                // Zeige CoverFlow
+                PanelStandardBrowse.Visible := False;
+                PanelTagCloudBrowse.Visible := True;
+                PanelCoverBrowse.Visible := False;
+
+                PanelTagCloudBrowse.Left := 4;
+                PanelTagCloudBrowse.Width := AuswahlPanel.Width - 8;
+                PanelTagCloudBrowse.Top := 4;
+                PanelTagCloudBrowse.Height := GRPBOXArtistsAlben.Height - 8;
+                PanelTagCloudBrowse.Anchors := [akleft, aktop, akright, akBottom];
+
+                // TabButtons-Glyphs neu setzen
+                TabBtn_Browse.GlyphLine := 0;
+                TabBtn_CoverFlow.GlyphLine := 0;
+                TabBtn_TagCloud.GlyphLine := 1;
+                TabBtn_Browse.Refresh;
+                TabBtn_CoverFlow.Refresh;
+                TabBtn_CoverFlow.Refresh;
             end;
         end;
     end;
