@@ -74,7 +74,12 @@ Const SO_Pfad = 0;
       MaxYear: Word;
       RatingMode: Integer;
       Rating: Byte;
-
+      // duration settings
+      UseMinLength: Boolean;
+      UseMaxLength: Boolean;
+      MinLength: Integer;
+      MaxLength: Integer;
+      // general settings
       MaxCount: Integer;
       WholeBib: Boolean;
     end;

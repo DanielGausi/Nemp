@@ -731,6 +731,10 @@ type
     EdtBibYear: TEdit;
     EdtBibTrack: TEdit;
     EdtBibGenre: TComboBox;
+    Button1: TButton;
+    PanelTagCloudBrowse: TNempPanel;
+    Memo1: TMemo;
+    SpinEdit1: TSpinEdit;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1221,6 +1225,7 @@ type
     procedure EdtBibArtistExit(Sender: TObject);
     procedure EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
     procedure VDTCoverClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
 
 
   private
@@ -5295,6 +5300,9 @@ procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var aRect: TRect;
 begin
+caption := 'wwewewe';
+
+
   DragSource := DS_PLAYLIST;
   ARect.TopLeft :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left, PlaylistVST.Top)));
   ARect.BottomRight :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left + PlaylistVST.Width, PlaylistVST.Top + PlaylistVST.Height)));
@@ -7198,6 +7206,14 @@ var point: TPoint;
 begin
   GetCursorPos(Point);
   Equalizer_PopupMenu.Popup(Point.X, Point.Y);
+end;
+
+procedure TNemp_MainForm.Button1Click(Sender: TObject);
+var s: String;
+begin
+  s :=
+  NempPlayer.NempScrobbler.GetTags(MedienBib.CurrentAudioFile);
+  ShowMessage(s);
 end;
 
 function TNemp_MainForm.GetDefaultEQName(aIdx: Integer): String;

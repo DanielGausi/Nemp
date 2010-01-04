@@ -83,6 +83,7 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alClient
         BevelInner = bvRaised
         BevelOuter = bvLowered
+        DragMode = dmAutomatic
         TabOrder = 0
         OnPaint = NewPanelPaint
         OwnerDraw = False
@@ -312,6 +313,36 @@ object Nemp_MainForm: TNemp_MainForm
                 Position = 0
                 Width = 214
               end>
+          end
+        end
+        object PanelTagCloudBrowse: TNempPanel
+          Tag = 2
+          Left = 6
+          Top = 286
+          Width = 275
+          Height = 114
+          BevelOuter = bvNone
+          TabOrder = 2
+          Visible = False
+          OwnerDraw = False
+          object Memo1: TMemo
+            Left = 0
+            Top = 0
+            Width = 205
+            Height = 114
+            Align = alLeft
+            ScrollBars = ssVertical
+            TabOrder = 0
+          end
+          object SpinEdit1: TSpinEdit
+            Left = 211
+            Top = 24
+            Width = 51
+            Height = 22
+            MaxValue = 0
+            MinValue = 0
+            TabOrder = 1
+            Value = 0
           end
         end
       end
@@ -2051,8 +2082,9 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           BorderStyle = bsNone
           DefaultPasteMode = amInsertAfter
+          DragImageKind = diMainColumnOnly
           DragMode = dmAutomatic
-          DragType = dtVCL
+          DragWidth = 10
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -2079,9 +2111,9 @@ object Nemp_MainForm: TNemp_MainForm
           ShowHint = True
           TabOrder = 0
           TextMargin = 0
-          TreeOptions.AutoOptions = [toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-          TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect, toRightClickSelect, toSimpleDrawSelection]
+          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
           OnAfterItemErase = VSTAfterItemErase
           OnAfterItemPaint = PlaylistVSTAfterItemPaint
@@ -2379,7 +2411,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitLeft = -2
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -2555,6 +2586,15 @@ object Nemp_MainForm: TNemp_MainForm
             Visible = False
             OnExit = EdtBibArtistExit
             OnKeyPress = EdtBibArtistKeyPress
+          end
+          object Button1: TButton
+            Left = 243
+            Top = 161
+            Width = 75
+            Height = 25
+            Caption = 'TestBtn'
+            TabOrder = 6
+            OnClick = Button1Click
           end
         end
       end

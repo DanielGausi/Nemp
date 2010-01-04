@@ -50,6 +50,23 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
 
 type
 
+    // Class TTag: Used for the TagCloud
+    TTag = class
+      private
+          // The key of the tag, e.g. 'Pop', 'really great song', '80s', ...
+          fKey: UTF8String;
+          function GetCount: Integer;
+      public
+          // Stores all AudioFiles with this Tag.
+          AudioFiles: TObjectList;
+          // The number of AudioFiles tagged with this Tag.
+          property count: Integer read GetCount;
+          property Key: UTF8String read fKey;
+
+          constructor Create(aKey: UTF8String);
+          destructor Destroy; override;
+    end;
+
 
 
     TAudioFile = class
@@ -94,6 +111,12 @@ type
         // These values must be set when building the "AllArtist-Lists" and so on
         fKey1: UnicodeString;
         fKey2: UnicodeString;
+
+        // List of all Tags for this Audiofile
+        // This List is managed in class TTagCloud
+        fTagList: TObjectList;
+
+        function fGetTagList: TObjectList;
 
         // ChannelMode/Samplerate is used most times for displaying as a String
         function GetChannelMode: String;
@@ -159,6 +182,12 @@ type
         // the file without publishing the filename in the local filesystem.
         WebServerID: Integer;
 
+        // RawTags: #13#10-separated Tags
+        // Management of these Strings (except loading/saving) is done in Class TTagCloud
+        RawTagAuto: UTF8String;
+        RawTagLastFM: UTF8String;
+        RawTagUserDefined: UTF8String;
+
         property Titel:  UnicodeString Read fTitle write fTitle;                        // 2
         property Artist: UnicodeString Index siArtist read GetString write SetString;  // 1
         property Album:  UnicodeString Index siAlbum read GetString write SetString;   // 3
@@ -195,6 +224,8 @@ type
 
         property Key1: UnicodeString read fKey1 write fKey1;
         property Key2: UnicodeString read fKey2 write fKey2;
+
+        property Taglist: TObjectList read fgetTagList;
 
         constructor Create;
         destructor Destroy; override;
@@ -365,6 +396,29 @@ uses NempMainUnit, Dialogs, CoverHelper;
 
  {$I-}
 
+
+ { TTag }
+
+constructor TTag.Create(aKey: UTF8String);
+begin
+    inherited create;
+    AudioFiles := TObjectList.Create(False);
+    fKey := aKey;
+end;
+
+destructor TTag.Destroy;
+begin
+    AudioFiles.Free;
+    inherited;
+end;
+
+function TTag.GetCount: Integer;
+begin
+    result := AudioFiles.Count;
+end;
+
+
+
 {
     --------------------------------------------------------
     GetMp3Details
@@ -433,6 +487,9 @@ begin
       CueList.Clear;
       CueList.Free;
   end;
+  if assigned(fTagList) then
+      fTagList.Free;
+
   inherited destroy;
 end;
 procedure TAudioFile.Assign(aAudioFile: TAudioFile);
@@ -563,6 +620,14 @@ begin
   if result = '' then
     result := Pfad;
 end;
+
+function TAudioFile.fGetTagList: TObjectList;
+begin
+    if not Assigned(fTagList) then
+        fTagList := TObjectList.Create(False);
+    result := fTagList;
+end;
+
 {
     --------------------------------------------------------
     Getter for ChannelMode
@@ -2026,6 +2091,8 @@ begin
     ID := MP3DB_ENDOFINFO;
     aStream.Write(ID,sizeof(ID));
 end;
+
+
 
 initialization
 

@@ -74,7 +74,8 @@ uses
   PartyModeClass in 'PartyModeClass.pas',
   NoLyricWikiApi in 'NoLyricWikiApi.pas' {NoLyricWikiApiForm},
   PostProcessorUtils in 'PostProcessorUtils.pas',
-  RatingCtrls in 'RatingCtrls.pas';
+  RatingCtrls in 'RatingCtrls.pas',
+  TagClouds in 'TagClouds.pas';
 
 {$R *.res}
 
