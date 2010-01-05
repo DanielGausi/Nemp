@@ -132,9 +132,6 @@ begin
     aListView.Items.BeginUpdate;
     aListView.Clear;
 
-
-    // ToDo: Nur Tags mit Count > 0 zeigen
-
     m := Tags.Count - 1;
     if m > 100 then m := 100;
 
@@ -256,9 +253,9 @@ begin
     x := 0;
     y := 0;
     if length(aKey) > 0 then
-        x := Ord(aKey[1]) AND 31;
+        x := Ord(aKey[1]) mod 32;
     if length(aKey) > 1 then
-        y := Ord(aKey[2]) AND 31;
+        y := Ord(aKey[2]) mod 32;
 
     KeyHashList := HashedTags[x,y];
 
