@@ -325,16 +325,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 2
           Visible = False
           OwnerDraw = False
-          object SpinEdit1: TSpinEdit
-            Left = 211
-            Top = 24
-            Width = 51
-            Height = 22
-            MaxValue = 0
-            MinValue = 0
-            TabOrder = 0
-            Value = 0
-          end
           object ListView1: TListView
             Left = 0
             Top = 0
@@ -342,7 +332,8 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 114
             Align = alLeft
             Columns = <>
-            TabOrder = 1
+            TabOrder = 0
+            OnClick = ListView1DblClick
             OnDblClick = ListView1DblClick
           end
         end

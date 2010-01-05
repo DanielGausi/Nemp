@@ -733,7 +733,6 @@ type
     EdtBibGenre: TComboBox;
     Button1: TButton;
     PanelTagCloudBrowse: TNempPanel;
-    SpinEdit1: TSpinEdit;
     ListView1: TListView;
 
     procedure FormCreate(Sender: TObject);
