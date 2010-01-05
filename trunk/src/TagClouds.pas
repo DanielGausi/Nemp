@@ -1,8 +1,16 @@
+{
+
+todo here:
+- (done) keys only lowercase
+- backup list of audiofiles
+- hash keys for faster Tagcloud-build
+}
+
 unit TagClouds;
 
 interface
 
-uses windows, classes, SysUtils,  Contnrs, AudioFileClass, Math, stdCtrls;
+uses windows, classes, SysUtils,  Contnrs, AudioFileClass, Math, stdCtrls, ComCtrls;
 
 type
 
@@ -10,6 +18,10 @@ type
       private
           // the main list with all Tags in the Cloud.
           Tags: TObjectList;
+
+          HashedTags: Array[0..31,0..31] of TObjectList;
+
+
 
           // A list of TObjectlists with AudioFiles
           BrowseHistory: TObjectList;
@@ -34,9 +46,9 @@ type
         destructor Destroy; override;
 
         // Build a Tag-Cloud for the AudioFiles given in Source
-        procedure BuildCloud(Source: TObjectList; aTag: TTag);
+        procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 
-        procedure ShowTags(aMemo: TMemo);
+        procedure ShowTags(aListView: TListView);
 
         // Add a file to the TagCloud
         procedure AddAudioFile(aAudioFile: TAudioFile);
@@ -79,10 +91,19 @@ end;
 constructor TTagCloud.Create;
 begin
     Tags := TObjectList.Create;
+    BrowseHistory := TObjectList.Create;
 end;
 
 destructor TTagCloud.Destroy;
+var i,j: Integer;
 begin
+    if assigned(HashedTags[0,0]) then
+    begin
+        for i := 0 to 31 do
+          for j := 0 to 31 do
+            Hashedtags[i,j].Free;
+    end;
+    BrowseHistory.Free;
     Tags.free;
     inherited;
 end;
@@ -102,13 +123,33 @@ end;
 
 
 
-procedure TTagCloud.ShowTags(aMemo: TMemo);
+procedure TTagCloud.ShowTags(aListView: TListView);
 var i: Integer;
+    newItem: TListItem;
+    m: Integer;
 begin
 
-    aMemo.Clear;
-    for i := 0 to Tags.Count - 1 do
-      aMemo.lines.Add(TTag(Tags[i]).Key + ' (' + Inttostr(TTag(Tags[i]).count) + ')' );
+    aListView.Items.BeginUpdate;
+    aListView.Clear;
+
+
+    // ToDo: Nur Tags mit Count > 0 zeigen
+
+    m := Tags.Count - 1;
+    if m > 100 then m := 100;
+
+
+    for i := 0 to m do
+    begin
+        if  TTag(Tags[i]).count >0 then
+        begin
+            newItem := aListView.Items.Add;
+            newItem.Caption := TTag(Tags[i]).Key + ' (' + Inttostr(TTag(Tags[i]).count) + ')';
+            newItem.Data := TTag(Tags[i]);
+        end;
+
+    end;
+    aListView.Items.EndUpdate;
 end;
 
 {
@@ -119,15 +160,44 @@ end;
     If the SourceList is aTag.AudioFiles, we need to backup these Files
     --------------------------------------------------------
 }
-procedure TTagCloud.BuildCloud(Source: TObjectList; aTag: TTag);
-var i: Integer;
+procedure TTagCloud.BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
+var i,j: Integer;
     backupList: TObjectList;
 begin
-    if assigned(aTag) then
-        backupList := TObjectList.Create(False)
-    else
-        backupList := Source;
+    if FromScratch then
+    begin
+        // We start complete new. Delete Browse-History.
+        BrowseHistory.Clear;
 
+        // This should be done only once per Nemp-Instance!
+        if Not assigned(HashedTags[0,0]) then
+        begin
+            for i := 0 to 31 do
+              for j := 0 to 31 do
+                HashedTags[i,j] := TObjectList.Create(False);
+        end;
+
+    end;
+
+    if assigned(aTag) then
+    begin
+        // Create a new List and store the Audiofiles from the clicked Tag
+        // in this list.
+        backupList := TObjectList.Create(False);
+        backupList.Capacity := Source.Count;
+
+        for i := 0 to Source.Count - 1 do
+            backupList.Add(Source[i]);
+
+        // Add the List to the BrowseHistory
+        BrowseHistory.Add(backUpList);
+    end
+    else
+    begin
+        // user clicked a Breadcrumb-Tag... ????
+        /// .... todo
+        backupList := Source;
+    end;
 
     {
     change:
@@ -138,25 +208,15 @@ begin
 
         else // New tag clicked
             Store List in AudioFilesBackups
-
-
     }
 
     try
-        if assigned(aTag) then
-        begin
-            // backup the source, as we will clear it ...
-            backupList.Capacity := Source.Count;
-            for i := 0 to Source.Count - 1 do
-                backupList.Add(Source[i])
-        end;
-
-        Reset;    // ... here ;-)
+        // Clear the cloud, i.e. set the Count of all Tags to Zero
+        Reset;
 
         // Insert Files into the new Cloud
         for i := 0 to backupList.Count - 1 do
             AddAudioFile(TAudioFile(backupList[i]));
-
 
         // Sort Tags by Count
         Tags.Sort(Sort_Count);
@@ -164,8 +224,8 @@ begin
         // todo: Clear the "BrowseTags", i.e. the previously clicked tags
 
     finally
-        if assigned(aTag) then
-            backupList.Free;
+       // if assigned(aTag) then
+       //     backupList.Free;
     end;
 
 end;
@@ -180,6 +240,8 @@ end;
 function TTagCloud.GetTag(aKey: UTF8String): TTag;
 var i: Integer;
     tmp: TTag;
+    KeyHashList: TObjectList;
+    x,y: Integer;
 begin
     tmp := Nil;
 
@@ -188,12 +250,29 @@ begin
     // and search only this List.
     // in Addition: Move the found key upwards , so that often used keys can be found faster.
 
-    for i := 0 to Tags.Count - 1 do
-        if TTag(Tags[i]).Key = aKey then
+    aKey := AnsiLowerCase(aKey);
+
+    // Hash the first two Chars of aKey
+    x := 0;
+    y := 0;
+    if length(aKey) > 0 then
+        x := Ord(aKey[1]) AND 31;
+    if length(aKey) > 1 then
+        y := Ord(aKey[2]) AND 31;
+
+    KeyHashList := HashedTags[x,y];
+
+
+    for i := 0 to KeyHashList.Count - 1 do
+        if TTag(KeyHashList[i]).Key = aKey then
         begin
-            tmp := TTag(Tags[i]);
+            tmp := TTag(KeyHashList[i]);
+            // move one item up
+            if (i > 0) and(TTag(KeyHashList[i]).count >= TTag(KeyHashList[i-1]).Count)  then
+                KeyHashList.Exchange(i, i-1);
             break;
         end;
+
 
     if assigned(tmp) then
         result := tmp
@@ -202,6 +281,7 @@ begin
         result := TTag.Create(aKey);
         // Add the new tag to the Taglist // todo !!! and the correct list in the Array of Lists!
         Tags.Add(result);
+        KeyHashList.Add(result);
     end;
 end;
 
@@ -220,7 +300,7 @@ begin
     if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
         Dest.Add(aAudioFile.Artist);
 
-    if aAudioFile.Year <> '0' then
+    if (aAudioFile.Year <> '0') and (trim(aAudioFile.Year) <> '')  then
     begin
         Dest.Add(aAudioFile.Year);
         year := StrToIntDef(aAudioFile.Year, -1);
@@ -234,10 +314,6 @@ begin
     if aAudioFile.Genre <> '' then
         Dest.Add(aAudioFile.Genre);
 
-    // Save these Auto-Tags
-    aAudioFile.RawTagAuto := Dest.Text;
-
-    // ToDo: MedienBib.Changed := True; ??
 end;
 
 
@@ -278,11 +354,16 @@ begin
     allTags := TStringList.Create;
     tmpTags := TStringList.Create;
     try
-        // Add the Tags from the three RawTag-Strings to allTag-List
-        tmpTags.Text := aAudioFile.RawTagAuto;
-        for i := 0 to tmpTags.Count - 1 do
-            allTags.Add(tmptags[i]);
 
+        //tmpTags.Text := aAudioFile.RawTagAuto;
+        //for i := 0 to tmpTags.Count - 1 do
+        //    allTags.Add(tmptags[i]);
+
+        // Generate Auto-Tags from Audiofile-Info
+        // ToDo: Settings like "UseYear", "UseDecade", ...
+        GenerateAutoRawTags(aAudioFile, allTags);
+
+        // Add the Tags from the two RawTag-Strings to allTag-List
         tmpTags.Text := aAudioFile.RawTagLastFM;
         for i := 0 to tmpTags.Count - 1 do
             allTags.Add(tmptags[i]);
@@ -290,10 +371,6 @@ begin
         tmpTags.Text := aAudioFile.RawTagUserDefined;
         for i := 0 to tmpTags.Count - 1 do
             allTags.Add(tmptags[i]);
-
-        // if no Tags were found: Generate some from other properties
-        if allTags.Count = 0 then
-            GenerateAutoRawTags(aAudioFile, allTags);
 
 
         // Add/Insert every Tag into the af.TagList

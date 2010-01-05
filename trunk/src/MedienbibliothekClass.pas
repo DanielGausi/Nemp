@@ -493,6 +493,7 @@ type
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
+        procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag);
         // Search the next matching cover
         function GetCoverWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
 
@@ -2553,7 +2554,8 @@ end;
 }
 procedure TMedienBibliothek.ReBuildTagCloud;
 begin
-    TagCloud.BuildCloud(Mp3ListePfadSort, Nil);
+    // Build the Tagcloud. Delete BrowseHistory (True)
+    TagCloud.BuildCloud(Mp3ListePfadSort, Nil, True);
 end;
 
 {
@@ -2912,6 +2914,37 @@ begin
   FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
+{
+    --------------------------------------------------------
+    GenerateAnzeigeListeFromTagCloud
+    - Same as above, for TagCloud
+      this is called when teh user clicks a Tag in the cloud,
+      not in the breadcrumb-navigation
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag);
+var i: Integer;
+begin
+  AnzeigeListIsCurrentlySorted := False;
+
+  AnzeigeListe.Clear;
+  AnzeigeListe2.Clear;
+
+  // we need no binary search or stuff here. The Tag saves all its AudioFiles.
+  for i := 0 to aTag.AudioFiles.Count - 1 do
+      AnzeigeListe.Add(aTag.AudioFiles[i]);
+
+  Self.TagCloud.BuildCloud(aTag.AudioFiles, aTag, False);
+
+
+  AnzeigeShowsPlaylistFiles := False;
+  AnzeigeListIsCurrentlySorted := False;
+  if AlwaysSortAnzeigeList then
+      SortAnzeigeliste;
+  FillQuickSearchList;
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
+end;
+
 {
     --------------------------------------------------------
     GetCoverWithPrefix

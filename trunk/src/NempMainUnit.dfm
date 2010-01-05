@@ -325,15 +325,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 2
           Visible = False
           OwnerDraw = False
-          object Memo1: TMemo
-            Left = 0
-            Top = 0
-            Width = 205
-            Height = 114
-            Align = alLeft
-            ScrollBars = ssVertical
-            TabOrder = 0
-          end
           object SpinEdit1: TSpinEdit
             Left = 211
             Top = 24
@@ -341,8 +332,18 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 22
             MaxValue = 0
             MinValue = 0
-            TabOrder = 1
+            TabOrder = 0
             Value = 0
+          end
+          object ListView1: TListView
+            Left = 0
+            Top = 0
+            Width = 205
+            Height = 114
+            Align = alLeft
+            Columns = <>
+            TabOrder = 1
+            OnDblClick = ListView1DblClick
           end
         end
       end
@@ -3540,7 +3541,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010E00130088010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010E00130090010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       00000000000000000000000000000000000000000000000000001A232800303A
       4000000000000000000000000000000000000000000070707000070707000000
@@ -4004,7 +4005,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800880110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800900110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
