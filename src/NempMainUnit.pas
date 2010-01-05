@@ -733,8 +733,8 @@ type
     EdtBibGenre: TComboBox;
     Button1: TButton;
     PanelTagCloudBrowse: TNempPanel;
-    Memo1: TMemo;
     SpinEdit1: TSpinEdit;
+    ListView1: TListView;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1226,6 +1226,7 @@ type
     procedure EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
     procedure VDTCoverClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure ListView1DblClick(Sender: TObject);
 
 
   private
@@ -9935,6 +9936,17 @@ procedure TNemp_MainForm.Lbl_CoverFlowMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   CoverScrollbar.SetFocus;
+end;
+
+procedure TNemp_MainForm.ListView1DblClick(Sender: TObject);
+begin
+    if ListView1.ItemIndex >= 0 then
+    begin
+        MedienBib.GenerateAnzeigeListeFromTagCloud(TTag(ListView1.Items.Item[ListView1.ItemIndex].Data));
+        MedienBib.TagCloud.  ShowTags(ListView1);
+
+        Caption := InttoStr(ListView1.Items.Count);
+    end;
 end;
 
 procedure TNemp_MainForm.SkinEditorstarten1Click(Sender: TObject);

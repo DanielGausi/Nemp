@@ -867,7 +867,9 @@ begin
             2: begin
                 // Hier Code für Tagwolke einfügen
                 MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags(Memo1);
+                MedienBib.TagCloud.ShowTags(ListView1);
+
+                Caption := InttoStr(ListView1.Items.Count);
 
             end;
         end;

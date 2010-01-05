@@ -184,7 +184,7 @@ type
 
         // RawTags: #13#10-separated Tags
         // Management of these Strings (except loading/saving) is done in Class TTagCloud
-        RawTagAuto: UTF8String;
+        //RawTagAuto: UTF8String;
         RawTagLastFM: UTF8String;
         RawTagUserDefined: UTF8String;
 
@@ -403,7 +403,7 @@ constructor TTag.Create(aKey: UTF8String);
 begin
     inherited create;
     AudioFiles := TObjectList.Create(False);
-    fKey := aKey;
+    fKey := AnsiLowercase(aKey);
 end;
 
 destructor TTag.Destroy;
