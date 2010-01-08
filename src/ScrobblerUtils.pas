@@ -533,7 +533,11 @@ begin
         c2 := pos('</count>', oneTag);
         c := copy(oneTag, c1 + 7, c2 - c1 - 7);
 
-        result := result + name + '(' + c + '), ';
+        if StrToIntDef(c, -1) >= 10 then          // ToDo: MinValue veränderbar, settings
+        if result = '' then
+            result := name
+        else
+            result := result + #13#10 + name;
 
         tagBegin := posEx('<tag>', aRawString, tagEnd);
         tagEnd := posEx('</tag>', aRawString, tagEnd + 4);

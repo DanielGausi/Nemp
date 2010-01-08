@@ -10,9 +10,91 @@ unit TagClouds;
 
 interface
 
-uses windows, classes, SysUtils,  Contnrs, AudioFileClass, Math, stdCtrls, ComCtrls;
+uses windows, classes, SysUtils,  Contnrs, AudioFileClass, Math, stdCtrls,
+    ComCtrls, Graphics;
 
 type
+
+  // a single Tag on a Paintbox
+  TPaintTag = class(TTag)
+      private
+          fLeft: Integer;    // left-position in a Tag-Line
+          fTop: Integer;
+          fWidth: Integer;
+          fHeight: Integer;
+          FontSize: Integer;
+      public
+          property Width: Integer read fWidth;
+          property Height: Integer read fheight;
+          procedure MeasureOutput(aCanvas: TCanvas);
+          procedure Paint(aCanvas: TCanvas);
+  end;
+
+  // a Line of Tags in a Paintbox
+  TTagLine = class
+      private
+          fGap: Integer;   // the needed gap between two tags for justification (Blocksatz)
+          fCanvasWidth: Integer;
+
+          fWidth: Integer;
+          fHeight: Integer;
+      public
+          Tags: TObjectList;     // the Tags in this line
+
+          Top: Integer;
+          property Width: Integer read fWidth;      // the width (of all Tags together)
+          property Height: Integer read fheight;    // the Height (of the biggest Tag)
+
+          constructor Create(CanvasWidth: Integer);
+          destructor Destroy; override;
+          procedure Paint(aCanvas: TCanvas);
+  end;
+
+  TCloudPainter = class
+      private
+          fWidth: Integer;
+          fHeight: Integer;
+
+          lastFontChangeAt: Integer;
+          currentFontSize: Integer;
+          FontFactor: Double;
+
+          function GetProperFontSize(aTag: TPaintTag):Integer;
+
+          // first Stage: Choose as many tags as possible from
+          // the Count-Sorted Source
+          // Line-Object not needed
+          procedure RawPaint1(Source: TObjectList);
+
+          // second Stage: Paint tags String-Sorted
+          // use source for additional tags, if new painting requires less space
+          // create Line-Objects
+          procedure RawPaint2(Source: TObjectList);
+
+          procedure SetHeight(Value: Integer);
+          procedure SetWidth(Value: Integer);
+
+      public
+          TagLines: TObjectList;
+          Tags: TObjectList;
+
+          maxCount: Integer;
+
+
+          Canvas: TCanvas;
+          property Width: Integer read fWidth write SetWidth;
+          property Height: Integer read fHeight write SetHeight;
+
+          constructor Create;
+          destructor Destroy; override;
+
+
+          procedure Paint(Source: TObjectList);
+
+          function GetTagAtMousePos(x,y: Integer): TTag;
+
+  end;
+
 
   TTagCloud = class
       private
@@ -30,6 +112,8 @@ type
           // Get a TTag-Object with a matching key
           function GetTag(aKey: UTF8String): TTag;
 
+          function fGetTagList: TObjectList;
+
           // Insert all Tags from the AudioFile into the Taglist
           procedure AddAudioFileTags(aAudioFile: TAudioFile);
 
@@ -41,6 +125,10 @@ type
 
 
       public
+
+        CloudPainter: TCloudPainter;
+
+        property CurrentTagList: TObjectList read fGetTagList;
 
         constructor Create;
         destructor Destroy; override;
@@ -62,12 +150,13 @@ type
         // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
         procedure Reset;
 
-
-
   end;
 
 
+
+
 function Sort_Count(item1,item2:pointer):integer;
+function Sort_Name(item1,item2:pointer):integer;
 
 implementation
 
@@ -78,9 +167,11 @@ begin
 
     if result = 0 then
         result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+end;
 
-
-
+function Sort_Name(item1,item2:pointer):integer;
+begin
+    result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
 end;
 
 
@@ -92,6 +183,7 @@ constructor TTagCloud.Create;
 begin
     Tags := TObjectList.Create;
     BrowseHistory := TObjectList.Create;
+    CloudPainter := TCloudPainter.Create;
 end;
 
 destructor TTagCloud.Destroy;
@@ -105,10 +197,16 @@ begin
     end;
     BrowseHistory.Free;
     Tags.free;
+    CloudPainter.Free;
     inherited;
 end;
 
 
+
+function TTagCloud.fGetTagList: TObjectList;
+begin
+   result := Tags;
+end;
 
 procedure TTagCloud.Reset;
 var i: Integer;
@@ -129,6 +227,8 @@ var i: Integer;
     m: Integer;
 begin
 
+    CloudPainter.Paint(CurrentTagList);
+
     aListView.Items.BeginUpdate;
     aListView.Clear;
 
@@ -147,6 +247,7 @@ begin
 
     end;
     aListView.Items.EndUpdate;
+
 end;
 
 {
@@ -275,7 +376,7 @@ begin
         result := tmp
     else
     begin
-        result := TTag.Create(aKey);
+        result := TPaintTag.Create(aKey);
         // Add the new tag to the Taglist // todo !!! and the correct list in the Array of Lists!
         Tags.Add(result);
         KeyHashList.Add(result);
@@ -422,6 +523,332 @@ end;
 procedure TTagCloud.UpdateAudioFile(aAudioFile: TAudioFile);
 begin
      // ToDo
+end;
+
+{ TPaintTag }
+
+procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
+begin
+    aCanvas.Font.Size := FontSize;
+    fWidth := aCanvas.TextWidth(Key);
+    fHeight := aCanvas.TextHeight(Key);
+end;
+
+procedure TPaintTag.Paint(aCanvas: TCanvas);
+begin
+    aCanvas.Font.Size := FontSize;
+    aCanvas.TextOut(fLeft, fTop, Key);
+end;
+
+{ TTagLine }
+
+constructor TTagLine.Create(CanvasWidth: Integer);
+begin
+  fCanvasWidth := CanvasWidth;
+  Tags := TObjectList.Create(False);
+end;
+
+destructor TTagLine.Destroy;
+begin
+  Tags.Free;
+  inherited;
+end;
+
+{
+  ------------------------------------
+  Tagline.Paint
+  - Paint all the Tags of the line.
+    This is done in the final step of the drawing
+  ------------------------------------
+}
+procedure TTagLine.Paint(aCanvas: TCanvas);
+var i, x: Integer;
+    pt: TPaintTag;
+begin
+    if Tags.Count > 1 then
+        fGap := (fCanvasWidth - Width) Div (Tags.Count - 1)
+    else
+        fGap := 0;
+
+    x := 0;
+    for i := 0 to Tags.Count - 1 do
+    begin
+        pt := TPaintTag(Tags[i]);
+        pt.fTop := Top;
+        pt.fLeft := x;
+
+        pt.Paint(aCanvas);
+
+        x := x + pt.Width + fGap + 10;
+    end;
+
+end;
+
+{ TCloudPainter }
+
+constructor TCloudPainter.Create;
+begin
+    TagLines := TObjectList.Create;
+    Tags := TObjectList.Create(False);
+end;
+
+destructor TCloudPainter.Destroy;
+begin
+    TagLines.Free;
+    Tags.Free;
+    inherited;
+end;
+
+
+
+procedure TCloudPainter.Paint(Source: TObjectList);
+var y, i: Integer;
+begin
+
+    RawPaint1(Source);
+    RawPaint2(Source);
+
+    Canvas.FillRect(Rect(0,0,width, Height));
+    y := 0;
+    for i := 0 to TagLines.Count - 1 do
+    begin
+        TTagLine(Taglines[i]).Top := y;
+        TTagLine(Taglines[i]).Paint(Canvas);
+        y := y + TTagLine(Taglines[i]).Height;
+    end;
+
+  {
+compute Top-offset
+drawlines
+
+}
+
+end;
+
+
+
+function TCloudPainter.GetProperFontSize(aTag: TPaintTag): Integer;
+begin
+
+    if (aTag.count < (0.9 * lastFontChangeAt)) then
+    begin
+        if currentFontSize > 8 then
+            currentFontSize := currentFontSize - 1;
+        lastFontChangeAt := aTag.count;
+    end;
+
+    result := currentFontSize;
+
+  { result :=  round(
+
+   FontFactor * (maxCount - aTag.count)) + 20;
+
+   if result < 8 then
+      result := 8;
+
+   if result > 20 then
+      result := 20;
+
+      }
+
+end;
+
+
+function TCloudPainter.GetTagAtMousePos(x, y: Integer): TTag;
+var line: TTagLine;
+  i: Integer;
+begin
+    for i := Taglines.Count - 1 downto 0 do
+      if TTagLine(TagLines[i]).Top <= y then
+      begin
+          line := TTagLine(TagLines[i]);
+          break;
+      end;
+
+    if assigned(line) then
+
+    for i := line.Tags.Count - 1 downto 0 do
+    begin
+        if TPaintTag(line.Tags[i]).fLeft <= x then
+        begin
+            result := TTag(line.Tags[i]);
+            break;
+        end;
+    end;
+
+end;
+
+{
+  ------------------------------------
+  TCloudPainter.RawPaint1
+  - First Step of the Painting.
+    Measure all Tags and fill the canvas
+    Note: The tags are sorted by Count here!
+  ------------------------------------
+}
+procedure TCloudPainter.RawPaint1(Source: TObjectList);
+var x, y, i, lineHeight: Integer;
+    aTag: TPaintTag;
+    CanvasFull: Boolean;
+begin
+    Tags.Clear;
+    CanvasFull := False;
+    i := 0;
+    x := 0;     // current x-Position
+    y := 0;     // current y-Position
+    lineHeight := 0;   // Height of the current "line"
+
+    if Source.Count > 1 then
+        maxCount := TTag(Source[1]).count;
+
+    lastFontChangeAt := maxCount;
+    currentFontSize := 20;
+    FontFactor := - 12 *4 / (3 * maxCount);
+
+    while (i < Source.Count) and Not CanvasFull do
+    begin
+        aTag := TPaintTag(Source[i]);
+        // Set the FontSize used to display the tag          // !!!!!!!!!!!!!!!!!!!!!!!
+        aTag.FontSize := GetProperFontSize(aTag);
+
+        // get the size of the Tag on the Canvas
+        aTag.MeasureOutput(Canvas);
+
+        if (x + aTag.Width <= Width) or (x = 0) then
+        begin
+            // Tag fits in the current line
+            x := x + aTag.Width + 10;     // add some space
+            lineHeight := max(lineHeight, aTag.Height);
+            Tags.Add(aTag);
+        end else
+        begin
+            // Tag does NOT fit in the current line => start a new one
+            y := y + lineHeight;
+
+            if (y + aTag.Height < Height - 8) then
+            begin
+                lineHeight := aTag.Height;
+                x := aTag.Width + 10;
+                Tags.Add(aTag);
+            end else
+            begin
+                // Canvas is full.
+                // Note: following Tags will have a smaller size, so this check
+                // should be ok.
+                CanvasFull := True;
+            end;
+        end;
+        // get the next Tag in Source.
+        inc(i);
+    end;  // while
+end;
+
+procedure TCloudPainter.RawPaint2(Source: TObjectList);
+var i, x, y: Integer;
+    currentLine: TTagLine;
+    currentTag: TPaintTag;
+    CanvasFull: Boolean;
+    SuccessfullyPaintItems: Integer;
+    Fail: Boolean;
+begin
+    TagLines.Clear;
+    // Sort Tags by Name
+    Tags.Sort(Sort_Name);
+
+    x := 0;
+    y := 0;
+    i := 0;
+    CanvasFull := False;
+    Fail := False;
+    SuccessfullyPaintItems := 0;
+
+    currentLine := TTagLine.Create(Width);
+    TagLines.Add(currentLine);
+
+    //for i := 0 to Tags.Count - 1 do
+    while (i < Tags.Count) and Not CanvasFull do
+    begin
+        currentTag := TPaintTag(Tags[i]);
+        if (x + currentTag.Width <= Width) or (x = 0) then
+        begin
+            // Tag fits in currentLine
+            currentLine.Tags.Add(currentTag);
+            currentLine.fHeight := max(currentLine.Height, currentTag.Height);
+            currentLine.fWidth := currentLine.Width + currentTag.Width + 10;
+            x := x + currentTag.Width + 10;
+        end else
+        begin
+            // line is full. We need to start a new line
+            // But: Maybe the currentline was to high for Canvas!
+            if y + currentLine.Height > Height - 8 then
+            begin
+                // currentline has grown to much in Height
+                // and so it cannot be painted on the canvas
+                CanvasFull := True;
+                Fail := True;
+            end else
+            begin
+                SuccessfullyPaintItems := i-1;  // last line can be painted
+
+                y := y + currentLine.Height;
+                currentLine := TTagLine.Create(Width);
+                TagLines.Add(currentLine);
+                currentLine.Tags.Add(currentTag);
+                currentLine.fHeight := currentTag.Height;
+                currentLine.fWidth := currentLine.Width + currentTag.Width + 10;
+                x := currentTag.Width + 10;
+            end;
+        end;
+        inc(i);
+    end;
+
+    if y + currentLine.Height > Height - 8 then
+        Fail := True;
+
+    if Fail then
+    begin
+        // we have to much in our TagList. So: Delete some tags
+        Tags.Sort(Sort_Count);
+        for i := Tags.Count - 1 downto SuccessfullyPaintItems do
+            Tags.Delete(i);
+
+        RawPaint2(Source);
+    end;
+
+
+
+    {
+    ToDo: Check, ob das so ins canvas passt
+    }
+    {
+    sort self.tags by Key
+    Get a Tag from self.tags, insert it into a TTagLine-Object
+
+    (+)
+    if "passt noch mehr" fill canvas with source, starting at tags.count
+    Do Rawpaint again
+
+    (-)
+    if "passt nicht" delete some Tags from self.tags
+    Do RawPaint again (but set Stop-Flag, i.e. do not do (+) again)
+    }
+
+end;
+
+procedure TCloudPainter.SetHeight(Value: Integer);
+begin
+ //   if Value > 10 then
+ //       fHeight := Value - 10
+ //   else
+        fHeight := value; //0;
+end;
+
+procedure TCloudPainter.SetWidth(Value: Integer);
+begin
+  //  if Value > 10 then
+  //      fWidth := Value - 10
+  //  else
+        fWidth := value; //0;
 end;
 
 end.

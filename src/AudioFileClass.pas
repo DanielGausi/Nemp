@@ -349,7 +349,8 @@ const
       // MP3DB_DUMMY_Int2   = 31;
       MP3DB_PLAYCOUNTER  = 31;
       MP3DB_DUMMY_Int3   = 32;
-      MP3DB_DUMMY_Text1  = 33;
+      //MP3DB_DUMMY_Text1  = 33;
+      MP3DB_LASTFM_TAGS  = 33;
       MP3DB_DUMMY_Text2  = 34;
       MP3DB_DUMMY_Text3  = 35;
       // 42 marks the end of an AudioFile
@@ -1502,7 +1503,7 @@ procedure TAudioFile.SetMp3Data(filename: UnicodeString; Flags: Integer);
 var
     ID3v2Tag:TID3V2Tag;
     ID3v1Tag:TID3v1Tag;
-
+    ms: TMemoryStream;
 begin
     if Flags = SAD_None then
         // Do not update the file
@@ -1526,16 +1527,35 @@ begin
         end;
 
         ID3v2Tag.ReadFromFile(filename);
-        ID3v2Tag.Artist := Artist;
-        ID3v2Tag.Title := Titel;
-        ID3v2Tag.Album := Album;
-        ID3v2Tag.Comment := Comment;
+
+        if Titel <> AUDIOFILE_UNKOWN then
+            ID3v2tag.Title  := Titel;
+        if Artist <> AUDIOFILE_UNKOWN then
+            ID3v2tag.Artist := Artist;
+        if Album <> AUDIOFILE_UNKOWN then
+            ID3v2tag.album  := Album;
+        if Comment <> AUDIOFILE_UNKOWN then
+            ID3v2tag.Comment:= Comment;
+        if Lyrics <> '' then
+            Id3v2Tag.Lyrics := Lyrics;
+
         ID3v2Tag.Year := Year;
         ID3v2Tag.Track := IntToStr(Track);
         ID3v2Tag.Genre := Genre;
         ID3v2Tag.Rating := Rating;
         ID3v2Tag.PlayCounter := PlayCounter;
-      
+
+        if length(RawTagLastFM) > 0 then
+        begin
+            ms := TMemoryStream.Create;
+            try
+                ms.Write(RawTagLastFM[1], length(RawTagLastFM));
+                ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+            finally
+                ms.Free;
+            end;
+        end;
+
         ID3v2Tag.WriteToFile(filename);
 
     finally
@@ -1835,7 +1855,8 @@ begin
             MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
-            MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
+            MP3DB_LASTFM_TAGS : RawTagLastFM := ReadTextFromStream(aStream);
+            //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
 
@@ -1925,7 +1946,8 @@ begin
             //MP3DB_DUMMY_Int1  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
-            MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
+            //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
+            MP3DB_LASTFM_TAGS : RawTagLastFM := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
 
@@ -1996,6 +2018,9 @@ begin
 
     if length(Album)>0 then
       WriteTextToStream(aStream, MP3DB_ALBUM, Album);
+
+    if RawTagLastFM <> '' then
+        WriteTextToStream(aStream, MP3DB_LASTFM_TAGS, RawTagLastFM);
 
     if Duration <> 0 then
     begin
