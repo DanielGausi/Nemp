@@ -734,6 +734,8 @@ type
     Button1: TButton;
     PanelTagCloudBrowse: TNempPanel;
     ListView1: TListView;
+    PM_ML_GetTags: TMenuItem;
+    LblBibTags: TLabel;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1226,6 +1228,11 @@ type
     procedure VDTCoverClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ListView1DblClick(Sender: TObject);
+    procedure PM_ML_GetTagsClick(Sender: TObject);
+    procedure PanelTagCloudBrowseResize(Sender: TObject);
+    procedure PanelTagCloudBrowsePaint(Sender: TObject);
+    procedure PanelTagCloudBrowseMouseMove(Sender: TObject; Shift: TShiftState;
+      X, Y: Integer);
 
 
   private
@@ -1592,6 +1599,8 @@ begin
 
     BibRatingHelper := TRatingHelper.Create;
     MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
+    MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
+    MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
     MedienBib.CoverSavePath := SavePath + 'Cover\';
@@ -4456,6 +4465,7 @@ begin
 
   BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
 
+  LblBibTags.Caption := StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
   // Get Cover
   Coverbmp := tBitmap.Create;
   try
@@ -4508,6 +4518,9 @@ begin
     LblBibDuration.left := dim + 8;
     LblBibQuality .left := dim + 8;
     ImgBibRating  .left := dim + 8;
+    LblBibTags    .left := dim + 8;
+    LblBibTags.Width := VDTCover.Width - dim - 10;
+    LblBibTags.Height := VDTCover.Height - LblBibTags.Top - 8;
 
     // Disable Editing
     ShowLabelAgain(EdtBibArtist, GetCorrespondingLabel(EdtBibArtist));
@@ -4748,6 +4761,46 @@ begin
     }
     end;
 end;
+
+
+procedure TNemp_MainForm.PM_ML_GetTagsClick(Sender: TObject);
+var  i:integer;
+     Data: PTreeData;
+    SelectedMp3s: TNodeArray;
+begin
+    SelectedMp3s := Nil;
+    if MedienBib.StatusBibUpdate <> 0 then
+    begin
+      MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+      exit;
+    end;
+
+    if NempOptions.DenyID3Edit then
+    begin
+      MessageDLG((Error_ID3EditDenied), mtInformation, [mbOK], 0);
+      exit; // Edit nicht erlaubt
+    end;
+    if MedienBib.AnzeigeShowsPlaylistFiles then
+    begin
+        MessageDLG((Medialibrary_GUIError5), mtError, [MBOK], 0);
+    end else
+    begin
+
+        MedienBib.StatusBibUpdate := 1;
+        BlockeMedienListeUpdate(True);
+
+        SelectedMP3s := VST.GetSortedSelection(False);
+        for i:=0 to length(SelectedMP3s)-1 do
+        begin
+            Data := VST.GetNodeData(SelectedMP3s[i]);
+            MedienBib.UpdateList.Add(Data^.FAudioFile);
+        end;
+
+        MedienBib.GetTags;
+
+    end;
+end;
+
 
 
 procedure TNemp_MainForm.VSTBeforeItemErase(Sender: TBaseVirtualTree;
@@ -7211,9 +7264,16 @@ end;
 procedure TNemp_MainForm.Button1Click(Sender: TObject);
 var s: String;
 begin
-  s :=
-  NempPlayer.NempScrobbler.GetTags(MedienBib.CurrentAudioFile);
-  ShowMessage(s);
+  s := NempPlayer.NempScrobbler.GetTags(MedienBib.CurrentAudioFile);
+
+  if trim(s) = '' then
+      ShowMessage('No Tags found')
+  else
+  begin
+      MedienBib.CurrentAudioFile.RawTagLastFM := AnsiLowerCase(s);
+      MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+  end;
+
 end;
 
 function TNemp_MainForm.GetDefaultEQName(aIdx: Integer): String;
@@ -9342,6 +9402,28 @@ begin
         NempSkin.DrawAPanel((Sender as TNempPanel), NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag])
     else
         NempSkin.DrawAPanel((Sender as TNempPanel), True);
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var aTag: TTag;
+begin
+    aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
+    if assigned(aTag) then
+        caption := aTag.key;
+
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowsePaint(Sender: TObject);
+begin
+MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
+begin
+    MedienBib.TagCloud.CloudPainter.Height := PanelTagCloudBrowse.Height;
+    MedienBib.TagCloud.CloudPainter.Width := PanelTagCloudBrowse.Width;
+    MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
 end;
 
 procedure TNemp_MainForm.PanelCoverBrowsePaint(Sender: TObject);

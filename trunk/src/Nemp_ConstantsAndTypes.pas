@@ -342,7 +342,6 @@ const
     MB_ShowQuickSearchResults  = 27;
 
 
-
     MB_DeadFilesWarning = 14;
     // Warnung: Duplikate in der Bib gefunden. Das sollte eigentlich nicht mehr vorkommen
     MB_DuplicateWarning = 15;
@@ -354,6 +353,8 @@ const
     MB_ProgressSearchDead = 17;
     // Lyrics, send Status complete/failed
     MB_LyricUpdateStatus = 18;
+    // same for Tags
+    MB_TagsUpdateStatus = 28;
     // Lyrics/PostProcessor: Send the filename which is currently edited by a thread
     MB_ThreadFileUpdate = 23;
     // Refresh AudioFile: GetAudiodata in VCL-Thread, as Cover-stuff will create some

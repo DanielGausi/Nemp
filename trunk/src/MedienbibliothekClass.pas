@@ -70,7 +70,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      //Indys:
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
-     NempCoverFlowClass, TagClouds;
+     NempCoverFlowClass, TagClouds, ScrobblerUtils;
 
 
 type
@@ -84,6 +84,7 @@ type
         fHND_DeleteFilesThread: DWord;
         fHND_RefreshFilesThread: DWord;
         fHND_GetLyricsThread: DWord;
+        fHND_GetTagsThread: DWord;
 
         // General note:
         //     all lists beginning with "tmp" are temporary lists, which stores the library
@@ -226,6 +227,7 @@ type
         // Refreshing Library
         procedure fRefreshFiles;      // 1a. Refresh files OR
         procedure fGetLyrics;         // 1b. get Lyrics
+        procedure fGetTags;           // 1c. get Tags (from LastFM)
 
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
@@ -393,6 +395,8 @@ type
         NewCoverFlow: TNempCoverFlow;
 
         TagCloud: TTagCloud;
+        // BibScrobbler: Link to Player.NempScrobbler
+        BibScrobbler: TNempScrobbler;
 
         property StatusBibUpdate   : Integer read GetStatusBibUpdate    write SetStatusBibUpdate;
 
@@ -441,6 +445,7 @@ type
         procedure CleanUpDeadFilesFromVCLLists;
         procedure RefreshFiles;
         procedure GetLyrics;
+        procedure GetTags;
 
         // Additional managing. Run in VCL-Thread.
         procedure BuildTotalString;
@@ -548,6 +553,7 @@ type
   Procedure fDeleteFilesUpdate(MB: TMedienbibliothek);
   procedure fRefreshFilesThread(MB: TMedienbibliothek);
   procedure fGetLyricsThread(MB: TMedienBibliothek);
+  procedure fGetTagsThread(MB: TMedienBibliothek);
 
 
   function GetProperMenuString(aIdx: Integer): UnicodeString;
@@ -601,8 +607,8 @@ begin
   tmpAlleAlben := TStringList.Create;
   AlleArtists  := TObjectlist.create(False);
   tmpAlleArtists  := TObjectlist.create(False);
-  Coverlist := tObjectList.create(False);;
-  tmpCoverlist := tObjectList.create(False);;
+  Coverlist := tObjectList.create(False);
+  tmpCoverlist := tObjectList.create(False);
 
   Alben        := TObjectlist.create(False);
   AnzeigeListe := TObjectlist.create(False);
@@ -1950,6 +1956,102 @@ begin
     id3v2Tag.free;
     // UnblockMEssage is sent via CleanUpTMPLists
 end;
+
+
+
+{
+    --------------------------------------------------------
+    GetTags
+    - Same as GetLyrics:
+      Creates a secondary thread and get Tags from LastFM
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.GetTags;
+  var Dummy: Cardinal;
+begin
+    // Status MUST be set outside
+    // (the updatelist is filled in VCL-Thread)
+    // But, to be sure:
+    StatusBibUpdate := 1;
+    UpdateFortsetzen := True;
+    fHND_GetTagsThread := BeginThread(Nil, 0, @fGetTagsThread, Self, 0, Dummy);
+end;
+{
+    --------------------------------------------------------
+    fGetTagsThread
+    - start a secondary thread
+    --------------------------------------------------------
+}
+procedure fGetTagsThread(MB: TMedienBibliothek);
+begin
+    MB.fGetTags;
+    MB.CleanUpTmpLists;
+    // Todo: Rebuild TagCloud ??
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    try
+        CloseHandle(MB.fHND_GetTagsThread);
+    except
+    end;
+end;
+{
+    --------------------------------------------------------
+    fGetTags
+    - getting the tags
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.fGetTags;
+var i: Integer;
+    done, failed: Integer;
+    af: TAudioFile;
+    s: String;
+begin
+    done := 0;
+    failed := 0;
+
+    for i := 0 to UpdateList.Count - 1 do
+    begin
+        if not UpdateFortsetzen then break;
+
+        af := TAudioFile(UpdateList[i]);
+
+        if FileExists(af.Pfad) then
+        begin
+            // call the vcl, that we will edit this file now
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                        Integer(PWideChar(af.Pfad)));
+
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
+                        Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
+
+             af.FileIsPresent:=True;
+
+
+
+
+            // GetTags will create the IDHttp-Object
+            s := BibScrobbler.GetTags(af);
+
+            // bei einer exception ganz abbrechen??
+            // nein, manchmal kommen ja auhc BadRequests...???
+
+            if trim(s) = '' then
+            begin
+                inc(failed);
+
+
+            end else
+            begin
+                inc(done);
+                af.RawTagLastFM := s;
+
+                Changed := True;
+            end;
+        end;
+    end;
+end;
+
+
+
 
 {
     --------------------------------------------------------

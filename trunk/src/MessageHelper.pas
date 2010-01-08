@@ -598,6 +598,18 @@ begin
                         PWideChar(aMsg.LParam)]);
             // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
         end;
+
+        MB_TagsUpdateStatus: begin
+        // WParam: a string like "(found 5/8)"
+            MedienListeStatusLBL.Caption :=
+                Format((MediaLibrary_SearchingTags),
+                      [ ExtractFilename(MedienBib.CurrentThreadFilename),
+                        PWideChar(aMsg.LParam)]);
+            // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
+
+
+        end;
+
         MB_LyricUpdateFailed: begin
                               MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0);
                             end;
