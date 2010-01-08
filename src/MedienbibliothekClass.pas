@@ -2027,7 +2027,6 @@ begin
 
 
 
-
             // GetTags will create the IDHttp-Object
             s := BibScrobbler.GetTags(af);
 
@@ -2043,6 +2042,9 @@ begin
             begin
                 inc(done);
                 af.RawTagLastFM := s;
+
+                //to do SetAudioData -> also in Datei schreiben
+
 
                 Changed := True;
             end;
