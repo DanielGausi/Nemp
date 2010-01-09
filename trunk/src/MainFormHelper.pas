@@ -869,6 +869,8 @@ begin
                 MedienBib.ReBuildTagCloud;
                 MedienBib.TagCloud.ShowTags(ListView1);
 
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag);
+
                 Caption := InttoStr(ListView1.Items.Count);
 
             end;

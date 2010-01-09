@@ -55,6 +55,10 @@ type
       private
           // The key of the tag, e.g. 'Pop', 'really great song', '80s', ...
           fKey: UTF8String;
+
+          //
+          fBreadCrumbIndex: Integer;
+
           function GetCount: Integer;
       public
           // Stores all AudioFiles with this Tag.
@@ -63,6 +67,7 @@ type
           property count: Integer read GetCount;
           property Key: UTF8String read fKey;
 
+          property BreadCrumbIndex: Integer read fBreadCrumbIndex write fBreadCrumbIndex;
           constructor Create(aKey: UTF8String);
           destructor Destroy; override;
     end;
@@ -405,6 +410,7 @@ begin
     inherited create;
     AudioFiles := TObjectList.Create(False);
     fKey := AnsiLowercase(aKey);
+    BreadCrumbIndex := High(Integer);
 end;
 
 destructor TTag.Destroy;
