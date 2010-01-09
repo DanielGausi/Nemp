@@ -662,6 +662,7 @@ begin
   NewCoverFlow.Clear;
   NewCoverFlow.free;
 
+  TagCloud.Free;
 
   for i := 0 to Mp3ListePfadSort.Count - 1 do
     TAudioFile(Mp3ListePfadSort[i]).Free;
@@ -718,7 +719,7 @@ begin
   Coverlist.Free;
   BibSearcher.Free;
 
-  TagCloud.Free;
+
 
   inherited Destroy;
 end;
@@ -2025,26 +2026,20 @@ begin
 
              af.FileIsPresent:=True;
 
-
-
             // GetTags will create the IDHttp-Object
             s := BibScrobbler.GetTags(af);
 
             // bei einer exception ganz abbrechen??
-            // nein, manchmal kommen ja auhc BadRequests...???
+            // nein, manchmal kommen ja auch BadRequests...???
 
             if trim(s) = '' then
             begin
                 inc(failed);
-
-
             end else
             begin
                 inc(done);
                 af.RawTagLastFM := s;
-
-                //to do SetAudioData -> also in Datei schreiben
-
+                af.SetAudioData(SAD_Both);
 
                 Changed := True;
             end;
@@ -3034,11 +3029,15 @@ begin
   AnzeigeListe.Clear;
   AnzeigeListe2.Clear;
 
-  // we need no binary search or stuff here. The Tag saves all its AudioFiles.
-  for i := 0 to aTag.AudioFiles.Count - 1 do
-      AnzeigeListe.Add(aTag.AudioFiles[i]);
+  if aTag = TagCloud.ClearTag then
+      for i := 0 to Mp3ListeArtistSort.Count - 1 do
+          AnzeigeListe.Add(Mp3ListeArtistSort[i])
+  else
+      // we need no binary search or stuff here. The Tag saves all its AudioFiles.
+      for i := 0 to aTag.AudioFiles.Count - 1 do
+          AnzeigeListe.Add(aTag.AudioFiles[i]);
 
-  Self.TagCloud.BuildCloud(aTag.AudioFiles, aTag, False);
+  Self.TagCloud.BuildCloud(Mp3ListeArtistSort, aTag, False);
 
 
   AnzeigeShowsPlaylistFiles := False;

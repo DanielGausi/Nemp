@@ -10,8 +10,8 @@ unit TagClouds;
 
 interface
 
-uses windows, classes, SysUtils,  Contnrs, AudioFileClass, Math, stdCtrls,
-    ComCtrls, Graphics;
+uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
+    ComCtrls, Graphics, Messages;
 
 type
 
@@ -23,11 +23,21 @@ type
           fWidth: Integer;
           fHeight: Integer;
           FontSize: Integer;
+          fActiveColor: TColor;
+          fColor: TColor;
       public
           property Width: Integer read fWidth;
           property Height: Integer read fheight;
+
+          constructor Create(aKey: UTF8String);
+
           procedure MeasureOutput(aCanvas: TCanvas);
           procedure Paint(aCanvas: TCanvas);
+
+          procedure PaintActive(aCanvas: TCanvas);
+
+
+
   end;
 
   // a Line of Tags in a Paintbox
@@ -57,9 +67,10 @@ type
 
           lastFontChangeAt: Integer;
           currentFontSize: Integer;
-          FontFactor: Double;
 
           function GetProperFontSize(aTag: TPaintTag):Integer;
+
+          function GetMaxCount(Source: TObjectList): Integer;
 
           // first Stage: Choose as many tags as possible from
           // the Count-Sorted Source
@@ -91,7 +102,9 @@ type
 
           procedure Paint(Source: TObjectList);
 
-          function GetTagAtMousePos(x,y: Integer): TTag;
+          procedure RePaintTag(aTag: TPaintTag; Active: Boolean);
+
+          function GetTagAtMousePos(x,y: Integer): TPaintTag;
 
   end;
 
@@ -100,14 +113,19 @@ type
       private
           // the main list with all Tags in the Cloud.
           Tags: TObjectList;
+          ActiveTags: TObjectList;
 
           HashedTags: Array[0..31,0..31] of TObjectList;
 
-
+          fClearTag: TTag;
 
           // A list of TObjectlists with AudioFiles
-          BrowseHistory: TObjectList;
+          ///BrowseHistory: TObjectList;
 
+          fBreadCrumbDepth: Integer;
+
+
+          procedure ClearBreadCrumbs(Above: Integer);
 
           // Get a TTag-Object with a matching key
           function GetTag(aKey: UTF8String): TTag;
@@ -123,12 +141,19 @@ type
           // Set Default-RawTags (like genre, artist, year)
           procedure GenerateAutoRawTags(aAudioFile: TAudioFile; Dest: TStringList);
 
+          //
+          procedure SetActivetags;
+
 
       public
 
         CloudPainter: TCloudPainter;
 
+        CurrentTag: TPaintTag;
+
         property CurrentTagList: TObjectList read fGetTagList;
+
+        property ClearTag: TTag read fCleartag;
 
         constructor Create;
         destructor Destroy; override;
@@ -152,6 +177,20 @@ type
 
   end;
 
+  TCloudViewer = class(TCustomControl)
+  protected
+      procedure CMWantspecialKey(var Msg : TWMKey); message CM_WANTSpecialKey;
+
+  published
+      property OnEnter;
+      property OnClick;
+      property OnMouseDown;
+      property OnMouseMove;
+      property OnKeypress;
+      property Canvas;
+      property OnKeyDown;
+  end;
+
 
 
 
@@ -163,15 +202,23 @@ implementation
 
 function Sort_Count(item1,item2:pointer):integer;
 begin
-    result := CompareValue(TTag(item2).Count ,TTag(item1).Count);
+    result := CompareValue(TTag(item1).BreadCrumbIndex ,TTag(item2).BreadCrumbIndex);
 
     if result = 0 then
-        result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    begin
+        result := CompareValue(TTag(item2).Count ,TTag(item1).Count);
+        if result = 0 then
+            result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    end;
 end;
 
 function Sort_Name(item1,item2:pointer):integer;
 begin
-    result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    result := CompareValue(TTag(item1).BreadCrumbIndex ,TTag(item2).BreadCrumbIndex);
+    if result = 0 then
+    begin
+        result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    end;
 end;
 
 
@@ -179,11 +226,16 @@ end;
 { TTagCloud }
 
 
+
 constructor TTagCloud.Create;
 begin
     Tags := TObjectList.Create;
-    BrowseHistory := TObjectList.Create;
+    ActiveTags := TObjectList.create(False);
+//    BrowseHistory := TObjectList.Create;
     CloudPainter := TCloudPainter.Create;
+
+    fClearTag := TPaintTag.Create('<Clear tags>');
+    fClearTag.BreadCrumbIndex := -2;
 end;
 
 destructor TTagCloud.Destroy;
@@ -195,9 +247,13 @@ begin
           for j := 0 to 31 do
             Hashedtags[i,j].Free;
     end;
-    BrowseHistory.Free;
-    Tags.free;
+//    BrowseHistory.Free;
     CloudPainter.Free;
+    Activetags.Free;
+    Tags.Extract(fClearTag);
+    fCleartag.Free;
+    Tags.free;
+
     inherited;
 end;
 
@@ -205,7 +261,7 @@ end;
 
 function TTagCloud.fGetTagList: TObjectList;
 begin
-   result := Tags;
+   result := Activetags;
 end;
 
 procedure TTagCloud.Reset;
@@ -216,33 +272,44 @@ begin
     // But we do not need to rebuild AudioFile.Taglist by parsing RawTags as
     // the Tag-Objects are still there!
     for i := 0 to Tags.Count - 1 do
-       (Tags[i] as TTag).AudioFiles.Clear;
+        if (Tags[i] as TTag).BreadCrumbIndex = High(Integer) then
+           (Tags[i] as TTag).AudioFiles.Clear;
 end;
 
 
+
+procedure TTagCloud.SetActivetags;
+var i: Integer;
+begin
+    ActiveTags.Clear;
+    for i := 0 to Tags.Count - 1 do
+        if (Tags[i] = fClearTag) or (TTag(Tags[i]).count > 0) then
+            Activetags.Add(Tags[i]);
+end;
 
 procedure TTagCloud.ShowTags(aListView: TListView);
 var i: Integer;
     newItem: TListItem;
     m: Integer;
 begin
+    CurrentTag := Nil;
 
     CloudPainter.Paint(CurrentTagList);
 
     aListView.Items.BeginUpdate;
     aListView.Clear;
 
-    m := Tags.Count - 1;
+    m := Activetags.Count - 1;
     if m > 100 then m := 100;
 
 
     for i := 0 to m do
     begin
-        if  TTag(Tags[i]).count >0 then
+        if  TTag(Activetags[i]).count >0 then
         begin
             newItem := aListView.Items.Add;
-            newItem.Caption := TTag(Tags[i]).Key + ' (' + Inttostr(TTag(Tags[i]).count) + ')';
-            newItem.Data := TTag(Tags[i]);
+            newItem.Caption := TTag(Activetags[i]).Key + ' (' + Inttostr(TTag(Activetags[i]).count) + ')';
+            newItem.Data := TTag(Activetags[i]);
         end;
 
     end;
@@ -250,9 +317,31 @@ begin
 
 end;
 
+procedure TTagCloud.ClearBreadCrumbs(Above: Integer);
+var i: Integer;
+begin
+    for i := 0 to Tags.Count - 1 do
+    begin
+        if (TTag(Tags[i]).BreadCrumbIndex > Above)
+            And (TTag(Tags[i]).BreadCrumbIndex < High(Integer))
+        then
+            TTag(Tags[i]).BreadCrumbIndex := High(Integer);
+    end;
+end;
+
+
 {
     --------------------------------------------------------
     BuildCloud
+    - Parameters:
+      Source: the complete List of the Library
+      aTag: a TTag (or NIL)
+
+      if aTag = "ClearTags"-Tag: Use Source
+      else
+      if aTag is "BreadCrumb": Use aTags.Tags, but do some more (clear some BreadcrumbTags)
+      else Use aTag.Tags
+
     - Clear alltags.AudioFiles
     - Add all AdioFiles from the List into the Cloud
     If the SourceList is aTag.AudioFiles, we need to backup these Files
@@ -260,22 +349,75 @@ end;
 }
 procedure TTagCloud.BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 var i,j: Integer;
-    backupList: TObjectList;
+    //backupList: TObjectList;
+    properList: TObjectList;
 begin
     if FromScratch then
     begin
         // We start complete new. Delete Browse-History.
-        BrowseHistory.Clear;
-
-        // This should be done only once per Nemp-Instance!
+        // BrowseHistory.Clear;
+        ClearBreadCrumbs(-1);
+        Tags.Extract(fClearTag);
+        properList := Source;
+        fBreadCrumbDepth := 0;
         if Not assigned(HashedTags[0,0]) then
         begin
+            // This should be done only once per Nemp-Instance!
             for i := 0 to 31 do
               for j := 0 to 31 do
                 HashedTags[i,j] := TObjectList.Create(False);
         end;
+    end else
+
+    begin
+
+        if assigned(aTag) then
+        begin
+            if aTag = fClearTag then
+            begin
+                // <Clear Tag> was chosen
+                // so: Delete this from Tags (do not show it on Top-Level)
+                //     Use Source (= MedienBib.FullList)
+                //     Clear BreadCrumbs
+                Tags.Extract(fClearTag);
+                properList := Source;
+                ClearBreadCrumbs(-1);
+                fBreadCrumbDepth := 0;
+            end
+            else
+            begin
+                if (aTag.BreadCrumbIndex > 0) and (aTag.BreadCrumbIndex < High(Integer)) then
+                begin
+                    // a "BreadCrumbTag" was chosen
+                    // so: Clear BreadCrumbs above this Tag
+                    //     Set the BreadCrumbWidth to this level
+                    ClearBreadCrumbs(aTag.BreadCrumbIndex);
+                    fBreadCrumbDepth := aTag.BreadCrumbIndex;
+                end else
+                begin
+                    // a new Tag was chosen
+                    // so: If we begin a tag-browsing: Add Cleartag
+                    //     Increase BreadCrumbwidth
+                    //     Set the Tags BreadCrumbindex (so its AudioFile-List will not be changed)
+                    if fBreadCrumbDepth = 0 then
+                        Tags.Add(fClearTag);
+
+                    fBreadCrumbDepth := fBreadCrumbDepth + 1;
+                    aTag.BreadCrumbIndex := fBreadCrumbDepth;
+                end;
+                // anyway, when we chose a tag, we should use it
+                properList := aTag.AudioFiles;
+            end;
+        end else
+        begin
+            // no Tag was clicked
+            properList := Source;
+            // to be sure: Clear all Breadcrumbs
+            ClearBreadCrumbs(-1);
+        end;
 
     end;
+    {
 
     if assigned(aTag) then
     begin
@@ -297,30 +439,27 @@ begin
         backupList := Source;
     end;
 
-    {
-    change:
-    If aTag = Nil: Cloud of whole library - no backup of the List
-
-    else
-        if Tag in BreadCrumb: Load old AudioFile-List (Source should be Nil then)
-
-        else // New tag clicked
-            Store List in AudioFilesBackups
-    }
+     }
 
     try
         // Clear the cloud, i.e. set the Count of all Tags to Zero
         Reset;
 
         // Insert Files into the new Cloud
-        for i := 0 to backupList.Count - 1 do
-            AddAudioFile(TAudioFile(backupList[i]));
+        for i := 0 to properList.Count - 1 do
+            AddAudioFile(TAudioFile(properList[i]));
 
         // Sort Tags by Count
         Tags.Sort(Sort_Count);
 
-        // todo: Clear the "BrowseTags", i.e. the previously clicked tags
+         self.SetActivetags;
 
+
+        // Copy Tags with Count > 0 to Currenttag-List ???
+
+
+
+        // todo: Clear the "BrowseTags", i.e. the previously clicked tags
     finally
        // if assigned(aTag) then
        //     backupList.Free;
@@ -398,6 +537,12 @@ begin
     if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
         Dest.Add(aAudioFile.Artist);
 
+    if aAudioFile.Album <> AUDIOFILE_UNKOWN then
+        Dest.Add(aAudioFile.Album);
+
+//    if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
+//        Dest.Add(aAudioFile.Titel);
+
     if (aAudioFile.Year <> '0') and (trim(aAudioFile.Year) <> '')  then
     begin
         Dest.Add(aAudioFile.Year);
@@ -427,7 +572,8 @@ var i: Integer;
 begin
     for i := 0 to aAudioFile.TagList.Count - 1 do
     begin
-        TTag(aAudioFile.TagList[i]).AudioFiles.Add(aAudioFile);
+        if (TTag(aAudioFile.TagList[i]).BreadCrumbIndex = High(Integer)) then
+            TTag(aAudioFile.TagList[i]).AudioFiles.Add(aAudioFile);
 
         // todo if aTag.count = 1 then AddTag to "currenttagCloudList"
         // NO. We dont need the Tags of Previous Clouds, but the List of AudioFiles
@@ -476,7 +622,9 @@ begin
         begin
             aTag := GetTag(allTags[i]);
             // ensure Uniquness - check whether the tag was just added to this file
-            if  (aTag.count = 0) or (TAudioFile(aTag.AudioFiles[aTag.count-1]) <> aAudioFile) then
+            if  (aTag.BreadCrumbIndex = High(Integer)) AND
+                ((aTag.count = 0) or (TAudioFile(aTag.AudioFiles[aTag.count-1]) <> aAudioFile))
+            then
             begin
                 // Add the AudioFile into the Filelist of the Tag
                 aTag.AudioFiles.Add(aAudioFile);
@@ -498,7 +646,6 @@ end;
 
 
 procedure TTagCloud.AddAudioFile(aAudioFile: TAudioFile);
-var i: Integer;
 begin
     if aAudioFile.TagList.Count = 0 then
     begin
@@ -527,6 +674,13 @@ end;
 
 { TPaintTag }
 
+constructor TPaintTag.Create(aKey: UTF8String);
+begin
+    inherited Create(aKey);
+    fColor := clBlack;
+    fActiveColor := clRed;
+end;
+
 procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
 begin
     aCanvas.Font.Size := FontSize;
@@ -536,6 +690,16 @@ end;
 
 procedure TPaintTag.Paint(aCanvas: TCanvas);
 begin
+    aCanvas.Font.Color := fColor;
+    aCanvas.Font.Style := [];
+    aCanvas.Font.Size := FontSize;
+    aCanvas.TextOut(fLeft, fTop, Key);
+end;
+
+procedure TPaintTag.PaintActive(aCanvas: TCanvas);
+begin
+    aCanvas.Font.Color := fActiveColor;
+    aCanvas.Font.Style := [fsUnderline];
     aCanvas.Font.Size := FontSize;
     aCanvas.TextOut(fLeft, fTop, Key);
 end;
@@ -605,6 +769,9 @@ procedure TCloudPainter.Paint(Source: TObjectList);
 var y, i: Integer;
 begin
 
+if not assigned(source) then Exit;
+
+
     RawPaint1(Source);
     RawPaint2(Source);
 
@@ -627,17 +794,33 @@ end;
 
 
 
+function TCloudPainter.GetMaxCount(Source: TObjectList): Integer;
+var i: integer;
+begin
+    result := 0;
+    for i := 0 to Source.Count - 1 do
+        if TTag(Source[i]).BreadCrumbIndex = High(Integer) then
+        begin
+            result := TTag(Source[i]).count;
+            break;
+        end;
+end;
+
 function TCloudPainter.GetProperFontSize(aTag: TPaintTag): Integer;
 begin
 
-    if (aTag.count < (0.9 * lastFontChangeAt)) then
+    if aTag.BreadCrumbIndex = High(Integer)  then
     begin
-        if currentFontSize > 8 then
-            currentFontSize := currentFontSize - 1;
-        lastFontChangeAt := aTag.count;
-    end;
+        if (aTag.count < (0.9 * lastFontChangeAt)) then
+        begin
+            if currentFontSize > 8 then
+                currentFontSize := currentFontSize - 1;
+            lastFontChangeAt := aTag.count;
+        end;
 
-    result := currentFontSize;
+        result := currentFontSize;
+    end else
+        result := 12;
 
   { result :=  round(
 
@@ -654,10 +837,12 @@ begin
 end;
 
 
-function TCloudPainter.GetTagAtMousePos(x, y: Integer): TTag;
+function TCloudPainter.GetTagAtMousePos(x, y: Integer): TPaintTag;
 var line: TTagLine;
   i: Integer;
 begin
+    result := Nil;
+
     for i := Taglines.Count - 1 downto 0 do
       if TTagLine(TagLines[i]).Top <= y then
       begin
@@ -671,7 +856,7 @@ begin
     begin
         if TPaintTag(line.Tags[i]).fLeft <= x then
         begin
-            result := TTag(line.Tags[i]);
+            result := TPaintTag(line.Tags[i]);
             break;
         end;
     end;
@@ -698,12 +883,26 @@ begin
     y := 0;     // current y-Position
     lineHeight := 0;   // Height of the current "line"
 
-    if Source.Count > 1 then
-        maxCount := TTag(Source[1]).count;
+//    if Source.Count > 1 then
+//        maxCount := TTag(Source[1]).count;
+
+    maxCount := GetMaxCount(Source);
 
     lastFontChangeAt := maxCount;
-    currentFontSize := 20;
-    FontFactor := - 12 *4 / (3 * maxCount);
+    case maxCount of
+        0..10: currentFontSize := 12;
+        11..25: currentFontSize := 13;
+        26..50: currentFontSize := 14;
+        51..75: currentFontSize := 15;
+        76..100: currentFontSize := 16;
+        101..125: currentFontSize := 17;
+        126..150: currentFontSize := 18;
+        151..175: currentFontSize := 19;
+    else
+        currentFontSize := 20;
+
+    end;
+    // FontFactor := - 12 *4 / (3 * maxCount);
 
     while (i < Source.Count) and Not CanvasFull do
     begin
@@ -835,6 +1034,17 @@ begin
 
 end;
 
+procedure TCloudPainter.RePaintTag(aTag: TPaintTag; Active: Boolean);
+begin
+    if assigned(aTag) then
+    begin
+        if Active then
+            aTag.PaintActive(Canvas)
+        else
+            aTag.Paint(Canvas);
+    end;
+end;
+
 procedure TCloudPainter.SetHeight(Value: Integer);
 begin
  //   if Value > 10 then
@@ -849,6 +1059,20 @@ begin
   //      fWidth := Value - 10
   //  else
         fWidth := value; //0;
+end;
+
+{ TCloudViewer }
+
+procedure TCloudViewer.CMWantspecialKey(var Msg: TWMKey);
+begin
+  inherited;
+
+
+      with msg do
+        case Charcode of
+            vk_left, vk_up, vk_right, vk_down : Result:=1;
+        end;
+
 end;
 
 end.

@@ -64,7 +64,7 @@ uses
   dwTaskbarComponents, dwTaskbarThumbnails,
   UpdateUtils, uDragFilesSrc,
 
-  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls;
+  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds;
 
 type
 
@@ -1233,7 +1233,14 @@ type
     procedure PanelTagCloudBrowsePaint(Sender: TObject);
     procedure PanelTagCloudBrowseMouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: Integer);
+    procedure PanelTagCloudBrowseClick(Sender: TObject);
 
+
+    procedure CloudTest(Sender: TObject);
+    procedure CloudTestKey(Sender: TObject; var Key: Char);
+
+    procedure CloudTestKeyDown(Sender: TObject; var Key: Word;
+    Shift: TShiftState);
 
   private
 
@@ -1275,6 +1282,9 @@ type
 
     { Private declarations }
   public
+
+      CloudViewer: TCloudViewer;
+
     // Zählt die Nachrichten "Neues Laufwerk angeschlossen"
     // nötig, da ein Update der Bib nicht möglich ist, wenn ein Update bereits läuft
     NewDrivesNotificationCount: Integer;
@@ -1600,7 +1610,8 @@ begin
     BibRatingHelper := TRatingHelper.Create;
     MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
-    MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
+    //MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
+    MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;       sdsd
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
     MedienBib.CoverSavePath := SavePath + 'Cover\';
@@ -1987,9 +1998,49 @@ begin
   NewPlayerPanel.DoubleBuffered := True;
 end;
 
+procedure TNemp_MainForm.CloudTest(Sender: TObject);
+begin
+wuppdi(42);
+end;
+
+procedure TNemp_MainForm.CloudTestKey(Sender: TObject; var Key: Char);
+begin
+//  wuppdi(ord(key));
+caption := caption + key;
+end;
+
+procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+wuppdi;
+end;
+
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
+
 begin
   // Nothing to do here. Will be done in nemp.dpr
+
+ { CloudViewer := TCloudViewer.Create(self);
+  CloudViewer.Parent := PanelTagCloudBrowse;
+  CloudViewer.Align := alClient;
+
+  CloudViewer.TabStop := True;
+
+  CloudViewer.OnKeypress := CloudTestKey;
+  CloudViewer.OnKeyDown := CloudTestKeyDown;
+
+
+
+//  CloudViewer.SetFocus;
+
+
+  CloudViewer.OnEnter := Cloudtest;
+
+ // t.onclick:= TabPanelPlaylistClick;
+
+  }
+  asas
+
 end;
 
 procedure TNemp_MainForm.FormShow(Sender: TObject);
@@ -9404,13 +9455,34 @@ begin
         NempSkin.DrawAPanel((Sender as TNempPanel), True);
 end;
 
+procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
+begin
+    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.CurrentTag);
+
+    MedienBib.TagCloud.  ShowTags(ListView1);
+
+end;
+
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var aTag: TTag;
+var aTag: TPaintTag;
 begin
     aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
-    if assigned(aTag) then
-        caption := aTag.key;
+
+    if (aTag <> MedienBib.TagCloud.CurrentTag) and assigned(aTag) then
+    begin
+
+        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.CurrentTag, False);
+
+
+        MedienBib.TagCloud.CurrentTag := aTag;
+
+        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.CurrentTag, True);
+
+        if assigned(aTag) then
+            caption := aTag.key + ' - ' + IntToStr(aTag.count) + 'index: ' + IntToStr(aTag.BreadCrumbIndex);
+
+    end;
 
 end;
 
@@ -9881,6 +9953,7 @@ begin
   CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
   CoverScrollbar.OnChange := CoverScrollbarChange;
   CoverScrollbar.SetFocus;
+
 end;
 
 
@@ -10072,6 +10145,7 @@ begin
  //  aDrive.GetInfo('E:\');
  //  Showmessage(aDrive.Name + #13#10 + IntToStr(aDrive.SerialNr));
 //   exit;
+CloudViewer.SetFocus;
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 end;
@@ -10115,6 +10189,8 @@ begin
     NempOptions.Language := newLanguage; 
     ReTranslateNemp(newLanguage);
 end;
+
+
 
 
 procedure TNemp_MainForm.VST_ColumnPopupOnClick(Sender: TObject);

@@ -329,6 +329,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 2
           Visible = False
+          OnClick = PanelTagCloudBrowseClick
           OnMouseMove = PanelTagCloudBrowseMouseMove
           OnResize = PanelTagCloudBrowseResize
           OnPaint = PanelTagCloudBrowsePaint
@@ -340,6 +341,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 25
             Columns = <>
             TabOrder = 0
+            Visible = False
             OnClick = ListView1DblClick
             OnDblClick = ListView1DblClick
           end
@@ -2230,7 +2232,6 @@ object Nemp_MainForm: TNemp_MainForm
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 273
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
@@ -2246,7 +2247,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 245
       DesignSize = (
         845
         265)
@@ -2259,7 +2259,6 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 235
         object Splitter4: TSplitter
           Left = 400
           Top = 0
@@ -2339,7 +2338,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 235
           Columns = <
             item
               Position = 0
@@ -2414,7 +2412,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 235
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
