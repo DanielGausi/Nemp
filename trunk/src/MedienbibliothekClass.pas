@@ -498,7 +498,7 @@ type
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
-        procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag);
+        procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
         // Search the next matching cover
         function GetCoverWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
 
@@ -3021,7 +3021,7 @@ end;
       not in the breadcrumb-navigation
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag);
+procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
 var i: Integer;
 begin
   AnzeigeListIsCurrentlySorted := False;
@@ -3037,7 +3037,8 @@ begin
       for i := 0 to aTag.AudioFiles.Count - 1 do
           AnzeigeListe.Add(aTag.AudioFiles[i]);
 
-  Self.TagCloud.BuildCloud(Mp3ListeArtistSort, aTag, False);
+  if BuildNewCloud then
+      TagCloud.BuildCloud(Mp3ListeArtistSort, aTag, False);
 
 
   AnzeigeShowsPlaylistFiles := False;
