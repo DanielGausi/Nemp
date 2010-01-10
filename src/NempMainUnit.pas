@@ -733,7 +733,6 @@ type
     EdtBibGenre: TComboBox;
     Button1: TButton;
     PanelTagCloudBrowse: TNempPanel;
-    ListView1: TListView;
     PM_ML_GetTags: TMenuItem;
     LblBibTags: TLabel;
 
@@ -1227,20 +1226,20 @@ type
     procedure EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
     procedure VDTCoverClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure ListView1DblClick(Sender: TObject);
     procedure PM_ML_GetTagsClick(Sender: TObject);
     procedure PanelTagCloudBrowseResize(Sender: TObject);
     procedure PanelTagCloudBrowsePaint(Sender: TObject);
     procedure PanelTagCloudBrowseMouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: Integer);
     procedure PanelTagCloudBrowseClick(Sender: TObject);
-
-
-    procedure CloudTest(Sender: TObject);
     procedure CloudTestKey(Sender: TObject; var Key: Char);
 
     procedure CloudTestKeyDown(Sender: TObject; var Key: Word;
     Shift: TShiftState);
+
+    procedure CloudPaint(Sender: TObject);
+    procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
   private
 
@@ -1610,8 +1609,8 @@ begin
     BibRatingHelper := TRatingHelper.Create;
     MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
-    //MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
-    MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;       sdsd
+    MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
+    //MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
     MedienBib.CoverSavePath := SavePath + 'Cover\';
@@ -1998,29 +1997,93 @@ begin
   NewPlayerPanel.DoubleBuffered := True;
 end;
 
-procedure TNemp_MainForm.CloudTest(Sender: TObject);
+
+procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
 begin
-wuppdi(42);
+
+    MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
+
+    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
+
+    MedienBib.TagCloud.  ShowTags;//(ListView1);
 end;
+
+
+procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var aTag: TPaintTag;
+begin
+    aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
+
+    if (aTag <> MedienBib.TagCloud.MouseOverTag) and assigned(aTag) then
+    begin
+
+        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, False);
+        MedienBib.TagCloud.MouseOverTag := aTag;
+        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, True);
+
+        if assigned(aTag) then
+            caption := aTag.key + ' - ' + IntToStr(aTag.count) + 'index: ' + IntToStr(aTag.BreadCrumbIndex);
+    end;
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowsePaint(Sender: TObject);
+begin
+    MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
+begin
+    MedienBib.TagCloud.CloudPainter.Height := PanelTagCloudBrowse.Height;
+    MedienBib.TagCloud.CloudPainter.Width := PanelTagCloudBrowse.Width;
+    MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
+end;
+
 
 procedure TNemp_MainForm.CloudTestKey(Sender: TObject; var Key: Char);
 begin
-//  wuppdi(ord(key));
-caption := caption + key;
+    if ord(Key) = vk_return then
+    begin
+        MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
+        MedienBib.TagCloud.ShowTags;//(ListView1);
+    end;
 end;
 
 procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-wuppdi;
+
+MedienBib.TagCloud.NavigateCloud(Key);
+
+MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
+{
+    case key of
+        vk_up: wuppdi (1);
+        vk_Down: wuppdi (2);
+        vk_Left: MedienBib.TagCloud.NavigateCloud(Key);
+        vk_right: wuppdi (4);
+    end;
+    }
 end;
+
+procedure TNemp_MainForm.CloudPaint(Sender: TObject);
+begin
+  MedienBib.TagCloud.CloudPainter.PaintAgain;
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    CloudViewer.SetFocus;
+end;
+
 
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 
 begin
   // Nothing to do here. Will be done in nemp.dpr
 
- { CloudViewer := TCloudViewer.Create(self);
+  CloudViewer := TCloudViewer.Create(self);
   CloudViewer.Parent := PanelTagCloudBrowse;
   CloudViewer.Align := alClient;
 
@@ -2030,16 +2093,16 @@ begin
   CloudViewer.OnKeyDown := CloudTestKeyDown;
 
 
+  CloudViewer.OnMouseMove := PanelTagCloudBrowseMouseMove;
+  CloudViewer.onclick:= PanelTagCloudBrowseClick;
 
-//  CloudViewer.SetFocus;
+  CloudViewer.OnMouseDown := PanelTagCloudBrowseMouseDown;
+
+  CloudViewer.OnResize := PanelTagCloudBrowseResize;
+
+  CloudViewer.OnPaint := CloudPaint;
 
 
-  CloudViewer.OnEnter := Cloudtest;
-
- // t.onclick:= TabPanelPlaylistClick;
-
-  }
-  asas
 
 end;
 
@@ -9455,48 +9518,6 @@ begin
         NempSkin.DrawAPanel((Sender as TNempPanel), True);
 end;
 
-procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
-begin
-    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.CurrentTag);
-
-    MedienBib.TagCloud.  ShowTags(ListView1);
-
-end;
-
-procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
-var aTag: TPaintTag;
-begin
-    aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
-
-    if (aTag <> MedienBib.TagCloud.CurrentTag) and assigned(aTag) then
-    begin
-
-        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.CurrentTag, False);
-
-
-        MedienBib.TagCloud.CurrentTag := aTag;
-
-        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.CurrentTag, True);
-
-        if assigned(aTag) then
-            caption := aTag.key + ' - ' + IntToStr(aTag.count) + 'index: ' + IntToStr(aTag.BreadCrumbIndex);
-
-    end;
-
-end;
-
-procedure TNemp_MainForm.PanelTagCloudBrowsePaint(Sender: TObject);
-begin
-MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
-end;
-
-procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
-begin
-    MedienBib.TagCloud.CloudPainter.Height := PanelTagCloudBrowse.Height;
-    MedienBib.TagCloud.CloudPainter.Width := PanelTagCloudBrowse.Width;
-    MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
-end;
 
 procedure TNemp_MainForm.PanelCoverBrowsePaint(Sender: TObject);
 begin
@@ -10090,17 +10111,6 @@ procedure TNemp_MainForm.Lbl_CoverFlowMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   CoverScrollbar.SetFocus;
-end;
-
-procedure TNemp_MainForm.ListView1DblClick(Sender: TObject);
-begin
-    if ListView1.ItemIndex >= 0 then
-    begin
-        MedienBib.GenerateAnzeigeListeFromTagCloud(TTag(ListView1.Items.Item[ListView1.ItemIndex].Data));
-        MedienBib.TagCloud.  ShowTags(ListView1);
-
-        Caption := InttoStr(ListView1.Items.Count);
-    end;
 end;
 
 procedure TNemp_MainForm.SkinEditorstarten1Click(Sender: TObject);

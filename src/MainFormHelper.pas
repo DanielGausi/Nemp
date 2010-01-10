@@ -867,11 +867,11 @@ begin
             2: begin
                 // Hier Code für Tagwolke einfügen
                 MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags(ListView1);
+                MedienBib.TagCloud.ShowTags;//(ListView1);
 
-                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag);
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
 
-                Caption := InttoStr(ListView1.Items.Count);
+                //Caption := InttoStr(ListView1.Items.Count);
 
             end;
         end;
@@ -952,6 +952,8 @@ begin
                 TabBtn_Browse.Refresh;
                 TabBtn_CoverFlow.Refresh;
                 TabBtn_CoverFlow.Refresh;
+
+                CloudViewer.SetFocus;
             end;
         end;
     end;

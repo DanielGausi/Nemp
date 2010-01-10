@@ -334,17 +334,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PanelTagCloudBrowseResize
           OnPaint = PanelTagCloudBrowsePaint
           OwnerDraw = False
-          object ListView1: TListView
-            Left = 0
-            Top = 0
-            Width = 89
-            Height = 25
-            Columns = <>
-            TabOrder = 0
-            Visible = False
-            OnClick = ListView1DblClick
-            OnDblClick = ListView1DblClick
-          end
         end
       end
       object AuswahlHeaderPanel: TNempPanel
