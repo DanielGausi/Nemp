@@ -3024,6 +3024,9 @@ end;
 procedure TMedienBibliothek.GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
 var i: Integer;
 begin
+  if not assigned(aTag) then exit;
+
+
   AnzeigeListIsCurrentlySorted := False;
 
   AnzeigeListe.Clear;

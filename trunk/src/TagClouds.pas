@@ -11,7 +11,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
-    ComCtrls, Graphics, Messages;
+    ComCtrls, Graphics, Messages, NempPanel;
 
 type
 
@@ -182,6 +182,17 @@ type
           function GetUpTag: TPaintTag;
           function GetDownTag: TPaintTag;
 
+          function GetFirstTag: TPaintTag;
+          function GetLastTag: TPaintTag;
+          function GetFirstTagOfLine: TPaintTag;
+          function GetLastTagOfLine: TPaintTag;
+
+          function GetTopTag: TPaintTag;
+          function GetBottomTag: TPaintTag;
+
+
+
+
 
 
 
@@ -205,7 +216,7 @@ type
 
         procedure ShowTags;//(aListView: TListView);
 
-        procedure NavigateCloud(aKey: Word);
+        procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
         // Add a file to the TagCloud
         procedure AddAudioFile(aAudioFile: TAudioFile);
@@ -221,7 +232,18 @@ type
 
   end;
 
-  TCloudViewer = class(TCustomControl)
+  TCloudViewer = class(TNempPanel)
+  protected
+      procedure CMWantspecialKey(var Msg : TWMKey); message CM_WANTSpecialKey;
+
+  published
+      property OnKeypress;
+      property OnKeyDown;
+
+  end;
+
+
+{  TCloudViewer = class(TCustomControl)
   private
       FOnPaint: TNotifyEvent;
 
@@ -245,7 +267,7 @@ type
   end;
 
 
-
+ }
 
 function Sort_Count(item1,item2:pointer):integer;
 function Sort_Name(item1,item2:pointer):integer;
@@ -540,6 +562,125 @@ begin
         result := GetDefaultTag;
 end;
 
+function TTagCloud.GetFirstTag: TPaintTag;
+var aLine: TTagline;
+begin
+    if CloudPainter.TagLines.Count > 0 then
+    begin
+        aLine := TTagLine(CloudPainter.TagLines[0]);
+        if aLine.Tags.Count > 0 then
+            result := TPaintTag(aLine.Tags[0])
+        else
+            GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+function TTagCloud.GetLastTag: TPaintTag;
+var aLine: TTagline;
+begin
+    if CloudPainter.TagLines.Count > 0 then
+    begin
+        aLine := TTagLine(CloudPainter.TagLines[CloudPainter.TagLines.Count-1]);
+        if aLine.Tags.Count > 0 then
+            result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
+        else
+            GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+
+function TTagCloud.GetFirstTagOfLine: TPaintTag;
+var aLine: TTagline;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fLine;
+
+        if aLine.Tags.Count > 0 then
+            result := TPaintTag(aLine.Tags[0])
+        else
+            GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+function TTagCloud.GetLastTagOfLine: TPaintTag;
+var aLine: TTagline;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fLine;
+        if aLine.Tags.Count > 0 then
+            result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
+        else
+            GetDefaultTag
+    end else
+        result := GetDefaultTag;
+end;
+
+function TTagCloud.GetTopTag: TPaintTag;
+var bLine: TTagLine;
+    oMax, oCurrent, i: Integer;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        oMax := -1;
+
+        if CloudPainter.TagLines.Count > 0 then
+        begin
+            bLine := TTagLine(CloudPainter.TagLines[0]);
+            if bLine.Tags.Count = 0 then
+                result := Nil
+            else
+            begin
+                for i := 0 to bLine.Tags.Count - 1 do
+                begin
+                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
+                    if oCurrent > oMax then
+                    begin
+                        result := TPaintTag(bLine.Tags[i]);
+                        oMax := oCurrent;
+                    end;
+                end;
+            end;
+        end else
+            result := GetDefaultTag;
+    end else
+        result := GetDefaultTag;
+end;
+function TTagCloud.GetBottomTag: TPaintTag;
+var bLine: TTagLine;
+    oMax, oCurrent, i: Integer;
+begin
+    if assigned(fFocussedTag) then
+    begin
+        oMax := -1;
+
+        if CloudPainter.TagLines.Count > 0 then
+        begin
+            bLine := TTagLine(CloudPainter.TagLines[CloudPainter.TagLines.Count - 1]);
+            if bLine.Tags.Count = 0 then
+                result := Nil
+            else
+            begin
+                for i := 0 to bLine.Tags.Count - 1 do
+                begin
+                    oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
+                    if oCurrent > oMax then
+                    begin
+                        result := TPaintTag(bLine.Tags[i]);
+                        oMax := oCurrent;
+                    end;
+                end;
+            end;
+        end else
+            result := GetDefaultTag;
+    end else
+        result := GetDefaultTag;
+end;
+
+
+
+
 function TTagCloud.GetFirstNewTag: TPaintTag;
 var i: Integer;
 begin
@@ -805,13 +946,45 @@ end;
 
 
 
-procedure TTagCloud.NavigateCloud(aKey: Word);
+procedure TTagCloud.NavigateCloud(aKey: Word; Shift: TShiftState);
 begin
     case aKey of
         vk_up:    FocussedTag := GetUpTag;
         vk_Down:  FocussedTag := GetDownTag;
         vk_Left:  FocussedTag := GetLeftTag;
         vk_right: FocussedTag := GetRightTag;
+
+        vk_Escape: begin
+              if (fBreadCrumbDepth > 0) then
+                  FocussedTag := GetDefaultTag
+              else
+                  FocussedTag := Nil;
+        end;
+
+        vk_home: begin
+                    if ssCtrl in Shift then
+                        FocussedTag := GetFirstTag
+                    else
+                        FocussedTag := GetFirstTagOfLine
+        end;
+
+        vk_end: begin
+                    if ssCtrl in Shift then
+                        FocussedTag := GetLastTag
+                    else
+                        FocussedTag := GetLastTagOfLine;
+        end;
+
+        vk_Prior: FocussedTag := GetTopTag;
+
+        vk_Next: FocussedTag := GetBottomTag;
+
+        vk_Back: begin
+              if (fBreadCrumbDepth > 0) then
+                  FocussedTag := TPaintTag(ActiveTags[fbreadCrumbDepth-1])
+              else
+                  FocussedTag := Nil;
+        end;
     end;
 
     //CloudPainter.DoPaint;
@@ -1413,7 +1586,7 @@ begin
         end;
 
 end;
-
+                        (*
 procedure TCloudViewer.WMEraseBkGnd(var Message: TWMEraseBkGnd);
 begin
   if Assigned(FOnPaint) then
@@ -1433,6 +1606,6 @@ begin
         FOnPaint(Self)
   end;
 
-end;
+end;     *)
 
 end.
