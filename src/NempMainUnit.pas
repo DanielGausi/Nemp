@@ -1232,6 +1232,7 @@ type
     procedure PanelTagCloudBrowseMouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: Integer);
     procedure PanelTagCloudBrowseClick(Sender: TObject);
+    procedure PanelTagCloudBrowseDblClick(Sender: TObject);
     procedure CloudTestKey(Sender: TObject; var Key: Char);
 
     procedure CloudTestKeyDown(Sender: TObject; var Key: Word;
@@ -2000,11 +2001,14 @@ end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
 begin
-
     MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
+    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
+end;
 
+procedure TNemp_MainForm.PanelTagCloudBrowseDblClick(Sender: TObject);
+begin
+    MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
     MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-
     MedienBib.TagCloud.  ShowTags;//(ListView1);
 end;
 
@@ -2052,18 +2056,16 @@ end;
 procedure TNemp_MainForm.CloudTestKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-
-MedienBib.TagCloud.NavigateCloud(Key);
-
-MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-{
+    MedienBib.TagCloud.NavigateCloud(Key, Shift);
     case key of
-        vk_up: wuppdi (1);
-        vk_Down: wuppdi (2);
-        vk_Left: MedienBib.TagCloud.NavigateCloud(Key);
-        vk_right: wuppdi (4);
+        vk_Escape,
+        vk_Back: begin
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
+                MedienBib.TagCloud.ShowTags;
+        end
+    else
+        MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
     end;
-    }
 end;
 
 procedure TNemp_MainForm.CloudPaint(Sender: TObject);
@@ -2094,15 +2096,14 @@ begin
 
 
   CloudViewer.OnMouseMove := PanelTagCloudBrowseMouseMove;
-  CloudViewer.onclick:= PanelTagCloudBrowseClick;
+  CloudViewer.OnClick := PanelTagCloudBrowseClick;
+  CloudViewer.OnDblClick := PanelTagCloudBrowseDblClick;
 
   CloudViewer.OnMouseDown := PanelTagCloudBrowseMouseDown;
 
   CloudViewer.OnResize := PanelTagCloudBrowseResize;
 
   CloudViewer.OnPaint := CloudPaint;
-
-
 
 end;
 
