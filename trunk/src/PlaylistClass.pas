@@ -97,10 +97,6 @@ type
       function GetProgress: Double;
       procedure SetProgress(Value: Double);
 
-      // Gets the Data for a new created AudioFile
-      // First: GetAudiodata.
-      // Second: Get Rating from the library (important for non-mp3-files)
-      procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
 
 
     public
@@ -764,7 +760,7 @@ begin
       AudioFile.FileIsPresent := True;
       if (Not AudioFile.FileChecked) AND (Not AudioFile.isStream) then
       begin
-          SynchronizeAudioFile(NewFile, aAudioFileName, False);
+          SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
           {AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover OR GAD_RATING);
 
           mbAf := MedienBib.GetAudioFileWithFilename(AudioFile.Pfad);
@@ -845,23 +841,6 @@ begin
   ReInitPlaylist;
 end;
 
-
-{
-    --------------------------------------------------------
-    Getting the Data for a new created AudioFile
-    --------------------------------------------------------
-}
-procedure TNempPlaylist.SynchronizeAudioFile(aNewFile: TAudioFile;
-  aFileName: UnicodeString; WithCover: Boolean = True);
-var mbAf: TAudioFile;
-begin
-    aNewFile.GetAudioData(aFileName, GAD_Cover OR GAD_Rating)
-    if WithCover then
-        Medienbib.InitCover(aNewFile);
-    mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
-    if assigned(mbAF) then
-        aNewFile.Rating := mbAf.Rating;
-end;
 
 {
     --------------------------------------------------------
