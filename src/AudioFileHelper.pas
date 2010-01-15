@@ -119,6 +119,12 @@ function BinaerCoverIDSuche(Liste: TObjectlist; CoverID: String; l,r: Integer): 
 function BinaerArtistSuche_JustContains(Liste: TObjectlist; artist: UnicodeString; l,r:integer):integer;
 function BinaerAlbumSuche_JustContains(Liste: TObjectlist; album: UnicodeString; l,r:integer):integer;
 
+// Gets the Data for a new created AudioFile
+// First: GetAudiodata.
+// Second: Get Rating from the library (important for non-mp3-files)
+procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
+
+
 procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 procedure LoadPlaylistFromFileM3U8(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 procedure LoadPlaylistFromFilePLS(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
@@ -842,6 +848,23 @@ end;
 
 {
     --------------------------------------------------------
+    Getting the Data for a new created AudioFile
+    --------------------------------------------------------
+}
+procedure SynchronizeAudioFile(aNewFile: TAudioFile;
+  aFileName: UnicodeString; WithCover: Boolean = True);
+var mbAf: TAudioFile;
+begin
+    aNewFile.GetAudioData(aFileName, GAD_Cover OR GAD_Rating);
+    if WithCover then
+        Medienbib.InitCover(aNewFile);
+    mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
+    if assigned(mbAF) then
+        aNewFile.Rating := mbAf.Rating;
+end;
+
+{
+    --------------------------------------------------------
     LoadPlaylistFromFileM3U8
     Load a playlist from an m3u8-playlist as used in Winamp
     Note: With Delphi 2009 you can load m3u and m3u8-lists
@@ -918,7 +941,8 @@ begin
                               aAudioFile.FileIsPresent := True;
                               if AutoScan then
                               begin
-                                  aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                                  //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                                  SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                                   aAudiofile.GetCueList;
                               end else
                               begin
@@ -953,7 +977,8 @@ begin
                         aAudioFile.FileIsPresent := True;
                         if AutoScan then
                         begin
-                            aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                            //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                            SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                             aAudiofile.GetCueList;
                         end else
                         begin
@@ -1006,7 +1031,8 @@ begin
           aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
           if AutoScan then
           begin
-              aAudioFile.GetAudioData(newFilename, GAD_Cover);
+              //aAudioFile.GetAudioData(newFilename, GAD_Cover);
+              SynchronizeAudioFile(aAudioFile, newFilename, False);
               aAudiofile.GetCueList;
           end;
         end;
@@ -1100,7 +1126,8 @@ begin
                             aAudioFile.FileIsPresent := True;
                             if AutoScan then
                             begin
-                                aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                                //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
+                                SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                                 aAudiofile.GetCueList;
                             end else
                             begin
