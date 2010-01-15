@@ -80,6 +80,7 @@ type
 
           lastFontChangeAt: Integer;
           currentFontSize: Integer;
+          visibleTags: TObjectList;
 
           function GetProperFontSize(aTag: TPaintTag):Integer;
 
@@ -123,6 +124,8 @@ type
 
           function GetTagAtMousePos(x,y: Integer): TPaintTag;
 
+          function GetFirstNewTag: TPaintTag;
+
   end;
 
 
@@ -136,20 +139,13 @@ type
 
           fClearTag: TTag;
 
-          // A list of TObjectlists with AudioFiles
-          ///BrowseHistory: TObjectList;
-
           fBreadCrumbDepth: Integer;
-
-
 
           fMouseOverTag: TPaintTag;
           fFocussedTag: TPaintTag;
 
           procedure SetMouseOverTag(Value: TPaintTag);
           procedure SetFocussedTag(Value: TPaintTag);
-
-
 
           procedure ClearBreadCrumbs(Above: Integer);
 
@@ -172,10 +168,9 @@ type
 
           function GetOverLap(TagA, TagB: TPaintTag): Integer;
 
-          function GetFirstNewTag: TPaintTag;
+
 
           function GetDefaultTag: TPainttag;
-
 
           function GetLeftTag: TPaintTag;
           function GetRightTag: TPaintTag;
@@ -190,45 +185,39 @@ type
           function GetTopTag: TPaintTag;
           function GetBottomTag: TPaintTag;
 
-
-
-
-
-
-
       public
 
-        CloudPainter: TCloudPainter;
+          CloudPainter: TCloudPainter;
 
-        property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
-        property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
+          property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
+          property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
 
 
-        property CurrentTagList: TObjectList read fGetTagList;
+          property CurrentTagList: TObjectList read fGetTagList;
 
-        property ClearTag: TTag read fCleartag;
+          property ClearTag: TTag read fCleartag;
 
-        constructor Create;
-        destructor Destroy; override;
+          constructor Create;
+          destructor Destroy; override;
 
-        // Build a Tag-Cloud for the AudioFiles given in Source
-        procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
+          // Build a Tag-Cloud for the AudioFiles given in Source
+          procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 
-        procedure ShowTags;//(aListView: TListView);
+          procedure ShowTags;//(aListView: TListView);
 
-        procedure NavigateCloud(aKey: Word; Shift: TShiftState);
+          procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
-        // Add a file to the TagCloud
-        procedure AddAudioFile(aAudioFile: TAudioFile);
+          // Add a file to the TagCloud
+          procedure AddAudioFile(aAudioFile: TAudioFile);
 
-        // Delete a File from the Cloud
-        procedure DeleteAudioFile(aAudioFile: TAudioFile);
+          // Delete a File from the Cloud
+          procedure DeleteAudioFile(aAudioFile: TAudioFile);
 
-        // Update a File (change the Tags) in the Cloud
-        procedure UpdateAudioFile(aAudioFile: TAudioFile);
+          // Update a File (change the Tags) in the Cloud
+          procedure UpdateAudioFile(aAudioFile: TAudioFile);
 
-        // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
-        procedure Reset;
+          // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
+          procedure Reset;
 
   end;
 
@@ -681,25 +670,6 @@ end;
 
 
 
-function TTagCloud.GetFirstNewTag: TPaintTag;
-var i: Integer;
-begin
-    if ActiveTags.Count > 0 then
-        Result := TPaintTag(Activetags[0])
-    else
-        Result := Nil;
-
-    for i := 1 to Activetags.Count - 1 do
-        if TPainttag(Activetags[i]).BreadCrumbIndex = High(Integer) then
-        begin
-            result := TPainttag(Activetags[i]);
-            break;
-        end;
-end;
-
-
-
-
 procedure TTagCloud.ShowTags;//(aListView: TListView);
 var i: Integer;
     newItem: TListItem;
@@ -711,7 +681,7 @@ begin
 
     CloudPainter.Paint(CurrentTagList);
 
-    FocussedTag := GetFirstNewTag;
+    FocussedTag := CloudPainter.GetFirstNewTag;
 
     if assigned(FocussedTag) then
         FocussedTag.PaintFocussed(CloudPainter.Canvas);
@@ -1255,10 +1225,12 @@ constructor TCloudPainter.Create;
 begin
     TagLines := TObjectList.Create;
     Tags := TObjectList.Create(False);
+    visibleTags := TObjectList.Create(False);
 end;
 
 destructor TCloudPainter.Destroy;
 begin
+    visibleTags.Free;
     TagLines.Free;
     Tags.Free;
     inherited;
@@ -1266,20 +1238,27 @@ end;
 
 
 procedure TCloudPainter.DoPaint;
-var y, i: Integer;
+var y, i, t: Integer;
 
 begin
     canvas.Brush.Color := ClWhite;
     canvas.Brush.Style := bsSolid;
     Canvas.FillRect(Rect(0,0,width, Height));
 
+    visibleTags.Clear;
+
     y := 0;
     for i := 0 to TagLines.Count - 1 do
     begin
         TTagLine(Taglines[i]).Top := y;
         TTagLine(Taglines[i]).Paint(Canvas);
+        for t := 0 to TTagLine(Taglines[i]).Tags.Count - 1 do
+            visibleTags.Add(TTagLine(Taglines[i]).Tags[t]);
+
         y := y + TTagLine(Taglines[i]).Height;
     end;
+
+    visibleTags.Sort(Sort_Count);
 end;
 
 
@@ -1323,7 +1302,6 @@ end;
 
 function TCloudPainter.GetProperFontSize(aTag: TPaintTag): Integer;
 begin
-
     if aTag.BreadCrumbIndex = High(Integer)  then
     begin
         if (aTag.count < (0.9 * lastFontChangeAt)) then
@@ -1332,23 +1310,9 @@ begin
                 currentFontSize := currentFontSize - 1;
             lastFontChangeAt := aTag.count;
         end;
-
         result := currentFontSize;
     end else
         result := 12;
-
-  { result :=  round(
-
-   FontFactor * (maxCount - aTag.count)) + 20;
-
-   if result < 8 then
-      result := 8;
-
-   if result > 20 then
-      result := 20;
-
-      }
-
 end;
 
 
@@ -1377,6 +1341,23 @@ begin
     end;
 
 end;
+
+function TCloudPainter.GetFirstNewTag: TPaintTag;
+var i: Integer;
+begin
+    if visibleTags.Count > 0 then
+        Result := TPaintTag(visibleTags[0])
+    else
+        Result := Nil;
+
+    for i := 1 to visibleTags.Count - 1 do
+        if TPainttag(visibleTags[i]).BreadCrumbIndex = High(Integer) then
+        begin
+            result := TPainttag(visibleTags[i]);
+            break;
+        end;
+end;
+
 
 {
   ------------------------------------

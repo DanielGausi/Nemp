@@ -110,7 +110,7 @@ function Sortieren_CoverID(item1,item2:pointer):integer;
 //function Sortieren_AlbumTrack_desc(item1,item2:pointer):integer;
 //function Sortieren_Rating_Desc(item1,item2:pointer):integer;
 
-function binaersuche(Liste: TObjectlist; filename: UnicodeString; l,r:integer):integer;
+function binaersuche(Liste: TObjectlist; FilePath, FileName: UnicodeString; l,r:integer):integer;
 function BinaerAlbumSuche(Liste: TObjectlist; album: UnicodeString; l,r:integer):integer;
 function BinaerArtistSuche(Liste: TObjectlist; artist: UnicodeString; l,r:integer):integer;
 function BinaerCoverIDSuche(Liste: TObjectlist; CoverID: String; l,r: Integer): Integer;
@@ -297,9 +297,8 @@ begin
   result := AnsiCompareText(TAudioFile(item1).Ordner, TAudioFile(item2).Ordner);
   if result = 0 then
       result := AnsiCompareText(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
-
-  //result := AnsiCompareText(TAudioFile(item1).Pfad, TAudioFile(item2).Pfad);
 end;
+
 function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
 begin
   result := AnsiCompareText(TAudioFile(item1).Album,TAudioFile(item2).Album);
@@ -655,9 +654,9 @@ end;
 
 
 
-function binaersuche(Liste: TObjectlist;filename: UnicodeString; l,r:integer):integer;
+function binaersuche(Liste: TObjectlist; FilePath, FileName: UnicodeString; l,r:integer):integer;
 var m:integer;
-    strm: UnicodeString;
+    //strm: UnicodeString;
     c:integer;
 begin
     if (r < l) or (r = -1) then
@@ -666,8 +665,16 @@ begin
     end else
     begin
         m:=(l+r) DIV 2;
-        strm:=(Liste[m] as TAudioFile).Pfad;
-        c := AnsiCompareText(filename,strm);
+
+          // strm := (Liste[m] as TAudioFile).Pfad;
+          c := AnsiCompareText(FilePath, TAudioFile(Liste[m]).Ordner);
+          if c = 0 then
+              c := AnsiCompareText(FileName, TAudioFile(Liste[m]).Dateiname);
+
+          //        strm:=(Liste[m] as TAudioFile).Pfad;
+          //c := AnsiCompareText(filename,strm);
+
+
         if l=r then
         begin
             if c=0 then result:=l
@@ -677,9 +684,9 @@ begin
             if  c=0 then
                 result:=m
             else if c > 0 then
-                result := binaersuche(Liste,filename,m+1,r)
+                result := binaersuche(Liste, FilePath, FileName, m+1, r)
                 else
-                    result := binaersuche(Liste,filename,l,m-1);
+                    result := binaersuche(Liste, FilePath, FileName, l, m-1);
         end;
     end;
 end;

@@ -329,10 +329,8 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 2
           Visible = False
-          OnClick = PanelTagCloudBrowseClick
-          OnMouseMove = PanelTagCloudBrowseMouseMove
           OnResize = PanelTagCloudBrowseResize
-          OnPaint = PanelTagCloudBrowsePaint
+          OnPaint = PanelPaint
           OwnerDraw = False
         end
       end

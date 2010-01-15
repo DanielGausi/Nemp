@@ -180,6 +180,7 @@ type
         fBrowseMode: Integer;
         fCoverSortOrder: Integer;
 
+        function IsAutoSortWanted: Boolean;
         // Getter and Setter for some properties.
         // Most of them Thread-Safe
         function GetCount: Integer;
@@ -337,6 +338,7 @@ type
         AutoLoadMediaList: Boolean;
         AutoSaveMediaList: Boolean;
         alwaysSortAnzeigeList: Boolean;
+        SkipSortOnLargeLists: Boolean;
         AnzeigeListIsCurrentlySorted: Boolean;
         AutoScanPlaylistFilesOnView: Boolean;
         ShowHintsInMedialist: Boolean;
@@ -916,6 +918,7 @@ begin
         end;
 
         AlwaysSortAnzeigeList := ini.ReadBool('MedienBib', 'AlwaysSortAnzeigeList', False);
+        SkipSortOnLargeLists  := ini.ReadBool('MedienBib', 'SkipSortOnLargeLists', True);
         AutoScanPlaylistFilesOnView := ini.ReadBool('MedienBib', 'AutoScanPlaylistFilesOnView', True);
         ShowHintsInMedialist := ini.ReadBool('Medienbib', 'ShowHintsInMedialist', True);
 
@@ -1027,6 +1030,8 @@ begin
         Ini.WriteInteger('MedienBib', 'Vorauswahl1', integer(NempSortArray[1]));
         Ini.WriteInteger('MedienBib', 'Vorauswahl2', integer(NempSortArray[2]));
         ini.WriteBool('MedienBib', 'AlwaysSortAnzeigeList', AlwaysSortAnzeigeList);
+        ini.WriteBool('MedienBib', 'SkipSortOnLargeLists', SkipSortOnLargeLists);
+
         ini.WriteBool('MedienBib', 'AutoScanPlaylistFilesOnView', AutoScanPlaylistFilesOnView);
         ini.WriteBool('Medienbib', 'ShowHintsInMedialist', ShowHintsInMedialist);
 
@@ -2233,7 +2238,7 @@ end;
 }
 function TMedienBibliothek.AudioFileExists(aFilename: UnicodeString): Boolean;
 begin
-    result := binaersuche(Mp3ListePfadSort,aFilename,0,Mp3ListePfadSort.Count-1) > -1;
+    result := binaersuche(Mp3ListePfadSort, ExtractFilePath(aFilename), ExtractFileName(aFilename), 0,Mp3ListePfadSort.Count-1) > -1;
 end;
 function TMedienBibliothek.PlaylistFileExists(aFilename: UnicodeString): Boolean;
 begin
@@ -2242,7 +2247,7 @@ end;
 function TMedienBibliothek.GetAudioFileWithFilename(aFilename: UnicodeString): TAudioFile;
 var idx: Integer;
 begin
-  idx := binaersuche(Mp3ListePfadSort,aFilename,0,Mp3ListePfadSort.Count-1);
+  idx := binaersuche(Mp3ListePfadSort,ExtractFilePath(aFilename), ExtractFileName(aFilename),0,Mp3ListePfadSort.Count-1);
   if idx = -1 then
     result := Nil
   else
@@ -2512,6 +2517,7 @@ begin
 
     AllPlaylistsNameSort.Sort(PlaylistSort_Name);
 end;
+
 {
     --------------------------------------------------------
     GenerateCoverList
@@ -2926,6 +2932,14 @@ begin
           Target.Add(Mp3ListeAlbenSort[i]);
   end;
 end;
+
+function TMedienBibliothek.IsAutoSortWanted: Boolean;
+begin
+    result := AlwaysSortAnzeigeList
+          And
+          ( (AnzeigeListe.Count + AnzeigeListe2.Count < 5000) or (Not SkipSortOnLargeLists));
+end;
+
 {
     --------------------------------------------------------
     GenerateAnzeigeListe
@@ -2965,7 +2979,8 @@ begin
   begin
       AnzeigeShowsPlaylistFiles := False;
       GetTitelList(AnzeigeListe, Artist, Album);
-      if AlwaysSortAnzeigeList then SortAnzeigeliste;
+      if IsAutoSortWanted then
+          SortAnzeigeliste;
       if UpdateQuickSearchList then
           FillQuickSearchList;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
@@ -3008,7 +3023,7 @@ begin
 
   AnzeigeShowsPlaylistFiles := False;
   AnzeigeListIsCurrentlySorted := False;
-  if AlwaysSortAnzeigeList then
+  if IsAutoSortWanted then
       SortAnzeigeliste;
   FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
@@ -3046,7 +3061,7 @@ begin
 
   AnzeigeShowsPlaylistFiles := False;
   AnzeigeListIsCurrentlySorted := False;
-  if AlwaysSortAnzeigeList then
+  if IsAutoSortWanted then
       SortAnzeigeliste;
   FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);

@@ -373,6 +373,12 @@ begin
     begin
         VST.BeginUpdate;
         VST.Clear;
+
+        if (Not MedienBib.AnzeigeListIsCurrentlySorted) then
+            VST.Header.SortColumn := -1
+        else
+            VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
+
         for i:=0 to MP3Liste.Count-1 do
         begin
           AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
