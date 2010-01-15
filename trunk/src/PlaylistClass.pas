@@ -97,6 +97,12 @@ type
       function GetProgress: Double;
       procedure SetProgress(Value: Double);
 
+      // Gets the Data for a new created AudioFile
+      // First: GetAudiodata.
+      // Second: Get Rating from the library (important for non-mp3-files)
+      procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
+
+
     public
       Playlist: TObjectlist;              // the list with the audiofiles
       Player: TNempPlayer;                // the player-object
@@ -758,7 +764,13 @@ begin
       AudioFile.FileIsPresent := True;
       if (Not AudioFile.FileChecked) AND (Not AudioFile.isStream) then
       begin
-        AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover);
+          SynchronizeAudioFile(NewFile, aAudioFileName, False);
+          {AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover OR GAD_RATING);
+
+          mbAf := MedienBib.GetAudioFileWithFilename(AudioFile.Pfad);
+          if assigned(mbAF) then
+              AudioFile.Rating := mbAf.Rating;
+          }
       end;
       if (Not AudioFile.isStream) and (not assigned(AudioFile.CueList)) then
       begin
@@ -833,6 +845,24 @@ begin
   ReInitPlaylist;
 end;
 
+
+{
+    --------------------------------------------------------
+    Getting the Data for a new created AudioFile
+    --------------------------------------------------------
+}
+procedure TNempPlaylist.SynchronizeAudioFile(aNewFile: TAudioFile;
+  aFileName: UnicodeString; WithCover: Boolean = True);
+var mbAf: TAudioFile;
+begin
+    aNewFile.GetAudioData(aFileName, GAD_Cover OR GAD_Rating)
+    if WithCover then
+        Medienbib.InitCover(aNewFile);
+    mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
+    if assigned(mbAF) then
+        aNewFile.Rating := mbAf.Rating;
+end;
+
 {
     --------------------------------------------------------
     Adding Files to the playlist
@@ -867,8 +897,13 @@ begin
 
   if not PathSeemsToBeURL(aAudiofileName) then
   begin
-      NewFile.GetAudioData(aAudiofileName, GAD_Cover);
+      SynchronizeAudioFile(NewFile, aAudioFileName);
+      {NewFile.GetAudioData(aAudiofileName, GAD_Cover OR GAD_Rating);
       Medienbib.InitCover(NewFile);
+      mbAf := MedienBib.GetAudioFileWithFilename(aAudiofileName);
+      if assigned(mbAF) then
+          NewFile.Rating := mbAf.Rating;
+      }
   end
   else
   begin
@@ -916,8 +951,13 @@ begin
   NewFile := TPlaylistfile.Create;
   if not PathSeemsToBeURL(aAudiofileName) then
   begin
-      NewFile.GetAudioData(aAudiofileName, GAD_Cover);
+      SynchronizeAudioFile(NewFile, aAudioFileName);
+      {NewFile.GetAudioData(aAudiofileName, GAD_Cover OR GAD_Rating);
       Medienbib.InitCover(NewFile);
+      mbAf := MedienBib.GetAudioFileWithFilename(aAudiofileName);
+      if assigned(mbAF) then
+          NewFile.Rating := mbAf.Rating;
+      }
   end
   else
   begin

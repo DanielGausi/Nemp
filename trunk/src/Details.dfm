@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MpegInformation
+    ActivePage = Tab_General
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'

@@ -876,7 +876,9 @@ begin
 
         // Determine rating if wanted.
         // Note: only if no rating is set!
-        if ((Flags and GAD_Rating) = GAD_Rating) and (fRating = 0) then
+        // Change January 2010: Set Rating if Flag is set OR (not AND as before) the current rating is zero
+        // No: Read it always from ID3Tag, as ratings are always written into the tag on mp3-Files!
+        // if ((Flags and GAD_Rating) = GAD_Rating) OR (fRating = 0) then
             fRating := id3v2tag.Rating;
 
         // Determine cover if wanted
@@ -986,7 +988,7 @@ begin
           Track := StrToIntDef(FLACfile.TrackString, 0);
 
           // ? FLACfile.xRating
-          fRating := 0;
+          //fRating := 0;
 
           Lyrics := UTF8Encode(FLACfile.Lyrics);
 
