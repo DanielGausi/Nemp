@@ -456,6 +456,7 @@ type
     cb_RatingDecreaseRating: TCheckBox;
     StaticText1: TStaticText;
     StaticText2: TStaticText;
+    CBSkipSortOnLargeLists: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -549,6 +550,7 @@ type
     procedure cbAllowRemoteControlClick(Sender: TObject);
     procedure cb_RatingActiveClick(Sender: TObject);
     procedure cb_RatingChangeCounterClick(Sender: TObject);
+    procedure CBAlwaysSortAnzeigeListClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1098,6 +1100,8 @@ begin
   CBChangeFontStyleOnMode.Checked := Nemp_MainForm.NempOptions.ChangeFontStyleOnMode;
   CBChangeFontOnCbrVbr.Checked := Nemp_MainForm.NempOptions.ChangeFontOnCbrVbr;
   SEFontSize.Value := Nemp_MainForm.NempOptions.DefaultFontSize;
+  SERowHeight.Value := Nemp_MainForm.NempOptions.RowHeight;
+
   CBFontNameCBR.ItemIndex := CBFontNameCBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameCBR);
   CBFontNameVBR.ItemIndex := CBFontNameVBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameVBR);
   LblConst_FontVBR.Enabled := CBChangeFontOnCbrVbr.Checked;
@@ -1133,6 +1137,9 @@ begin
   cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
+  CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
+  CBSkipSortOnLargeLists.Checked := MedienBib.SkipSortOnLargeLists;
+
   CBAutoScanPlaylistFilesOnView.Checked := MedienBib.AutoScanPlaylistFilesOnView;
   CBShowHintsInMedialist.Checked := MedienBib.ShowHintsInMedialist;
 
@@ -2020,6 +2027,7 @@ begin
   Nemp_MainForm.NempOptions.AutoShowDetails := cbAutoShowDetails.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
+  MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
   MedienBib.ShowHintsInMedialist := CBShowHintsInMedialist.Checked;
   Nemp_MainForm.VST.ShowHint := MedienBib.ShowHintsInMedialist;
@@ -2556,6 +2564,11 @@ end;
 procedure TOptionsCompleteForm.EditBirthdaySongChange(Sender: TObject);
 begin
   LblEventWarning.Visible := Not FileExists(EditBirthdaySong.Text);
+end;
+
+procedure TOptionsCompleteForm.CBAlwaysSortAnzeigeListClick(Sender: TObject);
+begin
+    CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
 end;
 
 procedure TOptionsCompleteForm.CBAutoScanClick(Sender: TObject);

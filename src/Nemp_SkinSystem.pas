@@ -1349,7 +1349,14 @@ begin
     begin
       TShape(Nemp_MainForm.Components[i]).Brush.Color := SkinColorScheme.ShapeBrushCL;
       TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
-    end;
+    end
+{    else
+    if Nemp_MainForm.Components[i] is TLabeledEdit then
+    begin
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Color := SkinColorScheme.LabelBackGroundCL;
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Font.Color := SkinColorScheme.LabelCL;
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Transparent := DrawTransparentLabel;
+    end}
   end;
 
   // Weitere Eigenschaften der Form setzen
@@ -1561,7 +1568,15 @@ begin
     begin
       TShape(Nemp_MainForm.Components[i]).Brush.Color := clGradientActiveCaption;
       TShape(Nemp_MainForm.Components[i]).Pen.Color := clBlack;
-    end;
+    end
+{    else
+    if Nemp_MainForm.Components[i] is TLabeledEdit then
+    begin
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Color := clBtnFace;
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Font.Color := clWindowText;
+      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Transparent := True;
+    end
+}
   end;
 
   

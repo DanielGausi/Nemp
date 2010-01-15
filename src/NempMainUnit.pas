@@ -2038,8 +2038,8 @@ end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
 begin
-    MedienBib.TagCloud.CloudPainter.Height := PanelTagCloudBrowse.Height;
-    MedienBib.TagCloud.CloudPainter.Width := PanelTagCloudBrowse.Width;
+    MedienBib.TagCloud.CloudPainter.Height := CloudViewer.Height;
+    MedienBib.TagCloud.CloudPainter.Width := CloudViewer.Width;
     MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
 end;
 
@@ -2087,7 +2087,16 @@ begin
 
   CloudViewer := TCloudViewer.Create(self);
   CloudViewer.Parent := PanelTagCloudBrowse;
-  CloudViewer.Align := alClient;
+
+ // CloudViewer.Left := 0;
+ // CloudViewer.Top := 29;
+ // CloudViewer.Width := PanelTagCloudBrowse.Width;
+ // CloudViewer.Height := PanelTagCloudBrowse.Height - 29;
+
+ // CloudViewer.Anchors := [akLeft, akTop, akBottom, akRight];
+
+   CloudViewer.Align := alClient;
+
 
   CloudViewer.TabStop := True;
 
