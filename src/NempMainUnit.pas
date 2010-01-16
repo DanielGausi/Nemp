@@ -7386,9 +7386,9 @@ begin
 end;
 
 procedure TNemp_MainForm.Button1Click(Sender: TObject);
-var s: String;
+//var s: String;
 begin
-  s := NempPlayer.NempScrobbler.GetTags(MedienBib.CurrentAudioFile);
+{  s := NempPlayer.NempScrobbler.GetTags(MedienBib.CurrentAudioFile);
 
   if trim(s) = '' then
       ShowMessage('No Tags found')
@@ -7397,7 +7397,7 @@ begin
       MedienBib.CurrentAudioFile.RawTagLastFM := AnsiLowerCase(s);
       MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
   end;
-
+}
 end;
 
 function TNemp_MainForm.GetDefaultEQName(aIdx: Integer): String;
