@@ -2592,6 +2592,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 25
             Caption = 'Get Tags'
             TabOrder = 6
+            Visible = False
             OnClick = Button1Click
           end
         end
