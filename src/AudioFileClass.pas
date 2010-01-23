@@ -879,7 +879,7 @@ begin
         // Change January 2010: Set Rating if Flag is set OR (not AND as before) the current rating is zero
         // No: Read it always from ID3Tag, as ratings are always written into the tag on mp3-Files!
         // if ((Flags and GAD_Rating) = GAD_Rating) OR (fRating = 0) then
-            fRating := id3v2tag.Rating;
+        fRating := id3v2tag.Rating;
 
         // Determine cover if wanted
         if (Flags and GAD_Cover) = GAD_Cover then
@@ -1188,7 +1188,7 @@ begin
     if titel='' then titel:=Dateiname;
     if artist='' then artist := AUDIOFILE_UNKOWN;
     if album='' then album := AUDIOFILE_UNKOWN;
-    //fRating := 0;
+    fRating := 0; // Rating is not supported in Ogg-Files
 end;
 
 {
@@ -1221,14 +1221,16 @@ begin
   if wmaFile.ReadFromFile(filename) then
   begin
     if wmaFile.Title <> '' then
-      Titel := wmaFile.Title
+        Titel := wmaFile.Title
     else Titel := Dateiname;
     if wmaFile.Artist <> '' then
-      Artist := wmaFile.Artist
+        Artist := wmaFile.Artist
     else Artist := AUDIOFILE_UNKOWN;
     if wmaFile.Album <> '' then
-      Album := wmaFile.Album
+        Album := wmaFile.Album
     else ALbum := AUDIOFILE_UNKOWN;
+
+    fRating := 0;  // Rating in WMA-Files is not supported
     Year := wmaFile.Year;
     Genre := wmaFile.Genre;
     Duration := Round(wmaFile.Duration);
@@ -1257,7 +1259,6 @@ begin
       end;
 
   end;
-  //fRating := 0;
 
   wmaFile.Free;
 end;
@@ -1334,7 +1335,7 @@ begin
   //LyricsExisting := False;
   fBitrate := 0;
   fvbr := False;
-  //fRating := 0;
+  fRating := 0;   // rating is not supported in WAV-Files
 
 //  Result := -1;
   try
@@ -1401,6 +1402,7 @@ begin
   fChannelmodeIDX := 4;
   fSamplerateIDX := 9;
   Track := 0;
+  fRating := 0;
   // Zurücksetzen, damit die Funktion MedienBib.InitCover später anschlagen kann!
   CoverID := '';
 end;

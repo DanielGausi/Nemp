@@ -415,9 +415,11 @@ end;
 }
 procedure TFDetails.BtnApplyClick(Sender: TObject);
 begin
-  // evtl. Todo:  Kontrollieren, was gesetzt werden darf
-  // DenyID3Edit...obwohl das eigentlich durch Readonly der
-  // Controls sichergestellt sein sollte... ;-)
+
+  // Do not Change anything in non-mp3-Files here!
+  // Do Not GetAudioData on Non-mp3-Files here!
+  if Not ValidMP3File then
+      Exit;
 
   if Nemp_MainForm.NempOptions.DenyID3Edit then
   begin
@@ -440,12 +442,15 @@ begin
       end;
 
       // Bewertung im AudioFile-Objekt setzen
-      // Das wird in GetAudioData ohne Flags nicht verändert!
-      AktuellesAudioFile.Rating := ActualRating;
+      // Das wird in GetAudioData ohne Flags bei mp3s nicht verändert!
+      //AktuellesAudioFile.Rating := ActualRating;
+      // ( not necessary any more. We do this ONLY on mp3-Files here,
+      //   and the rating is stored in the ID3-Tag -so we will get it
+      //   by GetAudioData)
+
+      AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
 
       NempPlaylist.UnifyRating(AktuellesAudioFile.Pfad, AktuellesAudioFile.Rating);
-
-      AktuellesAudioFile.GetAudioData(Dateipfad);
 
       if fFilefromMedienBib
           AND (NOT MedienBib.AnzeigeShowsPlaylistFiles)
@@ -453,10 +458,6 @@ begin
       then
       begin
           Nemp_MainForm.SetBrowseTabWarning(True);
-          // AudioFile neu einsortieren
-          // MedienBib.RestoreSortOrderAfterItemChanged(AktuellesAudioFile);
-          // Bäume neu bauen
-          // Nemp_MainForm.ReFillBrowseTrees(True);
       end else
       begin
           Nemp_MainForm.PlaylistVST.Invalidate;
@@ -522,25 +523,21 @@ begin
   end;
 
   if Fileexists(DateiPfad) then
-    AktuellesAudioFile.GetAudioData(Dateipfad);
+    AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
   ShowDetails(AktuellesAudioFile);
 
   if fFilefromMedienBib
       and (not MedienBib.AnzeigeShowsPlaylistFiles)
       and (not MedienBib.ValidKeys(AktuellesAudioFile))
   then
-  begin
       Nemp_MainForm.SetBrowseTabWarning(True);
-      // AudioFile neu einsortieren
-      //MedienBib.RestoreSortOrderAfterItemChanged(AktuellesAudioFile);
-      // Bäume neu bauen
-      //Nemp_MainForm.ReFillBrowseTrees(True);
-  end;
 
   if fFilefromMedienBib and not MedienBib.AnzeigeShowsPlaylistFiles then
     MedienBib.Changed := True
   else
     SearchAndUpdateFileInMB;
+
+  Nemp_MainForm.VST.Invalidate;
 end;
 
 {
@@ -710,6 +707,7 @@ var ControlsEnable, ButtonsEnable: Boolean;
 begin
   ButtonsEnable := (AktuellesAudioFile <> NIL) AND FileExists(AktuellesAudioFile.Pfad);
   ControlsEnable:= (AktuellesAudioFile <> NIL);
+
   Btn_Properties.Enabled := ButtonsEnable;
   Btn_Explore.Enabled := ButtonsEnable;
   Btn_Actualize.Enabled := ButtonsEnable;
@@ -1891,7 +1889,7 @@ begin
       mbAudioFile.Rating := ActualRating;
       // backup der CoverID
       oldCoverID := mbAudioFile.CoverID;
-      mbAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_COVER);
+      mbAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
       // Falls CoverID jetzt '', dann ist im ID3-Tag (immer noch) kein Cover drin
       if mbAudioFile.CoverID = '' then
           mbAudioFile.CoverID := oldCoverID;

@@ -1933,16 +1933,18 @@ begin
     repeat
       if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
       begin
+        tmpstr :=  StringReplace('<private> ' + Sr.Name,'&','&&',[rfReplaceAll]);
+
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := '<private> ' + Sr.Name;
+        aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
         PM_P_Skins.Add(aMenuItem);
 
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := '<private> ' + Sr.Name;
+        aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
         MM_O_Skins.Add(aMenuItem);
       end;
     until FindNext(SR)<>0;
@@ -1952,16 +1954,18 @@ begin
     repeat
       if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
       begin
+        tmpstr :=  StringReplace('<public> ' + Sr.Name,'&','&&',[rfReplaceAll]);
+
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := '<public> ' + Sr.Name;
+        aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
         PM_P_Skins.Add(aMenuItem);
 
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := '<public> ' + Sr.Name;
+        aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
         MM_O_Skins.Add(aMenuItem);
       end;
     until FindNext(SR)<>0;
@@ -2026,8 +2030,8 @@ begin
         MedienBib.TagCloud.MouseOverTag := aTag;
         MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, True);
 
-        if assigned(aTag) then
-            caption := aTag.key + ' - ' + IntToStr(aTag.count) + 'index: ' + IntToStr(aTag.BreadCrumbIndex);
+        //if assigned(aTag) then
+        //    caption := aTag.key + ' - ' + IntToStr(aTag.count) + 'index: ' + IntToStr(aTag.BreadCrumbIndex);
     end;
 end;
 
@@ -2421,19 +2425,17 @@ procedure TNemp_MainForm.NewSelected (Var Msg: TMessage);
 var aCover: tNempCover;
 begin
     CoverScrollBar.OnChange := Nil;
-    CoverScrollbar.Position := Msg.WParam;
-
-
-    if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+    if CoverScrollbar.Position <> Msg.WParam then
     begin
-        aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
-        MedienBib.GenerateAnzeigeListeFromCoverID(aCover.ID);
-
-        Lbl_CoverFlow.Caption := aCover.InfoString;
+        CoverScrollbar.Position := Msg.WParam;
+        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+        begin
+            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+            MedienBib.GenerateAnzeigeListeFromCoverID(aCover.ID);
+            Lbl_CoverFlow.Caption := aCover.InfoString;
+        end;
     end;
-
     CoverScrollbar.OnChange := CoverScrollbarChange;
-
 end;
 
 procedure TNemp_MainForm.NeedPreview (var msg : TWMFCNeedPreview);
@@ -3018,7 +3020,8 @@ procedure TNemp_MainForm.Skinan1Click(Sender: TObject);
 var tmpstr: UnicodeString;
 begin
   UseSkin := True;
-  SkinName := StringReplace((Sender as TMenuItem).Caption,'&','',[rfReplaceAll]);
+  SkinName := StringReplace((Sender as TMenuItem).Caption,'&&','&',[rfReplaceAll]);
+  //SkinName := (Sender as TMenuItem).Caption;
 
   // SkinName ist die Globale Var, die in die ini gespeichert wird -> da muss das privat//global mit rein!!!
   tmpstr := StringReplace(SkinName,
@@ -5477,9 +5480,6 @@ procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var aRect: TRect;
 begin
-caption := 'wwewewe';
-
-
   DragSource := DS_PLAYLIST;
   ARect.TopLeft :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left, PlaylistVST.Top)));
   ARect.BottomRight :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left + PlaylistVST.Width, PlaylistVST.Top + PlaylistVST.Height)));
@@ -9993,11 +9993,9 @@ procedure TNemp_MainForm.PanelCoverBrowseMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
     MedienBib.NewCoverFlow.SelectItemAt(x,y);
-    CoverScrollBar.OnChange := Nil;
-    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-    CoverScrollbar.OnChange := CoverScrollbarChange;
-
-    //Caption := IntToStr(PanelCoverBrowse.Handle);
+//    CoverScrollBar.OnChange := Nil;
+//    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+//    CoverScrollbar.OnChange := CoverScrollbarChange;
     CoverImgDownX := X;
     CoverImgDownY := Y;
     CoverScrollbar.SetFocus;

@@ -2,7 +2,6 @@
 
 todo here:
 - (done) keys only lowercase
-- backup list of audiofiles
 - hash keys for faster Tagcloud-build
 }
 

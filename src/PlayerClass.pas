@@ -417,7 +417,7 @@ Const
 
 implementation
 
-Uses NempMainUnit;
+Uses NempMainUnit, AudioFileHelper;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -1192,7 +1192,8 @@ begin
       // Jetzt das Audiofile ggf. ändern
       // zunächst mit eigenen Methoden rangehen
       if not MainAudioFile.IsStream then
-        MainAudioFile.GetAudioData(MainAudioFile.Pfad, GAD_Cover);
+          //MainAudioFile.GetAudioData(MainAudioFile.Pfad, GAD_Cover);
+          SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
       // dann ggf. von der bass korrigieren lassen
       If Mainstream <> 0 then
       begin
@@ -1505,32 +1506,49 @@ end;
 }
 procedure TNempPlayer.SetPosition(Value: Longword);
 var tmp: DWord;
+    InvalidSlideJump, localFading: Boolean;
 begin
-  if UseFading AND fReallyUseFading
-      AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
-  then
-  begin
-    // Position im Slidestream umsetzen
-    BASS_ChannelSetPosition(SlideStream, Value, BASS_POS_BYTE);
-    // SlideStream stummschalten und ggf. starten
-    BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
+  // Value is beyond the "NearEndSyncHandle"
+  InvalidSlideJump := (Bass_ChannelSeconds2Bytes(mainstream, Dauer - (FadingInterval / 1000)) <= Value);
 
-    if Status = PLAYER_ISPLAYING then
-      BASS_ChannelPlay(SlideStream , False);
-    // Mainstream ausfaden und stoppen
-    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, -2, SeekFadingInterval);
-    BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_VOL, fMainVolume, SeekFadingInterval);
-    // Streams vertauschen
-    tmp := Mainstream;
-    Mainstream := SlideStream;
-    SlideStream := tmp;
-  end else
+  // Current track should and can be faded
+  localFading := UseFading AND fReallyUseFading
+          AND NOT (IgnoreFadingOnShortTracks AND
+          (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200));
+
+  // fading, but beyond the nearendsync => Play next file
+  if localFading and InvalidSlideJump then
   begin
-    // einfach nur umsetzen
-    BASS_ChannelSetPosition(MainStream, Value, BASS_POS_BYTE);
+      // The same as in EndFileProc
+      EndFileProcReached := True;
+      SendMessage(MainWindowHandle, WM_NextFile, 0, 0);
+  end
+  else
+  begin
+      if localfading then
+      begin
+        // Position im Slidestream umsetzen
+        BASS_ChannelSetPosition(SlideStream, Value, BASS_POS_BYTE);
+        // SlideStream stummschalten und ggf. starten
+        BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
+
+        if Status = PLAYER_ISPLAYING then
+          BASS_ChannelPlay(SlideStream , False);
+        // Mainstream ausfaden und stoppen
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, -2, SeekFadingInterval);
+        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_VOL, fMainVolume, SeekFadingInterval);
+        // Streams vertauschen
+        tmp := Mainstream;
+        Mainstream := SlideStream;
+        SlideStream := tmp;
+      end else
+      begin
+        // einfach nur umsetzen
+        BASS_ChannelSetPosition(MainStream, Value, BASS_POS_BYTE);
+      end;
+      // CueSyncs neu setzen!!
+      SetCueSyncs;
   end;
-  // CueSyncs neu setzen!!
-  SetCueSyncs;
 end;
 
 function TNempPlayer.GetTime: Double;
@@ -2117,6 +2135,7 @@ begin
 end;
 
 function TNempPlayer.GenerateTaskbarTitel: UnicodeString;
+const MinLength = 10;
 begin
   if NOT assigned(MainAudioFile) then
   begin
@@ -2126,17 +2145,35 @@ begin
 
   if MainAudioFile.isStream then
   begin
-    if trim(MainAudioFile.Titel) = '' then
-    begin
-      result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Description + ' - '
-    end else
-      result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
+      if trim(MainAudioFile.Titel) = '' then
+      begin
+          if length(MainAudioFile.Description) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Description + ' - '
+          else
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Description + ' - '
+      end else
+      begin
+          if length(MainAudioFile.Titel) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Titel + ' - '
+          else
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
+      end
   end else
   begin // normale Datei
-    if MainAudioFile.Artist = AUDIOFILE_UNKOWN then
-      result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
-    else
-      result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.Titel + ' - ';
+      if MainAudioFile.Artist = AUDIOFILE_UNKOWN then
+      begin
+          if length(MainAudioFile.Titel) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Titel + ' - '
+          else
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
+      end
+      else
+      begin
+          if length(MainAudioFile.Artist + ' - ' + MainAudioFile.Titel) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.Titel + ' - '
+          else
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.Titel + ' - '
+      end;
   end;
 end;
 
