@@ -1501,8 +1501,6 @@ begin
     begin
         //wenn PostMessages eingestellt sind, wird so sichergestellt, dass die auch wirklich alle Messages abgearbeitet sind
         Application.ProcessMessages;
-        //Timer stoppen
-        timeKillEvent(tid);
 
         case Msg.WParam of
           ST_ID_Playlist: begin
@@ -1520,6 +1518,9 @@ begin
 
           end;
           ST_ID_Medialist: begin
+                //Timer stoppen
+                timeKillEvent(tid);
+
                 if Medienbib.ST_Ordnerlist.Count > 0 then
                   Medienbib.ST_Ordnerlist.Delete(0);
 

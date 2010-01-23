@@ -434,8 +434,8 @@ object Nemp_MainForm: TNemp_MainForm
             186
             24)
           object AuswahlStatusLBL: TLabel
-            Left = 8
-            Top = 5
+            Left = 10
+            Top = 7
             Width = 170
             Height = 13
             Anchors = [akLeft, akTop, akRight, akBottom]
@@ -446,8 +446,8 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ShowAccelChar = False
             Transparent = False
-            ExplicitWidth = 251
           end
         end
         object TabBtn_TagCloud: TSkinButton
@@ -2179,6 +2179,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 13
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
+            ShowAccelChar = False
             Transparent = False
             ExplicitWidth = 302
           end
@@ -2653,6 +2654,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 13
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
+          ShowAccelChar = False
           Transparent = False
         end
       end
@@ -5275,6 +5277,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object Player_PopupMenu: TPopupMenu
+    AutoHotkeys = maManual
     Images = MenuImages
     OnPopup = Player_PopupMenuPopup
     Left = 552
