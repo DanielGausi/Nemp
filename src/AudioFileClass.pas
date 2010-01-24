@@ -789,7 +789,7 @@ procedure TAudioFile.GetMp3Info(filename: UnicodeString; Flags: Integer = 0);
 var mpegInfo:TMpegInfo;
     ID3v2Tag:TID3V2Tag;
     ID3v1tag:TID3v1Tag;
-    CoverStream: TMemoryStream;
+    CoverStream, TagStream: TMemoryStream;
     PicList: TObjectlist;
     PicType: Byte;
     PicDesc: UnicodeString;
@@ -827,7 +827,8 @@ begin
     // If file was valid mp3-file:
     // Put the tag-info into the audiofile-structure.
     // Id3v2-tags have priority
-    if mpeginfo.FirstHeaderPosition>-1 then begin
+    if mpeginfo.FirstHeaderPosition>-1 then
+    begin
         // aus dem ID3 Tag
         if id3v2tag.artist<>'' then Artist:=(id3v2tag.artist)
             else if id3v1tag.artist<>'' then Artist:=(id3v1tag.artist)
@@ -872,6 +873,20 @@ begin
             2: fChannelmodeIDX := 2; //'Dual channel (Stereo)',
             3: fChannelmodeIDX := 3; //'Single channel (Mono)');
             else fChannelmodeIDX := 4;
+        end;
+
+        // get Nemp/Tags
+        TagStream := TMemoryStream.Create;
+        try
+            if id3v2tag.GetPrivateFrame('NEMP/Tags', TagStream) and (TagStream.Size > 0) then
+            begin
+                // We found a Tag-Frame with Information in the ID3Tag
+                TagStream.Position := 0;
+                SetLength(RawTagLastFM, TagStream.Size);
+                TagStream.Read(RawTagLastFM[1], TagStream.Size);
+            end;
+        finally
+            TagStream.Free;
         end;
 
         // Determine rating if wanted.
@@ -1564,7 +1579,10 @@ begin
             finally
                 ms.Free;
             end;
-        end;
+        end else
+            // delete Tags-Frame
+            ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+
 
         ID3v2Tag.WriteToFile(filename);
 

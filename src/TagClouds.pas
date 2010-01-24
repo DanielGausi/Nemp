@@ -807,32 +807,10 @@ begin
         end;
 
     end;
-    {
 
-    if assigned(aTag) then
-    begin
-        // Create a new List and store the Audiofiles from the clicked Tag
-        // in this list.
-        backupList := TObjectList.Create(False);
-        backupList.Capacity := Source.Count;
-
-        for i := 0 to Source.Count - 1 do
-            backupList.Add(Source[i]);
-
-        // Add the List to the BrowseHistory
-        BrowseHistory.Add(backUpList);
-    end
-    else
-    begin
-        // user clicked a Breadcrumb-Tag... ????
-        /// .... todo
-        backupList := Source;
-    end;
-
-     }
 
     try
-        // Clear the cloud, i.e. set the Count of all Tags to Zero
+        // Clear the cloud, i.e. set the Count of (almost) all Tags to Zero
         Reset;
 
         // Insert Files into the new Cloud
@@ -842,17 +820,10 @@ begin
         // Sort Tags by Count
         Tags.Sort(Sort_Count);
 
-         self.SetActivetags;
+        SetActivetags;
 
-
-        // Copy Tags with Count > 0 to Currenttag-List ???
-
-
-
-        // todo: Clear the "BrowseTags", i.e. the previously clicked tags
     finally
-       // if assigned(aTag) then
-       //     backupList.Free;
+
     end;
 
 end;
@@ -1035,11 +1006,6 @@ begin
     allTags := TStringList.Create;
     tmpTags := TStringList.Create;
     try
-
-        //tmpTags.Text := aAudioFile.RawTagAuto;
-        //for i := 0 to tmpTags.Count - 1 do
-        //    allTags.Add(tmptags[i]);
-
         // Generate Auto-Tags from Audiofile-Info
         // ToDo: Settings like "UseYear", "UseDecade", ...
         GenerateAutoRawTags(aAudioFile, allTags);
@@ -1067,11 +1033,6 @@ begin
                 aTag.AudioFiles.Add(aAudioFile);
                 // Add the Tag into the Taglist of the AudioFile
                 aAudioFile.Taglist.Add(aTag);
-
-
-                // if aTag.count = 1 then AddTag to "currenttagCloudList"
-                // NO. We dont need the Tags of Previous Clouds, but the List of AudioFiles
-                //   => Backup these in BuildCloud
             end;
         end;
 

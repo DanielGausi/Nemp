@@ -2089,6 +2089,7 @@ procedure TNemp_MainForm.FormCreate(Sender: TObject);
 begin
   // Nothing to do here. Will be done in nemp.dpr
 
+  //showmessage('sdsd');
   CloudViewer := TCloudViewer.Create(self);
   CloudViewer.Parent := PanelTagCloudBrowse;
 
@@ -2222,6 +2223,11 @@ begin
               else
                 CoverScrollbar.Max := 3;
               CoverScrollbarChange(Nil);
+          end;
+          2: begin
+                MedienBib.ReBuildTagCloud;
+                MedienBib.TagCloud.ShowTags;
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
           end;
       end;
       if FileExists(ExtractFilePath(ParamStr(0)) + 'default.nwl') then
@@ -3142,6 +3148,7 @@ begin
       CON_GENRE: MedienBib.AddSorter(CON_GENRE, False);
       CON_DAUER: MedienBib.AddSorter(CON_DAUER, False);
       CON_FILESIZE: MedienBib.AddSorter(CON_FILESIZE, False);
+      CON_LASTFMTAGS: MedienBib.AddSorter(CON_LASTFMTAGS, False);
   end;
 
   MedienBib.SortAnzeigeListe;
@@ -4031,6 +4038,8 @@ begin
           CON_TRACKNR   : CellText := IntToStr(Data^.FAudioFile.Track);
           CON_RATING    : CellText := '     ';//IntToStr(Data^.FAudioFile.Rating);//'';//
           CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
+
+          CON_LASTFMTAGS : CellText := ' ';// Data^.FAudioFile.RawTagLastFM;
         else CellText := ' ';
         end;
         // Correct CellText for toAutoSpan to a non-empty-string
@@ -7343,6 +7352,11 @@ begin
           CON_LYRICSEXISTING :
               if Data^.FAudioFile.LyricsExisting then imageIndex := 6
               else imageIndex := 7;
+
+          CON_LASTFMTAGS :
+                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 14
+              //else imageIndex := 15;
+
         end;
       end;
   end;
