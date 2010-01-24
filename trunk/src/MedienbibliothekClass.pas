@@ -176,7 +176,7 @@ type
         // Browsemode
         // 0: Classic
         // 1: Coverflow
-        // 2: Todo: Tagcloud
+        // 2: Tagcloud
         fBrowseMode: Integer;
         fCoverSortOrder: Integer;
 
@@ -948,7 +948,7 @@ begin
         WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
 
         BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 0);
-        if (BrowseMode < 0) OR (BrowseMode > 1) then
+        if (BrowseMode < 0) OR (BrowseMode > 2) then
           BrowseMode := 0;
         CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 1);
         if (CoverSortOrder < 1) OR (CoverSortOrder > 7) then
@@ -3192,6 +3192,7 @@ begin
         CON_TRACKNR             : NewSortMethod := AFCompareTrackNr;
         CON_RATING              : NewSortMethod := AFCompareRating;
         CON_PLAYCOUNTER         : NewSortMethod := AFComparePlayCounter;
+        CON_LASTFMTAGS          : NewSortMethod := AFCompareLastFMTagsExists;
     else
         NewSortMethod := AFComparePath;
     end;

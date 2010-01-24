@@ -868,17 +868,12 @@ begin
                 else
                     CoverScrollbar.Max := 3;
                 CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-                //CoverScrollbarChange(Nil);
             end;
             2: begin
                 // Hier Code für Tagwolke einfügen
                 MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags;//(ListView1);
-
+                MedienBib.TagCloud.ShowTags;
                 MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
-
-                //Caption := InttoStr(ListView1.Items.Count);
-
             end;
         end;
 
@@ -959,7 +954,11 @@ begin
                 TabBtn_CoverFlow.Refresh;
                 TabBtn_CoverFlow.Refresh;
 
-                CloudViewer.SetFocus;
+                //try
+                 //   CloudViewer.SetFocus;
+                //except
+
+                //end;
             end;
         end;
     end;

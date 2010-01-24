@@ -420,6 +420,7 @@ const
     CON_TRACKNR   = 16;
     CON_RATING    = 17;
     CON_PLAYCOUNTER = 18;
+    CON_LASTFMTAGS = 19;
     //-----
     CON_EX_ARTISTALBUMTITEL = 117;
     CON_EX_ALBUMTITELARTIST = 118;
@@ -474,7 +475,7 @@ const
 
     sepchar: char=';';
 
-    Spaltenzahl = 19;
+    Spaltenzahl = 20;
 
 
       SEARCH_ARTIST = 0;
@@ -575,7 +576,7 @@ const
          'Techno'
          );
 
-      DefaultSpalten : array[0..18] of TSpalte =
+      DefaultSpalten : array[0..19] of TSpalte =
       (
         (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 122 ;sortAscending: True),
         (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
@@ -596,9 +597,8 @@ const
         (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
         (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: false  ;width: 50 ;sortAscending: True),
         (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
-        (Bezeichnung: 'PlayCounter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True)
-
-
+        (Bezeichnung: 'PlayCounter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
+        (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS;visible: false  ;width: 44;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =

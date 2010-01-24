@@ -152,6 +152,7 @@ function AFCompareChannelMode(a1,a2: tAudioFile): Integer;
 function AFCompareSamplerate(a1,a2: tAudioFile): Integer;
 function AFCompareFilesize(a1,a2: tAudioFile): Integer;
 function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
+function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
 
 function MainSort(item1, item2: Pointer): Integer;
 
@@ -276,6 +277,18 @@ begin
         result := 1
       else
         result := -1;
+end;
+function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
+begin
+    if ((length(a1.RawTagLastFM) = 0) and (length(a2.RawTagLastFM) = 0))
+    OR ((length(a1.RawTagLastFM) > 0) and (length(a2.RawTagLastFM) > 0))
+    then
+        result := 0
+    else
+        if length(a1.RawTagLastFM) > 0 then
+            result := 1
+        else
+            result := -1;
 end;
 
 
