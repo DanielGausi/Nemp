@@ -1751,9 +1751,9 @@ begin
     vbrstr := 'cbr';
 
   if LyricsExisting then
-    Lyricsstr := 'ja'
+    Lyricsstr := 'ok'
   else
-    Lyricsstr := 'nein';
+    Lyricsstr := 'N/A';
 
   result :=
     StringReplace(Artist, ';', ',', [rfReplaceAll]) + ';' +
@@ -1769,7 +1769,8 @@ begin
     IntToStr(fBitrate) + ';' +
     ChannelMode + ';' +
     SamplerateShort + ';' +
-    IntToStr(Rating) + ';' + 
+    IntToStr(Rating) + ';' +
+    IntToStr(PlayCounter) + ';' +
     vbrstr + ';' +
     Lyricsstr  ;
 end;

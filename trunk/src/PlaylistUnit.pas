@@ -254,6 +254,11 @@ end;
 procedure TPlaylistForm.FormResize(Sender: TObject);
 begin
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
+  If Nemp_MainForm.NempSkin.isActive then
+  begin
+      Nemp_MainForm.NempSkin.SetPlaylistOffsets;
+      Repaint;
+  end;
 end;
 
 

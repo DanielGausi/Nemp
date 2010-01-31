@@ -985,10 +985,13 @@ begin
           PM_P_ViewSeparateWindows_Playlist.Enabled := AnzeigeMode = 1;
           PM_P_ViewSeparateWindows_Medialist.Enabled := AnzeigeMode = 1;
           PM_P_ViewSeparateWindows_Browse.Enabled := AnzeigeMode = 1;
+          PM_P_ViewStayOnTop.Enabled := AnzeigeMode = 1;
+
           MM_O_ViewSeparateWindows_Equalizer.Enabled := AnzeigeMode = 1;
           MM_O_ViewSeparateWindows_Playlist.Enabled := AnzeigeMode = 1;
           MM_O_ViewSeparateWindows_Medialist.Enabled := AnzeigeMode = 1;
           MM_O_ViewSeparateWindows_Browse.Enabled := AnzeigeMode = 1;
+          MM_O_ViewStayOnTop.Enabled := AnzeigeMode = 1;
 
           PM_P_ViewCompactComplete.Enabled := AnzeigeMode = 0;
           MM_O_ViewCompactComplete.Enabled := AnzeigeMode = 0;

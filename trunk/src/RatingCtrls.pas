@@ -51,6 +51,13 @@ uses windows, classes, ExtCtrls, Graphics;
     // bitmaps.
 
     TRatingHelper = class
+      private
+        fUseBackground: Boolean;
+        fBackGroundBitmap: TBitmap;
+        //fLast***: used for Redraw
+        fLastRating: Integer;
+        fLastWidth: Integer;
+        fLastHeight: Integer;
 
       public
         // Three graphics for the three types of stars
@@ -58,11 +65,15 @@ uses windows, classes, ExtCtrls, Graphics;
         fHalfStar: TBitmap;
         fUnSetStar: TBitmap;
 
+        // Use background for Stars (needed on Win7 in the library)
+        property UsebackGround: Boolean read fUseBackground write fUseBackground;
+
         constructor Create;
         destructor Destroy; override;
 
         procedure SetStars(full, half, none: TBitmap);
 
+        procedure SetbackGroundImage(source: TBitmap; OffsetX, OffsetY: Integer; Width, Height: Integer);
         // MousePosToRating: Get a proper rating from X-Position
         // should be called in OnMouseMove and OnMouseDown
         function MousePosToRating(X: Integer; ImageWidth: Integer): integer;
@@ -70,6 +81,7 @@ uses windows, classes, ExtCtrls, Graphics;
         // "Translates" a Rating into Stars using the three Bitmaps
         procedure DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
         procedure DrawRatingInStarsOnBitmap(aRating: Integer; aBitmap: TBitmap; ImageWidth: Integer; ImageHeight: Integer);
+        procedure ReDrawRatingInStarsOnBitmap(aBitmap: TBitmap);
 
 
     end;
@@ -84,6 +96,7 @@ begin
     fSetStar   := TBitmap.Create;
     fHalfStar  := TBitmap.Create;
     fUnSetStar := TBitmap.Create;
+    fBackGroundBitmap := TBitmap.Create;
 end;
 
 destructor TRatingHelper.Destroy;
@@ -91,7 +104,21 @@ begin
     fSetStar  .Free;
     fHalfStar .Free;
     fUnSetStar.Free;
+    fBackGroundBitmap.Free;
     inherited;
+end;
+
+procedure TRatingHelper.SetbackGroundImage(source: TBitmap; OffsetX, OffsetY,
+  Width, Height: Integer);
+begin
+    if fUseBackground then
+    begin
+        fBackGroundBitmap.Height := Height;
+        fBackGroundBitmap.Width  := Width;
+        fBackGroundBitmap.Canvas.CopyRect(Rect(0, 0, Width, Height),
+        Source.Canvas,
+        Rect(OffsetX, OffsetY, OffsetX + Width, OffsetY + Height))
+    end;
 end;
 
 procedure TRatingHelper.SetStars(full, half, none: TBitmap);
@@ -104,6 +131,8 @@ end;
 procedure TRatingHelper.DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
 var i, p: Integer;
 begin
+
+
     // Draw SetStars
     for i := 1 to (aRating div 51) do
         aCanvas.Draw(Left + (fSetStar.Width)*(i-1) , // left
@@ -141,21 +170,38 @@ procedure TRatingHelper.DrawRatingInStarsOnBitmap(aRating: Integer;
   aBitmap: TBitmap; ImageWidth: Integer; ImageHeight: Integer);
 var tmpBmp: TBitmap;
 begin
+
     if aRating = 0 then
         aRating := 127;
+
+    fLastRating := aRating;
+    fLastWidth  := ImageWidth;
+    flastHeight := ImageHeight;
+
     tmpBmp := TBitmap.Create;
     try
         tmpBmp.Width := ImageWidth;
         tmpBmp.Height := ImageHeight;
 
+        tmpBmp.Canvas.Brush.Style := bsSolid;
+        tmpBmp.Canvas.Brush.Color := clBtnFace;
+        if fUseBackground then
+            tmpBmp.canvas.Draw(0,0, fBackGroundBitmap)
+        else
+            tmpBmp.canvas.Fillrect(Rect(0, 0, ImageWidth, ImageHeight));
 
-        DrawRatingInStars(aRating, tmpBmp.canvas, ImageHeight);
-        tmpBmp.Transparent := True;
+
+       DrawRatingInStars(aRating, tmpBmp.canvas, ImageHeight);
+
         aBitmap.Assign(tmpBmp);
     finally
         tmpBmp.Free;
     end;
+end;
 
+procedure TRatingHelper.ReDrawRatingInStarsOnBitmap(aBitmap: TBitmap);
+begin
+    DrawRatingInStarsOnBitmap(fLastRating, aBitmap, fLastWidth, flastHeight);
 end;
 
 function TRatingHelper.MousePosToRating(X: Integer; ImageWidth: Integer): integer;
@@ -169,6 +215,8 @@ begin
     if result > 255 then
         result := 255;
 end;
+
+
 
 
 

@@ -1093,14 +1093,25 @@ begin
 end;
 
 procedure TNempSkin.SetVSTOffsets;
-var pnlPoint, OffsetPoint: TPoint;
+var pnlPoint, OffsetPoint, ImgPoint: TPoint;
 begin
   OffsetPoint := Nemp_MainForm.PlayerPanel.ClientToScreen(Point(0,0));
   pnlPoint := Nemp_MainForm.VST.ClientToScreen(Point(0,0));
+
+  ImgPoint := Nemp_MainForm.ImgBibRating.ClientToScreen(Point(0,0));
   Nemp_MainForm.VST.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
   Nemp_MainForm.VST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
-  pnlPoint := Nemp_MainForm.VDTCover.ClientToScreen(Point(0,0));
+  Nemp_MainForm.BibRatingHelper.SetbackGroundImage(CompleteBitmap,
+        PlayerPageOffsetX + (ImgPoint.X - OffsetPoint.X),
+        PlayerPageOffsetY + (ImgPoint.Y - OffsetPoint.Y),
+        Nemp_MainForm.ImgBibRating.Width,
+        Nemp_MainForm.ImgBibRating.Height
+         );
+
+  Nemp_MainForm.BibRatingHelper.ReDrawRatingInStarsOnBitmap(Nemp_MainForm.ImgBibRating.Picture.Bitmap);
+
+  //pnlPoint := Nemp_MainForm.VDTCover.ClientToScreen(Point(0,0));
 //  Nemp_MainForm.VDTCover.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
 //  Nemp_MainForm.VDTCover.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
@@ -1231,6 +1242,7 @@ begin
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
+      Nemp_MainForm.BibRatingHelper.UsebackGround := True;
       if (UseBackGroundImageVorauswahl)  then ArtistsVST.Background.Assign(CompleteBitmap)
         else ArtistsVST.Background.Assign(Nil);
       if (UseBackGroundImageVorauswahl) then AlbenVST.Background.Assign(CompleteBitmap)
@@ -1479,6 +1491,9 @@ begin
       AlbenVST.Background.Assign(Nil);
       PlaylistVST.Background.Assign(Nil);
       VST.Background.Assign(Nil);
+      BibRatingHelper.UsebackGround := False;
+      BibRatingHelper.ReDrawRatingInStarsOnBitmap(ImgBibRating.Picture.Bitmap);
+
 //      VDTCover.Background.Assign(Nil);
       // AlphaBlending
       ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];

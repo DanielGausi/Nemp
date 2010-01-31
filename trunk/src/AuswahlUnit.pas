@@ -234,6 +234,11 @@ begin
       OR (Nemp_MainForm.ArtistsVST.Width < 40) then
           Nemp_MainForm.ArtistsVST.Width := Nemp_MainForm.AuswahlPanel.width DIV 2;
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
+  If Nemp_MainForm.NempSkin.isActive then
+  begin
+      Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+      Repaint;
+  end;
 end;
 
 procedure TAuswahlForm.CloseImageClick(Sender: TObject);
