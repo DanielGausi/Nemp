@@ -10177,7 +10177,7 @@ begin
  //  aDrive.GetInfo('E:\');
  //  Showmessage(aDrive.Name + #13#10 + IntToStr(aDrive.SerialNr));
 //   exit;
-CloudViewer.SetFocus;
+//CloudViewer.SetFocus;
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 end;

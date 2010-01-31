@@ -3,7 +3,7 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 286
   BiDiMode = bdLeftToRight
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 802
+  ClientHeight = 822
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2214,18 +2214,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 293
+    Height = 313
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 293
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 265
+      Height = 285
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2235,23 +2236,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 265
       DesignSize = (
         845
-        265)
+        285)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 255
+        Height = 275
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 255
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 255
+          Height = 275
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
           ExplicitLeft = 250
@@ -2261,7 +2264,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 255
+          Height = 275
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2326,6 +2329,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 255
           Columns = <
             item
               Position = 0
@@ -2393,7 +2397,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 255
+          Height = 275
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2403,6 +2407,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 255
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -2431,7 +2436,7 @@ object Nemp_MainForm: TNemp_MainForm
           object LblBibTitle: TLabel
             Tag = 1
             Left = 158
-            Top = 21
+            Top = 19
             Width = 58
             Height = 13
             Caption = 'LblBibTitle'
@@ -2447,7 +2452,7 @@ object Nemp_MainForm: TNemp_MainForm
           object LblBibAlbum: TLabel
             Tag = 2
             Left = 158
-            Top = 40
+            Top = 36
             Width = 56
             Height = 13
             Caption = 'LblBibAlbum'
@@ -2457,7 +2462,7 @@ object Nemp_MainForm: TNemp_MainForm
           object LblBibYear: TLabel
             Tag = 4
             Left = 158
-            Top = 78
+            Top = 70
             Width = 49
             Height = 13
             Caption = 'LblBibYear'
@@ -2467,7 +2472,7 @@ object Nemp_MainForm: TNemp_MainForm
           object LblBibTrack: TLabel
             Tag = 3
             Left = 158
-            Top = 59
+            Top = 53
             Width = 53
             Height = 13
             Caption = 'LblBibTrack'
@@ -2477,7 +2482,7 @@ object Nemp_MainForm: TNemp_MainForm
           object LblBibGenre: TLabel
             Tag = 5
             Left = 158
-            Top = 97
+            Top = 87
             Width = 56
             Height = 13
             Caption = 'LblBibGenre'
@@ -2486,7 +2491,7 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object LblBibDuration: TLabel
             Left = 158
-            Top = 116
+            Top = 104
             Width = 68
             Height = 13
             Caption = 'LblBibDuration'
@@ -2494,7 +2499,7 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object LblBibQuality: TLabel
             Left = 158
-            Top = 135
+            Top = 121
             Width = 61
             Height = 13
             Caption = 'LblBibQuality'
@@ -2502,17 +2507,16 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object ImgBibRating: TImage
             Left = 158
-            Top = 154
+            Top = 140
             Width = 70
             Height = 14
-            Transparent = True
             OnMouseDown = ImgBibRatingMouseDown
             OnMouseLeave = ImgBibRatingMouseLeave
             OnMouseMove = ImgBibRatingMouseMove
           end
           object LblBibTags: TLabel
             Left = 157
-            Top = 174
+            Top = 158
             Width = 50
             Height = 59
             AutoSize = False
@@ -3126,17 +3130,17 @@ object Nemp_MainForm: TNemp_MainForm
           ShortCut = 8307
           OnClick = PM_P_ViewSeparateWindows_BrowseClick
         end
+        object MM_O_ViewStayOnTop: TMenuItem
+          Caption = 'Stay on &top'
+          ShortCut = 16468
+          OnClick = PM_P_ViewStayOnTopClick
+        end
         object N32: TMenuItem
           Caption = '-'
         end
         object MM_O_PartyMode: TMenuItem
           Caption = 'Party-Mode'
           OnClick = PM_P_PartyModeClick
-        end
-        object MM_O_ViewStayOnTop: TMenuItem
-          Caption = 'Stay on &top'
-          ShortCut = 16468
-          OnClick = PM_P_ViewStayOnTopClick
         end
       end
       object MM_O_Skins: TMenuItem
@@ -3544,7 +3548,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000130098010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010110001300A8010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4109,7 +4113,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800980110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800A80110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -5433,17 +5437,17 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 8307
         OnClick = PM_P_ViewSeparateWindows_BrowseClick
       end
+      object PM_P_ViewStayOnTop: TMenuItem
+        Caption = 'Stay on top'
+        ShortCut = 16468
+        OnClick = PM_P_ViewStayOnTopClick
+      end
       object N35: TMenuItem
         Caption = '-'
       end
       object PM_P_PartyMode: TMenuItem
         Caption = 'Party-Mode'
         OnClick = PM_P_PartyModeClick
-      end
-      object PM_P_ViewStayOnTop: TMenuItem
-        Caption = 'Stay on top'
-        ShortCut = 16468
-        OnClick = PM_P_ViewStayOnTopClick
       end
     end
     object PM_P_Skins: TMenuItem
