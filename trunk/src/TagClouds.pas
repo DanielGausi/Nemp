@@ -14,6 +14,19 @@ uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtr
 
 type
 
+  // class containing some colors and other stuff.
+  // can be changed by NempSkin
+  // used by every single tag to get its colors.
+  TTagCustomizer = class
+          ActiveColor: TColor;
+          Color: TColor;
+          FocusColor: TColor;
+          FocusBorderColor: TColor;
+          BackgroundImage: TBitmap;
+          constructor Create;
+          destructor Destroy; override;
+  end;
+
   TTagLine = class; // forward declaration
 
   // a single Tag on a Paintbox
@@ -24,10 +37,6 @@ type
           fWidth: Integer;
           fHeight: Integer;
           FontSize: Integer;
-          fActiveColor: TColor;
-          fColor: TColor;
-          fFocusColor: TColor;
-          fFocusBorderColor: TColor;
 
           fHover: Boolean;
           fFocussed: Boolean;
@@ -259,6 +268,9 @@ type
 
 function Sort_Count(item1,item2:pointer):integer;
 function Sort_Name(item1,item2:pointer):integer;
+
+var
+    TagCustomizer: TTagCustomizer;
 
 implementation
 
@@ -494,6 +506,7 @@ begin
         oMax := -1;
         aLine := fFocussedTag.fLine;
         aIdx := CloudPainter.TagLines.IndexOf(aLine);
+        result := fFocussedTag;
         if aIdx > 0 then
         begin
             bLine := TTagLine(CloudPainter.TagLines[aIdx-1]);
@@ -503,7 +516,6 @@ begin
             begin
                 for i := 0 to bLine.Tags.Count - 1 do
                 begin
-
                     oCurrent := GetOverLap(fFocussedTag, TPaintTag(bLine.Tags[i]));
                     if oCurrent > oMax then
                     begin
@@ -512,8 +524,7 @@ begin
                     end;
                 end;
             end;
-        end else
-            result := fFocussedTag;
+        end;
     end else
         result := GetDefaultTag;
 end;
@@ -527,6 +538,7 @@ begin
         oMax := -1;
         aLine := fFocussedTag.fLine;
         aIdx := CloudPainter.TagLines.IndexOf(aLine);
+        result := fFocussedTag;
         if aIdx < CloudPainter.TagLines.Count - 1 then
         begin
             bLine := TTagLine(CloudPainter.TagLines[aIdx+1]);
@@ -544,8 +556,7 @@ begin
                     end;
                 end;
             end;
-        end else
-            result := fFocussedTag;
+        end;
     end else
         result := GetDefaultTag;
 end;
@@ -559,7 +570,7 @@ begin
         if aLine.Tags.Count > 0 then
             result := TPaintTag(aLine.Tags[0])
         else
-            GetDefaultTag
+            result := GetDefaultTag
     end else
         result := GetDefaultTag;
 end;
@@ -572,7 +583,7 @@ begin
         if aLine.Tags.Count > 0 then
             result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
         else
-            GetDefaultTag
+            result := GetDefaultTag
     end else
         result := GetDefaultTag;
 end;
@@ -587,7 +598,7 @@ begin
         if aLine.Tags.Count > 0 then
             result := TPaintTag(aLine.Tags[0])
         else
-            GetDefaultTag
+            result := GetDefaultTag
     end else
         result := GetDefaultTag;
 end;
@@ -600,7 +611,7 @@ begin
         if aLine.Tags.Count > 0 then
             result := TPaintTag(aLine.Tags[aLine.Tags.Count - 1])
         else
-            GetDefaultTag
+            result := GetDefaultTag
     end else
         result := GetDefaultTag;
 end;
@@ -612,7 +623,7 @@ begin
     if assigned(fFocussedTag) then
     begin
         oMax := -1;
-
+        result := fFocussedTag;
         if CloudPainter.TagLines.Count > 0 then
         begin
             bLine := TTagLine(CloudPainter.TagLines[0]);
@@ -642,7 +653,7 @@ begin
     if assigned(fFocussedTag) then
     begin
         oMax := -1;
-
+        result := fFocussedTag;
         if CloudPainter.TagLines.Count > 0 then
         begin
             bLine := TTagLine(CloudPainter.TagLines[CloudPainter.TagLines.Count - 1]);
@@ -670,9 +681,6 @@ end;
 
 
 procedure TTagCloud.ShowTags;//(aListView: TListView);
-var i: Integer;
-    newItem: TListItem;
-    m: Integer;
 begin
 
     MouseOverTag := Nil;
@@ -1075,11 +1083,6 @@ end;
 constructor TPaintTag.Create(aKey: UTF8String);
 begin
     inherited Create(aKey);
-    fColor := clBlack;
-    fActiveColor := clRed;
-
-    fFocusColor := clGray;
-    fFocusBorderColor := clBlue;
 
     fHover := False;
     fFocussed := False;
@@ -1108,7 +1111,7 @@ procedure TPaintTag.PaintNormal(aCanvas: TCanvas);
 begin
     aCanvas.Brush.Color := clWhite;
 
-    aCanvas.Font.Color := fColor;
+    aCanvas.Font.Color := TagCustomizer.Color;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
     aCanvas.TextOut(fLeft, fTop, Key);
@@ -1119,7 +1122,7 @@ procedure TPaintTag.PaintActive(aCanvas: TCanvas);
 begin
     aCanvas.Brush.Color := clWhite;
 
-    aCanvas.Font.Color := fActiveColor;
+    aCanvas.Font.Color := TagCustomizer.ActiveColor;
     aCanvas.Font.Style := [fsUnderline];
     aCanvas.Font.Size := FontSize;
     aCanvas.TextOut(fLeft, fTop, Key);
@@ -1127,8 +1130,8 @@ end;
 
 procedure TPaintTag.PaintFocussed(aCanvas: TCanvas);
 begin
-    aCanvas.Font.Color := fFocusColor;
-    aCanvas.Brush.Color := fFocusBorderColor;
+    aCanvas.Font.Color := TagCustomizer.FocusColor;
+    aCanvas.Brush.Color := TagCustomizer.FocusBorderColor;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
     aCanvas.TextOut(fLeft, fTop, Key);
@@ -1281,7 +1284,7 @@ var line: TTagLine;
   i: Integer;
 begin
     result := Nil;
-
+    line  := Nil;
     for i := Taglines.Count - 1 downto 0 do
       if TTagLine(TagLines[i]).Top <= y then
       begin
@@ -1548,5 +1551,32 @@ begin
   end;
 
 end;     *)
+
+
+
+{ TTagCustomizer }
+
+constructor TTagCustomizer.Create;
+begin
+    Color := clBlack;
+    ActiveColor := clRed;
+
+    FocusColor := clGray;
+    FocusBorderColor := clBlue;
+    BackgroundImage := TBitmap.Create;
+end;
+
+destructor TTagCustomizer.Destroy;
+begin
+    BackgroundImage.Free;
+end;
+
+initialization
+
+    TagCustomizer := TagCustomizer.Create;
+
+finalization
+
+    TagCustomizer.Free;
 
 end.
