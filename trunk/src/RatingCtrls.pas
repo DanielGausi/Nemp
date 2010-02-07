@@ -184,7 +184,7 @@ begin
 
        DrawRatingInStars(aRating, tmpBmp.canvas, ImageHeight);
 
-       BackGroundBitmap.SaveToFile(ParamStr(0) + 'img.bmp');
+       //BackGroundBitmap.SaveToFile(ParamStr(0) + 'img.bmp');
         aBitmap.Assign(tmpBmp);
     finally
         tmpBmp.Free;
