@@ -12,19 +12,48 @@ interface
 uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
     ComCtrls, Graphics, Messages, NempPanel;
 
+const
+
+    BORDER_WIDTH = 4;
+    BORDER_HEIGHT = 1;
+
+    BREADCRUMB_GAP = 5;
+
 type
+
+  TBlendMode = (bm_Cloud, bm_Tag);
 
   // class containing some colors and other stuff.
   // can be changed by NempSkin
   // used by every single tag to get its colors.
-  TTagCustomizer = class
-          ActiveColor: TColor;
-          Color: TColor;
-          FocusColor: TColor;
-          FocusBorderColor: TColor;
+  TTagCustomizer = class(TObject)
+      public
+          FontColor: TColor;         // Default Font color
+          HoverFontColor: TColor;    // Hover (MouseOver)
+          FocusFontColor: TColor;    // Focus
+          FocusBorderColor: TColor;  // Focus Border
+          FocusBackgroundColor: TColor; // FocusBackground;
+          BackgroundColor: TColor;
+
+          // Alphablend for whole cloud
+          CloudUseAlphaBlend: Boolean;
+          CloudBlendColor: TColor;
+          CloudBlendIntensity: Integer;
+
+          // Alphablend for SelectedTags
+          TagUseAlphablend: Boolean;
+          TagBlendColor: TColor;
+          TagBlendIntensity: Integer;
+
           BackgroundImage: TBitmap;
+          UseBackGround: Boolean;
+          TileBackGround: Boolean;
+          OffSetX: Integer;
+          OffSetY: Integer;
           constructor Create;
           destructor Destroy; override;
+          procedure TileGraphic(const ATarget: TCanvas; X, Y: Integer);
+          procedure AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
   end;
 
   TTagLine = class; // forward declaration
@@ -44,8 +73,10 @@ type
           fLine: TTagLine;
 
           procedure PaintNormal(aCanvas: TCanvas);
-          procedure PaintActive(aCanvas: TCanvas);
+          procedure PaintHover(aCanvas: TCanvas);
           procedure PaintFocussed(aCanvas: TCanvas);
+
+          procedure Erase(aCanvas: TCanvas; Blend:Boolean);
 
 
       public
@@ -69,12 +100,16 @@ type
 
           fWidth: Integer;
           fHeight: Integer;
+
+          function fGetBreadCrumbline: Boolean;
+
       public
           Tags: TObjectList;     // the Tags in this line
 
           Top: Integer;
           property Width: Integer read fWidth;      // the width (of all Tags together)
           property Height: Integer read fheight;    // the Height (of the biggest Tag)
+          property BreadCrumbline: Boolean read fGetBreadCrumbline;
 
           constructor Create(CanvasWidth: Integer);
           destructor Destroy; override;
@@ -90,10 +125,15 @@ type
           currentFontSize: Integer;
           visibleTags: TObjectList;
 
+          // used do determine the forced LineBreak between Breadcrumb-tags
+          // and "new" tags
+          fForcedBreakDone: Boolean;
+
           function GetProperFontSize(aTag: TPaintTag):Integer;
 
           function GetMaxCount(Source: TObjectList): Integer;
 
+          function ForceLineBreak(currentTag: TPaintTag): Boolean;
           // first Stage: Choose as many tags as possible from
           // the Count-Sorted Source
           // Line-Object not needed
@@ -309,8 +349,9 @@ begin
 //    BrowseHistory := TObjectList.Create;
     CloudPainter := TCloudPainter.Create;
 
-    fClearTag := TPaintTag.Create('<Clear tags>');
+    fClearTag := TPaintTag.Create('<Your library>');
     fClearTag.BreadCrumbIndex := -2;
+    Tags.Add(ClearTag);
 end;
 
 destructor TTagCloud.Destroy;
@@ -488,9 +529,9 @@ begin
                 if bLine.Tags.Count > 0 then
                     result := TPainttag(bLine.Tags[0])
                 else
-                    result := Nil
+                    result := fFocussedTag
             end else
-                result := Nil;
+                result := fFocussedTag;
         end;
     end
     else
@@ -755,7 +796,7 @@ begin
         // We start complete new. Delete Browse-History.
         // BrowseHistory.Clear;
         ClearBreadCrumbs(-1);
-        Tags.Extract(fClearTag);
+//*//        Tags.Extract(fClearTag);
         properList := Source;
         fBreadCrumbDepth := 0;
         if Not assigned(HashedTags[0,0]) then
@@ -777,7 +818,7 @@ begin
                 // so: Delete this from Tags (do not show it on Top-Level)
                 //     Use Source (= MedienBib.FullList)
                 //     Clear BreadCrumbs
-                Tags.Extract(fClearTag);
+//*//                Tags.Extract(fClearTag);
                 properList := Source;
                 ClearBreadCrumbs(-1);
                 fBreadCrumbDepth := 0;
@@ -797,8 +838,8 @@ begin
                     // so: If we begin a tag-browsing: Add Cleartag
                     //     Increase BreadCrumbwidth
                     //     Set the Tags BreadCrumbindex (so its AudioFile-List will not be changed)
-                    if fBreadCrumbDepth = 0 then
-                        Tags.Add(fClearTag);
+//*//                    if fBreadCrumbDepth = 0 then
+//*//                        Tags.Add(fClearTag);
 
                     fBreadCrumbDepth := fBreadCrumbDepth + 1;
                     aTag.BreadCrumbIndex := fBreadCrumbDepth;
@@ -1083,58 +1124,130 @@ end;
 constructor TPaintTag.Create(aKey: UTF8String);
 begin
     inherited Create(aKey);
-
     fHover := False;
     fFocussed := False;
-
 end;
+
 
 procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
 begin
     aCanvas.Font.Size := FontSize;
-    fWidth := aCanvas.TextWidth(Key);
-    fHeight := aCanvas.TextHeight(Key);
+    fWidth := aCanvas.TextWidth(Key) + 4 * BORDER_WIDTH;
+    fHeight := aCanvas.TextHeight(Key) + 4 * BORDER_HEIGHT;
+end;
+
+{
+  Erase:
+  Erase the Tag-Rect and Draw the matching part of the background-image
+}
+procedure TPaintTag.Erase(aCanvas: TCanvas; Blend:Boolean);
+var tmp: TBitmap;
+begin
+    if Not TagCustomizer.UseBackGround then
+    begin
+        aCanvas.Brush.Style := bsSolid;
+        aCanvas.Brush.Color := TagCustomizer.BackgroundColor;
+        aCanvas.FillRect(Rect(fLeft, fTop, fLeft + fWidth, fTop + fHeight));
+    end else
+    begin
+        tmp := TBitmap.Create;
+        try
+            tmp.Width := fWidth;
+            tmp.Height := fHeight;
+            TagCustomizer.TileGraphic(tmp.Canvas, TagCustomizer.OffSetX + fLeft, TagCustomizer.OffSetY + fTop );
+            aCanvas.Draw(fLeft, fTop, tmp);
+        finally
+            tmp.Free;
+        end;
+    end;
+    if Blend then
+        TagCustomizer.AlphaBlendCloud(aCanvas, fWidth, fHeight, fLeft, fTop, bm_Cloud);
 end;
 
 procedure TPaintTag.Paint(aCanvas: TCanvas);
 begin
+    aCanvas.Brush.Style := bsClear;
+    Erase(aCanvas, (Not fFocussed) and TagCustomizer.TagUseAlphablend);
+
     if not (fFocussed or fHover) then
         PaintNormal(aCanvas)
     else
         if self.fFocussed then
             PaintFocussed(aCanvas)
         else
-            PaintActive(aCanvas);
+            PaintHover(aCanvas);
 end;
 
 procedure TPaintTag.PaintNormal(aCanvas: TCanvas);
 begin
-    aCanvas.Brush.Color := clWhite;
+    // Draw a roundrect
+    if self.BreadCrumbIndex < High(Integer) then
+    begin
+        aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+        aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
 
-    aCanvas.Font.Color := TagCustomizer.Color;
+        if TagCustomizer.TagUseAlphablend then
+            TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                      fLeft + 1, fTop + 1, bm_Tag)
+        else
+        begin
+            aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+            aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+        end;
+    end;
+
+    aCanvas.Font.Color := TagCustomizer.FontColor;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft, fTop, Key);
+    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
 end;
 
 
-procedure TPaintTag.PaintActive(aCanvas: TCanvas);
+procedure TPaintTag.PaintHover(aCanvas: TCanvas);
 begin
-    aCanvas.Brush.Color := clWhite;
+    // Draw a roundrect
+    if self.BreadCrumbIndex < High(Integer) then
+    begin
+        aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+        aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
 
-    aCanvas.Font.Color := TagCustomizer.ActiveColor;
+        if TagCustomizer.TagUseAlphablend then
+            TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                      fLeft + 1, fTop + 1, bm_Tag)
+        else
+        begin
+            aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+            aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+        end;
+    end;
+
+    // Draw the text
+    aCanvas.Font.Color := TagCustomizer.HoverFontColor;
     aCanvas.Font.Style := [fsUnderline];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft, fTop, Key);
+    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
 end;
 
 procedure TPaintTag.PaintFocussed(aCanvas: TCanvas);
 begin
-    aCanvas.Font.Color := TagCustomizer.FocusColor;
-    aCanvas.Brush.Color := TagCustomizer.FocusBorderColor;
+    // Draw a roundrect
+    aCanvas.Pen.Color := TagCustomizer.FocusBorderColor;
+    aCanvas.RoundRect(fLeft, fTop, fLeft + fWidth , fTop + fHeight , 6, 6);
+
+    if TagCustomizer.TagUseAlphablend then
+        TagCustomizer.AlphaBlendCloud(aCanvas, fWidth - 2, fHeight - 2,
+                                  fLeft + 1, fTop + 1, bm_Tag)
+    else
+    begin
+        aCanvas.Brush.Color := TagCustomizer.TagBlendColor;
+        aCanvas.FillRect (Rect(fLeft + 1, fTop + 1, fLeft + fWidth - 1, fTop + fHeight - 1));
+    end;
+
+    // Draw the text
+    aCanvas.Font.Color := TagCustomizer.FocusFontColor;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft, fTop, Key);
+    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
 end;
 
 
@@ -1152,6 +1265,11 @@ begin
   inherited;
 end;
 
+function TTagLine.fGetBreadCrumbline: Boolean;
+begin
+    result := (Tags.Count > 0) and (TPaintTag(Tags[0]).BreadCrumbIndex < High(Integer));
+end;
+
 {
   ------------------------------------
   Tagline.Paint
@@ -1163,7 +1281,7 @@ procedure TTagLine.Paint(aCanvas: TCanvas);
 var i, x: Integer;
     pt: TPaintTag;
 begin
-    if Tags.Count > 1 then
+    if (Tags.Count > 1) And (TPaintTag(Tags[0]).BreadCrumbIndex = High(Integer))  then
         fGap := (fCanvasWidth - Width) Div (Tags.Count - 1)
     else
         fGap := 0;
@@ -1177,7 +1295,7 @@ begin
 
         pt.Paint(aCanvas);
 
-        x := x + pt.Width + fGap + 10;
+        x := x + pt.Width + fGap ;
     end;
 
 end;
@@ -1202,11 +1320,23 @@ end;
 
 procedure TCloudPainter.DoPaint;
 var y, i, t: Integer;
-
 begin
-    canvas.Brush.Color := ClWhite;
-    canvas.Brush.Style := bsSolid;
-    Canvas.FillRect(Rect(0,0,width, Height));
+
+//    Canvas.Brush.Color := TagCustomizer.BackgroundColor;
+//    Canvas.Brush.Style := bsSolid;
+//    Canvas.FillRect(Rect(0,0,width, Height));
+
+    if TagCustomizer.UseBackGround and assigned(TagCustomizer.BackgroundImage) then
+    begin
+        TagCustomizer.TileGraphic(Canvas,
+              TagCustomizer.OffSetX, TagCustomizer.OffSetY);
+
+        TagCustomizer.AlphaBlendCloud(Canvas, Width, Height, 0, 0, bm_Cloud);
+    end else
+    begin
+        Canvas.Brush.Color := TagCustomizer.BackgroundColor;
+        Canvas.FillRect(Canvas.ClipRect);
+    end;
 
     visibleTags.Clear;
 
@@ -1219,6 +1349,10 @@ begin
             visibleTags.Add(TTagLine(Taglines[i]).Tags[t]);
 
         y := y + TTagLine(Taglines[i]).Height;
+        if (TTagLine(Taglines[i]).BreadCrumbline)
+           and ((i < TagLines.Count - 1) and Not (TTagLine(Taglines[i+1]).BreadCrumbline))
+        then
+            y := y + BREADCRUMB_GAP;
     end;
 
     visibleTags.Sort(Sort_Count);
@@ -1275,7 +1409,7 @@ begin
         end;
         result := currentFontSize;
     end else
-        result := 12;
+        result := 10;
 end;
 
 
@@ -1322,6 +1456,18 @@ begin
 end;
 
 
+function TCloudPainter.ForceLineBreak(currentTag: TPaintTag): Boolean;
+begin
+    if fForcedBreakDone then
+        result := False
+    else
+    begin
+        result := currentTag.BreadCrumbIndex = High(Integer);
+        if result then
+            fForcedBreakDone := True;
+    end;
+end;
+
 {
   ------------------------------------
   TCloudPainter.RawPaint1
@@ -1334,6 +1480,7 @@ procedure TCloudPainter.RawPaint1(Source: TObjectList);
 var x, y, i, lineHeight: Integer;
     aTag: TPaintTag;
     CanvasFull: Boolean;
+    BreadCrumbEnd: Boolean;
 begin
     Tags.Clear;
     CanvasFull := False;
@@ -1341,9 +1488,7 @@ begin
     x := 0;     // current x-Position
     y := 0;     // current y-Position
     lineHeight := 0;   // Height of the current "line"
-
-//    if Source.Count > 1 then
-//        maxCount := TTag(Source[1]).count;
+    fForcedBreakDone := False;
 
     maxCount := GetMaxCount(Source);
 
@@ -1359,9 +1504,8 @@ begin
         151..175: currentFontSize := 19;
     else
         currentFontSize := 20;
-
     end;
-    // FontFactor := - 12 *4 / (3 * maxCount);
+
 
     while (i < Source.Count) and Not CanvasFull do
     begin
@@ -1372,21 +1516,24 @@ begin
         // get the size of the Tag on the Canvas
         aTag.MeasureOutput(Canvas);
 
-        if (x + aTag.Width <= Width) or (x = 0) then
+        BreadCrumbEnd := ForceLineBreak(aTag);
+        if (Not BreadCrumbEnd) and ((x + aTag.Width <= Width) or (x = 0)) then
         begin
             // Tag fits in the current line
-            x := x + aTag.Width + 10;     // add some space
+            x := x + aTag.Width;
             lineHeight := max(lineHeight, aTag.Height);
             Tags.Add(aTag);
         end else
         begin
             // Tag does NOT fit in the current line => start a new one
             y := y + lineHeight;
+            if BreadCrumbEnd then
+                y := y + BREADCRUMB_GAP;
 
             if (y + aTag.Height < Height - 8) then
             begin
                 lineHeight := aTag.Height;
-                x := aTag.Width + 10;
+                x := aTag.Width;
                 Tags.Add(aTag);
             end else
             begin
@@ -1408,6 +1555,7 @@ var i, x, y: Integer;
     CanvasFull: Boolean;
     SuccessfullyPaintItems: Integer;
     Fail: Boolean;
+    BreadCrumbEnd: Boolean;
 begin
     TagLines.Clear;
     // Sort Tags by Name
@@ -1419,6 +1567,7 @@ begin
     CanvasFull := False;
     Fail := False;
     SuccessfullyPaintItems := 0;
+    fForcedBreakDone := False;
 
     currentLine := TTagLine.Create(Width);
     TagLines.Add(currentLine);
@@ -1427,19 +1576,25 @@ begin
     while (i < Tags.Count) and Not CanvasFull do
     begin
         currentTag := TPaintTag(Tags[i]);
-        if (x + currentTag.Width <= Width) or (x = 0) then
+        BreadCrumbEnd := ForceLineBreak(currentTag);
+        if (Not BreadCrumbEnd) and  ((x + currentTag.Width <= Width) or (x = 0)) then
         begin
             // Tag fits in currentLine
             currentLine.Tags.Add(currentTag);
             currentTag.fLine := currentLine;
             currentLine.fHeight := max(currentLine.Height, currentTag.Height);
-            currentLine.fWidth := currentLine.Width + currentTag.Width + 10;
-            x := x + currentTag.Width + 10;
+            currentLine.fWidth := currentLine.Width + currentTag.Width;
+            x := x + currentTag.Width;
         end else
         begin
+
+            y := y + currentLine.Height;
+            if BreadCrumbEnd then
+                y := y + BREADCRUMB_GAP;
+
             // line is full. We need to start a new line
             // But: Maybe the currentline was to high for Canvas!
-            if y + currentLine.Height > Height - 8 then
+            if y > Height - 8 then
             begin
                 // currentline has grown to much in Height
                 // and so it cannot be painted on the canvas
@@ -1449,14 +1604,14 @@ begin
             begin
                 SuccessfullyPaintItems := i-1;  // last line can be painted
 
-                y := y + currentLine.Height;
+                /////y := y + currentLine.Height;
                 currentLine := TTagLine.Create(Width);
                 TagLines.Add(currentLine);
                 currentLine.Tags.Add(currentTag);
                 currentTag.fLine := currentLine;
                 currentLine.fHeight := currentTag.Height;
-                currentLine.fWidth := currentLine.Width + currentTag.Width + 10;
-                x := currentTag.Width + 10;
+                currentLine.fWidth := currentLine.Width + currentTag.Width;
+                x := currentTag.Width ;
             end;
         end;
         inc(i);
@@ -1558,22 +1713,125 @@ end;     *)
 
 constructor TTagCustomizer.Create;
 begin
-    Color := clBlack;
+    inherited;
+    {Color := 0;
     ActiveColor := clRed;
 
     FocusColor := clGray;
-    FocusBorderColor := clBlue;
-    BackgroundImage := TBitmap.Create;
+    FocusBorderColor := clBlue;}
+    //BackgroundImage := TBitmap.Create;
 end;
 
 destructor TTagCustomizer.Destroy;
 begin
-    BackgroundImage.Free;
+    //BackgroundImage.Free;
+    inherited destroy;
+end;
+
+// This is (almost) a copy of NempSkin.TileGraphic,
+// but without the Stretch-stuff
+procedure TTagCustomizer.TileGraphic(
+  const ATarget: TCanvas; X, Y: Integer);
+var
+  xstart, xloop, yloop: Integer;
+begin
+  if BackgroundImage.Width * BackgroundImage.Height = 0 then exit;
+
+  if TileBackground then
+  begin
+      xloop := X Mod BackgroundImage.Width;
+      if xloop < 0 then xloop := xloop + BackgroundImage.Width;
+
+      xloop := -xloop;
+      xstart := xloop;
+
+      Yloop := Y Mod BackgroundImage.Height;
+      if yloop < 0 then yloop := yloop + BackgroundImage.Height;
+
+      yloop := - yloop;
+
+      while Yloop < ATarget.ClipRect.Bottom  do
+      begin
+        Xloop := xstart;
+        while Xloop < ATarget.ClipRect.Right do
+        begin
+            ATarget.StretchDraw(Rect(XLoop, YLoop, XLoop + Round(BackgroundImage.Width), yLoop + Round(BackgroundImage.Height) ), BackgroundImage);
+            Inc(Xloop, Round(BackgroundImage.Width));
+        end;
+        Inc(Yloop, Round(BackgroundImage.Height));
+      end;
+  end else
+  begin
+    ATarget.Brush.Color := BackgroundColor;
+    ATarget.FillRect(ATarget.ClipRect);
+    ATarget.Draw(-x, -y, BackgroundImage);
+  end;
+end;
+
+procedure TTagCustomizer.AlphaBlendCloud(TargetCanvas: TCanvas; Width, Height, Left, Top: Integer; Mode: TBlendMode);
+var lBlendParams: TBlendFunction;
+    AlphaBlendBMP: TBitmap;
+    localIntensity: Integer;
+    localBlendColor: TColor;
+    localDoBlend: Boolean;
+begin
+
+
+    case Mode of
+        bm_Cloud: begin
+            localIntensity  := CloudBlendIntensity;
+            localBlendColor := CloudBlendColor;
+            localDoBlend    := CloudUseAlphaBlend
+        end;
+        bm_Tag: begin
+            localIntensity  := TagBlendIntensity;
+            localBlendColor := TagBlendColor;
+            localDoBlend    := TagUseAlphaBlend;
+        end;
+    else
+        begin
+            localIntensity  := 0;
+            localBlendColor := clWhite;
+            localDoBlend    := False;
+        end;
+    end;
+
+    if localDoBlend then
+    begin
+        // correction. This does not work with clBlack - I don't know why...
+        if localBlendColor = clBlack then
+            localBlendColor := localBlendColor + 1;
+
+        AlphaBlendBMP := TBitmap.Create;
+        try
+            with lBlendParams do
+            begin
+                BlendOp := AC_SRC_OVER;
+                BlendFlags := 0;
+                SourceConstantAlpha := localIntensity;
+                AlphaFormat := 0;
+            end;
+
+
+            AlphaBlendBMP.Canvas.Brush.Color := localBlendColor;
+
+            // Bitmap-Größe einstellen, Bitmap einfärben
+            AlphaBlendBMP.Width := Width;
+            AlphaBlendBMP.Height := Height;
+            AlphaBlendBMP.Canvas.FillRect (Rect(0, 0, Width, Height));
+            // Alphablending durchführen
+            Windows.AlphaBlend(TargetCanvas.Handle, Left, Top, Width, Height,
+                               AlphaBlendBMP.Canvas.Handle, 0, 0, AlphaBlendBMP.Width, AlphaBlendBMP.Height, lBlendParams);
+
+        finally
+            AlphaBlendBMP.Free;
+        end;
+    end;
 end;
 
 initialization
 
-    TagCustomizer := TagCustomizer.Create;
+    TagCustomizer := TTagCustomizer.Create;
 
 finalization
 
