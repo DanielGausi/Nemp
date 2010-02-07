@@ -53,7 +53,7 @@ uses windows, classes, ExtCtrls, Graphics;
     TRatingHelper = class
       private
         fUseBackground: Boolean;
-        fBackGroundBitmap: TBitmap;
+
         //fLast***: used for Redraw
         fLastRating: Integer;
         fLastWidth: Integer;
@@ -65,6 +65,8 @@ uses windows, classes, ExtCtrls, Graphics;
         fHalfStar: TBitmap;
         fUnSetStar: TBitmap;
 
+        BackGroundBitmap: TBitmap;
+
         // Use background for Stars (needed on Win7 in the library)
         property UsebackGround: Boolean read fUseBackground write fUseBackground;
 
@@ -73,7 +75,6 @@ uses windows, classes, ExtCtrls, Graphics;
 
         procedure SetStars(full, half, none: TBitmap);
 
-        procedure SetbackGroundImage(source: TBitmap; OffsetX, OffsetY: Integer; Width, Height: Integer);
         // MousePosToRating: Get a proper rating from X-Position
         // should be called in OnMouseMove and OnMouseDown
         function MousePosToRating(X: Integer; ImageWidth: Integer): integer;
@@ -82,7 +83,6 @@ uses windows, classes, ExtCtrls, Graphics;
         procedure DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
         procedure DrawRatingInStarsOnBitmap(aRating: Integer; aBitmap: TBitmap; ImageWidth: Integer; ImageHeight: Integer);
         procedure ReDrawRatingInStarsOnBitmap(aBitmap: TBitmap);
-
 
     end;
 
@@ -96,7 +96,9 @@ begin
     fSetStar   := TBitmap.Create;
     fHalfStar  := TBitmap.Create;
     fUnSetStar := TBitmap.Create;
-    fBackGroundBitmap := TBitmap.Create;
+    BackGroundBitmap := TBitmap.Create;
+    fLastWidth  := 70;
+    fLastHeight := 14;
 end;
 
 destructor TRatingHelper.Destroy;
@@ -104,22 +106,10 @@ begin
     fSetStar  .Free;
     fHalfStar .Free;
     fUnSetStar.Free;
-    fBackGroundBitmap.Free;
+    BackGroundBitmap.Free;
     inherited;
 end;
 
-procedure TRatingHelper.SetbackGroundImage(source: TBitmap; OffsetX, OffsetY,
-  Width, Height: Integer);
-begin
-    if fUseBackground then
-    begin
-        fBackGroundBitmap.Height := Height;
-        fBackGroundBitmap.Width  := Width;
-        fBackGroundBitmap.Canvas.CopyRect(Rect(0, 0, Width, Height),
-        Source.Canvas,
-        Rect(OffsetX, OffsetY, OffsetX + Width, OffsetY + Height))
-    end;
-end;
 
 procedure TRatingHelper.SetStars(full, half, none: TBitmap);
 begin
@@ -183,16 +173,18 @@ begin
         tmpBmp.Width := ImageWidth;
         tmpBmp.Height := ImageHeight;
 
-        tmpBmp.Canvas.Brush.Style := bsSolid;
-        tmpBmp.Canvas.Brush.Color := clBtnFace;
         if fUseBackground then
-            tmpBmp.canvas.Draw(0,0, fBackGroundBitmap)
+            tmpBmp.canvas.Draw(0,0, BackGroundBitmap)
         else
+        begin
+            tmpBmp.Canvas.Brush.Style := bsSolid;
+            tmpBmp.Canvas.Brush.Color := clBtnFace;
             tmpBmp.canvas.Fillrect(Rect(0, 0, ImageWidth, ImageHeight));
-
+        end;
 
        DrawRatingInStars(aRating, tmpBmp.canvas, ImageHeight);
 
+       BackGroundBitmap.SaveToFile(ParamStr(0) + 'img.bmp');
         aBitmap.Assign(tmpBmp);
     finally
         tmpBmp.Free;

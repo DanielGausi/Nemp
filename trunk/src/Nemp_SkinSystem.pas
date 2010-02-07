@@ -176,6 +176,7 @@ type
         UseBackGroundImageVorauswahl  : boolean;
         UseBackgroundImagePlaylist    : boolean;
         UseBackgroundImageMedienliste : boolean;
+        UseBackgroundTagCloud         : boolean;
         UseBackgroundImages: Array[0..3] of boolean;
 
         TileBackground: Boolean;  // Hintergrund kacheln
@@ -203,21 +204,25 @@ type
         UseBlendedSelectionAlben       : Boolean;
         UseBlendedSelectionPlaylist    : Boolean;
         UseBlendedSelectionMedienliste : Boolean;
+        UseBlendedSelectionTagCloud    : Boolean;
 
         UseBlendedArtists      : Boolean;
         UseBlendedAlben        : Boolean;
         UseBlendedPlaylist     : Boolean;
         UseBlendedMedienliste  : Boolean;
+        UseBlendedTagCloud     : Boolean;
 
         BlendFaktorArtists     : Byte;
         BlendFaktorAlben       : Byte;
         BlendFaktorPlaylist    : Byte;
         BlendFaktorMedienliste : Byte;
+        BlendFaktorTagCloud    : Byte;
 
         BlendFaktorArtists2     : Byte;
         BlendFaktorAlben2       : Byte;
         BlendFaktorPlaylist2    : Byte;
         BlendFaktorMedienliste2 : Byte;
+        BlendFaktorTagCloud2    : Byte;
 
         //----
         HideMainMenu: Boolean;
@@ -312,7 +317,7 @@ implementation
 
 uses NempMainUnit, OptionsComplete, Hilfsfunktionen, spectrum_vis,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
-    VSTEditControls, MedienBibliothekClass;
+    VSTEditControls, MedienBibliothekClass, TagClouds;
 
 constructor TNempSkin.create;
 var i: Integer;
@@ -398,6 +403,8 @@ begin
   SlideButtons[0].GlyphFile := 'SlideBtnVolume';
   for i := 1 to 5 do SlideButtons[i].GlyphFile := 'SlideBtnLeftRight';
   for i := 6 to 15 do SlideButtons[i].GlyphFile := 'SlideBtnUpDown';
+
+
 end;
 
 destructor TNempSkin.Destroy;
@@ -434,6 +441,8 @@ begin
         UseBackGroundImageVorauswahl    := Not Ini.ReadBool('BackGround','HideBackgroundImageVorauswahl'   , False);
         UseBackgroundImagePlaylist      := Not Ini.ReadBool('BackGround','HideBackgroundImagePlaylist'     , False);
         UseBackgroundImageMedienliste   := Not Ini.ReadBool('BackGround','HideBackgroundImageMedienliste'  , False);
+        UseBackgroundTagCloud           := Not Ini.ReadBool('BackGround','HideBackgroundTagCloud'          , False);
+
         UseBackgroundImages[0] := True; // Player immer!
         UseBackgroundImages[1] := UseBackgroundImagePlaylist;
         UseBackgroundImages[2] := UseBackGroundImageVorauswahl;
@@ -477,11 +486,13 @@ begin
         UseBlendedSelectionAlben         := Ini.ReadBool('Options','UseBlendedSelectionAlben'        , True);
         UseBlendedSelectionPlaylist      := Ini.ReadBool('Options','UseBlendedSelectionPlaylist'     , True);
         UseBlendedSelectionMedienliste   := Ini.ReadBool('Options','UseBlendedSelectionMedienliste'  , True);
+        UseBlendedSelectionTagCloud      := Ini.ReadBool('Options','UseBlendedSelectionTagCloud'     , True);
 
         UseBlendedArtists        := Ini.ReadBool('Options','UseBlendedArtists'      , False);
         UseBlendedAlben          := Ini.ReadBool('Options','UseBlendedAlben'        , False);
         UseBlendedPlaylist       := Ini.ReadBool('Options','UseBlendedPlaylist'     , False);
         UseBlendedMedienliste    := Ini.ReadBool('Options','UseBlendedMedienliste'  , False);
+        UseBlendedTagCloud       := Ini.ReadBool('Options','UseBlendedTagCloud'     , False);
 
         //----
         HideMainMenu                     := Ini.ReadBool('Options','HideMainMenu'  , False);
@@ -512,11 +523,13 @@ begin
         BlendFaktorAlben       := Ini.ReadInteger('Options','BlendFaktorAlben'         , 100);
         BlendFaktorPlaylist    := Ini.ReadInteger('Options','BlendFaktorPlaylist'      , 100);
         BlendFaktorMedienliste := Ini.ReadInteger('Options','BlendFaktorMedienliste'   , 100);
+        BlendFaktorTagCloud    := Ini.ReadInteger('Options','BlendFaktorTagCloud'      , 100);
 
         BlendFaktorArtists2     := Ini.ReadInteger('Options','BlendFaktorArtists2'       , 100);
         BlendFaktorAlben2       := Ini.ReadInteger('Options','BlendFaktorAlben2'         , 100);
         BlendFaktorPlaylist2    := Ini.ReadInteger('Options','BlendFaktorPlaylist2'      , 100);
         BlendFaktorMedienliste2 := Ini.ReadInteger('Options','BlendFaktorMedienliste2'   , 100);
+        BlendFaktorTagCloud2    := Ini.ReadInteger('Options','BlendFaktorTagCloud2'      , 100);
 
         SkinColorScheme.FormCL                := StringToColor(Ini.ReadString('Colors','FormCL'               , 'clWindow'   ));
         SkinColorScheme.TabTextCL             := StringToColor(Ini.ReadString('Colors','TabTextCL'            , 'clWindowText'   ));
@@ -758,6 +771,7 @@ begin
         Ini.WriteBool('BackGround','HideBackgroundImageVorauswahl'   , NOT UseBackGroundImageVorauswahl    );
         Ini.WriteBool('BackGround','HideBackgroundImagePlaylist'     , NOT UseBackgroundImagePlaylist   );
         Ini.WriteBool('BackGround','HideBackgroundImageMedienliste'  , NOT UseBackgroundImageMedienliste);
+        Ini.WriteBool('BackGround','HideBackgroundTagCloud'          , Not UseBackgroundTagCloud);
         ini.WriteBool('BackGround','TileBackground'                  , TileBackground);
         ini.WriteBool('BackGround','FixedBackGround'                  , FixedBackGround);
 
@@ -787,11 +801,13 @@ begin
         Ini.WriteBool('Options','UseBlendedSelectionAlben'        , UseBlendedSelectionAlben       );
         Ini.WriteBool('Options','UseBlendedSelectionPlaylist'     , UseBlendedSelectionPlaylist    );
         Ini.WriteBool('Options','UseBlendedSelectionMedienliste'  , UseBlendedSelectionMedienliste );
+        Ini.WriteBool('Options','UseBlendedSelectionTagCloud'     , UseBlendedSelectionTagCloud    );
 
         Ini.WriteBool('Options','UseBlendedArtists'      , UseBlendedArtists     );
         Ini.WriteBool('Options','UseBlendedAlben'        , UseBlendedAlben       );
         Ini.WriteBool('Options','UseBlendedPlaylist'     , UseBlendedPlaylist    );
         Ini.WriteBool('Options','UseBlendedMedienliste'  , UseBlendedMedienliste );
+        Ini.WriteBool('Options','UseBlendedTagCloud'     , UseBlendedTagCloud    );
 
         //----
         Ini.WriteBool('Options','HideMainMenu'  , HideMainMenu);
@@ -808,11 +824,13 @@ begin
         Ini.WriteInteger('Options','BlendFaktorAlben'         , BlendFaktorAlben      );
         Ini.WriteInteger('Options','BlendFaktorPlaylist'      , BlendFaktorPlaylist   );
         Ini.WriteInteger('Options','BlendFaktorMedienliste'   , BlendFaktorMedienliste);
+        Ini.WriteInteger('Options','BlendFaktorTagCloud'      , BlendFaktorTagCloud);
 
         Ini.WriteInteger('Options','BlendFaktorArtists2'       , BlendFaktorArtists2    );
         Ini.WriteInteger('Options','BlendFaktorAlben2'         , BlendFaktorAlben2      );
         Ini.WriteInteger('Options','BlendFaktorPlaylist2'      , BlendFaktorPlaylist2   );
         Ini.WriteInteger('Options','BlendFaktorMedienliste2'   , BlendFaktorMedienliste2);
+        Ini.WriteInteger('Options','BlendFaktorTagCloud2'      , BlendFaktorTagCloud2   );
 
         // Farbwert in einen String der Form $XXXXXXXX bringen:      '$'+InttoHex(Integer(  ),8)
         // (damit die Vordefinierten Farben AUCH SO gespeichert werden, und nicht als Farbname wie "clblack")
@@ -932,6 +950,7 @@ begin
   UseBackGroundImageVorauswahl  := aSkin.UseBackGroundImageVorauswahl   ;
   UseBackgroundImagePlaylist    := aSkin.UseBackgroundImagePlaylist     ;
   UseBackgroundImageMedienliste := aSkin.UseBackgroundImageMedienliste  ;
+  UseBackgroundTagCloud         := aSkin.UseBackgroundTagCloud          ;
   UseBackgroundImages[0] := True; // Player immer!
   UseBackgroundImages[1] := UseBackgroundImagePlaylist;
   UseBackgroundImages[2] := UseBackGroundImageVorauswahl;
@@ -1087,9 +1106,18 @@ begin
   Nemp_MainForm.ArtistsVST.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
   Nemp_MainForm.ArtistsVST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
+
   pnlPoint := Nemp_MainForm.AlbenVST.ClientToScreen(Point(0,0));
   Nemp_MainForm.AlbenVST.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
   Nemp_MainForm.AlbenVST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
+
+
+  pnlPoint := Nemp_MainForm.PanelTagCloudBrowse.ClientToScreen(Point(0,0));
+  TagCustomizer.OffSetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
+  TagCustomizer.OffSetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
+
+  Nemp_MainForm.PanelTagCloudBrowse.Repaint;
+
 end;
 
 procedure TNempSkin.SetVSTOffsets;
@@ -1102,19 +1130,15 @@ begin
   Nemp_MainForm.VST.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
   Nemp_MainForm.VST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
-  Nemp_MainForm.BibRatingHelper.SetbackGroundImage(CompleteBitmap,
+  Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Width := Nemp_MainForm.ImgBibRating.Width;
+  Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Height := Nemp_MainForm.ImgBibRating.Height;
+  TileGraphic(CompleteBitmap,
+        Nemp_MainForm.BibRatingHelper.BackGroundBitmap.Canvas,
         PlayerPageOffsetX + (ImgPoint.X - OffsetPoint.X),
-        PlayerPageOffsetY + (ImgPoint.Y - OffsetPoint.Y),
-        Nemp_MainForm.ImgBibRating.Width,
-        Nemp_MainForm.ImgBibRating.Height
-         );
+        PlayerPageOffsetY + (ImgPoint.Y - OffsetPoint.Y)
+  );
 
   Nemp_MainForm.BibRatingHelper.ReDrawRatingInStarsOnBitmap(Nemp_MainForm.ImgBibRating.Picture.Bitmap);
-
-  //pnlPoint := Nemp_MainForm.VDTCover.ClientToScreen(Point(0,0));
-//  Nemp_MainForm.VDTCover.BackgroundOffsetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
-//  Nemp_MainForm.VDTCover.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
-
 end;
 
 Procedure TNempSkin.SetPlaylistOffsets;
@@ -1243,6 +1267,7 @@ begin
   with Nemp_MainForm do
   begin
       Nemp_MainForm.BibRatingHelper.UsebackGround := True;
+
       if (UseBackGroundImageVorauswahl)  then ArtistsVST.Background.Assign(CompleteBitmap)
         else ArtistsVST.Background.Assign(Nil);
       if (UseBackGroundImageVorauswahl) then AlbenVST.Background.Assign(CompleteBitmap)
@@ -1251,8 +1276,7 @@ begin
         else PlaylistVST.Background.Assign(Nil);
       if (UseBackgroundImageMedienliste) then VST.Background.Assign(CompleteBitmap)
         else VST.Background.Assign(Nil);
-//      if (UseBackgroundImageMedienliste) then VDTCover.Background.Assign(CompleteBitmap)
-//        else VDTCover.Background.Assign(Nil);
+
       // Scrollbars
       if DisableArtistScrollbar then ArtistsVST.ScrollBarOptions.ScrollBars := ssNone
         else ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
@@ -1275,21 +1299,41 @@ begin
       if UseBlendedSelectionMedienliste then
         VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions + [toUseBlendedSelection]
       else VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-//      if UseBlendedSelectionMedienliste then
-//        VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions + [toUseBlendedSelection]
-//      else VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
 
       ArtistsVST.SelectionBlendFactor  := BlendFaktorArtists     ;
       AlbenVST.SelectionBlendFactor    := BlendFaktorAlben       ;
       PlaylistVST.SelectionBlendFactor := BlendFaktorPlaylist    ;
       VST.SelectionBlendFactor         := BlendFaktorMedienliste ;
- //     VDTCover.SelectionBlendFactor         := BlendFaktorMedienliste ;
+
+      // TagCloud-Settings
+      TagCustomizer.UseBackGround    := UseBackgroundTagCloud;
+      if UseBackgroundTagCloud then
+          TagCustomizer.BackgroundImage := CompleteBitmap
+      else
+          TagCustomizer.BackgroundImage := Nil;
+      TagCustomizer.TileBackGround   := TileBackground;
+      TagCustomizer.BackgroundColor  := SkinColorScheme.Tree_Color[1];
+      TagCustomizer.FontColor        := SkinColorScheme.Tree_FontColor[1];
+      TagCustomizer.FocusFontColor   := SkinColorScheme.Tree_FontSelectedColor[1];
+      TagCustomizer.FocusBorderColor := SkinColorScheme.Tree_FocussedSelectionBorder[1];
+      TagCustomizer.FocusBackgroundColor := SkinColorScheme.Tree_FocussedSelectionColor[1];
+      TagCustomizer.HoverFontColor  := SkinColorScheme.Tree_FontSelectedColor[1];
+
+          TagCustomizer.CloudUseAlphaBlend := UseBlendedTagCloud ;
+          TagCustomizer.CloudBlendColor := SkinColorScheme.Tree_Color[1];
+          TagCustomizer.CloudBlendIntensity := BlendFaktorTagCloud2;
+
+          TagCustomizer.TagUseAlphaBlend := self.UseBlendedSelectionTagCloud ;
+          TagCustomizer.TagBlendColor := SkinColorScheme.Tree_SelectionRectangleBlendColor[1];
+          TagCustomizer.TagBlendIntensity := BlendFaktorTagCloud; // as in the Trees (set in the Object-Inspector)
+
+
       // Header
       ArtistsVST.Header.Options := ArtistsVST.Header.Options + [hoOwnerDraw];
       AlbenVST.Header.Options := AlbenVST.Header.Options + [hoOwnerDraw];
       PlaylistVST.Header.Options := PlaylistVST.Header.Options + [hoOwnerDraw];
       VST.Header.Options := VST.Header.Options + [hoOwnerDraw];
-//      VDTCover.Header.Options := VST.Header.Options + [hoOwnerDraw];
+
       // Farben
       for idx := 1 to 4 do
       begin
@@ -1319,26 +1363,6 @@ begin
         DestVST.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx];
         DestVST.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      ;
       end;
-{      VDTCover.Color                                  := SkinColorScheme.Tree_Color[4]                        ;
-      VDTCover.Font.Color                             := SkinColorScheme.Tree_FontColor[4]                    ;
-      VDTCover.Header.Background                      := SkinColorScheme.Tree_HeaderBackgroundColor[4]        ;
-      VDTCover.Header.Font.Color                      := SkinColorScheme.Tree_HeaderFontColor[4]              ;
-      VDTCover.Colors.BorderColor                     := SkinColorScheme.Tree_BorderColor[4]                  ;
-      VDTCover.Colors.DisabledColor                   := SkinColorScheme.Tree_DisabledColor[4]                ;
-      VDTCover.Colors.DropMarkColor                   := SkinColorScheme.Tree_DropMarkColor[4]                ;
-      VDTCover.Colors.DropTargetBorderColor           := SkinColorScheme.Tree_DropTargetBorderColor[4]        ;
-      VDTCover.Colors.DropTargetColor                 := SkinColorScheme.Tree_DropTargetColor[4]              ;
-      VDTCover.Colors.FocusedSelectionBorderColor     := SkinColorScheme.Tree_FocussedSelectionBorder[4]      ;
-      VDTCover.Colors.FocusedSelectionColor           := SkinColorScheme.Tree_FocussedSelectionColor[4]       ;
-      VDTCover.Colors.GridLineColor                   := SkinColorScheme.Tree_GridLineColor[4]                ;
-      VDTCover.Colors.HeaderHotColor                  := SkinColorScheme.Tree_HeaderHotColor[4]               ;
-      VDTCover.Colors.HotColor                        := SkinColorScheme.Tree_HotColor[4]                     ;
-      VDTCover.Colors.SelectionRectangleBlendColor    := SkinColorScheme.Tree_SelectionRectangleBlendColor[4] ;
-      VDTCover.Colors.SelectionRectangleBorderColor   := SkinColorScheme.Tree_SelectionRectangleBorderColor[4];
-      VDTCover.Colors.TreeLineColor                   := SkinColorScheme.Tree_TreeLineColor[4]                ;
-      VDTCover.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[4];
-      VDTCover.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[4]      ;
-}
   end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen
@@ -1492,7 +1516,12 @@ begin
       PlaylistVST.Background.Assign(Nil);
       VST.Background.Assign(Nil);
       BibRatingHelper.UsebackGround := False;
+
       BibRatingHelper.ReDrawRatingInStarsOnBitmap(ImgBibRating.Picture.Bitmap);
+
+      TagCustomizer.UseBackGround := False;
+      TagCustomizer.TileBackGround:= False;
+      TagCustomizer.BackgroundImage := Nil;
 
 //      VDTCover.Background.Assign(Nil);
       // AlphaBlending
@@ -1511,7 +1540,24 @@ begin
       AlbenVST.Header.Options := AlbenVST.Header.Options - [hoOwnerDraw];
       PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
       VST.Header.Options := VST.Header.Options - [hoOwnerDraw];
-//      VDTCover.Header.Options := VST.Header.Options - [hoOwnerDraw];
+
+      TagCustomizer.UseBackGround    := False;
+      TagCustomizer.BackgroundColor  := clWindow;
+      TagCustomizer.FontColor        := clWindowText;
+      TagCustomizer.FocusFontColor   := clWindowText;
+      TagCustomizer.FocusBorderColor := clHotlight;
+      TagCustomizer.FocusBackgroundColor := clHighlight;
+      TagCustomizer.HoverFontColor  := clHighlight;
+
+      TagCustomizer.CloudUseAlphaBlend := False ;
+      TagCustomizer.CloudBlendColor := clHighlight;
+      TagCustomizer.CloudBlendIntensity := 0;
+
+      TagCustomizer.TagUseAlphaBlend := False ;
+      TagCustomizer.TagBlendColor := clHighlight;
+      TagCustomizer.TagBlendIntensity := 0;
+
+
       // Farben
       for idx := 1 to 5 do
       begin
@@ -1634,6 +1680,7 @@ var
 begin
   if ATile.Width * ATile.Height = 0 then exit;
 
+  // Stretch is used only for the player-part, if a seperate bitmap is used there
   if Stretch then
       f := NempPartyMode.ResizeFactor
   else

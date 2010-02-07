@@ -1239,6 +1239,8 @@ type
     Shift: TShiftState);
 
     procedure CloudPaint(Sender: TObject);
+    procedure CloudAfterPaint(Sender: TObject);
+
     procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 
@@ -2072,8 +2074,17 @@ begin
     end;
 end;
 
+procedure TNemp_MainForm.CloudAfterPaint(Sender: TObject);
+begin
+
+
+    if Not NempSkin.isActive then
+        MedienBib.TagCloud.CloudPainter.PaintAgain;
+end;
+
 procedure TNemp_MainForm.CloudPaint(Sender: TObject);
 begin
+  caption := IntToStr(random(high(integer)));
   MedienBib.TagCloud.CloudPainter.PaintAgain;
 end;
 
@@ -2118,6 +2129,7 @@ begin
   CloudViewer.OnResize := PanelTagCloudBrowseResize;
 
   CloudViewer.OnPaint := CloudPaint;
+  CloudViewer.OnAfterPaint := CloudAfterPaint;
 
 end;
 
@@ -2253,6 +2265,9 @@ begin
   Spectrum.DrawClear;
   ReInitPlayerVCL;
   ReArrangeToolImages;
+
+  if NempSkin.isActive then
+      NempSkin.SetVSTOffsets;
 
   AcceptApiCommands := True;
   EditFastSearch.OnChange := EDITFastSearchChange;
@@ -8519,7 +8534,6 @@ begin
   // Parameter für Alphablending zusammstellen
   if Not NempSkin.isActive then exit;
 
-
   if Sender = VST then
   begin
     DoIt := NempSkin.UseBlendedMedienliste;
@@ -8531,7 +8545,6 @@ begin
       DoIt := NempSkin.UseBlendedPlaylist;
       BlendIntensity := Nempskin.BlendFaktorPlaylist2;
       BlendColor := Nempskin.SkinColorScheme.Tree_Color[3];
-
     end else
       if Sender = ArtistsVST then
       begin
@@ -8564,6 +8577,7 @@ begin
       AlphaBlendBMP.Width := Right - Left;
       AlphaBlendBMP.Height := Bottom - Top;
       AlphaBlendBMP.Canvas.FillRect (Rect(0, 0, Width, Height));
+      //AlphaBlendBMP.Canvas.FillRect (Rect(0, 0, Right - Left, Bottom - Top));
       // Alphablending durchführen
       Windows.AlphaBlend(TargetCanvas.Handle, Left, Top, Right - Left, Bottom - Top,
                          AlphaBlendBMP.Canvas.Handle, 0, 0, AlphaBlendBMP.Width, AlphaBlendBMP.Height, lBlendParams);
