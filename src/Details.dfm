@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MpegInformation
+    ActivePage = Tab_General
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
@@ -523,6 +523,12 @@ object FDetails: TFDetails
           Height = 13
           ShowAccelChar = False
           Transparent = True
+        end
+        object LblPlayCounter: TLabel
+          Left = 84
+          Top = 72
+          Width = 49
+          Height = 13
         end
       end
       object GrpBox_Cover: TGroupBox

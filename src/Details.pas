@@ -196,6 +196,7 @@ type
     LblRatingImage: TLabel;
     RatingImage: TImage;
     BtnResetRating: TButton;
+    LblPlayCounter: TLabel;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -737,6 +738,7 @@ begin
   LlblConst_Samplerate.Enabled := ControlsEnable;
   LblBitrate.Enabled := ControlsEnable;
   LblSamplerate.Enabled := ControlsEnable;
+  LblPlayCounter.Enabled := ControlsEnable;
 end;
 {
     --------------------------------------------------------
@@ -1069,6 +1071,7 @@ begin
       LBLTrack.Caption := '0';
       LblBitrate.Caption := 'N/A';
       LblSamplerate.Caption := 'N/A';
+      LblPlayCounter.Caption := '';
   end else
   begin
         Timer1.Enabled := False;
@@ -1105,6 +1108,7 @@ begin
             LBLDauer.Caption := '(inf)';
             LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
             LBLSamplerate.Caption := '-';
+            LblPlayCounter.Caption := '';
           end
           else
           begin
@@ -1128,6 +1132,8 @@ begin
               LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
 
             LBLSamplerate.Caption := Samplerate + ', ' + ChannelMode;
+
+            LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [PlayCounter]);
 
             if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
                 ActualRating := Rating

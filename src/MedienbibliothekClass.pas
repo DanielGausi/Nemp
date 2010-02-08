@@ -2050,6 +2050,9 @@ begin
             end;
         end;
     end;
+    // clear thread-used filename
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                    Integer(PWideChar('')));
 end;
 
 

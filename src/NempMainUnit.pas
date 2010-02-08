@@ -735,6 +735,7 @@ type
     PanelTagCloudBrowse: TNempPanel;
     PM_ML_GetTags: TMenuItem;
     LblBibTags: TLabel;
+    LblBibPlayCounter: TLabel;
 
     procedure FormCreate(Sender: TObject);
 
@@ -2084,7 +2085,6 @@ end;
 
 procedure TNemp_MainForm.CloudPaint(Sender: TObject);
 begin
-  caption := IntToStr(random(high(integer)));
   MedienBib.TagCloud.CloudPainter.PaintAgain;
 end;
 
@@ -4617,6 +4617,8 @@ begin
   BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
 
   LblBibTags.Caption := StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+
+  LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
   // Get Cover
   Coverbmp := tBitmap.Create;
   try
@@ -4670,6 +4672,7 @@ begin
     LblBibQuality .left := dim + 8;
     ImgBibRating  .left := dim + 8;
     LblBibTags    .left := dim + 8;
+    LblBibPlayCounter.Left := dim + 8;
     LblBibTags.Width := VDTCover.Width - dim - 10;
     LblBibTags.Height := VDTCover.Height - LblBibTags.Top - 8;
 
