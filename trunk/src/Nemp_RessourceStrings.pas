@@ -78,6 +78,7 @@ DetailForm_InfoLblWebStream = 'URL';
 DetailForm_InfoLblDescription = 'Description';
 DetailForm_InfoLblHint     = 'Hint:';
 DetailForm_InfoLblHinttext = 'Some information could be obsolete or wrong.';
+DetailForm_PlayCounter     = 'Played %d times';
 
 DetailForm_InfoLblPath     = 'Path';
 DetailForm_InfoLblFilename = 'Filename';
