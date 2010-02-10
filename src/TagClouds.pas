@@ -216,8 +216,6 @@ type
 
           function GetOverLap(TagA, TagB: TPaintTag): Integer;
 
-
-
           function GetDefaultTag: TPainttag;
 
           function GetLeftTag: TPaintTag;
