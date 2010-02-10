@@ -3060,6 +3060,7 @@ begin
 
   if BuildNewCloud then
       TagCloud.BuildCloud(Mp3ListeArtistSort, aTag, False);
+      // Note: Parameter Mp3ListeArtistSort is not used in this method, as the Filelist of aTag is used!
 
 
   AnzeigeShowsPlaylistFiles := False;
