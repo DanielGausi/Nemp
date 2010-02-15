@@ -3190,6 +3190,7 @@ begin
         CON_PFAD                : NewSortMethod := AFComparePath;
         CON_ORDNER              : NewSortMethod := AFCompareDirectory;
         CON_DATEINAME           : NewSortMethod := AFCompareFilename;
+        CON_EXTENSION           : NewSortMethod := AFCompareExtension;
         CON_YEAR                : NewSortMethod := AFCompareYear;
         CON_GENRE               : NewSortMethod := AFCompareGenre;
         CON_LYRICSEXISTING      : NewSortMethod := AFCompareLyricsExists;

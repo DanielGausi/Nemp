@@ -620,23 +620,24 @@ begin
     end;
 
     // Device für den Hauptthread hier auf MainDevice stellen,
-    // bei Fehlschalg auf 1.
+    // bei Fehlschlag auf 1.
     // Schlägt auch das fehl: gute nacht ;-)
     if not Bass_SetDevice(MainDevice) then
         Bass_SetDevice(1);
 
-    if (Count > HeadsetDevice) then
-        EnableHeadset := True
-    else
-    begin
-          if Count >= 2 then
+    ///if (Count > HeadsetDevice) then
+        // Headset jetzt immer erlauben, ggf. auch auf gleicher Soundkarte! (Feb. 2010)
+        EnableHeadset := True;
+    ///else
+    ///begin
+          if Count >= 1 then
           begin
               EnableHeadset := True;
-              HeadsetDevice := 2;
+              HeadsetDevice := Count-1;
           end
           else
               EnableHeadset := False;
-    end;
+    ///end;
 
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
     UpdateFlags;

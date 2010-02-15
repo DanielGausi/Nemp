@@ -3160,6 +3160,7 @@ begin
       CON_DATEINAME: MedienBib.AddSorter(CON_DATEINAME, False);
       CON_PFAD: MedienBib.AddSorter(CON_PFAD, False);
       CON_LYRICSEXISTING: MedienBib.AddSorter(CON_LYRICSEXISTING, False);
+      CON_EXTENSION : MedienBib.AddSorter(CON_EXTENSION, False);
       CON_GENRE: MedienBib.AddSorter(CON_GENRE, False);
       CON_DAUER: MedienBib.AddSorter(CON_DAUER, False);
       CON_FILESIZE: MedienBib.AddSorter(CON_FILESIZE, False);
@@ -3386,6 +3387,7 @@ var i:integer;
     datei_pfad: UnicodeString;
     Abspielen: Boolean;
     imax: integer;
+    tmp: PvirtualNode;
 begin
     if aList.Count = 0 then exit;
 
@@ -3409,7 +3411,10 @@ begin
         NempPlaylist.InsertNode := NIL;
 
     // Erste Datei einfügen und ggf. Abspielen
-    NempPlaylist.InsertFileToPlayList(TAudiofile(aList[0]));
+    tmp := Nil;
+    tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[0]));
+    if assigned(tmp) then
+      PlayListVST.ScrollIntoView( tmp, False, True);
 
     if Abspielen AND (NempPlaylist.Count>0) then // 2.Bedingung: Es wurde tatsächlich was eingefügt
     begin
@@ -3436,9 +3441,12 @@ begin
       if Not (aList[i] as TAudiofile).isStream then
           (aList[i] as TAudiofile).FileIsPresent := FileExists(datei_pfad);
 
-      NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
+      tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
       if i Mod 20 = 0 then
-          application.ProcessMessages;
+      begin
+          PlayListVST.ScrollIntoView( tmp, False, True);
+          Application.ProcessMessages;
+      end;
       if Not ContinueWithPlaylistAdding then break;
     end;
 
@@ -3583,7 +3591,22 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_ML_PlayNowClick(Sender: TObject);
-var DateiListe: TObjectList;
+var  OldNode: PVirtualNode;
+      Data: PTreeData;
+      af: TAudioFile;
+begin
+    OldNode := VST.FocusedNode;
+    if assigned(OldNode) then
+    begin
+      Data := VST.GetNodeData(OldNode);
+      af :=  Data^.FAudioFile;
+    end else
+      af := NIL;
+    if assigned(af) and FileExists(af.Pfad) then
+        NempPlaylist.PlayBibFile(af, NempPlayer.FadingInterval);
+end;
+
+{var DateiListe: TObjectList;
 begin
   DateiListe := TObjectList.Create(False);
   WebRadioInsertMode := PLAYER_PLAY_NOW;
@@ -3598,6 +3621,25 @@ begin
   FreeAndNil(DateiListe);
 end;
 
+
+procedure TNemp_MainForm.PlayTEST1Click(Sender: TObject);
+var  OldNode: PVirtualNode;
+      Data: PTreeData;
+      af: TAudioFile;
+begin
+    OldNode := VST.FocusedNode;
+    if assigned(OldNode) then
+    begin
+      Data := VST.GetNodeData(OldNode);
+      af :=  Data^.FAudioFile;
+    end else
+      af := NIL;
+    if assigned(af) and FileExists(af.Pfad) then
+        NempPlaylist.PlayBibFile(af, NempPlayer.FadingInterval);
+
+    //NempPlayer.play(af, NempPlayer.FadingInterval, True, 0);  // da wird die Dauer geändert
+
+end;      }
 
 procedure TNemp_MainForm.PM_ML_PlayClick(Sender: TObject);
 var DateiListe: TObjectList;
@@ -3632,6 +3674,19 @@ var o: TComponent;
   canPlay: Boolean;
 begin
   if LangeAktionWeitermachen then   exit;
+
+  Nemp_MainForm.PM_ML_Play    .Default := NempPlaylist.DefaultAction = 1;
+  Nemp_MainForm.PM_ML_Enqueue .Default := NempPlaylist.DefaultAction = 0;
+  Nemp_MainForm.PM_ML_PlayNext.Default := NempPlaylist.DefaultAction = 2;
+  Nemp_MainForm.PM_ML_PlayNow .Default := NempPlaylist.DefaultAction = 3;
+
+
+  { PLAYER_ENQUEUE_FILES = 0; // Achtung! Muss mit den Itemindexes der Radiogroup
+      PLAYER_PLAY_FILES = 1;    // in der Optionen-Form übereinstimmen!
+      PLAYER_PLAY_NEXT = 2;
+      PLAYER_PLAY_NOW = 3;
+      PLAYER_PLAY_DEFAULT = 4;
+      }
   
   o := Screen.ActiveForm.ActiveControl;
   if (o <> NIL) AND ((o.Name = 'VST') or (o.Name = 'TabBtn_Medialib')) then
@@ -3640,6 +3695,7 @@ begin
       PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueue );
       PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNext);
       PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNow );
+      PM_ML_PlayNow.Visible  := True;
       aVst := Vst;
       Medialist_PopupMenu.Tag := 0;
   end
@@ -3649,7 +3705,9 @@ begin
         PM_ML_Play.Caption     := GetProperMenuString(Integer(MedienBib.NempSortArray[1])); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[Integer(MedienBib.NempSortArray[1])]]);
         PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
         PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-        PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+        //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+        PM_ML_PlayNow.Visible  := False;
+
         aVst := ArtistsVST;
         Medialist_PopupMenu.Tag := 1;
     end
@@ -3666,7 +3724,8 @@ begin
 
           PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
           PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-          PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+          //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+          PM_ML_PlayNow.Visible  := False;
           aVST := ALbenVST;
           Medialist_PopupMenu.Tag := 2;
       end else
@@ -3675,7 +3734,8 @@ begin
             PM_ML_Play.Caption     := GetProperMenuString(1);; //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
             PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
             PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-            PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+            //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
+           PM_ML_PlayNow.Visible  := False;
             aVST := Nil;
             Medialist_PopupMenu.Tag := 3;
         end else
@@ -4036,13 +4096,16 @@ begin
                                 CellText := Data^.FAudioFile.Album;
                           end;
           CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
-          CON_BITRATE   : CellText := inttostr(Data^.FAudioFile.Bitrate);
+          CON_BITRATE   : if Data^.FAudioFile.Bitrate > 0 then
+                              CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s'
+                          else
+                              CellText := '-?-';
           CON_CBR       : if Data^.FAudioFile.vbr then CellText := 'vbr'
                           else CellText := 'cbr';
           CON_MODE            : CellText := Data^.FAudioFile.ChannelModeShort;
-          CON_SAMPLERATE      : CellText := Data^.FAudioFile.SamplerateShort;
+          CON_SAMPLERATE      : CellText := Data^.FAudioFile.Samplerate;
           CON_STANDARDCOMMENT : CellText := Data^.FAudioFile.Comment;
-          CON_FILESIZE  : CellText := FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2);
+          CON_FILESIZE  : CellText := FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
           CON_PFAD      : CellText := Data^.FAudioFile.Pfad;
           CON_ORDNER    : CellText := Data^.FAudioFile.Ordner;
           CON_DATEINAME : CellText := Data^.FAudioFile.Dateiname;
@@ -4050,6 +4113,7 @@ begin
           CON_GENRE     : CellText := Data^.FAudioFile.genre;
           CON_LYRICSEXISTING : if Data^.FAudioFile.LyricsExisting then CellText := ''
                                else CellText := ' ';
+          CON_EXTENSION : CellText := Data^.FAudioFile.Extension;
           CON_TRACKNR   : CellText := IntToStr(Data^.FAudioFile.Track);
           CON_RATING    : CellText := '     ';//IntToStr(Data^.FAudioFile.Rating);//'';//
           CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
@@ -4091,11 +4155,25 @@ procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
 var Dateiliste: TObjectlist;
 begin
+
+  case NempPlaylist.DefaultAction of
+
+      PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
+      PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
+      PLAYER_PLAY_NEXT    : PM_ML_PlayNext.Click ;
+      PLAYER_PLAY_NOW     : PM_ML_PlayNow.Click  ;
+  end;
+{  begin
+
   DateiListe := TObjectList.Create(False);
   GenerateListForHandleFiles(Dateiliste, 0);
   HandleFiles(Dateiliste, NempPlaylist.DefaultAction);
   if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
   FreeAndNil(Dateiliste);
+
+  end;
+
+  PM_ML_PlayNowClick}
 end;
 
 
@@ -4291,9 +4369,13 @@ begin
     aAudioFile := Data^.FAudioFile;
 
     case VST.Header.Columns[VST.FocusedColumn].Tag of
-        CON_ARTIST: aString := aAudioFile.Artist;
-        CON_TITEL: aString := aAudioFile.Titel;
-        CON_ALBUM: aString := aAudioFile.Album;
+        CON_ARTIST:   aString := aAudioFile.Artist;
+        CON_TITEL:    aString := aAudioFile.Titel;
+        CON_ALBUM:    aString := aAudioFile.Album;
+        CON_PFAD,
+        CON_ORDNER:   aString := aAudioFile.Ordner;
+        CON_DATEINAME:aString := aAudioFile.Dateiname;
+        CON_EXTENSION:aString := aAudioFile.Extension;
     else
         aString := aAudioFile.Artist;
     end;
@@ -4377,11 +4459,11 @@ begin
   
   case key of
     VK_Return: begin
-      DateiListe := TObjectList.Create(False);
-      GenerateListForHandleFiles(Dateiliste, 0);
-      HandleFiles(Dateiliste, NempPlaylist.DefaultAction);
-      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-      FreeAndNil(Dateiliste);
+        DateiListe := TObjectList.Create(False);
+        GenerateListForHandleFiles(Dateiliste, 0);
+        HandleFiles(Dateiliste, NempPlaylist.DefaultAction);
+        if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+        FreeAndNil(Dateiliste);
     end;
 
     VK_F3:
@@ -5760,6 +5842,8 @@ begin
       NempPlaylist.PlayPrevious(True);
   Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 end;
+
+
 
 procedure TNemp_MainForm.StopBTNIMGClick(Sender: TObject);
 begin
@@ -9341,7 +9425,7 @@ begin
                 end;
             else
                 {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
-                CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING }
+                CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
                 allowed := False;
             end;
         end;
@@ -9454,7 +9538,7 @@ begin
                     CON_TRACKNR: af.Track := StrToIntDef(NewText, 0);
                 else
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
-                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING }
+                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
                     // Nothing to do. Something was wrong ;-)
                 end;
                 // Note: Data will be written into the File in "VSTEdited"
