@@ -145,6 +145,7 @@ function AFCompareTrackNr(a1,a2: tAudioFile): Integer;
 function AFComparePath(a1,a2: tAudioFile): Integer;
 function AFCompareDirectory(a1,a2: tAudioFile): Integer;
 function AFCompareFilename(a1,a2: tAudioFile): Integer;
+function AFCompareExtension(a1,a2: tAudioFile): Integer;
 function AFCompareDuration(a1,a2: tAudioFile): Integer;
 function AFCompareBitrate(a1,a2: tAudioFile): Integer;
 function AFCompareCBR(a1,a2: tAudioFile): Integer;
@@ -237,6 +238,10 @@ end;
 function AFCompareFilename(a1,a2: tAudioFile): Integer;
 begin
     result := AnsiCompareText(a1.Dateiname, a2.Dateiname);
+end;
+function AFCompareExtension(a1,a2: tAudioFile): Integer;
+begin
+    result := AnsiCompareText(a1.Extension, a2.Extension);
 end;
 function AFCompareDuration(a1,a2: tAudioFile): Integer;
 begin

@@ -431,9 +431,9 @@ SearchForm_CBAddRefineSearch = '(refined search)';
 SearchForm_CBAddExtendSearch = '(extended search)';
 
 MainForm_MenuCaptionsPlay      = 'Play (and clear current playlist)';
-MainForm_MenuCaptionsEnqueue   = 'Enqueue';
-MainForm_MenuCaptionsPlayNext  = 'Play next';
-MainForm_MenuCaptionsPlayNow   = 'Enqueue and play now';
+MainForm_MenuCaptionsEnqueue   = 'Enqueue (at the end of the playlist)';
+MainForm_MenuCaptionsPlayNext  = 'Enqueue (after the current position)';
+MainForm_MenuCaptionsPlayNow   = 'Just play focussed file (no playlist change)';
 
 MainForm_MenuCaptionsPlayAllArtist      = 'Play all tracks of this artist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllAlbum       = 'Play all tracks of this album (and delete current playlist)';
@@ -444,9 +444,9 @@ MainForm_MenuCaptionsPlayAllYear        = 'Play all tracks of this year (and del
 MainForm_MenuCaptionsPlayAllPlaylist = 'Play all tracks of this playlist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllWebradio = 'Play all tracks of this webradio station (and delete current playlist)';
 
-MainForm_MenuCaptionsEnqueueAll   = 'Enqueue these tracks';
-MainForm_MenuCaptionsPlayNextAll  = 'Play these tracks next';
-MainForm_MenuCaptionsPlayNowAll   = 'Enqueue and play these tracks now';
+MainForm_MenuCaptionsEnqueueAll   = 'Enqueue these tracks (at the end of the playlist)';
+MainForm_MenuCaptionsPlayNextAll  = 'Enqueue these tracks (after the current position)';
+//MainForm_MenuCaptionsPlayNowAll   = 'Enqueue and play these tracks now'; // not possible any more
 MainForm_MenuCaptionsSearchForVar    = 'Search for ''%s''';
 MainForm_MenuCaptionsSearchForTitle  = 'Search for this title';
 MainForm_MenuCaptionsSearchForArtist = 'Search for this artist';

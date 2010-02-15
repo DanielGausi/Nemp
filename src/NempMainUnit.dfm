@@ -3,7 +3,7 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 286
   BiDiMode = bdLeftToRight
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 842
+  ClientHeight = 982
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2214,18 +2214,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 333
+    Height = 473
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 333
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 305
+      Height = 445
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2235,23 +2236,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 305
       DesignSize = (
         845
-        305)
+        445)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 295
+        Height = 435
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 295
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 295
+          Height = 435
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
           ExplicitLeft = 250
@@ -2261,7 +2264,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 295
+          Height = 435
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2326,6 +2329,9 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitLeft = 406
+          ExplicitTop = 2
+          ExplicitHeight = 375
           Columns = <
             item
               Position = 0
@@ -2386,6 +2392,9 @@ object Nemp_MainForm: TNemp_MainForm
             end
             item
               Position = 19
+            end
+            item
+              Position = 20
             end>
         end
         object VDTCover: TNempPanel
@@ -2393,7 +2402,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 295
+          Height = 435
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2403,6 +2412,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 295
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3551,7 +3561,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010110001300C4010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010110001300C8010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4116,7 +4126,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800C40110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800C80110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -4855,20 +4865,20 @@ object Nemp_MainForm: TNemp_MainForm
     OnPopup = Medialist_PopupMenuPopup
     Left = 456
     Top = 568
+    object PM_ML_Enqueue: TMenuItem
+      Caption = 'Enqueue at the end of the playlist'
+      OnClick = EnqueueTBClick
+    end
     object PM_ML_Play: TMenuItem
       Caption = 'Play (and clear current playlist)'
       OnClick = PM_ML_PlayClick
     end
-    object PM_ML_Enqueue: TMenuItem
-      Caption = 'Enqueue'
-      OnClick = EnqueueTBClick
-    end
     object PM_ML_PlayNext: TMenuItem
-      Caption = 'Play next'
+      Caption = 'Enqueue after current position'
       OnClick = PM_ML_PlayNextClick
     end
     object PM_ML_PlayNow: TMenuItem
-      Caption = 'Enqueue and play'
+      Caption = 'Just play focussed file (don'#39't change the playlist)'
       OnClick = PM_ML_PlayNowClick
     end
     object N14: TMenuItem

@@ -48,7 +48,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
-    ExplicitHeight = 544
     Columns = <>
   end
   object PageControl1: TPageControl
@@ -56,16 +55,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAnzeige1
+    ActivePage = TabAudio3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
     TabStop = False
-    ExplicitHeight = 548
     object TabSystem0: TTabSheet
       Caption = 'System (Main)'
       ImageIndex = 6
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -209,7 +206,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'System1'
       ImageIndex = 5
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -1113,7 +1109,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'System2'
       ImageIndex = 6
-      ExplicitHeight = 448
       object Label3: TLabel
         Left = 16
         Top = 336
@@ -1253,7 +1248,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'System3'
       ImageIndex = 20
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -1360,7 +1354,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige0: TTabSheet
       Caption = 'Anzeige (Main)'
       ImageIndex = 1
-      ExplicitHeight = 448
       object RGrp_View: TRadioGroup
         Left = 8
         Top = 72
@@ -1914,7 +1907,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige4: TTabSheet
       Caption = 'Anzeige1 (Player)'
       ImageIndex = 20
-      ExplicitHeight = 448
       DesignSize = (
         449
         436)
@@ -2083,7 +2075,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige5: TTabSheet
       Caption = 'Anzeige2 (View)'
       ImageIndex = 24
-      ExplicitHeight = 448
       DesignSize = (
         449
         436)
@@ -2247,7 +2238,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige1: TTabSheet
       Caption = 'Anzeige3 (Fonts)'
       ImageIndex = 7
-      ExplicitHeight = 448
       DesignSize = (
         449
         436)
@@ -2533,7 +2523,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige6: TTabSheet
       Caption = 'Anzeige4 (PartyMode)'
       ImageIndex = 19
-      ExplicitHeight = 448
       object GrpBoxPartyMode: TGroupBox
         Left = 8
         Top = 8
@@ -2568,7 +2557,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio0: TTabSheet
       Caption = 'Audio (Main)'
       ImageIndex = 2
-      ExplicitHeight = 448
       DesignSize = (
         449
         436)
@@ -2734,7 +2722,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio3: TTabSheet
       Caption = 'Audio1 (Playlist)'
       ImageIndex = 19
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -2822,9 +2809,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_RandomOptions: TGroupBox
         Left = 8
-        Top = 112
+        Top = 109
         Width = 432
-        Height = 73
+        Height = 77
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Random playback'
         TabOrder = 1
@@ -2865,17 +2852,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Default action for audiofiles'
         ItemIndex = 0
         Items.Strings = (
-          'Add to the playlist'
-          'Play (and delete playlist)'
-          'Insert after current position'
-          'Insert after current position and play')
+          'Enqueue at the end of the playlist'
+          'Play (and clear current playlist)'
+          'Enqueue after current track'
+          'Just play focussed file (don'#39't change the playlist)')
         TabOrder = 0
       end
     end
     object TabAudio8: TTabSheet
       Caption = 'Audio2 (Medialib)'
       ImageIndex = 22
-      ExplicitHeight = 448
       DesignSize = (
         449
         436)
@@ -3062,7 +3048,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio2: TTabSheet
       Caption = 'Audio2a (Rating)'
       ImageIndex = 20
-      ExplicitHeight = 479
       object GroupBox1: TGroupBox
         Left = 13
         Top = 8
@@ -3156,7 +3141,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio4: TTabSheet
       Caption = 'Audio3 (Webradio)'
       ImageIndex = 23
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -3328,7 +3312,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio5: TTabSheet
       Caption = 'Audio4 (Effekte)'
       ImageIndex = 15
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -3451,7 +3434,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio7: TTabSheet
       Caption = 'Audio5 (Birthday)'
       ImageIndex = 19
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -3615,7 +3597,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio9: TTabSheet
       Caption = 'Audio6 (Scrobble)'
       ImageIndex = 17
-      ExplicitHeight = 479
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -3955,7 +3936,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio10: TTabSheet
       Caption = 'Audio7 (Webserver)'
       ImageIndex = 18
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -4112,7 +4092,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Log'
         TabOrder = 2
-        ExplicitHeight = 194
         DesignSize = (
           434
           151)
@@ -4127,14 +4106,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
-          ExplicitHeight = 169
         end
       end
     end
     object TabExtended0: TTabSheet
       Caption = 'Extended (Main)'
       ImageIndex = 21
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -4296,7 +4273,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended1: TTabSheet
       Caption = 'Ext1 (Search Options)'
       ImageIndex = 25
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -4429,7 +4405,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended2: TTabSheet
       Caption = 'Ext2 (Unicode)'
       ImageIndex = 23
-      ExplicitHeight = 479
       DesignSize = (
         449
         436)
@@ -4606,7 +4581,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Apply'
     TabOrder = 2
     OnClick = BTNApplyClick
-    ExplicitTop = 560
   end
   object BTNCancel: TButton
     Left = 502
@@ -4618,7 +4592,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Cancel'
     TabOrder = 3
     OnClick = BTNCancelClick
-    ExplicitTop = 560
   end
   object BTNok: TButton
     Left = 422
@@ -4630,7 +4603,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Default = True
     TabOrder = 4
     OnClick = BTNokClick
-    ExplicitTop = 560
   end
   object ColorDialog1: TColorDialog
     Left = 104

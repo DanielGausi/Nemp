@@ -826,30 +826,26 @@ begin
     MainDeviceCB.ItemIndex := NempPlayer.MainDevice
   else
     if Count >= 1 then
-      MainDeviceCB.ItemIndex := 0;
+        MainDeviceCB.ItemIndex := 0;
 
   if (HeadPhonesDeviceCB.Items.Count > Integer(NempPlayer.HeadsetDevice)) then
     HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice
   else
-    if HeadPhonesDeviceCB.Items.Count >= 2 then
-    begin
-      HeadPhonesDeviceCB.ItemIndex := 1;
-      //Nemp_MainForm.EnableHeadset := True;
-    end
+    if Count >= 1 then
+        HeadPhonesDeviceCB.ItemIndex := Count - 1
     else
     begin
-      HeadPhonesDeviceCB.Enabled := False;
-      HeadSetVolumeTRACKBAR.Enabled := False;
-      LblConst_Headphones.Enabled := False;
-      LblConst_VolumeHeadphones.Enabled := False;
-      //Nemp_MainForm.EnableHeadset := False;
+        HeadPhonesDeviceCB.Enabled := False;
+        HeadSetVolumeTRACKBAR.Enabled := False;
+        LblConst_Headphones.Enabled := False;
+        LblConst_VolumeHeadphones.Enabled := False;
     end;
 
   CB_FloatingPoint.ItemIndex := NempPlayer.UseFloatingPointChannels;
   if NempPlayer.UseHardwareMixing then
-    CB_Mixing.ItemIndex := 0
+      CB_Mixing.ItemIndex := 0
   else
-    CB_Mixing.ItemIndex := 1;
+      CB_Mixing.ItemIndex := 1;
 
   if NempPlayer.Floatable then
     Lbl_FloatingPoints_Status.Caption := FloatingPointChannels_On
@@ -1892,11 +1888,11 @@ begin
   BASS_SetConfig(BASS_CONFIG_BUFFER,SEBufferSize.Value);
   NempPlayer.PlayBufferSize := SEBufferSize.Value;
 
-  if (HeadPhonesDeviceCB.Items.Count > 0) AND (MainDeviceCB.ItemIndex = HeadPhonesDeviceCB.ItemIndex) then
-  begin
-    HeadPhonesDeviceCB.ItemIndex := (MainDeviceCB.ItemIndex + 1) MOD (HeadPhonesDeviceCB.Items.Count);
+//  if (HeadPhonesDeviceCB.Items.Count > 0) AND (MainDeviceCB.ItemIndex = HeadPhonesDeviceCB.ItemIndex) then
+//  begin
+//    HeadPhonesDeviceCB.ItemIndex := (MainDeviceCB.ItemIndex + 1) MOD (HeadPhonesDeviceCB.Items.Count);
     //MessageDlg('Identische Angaben für Hauptdevice/Kopfhörer. Auswahl wurde automatisch korrigiert.', mtWarning, [mbOK], 0);
-  end;
+//  end;
   NempPlayer.MainDevice := MainDeviceCB.ItemIndex + 1;
   NempPlayer.HeadsetDevice := HeadPhonesDeviceCB.ItemIndex +1;
 
@@ -1912,6 +1908,7 @@ begin
   NempPlayer.HeadsetVolume := HeadSetVolumeTRACKBAR.Position / 100;
 
   NempPlaylist.DefaultAction := GrpBox_DefaultAction.ItemIndex;
+
   NempPlayer.UseFading := CB_Fading.Checked;
   NempPlayer.UseVisualization := CB_Visual.Checked;
   if not NempPlayer.UseVisualization then

@@ -132,6 +132,8 @@ type
         // Checks whether lyrics exist or not
         function fGetLyricsExisting: Boolean;
 
+        function fGetExtension: String;
+
         function GetString(Index: TAudioFileStringIndex): UnicodeString;
         procedure SetString(Index: TAudioFileStringIndex; const Value: UnicodeString);
 
@@ -204,6 +206,7 @@ type
         property LyricsExisting: Boolean read fGetLyricsExisting;
         property Description: UnicodeString read fDescription write fDescription;
         property Dateiname: UnicodeString Index siDateiname read GetString;
+        property Extension: String read fGetExtension;
         property Strings[Index: TAudioFileStringIndex]: UnicodeString read GetString write SetString;
         property Index01: single read FIndex01;
 
@@ -658,7 +661,7 @@ end;
 }
 function TAudioFile.GetSamplerate: String;
 begin
-    result := Mp3db_Samplerates[fSamplerateIDX] + 'kHz';
+    result := Mp3db_Samplerates[fSamplerateIDX] + ' kHz';
 end;
 function TAudioFile.GetSamplerateShort: String;
 begin
@@ -686,6 +689,21 @@ begin
     else
         fSamplerateIDX := 9;
     end;
+end;
+{
+    --------------------------------------------------------
+    Getter for Extension
+    (modified version of SysUtils.ExtractFileExt - we dont need the "." here)
+    --------------------------------------------------------
+}
+function TAudioFile.fGetExtension: String;
+var I: Integer;
+begin
+    I := LastDelimiter('.' + PathDelim + DriveDelim, Dateiname) + 1;
+    if (I > 1) and (Dateiname[I-1] = '.') then
+        Result := Copy(Dateiname, I, MaxInt)
+    else
+        Result := '';
 end;
 {
     --------------------------------------------------------
