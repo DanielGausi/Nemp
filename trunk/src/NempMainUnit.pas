@@ -4562,12 +4562,13 @@ begin
               UpdateFormDesignNeu;
            end;
 
-    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
+(*    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
                 //if (ssCtrl in Shift) AND (ssAlt in Shift) then
                 //  PlayPrevBTNClick(PlayPrevBTN)
                 //else
                   if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_Browse.Click;
             end;
+*)
     $46 {F}: if (Anzeigemode = 0) OR Auswahlform.Visible then
                     if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_CoverFlow.Click;
 
@@ -5056,6 +5057,7 @@ end;
 
 procedure TNemp_MainForm.PlaylistVSTAfterItemPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
+var Data: PTreeData;
 begin
   with TargetCanvas do
   begin
@@ -5066,6 +5068,7 @@ begin
       else
         Pen.Color := clGradientActiveCaption;
       pen.Width := 2;//3;
+
       Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
             Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
             Point(ItemRect.Right-1, ItemRect.Bottom-1),
@@ -5073,6 +5076,31 @@ begin
             Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
             );
     end;
+
+    Data := PlaylistVST.GetNodeData(Node);
+    if TAudioFile(Data^.FAudioFile).PrebookIndex > 0 then
+    begin
+        Font.Color := clred;
+       // Font.Size := 14;
+
+        TextOut(ItemRect.Left+1, ItemRect.Top, IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
+    end;
+   { if (Node = NempPlaylist.InsertNode) then
+    begin
+      if NempSkin.isActive then
+        Pen.Color := clred //NempSkin.SkinColorScheme.PlaylistPlayingFileColor
+      else
+        Pen.Color := clGradientActiveCaption;
+      pen.Width := 2;//3;
+      Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
+            //Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
+            //Point(ItemRect.Right-1, ItemRect.Bottom-1),
+            Point(ItemRect.Right-1, ItemRect.Top+1)]
+            //Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
+            );
+    end;
+    }
+
   end;
 end;
 
@@ -9630,8 +9658,13 @@ begin
   NempPlaylist.GetInsertNodeFromPlayPosition;
   if assigned(PlaylistVST.FocusedNode) then
   begin
-    Data := PlaylistVST.GetNodeData(PlaylistVST.FocusedNode);
-    NempPlaylist.InsertFileToPlayList(Data^.FAudioFile.Pfad);
+      NempPlaylist.AddNodeToPrebookList(PlaylistVST.FocusedNode);
+    //Data := PlaylistVST.GetNodeData(PlaylistVST.FocusedNode);
+
+    //TAudioFile(Data^.FAudioFile).PrebookIndex := 1;
+
+    //PlaylistVST.InvalidateNode(PlaylistVST.FocusedNode);
+    //NempPlaylist.InsertFileToPlayList(Data^.FAudioFile.Pfad);
   end;
 end;
 

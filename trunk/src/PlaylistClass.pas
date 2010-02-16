@@ -81,6 +81,10 @@ type
                                           // user played a title directly from the library
       fRememberInterruptedPlayPosition: Boolean; // Use this position and start playback of the track there
 
+      // PrebookList: Stores the prebooked AudioFiles,
+      // i.e. the files that are marked as "play next"
+      PrebookList: TObjectList;
+
       procedure SetInsertNode(Value: PVirtualNode);
       function GetAnAudioFile: TPlaylistFile;
       function GetNextAudioFileIndex: Integer;
@@ -218,6 +222,12 @@ type
       function InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode; overload;
       procedure ProcessBufferStringlist;
 
+      // adding a node to the PrebookList.
+      // (not an Audiofile, so we can use this method directly from the Playlist-VST
+      //  and after adding a file from the library to the playlist)
+      procedure AddNodeToPrebookList(aNode: PVirtualnode);
+      procedure ReIndexPrebookedFiles;
+
       // load/save playlist
       procedure LoadFromFile(aFilename: UnicodeString);
       procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
@@ -262,6 +272,7 @@ begin
   inherited create;
   Playlist := TObjectList.Create;
   ST_Ordnerlist := TStringList.Create;
+  PrebookList := TObjectList.Create(False);
   fPlayingFile := Nil;
   fBackupFile := TPlayListFile.Create;
   AcceptInput := True;
@@ -273,6 +284,7 @@ end;
 
 destructor TNempPlaylist.Destroy;
 begin
+  PrebookList.Free;
   Playlist.Free;
   ST_Ordnerlist.Free;
   BufferStringList.Free;
@@ -722,6 +734,7 @@ begin
                 fPlayingFile := fBackUpFile;
                 Player.MainAudioFile := fBackUpFile;
               end;
+              PrebookList.Remove(aData^.FAudioFile);
               Playlist.Delete(Selectedmp3s[i].Index);
               VST.DeleteNode(Selectedmp3s[i],True);
           end else
@@ -733,6 +746,7 @@ begin
           VST.Selected[NewSelectNode] := True;
           VST.FocusedNode := NewSelectNode;
         end;
+        ReIndexPrebookedFiles;
 
         VST.EndUpdate;
         VST.Invalidate;
@@ -743,6 +757,7 @@ end;
 procedure TNempPlaylist.ClearPlaylist;
 begin
     Player.StopAndFree;
+    PrebookList.Clear;
     Playlist.Clear;
     fPlayingFile := Nil;
     fPlayingNode := Nil;
@@ -761,8 +776,12 @@ begin
     if (NOT TPlaylistFile(Playlist.Items[i]).isStream)
         AND (NOT FileExists(TPlaylistFile(Playlist.Items[i]).Pfad))
         then
-          Playlist.Delete(i);
+        begin
+            PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
+            Playlist.Delete(i);
+        end;
   end;
+  ReIndexPrebookedFiles;
   FillPlaylistView;
   fDauer := ShowPlayListSummary;
 end;
@@ -773,8 +792,10 @@ begin
   aNode := GetNodeWithPlayingFile;
   if assigned(aNode) then
   begin
+    PrebookList.Remove(fPlayingFile);
     Playlist.Remove(fPlayingfile);
     VST.DeleteNode(aNode,True);
+    ReIndexPrebookedFiles;
   end;
 end;
 
@@ -1063,6 +1084,36 @@ begin
 
   result := InsertFileToPlayList(NewFile, aCueName);
   NewFile.Free;
+end;
+
+procedure TNempPlaylist.AddNodeToPrebookList(aNode: PVirtualnode);
+var Data: PTreeData;
+    af: TAudioFile;
+begin
+    if assigned(aNode) then
+    begin
+        Data := VST.GetNodeData(aNode);
+        af := Data^.FAudioFile;
+        if PrebookList.IndexOf(af) > -1 then
+        begin
+            PrebookList.Move(PrebookList.IndexOf(af), 0);
+            ReIndexPrebookedFiles;
+            VST.Invalidate;
+        end else
+        begin
+            PrebookList.Add(af);
+            af.PrebookIndex := PreBookList.Count;
+            VST.InvalidateNode(aNode);
+        end;
+
+    end;
+end;
+
+procedure TNempPlaylist.ReIndexPrebookedFiles;
+var i:Integer;
+begin
+    for i := 0 to PrebookList.Count - 1 do
+        TAudioFile(PrebookList[i]).PrebookIndex := i+1;
 end;
 
 procedure TNempPlaylist.ProcessBufferStringlist;

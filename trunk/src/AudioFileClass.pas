@@ -189,6 +189,11 @@ type
         // the file without publishing the filename in the local filesystem.
         WebServerID: Integer;
 
+        // PrebookIndex is used for prebooking some files for the playlist
+        // PrebookIndex should be equal to the Index of the file in the
+        // Playlist.PrebookList
+        PrebookIndex: Integer;
+
         // RawTags: #13#10-separated Tags
         // Management of these Strings (except loading/saving) is done in Class TTagCloud
         //RawTagAuto: UTF8String;
