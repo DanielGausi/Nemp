@@ -157,7 +157,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 385
           Height = 17
-          Caption = 'Remember last position in within the track'
+          Caption = 'Remember last track position'
           TabOrder = 1
         end
         object CB_AutoPlayOnStart: TCheckBox
@@ -2729,7 +2729,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 192
         Width = 432
-        Height = 177
+        Height = 195
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Behaviour of the playlist'
         TabOrder = 2
@@ -2805,6 +2805,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Caption = 'Jump to next entry in cuesheet on "next"'
           TabOrder = 8
+        end
+        object CB_RememberInterruptedPlayPosition: TCheckBox
+          Left = 8
+          Top = 169
+          Width = 409
+          Height = 17
+          Caption = 
+            'Remember track position when playing a song directly from the li' +
+            'brary'
+          TabOrder = 9
         end
       end
       object GrpBox_RandomOptions: TGroupBox
