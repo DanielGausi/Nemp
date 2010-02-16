@@ -43,7 +43,7 @@ unit MessageHelper;
 interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs,
-    ContNrs, StrUtils, ShellApi, hilfsfunktionen;
+    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
@@ -763,6 +763,7 @@ end;
 function Handle_WebServerMessage(Var aMsg: TMessage): Boolean;
 var idx: Integer;
     af: TAudioFile;
+    newNode: PVirtualNode;
 begin
     result := True;
     with Nemp_MainForm do
@@ -808,7 +809,8 @@ begin
                               begin
                                   af := TAudioFile(aMsg.LParam);
                                   NempPlaylist.GetInsertNodeFromPlayPosition;
-                                  NempPlaylist.InsertFileToPlayList(af);
+                                  newNode := NempPlaylist.InsertFileToPlayList(af);
+                                  NempPlaylist.AddNodeToPrebookList(newNode);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
                               end;

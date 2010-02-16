@@ -432,7 +432,7 @@ SearchForm_CBAddExtendSearch = '(extended search)';
 
 MainForm_MenuCaptionsPlay      = 'Play (and clear current playlist)';
 MainForm_MenuCaptionsEnqueue   = 'Enqueue (at the end of the playlist)';
-MainForm_MenuCaptionsPlayNext  = 'Enqueue (after the current position)';
+MainForm_MenuCaptionsPlayNext  = 'Enqueue (at the end of the prebook-list)';
 MainForm_MenuCaptionsPlayNow   = 'Just play focussed file (no playlist change)';
 
 MainForm_MenuCaptionsPlayAllArtist      = 'Play all tracks of this artist (and delete current playlist)';
@@ -445,7 +445,7 @@ MainForm_MenuCaptionsPlayAllPlaylist = 'Play all tracks of this playlist (and de
 MainForm_MenuCaptionsPlayAllWebradio = 'Play all tracks of this webradio station (and delete current playlist)';
 
 MainForm_MenuCaptionsEnqueueAll   = 'Enqueue these tracks (at the end of the playlist)';
-MainForm_MenuCaptionsPlayNextAll  = 'Enqueue these tracks (after the current position)';
+MainForm_MenuCaptionsPlayNextAll  = 'Enqueue these tracks (at the end of the prebook-list)';
 //MainForm_MenuCaptionsPlayNowAll   = 'Enqueue and play these tracks now'; // not possible any more
 MainForm_MenuCaptionsSearchForVar    = 'Search for ''%s''';
 MainForm_MenuCaptionsSearchForTitle  = 'Search for this title';
