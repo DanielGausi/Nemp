@@ -2691,6 +2691,7 @@ begin
 end;
 
 procedure TNemp_MainForm.HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
+var newnode: PVirtualNode;
 begin
   if Mode = PLAYER_PLAY_FILES then
     NempPlaylist.ClearPlaylist;
@@ -2700,7 +2701,10 @@ begin
   else
     NempPlaylist.InsertNode := NIL;
 
-  NempPlaylist.InsertFileToPlayList(filename);
+  newnode := NempPlaylist.InsertFileToPlayList(filename);
+  if Mode=PLAYER_PLAY_NEXT then
+      NempPlaylist.AddNodeToPrebookList(newnode);
+
 
   if (Mode in [PLAYER_PLAY_NOW, PLAYER_PLAY_FILES]) AND (NempPlaylist.Count > NempPlaylist.InsertIndex-1) then
   begin
@@ -3413,6 +3417,10 @@ begin
     // Erste Datei einfügen und ggf. Abspielen
     tmp := Nil;
     tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[0]));
+
+    if How=PLAYER_PLAY_NEXT then
+        NempPlaylist.AddNodeToPrebookList(tmp);
+
     if assigned(tmp) then
       PlayListVST.ScrollIntoView( tmp, False, True);
 
@@ -3442,6 +3450,8 @@ begin
           (aList[i] as TAudiofile).FileIsPresent := FileExists(datei_pfad);
 
       tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
+      if How=PLAYER_PLAY_NEXT then
+          NempPlaylist.AddNodeToPrebookList(tmp);
       if i Mod 20 = 0 then
       begin
           PlayListVST.ScrollIntoView( tmp, False, True);
@@ -5080,10 +5090,10 @@ begin
     Data := PlaylistVST.GetNodeData(Node);
     if TAudioFile(Data^.FAudioFile).PrebookIndex > 0 then
     begin
-        Font.Color := clred;
+       // Font.Color := clred;
        // Font.Size := 14;
 
-        TextOut(ItemRect.Left+1, ItemRect.Top, IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
+        TextOut(ItemRect.Left+1, ItemRect.Top + 1, IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
     end;
    { if (Node = NempPlaylist.InsertNode) then
     begin
@@ -6424,6 +6434,16 @@ begin
         NempPlayer.PlayJingle(Data^.FAudioFile);
       end;
     end;
+
+    96..105: begin // NumPad 0..9
+        NempPlaylist.ProcessKeypress(key - 96, PlaylistVST.FocusedNode);
+    end;
+
+    48..57: begin// 0..9
+        NempPlaylist.ProcessKeypress(key - 48, PlaylistVST.FocusedNode);
+    end;
+
+
   end;
 end;
 
@@ -9655,7 +9675,7 @@ procedure TNemp_MainForm.PM_PL_PlaySelectedNextClick(
   Sender: TObject);
 var Data: PTreeData;
 begin
-  NempPlaylist.GetInsertNodeFromPlayPosition;
+  // NempPlaylist.GetInsertNodeFromPlayPosition;
   if assigned(PlaylistVST.FocusedNode) then
   begin
       NempPlaylist.AddNodeToPrebookList(PlaylistVST.FocusedNode);

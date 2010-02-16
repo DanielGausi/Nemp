@@ -81,6 +81,8 @@ type
                                           // user played a title directly from the library
       fRememberInterruptedPlayPosition: Boolean; // Use this position and start playback of the track there
 
+      fLastEditedAudioFile: TAudioFile;      // the last edited AudioFile when manually sorting the PrebookList by keypress
+
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
       PrebookList: TObjectList;
@@ -227,6 +229,8 @@ type
       //  and after adding a file from the library to the playlist)
       procedure AddNodeToPrebookList(aNode: PVirtualnode);
       procedure ReIndexPrebookedFiles;
+      procedure SetNewPrebookIndex(aFile: TAudioFile; NewIndex: Integer);
+      procedure ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
 
       // load/save playlist
       procedure LoadFromFile(aFilename: UnicodeString);
@@ -494,9 +498,19 @@ begin
 
     // increase fPlayingIndex, so we will play the next file in the playlist after this one // no
     if fPlayingIndex = Playlist.IndexOf(fPlayingFile) then
+    begin
         // we will backup the index AND the current playposition, so we can
         // start next playback right where we are NOW
         fInterruptedPlayPosition := Player.Time;
+        // additionally, we set the current track on the beginning of the prebook-list
+        PrebookList.Insert(0, fPlayingFile);
+        if PrebookList.Count > 99 then
+        begin
+            TAudioFile(PrebookList[PrebookList.Count-1]).PrebookIndex := 0;
+            PrebookList.Delete(PrebookList.Count-1);
+        end;
+        ReIndexPrebookedFiles;
+    end;
 
     // Eingaben kurzfristig blocken
     AcceptInput := False;
@@ -823,25 +837,41 @@ begin
     fInsertindex := Playlist.Count;
 end;
 
+
+
 //Set fInsertNode/fInsertIndex from current position in the list
 procedure TNempPlaylist.GetInsertNodeFromPlayPosition;
-var i: Integer;
+var i, PrebookIdx: Integer;
+    lastPrebookFile: TAudioFile;
 begin
-    // InsertIndex wird vom InsertNode-Setter (eine Proc weiter oben) entsprechend gesetzt
-    // d.h. PlayingNode ist noch in der Liste;
-    if fPlayingNode <> NIL then
+    if PrebookList.Count > 0 then
     begin
-      InsertNode := fPlayingNode.NextSibling;
+        lastPrebookFile := TAudioFile(PrebookList[PrebookList.Count - 1]);
+        PrebookIdx := Playlist.IndexOf(lastPrebookFile);
+        InsertNode := VST.GetFirst;
+        for i := 0 to PrebookIdx do
+        begin
+            if assigned(InsertNode) then
+                InsertNode := {f}InsertNode.NextSibling;
+        end;
     end else
     begin
-      // Playingfile gelöscht - Dateien an der Position einfügen, die
-      // GetNextAudioFile ermitteln wird.
-      InsertNode := VST.GetFirst;
-      for i := 0 to fPlayingIndex-1 do
-      begin
-        if assigned(InsertNode) then
-          InsertNode := {f}InsertNode.NextSibling;
-      end;
+        // InsertIndex wird vom InsertNode-Setter (eine Proc weiter oben) entsprechend gesetzt
+        // d.h. PlayingNode ist noch in der Liste;
+        if fPlayingNode <> NIL then
+        begin
+          InsertNode := fPlayingNode.NextSibling;
+        end else
+        begin
+          // Playingfile gelöscht - Dateien an der Position einfügen, die
+          // GetNextAudioFile ermitteln wird.
+          InsertNode := VST.GetFirst;
+          for i := 0 to fPlayingIndex-1 do
+          begin
+            if assigned(InsertNode) then
+              InsertNode := {f}InsertNode.NextSibling;
+          end;
+        end;
     end;
 end;
 
@@ -1101,9 +1131,12 @@ begin
             VST.Invalidate;
         end else
         begin
-            PrebookList.Add(af);
-            af.PrebookIndex := PreBookList.Count;
-            VST.InvalidateNode(aNode);
+            if PrebookList.Count < 99 then
+            begin
+                PrebookList.Add(af);
+                af.PrebookIndex := PreBookList.Count;
+                VST.InvalidateNode(aNode);
+            end;
         end;
 
     end;
@@ -1114,6 +1147,73 @@ var i:Integer;
 begin
     for i := 0 to PrebookList.Count - 1 do
         TAudioFile(PrebookList[i]).PrebookIndex := i+1;
+end;
+
+procedure TNempPlaylist.ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
+var Data: PTreeData;
+    oldIndex, newIndex: Integer;
+    af: TAudioFile;
+begin
+
+    if assigned(aNode) then
+    begin
+        Data := VST.GetNodeData(aNode);
+        af := Data^.FAudioFile;
+        if af = fLastEditedAudioFile then
+        begin
+            oldIndex := fLastEditedAudioFile.PrebookIndex;
+            newIndex := (oldIndex mod 10) * 10 + aDigit;
+            // But: if NewIndex is bigger than max: Just use the Digit
+            //      e.g. max Idx is 15, and we want to change 15 to 1.
+            //      newIndex would be set to 51, which will be corrected to 15 in SetNewPrebookIndex
+            if (oldIndex=PrebookList.Count) and (newIndex > PrebookList.Count) then
+                newIndex := aDigit;
+
+        end else
+        begin
+            fLastEditedAudioFile := af;
+            newIndex := aDigit;
+        end;
+
+        SetNewPrebookIndex(af, newIndex);
+        VST.Invalidate;
+    end;
+end;
+
+procedure TNempPlaylist.SetNewPrebookIndex(aFile: TAudioFile;
+  NewIndex: Integer);
+begin
+    // Set the Prebook-Index of the AudioFile to NewIndex
+    if aFile.PrebookIndex > 0 then
+    begin
+        // the file is already in the PrebookList
+        if NewIndex <= 0 then
+        begin
+            // delete the File from the Prebooklist
+            aFile.PrebookIndex := 0;
+            PrebookList.Remove(aFile);
+        end else
+        begin
+            // Move it in the list to the new position
+            if NewIndex-1 > PrebookList.Count-1 then
+                PrebookList.Move(aFile.PrebookIndex-1, PrebookList.Count-1)
+            else
+                PrebookList.Move(aFile.PrebookIndex-1, NewIndex-1);
+        end;
+    end
+    else
+    begin
+        // the file is NOT already in the prebooklist
+        if NewIndex > 0 then
+        begin
+            // if the index is > 0: insert. Otherwise: Do nothing
+            if NewIndex-1 > PrebookList.Count then
+                PrebookList.Insert(PrebookList.Count, aFile)
+            else
+                PrebookList.Insert(NewIndex-1, aFile);
+        end;
+    end;
+    ReIndexPrebookedFiles;
 end;
 
 procedure TNempPlaylist.ProcessBufferStringlist;
@@ -1444,43 +1544,54 @@ var i:integer;
   tmpAudioFile: TPlaylistfile;
   c: Integer;
 begin
-  if WiedergabeMode <> 2 then  //  kein Zufall , +1 Mod Count, ggf. Liste neu mischen
-  begin
-      // Index auf aktuellen  + 1
-      if (fPlayingFile <> NIL) and (fPlayingFile <> fBackupFile) then
-        result := PlayList.IndexOf(fPlayingFile) + 1
-      else
-          result := fPlayingIndex ; // nicht um eins erhöhen !!
+    if PrebookList.Count > 0 then
+    begin
+        tmpAudioFile := TAudioFile(PrebookList[0]);
+        result := Playlist.IndexOf(tmpAudioFile);
+        PrebookList.Delete(0);
+        tmpAudioFile.PrebookIndex := 0;
+        ReIndexPrebookedFiles;
+    end
+    else
+    begin
+        if WiedergabeMode <> 2 then  //  kein Zufall , +1 Mod Count, ggf. Liste neu mischen
+        begin
+            // Index auf aktuellen  + 1
+            if (fPlayingFile <> NIL) and (fPlayingFile <> fBackupFile) then
+              result := PlayList.IndexOf(fPlayingFile) + 1
+            else
+                result := fPlayingIndex ; // nicht um eins erhöhen !!
 
-      if result > PlayList.Count-1 then
-      begin
-        result := 0;
-        if fAutoMix then
-        begin // Playlist neu durchmischen
-          for i := 0 to Playlist.Count-1 do
-            Playlist.Move(i,i + random(PlayList.Count-i));
-          FillPlaylistView;
+            if result > PlayList.Count-1 then
+            begin
+              result := 0;
+              if fAutoMix then
+              begin // Playlist neu durchmischen
+                for i := 0 to Playlist.Count-1 do
+                  Playlist.Move(i,i + random(PlayList.Count-i));
+                FillPlaylistView;
+              end;
+            end
+        end else
+        // shufflemode
+        begin
+            if Playlist.Count = 0 then
+                result := -1
+            else begin
+                result := Random(Playlist.Count);
+                c := 0;
+                tmpAudioFile := PlayList[result] as TPlaylistfile;
+                while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
+                      AND (tmpAudioFile.LastPlayed <> 0)
+                      AND (c <= PlayList.Count) do
+                begin
+                    inc(c);
+                    result := (result + 1) MOD Playlist.Count;
+                    tmpAudioFile := PlayList[result] as TPlaylistfile;
+                end;
+            end;
         end;
-      end
-  end else
-  // shufflemode
-  begin
-      if Playlist.Count = 0 then
-          result := -1
-      else begin
-          result := Random(Playlist.Count);
-          c := 0;
-          tmpAudioFile := PlayList[result] as TPlaylistfile;
-          while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
-                AND (tmpAudioFile.LastPlayed <> 0)
-                AND (c <= PlayList.Count) do
-          begin
-              inc(c);
-              result := (result + 1) MOD Playlist.Count;
-              tmpAudioFile := PlayList[result] as TPlaylistfile;
-          end;
-      end;
-  end;
+    end;
 end;
 
 function TNempPlaylist.GetPrevAudioFileIndex: Integer;
