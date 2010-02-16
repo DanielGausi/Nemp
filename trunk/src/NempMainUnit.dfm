@@ -3,7 +3,7 @@ object Nemp_MainForm: TNemp_MainForm
   Top = 286
   BiDiMode = bdLeftToRight
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 982
+  ClientHeight = 1002
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2214,19 +2214,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 473
+    Height = 493
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 333
+    ExplicitHeight = 473
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 445
+      Height = 465
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2236,25 +2236,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 305
+      ExplicitHeight = 445
       DesignSize = (
         845
-        445)
+        465)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 435
+        Height = 455
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 295
+        ExplicitHeight = 435
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 435
+          Height = 455
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
           ExplicitLeft = 250
@@ -2264,7 +2264,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 435
+          Height = 455
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2329,9 +2329,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitLeft = 406
-          ExplicitTop = 2
-          ExplicitHeight = 375
+          ExplicitHeight = 435
           Columns = <
             item
               Position = 0
@@ -2402,7 +2400,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 435
+          Height = 455
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2412,7 +2410,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 295
+          ExplicitHeight = 435
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3561,7 +3559,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010110001300C8010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010110001300CC010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4126,7 +4124,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800C80110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800CC0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000

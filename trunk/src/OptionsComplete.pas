@@ -457,6 +457,7 @@ type
     StaticText1: TStaticText;
     StaticText2: TStaticText;
     CBSkipSortOnLargeLists: TCheckBox;
+    CB_RememberInterruptedPlayPosition: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1045,6 +1046,8 @@ begin
 
   CB_AutoMixPlaylist.Checked        := NempPlaylist.AutoMix;
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
+  CB_RememberInterruptedPlayPosition.Checked := NempPlaylist.RememberInterruptedPlayPosition;
+
   CB_ShowHintsInPlaylist.Checked    := NempPlaylist.ShowHintsInPlaylist;
 
   TBRandomRepeat.Position := NempPlaylist.RandomRepeat;
@@ -1971,6 +1974,7 @@ begin
 
   NempPlaylist.AutoMix       := CB_AutoMixPlaylist.Checked;
   NempPlaylist.JumpToNextCueOnNextClick := CB_JumpToNextCue.Checked;
+  NempPlaylist.RememberInterruptedPlayPosition := CB_RememberInterruptedPlayPosition.Checked;
   NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
   Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
 

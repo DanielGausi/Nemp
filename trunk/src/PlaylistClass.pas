@@ -79,6 +79,7 @@ type
 
       fInterruptedPlayPosition: Double;   // the Position in the track that was played just before the
                                           // user played a title directly from the library
+      fRememberInterruptedPlayPosition: Boolean; // Use this position and start playback of the track there
 
       procedure SetInsertNode(Value: PVirtualNode);
       function GetAnAudioFile: TPlaylistFile;
@@ -155,6 +156,7 @@ type
       property WiedergabeMode: Integer read fWiedergabeMode write fWiedergabeMode;
       property AutoMix: Boolean read fAutoMix write fAutoMix;
       property JumpToNextCueOnNextClick: Boolean read fJumpToNextCueOnNextClick write fJumpToNextCueOnNextClick;
+      property RememberInterruptedPlayPosition: Boolean read fRememberInterruptedPlayPosition write fRememberInterruptedPlayPosition;
 
       property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
 
@@ -298,6 +300,7 @@ begin
   DisableAutoDeleteAtTitleChange  := ini.ReadBool('Playlist','DisableAutoDeleteAtTitleChange', True);
   fAutoMix                        := ini.ReadBool('Playlist','AutoMix', False);
   fJumpToNextCueOnNextClick       := Ini.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
+  fRememberInterruptedPlayPosition:= Ini.ReadBool('Playlist', 'RememberInterruptedPlayPosition', True);
   fShowHintsInPlaylist  := Ini.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
   RandomRepeat          := Ini.ReadInteger('Playlist', 'RandomRepeat', 25);
   TNA_PlaylistCount     := ini.ReadInteger('Playlist','TNA_PlaylistCount',30);
@@ -334,6 +337,8 @@ begin
 
   Ini.WriteBool('Playlist','AutoMix', fAutoMix);
   Ini.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
+  Ini.WriteBool('Playlist', 'RememberInterruptedPlayPosition', fRememberInterruptedPlayPosition);
+
   Ini.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
   Ini.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
   Ini.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
@@ -472,26 +477,14 @@ begin
 end;
 
 procedure TNempPlaylist.PlayBibFile(aFile: TAudioFile; aInterval: Integer);
-//var //RegularPlaylistInterrupted: Boolean;
-    //tmpPos: Double;
 begin
     if not AcceptInput then exit;
 
     // increase fPlayingIndex, so we will play the next file in the playlist after this one // no
     if fPlayingIndex = Playlist.IndexOf(fPlayingFile) then
-    begin
-        //    fPlayingIndex := fPlayingIndex + 1; // No
         // we will backup the index AND the current playposition, so we can
         // start next playback right where we are NOW
-        //RegularPlaylistInterrupted := True;
         fInterruptedPlayPosition := Player.Time;
-    end else
-    begin
-        //RegularPlaylistInterrupted := False;
-        //tmpPos := fInterruptedPlayPosition;
-    end;
-
-
 
     // Eingaben kurzfristig blocken
     AcceptInput := False;
@@ -561,22 +554,31 @@ begin
   end else
   begin
       Player.stop(Player.LastUserWish = USER_WANT_PLAY);
-      Play(GetNextAudioFileIndex, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, fInterruptedPlayPosition);
+      if fRememberInterruptedPlayPosition then
+          Play(GetNextAudioFileIndex, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, fInterruptedPlayPosition)
+      else
+          Play(GetNextAudioFileIndex, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, 0)
   end;
 end;
 
 procedure TNempPlaylist.PlayNextFile(aUserinput: Boolean = False);
+var sPos: Double;
 begin
   if not AcceptInput then exit;
 
   Player.stop; // Neu im Oktober 2008
   if aUserInput then
-    fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+
+  if fRememberInterruptedPlayPosition then
+      sPos := fInterruptedPlayPosition
+  else
+      sPos := 0;
 
   if Player.Status = PLAYER_ISPLAYING then
-      Play(GetNextAudioFileIndex, Player.FadingInterval, True, fInterruptedPlayPosition)
+      Play(GetNextAudioFileIndex, Player.FadingInterval, True, sPos)
   else
-      Play(GetNextAudioFileIndex, Player.FadingInterval, False, fInterruptedPlayPosition);
+      Play(GetNextAudioFileIndex, Player.FadingInterval, False, sPos);
 end;
 
 procedure TNempPlaylist.PlayPrevious(aUserinput: Boolean = False);
