@@ -55,7 +55,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAudio3
+    ActivePage = TabAnzeige1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -3058,6 +3058,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio2: TTabSheet
       Caption = 'Audio2a (Rating)'
       ImageIndex = 20
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 13
         Top = 8

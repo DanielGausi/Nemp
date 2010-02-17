@@ -1514,18 +1514,18 @@ procedure TOptionsCompleteForm.FormHide(Sender: TObject);
 begin
   if Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
   begin
-    ShowWindow( Application.Handle, SW_HIDE );
-    SetWindowLong( Application.Handle, GWL_EXSTYLE,
+    ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+    SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault
                  or WS_EX_TOOLWINDOW
                  and not WS_EX_APPWINDOW);
-    ShowWindow( Application.Handle, SW_SHOW );
+    ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
   end else
   begin
-    ShowWindow( Application.Handle, SW_HIDE );
-    SetWindowLong( Application.Handle, GWL_EXSTYLE,
+    ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+    SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault );
-    ShowWindow( Application.Handle, SW_SHOW );
+    ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
   end;
 end;
 
@@ -2204,10 +2204,10 @@ begin
   // Basis-Value für [3] nehmen
   Nemp_MainForm.NempOptions.FontSize[3] :=  SEFontSize.Value;
 
-  Nemp_MainForm.NempOptions.FontSize[1] :=  min(4,
+  Nemp_MainForm.NempOptions.FontSize[1] :=  max(4,
                   Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 2));
 
-  Nemp_MainForm.NempOptions.FontSize[2] :=  min(4,
+  Nemp_MainForm.NempOptions.FontSize[2] :=  max(4,
                   Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 4));
 
   Nemp_MainForm.NempOptions.FontSize[4] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 4);
@@ -2230,7 +2230,7 @@ begin
       VST.Font.Size := NempOptions.DefaultFontSize;
 
       PlaylistVST.Canvas.Font.Size := maxFont;
-      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('mmm:mm');
+      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('999:99');
       PlaylistVSTResize(Nil);
 
       PlaylistVST.Font.Size := NempOptions.DefaultFontSize;
