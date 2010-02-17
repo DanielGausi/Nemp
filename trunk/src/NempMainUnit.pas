@@ -1922,11 +1922,12 @@ begin
     NempWindowDefault := GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE);
     if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
     begin
-      ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+      //ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
       SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
-                 GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE) or
-                 WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
-      ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+                 GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE)
+                 //or WS_EX_TOOLWINDOW
+                 and (not WS_EX_APPWINDOW));
+      //ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
     end;
 
 
@@ -2575,7 +2576,7 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
       NempTrayIcon.Visible := False;
 
-  ShowWindow (Application.Handle, SW_RESTORE);
+  ShowWindow (Nemp_MainForm.Handle, SW_RESTORE);
   SetForegroundWindow(Nemp_MainForm.Handle);
 
   //if Tag = 3 then 
