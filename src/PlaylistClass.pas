@@ -52,6 +52,8 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
 type
   DWORD = cardinal;
 
+  TPreBookInsertMode = (pb_Beginning, pb_End);
+
   TNempPlaylist = Class
     private
       fDauer: Int64;                      // Duration of the Playlist in seconds
@@ -77,15 +79,19 @@ type
       fFirstAction: Boolean;              // used for inserting files (ProcessBufferStringlist). On Nemp-Start the playback should bes started.
                                           // see "AutoPlayNewTitle"
 
+
       fInterruptedPlayPosition: Double;   // the Position in the track that was played just before the
                                           // user played a title directly from the library
+      fInterruptedFile : TAudioFile;      // The track itself
       fRememberInterruptedPlayPosition: Boolean; // Use this position and start playback of the track there
 
-      fLastEditedAudioFile: TAudioFile;      // the last edited AudioFile when manually sorting the PrebookList by keypress
+      fLastEditedAudioFile: TAudioFile;   // the last edited AudioFile when manually sorting the PrebookList by keypress
+      fLastKeypressTick: Int64;           // TickCount when the last keypress occured
 
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
       PrebookList: TObjectList;
+      function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
       function GetAnAudioFile: TPlaylistFile;
@@ -171,6 +177,7 @@ type
 
       property InsertNode: PVirtualNode read fInsertNode write SetInsertNode;
       property InsertIndex: Integer read fInsertIndex;
+      property PrebookCount: Integer read fGetPreBookCount;
 
 
       constructor Create;
@@ -231,6 +238,9 @@ type
       procedure ReIndexPrebookedFiles;
       procedure SetNewPrebookIndex(aFile: TAudioFile; NewIndex: Integer);
       procedure ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
+      // Adding/removing selected Nodes form the PrebookList
+      procedure AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
+      procedure RemoveSelectedNodesFromPreBookList;
 
       // load/save playlist
       procedure LoadFromFile(aFilename: UnicodeString);
@@ -502,6 +512,7 @@ begin
         // we will backup the index AND the current playposition, so we can
         // start next playback right where we are NOW
         fInterruptedPlayPosition := Player.Time;
+        fInterruptedFile := fPlayingFile;
         // additionally, we set the current track on the beginning of the prebook-list
         PrebookList.Insert(0, fPlayingFile);
         if PrebookList.Count > 99 then
@@ -568,6 +579,7 @@ begin
 end;
 
 procedure TNempPlaylist.PlayNext(aUserinput: Boolean = False);
+var nextIdx: Integer;
 begin
   if not AcceptInput then exit;
 
@@ -580,15 +592,18 @@ begin
   end else
   begin
       Player.stop(Player.LastUserWish = USER_WANT_PLAY);
+      // GetNextAudioFileIndex can modify fInterruptedPlayPosition
+      nextIdx := GetNextAudioFileIndex;
       if fRememberInterruptedPlayPosition then
-          Play(GetNextAudioFileIndex, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, fInterruptedPlayPosition)
+          Play(nextIdx, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, fInterruptedPlayPosition)
       else
-          Play(GetNextAudioFileIndex, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, 0)
+          Play(nextIdx, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, 0)
   end;
 end;
 
 procedure TNempPlaylist.PlayNextFile(aUserinput: Boolean = False);
 var sPos: Double;
+    nextIdx: Integer;
 begin
   if not AcceptInput then exit;
 
@@ -596,15 +611,18 @@ begin
   if aUserInput then
       fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
 
+  // GetNextAudioFileIndex can modify fInterruptedPlayPosition
+  nextIdx := GetNextAudioFileIndex;
+
   if fRememberInterruptedPlayPosition then
       sPos := fInterruptedPlayPosition
   else
       sPos := 0;
 
   if Player.Status = PLAYER_ISPLAYING then
-      Play(GetNextAudioFileIndex, Player.FadingInterval, True, sPos)
+      Play(nextIdx, Player.FadingInterval, True, sPos)
   else
-      Play(GetNextAudioFileIndex, Player.FadingInterval, False, sPos);
+      Play(nextIdx, Player.FadingInterval, False, sPos);
 end;
 
 procedure TNempPlaylist.PlayPrevious(aUserinput: Boolean = False);
@@ -812,7 +830,6 @@ begin
     ReIndexPrebookedFiles;
   end;
 end;
-
 
 {
     --------------------------------------------------------
@@ -1116,11 +1133,17 @@ begin
   NewFile.Free;
 end;
 
+
+function TNempPlaylist.fGetPreBookCount: Integer;
+begin
+    result := PrebookList.Count;
+end;
+
 procedure TNempPlaylist.AddNodeToPrebookList(aNode: PVirtualnode);
 var Data: PTreeData;
     af: TAudioFile;
 begin
-    if assigned(aNode) then
+    if assigned(aNode) and (VST.GetNodeLevel(aNode)=0) then
     begin
         Data := VST.GetNodeData(aNode);
         af := Data^.FAudioFile;
@@ -1142,6 +1165,76 @@ begin
     end;
 end;
 
+procedure TNempPlaylist.RemoveSelectedNodesFromPreBookList;
+var i:integer;
+  Selectedmp3s: TNodeArray;
+  aData: PTreeData;
+begin
+    Selectedmp3s := VST.GetSortedSelection(False);
+    if length(SelectedMp3s) = 0 then exit;
+
+    VST.BeginUpdate;
+
+    for i := 0 to length(Selectedmp3s)-1 do
+    begin
+      // We dont need to handle Cue-Nodes here
+      if VST.GetNodeLevel(Selectedmp3s[i])=0 then
+      begin
+          aData := VST.GetNodeData(Selectedmp3s[i]);
+          aData^.FAudioFile.PrebookIndex := 0;
+          PrebookList.Remove(aData^.FAudioFile);
+      end
+    end;
+
+    ReIndexPrebookedFiles;
+
+    VST.EndUpdate;
+    VST.Invalidate;
+end;
+
+procedure TNempPlaylist.AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
+var i:integer;
+  Selectedmp3s: TNodeArray;
+  aData: PTreeData;
+  af: TAudioFile;
+begin
+
+    Selectedmp3s := VST.GetSortedSelection(False);
+    if length(SelectedMp3s) = 0 then exit;
+
+    for i := 0 to length(Selectedmp3s)-1 do
+    begin
+      // We dont need to handle Cue-Nodes here
+      if VST.GetNodeLevel(Selectedmp3s[i])=0 then
+      begin
+          aData := VST.GetNodeData(Selectedmp3s[i]);
+          af := aData^.FAudioFile;
+
+          case Mode of
+              pb_Beginning: begin
+                    if PrebookList.IndexOf(af) > -1 then
+                        PrebookList.Move(PrebookList.IndexOf(af), i)
+                    else
+                        if PrebookList.Count < 99 then
+                            PrebookList.Insert(i, af);
+              end;
+
+              pb_End: begin
+                    if PrebookList.IndexOf(af) > -1 then
+                        PrebookList.Move(PrebookList.IndexOf(af), PrebookList.Count-1)
+                    else
+                        if PrebookList.Count < 99 then
+                            PrebookList.Add(af);
+              end;
+          end;
+
+      end
+    end;
+
+    ReIndexPrebookedFiles;
+    VST.Invalidate;
+end;
+
 procedure TNempPlaylist.ReIndexPrebookedFiles;
 var i:Integer;
 begin
@@ -1153,13 +1246,15 @@ procedure TNempPlaylist.ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
 var Data: PTreeData;
     oldIndex, newIndex: Integer;
     af: TAudioFile;
+    tc: Int64;
 begin
 
-    if assigned(aNode) then
+    if assigned(aNode) and (VST.GetNodeLevel(aNode)=0) then
     begin
         Data := VST.GetNodeData(aNode);
         af := Data^.FAudioFile;
-        if af = fLastEditedAudioFile then
+        tc := GetTickCount;
+        if (af = fLastEditedAudioFile) and (tc - fLastKeypressTick < 1000) then
         begin
             oldIndex := fLastEditedAudioFile.PrebookIndex;
             newIndex := (oldIndex mod 10) * 10 + aDigit;
@@ -1168,12 +1263,12 @@ begin
             //      newIndex would be set to 51, which will be corrected to 15 in SetNewPrebookIndex
             if (oldIndex=PrebookList.Count) and (newIndex > PrebookList.Count) then
                 newIndex := aDigit;
-
         end else
         begin
             fLastEditedAudioFile := af;
             newIndex := aDigit;
         end;
+        fLastKeypressTick := tc;
 
         SetNewPrebookIndex(af, newIndex);
         VST.Invalidate;
@@ -1204,7 +1299,7 @@ begin
     else
     begin
         // the file is NOT already in the prebooklist
-        if NewIndex > 0 then
+        if (NewIndex > 0) and (PrebookList.Count < 99) then
         begin
             // if the index is > 0: insert. Otherwise: Do nothing
             if NewIndex-1 > PrebookList.Count then
@@ -1547,13 +1642,20 @@ begin
     if PrebookList.Count > 0 then
     begin
         tmpAudioFile := TAudioFile(PrebookList[0]);
+        // the new selected file IS NOT equal to the interrupted file
+        // => set the interruptedPLayPosition to 0
+        if fInterruptedFile <> tmpAudioFile then
+            fInterruptedPlayPosition := 0;
+
         result := Playlist.IndexOf(tmpAudioFile);
         PrebookList.Delete(0);
         tmpAudioFile.PrebookIndex := 0;
         ReIndexPrebookedFiles;
+
     end
     else
     begin
+        fInterruptedPlayPosition := 0;
         if WiedergabeMode <> 2 then  //  kein Zufall , +1 Mod Count, ggf. Liste neu mischen
         begin
             // Index auf aktuellen  + 1

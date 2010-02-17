@@ -2220,7 +2220,6 @@ object Nemp_MainForm: TNemp_MainForm
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 493
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
@@ -2236,7 +2235,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 465
       DesignSize = (
         845
         471)
@@ -2249,7 +2247,6 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 455
         object Splitter4: TSplitter
           Left = 400
           Top = 0
@@ -2329,7 +2326,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 455
           Columns = <
             item
               Position = 0
@@ -2410,7 +2406,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 455
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3044,7 +3039,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_PL_PlaySelectedNext: TMenuItem
         Caption = '&Play selected title next'
-        OnClick = PM_PL_PlaySelectedNextClick
+        OnClick = PM_PL_AddToPrebookListEndClick
       end
       object MM_PL_PlayInHeadset: TMenuItem
         Caption = 'Play in &headset'
@@ -3559,7 +3554,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010110001300D0010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300E8010E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4053,10 +4048,10 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
       2800000038000000460000000100010000000000300200000000000000000000
-      000000000000000000000000FFFFFF0000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000FFFFFF00FFFC000000000000FFFC000000000000
+      FFFC000000000000FFFC000000000000FFFC000000000000FFFC000000000000
+      FFFC000000000000FFFC000000000000FFFC000000000000FFFC000000000000
+      FFFC000000000000FFFC000000000000FFFC000000000000FFFC000000000000
       CF9F3E7000000000C31F0C7000000000E01F807000000000E01F807000000000
       E03F80F000000000C01F00700000000080060010000000000000000000000000
       0000000000000000F87FE1F000000000F8FFE3F000000000F8FFF3F000000000
@@ -4124,7 +4119,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800D00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800D40110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -5273,9 +5268,17 @@ object Nemp_MainForm: TNemp_MainForm
     object N12: TMenuItem
       Caption = '-'
     end
-    object PM_PL_PlaySelectedNext: TMenuItem
-      Caption = 'Play selected title next'
-      OnClick = PM_PL_PlaySelectedNextClick
+    object PM_PL_AddToPrebookListEnd: TMenuItem
+      Caption = 'Add selection to prebook-list (end)'
+      OnClick = PM_PL_AddToPrebookListEndClick
+    end
+    object PM_PL_AddToPrebookListBeginning: TMenuItem
+      Caption = 'Add selection to prebook-list (beginning)'
+      OnClick = PM_PL_AddToPrebookListBeginningClick
+    end
+    object PM_PL_RemoveFromPrebookList: TMenuItem
+      Caption = 'Remove selection from prebook-list'
+      OnClick = PM_PL_RemoveFromPrebookListClick
     end
     object PM_PL_PlayInHeadset: TMenuItem
       Caption = 'Play in headset'

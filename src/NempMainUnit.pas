@@ -439,7 +439,7 @@ type
     PM_PL_SavePlaylist: TMenuItem;
     PM_PL_AddPlaylist: TMenuItem;
     N12: TMenuItem;
-    PM_PL_PlaySelectedNext: TMenuItem;
+    PM_PL_AddToPrebookListEnd: TMenuItem;
     PM_PL_PlayInHeadset: TMenuItem;
     PM_PL_StopHeadset: TMenuItem;
     N13: TMenuItem;
@@ -736,6 +736,8 @@ type
     PM_ML_GetTags: TMenuItem;
     LblBibTags: TLabel;
     LblBibPlayCounter: TLabel;
+    PM_PL_AddToPrebookListBeginning: TMenuItem;
+    PM_PL_RemoveFromPrebookList: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1040,7 +1042,7 @@ type
     procedure RepairZOrder;
     procedure ActualizeVDTCover;
 
-    procedure PM_PL_PlaySelectedNextClick(Sender: TObject);
+    procedure PM_PL_AddToPrebookListEndClick(Sender: TObject);
     procedure PM_ML_PlayNowClick(Sender: TObject);
     procedure PanelPaint(Sender: TObject);
     //procedure GroupboxPaint(Sender: TObject);
@@ -1244,6 +1246,8 @@ type
 
     procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
+    procedure PM_PL_RemoveFromPrebookListClick(Sender: TObject);
 
   private
 
@@ -1806,7 +1810,7 @@ begin
       maxFont := NempOptions.DefaultFontSize;
 
     PlaylistVST.Canvas.Font.Size := maxFont;
-    PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('mmm:mm');
+    PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('999:99');
     VST.Font.Size:=NempOptions.DefaultFontSize;
     PlaylistVST.Font.Size:=NempOptions.DefaultFontSize;
     if Screen.Fonts.IndexOf(NempOptions.FontNameVBR) = -1 then
@@ -1915,14 +1919,14 @@ begin
     else
       NempTrayIcon.Visible := False;
 
-    NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
+    NempWindowDefault := GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE);
     if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
     begin
-      ShowWindow( Application.Handle, SW_HIDE );
-      SetWindowLong( Application.Handle, GWL_EXSTYLE,
-                 GetWindowLong(Application.Handle, GWL_EXSTYLE) or
+      ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+      SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
+                 GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE) or
                  WS_EX_TOOLWINDOW and not WS_EX_APPWINDOW);
-      ShowWindow( Application.Handle, SW_SHOW );
+      ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
     end;
 
 
@@ -2500,7 +2504,7 @@ begin
 
   if NempOptions.NempWindowView in [NEMPWINDOW_TASKBAR_MIN_TRAY, NEMPWINDOW_BOTH_MIN_TRAY, NEMPWINDOW_TRAYONLY]
   then // Taskbar-Eintrag weg, aber nur, wenn ein Icon da ist
-    if NempTrayIcon.Visible then ShowWindow(Application.Handle,SW_HIDE);
+    if NempTrayIcon.Visible then ShowWindow(Nemp_MainForm.Handle,SW_HIDE);
 
   if NempOptions.ShowDeskbandOnMinimize then
     NotifyDeskband(NempDeskbandActivateMessage);
@@ -5090,27 +5094,16 @@ begin
     Data := PlaylistVST.GetNodeData(Node);
     if TAudioFile(Data^.FAudioFile).PrebookIndex > 0 then
     begin
-       // Font.Color := clred;
-       // Font.Size := 14;
-
-        TextOut(ItemRect.Left+1, ItemRect.Top + 1, IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
+        // Clear the area
+        //brush.Color := PlaylistVST.Color;
+        //Fillrect(Rect(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top, ItemRect.Left+2*PlaylistVST.Indent, ItemRect.Bottom));
+        // Paint the Index of the file
+        Brush.Style := bsClear;
+        Font.Size := 8; // fixed size. Otherwise the Indent can be to small
+        Font.Style := [fsUnderline];
+        TextOut(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top,
+                IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
     end;
-   { if (Node = NempPlaylist.InsertNode) then
-    begin
-      if NempSkin.isActive then
-        Pen.Color := clred //NempSkin.SkinColorScheme.PlaylistPlayingFileColor
-      else
-        Pen.Color := clGradientActiveCaption;
-      pen.Width := 2;//3;
-      Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
-            //Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
-            //Point(ItemRect.Right-1, ItemRect.Bottom-1),
-            Point(ItemRect.Right-1, ItemRect.Top+1)]
-            //Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
-            );
-    end;
-    }
-
   end;
 end;
 
@@ -6133,6 +6126,7 @@ begin
   NempPlaylist.ClearPlaylist;
 end;
 
+
 procedure TNemp_MainForm.PM_PL_DeleteSelectedClick(Sender: TObject);
 begin
   NempPlaylist.DeleteMarkedFiles;
@@ -6641,6 +6635,7 @@ begin
 end;
 
 procedure TNemp_MainForm.PlayListPOPUPPopup(Sender: TObject);
+var prebookAllowed: Boolean;
 begin
   if (PlayListVST.FocusedNode= NIL) then
   begin
@@ -6656,6 +6651,12 @@ begin
     PM_PL_StopHeadset.Enabled   := NempPlayer.EnableHeadSet;
     PM_PL_ExtendedCopyToClipboard.Enabled := True;
   end;
+
+  // we could allow more, but this would be enough. ;-)
+  prebookAllowed := PlaylistVST.SelectedCount + NempPlaylist.PrebookCount <= 99;
+  PM_PL_AddToPrebookListEnd.Enabled := prebookAllowed;
+  PM_PL_AddToPrebookListBeginning.Enabled := prebookAllowed;
+
   If NempPlaylist.Count = 0 then
   begin
     PM_PL_SortBy.Enabled := False;
@@ -7446,44 +7447,49 @@ begin
     ikNormal, ikSelected:
       begin
         Data := Sender.GetNodeData(Node);
-        case Column of
-          0:  // main column
-            if (Data.FAudioFile.isStream) AND NOT (Node = NempPlaylist.PlayingNode) then
-            begin
-              imageIndex := 9;
-              exit;  // Anmerkung: Streams können nur Level 0 haben, daher ist das "if Level..." im Else-Zweik ausreichend!
-            end else
-            begin
-                if Sender.GetNodeLevel(Node) = 0 then
+        if (Column = 0) and (Data.FAudioFile.PrebookIndex > 0) then
+             ImageIndex := 16 // empty image// nothing ImageIndex := -1
+        else
+        begin
+            case Column of
+              0:  // main column
+                if (Data.FAudioFile.isStream) AND NOT (Node = NempPlaylist.PlayingNode) then
                 begin
-                        if Not Data.FAudioFile.FileIsPresent then
-                          imageIndex := 5
-                        else
-                          if Node = NempPlayList.PlayingNode then
-                            case NempPlayer.Status of
-                               PLAYER_ISPLAYING: ImageIndex := 2;
-                               PLAYER_ISPAUSED:  ImageIndex := 3;
-                               else              ImageIndex := 4;
-                            end// Case
-
+                  imageIndex := 9;
+                  exit;  // Anmerkung: Streams können nur Level 0 haben, daher ist das "if Level..." im Else-Zweik ausreichend!
+                end else
+                begin
+                    if Sender.GetNodeLevel(Node) = 0 then
+                    begin
+                            if Not Data.FAudioFile.FileIsPresent then
+                              imageIndex := 5
                             else
-                            begin
-                              if Data.FAudioFile.FileChecked then
-                              begin
-                                if Data.FAudioFile.LyricsExisting then
-                                  ImageIndex := 1
+                              if Node = NempPlayList.PlayingNode then
+                                case NempPlayer.Status of
+                                   PLAYER_ISPLAYING: ImageIndex := 2;
+                                   PLAYER_ISPAUSED:  ImageIndex := 3;
+                                   else              ImageIndex := 4;
+                                end// Case
+
                                 else
-                                  ImageIndex := 0;
-                                // Cue-Sheet vorhanden?
-                                if assigned(Data.FAudioFile.CueList) and (Data.FAudioFile.CueList.Count > 0) then
-                                  ImageIndex := 10;
-                              end
-                              else // Datei noch nicht untersucht => "?-Note"
-                                imageIndex := 8;
-                            end;
-                end else // level=1
-                  ;// nix - kein Bild anzeigen!
-            end; // case Column
+                                begin
+                                  if Data.FAudioFile.FileChecked then
+                                  begin
+                                    if Data.FAudioFile.LyricsExisting then
+                                      ImageIndex := 1
+                                    else
+                                      ImageIndex := 0;
+                                    // Cue-Sheet vorhanden?
+                                    if assigned(Data.FAudioFile.CueList) and (Data.FAudioFile.CueList.Count > 0) then
+                                      ImageIndex := 10;
+                                  end
+                                  else // Datei noch nicht untersucht => "?-Note"
+                                    imageIndex := 8;
+                                end;
+                    end else // level=1
+                      ;// nix - kein Bild anzeigen!
+                end; // case Column
+            end;
         end;
       end;
   end;
@@ -9671,12 +9677,22 @@ begin
 end;
 
 
-procedure TNemp_MainForm.PM_PL_PlaySelectedNextClick(
+procedure TNemp_MainForm.PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
+begin
+    NempPlaylist.AddSelectedNodesToPreBookList(pb_Beginning) ;
+end;
+
+procedure TNemp_MainForm.PM_PL_AddToPrebookListEndClick(
   Sender: TObject);
 var Data: PTreeData;
 begin
+
+  NempPlaylist.AddSelectedNodesToPreBookList(pb_End) ;
+
+  exit;
+
   // NempPlaylist.GetInsertNodeFromPlayPosition;
-  if assigned(PlaylistVST.FocusedNode) then
+  if assigned(PlaylistVST.FocusedNode) then //and (PlaylistVST.GetNodeLevel(PlaylistVST.FocusedNode) = 0) then
   begin
       NempPlaylist.AddNodeToPrebookList(PlaylistVST.FocusedNode);
     //Data := PlaylistVST.GetNodeData(PlaylistVST.FocusedNode);
@@ -9686,6 +9702,11 @@ begin
     //PlaylistVST.InvalidateNode(PlaylistVST.FocusedNode);
     //NempPlaylist.InsertFileToPlayList(Data^.FAudioFile.Pfad);
   end;
+end;
+
+procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);
+begin
+    NempPlaylist.RemoveSelectedNodesFromPreBookList;
 end;
 
 procedure TNemp_MainForm.PanelPaint(Sender: TObject);
