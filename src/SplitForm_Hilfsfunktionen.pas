@@ -1221,9 +1221,6 @@ begin
       begin
 
         SetWindowRgn( handle, 0, Not _IsThemeActive );
-        //SetWindowLong( Application.Handle, GWL_EXSTYLE,
-        //           GetWindowLong(Application.Handle, GWL_EXSTYLE) or
-        //          WS_Caption OR WS_SizeBox);
         InvalidateRect(handle, NIL, TRUE);
       end;
 

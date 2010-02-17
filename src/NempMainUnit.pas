@@ -1919,15 +1919,17 @@ begin
     else
       NempTrayIcon.Visible := False;
 
-    NempWindowDefault := GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE);
+  //  NempWindowDefault := GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE);
     if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
     begin
-      //ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
-      SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
+//      ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+{      SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE)
-                 //or WS_EX_TOOLWINDOW
+                 or WS_EX_TOOLWINDOW
+                 //and (not WS_ICONIC)
                  and (not WS_EX_APPWINDOW));
-      //ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+}
+///      ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
     end;
 
 
@@ -2142,7 +2144,8 @@ procedure TNemp_MainForm.FormShow(Sender: TObject);
 begin
   // StuffToDoAfterCreate;
   // Nothing to do here. Will be done in nemp.dpr
-  FSplash.Close;
+  if assigned(FSplash) then
+      FSplash.Close;
 
 end;
 
@@ -2505,7 +2508,19 @@ begin
 
   if NempOptions.NempWindowView in [NEMPWINDOW_TASKBAR_MIN_TRAY, NEMPWINDOW_BOTH_MIN_TRAY, NEMPWINDOW_TRAYONLY]
   then // Taskbar-Eintrag weg, aber nur, wenn ein Icon da ist
-    if NempTrayIcon.Visible then ShowWindow(Nemp_MainForm.Handle,SW_HIDE);
+  begin
+  /// XXX das geht so nicht mehr, weil in der Taskleiste seit D2007 Form.Handle drin steckt. Aber das
+  ///  einfach ausblenden bewirkt da nichts.
+//    if NempTrayIcon.Visible then ShowWindow(Nemp_MainForm.Handle, SW_HIDE); // vorher Application.Handle
+
+{   SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
+                 Nemp_MainForm.NempWindowDefault
+                 or WS_EX_TOOLWINDOW
+                 //and (not WS_ICONIC)
+                 and (not WS_EX_APPWINDOW));}
+
+  end;
+
 
   if NempOptions.ShowDeskbandOnMinimize then
     NotifyDeskband(NempDeskbandActivateMessage);
@@ -2558,7 +2573,7 @@ Begin
   Thread2 := GetWindowThreadProcessId (GetForegroundWindow, nil); 
   AttachThreadInput (Thread1, Thread2, true); 
   Try
-    SetForegroundWindow (Application.Handle); 
+    SetForegroundWindow (Nemp_MainForm.Handle);
   Finally 
     AttachThreadInput (Thread1, Thread2, false); 
   End;
@@ -2576,10 +2591,10 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
       NempTrayIcon.Visible := False;
 
-  ShowWindow (Nemp_MainForm.Handle, SW_RESTORE);
+  //ShowWindow(Nemp_MainForm.Handle, SW_RESTORE);
   SetForegroundWindow(Nemp_MainForm.Handle);
 
-  //if Tag = 3 then 
+  //if Tag = 3 then
     RepairZOrder;
 
   MinimizedIndicator := False;
@@ -10356,6 +10371,9 @@ begin
 //CloudViewer.SetFocus;
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
+
+  caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
+   + ' - ' + IntToStr(self.handle);
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
