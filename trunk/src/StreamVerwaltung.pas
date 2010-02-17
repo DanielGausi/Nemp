@@ -377,8 +377,6 @@ end;
 
 procedure TFormStreamVerwaltung.FormShow(Sender: TObject);
 begin
-    // Taskleisten-Eintrag
-    // SetWindowLong(Handle, GWL_ExStyle, WS_Ex_AppWindow);
     PC_Streams.ActivePageIndex := 0;
 end;
 

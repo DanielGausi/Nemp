@@ -1514,12 +1514,24 @@ procedure TOptionsCompleteForm.FormHide(Sender: TObject);
 begin
   if Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
   begin
-    //ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
-    SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
+    ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+    {SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault
-                 //or WS_EX_TOOLWINDOW
-                 and (not WS_EX_APPWINDOW));
-    //ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+                 //GetWindowLong(Application.Handle, GWL_EXSTYLE)
+                 or WS_EX_TOOLWINDOW
+                 //and (not WS_ICONIC)
+                 and not WS_EX_APPWINDOW);}
+
+                 SetWindowLong( Nemp_MainForm.Handle, GWL_STYLE,
+                 //Nemp_MainForm.NempWindowDefault
+                 GetWindowLong(Nemp_MainForm.Handle, GWL_STYLE)
+                //   or WS_EX_TOOLWINDOW
+                 and (not WS_ICONIC)
+                 //and not WS_EX_APPWINDOW
+                 );
+
+
+    ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
   end else
   begin
     ShowWindow( Nemp_MainForm.Handle, SW_HIDE );

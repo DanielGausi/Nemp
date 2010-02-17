@@ -75,27 +75,54 @@ uses
   NoLyricWikiApi in 'NoLyricWikiApi.pas' {NoLyricWikiApiForm},
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas';
+  TagClouds in 'TagClouds.pas',
+
+  classes;
 
 {$R *.res}
 
+var x: tStringList;
 
 begin
     ReportMemoryLeaksOnShutdown := True;
 
     Application.Initialize;
+    Application.MainFormOnTaskBar := True;
+{
+SetWindowLong mit Application.handle funktioniert, wenn MainFormOnTaskbar = False;
+Ist das True, funktioniert es mit MainForm.Handle
+Aber, mit "richtigem handle" funktioniert das Win7-Gedöns nicht mehr!!!!
+=> Unter WIN 7 die TASKLEISTE IN RUHE LASSEN!!!
 
-        Graphics.DefFontData.Name := 'Tahoma';
+Mit MainForm.handle funktioniert das Splash- gedöns nicht mehr!! und Win 7
+
+suchen nach SetWindowLong
+ShowWindow
+ }
 
 
+ asas
+
+ Graphics.DefFontData.Name := 'Tahoma';
 
         Application.Title := 'Nemp';
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  FSplash := TFSplash.Create (Application);
+
+  x := TStringlist.Create;
+  x.Add(Inttostr(Application.Handle))    ;
+  x.Add(IntToStr(Nemp_MainForm.dwTaskbarThumbnails1.TaskBarEntryHandle));
+  x.Add(IntToStr(Nemp_MainForm.handle));
+  x.SaveToFile('xxxxxxxx.txt');
+  x.Free;
+
+
+ // Application.CreateForm(TFSplash, FSplash);
+
+//  FSplash := TFSplash.Create (Application);
 
         try
-          FSplash.Show;
-          FSplash.Update;
+   //       FSplash.Show;
+     //     FSplash.Update;
           Nemp_MainForm.StuffToDoOnCreate;
 
           Application.CreateForm(TPlaylistForm   , PlaylistForm   );
@@ -103,7 +130,7 @@ begin
           Application.CreateForm(TMedienlisteForm, MedienlisteForm);
           Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
 
-          Nemp_MainForm.StuffToDoAfterCreate ;
+         Nemp_MainForm.StuffToDoAfterCreate ;
 
           if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
           begin
@@ -117,6 +144,8 @@ begin
         finally
           //FreeAndNil(FSplash);
         end;
+
+
 
         Application.Run;
 
