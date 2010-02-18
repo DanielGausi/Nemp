@@ -141,15 +141,9 @@
 			</DCCReference>
 			<DCCReference Include="PostProcessorUtils.pas"/>
 			<DCCReference Include="RatingCtrls.pas"/>
-			<DCCReference Include="TagClouds.pas"/>
-			<RcItem Include="playlist_3248_ohneAlpha.ico">
-				<ResourceType>Icon</ResourceType>
-				<ResourceId>Icon_2</ResourceId>
-			</RcItem>
-			<RcItem Include="Nemp32_48_ohneAlpha.ico">
-				<ResourceType>Icon</ResourceType>
-				<ResourceId>Icon_1</ResourceId>
-			</RcItem>
+			<DCCReference Include="TagClouds.pas">
+				<Form>/,  classes;</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>
