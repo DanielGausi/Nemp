@@ -75,13 +75,13 @@ uses
   NoLyricWikiApi in 'NoLyricWikiApi.pas' {NoLyricWikiApiForm},
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas',
-
-  classes;
+  TagClouds in 'TagClouds.pas'
+    ;
+  //,  classes;
 
 {$R *.res}
 
-var x: tStringList;
+//var x: tStringList;
 
 begin
     ReportMemoryLeaksOnShutdown := True;
@@ -101,28 +101,26 @@ ShowWindow
  }
 
 
- asas
-
- Graphics.DefFontData.Name := 'Tahoma';
+  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Graphics.DefFontData.Name := 'Tahoma';
 
         Application.Title := 'Nemp';
-  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
 
-  x := TStringlist.Create;
+ { x := TStringlist.Create;
   x.Add(Inttostr(Application.Handle))    ;
   x.Add(IntToStr(Nemp_MainForm.dwTaskbarThumbnails1.TaskBarEntryHandle));
   x.Add(IntToStr(Nemp_MainForm.handle));
   x.SaveToFile('xxxxxxxx.txt');
   x.Free;
 
+ }
+  //Application.CreateForm(TFSplash, FSplash);
 
- // Application.CreateForm(TFSplash, FSplash);
-
-//  FSplash := TFSplash.Create (Application);
+  //FSplash := TFSplash.Create (Application);
 
         try
-   //       FSplash.Show;
-     //     FSplash.Update;
+    //      FSplash.Show;
+      //    FSplash.Update;
           Nemp_MainForm.StuffToDoOnCreate;
 
           Application.CreateForm(TPlaylistForm   , PlaylistForm   );
