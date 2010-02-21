@@ -467,7 +467,7 @@ begin
           begin
               Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
               NempPlayer.RefreshPlayingTitel;
-              Application.Title := NempPlayer.GenerateTaskbarTitel;
+              Nemp_MainForm.Caption := NempPlayer.GenerateTaskbarTitel;
           end;
       end;
 

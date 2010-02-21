@@ -42,7 +42,7 @@ unit Nemp_ConstantsAndTypes;
 
 interface
 
-uses Windows, Messages, Graphics, IniFiles, Forms,  Classes,
+uses Windows, Messages, Graphics, IniFiles, Forms,  Classes, Controls,
      SysUtils, Contnrs, ShellApi, VirtualTrees,  Hilfsfunktionen;
 
 
