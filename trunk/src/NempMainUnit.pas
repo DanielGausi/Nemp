@@ -1248,6 +1248,11 @@ type
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
     procedure PM_PL_RemoveFromPrebookListClick(Sender: TObject);
+    procedure VSTColumnWidthDblClickResize(Sender: TVTHeader;
+      Column: TColumnIndex; Shift: TShiftState; P: TPoint;
+      var Allowed: Boolean);
+    procedure VSTAfterGetMaxColumnWidth(Sender: TVTHeader; Column: TColumnIndex;
+      var MaxWidth: Integer);
 
   private
 
@@ -1501,7 +1506,9 @@ begin
     ArtistsVST.NodeDataSize := SizeOf(TStringTreeData);
     ALbenVST.NodeDataSize := SizeOf(TStringTreeData);
     PlaylistVST.NodeDataSize := SizeOf(TTreeData);
-    Application.Title := NEMP_NAME_TASK;
+    //Application.Title := NEMP_NAME_TASK;
+    //Caption := NEMP_NAME_TASK;
+
     Application.Name := NEMP_NAME;
     Application.Name := NEMP_NAME;
 
@@ -4127,7 +4134,12 @@ begin
                           end;
           CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
           CON_BITRATE   : if Data^.FAudioFile.Bitrate > 0 then
-                              CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s'
+                          begin
+                              if Data^.FAudioFile.vbr then
+                                  CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s' + ' (vbr)'
+                              else
+                                  CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s';
+                          end
                           else
                               CellText := '-?-';
           CON_CBR       : if Data^.FAudioFile.vbr then CellText := 'vbr'
@@ -4181,6 +4193,8 @@ end;
 
 
 
+
+
 procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
 var Dateiliste: TObjectlist;
@@ -4206,6 +4220,19 @@ begin
   PM_ML_PlayNowClick}
 end;
 
+
+procedure TNemp_MainForm.VSTColumnWidthDblClickResize(Sender: TVTHeader;
+  Column: TColumnIndex; Shift: TShiftState; P: TPoint; var Allowed: Boolean);
+begin
+    //allowed := VST.Header.Columns[column].Tag <> CON_RATING;
+end;
+
+procedure TNemp_MainForm.VSTAfterGetMaxColumnWidth(Sender: TVTHeader;
+  Column: TColumnIndex; var MaxWidth: Integer);
+begin
+if VST.Header.Columns[column].Tag = CON_RATING then
+    MaxWidth := 80;
+end;
 
 procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader;
   HitInfo: TVTHeaderHitInfo);
@@ -5070,6 +5097,8 @@ end;
 
 
 
+
+
 procedure TNemp_MainForm.VSTBeforeItemErase(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
   var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -5589,7 +5618,8 @@ begin
           inc(TaskBarDelay);
           if TaskBarDelay >= NempPlayer.ScrollTaskbarDelay then
           begin
-            Application.Title := copy(Application.Title, 2 , length(Application.Title)- 1) + Application.Title[1];
+            //Application.Title := copy(Application.Title, 2 , length(Application.Title)- 1) + Application.Title[1];
+            caption := copy(caption, 2 , length(caption)- 1) + caption[1];
             TaskBarDelay := 0;
           end;
         end;
@@ -5918,7 +5948,8 @@ begin
         Spectrum.DrawTime('  00:00');
       end;
 
-      Application.Title := NempPlayer.GenerateTaskbarTitel;
+      Caption := NempPlayer.GenerateTaskbarTitel;
+
       PlaylistVST.Invalidate;
       Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
   end;
@@ -5943,7 +5974,7 @@ begin
       Spectrum.DrawTime('  00:00');
     end;
 
-    Application.Title := NempPlayer.GenerateTaskbarTitel;
+    Caption := NempPlayer.GenerateTaskbarTitel;
     PlaylistVST.Invalidate;
     Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 end;
@@ -8583,19 +8614,29 @@ end;
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
 begin
-  if ord(key) = VK_RETURN then
-  begin
-    key := #0;
-    if Trim(EDITFastSearch.Text)= '' then
-    begin
-        // Je nach letzte Quicksearch oder alles anzeigen
-        //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-        //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-        //else
-            MedienBib.ShowQuickSearchList;
-    end
-    else
-        DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
+  case ord(key) of
+
+      VK_RETURN:
+          begin
+            key := #0;
+            if Trim(EDITFastSearch.Text)= '' then
+            begin
+                // Je nach letzte Quicksearch oder alles anzeigen
+                //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
+                //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
+                //else
+                    MedienBib.ShowQuickSearchList;
+            end
+          end;
+      VK_ESCAPE:
+          begin
+              key := #0;
+              EDITFastSearch.Text := '';
+          end
+
+  else
+      DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
+
   end;
 end;
 
@@ -9949,7 +9990,7 @@ begin
   // Anzeigen im Mittelteil:
   if NempPlayer.MainStream = 0 then
   begin
-    Application.Title := NEMP_NAME_TASK;
+    Caption := NEMP_NAME_TASK;
     NempTrayIcon.Hint := 'Nemp - Noch ein mp3-Player';
 
     // Coveranzeige
@@ -9960,7 +10001,7 @@ begin
   end else
   begin
       NempPlayer.RefreshPlayingTitel;
-      Application.Title := NempPlayer.GenerateTaskbarTitel;
+      Caption := NempPlayer.GenerateTaskbarTitel;
       Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
       if NempPlayer.URLStream then
       begin

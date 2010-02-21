@@ -1,7 +1,6 @@
 object Nemp_MainForm: TNemp_MainForm
   Left = 701
   Top = 286
-  BiDiMode = bdLeftToRight
   Caption = 'Nemp - Noch ein MP3-Player'
   ClientHeight = 1008
   ClientWidth = 845
@@ -17,8 +16,8 @@ object Nemp_MainForm: TNemp_MainForm
   KeyPreview = True
   Menu = Nemp_MainMenu
   OldCreateOrder = False
-  ParentBiDiMode = False
   Scaled = False
+  ShowHint = True
   OnClose = TntFormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -2232,7 +2231,7 @@ object Nemp_MainForm: TNemp_MainForm
       DoubleBuffered = True
       ParentDoubleBuffered = False
       PopupMenu = Medialist_PopupMenu
-      TabOrder = 0
+      TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
       DesignSize = (
@@ -2284,7 +2283,7 @@ object Nemp_MainForm: TNemp_MainForm
           Header.Font.Height = -11
           Header.Font.Name = 'Tahoma'
           Header.Font.Style = []
-          Header.Options = [hoColumnResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
           Header.SortColumn = 0
           Header.Style = hsXPStyle
           HintMode = hmHint
@@ -2302,10 +2301,12 @@ object Nemp_MainForm: TNemp_MainForm
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
           OnAfterCellPaint = VSTAfterCellPaint
+          OnAfterGetMaxColumnWidth = VSTAfterGetMaxColumnWidth
           OnAfterItemErase = VSTAfterItemErase
           OnBeforeItemErase = VSTBeforeItemErase
           OnChange = VSTChange
           OnColumnDblClick = VSTColumnDblClick
+          OnColumnWidthDblClickResize = VSTColumnWidthDblClickResize
           OnCreateEditor = VSTCreateEditor
           OnEditCancelled = VSTEditCancelled
           OnEdited = VSTEdited
@@ -2622,7 +2623,7 @@ object Nemp_MainForm: TNemp_MainForm
       BevelOuter = bvNone
       DoubleBuffered = True
       ParentDoubleBuffered = False
-      TabOrder = 1
+      TabOrder = 0
       OnPaint = PanelPaint
       OwnerDraw = False
       DesignSize = (
@@ -2707,6 +2708,7 @@ object Nemp_MainForm: TNemp_MainForm
         ShowHint = True
         Spacing = 2
         TabOrder = 1
+        TabStop = False
         OnClick = CB_MedienBibGlobalQuickSearchClick
         DrawMode = dm_Skin
         NumGlyphsX = 1
@@ -3554,7 +3556,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130000020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130004020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4119,7 +4121,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800EC0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800F00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
