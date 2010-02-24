@@ -43,7 +43,7 @@ unit PlayerClass;
 interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
-      ShellApi, IniFiles, Dialogs,
+      ShellApi, IniFiles, Dialogs, Graphics,
       bass, bass_fx, spectrum_vis, DateUtils,
       AudioFileClass,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst, Easteregg, ScrobblerUtils;
@@ -287,6 +287,9 @@ type
         NempScrobbler: TNempScrobbler;   // the Scrobbler-thingy
         PostProcessor: TPostProcessor;   // the Postprocessor: change rating of the file and scrobble it
 
+        CoverBitmap: TBitmap;    // The Cover of the current file
+        PreviewBackGround: TBitmap; // The BackGroundImage for the Win7-Preview
+
         property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read fHeadsetVolume write SetHeadsetVolume;
         property Time: Double read GetTime write SetTime;              // time in seconds
@@ -370,6 +373,10 @@ type
         // Aktualisiert den Text, die Zeit und das Spectrum in der Anzeige
         procedure DrawInfo;
 
+        function RefreshCoverBitmap: Boolean;
+        function DrawPreview( DestWidth : Integer; DestHeight : Integer;
+                            SkinActive : Boolean = True) : HBITMAP;
+
         procedure SetCueSyncs;
 
         procedure SetEndSyncs(dest: DWord); // Stream, in dem sie gesetzt werden sollen
@@ -417,7 +424,7 @@ Const
 
 implementation
 
-Uses NempMainUnit, AudioFileHelper;
+Uses NempMainUnit, AudioFileHelper, CoverHelper;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -553,12 +560,21 @@ begin
     NempScrobbler := TNempScrobbler.Create(aHnd);
     PostProcessor := TPostProcessor.Create(aHnd);
     PostProcessor.NempScrobbler := NempScrobbler;
+
+    CoverBitmap := TBitmap.Create;
+    CoverBitmap.Width := 180;
+    CoverBitmap.Height := 180;
+    PreviewBackGround := TBitmap.Create;
+    PreviewBackGround.Width :=200;
+    PreviewBackGround.Height := 145;
 end;
 
 destructor TNempPlayer.Destroy;
 var i: Integer;
     BassInfo: BASS_DEVICEINFO;
 begin
+    CoverBitmap.Free;
+    PreviewBackGround.Free;
     FreeAndNil(ValidExtensions);
     i := 0;
     while (Bass_GetDeviceInfo(i, BassInfo)) do
@@ -2129,6 +2145,8 @@ begin
   if result = '' then result := '...';
 end;
 
+
+
 procedure TNempPlayer.RefreshPlayingTitel;
 begin
   Spectrum.TextPosX := 0;
@@ -2235,6 +2253,98 @@ begin
       0: Spectrum.DrawTime('  '+ SecToStr(Time));
       1: Spectrum.DrawTime(' -' + SecToStr(Dauer - Time ));
   end;
+end;
+
+
+function TNempPlayer.RefreshCoverBitmap: Boolean;
+begin
+    result := True;
+    CoverBitmap.Width := 180;
+    CoverBitmap.Height := 180;
+
+    if assigned(MainAudioFile) then
+    begin
+        result := GetCover(MainAudioFile, CoverBitmap)
+    end else
+        GetDefaultCover(dcNoCover, CoverBitmap, cmUseBibDefaults);
+end;
+
+
+function TNempPlayer.DrawPreview( DestWidth : Integer; DestHeight : Integer;
+                            SkinActive : Boolean = True) : HBITMAP;
+var
+  ddc   : HDC;
+  dbmi  : BITMAPINFO;
+  dBits : PInteger;
+  i, j  : Integer;
+  SAspect  : Double;
+  DAspect  : Double;
+  b: TBitmap;
+begin
+    Result := 0;
+    ddc := CreateCompatibleDC(0);
+
+    b := TBitmap.create;
+    try
+        b.Width := 200;
+        b.Height := 100;
+
+        b.Canvas.Pen.Color := clBtnFace;
+        b.Canvas.Brush.Style := bsSolid;
+        b.Canvas.Brush.Color := clBtnFace;
+        b.Canvas.Rectangle(0, 0, b.Width, b.Height);
+
+        if SkinActive then
+            b.Canvas.Draw(0,0, PreviewBackGround);
+
+        if assigned(MainAudioFile) then
+        begin
+            b.Canvas.Brush.Style := bsClear;
+            b.Canvas.TextOut(102,6, MainAudioFile.Artist);
+            b.Canvas.TextOut(102,20, MainAudioFile.Titel);
+            b.Canvas.TextOut(102,34, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+        end;
+
+        SetStretchBltMode(b.Canvas.Handle, HALFTONE);
+        StretchBlt(b.Canvas.Handle, 6, 5 + 90 - (CoverBitmap.Height Div 2), CoverBitmap.Width Div 2, CoverBitmap.Height Div 2,
+                   CoverBitmap.Canvas.Handle, 0,0 ,
+                   CoverBitmap.Width, CoverBitmap.Height,
+                   SRCCOPY);
+
+        // 1destination.ccordinates must match Spectrum.SetBackground
+        StretchBlt(b.Canvas.Handle, 102, 57, Spectrum.PreviewBuf.Width, Spectrum.PreviewBuf.Height,
+                   Spectrum.PreviewBuf.Canvas.Handle, 0,0 ,
+                   Spectrum.PreviewBuf.Width, Spectrum.PreviewBuf.Height,
+                   SRCCOPY);
+
+
+        SAspect := (b.Width) /  (b.Height);
+        DAspect := DestWidth / DestHeight;
+        if SAspect > DAspect then // Source rectangle is wider than the target, correct target height
+          DestHeight := Round(DestHeight * DAspect / SAspect)
+        else // Source rectangle is higher than the target, correct target witdh
+          DestWidth := Round(DestWidth * SAspect / DAspect);
+
+        ZeroMemory(@dbmi.bmiHeader, sizeof(BITMAPINFOHEADER));
+        dbmi.bmiHeader.biSize := sizeof(BITMAPINFOHEADER);
+        dbmi.bmiHeader.biWidth := DestWidth;
+        dbmi.bmiHeader.biHeight := -DestHeight;
+        dbmi.bmiHeader.biPlanes := 1;
+        dbmi.bmiHeader.biBitCount := 32;
+        Result := CreateDIBSection(ddc, dbmi, DIB_RGB_COLORS, Pointer(dBits), 0, 0);
+
+        SelectObject(ddc, Result);
+        SetStretchBltMode(ddc,HALFTONE);
+        StretchBlt(ddc, 0, 0, DestWidth, DestHeight,
+                   b.Canvas.Handle, 0,0 ,
+                   b.Width, b.Height,
+                   SRCCOPY);
+
+    finally
+        b.Free;
+    end;
+
+    DeleteDC(ddc);
 end;
 
 procedure TNempPlayer.UpdateDeskband(wParam, lParam: Integer);

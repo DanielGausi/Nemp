@@ -18,6 +18,7 @@ object Nemp_MainForm: TNemp_MainForm
   OldCreateOrder = False
   Scaled = False
   ShowHint = True
+  OnActivate = FormActivate
   OnClose = TntFormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -3556,7 +3557,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130004020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101110013000C020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4121,7 +4122,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800F00110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800F80110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -4794,28 +4795,6 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = VDTCoverTimerTimer
     Left = 436
     Top = 617
-  end
-  object dwTaskbarThumbnails1: TdwTaskbarThumbnails
-    Images = MenuImages
-    Thumbnails = <
-      item
-        ImageIndex = 1
-      end
-      item
-        ImageIndex = 2
-        Tag = 1
-      end
-      item
-        ImageIndex = 4
-        Tag = 2
-      end
-      item
-        ImageIndex = 6
-        Tag = 3
-      end>
-    OnThumbnailClick = dwTaskbarThumbnails1ThumbnailClick
-    Left = 560
-    Top = 632
   end
   object PlayListOpenDialog: TOpenDialog
     Filter = 
@@ -6297,7 +6276,52 @@ object Nemp_MainForm: TNemp_MainForm
     Hint = 'Nemp - Noch ein mp3-Player'
     PopupMenu = TNAMenu
     OnClick = NempTrayIconClick
-    Left = 672
-    Top = 632
+    Left = 624
+    Top = 640
+  end
+  object fspTaskbarMgr1: TfspTaskbarMgr
+    Active = False
+    ProgressValue = 0
+    ProgressValueMax = 100
+    ProgressState = fstpsNoProgress
+    ThumbButtons = <
+      item
+        ImageIndex = -1
+        Id = 0
+        Hint = 'Play previous'
+        ShowHint = True
+        Flags = []
+      end
+      item
+        ImageIndex = -1
+        Id = 1
+        Hint = 'Play/Pause'
+        ShowHint = True
+        Flags = []
+      end
+      item
+        ImageIndex = -1
+        Id = 2
+        Hint = 'Stop'
+        ShowHint = True
+        Flags = []
+      end
+      item
+        ImageIndex = -1
+        Id = 3
+        Hint = 'Play next'
+        ShowHint = True
+        Flags = []
+      end>
+    OnThumbButtonClick = fspTaskbarMgr1ThumbButtonClick
+    Left = 656
+    Top = 696
+  end
+  object fspTaskbarPreviews1: TfspTaskbarPreviews
+    Active = True
+    CustomLiveView = False
+    OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
+    Left = 728
+    Top = 704
   end
 end
