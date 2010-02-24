@@ -61,10 +61,11 @@ uses
   
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
-  dwTaskbarComponents, dwTaskbarThumbnails,
+  //dwTaskbarComponents, dwTaskbarThumbnails,
   UpdateUtils, uDragFilesSrc,
 
-  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds;
+  unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
+  fspTaskbarMgr, fspTaskbarPreviews;
 
 type
 
@@ -156,7 +157,6 @@ type
     Splitter4: TSplitter;
     VDTCover: TNempPanel;
     VDTCoverTimer: TTimer;
-    dwTaskbarThumbnails1: TdwTaskbarThumbnails;
     TabBtn_Nemp: TSkinButton;
     TabBtn_Playlist: TSkinButton;
     PlayListStatusLBL: TLabel;
@@ -738,6 +738,8 @@ type
     LblBibPlayCounter: TLabel;
     PM_PL_AddToPrebookListBeginning: TMenuItem;
     PM_PL_RemoveFromPrebookList: TMenuItem;
+    fspTaskbarMgr1: TfspTaskbarMgr;
+    fspTaskbarPreviews1: TfspTaskbarPreviews;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1132,8 +1134,8 @@ type
     procedure ShutDown_EndofPlaylistClick(Sender: TObject);
     procedure PM_EQ_DisabledClick(Sender: TObject);
     procedure MM_H_CheckForUpdatesClick(Sender: TObject);
-    procedure dwTaskbarThumbnails1ThumbnailClick(
-      Sender: TdwTaskbarThumbnailItem);
+    //procedure dwTaskbarThumbnails1ThumbnailClick(
+    //  Sender: TdwTaskbarThumbnailItem);
     procedure VolButtonKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure SlideBarButtonKeyDown(Sender: TObject; var Key: Word;
@@ -1253,6 +1255,11 @@ type
       var Allowed: Boolean);
     procedure VSTAfterGetMaxColumnWidth(Sender: TVTHeader; Column: TColumnIndex;
       var MaxWidth: Integer);
+    procedure fspTaskbarMgr1ThumbButtonClick(Sender: TObject;
+      ButtonId: Integer);
+    procedure FormActivate(Sender: TObject);
+    procedure fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject; Width,
+      Height: Integer; var Bitmap: HBITMAP);
 
   private
 
@@ -1435,7 +1442,7 @@ uses   Splash, MultimediaKeys,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   HeadsetControl, BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, NoLyricWikiApi;
+  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt;
 
 
 {$R *.dfm}
@@ -1506,7 +1513,7 @@ begin
     ArtistsVST.NodeDataSize := SizeOf(TStringTreeData);
     ALbenVST.NodeDataSize := SizeOf(TStringTreeData);
     PlaylistVST.NodeDataSize := SizeOf(TTreeData);
-    //Application.Title := NEMP_NAME_TASK;
+    Application.Title := NEMP_NAME_TASK;
     //Caption := NEMP_NAME_TASK;
 
     Application.Name := NEMP_NAME;
@@ -2155,6 +2162,8 @@ begin
       FSplash.Close;
 
 end;
+
+
 
 Procedure TNemp_MainForm.StuffToDoAfterCreate;
 var
@@ -5618,11 +5627,14 @@ begin
           inc(TaskBarDelay);
           if TaskBarDelay >= NempPlayer.ScrollTaskbarDelay then
           begin
-            //Application.Title := copy(Application.Title, 2 , length(Application.Title)- 1) + Application.Title[1];
-            caption := copy(caption, 2 , length(caption)- 1) + caption[1];
+            //
+            Application.Title := copy(Application.Title, 2 , length(Application.Title)- 1) + Application.Title[1];
+            //caption := copy(caption, 2 , length(caption)- 1) + caption[1];
             TaskBarDelay := 0;
           end;
         end;
+
+        fspTaskbarPreviews1.InvalidatePreview;
   end;
 end;
 
@@ -5948,7 +5960,7 @@ begin
         Spectrum.DrawTime('  00:00');
       end;
 
-      Caption := NempPlayer.GenerateTaskbarTitel;
+      Application.Title := NempPlayer.GenerateTaskbarTitel;
 
       PlaylistVST.Invalidate;
       Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
@@ -5974,7 +5986,7 @@ begin
       Spectrum.DrawTime('  00:00');
     end;
 
-    Caption := NempPlayer.GenerateTaskbarTitel;
+    Application.Title := NempPlayer.GenerateTaskbarTitel;
     PlaylistVST.Invalidate;
     Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 end;
@@ -6404,8 +6416,8 @@ begin
 end;
 
 procedure TNemp_MainForm.ShowPlayerDetails(aAudioFile: TAudioFile);
-var
-  Coverbmp: TBitmap;
+//var
+  //Coverbmp: TBitmap;
   ///ordner: UnicodeString;
 begin
   if aAudioFile = NIL then exit;
@@ -6416,14 +6428,21 @@ begin
 
   ///Ordner := ExtractFileDir(aAudioFile.Pfad);
 
-  Coverbmp := tBitmap.Create;
-  Coverbmp.Width := CoverImage.Width;
-  Coverbmp.Height := CoverImage.Width; //ja, quadratisch!
+  //Coverbmp := tBitmap.Create;
+  //Coverbmp.Width := CoverImage.Width;
+  //Coverbmp.Height := CoverImage.Width; //ja, quadratisch!
 
   if aAudioFile.CoverID = '' then
       MedienBib.InitCover(aAudioFile);
 
-  // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
+  if NempPlayer.RefreshCoverBitmap then
+  begin
+      CoverImage.Visible := True;
+      CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap)
+  end else
+      CoverImage.Visible := False;
+
+{  // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
   if GetCover(aAudioFile, Coverbmp) then
   begin
     CoverImage.Visible := True;
@@ -6434,7 +6453,7 @@ begin
   end else
     CoverImage.Visible := False;
   Coverbmp.Free;
-
+}
   if aAudioFile.Lyrics <> '' then
     LyricsMemo.Text := UTF8ToString(aAudioFile.Lyrics)
   else
@@ -8391,6 +8410,11 @@ begin
 end;
 
 
+procedure TNemp_MainForm.FormActivate(Sender: TObject);
+begin
+fspTaskbarMgr1.Active := True;
+end;
+
 procedure TNemp_MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := (MedienBib.StatusBibUpdate = 0) AND (NempPlaylist.Status = 0);
@@ -9990,7 +10014,7 @@ begin
   // Anzeigen im Mittelteil:
   if NempPlayer.MainStream = 0 then
   begin
-    Caption := NEMP_NAME_TASK;
+    Application.Title := NEMP_NAME_TASK;
     NempTrayIcon.Hint := 'Nemp - Noch ein mp3-Player';
 
     // Coveranzeige
@@ -10001,7 +10025,7 @@ begin
   end else
   begin
       NempPlayer.RefreshPlayingTitel;
-      Caption := NempPlayer.GenerateTaskbarTitel;
+      Application.Title := NempPlayer.GenerateTaskbarTitel;
       Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
       if NempPlayer.URLStream then
       begin
@@ -10413,8 +10437,8 @@ begin
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 
-  caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
-   + ' - ' + IntToStr(self.handle);
+  //caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
+  // + ' - ' + IntToStr(self.handle);
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
@@ -10633,7 +10657,7 @@ begin
     ArtistsVSTFocusChanged(ArtistsVST, ArtistsVST.FocusedNode, 0);
 end;
 
-
+                    (*
 procedure TNemp_MainForm.dwTaskbarThumbnails1ThumbnailClick(
   Sender: TdwTaskbarThumbnailItem);
 begin
@@ -10643,7 +10667,29 @@ begin
       2: StopBTNIMGClick(Nil);
       3: PlayNextBTNIMGClick(NIL);
     end;
+end;    *)
+
+procedure TNemp_MainForm.fspTaskbarMgr1ThumbButtonClick(Sender: TObject;
+  ButtonId: Integer);
+begin
+    case ButtonID of
+        0: PlayPrevBTNIMGClick(Nil);
+        1: PlayPauseBTNIMGClick(Nil);
+        2: StopBTNIMGClick(Nil);
+        3: PlayNextBTNIMGClick(NIL);
+    end;
 end;
+
+procedure TNemp_MainForm.fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject;
+  Width, Height: Integer; var Bitmap: HBITMAP);
+begin
+
+
+//Bitmap := fspControl2DIBPreview(PlayerPanel, PlayerPanel.ClientRect, Width, Height, true);
+
+    Bitmap := NempPlayer.DrawPreview(Width,Height, NempSkin.isActive);
+end;
+
 
 
 procedure TNemp_MainForm.MM_H_CheckForUpdatesClick(Sender: TObject);

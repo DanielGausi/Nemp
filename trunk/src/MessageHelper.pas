@@ -1228,7 +1228,7 @@ begin
 
     WM_NewMetaData: //DoMeta(PChar(Message.wParam));
                     begin
-                        Nemp_MainForm.Caption := NempPlayer.GenerateTaskbarTitel;
+                        Application.Title := NempPlayer.GenerateTaskbarTitel;
                         //if NempPlayer.StreamRecording AND (oldTitel<> NempPlayer.PlayingTitel) AND NempPlayer.AutoSplitFiles then
                         //    NempPlayer.StartRecording;
                         NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);

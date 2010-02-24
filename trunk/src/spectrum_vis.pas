@@ -61,6 +61,7 @@ interface
         TimeWidth, TimeHeight: Integer;
         StarHeight, StarWidth: Integer;
         ColumnWidth: Integer;
+        PreviewColumn: Integer;
         GradientHeight: Integer;
         TimeFontSize: Integer;
         TextFontSize: Integer;
@@ -78,11 +79,14 @@ interface
         StarHeight  : 14;
         StarWidth   : 70;
         ColumnWidth : 4;
+        PreviewColumn: 2;
         GradientHeight : 38;
         TimeFontSize: 10;
         TextFontSize: 10;
         FFTDataMultiplikator: 500;
     );
+
+    const PREVIEW_COLUMN_WIDTH = 3;
 
     type TSpectrum = Class(TObject)
     private
@@ -92,6 +96,7 @@ interface
         BackTimeBmp : TBitmap;
         BackTextBMP : TBitmap;
         BackStarBMP : TBitmap;
+        BackPreViewBuf: TBitmap;
 
         GradientBMP: TBitmap;
 
@@ -143,6 +148,9 @@ interface
         TextImage: TImage;
         TimeImage: TImage;
         StarImage: TImage;
+
+        PreViewBuf: TBitmap; // Buffer for Win7-Preview
+
 
         Constructor Create (Width, Height : Integer);
         Destructor Destroy; override;
@@ -269,10 +277,16 @@ Constructor TSpectrum.Create(Width, Height : Integer);
 begin
     VisBuff := TBitmap.Create;
     BackBmp := TBitmap.Create;
+    PreViewBuf  := TBitmap.Create;
+    BackPreViewBuf := TBitmap.Create;
     BackTimeBmp := TBitmap.Create;
     BackTextBMP := TBitmap.Create;
     BackStarBMP := TBitmap.Create;
 
+    PreViewBuf.Height := 38; // something like that should be ok
+    PreViewBuf.Width  := 92; //  --""--
+    BackPreViewBuf.Height := 38;
+    BackPreViewBuf.Width := 92;
 
     TxtBuff := tBitmap.Create;
     GradientBMP := TBitmap.Create;
@@ -316,6 +330,8 @@ end;
 Destructor TSpectrum.Destroy;
 begin
     VisBuff.Free;
+    PreViewBuf.Free;
+    BackPreViewBuf.Free;
     BackBmp.Free;
     BackTimeBmp.Free;
     BackTextBMP.Free;
@@ -355,7 +371,14 @@ if active then
       NempSkin.TileGraphic(sourceBmp, BackBmp.Canvas,
           localOffsetX + (grpPoint.X - OffsetPoint.X) ,
           localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
+
+      // Same vor the Win7Preview
+      localOffsetX := 102;  // Must be the same as in NempPlayer.DrawPreview
+      localOffsetY := 57;
+      NempSkin.TileGraphic(NempPlayer.PreviewBackGround, BackPreViewBuf.Canvas,
+              localOffsetX, localOffsetY, false);
   end;
+
 end;
 
 procedure TSpectrum.SetTextBackGround (Active : Boolean);
@@ -514,11 +537,23 @@ begin
       VisBuff.Canvas.Brush.Color := BkgColor;
       VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
 
-      if UseBkg then VisBuff.Canvas.CopyRect
-      // (Rect(ScaledBackGroundLeft, ScaledBackGroundTop, ScaledBackGroundLeft + BackBmp.Width, ScaledBackGroundTop + BackBmp.Height),
-      (Rect(0, 0, BackBmp.Width, BackBmp.Height),
-      BackBmp.Canvas,
-      Rect(0, 0, BackBmp.Width, BackBmp.Height));
+      PreViewBuf.Canvas.Pen.Color := BkgColor;
+      PreViewBuf.Canvas.Brush.Style := bsSolid;
+      PreViewBuf.Canvas.Brush.Color := BkgColor;
+      PreViewBuf.Canvas.Rectangle(0, 0, PreViewBuf.Width, PreViewBuf.Height);
+
+      if UseBkg then
+      begin
+          VisBuff.Canvas.CopyRect(
+              Rect(0, 0, BackBmp.Width, BackBmp.Height),
+              BackBmp.Canvas,
+              Rect(0, 0, BackBmp.Width, BackBmp.Height));
+
+          PreViewBuf.Canvas.CopyRect(
+              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height),
+              BackPreViewBuf.Canvas,
+              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height));
+      end;
     end;
 
 
@@ -570,6 +605,25 @@ begin
                   VisBuff.Canvas.MoveTo(i * (ColWidth + 1), VisBuff.Height - FFTPeacks[i]);
                   VisBuff.Canvas.LineTo(i * (ColWidth + 1) + ColWidth, VisBuff.Height - FFTPeacks[i]);
                end;
+
+
+               PreViewBuf.Canvas.Pen.Color := PenColor;
+               PreViewBuf.Canvas.Brush.Color := PenColor;
+               PreViewBuf.Canvas.CopyRect(Rect(i * (PREVIEW_COLUMN_WIDTH + 1),            PreViewBuf.Height - FFTFallOff[i],
+                                            i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height),
+                                       GradientBMP.Canvas,
+                                       Rect(0, PreViewBuf.Height - FFTFallOff[i], PREVIEW_COLUMN_WIDTH, PreViewBuf.Height)
+               );
+
+               if ShowPeak then
+               begin
+                  PreViewBuf.Canvas.Pen.Color := PeakColor;
+                  PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - FFTPeacks[i]);
+                  PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - FFTPeacks[i]);
+               end;
+
+
+
           end;
       end;
     end;

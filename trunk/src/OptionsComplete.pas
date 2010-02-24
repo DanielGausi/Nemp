@@ -1964,7 +1964,7 @@ begin
   end;
 
   if not NempPlayer.ScrollTaskbarTitel then
-      Nemp_MainForm.Caption := NempPlayer.GenerateTaskbarTitel;
+      Application.Title := NempPlayer.GenerateTaskbarTitel;
   Nemp_MainForm.BassTimer.Interval := NempPlayer.VisualizationInterval;
 
   NempPlaylist.AutoScan         := CB_AutoScanPlaylist.checked;

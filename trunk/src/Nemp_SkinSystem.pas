@@ -1172,6 +1172,8 @@ begin
   MedienListeForm.ContainerPanelMedienBibForm.OwnerDraw := True;
   PlaylistForm.ContainerPanelPlaylistForm.OwnerDraw := True;
   ExtendedControlForm.ContainerPanelExtendedControlsForm.OwnerDraw := True;
+
+  LoadGraphicFromBaseName(NempPlayer.PreviewBackGround, path + '\Win7PreviewBackground', false);
   // Grafiken für die Buttons setzem
   with Nemp_MainForm do
   begin

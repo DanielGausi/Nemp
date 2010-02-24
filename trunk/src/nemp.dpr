@@ -87,7 +87,7 @@ begin
     ReportMemoryLeaksOnShutdown := True;
 
     Application.Initialize;
-    Application.MainFormOnTaskBar := True;
+    //Application.MainFormOnTaskBar := True;
 {
 SetWindowLong mit Application.handle funktioniert, wenn MainFormOnTaskbar = False;
 Ist das True, funktioniert es mit MainForm.Handle
@@ -114,13 +114,13 @@ ShowWindow
   x.Free;
 
  }
-  //Application.CreateForm(TFSplash, FSplash);
+  Application.CreateForm(TFSplash, FSplash);
 
-  //FSplash := TFSplash.Create (Application);
+  FSplash := TFSplash.Create (Application);
 
         try
-    //      FSplash.Show;
-      //    FSplash.Update;
+          FSplash.Show;
+          FSplash.Update;
           Nemp_MainForm.StuffToDoOnCreate;
 
           Application.CreateForm(TPlaylistForm   , PlaylistForm   );
@@ -138,7 +138,7 @@ ShowWindow
           end;
 
 
-         // FSplash.Visible := False;
+          FSplash.Visible := False;
         finally
           //FreeAndNil(FSplash);
         end;
