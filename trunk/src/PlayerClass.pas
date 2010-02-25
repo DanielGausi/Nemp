@@ -2280,6 +2280,8 @@ var
   SAspect  : Double;
   DAspect  : Double;
   b: TBitmap;
+  s: String;
+  r: TRect;
 begin
     Result := 0;
     ddc := CreateCompatibleDC(0);
@@ -2297,16 +2299,8 @@ begin
         if SkinActive then
             b.Canvas.Draw(0,0, PreviewBackGround);
 
-        if assigned(MainAudioFile) then
-        begin
-            b.Canvas.Brush.Style := bsClear;
-            b.Canvas.TextOut(102,6, MainAudioFile.Artist);
-            b.Canvas.TextOut(102,20, MainAudioFile.Titel);
-            b.Canvas.TextOut(102,34, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
-        end;
-
         SetStretchBltMode(b.Canvas.Handle, HALFTONE);
-        StretchBlt(b.Canvas.Handle, 6, 5 + 90 - (CoverBitmap.Height Div 2), CoverBitmap.Width Div 2, CoverBitmap.Height Div 2,
+        StretchBlt(b.Canvas.Handle, 6, 5 + 45 - (CoverBitmap.Height Div 4), CoverBitmap.Width Div 2, CoverBitmap.Height Div 2,
                    CoverBitmap.Canvas.Handle, 0,0 ,
                    CoverBitmap.Width, CoverBitmap.Height,
                    SRCCOPY);
@@ -2316,6 +2310,20 @@ begin
                    Spectrum.PreviewBuf.Canvas.Handle, 0,0 ,
                    Spectrum.PreviewBuf.Width, Spectrum.PreviewBuf.Height,
                    SRCCOPY);
+
+        if assigned(MainAudioFile) then
+        begin
+            b.Canvas.Brush.Style := bsClear;
+            b.Canvas.Font.Size := 8;
+            s := 'Das ist etwas zu lang für deas hier';
+            s := MainAudioFile.PlaylistTitle;
+            r := Rect(102, 4, 198, 44);
+
+            b.Canvas.TextRect(r, s, [tfWordBreak]);
+           // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
+           // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
+            b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+        end;
 
 
         SAspect := (b.Width) /  (b.Height);
