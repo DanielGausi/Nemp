@@ -87,6 +87,7 @@ interface
     );
 
     const PREVIEW_COLUMN_WIDTH = 3;
+          PREVIEW_COLUMN_HEIGHT = 38;
 
     type TSpectrum = Class(TObject)
     private
@@ -99,11 +100,14 @@ interface
         BackPreViewBuf: TBitmap;
 
         GradientBMP: TBitmap;
+        GradientBMPPreView: TBitmap;
+
 
         BkgColor : TColor;
         TitelBkgCOlor: TColor;
         TimeBkgColor: TColor;
         SpecHeight : Integer;
+        SpecHeightPreview: Integer;
         PenColor : TColor;
         PenColor2 : TColor;
         PeakColor: TColor;
@@ -126,6 +130,7 @@ interface
         fTextFontSize: Integer;
 
         fFFTDataMultiplikator: Integer;
+        fFFTDataMultiplikatorPreView: Integer;
 
         FTimeTextBackground: TBrushStyle;
         FTitelTextBackground: TBrushStyle;
@@ -133,8 +138,11 @@ interface
         FTimeString: String;
         FTextString: UnicodeString;
 
-        FFTPeacks  : array [0..128] of Integer;
-        FFTFallOff : array [0..128] of Integer;
+        FFTPeacks  : array [0..30] of Integer;
+        FFTFallOff : array [0..30] of Integer;
+
+        FFTPeacksPreView  : array [0..30] of Integer;
+        FFTFallOffPreView : array [0..30] of Integer;
 
         fTextPosX: Integer;
         fTextPosY: Integer;
@@ -287,9 +295,11 @@ begin
     PreViewBuf.Width  := 92; //  --""--
     BackPreViewBuf.Height := 38;
     BackPreViewBuf.Width := 92;
+    SpecHeightPreview := 38;
 
     TxtBuff := tBitmap.Create;
     GradientBMP := TBitmap.Create;
+    GradientBMPPreView := TBitmap.Create;
 //    GradientBmp.Height := 65;
 //    GradientBMP.Width := 4;
 
@@ -338,6 +348,7 @@ begin
     BackStarBMP.Free;
     TxtBuff.Free;
     GradientBMP.Free;
+    GradientBMPPreView.Free;
     inherited destroy;
 end;
 
@@ -486,6 +497,17 @@ begin
               GradientBMP.Height
              ) ;
 
+  GradientBMPPreView.Height := PREVIEW_COLUMN_HEIGHT;
+  GradientBMPPreView.Width := PREVIEW_COLUMN_WIDTH;
+  DrawGradient(GradientBMPPreView.Canvas,
+                  PenColor, PenColor2,
+                  Rect( 0, 0, GradientBMPPreView.Width, GradientBMPPreView.Height),
+              goVertical,
+              GradientBMPPreView.Height
+             ) ;
+
+  //GradientBMPPreView.SaveToFile('C:\Users\Daniel\Delphi\Nemp SVN\Nemp\trunk\bin\grad.bmp');
+
 end;
 
 procedure TSpectrum.SetScale(aStretchFactor: Single);
@@ -521,13 +543,14 @@ begin
     fTextFontSize := Round(NempOriginalSpectrumSpecs.TextFontSize * aStretchFactor);
 
     fFFTDataMultiplikator := Round(NempOriginalSpectrumSpecs.FFTDataMultiplikator * aStretchFactor);
+    fFFTDataMultiplikatorPreView := NempOriginalSpectrumSpecs.FFTDataMultiplikator;
 
 end;
 
 
 
 procedure TSpectrum.Draw(FFTData : TFFTData);
-var i, YPos : LongInt; YVal : Single;
+var i, YPos, YPosPreview : LongInt; YVal : Single;
 begin
 
     if FrmClear then
@@ -573,6 +596,19 @@ begin
       else
         FFTFallOff[i] := FFTFallOff[i] - LineFall;
 
+
+      YPosPreview := Trunc((YVal) * fFFTDataMultiplikatorPreView);
+      if YPosPreview > SpecHeightPreview then YPosPreview := SpecHeightPreview;
+
+      if YPosPreview >= FFTPeacksPreview[i] then FFTPeacksPreview[i] := YPosPreview
+        else FFTPeacksPreview[i] := FFTPeacksPreview[i] - PeakFall;
+
+      if YPosPreview >= FFTFallOffPreview[i] then
+        FFTFallOffPreview[i] := YPosPreview - 1
+      else
+        FFTFallOffPreview[i] := FFTFallOffPreview[i] - LineFall;
+
+
       // ----------------------------------------
       if FFTPeacks[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
         FFTPeacks[i] := 1;
@@ -580,8 +616,19 @@ begin
       if FFTPeacks[i] > VisBuff.Height then // damit die Peaks nicht nach oben hin verschwinden
         FFTPeacks[i] := VisBuff.Height;
       //----------------------
-      if (VisBuff.Height - FFTPeacks[i]) > VisBuff.Height then FFTPeacks[i] := 0;
-      if (VisBuff.Height - FFTFallOff[i]) > VisBuff.Height then FFTFallOff[i] := 0;
+      // ----------------------------------------
+      if FFTPeacksPreview[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
+        FFTPeacksPreview[i] := 1;
+
+      if FFTPeacksPreview[i] > SpecHeightPreview then // damit die Peaks nicht nach oben hin verschwinden
+        FFTPeacksPreview[i] := SpecHeightPreview;
+      //----------------------
+
+     // if (VisBuff.Height - FFTPeacks[i]) > VisBuff.Height then FFTPeacks[i] := 0;
+     // if (VisBuff.Height - FFTFallOff[i]) > VisBuff.Height then FFTFallOff[i] := 0;
+
+     // if (SpecHeightPreview - FFTPeacksPreview[i]) > SpecHeightPreview then FFTPeacksPreview[i] := 0;
+     // if (SpecHeightPreview - FFTFallOffPreview[i]) > SpecHeightPreview then FFTFallOffPreview[i] := 0;
 
       case DrawType of
           0 : begin
@@ -609,17 +656,17 @@ begin
 
                PreViewBuf.Canvas.Pen.Color := PenColor;
                PreViewBuf.Canvas.Brush.Color := PenColor;
-               PreViewBuf.Canvas.CopyRect(Rect(i * (PREVIEW_COLUMN_WIDTH + 1),            PreViewBuf.Height - FFTFallOff[i],
+               PreViewBuf.Canvas.CopyRect(Rect(i * (PREVIEW_COLUMN_WIDTH + 1),                     PreViewBuf.Height - FFTFallOffPreview[i],
                                             i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height),
-                                       GradientBMP.Canvas,
-                                       Rect(0, PreViewBuf.Height - FFTFallOff[i], PREVIEW_COLUMN_WIDTH, PreViewBuf.Height)
+                                       GradientBMPPreview.Canvas,
+                                       Rect(0, PreViewBuf.Height - FFTFallOffPreview[i], PREVIEW_COLUMN_WIDTH, PreViewBuf.Height)
                );
 
                if ShowPeak then
                begin
                   PreViewBuf.Canvas.Pen.Color := PeakColor;
-                  PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - FFTPeacks[i]);
-                  PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - FFTPeacks[i]);
+                  PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - FFTPeacksPreview[i]);
+                  PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - FFTPeacksPreview[i]);
                end;
 
 

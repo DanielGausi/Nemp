@@ -342,13 +342,18 @@ begin
   ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
   ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
   ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
-  if PlayingFile <> NIL then
-      idx := PlayList.IndexOf(fPlayingFile)
-  else
+  //if PlayingFile <> NIL then
+  //    idx := PlayList.IndexOf(fPlayingFile)
+  //else
       idx := fPlayingIndex;
   ini.WriteInteger('Playlist','IndexinList',idx);
   ini.WriteBool('Playlist', 'SavePositionInTrack', SavePositionInTrack);
-  ini.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time));
+
+  if (assigned(fPlayingFile)) and (idx = PlayList.IndexOf(fPlayingFile)) then
+      ini.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time))
+  else
+  // this should be the case when we play a bibfile right now
+      ini.WriteInteger('Playlist', 'PositionInTrack', Round(fInterruptedPlayPosition));
 
   ini.WriteBool('Playlist','AutoScan', AutoScan);
   ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
@@ -507,12 +512,13 @@ begin
     if not AcceptInput then exit;
 
     // increase fPlayingIndex, so we will play the next file in the playlist after this one // no
-    if fPlayingIndex = Playlist.IndexOf(fPlayingFile) then
+    if assigned(fPlayingFile) and (fPlayingIndex = Playlist.IndexOf(fPlayingFile)) then
     begin
         // we will backup the index AND the current playposition, so we can
         // start next playback right where we are NOW
         fInterruptedPlayPosition := Player.Time;
         fInterruptedFile := fPlayingFile;
+
         // additionally, we set the current track on the beginning of the prebook-list
         PrebookList.Insert(0, fPlayingFile);
         if PrebookList.Count > 99 then
@@ -522,6 +528,9 @@ begin
         end;
         ReIndexPrebookedFiles;
     end;
+
+    if (not assigned(fPlayingFile)) and (fPlayingIndex = -1) then
+        fPlayingIndex := 0;
 
     // Eingaben kurzfristig blocken
     AcceptInput := False;
@@ -542,31 +551,7 @@ begin
 
   // Wenn was schiefgelaufen ist, d.h. der mainstream = 0 ist
   if (Player.MainStream = 0) And (Not Player.URLStream) then
-  begin
-      {try
-          if fErrorCount < Playlist.Count then
-          begin
-            AcceptInput := True;
-            if assigned(fPlayingNode) then VST.InvalidateNode(fPlayingNode);
-            inc(fErrorCount);
-
-            fDauer := fDauer  - OriginalLength;
-
-            PlayNext; // bei der nächsten Datei einen neuen verusch starten
-          end else
-          begin
-            AcceptInput := True;
-            if assigned(fPlayingNode) then VST.InvalidateNode(fPlayingNode);
-            fDauer := fDauer  - OriginalLength;
-            Stop;
-            VST.Header.Columns[1].Text := SekToPlaylistZeitString(fDauer);
-            //showmessage(Inttostr(fDauer));
-          end;
-      except
-          MessageDlg((BadError_Play1) + ' (2)', mtError, [mbOK], 0) ;
-      end;
-      }
-  end
+     // nothing
   else
   begin
       // Aufgestaute Nachrichten abarbeiten
@@ -1651,7 +1636,6 @@ begin
         PrebookList.Delete(0);
         tmpAudioFile.PrebookIndex := 0;
         ReIndexPrebookedFiles;
-
     end
     else
     begin
