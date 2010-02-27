@@ -32,6 +32,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -567,7 +568,7 @@ type
 
 implementation
 
-//uses Baum_Und_Listen_Prozeduren;
+uses fspTaskBarMgr;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -1686,6 +1687,8 @@ begin
   // AudioFiles will be changed. Block everything.
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
 
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
   toteFilesCount := 0;
   einUpdate := False;
 
@@ -1763,6 +1766,7 @@ begin
 
   // Status zurücksetzen, Unblock library
   SendMessage(MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
   // Changed Setz. Ja...IMMER. Eine Abfrage, ob sich _irgendwas_ an _irgendeinem_ File
   // geändert hat, führe ich nicht durch.
@@ -2014,6 +2018,8 @@ begin
     done := 0;
     failed := 0;
 
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
     for i := 0 to UpdateList.Count - 1 do
     begin
         if not UpdateFortsetzen then break;
@@ -2029,6 +2035,7 @@ begin
             SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
                         Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
 
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
              af.FileIsPresent:=True;
 
             // GetTags will create the IDHttp-Object
@@ -2050,6 +2057,8 @@ begin
             end;
         end;
     end;
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
@@ -2291,31 +2300,31 @@ begin
                 GetCoverListe(aAudioFile, coverliste);
                 if Coverliste.Count > 0 then
                 begin
-                  NewCoverName := coverliste[GetFrontCover(CoverListe)];
-                  if  (NewCovername <> fLastCoverName) then
-                  begin
-                      aAudioFile.CoverID := InitCoverFromFilename(NewCovername);
-                      if aAudioFile.CoverID = '' then
-                      begin
-                          // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
-                          // possible solution: Try the next coverfile.
-                          // Easier: Just use "Default-Cover" and md5(AudioFile.Ordner) as Cover-ID
-                          NewCoverName := '';
-                          aAudioFile.CoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
-                      end;
-                      flastID := aAudioFile.CoverID;
-                      fLastCoverName := NewCovername;
-                  end
-                  else
-                      aAudioFile.CoverID := flastID;
+                    NewCoverName := coverliste[GetFrontCover(CoverListe)];
+                    if  (NewCovername <> fLastCoverName) then
+                    begin
+                        aAudioFile.CoverID := InitCoverFromFilename(NewCovername);
+                        if aAudioFile.CoverID = '' then
+                        begin
+                            // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
+                            // possible solution: Try the next coverfile.
+                            // Easier: Just use "Default-Cover" and md5(AudioFile.Ordner) as Cover-ID
+                            NewCoverName := '';
+                            aAudioFile.CoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
+                        end;
+                        flastID := aAudioFile.CoverID;
+                        fLastCoverName := NewCovername;
+                    end
+                    else
+                        aAudioFile.CoverID := flastID;
                 end else
                 begin
-                  // Kein Cover gefunden
-                  fLastCoverName := '';
+                    // Kein Cover gefunden
+                    fLastCoverName := '';
 
-                  flastID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
-                  //flastID := '__'+ (StringReplace(aAudioFile.Ordner, '\', '-', [rfreplaceall]));
-                  aAudioFile.CoverID := flastID;
+                    flastID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
+                    //flastID := '__'+ (StringReplace(aAudioFile.Ordner, '\', '-', [rfreplaceall]));
+                    aAudioFile.CoverID := flastID;
                 end;
                 coverliste.free;
             end else

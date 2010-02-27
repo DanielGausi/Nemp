@@ -381,7 +381,7 @@ end;
 
 function MD5UnicodeString(const S: UnicodeString): TMD5Digest;
 begin
-  Result:=MD5Buffer(PChar(S)^, Length(S) * sizeOf(PChar));
+  Result:=MD5Buffer(PChar(S)^, Length(S) * sizeOf(Char));
 end;
 
 function MD5File(const FileName: String): TMD5Digest;

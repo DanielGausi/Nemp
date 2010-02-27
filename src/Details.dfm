@@ -41,10 +41,6 @@ object FDetails: TFDetails
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 8
         Top = 0
@@ -576,7 +572,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = CoverBoxChange
         end

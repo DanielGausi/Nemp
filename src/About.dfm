@@ -84,8 +84,13 @@ object AboutForm: TAboutForm
         'rl] (this scrolling thing)'
       ''
       
-        '[url="http://www.delphipraxis.net/topic150591.html"]Windows 7 Co' +
-        'ntrols for Delphi[/url]'
+        '[url="http://www.delphipraxis.net/topic116695_kompo+twindowsvers' +
+        'ionsinfo+kompo+zur+windowserkennung.html"]TWindowsVersionInfo[/u' +
+        'rl] by MagicAndre1981'
+      ''
+      
+        '[url="http://delphi.fsprolabs.com/"]FSPro Windows 7 Taskbar Comp' +
+        'onents[/url]'
       ''
       
         '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
@@ -155,6 +160,7 @@ object AboutForm: TAboutForm
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
+    position = 0
     EnableDragging = True
     Smooth = [spTop, spBottom]
     TextOffset = 1
