@@ -36,6 +36,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -458,6 +459,7 @@ type
     StaticText2: TStaticText;
     CBSkipSortOnLargeLists: TCheckBox;
     CB_RememberInterruptedPlayPosition: TCheckBox;
+    LblTaskbarWin7: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -596,7 +598,7 @@ var
 
 implementation
 
-uses NempMainUnit, Details, SplitForm_Hilfsfunktionen;
+uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo;
 
 {$R *.dfm}
 
@@ -1512,9 +1514,15 @@ end;
 
 procedure TOptionsCompleteForm.FormHide(Sender: TObject);
 begin
+
+
+    exit;
+
+
+
   if Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
   begin
-    ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
+    ShowWindow( Application.Handle, SW_HIDE );
     {SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault
                  //GetWindowLong(Application.Handle, GWL_EXSTYLE)
@@ -1522,22 +1530,21 @@ begin
                  //and (not WS_ICONIC)
                  and not WS_EX_APPWINDOW);}
 
-                 SetWindowLong( Nemp_MainForm.Handle, GWL_STYLE,
+                 SetWindowLong( Application.Handle, GWL_STYLE,
                  //Nemp_MainForm.NempWindowDefault
-                 GetWindowLong(Nemp_MainForm.Handle, GWL_STYLE)
-                //   or WS_EX_TOOLWINDOW
-                 and (not WS_ICONIC)
-                 //and not WS_EX_APPWINDOW
+                 GetWindowLong(Application.Handle, GWL_STYLE)
+                   or WS_EX_TOOLWINDOW
+                   and not WS_EX_APPWINDOW
                  );
 
 
-    ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+    ShowWindow( Application.Handle, SW_SHOW );
   end else
   begin
-    ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
-    SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
+    ShowWindow( Application.Handle, SW_HIDE );
+    SetWindowLong( Application.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault );
-    ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+    ShowWindow( Application.Handle, SW_SHOW );
   end;
 end;
 
@@ -2134,16 +2141,63 @@ begin
 
 
   // Fensterverhalten:
-  Nemp_MainForm.NempOptions.NempWindowView := GrpBox_TaskTray.ItemIndex;
-    // TrayIcon erzeugen, behalten oder löschen
-  if GrpBox_TaskTray.ItemIndex in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
+  if Nemp_MainForm.NempOptions.NempWindowView <> GrpBox_TaskTray.ItemIndex then
   begin
-    // TrayIcon erzeugen oder beibehalten
-    Nemp_MainForm.NempTrayIcon.Visible := True;
-  end else
-  begin
-    // TrayIcon löschen
-    Nemp_MainForm.NempTrayIcon.Visible := False;
+
+
+      // Hide Taskbar-entry
+
+
+      {NEMPWINDOW_ONLYTASKBAR = 0;
+    NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
+    NEMPWINDOW_TRAYONLY = 2;
+    NEMPWINDOW_BOTH = 3;
+    NEMPWINDOW_BOTH_MIN_TRAY = 4;}
+
+      if      (GrpBox_TaskTray.ItemIndex = NEMPWINDOW_TRAYONLY) // user want no taskbar-entry at all ...
+          and (Nemp_MainForm.NempOptions.NempWindowView in
+               [  NEMPWINDOW_ONLYTASKBAR,
+                  NEMPWINDOW_TASKBAR_MIN_TRAY,
+                  NEMPWINDOW_BOTH,
+                  NEMPWINDOW_BOTH_MIN_TRAY ])                   // .. and there is currently an entry
+      then
+      begin
+          // Change it (and loose the Taskbarbuttons on Win7)
+          ShowWindow( Application.Handle, SW_HIDE );
+          SetWindowLong( Application.Handle, GWL_STYLE,
+                     GetWindowLong(Application.Handle, GWL_STYLE)
+                         or WS_EX_TOOLWINDOW
+                         and not WS_EX_APPWINDOW
+                     );
+          ShowWindow( Application.Handle, SW_SHOW );
+      end else
+          if (Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY)   // user has no entry
+              and (GrpBox_TaskTray.ItemIndex in
+                  [ NEMPWINDOW_ONLYTASKBAR,
+                    NEMPWINDOW_TASKBAR_MIN_TRAY,
+                    NEMPWINDOW_BOTH,
+                    NEMPWINDOW_BOTH_MIN_TRAY ])                                 // but wants some
+          then
+          // User want a taskbar-entry
+          begin
+              ShowWindow( Application.Handle, SW_HIDE );
+              SetWindowLong( Application.Handle, GWL_EXSTYLE,
+                         Nemp_MainForm.NempWindowDefault );
+              ShowWindow( Application.Handle, SW_SHOW );
+          end;
+      // Set new value
+      Nemp_MainForm.NempOptions.NempWindowView := GrpBox_TaskTray.ItemIndex;
+
+        // TrayIcon erzeugen, behalten oder löschen
+      if GrpBox_TaskTray.ItemIndex in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
+      begin
+        // TrayIcon erzeugen oder beibehalten
+        Nemp_MainForm.NempTrayIcon.Visible := True;
+      end else
+      begin
+        // TrayIcon löschen
+        Nemp_MainForm.NempTrayIcon.Visible := False;
+      end;
   end;
 
   Nemp_MainForm.NempOptions.ShowDeskbandOnMinimize := CBShowDeskbandOnMinimize.Checked;
@@ -2554,14 +2608,40 @@ begin
 end;
 
 procedure TOptionsCompleteForm.Btn_ConfigureMediaKeysClick(Sender: TObject);
+var WinVersionInfo: TWindowsVersionInfo;
+
+    procedure StartConfig;
+    begin
+        with Nemp_MainForm do
+        begin
+            // Um die Reaktionen auf die Tasten "umzuschalten"
+          SchonMalEineMediaTasteGedrueckt := False;
+          // Den Medientasten-Test starten
+          MMKeyTimer.Enabled := True;
+        end;
+    end;
+
 begin
-  with Nemp_MainForm do
-  begin
-      // Um die Reaktionen auf die Tasten "umzuschalten"
-    SchonMalEineMediaTasteGedrueckt := False;
-    // Den Medientasten-Test starten
-    MMKeyTimer.Enabled := True;
-  end;
+    WinVersionInfo := TWindowsVersionInfo.Create;
+    try
+        if WinVersionInfo.ProcessorArchitecture = pax64 then
+        begin
+            if MessageDLG((WinX64WarningHook), mtWarning, [MBYes, MBNO], 0) = mrYes then
+                StartConfig
+            else
+            begin
+                Nemp_MainForm.SchonMalEineMediaTasteGedrueckt := True;
+                Nemp_MainForm.DoHookInstall := False;
+                if HookIsInstalled then
+                    UninstallHook;
+                HookIsInstalled := False;
+                Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Standard);
+            end;
+        end else
+            StartConfig;
+    finally
+        WinVersionInfo.Free;
+    end;
 end;
 
 procedure TOptionsCompleteForm.Btn_ReinitPlayerEngineClick(Sender: TObject);
@@ -2749,23 +2829,45 @@ begin
 end;
 
 procedure TOptionsCompleteForm.Btn_InstallDeskbandClick(Sender: TObject);
+var WinVersionInfo: TWindowsVersionInfo;
 begin
-  if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
-      ShellExecute(Handle, 'open' ,'regsvr32.exe',
-                      PChar('"' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
-                       '', sw_ShowNormal)
-  else
-    MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+    WinVersionInfo := TWindowsVersionInfo.Create;
+    try
+        if WinVersionInfo.ProcessorArchitecture = pax64 then
+            MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
+        else
+        begin
+            if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
+                ShellExecute(Handle, 'open' ,'regsvr32.exe',
+                                PChar('"' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
+                                 '', sw_ShowNormal)
+            else
+              MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+        end;
+    finally
+        WinVersionInfo.Free;
+    end;
 end;
 
 procedure TOptionsCompleteForm.Btn_UninstallDeskbandClick(Sender: TObject);
+var WinVersionInfo: TWindowsVersionInfo;
 begin
-  if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
-      ShellExecute(Handle, 'open' ,'regsvr32.exe',
-                      PChar('/u "' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
-                       '', sw_ShowNormal)
-  else
-    MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+    WinVersionInfo := TWindowsVersionInfo.Create;
+    try
+        if WinVersionInfo.ProcessorArchitecture = pax64 then
+            MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
+        else
+        begin
+            if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
+                ShellExecute(Handle, 'open' ,'regsvr32.exe',
+                                PChar('/u "' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
+                                 '', sw_ShowNormal)
+            else
+              MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+        end;
+    finally
+        WinVersionInfo.Free;
+    end;
 end;
 
 

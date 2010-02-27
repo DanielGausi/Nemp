@@ -33,6 +33,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -738,7 +739,7 @@ type
     LblBibPlayCounter: TLabel;
     PM_PL_AddToPrebookListBeginning: TMenuItem;
     PM_PL_RemoveFromPrebookList: TMenuItem;
-    fspTaskbarMgr1: TfspTaskbarMgr;
+    fspTaskbarManager: TfspTaskbarMgr;
     fspTaskbarPreviews1: TfspTaskbarPreviews;
 
     procedure FormCreate(Sender: TObject);
@@ -1255,7 +1256,7 @@ type
       var Allowed: Boolean);
     procedure VSTAfterGetMaxColumnWidth(Sender: TVTHeader; Column: TColumnIndex;
       var MaxWidth: Integer);
-    procedure fspTaskbarMgr1ThumbButtonClick(Sender: TObject;
+    procedure fspTaskbarManagerThumbButtonClick(Sender: TObject;
       ButtonId: Integer);
     procedure FormActivate(Sender: TObject);
     procedure fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject; Width,
@@ -1933,17 +1934,15 @@ begin
     else
       NempTrayIcon.Visible := False;
 
-  //  NempWindowDefault := GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE);
+    NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
     if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
     begin
-//      ShowWindow( Nemp_MainForm.Handle, SW_HIDE );
-{      SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
-                 GetWindowLong(Nemp_MainForm.Handle, GWL_EXSTYLE)
+        ShowWindow( Application.Handle, SW_HIDE );
+        SetWindowLong( Application.Handle, GWL_EXSTYLE,
+                 GetWindowLong(Application.Handle, GWL_EXSTYLE)
                  or WS_EX_TOOLWINDOW
-                 //and (not WS_ICONIC)
                  and (not WS_EX_APPWINDOW));
-}
-///      ShowWindow( Nemp_MainForm.Handle, SW_SHOW );
+        //ShowWindow( Application.Handle, SW_SHOW );
     end;
 
 
@@ -2527,7 +2526,7 @@ begin
   begin
   /// XXX das geht so nicht mehr, weil in der Taskleiste seit D2007 Form.Handle drin steckt. Aber das
   ///  einfach ausblenden bewirkt da nichts.
-//    if NempTrayIcon.Visible then ShowWindow(Nemp_MainForm.Handle, SW_HIDE); // vorher Application.Handle
+    if NempTrayIcon.Visible then ShowWindow(Application.Handle, SW_HIDE); // vorher Application.Handle
 
 {   SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
                  Nemp_MainForm.NempWindowDefault
@@ -2607,7 +2606,11 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
       NempTrayIcon.Visible := False;
 
-  //ShowWindow(Nemp_MainForm.Handle, SW_RESTORE);
+//  if NempOptions.NempWindowView <> NEMPWINDOW_TRAYONLY then
+      ShowWindow(Application.Handle, SW_RESTORE);
+ // else
+   //   ShowWindow( Application.Handle, SW_HIDE );
+
   SetForegroundWindow(Nemp_MainForm.Handle);
 
   //if Tag = 3 then
@@ -2619,6 +2622,9 @@ begin
   ShowApplication;
 
   Application.ShowMainForm := True;
+
+  if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+      ShowWindow( Application.Handle, SW_HIDE );
 end;
 
 procedure TNemp_MainForm.ProcessCommandline(lpData: Pointer; StartPlay: Boolean);
@@ -2652,7 +2658,7 @@ begin
         end;
       end;
   end else
-      PlayPauseBtn.Click;
+      RestoreNemp;
 
   if Not Enqueue then
   begin
@@ -3379,11 +3385,14 @@ begin
     exit;
   end;
 
+
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
   FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Caption );
   try
       if fb.Execute then
       begin
+          fspTaskbarManager.ProgressValue := 0;
+          fspTaskbarManager.ProgressState := fstpsIndeterminate;
           newdir := fb.SelectedItem;
           MedienBib.ST_Ordnerlist.Add(newdir);
           // DateiSuche starten
@@ -3987,6 +3996,9 @@ begin
   MedienBib.ReInitCoverSearch;
   SelectedMP3s := VST.GetSortedSelection(False);
 
+  fspTaskbarManager.ProgressState := fstpsNormal;
+  fspTaskbarManager.ProgressValue := 0;
+
   if MedienBib.AnzeigeShowsPlaylistFiles then
   begin
       //MessageDLG((Medialibrary_GUIError4), mtError, [MBOK], 0);
@@ -4007,8 +4019,11 @@ begin
               AudioFile.FileIsPresent:=False;
               VST.InvalidateNode(SelectedMP3s[i]);
           end;
-          if i mod 256 = 0 then
+          if i mod 64 = 0 then
+          begin
               MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/length(SelectedMP3s) * 100)]);
+              fspTaskbarManager.ProgressValue := Round(i/length(SelectedMP3s) * 100);
+          end;
       end;
   end else
   begin
@@ -4040,9 +4055,10 @@ begin
             VST.InvalidateNode(SelectedMP3s[i]);
             inc(tot);
           end;
-          if i mod 256 = 0 then
+          if i mod 64 = 0 then
           begin
             MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/length(SelectedMP3s) * 100)]);
+            fspTaskbarManager.ProgressValue := Round(i/length(SelectedMP3s) * 100);
           end;
       end;
 
@@ -4068,6 +4084,7 @@ begin
   MedienBib.StatusBibUpdate := 0;
   MedienListeStatusLBL.Caption := '';
   ShowSummary;
+  fspTaskbarManager.ProgressState := fstpsNoProgress;
 
   Node := VST.FocusedNode;
   if Assigned(Node) then
@@ -6752,6 +6769,7 @@ begin
       ST_Playlist.Break;
       ST_Medienliste.Break;
 
+      fspTaskbarManager.ProgressState := fstpsNoProgress;
       // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
       NempPlaylist.AcceptInput := True;
       LangeAktionWeitermachen := False;
@@ -8412,7 +8430,7 @@ end;
 
 procedure TNemp_MainForm.FormActivate(Sender: TObject);
 begin
-fspTaskbarMgr1.Active := True;
+    fspTaskbarManager.Active := True;
 end;
 
 procedure TNemp_MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -10669,7 +10687,7 @@ begin
     end;
 end;    *)
 
-procedure TNemp_MainForm.fspTaskbarMgr1ThumbButtonClick(Sender: TObject;
+procedure TNemp_MainForm.fspTaskbarManagerThumbButtonClick(Sender: TObject;
   ButtonId: Integer);
 begin
     case ButtonID of

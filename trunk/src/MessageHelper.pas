@@ -33,6 +33,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -70,7 +71,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
-    SearchTool, MMSystem, BibHelper;
+    SearchTool, MMSystem, BibHelper, fspTaskbarMgr;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -451,9 +452,7 @@ begin
         // Changing the status of the library MUST be done in the VCL-Thread!
         MB_SetStatus: begin
             MedienBib.StatusBibUpdate := aMsG.LParam;
-
         end;
-
 
         MB_BlockUpdateStart: begin
               // Alles deaktivieren, was ein hinzufügen/löschen von Dateien in die Medienbib erwirkt.
@@ -561,8 +560,17 @@ begin
             ShowSummary;
         end;
 
+        MB_SetWin7TaskbarProgress: begin
+            fspTaskbarManager.ProgressState := TfspTaskProgressState(aMsg.LParam);
+        end;
+
         MB_ProgressRefresh: begin
             AuswahlStatusLbl.Caption := Format((MediaLibrary_RefreshingFiles), [aMsg.LParam]);
+            fspTaskbarManager.ProgressValue := aMsg.LParam;
+        end;
+
+        MB_ProgressRefreshJustProgressbar: begin
+            fspTaskbarManager.ProgressValue := aMsg.LParam;
         end;
 
         MB_ProgressSearchDead: AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
@@ -620,6 +628,9 @@ begin
 
         MB_StartAutoScanDirs: begin
             ST_Medienliste.Mask := GenerateMedienBibSTFilter;
+            fspTaskbarManager.ProgressValue := 0;
+            fspTaskbarManager.ProgressState := fstpsIndeterminate;
+
             for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
             begin
                 if DirectoryExists(MedienBib.AutoScanDirList[i]) then
@@ -1516,6 +1527,7 @@ begin
                 begin
                   NempPlaylist.Status := 0;
                   LangeAktionWeitermachen := False;
+                  fspTaskbarManager.ProgressState := fstpsNoProgress;
                 end;
 
           end;
@@ -1537,6 +1549,7 @@ begin
                 begin
                     // Dateisuche fertig. Starte Updatekram
                     MedienBib.NewFilesUpdateBib;
+                    fspTaskbarManager.ProgressState := fstpsNoProgress;
                 end;
           end;
         end;

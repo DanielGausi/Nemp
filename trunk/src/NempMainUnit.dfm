@@ -3557,7 +3557,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130010020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130020020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4122,7 +4122,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800FC0110001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101130018000C0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -5313,8 +5313,8 @@ object Nemp_MainForm: TNemp_MainForm
   object TNAMenu: TPopupMenu
     AutoHotkeys = maManual
     OnPopup = TNAMenuPopup
-    Left = 713
-    Top = 608
+    Left = 745
+    Top = 568
     object PM_TNA_Play: TMenuItem
       Caption = 'Play'
       OnClick = PlayPauseBTNIMGClick
@@ -6276,10 +6276,10 @@ object Nemp_MainForm: TNemp_MainForm
     Hint = 'Nemp - Noch ein mp3-Player'
     PopupMenu = TNAMenu
     OnClick = NempTrayIconClick
-    Left = 624
-    Top = 640
+    Left = 672
+    Top = 568
   end
-  object fspTaskbarMgr1: TfspTaskbarMgr
+  object fspTaskbarManager: TfspTaskbarMgr
     Active = False
     ProgressValue = 0
     ProgressValueMax = 100
@@ -6313,15 +6313,15 @@ object Nemp_MainForm: TNemp_MainForm
         ShowHint = True
         Flags = []
       end>
-    OnThumbButtonClick = fspTaskbarMgr1ThumbButtonClick
-    Left = 656
-    Top = 696
+    OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
+    Left = 664
+    Top = 632
   end
   object fspTaskbarPreviews1: TfspTaskbarPreviews
     Active = True
     CustomLiveView = False
     OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
-    Left = 728
-    Top = 704
+    Left = 720
+    Top = 632
   end
 end

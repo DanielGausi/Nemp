@@ -33,6 +33,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -260,6 +261,9 @@ SelectDirectoryDialog_RemoteNemp = 'Select download directory';
 
 AutoScanDir_AlreadyExists = 'The selected directory (or a parent directory) is already in the list.';
 AutoSacnDir_SubDirExisted = 'A subdirectory of the selected directory was removed from the list: ';
+
+WinX64WarningHook = 'You are using a 64Bit-Version of Windows. It is NOT recommended to use a special handling of multimedia keys. Continue anyway?';
+WinX64WarningDeskband = 'You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible.';
 
     EQSetting_Custom = '(Custom)';
     Infostring_Webstream = 'Webstream';

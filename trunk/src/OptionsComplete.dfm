@@ -55,7 +55,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAnzeige1
+    ActivePage = TabSystem3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -63,10 +63,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem0: TTabSheet
       Caption = 'System (Main)'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -210,10 +206,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'System1'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -1070,7 +1062,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = '...'
         end
         object Btn_ConfigureMediaKeys: TButton
-          Left = 8
+          Left = 9
           Top = 136
           Width = 233
           Height = 25
@@ -1117,10 +1109,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'System2'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TLabel
         Left = 16
         Top = 336
@@ -1260,13 +1248,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'System3'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
+      object LblTaskbarWin7: TLabel
+        Left = 24
+        Top = 149
+        Width = 417
+        Height = 32
+        AutoSize = False
+        Caption = 
+          '(*) Not recommended under Windows7: The buttons in the preview w' +
+          'on'#39't work then.'
+      end
       object GrpBox_TaskTray: TRadioGroup
         Left = 8
         Top = 8
@@ -1277,17 +1271,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ItemIndex = 4
         Items.Strings = (
           'Windows standard (taskbar only)'
-          'Taskbar only, trayicon only when minimized'
-          'Trayicon only'
+          'Taskbar only, trayicon only when minimized (*)'
+          'Trayicon only (*)'
           'Taskbar and trayicon'
-          'Taskbar and trayicon, trayicon only when minimized')
+          'Taskbar and trayicon, trayicon only when minimized (*)')
         TabOrder = 0
       end
       object GrpBox_Deskband: TGroupBox
         Left = 8
-        Top = 152
+        Top = 182
         Width = 432
-        Height = 225
+        Height = 220
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Notification of a deskband'
         TabOrder = 1
@@ -1370,10 +1364,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige0: TTabSheet
       Caption = 'Anzeige (Main)'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RGrp_View: TRadioGroup
         Left = 8
         Top = 72
@@ -1463,7 +1453,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbSkinAuswahlChange
         end
@@ -1919,7 +1909,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 169
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
       end
@@ -1927,10 +1917,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige4: TTabSheet
       Caption = 'Anzeige1 (Player)'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2099,10 +2085,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige5: TTabSheet
       Caption = 'Anzeige2 (View)'
       ImageIndex = 24
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2266,10 +2248,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige1: TTabSheet
       Caption = 'Anzeige3 (Fonts)'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2324,7 +2302,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 2
         end
         object CBFontNameCBR: TComboBox
@@ -2333,7 +2311,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
         end
       end
@@ -2555,10 +2533,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige6: TTabSheet
       Caption = 'Anzeige4 (PartyMode)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBoxPartyMode: TGroupBox
         Left = 8
         Top = 8
@@ -2593,10 +2567,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio0: TTabSheet
       Caption = 'Audio (Main)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2653,7 +2623,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 217
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
         end
         object MainDeviceCB: TComboBox
@@ -2662,7 +2632,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 217
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
       end
@@ -2762,10 +2732,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio3: TTabSheet
       Caption = 'Audio1 (Playlist)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2916,10 +2882,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio8: TTabSheet
       Caption = 'Audio2 (Medialib)'
       ImageIndex = 22
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3106,10 +3068,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio2: TTabSheet
       Caption = 'Audio2a (Rating)'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 13
         Top = 8
@@ -3203,10 +3161,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio4: TTabSheet
       Caption = 'Audio3 (Webradio)'
       ImageIndex = 23
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3378,10 +3332,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio5: TTabSheet
       Caption = 'Audio4 (Effekte)'
       ImageIndex = 15
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3504,10 +3454,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio7: TTabSheet
       Caption = 'Audio5 (Birthday)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3671,10 +3617,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio9: TTabSheet
       Caption = 'Audio6 (Scrobble)'
       ImageIndex = 17
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4014,10 +3956,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio10: TTabSheet
       Caption = 'Audio7 (Webserver)'
       ImageIndex = 18
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4194,10 +4132,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended0: TTabSheet
       Caption = 'Extended (Main)'
       ImageIndex = 21
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4359,10 +4293,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended1: TTabSheet
       Caption = 'Ext1 (Search Options)'
       ImageIndex = 25
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4495,10 +4425,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended2: TTabSheet
       Caption = 'Ext2 (Unicode)'
       ImageIndex = 23
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4597,7 +4523,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
         object CBChinese: TComboBox
@@ -4606,7 +4532,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
         end
         object CBHebrew: TComboBox
@@ -4615,7 +4541,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
         end
         object CBJapanese: TComboBox
@@ -4624,7 +4550,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 4
         end
         object CBGreek: TComboBox
@@ -4633,7 +4559,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 2
         end
         object CBKorean: TComboBox
@@ -4642,7 +4568,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 5
         end
         object CBCyrillic: TComboBox
@@ -4651,7 +4577,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 6
         end
         object CBThai: TComboBox
@@ -4660,7 +4586,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 7
         end
       end
@@ -4719,7 +4645,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 624
-    Top = 240
+    Left = 632
+    Top = 200
   end
 end

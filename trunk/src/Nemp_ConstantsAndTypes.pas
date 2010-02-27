@@ -33,6 +33,7 @@
           (including, but not limited to the bass_fx.dll)
         - MadExcept
         - DGL-OpenGL
+        - FSPro Windows 7 Taskbar Components
     or a modified version of these libraries, the licensors of this Program
     grant you additional permission to convey the resulting work.
 
@@ -333,6 +334,7 @@ const
     //MB_ProgressSearchFuzzy = 10;
 
     MB_ProgressRefresh = 11;
+    MB_ProgressRefreshJustProgressbar = 30;
     MB_SearchAutoAbort = 12;
     // Show search results. lParam contains a Pointer to the result-list
     MB_ShowSearchResults = 13;
@@ -369,6 +371,9 @@ const
 
     // Search the playlist for a filename and set the ratings
     MB_UnifyPlaylistRating = 22;
+
+    // Set the Win7-Taskbar-Progressbar
+    MB_SetWin7TaskbarProgress = 29;
 
     MB_SetStatus = 100;
 
