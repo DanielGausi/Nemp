@@ -55,7 +55,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabSystem3
+    ActivePage = TabAnzeige5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2106,55 +2106,48 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Browsing in the medialibrary'
         TabOrder = 1
         object Label44: TLabel
-          Left = 8
-          Top = 60
+          Left = 12
+          Top = 20
           Width = 131
           Height = 13
           Caption = 'Sort orders in classic mode:'
         end
-        object Label48: TLabel
-          Left = 8
-          Top = 16
-          Width = 26
-          Height = 13
-          Caption = 'Mode'
-        end
         object Label61: TLabel
-          Left = 240
-          Top = 60
+          Left = 248
+          Top = 20
           Width = 114
           Height = 13
           Caption = 'Sort order in cover-flow'
         end
         object LblConst_CoverMode: TLabel
-          Left = 240
-          Top = 16
+          Left = 12
+          Top = 61
           Width = 56
           Height = 13
           Caption = 'Show cover'
         end
         object cbCoverMode: TComboBox
-          Left = 240
-          Top = 32
+          Left = 12
+          Top = 79
           Width = 89
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 1
+          TabOrder = 0
           Items.Strings = (
             'Disabled'
             'Left'
             'Right')
         end
         object CBSortArray1: TComboBox
-          Left = 8
-          Top = 76
+          Left = 12
+          Top = 37
           Width = 97
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 0
-          TabOrder = 2
+          TabOrder = 1
           Text = 'Artists'
           Items.Strings = (
             'Artists'
@@ -2164,14 +2157,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Years')
         end
         object CBSortArray2: TComboBox
-          Left = 112
-          Top = 76
+          Left = 115
+          Top = 37
           Width = 97
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 1
-          TabOrder = 3
+          TabOrder = 2
           Text = 'Albums'
           Items.Strings = (
             'Artists'
@@ -2180,28 +2173,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Genres'
             'Years')
         end
-        object cbBrowseMode: TComboBox
-          Left = 8
-          Top = 32
-          Width = 153
-          Height = 21
-          Style = csDropDownList
-          ItemHeight = 13
-          ItemIndex = 0
-          TabOrder = 0
-          Text = 'Nemp-Classic'
-          Items.Strings = (
-            'Nemp-Classic'
-            'Cover-Flow')
-        end
         object cbCoverSortOrder: TComboBox
-          Left = 240
-          Top = 79
+          Left = 248
+          Top = 37
           Width = 97
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 4
+          TabOrder = 3
           Items.Strings = (
             'Artists, Albums'
             'Albums, Artists'

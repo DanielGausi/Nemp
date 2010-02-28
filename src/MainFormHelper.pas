@@ -873,10 +873,14 @@ begin
                 CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
             end;
             2: begin
-                // Hier Code für Tagwolke einfügen
+                // 1. Backup Breadcrumbs (current navigation)
+                MedienBib.TagCloud.BackUpNavigation;
+                // 2. Rebuild TagCloud
                 MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags;
-                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
+                // 3. Restore BreadCrumbs
+                MedienBib.RestoreTagCloudNavigation;
+                // 4. Show Files for the current Tag
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
             end;
         end;
 
