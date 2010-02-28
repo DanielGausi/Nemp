@@ -5317,10 +5317,21 @@ begin
                 MedienBib.NewCoverFlow.Paint(10);
       end;
       2: begin
-                // tagCloud
+                // 1. Backup Breadcrumbs (current navigation)
+                if RemarkOldNodes then
+                    MedienBib.TagCloud.BackUpNavigation;
+
+                // 2. Rebuild TagCloud
                 MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags;
-                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
+
+                // 3. Restore BreadCrumbs
+                if RemarkOldNodes then
+                    MedienBib.RestoreTagCloudNavigation;
+
+                // 4. Show Tags
+                // No, as ShoTags will select a new focussed Tag MedienBib.TagCloud.ShowTags;
+                // 4. Show Files for the current Tag
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
       end;
   end;
   SetBrowseTabWarning(False);

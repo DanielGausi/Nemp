@@ -44,7 +44,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel;
+    ComCtrls, Graphics, Messages, NempPanel, IniFiles;
 
 const
 
@@ -204,6 +204,9 @@ type
 
           procedure RePaintTag(aTag: TPaintTag; Active: Boolean);
 
+          // Determine, whether a given Tag is visible tight now
+          function IsVisible(aTag: TPaintTag): Boolean;
+
           function GetTagAtMousePos(x,y: Integer): TPaintTag;
 
           function GetFirstNewTag: TPaintTag;
@@ -217,10 +220,16 @@ type
           Tags: TObjectList;
           ActiveTags: TObjectList;
 
+          // fBackUpBreadCrumbs: Used to restore the Navigation after a
+          // library update.
+          fBackUpBreadCrumbs: TObjectlist;
+          fBackupFocussedTag: TPaintTag;
+
           HashedTags: Array[0..31,0..31] of TObjectList;
 
           fClearTag: TTag;
 
+          fInitialising: Boolean;
           fBreadCrumbDepth: Integer;
 
           fMouseOverTag: TPaintTag;
@@ -235,6 +244,8 @@ type
           function GetTag(aKey: UTF8String): TTag;
 
           function fGetTagList: TObjectList;
+
+          procedure InitHashMap;
 
           // Insert all Tags from the AudioFile into the Taglist
           procedure AddAudioFileTags(aAudioFile: TAudioFile);
@@ -280,10 +291,20 @@ type
           constructor Create;
           destructor Destroy; override;
 
+          procedure LoadFromIni(Ini: TMemIniFile);
+          procedure SaveToIni(Ini: TMemIniFile);
+
           // Build a Tag-Cloud for the AudioFiles given in Source
           procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 
-          procedure ShowTags;//(aListView: TListView);
+          // Show the Tags in the Cloud
+          procedure ShowTags;
+
+          // Backup/RestoreNavigation: Save the current Breadcrumbs and restore them after
+          // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
+          procedure BackUpNavigation;
+          procedure RestoreNavigation(aList: TObjectList);
+
 
           procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
@@ -376,14 +397,18 @@ end;
 
 constructor TTagCloud.Create;
 begin
+    fInitialising := True;
     Tags := TObjectList.Create;
     ActiveTags := TObjectList.create(False);
 //    BrowseHistory := TObjectList.Create;
     CloudPainter := TCloudPainter.Create;
+    fBackUpBreadCrumbs := TObjectList.create(False);
 
     fClearTag := TPaintTag.Create('<Your library>');
     fClearTag.BreadCrumbIndex := -2;
     Tags.Add(ClearTag);
+
+    InitHashMap;
 end;
 
 destructor TTagCloud.Destroy;
@@ -398,6 +423,7 @@ begin
 //    BrowseHistory.Free;
     CloudPainter.Free;
     Activetags.Free;
+    fBackUpBreadCrumbs.Free;
     Tags.Extract(fClearTag);
     fCleartag.Free;
     Tags.free;
@@ -405,6 +431,70 @@ begin
     inherited;
 end;
 
+procedure TTagCloud.LoadFromIni(Ini: TMemIniFile);
+var NavDepth, i: Integer;
+    aTagString: UTF8String;
+    newTag: TTag;
+begin
+    NavDepth := Ini.ReadInteger('MedienBib', 'TagCloudNavDepth', 0);
+    if NavDepth > 0 then
+    begin
+        fBackUpBreadCrumbs.Add(ClearTag);
+
+        for i := 1 to NavDepth - 1 do
+        begin
+            aTagString := Ini.ReadString('MedienBib', 'TagCloudNav' + IntToStr(i), '');
+            if aTagString <> '' then
+            begin
+                // on Nemp Start, we have probably no Tags yet.
+                // But it doesnt matter, if we create some of them right now
+                newTag := GetTag(aTagString);
+                // use these new Tags as BackupBreadCrumbs
+                // when we Refill the cloud after loading the library, this should work!
+                fBackUpBreadCrumbs.Add(newTag);
+            end;
+        end;
+        // get the backupped focussed Tag
+        aTagString := Ini.ReadString('MedienBib', 'TagCloudNavFocus' , '');
+        if aTagString <> '' then
+            fBackupFocussedTag := TPaintTag(GetTag(aTagString))
+        else
+            fBackupFocussedTag := Nil;
+    end;
+end;
+
+procedure TTagCloud.SaveToIni(Ini: TMemIniFile);
+var i, NavDepth: Integer;
+    goOn: Boolean;
+begin
+    NavDepth := 0;
+
+    // Get the number of breadcrumb-tags
+    for i := 0 to Tags.Count - 1 do
+        if (Tags[i] as TTag).BreadCrumbIndex < High(Integer) then
+            inc(NavDepth)
+        else
+            break;
+    // write this number
+    Ini.WriteInteger('MedienBib', 'TagCloudNavDepth', NavDepth);
+    // write the keys of the breadcrumbtags
+    for i := 1 to NavDepth - 1 do
+        Ini.WriteString('MedienBib', 'TagCloudNav' + IntToStr(i), (Tags[i] as TTag).Key);
+
+    // Delete further keys from Ini
+    i := NavDepth;
+    repeat
+        Ini.DeleteKey('MedienBib', 'TagCloudNav' + IntToStr(i));
+        inc(i);
+        goOn := Ini.ValueExists('MedienBib', 'TagCloudNav' + IntToStr(i));
+    until not GoOn;
+
+    // write the key of the focussed tag
+    if assigned(fFocussedTag) then
+        Ini.WriteString('MedienBib', 'TagCloudNavFocus', fFocussedTag.Key)
+    else
+        Ini.DeleteKey('MedienBib', 'TagCloudNavFocus');
+end;
 
 
 function TTagCloud.fGetTagList: TObjectList;
@@ -423,8 +513,6 @@ begin
         if (Tags[i] as TTag).BreadCrumbIndex = High(Integer) then
            (Tags[i] as TTag).AudioFiles.Clear;
 end;
-
-
 
 procedure TTagCloud.SetActivetags;
 var i: Integer;
@@ -602,6 +690,18 @@ begin
         result := GetDefaultTag;
 end;
 
+procedure TTagCloud.InitHashMap;
+var i,j: Integer;
+begin
+    if Not assigned(HashedTags[0,0]) then
+    begin
+            // This should be done only once per Nemp-Instance!
+            for i := 0 to 31 do
+              for j := 0 to 31 do
+                HashedTags[i,j] := TObjectList.Create(False);
+    end;
+end;
+
 function TTagCloud.GetDownTag: TPaintTag;
 var aLine, bLine: TTagLine;
     oMax, oCurrent, aIdx, i: Integer;
@@ -753,39 +853,16 @@ end;
 
 
 
-procedure TTagCloud.ShowTags;//(aListView: TListView);
+procedure TTagCloud.ShowTags;
 begin
-
     MouseOverTag := Nil;
     FocussedTag  := Nil;
 
     CloudPainter.Paint(CurrentTagList);
-
     FocussedTag := CloudPainter.GetFirstNewTag;
 
     if assigned(FocussedTag) then
         FocussedTag.PaintFocussed(CloudPainter.Canvas);
-
-
-  {  aListView.Items.BeginUpdate;
-    aListView.Clear;
-
-    m := Activetags.Count - 1;
-    if m > 100 then m := 100;
-
-
-    for i := 0 to m do
-    begin
-        if  TTag(Activetags[i]).count >0 then
-        begin
-            newItem := aListView.Items.Add;
-            newItem.Caption := TTag(Activetags[i]).Key + ' (' + Inttostr(TTag(Activetags[i]).count) + ')';
-            newItem.Data := TTag(Activetags[i]);
-        end;
-
-    end;
-    aListView.Items.EndUpdate;
-   }
 end;
 
 procedure TTagCloud.ClearBreadCrumbs(Above: Integer);
@@ -831,13 +908,9 @@ begin
 //*//        Tags.Extract(fClearTag);
         properList := Source;
         fBreadCrumbDepth := 0;
-        if Not assigned(HashedTags[0,0]) then
-        begin
-            // This should be done only once per Nemp-Instance!
-            for i := 0 to 31 do
-              for j := 0 to 31 do
-                HashedTags[i,j] := TObjectList.Create(False);
-        end;
+
+        InitHashMap;
+
     end else
 
     begin
@@ -892,6 +965,8 @@ begin
 
     try
         // Clear the cloud, i.e. set the Count of (almost) all Tags to Zero
+        // All references to AudioFiles are deleted here
+        // (except the Breadcrumb-Tags, if existing)
         Reset;
 
         // Insert Files into the new Cloud
@@ -906,7 +981,66 @@ begin
     finally
 
     end;
+end;
 
+{
+    --------------------------------------------------------
+    BackUpNavigation
+    RestoreNavigation
+    - Save the current Breadcrumbs and restore them after
+      a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
+    --------------------------------------------------------
+}
+procedure TTagCloud.BackUpNavigation;
+var i: Integer;
+begin
+    //
+    if fInitialising then
+        fInitialising := False
+        // we are loading nemp.
+        // Do not overwrite the data from the inifile
+    else
+    begin
+        // clear old list
+        fBackUpBreadCrumbs.Clear;
+        // add current Breadcrumbs to the list
+        for i := 0 to Tags.Count - 1 do
+            if (Tags[i] as TTag).BreadCrumbIndex < High(Integer) then
+                fBackUpBreadCrumbs.Add(Tags[i])
+            else
+                break; // we need only the first few tags.
+
+        // Backup focussed Tag
+        fBackupFocussedTag := fFocussedTag;
+    end;
+end;
+
+procedure TTagCloud.RestoreNavigation(aList: TObjectList);
+var i: Integer;
+begin
+    // Initialisation done.
+    fInitialising := False;
+
+    // use the backupBreadcrumbs to navigate through the new cloud
+    for i := 0 to fBackUpBreadCrumbs.Count - 1 do
+    begin
+        BuildCloud(aList, TTag(fBackUpBreadCrumbs[i]), False);
+    end;
+
+    // Paint the new Cloud
+    MouseOverTag := Nil;
+    FocussedTag := Nil;
+    CloudPainter.Paint(CurrentTagList);
+
+    // is old focussed Tag visible? The set the new one!
+    if assigned(fBackupFocussedTag) and (CloudPainter.IsVisible(fBackupFocussedTag)) then
+        FocussedTag := fBackupFocussedTag
+    else
+        // otherwise: Get default-Tag
+        FocussedTag := CloudPainter.GetFirstNewTag;
+
+    if assigned(fFocussedTag) then
+        FocussedTag.PaintFocussed(CloudPainter.Canvas);
 end;
 
 {
@@ -941,7 +1075,6 @@ begin
         y := Ord(aKey[2]) mod 32;
 
     KeyHashList := HashedTags[x,y];
-
 
     for i := 0 to KeyHashList.Count - 1 do
         if TTag(KeyHashList[i]).Key = aKey then
@@ -1469,6 +1602,11 @@ begin
         end;
     end;
 
+end;
+
+function TCloudPainter.IsVisible(aTag: TPaintTag): Boolean;
+begin
+    result := visibleTags.IndexOf(aTag) >= 0;
 end;
 
 function TCloudPainter.GetFirstNewTag: TPaintTag;
