@@ -488,6 +488,7 @@ type
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList;       // -"- of CoverLists
         procedure ReBuildTagCloud;        // -"- of the TagCloud
+        procedure RestoreTagCloudNavigation;
         procedure RepairBrowseListsAfterDelete; // Rebuild, but sorting is not needed
         procedure RepairBrowseListsAfterChange; // Another Repair-method :?
         // 3. When Browsing the left tree, fill the right tree
@@ -1022,6 +1023,7 @@ begin
         NewCoverFlow.CurrentItem    := ini.ReadInteger('MedienBib', 'SelectedCoverIDX', 0);
 
         BibSearcher.LoadFromIni(ini);
+        TagCloud.LoadFromIni(ini);
 end;
 procedure TMedienBibliothek.WriteToIni(ini: TMemIniFile);
 var i: Integer;
@@ -1095,6 +1097,7 @@ begin
 
 
         BibSearcher.SaveToIni(Ini);
+        TagCloud.SaveToIni(Ini);
 end;
 
 {
@@ -2191,6 +2194,7 @@ begin
   LeaveCriticalSection(CSUpdate);
 end;
 
+
 {
     --------------------------------------------------------
     ValidKeys
@@ -2704,6 +2708,12 @@ begin
     // Build the Tagcloud. Delete BrowseHistory (True)
     TagCloud.BuildCloud(Mp3ListePfadSort, Nil, True);
 end;
+
+procedure TMedienBibliothek.RestoreTagCloudNavigation;
+begin
+    TagCloud.RestoreNavigation(Mp3ListeArtistSort);
+end;
+
 
 {
     --------------------------------------------------------
