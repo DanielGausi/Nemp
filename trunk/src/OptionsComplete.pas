@@ -247,7 +247,6 @@ type
     GrpBox_TabMedia3_Columns: TGroupBox;
     GrpBox_TabMedia3_Browseby: TGroupBox;
     Label44: TLabel;
-    Label48: TLabel;
     Label61: TLabel;
     LblConst_CoverMode: TLabel;
     cbCoverMode: TComboBox;
@@ -374,7 +373,6 @@ type
     CB_AnzeigeDelay: TComboBox;
     CBSortArray1: TComboBox;
     CBSortArray2: TComboBox;
-    cbBrowseMode: TComboBox;
     cbCoverSortOrder: TComboBox;
     CBMiddleToMinComputing: TComboBox;
     CBMiddleToMaxComputing: TComboBox;
@@ -1146,7 +1144,6 @@ begin
 
   CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
   CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
-  CBBrowseMode.ItemIndex := MedienBib.BrowseMode;
   cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
 
   CBAutoScan.Checked := MedienBib.AutoScanDirs;
@@ -2057,24 +2054,33 @@ begin
   NeedTotalLyricStringUpdate := False;
   if MedienBib.StatusBibUpdate = 0 then
   begin
-      if (CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
-        OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2]))
-        OR ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
-        OR (cbBrowseMode.ItemIndex <> MedienBib.BrowseMode)
-        then
-      begin
-        if cbBrowseMode.ItemIndex = 0 then
-        begin
-            MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
-            MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
-        end else
-            MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
-            
-        MedienBib.BrowseMode := cbBrowsemode.ItemIndex;
-        NeedUpdate := True;
-      end;
+      if ((
+          (CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
+          OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2]))
+          )
+          AND
+          (MedienBib.BrowseMode = 0)
+          )
 
-      // MedienBib, Suchoptionen                   
+          OR
+
+          (
+          ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
+          AND
+          (MedienBib.BrowseMode = 1)
+          )
+      then
+      begin
+          // We have changed something with the current Browse-Values
+          // Update needed
+          NeedUpdate := True;
+      end;
+      // However, we can synchronize VCL and Data here always. ;-)
+      MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
+      MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
+      MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
+
+      // MedienBib, Suchoptionen
       NeedTotalLyricStringUpdate := MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked;
 
       NeedTotalStringUpdate := (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch.Checked)
@@ -2094,7 +2100,6 @@ begin
     CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
     CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
     cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
-    cbBrowseMode.ItemIndex := MedienBib.BrowseMode;
   end;
 
   MedienBib.AutoScanDirs := CBAutoScan.Checked;
@@ -2222,26 +2227,22 @@ begin
   if NeedUpdate then
   begin
       // Browse-Listen neu aufbauen
-
-      if  MedienBib.BrowseMode = 1 then
-      begin
-        MedienBib.ReBuildCoverList;
-        If MedienBib.Coverlist.Count > 3 then
-          Nemp_MainForm.CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-        else
-          Nemp_MainForm.CoverScrollbar.Max := 3;
-
-        //Nemp_MainForm.CoverScrollbarChange(Nil);
-        MedienBib.NewCoverFlow.FindCurrentItemAgain;
-      end else
-      begin
-        MedienBib.ReBuildBrowseLists;
+      case MedienBib.BrowseMode of
+          0: begin
+              MedienBib.ReBuildBrowseLists;
+          end;
+          1: begin
+                MedienBib.ReBuildCoverList;
+                If MedienBib.Coverlist.Count > 3 then
+                    Nemp_MainForm.CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+                else
+                    Nemp_MainForm.CoverScrollbar.Max := 3;
+                MedienBib.NewCoverFlow.FindCurrentItemAgain;
+          end;
+          2: begin
+              // nothing to do.
+          end;
       end;
-
-      Nemp_MainForm.PanelStandardBrowse.Visible := MedienBib.BrowseMode = 0;
-      Nemp_MainForm.PanelCoverBrowse.Visible    := MedienBib.BrowseMode = 1;
-      Nemp_MainForm.PanelTagCloudBrowse.Visible := MedienBib.BrowseMode = 2;
-
       Nemp_MainForm.ShowSummary;
   end else
   begin
