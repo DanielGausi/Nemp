@@ -1160,7 +1160,6 @@ begin
   ///  This would be fatal.
 
 
-
   case MB.Initializing of
       init_nothing: begin
           if MB.AutoScanDirs then
@@ -1202,22 +1201,8 @@ begin
           // nothing more to do.
           SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
       end;
-
   end;
 
- { if MB.Initializing AND MB.AutoScanDirs then
-  begin
-      MB.Initializing := False;
-      SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartAutoScanDirs, 0);
-      // This starts a AutoScan, which will end again in this procedure.
-      // Todo: delete Initializing, add a Integer.
-      ///  0 : start Autscan
-      ///  1 : Activate Webserver
-      ///  2 : nothing more to do.
-  end else
-      MB.Initializing := False;
-
-  }
   try
       CloseHandle(MB.fHND_UpdateThread);
   except
@@ -1252,28 +1237,47 @@ begin
   end;
 
   // Build proper Browse-Lists
-  if BrowseMode = 0 then
-  begin
-      UpdateList.Sort(Sortieren_String1String2Titel_asc);
-      if fBrowseListsNeedUpdate then
-          Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-      Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
+  case BrowseMode of
+      0: begin
+          // Classic Browsing: Artist-Album (or whatever the user wanted)
+          UpdateList.Sort(Sortieren_String1String2Titel_asc);
+          if fBrowseListsNeedUpdate then
+              Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+          Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
 
-      if fBrowseListsNeedUpdate then
-          Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
-      UpdateList.Sort(Sortieren_String2String1Titel_asc);
-      Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_AlbumArtist, NempSortArray);
+          if fBrowseListsNeedUpdate then
+              Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+          UpdateList.Sort(Sortieren_String2String1Titel_asc);
+          Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_AlbumArtist, NempSortArray);
 
-      fBrowseListsNeedUpdate := False;
-  end else
-  begin
-      UpdateList.Sort(Sortieren_CoverID);
-      Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_Cover, NempSortArray);
-      Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_Cover, NempSortArray);
+          fBrowseListsNeedUpdate := False;
+      end;
+      1: begin
+          // Coverflow
+          UpdateList.Sort(Sortieren_CoverID);
+          Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_Cover, NempSortArray);
+          Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_Cover, NempSortArray);
+      end;
+      2: begin
+          // TagCloud: Just put all files into the tmp-Lists
+          // we do not need them really, but at least the file therein should be the same as in the PfadSortList
+          tmpMp3ListeArtistSort.Clear;
+          for i := 0 to Mp3ListeArtistSort.Count - 1 do
+              tmpMp3ListeArtistSort.Add(Mp3ListeArtistSort[i]);
+          tmpMp3ListeAlbenSort.Clear;
+          for i := 0 to Mp3ListeAlbenSort.Count - 1 do
+              tmpMp3ListeAlbenSort.Add(Mp3ListeAlbenSort[i]);
+          for i := 0 to UpdateList.Count - 1 do
+          begin
+              tmpMp3ListeArtistSort.Add(UpdateList[i]);
+              tmpMp3ListeAlbenSort.Add(UpdateList[i]);
+          end;
+      end;
   end;
 
   // Check for Duplicates
   // Note: This test should be always negative. If not, something in the system went wrong. :(
+  //       Probably the Sort and Binary-Search methods do not match then.
   for i := 0 to tmpMp3ListePfadSort.Count-2 do
   begin
     if TAudioFile(tmpMp3ListePfadSort[i]).Pfad = TAudioFile(tmpMp3ListePfadSort[i+1]).Pfad then
@@ -1304,12 +1308,19 @@ begin
   end;
 
   // Prepare BrowseLists
-  if BrowseMode = 0 then
-  begin
-      InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
-      Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
-  end else
-      GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverList);
+  case BrowseMode of
+      0: begin
+          InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
+          Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
+      end;
+      1: begin
+          GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverList);
+      end;
+      2: begin
+          // nothing to do. TagCloud will be rebuild in "RefillBrowseTrees"
+      end;
+  end;
+
 
   // Build String for accelerated search
   BibSearcher.BuildTMPTotalString(tmpMp3ListePfadSort);
@@ -1554,38 +1565,52 @@ begin
   AntiMergePlaylists(AllPlaylistsPfadSort, DeadPlaylists, tmpAllPlaylistsPfadSort);
 
   // Der Rest geht nicht mit AntiMerge. :(
-  if BrowseMode = 0 then
-  begin
-      tmpMp3ListeArtistSort.Clear;
-      for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-        tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-      tmpMp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+  case BrowseMode of
+      0: begin
+          // Classic browse
+          tmpMp3ListeArtistSort.Clear;
+          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
+            tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
+          tmpMp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
 
-      tmpMp3ListeAlbenSort.Clear;
-      for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-        tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
-      tmpMp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+          tmpMp3ListeAlbenSort.Clear;
+          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
+            tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
+          tmpMp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
 
-      fBrowseListsNeedUpdate := False;
-  end else
-  begin
-      tmpMp3ListeArtistSort.Clear;
-      for i := 0 to tmpMp3ListePfadSort.Count - 1 do
-      begin
-        tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-        tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
+          fBrowseListsNeedUpdate := False;
+
+          // BrowseListen vorbereiten.
+          InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
+          Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
       end;
-      tmpMp3ListeArtistSort.Sort(Sortieren_CoverID);
-      tmpMp3ListeAlbenSort.Sort(Sortieren_CoverID);
-  end;
+      1: begin
+          // CoverFlow
+          tmpMp3ListeArtistSort.Clear;
+          tmpMp3ListeAlbenSort.Clear;
+          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
+          begin
+            tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
+            tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
+          end;
+          tmpMp3ListeArtistSort.Sort(Sortieren_CoverID);
+          tmpMp3ListeAlbenSort.Sort(Sortieren_CoverID);
 
-  // BrowseListen vorbereiten.
-  if BrowseMode = 0 then
-  begin
-      InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
-      Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
-  end else
-      GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverList);
+          // BrowseListen vorbereiten.
+          GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverList);
+      end;
+      2: begin
+          // tagCloud
+          tmpMp3ListeArtistSort.Clear;
+          tmpMp3ListeAlbenSort.Clear;
+          for i := 0 to tmpMp3ListePfadSort.Count - 1 do
+          begin
+              tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
+              tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
+          end;
+          // Note: We do not need sorted BrowseLists in the TagCloud
+      end;
+  end;
 
   BibSearcher.BuildTMPTotalString(tmpMp3ListePfadSort);
   BibSearcher.BuildTMPTotalLyricString(tmpMp3ListePfadSort);
@@ -1737,21 +1762,26 @@ begin
       // With lParam = 1 only the caption of the StatusLabel is changed
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 1);
 
-      if BrowseMode = 0 then
-      begin
-          Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-          Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
-          // BrowseListen neu füllen
+      case BrowseMode of
+          0: begin
+              Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+              Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+              // BrowseListen neu füllen
 
-          SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
-          GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
-          InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
-      end else
-      begin
-          Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-          Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
-          SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
-          GenerateCoverList(Mp3ListeArtistSort, CoverList);
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
+              GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
+              InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
+          end;
+          1: begin
+              Mp3ListeArtistSort.Sort(Sortieren_CoverID);
+              Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
+              GenerateCoverList(Mp3ListeArtistSort, CoverList);
+          end;
+          2: begin
+              // Nothing to do here. TagCloud will be rebuild in VCL-Thread
+              // by MB_RefillTrees
+          end;
       end;
 
       // Build TotalStrings
@@ -2684,28 +2714,33 @@ end;
 }
 procedure TMedienBibliothek.RepairBrowseListsAfterDelete;
 begin
-  if BrowseMode = 0 then
-  begin
-    GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
-    InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
-  end else
-    GenerateCoverList(Mp3ListeArtistSort, CoverList);
+
+    case BrowseMode of
+        0: begin
+          GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
+          InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
+        end;
+        1: GenerateCoverList(Mp3ListeArtistSort, CoverList);
+        2: ;// nothing to do
+  end;
   // nicht senden SendMessage(MainWindowHandle, WM_RefillTrees, 0, 0);
   // Denn: Es sollen jetzt die alten Knoten wieder markiert werden
 end;
 Procedure TMedienBibliothek.RepairBrowseListsAfterChange;
 begin
-  if BrowseMode = 0 then
-  begin
-    Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-    Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
-    GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
-    InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
-  end else
-  begin
-    Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-    Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
-    GenerateCoverList(Mp3ListeArtistSort, CoverList);
+  case BrowseMode of
+      0: begin
+          Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+          Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+          GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
+          InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
+      end;
+      1: begin
+          Mp3ListeArtistSort.Sort(Sortieren_CoverID);
+          Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+          GenerateCoverList(Mp3ListeArtistSort, CoverList);
+      end;
+      2: ;// nothing to to
   end;
 end;
 
@@ -4171,10 +4206,12 @@ begin
         else
             if FileExists(SavePath + 'default.nwl') then
                 ImportFavorites(SavePath + 'default.nwl');
-        if BrowseMode = 0 then
-            ReBuildBrowseLists
-        else
-            ReBuildCoverList;
+
+        case BrowseMode of
+            0: ReBuildBrowseLists;
+            1: ReBuildCoverList;
+            2: ; // Nothing to do
+        end;
         SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
     end;
 end;

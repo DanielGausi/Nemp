@@ -5235,14 +5235,14 @@ var ArtistNode, AlbumNode: PVirtualNode;
   Artist, Album: UnicodeString;
 begin
 
-  if MedienBib.BrowseMode = 0 then
-  begin
+  case MedienBib.BrowseMode of
+      0:  begin
                 // erneuert nach einer Einfüge/Lösch/Edit-aktion die oberen beiden Listen
                 // die alten Knoten werden nach Möglichkeit wieder selektiert/focussiert
                 // Change auf Nil setzen
                 ArtistsVST.OnFocusChanged := NIL;
                 AlbenVST.OnFocusChanged := NIL;
-  
+
                 // linke Liste füllen
                 if MedienBib.NempSortArray[1] = siOrdner then
                   FillStringTreeWithSubNodes(MedienBib.AlleArtists, ArtistsVST)
@@ -5304,20 +5304,25 @@ begin
                 // Change wieder umsetzen
                 ArtistsVST.OnFocusChanged := ArtistsVSTFocusChanged;
                 AlbenVST.OnFocusChanged := AlbenVSTFocusChanged;
-  end else
-  begin
-
-     If MedienBib.Coverlist.Count > 3 then
-                  CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+      end;
+      1: begin
+                // Coverflow
+                If MedienBib.Coverlist.Count > 3 then
+                    CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
                 else
-                  CoverScrollbar.Max := 3;
-
-     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-     CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-     CoverScrollbarChange(Nil);
-     MedienBib.NewCoverFlow.Paint(10);
+                    CoverScrollbar.Max := 3;
+                MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+                CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+                CoverScrollbarChange(Nil);
+                MedienBib.NewCoverFlow.Paint(10);
+      end;
+      2: begin
+                // tagCloud
+                MedienBib.ReBuildTagCloud;
+                MedienBib.TagCloud.ShowTags;
+                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
+      end;
   end;
-
   SetBrowseTabWarning(False);
 end;
 
