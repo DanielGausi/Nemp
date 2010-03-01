@@ -86,6 +86,8 @@ DetailForm_InfoLblFilename = 'Filename';
 DetailForm_InfoLblFileSize = 'Filesize';
 DetailForm_ID3v2Info = '%d Bytes (%d used)';
 
+DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
+
 Warning_FileNotFound = 'File not found';
 Warning_FileNotFound_Hint = 'The specified file can not be found. Maybe it is on an external drive which is not connected.';
 Warning_Coverbox_NoCover = 'No coverfile found';

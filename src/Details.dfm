@@ -16,6 +16,7 @@ object FDetails: TFDetails
   OldCreateOrder = False
   Position = poMainFormCenter
   ScreenSnap = True
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnHide = FormHide
@@ -37,7 +38,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_General
+    ActivePage = Tab_MpegInformation
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
@@ -581,10 +582,6 @@ object FDetails: TFDetails
     object Tab_MpegInformation: TTabSheet
       Caption = 'ID3-Tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_ID3v1: TGroupBox
         Left = 8
         Top = 0
@@ -730,9 +727,10 @@ object FDetails: TFDetails
             AutoCloseUp = True
             Style = csDropDownList
             Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 0
+            ItemHeight = 13
             Sorted = True
             TabOrder = 0
+            OnChange = Lblv1Change
           end
         end
         object CBID3v1: TCheckBox
@@ -760,6 +758,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 2
+          OnChange = Lblv1Change
         end
         object Lblv1Artist: TEdit
           Left = 64
@@ -768,6 +767,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 0
+          OnChange = Lblv1Change
         end
         object Lblv1Titel: TEdit
           Left = 64
@@ -776,6 +776,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 1
+          OnChange = Lblv1Change
         end
         object Lblv1Year: TEdit
           Left = 264
@@ -793,6 +794,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 3
+          OnChange = Lblv1Change
         end
         object Lblv1Track: TEdit
           Left = 336
@@ -974,9 +976,10 @@ object FDetails: TFDetails
             Height = 21
             AutoComplete = False
             Anchors = [akLeft, akTop, akRight, akBottom]
-            ItemHeight = 0
+            ItemHeight = 13
             Sorted = True
             TabOrder = 0
+            OnChange = Lblv2Change
           end
         end
         object CBID3v2: TCheckBox
@@ -1009,6 +1012,7 @@ object FDetails: TFDetails
           LabelSpacing = 1
           ReadOnly = True
           TabOrder = 9
+          OnChange = Lblv2Change
         end
         object Lblv2URL: TLabeledEdit
           Left = 64
@@ -1022,6 +1026,7 @@ object FDetails: TFDetails
           LabelSpacing = 1
           ReadOnly = True
           TabOrder = 10
+          OnChange = Lblv2Change
         end
         object Lblv2Artist: TEdit
           Left = 64
@@ -1030,6 +1035,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 0
+          OnChange = Lblv2Change
         end
         object Lblv2Titel: TEdit
           Left = 64
@@ -1038,6 +1044,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 1
+          OnChange = Lblv2Change
         end
         object Lblv2Album: TEdit
           Left = 64
@@ -1046,6 +1053,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 2
+          OnChange = Lblv2Change
         end
         object Lblv2Year: TEdit
           Left = 264
@@ -1063,6 +1071,7 @@ object FDetails: TFDetails
           Height = 21
           ReadOnly = True
           TabOrder = 3
+          OnChange = Lblv2Change
         end
         object Lblv2Track: TEdit
           Left = 336
@@ -1087,10 +1096,6 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 8
         Top = 0
@@ -1202,7 +1207,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbPicturesChange
         end
@@ -1211,10 +1216,6 @@ object FDetails: TFDetails
     object Tab_ExtendedID3v2: TTabSheet
       Caption = 'More'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Mpeg: TGroupBox
         Left = 8
         Top = 8

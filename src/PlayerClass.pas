@@ -1870,8 +1870,8 @@ end;
 Procedure TNempPlayer.SetSamplerateFactor(Value: Single);
 begin
       if fIsURLStream then exit;
-      if Value > 1.33 then Value := 1.33;
-      if Value < 0.67 then Value := 0.67;
+      if Value > 1.66 then Value := 1.66;
+      if Value < 0.33 then Value := 0.33;
       fSamplerateFaktor := Value;
 
       if MainStreamIsTempoStream then

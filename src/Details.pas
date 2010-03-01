@@ -278,6 +278,9 @@ type
     procedure BtnLyricWikiClick(Sender: TObject);
     procedure BtnLyricWikiManualClick(Sender: TObject);
     procedure ReloadTimerTimer(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure Lblv1Change(Sender: TObject);
+    procedure Lblv2Change(Sender: TObject);
 
   private
     Coverpfade : TStringList;
@@ -296,6 +299,10 @@ type
     ID3v1Activated: Boolean;
     ID3v2Activated: Boolean;
     ActualRating: Integer;
+    PictureHasChanged: Boolean;
+    ID3v1HasChanged: Boolean;
+    ID3v2HasChanged: Boolean;
+
 
     DetailRatingHelper: TRatingHelper;
 
@@ -316,6 +323,8 @@ type
     // Dieses in der MedienBib suchen und aktualisieren
     procedure SearchAndUpdateFileInMB;
 
+    function CurrentFileHasBeenChanged: Boolean;
+
   public
     ID3v2Tag: TID3V2Tag; // wird in NewPicture benötigt
     AktuellesAudioFile : TAudioFile;
@@ -331,6 +340,21 @@ implementation
 Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass;
 
 {$R *.dfm}
+
+procedure TFDetails.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+    if CurrentFileHasBeenChanged then
+    begin
+        case MessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
+          mrYes   : begin
+                BtnApply.Click;   // save Changes
+                CanClose := True;
+          end;
+          mrNo    : CanClose := True;
+          mrAbort : CanClose := False;             // Abort showing Details
+        end;
+    end;
+end;
 
 procedure TFDetails.FormCreate(Sender: TObject);
 var i:integer;
@@ -388,6 +412,7 @@ end;
 procedure TFDetails.FormHide(Sender: TObject);
 begin
     Nemp_MainForm.AutoShowDetailsTMP := False;
+    AktuellesAudioFile := Nil;
 end;
 
 {
@@ -422,6 +447,10 @@ begin
   // Do Not GetAudioData on Non-mp3-Files here!
   if Not ValidMP3File then
       Exit;
+
+  PictureHasChanged := False;
+  ID3v1HasChanged := False;
+  ID3v2HasChanged := False;
 
   if Nemp_MainForm.NempOptions.DenyID3Edit then
   begin
@@ -624,6 +653,7 @@ procedure TFDetails.CoverIMAGEDblClick(Sender: TObject);
 begin
   ShellExecute(Handle, 'open', PChar(Coverpfade[Coverbox.itemindex]), nil, nil, SW_SHOWNORMAl)
 end;
+
 procedure TFDetails.CoverBoxChange(Sender: TObject);
 begin
   if Coverbox.itemindex < Coverpfade.Count then
@@ -985,9 +1015,15 @@ end;
     - Live-Checking for valid inputs
     --------------------------------------------------------
 }
+procedure TFDetails.Lblv2Change(Sender: TObject);
+begin
+    ID3v2HasChanged := True;
+end;
+
 procedure TFDetails.Lblv2TrackChange(Sender: TObject);
 begin
   if NOT Lblv2Artist.ReadOnly then
+  begin
     if (Sender as TEdit).Modified then
     begin
       if IsValidV2TrackString(Lblv2Track.Text) then
@@ -995,10 +1031,18 @@ begin
       else
         Lblv2Track.Font.Color := clred;
     end;
+    ID3v2HasChanged := True;
+  end;
 end;
+procedure TFDetails.Lblv1Change(Sender: TObject);
+begin
+  ID3v1HasChanged := True;
+end;
+
 procedure TFDetails.Lblv1TrackChange(Sender: TObject);
 begin
   if NOT Lblv1Artist.ReadOnly then
+  begin
     if (Sender as TEdit).Modified then
     begin
       if IsValidV1TrackString(Lblv1Track.Text) then
@@ -1006,10 +1050,13 @@ begin
       else
         Lblv1Track.Font.Color := clred;
     end;
+    ID3v1HasChanged := True;
+  end;
 end;
 procedure TFDetails.Lblv1YearChange(Sender: TObject);
 begin
   if NOT Lblv1Artist.ReadOnly then
+  begin
     if (Sender as TEdit).Modified then
     begin
       if IsValidYearString(Lblv1Year.Text)
@@ -1018,10 +1065,13 @@ begin
       else
         Lblv1Year.Font.Color := clRed;
     end;
+    ID3v1HasChanged := True;
+  end;
 end;
 procedure TFDetails.Lblv2YearChange(Sender: TObject);
 begin
   if NOT Lblv2Artist.ReadOnly then
+  begin
     if (Sender as TEdit).Modified then
     begin
       if IsValidYearString(Lblv2Year.Text)
@@ -1030,6 +1080,8 @@ begin
       else
         Lblv2Year.Font.Color := clRed;
     end;
+    ID3v2HasChanged := True;
+  end;
 end;
 
 {
@@ -1541,6 +1593,18 @@ end;
 }
 procedure TFDetails.ShowDetails(AudioFile:TAudioFile; Source: Integer = SD_MEDIENBIB);
 begin
+
+
+  // Hier auch die Abfrage zum Speichern rein
+  if CurrentFileHasBeenChanged then
+  begin
+      case MessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
+        mrYes   : BtnApply.Click;   // save Changes
+        mrNo    : ;                 // Nothing to do
+        mrAbort : Exit;             // Abort showing Details
+      end;
+  end;
+
   if Source <> -1 then
     fFilefromMedienBib := Source = SD_MedienBib;
 
@@ -1616,6 +1680,10 @@ begin
   UpdateID3v2EnabledStatus;
   ShowID3v1Details;
   ShowID3v2Details;
+
+  PictureHasChanged := False;
+  ID3v1HasChanged := False;
+  ID3v2HasChanged := False;
 end;
 
 
@@ -1708,7 +1776,9 @@ procedure TFDetails.Btn_NewPictureClick(Sender: TObject);
 begin
   if Not Assigned(FNewPicture) then
     Application.CreateForm(TFNewPicture, FNewPicture);
-  FNewPicture.Showmodal;
+
+  if FNewPicture.Showmodal = MROK then
+      PictureHasChanged := True;
 
   ShowPictures;
 end;
@@ -1911,6 +1981,46 @@ begin
     end;
 end;
 
+
+function TFDetails.CurrentFileHasBeenChanged: Boolean;
+begin
+    result := False;
+    if Not assigned(aktuellesAudioFile) then
+        exit; // no current AudioFile, no changes.
+
+    if not ValidMp3File then
+        exit;                 // we can't edit non-mp3-Files here
+
+    // aktuellesAudiofile is not NIL here.
+    if (Id3v1Tag.Exists <> CBID3v1.Checked)
+        or (Id3v2Tag.Exists <> CBID3v2.Checked)
+    then
+    begin
+        result := True;     // User changed existance of the ID3Tags
+        exit;
+    end;
+
+    if (Id3v1Tag.Exists) and (CBID3v1.Checked)  // ID3v1Tag exists
+        and ID3v1HasChanged                     // and changed
+    then
+    begin
+        result := True;
+        exit;
+    end;
+
+    if (Id3v2Tag.Exists) and (CBID3v2.Checked)  // ID3v2Tag exists
+        and
+        (
+          ID3v2HasChanged                      // and changed
+          or PictureHasChanged
+          or(ActualRating <> AktuellesAudioFile.Rating)
+        )
+    then
+    begin
+        result := True;
+        exit;
+    end;
+end;
 
 
 end.
