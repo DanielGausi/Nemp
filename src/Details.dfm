@@ -11,7 +11,6 @@ object FDetails: TFDetails
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  FormStyle = fsStayOnTop
   KeyPreview = True
   OldCreateOrder = False
   Position = poMainFormCenter
@@ -1562,7 +1561,7 @@ object FDetails: TFDetails
       end
     end
   end
-  object CB_StayOnTop: TCheckBox
+  object ___CB_StayOnTop: TCheckBox
     Left = 16
     Top = 480
     Width = 169
@@ -1571,7 +1570,7 @@ object FDetails: TFDetails
     Checked = True
     State = cbChecked
     TabOrder = 2
-    OnClick = CB_StayOnTopClick
+    Visible = False
   end
   object BtnApply: TButton
     Left = 392
