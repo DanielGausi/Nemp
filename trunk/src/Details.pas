@@ -70,7 +70,7 @@ type
     CoverIMAGE: TImage;
     Btn_OpenImage: TButton;
     Tab_MpegInformation: TTabSheet;
-    CB_StayOnTop: TCheckBox;
+    ___CB_StayOnTop: TCheckBox;
     GrpBox_ID3v1: TGroupBox;
     GrpBox_ID3v2: TGroupBox;
     Btn_Properties: TButton;
@@ -212,7 +212,7 @@ type
     procedure BtnApplyClick(Sender: TObject);
     procedure BtnUndoClick(Sender: TObject);
     procedure Btn_CloseClick(Sender: TObject);
-    procedure CB_StayOnTopClick(Sender: TObject);
+////    procedure ___CB_StayOnTopClick(Sender: TObject);
 
     // Some EventHandler for page 1
     procedure Btn_ExploreClick(Sender: TObject);
@@ -520,13 +520,15 @@ procedure TFDetails.Btn_CloseClick(Sender: TObject);
 begin
     hide;
 end;
-procedure TFDetails.CB_StayOnTopClick(Sender: TObject);
+(*
+procedure TFDetails.___CB_StayOnTopClick(Sender: TObject);
 begin
   if CB_StayOnTop.Checked then
     SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE)
   else
     SetWindowPos(FDetails.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;
+*)
 
 {
     --------------------------------------------------------
@@ -1604,6 +1606,8 @@ begin
         mrAbort : Exit;             // Abort showing Details
       end;
   end;
+
+  SetForeGroundWindow(Handle);
 
   if Source <> -1 then
     fFilefromMedienBib := Source = SD_MedienBib;

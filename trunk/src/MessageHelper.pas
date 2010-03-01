@@ -628,8 +628,6 @@ begin
 
         MB_StartAutoScanDirs: begin
             ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-            fspTaskbarManager.ProgressValue := 0;
-            fspTaskbarManager.ProgressState := fstpsIndeterminate;
 
             for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
             begin
@@ -640,6 +638,8 @@ begin
             end;
             if MedienBib.ST_Ordnerlist.Count > 0 then
             begin
+                fspTaskbarManager.ProgressValue := 0;
+                fspTaskbarManager.ProgressState := fstpsIndeterminate;
                 MedienBib.StatusBibUpdate := 1;
                 BlockeMedienListeUpdate(True);
                 ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);

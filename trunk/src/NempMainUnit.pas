@@ -6390,8 +6390,8 @@ begin
     AutoShowDetailsTMP := True;
     AktualisiereDetailForm(AudioFile, SD_Playlist);
 
-    if assigned(FDetails) then // sollte aber hier immer so sein ;-)
-      SetWindowPos(FDetails.Handle,HWND_TOP,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+    //if assigned(FDetails) then // sollte aber hier immer so sein ;-)
+    //  SetWindowPos(FDetails.Handle,HWND_TOP,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 
     if not (FileExists(AudioFile.Pfad) OR AudioFile.isStream) then
     begin
@@ -9739,8 +9739,8 @@ begin
     SetWindowPos(Nemp_MainForm.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 
     // ggf. das Detailfenster nach oben holen
-    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
-      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+//    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
+//      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
   end
   else
   begin
@@ -9748,8 +9748,8 @@ begin
     SetWindowPos(Nemp_MainForm.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 
     // ggf. das Detailfenster nach oben holen
-    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
-      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+//    if assigned(FDetails) and FDetails.CB_StayOnTop.Checked then
+//      SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
   end;
 
   if assigned(PlaylistForm) and PlaylistForm.Visible then
