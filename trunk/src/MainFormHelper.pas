@@ -218,7 +218,7 @@ begin
         whole := sqr(middle - SampleRateShape.Left);
 
         if NempPlayer.Speed > 1 then
-          SampleRateButton.Left := middle + Round(sqrt((NempPlayer.Speed - 1) * 3/2 * whole))
+          SampleRateButton.Left := middle + Round(sqrt((NempPlayer.Speed - 1) / 2 * whole))
         else
           SampleRateButton.Left := middle - Round(sqrt((1 - NempPlayer.Speed) * 3/2 * whole));
         SampleRateLBL.Caption := inttostr(Round(NempPlayer.Speed * 100)) + '%';
@@ -235,7 +235,7 @@ begin
       if SampleRateButton.Left < middle then
         result := sqr(SampleRateButton.Left - middle) * 0.66 / (-whole) + 1
       else
-        result := sqr(SampleRateButton.Left - middle) * 0.66 / whole + 1;
+        result := sqr(SampleRateButton.Left - middle) * 2 / whole + 1;
   end;
 end;
 
