@@ -105,6 +105,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure ClearShortCuts;
     procedure SetShortCuts;
 
+    // Select all files with the same path as MedienBib.CurrentAudioFile
+    function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
 
 
 implementation
@@ -1139,6 +1141,30 @@ begin
         PM_ML_HideSelected.ShortCut := 46;             // Entf
         PM_ML_CopyToClipboard.ShortCut := 16451;       // Strg + C
         PM_ML_PasteFromClipboard.ShortCut := 16470;    // Strg + V
+    end;
+end;
+
+function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
+var bibFile: TAudioFile;
+begin
+    result := False;
+    // 1. Add currentfile itself
+    Target.Add(Original);
+    // 2. Add files from the Playlist
+    NempPlaylist.CollectFilesWithSameFilename(Original.Pfad, Target);
+    // 3. Add File from the library (if possible)
+    // !!! this must be the last one in the list (see keymatching-test in the calling method)
+    if (MedienBib.StatusBibUpdate > 0) then
+        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
+    else
+    begin
+        bibFile := MedienBib.GetAudioFileWithFilename(Original.Pfad);
+        if assigned(bibFile) then
+        begin
+            Target.Add(bibFile);
+            result := True;
+        end else
+            result := False;
     end;
 end;
 

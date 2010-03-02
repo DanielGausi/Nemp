@@ -1060,7 +1060,7 @@ type
     procedure PlaylistVSTCollapsAndExpanded(Sender: TBaseVirtualTree;
       Node: PVirtualNode);
 
-    procedure AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
+    procedure AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
     procedure TNAMenuPopup(Sender: TObject);
     Procedure TNA_PlaylistClick(Sender: TObject);
     procedure BirthdayTimerTimer(Sender: TObject);
@@ -4111,7 +4111,7 @@ begin
     AudioFile := Data^.FAudioFile as TAudiofile;
     AutoShowDetailsTMP := True;
 
-    AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
+    AktualisiereDetailForm(AudioFile, SD_MEDIENBIB, True);
 
     if not FileExists(AudioFile.Pfad) then
     begin
@@ -4699,8 +4699,6 @@ begin
   MedienListeStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCount), [c] )
                                   + SizeToString(groesse)
                                   + SekToZeitString(dauer);
-
-
   aNode := VST.FocusedNode;
   if Assigned(aNode) then
   begin
@@ -4719,14 +4717,6 @@ begin
       ShowVSTDetails(AudioFile);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
 
-
-
-    {  aNode := AddVDTCover(VDTCover, Nil, AudioFile);
-      if VDTCover.Height - Integer(VDTCover.Header.Height) < 240 then
-          aNode.NodeHeight := VDTCover.Height - Integer(VDTCover.Header.Height)
-      else
-          aNode.NodeHeight := 240;
-}
       VDTCoverTimer.Enabled := True;
   end
 end;
@@ -4853,15 +4843,42 @@ end;
 
 procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var ListOfFiles: TObjectList;
+    bibFile: TAudioFile;
+    i: Integer;
 begin
     if Button = mbLeft  then
         if Assigned(MedienBib.CurrentAudioFile) then
         begin
-            MedienBib.CurrentAudioFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
-            MedienBib.Changed := True;
-            // Set this rating in all copies of the file in the Playlist
-            NempPlaylist.UnifyRating(MedienBib.CurrentAudioFile.Pfad, MedienBib.CurrentAudioFile.Rating);
+              ListOfFiles := TObjectList.Create(False);
+              try
+                GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+                for i := 0 to ListOfFiles.Count - 1 do
+                begin
+                    // recycle var bibfile here
+                    bibFile := TAudioFile(ListOfFiles[i]);
+                    bibFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+                end;
+
+                MedienBib.CurrentAudioFile.QuickUpdateTag;
+                MedienBib.Changed := True;
+              finally
+                  ListOfFiles.Free;
+              end;
+              // Check for Player.MainaudioFile
+              if assigned(NempPlayer.MainAudioFile)
+                  and (NempPlayer.MainAudioFile.Pfad = MedienBib.CurrentAudioFile.Pfad)
+              then
+              begin
+                  // Note: PlayBibFile works with a copy, so we have to set the rating there as well
+                  NempPlayer.MainAudioFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+                  Spectrum.DrawRating(bibFile.Rating);
+              end;
+
             VST.Invalidate;
+            // Show Deatils, ..
+            //if AutoShowDetailsTMP and assigned(FDetails) then
+            //    FDetails.ReloadTimer.Enabled := True;
         end;
 end;
 
@@ -4982,6 +4999,10 @@ begin
     ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
 end;
 procedure TNemp_MainForm.EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
+var ListOfFiles: TObjectList;
+    bibFile: TAudioFile;
+    i: Integer;
+    BibFileInList: Boolean;
 begin
     case Ord(key) of
         VK_Escape: begin
@@ -4991,17 +5012,59 @@ begin
         VK_RETURN: begin
               if Assigned(MedienBib.CurrentAudioFile) then
               begin
-                  case (Sender as TControl).Tag of
-                      0: MedienBib.CurrentAudioFile.Artist := EdtBibArtist.Text;
-                      1: MedienBib.CurrentAudioFile.Titel  := EdtBibTitle.Text;
-                      2: MedienBib.CurrentAudioFile.Album  := EdtBibAlbum.Text;
-                      3: MedienBib.CurrentAudioFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
-                      4: MedienBib.CurrentAudioFile.Year   := EdtBibYear.Text;
-                      5: MedienBib.CurrentAudioFile.Genre  := EdtBibGenre.Text;
+                  // Generate a List of Files which should be updated now
+                  ListOfFiles := TObjectList.Create(False);
+                  try
+                      BibFileInList := GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+
+                      // add MainAudioFile (note: PlayBibfile works with a copy!)
+                      if assigned(NempPlayer.MainAudioFile)
+                          and (NempPlayer.MainAudioFile.Pfad = MedienBib.CurrentAudioFile.Pfad)
+                      then
+                          ListOfFiles.Insert(0, NempPlayer.MainAudioFile);
+                          // insert, not add, as we check the last one(a file from the bib) for keys
+
+                      for i := 0 to ListOfFiles.Count - 1 do
+                      begin
+                          // recycle var bibfile here
+                          bibFile := TAudioFile(ListOfFiles[i]);
+                          // set the matching property of the files
+                          case (Sender as TControl).Tag of
+                              0: bibFile.Artist := EdtBibArtist.Text;
+                              1: bibFile.Titel  := EdtBibTitle.Text;
+                              2: bibFile.Album  := EdtBibAlbum.Text;
+                              3: bibFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
+                              4: bibFile.Year   := EdtBibYear.Text;
+                              5: bibFile.Genre  := EdtBibGenre.Text;
+                          end;
+
+                          // Check, whether keys are still ok
+                          if BibFileInList and (i = ListOfFiles.Count - 1) then
+                              if Not MedienBib.ValidKeys(bibfile) then
+                                  SetBrowseTabWarning(True);
+                      end;
+                  finally
+                      ListOfFiles.Free;
                   end;
+
+                  // Check for Player.MainFile
+                  if assigned(NempPlayer.MainAudioFile)
+                          and (NempPlayer.MainAudioFile.Pfad = MedienBib.CurrentAudioFile.Pfad)
+                  then
+                  begin
+                      ShowPlayerDetails(NempPlayer.MainAudioFile);
+                      NempPlayer.RefreshPlayingTitel;
+                      Application.Title := NempPlayer.GenerateTaskbarTitel;
+                  end;
+
+                  // write Data to file
+                  MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+                  // Show Deatils, ..
+                  //if AutoShowDetailsTMP and assigned(FDetails) then
+                  //    FDetails.ReloadTimer.Enabled := True;
                   FillBibDetailLabels(MedienBib.CurrentAudioFile);
                   MedienBib.Changed := True;
-                  NempPlaylist.UnifyRating(MedienBib.CurrentAudioFile.Pfad, MedienBib.CurrentAudioFile.Rating);
+                  PlaylistVST.Invalidate;
                   VST.Invalidate;
               end;
               key := #0;
@@ -6192,6 +6255,10 @@ begin
                         MedienBib.Changed := True;
                         // tell the postprocessor "already done. :D"
                         NempPlayer.PostProcessor.ManualRating := True;
+                        // Draw Rating in VST
+                        VST.Invalidate;
+                        // Draw Rating in VST-Details
+                        ImgBibRatingMouseLeave(ImgBibRating);
                     end else
                         MessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
                 end;
@@ -6388,7 +6455,7 @@ begin
     Data := PlaylistVST.GetNodeData(Node);
     AudioFile := Data^.FAudioFile;
     AutoShowDetailsTMP := True;
-    AktualisiereDetailForm(AudioFile, SD_Playlist);
+    AktualisiereDetailForm(AudioFile, SD_Playlist, True);
 
     //if assigned(FDetails) then // sollte aber hier immer so sein ;-)
     //  SetWindowPos(FDetails.Handle,HWND_TOP,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
@@ -6445,6 +6512,7 @@ begin
 
   Data := PlaylistVST.GetNodeData(aNode);
   AudioFile := Data^.FAudioFile;
+  ShowVSTDetails(AudioFile);
   AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
 end;
 
@@ -6499,7 +6567,7 @@ procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
 begin
   if NempPlaylist.PlayingFile = Nil then Exit;
   AutoShowDetailsTMP := True;
-  AktualisiereDetailForm(NempPlaylist.PlayingFile, SD_PLAYLIST);
+  AktualisiereDetailForm(NempPlaylist.PlayingFile, SD_PLAYLIST, True);
 end;
 
 procedure TNemp_MainForm.PlaylistVSTKeyDown(Sender: TObject; var Key: Word;
@@ -9666,10 +9734,12 @@ begin
 
                 af.SetAudioData(SAD_BOTH);
 
-                if AutoShowDetailsTMP and assigned(FDetails) then
-                    FDetails.ReloadTimer.Enabled := True;
+                //if AutoShowDetailsTMP and assigned(FDetails) then
+                //    FDetails.ReloadTimer.Enabled := True;
                     // Note: a call of AktualisiereDetailForm(af, SD_MEDIENBIB); here
                     //       will produce some strange AVs here - so we do it quick&dirty with a timer
+                // Note 2: With the new "save-Changes"-Query we should NOT actualise the
+                // detailform automatically here.
             end
             else
                 MessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
@@ -9962,13 +10032,15 @@ begin
 end;
 
 
-procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
+procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
 begin
   if AutoShowDetailsTMP then
   begin
     if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);
     FDetails.ShowDetails(aAudioFile, Source);
+    if ForeGround then
+        SetForeGroundWindow(FDetails.Handle);
   end;
 end;
 
