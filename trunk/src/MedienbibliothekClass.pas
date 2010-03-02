@@ -393,7 +393,10 @@ type
 
         // The Currently selected File in the Treeview.
         // used for editing-stuff in the detail-panel besides the tree
+        // Note: This File is not necessary in thje library. It can be just in
+        // the playlist! Or one entry in a Library-Playlist.
         CurrentAudioFile: TAudioFile;
+
 
         NewCoverFlow: TNempCoverFlow;
 

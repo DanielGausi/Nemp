@@ -1607,7 +1607,6 @@ begin
       end;
   end;
 
-  SetForeGroundWindow(Handle);
 
   if Source <> -1 then
     fFilefromMedienBib := Source = SD_MedienBib;

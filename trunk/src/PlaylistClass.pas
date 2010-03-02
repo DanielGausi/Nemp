@@ -259,6 +259,8 @@ type
       // changed in the whole playlist. (It could be multiply times in the playlist!)
       procedure UnifyRating(aFilename: String; aRating: Byte);
 
+      procedure CollectFilesWithSameFilename(aFilename: String; Target: TObjectList);
+
       // Search the Playlist for an ID. Used by Nemp Webserver
       // The links in the html-code will contain these IDs, so they will be valid
       // until the "real" Nemp-User deletes a file from the playlist.
@@ -785,6 +787,7 @@ begin
     fDauer := ShowPlayListSummary;
     SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
 end;
+
 
 procedure TNempPlaylist.DeleteDeadFiles;
 var i: Integer;
@@ -1753,6 +1756,19 @@ begin
             af.Rating := aRating;
         if af = Player.MainAudioFile then
             Spectrum.DrawRating(af.Rating);
+    end;
+end;
+
+procedure TNempPlaylist.CollectFilesWithSameFilename(aFilename: String;
+  Target: TObjectList);
+var i: Integer;
+    af: TAudioFile;
+begin
+    for i := 0 to Playlist.Count - 1 do
+    begin
+        af := TAudioFile(Playlist[i]);
+        if af.Pfad = aFilename then
+            Target.Add(af);
     end;
 end;
 
