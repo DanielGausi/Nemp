@@ -107,6 +107,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     // Select all files with the same path as MedienBib.CurrentAudioFile
     function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
+    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
 
 
 implementation
@@ -1144,15 +1145,50 @@ begin
     end;
 end;
 
+{
+    GetListOfAudioFileCopies
+    Collect all Files ithin the Nemp-Universe with the same filename.
+    These files must be updated when the user edits a file
+    ( in the tree, in the detail-listing within the mainform, in the detailform
+      or just the Player-rating )
+
+    !!! Important Note !!!
+    Use this function only in VCL-Thread and only after a test for
+     - Medienbib.status <= 1  (searching for new files or GetTags should be ok)
+       and MedienBib.CurrentThreadFilename
+}
 function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
 var bibFile: TAudioFile;
+    originalPath: String;
+
+      function NeededFile(af: TAudioFile): boolean;
+      begin
+          result := assigned(af) and (af.Pfad = originalPath);
+      end;
+
 begin
     result := False;
-    // 1. Add currentfile itself
+    originalPath := Original.Pfad;
+
+    // 1. Add Original itself
     Target.Add(Original);
-    // 2. Add files from the Playlist
+
+    // 2. The Player-File
+    if NeededFile(NempPlayer.MainAudioFile) then
+        Target.Add(NempPlayer.MainAudioFile);
+
+    // 3. The Detailform-File
+    if assigned(fDetails) and NeededFile(fDetails.AktuellesAudioFile) then
+        Target.Add(fDetails.AktuellesAudioFile);
+
+    // 4. The "currentfile" from the library (this is the one displayed in the VST-Details)
+    if NeededFile(Medienbib.CurrentAudioFile) then
+        Target.Add(MedienBib.CurrentAudioFile);
+
+    // 5. Add files from the Playlist
     NempPlaylist.CollectFilesWithSameFilename(Original.Pfad, Target);
-    // 3. Add File from the library (if possible)
+
+    // 4. Add File from the library (if possible)
     // !!! this must be the last one in the list (see keymatching-test in the calling method)
     if (MedienBib.StatusBibUpdate > 0) then
         MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
@@ -1166,6 +1202,26 @@ begin
         end else
             result := False;
     end;
+end;
+{
+    CorrectVCLAfterAudioFileEdit
+    After a File has been edited (and all of its copies)
+    The GUI has to be updated:
+        Player (Rating)
+        VST-Details
+        VST
+        PlaylistVST
+        Detailform
+}
+procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
+begin
+// to do: if Player.MainAudioFile.pfad = aFile.Pfad then ...
+
+// usw.
+
+// außerdem: hiernochmal  MedienBib.GetAudioFileWithFilename zur Überprüfung, ob keys noch valid sind
+
+// im FDetails.reloadTimer eine zusatz-Variable setzen, die das aktualisieren ohne Sicherheitabfrage erzwingt?
 end;
 
 

@@ -5070,6 +5070,9 @@ begin
 
 
                   Testen auf ThreadFileName  !!!!
+
+
+
                   // write Data to file
                   MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
                   // Show Deatils, ..
