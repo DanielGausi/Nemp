@@ -4860,6 +4860,8 @@ begin
                     bibFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                 end;
 
+                Status <= 1, ThreadFilename
+
                 MedienBib.CurrentAudioFile.QuickUpdateTag;
                 MedienBib.Changed := True;
               finally
@@ -5012,6 +5014,15 @@ begin
         VK_RETURN: begin
               if Assigned(MedienBib.CurrentAudioFile) then
               begin
+
+
+
+
+              Das alles nur machen, wenn BibStatus <= 1 !!!!
+
+
+
+
                   // Generate a List of Files which should be updated now
                   ListOfFiles := TObjectList.Create(False);
                   try
@@ -5057,6 +5068,8 @@ begin
                       Application.Title := NempPlayer.GenerateTaskbarTitel;
                   end;
 
+
+                  Testen auf ThreadFileName  !!!!
                   // write Data to file
                   MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
                   // Show Deatils, ..
@@ -9733,7 +9746,6 @@ begin
                 // Data of the af was set in VSTNewText or TRatingEditLink.EndEdit
 
                 af.SetAudioData(SAD_BOTH);
-
                 //if AutoShowDetailsTMP and assigned(FDetails) then
                 //    FDetails.ReloadTimer.Enabled := True;
                     // Note: a call of AktualisiereDetailForm(af, SD_MEDIENBIB); here
