@@ -115,7 +115,8 @@ implementation
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details, HeadsetControl,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
-    Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr;
+    Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
+    spectrum_vis;
 
 procedure CorrectVolButton;
 begin
@@ -1214,14 +1215,45 @@ end;
         Detailform
 }
 procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
+var OriginalPath: String;
+    bibFile: TAudioFile;
+
+      function SameFile(af: TAudioFile): boolean;
+      begin
+          result := assigned(af) and (af.Pfad = originalPath);
+      end;
+
 begin
-// to do: if Player.MainAudioFile.pfad = aFile.Pfad then ...
+    OriginalPath := aFile.Pfad;
 
-// usw.
+    Nemp_MainForm.PlaylistVST.Invalidate;
+    Nemp_MainForm.Vst.Invalidate;
 
-// außerdem: hiernochmal  MedienBib.GetAudioFileWithFilename zur Überprüfung, ob keys noch valid sind
+    // Actualise Player (Rating, Title, Taskbar)
+    if SameFile(NempPlayer.MainAudioFile) then
+    begin
+        Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
+        NempPlayer.RefreshPlayingTitel;
+        Application.Title := NempPlayer.GenerateTaskbarTitel;
 
-// im FDetails.reloadTimer eine zusatz-Variable setzen, die das aktualisieren ohne Sicherheitabfrage erzwingt?
+        Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
+    end;
+    // ... VST-Details
+    if SameFile(MedienBib.CurrentAudioFile) then
+        Nemp_MainForm.ShowVSTDetails(MedienBib.CurrentAudioFile);
+    // ... Detail-Form
+    if assigned(fDetails)
+        and Nemp_MainForm.AutoShowDetailsTMP
+        and SameFile(fDetails.AktuellesAudioFile)
+    then
+        FDetails.ReloadTimer.Enabled := True;
+    // TabWarning
+    bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
+    if SameFile(bibFile) then
+    begin
+        if Not MedienBib.ValidKeys(bibFile) then
+            Nemp_MainForm.SetBrowseTabWarning(True);
+    end;
 end;
 
 

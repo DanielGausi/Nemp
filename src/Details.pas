@@ -303,6 +303,9 @@ type
     ID3v1HasChanged: Boolean;
     ID3v2HasChanged: Boolean;
 
+    // ForceChange: ShowDetails without showing a "Do you want to save..."-Message
+    fForceChange: Boolean;
+
 
     DetailRatingHelper: TRatingHelper;
 
@@ -362,6 +365,7 @@ var i:integer;
     baseDir: String;
 begin
   PictureFrames := Nil;
+  fForceChange := False;
   TranslateComponent (self);
   Coverpfade := TStringList.Create;
   ID3v2Tag:=TID3V2Tag.Create;
@@ -723,11 +727,13 @@ end;
 }
 procedure TFDetails.ReloadTimerTimer(Sender: TObject);
 begin
+    fForceChange := True;
     ReloadTimer.Enabled := False;
     if fFilefromMedienBib then
         ShowDetails(AktuellesAudioFile, SD_MedienBib)
     else
         ShowDetails(AktuellesAudioFile, SD_PLAYLIST);
+    fForceChange := False;
 end;
 
 {
@@ -1598,7 +1604,7 @@ begin
 
 
   // Hier auch die Abfrage zum Speichern rein
-  if CurrentFileHasBeenChanged then
+  if (not fForceChange) and CurrentFileHasBeenChanged then
   begin
       case MessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
         mrYes   : BtnApply.Click;   // save Changes
