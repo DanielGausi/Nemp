@@ -1235,18 +1235,23 @@ begin
         Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
         NempPlayer.RefreshPlayingTitel;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
-
         Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
     end;
+
     // ... VST-Details
     if SameFile(MedienBib.CurrentAudioFile) then
         Nemp_MainForm.ShowVSTDetails(MedienBib.CurrentAudioFile);
+
     // ... Detail-Form
     if assigned(fDetails)
         and Nemp_MainForm.AutoShowDetailsTMP
         and SameFile(fDetails.AktuellesAudioFile)
     then
+        // Note: a call of AktualisiereDetailForm(af, SD_MEDIENBIB)
+        //       will produce some strange AVs here - so we do it quick&dirty with a timer
+        //       (Probably some issues with VST.Edited and stuff. Don't know.)
         FDetails.ReloadTimer.Enabled := True;
+
     // TabWarning
     bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
     if SameFile(bibFile) then

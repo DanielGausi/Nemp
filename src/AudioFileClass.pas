@@ -246,7 +246,7 @@ type
 
         // Copy the data from aAudiofile
         procedure Assign(aAudioFile: TAudioFile);
-        // AssignLight: Copy Data, except Lyrics
+        // AssignLight: Copy Data, except Lyrics and RawTagsLastFM
         //   used for the webserver-copy of the MedienBib.
         //   Lyrics are not used in webserver but needs much place
         procedure AssignLight(aAudioFile: TAudioFile);
@@ -532,6 +532,7 @@ begin
     Rating             := aAudioFile.Rating              ;
     PlayCounter        := aAudioFile.PlayCounter         ;
     Pfad               := aAudioFile.Pfad                ;
+    RawTagLastFM       := aAudioFile.RawTagLastFM        ;
 end;
 procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
 begin

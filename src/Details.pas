@@ -340,7 +340,7 @@ var
 
 implementation
 
-Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass;
+Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper;
 
 {$R *.dfm}
 
@@ -445,73 +445,50 @@ end;
     --------------------------------------------------------
 }
 procedure TFDetails.BtnApplyClick(Sender: TObject);
+var ListOfFiles: TObjectList;
+    listFile: TAudioFile;
+    i: Integer;
 begin
 
-  // Do not Change anything in non-mp3-Files here!
-  // Do Not GetAudioData on Non-mp3-Files here!
-  if Not ValidMP3File then
-      Exit;
+    // Do not Change anything in non-mp3-Files here!
+    // Do Not GetAudioData on Non-mp3-Files here!
+    if Not ValidMP3File then
+        Exit;
 
-  PictureHasChanged := False;
-  ID3v1HasChanged := False;
-  ID3v2HasChanged := False;
+    // Note from 04.03.2010: Redo "DenyID3-Edit-stuff" here. - This will have to do something with partymode
 
-  if Nemp_MainForm.NempOptions.DenyID3Edit then
-  begin
-      // nur Bewertung in der Bib ändern
-      AktuellesAudioFile.Rating := ActualRating;
-      Nemp_MainForm.VST.Invalidate;
-  end else
-  begin
-      // Volles Programm - alles Ändern
-      if (MedienBib.StatusBibUpdate > 0) AND fFilefromMedienBib then
-      begin
-        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-        exit;
-      end;
+    PictureHasChanged := False;
+    ID3v1HasChanged := False;
+    ID3v2HasChanged := False;
 
-      if ValidMp3File then
-      begin
+    if assigned(AktuellesAudioFile)
+        and (MedienBib.StatusBibUpdate <= 1)
+        and (MedienBib.CurrentThreadFilename <> AktuellesAudioFile.Pfad)
+    then
+    begin
+        // write Tags to file
         UpdateID3v1InFile;
         UpdateID3v2InFile;
-      end;
-
-      // Bewertung im AudioFile-Objekt setzen
-      // Das wird in GetAudioData ohne Flags bei mp3s nicht verändert!
-      //AktuellesAudioFile.Rating := ActualRating;
-      // ( not necessary any more. We do this ONLY on mp3-Files here,
-      //   and the rating is stored in the ID3-Tag -so we will get it
-      //   by GetAudioData)
-
-      AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
-
-      NempPlaylist.UnifyRating(AktuellesAudioFile.Pfad, AktuellesAudioFile.Rating);
-
-      if fFilefromMedienBib
-          AND (NOT MedienBib.AnzeigeShowsPlaylistFiles)
-          and (NOT MedienBib.ValidKeys(AktuellesAudioFile))
-      then
-      begin
-          Nemp_MainForm.SetBrowseTabWarning(True);
-      end else
-      begin
-          Nemp_MainForm.PlaylistVST.Invalidate;
-          // todo: Andere Anzeigen ändern, falls AktuellesAudioFile = Player.MainAudioFile
-          If AktuellesAudioFile = NempPlayer.MainAudioFile then
-          begin
-              Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
-              NempPlayer.RefreshPlayingTitel;
-              Application.Title := NempPlayer.GenerateTaskbarTitel;
-          end;
-      end;
-
-      if fFilefromMedienBib and (not MedienBib.AnzeigeShowsPlaylistFiles) then
-        MedienBib.Changed := True
-      else
-        SearchAndUpdateFileInMB;
-
-      Nemp_MainForm.VST.Invalidate;
-  end;
+        // get the information again and store them in the audiofile-object
+        AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
+        // Update other copies of this file
+        ListOfFiles := TObjectList.Create(False);
+        try
+            GetListOfAudioFileCopies(AktuellesAudioFile, ListOfFiles);
+            for i := 0 to ListOfFiles.Count - 1 do
+            begin
+                listFile := TAudioFile(ListOfFiles[i]);
+                // copy Data from AktuellesAudioFile to the files in the list.
+                listFile.Assign(AktuellesAudioFile);
+            end;
+        finally
+            ListOfFiles.Free;
+        end;
+        MedienBib.Changed := True;
+        // Correct GUI
+        CorrectVCLAfterAudioFileEdit(AktuellesAudioFile);
+    end else
+        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
@@ -552,29 +529,37 @@ begin
   ShowFileProperties(Nemp_MainForm.Handle, pChar(dateipfad),'');
 end;
 procedure TFDetails.Btn_ActualizeClick(Sender: TObject);
+var ListOfFiles: TObjectList;
+    listFile: TAudioFile;
+    i: Integer;
 begin
-  if (MedienBib.StatusBibUpdate > 0) AND fFilefromMedienBib then
-  begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-    exit;
-  end;
+    if assigned(AktuellesAudioFile)
+        and (MedienBib.StatusBibUpdate <= 1)
+        and (MedienBib.CurrentThreadFilename <> AktuellesAudioFile.Pfad)
+    then
+    begin
+        // Read file information from disk
+        if Fileexists(AktuellesAudioFile.Pfad) then
+            AktuellesAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
 
-  if Fileexists(DateiPfad) then
-    AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
-  ShowDetails(AktuellesAudioFile);
-
-  if fFilefromMedienBib
-      and (not MedienBib.AnzeigeShowsPlaylistFiles)
-      and (not MedienBib.ValidKeys(AktuellesAudioFile))
-  then
-      Nemp_MainForm.SetBrowseTabWarning(True);
-
-  if fFilefromMedienBib and not MedienBib.AnzeigeShowsPlaylistFiles then
-    MedienBib.Changed := True
-  else
-    SearchAndUpdateFileInMB;
-
-  Nemp_MainForm.VST.Invalidate;
+        // Generate a List of Files which should be updated now
+        ListOfFiles := TObjectList.Create(False);
+        try
+            GetListOfAudioFileCopies(AktuellesAudioFile, ListOfFiles);
+            for i := 0 to ListOfFiles.Count - 1 do
+            begin
+                listFile := TAudioFile(ListOfFiles[i]);
+                // copy Data from AktuellesAudioFile to the files in the list.
+                listFile.Assign(AktuellesAudioFile);
+            end;
+        finally
+            ListOfFiles.Free;
+        end;
+        MedienBib.Changed := True;
+        // Correct GUI
+        CorrectVCLAfterAudioFileEdit(AktuellesAudioFile);
+    end else
+        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 
 {
