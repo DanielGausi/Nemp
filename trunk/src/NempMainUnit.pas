@@ -4860,7 +4860,7 @@ begin
                     bibFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                 end;
 
-                Status <= 1, ThreadFilename
+///                Status <= 1, ThreadFilename
 
                 MedienBib.CurrentAudioFile.QuickUpdateTag;
                 MedienBib.Changed := True;
@@ -5018,7 +5018,7 @@ begin
 
 
 
-              Das alles nur machen, wenn BibStatus <= 1 !!!!
+///              Das alles nur machen, wenn BibStatus <= 1 !!!!
 
 
 
@@ -5069,7 +5069,7 @@ begin
                   end;
 
 
-                  Testen auf ThreadFileName  !!!!
+///                  Testen auf ThreadFileName  !!!!
 
 
 
@@ -6543,12 +6543,6 @@ begin
   LblPlayerArtist.Caption := aAudioFile.Artist;
   LblPlayerAlbum.Caption := aAudioFile.Album;
 
-  ///Ordner := ExtractFileDir(aAudioFile.Pfad);
-
-  //Coverbmp := tBitmap.Create;
-  //Coverbmp.Width := CoverImage.Width;
-  //Coverbmp.Height := CoverImage.Width; //ja, quadratisch!
-
   if aAudioFile.CoverID = '' then
       MedienBib.InitCover(aAudioFile);
 
@@ -6559,18 +6553,6 @@ begin
   end else
       CoverImage.Visible := False;
 
-{  // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-  if GetCover(aAudioFile, Coverbmp) then
-  begin
-    CoverImage.Visible := True;
-    CoverImage.Picture.Bitmap.Assign(Coverbmp);
-//    UpdateCoverBtn(CoverBmp);
-
-    CoverImage.Refresh;
-  end else
-    CoverImage.Visible := False;
-  Coverbmp.Free;
-}
   if aAudioFile.Lyrics <> '' then
     LyricsMemo.Text := UTF8ToString(aAudioFile.Lyrics)
   else
