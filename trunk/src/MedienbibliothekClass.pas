@@ -1248,7 +1248,11 @@ begin
           // Classic Browsing: Artist-Album (or whatever the user wanted)
           UpdateList.Sort(Sortieren_String1String2Titel_asc);
           if fBrowseListsNeedUpdate then
+
+           We need Block-READ-access here!!
+
               Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+
           Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
 
           if fBrowseListsNeedUpdate then
