@@ -1247,12 +1247,17 @@ begin
       0: begin
           // Classic Browsing: Artist-Album (or whatever the user wanted)
           UpdateList.Sort(Sortieren_String1String2Titel_asc);
+
           if fBrowseListsNeedUpdate then
+          begin
+              // We need Block-READ-access in this case here!
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
+              // Set the status of the library to Readaccessblocked
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_ReadAccessBlocked);
+          end;
 
-           We need Block-READ-access here!!
-
+          if fBrowseListsNeedUpdate then
               Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-
           Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
 
           if fBrowseListsNeedUpdate then

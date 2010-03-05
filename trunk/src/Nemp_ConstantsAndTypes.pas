@@ -148,7 +148,6 @@ type
 
 
         MiniNempStayOnTop: Boolean;
-        AutoShowDetails: Boolean;
         FullRowSelect: Boolean;
         TippSpeed: Integer;
         NempFormAufteilung: Array [0..1] of TNempFormAufteilung;
@@ -861,8 +860,6 @@ begin
         NempFormAufteilung[1].FormMinWidth  := 0;
         NempFormAufteilung[1].FormMaxWidth  := 0;
 
-        AutoShowDetails := ini.ReadBool('Fenster', 'AutoShowDetails', False);
-
         NempWindowView       := ini.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_TASKBAR_MIN_TRAY);
         ShowDeskbandOnMinimize  := ini.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
         ShowDeskbandOnStart     := ini.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
@@ -972,7 +969,6 @@ begin
         Ini.WriteInteger('Einzelfenster', 'AuswahlSucheHeight', AuswahlForm.Height);
         Ini.WriteInteger('Einzelfenster', 'AuswahlSucheWidth' , AuswahlForm.Width );
 
-        ini.WriteBool('Fenster', 'AutoShowDetails', AutoShowDetails);
         Ini.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
         ini.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
         ini.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);

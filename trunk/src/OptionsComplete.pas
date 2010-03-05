@@ -323,7 +323,6 @@ type
     Btn_ReinitPlayerEngine: TButton;
     GrpBox_Language: TGroupBox;
     cb_Language: TComboBox;
-    cbAutoShowDetails: TCheckBox;
     cb_StayOnTop: TCheckBox;
     CB_IgnoreVolume: TCheckBox;
     CB_AutoCheckNotifyOnBetas: TCheckBox;
@@ -1130,7 +1129,7 @@ begin
   EDTCoverSisterDirName.Text := MedienBib.CoverSearchSisterDirName;
 
   cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
-  cbAutoShowDetails.Checked := Nemp_MainForm.NempOptions.AutoShowDetails;
+
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
 
   cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
@@ -2041,7 +2040,6 @@ begin
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
 
   Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
-  Nemp_MainForm.NempOptions.AutoShowDetails := cbAutoShowDetails.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
@@ -2141,8 +2139,6 @@ begin
   if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);
   FDetails.UpdateID3ReadOnlyStatus;//SetID3EditsWritable(False);
-
-  Nemp_MainForm.AutoShowDetailsTMP := Nemp_MainForm.NempOptions.AutoShowDetails or FDetails.Visible;
 
 
   // Fensterverhalten:
