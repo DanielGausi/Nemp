@@ -87,7 +87,6 @@ type
     BtnRegistryUpdate: TButton;
     TabSystem1: TTabSheet;
     GrpBox_TaskTray: TRadioGroup;
-    LblConst_SpeedNote: TLabel;
     GrpBox_MickyMouse: TRadioGroup;
     GrpBox_Deskband: TGroupBox;
     CBShowDeskbandOnStart: TCheckBox;
@@ -296,12 +295,6 @@ type
     CBAskForAutoAddNewDirs: TCheckBox;
     GrpBox_TabMedia1_Filetypes: TGroupBox;
     LblConst_OnlythefollowingTypes: TLabel;
-    cbIncludeMP1: TCheckBox;
-    cbIncludeMP2: TCheckBox;
-    cbIncludeWMA: TCheckBox;
-    cbIncludeWAV: TCheckBox;
-    cbIncludeOGG: TCheckBox;
-    cbIncludeMP3: TCheckBox;
     cbIncludeAll: TCheckBox;
     GrpBox_ExtendedAudio: TGroupBox;
     LblConst_Buffersize: TLabel;
@@ -457,6 +450,7 @@ type
     CBSkipSortOnLargeLists: TCheckBox;
     CB_RememberInterruptedPlayPosition: TCheckBox;
     LblTaskbarWin7: TLabel;
+    cbIncludeFiles: TCheckListBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -672,11 +666,13 @@ begin
   begin
     CBFileTypes.Items.Add(NempPlayer.ValidExtensions[i]);
     CBFileTypes.Checked[i] := True;
+
+    cbIncludeFiles.Items.Add(NempPlayer.ValidExtensions[i]);
+    cbIncludeFiles.Checked[i] := True;
   end;
 
   for i := 0 to CBPlaylistTypes.Count - 1 do
-    CBPlaylistTypes.Checked[i] := True;
-
+      CBPlaylistTypes.Checked[i] := True;
 
 
   VerlaufBitmap := TBitmap.Create;
@@ -970,6 +966,12 @@ begin
   end;
 
 
+  for i := 0 to CBIncludeFiles.Count - 1 do
+  begin
+      CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
+  end;
+
+
 
   SE_Fade.Value := NempPlayer.FadingInterval;
   SE_SeekFade.Value := NempPlayer.SeekFadingInterval;
@@ -1165,20 +1167,8 @@ begin
   CB_TabStopAtPlayerControls.Checked := Nemp_MainForm.NempOptions.TabStopAtPlayerControls;
   CB_TabStopAtTabs          .Checked := Nemp_MainForm.NempOptions.TabStopAtTabs;
 
-  cbIncludeMP3.Checked := MedienBib.IncludeMP3;
-  cbIncludeOGG.Checked := MedienBib.IncludeOGG;
-  cbIncludeWAV.Checked := MedienBib.IncludeWAV;
-  cbIncludeWMA.Checked := MedienBib.IncludeWMA;
-  cbIncludeMP2.Checked := MedienBib.IncludeMP2;
-  cbIncludeMP1.Checked := MedienBib.IncludeMP1;
   cbIncludeAll.Checked := MedienBib.IncludeAll;
-
-  cbIncludemp3.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludeogg.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludewma.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludemp2.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludemp1.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludewav.Enabled := NOT cbIncludeAll.Checked;
+  cbIncludeFiles.Enabled := NOT cbIncludeAll.Checked;
   LblConst_OnlythefollowingTypes.Enabled := NOT cbIncludeAll.Checked;
 
   CBAutoLoadMediaList.Checked := MedienBib.AutoLoadMediaList;
@@ -1746,13 +1736,7 @@ end;
 
 procedure TOptionsCompleteForm.cbIncludeAllClick(Sender: TObject);
 begin
-  cbIncludemp3.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludeogg.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludewma.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludemp2.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludemp1.Enabled := NOT cbIncludeAll.Checked;
-  cbIncludewav.Enabled := NOT cbIncludeAll.Checked;
-
+  cbIncludeFiles.Enabled := NOT cbIncludeAll.Checked;
   LblConst_OnlythefollowingTypes.Enabled := NOT cbIncludeAll.Checked;
 end;
 
@@ -2125,13 +2109,27 @@ begin
 
   Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
 
-  MedienBib.IncludeMP3 := cbIncludeMP3.Checked;
-  MedienBib.IncludeOGG := cbIncludeOGG.Checked;
-  MedienBib.IncludeWAV := cbIncludeWAV.Checked;
-  MedienBib.IncludeWMA := cbIncludeWMA.Checked;
-  MedienBib.IncludeMP1 := cbIncludeMP1.Checked;
-  MedienBib.IncludeMP2 := cbIncludeMP2.Checked;
   MedienBib.IncludeAll := cbIncludeAll.Checked;
+
+  if Not MedienBib.IncludeAll then
+  begin
+      MedienBib.IncludeFilter := '';
+      for i := 0 to CBIncludeFiles.Count - 1 do
+      begin
+          if CBIncludeFiles.Checked[i] then
+              MedienBib.IncludeFilter := MedienBib.IncludeFilter + ';*' + CBIncludeFiles.Items[i];
+      end;
+      // delete first ';'
+      if (MedienBib.IncludeFilter <> '') AND (MedienBib.IncludeFilter[1] = ';') then
+            MedienBib.IncludeFilter := copy(MedienBib.IncludeFilter, 2, length(MedienBib.IncludeFilter));
+
+      if MedienBib.IncludeFilter = '' then
+          MedienBib.IncludeFilter := '*.mp3'
+  end;
+
+
+//      CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
+
 
   MedienBib.AutoLoadMediaList := CBAutoLoadMediaList.Checked;
   MedienBib.AutoSaveMediaList := CBAutoSaveMediaList.Checked;
