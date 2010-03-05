@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAudio0
+    ActivePage = TabAudio10
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2796,6 +2796,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 401
           Height = 17
+          Hint = 'remove a track from the playlist after it is completely played.'
           Caption = 'Delete completely played tracks from the playlist'
           TabOrder = 1
           OnClick = CB_AutoDeleteFromPlaylistClick
@@ -2805,6 +2806,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 136
           Width = 409
           Height = 17
+          Hint = 'Randomize playlist after the last track.'
           Caption = 'Mix playlist after last track'
           TabOrder = 7
         end
@@ -2813,6 +2815,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 120
           Width = 401
           Height = 17
+          Hint = 
+            'Backup the playlist every 5 minutes. When Nemp crashes, this bac' +
+            'kup will be loaded.'
           Caption = 'Automatically save playlist every 5 minutes'
           TabOrder = 6
         end
@@ -2821,6 +2826,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 401
           Height = 17
+          Hint = 
+            'Read metadata from the audiofiles or just use the data stored in' +
+            ' the playlistfile.'
           Caption = 'Check files on start'
           TabOrder = 0
         end
@@ -2829,6 +2837,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 381
           Height = 17
+          Hint = 'Exceptions for deleting a file from the playlist.'
           Caption = 'Do not delete after manual sliding within the track'
           TabOrder = 2
         end
@@ -2837,6 +2846,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 373
           Height = 17
+          Hint = 'Exceptions for deleting a file from the playlist.'
           Caption = 'Do not delete after pausing the track'
           TabOrder = 3
         end
@@ -2845,6 +2855,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 80
           Width = 389
           Height = 17
+          Hint = 'Exceptions for deleting a file from the playlist.'
           Caption = 'Do not delete after stopping a track'
           TabOrder = 4
         end
@@ -2853,6 +2864,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 96
           Width = 381
           Height = 17
+          Hint = 'Exceptions for deleting a file from the playlist.'
           Caption = 'Do not delete at manual title change'
           TabOrder = 5
         end
@@ -2861,6 +2873,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 152
           Width = 409
           Height = 17
+          Hint = 'When clicking "next", jump to the next cuesheet (if available)'
           Caption = 'Jump to next entry in cuesheet on "next"'
           TabOrder = 8
         end
@@ -2869,6 +2882,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 169
           Width = 409
           Height = 17
+          Hint = 'Used in combination with "Just play focussed file"'
           Caption = 
             'Remember track position when playing a song directly from the li' +
             'brary'
@@ -2880,6 +2894,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 109
         Width = 432
         Height = 77
+        Hint = 
+          'Random playback: Correct "real randomness" by avoiding repetitio' +
+          'ns of the same song.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Random playback'
         TabOrder = 1
@@ -2916,6 +2933,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 432
         Height = 97
+        Hint = 'Default action for files in the library (doubleclick)'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default action for audiofiles'
         ItemIndex = 0
@@ -2948,7 +2966,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 321
           Height = 17
-          Caption = 'Monitor the following directories'
+          Hint = 
+            'Check for new files in your music directories when starting Nemp' +
+            '.'
+          Caption = 'Search the following directories for new files on start'
           TabOrder = 0
           OnClick = CBAutoScanClick
         end
@@ -2975,6 +2996,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 137
           Width = 409
           Height = 17
+          Hint = 'Add new directories to this list'
           Caption = 'Automatically monitor new directories'
           TabOrder = 4
         end
@@ -2983,6 +3005,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 151
           Width = 409
           Height = 17
+          Hint = 
+            'When selecting a new directory: Show query whether it should be ' +
+            'added to this list or not.'
           Caption = 'Show query dialog when adding new directories'
           TabOrder = 5
         end
@@ -3003,7 +3028,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 434
         Height = 177
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Filetypes'
+        Caption = 'Filetypes for the library'
         TabOrder = 1
         object LblConst_OnlythefollowingTypes: TLabel
           Left = 24
@@ -3012,62 +3037,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Caption = 'Only the following types:'
         end
-        object cbIncludeMP1: TCheckBox
-          Left = 24
-          Top = 128
-          Width = 385
-          Height = 17
-          Caption = '*.mp1'
-          TabOrder = 5
-        end
-        object cbIncludeMP2: TCheckBox
-          Left = 24
-          Top = 112
-          Width = 385
-          Height = 17
-          Caption = '*.mp2'
-          TabOrder = 4
-        end
-        object cbIncludeWMA: TCheckBox
-          Left = 24
-          Top = 88
-          Width = 385
-          Height = 17
-          Caption = '*.wma (DRM is not supported!)'
-          TabOrder = 3
-        end
-        object cbIncludeWAV: TCheckBox
-          Left = 24
-          Top = 152
-          Width = 385
-          Height = 17
-          Caption = '*.wav'
-          TabOrder = 6
-        end
-        object cbIncludeOGG: TCheckBox
-          Left = 24
-          Top = 72
-          Width = 377
-          Height = 17
-          Caption = '*.ogg'
-          TabOrder = 2
-        end
-        object cbIncludeMP3: TCheckBox
-          Left = 24
-          Top = 56
-          Width = 385
-          Height = 17
-          Caption = '*.mp3'
-          TabOrder = 1
-        end
         object cbIncludeAll: TCheckBox
           Left = 8
           Top = 16
           Width = 401
           Height = 17
+          Hint = 
+            'When searching for files add everything the player can play or j' +
+            'ust some special types.'
           Caption = 'All types supported by the player'
           TabOrder = 0
           OnClick = cbIncludeAllClick
+        end
+        object cbIncludeFiles: TCheckListBox
+          Left = 20
+          Top = 57
+          Width = 402
+          Height = 111
+          Hint = 'List of supported audio files.'
+          Columns = 4
+          ItemHeight = 13
+          TabOrder = 1
         end
       end
       object GrpBox_TabMedia1_Medialist: TGroupBox
@@ -3091,6 +3081,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 401
           Height = 17
+          Hint = 
+            'When browsing in playlists: Get the meta-data from the included ' +
+            'audiofiles'
           Caption = 'Scan files in playlists'
           TabOrder = 0
         end
@@ -3099,6 +3092,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 401
           Height = 17
+          Hint = 'Always sort the displayed files in the library.'
           Caption = 'Always sort view (slower)'
           TabOrder = 1
           OnClick = CBAlwaysSortAnzeigeListClick
@@ -3108,6 +3102,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 385
           Height = 17
+          Hint = 'Skip this sorting when the list is too large.'
           Caption = 'Skip sort on large lists (> 5000)'
           TabOrder = 3
         end
@@ -3121,13 +3116,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 433
         Height = 322
-        Caption = 'Automatic rating of played audiofiles'
+        Caption = 'Automatic rating/playcounter of played audiofiles'
         TabOrder = 0
         object cb_RatingActive: TCheckBox
           Left = 16
           Top = 24
           Width = 409
           Height = 17
+          Hint = '(De)activate automatic rating/playcounter'
           Caption = 'Active'
           TabOrder = 0
           OnClick = cb_RatingActiveClick
@@ -3137,6 +3133,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 49
           Width = 300
           Height = 17
+          Hint = 'Do not change rating and playcounter on short tracks.'
           Caption = 'Ignore short tracks (i.e. less than 30 seconds)'
           TabOrder = 1
         end
@@ -3145,6 +3142,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 300
           Height = 17
+          Hint = 'Increase the playcounter of a file after it was played'
           Caption = 'Increase play counter'
           TabOrder = 2
           OnClick = cb_RatingChangeCounterClick
@@ -3154,6 +3152,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 65
           Width = 300
           Height = 17
+          Hint = 'Write rating and playcounter into the ID3-tags'
           Caption = 'Update ID3-Tags of audiofiles'
           TabOrder = 3
         end
@@ -3162,6 +3161,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 107
           Width = 186
           Height = 17
+          Hint = 'Do not increase the counter, if the file was aborted'
           Caption = 'Ignore on aborted tracks'
           TabOrder = 4
         end
@@ -3170,6 +3170,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 131
           Width = 300
           Height = 17
+          Hint = 
+            'Automatically increase rating on played tracks. The change will ' +
+            'be smaller the higher the playcounter is.'
           Caption = 'Increase rating on played tracks'
           TabOrder = 5
         end
@@ -3178,6 +3181,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 151
           Width = 300
           Height = 17
+          Hint = 
+            'Automatically decrease rating on aborted tracks. The change will' +
+            ' be smaller the higher the playcounter is.'
           Caption = 'Decrease rating on aborted tracks'
           TabOrder = 6
         end
@@ -3287,6 +3293,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 25
           Height = 21
+          Hint = 'Choose a download directory'
           Anchors = [akTop, akRight]
           Caption = '...'
           TabOrder = 1
@@ -3297,6 +3304,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 136
           Width = 417
           Height = 17
+          Hint = 
+            'Try to split the stream when a new title begins. This will work ' +
+            'only if the station submits proper title information.'
           Caption = 'Save different titles in separate files'
           Checked = True
           State = cbChecked
@@ -3307,6 +3317,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 208
           Width = 417
           Height = 17
+          Hint = 'Split recordings by time.'
           Caption = 'Split files by time'
           TabOrder = 6
           OnClick = cbAutoSplitByTimeClick
@@ -3326,6 +3337,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 160
           Width = 417
           Height = 17
+          Hint = 'Split recordings by size.'
           Caption = 'Split files by size'
           TabOrder = 4
           OnClick = cbAutoSplitBySizeClick
@@ -3369,6 +3381,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 433
         Height = 74
+        Hint = 
+          'A webstream-playlist can contain multiple streams (often just al' +
+          'ternate URLs) - add all of them to the playlist or let Nemp deci' +
+          'de which one to play?'
         Caption = 'Playlists (e.g. http://myradio.com/tunein.pls)'
         ItemIndex = 1
         Items.Strings = (
@@ -3383,22 +3399,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
       DesignSize = (
         449
         436)
-      object LblConst_SpeedNote: TLabel
-        Left = 8
-        Top = 296
-        Width = 433
-        Height = 33
-        AutoSize = False
-        Caption = '(*) Note: Changes will take effect on next track'
-        WordWrap = True
-      end
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
         Width = 432
         Height = 65
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'On changing speed (*)'
+        Caption = 'On changing speed (changes will take effect on next track)'
         ItemIndex = 1
         Items.Strings = (
           'Keep pitch'
@@ -3418,6 +3425,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 417
           Height = 17
+          Hint = 'Disable effects when Nemp starts'
           Caption = 'Reset effects on start'
           Checked = True
           State = cbChecked
@@ -3428,6 +3436,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 409
           Height = 17
+          Hint = 'Disable equalizer when Nemp starts'
           Caption = 'Reset equalizer on start'
           TabOrder = 0
         end
@@ -3452,6 +3461,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 96
           Width = 80
           Height = 13
+          Hint = 'Volume of the jingle in relation to main volume.'
           Caption = 'Volume of jingles'
         end
         object LblConst_JingleVolumePercent: TLabel
@@ -3459,6 +3469,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 120
           Width = 86
           Height = 13
+          Hint = 'Volume of the jingle in relation to main volume.'
           Caption = '% of main volume'
         end
         object LblConst_JinglePlayback: TLabel
@@ -3473,6 +3484,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 409
           Height = 17
+          Hint = 'Reduce main volume before when playing a jingle'
           Caption = 'Reduce main volume by'
           TabOrder = 0
           OnClick = CBJingleReduceClick
@@ -3482,6 +3494,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 49
           Height = 22
+          Hint = 'Reduce main volume before when playing a jingle'
           MaxValue = 100
           MinValue = 0
           TabOrder = 1
@@ -3492,6 +3505,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 115
           Width = 49
           Height = 22
+          Hint = 'Volume of the jingle in relation to main volume.'
           MaxValue = 200
           MinValue = 0
           TabOrder = 2
@@ -3542,6 +3556,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 361
           Height = 17
+          Hint = 'Signalize birthday song with a countdown.'
           Caption = 'Start a countdown before the event'
           TabOrder = 0
           OnClick = CBStartCountDownClick
@@ -3551,6 +3566,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 56
           Width = 25
           Height = 21
+          Hint = 'Select file'
           Anchors = [akTop, akRight]
           Caption = '...'
           TabOrder = 2
@@ -3561,6 +3577,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 80
           Width = 241
           Height = 21
+          Hint = 'Use the current selected file in player as countdown.'
           Caption = 'Use selected file in mainwindow'
           TabOrder = 3
           OnClick = BtnGetCountDownTitelClick
@@ -3591,6 +3608,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 24
           Width = 22
           Height = 13
+          Hint = 
+            'Time when the birthday song should be played. The optional count' +
+            'down will end at this time.'
           Caption = 'Time'
         end
         object lblBirthdayTitel: TLabel
@@ -3619,6 +3639,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 20
           Width = 57
           Height = 21
+          Hint = 
+            'Time when the birthday song should be played. The optional count' +
+            'down will end at this time.'
           Date = 39144.687500000000000000
           Time = 39144.687500000000000000
           Kind = dtkTime
@@ -3629,6 +3652,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 25
           Height = 21
+          Hint = 'Select file'
           Anchors = [akTop, akRight]
           Caption = '...'
           TabOrder = 2
@@ -3639,6 +3663,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 241
           Height = 21
+          Hint = 'Use the current selected file in player as birthday song.'
           Caption = 'Use selected file in mainwindow'
           TabOrder = 3
           OnClick = BtnGetBirthdayTitelClick
@@ -3658,6 +3683,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 256
         Width = 417
         Height = 17
+        Hint = 'Continue with the playlist after the birthday song.'
         Caption = 'Continue with the playlist after playing the birthdaysong'
         TabOrder = 2
       end
@@ -3969,6 +3995,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 417
           Height = 17
+          Hint = 'Always begin scrobbling when nemp starts.'
           Caption = 'Scrobble always'
           TabOrder = 0
         end
@@ -3977,6 +4004,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 417
           Height = 17
+          Hint = 
+            'Ignore hard failures like "no internet connection", "invalid use' +
+            'rname/password", ...'
           Caption = 
             'Ignore hard failures - just stop scrobbling if something goes wr' +
             'ong'
@@ -3987,6 +4017,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 417
           Height = 17
+          Hint = 'Begin scrobbling now.'
           Caption = 'Scrobble this session'
           TabOrder = 2
         end
@@ -3995,6 +4026,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 97
           Height = 25
+          Hint = 'Restart scrobbling.'
           Caption = 'Scrobble again!'
           TabOrder = 3
           OnClick = Btn_ScrobbleAgainClick
@@ -4693,7 +4725,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 632
-    Top = 200
+    Left = 624
+    Top = 152
   end
 end

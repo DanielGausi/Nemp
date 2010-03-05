@@ -329,13 +329,9 @@ type
 
         // Optionen, die aus der Ini kommen/gespeichert werden müssen
         NempSortArray: TNempSortArray;
-        IncludeMP3: Boolean;
-        IncludeOGG: Boolean;
-        IncludeWAV: Boolean;
-        IncludeWMA: Boolean;
-        IncludeMP1: Boolean;
-        IncludeMP2: Boolean;
         IncludeAll: Boolean;
+        IncludeFilter: String; // a string like "*.mp3;*.ogg;*.wma" - replaces the old Include*-Vars
+        
         AutoLoadMediaList: Boolean;
         AutoSaveMediaList: Boolean;
         alwaysSortAnzeigeList: Boolean;
@@ -959,13 +955,8 @@ begin
         if (CoverSortOrder < 1) OR (CoverSortOrder > 7) then
           CoverSortorder := 1;
 
-        IncludeMP3 := ini.ReadBool('MedienBib', 'mp3', True);
-        IncludeOGG := ini.ReadBool('MedienBib', 'ogg', True);
-        IncludeWAV := ini.ReadBool('MedienBib', 'wav', True);
-        IncludeWMA := ini.ReadBool('MedienBib', 'wma', True);
-        IncludeMP1 := ini.ReadBool('MedienBib', 'mp1', True);
-        IncludeMP2 := ini.ReadBool('MedienBib', 'mp2', True);
         IncludeAll := ini.ReadBool('MedienBib', 'other', True);
+        IncludeFilter := Ini.ReadString('MedienBib', 'includefilter', '*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.wma');
         AutoLoadMediaList := ini.ReadBool('MedienBib', 'autoload', True);
         AutoSaveMediaList := ini.ReadBool('MedienBib', 'autosave', AutoLoadMediaList);
 
@@ -1058,13 +1049,8 @@ begin
 
         Ini.Writebool('MedienBib','WriteRatingToTag', WriteRatingToTag);
 
-        ini.WriteBool('MedienBib', 'mp3', IncludeMP3);
-        ini.WriteBool('MedienBib', 'ogg', IncludeOGG);
-        ini.WriteBool('MedienBib', 'wav', IncludeWAV);
-        ini.WriteBool('MedienBib', 'wma', IncludeWMA);
-        ini.WriteBool('MedienBib', 'mp1', IncludeMP1);
-        ini.WriteBool('MedienBib', 'mp2', IncludeMP2);
         ini.WriteBool('MedienBib', 'other', IncludeAll);
+        ini.WriteString('MedienBib', 'includefilter', IncludeFilter);
         ini.WriteBool('MedienBib', 'autoload', AutoLoadMediaList);
         ini.WriteBool('MedienBib', 'autosave', AutoSaveMediaList);
 
@@ -2144,9 +2130,11 @@ end;
 function TMedienBibliothek.DeleteAudioFile(aAudioFile: tAudioFile): Boolean;
 var i: Integer;
 begin
-  result := StatusBibUpdate = 0;
-  if StatusBibUpdate <> 0 then exit;
+//  result := StatusBibUpdate = 0;
+// ??? Status MUST be set to 3 before calling this, as we have an "Application.ProcessMessages"
+//     in the calling Method PM_ML_DeleteSelectedClick
 
+  result := true;
   AnzeigeListe.Extract(aAudioFile);
   AnzeigeListe2.Extract(aAudioFile);
   if AnzeigeShowsPlaylistFiles then

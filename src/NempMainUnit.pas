@@ -1679,7 +1679,7 @@ begin
           Uselanguage(NempOptions.Language);
         //Player-Einstellungen lesen
         NempPlayer.LoadFromIni(Ini);
-{...}        //Player initialisieren
+        //Player initialisieren, Load Plugins.
         NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)), tmpwstr);
         // VCL an den Player anpassen
         PlaylistDateienOpenDialog.Filter := tmpwstr;
@@ -1701,8 +1701,9 @@ begin
         PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
         // MedienBib-Einstellungen laden
         MedienBib.LoadFromIni(Ini);
+
+
         CB_MedienBibGlobalQuickSearch.OnClick := Nil;
-//////        CB_MedienBibGlobalQuickSearch.Checked := MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch;
         CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;     //Quicksearch (library)
 
         EditFastSearch.Text := MainForm_GlobalQuickSearch;
@@ -2440,6 +2441,7 @@ begin
   ST_Medienliste.Break;
   LangeAktionWeiterMachen := False;
   M.Result := 1;
+
   TntFormClose(Nil, aAction);
   self.OnClose := Nil;
 end;
@@ -3320,6 +3322,7 @@ begin
                   exit;
                 end;
                 VST.BeginUpdate;
+                MedienBib.StatusBibUpdate := BIB_Status_ReadAccessBlocked;
                 SelectedMP3s := VST.GetSortedSelection(False);
                 if length(SelectedMP3s) = 0 then exit;
                 StarteLangeAktion(length(SelectedMP3s), Format((MediaLibrary_Deleting), [0]), False);
@@ -3333,7 +3336,7 @@ begin
                     Data := VST.GetNodeData(SelectedMP3s[i]);
                     MedienBib.DeleteAudioFile(Data^.FAudioFile);
 
-                    if i mod 256 = 0 then
+                    if i mod 64 = 0 then
                     begin
                       MedienListeStatusLBL.Caption := Format((MediaLibrary_Deleting), [Round(i/length(SelectedMP3s) * 100)]);
                       application.processmessages;
@@ -3350,6 +3353,7 @@ begin
                 ReFillBrowseTrees(True);
                 MedienListeStatusLBL.Caption := '';
                 BeendeLangeAktion;
+                MedienBib.StatusBibUpdate := BIB_Status_Free;
             end;
         end;
     end; // case
@@ -5046,15 +5050,15 @@ begin
     end;
 end;
 
-
 function TNemp_MainForm.ValidAudioFile(filename: UnicodeString; JustPlay:Boolean):boolean;
 var extension: string;
 begin
   extension := AnsiLowerCase(ExtractFileExt(filename));
 
-  if Justplay OR MedienBib.IncludeAll then
+  if Justplay then
   begin
     //showmessage('just play');
+    // this test is for the playlist
     result := (Extension <> '.m3u') AND (Extension <> '.m3u8')
           AND (Extension <> '.pls') AND (Extension <> '.gmp')
           AND (Extension <> '.cue') AND (Extension <> '.npl')
@@ -5064,14 +5068,21 @@ begin
   else // Aufnahme in die Medienliste verlangt, und nicht "alles rein" in den Optionen gewählt
   // also genauer prüfen
   begin
-  if (extension='.mp3') AND MedienBib.IncludeMP3 then result := True
-    else if (extension='.ogg') AND MedienBib.IncludeOGG then result := True
-      else if (extension='.wav') AND MedienBib.IncludeWAV then result := True
-        else if (extension='.wma') AND MedienBib.IncludeWMA then result := True
-          else if (extension='.mp1') AND MedienBib.IncludeMP1 then result := True
-            else if (extension='.mp2') AND MedienBib.IncludeMP2 then result := True
-              else
-                result := False;
+      if MedienBib.IncludeAll then
+          // include any valid extension
+          result := NempPlayer.ValidExtensions.IndexOf(extension) > -1
+      else
+          // include files as given in the Bib.Filterstring
+          result := pos('*'+Extension, MedienBib.IncludeFilter) > 0;
+
+      {if (extension='.mp3') AND MedienBib.IncludeMP3 then result := True
+        else if (extension='.ogg') AND MedienBib.IncludeOGG then result := True
+          else if (extension='.wav') AND MedienBib.IncludeWAV then result := True
+            else if (extension='.wma') AND MedienBib.IncludeWMA then result := True
+              else if (extension='.mp1') AND MedienBib.IncludeMP1 then result := True
+                else if (extension='.mp2') AND MedienBib.IncludeMP2 then result := True
+                  else
+                    result := False;    }
   end;
 end;
 
@@ -9534,7 +9545,8 @@ begin
             result := result + ';*' + NempPlayer.ValidExtensions[i];
     end else
     begin
-        if MedienBib.IncludeMP3 then result := '*.mp3';
+        result := MedienBib.IncludeFilter;
+        {if MedienBib.IncludeMP3 then result := '*.mp3';
         if MedienBib.IncludeOGG then result := result + ';*.ogg';
         if MedienBib.IncludeWAV then result := result + ';*.wav';
         if MedienBib.IncludeWMA then result := result + ';*.wma';
@@ -9543,6 +9555,7 @@ begin
 
         if (result <> '') AND (result[1] = ';') then
             result := copy(result, 2, length(result));
+        }
     end;
     // Ja, das ist so richtig. In die Medienbib kommen Playlist-Dateien rein.
     // In die Playlist nicht.
