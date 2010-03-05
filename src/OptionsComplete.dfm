@@ -15,6 +15,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  ShowHint = True
   Visible = True
   OnActivate = FormActivate
   OnCreate = FormCreate
@@ -55,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAnzeige5
+    ActivePage = TabAudio0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -63,18 +64,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem0: TTabSheet
       Caption = 'System (Main)'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
-        Top = 208
+        Top = 192
         Width = 434
-        Height = 137
+        Height = 138
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Nemp auto-updater'
         TabOrder = 1
@@ -83,6 +80,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 401
           Height = 17
+          Hint = 
+            'Check for updates and show a message if a newer version is avail' +
+            'able'
           Caption = 'Automatically check for new versions of Nemp'
           TabOrder = 0
           OnClick = CB_AutoCheckClick
@@ -101,6 +101,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 72
           Width = 417
           Height = 17
+          Hint = 
+            'Notify on Beta-releases. As Beta-software is normally instable, ' +
+            'this is recommended for advanced users only.'
           Caption = 'Notify on Beta-releases'
           TabOrder = 3
         end
@@ -109,7 +112,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 177
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 2
           TabOrder = 1
           Text = 'Weekly'
@@ -125,17 +128,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 193
+        Height = 177
         Caption = 'Starting Nemp'
         TabOrder = 0
         DesignSize = (
           433
-          193)
+          177)
         object CB_AllowMultipleInstances: TCheckBox
           Left = 8
           Top = 112
           Width = 409
           Height = 17
+          Hint = 'Allow multiple instances of Nemp.'
           Caption = 'Allow multiple instances'
           TabOrder = 5
         end
@@ -144,6 +148,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 128
           Width = 409
           Height = 17
+          Hint = 'Do not show Nemp window on start - directly minimize it.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Start minimized (you can also use the parameter "/minimized")'
           TabOrder = 6
@@ -153,6 +158,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 401
           Height = 17
+          Hint = 
+            'When starting Nemp by double-clicking a file in the Windows-Expl' +
+            'orer: Use this file instead of the last one.'
           Caption = 'If applicable: Start playback with new file'
           TabOrder = 2
         end
@@ -161,6 +169,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 385
           Height = 17
+          Hint = 'Begin playback at the last known position within the track'
           Caption = 'Remember last track position'
           TabOrder = 1
         end
@@ -169,6 +178,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 401
           Height = 17
+          Hint = 'Automatically begin playback when Nemp starts'
           Caption = 'Begin playback on start'
           TabOrder = 0
           OnClick = CB_AutoPlayOnStartClick
@@ -178,6 +188,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 72
           Width = 409
           Height = 17
+          Hint = 'Automatically load the Nemp medialibrary.'
           Caption = 'Load medialibrary on start'
           TabOrder = 3
         end
@@ -186,22 +197,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 409
           Height = 17
+          Hint = 'Automatically save the Nemp medialibrary.'
           Caption = 'Save medialibrary on close'
           TabOrder = 4
-        end
-        object cbAutoShowDetails: TCheckBox
-          Left = 8
-          Top = 168
-          Width = 409
-          Height = 17
-          Caption = 'Automatically show details'
-          TabOrder = 8
         end
         object cb_StayOnTop: TCheckBox
           Left = 8
           Top = 152
           Width = 409
           Height = 17
+          Hint = 
+            'Hold the Nemp main window in foreground. Works only in seperate-' +
+            'window-mode.'
           Caption = 'Stay on top'
           TabOrder = 7
         end
@@ -210,10 +217,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'System1'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -329,6 +332,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 377
           Height = 17
+          Hint = 
+            'Install global hotkeys. You should use some values that are not ' +
+            'used as shortcuts by your favorite software.'
           Caption = 'Install global hotkeys'
           TabOrder = 0
           OnClick = CBRegisterHotKeysClick
@@ -339,7 +345,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 2
           Text = 'Alt + Ctrl'
@@ -354,7 +360,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 3
           Text = 'A'
@@ -416,7 +422,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 5
           Text = 'Alt + Ctrl'
@@ -431,7 +437,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 6
           Text = 'A'
@@ -493,7 +499,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 8
           Text = 'Alt + Ctrl'
@@ -508,7 +514,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 9
           Text = 'A'
@@ -570,7 +576,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 11
           Text = 'Alt + Ctrl'
@@ -585,7 +591,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 12
           Text = 'A'
@@ -647,7 +653,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 14
           Text = 'Alt + Ctrl'
@@ -662,7 +668,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 15
           Text = 'A'
@@ -724,7 +730,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 17
           Text = 'Alt + Ctrl'
@@ -739,7 +745,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 18
           Text = 'A'
@@ -801,7 +807,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 20
           Text = 'Alt + Ctrl'
@@ -816,7 +822,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 21
           Text = 'A'
@@ -878,7 +884,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 23
           Text = 'Alt + Ctrl'
@@ -893,7 +899,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 24
           Text = 'A'
@@ -955,7 +961,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 97
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 26
           Text = 'Alt + Ctrl'
@@ -970,7 +976,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 65
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 27
           Text = 'A'
@@ -1074,6 +1080,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 136
           Width = 233
           Height = 25
+          Hint = 'Try to auto-configure mutlimedia keys properly.'
           Caption = 'Configure media keys'
           TabOrder = 0
           OnClick = Btn_ConfigureMediaKeysClick
@@ -1083,6 +1090,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 168
           Width = 417
           Height = 17
+          Hint = 
+            'If checked, Nemp will ignore volume keys, to allow global volume' +
+            ' control by these keys.'
           Caption = 'Ignore volume up/down keys'
           Checked = True
           State = cbChecked
@@ -1117,10 +1127,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'System2'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TLabel
         Left = 16
         Top = 336
@@ -1150,6 +1156,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 400
         Width = 170
         Height = 25
+        Hint = 'Register Nemp as default application for the selected filetypes.'
         Caption = 'Apply changes'
         TabOrder = 2
         OnClick = BtnRegistryUpdateClick
@@ -1180,6 +1187,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 297
           Height = 129
+          Hint = 'List of supported audio files.'
           Columns = 4
           ItemHeight = 13
           TabOrder = 0
@@ -1189,6 +1197,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 31
           Width = 113
           Height = 130
+          Hint = 'List of supported playlist files.'
           ItemHeight = 13
           Items.Strings = (
             '.m3u'
@@ -1222,6 +1231,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 409
           Height = 17
+          Hint = 
+            'Add a file to the playlist when double-clicking it in the Window' +
+            's-Explorer. Otherwise the current playlist will be deleted.'
           Caption = '"Enqueue" as default action for audio files'
           Checked = True
           State = cbChecked
@@ -1232,6 +1244,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 409
           Height = 17
+          Hint = 
+            'Add the files of a playlist to the current playlist when double-' +
+            'clicking it in the Windows-Explorer. Otherwise the current playl' +
+            'ist will be deleted.'
           Caption = '"Enqueue" as default action for playlists'
           Checked = True
           State = cbChecked
@@ -1242,6 +1258,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 56
           Width = 409
           Height = 17
+          Hint = 
+            'Add "Play/Enqueue in Nemp" to the context menu in the Windows Ex' +
+            'plorer.'
           Caption = 'Context menus on directories'
           Checked = True
           State = cbChecked
@@ -1252,6 +1271,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 80
           Width = 409
           Height = 17
+          Hint = 
+            'For Logitech Keyboards with installed "iTouch"-Software: Start N' +
+            'emp when pressing the "play-key".'
           Caption = 'Nemp as default player for "Logitech iTouch"'
           TabOrder = 3
         end
@@ -1260,10 +1282,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'System3'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -1282,6 +1300,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 433
         Height = 137
+        Hint = 'Behavior of Nemp in the Windows Taskbar'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Taskbar and/or tray'
         ItemIndex = 4
@@ -1362,6 +1381,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 161
           Height = 25
+          Hint = 'Install the Nemp Deskband.'
           Caption = 'Install deskband'
           TabOrder = 4
           OnClick = Btn_InstallDeskbandClick
@@ -1371,6 +1391,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 120
           Width = 161
           Height = 25
+          Hint = 'Uninstall the Nemp Deskband.'
           Caption = 'Uninstall deskband'
           TabOrder = 5
           OnClick = Btn_UninstallDeskbandClick
@@ -1380,15 +1401,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige0: TTabSheet
       Caption = 'Anzeige (Main)'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object RGrp_View: TRadioGroup
         Left = 8
         Top = 72
         Width = 433
         Height = 49
+        Hint = 
+          'Window mode: All in one or seperate windows for player, playlist' +
+          ', ...'
         Caption = 'Window mode'
         Columns = 2
         ItemIndex = 0
@@ -1442,6 +1462,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 224
         Width = 433
         Height = 217
+        Hint = 'Available skins for Nemp.'
         Caption = 'Available skins'
         TabOrder = 3
         object LblConst_Preview: TLabel
@@ -1473,7 +1494,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbSkinAuswahlChange
         end
@@ -1921,6 +1942,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 433
         Height = 57
+        Hint = 'Language settings.'
         Caption = 'Select language'
         TabOrder = 0
         object cb_Language: TComboBox
@@ -1929,7 +1951,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 169
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
       end
@@ -1937,10 +1959,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige4: TTabSheet
       Caption = 'Anzeige1 (Player)'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2003,7 +2021,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 4
           TabOrder = 3
           Text = 'Very fast'
@@ -2020,7 +2038,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 4
           TabOrder = 5
           Text = 'Very fast'
@@ -2037,23 +2055,24 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 199
         Width = 434
         Height = 116
+        Hint = 'Specify, where Nemp should look for cover images.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Search covers in ...'
         TabOrder = 1
         object CB_CoverSearch_inDir: TCheckBox
           Left = 8
-          Top = 32
+          Top = 16
           Width = 209
           Height = 17
           Hint = 'Search for coverfiles within the directory of the audiofile'
           Caption = 'Directory itself'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 1
+          TabOrder = 0
         end
         object CB_CoverSearch_inSubDir: TCheckBox
           Left = 8
-          Top = 50
+          Top = 48
           Width = 201
           Height = 17
           Hint = 'Search for coverfiles in the specified subdirectory.'
@@ -2065,18 +2084,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CB_CoverSearch_inParentDir: TCheckBox
           Left = 8
-          Top = 16
+          Top = 32
           Width = 201
           Height = 17
           Hint = 'Search for coverfiles in the parent directory of the audiofile.'
           Caption = 'Parent directory'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 0
+          TabOrder = 1
         end
         object CB_CoverSearch_inSisterDir: TCheckBox
           Left = 224
-          Top = 50
+          Top = 48
           Width = 185
           Height = 17
           Hint = 
@@ -2117,6 +2136,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 434
         Height = 121
+        Hint = 'Selct the visible columns in the library.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show the following columns in the medialist'
         TabOrder = 0
@@ -2134,6 +2154,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 20
           Width = 131
           Height = 13
+          Hint = 'Select the sorting criteria for browsing the library.'
           Caption = 'Sort orders in classic mode:'
         end
         object Label61: TLabel
@@ -2141,6 +2162,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 20
           Width = 114
           Height = 13
+          Hint = 'Select the sorting criteria for browsing the library.'
           Caption = 'Sort order in cover-flow'
         end
         object LblConst_CoverMode: TLabel
@@ -2148,6 +2170,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 61
           Width = 56
           Height = 13
+          Hint = 'Display the cover and some other details in the library.'
           Caption = 'Show cover'
         end
         object cbCoverMode: TComboBox
@@ -2227,6 +2250,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 401
           Height = 17
+          Hint = 'Select full row or just a single cell in the library.'
           Caption = 'Select full row in medialist'
           TabOrder = 0
         end
@@ -2235,6 +2259,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 401
           Height = 17
+          Hint = 'Show hints in the library or not.'
           Caption = 'Show hints in medialist'
           TabOrder = 1
         end
@@ -2243,6 +2268,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 401
           Height = 17
+          Hint = 'Show hints in the playlist or not.'
           Caption = 'Show hints in playlist'
           TabOrder = 2
         end
@@ -2251,10 +2277,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige1: TTabSheet
       Caption = 'Anzeige3 (Fonts)'
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2285,6 +2307,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 409
           Height = 17
+          Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
           Caption = 'Change style according to channelmode'
           ParentShowHint = False
           ShowHint = True
@@ -2296,6 +2319,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 401
           Height = 17
+          Hint = 'Use different fonts for files with fixed or variable bitrate.'
           Caption = 'Change font according to constant/variable bitrate'
           ParentShowHint = False
           ShowHint = True
@@ -2309,7 +2333,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 2
         end
         object CBFontNameCBR: TComboBox
@@ -2318,7 +2342,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
         end
       end
@@ -2395,6 +2419,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 393
           Height = 17
+          Hint = 'Use different colors for different bitrates.'
           Caption = 'Change font color according to bitrate'
           ParentShowHint = False
           ShowHint = True
@@ -2408,7 +2433,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 105
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 1
           TabOrder = 1
           Text = 'linear'
@@ -2424,7 +2449,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 113
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 1
           TabOrder = 2
           Text = 'linear'
@@ -2519,6 +2544,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 249
           Height = 17
+          Hint = 
+            'User bigger fonts for long tracks and smaller ones for short tra' +
+            'cks.'
           Caption = 'Change font size according to track length'
           ParentShowHint = False
           ShowHint = True
@@ -2540,10 +2568,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige6: TTabSheet
       Caption = 'Anzeige4 (PartyMode)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBoxPartyMode: TGroupBox
         Left = 8
         Top = 8
@@ -2563,7 +2587,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 39
           Width = 165
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 1
           TabOrder = 0
           Text = '1.5 (moderate amplification)'
@@ -2578,10 +2602,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio0: TTabSheet
       Caption = 'Audio (Main)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2616,6 +2636,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 72
           Width = 121
           Height = 26
+          Hint = 'Volume of the secondary device.'
           Alignment = taRightJustify
           AutoSize = False
           Caption = 'Volume headphones'
@@ -2637,8 +2658,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 217
           Height = 21
+          Hint = 'The secondary device.'
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
         end
         object MainDeviceCB: TComboBox
@@ -2646,8 +2668,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 24
           Width = 217
           Height = 21
+          Hint = 'The main device.'
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
       end
@@ -2664,6 +2687,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 73
           Height = 13
+          Hint = 'Fading length between two songs.'
           Caption = 'On title change'
         end
         object LblConst_Titlefade: TLabel
@@ -2671,6 +2695,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 92
           Height = 13
+          Hint = 'Fading length when scrolling inside a song.'
           Caption = 'On position change'
         end
         object LblConst_ms1: TLabel
@@ -2678,6 +2703,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 13
           Height = 13
+          Hint = 'Fading length between two songs.'
           Caption = 'ms'
         end
         object LblConst_ms2: TLabel
@@ -2685,6 +2711,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 13
           Height = 13
+          Hint = 'Fading length when scrolling inside a song.'
           Caption = 'ms'
         end
         object CB_Fading: TCheckBox
@@ -2692,6 +2719,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 161
           Height = 17
+          Hint = 'Use crossfading.'
           Caption = 'Fade in/out'
           TabOrder = 0
           OnClick = CB_FadingClick
@@ -2701,6 +2729,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 59
           Width = 57
           Height = 22
+          Hint = 'Fading length when scrolling inside a song.'
           Increment = 100
           MaxValue = 10000
           MinValue = 0
@@ -2712,6 +2741,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 59
           Width = 57
           Height = 22
+          Hint = 'Fading length between two songs.'
           Increment = 100
           MaxValue = 10000
           MinValue = 0
@@ -2723,6 +2753,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 88
           Width = 385
           Height = 17
+          Hint = 'Ignore fading on short tracks.'
           Caption = 'Ignore on short tracks'
           TabOrder = 3
         end
@@ -2731,6 +2762,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 104
           Width = 385
           Height = 17
+          Hint = 'Ignore fading when clicking on "Pause".'
           Caption = 'Ignore on pause'
           TabOrder = 4
         end
@@ -2739,6 +2771,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 120
           Width = 393
           Height = 17
+          Hint = 'Ignore fading when stopping the player.'
           Caption = 'Ignore on stop'
           TabOrder = 5
         end
@@ -2747,10 +2780,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio3: TTabSheet
       Caption = 'Audio1 (Playlist)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -2901,10 +2930,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio8: TTabSheet
       Caption = 'Audio2 (Medialib)'
       ImageIndex = 22
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3091,10 +3116,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio2: TTabSheet
       Caption = 'Audio2a (Rating)'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 13
         Top = 8
@@ -3188,10 +3209,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio4: TTabSheet
       Caption = 'Audio3 (Webradio)'
       ImageIndex = 23
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3336,7 +3353,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 79
           Width = 385
           Height = 21
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 2
           Text = '<date>, <time> - <title>'
           OnChange = cbFilenameFormatChange
@@ -3363,10 +3380,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio5: TTabSheet
       Caption = 'Audio4 (Effekte)'
       ImageIndex = 15
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3489,10 +3502,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio7: TTabSheet
       Caption = 'Audio5 (Birthday)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -3656,10 +3665,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio9: TTabSheet
       Caption = 'Audio6 (Scrobble)'
       ImageIndex = 17
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -3999,10 +4004,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio10: TTabSheet
       Caption = 'Audio7 (Webserver)'
       ImageIndex = 18
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4136,7 +4137,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 113
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
           Items.Strings = (
             '')
@@ -4179,10 +4180,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended0: TTabSheet
       Caption = 'Extended (Main)'
       ImageIndex = 21
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4248,7 +4245,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 1
           Text = 'Auto-detect'
@@ -4263,7 +4260,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 145
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 2
           Text = 'Hardware'
@@ -4344,10 +4341,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended1: TTabSheet
       Caption = 'Ext1 (Search Options)'
       ImageIndex = 25
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4480,10 +4473,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended2: TTabSheet
       Caption = 'Ext2 (Unicode)'
       ImageIndex = 23
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         449
         436)
@@ -4582,7 +4571,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
         end
         object CBChinese: TComboBox
@@ -4591,7 +4580,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 1
         end
         object CBHebrew: TComboBox
@@ -4600,7 +4589,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 3
         end
         object CBJapanese: TComboBox
@@ -4609,7 +4598,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 4
         end
         object CBGreek: TComboBox
@@ -4618,7 +4607,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 2
         end
         object CBKorean: TComboBox
@@ -4627,7 +4616,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 5
         end
         object CBCyrillic: TComboBox
@@ -4636,7 +4625,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 6
         end
         object CBThai: TComboBox
@@ -4645,7 +4634,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 7
         end
       end

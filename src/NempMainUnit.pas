@@ -1789,7 +1789,7 @@ begin
     PM_P_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
     MM_O_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
 
-    AutoShowDetailsTMP := NempOptions.AutoShowDetails;
+    AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
     // Menüeinträge checken//unchecken
     PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
