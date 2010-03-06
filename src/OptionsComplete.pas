@@ -188,16 +188,6 @@ type
     LblConst_WebradioHint: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    GrpBox_FontColor: TGroupBox;
-    ShapeMinColor: TShape;
-    ShapeMittelColor: TShape;
-    ShapeMaxColor: TShape;
-    Image1: TImage;
-    Label25: TLabel;
-    Label26: TLabel;
-    Label27: TLabel;
-    LblConst_FontColorHint: TLabel;
-    CBChangeFontColoronBitrate: TCheckBox;
     GrpBox_FontSizePreselection: TGroupBox;
     Label34: TLabel;
     Label32: TLabel;
@@ -366,8 +356,6 @@ type
     CBSortArray1: TComboBox;
     CBSortArray2: TComboBox;
     cbCoverSortOrder: TComboBox;
-    CBMiddleToMinComputing: TComboBox;
-    CBMiddleToMaxComputing: TComboBox;
     HeadphonesDeviceCB: TComboBox;
     MainDeviceCB: TComboBox;
     cbFilenameFormat: TComboBox;
@@ -451,6 +439,7 @@ type
     CB_RememberInterruptedPlayPosition: TCheckBox;
     LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;
+    CBChangeFontColoronBitrate: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -469,10 +458,6 @@ type
     procedure CB_CoverSearch_inSubDirClick(Sender: TObject);
     procedure CB_CoverSearch_inSisterDirClick(Sender: TObject);
     procedure CBChangeFontOnCbrVbrClick(Sender: TObject);
-    procedure ShapeColorMouseDown(Sender: TObject;
-      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure RGROUPMiddleToMaxComputingClick(Sender: TObject);
-    procedure CBChangeFontColoronBitrateClick(Sender: TObject);
     procedure BtnRegistryUpdateClick(Sender: TObject);
     procedure Btn_SelectAllClick(Sender: TObject);
     procedure cbIncludeAllClick(Sender: TObject);
@@ -548,8 +533,8 @@ type
   private
     { Private-Deklarationen }
     OldFontSize: integer;
-    VerlaufBitmap: TBitmap;
-    procedure RePaintVerlauf(Verlauf: Boolean);
+    //VerlaufBitmap: TBitmap;
+    //procedure RePaintVerlauf(Verlauf: Boolean);
     procedure GetSkins;
     // Hilfsprozeduren für das Hotkey-Laden/Speichern
     Function ModToIndex(aMod: Cardinal): Integer;
@@ -675,9 +660,9 @@ begin
       CBPlaylistTypes.Checked[i] := True;
 
 
-  VerlaufBitmap := TBitmap.Create;
-  VerlaufBitmap.Width := 320;
-  VerlaufBitmap.Height := 17;
+//  VerlaufBitmap := TBitmap.Create;
+//  VerlaufBitmap.Width := 320;
+//  VerlaufBitmap.Height := 17;
 
 // ok
 
@@ -912,7 +897,7 @@ begin
         end;
     finally
         OptionsVST.Clear;
-        VerlaufBitmap.Free;
+        // VerlaufBitmap.Free;
         Testskin.Free;
     end;
 end;
@@ -1202,7 +1187,7 @@ begin
   SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
   SEArtistAlbenRowHeight.Value := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
 
-  // Farben
+  {// Farben
   ShapeMinColor.Enabled          := CBChangeFontColoronBitrate.Checked;
   ShapeMittelColor.Enabled       := CBChangeFontColoronBitrate.Checked;
   ShapeMaxColor.Enabled          := CBChangeFontColoronBitrate.Checked;
@@ -1212,13 +1197,14 @@ begin
   Label25.Enabled                := CBChangeFontColoronBitrate.Checked;
   Label26.Enabled                := CBChangeFontColoronBitrate.Checked;
   Label27.Enabled                := CBChangeFontColoronBitrate.Checked;
-  LblConst_FontColorHint.Enabled                := CBChangeFontColoronBitrate.Checked;
   ShapeMinColor.Brush.Color   := Nemp_MainForm.NempOptions.MinFontColor;
   ShapeMittelColor.Brush.Color:= Nemp_MainForm.NempOptions.MiddleFontColor;
   ShapeMaxColor.Brush.Color   := Nemp_MainForm.NempOptions.MaxFontColor;
   CBMiddleToMinComputing.ItemIndex := Nemp_MainForm.NempOptions.MiddleToMinComputing ;
   CBMiddleToMaxComputing.ItemIndex := Nemp_MainForm.NempOptions.MiddleToMaxComputing ;
   RePaintVerlauf(CBChangeFontColoronBitrate.Checked);
+  LblConst_FontColorHint.Enabled                := CBChangeFontColoronBitrate.Checked;
+  }
 
   // Zeichensätze
   With MedienBib do
@@ -1616,14 +1602,7 @@ begin
   CBFontNameCBR.Enabled := CBChangeFontOnCbrVbr.Checked;
 end;
 
-procedure TOptionsCompleteForm.ShapeColorMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  if ColorDialog1.Execute then
-    (Sender as TShape).Brush.Color := ColorDialog1.Color;
-  RePaintVerlauf(True);
-end;
-
+(*
 procedure TOptionsCompleteForm.RePaintVerlauf(Verlauf: Boolean);
 var i: integer;
 begin
@@ -1643,28 +1622,7 @@ begin
   end;
   Image1.Picture.Assign(VerlaufBitmap);
 end;
-
-procedure TOptionsCompleteForm.RGROUPMiddleToMaxComputingClick(
-  Sender: TObject);
-begin
-  RePaintVerlauf(True);
-end;
-
-procedure TOptionsCompleteForm.CBChangeFontColoronBitrateClick(
-  Sender: TObject);
-begin
-  ShapeMinColor.Enabled          := CBChangeFontColoronBitrate.Checked;
-  ShapeMittelColor.Enabled       := CBChangeFontColoronBitrate.Checked;
-  ShapeMaxColor.Enabled          := CBChangeFontColoronBitrate.Checked;
-  CBMiddleToMinComputing.Enabled := CBChangeFontColoronBitrate.Checked;
-  CBMiddleToMaxComputing.Enabled := CBChangeFontColoronBitrate.Checked;
-  Label25.Enabled                := CBChangeFontColoronBitrate.Checked;
-  Label26.Enabled                := CBChangeFontColoronBitrate.Checked;
-  Label27.Enabled                := CBChangeFontColoronBitrate.Checked;
-  LblConst_FontColorHint.Enabled                := CBChangeFontColoronBitrate.Checked;
-  RepaintVerlauf(CBChangeFontColoronBitrate.Checked);
-end;
-
+*)
 
 procedure TOptionsCompleteForm.Btn_SelectAllClick(Sender: TObject);
 var i: integer;
@@ -2256,11 +2214,11 @@ begin
     end;
   end;
 
-  Nemp_MainForm.NempOptions.MinFontColor    := ShapeMinColor.Brush.Color;
-  Nemp_MainForm.NempOptions.MiddleFontColor := ShapeMittelColor.Brush.Color;
-  Nemp_MainForm.NempOptions.MaxFontColor    := ShapeMaxColor.Brush.Color;
-  Nemp_MainForm.NempOptions.MiddleToMinComputing := CBMiddleToMinComputing.ItemIndex;
-  Nemp_MainForm.NempOptions.MiddleToMaxComputing := CBMiddleToMaxComputing.ItemIndex;
+  //Nemp_MainForm.NempOptions.MinFontColor    := ShapeMinColor.Brush.Color;
+  //Nemp_MainForm.NempOptions.MiddleFontColor := ShapeMittelColor.Brush.Color;
+  //Nemp_MainForm.NempOptions.MaxFontColor    := ShapeMaxColor.Brush.Color;
+  //Nemp_MainForm.NempOptions.MiddleToMinComputing := CBMiddleToMinComputing.ItemIndex;
+  //Nemp_MainForm.NempOptions.MiddleToMaxComputing := CBMiddleToMaxComputing.ItemIndex;
 
   // Basis-Value für [3] nehmen
   Nemp_MainForm.NempOptions.FontSize[3] :=  SEFontSize.Value;
@@ -2291,7 +2249,7 @@ begin
       VST.Font.Size := NempOptions.DefaultFontSize;
 
       PlaylistVST.Canvas.Font.Size := maxFont;
-      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('999:99');
+      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
       PlaylistVSTResize(Nil);
 
       PlaylistVST.Font.Size := NempOptions.DefaultFontSize;

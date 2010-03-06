@@ -164,11 +164,11 @@ type
         ShutDownAtEndOfPlaylist: Boolean;
 
         // Optionen für die Darstellung der Playliste/Medienliste
-        MinFontColor: TColor;
-        MaxFontColor: TColor;
-        MiddleFontColor: TColor;
-        MiddleToMinComputing: Byte;
-        MiddleToMaxComputing: Byte;
+        // MinFontColor: TColor;          // not editable in Nemp 4.0 any longer
+        // MaxFontColor: TColor;
+        // MiddleFontColor: TColor;
+        // MiddleToMinComputing: Byte;
+        // MiddleToMaxComputing: Byte;
         MaxDauer: Array[1..4] of Integer;
         FontSize: Array[1..5] of Integer;
         RowHeight: Integer;
@@ -879,11 +879,11 @@ begin
         ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',True);
         ChangeFontSizeOnLength := ini.ReadBool('Font','ChangeFontSizeOnLength',False);
 
-        MinFontColor   := StringToColor(Ini.ReadString('Font','MinColor'   , 'clred'   ));
-        MiddleFontColor:= StringToColor(Ini.ReadString('Font','MiddleColor', 'clblack'   ));
-        MaxFontColor   := StringToColor(Ini.ReadString('Font','MaxColor'   , 'clgreen'   ));
-        MiddleToMinComputing := Ini.ReadInteger('Font', 'MiddleToMinComputing', 2);
-        MiddleToMaxComputing := Ini.ReadInteger('Font', 'MiddleToMaxComputing', 2);
+        //MinFontColor   := StringToColor(Ini.ReadString('Font','MinColor'   , 'clred'   ));
+        //MiddleFontColor:= StringToColor(Ini.ReadString('Font','MiddleColor', 'clblack'   ));
+        //MaxFontColor   := StringToColor(Ini.ReadString('Font','MaxColor'   , 'clgreen'   ));
+        //MiddleToMinComputing := Ini.ReadInteger('Font', 'MiddleToMinComputing', 2);
+        //MiddleToMaxComputing := Ini.ReadInteger('Font', 'MiddleToMaxComputing', 2);
 
         MaxDauer[1] := Ini.ReadInteger('Font', 'Maxdauer1',  59);
         MaxDauer[2] := Ini.ReadInteger('Font', 'Maxdauer2', 149);
@@ -993,11 +993,11 @@ begin
         Ini.WriteInteger('Font', 'FontSize4', FontSize[4]);
         Ini.WriteInteger('Font', 'FontSize5', FontSize[5]);
 
-        Ini.WriteString('Font','MinColor'   , '$'+InttoHex(Integer( MinFontColor ),8)  );
-        Ini.WriteString('Font','MiddleColor', '$'+InttoHex(Integer( MiddleFontColor ),8)  );
-        Ini.WriteString('Font','MaxColor'   , '$'+InttoHex(Integer( MaxFontColor ),8)  );
-        Ini.WriteInteger('Font', 'MiddleToMinComputing', MiddleToMinComputing);
-        Ini.WriteInteger('Font', 'MiddleToMaxComputing', MiddleToMaxComputing);
+        //Ini.WriteString('Font','MinColor'   , '$'+InttoHex(Integer( MinFontColor ),8)  );
+        //Ini.WriteString('Font','MiddleColor', '$'+InttoHex(Integer( MiddleFontColor ),8)  );
+        //Ini.WriteString('Font','MaxColor'   , '$'+InttoHex(Integer( MaxFontColor ),8)  );
+        //Ini.WriteInteger('Font', 'MiddleToMinComputing', MiddleToMinComputing);
+        //Ini.WriteInteger('Font', 'MiddleToMaxComputing', MiddleToMaxComputing);
 
         ini.Writebool('Font','ChangeFontStyleOnMode',ChangeFontStyleOnMode);
         ini.Writebool('Font','ChangeFontOnCbrVbr',ChangeFontOnCbrVbr);

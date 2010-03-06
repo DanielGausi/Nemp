@@ -623,10 +623,16 @@ begin
       ActualizeCue;   // nothing else todo. Jump complete :D
   end else
   begin
-      if Player.Status = PLAYER_ISPLAYING then
-          Play(GetPrevAudioFileIndex, Player.FadingInterval, True)
+      if Player.Time > 5  then
+          // just jump to beginning of the current file
+          Player.Time := 0
       else
-          Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
+      begin
+          if Player.Status = PLAYER_ISPLAYING then
+              Play(GetPrevAudioFileIndex, Player.FadingInterval, True)
+          else
+              Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
+      end;
   end;
 end;
 
@@ -636,10 +642,17 @@ begin
   Player.stop; // Neu im Oktober 2008
   if aUserInput then
       fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
-  if Player.Status = PLAYER_ISPLAYING then
-      Play(GetPrevAudioFileIndex, Player.FadingInterval, True)
+
+  if Player.Time > 5  then
+      // just jump to beginning of the current file
+      Player.Time := 0
   else
-      Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
+  begin
+      if Player.Status = PLAYER_ISPLAYING then
+          Play(GetPrevAudioFileIndex, Player.FadingInterval, True)
+      else
+          Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
+  end;
 end;
 
 procedure TNempPlaylist.PlayFocussed;

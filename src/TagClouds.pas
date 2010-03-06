@@ -320,6 +320,8 @@ type
           // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
           procedure Reset;
 
+          procedure _SaveTagsToFile(aFile: String);
+
   end;
 
   TCloudViewer = class(TNempPanel)
@@ -519,7 +521,7 @@ var i: Integer;
 begin
     ActiveTags.Clear;
     for i := 0 to Tags.Count - 1 do
-        if (Tags[i] = fClearTag) or (TTag(Tags[i]).count > 0) then
+        if (Tags[i] = fClearTag) or (TTag(Tags[i]).count > 2) then
             Activetags.Add(Tags[i]);
 end;
 
@@ -1222,7 +1224,7 @@ begin
     try
         // Generate Auto-Tags from Audiofile-Info
         // ToDo: Settings like "UseYear", "UseDecade", ...
-        GenerateAutoRawTags(aAudioFile, allTags);
+///        GenerateAutoRawTags(aAudioFile, allTags);
 
         // Add the Tags from the two RawTag-Strings to allTag-List
         tmpTags.Text := aAudioFile.RawTagLastFM;
@@ -1282,6 +1284,23 @@ end;
 procedure TTagCloud.UpdateAudioFile(aAudioFile: TAudioFile);
 begin
      // ToDo
+end;
+
+procedure TTagCloud._SaveTagsToFile(aFile: String);
+var s: tStringList;
+    i: Integer;
+begin
+    s := TStringList.Create;
+    try
+        Tags.Sort(Sort_Name);
+        for i := 0 to Tags.Count - 1 do
+          s.Add(TTag(Tags[i]).Key + ' - ' + IntToStr(TTag(Tags[i]).Count));
+
+        s.SaveToFile(aFile);
+    finally
+        s.Free;
+    end;
+
 end;
 
 { TPaintTag }
