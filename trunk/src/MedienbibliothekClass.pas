@@ -4217,12 +4217,17 @@ begin
             if FileExists(SavePath + 'default.nwl') then
                 ImportFavorites(SavePath + 'default.nwl');
 
-        case BrowseMode of
+        // We have no library, but we have to update anyway,
+        // as this ensures AutoScan and/or webserver-activation
+        NewFilesUpdateBib(True);
+
+        {case BrowseMode of
             0: ReBuildBrowseLists;
             1: ReBuildCoverList;
             2: ; // Nothing to do
         end;
         SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
+        }
     end;
 end;
 

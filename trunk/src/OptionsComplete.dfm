@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAudio10
+    ActivePage = TabAudio8
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -3043,8 +3043,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 401
           Height = 17
           Hint = 
-            'When searching for files add everything the player can play or j' +
-            'ust some special types.'
+            'When searching for files: Add every supported file or just some ' +
+            'special types.'
           Caption = 'All types supported by the player'
           TabOrder = 0
           OnClick = cbIncludeAllClick
@@ -4051,6 +4051,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 19
           Width = 48
           Height = 13
+          Hint = 'Set username and password to access your library.'
           Caption = 'Username'
         end
         object LblConst_Password2: TLabel
@@ -4058,6 +4059,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 19
           Width = 46
           Height = 13
+          Hint = 'Set username and password to access your library'
           Caption = 'Password'
         end
         object BtnServerActivate: TButton
@@ -4074,6 +4076,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 67
           Width = 393
           Height = 13
+          Hint = 'Deny access to your library from "the internet".'
           Caption = 'Permit access only from LAN'
           TabOrder = 1
           OnClick = cbOnlyLANClick
@@ -4083,6 +4086,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 99
           Width = 393
           Height = 13
+          Hint = 
+            'Decide, whether searching and downloading files from your librar' +
+            'y is allowed.'
           Caption = 'Permit access to the media library (read only)'
           TabOrder = 2
           OnClick = cbPermitLibraryAccessClick
@@ -4092,6 +4098,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 83
           Width = 393
           Height = 13
+          Hint = 'Decide, whether downloading files from your playlist is allowed.'
           Caption = 'Permit downloading files from the playlist'
           TabOrder = 3
           OnClick = cbPermitPlaylistDownloadClick
@@ -4101,6 +4108,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 115
           Width = 393
           Height = 13
+          Hint = 
+            'Permit remote control like "play", "stop", "next file" of the pl' +
+            'ayer.'
           Caption = 'Permit remote control of the player'
           TabOrder = 4
           OnClick = cbAllowRemoteControlClick
@@ -4126,6 +4136,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 137
           Width = 393
           Height = 17
+          Hint = 'Automatically activate the webserver when Nemp starts.'
           Caption = 'Activate webserver on start'
           TabOrder = 7
         end
@@ -4135,6 +4146,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 191
         Width = 434
         Height = 83
+        Hint = 
+          'Your IP-configuration. Tell your friends these IPs to access you' +
+          'r library.'
         Caption = 'Own IP-addresses'
         TabOrder = 1
         object LblConst_IPWAN: TLabel
@@ -4159,6 +4173,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 34
           Width = 121
           Height = 25
+          Hint = 
+            'Get your Internet-IP (done via a little php-script on www.gausi.' +
+            'de).'
           Caption = 'Get IP-address'
           TabOrder = 0
           OnClick = BtnGetIPsClick
@@ -4168,6 +4185,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 113
           Height = 21
+          Hint = 'Your IP(s) inside the local area network (LAN).'
           Style = csDropDownList
           ItemHeight = 13
           TabOrder = 1
@@ -4179,6 +4197,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 121
           Height = 21
+          Hint = 
+            'Your IP "in the internet". You have to configure your router and' +
+            '/or firewall properly (e.g. forwarding Port80 to your machine) '
           ReadOnly = True
           TabOrder = 2
           Text = '?'
@@ -4227,6 +4248,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 121
           Height = 13
+          Hint = 'Increase this value, if the playback stutters sometimes.'
           AutoSize = False
           Caption = 'Buffer size'
         end
@@ -4235,6 +4257,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 36
           Width = 13
           Height = 13
+          Hint = 'Increase this value, if the playback stutters sometimes.'
           Caption = 'ms'
         end
         object LblConst_UseFloatingPoint: TLabel
@@ -4242,6 +4265,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 121
           Height = 13
+          Hint = 'Try to change this, if the playback is distorted.'
           AutoSize = False
           Caption = 'Floating-point channels'
         end
@@ -4250,6 +4274,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 112
           Width = 121
           Height = 13
+          Hint = 'Try to change this, if the playback is distorted.'
           AutoSize = False
           Caption = 'Mixing'
         end
@@ -4258,6 +4283,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 84
           Width = 12
           Height = 13
+          Hint = 'Try to change this, if the playback is distorted.'
           Caption = '...'
         end
         object SEBufferSize: TSpinEdit
@@ -4265,6 +4291,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 57
           Height = 22
+          Hint = 'Increase this value, if the playback stutters sometimes.'
           Increment = 100
           MaxValue = 5000
           MinValue = 100
@@ -4276,6 +4303,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 80
           Width = 145
           Height = 21
+          Hint = 'Try to change this, if the playback is distorted.'
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 0
@@ -4291,6 +4319,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 128
           Width = 145
           Height = 21
+          Hint = 'Try to change this, if the playback is distorted.'
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 0
@@ -4314,6 +4343,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 142
           Height = 13
+          Hint = 
+            'Use this, if the playback don'#39't work after hibernating the syste' +
+            'm.'
           Caption = '(necessary on some systems)'
         end
         object cbPauseOnSuspend: TCheckBox
@@ -4321,6 +4353,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 409
           Height = 17
+          Hint = 
+            'Stop the player when the system hibernates, so the playback is s' +
+            'topped when the PC is turned on again.'
           Caption = 'Stop player when systems hibernates'
           Checked = True
           State = cbChecked
@@ -4331,6 +4366,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 393
           Height = 17
+          Hint = 
+            'Use this, if the playback don'#39't work after hibernating the syste' +
+            'm.'
           Caption = 'Reinit player engine on wakeup'
           TabOrder = 1
           WordWrap = True
@@ -4340,6 +4378,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 72
           Width = 161
           Height = 25
+          Hint = 'Reinit player engine now.'
           Caption = 'Reinit player engine now'
           TabOrder = 2
           OnClick = Btn_ReinitPlayerEngineClick
@@ -4353,18 +4392,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Beta-Settings'
         TabOrder = 2
         object CB_BetaDontUseThreadedUpdate: TCheckBox
-          Left = 8
-          Top = 16
+          Left = 13
+          Top = 15
           Width = 417
           Height = 17
+          Hint = 'Beta-Settings. Do not change, unless you know what yo are doing!'
           Caption = 'Update library in Mainthread'
           TabOrder = 0
         end
         object cb_UseClassicCoverflow: TCheckBox
-          Left = 8
+          Left = 13
           Top = 33
           Width = 214
           Height = 17
+          Hint = 'Beta-Settings. Do not change, unless you know what yo are doing!'
           Caption = 'Use classic coverflow'
           TabOrder = 1
         end
@@ -4416,6 +4457,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 410
           Height = 17
+          Hint = 'Use some tricky algorithms to accelerate the search.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Accelerate search'
           TabOrder = 0
@@ -4426,6 +4468,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 394
           Height = 17
+          Hint = 'Include filenames to the accelerated search algorithms.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Including filenames'
           TabOrder = 1
@@ -4435,6 +4478,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 80
           Width = 394
           Height = 17
+          Hint = 'Include comments to the accelerated search algorithms.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Including comments'
           TabOrder = 2
@@ -4444,6 +4488,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 128
           Width = 410
           Height = 17
+          Hint = 'Use some tricky algorithms to accelerate the search for lyrics.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Accelerate lyrics search'
           TabOrder = 3
@@ -4465,6 +4510,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 64
           Width = 378
           Height = 41
+          Hint = 'Activate this settings only if your machine is fast enough.'
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
           Caption = 
@@ -4478,6 +4524,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 410
           Height = 17
+          Hint = 
+            'Show search results in "real time" or just after pressing the "e' +
+            'nter"-key.'
           Anchors = [akLeft, akTop, akRight]
           Caption = '"While you type"'
           TabOrder = 0
@@ -4487,6 +4536,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 48
           Width = 410
           Height = 17
+          Hint = 
+            'Always use a fuzzy search (e.g. show files from "Amy MacDonald" ' +
+            'when you search for "Amy McDonald")'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Allow errors while typing'
           TabOrder = 2
@@ -4496,6 +4548,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 32
           Width = 410
           Height = 17
+          Hint = 
+            'Do a fuzzy search after pressing "enter" (e.g. show files from "' +
+            'Amy MacDonald" when you search for "Amy McDonald")'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Allow errors on [Enter]'
           TabOrder = 1
@@ -4521,6 +4576,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 16
           Width = 409
           Height = 17
+          Hint = 'If you don'#39't know what this means: Just let it unchecked. ;-)'
           Caption = 'Always write Unicode in ID3v2-tags'
           TabOrder = 0
         end
@@ -4529,6 +4585,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 40
           Width = 409
           Height = 17
+          Hint = 
+            'Use a uber-ingenious special method for better tag-reading in fi' +
+            'les with "unicode-filenames".'
           Caption = 'Auto-detect (probably) used charset'
           TabOrder = 1
         end
@@ -4538,6 +4597,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 78
         Width = 432
         Height = 211
+        Hint = 'Adjust charset-detection.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Charsets for auto-detection'
         TabOrder = 1
