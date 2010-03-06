@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAudio8
+    ActivePage = TabAnzeige1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2284,20 +2284,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 105
+        Height = 125
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fonts'
         TabOrder = 0
         object LblConst_FontVBR: TLabel
-          Left = 24
-          Top = 56
+          Left = 27
+          Top = 75
           Width = 115
           Height = 13
           Caption = 'Font for variable bitrate'
         end
         object LblConst_FontCBR: TLabel
-          Left = 216
-          Top = 56
+          Left = 219
+          Top = 75
           Width = 119
           Height = 13
           Caption = 'Font for constant bitrate'
@@ -2316,7 +2316,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CBChangeFontOnCbrVbr: TCheckBox
           Left = 8
-          Top = 32
+          Top = 54
           Width = 401
           Height = 17
           Hint = 'Use different fonts for files with fixed or variable bitrate.'
@@ -2328,8 +2328,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = CBChangeFontOnCbrVbrClick
         end
         object CBFontNameVBR: TComboBox
-          Left = 24
-          Top = 72
+          Left = 27
+          Top = 91
           Width = 161
           Height = 21
           Style = csDropDownList
@@ -2337,137 +2337,35 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 2
         end
         object CBFontNameCBR: TComboBox
-          Left = 216
-          Top = 72
+          Left = 219
+          Top = 91
           Width = 161
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
           TabOrder = 3
         end
-      end
-      object GrpBox_FontColor: TGroupBox
-        Left = 8
-        Top = 120
-        Width = 434
-        Height = 145
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Font colors'
-        TabOrder = 1
-        object ShapeMinColor: TShape
-          Left = 24
-          Top = 80
-          Width = 21
-          Height = 21
-          Shape = stRoundRect
-          OnMouseDown = ShapeColorMouseDown
-        end
-        object ShapeMittelColor: TShape
-          Left = 168
-          Top = 80
-          Width = 21
-          Height = 21
-          Shape = stRoundRect
-          OnMouseDown = ShapeColorMouseDown
-        end
-        object ShapeMaxColor: TShape
-          Left = 323
-          Top = 80
-          Width = 21
-          Height = 21
-          Shape = stRoundRect
-          OnMouseDown = ShapeColorMouseDown
-        end
-        object Image1: TImage
-          Left = 24
-          Top = 56
-          Width = 320
-          Height = 17
-        end
-        object Label25: TLabel
-          Left = 24
-          Top = 40
-          Width = 51
-          Height = 13
-          Caption = '0 kbits/sec'
-        end
-        object Label26: TLabel
-          Left = 168
-          Top = 40
-          Width = 18
-          Height = 13
-          Caption = '160'
-        end
-        object Label27: TLabel
-          Left = 328
-          Top = 40
-          Width = 18
-          Height = 13
-          Caption = '320'
-        end
-        object LblConst_FontColorHint: TLabel
-          Left = 24
-          Top = 112
-          Width = 314
-          Height = 13
-          Caption = 
-            'Note: Changings have no effect on skins. Use skin colors instead' +
-            '.'
-        end
         object CBChangeFontColoronBitrate: TCheckBox
           Left = 8
-          Top = 16
+          Top = 35
           Width = 393
           Height = 17
           Hint = 'Use different colors for different bitrates.'
-          Caption = 'Change font color according to bitrate'
+          Caption = 'Change font color according to bitrate (if skin allows this)'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 0
+          TabOrder = 4
           WordWrap = True
-          OnClick = CBChangeFontColoronBitrateClick
-        end
-        object CBMiddleToMinComputing: TComboBox
-          Left = 56
-          Top = 80
-          Width = 105
-          Height = 21
-          Style = csDropDownList
-          ItemHeight = 13
-          ItemIndex = 1
-          TabOrder = 1
-          Text = 'linear'
-          OnChange = RGROUPMiddleToMaxComputingClick
-          Items.Strings = (
-            'square'
-            'linear'
-            'logarithmic')
-        end
-        object CBMiddleToMaxComputing: TComboBox
-          Left = 200
-          Top = 80
-          Width = 113
-          Height = 21
-          Style = csDropDownList
-          ItemHeight = 13
-          ItemIndex = 1
-          TabOrder = 2
-          Text = 'linear'
-          OnChange = RGROUPMiddleToMaxComputingClick
-          Items.Strings = (
-            'square'
-            'linear'
-            'logarithmic')
         end
       end
       object GrpBox_FontSizePreselection: TGroupBox
         Left = 8
-        Top = 368
+        Top = 236
         Width = 434
-        Height = 65
+        Height = 70
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Font size (browselists)'
-        TabOrder = 3
+        TabOrder = 2
         object Label34: TLabel
           Left = 144
           Top = 16
@@ -2495,8 +2393,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Value = 16
         end
         object SEArtistAlbenSIze: TSpinEdit
-          Left = 3
-          Top = 35
+          Left = 8
+          Top = 33
           Width = 49
           Height = 22
           MaxValue = 72
@@ -2507,12 +2405,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_FontSize: TGroupBox
         Left = 8
-        Top = 272
+        Top = 138
         Width = 434
-        Height = 89
+        Height = 94
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Font size (playlist and medialist)'
-        TabOrder = 2
+        TabOrder = 1
         object LblConst_RowHeight: TLabel
           Left = 144
           Top = 16
@@ -2554,7 +2452,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           WordWrap = True
         end
         object SEFontSize: TSpinEdit
-          Left = 3
+          Left = 8
           Top = 35
           Width = 49
           Height = 22

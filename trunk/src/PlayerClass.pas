@@ -2059,9 +2059,36 @@ begin
       result := False;
 end;
 function TNempPlayer.JumpToPrevCue: Boolean;
-var PrevCueIdx: Integer;
+var PrevCueIdx, CurrentCueIdx: Integer;
+    startTime: Double;
 begin
-  PrevCueIdx := GetActiveCue - 1;
+
+    if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) then
+    begin
+        // we have a MainAudioFile and we have a cuelist
+        // determine, where we are right now
+        CurrentCueIdx := GetActiveCue;
+        startTime := TPlaylistFile(MainAudioFile.CueList[CurrentCueIdx]).Index01;
+
+        // If last Cue is "far away": jump to the beginning of the current cue
+        if self.Time - startTime > 5 then
+            PrevCueIdx := CurrentCueIdx
+        else
+            // else jump one cue back
+            PrevCueIdx := CurrentCueIdx - 1;
+
+        if PrevCueIdx >= 0 then
+        begin
+          SetTime(TPlaylistFile(MainAudioFile.CueList[PrevCueIdx]).Index01);
+          result := True;
+        end
+        else
+            result := False;  // this will result in playing the previous file
+    end else
+        // No cuelist - no jump
+        result := False;
+
+{  PrevCueIdx := GetActiveCue - 1;
   if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) and (PrevCueIdx > 0) then
   begin
       SetTime(TPlaylistFile(MainAudioFile.CueList[PrevCueIdx]).Index01);
@@ -2069,6 +2096,7 @@ begin
   end
   else
       result := False;
+  }
 end;
 
 {

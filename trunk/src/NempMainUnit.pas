@@ -1826,7 +1826,7 @@ begin
       maxFont := NempOptions.DefaultFontSize;
 
     PlaylistVST.Canvas.Font.Size := maxFont;
-    PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('999:99');
+    PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
     VST.Font.Size:=NempOptions.DefaultFontSize;
     PlaylistVST.Font.Size:=NempOptions.DefaultFontSize;
     if Screen.Fonts.IndexOf(NempOptions.FontNameVBR) = -1 then
@@ -4409,7 +4409,8 @@ begin
           end
           else
             // "kein Skin Aktiviert":
-            font.Color := BitrateToColor(AudioFile.Bitrate, NempOptions.MinFontColor, NempOptions.MiddleFontColor, NempOptions.MaxFontColor, NempOptions.MiddleToMinComputing, NempOptions.MiddleToMaxComputing );
+            //font.Color := BitrateToColor(AudioFile.Bitrate, NempOptions.MinFontColor, NempOptions.MiddleFontColor, NempOptions.MaxFontColor, NempOptions.MiddleToMinComputing, NempOptions.MiddleToMaxComputing );
+            font.Color := BitrateToColor(AudioFile.Bitrate, clRed, clBlack, clGreen, 2, 2);
         end;
 
         if  (NempSkin.isActive) AND
@@ -10548,6 +10549,8 @@ begin
 
   //caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
   // + ' - ' + IntToStr(self.handle);
+
+  MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
