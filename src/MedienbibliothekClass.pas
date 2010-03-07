@@ -2081,6 +2081,12 @@ begin
             end else
             begin
                 inc(done);
+
+
+                // ToDo: s // RawTagsLastFM nachbearbeiten, abgleichen mit Ignore-/Synonym-Liste
+                // Diese Listen können lokal hier gladen werden - die werden nur hier gebraucht
+                // in etwa s := self.tagCloud.checkTags(s, ignorelist, synonymlist)
+
                 af.RawTagLastFM := s;
                 af.SetAudioData(SAD_Both);
 

@@ -6,7 +6,7 @@ program nemp;
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
 
-{$R *.dres}
+
 
 uses
   madExcept,
@@ -75,9 +75,10 @@ uses
   NoLyricWikiApi in 'NoLyricWikiApi.pas' {NoLyricWikiApiForm},
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas'
-    ;
-  //,  classes;
+  TagClouds in 'TagClouds.pas' {/,  classes;},
+  CloudEditor in 'CloudEditor.pas' {CloudEditorForm};
+
+//,  classes;
 
 {$R *.res}
 
@@ -102,6 +103,7 @@ ShowWindow
 
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Application.CreateForm(TCloudEditorForm, CloudEditorForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
         Application.Title := 'Nemp';

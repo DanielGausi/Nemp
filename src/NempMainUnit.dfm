@@ -594,9 +594,9 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object SlideBarShape: TShape
           Left = 16
-          Top = 69
+          Top = 68
           Width = 193
-          Height = 4
+          Height = 6
           Brush.Color = clGradientActiveCaption
           DragCursor = crSizeWE
           Shape = stRoundRect
@@ -604,9 +604,9 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseDown = SlideBarShapeMouseDown
         end
         object VolShape: TShape
-          Left = 215
+          Left = 214
           Top = 29
-          Width = 4
+          Width = 6
           Height = 34
           Brush.Color = clGradientActiveCaption
           DragCursor = crSizeNS
@@ -3557,7 +3557,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130060020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130064020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4122,7 +4122,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C0101130018004C0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800500210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000

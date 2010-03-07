@@ -144,6 +144,9 @@
 			<DCCReference Include="TagClouds.pas">
 				<Form>/,  classes;</Form>
 			</DCCReference>
+			<DCCReference Include="CloudEditor.pas">
+				<Form>CloudEditorForm</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Basis">
 				<Key>Base</Key>
 			</BuildConfiguration>

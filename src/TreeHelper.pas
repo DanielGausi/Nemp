@@ -72,7 +72,6 @@ type
   function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
   function AddVDTCover(AVDT: TCustomVirtualDrawTree; aNode: PVirtualNode; aAudioFile: TAudioFile; Complete: Boolean = False): PVirtualNode;
 
-
   procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
   procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
 

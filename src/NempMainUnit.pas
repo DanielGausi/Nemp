@@ -1443,7 +1443,7 @@ uses   Splash, MultimediaKeys,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   HeadsetControl, BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt;
+  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt, CloudEditor;
 
 
 {$R *.dfm}
@@ -10550,7 +10550,9 @@ begin
   //caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
   // + ' - ' + IntToStr(self.handle);
 
-  MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
+  //MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
+
+  CloudEditorForm.show;
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
