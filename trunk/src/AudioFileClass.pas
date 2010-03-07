@@ -59,6 +59,7 @@ type
 
           //
           fBreadCrumbIndex: Integer;
+          fIsAutoTag: Boolean;
 
           function GetCount: Integer;
       public
@@ -67,6 +68,7 @@ type
           // The number of AudioFiles tagged with this Tag.
           property count: Integer read GetCount;
           property Key: UTF8String read fKey;
+          property IsAutoTag: Boolean read fIsAutoTag write fIsAutoTag;
 
           property BreadCrumbIndex: Integer read fBreadCrumbIndex write fBreadCrumbIndex;
           constructor Create(aKey: UTF8String);
@@ -419,6 +421,7 @@ begin
     inherited create;
     AudioFiles := TObjectList.Create(False);
     fKey := AnsiLowercase(aKey);
+    fIsAutoTag := False;
     BreadCrumbIndex := High(Integer);
 end;
 

@@ -57,6 +57,12 @@ type
 
   TBlendMode = (bm_Cloud, bm_Tag);
 
+  // types for the VirtualStringTree in CloudEditorForm
+  TTagTreeData = record
+      FTag : TTag;
+  end;
+  PTagTreeData = ^TTagTreeData;
+
   // class containing some colors and other stuff.
   // can be changed by NempSkin
   // used by every single tag to get its colors.
@@ -322,6 +328,11 @@ type
 
           procedure _SaveTagsToFile(aFile: String);
 
+          // Copy all Tags from self.Tags to Target
+          // used for TagEditor
+          // Note: Only references are copied, not the Tag-Objects themself!
+          procedure CopyTags(Target: TObjectList; HideAutotags: Boolean; MinCount: Integer);
+
   end;
 
   TCloudViewer = class(TNempPanel)
@@ -364,6 +375,9 @@ type
 function Sort_Count(item1,item2:pointer):integer;
 function Sort_Name(item1,item2:pointer):integer;
 
+function Sort_Count_DESC(item1,item2:pointer):integer;
+function Sort_Name_DESC(item1,item2:pointer):integer;
+
 var
     TagCustomizer: TTagCustomizer;
 
@@ -388,6 +402,26 @@ begin
     if result = 0 then
     begin
         result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    end;
+end;
+
+function Sort_Count_DESC(item1,item2:pointer):integer;
+begin
+    result := CompareValue(TTag(item1).BreadCrumbIndex ,TTag(item2).BreadCrumbIndex);
+    if result = 0 then
+    begin
+        result := CompareValue(TTag(item1).Count ,TTag(item2).Count);
+        if result = 0 then
+            result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+    end;
+end;
+
+function Sort_Name_DESC(item1,item2:pointer):integer;
+begin
+    result := CompareValue(TTag(item1).BreadCrumbIndex ,TTag(item2).BreadCrumbIndex);
+    if result = 0 then
+    begin
+        result := AnsiCompareText(TTag(item2).Key ,TTag(item1).Key);
     end;
 end;
 
@@ -880,6 +914,23 @@ begin
 end;
 
 
+procedure TTagCloud.CopyTags(Target: TObjectList; HideAutotags: Boolean; MinCount: Integer);
+var
+  i: Integer;
+  aTag: TTag;
+begin
+    Target.Clear;
+    for i := 0 to Tags.Count - 1 do
+    begin
+        aTag := TTag(Tags[i]);
+
+        if (aTag.count >= MinCount)
+           and (Not (HideAutotags and aTag.IsAutoTag))
+        then
+            Target.Add(Tags[i]);
+    end;
+end;
+
 {
     --------------------------------------------------------
     BuildCloud
@@ -1217,6 +1268,7 @@ end;
 procedure TTagCloud.AddAudioFileRAWTags(aAudioFile: TAudioFile);
 var allTags, tmpTags: TStringList;
     i: Integer;
+    autoCount: Integer;
     aTag: TTag;
 begin
     allTags := TStringList.Create;
@@ -1224,7 +1276,9 @@ begin
     try
         // Generate Auto-Tags from Audiofile-Info
         // ToDo: Settings like "UseYear", "UseDecade", ...
-///        GenerateAutoRawTags(aAudioFile, allTags);
+        GenerateAutoRawTags(aAudioFile, allTags);
+
+        autoCount := alltags.Count;
 
         // Add the Tags from the two RawTag-Strings to allTag-List
         tmpTags.Text := aAudioFile.RawTagLastFM;
@@ -1240,11 +1294,16 @@ begin
         for i := 0 to allTags.Count - 1 do
         begin
             aTag := GetTag(allTags[i]);
+
+            if i < autoCount then
+                aTag.IsAutoTag := True;
+
             // ensure Uniquness - check whether the tag was just added to this file
             if  (aTag.BreadCrumbIndex = High(Integer)) AND
                 ((aTag.count = 0) or (TAudioFile(aTag.AudioFiles[aTag.count-1]) <> aAudioFile))
             then
             begin
+
                 // Add the AudioFile into the Filelist of the Tag
                 aTag.AudioFiles.Add(aAudioFile);
                 // Add the Tag into the Taglist of the AudioFile
