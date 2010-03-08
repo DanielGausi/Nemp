@@ -57,6 +57,7 @@ type
     cbHideAutoTags: TCheckBox;
     seMinTagCount: TSpinEdit;
     lblMinTagCount: TLabel;
+    BtnTagRename: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -73,6 +74,7 @@ type
     procedure TagVSTIncrementalSearch(Sender: TBaseVirtualTree;
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
     procedure TagVSTKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure BtnTagRenameClick(Sender: TObject);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
@@ -122,6 +124,7 @@ begin
 
     Aus LocalTagList können Tags dann gelöscht werden, und sie bleiben hier
     dann weg, machen aber keine AVS, weil sie in der TagClud noch da sind.
+    NEIN. TAGS WERDEN NICHT EINZELN GELÖSCHT.
 
     Außerdem können hier NEUE TAGS erzeugt werden.
 
@@ -363,5 +366,11 @@ begin
             TargetCanvas.Font.Style := [fsItalic];
     end;
 end;
+
+procedure TCloudEditorForm.BtnTagRenameClick(Sender: TObject);
+begin
+    exit;
+end;
+
 
 end.

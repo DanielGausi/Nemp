@@ -82,4 +82,13 @@ object CloudEditorForm: TCloudEditorForm
     Value = 1
     OnChange = seMinTagCountChange
   end
+  object BtnTagRename: TButton
+    Left = 424
+    Top = 144
+    Width = 107
+    Height = 25
+    Caption = 'Rename Tag'
+    TabOrder = 3
+    OnClick = BtnTagRenameClick
+  end
 end

@@ -323,6 +323,9 @@ type
           // Update a File (change the Tags) in the Cloud
           procedure UpdateAudioFile(aAudioFile: TAudioFile);
 
+          // Rename a Tag
+          procedure RenameTag(oldTag: TTag; NewKey: String);
+
           // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
           procedure Reset;
 
@@ -537,6 +540,7 @@ function TTagCloud.fGetTagList: TObjectList;
 begin
    result := Activetags;
 end;
+
 
 procedure TTagCloud.Reset;
 var i: Integer;
@@ -1332,6 +1336,49 @@ begin
         AddAudioFileTags(aAudioFile);
 
 end;
+
+procedure TTagCloud.RenameTag(oldTag: TTag; NewKey: String);
+var NewTag: TTag;
+    i, t: Integer;
+    af: TAudioFile;
+    newRawString: UTF8String;
+begin
+    // 1. Get Tag with NewKey
+    Newtag := GetTag(NewKey); // if needed, it is created there and Added to Cloud.Tags
+
+    // 2. Move all AudioFiles from OldTag to NewTag
+    for i := 0 to oldTag.AudioFiles.Count - 1 do
+    begin
+        af := TAudioFile(oldTag.AudioFiles[i]);
+        if af.Taglist.Count = 0 then
+            // to be sure, but this should not happen
+            AddAudioFileRAWTags(af);
+        // add newTag into the Taglist of the current AudioFile
+        if af.Taglist.IndexOf(NewTag) = -1 then
+        begin
+            // add New Tag-Object to the audiofile
+            af.Taglist.Add(NewTag);
+            // add Audiofile to the NewTag
+            NewTag.AudioFiles.Add(af);
+        end;
+
+        // remove old Tag from AudioFile
+        af.Taglist.Extract(oldTag);
+
+        // generate New RawTagString from current tags
+        // (this should be easier than pos, copy, ...)
+        // we added newtag, so Count is >0
+        newRawString := TTag(af.Taglist[0]).key;
+        for t := 1 to af.TagList.Count - 1 do
+            newRawString := newRawString + #13#10 + TTag(af.Taglist[0]).key;  // See NempScrobbler.ParseRawTag
+        af.RawTagLastFM := newRawString;
+        // Mark this audiofile, to rewrite its ID3Tag later
+        af.ID3TagNeedsUpdate := True;
+    end;
+    // clear the oldTag
+    oldTag.AudioFiles.Clear;
+end;
+
 
 procedure TTagCloud.DeleteAudioFile(aAudioFile: TAudioFile);
 begin

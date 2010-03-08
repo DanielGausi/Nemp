@@ -539,6 +539,7 @@ begin
             result := name
         else
             result := result + #13#10 + name;
+            // note: if we change the #13#10 here, we MUST also change it in TagCloud.RenameTag
 
         tagBegin := posEx('<tag>', aRawString, tagEnd);
         tagEnd := posEx('</tag>', aRawString, tagEnd + 4);

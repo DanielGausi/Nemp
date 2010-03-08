@@ -202,6 +202,9 @@ type
         //RawTagAuto: UTF8String;
         RawTagLastFM: UTF8String;
         RawTagUserDefined: UTF8String;
+        // Used in TagEditor/CloudTag.RenameTag
+        // True indicates that the ID3Tag of the file should be rewritten
+        ID3TagNeedsUpdate: Boolean;
 
         property Titel:  UnicodeString Read fTitle write fTitle;                        // 2
         property Artist: UnicodeString Index siArtist read GetString write SetString;  // 1
@@ -497,6 +500,7 @@ begin
     Track := 0;
     coverID := '';
     fRating := 0;
+    ID3TagNeedsUpdate := False;
 end;
 destructor TAudioFile.Destroy;
 begin
