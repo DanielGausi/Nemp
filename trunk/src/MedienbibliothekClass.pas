@@ -86,6 +86,8 @@ type
         fHND_RefreshFilesThread: DWord;
         fHND_GetLyricsThread: DWord;
         fHND_GetTagsThread: DWord;
+        fHND_UpdateID3TagsThread: DWord;
+
 
         // General note:
         //     all lists beginning with "tmp" are temporary lists, which stores the library
@@ -230,6 +232,7 @@ type
         procedure fRefreshFiles;      // 1a. Refresh files OR
         procedure fGetLyrics;         // 1b. get Lyrics
         procedure fGetTags;           // 1c. get Tags (from LastFM)
+        procedure fUpdateId3tags;     // 2.  Write Library-Data into the id3-Tags (used in CloudEditor)
 
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
@@ -448,6 +451,7 @@ type
         procedure RefreshFiles;
         procedure GetLyrics;
         procedure GetTags;
+        procedure UpdateId3tags;
 
         // Additional managing. Run in VCL-Thread.
         procedure BuildTotalString;
@@ -552,6 +556,7 @@ type
         procedure LoadFromFile(aFilename: UnicodeString);
 
         function CountInconsistentFiles: Integer;      // Count "ID3TagNeedsUpdate"-AudioFiles
+        procedure PutInconsistentFilesToUpdateList;    // Put these files into the updatelist
   end;
 
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
@@ -559,6 +564,8 @@ type
   procedure fRefreshFilesThread(MB: TMedienbibliothek);
   procedure fGetLyricsThread(MB: TMedienBibliothek);
   procedure fGetTagsThread(MB: TMedienBibliothek);
+
+  procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
 
 
   function GetProperMenuString(aIdx: Integer): UnicodeString;
@@ -833,6 +840,7 @@ end;
     --------------------------------------------------------
     CountInconsistentFiles
     - Count "ID3TagNeedsUpdate"-AudioFiles
+      VCL-Thread only!
     --------------------------------------------------------
 }
 function TMedienBibliothek.CountInconsistentFiles: Integer;
@@ -842,8 +850,23 @@ begin
     for i := 0 to Mp3ListePfadSort.Count - 1 do
         if TAudioFile(Mp3ListePfadSort[i]).ID3TagNeedsUpdate then
             inc(c);
-
     result := c;
+end;
+{
+    --------------------------------------------------------
+    PutInconsistentFilesToUpdateList
+    - Put these Files int the Update-List
+      Runs in VCL-MainThread!
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.PutInconsistentFilesToUpdateList;
+var i: integer;
+begin
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+    begin
+        if TAudioFile(MP3ListePfadSort[i]).ID3TagNeedsUpdate then
+            UpdateList.Add(MP3ListePfadSort[i]);
+    end;
 end;
 
 {
@@ -1346,6 +1369,8 @@ begin
   BibSearcher.BuildTMPTotalString(tmpMp3ListePfadSort);
   BibSearcher.BuildTMPTotalLyricString(tmpMp3ListePfadSort);
 end;
+
+
 {
     --------------------------------------------------------
     AddUsedDrivesInformation
@@ -1823,6 +1848,8 @@ begin
   Changed := True;
 end;
 
+
+
 {
     --------------------------------------------------------
     GetLyrics
@@ -2122,6 +2149,66 @@ end;
 
 
 
+procedure TMedienBibliothek.UpdateId3tags;
+var Dummy: Cardinal;
+begin
+    // Status MUST be set outside
+    // (the updatelist is filled in VCL-Thread)
+    // But, to be sure:
+    StatusBibUpdate := 1;
+    UpdateFortsetzen := True;
+    fHND_UpdateID3TagsThread := BeginThread(Nil, 0, @fUpdateID3TagsThread, Self, 0, Dummy);
+end;
+
+
+
+procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
+begin
+    MB.fUpdateId3tags;
+    // Note: CleanUpTmpLists and stuff is not necessary here.
+    // We did not change the library, we "just" changed the ID3-Tags in some files
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    try
+        CloseHandle(MB.fHND_UpdateID3TagsThread);
+    except
+    end;
+
+end;
+
+procedure TMedienBibliothek.fUpdateId3tags;
+var i: Integer;
+    af: TAudioFile;
+begin
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
+    for i := 0 to UpdateList.Count - 1 do
+    begin
+        if not UpdateFortsetzen then break;
+
+        af := TAudioFile(UpdateList[i]);
+
+        if FileExists(af.Pfad) then
+        begin
+            // call the vcl, that we will edit this file now
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                        Integer(PWideChar(af.Pfad)));
+
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+            af.FileIsPresent := True;
+
+            af.SetAudioData(SAD_Both);
+            af.ID3TagNeedsUpdate := False;
+
+            Changed := True;
+        end;
+    end;
+
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+
+    // clear thread-used filename
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                    Integer(PWideChar('')));
+end;
 
 {
     --------------------------------------------------------
@@ -3554,6 +3641,7 @@ begin
     end;
     LeaveCriticalSection(CSAccessDriveList);
 end;
+
 {
     --------------------------------------------------------
     DrivesHaveChanged
@@ -4116,6 +4204,7 @@ begin
         RadioStationList.Add(NewStation);
     end;
 end;
+
 procedure TMedienBibliothek.SaveRadioStationsToStream(aStream: TStream);
 var i, c, len: Integer;
     tmpStream: TMemoryStream;

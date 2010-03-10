@@ -112,7 +112,7 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit, MedienBibliothekClass, Nemp_RessourceStrings, Math;
+uses NempMainUnit, MedienBibliothekClass, Nemp_RessourceStrings, Math, MainFormHelper;
 
 function AddVSTTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aTag: TTag): PVirtualNode;
 var Data: PTagTreeData;
@@ -477,20 +477,22 @@ procedure TCloudEditorForm.BtnTagRenameClick(Sender: TObject);
 var newKey: String;
     Data: PTagTreeData;
 begin
-    if assigned(TagVST.FocusedNode) then
-    begin
-        Data := TagVST.GetNodeData(TagVST.FocusedNode);
-
-        newKey := Data^.FTag.Key;
-        if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
+    if MedienBib.StatusBibUpdate > 1 then
+        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
+    else
+        if assigned(TagVST.FocusedNode) then
         begin
-            MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
-            ActualizeTreeView;
-            ReselectNode(newKey);
-            RefreshWarningLabel;
-        end;
+            Data := TagVST.GetNodeData(TagVST.FocusedNode);
 
-    end;
+            newKey := Data^.FTag.Key;
+            if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
+            begin
+                MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
+                ActualizeTreeView;
+                ReselectNode(newKey);
+                RefreshWarningLabel;
+            end;
+        end;
 end;
 
 {
@@ -505,37 +507,41 @@ var SelectedTags: TNodeArray;
     Data: PTagTreeData;
     maxKey: String;
 begin
-    SelectedTags := TagVST.GetSortedSelection(False);
-    if Length(SelectedTags) > 0 then
+    if MedienBib.StatusBibUpdate > 1 then
+        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
+    else
     begin
-        maxCount := 0;
-        maxKey := '';
-        // Get Tag with maximum Count for newKey-suggestion
-        for i := 0 to length(SelectedTags) - 1 do
+        SelectedTags := TagVST.GetSortedSelection(False);
+        if Length(SelectedTags) > 0 then
         begin
-            Data := TagVST.GetNodeData(SelectedTags[i]);
-            if Data^.FTag.count > maxCount then
-            begin
-                maxCount := Data^.FTag.count;
-                maxKey := Data^.FTag.Key;
-            end;
-        end;
-
-        // Get new key-name
-        if InputQuery(TagEditor_Merge_Caption, TagEditor_Merge_Prompt, maxKey) then
-        begin
+            maxCount := 0;
+            maxKey := '';
+            // Get Tag with maximum Count for newKey-suggestion
             for i := 0 to length(SelectedTags) - 1 do
             begin
                 Data := TagVST.GetNodeData(SelectedTags[i]);
-                if Data^.FTag.Key <> maxKey then
-                    MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
+                if Data^.FTag.count > maxCount then
+                begin
+                    maxCount := Data^.FTag.count;
+                    maxKey := Data^.FTag.Key;
+                end;
             end;
 
-            ActualizeTreeView;
-            ReselectNode(maxKey);
-            RefreshWarningLabel;
+            // Get new key-name
+            if InputQuery(TagEditor_Merge_Caption, TagEditor_Merge_Prompt, maxKey) then
+            begin
+                for i := 0 to length(SelectedTags) - 1 do
+                begin
+                    // process selected tags: rename them to the new Keyname
+                    Data := TagVST.GetNodeData(SelectedTags[i]);
+                    if Data^.FTag.Key <> maxKey then
+                        MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
+                end;
+                ActualizeTreeView;
+                ReselectNode(maxKey);
+                RefreshWarningLabel;
+            end;
         end;
-
     end;
 end;
 
@@ -546,13 +552,44 @@ end;
     --------------------------------------------------------
 }
 procedure TCloudEditorForm.BtnDeleteTagsClick(Sender: TObject);
+var SelectedTags: TNodeArray;
+    i: Integer;
+    Data: PTagTreeData;
+
 begin
-   Showmessage('Todo');
+    if MedienBib.StatusBibUpdate > 1 then
+        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
+    else
+    begin
+        SelectedTags := TagVST.GetSortedSelection(False);
+        if Length(SelectedTags) > 0 then
+        begin
+            for i := 0 to length(SelectedTags) - 1 do
+            begin
+                // delete selected Tags
+                Data := TagVST.GetNodeData(SelectedTags[i]);
+                MedienBib.TagCloud.DeleteTag(Data^.FTag);
+            end;
+            ActualizeTreeView;
+            RefreshWarningLabel;
+        end;
+    end;
 end;
 
 procedure TCloudEditorForm.BtnUpdateID3TagsClick(Sender: TObject);
 begin
-    Showmessage('Todo');
+    // This action will start a new thread!
+    if MedienBib.StatusBibUpdate <> 0 then
+        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
+    else
+    begin
+        MedienBib.StatusBibUpdate := 1;
+        BlockeMedienListeUpdate(True);
+
+        // Fill UpdateList
+        MedienBib.PutInconsistentFilesToUpdateList;
+        MedienBib.UpdateId3tags;
+    end;
 end;
 
 end.
