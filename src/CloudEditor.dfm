@@ -23,11 +23,25 @@ object CloudEditorForm: TCloudEditorForm
     Height = 13
     Caption = 'Show only tags with a minimum count of'
   end
+  object LblUpdateWarning: TLabel
+    Left = 17
+    Top = 535
+    Width = 129
+    Height = 13
+    Caption = 'CountInconsistentFiles'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    Visible = False
+  end
   object TagVST: TVirtualStringTree
-    Left = 8
-    Top = 104
+    Left = 17
+    Top = 78
     Width = 401
-    Height = 481
+    Height = 451
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
@@ -41,6 +55,7 @@ object CloudEditorForm: TCloudEditorForm
     TabOrder = 0
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
+    OnBeforeItemErase = TagVSTBeforeItemErase
     OnColumnDblClick = TagVSTColumnDblClick
     OnGetText = TagVSTGetText
     OnPaintText = TagVSTPaintText
@@ -84,11 +99,39 @@ object CloudEditorForm: TCloudEditorForm
   end
   object BtnTagRename: TButton
     Left = 424
-    Top = 144
+    Top = 78
     Width = 107
     Height = 25
     Caption = 'Rename Tag'
     TabOrder = 3
     OnClick = BtnTagRenameClick
+  end
+  object BtnUpdateID3Tags: TButton
+    Left = 18
+    Top = 554
+    Width = 128
+    Height = 25
+    Caption = 'Update files now'
+    TabOrder = 4
+    Visible = False
+    OnClick = BtnUpdateID3TagsClick
+  end
+  object BtnMerge: TButton
+    Left = 424
+    Top = 109
+    Width = 107
+    Height = 25
+    Caption = 'Merge Tags'
+    TabOrder = 5
+    OnClick = BtnMergeClick
+  end
+  object BtnDeleteTags: TButton
+    Left = 424
+    Top = 140
+    Width = 107
+    Height = 25
+    Caption = 'Delete Tags'
+    TabOrder = 6
+    OnClick = BtnDeleteTagsClick
   end
 end

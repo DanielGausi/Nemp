@@ -58,6 +58,10 @@ type
     seMinTagCount: TSpinEdit;
     lblMinTagCount: TLabel;
     BtnTagRename: TButton;
+    LblUpdateWarning: TLabel;
+    BtnUpdateID3Tags: TButton;
+    BtnMerge: TButton;
+    BtnDeleteTags: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -75,15 +79,29 @@ type
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
     procedure TagVSTKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure BtnTagRenameClick(Sender: TObject);
+    procedure BtnMergeClick(Sender: TObject);
+    procedure BtnUpdateID3TagsClick(Sender: TObject);
+    procedure BtnDeleteTagsClick(Sender: TObject);
+    procedure TagVSTBeforeItemErase(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
+      var ItemColor: TColor; var EraseAction: TItemEraseAction);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
 
     OldSelectionPrefix : String;
-    procedure FillTagTree;
+
+    procedure FillTagTree(reselect: Boolean = False);
+
+    procedure SortTags;                          // Resort the Tags
+    procedure ReselectNode(aKey: UTF8String);    // Reselect a node with the given key
+
+    procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
+
   public
     { Public-Deklarationen }
-    procedure ActualizeTreeView;
+    procedure ActualizeTreeView;      // get the tags from the cloud with current settings and show them in the tree
+
   end;
 
 
@@ -94,7 +112,7 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit, MedienBibliothekClass, Math;
+uses NempMainUnit, MedienBibliothekClass, Nemp_RessourceStrings, Math;
 
 function AddVSTTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aTag: TTag): PVirtualNode;
 var Data: PTagTreeData;
@@ -155,18 +173,77 @@ procedure TCloudEditorForm.ActualizeTreeView;
 begin
     // Get the tags from the TagCloud
     MedienBib.TagCloud.CopyTags(LocalTagList, cbHideAutoTags.Checked, seMinTagCount.Value);
+    SortTags;
     // Fill the treeview
     FillTagTree;
 end;
 
-procedure TCloudEditorForm.FillTagTree;
-var i: integer;
+procedure TCloudEditorForm.ReselectNode(aKey: UTF8String);
+var i: Integer;
+    aNode: PVirtualNode;
+    Data: PTagTreeData;
 begin
+    aNode := TagVST.GetFirst;
+    Data := TagVST.GetNodeData(aNode);
+    while (Data^.FTag.Key <> aKey) and (aNode <> TagVST.GetLast) do
+    begin
+        aNode := TagVST.GetNext(aNode);
+        Data := TagVST.GetNodeData(aNode);
+    end;
+
+    TagVST.FocusedNode := aNode;
+    TagVST.ScrollIntoView(aNode, True);
+    TagVST.Selected[aNode] := True;
+end;
+
+procedure TCloudEditorForm.FillTagTree(reselect: Boolean = False);
+var i: integer;
+    oldNode: PVirtualNode;
+    oldData: PTagTreeData;
+    oldKey: UTf8String;
+begin
+    if Reselect then
+    begin
+        oldNode := TagVST.FocusedNode;
+        if assigned(oldNode) then
+        begin
+            oldData := TagVST.GetNodeData(oldNode);
+            oldKey := oldData^.FTag.Key;
+        end;
+    end;
+
     TagVST.BeginUpdate;
     TagVST.Clear;
     for i:=0 to LocalTagList.Count-1 do
         AddVSTTag(TagVST,Nil,TTag(LocalTagList.Items[i]));
     TagVST.EndUpdate;
+
+    if Reselect then
+        ReselectNode(oldKey);
+end;
+
+procedure TCloudEditorForm.SortTags;
+begin
+    // Sort LocalTagList
+    if TagVST.Header.SortDirection =  sdDescending then
+        case TagVST.Header.SortColumn of
+            0: LocalTagList.Sort(Sort_Name_DESC);
+            1: LocalTagList.Sort(Sort_Count_DESC);
+        end
+    else
+        case TagVST.Header.SortColumn of
+            0: LocalTagList.Sort(Sort_Name);
+            1: LocalTagList.Sort(Sort_Count);
+        end;
+end;
+
+procedure TCloudEditorForm.RefreshWarningLabel;
+var c: Integer;
+begin
+    c := MedienBib.CountInconsistentFiles;
+    LblUpdateWarning.Caption := Format(TagEditor_FilesNeedUpdate, [c]);
+    LblUpdateWarning.Visible := c > 0;
+    BtnUpdateID3Tags.Visible := c > 0;
 end;
 
 procedure TCloudEditorForm.FormShow(Sender: TObject);
@@ -252,19 +329,10 @@ begin
               end;
           // Set SortColumn
           TagVST.Header.SortColumn := HitInfo.Column;
-          // Sort LocalTagList
-          if TagVST.Header.SortDirection =  sdDescending then
-              case HitInfo.Column of
-                  0: LocalTagList.Sort(Sort_Name_DESC);
-                  1: LocalTagList.Sort(Sort_Count_DESC);
-              end
-          else
-              case HitInfo.Column of
-                  0: LocalTagList.Sort(Sort_Name);
-                  1: LocalTagList.Sort(Sort_Count);
-              end;
+
+          SortTags;
           // Show Tags in TreeView
-          FillTagTree;
+          FillTagTree(True);
       end;
   end;
 end;
@@ -298,8 +366,9 @@ end;
 }
 procedure TCloudEditorForm.TagVSTKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
-var ScrollNode: PVirtualNode;
+var ScrollNode, aNode: PVirtualNode;
     erfolg: boolean;
+    Data: PTagTreeData;
 
         function GetNodeWithPrefix(StartNode:PVirtualNode; Prefix: String; var Erfolg:boolean):PVirtualNode;
         var nextnode:PVirtualnode;
@@ -342,9 +411,40 @@ begin
               TagVST.Selected[ScrollNode] := True;
             end;
         end;
+        VK_Return: begin
+            aNode := TagVST.FocusedNode;
+            if assigned(aNode) then
+            begin
+                Data := TagVST.GetNodeData(aNode);
+                if assigned(Data) then
+                    MedienBib.GenerateAnzeigeListeFromTagCloud(Data^.FTag, False);
+            end;
+        end;
     end;
 end;
 
+
+{
+    --------------------------------------------------------
+    TagVSTBeforeItemErase
+    - Paint Breadcrumb-Tags of the Cloud with a different background
+    --------------------------------------------------------
+}
+procedure TCloudEditorForm.TagVSTBeforeItemErase(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
+  var ItemColor: TColor; var EraseAction: TItemEraseAction);
+var Data: PTagTreeData;
+begin
+    Data := TagVST.GetNodeData(Node);
+    with TargetCanvas do
+    begin
+        if Data^.FTag.BreadCrumbIndex < High(Integer) then
+            ItemColor := $CCCCCC
+        else
+            ItemColor := TagVST.Color;
+        EraseAction := eaColor;
+    end;
+end;
 {
     --------------------------------------------------------
     TagVSTPaintText
@@ -367,10 +467,92 @@ begin
     end;
 end;
 
+{
+    --------------------------------------------------------
+    BtnTagRenameClick
+    - Rename the focussed Tag
+    --------------------------------------------------------
+}
 procedure TCloudEditorForm.BtnTagRenameClick(Sender: TObject);
+var newKey: String;
+    Data: PTagTreeData;
 begin
-    exit;
+    if assigned(TagVST.FocusedNode) then
+    begin
+        Data := TagVST.GetNodeData(TagVST.FocusedNode);
+
+        newKey := Data^.FTag.Key;
+        if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
+        begin
+            MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
+            ActualizeTreeView;
+            ReselectNode(newKey);
+            RefreshWarningLabel;
+        end;
+
+    end;
 end;
 
+{
+    --------------------------------------------------------
+    BtnMergeClick
+    - Merge the selected Tags
+    --------------------------------------------------------
+}
+procedure TCloudEditorForm.BtnMergeClick(Sender: TObject);
+var SelectedTags: TNodeArray;
+    maxCount, i: Integer;
+    Data: PTagTreeData;
+    maxKey: String;
+begin
+    SelectedTags := TagVST.GetSortedSelection(False);
+    if Length(SelectedTags) > 0 then
+    begin
+        maxCount := 0;
+        maxKey := '';
+        // Get Tag with maximum Count for newKey-suggestion
+        for i := 0 to length(SelectedTags) - 1 do
+        begin
+            Data := TagVST.GetNodeData(SelectedTags[i]);
+            if Data^.FTag.count > maxCount then
+            begin
+                maxCount := Data^.FTag.count;
+                maxKey := Data^.FTag.Key;
+            end;
+        end;
+
+        // Get new key-name
+        if InputQuery(TagEditor_Merge_Caption, TagEditor_Merge_Prompt, maxKey) then
+        begin
+            for i := 0 to length(SelectedTags) - 1 do
+            begin
+                Data := TagVST.GetNodeData(SelectedTags[i]);
+                if Data^.FTag.Key <> maxKey then
+                    MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
+            end;
+
+            ActualizeTreeView;
+            ReselectNode(maxKey);
+            RefreshWarningLabel;
+        end;
+
+    end;
+end;
+
+{
+    --------------------------------------------------------
+    BtnDeleteTagsClick
+    - Delete the selected Tags
+    --------------------------------------------------------
+}
+procedure TCloudEditorForm.BtnDeleteTagsClick(Sender: TObject);
+begin
+   Showmessage('Todo');
+end;
+
+procedure TCloudEditorForm.BtnUpdateID3TagsClick(Sender: TObject);
+begin
+    Showmessage('Todo');
+end;
 
 end.
