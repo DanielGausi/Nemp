@@ -589,6 +589,15 @@ Shoutcast_InputStreamLabel   = 'URL (e.g. "http://myhits.com/tune_in.pls" or "ht
 TabBtnBrowse_Hint1 = 'Browse your medialibrary';
 TabBtnBrowse_Hint2 = 'Click to resort';
 
+TagEditor_RenameTag_Caption = 'Rename Tag';
+TagEditor_RenameTag_Prompt = 'Enter a new name for the tag. If it already exists, the two tags are merged.';
+
+TagEditor_Merge_Caption = 'Merge Tags';
+TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it already exists, the tags are merged with this one.';
+
+TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
+
+
 
 implementation
 

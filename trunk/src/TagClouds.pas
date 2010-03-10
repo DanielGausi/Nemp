@@ -1370,7 +1370,7 @@ begin
         // we added newtag, so Count is >0
         newRawString := TTag(af.Taglist[0]).key;
         for t := 1 to af.TagList.Count - 1 do
-            newRawString := newRawString + #13#10 + TTag(af.Taglist[0]).key;  // See NempScrobbler.ParseRawTag
+            newRawString := newRawString + #13#10 + TTag(af.Taglist[t]).key;  // See NempScrobbler.ParseRawTag
         af.RawTagLastFM := newRawString;
         // Mark this audiofile, to rewrite its ID3Tag later
         af.ID3TagNeedsUpdate := True;

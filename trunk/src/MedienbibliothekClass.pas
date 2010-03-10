@@ -550,6 +550,8 @@ type
         // will call several private methods
         procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
         procedure LoadFromFile(aFilename: UnicodeString);
+
+        function CountInconsistentFiles: Integer;      // Count "ID3TagNeedsUpdate"-AudioFiles
   end;
 
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
@@ -825,6 +827,23 @@ begin
           dest.Add(newAF);
       end;
   end;
+end;
+
+{
+    --------------------------------------------------------
+    CountInconsistentFiles
+    - Count "ID3TagNeedsUpdate"-AudioFiles
+    --------------------------------------------------------
+}
+function TMedienBibliothek.CountInconsistentFiles: Integer;
+var i, c: Integer;
+begin
+    c := 0;
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+        if TAudioFile(Mp3ListePfadSort[i]).ID3TagNeedsUpdate then
+            inc(c);
+
+    result := c;
 end;
 
 {
