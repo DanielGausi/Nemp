@@ -44,7 +44,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel, IniFiles;
+    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs;
 
 const
 
@@ -325,6 +325,10 @@ type
 
           // Rename a Tag
           procedure RenameTag(oldTag: TTag; NewKey: String);
+
+          // Delete a Tag
+          // (this will not destroy the TTag-Object, just clear the audiofiles)
+          procedure DeleteTag(aTag: TTag);
 
           // Reset the Tag to zero, i.e. Clear the Tag.AudioFileList
           procedure Reset;
@@ -1337,6 +1341,12 @@ begin
 
 end;
 
+{
+    --------------------------------------------------------
+    RenameTag
+    - Rename a Tag (i.e. create a new tag Object and move Audiofiles to the new one)
+    --------------------------------------------------------
+}
 procedure TTagCloud.RenameTag(oldTag: TTag; NewKey: String);
 var NewTag: TTag;
     i, t: Integer;
@@ -1367,6 +1377,11 @@ begin
 
         // generate New RawTagString from current tags
         // (this should be easier than pos, copy, ...)
+
+        ssss
+
+        // But it is WRONG!!! in af.Tags are also the AUTO-tags!!
+
         // we added newtag, so Count is >0
         newRawString := TTag(af.Taglist[0]).key;
         for t := 1 to af.TagList.Count - 1 do
@@ -1379,12 +1394,47 @@ begin
     oldTag.AudioFiles.Clear;
 end;
 
+{
+    --------------------------------------------------------
+    DeleteTag
+    - Clear a Tags AudioFile-List
+    --------------------------------------------------------
+}
+procedure TTagCloud.DeleteTag(aTag: TTag);
+var i, t: Integer;
+    af: TAudioFile;
+    newRawString: UTF8String;
+begin
+    for i := 0 to aTag.AudioFiles.Count - 1 do
+    begin
+        af := TAudioFile(aTag.AudioFiles[i]);
+        if af.Taglist.Count = 0 then
+            // to be sure, but this should not happen
+            AddAudioFileRAWTags(af);
+        // remove Tag from the AudioFile's Taglist
+        af.Taglist.Extract(aTag);
+        // build new RawTag-String
+        if af.Taglist.Count > 0 then
+        begin
+            newRawString := TTag(af.Taglist[0]).key;
+            for t := 1 to af.TagList.Count - 1 do
+                newRawString := newRawString + #13#10 + TTag(af.Taglist[t]).key;  // See NempScrobbler.ParseRawTag
+            af.RawTagLastFM := newRawString;
+        end else
+            // nor Tags any more
+            af.RawTagLastFM := '';
+        af.ID3TagNeedsUpdate := True;
+
+        //ShowMessage((af.RawTagLastFM));
+    end;
+    aTag.AudioFiles.Clear;
+end;
+
 
 procedure TTagCloud.DeleteAudioFile(aAudioFile: TAudioFile);
 begin
     // Todo
 end;
-
 
 
 procedure TTagCloud.UpdateAudioFile(aAudioFile: TAudioFile);

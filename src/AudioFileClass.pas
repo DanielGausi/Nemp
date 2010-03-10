@@ -1615,15 +1615,12 @@ begin
             // delete Tags-Frame
             ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
-
         ID3v2Tag.WriteToFile(filename);
 
     finally
         ID3v1Tag.Free;
         ID3v2Tag.Free;
     end;
-
-    
 end;
 
 {
