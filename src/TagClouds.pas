@@ -1291,12 +1291,13 @@ begin
         // Add the Tags from the two RawTag-Strings to allTag-List
         tmpTags.Text := aAudioFile.RawTagLastFM;
         for i := 0 to tmpTags.Count - 1 do
-            allTags.Add(tmptags[i]);
+            if tmpTags[i] <> '' then
+                allTags.Add(tmptags[i]);
 
         tmpTags.Text := aAudioFile.RawTagUserDefined;
         for i := 0 to tmpTags.Count - 1 do
-            allTags.Add(tmptags[i]);
-
+            if tmpTags[i] <> '' then
+                allTags.Add(tmptags[i]);
 
         // Add/Insert every Tag into the af.TagList
         for i := 0 to allTags.Count - 1 do
@@ -1349,9 +1350,10 @@ end;
 }
 procedure TTagCloud.RenameTag(oldTag: TTag; NewKey: String);
 var NewTag: TTag;
-    i, t: Integer;
+    i, t, oi: Integer;
     af: TAudioFile;
     newRawString: UTF8String;
+    sl: TStringList;
 begin
     // 1. Get Tag with NewKey
     Newtag := GetTag(NewKey); // if needed, it is created there and Added to Cloud.Tags
@@ -1371,24 +1373,40 @@ begin
             // add Audiofile to the NewTag
             NewTag.AudioFiles.Add(af);
         end;
-
         // remove old Tag from AudioFile
         af.Taglist.Extract(oldTag);
 
+        // Do the same as above, but with the RawTagLastFM-String
+        // Split the RawTagString. Use Stringlist for that purpose
+        sl := TStringList.Create;
+        try
+            sl.Text := af.RawTagLastFM;
+            // Delete OldKey
+            oi := sl.IndexOf(oldTag.Key);
+            if (oi >= 0) and (oi < sl.Count) then
+                sl.Delete(oi);
+            // Insert NewKey
+            if sl.IndexOf(NewKey) = -1 then
+                sl.Add(NewKey);
+            // Set RawTag
+            af.RawTagLastFM := sl.Text;
+        finally
+            sl.Free;
+        end;
+
+        // Mark this audiofile, to rewrite its ID3Tag later
+        af.ID3TagNeedsUpdate := True;
+
         // generate New RawTagString from current tags
         // (this should be easier than pos, copy, ...)
-
-        ssss
-
         // But it is WRONG!!! in af.Tags are also the AUTO-tags!!
-
+        {
         // we added newtag, so Count is >0
         newRawString := TTag(af.Taglist[0]).key;
         for t := 1 to af.TagList.Count - 1 do
             newRawString := newRawString + #13#10 + TTag(af.Taglist[t]).key;  // See NempScrobbler.ParseRawTag
         af.RawTagLastFM := newRawString;
-        // Mark this audiofile, to rewrite its ID3Tag later
-        af.ID3TagNeedsUpdate := True;
+        }
     end;
     // clear the oldTag
     oldTag.AudioFiles.Clear;
@@ -1401,9 +1419,10 @@ end;
     --------------------------------------------------------
 }
 procedure TTagCloud.DeleteTag(aTag: TTag);
-var i, t: Integer;
+var i, t, oi: Integer;
     af: TAudioFile;
     newRawString: UTF8String;
+    sl: TStringList;
 begin
     for i := 0 to aTag.AudioFiles.Count - 1 do
     begin
@@ -1413,6 +1432,28 @@ begin
             AddAudioFileRAWTags(af);
         // remove Tag from the AudioFile's Taglist
         af.Taglist.Extract(aTag);
+
+
+        // Do the same as above, but with the RawTagLastFM-String
+        // Split the RawTagString. Use Stringlist for that purpose
+        sl := TStringList.Create;
+        try
+            sl.Text := af.RawTagLastFM;
+            // Delete OldKey
+            oi := sl.IndexOf(aTag.Key);
+            if (oi >= 0) and (oi < sl.Count) then
+                sl.Delete(oi);
+            // Set RawTag
+            if sl.Count > 0 then
+                af.RawTagLastFM := sl.Text
+            else
+                af.RawTagLastFM := ''; // just to be sure, empty Stringlist my return "#13#10"?
+        finally
+            sl.Free;
+        end;
+
+        af.ID3TagNeedsUpdate := True;
+        {
         // build new RawTag-String
         if af.Taglist.Count > 0 then
         begin
@@ -1423,7 +1464,8 @@ begin
         end else
             // nor Tags any more
             af.RawTagLastFM := '';
-        af.ID3TagNeedsUpdate := True;
+        }
+
 
         //ShowMessage((af.RawTagLastFM));
     end;
