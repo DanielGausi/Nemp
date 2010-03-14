@@ -81,6 +81,10 @@ type
       SpecPenCL: TColor;
       SpecPen2Cl: TColor;
       SpecPeakCL: TColor;
+      PreviewTitleColor: TColor;
+      PreviewArtistColor: TColor;
+      PreviewTimeColor: TColor;
+
       LabelCL: TColor;
       LabelBackGroundCL: TColor;
       GroupboxFrameCL: TColor;
@@ -542,6 +546,11 @@ begin
         SkinColorScheme.SpecTimeBackGroundCL  := StringToColor(Ini.ReadString('Colors','SpecTimeBackGroundCL' , 'clBtnFace'     ));
         SkinColorScheme.SpecPenCL             := StringToColor(Ini.ReadString('Colors','SpecPenCL'            , 'clActiveCaption' ));
         SkinColorScheme.SpecPeakCL            := StringToColor(Ini.ReadString('Colors','SpecPeakCL'           , 'clBackground'     ));
+        SkinColorScheme.PreviewTitleColor     := StringToColor(Ini.ReadString('Colors','PreviewTitleColor'    , 'clWindowText'     ));
+        SkinColorScheme.PreviewArtistColor    := StringToColor(Ini.ReadString('Colors','PreviewArtistColor'   , 'clGrayText'       ));
+        SkinColorScheme.PreviewTimeColor      := StringToColor(Ini.ReadString('Colors','PreviewTimeColor'     , 'clWindowText'     ));
+
+
         if ini.ValueExists('Colors','SpecPen2CL') then
             SkinColorScheme.SpecPen2CL             := StringToColor(Ini.ReadString('Colors','SpecPen2CL'            , 'clActiveCaption' ))
         else
@@ -846,8 +855,12 @@ begin
         Ini.WriteString('Colors','SpecTitelBackGroundCL', '$'+InttoHex(Integer( SkinColorScheme.SpecTitelBackGroundCL ),8)  );
         Ini.WriteString('Colors','SpecTimeBackGroundCL' , '$'+InttoHex(Integer( SkinColorScheme.SpecTimeBackGroundCL  ),8)  );
         Ini.WriteString('Colors','SpecPenCL'            , '$'+InttoHex(Integer( SkinColorScheme.SpecPenCL             ),8)  );
-        Ini.WriteString('Colors','SpecPen2CL'            , '$'+InttoHex(Integer( SkinColorScheme.SpecPen2CL             ),8)  );
+        Ini.WriteString('Colors','SpecPen2CL'            , '$'+InttoHex(Integer( SkinColorScheme.SpecPen2CL           ),8)  );
         Ini.WriteString('Colors','SpecPeakCL'           , '$'+InttoHex(Integer( SkinColorScheme.SpecPeakCL            ),8)  );
+        Ini.WriteString('Colors','PreviewTitleColor'    ,  '$'+InttoHex(Integer( SkinColorScheme.PreviewTitleColor    ),8)  );
+        Ini.WriteString('Colors','PreviewArtistColor'   ,  '$'+InttoHex(Integer( SkinColorScheme.PreviewArtistColor   ),8)  );
+        Ini.WriteString('Colors','PreviewTimeColor'     ,  '$'+InttoHex(Integer( SkinColorScheme.PreviewTimeColor     ),8)  );
+
         Ini.WriteString('Colors','LabelCL'              , '$'+InttoHex(Integer( SkinColorScheme.LabelCL               ),8)  );
         Ini.WriteString('Colors','LabelBackGroundCL'    , '$'+InttoHex(Integer( SkinColorScheme.LabelBackGroundCL     ),8)  );
         Ini.WriteString('Colors','GroupboxFrameCL'      , '$'+InttoHex(Integer( SkinColorScheme.GroupboxFrameCL       ),8)  );
@@ -1424,6 +1437,11 @@ begin
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
     Spectrum.TextColor := SkinColorScheme.SpecTitelCL;
+
+    Spectrum.PreviewArtistColor := SkinColorScheme.PreviewArtistColor ;
+    Spectrum.PreviewTitleColor  := SkinColorScheme.PreviewTitleColor  ;
+    Spectrum.PreviewTimeColor   := SkinColorScheme.PreviewTimeColor   ;
+
     Spectrum.TimeColor := SkinColorScheme.SpecTimeCL;
     Spectrum.TitelBackColor := SkinColorScheme.SpecTitelBackGroundCL;
     Spectrum.TimebackColor := SkinColorScheme.SpecTimeBackGroundCL;
@@ -1658,6 +1676,10 @@ begin
     Spectrum.TimeColor := clWindowText;
     Spectrum.TitelBackColor := clBtnFace;
     Spectrum.TimebackColor := clBtnFace;
+
+    Spectrum.PreviewArtistColor := clGrayText;
+    Spectrum.PreviewTitleColor  := clWindowText;
+    Spectrum.PreviewTimeColor   := clWindowText;
 
     Spectrum.TextStyle := [];
     Spectrum.TimeStyle := [];

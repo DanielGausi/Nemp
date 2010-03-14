@@ -66,6 +66,7 @@ interface
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math,
      AudioFileClass, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen, Mp3FileUtils,
+     ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      //Indys:
@@ -87,6 +88,7 @@ type
         fHND_GetLyricsThread: DWord;
         fHND_GetTagsThread: DWord;
         fHND_UpdateID3TagsThread: DWord;
+        fHND_BugFixID3TagsThread: DWord;
 
 
         // General note:
@@ -233,6 +235,7 @@ type
         procedure fGetLyrics;         // 1b. get Lyrics
         procedure fGetTags;           // 1c. get Tags (from LastFM)
         procedure fUpdateId3tags;     // 2.  Write Library-Data into the id3-Tags (used in CloudEditor)
+        procedure fBugFixID3Tags;     // BugFix-Method
 
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
@@ -452,6 +455,7 @@ type
         procedure GetLyrics;
         procedure GetTags;
         procedure UpdateId3tags;
+        procedure BugFixID3Tags;
 
         // Additional managing. Run in VCL-Thread.
         procedure BuildTotalString;
@@ -557,6 +561,8 @@ type
 
         function CountInconsistentFiles: Integer;      // Count "ID3TagNeedsUpdate"-AudioFiles
         procedure PutInconsistentFilesToUpdateList;    // Put these files into the updatelist
+        procedure PutAllFilesToUpdateList;    // Put these files into the updatelist
+
   end;
 
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
@@ -566,6 +572,7 @@ type
   procedure fGetTagsThread(MB: TMedienBibliothek);
 
   procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
+  procedure fBugFixID3TagsThread(MB: TMedienBibliothek);
 
 
   function GetProperMenuString(aIdx: Integer): UnicodeString;
@@ -855,18 +862,33 @@ end;
 {
     --------------------------------------------------------
     PutInconsistentFilesToUpdateList
-    - Put these Files int the Update-List
+    - Put these Files into the Update-List
       Runs in VCL-MainThread!
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.PutInconsistentFilesToUpdateList;
 var i: integer;
 begin
+    UpdateList.Clear;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
         if TAudioFile(MP3ListePfadSort[i]).ID3TagNeedsUpdate then
             UpdateList.Add(MP3ListePfadSort[i]);
     end;
+end;
+{
+    --------------------------------------------------------
+    PutAllFilesToUpdateList
+    - Put all Files into the Update-List
+      Used for ID3Bugfix
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.PutAllFilesToUpdateList;
+var i: integer;
+begin
+    UpdateList.Clear;
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+        UpdateList.Add(MP3ListePfadSort[i]);
 end;
 
 {
@@ -2148,7 +2170,13 @@ begin
 end;
 
 
-
+{
+    --------------------------------------------------------
+    UpdateId3tags
+    - Updating the ID3Tags
+      Used by the TagCloud-Editor
+    --------------------------------------------------------
+}
 procedure TMedienBibliothek.UpdateId3tags;
 var Dummy: Cardinal;
 begin
@@ -2168,11 +2196,11 @@ begin
     // Note: CleanUpTmpLists and stuff is not necessary here.
     // We did not change the library, we "just" changed the ID3-Tags in some files
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
     try
         CloseHandle(MB.fHND_UpdateID3TagsThread);
     except
     end;
-
 end;
 
 procedure TMedienBibliothek.fUpdateId3tags;
@@ -2194,6 +2222,12 @@ begin
                         Integer(PWideChar(af.Pfad)));
 
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile,
+                        Integer(PWideChar(
+                            Format(MediaLibrary_CloudUpdateStatus,
+                            [Round(i/UpdateList.Count * 100), af.Dateiname]))));
+
             af.FileIsPresent := True;
 
             af.SetAudioData(SAD_Both);
@@ -2205,11 +2239,163 @@ begin
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
+
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
 end;
 
+
+{
+    --------------------------------------------------------
+    UpdateId3tags
+    - Updating the ID3Tags
+      Used by the TagCloud-Editor
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.BugFixID3Tags;
+var Dummy: Cardinal;
+begin
+    // Status MUST be set outside
+    // (the updatelist is filled in VCL-Thread)
+    // But, to be sure:
+    StatusBibUpdate := 1;
+    UpdateFortsetzen := True;
+    fHND_BugFixID3TagsThread := BeginThread(Nil, 0, @fBugFixID3TagsThread, Self, 0, Dummy);
+end;
+
+
+
+procedure fBugFixID3TagsThread(MB: TMedienBibliothek);
+begin
+    MB.fBugFixID3Tags;
+    // Note: CleanUpTmpLists and stuff is not necessary here.
+    // We did not change the library, we "just" changed the ID3-Tags in some files
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+    try
+        CloseHandle(MB.fHND_BugFixID3TagsThread);
+    except
+    end;
+end;
+
+procedure TMedienBibliothek.fBugFixID3Tags;
+var i, f: Integer;
+    af: TAudioFile;
+    id3: TID3v2Tag;
+    aFrame: TID3v2Frame;
+    FrameList: TObjectList;
+    ms: TMemoryStream;
+    privateOwner: AnsiString;
+    LogList: TStringList;
+begin
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
+    LogList := TStringList.Create;
+    try
+        LogList.Add('Fixing ID3Tags. ');
+        LogList.Add(DateTimeToStr(now));
+        LogList.Add('Number of files to check: ' + IntToStr(UpdateList.Count));
+        LogList.Add('---------------------------');
+
+        for i := 0 to UpdateList.Count - 1 do
+        begin
+
+            if not UpdateFortsetzen then
+            begin
+                LogList.Add('Cancelled by User at file ' + IntToStr(i));
+                break;
+            end;
+
+            af := TAudioFile(UpdateList[i]);
+
+            if FileExists(af.Pfad) then
+            begin
+                // call the vcl, that we will edit this file now
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                            Integer(PWideChar(af.Pfad)));
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile,
+                        Integer(PWideChar(
+                            Format(MediaLibrary_CloudUpdateStatus,
+                            [Round(i/UpdateList.Count * 100), af.Dateiname]))));
+
+
+                af.FileIsPresent := True;
+
+                id3 := TID3v2Tag.Create;
+                try
+                    // Read the tag from the file
+                    id3.ReadFromFile(af.Pfad);
+
+                    // Get all private Frames in the ID3Tag
+                    FrameList := id3.GetAllPrivateFrames; // List is Created in this method
+
+                    // delete everything except the 'NEMP/Tags'-Private Frames
+                    // (from this list only, not from the ID3Tag ;-) )
+                    for f := FrameList.Count - 1 downto 0 do
+                    begin
+                        ms := TMemoryStream.Create;
+                        try
+                            (FrameList[f] as TID3v2Frame).GetPrivateFrame(privateOwner, ms);
+                        finally
+                            ms.Free;
+                        end;
+                        if privateOwner <> 'NEMP/Tags' then
+                            FrameList.Delete(f);
+                    end;
+
+                    if FrameList.Count > 1 then
+                    begin
+                        LogList.Add('Duplicate Entry: ' + af.Pfad);
+                        LogList.Add('Count: ' + IntToStr(FrameList.Count));
+                        // Oops, we have duplicate 'NEMP/Tags' in the file :(
+                        for f := FrameList.Count - 1 downto 0 do
+                            // Delete all these Frames
+                            id3.DeleteFrame(TID3v2Frame(FrameList[f]));
+
+                        // Set New Private Frame
+                        if length(af.RawTagLastFM) > 0 then
+                        begin
+                            ms := TMemoryStream.Create;
+                            try
+                                ms.Write(af.RawTagLastFM[1], length(af.RawTagLastFM));
+                                id3.SetPrivateFrame('NEMP/Tags', ms);
+                            finally
+                                ms.Free;
+                            end;
+                        end else
+                            // delete Tags-Frame
+                            id3.SetPrivateFrame('NEMP/Tags', NIL);
+
+                        // Update the File
+                        id3.WriteToFile(af.Pfad);
+                        LogList.Add('...fixed');
+                        LogList.Add('');
+                    end;
+                    FrameList.Free;
+                finally
+                    id3.Free;
+                end;
+                Changed := True;
+            end;
+        end;
+        LogList.Add('Done.');
+        LogList.SaveToFile(SavePath + 'ID3TagBugFix.log', TEncoding.Unicode);
+    finally
+        LogList.Free;
+    end;
+
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
+
+    // clear thread-used filename
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                    Integer(PWideChar('')));
+end;
 {
     --------------------------------------------------------
     BuildTotalString

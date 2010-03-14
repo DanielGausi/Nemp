@@ -1299,6 +1299,7 @@ begin
             if tmpTags[i] <> '' then
                 allTags.Add(tmptags[i]);
 
+
         // Add/Insert every Tag into the af.TagList
         for i := 0 to allTags.Count - 1 do
         begin

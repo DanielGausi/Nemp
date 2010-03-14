@@ -2,18 +2,25 @@ object CloudEditorForm: TCloudEditorForm
   Left = 0
   Top = 0
   Caption = 'Tagcloud: Editor'
-  ClientHeight = 593
-  ClientWidth = 554
+  ClientHeight = 313
+  ClientWidth = 516
   Color = clBtnFace
+  Constraints.MinHeight = 350
+  Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
+  DesignSize = (
+    516
+    313)
   PixelsPerInch = 96
   TextHeight = 13
   object lblMinTagCount: TLabel
@@ -24,24 +31,27 @@ object CloudEditorForm: TCloudEditorForm
     Caption = 'Show only tags with a minimum count of'
   end
   object LblUpdateWarning: TLabel
-    Left = 17
-    Top = 535
-    Width = 129
+    Left = 8
+    Top = 280
+    Width = 109
     Height = 13
+    Anchors = [akLeft, akBottom]
     Caption = 'CountInconsistentFiles'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
-    Font.Style = [fsBold]
+    Font.Style = []
     ParentFont = False
     Visible = False
+    ExplicitTop = 279
   end
   object TagVST: TVirtualStringTree
-    Left = 17
+    Left = 8
     Top = 78
-    Width = 401
-    Height = 451
+    Width = 387
+    Height = 196
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
@@ -62,6 +72,8 @@ object CloudEditorForm: TCloudEditorForm
     OnHeaderClick = TagVSTHeaderClick
     OnIncrementalSearch = TagVSTIncrementalSearch
     OnKeyDown = TagVSTKeyDown
+    ExplicitWidth = 357
+    ExplicitHeight = 195
     Columns = <
       item
         Position = 0
@@ -98,40 +110,61 @@ object CloudEditorForm: TCloudEditorForm
     OnChange = seMinTagCountChange
   end
   object BtnTagRename: TButton
-    Left = 424
+    Left = 401
     Top = 78
     Width = 107
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Rename Tag'
     TabOrder = 3
     OnClick = BtnTagRenameClick
+    ExplicitLeft = 424
   end
   object BtnUpdateID3Tags: TButton
-    Left = 18
-    Top = 554
-    Width = 128
+    Left = 401
+    Top = 280
+    Width = 107
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Update files now'
+    Enabled = False
     TabOrder = 4
-    Visible = False
     OnClick = BtnUpdateID3TagsClick
+    ExplicitLeft = 405
+    ExplicitTop = 279
   end
   object BtnMerge: TButton
-    Left = 424
+    Left = 401
     Top = 109
     Width = 107
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Merge Tags'
     TabOrder = 5
     OnClick = BtnMergeClick
+    ExplicitLeft = 424
   end
   object BtnDeleteTags: TButton
-    Left = 424
+    Left = 401
     Top = 140
     Width = 107
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = 'Delete Tags'
     TabOrder = 6
     OnClick = BtnDeleteTagsClick
+    ExplicitLeft = 424
+  end
+  object BtnBugFix: TButton
+    Left = 401
+    Top = 249
+    Width = 107
+    Height = 25
+    Anchors = [akRight, akBottom]
+    Caption = 'BugFix'
+    TabOrder = 7
+    OnClick = BtnBugFixClick
+    ExplicitLeft = 371
+    ExplicitTop = 248
   end
 end

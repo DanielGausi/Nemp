@@ -8,6 +8,8 @@ program nemp;
 
 
 
+{$R *.dres}
+
 uses
   madExcept,
   madLinkDisAsm,

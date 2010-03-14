@@ -62,6 +62,7 @@ type
     BtnUpdateID3Tags: TButton;
     BtnMerge: TButton;
     BtnDeleteTags: TButton;
+    BtnBugFix: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -85,6 +86,8 @@ type
     procedure TagVSTBeforeItemErase(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
       var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure BtnBugFixClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
@@ -96,12 +99,11 @@ type
     procedure SortTags;                          // Resort the Tags
     procedure ReselectNode(aKey: UTF8String);    // Reselect a node with the given key
 
-    procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
-
   public
     { Public-Deklarationen }
     procedure ActualizeTreeView;      // get the tags from the cloud with current settings and show them in the tree
 
+    procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
   end;
 
 
@@ -160,6 +162,15 @@ end;
 procedure TCloudEditorForm.FormDestroy(Sender: TObject);
 begin
     LocalTagList.Free;
+end;
+
+procedure TCloudEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+    case key of
+        // Abort Action
+        VK_ESCAPE: Nemp_MainForm.StopMenuClick(nil);
+    end;
 end;
 
 {
@@ -243,7 +254,7 @@ begin
     c := MedienBib.CountInconsistentFiles;
     LblUpdateWarning.Caption := Format(TagEditor_FilesNeedUpdate, [c]);
     LblUpdateWarning.Visible := c > 0;
-    BtnUpdateID3Tags.Visible := c > 0;
+    BtnUpdateID3Tags.Enabled := c > 0;
 end;
 
 procedure TCloudEditorForm.FormShow(Sender: TObject);
@@ -585,11 +596,44 @@ begin
     begin
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
-
+        LblUpdateWarning.Visible := True;
         // Fill UpdateList
         MedienBib.PutInconsistentFilesToUpdateList;
         MedienBib.UpdateId3tags;
     end;
 end;
+
+{
+    --------------------------------------------------------
+    BtnBugFixClick
+    - Fix ID3Tags
+      As there was a Bug in MP3FileUtils, some files may have a
+      duplicate "Private-Tag-Frame"
+      This Method will delete the duplicates.
+    --------------------------------------------------------
+}
+procedure TCloudEditorForm.BtnBugFixClick(Sender: TObject);
+begin
+    // This action will start a new thread!
+    if MedienBib.StatusBibUpdate <> 0 then
+        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
+    else
+    begin
+        if MessageDLG('Nemp wird nun alle Dateien auf Inkonsistenzen in den ID3Tags untersuchen, '
+          + 'die durch einen Fehler in einer früheren Pre-Alpha-Version verursacht werden konnten.'
+          + #13#10+#13#10
+          + 'Einen Bericht darüber finden sie danach in der Datei "ID3TagBugFix.log".'
+          , mtInformation, [MBOK, MBCancel], 0) = mrok then
+        begin
+            MedienBib.StatusBibUpdate := 1;
+            BlockeMedienListeUpdate(True);
+            LblUpdateWarning.Visible := True;
+
+            MedienBib.PutAllFilesToUpdateList;
+            MedienBib.BugFixID3Tags;
+        end;
+    end;
+end;
+
 
 end.

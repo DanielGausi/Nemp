@@ -506,6 +506,7 @@ MediaLibrary_SearchLyricsComplete_AllFound = 'Lyricsearch complete. All Lyrics f
 MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyricsearch complete. %d of %d lyrics found. You can try to find some of the missing lyrics by a manual search on Lyricwiki.org or other lyrics sites on the net.';
 MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
 MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
+MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
 
 MediaLibrary_Deleting                = 'Deleting from medialibrary (%d%%)';
 Medialibrary_QueryReallyDelete       = 'This will delete your complete medialibrary. Continue?';
