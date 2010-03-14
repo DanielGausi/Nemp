@@ -127,6 +127,11 @@ interface
         FTimeStyle: TFontStyles;
         FTimeColor: TColor;
 
+        FPreviewArtistColor: TColor;
+        FPreviewTitleColor: TColor;
+        FPreviewTimeColor: TColor;
+
+
         fTimeFontSize: Integer;
         fTextFontSize: Integer;
 
@@ -206,6 +211,11 @@ interface
         property TimeStyle  : TFontStyles read FTimeStyle write FTimeStyle;
         property TimeColor  : TColor read FTimeColor write FTimeColor;
         property UseBackGround: Boolean read Usebkg write UseBkg;
+
+        property PreviewArtistColor: TColor read FPreviewArtistColor write FPreviewArtistColor;
+        property PreviewTitleColor: TColor read FPreviewTitleColor write FPreviewTitleColor;
+        property PreviewTimeColor: tColor read FPreviewTimeColor write FPreviewTimeColor;
+
 
         // Dieser wird bei DrawTime gesetzt, so dass man nach einem Pause-Klick beim verschieben der Form
         // Die Zeit neu malen kann
@@ -780,9 +790,21 @@ begin
     VisBuff.Canvas.Pen.Color := BkgColor;
     VisBuff.Canvas.Brush.Color := BkgColor;
     VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
-    if UseBkg then VisBuff.Canvas.CopyRect(Rect(0, 0, BackBmp.Width, BackBmp.Height),
-          BackBmp.Canvas,
-          Rect(0, 0, BackBmp.Width, BackBmp.Height));
+    if UseBkg then
+        VisBuff.Canvas.CopyRect(Rect(0, 0, BackBmp.Width, BackBmp.Height),
+              BackBmp.Canvas,
+              Rect(0, 0, BackBmp.Width, BackBmp.Height));
+
+
+    PreViewBuf.Canvas.Pen.Color := BkgColor;
+    PreViewBuf.Canvas.Brush.Color := BkgColor;
+    PreViewBuf.Canvas.Rectangle(0, 0, PreViewBuf.Width, PreViewBuf.Height);
+    if UseBkg then
+        PreViewBuf.Canvas.CopyRect(
+              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height),
+              BackPreViewBuf.Canvas,
+              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height));
+
     for i := 0 to 30 do
     begin
         FFTPeacks[i] := 1;
@@ -792,6 +814,11 @@ begin
             VisBuff.Canvas.Pen.Color := PeakColor;
             VisBuff.Canvas.MoveTo(0 + i * (ColWidth + 1), 0 + VisBuff.Height - 1);
             VisBuff.Canvas.LineTo(0 + i * (ColWidth + 1) + ColWidth, 0 + VisBuff.Height - 1);
+
+
+             PreViewBuf.Canvas.Pen.Color := PeakColor;
+             PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - 1);
+             PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - 1);
         end;
     end;
 

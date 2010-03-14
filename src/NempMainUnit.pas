@@ -6039,6 +6039,7 @@ begin
         Spectrum.DrawClear;
         Spectrum.DrawText(NempPlayer.PlayingTitel,False);
         Spectrum.DrawTime('  00:00');
+        fspTaskbarPreviews1.InvalidatePreview;
       end;
 
       Application.Title := NempPlayer.GenerateTaskbarTitel;

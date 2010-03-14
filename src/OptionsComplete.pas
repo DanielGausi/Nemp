@@ -989,10 +989,10 @@ begin
   TB_Refresh.Position := 100 - NempPlayer.VisualizationInterval;
 
   case NempPlayer.ScrollTaskbarDelay of
-      0..10  : CB_TaskbarDelay.ItemIndex := 4;
-      11..20 : CB_TaskbarDelay.ItemIndex := 3;
-      21..30 : CB_TaskbarDelay.ItemIndex := 2;
-      31..40 : CB_TaskbarDelay.ItemIndex := 1;
+      0..5  : CB_TaskbarDelay.ItemIndex := 4;
+      6..10 : CB_TaskbarDelay.ItemIndex := 3;
+      11..15 : CB_TaskbarDelay.ItemIndex := 2;
+      16..20 : CB_TaskbarDelay.ItemIndex := 1;
   else
       CB_TaskbarDelay.ItemIndex := 0
   end;
@@ -1643,7 +1643,7 @@ begin
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
       if CBFileTypes.Checked[i] then
       begin
-          ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 1);
+          ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
           ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
       end;
 
@@ -1660,7 +1660,7 @@ begin
   for i := 0 to CBPlaylistTypes.Count - 1 do
     if CBPlaylistTypes.Checked[i] then
     begin
-        ftr.RegisterType(CBPlaylistTypes.Items[i], 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 2);
+        ftr.RegisterType(CBPlaylistTypes.Items[i], 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
         ftr.DeleteSpecialSetting(CBPlaylistTypes.Items[i]);
     end;
 
@@ -1883,7 +1883,7 @@ begin
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;
   NempPlayer.ScrollAnzeigeTitel := CB_ScrollTitleInMainWindow.Checked;
 
-  NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 10;
+  NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5;
   NempPlayer.ScrollAnzeigeDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
   Spectrum.ScrollDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
 

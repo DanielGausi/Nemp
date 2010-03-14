@@ -123,6 +123,8 @@ type
       fMainWindowHandle: HWND;    // the main window, where some messages are sent to
       fPathToDlls: String;        // the path to the bass.dll-addons
 
+      fDefaultCoverIsLoaded: Boolean;
+
 
       // Basic method for creating a stream from a given filename
       function NEMP_CreateStream(aFilename: UnicodeString;
@@ -798,7 +800,7 @@ begin
   ScrollTaskbarTitel    := ini.ReadBool('Player','ScrollTaskbarTitel',True);
   ScrollAnzeigeTitel    := ini.ReadBool('Player','ScrollAnzeigeTitel',True);
   ScrollTaskbarDelay    := ini.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
-  if ScrollTaskbarDelay < 10 then ScrollTaskbarDelay := 10;
+  if ScrollTaskbarDelay < 5 then ScrollTaskbarDelay := 5;
   ScrollAnzeigeDelay    := ini.ReadInteger('Player', 'ScrollAnzeigeDelay', 0);
   if ScrollAnzeigeDelay < 0 then ScrollAnzeigeDelay := 0;
 
@@ -2305,7 +2307,7 @@ var
   ddc   : HDC;
   dbmi  : BITMAPINFO;
   dBits : PInteger;
-  i, j  : Integer;
+  i, j, h  : Integer;
   SAspect  : Double;
   DAspect  : Double;
   b: TBitmap;
@@ -2328,6 +2330,12 @@ begin
         if SkinActive then
             b.Canvas.Draw(0,0, PreviewBackGround);
 
+        if (not assigned(MainAudioFile)) and (not fDefaultCoverIsLoaded) then
+        begin
+            fDefaultCoverIsLoaded := True;
+            RefreshCoverBitmap;
+        end;
+
         SetStretchBltMode(b.Canvas.Handle, HALFTONE);
         StretchBlt(b.Canvas.Handle, 6, 5 + 45 - (CoverBitmap.Height Div 4), CoverBitmap.Width Div 2, CoverBitmap.Height Div 2,
                    CoverBitmap.Canvas.Handle, 0,0 ,
@@ -2342,16 +2350,47 @@ begin
 
         if assigned(MainAudioFile) then
         begin
+            fDefaultCoverIsLoaded := False;
             b.Canvas.Brush.Style := bsClear;
             b.Canvas.Font.Size := 8;
-            s := 'Das ist etwas zu lang für deas hier';
-            s := MainAudioFile.PlaylistTitle;
-            r := Rect(102, 4, 198, 44);
 
-            b.Canvas.TextRect(r, s, [tfWordBreak]);
-           // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
-           // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
-            b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+            if MainAudioFile.Artist <> AUDIOFILE_UNKOWN then
+            begin
+                s := MainAudioFile.Titel;
+                r := Rect(102, 4, 198, 44);
+                b.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
+                // get needed Height of the Artist-String
+                h := r.Bottom - r.Top;
+                if h > 26 then
+                    h := 26;
+
+                // but draw 2 lines maximum
+                b.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                r := Rect(102, 4, 198, 30);
+                b.Canvas.TextRect(r, s, [tfWordBreak]);
+
+                s := MainAudioFile.Artist;
+                b.Canvas.Font.Color := Spectrum.PreviewArtistColor;
+                r := Rect(102, 4 + h, 198, 44);
+                b.Canvas.TextRect(r, s, [tfWordBreak]);
+               // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
+               // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
+               b.Canvas.Font.Color := Spectrum.PreviewTimeColor;
+               b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+
+            end else
+            begin
+                // just the title
+                s := MainAudioFile.Titel;
+                b.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                r := Rect(102, 4, 198, 44);
+                b.Canvas.TextRect(r, s, [tfWordBreak]);
+                b.Canvas.Font.Color := Spectrum.PreviewTimeColor;
+                b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+            end;
+        end else
+        begin
+
         end;
 
 

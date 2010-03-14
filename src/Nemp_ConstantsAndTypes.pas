@@ -373,6 +373,7 @@ const
 
     // Set the Win7-Taskbar-Progressbar
     MB_SetWin7TaskbarProgress = 29;
+    MB_RefreshTagCloudFile = 31;
 
     MB_SetStatus = 100;
 

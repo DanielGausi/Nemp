@@ -71,7 +71,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
-    SearchTool, MMSystem, BibHelper, fspTaskbarMgr;
+    SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -571,6 +571,15 @@ begin
 
         MB_ProgressRefreshJustProgressbar: begin
             fspTaskbarManager.ProgressValue := aMsg.LParam;
+        end;
+
+        MB_RefreshTagCloudFile: begin
+            CloudEditorForm.LblUpdateWarning.Caption := PChar(aMsg.LParam);
+            if PChar(aMsg.LParam) = '' then
+            begin
+                CloudEditorForm.LblUpdateWarning.Visible := False;
+                CloudEditorForm.RefreshWarningLabel;
+            end;
         end;
 
         MB_ProgressSearchDead: AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
