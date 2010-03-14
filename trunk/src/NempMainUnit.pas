@@ -3903,6 +3903,7 @@ begin
     Data := VST.GetNodeData(Node);
     datei_ordner := Data^.FAudioFile.Ordner;
 
+    // showmessage('/e,/select,"'+Data^.FAudioFile.Pfad+'"');
     if DirectoryExists(datei_ordner) then
         ShellExecute(Handle, 'open' ,'explorer.exe'
                       , PChar('/e,/select,"'+Data^.FAudioFile.Pfad+'"'), '', sw_ShowNormal);
