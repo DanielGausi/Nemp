@@ -507,6 +507,7 @@ MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyricsearch complete. %d of %d ly
 MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
 MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
 MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
+MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet. If you close this window now, these files remain inconsistent to the data in the library. Do you really want to close this window now?';
 
 MediaLibrary_Deleting                = 'Deleting from medialibrary (%d%%)';
 Medialibrary_QueryReallyDelete       = 'This will delete your complete medialibrary. Continue?';

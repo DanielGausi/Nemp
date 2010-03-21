@@ -2,7 +2,7 @@ object CloudEditorForm: TCloudEditorForm
   Left = 0
   Top = 0
   Caption = 'Tagcloud: Editor'
-  ClientHeight = 313
+  ClientHeight = 399
   ClientWidth = 516
   Color = clBtnFace
   Constraints.MinHeight = 350
@@ -14,13 +14,14 @@ object CloudEditorForm: TCloudEditorForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
     516
-    313)
+    399)
   PixelsPerInch = 96
   TextHeight = 13
   object lblMinTagCount: TLabel
@@ -32,7 +33,7 @@ object CloudEditorForm: TCloudEditorForm
   end
   object LblUpdateWarning: TLabel
     Left = 8
-    Top = 280
+    Top = 366
     Width = 109
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -50,7 +51,7 @@ object CloudEditorForm: TCloudEditorForm
     Left = 8
     Top = 78
     Width = 387
-    Height = 196
+    Height = 282
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
@@ -72,8 +73,7 @@ object CloudEditorForm: TCloudEditorForm
     OnHeaderClick = TagVSTHeaderClick
     OnIncrementalSearch = TagVSTIncrementalSearch
     OnKeyDown = TagVSTKeyDown
-    ExplicitWidth = 357
-    ExplicitHeight = 195
+    ExplicitHeight = 196
     Columns = <
       item
         Position = 0
@@ -95,6 +95,8 @@ object CloudEditorForm: TCloudEditorForm
       'Do not show Nemp-Auto-Tags like artist, albumname, genre, year a' +
       'nd decade.'
     Caption = 'Hide Auto-Tags'
+    Checked = True
+    State = cbChecked
     TabOrder = 1
     OnClick = cbHideAutoTagsClick
   end
@@ -118,11 +120,10 @@ object CloudEditorForm: TCloudEditorForm
     Caption = 'Rename Tag'
     TabOrder = 3
     OnClick = BtnTagRenameClick
-    ExplicitLeft = 424
   end
   object BtnUpdateID3Tags: TButton
     Left = 401
-    Top = 280
+    Top = 366
     Width = 107
     Height = 25
     Anchors = [akRight, akBottom]
@@ -130,8 +131,7 @@ object CloudEditorForm: TCloudEditorForm
     Enabled = False
     TabOrder = 4
     OnClick = BtnUpdateID3TagsClick
-    ExplicitLeft = 405
-    ExplicitTop = 279
+    ExplicitTop = 280
   end
   object BtnMerge: TButton
     Left = 401
@@ -142,7 +142,6 @@ object CloudEditorForm: TCloudEditorForm
     Caption = 'Merge Tags'
     TabOrder = 5
     OnClick = BtnMergeClick
-    ExplicitLeft = 424
   end
   object BtnDeleteTags: TButton
     Left = 401
@@ -153,18 +152,16 @@ object CloudEditorForm: TCloudEditorForm
     Caption = 'Delete Tags'
     TabOrder = 6
     OnClick = BtnDeleteTagsClick
-    ExplicitLeft = 424
   end
   object BtnBugFix: TButton
     Left = 401
-    Top = 249
+    Top = 335
     Width = 107
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'BugFix'
     TabOrder = 7
     OnClick = BtnBugFixClick
-    ExplicitLeft = 371
-    ExplicitTop = 248
+    ExplicitTop = 249
   end
 end

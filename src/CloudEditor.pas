@@ -88,6 +88,7 @@ type
       var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure BtnBugFixClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
@@ -135,29 +136,17 @@ procedure TCloudEditorForm.FormCreate(Sender: TObject);
 begin
     TagVST.NodeDataSize := SizeOf(TTagTreeData);
     LocalTagList := TObjectList.Create(False);
+end;
+procedure TCloudEditorForm.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+var c: Integer;
+begin
+    c := MedienBib.CountInconsistentFiles;
 
-    // Todo
-
-    {
-    LocalList einmalig aus tagCloud holen
-    Danach: Nur aus dieser die Daten zur Anzeige holen.
-
-    Aus LocalTagList können Tags dann gelöscht werden, und sie bleiben hier
-    dann weg, machen aber keine AVS, weil sie in der TagClud noch da sind.
-    NEIN. TAGS WERDEN NICHT EINZELN GELÖSCHT.
-
-    Außerdem können hier NEUE TAGS erzeugt werden.
-
-    Die Liste der AudioFiles an den Tags kann aber durchaus geändert werden.
-
-    Beim Beenden dieser Form muss dann die Tag-Cloud KOMPLETT neu aufgebaut
-    werden, inklusive vorherigem Zerstören aller Tag-Objekte !!
-    notwendige Daten sind dann ja auch in den RawTags der AudioFiles drin.
-    Danach kann dann ein Update der ID3Tags in einem Thread erfolgen.
-
-
-    }
-
+    if c > 0 then
+        CanClose := MessageDLG((MediaLibrary_InconsistentFilesWarning), mtWarning, [MBYes, MBNo], 0) = mrYes
+    else
+        CanClose := True;
 end;
 procedure TCloudEditorForm.FormDestroy(Sender: TObject);
 begin
