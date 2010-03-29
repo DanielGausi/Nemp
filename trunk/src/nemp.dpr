@@ -105,7 +105,6 @@ ShowWindow
 
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TCloudEditorForm, CloudEditorForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
         Application.Title := 'Nemp';

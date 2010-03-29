@@ -741,6 +741,7 @@ type
     PM_PL_RemoveFromPrebookList: TMenuItem;
     fspTaskbarManager: TfspTaskbarMgr;
     fspTaskbarPreviews1: TfspTaskbarPreviews;
+    PM_ML_CloudEditor: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1261,6 +1262,7 @@ type
     procedure FormActivate(Sender: TObject);
     procedure fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject; Width,
       Height: Integer; var Bitmap: HBITMAP);
+    procedure PM_ML_CloudEditorClick(Sender: TObject);
 
   private
 
@@ -6863,6 +6865,13 @@ begin
 
 end;
 
+procedure TNemp_MainForm.PM_ML_CloudEditorClick(Sender: TObject);
+begin
+    if not assigned(CloudEditorForm) then
+        Application.CreateForm(TCloudEditorForm, CloudEditorForm);
+    CloudEditorForm.show;
+end;
+
 procedure TNemp_MainForm.PM_ML_CopyToClipboardClick(Sender: TObject);
 var FileString: UnicodeString;
   idx: integer;
@@ -10553,8 +10562,6 @@ begin
   // + ' - ' + IntToStr(self.handle);
 
   //MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
-
-  CloudEditorForm.show;
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
