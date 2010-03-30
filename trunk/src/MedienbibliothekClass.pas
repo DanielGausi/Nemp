@@ -4493,8 +4493,8 @@ begin
 
                     if RadioStationList.Count = 0 then
                     begin
-                        if FileExists(ExtractFilePath(ParamStr(0)) + 'default.nwl') then
-                            ImportFavorites(ExtractFilePath(ParamStr(0)) + 'default.nwl')
+                        if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
+                            ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
                         else
                             if FileExists(SavePath + 'default.nwl') then
                                 ImportFavorites(SavePath + 'default.nwl')
@@ -4511,8 +4511,8 @@ begin
     end else
     begin
         // Datei nicht vorhanden - nur Webradio laden
-        if FileExists(ExtractFilePath(ParamStr(0)) + 'default.nwl') then
-            ImportFavorites(ExtractFilePath(ParamStr(0)) + 'default.nwl')
+        if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
+            ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
         else
             if FileExists(SavePath + 'default.nwl') then
                 ImportFavorites(SavePath + 'default.nwl');

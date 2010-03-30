@@ -1480,7 +1480,7 @@ var i, s, section:integer;
     tmpLastExitOK: boolean;
     maxFont: integer;
     aMenuItem: TMenuItem;
-    tmpwstr: UnicodeString;
+    tmpwstr, tmpCoverPath: UnicodeString;
     tmpstr: String;
 begin
     BackUpComboboxes;
@@ -1603,16 +1603,19 @@ begin
     begin
       // Nemp liegt im System-Programmverzeichnis
       SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
+      tmpCoverPath := SavePath + 'Cover\';
       try
-        ForceDirectories(SavePath);
+          ForceDirectories(SavePath);
       except
-        SavePath := ExtractFilePath(ParamStr(0));
+          SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+          tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
       end;
 
     end else
     begin
       // Nemp liegt woanders
-      SavePath := ExtractFilePath(ParamStr(0));
+      SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+      tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
     end;
 
     // Hook-Funktionen initialisieren
@@ -1638,7 +1641,7 @@ begin
     //MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
-    MedienBib.CoverSavePath := SavePath + 'Cover\';
+    MedienBib.CoverSavePath := tmpCoverPath;
 
 
     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
@@ -2268,8 +2271,8 @@ begin
                 MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
           end;
       end;
-      if FileExists(ExtractFilePath(ParamStr(0)) + 'default.nwl') then
-              MedienBib.ImportFavorites(ExtractFilePath(ParamStr(0)) + 'default.nwl')
+      if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
+              MedienBib.ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
           else
               if FileExists(SavePath + 'default.nwl') then
                   MedienBib.ImportFavorites(SavePath + 'default.nwl');
@@ -3946,11 +3949,11 @@ end;
 
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
 begin
-  if NOT FileExists(ExtractFilePath(Paramstr(0))+'faq.htm') then
+  if NOT FileExists(ExtractFilePath(Paramstr(0))+'Data\faq.htm') then
     MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
   else
     ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'Data\faq.htm')
                       , nil, nil, SW_SHOWNORMAl);
 end;
 
@@ -4617,11 +4620,11 @@ begin
            end else
            begin
 
-              if NOT FileExists(ExtractFilePath(Paramstr(0))+'faq.htm') then
+              if NOT FileExists(ExtractFilePath(Paramstr(0))+'Data\faq.htm') then
                 MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
               else
                 ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'Data\faq.htm')
                       , nil, nil, SW_SHOWNORMAl);
            end;
     VK_F2: if ssShift in shift then
