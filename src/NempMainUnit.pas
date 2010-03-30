@@ -1682,7 +1682,7 @@ begin
         //Player-Einstellungen lesen
         NempPlayer.LoadFromIni(Ini);
         //Player initialisieren, Load Plugins.
-        NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)), tmpwstr);
+        NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Data\Bass\', tmpwstr);
         // VCL an den Player anpassen
         PlaylistDateienOpenDialog.Filter := tmpwstr;
         CorrectVolButton;

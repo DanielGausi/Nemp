@@ -667,34 +667,34 @@ begin
     fh := FindFirstFile(PChar(PathToDlls + 'bass*.dll'), fd);
     if (fh <> INVALID_HANDLE_VALUE) then
     try
-      repeat
-        plug := BASS_PluginLoad(fd.cFileName, BASS_UNICODE);
-        if Plug <> 0 then
-        begin
-          Info := BASS_PluginGetInfo(Plug); // get plugin info to add to the file selector filter...
-          for a := 0 to Info.formatc - 1 do
-          begin
-            // Set The OpenDialog additional, to the supported PlugIn Formats
-            Filter := Filter
-              + '|' + String(Info.Formats[a].name) + ' ' + '(' +
-              String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
+        repeat
+            plug := BASS_PluginLoad(PChar(PathToDlls + fd.cFileName), BASS_UNICODE);
+            if Plug <> 0 then
+            begin
+                Info := BASS_PluginGetInfo(Plug); // get plugin info to add to the file selector filter...
+                for a := 0 to Info.formatc - 1 do
+                begin
+                    // Set The OpenDialog additional, to the supported PlugIn Formats
+                    Filter := Filter
+                      + '|' + String(Info.Formats[a].name) + ' ' + '(' +
+                      String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
 
-            //ValidExtensions
-            tmpext := Explode(';', String(Info.Formats[a].exts));
-            for i := 0 to tmpext.Count - 1 do
-              ValidExtensions.Add(StringReplace(tmpext.Strings[i],'*', '',[]));
-            FreeAndNil(tmpext);// im Explode wirds erzeugt
-          end;
-        end;
-      until FindNextFile(fh, fd) = false;
+                    //ValidExtensions
+                    tmpext := Explode(';', String(Info.Formats[a].exts));
+                    for i := 0 to tmpext.Count - 1 do
+                        ValidExtensions.Add(StringReplace(tmpext.Strings[i],'*', '',[]));
+                    FreeAndNil(tmpext);// im Explode wirds erzeugt
+                end;
+            end
+        until Not FindNextFile(fh, fd);
     finally
-      Windows.FindClose(fh);
+        Windows.FindClose(fh);
     end;
     // PLugins geladen
     // Filter "Alle Dateien" hinzufügen
     tmpfilter := '*.mp3';
     for i := 1 to ValidExtensions.Count -1 do
-      tmpfilter := tmpfilter + ';*' + ValidExtensions[i];
+        tmpfilter := tmpfilter + ';*' + ValidExtensions[i];
 
     Filter := 'All supported files|' + tmpfilter
                                        + Filter;
