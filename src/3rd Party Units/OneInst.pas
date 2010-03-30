@@ -202,18 +202,18 @@ begin
     NEMP_NAME := 'Nemp';
     if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
     begin
-      // Nemp liegt im System-Programmverzeichnis
-      SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
-      try
-        ForceDirectories(SavePath);
-      except
-        if Not DirectoryExists(SavePath) then
-          SavePath := ExtractFilePath(Paramstr(0));
-      end;
+        // Nemp liegt im System-Programmverzeichnis
+        SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
+        try
+            ForceDirectories(SavePath);
+        except
+            if Not DirectoryExists(SavePath) then
+                SavePath := ExtractFilePath(Paramstr(0)) + 'Data\';
+        end;
     end else
     begin
-      // Nemp liegt woanders
-      SavePath := ExtractFilePath(Paramstr(0));
+        // Nemp liegt woanders
+        SavePath := ExtractFilePath(Paramstr(0)) + 'Data\';
     end;
 
     ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
