@@ -73,7 +73,6 @@ object CloudEditorForm: TCloudEditorForm
     OnHeaderClick = TagVSTHeaderClick
     OnIncrementalSearch = TagVSTIncrementalSearch
     OnKeyDown = TagVSTKeyDown
-    ExplicitHeight = 196
     Columns = <
       item
         Position = 0
@@ -131,7 +130,6 @@ object CloudEditorForm: TCloudEditorForm
     Enabled = False
     TabOrder = 4
     OnClick = BtnUpdateID3TagsClick
-    ExplicitTop = 280
   end
   object BtnMerge: TButton
     Left = 401
@@ -162,6 +160,5 @@ object CloudEditorForm: TCloudEditorForm
     Caption = 'BugFix'
     TabOrder = 7
     OnClick = BtnBugFixClick
-    ExplicitTop = 249
   end
 end

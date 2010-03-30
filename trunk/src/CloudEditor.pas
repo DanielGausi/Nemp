@@ -47,7 +47,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees, contnrs, StrUtils,
 
-  AudioFileClass, TagClouds, StdCtrls, Spin
+  AudioFileClass, TagClouds, StdCtrls, Spin, TagHelper
   ;
 
 type
@@ -93,6 +93,8 @@ type
     { Private-Deklarationen }
     LocalTagList: TObjectList;
 
+    TagPostProcessor: TTagPostProcessor;
+
     OldSelectionPrefix : String;
 
     procedure FillTagTree(reselect: Boolean = False);
@@ -136,6 +138,9 @@ procedure TCloudEditorForm.FormCreate(Sender: TObject);
 begin
     TagVST.NodeDataSize := SizeOf(TTagTreeData);
     LocalTagList := TObjectList.Create(False);
+
+
+    TagPostProcessor := TTagPostProcessor.Create;
 end;
 procedure TCloudEditorForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
@@ -151,6 +156,7 @@ end;
 procedure TCloudEditorForm.FormDestroy(Sender: TObject);
 begin
     LocalTagList.Free;
+    TagPostProcessor.Free;
 end;
 
 procedure TCloudEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -249,6 +255,9 @@ end;
 procedure TCloudEditorForm.FormShow(Sender: TObject);
 begin
     ActualizeTreeView;
+
+    TagPostProcessor.LoadFiles;
+
 end;
 
 {

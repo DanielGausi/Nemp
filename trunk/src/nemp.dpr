@@ -78,7 +78,8 @@ uses
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
   TagClouds in 'TagClouds.pas' {/,  classes;},
-  CloudEditor in 'CloudEditor.pas' {CloudEditorForm};
+  CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
+  Taghelper in 'Taghelper.pas';
 
 //,  classes;
 
