@@ -1535,7 +1535,7 @@ begin
             // '' dürfte am häufigsten vorkommen (css, bilder, ...)
             if queriedAction = '' then
             begin
-                fn := fLocalDir + 'HTML' + StringReplace(RequestedDocument, '/', '\', [rfReplaceAll]);
+                fn := fLocalDir + 'Data\HTML' + StringReplace(RequestedDocument, '/', '\', [rfReplaceAll]);
                 //showmessage(fn);
                 if FileExists(fn) then
                 begin
