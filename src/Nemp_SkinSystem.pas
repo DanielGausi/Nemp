@@ -712,7 +712,7 @@ begin
   {if UseSkinGraphics then
             BaseDir := Path + '\'
         else
-            BaseDir := ExtractFilePath(ParamStr(0)) + 'img\';}
+            BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';}
   // Change in Nemp 4.0: The Graphics MUST be there. No Fallback to Default-Stars
 
   //if FileExists(DirName + '\starset.bmp') and FileExists(DirName + '\starunset.bmp') then
@@ -2213,7 +2213,7 @@ begin
         if UseSkinGraphics then
             BaseDir := Path + '\'
         else
-            BaseDir := ExtractFilePath(ParamStr(0)) + 'img\';
+            BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
 
         tmpBitmap := TBitmap.Create;
         try
@@ -2257,7 +2257,7 @@ begin
     if isActive and (not UseDefaultStarBitmaps) then
         BaseDir := path + '\'
     else
-        BaseDir := ExtractFilePath(ParamStr(0)) + 'img\';
+        BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
 
         // todo: Var UseDefaultStars...
 
@@ -2295,7 +2295,7 @@ begin
         if UseSkinGraphics then
             BaseDir := Path + '\'
         else
-            BaseDir := ExtractFilePath(ParamStr(0)) + 'img\';
+            BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
 
         tmpBitmap := tBitmap.Create;
         try
