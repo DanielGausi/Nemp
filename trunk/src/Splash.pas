@@ -76,7 +76,7 @@ var
 begin
   TranslateComponent (self);
 
-  filename := ExtractFilePath(ParamStr(0)) + 'img\splash.jpg';
+  filename := ExtractFilePath(ParamStr(0)) + 'Data\img\splash.jpg';
 
   if FileExists(filename) then
       image1.Picture.LoadFromFile(filename);

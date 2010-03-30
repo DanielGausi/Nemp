@@ -85,7 +85,7 @@ procedure TAboutForm.FormCreate(Sender: TObject);
 var filename: String;
     tmpbmp: TBitmap;
 begin
-    filename := ExtractFilePath(ParamStr(0)) + 'img\about_title.bmp';
+    filename := ExtractFilePath(ParamStr(0)) + 'Data\img\about_title.bmp';
     if FileExists(filename) then
     begin
         tmpbmp := TBitmap.Create;

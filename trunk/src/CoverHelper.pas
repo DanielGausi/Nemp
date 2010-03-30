@@ -787,7 +787,7 @@ begin
                          ResIndex := 200;
         end;  }
 
-        filename := ExtractFilePath(ParamStr(0)) + 'img\default_cover.png';
+        filename := ExtractFilePath(ParamStr(0)) + 'Data\img\default_cover.png';
         if FileExists(filename) then
         begin
             aGraphic := TPicture.Create;

@@ -181,7 +181,7 @@ begin
   s := TBitmap.Create;
   h := TBitmap.Create;
   u := TBitmap.Create;
-  BaseDir := ExtractFilePath(ParamStr(0)) + 'img\';
+  BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
   try
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
