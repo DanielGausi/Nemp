@@ -257,7 +257,6 @@ begin
     ActualizeTreeView;
 
     TagPostProcessor.LoadFiles;
-
 end;
 
 {
