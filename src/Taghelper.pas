@@ -67,15 +67,22 @@ type
 
             procedure AddRawMergeString(aString: String);
 
-        public
+            // Search the Lists for a matching key
+            function IgnoreTagExists(aKey: String):Boolean;
+            function MergeTagExists(aOriginalKey, aReplaceKey: String): Boolean;
 
-            // property SavePath: String read fSavePath write fSavepath;
+        public
 
             constructor Create;
             destructor Destroy; override;
 
             procedure LoadFiles;   // Load Data from the files
             procedure SaveFiles;   // Save Data back to the files
+
+            // Add new Tag to Ignore/Merge
+            // result: False if Tag already existed
+            function AddIgnoreTag(aKey: String): Boolean;
+            function AddMergeTag(aOriginalKey, aReplaceKey: String): Boolean;
     end;
 
 const
@@ -122,6 +129,7 @@ begin
     fDefaultPath := ExtractFilePath(ParamStr(0)) + 'Data\';
 
     fIgnoreList := TStringList.Create;
+    fIgnoreList.CaseSensitive := False;
     fMergeList := TObjectList.Create;
 end;
 
@@ -131,7 +139,6 @@ begin
     fMergeList.Free;
     inherited;
 end;
-
 
 {
     --------------------------------------------------------
@@ -183,7 +190,7 @@ begin
             fIgnoreList.Clear;
     end;
 
-    // 1. Merge-List
+    // 2. Merge-List
     // --------------
     tmpList := TStringList.Create;
     try
@@ -215,9 +222,12 @@ var tmpList: TStringList;
 begin
     ForceDirectories(fSavePath);
 
-    // save the IgnoreList
+    // 1. IgnoreList
+    // --------------
     fIgnoreList.SaveToFile(fSavePath + Usr_IgnoreList, TEncoding.UTF8);
 
+    // 2. MergeList
+    // --------------
     tmpList := TStringList.Create;
     try
         // build strings "<key1>@@<key2>"
@@ -229,10 +239,70 @@ begin
             tmpList.Add(s);
         end;
         // save the @@-List
-        tmpList.SaveToFile(fSavepath + Usr_MergeList);
+        tmpList.SaveToFile(fSavepath + Usr_MergeList, TEncoding.UTF8);
     finally
         tmpList.Free;
     end;
 end;
+
+{
+    --------------------------------------------------------
+    IgnoreTagExists, MergeTagExists
+    - Search the Lists for a matchin key
+    --------------------------------------------------------
+}
+function TTagPostProcessor.IgnoreTagExists(aKey: String): Boolean;
+begin
+    result := fIgnoreList.IndexOf(aKey) >= 0;
+end;
+
+function TTagPostProcessor.MergeTagExists(aOriginalKey,
+  aReplaceKey: String): Boolean;
+var i: Integer;
+    aItem: TTagMergeItem;
+begin
+    result := False;
+    for i := 0 to fMergeList.Count - 1 do
+    begin
+        aItem := TTagMergeItem(fMergeList[i]);
+        if SameText(aItem.fOriginalKey, aOriginalKey)
+            and SameText(aItem.fReplaceKey, aReplaceKey)
+        then
+        begin
+            result := True;
+            break;
+        end;
+    end;
+end;
+
+{
+    --------------------------------------------------------
+    AddIgnoreTag, AddMergeTag
+    - Add Ignore/Mergetag to the lists
+    --------------------------------------------------------
+}
+function TTagPostProcessor.AddIgnoreTag(aKey: String): Boolean;
+begin
+    if not IgnoreTagExists(aKey) then
+    begin
+        fIgnoreList.Add(aKey);
+        result := True;
+    end
+    else
+        result := False;
+end;
+function TTagPostProcessor.AddMergeTag(aOriginalKey,
+  aReplaceKey: String): Boolean;
+begin
+    if not MergeTagExists(aOriginalKey, aReplaceKey) then
+    begin
+        fMergeList.Add(TTagMergeItem.Create(aOriginalKey, aReplaceKey));
+        result := True;
+    end
+    else
+        result := False;
+end;
+
+
 
 end.

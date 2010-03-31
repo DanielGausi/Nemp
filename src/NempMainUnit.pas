@@ -3469,7 +3469,6 @@ begin
         NempPlaylist.InsertNode := NIL;
 
     // Erste Datei einfügen und ggf. Abspielen
-    tmp := Nil;
     tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[0]));
 
     if How=PLAYER_PLAY_NEXT then
