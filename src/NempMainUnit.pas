@@ -1685,7 +1685,7 @@ begin
         //Player-Einstellungen lesen
         NempPlayer.LoadFromIni(Ini);
         //Player initialisieren, Load Plugins.
-        NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Data\Bass\', tmpwstr);
+        NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
         // VCL an den Player anpassen
         PlaylistDateienOpenDialog.Filter := tmpwstr;
         CorrectVolButton;
@@ -3949,11 +3949,11 @@ end;
 
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
 begin
-  if NOT FileExists(ExtractFilePath(Paramstr(0))+'Data\faq.htm') then
+  if NOT FileExists(ExtractFilePath(Paramstr(0))+'HTML\faq.htm') then
     MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
   else
     ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'Data\faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'HTML\faq.htm')
                       , nil, nil, SW_SHOWNORMAl);
 end;
 
@@ -4620,11 +4620,11 @@ begin
            end else
            begin
 
-              if NOT FileExists(ExtractFilePath(Paramstr(0))+'Data\faq.htm') then
+              if NOT FileExists(ExtractFilePath(Paramstr(0))+'HTML\faq.htm') then
                 MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
               else
                 ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'Data\faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'HTML\faq.htm')
                       , nil, nil, SW_SHOWNORMAl);
            end;
     VK_F2: if ssShift in shift then

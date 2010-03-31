@@ -1311,7 +1311,7 @@ begin
   TP_ClassHandling:=TList.Create;
 
   // Set some settings
-  DefaultDomainDirectory := IncludeTrailingPathDelimiter(extractfilepath(ExecutableFilename))+'Data\Language';
+  DefaultDomainDirectory := IncludeTrailingPathDelimiter(extractfilepath(ExecutableFilename))+'Languages';
 
   UseLanguage('');
 
