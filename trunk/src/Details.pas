@@ -381,7 +381,7 @@ begin
   s := TBitmap.Create;
   h := TBitmap.Create;
   u := TBitmap.Create;
-  BaseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
+  BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
   try
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
       Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
@@ -872,8 +872,8 @@ begin
       DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height)
   else
   begin
-      if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\img\stardisabled.bmp') then
-          RatingImage.Picture.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Data\img\stardisabled.bmp');
+      if FileExists(ExtractFilePath(ParamStr(0)) + 'Images\stardisabled.bmp') then
+          RatingImage.Picture.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Images\stardisabled.bmp');
   end;
 
   LblConst_ID3v2Artist.Enabled := ControlsEnable;

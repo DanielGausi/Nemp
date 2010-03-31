@@ -124,7 +124,7 @@ var BaseDir: String;
 begin
     TranslateComponent (self);
 
-    baseDir := ExtractFilePath(ParamStr(0)) + 'Data\img\';
+    baseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
     if FileExists(baseDir + 'BtnPlayPause.bmp') then
         PlayBTN.NempGlyph.LoadFromFile(baseDir + 'BtnPlayPause.bmp');
     if FileExists(baseDir + 'BtnSlidebackward.bmp') then
