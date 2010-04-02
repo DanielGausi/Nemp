@@ -57,11 +57,6 @@ type
 
   TBlendMode = (bm_Cloud, bm_Tag);
 
-  // types for the VirtualStringTree in CloudEditorForm
-  TTagTreeData = record
-      FTag : TTag;
-  end;
-  PTagTreeData = ^TTagTreeData;
 
   // class containing some colors and other stuff.
   // can be changed by NempSkin

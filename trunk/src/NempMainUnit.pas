@@ -6869,6 +6869,12 @@ end;
 
 procedure TNemp_MainForm.PM_ML_CloudEditorClick(Sender: TObject);
 begin
+    if MedienBib.BrowseMode <> 2 then
+    begin
+        SwitchBrowsePanel(TabBtn_TagCloud.Tag);
+        SwitchMediaLibrary(TabBtn_TagCloud.Tag);
+    end;
+
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);
     CloudEditorForm.show;

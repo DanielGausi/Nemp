@@ -47,22 +47,46 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees, contnrs, StrUtils,
 
-  AudioFileClass, TagClouds, StdCtrls, Spin, TagHelper
+  AudioFileClass, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls
   ;
 
 type
 
+// types for the VirtualStringTree in CloudEditorForm
+  TTagTreeData = record
+      FTag : TTag;
+  end;
+  TIgnoreTagData = record
+      fString: String;
+  end;
+  TMergeTagData = record
+      fMergeTag: TTagMergeItem;
+  end;
+
+  PIgnoreTagData = ^TIgnoreTagData;
+  PMergeTagData = ^TMergeTagData;
+  PTagTreeData = ^TTagTreeData;
+
+
   TCloudEditorForm = class(TForm)
-    TagVST: TVirtualStringTree;
-    cbHideAutoTags: TCheckBox;
-    seMinTagCount: TSpinEdit;
-    lblMinTagCount: TLabel;
-    BtnTagRename: TButton;
     LblUpdateWarning: TLabel;
     BtnUpdateID3Tags: TButton;
+    BtnBugFix: TButton;
+    PageControl1: TPageControl;
+    TS_ExistingTags: TTabSheet;
+    TS_DeleteTags: TTabSheet;
+    TS_MergedTags: TTabSheet;
+    cbHideAutoTags: TCheckBox;
+    lblMinTagCount: TLabel;
+    seMinTagCount: TSpinEdit;
+    TagVST: TVirtualStringTree;
+    BtnTagRename: TButton;
     BtnMerge: TButton;
     BtnDeleteTags: TButton;
-    BtnBugFix: TButton;
+    cbAutoAddMergeTags: TCheckBox;
+    cbAutoAddIgnoreTags: TCheckBox;
+    MergeTagVST: TVirtualStringTree;
+    IgnoreTagVST: TVirtualStringTree;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -98,9 +122,17 @@ type
     OldSelectionPrefix : String;
 
     procedure FillTagTree(reselect: Boolean = False);
-
     procedure SortTags;                          // Resort the Tags
     procedure ReselectNode(aKey: UTF8String);    // Reselect a node with the given key
+
+
+    procedure ReselectIgnoreNode(aKey: String);
+    procedure ReselectMergeNode(aOriginalKey, aReplaceKey: String);
+
+    procedure FillIgnoreTree(reselect: Boolean = False);
+    procedure FillMergeTree(reselect: Boolean = False);
+
+
 
   public
     { Public-Deklarationen }
@@ -119,6 +151,13 @@ implementation
 
 uses NempMainUnit, MedienBibliothekClass, Nemp_RessourceStrings, Math, MainFormHelper;
 
+
+{
+    --------------------------------------------------------
+    AddVSTTag, AddVSTIgnoreTag, AddVSTMergeTag
+    - Adding nodes to the VSTs
+    --------------------------------------------------------
+}
 function AddVSTTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aTag: TTag): PVirtualNode;
 var Data: PTagTreeData;
 begin
@@ -126,6 +165,24 @@ begin
   AVST.ValidateNode(Result,false);
   Data := AVST.GetNodeData(Result);
   Data^.FTag := aTag;
+end;
+
+function AddVSTIgnoreTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: String): PVirtualNode;
+var Data: PIgnoreTagData;
+begin
+  Result :=  AVST.AddChild(aNode); // meistens wohl Nil
+  AVST.ValidateNode(Result,false);
+  Data := AVST.GetNodeData(Result);
+  Data^.fString := aString;
+end;
+
+function AddVSTMergeTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aMergeTag: TTagMergeItem): PVirtualNode;
+var Data: PMergeTagData;
+begin
+  Result :=  AVST.AddChild(aNode); // meistens wohl Nil
+  AVST.ValidateNode(Result,false);
+  Data := AVST.GetNodeData(Result);
+  Data^.fMergeTag := aMergeTag;
 end;
 
 {
@@ -159,6 +216,12 @@ begin
     TagPostProcessor.Free;
 end;
 
+procedure TCloudEditorForm.FormShow(Sender: TObject);
+begin
+    ActualizeTreeView;
+    TagPostProcessor.LoadFiles;
+end;
+
 procedure TCloudEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -183,6 +246,7 @@ begin
     // Fill the treeview
     FillTagTree;
 end;
+
 
 procedure TCloudEditorForm.ReselectNode(aKey: UTF8String);
 var i: Integer;
@@ -243,6 +307,58 @@ begin
         end;
 end;
 
+
+
+
+procedure TCloudEditorForm.ReselectIgnoreNode(aKey: String);
+var i: Integer;
+    aNode: PVirtualNode;
+    Data: PIgnoreTagData;
+begin
+    aNode := TagVST.GetFirst;
+    Data := TagVST.GetNodeData(aNode);
+    while (Data^.fString <> aKey) and (aNode <> IgnoreTagVST.GetLast) do
+    begin
+        aNode := IgnoreTagVST.GetNext(aNode);
+        Data := IgnoreTagVST.GetNodeData(aNode);
+    end;
+
+    IgnoreTagVST.FocusedNode := aNode;
+    IgnoreTagVST.ScrollIntoView(aNode, True);
+    IgnoreTagVST.Selected[aNode] := True;
+end;
+
+procedure TCloudEditorForm.FillIgnoreTree(reselect: Boolean);
+begin
+       sd
+end;
+
+procedure TCloudEditorForm.ReselectMergeNode(aOriginalKey, aReplaceKey: String);
+var i: Integer;
+    aNode: PVirtualNode;
+    Data: PMergeTagData;
+begin
+    aNode := TagVST.GetFirst;
+    Data := TagVST.GetNodeData(aNode);
+    while (Data^.fMergeTag.OriginalKey <> aOriginalKey)
+          and (Data^.fMergeTag.ReplaceKey <> aReplaceKey)
+          and (aNode <> MergeTagVST.GetLast) do
+    begin
+        aNode := MergeTagVST.GetNext(aNode);
+        Data := MergeTagVST.GetNodeData(aNode);
+    end;
+
+    MergeTagVST.FocusedNode := aNode;
+    MergeTagVST.ScrollIntoView(aNode, True);
+    MergeTagVST.Selected[aNode] := True;
+end;
+
+procedure TCloudEditorForm.FillMergeTree(reselect: Boolean);
+begin
+       sd
+end;
+
+
 procedure TCloudEditorForm.RefreshWarningLabel;
 var c: Integer;
 begin
@@ -252,12 +368,6 @@ begin
     BtnUpdateID3Tags.Enabled := c > 0;
 end;
 
-procedure TCloudEditorForm.FormShow(Sender: TObject);
-begin
-    ActualizeTreeView;
-
-    TagPostProcessor.LoadFiles;
-end;
 
 {
     --------------------------------------------------------
