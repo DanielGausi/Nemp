@@ -52,6 +52,8 @@ type
             fOriginalKey: String;
             fReplaceKey: String;
         public
+            property OriginalKey: String read fOriginalKey;
+            property ReplaceKey : String read fReplaceKey;
             constructor Create(OriginalKey, ReplaceKey: String);
     end;
 
@@ -70,8 +72,11 @@ type
             // Search the Lists for a matching key
             function IgnoreTagExists(aKey: String):Boolean;
             function MergeTagExists(aOriginalKey, aReplaceKey: String): Boolean;
+            function IndexOfMergeTag(aOriginalKey, aReplaceKey: String): Integer;
 
         public
+
+            property IgnoreList: TStringList read fIgnoreList;
 
             constructor Create;
             destructor Destroy; override;
@@ -83,6 +88,10 @@ type
             // result: False if Tag already existed
             function AddIgnoreTag(aKey: String): Boolean;
             function AddMergeTag(aOriginalKey, aReplaceKey: String): Boolean;
+
+            // delete a Tag from the List
+            procedure DeleteIgnoreTag(aKey: String);
+            procedure DeleteMergeTag(aOriginalKey, aReplaceKey: String);
     end;
 
 const
@@ -194,6 +203,10 @@ begin
     // --------------
     tmpList := TStringList.Create;
     try
+        // clear old list
+        fMergeList.Clear;
+
+        // load new list
         if FileExists(fSavePath + Usr_MergeList) then
             // User defined list exists
             tmpList.LoadFromFile(fSavePath + Usr_MergeList)
@@ -256,12 +269,12 @@ begin
     result := fIgnoreList.IndexOf(aKey) >= 0;
 end;
 
-function TTagPostProcessor.MergeTagExists(aOriginalKey,
-  aReplaceKey: String): Boolean;
-var i: Integer;
+function TTagPostProcessor.IndexOfMergeTag(aOriginalKey,
+  aReplaceKey: String): Integer;
+var i: integer;
     aItem: TTagMergeItem;
 begin
-    result := False;
+    result := -1;
     for i := 0 to fMergeList.Count - 1 do
     begin
         aItem := TTagMergeItem(fMergeList[i]);
@@ -269,10 +282,16 @@ begin
             and SameText(aItem.fReplaceKey, aReplaceKey)
         then
         begin
-            result := True;
+            result := i;
             break;
         end;
     end;
+end;
+
+function TTagPostProcessor.MergeTagExists(aOriginalKey,
+  aReplaceKey: String): Boolean;
+begin
+    result := IndexOfMergetag(aOriginalKey, aReplaceKey) >= 0;
 end;
 
 {
@@ -303,6 +322,27 @@ begin
         result := False;
 end;
 
+{
+    --------------------------------------------------------
+    DeleteIgnoreTag, DeleteMergeTag
+    - Delete Ignore/Mergetag from the lists
+    --------------------------------------------------------
+}
+procedure TTagPostProcessor.DeleteIgnoreTag(aKey: String);
+var idx: integer;
+begin
+    idx := fIgnoreList.IndexOf(aKey);
+    if idx >= 0 then
+        fIgnoreList.Delete(idx);
+end;
+
+procedure TTagPostProcessor.DeleteMergeTag(aOriginalKey, aReplaceKey: String);
+var idx: integer;
+begin
+    idx := IndexOfMergeTag(aOriginalKey, aReplaceKey);
+    if idx >= 0 then
+        fMergeList.Delete(idx);
+end;
 
 
 end.
