@@ -742,6 +742,10 @@ type
     fspTaskbarManager: TfspTaskbarMgr;
     fspTaskbarPreviews1: TfspTaskbarPreviews;
     PM_ML_CloudEditor: TMenuItem;
+    MemBibTags: TMemo;
+    BtnApplyEditTags: TButton;
+    BtnCancelEditTags: TButton;
+    MemoDisableTimer: TTimer;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1226,6 +1230,7 @@ type
     procedure FillBibDetailLabels(aAudioFile: TAudioFile);
     procedure AdjustEditToLabel(aEdit: TControl; aLabel: TLabel);
     procedure ShowLabelAgain(aEdit: TControl; aLabel: TLabel);
+    procedure HideTagMemo;
     function GetCorrespondingEdit(aLabel: TLabel): TControl;
     function GetCorrespondingLabel(aEdit: TControl): TLabel;
 
@@ -1263,6 +1268,11 @@ type
     procedure fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject; Width,
       Height: Integer; var Bitmap: HBITMAP);
     procedure PM_ML_CloudEditorClick(Sender: TObject);
+    procedure LblBibTagsClick(Sender: TObject);
+    procedure BtnApplyEditTagsClick(Sender: TObject);
+    procedure MemBibTagsKeyPress(Sender: TObject; var Key: Char);
+    procedure MemBibTagsExit(Sender: TObject);
+    procedure MemoDisableTimerTimer(Sender: TObject);
 
   private
 
@@ -2820,6 +2830,7 @@ Procedure TNemp_MainForm.MedienBibMessage(Var aMsg: TMessage);
 begin
     Handle_MedienBibMessage(aMsg);
 end;
+
 
 
 Procedure TNemp_MainForm.ShoutcastQueryMessage(Var aMsg: TMessage);
@@ -4811,6 +4822,7 @@ begin
     ShowLabelAgain(EdtBibTrack , GetCorrespondingLabel(EdtBibTrack ));
     ShowLabelAgain(EdtBibYear  , GetCorrespondingLabel(EdtBibYear  ));
     ShowLabelAgain(EdtBibGenre , GetCorrespondingLabel(EdtBibGenre ));
+    MemoDisableTimer.Enabled := True;
 end;
 
 procedure TNemp_MainForm.VDTCoverResize(Sender: TObject);
@@ -4849,6 +4861,10 @@ begin
     ShowLabelAgain(EdtBibTrack , GetCorrespondingLabel(EdtBibTrack ));
     ShowLabelAgain(EdtBibYear  , GetCorrespondingLabel(EdtBibYear  ));
     ShowLabelAgain(EdtBibGenre , GetCorrespondingLabel(EdtBibGenre ));
+    LblBibTags.Visible := True;
+    MemBibTags.Visible := False;
+    BtnApplyEditTags.Visible := False;
+    BtnCancelEditTags.Visible := False;
 end;
 
 procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
@@ -4961,6 +4977,14 @@ begin
     aEdit.Visible := False;
 end;
 
+procedure TNemp_MainForm.HideTagMemo;
+begin
+    LblBibTags.Visible := True;
+    MemBibTags.Visible := False;
+    BtnApplyEditTags.Visible := False;
+    BtnCancelEditTags.Visible := False;
+end;
+
 function TNemp_MainForm.GetCorrespondingEdit(aLabel: TLabel): TControl;
 begin
     case aLabel.Tag of
@@ -4996,6 +5020,65 @@ procedure TNemp_MainForm.LblBibArtistClick(Sender: TObject);
 begin
     AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
+procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
+begin
+
+    MemBibTags.Top := LblBibDuration.Top;
+    MemBibTags.Left := LblBibDuration.Left;
+    MemBibTags.Width := min(200, VDTCover.Width - MemBibTags.Left);
+    MemBibTags.Height := min(150, VDTCover.Height - MemBibTags.Top );
+
+
+    BtnApplyEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
+    BtnApplyEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28;
+
+    BtnCancelEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
+    BtnCancelEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28 - 29;
+
+    MemBibTags.Text := MedienBib.CurrentAudioFile.RawTagLastFM;
+
+    LblBibTags.Visible := False;
+    MemBibTags.Visible := True;
+    BtnApplyEditTags.Visible := True;
+    BtnCancelEditTags.Visible := True;
+
+    MemBibTags.SetFocus
+end;
+
+procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
+begin
+    if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
+    begin
+        MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+        LblBibTags.Caption := StringReplace(MedienBib.CurrentAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+    end;
+    HideTagMemo;
+end;
+
+procedure TNemp_MainForm.MemBibTagsKeyPress(Sender: TObject; var Key: Char);
+begin
+    case Ord(key) of
+        VK_Escape: begin
+              key := #0;
+              HideTagMemo;
+        end;
+    end;
+end;
+
+procedure TNemp_MainForm.MemBibTagsExit(Sender: TObject);
+begin
+    // ok, this is a BAAAAAD hack.
+    // We want the memo to be closed like the edits,
+    // but we have to allow a "OK-ButtonClick"
+    // (which will cause an Memo-Exit first, which will hide the Button)
+    MemoDisableTimer.Enabled := True;
+end;
+procedure TNemp_MainForm.MemoDisableTimerTimer(Sender: TObject);
+begin
+    MemoDisableTimer.Enabled := False;
+    HideTagMemo;
+end;
+
 procedure TNemp_MainForm.EdtBibArtistExit(Sender: TObject);
 begin
     ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
@@ -9034,6 +9117,8 @@ begin
    //ST_Playlist.Free;
     //ST_Medienliste.Free;
 end;
+
+
 
 procedure TNemp_MainForm.BtnCloseClick(Sender: TObject);
 begin

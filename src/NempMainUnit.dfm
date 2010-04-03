@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 701
   Top = 286
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 1004
+  ClientHeight = 831
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2214,18 +2214,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 495
+    Height = 322
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 495
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 467
+      Height = 294
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2235,23 +2236,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 467
       DesignSize = (
         845
-        467)
+        294)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 457
+        Height = 284
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 457
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 457
+          Height = 284
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
           ExplicitLeft = 250
@@ -2261,7 +2264,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 457
+          Height = 284
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2328,6 +2331,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 457
           Columns = <
             item
               Position = 0
@@ -2398,7 +2402,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 457
+          Height = 284
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2408,6 +2412,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitLeft = -2
+          ExplicitHeight = 457
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -2516,13 +2522,14 @@ object Nemp_MainForm: TNemp_MainForm
           end
           object LblBibTags: TLabel
             Left = 157
-            Top = 177
+            Top = 179
             Width = 50
             Height = 59
             AutoSize = False
             Caption = 'LblBibTags'
             ShowAccelChar = False
             WordWrap = True
+            OnClick = LblBibTagsClick
           end
           object LblBibPlayCounter: TLabel
             Left = 157
@@ -2610,6 +2617,38 @@ object Nemp_MainForm: TNemp_MainForm
             TabOrder = 6
             Visible = False
             OnClick = Button1Click
+          end
+          object MemBibTags: TMemo
+            Left = 242
+            Top = 161
+            Width = 134
+            Height = 89
+            ScrollBars = ssVertical
+            TabOrder = 7
+            Visible = False
+            WordWrap = False
+            OnExit = MemBibTagsExit
+            OnKeyPress = MemBibTagsKeyPress
+          end
+          object BtnApplyEditTags: TButton
+            Left = 327
+            Top = 229
+            Width = 29
+            Height = 19
+            Caption = 'Ok'
+            TabOrder = 8
+            Visible = False
+            OnClick = BtnApplyEditTagsClick
+          end
+          object BtnCancelEditTags: TButton
+            Left = 300
+            Top = 229
+            Width = 29
+            Height = 19
+            Caption = 'Esc'
+            TabOrder = 9
+            Visible = False
+            OnClick = BtnApplyEditTagsClick
           end
         end
       end
@@ -3557,7 +3596,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300B0020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300C0020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4122,7 +4161,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C0101130018009C0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800AC0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000
@@ -6327,5 +6366,12 @@ object Nemp_MainForm: TNemp_MainForm
     OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
     Left = 720
     Top = 632
+  end
+  object MemoDisableTimer: TTimer
+    Enabled = False
+    Interval = 150
+    OnTimer = MemoDisableTimerTimer
+    Left = 264
+    Top = 760
   end
 end

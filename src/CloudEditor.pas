@@ -57,7 +57,7 @@ type
       FTag : TTag;
   end;
   TIgnoreTagData = record
-      fString: String;
+      fString: TIgnoreTagString;
   end;
   TMergeTagData = record
       fMergeTag: TTagMergeItem;
@@ -72,7 +72,7 @@ type
     LblUpdateWarning: TLabel;
     BtnUpdateID3Tags: TButton;
     BtnBugFix: TButton;
-    PageControl1: TPageControl;
+    PC_Select: TPageControl;
     TS_ExistingTags: TTabSheet;
     TS_DeleteTags: TTabSheet;
     TS_MergedTags: TTabSheet;
@@ -87,6 +87,10 @@ type
     cbAutoAddIgnoreTags: TCheckBox;
     MergeTagVST: TVirtualStringTree;
     IgnoreTagVST: TVirtualStringTree;
+    LblMergeTagHint: TStaticText;
+    BtnDeleteMergeTag: TButton;
+    LblDeleteTagHint: TStaticText;
+    BtnDeleteIgnoreTag: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -113,6 +117,15 @@ type
     procedure BtnBugFixClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure MergeTagVSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure IgnoreTagVSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure MergeTagVSTHeaderClick(Sender: TVTHeader;
+      HitInfo: TVTHeaderHitInfo);
+    procedure BtnDeleteIgnoreTagClick(Sender: TObject);
+    procedure BtnDeleteMergeTagClick(Sender: TObject);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
@@ -129,8 +142,11 @@ type
     procedure ReselectIgnoreNode(aKey: String);
     procedure ReselectMergeNode(aOriginalKey, aReplaceKey: String);
 
+    procedure ClearIgnoreTree;
     procedure FillIgnoreTree(reselect: Boolean = False);
     procedure FillMergeTree(reselect: Boolean = False);
+
+    procedure SortMergetags;
 
 
 
@@ -173,7 +189,7 @@ begin
   Result :=  AVST.AddChild(aNode); // meistens wohl Nil
   AVST.ValidateNode(Result,false);
   Data := AVST.GetNodeData(Result);
-  Data^.fString := aString;
+  Data^.fString := TIgnoreTagString.create(aString);
 end;
 
 function AddVSTMergeTag(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aMergeTag: TTagMergeItem): PVirtualNode;
@@ -194,11 +210,15 @@ end;
 procedure TCloudEditorForm.FormCreate(Sender: TObject);
 begin
     TagVST.NodeDataSize := SizeOf(TTagTreeData);
+    IgnoreTagVST.NodeDataSize := SizeOf(TIgnoreTagData);
+    MergeTagVST.NodeDataSize := SizeOf(TMergeTagData);
+
     LocalTagList := TObjectList.Create(False);
-
-
     TagPostProcessor := TTagPostProcessor.Create;
+
+    PC_Select.ActivePageIndex := 0;
 end;
+
 procedure TCloudEditorForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 var c: Integer;
@@ -210,8 +230,13 @@ begin
     else
         CanClose := True;
 end;
+procedure TCloudEditorForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+    TagPostProcessor.SaveFiles;
+end;
 procedure TCloudEditorForm.FormDestroy(Sender: TObject);
 begin
+    ClearIgnoreTree;
     LocalTagList.Free;
     TagPostProcessor.Free;
 end;
@@ -220,7 +245,10 @@ procedure TCloudEditorForm.FormShow(Sender: TObject);
 begin
     ActualizeTreeView;
     TagPostProcessor.LoadFiles;
+    FillMergeTree(False);
+    FillIgnoreTree(False);
 end;
+
 
 procedure TCloudEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -295,7 +323,7 @@ end;
 procedure TCloudEditorForm.SortTags;
 begin
     // Sort LocalTagList
-    if TagVST.Header.SortDirection =  sdDescending then
+    if TagVST.Header.SortDirection = sdDescending then
         case TagVST.Header.SortColumn of
             0: LocalTagList.Sort(Sort_Name_DESC);
             1: LocalTagList.Sort(Sort_Count_DESC);
@@ -308,6 +336,20 @@ begin
 end;
 
 
+procedure TCloudEditorForm.SortMergetags;
+begin
+    if MergeTagVST.Header.SortDirection = sdDescending then
+        case MergeTagVST.Header.SortColumn of
+            0: TagPostProcessor.MergeList.Sort(Sort_OriginalKey_DESC);
+            1: TagPostProcessor.MergeList.Sort(Sort_ReplaceKey_DESC);
+        end
+    else
+        case MergeTagVST.Header.SortColumn of
+            0: TagPostProcessor.MergeList.Sort(Sort_OriginalKey);
+            1: TagPostProcessor.MergeList.Sort(Sort_ReplaceKey);
+        end;
+end;
+
 
 
 procedure TCloudEditorForm.ReselectIgnoreNode(aKey: String);
@@ -315,9 +357,9 @@ var i: Integer;
     aNode: PVirtualNode;
     Data: PIgnoreTagData;
 begin
-    aNode := TagVST.GetFirst;
-    Data := TagVST.GetNodeData(aNode);
-    while (Data^.fString <> aKey) and (aNode <> IgnoreTagVST.GetLast) do
+    aNode := IgnoreTagVST.GetFirst;
+    Data := IgnoreTagVST.GetNodeData(aNode);
+    while (Data^.fString.DataString <> aKey) and (aNode <> IgnoreTagVST.GetLast) do
     begin
         aNode := IgnoreTagVST.GetNext(aNode);
         Data := IgnoreTagVST.GetNodeData(aNode);
@@ -328,9 +370,56 @@ begin
     IgnoreTagVST.Selected[aNode] := True;
 end;
 
-procedure TCloudEditorForm.FillIgnoreTree(reselect: Boolean);
+procedure TCloudEditorForm.ClearIgnoreTree;
+var i: Integer;
+    aNode: PVirtualNode;
+    aData: PIgnoreTagData;
+    dummy, tmp: TIgnoreTagString;
+
 begin
-       sd
+    // just to be sure, use dummy-objects while clearing.
+    dummy := TIgnoreTagString.create('');
+    try
+        aNode := IgnoreTagVST.GetFirst;
+        while assigned(aNode) do
+        begin
+            aData := IgnoreTagVST.GetNodeData(aNode);
+            tmp := aData.fString;
+            aData.fString := dummy;
+            tmp.Free;
+            aNode := IgnoreTagVST.GetNext(aNode);
+        end;
+    finally
+        IgnoreTagVST.Clear;
+        dummy.Free;
+    end;
+end;
+
+procedure TCloudEditorForm.FillIgnoreTree(reselect: Boolean);
+var i: integer;
+    oldNode: PVirtualNode;
+    oldData: PIgnoreTagData;
+    oldKey: String;
+begin
+    if Reselect then
+    begin
+        oldNode := IgnoreTagVST.FocusedNode;
+        if assigned(oldNode) then
+        begin
+            oldData := IgnoreTagVST.GetNodeData(oldNode);
+            oldKey := oldData^.fString.DataString;
+        end;
+    end;
+
+    IgnoreTagVST.BeginUpdate;
+    ClearIgnoreTree;
+
+    for i:=0 to TagPostProcessor.IgnoreList.Count-1 do
+        AddVSTIgnoreTag(IgnoreTagVST, Nil, TagPostProcessor.IgnoreList[i]);
+    IgnoreTagVST.EndUpdate;
+
+    if Reselect then
+        ReselectIgnoreNode(oldKey);
 end;
 
 procedure TCloudEditorForm.ReselectMergeNode(aOriginalKey, aReplaceKey: String);
@@ -338,8 +427,8 @@ var i: Integer;
     aNode: PVirtualNode;
     Data: PMergeTagData;
 begin
-    aNode := TagVST.GetFirst;
-    Data := TagVST.GetNodeData(aNode);
+    aNode := MergeTagVST.GetFirst;
+    Data := MergeTagVST.GetNodeData(aNode);
     while (Data^.fMergeTag.OriginalKey <> aOriginalKey)
           and (Data^.fMergeTag.ReplaceKey <> aReplaceKey)
           and (aNode <> MergeTagVST.GetLast) do
@@ -354,8 +443,30 @@ begin
 end;
 
 procedure TCloudEditorForm.FillMergeTree(reselect: Boolean);
+var i: integer;
+    oldNode: PVirtualNode;
+    oldData: PMergeTagData;
+    oldOriginalKey, oldReplacekey: String;
 begin
-       sd
+    if Reselect then
+    begin
+        oldNode := MergeTagVST.FocusedNode;
+        if assigned(oldNode) then
+        begin
+            oldData := MergeTagVST.GetNodeData(oldNode);
+            oldOriginalKey := oldData^.fMergeTag.OriginalKey;
+            oldReplacekey  := oldData^.fMergeTag.ReplaceKey;
+        end;
+    end;
+
+    MergeTagVST.BeginUpdate;
+    MergeTagVST.Clear;
+    for i:=0 to TagPostProcessor.MergeList.Count-1 do
+        AddVSTMergeTag(MergeTagVST, Nil, TTagMergeItem(TagPostProcessor.MergeList[i]));
+    MergeTagVST.EndUpdate;
+
+    if Reselect then
+        ReselectMergeNode(oldOriginalKey, oldReplacekey);
 end;
 
 
@@ -426,6 +537,37 @@ begin
     end;
 end;
 
+procedure TCloudEditorForm.MergeTagVSTGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+  var CellText: string);
+var Data: PMergeTagData;
+begin
+    Data := MergeTagVST.GetNodeData(Node);
+    if assigned(Data) then
+    begin
+        case Column of
+          0: CellText := Data^.fMergeTag.OriginalKey;
+          1: CellText := Data^.fMergeTag.ReplaceKey;
+        end;
+    end;
+end;
+
+
+
+procedure TCloudEditorForm.IgnoreTagVSTGetText(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+  var CellText: string);
+var Data: PIgnoreTagData;
+begin
+    Data := IgnoreTagVST.GetNodeData(Node);
+    if assigned(Data) then
+    begin
+        case Column of
+          0: CellText := Data^.fString.DataString;
+        end;
+    end;
+end;
+
 {
     --------------------------------------------------------
     TagVSTHeaderClick
@@ -454,6 +596,30 @@ begin
       end;
   end;
 end;
+
+procedure TCloudEditorForm.MergeTagVSTHeaderClick(Sender: TVTHeader;
+  HitInfo: TVTHeaderHitInfo);
+begin
+    if (HitInfo.Button = mbLeft) then
+    begin
+        if (HitInfo.Column > -1 ) then
+        begin
+            if HitInfo.Column = MergeTagVST.Header.SortColumn then
+                // Swap SortDirection
+                case MergeTagVST.Header.SortDirection of
+                    sdAscending:  MergeTagVST.Header.SortDirection := sdDescending;
+                    sdDescending: MergeTagVST.Header.SortDirection := sdAscending;
+                end;
+            // Set SortColumn
+            MergeTagVST.Header.SortColumn := HitInfo.Column;
+
+            SortMergeTags;
+            // Show in TreeView
+            FillMergeTree(True);
+        end;
+    end;
+end;
+
 
 {
     --------------------------------------------------------
@@ -669,6 +835,7 @@ end;
     - Delete the selected Tags
     --------------------------------------------------------
 }
+
 procedure TCloudEditorForm.BtnDeleteTagsClick(Sender: TObject);
 var SelectedTags: TNodeArray;
     i: Integer;
@@ -692,6 +859,46 @@ begin
             RefreshWarningLabel;
         end;
     end;
+end;
+
+procedure TCloudEditorForm.BtnDeleteIgnoreTagClick(Sender: TObject);
+var SelectedTags: TNodeArray;
+    i: Integer;
+    Data: PIgnoreTagData;
+begin
+    IgnoreTagVST.BeginUpdate;
+    SelectedTags := IgnoreTagVST.GetSortedSelection(False);
+    if Length(SelectedTags) > 0 then
+    begin
+        for i := 0 to length(SelectedTags) - 1 do
+        begin
+            Data := IgnoreTagVST.GetNodeData(SelectedTags[i]);
+            TagPostProcessor.DeleteIgnoreTag(Data.fString.DataString);
+            Data.fString.Free;
+        end;
+    end;
+    IgnoreTagVST.DeleteSelectedNodes;
+    IgnoreTagVST.EndUpdate;
+end;
+
+procedure TCloudEditorForm.BtnDeleteMergeTagClick(Sender: TObject);
+var SelectedTags: TNodeArray;
+    i: Integer;
+    Data: PMergeTagData;
+begin
+    SelectedTags := MergeTagVST.GetSortedSelection(False);
+
+    MergeTagVST.BeginUpdate;
+    if Length(SelectedTags) > 0 then
+    begin
+        for i := 0 to length(SelectedTags) - 1 do
+        begin
+            Data :=MergeTagVST.GetNodeData(SelectedTags[i]);
+            TagPostProcessor.DeleteMergeTag(Data.fMergeTag.OriginalKey, Data.fMergeTag.ReplaceKey);
+        end;
+    end;
+    MergeTagVST.DeleteSelectedNodes;
+    MergeTagVST.EndUpdate;
 end;
 
 procedure TCloudEditorForm.BtnUpdateID3TagsClick(Sender: TObject);
