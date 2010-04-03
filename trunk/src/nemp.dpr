@@ -79,7 +79,8 @@ uses
   RatingCtrls in 'RatingCtrls.pas',
   TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
-  Taghelper in 'Taghelper.pas';
+  Taghelper in 'Taghelper.pas',
+  OKCANCL1 in 'c:\program files (x86)\codegear\rad studio\6.0\ObjRepos\DelphiWin32\OKCANCL1.PAS' {OKBottomDlg};
 
 //,  classes;
 

@@ -47,6 +47,12 @@ uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs;
 
 type
 
+    TIgnoreTagString = class
+    public
+      DataString: UnicodeString;
+      constructor create(aDataString: String);
+    end;
+
     TTagMergeItem = class
         private
             fOriginalKey: String;
@@ -77,6 +83,7 @@ type
         public
 
             property IgnoreList: TStringList read fIgnoreList;
+            property MergeList: TObjectList read fMergeList;
 
             constructor Create;
             destructor Destroy; override;
@@ -101,10 +108,50 @@ const
     Usr_IgnoreList = 'tag_ignore' ;
     Usr_MergeList  = 'tag_merge'  ;
 
+function Sort_OriginalKey(item1, item2: Pointer): Integer;
+function Sort_OriginalKey_DESC(item1, item2: Pointer): Integer;
+function Sort_ReplaceKey(item1, item2: Pointer): Integer;
+function Sort_ReplaceKey_DESC(item1, item2: Pointer): Integer;
+
 
 implementation
 
 uses Systemhelper, Nemp_ConstantsAndTypes;
+
+
+function Sort_OriginalKey(item1, item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TTagMergeItem(item1).OriginalKey ,TTagMergeItem(item2).OriginalKey);
+    if result = 0 then
+        result := AnsiCompareText(TTagMergeItem(item1).ReplaceKey ,TTagMergeItem(item2).ReplaceKey);
+end;
+function Sort_OriginalKey_DESC(item1, item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TTagMergeItem(item2).OriginalKey ,TTagMergeItem(item1).OriginalKey);
+    if result = 0 then
+        result := AnsiCompareText(TTagMergeItem(item2).ReplaceKey ,TTagMergeItem(item1).ReplaceKey);
+end;
+function Sort_ReplaceKey(item1, item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TTagMergeItem(item1).ReplaceKey ,TTagMergeItem(item2).ReplaceKey);
+    if result = 0 then
+        result := AnsiCompareText(TTagMergeItem(item1).OriginalKey ,TTagMergeItem(item2).OriginalKey);
+end;
+function Sort_ReplaceKey_DESC(item1, item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TTagMergeItem(item2).ReplaceKey ,TTagMergeItem(item1).ReplaceKey);
+    if result = 0 then
+        result := AnsiCompareText(TTagMergeItem(item2).OriginalKey ,TTagMergeItem(item1).OriginalKey);
+end;
+
+
+{ TIgnoreTagString }
+
+constructor TIgnoreTagString.create(aDataString: String);
+begin
+    DataString := aDataString;
+end;
+
 
 { TTagMergeItem }
 
@@ -139,6 +186,7 @@ begin
 
     fIgnoreList := TStringList.Create;
     fIgnoreList.CaseSensitive := False;
+    fIgnoreList.Sorted := True;
     fMergeList := TObjectList.Create;
 end;
 
@@ -185,6 +233,7 @@ var tmpList: TStringList;
 begin
     // 1. Ignore-List
     // --------------
+    fIgnoreList.Sorted := False;
     if FileExists(fSavePath + Usr_IgnoreList) then
         // User defined list exists
         fIgnoreList.LoadFromFile(fSavePath + Usr_IgnoreList)
@@ -198,6 +247,7 @@ begin
             // No List found at all - clear list (just to be sure)
             fIgnoreList.Clear;
     end;
+    fIgnoreList.Sorted := True;
 
     // 2. Merge-List
     // --------------

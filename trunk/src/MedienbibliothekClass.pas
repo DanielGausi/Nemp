@@ -2135,7 +2135,7 @@ begin
                         Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
 
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
-             af.FileIsPresent:=True;
+            af.FileIsPresent:=True;
 
             // GetTags will create the IDHttp-Object
             s := BibScrobbler.GetTags(af);

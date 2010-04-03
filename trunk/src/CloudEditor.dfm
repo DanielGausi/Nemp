@@ -3,7 +3,7 @@ object CloudEditorForm: TCloudEditorForm
   Top = 0
   Caption = 'Tagcloud: Editor'
   ClientHeight = 425
-  ClientWidth = 521
+  ClientWidth = 523
   Color = clBtnFace
   Constraints.MinHeight = 350
   Constraints.MinWidth = 400
@@ -14,13 +14,14 @@ object CloudEditorForm: TCloudEditorForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    521
+    523
     425)
   PixelsPerInch = 96
   TextHeight = 13
@@ -41,7 +42,7 @@ object CloudEditorForm: TCloudEditorForm
     ExplicitTop = 279
   end
   object BtnUpdateID3Tags: TButton
-    Left = 406
+    Left = 408
     Top = 392
     Width = 107
     Height = 25
@@ -52,7 +53,7 @@ object CloudEditorForm: TCloudEditorForm
     OnClick = BtnUpdateID3TagsClick
   end
   object BtnBugFix: TButton
-    Left = 293
+    Left = 295
     Top = 392
     Width = 107
     Height = 25
@@ -61,18 +62,18 @@ object CloudEditorForm: TCloudEditorForm
     TabOrder = 1
     OnClick = BtnBugFixClick
   end
-  object PageControl1: TPageControl
+  object PC_Select: TPageControl
     Left = 8
     Top = 8
-    Width = 504
+    Width = 506
     Height = 378
-    ActivePage = TS_DeleteTags
+    ActivePage = TS_MergedTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
       DesignSize = (
-        496
+        498
         350)
       object lblMinTagCount: TLabel
         Left = 63
@@ -92,6 +93,8 @@ object CloudEditorForm: TCloudEditorForm
           'nd decade.'
         Caption = 'Hide Auto-Tags'
         Checked = True
+        ParentShowHint = False
+        ShowHint = True
         State = cbChecked
         TabOrder = 0
         OnClick = cbHideAutoTagsClick
@@ -110,7 +113,7 @@ object CloudEditorForm: TCloudEditorForm
       object TagVST: TVirtualStringTree
         Left = 3
         Top = 96
-        Width = 377
+        Width = 379
         Height = 251
         Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
@@ -146,7 +149,7 @@ object CloudEditorForm: TCloudEditorForm
           end>
       end
       object BtnTagRename: TButton
-        Left = 386
+        Left = 388
         Top = 96
         Width = 107
         Height = 25
@@ -156,7 +159,7 @@ object CloudEditorForm: TCloudEditorForm
         OnClick = BtnTagRenameClick
       end
       object BtnMerge: TButton
-        Left = 386
+        Left = 388
         Top = 127
         Width = 107
         Height = 25
@@ -166,7 +169,7 @@ object CloudEditorForm: TCloudEditorForm
         OnClick = BtnMergeClick
       end
       object BtnDeleteTags: TButton
-        Left = 386
+        Left = 388
         Top = 158
         Width = 107
         Height = 25
@@ -180,8 +183,13 @@ object CloudEditorForm: TCloudEditorForm
         Top = 55
         Width = 468
         Height = 17
+        Hint = 
+          'When getting new tags from LastFM, this list is used to correct ' +
+          'some tags'
         Caption = 'Remember merged/renamed tags'
         Checked = True
+        ParentShowHint = False
+        ShowHint = True
         State = cbChecked
         TabOrder = 6
       end
@@ -190,8 +198,13 @@ object CloudEditorForm: TCloudEditorForm
         Top = 73
         Width = 468
         Height = 17
+        Hint = 
+          'When getting new tags from LastFM, this list is used to ignore s' +
+          'ome tags'
         Caption = 'Remember deleted tags'
         Checked = True
+        ParentShowHint = False
+        ShowHint = True
         State = cbChecked
         TabOrder = 7
       end
@@ -199,11 +212,15 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Merged/renamed tags'
       ImageIndex = 2
+      DesignSize = (
+        498
+        350)
       object MergeTagVST: TVirtualStringTree
-        Left = 24
-        Top = 16
-        Width = 364
-        Height = 305
+        Left = 3
+        Top = 55
+        Width = 379
+        Height = 292
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
         Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
@@ -211,19 +228,60 @@ object CloudEditorForm: TCloudEditorForm
         Header.Font.Height = -11
         Header.Font.Name = 'Tahoma'
         Header.Font.Style = []
-        Header.MainColumn = -1
+        Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+        Indent = 4
         TabOrder = 0
-        Columns = <>
+        TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+        TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
+        OnGetText = MergeTagVSTGetText
+        OnHeaderClick = MergeTagVSTHeaderClick
+        Columns = <
+          item
+            Position = 0
+            Width = 150
+            WideText = 'Original key'
+          end
+          item
+            Position = 1
+            Width = 150
+            WideText = 'Replace with'
+          end>
+      end
+      object LblMergeTagHint: TStaticText
+        Left = 3
+        Top = 3
+        Width = 492
+        Height = 46
+        Anchors = [akLeft, akTop, akRight]
+        AutoSize = False
+        Caption = 
+          'This is list is used to adjust new tags from LastFM. Tags in thi' +
+          's list are automatically replaced when getting new tags.'
+        TabOrder = 1
+      end
+      object BtnDeleteMergeTag: TButton
+        Left = 388
+        Top = 55
+        Width = 107
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = 'Delete from list'
+        TabOrder = 2
+        OnClick = BtnDeleteMergeTagClick
       end
     end
     object TS_DeleteTags: TTabSheet
       Caption = 'Deleted tags'
       ImageIndex = 1
+      DesignSize = (
+        498
+        350)
       object IgnoreTagVST: TVirtualStringTree
-        Left = 24
-        Top = 16
-        Width = 364
-        Height = 305
+        Left = 3
+        Top = 55
+        Width = 379
+        Height = 292
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
         Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
@@ -231,9 +289,40 @@ object CloudEditorForm: TCloudEditorForm
         Header.Font.Height = -11
         Header.Font.Name = 'Tahoma'
         Header.Font.Style = []
-        Header.MainColumn = -1
+        Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+        Indent = 4
         TabOrder = 0
-        Columns = <>
+        TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+        TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
+        OnGetText = IgnoreTagVSTGetText
+        Columns = <
+          item
+            Position = 0
+            Width = 200
+            WideText = 'Key'
+          end>
+      end
+      object LblDeleteTagHint: TStaticText
+        Left = 3
+        Top = 3
+        Width = 492
+        Height = 46
+        Anchors = [akLeft, akTop, akRight]
+        AutoSize = False
+        Caption = 
+          'This is list is used to adjust new tags from LastFM. Tags in thi' +
+          's list are automatically deleted when getting new tags.'
+        TabOrder = 1
+      end
+      object BtnDeleteIgnoreTag: TButton
+        Left = 388
+        Top = 55
+        Width = 107
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = 'Delete from list'
+        TabOrder = 2
+        OnClick = BtnDeleteIgnoreTagClick
       end
     end
   end
