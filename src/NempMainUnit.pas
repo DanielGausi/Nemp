@@ -4793,7 +4793,8 @@ begin
 
   BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
 
-  LblBibTags.Caption := StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+
+  LblBibTags.Caption := aAudioFile.TagDisplayString; //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
 
   LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
   // Get Cover

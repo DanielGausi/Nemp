@@ -599,6 +599,8 @@ TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it a
 
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
+Tags_AddTags = 'No additional Tags set. Click here to add some.';
+
 
 
 implementation
