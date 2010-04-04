@@ -145,6 +145,8 @@ type
 
         function fGetPlaylistTitleString: UnicodeString;
 
+        function fGetTagDisplayString: String;
+
         // Read tags from the filetype and convert the data to TAudiofile-Data
         procedure GetMp3Info(filename: UnicodeString; Flags: Integer = 0);
         procedure GetOggInfo(filename: UnicodeString);
@@ -245,6 +247,7 @@ type
         property Key2: UnicodeString read fKey2 write fKey2;
 
         property Taglist: TObjectList read fgetTagList;
+        property TagDisplayString: String read fGetTagDisplayString;
 
         constructor Create;
         destructor Destroy; override;
@@ -412,7 +415,7 @@ procedure GetMp3Details(filename:UnicodeString;
 
 implementation
 
-uses NempMainUnit, Dialogs, CoverHelper;
+uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings;
 
  {$I-}
 
@@ -650,6 +653,14 @@ begin
     if not Assigned(fTagList) then
         fTagList := TObjectList.Create(False);
     result := fTagList;
+end;
+
+function TAudioFile.fGetTagDisplayString: String;
+begin
+    if trim(RawTagLastFM) <> '' then
+        result := StringReplace(RawTagLastFM, #13#10, ', ', [rfreplaceAll])
+    else
+        result := Tags_AddTags;
 end;
 
 {
