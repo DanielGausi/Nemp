@@ -440,6 +440,8 @@ type
     LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;
     CBChangeFontColoronBitrate: TCheckBox;
+    cbHideNACover: TCheckBox;
+    LblNACoverHint: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1102,6 +1104,7 @@ begin
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
  end;
 
+ cbHideNACover.Checked := MedienBib.HideNACover;
  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
 
   CB_CoverSearch_inDir.Checked       := MedienBib.CoverSearchInDir;
@@ -1118,8 +1121,6 @@ begin
   cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
-
-  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
   CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
@@ -1980,6 +1981,7 @@ begin
   MedienBib.CoverSearchInSisterDir := CB_CoverSearch_inSisterDir.Checked;
   MedienBib.CoverSearchSubDirName := EDTCoverSubDirName.Text ;
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
+  MedienBib.HideNACover := cbHideNACover.Checked;
 
   Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;

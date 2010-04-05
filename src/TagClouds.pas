@@ -1478,6 +1478,7 @@ end;
 procedure TTagCloud.UpdateAudioFile(aAudioFile: TAudioFile);
 begin
      // ToDo
+     !!! important !!!
 end;
 
 procedure TTagCloud._SaveTagsToFile(aFile: String);

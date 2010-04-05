@@ -237,6 +237,9 @@ type
         procedure fUpdateId3tags;     // 2.  Write Library-Data into the id3-Tags (used in CloudEditor)
         procedure fBugFixID3Tags;     // BugFix-Method
 
+        // ControlRawTag. Result: The new rawTag for the audiofile, including the previous existing
+        function ControlRawTag(af: TAudioFile; newTags: String; aIgnoreList: TStringList; aMergeList: TObjectList): String;
+
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
         Function InitCoverFromFilename(aFileName: UnicodeString): String;
@@ -366,6 +369,7 @@ type
         CoverSearchInSisterDir: Boolean;
         CoverSearchSubDirName: UnicodeString;
         CoverSearchSisterDirName: UnicodeString;
+        HideNACover: Boolean;
         // Einstellungen für Standard-Cover
         // Eines für alle. Ist eins nicht da: Fallback auf Default
         //UseNempDefaultCover: Boolean;
@@ -584,7 +588,7 @@ type
 
 implementation
 
-uses fspTaskBarMgr;
+uses fspTaskBarMgr, TagHelper;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -1007,6 +1011,8 @@ begin
         CoverSearchInSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
         CoverSearchSubDirName    := (ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover'));
         CoverSearchSisterDirName := (ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover'));
+
+        HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
         //UseNempDefaultCover      := Ini.ReadBool('MedienBib', 'UseNempDefaultCover', True);
         //PersonalizeMainCover     := Ini.ReadBool('MedienBib', 'PersonalizeMainCover', True);
 
@@ -1108,6 +1114,7 @@ begin
         ini.Writebool('MedienBib', 'CoverSearchInSisterDir', CoverSearchInSisterDir);
         ini.WriteString('MedienBib', 'CoverSearchSubDirName', (CoverSearchSubDirName));
         ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (CoverSearchSisterDirName));
+        ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
         //Ini.WriteBool('MedienBib', 'PersonalizeMainCover', PersonalizeMainCover);
 
@@ -2113,60 +2120,134 @@ var i: Integer;
     done, failed: Integer;
     af: TAudioFile;
     s: String;
+    TagPostProcessor: TTagPostProcessor;
 begin
     done := 0;
     failed := 0;
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
-    for i := 0 to UpdateList.Count - 1 do
-    begin
-        if not UpdateFortsetzen then break;
-
-        af := TAudioFile(UpdateList[i]);
-
-        if FileExists(af.Pfad) then
+    TagPostProcessor := TTagPostProcessor.Create;
+    try
+        TagPostProcessor.LoadFiles;
+        for i := 0 to UpdateList.Count - 1 do
         begin
-            // call the vcl, that we will edit this file now
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                        Integer(PWideChar(af.Pfad)));
+            if not UpdateFortsetzen then break;
 
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
-                        Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
+            af := TAudioFile(UpdateList[i]);
 
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
-            af.FileIsPresent:=True;
-
-            // GetTags will create the IDHttp-Object
-            s := BibScrobbler.GetTags(af);
-
-            // bei einer exception ganz abbrechen??
-            // nein, manchmal kommen ja auch BadRequests...???
-
-            if trim(s) = '' then
+            if FileExists(af.Pfad) then
             begin
-                inc(failed);
-            end else
-            begin
-                inc(done);
+                // call the vcl, that we will edit this file now
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                            Integer(PWideChar(af.Pfad)));
 
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
+                            Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
 
-                // ToDo: s // RawTagsLastFM nachbearbeiten, abgleichen mit Ignore-/Synonym-Liste
-                // Diese Listen können lokal hier gladen werden - die werden nur hier gebraucht
-                // in etwa s := self.tagCloud.checkTags(s, ignorelist, synonymlist)
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+                af.FileIsPresent:=True;
 
-                af.RawTagLastFM := s;
-                af.SetAudioData(SAD_Both);
+                // GetTags will create the IDHttp-Object
+                s := BibScrobbler.GetTags(af);
 
-                Changed := True;
+                // bei einer exception ganz abbrechen??
+                // nein, manchmal kommen ja auch BadRequests...???
+
+                if trim(s) = '' then
+                begin
+                    inc(failed);
+                end else
+                begin
+                    inc(done);
+                    // process new Tags. Rename, delete ignored and duplicates.
+                    af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
+                    af.SetAudioData(SAD_Both);
+                    Changed := True;
+                end;
             end;
         end;
+    finally
+        TagPostProcessor.Free;
     end;
+
+
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
+end;
+
+{
+    --------------------------------------------------------
+    ControlRawtag
+    - Correct RawTags from lastFM
+      af: Current AudioFile
+      newTags: String with new tags (result from LastFM)
+      aIgnorelist, aMergeList: Data how to change newTags
+      Result: The new #13#10-seperated TagString, including the old ones
+    --------------------------------------------------------
+}
+function TMedienBibliothek.ControlRawTag(af: TAudioFile; newTags: String;
+  aIgnoreList: TStringList; aMergeList: TObjectList): String;
+var oldTagList, newTagList: TStringList;
+    i: Integer;
+    aMergeItem: tTagMergeItem;
+
+        function GetMatchingMergeItem(aKey: String): TTagMergeItem;
+        var i: Integer;
+        begin
+            result := Nil;
+            for i := 0 to aMergeList.Count - 1 do
+            begin
+                if AnsiSameText(TTagMergeItem(aMergeList[i]).OriginalKey, aKey) then
+                begin
+                    result := TTagMergeItem(aMergeList[i]);
+                    break;
+                end;
+            end;
+        end;
+
+begin
+    oldTagList := TStringList.Create;
+    newTagList := TStringList.Create;
+    try
+        oldTagList.Text := af.RawTagLastFM;
+        newTagList.Text := newTags;
+
+        // 1.) delete duplicates, i.e. new tags, that are already there
+        for i := newTagList.Count - 1 downto 0 do
+            if oldTagList.IndexOf(newTagList[i]) >= 0 then
+                newTagList.Delete(i);
+
+        // 2.) delete ignored tags
+        for i := newTagList.Count - 1 downto 0 do
+            if aIgnoreList.IndexOf(newTagList[i]) >= 0 then
+                newTagList.Delete(i);
+
+        // 3.) Change Tags as described in aMergeList
+        for i := 0 to newTagList.Count - 1 do
+        begin
+            aMergeItem := GetMatchingMergeItem(newTagList[i]);
+            if assigned(aMergeItem) then
+                // change key
+                newTagList[i] := aMergeItem.ReplaceKey;
+        end;
+
+        // 4.) Add new Tags to oldTagList, check for duplicates EVERY time,
+        //     as by 3.) we could have generated duplicates again.
+        for i := 0 to newTagList.Count - 1 do
+        begin
+            if oldTagList.IndexOf(newTagList[i]) = -1 then
+                oldTagList.Add(newtagList[i]);
+        end;
+
+        result := trim(oldTagList.Text);
+    finally
+        oldTagList.Free;
+        newTagList.Free;
+    end;
 end;
 
 
@@ -2920,6 +3001,17 @@ begin
     begin
       // Checklist (liste, cover)
       GetCoverInfos(AudioFilesWithSameCover, newCover);
+
+      // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
+      if HideNACover then
+      begin
+          if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
+          begin
+              // discard current cover
+              NewCover.Free;
+              Target.Delete(Target.Count - 1);
+          end;
+      end;
 
       // Neues Cover erstellen und neue Liste anfangen
       lastID := aktualID;

@@ -205,8 +205,9 @@ begin
         break;
     end;
     if newItem = -1 then
-        newItem := fCurrentItem;
-    if newItem >= fCoverlist.Count then
+        // Change item, so there is a "change" notified by the main window. ;-)
+        newItem := fCurrentItem - 1;
+    if (newItem >= fCoverlist.Count) or (newItem < 0) then
         newItem := 0;
 
 
