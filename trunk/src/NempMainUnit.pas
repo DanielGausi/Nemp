@@ -5047,7 +5047,7 @@ end;
 
 procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
 var ListOfFiles: TObjectList;
-    ListFile: TAudioFile;
+    ListFile, BibFile: TAudioFile;
     i: Integer;
 begin
     if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
@@ -5072,7 +5072,9 @@ begin
         // Correct GUI (player, Details, Detailform, VSTs))
         CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
         // Update the TagCloud
-        MedienBib.TagCloud.UpdateAudioFile(MedienBib.CurrentAudioFile);
+        BibFile := MedienBib.GetAudioFileWithFilename(MedienBib.CurrentAudioFile.Pfad);
+        if assigned(BibFile) then
+            MedienBib.TagCloud.UpdateAudioFile(BibFile);
     end;
     HideTagMemo;
 end;
@@ -6974,15 +6976,19 @@ end;
 
 procedure TNemp_MainForm.PM_ML_CloudEditorClick(Sender: TObject);
 begin
+    // switch to TagCloud
     if MedienBib.BrowseMode <> 2 then
     begin
         SwitchBrowsePanel(TabBtn_TagCloud.Tag);
         SwitchMediaLibrary(TabBtn_TagCloud.Tag);
     end;
+    // navigate to whole library
+    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
+    MedienBib.TagCloud.ShowTags;
 
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);
-    CloudEditorForm.show;
+    CloudEditorForm.ShowModal;
 end;
 
 procedure TNemp_MainForm.PM_ML_CopyToClipboardClick(Sender: TObject);
