@@ -1625,7 +1625,7 @@ begin
     begin
       // Nemp liegt woanders
       SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
-      tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
+      tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Data\Cover\';
     end;
 
     // Hook-Funktionen initialisieren
@@ -1652,7 +1652,6 @@ begin
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
     MedienBib.CoverSavePath := tmpCoverPath;
-
 
     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
     MedienBib.NewCoverFlow.CoverSavePath := MedienBib.CoverSavePath;
@@ -5047,11 +5046,33 @@ begin
 end;
 
 procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
+var ListOfFiles: TObjectList;
+    ListFile: TAudioFile;
+    i: Integer;
 begin
     if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
     begin
         MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
-        LblBibTags.Caption := StringReplace(MedienBib.CurrentAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+        LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
+
+        // Generate a List of Files which should be updated now
+        ListOfFiles := TObjectList.Create(False);
+        try
+            GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+            for i := 0 to ListOfFiles.Count - 1 do
+            begin
+                listFile := TAudioFile(ListOfFiles[i]);
+                listFile.RawTagLastFM := MedienBib.CurrentAudioFile.RawTagLastFM;
+            end;
+        finally
+            ListOfFiles.Free;
+        end;
+        // write Data to the file
+        MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+        // Correct GUI (player, Details, Detailform, VSTs))
+        CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
+        // Update the TagCloud
+        MedienBib.TagCloud.UpdateAudioFile(MedienBib.CurrentAudioFile);
     end;
     HideTagMemo;
 end;

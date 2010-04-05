@@ -882,6 +882,7 @@ end;
 procedure GetRandomCover(SourceCoverlist: TObjectlist);
 var i: Integer;
     CoverArray: Array of Integer;
+    GoodCoverList: TObjectList;
 
     procedure ShuffleFisherYates;
     var
@@ -904,36 +905,55 @@ begin
     EnterCriticalSection(CSAccessRandomCoverlist);
     RandomCoverList.Clear;
 
-    if SourceCoverlist.Count >= 2 then
-    begin
-        if TNempCover(SourceCoverlist[1]).ID = '' then
+    GoodCoverList := TObjectList.Create(False);
+    try
+        // fill GoodCoverList with "good covers", i.e. a cover-bitmap exists
+        for i :=0 to SourceCoverList.Count - 1 do
         begin
-            Setlength(CoverArray, SourceCoverlist.Count - 2);
-            for i := 2 to SourceCoverlist.Count - 1 do
-                CoverArray[i-2] := i;
-        end else
-        begin
-            Setlength(CoverArray, SourceCoverlist.Count - 1);
-            for i := 1 to SourceCoverlist.Count - 1 do
-                CoverArray[i-1] := i;
+            if (TNempCover(SourceCoverlist[i]).ID <> '')
+                and(TNempCover(SourceCoverlist[i]).ID[1] <> '_')
+            then
+                GoodCoverList.Add(SourceCoverlist[i]);
         end;
-        ShuffleFisherYates;
 
-        case Length(CoverArray) of
-            0: ; // empty list
-            1: RandomCoverList.Add(TNempCover(SourceCoverlist[CoverArray[0]]).ID); // Ein Cover - das draufmalen
-            2..3: for i := 0 to 1  do
-                      RandomCoverList.Add(TNempCover(SourceCoverlist[CoverArray[i]]).ID);
-            4..7: for i := 0 to 3  do
-                      RandomCoverList.Add(TNempCover(SourceCoverlist[CoverArray[i]]).ID);
-            8..15: for i := 0 to 7  do
-                      RandomCoverList.Add(TNempCover(SourceCoverlist[CoverArray[i]]).ID);
+        if GoodCoverList.Count >= 1 then
+        begin
+                {if TNempCover(GoodCoverList[1]).ID = '' then
+                begin
+                    Setlength(CoverArray, GoodCoverList.Count - 2);
+                    for i := 2 to GoodCoverList.Count - 1 do
+                        CoverArray[i-2] := i;
+                end else
+                begin
+                    Setlength(CoverArray, GoodCoverList.Count - 1);
+                    for i := 1 to GoodCoverList.Count - 1 do
+                        CoverArray[i-1] := i;
+                end;}
+                Setlength(CoverArray, GoodCoverList.Count - 2);
+                for i := 0 to GoodCoverList.Count - 1 do
+                    CoverArray[i] := i;
+                ShuffleFisherYates;
+
+                case Length(CoverArray) of
+                    0: ; // empty list
+                    1: RandomCoverList.Add(TNempCover(GoodCoverList[CoverArray[0]]).ID); // Ein Cover - das draufmalen
+                    2..3: for i := 0 to 1  do
+                              RandomCoverList.Add(TNempCover(GoodCoverList[CoverArray[i]]).ID);
+                    4..7: for i := 0 to 3  do
+                              RandomCoverList.Add(TNempCover(GoodCoverList[CoverArray[i]]).ID);
+                    8..15: for i := 0 to 7  do
+                              RandomCoverList.Add(TNempCover(GoodCoverList[CoverArray[i]]).ID);
+                else
+                    for i := 0 to 15 do
+                        RandomCoverList.Add(TNempCover(GoodCoverList[CoverArray[i]]).ID);
+                end;
+        end
         else
-            for i := 0 to 15 do
-                RandomCoverList.Add(TNempCover(SourceCoverlist[CoverArray[i]]).ID);
-        end;
-    end else
-        ;// leere Liste, nichts zu tun.
+            ;// leere Liste, nichts zu tun.
+    finally
+        GoodCoverList.Free;
+    end;
+
 
   LeaveCriticalSection(CSAccessRandomCoverlist);
 end;

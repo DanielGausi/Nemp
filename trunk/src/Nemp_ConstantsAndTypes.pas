@@ -978,6 +978,7 @@ begin
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
         ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
+
         ini.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
         ini.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);
         Ini.WriteInteger('Font', 'RowHeight', RowHeight  );
