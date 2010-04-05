@@ -252,7 +252,7 @@ type
           procedure AddAudioFileTags(aAudioFile: TAudioFile);
 
           // Generate a TagList from RawTag-Strings of the Audiofile.
-          procedure AddAudioFileRAWTags(aAudioFile: TAudioFile);
+          procedure AddAudioFileRAWTags(aAudioFile: TAudioFile; InsertInBreadcrumbs: Boolean=False);
 
           // Set Default-RawTags (like genre, artist, year)
           procedure GenerateAutoRawTags(aAudioFile: TAudioFile; Dest: TStringList);
@@ -384,6 +384,8 @@ var
     TagCustomizer: TTagCustomizer;
 
 implementation
+
+uses NempMainUnit;
 
 
 function Sort_Count(item1,item2:pointer):integer;
@@ -927,8 +929,9 @@ begin
     begin
         aTag := TTag(Tags[i]);
 
-        if (aTag.count >= MinCount)
-           and (Not (HideAutotags and aTag.IsAutoTag))
+        if ((aTag.count >= MinCount)
+           and (Not (HideAutotags and aTag.IsAutoTag)))
+           or ((aTag.BreadCrumbIndex < High(Integer)) and (aTag <> ClearTag))
         then
             Target.Add(Tags[i]);
     end;
@@ -1250,6 +1253,9 @@ var i: Integer;
 begin
     for i := 0 to aAudioFile.TagList.Count - 1 do
     begin
+        // Test for "= High(Integer)":
+        // We do not want the file added to tags in the breadcrumblist, as
+        // it is already in these lists (as a go-back-navigation)
         if (TTag(aAudioFile.TagList[i]).BreadCrumbIndex = High(Integer)) then
             TTag(aAudioFile.TagList[i]).AudioFiles.Add(aAudioFile);
 
@@ -1268,7 +1274,7 @@ end;
     - Add the Tag to the Audiofile and vice versa
     --------------------------------------------------------
 }
-procedure TTagCloud.AddAudioFileRAWTags(aAudioFile: TAudioFile);
+procedure TTagCloud.AddAudioFileRAWTags(aAudioFile: TAudioFile; InsertInBreadcrumbs: Boolean=False);
 var allTags, tmpTags: TStringList;
     i: Integer;
     autoCount: Integer;
@@ -1304,7 +1310,11 @@ begin
                 aTag.IsAutoTag := True;
 
             // ensure Uniquness - check whether the tag was just added to this file
-            if  (aTag.BreadCrumbIndex = High(Integer)) AND
+            if  ((aTag.BreadCrumbIndex = High(Integer)) or (InsertInBreadcrumbs)) AND
+                // Test for "= High(Integer)":
+                // We do not want the file added to tags in the breadcrumblist, as
+                // it is already in these lists (as a go-back-navigation)
+                // But after an update, we MUST skip this first test
                 ((aTag.count = 0) or (TAudioFile(aTag.AudioFiles[aTag.count-1]) <> aAudioFile))
             then
             begin
@@ -1476,9 +1486,19 @@ end;
 
 
 procedure TTagCloud.UpdateAudioFile(aAudioFile: TAudioFile);
+var i: Integer;
+    aTag: TTag;
 begin
-     // ToDo
-     !!! important !!!
+     // 1.) Delete this file from the file-lists of all of its tags
+     for i := 0 to aAudioFile.Taglist.Count - 1 do
+     begin
+        aTag := TTag(aAudioFile.Taglist[i]);
+        aTag.AudioFiles.Extract(aAudioFile);
+     end;
+     // 2.) Clear this files taglist
+     aAudioFile.Taglist.Clear;
+     // 3.) Generate tag-list from RawTag
+     AddAudioFileRAWTags(aAudioFile, True);
 end;
 
 procedure TTagCloud._SaveTagsToFile(aFile: String);
