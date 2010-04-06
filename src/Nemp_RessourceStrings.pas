@@ -600,6 +600,7 @@ TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it a
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
+Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?';
 
 
 

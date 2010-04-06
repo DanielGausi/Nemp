@@ -1292,13 +1292,13 @@ begin
         // Add the Tags from the two RawTag-Strings to allTag-List
         tmpTags.Text := aAudioFile.RawTagLastFM;
         for i := 0 to tmpTags.Count - 1 do
-            if tmpTags[i] <> '' then
-                allTags.Add(tmptags[i]);
+            if trim(tmpTags[i]) <> '' then
+                allTags.Add(trim(tmptags[i]));
 
         tmpTags.Text := aAudioFile.RawTagUserDefined;
         for i := 0 to tmpTags.Count - 1 do
-            if tmpTags[i] <> '' then
-                allTags.Add(tmptags[i]);
+            if trim(tmpTags[i]) <> '' then
+                allTags.Add(trim(tmptags[i]));
 
 
         // Add/Insert every Tag into the af.TagList

@@ -1455,7 +1455,8 @@ uses   Splash, MultimediaKeys,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   HeadsetControl, BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt, CloudEditor;
+  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt, CloudEditor,
+  TagHelper;
 
 
 {$R *.dfm}
@@ -5052,7 +5053,18 @@ var ListOfFiles: TObjectList;
 begin
     if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
     begin
-        MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+
+        if CommasInString(MemBibTags.Text) then
+        begin
+            if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
+                MedienBib.CurrentAudioFile.RawTagLastFM := Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text)))
+            else
+                MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+        end
+        else
+            MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+
+
         LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
 
         // Generate a List of Files which should be updated now
