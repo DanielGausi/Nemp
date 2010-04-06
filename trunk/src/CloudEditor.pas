@@ -772,6 +772,11 @@ begin
             if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
             begin
                 MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
+
+
+                todo: add zur ignore/merge-liste
+
+
                 ActualizeTreeView;
                 ReselectNode(newKey);
                 RefreshWarningLabel;
