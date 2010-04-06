@@ -148,9 +148,6 @@
 				<Form>CloudEditorForm</Form>
 			</DCCReference>
 			<DCCReference Include="Taghelper.pas"/>
-			<DCCReference Include="c:\program files (x86)\codegear\rad studio\6.0\ObjRepos\DelphiWin32\OKCANCL1.PAS">
-				<Form>OKBottomDlg</Form>
-			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

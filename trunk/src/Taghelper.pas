@@ -113,6 +113,9 @@ function Sort_OriginalKey_DESC(item1, item2: Pointer): Integer;
 function Sort_ReplaceKey(item1, item2: Pointer): Integer;
 function Sort_ReplaceKey_DESC(item1, item2: Pointer): Integer;
 
+function CommasInString(aString: String): Boolean;
+function ReplaceCommasbyLinebreaks(aString: String): String;
+
 
 implementation
 
@@ -142,6 +145,40 @@ begin
     result := AnsiCompareText(TTagMergeItem(item2).ReplaceKey ,TTagMergeItem(item1).ReplaceKey);
     if result = 0 then
         result := AnsiCompareText(TTagMergeItem(item2).OriginalKey ,TTagMergeItem(item1).OriginalKey);
+end;
+
+function CommasInString(aString: String): Boolean;
+var i, c: integer;
+begin
+    c := 0;
+    for i := 1 to length(aString) do
+        if aString[i] = ',' then
+            inc(c);
+    // Idea: more than one comma or  only one and short string may
+    // indicate an comma-separated input of tags.
+    result := (c >= 2) or ((c > 0) and (length(aString) < 15));
+end;
+
+function ReplaceCommasbyLinebreaks(aString: String): String;
+var sl: TStringList;
+    i: integer;
+begin
+    result := Stringreplace(aString, ',', #13#10, [rfReplaceAll]);
+    sl := TStringList.Create;
+    try
+        sl.Text := result;
+        // trim lines
+        for i := 0 to sl.Count - 1 do
+            sl[i] := Trim(sl[i]);
+        // delete empty lines
+        for i := sl.Count - 1 downto 0 do
+            if sl[i] = '' then
+                sl.Delete(i);
+
+        result := sl.Text;
+    finally
+        sl.Free;
+    end;
 end;
 
 
