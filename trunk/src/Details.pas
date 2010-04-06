@@ -1967,7 +1967,7 @@ begin
 
       if Not MedienBib.ValidKeys(mbAudioFile) then
       begin
-          Nemp_MainForm.SetBrowseTabWarning(True);
+          SetBrowseTabWarning(True);
           // MedienBib.RestoreSortOrderAfterItemChanged(mbAudioFile); // mbAudioFile, nicht AktuellesAudioFile !
           // Nemp_MainForm.ReFillBrowseTrees(True);
       end;

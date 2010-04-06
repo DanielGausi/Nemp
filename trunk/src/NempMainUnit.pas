@@ -820,7 +820,6 @@ type
       Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
       var CellText: String);
 
-    procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure ReFillBrowseTrees(RemarkOldNodes: LongBool);
 
     procedure ArtistsVSTPaintText(Sender: TBaseVirtualTree;
@@ -5369,38 +5368,6 @@ begin
 end;
 
 
-// When editing audiofiles, the browse-lists may become invalid
-// in this case, a Warning-Icon should be displayed in the first Browse-Button
-procedure TNemp_MainForm.SetBrowseTabWarning(ShowWarning: Boolean);
-begin
-    if ShowWarning then
-    begin
-        // Show a warning-sign
-        if Medienbib.BrowseMode = 0 then
-        begin
-            // Browsing by artist-album activated
-            TabBtn_Browse.GlyphLine := 2;
-        end else
-            // Browsing by cover (or something else) activated
-            TabBtn_Browse.GlyphLine := 0;
-        TabBtn_Browse.Hint := TabBtnBrowse_Hint1 + #13#10 + TabBtnBrowse_Hint2;
-
-    end else
-    begin
-        // Show Default-Button
-        if Medienbib.BrowseMode = 0 then
-        begin
-            // Browsing by artist-album activated
-            TabBtn_Browse.GlyphLine := 1;
-        end else
-            // Browsing by cover (or something else) activated
-            TabBtn_Browse.GlyphLine := 0;
-        TabBtn_Browse.Hint := TabBtnBrowse_Hint1;
-    end;
-    // Refresh the Button
-    TabBtn_Browse.Refresh;
-end;
-
 procedure TNemp_MainForm.ReFillBrowseTrees(RemarkOldNodes: LongBool);
 var ArtistNode, AlbumNode: PVirtualNode;
   ArtistData, AlbumData: PStringTreeData;
@@ -5507,6 +5474,7 @@ begin
       end;
   end;
   SetBrowseTabWarning(False);
+  SetBrowseTabCloudWarning(False);
 end;
 
 
@@ -7000,7 +6968,7 @@ begin
 
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);
-    CloudEditorForm.ShowModal;
+    CloudEditorForm.Show;
 end;
 
 procedure TNemp_MainForm.PM_ML_CopyToClipboardClick(Sender: TObject);

@@ -623,8 +623,10 @@ begin
                       [ ExtractFilename(MedienBib.CurrentThreadFilename),
                         PWideChar(aMsg.LParam)]);
             // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
+        end;
 
-
+        MB_TagsSetTabWarning: begin
+            SetBrowseTabCloudWarning(True);
         end;
 
         MB_LyricUpdateFailed: begin

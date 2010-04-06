@@ -772,14 +772,15 @@ begin
             if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
             begin
                 MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
-
-
-                todo: add zur ignore/merge-liste
-
-
+                if cbAutoAddMergeTags.Checked then
+                begin
+                    TagPostProcessor.AddMergeTag(Data^.FTag.Key, newKey);
+                    FillMergeTree;
+                end;
                 ActualizeTreeView;
                 ReselectNode(newKey);
                 RefreshWarningLabel;
+                SetBrowseTabCloudWarning(True);
             end;
         end;
 end;
@@ -825,10 +826,17 @@ begin
                     Data := TagVST.GetNodeData(SelectedTags[i]);
                     if Data^.FTag.Key <> maxKey then
                         MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
+
+                    if cbAutoAddMergeTags.Checked then
+                        TagPostProcessor.AddMergeTag(Data^.FTag.Key, maxKey);
                 end;
+                if cbAutoAddMergeTags.Checked then
+                    FillMergeTree;
+
                 ActualizeTreeView;
                 ReselectNode(maxKey);
                 RefreshWarningLabel;
+                SetBrowseTabCloudWarning(True);
             end;
         end;
     end;
@@ -859,9 +867,15 @@ begin
                 // delete selected Tags
                 Data := TagVST.GetNodeData(SelectedTags[i]);
                 MedienBib.TagCloud.DeleteTag(Data^.FTag);
+
+                if cbAutoAddIgnoreTags.Checked then
+                    TagPostProcessor.AddIgnoreTag(Data^.FTag.Key);
             end;
+            if cbAutoAddIgnoreTags.Checked then
+                FillIgnoreTree;
             ActualizeTreeView;
             RefreshWarningLabel;
+            SetBrowseTabCloudWarning(True);
         end;
     end;
 end;

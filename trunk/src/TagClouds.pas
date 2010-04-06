@@ -967,9 +967,12 @@ begin
 //*//        Tags.Extract(fClearTag);
         properList := Source;
         fBreadCrumbDepth := 0;
+        // clear all AudioFile.Tags
+        for i := 0 to Source.Count - 1 do
+            // we should use the (new) rawtags to rebuild the cloud
+            TAudioFile(Source[i]).Taglist.Clear;
 
         InitHashMap;
-
     end else
 
     begin
