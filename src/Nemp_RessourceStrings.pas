@@ -591,6 +591,9 @@ Shoutcast_InputStreamLabel   = 'URL (e.g. "http://myhits.com/tune_in.pls" or "ht
 TabBtnBrowse_Hint1 = 'Browse your medialibrary';
 TabBtnBrowse_Hint2 = 'Click to resort';
 
+TabBtnTagCloud_Hint1 = 'Tag cloud';
+TabBtnTagCloud_Hint2 = 'Click to rebuild';
+
 TagEditor_RenameTag_Caption = 'Rename Tag';
 TagEditor_RenameTag_Prompt = 'Enter a new name for the tag. If it already exists, the two tags are merged.';
 

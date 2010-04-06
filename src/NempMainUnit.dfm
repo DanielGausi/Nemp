@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 701
   Top = 286
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 851
+  ClientHeight = 871
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -452,8 +452,8 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TabBtn_TagCloud: TSkinButton
           Tag = 2
-          Left = 86
-          Top = 2
+          Left = 88
+          Top = 4
           Width = 24
           Height = 24
           Hint = 'Tag cloud'
@@ -466,7 +466,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = TABPanelAuswahlClick
           DrawMode = dm_Skin
           NumGlyphsX = 5
-          NumGlyphsY = 2
+          NumGlyphsY = 3
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
@@ -2214,18 +2214,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 342
+    Height = 362
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 342
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 314
+      Height = 334
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2234,23 +2235,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 314
       DesignSize = (
         845
-        314)
+        334)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 304
+        Height = 324
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 304
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 304
+          Height = 324
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter1Moved
           ExplicitLeft = 250
@@ -2260,7 +2263,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 304
+          Height = 324
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2327,6 +2330,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 304
           Columns = <
             item
               Position = 0
@@ -2397,7 +2401,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 304
+          Height = 324
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2406,6 +2410,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 304
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3588,7 +3593,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300D0020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300D4020E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4153,7 +4158,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C010113001800BC0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010113001800C00210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000E5D1B900DDB68900E1B27D00E1B27D00DDB68900E5D1B9000000

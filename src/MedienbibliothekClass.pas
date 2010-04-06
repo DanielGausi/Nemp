@@ -2171,6 +2171,8 @@ begin
         TagPostProcessor.Free;
     end;
 
+    if done > 0 then
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsSetTabWarning, 0);
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
@@ -3095,7 +3097,7 @@ end;
 }
 procedure TMedienBibliothek.ReBuildTagCloud;
 begin
-    // Build the Tagcloud. Delete BrowseHistory (True)
+    // Build the Tagcloud.
     TagCloud.BuildCloud(Mp3ListePfadSort, Nil, True);
 end;
 

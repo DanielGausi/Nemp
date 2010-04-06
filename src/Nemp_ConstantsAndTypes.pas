@@ -375,6 +375,9 @@ const
     MB_SetWin7TaskbarProgress = 29;
     MB_RefreshTagCloudFile = 31;
 
+    // Set TabWarning for TagCloud after getting Tags
+    MB_TagsSetTabWarning = 32;
+
     MB_SetStatus = 100;
 
 

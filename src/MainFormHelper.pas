@@ -109,6 +109,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
     procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
 
+    procedure SetBrowseTabWarning(ShowWarning: Boolean);
+    procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
 
 implementation
 
@@ -1257,9 +1259,76 @@ begin
     if SameFile(bibFile) then
     begin
         if Not MedienBib.ValidKeys(bibFile) then
-            Nemp_MainForm.SetBrowseTabWarning(True);
+            SetBrowseTabWarning(True);
     end;
 end;
 
+// When editing audiofiles, the browse-lists may become invalid
+// in this case, a Warning-Icon should be displayed in the first Browse-Button
+procedure SetBrowseTabWarning(ShowWarning: Boolean);
+begin
+    With Nemp_MainForm do
+    begin
+        if ShowWarning then
+        begin
+            // Show a warning-sign
+            if Medienbib.BrowseMode = 0 then
+            begin
+                // Browsing by artist-album activated
+                TabBtn_Browse.GlyphLine := 2;
+            end else
+                // Browsing by cover (or something else) activated
+                TabBtn_Browse.GlyphLine := 0;
+            TabBtn_Browse.Hint := TabBtnBrowse_Hint1 + #13#10 + TabBtnBrowse_Hint2;
+
+        end else
+        begin
+            // Show Default-Button
+            if Medienbib.BrowseMode = 0 then
+            begin
+                // Browsing by artist-album activated
+                TabBtn_Browse.GlyphLine := 1;
+            end else
+                // Browsing by cover (or something else) activated
+                TabBtn_Browse.GlyphLine := 0;
+            TabBtn_Browse.Hint := TabBtnBrowse_Hint1;
+        end;
+        // Refresh the Button
+        TabBtn_Browse.Refresh;
+    end;
+end;
+
+procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
+begin
+    With Nemp_MainForm do
+    begin
+        if ShowWarning then
+        begin
+            // Show a warning-sign
+            if Medienbib.BrowseMode = 2 then
+            begin
+                // Browsing by artist-album activated
+                TabBtn_TagCloud.GlyphLine := 2;
+            end else
+                // Browsing by cover (or something else) activated
+                TabBtn_TagCloud.GlyphLine := 0;
+            TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1 + #13#10 + TabBtnTagCloud_Hint2;
+
+        end else
+        begin
+            // Show Default-Button
+            if Medienbib.BrowseMode = 2 then
+            begin
+                // Browsing by artist-album activated
+                TabBtn_TagCloud.GlyphLine := 1;
+            end else
+                // Browsing by cover (or something else) activated
+                TabBtn_TagCloud.GlyphLine := 0;
+            TabBtn_TagCloud.Hint := TabBtnTagCloud_Hint1;
+        end;
+        // Refresh the Button
+        TabBtn_TagCloud.Refresh;
+    end;
+end;
 
 end.
