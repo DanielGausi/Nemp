@@ -79,7 +79,8 @@ uses
   RatingCtrls in 'RatingCtrls.pas',
   TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
-  Taghelper in 'Taghelper.pas';
+  Taghelper in 'Taghelper.pas',
+  CoverDownloads in 'CoverDownloads.pas';
 
 //,  classes;
 

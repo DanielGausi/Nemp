@@ -2516,8 +2516,14 @@ begin
           aCover := TNempCover(MedienBib.CoverList[msg.Index]);
 
           GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
-       
-          Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+
+         Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+
+         Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
+
+//         Medienbib.NewCoverFlow.DownloadCover(
+         
+
       end;
   finally
       bmp.free;
@@ -10647,6 +10653,8 @@ procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
 //a: TAudiofile;
 // aDrive: TDrive;
+c : Integer;
+bmp: TBitmap;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -10663,6 +10671,30 @@ begin
   // + ' - ' + IntToStr(self.handle);
 
   //MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
+
+  bmp := TBitmap.Create;
+  try
+      bmp.PixelFormat := pf24bit;
+      bmp.Height := 240;
+      bmp.Width := 240;
+
+      //if MedienBib.CoverList.Count > msg.Index then
+      //begin
+       //   aCover := TNempCover(MedienBib.CoverList[msg.Index]);
+
+      //    GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
+
+      c := random(20);
+      bmp.LoadFromFile('E:\Nemp SVN\test' +inttostr(c mod 2) + '.bmp');
+         // if msg.Index = 0 then
+         // Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1])
+         // else
+          Medienbib.NewCoverFlow.SetPreview (c, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1])
+      ;
+      MedienBib.NewCoverFlow.Paint(10);
+  finally
+      bmp.free;
+  end;
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);

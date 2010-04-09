@@ -49,7 +49,7 @@ unit NempCoverFlowClass;
 interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
-    ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs;
+    ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs, CoverDownloads;
 
 type
 
@@ -63,6 +63,8 @@ type
             fMode: TCoverFlowMode;
 
             fCoverList: TObjectList;
+
+            fDownloadThread: TCoverDownloadWorkerThread;
 
             fCurrentItem: Integer;  // Index of the current selected cover
 
@@ -120,6 +122,9 @@ type
             procedure Paint(i: Integer = 1);
 
             procedure SetNewHandle(aWnd: HWND);
+
+            procedure DownloadCover(aCover: TNempCover; aIdx: Integer);
+
 
     end;
 
@@ -244,12 +249,23 @@ begin
   fClassicFlow := Nil;
   fFlyingCow := Nil;
   fMode := cm_None;
+  fDownloadThread := TCoverDownloadWorkerThread.Create;
 end;
 
 destructor TNempCoverFlow.Destroy;
 begin
     Mode := cm_None; // This will also free the sub-coverflows
+
+    fDownloadThread.Terminate;
+    fDownloadThread.WaitFor;
+    fDownloadThread.Free;
+
     inherited Destroy;
+end;
+
+procedure TNempCoverFlow.DownloadCover(aCover: TNempCover; aIdx: Integer);
+begin
+    fDownloadThread.AddJob(aCover, aIdx);
 end;
 
 function TNempCoverFlow.fGetCurrentItem: Integer;

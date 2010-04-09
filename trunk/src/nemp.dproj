@@ -148,6 +148,7 @@
 				<Form>CloudEditorForm</Form>
 			</DCCReference>
 			<DCCReference Include="Taghelper.pas"/>
+			<DCCReference Include="CoverDownloads.pas"/>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

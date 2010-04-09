@@ -389,6 +389,7 @@ function TPostProcessor.Process(IsJustPlaying: Boolean): Boolean;
 var NewJob: TPostProcessJob;
     i: Integer;
 begin
+    result := True;
     if not fCurrentFileAdded then
     begin
         fCurrentFileAdded := True;
