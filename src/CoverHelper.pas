@@ -929,7 +929,7 @@ begin
                     for i := 1 to GoodCoverList.Count - 1 do
                         CoverArray[i-1] := i;
                 end;}
-                Setlength(CoverArray, GoodCoverList.Count - 2);
+                Setlength(CoverArray, GoodCoverList.Count);
                 for i := 0 to GoodCoverList.Count - 1 do
                     CoverArray[i] := i;
                 ShuffleFisherYates;
