@@ -1490,7 +1490,7 @@ var i, s, section:integer;
     tmpLastExitOK: boolean;
     maxFont: integer;
     aMenuItem: TMenuItem;
-    tmpwstr, tmpCoverPath: UnicodeString;
+    tmpwstr: UnicodeString;
     tmpstr: String;
 begin
     BackUpComboboxes;
@@ -1613,19 +1613,19 @@ begin
     begin
       // Nemp liegt im System-Programmverzeichnis
       SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
-      tmpCoverPath := SavePath + 'Cover\';
+      //tmpCoverPath := SavePath + 'Cover\';
       try
           ForceDirectories(SavePath);
       except
           SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
-          tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
+          //unsinn tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
       end;
 
     end else
     begin
       // Nemp liegt woanders
       SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
-      tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Data\Cover\';
+      //tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Data\Cover\';
     end;
 
     // Hook-Funktionen initialisieren
@@ -1651,7 +1651,7 @@ begin
     //MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
     //MedienBib.MainWindowHandle := Handle;
     MedienBib.SavePath := SavePath;
-    MedienBib.CoverSavePath := tmpCoverPath;
+    MedienBib.CoverSavePath := SavePath + 'Cover\';
 
     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
     MedienBib.NewCoverFlow.CoverSavePath := MedienBib.CoverSavePath;
@@ -2502,6 +2502,7 @@ procedure TNemp_MainForm.NeedPreview (var msg : TWMFCNeedPreview);
 var
     aCover: tNempCover;
     bmp: TBitmap;
+    success: Boolean;
 begin
   if NempIsClosing then exit;
 
@@ -2515,14 +2516,11 @@ begin
       begin
           aCover := TNempCover(MedienBib.CoverList[msg.Index]);
 
-          GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
+          success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
+          Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
-         Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-
-         Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
-
-//         Medienbib.NewCoverFlow.DownloadCover(
-         
+          if not success then
+              Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
 
       end;
   finally
