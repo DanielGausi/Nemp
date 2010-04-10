@@ -45,17 +45,30 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
-  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math,
+  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException,
   CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes;
 
+const
+    ccArtist     = 0;
+    ccAlbum      = 1;
+    ccDirectory  = 2;
+    ccQueryCount = 3;
+    ccLastQuery  = 4;
+    ccDataEnd    = 255;
+
 type
+
+    TPicType = (ptNone, ptJPG, ptPNG);
+
+    TQueryType = (qtCoverFlow, qtPlayer);
 
     TCoverDownloadItem = class
         Artist: String;
         Album: String;
         Directory: String;
-        Index: Integer;
+        QueryType: TQueryType;
+        Index: Integer;         // used in CoverFlow
         distance: Integer;      // distance to MostImportantIndex
         lastChecked: TDateTime; // time of last query for this Item
         queryCount: Integer;    // Used to increase the Cache-Interval
@@ -64,7 +77,6 @@ type
         procedure SaveToStream(aStream: TStream);
     end;
 
-    TPicType = (ptNone, ptJPG, ptPNG);
 
     TCoverDownloadWorkerThread = class(TThread)
         private
@@ -74,6 +86,7 @@ type
 
             // Thread-Copy for the Item that is currently processed
             fCurrentDownloadItem: TCoverDownloadItem;
+            fCurrentDownloadComplete: Boolean;
 
             // LastFM allows only 5 calls per Second
             // The GetTag-Method will be calles very often - so we need a speed-limit here!
@@ -85,6 +98,9 @@ type
             fBestCoverURL: AnsiString;   // URL of the "extra-large" cover, if available
             fDataStream: TMemoryStream;  // Stream containing the Picture-Data
             fDataType: TPicType;
+
+            fCacheFilename: String;
+            fCacheList: TObjectList;
 
             fMostImportantIndex: Integer;
             procedure SetMostImportantIndex(Value: Integer);    // VCL
@@ -98,15 +114,21 @@ type
             procedure LoadCacheList;
             procedure SaveCacheList;
 
+            function GetMatchingCacheItem: TCoverDownloadItem;
+            function CacheItemCanBeRechecked(aCacheItem: TCoverDownloadItem): Boolean;
+
 
             // VCL-methods
             function StreamToBitmap(TargetBMP: TBitmap): Boolean;
 
             procedure StartWorking;  // VCL
+
             // Get next job, i.e. information about the next queried cover
-            function SyncGetFirstJob: Boolean; // VCL
+            procedure SyncGetFirstJob; // VCL
             // Update the Cover in Coverflow (or: in Player?)
-            function SyncUpdateCover: Boolean; // VCL
+            procedure SyncUpdateCover; // VCL
+
+
 
         protected
             procedure Execute; override;
@@ -117,14 +139,15 @@ type
             constructor Create;
             destructor Destroy; override;
 
-            procedure AddJob(aCover: TNempCover; Idx: Integer); // VCL
+            procedure AddJob(aCover: TNempCover; Idx: Integer); overload;     // VCL
+            procedure AddJob(aAudioFile: TAudioFile; Idx: Integer); overload; // VCL
     end;
 
     function SortDownloadPriority(item1,item2: Pointer): Integer;
 
 implementation
 
-uses NempMainUnit, ScrobblerUtils, Hilfsfunktionen;
+uses NempMainUnit, ScrobblerUtils, Hilfsfunktionen, SystemHelper;
 
 
 function SortDownloadPriority(item1,item2: Pointer): Integer;
@@ -134,14 +157,81 @@ end;
 
 { TCoverDownloadItem }
 
-procedure TCoverDownloadItem.LoadFromStream(aStream: TStream);
-begin
-      // ToDo
-end;
 
-procedure TCoverDownloadItem.SaveToStream(aStream: TStream);
+{
+    --------------------------------------------------------
+    LoadFromStream:
+    - Load a CacheItem from a Stream
+      String information is stored as UTF8
+    --------------------------------------------------------
+}
+procedure TCoverDownloadItem.LoadFromStream(aStream: TStream);
+var c: Integer;
+    id: Byte;
+
+        function ReadTextFromStream: String;
+        var len: Integer;
+            tmputf8: UTF8String;
+        begin
+            aStream.Read(len,sizeof(len));
+            setlength(tmputf8, len);
+            aStream.Read(PAnsiChar(tmputf8)^, len);
+            result := UTF8ToString(tmputf8);
+        end;
+
 begin
-      // ToDo
+    c := 0;
+    repeat
+        aStream.Read(id, sizeof(ID));
+        inc(c);
+        case ID of
+            ccArtist     : Artist := ReadTextFromStream;
+            ccAlbum      : Album  := ReadTextFromStream;
+            ccDirectory  : Directory  := ReadTextFromStream;
+            ccQueryCount : aStream.Read(queryCount, SizeOf(queryCount));
+            ccLastQuery  : aStream.Read(lastChecked, SizeOf(LastChecked));
+            ccDataEnd    : ;  // Nothing to do
+        else
+            ID := ccDataEnd;  // Somthing was wrong, abort
+        end;
+    until (ID = ccDataEnd) or (c >= ccDataEnd);
+end;
+{
+    --------------------------------------------------------
+    SaveToStream:
+    - Save the data
+      String information is stored as UTF8
+    --------------------------------------------------------
+}
+procedure TCoverDownloadItem.SaveToStream(aStream: TStream);
+var ID: Byte;
+
+        procedure WriteTextToStream(ID: Byte; wString: UnicodeString);
+        var len: integer;
+            tmpStr: UTF8String;
+        begin
+            aStream.Write(ID,sizeof(ID));
+            tmpstr := UTF8Encode(wString);
+            len := length(tmpstr);
+            aStream.Write(len,SizeOf(len));
+            aStream.Write(PAnsiChar(tmpstr)^,len);
+        end;
+
+begin
+    WriteTextToStream(ccArtist   , Artist);
+    WriteTextToStream(ccAlbum    , Album );
+    WriteTextToStream(ccDirectory, Directory);
+
+    ID := ccQueryCount;
+    aStream.Write(ID, sizeof(ID));
+    aStream.Write(QueryCount, sizeOf(QueryCount));
+
+    ID := ccLastQuery;
+    aStream.Write(ID, sizeof(ID));
+    aStream.Write(lastChecked, sizeOf(lastChecked));
+
+    ID := ccDataEnd;
+    aStream.Write(ID, sizeof(ID));
 end;
 
 
@@ -176,10 +266,19 @@ end;
 
 procedure TCoverDownloadWorkerThread.Execute;
 var n: DWord;
-    CacheList: TObjectList;
+    CurrentCacheItem: TCoverDownloadItem;
+    NewCacheItem: TCoverDownloadItem;
+
 begin
     // LoadCacheList
-    CacheList := TObjectList.Create;
+    fCacheList := TObjectList.Create;
+
+    if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+        fCacheFilename := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\CoverCache'
+    else
+        fCacheFilename := ExtractFilePath(ParamStr(0)) + 'Data\CoverCache';
+
+    LoadCacheList;
 
     try
         While Not Terminated do
@@ -187,46 +286,197 @@ begin
             if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
             if not Terminated then
             begin
-                if SyncGetFirstJob then
+                Synchronize(SyncGetFirstJob);
+                if assigned(fCurrentDownloadItem) then
                 begin
-                    n := GetTickCount;
-                    if n - fLastCall < 250 then
-                        sleep(250);
-                    fLastCall := GetTickCount;
 
-                    QueryLastFMCoverXML;
-                    GetBestCoverUrlFromXML;
-                    DownloadBestCoverToStream;
+                    // Check, for Cache-time here
+                    // get Item in CacheList
 
-                    SyncUpdateCover;
+                    CurrentCacheItem := GetMatchingCacheItem;
+                    if CacheItemCanBeRechecked(CurrentCacheItem) then
+                    begin
+                        n := GetTickCount;
+                        if n - fLastCall < 250 then
+                            sleep(250);
+                        fLastCall := GetTickCount;
+
+                        // we start the dwonload now
+                        fCurrentDownloadComplete := False;
+
+                        QueryLastFMCoverXML;
+                        GetBestCoverUrlFromXML;
+                        DownloadBestCoverToStream;     // here: Download ok (or not)
+
+                        Synchronize(SyncUpdateCover);  // after this: Cover is really ok
+
+
+                        if fCurrentDownloadComplete then // is set to True in SyncUpdateCover
+                        begin
+                            if assigned(CurrentCacheItem) then
+                                fCacheList.Remove(CurrentCacheItem)
+
+                                // Synchronize(ChangeCoverFlow)
+                                ///  Cover in Datei "front (NEMPAutoCover).xxx" schreiben
+                                ///  MD5 vom Cover bestimmen und in Cover-Ordner kopieren
+                                !!!!!!!
+                                ///  passendes NempCover finden
+                                ///  AudioFileListe generieren
+                                ///  Neue ID setzen
+
+                        end else
+                        begin
+                            // the current job was not completed
+                            if assigned(CurrentCacheItem) then
+                            begin
+                                // the job was already in the cache-list
+                                // increase Counter and save queryTime
+                                CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
+                                CurrentCacheItem.lastChecked := Now;
+                            end else
+                            begin
+                                NewCacheItem := TCoverDownloadItem.Create;
+                                NewCacheItem.Artist := fCurrentDownloadItem.Artist;
+                                NewCacheItem.Album  := fCurrentDownloadItem.Album ;
+                                NewCacheItem.Directory := fCurrentDownloadItem.Directory;
+                                NewCacheItem.queryCount := 1;
+                                NewCacheItem.lastChecked := Now;
+
+                                fCacheList.Add(NewCacheItem);
+                            end;
+                        end;
+                    end;
                 end;
             end;
         end;
-
+        SaveCacheList;
     finally
-        CacheList.Free;
+        fCacheList.Free;
     end;
 end;
 
 {
     --------------------------------------------------------
     LoadCacheList:
-    -
+    - Load the Cache from the CacheFile
+      Store the CoverDownloadItems in the Target-List
     --------------------------------------------------------
 }
 procedure TCoverDownloadWorkerThread.LoadCacheList;
+var Header: AnsiString;
+    major,minor: Byte;
+    aStream: TMemoryStream;
+    i, Count: Integer;
+    NewItem: TCoverDownloadItem;
 begin
+    aStream := TMemoryStream.Create;
+    try
+        if FileExists(fCacheFilename) then
+        begin
+            aStream.LoadFromFile(fCacheFilename);
+            aStream.Position := 0;
 
+            SetLength(Header, Length('NempCoverCache'));
+            aStream.Read(Header[1], length(Header));
+            aStream.Read(major, sizeOf(Byte));
+            aStream.Read(minor, sizeOf(Byte));
+
+            if (Header = 'NempCoverCache')
+                and (major = 1)
+                and (minor = 0)
+            then
+            begin
+                aStream.Read(Count, SizeOf(Count));
+                for i := 0 to Count - 1 do
+                begin
+                    NewItem := TCoverDownloadItem.Create;
+                    NewItem.LoadFromStream(aStream);
+                    fCacheList.Add(NewItem);
+                end;
+            end;
+        end;
+    finally
+        aStream.Free;
+    end;
 end;
 
 procedure TCoverDownloadWorkerThread.SaveCacheList;
+var Header: AnsiString;
+    major,minor: Byte;
+    aStream: TMemoryStream;
+    i, Count: Integer;
 begin
+    aStream := TMemoryStream.Create;
+    try
+        Header := 'NempCoverCache';
+        major  := 1;
+        minor  := 0;
+        Count  := fCacheList.Count;
 
+        aStream.Write(Header[1], length(Header));
+        aStream.Write(major, sizeOf(Byte));
+        aStream.Write(minor, sizeOf(Byte));
+
+        aStream.Write(Count, SizeOf(Count));
+
+        for i := 0 to Count - 1 do
+            TCoverDownloadItem(fCacheList[i]).SaveToStream(aStream);
+
+        aStream.SaveToFile(fCacheFilename);
+    finally
+        aStream.Free;
+    end;
+end;
+
+
+{
+    --------------------------------------------------------
+    GetMatchingCacheItem:
+    - Search an Item in the Cache-List, which matches Self.fCurrentDownloadItem
+    --------------------------------------------------------
+}
+function TCoverDownloadWorkerThread.GetMatchingCacheItem: TCoverDownloadItem;
+var i: Integer;
+    aItem: TCoverDownloadItem;
+begin
+    result := Nil;
+    for i := 0 to fCacheList.Count - 1 do
+    begin
+        aItem := TCoverDownloadItem(fCacheList[i]);
+        if (aItem.Artist = fCurrentDownloadItem.Artist)
+            and (aItem.Album = fCurrentDownloadItem.Album)
+        then
+        begin
+            result := aItem;
+            break;
+        end;
+    end;
 end;
 
 {
     --------------------------------------------------------
-    fDownloadXML:
+    CacheItemCanBeRechecked:
+    - Check, whether a new Request for this item does make sense
+      i.e. last check is some time ago
+    --------------------------------------------------------
+}
+function TCoverDownloadWorkerThread.CacheItemCanBeRechecked(
+  aCacheItem: TCoverDownloadItem): Boolean;
+begin
+    result :=
+        (not assigned(aCacheItem))
+        or
+        (
+            (DaysBetween(now, aCacheItem.lastChecked) >= 7) // one week ago
+            or
+            // one day ago and not very often tested yet (better for brandnew albums?)
+            ((HoursBetween(now, aCacheItem.lastChecked) >= 24) and (aCacheItem.queryCount <= 10))
+        );
+end;
+
+{
+    --------------------------------------------------------
+    QueryLastFMCoverXML:
     - download the XML-Reply from the LastFM API
       save the reply in Self.fXMLData
     --------------------------------------------------------
@@ -282,6 +532,7 @@ begin
         fBestCoverURL := '';
     end;
 end;
+
 
 
 {
@@ -383,7 +634,6 @@ begin
     finally
         localBMP.Free;
     end;
-
 end;
 
 {
@@ -399,7 +649,26 @@ begin
     NewDownloadItem.Artist    := aCover.Artist;
     NewDownloadItem.Album     := aCover.Album;
     NewDownloadItem.Directory := aCover.Directory;
+    NewDownloadItem.QueryType := qtCoverFlow;
     NewDownloadItem.Index     := Idx;
+    fJobList.Insert(0, NewDownloadItem);
+    if fJobList.Count > 50 then
+        fJobList.Delete(fJobList.Count-1);
+
+    StartWorking;
+end;
+
+procedure TCoverDownloadWorkerThread.AddJob(aAudioFile: TAudioFile;
+  Idx: Integer);
+var NewDownloadItem: TCoverDownloadItem;
+begin
+    NewDownloadItem := TCoverDownloadItem.Create;
+    NewDownloadItem.Artist    := aAudioFile.Artist;
+    NewDownloadItem.Album     := aAudioFile.Album;
+    NewDownloadItem.Directory := aAudioFile.Ordner;
+    NewDownloadItem.QueryType := qtPlayer;
+    NewDownloadItem.Index     := 0;
+
     fJobList.Insert(0, NewDownloadItem);
     if fJobList.Count > 50 then
         fJobList.Delete(fJobList.Count-1);
@@ -438,7 +707,7 @@ begin
 end;
 
 
-function TCoverDownloadWorkerThread.SyncGetFirstJob: Boolean;
+procedure TCoverDownloadWorkerThread.SyncGetFirstJob;
 var fi: TCoverDownloadItem;
 begin
     // result: True if there is something to do
@@ -450,24 +719,19 @@ begin
         fCurrentDownloadItem.Album       := fi.Album     ;
         fCurrentDownloadItem.Directory   := fi.Directory ;
         fCurrentDownloadItem.Index       := fi.Index     ;
+        fCurrentDownloadItem.QueryType   := fi.QueryType ;
+
         fJobList.Delete(0);
-        result := True;
     end
     else
-        result := False;
+        fCurrentDownloadItem := Nil;
 end;
 
-function TCoverDownloadWorkerThread.SyncUpdateCover: Boolean;
+procedure TCoverDownloadWorkerThread.SyncUpdateCover;
 var bmp: TBitmap;
     r: TRect;
     s: String;
-    success: Boolean;
 begin
-    // result: Cover has been updated
-    // false, if something has changed (i.e. cover artist/album does not match idx any more)
-
-    result := True;
-
     bmp := TBitmap.Create;
     try
         bmp.PixelFormat := pf24bit;
@@ -475,7 +739,7 @@ begin
         bmp.Height := 240;
         bmp.Width := 240;
 
-        success := StreamToBitmap(bmp);
+        fCurrentDownloadComplete := StreamToBitmap(bmp);
         //if not success then
         begin
             if self.fXMLData <> '' then
