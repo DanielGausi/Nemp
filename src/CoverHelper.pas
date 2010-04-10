@@ -718,6 +718,7 @@ begin
         if aCoverID = '' then
         begin
             GetDefaultCover(dcNoCover, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+            result := False;
           //  fCaption := _(aCover.Artist) + #13#10 + _(aCover.Album); //+ ' --- ' + aCover.ID;
         end else
         begin
@@ -732,6 +733,7 @@ begin
                         aCoverBmp.Assign(aJpg);
                     except
                         GetDefaultCover(dcError, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+                        result := False;
                     end;
                 finally
                   aJpg.Free;
@@ -739,6 +741,7 @@ begin
             end else
             begin
                 GetDefaultCover(dcError, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+                result := False;
             end;
         end;
     end;

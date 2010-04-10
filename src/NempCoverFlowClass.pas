@@ -295,6 +295,7 @@ begin
             cm_OpenGL  : fFlyingCow.CurrentItem := aValue;
         end;
 
+        fDownloadThread.MostImportantIndex := aValue;
         fCurrentitem := aValue;
         if (aValue >= 0) and (aValue <= fCoverList.Count-1) then
         begin
