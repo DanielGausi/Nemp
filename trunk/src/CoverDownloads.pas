@@ -87,6 +87,7 @@ type
             // Thread-Copy for the Item that is currently processed
             fCurrentDownloadItem: TCoverDownloadItem;
             fCurrentDownloadComplete: Boolean;
+            FWorkToDo: Boolean;
 
             // LastFM allows only 5 calls per Second
             // The GetTag-Method will be calles very often - so we need a speed-limit here!
@@ -94,9 +95,11 @@ type
 
             fJobList: TObjectList;   // Access only from VCL !!!
 
+            fInternetConnectionLost: Boolean;
             fXMLData: AnsiString;        // API-Response
             fBestCoverURL: AnsiString;   // URL of the "extra-large" cover, if available
             fDataStream: TMemoryStream;  // Stream containing the Picture-Data
+            fNewCoverFilename: String;   // Local Filename of the downloaded Coverfile
             fDataType: TPicType;
 
             fCacheFilename: String;
@@ -110,6 +113,8 @@ type
             function QueryLastFMCoverXML: Boolean;
             function GetBestCoverUrlFromXML: Boolean;
             function DownloadBestCoverToStream: Boolean;
+            procedure SavePicStreamToFile;
+
             // CacheList
             procedure LoadCacheList;
             procedure SaveCacheList;
@@ -123,11 +128,15 @@ type
 
             procedure StartWorking;  // VCL
 
+            function DownloadItemStillMatchesCoverFlow: Boolean;  // VCL (called in Sync-methods)
             // Get next job, i.e. information about the next queried cover
             procedure SyncGetFirstJob; // VCL
             // Update the Cover in Coverflow (or: in Player?)
             procedure SyncUpdateCover; // VCL
-
+            procedure SyncUpdateCoverCacheBlocked; // VCL
+            procedure AddLogoToBitmap(aLogo: String; Target: TBitmap);
+            // Update CoverFlow-Data in Medialibrary
+            procedure SyncUpdateMedialib;
 
 
         protected
@@ -286,13 +295,11 @@ begin
             if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
             if not Terminated then
             begin
+                FWorkToDo := False;  // will be set to True again in SyncGetFirstJob
                 Synchronize(SyncGetFirstJob);
-                if assigned(fCurrentDownloadItem) then
+                if FWorkToDo then
                 begin
-
                     // Check, for Cache-time here
-                    // get Item in CacheList
-
                     CurrentCacheItem := GetMatchingCacheItem;
                     if CacheItemCanBeRechecked(CurrentCacheItem) then
                     begin
@@ -300,30 +307,21 @@ begin
                         if n - fLastCall < 250 then
                             sleep(250);
                         fLastCall := GetTickCount;
-
-                        // we start the dwonload now
+                        // we start the download now
                         fCurrentDownloadComplete := False;
-
+                        fInternetConnectionLost := False;  // assume there is a connection
                         QueryLastFMCoverXML;
                         GetBestCoverUrlFromXML;
-                        DownloadBestCoverToStream;     // here: Download ok (or not)
-
+                        DownloadBestCoverToStream;
                         Synchronize(SyncUpdateCover);  // after this: Cover is really ok
-
-
+                                                       // i.e. downloaded Data is valid Picture-data
                         if fCurrentDownloadComplete then // is set to True in SyncUpdateCover
                         begin
                             if assigned(CurrentCacheItem) then
-                                fCacheList.Remove(CurrentCacheItem)
-
-                                // Synchronize(ChangeCoverFlow)
-                                ///  Cover in Datei "front (NEMPAutoCover).xxx" schreiben
-                                ///  MD5 vom Cover bestimmen und in Cover-Ordner kopieren
-                                !!!!!!!
-                                ///  passendes NempCover finden
-                                ///  AudioFileListe generieren
-                                ///  Neue ID setzen
-
+                                fCacheList.Remove(CurrentCacheItem);
+                            // save downloaded picture to a file
+                            SavePicStreamToFile;
+                            Synchronize(SyncUpdateMedialib);
                         end else
                         begin
                             // the current job was not completed
@@ -331,20 +329,30 @@ begin
                             begin
                                 // the job was already in the cache-list
                                 // increase Counter and save queryTime
-                                CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
-                                CurrentCacheItem.lastChecked := Now;
+                                if not fInternetConnectionLost then
+                                begin
+                                    CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
+                                    CurrentCacheItem.lastChecked := Now;
+                                end;
                             end else
                             begin
-                                NewCacheItem := TCoverDownloadItem.Create;
-                                NewCacheItem.Artist := fCurrentDownloadItem.Artist;
-                                NewCacheItem.Album  := fCurrentDownloadItem.Album ;
-                                NewCacheItem.Directory := fCurrentDownloadItem.Directory;
-                                NewCacheItem.queryCount := 1;
-                                NewCacheItem.lastChecked := Now;
-
-                                fCacheList.Add(NewCacheItem);
+                                if not fInternetConnectionLost then
+                                begin
+                                    NewCacheItem := TCoverDownloadItem.Create;
+                                    NewCacheItem.Artist := fCurrentDownloadItem.Artist;
+                                    NewCacheItem.Album  := fCurrentDownloadItem.Album ;
+                                    NewCacheItem.Directory := fCurrentDownloadItem.Directory;
+                                    NewCacheItem.queryCount := 1;
+                                    NewCacheItem.lastChecked := Now;
+                                    fCacheList.Add(NewCacheItem);
+                                end;
                             end;
                         end;
+                    end else
+                    begin
+                        // cache blocks downloading
+                        Synchronize(SyncUpdateCoverCacheBlocked);
+
                     end;
                 end;
             end;
@@ -484,7 +492,6 @@ end;
 function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
 var url: UTF8String;
 begin
-
     url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
         + '&api_key=' + api_key
         + '&artist=' + StringToURLStringAnd(AnsiLowerCase(fCurrentDownloadItem.Artist))
@@ -493,10 +500,14 @@ begin
         fXMLData := fIDHttp.Get(url);
         result := True;
     except
-        on E: Exception do
+        on E: EIdSocketError do
         begin
-          fXMLData := E.Message;
-          result := False;
+            fInternetConnectionLost := True;
+            result := False;
+        end;
+        else
+        begin
+            result := False;
         end;
     end;
 end;
@@ -549,9 +560,19 @@ begin
         try
             fIDHttp.Get(fBestCoverURL, fDataStream);
         except
-            fDataStream.Clear;
-            result := False;
-            fDataType := ptNone;
+            on E: EIdSocketError do
+            begin
+                fDataStream.Clear;
+                result := False;
+                fDataType := ptNone;
+                fInternetConnectionLost := True;
+            end;
+            else
+            begin
+                fDataStream.Clear;
+                result := False;
+                fDataType := ptNone;
+            end;
         end;
 
         if AnsiEndsText('.jpg', fBestCoverURL) then
@@ -571,6 +592,7 @@ begin
         fDataStream.Clear;
     end;
 end;
+
 
 {
     --------------------------------------------------------
@@ -633,6 +655,29 @@ begin
         end;
     finally
         localBMP.Free;
+    end;
+end;
+
+{
+    --------------------------------------------------------
+    SavePicStreamToFile:
+    - Save the downloaded Stream to a file
+    --------------------------------------------------------
+}
+procedure TCoverDownloadWorkerThread.SavePicStreamToFile;
+begin
+    case fDataType of
+        ptJPG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).jpg';
+        ptPNG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).png';
+    else
+        fNewCoverFilename := '';
+    end;
+
+    if fNewCoverFilename <> '' then
+    try
+        fDataStream.SaveToFile(fNewCoverFilename);
+    except
+        // nothing. saving failed
     end;
 end;
 
@@ -707,12 +752,37 @@ begin
 end;
 
 
+{
+    --------------------------------------------------------
+    DownloadItemStillMatchesCoverFlow
+    - After a Resort of the Coverflow, our downloaded data may be useless/wrong
+    --------------------------------------------------------
+}
+function TCoverDownloadWorkerThread.DownloadItemStillMatchesCoverFlow: Boolean;
+var aCover: TNempCover;
+begin
+    if fCurrentDownloadItem.Index <= MedienBib.Coverlist.Count - 1 then
+    begin
+        aCover := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]);
+        result := (aCover.Artist = fCurrentDownloadItem.Artist)
+                  and (aCover.Album = fCurrentDownloadItem.Album);
+    end else
+        result := False;
+end;
+
+{
+    --------------------------------------------------------
+    SyncGetFirstJob
+    - Get the first item in the Joblist
+    --------------------------------------------------------
+}
 procedure TCoverDownloadWorkerThread.SyncGetFirstJob;
 var fi: TCoverDownloadItem;
 begin
     // result: True if there is something to do
     if fJobList.Count > 0 then
     begin
+        FWorkToDo := True;
         // Copy the Item from the List, so the Thread can savely work on this
         fi := TCoverDownloadItem(fJobList.Items[0]);
         fCurrentDownloadItem.Artist      := fi.Artist    ;
@@ -720,13 +790,17 @@ begin
         fCurrentDownloadItem.Directory   := fi.Directory ;
         fCurrentDownloadItem.Index       := fi.Index     ;
         fCurrentDownloadItem.QueryType   := fi.QueryType ;
-
         fJobList.Delete(0);
-    end
-    else
-        fCurrentDownloadItem := Nil;
+    end;
 end;
 
+{
+    --------------------------------------------------------
+    SyncUpdateCover
+    - After the Cover-Download has completed, copy the DataStream into a Bitmap
+      and call SetPreview (paint it on the CoverFlow)
+    --------------------------------------------------------
+}
 procedure TCoverDownloadWorkerThread.SyncUpdateCover;
 var bmp: TBitmap;
     r: TRect;
@@ -739,8 +813,26 @@ begin
         bmp.Height := 240;
         bmp.Width := 240;
 
-        fCurrentDownloadComplete := StreamToBitmap(bmp);
+        if fInternetConnectionLost then
+        begin
+            GetDefaultCover(dcNoCover, bmp, 0);
+            AddLogoToBitmap('lastfmConnectError', bmp);
+        end else
+        begin
+            fCurrentDownloadComplete := StreamToBitmap(bmp);
+
+            if Not fCurrentDownloadComplete then
+            begin
+                GetDefaultCover(dcNoCover, bmp, 0);
+                AddLogoToBitmap('lastfmFail', bmp);
+            end else
+            begin
+                AddLogoToBitmap('lastfmOK', bmp);
+            end;
+        end;
+
         //if not success then
+        {
         begin
             if self.fXMLData <> '' then
             begin
@@ -755,15 +847,115 @@ begin
                 bmp.Canvas.TextOut(10, 80, fCurrentDownloadItem.Album);
             end;
         end;
+        }
 
-        Medienbib.NewCoverFlow.SetPreview (fCurrentDownloadItem.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-
-        MedienBib.NewCoverFlow.Paint(1);
+        if DownloadItemStillMatchesCoverFlow then
+        begin
+            Medienbib.NewCoverFlow.SetPreview (fCurrentDownloadItem.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+            MedienBib.NewCoverFlow.Paint(1);
+        end;
     finally
         bmp.free;
     end;
 end;
 
 
+procedure TCoverDownloadWorkerThread.AddLogoToBitmap(aLogo: String; Target: TBitmap);
+var logoBmp: TBitmap;
+    filename: String;
+begin
+    // Add Icon to Image
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\' + aLogo + '.bmp';
+    if FileExists(filename) then
+    begin
+        logoBmp := TBitmap.Create;
+        try
+            logoBmp.LoadFromFile(filename);
+
+            Target.Canvas.Draw(215, 3, logoBmp);
+
+        finally
+            logoBmp.Free;
+        end;
+    end;
+end;
+
+
+procedure TCoverDownloadWorkerThread.SyncUpdateCoverCacheBlocked;
+var bmp: TBitmap;
+begin
+    bmp := TBitmap.Create;
+    try
+        bmp.PixelFormat := pf24bit;
+
+        bmp.Height := 240;
+        bmp.Width := 240;
+
+        GetDefaultCover(dcNoCover, bmp, 0);
+        AddLogoToBitmap('lastfmCache', bmp);
+
+        //bmp.Canvas.Brush.Style := bsClear;
+        //bmp.Canvas.Font.Size := 6;
+        //bmp.Canvas.TextOut(5,5, 'Cover-download blocked by cache');
+
+        if DownloadItemStillMatchesCoverFlow then
+        begin
+            Medienbib.NewCoverFlow.SetPreview (fCurrentDownloadItem.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+            MedienBib.NewCoverFlow.Paint(1);
+        end;
+    finally
+        bmp.free;
+    end;
+
+end;
+
+{
+    --------------------------------------------------------
+    SyncUpdateMedialib
+    - compute MD5-Hash of the saved Coverfile, copy it to the library's Cover-Dir
+    - get the matching "NempCoverItem"
+    - get all of its AudioFiles
+    - change the CoverIDs of these files (and from the NempCover-Object)
+
+    ///  passendes NempCover (wieder)finden
+    ///  AudioFileListe generieren
+    ///  Neue ID setzen
+
+    --------------------------------------------------------
+}
+procedure TCoverDownloadWorkerThread.SyncUpdateMedialib;
+var OldID, NewID: String;
+    i: Integer;
+    afList: TObjectList;
+begin
+    if  (MedienBib.BrowseMode = 1)         // we are still in CoverFlow
+        and FileExists(fNewCoverFilename)  // the downloaded file exists
+        and DownloadItemStillMatchesCoverFlow
+    then
+    begin
+        NewID := Medienbib.InitCoverFromFilename(fNewCoverFilename);
+        // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
+        OldID := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID;
+
+        // Get List of all Files with the old ID
+        afList := TObjectList.Create(False);
+        try
+            MedienBib.GetTitelListFromCoverID(afList, OldID);
+            for i := 0 to afList.Count - 1 do
+                // set the new ID
+                TAudioFile(afList[i]).CoverID := NewID;
+            // set the new ID on the NempCover-Object
+            TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID := NewID;
+
+            if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
+                MedienBib.NewCoverFlow.CurrentCoverID := NewID;
+
+            MedienBib.Changed := True;
+        finally
+            afList.Free;
+        end;
+    end else
+        Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
+end;
 
 end.

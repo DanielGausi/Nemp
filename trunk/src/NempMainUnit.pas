@@ -2491,7 +2491,7 @@ begin
         if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
         begin
             aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
-            MedienBib.GenerateAnzeigeListeFromCoverID(aCover.ID);
+            MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
             Lbl_CoverFlow.Caption := aCover.InfoString;
         end;
     end;
@@ -10466,7 +10466,7 @@ begin
         MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
 
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
-        MedienBib.GenerateAnzeigeListeFromCoverID(aCover.ID);
+        MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
 
         Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
@@ -10480,7 +10480,6 @@ begin
   CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
   CoverScrollbar.OnChange := CoverScrollbarChange;
   CoverScrollbar.SetFocus;
-
 end;
 
 
