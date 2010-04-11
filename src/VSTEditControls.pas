@@ -270,7 +270,7 @@ begin
       OnMouseLeave := RatingMouseLeave;    // Cancel Edit
       OnClick := RatingClick;              // Set new value
       Visible := False;
-      Parent := Tree;
+      Parent := FTree;
   end;
 end;
 
@@ -376,11 +376,11 @@ begin
   FEdit := TEdit.Create(nil);
   with FEdit as TEdit do
   begin
-      Height := fTree.Font.Size + 10;
+      Height := FTree.Font.Size + 10;
       Font.Color := clWindowText;
       Color := clWindow;
       Visible := False;
-      Parent := Tree;
+      Parent := FTree;
       OnKeyDown := EditKeyDown;
   end;
 end;
@@ -407,8 +407,8 @@ begin
   S:= Tedit(FEdit).Text;
   FTree.Text[FNode, FColumn] := S;
 
-  FTree.InvalidateNode(FNode);
-  FEdit.Hide;
+  //FTree.InvalidateNode(FNode);
+  //FEdit.Hide;
   FTree.SetFocus;
 end;
 
@@ -417,17 +417,21 @@ begin
     case Key of
     VK_ESCAPE:
       begin
+        FTree.setfocus;
         FTree.CancelEditNode;
         Key := 0;
-        FTree.setfocus;
+        //FTree.setfocus;
       end;
       VK_RETURN:
       begin
-       PostMessage(FTree.Handle, WM_KEYDOWN, VK_DOWN, 0);
-       Key := 0;
+       //PostMessage(FTree.Handle, WM_KEYDOWN, VK_DOWN, 0);  // WHY This??? (11.04.2010)
+
        FTree.EndEditNode;
+       Key := 0;
+
       end;
      End; //case
+
 end;
 
 

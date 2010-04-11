@@ -281,12 +281,10 @@ var n: DWord;
 begin
     // LoadCacheList
     fCacheList := TObjectList.Create;
-
     if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
         fCacheFilename := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\CoverCache'
     else
         fCacheFilename := ExtractFilePath(ParamStr(0)) + 'Data\CoverCache';
-
     LoadCacheList;
 
     try
@@ -310,25 +308,25 @@ begin
                         // we start the download now
                         fCurrentDownloadComplete := False;
                         fInternetConnectionLost := False;  // assume there is a connection
-                        QueryLastFMCoverXML;
-                        GetBestCoverUrlFromXML;
-                        DownloadBestCoverToStream;
+
+                        QueryLastFMCoverXML;         // Get XML-File from API
+                        GetBestCoverUrlFromXML;      // Get a Cover-URL from the XML-File
+                        DownloadBestCoverToStream;   // download the Cover from the URL
+
                         Synchronize(SyncUpdateCover);  // after this: Cover is really ok
                                                        // i.e. downloaded Data is valid Picture-data
-                        if fCurrentDownloadComplete then // is set to True in SyncUpdateCover
+                        if fCurrentDownloadComplete then
                         begin
                             if assigned(CurrentCacheItem) then
                                 fCacheList.Remove(CurrentCacheItem);
-                            // save downloaded picture to a file
-                            SavePicStreamToFile;
-                            Synchronize(SyncUpdateMedialib);
+                            SavePicStreamToFile;             // save downloaded picture to a file
+                            Synchronize(SyncUpdateMedialib); // update Medialibrary
                         end else
                         begin
                             // the current job was not completed
                             if assigned(CurrentCacheItem) then
                             begin
                                 // the job was already in the cache-list
-                                // increase Counter and save queryTime
                                 if not fInternetConnectionLost then
                                 begin
                                     CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
@@ -338,6 +336,7 @@ begin
                             begin
                                 if not fInternetConnectionLost then
                                 begin
+                                    // create new cache entry
                                     NewCacheItem := TCoverDownloadItem.Create;
                                     NewCacheItem.Artist := fCurrentDownloadItem.Artist;
                                     NewCacheItem.Album  := fCurrentDownloadItem.Album ;
@@ -349,11 +348,7 @@ begin
                             end;
                         end;
                     end else
-                    begin
-                        // cache blocks downloading
-                        Synchronize(SyncUpdateCoverCacheBlocked);
-
-                    end;
+                        Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
                 end;
             end;
         end;
@@ -503,10 +498,12 @@ begin
         on E: EIdSocketError do
         begin
             fInternetConnectionLost := True;
+            fXMLData := '';
             result := False;
         end;
         else
         begin
+            fXMLData := '';
             result := False;
         end;
     end;
@@ -584,7 +581,11 @@ begin
         if AnsiEndsText('.jpeg', fBestCoverURL) then
             fDataType := ptJPG
         else
+        begin
             fDataType := ptNone;
+            fDataStream.Clear;
+            result := False;
+        end;
     end else
     begin
         result := False;
@@ -817,6 +818,7 @@ begin
         begin
             GetDefaultCover(dcNoCover, bmp, 0);
             AddLogoToBitmap('lastfmConnectError', bmp);
+            fCurrentDownloadComplete := False;
         end else
         begin
             fCurrentDownloadComplete := StreamToBitmap(bmp);
@@ -830,24 +832,6 @@ begin
                 AddLogoToBitmap('lastfmOK', bmp);
             end;
         end;
-
-        //if not success then
-        {
-        begin
-            if self.fXMLData <> '' then
-            begin
-                bmp.Canvas.Font.Size := 6;
-                r := Rect(0,0,240,10);
-                s := fBestCoverURL;//fXMLData;
-                bmp.Canvas.TextRect(r, s, [tfWordBreak]);
-            end else
-            begin
-                bmp.Canvas.Font.Size := 16;
-                bmp.Canvas.TextOut(10, 10, fCurrentDownloadItem.Artist);
-                bmp.Canvas.TextOut(10, 80, fCurrentDownloadItem.Album);
-            end;
-        end;
-        }
 
         if DownloadItemStillMatchesCoverFlow then
         begin
