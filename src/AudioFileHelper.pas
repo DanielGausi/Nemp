@@ -788,7 +788,7 @@ begin
     end else
     begin
         m := (l+r) DIV 2;
-        strm := (Liste[m] as TAudioFile).CoverID;
+        strm := (Liste[m] as TAudioFile).Key1;
         c := CompareText(CoverID, strm);
         if l = r then
         begin

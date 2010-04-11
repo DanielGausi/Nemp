@@ -240,10 +240,6 @@ type
         // ControlRawTag. Result: The new rawTag for the audiofile, including the previous existing
         function ControlRawTag(af: TAudioFile; newTags: String; aIgnoreList: TStringList; aMergeList: TObjectList): String;
 
-        // Copy a CoverFile to Cover\<md5-Hash(File)>
-        // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
-        Function InitCoverFromFilename(aFileName: UnicodeString): String;
-
         // General Note:
         // "Artist" and "Album" are not necessary the artist and album, but
         // the two AudioFile-Properties selected for  browsing.
@@ -485,6 +481,10 @@ type
         //    if the new file is in the same directory as the last one,
         //    the method will use the last cover for this one, too
         //    (except there is one in the id3-tag of the file)
+
+        // Copy a CoverFile to Cover\<md5-Hash(File)>
+        // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
+        function InitCoverFromFilename(aFileName: UnicodeString): String;
         procedure InitCover(aAudioFile: tAudioFile);
         // 2. If AudioFile is in a new directory:
         //    Get a List with candidates for the cover for the audiofile
@@ -2979,11 +2979,13 @@ begin
   AudioFilesWithSameCover := TObjectlist.Create(False);
 
   aktualAudioFile := (Source[0] as TAudioFile);
+  aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
   aktualID := aktualAudioFile.CoverID;
   lastID := aktualID;
 
   newCover := TNempCover.Create;
   newCover.ID := aktualAudioFile.CoverID;
+  newCover.key := newCover.ID;
   NewCover.Artist := aktualAudioFile.Artist;
   NewCover.Album := aktualAudioFile.Album;
   NewCover.Year := StrToIntDef(aktualAudioFile.Year, 0);
@@ -2995,6 +2997,7 @@ begin
   for i := 1 to Source.Count - 1 do
   begin
     aktualAudioFile := (Source[i] as TAudioFile);
+    aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
     aktualID := aktualAudioFile.CoverID;
     if SameText(aktualID, lastID) then
     begin
@@ -3019,6 +3022,7 @@ begin
       lastID := aktualID;
       newCover := TNempCover.Create;
       newCover.ID := aktualAudioFile.CoverID;
+      newCover.key := newCover.ID;
       NewCover.Year := StrToIntDef(aktualAudioFile.Year, 0);
       NewCover.Genre := aktualAudioFile.Genre;
       Target.Add(NewCover);
@@ -3227,8 +3231,8 @@ begin
   einIndex := BinaerCoverIDSuche(Liste, aCoverID, Start, Ende);
   Start := EinIndex;
   Ende := EinIndex;
-  while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).CoverID, aCoverID)) do dec(Start);
-  while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).CoverID, aCoverID)) do inc(Ende);
+  while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).Key1, aCoverID)) do dec(Start);
+  while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key1, aCoverID)) do inc(Ende);
 end;
 
 {

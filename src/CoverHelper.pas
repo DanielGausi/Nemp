@@ -62,6 +62,7 @@ type
         function fGetInfoString: String;
     public
       ID: String;
+      key: String;    // init: a copy of ID, but ID can be changed without resorting
       Artist: UnicodeString;
       Album: UnicodeString;
       Year: Integer;

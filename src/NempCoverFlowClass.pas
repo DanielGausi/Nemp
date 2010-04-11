@@ -130,7 +130,7 @@ type
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, AudioFileClass;
 
 { TNempCoverFlow }
 
@@ -265,7 +265,11 @@ end;
 
 procedure TNempCoverFlow.DownloadCover(aCover: TNempCover; aIdx: Integer);
 begin
-    fDownloadThread.AddJob(aCover, aIdx);
+    if (aCover.Album <> 'Unknown compilation')
+        and (aCover.Artist <> AUDIOFILE_UNKOWN)
+        and (aCover.Album <> AUDIOFILE_UNKOWN)
+    then
+        fDownloadThread.AddJob(aCover, aIdx);
 end;
 
 function TNempCoverFlow.fGetCurrentItem: Integer;
