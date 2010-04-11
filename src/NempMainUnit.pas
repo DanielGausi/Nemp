@@ -10669,7 +10669,7 @@ begin
 
   //MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
 
-  bmp := TBitmap.Create;
+ { bmp := TBitmap.Create;
   try
       bmp.PixelFormat := pf24bit;
       bmp.Height := 240;
@@ -10691,7 +10691,7 @@ begin
       MedienBib.NewCoverFlow.Paint(10);
   finally
       bmp.free;
-  end;
+  end;    }
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
