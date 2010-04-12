@@ -4246,11 +4246,9 @@ end;
 
 procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
-var Dateiliste: TObjectlist;
+//var Dateiliste: TObjectlist;
 begin
-
   case NempPlaylist.DefaultAction of
-
       PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
       PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
       PLAYER_PLAY_NEXT    : PM_ML_PlayNext.Click ;
@@ -4566,11 +4564,17 @@ begin
   
   case key of
     VK_Return: begin
-        DateiListe := TObjectList.Create(False);
-        GenerateListForHandleFiles(Dateiliste, 0);
-        HandleFiles(Dateiliste, NempPlaylist.DefaultAction);
-        if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-        FreeAndNil(Dateiliste);
+        case NempPlaylist.DefaultAction of
+            PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
+            PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
+            PLAYER_PLAY_NEXT    : PM_ML_PlayNext.Click ;
+            PLAYER_PLAY_NOW     : PM_ML_PlayNow.Click  ;
+        end;
+        //DateiListe := TObjectList.Create(False);
+        //GenerateListForHandleFiles(Dateiliste, 0);
+        //HandleFiles(Dateiliste, NempPlaylist.DefaultAction);
+        //if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+        //FreeAndNil(Dateiliste);
     end;
 
     VK_F3:
@@ -9828,6 +9832,7 @@ var
   listFile: TAudioFile;
   i: Integer;
 begin
+caption := 'On Edited beginn';
     //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
     SetShortCuts;
     EditingVSTRating := False;
