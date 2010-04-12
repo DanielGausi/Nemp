@@ -2966,6 +2966,7 @@ begin
 
   newCover := TNempCover.Create;
   newCover.ID := 'all';
+  newCover.key := 'all';
   newCover.Artist := 'All artists';
   Newcover.Album := 'Your media-library';
   Target.Add(NewCover);
