@@ -19,6 +19,27 @@
           http://wiki.freepascal.org/VirtualTreeview_Example_for_Lazarus
 
 
+
+          Temporary comment ???
+          Got some AccessViolations in "GetRealParentForm" here.
+          I changed, and it worked, where it doesnt all the time before. More testing needed.
+
+          function TBaseVirtualTree.DoEndEdit: Boolean;
+          begin
+            StopTimer(EditTimer);
+            Result := (tsEditing in FStates) and FEditLink.EndEdit;
+            if Result then
+            begin
+              DoStateChange([], [tsEditing]);
+              //FEditLink := nil;             // not here
+              if Assigned(FOnEdited) then
+                FOnEdited(Self, FFocusedNode, FEditColumn);
+              FEditLink := nil;               // but here !!!
+            end;
+            DoStateChange([], [tsEditPending]);
+          end;
+
+
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
     Copyright (C) 2009, Daniel Gaussmann
@@ -151,10 +172,12 @@ type
 var RatingGraphics: TRatingGraphics ;
     PlayerRatingGraphics: TRatingGraphics;
 
+    TestTimerID: Cardinal;
+
 
 implementation
 
-uses AudioFileClass;
+uses AudioFileClass;//, NempMainUnit, mmSystem;
 
 {
     --------------------------------------------------------
@@ -284,7 +307,7 @@ end;
 function TRatingEditLink.CancelEdit: Boolean;
 begin
   Result := True;
-  FEdit.Hide;
+  //FEdit.Hide;
 end;
 
 function TRatingEditLink.EndEdit: Boolean;
@@ -306,7 +329,7 @@ begin
       af.Rating := FEdit.Tag;
   end;
   FTree.InvalidateNode(FNode);
-  FEdit.Hide;
+  //FEdit.Hide;
   FTree.SetFocus;
 end;
 
@@ -396,7 +419,9 @@ end;
 function TModStringEditLink.CancelEdit: Boolean;
 begin
   Result := True;
-  FEdit.Hide;
+  //FEdit.Hide;
+
+  FTree.SetFocus;
 end;
 
 function TModStringEditLink.EndEdit: Boolean;
@@ -404,34 +429,44 @@ var
   S: WideString;
 begin
   Result := True;
+//  Nemp_MainForm.Caption := 'Setting S ...';
   S:= Tedit(FEdit).Text;
+//  Nemp_MainForm.Caption := 'Setting Text ...';
   FTree.Text[FNode, FColumn] := S;
 
   //FTree.InvalidateNode(FNode);
   //FEdit.Hide;
+
+//  Nemp_MainForm.Caption := 'Setting Focus ...';
   FTree.SetFocus;
 end;
+
+//procedure TestTimeFire(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
+//begin
+  //  TVirtualStringTree(dwUser).EndEditNode;
+//end;
 
 procedure TModStringEditLink.EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
     case Key of
     VK_ESCAPE:
       begin
-        FTree.setfocus;
-        FTree.CancelEditNode;
         Key := 0;
-        //FTree.setfocus;
+        FTree.CancelEditNode;
       end;
       VK_RETURN:
       begin
-       //PostMessage(FTree.Handle, WM_KEYDOWN, VK_DOWN, 0);  // WHY This??? (11.04.2010)
+        //PostMessage(FTree.Handle, WM_KEYDOWN, VK_DOWN, 0);  // Select next line
+        Key := 0;
+//        Nemp_MainForm.Caption := 'Beginne EndEditNode';
 
-       FTree.EndEditNode;
-       Key := 0;
+        //TimeKillEvent(TestTimerID);
+        //TestTimerID := TimeSetEvent(500, 50, @TestTimeFire, Cardinal(FTree), TIME_ONESHOT);
 
-      end;
-     End; //case
-
+        FTree.EndEditNode;
+//        Nemp_MainForm.Caption := 'EndEditNode Complete';
+     end;
+    End; //case
 end;
 
 
