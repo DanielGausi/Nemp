@@ -46,8 +46,8 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException,
-  CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes;
+  IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException,
+  CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes, SyncObjs;
 
 const
     ccArtist     = 0;
@@ -58,6 +58,8 @@ const
     ccDataEnd    = 255;
 
 type
+
+
 
     TPicType = (ptNone, ptJPG, ptPNG);
 
@@ -81,8 +83,10 @@ type
     TCoverDownloadWorkerThread = class(TThread)
         private
             { Private-Deklarationen }
-            fSemaphore: THandle;
             fIDHttp: TIdHttp;
+
+            //fSemaphore: THandle;
+            fEvent: TEvent;
 
             // Thread-Copy for the Item that is currently processed
             fCurrentDownloadItem: TCoverDownloadItem;
@@ -253,7 +257,11 @@ begin
     fJobList := TObjectList.Create;
     fDataStream := TMemoryStream.Create;
     fCurrentDownloadItem := TCoverDownloadItem.Create;
-    fSemaphore := CreateSemaphore(Nil, 0, maxInt, Nil);
+
+    //fSemaphore := CreateSemaphore(Nil, 0, maxInt, Nil);
+    fEvent := TEvent.Create(Nil, True, False, '');
+
+
     FreeOnTerminate := False;
 
     fIDHttp.ConnectTimeout:= 5000;
@@ -270,6 +278,7 @@ begin
     fDataStream.Free;
     fJobList.Free;
     fCurrentDownloadItem.Free;
+    fEvent.Free;
     inherited;
 end;
 
@@ -290,65 +299,69 @@ begin
     try
         While Not Terminated do
         begin
-            if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
-            if not Terminated then
+
+            //if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
+            if fEvent.WaitFor(1000) = wrSignaled then
             begin
-                FWorkToDo := False;  // will be set to True again in SyncGetFirstJob
-                Synchronize(SyncGetFirstJob);
-                if FWorkToDo then
+                if not Terminated then
                 begin
-                    // Check, for Cache-time here
-                    CurrentCacheItem := GetMatchingCacheItem;
-                    if CacheItemCanBeRechecked(CurrentCacheItem) then
+                    FWorkToDo := False;  // will be set to True again in SyncGetFirstJob
+                    Synchronize(SyncGetFirstJob);
+                    if FWorkToDo then
                     begin
-                        n := GetTickCount;
-                        if n - fLastCall < 250 then
-                            sleep(250);
-                        fLastCall := GetTickCount;
-                        // we start the download now
-                        fCurrentDownloadComplete := False;
-                        fInternetConnectionLost := False;  // assume there is a connection
-
-                        QueryLastFMCoverXML;         // Get XML-File from API
-                        GetBestCoverUrlFromXML;      // Get a Cover-URL from the XML-File
-                        DownloadBestCoverToStream;   // download the Cover from the URL
-
-                        Synchronize(SyncUpdateCover);  // after this: Cover is really ok
-                                                       // i.e. downloaded Data is valid Picture-data
-                        if fCurrentDownloadComplete then
+                        // Check, for Cache-time here
+                        CurrentCacheItem := GetMatchingCacheItem;
+                        if CacheItemCanBeRechecked(CurrentCacheItem) then
                         begin
-                            if assigned(CurrentCacheItem) then
-                                fCacheList.Remove(CurrentCacheItem);
-                            SavePicStreamToFile;             // save downloaded picture to a file
-                            Synchronize(SyncUpdateMedialib); // update Medialibrary
-                        end else
-                        begin
-                            // the current job was not completed
-                            if assigned(CurrentCacheItem) then
+                            n := GetTickCount;
+                            if n - fLastCall < 300 then
+                                sleep(300);
+                            fLastCall := GetTickCount;
+                            // we start the download now
+                            fCurrentDownloadComplete := False;
+                            fInternetConnectionLost := False;  // assume there is a connection
+
+                            QueryLastFMCoverXML;         // Get XML-File from API
+                            GetBestCoverUrlFromXML;      // Get a Cover-URL from the XML-File
+                            DownloadBestCoverToStream;   // download the Cover from the URL
+
+                            Synchronize(SyncUpdateCover);  // after this: Cover is really ok
+                                                           // i.e. downloaded Data is valid Picture-data
+                            if fCurrentDownloadComplete then
                             begin
-                                // the job was already in the cache-list
-                                if not fInternetConnectionLost then
-                                begin
-                                    CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
-                                    CurrentCacheItem.lastChecked := Now;
-                                end;
+                                if assigned(CurrentCacheItem) then
+                                    fCacheList.Remove(CurrentCacheItem);
+                                SavePicStreamToFile;             // save downloaded picture to a file
+                                Synchronize(SyncUpdateMedialib); // update Medialibrary
                             end else
                             begin
-                                if not fInternetConnectionLost then
+                                // the current job was not completed
+                                if assigned(CurrentCacheItem) then
                                 begin
-                                    // create new cache entry
-                                    NewCacheItem := TCoverDownloadItem.Create;
-                                    NewCacheItem.Artist := fCurrentDownloadItem.Artist;
-                                    NewCacheItem.Album  := fCurrentDownloadItem.Album ;
-                                    NewCacheItem.Directory := fCurrentDownloadItem.Directory;
-                                    NewCacheItem.queryCount := 1;
-                                    NewCacheItem.lastChecked := Now;
-                                    fCacheList.Add(NewCacheItem);
+                                    // the job was already in the cache-list
+                                    if not fInternetConnectionLost then
+                                    begin
+                                        CurrentCacheItem.queryCount := CurrentCacheItem.queryCount + 1;
+                                        CurrentCacheItem.lastChecked := Now;
+                                    end;
+                                end else
+                                begin
+                                    if not fInternetConnectionLost then
+                                    begin
+                                        // create new cache entry
+                                        NewCacheItem := TCoverDownloadItem.Create;
+                                        NewCacheItem.Artist := fCurrentDownloadItem.Artist;
+                                        NewCacheItem.Album  := fCurrentDownloadItem.Album ;
+                                        NewCacheItem.Directory := fCurrentDownloadItem.Directory;
+                                        NewCacheItem.queryCount := 1;
+                                        NewCacheItem.lastChecked := Now;
+                                        fCacheList.Add(NewCacheItem);
+                                    end;
                                 end;
                             end;
-                        end;
-                    end else
-                        Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
+                        end else
+                            Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
+                    end;
                 end;
             end;
         end;
@@ -724,7 +737,8 @@ end;
 
 procedure TCoverDownloadWorkerThread.StartWorking;
 begin
-    ReleaseSemaphore(fSemaphore, 1, Nil);
+    //ReleaseSemaphore(fSemaphore, 1, Nil);
+    fEvent.SetEvent;
 end;
 
 {
@@ -792,7 +806,8 @@ begin
         fCurrentDownloadItem.Index       := fi.Index     ;
         fCurrentDownloadItem.QueryType   := fi.QueryType ;
         fJobList.Delete(0);
-    end;
+    end else
+        fEvent.ResetEvent;
 end;
 
 {
