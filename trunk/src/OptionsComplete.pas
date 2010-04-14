@@ -442,6 +442,7 @@ type
     CBChangeFontColoronBitrate: TCheckBox;
     cbHideNACover: TCheckBox;
     LblNACoverHint: TLabel;
+    CB_CoverSearch_LastFM: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1117,6 +1118,8 @@ begin
 
   EDTCoverSubDirName.Text    := MedienBib.CoverSearchSubDirName;
   EDTCoverSisterDirName.Text := MedienBib.CoverSearchSisterDirName;
+
+  CB_CoverSearch_LastFM.Checked := (MedienBib.CoverSearchLastFM = BoolTrue);
 
   cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
@@ -1979,6 +1982,21 @@ begin
   MedienBib.CoverSearchInParentDir := CB_CoverSearch_inParentDir.Checked;
   MedienBib.CoverSearchInSubDir    := CB_CoverSearch_inSubDir.Checked;
   MedienBib.CoverSearchInSisterDir := CB_CoverSearch_inSisterDir.Checked;
+  if CB_CoverSearch_LastFM.Checked then
+  begin
+      if MedienBib.CoverSearchLastFM <> BoolTrue then // i.e. false ore undefined
+      begin
+          MedienBib.CoverSearchLastFM  := BoolTrue;   // set it to true
+          MedienBib.NewCoverFlow.ClearTextures;
+      end;
+  end
+  else
+      if MedienBib.CoverSearchLastFM = BoolTrue then  // really true, if undef: it remains undef
+      begin
+          MedienBib.CoverSearchLastFM  := BoolFalse;
+          MedienBib.NewCoverFlow.ClearTextures;
+      end;
+
   MedienBib.CoverSearchSubDirName := EDTCoverSubDirName.Text ;
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
   MedienBib.HideNACover := cbHideNACover.Checked;

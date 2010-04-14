@@ -248,6 +248,11 @@ const
     MP3DB_VERSION: Byte = 4;        // Dateiformat seit 3.1
     MP3DB_SUBVERSION: Byte = 0;
 
+    // "Extended Boolean", used for "unset" settings
+    BoolUnDef = 0;
+    BoolTrue = 1;
+    BoolFalse = 2;
+
     //-------------
     // Zeug für die Anzeige:
     NEMP_NAME = 'Nemp'; // Bezeichnung der ini-Datei
@@ -334,7 +339,7 @@ const
 
     MB_ProgressRefresh = 11;
     MB_ProgressRefreshJustProgressbar = 30;
-    MB_SearchAutoAbort = 12;
+    //MB_SearchAutoAbort = 12;
     // Show search results. lParam contains a Pointer to the result-list
     MB_ShowSearchResults = 13;
     // Show Quicksearch-results

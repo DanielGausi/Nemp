@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAnzeige5
+    ActivePage = TabAnzeige4
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2054,7 +2054,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 199
         Width = 434
-        Height = 116
+        Height = 137
         Hint = 'Specify, where Nemp should look for cover images.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Search covers in ...'
@@ -2108,7 +2108,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = CB_CoverSearch_inSisterDirClick
         end
         object EDTCoverSubDirName: TEdit
-          Left = 26
+          Left = 24
           Top = 72
           Width = 105
           Height = 21
@@ -2122,6 +2122,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           TabOrder = 5
           Text = 'cover'
+        end
+        object CB_CoverSearch_LastFM: TCheckBox
+          Left = 13
+          Top = 106
+          Width = 404
+          Height = 17
+          Hint = 'Allow Nemp downloading missing cover files from the internet'
+          Caption = 'Try to get missing covers from LastFM'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 6
         end
       end
     end

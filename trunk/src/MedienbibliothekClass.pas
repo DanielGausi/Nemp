@@ -365,6 +365,8 @@ type
         CoverSearchInSisterDir: Boolean;
         CoverSearchSubDirName: UnicodeString;
         CoverSearchSisterDirName: UnicodeString;
+        CoverSearchLastFM: Integer;
+        CoverSearchLastFMInit: Boolean;  // used for the first "do you want this"-message on first start
         HideNACover: Boolean;
         // Einstellungen für Standard-Cover
         // Eines für alle. Ist eins nicht da: Fallback auf Default
@@ -1009,8 +1011,10 @@ begin
         CoverSearchInParentDir   := ini.ReadBool('MedienBib','CoverSearchInParentDir', True);
         CoverSearchInSubDir      := ini.ReadBool('MedienBib','CoverSearchInSubDir', True);
         CoverSearchInSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
-        CoverSearchSubDirName    := (ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover'));
-        CoverSearchSisterDirName := (ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover'));
+        CoverSearchSubDirName    := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
+        CoverSearchSisterDirName := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
+        CoverSearchLastFM        := ini.ReadInteger('MedienBib', 'CoverSearchLastFM', BoolUnDef);
+        CoverSearchLastFMInit    := True;
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
         //UseNempDefaultCover      := Ini.ReadBool('MedienBib', 'UseNempDefaultCover', True);
@@ -1114,6 +1118,7 @@ begin
         ini.Writebool('MedienBib', 'CoverSearchInSisterDir', CoverSearchInSisterDir);
         ini.WriteString('MedienBib', 'CoverSearchSubDirName', (CoverSearchSubDirName));
         ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (CoverSearchSisterDirName));
+        ini.WriteInteger('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
         //Ini.WriteBool('MedienBib', 'PersonalizeMainCover', PersonalizeMainCover);
@@ -2793,23 +2798,46 @@ function TMedienBibliothek.InitCoverFromFilename(aFileName: UnicodeString): Stri
 var aGraphic: TPicture;
     newID: String;
 begin
-  newID := MD5DigestToStr(MD5File(aFileName));
+    try
+        newID := MD5DigestToStr(MD5File(aFileName));
+    except
+        newID := ''
+    end;
+
+    if newID = '' then
+    begin
+        // somethin was wrong with opening the file ...
+        // I've got sometimes Exceptions "cannot access file..." with fresh downloaded files from LastFM
+        // maybe conflicts with an antivirus-scanner??
+        // so, try again.
+        sleep(100);
+        try
+            newID := MD5DigestToStr(MD5File(aFileName));
+        except
+            newID := ''
+        end;
+    end;
+
   result := '';
-  aGraphic := TPicture.Create;
-  try
+
+  if newID <> '' then
+  begin
+      aGraphic := TPicture.Create;
       try
-          aGraphic.LoadFromFile(aFilename);
+          try
+              aGraphic.LoadFromFile(aFilename);
 
-          if SafeResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
-              result := newID;
-      except
-          // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
-          // => silent exception, as this is done during the search for new files.
-          // wuppdi;
+              if SafeResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
+                  result := newID;
+          except
+              // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
+              // => silent exception, as this is done during the search for new files.
+              // wuppdi;
+          end;
+
+      finally
+          aGraphic.Free;
       end;
-
-  finally
-      aGraphic.Free;
   end;
 end;
 {

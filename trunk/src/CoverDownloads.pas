@@ -953,8 +953,8 @@ begin
         finally
             afList.Free;
         end;
-    end else
-        Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
+    end;// else
+        //Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
 end;
 
 end.

@@ -168,11 +168,12 @@ Error_ID3EditDenied = 'Edit of ID3-Tags denied. You can allow this by Preference
 // automatisch übersetzt werden!!!
 CoverFlowText_VariousArtists    = 'Various artists';
 CoverFlowText_UnkownCompilation = 'Unknown compilation';
-CoverFlowText_NoCover           = 'Albums without cover';
+//CoverFlowText_NoCover           = 'Albums without cover';
 CoverFlowText_AllArtists        = 'All artists';
 CoverFlowText_WholeLibrary      = 'Your media-library';
+CoverFlowLastFM_Confirmation    = 'Nemp can download missing covers using a webservice from LastFM. Is this ok for you?';
 
-    Warning_No_PNG = 'PNG-Images are not supported.';
+    //Warning_No_PNG = 'PNG-Images are not supported.';
 
 MediaKeys_Status_Standard = 'Windows standard';
 MediaKeys_Status_Hook     = 'Mediakeys are hooked by Nemp';
@@ -282,7 +283,7 @@ BadError_Play2 = 'An error occured while initializing the player. This should no
     Hint_RandomPlaylist_NotEnoughTitlesFound =
        'Only %d titles found with these settings. Take these files as new playlist?';
 
-RemoteNemp_NempServerFound  = 'Nemp server found at %s.';
+{RemoteNemp_NempServerFound  = 'Nemp server found at %s.';
 RemoteNemp_StatusOnline     = 'Status: Online';
 RemoteNemp_StatusOffline    = 'Status: Offline';
 RemoteNemp_ActivateServer   = 'Activate server';
@@ -303,6 +304,7 @@ NempRemote_DownloadDenied   = 'Download denied.';
 NempRemote_DownloadDeniedMediaLib = 'Download denied. The queried file can not be found in the media library. You evil hack0r!';
 NempRemote_DownloadDFailedFileNotFound = 'Download failed. The queried file %s can not be found on the remote system.';
 NempRemote_DownloadFailedAccessError = 'Download failed. The queried file %s can not be opened by the remote system.';
+}
 
 WebServer_StatusOnline     = 'Status: Online';
 WebServer_StatusOffline    = 'Status: Offline';
@@ -492,7 +494,7 @@ MediaLibrary_RefreshingFiles         = 'Refreshing file information (%d%%)';
 MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
 MediaLibrary_SearchingNewFiles       = '(%d) Searching %s';
 MediaLibrary_StartSearchingNewFiles  = 'Start searching...';
-MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
+// MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
 MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
 MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
 MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your medialibrary. This is not supposed to happen. If this message appears frequently feel free to contact me via e-mail. Thank you!';

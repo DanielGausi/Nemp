@@ -388,12 +388,12 @@ function MD5File(const FileName: String): TMD5Digest;
 var
  F: TFileStream;
 begin
- F:=TFileStream.Create(FileName, fmOpenRead);
- try
-  Result:=MD5Stream(F);
- finally
-  F.Free;
- end;
+      F := TFileStream.Create(FileName, fmOpenRead);
+      try
+          Result := MD5Stream(F);
+      finally
+          F.Free;
+      end;
 end;
 
 function MD5Stream(const Stream: TStream): TMD5Digest;
