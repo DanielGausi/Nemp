@@ -103,6 +103,9 @@ type
             // we need to correct the CoverList-Pointer
             procedure SetNewList(aList: TObjectList);
 
+            // Clear Textures and force redrawing
+            procedure ClearTextures;
+
             // Setpreview is only needed by FlyingCow.
             // In ClassicMode this will do nothing
             procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
@@ -243,6 +246,7 @@ begin
     end;
 end;
 
+
 constructor TNempCoverFlow.Create;
 begin
   inherited;
@@ -358,6 +362,21 @@ begin
     end;
     FindCurrentItemAgain;
 end;
+
+procedure TNempCoverFlow.ClearTextures;
+begin
+    case fMode of
+        cm_Classic : ; // nothing to do here
+        cm_OpenGL  : begin
+              fFlyingCow.BeginUpdate;
+              fFlyingCow.Cleartextures;
+              fFlyingCow.EndUpdate;
+              fFlyingCow.DoSomeDrawing(10);
+        end;
+    end;
+
+end;
+
 
 procedure TNempCoverFlow.SetPreview(index, width, height: Integer;
   pixels: PByteArray);

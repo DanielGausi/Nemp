@@ -2519,9 +2519,20 @@ begin
           success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
-          if not success then
-              Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
+          if (MedienBib.CoverSearchLastFM = BoolUnDef)
+              and MedienBib.CoverSearchLastFMInit
+          then
+          begin
+              MedienBib.CoverSearchLastFMInit := False;
+              if MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes then
+                  MedienBib.CoverSearchLastFM := BoolTrue
+              else
+                  MedienBib.CoverSearchLastFM := BoolFalse;
+              Medienbib.NewCoverFlow.ClearTextures;
+          end;
 
+          if (not success) and (MedienBib.CoverSearchLastFM = BoolTrue) then
+              Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
       end;
   finally
       bmp.free;
