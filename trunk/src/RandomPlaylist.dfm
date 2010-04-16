@@ -1,11 +1,11 @@
 object RandomPlaylistForm: TRandomPlaylistForm
   Left = 861
   Top = 45
-  BorderStyle = bsSingle
   Caption = 'Create random playlist'
-  ClientHeight = 497
-  ClientWidth = 506
+  ClientHeight = 554
+  ClientWidth = 504
   Color = clBtnFace
+  Constraints.MinWidth = 520
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -15,9 +15,11 @@ object RandomPlaylistForm: TRandomPlaylistForm
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnShow = FormShow
   DesignSize = (
-    506
-    497)
+    504
+    554)
   PixelsPerInch = 96
   TextHeight = 13
   object GrpBox_Date: TGroupBox
@@ -82,13 +84,16 @@ object RandomPlaylistForm: TRandomPlaylistForm
   object GrpBox_Genre: TGroupBox
     Left = 8
     Top = 191
-    Width = 489
-    Height = 266
+    Width = 492
+    Height = 324
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Genres'
     TabOrder = 2
+    ExplicitWidth = 489
+    ExplicitHeight = 266
     DesignSize = (
-      489
-      266)
+      492
+      324)
     object LblConst_Preselection: TLabel
       Left = 200
       Top = 22
@@ -98,8 +103,8 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Caption = 'Preselection'
     end
     object cbIgnoreGenres: TCheckBox
-      Left = 8
-      Top = 22
+      Left = 232
+      Top = 73
       Width = 97
       Height = 17
       Caption = 'Ignore'
@@ -112,10 +117,10 @@ object RandomPlaylistForm: TRandomPlaylistForm
     end
     object cbGenres: TCheckListBox
       Left = 8
-      Top = 48
-      Width = 473
-      Height = 265
-      Anchors = [akLeft, akTop, akRight]
+      Top = 96
+      Width = 476
+      Height = 217
+      Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 4
       Enabled = False
       ItemHeight = 13
@@ -137,9 +142,33 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 145
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
+      ItemHeight = 13
       TabOrder = 1
       OnChange = cb_PreselectionChange
+    end
+    object cbTagCountSelection: TComboBox
+      Left = 16
+      Top = 45
+      Width = 145
+      Height = 21
+      Style = csDropDownList
+      ItemHeight = 13
+      ItemIndex = 5
+      TabOrder = 4
+      Text = '150'
+      OnChange = cbTagCountSelectionChange
+      Items.Strings = (
+        '10'
+        '25'
+        '50'
+        '75'
+        '100'
+        '150'
+        '200'
+        '250'
+        '300'
+        '400'
+        '500')
     end
   end
   object GrpBox_General: TGroupBox
@@ -190,8 +219,8 @@ object RandomPlaylistForm: TRandomPlaylistForm
     end
   end
   object Btn_Ok: TButton
-    Left = 331
-    Top = 464
+    Left = 329
+    Top = 521
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -199,10 +228,12 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Default = True
     TabOrder = 3
     OnClick = Btn_OkClick
+    ExplicitLeft = 331
+    ExplicitTop = 464
   end
   object Btn_Cancel: TButton
-    Left = 415
-    Top = 464
+    Left = 413
+    Top = 521
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -210,13 +241,16 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 4
+    ExplicitLeft = 415
+    ExplicitTop = 464
   end
   object CBInsertMode: TComboBox
-    Left = 104
-    Top = 466
+    Left = 8
+    Top = 521
     Width = 217
     Height = 21
     Style = csDropDownList
+    Anchors = [akLeft, akBottom]
     ItemHeight = 13
     ItemIndex = 1
     TabOrder = 5
@@ -226,6 +260,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
       'Play (and delete playlist)'
       'Insert after current position'
       'Insert after current position and play')
+    ExplicitTop = 477
   end
   object GrpBox_Rating: TGroupBox
     Left = 312
