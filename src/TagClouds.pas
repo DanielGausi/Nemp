@@ -298,6 +298,8 @@ type
           // Build a Tag-Cloud for the AudioFiles given in Source
           procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 
+          procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TObjectList; Target: TObjectList);
+
           // Show the Tags in the Cloud
           procedure ShowTags;
 
@@ -305,7 +307,6 @@ type
           // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
           procedure BackUpNavigation;
           procedure RestoreNavigation(aList: TObjectList);
-
 
           procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
@@ -380,6 +381,8 @@ function Sort_Name(item1,item2:pointer):integer;
 function Sort_Count_DESC(item1,item2:pointer):integer;
 function Sort_Name_DESC(item1,item2:pointer):integer;
 
+function Sort_TotalCount(item1,item2:pointer):integer;
+
 var
     TagCustomizer: TTagCustomizer;
 
@@ -429,6 +432,12 @@ begin
     end;
 end;
 
+function Sort_TotalCount(item1,item2:pointer):integer;
+begin
+    result := CompareValue(TTag(item2).TotalCount ,TTag(item1).TotalCount);
+    if result = 0 then
+        result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
+end;
 
 
 { TTagCloud }
@@ -860,6 +869,8 @@ begin
     end else
         result := GetDefaultTag;
 end;
+
+
 function TTagCloud.GetBottomTag: TPaintTag;
 var bLine: TTagLine;
     oMax, oCurrent, i: Integer;
@@ -934,6 +945,44 @@ begin
            or ((aTag.BreadCrumbIndex < High(Integer)) and (aTag <> ClearTag))
         then
             Target.Add(Tags[i]);
+    end;
+end;
+
+{
+    --------------------------------------------------------
+    GetTopTags
+    - Parameters:
+      ResultCount: maximum count of returned tags
+      Offset: Minimum count a tag needs to be considered at all
+      Source: the complete List of the Library
+      Target: the Targetlist for the top tags
+    Get the global to tags. Used e.g. for the random-playlist-form
+    --------------------------------------------------------
+}
+procedure TTagCloud.GetTopTags(ResultCount: Integer; Offset: Integer;
+    BibSource: TObjectList; Target: TObjectList);
+var tmpList: TObjectList;
+    i: Integer;
+begin
+    tmpList := TObjectList.Create(False);
+    try
+        // copy all tags to temporary list
+        for i := 0 to Tags.Count - 1 do
+            if TTag(Tags[i]).TotalCount >= Offset then
+                tmpList.Add(Tags[i]);
+        // sort list by totalcount
+        tmplist.Sort(Sort_TotalCount);
+        // ensure maxcount entries in the list
+        if ResultCount > tmpList.Count - 1 then
+            ResultCount := tmpList.Count - 1;
+        // add maxCount entries to the target list
+        Target.Clear;
+        for i := 0 to ResultCount do
+            Target.Add(tmpList[i]);
+        // sort target list by name
+        Target.Sort(Sort_Name);
+    finally
+        tmpList.Free;
     end;
 end;
 
@@ -1042,6 +1091,14 @@ begin
 
     finally
 
+    end;
+
+    if FromScratch then
+    begin
+        // we started a new Cloud, so: Count = TotalCount
+        // this is used when we need the top tags, e.g.
+        for i := 0 to Tags.Count - 1 do
+            TTag(Tags[i]).TotalCount := TTag(Tags[i]).Count;
     end;
 end;
 

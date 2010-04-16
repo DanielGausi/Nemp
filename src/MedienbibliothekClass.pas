@@ -501,6 +501,7 @@ type
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList;       // -"- of CoverLists
         procedure ReBuildTagCloud;        // -"- of the TagCloud
+        procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList);
         procedure RestoreTagCloudNavigation;
         procedure RepairBrowseListsAfterDelete; // Rebuild, but sorting is not needed
         procedure RepairBrowseListsAfterChange; // Another Repair-method :?
@@ -3137,6 +3138,11 @@ end;
 procedure TMedienBibliothek.RestoreTagCloudNavigation;
 begin
     TagCloud.RestoreNavigation(Mp3ListeArtistSort);
+end;
+
+procedure TMedienBibliothek.GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList);
+begin
+    TagCloud.GetTopTags(ResultCount, Offset, Mp3ListeArtistSort, Target);
 end;
 
 

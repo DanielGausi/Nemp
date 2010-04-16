@@ -45,7 +45,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs,
-  Menus,   Hilfsfunktionen,
+  Menus,   Hilfsfunktionen, AudioFileClass,
   MP3FileUtils, Nemp_ConstantsAndTypes,
   gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls;
 
@@ -89,6 +89,7 @@ type
     SE_MaxLength: TSpinEdit;
     LblMinLength: TLabel;
     LblMaxLength: TLabel;
+    cbTagCountSelection: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure cbIgnoreYearClick(Sender: TObject);
     procedure cbIgnoreGenresClick(Sender: TObject);
@@ -107,6 +108,9 @@ type
     procedure CBMaxLengthClick(Sender: TObject);
     procedure SE_MinLengthChange(Sender: TObject);
     procedure SE_MaxLengthChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure cbTagCountSelectionChange(Sender: TObject);
   private
     { Private-Deklarationen }
     GenreSettings: Array [0..9] of TGenreSetting;
@@ -114,6 +118,11 @@ type
 
     ActualRating: Integer;
     RandomRatingHelper : TRatingHelper;
+
+    LocalTopTags: TObjectList;
+
+    procedure RefillTagList;
+
 
   public
     { Public-Deklarationen }
@@ -145,7 +154,7 @@ implementation
 
 {$R *.dfm}
 
-Uses NempMainUnit;
+Uses NempMainUnit, TagClouds;
 
 Constructor TGenreSetting.Create;
 var i: Integer;
@@ -175,9 +184,10 @@ begin
   TranslateComponent (self);
   RestoreComboboxes;
   cbGenres.Items.Clear;
-  cbGenres.Items := Genres;
+  // cbGenres.Items := Genres;
 
   RandomRatingHelper := TRatingHelper.Create;
+  LocalTopTags := TObjectList.Create(False);
   s := TBitmap.Create;
   h := TBitmap.Create;
   u := TBitmap.Create;
@@ -296,6 +306,40 @@ begin
     GenreSettings[i].Free;
 
   RandomRatingHelper.Free;
+  LocalTopTags.Free;
+end;
+
+procedure TRandomPlaylistForm.FormResize(Sender: TObject);
+begin
+    cbGenres.Columns := Width Div 130;
+end;
+
+procedure TRandomPlaylistForm.RefillTagList;
+var i: Integer;
+begin
+    cbGenres.Clear;
+    LocalTopTags.Clear;
+    MedienBib.GetTopTags(StrToIntDef(cbTagCountSelection.Text, 150), 10, LocalTopTags);
+
+    for i := 0 to LocalTopTags.Count - 1 do
+    begin
+        cbGenres.AddItem( TTag(LocalTopTags[i]).key + ' (' + IntToStr(TTag(LocalTopTags[i]).TotalCount)+')',
+                          TTag(LocalTopTags[i]) );
+    end;
+
+    // todo:
+    // - checked items wieder herstellen
+    // - eigene Tags durch komma-getrennte Liste hinzufügen?
+    sdsd
+
+end;
+
+procedure TRandomPlaylistForm.FormShow(Sender: TObject);
+begin
+    if MedienBib.BrowseMode <> 2 then
+        MedienBib.ReBuildTagCloud;
+
+    RefillTagList;
 end;
 
 procedure TRandomPlaylistForm.cbIgnoreYearClick(Sender: TObject);
@@ -502,6 +546,11 @@ begin
   end;
 end;
 
+procedure TRandomPlaylistForm.cbTagCountSelectionChange(Sender: TObject);
+begin
+    RefillTagList;
+end;
+
 procedure TRandomPlaylistForm.cb_PreselectionChange(Sender: TObject);
 var i, idx: Integer;
 begin
@@ -518,6 +567,7 @@ begin
       if (Components[i] is TComboBox) then
         Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
 end;
+
 
 procedure TRandomPlaylistForm.RestoreComboboxes;
 var i: Integer;

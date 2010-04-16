@@ -61,6 +61,8 @@ type
           fBreadCrumbIndex: Integer;
           fIsAutoTag: Boolean;
 
+          fTotalCount: Integer; // the total count of this Tag. (= Count in initial cloud)
+
           function GetCount: Integer;
       public
           // Stores all AudioFiles with this Tag.
@@ -69,6 +71,7 @@ type
           property count: Integer read GetCount;
           property Key: UTF8String read fKey;
           property IsAutoTag: Boolean read fIsAutoTag write fIsAutoTag;
+          property TotalCount: Integer read fTotalCount write fTotalCount;
 
           property BreadCrumbIndex: Integer read fBreadCrumbIndex write fBreadCrumbIndex;
           constructor Create(aKey: UTF8String);
