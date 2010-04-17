@@ -118,7 +118,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     object cbIgnoreGenres: TCheckBox
       Left = 16
       Top = 20
-      Width = 68
+      Width = 104
       Height = 17
       Caption = 'Ignore'
       Checked = True
@@ -129,9 +129,9 @@ object RandomPlaylistForm: TRandomPlaylistForm
       OnClick = cbIgnoreGenresClick
     end
     object cbGenres: TCheckListBox
-      Left = 144
+      Left = 132
       Top = 20
-      Width = 336
+      Width = 348
       Height = 293
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 4
@@ -141,9 +141,9 @@ object RandomPlaylistForm: TRandomPlaylistForm
       TabOrder = 2
     end
     object Btn_Save: TButton
-      Left = 61
+      Left = 54
       Top = 205
-      Width = 65
+      Width = 70
       Height = 21
       Caption = 'Save'
       TabOrder = 3
@@ -152,7 +152,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     object cb_Preselection: TComboBox
       Left = 16
       Top = 178
-      Width = 110
+      Width = 108
       Height = 21
       Style = csDropDownList
       ItemHeight = 13
