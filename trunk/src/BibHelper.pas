@@ -65,11 +65,14 @@ Const SO_Pfad = 0;
 
 
     TPlaylistFillOptions = record
-      SkipGenreCheck: boolean;
+      // SkipGenreCheck: boolean;
       // Sortierte Version von "Genres" aus mp3fileUtils.
       // Wird von der Checklistbox übernommen
-      GenreStrings: TStrings;
-      GenreChecked: Array of boolean;
+      // GenreStrings: TStrings;
+      // GenreChecked: Array of boolean;
+      SkipTagCheck: boolean;
+      WantedTags: TObjectList;
+      MinTagMatchCount: Integer;   // <= WantedTags.Count
       SkipYearCheck: Boolean;
       MinYear: Word;
       MaxYear: Word;
