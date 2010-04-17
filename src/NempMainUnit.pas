@@ -1273,6 +1273,12 @@ type
     procedure MemBibTagsExit(Sender: TObject);
     procedure MemoDisableTimerTimer(Sender: TObject);
 
+    procedure NewPlayerPanelClick(Sender: TObject);
+    procedure NewPlayerPanelMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure NewPlayerPanelMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+
   private
 
     MediaTest: Boolean;
@@ -3661,6 +3667,30 @@ begin
   FreeAndNil(DateiListe);
 end;
 
+procedure TNemp_MainForm.PM_ML_PlayClick(Sender: TObject);
+var DateiListe: TObjectList;
+begin
+  DateiListe := TObjectList.Create(False);
+  WebRadioInsertMode := PLAYER_PLAY_FILES;
+  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag);
+  if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
+           AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
+          ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
+  begin
+      if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
+      begin
+        if MessageDlg((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+              HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
+      end
+      else
+        HandleFiles(Dateiliste, PLAYER_PLAY_FILES);
+
+      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+  end;
+  FreeAndNil(Dateiliste);
+end;
+
+
 procedure TNemp_MainForm.PM_ML_PlayNextClick(Sender: TObject);
 var DateiListe: TObjectList;
 begin
@@ -3729,28 +3759,6 @@ begin
 
 end;      }
 
-procedure TNemp_MainForm.PM_ML_PlayClick(Sender: TObject);
-var DateiListe: TObjectList;
-begin
-  DateiListe := TObjectList.Create(False);
-  WebRadioInsertMode := PLAYER_PLAY_FILES;
-  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag);
-  if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
-           AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
-          ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
-  begin
-      if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
-      begin
-        if MessageDlg((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
-              HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
-      end
-      else
-        HandleFiles(Dateiliste, PLAYER_PLAY_FILES);
-
-      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-  end;
-  FreeAndNil(Dateiliste);
-end;
 
 procedure TNemp_MainForm.Medialist_PopupMenuPopup(Sender: TObject);
 var o: TComponent;
@@ -10167,6 +10175,26 @@ begin
   aPanel.Canvas.RoundRect(0,0, aPanel.Width-0, aPanel.Height-0, 6, 6);
 end;
 
+
+procedure TNemp_MainForm.NewPlayerPanelClick(Sender: TObject);
+begin
+    FocusControl(VolButton);
+end;
+
+
+procedure TNemp_MainForm.NewPlayerPanelMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    NempPlayer.Volume := NempPlayer.Volume - 1;
+    CorrectVolButton;
+end;
+
+procedure TNemp_MainForm.NewPlayerPanelMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    NempPlayer.Volume := NempPlayer.Volume + 1;
+    CorrectVolButton;
+end;
 
 procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
 begin

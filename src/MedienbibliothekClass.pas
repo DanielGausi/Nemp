@@ -264,9 +264,10 @@ type
 
         // Helper for "FillRandomList"
         function CheckYearRange(Year: UnicodeString): Boolean;
-        function CheckGenrePL(Genre: UnicodeString): Boolean;
+        //function CheckGenrePL(Genre: UnicodeString): Boolean;
         function CheckRating(aRating: Byte): Boolean;
         function CheckLength(aLength: Integer): Boolean;
+        function CheckTags(aTagList: TObjectList): Boolean;
 
         // Synch a List of TDrives with the current situation on the PC
         // i.e. Search the Drive-IDs in the system and adjust the drive-letters
@@ -3759,23 +3760,25 @@ end;
     CheckGenrePL
     CheckYearRange
     CheckRating
+    CheckLength
+    CheckTags
     - Helper for FillRandomList
     --------------------------------------------------------
 }
-function TMedienBibliothek.CheckGenrePL(Genre: UnicodeString): Boolean;
-var GenreIDX: Integer;
-begin
-  if PlaylistFillOptions.SkipGenreCheck then
-    result := true
-  else
-  begin
-    GenreIDX := PlaylistFillOptions.GenreStrings.IndexOf(Genre);
-    if GenreIDX > -1 then
-      result := PlaylistFillOptions.GenreChecked[GenreIDX]
-    else
-      result := False; //PlaylistFillOptions.IncludeNAGenres; // Unbekannte genres auch aufzählen
-  end;
-end;
+//function TMedienBibliothek.CheckGenrePL(Genre: UnicodeString): Boolean;
+//var GenreIDX: Integer;
+//begin
+  //if PlaylistFillOptions.SkipGenreCheck then
+  //  result := true
+  //else
+  //begin
+  //  GenreIDX := PlaylistFillOptions.GenreStrings.IndexOf(Genre);
+  //  if GenreIDX > -1 then
+  //    result := PlaylistFillOptions.GenreChecked[GenreIDX]
+  //  else
+  //    result := False; //PlaylistFillOptions.IncludeNAGenres; // Unbekannte genres auch aufzählen
+  //end;
+//end;
 
 function TMedienBibliothek.CheckYearRange(Year: UnicodeString): Boolean;
 var intYear: Integer;
@@ -3809,7 +3812,22 @@ begin
             AND
              ((Not PlaylistFillOptions.UseMaxLength) or (aLength <= PlaylistFillOptions.MaxLength))
 end;
-
+function TMedienBibliothek.CheckTags(aTagList: TObjectList): Boolean;
+var i, c: Integer;
+begin
+    if PlaylistFillOptions.SkipTagCheck or (not assigned(PlaylistFillOptions.WantedTags)) then
+        result := true
+    else
+    begin
+        c := 0;
+        for i := 0 to PlaylistFillOptions.WantedTags.Count - 1 do
+        begin
+            if aTagList.IndexOf(PlaylistFillOptions.WantedTags[i]) >= 0 then
+                inc(c);
+        end;
+        result := c >= PlaylistFillOptions.MinTagMatchCount;
+    end;
+end;
 
 {
     --------------------------------------------------------
@@ -3833,9 +3851,10 @@ begin
   begin
     aAudioFile := SourceList[i] as TAudioFile;
     if CheckYearRange(aAudioFile.Year)
-        and CheckGenrePL(aAudioFile.Genre)
+        //and CheckGenrePL(aAudioFile.Genre)
         and CheckRating(aAudioFile.Rating)
         and CheckLength(aAudioFile.Duration)
+        and CheckTags(aAudioFile.Taglist)
         then
       aList.Add(aAudioFile);
   end;
