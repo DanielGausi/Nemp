@@ -4171,11 +4171,20 @@ begin
 
     if (vsDisabled in Node.States) then
     begin
-
-    if VST.Header.Columns[column].Position = 0 then
-        Celltext := MainForm_MoreSearchresults
-    else
-        CellText := '';
+        //if (MedienBib.AnzeigeListe.Count = 0) and (MedienBib.AnzeigeListe2.Count = 0) then
+        //begin
+            Data:=Sender.GetNodeData(Node);
+            if VST.Header.Columns[column].Position = 0 then
+                Celltext := Data^.FAudioFile.Titel
+            else
+                CellText := '';
+        //end else
+        //begin
+        //    if VST.Header.Columns[column].Position = 0 then
+        //        Celltext := MainForm_MoreSearchresults
+        //    else
+        //        CellText := '';
+        //end;
     end else
     begin
 
@@ -4508,9 +4517,15 @@ end;
 
 procedure TNemp_MainForm.VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
   Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
+var data: PTreeData;
 begin
-  if (MedienBib.AnzeigeListe.Count > 0) and (Node.Index = MedienBib.AnzeigeListe.Count) then
-    InitialStates:= [ivsDisabled];
+    data := VST.GetNodeData(Node);
+    if (data^.FAudioFile = MedienBib.BibSearcher.DummyAudioFile) {or (not assigned(data^.FAudioFile))} then
+        InitialStates := [ivsDisabled];
+//  if (MedienBib.AnzeigeListe.Count > 0) and (Node.Index = MedienBib.AnzeigeListe.Count) then
+//      InitialStates:= [ivsDisabled];
+//  if (MedienBib.AnzeigeListe.Count = 0) and (MedienBib.AnzeigeListe2.Count = 0) then
+//      InitialStates:= [ivsDisabled];
 end;
 
 procedure TNemp_MainForm.VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
@@ -8877,7 +8892,6 @@ end;
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
 begin
   case ord(key) of
-
       VK_RETURN:
           begin
             key := #0;
@@ -8889,21 +8903,16 @@ begin
                 //else
                     MedienBib.ShowQuickSearchList;
             end
+            else
+                DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
           end;
       VK_ESCAPE:
           begin
               key := #0;
               EDITFastSearch.Text := '';
           end
-
-  else
-      DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
-
   end;
 end;
-
-
-
 
 
 procedure TNemp_MainForm.EDITFastSearchChange(Sender: TObject);
@@ -8919,7 +8928,14 @@ begin
               MedienBib.ShowQuickSearchList;
       end else
           if Length(Trim(EDITFastSearch.Text)) >= 2 then
-              DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
+              DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType)
+          else
+          begin
+              //MedienBib.AnzeigeListe.Clear;
+              //MedienBib.AnzeigeListe2.Clear;
+              MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
+              FillTreeViewQueryTooShort(MedienBib.BibSearcher.DummyAudioFile);
+          end;
   end;
   // Sonst nichts machen.
 end;

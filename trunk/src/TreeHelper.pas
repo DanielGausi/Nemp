@@ -136,9 +136,11 @@ function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFi
 var Data: PTreeData;
 begin
   Result:= AVST.AddChild(aNode); // meistens wohl Nil
-  AVST.ValidateNode(Result,false); // ?? was macht das??
+
   Data:=AVST.GetNodeData(Result);
   Data^.FAudioFile:=aAudioFile;
+
+  AVST.ValidateNode(Result,false); // validate at the end, as we check FAudioFile on InitNode
 end;
 
 
