@@ -1121,6 +1121,12 @@ begin
             end;
       end;
   end;
+  if (QuickSearchResults.Count = 0) and (QuickSearchAdditionalResults.Count = 0) then
+      fDummyAudioFile.Titel := MainForm_NoSearchresults
+  else
+      fDummyAudioFile.Titel := MainForm_MoreSearchresults;
+
+
   // Copy SearchResults to VCL-Lists
   SendMessage(MainWindowHandle, WM_MedienBib, MB_GetQuickSearchResults, lParam(QuickSearchResults));
   SendMessage(MainWindowHandle, WM_MedienBib, MB_GetAdditionalQuickSearchResults, lParam(QuickSearchAdditionalResults));

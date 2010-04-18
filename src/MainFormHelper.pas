@@ -71,6 +71,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     // Fills the TreeView with 2 Lists (used for Quicksearch)
     procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
 
+    procedure FillTreeViewQueryTooShort(Dummy: TAudioFile);
+
     // Fills the TreeView with 2 Lists and re-select previous selected one
     procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
 
@@ -450,11 +452,27 @@ begin
         for i:=0 to List1.Count-1 do
             AddVSTMp3(VST,Nil,TAudioFile(List1.Items[i]));
 
-        if (List1.Count > 0) and (List2.Count > 0) then
+        if ((List1.Count > 0) and (List2.Count > 0))
+            or ((List1.Count = 0) and (List2.Count = 0))
+        then
             AddVSTMp3(VST, NIL, Dummy);
 
         for i:=0 to List2.Count-1 do
             AddVSTMp3(VST,Nil,TAudioFile(List2.Items[i]));
+
+        VST.EndUpdate;
+        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+    end;
+end;
+
+procedure FillTreeViewQueryTooShort(Dummy: TAudioFile);
+begin
+    with Nemp_MainForm do
+    begin
+        VST.BeginUpdate;
+        VST.Clear;
+
+        AddVSTMp3(VST, NIL, Dummy);
 
         VST.EndUpdate;
         AktualisiereDetailForm(NIL, SD_MEDIENBIB);

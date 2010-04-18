@@ -402,6 +402,8 @@ MainForm_NoSearchHistory = 'Previous searchs';
 MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
 MainForm_LocalQuickSearch     = 'Quicksearch (current list)';
 MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
+MainForm_NoSearchresults    = 'Nothing found. Try another search.';
+MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 chars.';
 
 MainForm_BtnEqualizerPresetsSelect = 'Select';
 MainForm_BtnEqualizerPresetsCustom = 'Custom';
