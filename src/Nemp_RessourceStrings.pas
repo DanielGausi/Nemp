@@ -172,6 +172,12 @@ CoverFlowText_UnkownCompilation = 'Unknown compilation';
 CoverFlowText_AllArtists        = 'All artists';
 CoverFlowText_WholeLibrary      = 'Your media-library';
 CoverFlowLastFM_Confirmation    = 'Nemp can download missing covers using a webservice from LastFM. Is this ok for you?';
+CoverFlowLastFM_HintConnectError = 'Downloading a cover from LastFM failed.' +#13#10 + 'There is a problem with your internet connection.';
+CoverFlowLastFM_HintFail         = 'Downloading a cover from LastFM failed.' +#13#10 + 'No proper cover found.';
+CoverFlowLastFM_HintOK           = 'This cover was just downloaded from LastFM.';
+CoverFlowLastFM_HintCache        = 'Downloading a cover from LastFM cancelled.' + #13#10 + 'This cover was not found a short time ago.' + #13#10  + 'You can clear the cover-cache to retry.';
+CoverFlowLastFM_HintInvalid      = 'Downloading a cover from LastFM cancelled.' + #13#10 + 'No proper album information found.' + #13#10 + 'Try to update the ID3-Tags.';
+
 
     //Warning_No_PNG = 'PNG-Images are not supported.';
 

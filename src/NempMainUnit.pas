@@ -2307,7 +2307,8 @@ begin
   ActualizeVDTCover;
   ReTranslateNemp(GetCurrentLanguage);
   Spectrum.DrawClear;
-  ReInitPlayerVCL;
+  if NempPlayer.MainStream = 0 then
+      ReInitPlayerVCL; // otherwise it has been done in player.play
   ReArrangeToolImages;
 
   if NempSkin.isActive then
@@ -2525,17 +2526,8 @@ begin
           success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
-          if (MedienBib.CoverSearchLastFM = BoolUnDef)
-              and MedienBib.CoverSearchLastFMInit
-          then
-          begin
-              MedienBib.CoverSearchLastFMInit := False;
-              if MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes then
-                  MedienBib.CoverSearchLastFM := BoolTrue
-              else
-                  MedienBib.CoverSearchLastFM := BoolFalse;
-              Medienbib.NewCoverFlow.ClearTextures;
-          end;
+          if (not success) then
+              CheckAndDoCoverDownloaderQuery;
 
           if (not success) and (MedienBib.CoverSearchLastFM = BoolTrue) then
               Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
@@ -4845,11 +4837,11 @@ begin
       Coverbmp.Height := 250;
 
       // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-      if GetCover(aAudioFile, Coverbmp) then
-      begin
+      GetCover(aAudioFile, Coverbmp);
+      //begin
           ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
           ImgDetailCover.Refresh;
-      end;
+      //end;
   finally
       Coverbmp.Free;
   end;
@@ -6669,7 +6661,8 @@ begin
 end;
 
 procedure TNemp_MainForm.ShowPlayerDetails(aAudioFile: TAudioFile);
-//var
+var
+    success: Boolean;
   //Coverbmp: TBitmap;
   ///ordner: UnicodeString;
 begin
@@ -6682,12 +6675,16 @@ begin
   if aAudioFile.CoverID = '' then
       MedienBib.InitCover(aAudioFile);
 
-  if NempPlayer.RefreshCoverBitmap then
+  success := NempPlayer.RefreshCoverBitmap;
+  CoverImage.Visible := True;
+  CoverImage.Hint := '';
+  CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);
+  if not success then
   begin
-      CoverImage.Visible := True;
-      CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap)
-  end else
-      CoverImage.Visible := False;
+      CheckAndDoCoverDownloaderQuery;
+      if (MedienBib.CoverSearchLastFM = BoolTrue) then
+          Medienbib.NewCoverFlow.DownloadPlayerCover(aAudioFile);
+  end;
 
   if aAudioFile.Lyrics <> '' then
     LyricsMemo.Text := UTF8ToString(aAudioFile.Lyrics)
