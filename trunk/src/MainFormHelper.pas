@@ -114,6 +114,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
 
+    procedure CheckAndDoCoverDownloaderQuery;
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1347,6 +1349,21 @@ begin
         // Refresh the Button
         TabBtn_TagCloud.Refresh;
     end;
+end;
+
+procedure CheckAndDoCoverDownloaderQuery;
+begin
+          if (MedienBib.CoverSearchLastFM = BoolUnDef)
+              and MedienBib.CoverSearchLastFMInit
+          then
+          begin
+              MedienBib.CoverSearchLastFMInit := False;
+              if MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes then
+                  MedienBib.CoverSearchLastFM := BoolTrue
+              else
+                  MedienBib.CoverSearchLastFM := BoolFalse;
+          end;
+
 end;
 
 end.

@@ -643,8 +643,9 @@ begin
                         if Not GetCoverFromList(CoverListe, aCoverbmp) then
                         begin
                             GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
-                        end;
-                        result := True;
+                            result := False;
+                        end else
+                            result := True;
                     except
                         GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
                         result := false;

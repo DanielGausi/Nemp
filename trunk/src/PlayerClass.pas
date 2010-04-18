@@ -2298,6 +2298,7 @@ begin
         result := GetCover(MainAudioFile, CoverBitmap)
     end else
         GetDefaultCover(dcNoCover, CoverBitmap, cmUseBibDefaults);
+        //result := True; // no audiofile, no downloading. ;-)
 end;
 
 

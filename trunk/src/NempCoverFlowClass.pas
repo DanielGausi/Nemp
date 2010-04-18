@@ -49,7 +49,8 @@ unit NempCoverFlowClass;
 interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
-    ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs, CoverDownloads;
+    ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs, CoverDownloads,
+    AudioFileClass;
 
 type
 
@@ -127,13 +128,13 @@ type
             procedure SetNewHandle(aWnd: HWND);
 
             procedure DownloadCover(aCover: TNempCover; aIdx: Integer);
-
+            procedure DownloadPlayerCover(aAudioFile: TAudioFile);
 
     end;
 
 implementation
 
-uses NempMainUnit, AudioFileClass;
+uses NempMainUnit;
 
 { TNempCoverFlow }
 
@@ -274,6 +275,11 @@ begin
         and (aCover.Album <> AUDIOFILE_UNKOWN)
     then
         fDownloadThread.AddJob(aCover, aIdx);
+end;
+
+procedure TNempCoverFlow.DownloadPlayerCover(aAudioFile: TAudioFile);
+begin
+    fDownloadThread.AddJob(aAudioFile, 0);
 end;
 
 function TNempCoverFlow.fGetCurrentItem: Integer;
