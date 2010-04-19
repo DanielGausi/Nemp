@@ -746,6 +746,10 @@ type
     BtnApplyEditTags: TButton;
     BtnCancelEditTags: TButton;
     MemoDisableTimer: TTimer;
+    TaskBarImages: TImageList;
+    Win7TaskBarPopup: TPopupMenu;
+    test1: TMenuItem;
+    N67: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1278,6 +1282,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure NewPlayerPanelMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
+    procedure Win7TaskBarPopupPopup(Sender: TObject);
 
   private
 
@@ -4964,6 +4969,9 @@ end;
 procedure TNemp_MainForm.AdjustEditToLabel(aEdit: TControl; aLabel: TLabel);
 var w: Integer;
 begin
+    if not Assigned(MedienBib.CurrentAudioFile) then
+        exit;
+
     aEdit.Top := aLabel.Top - 4;
     aEdit.Left := aLabel.Left - 4;
 
@@ -5056,6 +5064,8 @@ begin
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
 begin
+    if not Assigned(MedienBib.CurrentAudioFile) then
+        exit;
 
     MemBibTags.Top := LblBibDuration.Top;
     MemBibTags.Left := LblBibDuration.Left;
@@ -10253,7 +10263,7 @@ begin
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.RadioItem := True;
         aMenuItem.AutoCheck := True;
-        aMenuItem.Checked := (i=centerIdx) AND assigned(NempPlaylist.Playingfile);
+        aMenuItem.Checked := (i=centerIdx) AND assigned(NempPlaylist.PlayingNode);
         aMenuItem.OnClick := TNA_PlaylistClick;
         aMenuItem.Tag := i;
         aMenuItem.Caption := EscapeAmpersAnd(  TPlaylistFile(NempPlaylist.Playlist[i]).PlaylistTitle);
@@ -10681,6 +10691,48 @@ begin
   MessageDlg('SkinEditor removed from Nemp.exe. Separate SkinEditor is not implemented yet!', mtError, [mbOK], 0);
 end;
 
+procedure TNemp_MainForm.Win7TaskBarPopupPopup(Sender: TObject);
+var i: Integer;
+  centerIdx, minIdx, maxIdx: Integer;
+  aMenuItem: TMenuItem;
+begin
+  // altes Menu mit Playlist-Einträgen erstellen und neues erstellen
+  for i := Win7TaskBarPopup.Items.Count - 3 downto 0 do
+      Win7TaskBarPopup.Items.Delete(i);
+
+  if assigned(NempPlaylist.Playlist) then
+  begin
+    centerIdx := NempPlaylist.PlayingIndex;
+
+    // min Idx Count.halbe vor dem aktuellen Lied
+    minIdx := centerIdx - (NempPlaylist.TNA_PlaylistCount DIV 2);
+    // ggf. auf 0 korrigieren
+    if MinIDX < 0 then MinIdx := 0;
+
+    // maxIdx Count mehr
+    maxIdx := minIdx + NempPlaylist.TNA_PlaylistCount;
+    if MaxIdx > NempPlaylist.Count - 1 then MaxIdx := NempPlaylist.Count - 1;
+
+    // ggf. den minIdx korrigieren, so dass immer count Einträge da sind
+    minIdx := maxIdx - NempPlaylist.TNA_PlaylistCount;
+    if minIdx < 0 then minIdx := 0;
+
+    for i := MaxIdx downto MinIdx do
+    begin
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.AutoHotkeys := maManual;
+        aMenuItem.RadioItem := True;
+        aMenuItem.AutoCheck := True;
+        aMenuItem.Checked := (i=centerIdx) AND assigned(NempPlaylist.PlayingNode);
+        aMenuItem.OnClick := TNA_PlaylistClick;
+        aMenuItem.Tag := i;
+        aMenuItem.Caption := EscapeAmpersAnd(  TPlaylistFile(NempPlaylist.Playlist[i]).PlaylistTitle);
+        Win7TaskBarPopup.Items.Insert(0, aMenuItem);
+        //PM_TNA_Playlist.Add(aMenuItem);
+    end;
+  end;
+end;
+
 procedure TNemp_MainForm.WindowsStandardClick(Sender: TObject);
 begin
   NempSkin.DeActivateSkin;
@@ -10981,12 +11033,35 @@ end;    *)
 
 procedure TNemp_MainForm.fspTaskbarManagerThumbButtonClick(Sender: TObject;
   ButtonId: Integer);
+var point: TPoint;
 begin
     case ButtonID of
         0: PlayPrevBTNIMGClick(Nil);
         1: PlayPauseBTNIMGClick(Nil);
         2: StopBTNIMGClick(Nil);
         3: PlayNextBTNIMGClick(NIL);
+        4: begin
+            //VolTimer.Enabled := False;
+            //NempPlayer.VolStep := NempPlayer.VolStep + 1;
+            NempPlayer.Volume := NempPlayer.Volume - 10;
+            //VolTimer.Enabled := True;
+            CorrectVolButton;
+        end;
+        5: begin
+            //VolTimer.Enabled := False;
+            //NempPlayer.VolStep := NempPlayer.VolStep + 1;
+            NempPlayer.Volume := NempPlayer.Volume + 10;// + (NempPlayer.VolStep DIV 3);
+            //VolTimer.Enabled := True;
+            CorrectVolButton;
+        end;
+        42: begin
+            GetCursorPos(Point);
+            Win7TaskBarPopup.Popup(Point.X, Point.Y-10);
+            //TaskbarForm.Left := Point.x - 30;
+            //TaskbarForm.Top := Point.y - 10;
+            //TaskbarForm.Show;
+            //TaskbarForm.BringToFront;
+        end;
     end;
 end;
 

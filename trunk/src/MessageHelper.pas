@@ -1238,9 +1238,11 @@ begin
                                   case Message.WParam of
                                       NEMP_API_STOPPED, NEMP_API_PAUSED: begin
                                             PlayPauseBTN.GlyphLine := 0;
+                                            fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
                                       end;
                                       NEMP_API_PLAYING : begin
                                         PlayPauseBTN.GlyphLine := 1;
+                                        fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
                                       end;
                                   end;
                                   //showmessage(Inttostr(Message.wParam));
