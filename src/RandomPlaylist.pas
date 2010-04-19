@@ -133,7 +133,9 @@ type
     procedure SetLastCheckedTags;
     procedure RecheckLastCheckedTags;
 
+    procedure FillTagList;
     procedure RefillTagList;
+
 
 
   public
@@ -348,7 +350,7 @@ begin
     cb_Preselection.OnChange := Nil;
     cb_Preselection.ItemIndex := LastSelection;
     cb_Preselection.OnChange := cb_PreselectionChange;
-    RecheckLastCheckedTags;
+    //RecheckLastCheckedTags; // No. Do this not until OnShow
 
   finally
     ini.Free;
@@ -370,7 +372,7 @@ end;
 
 procedure TRandomPlaylistForm.FormResize(Sender: TObject);
 begin
-    cbGenres.Columns := Width Div 130;
+    cbGenres.Columns := Width Div 150;
 end;
 
 procedure TRandomPlaylistForm.SetLastCheckedTags;
@@ -391,42 +393,30 @@ begin
     end;
 end;
 
-
-procedure TRandomPlaylistForm.RefillTagList;
+procedure TRandomPlaylistForm.FillTagList;
 var i: Integer;
-    //backupTags: TObjectList;
     aTag: TTag;
 begin
-    //backupTags := TObjectList.Create(False);
-    //try
-        // backup checked Items
-        //for i := 0 to cbGenres.Count - 1 do
-        //    if cbGenres.Checked[i] then
-        //        backupTags.Add(cbGenres.Items.Objects[i]);
+      // clear ChecklistBox
+    cbGenres.Clear;
+    LocalTopTags.Clear;
+    // Get new tags
+    MedienBib.GetTopTags(StrToIntDef(cbTagCountSelection.Text, 150), 10, LocalTopTags);
+    // Show Tags
+    for i := 0 to LocalTopTags.Count - 1 do
+    begin
+        aTag := TTag(LocalTopTags[i]);
+        cbGenres.AddItem( aTag.key + ' (' + IntToStr(aTag.TotalCount)+')', aTag);
+    end;
+end;
 
-        SetLastCheckedTags;
-
-        // clear ChecklistBox
-        cbGenres.Clear;
-        LocalTopTags.Clear;
-        // Get new tags
-        MedienBib.GetTopTags(StrToIntDef(cbTagCountSelection.Text, 150), 10, LocalTopTags);
-        // Show Tags
-        for i := 0 to LocalTopTags.Count - 1 do
-        begin
-            aTag := TTag(LocalTopTags[i]);
-            cbGenres.AddItem( aTag.key + ' (' + IntToStr(aTag.TotalCount)+')', aTag);
-        end;
-        // Restore checked items
-        RecheckLastCheckedTags;
-        //for i := 0 to LocalTopTags.Count - 1 do
-        //begin
-        //    aTag := TTag(cbGenres.Items.Objects[i]);
-        //    cbGenres.Checked[i] := backuptags.IndexOf(aTag) >= 0;
-        //end;
-    //finally
-    //    backupTags.Free;
-    //end;
+procedure TRandomPlaylistForm.RefillTagList;
+begin
+    SetLastCheckedTags;
+    // Fill List
+    FillTagList;
+    // Restore checked items
+    RecheckLastCheckedTags;
 end;
 
 procedure TRandomPlaylistForm.FormShow(Sender: TObject);
@@ -434,7 +424,8 @@ begin
     if MedienBib.BrowseMode <> 2 then
         MedienBib.ReBuildTagCloud;
 
-    RefillTagList;
+    FillTagList;
+    RecheckLastCheckedTags;
 end;
 
 procedure TRandomPlaylistForm.cbIgnoreYearClick(Sender: TObject);
@@ -664,6 +655,8 @@ begin
           else
               Medienbib.PlaylistFillOptions.MinTagMatchCount := 1;
           end;
+          if Medienbib.PlaylistFillOptions.MinTagMatchCount < 1 then
+              Medienbib.PlaylistFillOptions.MinTagMatchCount := 1;
       end else
           Medienbib.PlaylistFillOptions.Wantedtags := Nil;
 
