@@ -1,6 +1,6 @@
 object HeadsetControlForm: THeadsetControlForm
-  Left = 1051
-  Top = 209
+  Left = 0
+  Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Headphones control'
   ClientHeight = 113
@@ -13,7 +13,7 @@ object HeadsetControlForm: THeadsetControlForm
   Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poDesigned
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
