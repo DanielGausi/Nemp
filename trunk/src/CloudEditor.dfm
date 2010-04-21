@@ -67,7 +67,7 @@ object CloudEditorForm: TCloudEditorForm
     Top = 8
     Width = 506
     Height = 378
-    ActivePage = TS_ExistingTags
+    ActivePage = TS_DeleteTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
@@ -255,8 +255,8 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
-          'This is list is used to adjust new tags from LastFM. Tags in thi' +
-          's list are automatically replaced when getting new tags.'
+          'This list is used to adjust new tags from LastFM. Tags in this l' +
+          'ist are automatically replaced when getting new tags.'
         TabOrder = 1
       end
       object BtnDeleteMergeTag: TButton
@@ -310,8 +310,8 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
-          'This is list is used to adjust new tags from LastFM. Tags in thi' +
-          's list are automatically deleted when getting new tags.'
+          'This list is used to adjust new tags from LastFM. Tags in this l' +
+          'ist are automatically deleted when getting new tags.'
         TabOrder = 1
       end
       object BtnDeleteIgnoreTag: TButton

@@ -219,12 +219,9 @@ type
     MM_ML_RefreshAll: TMenuItem;
     MM_ML_ResetRatings: TMenuItem;
     MM_Playlist: TMenuItem;
-    MM_PL_Add: TMenuItem;
     MM_PL_Files: TMenuItem;
     MM_PL_Directory: TMenuItem;
     MM_PL_WebStream: TMenuItem;
-    MM_PL_Delete: TMenuItem;
-    MM_PL_DeleteAll: TMenuItem;
     MM_PL_DeleteSelected: TMenuItem;
     MM_PL_DeleteMissingFiles: TMenuItem;
     MM_PL_RecentPlaylists: TMenuItem;
@@ -242,11 +239,8 @@ type
     MM_PL_Save: TMenuItem;
     MM_PL_AddPlaylist: TMenuItem;
     N1: TMenuItem;
-    MM_PL_PlaySelectedNext: TMenuItem;
-    MM_PL_PlayInHeadset: TMenuItem;
     MM_PL_StopHeadset: TMenuItem;
     N26: TMenuItem;
-    MM_PL_Extended: TMenuItem;
     MM_PL_ExtendedAddToMedialibrary: TMenuItem;
     MM_PL_ExtendedCopyFromWinamp: TMenuItem;
     MM_PL_ExtendedScanFiles: TMenuItem;
@@ -417,12 +411,9 @@ type
     PM_ML_ExtendedSearchAlbum: TMenuItem;
     N55: TMenuItem;
     PM_ML_Properties: TMenuItem;
-    PM_PL_Add: TMenuItem;
     PM_PL_AddFiles: TMenuItem;
     PM_PL_AddDirectories: TMenuItem;
     PM_PL_AddWebstream: TMenuItem;
-    PM_PL_Delete: TMenuItem;
-    PM_PL_DeleteAll: TMenuItem;
     PM_PL_DeleteSelected: TMenuItem;
     PM_PL_DeleteMissingFiles: TMenuItem;
     PM_PL_RecentPlaylists: TMenuItem;
@@ -444,7 +435,6 @@ type
     PM_PL_PlayInHeadset: TMenuItem;
     PM_PL_StopHeadset: TMenuItem;
     N13: TMenuItem;
-    PM_PL_Extended: TMenuItem;
     PM_PL_ExtendedAddToMedialibrary: TMenuItem;
     PM_PL_ExtendedCopyFromWinamp: TMenuItem;
     PM_PL_ExtendedScanFiles: TMenuItem;
@@ -750,6 +740,15 @@ type
     Win7TaskBarPopup: TPopupMenu;
     test1: TMenuItem;
     N67: TMenuItem;
+    N68: TMenuItem;
+    PM_PL_ShowInExplorer: TMenuItem;
+    N69: TMenuItem;
+    MM_PL_ShowInExplorer: TMenuItem;
+    MM_PL_AddSelectionToPreBooklistEnd: TMenuItem;
+    MM_PL_AddSelectionToPrebooklistBeginning: TMenuItem;
+    MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
+    MM_PL_PlayInHeadset: TMenuItem;
+    MM_T_CloudEditor: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1283,6 +1282,7 @@ type
     procedure NewPlayerPanelMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure Win7TaskBarPopupPopup(Sender: TObject);
+    procedure PM_PL_ShowInExplorerClick(Sender: TObject);
 
   private
 
@@ -6534,7 +6534,13 @@ end;
 
 
 procedure TNemp_MainForm.PM_PL_SavePlaylistClick(Sender: TObject);
+var dir, name: String;
 begin
+
+  if NempPlaylist.SuggestSaveLocation(dir, name) then
+      PlayListSaveDialog.InitialDir := Dir;
+  PlayListSaveDialog.FileName := name;
+
   if PlayListSaveDialog.Execute then
   begin
     NempPlaylist.SaveToFile(PlayListSaveDialog.FileName, False);
@@ -6544,6 +6550,24 @@ begin
   end;
 end;
 
+
+procedure TNemp_MainForm.PM_PL_ShowInExplorerClick(Sender: TObject);
+var
+    datei_ordner: UnicodeString;
+    Node: PVirtualNode;
+    Data: PTreeData;
+begin
+    Node := PlaylistVST.FocusedNode;
+    if not Assigned(Node) then
+        Exit;
+    Data := PlaylistVST.GetNodeData(Node);
+    datei_ordner := Data^.FAudioFile.Ordner;
+
+    // showmessage('/e,/select,"'+Data^.FAudioFile.Pfad+'"');
+    if DirectoryExists(datei_ordner) then
+        ShellExecute(Handle, 'open' ,'explorer.exe'
+                      , PChar('/e,/select,"'+Data^.FAudioFile.Pfad+'"'), '', sw_ShowNormal);
+end;
 
 procedure TNemp_MainForm.PM_PL_LoadPlaylistClick(Sender: TObject);
 var restart: boolean;
@@ -6969,12 +6993,12 @@ begin
   begin
     PM_PL_SortBy.Enabled := False;
     PM_PL_SavePlaylist.Enabled := False;
-    PM_PL_DeleteAll.Enabled    := False;
+    //PM_PL_DeleteAll.Enabled    := False;
   end else
   begin
     PM_PL_SortBy.Enabled := True;
     PM_PL_SavePlaylist.Enabled := True;
-    PM_PL_DeleteAll.Enabled    := True;
+    //PM_PL_DeleteAll.Enabled    := True;
     //InMedienlisteaufnehmen1.Enabled := NOT StopMENU.Visible;
   end;
   ClipCursor(Nil);
@@ -9632,7 +9656,7 @@ end;
 Procedure TNemp_MainForm.SetRecentPlaylistsMenuItems;
 var i: Integer;
   aMenuItem: TMenuItem;
-begin                                                         
+begin
   // Recent Playlists initialisieren                          
   MM_PL_RecentPlaylists.Clear;
   PM_PL_RecentPlaylists.Clear;

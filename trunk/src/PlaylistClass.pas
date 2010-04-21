@@ -243,6 +243,7 @@ type
       procedure AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
       procedure RemoveSelectedNodesFromPreBookList;
 
+      function SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
       // load/save playlist
       procedure LoadFromFile(aFilename: UnicodeString);
       procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
@@ -1350,6 +1351,68 @@ begin
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
 end;
 
+function TNempPlaylist.SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
+var iMax, i: integer;
+    aDir, aAlbum, aArtist: String;
+    af: TAudioFile;
+    OKDir, OKArtist, OKAlbum: Boolean;
+begin
+    if count = 0 then
+    begin
+        Directory := '';
+        Filename := '';
+        result := False
+    end
+    else
+    begin
+        if self.Count < 10 then
+            iMax := Count
+        else
+            iMax := 10;
+
+        OKDir    := True;
+        OKArtist := True;
+        OKAlbum  := True;
+        af := TAudioFile(Playlist[0]);
+        aDir    := af.Ordner;
+        aAlbum  := af.Album;
+        aArtist := af.Artist;
+
+        for i := 1 to iMax-1 do
+        begin
+            af := TAudioFile(Playlist[i]);
+            if af.Ordner <> aDir then
+                OKDir := False;
+            if af.Artist <> aArtist then
+                OKArtist := False;
+            if af.Album <> aAlbum then
+                OKAlbum := False;
+        end;
+
+        if okDir then
+        begin
+            Directory := aDir;
+            result := True;
+        end
+        else
+            result := False;
+
+        if okAlbum then
+        begin
+            if OKArtist then
+                Filename := aArtist + ' - ' + aAlbum
+            else
+                Filename := 'VA - ' + aAlbum;
+        end else
+        begin
+            if OKArtist then
+                Filename := aArtist + ' - Mix'
+            else
+                Filename := '';
+        end;
+    end;
+
+end;
 procedure TNempPlaylist.SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
 var
   myAList: tStringlist;
