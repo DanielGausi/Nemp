@@ -607,6 +607,7 @@ begin
         MM_ML_Load.Enabled   := block;
         MM_ML_Save.Enabled := block;
         MM_ML_DeleteMissingFiles.Enabled := block;
+        MM_ML_DeleteSelectedFiles.Enabled := block;
         MM_ML_RefreshAll.Enabled := block;
         MM_ML_ResetRatings.Enabled := block;
         // Einträge im Popup-Menü der Medienliste
@@ -1213,10 +1214,10 @@ begin
 
     // 4. Add File from the library (if possible)
     // !!! this must be the last one in the list (see keymatching-test in the calling method)
-    if (MedienBib.StatusBibUpdate > 0) then
-        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
-    else
-    begin
+    //if (MedienBib.StatusBibUpdate > 0) then
+    //    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
+    //else
+    //begin
         bibFile := MedienBib.GetAudioFileWithFilename(Original.Pfad);
         if assigned(bibFile) then
         begin
@@ -1224,7 +1225,7 @@ begin
             result := True;
         end else
             result := False;
-    end;
+    //end;
 end;
 {
     CorrectVCLAfterAudioFileEdit
