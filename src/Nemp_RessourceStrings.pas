@@ -265,7 +265,8 @@ FloatingPointChannels_Off = 'Current status: Off';
     
 
 
-SelectDirectoryDialog_Caption = 'Select directory';
+SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the medialibrary.';
+SelectDirectoryDialog_PlaylistCaption = 'Please select the root directory of the audiofiles you want to add to the playlist.';
 SelectDirectoryDialog_Webradio_Caption = 'Select download directory for webstreams';
 SelectDirectoryDialog_RemoteNemp = 'Select download directory';
 
@@ -533,9 +534,9 @@ Medialibrary_SaveException1 = 'An error occured while saving the medialibrary. P
 Medialibrary_QuickSearchError1 = 'Tried to fill the Quicksearchlist while displaying playlists. This should never occur - please report this error. ';
 Medialibrary_GUIError1 = 'This function (1) shouldn''t be accessible now. Please report this error.';
 Medialibrary_GUIError2 = 'Tried to fill searchhistory with playlist files. This should never occur - please report this error.';
-Medialibrary_GUIError3 = 'This function (3) shouldn''t be accessible now. Please report this error.';
+Medialibrary_GUIError3 = 'The current view shows files from a playlist-file. You can not delete these files frome the library.';
 Medialibrary_GUIError4 = 'This function (4) shouldn''t be accessible now. Please report this error.';
-Medialibrary_GUIError5 = 'This function (5) shouldn''t be accessible now. Please report this error.';
+Medialibrary_GUIError5 = 'The current view shows files from a playlist-file. Getting lyrics or additional tags is not possible.';
 Medialibrary_DriveRepairError = 'An Error occured while updating drivelist. Please report this error.';
 
 Medialibrary_DialogFilter            = 'Nemp medialibrary';

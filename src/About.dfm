@@ -113,6 +113,10 @@ object AboutForm: TAboutForm
         'famfamfam.com[/url]'
       ''
       
+        '[url="http://tango.freedesktop.org/Tango_Icon_Library"]Tango Ico' +
+        'n Library[/url]'
+      ''
+      
         'Nemp Logo by [url="http://www.mantis-media.de"]Danny aka Mantis[' +
         '/url]'
       ''

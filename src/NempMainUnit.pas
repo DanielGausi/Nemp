@@ -749,6 +749,26 @@ type
     MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
     MM_PL_PlayInHeadset: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
+    MM_ML_DeleteSelectedFiles: TMenuItem;
+    N70: TMenuItem;
+    MM_ML_GetAdditionalTags: TMenuItem;
+    MM_ML_GetLyrics: TMenuItem;
+    N71: TMenuItem;
+    MM_ML_CloseNemp: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles1: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles2: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles3: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles4: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles5: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles6: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles7: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles8: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles9: TMenuItem;
+    PM_ML_SetRatingsOfSelectedFiles10: TMenuItem;
+    N72: TMenuItem;
+    N73: TMenuItem;
+    Resetrating1: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1283,6 +1303,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure Win7TaskBarPopupPopup(Sender: TObject);
     procedure PM_PL_ShowInExplorerClick(Sender: TObject);
+    procedure PM_ML_SetRatingsOfSelectedFilesClick(Sender: TObject);
 
   private
 
@@ -2427,7 +2448,7 @@ begin
     if NempOptions.HideDeskbandOnClose then
         NotifyDeskband(NempDeskbandDeActivateMessage);
 
-    if MedienBib.AutoSaveMediaList AND (MedienBib.Count > 0) AND (MedienBib.Changed) then
+    if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
     begin
       AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint_MediaLib);
       AuswahlStatusLBL.Update;
@@ -3346,7 +3367,7 @@ begin
         0: begin
             if MedienBib.AnzeigeShowsPlaylistFiles then
             begin
-                MessageDLG((Medialibrary_GUIError3), mtError, [MBOK], 0);
+                MessageDLG((Medialibrary_GUIError3), mtInformation, [MBOK], 0);
             end else
             begin
                 if MedienBib.StatusBibUpdate <> 0 then
@@ -3372,7 +3393,7 @@ begin
                     if i mod 64 = 0 then
                     begin
                       MedienListeStatusLBL.Caption := Format((MediaLibrary_Deleting), [Round(i/length(SelectedMP3s) * 100)]);
-                      application.processmessages;
+                      Application.ProcessMessages;
                     end;
 
                   end;
@@ -3424,7 +3445,7 @@ begin
 
 
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Caption );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption );
   try
       if fb.Execute then
       begin
@@ -3897,6 +3918,7 @@ begin
       PM_ML_PlayNow.Enabled := canPlay;
       //PM_ML_DeleteSelected.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
       PM_ML_GetLyrics.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen);
+      PM_ML_GetTags.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen);
       PM_ML_PlayHeadset.Enabled := (aVST = VST) AND NempPlayer.EnableHeadSet;
       PM_ML_StopHeadset.Enabled := NempPlayer.EnableHeadSet;
 
@@ -3923,6 +3945,83 @@ begin
       PM_ML_ExtendedSearchArtist.Caption := (MainForm_MenuCaptionsSearchForArtist);
       PM_ML_ExtendedSearchAlbum.Caption  := (MainForm_MenuCaptionsSearchForAlbum)
     end;
+end;
+
+procedure TNemp_MainForm.PM_ML_SetRatingsOfSelectedFilesClick(
+  Sender: TObject);
+var CurrentAF, listFile :TAudioFile;
+    iSel, iList: Integer;
+    Data: PTreeData;
+    SelectedMp3s: TNodeArray;
+    Node:PVirtualNode;
+    ListOfFiles: TObjectList;
+    newRating: Integer;
+begin
+    // preparation
+    SelectedMp3s := Nil;
+    if MedienBib.StatusBibUpdate <> 0 then
+    begin
+        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+        exit;
+    end;
+    MedienBib.StatusBibUpdate := 3;
+    BlockeMedienListeReadAccess(True);
+    LangeAktionWeitermachen := true;
+    fspTaskbarManager.ProgressState := fstpsNormal;
+    fspTaskbarManager.ProgressValue := 0;
+
+    SelectedMP3s := VST.GetSortedSelection(False);
+    ListOfFiles := TObjectList.Create(False);
+    try
+        if (Sender as TMenuItem).Tag = -1 then
+            newRating := 0
+        else
+            newRating := Round((Sender as TMenuItem).Tag * 25.5) + 20;
+        if newRating > 255 then newRating := 255;
+        for iSel := 0 to length(SelectedMP3s)-1 do
+        begin
+            fspTaskbarManager.ProgressValue := Round(iSel/length(SelectedMP3s) * 100);
+            application.processmessages;
+            if not LangeAktionWeitermachen then break;
+
+            Data := VST.GetNodeData(SelectedMP3s[iSel]);
+            CurrentAF := Data^.FAudioFile;
+
+                  // get List of this AudioFile
+                  GetListOfAudioFileCopies(CurrentAF, ListOfFiles);
+                  // edit all these files
+                  for iList := 0 to ListOfFiles.Count - 1 do
+                  begin
+                      listFile := TAudioFile(ListOfFiles[iList]);
+                      listFile.Rating := newRating;
+                  end;
+                  // write the rating into the file on disk
+                  CurrentAF.QuickUpdateTag;
+                  // correct GUI
+                  CorrectVCLAfterAudioFileEdit(CurrentAF);
+        end;
+    finally
+        ListOfFiles.Free;
+    end;
+    MedienBib.Changed := True;
+
+    // clean up stuff
+    BlockeMedienListeReadAccess(False);
+    BlockeMedienListeWriteAcces(False);
+    BlockeMedienListeUpdate(False);
+
+    LangeAktionWeitermachen := False;
+    MedienBib.StatusBibUpdate := 0;
+    MedienListeStatusLBL.Caption := '';
+    ShowSummary;
+    fspTaskbarManager.ProgressState := fstpsNoProgress;
+    Node := VST.FocusedNode;
+    if Assigned(Node) then
+    begin
+        Data := VST.GetNodeData(Node);
+        AktualisiereDetailForm(Data^.FAudioFile, SD_MEDIENBIB);
+    end else
+        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
 end;
 
 procedure TNemp_MainForm.PM_ML_ShowInExplorerClick(Sender: TObject);
@@ -4711,13 +4810,13 @@ begin
                   if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_Browse.Click;
             end;
 *)
-    $46 {F}: if (Anzeigemode = 0) OR Auswahlform.Visible then
-                    if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_CoverFlow.Click;
+    //$46 {F}: if (Anzeigemode = 0) OR Auswahlform.Visible then
+    //                if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_CoverFlow.Click;
 
-    $31 {1}: if (ssctrl in Shift) then TabBtn_Cover.Click;
-    $32 {2}: if (ssctrl in Shift) then TabBtn_Lyrics.Click;
-    $33 {3}: if (ssctrl in Shift) then TabBtn_Equalizer.Click;
-    $34 {4}: if (ssctrl in Shift) then TabBtn_Effects.Click;
+    //$31 {1}: if (ssctrl in Shift) then TabBtn_Cover.Click;
+    //$32 {2}: if (ssctrl in Shift) then TabBtn_Lyrics.Click;
+    //$33 {3}: if (ssctrl in Shift) then TabBtn_Equalizer.Click;
+    //$34 {4}: if (ssctrl in Shift) then TabBtn_Effects.Click;
 
   end;
 end;
@@ -4911,6 +5010,7 @@ procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
+
 begin
     if Button = mbLeft  then
     begin
@@ -5094,42 +5194,47 @@ var ListOfFiles: TObjectList;
     ListFile, BibFile: TAudioFile;
     i: Integer;
 begin
-    if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
+    if Assigned(MedienBib.CurrentAudioFile)
+        and (MedienBib.StatusBibUpdate <= 1)
+        and (MedienBib.CurrentThreadFilename <> MedienBib.CurrentAudioFile.Pfad)
+    then
     begin
-
-        if CommasInString(MemBibTags.Text) then
+        if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
         begin
-            if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
-                MedienBib.CurrentAudioFile.RawTagLastFM := Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text)))
+            if CommasInString(MemBibTags.Text) then
+            begin
+                if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
+                    MedienBib.CurrentAudioFile.RawTagLastFM := Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text)))
+                else
+                    MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+            end
             else
                 MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
-        end
-        else
-            MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
 
 
-        LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
+            LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
 
-        // Generate a List of Files which should be updated now
-        ListOfFiles := TObjectList.Create(False);
-        try
-            GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
-            for i := 0 to ListOfFiles.Count - 1 do
-            begin
-                listFile := TAudioFile(ListOfFiles[i]);
-                listFile.RawTagLastFM := MedienBib.CurrentAudioFile.RawTagLastFM;
+            // Generate a List of Files which should be updated now
+            ListOfFiles := TObjectList.Create(False);
+            try
+                GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+                for i := 0 to ListOfFiles.Count - 1 do
+                begin
+                    listFile := TAudioFile(ListOfFiles[i]);
+                    listFile.RawTagLastFM := MedienBib.CurrentAudioFile.RawTagLastFM;
+                end;
+            finally
+                ListOfFiles.Free;
             end;
-        finally
-            ListOfFiles.Free;
+            // write Data to the file
+            MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+            // Correct GUI (player, Details, Detailform, VSTs))
+            CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
+            // Update the TagCloud
+            BibFile := MedienBib.GetAudioFileWithFilename(MedienBib.CurrentAudioFile.Pfad);
+            if assigned(BibFile) then
+                MedienBib.TagCloud.UpdateAudioFile(BibFile);
         end;
-        // write Data to the file
-        MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
-        // Correct GUI (player, Details, Detailform, VSTs))
-        CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
-        // Update the TagCloud
-        BibFile := MedienBib.GetAudioFileWithFilename(MedienBib.CurrentAudioFile.Pfad);
-        if assigned(BibFile) then
-            MedienBib.TagCloud.UpdateAudioFile(BibFile);
     end;
     HideTagMemo;
 end;
@@ -5274,7 +5379,7 @@ begin
     end;
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
-        MessageDLG((Medialibrary_GUIError5), mtError, [MBOK], 0);
+        MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
           if not assigned(NoLyricWikiApiForm) then
@@ -5317,7 +5422,7 @@ begin
     end;
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
-        MessageDLG((Medialibrary_GUIError5), mtError, [MBOK], 0);
+        MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
 
@@ -6868,7 +6973,7 @@ procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
 begin
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Caption );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption );
   try
       if fb.Execute then
       begin
@@ -9898,7 +10003,6 @@ var
   listFile: TAudioFile;
   i: Integer;
 begin
-caption := 'On Edited beginn';
     //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
     SetShortCuts;
     EditingVSTRating := False;

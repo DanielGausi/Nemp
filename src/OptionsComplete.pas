@@ -2649,7 +2649,7 @@ var tmp, newdir: UnicodeString;
     i: Integer;
     FB: TFolderBrowser;
 begin
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Caption );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption );
   try
       if fb.Execute then
       begin
@@ -2789,7 +2789,7 @@ var adir: UnicodeString;
     FB: TFolderBrowser;
 begin
   aDir := NempPlayer.DownloadDir;
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Caption, NempPlayer.DownloadDir);
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Webradio_Caption, NempPlayer.DownloadDir);
   try
       if fb.Execute then
       begin
