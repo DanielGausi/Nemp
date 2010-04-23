@@ -433,9 +433,10 @@ MainForm_RecordBtnHint_Recording   = 'Recording...';
 
 MainForm_StopBtn_NormalHint = 'Stop';
 MainForm_StopBtn_StopAfterTitleHint = 'Nemp will stop playback after current title.';
-MainForm_StopMenu_StopAfterTitle = 'Stop after title';
-MainForm_StopMenu_NoStopAfterTitle = 'Do not stop after title';
-
+MainForm_StopMenu_StopAfterTitle = 'Stop after current title (Shift+Click)';
+MainForm_StopMenu_NoStopAfterTitle = 'Do not stop after current title (Shift+Click)';
+MainForm_PlaylistMenu_StopAfterTitle = 'Stop after current title';
+MainForm_PlaylistMenu_NoStopAfterTitle = 'Do not stop after current title';
 
 
 MainForm_ReverseBtnHint_PlayNormal  = 'Play forwards';

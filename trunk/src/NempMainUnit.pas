@@ -768,7 +768,47 @@ type
     PM_ML_SetRatingsOfSelectedFiles10: TMenuItem;
     N72: TMenuItem;
     N73: TMenuItem;
-    Resetrating1: TMenuItem;
+    PM_ML_ResetRating: TMenuItem;
+    MM_ML_SetRatingSelected: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles1: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles2: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles3: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles4: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles5: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles6: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles7: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles8: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles9: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFiles10: TMenuItem;
+    N74: TMenuItem;
+    MM_ML_SetRatingsOfSelectedFilesReset: TMenuItem;
+    PM_PL_SetRatingofSelectedFilesTo: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles1: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles2: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles3: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles4: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles5: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles6: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles7: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles8: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles9: TMenuItem;
+    PM_PL_SetRatingsOfSelectedFiles10: TMenuItem;
+    N75: TMenuItem;
+    PM_PL_ResetRating: TMenuItem;
+    MM_PL_SetRatingofSelectedFilesTo: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles1: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles2: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles3: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles4: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles5: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles6: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles7: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles8: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles9: TMenuItem;
+    MM_PL_SetRatingsOfSelectedFiles10: TMenuItem;
+    N77: TMenuItem;
+    MM_PL_ResetRating: TMenuItem;
+    PM_PL_StopAfterCurrentTitle: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -3956,6 +3996,8 @@ var CurrentAF, listFile :TAudioFile;
     Node:PVirtualNode;
     ListOfFiles: TObjectList;
     newRating: Integer;
+    detUpdate, TagMod100: Integer;
+    LocalTree: TVirtualStringTree;
 begin
     // preparation
     SelectedMp3s := Nil;
@@ -3970,13 +4012,19 @@ begin
     fspTaskbarManager.ProgressState := fstpsNormal;
     fspTaskbarManager.ProgressValue := 0;
 
-    SelectedMP3s := VST.GetSortedSelection(False);
+    TagMod100 := (Sender as TMenuItem).Tag Mod 100;
+    if (Sender as TMenuItem).Tag >= 100 then
+        LocalTree := VST
+    else
+        LocalTree := PlaylistVST;
+
+    SelectedMP3s := LocalTree.GetSortedSelection(False);
     ListOfFiles := TObjectList.Create(False);
     try
-        if (Sender as TMenuItem).Tag = -1 then
+        if TagMod100 = 10 then
             newRating := 0
         else
-            newRating := Round((Sender as TMenuItem).Tag * 25.5) + 20;
+            newRating := Round(TagMod100 * 25.5) + 20;
         if newRating > 255 then newRating := 255;
         for iSel := 0 to length(SelectedMP3s)-1 do
         begin
@@ -3984,7 +4032,7 @@ begin
             application.processmessages;
             if not LangeAktionWeitermachen then break;
 
-            Data := VST.GetNodeData(SelectedMP3s[iSel]);
+            Data := LocalTree.GetNodeData(SelectedMP3s[iSel]);
             CurrentAF := Data^.FAudioFile;
 
                   // get List of this AudioFile
@@ -4015,13 +4063,18 @@ begin
     MedienListeStatusLBL.Caption := '';
     ShowSummary;
     fspTaskbarManager.ProgressState := fstpsNoProgress;
-    Node := VST.FocusedNode;
+    Node := LocalTree.FocusedNode;
+    if LocalTree = VST then
+        detUpdate := SD_MEDIENBIB
+    else
+        detUpdate := SD_PLAYLIST;
+
     if Assigned(Node) then
     begin
-        Data := VST.GetNodeData(Node);
-        AktualisiereDetailForm(Data^.FAudioFile, SD_MEDIENBIB);
+        Data := LocalTree.GetNodeData(Node);
+        AktualisiereDetailForm(Data^.FAudioFile, detUpdate);
     end else
-        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+        AktualisiereDetailForm(NIL, detUpdate);
 end;
 
 procedure TNemp_MainForm.PM_ML_ShowInExplorerClick(Sender: TObject);
@@ -6259,74 +6312,33 @@ end;
 procedure TNemp_MainForm.StopBTNIMGClick(Sender: TObject);
 begin
   if ((GetAsyncKeyState(vk_shift) < 0) and (GetAsyncKeyState(vk_Control) >= 0)) then
-  begin
-      if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
-      begin
-          NempPlayer.SetNoEndSyncs(NempPlayer.MainStream);
-          NempPlayer.SetNoEndSyncs(NempPlayer.SlideStream);
-          NempPlayer.LastUserWish := USER_WANT_STOP;
-      end else
-      begin
-          NempPlayer.SetEndSyncs(NempPlayer.MainStream);
-          NempPlayer.SetEndSyncs(NempPlayer.SlideStream);
-          NempPlayer.LastUserWish := USER_WANT_PLAY;
-      end;
-  end else
-  begin
-      NempPlayer.LastUserWish := USER_WANT_STOP;
-      NempPlaylist.stop;
-      if NempPlayer.BassStatus <> BASS_ACTIVE_PLAYING then
-      begin
-        Spectrum.DrawClear;
-        Spectrum.DrawText(NempPlayer.PlayingTitel,False);
-        Spectrum.DrawTime('  00:00');
-        fspTaskbarPreviews1.InvalidatePreview;
-      end;
-
-      Application.Title := NempPlayer.GenerateTaskbarTitel;
-
-      PlaylistVST.Invalidate;
-      Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
-  end;
+      HandleStopAfterTitleClick
+  else
+      HandleStopNowClick;
 end;
 
 procedure TNemp_MainForm.PopupStopPopup(Sender: TObject);
 begin
     if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
-        PM_StopAfterTitle.Caption := MainForm_StopMenu_StopAfterTitle
+    begin
+        PM_StopAfterTitle.Caption := MainForm_StopMenu_StopAfterTitle;
+        PM_StopAfterTitle.ImageIndex := 27;
+    end
     else
+    begin
         PM_StopAfterTitle.Caption := MainForm_StopMenu_NoStopAfterTitle;
+        PM_StopAfterTitle.ImageIndex := 26;
+    end;
 end;
 
 procedure TNemp_MainForm.PM_StopNowClick(Sender: TObject);
 begin
-    NempPlayer.LastUserWish := USER_WANT_STOP;
-    NempPlaylist.stop;
-    if NempPlayer.BassStatus <> BASS_ACTIVE_PLAYING then
-    begin
-      Spectrum.DrawClear;
-      Spectrum.DrawText(NempPlayer.PlayingTitel,False);
-      Spectrum.DrawTime('  00:00');
-    end;
-
-    Application.Title := NempPlayer.GenerateTaskbarTitel;
-    PlaylistVST.Invalidate;
-    Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
+    HandleStopNowClick;
 end;
 
 procedure TNemp_MainForm.PM_StopAfterTitleClick(Sender: TObject);
 begin
-    if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
-    begin
-        NempPlayer.SetNoEndSyncs(NempPlayer.MainStream);
-        NempPlayer.SetNoEndSyncs(NempPlayer.SlideStream);
-        NempPlayer.LastUserWish := USER_WANT_STOP;
-    end else
-    begin
-        NempPlayer.SetEndSyncs(NempPlayer.MainStream);
-        NempPlayer.SetEndSyncs(NempPlayer.SlideStream);
-        NempPlayer.LastUserWish := USER_WANT_PLAY;
-    end;
+    HandleStopAfterTitleClick;
 end;
 
 Procedure TNemp_MainForm.TNA_PlaylistClick(Sender: TObject);
@@ -7087,6 +7099,17 @@ begin
     PM_PL_PlayInHeadset.Enabled := NempPlayer.EnableHeadSet;
     PM_PL_StopHeadset.Enabled   := NempPlayer.EnableHeadSet;
     PM_PL_ExtendedCopyToClipboard.Enabled := True;
+  end;
+
+  if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
+  begin
+      PM_PL_StopAfterCurrentTitle.Caption := MainForm_PlaylistMenu_StopAfterTitle;
+      PM_PL_StopAfterCurrentTitle.ImageIndex := 27;
+  end
+  else
+  begin
+      PM_PL_StopAfterCurrentTitle.Caption := MainForm_PlaylistMenu_NoStopAfterTitle;
+      PM_PL_StopAfterCurrentTitle.ImageIndex := 26;
   end;
 
   // we could allow more, but this would be enough. ;-)
@@ -10164,7 +10187,6 @@ end;
 
 procedure TNemp_MainForm.PM_PL_AddToPrebookListEndClick(
   Sender: TObject);
-var Data: PTreeData;
 begin
 
   NempPlaylist.AddSelectedNodesToPreBookList(pb_End) ;
@@ -10172,16 +10194,16 @@ begin
   exit;
 
   // NempPlaylist.GetInsertNodeFromPlayPosition;
-  if assigned(PlaylistVST.FocusedNode) then //and (PlaylistVST.GetNodeLevel(PlaylistVST.FocusedNode) = 0) then
-  begin
-      NempPlaylist.AddNodeToPrebookList(PlaylistVST.FocusedNode);
+//  if assigned(PlaylistVST.FocusedNode) then //and (PlaylistVST.GetNodeLevel(PlaylistVST.FocusedNode) = 0) then
+//  begin
+//      NempPlaylist.AddNodeToPrebookList(PlaylistVST.FocusedNode);
     //Data := PlaylistVST.GetNodeData(PlaylistVST.FocusedNode);
 
     //TAudioFile(Data^.FAudioFile).PrebookIndex := 1;
 
     //PlaylistVST.InvalidateNode(PlaylistVST.FocusedNode);
     //NempPlaylist.InsertFileToPlayList(Data^.FAudioFile.Pfad);
-  end;
+//  end;
 end;
 
 procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);
@@ -10886,9 +10908,8 @@ end;
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
 //a: TAudiofile;
-// aDrive: TDrive;
-c : Integer;
-bmp: TBitmap;
+ aDrive: TDrive;
+
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -10901,34 +10922,6 @@ begin
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 
-  //caption := IntToStr(Application.Handle)  + ' - ' + IntToStr(dwTaskbarThumbnails1.TaskBarEntryHandle)
-  // + ' - ' + IntToStr(self.handle);
-
-  //MedienBib.TagCloud._SaveTagsToFile(ExtractFilePath(ParamStr(0)) + 'Tags_LastFM.txt');
-
- { bmp := TBitmap.Create;
-  try
-      bmp.PixelFormat := pf24bit;
-      bmp.Height := 240;
-      bmp.Width := 240;
-
-      //if MedienBib.CoverList.Count > msg.Index then
-      //begin
-       //   aCover := TNempCover(MedienBib.CoverList[msg.Index]);
-
-      //    GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
-
-      c := random(20);
-      bmp.LoadFromFile('E:\Nemp SVN\test' +inttostr(c mod 2) + '.bmp');
-         // if msg.Index = 0 then
-         // Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1])
-         // else
-          Medienbib.NewCoverFlow.SetPreview (c, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1])
-      ;
-      MedienBib.NewCoverFlow.Paint(10);
-  finally
-      bmp.free;
-  end;    }
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
