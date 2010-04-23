@@ -116,13 +116,16 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure CheckAndDoCoverDownloaderQuery;
 
+    procedure HandleStopAfterTitleClick;
+    procedure HandleStopNowClick;
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details, HeadsetControl,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis;
+    spectrum_vis, PlayerClass;
 
 procedure CorrectVolButton;
 begin
@@ -1365,6 +1368,42 @@ begin
                   MedienBib.CoverSearchLastFM := BoolFalse;
           end;
 
+end;
+
+procedure HandleStopAfterTitleClick;
+begin
+    With Nemp_MainForm do
+    begin
+        if NempPlayer.StopStatus = PLAYER_STOP_NORMAL then
+        begin
+            NempPlayer.SetNoEndSyncs(NempPlayer.MainStream);
+            NempPlayer.SetNoEndSyncs(NempPlayer.SlideStream);
+            NempPlayer.LastUserWish := USER_WANT_STOP;
+        end else
+        begin
+            NempPlayer.SetEndSyncs(NempPlayer.MainStream);
+            NempPlayer.SetEndSyncs(NempPlayer.SlideStream);
+            NempPlayer.LastUserWish := USER_WANT_PLAY;
+        end;
+    end;
+end;
+procedure HandleStopNowClick;
+begin
+    With Nemp_MainForm do
+    begin
+        NempPlayer.LastUserWish := USER_WANT_STOP;
+        NempPlaylist.stop;
+        if NempPlayer.BassStatus <> BASS_ACTIVE_PLAYING then
+        begin
+          Spectrum.DrawClear;
+          Spectrum.DrawText(NempPlayer.PlayingTitel,False);
+          Spectrum.DrawTime('  00:00');
+          fspTaskbarPreviews1.InvalidatePreview;
+        end;
+        Application.Title := NempPlayer.GenerateTaskbarTitel;
+        PlaylistVST.Invalidate;
+        Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
+    end;
 end;
 
 end.
