@@ -67,7 +67,7 @@ object CloudEditorForm: TCloudEditorForm
     Top = 8
     Width = 506
     Height = 378
-    ActivePage = TS_DeleteTags
+    ActivePage = TS_ExistingTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet

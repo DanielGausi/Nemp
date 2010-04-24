@@ -408,9 +408,9 @@ const
 
     // WM_TRAYMSG = WM_USER + 10; // not needed any more (tTrayIcon)
 
-    SEARCH_SIMPLE = 0;
+    //SEARCH_SIMPLE = 0;
     SEARCH_EXTENDED = 1;
-    SEARCH_LYRICs = 2;
+    //SEARCH_LYRICs = 2;
 
     Spaltenzahl = 21;
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
