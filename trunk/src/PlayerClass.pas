@@ -146,6 +146,7 @@ type
       function GetLength: Double;                 // Length of a song
 
       procedure SetHeadsetVolume(Value: Single);    // the same stuff for the
+      function GetHeadsetVolume: Single;
       function GetHeadsetTime: Double;              // secondary (headset) stream
       procedure SetHeadsetTime(Value: Double);
       function GetHeadsetProgress: Double;
@@ -294,7 +295,7 @@ type
         PreviewBackGround: TBitmap; // The BackGroundImage for the Win7-Preview
 
         property Volume: Single read GetVolume write SetVolume;
-        property HeadSetVolume: Single read fHeadsetVolume write SetHeadsetVolume;
+        property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
         property Time: Double read GetTime write SetTime;              // time in seconds
         property Progress: Double read GetProgress write SetProgress;  // 0..1
         property Dauer: Double read Getlength;
@@ -1500,8 +1501,13 @@ begin
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
 end;
 
+function TNempPlayer.GetHeadsetVolume: Single;
+begin
+  result := fHeadsetVolume * 100;
+end;
 procedure TNempPlayer.SetHeadsetVolume(Value: Single);
 begin
+  Value := Value / 100;
   if Value < 0 then Value := 0;
   if Value > 1 then Value := 1;
   fHeadsetVolume := Value;

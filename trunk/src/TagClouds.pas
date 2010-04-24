@@ -44,7 +44,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs;
+    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils;
 
 const
 
@@ -236,6 +236,9 @@ type
           fMouseOverTag: TPaintTag;
           fFocussedTag: TPaintTag;
 
+          fLastKeypressTick: Int64;           // TickCount when the last keypress occured
+          fSearchString: String;
+
           procedure SetMouseOverTag(Value: TPaintTag);
           procedure SetFocussedTag(Value: TPaintTag);
 
@@ -276,6 +279,10 @@ type
 
           function GetTopTag: TPaintTag;
           function GetBottomTag: TPaintTag;
+
+          function GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
+          function GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
+
 
       public
 
@@ -456,6 +463,9 @@ begin
     fClearTag := TPaintTag.Create('<Your library>');
     fClearTag.BreadCrumbIndex := -2;
     Tags.Add(ClearTag);
+
+    fSearchString := '';
+    fLastKeypressTick := GetTickCount;
 
     InitHashMap;
 end;
@@ -675,7 +685,6 @@ begin
     else
         result := GetDefaultTag;
 end;
-
 
 
 function TTagCloud.GetRightTag: TPaintTag;
@@ -902,7 +911,66 @@ begin
         result := GetDefaultTag;
 end;
 
+{
+    --------------------------------------------------------
+    GetNextMatchingTagInLine
+    - Get a tag with Prefix "fSearchString" in the given line
+    --------------------------------------------------------
+}
+function TTagCloud.GetNextMatchingTagInLine(aLine: TTagLine; Offset: Integer): TPaintTag;
+var i: integer;
+    aTag: TPaintTag;
+begin
+    result := Nil;
+    for i := Offset to aLine.Tags.Count - 1 do
+    begin
+        aTag := TPaintTag(aLine.Tags[i]);
+        //if AnsiStartsText(fSearchString, aTag.Key) then
+        if AnsiContainsText(aTag.Key, fSearchString) then
+        begin
+            result := aTag;
+            break;
+        end;
+    end;
+end;
+function TTagCloud.GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
+var aLine: TTagLine;
+    StartTag: TPaintTag;
+    tc: Int64;
+    LineCount, LineIdx, TagIdx: Integer;
 
+begin
+    tc := GetTickCount;
+    if not f3pressed then
+    begin
+        if (tc - fLastKeypressTick < 1000) then
+            fSearchString := fSearchString + Char(aKey)
+        else
+            fSearchString := Char(aKey);
+    end;
+    fLastKeypressTick := tc;
+
+    if assigned(fFocussedTag) then
+    begin
+        aLine := fFocussedTag.fLine;
+        LineIdx := CloudPainter.TagLines.IndexOf(aLine);
+        TagIdx := aLine.Tags.IndexOf(fFocussedTag);
+        if f3pressed then
+            inc(TagIdx);
+        result := GetNextMatchingTagInLine(aLine, TagIdx);
+        LineCount := 0;
+        while (not assigned(result)) and (LineCount <= CloudPainter.TagLines.Count - 1) do
+        begin
+            inc(LineCount);
+            LineIdx := (LineIdx + 1) mod (CloudPainter.TagLines.Count);
+            aLine := TTagLine(CloudPainter.TagLines[LineIdx]);
+            result := GetNextMatchingTagInLine(aLine, 0);
+        end;
+        if not assigned(result) then
+            result := fFocussedTag;  //
+    end else
+        result := GetDefaultTag;
+end;
 
 
 procedure TTagCloud.ShowTags;
@@ -1258,6 +1326,9 @@ begin
               else
                   FocussedTag := Nil;
         end;
+        vk_F3: FocussedTag := GetNextMatchingTag(aKey, True);
+    else
+        FocussedTag := GetNextMatchingTag(aKey, False);
     end;
 
     //CloudPainter.DoPaint;

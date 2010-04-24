@@ -638,7 +638,8 @@ begin
     if assigned(Data) then
     begin
         aString := Data^.FTag.Key;
-        Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+//        Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+        Result := StrLIComp(PChar(SearchText), PChar(aString), length(SearchText));
     end;
 end;
 
@@ -825,10 +826,11 @@ begin
                     // process selected tags: rename them to the new Keyname
                     Data := TagVST.GetNodeData(SelectedTags[i]);
                     if Data^.FTag.Key <> maxKey then
+                    begin
                         MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
-
-                    if cbAutoAddMergeTags.Checked then
-                        TagPostProcessor.AddMergeTag(Data^.FTag.Key, maxKey);
+                        if cbAutoAddMergeTags.Checked then
+                            TagPostProcessor.AddMergeTag(Data^.FTag.Key, maxKey);
+                    end;
                 end;
                 if cbAutoAddMergeTags.Checked then
                     FillMergeTree;

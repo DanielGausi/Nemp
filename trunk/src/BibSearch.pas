@@ -103,6 +103,8 @@ type
 var
   FormBibSearch: TFormBibSearch;
 
+procedure StringAdd(var OldString: String; AddString: String);
+
 implementation
 
 {$R *.dfm}

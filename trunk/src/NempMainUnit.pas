@@ -54,7 +54,7 @@ uses
    Mp3FileUtils, spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
-      fldbrows, MainFormHelper, MessageHelper,
+      fldbrows, MainFormHelper, MessageHelper, BibSearchClass,
   Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
    Nemp_SkinSystem, NempPanel, SkinButtons, math,
 
@@ -2184,15 +2184,13 @@ end;
 
 procedure TNemp_MainForm.CloudAfterPaint(Sender: TObject);
 begin
-
-
     if Not NempSkin.isActive then
         MedienBib.TagCloud.CloudPainter.PaintAgain;
 end;
 
 procedure TNemp_MainForm.CloudPaint(Sender: TObject);
 begin
-  MedienBib.TagCloud.CloudPainter.PaintAgain;
+    MedienBib.TagCloud.CloudPainter.PaintAgain;
 end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseDown(Sender: TObject;
@@ -2536,9 +2534,14 @@ end;
 procedure TNemp_MainForm.WMStartEditing(var Msg: TMessage);
 var aNode: PVirtualNode;
 begin
-    aNode := Pointer(Msg.WParam);
-    VST.EditNode(aNode, Msg.LParam);
-
+    try
+        aNode := Pointer(Msg.WParam);
+        VST.EditNode(aNode, Msg.LParam);
+    except
+        /// nothing
+        /// This happens, when the user select "search for ..." in the popup-menu
+        /// and the menu is over the "rating"-column
+    end;
 end;
 
 procedure TNemp_MainForm.WMEndSession(var M: TWMEndSession);
@@ -2906,29 +2909,43 @@ end;
 
 Procedure TNemp_MainForm.MedienBibMessage(Var aMsg: TMessage);
 begin
-    Handle_MedienBibMessage(aMsg);
+    if NempIsClosing then
+        aMsg.Result := 1
+    else
+        Handle_MedienBibMessage(aMsg);
 end;
-
 
 
 Procedure TNemp_MainForm.ShoutcastQueryMessage(Var aMsg: TMessage);
 begin
-    Handle_ShoutcastQueryMessage(aMsg);
+    if NempIsClosing then
+        aMsg.Result := 1
+    else
+        Handle_ShoutcastQueryMessage(aMsg);
 end;
 
 Procedure TNemp_MainForm.WebServerMessage(Var aMsg: TMessage);
 begin
-    Handle_WebServerMessage(aMsg);
+    if NempIsClosing then
+        aMsg.Result := 1
+    else
+        Handle_WebServerMessage(aMsg);
 end;
 
 Procedure TNemp_MainForm.UpdaterMessage(Var aMsg: TMessage);
 begin
-    Handle_UpdaterMessage(aMsg);
+    if NempIsClosing then
+        aMsg.Result := 1
+    else
+        Handle_UpdaterMessage(aMsg);
 end;
 
 Procedure TNemp_MainForm.ScrobblerMessage(Var aMsg: TMessage);
 begin
-    Handle_ScrobblerMessage(aMsg);
+    if NempIsClosing then
+        aMsg.Result := 1
+    else
+        Handle_ScrobblerMessage(aMsg);
 end;
 
 procedure TNemp_MainForm.WndProc(var Message: TMessage);
@@ -2943,14 +2960,14 @@ begin
                   SC_MAXIMIZE:
                         begin
                             MinimizedIndicator := False;
-                            if NempSkin.isActive then
+                            if (not NempIsClosing) and NempSkin.isActive then
                               NempSkin.FitSkinToNewWindow;
                             Message.Result := 0;
                         end;
                   SC_Restore:
                         begin
                             MinimizedIndicator := False;
-                            if NempSkin.isActive then
+                            if (not NempIsClosing) and NempSkin.isActive then
                               NempSkin.FitSkinToNewWindow;
                             Message.Result := 0;
                         end;
@@ -4661,7 +4678,8 @@ begin
     else
         aString := aAudioFile.Artist;
     end;
-    Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+    //Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+    Result := StrLIComp(PChar(SearchText), PChar(aString), length(SearchText));
 end;
 
 procedure TNemp_MainForm.VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
@@ -5789,7 +5807,8 @@ begin
 
     Data := Sender.GetNodeData(Node);
     aString := TJustAstring(Data^.FString).AnzeigeString;
-    Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+    //Result := StrLIComp(PChar(SearchText), PChar(aString), Min(length(SearchText), length(aString)));
+    Result := StrLIComp(PChar(SearchText), PChar(aString), length(SearchText));
 end;
 
 procedure TNemp_MainForm.AlbenVSTFocusChanged(Sender: TBaseVirtualTree;
@@ -6925,45 +6944,50 @@ begin
 end;
 
 procedure TNemp_MainForm.NachDiesemDingSuchen1Click(Sender: TObject);
-//var  aNode: pVirtualNode;
-//      Data: PTreeData;
-//      tmpstr: UnicodeString;
+var aNode: pVirtualNode;
+    Data: PTreeData;
+    newComboBoxString, tmpstr: UnicodeString;
+    KeyWords: TSearchKeyWords;
 begin
+    Medienbib.BibSearcher.SearchOptions.SearchParam := 0;       // = New Search
+    Medienbib.BibSearcher.SearchOptions.AllowErrors := False;  // no errors allowed
+    KeyWords.General   := '';
+    KeyWords.Artist    := '';
+    KeyWords.Album     := '';
+    KeyWords.Titel     := '';
+    KeyWords.Pfad      := '';
+    KeyWords.Kommentar := '';
+    KeyWords.Lyric     := '';
+    KeyWords.Mode      := SEARCH_EXTENDED;
 
-ShowMessage('Not implemented right now');
+    aNode := VST.FocusedNode;
+    if not assigned(aNode) then exit;
 
-{
+    Data := VST.GetNodeData(aNode);
+    case (Sender as TMenuItem).Tag of
+        1: KeyWords.Titel  := (Data^.FaudioFile).Titel;
+        2: KeyWords.Artist := (Data^.FaudioFile).Artist;
+        3: KeyWords.Album  := (Data^.FaudioFile).Album;
+    end;
 
-  aNode := VST.FocusedNode;
-  if not assigned(aNode) then exit;
+    newComboBoxString := '';
+    StringAdd(newComboBoxString, KeyWords.General  );
+    StringAdd(newComboBoxString, KeyWords.Artist   );
+    StringAdd(newComboBoxString, KeyWords.Album    );
+    StringAdd(newComboBoxString, KeyWords.Titel    );
+    StringAdd(newComboBoxString, KeyWords.Pfad     );
+    StringAdd(newComboBoxString, KeyWords.Kommentar);
+    StringAdd(newComboBoxString, KeyWords.Lyric    );
+    if newComboBoxString = '' then
+        newComboBoxString := (MainForm_NoSearchKeywords);
 
-  Data := VST.GetNodeData(aNode);
-  case (Sender as TMenuItem).Tag of
-    1: tmpstr := (Data^.FaudioFile).Titel;
-    2: tmpstr := (Data^.FaudioFile).Artist;
-    3: tmpstr := (Data^.FaudioFile).Album;
-  end;
+    KeyWords.ComboBoxString := newComboBoxString;
 
-  // Seite Wechseln
-  TabBtn_Search.Click;
-  // Genaue Suche
-  CB_SearchMode.ItemIndex := 1;
-
-  TitelEDIT.Text := '';
-  ArtistEdit.Text := '';
-  AlbumEdit.Text := '';
-  KommentarEdit.Text := '';
-  case (Sender as TMenuItem).Tag of
-    1: TitelEDIT.Text  := tmpstr;
-    2: ArtistEdit.Text := tmpstr;
-    3: AlbumEdit.Text  := tmpstr;
-  end;
-  CB_SearchOptionsExtended.ItemIndex := 0;
-  GenaueSucheBTNClick(Nil);
-
-  }
+    Medienbib.BibSearcher.InitNewSearch(KeyWords);
+    Medienbib.BibSearcher.SearchOptions.SkipGenreCheck  := True;
+    Medienbib.BibSearcher.SearchOptions.SkipYearCheck  := True;
+    MedienBib.CompleteSearch(Keywords);
 end;
-
 
 
 procedure TNemp_MainForm.MM_H_ShowReadmeClick(Sender: TObject);
@@ -9948,7 +9972,9 @@ var
   Data: PTreeData;
   af: tAudioFile;
 begin
+
     Data := VST.GetNodeData(Node);
+
     if assigned(Data) then
         af := Data^.FAudioFile
     else
@@ -10992,6 +11018,7 @@ end;
 procedure TNemp_MainForm.VST_ColumnPopupPopup(Sender: TObject);
 var i: Integer;
 begin
+
     for i := 0 to VST_ColumnPopup.Items.Count - 3 do
     begin
         VST_ColumnPopup.Items[i].Checked :=

@@ -661,7 +661,7 @@ end;
 function TAudioFile.fGetTagDisplayString: String;
 begin
     if trim(RawTagLastFM) <> '' then
-        result := StringReplace(RawTagLastFM, #13#10, ', ', [rfreplaceAll])
+        result := StringReplace(Trim(RawTagLastFM), #13#10, ', ', [rfreplaceAll])
     else
         result := Tags_AddTags;
 end;
