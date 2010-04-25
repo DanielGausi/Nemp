@@ -1181,6 +1181,7 @@ begin
                                                       /// UND WARUM BITTESCHÖN ????
                       case NempPlaylist.WiedergabeMode of
                           0,2: begin
+                                  //NempPlaylist.UpdateHistory;
                                   NempPlaylist.PlayNext
                           end;
                           1: NempPlaylist.PlayAgain;
@@ -1188,13 +1189,17 @@ begin
                               if // (NempPlaylist.Count > 1) and
                                  (NempPlaylist.PlayingIndex <> NempPlaylist.Count -1)
                               then
-                                  NempPlaylist.PlayNext
+                              begin
+                                  //NempPlaylist.UpdateHistory;
+                                  NempPlaylist.PlayNext;
+                              end
                               else
                               begin
                                   if NempOptions.ShutDownAtEndOfPlaylist then
                                       InitShutDown
                                   else
                                   begin
+                                      //NempPlaylist.UpdateHistory;
                                       NempPlayer.LastUserWish := USER_WANT_STOP;
                                       NempPlaylist.Stop;
                                   end;

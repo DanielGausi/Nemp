@@ -92,6 +92,17 @@ type
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
       PrebookList: TObjectList;
+
+      /// History: When playing a new File, the file played before this file is added to the historylist
+      /// and fCurrentHistoryFile points to this last played file.
+      ///  GetNext/GetPrevious-Index Call "UpdateHistory" first
+      ///     There is checked, whether we are currently "browsing in the history" or leaving it
+      ///     (in this case the last played file ist added at the end/at the beginning of the history list)
+      /// After this, GetNext/GetPreviousIndex will get the new index through the history (if needed)
+      ///  or get a "New" index
+      fCurrentHistoryFile: TAudioFile;
+      HistoryList: TObjectList;
+
       function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
@@ -115,6 +126,10 @@ type
       function GetProgress: Double;
       procedure SetProgress(Value: Double);
 
+      // UpdateHistory
+      // called from GetNext- GetPrevAudioFileIndex
+      // Inserts (if needed) currentfile at the end of the Historylist
+      procedure UpdateHistory(Backwards: Boolean = False);
 
 
     public
@@ -204,6 +219,7 @@ type
       procedure ClearPlaylist;      // Delete whole playlist
       procedure DeleteDeadFiles;    // Delete dead (non existing) files
       procedure RemovePlayingFile;  // Remove the current file from the list
+      procedure RemoveFileFromHistory(aFile: TAudioFile);
 
       //// Some GUI-Stuff
       // Get the InsertNode from current playing position
@@ -291,6 +307,8 @@ begin
   Playlist := TObjectList.Create;
   ST_Ordnerlist := TStringList.Create;
   PrebookList := TObjectList.Create(False);
+  HistoryList := TObjectList.Create(False);
+  fCurrentHistoryFile := Nil;
   fPlayingFile := Nil;
   fBackupFile := TPlayListFile.Create;
   AcceptInput := True;
@@ -302,6 +320,7 @@ end;
 
 destructor TNempPlaylist.Destroy;
 begin
+  HistoryList.Free;
   PrebookList.Free;
   Playlist.Free;
   ST_Ordnerlist.Free;
@@ -666,6 +685,9 @@ begin
   if Not Assigned(Node) then Exit;
   if Not VST.Selected[Node] then Exit;
 
+  // add the current title into the history
+  UpdateHistory;
+
   if VST.GetNodeLevel(Node)=0 then
   begin
       Play(Node.Index, Player.FadingInterval, True);
@@ -741,6 +763,7 @@ var i:integer;
   aData: PTreeData;
   NewSelectNode: PVirtualNode;
   allNodesDeleted: Boolean;
+  aIdx: Integer;
 begin
   Selectedmp3s := VST.GetSortedSelection(False);
   if length(SelectedMp3s) = 0 then exit;
@@ -769,6 +792,7 @@ begin
                 Player.MainAudioFile := fBackUpFile;
               end;
               PrebookList.Remove(aData^.FAudioFile);
+              RemoveFileFromHistory(aData^.FAudioFile);
               Playlist.Delete(Selectedmp3s[i].Index);
               VST.DeleteNode(Selectedmp3s[i],True);
           end else
@@ -791,10 +815,12 @@ end;
 procedure TNempPlaylist.ClearPlaylist;
 begin
     Player.StopAndFree;
+    HistoryList.Clear;
     PrebookList.Clear;
     Playlist.Clear;
     fPlayingFile := Nil;
     fPlayingNode := Nil;
+    fCurrentHistoryFile := Nil;
     Player.MainAudioFile := Nil;
     fPlayingIndex := 0;
     FillPlaylistView;
@@ -813,12 +839,31 @@ begin
         then
         begin
             PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
+            HistoryList.Remove(TPlaylistFile(Playlist.Items[i]));
+            RemoveFileFromHistory(TPlaylistFile(Playlist.Items[i]));
             Playlist.Delete(i);
         end;
   end;
   ReIndexPrebookedFiles;
   FillPlaylistView;
   fDauer := ShowPlayListSummary;
+end;
+
+procedure TNempPlaylist.RemoveFileFromHistory(aFile: TAudioFile);
+var aIdx: Integer;
+begin
+    if aFile = fCurrentHistoryFile then
+    begin
+        aIdx := HistoryList.IndexOf(fCurrentHistoryFile);
+        if aIdx < HistoryList.Count-1 then
+            fCurrentHistoryFile := TAudioFile(HistoryList[aIdx])
+        else
+            if aIdx - 1 > 0 then
+                fCurrentHistoryFile := TAudioFile(HistoryList[aIdx - 1])
+            else
+                fCurrentHistoryFile := Nil;
+    end;
+    HistoryList.Remove(aFile);
 end;
 
 procedure TNempPlaylist.removePlayingFile;
@@ -828,6 +873,7 @@ begin
   if assigned(aNode) then
   begin
     PrebookList.Remove(fPlayingFile);
+    RemoveFileFromHistory(fPlayingFile);
     Playlist.Remove(fPlayingfile);
     VST.DeleteNode(aNode,True);
     ReIndexPrebookedFiles;
@@ -1672,6 +1718,39 @@ begin
   end;
 end;
 
+procedure TNempPlaylist.UpdateHistory(Backwards: Boolean = False);
+begin
+    if backwards then
+    begin
+        if assigned(fPlayingFile)
+        and ((fCurrentHistoryFile = nil) or (HistoryList.IndexOf(fCurrentHistoryFile) = 0 ) )
+        then
+        begin
+            HistoryList.Remove(fPlayingFile); // we MUST NOT have duplicates in this list
+            HistoryList.Insert(0, fPlayingFile);
+            if HistoryList.Count > 25 then
+                HistoryList.Delete(HistoryList.Count-1);
+            fCurrentHistoryFile := fPlayingFile;
+            Nemp_MainForm.Caption := 'Update History: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
+             + Inttostr(HistoryList.Count - 1);
+        end;
+    end else
+    begin
+        if assigned(fPlayingFile)
+        and ((fCurrentHistoryFile = nil) or (HistoryList.IndexOf(fCurrentHistoryFile) = HistoryList.Count-1 ) )
+        then
+        begin
+            HistoryList.Remove(fPlayingFile); // we MUST NOT have duplicates in this list
+            HistoryList.Add(fPlayingFile);
+            if HistoryList.Count > 25 then
+                HistoryList.Delete(0);
+            fCurrentHistoryFile := fPlayingFile;
+            Nemp_MainForm.Caption := 'Update History: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
+             + Inttostr(HistoryList.Count - 1);
+        end;
+    end;
+end;
+
 {
     --------------------------------------------------------
     Getting an Audiofile
@@ -1703,57 +1782,98 @@ function TNempPlaylist.GetNextAudioFileIndex: Integer;
 var i:integer;
   tmpAudioFile: TPlaylistfile;
   c: Integer;
+  historySuccess: Boolean;
 begin
-    if PrebookList.Count > 0 then
-    begin
-        tmpAudioFile := TAudioFile(PrebookList[0]);
-        // the new selected file IS NOT equal to the interrupted file
-        // => set the interruptedPLayPosition to 0
-        if fInterruptedFile <> tmpAudioFile then
-            fInterruptedPlayPosition := 0;
+    UpdateHistory;
 
-        result := Playlist.IndexOf(tmpAudioFile);
-        PrebookList.Delete(0);
-        tmpAudioFile.PrebookIndex := 0;
-        ReIndexPrebookedFiles;
-    end
-    else
+
+    if assigned(fCurrentHistoryFile) and (HistoryList.IndexOf(fCurrentHistoryFile) < HistoryList.Count-1 ) then
     begin
-        fInterruptedPlayPosition := 0;
-        if WiedergabeMode <> 2 then  //  kein Zufall , +1 Mod Count, ggf. Liste neu mischen
+        // we are "browsing in the history list"
+        c := HistoryList.IndexOf(fCurrentHistoryFile);
+        // get the next one
+        if (fPlayingFile = fCurrentHistoryFile) and (c < HistoryList.Count-1) then
         begin
-            // Index auf aktuellen  + 1
-            if (fPlayingFile <> NIL) and (fPlayingFile <> fBackupFile) then
-              result := PlayList.IndexOf(fPlayingFile) + 1
-            else
-                result := fPlayingIndex ; // nicht um eins erhöhen !!
-
-            if result > PlayList.Count-1 then
-            begin
-              result := 0;
-              if fAutoMix then
-              begin // Playlist neu durchmischen
-                for i := 0 to Playlist.Count-1 do
-                  Playlist.Move(i,i + random(PlayList.Count-i));
-                FillPlaylistView;
-              end;
-            end
+            fCurrentHistoryFile := TPlaylistfile(HistoryList[c+1]);
+            result := Playlist.IndexOf(fCurrentHistoryFile);
+            historySuccess := result > -1
         end else
-        // shufflemode
         begin
-            if Playlist.Count = 0 then
-                result := -1
-            else begin
-                result := Random(Playlist.Count);
-                c := 0;
-                tmpAudioFile := PlayList[result] as TPlaylistfile;
-                while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
-                      AND (tmpAudioFile.LastPlayed <> 0)
-                      AND (c <= PlayList.Count) do
+            if (c >= 0) then
+            begin
+                fCurrentHistoryFile := TPlaylistfile(HistoryList[c]);
+                result := Playlist.IndexOf(fCurrentHistoryFile);
+                historySuccess := result > -1
+            end else
+            begin
+                historySuccess := False;
+                result := 0; // dummy, so the compiler dont show a warning
+            end;
+        end;
+
+        Nemp_MainForm.Caption := 'forward in history: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
+         + Inttostr(HistoryList.Count - 1);
+
+    end else
+    begin
+        historySuccess := False;
+        result := 0; // dummy, so the compiler dont show a warning
+    end;
+
+
+    if not historySuccess then
+    begin
+        if PrebookList.Count > 0 then
+        begin
+            tmpAudioFile := TAudioFile(PrebookList[0]);
+            // the new selected file IS NOT equal to the interrupted file
+            // => set the interruptedPLayPosition to 0
+            if fInterruptedFile <> tmpAudioFile then
+                fInterruptedPlayPosition := 0;
+
+            result := Playlist.IndexOf(tmpAudioFile);
+            PrebookList.Delete(0);
+            tmpAudioFile.PrebookIndex := 0;
+            ReIndexPrebookedFiles;
+        end
+        else
+        begin
+            fInterruptedPlayPosition := 0;
+            if WiedergabeMode <> 2 then  //  kein Zufall , +1 Mod Count, ggf. Liste neu mischen
+            begin
+                // Index auf aktuellen  + 1
+                if (fPlayingFile <> NIL) and (fPlayingFile <> fBackupFile) then
+                  result := PlayList.IndexOf(fPlayingFile) + 1
+                else
+                    result := fPlayingIndex ; // nicht um eins erhöhen !!
+
+                if result > PlayList.Count-1 then
                 begin
-                    inc(c);
-                    result := (result + 1) MOD Playlist.Count;
+                  result := 0;
+                  if fAutoMix then
+                  begin // Playlist neu durchmischen
+                    for i := 0 to Playlist.Count-1 do
+                      Playlist.Move(i,i + random(PlayList.Count-i));
+                    FillPlaylistView;
+                  end;
+                end
+            end else
+            // shufflemode
+            begin
+                if Playlist.Count = 0 then
+                    result := -1
+                else begin
+                    result := Random(Playlist.Count);
+                    c := 0;
                     tmpAudioFile := PlayList[result] as TPlaylistfile;
+                    while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
+                          AND (tmpAudioFile.LastPlayed <> 0)
+                          AND (c <= PlayList.Count) do
+                    begin
+                        inc(c);
+                        result := (result + 1) MOD Playlist.Count;
+                        tmpAudioFile := PlayList[result] as TPlaylistfile;
+                    end;
                 end;
             end;
         end;
@@ -1761,13 +1881,55 @@ begin
 end;
 
 function TNempPlaylist.GetPrevAudioFileIndex: Integer;
+var c: Integer;
+    historySuccess: Boolean;
 begin
-  if (fPlayingFile <> NIL)  and (fPlayingFile <> fBackupFile) then
-    result := PlayList.IndexOf(fPlayingFile) - 1
-  else
-    result := fPlayingIndex-1;
-  if (result < 0) then
-    result := 0;
+    UpdateHistory(True);
+    if assigned(fCurrentHistoryFile) and (HistoryList.IndexOf(fCurrentHistoryFile) >= 0 ) then
+    begin
+        // we are "browsing in the history list"
+        c := HistoryList.IndexOf(fCurrentHistoryFile);
+        // get the previous one
+        if (fPlayingFile = fCurrentHistoryFile) and (c > 0) then
+        begin
+            fCurrentHistoryFile := TPlaylistfile(HistoryList[c-1]);
+            result := Playlist.IndexOf(fCurrentHistoryFile);
+            historySuccess := result > -1
+        end else
+        begin
+            if (c > 0) then
+            begin
+                fCurrentHistoryFile := TPlaylistfile(HistoryList[c]);
+                result := Playlist.IndexOf(fCurrentHistoryFile);
+                historySuccess := result > -1
+            end else
+            begin
+                historySuccess := False;
+                result := 0; // dummy, so the compiler dont show a warning
+            end;
+        end;
+                Nemp_MainForm.Caption := 'back in history: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
+         + Inttostr(HistoryList.Count - 1);
+
+        //fCurrentHistoryFile := TPlaylistfile(HistoryList[c-1]);
+        //result := Playlist.IndexOf(fCurrentHistoryFile);
+    end else
+    begin
+        historySuccess := False;
+        result := 0; // dummy, so the compiler dont show a warning
+    end;
+
+    if not historySuccess then
+    begin // fallback to "normal previous"
+        if (fPlayingFile <> NIL)  and (fPlayingFile <> fBackupFile) then
+            result := PlayList.IndexOf(fPlayingFile) - 1
+        else
+            result := fPlayingIndex-1;
+        if (result < 0) then
+            result := Playlist.Count - 1;
+        if (result < 0) then
+            result := 0;
+    end;
 end;
 
 
