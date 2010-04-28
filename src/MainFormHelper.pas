@@ -119,6 +119,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure HandleStopAfterTitleClick;
     procedure HandleStopNowClick;
 
+    procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1403,6 +1405,17 @@ begin
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         PlaylistVST.Invalidate;
         Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
+    end;
+end;
+
+procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
+var i: Integer;
+    Data: PTreeData;
+begin
+    for i := 0 to length(aSelection) - 1 do
+    begin
+        Data := aTree.GetNodeData(aSelection[i]);
+        Target.Add(Data^.FAudioFile);
     end;
 end;
 

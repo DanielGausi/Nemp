@@ -2110,6 +2110,8 @@ begin
     end;
   Spectrum.DrawClear;
   NewPlayerPanel.DoubleBuffered := True;
+
+
 end;
 
 
@@ -2236,6 +2238,18 @@ begin
   CloudViewer.OnPaint := CloudPaint;
   CloudViewer.OnAfterPaint := CloudAfterPaint;
 
+  LblBibArtist     .Caption := '';
+  LblBibAlbum      .Caption := '';
+  LblBibTitle      .Caption := '';
+  LblBibTrack      .Caption := '';
+  LblBibYear       .Caption := '';
+  LblBibGenre      .Caption := '';
+  LblBibDuration   .Caption := '';
+  LblBibQuality    .Caption := '';
+  LblBibPlayCounter.Caption := '';
+  LblBibTags       .Caption := '';
+
+
 end;
 
 procedure TNemp_MainForm.FormShow(Sender: TObject);
@@ -2253,6 +2267,12 @@ Procedure TNemp_MainForm.StuffToDoAfterCreate;
 var
   tmpstr: UnicodeString;
 begin
+
+
+
+
+
+
   if NempOptions.ShowDeskbandOnStart then
   begin
     NotifyDeskband(NempDeskbandActivateMessage);
@@ -3357,22 +3377,22 @@ begin
     VST.BeginUpdate;
     NewSelectNode := VST.GetNextSibling(Selectedmp3s[length(Selectedmp3s)-1]);
     if not Assigned(NewSelectNode) then
-      NewSelectNode := VST.GetPreviousSibling(Selectedmp3s[0]);
+        NewSelectNode := VST.GetPreviousSibling(Selectedmp3s[0]);
 
     begin
-      for i:=0 to length(SelectedMP3s)-1 do
-      begin
-        Data := VST.GetNodeData(SelectedMP3s[i]);
-        MedienBib.AnzeigeListe.Extract(Data^.FAudioFile);
-        MedienBib.AnzeigeListe2.Extract(Data^.FAudioFile);
-      end;
-      VST.DeleteSelectedNodes;
+        for i:=0 to length(SelectedMP3s)-1 do
+        begin
+            Data := VST.GetNodeData(SelectedMP3s[i]);
+            MedienBib.AnzeigeListe.Extract(Data^.FAudioFile);
+            MedienBib.AnzeigeListe2.Extract(Data^.FAudioFile);
+        end;
+        VST.DeleteSelectedNodes;
     end;
 
     if assigned(NewSelectNode) then
     begin
-      VST.Selected[NewSelectNode] := True;
-      VST.FocusedNode := NewSelectNode;
+        VST.Selected[NewSelectNode] := True;
+        VST.FocusedNode := NewSelectNode;
     end;
 
     VST.EndUpdate;
@@ -3390,6 +3410,7 @@ var i:integer;
     FocussedAlbumNode, NewSelectNode: PVirtualNode;
     SelectedPlaylist: TJustaString;
     SelectedMp3s: TNodeArray;
+    FileList: TObjectList;
 begin
     SelectedMp3s := Nil;
     case Medialist_PopupMenu.Tag of
@@ -3429,8 +3450,8 @@ begin
             begin
                 if MedienBib.StatusBibUpdate <> 0 then
                 begin
-                  MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-                  exit;
+                    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+                    exit;
                 end;
                 VST.BeginUpdate;
                 MedienBib.StatusBibUpdate := BIB_Status_ReadAccessBlocked;
@@ -3441,20 +3462,27 @@ begin
                 // Hier wird komplett gelöscht.
                 // d.h.: aus der Medienliste entfernen und aus alle anderen Listen
                 begin
-                  // in allen Listen löschen und MP3-File entfernen
-                  for i:=0 to length(SelectedMP3s)-1 do
-                  begin
-                    Data := VST.GetNodeData(SelectedMP3s[i]);
-                    MedienBib.DeleteAudioFile(Data^.FAudioFile);
+                    FileList := TObjectList.Create(False);
+                    try
+                        // collect Data first
+                        VSTSelectionToAudiofileList(VST, SelectedMP3s, FileList);
+                        // Delete Nodes
+                        VST.DeleteSelectedNodes;
 
-                    if i mod 64 = 0 then
-                    begin
-                      MedienListeStatusLBL.Caption := Format((MediaLibrary_Deleting), [Round(i/length(SelectedMP3s) * 100)]);
-                      Application.ProcessMessages;
+                        // in allen Listen löschen und MP3-File entfernen
+                        for i:=0 to FileList.Count-1 do
+                        begin
+                            //Data := VST.GetNodeData(SelectedMP3s[i]);
+                            MedienBib.DeleteAudioFile(TAudioFile(FileList[i]));
+                            if i mod 64 = 0 then
+                            begin
+                                MedienListeStatusLBL.Caption := Format((MediaLibrary_Deleting), [Round(i/length(SelectedMP3s) * 100)]);
+                                Application.ProcessMessages;
+                            end;
+                        end;
+                    finally
+                        FileList.Free;
                     end;
-
-                  end;
-                  VST.DeleteSelectedNodes;
                 end;
 
                 VST.EndUpdate;
@@ -3846,10 +3874,17 @@ var o: TComponent;
 begin
   if LangeAktionWeitermachen then   exit;
 
-  Nemp_MainForm.PM_ML_Play    .Default := NempPlaylist.DefaultAction = 1;
-  Nemp_MainForm.PM_ML_Enqueue .Default := NempPlaylist.DefaultAction = 0;
-  Nemp_MainForm.PM_ML_PlayNext.Default := NempPlaylist.DefaultAction = 2;
-  Nemp_MainForm.PM_ML_PlayNow .Default := NempPlaylist.DefaultAction = 3;
+
+
+  if MedienBib.Count <= 10 then
+      PM_ML_SearchDirectory.Default := True
+  else
+  begin
+      Nemp_MainForm.PM_ML_Play    .Default := NempPlaylist.DefaultAction = 1;
+      Nemp_MainForm.PM_ML_Enqueue .Default := NempPlaylist.DefaultAction = 0;
+      Nemp_MainForm.PM_ML_PlayNext.Default := NempPlaylist.DefaultAction = 2;
+      Nemp_MainForm.PM_ML_PlayNow .Default := NempPlaylist.DefaultAction = 3;
+  end;
 
 
   { PLAYER_ENQUEUE_FILES = 0; // Achtung! Muss mit den Itemindexes der Radiogroup
@@ -4011,7 +4046,7 @@ var CurrentAF, listFile :TAudioFile;
     Data: PTreeData;
     SelectedMp3s: TNodeArray;
     Node:PVirtualNode;
-    ListOfFiles: TObjectList;
+    SelectedFiles, ListOfFiles: TObjectList;
     newRating: Integer;
     detUpdate, TagMod100: Integer;
     LocalTree: TVirtualStringTree;
@@ -4043,27 +4078,37 @@ begin
         else
             newRating := Round(TagMod100 * 25.5) + 20;
         if newRating > 255 then newRating := 255;
-        for iSel := 0 to length(SelectedMP3s)-1 do
-        begin
-            fspTaskbarManager.ProgressValue := Round(iSel/length(SelectedMP3s) * 100);
-            application.processmessages;
-            if not LangeAktionWeitermachen then break;
 
-            Data := LocalTree.GetNodeData(SelectedMP3s[iSel]);
-            CurrentAF := Data^.FAudioFile;
 
-                  // get List of this AudioFile
-                  GetListOfAudioFileCopies(CurrentAF, ListOfFiles);
-                  // edit all these files
-                  for iList := 0 to ListOfFiles.Count - 1 do
-                  begin
-                      listFile := TAudioFile(ListOfFiles[iList]);
-                      listFile.Rating := newRating;
-                  end;
-                  // write the rating into the file on disk
-                  CurrentAF.QuickUpdateTag;
-                  // correct GUI
-                  CorrectVCLAfterAudioFileEdit(CurrentAF);
+        SelectedFiles := TObjectList.Create(False);
+        try
+            // Collect Data
+            VSTSelectionToAudiofileList(VST, SelectedMP3s, SelectedFiles);
+
+            for iSel := 0 to SelectedFiles.Count-1 do
+            begin
+                fspTaskbarManager.ProgressValue := Round(iSel/SelectedFiles.Count * 100);
+                application.processmessages;
+                if not LangeAktionWeitermachen then break;
+
+                //Data := LocalTree.GetNodeData(SelectedMP3s[iSel]);
+                CurrentAF := TAudioFile(SelectedFiles[iSel]); //Data^.FAudioFile;
+
+                      // get List of this AudioFile
+                      GetListOfAudioFileCopies(CurrentAF, ListOfFiles);
+                      // edit all these files
+                      for iList := 0 to ListOfFiles.Count - 1 do
+                      begin
+                          listFile := TAudioFile(ListOfFiles[iList]);
+                          listFile.Rating := newRating;
+                      end;
+                      // write the rating into the file on disk
+                      CurrentAF.QuickUpdateTag;
+                      // correct GUI
+                      CorrectVCLAfterAudioFileEdit(CurrentAF);
+            end;
+        finally
+            SelectedFiles.Free;
         end;
     finally
         ListOfFiles.Free;
@@ -4186,6 +4231,7 @@ var
     i,tot:integer;
     Data: PTreeData;
     SelectedMp3s: TNodeArray;
+    SelectedFiles: TObjectList;
     Node:PVirtualNode;
     oldArtist, oldAlbum: UnicodeString;
     oldID: String;
@@ -4207,81 +4253,90 @@ begin
   fspTaskbarManager.ProgressState := fstpsNormal;
   fspTaskbarManager.ProgressValue := 0;
 
-  if MedienBib.AnzeigeShowsPlaylistFiles then
-  begin
-      //MessageDLG((Medialibrary_GUIError4), mtError, [MBOK], 0);
-      for i:=0 to length(SelectedMP3s)-1 do
-      begin
-          application.processmessages;
-          if not LangeAktionWeitermachen then break;
-          Data := VST.GetNodeData(SelectedMP3s[i]);
-          AudioFile := Data^.FAudioFile;
-          if FileExists(AudioFile.Pfad) then
-          begin
-              AudioFile.FileIsPresent:=True;
-              AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-              MedienBib.InitCover(AudioFile);
-              VST.InvalidateNode(SelectedMP3s[i]);
-          end
-          else begin
-              AudioFile.FileIsPresent:=False;
-              VST.InvalidateNode(SelectedMP3s[i]);
-          end;
-          if i mod 64 = 0 then
-          begin
-              MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/length(SelectedMP3s) * 100)]);
-              fspTaskbarManager.ProgressValue := Round(i/length(SelectedMP3s) * 100);
-          end;
-      end;
-  end else
-  begin
-      einUpdate := False;
-      tot := 0;
-      for i:=0 to length(SelectedMP3s)-1 do
-      begin
-          application.processmessages;
-          if not LangeAktionWeitermachen then break;
-          Data := VST.GetNodeData(SelectedMP3s[i]);
-          AudioFile := Data^.FAudioFile;
-          oldArtist := AudioFile.Strings[MedienBib.NempSortArray[1]];
-          oldAlbum := AudioFile.Strings[MedienBib.NempSortArray[2]];
-          oldID := AudioFile.CoverID;
-          if FileExists(AudioFile.Pfad) then
-          begin
-            AudioFile.FileIsPresent:=True;
-            AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-            MedienBib.InitCover(AudioFile);
-            if  (oldArtist <> AudioFile.Strings[MedienBib.NempSortArray[1]])
-                 OR (oldAlbum <> AudioFile.Strings[MedienBib.NempSortArray[2]])
-                 or (oldID <> AudioFile.CoverID)
-            then
-              einUpdate := true;
-            VST.InvalidateNode(SelectedMP3s[i]);
-          end
-          else begin
-            AudioFile.FileIsPresent:=False;
-            VST.InvalidateNode(SelectedMP3s[i]);
-            inc(tot);
-          end;
-          if i mod 64 = 0 then
-          begin
-            MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/length(SelectedMP3s) * 100)]);
-            fspTaskbarManager.ProgressValue := Round(i/length(SelectedMP3s) * 100);
-          end;
-      end;
+  SelectedFiles := TObjectList.Create(False);
+  try
+      // Collect Data
+      VSTSelectionToAudiofileList(VST, SelectedMP3s, SelectedFiles);
 
-      if tot > 0 then
-          if (tot < 2000) AND (tot < MedienBib.Count DIV 10) then // weniger als 10% fehlen
-              MessageDlg(Format((MediaLibrary_FilesNotFound), [tot]), mtWarning, [MBOK], 0)
-          else // mehr als 10% fehlen => Laufwerk fehlt?
-              MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [tot]), mtWarning, [MBOK], 0);
-
-      if einUpdate then
+      if MedienBib.AnzeigeShowsPlaylistFiles then
       begin
-        MedienBib.RepairBrowseListsAfterChange;
-        ReFillBrowseTrees(True);
+
+          //MessageDLG((Medialibrary_GUIError4), mtError, [MBOK], 0);
+          for i:=0 to SelectedFiles.Count-1 do
+          begin
+              application.processmessages;
+              if not LangeAktionWeitermachen then break;
+              //Data := VST.GetNodeData(SelectedMP3s[i]);
+              AudioFile := TAudioFile(SelectedFiles[i]);//Data^.FAudioFile;
+              if FileExists(AudioFile.Pfad) then
+              begin
+                  AudioFile.FileIsPresent:=True;
+                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  MedienBib.InitCover(AudioFile);
+                  VST.Invalidate;
+              end
+              else begin
+                  AudioFile.FileIsPresent:=False;
+                  VST.Invalidate;
+              end;
+              if i mod 64 = 0 then
+              begin
+                  MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/SelectedFiles.Count * 100)]);
+                  fspTaskbarManager.ProgressValue := Round(i/SelectedFiles.Count * 100);
+              end;
+          end;
+      end else
+      begin
+          einUpdate := False;
+          tot := 0;
+          for i:=0 to SelectedFiles.Count-1 do
+          begin
+              application.processmessages;
+              if not LangeAktionWeitermachen then break;
+              //Data := VST.GetNodeData(SelectedMP3s[i]);
+              AudioFile := TAudioFile(SelectedFiles[i]); //Data^.FAudioFile;
+              oldArtist := AudioFile.Strings[MedienBib.NempSortArray[1]];
+              oldAlbum := AudioFile.Strings[MedienBib.NempSortArray[2]];
+              oldID := AudioFile.CoverID;
+              if FileExists(AudioFile.Pfad) then
+              begin
+                  AudioFile.FileIsPresent:=True;
+                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  MedienBib.InitCover(AudioFile);
+                  if  (oldArtist <> AudioFile.Strings[MedienBib.NempSortArray[1]])
+                       OR (oldAlbum <> AudioFile.Strings[MedienBib.NempSortArray[2]])
+                       or (oldID <> AudioFile.CoverID)
+                  then
+                    einUpdate := true;
+                  VST.Invalidate;
+              end
+              else begin
+                  AudioFile.FileIsPresent:=False;
+                  VST.Invalidate;
+                  inc(tot);
+              end;
+              if i mod 64 = 0 then
+              begin
+                  MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/SelectedFiles.Count * 100)]);
+                  fspTaskbarManager.ProgressValue := Round(i/SelectedFiles.Count * 100);
+              end;
+          end;
+
+          if tot > 0 then
+              if (tot < 2000) AND (tot < MedienBib.Count DIV 10) then // weniger als 10% fehlen
+                  MessageDlg(Format((MediaLibrary_FilesNotFound), [tot]), mtWarning, [MBOK], 0)
+              else // mehr als 10% fehlen => Laufwerk fehlt?
+                  MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [tot]), mtWarning, [MBOK], 0);
+
+          if einUpdate then
+          begin
+              MedienBib.RepairBrowseListsAfterChange;
+              ReFillBrowseTrees(True);
+          end;
+          MedienBib.Changed := True;
       end;
-      MedienBib.Changed := True;
+  finally
+      SelectedFiles.Free;
   end;
 
   BlockeMedienListeReadAccess(False);
@@ -4999,6 +5054,7 @@ begin
       tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
   LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
 
+  ImgBibRating.Visible := True;
   BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
 
 
