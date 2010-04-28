@@ -2561,8 +2561,16 @@ end;
 }
 procedure TMedienBibliothek.Abort;
 begin
+  // when we get in "long VCL-actions" an exception,
+  // the final MedienBib.StatusBibUpdate := 0; will not be called
+  // so Nemp will never close
+  // this is not 1000% "safe" with thread, but should be ok
+  if not UpdateFortsetzen then
+      StatusBibUpdate := 0;
+
+  // this is the main-code in this method
   if StatusBibUpdate > 0 then
-    UpdateFortsetzen := False;
+      UpdateFortsetzen := False;
 end;
 {
     --------------------------------------------------------

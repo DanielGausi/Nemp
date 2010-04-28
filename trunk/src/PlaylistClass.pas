@@ -763,7 +763,6 @@ var i:integer;
   aData: PTreeData;
   NewSelectNode: PVirtualNode;
   allNodesDeleted: Boolean;
-  aIdx: Integer;
 begin
   Selectedmp3s := VST.GetSortedSelection(False);
   if length(SelectedMp3s) = 0 then exit;
@@ -849,6 +848,25 @@ begin
   fDauer := ShowPlayListSummary;
 end;
 
+procedure TNempPlaylist.removePlayingFile;
+var aNode: PVirtualNode;
+begin
+  aNode := GetNodeWithPlayingFile;
+  if assigned(aNode) then
+  begin
+    PrebookList.Remove(fPlayingFile);
+    RemoveFileFromHistory(fPlayingFile);
+    Playlist.Remove(fPlayingfile);
+    VST.DeleteNode(aNode,True);
+    ReIndexPrebookedFiles;
+  end;
+end;
+{
+    --------------------------------------------------------
+    RemoveFileFromHistory
+    - Delete the entry from the list and set a new fCurrentHistoryFile
+    --------------------------------------------------------
+}
 procedure TNempPlaylist.RemoveFileFromHistory(aFile: TAudioFile);
 var aIdx: Integer;
 begin
@@ -866,19 +884,6 @@ begin
     HistoryList.Remove(aFile);
 end;
 
-procedure TNempPlaylist.removePlayingFile;
-var aNode: PVirtualNode;
-begin
-  aNode := GetNodeWithPlayingFile;
-  if assigned(aNode) then
-  begin
-    PrebookList.Remove(fPlayingFile);
-    RemoveFileFromHistory(fPlayingFile);
-    Playlist.Remove(fPlayingfile);
-    VST.DeleteNode(aNode,True);
-    ReIndexPrebookedFiles;
-  end;
-end;
 
 {
     --------------------------------------------------------
@@ -1718,6 +1723,15 @@ begin
   end;
 end;
 
+{
+    --------------------------------------------------------
+    UpdateHistory
+    - add current playingfile to the history
+      if we are at the beginning of the historylist, we insert the new file
+      at the beginning of the list
+      otherwise we add it at the end of the historylist
+    --------------------------------------------------------
+}
 procedure TNempPlaylist.UpdateHistory(Backwards: Boolean = False);
 begin
     if backwards then
@@ -1731,8 +1745,6 @@ begin
             if HistoryList.Count > 25 then
                 HistoryList.Delete(HistoryList.Count-1);
             fCurrentHistoryFile := fPlayingFile;
-            Nemp_MainForm.Caption := 'Update History: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
-             + Inttostr(HistoryList.Count - 1);
         end;
     end else
     begin
@@ -1745,8 +1757,6 @@ begin
             if HistoryList.Count > 25 then
                 HistoryList.Delete(0);
             fCurrentHistoryFile := fPlayingFile;
-            Nemp_MainForm.Caption := 'Update History: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
-             + Inttostr(HistoryList.Count - 1);
         end;
     end;
 end;
@@ -1784,9 +1794,10 @@ var i:integer;
   c: Integer;
   historySuccess: Boolean;
 begin
+    // 1. add current file to the history, if needed
+    // i.e. we are at the end (or the beginning) of the HistoryList
     UpdateHistory;
-
-
+    // 2. if we are currently "browsing" in the Historylist, get the next one
     if assigned(fCurrentHistoryFile) and (HistoryList.IndexOf(fCurrentHistoryFile) < HistoryList.Count-1 ) then
     begin
         // we are "browsing in the history list"
@@ -1801,6 +1812,10 @@ begin
         begin
             if (c >= 0) then
             begin
+                // this occurs, when we browse backwards further than the first "real history file"
+                // so the UpdateHistory will add the file, currentHistoryFile is valid and at first position
+                // then another title was played
+                // and now we want this previous played song, So, we do not change position in HistoryList
                 fCurrentHistoryFile := TPlaylistfile(HistoryList[c]);
                 result := Playlist.IndexOf(fCurrentHistoryFile);
                 historySuccess := result > -1
@@ -1810,16 +1825,11 @@ begin
                 result := 0; // dummy, so the compiler dont show a warning
             end;
         end;
-
-        Nemp_MainForm.Caption := 'forward in history: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
-         + Inttostr(HistoryList.Count - 1);
-
     end else
     begin
         historySuccess := False;
         result := 0; // dummy, so the compiler dont show a warning
     end;
-
 
     if not historySuccess then
     begin
@@ -1908,11 +1918,6 @@ begin
                 result := 0; // dummy, so the compiler dont show a warning
             end;
         end;
-                Nemp_MainForm.Caption := 'back in history: ' + Inttostr(HistoryList.IndexOf(fCurrentHistoryFile)) + ' - '
-         + Inttostr(HistoryList.Count - 1);
-
-        //fCurrentHistoryFile := TPlaylistfile(HistoryList[c-1]);
-        //result := Playlist.IndexOf(fCurrentHistoryFile);
     end else
     begin
         historySuccess := False;
