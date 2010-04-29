@@ -226,7 +226,7 @@ type
           fBackUpBreadCrumbs: TObjectlist;
           fBackupFocussedTag: TPaintTag;
 
-          HashedTags: Array[0..31,0..31] of TObjectList;
+          HashedTags: Array[0..1023] of TObjectList;
 
           fClearTag: TTag;
 
@@ -446,6 +446,26 @@ begin
         result := AnsiCompareText(TTag(item1).Key ,TTag(item2).Key);
 end;
 
+// ELF-Hash by alzaimar
+// http://www.delphi-forum.de/viewtopic.php?p=590514#590514
+function HashFromStr(Const Value: String): Cardinal; // ELF-Hash
+var
+  i: Integer;
+  x: Cardinal;
+begin
+    Result := 0;
+    for i := 1 to length(Value) do
+    begin
+        Result := (Result shl 4) + Ord(Value[i]);
+        x := Result and $F0000000;
+        if (x <> 0) then
+            Result := Result xor (x shr 24);
+        Result := Result and (not x);
+    end;
+    // modification: Use only the last 10 bits (= 1024 values)
+    Result := Result AND $3FF;
+end;
+
 
 { TTagCloud }
 
@@ -471,13 +491,12 @@ begin
 end;
 
 destructor TTagCloud.Destroy;
-var i,j: Integer;
+var i: Integer;
 begin
-    if assigned(HashedTags[0,0]) then
+    if assigned(HashedTags[0]) then
     begin
-        for i := 0 to 31 do
-          for j := 0 to 31 do
-            Hashedtags[i,j].Free;
+        for i := 0 to 1023 do
+            Hashedtags[i].Free;
     end;
 //    BrowseHistory.Free;
     CloudPainter.Free;
@@ -750,14 +769,13 @@ begin
 end;
 
 procedure TTagCloud.InitHashMap;
-var i,j: Integer;
+var i: Integer;
 begin
-    if Not assigned(HashedTags[0,0]) then
+    if Not assigned(HashedTags[0]) then
     begin
             // This should be done only once per Nemp-Instance!
-            for i := 0 to 31 do
-              for j := 0 to 31 do
-                HashedTags[i,j] := TObjectList.Create(False);
+            for i := 0 to 1023 do
+                HashedTags[i] := TObjectList.Create(False);
     end;
 end;
 
@@ -1242,7 +1260,7 @@ function TTagCloud.GetTag(aKey: UTF8String): TTag;
 var i: Integer;
     tmp: TTag;
     KeyHashList: TObjectList;
-    x,y: Integer;
+    //x,y: Integer;
 begin
     tmp := Nil;
 
@@ -1254,14 +1272,15 @@ begin
     aKey := AnsiLowerCase(aKey);
 
     // Hash the first two Chars of aKey
-    x := 0;
+  {  x := 0;
     y := 0;
     if length(aKey) > 0 then
         x := Ord(aKey[1]) mod 32;
     if length(aKey) > 1 then
         y := Ord(aKey[2]) mod 32;
+    }
 
-    KeyHashList := HashedTags[x,y];
+    KeyHashList := HashedTags[HashFromStr(aKey)];
 
     for i := 0 to KeyHashList.Count - 1 do
         if TTag(KeyHashList[i]).Key = aKey then
