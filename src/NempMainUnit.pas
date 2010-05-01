@@ -2044,7 +2044,6 @@ begin
       if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
       begin
         tmpstr :=  StringReplace('<private> ' + Sr.Name,'&','&&',[rfReplaceAll]);
-
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
         aMenuItem.AutoHotkeys := maManual;
         aMenuItem.OnClick := SkinAn1Click;
@@ -10314,6 +10313,7 @@ begin
     // On WindowsXP the Coverflow on the Panel will not be repainted automatically.
     if Not NempSkin.isActive then
         MedienBib.NewCoverFlow.Paint;
+
     // Otherwise the Paint-Event has been fired, where the Coverflow was already painted.
 end;
 
@@ -10768,6 +10768,8 @@ begin
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
 
         Lbl_CoverFlow.Caption := aCover.InfoString;
+
+        //caption := aCover.ID + ' - ' + aCover.Key;
     end;
 end;
 
@@ -11005,6 +11007,7 @@ begin
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 
 end;
+
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
 begin

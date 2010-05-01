@@ -557,7 +557,7 @@ type
         // Managing webradio in the Library
         procedure ExportFavorites(aFilename: UnicodeString);
         procedure ImportFavorites(aFilename: UnicodeString);
-        Procedure AddRadioStation(aStation: TStation);
+        function AddRadioStation(aStation: TStation): Integer;
 
         // Saving/Loading
         // a. Export as CSV, to get the library to Excel or whatever.
@@ -4183,13 +4183,23 @@ end;
     Note: Station gets a new Handle for Messages here.
     --------------------------------------------------------
 }
-Procedure TMedienBibliothek.AddRadioStation(aStation: TStation);
+function TMedienBibliothek.AddRadioStation(aStation: TStation): Integer;
 var newStation: TStation;
+    i, maxIdx: Integer;
+
 begin
+    maxIdx := -1;
+    for i := 0 to RadioStationList.Count - 1 do
+        if TSTation(RadioStationList[i]).SortIndex > maxIdx  then
+            maxIdx := TSTation(RadioStationList[i]).SortIndex;
+    inc(maxIdx);
+
     newStation := TStation.Create(MainWindowHandle);
     newStation.Assign(aStation);
+    newStation.SortIndex := maxIdx;
     RadioStationList.Add(NewStation);
     Changed := True;
+    result := maxIdx;
 end;
 
 {
@@ -4637,17 +4647,18 @@ begin
                         2: MessageDLG((Medialibrary_LibFileTooOld), mtError, [MBOK], 0);
                         3: MessageDLG((Medialibrary_LibFileTooOld), mtError, [MBOK], 0);
                         4: begin
-                            if Subversion = 0 then
+                            if Subversion <= 1 then // new in Nemp 4.0: Subversion changed to 1
+                                                    // (additional value in RadioStations)
                             begin
                                 EnterCriticalSection(CSAccessDriveList);
                                 LoadFromFile4(aStream);
                                 LeaveCriticalSection(CSAccessDriveList);
                                 NewFilesUpdateBib(True);
                             end else
-                                MessageDLG((Medialibrary_InvalidLibFile), mtError, [MBOK], 0);
+                                MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
                         end
                         else
-                            MessageDLG((Medialibrary_InvalidLibFile), mtError, [MBOK], 0);
+                            MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
 
                     end; // case Version
 

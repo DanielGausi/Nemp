@@ -80,6 +80,7 @@ type
 
             procedure fSetMode(aValue: TCoverFlowMode);
 
+
         public
             CoverSavePath: String;
 
@@ -126,6 +127,7 @@ type
             procedure Paint(i: Integer = 1);
 
             procedure SetNewHandle(aWnd: HWND);
+            procedure SetColor(aColor: TColor);
 
             procedure DownloadCover(aCover: TNempCover; aIdx: Integer);
             procedure DownloadPlayerCover(aAudioFile: TAudioFile);
@@ -339,6 +341,20 @@ begin
         cm_Classic : ; // nothing to do here
         cm_OpenGL  : begin
             fFlyingCow.SetNewHandle(aWnd);
+        end;
+    end;
+end;
+procedure TNempCoverFlow.SetColor(aColor: TColor);
+var r,g,b: Integer;
+begin
+    r := GetRValue(aColor);
+    g := GetGValue(aColor);
+    b := GetBValue(aColor);
+
+    case fMode of
+        cm_Classic : ; // nothing to do here
+        cm_OpenGL  : begin
+            fFlyingCow.SetColor(r,g,b);
         end;
     end;
 end;

@@ -83,6 +83,7 @@ Type
             fGenre        : String;
             fCurrentTitle : String;
             fCount        : Integer; // Anzahl der Hörer
+            fSortIndex    : Integer; // used for a custom sorting of the favorite stations in nemp
 
             function fGetURL: String;
             procedure fSetURL(Value: String);
@@ -103,6 +104,7 @@ Type
             property Genre: String          read fGenre        write fGenre;
             property CurrentTitle: String   read fCurrentTitle ;
             property Count: Integer         read fCount        ;
+            property SortIndex: Integer     read fSortIndex    write fSortIndex;
             property URL: String       read fGetURL   write fSetURL;
 
             constructor Create(aHandle: HWnd);
@@ -182,6 +184,10 @@ Type
     function Sort_CurrentTitle_Desc(Item1, Item2: Pointer): Integer;
     function Sort_Count_Asc(Item1, Item2: Pointer): Integer;
     function Sort_Count_Desc(Item1, Item2: Pointer): Integer;
+
+    function Sort_Custom(Item1, Item2: Pointer): Integer;
+
+
 
 var
     CSQueryString: RTL_CRITICAL_SECTION;
@@ -336,6 +342,11 @@ begin
     if tmp = 0 then
         tmp := AnsiCompareText(TStation(Item1).Name, TStation(Item2).Name);
     result := tmp;
+end;
+
+function Sort_Custom(Item1, Item2: Pointer): Integer;
+begin
+    result := CompareValue(TStation(Item1).SortIndex, TStation(Item2).SortIndex);
 end;
 
 
@@ -556,12 +567,22 @@ end;
 procedure TStation.LoadFromStream(aStream: TStream);
 var len: Integer;
     tmp: UTF8String;
+    si: Integer;
 begin
     aStream.Read(fBitrate, SizeOf(Integer));
     aStream.Read(fCount, SizeOf(Integer));
 
-
     aStream.Read(len, SizeOf(len));
+    // new in Nemp 4.0
+    if len = High(Integer) then
+    begin
+        // we have a "Nemp 4.0 file" with sort-index here
+        aStream.Read(fSortIndex, SizeOf(Integer));
+        // read the length of the next part (= name)
+        aStream.Read(len, SizeOf(len));
+    end;
+    // end of new in Nemp 4.0
+
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
     fName := UTF8ToString(tmp);
@@ -595,6 +616,15 @@ begin
     aStream.Write(tmpi, SizeOf(Integer));
     tmpi := Count;
     aStream.Write(tmpi, SizeOf(Integer));
+
+    // New in Nemp 4.0
+    // !!! Use Fileversion 4.1 (was 4.0 before)
+    // determine old/new version by a leading High(Integer)
+    tmpi := High(Integer);
+    aStream.Write(tmpi, SizeOf(Integer));
+    tmpi := SortIndex;
+    aStream.Write(tmpi, SizeOf(Integer));
+    // end of new in Nemp 4.0
 
     if Name = '' then tmps := ' ' else tmps := UTF8Encode(Name);
     len := length(tmps);

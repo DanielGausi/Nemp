@@ -246,7 +246,7 @@ const
     MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
     
     MP3DB_VERSION: Byte = 4;        // Dateiformat seit 3.1
-    MP3DB_SUBVERSION: Byte = 0;
+    MP3DB_SUBVERSION: Byte = 1;     // subversion changed to 1 in Nemp 4.0
 
     // "Extended Boolean", used for "unset" settings
     BoolUnDef = 0;

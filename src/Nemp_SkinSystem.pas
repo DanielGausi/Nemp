@@ -1414,6 +1414,8 @@ begin
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
   begin
+    MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
+
     if boldFont then
     begin
       Spectrum.TextStyle := [fsBold];
@@ -1661,6 +1663,7 @@ begin
 }
   end;
 
+  MedienBib.NewCoverFlow.SetColor(clWhite);
   
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
