@@ -525,6 +525,7 @@ MediaLibrary_Deleting                = 'Deleting from medialibrary (%d%%)';
 Medialibrary_QueryReallyDelete       = 'This will delete your complete medialibrary. Continue?';
 Medialibrary_LoadingFile             = 'Loading medialibrary (%s)';
 Medialibrary_InvalidLibFile          = 'Invalid medialibrary-file.';
+Medialibrary_LibFileTooYoung         = 'The medialibrary was probably created by a newer version of Nemp. This version of Nemp doesn''t know how to read this file.';
 Medialibrary_LibFileTooOld           = 'Medialibrary of Nemp 2.4 or earlier detected. This is not supported any more.';
 Medialibrary_OldFileHint        = 'You are loading a medialibrary of an earlier version of Nemp. Please connect all relevant drives to your computer before you proceed. '
                                  + 'Otherwise some files will be deleted from the library.';

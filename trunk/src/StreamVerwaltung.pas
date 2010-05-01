@@ -110,6 +110,10 @@ type
     MM_SC_AddToPlaylist: TMenuItem;
     MM_SC_AddToFavorites: TMenuItem;
     CB_ParseStreamURL: TCheckBox;
+    udSortFavorites: TUpDown;
+    Label1: TLabel;
+    cbSortMode: TComboBox;
+    BtnSetCustomSort: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Btn_OkClick(Sender: TObject);
@@ -145,6 +149,12 @@ type
       var CellText: string);
     procedure VST_FavoritesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
+    procedure VST_FavoritesHeaderClick(Sender: TVTHeader;
+      HitInfo: TVTHeaderHitInfo);
+    procedure udSortFavoritesClick(Sender: TObject; Button: TUDBtnType);
+    procedure VST_FavoritesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
+    procedure cbSortModeChange(Sender: TObject);
+    procedure BtnSetCustomSortClick(Sender: TObject);
   private
     { Private-Deklarationen }
     StationList: TObjectlist;
@@ -155,6 +165,8 @@ type
   public
     { Public-Deklarationen }
     ShoutcastQuery: TShoutcastQuery;
+    procedure BackUpComboBoxes;
+    procedure RestoreComboboxes;
 
   end;
 
@@ -215,8 +227,11 @@ procedure TFormStreamVerwaltung.FormCreate(Sender: TObject);
 var i: integer;
   newStation: TStation;
 begin
+  BackupComboboxes;
   TranslateComponent (self);
-  CB_SearchGenre.ItemIndex := 0;
+  RestoreComboboxes;
+  //CB_SearchGenre.ItemIndex := 0;
+
   StationList := TObjectlist.Create;
   FavoriteList := TObjectlist.Create;
 
@@ -310,7 +325,6 @@ begin
                                end;
         ST_PlaylistDownloadComplete : begin
                                   s := PAnsiChar(aMsg.LParam);
-                                  FS := Nil;
                                   if s <> '' then
                                   begin
                                       filename := GetProperFilenameForPlaylist(s);
@@ -344,12 +358,74 @@ begin
 
 end;
 
+procedure TFormStreamVerwaltung.VST_FavoritesChange(Sender: TBaseVirtualTree;
+  Node: PVirtualNode);
+begin
+    if VST_Favorites.Selected[Node] then
+    begin
+        udSortFavorites.Min := 0;
+        udSortFavorites.Max := 2* FavoriteList.Count;
+        udSortFavorites.Position := FavoriteList.Count;
+    end;
+end;
+
+
+procedure TFormStreamVerwaltung.udSortFavoritesClick(Sender: TObject;
+  Button: TUDBtnType);
+var currentIDX: Integer;
+    aNode: PVirtualNode;
+    i: Integer;
+begin
+    if assigned(VST_Favorites.FocusedNode) then
+    begin
+        currentIDX :=  VST_Favorites.FocusedNode.Index;
+        case Button of
+            btNext: begin
+                if currentIdx > 0 then
+                begin
+                    FavoriteList.Exchange(currentIdx, currentIdx-1);
+                    Medienbib.RadioStationList.Exchange(currentIdx, currentIdx-1);
+                    dec(currentIdx);
+                end;
+            end;
+
+            btPrev: begin
+                if currentIdx < FavoriteList.Count - 1 then
+                begin
+                    FavoriteList.Exchange(currentIdx, currentIdx+1);
+                    Medienbib.RadioStationList.Exchange(currentIdx, currentIdx+1);
+                    inc(currentIdx);
+                end;
+            end;
+        end;
+
+        VST_Favorites.OnChange := Nil;
+        VST_Favorites.Clear;
+        for i := 0 to FavoriteList.Count - 1 do
+            AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
+        aNode := VST_Favorites.GetFirst;
+        for i := 0 to currentIdx - 1 do
+            aNode := VST_Favorites.GetNext(aNode);
+        VST_Favorites.FocusedNode := aNode;
+        VST_Favorites.Selected[aNode] := True;
+        VST_Favorites.OnChange := VST_FavoritesChange;
+
+
+        Medienbib.Changed := True;
+        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+        begin
+            // Anzeige im Tree der MainForm neu füllen
+            Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        end;
+    end;
+end;
+
 procedure TFormStreamVerwaltung.HideTimerTimer(Sender: TObject);
 begin
     //Lbl_Status.Visible := False;
     StatusBar1.Panels[0].Text := '';
-    ProgressBar1
-    .Visible := False;
+    ProgressBar1 .Visible := False;
     HideTimer.Enabled := False;
 end;
 
@@ -370,6 +446,47 @@ begin
     ShellExecute(Handle, 'open', 'http://www.shoutcast.com', nil, nil, SW_SHOW);
 end;
 
+procedure TFormStreamVerwaltung.cbSortModeChange(Sender: TObject);
+var i: Integer;
+begin
+    case cbSortMode.ItemIndex of
+        0: begin
+          FavoriteList.Sort(Sort_Name_Asc);
+          Medienbib.RadioStationList.Sort(Sort_Name_Asc);
+        end;
+        1: begin
+          FavoriteList.Sort(Sort_CurrentTitle_Asc);
+          Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Asc);
+        end;
+        2: begin
+          FavoriteList.Sort(Sort_MediaType_Asc);
+          Medienbib.RadioStationList.Sort(Sort_MediaType_Asc);
+        end;
+        3: begin
+          FavoriteList.Sort(Sort_Genre_Asc);
+          Medienbib.RadioStationList.Sort(Sort_Genre_Asc);
+        end;
+        4: begin
+          FavoriteList.Sort(Sort_Custom);
+          Medienbib.RadioStationList.Sort(Sort_Custom);
+        end;
+    end;
+
+    VST_Favorites.Clear;
+    for i := 0 to FavoriteList.Count - 1 do
+        AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
+
+    Medienbib.Changed := True;
+    if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+    begin
+        // Anzeige im Tree der MainForm neu füllen
+        Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+        FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+    end;
+
+    udSortFavorites.Enabled := cbSortMode.ItemIndex = 4;
+end;
+
 procedure TFormStreamVerwaltung.Btn_IcecastClick(Sender: TObject);
 begin
     ShellExecute(Handle, 'open', 'http://www.icecast.org', nil, nil, SW_SHOW);
@@ -379,6 +496,7 @@ end;
 procedure TFormStreamVerwaltung.FormShow(Sender: TObject);
 begin
     PC_Streams.ActivePageIndex := 0;
+    udSortFavorites.Enabled := cbSortMode.ItemIndex = 5;
 end;
 
 procedure TFormStreamVerwaltung.Btn_SearchClick(Sender: TObject);
@@ -498,13 +616,111 @@ begin
 end;
 
 
+procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader;
+  HitInfo: TVTHeaderHitInfo);
+var i: Integer;
+begin
+    if HitInfo.Button = mbLeft then
+    begin
+        cbSortMode.ItemIndex := HitInfo.Column;
+
+        if VST_Favorites.Header.SortDirection = sdAscending then
+        begin
+            VST_Favorites.Header.SortDirection := sdDescending;
+            case HitInfo.Column of
+               0: begin
+                  FavoriteList.Sort(Sort_Name_Desc);
+                  Medienbib.RadioStationList.Sort(Sort_Name_Desc);
+               end;
+               1: begin
+                  FavoriteList.Sort(Sort_CurrentTitle_Desc);
+                  Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Desc);
+               end;
+               2: begin
+                  FavoriteList.Sort(Sort_MediaType_Desc);
+                  Medienbib.RadioStationList.Sort(Sort_MediaType_Desc);
+               end;
+               3: begin
+                  FavoriteList.Sort(Sort_Genre_Desc);
+                  Medienbib.RadioStationList.Sort(Sort_Genre_Desc);
+               end;
+
+            end;
+        end else
+        begin
+            VST_Favorites.Header.SortDirection := sdAscending;
+            case HitInfo.Column of
+               0: begin
+                  FavoriteList.Sort(Sort_Name_Asc);
+                  Medienbib.RadioStationList.Sort(Sort_Name_Asc);
+               end;
+               1: begin
+                  FavoriteList.Sort(Sort_CurrentTitle_Asc);
+                  Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Asc);
+               end;
+               2: begin
+                  FavoriteList.Sort(Sort_MediaType_Asc);
+                  Medienbib.RadioStationList.Sort(Sort_MediaType_Asc);
+               end;
+               3: begin
+                  FavoriteList.Sort(Sort_Genre_Asc);
+                  Medienbib.RadioStationList.Sort(Sort_Genre_Asc);
+               end;
+
+            end;
+        end;
+        VST_Favorites.Clear;
+        for i := 0 to FavoriteList.Count - 1 do
+            AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
+  end;
+
+  Medienbib.Changed := True;
+  if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+  begin
+        // Anzeige im Tree der MainForm neu füllen
+        Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+        FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+  end;
+end;
+
+
+
+procedure TFormStreamVerwaltung.BackUpComboBoxes;
+var i: Integer;
+begin
+    for i := 0 to self.ComponentCount - 1 do
+      if (Components[i] is TComboBox) then
+        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
+end;
+procedure TFormStreamVerwaltung.RestoreComboboxes;
+var i: Integer;
+begin
+  for i := 0 to self.ComponentCount - 1 do
+      if (Components[i] is TComboBox) then
+        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
+end;
+
+procedure TFormStreamVerwaltung.BtnSetCustomSortClick(Sender: TObject);
+var i: Integer;
+begin
+    for i := 0 to FavoriteList.Count - 1 do
+    begin
+        TStation(FavoriteList[i]).SortIndex := i;
+        TStation(Medienbib.RadioStationList[i]).SortIndex := i;
+    end;
+
+    cbSortMode.ItemIndex := 4;
+end;
+
 procedure TFormStreamVerwaltung.Btn_AddSelectedClick(Sender: TObject);
 var SelectedStations: TNodeArray;
     aNode: PVirtualNode;
     Data: PStationTreeData;
     Station, NewStation: TStation;
     i: Integer;
+    currentmaxIdx: Integer;
 begin
+
     SelectedStations := VST_ShoutcastQuery.GetSortedSelection(False);
     for i := 0 to length(SelectedStations) - 1 do
     begin
@@ -512,10 +728,11 @@ begin
         Data := VST_ShoutcastQuery.GetNodeData(aNode);
         Station := Data^.fStation;
 
-        MedienBib.AddRadioStation(Station);
+        currentmaxIdx := MedienBib.AddRadioStation(Station);
 
         NewStation := TStation.Create(Handle);
         NewStation.Assign(Station);
+        NewStation.SortIndex := currentmaxIdx;
         FavoriteList.Add(newStation);
         AddVSTStation(VST_Favorites, NIL, NewStation);
     end;
@@ -531,6 +748,7 @@ end;
 
 procedure TFormStreamVerwaltung.Btn_NewClick(Sender: TObject);
 var NewStation: TStation;
+    currentmaxIdx: Integer;
 begin
     if Not Assigned(NewStationForm) then
         Application.CreateForm(TNewStationForm, NewStationForm);
@@ -549,7 +767,8 @@ begin
         NewStation.Genre     := NewStationForm.Edt_Genre.Text;
 
         FavoriteList.Add(newStation);
-        MedienBib.AddRadioStation(newStation);
+        currentmaxIdx := MedienBib.AddRadioStation(newStation);
+        newStation.SortIndex := currentmaxIdx;
         AddVSTStation(VST_Favorites, NIL, NewStation);
     end;
 end;
@@ -650,6 +869,7 @@ begin
   end;
 end;
 
+
 procedure TFormStreamVerwaltung.VST_FavoritesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
@@ -663,6 +883,8 @@ begin
     3: CellText := Data^.fStation.URL;
   end;
 end;
+
+
 
 procedure TFormStreamVerwaltung.VST_FavoritesKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);

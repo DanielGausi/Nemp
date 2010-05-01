@@ -1084,7 +1084,12 @@ begin
            OptionsCompleteForm.OptionsVST.Invalidate;
            OptionsCompleteForm.RestoreComboboxes;
         end;
-        if assigned(FormStreamVerwaltung ) then ReTranslateComponent(FormStreamVerwaltung);
+        if assigned(FormStreamVerwaltung ) then
+        begin
+            FormStreamVerwaltung.BackUpComboBoxes;
+            ReTranslateComponent(FormStreamVerwaltung);
+            FormStreamVerwaltung.RestoreComboboxes;
+        end;
         if assigned(ShutDownForm         ) then ReTranslateComponent(ShutDownForm        );
         if assigned(HeadsetControlForm   ) then ReTranslateComponent(HeadsetControlForm  );
         {if assigned(SkinEditorForm       ) then

@@ -46,6 +46,7 @@ const
   WM_FC_NEEDPREVIEW = WM_FLYINGCOW + 0;
   WM_FC_SELECT = WM_FLYINGCOW + 1;
 
+
  // WM_FC_NEEDMORE = WM_FLYINGCOW + 2;
   WM_FLYINGCOWTEST = WM_FLYINGCOW + 3;
 
@@ -104,6 +105,9 @@ type
     fEventsWindow : HWND;
     fCaption, fSubCaption : String;
     fCaptionCS : Integer;
+    fr: single;
+    fg: single;
+    fb: single;
 
     // New Caption-Stuff
     //fTextBitmap: tBitmap;
@@ -168,6 +172,7 @@ type
     procedure EndUpdate;
 
     procedure SetNewHandle(aWnd: HWND);
+    procedure SetColor(r,g,b: Integer);
 
     destructor Destroy; override;
 
@@ -366,6 +371,25 @@ begin
     DoSomeDrawing(20);
 end;
 
+procedure TFlyingCow.SetColor(r,g,b: Integer);
+var i: Integer;
+begin
+    fThread.PauseRender;
+
+    // Clear Textures
+    for i := 0 to self.Count - 1 do
+      If fThread.fItem[i].texture.handle <> 0 Then
+          fThread.DeleteTexture (i);
+
+    fThread.fr := r / 255;
+    fThread.fg := g / 255;
+    fThread.fb := b / 255;
+
+    fThread.fNewHandleNeeded := True;
+
+    fThread.ResumeRender;
+    DoSomeDrawing(20);
+end;
 procedure TFlyingCow.SetPreview(index, width, height: Integer;
   pixels: PByteArray);
 begin
@@ -410,6 +434,9 @@ begin
   fCaptionCS := 0;
   fXClicked := -1;
   fYClicked := -1;
+  fr := 0.0;
+  fg := 0.0;
+  fb := 0.0;
   Resume;
 end;
 
@@ -709,6 +736,7 @@ begin
     // Filling
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
 
     glEnable (GL_POLYGON_OFFSET_FILL);
     glPolygonOffset (1.0, 1.0);
@@ -719,6 +747,8 @@ begin
     glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
     glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+
 
     glDepthMask (False);
     glDepthFunc (GL_LEQUAL);
@@ -845,7 +875,7 @@ begin
     SetPixelFormat (fDC, ChoosePixelFormat (fDC, @pfd), @pfd);
     glrc := wglCreateContext (fDC);
     wglMakeCurrent (fDC, glrc);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearColor(fr, fg, fb, 0.0);
     glLineWidth (1.0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
@@ -892,17 +922,11 @@ begin
   begin
     // Determinar si el item cae dentro de la pantalla
     If fItem[i].x < -2.0 Then
-    begin
-      gluProject (fItem[i].x+Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz);
-    end
+        gluProject (fItem[i].x+Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
     else If fItem[i].x > 2.0 Then
-    begin
-      gluProject (fItem[i].x-Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz);
-    end
+        gluProject (fItem[i].x-Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
     else
-    begin
-      vx := (rc.Right - rc.Left) / 2.0;
-    end;
+        vx := (rc.Right - rc.Left) / 2.0;
     //If (vx >= (rc.Right-rc.Left) div 8) And (vx < (rc.Right-rc.Left)*7 div 8) Then
     If (vx >= -(rc.Right-rc.Left) div 2) And (vx < (rc.Right-rc.Left)*3 div 2) Then
     begin
@@ -913,22 +937,16 @@ begin
         begin
           // El item no tiene preview
           If fItem[i].nx < -2.0 Then
-          begin
-            gluProject (fItem[i].nx+Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz);
-          end
+              gluProject (fItem[i].nx+Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
           else If fItem[i].nx > 2.0 Then
-          begin
-            gluProject (fItem[i].nx-Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz);
-          end
+              gluProject (fItem[i].nx-Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
           else
-          begin
-            vx := (rc.Right - rc.Left) / 2.0;
-          end;
+              vx := (rc.Right - rc.Left) / 2.0;
 
           If (vx_index = -1) Or (Abs(vx-(rc.Right-rc.Left) div 2) < vx_nearest) Then
           begin
-            vx_index := i;
-            vx_nearest := Abs(vx-(rc.Right-rc.Left) div 2);
+              vx_index := i;
+              vx_nearest := Abs(vx-(rc.Right-rc.Left) div 2);
           end;
         end;
       end
@@ -939,18 +957,27 @@ begin
         glBindTexture (GL_TEXTURE_2D, fItem[i].texture.handle);
 
         // for transparent Object
-        glEnable (GL_BLEND);
+       // glEnable (GL_Blend);
+
 
         fItem[i].texture.age := 0;
         w := fItem[i].texture.w;
         h := fItem[i].texture.h;
 
-        glColor3f (0.5+Abs(fItem[i].x)/7.0*0.5,
-                   0.5+Abs(fItem[i].x)/7.0*0.5,
-                   0.5+Abs(fItem[i].x)/7.0*0.5);
 
-                     glColor3f(0.7,0.7,0.7);
+        // reflexion
+        glColor3f (0.85-Abs(fItem[i].x)/7.0*1.5,
+                   0.85-Abs(fItem[i].x)/7.0*1.5,
+                   0.85-Abs(fItem[i].x)/7.0*1.5);
+  //      glColor3f (Abs(fItem[i].x)/7.0*0.5,
+  //                 Abs(fItem[i].x)/7.0*0.5,
+   //                Abs(fItem[i].x)/7.0*0.5);
 
+        glColor3f ((0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fr)+fr,
+                   (0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fg)+fg,
+                   (0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fb)+fb);
+
+          //           glColor3f(0.9,0.9,1.0);
         glBegin (GL_QUADS);
         glTexCoord2f (fItem[i].texture.su, fItem[i].texture.tv);
         glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75-h*2, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
@@ -962,10 +989,17 @@ begin
         glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
         glEnd;
 
+
+        // item itsself
         glColor3f (1.0-Abs(fItem[i].x)/7.0,
                    1.0-Abs(fItem[i].x)/7.0,
                    1.0-Abs(fItem[i].x)/7.0);
 
+        glColor3f ((1.0-Abs(fItem[i].x)/7.0)*(1-fr)+fr,
+                   (1.0-Abs(fItem[i].x)/7.0)*(1-fg)+fg,
+                   (1.0-Abs(fItem[i].x)/7.0)*(1-fb)+fb);
+
+        //glColor3f(1.9,1.9,0.0);
 
         if check_missings then
             glLoadName(i);
@@ -974,22 +1008,18 @@ begin
         glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.sv);
         glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75,
                     w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        //glVertex3f (fItem[i].x + 1, -0, 0);
 
         glTexCoord2f (fItem[i].texture.su, fItem[i].texture.sv);
         glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75,
                     -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        //glVertex3f (fItem[i].x, -0, 0);
 
         glTexCoord2f (fItem[i].texture.su, fItem[i].texture.tv);
         glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75+h*2,
                   -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        //glVertex3f (fItem[i].x, 1 , 0);              //-0.75+h*2
 
         glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.tv);
         glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75+h*2,
                  w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        //glVertex3f (fItem[i].x+ 1, 1, 0);
 
         glEnd;
       end;
@@ -1132,3 +1162,8 @@ end;                   *)
 initialization
   InitOpenGL;
 end.
+
+
+
+
+

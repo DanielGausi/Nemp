@@ -674,7 +674,7 @@ end;
 
 function Sortieren_CoverID(item1,item2:pointer):integer;
 begin
-  result := CompareText(TAudioFile(item1).CoverID,TAudioFile(item2).CoverID);
+  result := AnsiCompareText(TAudioFile(item1).CoverID,TAudioFile(item2).CoverID);
 end;
 
 
@@ -789,7 +789,7 @@ begin
     begin
         m := (l+r) DIV 2;
         strm := (Liste[m] as TAudioFile).Key1;
-        c := CompareText(CoverID, strm);
+        c := AnsiCompareText(CoverID, strm);
         if l = r then
         begin
             if c = 0 then result := l
