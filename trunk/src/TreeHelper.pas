@@ -225,6 +225,7 @@ begin
         siOrdner: HeaderStr := (TreeHeader_Directories);
         siGenre:  HeaderStr := (TreeHeader_Genres);
         siJahr:   HeaderStr := (TreeHeader_Years);
+        siFileAge:HeaderStr := (TreeHeader_FileAges);
         else HeaderStr := '(N/A)';
       end;
   end;
