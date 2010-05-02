@@ -81,7 +81,7 @@ type
     BtnExport: TButton;
     BtnImport: TButton;
     OpenDialog1: TOpenDialog;
-    SaveDialog1: TSaveDialog;
+    SaveDialogFavorites: TSaveDialog;
     PM_Shoutcast: TPopupMenu;
     PM_Favorites: TPopupMenu;
     PM_SC_AddToPlaylist: TMenuItem;
@@ -155,6 +155,7 @@ type
     procedure VST_FavoritesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure cbSortModeChange(Sender: TObject);
     procedure BtnSetCustomSortClick(Sender: TObject);
+    procedure SaveDialogFavoritesTypeChange(Sender: TObject);
   private
     { Private-Deklarationen }
     StationList: TObjectlist;
@@ -259,6 +260,7 @@ begin
   for i := 0 to FavoriteList.Count - 1 do
       AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 end;
+
 
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
 var i: Integer;
@@ -455,16 +457,16 @@ begin
           Medienbib.RadioStationList.Sort(Sort_Name_Asc);
         end;
         1: begin
-          FavoriteList.Sort(Sort_CurrentTitle_Asc);
-          Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Asc);
-        end;
-        2: begin
           FavoriteList.Sort(Sort_MediaType_Asc);
           Medienbib.RadioStationList.Sort(Sort_MediaType_Asc);
         end;
-        3: begin
+        2: begin
           FavoriteList.Sort(Sort_Genre_Asc);
           Medienbib.RadioStationList.Sort(Sort_Genre_Asc);
+        end;
+        3: begin
+          FavoriteList.Sort(Sort_URL_Asc);
+          Medienbib.RadioStationList.Sort(Sort_URL_Asc);
         end;
         4: begin
           FavoriteList.Sort(Sort_Custom);
@@ -628,45 +630,43 @@ begin
         begin
             VST_Favorites.Header.SortDirection := sdDescending;
             case HitInfo.Column of
-               0: begin
+                0: begin
                   FavoriteList.Sort(Sort_Name_Desc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Desc);
-               end;
-               1: begin
-                  FavoriteList.Sort(Sort_CurrentTitle_Desc);
-                  Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Desc);
-               end;
-               2: begin
+                end;
+                1: begin
                   FavoriteList.Sort(Sort_MediaType_Desc);
                   Medienbib.RadioStationList.Sort(Sort_MediaType_Desc);
-               end;
-               3: begin
+                end;
+                2: begin
                   FavoriteList.Sort(Sort_Genre_Desc);
                   Medienbib.RadioStationList.Sort(Sort_Genre_Desc);
-               end;
-
+                end;
+                3: begin
+                  FavoriteList.Sort(Sort_URL_Desc);
+                  Medienbib.RadioStationList.Sort(Sort_URL_Desc);
+                end;
             end;
         end else
         begin
             VST_Favorites.Header.SortDirection := sdAscending;
             case HitInfo.Column of
-               0: begin
+                0: begin
                   FavoriteList.Sort(Sort_Name_Asc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Asc);
-               end;
-               1: begin
-                  FavoriteList.Sort(Sort_CurrentTitle_Asc);
-                  Medienbib.RadioStationList.Sort(Sort_CurrentTitle_Asc);
-               end;
-               2: begin
+                end;
+                1: begin
                   FavoriteList.Sort(Sort_MediaType_Asc);
                   Medienbib.RadioStationList.Sort(Sort_MediaType_Asc);
-               end;
-               3: begin
+                end;
+                2: begin
                   FavoriteList.Sort(Sort_Genre_Asc);
                   Medienbib.RadioStationList.Sort(Sort_Genre_Asc);
-               end;
-
+                end;
+                3: begin
+                  FavoriteList.Sort(Sort_URL_Asc);
+                  Medienbib.RadioStationList.Sort(Sort_URL_Asc);
+                end;
             end;
         end;
         VST_Favorites.Clear;
@@ -833,6 +833,7 @@ begin
     for i := length(SelectedStations)-1 downto 0 do
     begin
           MedienBib.RadioStationList.Delete(SelectedStations[i].Index);
+          FavoriteList.Delete(SelectedStations[i].Index);
           VST_Favorites.DeleteNode(SelectedStations[i],True);
     end;
 
@@ -944,10 +945,19 @@ begin
     Btn_DeleteSelectedClick(Nil);
 end;
 
+
+procedure TFormStreamVerwaltung.SaveDialogFavoritesTypeChange(Sender: TObject);
+begin
+    case SaveDialogFavorites.FilterIndex of
+        1: SaveDialogFavorites.DefaultExt := 'pls';
+        2: SaveDialogFavorites.DefaultExt := 'nwl';
+    end;
+end;
+
 procedure TFormStreamVerwaltung.PM_Fav_ExportClick(Sender: TObject);
 begin
-    If SaveDialog1.Execute then
-        MedienBib.ExportFavorites(SaveDialog1.FileName)
+    If SaveDialogFavorites.Execute then
+        MedienBib.ExportFavorites(SaveDialogFavorites.FileName)
 end;
 
 procedure TFormStreamVerwaltung.PM_Fav_ImportClick(Sender: TObject);
@@ -965,6 +975,7 @@ begin
             newStation.Assign( TStation(MedienBib.RadioStationList[i]));
             FavoriteList.Add(newStation);
         end;
+
         for i := 0 to FavoriteList.Count - 1 do
             AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 

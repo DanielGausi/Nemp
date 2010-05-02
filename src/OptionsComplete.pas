@@ -849,8 +849,8 @@ begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-    CBSpalten[i].Top := 16 + (i mod 5)*16;
-    CBSpalten[i].Left := 8 + (i div 5) * 100;
+    CBSpalten[i].Top := 16 + (i mod 6)*16;
+    CBSpalten[i].Left := 8 + (i div 6) * 100;
   end;
 
   cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;

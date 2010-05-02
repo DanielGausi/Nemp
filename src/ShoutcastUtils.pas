@@ -184,6 +184,9 @@ Type
     function Sort_CurrentTitle_Desc(Item1, Item2: Pointer): Integer;
     function Sort_Count_Asc(Item1, Item2: Pointer): Integer;
     function Sort_Count_Desc(Item1, Item2: Pointer): Integer;
+    function Sort_URL_Asc(Item1, Item2: Pointer): Integer;
+    function Sort_URL_Desc(Item1, Item2: Pointer): Integer;
+
 
     function Sort_Custom(Item1, Item2: Pointer): Integer;
 
@@ -344,6 +347,15 @@ begin
     result := tmp;
 end;
 
+function Sort_URL_Asc(Item1, Item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TStation(Item1).URL, TStation(Item2).URL);
+end;
+function Sort_URL_Desc(Item1, Item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TStation(Item2).URL, TStation(Item1).URL);
+end;
+
 function Sort_Custom(Item1, Item2: Pointer): Integer;
 begin
     result := CompareValue(TStation(Item1).SortIndex, TStation(Item2).SortIndex);
@@ -492,9 +504,13 @@ begin
         //if MediaType = 'audio/aacp' then
         //    result := 'aac, ' + IntToStr(Bitrate) + 'kbit/s'
         //else
-    result := MediaType + ', ' + IntToStr(Bitrate) + 'kbit/s';
-    if result = '' then
-        result := Shoutcast_UnknownFormat;
+    if (MediaType <> '') and (Bitrate > 0) then
+        result := MediaType + ', ' + IntToStr(Bitrate) + 'kbit/s'
+    else
+        if Bitrate > 0 then
+            result := IntToStr(Bitrate) + 'kbit/s'
+        else
+            result := Shoutcast_UnknownFormat;
 end;
 
 

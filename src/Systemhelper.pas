@@ -92,7 +92,8 @@ function GetFileVersionString(Path: String): string;
 // Opens the Properties-Dialog for a File (like in Explorer)
 function ShowFileProperties(const hWndOwner: HWnd; FileName, Caption: PChar): Boolean;
 
-
+// Get the time the file was created
+function GetFileCreationDateTime(Filename:String):TDateTime;
 
 implementation
 
@@ -433,5 +434,15 @@ begin
   Result := ShellExecuteEx(@Info);
 end;
 
+
+// source: http://www.delphi-forum.de/viewtopic.php?t=26462
+function GetFileCreationDateTime(Filename:String):TDateTime;
+var t:TWin32FileAttributeData;
+    Zeit:SYSTEMTIME;
+begin
+ GetFileAttributesEx(pchar(FileName),GetFileExInfoStandard,@t);
+ FileTimeToSystemTime(t.ftCreationTime,Zeit);
+ Result:=SystemTimeToDateTime(zeit);
+end;
 
 end.

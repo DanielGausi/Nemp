@@ -4445,6 +4445,7 @@ begin
           CON_SAMPLERATE      : CellText := Data^.FAudioFile.Samplerate;
           CON_STANDARDCOMMENT : CellText := Data^.FAudioFile.Comment;
           CON_FILESIZE  : CellText := FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
+          CON_FILEAGE   : Celltext := Data^.FAudioFile.FileAgeString;//DateToStr(Data^.FAudioFile.FileAge);
           CON_PFAD      : CellText := Data^.FAudioFile.Pfad;
           CON_ORDNER    : CellText := Data^.FAudioFile.Ordner;
           CON_DATEINAME : CellText := Data^.FAudioFile.Dateiname;
@@ -9351,6 +9352,8 @@ begin
             MedienBib.NempSortArray[2] := siArtist;
             MedienBib.CoverSortOrder := 4;
     end;
+
+    s
 
     // 5: Coverflow - nothing to do here
     100:  begin
