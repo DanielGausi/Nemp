@@ -282,10 +282,17 @@ begin
             result := tmp < 0;
       end;
       SO_ArtistAlbum: begin
-          tmp1 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
+          if SortArray[1] = siFileAge then
+              tmp1 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+          else
+              tmp1 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
+
           if tmp1=0 then
           begin
-              tmp2 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
+              if SortArray[2] = siFileAge then
+                  tmp2 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+              else
+                  tmp2 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
               if tmp2 = 0 then
                   result := AnsiCompareText(A.Titel, B.Titel) < 0
               else
@@ -294,10 +301,16 @@ begin
           else result := tmp1 < 0;
       end;
       SO_AlbumArtist: begin
-          tmp1 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
+          if SortArray[2] = siFileAge then
+              tmp1 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+          else
+              tmp1 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
           if tmp1=0 then
           begin
-              tmp2 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
+              if SortArray[1] = siFileAge then
+                  tmp2 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+              else
+                  tmp2 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
               if tmp2 = 0 then
                   result := AnsiCompareText(A.Titel, B.Titel) < 0
               else

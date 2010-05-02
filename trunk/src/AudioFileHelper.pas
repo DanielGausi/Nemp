@@ -49,7 +49,7 @@ unit AudioFileHelper;
 interface
 
 uses Windows, Classes, Contnrs, SysUtils, StrUtils, Math, IniFiles, Dialogs,
-    Nemp_ConstantsAndTypes, Hilfsfunktionen, AudioFileClass;
+    Nemp_ConstantsAndTypes, Hilfsfunktionen, AudioFileClass, DateUtils;
 
 const SORT_MAX = 10;
 
@@ -153,6 +153,7 @@ function AFCompareCBR(a1,a2: tAudioFile): Integer;
 function AFCompareChannelMode(a1,a2: tAudioFile): Integer;
 function AFCompareSamplerate(a1,a2: tAudioFile): Integer;
 function AFCompareFilesize(a1,a2: tAudioFile): Integer;
+function AFCompareFileAge(a1,a2: tAudioFile): Integer;
 function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
 function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
 
@@ -273,6 +274,10 @@ end;
 function AFCompareFilesize(a1,a2: tAudioFile): Integer;
 begin
     result := CompareValue(a1.Size, a2.Size);
+end;
+function AFCompareFileAge(a1,a2: tAudioFile): Integer;
+begin
+    result := CompareValue(DateOf(a1.FileAge), DateOf(a2.Fileage));
 end;
 function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
 begin
@@ -646,10 +651,16 @@ end;
 function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
 var tmp1,tmp2:integer;
 begin
-    tmp1:=AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
+    if MedienBib.NempSortArray[1] = siFileAge then
+        tmp1 := AnsiCompareText(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
+    else
+        tmp1:=AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
     if tmp1=0 then
     begin
-        tmp2 := AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
+        if MedienBib.NempSortArray[2] = siFileAge then
+            tmp2 := AnsiCompareText(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
+        else
+            tmp2 := AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
         if tmp2 = 0 then
         begin
             result:= AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
@@ -660,10 +671,16 @@ end;
 function Sortieren_String2String1Titel_asc(item1,item2:pointer):integer;
 var tmp1,tmp2:integer;
 begin
-    tmp1:= AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
+    if MedienBib.NempSortArray[2] = siFileAge then
+        tmp1 := AnsiCompareText(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
+    else
+        tmp1:= AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[2]], TAudioFile(item2).Strings[MedienBib.NempSortArray[2]]);
     if tmp1=0 then
     begin
-        tmp2 := AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
+        if MedienBib.NempSortArray[1] = siFileAge then
+            tmp2 := AnsiCompareText(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
+        else
+            tmp2 := AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
         if tmp2 = 0 then
         begin
             result:= AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
@@ -1039,7 +1056,12 @@ begin
           aAudioFile.isStream := True;
           aAudioFile.FileIsPresent := True;
           aAudioFile.Pfad := newFilename;
-          aAudioFile.Titel := aAudioFile.Pfad
+          newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
+          //if newTitel <> '' then
+              aAudioFile.Description :=  NewTitel
+          //else
+          //    aAudioFile.Description := aAudioFile.Pfad;
+          // aAudioFile.Titel := aAudioFile.Description;
         end else
         begin
           newFilename := ExpandFilename(newFilename);
@@ -1087,6 +1109,10 @@ begin
                   begin
                       NewAudioFile := TAudioFile.Create;
                       NewAudioFile.LoadFromStreamForPlaylist(aStream);
+
+                      //if NewAudioFile.isStream then
+                      //  NewAudioFile.Description := NewAudioFile.Titel;
+
                       if AutoScan and not NewAudioFile.isStream then
                           NewAudioFile.FileIsPresent := FileExists(NewAudioFile.Pfad)
                       else

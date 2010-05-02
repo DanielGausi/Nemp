@@ -47,7 +47,8 @@ interface
 
 uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
   ID3v2Frames, ComObj, graphics, variants, ATL_WMAfile, ATL_FLACfile_ReadOnly,
-  strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles;
+  strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
+  DateUtils;
 
 type
 
@@ -87,7 +88,7 @@ type
         fTitle: UnicodeString;
         fComment: UnicodeString;
         fLyrics: UTF8String;
-        fDescription: UnicodeString;
+        //fDescription: UnicodeString;
         fTrack: Byte;
         fRating: Byte;
         fPlayCounter: Cardinal;
@@ -99,6 +100,7 @@ type
         fVBR: Boolean;
         fBitrate: Word;
         fFileSize: Integer;
+        fFileAge: TDateTime;
         // CoverID: a md5-hash-like string
         fCoverID: String;
 
@@ -142,6 +144,8 @@ type
 
         function GetString(Index: TAudioFileStringIndex): UnicodeString;
         procedure SetString(Index: TAudioFileStringIndex; const Value: UnicodeString);
+        function GetFileAgeSortString: String;
+
 
         function GetPath: UnicodeString;
         procedure SetPath(const Value: UnicodeString);
@@ -220,8 +224,11 @@ type
         property Comment:UnicodeString read fComment write fComment;
         property Lyrics : UTF8String   read fLyrics write fLyrics;
         property LyricsExisting: Boolean read fGetLyricsExisting;
-        property Description: UnicodeString read fDescription write fDescription;
+        property Description: UnicodeString read fComment write fComment;//read fDescription write fDescription;
         property Dateiname: UnicodeString Index siDateiname read GetString;
+        property FileAgeString: UnicodeString Index siFileAge read GetString;
+        property FileAgeSortString: UnicodeString read GetFileAgeSortString;
+
         property Extension: String read fGetExtension;
         property Strings[Index: TAudioFileStringIndex]: UnicodeString read GetString write SetString;
         property Index01: single read FIndex01;
@@ -242,6 +249,7 @@ type
         property vbr: boolean read fVBR;
         property Bitrate: word read fBitrate write fBitrate;
         property Size: Integer read fFileSize;
+        property FileAge: TDateTime read fFileAge;
         
         property Pfad: UnicodeString read GetPath write SetPath;
         property PlaylistTitle: UnicodeString read fGetPlaylistTitleString;
@@ -418,7 +426,7 @@ procedure GetMp3Details(filename:UnicodeString;
 
 implementation
 
-uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings;
+uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings, SystemHelper;
 
  {$I-}
 
@@ -525,6 +533,7 @@ procedure TAudioFile.Assign(aAudioFile: TAudioFile);
 begin
     Description        := aAudioFile.Description         ;
     fFileSize          := aAudioFile.fFileSize           ;
+    fFileAge           := aAudioFile.fFileAge            ;
     Duration           := aAudioFile.Duration            ;
     fBitrate           := aAudioFile.fBitrate            ;
     fvbr               := aAudioFile.fvbr                ;
@@ -551,6 +560,7 @@ procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
 begin
     Description        := aAudioFile.Description         ;
     fFileSize          := aAudioFile.fFileSize           ;
+    fFileAge           := aAudioFile.fFileAge            ;
     Duration           := aAudioFile.Duration            ;
     fBitrate           := aAudioFile.fBitrate            ;
     fvbr               := aAudioFile.fvbr                ;
@@ -628,17 +638,29 @@ end;
 }
 function TAudioFile.GetString(Index: TAudioFileStringIndex): UnicodeString;
 begin
-    result := FStrings[Index];
+    if Index = siFileAge then
+        result := FormatDateTime('mmmm yyyy' , fFileAge)
+    else
+        result := FStrings[Index];
 end;
 procedure TAudioFile.SetString(Index: TAudioFileStringIndex; const Value: UnicodeString);
 begin
     FStrings[Index] := Value;
 end;
 
+function TAudioFile.GetFileAgeSortString: String;
+begin
+    result := FormatDateTime('yyyymm', fFileAge);
+end;
+
 function TAudioFile.fGetPlaylistTitleString: UnicodeString;
 begin
   if isStream then
-    result := Description
+  begin
+    result := Description;
+    if (titel <> '') and (titel <> pfad) then
+      result := result + ' (' + titel + ')';
+  end
   else
   begin
     if Artist = AUDIOFILE_UNKOWN then
@@ -776,11 +798,13 @@ begin
       IsStream := True;
       Pfad := filename;
       fFileSize := 0;
+      fFileAge  := Now;
   end
   else
   begin
       try
         IsStream := False;
+        fFileAge := GetFileCreationDateTime(filename);
         // Get the extension and call the proper private method.
         if (AnsiLowerCase(ExtractFileExt(filename)) = '.mp3')
           or (AnsiLowerCase(ExtractFileExt(filename)) = '.mp2')
@@ -1903,6 +1927,8 @@ begin
                                 fSamplerateIDX := 7;
             end;
             MP3DB_FILESIZE: aStream.Read(fFileSize,SizeOf(fFileSize));
+            // new again in Nemp 4.0: FileAge
+            MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
             MP3DB_TRACK: aStream.Read(fTrack, SizeOf(fTrack));
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
             MP3DB_YEAR: begin
@@ -1991,6 +2017,8 @@ begin
             MP3DB_CHANNELMODE: aStream.Read(fChannelmodeIDX, SizeOf(fChannelModeIDX));
             MP3DB_SAMPLERATE: aStream.Read(fSamplerateIDX,SizeOf(fSamplerateIDX));
             MP3DB_FILESIZE: aStream.Read(fFileSize,SizeOf(fFileSize));
+            // new again in Nemp 4.0: FileAge
+            MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
             MP3DB_TRACK: aStream.Read(fTrack, SizeOf(fTrack));
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
             MP3DB_YEAR: begin
@@ -2129,6 +2157,11 @@ begin
     ID:=MP3DB_FILESIZE;
     aStream.Write(ID,sizeof(ID));
     aStream.Write(fFileSize,sizeOf(fFileSize));
+
+    // new again in Nemp 4.0: FileAge
+    ID := MP3DB_DATUM;
+    aStream.Write(ID,sizeof(ID));
+    aStream.Write(fFileAge, SizeOf(fFileAge));
 
     if Track <> 0 then
     begin

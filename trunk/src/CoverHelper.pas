@@ -68,6 +68,7 @@ type
       Year: Integer;
       Genre: UnicodeString;
       Directory: UnicodeString;
+      FileAge: TDateTime;
 
       property InfoString: String read fGetInfoString;
     end;
@@ -815,16 +816,18 @@ procedure GetCoverInfos(AudioFileList: TObjectlist; aCover: TNempCover);
 var str1: UnicodeString;
     maxidx, i, fehlstelle: Integer;
     aStringlist: TStringList;
+    newestAge, currentAge: TDateTime;
 begin
 
   if aCover.ID = '' then
   begin
-    aCover.Artist := 'Various artists';
-    aCover.Album := 'Albums without cover';
-    aCover.Year := 0;
-    aCover.Genre := 'Other';
-    aCover.Directory := ' ';
-    exit;
+      aCover.Artist := 'Various artists';
+      aCover.Album := 'Albums without cover';
+      aCover.Year := 0;
+      aCover.Genre := 'Other';
+      aCover.Directory := ' ';
+      aCover.FileAge := 0;
+      exit;
   end;
 
   if AudioFileList.Count <= 25 then maxIdx := AudioFileList.Count-1 else maxIdx := 25;
@@ -880,6 +883,15 @@ begin
     aCover.Year := StrToIntDef(TAudioFile(AudioFileList[AudioFileList.Count Div 2]).Year, 0);
     aCover.Directory := TAudioFile(AudioFileList[0]).Ordner;
   end;
+
+  newestAge := 0;
+  for i := 0 to AudioFileList.Count - 1 do
+  begin
+      currentAge := TAudioFile(AudioFileList[i]).FileAge;
+      if currentAge > newestAge then
+          newestAge := currentAge;
+  end;
+  aCover.FileAge := newestAge;
 
   aStringlist.Free;
 end;

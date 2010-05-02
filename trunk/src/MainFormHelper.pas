@@ -1130,6 +1130,7 @@ begin
             siOrdner: ArtistsVST.Header.Columns[0].Text := (TreeHeader_Directories) + ' (' + inttostr(c) + ')' ;
             siGenre:  ArtistsVST.Header.Columns[0].Text := (TreeHeader_Genres)      + ' (' + inttostr(c) + ')' ;
             siJahr:   ArtistsVST.Header.Columns[0].Text := (TreeHeader_Years)       + ' (' + inttostr(c) + ')' ;
+            siFileage:ArtistsVST.Header.Columns[0].Text := (TreeHeader_FileAges)    + ' (' + inttostr(c) + ')' ;
           else ArtistsVST.Header.Columns[0].Text := '(N/A)';
         end;
         ArtistsVST.Invalidate;
@@ -1151,6 +1152,7 @@ begin
             siOrdner: AlbenVST.Header.Columns[0].Text := (TreeHeader_Directories) + ' (' + inttostr(c) + ')' ;
             siGenre:  AlbenVST.Header.Columns[0].Text := (TreeHeader_Genres)      + ' (' + inttostr(c) + ')' ;
             siJahr:   AlbenVST.Header.Columns[0].Text := (TreeHeader_Years)       + ' (' + inttostr(c) + ')' ;
+            siFileage:AlbenVST.Header.Columns[0].Text := (TreeHeader_FileAges)    + ' (' + inttostr(c) + ')' ;
           else AlbenVST.Header.Columns[0].Text := '(N/A)';
         end;
         AlbenVST.Invalidate;

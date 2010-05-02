@@ -983,7 +983,7 @@ begin
         NempSortArray[1] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl1', integer(siArtist)));
         NempSortArray[2] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl2', integer(siAlbum)));
 
-        if (NempSortArray[1] > siJahr) OR (NempSortArray[2] > siJahr) or
+        if (NempSortArray[1] > siFileAge) OR (NempSortArray[2] > siFileAge) or
            (NempSortArray[1] < siArtist) OR (NempSortArray[2] < siArtist)then
         begin
           NempSortArray[1] := siArtist;
@@ -2887,25 +2887,39 @@ begin
   if Source.Count < 1 then exit;
 
 
-  aktualArtist := (Source[0] as TAudioFile).Strings[NempSortArray[1]];
+  if NempSortArray[1] = siFileAge then
+      aktualArtist := (Source[0] as TAudioFile).FileAgeString
+  else
+      aktualArtist := (Source[0] as TAudioFile).Strings[NempSortArray[1]];
+
   // Copy current value for "artist" to key1
-  (Source[0] as TAudioFile).Key1 := aktualArtist;
+  if NempSortArray[1] = siFileAge then
+      (Source[0] as TAudioFile).Key1 := (Source[0] as TAudioFile).FileAgeSortString
+  else
+      (Source[0] as TAudioFile).Key1 := aktualArtist;
 
   lastArtist := aktualArtist;
   if lastArtist <> '' then
-    Target.Add(TJustastring.create(lastArtist));
+      Target.Add(TJustastring.create((Source[0] as TAudioFile).Key1 , lastArtist));
 
   for i := 1 to Source.Count - 1 do
   begin
-    aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+    if NempSortArray[1] = siFileAge then
+      aktualArtist := (Source[i] as TAudioFile).FileAgeString
+    else
+      aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+
     // Copy current value for "artist" to key1
-    (Source[i] as TAudioFile).Key1 := aktualArtist;
+    if NempSortArray[1] = siFileAge then
+        (Source[i] as TAudioFile).Key1 := (Source[i] as TAudioFile).FileAgeSortString
+    else
+        (Source[i] as TAudioFile).Key1 := aktualArtist;
 
     if NOT AnsiSameText(aktualArtist, lastArtist) then
     begin
       lastArtist := aktualArtist;
       if lastArtist <> '' then
-        Target.Add(TJustastring.create(lastArtist));
+          Target.Add(TJustastring.create((Source[i] as TAudioFile).Key1 , lastArtist));
     end;
   end;
 
@@ -2943,10 +2957,18 @@ begin
   Target.Add(BROWSE_ALL);
   if Source.Count < 1 then exit;
 
-  // Copy current value for "album" to key2
-  (Source[0] as TAudioFile).Key2 := (Source[0] as TAudioFile).Strings[NempSortArray[2]];
+  if NempSortArray[2] = siFileAge then
+      aktualAlbum := (Source[0] as TAudioFile).FileAgeString
+  else
+      aktualAlbum := (Source[0] as TAudioFile).Strings[NempSortArray[2]];
 
-  aktualAlbum := (Source[0] as TAudioFile).Strings[NempSortArray[2]];
+  // Copy current value for "album" to key2
+  if NempSortArray[2] = siFileAge then
+      (Source[0] as TAudioFile).Key2 := (Source[0] as TAudioFile).FileAgeSortString
+  else
+      (Source[0] as TAudioFile).Key2 := aktualAlbum;
+
+
   lastAlbum := aktualAlbum;
   // Ungültige Alben nicht einfügen
   if lastAlbum <> '' then  // Hier noch eine bessere Überprüfung einbauen ???      (*)
@@ -2954,10 +2976,18 @@ begin
 
   for i := 1 to Source.Count - 1 do
   begin
-    // Copy current value for "album" to key2
-    (Source[i] as TAudioFile).Key2 := (Source[i] as TAudioFile).Strings[NempSortArray[2]];
     // check for "new album"
-    aktualAlbum := (Source[i] as TAudioFile).Strings[NempSortArray[2]];
+      if NempSortArray[2] = siFileAge then
+        aktualAlbum := (Source[i] as TAudioFile).FileAgeString
+      else
+        aktualAlbum := (Source[i] as TAudioFile).Strings[NempSortArray[2]];
+
+    // Copy current value for "album" to key2
+      if NempSortArray[2] = siFileAge then
+          (Source[i] as TAudioFile).Key2 := (Source[i] as TAudioFile).FileAgeSortString
+      else
+          (Source[i] as TAudioFile).Key2 := aktualAlbum;// (Source[i] as TAudioFile).Strings[NempSortArray[2]];
+
     if NOT AnsiSameText(aktualAlbum, lastAlbum) then
     begin
       lastAlbum := aktualAlbum;
@@ -3217,7 +3247,10 @@ begin
 
                   Start := EinIndex;
                   Ende := EinIndex;
-                  if EinIndex = -1 then exit;
+                  if EinIndex = -1 then begin
+                  wuppdi;
+                  exit;
+                  end;
 
                   if NempSortArray[1] = siOrdner then
                   begin
@@ -3232,6 +3265,7 @@ begin
                     while (Ende < max) AND (AnsiSameText(name,(Liste[Ende+1] as TAudiofile).Key1)) do
                         inc(Ende);
                   end;
+                  //ShowMessage('Artists* ' +  InttoStr(Start) + ' - ' + Inttostr(Ende) + ': ' + Inttostr(Ende - Start));
         end;
         SEARCH_ALBUM: begin
                   // Suchart : Search_album
@@ -3239,9 +3273,14 @@ begin
                     einIndex := BinaerAlbumSuche_JustContains(Liste, name, Start, Ende)
                   else
                     einIndex := BinaerAlbumSuche(Liste, name, Start, Ende);
+
+
+
                   Start := EinIndex;
                   Ende := EinIndex;
-                  if EinIndex = -1 then exit;
+                  if EinIndex = -1 then begin
+                      exit;
+                  end;
                   if NempSortArray[2] = siOrdner then
                   begin
                     while (Start > min) AND (Pos(name,(Liste[Start-1] as TAudiofile).Key2) = 1) do
@@ -3254,6 +3293,8 @@ begin
                     while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key2,name)) do
                         inc(Ende);
                   end;
+
+                  //ShowMessage(InttoStr(Start) + ' - ' + Inttostr(Ende) + ': ' + Inttostr(Ende - Start));
         end;
         SEARCH_COVERID: begin
            // s.u.   (GetStartEndIndexCover)
@@ -3352,7 +3393,11 @@ begin
             // Hier funktioniert das einfache EInfügen
             aktualAlbum := (Mp3ListeArtistSort[start] as TAudioFile).Key2;
             lastAlbum := aktualAlbum;
-            Alben.Add(TJustastring.create(lastAlbum));
+            if NempSortArray[2] = siFileAge then
+                Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[start] as TAudioFile).FileAgeString ))
+            else
+                Alben.Add(TJustastring.create(lastAlbum));
+
 
             for i := start+1 to Ende do
             begin
@@ -3360,7 +3405,10 @@ begin
               if NOT AnsiSameText(aktualAlbum, lastAlbum) then
               begin
                 lastAlbum := aktualAlbum;
-                Alben.Add(TJustastring.create(lastAlbum));
+                if NempSortArray[2] = siFileAge then
+                    Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[i] as TAudioFile).FileAgeString))
+                else
+                    Alben.Add(TJustastring.create(lastAlbum));
               end;
             end;
       end;
@@ -3681,6 +3729,7 @@ begin
         CON_SAMPLERATE          : NewSortMethod := AFCompareSamplerate;
         CON_STANDARDCOMMENT     : NewSortMethod := AFCompareComment;
         CON_FILESIZE            : NewSortMethod := AFCompareFilesize;
+        CON_FILEAGE             : NewSortMethod := AFCompareFileAge;
         CON_PFAD                : NewSortMethod := AFComparePath;
         CON_ORDNER              : NewSortMethod := AFCompareDirectory;
         CON_DATEINAME           : NewSortMethod := AFCompareFilename;
@@ -4143,38 +4192,93 @@ end;
 }
 procedure TMedienBibliothek.ExportFavorites(aFilename: UnicodeString);
 var fs: TMemoryStream;
+    ini: TMemIniFile;
     i, c: Integer;
 begin
-    fs := Nil;
-    try
-        fs := TMemoryStream.Create;
-        c := RadioStationList.Count;
-        fs.Write(c, SizeOf(c));
-        for i := 0 to c-1 do
-            TStation(RadioStationList[i]).SaveToStream(fs);
+    if AnsiLowerCase(ExtractFileExt(aFilename)) = '.pls' then
+    begin
+        //save as pls Playlist-File
+        ini := TMeminiFile.Create(aFilename);
         try
-            fs.SaveToFile(aFilename);
-        except
-            on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
-        end;
-    finally
-        if assigned(fs) then
+            ini.Clear;
+            for i := 0 to RadioStationList.Count - 1 do
+            begin
+                ini.WriteString ('playlist', 'File'  + IntToStr(i+1), TStation(RadioStationList[i]).URL);
+                ini.WriteString ('playlist', 'Title'  + IntToStr(i+1), TStation(RadioStationList[i]).Name);
+                ini.WriteInteger ('playlist', 'Length'  + IntToStr(i+1), -1);
+            end;
+            ini.WriteInteger('playlist', 'NumberOfEntries', RadioStationList.Count);
+            ini.WriteInteger('playlist', 'Version', 2);
+            try
+                Ini.UpdateFile;
+            except
+                on E: Exception do
+                    MessageDLG(E.Message, mtError, [mbOK], 0);
+            end;
+      finally
+          ini.Free
+      end;
+
+    end
+    else
+    if AnsiLowerCase(ExtractFileExt(aFilename)) = '.nwl' then
+    begin
+        fs := TMemoryStream.Create;
+        try
+            c := RadioStationList.Count;
+            fs.Write(c, SizeOf(c));
+            for i := 0 to c-1 do
+                TStation(RadioStationList[i]).SaveToStream(fs);
+            try
+                fs.SaveToFile(aFilename);
+            except
+                on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
+            end;
+        finally
             fs.Free;
+        end;
     end;
 end;
 procedure TMedienBibliothek.ImportFavorites(aFilename: UnicodeString);
 var fs: TMemoryStream;
+    ini: TMemIniFile;
+    NumberOfEntries, i: Integer;
+    newURL, newName: String;
+    NewStation: TStation;
 begin
-    fs := Nil;
-    try
+    if AnsiLowerCase(ExtractFileExt(aFilename)) = '.pls' then
+    begin
+        ini := TMeminiFile.Create(aFilename);
+        try
+            NumberOfEntries := ini.ReadInteger('playlist','NumberOfEntries',-1);
+            for i := 1 to NumberOfEntries do
+            begin
+                newURL := ini.ReadString('playlist','File'+ IntToStr(i),'');
+                if newURL = '' then continue;
+                if PathSeemsToBeURL(newURL) then
+                begin
+                    NewStation := TStation.Create(MainWindowHandle);
+                    NewStation.URL := newURL;
+                    newName := ini.ReadString('playlist','Title'+ IntToStr(i),'');
+                    NewStation.Name := NewName;
+                    RadioStationList.Add(NewStation);
+                end;
+            end;
+        finally
+            ini.free;
+        end;
+    end else
+    if AnsiLowerCase(ExtractFileExt(aFilename)) = '.nwl' then
+    begin
         fs := TMemoryStream.Create;
-        fs.LoadFromFile(aFilename);
-        fs.Position := 0;
-        LoadRadioStationsFromStream(fs);
-        Changed := True;
-    finally
-        if assigned(fs) then
+        try
+            fs.LoadFromFile(aFilename);
+            fs.Position := 0;
+            LoadRadioStationsFromStream(fs);
+            Changed := True;
+        finally
             fs.Free;
+        end;
     end;
 end;
 {
