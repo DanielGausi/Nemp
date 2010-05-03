@@ -93,6 +93,9 @@ Const SO_Pfad = 0;
   function CoverSort_Genre(item1,item2:pointer):integer;
   function CoverSort_GenreYear(item1,item2:pointer):integer;
   function CoverSort_Jahr(item1,item2:pointer):integer;
+  function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
+  function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
+
   // Note: These two coversort-Methods are almost the same, as
   //       in one Directory there is (almost everytime) only one
   //       "cover" (except covers are set by the ID3.tag)
@@ -202,6 +205,30 @@ begin
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
     result := CompareValue(TNempCover(item2).Year,TNempCover(item1).Year); // umgekehrt sortieren - neuere zuerst
+    if result = 0 then
+      result := CoverSort_Artist(item1, item2);
+  end;
+end;
+function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
+begin
+  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
+  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
+  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
+  begin
+    result := CompareValue(TNempCover(item2).FileAge,TNempCover(item1).FileAge); // umgekehrt sortieren - neuere zuerst
+    if result = 0 then
+      result := CoverSort_Album(item1, item2);
+  end;
+end;
+function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
+begin
+  if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
+  if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
+  if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
+  begin
+    result := CompareValue(TNempCover(item2).FileAge,TNempCover(item1).FileAge); // umgekehrt sortieren - neuere zuerst
     if result = 0 then
       result := CoverSort_Artist(item1, item2);
   end;

@@ -1028,7 +1028,7 @@ begin
         if (BrowseMode < 0) OR (BrowseMode > 2) then
           BrowseMode := 0;
         CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 1);
-        if (CoverSortOrder < 1) OR (CoverSortOrder > 7) then
+        if (CoverSortOrder < 1) OR (CoverSortOrder > 9) then
           CoverSortorder := 1;
 
         IncludeAll := ini.ReadBool('MedienBib', 'other', True);
@@ -3113,6 +3113,8 @@ begin
       5: Target.Sort(CoverSort_GenreYear);
       6: Target.Sort(CoverSort_DirectoryArtist);
       7: Target.Sort(CoverSort_DirectoryAlbum);
+      8: Target.Sort(CoverSort_FileAgeAlbum);
+      9: Target.Sort(CoverSort_FileAgeArtist);
   end;
   GetRandomCover(Target);
 

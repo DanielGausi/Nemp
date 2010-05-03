@@ -2255,7 +2255,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Years, Artists'
             'Genre, Years'
             'Directories, Artists'
-            'Directories, Albums')
+            'Directories, Albums'
+            'Fileage, Album'
+            'Fileage, Artist')
         end
         object cbHideNACover: TCheckBox
           Left = 15
