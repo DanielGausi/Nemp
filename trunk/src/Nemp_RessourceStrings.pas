@@ -64,7 +64,7 @@ TreeHeader_Directories = 'Directories';
 TreeHeader_Genres = 'Genres';
 TreeHeader_Years = 'Years';
 TreeHeader_Titles = 'Titles';
-TreeHeader_FileAges = 'Dates';
+TreeHeader_FileAges = 'Fileage';
 TreeHeader_Playlists = 'Playlists';
 TreeHeader_Webradio = 'Webradio';
 

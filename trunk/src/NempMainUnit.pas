@@ -809,6 +809,10 @@ type
     N77: TMenuItem;
     MM_PL_ResetRating: TMenuItem;
     PM_PL_StopAfterCurrentTitle: TMenuItem;
+    MM_ML_BrowseByFileageAlbum: TMenuItem;
+    PM_ML_BrowseByFileageAlbum: TMenuItem;
+    MM_ML_BrowseByFileageArtist: TMenuItem;
+    PM_ML_BrowseByFileageArtist: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -9352,8 +9356,17 @@ begin
             MedienBib.NempSortArray[2] := siArtist;
             MedienBib.CoverSortOrder := 4;
     end;
+    8: begin
+            MedienBib.NempSortArray[1] := siFileAge;
+            MedienBib.NempSortArray[2] := siAlbum;
+            MedienBib.CoverSortOrder := 8;
+    end;
+    9: begin
+            MedienBib.NempSortArray[1] := siFileAge;
+            MedienBib.NempSortArray[2] := siArtist;
+            MedienBib.CoverSortOrder := 9;
+    end;
 
-    s
 
     // 5: Coverflow - nothing to do here
     100:  begin
@@ -9367,7 +9380,7 @@ begin
   end;
 
   case (Sender as TMenuItem).Tag of
-      0..4, 6..7 : SwitchMediaLibrary(MedienBib.BrowseMode);
+      0..4, 6..9 : SwitchMediaLibrary(MedienBib.BrowseMode);
       //5 : SwitchMediaLibrary(1);     // CoverFlow
   end;
 end;
