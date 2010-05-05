@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabAnzeige5
+    ActivePage = TabAnzeige6
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2500,7 +2500,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 425
-        Height = 106
+        Height = 186
         Caption = 'Partymode'
         TabOrder = 0
         object Lbl_PartyMode_ResizeFactor: TLabel
@@ -2524,6 +2524,46 @@ object OptionsCompleteForm: TOptionsCompleteForm
             '1.5 (moderate amplification)'
             '2 (double sized)'
             '2.5 (really huge)')
+        end
+        object cb_PartyMode_BlockTreeEdit: TCheckBox
+          Left = 17
+          Top = 70
+          Width = 350
+          Height = 17
+          Caption = 'Block editing file information in the treeview'
+          TabOrder = 1
+        end
+        object cb_PartyMode_BlockDetailWindow: TCheckBox
+          Left = 16
+          Top = 94
+          Width = 350
+          Height = 17
+          Caption = 'Do not show detail window'
+          TabOrder = 2
+        end
+        object cb_PartyMode_BlockBibOperations: TCheckBox
+          Left = 17
+          Top = 134
+          Width = 350
+          Height = 17
+          Caption = 'Block library operations'
+          TabOrder = 3
+        end
+        object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
+          Left = 17
+          Top = 113
+          Width = 350
+          Height = 17
+          Caption = 'Block rating of current title'
+          TabOrder = 4
+        end
+        object cb_PartyMode_BlockTools: TCheckBox
+          Left = 17
+          Top = 154
+          Width = 350
+          Height = 17
+          Caption = 'Block tools'
+          TabOrder = 5
         end
       end
     end

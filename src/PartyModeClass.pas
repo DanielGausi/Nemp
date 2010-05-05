@@ -64,8 +64,14 @@ type
           fActive: Boolean;
           fResizeProc: TChangeProc;
 
-
-          fResizeFactor: Single;
+          // settings
+          fResizeFactor: Single;  // resize-factor
+          fPassword: String;      // password, needed to deactivatre Party-Mode
+          fBlockTreeEdit: Boolean;     // block editing inside the StringTree
+          fBlockDetailWindow: Boolean; // block showing the Detailform
+          fBlockCurrentTitleRating: Boolean; // block editing the rating of the current title
+          fBlockBibOperations: Boolean;     // Block adding, deleting, Get Tags, lyrics, reset rating, ... of files
+          fBlockTools: Boolean;            // Block tools like Birthday, Scrobbler, ...
 
           // Array of PlayerControls/Positions.
           // These are "completely doubled" i.e. width, height,top, left
@@ -78,7 +84,6 @@ type
 
           procedure CorrectMainForm;
 
-
           procedure SetActive(value: Boolean);
           procedure SetScaleFactor(Value: Single);
           procedure SetOriginalPosition(aControl: TControl; var aIndex: Integer);
@@ -89,6 +94,11 @@ type
           property ResizeProc: TChangeProc read fResizeProc;
 
           property ResizeFactor: Single read fResizeFactor write SetScaleFactor;
+          property BlockTreeEdit          : Boolean read fBlockTreeEdit           write fBlockTreeEdit           ;
+          property BlockDetailWindow      : Boolean read fBlockDetailWindow       write fBlockDetailWindow       ;
+          property BlockCurrentTitleRating: Boolean read fBlockCurrentTitleRating write fBlockCurrentTitleRating ;
+          property BlockBibOperations     : Boolean read fBlockBibOperations      write fBlockBibOperations      ;
+          property BlockTools             : Boolean read fBlockTools              write fBlockTools              ;
 
           constructor Create;
 
@@ -107,7 +117,13 @@ type
           function Smaller(value: Integer): Integer;
           function Equal(value: Integer): Integer;
 
-         
+          // Pseudo-Getter for properties. AND with fActive.
+          function DoBlockTreeEdit          : Boolean;
+          function DoBlockDetailWindow      : Boolean;
+          function DoBlockCurrentTitleRating: Boolean;
+          function DoBlockBibOperations     : Boolean;
+          function DoBlockTools             : Boolean;
+
     end;
 
 
@@ -127,17 +143,53 @@ begin
     fResizeFactor := 1.5;
 end;
 
+function TNempPartyMode.DoBlockBibOperations: Boolean;
+begin
+    result := fActive and fBlockBibOperations;
+end;
+
+function TNempPartyMode.DoBlockCurrentTitleRating: Boolean;
+begin
+    result := fActive and fBlockCurrentTitleRating;
+end;
+
+function TNempPartyMode.DoBlockDetailWindow: Boolean;
+begin
+    result := fActive and fBlockDetailWindow;
+end;
+
+function TNempPartyMode.DoBlockTools: Boolean;
+begin
+    result := fActive and fBlockTools;
+end;
+
+function TNempPartyMode.DoBlockTreeEdit: Boolean;
+begin
+    result := fActive and fBlockTreeEdit;
+end;
+
 procedure TNempPartyMode.LoadFromIni(Ini: TMemIniFile);
 var tmp: Integer;
 begin
     tmp := Ini.ReadInteger('PartyMode', 'Factor', 1);
     fResizeFactor := IndexToFactor(tmp);
+
+    fBlockTreeEdit            := Ini.ReadBool('PartyMode', 'BlockTreeEdit'          , True);
+    fBlockDetailWindow        := Ini.ReadBool('PartyMode', 'BlockDetailWindow'      , True);
+    fBlockCurrentTitleRating  := Ini.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
+    fBlockBibOperations       := Ini.ReadBool('PartyMode', 'BlockBibOperations'     , True);
+    fBlockTools               := Ini.ReadBool('PartyMode', 'BlockTools'             , True);
 end;
 
 
 procedure TNempPartyMode.WriteToIni(Ini: TMemIniFile);
 begin
     Ini.WriteInteger('PartyMode', 'Factor', FactorToIndex);
+    Ini.WriteBool('PartyMode', 'BlockTreeEdit'          , fBlockTreeEdit          );
+    Ini.WriteBool('PartyMode', 'BlockDetailWindow'      , fBlockDetailWindow      );
+    Ini.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
+    Ini.WriteBool('PartyMode', 'BlockBibOperations'     , fBlockBibOperations     );
+    Ini.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
 end;
 
 
@@ -476,18 +528,14 @@ begin
             // Star-Graphics must be reloaded!
             Nemp_MainForm.NempSkin.DeActivateSkin;
 
-
         if fActive then
             Spectrum.SetScale(fResizeFactor)
         else
             Spectrum.SetScale(1);
 
-
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
-
         ReArrangeToolImages;
     end;
-
 end;
 
 
