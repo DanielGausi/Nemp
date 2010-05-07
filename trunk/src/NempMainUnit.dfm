@@ -490,36 +490,6 @@ object Nemp_MainForm: TNemp_MainForm
       OnMouseUp = PaintFrameMouseUp
       OnPaint = PanelPaint
       OwnerDraw = False
-      object GRPBOXCover: TNempPanel
-        Tag = 5
-        Left = 2
-        Top = 150
-        Width = 191
-        Height = 180
-        BevelOuter = bvNone
-        PopupMenu = Player_PopupMenu
-        TabOrder = 6
-        OnMouseDown = PaintFrameMouseDown
-        OnMouseMove = PaintFrameMouseMove
-        OnMouseUp = PaintFrameMouseUp
-        OnPaint = PanelPaint
-        OwnerDraw = False
-        object CoverImage: TImage
-          Left = 0
-          Top = 0
-          Width = 191
-          Height = 180
-          Align = alClient
-          Center = True
-          PopupMenu = Player_PopupMenu
-          Proportional = True
-          Stretch = True
-          OnDblClick = CoverImageDblClick
-          ExplicitTop = 2
-          ExplicitWidth = 189
-          ExplicitHeight = 175
-        end
-      end
       object TabBtn_Nemp: TSkinButton
         Left = 10
         Top = 377
@@ -1802,8 +1772,8 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object GRPBOXEffekte: TNempPanel
         Tag = 5
-        Left = 8
-        Top = 199
+        Left = 6
+        Top = 163
         Width = 191
         Height = 180
         BevelOuter = bvNone
@@ -2038,6 +2008,36 @@ object Nemp_MainForm: TNemp_MainForm
           Color1 = clBlack
           Color2 = clBlack
           AcceptArrowKeys = True
+        end
+      end
+      object GRPBOXCover: TNempPanel
+        Tag = 5
+        Left = 26
+        Top = 265
+        Width = 191
+        Height = 180
+        BevelOuter = bvNone
+        PopupMenu = Player_PopupMenu
+        TabOrder = 6
+        OnMouseDown = PaintFrameMouseDown
+        OnMouseMove = PaintFrameMouseMove
+        OnMouseUp = PaintFrameMouseUp
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        DesignSize = (
+          191
+          180)
+        object CoverImage: TImage
+          Left = 8
+          Top = 8
+          Width = 175
+          Height = 164
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Center = True
+          PopupMenu = Player_PopupMenu
+          Proportional = True
+          Stretch = True
+          OnDblClick = CoverImageDblClick
         end
       end
     end
@@ -3773,7 +3773,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130068030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101110013006C030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4338,7 +4338,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011C00F806440410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011C00F806480410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7128,7 +7128,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 536
     Top = 632
     Bitmap = {
-      494C010107002800D40010001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800D80010001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
