@@ -1402,6 +1402,15 @@ Var
   AudioFile:TAudioFile;
 Begin
     result := True;
+
+    if Nemp_MainForm.NempSkin.NempPartyMode.DoBlockBibOperations then
+    begin
+        DragFinish (aMsg.WParam);
+        Nemp_MainForm.DragSource := DS_EXTERN;
+        exit;
+    end;
+
+
     with Nemp_MainForm do
     begin
           if (DragSource <> DS_VST) then    // Files kommen von Auﬂerhalb

@@ -127,7 +127,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details, HeadsetControl,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis, PlayerClass;
+    spectrum_vis, PlayerClass, PartymodePassword;
 
 procedure CorrectVolButton;
 begin
@@ -827,14 +827,17 @@ end;
 procedure ReArrangeToolImages;
 var currentLeft: Integer;
     decvalue: Integer;
+    newtop: Integer;
 begin
     with Nemp_MainForm do
     begin
         decvalue := ScrobblerImage.Width + 2;
         currentLeft := PaintFrame.Left + PaintFrame.Width - ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
+        newTop := PaintFrame.Top + PaintFrame.Height - 16;
 
         if NempPlayer.NempScrobbler.DoScrobble then
         begin
+            ScrobblerImage.Top := newTop;
             ScrobblerImage.Left := currentLeft;
             ScrobblerImage.Visible := True;
             dec(currentLeft, decvalue);
@@ -843,6 +846,7 @@ begin
 
         If assigned(NempWebserver) and NempWebserver.Active then
         begin
+            WebserverImage.Top := newTop;
             WebserverImage.Left := currentLeft;
             WebserverImage.Visible := True;
             dec(currentLeft, decvalue);
@@ -851,6 +855,7 @@ begin
 
         if BirthdayTimer.Enabled then
         begin
+            BirthdayImage.Top := newTop;
             BirthdayImage.Left := currentLeft;
             BirthdayImage.Visible := True;
             dec(currentLeft, decvalue);
@@ -859,6 +864,7 @@ begin
 
         if (SleepTimer.Enabled) or (NempOptions.ShutDownAtEndOfPlaylist) then
         begin
+            SleepImage.Top := newTop;
             SleepImage.Left := currentLeft;
             SleepImage.Visible := True;
             //dec(currentLeft, 18);
@@ -1076,6 +1082,8 @@ begin
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
         if assigned(FormMediaKeyInit     ) then ReTranslateComponent(FormMediaKeyInit    );
+        if assigned(PasswordDlg          ) then ReTranslateComponent(PasswordDlg         );
+
         //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
         if assigned(OptionsCompleteForm  ) then
         begin

@@ -458,7 +458,7 @@ type
     PM_EQ_Delete: TMenuItem;
     N45: TMenuItem;
     PM_EQ_RestoreStandard: TMenuItem;
-    PM_P_Options: TMenuItem;
+    PM_P_Preferences: TMenuItem;
     PM_P_View: TMenuItem;
     PM_P_ViewCompact: TMenuItem;
     PM_P_ViewCompactComplete: TMenuItem;
@@ -1531,7 +1531,7 @@ uses   Splash, MultimediaKeys,
   HeadsetControl, BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt, CloudEditor,
-  TagHelper;
+  TagHelper, PartymodePassword;
 
 
 {$R *.dfm}
@@ -3967,10 +3967,8 @@ begin
       PM_ML_Enqueue.Enabled := False;
       PM_ML_PlayNext.Enabled := False;
       PM_ML_PlayNow.Enabled := False;
-      PM_ML_DeleteSelected.Enabled := False;
       PM_ML_PlayHeadset.Enabled := False;
       PM_ML_StopHeadset.Enabled := NempPlayer.EnableHeadSet;
-      PM_ML_DeleteSelected.Enabled := False;
       PM_ML_GetLyrics.Enabled := False;
       PM_ML_ExtendedShowAllFilesInDir.Enabled := False;
       PM_ML_ExtendedAddAllFilesInDir.Enabled := False;
@@ -3983,12 +3981,12 @@ begin
     begin
       // ???
       //Liste:=AnzeigeListe;
-      PM_ML_Properties.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
-      PM_ML_RefreshSelected.Enabled := (aVST = VST) AND {(not MedienBib.AnzeigeShowsPlaylistFiles) AND} (not LangeAktionWeitermachen);
+      PM_ML_Properties.Enabled := (aVST = VST) AND (not LangeAktionWeitermachen) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
+      PM_ML_RefreshSelected.Enabled := (aVST = VST) AND (not LangeAktionWeitermachen)  and (not NempSkin.NempPartyMode.DoBlockBibOperations);
       PM_ML_HideSelected.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
-      PM_ML_DeleteSelected.Enabled := ((aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen))
-                                    OR ((aVST = AlbenVST) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) AND (not LangeAktionWeitermachen))
-      ;
+      PM_ML_DeleteSelected.Enabled := (((aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen))
+                                    OR ((aVST = AlbenVST) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) AND (not LangeAktionWeitermachen)))
+                                    and (not NempSkin.NempPartyMode.DoBlockBibOperations);
 
 
       if aVST = ArtistsVST then
@@ -4012,8 +4010,8 @@ begin
       PM_ML_PlayNext.Enabled := canPlay;
       PM_ML_PlayNow.Enabled := canPlay;
       //PM_ML_DeleteSelected.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
-      PM_ML_GetLyrics.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen);
-      PM_ML_GetTags.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen);
+      PM_ML_GetLyrics.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
+      PM_ML_GetTags.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
       PM_ML_PlayHeadset.Enabled := (aVST = VST) AND NempPlayer.EnableHeadSet;
       PM_ML_StopHeadset.Enabled := NempPlayer.EnableHeadSet;
 
@@ -4024,9 +4022,9 @@ begin
       PM_ML_ExtendedSearchArtist.Enabled := True;
       PM_ML_ExtendedSearchAlbum.Enabled := True;
       PM_ML_ShowInExplorer.Enabled := (aVST = VST);
-      PM_ML_CopyToClipboard.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
+      PM_ML_CopyToClipboard.Enabled := (aVST = VST) AND (not LangeAktionWeitermachen);
     end;
-    PM_ML_PasteFromClipboard.Enabled := Clipboard.HasFormat(CF_HDROP);
+    PM_ML_PasteFromClipboard.Enabled := (Clipboard.HasFormat(CF_HDROP)) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
 
     if (aVST = VST) AND (aVST.FocusedNode <> NIL) then
     begin
@@ -4923,14 +4921,17 @@ begin
 
     VK_F8,
     VK_F7: begin
-              Anzeigemode := (AnzeigeMode + 1) mod 2;
-              if Anzeigemode = 1 then
+              if Not NempSkin.NempPartyMode.Active then
               begin
-                  // Party-mode in Separate-Window-Mode is not allowed.
-                  NempSkin.NempPartyMode.Active := False;
-                  CorrectFormAfterPartyModeChange;
+                  Anzeigemode := (AnzeigeMode + 1) mod 2;
+                  if Anzeigemode = 1 then
+                  begin
+                      // Party-mode in Separate-Window-Mode is not allowed.
+                      NempSkin.NempPartyMode.Active := False;
+                      CorrectFormAfterPartyModeChange;
+                  end;
+                  UpdateFormDesignNeu;
               end;
-              UpdateFormDesignNeu;
            end;
 
 (*    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
@@ -5141,9 +5142,8 @@ procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
-
 begin
-    if Button = mbLeft  then
+    if (not NempSkin.NempPartyMode.DoBlockTreeEdit) and (Button = mbLeft) then
     begin
         if Assigned(MedienBib.CurrentAudioFile)
            and (MedienBib.StatusBibUpdate <= 1)
@@ -5180,19 +5180,25 @@ var aNode: PVirtualNode;
     Data: PTreeData;
     AudioFile: TAudioFile;
 begin
-    if Assigned(MedienBib.CurrentAudioFile) then
-        BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height)
-    else
-        BibRatingHelper.DrawRatingInStarsOnBitmap(128, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+    if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+    begin
+        if Assigned(MedienBib.CurrentAudioFile) then
+            BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height)
+        else
+            BibRatingHelper.DrawRatingInStarsOnBitmap(128, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+    end;
 end;
 
 procedure TNemp_MainForm.ImgBibRatingMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var rat: Integer;
 begin
-  // draw stars according to current mouse position
-  rat := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
-  BibRatingHelper.DrawRatingInStarsOnBitmap(rat, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+  if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+  begin
+      // draw stars according to current mouse position
+      rat := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+      BibRatingHelper.DrawRatingInStarsOnBitmap(rat, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+  end
 end;
 
 
@@ -5291,11 +5297,12 @@ end;
 // OnKeyEnter  : Show the Label again, update the Information
 procedure TNemp_MainForm.LblBibArtistClick(Sender: TObject);
 begin
-    AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
+    if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+        AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
 begin
-    if not Assigned(MedienBib.CurrentAudioFile) then
+    if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
         exit;
 
     MemBibTags.Top := LblBibDuration.Top;
@@ -5341,7 +5348,6 @@ begin
             end
             else
                 MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
-
 
             LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
 
@@ -6537,9 +6543,12 @@ procedure TNemp_MainForm.RatingImageMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var rat: Integer;
 begin
-  // draw stars according to current mouse position
-  rat := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
-  Spectrum.DrawRating(rat);
+  if not NempSkin.NempPartyMode.DoBlockCurrentTitleRating then
+  begin
+      // draw stars according to current mouse position
+      rat := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
+      Spectrum.DrawRating(rat);
+  end;
 end;
 
 procedure TNemp_MainForm.RatingImageMouseDown(Sender: TObject;
@@ -6548,7 +6557,7 @@ var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
 begin
-    if Button = mbLeft  then
+    if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating) and (Button = mbLeft)  then
     begin
         if Assigned(NempPlayer.MainAudioFile)
            and (MedienBib.StatusBibUpdate <= 1)
@@ -6621,11 +6630,14 @@ end;
 
 procedure TNemp_MainForm.RatingImageMouseLeave(Sender: TObject);
 begin
-    if assigned(NempPlayer.MainAudioFile) then
-        Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating)
-    else
-        Spectrum.DrawRating(0);
-    NewPlayerPanel.Repaint;
+    if not NempSkin.NempPartyMode.DoBlockCurrentTitleRating then
+    begin
+        if assigned(NempPlayer.MainAudioFile) then
+            Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating)
+        else
+            Spectrum.DrawRating(0);
+        NewPlayerPanel.Repaint;
+    end;
 end;
 
 
@@ -8796,17 +8808,32 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_P_PartyModeClick(Sender: TObject);
+var pw: String;
 begin
-  if Anzeigemode = 1 then
-  begin
-      // Set Compact Mode
-      // Party-mode in Separate-Window-Mode is not allowed.
-      Anzeigemode := 0;
-      UpdateFormDesignNeu;
-  end;
+    if NempSkin.NempPartyMode.Active then
+    begin
+        if not assigned(PasswordDlg) then
+            Application.CreateForm(tPasswordDlg, PasswordDlg);
+        PasswordDlg.ShowModal;
+        if PasswordDlg.Password.Text = 'LSD' then
+        begin
+            NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
+            CorrectFormAfterPartyModeChange;
+        end else
+            MessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
+    end else
+    begin
+        if Anzeigemode = 1 then
+        begin
+            // Set Compact Mode
+            // Party-mode in Separate-Window-Mode is not allowed.
+            Anzeigemode := 0;
+            UpdateFormDesignNeu;
+        end;
 
-  NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
-  CorrectFormAfterPartyModeChange;
+        NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
+        CorrectFormAfterPartyModeChange;
+    end;
 end;
 
 
@@ -9988,6 +10015,9 @@ begin
   // further action (like Click).
   // For this, the Edit of other Rating-Nodes should be cancelled first.
 
+  if NempSkin.NempPartyMode.DoBlockTreeEdit then
+      exit; // dont do anythin here
+
   aNode := VST.GetNodeAt(x,y);
   if assigned(aNode) then
   begin
@@ -10044,44 +10074,49 @@ var
   af: tAudioFile;
 begin
 
-    Data := VST.GetNodeData(Node);
-
-    if assigned(Data) then
-        af := Data^.FAudioFile
+    if NempSkin.NempPartyMode.DoBlockTreeEdit then
+        allowed := false
     else
-        af := Nil;
-
-    if assigned(af) and (FileExists(af.Pfad)) then
     begin
-        if MedienBib.StatusBibUpdate > 1 then
-            // if the library is in the "hot phase" of an update: Do not allow edit
-            // Note: We have to check this again in EndUpdate and NewText!
-            allowed := false
+        Data := VST.GetNodeData(Node);
+
+        if assigned(Data) then
+            af := Data^.FAudioFile
         else
+            af := Nil;
+
+        if assigned(af) and (FileExists(af.Pfad)) then
         begin
-            // Set the Delete-Shortcut to 0, otherwise the DEL-Key wont work in Edit
-            case VST.Header.Columns[column].Tag of
-                CON_ARTIST,
-                CON_TITEL,
-                CON_ALBUM,
-                CON_STANDARDCOMMENT,
-                CON_YEAR,
-                CON_GENRE,
-                CON_TRACKNR,
-                CON_RATING: begin
-                        ClearShortCuts;
-                        allowed := True;
-                end;
+            if MedienBib.StatusBibUpdate > 1 then
+                // if the library is in the "hot phase" of an update: Do not allow edit
+                // Note: We have to check this again in EndUpdate and NewText!
+                allowed := false
             else
-                {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
-                CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
-                allowed := False;
+            begin
+                // Set the Delete-Shortcut to 0, otherwise the DEL-Key wont work in Edit
+                case VST.Header.Columns[column].Tag of
+                    CON_ARTIST,
+                    CON_TITEL,
+                    CON_ALBUM,
+                    CON_STANDARDCOMMENT,
+                    CON_YEAR,
+                    CON_GENRE,
+                    CON_TRACKNR,
+                    CON_RATING: begin
+                            ClearShortCuts;
+                            allowed := True;
+                    end;
+                else
+                    {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
+                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
+                    allowed := False;
+                end;
             end;
-        end;
-    end
-    else
-        // File does not exist - no editing allowed
-        allowed := False;
+        end
+        else
+            // File does not exist - no editing allowed
+            allowed := False;
+    end;
 end;
 
 procedure TNemp_MainForm.VSTCreateEditor(Sender: TBaseVirtualTree;
@@ -10123,6 +10158,9 @@ var
   listFile: TAudioFile;
   i: Integer;
 begin
+    if NempSkin.NempPartyMode.DoBlockTreeEdit then
+        exit;
+
     //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
     SetShortCuts;
     EditingVSTRating := False;
@@ -10469,7 +10507,7 @@ end;
 
 procedure TNemp_MainForm.AktualisiereDetailForm(aAudioFile: TAudioFile; Source: Integer; Foreground: Boolean = False);
 begin
-  if AutoShowDetailsTMP then
+  if (not NempSkin.NempPartyMode.DoBlockDetailWindow) and AutoShowDetailsTMP then
   begin
     if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);

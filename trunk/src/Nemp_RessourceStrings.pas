@@ -619,6 +619,13 @@ TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
 Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?';
 
+MenuItem_Partymode = 'Activate Party-Mode';
+MenuItem_PartymodeExit = 'Exit Party-Mode';
+
+ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. Or go back to the party and have some fun.';
+ParrtyMode_Password_Caption = 'Nemp Party-Mode';
+ParrtyMode_Password_Prompt = 'Please enter the password to exit the Nemp Party-Mode';
+
 
 
 implementation

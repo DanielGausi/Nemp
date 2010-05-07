@@ -149,6 +149,9 @@
 			</DCCReference>
 			<DCCReference Include="Taghelper.pas"/>
 			<DCCReference Include="CoverDownloads.pas"/>
+			<DCCReference Include="PartymodePassword.pas">
+				<Form>PasswordDlg</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>
