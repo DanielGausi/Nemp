@@ -299,7 +299,7 @@ begin
         // Other Controls
         SetOriginalPosition(PlayerPanel         , i);
         SetOriginalPosition(GRPBOXCover         , i);
-        SetOriginalPosition(CoverImage          , i);
+//        SetOriginalPosition(CoverImage          , i);
         SetOriginalPosition(NewPlayerPanel      , i);
         SetOriginalPosition(PaintFrame          , i);
         SetOriginalPosition(TextAnzeigeIMAGE    , i);
