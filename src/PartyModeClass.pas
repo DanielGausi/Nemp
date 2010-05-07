@@ -46,7 +46,7 @@ unit PartyModeClass;
 interface
 
 uses Windows, Forms, Controls, StdCtrls, Classes, SysUtils, SkinButtons,
-    Nemp_ConstantsAndTypes, IniFiles, math;
+    Nemp_ConstantsAndTypes, IniFiles, math, Details, Nemp_RessourceStrings;
 
 type
     TChangeProc = function(value: Integer): Integer of Object;
@@ -68,9 +68,9 @@ type
           fResizeFactor: Single;  // resize-factor
           fPassword: String;      // password, needed to deactivatre Party-Mode
           fBlockTreeEdit: Boolean;     // block editing inside the StringTree
-          fBlockDetailWindow: Boolean; // block showing the Detailform
+          // (always block) fBlockDetailWindow: Boolean; // block showing the Detailform
           fBlockCurrentTitleRating: Boolean; // block editing the rating of the current title
-          fBlockBibOperations: Boolean;     // Block adding, deleting, Get Tags, lyrics, reset rating, ... of files
+          // (Always block) fBlockBibOperations: Boolean;     // Block adding, deleting, Get Tags, lyrics, reset rating, ... of files
           fBlockTools: Boolean;            // Block tools like Birthday, Scrobbler, ...
 
           // Array of PlayerControls/Positions.
@@ -83,6 +83,7 @@ type
           fAdditionalPositionsArray: Array of TPosrecord;
 
           procedure CorrectMainForm;
+          procedure CorrectMenuStff;
 
           procedure SetActive(value: Boolean);
           procedure SetScaleFactor(Value: Single);
@@ -95,9 +96,9 @@ type
 
           property ResizeFactor: Single read fResizeFactor write SetScaleFactor;
           property BlockTreeEdit          : Boolean read fBlockTreeEdit           write fBlockTreeEdit           ;
-          property BlockDetailWindow      : Boolean read fBlockDetailWindow       write fBlockDetailWindow       ;
+          // property BlockDetailWindow      : Boolean read fBlockDetailWindow       write fBlockDetailWindow       ;
           property BlockCurrentTitleRating: Boolean read fBlockCurrentTitleRating write fBlockCurrentTitleRating ;
-          property BlockBibOperations     : Boolean read fBlockBibOperations      write fBlockBibOperations      ;
+          // property BlockBibOperations     : Boolean read fBlockBibOperations      write fBlockBibOperations      ;
           property BlockTools             : Boolean read fBlockTools              write fBlockTools              ;
 
           constructor Create;
@@ -145,7 +146,7 @@ end;
 
 function TNempPartyMode.DoBlockBibOperations: Boolean;
 begin
-    result := fActive and fBlockBibOperations;
+    result := fActive;
 end;
 
 function TNempPartyMode.DoBlockCurrentTitleRating: Boolean;
@@ -155,7 +156,7 @@ end;
 
 function TNempPartyMode.DoBlockDetailWindow: Boolean;
 begin
-    result := fActive and fBlockDetailWindow;
+    result := fActive;
 end;
 
 function TNempPartyMode.DoBlockTools: Boolean;
@@ -175,9 +176,7 @@ begin
     fResizeFactor := IndexToFactor(tmp);
 
     fBlockTreeEdit            := Ini.ReadBool('PartyMode', 'BlockTreeEdit'          , True);
-    fBlockDetailWindow        := Ini.ReadBool('PartyMode', 'BlockDetailWindow'      , True);
     fBlockCurrentTitleRating  := Ini.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
-    fBlockBibOperations       := Ini.ReadBool('PartyMode', 'BlockBibOperations'     , True);
     fBlockTools               := Ini.ReadBool('PartyMode', 'BlockTools'             , True);
 end;
 
@@ -186,9 +185,7 @@ procedure TNempPartyMode.WriteToIni(Ini: TMemIniFile);
 begin
     Ini.WriteInteger('PartyMode', 'Factor', FactorToIndex);
     Ini.WriteBool('PartyMode', 'BlockTreeEdit'          , fBlockTreeEdit          );
-    Ini.WriteBool('PartyMode', 'BlockDetailWindow'      , fBlockDetailWindow      );
     Ini.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
-    Ini.WriteBool('PartyMode', 'BlockBibOperations'     , fBlockBibOperations     );
     Ini.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
 end;
 
@@ -309,10 +306,10 @@ begin
         SetOriginalPosition(TimePaintBox        , i);
         SetOriginalPosition(SlideBarShape       , i);
         SetOriginalPosition(VolShape            , i);
-        SetOriginalPosition(SleepImage          , i);
-        SetOriginalPosition(WebserverImage      , i);
-        SetOriginalPosition(BirthdayImage       , i);
-        SetOriginalPosition(ScrobblerImage      , i);
+        //SetOriginalPosition(SleepImage          , i);
+        //SetOriginalPosition(WebserverImage      , i);
+        //SetOriginalPosition(BirthdayImage       , i);
+        //SetOriginalPosition(ScrobblerImage      , i);
         SetOriginalPosition(RatingImage         , i);
         SetOriginalPosition(LblPlayerTitle      , i);
         SetOriginalPosition(LblPlayerArtist     , i);
@@ -536,8 +533,148 @@ begin
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
     end;
+
+    if assigned(FDetails) and FDetails.visible then
+    begin
+        FDetails.Close;
+        Nemp_MainForm.AutoShowDetailsTMP := False;
+    end;
+
+    CorrectMenuStff;
 end;
 
+
+procedure TNempPartyMode.CorrectMenuStff;
+var vis: Boolean;
+begin
+    vis := not fActive;
+    with Nemp_MainForm do
+    begin
+        // Popup-Menu Library
+        PM_ML_BrowseByMore    .Enabled := vis;
+        PM_ML_Medialibrary    .Visible := vis;
+        PM_ML_Medialibrary    .Enabled := vis;
+        PM_ML_SearchDirectory .Visible := vis;
+        PM_ML_SearchDirectory .Enabled := vis;
+        PM_ML_Webradio        .Visible := vis;
+        PM_ML_Webradio        .Enabled := vis;
+        PM_ML_DeleteSelected.Visible := vis; // enabled is done at OnPopup
+        //-----
+        N72                            .Visible := vis;   // - before "set rating of selected files"
+        PM_ML_SetRatingsOfSelectedFiles.Visible := vis;
+        PM_ML_SetRatingsOfSelectedFiles.Enabled := vis;
+        PM_ML_GetLyrics   .Visible := vis; // enabled is done at OnPopup
+        PM_ML_GetTags     .Visible := vis; // enabled is done at OnPopup
+        PM_ML_CloudEditor .Visible := vis;
+        PM_ML_CloudEditor .Enabled := vis;
+        // --
+        PM_ML_PasteFromClipboard.Visible := vis; // enabled is done at OnPopup
+        //--
+        PM_ML_RefreshSelected.Visible := vis; // enabled is done at OnPopup
+        PM_ML_Properties     .Visible := vis; // enabled is done at OnPopup
+
+        // Popup Player
+        PM_P_Preferences.Visible := vis;
+        //--
+        N36             .visible := not DoBlockTools; // '-' before shutdown
+        PM_P_ShutDown   .visible := not DoBlockTools;
+        PM_P_Birthday   .visible := not DoBlockTools;
+        PM_P_RemoteNemp .visible := not DoBlockTools;
+        PM_P_Scrobbler  .visible := not DoBlockTools;
+        PM_P_Directories.visible := not DoBlockTools;
+        PM_P_CheckForUpdates.visible := not DoBlockTools;
+        // --
+        PM_P_ViewCompact                    .Visible := vis;
+        PM_P_ViewCompactComplete            .Visible := vis;
+        N31                                 .Visible := vis;
+        PM_P_ViewSeparateWindows            .Visible := vis;
+        PM_P_ViewSeparateWindows_Equalizer  .Visible := vis;
+        PM_P_ViewSeparateWindows_Playlist   .Visible := vis;
+        PM_P_ViewSeparateWindows_Medialist  .Visible := vis;
+        PM_P_ViewSeparateWindows_Browse     .Visible := vis;
+        PM_P_ViewStayOnTop                  .Visible := vis;
+        N35                                 .Visible := vis;
+        if vis then
+            PM_P_PartyMode.Caption := MenuItem_Partymode
+        else
+            PM_P_PartyMode.Caption := MenuItem_PartymodeExit;
+
+        // Popup Playlist
+        PM_PL_SetRatingofSelectedFilesTo .Visible := vis;
+        PM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
+        PM_PL_ExtendedAddToMedialibrary  .Visible := vis;
+        PM_PL_ExtendedAddToMedialibrary  .Enabled := vis;
+        PM_PL_Properties                 .Visible := vis;
+        PM_PL_Properties                 .Enabled := vis;
+
+        // Mainmenu
+        // Medialibrary
+        MM_ML_SearchDirectory     .Visible := vis;
+        MM_ML_SearchDirectory     .Enabled := vis;
+        MM_ML_Webradio            .Visible := vis;
+        MM_ML_Webradio            .Enabled := vis;
+        MM_ML_BrowseByMore        .Enabled := vis;
+        //--
+        MM_ML_Delete              .Visible := vis;
+        MM_ML_Delete              .Enabled := vis;
+        MM_ML_Load                .Visible := vis;
+        MM_ML_Load                .Enabled := vis;
+        MM_ML_Save                .Visible := vis;
+        MM_ML_Save                .Enabled := vis;
+        MM_ML_DeleteMissingFiles  .Visible := vis;
+        MM_ML_DeleteMissingFiles  .Enabled := vis;
+        MM_ML_ExportAsCSV         .Visible := vis;
+        MM_ML_ExportAsCSV         .Enabled := vis;
+        N21                       .Visible := vis;
+        //---
+        MM_ML_DeleteSelectedFiles .Visible := vis;
+        MM_ML_DeleteSelectedFiles .Enabled := vis;
+        MM_ML_SetRatingSelected   .Visible := vis;
+        MM_ML_SetRatingSelected   .Enabled := vis;
+        MM_ML_GetLyrics           .Visible := vis;
+        MM_ML_GetLyrics           .Enabled := vis;
+        MM_ML_GetAdditionalTags   .Visible := vis;
+        MM_ML_GetAdditionalTags   .Enabled := vis;
+        N70                       .Visible := vis;
+        //--
+        MM_ML_RefreshAll          .Visible := vis;
+        MM_ML_RefreshAll          .Enabled := vis;
+        MM_ML_ResetRatings        .Visible := vis;
+        MM_ML_ResetRatings        .Enabled := vis;
+        // Playlist
+        MM_PL_SetRatingofSelectedFilesTo .Visible := vis;
+        MM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
+        MM_PL_ExtendedAddToMedialibrary  .Visible := vis;
+        MM_PL_ExtendedAddToMedialibrary  .Enabled := vis;
+        MM_PL_Properties                 .Visible := vis;
+        MM_PL_Properties                 .Enabled := vis;
+        // Settings
+        MM_O_Preferences.Visible := vis;
+        MM_O_ViewCompact                    .Visible := vis;
+        MM_O_ViewCompactComplete            .Visible := vis;
+        N34                                 .Visible := vis;
+        MM_O_ViewSeparateWindows            .Visible := vis;
+        MM_O_ViewSeparateWindows_Equalizer  .Visible := vis;
+        MM_O_ViewSeparateWindows_Playlist   .Visible := vis;
+        MM_O_ViewSeparateWindows_Medialist  .Visible := vis;
+        MM_O_ViewSeparateWindows_Browse     .Visible := vis;
+        MM_O_ViewStayOnTop                  .Visible := vis;
+        N32                                 .Visible := vis;
+        if vis then
+            MM_O_PartyMode.Caption := MenuItem_Partymode
+        else
+            MM_O_PartyMode.Caption := MenuItem_PartymodeExit;
+
+        // Tools
+        MM_Tools        .Visible := not DoBlockTools;
+
+        // Images
+        ScrobblerImage    .Enabled := not DoBlockTools;
+        BirthdayImage     .Enabled := not DoBlockTools;
+        SleepImage        .Enabled := not DoBlockTools;
+        WebserverImage    .Enabled := not DoBlockTools;
+    end;
+end;
 
 procedure TNempPartyMode.SetActive(value: Boolean);
 begin

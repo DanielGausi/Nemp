@@ -2500,7 +2500,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 425
-        Height = 186
+        Height = 141
         Caption = 'Partymode'
         TabOrder = 0
         object Lbl_PartyMode_ResizeFactor: TLabel
@@ -2533,37 +2533,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Block editing file information in the treeview'
           TabOrder = 1
         end
-        object cb_PartyMode_BlockDetailWindow: TCheckBox
-          Left = 16
-          Top = 94
-          Width = 350
-          Height = 17
-          Caption = 'Do not show detail window'
-          TabOrder = 2
-        end
-        object cb_PartyMode_BlockBibOperations: TCheckBox
-          Left = 17
-          Top = 134
-          Width = 350
-          Height = 17
-          Caption = 'Block library operations'
-          TabOrder = 3
-        end
         object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
           Left = 17
-          Top = 113
+          Top = 88
           Width = 350
           Height = 17
           Caption = 'Block rating of current title'
-          TabOrder = 4
+          TabOrder = 2
         end
         object cb_PartyMode_BlockTools: TCheckBox
           Left = 17
-          Top = 154
+          Top = 108
           Width = 350
           Height = 17
           Caption = 'Block tools'
-          TabOrder = 5
+          TabOrder = 3
         end
       end
     end

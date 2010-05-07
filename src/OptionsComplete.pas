@@ -444,8 +444,6 @@ type
     LblNACoverHint: TLabel;
     CB_CoverSearch_LastFM: TCheckBox;
     cb_PartyMode_BlockTreeEdit: TCheckBox;
-    cb_PartyMode_BlockDetailWindow: TCheckBox;
-    cb_PartyMode_BlockBibOperations: TCheckBox;
     cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
     cb_PartyMode_BlockTools: TCheckBox;
     procedure FormCreate(Sender: TObject);
@@ -1391,9 +1389,7 @@ begin
   // Partymode-Optionen
   CB_PartyMode_ResizeFactor.ItemIndex := Nemp_MainForm.NempSkin.NempPartyMode.FactorToIndex;
   cb_PartyMode_BlockTreeEdit          .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit            ;
-  cb_PartyMode_BlockDetailWindow      .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockDetailWindow        ;
   cb_PartyMode_BlockCurrentTitleRating.Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating  ;
-  cb_PartyMode_BlockBibOperations     .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockBibOperations       ;
   cb_PartyMode_BlockTools             .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTools               ;
 
 
@@ -2559,9 +2555,7 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex);
 
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit           := cb_PartyMode_BlockTreeEdit          .Checked;
-  Nemp_MainForm.NempSkin.NempPartyMode.BlockDetailWindow       := cb_PartyMode_BlockDetailWindow      .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
-  Nemp_MainForm.NempSkin.NempPartyMode.BlockBibOperations      := cb_PartyMode_BlockBibOperations     .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTools              := cb_PartyMode_BlockTools             .Checked;
 
  { if True then

@@ -71,12 +71,12 @@ interface
 
     const NempOriginalSpectrumSpecs: TSpectrumSpecs =
     (
-        Width       : 113;
+        Width       : 114;
         Height      : 38;
         TextWidth   : 216;
-        TextHeight  : 14;
+        TextHeight  : 18;
         TimeWidth   : 53;
-        TimeHeight  : 14;
+        TimeHeight  : 18;
         StarHeight  : 14;
         StarWidth   : 70;
         ColumnWidth : 4;

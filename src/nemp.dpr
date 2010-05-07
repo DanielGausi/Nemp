@@ -80,7 +80,8 @@ uses
   TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
-  CoverDownloads in 'CoverDownloads.pas';
+  CoverDownloads in 'CoverDownloads.pas',
+  PartymodePassword in 'PartymodePassword.pas' {PasswordDlg};
 
 //,  classes;
 
@@ -107,6 +108,7 @@ ShowWindow
 
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Application.CreateForm(TPasswordDlg, PasswordDlg);
   Graphics.DefFontData.Name := 'Tahoma';
 
         Application.Title := 'Nemp';
