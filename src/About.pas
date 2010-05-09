@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2009, Daniel Gaussmann
+    Copyright (C) 2005-2010, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -25,17 +25,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
-    Additional permissions
-
-    If you modify this Program, or any covered work, by linking or combining it
-    with
-        - the bass.dll and it addons
-          (including, but not limited to the bass_fx.dll)
-        - MadExcept
-        - DGL-OpenGL
-        - FSPro Windows 7 Taskbar Components
-    or a modified version of these libraries, the licensors of this Program
-    grant you additional permission to convey the resulting work.
+    See license.txt for more information
 
     ---------------------------------------------------------------
 }
@@ -97,7 +87,7 @@ begin
         end;
     end;
 
-   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString('') + ' (2k9)');
+   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString('') + ' (alpha)');
 end;
 
 procedure TAboutForm.FormShow(Sender: TObject);
@@ -116,11 +106,11 @@ procedure TAboutForm.NempCreditsAnchorClicked(Sender: TObject;
 begin
   if Anchor = 'gpl' then
   begin
-      if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'licence.txt') then
+      if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'gpl.txt') then
         MessageDLG((Error_LGPLFileNotFound), mtError, [mbOK], 0)
       else
         ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'licence.txt')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'gpl.txt')
                       , nil, nil, SW_SHOWNORMAl);
   end;
 end;

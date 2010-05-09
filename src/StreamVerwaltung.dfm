@@ -38,7 +38,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'Ok'
     TabOrder = 0
     OnClick = Btn_OkClick
-    ExplicitTop = 357
   end
   object Btn_Shoutcast: TButton
     Left = 553
@@ -49,7 +48,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Shoutcast.com'
     TabOrder = 1
     OnClick = Btn_ShoutcastClick
-    ExplicitTop = 357
   end
   object Btn_Icecast: TButton
     Left = 433
@@ -60,7 +58,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Icecast.org'
     TabOrder = 2
     OnClick = Btn_IcecastClick
-    ExplicitTop = 357
   end
   object PC_Streams: TPageControl
     Left = 8
@@ -70,10 +67,8 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     ActivePage = Tab_Favourites
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
-    ExplicitHeight = 342
     object Tab_Favourites: TTabSheet
       Caption = 'Favorites'
-      ExplicitHeight = 314
       DesignSize = (
         738
         334)
@@ -102,7 +97,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         OnGetText = VST_FavoritesGetText
         OnHeaderClick = VST_FavoritesHeaderClick
         OnKeyDown = VST_FavoritesKeyDown
-        ExplicitHeight = 246
         Columns = <
           item
             Position = 0
@@ -134,7 +128,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Caption = 'Export'
         TabOrder = 1
         OnClick = PM_Fav_ExportClick
-        ExplicitTop = 286
       end
       object BtnImport: TButton
         Left = 141
@@ -145,7 +138,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Caption = 'Import'
         TabOrder = 2
         OnClick = PM_Fav_ImportClick
-        ExplicitTop = 286
       end
       object udSortFavorites: TUpDown
         Left = 3
@@ -192,6 +184,9 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 314
       DesignSize = (
         738
@@ -293,7 +288,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Height = 21
           Style = csDropDownList
           DropDownCount = 23
-          ItemHeight = 13
+          ItemHeight = 0
           ItemIndex = 0
           TabOrder = 0
           Text = '70s'
@@ -352,7 +347,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Anchors = [akLeft, akBottom]
     TabOrder = 4
     Visible = False
-    ExplicitTop = 385
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -366,7 +360,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       item
         Width = 200
       end>
-    ExplicitTop = 408
   end
   object CB_ParseStreamURL: TCheckBox
     Left = 8
@@ -376,7 +369,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Anchors = [akLeft, akBottom]
     Caption = 'Parse Stream-Playlist and add all contained streams to playlist'
     TabOrder = 6
-    ExplicitTop = 358
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True
