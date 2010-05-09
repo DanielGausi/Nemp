@@ -8870,6 +8870,8 @@ begin
       2: begin
           GRPBoxCover.Visible     := False;
           GRPBoxLyrics.Visible    := True;
+          LyricsMemo.Top          := 5;
+          LyricsMemo.Height       := GRPBoxLyrics.Height - 10;
           GRPBoxEqualizer.Visible := False;
           GRPBoxEffekte.Visible   := False;
           TabBtn_Lyrics.GlyphLine := 1;
