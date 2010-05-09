@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2009, Daniel Gaussmann
+    Copyright (C) 2005-2010, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -25,17 +25,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
-    Additional permissions
-
-    If you modify this Program, or any covered work, by linking or combining it
-    with
-        - the bass.dll and it addons
-          (including, but not limited to the bass_fx.dll)
-        - MadExcept
-        - DGL-OpenGL
-        - FSPro Windows 7 Taskbar Components
-    or a modified version of these libraries, the licensors of this Program
-    grant you additional permission to convey the resulting work.
+    See license.txt for more information
 
     ---------------------------------------------------------------
 }
@@ -259,7 +249,7 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'v2k9';// 'v3.3';
+    NEMP_VERSION_SPLASH = 'v4.0';// 'v3.3';
 
     NEMP_TIPSIZE = 128;
 
@@ -270,7 +260,7 @@ const
     //ALL_ALBUMS = '{6388E9C0-F52B-4D3D-B958-8A87EFDD84B8}';
 
     // Höhe der Cover/EQ/Lyrics/Effekte-Box
-    EXTENDED_HEIGHT = 218;
+    //EXTENDED_HEIGHT = 218;
     // Minimale Höhe des oberen teils:
     TOP_MIN_HEIGHT = 311;//426;
 

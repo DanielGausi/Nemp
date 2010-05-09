@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2009, Daniel Gaussmann
+    Copyright (C) 2005-2010, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -25,17 +25,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 
-    Additional permissions
-
-    If you modify this Program, or any covered work, by linking or combining it
-    with
-        - the bass.dll and it addons
-          (including, but not limited to the bass_fx.dll)
-        - MadExcept
-        - DGL-OpenGL
-        - FSPro Windows 7 Taskbar Components
-    or a modified version of these libraries, the licensors of this Program
-    grant you additional permission to convey the resulting work.
+    See license.txt for more information
 
     ---------------------------------------------------------------
 }
@@ -208,7 +198,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     //OptionsTree_AudioJingles     = 'Jingles';
     //OptionsTree_SystemMain       = 'System';
 
-    OptionsTree_SystemGeneral     = 'General options';
+    OptionsTree_SystemGeneral     = 'General settings';
     OptionsTree_SystemFiletyps    = 'File types registration';
     OptionsTree_SystemControl     = 'Controls';
     OptionsTree_SystemTaskbar     = 'Taskbar and tray';
@@ -217,7 +207,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_ViewPlayer        = 'Player and Cover';
     OptionsTree_ViewView          = 'View';
     OptionsTree_ViewFonts         = 'Fonts';
-    OptionsTree_PartyMode         = 'PartyMode';
+    OptionsTree_PartyMode         = 'Party-Mode';
 
     OptionsTree_PlayerMain        = 'Player settings';
     OptionsTree_PlayerPlaylist    = 'Playlist';

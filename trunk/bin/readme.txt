@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Dezember 2009
+      Januar 2005 - Mai 2010
 
-      Version: 3.9.0
+      Version: 4.0.0
 
 
 -----------------------------------------------------------
@@ -94,8 +94,11 @@ Verwendete Units/Komponenten:
 - TACredits
   http://www.delphipraxis.net/topic114228.html
 
-- Windows 7 Support für Delphi
-  http://www.delphipraxis.net/topic150591.html
+- FSPro Windows 7 Taskbar Components
+  http://delphi.fsprolabs.com/
+
+- Flying Cow
+  http://sourceforge.net/projects/flyingcow/
 
 - LastFM API
   http://www.last.fm/api/intro
