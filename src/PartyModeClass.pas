@@ -73,6 +73,7 @@ type
           // (Always block) fBlockBibOperations: Boolean;     // Block adding, deleting, Get Tags, lyrics, reset rating, ... of files
           fBlockTools: Boolean;            // Block tools like Birthday, Scrobbler, ...
 
+
           // Array of PlayerControls/Positions.
           // These are "completely doubled" i.e. width, height,top, left
           fPartyControls: Array of TControl;
@@ -101,6 +102,7 @@ type
           // property BlockBibOperations     : Boolean read fBlockBibOperations      write fBlockBibOperations      ;
           property BlockTools             : Boolean read fBlockTools              write fBlockTools              ;
 
+          property password: String read fPassword write fPassword;
           constructor Create;
 
           procedure LoadFromIni(Ini: TMemIniFile);
@@ -178,6 +180,7 @@ begin
     fBlockTreeEdit            := Ini.ReadBool('PartyMode', 'BlockTreeEdit'          , True);
     fBlockCurrentTitleRating  := Ini.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
     fBlockTools               := Ini.ReadBool('PartyMode', 'BlockTools'             , True);
+    fPassword                 := Ini.ReadString('PartyMode', 'Password'             , 'nemp');
 end;
 
 
@@ -187,6 +190,7 @@ begin
     Ini.WriteBool('PartyMode', 'BlockTreeEdit'          , fBlockTreeEdit          );
     Ini.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
     Ini.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
+    Ini.WriteString('PartyMode', 'Password'             , fPassword               );
 end;
 
 
@@ -311,9 +315,9 @@ begin
         //SetOriginalPosition(BirthdayImage       , i);
         //SetOriginalPosition(ScrobblerImage      , i);
         SetOriginalPosition(RatingImage         , i);
-        SetOriginalPosition(LblPlayerTitle      , i);
-        SetOriginalPosition(LblPlayerArtist     , i);
-        SetOriginalPosition(LblPlayerAlbum      , i);
+        //SetOriginalPosition(LblPlayerTitle      , i);
+        //SetOriginalPosition(LblPlayerArtist     , i);
+        //SetOriginalPosition(LblPlayerAlbum      , i);
         SetOriginalPosition(SlideBarButton      , i);
         SetOriginalPosition(VolButton           , i);
         SetOriginalPosition(AudioPanel          , i);

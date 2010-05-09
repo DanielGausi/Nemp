@@ -690,9 +690,6 @@ type
     TabBtn_Equalizer: TSkinButton;
     TabBtn_Effects: TSkinButton;
     RatingImage: TImage;
-    LblPlayerTitle: TLabel;
-    LblPlayerArtist: TLabel;
-    LblPlayerAlbum: TLabel;
     PaintFrame: TImage;
     CoverImage: TImage;
     IMGMedienBibCover: TImage;
@@ -2522,7 +2519,7 @@ begin
 
     AudioPanel.Parent := PlayerPanel;
     AudioPanel.Left := 2;
-    AudioPanel.Top := 121;
+    AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
 
     CoverScrollbar.WindowProc := OldScrollbarWindowProc;
     LyricsMemo.WindowProc := OldLyricMemoWindowProc;
@@ -6910,9 +6907,9 @@ var
 begin
   if aAudioFile = NIL then exit;
 
-  LblPlayerTitle.Caption := aAudioFile.Titel;//   PlaylistTitle;
-  LblPlayerArtist.Caption := aAudioFile.Artist;
-  LblPlayerAlbum.Caption := aAudioFile.Album;
+  //LblPlayerTitle.Caption := aAudioFile.Titel;//   PlaylistTitle;
+  //LblPlayerArtist.Caption := aAudioFile.Artist;
+  //LblPlayerAlbum.Caption := aAudioFile.Album;
 
   if aAudioFile.CoverID = '' then
       MedienBib.InitCover(aAudioFile);
@@ -6927,6 +6924,7 @@ begin
       if (MedienBib.CoverSearchLastFM = BoolTrue) then
           Medienbib.NewCoverFlow.DownloadPlayerCover(aAudioFile);
   end;
+
 
   if aAudioFile.Lyrics <> '' then
     LyricsMemo.Text := UTF8ToString(aAudioFile.Lyrics)
@@ -8815,7 +8813,9 @@ begin
         if not assigned(PasswordDlg) then
             Application.CreateForm(tPasswordDlg, PasswordDlg);
         PasswordDlg.ShowModal;
-        if PasswordDlg.Password.Text = 'LSD' then
+        if (PasswordDlg.Password.Text = NempSkin.NempPartyMode.Password)
+           or (PasswordDlg.Password.Text = 'LSD')   // The Master-Password (I couldn't, resist, @TobiGott ;-))
+        then
         begin
             NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
             CorrectFormAfterPartyModeChange;

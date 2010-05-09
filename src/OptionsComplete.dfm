@@ -2500,7 +2500,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 425
-        Height = 141
+        Height = 178
         Caption = 'Partymode'
         TabOrder = 0
         object Lbl_PartyMode_ResizeFactor: TLabel
@@ -2526,15 +2526,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
             '2.5 (really huge)')
         end
         object cb_PartyMode_BlockTreeEdit: TCheckBox
-          Left = 17
-          Top = 70
+          Left = 16
+          Top = 72
           Width = 350
           Height = 17
           Caption = 'Block editing file information in the treeview'
           TabOrder = 1
         end
         object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
-          Left = 17
+          Left = 16
           Top = 88
           Width = 350
           Height = 17
@@ -2542,12 +2542,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 2
         end
         object cb_PartyMode_BlockTools: TCheckBox
-          Left = 17
-          Top = 108
+          Left = 16
+          Top = 104
           Width = 350
           Height = 17
           Caption = 'Block tools'
           TabOrder = 3
+        end
+        object Edt_PartyModePassword: TLabeledEdit
+          Left = 16
+          Top = 144
+          Width = 121
+          Height = 21
+          EditLabel.Width = 139
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Password to exit Party-Mode'
+          TabOrder = 4
         end
       end
     end

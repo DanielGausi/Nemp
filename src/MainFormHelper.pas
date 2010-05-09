@@ -829,18 +829,21 @@ var currentLeft: Integer;
     decvalue: Integer;
     newtop: Integer;
 begin
+
     with Nemp_MainForm do
     begin
         decvalue := ScrobblerImage.Width + 2;
-        currentLeft := PaintFrame.Left + PaintFrame.Width - ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
-        newTop := PaintFrame.Top + PaintFrame.Height - 16;
+        currentLeft := RatingImage.Left;// + RatingImage.Width + ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
+        //PaintFrame.Left + PaintFrame.Width - ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
+
+        newTop := RatingImage.Top + RatingImage.Height + 2;//TextAnzeigeIMAGE.Top + TextAnzeigeIMAGE.Height + 16;
 
         if NempPlayer.NempScrobbler.DoScrobble then
         begin
             ScrobblerImage.Top := newTop;
             ScrobblerImage.Left := currentLeft;
             ScrobblerImage.Visible := True;
-            dec(currentLeft, decvalue);
+            inc(currentLeft, decvalue);
         end else
             ScrobblerImage.Visible := False;
 
@@ -849,7 +852,7 @@ begin
             WebserverImage.Top := newTop;
             WebserverImage.Left := currentLeft;
             WebserverImage.Visible := True;
-            dec(currentLeft, decvalue);
+            inc(currentLeft, decvalue);
         end else
             WebserverImage.Visible := False;
 
@@ -858,7 +861,7 @@ begin
             BirthdayImage.Top := newTop;
             BirthdayImage.Left := currentLeft;
             BirthdayImage.Visible := True;
-            dec(currentLeft, decvalue);
+            inc(currentLeft, decvalue);
         end else
             BirthdayImage.Visible := False;
 

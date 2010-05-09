@@ -787,7 +787,7 @@ begin
 
     AudioPanel.Parent := PlayerPanel;
     AudioPanel.Left := 2;
-    AudioPanel.Top := 121;
+    AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
 
 
     EditFastSearch.Width := 194;

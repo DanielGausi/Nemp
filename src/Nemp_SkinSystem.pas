@@ -161,8 +161,9 @@ type
 
         // Bild für den Mittelteil (den eigentlichen Player)
         // Kann leer sein - Aber wenn vorhanden, dann ist hier der Offset klar. Nämlich 0/0
-        PlayerBitmap: TBitmap;
         UseSeparatePlayerBitmap: Boolean;
+        PlayerBitmap: TBitmap;
+        ExtendedPlayerBitmap: TBitmap;
 
         SetStarBitmap: TBitmap;
         HalfStarBitmap: TBitmap;
@@ -330,6 +331,7 @@ begin
   inherited create;
   CompleteBitmap := TBitmap.Create;
   PlayerBitmap := TBitmap.Create;
+  ExtendedPlayerBitmap := TBitmap.Create;
 
   NempPartyMode := TNempPartyMode.Create;
   NempPartymode.BackupOriginalPositions;
@@ -416,6 +418,7 @@ destructor TNempSkin.Destroy;
 begin
   CompleteBitmap.Free;
   PlayerBitmap.Free;
+  ExtendedPlayerBitmap.Free;
 
   SetStarBitmap.Free;
   HalfStarBitmap.Free;
@@ -637,7 +640,7 @@ begin
 
   if UseSeparatePlayerBitmap then
   begin
-      if not LoadGraphicFromBaseName(PlayerBitmap, DirName + '\player', false) then
+      if not LoadGraphicFromBaseName(PlayerBitmap, DirName + '\player', False) then
       begin
           PlayerBitmap.Width := 10;
           PlayerBitmap.Height := 10;
@@ -645,7 +648,20 @@ begin
           PlayerBitmap.Canvas.Pen.Color := SkinColorScheme.LabelCL;
           PlayerBitmap.Canvas.FillRect(PlayerBitmap.Canvas.ClipRect);
       end;
+      if not LoadGraphicFromBaseName(ExtendedPlayerBitmap, DirName + '\extendedplayer', true) then
+      begin
+          ExtendedPlayerBitmap.Width := 10;
+          ExtendedPlayerBitmap.Height := 10;
+          ExtendedPlayerBitmap.Canvas.Brush.Color := SkinColorScheme.FormCL;
+          ExtendedPlayerBitmap.Canvas.Pen.Color := SkinColorScheme.LabelCL;
+          ExtendedPlayerBitmap.Canvas.FillRect(ExtendedPlayerBitmap.Canvas.ClipRect);
+      end;
+
+
+
   end;
+
+
 
 
   if Not Complete then exit;
@@ -942,6 +958,7 @@ var idx: integer;
 begin
   CompleteBitmap.Assign(askin.CompleteBitmap);
   PlayerBitmap.Assign(aSkin.PlayerBitmap);
+  ExtendedPlayerBitmap.Assign(aSkin.ExtendedPlayerBitmap);
 
   for tc := low(TControlbuttons) to High(TControlButtons) do
   begin
@@ -1432,9 +1449,9 @@ begin
     Splitter3.Color := SkinColorScheme.Splitter3Color;
     Splitter4.Color := SkinColorScheme.Splitter1Color;
 
-    LblPlayerTitle.Font.Color := SkinColorScheme.SpecTitelCL;
-    LblPlayerArtist.Font.Color := SkinColorScheme.SpecTitelCL;
-    LblPlayerAlbum.Font.Color := SkinColorScheme.SpecTitelCL;
+    //LblPlayerTitle.Font.Color := SkinColorScheme.SpecTitelCL;
+    //LblPlayerArtist.Font.Color := SkinColorScheme.SpecTitelCL;
+    //LblPlayerAlbum.Font.Color := SkinColorScheme.SpecTitelCL;
 
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
@@ -1918,6 +1935,7 @@ begin
       localOffsetY := 0;
       sourceBmp := PlayerBitmap;
       stretch := NempPartyMode.Active;
+      OffsetPoint := pnlPoint;
   end
   else
       if (aPanel.Tag = 5) and UseSeparatePlayerBitmap then
@@ -1927,10 +1945,9 @@ begin
           localOffsetY := 0;//{-pnlPoint.Y +} OffsetPoint.Y;
           pnlPoint := aPanel.ClientToScreen(Point(0,0));
           OffsetPoint := Nemp_MainForm.AudioPanel.ClientToScreen(Point(0,0));
-          OffsetPoint.X := OffsetPoint.X - Nemp_MainForm.AudioPanel.Left;  // AudioPanel.Top/Left is 2 on the ContainerPanel
-          OffsetPoint.Y := OffsetPoint.Y - Nemp_MainForm.AudioPanel.Top;
-
-          sourceBmp := PlayerBitmap;
+          sourceBmp := ExtendedPlayerBitmap;
+          //OffsetPoint.X := OffsetPoint.X - Nemp_MainForm.AudioPanel.Left;  // AudioPanel.Top/Left is 2 on the ContainerPanel
+          //OffsetPoint.Y := OffsetPoint.Y - Nemp_MainForm.AudioPanel.Top;
           stretch := NempPartyMode.Active;
       end
       else

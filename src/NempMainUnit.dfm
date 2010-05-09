@@ -1,6 +1,6 @@
 object Nemp_MainForm: TNemp_MainForm
   Left = 0
-  Top = -66
+  Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
   ClientHeight = 1004
   ClientWidth = 845
@@ -16,7 +16,7 @@ object Nemp_MainForm: TNemp_MainForm
   KeyPreview = True
   Menu = Nemp_MainMenu
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poDesigned
   Scaled = False
   ShowHint = True
   OnActivate = FormActivate
@@ -477,6 +477,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
     object PlayerPanel: TNempPanel
+      Tag = 6
       Left = 304
       Top = 0
       Width = 234
@@ -518,7 +519,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 2
         Top = 2
         Width = 230
-        Height = 116
+        Height = 131
         BevelInner = bvRaised
         BevelOuter = bvLowered
         PopupMenu = Player_PopupMenu
@@ -534,12 +535,12 @@ object Nemp_MainForm: TNemp_MainForm
         OnMouseWheelDown = NewPlayerPanelMouseWheelDown
         DesignSize = (
           230
-          116)
+          131)
         object PaintFrame: TImage
-          Left = 95
-          Top = 25
-          Width = 114
-          Height = 38
+          Left = 80
+          Top = 36
+          Width = 125
+          Height = 35
           OnClick = NewPlayerPanelClick
           OnDragOver = GRPBOXControlDragOver
           OnMouseDown = PaintFrameMouseDown
@@ -548,7 +549,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TextAnzeigeIMAGE: TImage
           Left = 4
-          Top = 5
+          Top = 2
           Width = 216
           Height = 18
           Anchors = [akLeft, akTop, akRight]
@@ -559,9 +560,9 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TimePaintBox: TImage
           Left = 8
-          Top = 49
+          Top = 58
           Width = 53
-          Height = 18
+          Height = 14
           ParentShowHint = False
           ShowHint = True
           OnClick = BassTimeLBLClick
@@ -569,7 +570,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object SlideBarShape: TShape
           Left = 16
-          Top = 68
+          Top = 77
           Width = 193
           Height = 6
           Brush.Color = clGradientActiveCaption
@@ -580,17 +581,17 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object VolShape: TShape
           Left = 214
-          Top = 29
+          Top = 36
           Width = 6
-          Height = 34
+          Height = 33
           Brush.Color = clGradientActiveCaption
           DragCursor = crSizeNS
           Shape = stRoundRect
           OnDragOver = GRPBOXControlDragOver
         end
         object SleepImage: TImage
-          Left = 167
-          Top = 47
+          Left = 44
+          Top = 42
           Width = 16
           Height = 16
           ParentShowHint = False
@@ -629,8 +630,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = SleepImageClick
         end
         object WebserverImage: TImage
-          Left = 189
-          Top = 47
+          Left = 66
+          Top = 42
           Width = 16
           Height = 16
           Hint = 'Nemp Webserver'
@@ -671,8 +672,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnDblClick = MM_T_WebServerOptionsClick
         end
         object BirthdayImage: TImage
-          Left = 145
-          Top = 47
+          Left = 22
+          Top = 42
           Width = 16
           Height = 16
           ParentShowHint = False
@@ -712,9 +713,9 @@ object Nemp_MainForm: TNemp_MainForm
           OnDblClick = PM_P_BirthdayOptionsClick
         end
         object ScrobblerImage: TImage
-          Left = 67
-          Top = 47
-          Width = 16
+          Left = 9
+          Top = 42
+          Width = 15
           Height = 16
           Hint = 'Nemp LastFM Scrobbler'
           ParentShowHint = False
@@ -754,8 +755,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnDblClick = PM_P_ScrobblerOptionsClick
         end
         object RatingImage: TImage
-          Left = 8
-          Top = 25
+          Left = 4
+          Top = 26
           Width = 70
           Height = 14
           Transparent = True
@@ -764,36 +765,9 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseLeave = RatingImageMouseLeave
           OnMouseMove = RatingImageMouseMove
         end
-        object LblPlayerTitle: TLabel
-          Left = 42
-          Top = 103
-          Width = 12
-          Height = 13
-          Caption = '...'
-          Visible = False
-          OnDragOver = GRPBOXControlDragOver
-        end
-        object LblPlayerArtist: TLabel
-          Left = 4
-          Top = 96
-          Width = 12
-          Height = 13
-          Caption = '...'
-          Visible = False
-          OnDragOver = GRPBOXControlDragOver
-        end
-        object LblPlayerAlbum: TLabel
-          Left = 22
-          Top = 96
-          Width = 12
-          Height = 13
-          Caption = '...'
-          Visible = False
-          OnDragOver = GRPBOXControlDragOver
-        end
         object SlideBarButton: TSkinButton
           Left = 20
-          Top = 66
+          Top = 75
           Width = 25
           Height = 10
           DoubleBuffered = True
@@ -818,7 +792,7 @@ object Nemp_MainForm: TNemp_MainForm
         object SlideBackBTN: TSkinButton
           Tag = -1
           Left = 20
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           Hint = 'Slide backward'
@@ -840,7 +814,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object PlayPrevBTN: TSkinButton
           Left = 60
-          Top = 83
+          Top = 97
           Width = 14
           Height = 14
           Hint = 'Previous title'
@@ -863,7 +837,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object PlayPauseBTN: TSkinButton
           Left = 80
-          Top = 88
+          Top = 97
           Width = 14
           Height = 20
           Hint = 'Play'
@@ -886,7 +860,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object StopBTN: TSkinButton
           Left = 120
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           Hint = 'Stop'
@@ -909,7 +883,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object RecordBtn: TSkinButton
           Left = 140
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           DoubleBuffered = True
@@ -930,7 +904,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object PlayNextBTN: TSkinButton
           Left = 100
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           Hint = 'Next title'
@@ -953,7 +927,7 @@ object Nemp_MainForm: TNemp_MainForm
         object SlideForwardBTN: TSkinButton
           Tag = 1
           Left = 40
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           Hint = 'Slide forward'
@@ -975,7 +949,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object RandomBtn: TSkinButton
           Left = 160
-          Top = 88
+          Top = 97
           Width = 14
           Height = 14
           DoubleBuffered = True
@@ -1024,7 +998,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object BtnMenu: TSkinButton
           Left = 196
-          Top = 79
+          Top = 94
           Width = 12
           Height = 12
           Hint = 'Show menu'
@@ -1097,7 +1071,7 @@ object Nemp_MainForm: TNemp_MainForm
       object AudioPanel: TNempPanel
         Tag = 5
         Left = 2
-        Top = 121
+        Top = 139
         Width = 230
         Height = 184
         BevelInner = bvRaised
@@ -1739,37 +1713,6 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
       end
-      object GRPBOXLyrics: TNempPanel
-        Tag = 5
-        Left = 8
-        Top = 150
-        Width = 218
-        Height = 81
-        BevelOuter = bvNone
-        PopupMenu = Player_PopupMenu
-        TabOrder = 0
-        OnMouseDown = PaintFrameMouseDown
-        OnMouseMove = PaintFrameMouseMove
-        OnMouseUp = PaintFrameMouseUp
-        OnPaint = PanelPaint
-        OwnerDraw = False
-        object LyricsMemo: TMemo
-          Left = 0
-          Top = 0
-          Width = 218
-          Height = 81
-          Align = alClient
-          BevelInner = bvNone
-          BevelOuter = bvNone
-          BorderStyle = bsNone
-          Lines.Strings = (
-            'LyricsMemo')
-          PopupMenu = Player_PopupMenu
-          ReadOnly = True
-          TabOrder = 0
-          OnKeyDown = LyricsMemoKeyDown
-        end
-      end
       object GRPBOXEffekte: TNempPanel
         Tag = 5
         Left = 6
@@ -2038,6 +1981,38 @@ object Nemp_MainForm: TNemp_MainForm
           Proportional = True
           Stretch = True
           OnDblClick = CoverImageDblClick
+        end
+      end
+      object GRPBOXLyrics: TNempPanel
+        Tag = 5
+        Left = 8
+        Top = 150
+        Width = 218
+        Height = 81
+        BevelOuter = bvNone
+        PopupMenu = Player_PopupMenu
+        TabOrder = 0
+        OnMouseDown = PaintFrameMouseDown
+        OnMouseMove = PaintFrameMouseMove
+        OnMouseUp = PaintFrameMouseUp
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        DesignSize = (
+          218
+          81)
+        object LyricsMemo: TMemo
+          Left = 5
+          Top = 5
+          Width = 212
+          Height = 74
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          BevelInner = bvNone
+          BevelOuter = bvNone
+          BorderStyle = bsNone
+          PopupMenu = Player_PopupMenu
+          ReadOnly = True
+          TabOrder = 0
+          OnKeyDown = LyricsMemoKeyDown
         end
       end
     end
@@ -3773,7 +3748,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C0101110013006C030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101110013007C030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4338,7 +4313,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011C00F806480410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011C00F806580410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7128,7 +7103,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 536
     Top = 632
     Bitmap = {
-      494C010107002800D80010001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800E80010001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

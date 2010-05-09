@@ -71,17 +71,17 @@ interface
 
     const NempOriginalSpectrumSpecs: TSpectrumSpecs =
     (
-        Width       : 114;
-        Height      : 38;
+        Width       : 125;
+        Height      : 35;
         TextWidth   : 216;
         TextHeight  : 18;
         TimeWidth   : 53;
-        TimeHeight  : 18;
+        TimeHeight  : 14;
         StarHeight  : 14;
         StarWidth   : 70;
         ColumnWidth : 4;
         PreviewColumn: 2;
-        GradientHeight : 38;
+        GradientHeight : 35;
         TimeFontSize: 10;
         TextFontSize: 10;
         FFTDataMultiplikator: 500;
@@ -419,6 +419,7 @@ if active then
     begin
         localOffsetX := 0;
         localOffsetY := 0;
+        OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.PlayerBitmap;
         stretch := NempSkin.NempPartyMode.Active;
     end else
