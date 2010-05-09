@@ -23,7 +23,7 @@ object ExtendedControlForm: TExtendedControlForm
   PixelsPerInch = 96
   TextHeight = 13
   object ContainerPanelExtendedControlsForm: TNempPanel
-    Tag = 5
+    Tag = 6
     Left = 0
     Top = 0
     Width = 234

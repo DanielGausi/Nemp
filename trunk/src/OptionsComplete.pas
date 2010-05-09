@@ -446,6 +446,7 @@ type
     cb_PartyMode_BlockTreeEdit: TCheckBox;
     cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
     cb_PartyMode_BlockTools: TCheckBox;
+    Edt_PartyModePassword: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1391,7 +1392,7 @@ begin
   cb_PartyMode_BlockTreeEdit          .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit            ;
   cb_PartyMode_BlockCurrentTitleRating.Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating  ;
   cb_PartyMode_BlockTools             .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTools               ;
-
+  Edt_PartyModePassword.Text := Nemp_MainForm.NempSkin.NempPartyMode.password;
 
 
   // Automatic ratings
@@ -2557,6 +2558,7 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit           := cb_PartyMode_BlockTreeEdit          .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTools              := cb_PartyMode_BlockTools             .Checked;
+  Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
  { if True then
 
