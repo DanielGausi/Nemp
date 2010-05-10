@@ -111,11 +111,78 @@ Verwendete Units/Komponenten:
   http://www.delphipraxis.net
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
+
   
 
-Version 3.9.0 (Preview auf 4.0), Dezember 2009
+Version 4.0.0 (Serengeti), Mai (Juni?) 2010
 ----------------------------------------------------------- 
-Liste kommt bei Version 4.0 ;-)
+* Änderung der Lizenz von "Freeware" auf OpenSource
+  Nemp steht ab jetzt unter der GPL
+
+Neue Funktionen:
+----------------
+* Neuer Coverflow
+* Automatisches Nachladen von Covern von LastFM
+* Browse-Modus "Tagwolke" hinzugefügt
+* Automatische Beschaffung von weiteren Tags (z.B. "Singer-Songwriter")
+  von LastFM
+* Bearbeiten von Datei-Informationen direkt im Hauptfenster
+* Anzeige von Dateidetails neben dem Cover im Hauptfenster
+* Dort auch Anzeige zu Dateien in der Playlist
+* Sortierung nach Dateialter hinzugefügt
+* Sortierung nach Dateityp hinzugefügt
+* Windows7: Angepasstes Vorschaufenster für die Taskleiste
+* Windows7: Buttons für die Lautstärke in der Taskleiste
+* Windows7: Fortschrittsbalken bei längeren Aktionen in der Taskleiste
+* Feld "Playcounter" hinzugefügt
+* Automatische Anpassung der Bewertung bei oft abgespielten Dateien 
+* Beim Speichern der Playlist mit einem Album drin wird ein passender 
+  Name vorgeschlagen
+* Direktes Abspielen aus der Medienbibliothel ohne Änderung an der Playlist möglich
+* "Vormerkliste" in der Playlist: Abspielreihenfolge kann über die Zifferntasten
+  geändert werden
+* Damit funktioniert "als nächstes Abspielen" auch im Random-Modus
+* Klick auf "Voriger Titel"spielt auch im Zufallsmodus das zuletzt gespielte Stück ab
+  (History)
+* Party-Modus hinzugefügt mit vergrößerter Ansicht und reduzierter Funktionalität
+* Sortiermöglichkeit für die Webradio-Stationen in der Medienbibliothek
+* Export der Webradio-Stationen als pls-Datei
+* Random-Playlist: Dauer der Dateien als Auswahl-Kriterium
+* Random-Playlist: Tags der Dateien als Auswahlkriterium (dafür "Genre" entfernt)
+* Steuerung: Bei Klick in den Playerteil kann die Lautstärke mit dem Mausrad gesteuert 
+  werden
+* Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
+
+Änderungen:
+-----------
+* Umstellung von Delphi7 auf Delphi2009 (Unicode war ein hartes Stück Arbeit ...)
+* Playeranzeige etwas umgestaltet
+* im Einzelfenstermodus gibt es nun für Equalizer/Effekte/... ein eigenes Fenster
+* Suche in eigenes Fenster ausgelagert, die Umschalt-Buttons über der "Browse-Liste"
+  schalten jetzt um zwischen Classic, Coverflow und Tagwolke
+* Im Coverflow erscheinen "Alben ohne Cover" jetzt getrennt nach Ordner, nicht mehr 
+  als eine dicke Liste
+* "Kopfhörer-Ausgabe" auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
+* Auswahl "Jetzt abspielen, später abspielen, ..." anders
+* Optionen, Bitraten-Farben: Entfernt. Farben können nur über den Skin eingestellt 
+  werden, in den Optionen kann das dann auf Wunsch abgeschaltet werden
+* Beim Bearbeiten von Dateieigenschaften im Detailfenster kommt beim Wechsel eine
+  "Wollen Sie speichern"-Abfrage
+* Effekt "Geschwindigkeit" von 33% - 300% erweitert
+* Skineditor aus dem Hauptprogramm entfernt - der wird als eigenes Programm 
+  nachgeliefert
+* Option: Beim Start Webserver aktivieren hinzugefügt
+* Klick auf "Voriger Titel" springt nach den ersten 5 Sekunden nur zum Anfang des 
+  aktuellen Stückes
+* System "Schnellsuche" überarbeitet. Es wird immer alles durchsucht, nicht nur 
+  die "aktuelle Liste"
+
+Bugfixes:
+---------
+* Beim Sliden in einem Lied bis fast ans Ende wurde u.U. kein Faden ausgeführt
+* Wenn die Medienbibliothek leer war, wurden die "überwachten Verzeichnisse" nicht
+  nach neuen Dateien gescannt.
+
 
 
 
