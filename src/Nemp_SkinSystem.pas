@@ -119,14 +119,14 @@ type
 
   const
     DefaultButtonData : Array[TControlButtons] of TNempButtonData =
-      ( (Name: 'BtnPlayPause'    ; Visible: True; Left:  61; Top: 82; Width: 24; Height: 24),  // 'PlayBtn',
-        (Name: 'BtnStop'         ; Visible: True; Left:  85; Top: 82; Width: 24; Height: 24),  // 'StopBtn',
-        (Name: 'BtnNext'         ; Visible: True; Left: 133; Top: 82; Width: 24; Height: 24),  // 'NextBtn',
-        (Name: 'BtnPrev'         ; Visible: True; Left:  37; Top: 82; Width: 24; Height: 24),  // 'PrevBtn',
-        (Name: 'BtnSlideForward' ; Visible: True; Left: 157; Top: 82; Width: 24; Height: 24),  // 'SlideForwardBtn',
-        (Name: 'BtnSlideBackward'; Visible: True; Left:  13; Top: 82; Width: 24; Height: 24),   // 'SlidebackwardBtn'
-        (Name: 'BtnRandom'       ; Visible: True; Left: 191; Top: 82; Width: 24; Height: 24),  // 'RandomBtn',
-        (Name: 'BtnRecord'       ; Visible: True; Left: 109; Top: 82; Width: 24; Height: 24),  // 'RecordBtn',
+      ( (Name: 'BtnPlayPause'    ; Visible: True; Left:  61; Top: 98; Width: 24; Height: 24),  // 'PlayBtn',
+        (Name: 'BtnStop'         ; Visible: True; Left:  85; Top: 98; Width: 24; Height: 24),  // 'StopBtn',
+        (Name: 'BtnNext'         ; Visible: True; Left: 133; Top: 98; Width: 24; Height: 24),  // 'NextBtn',
+        (Name: 'BtnPrev'         ; Visible: True; Left:  37; Top: 98; Width: 24; Height: 24),  // 'PrevBtn',
+        (Name: 'BtnSlideForward' ; Visible: True; Left: 157; Top: 98; Width: 24; Height: 24),  // 'SlideForwardBtn',
+        (Name: 'BtnSlideBackward'; Visible: True; Left:  13; Top: 98; Width: 24; Height: 24),   // 'SlidebackwardBtn'
+        (Name: 'BtnRandom'       ; Visible: True; Left: 191; Top: 98; Width: 24; Height: 24),  // 'RandomBtn',
+        (Name: 'BtnRecord'       ; Visible: True; Left: 109; Top: 98; Width: 24; Height: 24),  // 'RecordBtn',
         (Name: 'BtnMinimize'     ; Visible: False; Left: 202; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
         (Name: 'BtnClose'        ; Visible: True; Left: 214; Top: 1; Width: 12; Height: 12),  // 'CloseBtn',
         (Name: 'BtnMenu'         ; Visible: False; Left:   8; Top: 52; Width: 12; Height: 12)  // 'MenuBtn',
