@@ -11040,6 +11040,8 @@ var point: TPoint;
 //a: TAudiofile;
  aDrive: TDrive;
 
+ t: TDateTime;
+
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11051,7 +11053,6 @@ begin
 //CloudViewer.SetFocus;
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
-
 end;
 
 

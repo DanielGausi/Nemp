@@ -504,6 +504,7 @@ begin
     Track := 0;
     coverID := '';
     fRating := 0;
+    fFileAge := 40300;    // this is May 2nd, 2010, so all files from Nemp3 will appear as may 2010
     ID3TagNeedsUpdate := False;
 end;
 destructor TAudioFile.Destroy;
