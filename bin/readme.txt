@@ -25,30 +25,32 @@ Merkmale
 
 Zusammengefasst:
                
-                 Nemp ist einfach nur noch ein mp3 Player.
+                 Nemp ist einfach nur [n]och [e]in [m]p3 [P]layer.
 
 
 Aber für ein Ein-Mann-Projekt ein verdammt guter:
 
    Nemp kann Musikdateien, Playlists und Webstreams abspielen, finden und verwalten. 
-   Unter anderem mp3, ogg, wma, wav, m3u, m3u8, pls, asx, wax. Andere Musikformate wie
-   flac, ape, aac, m4a können über Plugins hinzugefügt werden.
+   Unter anderem mp3, ogg, wma, wav, flac, ape, aac, m4a, m3u, m3u8, pls, asx, wax. 
 
    Nemp muss nicht installiert werden. Als Tool auf einer externen Platte ist es    
    sofort an jedem Rechner einsatzbereit - inklusive der Medienbibliothek
 
-   Nemp kann Webstreams (nur mp3, optional aac) aufnehmen und automatisch schneiden
+   Nemp kann Webstreams (nur mp3 und aac) aufnehmen und automatisch schneiden
 
    Nemp hat einen integrierten Webserver um die eigene Musiksammlung mit Freunden zu
    teilen - auf der anderen Seite reicht ein einfacher Webbrowser
 
    Nemp hat ein intuitives GUI mit vielen kleinen nützlichen Dingen wie z.B.
+
       - optional ins System integrierbares Deskband, wie man es vom WindowsMediaPlayer kennt
-      - anpassbares Design durch den integrierten Skineditor
+      - anpassbares Design
       - Mehrsprachigkeit
       - paralleles Abspielen eines zweiten Liedes über eine zweite Soundkarte
       - automatisches Herunterfahren des Systems nach einer gewissen Zeit
+      - integrierter LastFM-Scrobbler
       - Geburtstagsmodus, d.h. abspielen eines bestimmten Liedes zu einer bestimmten Zeit
+      - Partymodus mit größeren Buttons, reduziertem Menü und eingeschränkter Funktionalität
      
 
 Was Nemp NICHT kann:
@@ -66,7 +68,8 @@ Was Nemp NICHT kann:
 
 Lizenzvereinbarungen:
 -----------------------------------------------------------
-GPL 2.0 oder später.
+GPL 2.0 oder später
+(Details in der licence.txt und der gpl.txt)
 
 
 
@@ -116,66 +119,105 @@ Verwendete Units/Komponenten:
 
 Version 4.0.0 (Serengeti), Mai (Juni?) 2010
 ----------------------------------------------------------- 
+       Todo für die fertige Version)
+       -----------------------------
+       - Lyric-Suche von Bergmann einbauen
+       - Korrektur des Ogg-Lese-Codes
+       - Skin-Editor bauen oder Menüpunkt erstmal entfernen
+       - Deskband korrigieren 
+        (für XP 32Bit. Vista lass ich aus, Win7 erledigt die Taskleiste, 64Bit geht eh nicht)
+
 * Änderung der Lizenz von "Freeware" auf OpenSource
-  Nemp steht ab jetzt unter der GPL
+  - Nemp steht ab jetzt unter der GPL
+* Wechsel der Programmierumgebung von Delphi7 auf Delphi2009
 
 Neue Funktionen:
 ----------------
 * Neuer Coverflow
-* Automatisches Nachladen von Covern von LastFM
+  - zeitgemäßeres Look&Feel
+  - "Alben ohne Cover" werden jetzt einzeln nach Ordner gruppiert angezeigt,
+    nicht mehr als ein großer Block
+  - Automatisches Nachladen von Covern aus dem Internet
 * Browse-Modus "Tagwolke" hinzugefügt
-* Automatische Beschaffung von weiteren Tags (z.B. "Singer-Songwriter")
-  von LastFM
-* Bearbeiten von Datei-Informationen direkt im Hauptfenster
-* Anzeige von Dateidetails neben dem Cover im Hauptfenster
-* Dort auch Anzeige zu Dateien in der Playlist
+  - Automatische Beschaffung von weiteren Tags (z.B. "Singer-Songwriter")
+    von LastFM
+  - Anzeige der häufigsten Tags in unterschiedlichen Schriftgrößen
+  - Doppelklick auf einen tag erzeugt neue Tagwolke, eingeschränkt auf alle
+    Dateien, die diesen Tag enthalten
 * Sortierung nach Dateialter hinzugefügt
-* Sortierung nach Dateityp hinzugefügt
-* Windows7: Angepasstes Vorschaufenster für die Taskleiste
-* Windows7: Buttons für die Lautstärke in der Taskleiste
-* Windows7: Fortschrittsbalken bei längeren Aktionen in der Taskleiste
-* Feld "Playcounter" hinzugefügt
+  - zum Browsen werden die Dateien nach Monaten gruppiert
+* Spalte Dateityp (mp3, ogg, ...) hinzugefügt
+* Spalte "Playcounter" hinzugefügt
+* Coveranzeige neben der Medienbibliothek erweitert
+  - Anzeige von weiteren Informationen, um einige Spalten ausblenden zu können
+  - dort auch Bearbeitung der Daten möglich
+  - dort jetzt auch Anzeige zu Dateien in der Playlist
+* Bearbeiten von Datei-Informationen direkt im Hauptfenster
+  - Start der Bearbeitung durch zweimal Klicken oder F2
+  - Änderung der Bewertung durch einen einzigen Klick möglich
 * Automatische Anpassung der Bewertung bei oft abgespielten Dateien 
+  - Die Änderung der Bewertung ist abhängig vom Playcounter
+    (bei oft gehörten Titeln ändert sich die Bewertung weniger stark)
+* Windows7-Support erweitert 
+  - Angepasstes Vorschaufenster für die Taskleiste
+  - Buttons für die Lautstärke in der Taskleiste
+  - Fortschrittsbalken bei längeren Aktionen in der Taskleiste
 * Beim Speichern der Playlist mit einem Album drin wird ein passender 
-  Name vorgeschlagen
-* Direktes Abspielen aus der Medienbibliothel ohne Änderung an der Playlist möglich
-* "Vormerkliste" in der Playlist: Abspielreihenfolge kann über die Zifferntasten
-  geändert werden
-* Damit funktioniert "als nächstes Abspielen" auch im Random-Modus
-* Klick auf "Voriger Titel"spielt auch im Zufallsmodus das zuletzt gespielte Stück ab
-  (History)
-* Party-Modus hinzugefügt mit vergrößerter Ansicht und reduzierter Funktionalität
-* Sortiermöglichkeit für die Webradio-Stationen in der Medienbibliothek
-* Export der Webradio-Stationen als pls-Datei
-* Random-Playlist: Dauer der Dateien als Auswahl-Kriterium
-* Random-Playlist: Tags der Dateien als Auswahlkriterium (dafür "Genre" entfernt)
-* Steuerung: Bei Klick in den Playerteil kann die Lautstärke mit dem Mausrad gesteuert 
-  werden
-* Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
+  Name vorgeschlagen ("Interpret - Album")
+* Direktes Abspielen aus der Medienbibliothek ohne Änderung an der Playlist möglich
+* "Vormerkliste" in der Playlist 
+  - Abspielreihenfolge kann über die Zifferntasten geändert werden
+  - Über das Kontextmenü können auch mehrere Dateien in die Vormerkliste
+    aufgenommen werden 
+  - Damit funktioniert "als nächstes Abspielen" auch im Random-Modus
+* Playlist-History
+  - Klick auf "Voriger Titel" spielt auch im Zufallsmodus die zuletzt 
+    gespielten Stücke ab
+  - Klick auf Vor/Zurück navigiert dann in der History
+  - Erst bei Start eines "neuen" Liedes wird dieses dann in die History-List
+    aufgenommen
+* Party-Modus 
+  - einstellbarer Zoom (1.5x, 2x, 2.5x) für leichteres Treffen der Buttons
+  - reduziertes Menü
+  - eingeschränkte Funktionalität (Dateien in die Medienbibliothek einfügen, löschen, 
+    Bearbeiten der ID3-Tags, ...)
+* Webradio-Verwaltung verbessert
+  - Sortiermöglichkeit für die Webradio-Stationen in der Medienbibliothek
+  - Export der Webradio-Stationen als pls-Datei
+* Random-Playlist erweitert 
+  - Dauer der Dateien als Auswahl-Kriterium
+  - Tags der Dateien als Auswahlkriterium 
+    (dafür "Genre" entfernt)
+* GUI
+  - Bei Klick in den Playerteil: Lautstärke-Regelung per Mausrad
+  - Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
 
 Änderungen:
 -----------
-* Umstellung von Delphi7 auf Delphi2009 (Unicode war ein hartes Stück Arbeit ...)
-* Playeranzeige etwas umgestaltet
-* im Einzelfenstermodus gibt es nun für Equalizer/Effekte/... ein eigenes Fenster
-* Suche in eigenes Fenster ausgelagert, die Umschalt-Buttons über der "Browse-Liste"
-  schalten jetzt um zwischen Classic, Coverflow und Tagwolke
-* Im Coverflow erscheinen "Alben ohne Cover" jetzt getrennt nach Ordner, nicht mehr 
-  als eine dicke Liste
-* "Kopfhörer-Ausgabe" auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
+* GUI
+  - Anzeige im Playerteil umgestaltet
+  - im Einzelfenstermodus gibt es nun für Equalizer/Effekte/... ein eigenes Fenster
+  - Umschalt-Buttons für Equalizer/Effekte/... jetzt neben diesen Dingen, nicht mehr über
+    dem Player 
+  - Ausführliche Suche in eigenes Fenster ausgelagert 
+  - die Umschalt-Buttons über der "Browse-Liste" schalten jetzt um zwischen 
+    Classic, Coverflow und Tagwolke
+  - Klick auf "Voriger Titel" springt nach den ersten 5 Sekunden nur zum Anfang des 
+    aktuellen Stückes
 * Auswahl "Jetzt abspielen, später abspielen, ..." anders
+* "Kopfhörer-Ausgabe" auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
+* Skineditor aus dem Hauptprogramm entfernt - der wird als eigenes Programm 
+  nachgeliefert
 * Optionen, Bitraten-Farben: Entfernt. Farben können nur über den Skin eingestellt 
   werden, in den Optionen kann das dann auf Wunsch abgeschaltet werden
 * Beim Bearbeiten von Dateieigenschaften im Detailfenster kommt beim Wechsel eine
   "Wollen Sie speichern"-Abfrage
 * Effekt "Geschwindigkeit" von 33% - 300% erweitert
-* Skineditor aus dem Hauptprogramm entfernt - der wird als eigenes Programm 
-  nachgeliefert
 * Option: Beim Start Webserver aktivieren hinzugefügt
-* Klick auf "Voriger Titel" springt nach den ersten 5 Sekunden nur zum Anfang des 
-  aktuellen Stückes
 * System "Schnellsuche" überarbeitet. Es wird immer alles durchsucht, nicht nur 
-  die "aktuelle Liste"
+  die "aktuelle Liste". 
+  - Treffer aus dieser Liste werden aber zuerst angezeigt
+  - statt der Checkbox jetzt ein Button zum Löschend der Eingabe
 
 Bugfixes:
 ---------
@@ -183,6 +225,53 @@ Bugfixes:
 * Wenn die Medienbibliothek leer war, wurden die "überwachten Verzeichnisse" nicht
   nach neuen Dateien gescannt.
 
+
+
+
+Version 3.3.4, November 2009
+----------------------------------------------------------- 
+Bugfixes:
+---------
+* Die Playlist spielte unter bestimmten Umständen nur ein Lied ab und stoppte dann
+
+
+
+Version 3.3.3, August 2009
+----------------------------------------------------------- 
+Entfernte Funktionen (ja, ENTFERNT!)
+-----------------------------------
+* Automatische Lyrics-Suche - LyricWiki musste auf Druck der Plattenfirmen 
+  die API abschalten
+
+Bugfixes:
+---------
+* Der Button "Änderungen übernehmen" im Einstellungsdialog ist jetzt groß genug
+* Bei Klick auf Stop springt die Titelanzeige jetzt zurück
+* Ein Starten des Webservers gibt es jetzt ne nettere Fehlermeldung, wenn z.B. XAMPP
+  bereits läuft
+* Fading und "Ignorieren bei Stop" funktionierte nicht wie gewünscht
+* Fehlende Dateien in der Playlist wurden nicht übersprungen, bzw. die Wiedergabe 
+  hielt danach automatisch an
+* Problem mit der Track-Nr bei WMA-Dateien behoben (hoffentlich)
+
+
+
+Version 3.3.2, Juli 2009
+----------------------------------------------------------- 
+Bugfixes:
+---------
+* Diverse Fehler beim Starten von CD/DVD oder anderen schreibgeschützten Medien behoben
+* Die Funktion "Vollständig abgespielte Titel aus der Playlist löschen" funktionierte nicht
+* Das Abschalten der automatischen Update-Suche funktionierte nicht
+
+
+
+Version 3.3.1, April 2009
+----------------------------------------------------------- 
+Bugfixes:
+---------
+* Bearbeiten von ID3-Tags führte zu Inkonsistenzen in der Medienbibliothek
+  ("doppelte Dateien") oder zu einem Totalabsturz des Players
 
 
 
