@@ -162,7 +162,7 @@ type
 
 implementation
 
-uses NempMainUnit, ScrobblerUtils, Hilfsfunktionen, SystemHelper, Nemp_RessourceStrings;
+uses NempMainUnit, ScrobblerUtils, Hilfsfunktionen, SystemHelper, Nemp_RessourceStrings, OneInst;
 
 
 function SortDownloadPriority(item1,item2: Pointer): Integer;
@@ -292,7 +292,7 @@ var n: DWord;
 begin
     // LoadCacheList
     fCacheList := TObjectList.Create;
-    if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+    if IsExeInProgramSubDir then
         fCacheFilename := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\CoverCache'
     else
         fCacheFilename := ExtractFilePath(ParamStr(0)) + 'Data\CoverCache';
@@ -453,7 +453,14 @@ begin
         for i := 0 to Count - 1 do
             TCoverDownloadItem(fCacheList[i]).SaveToStream(aStream);
 
-        aStream.SaveToFile(fCacheFilename);
+        try
+            aStream.SaveToFile(fCacheFilename);
+        except
+            // Do nothing, saving failed
+            //on E: Exception do
+            //    if not Silent then
+            //        MessageDLG(E.Message, mtError, [mbOK], 0);
+        end;
     finally
         aStream.Free;
     end;

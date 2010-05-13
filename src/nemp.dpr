@@ -81,7 +81,8 @@ uses
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
   CoverDownloads in 'CoverDownloads.pas',
-  PartymodePassword in 'PartymodePassword.pas' {PasswordDlg};
+  PartymodePassword in 'PartymodePassword.pas' {PasswordDlg},
+  Lyrics in 'Lyrics.pas';
 
 //,  classes;
 

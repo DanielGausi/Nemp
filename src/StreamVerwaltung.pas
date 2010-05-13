@@ -104,6 +104,7 @@ type
     Label1: TLabel;
     cbSortMode: TComboBox;
     BtnSetCustomSort: TButton;
+    BtnNewStation: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Btn_OkClick(Sender: TObject);
@@ -760,6 +761,15 @@ begin
         currentmaxIdx := MedienBib.AddRadioStation(newStation);
         newStation.SortIndex := currentmaxIdx;
         AddVSTStation(VST_Favorites, NIL, NewStation);
+
+        Medienbib.Changed := True;
+        if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+        begin
+            // Anzeige im Tree der MainForm neu füllen
+            Medienbib.GetAlbenList(MedienBib.CurrentArtist);
+            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+        end;
+
     end;
 end;
 
