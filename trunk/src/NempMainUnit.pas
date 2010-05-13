@@ -11042,9 +11042,9 @@ var point: TPoint;
 
  t: TDateTime;
 
- //lyrics: TLyrics;
- // s: String;
- // sl: TStringList;
+ lyrics: TLyrics;
+  s: String;
+  sl: TStringList;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11057,7 +11057,7 @@ begin
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 
-   {lyrics := TLyrics.Create;
+   lyrics := TLyrics.Create;
    try
       s := Lyrics.GetLyrics(
           MedienBib.CurrentAudioFile.Artist,
@@ -11071,7 +11071,7 @@ begin
 
    finally
       lyrics.Free;
-   end; }
+   end;
 
 end;
 

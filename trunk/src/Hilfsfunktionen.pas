@@ -660,7 +660,8 @@ var
 begin
     s := LowerCase(s);
     result := s;
-    with TStringList.Create do try
+    with TStringList.Create do
+    try
         Delimiter := ' ';
         DelimitedText := s;
         for i := 0 to Count-1 do
@@ -672,6 +673,7 @@ begin
             end;
         Delimiter := '_';//#32;
         result := DelimitedText;
+
     finally
         Free;
     end;
