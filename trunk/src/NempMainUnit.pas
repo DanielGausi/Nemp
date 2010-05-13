@@ -56,7 +56,7 @@ uses
   UpdateUtils, uDragFilesSrc,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews;
+  fspTaskbarMgr, fspTaskbarPreviews, Lyrics;
 
 type
 
@@ -1672,7 +1672,7 @@ begin
 
     //--------------------------------------------------------------------
     // neues System - Unterscheidung nach Order
-    if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+    if IsExeInProgramSubDir then
     begin
       // Nemp liegt im System-Programmverzeichnis
       SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
@@ -11042,6 +11042,9 @@ var point: TPoint;
 
  t: TDateTime;
 
+ //lyrics: TLyrics;
+ // s: String;
+ // sl: TStringList;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11053,6 +11056,23 @@ begin
 //CloudViewer.SetFocus;
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
+
+   {lyrics := TLyrics.Create;
+   try
+      s := Lyrics.GetLyrics(
+          MedienBib.CurrentAudioFile.Artist,
+          MedienBib.CurrentAudioFile.Titel);
+
+
+      sl := TStringList.Create;
+      sl.Text := s;
+      sl.SaveToFile(savePath + 'lyric.txt');
+      sl.Free;
+
+   finally
+      lyrics.Free;
+   end; }
+
 end;
 
 

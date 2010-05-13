@@ -1109,7 +1109,7 @@ var  F: File;
     sr,vendor_length,comment_list_length, comment_length: ^cardinal;
     min_bitrate,nominal_bitrate,max_bitrate:^integer;
 
-    vendorstr,tmpstr, param:string;
+    vendorstr,tmpstr, param: AnsiString;
     value: UTF8String;
     chmode:byte;
 begin
@@ -1197,7 +1197,7 @@ begin
                 vendor_length := @(buffer[position+7]);
                 setlength(vendorstr,vendor_length^);
                 for i:=0 to vendor_length^-1 do
-                    vendorstr[i+1] := chr(buffer[position+11+i]);
+                    vendorstr[i+1] := AnsiChar(chr(buffer[position+11+i]));
                 // Anzahl der Kommentarfelder
                 comment_list_length := @(buffer[position+11 + Integer(vendor_length^)]);
                 position:=position+15+ Integer(vendor_length^); // Position: länge des folgenden Kommentares
@@ -1208,7 +1208,7 @@ begin
 
                     // das solte doch mit move oder so besser gehen, oder???
                     for i:=0 to comment_length^-1 do
-                        tmpstr[i+1] := chr(buffer[position+4+i]);
+                        tmpstr[i+1] := AnsiChar(chr(buffer[position+4+i]));
 
                     {.$Message Hint 'Code testen, anders machen! Nix mit TmpStringlist, das geht ohne Explode'}
 
@@ -1247,8 +1247,7 @@ begin
                                   tmpstrlist.free;
                                   *)
                     end;
-
-
+                    inc(position,comment_length^+4);
 
                 end;
 

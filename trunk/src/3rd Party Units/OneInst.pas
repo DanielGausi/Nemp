@@ -13,6 +13,8 @@ var
 function ParamBlobToStr(lpData: Pointer): Widestring;
 function ParamStrToBlob(out cbData: DWORD): Pointer;
 
+function IsExeInProgramSubDir: Boolean;
+
 
 implementation
 
@@ -22,7 +24,7 @@ const
   { Maximale Zeit, die auf die Antwort der ersten Instanz gewartet wird (ms) }
   TimeoutWaitForReply = 5000;
   CSIDL_APPDATA = $001a;
-  CSIDL_PROGRAM_FILES = $26;
+  //CSIDL_PROGRAM_FILES = $26;
 
   ZeilenEnde = #13#10;
 
@@ -192,6 +194,26 @@ begin
   end;
 end;
 
+
+function IsExeInProgramSubDir: Boolean;
+var p1, p2: String;
+begin
+    result := false;
+    p1 := IncludeTrailingPathDelimiter(GetEnvironmentVariable('ProgramFiles'));
+    if AnsiStartsText(p1, ParamStr(0)) then
+        result := true
+    else
+    begin
+        p1 := GetEnvironmentVariable('ProgramW6432');
+        if p1 <> '' then
+            result := AnsiStartsText(IncludeTrailingPathDelimiter(p1), ParamStr(0));
+    end;
+end;
+{
+ShowMessage(GetEnvironmentVariable('ProgramW6432'));
+ShowMessage(GetEnvironmentVariable('ProgramFiles'));
+}
+
 function AllowOnlyOneInstance:boolean;
 var NEMP_NAME: WideString;
   Savepath: WideString;
@@ -200,7 +222,8 @@ begin
     result := True;
 
     NEMP_NAME := 'Nemp';
-    if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+    //if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+    if IsExeInProgramSubDir then
     begin
         // Nemp liegt im System-Programmverzeichnis
         SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';

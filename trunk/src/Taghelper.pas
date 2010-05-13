@@ -109,7 +109,7 @@ function ReplaceCommasbyLinebreaks(aString: String): String;
 
 implementation
 
-uses Systemhelper, Nemp_ConstantsAndTypes;
+uses Systemhelper, Nemp_ConstantsAndTypes, OneInst;
 
 
 function Sort_OriginalKey(item1, item2: Pointer): Integer;
@@ -204,7 +204,7 @@ constructor TTagPostProcessor.Create;
 begin
     inherited create;
     // determine path for saving (and loading) files
-    if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
+    if IsExeInProgramSubDir then
         fSavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\'
     else
         fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
