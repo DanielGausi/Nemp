@@ -152,6 +152,23 @@ end;
 procedure TLyrics.GetAllTitlesFromArtist;
 begin
 
+{
+Artist-Page-Design
+...
+<span class="mw-headline"> [..album-titel..]
+<ol>
+    [Titles of the album]
+</ol>
+...
+}
+
+/// Todo
+///  - blöcke da obe finden
+///  - daraus titel finden und in Titelliste einfügen
+///  - diese Titel korrigieren (e.g. "&amp;")
+///  in dieser Liste "besten Titel finden"
+///  dessen URL aufrufen.
+
 end;
 
 function TLyrics.GetBestTitle: TTitle;
