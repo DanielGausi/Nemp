@@ -65,6 +65,8 @@ uses Windows, Contnrs, Sysutils,  Classes,
 
               fCurrentLyrics: String;
 
+              function DownloadCode(Source: String): String;
+
               // Get the HTML-Code and parse it
               function GetLyricsFromURL(aURL: AnsiString): Boolean;
 
@@ -73,6 +75,7 @@ uses Windows, Contnrs, Sysutils,  Classes,
 
               // if this fails: Get all titles for the artist
               procedure GetAllTitlesFromArtist;
+              procedure AddAllTitlesFromAlbum(AlbumCode: String);
               // ... and get the best matching title
               function GetBestTitle: TTitle;
 
@@ -126,6 +129,10 @@ end;
 function TLyrics.GetLyrics(aInterpret, aTitle: String): String;
 var LyricQuery: String;
     Success: Boolean;
+
+    s: String;
+    i: integer;
+
 begin
     fInterpret := aInterpret;
     fTitle := aTitle;
@@ -145,17 +152,96 @@ begin
     else
     begin
         // try something else
+        GetAllTitlesFromArtist;
+
+        {
+        to do here
+        process titles (&amps and stuff) (or done in the ttitle-constructor???!!!)
+        find best title
+        GetLyrics from this titles url
+
+        }
+
+        s := '';
+        for i := 0 to fTitleList.Count - 1 do
+        begin
+            s := s +  TTitle(fTitleList[i]).fTitle + ' - ' + TTitle(fTitleList[i]).fLink + #13#10;
+        end;
+        result := s;
     end;
 end;
 
 
-procedure TLyrics.GetAllTitlesFromArtist;
+function TLyrics.DownloadCode(Source: String): String;
 begin
+    try
+        result := fIdHTTP.Get(Source);
+    except
+        result := '';
+    end;
+end;
+
+procedure TLyrics.AddAllTitlesFromAlbum(AlbumCode: String);
+var currentPos: Integer;
+    href, name: String;
+    a,b: Integer;
+    newTitle: TTitle;
+const LinkBegin = '<a href="';
+begin
+    // search for something like
+    // <a href="/Amy_Macdonald:Spark" title="Amy Macdonald:Spark">Spark</a>
+    //
+    currentPos := Pos(LinkBegin, AlbumCode);
+    while currentPos <> 0 do
+    begin
+        // Get link
+        a := currentPos + Length(LinkBegin); // there should be the "/" from the link
+        b := PosEx('"', AlbumCode, a);       // closing " from href
+        href := copy(AlbumCode, a, b-a);
+        // get name
+        a := PosEx('>', AlbumCode, a) + 1;   // first char of the title
+        b := PosEx('</a>', AlbumCode, a);    // closing tag
+        name := copy(AlbumCode, a, b-a);
+        // create a new TTitle-Object and add it to the list
+        newTitle := TTitle.Create(name, href);
+        fTitleList.Add(newTitle);
+        // Get next Link
+        currentPos := PosEx(LinkBegin, AlbumCode, currentPos + 10);
+    end;
+end;
+
+procedure TLyrics.GetAllTitlesFromArtist;
+var ArtistURL: String;
+    code, AlbCode: String;
+    currentPos, AlbStart, AlbEnd: Integer;
+const AlbumHeadline = '<span class="mw-headline">';
+
+begin
+    ArtistURL := 'http://lyrics.wikia.com/'
+                        + StringToURLStringAND(UTF8Encode(WordUppercase(fInterpret)));
+    code := DownloadCode(ArtistURL);
+
+    // find first album-Headline
+    currentPos := Pos(AlbumHeadline, code);
+    // while we have another album
+    while currentPos <> 0 do
+    begin
+        AlbStart := PosEx('<ol>', code, currentPos);
+        AlbEnd   := PosEx('</ol>', code, currentPos);
+        if (AlbStart > 0) and (AlbEnd > 0) then
+        begin
+            AlbStart := AlbStart + 4;
+            AlbCode := copy(code, AlbStart, AlbEnd - AlbStart);
+            // we have seperated an album - parse it and add its titles to the list
+            AddAllTitlesFromAlbum(AlbCode);
+        end;
+        currentPos := PosEx(AlbumHeadline, code, currentPos + 10);
+    end;
 
 {
 Artist-Page-Design
 ...
-<span class="mw-headline"> [..album-titel..]
+<span class="mw-headline"> [...album-titel, cover,...]
 <ol>
     [Titles of the album]
 </ol>
@@ -198,8 +284,11 @@ var code: String;
 const LyricBox = '<div class=''lyricbox''>';
 
 begin
-    try
-        code := fIdHTTP.Get(aURL);
+    code := DownloadCode(aURL);
+    if code = '' then
+        result := False
+    else
+    begin
         // parse it
         // current design of the site:
         {
@@ -265,9 +354,6 @@ begin
         else
             // no lyric-Box found :(
             result := False;
-    except
-        // Some Indy-Exception, probably 404 or stuff...
-        result := False;
     end;
 end;
 
