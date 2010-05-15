@@ -82,7 +82,8 @@ uses
   Taghelper in 'Taghelper.pas',
   CoverDownloads in 'CoverDownloads.pas',
   PartymodePassword in 'PartymodePassword.pas' {PasswordDlg},
-  Lyrics in 'Lyrics.pas';
+  Lyrics in 'Lyrics.pas',
+  HtmlHelper in 'HtmlHelper.pas';
 
 //,  classes;
 

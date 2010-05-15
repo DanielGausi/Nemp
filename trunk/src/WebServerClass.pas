@@ -56,7 +56,7 @@ uses Windows, Classes, Messages, ContNrs, SysUtils,  dialogs,
 IniFiles,  StrUtils, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdCustomHTTPServer, IdHTTPServer, IdContext,
 
-MP3FileUtils, AudioFileClass, Hilfsfunktionen,
+MP3FileUtils, AudioFileClass, Hilfsfunktionen, HtmlHelper,
 Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
 
 MedienbibliothekClass, BibSearchClass

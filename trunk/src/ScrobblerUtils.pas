@@ -42,7 +42,7 @@ uses
   Dialogs, md5, StdCtrls, ShellApi, DateUtils, IniFiles, Contnrs, 
 
   AudioFileClass,
-  Systemhelper, Nemp_RessourceStrings, Hilfsfunktionen;
+  Systemhelper, Nemp_RessourceStrings, HtmlHelper;//Hilfsfunktionen;
 
 const
     UnixStartDate: TDateTime = 25569.0;

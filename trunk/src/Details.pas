@@ -40,7 +40,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, AudioFileClass, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
   ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, CoverHelper,
-  Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, U_CharCode,
+  Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, U_CharCode, HtmlHelper,
 
   Nemp_ConstantsAndTypes, gnuGettext,
   Nemp_RessourceStrings,  IdBaseComponent, IdComponent,
@@ -1885,7 +1885,7 @@ begin
 
                 If Trim(LyricWikiResponse) <> 'Not found' then
                 begin
-                    Memo_Lyrics.Text := ProcessWikiResponse((trim(LyricWikiResponse)));
+                    Memo_Lyrics.Text := ReplaceGeneralEntities(trim(LyricWikiResponse));
                 end else
                     if (MessageDlg(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
                     begin
