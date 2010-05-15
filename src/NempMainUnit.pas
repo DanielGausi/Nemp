@@ -5484,10 +5484,9 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_ML_GetLyricsClick(Sender: TObject);
-var // i:integer;
-    // Data: PTreeData;
+var i:integer;
+    Data: PTreeData;
     SelectedMp3s: TNodeArray;
-
 begin
     SelectedMp3s := Nil;
     if MedienBib.StatusBibUpdate <> 0 then
@@ -5498,19 +5497,19 @@ begin
 
     if NempOptions.DenyID3Edit then
     begin
-      MessageDLG((Error_ID3EditDenied), mtInformation, [mbOK], 0);
-      exit; // Edit nicht erlaubt
+        MessageDLG((Error_ID3EditDenied), mtInformation, [mbOK], 0);
+        exit; // Edit nicht erlaubt
     end;
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
-          if not assigned(NoLyricWikiApiForm) then
-              Application.CreateForm(TNoLyricWikiApiForm, NoLyricWikiApiForm);
-          NoLyricWikiApiForm.ShowModal;
+          //if not assigned(NoLyricWikiApiForm) then
+          //    Application.CreateForm(TNoLyricWikiApiForm, NoLyricWikiApiForm);
+          //NoLyricWikiApiForm.ShowModal;
 
-    {
+
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
 
@@ -5522,7 +5521,7 @@ begin
         end;
 
         MedienBib.GetLyrics;
-    }
+
     end;
 end;
 

@@ -54,7 +54,7 @@ unit MedienbibliothekClass;
 interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
-     dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math,
+     dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math, Lyrics,
      AudioFileClass, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
@@ -1920,115 +1920,95 @@ procedure TMedienBibliothek.fGetLyrics;
 var i: Integer;
     aAudioFile: TAudioFile;
     ID3v2tag: TID3v2Tag;
-    IdHTTP1: TIdHTTP;
     LyricWikiResponse: String;
     LyricQuery: AnsiString;
     done, failed: Integer;
+    Lyrics: TLyrics;
 begin
     ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
 
-    IdHTTP1 := TIdHTTP.Create;
-    IDHttp1.ConnectTimeout:= 5000;
-    IDHttp1.ReadTimeout:= 5000;
-    IDHttp1.Request.UserAgent := 'Mozilla/3.0';
-    IDHttp1.HTTPOptions :=  [hoForceEncodeParams];
-
     done := 0;
     failed := 0;
-    // Lyrics suchen
-    for i := 0 to UpdateList.Count - 1 do
-    begin
-        if not UpdateFortsetzen then break;
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
-        aAudioFile := tAudioFile(UpdateList[i]);
-        if FileExists(aAudioFile.Pfad)
-           AND (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
-        then
-        begin
+    Lyrics :=  TLyrics.create;
+    try
+            // Lyrics suchen
+            for i := 0 to UpdateList.Count - 1 do
+            begin
+                if not UpdateFortsetzen then break;
 
-            // call the vcl, that we will edit this file now
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                    Integer(PWideChar(aAudioFile.Pfad)));
-
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateStatus,
-                    Integer(PWideChar(Format(MediaLibrary_SearchLyricsStats, [done, done + failed]))));
-            aAudioFile.FileIsPresent:=True;
-             {$Message Hint 'Hier UTF8-Konzept überdenken (vgl. auch: Detail-Fenster)'}
-            {LyricQuery := 'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + StringToURLString(WordUppercase(UTF8Encode((aAudiofile.Artist))))
-                        + '&song='
-                        + StringToURLString(WordUppercase(UTF8Encode((aAudiofile.Titel))))
-                        + '&fmt=text';
-            }
-            LyricQuery := 'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + StringToURLStringAND(UTF8Encode(WordUppercase((aAudiofile.Artist))))
-                        + '&song='
-                        + StringToURLStringAND(UTF8Encode(WordUppercase((aAudiofile.Titel))))
-                        + '&fmt=text';
-
-            LyricWikiResponse := '';
-            try
-                LyricWikiResponse := idHttp1.Get(String(LyricQuery));
-            except
-                if UpdateFortsetzen then
+                aAudioFile := tAudioFile(UpdateList[i]);
+                if FileExists(aAudioFile.Pfad)
+                   AND (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                then
                 begin
-                  IDHttp1.Disconnect;
-                  SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateFailed, 0);
-                  UpdateFortsetzen := False;
+                    // call the vcl, that we will edit this file now
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                            Integer(PWideChar(aAudioFile.Pfad)));
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateStatus,
+                            Integer(PWideChar(Format(MediaLibrary_SearchLyricsStats, [done, done + failed]))));
+
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+
+                    aAudioFile.FileIsPresent:=True;
+
+                    LyricWikiResponse := Lyrics.GetLyrics(aAudiofile.Artist, aAudiofile.Titel);
+                    if LyricWikiResponse <> '' then
+                    begin
+                        // ok, Lyrics found
+                        // Lyrics speichern
+                        // 1. id3Tag ermitteln
+                        ID3v2tag.ReadFromFile(aAudioFile.Pfad);
+                        if not Id3v2Tag.exists then
+                        begin
+                            // Tag erstellen und sinnvoll füllen
+                            if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
+                                ID3v2tag.Title  := aAudioFile.Titel;
+                            if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
+                                ID3v2tag.Artist := aAudioFile.Artist;
+                            if aAudioFile.Album <> AUDIOFILE_UNKOWN then
+                                ID3v2tag.album  := aAudioFile.Album;
+                            if aAudioFile.Comment <> AUDIOFILE_UNKOWN then
+                                ID3v2tag.Comment:= aAudioFile.Comment;
+                            ID3v2tag.Year   := aAudioFile.Year;
+                            ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
+                            ID3v2tag.Genre  := aAudioFile.Genre;
+                        end;
+                        Id3v2Tag.Lyrics := LyricWikiResponse;
+
+                        if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
+                        begin
+                            aAudioFile.Lyrics := UTF8Encode(Id3v2Tag.Lyrics);
+                            Changed := True;
+                            inc(done);
+                        end else
+                        begin
+                            // Datei konnte nicht aktualisiert werden.
+                            // (Schreibgeschützt, oder jemand anders greift grade auf die Datei zu)
+                            // nichts an den Lyrics ändern, aber
+                            inc(failed);
+                        end;
+                    end
+                    else
+                        inc(failed);
+                end
+                else begin
+                    aAudioFile.FileIsPresent:=False;
+                    inc(failed);
                 end;
             end;
-
-            if UpdateFortsetzen then
-            begin
-                LyricWikiResponse := StringReplace(LyricWikiResponse, #10, #13#10, [rfReplaceAll]);
-
-                If (Trim(LyricWikiResponse) <> '') and (Trim(LyricWikiResponse) <> 'Not found') then
-                begin
-                    // Lyrics speichern
-                    // 1. id3Tag ermitteln
-                    ID3v2tag.ReadFromFile(aAudioFile.Pfad);
-                    if not Id3v2Tag.exists then
-                    begin
-                      // Tag erstellen und sinnvoll füllen
-                      if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
-                          ID3v2tag.Title  := aAudioFile.Titel;
-                      if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
-                          ID3v2tag.Artist := aAudioFile.Artist;
-                      if aAudioFile.Album <> AUDIOFILE_UNKOWN then
-                          ID3v2tag.album  := aAudioFile.Album;
-                      if aAudioFile.Comment <> AUDIOFILE_UNKOWN then
-                          ID3v2tag.Comment:= aAudioFile.Comment;
-                      ID3v2tag.Year   := aAudioFile.Year;
-                      ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
-                      ID3v2tag.Genre  := aAudioFile.Genre;
-                    end;
-                    Id3v2Tag.Lyrics := ReplaceGeneralEntities((trim(LyricWikiResponse)));
-
-                    if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
-                    begin
-                        aAudioFile.Lyrics := UTF8Encode(Id3v2Tag.Lyrics);
-                        Changed := True;
-                        inc(done);
-                    end else
-                    begin
-                        // Datei konnte nicht aktualisiert werden.
-                        // (Schreibgeschützt, oder jemand anders greift grade auf die Datei zu)
-                        // nichts an den Lyrics ändern, aber
-                        inc(failed);
-                    end;
-                end else
-                    inc(failed);
-            end;
-        end
-        else begin
-            aAudioFile.FileIsPresent:=False;
-            inc(failed);
-        end;
+    finally
+            Lyrics.Free;
     end;
+
+
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
+
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
     // Build TotalStrings
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
@@ -2065,7 +2045,6 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                         Integer(PChar(MediaLibrary_SearchLyricsComplete_NoneFound)))
     end;
-    IdHTTP1.Free;
     id3v2Tag.free;
     // UnblockMEssage is sent via CleanUpTMPLists
 end;
