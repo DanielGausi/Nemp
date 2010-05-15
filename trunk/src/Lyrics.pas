@@ -201,7 +201,6 @@ begin
         if assigned(bestTitle) then
         begin
             // try to download it
-            showmessage(bestTitle.fLink);
             Success := GetLyricsFromURL(bestTitle.fLink);
             if Success then
                 result := fCurrentLyrics
