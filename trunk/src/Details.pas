@@ -42,7 +42,7 @@ uses
   ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, CoverHelper,
   Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, U_CharCode, HtmlHelper,
 
-  Nemp_ConstantsAndTypes, gnuGettext,
+  Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
   Nemp_RessourceStrings,  IdBaseComponent, IdComponent,
   IdTCPConnection, IdTCPClient, IdHTTP, Menus, RatingCtrls;
 
@@ -1839,28 +1839,40 @@ end;
 procedure TFDetails.BtnLyricWikiClick(Sender: TObject);
 var LyricWikiResponse: String;
     LyricQuery: AnsiString;
-
+    Lyrics: TLyrics;
+    LyricString: String;
 begin
-
-{  ShowMessage(Stringreplace( 'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + WordUppercase((DeleteForbiddenLyricWikiChars(AktuellesAudioFile.Artist)))
-                        + '&song='
-                        + WordUppercase((DeleteForbiddenLyricWikiChars(AktuellesAudioFile.Titel)))
-                        + '&fmt=text'
-    + #13#10 +
-                   'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + (WordUppercase(UTF8Encode((AktuellesAudioFile.Artist))))
-                        + '&song='
-                        + (WordUppercase(UTF8Encode((AktuellesAudioFile.Titel))))
-                        + '&fmt=text', '&', '&&', [rfreplaceall]));
-}
 
         if Fileexists(AktuellesAudioFile.Pfad)
            AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
         then
         begin
             AktuellesAudioFile.FileIsPresent:=True;
+            Lyrics := TLyrics.Create;
+            try
+                LyricString := Lyrics.GetLyrics(AktuellesAudioFile.Artist, AktuellesAudioFile.Titel);
 
+                if LyricString = '' then
+                begin
+                    if Lyrics.ExceptionOccured then
+                        // no connection
+                        MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0)
+                    else
+                    begin
+                        // no lyrics found
+                        if (MessageDlg(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+                            BtnLyricWikiManual.Click;
+                    end;
+                end else
+                begin
+                    // ok, Lyrics found
+                    Memo_Lyrics.Text := LyricString;
+                    ID3v2HasChanged := True;
+                end;
+            finally
+                Lyrics.Free;
+            end;
+            (*
             {$Message Hint 'Hier UTF8-Konzept überdenken'}
             {LyricQuery := 'http://lyricwiki.org/api.php?func=getSong&artist='
                         + StringToURLString(WordUppercase(UTF8Encode((AktuellesAudioFile.Artist))))
@@ -1906,6 +1918,7 @@ begin
             except
                 MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0);
             end;
+            *)
 
         end
         else
@@ -1919,10 +1932,14 @@ begin
                   StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll]) + '+' +
                   StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll])));
 
+    //http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0
+
     LyricQuery :=
-      'http://lyricwiki.org/Special:GoogleSearchResults?cx=partner-pub-7265006513689515%3Aenbi50a4igp&cof=FORID%3A9&ie=UTF-8&q='
-      + LyricQuery
-      + '&sa=Search';
+
+    Format('http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0', [LyricQuery]);
+     // 'http://lyricwiki.org/Special:GoogleSearchResults?cx=partner-pub-7265006513689515%3Aenbi50a4igp&cof=FORID%3A9&ie=UTF-8&q='
+     // + LyricQuery
+     // + '&sa=Search';
     ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
 end;
 

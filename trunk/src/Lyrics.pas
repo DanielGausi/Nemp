@@ -41,7 +41,8 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils,
      //Indys:
-     IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP;
+     IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
+     IdStack, IdException;
 
   type
       TTitle = class
@@ -59,6 +60,7 @@ uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils,
               fTitle: String;      // the current title we are searching for
               fTitleList: TObjectList;   // List of all titles for the current artist
               fCurrentLyrics: String;
+              fExceptionOccured: Boolean;
 
               function DownloadCode(Source: String): String;
 
@@ -74,6 +76,7 @@ uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils,
           public
               constructor Create;
               destructor Destroy; override;
+              property ExceptionOccured: Boolean read fExceptionOccured;
 
               // main method of the class
               // everything else is done in the subroutines
@@ -177,6 +180,7 @@ var LyricQuery: String;
     Success: Boolean;
     bestTitle: TTitle;
 begin
+    fExceptionOccured := False;
     fInterpret := aInterpret;
     fTitle := aTitle;
     fCurrentLyrics := '';
@@ -223,7 +227,13 @@ begin
     try
         result := fIdHTTP.Get(Source);
     except
-        result := '';
+        on E: EIdSocketError do
+        begin
+            fExceptionOccured := True;
+            result := '';
+        end
+        else
+            result := '';
     end;
 end;
 
