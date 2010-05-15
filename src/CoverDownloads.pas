@@ -162,7 +162,7 @@ type
 
 implementation
 
-uses NempMainUnit, ScrobblerUtils, Hilfsfunktionen, SystemHelper, Nemp_RessourceStrings, OneInst;
+uses NempMainUnit, ScrobblerUtils, HtmlHelper, SystemHelper, Nemp_RessourceStrings, OneInst;
 
 
 function SortDownloadPriority(item1,item2: Pointer): Integer;

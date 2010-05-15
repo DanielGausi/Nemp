@@ -55,8 +55,8 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math,
-     AudioFileClass, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen, Mp3FileUtils,
-     ID3v2Frames,
+     AudioFileClass, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
+     HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      //Indys:
@@ -2003,7 +2003,7 @@ begin
                       ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
                       ID3v2tag.Genre  := aAudioFile.Genre;
                     end;
-                    Id3v2Tag.Lyrics := ProcessWikiResponse((trim(LyricWikiResponse)));
+                    Id3v2Tag.Lyrics := ReplaceGeneralEntities((trim(LyricWikiResponse)));
 
                     if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
                     begin

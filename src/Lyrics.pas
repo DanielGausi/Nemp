@@ -5,11 +5,10 @@
     a class for downloading Lyrics from http://lyrics.wikia.com
     The API of this site is down, so we need to parse the html-code
 
-    This class is based on "unit Interpret" from Bergmann89, which is used in
-    his "MP3Updater".
-
-    Note: This class here is designed to work completely in a secondary Thread.
-          It should be created and destroyed there, not in the VCL.
+    This class uses some ideas from "unit Interpret", (c) Bergmann89,
+    which is used in his "MP3Updater".
+    However, my intended use is a bit different, so I have rewritten
+    the code completely. But ... all the ideas are belong to Bergmann89 :D
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
@@ -40,10 +39,7 @@ unit Lyrics;
 
 interface
 
-uses Windows, Contnrs, Sysutils,  Classes,
-     dialogs, Messages, Nemp_ConstantsAndTypes, Hilfsfunktionen,
-     StrUtils, Nemp_RessourceStrings,
-
+uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils,
      //Indys:
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP;
 
@@ -62,16 +58,12 @@ uses Windows, Contnrs, Sysutils,  Classes,
               fInterpret: String;  // the current artist we are searching for
               fTitle: String;      // the current title we are searching for
               fTitleList: TObjectList;   // List of all titles for the current artist
-
               fCurrentLyrics: String;
 
               function DownloadCode(Source: String): String;
 
               // Get the HTML-Code and parse it
               function GetLyricsFromURL(aURL: AnsiString): Boolean;
-
-              // try to get lyrics directly via "http://lyrics.wikia.com/<Interpret>:<Title>"
-              function GetLyricsDirect: String;
 
               // if this fails: Get all titles for the artist
               procedure GetAllTitlesFromArtist;
@@ -84,17 +76,73 @@ uses Windows, Contnrs, Sysutils,  Classes,
               destructor Destroy; override;
 
               // main method of the class
+              // everything else is done in the subroutines
               function GetLyrics(aInterpret, aTitle: String): String;
       end;
 
 implementation
 
+uses HtmlHelper;
+
+{ Get the Minimum of 3 Integers}
+
+function min3(a, b, c: Integer): Integer;
+begin
+  result := a;
+  if b < result then result := b;
+  if c < result then result := c;
+end;
+
+{ Compute the Edit/Levenshtein-Distance by dynamic-programming  }
+
+function LevenshteinDistance(const AText, AOther: String): Integer;
+var i, im, n, m: Integer;
+    C: Array of Integer;
+    pC, nC: Integer;
+begin
+  n := length(AText);
+  m := length(AOther);
+
+  if m = 0 then
+      result := n
+  else begin
+      setlength(C, m+1);
+      for i := 0 to m do C[i] := i;
+
+      for i := 1 to n do
+      begin
+          pC := i-1;
+          nC := i;
+          for im  := 1 to m do
+          begin
+              if AText[i] = AOther[im] then
+                  nC := pC
+              else
+                  nC := 1 + min3(nC, pC, C[im]);
+              pC := C[im];
+              C[im] := nC;
+          end;
+      end;
+      result := C[m];
+  end;
+end;
+
+
 { TTitle }
 
+{
+    --------------------------------------------------------
+    Constructor TTitle.Create
+    - replace stuff entities like '&amp;' in the title
+    - store title lowercase
+    - add website-adress to intenal link
+    --------------------------------------------------------
+}
 constructor TTitle.Create(aTitle, aLink: String);
 begin
-    fTitle := aTitle;
-    fLink  := aLink;
+    fTitle := ReplaceGeneralEntities(aTitle);
+    fTitle := AnsiLowerCase(fTitle);
+    fLink  := 'http://lyrics.wikia.com' + aLink;
 end;
 
 { TLyrics }
@@ -107,9 +155,7 @@ begin
     fIDHttp.ReadTimeout:= 5000;
     fIDHttp.Request.UserAgent := 'Mozilla/3.0';
     fIDHttp.HTTPOptions :=  [hoForceEncodeParams];
-
     fTitleList := TObjectList.Create;
-
 end;
 
 destructor TLyrics.Destroy;
@@ -119,27 +165,22 @@ begin
     inherited;
 end;
 
-
 {
     --------------------------------------------------------
-    GetLyrics
-    - Main Method
+    GetLyrics (Main Method)
+    - try to get the lyrics directly
+      or try to get it through the artist-page
     --------------------------------------------------------
 }
 function TLyrics.GetLyrics(aInterpret, aTitle: String): String;
 var LyricQuery: String;
     Success: Boolean;
-
-    s: String;
-    i: integer;
-
+    bestTitle: TTitle;
 begin
     fInterpret := aInterpret;
     fTitle := aTitle;
     fCurrentLyrics := '';
     fTitleList.Clear;
-    // think positive :D
-    Success := True;
 
     // build proper URL
     LyricQuery := 'http://lyrics.wikia.com/'
@@ -151,27 +192,33 @@ begin
         result := fCurrentLyrics
     else
     begin
-        // try something else
+        // try something else:
+        // Get all titles for this Artist from the artist-page
         GetAllTitlesFromArtist;
-
-        {
-        to do here
-        process titles (&amps and stuff) (or done in the ttitle-constructor???!!!)
-        find best title
-        GetLyrics from this titles url
-
-        }
-
-        s := '';
-        for i := 0 to fTitleList.Count - 1 do
+        // search for the current title in the titlelist
+        bestTitle := GetBestTitle;
+        // if there is a "best title"
+        if assigned(bestTitle) then
         begin
-            s := s +  TTitle(fTitleList[i]).fTitle + ' - ' + TTitle(fTitleList[i]).fLink + #13#10;
-        end;
-        result := s;
+            // try to download it
+            showmessage(bestTitle.fLink);
+            Success := GetLyricsFromURL(bestTitle.fLink);
+            if Success then
+                result := fCurrentLyrics
+            else
+                result := '';
+        end else
+            result := '';
     end;
 end;
 
-
+{
+    --------------------------------------------------------
+    DownloadCode
+    - download a URL
+      dont show any exceptions
+    --------------------------------------------------------
+}
 function TLyrics.DownloadCode(Source: String): String;
 begin
     try
@@ -181,35 +228,14 @@ begin
     end;
 end;
 
-procedure TLyrics.AddAllTitlesFromAlbum(AlbumCode: String);
-var currentPos: Integer;
-    href, name: String;
-    a,b: Integer;
-    newTitle: TTitle;
-const LinkBegin = '<a href="';
-begin
-    // search for something like
-    // <a href="/Amy_Macdonald:Spark" title="Amy Macdonald:Spark">Spark</a>
-    //
-    currentPos := Pos(LinkBegin, AlbumCode);
-    while currentPos <> 0 do
-    begin
-        // Get link
-        a := currentPos + Length(LinkBegin); // there should be the "/" from the link
-        b := PosEx('"', AlbumCode, a);       // closing " from href
-        href := copy(AlbumCode, a, b-a);
-        // get name
-        a := PosEx('>', AlbumCode, a) + 1;   // first char of the title
-        b := PosEx('</a>', AlbumCode, a);    // closing tag
-        name := copy(AlbumCode, a, b-a);
-        // create a new TTitle-Object and add it to the list
-        newTitle := TTitle.Create(name, href);
-        fTitleList.Add(newTitle);
-        // Get next Link
-        currentPos := PosEx(LinkBegin, AlbumCode, currentPos + 10);
-    end;
-end;
-
+{
+    --------------------------------------------------------
+    GetAllTitlesFromArtist
+    - download the Artist-Page
+    - split it into "album-parts"
+    - add albummtracks to titlelist
+    --------------------------------------------------------
+}
 procedure TLyrics.GetAllTitlesFromArtist;
 var ArtistURL: String;
     code, AlbCode: String;
@@ -217,6 +243,15 @@ var ArtistURL: String;
 const AlbumHeadline = '<span class="mw-headline">';
 
 begin
+    {
+    Artist-Page-Design
+    ...
+    <span class="mw-headline"> [...album-titel, cover,...]
+    <ol>
+        [Titles of the album]
+    </ol>
+    ...
+    }
     ArtistURL := 'http://lyrics.wikia.com/'
                         + StringToURLStringAND(UTF8Encode(WordUppercase(fInterpret)));
     code := DownloadCode(ArtistURL);
@@ -237,36 +272,83 @@ begin
         end;
         currentPos := PosEx(AlbumHeadline, code, currentPos + 10);
     end;
+end;
+
 
 {
-Artist-Page-Design
-...
-<span class="mw-headline"> [...album-titel, cover,...]
-<ol>
-    [Titles of the album]
-</ol>
-...
+    --------------------------------------------------------
+    AddAllTitlesFromAlbum
+    - search for something like
+      <a href="/Amy_Macdonald:Spark" title="Amy Macdonald:Spark">Spark</a>
+      and get link and name from this string
+    --------------------------------------------------------
 }
-
-/// Todo
-///  - blöcke da obe finden
-///  - daraus titel finden und in Titelliste einfügen
-///  - diese Titel korrigieren (e.g. "&amp;")
-///  in dieser Liste "besten Titel finden"
-///  dessen URL aufrufen.
-
+procedure TLyrics.AddAllTitlesFromAlbum(AlbumCode: String);
+var currentPos: Integer;
+    href, name: String;
+    a,b: Integer;
+    newTitle: TTitle;
+const LinkBegin = '<a href="';
+begin
+    currentPos := Pos(LinkBegin, AlbumCode);
+    while currentPos <> 0 do
+    begin
+        // Get link
+        a := currentPos + Length(LinkBegin); // there should be the "/" from the link
+        b := PosEx('"', AlbumCode, a);       // closing " from href
+        href := copy(AlbumCode, a, b-a);
+        // get name
+        a := PosEx('>', AlbumCode, a) + 1;   // first char of the title
+        b := PosEx('</a>', AlbumCode, a);    // closing tag
+        name := copy(AlbumCode, a, b-a);
+        // create a new TTitle-Object and add it to the list
+        newTitle := TTitle.Create(name, href);
+        fTitleList.Add(newTitle);
+        // Get next Link
+        currentPos := PosEx(LinkBegin, AlbumCode, currentPos + 10);
+    end;
 end;
 
+{
+    --------------------------------------------------------
+    GetBestTitle
+    - Search in the title-list the best title
+      (levenshtein-distance 1 or lower)
+    --------------------------------------------------------
+}
 function TLyrics.GetBestTitle: TTitle;
-begin
+var i: integer;
+    bestValue, bestIndex, currentValue: Integer;
+    lowerCaseTitle: String;
+    allowedError: Integer;
 
+begin
+    bestValue := High(Integer);
+    bestIndex := -1;
+    lowerCaseTitle := AnsiLowerCase(fTitle);
+
+    for i := 0 to fTitleList.Count - 1 do
+    begin
+        currentValue := LevenshteinDistance(TTitle(fTitleList[i]).fTitle, lowerCaseTitle);
+        if currentValue < bestValue then
+        begin
+            bestValue := currentValue;
+            bestIndex := i;
+        end;
+    end;
+
+    if length(fTitle) > 5 then
+        allowedError := 1
+    else
+        allowedError := 0;
+
+    if (bestValue <= allowedError) and (bestIndex >= 0) then
+    begin
+        result := TTitle(fTitleList[bestIndex]);
+    end else
+        result := Nil;
 end;
 
-
-function TLyrics.GetLyricsDirect: String;
-begin
-
-end;
 
 {
     --------------------------------------------------------
@@ -311,7 +393,9 @@ begin
             lStart := lStart + length('</div>');
         // search for the "end marker"
         if lStart > 0 then
-            lEnd := PosEx('<!--', code, lStart);
+            lEnd := PosEx('<!--', code, lStart)
+        else
+            lEnd := 0;
 
         if (lStart > 0) and (lEnd > 0) then
         begin
