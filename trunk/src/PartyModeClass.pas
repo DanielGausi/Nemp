@@ -53,6 +53,9 @@ type
       private
           fActive: Boolean;
           fResizeProc: TChangeProc;
+          fLastTopHeight: Integer;
+          flastHeight: Integer;
+          fLastWidth: Integer;
 
           // settings
           fResizeFactor: Single;  // resize-factor
@@ -123,7 +126,7 @@ type
 
 implementation
 
-uses NempMainUnit, MainFormHelper, spectrum_vis;
+uses NempMainUnit, MainFormHelper, spectrum_vis, TreeHelper;
 
 
 { TNempPartyMode }
@@ -383,8 +386,8 @@ begin
 
         // Additional Controls
         i := 0;
-        Setlength(fAdditionalControls, 14);
-        SetLength(fAdditionalPositionsArray, 14);
+        Setlength(fAdditionalControls, 15);
+        SetLength(fAdditionalPositionsArray, 15);
 
         SetAdditionalOriginalPosition(AuswahlHeaderPanel, i);
         SetAdditionalOriginalPosition(AuswahlFillPanel, i);
@@ -403,6 +406,8 @@ begin
         SetAdditionalOriginalPosition(EDITFastSearch               , i);
         SetAdditionalOriginalPosition(CB_MedienBibGlobalQuickSearch, i);
 
+        SetAdditionalOriginalPosition(Lbl_CoverFlow, i);
+
 
         //SetAdditionalOriginalPosition(, i);
 
@@ -420,6 +425,10 @@ begin
     begin
         ChangeProc := Bigger;
         fResizeProc := Bigger;
+        fLastTopHeight := Nemp_MainForm.TopMainPanel.Height;
+        fLastHeight    := Nemp_MainForm.Height;
+        fLastWidth     := Nemp_MainForm.Width;
+
         d := true;
     end
     else
@@ -499,7 +508,46 @@ begin
         CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
         CB_MedienBibGlobalQuickSearch.Left := ChangeProc(fAdditionalPositionsArray[13].Left);
         CB_MedienBibGlobalQuickSearch.Top := ChangeProc(fAdditionalPositionsArray[13].Top);
+
+        Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[14].Height);
+        Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
+        Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
+
         CB_MedienBibGlobalQuickSearch.Font.Size := EDITFastSearch.Font.Size;
+
+
+        PlaylistVST.Font.Size := ChangeProc(NempOptions.DefaultFontSize);
+        ArtistsVST.Font.Size  := ChangeProc(NempOptions.ArtistAlbenFontSize);
+        AlbenVST.Font.Size    := ChangeProc(NempOptions.ArtistAlbenFontSize);
+        VST.Font.Size         := ChangeProc(NempOptions.DefaultFontSize);
+
+        ArtistsVST.DefaultNodeHeight  := ChangeProc(NempOptions.ArtistAlbenRowHeight);
+        AlbenVST.DefaultNodeHeight    := ChangeProc(NempOptions.ArtistAlbenRowHeight);
+        VST.DefaultNodeHeight         := ChangeProc(NempOptions.RowHeight);
+        PlaylistVST.DefaultNodeHeight := ChangeProc(NempOptions.RowHeight);
+
+
+
+        if MedienBib.NempSortArray[1] = siOrdner then
+            FillStringTreeWithSubNodes(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST)
+        else
+            FillStringTree(MedienBib.AlleArtists, Nemp_MainForm.ArtistsVST);
+
+        if MedienBib.NempSortArray[2] = siOrdner then
+            FillStringTreeWithSubNodes(Medienbib.Alben, Nemp_MainForm.AlbenVST)
+        else
+            FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
+
+        FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
+        NempPlaylist.FillPlaylistView;
+        NempPlaylist.ReInitPlaylist;
+
+
+//        PlaylistVST.Canvas.Font.Size := maxFont;
+//        PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
+
+
+
 
 
         for i := 0 to 9 do CorrectEQButton(i);
@@ -514,7 +562,10 @@ begin
 
         // Load correctly scaled graphics
         if Nemp_MainForm.NempSkin.isActive then
+        begin
+            Nemp_MainForm.NempSkin.Reload;
             Nemp_MainForm.NempSkin.ActivateSkin
+        end
         else
             // Star-Graphics must be reloaded!
             Nemp_MainForm.NempSkin.DeActivateSkin;
@@ -524,6 +575,7 @@ begin
         else
             Spectrum.SetScale(1);
 
+        Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
     end;
@@ -532,6 +584,23 @@ begin
     begin
         FDetails.Close;
         Nemp_MainForm.AutoShowDetailsTMP := False;
+    end;
+
+
+    Nemp_MainForm.TopMainPanel.Constraints.MinHeight := ChangeProc(TOP_MIN_HEIGHT);
+    Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
+    Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
+
+
+    if Not fActive then
+    begin
+        Nemp_MainForm.TopMainPanel.Height := fLastTopHeight;
+        Nemp_MainForm.Height := fLastHeight ;
+        Nemp_MainForm.Width  := fLastWidth  ;
+        if Nemp_MainForm.Left < 0 then
+            Nemp_MainForm.Left := 0;
+        if Nemp_MainForm.Top < 0 then
+            Nemp_MainForm.Top := 0;
     end;
 
     CorrectMenuStff;

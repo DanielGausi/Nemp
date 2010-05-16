@@ -1927,19 +1927,16 @@ end;
 procedure TFDetails.BtnLyricWikiManualClick(Sender: TObject);
 var LyricQuery: AnsiString;
 begin
-   {$Message Hint 'Hier UTF8-Konzept überdenken'}
-    LyricQuery := StringToURLStringAnd(UTF8Encode(
-                  StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll]) + '+' +
-                  StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll])));
 
-    //http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0
+//    LyricQuery := StringToURLStringAnd(UTF8Encode(
+//                  StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll]) + '+' +
+//                  StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll])));
 
-    LyricQuery :=
+//    LyricQuery :=
+//    Format('http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0', [LyricQuery]);
 
-    Format('http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0', [LyricQuery]);
-     // 'http://lyricwiki.org/Special:GoogleSearchResults?cx=partner-pub-7265006513689515%3Aenbi50a4igp&cof=FORID%3A9&ie=UTF-8&q='
-     // + LyricQuery
-     // + '&sa=Search';
+    LyricQuery := 'http://lyrics.wikia.com';
+
     ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
 end;
 

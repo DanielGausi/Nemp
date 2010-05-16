@@ -371,7 +371,8 @@ if active then
           localOffsetX := 0;
           localOffsetY := 0;
           sourceBmp := NempSkin.PlayerBitmap;
-          stretch := NempSkin.NempPartyMode.Active;
+          //stretch := NempSkin.NempPartyMode.Active;
+          stretch := False;
       end else
       begin
           localOffsetX := NempSkin.PlayerPageOffsetX;
@@ -411,7 +412,8 @@ if active then
         localOffsetY := 0;
         OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.PlayerBitmap;
-        stretch := NempSkin.NempPartyMode.Active;
+        // stretch := NempSkin.NempPartyMode.Active;
+        stretch := False;
     end else
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
@@ -441,8 +443,10 @@ if active then
     begin
         localOffsetX := 0;
         localOffsetY := 0;
+        OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.PlayerBitmap;
-        stretch := NempSkin.NempPartyMode.Active;
+        //stretch := NempSkin.NempPartyMode.Active;
+        stretch := False;
     end else
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
@@ -473,7 +477,8 @@ if active then
         localOffsetX := 0;
         localOffsetY := 0;
         sourceBmp := NempSkin.PlayerBitmap;
-        stretch := NempSkin.NempPartyMode.Active;
+        //stretch := NempSkin.NempPartyMode.Active;
+        stretch := False;
     end else
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;

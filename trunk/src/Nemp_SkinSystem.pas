@@ -248,6 +248,7 @@ type
         constructor create;
         destructor Destroy;  override;         //Complete:: Für die Optionen-Vorschau. Da z.B. nicht die SkinButtons ändern
         procedure LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
+        procedure Reload;
         procedure SaveToDir(DirName: UnicodeString);
         procedure copyFrom(aSkin: TNempskin);
 
@@ -417,6 +418,11 @@ begin
   NempPartyMode.Free;
 
   inherited destroy;
+end;
+
+procedure TNempSkin.Reload;
+begin
+    LoadFromDir(path);
 end;
 
 procedure TNempSkin.LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
@@ -630,7 +636,7 @@ begin
 
   if UseSeparatePlayerBitmap then
   begin
-      if not LoadGraphicFromBaseName(PlayerBitmap, DirName + '\player', False) then
+      if not LoadGraphicFromBaseName(PlayerBitmap, DirName + '\player', True) then
       begin
           PlayerBitmap.Width := 10;
           PlayerBitmap.Height := 10;
@@ -647,11 +653,7 @@ begin
           ExtendedPlayerBitmap.Canvas.FillRect(ExtendedPlayerBitmap.Canvas.ClipRect);
       end;
 
-
-
   end;
-
-
 
 
   if Not Complete then exit;
@@ -1473,6 +1475,11 @@ begin
   SetVSTOffsets;
   SetPlaylistOffsets;
 
+  if NempPartyMode.Active then
+      Spectrum.SetScale(NempPartyMode.ResizeFactor)
+  else
+      Spectrum.SetScale(1);
+
   // Spectrum-Hintergrund setzen
   UpdateSpectrumGraphics;
   Nemp_MainForm.RepaintVisOnPause;
@@ -1924,7 +1931,7 @@ begin
       localOffsetX := 0;
       localOffsetY := 0;
       sourceBmp := PlayerBitmap;
-      stretch := NempPartyMode.Active;
+      //stretch := NempPartyMode.Active;
       OffsetPoint := pnlPoint;
   end
   else
@@ -1938,7 +1945,8 @@ begin
           sourceBmp := ExtendedPlayerBitmap;
           //OffsetPoint.X := OffsetPoint.X - Nemp_MainForm.AudioPanel.Left;  // AudioPanel.Top/Left is 2 on the ContainerPanel
           //OffsetPoint.Y := OffsetPoint.Y - Nemp_MainForm.AudioPanel.Top;
-          stretch := NempPartyMode.Active;
+          //stretch := NempPartyMode.Active;
+          stretch := False;
       end
       else
       begin
@@ -2024,6 +2032,8 @@ begin
       else
       begin
           // No valid file found. Fall back to default graphics
+
+
           ScaleCorrectionNeeded := True;
           NewName := aFilename;
           ext := GetExistingExtension;
@@ -2060,9 +2070,12 @@ begin
               result := True;
               try
                   tmpPic.LoadFromFile(NewName);
+
                   aBmp.Width := Round(NempPartyMode.ResizeFactor * tmpPic.Width);
                   aBmp.Height := Round(NempPartyMode.ResizeFactor * tmpPic.Height);
                   aBmp.Canvas.StretchDraw(Rect(0,0, aBmp.Width, aBmp.Height), tmpPic.Graphic);
+                  //                    aBmp.Assign(tmpPic.Graphic);
+
               except
                   result := False;
               end;
