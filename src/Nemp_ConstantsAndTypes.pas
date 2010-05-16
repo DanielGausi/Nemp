@@ -262,7 +262,7 @@ const
     // Höhe der Cover/EQ/Lyrics/Effekte-Box
     //EXTENDED_HEIGHT = 218;
     // Minimale Höhe des oberen teils:
-    TOP_MIN_HEIGHT = 311;//426;
+    TOP_MIN_HEIGHT = 323;//311///426;
 
     MAX_DRAGFILECOUNT = 500;
 
@@ -873,7 +873,7 @@ begin
         if (CoverWidth < 0) or (CoverWidth > 600) then CoverWidth := 450;
 
         ArtistAlbenFontSize  := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
-        ArtistAlbenRowHeight := ini.ReadInteger('Font','ArtistAlbenRowHeight',12);
+        ArtistAlbenRowHeight := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
         RowHeight   := Ini.ReadInteger('Font', 'RowHeight', 16 );
         DefaultFontSize := ini.ReadInteger('Font','DefaultFontSize',8);
         ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',True);

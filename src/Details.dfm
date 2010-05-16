@@ -1117,7 +1117,7 @@ object FDetails: TFDetails
           Top = 40
           Width = 89
           Height = 21
-          Caption = 'LyricWiki.org'
+          Caption = 'lyrics.wikia.com'
           TabOrder = 1
           OnClick = BtnLyricWikiClick
         end
@@ -1608,8 +1608,7 @@ object FDetails: TFDetails
     Left = 340
   end
   object PM_URLCopy: TPopupMenu
-    Left = 436
-    Top = 48
+    Left = 260
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick

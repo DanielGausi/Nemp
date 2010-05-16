@@ -688,7 +688,7 @@ type
     PM_ML_BrowseByYearArtist: TMenuItem;
     MM_ML_BrowseByAlbumArtists: TMenuItem;
     MM_ML_BrowseByYearArtist: TMenuItem;
-    Panel1: TNempPanel;
+    Pnl_CoverFlowLabel: TNempPanel;
     Lbl_CoverFlow: TLabel;
     PM_P_PartyMode: TMenuItem;
     TabBtn_TagCloud: TSkinButton;
@@ -3222,6 +3222,15 @@ begin
 
   NempSkin.LoadFromDir(tmpstr);
   NempSkin.ActivateSkin;
+
+  if NempSkin.NempPartyMode.Active then
+  begin
+      // I have no idea, why I need to reactivate PartyMode to
+      // get proper results with the player-image... :(
+      NempSkin.NempPartyMode.Active := false;
+      NempSkin.NempPartyMode.Active := true;
+  end;
+
   RePaintPanels;
   RepaintOtherForms;
 
@@ -4634,10 +4643,13 @@ begin
     AudioFile := Data^.FAudioFile;
     With TargetCanvas Do
     begin
-        if NempOptions.ChangeFontSizeOnLength AND (NOT AudioFile.isStream) AND (Sender.GetNodeLevel(Node)=0)  then
-          font.Size := LengthToSize(AudioFile.Duration,NempOptions.DefaultFontSize)
-        else
-          font.Size := NempOptions.DefaultFontSize;
+        if Not NempSkin.NempPartyMode.Active then
+        begin
+            if NempOptions.ChangeFontSizeOnLength AND (NOT AudioFile.isStream) AND (Sender.GetNodeLevel(Node)=0)  then
+                font.Size := LengthToSize(AudioFile.Duration,NempOptions.DefaultFontSize)
+            else
+                font.Size := NempOptions.DefaultFontSize;
+        end;
 
         if AllowColorChange AND
               ( (NempOptions.ChangeFontColorOnBitrate AND (Not (vsSelected in Node.States)))

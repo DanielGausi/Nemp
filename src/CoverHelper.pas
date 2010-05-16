@@ -812,7 +812,7 @@ begin
   if aCover.ID = '' then
   begin
       aCover.Artist := 'Various artists';
-      aCover.Album := 'Albums without cover';
+      aCover.Album := 'Unkown';
       aCover.Year := 0;
       aCover.Genre := 'Other';
       aCover.Directory := ' ';
