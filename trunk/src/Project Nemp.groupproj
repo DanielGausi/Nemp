@@ -1,0 +1,60 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{3739B8DB-3697-4F3C-9B82-835891825244}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="nemp.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Deskband\Deskband_TestProject.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="Deskband\NempDeskband.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="nemp">
+			<MSBuild Projects="nemp.dproj"/>
+		</Target>
+		<Target Name="nemp:Clean">
+			<MSBuild Targets="Clean" Projects="nemp.dproj"/>
+		</Target>
+		<Target Name="nemp:Make">
+			<MSBuild Targets="Make" Projects="nemp.dproj"/>
+		</Target>
+		<Target Name="Deskband_TestProject">
+			<MSBuild Projects="Deskband\Deskband_TestProject.dproj"/>
+		</Target>
+		<Target Name="Deskband_TestProject:Clean">
+			<MSBuild Targets="Clean" Projects="Deskband\Deskband_TestProject.dproj"/>
+		</Target>
+		<Target Name="Deskband_TestProject:Make">
+			<MSBuild Targets="Make" Projects="Deskband\Deskband_TestProject.dproj"/>
+		</Target>
+		<Target Name="NempDeskband">
+			<MSBuild Projects="Deskband\NempDeskband.dproj"/>
+		</Target>
+		<Target Name="NempDeskband:Clean">
+			<MSBuild Targets="Clean" Projects="Deskband\NempDeskband.dproj"/>
+		</Target>
+		<Target Name="NempDeskband:Make">
+			<MSBuild Targets="Make" Projects="Deskband\NempDeskband.dproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="nemp;Deskband_TestProject;NempDeskband"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="nemp:Clean;Deskband_TestProject:Clean;NempDeskband:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="nemp:Make;Deskband_TestProject:Make;NempDeskband:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>
