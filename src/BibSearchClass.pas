@@ -138,6 +138,7 @@ type
         QuickSearchResults: TObjectList;
         QuickSearchAdditionalResults: TObjectList;
 
+        fIPCSearchIsRunning: Boolean;
 
         // Some Flags for the search
         // are used in VCL and secondary thread
@@ -201,6 +202,9 @@ type
         // Main list. This is just a pointer to TMedienBibliothek.Mp3ListePfadSort
         MainList: TObjectList;
 
+        // The IPC-Search results for the Deskband. VCL only!!
+        IPCSearchResults: TObjectList;
+
         QuickSearchOptions: TQuickSearchOptions;
         SearchOptions: TSearchOptions;
 
@@ -216,6 +220,8 @@ type
         property AccelerateLyricSearch: LongBool read GetAccelerateLyricSearch write SetAccelerateLyricSearch;
 
         property DummyAudioFile: TAudioFile read fDummyAudioFile;
+
+        property IPCSearchIsRunning: Boolean read fIPCSearchIsRunning;
 
         constructor Create(aWnd: DWord);
         destructor Destroy; override;
@@ -257,6 +263,8 @@ type
 
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
         procedure CompleteSearch(Keywords: TSearchKeyWords);
+        // Search for IPC (as used in the Deskband)
+        procedure IPCQuickSearch(Keyword: UnicodeString);
     end;
 
 // Helpers for Quicksearch.
@@ -330,6 +338,7 @@ begin
     QuickSearchList := TObjectList.Create(False);
     QuickSearchResults := TObjectList.Create(False);
     QuickSearchAdditionalResults := TObjectList.Create(False);
+    IPCSearchResults := TObjectList.Create(False);
     for i := 1 to 10 do
         SearchResultLists[i] := TObjectlist.Create(False);
     fDummyAudioFile := TAudioFile.Create;
@@ -338,6 +347,7 @@ end;
 destructor TBibSearcher.Destroy;
 var i: Integer;
 begin
+    IPCSearchResults.Free;
     QuickSearchList.Free;
     QuickSearchResults.Free;
     QuickSearchAdditionalResults.Free;
@@ -865,6 +875,8 @@ begin
     // Show empty CurrentList in MainForm
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
 end;
+
+
 procedure TBibSearcher.InitBetterSearch(Keywords: TSearchKeyWords);
 var i,l:integer;
     tmpList: TObjectList;
@@ -1028,10 +1040,6 @@ begin
                 // Check every single object
                 for i := 0 to MainList.Count - 1 do
                 begin
-
-
-                ///    if (QuickSearchOptions.GlobalQuickSearch) or (TAudioFile(MainList[i]).ViewCounter = fViewCounter) then
-                ///    begin
                     if TAudioFile(MainList[NewIdx]).ViewCounter = fViewCounter then
                     begin
                         // Add File to first List
@@ -1049,8 +1057,6 @@ begin
                             if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
                                 tmpList2.Add(TAudioFile(MainList[i]));
                     end;
-               ///     end;
-
                 end;
             end;
             // Exact matchings first, matchings with errors afterwards.
@@ -1125,6 +1131,120 @@ begin
   Keywords.Free;
 end;
 
+
+
+{
+    --------------------------------------------------------
+    IPCQuickSearch
+    performs a quick search on the library
+    similar to GlobalQuickSearch, but less options
+    * always errors allowed
+    * no "current view"
+    --------------------------------------------------------
+}
+procedure TBibSearcher.IPCQuickSearch(Keyword: UnicodeString);
+var i, lmax: integer;
+    Keywords: TStringList;
+    KeywordsUTF8: TUTF8StringList;
+    UTF8Keyword: UTF8String;
+    OnlyOneWord: Boolean;
+    // for Horspool/dynamic programming
+    k: Integer;
+    BC, A: TBC_IntArray;
+    // search borders for binary search
+    // note: Not really used here. It could increase the searchspeed
+    //       as the search-interval could theoretically be reduced piece by piece,
+    //       but this here ist fast enough already :D
+    searchL, searchR: Integer;
+    // Index of the next audiofile for detailed testing
+    NewIdx: Integer;
+    // tmpList stores the Not exact matching files, for a sorted result
+    // (exact matchings first)
+    tmpList: TObjectlist;
+begin
+  fIPCSearchIsRunning := True;
+
+  Keywords := GenerateKeywordList(keyword);
+  OnlyOneWord := Keywords.Count = 1;
+  searchL := 0;
+  searchR := length(TotalStringIndizes) - 1;
+
+  SetLength(KeywordsUTF8, Keywords.Count);
+  for i := 0 to Keywords.Count - 1 do
+      KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
+
+  // Get the longest keyword
+  // Note: Boyer-Moore-Horspool is (much) faster on (much) longer search-patterns.
+  //       Dynamic-programming is slower on longer searchpatterns, but shorter
+  //       ones will cause many false positives
+  UTF8Keyword := GetLongestUTF8String(Keywords);
+  lmax := length(UTF8Keyword);
+
+  IPCSearchResults.clear;
+
+  if lmax > 0 then
+  begin
+            tmpList  := TObjectlist.Create(False);
+            if AccelerateSearch then
+            begin
+                k := 0;
+                // Preprocessing for dynamic programming
+                A := PreProcess_FilterCount(UTF8Keyword);
+
+                while k + lmax < Length(TotalString) do
+                begin
+                    k := SearchFilterCountDP(TotalString, UTF8Keyword, (lmax Div 4), k, A);
+                    if k = 0 then break;
+
+                    NewIdx := BinIntSearch(TotalStringIndizes, k, searchL, searchR);
+                    // Probably binary search will NOT find k in the indizes-array
+                    // it will return randomly the next smaller or bigger index.
+                    // we need always the smaller one.
+                    if TotalStringIndizes[NewIdx] > k then
+                        if NewIdx > 0 then dec(NewIdx);
+
+                    // Check whether audiofile really matches the keywords
+                    if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
+                        IPCSearchResults.Add(TAudioFile(MainList[NewIdx]))
+                    else
+                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
+                            tmpList.Add(TAudioFile(MainList[NewIdx]));
+
+                    // continue with next audiofile
+                    if NewIdx < length(TotalStringIndizes) - 1 then
+                        k := TotalStringIndizes[NewIdx + 1]
+                    else
+                        k := length(TotalString) + 1;
+                end;
+            end else
+            begin
+                // No acceleration. :(
+                // Check every single object
+                for i := 0 to MainList.Count - 1 do
+                begin
+                    if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
+                        IPCSearchResults.Add(TAudioFile(MainList[i]))
+                    else
+                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
+                            tmpList.Add(TAudioFile(MainList[i]));
+                end;
+            end;
+            // Exact matchings first, matchings with errors afterwards.
+            for i := 0 to tmpList.Count - 1 do
+                IPCSearchResults.Add(tmpList[i]);
+
+            tmpList.Free;
+  end;
+
+  // Copy SearchResults to VCL-Lists
+  //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetQuickSearchResults, lParam(QuickSearchResults));
+  //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetAdditionalQuickSearchResults, lParam(QuickSearchAdditionalResults));
+  // Show search results.
+  //SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(fDummyAudioFile));
+
+  Keywords.Free;
+  fIPCSearchIsRunning := False;
+end;
 
 
 {

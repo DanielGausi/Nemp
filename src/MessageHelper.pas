@@ -113,7 +113,11 @@ begin
 
         // Playlist-Länge
         IPC_GETLISTLENGTH : if AcceptApiCommands then if assigned(NempPlaylist) then aMsg.Result := NempPlaylist.Count else aMsg.Result := -1;
-        IPC_GETSEARCHLISTLENGTH  : if AcceptApiCommands then if assigned(MedienBib.AnzeigeListe) then aMsg.Result := MedienBib.AnzeigeListe.Count else aMsg.Result := -1;
+        IPC_GETSEARCHLISTLENGTH  : if AcceptApiCommands then
+                                    if assigned(MedienBib.BibSearcher) and assigned(MedienBib.BibSearcher.IPCSearchResults) then
+                                        aMsg.Result := MedienBib.BibSearcher.IPCSearchResults.Count
+                                    else
+                                        aMsg.Result := -1;
 
         // Zeiten des aktuellen Titels
         // Position in MilliSec, Dauer in Sec - das ist in Winamp dummerweise auch so - und die Api soll kompatibel dazu sein
@@ -246,7 +250,7 @@ begin
                                 IPC_GETPLAYLISTALBUM,
                                 IPC_GETPLAYLISTTITLEONLY : aList := NempPLaylist.Playlist
                             else
-                              aList := MedienBib.AnzeigeListe;
+                              aList := MedienBib.BibSearcher.IPCSearchResults;
                             end;
 
                             If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam > -1) then
@@ -322,7 +326,7 @@ begin
                                 IPC_GETPLAYLISTALBUM_W,
                                 IPC_GETPLAYLISTTITLEONLY_W : aList := NempPLaylist.Playlist
                             else
-                              aList := MedienBib.AnzeigeListe;
+                              aList := MedienBib.BibSearcher.IPCSearchResults
                             end;
 
                             If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam > -1) then
@@ -419,12 +423,10 @@ begin
         // Repeat ist bei Nemp immer an!                     //                       // in 3.1 nicht mehr !!!
         IPC_GET_REPEAT: if AcceptApiCommands then aMsg.Result := 1;                    //
 
-        IPC_QUERY_SEARCHSTATUS:  if AcceptApiCommands then begin
-                                        aMsg.Result := 1
-                                 end
-                                 else aMsg.Result := 0;
-
-
+        IPC_QUERY_SEARCHSTATUS:  if MedienBib.BibSearcher.IPCSearchIsRunning then
+                                    aMsg.Result := 0
+                                 else
+                                    aMsg.Result := 1;
         else
             result := False;
     end;

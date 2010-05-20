@@ -928,7 +928,7 @@ begin
 
     EnterCriticalSection(CS_AccessLibrary);
 
-    Keywords := ExplodeWithQuoteMarks(' ', Keyword);
+    Keywords := ExplodeWithQuoteMarks('+', Keyword);
 
     SetLength(KeywordsUTF8, Keywords.Count);
     for i := 0 to Keywords.Count - 1 do
