@@ -80,7 +80,6 @@ type
         fHND_UpdateID3TagsThread: DWord;
         fHND_BugFixID3TagsThread: DWord;
 
-
         // General note:
         //     all lists beginning with "tmp" are temporary lists, which stores the library
         //     during a update-process, so that the Application is blocked only for a very
@@ -519,6 +518,8 @@ type
         // Searching for keywords
         // a. Quicksearch
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
+        procedure IPCSearch(Keyword: UnicodeString);
+
         // b. detailed search
         procedure CompleteSearch(Keywords: TSearchKeyWords);
         // c. get all files from the library in the same directory
@@ -3653,6 +3654,14 @@ begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
     BibSearcher.CompleteSearch(KeyWords);
+    LeaveCriticalSection(CSUpdate);
+end;
+
+procedure TMedienBibliothek.IPCSearch(Keyword: UnicodeString);
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.IPCQuickSearch(Keyword);
     LeaveCriticalSection(CSUpdate);
 end;
 

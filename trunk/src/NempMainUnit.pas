@@ -1056,6 +1056,8 @@ type
     procedure PM_P_ViewStayOnTopClick(Sender: TObject);
     procedure EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
     procedure DoFastSearch(aString: UnicodeString; AllowErr: Boolean = False);
+    procedure DoFastIPCSearch(aString: UnicodeString);
+
     procedure FormPaint(Sender: TObject);
     procedure PlaylistVSTGetHint(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex;
@@ -2994,7 +2996,7 @@ end;
 
 
 procedure TNemp_MainForm.WMCopyData(var Msg: TWMCopyData);
-var IncomingPChar:PChar;
+var IncomingPAnsiChar:PAnsiChar;
     IncomingPWideChar: PWideChar;
     mode: Integer;
 begin
@@ -3008,9 +3010,9 @@ begin
   else
     case MsG.CopyDataStruct.dwData of
         IPC_SEND_SEARCHSTRING: if ReadyForGetFileApiCommands then begin
-                  IncomingPChar := PChar(Msg.CopyDataStruct.lpData);
+                  IncomingPAnsiChar := PAnsiChar(Msg.CopyDataStruct.lpData);
                   Msg.Result := 1;
-                  DoFastSearch(trim(UnicodeString(IncomingPChar)));
+                  DoFastIPCSearch(trim(UnicodeString(AnsiString(IncomingPAnsiChar))));
         end;
 
         IPC_SEND_FILEFORPLAYLIST..IPC_SEND_FILEFORPLAYLIST+4:
@@ -3019,16 +3021,16 @@ begin
                     Mode := MsG.CopyDataStruct.dwData - IPC_SEND_FILEFORPLAYLIST_W;
                     if (Mode >= PLAYER_PLAY_DEFAULT) then
                       Mode := NempPlaylist.DefaultAction;
-                    IncomingPChar := PChar(Msg.CopyDataStruct.lpData);
+                    IncomingPAnsiChar := PAnsiChar(Msg.CopyDataStruct.lpData);
                     Msg.Result := 1;
-                    HandleRemoteFilename(UnicodeString(IncomingPChar), Mode);
+                    HandleRemoteFilename(UnicodeString(AnsiString(IncomingPAnsiChar)), Mode);
             end;
 
         // WideString-variante
         IPC_SEND_SEARCHSTRING_W: if ReadyForGetFileApiCommands then begin
                   IncomingPWideChar := PWideChar(Msg.CopyDataStruct.lpData);
+                  DoFastIPCSearch(trim(UnicodeString(IncomingPWideChar)));
                   Msg.Result := 1;
-                  DoFastSearch(trim(UnicodeString(IncomingPWideChar)));
         end;
 
         IPC_SEND_FILEFORPLAYLIST_W..IPC_SEND_FILEFORPLAYLIST_W+4:
@@ -9120,6 +9122,12 @@ begin
   RepairZOrder;
 end;
 
+procedure TNemp_MainForm.DoFastIPCSearch(aString: UnicodeString);
+begin
+    if Medienbib.StatusBibUpdate >= 2 then exit;
+    MedienBib.IPCSearch(aString);
+end;
+
 procedure TNemp_MainForm.DoFastSearch(aString: UnicodeString; AllowErr: Boolean = False);
 begin
     if Medienbib.StatusBibUpdate >= 2 then exit;
@@ -9129,37 +9137,12 @@ end;
 procedure TNemp_MainForm.CB_MedienBibGlobalQuickSearchClick(
   Sender: TObject);
 begin
-///  MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch := CB_MedienBibGlobalQuickSearch.Checked;
-
-
     EditFastSearch.Font.Color := clGrayText;
     EditFastSearch.Font.Style := [];
     EditFastSearch.OnChange := Nil;
     EditFastSearch.Text := MainForm_GlobalQuickSearch;
     EditFastSearch.OnChange := EDITFastSearchChange;
-
     MedienBib.ShowQuickSearchList;
-{
-  if EditFastSearch.Font.Color = clGrayText then
-  begin
-      EditFastSearch.OnChange := Nil;
-      EditFastSearch.Text := MainForm_GlobalQuickSearch;
-      EditFastSearch.OnChange := EDITFastSearchChange;
-  end else
-  begin
-      if Trim(EDITFastSearch.Text)= '' then
-      begin
-          // Je nach letzte Quicksearch oder alles anzeigen
-          //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-          //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-          //else
-          MedienBib.ShowQuickSearchList;
-      end
-      else
-          DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
-  end;
-
-  }
 end;
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
@@ -9169,13 +9152,7 @@ begin
           begin
             key := #0;
             if Trim(EDITFastSearch.Text)= '' then
-            begin
-                // Je nach letzte Quicksearch oder alles anzeigen
-                //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-                //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-                //else
-                    MedienBib.ShowQuickSearchList;
-            end
+                MedienBib.ShowQuickSearchList
             else
                 DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
           end;
@@ -9193,24 +9170,16 @@ begin
   If MedienBib.BibSearcher.QuickSearchOptions.WhileYouType then
   begin
       if Trim(EDITFastSearch.Text)= '' then
-      begin
-          // Je nach letzte Quicksearch oder alles anzeigen
-          //if MedienBib.BibSearcher.QuickSearchOptions.GlobalQuickSearch then
-          //    MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL, False) // False: Kein Update der Quicksearchlist
-          //else
-              MedienBib.ShowQuickSearchList;
-      end else
+          MedienBib.ShowQuickSearchList
+      else
           if Length(Trim(EDITFastSearch.Text)) >= 2 then
               DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType)
           else
           begin
-              //MedienBib.AnzeigeListe.Clear;
-              //MedienBib.AnzeigeListe2.Clear;
               MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
               FillTreeViewQueryTooShort(MedienBib.BibSearcher.DummyAudioFile);
           end;
   end;
-  // Sonst nichts machen.
 end;
 
 
