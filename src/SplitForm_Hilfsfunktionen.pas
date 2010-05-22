@@ -1159,8 +1159,6 @@ begin
       if AnzeigeMode = 0 then
       begin
           TopMainPanel.Constraints.MaxHeight := Height - 160;
-          //xx//Splitter2.Tag := AuswahlPanel.Width;
-          //xx//Splitter3.Tag := ArtistsVST.Width;
 
           NempRegionsDistance.Top := 0;
           NempRegionsDistance.Bottom := height;

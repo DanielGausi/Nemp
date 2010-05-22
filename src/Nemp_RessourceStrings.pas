@@ -266,6 +266,8 @@ AutoSacnDir_SubDirExisted = 'A subdirectory of the selected directory was remove
 
 WinX64WarningHook = 'You are using a 64Bit-Version of Windows. It is NOT recommended to use a special handling of multimedia keys. Continue anyway?';
 WinX64WarningDeskband = 'You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible.';
+WinVistaWarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later.';
+Win7WarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later. Use the buttons in the Windows Taskbar-preview instead.';
 
     EQSetting_Custom = '(Custom)';
     Infostring_Webstream = 'Webstream';

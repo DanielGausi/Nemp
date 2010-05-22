@@ -2813,12 +2813,28 @@ begin
             MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
         else
         begin
-            if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
-                ShellExecute(Handle, 'open' ,'regsvr32.exe',
-                                PChar('"' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
-                                 '', sw_ShowNormal)
-            else
-              MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+            if WinVersionInfo.MajorVersion >= 6 then
+            begin
+                if (WinVersionInfo.MajorVersion = 6) and (WinVersionInfo.MinorVersion = 0) then
+                    // Vista
+                    MessageDLG((WinVistaWarningDeskband), mtWarning, [MBOK], 0)
+                else
+                    if (WinVersionInfo.MajorVersion = 6) and (WinVersionInfo.MinorVersion = 1) then
+                        // Windows 7
+                        MessageDLG((Win7WarningDeskband), mtWarning, [MBOK], 0)
+                    else
+                        // unknown Windows
+                        MessageDLG((WinVistaWarningDeskband), mtWarning, [MBOK], 0)
+            end else
+            begin
+                // Windows XP/2000/...
+                if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
+                    ShellExecute(Handle, 'open' ,'regsvr32.exe',
+                                    PChar('"' + ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll"'),
+                                     '', sw_ShowNormal)
+                else
+                  MessageDlg(_('NempDeskband.dll not found.'), mtError, [mbOK], 0);
+            end;
         end;
     finally
         WinVersionInfo.Free;
@@ -2830,9 +2846,10 @@ var WinVersionInfo: TWindowsVersionInfo;
 begin
     WinVersionInfo := TWindowsVersionInfo.Create;
     try
-        if WinVersionInfo.ProcessorArchitecture = pax64 then
-            MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
-        else
+        //if WinVersionInfo.ProcessorArchitecture = pax64 then
+        //    MessageDLG((WinX64WarningDeskband), mtWarning, [MBOK], 0)
+        //else
+        // uninstalling should be allowed. ;-)
         begin
             if FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll') then
                 ShellExecute(Handle, 'open' ,'regsvr32.exe',

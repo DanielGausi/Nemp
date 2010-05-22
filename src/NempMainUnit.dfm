@@ -86,6 +86,7 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvLowered
         DragMode = dmAutomatic
         TabOrder = 0
+        OnResize = GRPBOXArtistsAlbenResize
         OnPaint = NewPanelPaint
         OwnerDraw = False
         DesignSize = (
@@ -2235,7 +2236,7 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 4
           Height = 457
           OnCanResize = Splitter4CanResize
-          OnMoved = Splitter1Moved
+          OnMoved = Splitter4Moved
           ExplicitLeft = 250
           ExplicitHeight = 175
         end
@@ -2392,6 +2393,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitLeft = -2
+          ExplicitTop = -1
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -2402,232 +2405,234 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             OnClick = VDTCoverClick
           end
-          object LblBibArtist: TLabel
-            Left = 158
-            Top = 2
-            Width = 65
-            Height = 13
-            Caption = 'LblBibArtist'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibTitle: TLabel
-            Tag = 1
-            Left = 158
-            Top = 19
-            Width = 9
-            Height = 13
-            Caption = '...'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibAlbum: TLabel
-            Tag = 2
-            Left = 158
-            Top = 36
-            Width = 56
-            Height = 13
-            Caption = 'LblBibAlbum'
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibYear: TLabel
-            Tag = 4
-            Left = 158
-            Top = 70
-            Width = 49
-            Height = 13
-            Caption = 'LblBibYear'
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibTrack: TLabel
+          object VDTCoverInfoPanel: TNempPanel
             Tag = 3
             Left = 158
-            Top = 53
-            Width = 53
-            Height = 13
-            Caption = 'LblBibTrack'
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibGenre: TLabel
-            Tag = 5
-            Left = 158
-            Top = 87
-            Width = 56
-            Height = 13
-            Caption = 'LblBibGenre'
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibDuration: TLabel
-            Left = 158
-            Top = 104
-            Width = 68
-            Height = 13
-            Caption = 'LblBibDuration'
-            ShowAccelChar = False
-          end
-          object LblBibQuality: TLabel
-            Left = 158
-            Top = 121
-            Width = 61
-            Height = 13
-            Caption = 'LblBibQuality'
-            ShowAccelChar = False
-          end
-          object ImgBibRating: TImage
-            Left = 158
-            Top = 140
-            Width = 70
-            Height = 14
-            Visible = False
-            OnMouseDown = ImgBibRatingMouseDown
-            OnMouseLeave = ImgBibRatingMouseLeave
-            OnMouseMove = ImgBibRatingMouseMove
-          end
-          object LblBibTags: TLabel
-            Left = 157
-            Top = 179
-            Width = 50
-            Height = 59
-            AutoSize = False
-            Caption = 'LblBibTags'
-            ShowAccelChar = False
-            WordWrap = True
-            OnClick = LblBibTagsClick
-          end
-          object LblBibPlayCounter: TLabel
-            Left = 157
-            Top = 160
-            Width = 86
-            Height = 13
-            Caption = 'LblBibPlayCounter'
-            ShowAccelChar = False
-          end
-          object EdtBibArtist: TEdit
-            Left = 244
             Top = 2
-            Width = 121
-            Height = 21
+            Width = 236
+            Height = 447
+            BevelOuter = bvNone
             TabOrder = 0
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibAlbum: TEdit
-            Tag = 2
-            Left = 244
-            Top = 53
-            Width = 121
-            Height = 21
-            TabOrder = 1
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibTitle: TEdit
-            Tag = 1
-            Left = 244
-            Top = 29
-            Width = 121
-            Height = 21
-            TabOrder = 2
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibYear: TEdit
-            Tag = 4
-            Left = 244
-            Top = 107
-            Width = 121
-            Height = 21
-            NumbersOnly = True
-            TabOrder = 3
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibTrack: TEdit
-            Tag = 3
-            Left = 244
-            Top = 80
-            Width = 121
-            Height = 21
-            NumbersOnly = True
-            TabOrder = 4
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibGenre: TComboBox
-            Tag = 5
-            Left = 244
-            Top = 134
-            Width = 150
-            Height = 21
-            ItemHeight = 0
-            Sorted = True
-            TabOrder = 5
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object Button1: TButton
-            Left = 3
-            Top = 2
-            Width = 75
-            Height = 25
-            Caption = 'Get Tags'
-            TabOrder = 6
-            Visible = False
-            OnClick = Button1Click
-          end
-          object MemBibTags: TMemo
-            Left = 242
-            Top = 161
-            Width = 134
-            Height = 89
-            ScrollBars = ssVertical
-            TabOrder = 7
-            Visible = False
-            WordWrap = False
-            OnExit = MemBibTagsExit
-            OnKeyPress = MemBibTagsKeyPress
-          end
-          object BtnApplyEditTags: TButton
-            Left = 327
-            Top = 229
-            Width = 29
-            Height = 19
-            Caption = 'Ok'
-            TabOrder = 8
-            Visible = False
-            OnClick = BtnApplyEditTagsClick
-          end
-          object BtnCancelEditTags: TButton
-            Left = 300
-            Top = 229
-            Width = 29
-            Height = 19
-            Caption = 'Esc'
-            TabOrder = 9
-            Visible = False
-            OnClick = BtnApplyEditTagsClick
+            OnResize = VDTCoverInfoPanelResize
+            OnPaint = PanelPaint
+            OwnerDraw = False
+            object ImgBibRating: TImage
+              Left = 8
+              Top = 140
+              Width = 70
+              Height = 14
+              Visible = False
+              OnMouseDown = ImgBibRatingMouseDown
+              OnMouseLeave = ImgBibRatingMouseLeave
+              OnMouseMove = ImgBibRatingMouseMove
+            end
+            object LblBibAlbum: TLabel
+              Tag = 2
+              Left = 8
+              Top = 36
+              Width = 56
+              Height = 13
+              Caption = 'LblBibAlbum'
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object LblBibArtist: TLabel
+              Left = 8
+              Top = 2
+              Width = 65
+              Height = 13
+              Caption = 'LblBibArtist'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ParentFont = False
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object LblBibDuration: TLabel
+              Left = 8
+              Top = 104
+              Width = 68
+              Height = 13
+              Caption = 'LblBibDuration'
+              ShowAccelChar = False
+            end
+            object LblBibGenre: TLabel
+              Tag = 5
+              Left = 8
+              Top = 87
+              Width = 56
+              Height = 13
+              Caption = 'LblBibGenre'
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object LblBibPlayCounter: TLabel
+              Left = 7
+              Top = 160
+              Width = 86
+              Height = 13
+              Caption = 'LblBibPlayCounter'
+              ShowAccelChar = False
+            end
+            object LblBibQuality: TLabel
+              Left = 8
+              Top = 121
+              Width = 61
+              Height = 13
+              Caption = 'LblBibQuality'
+              ShowAccelChar = False
+            end
+            object LblBibTags: TLabel
+              Left = 7
+              Top = 179
+              Width = 50
+              Height = 59
+              AutoSize = False
+              Caption = 'LblBibTags'
+              ShowAccelChar = False
+              WordWrap = True
+              OnClick = LblBibTagsClick
+            end
+            object LblBibTitle: TLabel
+              Tag = 1
+              Left = 8
+              Top = 19
+              Width = 9
+              Height = 13
+              Caption = '...'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ParentFont = False
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object LblBibTrack: TLabel
+              Tag = 3
+              Left = 8
+              Top = 53
+              Width = 53
+              Height = 13
+              Caption = 'LblBibTrack'
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object LblBibYear: TLabel
+              Tag = 4
+              Left = 8
+              Top = 70
+              Width = 49
+              Height = 13
+              Caption = 'LblBibYear'
+              ShowAccelChar = False
+              OnClick = LblBibArtistClick
+            end
+            object EdtBibAlbum: TEdit
+              Tag = 2
+              Left = 82
+              Top = 53
+              Width = 121
+              Height = 21
+              TabOrder = 2
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object EdtBibArtist: TEdit
+              Left = 82
+              Top = 2
+              Width = 121
+              Height = 21
+              TabOrder = 3
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object EdtBibGenre: TComboBox
+              Tag = 5
+              Left = 53
+              Top = 134
+              Width = 150
+              Height = 21
+              ItemHeight = 13
+              Sorted = True
+              TabOrder = 4
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object EdtBibTitle: TEdit
+              Tag = 1
+              Left = 82
+              Top = 29
+              Width = 121
+              Height = 21
+              TabOrder = 5
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object EdtBibTrack: TEdit
+              Tag = 3
+              Left = 82
+              Top = 80
+              Width = 121
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 6
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object EdtBibYear: TEdit
+              Tag = 4
+              Left = 82
+              Top = 107
+              Width = 121
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 7
+              Visible = False
+              OnExit = EdtBibArtistExit
+              OnKeyPress = EdtBibArtistKeyPress
+            end
+            object MemBibTags: TMemo
+              Left = 69
+              Top = 161
+              Width = 134
+              Height = 89
+              ScrollBars = ssVertical
+              TabOrder = 8
+              Visible = False
+              WordWrap = False
+              OnExit = MemBibTagsExit
+              OnKeyPress = MemBibTagsKeyPress
+            end
+            object BtnApplyEditTags: TButton
+              Left = 44
+              Top = 221
+              Width = 29
+              Height = 19
+              Caption = 'Ok'
+              TabOrder = 0
+              Visible = False
+              OnClick = BtnApplyEditTagsClick
+            end
+            object BtnCancelEditTags: TButton
+              Left = 79
+              Top = 222
+              Width = 29
+              Height = 19
+              Caption = 'Esc'
+              TabOrder = 1
+              Visible = False
+              OnClick = BtnApplyEditTagsClick
+            end
           end
         end
       end
@@ -3748,7 +3753,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300C0030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300C8030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4313,7 +4318,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011C00F8069C0410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011C00F806A40410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7095,15 +7100,15 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 150
     OnTimer = MemoDisableTimerTimer
-    Left = 264
-    Top = 760
+    Left = 360
+    Top = 824
   end
   object TaskBarImages: TImageList
     BkColor = clWhite
     Left = 536
     Top = 632
     Bitmap = {
-      494C0101070028002C0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800340110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
