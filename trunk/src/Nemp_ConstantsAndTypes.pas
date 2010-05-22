@@ -56,6 +56,15 @@ type
       sortAscending: boolean;
     end;
 
+    TNempMainFormRatios = record
+      VSTHeight: Integer;
+      BrowseWidth: Integer;
+
+      VSTWidth: Integer;
+      VDTCoverWidth: Integer;
+      ArtistWidth: Integer;
+    end;
+
     // Das speichert die Aufteilung der Form
     // Im Programm findet man dann ein Array dieses Typs,
     // für jeden Anzeigemodus eins.
@@ -141,6 +150,7 @@ type
         FullRowSelect: Boolean;
         TippSpeed: Integer;
         NempFormAufteilung: Array [0..1] of TNempFormAufteilung;
+        NempFormRatios: TNempMainFormRatios;
         NempEinzelFormOptions: TNempEinzelFormOptions; // Optionen für die Einzelformen
         NempWindowView: Word;
         StartMinimized: Boolean;
@@ -785,6 +795,15 @@ uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 var i: integer;
+
+      procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
+      begin
+          if x < minValue then
+              x := minValue;
+          if x > maxValue then
+              x := maxValue;
+      end;
+
 begin
   With Options do
   begin
@@ -795,7 +814,6 @@ begin
         IgnoreVolumeUpDownKeys := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
-
 
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
                   //ShutdownMode := Ini.ReadInteger('Allgemein', 'ShutDownMode', SHUTDOWNMODE_Shutdown);
@@ -820,6 +838,18 @@ begin
         NempFormAufteilung[1].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_1'  ,320);//303;
         NempFormAufteilung[1].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_1'   ,160);//73;
         NempFormAufteilung[1].Maximized := False;
+
+        NempFormRatios.VSTHeight     := Ini.ReadInteger('Fenster', 'VSTHeight'     , 50);
+        NempFormRatios.BrowseWidth   := Ini.ReadInteger('Fenster', 'BrowseWidth'   , 50);
+        NempFormRatios.VSTWidth      := Ini.ReadInteger('Fenster', 'VSTWidth'      , 30);
+        NempFormRatios.VDTCoverWidth := Ini.ReadInteger('Fenster', 'VDTCoverWidth' , 50);
+        NempFormRatios.ArtistWidth   := Ini.ReadInteger('Fenster', 'ArtistWidth'   , 50);
+
+        CheckValue(NempFormRatios.VSTHeight    , 10, 90);
+        CheckValue(NempFormRatios.BrowseWidth  , 10, 90);
+        CheckValue(NempFormRatios.VSTWidth     , 10, 90);
+        CheckValue(NempFormRatios.VDTCoverWidth, 10, 90);
+        CheckValue(NempFormRatios.ArtistWidth  , 10, 90);
 
         NempEinzelFormOptions.PlaylistVisible           := ini.ReadBool('EinzelFenster','PlaylistVisible'   , True);
         NempEinzelFormOptions.MedienlisteVisible        := ini.ReadBool('EinzelFenster','MedienlisteVisible', True);
@@ -932,13 +962,18 @@ begin
         ini.WriteInteger('Fenster', 'ArtisListenWeite_0'   , NempFormAufteilung[0].ArtistWidth       );
         ini.WriteBool('Fenster', 'maximiert_0', NempFormAufteilung[0].Maximized);
 
-         ini.WriteInteger('Fenster', 'Splitter1_1'          ,NempFormAufteilung[1].TopMainPanelHeight);//391;
-         ini.WriteInteger('Fenster', 'BrowseListenWeite_1'  ,NempFormAufteilung[1].AuswahlPanelWidth);//303;
-         ini.WriteInteger('Fenster', 'ArtisListenWeite_1'   ,NempFormAufteilung[1].ArtistWidth);//73;
-
+        ini.WriteInteger('Fenster', 'Splitter1_1'          ,NempFormAufteilung[1].TopMainPanelHeight);//391;
+        ini.WriteInteger('Fenster', 'BrowseListenWeite_1'  ,NempFormAufteilung[1].AuswahlPanelWidth);//303;
+        ini.WriteInteger('Fenster', 'ArtisListenWeite_1'   ,NempFormAufteilung[1].ArtistWidth);//73;
 
         ini.WriteInteger('Fenster', 'Top_1'                , NempFormAufteilung[1].FormTop           );
         ini.WriteInteger('Fenster', 'Left_1'               , NempFormAufteilung[1].FormLeft          );
+
+        Ini.WriteInteger('Fenster', 'VSTHeight'     , NempFormRatios.VSTHeight    );
+        Ini.WriteInteger('Fenster', 'BrowseWidth'   , NempFormRatios.BrowseWidth  );
+        Ini.WriteInteger('Fenster', 'VSTWidth'      , NempFormRatios.VSTWidth     );
+        Ini.WriteInteger('Fenster', 'VDTCoverWidth' , NempFormRatios.VDTCoverWidth);
+        Ini.WriteInteger('Fenster', 'ArtistWidth'   , NempFormRatios.ArtistWidth  );
 
         ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
         ini.WriteBool('EinzelFenster','MedienlisteVisible', NempEinzelFormOptions.MedienlisteVisible        );

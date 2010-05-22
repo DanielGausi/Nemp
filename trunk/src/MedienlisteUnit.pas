@@ -224,6 +224,7 @@ end;
 
 procedure TMedienlisteForm.FormResize(Sender: TObject);
 begin
+
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
