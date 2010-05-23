@@ -1977,7 +1977,11 @@ begin
   end;
 
   Nemp_MainForm.NempOptions.CoverMode := cbCoverMode.ItemIndex;
-  Nemp_MainForm.NempOptions.DetailMode := cbDetailMode.ItemIndex;
+
+  if Nemp_MainForm.NempOptions.DetailMode <> cbDetailMode.ItemIndex then
+  begin
+      Nemp_MainForm.NempOptions.DetailMode := cbDetailMode.ItemIndex;
+  end;
 
   Nemp_MainForm.ActualizeVDTCover;
 

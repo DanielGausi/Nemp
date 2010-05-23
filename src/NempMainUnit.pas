@@ -800,6 +800,10 @@ type
     LblBibTrack: TLabel;
     LblBibYear: TLabel;
     MemBibTags: TMemo;
+    CoverDetails_Popup: TPopupMenu;
+    PM_Cover_Aside: TMenuItem;
+    PM_Cover_Below: TMenuItem;
+    PM_Cover_DontShowDetails: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1326,6 +1330,8 @@ type
     procedure VDTCoverInfoPanelResize(Sender: TObject);
     procedure Splitter3Moved(Sender: TObject);
     procedure Splitter4Moved(Sender: TObject);
+    procedure ImgDetailSwitchClick(Sender: TObject);
+    procedure PM_Cover_DontShowDetailsClick(Sender: TObject);
 
   private
 
@@ -1741,6 +1747,7 @@ begin
         ReadNempOptions(ini, NempOptions);
         if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
           Uselanguage(NempOptions.Language);
+
         //Player-Einstellungen lesen
         NempPlayer.LoadFromIni(Ini);
         //Player initialisieren, Load Plugins.
@@ -2691,6 +2698,8 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
       ShowWindow( Application.Handle, SW_HIDE );
 end;
+
+
 
 procedure TNemp_MainForm.ProcessCommandline(lpData: Pointer; StartPlay: Boolean);
 var filename: String;
@@ -4789,6 +4798,12 @@ begin
            begin
               PM_P_ViewSeparateWindows_BrowseClick(NIL);
            end;
+    $52 {R}: if ssCtrl in shift then
+             begin
+                Nemp_MainForm.NempOptions.DetailMode := (Nemp_MainForm.NempOptions.DetailMode + 1) mod 3;
+                Nemp_MainForm.ActualizeVDTCover;
+             end;
+
     $54 {T}: if ssCtrl in shift then
            begin
               PM_P_ViewStayOnTopClick(NIL);
@@ -4957,6 +4972,7 @@ begin
 end;
 
 procedure TNemp_MainForm.VDTCoverClick(Sender: TObject);
+var Point: tPoint;
 begin
     // Disable Editing
     ShowLabelAgain(EdtBibArtist, GetCorrespondingLabel(EdtBibArtist));
@@ -4966,6 +4982,12 @@ begin
     ShowLabelAgain(EdtBibYear  , GetCorrespondingLabel(EdtBibYear  ));
     ShowLabelAgain(EdtBibGenre , GetCorrespondingLabel(EdtBibGenre ));
     MemoDisableTimer.Enabled := True;
+
+    if Sender = ImgDetailCover then
+    begin
+        GetCursorPos(Point);
+        CoverDetails_Popup.Popup(Point.X, Point.Y+10);
+    end;
 end;
 
 procedure TNemp_MainForm.VDTCoverInfoPanelResize(Sender: TObject);
@@ -4994,6 +5016,8 @@ begin
             dim := Round(NempOptions.NempFormRatios.VDTCoverWidth / 100 * VDTCover.Width);
             if dim > 250 then
                 dim := 250;
+            if dim > VDTCover.Height then
+                dim := VDTCover.Height;
 
             VDTCoverInfoPanel.Visible := True;
             ImgDetailCover.Width  := dim;
@@ -5100,6 +5124,16 @@ begin
   end
 end;
 
+procedure TNemp_MainForm.PM_Cover_DontShowDetailsClick(Sender: TObject);
+begin
+    Nemp_MainForm.NempOptions.DetailMode := (Sender as TMenuItem).Tag;
+    Nemp_MainForm.ActualizeVDTCover;
+end;
+
+procedure TNemp_MainForm.ImgDetailSwitchClick(Sender: TObject);
+begin
+
+end;
 
 // Show the corresponding TEdit and set the Caption
 procedure TNemp_MainForm.AdjustEditToLabel(aEdit: TControl; aLabel: TLabel);
@@ -8071,6 +8105,8 @@ begin
             // Silent Exception
         end;
 end;
+
+
 
 procedure TNemp_MainForm.PM_EQ_DisabledClick(Sender: TObject);
 var i: Integer;
