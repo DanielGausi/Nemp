@@ -59,10 +59,12 @@ type
     TNempMainFormRatios = record
       VSTHeight: Integer;
       BrowseWidth: Integer;
+      ArtistWidth: Integer;
 
       VSTWidth: Integer;
       VDTCoverWidth: Integer;
-      ArtistWidth: Integer;
+      VDTCoverHeight: Integer;
+
     end;
 
     // Das speichert die Aufteilung der Form
@@ -182,6 +184,7 @@ type
         ArtistAlbenFontSize: Integer;
         ArtistAlbenRowHeight: Integer;
         CoverMode: Integer;
+        DetailMode: Integer;
         CoverWidth: Integer;
 
         // Steuerung des Deskbands:
@@ -839,17 +842,19 @@ begin
         NempFormAufteilung[1].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_1'   ,160);//73;
         NempFormAufteilung[1].Maximized := False;
 
-        NempFormRatios.VSTHeight     := Ini.ReadInteger('Fenster', 'VSTHeight'     , 50);
-        NempFormRatios.BrowseWidth   := Ini.ReadInteger('Fenster', 'BrowseWidth'   , 50);
-        NempFormRatios.VSTWidth      := Ini.ReadInteger('Fenster', 'VSTWidth'      , 30);
-        NempFormRatios.VDTCoverWidth := Ini.ReadInteger('Fenster', 'VDTCoverWidth' , 50);
-        NempFormRatios.ArtistWidth   := Ini.ReadInteger('Fenster', 'ArtistWidth'   , 50);
+        NempFormRatios.VSTHeight      := Ini.ReadInteger('Fenster', 'VSTHeight'      , 50);
+        NempFormRatios.BrowseWidth    := Ini.ReadInteger('Fenster', 'BrowseWidth'    , 50);
+        NempFormRatios.VSTWidth       := Ini.ReadInteger('Fenster', 'VSTWidth'       , 30);
+        NempFormRatios.VDTCoverWidth  := Ini.ReadInteger('Fenster', 'VDTCoverWidth'  , 50);
+        NempFormRatios.VDTCoverHeight := Ini.ReadInteger('Fenster', 'VDTCoverHeight' , 20);
+        NempFormRatios.ArtistWidth    := Ini.ReadInteger('Fenster', 'ArtistWidth'    , 50);
 
-        CheckValue(NempFormRatios.VSTHeight    , 10, 90);
-        CheckValue(NempFormRatios.BrowseWidth  , 10, 90);
-        CheckValue(NempFormRatios.VSTWidth     , 10, 90);
-        CheckValue(NempFormRatios.VDTCoverWidth, 10, 90);
-        CheckValue(NempFormRatios.ArtistWidth  , 10, 90);
+        CheckValue(NempFormRatios.VSTHeight     , 10, 90);
+        CheckValue(NempFormRatios.BrowseWidth   , 10, 90);
+        CheckValue(NempFormRatios.VSTWidth      , 10, 90);
+        CheckValue(NempFormRatios.VDTCoverWidth , 10, 90);
+        CheckValue(NempFormRatios.VDTCoverHeight, 10, 90);
+        CheckValue(NempFormRatios.ArtistWidth   , 10, 90);
 
         NempEinzelFormOptions.PlaylistVisible           := ini.ReadBool('EinzelFenster','PlaylistVisible'   , True);
         NempEinzelFormOptions.MedienlisteVisible        := ini.ReadBool('EinzelFenster','MedienlisteVisible', True);
@@ -901,6 +906,8 @@ begin
         if not CoverMode in [0,1,2] then CoverMode := 1;
         CoverWidth := ini.ReadInteger('Fenster', 'CoverWidth', 240);
         if (CoverWidth < 0) or (CoverWidth > 600) then CoverWidth := 450;
+        DetailMode := ini.ReadInteger('Fenster', 'DetailMode', 1);
+        if not DetailMode in [0,1,2] then DetailMode := 1;
 
         ArtistAlbenFontSize  := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
         ArtistAlbenRowHeight := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
@@ -969,11 +976,12 @@ begin
         ini.WriteInteger('Fenster', 'Top_1'                , NempFormAufteilung[1].FormTop           );
         ini.WriteInteger('Fenster', 'Left_1'               , NempFormAufteilung[1].FormLeft          );
 
-        Ini.WriteInteger('Fenster', 'VSTHeight'     , NempFormRatios.VSTHeight    );
-        Ini.WriteInteger('Fenster', 'BrowseWidth'   , NempFormRatios.BrowseWidth  );
-        Ini.WriteInteger('Fenster', 'VSTWidth'      , NempFormRatios.VSTWidth     );
-        Ini.WriteInteger('Fenster', 'VDTCoverWidth' , NempFormRatios.VDTCoverWidth);
-        Ini.WriteInteger('Fenster', 'ArtistWidth'   , NempFormRatios.ArtistWidth  );
+        Ini.WriteInteger('Fenster', 'VSTHeight'      , NempFormRatios.VSTHeight    );
+        Ini.WriteInteger('Fenster', 'BrowseWidth'    , NempFormRatios.BrowseWidth  );
+        Ini.WriteInteger('Fenster', 'VSTWidth'       , NempFormRatios.VSTWidth     );
+        Ini.WriteInteger('Fenster', 'VDTCoverWidth'  , NempFormRatios.VDTCoverWidth);
+        Ini.WriteInteger('Fenster', 'VDTCoverHeight' , NempFormRatios.VDTCoverHeight);
+        Ini.WriteInteger('Fenster', 'ArtistWidth'    , NempFormRatios.ArtistWidth  );
 
         ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
         ini.WriteBool('EinzelFenster','MedienlisteVisible', NempEinzelFormOptions.MedienlisteVisible        );
@@ -1012,6 +1020,7 @@ begin
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
         ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
+        ini.WriteInteger('Fenster', 'DetailMode', DetailMode);
 
         ini.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
         ini.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);

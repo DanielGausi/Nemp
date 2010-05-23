@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 536
-    ActivePage = TabSystem3
+    ActivePage = TabAnzeige5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2156,7 +2156,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 142
         Width = 434
-        Height = 155
+        Height = 111
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Browsing in the medialibrary'
         TabOrder = 1
@@ -2176,33 +2176,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Select the sorting criteria for browsing the library.'
           Caption = 'Sort order in cover-flow'
         end
-        object LblConst_CoverMode: TLabel
-          Left = 13
-          Top = 108
-          Width = 56
-          Height = 13
-          Hint = 'Display the cover and some other details in the library.'
-          Caption = 'Show cover'
-        end
         object LblNACoverHint: TLabel
           Left = 33
           Top = 86
           Width = 276
           Height = 13
           Caption = '(Changes will take effect after a rebuild of the coverflow)'
-        end
-        object cbCoverMode: TComboBox
-          Left = 13
-          Top = 126
-          Width = 89
-          Height = 21
-          Style = csDropDownList
-          ItemHeight = 13
-          TabOrder = 0
-          Items.Strings = (
-            'Disabled'
-            'Left'
-            'Right')
         end
         object CBSortArray1: TComboBox
           Left = 12
@@ -2212,7 +2191,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 0
-          TabOrder = 1
+          TabOrder = 0
           Text = 'Artists'
           Items.Strings = (
             'Artists'
@@ -2230,7 +2209,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Style = csDropDownList
           ItemHeight = 13
           ItemIndex = 1
-          TabOrder = 2
+          TabOrder = 1
           Text = 'Albums'
           Items.Strings = (
             'Artists'
@@ -2247,7 +2226,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 3
+          TabOrder = 2
           Items.Strings = (
             'Artists, Albums'
             'Albums, Artists'
@@ -2265,14 +2244,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 402
           Height = 17
           Caption = 'Hide cover with no tag-information in coverflow'
-          TabOrder = 4
+          TabOrder = 3
         end
       end
       object GrpBox_TabMedia3_Other: TGroupBox
         Left = 8
-        Top = 303
+        Top = 340
         Width = 433
-        Height = 74
+        Height = 77
         Caption = 'Other'
         TabOrder = 2
         object CBFullRowSelect: TCheckBox
@@ -2301,6 +2280,61 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Show hints in the playlist or not.'
           Caption = 'Show hints in playlist'
           TabOrder = 2
+        end
+      end
+      object GrpBox_TabMedia3_CoverDetails: TGroupBox
+        Left = 8
+        Top = 255
+        Width = 434
+        Height = 83
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Cover && Details'
+        TabOrder = 3
+        object LblConst_CoverMode: TLabel
+          Left = 13
+          Top = 22
+          Width = 56
+          Height = 13
+          Hint = 'Display the cover and some other details in the library.'
+          Caption = 'Show cover'
+        end
+        object LblConst_DetailMode: TLabel
+          Left = 135
+          Top = 22
+          Width = 154
+          Height = 13
+          AutoSize = False
+          Caption = 'Show additional details'
+        end
+        object cbCoverMode: TComboBox
+          Left = 9
+          Top = 39
+          Width = 89
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 1
+          TabOrder = 0
+          Text = 'Left'
+          Items.Strings = (
+            'Disabled'
+            'Left'
+            'Right')
+        end
+        object cbDetailMode: TComboBox
+          Left = 135
+          Top = 41
+          Width = 106
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 1
+          TabOrder = 1
+          Text = 'Aside'
+          Items.Strings = (
+            'Disabled'
+            'Aside'
+            'Below')
         end
       end
     end
