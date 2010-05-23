@@ -1922,7 +1922,6 @@ var i: Integer;
     aAudioFile: TAudioFile;
     ID3v2tag: TID3v2Tag;
     LyricWikiResponse: String;
-    LyricQuery: AnsiString;
     done, failed: Integer;
     Lyrics: TLyrics;
 begin
@@ -2344,7 +2343,6 @@ procedure TMedienBibliothek.fBugFixID3Tags;
 var i, f: Integer;
     af: TAudioFile;
     id3: TID3v2Tag;
-    aFrame: TID3v2Frame;
     FrameList: TObjectList;
     ms: TMemoryStream;
     privateOwner: AnsiString;
@@ -2486,7 +2484,6 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.DeleteAudioFile(aAudioFile: tAudioFile): Boolean;
-var i: Integer;
 begin
 //  result := StatusBibUpdate = 0;
 // ??? Status MUST be set to 3 before calling this, as we have an "Application.ProcessMessages"
@@ -3220,7 +3217,6 @@ begin
                   Start := EinIndex;
                   Ende := EinIndex;
                   if EinIndex = -1 then begin
-                  wuppdi;
                   exit;
                   end;
 

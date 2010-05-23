@@ -4977,16 +4977,54 @@ end;
 procedure TNemp_MainForm.VDTCoverResize(Sender: TObject);
 var dim: Integer;
 begin
-    dim := Round(NempOptions.NempFormRatios.VDTCoverWidth / 100 * VDTCover.Width);
-    if dim > 250 then
-        dim := 250;
+    case NempOptions.DetailMode of
+        0: //Disabled
+        begin
+            VDTCoverInfoPanel.Visible := False;
+            dim := VDTCover.Width;
+            if dim > 250 then
+                dim := 250;
+            if dim > VDTCover.Height then
+                dim := VDTCover.Height;
+            ImgDetailCover.Width  := dim;
+            ImgDetailCover.Height := dim;
+        end;
+        1: //Aside
+        begin
+            dim := Round(NempOptions.NempFormRatios.VDTCoverWidth / 100 * VDTCover.Width);
+            if dim > 250 then
+                dim := 250;
 
-    ImgDetailCover.Width  := dim;
-    ImgDetailCover.Height := dim;
+            VDTCoverInfoPanel.Visible := True;
+            ImgDetailCover.Width  := dim;
+            ImgDetailCover.Height := dim;
 
-    VDTCoverInfoPanel.Left := dim + 4;
-    VDTCoverInfoPanel.Width :=  VDTCover.Width - dim - 8;
-    VDTCoverInfoPanel.Height := VDTCover.Height - VDTCoverInfoPanel.Top;
+            VDTCoverInfoPanel.Top := 2;
+            VDTCoverInfoPanel.Left := dim + 4;
+            VDTCoverInfoPanel.Width :=  VDTCover.Width - dim - 8;
+            VDTCoverInfoPanel.Height := VDTCover.Height - VDTCoverInfoPanel.Top;
+        end;
+        2: //Below
+        begin           //  VDTCoverHeight
+            dim := Round(NempOptions.NempFormRatios.VDTCoverHeight / 100 * VDTCover.Height);
+            if dim > VDTCover.Width then
+                dim := VDTCover.Width;
+            if dim > 250 then
+                dim := 250;
+
+            VDTCoverInfoPanel.Visible := True;
+            ImgDetailCover.Width  := dim;
+            ImgDetailCover.Height := dim;
+
+            VDTCoverInfoPanel.Top := 2;
+            VDTCoverInfoPanel.Left := ImgDetailCover.Left;
+
+            VDTCoverInfoPanel.Top := ImgDetailCover.Top + ImgDetailCover.Height + 4;
+            VDTCoverInfoPanel.Width :=  VDTCover.Width - 8;
+            VDTCoverInfoPanel.Height := VDTCover.Height - VDTCoverInfoPanel.Top;
+        end;
+    end;
+    NempOptions.CoverWidth := VDTCover.Width;
 
     // Disable Editing
     ShowLabelAgain(EdtBibArtist, GetCorrespondingLabel(EdtBibArtist));
@@ -10063,6 +10101,7 @@ end;
 
 procedure TNemp_MainForm.ActualizeVDTCover;
 begin
+    // wird von Options - OK aufgerufen nach Änderung der Cover-Zeugs
     VDTCover.Width := NempOptions.CoverWidth;
     case NempOptions.CoverMode of
         0: begin
@@ -10089,6 +10128,8 @@ begin
           VDTCover.Left := VST.Width + Splitter4.Width;
         end;
     end;
+    // manually call OnResize, to put details below or aside the coverimage
+    VDTCoverResize(VDTCover);
 end;
 
 

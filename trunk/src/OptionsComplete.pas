@@ -227,8 +227,6 @@ type
     GrpBox_TabMedia3_Browseby: TGroupBox;
     Label44: TLabel;
     Label61: TLabel;
-    LblConst_CoverMode: TLabel;
-    cbCoverMode: TComboBox;
     GrpBox_TabMedia3_Other: TGroupBox;
     CBFullRowSelect: TCheckBox;
     CBShowHintsInMedialist: TCheckBox;
@@ -437,6 +435,11 @@ type
     cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
     cb_PartyMode_BlockTools: TCheckBox;
     Edt_PartyModePassword: TLabeledEdit;
+    GrpBox_TabMedia3_CoverDetails: TGroupBox;
+    LblConst_CoverMode: TLabel;
+    cbCoverMode: TComboBox;
+    LblConst_DetailMode: TLabel;
+    cbDetailMode: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -848,6 +851,7 @@ begin
   end;
 
   cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+  cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 
   //Sprachen initialisieren
   cb_Language.Items.Add('English');
@@ -1101,6 +1105,7 @@ begin
 
  cbHideNACover.Checked := MedienBib.HideNACover;
  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+ cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 
   CB_CoverSearch_inDir.Checked       := MedienBib.CoverSearchInDir;
   CB_CoverSearch_inParentDir.Checked := MedienBib.CoverSearchInParentDir;
@@ -1729,6 +1734,7 @@ begin
  end;
  //CBCoverColumn.Checked := Nemp_MainForm.VDTCover.Visible;
  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+ cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 end;
 
 // GeburtstagsOptionen
@@ -1971,6 +1977,8 @@ begin
   end;
 
   Nemp_MainForm.NempOptions.CoverMode := cbCoverMode.ItemIndex;
+  Nemp_MainForm.NempOptions.DetailMode := cbDetailMode.ItemIndex;
+
   Nemp_MainForm.ActualizeVDTCover;
 
   Nemp_MainForm.NempOptions.FontNameCBR := CBFontNameCBR.Items[CBFontNameCBR.itemindex];
