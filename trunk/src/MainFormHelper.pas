@@ -111,6 +111,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
 
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1426,5 +1427,6 @@ begin
         Target.Add(Data^.FAudioFile);
     end;
 end;
+
 
 end.
