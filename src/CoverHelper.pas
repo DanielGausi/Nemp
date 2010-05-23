@@ -111,11 +111,6 @@ type
   // then MedienBib.GetCoverList and GetCoverFromList if no success
   // finally GetDefaultCover if still no success
   function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
-  // GetCoverLight: No StretchDraw, no search for cover.
-  // Just check CoverID of the audiofile and get the <md5-hash>.jpg
-  //     Used by VST.OnChange, to display the cover fast.
-  //     After the CoverTimer elapsed, GetCover() will be called to show a better cover
-  function GetCoverLight(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 
   // GetCoverBitmapFromID:
   // Get the Bitmap for a specified Cover-ID
@@ -137,12 +132,6 @@ type
   procedure ClearRandomCover;
   // Paint a custumized cover "Your Library", using Cover in RandomCoverList
   procedure PaintPersonalMainCover(aCoverBmp: TBitmap);
-
-  // Painting a "ScrollCover"
-  // aIdx: Current Cover, "the one in the middle"
-  // aWidth/aHeight: The Width(Height of the Control
-  // aTarget: The Target picture
-  //procedure DrawScrollCoverOLD(aIdx: Integer; aWidth, aHeight: Integer; aTarget: TPicture);
 
 
 implementation
@@ -649,48 +638,7 @@ begin
             end;
       end;
   except
-
       GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
-      result := false;
-  end;
-end;
-
-function GetCoverLight(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean; // Kein StretchDraw, keine erweiterte Suche nach Covern
-//var aGraphic: TPicture;
-begin
-  try
-      if aAudioFile.isStream then
-      begin
-          GetDefaultCover(dcWebRadio, aCoverbmp, cmUseBibDefaults);
-          result := True;
-      end else
-      begin
-          result := GetCoverBitmapFromID(aAudioFile.CoverID, aCoverbmp, Medienbib.CoverSavePath );
-
-          {  if (aAudioFile.CoverID <> '') then
-            begin
-                if FileExists(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg') then
-                begin
-                    aGraphic := TPicture.Create;
-                    try
-                        aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
-                        AssignBitmap(aCoverBmp, aGraphic);
-                        result := True;
-                    finally
-                        aGraphic.Free;
-                    end;
-                end else
-                begin
-                    GetDefaultCover(dcError, aCoverbmp, cmUseBibDefaults);
-                    result := True;
-                end;
-            end else
-            begin
-                GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
-                result := True;
-            end;}
-      end;
-  except
       result := false;
   end;
 end;
@@ -701,24 +649,18 @@ begin
     result := true;
     if aCoverID = 'all' then
     begin
-        //GetDefaultCover(dcAllFiles, aCoverBmp, cmUseBibDefaults or cmNoStretch);
-
         // PaintPersonalCover
         PaintPersonalMainCover(aCoverBmp);
-        //fCaption := _(aCover.Artist) + #13#10 + _(aCover.Album);
     end else
     begin
         if aCoverID = '' then
         begin
             GetDefaultCover(dcNoCover, aCoverBmp, cmUseBibDefaults or cmNoStretch);
             result := False;
-          //  fCaption := _(aCover.Artist) + #13#10 + _(aCover.Album); //+ ' --- ' + aCover.ID;
         end else
         begin
-            //fCaption := (aCover.Artist) + #13#10 + (aCover.Album) ;// + ' --- ' + aCover.ID;
             if FileExists(aDir + aCoverID + '.jpg') then
             begin
-                //aStream := TFileStream.Create(CoverSavePath  + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
                 aJpg := TJpegImage.Create;
                 try
                     try
@@ -740,66 +682,30 @@ begin
     end;
 end;
 
-//procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: tBitmap; UseNempDefault: Boolean; Stretch: Boolean = True);
 procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: tBitmap; Flags: Integer);
 var filename: UnicodeString;
     aGraphic: TPicture;
-    //UseNempDefault, Customize,
     Stretch: Boolean;
 begin
-   // NempDefault: NICHT das aus der Medienbib!
-   begin
-        // Flags auswerten
-        Stretch := (Flags and cmNoStretch) = 0;
-        {if (Flags and cmUseBibDefaults) = cmUseBibDefaults then
-        begin
-            UseNempDefault := MedienBib.UseNempDefaultCover;
-            Customize := MedienBib.PersonalizeMainCover;
-        end else
-        begin
-            UseNempDefault := (Flags and cmUseDefaultCover) = cmUseDefaultCover;
-            Customize      := (Flags and cmCustomizeMainCover) = cmCustomizeMainCover;
-        end; }
+    // Flags auswerten
+    Stretch := (Flags and cmNoStretch) = 0;
 
-        {case aType of
-            dcAllFiles : begin
-                            filename := Medienbib.CoverSavePath + '_defaultAllFiles.jpg';
-                            ResIndex := 201;
-                         end;
-            dcWebRadio : begin
-                            filename := Medienbib.CoverSavePath + '_defaultWebradio.jpg';
-                            ResIndex := 203;
-                         end;
-            dcNoCover  : begin
-                            filename := Medienbib.CoverSavePath + '_defaultNoCover.jpg';
-                            ResIndex := 202;
-                         end;
-            dcError    : begin
-                            filename := Medienbib.CoverSavePath + '_defaultError.jpg';
-                            ResIndex := 200;
-                         end;
-        else
-                         filename := Medienbib.CoverSavePath + '_defaultError.jpg';
-                         ResIndex := 200;
-        end;  }
-
-        filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
-        if FileExists(filename) then
-        begin
-            aGraphic := TPicture.Create;
-            try
-                aGraphic.LoadFromFile(filename);
-                if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                begin
-                    FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-                    aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-                end else
-                    AssignBitmap(aCoverBmp, aGraphic);
-            finally
-                aGraphic.Free;
-            end;
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+    if FileExists(filename) then
+    begin
+        aGraphic := TPicture.Create;
+        try
+            aGraphic.LoadFromFile(filename);
+            if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+            begin
+                FitBitmapIn(aCoverbmp, aGraphic.Graphic);
+                aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
+            end else
+                AssignBitmap(aCoverBmp, aGraphic);
+        finally
+            aGraphic.Free;
         end;
-   end;
+    end;
 end;
 
 procedure GetCoverInfos(AudioFileList: TObjectlist; aCover: TNempCover);
@@ -925,17 +831,6 @@ begin
 
         if GoodCoverList.Count >= 1 then
         begin
-                {if TNempCover(GoodCoverList[1]).ID = '' then
-                begin
-                    Setlength(CoverArray, GoodCoverList.Count - 2);
-                    for i := 2 to GoodCoverList.Count - 1 do
-                        CoverArray[i-2] := i;
-                end else
-                begin
-                    Setlength(CoverArray, GoodCoverList.Count - 1);
-                    for i := 1 to GoodCoverList.Count - 1 do
-                        CoverArray[i-1] := i;
-                end;}
                 Setlength(CoverArray, GoodCoverList.Count);
                 for i := 0 to GoodCoverList.Count - 1 do
                     CoverArray[i] := i;
@@ -1073,93 +968,6 @@ begin
 
     LeaveCriticalSection(CSAccessRandomCoverlist);
 end;
-
-          (*
-procedure DrawScrollCoverOLD(aIdx: Integer; aWidth, aHeight: Integer; aTarget: TPicture);
-var mitte, minidx, maxidx, i: Integer;
-    abmp: TBitmap;
-    ajpg: TJpegImage;
-    xfactor, yfactor:double;
-    NewHeight, NewWidth: Integer;
-    bigbmp: TBitmap;
-    aStream: TFileStream;
-    aCover: TNempCover;
-begin
-  mitte := aWidth Div 2;
-
-  minidx := aIdx - ((Mitte Div 75) + 1);
-  maxidx := aIdx + ((Mitte Div 75) + 1);
-  if minidx < 0 then minidx := 0;
-  if maxidx >= MedienBib.Coverlist.Count-1 then maxidx := MedienBib.Coverlist.Count - 1;
-
-  ajpg := TJpegImage.Create;
-  abmp := TBitmap.Create;
-  bigbmp := TBitmap.Create;
-  bigbmp.Width := aWidth;
-  Bigbmp.Height := aHeight;
-  bigbmp.TransparentColor := cllime;
-  Bigbmp.Canvas.Brush.Color := clLime;
-  bigbmp.Canvas.FillRect(Rect(0,0,bigbmp.Width, bigbmp.Height));
-
-  for i := minidx to maxidx do
-  begin
-          aCover := TNempCover(MedienBib.Coverlist[i]);
-          if aCover.ID = 'all' then
-          begin
-              GetDefaultCover(dcAllFiles, aBmp, cmUseBibDefaults);
-          end else
-          begin
-              if aCover.ID = '' then
-              begin
-                GetDefaultCover(dcNoCover, aBmp, cmUseBibDefaults);
-              end else
-                  if FileExists(MedienBib.CoverSavePath + aCover.ID + '.jpg') then
-                  begin
-                      try
-                        aStream := TFileStream.Create(MedienBib.CoverSavePath + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
-                        aJpg.LoadFromStream(aStream);
-                        abmp.Assign(aJpg);
-                        aStream.free;
-                      except
-                      end;
-                  end else
-                  begin
-                      GetDefaultCover(dcError, aBmp, cmUseBibDefaults);
-                  end;
-          end;
-
-          if (abmp.Width > 0) AND (abmp.Height > 0) then
-          begin
-              xfactor:= (75) / abmp.Width;
-              yfactor:= (75) / abmp.Height;
-              if xfactor > yfactor then
-                begin
-                  NewWidth := round(abmp.Width * yfactor);
-                  NewHeight := round(abmp.Height * yfactor);
-                end else
-                begin
-                  NewWidth := round(abmp.Width * xfactor);
-                  NewHeight := round(abmp.Height * xfactor);
-                end;
-
-              SetStretchBltMode(bigbmp.Canvas.Handle, HALFTONE);
-              StretchBlt(bigbmp.Canvas.Handle,
-                          (mitte - 37)  - (aIdx - i) * 85 + ( (75-NewWidth) Div 2)
-                          ,
-                         (75 - Newheight) Div 2, NewWidth, NewHeight,
-
-                          abmp.Canvas.Handle, 0, 0, abmp.Width, abmp.Height, SRCCopy);
-          end;
-
-  end;
-  aTarget.Assign(bigbmp);
-
-
-  bigbmp.Free;
-  ajpg.Free;
-  abmp.Free;
-end;
-         *)
 
 initialization
 

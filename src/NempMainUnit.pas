@@ -147,7 +147,6 @@ type
     VST: TVirtualStringTree;
     Splitter4: TSplitter;
     VDTCover: TNempPanel;
-    VDTCoverTimer: TTimer;
     TabBtn_Nemp: TSkinButton;
     TabBtn_Playlist: TSkinButton;
     PlayListStatusLBL: TLabel;
@@ -252,7 +251,6 @@ type
     N32: TMenuItem;
     MM_O_ViewStayOnTop: TMenuItem;
     MM_O_Skins: TMenuItem;
-    MM_O_Skins_OpenEditor: TMenuItem;
     MM_O_Skins_WindowsStandard: TMenuItem;
     N38: TMenuItem;
     MM_O_Languages: TMenuItem;
@@ -461,7 +459,6 @@ type
     N35: TMenuItem;
     PM_P_ViewStayOnTop: TMenuItem;
     PM_P_Skins: TMenuItem;
-    PM_P_Skins_OpenEditor: TMenuItem;
     PM_P_Skins_WindowsStandard: TMenuItem;
     N30: TMenuItem;
     PM_P_Languages: TMenuItem;
@@ -1150,7 +1147,6 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure Lbl_CoverFlowMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure SkinEditorstarten1Click(Sender: TObject);
     procedure WindowsStandardClick(Sender: TObject);
     procedure PM_P_BirthdayOptionsClick(Sender: TObject);
     procedure _XXX_SleepLBLClick(Sender: TObject);
@@ -1172,8 +1168,6 @@ type
     procedure VST_ColumnPopupCoverOnClick(Sender: TObject);
     procedure EDITFastSearchChange(Sender: TObject);
     procedure CB_MedienBibGlobalQuickSearchClick(Sender: TObject);
-    procedure RefreshMedienBibCover;
-    procedure VDTCoverTimerTimer(Sender: TObject);
     procedure AlbenVSTClick(Sender: TObject);
     procedure ArtistsVSTClick(Sender: TObject);
     procedure PM_PlayFilesClick(Sender: TObject);
@@ -1514,7 +1508,7 @@ uses   Splash, MultimediaKeys,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   HeadsetControl, BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, NoLyricWikiApi, fspControlsExt, CloudEditor,
+  ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword;
 
 
@@ -3205,50 +3199,6 @@ end;
 
 
 
-procedure TNemp_MainForm.RefreshMedienBibCover;
-var aNode: PVirtualNode;
-    Data: PTreeData;
-    AudioFile: TAudioFile;
-begin
-   { VDTCover.Clear;
-
-    aNode := VST.FocusedNode;
-    if Assigned(aNode) then
-    begin
-        Data := VST.GetNodeData(aNode);
-        AudioFile := Data^.FAudioFile;
-    end else
-    begin
-        aNode := VST.GetFirst;
-        if assigned(aNode) then
-        begin
-            Data := VST.GetNodeData(aNode);
-            AudioFile := Data^.FAudioFile;
-        end else
-            AudioFile := Nil;
-    end;
-
-    if assigned(AudioFile) then
-    begin
-        aNode := AddVDTCover(VDTCover, Nil, AudioFile, True);
-        if VDTCover.Height - Integer(VDTCover.Header.Height) < 240 then
-            aNode.NodeHeight := VDTCover.Height - Integer(VDTCover.Header.Height)
-        else
-            aNode.NodeHeight := 240;
-    end;
-    }
-end;
-
-
-
-procedure TNemp_MainForm.VDTCoverTimerTimer(Sender: TObject);
-begin
-    VDTCoverTimer.Enabled := False;
-    RefreshMedienBibCover;
-end;
-
-
-
 function TNemp_MainForm.GetFocussedAudioFile:TAudioFile;
 var  OldNode: PVirtualNode;
   Data: PTreeData;
@@ -4854,8 +4804,6 @@ var c,i:integer;
   AudioFile: TAudioFile;
 begin
 
-  VDTCoverTimer.Enabled := False;
-
   c := VST.SelectedCount;
   SelectedMP3s := VST.GetSortedSelection(False);
   if c=0 then
@@ -4895,8 +4843,6 @@ begin
 
       ShowVSTDetails(AudioFile);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
-
-      VDTCoverTimer.Enabled := True;
   end
 end;
 
@@ -5451,11 +5397,6 @@ begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
-          //if not assigned(NoLyricWikiApiForm) then
-          //    Application.CreateForm(TNoLyricWikiApiForm, NoLyricWikiApiForm);
-          //NoLyricWikiApiForm.ShowModal;
-
-
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
 
@@ -5467,7 +5408,6 @@ begin
         end;
 
         MedienBib.GetLyrics;
-
     end;
 end;
 
@@ -10792,14 +10732,6 @@ procedure TNemp_MainForm.Lbl_CoverFlowMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   CoverScrollbar.SetFocus;
-end;
-
-procedure TNemp_MainForm.SkinEditorstarten1Click(Sender: TObject);
-begin
-  //if not assigned(SkinEditorForm) then
-  //  Application.CreateForm(TSkinEditorForm, SkinEditorForm);
-  //SkinEditorForm.show;
-  MessageDlg('SkinEditor removed from Nemp.exe. Separate SkinEditor is not implemented yet!', mtError, [mbOK], 0);
 end;
 
 procedure TNemp_MainForm.Win7TaskBarPopupPopup(Sender: TObject);

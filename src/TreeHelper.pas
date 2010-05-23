@@ -60,13 +60,11 @@ type
 
   function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
   function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
-  function AddVDTCover(AVDT: TCustomVirtualDrawTree; aNode: PVirtualNode; aAudioFile: TAudioFile; Complete: Boolean = False): PVirtualNode;
 
   procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
   procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
 
   function GetOldNode(aString: UnicodeString; aTree: TVirtualStringTree): PVirtualNode;
-  //function GetOldCoverIdx(oldID: String; oldIDX: Integer): Integer;
 
 
 implementation
@@ -133,24 +131,6 @@ begin
   AVST.ValidateNode(Result,false); // validate at the end, as we check FAudioFile on InitNode
 end;
 
-
-function AddVDTCover(AVDT: TCustomVirtualDrawTree; aNode: PVirtualNode; aAudioFile: TAudioFile; Complete: Boolean = False): PVirtualNode;
-var Data: PCoverTreeData;
-begin
-  Result:= AVDT.AddChild(aNode);
-  AVDT.ValidateNode(Result,false);
-
-  Data:=AVDT.GetNodeData(Result);
-  Data^.Image := TBitmap.Create;
-
-
-  if Complete then
-      GetCover(aAudioFile, Data^.Image)
-  else
-      GetCoverLight(aAudioFile, Data^.Image)
-
-
-end;
 
 function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
 var Data: PStringTreeData;
@@ -394,23 +374,6 @@ begin
         end;
     end
 end;
-  (*
-function GetOldCoverIdx(oldID: String; oldIDX: Integer): Integer;
-var i: Integer;
-begin
-    result := -1;
-    for i := 0 to MedienBib.Coverlist.Count -  1 do
-    if tNempCover(MedienBib.Coverlist[i]).ID = oldID then
-    begin
-        result := i;
-        break;
-    end;
-    if result = -1 then
-        result := oldIdx;
-    if result >= MedienBib.Coverlist.Count then
-        result := 0;
-end;
-     *)
 
 
 initialization
