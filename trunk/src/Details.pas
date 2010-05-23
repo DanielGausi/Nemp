@@ -312,10 +312,6 @@ type
     procedure UpdateID3v1InFile;
     procedure UpdateID3v2InFile;
 
-    // Wenn ein PlaylistFile bearbeitet wird:
-    // Dieses in der MedienBib suchen und aktualisieren
-    procedure SearchAndUpdateFileInMB;
-
     function CurrentFileHasBeenChanged: Boolean;
 
   public
@@ -491,15 +487,6 @@ procedure TFDetails.Btn_CloseClick(Sender: TObject);
 begin
     hide;
 end;
-(*
-procedure TFDetails.___CB_StayOnTopClick(Sender: TObject);
-begin
-  if CB_StayOnTop.Checked then
-    SetWindowPos(FDetails.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE)
-  else
-    SetWindowPos(FDetails.Handle,HWND_NOTOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-end;
-*)
 
 {
     --------------------------------------------------------
@@ -570,7 +557,6 @@ begin
     begin
         rat := DetailRatingHelper.MousePosToRating(x, 70);//((x div 8)) * 8;
         DetailRatingHelper.DrawRatingInStarsOnBitmap(rat, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
-    //ShowRating(rat);
     end;
 end;
 
@@ -584,7 +570,6 @@ begin
 end;
 procedure TFDetails.RatingImageMouseLeave(Sender: TObject);
 begin
-    //ShowRating(ActualRating);
     if RatingImage.Enabled then
         DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
 end;
@@ -594,29 +579,6 @@ begin
     DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
 end;
-
-{
-    --------------------------------------------------------
-    ShowRating
-    - Show the rating, build the image
-    --------------------------------------------------------
-
-procedure TFDetails.ShowRating(Value: Integer);
-var aBmp: TBitmap;
-begin
-    if Value = 0 then
-        Value := 128;
-    aBmp := TBitmap.Create;
-    try
-        aBmp.Width := RatingImage.Width;
-        aBmp.Height := RatingImage.Height;
-        DetailRatingHelper.DrawRatingInStars(value, aBmp.canvas, RatingImage.Height);
-         aBmp.Transparent := True;
-        RatingImage.Picture.Bitmap.Assign(aBmp);
-    finally
-        aBmp.Free;
-    end;
-end;   }
 
 {
     --------------------------------------------------------
@@ -768,14 +730,6 @@ begin
 
   CBID3v1.Enabled := ControlsEnable;
   CBID3v2.Enabled := ControlsEnable;
-
-//  cbWriteRatingToTag.Enabled := ValidMp3File and ControlsEnable;
-//  cbWriteRatingToTag.OnClick := Nil;
-//  if ControlsReadOnly then
-//      cbWriteRatingToTag.Checked := False
-//  else
-//      cbWriteRatingToTag.Checked := MedienBib.WriteRatingToTag;
-//  cbWriteRatingToTag.OnClick := cbWriteRatingToTagClick;
 
   Lblv1Artist.ReadOnly := ControlsReadOnly;
   Lblv1Album.ReadOnly := ControlsReadOnly;
@@ -1121,8 +1075,8 @@ begin
             Lbl_Warnings.Caption := (Warning_FileNotFound);
             Lbl_Warnings.Hint := (Warning_FileNotFound_Hint);
             PnlWarnung.Visible := True;
-          end;// else
-            //PnlWarnung.Visible := False;
+          end;
+
 
           DateiPfad := Pfad;
           LBLPfad.Caption := Ordner;
@@ -1163,12 +1117,10 @@ begin
             LBLDauer.Caption  := SekToZeitString(Duration);
 
             if vbr then
-              LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s (vbr)'
+                LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s (vbr)'
             else
-              LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
-
+                LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
             LBLSamplerate.Caption := Samplerate + ', ' + ChannelMode;
-
             LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [PlayCounter]);
 
             if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
@@ -1186,11 +1138,8 @@ begin
                     ActualRating := ID3v2Tag.Rating;
                 end;
             end;
-            //ShowRating(ActualRating);
             DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
-
           end;
-
           LBLArtist.Caption := Artist;
           LBLTitel.Caption  := Titel;
           LBLAlbum.Caption  := Album;
@@ -1523,13 +1472,9 @@ begin
         Lblv2_Size   .Caption := Format(DetailForm_ID3v2Info, [id3v2Tag.Size, id3v2Tag.Size - id3v2Tag.PaddingSize]);
 
         FillFrameView;
-
         Memo_Lyrics.Text := ID3v2Tag.Lyrics;
-
         ShowPictures;
-
         Lblv2Copyright.Text        := Id3v2Tag.Copyright;
-////        Lblv2EncodedBy.Text        := Id3v2Tag.EncodedBy;
   end else
   begin
         Btn_DeletePicture.Enabled := False;
@@ -1564,7 +1509,6 @@ begin
         Lblv2Comment.Text := '';
         Lblv2Track.Text := '0';
         Lblv2Copyright.Text        := '';
-////        Lblv2EncodedBy.Text        := '';
   end;
 end;
 
@@ -1710,7 +1654,6 @@ begin
     Id3v2Tag.Track := Lblv2Track.Text;
     Id3v2Tag.Year := Lblv2Year.Text;
     // weitere Frames
-////    ID3v2Tag.EncodedBy := Lblv2EncodedBy.Text;
     ID3v2Tag.Copyright := Lblv2Copyright.Text;
     // Lyrics
     ID3v2Tag.Lyrics := Memo_Lyrics.Text;
@@ -1718,7 +1661,7 @@ begin
     // Bewertung. Nur schreiben, wenn gechecked
     // No write always - rating-image is now an ID3v2-Page
     // if (cbWriteRatingToTag.Checked) and (cbWriteRatingToTag.Enabled) then
-      ID3v2Tag.Rating := ActualRating;
+    ID3v2Tag.Rating := ActualRating;
 
     id3v2Tag.WriteToFile(Dateipfad);
   end else
@@ -1837,9 +1780,7 @@ end;
     --------------------------------------------------------
 }
 procedure TFDetails.BtnLyricWikiClick(Sender: TObject);
-var LyricWikiResponse: String;
-    LyricQuery: AnsiString;
-    Lyrics: TLyrics;
+var Lyrics: TLyrics;
     LyricString: String;
 begin
 
@@ -1872,54 +1813,6 @@ begin
             finally
                 Lyrics.Free;
             end;
-            (*
-            {$Message Hint 'Hier UTF8-Konzept überdenken'}
-            {LyricQuery := 'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + StringToURLString(WordUppercase(UTF8Encode((AktuellesAudioFile.Artist))))
-                        + '&song='
-                        + StringToURLString(WordUppercase(UTF8Encode((AktuellesAudioFile.Titel))))
-                        + '&fmt=text';
-            }
-            LyricQuery := 'http://lyricwiki.org/api.php?func=getSong&artist='
-                        + StringToURLStringAND(UTF8Encode(WordUppercase((AktuellesAudioFile.Artist))))
-                        + '&song='
-                        + StringToURLStringAND(UTF8Encode(WordUppercase((AktuellesAudioFile.Titel))))
-                        + '&fmt=text';
-
-
-            try
-
-                LyricWikiResponse := idHttp1.Get(String(LyricQuery));
-
-                //showmessage(LyricWikiResponse);
-
-                LyricWikiResponse := StringReplace(LyricWikiResponse, #10, #13#10, [rfReplaceAll]);
-
-                If Trim(LyricWikiResponse) <> 'Not found' then
-                begin
-                    Memo_Lyrics.Text := ReplaceGeneralEntities(trim(LyricWikiResponse));
-                end else
-                    if (MessageDlg(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
-                    begin
-                        BtnLyricWikiManual.Click;
-                        {//LyricQuery := StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll])
-                        //       + '+' + StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll]);
-                        LyricQuery := StringToURLStringAnd(UTF8Encode(
-                                StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll]) + '+' +
-                                StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll])));
-
-                        LyricQuery :=
-                          'http://lyricwiki.org/Special:GoogleSearchResults?cx=partner-pub-7265006513689515%3Aenbi50a4igp&cof=FORID%3A9&ie=UTF-8&q='
-                          + LyricQuery
-                          + '&sa=Search';
-                        ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
-                        }
-                    end;
-            except
-                MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0);
-            end;
-            *)
-
         end
         else
             AktuellesAudioFile.FileIsPresent:=False;
@@ -1927,57 +1820,10 @@ end;
 procedure TFDetails.BtnLyricWikiManualClick(Sender: TObject);
 var LyricQuery: AnsiString;
 begin
-
-//    LyricQuery := StringToURLStringAnd(UTF8Encode(
-//                  StringReplace(AktuellesAudioFile.Artist, ' ', '+', [rfReplaceAll]) + '+' +
-//                  StringReplace(AktuellesAudioFile.Titel, ' ', '+', [rfReplaceAll])));
-
-//    LyricQuery :=
-//    Format('http://lyrics.wikia.com/Special:Search?search=%s&go=1&x=0&y=0', [LyricQuery]);
-
     LyricQuery := 'http://lyrics.wikia.com';
-
     ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
 end;
 
-{
-    --------------------------------------------------------
-    SearchAndUpdateFileInMB
-    - if a AudioFile from the Playlist was modified, it should
-      be changed in the library as well. This is done here.
-    --------------------------------------------------------
-}
-procedure TFDetails.SearchAndUpdateFileInMB;
-var mbAudioFile: TAudioFile;
-    oldCoverID: String;
-begin
-    if (MedienBib.StatusBibUpdate > 0) then
-    begin
-      MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-      exit;
-    end;
-
-    // Datei in der MedienBib Suchen und erneuern
-    mbAudioFile := MedienBib.GetAudioFileWithFilename(AktuellesAudioFile.Pfad);
-    if assigned(mbAudioFile) then
-    begin
-      mbAudioFile.Rating := ActualRating;
-      // backup der CoverID
-      oldCoverID := mbAudioFile.CoverID;
-      mbAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
-      // Falls CoverID jetzt '', dann ist im ID3-Tag (immer noch) kein Cover drin
-      if mbAudioFile.CoverID = '' then
-          mbAudioFile.CoverID := oldCoverID;
-
-      if Not MedienBib.ValidKeys(mbAudioFile) then
-      begin
-          SetBrowseTabWarning(True);
-          // MedienBib.RestoreSortOrderAfterItemChanged(mbAudioFile); // mbAudioFile, nicht AktuellesAudioFile !
-          // Nemp_MainForm.ReFillBrowseTrees(True);
-      end;
-      MedienBib.Changed := True;
-    end;
-end;
 
 
 function TFDetails.CurrentFileHasBeenChanged: Boolean;

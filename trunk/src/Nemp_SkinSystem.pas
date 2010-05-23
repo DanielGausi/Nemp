@@ -128,7 +128,7 @@ type
         (Name: 'BtnRandom'       ; Visible: True; Left: 191; Top: 98; Width: 24; Height: 24),  // 'RandomBtn',
         (Name: 'BtnRecord'       ; Visible: True; Left: 109; Top: 98; Width: 24; Height: 24),  // 'RecordBtn',
         (Name: 'BtnMinimize'     ; Visible: False; Left: 202; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
-        (Name: 'BtnClose'        ; Visible: True; Left: 214; Top: 1; Width: 12; Height: 12),  // 'CloseBtn',
+        (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12),  // 'CloseBtn',
         (Name: 'BtnMenu'         ; Visible: False; Left:   8; Top: 52; Width: 12; Height: 12)  // 'MenuBtn',
       ) ;
 
@@ -1411,13 +1411,6 @@ begin
       TShape(Nemp_MainForm.Components[i]).Brush.Color := SkinColorScheme.ShapeBrushCL;
       TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
     end
-{    else
-    if Nemp_MainForm.Components[i] is TLabeledEdit then
-    begin
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Color := SkinColorScheme.LabelBackGroundCL;
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Font.Color := SkinColorScheme.LabelCL;
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Transparent := DrawTransparentLabel;
-    end}
   end;
 
   // Weitere Eigenschaften der Form setzen
@@ -1440,10 +1433,6 @@ begin
     Splitter2.Color := SkinColorScheme.Splitter2Color;
     Splitter3.Color := SkinColorScheme.Splitter3Color;
     Splitter4.Color := SkinColorScheme.Splitter1Color;
-
-    //LblPlayerTitle.Font.Color := SkinColorScheme.SpecTitelCL;
-    //LblPlayerArtist.Font.Color := SkinColorScheme.SpecTitelCL;
-    //LblPlayerAlbum.Font.Color := SkinColorScheme.SpecTitelCL;
 
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
@@ -1560,13 +1549,11 @@ begin
       TagCustomizer.TileBackGround:= False;
       TagCustomizer.BackgroundImage := Nil;
 
-//      VDTCover.Background.Assign(Nil);
       // AlphaBlending
       ArtistsVST.TreeOptions.PaintOptions := ArtistsVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       AlbenVST.TreeOptions.PaintOptions := AlbenVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       PlaylistVST.TreeOptions.PaintOptions := PlaylistVST.TreeOptions.PaintOptions - [toUseBlendedSelection];
       VST.TreeOptions.PaintOptions := VST.TreeOptions.PaintOptions - [toUseBlendedSelection];
-//      VDTCover.TreeOptions.PaintOptions := VDTCover.TreeOptions.PaintOptions - [toUseBlendedSelection];
       // Scrollbars
       ArtistsVST.ScrollBarOptions.ScrollBars := ssVertical;
       AlbenVST.ScrollBarOptions.ScrollBars := ssVertical;
@@ -1624,26 +1611,6 @@ begin
         DestVST.Colors.UnfocusedSelectionBorderColor   := clBtnFace;
         DestVST.Colors.UnfocusedSelectionColor         := clBtnFace;
       end;
-{      VDTCover.Color                                  := clWindow;
-      VDTCover.Font.Color                             := clWindowText;
-      VDTCover.Header.Background                      := clWindow;
-      VDTCover.Header.Font.Color                      := clWindowText;
-      VDTCover.Colors.BorderColor                     := clBtnFace;
-      VDTCover.Colors.DisabledColor                   := clBtnShadow;
-      VDTCover.Colors.DropMarkColor                   := clHighlight;
-      VDTCover.Colors.DropTargetBorderColor           := clHighlight;
-      VDTCover.Colors.DropTargetColor                 := clHighlight;
-      VDTCover.Colors.FocusedSelectionBorderColor     := clHighlight;
-      VDTCover.Colors.FocusedSelectionColor           := clHighlight;
-      VDTCover.Colors.GridLineColor                   := clBtnFace;
-      VDTCover.Colors.HeaderHotColor                  := clBtnShadow;
-      VDTCover.Colors.HotColor                        := clWindowText;
-      VDTCover.Colors.SelectionRectangleBlendColor    := clHighlight;
-      VDTCover.Colors.SelectionRectangleBorderColor   := clHighlight;
-      VDTCover.Colors.TreeLineColor                   := clBtnShadow;
-      VDTCover.Colors.UnfocusedSelectionBorderColor   := clBtnFace;
-      VDTCover.Colors.UnfocusedSelectionColor         := clBtnFace;
- }
   end;
 
   // Eigenschaften der Massenhaft auftretenden Sachen setzen

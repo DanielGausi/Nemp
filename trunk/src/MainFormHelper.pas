@@ -54,8 +54,6 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure HandleNewConnectedDrive;
 
- //   procedure FillTreeView(MP3Liste: TObjectlist; Index:Integer); overload;
- //   procedure FillTreeView(aVST: TVirtualStringTree; MP3Liste: TObjectlist); overload;
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
 
     // Fills the TreeView with 2 Lists (used for Quicksearch)
@@ -324,48 +322,6 @@ begin
         end;
     end;
 end;
-               (*
-procedure FillTreeView(aVST: TVirtualStringTree; MP3Liste: TObjectlist);
-var i,c: integer;
-  aNode,CueNode: PVirtualNode;
-  aData: PTreeData;
-begin
-    With Nemp_MainForm do
-    begin
-        VDTCoverTimer.Enabled := False;
-        aVST.BeginUpdate;
-        aVST.Clear;
-
-        if (aVST = VST) and (Not MedienBib.AnzeigeListIsCurrentlySorted) then
-            VST.Header.SortColumn := -1
-        else
-            VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
-
-        for i:=0 to MP3Liste.Count-1 do
-        begin
-            aNode := AddVSTMp3(aVST,Nil,TAudioFile(MP3Liste.Items[i]));
-            // ggf. Cuelist einfügen
-            if (aVST=PlaylistVST) AND Assigned(TAudioFile(MP3Liste.Items[i]).CueList) AND (TAudioFile(MP3Liste.Items[i]).CueList.Count > 0) then
-            begin
-                    for c := 0 to TAudioFile(MP3Liste.Items[i]).CueList.Count - 1 do
-                    begin
-                      CueNode := PlayListVST.AddChild(aNode);
-                      PlayListVST.ValidateNode(CueNode,false);
-                      aData := PlayListVST.GetNodeData(CueNode);
-                      aData^.FAudioFile := TAudiofile(TAudioFile(MP3Liste.Items[i]).Cuelist[c]);
-                    end;
-            end;
-        end;
-
-        aVST.EndUpdate;
-
-        if Mp3Liste.Count > 0 then
-          AktualisiereDetailForm(TAudioFile(Mp3Liste[0]), SD_MEDIENBIB);
-
-        // VDTCoverTimer neu starten
-        VDTCoverTimer.Enabled := True;
-    end;
-end;     *)
 
 
 // Diese Prozedur soll aufgerufen werden, wenn die Liste nach einem
@@ -391,8 +347,6 @@ begin
           AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
         end;
         VST.EndUpdate;
-
-     //   if AudioFile = Nil then exit; // z.B. bei leerer Liste!
 
         // Knoten mit AudioFile suchen und focussieren
         NewNode := VST.GetFirst;
@@ -432,11 +386,8 @@ begin
           end else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         end
-          else
+        else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-
-        // VDTCoverTimer neu starten
-        VDTCoverTimer.Enabled := True;
     end;
 end;
 
@@ -478,8 +429,7 @@ begin
 end;
 
 procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
-var i: integer;
-  NewNode:PVirtualNode;
+var NewNode:PVirtualNode;
   Data:PTreeData;
   tmpAudioFile: TAudioFile;
 begin
@@ -507,69 +457,14 @@ begin
             VST.FocusedNode := NewNode;
             ShowVSTDetails(tmpAudioFile);
             AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-          end else
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-        end
-          else
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-
-    end;
-end;
-
-
-           (*
-// diese Prozedur wird aufgerufen, wenn Knoten entfernt wurden (z.B. bei Kategoriewechsel)
-// Dort soll ein Knoten markiert werden, der an der Stelle steht, an dem das erste markiere File
-// stand.
-// Wow. "Kategoriewechsel" ??? This was something from "Gausis mp3-Verwaltung".
-// A little bit deprecated in dezember 2009
-procedure FillTreeView(MP3Liste: TObjectlist; Index:Integer);
-var i: integer;
-  NewNode: PVirtualNode;
-  Data:PTreeData;
-begin
-    with Nemp_MainForm do
-    begin
-        VST.BeginUpdate;
-        VST.Clear;
-        for i:=0 to MP3Liste.Count-1 do
-        begin
-          AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
-        end;
-
-        VST.EndUpdate;
-
-        If Index < 0 then exit;
-
-        NewNode := VST.GetFirst;
-        i := 0;
-        if assigned(Newnode) then
-        begin
-          while i<index do
-          begin
-            if assigned(VST.GetNext(NewNode)) then
-            begin
-              NewNode := VST.GetNext(NewNode);
-              inc(i);
-            end else
-              // wenn nicht, dann nehme ich den letzten gefunden Knoten
-              i := index+1;
-          end;
-
-          if assigned(Newnode) then // Nur zur Sicherheit!
-          begin
-            VST.Selected[NewNode] := True;
-            VST.FocusedNode := NewNode;
-            Data := VST.GetNodeData(NewNode);
-            AktualisiereDetailForm(Data^.FAudioFile, SD_MEDIENBIB);
           end
           else
               AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         end
-          else
+        else
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
     end;
-end;     *)
+end;
 
 
 function GetObjectAt(form: TForm; x,y: integer): TControl;
@@ -824,8 +719,7 @@ begin
     with Nemp_MainForm do
     begin
         decvalue := ScrobblerImage.Width + 2;
-        currentLeft := RatingImage.Left;// + RatingImage.Width + ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
-        //PaintFrame.Left + PaintFrame.Width - ScrobblerImage.Width ;//191;//6;// 208; // Left-Position ders ersten d.h. rechtesten Images
+        currentLeft := RatingImage.Left;
 
         newTop := RatingImage.Top + RatingImage.Height + 2;//TextAnzeigeIMAGE.Top + TextAnzeigeIMAGE.Height + 16;
 
@@ -872,10 +766,6 @@ procedure SwitchMediaLibrary(NewMode: Integer);
 begin
     with Nemp_MainForm do
     begin
-        //if MedienBib.BrowseMode = NewMode then
-            // nothing to do
-        //    exit; // WE HAVE something to do! - ReSorting the Lists!!
-
         // Bib umschalten.
         StarteLangeAktion(-1,'', True);
         Nemp_MainForm.Enabled := False;
@@ -993,11 +883,6 @@ begin
                 TabBtn_CoverFlow.Refresh;
                 TabBtn_CoverFlow.Refresh;
 
-                //try
-                 //   CloudViewer.SetFocus;
-                //except
-
-                //end;
             end;
         end;
     end;
