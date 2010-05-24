@@ -234,7 +234,6 @@ type
     GrpBox_Skins: TGroupBox;
     LblConst_Preview: TLabel;
     LblConst_Choose: TLabel;
-    Btn_StartSkinEditor: TButton;
     GrpBox_TabAudio2_View: TGroupBox;
     Lbl_Framerate: TLabel;
     CB_visual: TCheckBox;
@@ -284,7 +283,6 @@ type
     CB_Mixing: TComboBox;
     Lbl_FloatingPoints_Status: TLabel;
     GrpBox_TabMedia1_Medialist: TGroupBox;
-    cbDenyId3Edit: TCheckBox;
     CBAutoScanPlaylistFilesOnView: TCheckBox;
     CBAlwaysSortAnzeigeList: TCheckBox;
     GrpBox_Hibernate: TGroupBox;
@@ -471,8 +469,6 @@ type
     function GetFocussedAudioFileName: UnicodeString;
     procedure BTNCancelClick(Sender: TObject);
     procedure cbSkinAuswahlChange(Sender: TObject);
-    //procedure GRPBOXControlPaint(Sender: TObject);
-    procedure Btn_StartSkinEditorClick(Sender: TObject);
     procedure BTNApplyClick(Sender: TObject);
     procedure CBStartCountDownClick(Sender: TObject);
     procedure Btn_ConfigureMediaKeysClick(Sender: TObject);
@@ -1120,7 +1116,7 @@ begin
 
   CB_CoverSearch_LastFM.Checked := (MedienBib.CoverSearchLastFM = BoolTrue);
 
-  cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
+  //cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
 
@@ -1825,14 +1821,6 @@ begin
     TestSkin.DrawPreview(Sender as TNempPanel);
 end;
 
-procedure TOptionsCompleteForm.Btn_StartSkinEditorClick(Sender: TObject);
-begin
-  //if not assigned(SkinEditorForm) then
-  //  Application.CreateForm(TSkinEditorForm, SkinEditorForm);
-  //SkinEditorForm.show;
-  MessageDlg('SkinEditor removed from Nemp.exe. Separate SkinEditor is not implemented yet!', mtError, [mbOK], 0);
-end;
-
 procedure TOptionsCompleteForm.BTNApplyClick(Sender: TObject);
 var i,s,l, maxfont:integer;
   NeedUpdate, NeedFormUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate: boolean;
@@ -2011,7 +1999,7 @@ begin
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
   MedienBib.HideNACover := cbHideNACover.Checked;
 
-  Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
+  //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
@@ -2116,24 +2104,18 @@ begin
   end;
 
 
-//      CBIncludeFiles.Checked[i] := Pos('*' + CBIncludeFiles.Items[i], MedienBib.IncludeFilter) > 0;
-
-
   MedienBib.AutoLoadMediaList := CBAutoLoadMediaList.Checked;
   MedienBib.AutoSaveMediaList := CBAutoSaveMediaList.Checked;
 
   if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);
-  FDetails.UpdateID3ReadOnlyStatus;//SetID3EditsWritable(False);
 
+  //FDetails.UpdateID3ReadOnlyStatus;//SetID3EditsWritable(False);
 
   // Fensterverhalten:
   if Nemp_MainForm.NempOptions.NempWindowView <> GrpBox_TaskTray.ItemIndex then
   begin
-
-
       // Hide Taskbar-entry
-
 
       {NEMPWINDOW_ONLYTASKBAR = 0;
     NEMPWINDOW_TASKBAR_MIN_TRAY = 1;

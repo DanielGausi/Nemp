@@ -267,8 +267,7 @@ end;
 
 
 procedure TCloudEditorForm.ReselectNode(aKey: UTF8String);
-var i: Integer;
-    aNode: PVirtualNode;
+var aNode: PVirtualNode;
     Data: PTagTreeData;
 begin
     aNode := TagVST.GetFirst;
@@ -343,8 +342,7 @@ end;
 
 
 procedure TCloudEditorForm.ReselectIgnoreNode(aKey: String);
-var i: Integer;
-    aNode: PVirtualNode;
+var aNode: PVirtualNode;
     Data: PIgnoreTagData;
 begin
     aNode := IgnoreTagVST.GetFirst;
@@ -361,8 +359,7 @@ begin
 end;
 
 procedure TCloudEditorForm.ClearIgnoreTree;
-var i: Integer;
-    aNode: PVirtualNode;
+var aNode: PVirtualNode;
     aData: PIgnoreTagData;
     dummy, tmp: TIgnoreTagString;
 
@@ -413,8 +410,7 @@ begin
 end;
 
 procedure TCloudEditorForm.ReselectMergeNode(aOriginalKey, aReplaceKey: String);
-var i: Integer;
-    aNode: PVirtualNode;
+var aNode: PVirtualNode;
     Data: PMergeTagData;
 begin
     aNode := MergeTagVST.GetFirst;

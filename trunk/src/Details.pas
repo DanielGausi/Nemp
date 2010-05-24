@@ -228,7 +228,7 @@ type
 
     // Some methods to (de)activate some controls
     procedure UpdateMediaBibEnabledStatus;
-    Procedure UpdateID3ReadOnlyStatus;
+    //Procedure UpdateID3ReadOnlyStatus;
     Procedure UpdateID3v1EnabledStatus;
     Procedure UpdateID3v2EnabledStatus;
     Procedure UpdateMPEGEnabledStatus;
@@ -396,7 +396,7 @@ end;
 procedure TFDetails.FormShow(Sender: TObject);
 begin
     MainPageControl.ActivePageIndex := 0;
-    UpdateID3ReadOnlyStatus;
+//    UpdateID3ReadOnlyStatus;
 end;
 
 procedure TFDetails.FormHide(Sender: TObject);
@@ -721,12 +721,12 @@ end;
     UpdateID3ReadOnlyStatus
     - Set ReadOnly to the ID3-Edits
     --------------------------------------------------------
-}
+
 Procedure TFDetails.UpdateID3ReadOnlyStatus;
 var ControlsEnable, ControlsReadOnly: Boolean;
 begin
-  ControlsEnable := Not Nemp_MainForm.NempOptions.DenyID3Edit;
-  ControlsReadOnly := Nemp_MainForm.NempOptions.DenyID3Edit;
+  ControlsEnable := True;
+  ControlsReadOnly := False;
 
   CBID3v1.Enabled := ControlsEnable;
   CBID3v2.Enabled := ControlsEnable;
@@ -757,6 +757,8 @@ begin
   BtnCopyFromV2.Enabled := ControlsEnable;
   BtnCopyFromV1.Enabled := ControlsEnable;
 end;
+}
+
 {
     --------------------------------------------------------
     UpdateID3v1EnabledStatus
@@ -797,7 +799,7 @@ Procedure TFDetails.UpdateID3v2EnabledStatus;
 var ControlsEnable, ButtonsEnable: Boolean;
 begin
   ControlsEnable := ValidMp3File and ID3v2Activated;
-  ButtonsEnable := ValidMp3File and ID3v2Activated and (not Nemp_MainForm.NempOptions.DenyID3Edit);
+  ButtonsEnable := ValidMp3File and ID3v2Activated;
   CBID3v2.Enabled := ValidMp3File;
   CBID3v2.OnClick := Nil;  // ! Wichtig, sonst Endlossschleife!
   CBID3v2.Checked := ControlsEnable;
@@ -828,7 +830,6 @@ begin
   LblConst_ID3v2Track.Enabled := ControlsEnable;
   LblConst_ID3v2Year.Enabled := ControlsEnable;
   BtnCopyFromV2.Enabled := ControlsEnable;
-//  cbWriteRatingToTag.Enabled := ValidMp3File and (not Nemp_MainForm.NempOptions.DenyID3Edit);
   // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
   if (AktuellesAudioFile <> NIL)
     AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
@@ -841,7 +842,7 @@ begin
       Memo_Lyrics.Enabled := True;
   end else
   begin
-      Memo_Lyrics.ReadOnly := Nemp_MainForm.NempOptions.DenyID3Edit;
+      Memo_Lyrics.ReadOnly := False;
       Memo_Lyrics.Enabled := ControlsEnable;
   end;
 
@@ -857,6 +858,9 @@ begin
   Btn_NewPicture.Enabled       := ButtonsEnable;
   Btn_DeletePicture.Enabled    := ButtonsEnable;
   Btn_SavePictureToFile.Enabled := ButtonsEnable;
+
+  LblConst_Id3v2Version.Enabled := ControlsEnable;
+  LblConst_Id3v2Size.Enabled := ControlsEnable;
 end;
 {
     --------------------------------------------------------
@@ -1322,9 +1326,9 @@ begin
                 cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[0], Description]));
         end;
 
-        Btn_DeletePicture.Enabled := (Not Nemp_MainForm.NempOptions.DenyID3Edit) and  (cbPictures.Items.Count > 0);
-        Btn_SavePictureToFile.Enabled := (cbPictures.Items.Count > 0);
-        Btn_NewPicture.Enabled := Not Nemp_MainForm.NempOptions.DenyID3Edit;
+        Btn_DeletePicture.Enabled := cbPictures.Items.Count > 0;
+        Btn_SavePictureToFile.Enabled := cbPictures.Items.Count > 0;
+        Btn_NewPicture.Enabled := True;
 
         if cbPictures.Items.Count > 0 then
         begin

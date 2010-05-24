@@ -591,6 +591,9 @@ begin
     Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
     Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
 
+    Nemp_MainForm.LyricsMemo.Top          := 5;
+    Nemp_MainForm.LyricsMemo.Height       := Nemp_MainForm.GRPBoxLyrics.Height - 10;
+
 
     if Not fActive then
     begin

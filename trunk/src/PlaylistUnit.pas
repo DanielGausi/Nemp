@@ -207,17 +207,9 @@ begin
 end;
 
 Procedure TPlaylistForm.WMDropFiles (Var aMsg: tMessage);
-Var
-  Idx,
-  Size,
-  FileCount: Integer;
-  Filename: PChar;
-  abspielen: Boolean;
-  p: TPoint;
 Begin
     Inherited;
-
-  Handle_DropFilesForPlaylist(aMsg);
+    Handle_DropFilesForPlaylist(aMsg);
 end;
 
 

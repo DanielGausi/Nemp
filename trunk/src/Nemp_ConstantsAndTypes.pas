@@ -139,7 +139,7 @@ type
 
     TNempOptions = record
         // etaws Kleinkram und allgemeine Optionen
-        DenyID3Edit: Boolean;
+        //DenyID3Edit: Boolean;
         AllowOnlyOneInstance: Boolean;
         RegisterHotKeys: Boolean;
         IgnoreVolumeUpDownKeys: Boolean;
@@ -810,7 +810,7 @@ var i: integer;
 begin
   With Options do
   begin
-        DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
+        //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
         StartMinimized  := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
         RegisterHotKeys := ini.ReadBool('Allgemein', 'RegisterHotKeys', True);
@@ -948,7 +948,7 @@ var i: integer;
 begin
   With Options do
   begin
-        ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
+        //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
         ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);

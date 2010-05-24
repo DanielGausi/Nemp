@@ -163,7 +163,6 @@ Uses NempMainUnit, TagClouds;
 
 
 Constructor TTagSetting.Create;
-var i: Integer;
 begin
     inherited create;
     CheckList := TStringList.Create;
