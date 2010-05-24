@@ -3,7 +3,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   Top = 125
   BorderIcons = [biSystemMenu]
   Caption = 'Preferences'
-  ClientHeight = 578
+  ClientHeight = 585
   ClientWidth = 667
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -24,14 +24,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   OnShow = FormShow
   DesignSize = (
     667
-    578)
+    585)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionsVST: TVirtualStringTree
     Left = 8
     Top = 8
     Width = 185
-    Height = 532
+    Height = 539
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
@@ -49,24 +49,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
+    ExplicitHeight = 532
     Columns = <>
   end
   object PageControl1: TPageControl
     Left = 200
     Top = 6
     Width = 457
-    Height = 536
-    ActivePage = TabAnzeige5
+    Height = 543
+    ActivePage = TabAudio8
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
     TabStop = False
+    ExplicitHeight = 536
     object TabSystem0: TTabSheet
       Caption = 'System (Main)'
       ImageIndex = 6
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
         Top = 192
@@ -217,9 +220,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'System1'
       ImageIndex = 5
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
         Top = 208
@@ -1127,6 +1131,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'System2'
       ImageIndex = 6
+      ExplicitHeight = 436
       object Label3: TLabel
         Left = 16
         Top = 336
@@ -1282,9 +1287,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'System3'
       ImageIndex = 20
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object LblTaskbarWin7: TLabel
         Left = 24
         Top = 149
@@ -1401,6 +1407,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige0: TTabSheet
       Caption = 'Anzeige (Main)'
       ImageIndex = 1
+      ExplicitHeight = 436
       object RGrp_View: TRadioGroup
         Left = 8
         Top = 72
@@ -1461,7 +1468,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 224
         Width = 433
-        Height = 217
+        Height = 178
         Hint = 'Available skins for Nemp.'
         Caption = 'Available skins'
         TabOrder = 3
@@ -1479,15 +1486,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Caption = 'Choose'
         end
-        object Btn_StartSkinEditor: TButton
-          Left = 8
-          Top = 180
-          Width = 161
-          Height = 25
-          Caption = 'Start skin editor'
-          TabOrder = 1
-          OnClick = Btn_StartSkinEditorClick
-        end
         object cbSkinAuswahl: TComboBox
           Left = 8
           Top = 36
@@ -1501,31 +1499,32 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object NewPlayerPanelOptions: TNempPanel
           Left = 183
           Top = 35
-          Width = 234
-          Height = 120
+          Width = 230
+          Height = 131
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 2
+          TabOrder = 1
           OnPaint = NewPlayerPanelOptionsPaint
           OwnerDraw = False
           DesignSize = (
-            234
-            120)
+            230
+            131)
           object PaintFrame: TImage
             Left = 96
             Top = 25
             Width = 113
             Height = 38
+            Visible = False
           end
           object TextAnzeigeIMAGE: TImage
             Left = 4
             Top = 5
-            Width = 220
+            Width = 216
             Height = 14
             Anchors = [akLeft, akTop, akRight]
             ParentShowHint = False
             ShowHint = True
-            ExplicitWidth = 216
+            Visible = False
           end
           object TimePaintBox: TImage
             Left = 8
@@ -1534,6 +1533,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Height = 14
             ParentShowHint = False
             ShowHint = True
+            Visible = False
           end
           object SlidebarShape: TShape
             Left = 16
@@ -1543,6 +1543,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Brush.Color = clGradientActiveCaption
             DragCursor = crSizeWE
             Shape = stRoundRect
+            Visible = False
           end
           object VolShape: TShape
             Left = 215
@@ -1552,6 +1553,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Brush.Color = clGradientActiveCaption
             DragCursor = crSizeNS
             Shape = stRoundRect
+            Visible = False
           end
           object RatingImage: TImage
             Left = 8
@@ -1668,6 +1670,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               FFFFFFFF797979FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            Visible = False
           end
           object SlideBarButton: TSkinButton
             Left = 20
@@ -1678,6 +1681,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             DragCursor = crSizeWE
             ParentDoubleBuffered = False
             TabOrder = 0
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1700,6 +1704,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1721,6 +1726,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ShowHint = True
             Spacing = 14
             TabOrder = 2
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1741,6 +1747,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 3
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 2
@@ -1761,6 +1768,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 4
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 2
@@ -1780,6 +1788,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 5
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 2
@@ -1800,6 +1809,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 6
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1821,6 +1831,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 7
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1840,6 +1851,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 8
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 4
@@ -1861,6 +1873,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ParentShowHint = False
             ShowHint = True
             TabOrder = 9
+            Visible = False
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1872,7 +1885,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             AcceptArrowKeys = True
           end
           object Menu1Img: TSkinButton
-            Left = 200
+            Left = 196
             Top = 79
             Width = 12
             Height = 12
@@ -1884,6 +1897,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ShowHint = True
             TabOrder = 10
             TabStop = False
+            Visible = False
             DrawMode = dm_Skin
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1905,6 +1919,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ShowHint = True
             TabOrder = 11
             TabStop = False
+            Visible = False
             DrawMode = dm_Skin
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1926,6 +1941,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ShowHint = True
             TabOrder = 12
             TabStop = False
+            Visible = False
             DrawMode = dm_Skin
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1959,9 +1975,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige4: TTabSheet
       Caption = 'Anzeige1 (Player)'
       ImageIndex = 20
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_TabAudio2_View: TGroupBox
         Left = 8
         Top = 8
@@ -2139,9 +2156,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige5: TTabSheet
       Caption = 'Anzeige2 (View)'
       ImageIndex = 24
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_TabMedia3_Columns: TGroupBox
         Left = 8
         Top = 8
@@ -2341,9 +2359,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige1: TTabSheet
       Caption = 'Anzeige3 (Fonts)'
       ImageIndex = 7
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_Fonts: TGroupBox
         Left = 8
         Top = 8
@@ -2530,6 +2549,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAnzeige6: TTabSheet
       Caption = 'Anzeige4 (PartyMode)'
       ImageIndex = 19
+      ExplicitHeight = 436
       object GrpBoxPartyMode: TGroupBox
         Left = 8
         Top = 8
@@ -2598,9 +2618,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio0: TTabSheet
       Caption = 'Audio (Main)'
       ImageIndex = 2
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_Devices: TGroupBox
         Left = 8
         Top = 8
@@ -2776,9 +2797,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio3: TTabSheet
       Caption = 'Audio1 (Playlist)'
       ImageIndex = 19
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_PlaylistBehaviour: TGroupBox
         Left = 8
         Top = 192
@@ -2944,9 +2966,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio8: TTabSheet
       Caption = 'Audio2 (Medialib)'
       ImageIndex = 22
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_Directories: TGroupBox
         Left = 8
         Top = 8
@@ -3058,20 +3081,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_TabMedia1_Medialist: TGroupBox
         Left = 8
-        Top = 367
+        Top = 371
         Width = 434
-        Height = 98
+        Height = 71
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Other'
         TabOrder = 2
-        object cbDenyId3Edit: TCheckBox
-          Left = 8
-          Top = 68
-          Width = 401
-          Height = 17
-          Caption = 'Deny editing of id3-tags (probably soon obselete)'
-          TabOrder = 2
-        end
         object CBAutoScanPlaylistFilesOnView: TCheckBox
           Left = 8
           Top = 16
@@ -3100,13 +3115,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Skip this sorting when the list is too large.'
           Caption = 'Skip sort on large lists (> 5000)'
-          TabOrder = 3
+          TabOrder = 2
         end
       end
     end
     object TabAudio2: TTabSheet
       Caption = 'Audio2a (Rating)'
       ImageIndex = 20
+      ExplicitHeight = 436
       object GroupBox1: TGroupBox
         Left = 13
         Top = 8
@@ -3211,9 +3227,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio4: TTabSheet
       Caption = 'Audio3 (Webradio)'
       ImageIndex = 23
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_WebradioRecording: TGroupBox
         Left = 8
         Top = 91
@@ -3392,9 +3409,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio5: TTabSheet
       Caption = 'Audio4 (Effekte)'
       ImageIndex = 15
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
@@ -3512,9 +3530,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio7: TTabSheet
       Caption = 'Audio5 (Birthday)'
       ImageIndex = 19
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_TabAudio7_Countdown: TGroupBox
         Left = 8
         Top = 8
@@ -3687,6 +3706,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio9: TTabSheet
       Caption = 'Audio6 (Scrobble)'
       ImageIndex = 17
+      ExplicitHeight = 436
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4032,9 +4052,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio10: TTabSheet
       Caption = 'Audio7 (Webserver)'
       ImageIndex = 18
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
@@ -4205,33 +4226,36 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 275
         Width = 434
-        Height = 151
+        Height = 158
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Log'
         TabOrder = 2
+        ExplicitHeight = 151
         DesignSize = (
           434
-          151)
+          158)
         object WebServerLogMemo: TMemo
           Left = 4
           Top = 17
           Width = 422
-          Height = 126
+          Height = 133
           Anchors = [akLeft, akTop, akRight, akBottom]
           Lines.Strings = (
             '')
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
+          ExplicitHeight = 126
         end
       end
     end
     object TabExtended0: TTabSheet
       Caption = 'Extended (Main)'
       ImageIndex = 21
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_ExtendedAudio: TGroupBox
         Left = 8
         Top = 8
@@ -4410,9 +4434,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended1: TTabSheet
       Caption = 'Ext1 (Search Options)'
       ImageIndex = 25
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
         Left = 8
         Top = 8
@@ -4556,9 +4581,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabExtended2: TTabSheet
       Caption = 'Ext2 (Unicode)'
       ImageIndex = 23
+      ExplicitHeight = 436
       DesignSize = (
         449
-        436)
+        443)
       object GrpBox_TabMedia5_ID3: TGroupBox
         Left = 8
         Top = 8
@@ -4730,17 +4756,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNApply: TButton
     Left = 582
-    Top = 548
+    Top = 555
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Apply'
     TabOrder = 2
     OnClick = BTNApplyClick
+    ExplicitTop = 548
   end
   object BTNCancel: TButton
     Left = 502
-    Top = 548
+    Top = 555
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4748,10 +4775,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Cancel'
     TabOrder = 3
     OnClick = BTNCancelClick
+    ExplicitTop = 548
   end
   object BTNok: TButton
     Left = 422
-    Top = 548
+    Top = 555
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4759,6 +4787,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Default = True
     TabOrder = 4
     OnClick = BTNokClick
+    ExplicitTop = 548
   end
   object ColorDialog1: TColorDialog
     Left = 104

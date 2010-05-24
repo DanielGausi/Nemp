@@ -971,7 +971,6 @@ end;
 }
 procedure TCoverDownloadWorkerThread.SyncUpdateCover;
 var bmp: TBitmap;
-    r: TRect;
     HintString: String;
 begin
 

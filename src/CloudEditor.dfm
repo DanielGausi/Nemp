@@ -72,6 +72,10 @@ object CloudEditorForm: TCloudEditorForm
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         498
         350)

@@ -3327,7 +3327,6 @@ end;
 
 procedure TNemp_MainForm.PM_ML_DeleteSelectedClick(Sender: TObject);
 var i:integer;
-    Data: PTreeData;
     AlbumData: PStringTreeData;
     FocussedAlbumNode, NewSelectNode: PVirtualNode;
     SelectedPlaylist: TJustaString;
@@ -5387,11 +5386,6 @@ begin
       exit;
     end;
 
-    if NempOptions.DenyID3Edit then
-    begin
-        MessageDLG((Error_ID3EditDenied), mtInformation, [mbOK], 0);
-        exit; // Edit nicht erlaubt
-    end;
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
@@ -5424,11 +5418,6 @@ begin
       exit;
     end;
 
-    if NempOptions.DenyID3Edit then
-    begin
-      MessageDLG((Error_ID3EditDenied), mtInformation, [mbOK], 0);
-      exit; // Edit nicht erlaubt
-    end;
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);

@@ -63,7 +63,6 @@ type
             // Note: I'm not using a NempCover-object here, to remember the idx, even
             //       if a Cover is deleted.
 
-            fCaption: String; // caption for the current Cover
             function fGetCurrentItem: Integer;
             // SetCurrentItem: Set the current Item and draws cover and scrollcover
             procedure fSetCurrentItem(aValue: Integer);

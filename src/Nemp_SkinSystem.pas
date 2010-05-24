@@ -1846,9 +1846,9 @@ begin
     try
         tmp.Width := aPanel.Width;
         tmp.Height := aPanel.Height;
+
         pnlPoint := Nemp_MainForm.NewPlayerPanel.ClientToScreen(Point(0,0));
         OffsetPoint := Nemp_MainForm.PlayerPanel.ClientToScreen(Point(0,0));
-        stretch := False;
 
         if UseSeparatePlayerBitmap then
         begin
@@ -1856,16 +1856,15 @@ begin
             // The NewPlayerPanel On OptionsForm is bigger than the NewPlayerPanel on Mainform
             // This ist to include the Top/Left-Values of MainForm.NewPlayerPanel on the
             // MainForm PlayerPanel-Container-Panel
-            localOffsetX := -2;
-            localOffsetY := -2;
+            localOffsetX := 0;
+            localOffsetY := 0;
             sourceBmp := PlayerBitmap;
-            //localDrawFrame := DrawGroupboxFramesMain;
+            OffsetPoint := pnlPoint;
         end else
         begin
-            localOffsetX := PlayerPageOffsetX-2;
-            localOffsetY := PlayerPageOffsetY-2;
+            localOffsetX := PlayerPageOffsetX;
+            localOffsetY := PlayerPageOffsetY;
             sourceBmp := CompleteBitmap;
-            //localDrawFrame := DrawGroupboxFrames;
         end;
         TileGraphic(sourceBmp, tmp.Canvas,
               localOffsetX + (pnlPoint.X - OffsetPoint.X) ,
