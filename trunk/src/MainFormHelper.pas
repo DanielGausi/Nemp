@@ -352,47 +352,54 @@ begin
         NewNode := VST.GetFirst;
         if assigned(Newnode) then
         begin
-          Data := VST.GetNodeData(NewNode);
-          tmpAudioFile := Data^.FAudioFile;
-          if tmpAudioFile <> AudioFile then
-          repeat
-            NewNode := VST.GetNext(NewNode);
-            if assigned(NewNode) then
-            begin
-                Data := VST.GetNodeData(NewNode);
-                tmpAudioFile := Data^.FAudioFile;
-            end;
-          until (tmpAudioFile = AudioFile) OR (NewNode=NIL);
-
-          // Ok, we didn't found our AudioFile.
-          // get the first one in the list.
-          if not assigned(NewNode) then
-          begin
-              NewNode := VST.GetFirst;
-              // and get the corresponding AudioFile again
+            Data := VST.GetNodeData(NewNode);
+            tmpAudioFile := Data^.FAudioFile;
+            if tmpAudioFile <> AudioFile then
+            repeat
+              NewNode := VST.GetNext(NewNode);
               if assigned(NewNode) then
               begin
                   Data := VST.GetNodeData(NewNode);
                   tmpAudioFile := Data^.FAudioFile;
               end;
-          end;
+            until (tmpAudioFile = AudioFile) OR (NewNode=NIL);
 
-          if assigned(Newnode) then // Nur zur Sicherheit!
-          begin
-            VST.Selected[NewNode] := True;
-            VST.FocusedNode := NewNode;
-            AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-            ShowVSTDetails(tmpAudioFile);
-          end else
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            // Ok, we didn't found our AudioFile.
+            // get the first one in the list.
+            if not assigned(NewNode) then
+            begin
+                NewNode := VST.GetFirst;
+                // and get the corresponding AudioFile again
+                if assigned(NewNode) then
+                begin
+                    Data := VST.GetNodeData(NewNode);
+                    tmpAudioFile := Data^.FAudioFile;
+                end;
+            end;
+
+            if assigned(Newnode) then // Nur zur Sicherheit!
+            begin
+              VST.Selected[NewNode] := True;
+              VST.FocusedNode := NewNode;
+              AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+              ShowVSTDetails(tmpAudioFile);
+            end else
+              AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         end
         else
+        begin
+            // no file in view
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            ShowVSTDetails(Nil);
+        end;
     end;
 end;
 
 procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
 var i: integer;
+    NewNode:PVirtualNode;
+    Data:PTreeData;
+    tmpAudioFile: TAudioFile;
 begin
     with Nemp_MainForm do
     begin
@@ -410,7 +417,28 @@ begin
             AddVSTMp3(VST,Nil,TAudioFile(List2.Items[i]));
 
         VST.EndUpdate;
-        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+
+        NewNode := VST.GetFirst;
+        if assigned(Newnode) then
+        begin
+            Data := VST.GetNodeData(NewNode);
+            tmpAudioFile := data^.FAudioFile;
+            if tmpAudioFile <> Dummy then
+            begin
+                VST.Selected[NewNode] := True;
+                VST.FocusedNode := NewNode;
+                AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+                ShowVSTDetails(tmpAudioFile);
+            end else
+            begin
+                AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+                ShowVSTDetails(Nil);
+            end;
+        end else
+        begin
+            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            ShowVSTDetails(Nil);
+        end;
     end;
 end;
 
@@ -425,6 +453,7 @@ begin
 
         VST.EndUpdate;
         AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+        ShowVSTDetails(Nil);
     end;
 end;
 
@@ -459,10 +488,16 @@ begin
             AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
           end
           else
+          begin
               AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+              ShowVSTDetails(Nil);
+          end;
         end
         else
+        begin
             AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            ShowVSTDetails(Nil);
+        end;
     end;
 end;
 
