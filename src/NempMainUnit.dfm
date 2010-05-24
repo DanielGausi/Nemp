@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 848
+  ClientHeight = 868
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2198,18 +2198,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 509
     Width = 845
-    Height = 339
+    Height = 359
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 339
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 311
+      Height = 331
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2218,23 +2219,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 311
       DesignSize = (
         845
-        311)
+        331)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 301
+        Height = 321
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 301
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 301
+          Height = 321
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2244,7 +2247,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 301
+          Height = 321
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2311,6 +2314,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 301
           Columns = <
             item
               Position = 0
@@ -2384,7 +2388,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 301
+          Height = 321
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2394,6 +2398,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 301
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3749,7 +3754,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300E0030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300E4030E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4314,7 +4319,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806E40410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806E80410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7093,7 +7098,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 536
     Top = 632
     Bitmap = {
-      494C0101070028004C0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800500110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

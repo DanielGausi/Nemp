@@ -4552,7 +4552,16 @@ begin
         end;
 
         if NOT AudioFile.FileIsPresent then
-            Font.Style := Font.Style + [fsStrikeOut];
+        begin
+            case VST.Header.Columns[column].Tag of
+                CON_RATING,
+                CON_LASTFMTAGS,
+                CON_LYRICSEXISTING: ; // nothing
+            else
+                // strike out
+                Font.Style := Font.Style + [fsStrikeOut];
+            end;
+        end;
     end;
 end;
 
@@ -4856,12 +4865,23 @@ procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
 begin
     if assigned(aAudioFile) then
     begin
-        LblBibArtist    .Caption := SetString(aAudioFile.Artist, AudioFileProperty_Artist);
-        LblBibTitle     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
-        LblBibAlbum     .Caption := SetString(aAudioFile.Album, AudioFileProperty_Album);
-        LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
-        LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
-        LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+        if aAudioFile.isStream then
+        begin
+            LblBibArtist    .Caption := SetString(aAudioFile.Description, AudioFileProperty_Name);
+            LblBibTitle     .Caption := SetString(aAudioFile.Ordner, AudioFileProperty_URL);
+            LblBibAlbum     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
+            LblBibTrack     .Caption := '(' + AudioFileProperty_Webstream + ')';
+            LblBibYear      .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
+            LblBibGenre     .Caption := '';
+        end else
+        begin
+            LblBibArtist    .Caption := SetString(aAudioFile.Artist, AudioFileProperty_Artist);
+            LblBibTitle     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
+            LblBibAlbum     .Caption := SetString(aAudioFile.Album, AudioFileProperty_Album);
+            LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
+            LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
+            LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+        end;
     end;
 end;
 
@@ -4870,37 +4890,17 @@ var Coverbmp: TBitmap;
     tmp: String;
 begin
   MedienBib.CurrentAudioFile := aAudioFile;
-
-  if aAudioFile = NIL then exit;
+  if aAudioFile = NIL then
+  begin
+      ImgDetailCover.Visible := False;
+      VDTCoverInfoPanel.Visible := False;
+  end else
+  begin
+      ImgDetailCover.Visible := True;
+      VDTCoverInfoPanel.Visible := NempOptions.DetailMode > 0;
+  end;
 
   FillBibDetailLabels(aAudioFile);
-
-  EdtBibArtist    .Text := aAudioFile.Artist;
-  EdtBibTitle     .Text := aAudioFile.Titel;
-  EdtBibAlbum     .Text := aAudioFile.Album;
-  EdtBibTrack     .Text := IntToStr(aAudioFile.Track);
-  EdtBibYear      .Text := aAudioFile.Year;
-  if Trim(aAudioFile.Genre) = '' then
-      EdtBibGenre     .Text := 'Other'
-  else
-      EdtBibGenre     .Text := aAudioFile.Genre;
-
-  LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
-                            + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
-
-  if aAudioFile.vbr then
-      tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
-  else
-      tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
-  LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
-
-  ImgBibRating.Visible := True;
-  BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
-
-
-  LblBibTags.Caption := aAudioFile.TagDisplayString; //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
-
-  LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
   // Get Cover
   Coverbmp := tBitmap.Create;
   try
@@ -4913,6 +4913,40 @@ begin
       ImgDetailCover.Refresh;
   finally
       Coverbmp.Free;
+  end;
+
+  if not assigned(aAudiofile) then
+       exit;
+
+  if aAudioFile.isStream then
+  begin
+      ImgBibRating.Visible := False;
+      LblBibDuration  .Caption := '';
+      LblBibPlayCounter.Caption := '';
+      LblBibTags.Caption := '';
+      LblBibQuality.Caption := '';
+  end else
+  begin
+      EdtBibArtist    .Text := aAudioFile.Artist;
+      EdtBibTitle     .Text := aAudioFile.Titel;
+      EdtBibAlbum     .Text := aAudioFile.Album;
+      EdtBibTrack     .Text := IntToStr(aAudioFile.Track);
+      EdtBibYear      .Text := aAudioFile.Year;
+      if Trim(aAudioFile.Genre) = '' then
+          EdtBibGenre     .Text := 'Other'
+      else
+          EdtBibGenre     .Text := aAudioFile.Genre;
+      LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
+                                + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
+      if aAudioFile.vbr then
+          tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
+      else
+          tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
+      LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
+      ImgBibRating.Visible := True;
+      BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+      LblBibTags.Caption := aAudioFile.TagDisplayString; //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+      LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
   end;
 end;
 
@@ -5175,7 +5209,10 @@ end;
 // OnKeyEnter  : Show the Label again, update the Information
 procedure TNemp_MainForm.LblBibArtistClick(Sender: TObject);
 begin
-    if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
+        exit;
+
+    if (not MedienBib.CurrentAudioFile.isStream) then
         AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
@@ -5183,26 +5220,29 @@ begin
     if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
         exit;
 
-    MemBibTags.Top := LblBibDuration.Top;
-    MemBibTags.Left := LblBibDuration.Left - 4;
-    MemBibTags.Width := min(200, VDTCoverInfoPanel.Width - MemBibTags.Left);
-    MemBibTags.Height := min(150, VDTCoverInfoPanel.Height - MemBibTags.Top );
+    if (not MedienBib.CurrentAudioFile.isStream) then
+    begin
+        MemBibTags.Top := LblBibDuration.Top;
+        MemBibTags.Left := LblBibDuration.Left - 4;
+        MemBibTags.Width := min(200, VDTCoverInfoPanel.Width - MemBibTags.Left);
+        MemBibTags.Height := min(150, VDTCoverInfoPanel.Height - MemBibTags.Top );
 
 
-    BtnApplyEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
-    BtnApplyEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28;
+        BtnApplyEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
+        BtnApplyEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28;
 
-    BtnCancelEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
-    BtnCancelEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28 - 29;
+        BtnCancelEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
+        BtnCancelEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28 - 29;
 
-    MemBibTags.Text := MedienBib.CurrentAudioFile.RawTagLastFM;
+        MemBibTags.Text := MedienBib.CurrentAudioFile.RawTagLastFM;
 
-    LblBibTags.Visible := False;
-    MemBibTags.Visible := True;
-    BtnApplyEditTags.Visible := True;
-    BtnCancelEditTags.Visible := True;
+        LblBibTags.Visible := False;
+        MemBibTags.Visible := True;
+        BtnApplyEditTags.Visible := True;
+        BtnCancelEditTags.Visible := True;
 
-    MemBibTags.SetFocus;
+        MemBibTags.SetFocus;
+    end;
 end;
 
 procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
@@ -5765,7 +5805,7 @@ begin
       end
       else
           MessageDlg(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
-
+      ShowVSTDetails(NIL);
   end else
       MedienBib.GenerateAnzeigeListe(Artist, Album);
 end;

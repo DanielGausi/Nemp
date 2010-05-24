@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_ExtendedID3v2
+    ActivePage = Tab_General
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'

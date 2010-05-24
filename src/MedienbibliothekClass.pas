@@ -1782,7 +1782,7 @@ var i, toteFilesCount, freq: Integer;
     einUpdate: boolean;
 begin
   // AudioFiles will be changed. Block everything.
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0); //
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
