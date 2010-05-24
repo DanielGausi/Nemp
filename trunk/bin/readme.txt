@@ -119,14 +119,6 @@ Verwendete Units/Komponenten:
 
 Version 4.0.0 (Serengeti), Mai (Juni?) 2010
 ----------------------------------------------------------- 
-       Todo für die fertige Version)
-       -----------------------------
-       - Lyric-Suche von Bergmann einbauen
-       - Korrektur des Ogg-Lese-Codes
-       - Skin-Editor bauen oder Menüpunkt erstmal entfernen
-       - Deskband korrigieren 
-        (für XP 32Bit. Vista lass ich aus, Win7 erledigt die Taskleiste, 64Bit geht eh nicht)
-
 * Änderung der Lizenz von "Freeware" auf OpenSource
   - Nemp steht ab jetzt unter der GPL
 * Wechsel der Programmierumgebung von Delphi7 auf Delphi2009
@@ -191,6 +183,8 @@ Neue Funktionen:
 * GUI
   - Bei Klick in den Playerteil: Lautstärke-Regelung per Mausrad
   - Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
+  - intelligentere Größenveränderung der Komponenten bei Resize des Hauptfensters
+* Erkennung von VBRI-Headern in mp3-Dateien
 
 Änderungen:
 -----------
@@ -203,7 +197,9 @@ Neue Funktionen:
   - die Umschalt-Buttons über der "Browse-Liste" schalten jetzt um zwischen 
     Classic, Coverflow und Tagwolke
   - Klick auf "Voriger Titel" springt nach den ersten 5 Sekunden nur zum Anfang des 
-    aktuellen Stückes
+    aktuellen Stückes  
+* Deskand-Installierung wird unter Windows Vista und 7 verweigert - da funktioniert das 
+  eh nicht richtig.
 * Auswahl "Jetzt abspielen, später abspielen, ..." anders
 * "Kopfhörer-Ausgabe" auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
 * Skineditor aus dem Hauptprogramm entfernt - der wird als eigenes Programm 
@@ -217,13 +213,14 @@ Neue Funktionen:
 * System "Schnellsuche" überarbeitet. Es wird immer alles durchsucht, nicht nur 
   die "aktuelle Liste". 
   - Treffer aus dieser Liste werden aber zuerst angezeigt
-  - statt der Checkbox jetzt ein Button zum Löschend der Eingabe
+  - statt der Checkbox jetzt ein Button zum Löschen der Eingabe
 
 Bugfixes:
 ---------
 * Beim Sliden in einem Lied bis fast ans Ende wurde u.U. kein Faden ausgeführt
 * Wenn die Medienbibliothek leer war, wurden die "überwachten Verzeichnisse" nicht
   nach neuen Dateien gescannt.
+* Die Suche über den Webserver lieferte nicht immer die erwarteten Ergebnisse
 
 
 
