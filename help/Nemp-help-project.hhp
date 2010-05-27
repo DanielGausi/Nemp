@@ -1,0 +1,18 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=Nemp-help-project.chm
+Contents file=nemp-toc.hhc
+Default topic=nemp_start.html
+Display compile progress=No
+Language=0x407 Deutsch (Deutschland)
+Title=Nemp - Noch ein mp3-Player
+
+
+[FILES]
+nemp_medienbib.html
+nemp_play.html
+nemp_playlist.html
+nemp_start.html
+
+[INFOTYPES]
+
