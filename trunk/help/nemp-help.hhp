@@ -1,6 +1,6 @@
 [OPTIONS]
 Compatibility=1.1 or later
-Compiled file=Nemp-help-project.chm
+Compiled file=nemp-help.chm
 Contents file=nemp-toc.hhc
 Default topic=nemp_start.html
 Display compile progress=No
@@ -13,6 +13,10 @@ nemp_medienbib.html
 nemp_play.html
 nemp_playlist.html
 nemp_start.html
+nemp_coverflow.html
+nemp_tagcloud.html
+medienbib_pflege.html
+medienbib_cloudeditor.html
 
 [INFOTYPES]
 

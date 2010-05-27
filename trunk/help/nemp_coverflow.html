@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>Der Coverflow in Nemp</title>
+
+
+  <style title="" media="" type="text/css">
+.head { margin: 0px;
+padding: 0px;
+top: 0px;
+left: 0px;
+right: 0px;
+bottom: 0px;
+}
+body { font-family: Verdana;
+font-size: 12px;
+}
+td { font-family: Verdana;
+font-size: 12px;
+}
+  </style>
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
+
+      <td>
+      <h2 class="head">Der Coverflow</h2>
+
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+Der Coverflow in Nemp funktioniert eventuell etwas anders als in
+anderen Playern. Folgendes passiert f&uuml;r diese Anzeige:<br>
+
+<ol>
+
+  <li>Jede mp3-Datei wird nach einem Cover im ID3-Tag hin
+untersucht. Wenn eines vorhanden ist, wird das genommen.</li>
+
+  <li>Wenn kein Cover im ID3-Tag vorhanden ist, wird auf der
+Festplatte "in der N&auml;he" zur Audiodatei nach Bildern gesucht.</li>
+
+  <li>Aus dieser Bilderliste wird dann das Bild genommen, was
+nach "Front-Cover" aussieht.&nbsp;</li>
+
+  <li>Alle Dateien, zu denen dasselbe Cover gefunden wurde,
+werden unter diesem Cover gruppiert.</li>
+
+  <li>Wenn zu einer Datei kein Cover gefunden werden kann, wird
+nach Ordner gruppiert.</li>
+
+</ol>
+
+"In der N&auml;he" l&auml;sst sich in den Einstellungen genauer
+angeben. Voreingestellt ist dieses Suchverhalten:<br>
+
+<ul style="list-style-type: circle;">
+
+  <li>Suche im Ordner der Audiodatei</li>
+
+  <li>Suche in einem Unterordner mit "cover" im Ordnernamen</li>
+
+  <li>Suche im &uuml;bergeordneten Ordner (falls dort nicht
+zuviele Dateien/Ordner enthalten sind)</li>
+
+  <li>Suche in einem Unterordner des &uuml;bergeordneten
+Ordners ("Nachbarordner") mit "cover" im Namen (falls der
+&uuml;bergeordnete Ordner nicht zuviele Dateien/Ordner
+enth&auml;lt)</li>
+
+</ul>
+
+Idee dahinter sind folgende F&auml;lle, in
+denen&nbsp;erfolgreich das passende Bild zu den Liedern gefunden
+wird.<br>
+
+<span style="font-family: monospace;"></span><span style="font-family: monospace;"><br>
+
+</span>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td><span style="font-family: monospace;">c:\EinAlbum<br>
+
+&nbsp; \Track 1.mp3<br>
+
+      </span><span style="font-family: monospace;">&nbsp;
+\</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 2.mp3</span><br>
+
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">&nbsp; \front.jpg</span></td>
+
+      <td><span style="font-family: monospace;">c:\EinAlbum<br>
+
+&nbsp; \Cover<br>
+
+&nbsp; &nbsp;&nbsp;&nbsp;</span><span style="font-family: monospace;">\front.jpg</span><br>
+
+      <span style="font-family: monospace;">&nbsp; </span><span style="font-family: monospace;">\</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 1.mp3<br>
+
+      </span><span style="font-family: monospace;">&nbsp;
+\</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 2.mp3</span><br>
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;<br>
+
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;
+&nbsp;&nbsp;</span></td>
+
+      <td><span style="font-family: monospace;">c:\EinDoppelAlbum<br>
+
+&nbsp; \CD 1<br>
+
+&nbsp; &nbsp;&nbsp; \</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 1.mp3<br>
+
+&nbsp; \CD 2<br>
+
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;
+&nbsp; \</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 2.mp3</span><br>
+
+      <span style="font-family: monospace;"></span><span style="font-family: monospace;">&nbsp; \front.jpg</span></td>
+
+      <td><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span><span style="font-family: monospace;">c:\EinDoppelAlbum<br>
+
+&nbsp; \CD 1<br>
+
+&nbsp; &nbsp;&nbsp; \</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 1.mp3<br>
+
+&nbsp; \CD 2<br>
+
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;
+&nbsp; \</span><span style="font-family: monospace;">Track</span><span style="font-family: monospace;"> 2.mp3</span><br>
+
+      <span style="font-family: monospace;">&nbsp;&nbsp;\Cover
+      <br>
+
+      </span><span style="font-family: monospace;">&nbsp;&nbsp;
+&nbsp; \front.jpg</span></td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br>
+
+F&uuml;r das Front-Cover wird eine Datei gesucht, die ein "front",
+ein "_a" oder ein "folder" im Namen hat (mit dieser Priorit&auml;t).<br>
+<br>
+<br>
+<span style="font-weight: bold;">Coverflow sortieren</span><br>
+Sie k&ouml;nnen die Reihenfolge des Coverflows &auml;ndern, indem Sie
+wie in der klassischen Ansicht &uuml;ber das Men&uuml; w&auml;hlen
+"Browsen nach -&gt; ...".<br>
+Beachten Sie dabei, dass dabei der Interpret oder der Albumname des
+ganzen Albums genommen wird - bei einem Sampler ist der Interpret dann
+sehr oft "Various Artists".<br>
+
+<br>
+
+<br>
+
+<span style="font-weight: bold;">Nachladen von Covern aus
+dem Internet</span><br>
+
+Wenn kein Cover zu einem Lied gefunden wird, dann kann Nemp im Internet
+nach einem passenden Cover suchen. Hierf&uuml;r nutzt Nemp die API
+von LastFM, die auch f&uuml;r das Scrobbeln genutzt wird.<br>
+
+<br>
+
+Wenn die API gerade f&uuml;r die Anzeige eines Covers genutzt
+wurde, blendet Nemp ein kleines Symbol zu dem Cover ein:<br>
+
+<br>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td style="width: 30px;"><img src="lastfmOK.png" alt=""></td>
+
+      <td>Das Cover wurde gerade eben erfolgreich von LastFM
+heruntergeladen und
+gespeichert. Eine Kopie&nbsp;davon findet sich jetzt auch bei den
+Audiodateien im Ordner.</td>
+
+    </tr>
+
+    <tr>
+
+      <td><img src="lastfmFail.png" alt=""></td>
+
+      <td>Es konnte auch bei LastFM kein
+Cover gefunden werden. Das passiert bei exotischen Alben und (leider)
+sehr oft auch bei Samplern.</td>
+
+    </tr>
+
+    <tr>
+
+      <td><img src="lastfmCache.png" alt=""></td>
+
+      <td>Die Anfrage an LastFM wurde nicht durchgef&uuml;hrt, da vor
+kurzem schon einmal ein Versuch fehlgeschlagen ist. Es wird dann im
+Tages- sp&auml;ter im Wochenrhythmus nochmal nachgefragt, bis die
+Coversuche f&uuml;r dieses Album dann komplett eingestellt wird.</td>
+
+    </tr>
+
+    <tr>
+
+      <td><img src="lastfmConnectError.png" alt=""></td>
+
+      <td>Es konnte keine Verbindung zu LastFM hergestellt werden. In
+der Regel liegt das einer fehlenden Internetverbindung oder an den
+Einstellungen Ihrer Firewall.</td>
+
+    </tr>
+
+    <tr>
+
+      <td><img src="lastfmInvalid.png" alt=""></td>
+
+      <td>Dieses Symbol erscheint nicht im Coverflow, sondern nur in
+der Coveranzeige des Players. Es deutet an, dass zu den Dateien, die
+sich im selben Ordner wie das aktuelle St&uuml;ck befinden, keine
+einheitliche Album-Information gefunden werden kann. In diesem Fall
+wird die Suche bei lastFM nicht durchgef&uuml;hrt.</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+Die heruntergeladene Datei bekommt den Namen "front (NempAutoCover).jpg" (manchmal auch mit der Endung .png)<br>
+
+&nbsp;<br>
+
+&nbsp;<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+<br>
+
+</body>
+</html>

@@ -9,21 +9,45 @@
 </OBJECT>
 <UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Einf&uuml;hrung">
+		<param name="Name" value="Nemp - Noch ein mp3-Player">
 		<param name="Local" value="nemp_start.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Nemp Grundlagen">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Play">
+			<param name="Name" value="Abspielen mit Nemp">
 			<param name="Local" value="nemp_play.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Playlist">
+			<param name="Name" value="Die Playliste von Nemp">
 			<param name="Local" value="nemp_playlist.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Medienbib">
+			<param name="Name" value="Die Medienbibliothek">
 			<param name="Local" value="nemp_medienbib.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Die Medienbibliothek">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Der Coverflow">
+			<param name="Local" value="nemp_coverflow.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Die Tagwolke">
+			<param name="Local" value="nemp_tagcloud.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pflege der Medienbibliothek">
+			<param name="Local" value="medienbib_pflege.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Der Tagwolken-Editor">
+			<param name="Local" value="medienbib_cloudeditor.html">
 			</OBJECT>
 	</UL>
 </UL>
