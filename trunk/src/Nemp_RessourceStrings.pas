@@ -56,6 +56,7 @@ TreeHeader_Years = 'Years';
 TreeHeader_Titles = 'Titles';
 TreeHeader_FileAges = 'Fileage';
 TreeHeader_Playlists = 'Playlists';
+TreeHeader_Playlist = 'Playlist';
 TreeHeader_Webradio = 'Webradio';
 
 Time_HoursLong = 'hours';

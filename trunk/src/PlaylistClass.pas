@@ -1009,7 +1009,7 @@ end;
 
 procedure TNempPlaylist.UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
 begin
-  aVST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Titles), Playlist.Count]);// 'Titel (' + IntToStr(Playlist.Count) + ')';
+  aVST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Playlist.Count]);// 'Titel (' + IntToStr(Playlist.Count) + ')';
   aVST.Header.Columns[1].Text := SekToPlaylistZeitString(fdauer);
 end;
 
