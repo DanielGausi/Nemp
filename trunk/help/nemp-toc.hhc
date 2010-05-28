@@ -50,6 +50,10 @@
 			<param name="Local" value="kopfhoerer.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Jingles">
+			<param name="Local" value="jingles.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Zufalls-Playlist">
 			<param name="Local" value="randomPlaylist.html">
 			</OBJECT>
@@ -81,6 +85,72 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Weitere Funktionen">
 			<param name="Local" value="medienbib_weitereFunktionen.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Tools">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Herunterfahren">
+			<param name="Local" value="herunterfahren.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Geburtstagsmodus">
+			<param name="Local" value="geburtstagsmodus.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Nemp Webserver">
+			<param name="Local" value="webserver.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Scrobbeln mit Nemp">
+			<param name="Local" value="scrobbeln.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Der Tagwolken-Editor">
+			<param name="Local" value="medienbib_cloudeditor.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Einstellungen">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Allgemeine Einstellungen">
+			<param name="Local" value="optionen_1_allgemein.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Dateitypen-Registrierung">
+			<param name="Local" value="optionen_2_Dateitypen.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Steuerung">
+			<param name="Local" value="optionen_3_Steuerung.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Taskleiste und Tray">
+			<param name="Local" value="optionen_4_Taskleiste.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Anzeige">
+			<param name="Local" value="optionen_5_Anzeige.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Player und Cover">
+			<param name="Local" value="optionen_6_Player_Cover.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Ansicht">
+			<param name="Local" value="optionen_7_Ansicht.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Schriften">
+			<param name="Local" value="optionen_8_Schriften.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Party-Modus">
+			<param name="Local" value="optionen_9_PartyMode.html">
 			</OBJECT>
 	</UL>
 </UL>
