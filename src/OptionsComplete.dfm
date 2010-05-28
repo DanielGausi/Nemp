@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabSystem0
+    ActivePage = TabSystem3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -1316,34 +1316,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 182
         Width = 432
-        Height = 220
+        Height = 159
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Notification of a deskband'
         TabOrder = 1
-        object LblConst_DeskbandHint: TLabel
-          Left = 8
-          Top = 160
-          Width = 29
-          Height = 13
-          Caption = 'Note:'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-        object LblConst_DeskbandHint2: TLabel
-          Left = 8
-          Top = 176
-          Width = 401
-          Height = 33
-          AutoSize = False
-          Caption = 
-            'You need to run Nemp as administrator (run as -> admin) to (un)i' +
-            'nstall the Deskband on Windows Vista.'
-          WordWrap = True
-        end
         object CBShowDeskbandOnStart: TCheckBox
           Left = 8
           Top = 16

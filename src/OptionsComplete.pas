@@ -83,8 +83,6 @@ type
     CBShowDeskbandOnMinimize: TCheckBox;
     CBHideDeskbandOnRestore: TCheckBox;
     CBHideDeskbandOnClose: TCheckBox;
-    LblConst_DeskbandHint: TLabel;
-    LblConst_DeskbandHint2: TLabel;
     GrpBox_Effects: TGroupBox;
     CB_UseDefaultEffects: TCheckBox;
     CB_UseDefaultEqualizer: TCheckBox;
