@@ -4076,11 +4076,11 @@ end;
 
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
 begin
-  if NOT FileExists(ExtractFilePath(Paramstr(0))+'HTML\faq.htm') then
+  if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
     MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
   else
     ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'HTML\faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
                       , nil, nil, SW_SHOWNORMAl);
 end;
 
@@ -4737,11 +4737,11 @@ begin
            end else
            begin
 
-              if NOT FileExists(ExtractFilePath(Paramstr(0))+'HTML\faq.htm') then
+              if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
                 MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
               else
                 ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'HTML\faq.htm')
+                      ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
                       , nil, nil, SW_SHOWNORMAl);
            end;
     VK_F2: if ssShift in shift then

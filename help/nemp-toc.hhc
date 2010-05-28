@@ -30,6 +30,31 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Der Player">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Anzeigen im Player">
+			<param name="Local" value="player_anzeige.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Equalizer">
+			<param name="Local" value="equalizer.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Effekte">
+			<param name="Local" value="Effekte.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Abspielen im Kopfh&ouml;rer">
+			<param name="Local" value="kopfhoerer.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Zufalls-Playlist">
+			<param name="Local" value="randomPlaylist.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Die Medienbibliothek">
 		</OBJECT>
 	<UL>
@@ -48,6 +73,14 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Der Tagwolken-Editor">
 			<param name="Local" value="medienbib_cloudeditor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Webradio">
+			<param name="Local" value="webradio_verwaltung.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Weitere Funktionen">
+			<param name="Local" value="medienbib_weitereFunktionen.html">
 			</OBJECT>
 	</UL>
 </UL>
