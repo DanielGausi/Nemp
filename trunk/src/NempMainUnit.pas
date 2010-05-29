@@ -2194,6 +2194,8 @@ begin
   CloudViewer.OnPaint := CloudPaint;
   CloudViewer.OnAfterPaint := CloudAfterPaint;
 
+
+
   LblBibArtist     .Caption := '';
   LblBibAlbum      .Caption := '';
   LblBibTitle      .Caption := '';
