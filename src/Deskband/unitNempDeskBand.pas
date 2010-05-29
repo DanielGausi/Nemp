@@ -414,7 +414,7 @@ function TDemoDeskBand.GetBandInfo(dwBandID, dwViewMode: DWORD; var pdbi: TDeskB
 var hwndNemp: THandle;
 begin
 
-  hwndNemp:= FindWindow('TNemp_MainForm.UnicodeClass',nil);
+  hwndNemp:= FindWindow('TNemp_MainForm',nil);
 
   if (hwndNemp <> 0) then        //???
     FBandForm.ReOrderControls;
@@ -594,7 +594,7 @@ function TDemoDeskBand.ShowDW(fShow: BOOL): HResult;
 var hwndNemp : THandle;
 begin
 
-  hwndNemp:= FindWindow('TNemp_MainForm.UnicodeClass',nil);
+  hwndNemp:= FindWindow('TNemp_MainForm',nil);
 
   if BandForm <> nil then
   begin

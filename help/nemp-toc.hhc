@@ -57,6 +57,10 @@
 			<param name="Name" value="Zufalls-Playlist">
 			<param name="Local" value="randomPlaylist.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Cuesheets">
+			<param name="Local" value="cuesheets.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Die Medienbibliothek">
@@ -151,6 +155,54 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Party-Modus">
 			<param name="Local" value="optionen_9_PartyMode.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Player-Einstellungen">
+			<param name="Local" value="optionen_a_player-einstellungen.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Playlist">
+			<param name="Local" value="optionen_b_Playlist.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Medienbibliothek">
+			<param name="Local" value="optionen_c_medienbibliothek.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Automatische Bewertung">
+			<param name="Local" value="optionen_d_Automatic-rating.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Webradio">
+			<param name="Local" value="optionen_e_webradio.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Effekte">
+			<param name="Local" value="optionen_f_effekte.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Geburtstags-Modus">
+			<param name="Local" value="optionen_g_geburtstag.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="LastFM (Scrobbeln)">
+			<param name="Local" value="optionen_h_scrobbeln.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Webserver">
+			<param name="Local" value="optionen_i_webserver.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Erweiterte Einstellungen">
+			<param name="Local" value="optionen_j_erweiterte.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Suchoptionen">
+			<param name="Local" value="optionen_k_suchoptionen.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Unicode">
+			<param name="Local" value="optionen_l_unicode.html">
 			</OBJECT>
 	</UL>
 </UL>
