@@ -205,5 +205,21 @@
 			<param name="Local" value="optionen_l_unicode.html">
 			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Tipps und Tricks">
+		<param name="Local" value="Tipps.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Fehlerbehebung">
+		<param name="Local" value="Fehlerbehebung.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Weitere Fragen">
+		<param name="Local" value="Fragen.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Lizenz">
+		<param name="Local" value="lizenz.html">
+		</OBJECT>
 </UL>
 </BODY></HTML>
