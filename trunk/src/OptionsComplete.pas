@@ -310,7 +310,7 @@ type
     CB_TabStopAtPlayerControls: TCheckBox;
     CB_TabStopAtTabs: TCheckBox;
     GrpBox_BetaOptions: TGroupBox;
-    CB_BetaDontUseThreadedUpdate: TCheckBox;
+    XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
     OpenDlg_CountdownSongs: TOpenDialog;
     EdtDownloadDir: TEdit;
     EditCountdownSong: TEdit;
@@ -355,7 +355,7 @@ type
     OpenDlg_DefaultCover: TOpenPictureDialog;
     LBAutoscan: TListBox;
     RGroup_Playlist: TRadioGroup;
-    cb_UseClassicCoverflow: TCheckBox;
+    XXX_cb_UseClassicCoverflow: TCheckBox;
     NewPlayerPanelOptions: TNempPanel;
     PaintFrame: TImage;
     TextAnzeigeIMAGE: TImage;
@@ -916,8 +916,8 @@ var i,s: integer;
     tmpIPs: TStrings;
 begin
   // Beta-Option
-  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
-  cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
+//  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
+//  cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
 
   //---PLAYER----
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
@@ -1830,11 +1830,11 @@ var i,s,l, maxfont:integer;
   oldfactor: single;
 begin
   // Beta-Optionen
-  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
+//  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
 
-  if cb_UseClassicCoverflow.Checked then
-      MedienBib.NewCoverFlow.Mode := cm_Classic
-  else
+//  if cb_UseClassicCoverflow.Checked then
+//      MedienBib.NewCoverFlow.Mode := cm_Classic
+//  else
       MedienBib.NewCoverFlow.Mode := cm_OpenGL;
 
 // ----------------------Player------------------------------

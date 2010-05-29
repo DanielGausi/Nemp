@@ -1292,6 +1292,10 @@ type
 
     procedure PanelTagCloudBrowseMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure PanelTagCloudBrowseMouseUp(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+
+
     procedure PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
     procedure PM_PL_RemoveFromPrebookListClick(Sender: TObject);
     procedure VSTColumnWidthDblClickResize(Sender: TVTHeader;
@@ -1334,6 +1338,9 @@ type
 
     CoverImgDownX: Integer;
     CoverImgDownY: Integer;
+    TagCloudDownX: Integer;
+    TagCloudDownY: Integer;
+
     PaintFrameDownX: Integer;
     PaintFrameDownY: Integer;
 
@@ -2108,14 +2115,57 @@ end;
 procedure TNemp_MainForm.PanelTagCloudBrowseMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var aTag: TPaintTag;
+    i:integer;
+    DateiListe: TObjectlist;
+    maxC: Integer;
 begin
-    aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
-
-    if (aTag <> MedienBib.TagCloud.MouseOverTag) and assigned(aTag) then
+    if ssleft in shift then
     begin
-        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, False);
-        MedienBib.TagCloud.MouseOverTag := aTag;
-        MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, True);
+      if (abs(X - TagCloudDownX) > 5) or  (abs(Y - TagCloudDownY) > 5) then
+      begin
+      //showmessage( inttostr(abs(X - CoverImgDownX)) + '----' + inttostr(abs(Y - CoverImgDownY)) );
+          Dateiliste := TObjectlist.Create(False);
+          GenerateListForHandleFiles(DateiListe, 4);
+          DragSource := DS_VST;
+          with DragFilesSrc1 do
+          begin
+              // Add files selected to DragFilesSrc1 list
+              ClearFiles;
+              DragDropList.Clear;
+
+              maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
+
+              //if DateiListe.Count > MAX_DRAGFILECOUNT then
+              //begin
+              //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
+              //  FreeAndNil(Dateiliste);
+              //  exit;
+              //end;
+              for i:=0 to maxC do
+              begin
+                  AddFile((Dateiliste[i] as TAudiofile).Pfad);
+                  DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+              end;
+              // This is the START of the drag (FROM) operation.
+              Execute;
+          end;
+          if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+          FreeAndNil(Dateiliste);
+      end;
+    end
+    else
+    begin
+        TagCloudDownX := 0;
+        TagCloudDownY := 0;
+
+        aTag := MedienBib.TagCloud.CloudPainter.GetTagAtMousePos(x,y);
+
+        if (aTag <> MedienBib.TagCloud.MouseOverTag) and assigned(aTag) then
+        begin
+            MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, False);
+            MedienBib.TagCloud.MouseOverTag := aTag;
+            MedienBib.TagCloud.CloudPainter.RePaintTag(MedienBib.TagCloud.MouseOverTag, True);
+        end;
     end;
 end;
 
@@ -2171,6 +2221,21 @@ procedure TNemp_MainForm.PanelTagCloudBrowseMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
     CloudViewer.SetFocus;
+    TagCloudDownX := X;
+    TagCloudDownY := Y;
+
+    if Button = mbRight then
+    begin
+        MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
+        MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
+    end;
+end;
+
+procedure TNemp_MainForm.PanelTagCloudBrowseMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    TagCloudDownX := 0;
+    TagCloudDownY := 0;
 end;
 
 
@@ -2179,6 +2244,7 @@ begin
 
   CloudViewer := TCloudViewer.Create(self);
   CloudViewer.Parent := PanelTagCloudBrowse;
+  CloudViewer.Name := 'CloudViewer';
 
 
   CloudViewer.Align := alClient;
@@ -2190,10 +2256,13 @@ begin
   CloudViewer.OnClick := PanelTagCloudBrowseClick;
   CloudViewer.OnDblClick := PanelTagCloudBrowseDblClick;
   CloudViewer.OnMouseDown := PanelTagCloudBrowseMouseDown;
+  CloudViewer.OnMouseUp := PanelTagCloudBrowseMouseUp;
+
   CloudViewer.OnResize := PanelTagCloudBrowseResize;
   CloudViewer.OnPaint := CloudPaint;
   CloudViewer.OnAfterPaint := CloudAfterPaint;
 
+  CloudViewer.PopupMenu := Medialist_PopupMenu;
 
 
   LblBibArtist     .Caption := '';
@@ -3664,6 +3733,12 @@ begin
         if aList.Count <= 5000 then
             aList.Sort(Sortieren_AlbumTrack_asc);
       end;
+      4: begin
+        MedienBib.GenerateDragDropListFromTagCloud(MedienBib.TagCloud.FocussedTag, aList);
+          // Sortieren
+        if aList.Count <= 5000 then
+            aList.Sort(Sortieren_AlbumTrack_asc);
+      end;
   else
     MessageDlg('Uh-Oh. Something strange happens (GenerateListForHandleFiles). Please report this error.'
       + #13#10 + 'Param: ' + InttoStr(what) , mtWarning, [mbOK], 0);
@@ -3790,18 +3865,18 @@ begin
       PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNext);
       PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNow );
       PM_ML_PlayNow.Visible  := True;
+      PM_ML_BrowseBy.Enabled := True;
       aVst := Vst;
       Medialist_PopupMenu.Tag := 0;
   end
   else
     if (o <> NIL) AND (o.Name = 'ArtistsVST') then
     begin
-        PM_ML_Play.Caption     := GetProperMenuString(Integer(MedienBib.NempSortArray[1])); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[Integer(MedienBib.NempSortArray[1])]]);
-        PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
+        PM_ML_Enqueue.Caption := GetProperMenuString(Integer(MedienBib.NempSortArray[1])); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[Integer(MedienBib.NempSortArray[1])]]);
+        PM_ML_Play.Caption    := (MainForm_MenuCaptionsPlayAll );
         PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-        //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
         PM_ML_PlayNow.Visible  := False;
-
+        PM_ML_BrowseBy.Enabled := True;
         aVst := ArtistsVST;
         Medialist_PopupMenu.Tag := 1;
     end
@@ -3809,31 +3884,41 @@ begin
       if (o <> NIL) AND (o.Name = 'AlbenVST') then
       begin
           if (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
-              PM_ML_Play.Caption := MainForm_MenuCaptionsPlayAllPlaylist
+              PM_ML_Enqueue.Caption := MainForm_MenuCaptionsEnqueueAllPlaylist
           else
               if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
-                  PM_ML_Play.Caption := MainForm_MenuCaptionsPlayAllWebradio
+                  PM_ML_Enqueue.Caption := MainForm_MenuCaptionsEnqueueAllWebradio
               else
-                  PM_ML_Play.Caption     := GetProperMenuString(Integer(MedienBib.NempSortArray[2]));;//Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[Integer(MedienBib.NempSortArray[2])]]);
-
-          PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
+                  PM_ML_Enqueue.Caption := GetProperMenuString(Integer(MedienBib.NempSortArray[2]));;//Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[Integer(MedienBib.NempSortArray[2])]]);
+          PM_ML_Play.Caption     := (MainForm_MenuCaptionsPlayAll );
           PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-          //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
           PM_ML_PlayNow.Visible  := False;
+          PM_ML_BrowseBy.Enabled := True;
           aVST := ALbenVST;
           Medialist_PopupMenu.Tag := 2;
       end else
         if (o <> NIL) AND (o.Name = 'CoverScrollbar') then
         begin
-            PM_ML_Play.Caption     := GetProperMenuString(1);; //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
-            PM_ML_Enqueue.Caption  := (MainForm_MenuCaptionsEnqueueAll );
+            PM_ML_Enqueue.Caption  := GetProperMenuString(1);; //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
+            PM_ML_Play.Caption     := (MainForm_MenuCaptionsPlayAll );
             PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
-            //PM_ML_PlayNow.Caption  := (MainForm_MenuCaptionsPlayNowAll );
-           PM_ML_PlayNow.Visible  := False;
+            PM_ML_PlayNow.Visible  := False;
+            PM_ML_BrowseBy.Enabled := True;
             aVST := Nil;
             Medialist_PopupMenu.Tag := 3;
         end else
-            aVST := Nil;
+          if (o <> NIL) AND (o.Name = 'CloudViewer') then
+          begin
+              PM_ML_Enqueue.Caption  := GetProperMenuString(5); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
+              PM_ML_Play.Caption     := (MainForm_MenuCaptionsPlayAll );
+              PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
+              PM_ML_PlayNow.Visible  := False;
+              PM_ML_BrowseBy.Enabled := False;
+              aVST := Nil;
+              Medialist_PopupMenu.Tag := 4;
+          end
+          else
+              aVST := Nil;
 
       PM_ML_SortBy.Enabled := (aVST = VST) AND Not LangeAktionWeitermachen;
       PM_ML_Extended.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
@@ -3841,7 +3926,8 @@ begin
     if (((aVST = NIL) OR (aVST.FocusedNode= NIL))
        or ((aVST = VST) AND (VST.SelectedCount = 0)))
         AND
-       ((o <> NIL) AND (o.Name <> 'CoverScrollbar'))
+       ((o <> NIL) AND (o.Name <> 'CoverScrollbar')
+                   AND (o.Name <>'CloudViewer') )
        then
     begin
       PM_ML_Properties.Enabled := False;
@@ -4054,11 +4140,11 @@ begin
   // ???
   Liste := MedienBib.Anzeigeliste;
 
-  if MedienBib.CurrentArtist = BROWSE_PLAYLISTS then
+  if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
   begin
       AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCount, [MedienBib.Alben.Count])
   end else
-  if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then
+  if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) then
   begin
       AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCount, [MedienBib.RadioStationList.Count]);
   end else
@@ -6478,33 +6564,35 @@ var ListOfFiles: TObjectList;
 begin
     if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating) and (Button = mbLeft)  then
     begin
-        if Assigned(NempPlayer.MainAudioFile)
-           and (MedienBib.StatusBibUpdate <= 1)
-           and (MedienBib.CurrentThreadFilename <> NempPlayer.MainAudioFile.Pfad)
-        then
+        if Assigned(NempPlayer.MainAudioFile) then
         begin
-              ListOfFiles := TObjectList.Create(False);
-              try
-                  // get List of this AudioFile
-                  GetListOfAudioFileCopies(NempPlayer.MainAudioFile, ListOfFiles);
-                  // edit all these files
-                  for i := 0 to ListOfFiles.Count - 1 do
-                  begin
-                      listFile := TAudioFile(ListOfFiles[i]);
-                      listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
+            if (MedienBib.StatusBibUpdate <= 1)
+               and (MedienBib.CurrentThreadFilename <> NempPlayer.MainAudioFile.Pfad)
+            then
+            begin
+                  ListOfFiles := TObjectList.Create(False);
+                  try
+                      // get List of this AudioFile
+                      GetListOfAudioFileCopies(NempPlayer.MainAudioFile, ListOfFiles);
+                      // edit all these files
+                      for i := 0 to ListOfFiles.Count - 1 do
+                      begin
+                          listFile := TAudioFile(ListOfFiles[i]);
+                          listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
+                      end;
+                      // write the rating into the file on disk
+                      NempPlayer.MainAudioFile.QuickUpdateTag;
+                      MedienBib.Changed := True;
+                  finally
+                      ListOfFiles.Free;
                   end;
-                  // write the rating into the file on disk
-                  NempPlayer.MainAudioFile.QuickUpdateTag;
-                  MedienBib.Changed := True;
-              finally
-                  ListOfFiles.Free;
-              end;
-              // Correct GUI (player, Details, Detailform, VSTs))
-              CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile);
-        end else
-        begin
-            MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
-        end;
+                  // Correct GUI (player, Details, Detailform, VSTs))
+                  CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile);
+            end else
+            begin
+                MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+            end;
+        end; // else nothing to do
     end;
 end;
 
@@ -8847,7 +8935,7 @@ end;
 
 procedure TNemp_MainForm.AlbenVSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
-var i:integer;
+var i, maxC:integer;
   DateiListe: TObjectlist;
   aNode, ArtistNode: PVirtualNode;
 
@@ -8877,14 +8965,16 @@ begin
             ClearFiles;
             DragDropList.Clear;
 
-            if DateiListe.Count > MAX_DRAGFILECOUNT then
-            begin
-              MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-              FreeAndNil(Dateiliste);
-              exit;
-            end;
+            maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
 
-            for i:=0 to DateiListe.Count - 1 do
+            //if DateiListe.Count > MAX_DRAGFILECOUNT then
+            //begin
+            //  MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+            //  FreeAndNil(Dateiliste);
+            //  exit;
+            //end;
+
+            for i:=0 to maxC do
             begin
                 AddFile((Dateiliste[i] as TAudiofile).Pfad);
                 DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad)
@@ -10710,7 +10800,7 @@ end;
 
 procedure TNemp_MainForm.IMGMedienBibCoverMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var i:integer;
+var i, maxC:integer;
   DateiListe: TObjectlist;
 begin
   if ssleft in shift then
@@ -10726,13 +10816,16 @@ begin
             // Add files selected to DragFilesSrc1 list
             ClearFiles;
             DragDropList.Clear;
-            if DateiListe.Count > 500 then
-            begin
-              //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
-              FreeAndNil(Dateiliste);
-              exit;
-            end;
-            for i:=0 to DateiListe.Count - 1 do
+
+            maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
+
+            //if DateiListe.Count > MAX_DRAGFILECOUNT then
+            //begin
+            //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
+            //  FreeAndNil(Dateiliste);
+            //  exit;
+            //end;
+            for i := 0 to maxC do
             begin
                 AddFile((Dateiliste[i] as TAudiofile).Pfad);
                 DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);

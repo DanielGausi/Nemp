@@ -281,7 +281,7 @@ type
 
     public
         // Some Beta-Options
-        BetaDontUseThreadedUpdate: Boolean;
+        //BetaDontUseThreadedUpdate: Boolean;
 
         // Diese Objekte werden in der linken Vorauswahlspalte angezeigt.
         AlleArtists: TObjectList;
@@ -507,6 +507,8 @@ type
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
         procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
+        procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
+
         // Search the next matching cover
         function GetCoverWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
 
@@ -589,11 +591,12 @@ function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
     case aIdx of
 
-    0: result := MainForm_MenuCaptionsPlayAllArtist   ;
-    1: result := MainForm_MenuCaptionsPlayAllAlbum    ;
-    2: result := MainForm_MenuCaptionsPlayAllDirectory;
-    3: result := MainForm_MenuCaptionsPlayAllGenre    ;
-    4: result := MainForm_MenuCaptionsPlayAllYear     ;
+    0: result := MainForm_MenuCaptionsEnqueueAllArtist   ;
+    1: result := MainForm_MenuCaptionsEnqueueAllAlbum    ;
+    2: result := MainForm_MenuCaptionsEnqueueAllDirectory;
+    3: result := MainForm_MenuCaptionsEnqueueAllGenre    ;
+    4: result := MainForm_MenuCaptionsEnqueueAllYear     ;
+    5: result := MainForm_MenuCaptionsEnqueueAllTag      ;
     else result := '(?)'
     end;
 end;
@@ -969,7 +972,7 @@ var tmpcharcode, dircount, i: integer;
     tmp: UnicodeString;
     so, sd: Integer;
 begin
-        BetaDontUseThreadedUpdate := Ini.ReadBool('Beta', 'DontUseThreadedUpdate', False);
+        //BetaDontUseThreadedUpdate := Ini.ReadBool('Beta', 'DontUseThreadedUpdate', False);
 
         NempSortArray[1] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl1', integer(siArtist)));
         NempSortArray[2] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl2', integer(siAlbum)));
@@ -1076,7 +1079,7 @@ begin
 
         AutoActivateWebServer := Ini.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
-        NewCoverFlow.Mode := TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
+        NewCoverFlow.Mode := cm_OpenGL; //TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
 
         CurrentArtist := Ini.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);
         CurrentAlbum := Ini.ReadString('MedienBib','SelectedAlbum', BROWSE_ALL);
@@ -1089,7 +1092,7 @@ end;
 procedure TMedienBibliothek.WriteToIni(ini: TMemIniFile);
 var i: Integer;
 begin
-        Ini.WriteBool('Beta', 'DontUseThreadedUpdate', BetaDontUseThreadedUpdate);
+        //Ini.WriteBool('Beta', 'DontUseThreadedUpdate', BetaDontUseThreadedUpdate);
 
         Ini.WriteInteger('MedienBib', 'Vorauswahl1', integer(NempSortArray[1]));
         Ini.WriteInteger('MedienBib', 'Vorauswahl2', integer(NempSortArray[2]));
@@ -1151,7 +1154,7 @@ begin
         Ini.WriteString('MedienBib','SelectedCoverID', NewCoverFlow.CurrentCoverID);
         Ini.WriteInteger('MedienBib', 'SelectedCoverIDX', NewCoverFlow.CurrentItem);
 
-         ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
+         // ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
 
 
         BibSearcher.SaveToIni(Ini);
@@ -1182,12 +1185,12 @@ begin
   // be caused by this thread. So in this case call the thread method
   // directly.
   StatusBibUpdate := 2;
-  if BetaDontUseThreadedUpdate then
-  begin
-      fNewFilesUpdate(self);
-      fHND_UpdateThread := 0;
-  end
-  else
+  //if BetaDontUseThreadedUpdate then
+  //begin
+  //    fNewFilesUpdate(self);
+  //    fHND_UpdateThread := 0;
+  //end
+  //else
       fHND_UpdateThread := (BeginThread(Nil, 0, @fNewFilesUpdate, Self, 0, Dummy));
 end;
 {
@@ -3579,6 +3582,22 @@ begin
       SortAnzeigeliste;
   FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
+end;
+
+procedure TMedienBibliothek.GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
+var i: Integer;
+begin
+    if not assigned(aTag) then exit;
+
+    Target.Clear;
+
+    if aTag = TagCloud.ClearTag then
+        for i := 0 to Mp3ListeArtistSort.Count - 1 do
+          Target.Add(Mp3ListeArtistSort[i])
+    else
+        // we need no binary search or stuff here. The Tag saves all its AudioFiles.
+        for i := 0 to aTag.AudioFiles.Count - 1 do
+            Target.Add(aTag.AudioFiles[i]);
 end;
 
 {

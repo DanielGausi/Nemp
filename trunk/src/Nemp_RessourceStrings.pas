@@ -448,15 +448,32 @@ MainForm_MenuCaptionsEnqueue   = 'Enqueue (at the end of the playlist)';
 MainForm_MenuCaptionsPlayNext  = 'Enqueue (at the end of the prebook-list)';
 MainForm_MenuCaptionsPlayNow   = 'Just play focussed file (no playlist change)';
 
+
 MainForm_MenuCaptionsPlayAllArtist      = 'Play all tracks of this artist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllAlbum       = 'Play all tracks of this album (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllDirectory   = 'Play all tracks of this directory (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllGenre       = 'Play all tracks of this genre (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllYear        = 'Play all tracks of this year (and delete current playlist)';
+MainForm_MenuCaptionsPlayAllTag         = 'Play all tracks with this tag (and delete current playlist)';
 
 MainForm_MenuCaptionsPlayAllPlaylist = 'Play all tracks of this playlist (and delete current playlist)';
 MainForm_MenuCaptionsPlayAllWebradio = 'Play all tracks of this webradio station (and delete current playlist)';
 
+
+
+MainForm_MenuCaptionsEnqueueAllArtist      = 'Enqueue all tracks of this artist (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllAlbum       = 'Enqueue all tracks of this album (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllDirectory   = 'Enqueue all tracks of this directory (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllGenre       = 'Enqueue all tracks of this genre (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllYear        = 'Enqueue all tracks of this year (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllTag         = 'Enqueue all tracks with this tag (at the end of the playlist)';
+
+MainForm_MenuCaptionsEnqueueAllPlaylist = 'Enqueue all tracks of this playlist (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllWebradio = 'Enqueue all tracks of this webradio station (at the end of the playlist)';
+
+
+
+MainForm_MenuCaptionsPlayAll   = 'Play these tracks (and delete current playlist)';
 MainForm_MenuCaptionsEnqueueAll   = 'Enqueue these tracks (at the end of the playlist)';
 MainForm_MenuCaptionsPlayNextAll  = 'Enqueue these tracks (at the end of the prebook-list)';
 //MainForm_MenuCaptionsPlayNowAll   = 'Enqueue and play these tracks now'; // not possible any more
