@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabSystem3
+    ActivePage = TabExtended0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -4364,7 +4364,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 62
         Caption = 'Beta-Settings'
         TabOrder = 2
-        object CB_BetaDontUseThreadedUpdate: TCheckBox
+        Visible = False
+        object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
           Left = 13
           Top = 15
           Width = 417
@@ -4373,7 +4374,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Update library in Mainthread'
           TabOrder = 0
         end
-        object cb_UseClassicCoverflow: TCheckBox
+        object XXX_cb_UseClassicCoverflow: TCheckBox
           Left = 13
           Top = 33
           Width = 214

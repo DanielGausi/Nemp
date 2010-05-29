@@ -89,6 +89,10 @@ object AboutForm: TAboutForm
         'rl] by MagicAndre1981'
       ''
       
+        '[url="http://angusj.com/delphi/"]Drag&Drop-Component[/url] (modi' +
+        'fied) by Angus Johnson'
+      ''
+      
         '[url="http://delphi.fsprolabs.com/"]FSPro Windows 7 Taskbar Comp' +
         'onents[/url]'
       ''
