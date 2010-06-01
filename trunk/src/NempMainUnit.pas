@@ -147,7 +147,6 @@ type
     VST: TVirtualStringTree;
     Splitter4: TSplitter;
     VDTCover: TNempPanel;
-    TabBtn_Nemp: TSkinButton;
     TabBtn_Playlist: TSkinButton;
     PlayListStatusLBL: TLabel;
     PlayListOpenDialog: TOpenDialog;
@@ -801,6 +800,14 @@ type
     PM_Cover_Aside: TMenuItem;
     PM_Cover_Below: TMenuItem;
     PM_Cover_DontShowDetails: TMenuItem;
+    GRPBOXHeadset: TNempPanel;
+    XXXX_TabBtn_Nemp: TSkinButton;
+    SlidebarButton_Headset: TSkinButton;
+    SlideBarShapeHeadset: TShape;
+    LoadNewFileHeadset: TSkinButton;
+    HeadSetTimer: TTimer;
+    PlayPauseHeadSetBtn: TSkinButton;
+    StopBtnHeadset: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1330,6 +1337,18 @@ type
     procedure Splitter4Moved(Sender: TObject);
     procedure ImgDetailSwitchClick(Sender: TObject);
     procedure PM_Cover_DontShowDetailsClick(Sender: TObject);
+    procedure SlideBarShapeHeadsetMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure SlidebarButton_HeadsetEndDrag(Sender, Target: TObject; X,
+      Y: Integer);
+    procedure SlidebarButton_HeadsetKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure SlidebarButton_HeadsetStartDrag(Sender: TObject;
+      var DragObject: TDragObject);
+    procedure PLayPauseBtnHeadsetClick(Sender: TObject);
+    procedure LoadNewFileHeadsetClick(Sender: TObject);
+    procedure HeadSetTimerTimer(Sender: TObject);
+    procedure StopBtnHeadsetClick(Sender: TObject);
 
   private
 
@@ -1627,18 +1646,22 @@ begin
     GRPBoxEffekte.Parent := AudioPanel;
     GRPBoxEqualizer.Parent := AudioPanel;
     GRPBoxLyrics.Parent := AudioPanel;
+    GRPBOXHeadset.Parent := AudioPanel;
     GRPBoxCover      .Align := alLeft;
     GRPBoxEffekte    .Align := alLeft;
     GRPBoxEqualizer  .Align := alLeft;
     GRPBoxLyrics     .Align := alLeft;
+    GRPBOXHeadset    .Align := alLeft;
     GRPBoxCover      .Width := 191;
     GRPBoxEffekte    .Width := 191;
     GRPBoxEqualizer  .Width := 191;
     GRPBoxLyrics     .Width := 191;
+    GRPBOXHeadset    .Width := 191;
 
     GRPBoxLyrics.Visible := False;
     GRPBoxEffekte.Visible := False;
     GRPBoxEqualizer.Visible := False;
+    GRPBOXHeadset.Visible := False;
     // Neu: August 2007
     TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
 
@@ -2894,6 +2917,13 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.HeadSetTimerTimer(Sender: TObject);
+begin
+  if SlideBarButton_HeadSet.Tag = 0 then
+    SlideBarButton_HeadSet.Left := SlideBarShapeHeadset.Left
+          + Round((SlideBarShapeHeadset.Width - SlideBarButton_HeadSet.Width) * NempPlayer.HeadsetProgress);
+end;
+
 procedure TNemp_MainForm.NotifyDeskband(aMsg: Integer);
 var wnd: THandle;
 begin
@@ -3267,6 +3297,8 @@ begin
 
   RepaintAll;
 end;
+
+
 
 
 
@@ -6291,6 +6323,23 @@ begin
   NempPlaylist.YMouseDown := Y;
 end;
 
+procedure TNemp_MainForm.SlideBarShapeHeadsetMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var NewPos: Integer;
+begin
+  NewPos := SlideBarShapeHeadset.Left + x - (SlidebarButton_Headset.Width Div 2);
+  if NewPos <= SlideBarShapeHeadset.Left then
+      NewPos := SlideBarShapeHeadset.Left
+    else
+      if NewPos >= SlideBarShapeHeadset.Left + SlideBarShapeHeadset.Width - SlidebarButton_Headset.Width then
+        NewPos := SlideBarShapeHeadset.Left + SlideBarShapeHeadset.Width - SlidebarButton_Headset.Width;
+
+  SlidebarButton_Headset.Left := NewPos;
+  NempPlayer.HeadsetProgress := (SlidebarButton_Headset.Left - SlideBarShapeHeadset.Left) / (SlideBarShapeHeadset.Width - SlidebarButton_Headset.Width);
+
+
+end;
+
 procedure TNemp_MainForm.SlideBarShapeMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var NewPos: Integer;
@@ -6301,7 +6350,7 @@ begin
     else
       if NewPos >= SlideBarShape.Left + SlideBarShape.Width - SlideBarButton.Width then
         NewPos := SlideBarShape.Left + SlideBarShape.Width - SlideBarButton.Width;
-        
+
   SlideBarButton.Left := NewPos;
   NempPlaylist.Progress := (SlideBarButton.Left-SlideBarShape.Left) / (SlideBarShape.Width-SlideBarButton.Width);
 end;
@@ -6315,6 +6364,32 @@ begin
   ARect.BottomRight :=  (PlayerPanel.ClientToScreen(Point(NewPlayerPanel.Left + NewPlayerPanel.Width, NewPlayerPanel.Top + NewPlayerPanel.Height)));
   SlideBarButton.Tag := 1;
   ClipCursor(@Arect);
+end;
+
+procedure TNemp_MainForm.SlidebarButton_HeadsetStartDrag(Sender: TObject;
+  var DragObject: TDragObject);
+var AREct: tRect;
+begin
+
+  with (Sender as TControl) do
+  begin
+    Begindrag(false);
+    ARect.TopLeft :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left, GRPBOXHeadset.Top)));
+    ARect.BottomRight :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left + GRPBOXHeadset.Width, GRPBOXHeadset.Top + GRPBOXHeadset.Height)));
+    SlideBarButton_Headset.Tag := 1;
+    ClipCursor(@Arect);
+  end;
+end;
+
+
+
+procedure TNemp_MainForm.SlidebarButton_HeadsetKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+  case key of
+    vk_up, vk_Right:  NempPlayer.HeadsetTime := NempPlayer.HeadsetTime + 5;
+    vk_Down, vk_Left: NempPlayer.HeadsetTime := NempPlayer.HeadsetTime - 5;
+  end;
 end;
 
 procedure TNemp_MainForm.GrpBoxControlDragOver(Sender, Source: TObject; X,
@@ -6350,7 +6425,23 @@ begin
             NewPos := VolShape.Top + VolShape.Height - (VolButton.Height Div 2);
         VolButton.Top := NewPos;
         NempPlayer.Volume := VCLVolToPlayer;
+    end else
+    if source = SlidebarButton_Headset then
+    begin
+        if (Sender is TNempPanel) then
+            NewPos := x - (SlidebarButton_Headset.Width Div 2)
+        else
+            NewPos := (Sender as TControl).Left + x - (SlidebarButton_Headset.Width Div 2);
+
+        if NewPos <= SlideBarShapeHeadset.Left then
+            NewPos := SlideBarShapeHeadset.Left
+        else
+            if NewPos >= SlideBarShapeHeadset.Width  + SlideBarShapeHeadset.Left - SlideBarButton_Headset.Width then
+                NewPos := SlideBarShapeHeadset.Width + SlideBarShapeHeadset.Left - SlideBarButton_Headset.Width;
+          SlidebarButton_Headset.Left := NewPos;
+
     end;
+
 end;
 
 procedure TNemp_MainForm.SlideBarButtonEndDrag(Sender, Target: TObject; X,
@@ -6358,6 +6449,14 @@ procedure TNemp_MainForm.SlideBarButtonEndDrag(Sender, Target: TObject; X,
 begin
   NempPlaylist.Progress := (SlideBarButton.Left-SlideBarShape.Left) / (SlideBarShape.Width-SlideBarButton.Width);
   SlideBarButton.Tag := 0;
+  ClipCursor(NIL);
+end;
+
+procedure TNemp_MainForm.SlidebarButton_HeadsetEndDrag(Sender, Target: TObject;
+  X, Y: Integer);
+begin
+  NempPlayer.HeadSetProgress := (SlidebarButton_Headset.Left - SlideBarShapeHeadset.Left) / (SlideBarShapeHeadset.Width - SlidebarButton_Headset.Width);
+  SlidebarButton_Headset.Tag := 0;
   ClipCursor(NIL);
 end;
 
@@ -6496,6 +6595,27 @@ begin
     end;
   Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
   PlaylistVST.Invalidate;
+end;
+
+procedure TNemp_MainForm.PLayPauseBtnHeadsetClick(Sender: TObject);
+begin
+    // play current Headset-Track again
+    case NempPlayer.BassHeadSetStatus of
+        BASS_ACTIVE_PAUSED  : NempPlayer.resumeHeadset;
+        BASS_ACTIVE_STOPPED : NempPlayer.PlayInHeadset(nil);
+        BASS_ACTIVE_PLAYING : NempPlayer.PauseHeadset;
+    end;
+end;
+
+procedure TNemp_MainForm.LoadNewFileHeadsetClick(Sender: TObject);
+begin
+    // Play new song in headset
+    NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
+end;
+
+procedure TNemp_MainForm.StopBtnHeadsetClick(Sender: TObject);
+begin
+    NempPlayer.StopHeadset;
 end;
 
 procedure TNemp_MainForm.PM_PlayFilesClick(Sender: TObject);
@@ -8795,42 +8915,51 @@ begin
       TabBtn_Effects.GlyphLine := 0;
   end;
 
+  GRPBoxCover.Visible     := (Sender as TControl).Tag = 1;
+  GRPBoxLyrics.Visible    := (Sender as TControl).Tag = 2;
+  GRPBoxEqualizer.Visible := (Sender as TControl).Tag = 3;
+  GRPBoxEffekte.Visible   := (Sender as TControl).Tag = 4;
+  GRPBOXHeadset.Visible   := (Sender as TControl).Tag = 5;
+  HeadSetTimer.Enabled    := (Sender as TControl).Tag = 5;
+
   Case (Sender as TControl).Tag of
-      0: begin
-          GetCursorPos(Point);
-          Player_PopupMenu.Popup(Point.X, Point.Y+10);
-      end;
+      //0: begin
+      //    GetCursorPos(Point);
+      //    Player_PopupMenu.Popup(Point.X, Point.Y+10);
+      //end;
       1: begin
-          GRPBoxCover.Visible     := True;
-          GRPBoxLyrics.Visible    := False;
-          GRPBoxEqualizer.Visible := False;
-          GRPBoxEffekte.Visible   := False;
+          //GRPBoxCover.Visible     := True;
+          //GRPBoxLyrics.Visible    := False;
+          //GRPBoxEqualizer.Visible := False;
+          //GRPBoxEffekte.Visible   := False;
           TabBtn_Cover.GlyphLine := 1;
       end;
       2: begin
-          GRPBoxCover.Visible     := False;
-          GRPBoxLyrics.Visible    := True;
+          //GRPBoxCover.Visible     := False;
+          //GRPBoxLyrics.Visible    := True;
           LyricsMemo.Top          := 5;
           LyricsMemo.Height       := GRPBoxLyrics.Height - 10;
-          GRPBoxEqualizer.Visible := False;
-          GRPBoxEffekte.Visible   := False;
+          //GRPBoxEqualizer.Visible := False;
+          //GRPBoxEffekte.Visible   := False;
           TabBtn_Lyrics.GlyphLine := 1;
       end;
       3: begin
-          GRPBoxCover.Visible     := False;
-          GRPBoxLyrics.Visible    := False;
-          GRPBoxEqualizer.Visible := True;
-          GRPBoxEffekte.Visible   := False;
+          //GRPBoxCover.Visible     := False;
+          //GRPBoxLyrics.Visible    := False;
+          //GRPBoxEqualizer.Visible := True;
+          //GRPBoxEffekte.Visible   := False;
           TabBtn_Equalizer.GlyphLine := 1;
       end;
       4: begin
-          GRPBoxCover.Visible     := False;
-          GRPBoxLyrics.Visible    := False;
-          GRPBoxEqualizer.Visible := False;
-          GRPBoxEffekte.Visible   := True;
+          //GRPBoxCover.Visible     := False;
+          //GRPBoxLyrics.Visible    := False;
+          //GRPBoxEqualizer.Visible := False;
+          //GRPBoxEffekte.Visible   := True;
           // erzwingt den Refresh des Buttons. Scheint manchmal nötig zu sein...
           DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
           TabBtn_Effects.GlyphLine := 1;
+      end;
+      5: begin
       end;
   end; //case
 

@@ -47,8 +47,8 @@ object HeadsetControlForm: THeadsetControlForm
     Transparent = False
   end
   object PlayBTN: TSkinButton
-    Left = 72
-    Top = 33
+    Left = 70
+    Top = 28
     Width = 25
     Height = 24
     DoubleBuffered = True

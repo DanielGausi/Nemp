@@ -1232,19 +1232,41 @@ begin
     WM_ResetPlayerVCL: ReInitPlayerVCL;
 
     WM_ActualizePlayPauseBtn: begin
-                                  case Message.WParam of
-                                      NEMP_API_STOPPED, NEMP_API_PAUSED: begin
-                                            PlayPauseBTN.GlyphLine := 0;
-                                            fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
+                            case Message.LParam of
+                                0: begin
+                                      case Message.WParam of
+                                          NEMP_API_STOPPED, NEMP_API_PAUSED: begin
+                                                PlayPauseBTN.GlyphLine := 0;
+                                                fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
+                                          end;
+                                          NEMP_API_PLAYING : begin
+                                            PlayPauseBTN.GlyphLine := 1;
+                                            fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
+                                          end;
                                       end;
-                                      NEMP_API_PLAYING : begin
-                                        PlayPauseBTN.GlyphLine := 1;
-                                        fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
+                                      //showmessage(Inttostr(Message.wParam));
+                                end;
+                                1: begin
+                                      case Message.WParam of
+                                          NEMP_API_STOPPED: begin
+                                                PlayPauseHeadSetBtn.GlyphLine := 0;
+                                                PlayPauseHeadSetBtn.Caption := 'Play';
+                                                HeadSetTimer.Enabled := False;
+                                                SlidebarButton_Headset.Left := SlideBarShapeHeadset.Left;
+                                          end;
+                                          NEMP_API_PAUSED: begin
+                                                PlayPauseHeadSetBtn.GlyphLine := 0;
+                                                PlayPauseHeadSetBtn.Caption := 'Play';
+                                                HeadSetTimer.Enabled := False;
+                                          end;
+                                          NEMP_API_PLAYING : begin
+                                                PlayPauseHeadSetBtn.GlyphLine := 1;
+                                                PlayPauseHeadSetBtn.Caption := 'Pause';
+                                                HeadSetTimer.Enabled := True;
+                                          end;
                                       end;
-                                  end;
-                                  //showmessage(Inttostr(Message.wParam));
-
-
+                                end;
+                            end;
     end;
 
     WM_NewMetaData: //DoMeta(PChar(Message.wParam));

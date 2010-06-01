@@ -146,6 +146,8 @@ type
       function GetBassStatus: DWord;    // returns the status of the bass.dll (playing, paused, ..)
                                         // this is NOT the same as fStatus!
 
+      function GetBassHeadSetStatus: DWord;
+
       Procedure SetSamplerateFactor(Value: Single);   // Samplerate
       Procedure SetEchoMix(Value: Single);            // Echo
       Procedure SetEchoTime(Value: Single);
@@ -167,6 +169,7 @@ type
 
     public
         MainAudioFile: TPlaylistFile;
+        HeadSetAudioFile: TPlaylistFile;
         MainWindowHandle: DWord;
 
         MainStream: DWord;
@@ -303,6 +306,8 @@ type
         property Status: Integer read fStatus;
         property StopStatus: Integer read fStopStatus;
         property BassStatus: DWord read GetBassStatus;
+        property BassHeadSetStatus: DWord read GetBassHeadSetStatus;
+
         property LastUserWish: Integer read fLastUserWish write fLastUserWish;
 
         property AutoSplitMaxSize: Integer read fAutoSplitMaxSizeMB write SetAutoSplitMaxSize;
@@ -354,6 +359,8 @@ type
         // eine Datei im Headset abspielen
         procedure PlayInHeadset(aAudioFile: TAudioFile); // kein PlaylistFile, weil auch aus der Medienliste ein Jingle gespielt werden kann
         procedure StopHeadset;
+        procedure PauseHeadset;
+        procedure ResumeHeadset;
         property HeadsetTime: Double read GetHeadsetTime write SetHeadsetTime;
         // Fortschritt in Bruchteilen (0..1)
         property HeadsetProgress: Double read GetHeadsetProgress write SetHeadsetProgress;
@@ -580,6 +587,9 @@ begin
     MainStation.Free;
     PostProcessor.Free;
     NempScrobbler.Free;
+
+    if assigned(HeadSetAudioFile) then
+        HeadSetAudioFile.Free;
     inherited Destroy;
 end;
 
@@ -1456,12 +1466,48 @@ procedure TNempPlayer.PlayInHeadset(aAudioFile: TAudioFile); // kein PlaylistFil
 begin
   if not Bass_SetDevice(HeadsetDevice) then
     exit;
-  fHeadsetIsURLStream := PathSeemsToBeURL(aAudioFile.Pfad);
-  Bass_ChannelStop(HeadsetStream);
-  HeadsetStream := NEMP_CreateStream(aAudioFile.Pfad, False, False, True);
-  BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
-  Bass_ChannelPlay(HeadsetStream, True);
+
+  if not assigned(HeadSetAudioFile) then
+  begin
+      if assigned(aAudioFile) then
+          HeadSetAudioFile := TAudioFile.Create
+      else
+          exit;
+  end;
+
+  // aAudioFile = NIL: PlayAgain
+  if assigned(aAudioFile) then
+      HeadSetAudioFile.Assign(aAudioFile);
+
+  if assigned(HeadSetAudioFile) then
+  begin
+      fHeadsetIsURLStream := PathSeemsToBeURL(HeadSetAudioFile.Pfad);
+      Bass_ChannelStop(HeadsetStream);
+      HeadsetStream := NEMP_CreateStream(HeadSetAudioFile.Pfad, False, False, True);
+      BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
+      Bass_ChannelPlay(HeadsetStream, True);
+      Bass_SetDevice(MainDevice);
+      ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
+  end;
+end;
+
+procedure TNempPlayer.PauseHeadset;
+begin
+  if not Bass_SetDevice(HeadsetDevice) then
+    exit;
+  Bass_ChannelPause(HeadsetStream);
   Bass_SetDevice(MainDevice);
+
+  ActualizePlayPauseBtn(NEMP_API_PAUSED, 1);
+end;
+
+procedure TNempPlayer.ResumeHeadset;
+begin
+  if not Bass_SetDevice(HeadsetDevice) then
+    exit;
+  BASS_ChannelPlay(HeadsetStream, False);
+  Bass_SetDevice(MainDevice);
+  ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
 end;
 
 procedure TNempPlayer.StopHeadset;
@@ -1470,6 +1516,7 @@ begin
     exit;
   Bass_ChannelStop(HeadsetStream);
   Bass_SetDevice(MainDevice);
+  ActualizePlayPauseBtn(NEMP_API_STOPPED, 1);
 end;
 
 
@@ -1636,7 +1683,7 @@ procedure TNempPlayer.SetHeadsetProgress(Value: Double);
 begin
   if fHeadsetIsURLStream then exit;
   if Value < 0 then Value := 0;
-  if Value > 1 then Value := 1;
+  if Value > 0.999 then Value := 0.999;
   BASS_ChannelSetPosition(HeadsetStream, Round(BASS_ChannelGetLength(HeadsetStream, BASS_POS_BYTE) * Value), BASS_POS_BYTE);
 end;
 function TNempPlayer.GetHeadsetLength: Double;
@@ -1650,6 +1697,11 @@ end;
 function TNempPlayer.GetBassStatus: DWord;
 begin
   result := BASS_ChannelIsActive(MainStream);
+end;
+
+function TNempPlayer.GetBassHeadSetStatus: DWord;
+begin
+  result := BASS_ChannelIsActive(HeadSetStream);
 end;
 
 {
