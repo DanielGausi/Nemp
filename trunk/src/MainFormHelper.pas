@@ -122,6 +122,9 @@ procedure CorrectVolButton;
 begin
     with Nemp_MainForm do
       VolButton.Top := Round((100-NempPlayer.Volume)/ (100/VolShape.Height) {3.125}) + (VolShape.Top - (VolButton.Height Div 2));
+
+    with Nemp_MainForm do
+      VolButtonHeadset.Top := Round((100-NempPlayer.HeadsetVolume)/ (100/VolShapeHeadset.Height) {3.125}) + (VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2));
 end;
 function VCLVolToPlayer: Integer;
 begin

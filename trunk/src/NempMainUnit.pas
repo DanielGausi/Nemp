@@ -56,7 +56,7 @@ uses
   UpdateUtils, uDragFilesSrc,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews, Lyrics;
+  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage;
 
 type
 
@@ -801,13 +801,20 @@ type
     PM_Cover_Below: TMenuItem;
     PM_Cover_DontShowDetails: TMenuItem;
     GRPBOXHeadset: TNempPanel;
-    XXXX_TabBtn_Nemp: TSkinButton;
+    TabBtn_Headset: TSkinButton;
     SlidebarButton_Headset: TSkinButton;
     SlideBarShapeHeadset: TShape;
-    LoadNewFileHeadset: TSkinButton;
+    BtnLoadHeadset: TSkinButton;
     HeadSetTimer: TTimer;
     PlayPauseHeadSetBtn: TSkinButton;
-    StopBtnHeadset: TSkinButton;
+    StopHeadSetBtn: TSkinButton;
+    VolButtonHeadset: TSkinButton;
+    VolShapeHeadset: TShape;
+    HeadsetCoverImage: TImage;
+    LblHeadsetTitle: TLabel;
+    LblHeadsetArtist: TLabel;
+    SlideForwardHeadsetBTN: TSkinButton;
+    SlideBackHeadsetBTN: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -918,6 +925,7 @@ type
     procedure SlideBarButtonStartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure ShowPlayerDetails(aAudioFile: TAudioFile);
+    procedure ShowHeadsetDetails(aAudioFile: TAudioFile);
     procedure ShowVSTDetails(aAudioFile: TAudioFile);
     procedure VolButtonStartDrag(Sender: TObject;
       var DragObject: TDragObject);
@@ -1346,9 +1354,16 @@ type
     procedure SlidebarButton_HeadsetStartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure PLayPauseBtnHeadsetClick(Sender: TObject);
-    procedure LoadNewFileHeadsetClick(Sender: TObject);
+    procedure BtnLoadHeadsetClick(Sender: TObject);
     procedure HeadSetTimerTimer(Sender: TObject);
-    procedure StopBtnHeadsetClick(Sender: TObject);
+    procedure StopHeadSetBtnClick(Sender: TObject);
+    procedure VolButtonHeadsetKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure GRPBOXHeadsetMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure GRPBOXHeadsetMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure GRPBOXHeadsetClick(Sender: TObject);
 
   private
 
@@ -6370,18 +6385,15 @@ procedure TNemp_MainForm.SlidebarButton_HeadsetStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var AREct: tRect;
 begin
-
   with (Sender as TControl) do
   begin
     Begindrag(false);
     ARect.TopLeft :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left, GRPBOXHeadset.Top)));
     ARect.BottomRight :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left + GRPBOXHeadset.Width, GRPBOXHeadset.Top + GRPBOXHeadset.Height)));
-    SlideBarButton_Headset.Tag := 1;
+    Tag := 1;
     ClipCursor(@Arect);
   end;
 end;
-
-
 
 procedure TNemp_MainForm.SlidebarButton_HeadsetKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
@@ -6439,9 +6451,23 @@ begin
             if NewPos >= SlideBarShapeHeadset.Width  + SlideBarShapeHeadset.Left - SlideBarButton_Headset.Width then
                 NewPos := SlideBarShapeHeadset.Width + SlideBarShapeHeadset.Left - SlideBarButton_Headset.Width;
           SlidebarButton_Headset.Left := NewPos;
+    end else
+    if Source = VolButtonHeadset then
+    begin
+        if (Sender is TNempPanel) then
+            NewPos := y - (VolButtonHeadset.Height Div 2)
+        else
+            NewPos := (Sender as TControl).Top + y - (VolButtonHeadset.Height Div 2);
 
+        if NewPos <= VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2) then
+          NewPos := VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2)
+        else
+          if NewPos >= VolShapeHeadset.Top + VolShapeHeadset.Height - (VolButtonHeadset.Height Div 2) then
+            NewPos := VolShapeHeadset.Top + VolShapeHeadset.Height - (VolButtonHeadset.Height Div 2);
+        VolButtonHeadset.Top := NewPos;
+        NempPlayer.HeadSetVolume :=
+            Round(100-((VolButtonHeadset.Top - VolShapeHeadset.Top + (VolButtonHeadset.Height Div 2))* (100/VolShapeHeadset.Height)));
     end;
-
 end;
 
 procedure TNemp_MainForm.SlideBarButtonEndDrag(Sender, Target: TObject; X,
@@ -6474,6 +6500,28 @@ procedure TNemp_MainForm.VolButtonEndDrag(Sender, Target: TObject; X,
   Y: Integer);
 begin
     ClipCursor(Nil);
+end;
+
+
+procedure TNemp_MainForm.VolButtonHeadsetKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case key of
+    vk_up, vk_Right:  begin
+                        VolTimer.Enabled := False;
+                        NempPlayer.VolStep := NempPlayer.VolStep + 1;
+                        NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume + 1 + (NempPlayer.VolStep DIV 3);
+                        VolTimer.Enabled := True;
+                        CorrectVolButton;
+                     end;
+    vk_Down, vk_Left: begin
+                        VolTimer.Enabled := False;
+                        NempPlayer.VolStep := NempPlayer.VolStep + 1;
+                        NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume - 1 - (NempPlayer.VolStep DIV 3);
+                        VolTimer.Enabled := True;
+                        CorrectVolButton;
+                       end;
+  end;
 end;
 
 procedure TNemp_MainForm.PlayNextBTNIMGClick(Sender: TObject);
@@ -6607,13 +6655,57 @@ begin
     end;
 end;
 
-procedure TNemp_MainForm.LoadNewFileHeadsetClick(Sender: TObject);
+procedure TNemp_MainForm.ShowHeadsetDetails(aAudioFile: TAudioFile);
+var coverbmp: TBitmap;
+    success: Boolean;
+    fn: String;
+begin
+    if assigned(aAudioFile) then
+    begin
+        LblHeadsetTitle.Caption  := aAudioFile.Titel;
+        LblHeadsetArtist.Caption := aAudioFile.PlaylistTitle;
+        SlidebarButton_Headset.Enabled := True;
+        SlideBarShapeHeadset.Enabled := True;
+    end else
+    begin
+        LblHeadsetTitle.Caption  := HeadSetLabel_Default2;
+        LblHeadsetArtist.Caption := HeadSetLabel_Default1;
+        SlidebarButton_Headset.Enabled := False;
+        SlideBarShapeHeadset.Enabled := False;
+    end;
+
+    Coverbmp := tBitmap.Create;
+    try
+        Coverbmp.Width := 250;
+        Coverbmp.Height := 250;
+
+        // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
+        success := GetCover(aAudioFile, Coverbmp);
+        // HeadsetCoverImage.Visible := success;
+        if success then
+        begin
+            HeadsetCoverImage.Picture.Bitmap.Assign(Coverbmp);
+            HeadsetCoverImage.Refresh;
+        end else
+        begin
+            fn := ExtractFilePath(ParamStr(0)) + 'Images\headset.png';
+            if FileExists(fn) then
+                HeadsetCoverImage.Picture.LoadFromFile(fn);
+        end;
+    finally
+        Coverbmp.Free;
+    end;
+end;
+
+procedure TNemp_MainForm.BtnLoadHeadsetClick(Sender: TObject);
 begin
     // Play new song in headset
     NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
+    // Show Details
+    ShowHeadsetDetails(MedienBib.CurrentAudioFile);
 end;
 
-procedure TNemp_MainForm.StopBtnHeadsetClick(Sender: TObject);
+procedure TNemp_MainForm.StopHeadSetBtnClick(Sender: TObject);
 begin
     NempPlayer.StopHeadset;
 end;
@@ -6745,12 +6837,12 @@ end;
                  
 // Datei im Headset (2. Device abspielen)
 procedure TNemp_MainForm.PlayInHeadset(aTree: TVirtualStringTree);
-var aNode: PVirtualNode;
-  Data: PTreeData;
-  aAudiofile: TAudiofile;
+//var aNode: PVirtualNode;
+//  Data: PTreeData;
+//  aAudiofile: TAudiofile;
 
 begin
-  if not assigned(HeadsetControlForm) then
+{  if not assigned(HeadsetControlForm) then
     Application.CreateForm(THeadsetControlForm, HeadsetControlForm);
 
   aNode := aTree.FocusedNode;
@@ -6769,25 +6861,37 @@ begin
       HeadsetControlForm.Lbl_HeadSetTitle.Caption := NempPlayer.GenerateTitelString(aAudioFile, 0)
   else
       HeadsetControlForm.Lbl_HeadSetTitle.Caption := HeadSetForm_NoAudioFile;
+}
 end;
 
 
 procedure TNemp_MainForm.PM_PL_PlayInHeadsetClick(Sender: TObject);
 begin
-  PlayInHeadset(PlaylistVST);
-end;
-
-procedure TNemp_MainForm.PM_PL_StopHeadsetClick(Sender: TObject);
-begin
-  NempPlayer.StopHeadset;
-  if assigned(HeadsetControlForm) then
-    HeadSetControlForm.Close;
+    // Play new song in headset
+    NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
+    // Show Details
+    //ShowHeadsetDetails(MedienBib.CurrentAudioFile);
+    TabBtn_Headset.Click;
 end;
 
 procedure TNemp_MainForm.PM_ML_PlayHeadsetClick(Sender: TObject);
 begin
-  PlayInHeadset(VST);
+    // Play new song in headset
+    NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
+    // Show Details
+    //ShowHeadsetDetails(MedienBib.CurrentAudioFile);
+    TabBtn_Headset.Click;
 end;
+
+
+procedure TNemp_MainForm.PM_PL_StopHeadsetClick(Sender: TObject);
+begin
+  NempPlayer.StopHeadset;
+  //if assigned(HeadsetControlForm) then
+  //  HeadSetControlForm.Close;
+end;
+
+
 
 procedure TNemp_MainForm.BassTimeLBLClick(Sender: TObject);
 begin
@@ -7544,6 +7648,29 @@ begin
 
   NempPlayer.EQSettingName := (MainForm_BtnEqualizerPresetsCustom);
   Btn_EqualizerPresets.Caption := (MainForm_BtnEqualizerPresetsCustom);
+end;
+
+procedure TNemp_MainForm.GRPBOXHeadsetClick(Sender: TObject);
+begin
+    try
+    FocusControl(VolButtonHeadset);
+    except
+
+    end;
+end;
+
+procedure TNemp_MainForm.GRPBOXHeadsetMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume - 1;
+    CorrectVolButton;
+end;
+
+procedure TNemp_MainForm.GRPBOXHeadsetMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume + 1;
+    CorrectVolButton;
 end;
 
 procedure TNemp_MainForm.EqualizerButton1EndDrag(Sender, Target: TObject;
@@ -8913,6 +9040,7 @@ begin
       TabBtn_Lyrics.GlyphLine := 0;
       TabBtn_Equalizer.GlyphLine := 0;
       TabBtn_Effects.GlyphLine := 0;
+      TabBtn_Headset.GlyphLine := 0;
   end;
 
   GRPBoxCover.Visible     := (Sender as TControl).Tag = 1;
@@ -8960,6 +9088,8 @@ begin
           TabBtn_Effects.GlyphLine := 1;
       end;
       5: begin
+          ShowHeadsetDetails(NempPlayer.HeadSetAudioFile);
+          TabBtn_Headset.GlyphLine := 1;
       end;
   end; //case
 
