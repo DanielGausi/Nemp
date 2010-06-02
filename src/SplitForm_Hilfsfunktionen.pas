@@ -752,6 +752,10 @@ begin
       GRPBOXEffekte.OnMouseDown := ExtendedControlForm.OnMouseDown;
       GRPBOXEffekte.OnMouseMove := ExtendedControlForm.OnMouseMove;
       GRPBOXEffekte.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
+      GRPBOXHeadset.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      GRPBOXHeadset.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      GRPBOXHeadset.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
   end;
 end;
 
@@ -845,6 +849,10 @@ begin
     GRPBOXEffekte.OnMouseDown :=  Nil;
     GRPBOXEffekte.OnMouseMove :=  Nil;
     GRPBOXEffekte.OnMouseUp   :=  Nil;
+
+    GRPBOXHeadset.OnMouseDown := Nil;
+    GRPBOXHeadset.OnMouseMove := Nil;
+    GRPBOXHeadset.OnMouseUp   := Nil;
   end;
 end;
 
@@ -1187,7 +1195,8 @@ begin
       SampleRateButton   .Height := SampleRateButton   .Height;
       for i := 0 to 9 do
           EqualizerButtons[i].Height := EqualizerButtons[i].Height;
-
+      VolButtonHeadset        .Height := VolButtonHeadset        .Height;
+      SlidebarButton_Headset  .Height := SlidebarButton_Headset  .Height;
 
 
 

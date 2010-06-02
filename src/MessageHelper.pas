@@ -1250,18 +1250,16 @@ begin
                                       case Message.WParam of
                                           NEMP_API_STOPPED: begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 0;
-                                                PlayPauseHeadSetBtn.Caption := 'Play';
+                                                //PlayPauseHeadSetBtn.Caption := 'Play';
                                                 HeadSetTimer.Enabled := False;
                                                 SlidebarButton_Headset.Left := SlideBarShapeHeadset.Left;
                                           end;
                                           NEMP_API_PAUSED: begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 0;
-                                                PlayPauseHeadSetBtn.Caption := 'Play';
                                                 HeadSetTimer.Enabled := False;
                                           end;
                                           NEMP_API_PLAYING : begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 1;
-                                                PlayPauseHeadSetBtn.Caption := 'Pause';
                                                 HeadSetTimer.Enabled := True;
                                           end;
                                       end;

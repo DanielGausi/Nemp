@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 928
+  ClientHeight = 948
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -948,7 +948,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object VolButton: TSkinButton
           Left = 211
-          Top = 54
+          Top = 60
           Width = 12
           Height = 12
           Hint = 'Volume'
@@ -1058,8 +1058,8 @@ object Nemp_MainForm: TNemp_MainForm
         OwnerDraw = True
         object TabBtn_Cover: TSkinButton
           Tag = 1
-          Left = 197
-          Top = 32
+          Left = 195
+          Top = 20
           Width = 24
           Height = 24
           Hint = 'Show cover'
@@ -1082,8 +1082,8 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TabBtn_Lyrics: TSkinButton
           Tag = 2
-          Left = 197
-          Top = 62
+          Left = 195
+          Top = 50
           Width = 24
           Height = 24
           Hint = 'Show lyrics'
@@ -1106,8 +1106,8 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TabBtn_Equalizer: TSkinButton
           Tag = 3
-          Left = 197
-          Top = 92
+          Left = 195
+          Top = 80
           Width = 24
           Height = 24
           Hint = 'Show equalizer'
@@ -1130,8 +1130,8 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object TabBtn_Effects: TSkinButton
           Tag = 4
-          Left = 197
-          Top = 122
+          Left = 195
+          Top = 110
           Width = 24
           Height = 24
           Hint = 'Show effects'
@@ -1152,10 +1152,10 @@ object Nemp_MainForm: TNemp_MainForm
           Color1 = clBlack
           Color2 = clBlack
         end
-        object XXXX_TabBtn_Nemp: TSkinButton
+        object TabBtn_Headset: TSkinButton
           Tag = 5
-          Left = 197
-          Top = 152
+          Left = 195
+          Top = 140
           Width = 24
           Height = 24
           Hint = 'Headset-controls'
@@ -1170,7 +1170,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = TabBtn_CoverMouseMove
           DrawMode = dm_Skin
           NumGlyphsX = 5
-          NumGlyphsY = 1
+          NumGlyphsY = 2
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
@@ -1228,7 +1228,7 @@ object Nemp_MainForm: TNemp_MainForm
         object LyricsMemo: TMemo
           Left = 5
           Top = 5
-          Width = 148
+          Width = 167
           Height = 74
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvNone
@@ -2019,16 +2019,20 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object GRPBOXHeadset: TNempPanel
         Left = 17
-        Top = 341
+        Top = 330
         Width = 191
         Height = 180
+        BevelOuter = bvNone
         TabOrder = 6
+        OnClick = GRPBOXHeadsetClick
         OnDragOver = GRPBOXControlDragOver
         OwnerDraw = False
+        OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
+        OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
         object SlideBarShapeHeadset: TShape
           Left = 14
-          Top = 142
-          Width = 155
+          Top = 131
+          Width = 139
           Height = 6
           Brush.Color = clGradientActiveCaption
           DragCursor = crSizeWE
@@ -2036,9 +2040,43 @@ object Nemp_MainForm: TNemp_MainForm
           OnDragOver = GRPBOXControlDragOver
           OnMouseDown = SlideBarShapeHeadsetMouseDown
         end
+        object VolShapeHeadset: TShape
+          Left = 147
+          Top = 86
+          Width = 6
+          Height = 33
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnDragOver = GRPBOXControlDragOver
+        end
+        object HeadsetCoverImage: TImage
+          Left = 37
+          Top = 30
+          Width = 91
+          Height = 91
+          Proportional = True
+          Stretch = True
+          OnClick = GRPBOXHeadsetClick
+        end
+        object LblHeadsetTitle: TLabel
+          Left = 80
+          Top = 11
+          Width = 76
+          Height = 13
+          Caption = '(no title loaded)'
+          Visible = False
+        end
+        object LblHeadsetArtist: TLabel
+          Left = 8
+          Top = 11
+          Width = 60
+          Height = 13
+          Caption = 'Headphones'
+        end
         object SlidebarButton_Headset: TSkinButton
-          Left = 39
-          Top = 140
+          Left = 41
+          Top = 130
           Width = 25
           Height = 10
           DoubleBuffered = True
@@ -2061,11 +2099,10 @@ object Nemp_MainForm: TNemp_MainForm
           AcceptArrowKeys = True
         end
         object PlayPauseHeadSetBtn: TSkinButton
-          Left = 97
-          Top = 93
-          Width = 32
-          Height = 25
-          Caption = '> ||'
+          Left = 57
+          Top = 147
+          Width = 24
+          Height = 24
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 1
@@ -2073,23 +2110,23 @@ object Nemp_MainForm: TNemp_MainForm
           OnDragOver = GRPBOXControlDragOver
           DrawMode = dm_Windows
           NumGlyphsX = 5
-          NumGlyphsY = 1
+          NumGlyphsY = 2
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
           Color1 = clBlack
           Color2 = clBlack
         end
-        object LoadNewFileHeadset: TSkinButton
-          Left = 16
-          Top = 93
-          Width = 75
-          Height = 25
-          Caption = 'Play New'
+        object BtnLoadHeadset: TSkinButton
+          Left = 134
+          Top = 30
+          Width = 28
+          Height = 28
+          Hint = 'Load selected file into headset (Ctrl+H)'
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 2
-          OnClick = LoadNewFileHeadsetClick
+          OnClick = BtnLoadHeadsetClick
           OnDragOver = GRPBOXControlDragOver
           DrawMode = dm_Windows
           NumGlyphsX = 5
@@ -2100,16 +2137,78 @@ object Nemp_MainForm: TNemp_MainForm
           Color1 = clBlack
           Color2 = clBlack
         end
-        object StopBtnHeadset: TSkinButton
-          Left = 141
-          Top = 93
-          Width = 31
-          Height = 25
-          Caption = '[ ]'
+        object StopHeadSetBtn: TSkinButton
+          Left = 87
+          Top = 147
+          Width = 24
+          Height = 24
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 3
-          OnClick = StopBtnHeadsetClick
+          OnClick = StopHeadSetBtnClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object VolButtonHeadset: TSkinButton
+          Left = 144
+          Top = 104
+          Width = 12
+          Height = 12
+          Hint = 'Volume'
+          DoubleBuffered = True
+          DragCursor = crSizeNS
+          DragMode = dmAutomatic
+          ParentDoubleBuffered = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 4
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = VolButtonEndDrag
+          OnKeyDown = VolButtonHeadsetKeyDown
+          OnStartDrag = SlidebarButton_HeadsetStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = True
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object SlideForwardHeadsetBTN: TSkinButton
+          Left = 118
+          Top = 148
+          Width = 22
+          Height = 22
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          TabOrder = 5
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object SlideBackHeadsetBTN: TSkinButton
+          Left = 29
+          Top = 148
+          Width = 22
+          Height = 22
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          TabOrder = 6
           OnDragOver = GRPBOXControlDragOver
           DrawMode = dm_Windows
           NumGlyphsX = 5
@@ -2150,7 +2249,7 @@ object Nemp_MainForm: TNemp_MainForm
           307
           630)
         object PlaylistVST: TVirtualStringTree
-          Left = 4
+          Left = 6
           Top = 2
           Width = 299
           Height = 622
@@ -2303,18 +2402,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 845
-    Height = 266
+    Height = 286
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 266
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 238
+      Height = 258
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2323,23 +2423,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 238
       DesignSize = (
         845
-        238)
+        258)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 228
+        Height = 248
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 228
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 228
+          Height = 248
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2349,7 +2451,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 228
+          Height = 248
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2416,6 +2518,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 228
           Columns = <
             item
               Position = 0
@@ -2489,7 +2592,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 228
+          Height = 248
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2499,6 +2602,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 228
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3854,7 +3958,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130018040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101110013001C040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4419,7 +4523,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F8061C0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806200510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7198,7 +7302,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 576
     Top = 632
     Bitmap = {
-      494C010107002800840110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800880110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

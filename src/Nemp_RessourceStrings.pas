@@ -636,7 +636,8 @@ ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. O
 ParrtyMode_Password_Caption = 'Nemp Party-Mode';
 ParrtyMode_Password_Prompt = 'Please enter the password to exit the Nemp Party-Mode';
 
-
+HeadSetLabel_Default1 = 'Headphones (no title loaded)';
+HeadSetLabel_Default2 = '(no title loaded)';
 
 implementation
 

@@ -240,8 +240,8 @@ type
         // ControlButtons: The Buttons on the MainForm
         ControlButtons : Array[TControlButtons] of TSkinButton;
 
-        TabButtons: Array [0..9] of SkinButtonRec;
-        SlideButtons: Array [0..15] of SkinButtonRec;
+        TabButtons: Array [0..10] of SkinButtonRec;
+        SlideButtons: Array [0..17] of SkinButtonRec;
 
         NempPartyMode: TNempPartyMode;
 
@@ -369,6 +369,7 @@ begin
   TabButtons[7].Button    :=  Nemp_MainForm.TabBtn_TagCloud      ;
   TabButtons[8].Button    :=  Nemp_MainForm.TabBtn_Preselection  ;
   TabButtons[9].Button    :=  Nemp_MainForm.TabBtn_Medialib      ;
+  TabButtons[10].Button   :=  Nemp_MainForm.TabBtn_Headset       ;
 
   TabButtons[0].GlyphFile := 'TabBtnCover'       ;
   TabButtons[1].GlyphFile := 'TabBtnLyrics'      ;
@@ -380,6 +381,7 @@ begin
   TabButtons[7].GlyphFile := 'TabBtnTagCloud'    ;
   TabButtons[8].GlyphFile := 'TabBtnNemp'        ;
   TabButtons[9].GlyphFile := 'TabBtnNemp'        ;
+  TabButtons[10].GlyphFile := 'TabBtnHeadset'    ;
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;
@@ -397,12 +399,15 @@ begin
   SlideButtons[13].Button := Nemp_MainForm.EqualizerButton8    ;
   SlideButtons[14].Button := Nemp_MainForm.EqualizerButton9    ;
   SlideButtons[15].Button := Nemp_MainForm.EqualizerButton10   ;
+  SlideButtons[16].Button := Nemp_MainForm.VolButtonHeadset    ;
+  SlideButtons[17].Button := Nemp_MainForm.SlidebarButton_Headset   ;
 
   SlideButtons[0].GlyphFile := 'SlideBtnVolume';
   for i := 1 to 5 do SlideButtons[i].GlyphFile := 'SlideBtnLeftRight';
   for i := 6 to 15 do SlideButtons[i].GlyphFile := 'SlideBtnUpDown';
 
-
+  SlideButtons[16].GlyphFile := 'SlideBtnVolume';
+  SlideButtons[17].GlyphFile := 'SlideBtnLeftRight';
 end;
 
 destructor TNempSkin.Destroy;
@@ -1212,7 +1217,7 @@ begin
 
         case SlideButtonMode of
            0,1: begin
-                  for i := 0 to 15 do
+                  for i := 0 to 17 do
                   begin
                       SlideButtons[i].Button.DrawMode := dm_Windows;
                       SlideButtons[i].Button.CustomRegion := False;
@@ -1222,7 +1227,7 @@ begin
            end;
 
            2: begin
-                  for i := 0 to 15 do
+                  for i := 0 to 17 do
                   begin
                       SlideButtons[i].Button.DrawMode := dm_Skin;
                       AssignNemp3Glyph(SlideButtons[i].Button,
@@ -1279,6 +1284,24 @@ begin
 
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
+
+                AssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
+                BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
+
+                AssignNemp3Glyph(PlayPauseHeadSetBtn,  Path + '\BtnPlayPauseHeadset', True);
+                PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
+
+                AssignNemp3Glyph(StopHeadSetBtn,  Path + '\BtnStopHeadset', True);
+                StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
+
+
+                AssignNemp3Glyph(SlideBackHeadsetBTN,  Path + '\BtnSlideBackwardHeadset', True);
+                SlideBackHeadsetBTN.GlyphLine := SlideBackHeadsetBTN.GlyphLine;
+
+                AssignNemp3Glyph(SlideForwardHeadsetBTN,  Path + '\BtnSlideForwardHeadset', True);
+                SlideForwardHeadsetBTN.GlyphLine := SlideForwardHeadsetBTN.GlyphLine;
+
+
 
                 AssignNemp3Glyph(CB_MedienBibGlobalQuickSearch,  Path + '\BtnQuickSearch', True);
                 CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
@@ -1514,7 +1537,7 @@ begin
 
         AssignStarGraphics;
 
-        for i := 0 to 15 do
+        for i := 0 to 17 do
         begin
             SlideButtons[i].Button.DrawMode := dm_Windows;
             SlideButtons[i].Button.CustomRegion := False;
@@ -2206,7 +2229,7 @@ begin
 
         tmpBitmap := TBitmap.Create;
         try
-            for b := 0 to 9 do
+            for b := 0 to 10 do
             begin
                 TabButtons[b].Button.DrawMode := dm_Windows;
                 TabButtons[b].Button.NumGlyphsX := 1;
@@ -2230,7 +2253,7 @@ begin
     with Nemp_MainForm do
     begin
         BaseDir := path + '\';
-        for b := 0 to 9 do
+        for b := 0 to 10 do
         begin
             TabButtons[b].Button.DrawMode := dm_Skin;
             AssignNemp3Glyph(TabButtons[b].Button, BaseDir + TabButtons[b].GlyphFile, True);
@@ -2307,6 +2330,47 @@ begin
             DirectionPositionBTN.NempGlyph.Assign(tmpBitmap);
             DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
             DirectionPositionBTN.Refresh;
+
+            BtnLoadHeadset .drawMode := dm_Windows;
+            BtnLoadHeadset .NumGlyphs := 1;
+            BtnLoadHeadset .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnLoadHeadset', True);
+            BtnLoadHeadset.NempGlyph.Assign(tmpBitmap);
+            BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
+            BtnLoadHeadset.Refresh;
+
+            PlayPauseHeadSetBtn .drawMode := dm_Windows;
+            PlayPauseHeadSetBtn .NumGlyphs := 1;
+            PlayPauseHeadSetBtn .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnPlayPauseHeadset', True);
+            PlayPauseHeadSetBtn.NempGlyph.Assign(tmpBitmap);
+            PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
+            PlayPauseHeadSetBtn.Refresh;
+
+            StopHeadSetBtn .drawMode := dm_Windows;
+            StopHeadSetBtn .NumGlyphs := 1;
+            StopHeadSetBtn .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnStopHeadSet', True);
+            StopHeadSetBtn.NempGlyph.Assign(tmpBitmap);
+            StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
+            StopHeadSetBtn.Refresh;
+
+
+            SlideBackHeadsetBTN .drawMode := dm_Windows;
+            SlideBackHeadsetBTN .NumGlyphs := 1;
+            SlideBackHeadsetBTN .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnSlideBackWardHeadset', True);
+            SlideBackHeadsetBTN.NempGlyph.Assign(tmpBitmap);
+            SlideBackHeadsetBTN.GlyphLine := SlideBackHeadsetBTN.GlyphLine;
+            SlideBackHeadsetBTN.Refresh;
+
+            SlideForwardHeadsetBTN .drawMode := dm_Windows;
+            SlideForwardHeadsetBTN .NumGlyphs := 1;
+            SlideForwardHeadsetBTN .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnSlideForwardHeadset', True);
+            SlideForwardHeadsetBTN.NempGlyph.Assign(tmpBitmap);
+            SlideForwardHeadsetBTN.GlyphLine := SlideForwardHeadsetBTN.GlyphLine;
+            SlideForwardHeadsetBTN.Refresh;
 
 
             CB_MedienBibGlobalQuickSearch .drawMode := dm_Windows;
