@@ -318,6 +318,7 @@ begin
         SetOriginalPosition(TabBtn_Lyrics       , i);
         SetOriginalPosition(TabBtn_Equalizer    , i);
         SetOriginalPosition(TabBtn_Effects      , i);
+        SetOriginalPosition(TabBtn_Headset      , i);
         SetOriginalPosition(GRPBOXEffekte       , i);
         SetOriginalPosition(HallShape           , i);
         SetOriginalPosition(HallLBL             , i);
@@ -371,6 +372,21 @@ begin
         SetOriginalPosition(Btn_EqualizerPresets, i);
         SetOriginalPosition(GRPBOXLyrics        , i);
         SetOriginalPosition(LyricsMemo          , i);
+
+        SetOriginalPosition(GRPBOXHeadset          , i);
+        SetOriginalPosition(BtnHeadsetToPlaylist   , i);
+        SetOriginalPosition(BtnLoadHeadset         , i);
+        SetOriginalPosition(HeadsetCoverImage      , i);
+        SetOriginalPosition(LblHeadsetArtist       , i);
+        SetOriginalPosition(PlayPauseHeadSetBtn    , i);
+        SetOriginalPosition(SlideBackHeadsetBTN    , i);
+        SetOriginalPosition(SlidebarButton_Headset , i);
+        SetOriginalPosition(SlideBarShapeHeadset   , i);
+        SetOriginalPosition(SlideForwardHeadsetBTN , i);
+        SetOriginalPosition(StopHeadSetBtn         , i);
+        SetOriginalPosition(VolButtonHeadset       , i);
+        SetOriginalPosition(VolShapeHeadset        , i);
+
 
         SetOriginalPosition(TabBtn_Preselection , i);
         SetOriginalPosition(TabBtn_Browse       , i);
@@ -578,6 +594,9 @@ begin
         Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
+
+        SlidebarButton_Headset  .Height := SlidebarButton_Headset  .Height;
+        SlidebarButton_Headset.Left := SlidebarButton_Headset.Left;
     end;
 
     if assigned(FDetails) and FDetails.visible then

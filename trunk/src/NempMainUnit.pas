@@ -811,10 +811,10 @@ type
     VolButtonHeadset: TSkinButton;
     VolShapeHeadset: TShape;
     HeadsetCoverImage: TImage;
-    LblHeadsetTitle: TLabel;
     LblHeadsetArtist: TLabel;
     SlideForwardHeadsetBTN: TSkinButton;
     SlideBackHeadsetBTN: TSkinButton;
+    BtnHeadsetToPlaylist: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1364,6 +1364,7 @@ type
     procedure GRPBOXHeadsetMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure GRPBOXHeadsetClick(Sender: TObject);
+    procedure BtnHeadsetToPlaylistClick(Sender: TObject);
 
   private
 
@@ -4507,6 +4508,9 @@ end;
 procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
 begin
+
+  Medialist_PopupMenu.Tag := 0;
+
   case NempPlaylist.DefaultAction of
       PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
       PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
@@ -6662,16 +6666,16 @@ var coverbmp: TBitmap;
 begin
     if assigned(aAudioFile) then
     begin
-        LblHeadsetTitle.Caption  := aAudioFile.Titel;
         LblHeadsetArtist.Caption := aAudioFile.PlaylistTitle;
         SlidebarButton_Headset.Enabled := True;
         SlideBarShapeHeadset.Enabled := True;
+        //BtnHeadsetToPlaylist.Enabled := True;
     end else
     begin
-        LblHeadsetTitle.Caption  := HeadSetLabel_Default2;
         LblHeadsetArtist.Caption := HeadSetLabel_Default1;
-        SlidebarButton_Headset.Enabled := False;
-        SlideBarShapeHeadset.Enabled := False;
+        //SlidebarButton_Headset.Enabled := False;
+        //SlideBarShapeHeadset.Enabled := False;
+        //BtnHeadsetToPlaylist.Enabled := False;
     end;
 
     Coverbmp := tBitmap.Create;
@@ -9090,8 +9094,21 @@ begin
       5: begin
           ShowHeadsetDetails(NempPlayer.HeadSetAudioFile);
           TabBtn_Headset.GlyphLine := 1;
+          if (AnzeigeMode = 1) and (not NempOptions.NempEinzelformOptions.ErweiterteControlsVisible)  then
+          begin
+              // Show Headset-Controls
+              NempOptions.NempEinzelformOptions.ErweiterteControlsVisible := true;
+              PM_P_ViewSeparateWindows_Equalizer.Checked := true;
+              MM_O_ViewSeparateWindows_Equalizer.Checked := true;
+              ExtendedControlForm.Visible := true;
+              FormPosAndSizeCorrect(ExtendedControlForm);
+              ReInitDocks;
+          end;
       end;
   end; //case
+
+  if ((Sender as TControl).Tag <> 5) and (NempPlaylist.AutoStopHeadset) then
+      NempPlayer.PauseHeadset;
 
   Constraints.MinHeight := TopMainPanel.Constraints.MinHeight + heightaddi;
 end;
@@ -9638,6 +9655,38 @@ end;
 procedure TNemp_MainForm.BtnCloseClick(Sender: TObject);
 begin
   close;
+end;
+
+procedure TNemp_MainForm.BtnHeadsetToPlaylistClick(Sender: TObject);
+var tmp: PvirtualNode;
+begin
+    if assigned(NempPlayer.HeadSetAudioFile) then
+    begin
+        case NempPlaylist.HeadSetAction of
+            0: begin
+                // enqueue (at the end)
+                NempPlaylist.InsertNode := NIL;
+                NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+            end;
+            1: begin
+                // play(and clear current list)
+                NempPlayList.ClearPlaylist;
+                NempPlaylist.InsertNode := NIL;
+                NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+            end;
+            2: begin
+                // enqueue (in th prebook-list)
+                NempPlaylist.GetInsertNodeFromPlayPosition;
+                tmp := NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+                NempPlaylist.AddNodeToPrebookList(tmp);
+            end;
+            3: begin
+                  // just play
+                  //if FileExists(NempPlayer.HeadSetAudioFile.Pfad) then
+                      NempPlaylist.PlayBibFile(NempPlayer.HeadSetAudioFile, NempPlayer.FadingInterval);
+            end;
+        end;
+    end;
 end;
 
 procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);

@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabExtended0
+    ActivePage = TabAudio5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2590,7 +2590,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 121
+        Height = 90
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Output devices'
         TabOrder = 0
@@ -2611,28 +2611,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Alignment = taRightJustify
           AutoSize = False
           Caption = 'Headphones'
-        end
-        object LblConst_VolumeHeadphones: TLabel
-          Left = 16
-          Top = 72
-          Width = 121
-          Height = 26
-          Hint = 'Volume of the secondary device.'
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'Volume headphones'
-          WordWrap = True
-        end
-        object HeadSetVolumeTRACKBAR: TTrackBar
-          Left = 136
-          Top = 72
-          Width = 225
-          Height = 33
-          Max = 100
-          Frequency = 10
-          Position = 50
-          TabOrder = 2
-          OnChange = HeadSetVolumeTRACKBARChange
         end
         object HeadphonesDeviceCB: TComboBox
           Left = 144
@@ -2657,9 +2635,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_TabAudio2_Fading: TGroupBox
         Left = 8
-        Top = 136
+        Top = 102
         Width = 433
-        Height = 145
+        Height = 151
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fading'
         TabOrder = 1
@@ -3416,45 +3394,38 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_Jingles: TGroupBox
         Left = 8
-        Top = 144
+        Top = 141
         Width = 432
-        Height = 145
+        Height = 123
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Jingles'
+        Caption = 'Jingles (playback via F9)'
         TabOrder = 2
         object LblJingleReduce: TLabel
-          Left = 88
-          Top = 68
+          Left = 92
+          Top = 47
           Width = 11
           Height = 13
           Caption = '%'
         end
         object LblConst_JingleVolume: TLabel
-          Left = 8
-          Top = 96
+          Left = 12
+          Top = 71
           Width = 80
           Height = 13
           Hint = 'Volume of the jingle in relation to main volume.'
           Caption = 'Volume of jingles'
         end
         object LblConst_JingleVolumePercent: TLabel
-          Left = 88
-          Top = 120
+          Left = 92
+          Top = 95
           Width = 86
           Height = 13
           Hint = 'Volume of the jingle in relation to main volume.'
           Caption = '% of main volume'
         end
-        object LblConst_JinglePlayback: TLabel
-          Left = 8
-          Top = 16
-          Width = 151
-          Height = 13
-          Caption = 'Playback of jingles via F9 (hold)'
-        end
         object CBJingleReduce: TCheckBox
-          Left = 8
-          Top = 40
+          Left = 12
+          Top = 19
           Width = 409
           Height = 17
           Hint = 'Reduce main volume before when playing a jingle'
@@ -3463,8 +3434,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = CBJingleReduceClick
         end
         object SEJingleReduce: TSpinEdit
-          Left = 32
-          Top = 64
+          Left = 36
+          Top = 43
           Width = 49
           Height = 22
           Hint = 'Reduce main volume before when playing a jingle'
@@ -3474,8 +3445,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Value = 50
         end
         object SEJingleVolume: TSpinEdit
-          Left = 32
-          Top = 115
+          Left = 36
+          Top = 90
           Width = 49
           Height = 22
           Hint = 'Volume of the jingle in relation to main volume.'
@@ -3483,6 +3454,47 @@ object OptionsCompleteForm: TOptionsCompleteForm
           MinValue = 0
           TabOrder = 2
           Value = 100
+        end
+      end
+      object GrpBox_Headset: TGroupBox
+        Left = 13
+        Top = 270
+        Width = 433
+        Height = 111
+        Caption = 'Headset'
+        TabOrder = 3
+        object LblHeadsetDefaultAction: TLabel
+          Left = 12
+          Top = 19
+          Width = 405
+          Height = 13
+          AutoSize = False
+          Caption = 'Insert mode for headset files'
+        end
+        object GrpBox_HeadsetDefaultAction: TComboBox
+          Left = 12
+          Top = 38
+          Width = 285
+          Height = 21
+          Hint = 'Insert mode for files from the headset'
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'Enqueue at the end of the playlist'
+          Items.Strings = (
+            'Enqueue at the end of the playlist'
+            'Play (and clear current playlist)'
+            'Enqueue after current track'
+            'Just play (don'#39't change the playlist)')
+        end
+        object cb_AutoStopHeadset: TCheckBox
+          Left = 12
+          Top = 68
+          Width = 389
+          Height = 17
+          Caption = 'Stop headset when switching to another tab'
+          TabOrder = 1
         end
       end
     end

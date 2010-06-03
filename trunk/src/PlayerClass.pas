@@ -84,6 +84,8 @@ type
       fSlideEndSyncM: DWord;
       fSlideEndSyncS: DWord;
 
+      fHeadsetFileEndSyncHandle: DWord;
+
       fStatus: Integer;       // Playing, paused, stopped
       fStopStatus: Integer;   // "normal Stop" or "Stop after title"
 
@@ -433,6 +435,11 @@ begin
     // If this is called, the file is on its end.
     TNempPlayer(User).EndFileProcReached := True;
     SendMessage(TNempPlayer(User).MainWindowHandle, WM_NextFile, 0, 0);
+end;
+
+procedure EndHeadSetFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+begin
+    SendMessage(TNempPlayer(User).MainWindowHandle, WM_PlayerHeadSetEnd, 0, 0);
 end;
 
 procedure StopPlaylistProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -1486,6 +1493,12 @@ begin
       HeadsetStream := NEMP_CreateStream(HeadSetAudioFile.Pfad, False, False, True);
       BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
       Bass_ChannelPlay(HeadsetStream, True);
+
+      fHeadsetFileEndSyncHandle := Bass_ChannelSetSync(HeadsetStream,
+                    BASS_SYNC_END, 0,
+                    @EndHeadSetFileProc, Self);
+
+
       Bass_SetDevice(MainDevice);
       ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
   end;
@@ -1674,10 +1687,15 @@ begin
 end;
 function TNempPlayer.GetHeadsetProgress: Double;
 begin
-  if (HeadsetStream <> 0) and not fHeadsetIsURLStream then
-    result := BASS_ChannelGetPosition(HeadsetStream, BASS_POS_BYTE) / BASS_ChannelGetLength(HeadsetStream, BASS_POS_BYTE)
+  if BASS_ChannelIsActive(HeadsetStream) = BASS_ACTIVE_STOPPED then
+      result := 0
   else
-    result := 0;
+  begin
+      if (HeadsetStream <> 0) and not fHeadsetIsURLStream then
+        result := BASS_ChannelGetPosition(HeadsetStream, BASS_POS_BYTE) / BASS_ChannelGetLength(HeadsetStream, BASS_POS_BYTE)
+      else
+        result := 0;
+  end;
 end;
 procedure TNempPlayer.SetHeadsetProgress(Value: Double);
 begin

@@ -306,6 +306,8 @@ const
 
     WM_StopPlaylist = WM_USER + 514;
 
+    WM_PlayerHeadSetEnd = WM_USER + 515;
+
     //---------------------------------------
 
     // Messages der Medienbibliothek

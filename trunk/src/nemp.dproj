@@ -126,9 +126,6 @@
 			<DCCReference Include="MainFormHelper.pas"/>
 			<DCCReference Include="MessageHelper.pas"/>
 			<DCCReference Include="BassHelper.pas"/>
-			<DCCReference Include="OptionsComplete.pas">
-				<Form>OptionsCompleteForm</Form>
-			</DCCReference>
 			<DCCReference Include="VSTEditControls.pas"/>
 			<DCCReference Include="ClassicCoverflowClass.pas"/>
 			<DCCReference Include="NempCoverFlowClass.pas"/>
@@ -191,7 +188,7 @@
 						<VersionInfo Name="MajorVer">4</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">394</VersionInfo>
+						<VersionInfo Name="Build">395</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -203,7 +200,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.0.0.394</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">4.0.0.395</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2010, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>

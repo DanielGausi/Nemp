@@ -1291,6 +1291,12 @@ begin
                                     end;
 
                                   end;
+    WM_PlayerHeadSetEnd : begin
+          SlidebarButton_Headset.Left := SlidebarShapeHeadset.Left;
+          PlayPauseHeadsetBtn.GlyphLine := 0;
+
+
+    end;
     WM_PlayerStopRecord : begin
                                  // Aufnahme wurde beendet
                                 RecordBtn.GlyphLine := 0;

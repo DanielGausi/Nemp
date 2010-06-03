@@ -68,7 +68,6 @@ uses
   MainFormHelper in 'MainFormHelper.pas',
   MessageHelper in 'MessageHelper.pas',
   BassHelper in 'BassHelper.pas',
-  OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm},
   VSTEditControls in 'VSTEditControls.pas',
   ClassicCoverflowClass in 'ClassicCoverflowClass.pas',
   NempCoverFlowClass in 'NempCoverFlowClass.pas',

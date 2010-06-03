@@ -38,6 +38,14 @@
 			<param name="Local" value="player_anzeige.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Cover">
+			<param name="Local" value="cover.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Lyrics">
+			<param name="Local" value="lyrrics.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Equalizer">
 			<param name="Local" value="equalizer.html">
 			</OBJECT>
