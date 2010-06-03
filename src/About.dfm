@@ -110,7 +110,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Icons and Graphics[/b]'
       ''
-      '[url="http://www.eldorado.com"]Chrystal Project Icons[/url]'
+      '[url="http://everaldo.com/crystal"]Chrystal Project Icons[/url]'
       ''
       
         'Silk Icon Set by [url="http://www.famfamfam.com/lab/icons/silk"]' +
@@ -120,9 +120,7 @@ object AboutForm: TAboutForm
         '[url="http://tango.freedesktop.org/Tango_Icon_Library"]Tango Ico' +
         'n Library[/url]'
       ''
-      
-        'Nemp Logo by [url="http://www.mantis-media.de"]Danny aka Mantis[' +
-        '/url]'
+      'Nemp Logo by Danny aka Mantis'
       ''
       ''
       '[row="200"]'

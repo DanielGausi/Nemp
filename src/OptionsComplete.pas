@@ -241,8 +241,6 @@ type
     GrpBox_Devices: TGroupBox;
     LblConst_MainDevice: TLabel;
     LblConst_Headphones: TLabel;
-    LblConst_VolumeHeadphones: TLabel;
-    HeadSetVolumeTRACKBAR: TTrackBar;
     GrpBox_TabAudio2_Fading: TGroupBox;
     LblConst_TitleChange: TLabel;
     LblConst_Titlefade: TLabel;
@@ -258,7 +256,6 @@ type
     LblJingleReduce: TLabel;
     LblConst_JingleVolume: TLabel;
     LblConst_JingleVolumePercent: TLabel;
-    LblConst_JinglePlayback: TLabel;
     CBJingleReduce: TCheckBox;
     SEJingleReduce: TSpinEdit;
     SEJingleVolume: TSpinEdit;
@@ -436,6 +433,10 @@ type
     cbCoverMode: TComboBox;
     LblConst_DetailMode: TLabel;
     cbDetailMode: TComboBox;
+    GrpBox_Headset: TGroupBox;
+    GrpBox_HeadsetDefaultAction: TComboBox;
+    LblHeadsetDefaultAction: TLabel;
+    cb_AutoStopHeadset: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -449,7 +450,6 @@ type
     procedure TB_RefreshChange(Sender: TObject);
     procedure CB_FadingClick(Sender: TObject);
     procedure CB_visualClick(Sender: TObject);
-    procedure HeadSetVolumeTRACKBARChange(Sender: TObject);
     procedure CB_AutoPlayOnStartClick(Sender: TObject);
     procedure CB_CoverSearch_inSubDirClick(Sender: TObject);
     procedure CB_CoverSearch_inSisterDirClick(Sender: TObject);
@@ -811,9 +811,7 @@ begin
     else
     begin
         HeadPhonesDeviceCB.Enabled := False;
-        HeadSetVolumeTRACKBAR.Enabled := False;
         LblConst_Headphones.Enabled := False;
-        LblConst_VolumeHeadphones.Enabled := False;
     end;
 
   CB_FloatingPoint.ItemIndex := NempPlayer.UseFloatingPointChannels;
@@ -921,6 +919,10 @@ begin
 
   //---PLAYER----
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
+  GrpBox_HeadsetDefaultAction.ItemIndex := NempPlaylist.HeadSetAction;
+
+  cb_AutoStopHeadset.Checked := NempPlaylist.AutoStopHeadset;
+
   CB_Fading.Checked := NempPlayer.UseFading;
   CB_visual.Checked := NempPlayer.UseVisualization;
   TB_Refresh.Enabled := CB_visual.Checked;
@@ -979,8 +981,7 @@ begin
       HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice - 1
   else
       HeadPhonesDeviceCB.ItemIndex := 0;
-  HeadSetVolumeTRACKBAR.Position := Round(NempPlayer.HeadsetVolume * 100);
-                            
+
   TB_Refresh.Position := 100 - NempPlayer.VisualizationInterval;
 
   case NempPlayer.ScrollTaskbarDelay of
@@ -1572,13 +1573,6 @@ begin
     CB_AnzeigeDelay.Enabled := CB_ScrollTitleInMainWindow.Checked;
 end;
 
-procedure TOptionsCompleteForm.HeadSetVolumeTRACKBARChange(
-  Sender: TObject);
-begin
-  NempPlayer.HeadsetVolume := HeadSetVolumeTRACKBAR.Position;
-  BASS_ChannelSetAttribute(NempPlayer.HeadsetStream, BASS_ATTRIB_VOL, NempPlayer.HeadSetVolume);
-end;
-
 procedure TOptionsCompleteForm.CB_AutoPlayOnStartClick(Sender: TObject);
 begin
   cb_SavePositionInTrack.Enabled := CB_AutoPlayOnStart.Checked;
@@ -1859,9 +1853,9 @@ begin
   else
     Lbl_FloatingPoints_Status.Caption := FloatingPointChannels_Off;
 
-  NempPlayer.HeadsetVolume := HeadSetVolumeTRACKBAR.Position / 100;
-
   NempPlaylist.DefaultAction := GrpBox_DefaultAction.ItemIndex;
+  NempPlaylist.HeadSetAction := GrpBox_HeadsetDefaultAction.ItemIndex;
+  NempPlaylist.AutoStopHeadset := cb_AutoStopHeadset.Checked;
 
   NempPlayer.UseFading := CB_Fading.Checked;
   NempPlayer.UseVisualization := CB_Visual.Checked;

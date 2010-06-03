@@ -64,6 +64,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ContainerPanelExtendedControlsFormPaint(Sender: TObject);
+    procedure FormHide(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -103,6 +104,10 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
+
+  if Nemp_MainForm.AnzeigeMode = 1 then
+      // still in seperate-window-mode
+      NempPlayer.StopHeadset;
 end;
 
 procedure TExtendedControlForm.FormCreate(Sender: TObject);
@@ -126,6 +131,13 @@ BWidth := Width;
   NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
 
   Caption := NEMP_CAPTION;
+end;
+
+procedure TExtendedControlForm.FormHide(Sender: TObject);
+begin
+  if Nemp_MainForm.AnzeigeMode = 1 then
+      // still in seperate-window-mode
+      NempPlayer.StopHeadset;
 end;
 
 procedure TExtendedControlForm.SetPartySize(w, h: Integer);

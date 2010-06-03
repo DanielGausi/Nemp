@@ -143,6 +143,10 @@ type
 
       // default-action when the user doubleclick an item in the medialibrary
       DefaultAction: Integer;
+      // default-action when the user clicks "Add current Headphone-title to playlist"
+      HeadSetAction: Integer;
+      AutoStopHeadset: Boolean;
+
 
       TNA_PlaylistCount: Integer; // number of files displayed in the TNA-menu
 
@@ -327,6 +331,8 @@ end;
 procedure TNempPlaylist.LoadFromIni(Ini: TMemIniFile);
 begin
   DefaultAction         := ini.ReadInteger('Playlist','DefaultAction',0);
+  HeadSetAction         := ini.ReadInteger('Playlist','HeadSetAction',0);
+  AutoStopHeadset       := ini.ReadBool('Playlist','AutoStopHeadset',True);
   WiedergabeMode        := ini.ReadInteger('Playlist','WiedergabeModus',0);
   AutoScan              := ini.ReadBool('Playlist','AutoScan', True);
   AutoPlayOnStart       := ini.ReadBool('Playlist','AutoPlayOnStart', True);
@@ -353,6 +359,8 @@ procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
 var idx: Integer;
 begin
   ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
+  ini.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
+  ini.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadset);
   ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
   ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
   //if PlayingFile <> NIL then
