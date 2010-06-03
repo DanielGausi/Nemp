@@ -227,7 +227,6 @@ type
     MM_PL_Save: TMenuItem;
     MM_PL_AddPlaylist: TMenuItem;
     N1: TMenuItem;
-    MM_PL_StopHeadset: TMenuItem;
     N26: TMenuItem;
     MM_PL_ExtendedAddToMedialibrary: TMenuItem;
     MM_PL_ExtendedCopyFromWinamp: TMenuItem;
@@ -342,7 +341,6 @@ type
     PM_ML_PlayNow: TMenuItem;
     N14: TMenuItem;
     PM_ML_PlayHeadset: TMenuItem;
-    PM_ML_StopHeadset: TMenuItem;
     N2: TMenuItem;
     PM_ML_SortBy: TMenuItem;
     PM_ML_SortByArtistTitel: TMenuItem;
@@ -420,7 +418,6 @@ type
     N12: TMenuItem;
     PM_PL_AddToPrebookListEnd: TMenuItem;
     PM_PL_PlayInHeadset: TMenuItem;
-    PM_PL_StopHeadset: TMenuItem;
     N13: TMenuItem;
     PM_PL_ExtendedAddToMedialibrary: TMenuItem;
     PM_PL_ExtendedCopyFromWinamp: TMenuItem;
@@ -709,7 +706,6 @@ type
     MM_PL_AddSelectionToPreBooklistEnd: TMenuItem;
     MM_PL_AddSelectionToPrebooklistBeginning: TMenuItem;
     MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
-    MM_PL_PlayInHeadset: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
     MM_ML_DeleteSelectedFiles: TMenuItem;
     N70: TMenuItem;
@@ -931,10 +927,7 @@ type
       var DragObject: TDragObject);
     procedure PM_PL_DeleteAllClick(Sender: TObject);
     procedure PM_PL_DeleteSelectedClick(Sender: TObject);
-    procedure PlayInHeadset(aTree: TVirtualStringTree);
     procedure PM_PL_PlayInHeadsetClick(Sender: TObject);
-    procedure PM_PL_StopHeadsetClick(Sender: TObject);
-    procedure PM_ML_PlayHeadsetClick(Sender: TObject);
     procedure BassTimeLBLClick(Sender: TObject);
     procedure PlaylistSortClick(Sender: TObject);
     procedure PM_PL_SortByInverseClick(Sender: TObject);
@@ -1548,7 +1541,7 @@ implementation
 uses   Splash, MultimediaKeys,
     About, OptionsComplete, StreamVerwaltung,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
-  HeadsetControl, BirthdayShow, RandomPlaylist,
+  BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword;
@@ -3987,7 +3980,6 @@ begin
       PM_ML_PlayNext.Enabled := False;
       PM_ML_PlayNow.Enabled := False;
       PM_ML_PlayHeadset.Enabled := False;
-      PM_ML_StopHeadset.Enabled := NempPlayer.EnableHeadSet;
       PM_ML_GetLyrics.Enabled := False;
       PM_ML_ExtendedShowAllFilesInDir.Enabled := False;
       PM_ML_ExtendedAddAllFilesInDir.Enabled := False;
@@ -4031,8 +4023,7 @@ begin
       //PM_ML_DeleteSelected.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
       PM_ML_GetLyrics.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
       PM_ML_GetTags.Enabled := (aVST = VST) AND (not MedienBib.AnzeigeShowsPlaylistFiles) AND (not LangeAktionWeitermachen) and (not NempSkin.NempPartyMode.DoBlockBibOperations);
-      PM_ML_PlayHeadset.Enabled := (aVST = VST) AND NempPlayer.EnableHeadSet;
-      PM_ML_StopHeadset.Enabled := NempPlayer.EnableHeadSet;
+      PM_ML_PlayHeadset.Enabled := (aVST = VST);
 
       //PM_ML_DeleteSelected.Enabled := (aVST = VST) AND not LangeAktionWeitermachen;
       PM_ML_ExtendedShowAllFilesInDir.Enabled := (not MedienBib.AnzeigeShowsPlaylistFiles);
@@ -6828,78 +6819,28 @@ end;
 
 procedure TNemp_MainForm.PM_PL_DeleteAllClick(Sender: TObject);
 begin
-  NempPlaylist.ClearPlaylist;
+    NempPlaylist.ClearPlaylist;
 end;
 
 
 procedure TNemp_MainForm.PM_PL_DeleteSelectedClick(Sender: TObject);
 begin
-  NempPlaylist.DeleteMarkedFiles;
-
-PlaylistVSTChange(PlaylistVST, Nil);
+    NempPlaylist.DeleteMarkedFiles;
+    PlaylistVSTChange(PlaylistVST, Nil);
 end;
                  
-// Datei im Headset (2. Device abspielen)
-procedure TNemp_MainForm.PlayInHeadset(aTree: TVirtualStringTree);
-//var aNode: PVirtualNode;
-//  Data: PTreeData;
-//  aAudiofile: TAudiofile;
-
-begin
-{  if not assigned(HeadsetControlForm) then
-    Application.CreateForm(THeadsetControlForm, HeadsetControlForm);
-
-  aNode := aTree.FocusedNode;
-  if assigned(aNode) then
-  begin
-      Data := aTree.GetNodeData(aNode);
-      aAudiofile := Data^.FAudioFile;
-      NempPlayer.PlayInHeadset(aAudioFile);
-  end else
-      aAudioFile := Nil;
-
-  HeadsetControlForm.Show;
-  HeadsetControlForm.Timer1.Enabled := True;
-
-  if assigned(aAudioFile) then
-      HeadsetControlForm.Lbl_HeadSetTitle.Caption := NempPlayer.GenerateTitelString(aAudioFile, 0)
-  else
-      HeadsetControlForm.Lbl_HeadSetTitle.Caption := HeadSetForm_NoAudioFile;
-}
-end;
-
-
+// Datei im Headset abspielen
 procedure TNemp_MainForm.PM_PL_PlayInHeadsetClick(Sender: TObject);
 begin
     // Play new song in headset
     NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
     // Show Details
-    //ShowHeadsetDetails(MedienBib.CurrentAudioFile);
     TabBtn_Headset.Click;
 end;
-
-procedure TNemp_MainForm.PM_ML_PlayHeadsetClick(Sender: TObject);
-begin
-    // Play new song in headset
-    NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
-    // Show Details
-    //ShowHeadsetDetails(MedienBib.CurrentAudioFile);
-    TabBtn_Headset.Click;
-end;
-
-
-procedure TNemp_MainForm.PM_PL_StopHeadsetClick(Sender: TObject);
-begin
-  NempPlayer.StopHeadset;
-  //if assigned(HeadsetControlForm) then
-  //  HeadSetControlForm.Close;
-end;
-
-
 
 procedure TNemp_MainForm.BassTimeLBLClick(Sender: TObject);
 begin
-  NempPlayer.TimeMode := (NempPlayer.TimeMode + 1) Mod 2;
+    NempPlayer.TimeMode := (NempPlayer.TimeMode + 1) Mod 2;
 end;
 
 procedure TNemp_MainForm.PlaylistSortClick(Sender: TObject);
@@ -7372,13 +7313,11 @@ begin
     PM_PL_DeleteSelected.Enabled   := False;
     PM_PL_Properties.Enabled := False;
     PM_PL_PlayInHeadset.Enabled := False;
-    PM_PL_StopHeadset.Enabled   := NempPlayer.EnableHeadSet;
     PM_PL_ExtendedCopyToClipboard.Enabled := False;
   end else begin
     PM_PL_DeleteSelected.Enabled   := True;
     PM_PL_Properties.Enabled := True;
-    PM_PL_PlayInHeadset.Enabled := NempPlayer.EnableHeadSet;
-    PM_PL_StopHeadset.Enabled   := NempPlayer.EnableHeadSet;
+    PM_PL_PlayInHeadset.Enabled := True;
     PM_PL_ExtendedCopyToClipboard.Enabled := True;
   end;
 

@@ -40,7 +40,6 @@ uses
   MedienlisteUnit in 'MedienlisteUnit.pas' {MedienlisteForm},
   SplitForm_Hilfsfunktionen in 'SplitForm_Hilfsfunktionen.pas',
   ShutDown in 'ShutDown.pas' {ShutDownForm},
-  HeadsetControl in 'HeadsetControl.pas' {HeadsetControlForm},
   Nemp_SkinSystem in 'Nemp_SkinSystem.pas',
   BirthdayShow in 'BirthdayShow.pas' {BirthdayForm},
   PlaylistClass in 'PlaylistClass.pas',

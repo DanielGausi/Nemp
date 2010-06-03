@@ -87,9 +87,6 @@
 			<DCCReference Include="ShutDown.pas">
 				<Form>ShutDownForm</Form>
 			</DCCReference>
-			<DCCReference Include="HeadsetControl.pas">
-				<Form>HeadsetControlForm</Form>
-			</DCCReference>
 			<DCCReference Include="Nemp_SkinSystem.pas"/>
 			<DCCReference Include="BirthdayShow.pas">
 				<Form>BirthdayForm</Form>
