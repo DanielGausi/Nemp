@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 988
+  ClientHeight = 1004
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2414,19 +2414,18 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 845
-    Height = 326
+    Height = 342
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 286
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 298
+      Height = 314
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2435,25 +2434,23 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 258
       DesignSize = (
         845
-        298)
+        314)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 288
+        Height = 304
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 248
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 288
+          Height = 304
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2463,7 +2460,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 288
+          Height = 304
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2530,7 +2527,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 248
           Columns = <
             item
               Position = 0
@@ -2604,7 +2600,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 288
+          Height = 304
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2614,7 +2610,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 248
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3459,17 +3454,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Remove selection from prebook-list'
         OnClick = PM_PL_RemoveFromPrebookListClick
       end
-      object MM_PL_PlayInHeadset: TMenuItem
-        Caption = 'Play in headset'
-        ImageIndex = 7
-        ShortCut = 16456
-        OnClick = PM_PL_PlayInHeadsetClick
-      end
-      object MM_PL_StopHeadset: TMenuItem
-        Caption = 'S&top headset'
-        ShortCut = 49224
-        OnClick = PM_PL_StopHeadsetClick
-      end
       object N26: TMenuItem
         Caption = '-'
       end
@@ -3970,7 +3954,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130020040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130028040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4535,7 +4519,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806240510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F8062C0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5664,12 +5648,7 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Play in headset'
       ImageIndex = 7
       ShortCut = 16456
-      OnClick = PM_ML_PlayHeadsetClick
-    end
-    object PM_ML_StopHeadset: TMenuItem
-      Caption = 'Stop headset'
-      ShortCut = 49224
-      OnClick = PM_PL_StopHeadsetClick
+      OnClick = PM_PL_PlayInHeadsetClick
     end
     object N2: TMenuItem
       Caption = '-'
@@ -6234,11 +6213,6 @@ object Nemp_MainForm: TNemp_MainForm
       ImageIndex = 7
       ShortCut = 16456
       OnClick = PM_PL_PlayInHeadsetClick
-    end
-    object PM_PL_StopHeadset: TMenuItem
-      Caption = 'Stop headset'
-      ShortCut = 49224
-      OnClick = PM_PL_StopHeadsetClick
     end
     object N13: TMenuItem
       Caption = '-'
@@ -7314,7 +7288,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 576
     Top = 632
     Bitmap = {
-      494C0101070028008C0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800940110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

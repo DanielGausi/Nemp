@@ -112,9 +112,8 @@ Warning_MedienBibBusyThread = 'The library blocked this very file by an automate
 MedienBib_ConfirmResetRatings = 'This will reset the rating of all files in the library. Ratings within the ID3-tags will not be changed. Continue?';           
 
 Warning_TooManyFiles = 'Operation cancelled: Too many files for drag&&drop and copy&&paste respectively.'
-                      + #13#10 +
-                      'You can use the pop-up menu to put all these files into the playlist or just select fewer files.'
-                      ;
+                      + #13#10
+                      + 'You can use the pop-up menu to put all these files into the playlist or just select fewer files.';
 
 Error_ID3OnlyInMp3Files = 'ID3-tags can only be written to mp3-files.';
 //Error_EvilLyricsNotFound1 = 'This function needs another program called "EvilLyrics". Start this program and try again.';
@@ -332,10 +331,11 @@ NempUpdate_InfoNewestVersion = 'Newest version: %s';
 NempUpdate_InfoLastRelease = 'Latest release: %s (%s)';
 NempUpdate_InfoLastStableRelease = 'Latest stable release: %s';
 NempUpdate_InfoNote = 'Note: %s';
-NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) for the first time. Nemp will now search for a newer version (even if it is probably up-to-date)' +#13#10 +
-                            'to show you this function. After this Nemp will search once a week for an update without showing this message.'
-                            + #13#10#13#10 +
-                            'No personal information will be sent. You can deactivate this function within the preferences (and change the interval), or right now by clicking "Cancel".';
+NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) for the first time. Nemp will now search for a newer version (even if it is probably up-to-date)' +#13#10
+                            + 'to show you this function. After this Nemp will search once a week for an update without showing this message.'
+                            + #13#10#13#10
+                            + 'No personal information will be sent. You can deactivate this function within the preferences (and change the interval), or right now by clicking "Cancel".';
+
 
   NempShutDown_StopNemp  = 'Nemp will stop now.';
   NempShutDown_CloseNemp = 'Nemp will close now.';
@@ -592,8 +592,9 @@ AudioFileProperty_Track       = 'Track';
 
 
     AutoScanDirsDialog_Caption = 'Confirmation';
-    AutoScanDirsDialog_Text    = 'Do you want Nemp to monitor this directoy?' +#13#10 + #13#10 +
-                                 'Nemp will scan this directory for new files on startup. You can edit the monitored directorys within the preferences.';
+    AutoScanDirsDialog_Text    = 'Do you want Nemp to monitor this directoy?' +#13#10 + #13#10
+                                 + 'Nemp will scan this directory for new files on startup. You can edit the monitored directorys within the preferences.';
+
     AutoScanDirsDialog_ShowAgain = 'Save selection and do not show this dialog again.';
 
 Shoutcast_Error_ConnectionFailed = 'Connection failed. Please check your internet configuration.';

@@ -113,7 +113,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
-    PlayListUnit, AuswahlUnit, MedienListeUnit, Details, HeadsetControl,
+    PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword;
@@ -1016,7 +1016,7 @@ begin
             FormStreamVerwaltung.RestoreComboboxes;
         end;
         if assigned(ShutDownForm         ) then ReTranslateComponent(ShutDownForm        );
-        if assigned(HeadsetControlForm   ) then ReTranslateComponent(HeadsetControlForm  );
+        //if assigned(HeadsetControlForm   ) then ReTranslateComponent(HeadsetControlForm  );
         {if assigned(SkinEditorForm       ) then
         begin
           SkinEditorForm.BackupComboboxes;

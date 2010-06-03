@@ -198,8 +198,6 @@ type
         ///  EndFileProcreached will cancel the cancel.
         EndFileProcReached: Boolean;
 
-        EnableHeadset: Boolean;
-
         // Status-Callback-Proc for CreateURL
         Statusproc: DOWNLOADPROC;
 
@@ -654,19 +652,6 @@ begin
 
     if Count < HeadsetDevice then
         HeadsetDevice := MainDevice;
-    ///if (Count > HeadsetDevice) then
-        // Headset jetzt immer erlauben, ggf. auch auf gleicher Soundkarte! (Feb. 2010)
-        EnableHeadset := True;
-    ///else
-    ///begin
-          //if Count >= 1 then
-          //begin
-          //    EnableHeadset := True;
-          //    HeadsetDevice := Count-1;
-          //end
-          //else
-          //    EnableHeadset := False;
-    ///end;
 
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
     UpdateFlags;
