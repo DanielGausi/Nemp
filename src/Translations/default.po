@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-06-03 18:33\n"
-"PO-Revision-Date: 2010-06-03 22:35+0100\n"
+"PO-Revision-Date: 2010-06-04 13:59+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -7234,7 +7234,7 @@ msgstr "Die Medienbibliothek ist gerade beschäftigt, daher konnten Ihre Eingabe
 msgid ""
 "The library blocked this very file by an automated background-process right now. Please try again in a few seconds.\n"
 "Note: The probability for this message is almost zero (unless Gausi made some bad mistakes). You should play Lotto this week!"
-msgstr ""
+msgstr "Die Medienbibliothek hat gerade diese spezielle Datei geblockt, da ein Hintergrund-Thread jetzt darauf zugreift. Bitte versuchen Sie es in einigen Sekunden erneut.Hinweis: Die Wahrscheinlichkeit hierfür ist praktisch Null. Entweder hat Gausi hier Mist gebaut, oder Sie sollten diese Woche Lotto spielen."
 
 #. Programmer's name for it: MedienBib_ConfirmResetRatings
 #: Nemp_RessourceStrings.pas:112
@@ -7398,7 +7398,7 @@ msgstr "Ihre Medienbibliothek"
 #. Programmer's name for it: CoverFlowLastFM_Confirmation
 #: Nemp_RessourceStrings.pas:165
 msgid "Nemp can download missing covers using a webservice from LastFM. Is this ok for you?"
-msgstr ""
+msgstr "Nemp kann automatisch fehlende Cover von LastFM herunterladen. Sind Sie damit einverstanden?"
 
 #. Programmer's name for it: CoverFlowLastFM_HintConnectError
 #: Nemp_RessourceStrings.pas:166
@@ -7406,6 +7406,8 @@ msgid ""
 "Downloading a cover from LastFM failed.\n"
 "There is a problem with your internet connection."
 msgstr ""
+"Download eines Covers von LastFM fehlgeschlagen.\n"
+"Überprüfen Sie Ihre Internet-Verbindung."
 
 #. Programmer's name for it: CoverFlowLastFM_HintFail
 #: Nemp_RessourceStrings.pas:167
@@ -7413,11 +7415,13 @@ msgid ""
 "Downloading a cover from LastFM failed.\n"
 "No proper cover found."
 msgstr ""
+"Download eines Covers von LastFM fehlgeschlagen.\n"
+"Kein passendes Cover gefunden."
 
 #. Programmer's name for it: CoverFlowLastFM_HintOK
 #: Nemp_RessourceStrings.pas:168
 msgid "This cover was just downloaded from LastFM."
-msgstr ""
+msgstr "Dieses Cover wurde gerade eben von LastFM heruntergeladen."
 
 #. Programmer's name for it: CoverFlowLastFM_HintCache
 #: Nemp_RessourceStrings.pas:169
@@ -7426,6 +7430,9 @@ msgid ""
 "This cover was not found a short time ago.\n"
 "You can clear the cover-cache to retry."
 msgstr ""
+"Download eines Covers von LastFM abgebrochen.\n"
+"Dieses Cover wurde schon vor kurzem nicht gefunden.\n"
+"Sie können den Covercache leeren für einen erneuten Versuch."
 
 #. Programmer's name for it: CoverFlowLastFM_HintInvalid
 #: Nemp_RessourceStrings.pas:170
@@ -7434,6 +7441,9 @@ msgid ""
 "No proper album information found.\n"
 "Try to update the ID3-Tags."
 msgstr ""
+"Download eines Covers von LastFM abgebrochen.\n"
+"Es wurden keine passenden Album-Informationen gefunden.\n"
+"Aktualisieren Sie ggf. die ID3-Tags."
 
 #. Programmer's name for it: MediaKeys_Status_Hook
 #: Nemp_RessourceStrings.pas:176
@@ -7485,7 +7495,7 @@ msgstr "Medienbibliothek"
 #. Programmer's name for it: OptionsTree_PlayerAutomaticRating
 #: Nemp_RessourceStrings.pas:216
 msgid "Automatic rating"
-msgstr ""
+msgstr "Automatische Bewertung"
 
 #. Programmer's name for it: OptionsTree_PlayerWebradio
 #: Nemp_RessourceStrings.pas:217
@@ -7623,12 +7633,12 @@ msgstr "Einstellungen zum Scrobbeln sind unvollständig. Wollen Sie sie jetzt be
 #. Programmer's name for it: SelectDirectoryDialog_BibCaption
 #: Nemp_RessourceStrings.pas:259
 msgid "Please select the root directory of the audiofiles you want to add to the medialibrary."
-msgstr ""
+msgstr "Bitte wählen Sie das Wurzelverzeichnis Ihrer Musiksammlung aus."
 
 #. Programmer's name for it: SelectDirectoryDialog_PlaylistCaption
 #: Nemp_RessourceStrings.pas:260
 msgid "Please select the root directory of the audiofiles you want to add to the playlist."
-msgstr ""
+msgstr "Bitte wählen Sie das Wurzelverzeichnis für die Dateien aus, die Sie in die Playlist einfügen möchten."
 
 #. Programmer's name for it: SelectDirectoryDialog_Webradio_Caption
 #: Nemp_RessourceStrings.pas:261
@@ -7653,22 +7663,22 @@ msgstr "Ein Unterverzeichnis des gewählten Verzeichnisses war in der Liste vorh
 #. Programmer's name for it: WinX64WarningHook
 #: Nemp_RessourceStrings.pas:267
 msgid "You are using a 64Bit-Version of Windows. It is NOT recommended to use a special handling of multimedia keys. Continue anyway?"
-msgstr ""
+msgstr "Sie verwenden eine 64-Bit-Version von Windows. Es wird ausdrücklich NICHT empfohlen, die Multimediatasten besonders zu behandeln. Wollen Sie trotzdem fortfahren?"
 
 #. Programmer's name for it: WinX64WarningDeskband
 #: Nemp_RessourceStrings.pas:268
 msgid "You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible."
-msgstr ""
+msgstr "Sie verwenden eine 64-Bit-Version von Windows. Das Nemp Deskband zu installieren ist hier leider nicht möglich."
 
 #. Programmer's name for it: WinVistaWarningDeskband
 #: Nemp_RessourceStrings.pas:269
 msgid "The Nemp Deskband is not compatible with Windows Vista or later."
-msgstr ""
+msgstr "Das Nemp Deskband ist nicht kompatibel mit Windows Vista oder später."
 
 #. Programmer's name for it: Win7WarningDeskband
 #: Nemp_RessourceStrings.pas:270
 msgid "The Nemp Deskband is not compatible with Windows Vista or later. Use the buttons in the Windows Taskbar-preview instead."
-msgstr ""
+msgstr "Das Nemp Deskband ist nicht kompatibel mit Windows Vista oder später. Verwenden Sie anstelle dessen die Buttons in der Taskleisten-Vorschau."
 
 #. Programmer's name for it: EQSetting_Custom
 #: Nemp_RessourceStrings.pas:272
@@ -7999,17 +8009,17 @@ msgstr "Schnellsuche (aktuelle Liste)"
 #. Programmer's name for it: MainForm_MoreSearchresults
 #: Nemp_RessourceStrings.pas:405
 msgid "Additional results (not limited to current preselection)"
-msgstr ""
+msgstr "Weitere Suchergebnisse (nicht beschränkt auf die aktuelle Vorauswahl)"
 
 #. Programmer's name for it: MainForm_NoSearchresults
 #: Nemp_RessourceStrings.pas:406
 msgid "Nothing found. Try another search."
-msgstr ""
+msgstr "Keine Treffer. Versuchen Sie einen anderen Suchbegriff."
 
 #. Programmer's name for it: MainForm_SearchQueryTooShort
 #: Nemp_RessourceStrings.pas:407
 msgid "Search query too short. Please enter at least 2 characters."
-msgstr ""
+msgstr "Suchanfrage zu kurz. Bitte geben Sie mindestens zwei Zeichen ein."
 
 #. Programmer's name for it: MainForm_BtnEqualizerSaveNewButton
 #: Nemp_RessourceStrings.pas:411
@@ -8064,7 +8074,7 @@ msgstr "Nemp wird nach dem Ende dieses Titel anhalten."
 #. Programmer's name for it: MainForm_StopMenu_StopAfterTitle
 #: Nemp_RessourceStrings.pas:430
 msgid "Stop after current title (Shift+Click)"
-msgstr ""
+msgstr "Nach dem aktuellen Titel anhalten. (Shift+Click)"
 
 #. Programmer's name for it: MainForm_StopMenu_NoStopAfterTitle
 #: Nemp_RessourceStrings.pas:431
@@ -8113,7 +8123,7 @@ msgstr "Erweiterte Suche"
 #. Programmer's name for it: MainForm_MenuCaptionsPlayNow
 #: Nemp_RessourceStrings.pas:449
 msgid "Just play focussed file (no playlist change)"
-msgstr ""
+msgstr "Markierte Datei einfach abspielen (ohne die Playlist zu verändern)"
 
 #. Programmer's name for it: MainForm_MenuCaptionsPlayAllArtist
 #: Nemp_RessourceStrings.pas:452
@@ -8422,12 +8432,12 @@ msgstr "Lyricsuche abgeschlossen. Sorry, aber es wurde nichts gefunden. Entweder
 #. Programmer's name for it: MediaLibrary_CloudUpdateStatus
 #: Nemp_RessourceStrings.pas:532
 msgid "Working (%d%%) %s"
-msgstr ""
+msgstr "Arbeite ... (%d%%) %s"
 
 #. Programmer's name for it: MediaLibrary_InconsistentFilesWarning
 #: Nemp_RessourceStrings.pas:533
 msgid "You have changed some tags in the library, but the mp3-files have not been updated yet. If you close this window now, these files remain inconsistent to the data in the library. Do you really want to close this window now?"
-msgstr ""
+msgstr "Sie haben einige Tags in der Medienbibliothek geändert, aber die mp3-Dateien wurden noch nicht aktualisiert. Wenn Sie dieses Fenster jetzt schließen, entsteht dadurch eine Inkonsistenz. Wollen Sie das Fenster jetzt wirklich schließen?"
 
 #. Programmer's name for it: MediaLibrary_Deleting
 #: Nemp_RessourceStrings.pas:535
@@ -8452,7 +8462,7 @@ msgstr "Ungültige Medienbibliotheks-Datei."
 #. Programmer's name for it: Medialibrary_LibFileTooYoung
 #: Nemp_RessourceStrings.pas:539
 msgid "The medialibrary was probably created by a newer version of Nemp. This version of Nemp doesn't know how to read this file."
-msgstr ""
+msgstr "Die Medienbibliothek wurde wahrscheinlich von einer neueren Version von Nemp erstellt. Diese Version von Nemp kann die Datei nicht korrekt lesen."
 
 #. Programmer's name for it: Medialibrary_LibFileTooOld
 #: Nemp_RessourceStrings.pas:540
@@ -8493,7 +8503,7 @@ msgstr "Versuch, die Such-History mit Playlist-Daten zu füllen. Das sollte nich
 #. Programmer's name for it: Medialibrary_GUIError3
 #: Nemp_RessourceStrings.pas:550
 msgid "The current view shows files from a playlist-file. You can not delete these files frome the library."
-msgstr ""
+msgstr "Die aktuelle Ansicht zeigt Dateien aus einer Playlist. Sie können diese Dateien nicht aus der Medienbibliothek löschen."
 
 #. Programmer's name for it: Medialibrary_GUIError4
 #: Nemp_RessourceStrings.pas:551
