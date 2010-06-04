@@ -66,6 +66,8 @@ type
           // (Always block) fBlockBibOperations: Boolean;     // Block adding, deleting, Get Tags, lyrics, reset rating, ... of files
           fBlockTools: Boolean;            // Block tools like Birthday, Scrobbler, ...
 
+          fShowPasswordOnActivate: Boolean;
+
 
           // Array of PlayerControls/Positions.
           // These are "completely doubled" i.e. width, height,top, left
@@ -94,6 +96,7 @@ type
           property BlockCurrentTitleRating: Boolean read fBlockCurrentTitleRating write fBlockCurrentTitleRating ;
           // property BlockBibOperations     : Boolean read fBlockBibOperations      write fBlockBibOperations      ;
           property BlockTools             : Boolean read fBlockTools              write fBlockTools              ;
+          property ShowPasswordOnActivate : boolean read fShowPasswordOnActivate write fShowPasswordOnActivate;
 
           property password: String read fPassword write fPassword;
           constructor Create;
@@ -174,6 +177,9 @@ begin
     fBlockCurrentTitleRating  := Ini.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
     fBlockTools               := Ini.ReadBool('PartyMode', 'BlockTools'             , True);
     fPassword                 := Ini.ReadString('PartyMode', 'Password'             , 'nemp');
+    fShowPasswordOnActivate   := Ini.ReadBool('PartyMode', 'fShowPasswordOnActivate', True);
+
+
 end;
 
 
@@ -184,6 +190,8 @@ begin
     Ini.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
     Ini.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
     Ini.WriteString('PartyMode', 'Password'             , fPassword               );
+    Ini.WriteBool('PartyMode', 'fShowPasswordOnActivate', fShowPasswordOnActivate );
+
 end;
 
 

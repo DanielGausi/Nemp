@@ -3,10 +3,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
   Top = 308
   Caption = 'Nemp - Stream selection'
   ClientHeight = 466
-  ClientWidth = 766
+  ClientWidth = 712
   Color = clBtnFace
   Constraints.MinHeight = 420
-  Constraints.MinWidth = 590
+  Constraints.MinWidth = 712
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -19,7 +19,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    766
+    712
     466)
   PixelsPerInch = 96
   TextHeight = 13
@@ -30,7 +30,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Height = 13
   end
   object Btn_Ok: TButton
-    Left = 673
+    Left = 619
     Top = 396
     Width = 75
     Height = 25
@@ -38,10 +38,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'Ok'
     TabOrder = 0
     OnClick = Btn_OkClick
-    ExplicitTop = 377
+    ExplicitLeft = 673
   end
   object Btn_Shoutcast: TButton
-    Left = 553
+    Left = 499
     Top = 396
     Width = 113
     Height = 25
@@ -49,10 +49,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Shoutcast.com'
     TabOrder = 1
     OnClick = Btn_ShoutcastClick
-    ExplicitTop = 377
+    ExplicitLeft = 553
   end
   object Btn_Icecast: TButton
-    Left = 433
+    Left = 379
     Top = 396
     Width = 113
     Height = 25
@@ -60,27 +60,27 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Icecast.org'
     TabOrder = 2
     OnClick = Btn_IcecastClick
-    ExplicitTop = 377
+    ExplicitLeft = 433
   end
   object PC_Streams: TPageControl
     Left = 8
     Top = 8
-    Width = 746
+    Width = 692
     Height = 381
     ActivePage = Tab_Favourites
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
-    ExplicitHeight = 362
+    ExplicitWidth = 746
     object Tab_Favourites: TTabSheet
       Caption = 'Favorites'
-      ExplicitHeight = 334
+      ExplicitWidth = 738
       DesignSize = (
-        738
+        684
         353)
       object VST_Favorites: TVirtualStringTree
         Left = 31
         Top = 34
-        Width = 704
+        Width = 650
         Height = 285
         Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
@@ -102,7 +102,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         OnGetText = VST_FavoritesGetText
         OnHeaderClick = VST_FavoritesHeaderClick
         OnKeyDown = VST_FavoritesKeyDown
-        ExplicitHeight = 266
+        ExplicitWidth = 704
         Columns = <
           item
             Position = 0
@@ -200,9 +200,9 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
-      ExplicitHeight = 334
+      ExplicitWidth = 738
       DesignSize = (
-        738
+        684
         353)
       object LblConst_Limit: TLabel
         Left = 480
@@ -213,7 +213,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       object VST_ShoutcastQuery: TVirtualStringTree
         Left = 8
         Top = 64
-        Width = 722
+        Width = 668
         Height = 249
         Anchors = [akLeft, akTop, akRight, akBottom]
         Header.AutoSizeIndex = 0
@@ -234,7 +234,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         OnGetText = VST_ShoutcastQueryGetText
         OnHeaderClick = VST_ShoutcastQueryHeaderClick
         OnKeyDown = VST_ShoutcastQueryKeyDown
-        ExplicitHeight = 230
+        ExplicitWidth = 722
         Columns = <
           item
             Position = 0
@@ -348,7 +348,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Caption = 'Add selected to favorites'
         TabOrder = 1
         OnClick = Btn_AddSelectedClick
-        ExplicitTop = 300
       end
     end
   end
@@ -360,12 +359,11 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Anchors = [akLeft, akBottom]
     TabOrder = 4
     Visible = False
-    ExplicitTop = 405
   end
   object StatusBar1: TStatusBar
     Left = 0
     Top = 447
-    Width = 766
+    Width = 712
     Height = 19
     Panels = <
       item
@@ -374,17 +372,16 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       item
         Width = 200
       end>
-    ExplicitTop = 428
+    ExplicitWidth = 766
   end
   object CB_ParseStreamURL: TCheckBox
     Left = 8
-    Top = 397
+    Top = 395
     Width = 353
     Height = 17
     Anchors = [akLeft, akBottom]
     Caption = 'Parse Stream-Playlist and add all contained streams to playlist'
     TabOrder = 6
-    ExplicitTop = 378
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True

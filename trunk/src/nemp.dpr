@@ -80,7 +80,8 @@ uses
   CoverDownloads in 'CoverDownloads.pas',
   PartymodePassword in 'PartymodePassword.pas' {PasswordDlg},
   Lyrics in 'Lyrics.pas',
-  HtmlHelper in 'HtmlHelper.pas';
+  HtmlHelper in 'HtmlHelper.pas',
+  OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm};
 
 //,  classes;
 

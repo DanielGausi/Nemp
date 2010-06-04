@@ -117,7 +117,7 @@ Verwendete Units/Komponenten:
 
   
 
-Version 4.0.0 (Serengeti), Mai (Juni?) 2010
+Version 4.0.0 (Serengeti), Mai-Juni 2010
 ----------------------------------------------------------- 
 * Änderung der Lizenz von "Freeware" auf OpenSource
   - Nemp steht ab jetzt unter der GPL
@@ -184,7 +184,11 @@ Neue Funktionen:
   - Bei Klick in den Playerteil: Lautstärke-Regelung per Mausrad
   - Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
   - intelligentere Größenveränderung der Komponenten bei Resize des Hauptfensters
+* Kopfhörer-Steuerung in das Hauptfenster integriert
+  - leichtes Einfügen des aktuellen Kopfhörer-Titels in die Playlist
 * Erkennung von VBRI-Headern in mp3-Dateien
+* Erkennung von weiteren Genre-IDs
+* Bessere Hilfe-Datei erstellt
 
 Änderungen:
 -----------
@@ -200,6 +204,7 @@ Neue Funktionen:
     aktuellen Stückes  
 * Deskand-Installierung wird unter Windows Vista und 7 verweigert - da funktioniert das 
   eh nicht richtig.
+  - ebenso generell unter 64-Bit-Systemen
 * Auswahl "Jetzt abspielen, später abspielen, ..." anders
 * "Kopfhörer-Ausgabe" auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
 * Skineditor aus dem Hauptprogramm entfernt - der wird als eigenes Programm 

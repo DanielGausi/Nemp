@@ -437,6 +437,7 @@ type
     GrpBox_HeadsetDefaultAction: TComboBox;
     LblHeadsetDefaultAction: TLabel;
     cb_AutoStopHeadset: TCheckBox;
+    cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1382,6 +1383,8 @@ begin
   cb_PartyMode_BlockTreeEdit          .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit            ;
   cb_PartyMode_BlockCurrentTitleRating.Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating  ;
   cb_PartyMode_BlockTools             .Checked := Nemp_MainForm.NempSkin.NempPartyMode.BlockTools               ;
+  cb_PartyMode_ShowPasswordOnActivate .Checked := Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate   ;
+
   Edt_PartyModePassword.Text := Nemp_MainForm.NempSkin.NempPartyMode.password;
 
 
@@ -2534,6 +2537,7 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit           := cb_PartyMode_BlockTreeEdit          .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTools              := cb_PartyMode_BlockTools             .Checked;
+  Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate  := cb_PartyMode_ShowPasswordOnActivate .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
  { if True then

@@ -87,7 +87,7 @@ begin
         end;
     end;
 
-   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString('') + ' (alpha)');
+   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString('') + ' (Beta)');
 end;
 
 procedure TAboutForm.FormShow(Sender: TObject);

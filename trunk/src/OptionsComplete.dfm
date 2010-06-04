@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio5
+    ActivePage = TabAnzeige6
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -93,7 +93,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 121
           Height = 25
           Caption = 'Check now'
-          TabOrder = 2
+          TabOrder = 3
           OnClick = Btn_CHeckNowForUpdatesClick
         end
         object CB_AutoCheckNotifyOnBetas: TCheckBox
@@ -105,7 +105,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Notify on Beta-releases. As Beta-software is normally instable, ' +
             'this is recommended for advanced users only.'
           Caption = 'Notify on Beta-releases'
-          TabOrder = 3
+          TabOrder = 2
         end
         object CBBOX_UpdateInterval: TComboBox
           Left = 24
@@ -1294,6 +1294,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 
           '(*) Not recommended under Windows7: The buttons in the preview w' +
           'on'#39't work then.'
+        WordWrap = True
       end
       object GrpBox_TaskTray: TRadioGroup
         Left = 8
@@ -2207,7 +2208,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cbCoverSortOrder: TComboBox
           Left = 248
           Top = 37
-          Width = 97
+          Width = 145
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
@@ -2238,7 +2239,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 433
         Height = 77
         Caption = 'Other'
-        TabOrder = 2
+        TabOrder = 3
         object CBFullRowSelect: TCheckBox
           Left = 8
           Top = 16
@@ -2274,7 +2275,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 83
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Cover && Details'
-        TabOrder = 3
+        TabOrder = 2
         object LblConst_CoverMode: TLabel
           Left = 13
           Top = 22
@@ -2372,7 +2373,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Change font according to constant/variable bitrate'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 1
+          TabOrder = 2
           WordWrap = True
           OnClick = CBChangeFontOnCbrVbrClick
         end
@@ -2383,7 +2384,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 2
+          TabOrder = 3
         end
         object CBFontNameCBR: TComboBox
           Left = 219
@@ -2392,7 +2393,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 3
+          TabOrder = 4
         end
         object CBChangeFontColoronBitrate: TCheckBox
           Left = 8
@@ -2403,7 +2404,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Change font color according to bitrate (if skin allows this)'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 4
+          TabOrder = 1
           WordWrap = True
         end
       end
@@ -2519,7 +2520,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 425
-        Height = 178
+        Height = 208
         Caption = 'Partymode'
         TabOrder = 0
         object Lbl_PartyMode_ResizeFactor: TLabel
@@ -2577,6 +2578,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           EditLabel.Height = 13
           EditLabel.Caption = 'Password to exit Party-Mode'
           TabOrder = 4
+        end
+        object cb_PartyMode_ShowPasswordOnActivate: TCheckBox
+          Left = 16
+          Top = 171
+          Width = 393
+          Height = 17
+          Caption = 'Show password when activating the Nemp Party-Mode'
+          TabOrder = 5
         end
       end
     end
@@ -2923,7 +2932,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object CBAutoScan: TCheckBox
           Left = 8
           Top = 16
-          Width = 321
+          Width = 409
           Height = 17
           Hint = 
             'Check for new files in your music directories when starting Nemp' +
@@ -2952,7 +2961,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CBAutoAddNewDirs: TCheckBox
           Left = 8
-          Top = 137
+          Top = 134
           Width = 409
           Height = 17
           Hint = 'Add new directories to this list'
@@ -3082,7 +3091,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cb_RatingIgnoreShortFiles: TCheckBox
           Left = 33
           Top = 49
-          Width = 300
+          Width = 376
           Height = 17
           Hint = 'Do not change rating and playcounter on short tracks.'
           Caption = 'Ignore short tracks (i.e. less than 30 seconds)'
@@ -3091,26 +3100,26 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cb_RatingChangeCounter: TCheckBox
           Left = 33
           Top = 88
-          Width = 300
+          Width = 384
           Height = 17
           Hint = 'Increase the playcounter of a file after it was played'
           Caption = 'Increase play counter'
-          TabOrder = 2
+          TabOrder = 3
           OnClick = cb_RatingChangeCounterClick
         end
         object cb_RatingWriteToFiles: TCheckBox
           Left = 33
           Top = 65
-          Width = 300
+          Width = 384
           Height = 17
           Hint = 'Write rating and playcounter into the ID3-tags'
           Caption = 'Update ID3-Tags of audiofiles'
-          TabOrder = 3
+          TabOrder = 2
         end
         object cb_RatingIgnoreCounterOnAbortedTracks: TCheckBox
           Left = 51
           Top = 107
-          Width = 186
+          Width = 379
           Height = 17
           Hint = 'Do not increase the counter, if the file was aborted'
           Caption = 'Ignore on aborted tracks'
@@ -3118,8 +3127,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cb_RatingIncreaseRating: TCheckBox
           Left = 33
-          Top = 131
-          Width = 300
+          Top = 129
+          Width = 376
           Height = 17
           Hint = 
             'Automatically increase rating on played tracks. The change will ' +
@@ -3130,7 +3139,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cb_RatingDecreaseRating: TCheckBox
           Left = 33
           Top = 151
-          Width = 300
+          Width = 376
           Height = 17
           Hint = 
             'Automatically decrease rating on aborted tracks. The change will' +
@@ -3176,7 +3185,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 315
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recording options'
-        TabOrder = 0
+        TabOrder = 1
         DesignSize = (
           434
           315)
@@ -3341,7 +3350,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Items.Strings = (
           'Parse Stream-Playlist and add all contained streams to playlist'
           'Just add playlist-URL to the playlist')
-        TabOrder = 1
+        TabOrder = 0
       end
     end
     object TabAudio5: TTabSheet
@@ -3942,7 +3951,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 433
         Height = 169
         Caption = 'Scrobble Log (this session)'
-        TabOrder = 1
+        TabOrder = 2
         DesignSize = (
           433
           169)
@@ -3965,7 +3974,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 433
         Height = 121
         Caption = 'Scrobble Settings'
-        TabOrder = 2
+        TabOrder = 1
         object Label5: TLabel
           Left = 24
           Top = 72
@@ -3995,7 +4004,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 
             'Ignore hard failures - just stop scrobbling if something goes wr' +
             'ong'
-          TabOrder = 1
+          TabOrder = 2
         end
         object CB_ScrobbleThisSession: TCheckBox
           Left = 8
@@ -4004,7 +4013,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Begin scrobbling now.'
           Caption = 'Scrobble this session'
-          TabOrder = 2
+          TabOrder = 1
         end
         object Btn_ScrobbleAgain: TButton
           Left = 24
@@ -4053,7 +4062,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 129
           Height = 25
           Caption = 'Activate server'
-          TabOrder = 0
+          TabOrder = 2
           OnClick = BtnServerActivateClick
         end
         object cbOnlyLAN: TCheckBox
@@ -4063,7 +4072,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Hint = 'Deny access to your library from "the internet".'
           Caption = 'Permit access only from LAN'
-          TabOrder = 1
+          TabOrder = 3
           OnClick = cbOnlyLANClick
         end
         object cbPermitLibraryAccess: TCheckBox
@@ -4075,7 +4084,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Decide, whether searching and downloading files from your librar' +
             'y is allowed.'
           Caption = 'Permit access to the media library (read only)'
-          TabOrder = 2
+          TabOrder = 5
           OnClick = cbPermitLibraryAccessClick
         end
         object cbPermitPlaylistDownload: TCheckBox
@@ -4085,7 +4094,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Hint = 'Decide, whether downloading files from your playlist is allowed.'
           Caption = 'Permit downloading files from the playlist'
-          TabOrder = 3
+          TabOrder = 4
           OnClick = cbPermitPlaylistDownloadClick
         end
         object cbAllowRemoteControl: TCheckBox
@@ -4097,7 +4106,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Permit remote control like "play", "stop", "next file" of the pl' +
             'ayer.'
           Caption = 'Permit remote control of the player'
-          TabOrder = 4
+          TabOrder = 6
           OnClick = cbAllowRemoteControlClick
         end
         object EdtUsername: TEdit
@@ -4105,7 +4114,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 35
           Width = 98
           Height = 21
-          TabOrder = 5
+          TabOrder = 0
           OnKeyPress = EdtUsernameKeyPress
         end
         object EdtPassword: TEdit
@@ -4113,7 +4122,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 35
           Width = 98
           Height = 21
-          TabOrder = 6
+          TabOrder = 1
           OnKeyPress = EdtPasswordKeyPress
         end
         object CBAutoStartWebServer: TCheckBox
@@ -4162,7 +4171,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Get your Internet-IP (done via a little php-script on www.gausi.' +
             'de).'
           Caption = 'Get IP-address'
-          TabOrder = 0
+          TabOrder = 2
           OnClick = BtnGetIPsClick
         end
         object cbLANIPs: TComboBox
@@ -4173,7 +4182,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Your IP(s) inside the local area network (LAN).'
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 1
+          TabOrder = 0
           Items.Strings = (
             '')
         end
@@ -4186,7 +4195,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Your IP "in the internet". You have to configure your router and' +
             '/or firewall properly (e.g. forwarding Port80 to your machine) '
           ReadOnly = True
-          TabOrder = 2
+          TabOrder = 1
           Text = '?'
         end
       end
@@ -4772,6 +4781,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
     Left = 624
-    Top = 152
+    Top = 88
   end
 end

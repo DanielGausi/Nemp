@@ -145,6 +145,9 @@
 			</DCCReference>
 			<DCCReference Include="Lyrics.pas"/>
 			<DCCReference Include="HtmlHelper.pas"/>
+			<DCCReference Include="OptionsComplete.pas">
+				<Form>OptionsCompleteForm</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

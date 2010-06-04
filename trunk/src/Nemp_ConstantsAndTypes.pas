@@ -616,7 +616,7 @@ const
         (Bezeichnung: 'Lyrics' ;Inhalt: CON_LYRICSEXISTING ;visible: False  ;width: 50 ;sortAscending: True),
         (Bezeichnung: 'Track' ;Inhalt: CON_TRACKNR         ;visible: false  ;width: 50 ;sortAscending: True),
         (Bezeichnung: 'Rating' ;Inhalt: CON_RATING         ;visible: true  ;width: 100 ;sortAscending: True),
-        (Bezeichnung: 'PlayCounter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
+        (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
         (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True)

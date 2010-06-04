@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, CheckLst, ExtCtrls, ComCtrls,
   MedienBibliothekClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings,
-  Mp3FileUtils, BibSearchClass;
+  Mp3FileUtils, BibSearchClass, gnugettext;
 
 type
   TFormBibSearch = class(TForm)
@@ -85,6 +85,8 @@ type
   private
     { Private-Deklarationen }
     procedure FillSuchComboBox;
+    procedure BackupComboboxes;
+    procedure RestoreComboboxes;
   public
     { Public-Deklarationen }
     procedure EnableControls(AllowSearch: Boolean);
@@ -150,8 +152,28 @@ begin
         OldString := '';
 end;
 
+procedure TFormBibSearch.BackupComboboxes;
+var i: Integer;
+begin
+    for i := 0 to self.ComponentCount - 1 do
+      if (Components[i] is TComboBox) then
+        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
+end;
+procedure TFormBibSearch.RestoreComboboxes;
+var i: Integer;
+begin
+  for i := 0 to self.ComponentCount - 1 do
+      if (Components[i] is TComboBox) then
+        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
+end;
+
+
 procedure TFormBibSearch.FormCreate(Sender: TObject);
 begin
+    BackUpComboBoxes;
+    TranslateComponent (self);
+    RestoreComboboxes;
+
     cbGenres.Items.Clear;
     // Genres: StringList defined in MP3FileUtils
     cbGenres.Items := Genres;
