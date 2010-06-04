@@ -116,7 +116,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis, PlayerClass, PartymodePassword;
+    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor;
 
 procedure CorrectVolButton;
 begin
@@ -1000,6 +1000,12 @@ begin
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
         if assigned(FormMediaKeyInit     ) then ReTranslateComponent(FormMediaKeyInit    );
         if assigned(PasswordDlg          ) then ReTranslateComponent(PasswordDlg         );
+        if assigned(FormBibSearch        ) then ReTranslateComponent(FormBibSearch       );
+        if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
+
+
+
+
 
         //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
         if assigned(OptionsCompleteForm  ) then

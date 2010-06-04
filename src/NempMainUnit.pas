@@ -8953,6 +8953,11 @@ begin
             MessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
     end else
     begin
+        if Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate then
+            MessageDlg(
+                Format(_(ParrtyMode_Password_PromptOnActivate), [NempSkin.NempPartyMode.Password]),
+                mtInformation, [mbOK], 0);
+
         if Anzeigemode = 1 then
         begin
             // Set Compact Mode

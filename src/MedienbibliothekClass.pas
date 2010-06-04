@@ -1951,7 +1951,7 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                             Integer(PWideChar(aAudioFile.Pfad)));
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateStatus,
-                            Integer(PWideChar(Format(MediaLibrary_SearchLyricsStats, [done, done + failed]))));
+                            Integer(PWideChar(Format(_(MediaLibrary_SearchLyricsStats), [done, done + failed]))));
 
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
 
@@ -2122,7 +2122,7 @@ begin
                             Integer(PWideChar(af.Pfad)));
 
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
-                            Integer(PWideChar(Format(MediaLibrary_SearchTagsStats, [done, done + failed]))));
+                            Integer(PWideChar(Format(_(MediaLibrary_SearchTagsStats), [done, done + failed]))));
 
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
                 af.FileIsPresent:=True;

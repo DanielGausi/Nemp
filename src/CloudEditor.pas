@@ -35,7 +35,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, VirtualTrees, contnrs, StrUtils,
+  Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext,
 
   AudioFileClass, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls
   ;
@@ -199,6 +199,8 @@ end;
 }
 procedure TCloudEditorForm.FormCreate(Sender: TObject);
 begin
+    TranslateComponent (self);
+
     TagVST.NodeDataSize := SizeOf(TTagTreeData);
     IgnoreTagVST.NodeDataSize := SizeOf(TIgnoreTagData);
     MergeTagVST.NodeDataSize := SizeOf(TMergeTagData);

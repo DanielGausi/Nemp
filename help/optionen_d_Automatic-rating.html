@@ -2,10 +2,15 @@
 <html>
 <head>
 
+
+  
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+  
+
+
+  
   <title>Automatische Bewertung</title>
-
-
   <style title="" media="" type="text/css">
 .head { margin: 0px;
 padding: 0px;
@@ -26,57 +31,89 @@ font-size: 12px;
 
 <body>
 
+
 <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
 
   <tbody>
 
+
     <tr>
+
 
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
+
       <td>
+      
       <h2 class="head">Automatische Bewertung</h2>
+
 
       </td>
 
+
     </tr>
 
+
+  
   </tbody>
 </table>
 
+
 <hr style="width: 100%; height: 2px;"><br>
+
 
 Nemp kann die Dateien im Laufe der Zeit automatisch bewerten. Das
 hei&szlig;t, dass h&auml;ufig geh&ouml;rte Lieder nach und nach eine
 bessere Bewertung bekommen als solche, die nicht so oft angeh&ouml;rt
 werden. Au&szlig;erdem k&ouml;nnen abgerochene Lieder automatisch eine
 schlechtere Bewertung bekommen.<br>
+
 <br>
+
 Die &Auml;nderung der Bewertung h&auml;ngt dabei von der aktuellen
 Bewertung r ab, und vom Abspielz&auml;hler c. Wenn die aktuelle
 Bewertung sehr schlecht ist, wird die Bewertung st&auml;rker
 erh&ouml;ht, und wenn der Abspielz&auml;hler hoch ist, verringert sich
 die Verbesserung. Die genaue Formel, die Sie auch im Quellcode
 nachlesen k&ouml;nnen, lautet:<br>
+
 <br>
+
 <img style="width: 183px; height: 45px;" alt="rating1" src="ratingformular1.png"><br>
+
 <br>
 Dabei ist 255 die maximal m&ouml;gliche Bewertung. Die Wurzel und den
 ganzen Rest habe ich so gew&auml;hlt, bis ich den Eindruck hatte, dass
-das Ergebnis halbwegs sinnvoll ist.<br>
+das Ergebnis halbwegs sinnvoll ist. Da steckt also keine "h&ouml;here
+Mathematik" hinter, sondern ist einfach so ausgew&uuml;rfelt. Aber die
+Hilfe darf ja auch mal was komplizierter aussehen, oder?<br>
+
 <br>
+
 Die Formel f&uuml;r das Abwerten lautet entsprechend (25 ist die minimale Bewertung, das entspricht einem halben Sternchen):<br>
+
 <br>
+
 <img style="width: 183px; height: 45px;" alt="rating2" src="ratingformular2.png"><br>
+
 <br>
+
 Sie k&ouml;nnen einstellen, ob ein abgespieltes Lied besser, und ob ein
 abgebrochenes Lied schlechter bewertet werden soll. Dabei bedeutet<br>
+
 <ul style="list-style-type: circle;">
+
   <li>Abgespielt: Das Lied wurde mindestens zur H&auml;lfte oder mindestens 4 Minuten lang angeh&ouml;rt</li>
+
   <li>Abgebrochen: Das Lied wurde nicht "abgespielt"</li>
+
 </ul>
+
 Diese Definition deckt sich mit der, die auch f&uuml;r das <a href="scrobbeln.html">Scrobbeln</a> benutzt wird.<br>
+
 <br>
+
 F&uuml;r kurze Lieder k&ouml;nnen Sie die automatische Bewertung getrennt abschalten
 </body>
 </html>

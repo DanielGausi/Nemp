@@ -55,6 +55,7 @@ TreeHeader_Genres = 'Genres';
 TreeHeader_Years = 'Years';
 TreeHeader_Titles = 'Titles';
 TreeHeader_FileAges = 'Fileage';
+TreeHeader_PlayCounter = 'Play counter';
 TreeHeader_Playlists = 'Playlists';
 TreeHeader_Playlist = 'Playlist';
 TreeHeader_Webradio = 'Webradio';
@@ -636,6 +637,8 @@ MenuItem_PartymodeExit = 'Exit Party-Mode';
 ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. Or go back to the party and have some fun.';
 ParrtyMode_Password_Caption = 'Nemp Party-Mode';
 ParrtyMode_Password_Prompt = 'Please enter the password to exit the Nemp Party-Mode';
+ParrtyMode_Password_PromptOnActivate = 'Note: The password to exit the Nemp Party-Mode is "%s".';
+
 
 HeadSetLabel_Default1 = 'Headphones (no title loaded)';
 HeadSetLabel_Default2 = '(no title loaded)';
