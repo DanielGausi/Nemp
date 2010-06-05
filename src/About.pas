@@ -45,12 +45,14 @@ type
     BtnOK: TButton;
     NempCredits: TACredits;
     ImageList1: TImageList;
+    BtnDonate: TButton;
 
     procedure BtnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure NempCreditsAnchorClicked(Sender: TObject; Anchor: String);
+    procedure BtnDonateClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -65,6 +67,13 @@ implementation
 uses Systemhelper;
 
 {$R *.dfm}
+
+procedure TAboutForm.BtnDonateClick(Sender: TObject);
+begin
+ShellExecute(Handle, 'open'
+                      ,PChar('http://www.gausi.de/spenden.html')
+                      , nil, nil, SW_SHOWNORMAl);
+end;
 
 procedure TAboutForm.BtnOKClick(Sender: TObject);
 begin

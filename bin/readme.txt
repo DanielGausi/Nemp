@@ -8,7 +8,7 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Mai 2010
+      Januar 2005 - Juni 2010
 
       Version: 4.0.0
 
@@ -96,6 +96,9 @@ Verwendete Units/Komponenten:
 
 - TACredits
   http://www.delphipraxis.net/topic114228.html
+
+- Eine Drag&Drop-Komponente von Angus Johnson (leicht verändert)
+  http://angusj.com/delphi/
 
 - FSPro Windows 7 Taskbar Components
   http://delphi.fsprolabs.com/
