@@ -144,6 +144,21 @@ object AboutForm: TAboutForm
       'pol... for his "concrete feedback"'
       ''
       ''
+      '[row="200"]'
+      ''
+      ''
+      '[b]Some music I listened to during coding[/b]'
+      ''
+      'The Avatar Soundtrack'
+      ''
+      
+        '[url="http://www.jamendo.com/de/album/55571"]Kendra Springer - H' +
+        'ope[/url]'
+      ''
+      'I think its ok to mention some amazing billion-dollar-stuff '
+      'and a wonderful creative-commons-work in one sentence...'
+      ''
+      ''
       '[row="200"]')
     LinkFont.Charset = DEFAULT_CHARSET
     LinkFont.Color = clGray
@@ -182,10 +197,19 @@ object AboutForm: TAboutForm
     TabOrder = 0
     OnClick = BtnOKClick
   end
+  object BtnDonate: TButton
+    Left = 8
+    Top = 360
+    Width = 75
+    Height = 25
+    Caption = 'Donate'
+    TabOrder = 1
+    OnClick = BtnDonateClick
+  end
   object ImageList1: TImageList
     Height = 112
     Width = 155
-    Left = 32
-    Top = 336
+    Left = 24
+    Top = 272
   end
 end
