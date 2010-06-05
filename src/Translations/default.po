@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-06-04 21:32\n"
-"PO-Revision-Date: 2010-06-04 21:34+0100\n"
+"PO-Revision-Date: 2010-06-05 17:26+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -7833,7 +7833,7 @@ msgstr "Alte Suchergebnisse"
 #. Programmer's name for it: MainForm_GlobalQuickSearch
 #: Nemp_RessourceStrings.pas:404
 msgid "Quicksearch (library)"
-msgstr "Schnellsuche (Alles)"
+msgstr "Schnellsuche"
 
 #. Programmer's name for it: MainForm_LocalQuickSearch
 #: Nemp_RessourceStrings.pas:405
