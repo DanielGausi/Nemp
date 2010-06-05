@@ -1,0 +1,9 @@
+1. Kontextmenü des Explorers: neue Default.po erstellen
+
+2. msgcat -o newdefault.po delphi7.po Default.po
+   // newdefault.po wird neu erstellt!
+
+3. C:\Programme\dxgettext\ggmerge.exe
+   merge und neue Sachen übersetzen.
+   oben: alte default.po (locale\de\LC_Messages\)
+   unten: neu erstellte newdefault.po
