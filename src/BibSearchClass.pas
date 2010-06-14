@@ -1150,7 +1150,7 @@ var i, lmax: integer;
     OnlyOneWord: Boolean;
     // for Horspool/dynamic programming
     k: Integer;
-    BC, A: TBC_IntArray;
+    A: TBC_IntArray;
     // search borders for binary search
     // note: Not really used here. It could increase the searchspeed
     //       as the search-interval could theoretically be reduced piece by piece,

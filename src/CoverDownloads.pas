@@ -795,6 +795,8 @@ begin
                     png.Free;
                 end;
             end;
+        else
+            result := False;
         end;
     finally
         localBMP.Free;

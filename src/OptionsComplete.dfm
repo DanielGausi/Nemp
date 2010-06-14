@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio9
+    ActivePage = TabAnzeige5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2133,7 +2133,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 8
         Width = 434
         Height = 127
-        Hint = 'Selct the visible columns in the library.'
+        Hint = 'Select the visible columns in the library.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show the following columns in the medialist'
         TabOrder = 0
@@ -2237,7 +2237,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 340
         Width = 433
-        Height = 77
+        Height = 93
         Caption = 'Other'
         TabOrder = 3
         object CBFullRowSelect: TCheckBox
@@ -2266,6 +2266,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Show hints in the playlist or not.'
           Caption = 'Show hints in playlist'
           TabOrder = 2
+        end
+        object CB_EditOnClick: TCheckBox
+          Left = 8
+          Top = 64
+          Width = 409
+          Height = 17
+          Hint = 
+            'Begin editing file information in the medialist after a slow dou' +
+            'bleclick'
+          Caption = 'Edit files at click'
+          TabOrder = 3
         end
       end
       object GrpBox_TabMedia3_CoverDetails: TGroupBox

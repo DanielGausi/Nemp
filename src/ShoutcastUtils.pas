@@ -573,7 +573,6 @@ end;
 procedure TStation.LoadFromStream(aStream: TStream);
 var len: Integer;
     tmp: UTF8String;
-    si: Integer;
 begin
     aStream.Read(fBitrate, SizeOf(Integer));
     aStream.Read(fCount, SizeOf(Integer));

@@ -2361,7 +2361,7 @@ var
   ddc   : HDC;
   dbmi  : BITMAPINFO;
   dBits : PInteger;
-  i, j, h  : Integer;
+  h  : Integer;
   SAspect  : Double;
   DAspect  : Double;
   b: TBitmap;

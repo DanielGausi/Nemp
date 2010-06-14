@@ -438,6 +438,7 @@ type
     LblHeadsetDefaultAction: TLabel;
     cb_AutoStopHeadset: TCheckBox;
     cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
+    CB_EditOnClick: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1119,6 +1120,8 @@ begin
   //cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
+  CB_EditOnClick.Checked  := Nemp_MainForm.NempOptions.EditOnClick;
+
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
   CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
@@ -1996,6 +1999,7 @@ begin
 
   //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
+  Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
@@ -2067,6 +2071,10 @@ begin
   else
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions - [toFullRowSelect];
 
+  if Nemp_MainForm.NempOptions.EditOnClick then
+      Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions + [toEditOnClick]
+  else
+      Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions - [toEditOnClick];
 
   Nemp_MainForm.NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
   Nemp_MainForm.NempOptions.StartMinimized  := CB_StartMinimized.Checked;

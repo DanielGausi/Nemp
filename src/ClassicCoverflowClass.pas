@@ -117,8 +117,6 @@ end;
 
 procedure TClassicCoverFlow.fSetCurrentItem(aValue: Integer);
 var aCover: tNempCover;
-    aStream: TFileStream;
-    aJpg: TJpegImage;
 begin
     fCurrentItem := aValue;
     if fCurrentItem < 0 then

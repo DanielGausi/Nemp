@@ -229,7 +229,6 @@ type
     N1: TMenuItem;
     N26: TMenuItem;
     MM_PL_ExtendedAddToMedialibrary: TMenuItem;
-    MM_PL_ExtendedCopyFromWinamp: TMenuItem;
     MM_PL_ExtendedScanFiles: TMenuItem;
     MM_PL_ExtendedCopyToClipboard: TMenuItem;
     MM_PL_ExtendedPasteFromClipboard: TMenuItem;
@@ -420,7 +419,6 @@ type
     PM_PL_PlayInHeadset: TMenuItem;
     N13: TMenuItem;
     PM_PL_ExtendedAddToMedialibrary: TMenuItem;
-    PM_PL_ExtendedCopyFromWinamp: TMenuItem;
     PM_PL_ExtendedScanFiles: TMenuItem;
     PM_PL_ExtendedCopyToClipboard: TMenuItem;
     PM_PL_ExtendedPasteFromClipboard: TMenuItem;
@@ -689,7 +687,6 @@ type
     ImgDetailCover: TImage;
     PanelTagCloudBrowse: TNempPanel;
     PM_ML_GetTags: TMenuItem;
-    PM_PL_AddToPrebookListBeginning: TMenuItem;
     PM_PL_RemoveFromPrebookList: TMenuItem;
     fspTaskbarManager: TfspTaskbarMgr;
     fspTaskbarPreviews1: TfspTaskbarPreviews;
@@ -704,7 +701,6 @@ type
     N69: TMenuItem;
     MM_PL_ShowInExplorer: TMenuItem;
     MM_PL_AddSelectionToPreBooklistEnd: TMenuItem;
-    MM_PL_AddSelectionToPrebooklistBeginning: TMenuItem;
     MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
     MM_ML_DeleteSelectedFiles: TMenuItem;
@@ -811,6 +807,8 @@ type
     SlideForwardHeadsetBTN: TSkinButton;
     SlideBackHeadsetBTN: TSkinButton;
     BtnHeadsetToPlaylist: TSkinButton;
+    PM_PL_ClearPlaylist: TMenuItem;
+    MM_PL_ClearPlaylist: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -952,7 +950,6 @@ type
     procedure PM_ML_ExtendedShowAllFilesInDirClick(Sender: TObject);
     procedure NachDiesemDingSuchen1Click(Sender: TObject);
     procedure MM_H_ShowReadmeClick(Sender: TObject);
-    procedure PM_PL_ExtendedCopyFromWinampClick(Sender: TObject);
     procedure MM_PL_DirectoryClick(Sender: TObject);
     procedure MM_PL_FilesClick(Sender: TObject);
     procedure MM_PL_AddPlaylistClick(Sender: TObject);
@@ -1358,6 +1355,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure GRPBOXHeadsetClick(Sender: TObject);
     procedure BtnHeadsetToPlaylistClick(Sender: TObject);
+    procedure PM_PL_ClearPlaylistClick(Sender: TObject);
 
   private
 
@@ -1911,6 +1909,12 @@ begin
       VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
     else
       VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions - [toFullRowSelect];
+
+    if NempOptions.EditOnClick then
+      VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions + [toEditOnClick]
+    else
+      VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
+
 
     ArtistsVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
     AlbenVST.DefaultNodeHeight   := NempOptions.ArtistAlbenRowHeight;
@@ -3054,7 +3058,7 @@ begin
               end;
           end;
       else
-          if Message.Msg = SecondInstMsgId then
+          if (Message.Msg = SecondInstMsgId) and (not NempIsClosing) then
             PostThreadMessage(Message.WParam, SecondInstMsgId, Handle, 0)
           else
             inherited WndProc(Message);
@@ -3070,7 +3074,13 @@ var IncomingPAnsiChar:PAnsiChar;
 begin
   if (MsG.CopyDataStruct.dwData = SecondInstMsgId) AND (SecondInstMsgId <> 0) then
   begin
-      ProcessCommandline(Msg.CopyDataStruct.lpData, False) // False: Nicht Play
+      if (not NempIsClosing) then
+          ProcessCommandline(Msg.CopyDataStruct.lpData, False) // False: Nicht Play
+      else
+      begin
+          inherited;
+          exit;
+      end;
   end;
   ;//else
 
@@ -3950,7 +3960,7 @@ begin
         end else
           if (o <> NIL) AND (o.Name = 'CloudViewer') then
           begin
-              PM_ML_Enqueue.Caption  := GetProperMenuString(5); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
+              PM_ML_Enqueue.Caption  := GetProperMenuString(6); //Format((MainForm_MenuCaptionsPlayAll), [AUDIOFILE_STRINGS[1]]);
               PM_ML_Play.Caption     := (MainForm_MenuCaptionsPlayAll );
               PM_ML_PlayNext.Caption := (MainForm_MenuCaptionsPlayNextAll);
               PM_ML_PlayNow.Visible  := False;
@@ -4048,6 +4058,27 @@ begin
       PM_ML_ExtendedSearchArtist.Caption := (MainForm_MenuCaptionsSearchForArtist);
       PM_ML_ExtendedSearchAlbum.Caption  := (MainForm_MenuCaptionsSearchForAlbum)
     end;
+
+    // Additional: Hide most of the items when opening from the Browse-Part
+    //(makes some of the things above useless...)
+    N14                              .visible := aVST = VST;
+    PM_ML_PlayHeadset                .visible := aVST = VST;
+    PM_ML_SortBy                     .visible := aVST = VST;
+    PM_ML_HideSelected               .visible := aVST = VST;
+    PM_ML_DeleteSelected             .visible := aVST = VST;
+    PM_ML_SetRatingsOfSelectedFiles  .visible := aVST = VST;
+    PM_ML_GetLyrics                  .visible := aVST = VST;
+    PM_ML_GetTags                    .visible := aVST = VST;
+    N3                               .visible := aVST = VST;
+    PM_ML_CopyToClipboard            .visible := aVST = VST;
+    PM_ML_PasteFromClipboard         .visible := aVST = VST;
+    PM_ML_Extended                   .visible := aVST = VST;
+    N55                              .visible := aVST = VST;
+    PM_ML_RefreshSelected            .visible := aVST = VST;
+    PM_ML_ShowInExplorer             .visible := aVST = VST;
+    PM_ML_Properties                 .visible := aVST = VST;
+
+
 end;
 
 procedure TNemp_MainForm.PM_ML_SetRatingsOfSelectedFilesClick(
@@ -6590,7 +6621,7 @@ end;
 procedure TNemp_MainForm.PlayPauseBTNIMGClick(Sender: TObject);
 begin
   NempPlaylist.UserInput;
-  if (NempPlayer.MainStream = 0) AND (NempPlaylist.Count = 0) then
+  if (NempPlayer.MainStream = 0) AND (NempPlaylist.Count = 0) and (not assigned(NempPlaylist.PlayingFile)) then
   begin
       MM_PL_FilesClick(NIL);
       exit;
@@ -7198,11 +7229,6 @@ begin
                       , nil, nil, SW_SHOWNORMAl);
 end;
 
-procedure TNemp_MainForm.PM_PL_ExtendedCopyFromWinampClick(Sender: TObject);
-begin
-  NempPlaylist.GetFromWinamp;
-end;
-
 procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
@@ -7335,7 +7361,7 @@ begin
   // we could allow more, but this would be enough. ;-)
   prebookAllowed := PlaylistVST.SelectedCount + NempPlaylist.PrebookCount <= 99;
   PM_PL_AddToPrebookListEnd.Enabled := prebookAllowed;
-  PM_PL_AddToPrebookListBeginning.Enabled := prebookAllowed;
+  // PM_PL_AddToPrebookListBeginning.Enabled := prebookAllowed;
 
   If NempPlaylist.Count = 0 then
   begin
@@ -8974,7 +9000,6 @@ end;
 
 procedure TNemp_MainForm.PlayerTabsClick(Sender: TObject);
 var heightaddi: integer;
-    point: TPoint;
 begin
 
   if AnzeigeMode = 0 then
@@ -10484,13 +10509,18 @@ end;
 
 procedure TNemp_MainForm.PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
 begin
-    NempPlaylist.AddSelectedNodesToPreBookList(pb_Beginning) ;
+    // NempPlaylist.AddSelectedNodesToPreBookList(pb_Beginning) ;
 end;
 
 procedure TNemp_MainForm.PM_PL_AddToPrebookListEndClick(
   Sender: TObject);
 begin
     NempPlaylist.AddSelectedNodesToPreBookList(pb_End) ;
+end;
+
+procedure TNemp_MainForm.PM_PL_ClearPlaylistClick(Sender: TObject);
+begin
+    NempPlaylist.ClearPlaylist(False);
 end;
 
 procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);

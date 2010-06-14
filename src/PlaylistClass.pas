@@ -210,7 +210,7 @@ type
       procedure Stop;
 
       procedure DeleteMarkedFiles;  // Delete selected files
-      procedure ClearPlaylist;      // Delete whole playlist
+      procedure ClearPlaylist(StopPlayer: Boolean = True);      // Delete whole playlist
       procedure DeleteDeadFiles;    // Delete dead (non existing) files
       procedure RemovePlayingFile;  // Remove the current file from the list
       procedure RemoveFileFromHistory(aFile: TAudioFile);
@@ -809,16 +809,27 @@ begin
         fDauer := ShowPlayListSummary;
 end;
 
-procedure TNempPlaylist.ClearPlaylist;
+procedure TNempPlaylist.ClearPlaylist(StopPlayer: Boolean = True);
 begin
-    Player.StopAndFree;
+    if StopPlayer then
+    begin
+        Player.StopAndFree;
+        Player.MainAudioFile := Nil;
+        fPlayingFile := Nil;
+    end else
+    begin
+        fBackUpFile.Assign(fPlayingFile);
+        fPlayingFile := fBackUpFile;
+        Player.MainAudioFile := fBackUpFile;
+    end;
+
     HistoryList.Clear;
     PrebookList.Clear;
     Playlist.Clear;
-    fPlayingFile := Nil;
+
     fPlayingNode := Nil;
     fCurrentHistoryFile := Nil;
-    Player.MainAudioFile := Nil;
+
     fPlayingIndex := 0;
     FillPlaylistView;
     fDauer := ShowPlayListSummary;

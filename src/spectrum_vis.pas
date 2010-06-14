@@ -749,7 +749,6 @@ begin
 end;
 
 procedure TSpectrum.DrawTime(aString: String);
-var timeWidth: integer;
 begin
   TxtBuff.Canvas.Pen.Color := TimeBkgColor;
   TxtBuff.Canvas.Brush.Style := bsSolid;
@@ -765,8 +764,6 @@ begin
 
   TxtBuff.Canvas.Font.Color := TimeColor;
   TxtBuff.Canvas.Font.Style := TimeStyle;
-
-  timeWidth := TxtBuff.Canvas.TextWidth(aString);
 
   TxtBuff.Canvas.Brush.Color := TimeBkgColor;
   TxtBuff.Canvas.Brush.Style := TimeTextBackground; //bsSolid;//bsDiagCross;

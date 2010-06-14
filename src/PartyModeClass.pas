@@ -443,7 +443,6 @@ procedure TNempPartyMode.CorrectMainForm;
 var ChangeProc: TChangeProc;
     i: Integer;
     c: tControl;
-    d: Boolean;
 begin
     if fActive then
     begin
@@ -452,14 +451,11 @@ begin
         fLastTopHeight := Nemp_MainForm.TopMainPanel.Height;
         fLastHeight    := Nemp_MainForm.Height;
         fLastWidth     := Nemp_MainForm.Width;
-
-        d := true;
     end
     else
     begin
         ChangeProc := Equal; //Smaller;
         fResizeProc := Equal;
-        d := False;
     end;
 
     // Update MainWindow
