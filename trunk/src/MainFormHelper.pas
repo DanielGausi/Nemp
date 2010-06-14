@@ -624,7 +624,7 @@ begin
         //Dateienhinzufgen2.Enabled := False;
         PM_PL_AddDirectories.Enabled := False;
         PM_PL_ExtendedAddToMedialibrary.Enabled := False;
-        PM_PL_ExtendedCopyFromWinamp.Enabled := False;
+        //PM_PL_ExtendedCopyFromWinamp.Enabled := False;
         //Dateienhinzufgen3.Enabled := False;
 
 
@@ -679,7 +679,7 @@ begin
         //Dateienhinzufgen2.Enabled := True;
         PM_PL_AddDirectories.Enabled := True;
         PM_PL_ExtendedAddToMedialibrary.Enabled := True;
-        PM_PL_ExtendedCopyFromWinamp.Enabled := True;
+        //PM_PL_ExtendedCopyFromWinamp.Enabled := True;
         PM_ML_Medialibrary.Enabled := True;
         PM_ML_SearchDirectory.Enabled := True;
         //Dateienhinzufgen3.Enabled := True;

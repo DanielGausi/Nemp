@@ -196,7 +196,7 @@ end;
 
 
 function IsExeInProgramSubDir: Boolean;
-var p1, p2: String;
+var p1: String;
 begin
     result := false;
     p1 := IncludeTrailingPathDelimiter(GetEnvironmentVariable('ProgramFiles'));

@@ -150,6 +150,7 @@ type
 
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
+        EditOnClick: Boolean;
         TippSpeed: Integer;
         NempFormAufteilung: Array [0..1] of TNempFormAufteilung;
         NempFormRatios: TNempMainFormRatios;
@@ -904,6 +905,8 @@ begin
         HideDeskbandOnClose     := ini.ReadBool('Fenster', 'HideDeskbandOnClose', True);
 
         FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
+        EditOnClick   := ini.ReadBool('Fenster', 'EditOnClick', True);
+
         CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
         if not CoverMode in [0,1,2] then CoverMode := 1;
         CoverWidth := ini.ReadInteger('Fenster', 'CoverWidth', 240);
@@ -1020,6 +1023,7 @@ begin
         ini.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
         ini.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
+        ini.WriteBool('Fenster', 'EditOnClick', EditOnClick);
         ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
         ini.WriteInteger('Fenster', 'DetailMode', DetailMode);

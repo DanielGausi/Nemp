@@ -943,7 +943,6 @@ begin
 end;
 function TTagCloud.GetNextMatchingTag(aKey: Word; f3pressed: Boolean): TPaintTag;
 var aLine: TTagLine;
-    StartTag: TPaintTag;
     tc: Int64;
     LineCount, LineIdx, TagIdx: Integer;
 
@@ -1080,8 +1079,7 @@ end;
     --------------------------------------------------------
 }
 procedure TTagCloud.BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
-var i,j: Integer;
-    //backupList: TObjectList;
+var i: Integer;
     properList: TObjectList;
 begin
     if FromScratch then
@@ -1496,9 +1494,8 @@ end;
 }
 procedure TTagCloud.RenameTag(oldTag: TTag; NewKey: String);
 var NewTag: TTag;
-    i, t, oi: Integer;
+    i, oi: Integer;
     af: TAudioFile;
-    newRawString: UTF8String;
     sl: TStringList;
 begin
     // 1. Get Tag with NewKey
@@ -1565,9 +1562,8 @@ end;
     --------------------------------------------------------
 }
 procedure TTagCloud.DeleteTag(aTag: TTag);
-var i, t, oi: Integer;
+var i, oi: Integer;
     af: TAudioFile;
-    newRawString: UTF8String;
     sl: TStringList;
 begin
     for i := 0 to aTag.AudioFiles.Count - 1 do

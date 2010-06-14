@@ -590,14 +590,15 @@ uses fspTaskBarMgr, TagHelper;
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
     case aIdx of
-
-    0: result := MainForm_MenuCaptionsEnqueueAllArtist   ;
-    1: result := MainForm_MenuCaptionsEnqueueAllAlbum    ;
-    2: result := MainForm_MenuCaptionsEnqueueAllDirectory;
-    3: result := MainForm_MenuCaptionsEnqueueAllGenre    ;
-    4: result := MainForm_MenuCaptionsEnqueueAllYear     ;
-    5: result := MainForm_MenuCaptionsEnqueueAllTag      ;
-    else result := '(?)'
+        0: result := MainForm_MenuCaptionsEnqueueAllArtist   ;
+        1: result := MainForm_MenuCaptionsEnqueueAllAlbum    ;
+        2: result := MainForm_MenuCaptionsEnqueueAllDirectory;
+        3: result := MainForm_MenuCaptionsEnqueueAllGenre    ;
+        4: result := MainForm_MenuCaptionsEnqueueAllYear     ;
+        5: result := MainForm_MenuCaptionsEnqueueAllDate     ;
+        6: result := MainForm_MenuCaptionsEnqueueAllTag      ;
+    else
+        result := '(?)'
     end;
 end;
 

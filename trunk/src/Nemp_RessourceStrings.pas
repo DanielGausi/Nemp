@@ -468,6 +468,7 @@ MainForm_MenuCaptionsEnqueueAllDirectory   = 'Enqueue all tracks of this directo
 MainForm_MenuCaptionsEnqueueAllGenre       = 'Enqueue all tracks of this genre (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllYear        = 'Enqueue all tracks of this year (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllTag         = 'Enqueue all tracks with this tag (at the end of the playlist)';
+MainForm_MenuCaptionsEnqueueAllDate        = 'Enqueue all tracks from this month (at the end of the playlist)';
 
 MainForm_MenuCaptionsEnqueueAllPlaylist = 'Enqueue all tracks of this playlist (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllWebradio = 'Enqueue all tracks of this webradio station (at the end of the playlist)';

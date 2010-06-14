@@ -103,7 +103,6 @@ type
     fQueryUpdateTexture_height : Integer;
     fPendingPreview : Boolean;
     fEventsWindow : HWND;
-    fCaption, fSubCaption : String;
     fCaptionCS : Integer;
     fr: single;
     fg: single;
@@ -480,8 +479,6 @@ end;
 
 procedure TRenderThread.Execute;
 var
-  pfd : TPixelFormatDescriptor;
-
   delta_t : Cardinal;
 
   i : Integer;

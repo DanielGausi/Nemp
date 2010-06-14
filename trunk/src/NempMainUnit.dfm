@@ -3358,21 +3358,20 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 16467
         OnClick = PM_PL_SavePlaylistClick
       end
-      object MM_PL_ExtendedCopyFromWinamp: TMenuItem
-        Caption = 'Copy playlist from &Winamp'
-        Visible = False
-        OnClick = PM_PL_ExtendedCopyFromWinampClick
-      end
       object N18: TMenuItem
         Caption = '-'
       end
-      object MM_PL_DeleteMissingFiles: TMenuItem
-        Caption = 'Cleanup playlist (delete missing files)'
-        OnClick = Nichtvorhandenelschen1Click
+      object MM_PL_ClearPlaylist: TMenuItem
+        Caption = 'Clear playlist'
+        OnClick = PM_PL_ClearPlaylistClick
       end
       object MM_PL_DeleteSelected: TMenuItem
         Caption = 'Delete selected'
         OnClick = PM_PL_DeleteSelectedClick
+      end
+      object MM_PL_DeleteMissingFiles: TMenuItem
+        Caption = 'Cleanup playlist (delete missing files)'
+        OnClick = Nichtvorhandenelschen1Click
       end
       object MM_PL_SetRatingofSelectedFilesTo: TMenuItem
         Caption = 'Set rating of selected files to'
@@ -3445,10 +3444,6 @@ object Nemp_MainForm: TNemp_MainForm
       object MM_PL_AddSelectionToPreBooklistEnd: TMenuItem
         Caption = 'Add selection to prebook-list (end)'
         OnClick = PM_PL_AddToPrebookListEndClick
-      end
-      object MM_PL_AddSelectionToPrebooklistBeginning: TMenuItem
-        Caption = 'Add selection to prebook-list (beginning)'
-        OnClick = PM_PL_AddToPrebookListBeginningClick
       end
       object MM_PL_RemoveSelectionFromPrebooklist: TMenuItem
         Caption = 'Remove selection from prebook-list'
@@ -3954,7 +3949,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C0101110013003C040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130040040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4519,7 +4514,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806400510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806440510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6105,22 +6100,21 @@ object Nemp_MainForm: TNemp_MainForm
       ShortCut = 16467
       OnClick = PM_PL_SavePlaylistClick
     end
-    object PM_PL_ExtendedCopyFromWinamp: TMenuItem
-      Caption = 'Copy playlist from Winamp'
-      Visible = False
-      OnClick = PM_PL_ExtendedCopyFromWinampClick
-    end
     object N12: TMenuItem
       Caption = '-'
     end
-    object PM_PL_DeleteMissingFiles: TMenuItem
-      Caption = 'Cleanup playlist (delete missing files)'
-      OnClick = Nichtvorhandenelschen1Click
+    object PM_PL_ClearPlaylist: TMenuItem
+      Caption = 'Clear playlist'
+      OnClick = PM_PL_ClearPlaylistClick
     end
     object PM_PL_DeleteSelected: TMenuItem
       Caption = 'Delete Selected'
       ShortCut = 46
       OnClick = PM_PL_DeleteSelectedClick
+    end
+    object PM_PL_DeleteMissingFiles: TMenuItem
+      Caption = 'Cleanup playlist (delete missing files)'
+      OnClick = Nichtvorhandenelschen1Click
     end
     object PM_PL_SetRatingofSelectedFilesTo: TMenuItem
       Caption = 'Set rating of selected files to'
@@ -6199,10 +6193,6 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_PL_AddToPrebookListEnd: TMenuItem
       Caption = 'Add selection to prebook-list (end)'
       OnClick = PM_PL_AddToPrebookListEndClick
-    end
-    object PM_PL_AddToPrebookListBeginning: TMenuItem
-      Caption = 'Add selection to prebook-list (beginning)'
-      OnClick = PM_PL_AddToPrebookListBeginningClick
     end
     object PM_PL_RemoveFromPrebookList: TMenuItem
       Caption = 'Remove selection from prebook-list'
@@ -7288,7 +7278,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 576
     Top = 632
     Bitmap = {
-      494C010107002800A80110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800AC0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

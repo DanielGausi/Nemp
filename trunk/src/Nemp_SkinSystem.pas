@@ -1893,6 +1893,7 @@ begin
             localOffsetY := PlayerPageOffsetY;
             sourceBmp := CompleteBitmap;
         end;
+        Stretch := false;
         TileGraphic(sourceBmp, tmp.Canvas,
               localOffsetX + (pnlPoint.X - OffsetPoint.X) ,
               localOffsetY + (pnlPoint.Y - OffsetPoint.Y),
