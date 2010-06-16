@@ -87,10 +87,8 @@ uses
 
 {$R *.res}
 
-//var x: tStringList;
-
 begin
-    ReportMemoryLeaksOnShutdown := True;
+    ReportMemoryLeaksOnShutdown := False;
 
     Application.Initialize;
     //Application.MainFormOnTaskBar := True;
@@ -107,51 +105,31 @@ ShowWindow
  }
 
 
-  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TPasswordDlg, PasswordDlg);
-  Graphics.DefFontData.Name := 'Tahoma';
+    Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+    Application.CreateForm(TPasswordDlg, PasswordDlg);
+    Graphics.DefFontData.Name := 'Tahoma';
 
-        Application.Title := 'Nemp';
+    Application.Title := 'Nemp';
 
- { x := TStringlist.Create;
-  x.Add(Inttostr(Application.Handle))    ;
-  x.Add(IntToStr(Nemp_MainForm.dwTaskbarThumbnails1.TaskBarEntryHandle));
-  x.Add(IntToStr(Nemp_MainForm.handle));
-  x.SaveToFile('xxxxxxxx.txt');
-  x.Free;
+    Application.CreateForm(TFSplash, FSplash);
+    FSplash.Show;
+    FSplash.Update;
+    Nemp_MainForm.StuffToDoOnCreate;
 
- }
-  Application.CreateForm(TFSplash, FSplash);
+    Application.CreateForm(TPlaylistForm   , PlaylistForm   );
+    Application.CreateForm(TAuswahlForm    , AuswahlForm    );
+    Application.CreateForm(TMedienlisteForm, MedienlisteForm);
+    Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
 
-  FSplash := TFSplash.Create (Application);
+    Nemp_MainForm.StuffToDoAfterCreate ;
 
-        try
-          FSplash.Show;
-          FSplash.Update;
-          Nemp_MainForm.StuffToDoOnCreate;
+    if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
+    begin
+       Nemp_MainForm.Hide;
+       Application.ShowMainForm := False;
+       PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
+    end;
 
-          Application.CreateForm(TPlaylistForm   , PlaylistForm   );
-          Application.CreateForm(TAuswahlForm    , AuswahlForm    );
-          Application.CreateForm(TMedienlisteForm, MedienlisteForm);
-          Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
-
-         Nemp_MainForm.StuffToDoAfterCreate ;
-
-          if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
-          begin
-             Nemp_MainForm.Hide;
-             Application.ShowMainForm := False;
-             PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
-          end;
-
-
-          FSplash.Visible := False;
-        finally
-          //FreeAndNil(FSplash);
-        end;
-
-
-
-        Application.Run;
-
+    FSplash.Visible := False;
+    Application.Run;
 end.
