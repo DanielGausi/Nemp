@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-06-14 21:30\n"
-"PO-Revision-Date: 2010-06-14 21:34+0100\n"
+"PO-Revision-Date: 2010-06-16 19:35+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -6215,13 +6215,13 @@ msgstr "Software"
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..Caption
 #: OptionsComplete.dfm:4344
 msgid "Hibernate/standby"
-msgstr "Ruhemodus"
+msgstr "Ruhezustand"
 
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..LBlConst_ReInitPlayerEngine_Hint....Hint
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..cbReInitAfterSuspend....Hint
 #: OptionsComplete.dfm:4353
 msgid "Use this, if the playback don't work after hibernating the system."
-msgstr "Wenn die Wiedergabe nicht mehr funktioniert, nachdem das System aus dem Ruhemodus hochgefahren wurde."
+msgstr "Wenn die Wiedergabe nicht mehr funktioniert, nachdem das System aus dem Ruhezustand hochgefahren wurde."
 
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..LBlConst_ReInitPlayerEngine_Hint..Caption
 #: OptionsComplete.dfm:4354
@@ -6231,12 +6231,12 @@ msgstr "(auf einigen Systemen notwendig)"
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..cbPauseOnSuspend....Hint
 #: OptionsComplete.dfm:4363
 msgid "Stop the player when the system hibernates, so the playback is stopped when the PC is turned on again."
-msgstr "Den Player anhalten beim Wechsel in den Ruhemodus, damit die Wiedergabe angehalten ist, wenn der Rechner wieder hochfährt."
+msgstr "Den Player anhalten beim Wechsel in den Ruhezustand, damit die Wiedergabe angehalten ist, wenn der Rechner wieder hochfährt."
 
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..cbPauseOnSuspend..Caption
 #: OptionsComplete.dfm:4364
 msgid "Stop player when systems hibernates"
-msgstr "Player anhalten, wenn in den Ruhemodus gewechselt wird"
+msgstr "Player anhalten, wenn in den Ruhezustand gewechselt wird"
 
 #. OptionsCompleteForm..PageControl1..TabExtended0..GrpBox_Hibernate..cbReInitAfterSuspend..Caption
 #: OptionsComplete.dfm:4377
@@ -7717,7 +7717,7 @@ msgstr "Windows wird nun in den Energiesparmodus versetzt. Wenn sie den Computer
 #. Programmer's name for it: NempShutDown_Hibernate
 #: Nemp_RessourceStrings.pas:344
 msgid "Windows will hibernate now. When you switch on your computer, the current session will be restored."
-msgstr "Windows wird nun in den Ruhemodus versetzt. Wenn sie den Computer wieder einschalten, wird die aktuelle Sitzung wiederhergestellt"
+msgstr "Windows wird nun in den Ruhezustand versetzt. Wenn sie den Computer wieder einschalten, wird die aktuelle Sitzung wiederhergestellt"
 
 #. Programmer's name for it: NempShutDown_ShutDown
 #: Nemp_RessourceStrings.pas:345
@@ -7743,7 +7743,7 @@ msgstr "Windows wird nach Ende der Wiedergabeliste in den Energiesparmodus verse
 #. Programmer's name for it: NempShutDown_HibernateHint_AtEndOfPlaylist
 #: Nemp_RessourceStrings.pas:351
 msgid "Windows will hibernate at the end of the playlist."
-msgstr "Windows wird nach Ende der Wiedergabeliste in den Ruhemodus versetzt."
+msgstr "Windows wird nach Ende der Wiedergabeliste in den Ruhezustand versetzt."
 
 #. Programmer's name for it: NempShutDown_ShutDownHint_AtEndOfPlaylist
 #: Nemp_RessourceStrings.pas:352
@@ -7773,7 +7773,7 @@ msgstr "Windows wird in %s in den Energiesparmodus versetzt."
 #. Programmer's name for it: NempShutDown_HibernateHint
 #: Nemp_RessourceStrings.pas:359
 msgid "Windows will hibernate in %s."
-msgstr "Windows wird in %s in den Ruhemodus versetzt."
+msgstr "Windows wird in %s in den Ruhezustand versetzt."
 
 #. Programmer's name for it: NempShutDown_ShutDownHint
 #: Nemp_RessourceStrings.pas:360
