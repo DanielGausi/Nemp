@@ -2646,18 +2646,18 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 2
               Left = 8
               Top = 36
-              Width = 56
+              Width = 60
               Height = 13
-              Caption = 'LblBibAlbum'
+              Caption = '                    '
               ShowAccelChar = False
               OnClick = LblBibArtistClick
             end
             object LblBibArtist: TLabel
               Left = 8
               Top = 2
-              Width = 65
+              Width = 60
               Height = 13
-              Caption = 'LblBibArtist'
+              Caption = '                    '
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -2670,35 +2670,35 @@ object Nemp_MainForm: TNemp_MainForm
             object LblBibDuration: TLabel
               Left = 8
               Top = 104
-              Width = 68
+              Width = 60
               Height = 13
-              Caption = 'LblBibDuration'
+              Caption = '                    '
               ShowAccelChar = False
             end
             object LblBibGenre: TLabel
               Tag = 5
               Left = 8
               Top = 87
-              Width = 56
+              Width = 60
               Height = 13
-              Caption = 'LblBibGenre'
+              Caption = '                    '
               ShowAccelChar = False
               OnClick = LblBibArtistClick
             end
             object LblBibPlayCounter: TLabel
               Left = 7
               Top = 160
-              Width = 86
+              Width = 60
               Height = 13
-              Caption = 'LblBibPlayCounter'
+              Caption = '                    '
               ShowAccelChar = False
             end
             object LblBibQuality: TLabel
               Left = 8
               Top = 121
-              Width = 61
+              Width = 60
               Height = 13
-              Caption = 'LblBibQuality'
+              Caption = '                    '
               ShowAccelChar = False
             end
             object LblBibTags: TLabel
@@ -2707,7 +2707,7 @@ object Nemp_MainForm: TNemp_MainForm
               Width = 50
               Height = 59
               AutoSize = False
-              Caption = 'LblBibTags'
+              Caption = '                    '
               ShowAccelChar = False
               WordWrap = True
               OnClick = LblBibTagsClick
@@ -2716,9 +2716,9 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 1
               Left = 8
               Top = 19
-              Width = 9
+              Width = 60
               Height = 13
-              Caption = '...'
+              Caption = '                    '
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -2732,9 +2732,9 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 3
               Left = 8
               Top = 53
-              Width = 53
+              Width = 60
               Height = 13
-              Caption = 'LblBibTrack'
+              Caption = '                    '
               ShowAccelChar = False
               OnClick = LblBibArtistClick
             end
@@ -2742,9 +2742,9 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 4
               Left = 8
               Top = 70
-              Width = 49
+              Width = 60
               Height = 13
-              Caption = 'LblBibYear'
+              Caption = '                    '
               ShowAccelChar = False
               OnClick = LblBibArtistClick
             end
@@ -3949,7 +3949,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130044040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130054040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4514,7 +4514,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806480510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806580510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7278,7 +7278,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 576
     Top = 632
     Bitmap = {
-      494C010107002800B00110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800C00110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

@@ -54,7 +54,6 @@ type
   TExtendedControlForm = class(TNempForm)
     ContainerPanelExtendedControlsForm: TNempPanel;
     CloseImage: TSkinButton;
-    procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -78,6 +77,7 @@ type
   public
     { Public-Deklarationen }
     procedure SetPartySize(w,h: Integer);
+    procedure InitForm;
   end;
 
 var
@@ -110,7 +110,7 @@ begin
       NempPlayer.StopHeadset;
 end;
 
-procedure TExtendedControlForm.FormCreate(Sender: TObject);
+procedure TExtendedControlForm.InitForm;
 begin
   TranslateComponent (self);
   Top    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsTop;

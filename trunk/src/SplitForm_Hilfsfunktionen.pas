@@ -859,6 +859,7 @@ end;
 
 procedure UpdateSmallMainForm;
 var formregion,
+  formregion1: HRGN;
   xpbottom, xptop, xpleft, xpright: integer;
 begin
     with Nemp_MainForm do
@@ -1006,9 +1007,12 @@ begin
       PanelCoverBrowse.OnResize := Nil;
       // 1. Form: Größen setzen
 
-      Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
-      Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
 
+      if Tag in [0,1] then
+      begin
+          Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
+          Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
+      end;
 
       // 2. Sachenanzeigen und Aligns ggf. wieder umsetzen
       // 3. Positionen korrigieren
@@ -1179,11 +1183,14 @@ begin
           UpdateSmallMainForm;
       end;
 
-      FormPosAndSizeCorrect(Nemp_MainForm);
-      FormPosAndSizeCorrect(AuswahlForm);
-      FormPosAndSizeCorrect(PlaylistForm);
-      FormPosAndSizeCorrect(MedienlisteForm);
-      ReInitRelativePositions;
+      if Tag in [0,1] then
+      begin
+          FormPosAndSizeCorrect(Nemp_MainForm);
+          FormPosAndSizeCorrect(AuswahlForm);
+          FormPosAndSizeCorrect(PlaylistForm);
+          FormPosAndSizeCorrect(MedienlisteForm);
+          ReInitRelativePositions;
+      end;
 
       // This seems useless.
       // But the setter will call SetCustomregion, which seems to be
@@ -1216,16 +1223,28 @@ begin
     // teilweise auskommentiert für Windows 7
       if (AnzeigeMode = 0) AND (Tag in [0,1]) then
       begin
-
         SetWindowRgn( handle, 0, Not _IsThemeActive );
         InvalidateRect(handle, NIL, TRUE);
       end;
 
-      Tag := AnzeigeMode;
+
       SnapActive := True;
+
+      if Tag = -1 then
+      begin
+          Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
+          Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
+
+          FormPosAndSizeCorrect(Nemp_MainForm);
+          FormPosAndSizeCorrect(AuswahlForm);
+          FormPosAndSizeCorrect(PlaylistForm);
+          FormPosAndSizeCorrect(MedienlisteForm);
+          ReInitRelativePositions;
+      end;
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
 
+      Tag := AnzeigeMode;
   end;
 end;
 

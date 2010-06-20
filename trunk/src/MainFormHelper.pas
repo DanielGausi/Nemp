@@ -88,8 +88,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
     procedure SwitchBrowsePanel(NewMode: Integer);
 
-    procedure BackupComboboxes;
-    procedure RestoreComboboxes;
+//    procedure BackupComboboxes;    // We dont have any comboboxes on the mainform
+//    procedure RestoreComboboxes;   // except the genre-box
     procedure ReTranslateNemp(LanguageCode: String);
 
     procedure ClearShortCuts;
@@ -598,7 +598,6 @@ begin
         MedienListeStatusLBL.Caption := Text;
         MedienListeStatusLBL.Update;
         LangeAktionWeitermachen := True;
-        AllowClose := False;
 
         // Panel Suche//Auswahl disablen
         TabBtn_CoverFlow.Enabled := False;
@@ -650,7 +649,6 @@ begin
         MM_ML_SortBy.Enabled:=True;
         PM_ML_SortBy.Enabled:=True;
         LangeAktionWeitermachen := False; // Suche fertig
-        AllowClose:= True;
 
         // Panel Suche//Auswahl enablen
         TabBtn_CoverFlow.Enabled := True;
@@ -926,10 +924,12 @@ begin
     end;
 end;
 
+(*
 procedure BackupComboboxes;
 var i: Integer;
 begin
     with Nemp_MainForm do
+        EdtBibGenre.Tag := EdtBibGenre.ItemIndex
     for i := 0 to ComponentCount - 1 do
       if (Components[i] is TComboBox) then
         Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
@@ -947,8 +947,8 @@ begin
     // We need this tag for Editing purposes!
     EdtBibGenre.Tag := 5;
   end;
-
 end;
+*)
 
 procedure ReTranslateNemp(LanguageCode: String);
 var i, c: Integer;
@@ -957,7 +957,7 @@ begin
     begin
         Uselanguage(LanguageCode);
 
-        BackupComboboxes;
+        //BackupComboboxes;
         ReTranslateComponent (Nemp_MainForm);
         NempPlayer.RefreshPlayingTitel;
 
@@ -989,7 +989,7 @@ begin
         if BirthdayTimer.Enabled then BirthdayTimerTimer(Nil);
 
 
-        RestoreComboboxes;
+        //RestoreComboboxes;
 
         ReTranslateComponent (PlaylistForm    );
         ReTranslateComponent (AuswahlForm     );

@@ -81,7 +81,8 @@ uses
   PartymodePassword in 'PartymodePassword.pas' {PasswordDlg},
   Lyrics in 'Lyrics.pas',
   HtmlHelper in 'HtmlHelper.pas',
-  OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm};
+  OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm},
+  CreateHelper in 'CreateHelper.pas';
 
 //,  classes;
 
@@ -106,22 +107,26 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-    Application.CreateForm(TPasswordDlg, PasswordDlg);
     Graphics.DefFontData.Name := 'Tahoma';
 
-    Application.Title := 'Nemp';
+    Application.Title := NEMP_NAME_TASK;
+    Application.Name  := NEMP_NAME;
+
+    // Show Mainform, but beyond all visible area
+    Nemp_MainForm.Top := 10000;
+    Nemp_MainForm.Visible := True;
+    Nemp_MainForm.Top := 10000;
 
     Application.CreateForm(TFSplash, FSplash);
     FSplash.Show;
     FSplash.Update;
-    Nemp_MainForm.StuffToDoOnCreate;
 
     Application.CreateForm(TPlaylistForm   , PlaylistForm   );
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
 
-    Nemp_MainForm.StuffToDoAfterCreate ;
+    StuffToDoAfterCreate ;
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin

@@ -1592,6 +1592,11 @@ begin
       PlaylistVST.Header.Options := PlaylistVST.Header.Options - [hoOwnerDraw];
       VST.Header.Options := VST.Header.Options - [hoOwnerDraw];
 
+      ArtistsVST.SelectionBlendFactor  := 75 ;
+      AlbenVST.SelectionBlendFactor    := 75 ;
+      PlaylistVST.SelectionBlendFactor := 75 ;
+      VST.SelectionBlendFactor         := 75 ;
+
       TagCustomizer.UseBackGround    := False;
       TagCustomizer.BackgroundColor  := clWindow;
       TagCustomizer.FontColor        := clWindowText;
