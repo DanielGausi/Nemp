@@ -867,9 +867,6 @@ type
     procedure VSTChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure FormShow(Sender: TObject);
 
-    Procedure StuffToDoOnCreate;
-    Procedure StuffToDoAfterCreate;
-
     function ValidAudioFile(filename: UnicodeString; JustPlay: Boolean): boolean;
     procedure PM_ML_GetLyricsClick(Sender: TObject);
 
@@ -1393,8 +1390,7 @@ type
     procedure NewLyricMemoWndProc(var Message: TMessage);
     procedure WMStartEditing(var Msg: TMessage); Message WM_STARTEDITING;
 
-    procedure ProcessCommandline(lpData: Pointer; StartPlay: Boolean) ; overload;
-    procedure ProcessCommandline(filename: UnicodeString; StartPlay: Boolean; Enqueue: Boolean); overload;
+
 
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
 
@@ -1408,7 +1404,6 @@ type
     NewDrivesNotificationCount: Integer;
 
     WebRadioInsertMode: Integer;
-    AllowClose: boolean;
 
     { Public declarations }
     DoHookInstall: Boolean;
@@ -1468,11 +1463,13 @@ type
     procedure MinimizeNemp(Sender: TObject);
     procedure DeactivateNemp(Sender: TObject);
     procedure RestoreNemp;
+    procedure NotifyDeskband(aMsg: Integer);
+    procedure ProcessCommandline(lpData: Pointer; StartPlay: Boolean) ; overload;
+    procedure ProcessCommandline(filename: UnicodeString; StartPlay: Boolean; Enqueue: Boolean); overload;
   protected
     Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
     procedure MediaKey (Var aMSG: tMessage); message WM_APPCOMMAND;
 
-    procedure NotifyDeskband(aMsg: Integer);
     Procedure NempAPI_Commands(Var aMSG: tMessage); message WM_COMMAND;
     Procedure NempAPI_UserCommands(Var aMSG: tMessage); message WM_USER;
 
@@ -1542,7 +1539,7 @@ uses   Splash, MultimediaKeys,
   BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
-  TagHelper, PartymodePassword;
+  TagHelper, PartymodePassword, CreateHelper;
 
 
 {$R *.dfm}
@@ -1566,571 +1563,6 @@ begin
        on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
     end;
     end;
-end;
-
-Procedure TNemp_MainForm.StuffToDoOnCreate;
-var i, s, section:integer;
-    ini:TMemIniFile;
-    DefaultEQ: integer;
-    specbmp:TBitmap;
-    SR: TSearchrec;
-    tmpLastExitOK: boolean;
-    maxFont: integer;
-    aMenuItem: TMenuItem;
-    tmpwstr: UnicodeString;
-    tmpstr: String;
-begin
-    BackUpComboboxes;
-    TranslateComponent (self);
-    RestoreComboboxes;
-    NempIsClosing := False;
-
-    NewDrivesNotificationCount := 0;
-    ReadyForGetFileApiCommands := False;
-    Randomize;
-    NempRegionsDistance.docked := true;
-    MinimizedIndicator := False;
-    OldScrollbarWindowProc := CoverScrollbar.WindowProc;
-    OldLyricMemoWindowProc := LyricsMemo.WindowProc;
-
-    CoverScrollbar.WindowProc :=  NewScrollBarWndProc;
-
-    LyricsMemo.WindowProc := NewLyricMemoWndProc;
-    AllowClose := True;
-    WebRadioInsertMode := PLAYER_PLAY_DEFAULT;
-        // Diverse Exceptions abschalten
-       SetErrorMode(SEM_FAILCRITICALERRORS); // e.g. Dont display "Insert Disk"
-       Saved8087CW := Default8087CW;
-       Set8087CW($133f);
-    Decimalseparator := '.';
-    DragAcceptFiles (Handle, True);
-    LangeAktionWeitermachen := False;
-    VST.NodeDataSize := SizeOf(TTreeData);
-
-    ArtistsVST.NodeDataSize := SizeOf(TStringTreeData);
-    ALbenVST.NodeDataSize := SizeOf(TStringTreeData);
-    PlaylistVST.NodeDataSize := SizeOf(TTreeData);
-    Application.Title := NEMP_NAME_TASK;
-
-    Application.Name := NEMP_NAME;
-    Application.Name := NEMP_NAME;
-
-    // "OnMinimize"-Event ändern
-    Application.OnMinimize := MinimizeNemp;
-    Application.OnDeactivate := DeactivateNemp;
-
-    AlphaBlendBMP := TBitmap.Create;
-
-    ST_Playlist := TSearchTool.Create;
-    ST_Medienliste := TSearchTool.Create;
-    with ST_Medienliste do
-    begin
-      ID := ST_ID_Medialist;
-      Recurse := True;
-      //Zielhandle der Messages festlegen
-      MHandle     := Handle;
-      //Art der Message bei Benachrichtigungen über den aktuellen Ordner, der durchsucht wird, ändern
-      MCurrentDir := mkNoneMessage; //brauche ich nicht abfragen, da ich ein Timer verwende ;)
-      MFound := mkSendMessage;
-    end;
-    with ST_Playlist do
-    begin
-      ID := ST_ID_Playlist;
-      Recurse := True;
-      MHandle     := Handle;
-      MCurrentDir := mkNoneMessage;
-      MFound := mkSendMessage;
-    end;
-
-    if Assigned(FSplash) then
-    begin
-      FSplash.StatusLBL.Caption := (SplashScreen_Loading);
-      FSplash.Update;
-    end;
-
-    // Diverse Controls richtig positionieren
-    GRPBoxCover.Parent := AudioPanel;
-    GRPBoxEffekte.Parent := AudioPanel;
-    GRPBoxEqualizer.Parent := AudioPanel;
-    GRPBoxLyrics.Parent := AudioPanel;
-    GRPBOXHeadset.Parent := AudioPanel;
-    GRPBoxCover      .Align := alLeft;
-    GRPBoxEffekte    .Align := alLeft;
-    GRPBoxEqualizer  .Align := alLeft;
-    GRPBoxLyrics     .Align := alLeft;
-    GRPBOXHeadset    .Align := alLeft;
-    GRPBoxCover      .Width := 191;
-    GRPBoxEffekte    .Width := 191;
-    GRPBoxEqualizer  .Width := 191;
-    GRPBoxLyrics     .Width := 191;
-    GRPBOXHeadset    .Width := 191;
-
-    GRPBoxLyrics.Visible := False;
-    GRPBoxEffekte.Visible := False;
-    GRPBoxEqualizer.Visible := False;
-    GRPBOXHeadset.Visible := False;
-    // Neu: August 2007
-    TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
-
-    GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
-    GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
-
-    ArtistsVST.SelectionBlendFactor := 75;
-    AlbenVST.SelectionBlendFactor := 75;
-    VST.SelectionBlendFactor := 75;
-    PlaylistVST.SelectionBlendFactor := 75;
-
-    // EQ-Buttons-Array befüllen
-    EqualizerButtons[0] := EqualizerButton1;
-    EqualizerButtons[1] := EqualizerButton2;
-    EqualizerButtons[2] := EqualizerButton3;
-    EqualizerButtons[3] := EqualizerButton4;
-    EqualizerButtons[4] := EqualizerButton5;
-    EqualizerButtons[5] := EqualizerButton6;
-    EqualizerButtons[6] := EqualizerButton7;
-    EqualizerButtons[7] := EqualizerButton8;
-    EqualizerButtons[8] := EqualizerButton9;
-    EqualizerButtons[9] := EqualizerButton10;
-
-    DragDropList := TStringList.Create;
-
-    //--------------------------------------------------------------------
-    // neues System - Unterscheidung nach Order
-    if IsExeInProgramSubDir then
-    begin
-      // Nemp liegt im System-Programmverzeichnis
-      SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
-      //tmpCoverPath := SavePath + 'Cover\';
-      try
-          ForceDirectories(SavePath);
-      except
-          SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
-          //unsinn tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Cover\';
-      end;
-
-    end else
-    begin
-      // Nemp liegt woanders
-      SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
-      //tmpCoverPath := ExtractFilePath(ParamStr(0)) + 'Data\Cover\';
-    end;
-
-    // Hook-Funktionen initialisieren
-    lib := LoadLibraryW(PWideChar(ExtractFilePath(Paramstr(0))+'KBHook.dll'));
-    if lib <> INVALID_HANDLE_VALUE then
-    begin
-      InstallHook := GetProcAddress(lib, 'InstallHook');
-      UnInstallHook := GetProcAddress(lib, 'UninstallHook');
-    end;
-
-    NempPlayer := TNempPlayer.Create(Handle);
-    NempPlayer.Statusproc := StatusProc;
-
-    NempPlaylist := TNempPlaylist.Create;
-    NempPlaylist.VST := PlaylistVST;
-    NempPlaylist.Player := NempPlayer;
-    NempPlaylist.MainWindowHandle := Handle;
-
-    BibRatingHelper := TRatingHelper.Create;
-    MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
-    MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
-    MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
-    //MedienBib.TagCloud.CloudPainter.Canvas := PanelTagCloudBrowse.Canvas;
-    //MedienBib.MainWindowHandle := Handle;
-    MedienBib.SavePath := SavePath;
-    MedienBib.CoverSavePath := SavePath + 'Cover\';
-
-    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-    MedienBib.NewCoverFlow.CoverSavePath := MedienBib.CoverSavePath;
-
-            // needed for ClassicFlow
-            MedienBib.NewCoverFlow.MainImage := IMGMedienBibCover;
-            MedienBib.NewCoverFlow.ScrollImage := ImgScrollCover;
-
-            // Needed for FlyingCow
-            MedienBib.NewCoverFlow.Window := PanelCoverBrowse.Handle ;
-            MedienBib.NewCoverFlow.events_window := Self.Handle;
-
-    try
-      ForceDirectories(MedienBib.CoverSavePath);
-    except
-      if not DirectoryExists(MedienBib.CoverSavePath) then
-        MedienBib.CoverSavePath := MedienBib.SavePath;
-    end;
-
-    // Skin-System initialisieren
-    NempSkin := TNempSkin.create;
-    PlayListSkinImageList := TImageList.Create(Nemp_MainForm);
-    PlayListSkinImageList.Height := 14;
-    PlayListSkinImageList.Width := 14;
-
-    if Assigned(FSplash) then
-    begin
-      FSplash.StatusLBL.Caption := (SplashScreen_LoadingPreferences);
-      FSplash.Update;
-    end;
-
-    ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-    try
-        ini.Encoding := TEncoding.UTF8;
-
-        tmpLastExitOK := ini.ReadBool('Allgemein', 'LastExitOK', True);
-        ReadNempOptions(ini, NempOptions);
-        if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
-          Uselanguage(NempOptions.Language);
-
-        //Player-Einstellungen lesen
-        NempPlayer.LoadFromIni(Ini);
-        //Player initialisieren, Load Plugins.
-        NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
-        // VCL an den Player anpassen
-        PlaylistDateienOpenDialog.Filter := tmpwstr;
-        CorrectVolButton;
-        CorrectHallButton;
-        CorrectEchoButtons;
-        CorrectSpeedButton;
-        for i := 0 to 9 do CorrectEQButton(i);
-        // TabStops setzen
-        SetTabStopsPlayer;
-        SetTabStopsTabs;
-
-        // Hier auch Scrobbler.Checked setzen
-        MM_T_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
-        PM_P_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
-
-        //Playlist-Einstellungen laden
-        NempPlaylist.LoadFromIni(Ini);
-        PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
-        // MedienBib-Einstellungen laden
-        MedienBib.LoadFromIni(Ini);
-
-
-        CB_MedienBibGlobalQuickSearch.OnClick := Nil;
-        CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;     //Quicksearch (library)
-
-        EditFastSearch.Text := MainForm_GlobalQuickSearch;
-
-        VST.ShowHint := MedienBib.ShowHintsInMedialist;
-
-        UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
-        SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp3');
-
-        for i:=0 to Spaltenzahl-1 do
-        begin
-            s := ini.ReadInteger('Spalten','Inhalt' + IntToStr(i), DefaultSpalten[i].Inhalt);
-            VST.Header.Columns[i].Text := _(DefaultSpalten[s].Bezeichnung);
-            VST.Header.Columns[i].Tag := s;
-
-            if ini.readbool('Spalten','visible' + IntToStr(i), DefaultSpalten[i].visible) then
-                VST.Header.Columns[i].Options := VST.Header.Columns[i].Options + [coVisible]
-            else
-                VST.Header.Columns[i].Options := VST.Header.Columns[i].Options - [coVisible];
-
-            VST.Header.Columns[i].Width := ini.ReadInteger('Spalten','Breite' + IntToStr(i), DefaultSpalten[i].width);
-
-            aMenuItem := TMenuItem.Create(Nemp_MainForm);
-            aMenuItem.AutoHotkeys := maManual;
-            aMenuItem.AutoCheck := True;
-            aMenuItem.Tag := i;
-            aMenuItem.OnClick := VST_ColumnPopupOnClick;
-            aMenuItem.Caption := _(DefaultSpalten[s].Bezeichnung);
-            VST_ColumnPopup.Items.Insert(i, aMenuItem);
-        end;
-
-        ini.ReadInteger('Spalten','BreiteCover', 250);
-
-        // Initialisierung des Hooks
-        if lib <> INVALID_HANDLE_VALUE then
-        begin
-          SchonMalEineMediaTasteGedrueckt := ini.ReadBool('Multimediatasten','BereitsGedrueckt',False);
-          DoHookInstall := ini.ReadBool('Multimediatasten','HookInstall',False);
-          if DoHookInstall then
-          begin
-            InstallHook(Nemp_MainForm.Handle);
-            HookIsInstalled := True;
-          end else
-          begin
-            HookIsInstalled := False;
-          end;
-          MediaCount := 0;
-          MediaTest := False;
-        end
-        else begin
-          SchonMalEineMediaTasteGedrueckt := True;
-          DoHookInstall := False;
-        end;
-
-        NempUpdater := TNempUpdater.Create(Handle);
-        NempUpdater.LoadFromIni(Ini);
-
-        NempSkin.NempPartyMode.LoadFromIni(ini);
-
-        // AnzeigeModus (Das "i" in der NempFormAufteilung)
-        AnzeigeMode := (Ini.ReadInteger('Fenster', 'Anzeigemode', 0)) Mod 2; // 0 oder 1, was anderes gibts nicht mehr.
-
-        Tag := -1;
-
-        // Jetzt: False reinschreiben
-        // Das wird erst am Ende wieder "gut gemacht" ;-)
-        ini.WriteBool('Allgemein', 'LastExitOK', False);
-        ini.Encoding := TEncoding.UTF8;
-        try
-            Ini.UpdateFile;
-        except
-            // Silent Exception
-        end;
-    finally
-        ini.Free
-    end;
-
-    Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
-    Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
-    Height := NempOptions.NempFormAufteilung[AnzeigeMode].FormHeight;
-    Width := NempOptions.NempFormAufteilung[AnzeigeMode].FormWidth;
-
-    // Optionen verarbeiten, Variablen entsprechend setzen
-    PM_P_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
-    MM_O_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;
-
-    AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
-
-    // Menüeinträge checken//unchecken
-    PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-    PM_P_ViewSeparateWindows_Playlist.Checked  := NempOptions.NempEinzelFormOptions.PlaylistVisible;
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-    PM_P_ViewSeparateWindows_Browse.Checked    := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-
-    MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-    MM_O_ViewSeparateWindows_Playlist.Checked  := NempOptions.NempEinzelFormOptions.PlaylistVisible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-    MM_O_ViewSeparateWindows_Browse.Checked    := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-
-    if NempOptions.FullRowSelect then
-      VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
-    else
-      VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions - [toFullRowSelect];
-
-    if NempOptions.EditOnClick then
-      VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions + [toEditOnClick]
-    else
-      VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
-
-
-    ArtistsVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
-    AlbenVST.DefaultNodeHeight   := NempOptions.ArtistAlbenRowHeight;
-    ArtistsVST.Font.Size := NempOptions.ArtistAlbenFontSize;
-    AlbenVST.Font.Size   := NempOptions.ArtistAlbenFontSize;
-    VST.DefaultNodeHeight         := NempOptions.RowHeight;
-    PlaylistVST.DefaultNodeHeight := NempOptions.RowHeight;
-    if NempOptions.ChangeFontSizeOnLength then
-    begin
-        maxFont := NempOptions.FontSize[1];
-        if NempOptions.FontSize[2] > maxFont then maxFont := NempOptions.FontSize[2];
-        if NempOptions.FontSize[3] > maxFont then maxFont := NempOptions.FontSize[3];
-        if NempOptions.FontSize[4] > maxFont then maxFont := NempOptions.FontSize[4];
-        if NempOptions.FontSize[5] > maxFont then maxFont := NempOptions.FontSize[5];
-    end
-    else
-      maxFont := NempOptions.DefaultFontSize;
-
-    PlaylistVST.Canvas.Font.Size := maxFont;
-    PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
-    VST.Font.Size:=NempOptions.DefaultFontSize;
-    PlaylistVST.Font.Size:=NempOptions.DefaultFontSize;
-    if Screen.Fonts.IndexOf(NempOptions.FontNameVBR) = -1 then
-      NempOptions.FontNameVBR := VST.Font.Name;
-    if Screen.Fonts.IndexOf(NempOptions.FontNameCBR) = -1 then
-      NempOptions.FontNameCBR := VST.Font.Name;
-    case NempPlaylist.WiedergabeMode of
-        0: begin
-              RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatAll);
-        end;
-        1: begin
-              RandomBtn.Hint := (MainForm_RepeatBtnHint_RepeatTitle);
-        end;
-        2: begin
-              RandomBtn.Hint := (MainForm_RepeatBtnHint_RandomMode);
-        end
-        else begin
-              RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
-        end;
-    end;
-
-    BassTimer.Interval := NempPlayer.VisualizationInterval;
-    AutoSavePlaylistTimer.Enabled := NempPlaylist.AutoSave;
-    AutoSavePlaylistTimer.Interval := 5 * 60000;
-
-    if NempOptions.RegisterHotKeys then
-        InstallHotkeys (SavePath, Handle);
-
-    ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
-    try
-        InitEqualizerMenuFormIni(ini);
-        Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
-
-    finally
-        ini.Free
-    end;
-
-    SetRecentPlaylistsMenuItems;
-
-    if (NOT tmpLastExitOK) AND
-       ( FileExists(SavePath + 'temp.npl') or
-         FileExists(SavePath + 'temp.m3u8') or
-         FileExists(SavePath + 'temp.m3u'))
-    then begin
-            if Assigned(FSplash) then
-            begin
-                FSplash.StatusLBL.Caption := (SplashScreen_Loadingplaylist);
-                FSplash.Update;
-            end;
-            if FileExists(SavePath + 'temp.npl') then
-                NempPlaylist.LoadFromFile(SavePath + 'temp.npl')
-            else
-                if FileExists(SavePath + 'temp.m3u8') then
-                    NempPlaylist.LoadFromFile(SavePath + 'temp.m3u8')
-                else
-                    NempPlaylist.LoadFromFile(SavePath + 'temp.m3u');
-    end else // backup existiert nicht oder tmplastexit war False
-    begin
-
-        if   (FileExists(SavePath +  NEMP_NAME + '.npl')
-           or FileExists(SavePath +  NEMP_NAME + '.m3u8')
-           or FileExists(SavePath +  NEMP_NAME + '.m3u') ) then
-        begin
-            if Assigned(FSplash) then
-            begin
-                FSplash.StatusLBL.Caption := (SplashScreen_Loadingplaylist);
-                FSplash.Update;
-            end;
-            if FileExists(SavePath +  NEMP_NAME + '.npl') then
-                NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.npl')
-            else
-                if FileExists(SavePath +  NEMP_NAME + '.m3u8') then
-                    NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.m3u8')
-                else
-                    NempPlaylist.LoadFromFile(SavePath +  NEMP_NAME + '.m3u');
-        end;
-    end;
-
-    VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
-
-    DragSource := DS_EXTERN;
-
-    Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
-    Spectrum.MainImage := PaintFrame;
-    Spectrum.TextImage := TextAnzeigeImage;
-    Spectrum.TimeImage := TimePaintbox;
-    Spectrum.StarImage := RatingImage;
-    Spectrum.Mode := 1;
-    //Spectrum.Height := PaintFrame.Height;
-    Spectrum.LineFallOff := 7;
-    Spectrum.PeakFallOff := 1;
-    Spectrum.Pen := clActiveCaption;
-    Spectrum.Peak := clBackground;
-    Spectrum.BackColor := clBtnFace;
-    Spectrum.TimebackColor := Spectrum.BackColor;
-    Spectrum.TitelbackColor := Spectrum.BackColor;
-    Spectrum.TextColor := clWindowText;
-    Spectrum.TextPosY := 0;
-    Spectrum.TextPosX := 0;
-    Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
-
-
-    // Ggf. Tray-Icon erzeugen und das erzeugen in TrayIconAdded merken
-    if NempOptions.NempWindowView in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
-      NempTrayIcon.Visible := True
-    else
-      NempTrayIcon.Visible := False;
-
-    NempWindowDefault := GetWindowLong(Application.Handle, GWL_EXSTYLE);
-    if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
-    begin
-        ShowWindow( Application.Handle, SW_HIDE );
-        SetWindowLong( Application.Handle, GWL_EXSTYLE,
-                 GetWindowLong(Application.Handle, GWL_EXSTYLE)
-                 or WS_EX_TOOLWINDOW
-                 and (not WS_EX_APPWINDOW));
-        //ShowWindow( Application.Handle, SW_SHOW );
-    end;
-
-
-    if Assigned(FSplash) then
-    begin
-      FSplash.StatusLBL.Caption := (SplashScreen_SearchSkins);
-      FSplash.Update;
-    end;
-    // Skin-MenuItems setzen
-    if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
-    repeat
-      if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-      begin
-        tmpstr :=  StringReplace('<private> ' + Sr.Name,'&','&&',[rfReplaceAll]);
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
-        PM_P_Skins.Add(aMenuItem);
-
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
-        MM_O_Skins.Add(aMenuItem);
-      end;
-    until FindNext(SR)<>0;
-    FindClose(SR);
-
-    if (FindFirst(ExtractFilePath(Paramstr(0)) + 'Skins\' +'*',faDirectory,SR)=0) then
-    repeat
-      if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-      begin
-        tmpstr :=  StringReplace('<public> ' + Sr.Name,'&','&&',[rfReplaceAll]);
-
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
-        PM_P_Skins.Add(aMenuItem);
-
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := SkinAn1Click;
-        aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
-        MM_O_Skins.Add(aMenuItem);
-      end;
-    until FindNext(SR)<>0;
-    FindClose(SR);
-
-    // installierte Sprachen suchen
-    LanguageList := TStringlist.Create;
-    DefaultInstance.GetListOfLanguages ('default',LanguageList);
-    for i := 0 to LanguageList.Count - 1 do
-    begin
-        tmpstr := getlanguagename(LanguageList[i]);
-
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := ChangeLanguage;
-        if  tmpstr <> '' then
-          aMenuItem.Caption := tmpstr
-        else
-          aMenuItem.Caption := '(?)';
-        aMenuItem.Tag := i;
-        MM_O_Languages.Add(aMenuItem);
-
-        aMenuItem := TMenuItem.Create(Nemp_MainForm);
-        aMenuItem.AutoHotkeys := maManual;
-        aMenuItem.OnClick := ChangeLanguage;
-        if  tmpstr <> '' then
-          aMenuItem.Caption := tmpstr
-        else
-          aMenuItem.Caption := '(?)';
-        aMenuItem.Tag := i;
-        PM_P_Languages.Add(aMenuItem);
-    end;
-  Spectrum.DrawClear;
-  NewPlayerPanel.DoubleBuffered := True;
 end;
 
 
@@ -2277,40 +1709,151 @@ end;
 
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 begin
+    TranslateComponent (self);
+    Randomize;
+    // Diverse Exceptions abschalten
+    SetErrorMode(SEM_FAILCRITICALERRORS); // e.g. Dont display "Insert Disk"
+    Saved8087CW := Default8087CW;
+    Set8087CW($133f);
 
-  CloudViewer := TCloudViewer.Create(self);
-  CloudViewer.Parent := PanelTagCloudBrowse;
-  CloudViewer.Name := 'CloudViewer';
+    DragAcceptFiles (Handle, True);
+    DragSource := DS_EXTERN;
 
+    NewDrivesNotificationCount := 0;
+    MediaCount                 := 0;
+    MediaTest                  := False;
+    NempIsClosing              := False;
+    ReadyForGetFileApiCommands := False;
+    LangeAktionWeitermachen    := False;
+    NempRegionsDistance.Docked := True;
+    MinimizedIndicator         := False;
+    Decimalseparator := '.';
 
-  CloudViewer.Align := alClient;
-  CloudViewer.TabStop := True;
+    OldScrollbarWindowProc    := CoverScrollbar.WindowProc;
+    CoverScrollbar.WindowProc := NewScrollBarWndProc;
+    OldLyricMemoWindowProc    := LyricsMemo.WindowProc;
+    LyricsMemo.WindowProc     := NewLyricMemoWndProc;
+    // "OnMinimize"-Event ändern
+    Application.OnMinimize    := MinimizeNemp;
+    Application.OnDeactivate  := DeactivateNemp;
 
-  CloudViewer.OnKeypress := CloudTestKey;
-  CloudViewer.OnKeyDown := CloudTestKeyDown;
-  CloudViewer.OnMouseMove := PanelTagCloudBrowseMouseMove;
-  CloudViewer.OnClick := PanelTagCloudBrowseClick;
-  CloudViewer.OnDblClick := PanelTagCloudBrowseDblClick;
-  CloudViewer.OnMouseDown := PanelTagCloudBrowseMouseDown;
-  CloudViewer.OnMouseUp := PanelTagCloudBrowseMouseUp;
+    WebRadioInsertMode := PLAYER_PLAY_DEFAULT;
 
-  CloudViewer.OnResize := PanelTagCloudBrowseResize;
-  CloudViewer.OnPaint := CloudPaint;
-  CloudViewer.OnAfterPaint := CloudAfterPaint;
+    VST.NodeDataSize         := SizeOf(TTreeData);
+    ArtistsVST.NodeDataSize  := SizeOf(TStringTreeData);
+    ALbenVST.NodeDataSize    := SizeOf(TStringTreeData);
+    PlaylistVST.NodeDataSize := SizeOf(TTreeData);
 
-  CloudViewer.PopupMenu := Medialist_PopupMenu;
+    AlphaBlendBMP := TBitmap.Create;
 
+    // Create FileSearcher
+    ST_Playlist := TSearchTool.Create;
+    ST_Medienliste := TSearchTool.Create;
+    with ST_Medienliste do
+    begin
+        ID      := ST_ID_Medialist;
+        Recurse := True;
+        MHandle := Handle;
+        MCurrentDir := mkNoneMessage;
+        MFound      := mkSendMessage;
+    end;
+    with ST_Playlist do
+    begin
+        ID      := ST_ID_Playlist;
+        Recurse := True;
+        MHandle := Handle;
+        MCurrentDir := mkNoneMessage;
+        MFound      := mkSendMessage;
+    end;
 
-  LblBibArtist     .Caption := '';
-  LblBibAlbum      .Caption := '';
-  LblBibTitle      .Caption := '';
-  LblBibTrack      .Caption := '';
-  LblBibYear       .Caption := '';
-  LblBibGenre      .Caption := '';
-  LblBibDuration   .Caption := '';
-  LblBibQuality    .Caption := '';
-  LblBibPlayCounter.Caption := '';
-  LblBibTags       .Caption := '';
+    DragDropList := TStringList.Create;
+
+    // Get Savepath for settings
+    if IsExeInProgramSubDir then
+    begin
+        // Nemp liegt im System-Programmverzeichnis
+        SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
+        try
+            ForceDirectories(SavePath);
+        except
+            SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+        end;
+    end else
+    begin
+        // Nemp liegt woanders
+        SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+    end;
+
+    // Create additional controls
+    CloudViewer           := TCloudViewer.Create(self);
+    CloudViewer.Parent    := PanelTagCloudBrowse;
+    CloudViewer.Name      := 'CloudViewer';
+    CloudViewer.Align     := alClient;
+    CloudViewer.TabStop   := True;
+    CloudViewer.PopupMenu := Medialist_PopupMenu;
+    CloudViewer.OnKeypress   := CloudTestKey;
+    CloudViewer.OnKeyDown    := CloudTestKeyDown;
+    CloudViewer.OnMouseMove  := PanelTagCloudBrowseMouseMove;
+    CloudViewer.OnClick      := PanelTagCloudBrowseClick;
+    CloudViewer.OnDblClick   := PanelTagCloudBrowseDblClick;
+    CloudViewer.OnMouseDown  := PanelTagCloudBrowseMouseDown;
+    CloudViewer.OnMouseUp    := PanelTagCloudBrowseMouseUp;
+    CloudViewer.OnResize     := PanelTagCloudBrowseResize;
+    CloudViewer.OnPaint      := CloudPaint;
+    CloudViewer.OnAfterPaint := CloudAfterPaint;
+    NewPlayerPanel.DoubleBuffered := True;
+
+    // Create Player
+    NempPlayer            := TNempPlayer.Create(Handle);
+    NempPlayer.Statusproc := StatusProc;
+    // Create Playlist
+    NempPlaylist        := TNempPlaylist.Create;
+    NempPlaylist.VST    := PlaylistVST;
+    NempPlaylist.Player := NempPlayer;
+    NempPlaylist.MainWindowHandle := Handle;
+
+    BibRatingHelper := TRatingHelper.Create;
+    // Create Medialibrary
+    MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
+    MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
+    MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
+    MedienBib.SavePath := SavePath;
+    MedienBib.CoverSavePath := SavePath + 'Cover\';
+    MedienBib.NewCoverFlow.CoverSavePath := MedienBib.CoverSavePath;
+    // needed for ClassicFlow
+    MedienBib.NewCoverFlow.MainImage := IMGMedienBibCover;
+    MedienBib.NewCoverFlow.ScrollImage := ImgScrollCover;
+    // Needed for FlyingCow
+    MedienBib.NewCoverFlow.Window := PanelCoverBrowse.Handle ;
+    MedienBib.NewCoverFlow.events_window := Self.Handle;
+    try
+        ForceDirectories(MedienBib.CoverSavePath);
+    except
+        if not DirectoryExists(MedienBib.CoverSavePath) then
+            MedienBib.CoverSavePath := MedienBib.SavePath;
+    end;
+
+    // Create Skin-System
+    NempSkin := TNempSkin.create;
+    PlayListSkinImageList := TImageList.Create(Nemp_MainForm);
+    PlayListSkinImageList.Height := 14;
+    PlayListSkinImageList.Width := 14;
+
+    // Create Updater
+    NempUpdater := TNempUpdater.Create(Handle);
+
+    // create WebServer
+    NempWebServer := TNempWebServer.Create(Nemp_MainForm.Handle);
+    NempWebServer.SavePath := SavePath;
+    NempWebServer.CoverSavePath := MedienBib.CoverSavePath;
+
+    // create Spectrum
+    Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
+    Spectrum.MainImage := PaintFrame;
+    Spectrum.TextImage := TextAnzeigeImage;
+    Spectrum.TimeImage := TimePaintbox;
+    Spectrum.StarImage := RatingImage;
+
 end;
 
 procedure TNemp_MainForm.FormShow(Sender: TObject);
@@ -2319,155 +1862,6 @@ begin
   // Nothing to do here. Will be done in nemp.dpr
   if assigned(FSplash) then
       FSplash.Close;
-end;
-
-
-
-Procedure TNemp_MainForm.StuffToDoAfterCreate;
-var
-  tmpstr: UnicodeString;
-begin
-
-  if NempOptions.ShowDeskbandOnStart then
-  begin
-    NotifyDeskband(NempDeskbandActivateMessage);
-  end;
-
-  if Useskin then
-  begin
-    tmpstr := StringReplace(SkinName,
-              '<public> ', ExtractFilePath(Paramstr(0)) + 'Skins\', []);
-    tmpstr := StringReplace(tmpstr,
-              '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
-    Nempskin.LoadFromDir(tmpstr);
-    NempSkin.ActivateSkin;
-    RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
-  end else
-  begin
-    NempSkin.DeActivateSkin;
-
-    TabBtn_Equalizer.ResetGlyph;
-
-  end;
-
-  if Assigned(FSplash) then
-  begin
-    FSplash.StatusLBL.Caption := (SplashScreen_InitPlayer);
-    FSplash.Update;
-  end;
-
-  NempOptions.StartMinimizedByParameter := False;
-
-  if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') then
-  begin
-      //showmessage('Da');
-      if trim(paramstr(1)) = '/minimized' then
-      begin
-          //showmessage('Auch Da');
-          NempOptions.StartMinimizedByParameter := True;
-      end;
-      InitPlayingFile(NempPlaylist.AutoplayOnStart, True);
-  end else
-  begin
-      //
-      if NempPlaylist.AutoPlayNewTitle then
-      begin
-        // Letzten Index merken
-        BackupPlayingIndex := NempPlaylist.PlayingIndex;
-        // Index auf den neuen Titel setzen, der aber nicht nicht in der Liste drin ist!
-        NempPlaylist.PlayingIndex := NempPlaylist.Count; // Ja, nicht ..-1, es kommt ja wahrscheinlich einer dazu ;-)
-      end;
-
-      if ParamCount >= 2 then
-      begin
-          if trim(paramstr(1)) = '/play' then                             // Hier wirklich Startplay = True
-              ProcessCommandline(paramstr(2), True, False)               // Das bewirkt, dass das Playingfile gesetzt
-          else                                                            // wird. Wenn Autoplay True ist, wird
-              if trim(paramstr(1)) = '/enqueue' then                      // die Wiedergabe gestartet, sonst nicht!!
-                  ProcessCommandline(paramstr(2), True, True);
-      end else
-      begin
-          ProcessCommandline(paramstr(1), True, True);
-      end;
-  end;
-
-  if Assigned(FSplash) then
-  begin
-    FSplash.StatusLBL.Caption := (SplashScreen_LoadingMediaLib);
-    FSplash.Update;
-  end;
-
-  // Anzeige oben links initialisieren
-  SwitchBrowsePanel(MedienBib.BrowseMode);
-  // Medienliste laden
-  if MedienBib.AutoLoadMediaList then // AND (FileExists(SavePath + NEMP_NAME + '.gmp')) then
-  begin
-      MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp');
-  end
-  else
-  begin
-      case MedienBib.BrowseMode of
-          0 : MedienBib.ReBuildBrowseLists;
-
-          1: begin
-              MedienBib.ReBuildCoverList;
-              MedienBib.CurrentArtist := BROWSE_ALL;
-              MedienBib.CurrentAlbum := BROWSE_ALL;
-              If MedienBib.Coverlist.Count > 3 then
-                CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-              else
-                CoverScrollbar.Max := 3;
-              CoverScrollbarChange(Nil);
-          end;
-          2: begin
-                MedienBib.ReBuildTagCloud;
-                MedienBib.TagCloud.ShowTags;
-                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
-          end;
-      end;
-      if FileExists(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl') then
-              MedienBib.ImportFavorites(ExtractFilePath(ParamStr(0)) + 'Data\default.nwl')
-          else
-              if FileExists(SavePath + 'default.nwl') then
-                  MedienBib.ImportFavorites(SavePath + 'default.nwl');
-      ReFillBrowseTrees(False);
-  end;
-  ReadyForgetFileApiCommands := True;
-
-  if assigned(FSplash) then
-  begin
-    FSplash.StatusLBL.Caption := (SplashScreen_GenerateWindows);
-    FSplash.Update;
-  end;
-  // nicht nochmla machen, da hier ;-)
-  //  Nemp_MainForm.OnShow := Nil;
-
-  UpdateFormDesignNeu;
-  ActualizeVDTCover;
-  ReTranslateNemp(GetCurrentLanguage);
-  Spectrum.DrawClear;
-  if NempPlayer.MainStream = 0 then
-      ReInitPlayerVCL; // otherwise it has been done in player.play
-  ReArrangeToolImages;
-
-  if NempSkin.isActive then
-      NempSkin.SetVSTOffsets;
-
-  AcceptApiCommands := True;
-  EditFastSearch.OnChange := EDITFastSearchChange;
-
-  NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
-
-  NempWebServer := TNempWebServer.Create(Nemp_MainForm.Handle);
-  NempWebServer.SavePath := SavePath;
-  NempWebServer.CoverSavePath := MedienBib.CoverSavePath;
-
-  EdtBibGenre.Items := Genres;
-  //NempWebServer.LoadfromIni;
-  // Das war hier wegen. ServerAutoActivate.
-  // Aber: Das sollte eine Eigenschaft der MedienBib sein
-  //       Denn die muss das anleiern, wenn der Startvorgang komplett ist.
-  // DAher: Server.LoadFromIni erst dann.
 end;
 
 procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction);

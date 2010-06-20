@@ -62,7 +62,6 @@ type
       Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormActivate(Sender: TObject);
@@ -90,6 +89,7 @@ type
     // Resizing-Flag: On WMWindowPosChanging the RelativPositions must be changed
     Resizing: Boolean;
     //NempRegionsDistance: TNempRegionsDistance;
+    procedure InitForm;
   end;
 
 var
@@ -103,7 +103,7 @@ uses NempMainUnit,  SplitForm_Hilfsfunktionen, MedienlisteUnit,
 {$R *.dfm}
 
 
-procedure TPlaylistForm.FormCreate(Sender: TObject);
+procedure TPlaylistForm.InitForm;
 begin
   TranslateComponent (self);
   DragAcceptFiles (Handle, True);

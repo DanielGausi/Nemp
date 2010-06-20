@@ -14,7 +14,6 @@ object ExtendedControlForm: TExtendedControlForm
   KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
-  OnCreate = FormCreate
   OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
