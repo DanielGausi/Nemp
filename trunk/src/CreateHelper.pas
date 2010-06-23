@@ -549,6 +549,7 @@ begin
     begin
         TmpLastExitWasOK := LoadSettings;
         SearchSkins;
+        SearchLanguages;
         AutoLoadPlaylist(TmpLastExitWasOK);
         ApplySettings;
         ApplyLayout;
