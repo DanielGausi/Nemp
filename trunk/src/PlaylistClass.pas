@@ -863,12 +863,13 @@ begin
   aNode := GetNodeWithPlayingFile;
   if assigned(aNode) then
   begin
-    PrebookList.Remove(fPlayingFile);
-    RemoveFileFromHistory(fPlayingFile);
-    Playlist.Remove(fPlayingfile);
-    VST.DeleteNode(aNode,True);
-    ReIndexPrebookedFiles;
+      PrebookList.Remove(fPlayingFile);
+      RemoveFileFromHistory(fPlayingFile);
+      Playlist.Remove(fPlayingfile);
+      VST.DeleteNode(aNode,True);
+      ReIndexPrebookedFiles;
   end;
+  fDauer := ShowPlayListSummary;
 end;
 {
     --------------------------------------------------------

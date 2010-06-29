@@ -1353,6 +1353,9 @@ type
     procedure GRPBOXHeadsetClick(Sender: TObject);
     procedure BtnHeadsetToPlaylistClick(Sender: TObject);
     procedure PM_PL_ClearPlaylistClick(Sender: TObject);
+    procedure test1Click(Sender: TObject);
+    procedure SlideBackHeadsetBTNClick(Sender: TObject);
+    procedure SlideForwardHeadsetBTNClick(Sender: TObject);
 
   private
 
@@ -1553,15 +1556,15 @@ begin
         NempPlayer.LastUserWish := USER_WANT_STOP;
     if (NempPlaylist.PlayingIndex > -1) AND (NempPlaylist.PlayingIndex <= NempPlaylist.PlayList.Count-1) then
     begin
-    try
-      if NempPlaylist.SavePositionInTrack AND StartAtOldPosition then
-        NempPlaylist.Play(NempPlaylist.PlayingIndex, NempPlayer.FadingInterval, StartPlay, NempPlaylist.PositionInTrack)
-      else
-        NempPlaylist.Play(NempPlaylist.PlayingIndex, NempPlayer.FadingInterval, StartPlay);
-      basstimer.Enabled := StartPlay;
-    except
-       on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
-    end;
+        try
+          if NempPlaylist.SavePositionInTrack AND StartAtOldPosition then
+            NempPlaylist.Play(NempPlaylist.PlayingIndex, NempPlayer.FadingInterval, StartPlay, NempPlaylist.PositionInTrack)
+          else
+            NempPlaylist.Play(NempPlaylist.PlayingIndex, NempPlayer.FadingInterval, StartPlay);
+          basstimer.Enabled := StartPlay;
+        except
+           on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
+        end;
     end;
 end;
 
@@ -4108,13 +4111,20 @@ begin
 
         if NOT AudioFile.FileIsPresent then
         begin
-            case VST.Header.Columns[column].Tag of
-                CON_RATING,
-                CON_LASTFMTAGS,
-                CON_LYRICSEXISTING: ; // nothing
+            // duplicate code needed here. otherwise this produces exceptions on start,
+            // if EVERY file in the playlist is missing.
+            if Sender = PlaylistVST then
+                Font.Style := Font.Style + [fsStrikeOut]
             else
-                // strike out
-                Font.Style := Font.Style + [fsStrikeOut];
+            begin
+                case VST.Header.Columns[column].Tag of
+                    CON_RATING,
+                    CON_LASTFMTAGS,
+                    CON_LYRICSEXISTING: ; // nothing
+                else
+                    // strike out
+                    Font.Style := Font.Style + [fsStrikeOut];
+                end;
             end;
         end;
     end;
@@ -6168,13 +6178,20 @@ procedure TNemp_MainForm.SlideBackBTNIMGClick(Sender: TObject);
 begin
   NempPlaylist.Time := NempPlaylist.Time - 5;
 end;
-
 procedure TNemp_MainForm.SlideForwardBTNIMGClick(Sender: TObject);
 begin
   NempPlaylist.Time := NempPlaylist.Time + 5;
 end;
 
 
+procedure TNemp_MainForm.SlideBackHeadsetBTNClick(Sender: TObject);
+begin
+    NempPlayer.HeadsetTime := NempPlayer.HeadsetTime - 5;
+end;
+procedure TNemp_MainForm.SlideForwardHeadsetBTNClick(Sender: TObject);
+begin
+    NempPlayer.HeadsetTime := NempPlayer.HeadsetTime + 5;
+end;
 
 procedure TNemp_MainForm.RatingImageMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
@@ -9601,6 +9618,10 @@ begin
   if NempSkin.NempPartyMode.DoBlockTreeEdit then
       exit; // dont do anythin here
 
+  if not self.Active then
+      exit;
+
+
   aNode := VST.GetNodeAt(x,y);
   if assigned(aNode) then
   begin
@@ -10560,6 +10581,7 @@ begin
     minIdx := maxIdx - NempPlaylist.TNA_PlaylistCount;
     if minIdx < 0 then minIdx := 0;
 
+
     for i := MaxIdx downto MinIdx do
     begin
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
@@ -10571,7 +10593,6 @@ begin
         aMenuItem.Tag := i;
         aMenuItem.Caption := EscapeAmpersAnd(  TPlaylistFile(NempPlaylist.Playlist[i]).PlaylistTitle);
         Win7TaskBarPopup.Items.Insert(0, aMenuItem);
-        //PM_TNA_Playlist.Add(aMenuItem);
     end;
   end;
 end;
@@ -10638,6 +10659,11 @@ begin
 
 end;
 
+
+procedure TNemp_MainForm.test1Click(Sender: TObject);
+begin
+         //   nothing
+end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
 begin

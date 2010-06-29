@@ -2430,7 +2430,11 @@ begin
                // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
                // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
                b.Canvas.Font.Color := Spectrum.PreviewTimeColor;
-               b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+               if MainAudioFile.isStream then
+                  b.Canvas.TextOut(102,44, '(Webradio)')
+               else
+                   b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+
 
             end else
             begin
@@ -2440,7 +2444,10 @@ begin
                 r := Rect(102, 4, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
                 b.Canvas.Font.Color := Spectrum.PreviewTimeColor;
-                b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+                if MainAudioFile.isStream then
+                    b.Canvas.TextOut(102,44, '(Webradio)')
+                else
+                    b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
             end;
         end else
         begin

@@ -563,13 +563,6 @@ begin
         NempPlaylist.ReInitPlaylist;
 
 
-//        PlaylistVST.Canvas.Font.Size := maxFont;
-//        PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
-
-
-
-
-
         for i := 0 to 9 do CorrectEQButton(i);
         CorrectHallButton;
         CorrectEchoButtons;
@@ -595,7 +588,7 @@ begin
         else
             Spectrum.SetScale(1);
 
-        Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
+        // xxxxxx   Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
 

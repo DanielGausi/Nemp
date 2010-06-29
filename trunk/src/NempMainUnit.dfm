@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 1004
+  ClientHeight = 1008
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2018,6 +2018,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object GRPBOXHeadset: TNempPanel
+        Tag = 5
         Left = 17
         Top = 330
         Width = 191
@@ -2026,6 +2027,7 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 6
         OnClick = GRPBOXHeadsetClick
         OnDragOver = GRPBOXControlDragOver
+        OnPaint = PanelPaint
         OwnerDraw = False
         OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
         OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
@@ -2183,6 +2185,7 @@ object Nemp_MainForm: TNemp_MainForm
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 5
+          OnClick = SlideForwardHeadsetBTNClick
           OnDragOver = GRPBOXControlDragOver
           DrawMode = dm_Windows
           NumGlyphsX = 5
@@ -2201,6 +2204,7 @@ object Nemp_MainForm: TNemp_MainForm
           DoubleBuffered = True
           ParentDoubleBuffered = False
           TabOrder = 6
+          OnClick = SlideBackHeadsetBTNClick
           OnDragOver = GRPBOXControlDragOver
           DrawMode = dm_Windows
           NumGlyphsX = 5
@@ -2414,18 +2418,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 845
-    Height = 342
+    Height = 346
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 342
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 314
+      Height = 318
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2434,23 +2439,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 314
       DesignSize = (
         845
-        314)
+        318)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 304
+        Height = 308
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 304
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 304
+          Height = 308
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2460,7 +2467,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 304
+          Height = 308
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2527,6 +2534,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 304
           Columns = <
             item
               Position = 0
@@ -2600,7 +2608,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 304
+          Height = 308
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2610,6 +2618,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 304
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3949,7 +3958,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130058040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130060040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4514,7 +4523,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F8065C0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806640510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6243,8 +6252,8 @@ object Nemp_MainForm: TNemp_MainForm
   object TNAMenu: TPopupMenu
     AutoHotkeys = maManual
     OnPopup = TNAMenuPopup
-    Left = 745
-    Top = 568
+    Left = 729
+    Top = 552
     object PM_TNA_Play: TMenuItem
       Caption = 'Play'
       OnClick = PlayPauseBTNIMGClick
@@ -7257,13 +7266,13 @@ object Nemp_MainForm: TNemp_MainForm
       end>
     OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
     Left = 624
-    Top = 632
+    Top = 624
   end
   object fspTaskbarPreviews1: TfspTaskbarPreviews
     Active = True
     CustomLiveView = False
     OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
-    Left = 720
+    Left = 696
     Top = 632
   end
   object MemoDisableTimer: TTimer
@@ -7275,10 +7284,10 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object TaskBarImages: TImageList
     BkColor = clWhite
-    Left = 576
-    Top = 632
+    Left = 552
+    Top = 624
     Bitmap = {
-      494C010107002800C40110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800CC0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -7558,6 +7567,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object test1: TMenuItem
       Caption = 'Close this menu'
+      OnClick = test1Click
     end
   end
   object CoverDetails_Popup: TPopupMenu
