@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-06-14 21:30\n"
-"PO-Revision-Date: 2010-06-16 19:35+0100\n"
+"PO-Revision-Date: 2010-06-29 20:17+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -2078,7 +2078,7 @@ msgstr "Playlist laden (und aktuelle Playlist löschen)"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_AddPlaylist..Caption
 #: NempMainUnit.dfm:3349
 msgid "L&oad  playlist (add files to current list)"
-msgstr "Playlist laden (und aktuelle Playlist löschen)"
+msgstr "Playlist laden (Dateien zur aktuellen Playlist hinzufügen)"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_RecentPlaylists..Caption
 #: NempMainUnit.dfm:3353

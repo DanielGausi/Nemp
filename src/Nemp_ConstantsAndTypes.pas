@@ -898,7 +898,7 @@ begin
         NempFormAufteilung[1].FormMinWidth  := 0;
         NempFormAufteilung[1].FormMaxWidth  := 0;
 
-        NempWindowView       := ini.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_TASKBAR_MIN_TRAY);
+        NempWindowView       := ini.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
         ShowDeskbandOnMinimize  := ini.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
         ShowDeskbandOnStart     := ini.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
         HideDeskbandOnRestore   := ini.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
