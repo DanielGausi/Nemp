@@ -2513,7 +2513,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnBeforeItemErase = VSTBeforeItemErase
           OnChange = VSTChange
           OnColumnDblClick = VSTColumnDblClick
-          OnColumnWidthDblClickResize = VSTColumnWidthDblClickResize
           OnCreateEditor = VSTCreateEditor
           OnEditCancelled = VSTEditCancelled
           OnEdited = VSTEdited

@@ -2548,12 +2548,6 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate  := cb_PartyMode_ShowPasswordOnActivate .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
- { if True then
-
-  NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
-  CorrectFormAfterPartyModeChange;
-  }
-
   // automatic rating
   NempPlayer.PostProcessor.Active                       := cb_RatingActive                       .checked ;
   NempPlayer.PostProcessor.IgnoreShortFiles             := cb_RatingIgnoreShortFiles             .checked ;

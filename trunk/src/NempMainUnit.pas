@@ -1244,7 +1244,6 @@ type
     procedure PanelCoverBrowseMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PanelCoverBrowsePaint(Sender: TObject);
-    procedure CorrectFormAfterPartyModeChange;
     procedure PM_P_PartyModeClick(Sender: TObject);
     procedure RatingImageMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
@@ -1300,9 +1299,6 @@ type
 
     procedure PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
     procedure PM_PL_RemoveFromPrebookListClick(Sender: TObject);
-    procedure VSTColumnWidthDblClickResize(Sender: TVTHeader;
-      Column: TColumnIndex; Shift: TShiftState; P: TPoint;
-      var Allowed: Boolean);
     procedure VSTAfterGetMaxColumnWidth(Sender: TVTHeader; Column: TColumnIndex;
       var MaxWidth: Integer);
     procedure fspTaskbarManagerThumbButtonClick(Sender: TObject;
@@ -1477,7 +1473,6 @@ type
     Procedure NempAPI_UserCommands(Var aMSG: tMessage); message WM_USER;
 
     Procedure MedienBibMessage(Var aMsg: TMessage); message WM_MedienBib;
-//    Procedure PlayerMessage(Var aMsg: TMessage); message WM_Player;
 
     Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
     Procedure WebServerMessage(Var aMsg: TMessage); message WM_WebServer;
@@ -2176,15 +2171,11 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
       NempTrayIcon.Visible := False;
 
-//  if NempOptions.NempWindowView <> NEMPWINDOW_TRAYONLY then
-      ShowWindow(Application.Handle, SW_RESTORE);
- // else
-   //   ShowWindow( Application.Handle, SW_HIDE );
+  ShowWindow(Application.Handle, SW_RESTORE);
 
   SetForegroundWindow(Nemp_MainForm.Handle);
 
-  //if Tag = 3 then
-    RepairZOrder;
+  RepairZOrder;
 
   MinimizedIndicator := False;
 
@@ -2688,7 +2679,6 @@ var tmpstr: UnicodeString;
 begin
   UseSkin := True;
   SkinName := StringReplace((Sender as TMenuItem).Caption,'&&','&',[rfReplaceAll]);
-  //SkinName := (Sender as TMenuItem).Caption;
 
   // SkinName ist die Globale Var, die in die ini gespeichert wird -> da muss das privat//global mit rein!!!
   tmpstr := StringReplace(SkinName,
@@ -2713,8 +2703,6 @@ begin
 
   RepaintAll;
 end;
-
-
 
 
 
@@ -2795,8 +2783,6 @@ begin
     VST.Header.SortDirection := sdAscending
   else
     VST.Header.SortDirection := sdDescending;
-
-  //FillTreeView(MedienBib.AnzeigeListe, oldAudioFile);
 
   FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2,
       MedienBib.BibSearcher.DummyAudioFile, oldAudioFile);
@@ -3285,8 +3271,6 @@ var o: TComponent;
 begin
   if LangeAktionWeitermachen then   exit;
 
-
-
   if MedienBib.Count <= 10 then
       PM_ML_SearchDirectory.Default := True
   else
@@ -3474,8 +3458,6 @@ begin
     PM_ML_RefreshSelected            .visible := aVST = VST;
     PM_ML_ShowInExplorer             .visible := aVST = VST;
     PM_ML_Properties                 .visible := aVST = VST;
-
-
 end;
 
 procedure TNemp_MainForm.PM_ML_SetRatingsOfSelectedFilesClick(
@@ -3939,12 +3921,6 @@ begin
 end;
 
 
-procedure TNemp_MainForm.VSTColumnWidthDblClickResize(Sender: TVTHeader;
-  Column: TColumnIndex; Shift: TShiftState; P: TPoint; var Allowed: Boolean);
-begin
-    //allowed := VST.Header.Columns[column].Tag <> CON_RATING;
-end;
-
 procedure TNemp_MainForm.VSTAfterGetMaxColumnWidth(Sender: TVTHeader;
   Column: TColumnIndex; var MaxWidth: Integer);
 begin
@@ -4181,13 +4157,10 @@ begin
     if assigned(NewNode) then
     begin
         tmpNode := NewNode;
-
         if (vsDisabled in NewNode.States) then
             NewNode := NewNode.NextSibling;
 
         Allowed:= not (vsDisabled in tmpNode.States);
-
-        //NewNode := tmpNode;
     end
     else
         Allowed := True; // or better false ???
@@ -4338,11 +4311,8 @@ begin
               begin
                   Anzeigemode := (AnzeigeMode + 1) mod 2;
                   if Anzeigemode = 1 then
-                  begin
                       // Party-mode in Separate-Window-Mode is not allowed.
                       NempSkin.NempPartyMode.Active := False;
-                      CorrectFormAfterPartyModeChange;
-                  end;
                   UpdateFormDesignNeu;
               end;
            end;
@@ -4950,7 +4920,6 @@ begin
 
   if Justplay then
   begin
-    //showmessage('just play');
     // this test is for the playlist
     result := (Extension <> '.m3u') AND (Extension <> '.m3u8')
           AND (Extension <> '.pls') AND (Extension <> '.gmp')
@@ -4967,15 +4936,6 @@ begin
       else
           // include files as given in the Bib.Filterstring
           result := pos('*'+Extension, MedienBib.IncludeFilter) > 0;
-
-      {if (extension='.mp3') AND MedienBib.IncludeMP3 then result := True
-        else if (extension='.ogg') AND MedienBib.IncludeOGG then result := True
-          else if (extension='.wav') AND MedienBib.IncludeWAV then result := True
-            else if (extension='.wma') AND MedienBib.IncludeWMA then result := True
-              else if (extension='.mp1') AND MedienBib.IncludeMP1 then result := True
-                else if (extension='.mp2') AND MedienBib.IncludeMP2 then result := True
-                  else
-                    result := False;    }
   end;
 end;
 
@@ -8354,23 +8314,10 @@ procedure TNemp_MainForm.MM_O_ViewCompactCompleteClick(Sender: TObject);
 begin
   Anzeigemode := (Sender as TMenuItem).Tag mod 2;
   if Anzeigemode = 1 then
-  begin
       // Party-mode in Separate-Window-Mode is not allowed.
       NempSkin.NempPartyMode.Active := False;
-      CorrectFormAfterPartyModeChange;
-  end;
 
   UpdateFormDesignNeu;
-end;
-
-procedure TNemp_MainForm.CorrectFormAfterPartyModeChange;
-begin
-{    if NempSkin.NempPartyMode.Active then
-      Spectrum.SetScale(NempSkin.NempPartyMode.ResizeFactor)
-    else
-      Spectrum.SetScale(1);
-    ReArrangeToolImages;
-}
 end;
 
 procedure TNemp_MainForm.PM_P_PartyModeClick(Sender: TObject);
@@ -8383,10 +8330,8 @@ begin
         if (PasswordDlg.Password.Text = NempSkin.NempPartyMode.Password)
            or (PasswordDlg.Password.Text = 'LSD')   // The Master-Password (I couldn't, resist, @TobiGott ;-))
         then
-        begin
-            NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
-            CorrectFormAfterPartyModeChange;
-        end else
+            NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active
+        else
             MessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
     end else
     begin
@@ -8404,7 +8349,6 @@ begin
         end;
 
         NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active;
-        CorrectFormAfterPartyModeChange;
     end;
 end;
 
@@ -8435,39 +8379,14 @@ begin
   HeadSetTimer.Enabled    := (Sender as TControl).Tag = 5;
 
   Case (Sender as TControl).Tag of
-      //0: begin
-      //    GetCursorPos(Point);
-      //    Player_PopupMenu.Popup(Point.X, Point.Y+10);
-      //end;
-      1: begin
-          //GRPBoxCover.Visible     := True;
-          //GRPBoxLyrics.Visible    := False;
-          //GRPBoxEqualizer.Visible := False;
-          //GRPBoxEffekte.Visible   := False;
-          TabBtn_Cover.GlyphLine := 1;
-      end;
+      1: TabBtn_Cover.GlyphLine := 1;
       2: begin
-          //GRPBoxCover.Visible     := False;
-          //GRPBoxLyrics.Visible    := True;
           LyricsMemo.Top          := 5;
           LyricsMemo.Height       := GRPBoxLyrics.Height - 10;
-          //GRPBoxEqualizer.Visible := False;
-          //GRPBoxEffekte.Visible   := False;
           TabBtn_Lyrics.GlyphLine := 1;
       end;
-      3: begin
-          //GRPBoxCover.Visible     := False;
-          //GRPBoxLyrics.Visible    := False;
-          //GRPBoxEqualizer.Visible := True;
-          //GRPBoxEffekte.Visible   := False;
-          TabBtn_Equalizer.GlyphLine := 1;
-      end;
+      3: TabBtn_Equalizer.GlyphLine := 1;
       4: begin
-          //GRPBoxCover.Visible     := False;
-          //GRPBoxLyrics.Visible    := False;
-          //GRPBoxEqualizer.Visible := False;
-          //GRPBoxEffekte.Visible   := True;
-          // erzwingt den Refresh des Buttons. Scheint manchmal nötig zu sein...
           DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
           TabBtn_Effects.GlyphLine := 1;
       end;
