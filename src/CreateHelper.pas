@@ -589,6 +589,9 @@ begin
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
 
         UpdateFormDesignNeu;
+
+        MedienBib.NewCoverFlow.SetColor(clWhite);
+
         ActualizeVDTCover;
 
         ReTranslateNemp(GetCurrentLanguage);
