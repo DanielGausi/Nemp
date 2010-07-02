@@ -1676,7 +1676,8 @@ begin
 }
   end;
 
-  MedienBib.NewCoverFlow.SetColor(clWhite);
+
+  // MedienBib.NewCoverFlow.SetColor(clWhite);
   
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
