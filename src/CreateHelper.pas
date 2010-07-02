@@ -505,11 +505,11 @@ begin
             tmpstr := StringReplace(tmpstr,
                     '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
             Nempskin.LoadFromDir(tmpstr);
-            NempSkin.ActivateSkin;
+          //  NempSkin.ActivateSkin;
             RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
         end else
         begin
-            NempSkin.DeActivateSkin;
+          //  NempSkin.DeActivateSkin;
             TabBtn_Equalizer.ResetGlyph;
         end;
 
