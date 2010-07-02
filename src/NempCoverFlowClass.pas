@@ -132,6 +132,10 @@ uses NempMainUnit;
 procedure TNempCoverFlow.fSetMode(aValue: TCoverFlowMode);
 var i: integer;
 begin
+    // fallback to clasic-mode, if opengl was not initialized
+    if (aValue = cm_OpenGL) and (not OPENGL_InitOK) then
+        aValue := cm_Classic;
+
     case aValue of
         cm_None: begin
             fMode := aValue;

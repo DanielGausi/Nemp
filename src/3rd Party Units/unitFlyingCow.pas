@@ -40,6 +40,10 @@ uses Windows, Messages, SysUtils, Graphics, Classes, dglOpenGL;// , unitGLText;
 
 {.$R FlyingCowIcons.res}
 
+var
+
+  OPENGL_InitOK: Boolean;
+
 const
   WM_FLYINGCOW = WM_USER + $1000;
 
@@ -637,6 +641,8 @@ begin
                             91..103: NewSelectedItem := 5;
                             104..116:NewSelectedItem := 6;
                             117..128:NewSelectedItem := 7;
+                        else
+                            NewSelectedItem := 8;
                         end;
 
                         if vec0 > 0 then
@@ -718,7 +724,6 @@ begin
 end;    *)
 
 procedure TRenderThread.DrawScene;
-var fTextBitmap: TBitmap;
 begin
     glMatrixMode (GL_MODELVIEW);
 
@@ -1157,7 +1162,7 @@ begin
 end;                   *)
 
 initialization
-  InitOpenGL;
+  OPENGL_InitOK := InitOpenGL;
 end.
 
 
