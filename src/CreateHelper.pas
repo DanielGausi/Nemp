@@ -505,11 +505,11 @@ begin
             tmpstr := StringReplace(tmpstr,
                     '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
             Nempskin.LoadFromDir(tmpstr);
-            NempSkin.ActivateSkin;
+            NempSkin.ActivateSkin(False);
             RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
         end else
         begin
-            NempSkin.DeActivateSkin;
+            NempSkin.DeActivateSkin(False);
             TabBtn_Equalizer.ResetGlyph;
         end;
 
@@ -590,7 +590,10 @@ begin
 
         UpdateFormDesignNeu;
 
-        MedienBib.NewCoverFlow.SetColor(clWhite);
+        if NempSkin.isActive then
+            MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)
+        else
+            MedienBib.NewCoverFlow.SetColor(clWhite);
 
         ActualizeVDTCover;
 
