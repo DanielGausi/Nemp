@@ -82,7 +82,8 @@ uses
   Lyrics in 'Lyrics.pas',
   HtmlHelper in 'HtmlHelper.pas',
   OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm},
-  CreateHelper in 'CreateHelper.pas';
+  CreateHelper in 'CreateHelper.pas',
+  ExPopupList in 'ExPopupList.pas';
 
 //,  classes;
 
@@ -107,7 +108,7 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-    Graphics.DefFontData.Name := 'Tahoma';
+  Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
     Application.Name  := NEMP_NAME;

@@ -149,6 +149,7 @@
 				<Form>OptionsCompleteForm</Form>
 			</DCCReference>
 			<DCCReference Include="CreateHelper.pas"/>
+			<DCCReference Include="ExPopupList.pas"/>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>
