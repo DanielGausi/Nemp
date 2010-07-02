@@ -1443,7 +1443,9 @@ begin
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
   begin
+
     if SetFlowColor then
+        // Dont do this on startup. On some systems the complete Desktop is painted
         MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
     if boldFont then
@@ -1678,6 +1680,7 @@ begin
   end;
 
   if SetFlowColor then
+      // Dont do this on startup. On some systems the complete Desktop is painted white
       MedienBib.NewCoverFlow.SetColor(clWhite);
   
   // Weitere Eigenschaften der Form setzen
