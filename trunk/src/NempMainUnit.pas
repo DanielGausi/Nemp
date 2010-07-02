@@ -49,14 +49,16 @@ uses
    Nemp_SkinSystem, NempPanel, SkinButtons, math,
 
   PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, MyDialogs,
-  
+
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
   //dwTaskbarComponents, dwTaskbarThumbnails,
   UpdateUtils, uDragFilesSrc,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage;
+  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage,
+
+  ExPopupList;
 
 type
 
@@ -1389,6 +1391,9 @@ type
     procedure NewLyricMemoWndProc(var Message: TMessage);
     procedure WMStartEditing(var Msg: TMessage); Message WM_STARTEDITING;
 
+    procedure CMMenuClosed(var Msg: TMessage ); message CM_MENUCLOSED;
+    procedure CM_ENTERMENULOOP(var Msg: TMessage ); message CM_ENTERMENULOOP;
+
 
 
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
@@ -2010,6 +2015,17 @@ begin
         /// and the menu is over the "rating"-column
     end;
 end;
+
+procedure TNemp_MainForm.CMMenuClosed(var Msg: TMessage );
+begin
+    Win7TaskBarPopup.Tag := 0;
+end;
+
+procedure TNemp_MainForm.CM_ENTERMENULOOP(var Msg: TMessage );
+begin
+    Win7TaskBarPopup.Tag := 1;
+end;
+
 
 procedure TNemp_MainForm.WMEndSession(var M: TWMEndSession);
 begin
@@ -10721,8 +10737,16 @@ begin
             CorrectVolButton;
         end;
         42: begin
-            GetCursorPos(Point);
-            Win7TaskBarPopup.Popup(Point.X, Point.Y-10);
+            if Win7TaskBarPopup.Tag = 0 then
+            begin
+                GetCursorPos(Point);
+                Win7TaskBarPopup.Popup(Point.X, Point.Y-10);
+            end else
+            begin
+                // Post MoudeDown/Up to close the Popup-Menu
+                PostMessage(Handle, WM_LBUTTONDOWN, MK_LBUTTON, 0);
+                PostMessage(Handle, WM_LBUTTONUP, MK_LBUTTON, 0);
+            end;
         end;
     end;
 end;

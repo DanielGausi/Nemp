@@ -1835,7 +1835,7 @@ begin
 //  if cb_UseClassicCoverflow.Checked then
 //      MedienBib.NewCoverFlow.Mode := cm_Classic
 //  else
-      MedienBib.NewCoverFlow.Mode := cm_OpenGL;
+//      MedienBib.NewCoverFlow.Mode := cm_OpenGL;
 
 // ----------------------Player------------------------------
   Bass_SetDevice(MainDeviceCB.ItemIndex + 1);

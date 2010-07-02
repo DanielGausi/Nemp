@@ -1080,7 +1080,7 @@ begin
 
         AutoActivateWebServer := Ini.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
-        NewCoverFlow.Mode := cm_OpenGL; //TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
+        NewCoverFlow.Mode := cm_OpenGL; //cm_Classic; //cm_OpenGL; //TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
 
         CurrentArtist := Ini.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);
         CurrentAlbum := Ini.ReadString('MedienBib','SelectedAlbum', BROWSE_ALL);
