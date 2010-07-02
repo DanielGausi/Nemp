@@ -1677,7 +1677,9 @@ begin
   end;
 
 
-  // MedienBib.NewCoverFlow.SetColor(clWhite);
+  if MedienBib.NewCoverFlow.window <> Nemp_MainForm.PanelCoverBrowse.Handle then
+      MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
+  MedienBib.NewCoverFlow.SetColor(clWhite);
   
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
