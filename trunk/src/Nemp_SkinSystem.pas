@@ -267,8 +267,8 @@ type
 
 
         Procedure UpdateSpectrumGraphics;
-        procedure ActivateSkin;
-        procedure DeActivateSkin;
+        procedure ActivateSkin(SetFlowColor: Boolean = True);
+        procedure DeActivateSkin(SetFlowColor: Boolean = True);
 
         procedure TileGraphic(const ATile: TBitmap; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
 
@@ -1178,7 +1178,7 @@ begin
   Nemp_MainForm.PlaylistVST.BackgroundOffsetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 end;
 
-procedure TNempSkin.ActivateSkin;
+procedure TNempSkin.ActivateSkin(SetFlowColor: Boolean = True);
 var i, idx: integer;
   DestVST: TVirtualStringTree;
   j: TControlButtons;
@@ -1443,7 +1443,8 @@ begin
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
   begin
-    MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
+    if SetFlowColor then
+        MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
     if boldFont then
     begin
@@ -1503,7 +1504,7 @@ begin
 end;
 
 
-procedure TNempSkin.DeActivateSkin;
+procedure TNempSkin.DeActivateSkin(SetFlowColor: Boolean = True);
 var i, idx: integer;
   DestVST: TVirtualStringTree;
 
@@ -1676,8 +1677,8 @@ begin
 }
   end;
 
-
-  //MedienBib.NewCoverFlow.SetColor(clWhite);
+  if SetFlowColor then
+      MedienBib.NewCoverFlow.SetColor(clWhite);
   
   // Weitere Eigenschaften der Form setzen
   with Nemp_MainForm do
