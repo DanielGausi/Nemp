@@ -1382,6 +1382,9 @@ type
 
     NempIsClosing: Boolean;
 
+    CurrentScanDir: String;
+    CurrentPlaylistDir: String;
+
     // Setzt alle DragOver-Eventhandler auf das der Effekte-Groupbox
     procedure SetGroupboxEffectsDragover;
     // ... der Equalizer-Groupbox
@@ -1730,7 +1733,9 @@ begin
     LangeAktionWeitermachen    := False;
     NempRegionsDistance.Docked := True;
     MinimizedIndicator         := False;
-    Decimalseparator := '.';
+    Decimalseparator   := '.';
+    CurrentScanDir     := '';
+    CurrentPlaylistDir := '';
 
     OldScrollbarWindowProc    := CoverScrollbar.WindowProc;
     CoverScrollbar.WindowProc := NewScrollBarWndProc;
@@ -2963,6 +2968,8 @@ end;
 procedure TNemp_MainForm.MM_ML_SearchDirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
+    aNode: PVirtualNode;
+    Data: PStringTreeData;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
@@ -2970,15 +2977,28 @@ begin
     exit;
   end;
 
+  if CurrentScanDir = ''  then
+      CurrentScanDir := GetShellFolder(CSIDL_MYMUSIC);
+
+  if MedienBib.NempSortArray[1] = siOrdner then
+  begin
+      aNode := ArtistsVST.FocusedNode;
+      if assigned(aNode) and (ArtistsVST.GetNodeLevel(aNode) > 0) then
+      begin
+          Data := ArtistsVST.GetNodeData(aNode);
+          CurrentScanDir := Data.FString.DataString;
+      end;
+  end;
 
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, CurrentScanDir );
   try
       if fb.Execute then
       begin
           fspTaskbarManager.ProgressValue := 0;
           fspTaskbarManager.ProgressState := fstpsIndeterminate;
           newdir := fb.SelectedItem;
+          CurrentScanDir := fb.SelectedItem;
           MedienBib.ST_Ordnerlist.Add(newdir);
           // DateiSuche starten
           if (Not ST_Medienliste.IsSearching) then
@@ -6628,11 +6648,15 @@ procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
 begin
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption );
+  if (CurrentPlaylistDir = '') then
+      CurrentPlaylistDir := GetShellFolder(CSIDL_MYMUSIC);
+
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption, CurrentPlaylistDir );
   try
       if fb.Execute then
       begin
           newdir := fb.SelectedItem;
+          CurrentPlaylistDir := fb.SelectedItem;
 
           NempPlaylist.InsertNode := Nil;
           ST_Playlist.Mask := GeneratePlaylistSTFilter;

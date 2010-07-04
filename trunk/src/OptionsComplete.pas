@@ -530,6 +530,7 @@ type
   private
     { Private-Deklarationen }
     OldFontSize: integer;
+    CurrentScanDir: String;
     //VerlaufBitmap: TBitmap;
     //procedure RePaintVerlauf(Verlauf: Boolean);
     procedure GetSkins;
@@ -581,40 +582,7 @@ var
  OptionsArrayAudio  : array[0..8] of TOptionData;
  OptionsArrayExtended: Array[0..2] of TOptionData;
  Testskin: TNempSkin;
-    {
-const
 
-    oOptionsTree_SystemMain       = 'System';
-    oOptionsTree_SystemGeneral    = 'General options';
-    oOptionsTree_SystemControl    = 'Controls';
-    oOptionsTree_SystemFiletyps   = 'Filetypes (Windows Registry)';
-    oOptionsTree_SystemTaskbar    = 'Taskbar';
-    oOptionsTree_SystemMediaKeys  = 'Media keys';
-    oOptionsTree_SystemOther      = 'Shutdown';
-    oOptionsTree_ViewMain         = 'Viewing options';
-    oOptionsTree_ViewFonts        = 'Fonts';
-    oOptionsTree_ViewFontColor    = 'Font color';
-    oOptionsTree_ViewFontsize     = 'Font size';
-
-    oOptionsTree_ViewPlayer        = 'Player and Cover';
-    oOptionsTree_ViewView          = 'Lists and Columns';
-    oOptionsTree_PlayerMain        = 'Player settings';
-    oOptionsTree_PlayerPlaylist    = 'Playlist';
-    oOptionsTree_PlayerWebradio    = 'Webstreams';
-    oOptionsTree_PlayerEffects     = 'Effects';
-    oOptionsTree_PlayerWebServer   = 'WebServer';
-
-    oOptionsTree_PlayerEvents      = 'Events';
-    oOptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
-    oOptionsTree_PlayerMedialibrary = 'Media library';
-    oOptionsTree_ExtendedMain         = 'Extended settings';
-    oOptionsTree_MediabibList         = 'Media list';
-    oOptionsTree_MediabibDirectories  = 'Directories';
-    oOptionsTree_MediabibView         = 'View';
-    oOptionsTree_MediabibSearch       = 'Search options';
-    oOptionsTree_MediabibCover        = 'Cover';
-    oOptionsTree_MediabibUnicode      = 'Unicode';
-}
 
 
 function AddVSTOptions(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aOption: TOptionData): PVirtualNode;
@@ -643,6 +611,7 @@ begin
   Testskin := TNempSkin.create;
 
   DTPBirthdayTime.Format := 'HH:mm';
+  CurrentScanDir := '';
 
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
   begin
@@ -2646,11 +2615,17 @@ var tmp, newdir: UnicodeString;
     i: Integer;
     FB: TFolderBrowser;
 begin
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption );
+  if CurrentScanDir = '' then
+      CurrentScanDir := GetShellFolder(CSIDL_MYMUSIC);
+
+
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, CurrentScanDir);
   try
       if fb.Execute then
       begin
           newdir := Fb.SelectedItem;
+          // save selected dir for next call of this dialog
+          CurrentScanDir := Fb.SelectedItem;
 
           // Parentdir schon drin? - Nicht einfügen
           if MedienBib.ScanListContainsParentDir(newdir) <> '' then
