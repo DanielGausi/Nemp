@@ -1080,7 +1080,10 @@ begin
 
         AutoActivateWebServer := Ini.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
-        NewCoverFlow.Mode := cm_OpenGL; //cm_Classic; //cm_OpenGL; //TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL)));
+        if (ParamCount >= 1) and (ParamStr(1) = '/safemode') then
+            NewCoverFlow.Mode := cm_Classic
+        else
+            NewCoverFlow.Mode := TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL))); // cm_OpenGL; //cm_Classic; //cm_OpenGL; //
 
         CurrentArtist := Ini.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);
         CurrentAlbum := Ini.ReadString('MedienBib','SelectedAlbum', BROWSE_ALL);
@@ -1155,7 +1158,8 @@ begin
         Ini.WriteString('MedienBib','SelectedCoverID', NewCoverFlow.CurrentCoverID);
         Ini.WriteInteger('MedienBib', 'SelectedCoverIDX', NewCoverFlow.CurrentItem);
 
-         // ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
+        Ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
+
 
 
         BibSearcher.SaveToIni(Ini);

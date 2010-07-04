@@ -12,6 +12,12 @@
 			<Projects Include="Deskband\NempDeskband.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="CloseNemp.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="NempSafemode.dproj">
+				<Dependencies/>
+			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +53,32 @@
 		<Target Name="NempDeskband:Make">
 			<MSBuild Targets="Make" Projects="Deskband\NempDeskband.dproj"/>
 		</Target>
+		<Target Name="CloseNemp">
+			<MSBuild Projects="CloseNemp.dproj"/>
+		</Target>
+		<Target Name="CloseNemp:Clean">
+			<MSBuild Targets="Clean" Projects="CloseNemp.dproj"/>
+		</Target>
+		<Target Name="CloseNemp:Make">
+			<MSBuild Targets="Make" Projects="CloseNemp.dproj"/>
+		</Target>
+		<Target Name="NempSafemode">
+			<MSBuild Projects="NempSafemode.dproj"/>
+		</Target>
+		<Target Name="NempSafemode:Clean">
+			<MSBuild Targets="Clean" Projects="NempSafemode.dproj"/>
+		</Target>
+		<Target Name="NempSafemode:Make">
+			<MSBuild Targets="Make" Projects="NempSafemode.dproj"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="nemp;Deskband_TestProject;NempDeskband"/>
+			<CallTarget Targets="nemp;Deskband_TestProject;NempDeskband;CloseNemp;NempSafemode"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="nemp:Clean;Deskband_TestProject:Clean;NempDeskband:Clean"/>
+			<CallTarget Targets="nemp:Clean;Deskband_TestProject:Clean;NempDeskband:Clean;CloseNemp:Clean;NempSafemode:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="nemp:Make;Deskband_TestProject:Make;NempDeskband:Make"/>
+			<CallTarget Targets="nemp:Make;Deskband_TestProject:Make;NempDeskband:Make;CloseNemp:Make;NempSafemode:Make"/>
 		</Target>
 		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 	</Project>
