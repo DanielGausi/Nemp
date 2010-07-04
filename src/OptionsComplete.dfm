@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabExtended0
+    ActivePage = TabAudio3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2923,6 +2923,48 @@ object OptionsCompleteForm: TOptionsCompleteForm
           'Just play focussed file (don'#39't change the playlist)')
         TabOrder = 0
       end
+      object GrpBox_Headset: TGroupBox
+        Left = 8
+        Top = 391
+        Width = 433
+        Height = 96
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Headset'
+        TabOrder = 3
+        object LblHeadsetDefaultAction: TLabel
+          Left = 12
+          Top = 19
+          Width = 405
+          Height = 13
+          AutoSize = False
+          Caption = 'Insert mode for headset files'
+        end
+        object GrpBox_HeadsetDefaultAction: TComboBox
+          Left = 12
+          Top = 38
+          Width = 285
+          Height = 21
+          Hint = 'Insert mode for files from the headset'
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'Enqueue at the end of the playlist'
+          Items.Strings = (
+            'Enqueue at the end of the playlist'
+            'Play (and clear current playlist)'
+            'Enqueue after current track'
+            'Just play (don'#39't change the playlist)')
+        end
+        object cb_AutoStopHeadset: TCheckBox
+          Left = 12
+          Top = 68
+          Width = 389
+          Height = 17
+          Caption = 'Stop headset when switching to another tab'
+          TabOrder = 1
+        end
+      end
     end
     object TabAudio8: TTabSheet
       Caption = 'Audio2 (Medialib)'
@@ -3474,47 +3516,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           MinValue = 0
           TabOrder = 2
           Value = 100
-        end
-      end
-      object GrpBox_Headset: TGroupBox
-        Left = 13
-        Top = 270
-        Width = 433
-        Height = 111
-        Caption = 'Headset'
-        TabOrder = 3
-        object LblHeadsetDefaultAction: TLabel
-          Left = 12
-          Top = 19
-          Width = 405
-          Height = 13
-          AutoSize = False
-          Caption = 'Insert mode for headset files'
-        end
-        object GrpBox_HeadsetDefaultAction: TComboBox
-          Left = 12
-          Top = 38
-          Width = 285
-          Height = 21
-          Hint = 'Insert mode for files from the headset'
-          Style = csDropDownList
-          ItemHeight = 13
-          ItemIndex = 0
-          TabOrder = 0
-          Text = 'Enqueue at the end of the playlist'
-          Items.Strings = (
-            'Enqueue at the end of the playlist'
-            'Play (and clear current playlist)'
-            'Enqueue after current track'
-            'Just play (don'#39't change the playlist)')
-        end
-        object cb_AutoStopHeadset: TCheckBox
-          Left = 12
-          Top = 68
-          Width = 389
-          Height = 17
-          Caption = 'Stop headset when switching to another tab'
-          TabOrder = 1
         end
       end
     end

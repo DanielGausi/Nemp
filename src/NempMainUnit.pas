@@ -3997,6 +3997,7 @@ var i:integer;
   SelectedMp3s: TNodeArray;
   Data: PTreeData;
   aVST: TVirtualStringTree;
+  cueFile: String;
 begin
     DragSource := DS_VST;
     aVST := Sender as TVirtualStringTree;
@@ -4018,6 +4019,13 @@ begin
             Data := aVST.GetNodeData(SelectedMP3s[i]);
             AddFile(Data^.FAudioFile.Pfad);
             DragDropList.Add(Data^.FAudioFile.Pfad);
+            if (Data^.FAudioFile.Duration >  600) then
+            begin
+                cueFile := ChangeFileExt(Data^.FAudioFile.Pfad, '.cue');
+                if FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue')) then
+                    // We dont need internal dragging of cue-Files, so only Addfile
+                    AddFile(cueFile);
+            end;
         end;
         // This is the START of the drag (FROM) operation.
         Execute;
@@ -6810,27 +6818,31 @@ var FileString: UnicodeString;
   aVST: TVirtualStringTree;
 begin
   if Sender = PM_ML_CopyToClipboard then
-    aVST := VST
-  //if Sender = PlayListKopierenPMENU then
+      aVST := VST
+      //if Sender = PlayListKopierenPMENU then
   else
-    aVST :=PlayListVST;
+      aVST :=PlayListVST;
 
   SelectedMP3s := aVST.GetSortedSelection(False);
   if length(SelectedMp3s) > MAX_DRAGFILECOUNT then
   begin
-    MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-    exit;
+      MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+      exit;
   end;
   FileString := '';
   for idx := 0 to length(SelectedMP3s)-1 do
   begin
-    Data := aVST.GetNodeData(SelectedMP3s[idx]);
-    if FileExists(Data^.FAudioFile.Pfad) then
-      FileString := FileString + Data^.FAudioFile.Pfad + #0;
+      Data := aVST.GetNodeData(SelectedMP3s[idx]);
+      if FileExists(Data^.FAudioFile.Pfad) then
+          FileString := FileString + Data^.FAudioFile.Pfad + #0;
+      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  600)  )
+         AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
+      then
+          FileString := FileString + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
   end;
 
   if FileString<>'' then
-    CopyFilesToClipboard(FileString);
+      CopyFilesToClipboard(FileString);
 end;
 
 
