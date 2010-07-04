@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 746
+  ClientHeight = 786
   ClientWidth = 845
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2418,19 +2418,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 845
-    Height = 84
+    Height = 124
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 64
+    ExplicitHeight = 84
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 845
-      Height = 56
+      Height = 96
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2439,25 +2439,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 36
+      ExplicitHeight = 56
       DesignSize = (
         845
-        56)
+        96)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 837
-        Height = 46
+        Height = 86
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 26
+        ExplicitHeight = 46
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 46
+          Height = 86
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2467,7 +2467,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 433
-          Height = 46
+          Height = 86
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2533,7 +2533,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 26
+          ExplicitHeight = 46
           Columns = <
             item
               Position = 0
@@ -2607,7 +2607,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 46
+          Height = 86
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2617,7 +2617,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 26
+          ExplicitHeight = 46
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3957,7 +3957,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C0101110013007C040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130080040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4522,7 +4522,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806800510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806840510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7286,7 +7286,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010107002800E80110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
+      494C010107002800EC0110001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF

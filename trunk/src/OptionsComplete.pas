@@ -432,14 +432,14 @@ type
     cbCoverMode: TComboBox;
     LblConst_DetailMode: TLabel;
     cbDetailMode: TComboBox;
-    GrpBox_Headset: TGroupBox;
-    GrpBox_HeadsetDefaultAction: TComboBox;
-    LblHeadsetDefaultAction: TLabel;
-    cb_AutoStopHeadset: TCheckBox;
     cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
     CB_EditOnClick: TCheckBox;
     GrpBox_OpenGL: TGroupBox;
     cb_UseClassicCoverflow: TCheckBox;
+    GrpBox_Headset: TGroupBox;
+    LblHeadsetDefaultAction: TLabel;
+    GrpBox_HeadsetDefaultAction: TComboBox;
+    cb_AutoStopHeadset: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
