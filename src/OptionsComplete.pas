@@ -352,7 +352,6 @@ type
     OpenDlg_DefaultCover: TOpenPictureDialog;
     LBAutoscan: TListBox;
     RGroup_Playlist: TRadioGroup;
-    XXX_cb_UseClassicCoverflow: TCheckBox;
     NewPlayerPanelOptions: TNempPanel;
     PaintFrame: TImage;
     TextAnzeigeIMAGE: TImage;
@@ -439,6 +438,8 @@ type
     cb_AutoStopHeadset: TCheckBox;
     cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
     CB_EditOnClick: TCheckBox;
+    GrpBox_OpenGL: TGroupBox;
+    cb_UseClassicCoverflow: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -917,7 +918,8 @@ var i,s: integer;
 begin
   // Beta-Option
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
-//  cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
+
+  cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
 
   //---PLAYER----
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
@@ -1832,10 +1834,10 @@ begin
   // Beta-Optionen
 //  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
 
-//  if cb_UseClassicCoverflow.Checked then
-//      MedienBib.NewCoverFlow.Mode := cm_Classic
-//  else
-//      MedienBib.NewCoverFlow.Mode := cm_OpenGL;
+  if cb_UseClassicCoverflow.Checked then
+      MedienBib.NewCoverFlow.Mode := cm_Classic
+  else
+      MedienBib.NewCoverFlow.Mode := cm_OpenGL;
 
 // ----------------------Player------------------------------
   Bass_SetDevice(MainDeviceCB.ItemIndex + 1);

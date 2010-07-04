@@ -514,7 +514,7 @@ begin
         end;
 
         NempOptions.StartMinimizedByParameter := False;
-        if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') then
+        if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') or (trim(paramstr(1)) = '/safemode') then
         begin
             if trim(paramstr(1)) = '/minimized' then
                 NempOptions.StartMinimizedByParameter := True;
@@ -537,7 +537,12 @@ begin
                     if trim(paramstr(1)) = '/enqueue' then                      // die Wiedergabe gestartet, sonst nicht!!
                         ProcessCommandline(paramstr(2), True, True);
             end else
-                ProcessCommandline(paramstr(1), True, True);
+            begin
+                if paramstr(1) = '/safemode' then
+                    // nothing
+                else
+                    ProcessCommandline(paramstr(1), True, True);
+            end;
         end;
     end;
 end;

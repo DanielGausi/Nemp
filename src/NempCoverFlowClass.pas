@@ -132,7 +132,7 @@ uses NempMainUnit;
 procedure TNempCoverFlow.fSetMode(aValue: TCoverFlowMode);
 var i: integer;
 begin
-    // fallback to clasic-mode, if opengl was not initialized
+    // fallback to classic-mode, if opengl was not initialized
     if (aValue = cm_OpenGL) and (not OPENGL_InitOK) then
         aValue := cm_Classic;
 
@@ -178,12 +178,14 @@ begin
                                       TNempCover(fCoverList[i]).Album));
                 end;
                 fFlyingCow.EndUpdate;
+                SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
             end;
             fFlyingCow.CurrentItem := fCurrentItem;
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := False;
             FreeAndNil(fClassicFlow);
+
 
         end;
     end;
