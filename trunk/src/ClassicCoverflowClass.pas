@@ -263,7 +263,7 @@ begin
           end;
   end;
   ScrollImage.Picture.Assign(bigbmp);
-
+  ScrollImage.Refresh;
   bigbmp.Free;
   ajpg.Free;
   abmp.Free;
