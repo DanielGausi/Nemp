@@ -1873,7 +1873,7 @@ begin
   if assigned(FSplash) then
       FSplash.Close;
 
-  MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+
 end;
 
 procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction);
