@@ -127,6 +127,13 @@ begin
                 VST_ColumnPopup.Items.Insert(i, aMenuItem);
             end;
 
+            // Hook-Funktionen initialisieren
+            lib := LoadLibraryW(PWideChar(ExtractFilePath(Paramstr(0))+'KBHook.dll'));
+            if lib <> INVALID_HANDLE_VALUE then
+            begin
+                InstallHook := GetProcAddress(lib, 'InstallHook');
+                UnInstallHook := GetProcAddress(lib, 'UninstallHook');
+            end;
             // Initialisierung des Hooks
             if lib <> INVALID_HANDLE_VALUE then
             begin
@@ -560,13 +567,7 @@ begin
         ApplyLayout;
         AutoLoadBib;
 
-        // Hook-Funktionen initialisieren
-        lib := LoadLibraryW(PWideChar(ExtractFilePath(Paramstr(0))+'KBHook.dll'));
-        if lib <> INVALID_HANDLE_VALUE then
-        begin
-            InstallHook := GetProcAddress(lib, 'InstallHook');
-            UnInstallHook := GetProcAddress(lib, 'UninstallHook');
-        end;
+
 
         UpdateSplashScreen(SplashScreen_GenerateWindows);
         // Place some controls correctly
