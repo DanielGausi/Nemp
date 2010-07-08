@@ -889,7 +889,7 @@ begin
                 PanelCoverBrowse.Top := 4;
                 PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 8;
                 PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
-                MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+
 
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse.GlyphLine := 0;
@@ -922,6 +922,7 @@ begin
 
             end;
         end;
+        MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
     end;
 end;
 
