@@ -162,8 +162,8 @@ begin
             Nemp_MainForm.IMGMedienBibCover.Visible := True;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := True;
-           // Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := True;
-           // Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
+            Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := True;
+            Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
 
 
             //FreeAndNil(fFlyingCow);
@@ -191,10 +191,10 @@ begin
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := False;
 
-           // Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := False;
-           // Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
+            Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := False;
+            Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
 
-           Nemp_MainForm.PanelCoverBrowse.BringToFront;
+            Nemp_MainForm.PanelCoverBrowse.BringToFront;
             SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
 
             fFlyingCow.CurrentItem := fCurrentItem;
