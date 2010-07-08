@@ -10613,7 +10613,7 @@ begin
 //   exit;
 //CloudViewer.SetFocus;
 
-UpdateFormDesignNeu            ;
+
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
