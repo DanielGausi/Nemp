@@ -1240,6 +1240,13 @@ begin
           FormPosAndSizeCorrect(PlaylistForm);
           FormPosAndSizeCorrect(MedienlisteForm);
           ReInitRelativePositions;
+
+          if TopMainPanel.Height Mod 2 = 0 then
+              TopMainPanel.Height := TopMainPanel.Height + 1
+          else
+              TopMainPanel.Height := TopMainPanel.Height - 1  ;
+
+
       end;
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);

@@ -595,6 +595,7 @@ begin
 
         UpdateFormDesignNeu;
 
+
         if NempSkin.isActive then
             MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)
         else
