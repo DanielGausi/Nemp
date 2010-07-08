@@ -152,18 +152,21 @@ begin
             if Not Assigned(fClassicFlow) then
             begin
                 fClassicFlow := TClassicCoverFlow.Create;
+            end;
                 fClassicFlow.MainImage := MainImage;
                 fClassicFlow.ScrollImage := ScrollImage;
                 fClassicFlow.CoverList := fCoverList;
                 fClassicFlow.CoverSavePath := CoverSavePath;
-            end;
+
             fClassicFlow.CurrentItem := fCurrentItem;
             Nemp_MainForm.IMGMedienBibCover.Visible := True;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := True;
-            //Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := True;
-            //Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
-            FreeAndNil(fFlyingCow);
+           // Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := True;
+           // Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
+
+
+            //FreeAndNil(fFlyingCow);
         end;
 
         cm_OpenGL  :
@@ -172,6 +175,7 @@ begin
             if Not Assigned(fFlyingCow) then
             begin
                 fFlyingCow := tFlyingCow.Create(window, events_Window);
+            end;
                 fFlyingCow.BeginUpdate;
                 for i := 0 to fCoverList.Count - 1 do
                 begin
@@ -181,18 +185,22 @@ begin
                 end;
                 fFlyingCow.EndUpdate;
 
-            end;
-            fFlyingCow.CurrentItem := fCurrentItem;
+
+
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := False;
 
+           // Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := False;
+           // Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
+
+           Nemp_MainForm.PanelCoverBrowse.BringToFront;
             SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
-            //Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := False;
-            //Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
-            FreeAndNil(fClassicFlow);
+
+            fFlyingCow.CurrentItem := fCurrentItem;
 
 
+            //FreeAndNil(fClassicFlow);
         end;
     end;
 

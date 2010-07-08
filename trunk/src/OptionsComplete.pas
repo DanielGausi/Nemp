@@ -1808,6 +1808,7 @@ begin
   else
       MedienBib.NewCoverFlow.Mode := cm_OpenGL;
 
+
 // ----------------------Player------------------------------
   Bass_SetDevice(MainDeviceCB.ItemIndex + 1);
   BASS_SetConfig(BASS_CONFIG_BUFFER,SEBufferSize.Value);

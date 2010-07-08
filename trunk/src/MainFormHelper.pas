@@ -922,7 +922,7 @@ begin
 
             end;
         end;
-        MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+        //MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
     end;
 end;
 
