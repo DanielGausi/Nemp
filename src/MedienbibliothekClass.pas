@@ -1160,8 +1160,6 @@ begin
 
         Ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
 
-
-
         BibSearcher.SaveToIni(Ini);
         TagCloud.SaveToIni(Ini);
 end;

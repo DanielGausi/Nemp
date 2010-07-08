@@ -1811,6 +1811,8 @@ begin
     CloudViewer.OnAfterPaint := CloudAfterPaint;
     NewPlayerPanel.DoubleBuffered := True;
 
+    //ImgScrollCover.DoubleBuffered := True;
+
     // Create Player
     NempPlayer            := TNempPlayer.Create(Handle);
     NempPlayer.Statusproc := StatusProc;
