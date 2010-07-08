@@ -186,7 +186,6 @@ begin
                 fFlyingCow.EndUpdate;
 
 
-
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := False;
