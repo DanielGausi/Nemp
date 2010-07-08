@@ -10614,6 +10614,9 @@ begin
 //CloudViewer.SetFocus;
 
 
+if PanelCoverBrowse.Visible then
+      MedienBib.NewCoverFlow.Paint;
+
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
