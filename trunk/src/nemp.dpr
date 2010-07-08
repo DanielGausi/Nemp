@@ -114,9 +114,9 @@ ShowWindow
     Application.Name  := NEMP_NAME;
 
     // Show Mainform, but beyond all visible area
-    Nemp_MainForm.Top := 10000;
+    //Nemp_MainForm.Top := 10000;
     Nemp_MainForm.Visible := True;
-    Nemp_MainForm.Top := 10000;
+    //Nemp_MainForm.Top := 10000;
 
     Application.CreateForm(TFSplash, FSplash);
     FSplash.Show;
