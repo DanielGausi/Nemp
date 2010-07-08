@@ -180,12 +180,14 @@ begin
                                       TNempCover(fCoverList[i]).Album));
                 end;
                 fFlyingCow.EndUpdate;
-                SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
+
             end;
             fFlyingCow.CurrentItem := fCurrentItem;
             Nemp_MainForm.IMGMedienBibCover.Visible := False;
             Nemp_MainForm.Lbl_CoverFlow.Visible     := True;
             Nemp_MainForm.ImgScrollCover.Visible    := False;
+
+            SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
             //Nemp_MainForm.PanelCoverBrowse.DoubleBuffered := False;
             //Nemp_MainForm.CoverScrollbar.DoubleBuffered := False;
             FreeAndNil(fClassicFlow);
