@@ -1241,12 +1241,14 @@ begin
           FormPosAndSizeCorrect(MedienlisteForm);
           ReInitRelativePositions;
 
-          // this is somehow needed on XP (or only in my virtual machine??)
-          if TopMainPanel.Height Mod 2 = 0 then
-              TopMainPanel.Height := TopMainPanel.Height + 1
-          else
-              TopMainPanel.Height := TopMainPanel.Height - 1  ;
-
+          if NempOptions.FixCoverFlowOnStart then
+          begin
+              // this is somehow needed on XP (or only in my virtual machine??)
+              if TopMainPanel.Height Mod 2 = 0 then
+                  TopMainPanel.Height := TopMainPanel.Height + 1
+              else
+                  TopMainPanel.Height := TopMainPanel.Height - 1  ;
+          end;
       end;
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);

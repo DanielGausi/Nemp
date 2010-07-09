@@ -158,6 +158,7 @@ type
         NempWindowView: Word;
         StartMinimized: Boolean;
         StartMinimizedByParameter: Boolean;
+        FixCoverFlowOnStart: Boolean;
 
         //Sprache
         Language: String;
@@ -823,6 +824,8 @@ begin
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
 
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
+        FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
+
                   //ShutdownMode := Ini.ReadInteger('Allgemein', 'ShutDownMode', SHUTDOWNMODE_Shutdown);
         // ShutDownAtEndOfPlaylist initialisieren
         ShutDownAtEndOfPlaylist := False;
@@ -963,6 +966,8 @@ begin
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
 
         ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
+        ini.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
+
         //ini.WriteInteger('Allgemein', 'ShutDownMode', ShutDownMode);
         Ini.WriteString('Allgemein', 'Language', Language);
 
