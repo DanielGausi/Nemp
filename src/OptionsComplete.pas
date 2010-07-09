@@ -440,6 +440,7 @@ type
     LblHeadsetDefaultAction: TLabel;
     GrpBox_HeadsetDefaultAction: TComboBox;
     cb_AutoStopHeadset: TCheckBox;
+    cbFixCoverFlowOnStart: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -889,6 +890,7 @@ begin
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
 
   cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
+  cbFixCoverFlowOnStart.Checked := Nemp_MainForm.NempOptions.FixCoverFlowOnStart;
 
   //---PLAYER----
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
@@ -1807,6 +1809,8 @@ begin
       MedienBib.NewCoverFlow.Mode := cm_Classic
   else
       MedienBib.NewCoverFlow.Mode := cm_OpenGL;
+
+  Nemp_MainForm.NempOptions.FixCoverFlowOnStart := cbFixCoverFlowOnStart.Checked;
 
 
 // ----------------------Player------------------------------

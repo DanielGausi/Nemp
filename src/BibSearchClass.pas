@@ -1040,7 +1040,7 @@ begin
                 // Check every single object
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if TAudioFile(MainList[NewIdx]).ViewCounter = fViewCounter then
+                    if TAudioFile(MainList[i]).ViewCounter = fViewCounter then
                     begin
                         // Add File to first List
                         if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
@@ -1147,7 +1147,7 @@ var i, lmax: integer;
     Keywords: TStringList;
     KeywordsUTF8: TUTF8StringList;
     UTF8Keyword: UTF8String;
-    OnlyOneWord: Boolean;
+    //OnlyOneWord: Boolean;
     // for Horspool/dynamic programming
     k: Integer;
     A: TBC_IntArray;
@@ -1165,7 +1165,7 @@ begin
   fIPCSearchIsRunning := True;
 
   Keywords := GenerateKeywordList(keyword);
-  OnlyOneWord := Keywords.Count = 1;
+  //OnlyOneWord := Keywords.Count = 1;
   searchL := 0;
   searchR := length(TotalStringIndizes) - 1;
 
