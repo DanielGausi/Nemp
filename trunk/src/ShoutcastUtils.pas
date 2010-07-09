@@ -7,6 +7,19 @@
     Note: This Unit _IS NOT_ the same as the "ShoutcastUtils" that can be downloaded
           at my website. Here are some minor changes done, e.g. in the TuneIn-Method.
 
+    Also, SHOUTcast is a Trademark of AOL
+    The SHOUTcast API used in this Unit is NOT covered by the GPL.
+
+      (
+        I don't understand all this licensing stuff.
+        The VLC-project cancelled shoutcast-support because of
+        some strange restrictions. After this, some of the shoutcast-team
+        posted this
+        http://forums.winamp.com/showthread.php?t=320136
+        So it is ok to use the SHOUTcast API in this form?
+      )
+
+
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
     Copyright (C) 2005-2010, Daniel Gaussmann
