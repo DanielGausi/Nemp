@@ -102,6 +102,8 @@ object AboutForm: TAboutForm
       ''
       '[url="http://www.last.fm/api/intro"]The LastFM API[/url]'
       ''
+      '[url="http://www.shoutcast.com/"]The SHOUTcast API[/url]'
+      ''
       '[url="http://www.madshi.net/"]MadExcept[/url] by Mathias Rauen'
       ''
       ''
