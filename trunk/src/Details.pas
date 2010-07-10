@@ -1387,6 +1387,21 @@ begin
     end;
 
     FrameList.Free;
+    FrameList := ID3v2Tag.GetAllUserTextFrames;
+    for i := 0 to FrameList.Count - 1 do
+    begin
+        Value := (FrameList[i] as TID3v2Frame).GetUsertext(Description);
+        newItem := LvFrames.Items.Add;
+        if Description = '' then
+            newItem.Caption := 'Usertext'
+        else
+            newItem.Caption := 'Usertext: ' + Description;
+
+        NewItem.SubItems.Add(Value);
+        NewItem.Data := (FrameList[i] as TID3v2Frame);
+    end;
+
+    FrameList.Free;
     FrameList := ID3v2Tag.GetAllCommentFrames;
     for i := 0 to FrameList.Count - 1 do
     begin
