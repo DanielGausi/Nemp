@@ -1884,6 +1884,8 @@ procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction)
 begin
     NempIsClosing := True;
 
+    NempTrayIcon.Visible := False;
+
     NempWebServer.Free;
 
     AcceptApiCommands := False;
@@ -10602,7 +10604,7 @@ var point: TPoint;
 
 // lyrics: TLyrics;
 //  s: String;
-//  sl: TStringList;
+  sl: TStringList;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)

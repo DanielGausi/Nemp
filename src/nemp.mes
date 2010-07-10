@@ -69,11 +69,11 @@ MailFailureMsg=Sorry, sending the bug report didn't work.
 VersionVariable=
 [ExceptionBox]
 ShowButtonMailBugReport=1
-ShowButtonSaveBugReport=0
+ShowButtonSaveBugReport=1
 ShowButtonPrintBugReport=0
 ShowButtonShowBugReport=1
 ShowButtonContinueApplication=1
-ShowButtonRestartApplication=1
+ShowButtonRestartApplication=0
 ShowButtonCloseApplication=1
 IconButtonSendBugReport=send1
 IconButtonSaveBugReport=save1
