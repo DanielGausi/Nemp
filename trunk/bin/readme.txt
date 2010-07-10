@@ -8,7 +8,7 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Juni 2010
+      Januar 2005 - Juli 2010
 
       Version: 4.0.0
 
@@ -109,6 +109,9 @@ Verwendete Units/Komponenten:
 - LastFM API
   http://www.last.fm/api/intro
 
+- SHOUTcast API
+  http://www.shoutcast.com
+
 - MadExcept by Mathias Rauen 
   http://www.madshi.net/
   
@@ -120,7 +123,7 @@ Verwendete Units/Komponenten:
 
   
 
-Version 4.0.0 (Serengeti), Mai-Juni 2010
+Version 4.0.0 (Serengeti), Mai-Juli 2010
 ----------------------------------------------------------- 
 * Änderung der Lizenz von "Freeware" auf OpenSource
   - Nemp steht ab jetzt unter der GPL

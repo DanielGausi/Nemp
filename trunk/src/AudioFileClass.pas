@@ -885,6 +885,7 @@ begin
     // read Tags from File
     GetMp3Details(filename,mpegInfo,ID3v2Tag,ID3v1tag);
 
+
     // If file was valid mp3-file:
     // Put the tag-info into the audiofile-structure.
     // Id3v2-tags have priority
