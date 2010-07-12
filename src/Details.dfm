@@ -37,14 +37,10 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_ExtendedID3v2
+    ActivePage = Tab_MpegInformation
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 8
         Top = 0
@@ -576,7 +572,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -585,10 +581,6 @@ object FDetails: TFDetails
     object Tab_MpegInformation: TTabSheet
       Caption = 'ID3-Tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_ID3v1: TGroupBox
         Left = 8
         Top = 0
@@ -596,6 +588,9 @@ object FDetails: TFDetails
         Height = 169
         Caption = 'ID3 v1'
         TabOrder = 0
+        DesignSize = (
+          441
+          169)
         object LblConst_ID3v1Artist: TLabel
           Left = 8
           Top = 43
@@ -715,38 +710,13 @@ object FDetails: TFDetails
           ShowAccelChar = False
           Transparent = True
         end
-        object pnlIDv1Genre: TPanel
-          Left = 64
-          Top = 136
-          Width = 153
-          Height = 21
-          BevelOuter = bvNone
-          Enabled = False
-          TabOrder = 4
-          DesignSize = (
-            153
-            21)
-          object cbIDv1Genres: TComboBox
-            Left = 0
-            Top = 0
-            Width = 145
-            Height = 21
-            AutoCloseUp = True
-            Style = csDropDownList
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 0
-            Sorted = True
-            TabOrder = 0
-            OnChange = Lblv1Change
-          end
-        end
         object CBID3v1: TCheckBox
           Left = 64
           Top = 16
           Width = 97
           Height = 17
           Caption = 'ID3 v1'
-          TabOrder = 7
+          TabOrder = 6
           OnClick = CBID3v1Click
         end
         object BtnCopyFromV2: TButton
@@ -755,7 +725,7 @@ object FDetails: TFDetails
           Width = 139
           Height = 21
           Caption = 'Copy from ID3 v2'
-          TabOrder = 8
+          TabOrder = 7
           OnClick = BtnCopyFromV2Click
         end
         object Lblv1Album: TEdit
@@ -763,7 +733,6 @@ object FDetails: TFDetails
           Top = 88
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 2
           OnChange = Lblv1Change
         end
@@ -772,7 +741,6 @@ object FDetails: TFDetails
           Top = 40
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 0
           OnChange = Lblv1Change
         end
@@ -781,7 +749,6 @@ object FDetails: TFDetails
           Top = 64
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 1
           OnChange = Lblv1Change
         end
@@ -790,8 +757,7 @@ object FDetails: TFDetails
           Top = 136
           Width = 33
           Height = 21
-          ReadOnly = True
-          TabOrder = 6
+          TabOrder = 5
           OnChange = Lblv1YearChange
         end
         object Lblv1Comment: TEdit
@@ -799,7 +765,6 @@ object FDetails: TFDetails
           Top = 112
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 3
           OnChange = Lblv1Change
         end
@@ -808,9 +773,21 @@ object FDetails: TFDetails
           Top = 136
           Width = 41
           Height = 21
-          ReadOnly = True
-          TabOrder = 5
+          TabOrder = 4
           OnChange = Lblv1TrackChange
+        end
+        object cbIDv1Genres: TComboBox
+          Left = 65
+          Top = 136
+          Width = 145
+          Height = 21
+          AutoCloseUp = True
+          Style = csDropDownList
+          Anchors = [akLeft, akTop, akRight]
+          ItemHeight = 13
+          Sorted = True
+          TabOrder = 8
+          OnChange = Lblv1Change
         end
       end
       object GrpBox_ID3v2: TGroupBox
@@ -820,6 +797,9 @@ object FDetails: TFDetails
         Height = 249
         Caption = 'ID3 v2'
         TabOrder = 1
+        DesignSize = (
+          441
+          249)
         object LblConst_ID3v2Artist: TLabel
           Left = 8
           Top = 43
@@ -965,37 +945,13 @@ object FDetails: TFDetails
           OnMouseLeave = RatingImageMouseLeave
           OnMouseMove = RatingImageMouseMove
         end
-        object pnlIDv2Genre: TPanel
-          Left = 64
-          Top = 136
-          Width = 153
-          Height = 21
-          BevelOuter = bvNone
-          Enabled = False
-          TabOrder = 4
-          DesignSize = (
-            153
-            21)
-          object cbIDv2Genres: TComboBox
-            Left = 0
-            Top = 0
-            Width = 145
-            Height = 21
-            AutoComplete = False
-            Anchors = [akLeft, akTop, akRight, akBottom]
-            ItemHeight = 0
-            Sorted = True
-            TabOrder = 0
-            OnChange = Lblv2Change
-          end
-        end
         object CBID3v2: TCheckBox
           Left = 64
           Top = 16
           Width = 97
           Height = 17
           Caption = 'ID3 v2'
-          TabOrder = 7
+          TabOrder = 6
           OnClick = CBID3v2Click
         end
         object BtnCopyFromV1: TButton
@@ -1004,7 +960,7 @@ object FDetails: TFDetails
           Width = 139
           Height = 21
           Caption = 'Copy from ID3 v1'
-          TabOrder = 8
+          TabOrder = 7
           OnClick = BtnCopyFromV1Click
         end
         object Lblv2Copyright: TLabeledEdit
@@ -1017,8 +973,7 @@ object FDetails: TFDetails
           EditLabel.Caption = 'Copyright'
           LabelPosition = lpLeft
           LabelSpacing = 1
-          ReadOnly = True
-          TabOrder = 9
+          TabOrder = 8
           OnChange = Lblv2Change
         end
         object Lblv2URL: TLabeledEdit
@@ -1031,8 +986,7 @@ object FDetails: TFDetails
           EditLabel.Caption = 'URL'
           LabelPosition = lpLeft
           LabelSpacing = 1
-          ReadOnly = True
-          TabOrder = 10
+          TabOrder = 9
           OnChange = Lblv2Change
         end
         object Lblv2Artist: TEdit
@@ -1040,7 +994,6 @@ object FDetails: TFDetails
           Top = 40
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 0
           OnChange = Lblv2Change
         end
@@ -1049,7 +1002,6 @@ object FDetails: TFDetails
           Top = 64
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 1
           OnChange = Lblv2Change
         end
@@ -1058,7 +1010,6 @@ object FDetails: TFDetails
           Top = 88
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 2
           OnChange = Lblv2Change
         end
@@ -1067,8 +1018,7 @@ object FDetails: TFDetails
           Top = 136
           Width = 33
           Height = 21
-          ReadOnly = True
-          TabOrder = 6
+          TabOrder = 5
           OnChange = Lblv2YearChange
         end
         object Lblv2Comment: TEdit
@@ -1076,7 +1026,6 @@ object FDetails: TFDetails
           Top = 112
           Width = 313
           Height = 21
-          ReadOnly = True
           TabOrder = 3
           OnChange = Lblv2Change
         end
@@ -1085,8 +1034,7 @@ object FDetails: TFDetails
           Top = 136
           Width = 41
           Height = 21
-          ReadOnly = True
-          TabOrder = 5
+          TabOrder = 4
           OnChange = Lblv2TrackChange
         end
         object BtnResetRating: TButton
@@ -1095,18 +1043,26 @@ object FDetails: TFDetails
           Width = 81
           Height = 21
           Caption = 'Reset'
-          TabOrder = 11
+          TabOrder = 10
           OnClick = BtnResetRatingClick
+        end
+        object cbIDv2Genres: TComboBox
+          Left = 64
+          Top = 136
+          Width = 145
+          Height = 21
+          AutoComplete = False
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          ItemHeight = 13
+          Sorted = True
+          TabOrder = 11
+          OnChange = Lblv2Change
         end
       end
     end
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 8
         Top = 0
@@ -1218,7 +1174,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbPicturesChange
         end
