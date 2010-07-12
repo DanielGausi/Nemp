@@ -65,9 +65,6 @@ type
     GrpBox_ID3v2: TGroupBox;
     Btn_Properties: TButton;
     Timer1: TTimer;
-    pnlIDv1Genre: TPanel;
-    cbIDv1Genres: TComboBox;
-    pnlIDv2Genre: TPanel;
     Tab_Lyrics: TTabSheet;
     GrpBox_Lyrics: TGroupBox;
     PnlWarnung: TPanel;
@@ -180,7 +177,6 @@ type
     Lblv2Comment: TEdit;
     Lblv2Track: TEdit;
     CoverBox: TComboBox;
-    cbIDv2Genres: TComboBox;
     cbPictures: TComboBox;
     Memo_Lyrics: TMemo;
     ReloadTimer: TTimer;
@@ -188,6 +184,8 @@ type
     RatingImage: TImage;
     BtnResetRating: TButton;
     LblPlayCounter: TLabel;
+    cbIDv1Genres: TComboBox;
+    cbIDv2Genres: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
