@@ -351,6 +351,7 @@ NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) 
   NempShutDown_HibernateHint_AtEndOfPlaylist = 'Windows will hibernate at the end of the playlist.';
   NempShutDown_ShutDownHint_AtEndOfPlaylist  = 'Windows will shutdown at the end of the playlist.';
   NempShutDown_AtEndOfPlaylist_Hint = 'Note that this only makes sense with mode "Repeat off" and no webstreams in the playlist.';
+  NempShutDown_AtEndOfPlaylist_Dlg = 'Shutting down at the end of the playlist only works with "Repeat off". Do you want to change the playback mode now?';
 
 
   NempShutDown_StopHint     = 'Nemp will stop in %s.';
@@ -643,6 +644,10 @@ ParrtyMode_Password_PromptOnActivate = 'Note: The password to exit the Nemp Part
 
 HeadSetLabel_Default1 = 'Headphones (no title loaded)';
 HeadSetLabel_Default2 = '(no title loaded)';
+
+PlayerBtn_Pause = 'Pause';
+PlayerBtn_Play = 'Play';
+
 
 implementation
 

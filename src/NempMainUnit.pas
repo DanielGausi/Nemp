@@ -426,8 +426,7 @@ type
     PM_PL_ExtendedPasteFromClipboard: TMenuItem;
     N48: TMenuItem;
     PM_PL_Properties: TMenuItem;
-    PM_TNA_Play: TMenuItem;
-    PM_TNA_Pause: TMenuItem;
+    PM_TNA_PlayPause: TMenuItem;
     PM_TNA_Stop: TMenuItem;
     PM_TNA_Next: TMenuItem;
     PM_TNA_Previous: TMenuItem;
@@ -9241,7 +9240,6 @@ begin
   begin
       if NempOptions.ShutDownAtEndOfPlaylist then
       begin
-
           case NempOptions.ShutDownMode of
               SHUTDOWNMODE_ExitNemp  : begin
                                         MM_T_ShutdownModeCloseNemp.Caption := NempShutDown_ClosePopupTime_AtEndOfPlaylist;
@@ -9344,7 +9342,25 @@ end;
 
 
 procedure TNemp_MainForm.ShutDown_EndofPlaylistClick(Sender: TObject);
+var DlgResult: Integer;
 begin
+    if NempPlaylist.WiedergabeMode <> NEMP_API_NOREPEAT then
+    begin
+        DlgResult := MessageDlg(NempShutDown_AtEndOfPlaylist_Dlg,
+            mtWarning, [MBYes, MBNO, MBAbort], 0);
+    end else
+        DlgResult := mrNone;
+
+    // Exit when user choosed "Cancel"
+    if DlgResult = MrAbort then exit;
+
+    // switch mode
+    if DlgResult = MrYes then
+    begin
+        NempPlaylist.WiedergabeMode := NEMP_API_NOREPEAT; //(NempPlaylist.WiedergabeMode + 1) Mod 4;
+        SetRepeatBtnGraphics;
+    end;
+
     NempOptions.ShutDownMode := ((Sender as TMenuItem).Tag) DIV 100;
 
     NempOptions.ShutDownAtEndOfPlaylist := True;
@@ -9377,6 +9393,7 @@ begin
                                  end;
     end;
 
+    SleepTimer.Enabled := False;
     ResetShutDownCaptions;
     ReArrangeToolImages;
     SleepImage.Hint := GenerateSleepHint;
