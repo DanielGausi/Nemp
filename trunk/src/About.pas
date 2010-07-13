@@ -96,7 +96,7 @@ begin
         end;
     end;
 
-   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString('') + ' (Release Candidate)');
+   NempCredits.Credits.Insert(3, 'Version ' + GetFileVersionString(''));// + ' (Release Candidate)');
 end;
 
 procedure TAboutForm.FormShow(Sender: TObject);
