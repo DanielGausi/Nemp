@@ -859,7 +859,6 @@ end;
 
 procedure UpdateSmallMainForm;
 var formregion,
-  formregion1: HRGN;
   xpbottom, xptop, xpleft, xpright: integer;
 begin
     with Nemp_MainForm do

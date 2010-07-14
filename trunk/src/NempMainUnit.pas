@@ -3203,7 +3203,9 @@ begin
       end;
       3: begin
         // Quelle ist das Cover-Flow-Image
-        MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).ID);
+        //MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).ID);
+        MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
+
         // Sortieren
         if aList.Count <= 5000 then
             aList.Sort(Sortieren_AlbumTrack_asc);

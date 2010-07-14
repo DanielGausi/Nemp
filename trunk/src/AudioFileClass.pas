@@ -1292,7 +1292,6 @@ begin
 
   FileIsPresent:=True;
   FileChecked := True;
-  {$Message Hint 'WMAFILE Überprüfen (done?)'}
   wmaFile := TWMAFile.create;
   if wmaFile.ReadFromFile(filename) then
   begin
@@ -1361,7 +1360,6 @@ var
   // chunk seeking function,
   // -1 means: chunk not found
 
- {$Message Hint 'WAV-File: Ok (?)'}
   function GotoChunk(ID: AnsiString): Integer;
   var
     chunkID: array[0..3] of AnsiChar;
