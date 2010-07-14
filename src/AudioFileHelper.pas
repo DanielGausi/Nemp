@@ -1131,7 +1131,6 @@ var mylist: tStringlist;
 begin
       mylist := TStringlist.Create;
       try
-          {$Message Hint 'UTF8 in ASX so ok (?)'}
           myList.LoadFromFile(aFileName);
           if (mylist.Count > 0) and AnsiStartsText('<asx', Trim(mylist[0])) then
           begin

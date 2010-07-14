@@ -1136,7 +1136,6 @@ var bibFile: TAudioFile;
       end;
 
 begin
-    result := False;
     originalPath := Original.Pfad;
 
     // 1. Add Original itself
