@@ -131,8 +131,8 @@ ShowWindow
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin
-       Nemp_MainForm.Hide;
-       Application.ShowMainForm := False;
+       //Nemp_MainForm.Hide;
+       //Application.ShowMainForm := False;
        PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
     end;
 
