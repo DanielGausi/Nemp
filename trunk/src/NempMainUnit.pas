@@ -2171,24 +2171,22 @@ end;
 
 
 procedure TNemp_MainForm.RestoreNemp;
-
-Procedure ShowApplication;
-Var 
-  Thread1, 
-  Thread2: Cardinal;
-Begin 
-  Thread1 := GetCurrentThreadId;
-  Thread2 := GetWindowThreadProcessId (GetForegroundWindow, nil); 
-  AttachThreadInput (Thread1, Thread2, true); 
-  Try
-    SetForegroundWindow (Nemp_MainForm.Handle);
-  Finally 
-    AttachThreadInput (Thread1, Thread2, false); 
-  End;
-  if NempOptions.HideDeskbandOnRestore then
-    NotifyDeskband(NempDeskbandDeActivateMessage);
-End;
-
+    Procedure ShowApplication;
+    Var
+      Thread1,
+      Thread2: Cardinal;
+    Begin
+      Thread1 := GetCurrentThreadId;
+      Thread2 := GetWindowThreadProcessId (GetForegroundWindow, nil);
+      AttachThreadInput (Thread1, Thread2, true);
+      Try
+        SetForegroundWindow (Nemp_MainForm.Handle);
+      Finally
+        AttachThreadInput (Thread1, Thread2, false);
+      End;
+      if NempOptions.HideDeskbandOnRestore then
+        NotifyDeskband(NempDeskbandDeActivateMessage);
+    End;
 begin
   // NEMPWINDOW_ONLYTASKBAR = 0;
   // NEMPWINDOW_TASKBAR_MIN_TRAY = 1;
@@ -2207,12 +2205,16 @@ begin
 
   MinimizedIndicator := False;
 
-  if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
-      ShowWindow( Application.Handle, SW_HIDE );
+  //if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+  //    ShowWindow( Application.Handle, SW_HIDE );
 
   Show;
   ShowApplication;
   Application.ShowMainForm := True;
+
+  if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+      ShowWindow( Application.Handle, SW_HIDE );
+
 end;
 
 
@@ -5088,35 +5090,38 @@ var Data: PTreeData;
 begin
   with TargetCanvas do
   begin
-    if (Node = NempPlaylist.PlayingNode) Or (Node = NempPlaylist.ActiveCueNode) then
-    begin
-      if NempSkin.isActive then
-        Pen.Color := NempSkin.SkinColorScheme.PlaylistPlayingFileColor
-      else
-        Pen.Color := clGradientActiveCaption;
-      pen.Width := 2;//3;
+      if (Node = NempPlaylist.PlayingNode) Or (Node = NempPlaylist.ActiveCueNode) then
+      begin
+        if NempSkin.isActive then
+            Pen.Color := NempSkin.SkinColorScheme.PlaylistPlayingFileColor
+        else
+            Pen.Color := clGradientActiveCaption;
+        pen.Width := 2;//3;
 
-      Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
-            Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
-            Point(ItemRect.Right-1, ItemRect.Bottom-1),
-            Point(ItemRect.Right-1, ItemRect.Top+1),
-            Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
-            );
-    end;
+        Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
+              );
+      end;
 
-    Data := PlaylistVST.GetNodeData(Node);
-    if TAudioFile(Data^.FAudioFile).PrebookIndex > 0 then
-    begin
-        // Clear the area
-        //brush.Color := PlaylistVST.Color;
-        //Fillrect(Rect(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top, ItemRect.Left+2*PlaylistVST.Indent, ItemRect.Bottom));
-        // Paint the Index of the file
-        Brush.Style := bsClear;
-        Font.Size := 8; // fixed size. Otherwise the Indent can be to small
-        Font.Style := [fsUnderline];
-        TextOut(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top,
-                IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
-    end;
+      Data := PlaylistVST.GetNodeData(Node);
+      if assigned(Data) then
+      begin
+          if TAudioFile(Data^.FAudioFile).PrebookIndex > 0 then
+          begin
+              // Clear the area
+              //brush.Color := PlaylistVST.Color;
+              //Fillrect(Rect(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top, ItemRect.Left+2*PlaylistVST.Indent, ItemRect.Bottom));
+              // Paint the Index of the file
+              Brush.Style := bsClear;
+              Font.Size := 8; // fixed size. Otherwise the Indent can be to small
+              Font.Style := [fsUnderline];
+              TextOut(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top,
+                      IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
+          end;
+      end;
   end;
 end;
 
@@ -5126,16 +5131,20 @@ procedure TNemp_MainForm.StringVSTGetText(Sender: TBaseVirtualTree;
 var Data: PStringTreeData;
 begin
   Data:=Sender.GetNodeData(Node);
-  if TJustAstring(Data^.FString).DataString = BROWSE_ALL then
-      CellText := _('<All Files>')
-  else
-      if TJustAstring(Data^.FString).DataString = BROWSE_PLAYLISTS then
-          CellText := _('<Playlists>')
+  if assigned(Data) then
+  begin
+      if TJustAstring(Data^.FString).DataString = BROWSE_ALL then
+          CellText := _('<All Files>')
       else
-          if TJustAstring(Data^.FString).DataString = BROWSE_RADIOSTATIONS then
-              CellText := _('<Webradio>')
+          if TJustAstring(Data^.FString).DataString = BROWSE_PLAYLISTS then
+              CellText := _('<Playlists>')
           else
-              CellText := TJustAstring(Data^.FString).AnzeigeString;
+              if TJustAstring(Data^.FString).DataString = BROWSE_RADIOSTATIONS then
+                  CellText := _('<Webradio>')
+              else
+                  CellText := TJustAstring(Data^.FString).AnzeigeString;
+  end else
+      CellText := '';
 end;
 
 
