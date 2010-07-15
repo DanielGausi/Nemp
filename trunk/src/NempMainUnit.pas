@@ -2129,8 +2129,10 @@ begin
 
 
   if NempOptions.ShowDeskbandOnMinimize then
-    NotifyDeskband(NempDeskbandActivateMessage);
+      NotifyDeskband(NempDeskbandActivateMessage);
 
+  Application.ShowMainForm := False;
+//  hide;
   MinimizedIndicator := True;
 end;
 
@@ -2205,13 +2207,12 @@ begin
 
   MinimizedIndicator := False;
 
-  Show;
-  ShowApplication;
-
-  Application.ShowMainForm := True;
-
   if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
       ShowWindow( Application.Handle, SW_HIDE );
+
+  Show;
+  ShowApplication;
+  Application.ShowMainForm := True;
 end;
 
 
@@ -2364,7 +2365,15 @@ Procedure TNemp_MainForm.NempAPI_Commands(Var aMSG: tMessage);
 begin
     if aMsg.WParam = COMMAND_RESTORE then
       begin
-        if MinimizedIndicator then RestoreNemp else Application.Minimize;
+        if MinimizedIndicator then
+        begin
+            RestoreNemp;
+            MinimizedIndicator := False;
+        end else
+        begin
+            Application.Minimize;
+            MinimizedIndicator := True;
+        end;
       end else
       begin
 

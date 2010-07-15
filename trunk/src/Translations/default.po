@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-07-13 18:53\n"
-"PO-Revision-Date: 2010-07-13 18:57+0100\n"
+"PO-Revision-Date: 2010-07-14 21:31+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -4538,7 +4538,7 @@ msgstr "Für Logitech Keyboards mit installierter \"iTouch\"-Software: Starte Ne
 #. OptionsCompleteForm..PageControl1..TabSystem2..GrpBoxFileFormatOptions..CBiTouch..Caption
 #: OptionsComplete.dfm:1277
 msgid "Nemp as default player for \"Logitech iTouch\""
-msgstr "Nemp als standard-Player für \"Logitech iTouch\""
+msgstr "Nemp als Standard-Player für \"Logitech iTouch\""
 
 #. OptionsCompleteForm..PageControl1..TabSystem3..Caption
 #: OptionsComplete.dfm:1283
