@@ -1188,6 +1188,7 @@ begin
           FormPosAndSizeCorrect(AuswahlForm);
           FormPosAndSizeCorrect(PlaylistForm);
           FormPosAndSizeCorrect(MedienlisteForm);
+          FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
       end;
 
@@ -1210,27 +1211,14 @@ begin
           OR (ArtistsVST.Width < 40) then
               ArtistsVST.Width := AuswahlPanel.width DIV 2;
 
-      if NempOptions.NempFormAufteilung[Anzeigemode].Maximized then
-        WindowState := wsMaximized;
 
-      if NempSkin.isActive then
-        NempSkin.FitSkinToNewWindow;
-
-      RepairZOrder;
-      // evtl. Form neu zeichnen. Stichwort "Schwarze Ecken"
-
-    // teilweise auskommentiert für Windows 7
-      if (AnzeigeMode = 0) AND (Tag in [0,1]) then
-      begin
-        SetWindowRgn( handle, 0, Not _IsThemeActive );
-        InvalidateRect(handle, NIL, TRUE);
-      end;
 
 
       SnapActive := True;
 
       if Tag = -1 then
       begin
+          // Note:  WindowState := wsMaximized; MUST be set AFTER this!
           Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
           Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
 
@@ -1238,7 +1226,9 @@ begin
           FormPosAndSizeCorrect(AuswahlForm);
           FormPosAndSizeCorrect(PlaylistForm);
           FormPosAndSizeCorrect(MedienlisteForm);
+          FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
+
 
           if NempOptions.FixCoverFlowOnStart then
           begin
@@ -1249,6 +1239,24 @@ begin
                   TopMainPanel.Height := TopMainPanel.Height - 1  ;
           end;
       end;
+
+
+      if NempOptions.NempFormAufteilung[Anzeigemode].Maximized then
+          WindowState := wsMaximized;
+
+      if NempSkin.isActive then
+          NempSkin.FitSkinToNewWindow;
+
+      RepairZOrder;
+      // evtl. Form neu zeichnen. Stichwort "Schwarze Ecken"
+
+    // teilweise auskommentiert für Windows 7
+      if (AnzeigeMode = 0) AND (Tag in [0,1]) then
+      begin
+          SetWindowRgn( handle, 0, Not _IsThemeActive );
+          InvalidateRect(handle, NIL, TRUE);
+      end;
+
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
 
