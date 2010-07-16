@@ -2215,6 +2215,15 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
       ShowWindow( Application.Handle, SW_HIDE );
 
+  FormPosAndSizeCorrect(Nemp_MainForm);
+  FormPosAndSizeCorrect(AuswahlForm);
+  FormPosAndSizeCorrect(PlaylistForm);
+  FormPosAndSizeCorrect(MedienlisteForm);
+  FormPosAndSizeCorrect(ExtendedControlForm);
+  ReInitRelativePositions;
+
+
+
 end;
 
 
@@ -8785,7 +8794,9 @@ end;
 
 procedure TNemp_MainForm.FormPaint(Sender: TObject);
 begin
-  if (Not BassTimer.Enabled) OR (NOT NempPlayer.UseVisualization) then
+  if ((Not BassTimer.Enabled) OR (NOT NempPlayer.UseVisualization))
+      And (not NempIsClosing)
+  then
       Spectrum.DrawClear;
 end;
 
