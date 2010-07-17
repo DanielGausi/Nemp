@@ -458,6 +458,9 @@ type
         procedure ResetRatings;
         // Check, whether Key1 and Key2 matches strings[sortarray[1/2]]
         function ValidKeys(aAudioFile: TAudioFile): Boolean;
+        // set fBrowseListsNeedUpdate to true
+        procedure HandleChangedCoverID;
+
         // Not needed any longer
         // function RestoreSortOrderAfterItemChanged(aAudioFile: tAudioFile): Boolean;
 
@@ -1331,6 +1334,21 @@ begin
       1: begin
           // Coverflow
           UpdateList.Sort(Sortieren_CoverID);
+
+          if fBrowseListsNeedUpdate then
+          begin
+              // We need Block-READ-access in this case here!
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
+              // Set the status of the library to Readaccessblocked
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_ReadAccessBlocked);
+          end;
+
+          if fBrowseListsNeedUpdate then
+          begin
+              Mp3ListeArtistSort.Sort(Sortieren_CoverID);
+              Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+          end;
+
           Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_Cover, NempSortArray);
           Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_Cover, NempSortArray);
       end;
@@ -2578,6 +2596,18 @@ begin
 
     if Not result then
         fBrowseListsNeedUpdate := True;
+end;
+
+{
+    --------------------------------------------------------
+    HandleChangedCoverID
+    - After a Cover-download the Files are not sorted by CoverID
+      so we should resort them before merging with new files.
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.HandleChangedCoverID;
+begin
+    fBrowseListsNeedUpdate := True;
 end;
 
 {

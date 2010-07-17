@@ -4417,7 +4417,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Coverflow'
         TabOrder = 3
         object cb_UseClassicCoverflow: TCheckBox
-          Left = 8
+          Left = 3
           Top = 16
           Width = 409
           Height = 17

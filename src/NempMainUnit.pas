@@ -2215,14 +2215,16 @@ begin
   if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
       ShowWindow( Application.Handle, SW_HIDE );
 
-  FormPosAndSizeCorrect(Nemp_MainForm);
-  FormPosAndSizeCorrect(AuswahlForm);
-  FormPosAndSizeCorrect(PlaylistForm);
-  FormPosAndSizeCorrect(MedienlisteForm);
-  FormPosAndSizeCorrect(ExtendedControlForm);
-  ReInitRelativePositions;
 
-
+  if WindowState <> wsMaximized then
+  begin
+      FormPosAndSizeCorrect(Nemp_MainForm);
+      FormPosAndSizeCorrect(AuswahlForm);
+      FormPosAndSizeCorrect(PlaylistForm);
+      FormPosAndSizeCorrect(MedienlisteForm);
+      FormPosAndSizeCorrect(ExtendedControlForm);
+      ReInitRelativePositions;
+  end;
 
 end;
 
