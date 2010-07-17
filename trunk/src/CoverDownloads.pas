@@ -1144,12 +1144,14 @@ begin
             for i := 0 to afList.Count - 1 do
                 // set the new ID
                 TAudioFile(afList[i]).CoverID := NewID;
+
             // set the new ID on the NempCover-Object
             TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID := NewID;
 
             if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
                 MedienBib.NewCoverFlow.CurrentCoverID := NewID;
 
+            MedienBib.HandleChangedCoverID;
             MedienBib.Changed := True;
         finally
             afList.Free;
