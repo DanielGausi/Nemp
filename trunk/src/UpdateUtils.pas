@@ -35,7 +35,7 @@ unit UpdateUtils;
 
 interface
 
-uses Windows, Classes, SysUtils, StrUtils, Hilfsfunktionen {wegen ParamStrW}, Messages, ExtCtrls, DateUtils, Inifiles, Controls, 
+uses Windows, Classes, SysUtils, StrUtils, Messages, ExtCtrls, DateUtils, Inifiles, Controls,
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException, Nemp_RessourceStrings;
 
 type
@@ -82,6 +82,8 @@ type
             fManualCheck: Boolean;
             fNotifyOnBetas: Boolean;
 
+            fWriteAccessPossible: Boolean;
+
             procedure fCheckForUpdates;
             function fGetUpdateType(aString: String): TUpdateType;
 
@@ -115,6 +117,9 @@ type
             property NotifyOnBetas: Boolean read fNotifyOnBetas write fNotifyOnBetas;
 
             property ManualCheck: Boolean read fManualCheck;
+
+            // Is writeaccess to the inifile possible? If not: Dont show Diaalog, Dont search for Updates
+            property WriteAccessPossible: Boolean read fWriteAccessPossible write fWriteAccessPossible;
 
             constructor Create(aHandle: HWnd);
             destructor Destroy; override;
@@ -220,18 +225,23 @@ procedure TNempUpdater.DoOnTimer(Sender: TObject);
 begin
     fTimer.Enabled := False;
 
+
     if AutoCheck and ((CheckInterval = 0) or (DaysBetween(Now, LastCheck) >= CheckInterval)) then
     begin
         ///  New in Nemp 3.3.3: First MessageDlg canceled.
         ///  Reason: People should know this function now
         ///     and: starting from a CD will cause this dialog EVERY time.
-        //if LastCheck = 0 then
-        //begin
-            //if MessageDlg(NempUpdate_InfoFirstStart, mtInformation, [mbOK, mbCancel], 0) = mrOK then
-            //    CheckForUpdatesManually
-            //else
-            //    AutoCheck := False;
-        //end else
+        if LastCheck = 0 then
+        begin
+            // This would be our first check
+            if fWriteAccessPossible
+                and (MessageDlg(NempUpdate_InfoFirstStart, mtInformation, [mbOK, mbCancel], 0) = mrOK)
+            then
+                CheckForUpdatesManually
+            else
+                AutoCheck := False;
+        end else
+            // ok, AutoCheck is true, so do it
             CheckForUpdatesAutomatically;
     end;
 end;

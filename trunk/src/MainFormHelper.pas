@@ -1303,7 +1303,9 @@ begin
           then
           begin
               MedienBib.CoverSearchLastFMInit := False;
-              if MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes then
+              if Nemp_MainForm.NempOptions.WriteAccessPossible
+                  and (MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes)
+              then
                   MedienBib.CoverSearchLastFM := BoolTrue
               else
                   MedienBib.CoverSearchLastFM := BoolFalse;
