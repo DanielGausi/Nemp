@@ -40,7 +40,9 @@ unit CreateHelper;
 
 interface
 
-    uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees;
+    uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees,
+
+    dialogs;
 
 
     procedure UpdateSplashScreen(status: String);
@@ -165,12 +167,32 @@ begin
             ini.Encoding := TEncoding.UTF8;
             try
                 Ini.UpdateFile;
+                NempOptions.WriteAccessPossible := True;
             except
                 // Silent Exception
+                NempOptions.WriteAccessPossible := False;
             end;
+
+            NempUpdater.WriteAccessPossible := NempOptions.WriteAccessPossible;
         finally
             ini.Free
         end;
+
+        {// Now: Get LastExitOK from the file (test for writeaccess)
+        ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
+        try
+            NempOptions.WriteAccessPossible := Not (Ini.ReadBool('Allgemein', 'LastExitOK', True));
+
+            if NempOptions.WriteAccessPossible then
+                showmessage('ok')
+            else
+                showmessage('nicht ok');
+
+        finally
+            ini.Free;
+        end;
+        }
+
 
         ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
         try

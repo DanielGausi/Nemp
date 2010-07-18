@@ -189,6 +189,8 @@ type
         DetailMode: Integer;
         CoverWidth: Integer;
 
+        WriteAccessPossible: Boolean;
+
         // Steuerung des Deskbands:
         //Folgende Nachrichten werden registriert und an ein Deskband gesendet:
         //NEMP_DESKBAND_ACTIVATE:   array [0..MAX_PATH] of Char = 'NEMP - Deskband Activate'#0;
