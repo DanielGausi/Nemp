@@ -2424,7 +2424,6 @@ object Nemp_MainForm: TNemp_MainForm
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 144
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
@@ -2439,7 +2438,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 116
       DesignSize = (
         845
         156)
@@ -2452,7 +2450,6 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 106
         object Splitter4: TSplitter
           Left = 400
           Top = 0
@@ -2533,7 +2530,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 106
           Columns = <
             item
               Position = 0
@@ -2617,7 +2613,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 106
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3954,7 +3949,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300F0040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300F8040E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4519,7 +4514,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806F40510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806FC0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7270,8 +7265,8 @@ object Nemp_MainForm: TNemp_MainForm
     Active = True
     CustomLiveView = False
     OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
-    Left = 696
-    Top = 632
+    Left = 728
+    Top = 624
   end
   object MemoDisableTimer: TTimer
     Enabled = False
@@ -7284,7 +7279,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800980210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800A00210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

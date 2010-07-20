@@ -428,7 +428,7 @@ begin
   fAllowItemAccess := True;
   fFrameDone := False;
   SetLength (fItem, 0);
-  fCurrentItem := 0;
+  fCurrentItem := -1;//0;
   fSelectedItem := -1;
   fQueryDeleteTexture := -1;
   fQueryUpdateTexture := -1;
