@@ -1239,11 +1239,13 @@ begin
                                                 PlayPauseBTN.GlyphLine := 0;
                                                 fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 1;
                                                 PM_TNA_PlayPause.Caption := PlayerBtn_Play;
+                                                PM_TNA_PlayPause.ImageIndex := 1;
                                           end;
                                           NEMP_API_PLAYING : begin
                                             PlayPauseBTN.GlyphLine := 1;
                                             fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
                                             PM_TNA_PlayPause.Caption := PlayerBtn_Pause;
+                                            PM_TNA_PlayPause.ImageIndex := 2;
                                           end;
                                       end;
                                       //showmessage(Inttostr(Message.wParam));
