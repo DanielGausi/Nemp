@@ -2410,7 +2410,7 @@ begin
 
             if MainAudioFile.Artist <> AUDIOFILE_UNKOWN then
             begin
-                s := MainAudioFile.Titel;
+                s := StringReplace(MainAudioFile.Titel,'&','&&',[rfReplaceAll]);
                 r := Rect(102, 4, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
                 // get needed Height of the Artist-String
@@ -2423,7 +2423,7 @@ begin
                 r := Rect(102, 4, 198, 30);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
 
-                s := MainAudioFile.Artist;
+                s := StringReplace(MainAudioFile.Artist,'&','&&',[rfReplaceAll]);
                 b.Canvas.Font.Color := Spectrum.PreviewArtistColor;
                 r := Rect(102, 4 + h, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
@@ -2435,11 +2435,10 @@ begin
                else
                    b.Canvas.TextOut(102,44, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
 
-
             end else
             begin
                 // just the title
-                s := MainAudioFile.Titel;
+                s := StringReplace(MainAudioFile.Titel,'&','&&',[rfReplaceAll]);
                 b.Canvas.Font.Color := Spectrum.PreviewTitleColor;
                 r := Rect(102, 4, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
