@@ -695,7 +695,7 @@ begin
         MB_UnifyPlaylistRating: begin
             // im Lparam steckt ein AudioFile drin
             af := TAudioFile(aMsg.LParam);
-            NempPlaylist.UnifyRating(af.Pfad, af.Rating);
+            NempPlaylist.UnifyRating(af.Pfad, af.Rating, af.PlayCounter);
         end;
 
   end;

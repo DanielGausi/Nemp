@@ -364,7 +364,7 @@ type
         //PersonalizeMainCover: Boolean;
 
         // Fürs Detail-Fenster:
-        WriteRatingToTag: Boolean;
+        //WriteRatingToTag: Boolean; // not used any longer
 
         // zur Laufzeit - weitere Sortiereigenschaften
         //Sortparam: Integer; // Eine der CON_ // CON_EX_- Konstanten
@@ -1019,8 +1019,8 @@ begin
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
         //UseNempDefaultCover      := Ini.ReadBool('MedienBib', 'UseNempDefaultCover', True);
         //PersonalizeMainCover     := Ini.ReadBool('MedienBib', 'PersonalizeMainCover', True);
+        //WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
 
-        WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
 
         BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 0);
         if (BrowseMode < 0) OR (BrowseMode > 2) then
@@ -1125,8 +1125,7 @@ begin
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
         //Ini.WriteBool('MedienBib', 'PersonalizeMainCover', PersonalizeMainCover);
-
-        Ini.Writebool('MedienBib','WriteRatingToTag', WriteRatingToTag);
+        //Ini.Writebool('MedienBib','WriteRatingToTag', WriteRatingToTag);
 
         ini.WriteBool('MedienBib', 'other', IncludeAll);
         ini.WriteString('MedienBib', 'includefilter', IncludeFilter);
