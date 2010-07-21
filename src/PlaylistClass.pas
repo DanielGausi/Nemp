@@ -268,7 +268,7 @@ type
 
       // when the user change the rating of a audiofile-object, it should be
       // changed in the whole playlist. (It could be multiply times in the playlist!)
-      procedure UnifyRating(aFilename: String; aRating: Byte);
+      procedure UnifyRating(aFilename: String; aRating: Byte; aCounter: Integer);
 
       procedure CollectFilesWithSameFilename(aFilename: String; Target: TObjectList);
 
@@ -1998,7 +1998,7 @@ end;
     Used when the user changes the rating of a file
     --------------------------------------------------------
 }
-procedure TNempPlaylist.UnifyRating(aFilename: String; aRating: Byte);
+procedure TNempPlaylist.UnifyRating(aFilename: String; aRating: Byte; aCounter: Integer);
 var i: Integer;
     af: TAudioFile;
 begin
@@ -2006,7 +2006,10 @@ begin
     begin
         af := TAudioFile(Playlist[i]);
         if af.Pfad = aFilename then
+        begin
             af.Rating := aRating;
+            af.PlayCounter := aCounter;
+        end;
         if af = Player.MainAudioFile then
             Spectrum.DrawRating(af.Rating);
     end;

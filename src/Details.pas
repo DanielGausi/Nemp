@@ -543,7 +543,6 @@ end;
     RatingImageMouseDown
     RatingImageMouseLeave
     BtnResetRatingClick
-    cbWriteRatingToTagClick
     - Edit the rating of the current audiofile
     --------------------------------------------------------
 }
