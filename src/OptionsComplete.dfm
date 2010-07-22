@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio2
+    ActivePage = TabExtended0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -4417,7 +4417,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Coverflow'
         TabOrder = 3
         object cb_UseClassicCoverflow: TCheckBox
-          Left = 3
+          Left = 8
           Top = 16
           Width = 409
           Height = 17
