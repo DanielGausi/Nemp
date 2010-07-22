@@ -56,7 +56,7 @@ procedure Handle_STFinish(var Msg: TMessage);
 implementation
 
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass,
+uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass, Details,
     MainFormHelper, CoverHelper, AudioFileHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
@@ -696,6 +696,16 @@ begin
             // im Lparam steckt ein AudioFile drin
             af := TAudioFile(aMsg.LParam);
             NempPlaylist.UnifyRating(af.Pfad, af.Rating, af.PlayCounter);
+
+
+            if assigned(FDetails)
+                and FDetails.Visible
+                and assigned(af)
+                and assigned(FDetails.AktuellesAudioFile)
+                and (FDetails.AktuellesAudioFile.Pfad = af.Pfad)
+            then
+                FDetails.ReloadTimer.Enabled := True;
+
         end;
 
   end;

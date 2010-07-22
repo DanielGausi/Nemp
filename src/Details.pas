@@ -1032,6 +1032,7 @@ procedure TFDetails.ShowMediaBibDetails;
 var i: Integer;
     mbAudioFile: TAudioFile;
     FirstCoverIsFromMB: Boolean;
+    LocalPlayCounter: Integer;
 begin
   if AktuellesAudioFile = Nil then
   begin
@@ -1122,10 +1123,13 @@ begin
             else
                 LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
             LBLSamplerate.Caption := Samplerate + ', ' + ChannelMode;
-            LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [PlayCounter]);
+
 
             if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
-                ActualRating := Rating
+            begin
+                ActualRating := Rating;
+                LocalPlayCounter := PlayCounter;
+            end
             else
             begin
                 mbAudioFile := MedienBib.GetAudioFileWithFilename(AktuellesAudioFile.Pfad);
@@ -1133,13 +1137,16 @@ begin
                 begin
                     ActualRating := mbAudioFile.Rating;
                     AktuellesAudioFile.Rating := mbAudioFile.Rating;
+                    LocalPlayCounter := mbAudioFile.PlayCounter;
                 end else
                 begin
                     // File is not in MediaLibrary, but PlaylistFile
                     ActualRating := ID3v2Tag.Rating;
+                    LocalPlayCounter := ID3v2Tag.PlayCounter;
                 end;
             end;
             DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
+            LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [LocalPlayCounter]);
           end;
           LBLArtist.Caption := Artist;
           LBLTitel.Caption  := Titel;
@@ -1873,7 +1880,7 @@ begin
         (
           ID3v2HasChanged                      // and changed
           or PictureHasChanged
-          or(ActualRating <> AktuellesAudioFile.Rating)
+          or (ActualRating <> AktuellesAudioFile.Rating)
         )
     then
     begin
