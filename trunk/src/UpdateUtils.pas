@@ -507,7 +507,7 @@ procedure TNempUpdater.LoadFromIni(ini: TMemIniFile);
 begin
     LastCheck      := Ini.ReadDateTime('Updater', 'LastCheck', 0);
     fCheckInterval := Ini.ReadInteger('Updater', 'Interval', 7);
-    fAutoCheck     := Ini.ReadBool('Updater', 'AutoCheck', False);
+    fAutoCheck     := Ini.ReadBool('Updater', 'AutoCheck', True);
     fNotifyOnBetas := Ini.ReadBool('Updater', 'NotifyOnBetas', False);
 end;
 
