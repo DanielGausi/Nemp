@@ -142,6 +142,7 @@ Neue Funktionen:
   - Anzeige der häufigsten Tags in unterschiedlichen Schriftgrößen
   - Doppelklick auf einen tag erzeugt neue Tagwolke, eingeschränkt auf alle
     Dateien, die diesen Tag enthalten
+* Lyricsuche im Netz funktioniert wieder
 * Sortierung nach Dateialter hinzugefügt
   - zum Browsen werden die Dateien nach Monaten gruppiert
 * Spalte Dateityp (mp3, ogg, ...) hinzugefügt
