@@ -3997,6 +3997,7 @@ procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader;
   HitInfo: TVTHeaderHitInfo);
 var oldAudioFile: TAudioFile;
 begin
+  VST.CancelEditNode;
   if (HitInfo.Button = mbLeft) then
   begin
       if (HitInfo.Column > -1 ) then

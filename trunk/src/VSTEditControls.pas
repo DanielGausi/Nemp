@@ -320,7 +320,10 @@ begin
   end;
   FTree.InvalidateNode(FNode);
   //FEdit.Hide;
-  FTree.SetFocus;
+  try
+    FTree.SetFocus;
+  except
+  end;
 end;
 
 procedure TRatingEditLink.RatingMouseMove(Sender: TObject; Shift: TShiftState;
@@ -410,8 +413,11 @@ function TModStringEditLink.CancelEdit: Boolean;
 begin
   Result := True;
   //FEdit.Hide;
+  try
+      FTree.SetFocus;
+  except
 
-  FTree.SetFocus;
+  end;
 end;
 
 function TModStringEditLink.EndEdit: Boolean;
@@ -428,7 +434,10 @@ begin
   //FEdit.Hide;
 
 //  Nemp_MainForm.Caption := 'Setting Focus ...';
-  FTree.SetFocus;
+  try
+      FTree.SetFocus;
+  except
+  end;
 end;
 
 //procedure TestTimeFire(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
