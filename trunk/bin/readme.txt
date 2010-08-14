@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Juli 2010
+      Januar 2005 - August 2010
 
-      Version: 4.0.0
+      Version: 4.0.1
 
 
 -----------------------------------------------------------
@@ -122,6 +122,14 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
   
+
+Version 4.0.1, August 2010
+----------------------------------------------------------- 
+Bugfix:
+-------
+* Bewertungen wurden nicht in den ID3-Tag übernommen, wenn der 
+  Abspielzähler auf 0 stand
+
 
 Version 4.0.0 (Serengeti), Mai-Juli 2010
 ----------------------------------------------------------- 
