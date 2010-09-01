@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nemp 3.1\n"
 "POT-Creation-Date: 2010-07-13 18:53\n"
-"PO-Revision-Date: 2010-07-14 21:31+0100\n"
+"PO-Revision-Date: 2010-09-01 21:00+0100\n"
 "Last-Translator: Daniel Gaußmann <mail@gausi.de>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "MIME-Version: 1.0\n"
@@ -8400,7 +8400,7 @@ msgstr "Nein. Nemp wird nicht _alles_ in die Playlist packen."
 #. Programmer's name for it: Playlist_FileNotFound
 #: Nemp_RessourceStrings.pas:565
 msgid "The specified file can not be found."
-msgstr "Die angegebene Datei konnte nciht gefunden werden."
+msgstr "Die angegebene Datei konnte nicht gefunden werden."
 
 #. Programmer's name for it: Playlist_NoRecentlists
 #: Nemp_RessourceStrings.pas:566
