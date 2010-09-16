@@ -701,6 +701,7 @@ var dummy: UnicodeString;
   BassInfo: BASS_DEVICEINFO;
 begin
   // Bass_freigeben
+  BASS_PluginFree(0); // first: clear all Plugins, otherwise Plugin_Load in InitBassEngine will fail
   i := 0;
   while (Bass_GetDeviceInfo(i, BassInfo)) do
   begin

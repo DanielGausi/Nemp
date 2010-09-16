@@ -810,6 +810,8 @@ type
     BtnHeadsetToPlaylist: TSkinButton;
     PM_PL_ClearPlaylist: TMenuItem;
     MM_PL_ClearPlaylist: TMenuItem;
+    ButtonNextEQ: TButton;
+    ButtonPrevEQ: TButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1012,6 +1014,7 @@ type
     function GetDefaultEQName(aIdx: Integer): String;
     procedure InitEqualizerMenuFormIni(aIni: TMemIniFile);
     procedure SetEqualizerFromPresetClick(Sender: TObject);
+    procedure SetEqualizerByName(aSetting: UnicodeString);
     procedure Btn_EqualizerPresetsClick(Sender: TObject);
     procedure DirectionPositionBTNClick(Sender: TObject);
     procedure SaveEQSettingsClick(Sender: TObject);
@@ -1094,6 +1097,7 @@ type
     procedure Schlafmodusdeaktivieren1Click(Sender: TObject);
 
     procedure LoadARecentPlaylist(Sender: TObject);
+    function DeleteFileFromRecentList(aIdx: Integer): boolean;
     function AddFileToRecentList(NewFile: UnicodeString): Boolean;
     Procedure SetRecentPlaylistsMenuItems;
 
@@ -1353,6 +1357,7 @@ type
     procedure test1Click(Sender: TObject);
     procedure SlideBackHeadsetBTNClick(Sender: TObject);
     procedure SlideForwardHeadsetBTNClick(Sender: TObject);
+    procedure ButtonNextEQClick(Sender: TObject);
 
   private
 
@@ -7757,6 +7762,7 @@ begin
   Equalizer_PopupMenu.Popup(Point.X, Point.Y);
 end;
 
+
 function TNemp_MainForm.GetDefaultEQName(aIdx: Integer): String;
 begin
   if (aIdx >= 0) and (aIdx <= 17) then
@@ -7855,36 +7861,78 @@ begin
     Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
 end;
 
-
-procedure TNemp_MainForm.SetEqualizerFromPresetClick(Sender: TObject);
+procedure TNemp_MainForm.SetEqualizerByName(aSetting: UnicodeString);
 var i, DefIndex: integer;
   preset: single;
-  PresetName: String;
   ini: TMeminiFile;
+begin
+    // DefaultIndex ermitteln (für die voreingestellten Settings, falls die Ini leer ist)
+    DefIndex := GetDefaultEqualizerIndex(aSetting);
+
+    // Daten aus Ini laden
+    ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+    try
+        for i := 0 to 9 do
+        begin
+            preset := Ini.ReadInteger(aSetting, 'EQ'+inttostr(i+1), Round(EQ_DEFAULTPRESETS[DefIndex][i])) / EQ_NEW_FACTOR ;
+            NempPlayer.SetEqualizer(i, preset);
+            CorrectEQButton(i, False);
+        end;
+    finally
+        ini.Free
+    end;
+
+    if SameText(aSetting,EQ_NAMES[0]) then
+        NempPlayer.EQSettingName := (MainForm_BtnEqualizerPresetsSelect)
+    else
+        NempPlayer.EQSettingName := aSetting;
+    Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
+
+end;
+
+procedure TNemp_MainForm.SetEqualizerFromPresetClick(Sender: TObject);
+var PresetName: String;
 begin
   // Gewählte Einstellung erkennen
   PresetName := (Sender as TMenuItem).Caption;
-  // DefaultIndex ermitteln (für die voreingestellten Settings, falls die Ini leer ist)
-  DefIndex := GetDefaultEqualizerIndex(PresetName);
 
-  // Daten aus Ini laden
-  ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
-  try
-      for i := 0 to 9 do
-      begin
-          preset := Ini.ReadInteger(PresetName, 'EQ'+inttostr(i+1), Round(EQ_DEFAULTPRESETS[DefIndex][i])) / EQ_NEW_FACTOR ;
-          NempPlayer.SetEqualizer(i, preset);
-          CorrectEQButton(i);
-      end;
-  finally
-      ini.Free
-  end;
+  SetEqualizerByName(PresetName);
+end;
 
-  if SameText(PresetName,EQ_NAMES[0]) then
-      NempPlayer.EQSettingName := (MainForm_BtnEqualizerPresetsSelect)
-  else
-      NempPlayer.EQSettingName := (Sender as TMenuItem).Caption;
-  Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
+procedure TNemp_MainForm.ButtonNextEQClick(Sender: TObject);
+var //currentSetting: String;
+    i, currentIdx, maxIdx, nextIdx: Integer;
+    newSetting: String;
+    Ini: TMeminiFile;
+begin
+    // Get the Index of the Current setting
+    currentIdx := GetDefaultEqualizerIndex(NempPlayer.EQSettingName);
+
+    // Get next Element
+    Ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
+    try
+        maxIdx := Ini.ReadInteger('Summary', 'Max', 17);
+
+        if (Sender as TButton).Tag = 0 then
+        begin
+            if currentIdx <= 0 then
+                nextIdx := maxIdx
+            else
+                nextIdx := currentIdx - 1;
+        end else
+        begin
+            if currentIdx >= maxIdx then
+                nextIdx := 0
+            else
+                nextIdx := currentIdx + 1;
+        end;
+
+        newSetting := Ini.ReadString('Summary', 'Name'+IntToStr(nextIdx), GetDefaultEQName(nextIdx));
+        SetEqualizerByName(newSetting);
+
+    finally
+        Ini.Free;
+    end;
 
 end;
 
@@ -9504,8 +9552,29 @@ begin
         NempPlaylist.Play(0,0, True);
      end
   end else
-      MessageDLG((Playlist_FileNotFound), mtWarning, [MBOK], 0);
+  begin
+      if MessageDLG((Playlist_FileNotFound), mtWarning, [MBYES, MBNO, MBABORT], 0) = mrYes then
+      begin
+          if DeleteFileFromRecentList(idx) then
+              SetRecentPlaylistsMenuItems;
+      end;
+  end;
 end;
+
+function TNemp_MainForm.DeleteFileFromRecentList(aIdx: Integer): boolean;
+var i: Integer;
+begin
+    result := (aIdx > 1) and (aIdx < 11);
+
+    if result then
+    begin
+        // file "aIdx" should be deleted
+        for i := aIdx to 9 do
+            NempOptions.RecentPlaylists[i] := NempOptions.RecentPlaylists[i+1];
+        NempOptions.RecentPlaylists[10] := '';
+    end;
+end;
+
 
 function TNemp_MainForm.AddFileToRecentList(NewFile: UnicodeString): boolean;
 var i, newpos: integer;
@@ -9547,7 +9616,7 @@ Procedure TNemp_MainForm.SetRecentPlaylistsMenuItems;
 var i: Integer;
   aMenuItem: TMenuItem;
 begin
-  // Recent Playlists initialisieren                          
+  // Recent Playlists initialisieren
   MM_PL_RecentPlaylists.Clear;
   PM_PL_RecentPlaylists.Clear;
 

@@ -38,7 +38,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
 
 // passt die VCL an die Player-Werte an
-    procedure CorrectEQButton(band: Integer);
+    procedure CorrectEQButton(band: Integer; ResetCaption: Boolean = True);
     procedure CorrectHallButton;
     procedure CorrectEchoButtons;
     procedure CorrectSpeedButton;
@@ -133,7 +133,7 @@ begin
 end;
 
 
-procedure CorrectEQButton(band: Integer);
+procedure CorrectEQButton(band: Integer; ResetCaption: Boolean = True);
 begin
     with Nemp_MainForm do
     begin
@@ -145,7 +145,8 @@ begin
             Round((EQ_NEW_MAX - NempPlayer.fxgain[band])
                   * (EqualizerShape1.Height - EqualizerButtons[band].Height)
                   / (2*EQ_NEW_MAX));
-        Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
+        if ResetCaption then
+            Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
     end;
 end;
 function VCLEQToPlayer(idx: Integer): Single;
