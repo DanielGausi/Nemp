@@ -2590,7 +2590,9 @@ end;
 
 procedure TOptionsCompleteForm.Btn_ReinitPlayerEngineClick(Sender: TObject);
 begin
+//  showmessage('vorher: ' + IntToStr(CBFileTypes.Count) + ', ' + IntToStr(NempPlayer.ValidExtensions.Count) );
   NempPlaylist.RepairBassEngine(True);
+//  showmessage('nachher: ' + IntToStr(CBFileTypes.Count) + ', ' + IntToStr(NempPlayer.ValidExtensions.Count) );
 end;
 
 procedure TOptionsCompleteForm.EditCountdownSongChange(Sender: TObject);

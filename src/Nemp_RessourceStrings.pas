@@ -562,7 +562,7 @@ MediaLibrary_CSVFilter               = 'CSV files';
 
     Playlist_QueryReallyDelete    = 'This will delete your current playlist. Continue?';
     Playlist_NotEverything        = 'No. Nemp will not add _everything_ to the playlist.';
-    Playlist_FileNotFound         = 'The specified file can not be found.';
+    Playlist_FileNotFound         = 'The specified file can not be found. Do you want to delete it from the list?';
     Playlist_NoRecentlists        = 'empty';
 
 
