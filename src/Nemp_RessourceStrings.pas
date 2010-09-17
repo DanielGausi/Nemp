@@ -116,6 +116,8 @@ Warning_TooManyFiles = 'Operation cancelled: Too many files for drag&&drop and c
                       + #13#10
                       + 'You can use the pop-up menu to put all these files into the playlist or just select fewer files.';
 
+Warning_MagicCopyFailed = 'Extended Copy&&Paste failed. This method doesn''t work from write-protected drives (e.g. CD/DVD).';
+
 Error_ID3OnlyInMp3Files = 'ID3-tags can only be written to mp3-files.';
 //Error_EvilLyricsNotFound1 = 'This function needs another program called "EvilLyrics". Start this program and try again.';
 //Error_EvilLyricsNotFound2 = 'This program can easily be found on freeware-sites in the internet.';

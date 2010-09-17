@@ -109,6 +109,11 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
 
+    function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
+    // WritePlaylistForClipBoard: Create a temporary Playlist with the fileNAMES (EXcluding the path)
+    // this playlist is added to the Clipboard in a Copy&Paste-Process
+    // (e.g.: use it to copy the playlist to a USB-Stick or portable player
+    function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 
 implementation
 
@@ -1361,5 +1366,99 @@ begin
     end;
 end;
 
+function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
+var
+  idx: integer;
+  SelectedMP3s: TNodeArray;
+  Data: PTreeData;
+begin
+
+  result := '';
+  SelectedMP3s := aTree.GetSortedSelection(False);
+  if length(SelectedMp3s) > MAX_DRAGFILECOUNT then
+  begin
+      MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+      exit;
+  end;
+
+  for idx := 0 to length(SelectedMP3s)-1 do
+  begin
+      //if aTree.GetNodeLevel(SelectedMP3s[idx]) <> 0 then
+      //showmessage(inttostr(aTree.GetNodeLevel(SelectedMP3s[idx])));
+
+      Data := aTree.GetNodeData(SelectedMP3s[idx]);
+      if FileExists(Data^.FAudioFile.Pfad) then
+          result := result + Data^.FAudioFile.Pfad + #0;
+      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  600)  )
+         AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
+      then
+          result := result + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
+  end;
+end;
+
+// this is called after a succesful call of GetFileListForClipBoardFromTree
+// so we do not need the MAX_DRAGFILECOUNT-Check here
+function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
+var
+    idx: integer;
+    SelectedMP3s: TNodeArray;
+    Data: PTreeData;
+    af: TAudioFile;
+    tmpPlaylist: TStringList;
+    m3u8Needed: Boolean;
+    tmpAnsi: AnsiString;
+    tmpUnicode: UnicodeString;
+    fn: String;
+begin
+    SelectedMP3s := aTree.GetSortedSelection(False);
+
+    // we save the files as an m3u-List (or m3u8, if needed)
+    tmpPlaylist := TStringList.Create;
+    try
+        tmpPlaylist.Add('#EXTM3U');
+        for idx := 0 to length(SelectedMP3s)-1 do
+        begin
+
+            Data := aTree.GetNodeData(SelectedMP3s[idx]);
+            af := Data^.FAudioFile;
+            if FileExists(af.Pfad) then
+            begin
+                // Add File to Playlist
+                tmpPlaylist.add('#EXTINF:' + IntTostr(af.Duration) + ','
+                    + af.Artist + ' - ' + af.Titel);
+                // but only the filename here, without the path
+                // all the files (including this playlist-file) will be copied to the same directory
+                tmpPlaylist.Add(af.Dateiname);
+            end;
+        end;
+
+        // save Playlist
+        tmpUnicode := tmpPlaylist.Text;
+        tmpAnsi := AnsiString(tmpUnicode);
+        m3u8Needed := (tmpUnicode <> UnicodeString(tmpAnsi));
+
+        try
+            if m3u8Needed then
+            begin
+                fn := SavePath + '000-Playlist.m3u8';
+                tmpPlaylist.SaveToFile(fn, TEncoding.UTF8);
+            end
+            else
+            begin
+                fn := SavePath + '000-Playlist.m3u';
+                tmpPlaylist.SaveToFile(fn, TEncoding.Default);
+            end;
+        except
+            // we couldnt save the temporary file
+            // return empty filename
+            fn := '';
+        end;
+
+        result := fn;
+    finally
+        tmpPlaylist.Free;
+    end;
+
+end;
 
 end.

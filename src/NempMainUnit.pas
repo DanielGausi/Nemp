@@ -812,6 +812,8 @@ type
     MM_PL_ClearPlaylist: TMenuItem;
     ButtonNextEQ: TButton;
     ButtonPrevEQ: TButton;
+    PM_PL_MagicCopyToClipboard: TMenuItem;
+    PM_ML_MagicCopyToClipboard: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1359,6 +1361,7 @@ type
     procedure SlideForwardHeadsetBTNClick(Sender: TObject);
     procedure ButtonNextEQClick(Sender: TObject);
     procedure MM_ML_WebradioClick(Sender: TObject);
+    procedure PM_PL_MagicCopyToClipboardClick(Sender: TObject);
 
   private
 
@@ -1869,6 +1872,11 @@ begin
     Spectrum.TimeImage := TimePaintbox;
     Spectrum.StarImage := RatingImage;
 
+    // Set some ShortCuts
+    PM_PL_MagicCopyToClipboard.ShortCut :=
+       Menus.ShortCut(Word('C'), [ssCtrl, ssShift]);
+    PM_ML_MagicCopyToClipboard.ShortCut :=
+       Menus.ShortCut(Word('C'), [ssCtrl, ssShift]);
 end;
 
 procedure TNemp_MainForm.FormShow(Sender: TObject);
@@ -1877,7 +1885,6 @@ begin
   // Nothing to do here. Will be done in nemp.dpr
   if assigned(FSplash) then
       FSplash.Close;
-
 
 end;
 
@@ -6424,6 +6431,8 @@ begin
 end;
 
 
+
+
 procedure TNemp_MainForm.LoadCueSheet(filename: UnicodeString);
 var tmplist: TStringList;
     i: Integer;
@@ -6881,39 +6890,44 @@ end;
 
 procedure TNemp_MainForm.PM_ML_CopyToClipboardClick(Sender: TObject);
 var FileString: UnicodeString;
-  idx: integer;
-  SelectedMP3s: TNodeArray;
-  Data: PTreeData;
-  aVST: TVirtualStringTree;
+    aVST: TVirtualStringTree;
 begin
   if Sender = PM_ML_CopyToClipboard then
       aVST := VST
-      //if Sender = PlayListKopierenPMENU then
-  else
+ else
       aVST :=PlayListVST;
 
-  SelectedMP3s := aVST.GetSortedSelection(False);
-  if length(SelectedMp3s) > MAX_DRAGFILECOUNT then
-  begin
-      MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-      exit;
-  end;
-  FileString := '';
-  for idx := 0 to length(SelectedMP3s)-1 do
-  begin
-      Data := aVST.GetNodeData(SelectedMP3s[idx]);
-      if FileExists(Data^.FAudioFile.Pfad) then
-          FileString := FileString + Data^.FAudioFile.Pfad + #0;
-      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  600)  )
-         AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
-      then
-          FileString := FileString + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
-  end;
+  FileString := GetFileListForClipBoardFromTree(aVST);
 
   if FileString<>'' then
       CopyFilesToClipboard(FileString);
 end;
 
+
+procedure TNemp_MainForm.PM_PL_MagicCopyToClipboardClick(Sender: TObject);
+var FileString: UnicodeString;
+    tmpPlaylist: String;
+    aVST: TVirtualStringTree;
+begin
+    if Sender = PM_PL_MagicCopyToClipboard then
+        aVST := PlayListVST
+    else
+        aVST := VST;
+
+    FileString := GetFileListForClipBoardFromTree(aVST);
+
+    if FileString <> '' then
+    begin
+        tmpPlaylist := WritePlaylistForClipBoard(aVST);
+        if tmpPlaylist <> '' then
+            FileString := FileString + tmpPlaylist + #0
+        else
+            MessageDlg(Warning_MagicCopyFailed, mtInformation, [MBOK], 0);
+    end;
+
+    if FileString<>'' then
+        CopyFilesToClipboard(FileString);
+end;
 
 procedure TNemp_MainForm.PM_ML_PasteFromClipboardClick(Sender: TObject);
 var
