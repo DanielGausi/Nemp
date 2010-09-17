@@ -121,6 +121,8 @@ type
             procedure DownloadCover(aCover: TNempCover; aIdx: Integer);
             procedure DownloadPlayerCover(aAudioFile: TAudioFile);
 
+            procedure ClearCoverCache;
+
     end;
 
 implementation
@@ -290,6 +292,11 @@ end;
 procedure TNempCoverFlow.DownloadPlayerCover(aAudioFile: TAudioFile);
 begin
     fDownloadThread.AddJob(aAudioFile, 0);
+end;
+
+procedure TNempCoverFlow.ClearCoverCache;
+begin
+    fDownloadThread.ClearCacheList;
 end;
 
 function TNempCoverFlow.fGetCurrentItem: Integer;

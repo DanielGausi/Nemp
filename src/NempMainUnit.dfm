@@ -2,8 +2,8 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 886
-  ClientWidth = 845
+  ClientHeight = 726
+  ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
   Constraints.MinWidth = 800
@@ -34,7 +34,7 @@ object Nemp_MainForm: TNemp_MainForm
   object Splitter1: TSplitter
     Left = 0
     Top = 658
-    Width = 845
+    Width = 858
     Height = 4
     Cursor = crVSplit
     Align = alTop
@@ -48,12 +48,13 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 200
     Left = 0
     Top = 0
-    Width = 845
+    Width = 858
     Height = 658
     Align = alTop
     BevelOuter = bvNone
     Constraints.MinHeight = 240
     TabOrder = 0
+    ExplicitWidth = 845
     object Splitter2: TSplitter
       Left = 300
       Top = 0
@@ -2262,7 +2263,7 @@ object Nemp_MainForm: TNemp_MainForm
       Tag = 1
       Left = 538
       Top = 0
-      Width = 307
+      Width = 320
       Height = 658
       Align = alClient
       BevelOuter = bvNone
@@ -2270,11 +2271,12 @@ object Nemp_MainForm: TNemp_MainForm
       OnResize = PlaylistPanelResize
       OnPaint = PanelPaint
       OwnerDraw = False
+      ExplicitWidth = 307
       object GRPBOXPlaylist: TNempPanel
         Tag = 1
         Left = 0
         Top = 28
-        Width = 307
+        Width = 320
         Height = 630
         Align = alClient
         BevelInner = bvRaised
@@ -2282,13 +2284,14 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 0
         OnPaint = NewPanelPaint
         OwnerDraw = False
+        ExplicitWidth = 307
         DesignSize = (
-          307
+          320
           630)
         object PlaylistVST: TVirtualStringTree
           Left = 6
           Top = 2
-          Width = 299
+          Width = 312
           Height = 622
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvNone
@@ -2350,6 +2353,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
+          ExplicitWidth = 299
           Columns = <
             item
               Margin = 0
@@ -2372,21 +2376,22 @@ object Nemp_MainForm: TNemp_MainForm
         Tag = 1
         Left = 0
         Top = 0
-        Width = 307
+        Width = 320
         Height = 28
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
         OnPaint = PanelPaint
         OwnerDraw = False
+        ExplicitWidth = 307
         DesignSize = (
-          307
+          320
           28)
         object PlaylistFillPanel: TNempPanel
           Tag = 1
           Left = 28
           Top = 2
-          Width = 279
+          Width = 292
           Height = 24
           Anchors = [akLeft, akTop, akRight]
           BevelInner = bvRaised
@@ -2394,13 +2399,14 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnPaint = TABPanelPaint
           OwnerDraw = False
+          ExplicitWidth = 279
           DesignSize = (
-            279
+            292
             24)
           object PlayListStatusLBL: TLabel
             Left = 8
             Top = 5
-            Width = 262
+            Width = 275
             Height = 13
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
@@ -2438,19 +2444,20 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 3
     Left = 0
     Top = 662
-    Width = 845
-    Height = 224
+    Width = 858
+    Height = 64
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitWidth = 845
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
-      Width = 845
-      Height = 196
+      Width = 858
+      Height = 36
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2459,23 +2466,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitWidth = 845
       DesignSize = (
-        845
-        196)
+        858
+        36)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
-        Width = 837
-        Height = 186
+        Width = 850
+        Height = 26
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitWidth = 837
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 186
+          Height = 26
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2484,8 +2493,8 @@ object Nemp_MainForm: TNemp_MainForm
         object VST: TVirtualStringTree
           Left = 404
           Top = 0
-          Width = 433
-          Height = 186
+          Width = 446
+          Height = 26
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2551,6 +2560,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitWidth = 433
           Columns = <
             item
               Position = 0
@@ -2624,7 +2634,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 186
+          Height = 26
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2881,7 +2891,7 @@ object Nemp_MainForm: TNemp_MainForm
       Tag = 3
       Left = 0
       Top = 0
-      Width = 845
+      Width = 858
       Height = 28
       Align = alTop
       BevelOuter = bvNone
@@ -2890,8 +2900,9 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = PanelPaint
       OwnerDraw = False
+      ExplicitWidth = 845
       DesignSize = (
-        845
+        858
         28)
       object EDITFastSearch: TEdit
         Left = 32
@@ -2914,7 +2925,7 @@ object Nemp_MainForm: TNemp_MainForm
         Tag = 3
         Left = 232
         Top = 2
-        Width = 605
+        Width = 618
         Height = 23
         Anchors = [akLeft, akTop, akRight]
         BevelInner = bvRaised
@@ -2922,18 +2933,20 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 2
         OnPaint = TABPanelPaint
         OwnerDraw = False
+        ExplicitWidth = 605
         DesignSize = (
-          605
+          618
           23)
         object MedienListeStatusLBL: TLabel
           Left = 8
           Top = 5
-          Width = 591
+          Width = 604
           Height = 13
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
           ShowAccelChar = False
           Transparent = False
+          ExplicitWidth = 591
         end
       end
       object TabBtn_Medialib: TSkinButton
@@ -3005,7 +3018,7 @@ object Nemp_MainForm: TNemp_MainForm
       object MM_ML_Webradio: TMenuItem
         Caption = 'Manage webradio stations'
         ShortCut = 16471
-        OnClick = MM_PL_WebStreamClick
+        OnClick = MM_ML_WebradioClick
       end
       object N22: TMenuItem
         Caption = '-'
@@ -3970,7 +3983,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130024050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130028050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4535,7 +4548,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F806280610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F8062C0610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5873,7 +5886,7 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ML_Webradio: TMenuItem
       Caption = 'Manage webradio stations'
       ShortCut = 16471
-      OnClick = MM_PL_WebStreamClick
+      OnClick = MM_ML_WebradioClick
     end
     object PM_ML_HideSelected: TMenuItem
       Caption = 'Hide selected'
@@ -7300,7 +7313,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800CC0210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800D00210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7717,8 +7730,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object CoverDetails_Popup: TPopupMenu
     Images = MenuImages
-    Left = 48
-    Top = 704
+    Left = 56
+    Top = 656
     object PM_Cover_Aside: TMenuItem
       Tag = 1
       Caption = 'Show details aside the cover'

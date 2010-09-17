@@ -98,7 +98,8 @@ type
             fDataType: TPicType;
 
             fCacheFilename: String;
-            fCacheList: TObjectList;
+            fCacheList: TObjectList;   // Always use CriticalSection CSAccessCacheList to access this List!
+                                       // The List is mainly used by the secondary thread, but can be deleted by the Settings-dialog.
 
             fMostImportantIndex: Integer;
             procedure SetMostImportantIndex(Value: Integer);    // VCL
@@ -156,9 +157,14 @@ type
 
             procedure AddJob(aCover: TNempCover; Idx: Integer); overload;     // VCL
             procedure AddJob(aAudioFile: TAudioFile; Idx: Integer); overload; // VCL
+
+            procedure ClearCacheList; // VCL
     end;
 
     function SortDownloadPriority(item1,item2: Pointer): Integer;
+
+var
+    CSAccessCacheList: RTL_CRITICAL_SECTION;
 
 implementation
 
@@ -311,6 +317,9 @@ begin
                     Synchronize(SyncGetFirstJob);
                     if FWorkToDo then
                     begin
+                        // Block CacheList
+                        EnterCriticalSection(CSAccessCacheList);
+
                         if fCurrentDownloadItem.QueryType = qtPlayer then
                             ProperAlbum := CollectAlbumInformation
                         else
@@ -336,6 +345,7 @@ begin
 
                                       Synchronize(SyncUpdateCover);  // after this: Cover is really ok
                                                                      // i.e. downloaded Data is valid Picture-data
+
                                       if fCurrentDownloadComplete then
                                       begin
                                           if assigned(CurrentCacheItem) then
@@ -368,6 +378,7 @@ begin
                                               end;
                                           end;
                                       end;
+
                                   end else
                                       Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
 
@@ -376,6 +387,8 @@ begin
                         begin
                             Synchronize(SyncUpdateInvalidCover);
                         end;
+                        LeaveCriticalSection(CSAccessCacheList);
+
                     end;
                 end;
             end;
@@ -400,6 +413,7 @@ var Header: AnsiString;
     i, Count: Integer;
     NewItem: TCoverDownloadItem;
 begin
+    EnterCriticalSection(CSAccessCacheList);
     aStream := TMemoryStream.Create;
     try
         if FileExists(fCacheFilename) then
@@ -429,6 +443,7 @@ begin
     finally
         aStream.Free;
     end;
+    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 procedure TCoverDownloadWorkerThread.SaveCacheList;
@@ -437,6 +452,7 @@ var Header: AnsiString;
     aStream: TMemoryStream;
     i, Count: Integer;
 begin
+    EnterCriticalSection(CSAccessCacheList);
     aStream := TMemoryStream.Create;
     try
         Header := 'NempCoverCache';
@@ -464,6 +480,21 @@ begin
     finally
         aStream.Free;
     end;
+    LeaveCriticalSection(CSAccessCacheList);
+end;
+
+{
+    --------------------------------------------------------
+    ClearCacheList:
+    - Clear the Cache
+      Called from the Settings-dialog
+    --------------------------------------------------------
+}
+procedure TCoverDownloadWorkerThread.ClearCacheList;
+begin
+    EnterCriticalSection(CSAccessCacheList);
+    fCacheList.Clear;
+    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 {
@@ -582,6 +613,8 @@ function TCoverDownloadWorkerThread.GetMatchingCacheItem: TCoverDownloadItem;
 var i: Integer;
     aItem: TCoverDownloadItem;
 begin
+    // Block CacheList
+    EnterCriticalSection(CSAccessCacheList);
     result := Nil;
     for i := 0 to fCacheList.Count - 1 do
     begin
@@ -594,6 +627,7 @@ begin
             break;
         end;
     end;
+    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 {
@@ -1159,5 +1193,13 @@ begin
     end;// else
         //Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
 end;
+
+initialization
+
+  InitializeCriticalSection(CSAccessCacheList);
+
+finalization
+
+  DeleteCriticalSection(CSAccessCacheList);
 
 end.
