@@ -441,6 +441,7 @@ type
     GrpBox_HeadsetDefaultAction: TComboBox;
     cb_AutoStopHeadset: TCheckBox;
     cbFixCoverFlowOnStart: TCheckBox;
+    BtnClearCoverCache: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -528,6 +529,7 @@ type
     procedure cb_RatingActiveClick(Sender: TObject);
     procedure cb_RatingChangeCounterClick(Sender: TObject);
     procedure CBAlwaysSortAnzeigeListClick(Sender: TObject);
+    procedure BtnClearCoverCacheClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -2778,6 +2780,12 @@ begin
   finally
       fb.Free;
   end;
+end;
+
+procedure TOptionsCompleteForm.BtnClearCoverCacheClick(Sender: TObject);
+begin
+    MedienBib.NewCoverFlow.ClearCoverCache;
+    MedienBib.NewCoverFlow.ClearTextures;
 end;
 
 procedure TOptionsCompleteForm.Btn_InstallDeskbandClick(Sender: TObject);

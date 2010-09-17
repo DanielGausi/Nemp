@@ -1358,6 +1358,7 @@ type
     procedure SlideBackHeadsetBTNClick(Sender: TObject);
     procedure SlideForwardHeadsetBTNClick(Sender: TObject);
     procedure ButtonNextEQClick(Sender: TObject);
+    procedure MM_ML_WebradioClick(Sender: TObject);
 
   private
 
@@ -4045,6 +4046,8 @@ begin
   MM_ML_SortDescending.Checked := True;
   PM_ML_SortDescending.Checked := True;
 end;
+
+
 
 procedure TNemp_MainForm.VSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
@@ -8740,6 +8743,22 @@ end;
 
 
 procedure TNemp_MainForm.MM_PL_WebStreamClick(Sender: TObject);
+var
+  NewString: string;
+  ClickedOK: Boolean;
+begin
+  NewString := 'http://';
+  ClickedOK := InputQuery(Shoutcast_InputStreamCaption, Shoutcast_InputStreamLabel, NewString);
+  if ClickedOK then
+  begin
+      NempPlayer.LastUserWish := USER_WANT_PLAY;
+      // WebRadioInsertMode := PLAYER_ENQUEUE_FILES;// PLAYER_PLAY_NOW;
+      NempPlayer.MainStation.URL := NewString;
+      NempPlayer.MainStation.TuneIn(NempPlaylist.BassHandlePlaylist);
+  end;
+end;
+
+procedure TNemp_MainForm.MM_ML_WebradioClick(Sender: TObject);
 begin
   if not assigned(FormStreamVerwaltung) then
     Application.CreateForm(TFormStreamVerwaltung, FormStreamVerwaltung);
