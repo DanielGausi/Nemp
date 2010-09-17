@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 726
+  ClientHeight = 826
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -54,7 +54,6 @@ object Nemp_MainForm: TNemp_MainForm
     BevelOuter = bvNone
     Constraints.MinHeight = 240
     TabOrder = 0
-    ExplicitWidth = 845
     object Splitter2: TSplitter
       Left = 300
       Top = 0
@@ -2271,7 +2270,6 @@ object Nemp_MainForm: TNemp_MainForm
       OnResize = PlaylistPanelResize
       OnPaint = PanelPaint
       OwnerDraw = False
-      ExplicitWidth = 307
       object GRPBOXPlaylist: TNempPanel
         Tag = 1
         Left = 0
@@ -2284,7 +2282,6 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 0
         OnPaint = NewPanelPaint
         OwnerDraw = False
-        ExplicitWidth = 307
         DesignSize = (
           320
           630)
@@ -2353,7 +2350,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
-          ExplicitWidth = 299
           Columns = <
             item
               Margin = 0
@@ -2383,7 +2379,6 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 1
         OnPaint = PanelPaint
         OwnerDraw = False
-        ExplicitWidth = 307
         DesignSize = (
           320
           28)
@@ -2399,7 +2394,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnPaint = TABPanelPaint
           OwnerDraw = False
-          ExplicitWidth = 279
           DesignSize = (
             292
             24)
@@ -2445,19 +2439,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 64
+    Height = 164
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitWidth = 845
+    ExplicitHeight = 64
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 858
-      Height = 36
+      Height = 136
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2466,25 +2460,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitWidth = 845
+      ExplicitHeight = 36
       DesignSize = (
         858
-        36)
+        136)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 26
+        Height = 126
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitWidth = 837
+        ExplicitHeight = 26
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 26
+          Height = 126
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2494,7 +2488,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 26
+          Height = 126
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2560,7 +2554,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitWidth = 433
+          ExplicitHeight = 26
           Columns = <
             item
               Position = 0
@@ -2634,7 +2628,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 26
+          Height = 126
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2644,6 +2638,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 26
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -2900,7 +2895,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 0
       OnPaint = PanelPaint
       OwnerDraw = False
-      ExplicitWidth = 845
       DesignSize = (
         858
         28)
@@ -2933,7 +2927,6 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 2
         OnPaint = TABPanelPaint
         OwnerDraw = False
-        ExplicitWidth = 605
         DesignSize = (
           618
           23)
@@ -3983,7 +3976,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130028050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101110013002C050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4513,8 +4506,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object DragDropTimer: TTimer
     OnTimer = DragDropTimerTimer
-    Left = 432
-    Top = 720
+    Left = 176
+    Top = 512
   end
   object SleepTimer: TTimer
     Enabled = False
@@ -4548,7 +4541,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F8062C0610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806300610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5652,8 +5645,8 @@ object Nemp_MainForm: TNemp_MainForm
   object Medialist_PopupMenu: TPopupMenu
     Images = MenuImages
     OnPopup = Medialist_PopupMenuPopup
-    Left = 536
-    Top = 720
+    Left = 128
+    Top = 576
     object PM_ML_Enqueue: TMenuItem
       Caption = 'Enqueue (at the end of the playlist)'
       OnClick = EnqueueTBClick
@@ -5998,6 +5991,10 @@ object Nemp_MainForm: TNemp_MainForm
       ShortCut = 16451
       OnClick = PM_ML_CopyToClipboardClick
     end
+    object PM_ML_MagicCopyToClipboard: TMenuItem
+      Caption = '... and include a proper playlist-file'
+      OnClick = PM_PL_MagicCopyToClipboardClick
+    end
     object PM_ML_PasteFromClipboard: TMenuItem
       Caption = 'Paste from clipboard'
       ShortCut = 16470
@@ -6054,8 +6051,8 @@ object Nemp_MainForm: TNemp_MainForm
   object PlayListPOPUP: TPopupMenu
     Images = MenuImages
     OnPopup = PlayListPOPUPPopup
-    Left = 656
-    Top = 208
+    Left = 368
+    Top = 24
     object PM_PL_AddFiles: TMenuItem
       Caption = 'Add files'
       OnClick = MM_PL_FilesClick
@@ -6249,6 +6246,10 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Copy selected files to clipboard'
       ShortCut = 16451
       OnClick = PM_ML_CopyToClipboardClick
+    end
+    object PM_PL_MagicCopyToClipboard: TMenuItem
+      Caption = '... and include a proper playlist-file'
+      OnClick = PM_PL_MagicCopyToClipboardClick
     end
     object PM_PL_ExtendedPasteFromClipboard: TMenuItem
       Caption = 'Paste from clipboard'
@@ -7306,14 +7307,14 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 150
     OnTimer = MemoDisableTimerTimer
-    Left = 368
-    Top = 720
+    Left = 128
+    Top = 512
   end
   object TaskBarImages: TImageList
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800D00210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800D40210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7730,8 +7731,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object CoverDetails_Popup: TPopupMenu
     Images = MenuImages
-    Left = 56
-    Top = 656
+    Left = 32
+    Top = 576
     object PM_Cover_Aside: TMenuItem
       Tag = 1
       Caption = 'Show details aside the cover'
