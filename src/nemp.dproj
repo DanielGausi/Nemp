@@ -150,6 +150,9 @@
 			</DCCReference>
 			<DCCReference Include="CreateHelper.pas"/>
 			<DCCReference Include="ExPopupList.pas"/>
+			<DCCReference Include="PlaylistToUSB.pas">
+				<Form>PlaylistCopyForm</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

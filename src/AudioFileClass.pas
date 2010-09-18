@@ -141,6 +141,7 @@ type
         procedure SetPath(const Value: UnicodeString);
 
         function fGetPlaylistTitleString: UnicodeString;
+        function fGetProperFilename: UnicodeString;
 
         function fGetTagDisplayString: String;
 
@@ -243,6 +244,7 @@ type
         
         property Pfad: UnicodeString read GetPath write SetPath;
         property PlaylistTitle: UnicodeString read fGetPlaylistTitleString;
+        property FilenameForUSBCopy: UnicodeString read fGetProperFilename;
 
         property Key1: UnicodeString read fKey1 write fKey1;
         property Key2: UnicodeString read fKey2 write fKey2;
@@ -662,6 +664,29 @@ begin
 
   if result = '' then
     result := Pfad;
+end;
+
+function TAudioFile.fGetProperFilename: UnicodeString;
+begin
+  if isStream then
+      result := '//' // invalid Filename ;-)
+  else
+  begin
+      if Artist = AUDIOFILE_UNKOWN then
+      begin
+          if Titel <> Dateiname then
+              result := Titel + '.' + self.Extension
+          else
+              result := Dateiname;
+      end
+      else
+          result := Artist + ' - ' + Titel + '.' + self.Extension;
+
+      result := ReplaceForbiddenFilenameChars(result);
+  end;
+
+  if result = '' then
+      result := ReplaceForbiddenFilenameChars(Dateiname);
 end;
 
 function TAudioFile.fGetTagList: TObjectList;

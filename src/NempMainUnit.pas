@@ -232,8 +232,6 @@ type
     N26: TMenuItem;
     MM_PL_ExtendedAddToMedialibrary: TMenuItem;
     MM_PL_ExtendedScanFiles: TMenuItem;
-    MM_PL_ExtendedCopyToClipboard: TMenuItem;
-    MM_PL_ExtendedPasteFromClipboard: TMenuItem;
     N33: TMenuItem;
     MM_PL_Properties: TMenuItem;
     MM_Options: TMenuItem;
@@ -814,6 +812,7 @@ type
     ButtonPrevEQ: TButton;
     PM_PL_MagicCopyToClipboard: TMenuItem;
     PM_ML_MagicCopyToClipboard: TMenuItem;
+    PM_PL_CopyPlaylistToUSB: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1362,6 +1361,7 @@ type
     procedure ButtonNextEQClick(Sender: TObject);
     procedure MM_ML_WebradioClick(Sender: TObject);
     procedure PM_PL_MagicCopyToClipboardClick(Sender: TObject);
+    procedure PM_PL_CopyPlaylistToUSBClick(Sender: TObject);
 
   private
 
@@ -1553,7 +1553,7 @@ uses   Splash, MultimediaKeys,
   BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
-  TagHelper, PartymodePassword, CreateHelper;
+  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB;
 
 
 {$R *.dfm}
@@ -10066,6 +10066,14 @@ end;
 procedure TNemp_MainForm.PM_PL_ClearPlaylistClick(Sender: TObject);
 begin
     NempPlaylist.ClearPlaylist(False);
+end;
+
+procedure TNemp_MainForm.PM_PL_CopyPlaylistToUSBClick(Sender: TObject);
+begin
+    if not assigned(PlaylistCopyForm) then
+        Application.CreateForm(TPlaylistCopyForm, PlaylistCopyForm);
+
+    PlaylistCopyForm.ShowModal;
 end;
 
 procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);

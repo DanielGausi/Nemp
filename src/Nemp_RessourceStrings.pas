@@ -650,6 +650,12 @@ HeadSetLabel_Default2 = '(no title loaded)';
 PlayerBtn_Pause = 'Pause';
 PlayerBtn_Play = 'Play';
 
+CopyToUSB_Copy = 'Copy files';
+CopyToUSB_Abort = 'Abort';
+CopyToUSB_FileProgress = 'Copying file %s';
+CopyToUSB_Complete = 'Completed';
+
+
 
 implementation
 

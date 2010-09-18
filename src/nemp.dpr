@@ -83,7 +83,8 @@ uses
   HtmlHelper in 'HtmlHelper.pas',
   OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm},
   CreateHelper in 'CreateHelper.pas',
-  ExPopupList in 'ExPopupList.pas';
+  ExPopupList in 'ExPopupList.pas',
+  PlaylistToUSB in 'PlaylistToUSB.pas' {PlaylistCopyForm};
 
 //,  classes;
 
