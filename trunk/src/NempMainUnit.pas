@@ -10073,7 +10073,7 @@ begin
     if not assigned(PlaylistCopyForm) then
         Application.CreateForm(TPlaylistCopyForm, PlaylistCopyForm);
 
-    PlaylistCopyForm.ShowModal;
+    PlaylistCopyForm.Show;
 end;
 
 procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);

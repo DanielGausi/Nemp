@@ -66,9 +66,13 @@ type
     PBCurrentFile: TProgressBar;
     LblCompleteProgress: TLabel;
     PBComplete: TProgressBar;
+    cbIncludeCuesheets: TCheckBox;
+    Memo1: TMemo;
     procedure FormCreate(Sender: TObject);
     procedure BtnSelectDirectoryClick(Sender: TObject);
     procedure BtnCopyFilesClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormShow(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -103,6 +107,7 @@ type
           Handle: THandle;
           ReplacePattern: TReplacePattern;
           CreatePlaylistFile: Boolean;
+          IncludeCuesheets: Boolean;
 
           constructor Create;
           destructor Destroy; Override;
@@ -116,8 +121,12 @@ const
   CEXM_FILEINDEX         = WM_User + 4;
   CEXM_COPYCOMPLETE      = WM_User + 5;
 
+
+  CEXM_TEST = WM_User + 42;
+
 var
-  CancelCopy             : Boolean = False;
+  CancelCopy     : Boolean = False;
+  ThreadIsActive : Boolean = False;
 
 
 { TCopyEx }
@@ -167,6 +176,44 @@ begin
     end;
 end;
 
+// newfile: Complete path to the new Cue-Sheet
+// OldFilename: the old Filename of the mp3-File
+procedure RepairCueSheet(newCueFile: String; OldFilename: String);
+var sl: TStringList;
+    i: Integer;
+    testFile: String;
+    newMp3Name: String;
+begin
+    if FileExists(newCueFile) then
+    begin
+        sl := TStringList.Create;
+        try
+            sl.LoadFromFile(newCueFile);
+            for i := 0 to sl.Count - 1 do
+            begin
+                if GetCueID(sl[i]) = CUE_ID_FILE then
+                begin
+                    // we have a "FILE"-Entry here, get the filename
+                    testFile := GetFileNameFromCueString(sl[i]);
+
+                    if AnsiSameText(trim(testFile), OldFilename) then
+                    begin
+                        // we found our matching entry
+                        // replace it by the new Filename
+                        newMp3Name := ChangeFileExt(
+                              ExtractFilename(newCueFile),
+                              ExtractFileExt(OldFilename));
+                        sl[i] := StringReplace(sl[i], OldFilename, newMp3Name, [rfReplaceAll, rfIgnoreCase]);
+                    end;
+                end;
+            end;
+            sl.SaveToFile(newCueFile);
+        finally
+            sl.Free;
+        end;
+    end;
+end;
+
 function CopyFileProgress(TotalFileSize, TotalBytesTransferred, StreamSize,
   StreamBytesTransferred: LARGE_INTEGER; dwStreamNumber, dwCallbackReason,
   hSourceFile, hDestinationFile: DWORD; lpData: Pointer): DWORD; stdcall;
@@ -195,7 +242,7 @@ end;
 
 function CopyExThread(p: TCopyEx): Integer;
 var
-  Source, Dest, BaseDir : String;
+  Source, Dest, BaseDir: String;
   Handle : THandle;
   Cancel : PBool;
   i : integer;
@@ -205,7 +252,7 @@ var
       begin
           result := IntToStr(aInt);
           while length(result) < 3 do
-              result := '0' + result;
+              result := '0' + result;            p
       end;
 
       // rename a File, input: Complete Path. output: NO PATH, just the filename
@@ -237,6 +284,7 @@ var
           // ReplaceForbiddenFilenameChars
       end;
 begin
+    ThreadIsActive := True;
     BaseDir := IncludeTrailingPathDelimiter(p.DestinationDirectoy);
 
     for i := 0 to p.SourceFiles.Count - 1 do
@@ -248,36 +296,55 @@ begin
         SendMessage(p.Handle, CEXM_FILEINDEX, wparam(i), lParam(p.SourceFiles[i]));
 
         Source := p.SourceFiles[i];
-        Dest   := BaseDir + RenameFile(p.SourceFiles[i], i, p.ReplacePattern);
+        Dest   := BaseDir + RenameFile(p.SourceFiles[i], i+1, p.ReplacePattern);
         Handle := p.Handle;
         Cancel := PBOOL(False);
 
         CopyFileEx(PChar(Source), PChar(Dest), @CopyFileProgress, Pointer(Handle), Cancel, 0);
 
-        // search for cue-sheet and copy it, too
-        // todo
-        d
+        if p.IncludeCuesheets then
+        begin
+            if FileExists(ChangeFileExt(Source, '.cue')) then
+            begin
+                // just copy the (very small) cuesheetfile - no use for CopyEx
+                CopyFile(PChar(ChangeFileExt(Source, '.cue')), PChar(ChangeFileExt(Dest, '.cue')), False);
+                // repair the cuesheet
+                RepairCueSheet(ChangeFileExt(Dest, '.cue'), ExtractFileName(Source));
+
+                SendMessage(p.Handle, CEXM_Test, wParam(ChangeFileExt(Dest, '.cue')), lParam(ExtractFileName(Source)));
+            end;
+        end;
+
 
     end;
-
-    SendMessage(p.Handle, CEXM_COPYCOMPLETE, wParam(CancelCopy), 0);
     // free the Copy-Job
     p.Free;
     result := 0;
- { Source := p.Source;
-  Dest := p.Dest;
-  Handle := p.Handle;
-  Cancel := PBOOL(False);
 
-  CopyFileEx(PChar(Source), PChar(Dest), @CopyFileProgress, Pointer(Handle), Cancel, 0);
-
-  Dispose(p);   // .... p.free
-  result := 0;
-  }
+    ThreadIsActive := False;
+    SendMessage(p.Handle, CEXM_COPYCOMPLETE, wParam(CancelCopy), 0);
 end;
 
 
 { TPlaylistCopyForm }
+
+procedure TPlaylistCopyForm.FormCloseQuery(Sender: TObject;
+  var CanClose: Boolean);
+begin
+    if ThreadIsActive then
+    begin
+        case MessageDLG((CopyToUSB_AbortQuery), mtWarning, [MBYes, MBNO], 0) of
+            mrYes: begin
+                CancelCopy := True;
+                CanClose := True;
+            end;
+            mrNo: begin
+                CanClose := False;
+            end;
+        end;
+    end else
+        canClose := True;
+end;
 
 procedure TPlaylistCopyForm.FormCreate(Sender: TObject);
 begin
@@ -288,6 +355,16 @@ begin
     EditDirectory.Text := GetUSBDrive;
 end;
 
+
+procedure TPlaylistCopyForm.FormShow(Sender: TObject);
+begin
+    LblProgressFile.Caption := CopyToUSB_Idle;
+
+    PBComplete.Position := 0;
+    PBCurrentFile.Position := 0;
+    BtnCopyFiles.Caption := CopyToUSB_Copy;
+    BtnCopyFiles.Tag := 0;
+end;
 
 procedure TPlaylistCopyForm.BackupComboboxes;
 var i: Integer;
@@ -326,22 +403,28 @@ begin
     CEXM_FILEINDEX:
     begin
         PBComplete.Position := Msg.WParam;
-        Caption := Inttostr(Msg.WParam);
-
         LblProgressFile.Caption := Format((CopyToUSB_FileProgress), [pChar(Msg.LParam)] );
-
     end;
 
     CEXM_COPYCOMPLETE:
     begin
         if Boolean(Msg.wParam) then
-            showmessage('abgebrochen');
+            LblProgressFile.Caption := CopyToUSB_Aborted
+        else
+            LblProgressFile.Caption := (CopyToUSB_Complete);
 
-        LblProgressFile.Caption := (CopyToUSB_Complete);
         PBComplete.Position := PBComplete.Max;
         PBCurrentFile.Position := PBCurrentFile.Max;
         BtnCopyFiles.Caption := CopyToUSB_Copy;
         BtnCopyFiles.Tag := 0;
+
+        if (not Boolean(Msg.wParam)) and (cbCloseWindow.Checked) then
+            close;
+    end;
+
+    CEXM_TEST: begin
+        memo1.Lines.Add(Pchar(msg.WParam));
+        memo1.Lines.Add(Pchar(msg.lParam));
     end;
 
   end;
@@ -394,6 +477,7 @@ begin
             Params.Handle := self.Handle;
             Params.ReplacePattern := TReplacePattern(cbRenameSetting.ItemIndex);
             Params.CreatePlaylistFile := cbCreatePlaylistFile.Checked;
+            Params.IncludeCuesheets := cbIncludeCuesheets.Checked;
 
             // Set GUI
             PBComplete.Max := Params.SourceFiles.Count;
