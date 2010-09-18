@@ -121,7 +121,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor;
+    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB;
 
 procedure CorrectVolButton;
 begin
@@ -1044,10 +1044,17 @@ begin
           ReTranslateComponent(RandomPlaylistForm  );
           RandomPlaylistForm.RestoreComboboxes;
         end;
-        //if assigned(FormWebServer        ) then ReTranslateComponent(FormWebServer       );
 
         if assigned(ShutDownEditForm     ) then ReTranslateComponent(ShutDownEditForm    );
         if assigned(NewStationForm       ) then ReTranslateComponent(NewStationForm      );
+
+        if assigned(PlaylistCopyForm     ) then
+        begin
+            PlaylistCopyForm.BackUpComboBoxes;
+            ReTranslateComponent(PlaylistCopyForm     );
+            PlaylistCopyForm.RestoreComboBoxes;
+        end;
+
 
          // Todo:
         // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)
