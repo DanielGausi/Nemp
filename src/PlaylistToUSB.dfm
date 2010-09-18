@@ -3,7 +3,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Copy playlist to USB'
-  ClientHeight = 361
+  ClientHeight = 622
   ClientWidth = 424
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,7 +12,9 @@ object PlaylistCopyForm: TPlaylistCopyForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object BtnCopyFiles: TButton
@@ -25,9 +27,9 @@ object PlaylistCopyForm: TPlaylistCopyForm
     OnClick = BtnCopyFilesClick
   end
   object cbCloseWindow: TCheckBox
-    Left = 8
+    Left = 24
     Top = 315
-    Width = 201
+    Width = 241
     Height = 17
     Caption = 'Close this window after copying'
     TabOrder = 1
@@ -81,14 +83,24 @@ object PlaylistCopyForm: TPlaylistCopyForm
       TabOrder = 2
     end
     object cbCreatePlaylistFile: TCheckBox
-      Left = 18
-      Top = 126
+      Left = 16
+      Top = 134
       Width = 371
       Height = 17
       Caption = 
         'Create a proper playlist-file (*.m3u) in the destination directo' +
         'ry'
       TabOrder = 3
+    end
+    object cbIncludeCuesheets: TCheckBox
+      Left = 16
+      Top = 111
+      Width = 345
+      Height = 17
+      Caption = 'Including cuesheets'
+      Checked = True
+      State = cbChecked
+      TabOrder = 4
     end
   end
   object GrpboxStatus: TGroupBox
@@ -101,9 +113,9 @@ object PlaylistCopyForm: TPlaylistCopyForm
     object LblProgressFile: TLabel
       Left = 18
       Top = 20
-      Width = 71
+      Width = 18
       Height = 13
-      Caption = 'LblProgressFile'
+      Caption = 'Idle'
     end
     object LblCompleteProgress: TLabel
       Left = 18
@@ -126,5 +138,14 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Height = 17
       TabOrder = 1
     end
+  end
+  object Memo1: TMemo
+    Left = 8
+    Top = 352
+    Width = 400
+    Height = 262
+    Lines.Strings = (
+      'Memo1')
+    TabOrder = 4
   end
 end

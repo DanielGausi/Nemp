@@ -654,6 +654,9 @@ CopyToUSB_Copy = 'Copy files';
 CopyToUSB_Abort = 'Abort';
 CopyToUSB_FileProgress = 'Copying file %s';
 CopyToUSB_Complete = 'Completed';
+CopyToUSB_Aborted = 'Aborted by user';
+CopyToUSB_Idle = 'Idle';
+CopyToUSB_AbortQuery = 'Copying in progress. Do you want to cancel the copy process?';
 
 
 
