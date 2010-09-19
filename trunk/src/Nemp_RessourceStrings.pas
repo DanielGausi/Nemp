@@ -657,6 +657,19 @@ CopyToUSB_Complete = 'Completed';
 CopyToUSB_Aborted = 'Aborted by user';
 CopyToUSB_Idle = 'Idle';
 CopyToUSB_AbortQuery = 'Copying in progress. Do you want to cancel the copy process?';
+CopyToUSB_SavingPlaylistFailed = 'Could not save the playlist: %s';
+CopyToUSB_ChooseDestination = 'You have to choose a destination directory where the playlist should be copied to.';
+CopyToUSB_DestinationDirDoesNotexist = 'The destination directory does not exist. Do you want to create it?';
+CopyToUSB_DestinationDirCreateFailed = 'The specified destination directory could not be created. Please verify that the directory name is valid.';
+
+
+CopyToUSB_ERROR_UNKOWN = 'Copying file failed for an unknown reason (Errorcode: %d). Choose OK to continue with next file, or cancel the copying process.';
+
+CopyToUSB_ERROR_FILE_NOT_FOUND = 'The current file can not be found. Choose OK to continue with next file, or cancel the copying process.';
+CopyToUSB_ERROR_PATH_NOT_FOUND = 'The destination path can not be found. Choose OK to continue with next file, or cancel the copying process.';
+CopyToUSB_ERROR_TOO_MANY_OPEN_FILES = 'Too many open files. Choose OK to continue with next file, or cancel the copying process.';
+CopyToUSB_ERROR_ACCESS_DENIED = 'Access denied. Choose OK to continue with next file, or cancel the copying process.';
+CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue with next file, or cancel the copying process.';
 
 
 

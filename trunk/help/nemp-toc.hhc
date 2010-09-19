@@ -69,6 +69,10 @@
 			<param name="Name" value="Cuesheets">
 			<param name="Local" value="cuesheets.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Playlist kopieren">
+			<param name="Local" value="Playlisten_kopieren.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Die Medienbibliothek">

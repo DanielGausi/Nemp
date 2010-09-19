@@ -813,6 +813,7 @@ type
     PM_PL_MagicCopyToClipboard: TMenuItem;
     PM_ML_MagicCopyToClipboard: TMenuItem;
     PM_PL_CopyPlaylistToUSB: TMenuItem;
+    MM_PL_CopyPlaylistToUSB: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
