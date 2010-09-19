@@ -35,10 +35,10 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
+    Cancel = True
     Caption = 'Ok'
     TabOrder = 0
     OnClick = Btn_OkClick
-    ExplicitLeft = 673
   end
   object Btn_Shoutcast: TButton
     Left = 499
@@ -49,7 +49,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Shoutcast.com'
     TabOrder = 1
     OnClick = Btn_ShoutcastClick
-    ExplicitLeft = 553
   end
   object Btn_Icecast: TButton
     Left = 379
@@ -60,7 +59,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'www.Icecast.org'
     TabOrder = 2
     OnClick = Btn_IcecastClick
-    ExplicitLeft = 433
   end
   object PC_Streams: TPageControl
     Left = 8
@@ -70,10 +68,8 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     ActivePage = Tab_Favourites
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
-    ExplicitWidth = 746
     object Tab_Favourites: TTabSheet
       Caption = 'Favorites'
-      ExplicitWidth = 738
       DesignSize = (
         684
         353)
@@ -102,7 +98,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         OnGetText = VST_FavoritesGetText
         OnHeaderClick = VST_FavoritesHeaderClick
         OnKeyDown = VST_FavoritesKeyDown
-        ExplicitWidth = 704
         Columns = <
           item
             Position = 0
@@ -200,7 +195,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
-      ExplicitWidth = 738
       DesignSize = (
         684
         353)
@@ -234,7 +228,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         OnGetText = VST_ShoutcastQueryGetText
         OnHeaderClick = VST_ShoutcastQueryHeaderClick
         OnKeyDown = VST_ShoutcastQueryKeyDown
-        ExplicitWidth = 722
         Columns = <
           item
             Position = 0
@@ -372,7 +365,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       item
         Width = 200
       end>
-    ExplicitWidth = 766
   end
   object CB_ParseStreamURL: TCheckBox
     Left = 8

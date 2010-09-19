@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 926
+  ClientHeight = 966
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2439,7 +2439,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 264
+    Height = 304
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
@@ -2450,7 +2450,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 28
       Width = 858
-      Height = 236
+      Height = 276
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2461,12 +2461,12 @@ object Nemp_MainForm: TNemp_MainForm
       OwnerDraw = False
       DesignSize = (
         858
-        236)
+        276)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 226
+        Height = 266
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
@@ -2475,7 +2475,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 400
           Top = 0
           Width = 4
-          Height = 226
+          Height = 266
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2485,7 +2485,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 226
+          Height = 266
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2624,7 +2624,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 226
+          Height = 266
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -3478,6 +3478,10 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Add all files to the medialibrary'
         OnClick = PM_PL_ExtendedAddToMedialibraryClick
       end
+      object MM_PL_CopyPlaylistToUSB: TMenuItem
+        Caption = 'Copy playlist into one directory'
+        OnClick = PM_PL_CopyPlaylistToUSBClick
+      end
       object N33: TMenuItem
         Caption = '-'
       end
@@ -3963,7 +3967,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011100130038050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130040050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4528,7 +4532,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01011F00F8063C0610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011F00F806440610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000008000000001002000000000000080
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7306,7 +7310,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800E00210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800E80210001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
