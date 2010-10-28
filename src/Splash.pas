@@ -43,6 +43,7 @@ type
     Image1: TImage;
     StatusLBL: TLabel;
     procedure FormCreate(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -53,6 +54,8 @@ var
   FSplash: TFSplash;
 
 implementation
+
+uses NempMainUnit;
 
 
 {$R *.dfm}
@@ -96,6 +99,14 @@ begin
 
   LAbel2.Caption := NEMP_VERSION_SPLASH;
 
+end;
+
+procedure TFSplash.Image1Click(Sender: TObject);
+begin
+FSplash.StatusLBL.caption := Inttostr(Nemp_MainForm.top) + ' - '
+    + Inttostr(Nemp_MainForm.NempRegionsDistance.Top) + ' - '
+    + Inttostr(Nemp_MainForm.NempRegionsDistance.RelativPositionY)
+    ;
 end;
 
 end.

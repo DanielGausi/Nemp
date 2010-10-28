@@ -67,6 +67,7 @@ var formregion,
   formregion1: HRGN;
   xpbottom, xptop, xpleft, xpright: integer;
 begin
+
     xptop    := 0;
     xpleft   := 0; //GrpBox.Left + 1 - 2;
     xpRight  := xpleft + GrpBox.Width;// - 2 + 5;  //aForm.width - 10;
@@ -104,6 +105,7 @@ const
   distance = 10;
 
 begin
+
   result := False;
 
   if not SnapActive then exit;
@@ -1219,6 +1221,7 @@ begin
       if Tag = -1 then
       begin
           // Note:  WindowState := wsMaximized; MUST be set AFTER this!
+
           Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
           Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
 

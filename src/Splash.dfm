@@ -23,6 +23,7 @@ object FSplash: TFSplash
     Top = 0
     Width = 220
     Height = 173
+    OnClick = Image1Click
   end
   object Label2: TLabel
     Left = 184
