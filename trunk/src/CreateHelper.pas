@@ -589,8 +589,6 @@ begin
         ApplyLayout;
         AutoLoadBib;
 
-
-
         UpdateSplashScreen(SplashScreen_GenerateWindows);
         // Place some controls correctly
         GRPBoxCover      .Parent := AudioPanel;

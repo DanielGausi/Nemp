@@ -1500,7 +1500,7 @@ type
     procedure WMCopyData(var Msg: TWMCopyData); message WM_COPYDATA;
 
     procedure hotkey(var msg:Tmessage); message WM_HOTKEY;
-    procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
+    procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); //message WM_WINDOWPOSCHANGING;
     procedure WMExitSizeMove(var Message: TMessage); message WM_EXITSIZEMOVE;
     procedure WMQueryEndSession(var M: TWMQueryEndSession); message WM_QUERYENDSESSION;
     procedure WMEndSession(var M: TWMEndSession); message WM_ENDSESSION;
@@ -1562,6 +1562,9 @@ uses   Splash, MultimediaKeys,
 
 procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 begin
+
+sleep(2000);       //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
     if StartPlay then
         NempPlayer.LastUserWish := USER_WANT_PLAY
     else
@@ -1578,6 +1581,8 @@ begin
            on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
         end;
     end;
+
+    sleep(2000);
 end;
 
 
@@ -1886,7 +1891,6 @@ begin
   // Nothing to do here. Will be done in nemp.dpr
   if assigned(FSplash) then
       FSplash.Close;
-
 end;
 
 procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction);
@@ -2413,7 +2417,7 @@ begin
           NEMP_BUTTON_PAUSE     : PlayPauseBTNIMGClick(Nil);
           NEMP_BUTTON_STOP      : StopBTNIMGClick(Nil);
           NEMP_BUTTON_NEXTTITLE : PlayNextBTNIMGClick(NIL);
-          COMMAND_RESTORE       : if MinimizedIndicator then RestoreNemp else application.Minimize;
+          //COMMAND_RESTORE       : if MinimizedIndicator then RestoreNemp else application.Minimize;
 
 
           NEMP_VOLUMEUP: begin
