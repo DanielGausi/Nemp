@@ -1562,9 +1562,7 @@ uses   Splash, MultimediaKeys,
 
 procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 begin
-
-sleep(2000);       //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+    //sleep(2000);
     if StartPlay then
         NempPlayer.LastUserWish := USER_WANT_PLAY
     else
@@ -1581,8 +1579,7 @@ sleep(2000);       //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
            on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
         end;
     end;
-
-    sleep(2000);
+    //sleep(2000);
 end;
 
 
