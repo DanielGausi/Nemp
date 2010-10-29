@@ -90,7 +90,7 @@ uses
 
 {$R *.res}
 
-var EVILHACK: INTEGER;
+var EVILHACKX, EVILHACKY: INTEGER;
 
 begin
 
@@ -112,7 +112,8 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Graphics.DefFontData.Name := 'Tahoma';
+
+    Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
     Application.Name  := NEMP_NAME;
@@ -133,60 +134,20 @@ ShowWindow
 
     StuffToDoAfterCreate ;
 
-
-    //Nemp_MainForm.NempRegionsDistance.RelativPositionY := 0;
-
-
     // TOP scheint hier ok zu sein, aber dann kommen irgendwelche Messages und machen Top wieder auf 10.000
-
-    FSplash.StatusLBL.caption := Inttostr(Nemp_MainForm.top) + ' - '
-    + Inttostr(Nemp_MainForm.NempRegionsDistance.Top) + ' - '
-    + Inttostr(Nemp_MainForm.NempRegionsDistance.RelativPositionY)
-    ;
-
-    EVILHACK := Nemp_MainForm.Top;
+    EVILHACKY := Nemp_MainForm.Top;
+    EVILHACKX := Nemp_MainForm.Left;
     Application.ProcessMessages;
-    Nemp_MainForm.Top := EVILHACK;
-
-    //Nemp_MainForm.RestoreNemp;
-
+    Nemp_MainForm.Top := EVILHACKY;
+    Nemp_MainForm.Left := EVILHACKX;
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin
-        // DAS HIER DIENT DEM VERSTECKEN, NICHT DEM ANEZEIGEN
-
-       //Nemp_MainForm.Hide;
-       //Application.ShowMainForm := False;
-       //Post
-       //Send
-
+        // DAS HIER DIENT DEM VERSTECKEN, NICHT DEM ANZEIGEN
        PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
-    end else
-    begin
-        //wuppdi;
-      //  Application.ProcessMessages;
-        //Application.ShowMainForm := True;
-        //Nemp_MainForm.Show;
-        //Nemp_MainForm.top := 20;
-        //Nemp_MainForm.left := 20;
-      //  Nemp_MainForm.RestoreNemp;
     end;
 
-    //wuppdi;
-    //PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
-
-
-
-
-
-
-   // FSplash.Visible := False;
-
-
-
-
-
+    FSplash.Visible := False;
     Application.Run;
-
 
 end.
