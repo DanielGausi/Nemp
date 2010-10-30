@@ -36,7 +36,9 @@ unit AudioFileClass;
 interface
 
 uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
-  ID3v2Frames, ComObj, graphics, variants, ATL_WMAfile, ATL_FLACfile_ReadOnly,
+  ID3v2Frames,
+  OggVorbis, Flac, VorbisComments,
+  ComObj, graphics, variants, ATL_WMAfile,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
   DateUtils;
 
@@ -147,10 +149,10 @@ type
 
         // Read tags from the filetype and convert the data to TAudiofile-Data
         procedure GetMp3Info(filename: UnicodeString; Flags: Integer = 0);
-        procedure GetOggInfo(filename: UnicodeString);
+        procedure GetOggInfo(filename: UnicodeString; Flags: Integer = 0);
         procedure GetWmaInfo(filename: UnicodeString);
         procedure GetWavInfo(WaveFile: UnicodeString);
-        procedure GetFlacInfo(Filename: UnicodeString);
+        procedure GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0);
         // no tags found - set default values
         procedure SetUnknown;
 
@@ -388,11 +390,11 @@ const
             = (' 8.0','11.0','12.0','16.0','22.0','24.0','32.0','44.1','48.0','N/A ');
       Nemp_Samplerates_Int: Array[0..9] of Integer
             = ( 8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, -1);
-      Mp3db_Modes:  Array[0..4] of String
-            = ('S ','JS','DC','M ','--');
-      Nemp_Modes_Int: Array[0..4] of Integer
-            = (2,2,2,1,-1);
-      Mp3DB_ExtendedModes : Array[0..4] of String =('Stereo', 'Joint-Stereo', 'Dual-Channel', 'Mono', '');
+      Mp3db_Modes:  Array[0..5] of String
+            = ('S ','JS','DC','M ','--', 'X');
+      Nemp_Modes_Int: Array[0..5] of Integer
+            = (2,2,2,1,-1, 0);
+      Mp3DB_ExtendedModes : Array[0..5] of String =('Stereo', 'Joint-Stereo', 'Dual-Channel', 'Mono', '', 'Multi');
 
       AUDIOFILE_UNKOWN = '<N/A>';
 
@@ -832,13 +834,13 @@ begin
             GetWMAInfo(Filename)
           else
             if AnsiLowerCase(ExtractFileExt(filename)) = '.ogg' then
-              GetOggInfo(Filename)
+              GetOggInfo(Filename, Flags)
             else
               if AnsiLowerCase(ExtractFileExt(filename)) = '.wav' then
                 GetWavInfo(Filename)
               else
                 if AnsiLowerCase(ExtractFileExt(filename)) = '.flac' then
-                  GetFlacInfo(filename)
+                  GetFlacInfo(filename, Flags)
                 else
                 begin
                     Pfad:=filename;
@@ -1041,7 +1043,110 @@ end;
     Uses ATL
     --------------------------------------------------------
 }
-procedure TAudioFile.GetFlacInfo(Filename: UnicodeString);
+procedure TAudioFile.GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0);
+var FlacFile: TFlacFile;
+    CoverStream: TMemoryStream;
+    PicType: Cardinal;
+    Mime: AnsiString;
+    Description: UnicodeString;
+    aBMP: TBitmap;
+    newID: String;
+begin
+    FileIsPresent := False;
+    Pfad := filename;
+    if NOT FileExists(Filename) then
+    begin
+        SetUnknown;
+        exit;
+    end;
+    FileIsPresent := True;
+    FileChecked := True;
+    isStream := False;
+
+    FlacFile := TFlacFile.Create;
+    try
+        FlacFile.ReadFromFile(filename);
+        if (Flags and GAD_Cover) = GAD_Cover then
+        begin
+            // clear ID, so MediaLibrary.GetCover can do its job
+            CoverID := '';
+            CoverStream := TMemoryStream.Create;
+            try
+                if FlacFile.GetPictureStream(CoverStream, PicType, Mime, Description) then
+                begin
+                    // Cover in FlacFile Found
+                    aBMP := TBitmap.Create;
+                    try
+                        PicStreamToImage(CoverStream, Mime, aBMP);
+                        if not aBMP.Empty then
+                        begin
+                            CoverStream.Seek(0, soFromBeginning);
+                            newID := MD5DigestToStr(MD5Stream(CoverStream));
+                            if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                                CoverID := newID;
+                        end;
+                    finally
+                        aBMP.Free;
+                    end;
+
+                end;
+            finally
+                CoverStream.Free;
+            end;
+
+
+        end;
+
+
+        fFileSize := FlacFile.FileSize;
+        Duration := FlacFile.Duration;
+        Bitrate := FlacFile.Bitrate;
+        fVBR := False;
+        SetSampleRate(FlacFile.SampleRate);
+        case FlacFile.Channels of
+            1: fChannelModeIDX := 3; // Mono
+            2: fChannelModeIDX := 0; // Stereo
+            3..100: fChannelModeIDX := 5; // Multichannel
+        else
+            fChannelModeIDX := 4; // unknown
+        end;
+
+        // Vorbis-Comments
+        if FlacFile.Artist <> '' then
+            Artist := FlacFile.Artist
+        else
+            Artist := AUDIOFILE_UNKOWN;
+
+        if FlacFile.Title <> '' then
+            Titel := FlacFile.Title
+        else
+            Titel := Dateiname;
+
+        if FlacFile.Album <> '' then
+            Album := FlacFile.Album
+        else
+            Album := AUDIOFILE_UNKOWN;
+
+        Track := GetTrackFromV2TrackString(FlacFile.TrackNumber);
+        Year  := FlacFile.Date;
+        Genre := FlacFile.Genre;
+
+        // Additional Fields, not OGG-VORBIS-Standard but probably ok
+        Comment := FlacFile.GetPropertyByFieldname('COMMENT');
+        Lyrics  := FlacFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        // Playcounter/Rating: Maybe incompatible with other Taggers
+        PlayCounter := StrToIntDef(FlacFile.GetPropertyByFieldname('PLAYCOUNT'), 0);
+        Rating :=  StrToIntDef(FlacFile.GetPropertyByFieldname('RATING'), 0);
+        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+        RawTagLastFM := FlacFile.GetPropertyByFieldname('CATEGORIES');
+    finally
+        FlacFile.Free;
+    end;
+
+end;
+
+(*
+procedure TAudioFile.GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0);
 var FLACfile: TFLACfile;
 begin
     FileIsPresent := False;
@@ -1120,12 +1225,89 @@ begin
   FlacFile.Free;
 end;
 
+*)
+
+{
+    --------------------------------------------------------
+    GetOggInfo
+    New in Nemp 4.1: Use Selfmade-Unit "Flogger"
+    --------------------------------------------------------
+}
+procedure TAudioFile.GetOggInfo(filename: UnicodeString; Flags: Integer = 0);
+var OggVorbisFile: TOggVorbisFile;
+begin
+    FileIsPresent := False;
+    Pfad := filename;
+    if NOT FileExists(Filename) then
+    begin
+        SetUnknown;
+        exit;
+    end;
+    FileIsPresent := True;
+    FileChecked := True;
+    isStream := False;
+
+    OggVorbisFile := TOggVorbisFile.Create;
+    try
+        OggVorbisFile.ReadFromFile(filename);
+        if (Flags and GAD_Cover) = GAD_Cover then
+            // clear ID, so MediaLibrary.GetCover can do its job
+            CoverID := '';
+
+        fFileSize := OggVorbisFile.FileSize;
+
+        Duration := OggVorbisFile.Duration;
+        Bitrate := OggVorbisFile.Bitrate;
+        fVBR := False;
+        SetSampleRate(OggVorbisFile.SampleRate);
+        case OggVorbisFile.Channels of
+            1: fChannelModeIDX := 3; // Mono
+            2: fChannelModeIDX := 0; // Stereo
+            3..100: fChannelModeIDX := 5; // Multichannel
+        else
+            fChannelModeIDX := 4; // unknown
+        end;
+
+        // Vorbis-Comments
+        if OggVorbisFile.Artist <> '' then
+            Artist := OggVorbisFile.Artist
+        else
+            Artist := AUDIOFILE_UNKOWN;
+
+        if OggVorbisFile.Title <> '' then
+            Titel := OggVorbisFile.Title
+        else
+            Titel := Dateiname;
+
+        if OggVorbisFile.Album <> '' then
+            Album := OggVorbisFile.Album
+        else
+            Album := AUDIOFILE_UNKOWN;
+
+        Track := GetTrackFromV2TrackString(OggVorbisFile.TrackNumber);
+        Year  := OggVorbisFile.Date;
+        Genre := OggVorbisFile.Genre;
+
+        // Additional Fields, not OGG-VORBIS-Standard but probably ok
+        Comment := OggVorbisFile.GetPropertyByFieldname('COMMENT');
+        Lyrics  := OggVorbisFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        // Playcounter/Rating: Maybe incompatible with other Taggers
+        PlayCounter := StrToIntDef(OggVorbisFile.GetPropertyByFieldname('PLAYCOUNT'), 0);
+        Rating :=  StrToIntDef(OggVorbisFile.GetPropertyByFieldname('RATING'), 0);
+        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+        RawTagLastFM := OggVorbisFile.GetPropertyByFieldname('CATEGORIES');
+    finally
+        OggVorbisFile.Free;
+    end;
+
+end;
 {
     --------------------------------------------------------
     GetOggInfo
     Uses some weird code - I should replace this by the ATL soon
     --------------------------------------------------------
 }
+(*
 procedure TAudioFile.GetOggInfo(filename: UnicodeString);
 var  F: File;
     fsize:integer;
@@ -1256,7 +1438,7 @@ begin
                               if param='tracknumber' then
                                   Track := StrToIntDef(UTF8ToAnsi(value), 0);
 
-                                  (*
+                                  {
                                   tmpstrlist := explode('=',tmpstr);
                                   if tmpstrlist.Count > 1 then
                                   begin
@@ -1271,7 +1453,7 @@ begin
                                   end;
                                   inc(position,comment_length^+4);
                                   tmpstrlist.free;
-                                  *)
+                                  }
                     end;
                     inc(position,comment_length^+4);
 
@@ -1291,6 +1473,7 @@ begin
     if album='' then album := AUDIOFILE_UNKOWN;
     fRating := 0; // Rating is not supported in Ogg-Files
 end;
+*)
 
 {
     --------------------------------------------------------

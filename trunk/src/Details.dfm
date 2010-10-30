@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_General
+    ActivePage = Tab_VorbisComments
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
@@ -1060,6 +1060,285 @@ object FDetails: TFDetails
         end
       end
     end
+    object Tab_VorbisComments: TTabSheet
+      Caption = 'Vorbis Comments'
+      ImageIndex = 4
+      object GrpBox_StandardVorbisComments: TGroupBox
+        Left = 8
+        Top = 0
+        Width = 443
+        Height = 209
+        Caption = 'Standard comments'
+        TabOrder = 0
+        object Lbl_VorbisArtist: TLabel
+          Left = 8
+          Top = 27
+          Width = 54
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Artist'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisTitle: TLabel
+          Left = 8
+          Top = 51
+          Width = 54
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Title'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisAlbum: TLabel
+          Left = 8
+          Top = 75
+          Width = 54
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Album'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisComment: TLabel
+          Left = 8
+          Top = 99
+          Width = 54
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Comment'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisGenre: TLabel
+          Left = 8
+          Top = 123
+          Width = 54
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Genre'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisYear: TLabel
+          Left = 222
+          Top = 123
+          Width = 38
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Year'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisTrack: TLabel
+          Left = 304
+          Top = 123
+          Width = 30
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Track'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          ShowAccelChar = False
+          Transparent = True
+        end
+        object Lbl_VorbisRating: TLabel
+          Left = -12
+          Top = 147
+          Width = 70
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Rating'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          Transparent = True
+        end
+        object RatingImageVorbis: TImage
+          Left = 64
+          Top = 147
+          Width = 70
+          Height = 14
+          Transparent = True
+          OnMouseDown = RatingImageMouseDown
+          OnMouseLeave = RatingImageMouseLeave
+          OnMouseMove = RatingImageMouseMove
+        end
+        object Edt_VorbisArtist: TEdit
+          Left = 64
+          Top = 24
+          Width = 313
+          Height = 21
+          TabOrder = 0
+        end
+        object Edt_VorbisTitle: TEdit
+          Left = 64
+          Top = 48
+          Width = 313
+          Height = 21
+          TabOrder = 1
+        end
+        object Edt_VorbisAlbum: TEdit
+          Left = 64
+          Top = 72
+          Width = 313
+          Height = 21
+          TabOrder = 2
+        end
+        object Edt_VorbisComment: TEdit
+          Left = 64
+          Top = 96
+          Width = 313
+          Height = 21
+          TabOrder = 3
+        end
+        object cb_VorbisGenre: TComboBox
+          Left = 64
+          Top = 120
+          Width = 145
+          Height = 21
+          AutoComplete = False
+          ItemHeight = 13
+          Sorted = True
+          TabOrder = 4
+        end
+        object Edt_VorbisYear: TEdit
+          Left = 264
+          Top = 120
+          Width = 33
+          Height = 21
+          TabOrder = 5
+        end
+        object Edt_VorbisTrack: TEdit
+          Left = 336
+          Top = 120
+          Width = 41
+          Height = 21
+          TabOrder = 6
+        end
+        object Btn_ResetVorbisRating: TButton
+          Left = 147
+          Top = 147
+          Width = 81
+          Height = 21
+          Caption = 'Reset'
+          TabOrder = 7
+          OnClick = BtnResetRatingClick
+        end
+        object Edt_VorbisCopyright: TLabeledEdit
+          Left = 64
+          Top = 174
+          Width = 313
+          Height = 21
+          EditLabel.Width = 47
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Copyright'
+          LabelPosition = lpLeft
+          LabelSpacing = 1
+          TabOrder = 8
+        end
+      end
+      object GrpBox_AllVorbisComments: TGroupBox
+        Left = 8
+        Top = 215
+        Width = 443
+        Height = 210
+        Caption = 'All comments'
+        TabOrder = 1
+        object Lbl_VorbisContent: TLabel
+          Left = 173
+          Top = 16
+          Width = 257
+          Height = 13
+          AutoSize = False
+          Caption = 'Value'
+        end
+        object Lbl_VorbisKey: TLabel
+          Left = 8
+          Top = 16
+          Width = 154
+          Height = 13
+          AutoSize = False
+          Caption = 'Key'
+        end
+        object Memo_Vorbis: TMemo
+          Left = 173
+          Top = 30
+          Width = 260
+          Height = 171
+          ReadOnly = True
+          ScrollBars = ssVertical
+          TabOrder = 0
+        end
+        object lv_VorbisComments: TListView
+          Left = 8
+          Top = 30
+          Width = 159
+          Height = 171
+          Columns = <
+            item
+              Caption = 'Key'
+              Width = 135
+            end>
+          ReadOnly = True
+          ShowColumnHeaders = False
+          TabOrder = 1
+          ViewStyle = vsReport
+          OnChange = lv_VorbisCommentsChange
+        end
+      end
+    end
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
@@ -1573,10 +1852,12 @@ object FDetails: TFDetails
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 340
+    Left = 412
+    Top = 40
   end
   object PM_URLCopy: TPopupMenu
-    Left = 260
+    Left = 340
+    Top = 8
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick
