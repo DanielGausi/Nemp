@@ -294,9 +294,9 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure Lblv1Change(Sender: TObject);
     procedure Lblv2Change(Sender: TObject);
-    procedure cb_VorbisCommentsChange(Sender: TObject);
     procedure lv_VorbisCommentsChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
+    procedure Memo_LyricsChange(Sender: TObject);
 
   private
     Coverpfade : TStringList;
@@ -332,7 +332,9 @@ type
     procedure ShowMediaBibDetails;
     procedure ShowMPEGDetails;
     procedure ShowID3v1Details;
+    procedure EnablePictureButtons;
     procedure ShowPictures;
+    procedure ShowLyrics;
     //procedure ShowRating(Value: Integer);
     procedure FillFrameView;
     procedure ShowID3v2Details;
@@ -839,10 +841,10 @@ end;
     --------------------------------------------------------
 }
 Procedure TFDetails.UpdateID3v2EnabledStatus;
-var ControlsEnable, ButtonsEnable: Boolean;
+var ControlsEnable: Boolean;
 begin
   ControlsEnable := ValidMp3File and ID3v2Activated;
-  ButtonsEnable := ValidMp3File and ID3v2Activated;
+  //ButtonsEnable := ValidMp3File and ID3v2Activated;
   CBID3v2.Enabled := ValidMp3File;
   CBID3v2.OnClick := Nil;  // ! Wichtig, sonst Endlossschleife!
   CBID3v2.Checked := ControlsEnable;
@@ -874,37 +876,51 @@ begin
   LblConst_ID3v2Year.Enabled := ControlsEnable;
   BtnCopyFromV2.Enabled := ControlsEnable;
   // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
-  if (AktuellesAudioFile <> NIL)
-    AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
-    AND (not FileExists(AktuellesAudioFile.Pfad))
-    AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
-    then
-  begin
+  //if (AktuellesAudioFile <> NIL)
+  //  AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
+  //  AND (not FileExists(AktuellesAudioFile.Pfad))
+  //  AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
+  //  then
+  //begin
       // d.h. es ist ein mp3File, was gerade nicht da ist, das aber Lyrics in der DB hat
-      Memo_Lyrics.ReadOnly := True;
-      Memo_Lyrics.Enabled := True;
-  end else
-  begin
-      Memo_Lyrics.ReadOnly := False;
-      Memo_Lyrics.Enabled := ControlsEnable;
-  end;
+  //    Memo_Lyrics.ReadOnly := True;
+  //    Memo_Lyrics.Enabled := True;
+  //end else
+  //begin
+  //    Memo_Lyrics.ReadOnly := False;
+  //    Memo_Lyrics.Enabled := ControlsEnable;
+  //end;
+  //Btn_DeleteLyricFrame.Enabled := ButtonsEnable;
+  //BtnLyricWiki.Enabled       := ButtonsEnable;
 
   LvFrames.Enabled := ControlsEnable;
-  cbPictures.Enabled := ControlsEnable;
-  ID3Image.Visible := ControlsEnable;
+  // cbPictures.Enabled := ControlsEnable;
+  // ID3Image.Visible := ControlsEnable;
   // Seite 4
   Lblv2Copyright.Enabled := ControlsEnable;
   Lblv2URL.Enabled := ControlsEnable;
 ////  Lblv2EncodedBy.Enabled := ControlsEnable;
-  Btn_DeleteLyricFrame.Enabled := ButtonsEnable;
-  BtnLyricWiki.Enabled       := ButtonsEnable;
-  Btn_NewPicture.Enabled       := ButtonsEnable;
-  Btn_DeletePicture.Enabled    := ButtonsEnable;
-  Btn_SavePictureToFile.Enabled := ButtonsEnable;
+
+  //Btn_NewPicture.Enabled       := ButtonsEnable;
+  //Btn_DeletePicture.Enabled    := ButtonsEnable;
+  //Btn_SavePictureToFile.Enabled := ButtonsEnable;
 
   LblConst_Id3v2Version.Enabled := ControlsEnable;
   LblConst_Id3v2Size.Enabled := ControlsEnable;
 end;
+
+procedure TFDetails.EnablePictureButtons;
+var picsEnabled: Boolean;
+begin
+    picsEnabled  := (ValidMp3File and ID3v2Activated) or ValidFlacFile;
+
+    cbPictures.Enabled := picsEnabled;
+    ID3Image.Visible := picsEnabled;
+    Btn_NewPicture.Enabled := picsEnabled;
+    Btn_DeletePicture.Enabled := picsEnabled;
+    Btn_SavePictureToFile.Enabled := picsEnabled;
+end;
+
 {
     --------------------------------------------------------
     UpdateMPEGEnabledStatus
@@ -1447,10 +1463,7 @@ begin
     else
         Memo_Vorbis.Text := FlacFile.GetPropertyByIndex(lv_VorbisComments.ItemIndex)
 end;
-procedure TFDetails.cb_VorbisCommentsChange(Sender: TObject);
-begin
 
-end;
 
 {
     --------------------------------------------------------
@@ -1458,6 +1471,7 @@ end;
     - Pictures within the id3-tag, Page 3.
     --------------------------------------------------------
 }
+
 procedure TFDetails.ShowPictures;
 var i: Integer;
   stream: TMemoryStream;
@@ -1468,15 +1482,55 @@ begin
     if assigned(PictureFrames) then
         FreeAndNil(PictureFrames);
 
-    PictureFrames := ID3v2Tag.GetAllPictureFrames;
     cbPictures.Items.Clear;
 
-    stream := TMemoryStream.Create;
-    try
-        for i := PictureFrames.Count - 1 downto 0 do // andersrum, damit das erste Bild am Ende im Speicher ist. ;-)
+    if validMp3File then
+    begin
+        PictureFrames := ID3v2Tag.GetAllPictureFrames;
+
+        stream := TMemoryStream.Create;
+        try
+            for i := PictureFrames.Count - 1 downto 0 do // andersrum, damit das erste Bild am Ende im Speicher ist. ;-)
+            begin
+                Stream.Clear;
+                (PictureFrames[i] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
+                if PicType < length(Picture_Types) then
+                    cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[PicType], Description]))
+                else
+                    cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[0], Description]));
+            end;
+
+            Btn_DeletePicture.Enabled := cbPictures.Items.Count > 0;
+            Btn_SavePictureToFile.Enabled := cbPictures.Items.Count > 0;
+            Btn_NewPicture.Enabled := True;
+
+            if cbPictures.Items.Count > 0 then
+            begin
+                cbPictures.ItemIndex := 0;
+                ID3Image.Visible := True;
+                stream.Seek(0, soFromBeginning);
+                PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+            end else
+            begin
+                cbPictures.ItemIndex := -1;
+                ID3Image.Picture.Assign(NIL);
+                ID3Image.Visible := False;
+            end;
+        finally
+            stream.Free;
+        end;
+    end;
+
+    if ValidFlacFile then
+    begin
+        if not assigned(PictureFrames) then
+            PictureFrames := TObjectList.Create(False);
+        FlacFile.GetAllPictureBlocks(PictureFrames);
+
+        for i := PictureFrames.Count - 1 downto 0 do
         begin
-            Stream.Clear;
-            (PictureFrames[i] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
+            PicType := TFlacPictureBlock(PictureFrames[i]).PictureType;
+            Description := TFlacPictureBlock(PictureFrames[i]).Description;
             if PicType < length(Picture_Types) then
                 cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[PicType], Description]))
             else
@@ -1485,24 +1539,73 @@ begin
 
         Btn_DeletePicture.Enabled := cbPictures.Items.Count > 0;
         Btn_SavePictureToFile.Enabled := cbPictures.Items.Count > 0;
+        ID3Image.Visible := cbPictures.Items.Count > 0;
         Btn_NewPicture.Enabled := True;
 
         if cbPictures.Items.Count > 0 then
         begin
             cbPictures.ItemIndex := 0;
-            ID3Image.Visible := True;
-            stream.Seek(0, soFromBeginning);
-            PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+            //stream.Seek(0, soFromBeginning);
+            stream := TMemoryStream.Create;
+            try
+                TFlacPictureBlock(PictureFrames[0]).CopyPicData(stream);
+                PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[0]).Mime, ID3IMAGE.Picture.Bitmap);
+            finally
+                stream.Free;
+            end;
         end else
         begin
             cbPictures.ItemIndex := -1;
             ID3Image.Picture.Assign(NIL);
-            ID3Image.Visible := False;
         end;
-    finally
-        stream.Free;
     end;
+
+   // if not (validMp3File or ValidFlacFile) then
+   // begin
+   //     cbPictures.ItemIndex := -1;
+   //     ID3Image.Picture.Assign(NIL);
+   // end;
 end;
+
+procedure TFDetails.ShowLyrics;
+var ButtonsEnable: Boolean;
+    ext: String;
+begin
+    ButtonsEnable := (ValidMp3File and ID3v2Activated) or (ValidOggFile) or (ValidFlacFile);
+    ext := AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad));
+    // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
+    if (AktuellesAudioFile <> NIL)
+        AND ((ext = '.mp3') or (ext = '.ogg') or (ext = '.flac') )
+        AND (not FileExists(AktuellesAudioFile.Pfad))
+        AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
+    then
+    begin
+        // d.h. es ist ein mp3/ogg/flac-File, was gerade nicht da ist, das aber Lyrics in der DB hat
+        Memo_Lyrics.ReadOnly := True;
+        Memo_Lyrics.Enabled := True;
+        Memo_Lyrics.Text :=  UTF8ToString(AktuellesAudioFile.Lyrics);
+    end else
+    begin
+        Memo_Lyrics.ReadOnly := False;
+        Memo_Lyrics.Enabled := ButtonsEnable;
+        Memo_Lyrics.Text := '';
+    end;
+
+    if ValidMp3File then
+        Memo_Lyrics.Text := ID3v2Tag.Lyrics;
+
+    if ValidOggFile then
+        Memo_Lyrics.Text := OggVorbisFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+
+    if ValidFlacFile then
+        Memo_Lyrics.Text := FlacFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+
+    Btn_DeleteLyricFrame.Enabled := ButtonsEnable and (Memo_Lyrics.Text <> '');
+    BtnLyricWiki.Enabled         := ButtonsEnable;
+    //BtnLyricWikiManual can be always activated
+end;
+
+
 {
     --------------------------------------------------------
     FillFrameView
@@ -1648,29 +1751,29 @@ begin
         Lblv2_Size   .Caption := Format(DetailForm_ID3v2Info, [id3v2Tag.Size, id3v2Tag.Size - id3v2Tag.PaddingSize]);
 
         FillFrameView;
-        Memo_Lyrics.Text := ID3v2Tag.Lyrics;
-        ShowPictures;
+        //Memo_Lyrics.Text := ID3v2Tag.Lyrics;
+        //ShowPictures;
         Lblv2Copyright.Text        := Id3v2Tag.Copyright;
   end else
   begin
-        Btn_DeletePicture.Enabled := False;
-        Btn_NewPicture.Enabled := False;
+        //Btn_DeletePicture.Enabled := False;
+        //Btn_NewPicture.Enabled := False;
         Btn_DeleteLyricFrame.Enabled := False;
         BtnLyricWiki.Enabled := False;
-        Btn_SavePictureToFile.Enabled := False;
+        // Btn_SavePictureToFile.Enabled := False;
 
-        ID3Image.Visible := False;
+        // ID3Image.Visible := False;
 
         // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
-        if  (AktuellesAudioFile <> NIL)
-          AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
-          AND (not FileExists(AktuellesAudioFile.Pfad))
-          AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
-          then
+        //if  (AktuellesAudioFile <> NIL)
+        //  AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
+        //  AND (not FileExists(AktuellesAudioFile.Pfad))
+        //  AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
+        //  then
             // d.h. es ist ein mp3File, was gerade nicht da ist, das aber Lyrics in der DB hat
-            Memo_Lyrics.Text :=  UTF8ToString(AktuellesAudioFile.Lyrics)
-        else
-            Memo_Lyrics.Text := '';
+        //    Memo_Lyrics.Text :=  UTF8ToString(AktuellesAudioFile.Lyrics)
+        //else
+        //    Memo_Lyrics.Text := '';
 
         Lblv2_Version.Caption := '';
         Lblv2_Size   .Caption := '';
@@ -1851,15 +1954,27 @@ begin
       // ID3Tags
       UpdateID3v1EnabledStatus;
       UpdateID3v2EnabledStatus;
+      EnablePictureButtons;
       ShowID3v1Details;
       ShowID3v2Details;
+      ShowPictures;
+      ShowLyrics;
   end;
 
   if ValidOggFile then
+  begin
+      EnablePictureButtons;
       ShowOggDetails;
+      ShowLyrics;
+  end;
 
   if ValidFlacFile then
+  begin
+      EnablePictureButtons;
       ShowFlacDetails;
+      ShowPictures;
+      ShowLyrics;
+  end;
 
 
   PictureHasChanged := False;
@@ -1933,22 +2048,41 @@ end;
 }
 procedure TFDetails.Btn_DeleteLyricFrameClick(Sender: TObject);
 begin
-  id3v2Tag.Lyrics := '';
-  // Maybe there are some other Lyrics in the id3-tag ;-)
-  Memo_Lyrics.Text := ID3v2Tag.Lyrics;
+    if ValidMp3File then
+        id3v2Tag.Lyrics := '';
+
+    if ValidOggFile then
+        OggVorbisFile.SetPropertyByFieldname('UNSYNCEDLYRICS', '');
+
+    if ValidFlacFile then
+        FlacFile.SetPropertyByFieldname('UNSYNCEDLYRICS', '');
+
+    // Maybe there are some other Lyrics in the id3-tag ;-)
+    ShowLyrics;
+    //Memo_Lyrics.Text := ID3v2Tag.Lyrics;
 end;
 procedure TFDetails.cbPicturesChange(Sender: TObject);
 var stream: TMemorystream;
     mime: AnsiString;
     PicType: Byte;
     Description: UnicodeString;
+    idx: Integer;
 begin
+
     stream := TMemoryStream.Create;
     try
-        ID3Image.Visible := True;
-
-        (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
-        PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+        if ValidMP3File then
+        begin
+            ID3Image.Visible := True;
+            (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
+            PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+        end;
+        if ValidFlacFile then
+        begin
+            idx := cbPictures.ItemIndex;
+            TFlacPictureBlock(PictureFrames[idx]).CopyPicData(stream);
+            PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[idx]).Mime, ID3IMAGE.Picture.Bitmap);
+        end;
     finally
       stream.Free;
     end;
@@ -2025,7 +2159,10 @@ begin
         end;
   end;
 end;
-
+procedure TFDetails.Memo_LyricsChange(Sender: TObject);
+begin
+    ID3v2HasChanged := True;
+end;
 {
     --------------------------------------------------------
     BtnLyricWikiClick
@@ -2038,10 +2175,9 @@ procedure TFDetails.BtnLyricWikiClick(Sender: TObject);
 var Lyrics: TLyrics;
     LyricString: String;
 begin
-
-        if Fileexists(AktuellesAudioFile.Pfad)
-           AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
-        then
+        //if Fileexists(AktuellesAudioFile.Pfad)
+        //   AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
+        if ValidMp3File or ValidOggFile or ValidFlacFile then
         begin
             AktuellesAudioFile.FileIsPresent:=True;
             Lyrics := TLyrics.Create;

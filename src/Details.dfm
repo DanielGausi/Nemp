@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_VorbisComments
+    ActivePage = Tab_Lyrics
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
@@ -1361,7 +1361,7 @@ object FDetails: TFDetails
         end
         object BtnLyricWiki: TButton
           Left = 344
-          Top = 40
+          Top = 41
           Width = 89
           Height = 21
           Caption = 'lyrics.wikia.com'
@@ -1386,6 +1386,7 @@ object FDetails: TFDetails
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 2
+          OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
         end
       end

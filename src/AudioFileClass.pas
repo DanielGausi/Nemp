@@ -1093,8 +1093,6 @@ begin
             finally
                 CoverStream.Free;
             end;
-
-
         end;
 
 
