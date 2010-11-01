@@ -1350,8 +1350,8 @@ object FDetails: TFDetails
         Caption = 'Lyrics'
         TabOrder = 0
         object Btn_DeleteLyricFrame: TButton
-          Left = 344
-          Top = 16
+          Left = 349
+          Top = 13
           Width = 89
           Height = 21
           Caption = 'Delete lyrics'
