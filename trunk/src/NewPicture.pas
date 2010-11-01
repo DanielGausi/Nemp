@@ -107,6 +107,8 @@ end;
 function TFNewPicture.CheckDescription:boolean;
 begin
   result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+
+  df
 end;
 
 procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);

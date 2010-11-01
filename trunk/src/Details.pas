@@ -320,7 +320,7 @@ type
     PictureHasChanged: Boolean;
     ID3v1HasChanged: Boolean;
     ID3v2HasChanged: Boolean;
-    OggCommentHasChanged: Boolean;
+    VorbisCommentHasChanged: Boolean;
 
     // ForceChange: ShowDetails without showing a "Do you want to save..."-Message
     fForceChange: Boolean;
@@ -1980,7 +1980,7 @@ begin
   PictureHasChanged := False;
   ID3v1HasChanged := False;
   ID3v2HasChanged := False;
-  OggCommentHasChanged := False;
+  VorbisCommentHasChanged := False;
 end;
 
 
@@ -2057,6 +2057,11 @@ begin
     if ValidFlacFile then
         FlacFile.SetPropertyByFieldname('UNSYNCEDLYRICS', '');
 
+    if ValidMp3File then
+        ID3v2HasChanged := True;
+    if ValidOggFile or ValidflacFile then
+        VorbisCommentHasChanged := True;
+
     // Maybe there are some other Lyrics in the id3-tag ;-)
     ShowLyrics;
     //Memo_Lyrics.Text := ID3v2Tag.Lyrics;
@@ -2099,9 +2104,17 @@ begin
   ShowPictures;
 end;
 procedure TFDetails.Btn_DeletePictureClick(Sender: TObject);
+var idx: Integer;
 begin
-  Id3v2Tag.DeleteFrame(PictureFrames[cbPictures.ItemIndex] as TID3v2Frame );
-  ShowPictures;
+    if ValidMp3File then
+        Id3v2Tag.DeleteFrame(PictureFrames[cbPictures.ItemIndex] as TID3v2Frame );
+    if ValidFlacFile then
+    begin
+        idx := cbPictures.ItemIndex;
+        FlacFile.DeletePicture(TFlacPictureBlock(PictureFrames[idx]));
+    end;
+
+    ShowPictures;
 end;
 
 {
@@ -2115,28 +2128,42 @@ var Stream: TMemoryStream;
     mime: AnsiString;
     PicType: Byte;
     Description: UnicodeString;
+    idx: Integer;
 begin
     Stream := TMemoryStream.Create;
     try
-        (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, Stream);
-        if (mime = 'image/png') or (Uppercase(UnicodeString(Mime)) = 'PNG') then
+        // Get Picture-Data from current Frame/MetaBlock
+        if ValidMP3File then
         begin
-          SaveDialog1.DefaultExt := 'png';
-          SaveDialog1.Filter := '*.png|*.png;';
-        end else
-        begin
-          SaveDialog1.DefaultExt := 'jpg';
-          SaveDialog1.Filter := '*.jpg;*.jpeg;|*.jpg;*.jpeg;';
+            (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
         end;
-        if SaveDialog1.execute then
+        if ValidFlacFile then
         begin
-          try
-              Stream.SaveToFile(saveDialog1.FileName);
-          except
-              on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
-          end;
+            idx := cbPictures.ItemIndex;
+            mime := TFlacPictureBlock(PictureFrames[idx]).Mime;
+            TFlacPictureBlock(PictureFrames[idx]).CopyPicData(stream);
         end;
 
+        // Get proper Filter for SaveDialog
+        if (mime = 'image/png') or (Uppercase(UnicodeString(Mime)) = 'PNG') then
+        begin
+            SaveDialog1.DefaultExt := 'png';
+            SaveDialog1.Filter := '*.png|*.png;';
+        end else
+        begin
+            SaveDialog1.DefaultExt := 'jpg';
+            SaveDialog1.Filter := '*.jpg;*.jpeg;|*.jpg;*.jpeg;';
+        end;
+
+        // Save the Picture
+        if SaveDialog1.execute then
+        begin
+            try
+                Stream.SaveToFile(saveDialog1.FileName);
+            except
+                on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
+            end;
+        end;
     finally
         stream.Free;
     end;
@@ -2161,7 +2188,10 @@ begin
 end;
 procedure TFDetails.Memo_LyricsChange(Sender: TObject);
 begin
-    ID3v2HasChanged := True;
+    if ValidMp3File then
+        ID3v2HasChanged := True;
+    if ValidOggFile or ValidflacFile then
+        VorbisCommentHasChanged := True;
 end;
 {
     --------------------------------------------------------
@@ -2199,7 +2229,10 @@ begin
                 begin
                     // ok, Lyrics found
                     Memo_Lyrics.Text := LyricString;
-                    ID3v2HasChanged := True;
+                    if ValidMp3File then
+                        ID3v2HasChanged := True;
+                    if ValidOggFile or ValidflacFile then
+                        VorbisCommentHasChanged := True;
                 end;
             finally
                 Lyrics.Free;
