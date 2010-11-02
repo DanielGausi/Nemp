@@ -81,7 +81,7 @@ var i:integer;
 begin
   TranslateComponent (self);
   for i := 0 to 20 do
-    cbPicturetype.Items.Add(Picture_Types[i]);
+      cbPicturetype.Items.Add(Picture_Types[i]);
   cbPictureType.ItemIndex := 0;
 end;
 
@@ -94,21 +94,25 @@ begin
   Btn_OK.Enabled := False;
   if CheckDescription then
   begin
-    Btn_OK.Enabled := Image1.Visible;
-    PnlWarnung.Visible := False;
+      Btn_OK.Enabled := Image1.Visible;
+      PnlWarnung.Visible := False;
   end else
   begin
-    Btn_OK.Enabled := False;
-    PnlWarnung.Visible := True;
+      Btn_OK.Enabled := False;
+      PnlWarnung.Visible := True;
   end;
 end;
 
 
 function TFNewPicture.CheckDescription:boolean;
 begin
-  result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+  result := False;
 
-  df
+  if FDetails.ValidMp3File then
+      result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+
+  if FDetails.ValidFlacFile then
+      result := True; // No restrictions here
 end;
 
 procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);
@@ -148,7 +152,7 @@ end;
 
 procedure TFNewPicture.Btn_CancelClick(Sender: TObject);
 begin
-  ModalResult := MRCANCEL;
+    ModalResult := MRCANCEL;
 end;
 
 procedure TFNewPicture.Btn_OKClick(Sender: TObject);
@@ -163,10 +167,14 @@ begin
           else
               mime := AnsiString('image/jpeg');
 
-          FDetails.ID3v2Tag.SetPicture(mime,
+          if FDetails.ValidMp3File then
+              FDetails.ID3v2Tag.SetPicture(mime,
                                        cbPicturetype.Itemindex,
                                        EdtPictureDescription.Text,
                                        str);
+
+          if FDetails.ValidFlacFile then
+              FDetails.FlacFile.AddPicture(str, cbPicturetype.Itemindex, mime, EdtPictureDescription.Text);
       finally
           str.Free;
       end;

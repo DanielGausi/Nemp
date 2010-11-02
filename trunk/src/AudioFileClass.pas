@@ -159,6 +159,9 @@ type
         procedure QuickUpdateMP3Tag(aFilename: String = '');
 
         procedure SetMp3Data(filename: UnicodeString; Flags: Integer = 0);
+        procedure SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0);
+        procedure SetFlacData(filename: UnicodeString; Flags: Integer = 0);
+
 
         // Write a string in a stream. In previous versions several encodings were
         // written, now only UTF8 is used
@@ -1130,13 +1133,13 @@ begin
         Genre := FlacFile.Genre;
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
-        Comment := FlacFile.GetPropertyByFieldname('COMMENT');
-        Lyrics  := FlacFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        Comment := FlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
+        Lyrics  := FlacFile.GetPropertyByFieldname(VORBIS_LYRICS);
         // Playcounter/Rating: Maybe incompatible with other Taggers
-        PlayCounter := StrToIntDef(FlacFile.GetPropertyByFieldname('PLAYCOUNT'), 0);
-        Rating :=  StrToIntDef(FlacFile.GetPropertyByFieldname('RATING'), 0);
+        PlayCounter := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
+        Rating :=  StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        RawTagLastFM := FlacFile.GetPropertyByFieldname('CATEGORIES');
+        RawTagLastFM := FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
     finally
         FlacFile.Free;
     end;
@@ -1287,13 +1290,13 @@ begin
         Genre := OggVorbisFile.Genre;
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
-        Comment := OggVorbisFile.GetPropertyByFieldname('COMMENT');
-        Lyrics  := OggVorbisFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        Comment := OggVorbisFile.GetPropertyByFieldname(VORBIS_COMMENT);
+        Lyrics  := OggVorbisFile.GetPropertyByFieldname(VORBIS_LYRICS);
         // Playcounter/Rating: Maybe incompatible with other Taggers
-        PlayCounter := StrToIntDef(OggVorbisFile.GetPropertyByFieldname('PLAYCOUNT'), 0);
-        Rating :=  StrToIntDef(OggVorbisFile.GetPropertyByFieldname('RATING'), 0);
+        PlayCounter := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
+        Rating :=  StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING), 0);
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        RawTagLastFM := OggVorbisFile.GetPropertyByFieldname('CATEGORIES');
+        RawTagLastFM := OggVorbisFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
     finally
         OggVorbisFile.Free;
     end;
@@ -1714,6 +1717,8 @@ begin
               or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp1')
             then
                 QuickUpdateMP3Tag(localName)
+sdsdds
+
             //else
             //    if AnsiLowerCase(ExtractFileExt(filename)) = '.ogg' then
             //        QuickSetOggInfo(Filename)
@@ -1791,6 +1796,12 @@ begin
     begin
         SetMp3Data(pfad, flags);
     end;
+
+    if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
+        SetOggVorbisData(pfad, flags);
+    if (AnsiLowerCase(ExtractFileExt(pfad)) = '.flac') then
+        SetFlacData(pfad, flags);
+
 end;
 
 {
@@ -1844,7 +1855,9 @@ begin
             Id3v2Tag.Lyrics := Lyrics;
 
         ID3v2Tag.Year := Year;
-        ID3v2Tag.Track := IntToStr(Track);
+        if Track > 0 then
+            ID3v2Tag.Track := IntToStr(Track);  // else: DO nothing, dont change "TrackNr"
+
         ID3v2Tag.Genre := Genre;
 
         if (Rating = 0) and (PlayCounter = 0) then
@@ -1881,6 +1894,92 @@ begin
         ID3v2Tag.Free;
     end;
 end;
+
+procedure TAudioFile.SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0);
+var OggVorbisFile: TOggVorbisFile;
+begin
+    if Flags = SAD_None then
+        // Do not update the file
+        exit;
+
+    OggVorbisFile := TOggVorbisFile.Create;
+    try
+        OggVorbisFile.ReadFromFile(filename);
+
+        OggVorbisFile.Artist := Artist;
+        OggVorbisFile.Title  := Titel;
+        OggVorbisFile.Album  := Album;
+
+        if Track > 0 then
+            OggVorbisFile.TrackNumber := IntToStr(Track);
+
+        OggVorbisFile.Date := Year;
+        OggVorbisFile.Genre := Genre;
+
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Lyrics);
+        // Playcounter/Rating: Maybe incompatible with other Taggers
+        if Playcounter > 0 then
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+        else
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
+
+        if Rating > 0 then
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+        else
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
+
+        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
+
+        OggVorbisFile.WriteToFile(filename);
+    finally
+        OggVorbisFile.Free;
+    end;
+end;
+procedure TAudioFile.SetFlacData(filename: UnicodeString; Flags: Integer = 0);
+var FlacFile: TFlacFile;
+begin
+    if Flags = SAD_None then
+        // Do not update the file
+        exit;
+
+    FlacFile := TFlacFile.Create;
+    try
+        FlacFile.ReadFromFile(filename);
+
+        FlacFile.Artist := Artist;
+        FlacFile.Title  := Titel;
+        FlacFile.Album  := Album;
+
+        if Track > 0 then
+            FlacFile.TrackNumber := IntToStr(Track);
+
+        FlacFile.Date := Year;
+        FlacFile.Genre := Genre;
+
+        FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
+        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Lyrics);
+        // Playcounter/Rating: Maybe incompatible with other Taggers
+        if Playcounter > 0 then
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+        else
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
+
+        if Rating > 0 then
+            FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+        else
+            FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
+
+        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+        FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
+
+        FlacFile.WriteToFile(filename);
+    finally
+        FlacFile.Free;
+    end;
+end;
+
 
 {
     --------------------------------------------------------
