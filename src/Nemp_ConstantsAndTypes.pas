@@ -782,6 +782,13 @@ const
       NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
       NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
 
+      VORBIS_COMMENT = 'COMMENT';
+      VORBIS_LYRICS = 'UNSYNCEDLYRICS';
+      VORBIS_RATING = 'RATING';
+      VORBIS_PLAYCOUNT = 'PLAYCOUNT';
+      VORBIS_CATEGORIES = 'CATEGORIES';
+
+
 var
 
   NempDeskbandActivateMessage: UINT = 0;

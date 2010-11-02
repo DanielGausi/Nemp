@@ -309,10 +309,6 @@ type
 
     fFileFromMedienBib: Boolean;
 
-    // Gibt an, ob aktuelles AudioFile ein gültiges MP3-File ist
-    ValidMp3File: Boolean;
-    ValidOggFile: Boolean;
-    ValidFlacFile: Boolean;
     // Speichert die "temporäre Existenz" der ID3Tags, d.h. ob der User sie aktiviert hat oder nicht
     ID3v1Activated: Boolean;
     ID3v2Activated: Boolean;
@@ -346,6 +342,10 @@ type
     // Save information to ID3-Tag
     procedure UpdateID3v1InFile;
     procedure UpdateID3v2InFile;
+    procedure UpdateOggVorbisInFile;
+    procedure UpdateFlacInFile;
+
+
 
     function CurrentFileHasBeenChanged: Boolean;
 
@@ -354,6 +354,11 @@ type
     FlacFile: TFlacFile;
     OggVorbisFile: TOggVorbisFile;
     AktuellesAudioFile : TAudioFile;
+
+    // Gibt an, ob aktuelles AudioFile ein gültiges MP3-File ist
+    ValidMp3File: Boolean;
+    ValidOggFile: Boolean;
+    ValidFlacFile: Boolean;
   end;
 
 
@@ -483,7 +488,7 @@ begin
 
     // Do not Change anything in non-mp3-Files here!
     // Do Not GetAudioData on Non-mp3-Files here!
-    if Not ValidMP3File then
+    if Not (ValidMP3File or ValidOggFile or ValidFlacFile) then
         Exit;
 
     // Note from 04.03.2010: Redo "DenyID3-Edit-stuff" here. - This will have to do something with partymode
@@ -491,6 +496,7 @@ begin
     PictureHasChanged := False;
     ID3v1HasChanged := False;
     ID3v2HasChanged := False;
+    VorbisCommentHasChanged := False;
 
     if assigned(AktuellesAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
@@ -498,8 +504,16 @@ begin
     then
     begin
         // write Tags to file
-        UpdateID3v1InFile;
-        UpdateID3v2InFile;
+        if ValidMp3File then
+        begin
+            UpdateID3v1InFile;
+            UpdateID3v2InFile;
+        end;
+        if ValidOggFile then
+            UpdateOggVorbisInFile;
+        if ValidFlacFile then
+            UpdateFlacInFile;
+
         // get the information again and store them in the audiofile-object
         AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
         // Update other copies of this file
@@ -810,6 +824,7 @@ end;
     - (de)activate some ID3v1 stuff
     --------------------------------------------------------
 }
+
 Procedure TFDetails.UpdateID3v1EnabledStatus;
 var ControlsEnable: Boolean;
 begin
@@ -952,6 +967,7 @@ begin
   LblConst_MpegSamplerate.Enabled := ControlsEnable;
   LblConst_MpegVersion.Enabled := ControlsEnable;
 end;
+
 
 {
     --------------------------------------------------------
@@ -1378,7 +1394,7 @@ begin
     Edt_VorbisArtist.Text    := OggVorbisFile.Artist;
     Edt_VorbisTitle.Text     := OggVorbisFile.Title;
     Edt_VorbisAlbum.Text     := OggVorbisFile.Album;
-    Edt_VorbisComment.Text   := OggVorbisFile.GetPropertyByFieldname('COMMENT');
+    Edt_VorbisComment.Text   := OggVorbisFile.GetPropertyByFieldname(VORBIS_COMMENT);
     Edt_VorbisYear.Text      := OggVorbisFile.Date;
     Edt_VorbisTrack.Text     := OggVorbisFile.TrackNumber;
     Edt_VorbisCopyright.Text := OggVorbisFile.Copyright;
@@ -1417,7 +1433,7 @@ begin
     Edt_VorbisArtist.Text    := FlacFile.Artist;
     Edt_VorbisTitle.Text     := FlacFile.Title;
     Edt_VorbisAlbum.Text     := FlacFile.Album;
-    Edt_VorbisComment.Text   := FlacFile.GetPropertyByFieldname('COMMENT');
+    Edt_VorbisComment.Text   := FlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
     Edt_VorbisYear.Text      := FlacFile.Date;
     Edt_VorbisTrack.Text     := FlacFile.TrackNumber;
     Edt_VorbisCopyright.Text := FlacFile.Copyright;
@@ -1595,10 +1611,10 @@ begin
         Memo_Lyrics.Text := ID3v2Tag.Lyrics;
 
     if ValidOggFile then
-        Memo_Lyrics.Text := OggVorbisFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        Memo_Lyrics.Text := OggVorbisFile.GetPropertyByFieldname(VORBIS_LYRICS);
 
     if ValidFlacFile then
-        Memo_Lyrics.Text := FlacFile.GetPropertyByFieldname('UNSYNCEDLYRICS');
+        Memo_Lyrics.Text := FlacFile.GetPropertyByFieldname(VORBIS_LYRICS);
 
     Btn_DeleteLyricFrame.Enabled := ButtonsEnable and (Memo_Lyrics.Text <> '');
     BtnLyricWiki.Enabled         := ButtonsEnable;
@@ -2037,6 +2053,45 @@ begin
     id3v2Tag.RemoveFromFile(Dateipfad);
 end;
 
+procedure TFDetails.UpdateOggVorbisInFile;
+begin
+    if ValidOggFile then
+    begin
+        OggVorbisFile.Artist := Edt_VorbisArtist.Text;
+        OggVorbisFile.Title  := Edt_VorbisTitle.Text;
+        OggVorbisFile.Album  := Edt_VorbisAlbum.Text;
+        OggVorbisFile.Genre  := cb_VorbisGenre.Text;
+        OggVorbisFile.TrackNumber := Edt_VorbisTrack.Text;
+        OggVorbisFile.Date        := Edt_VorbisYear.Text;
+        OggVorbisFile.Copyright   := Edt_VorbisCopyright.Text;
+
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+
+        OggVorbisFile.WriteToFile(Dateipfad);
+    end;
+end;
+procedure TFDetails.UpdateFlacInFile;
+begin
+    if ValidFlacFile then
+    begin
+        FlacFile.Artist := Edt_VorbisArtist.Text;
+        FlacFile.Title  := Edt_VorbisTitle.Text;
+        FlacFile.Album  := Edt_VorbisAlbum.Text;
+        FlacFile.Genre  := cb_VorbisGenre.Text;
+        FlacFile.TrackNumber := Edt_VorbisTrack.Text;
+        FlacFile.Date        := Edt_VorbisYear.Text;
+        FlacFile.Copyright   := Edt_VorbisCopyright.Text;
+
+        FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
+        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
+        FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+
+        FlacFile.WriteToFile(Dateipfad);
+    end;
+end;
+
 {
     --------------------------------------------------------
     Btn_DeleteLyricFrameClick
@@ -2052,10 +2107,10 @@ begin
         id3v2Tag.Lyrics := '';
 
     if ValidOggFile then
-        OggVorbisFile.SetPropertyByFieldname('UNSYNCEDLYRICS', '');
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, '');
 
     if ValidFlacFile then
-        FlacFile.SetPropertyByFieldname('UNSYNCEDLYRICS', '');
+        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, '');
 
     if ValidMp3File then
         ID3v2HasChanged := True;
