@@ -43,7 +43,7 @@ uses
   OggVorbis, Flac, VorbisComments,
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
-  Nemp_RessourceStrings,  IdBaseComponent, IdComponent,
+  Nemp_RessourceStrings,  IdBaseComponent, IdComponent, TagClouds,
   IdTCPConnection, IdTCPClient, IdHTTP, Menus, RatingCtrls;
 
 type
@@ -211,6 +211,12 @@ type
     lv_VorbisComments: TListView;
     Lbl_VorbisContent: TLabel;
     Lbl_VorbisKey: TLabel;
+    Tab_MoreTags: TTabSheet;
+    GrpBox_TagCloud: TGroupBox;
+    GrpBox_ExistingTags: TGroupBox;
+    Btn_GetTags: TButton;
+    lvExistingTags: TListView;
+    Lbl_TagCloudInfo2: TLabel;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -297,6 +303,9 @@ type
     procedure lv_VorbisCommentsChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
     procedure Memo_LyricsChange(Sender: TObject);
+    procedure Btn_GetTagsClick(Sender: TObject);
+    procedure lvExistingTagsClick(Sender: TObject);
+    procedure MainPageControlChange(Sender: TObject);
 
   private
     Coverpfade : TStringList;
@@ -1982,6 +1991,7 @@ begin
       EnablePictureButtons;
       ShowOggDetails;
       ShowLyrics;
+      ShowPictures; // To clear the ComboBox
   end;
 
   if ValidFlacFile then
@@ -2224,6 +2234,60 @@ begin
     end;
 end;
 
+procedure TFDetails.MainPageControlChange(Sender: TObject);
+begin
+    if (MainPageControl.ActivePage = Tab_MoreTags)
+    and (lvExistingTags.Items.Count = 0)
+    then
+    begin
+        Btn_GetTagsClick(Nil);
+    end;
+
+end;
+
+
+procedure TFDetails.Btn_GetTagsClick(Sender: TObject);
+var
+    tmp: TObjectList;
+    i: Integer;
+    aTag: TTag;
+    newItem: TListItem;
+
+begin
+    if MedienBib.BrowseMode <> 2 then
+        MedienBib.ReBuildTagCloud;
+
+      // clear ChecklistBox
+    lvExistingTags.Clear;
+
+    tmp := TObjectList.Create(False);
+    try
+        // Get Tags
+        MedienBib.GetTopTags(150, 10, tmp);
+        // Show Tags
+        for i := 0 to tmp.Count - 1 do
+        begin
+            aTag := TTag(tmp[i]);
+            newItem := lvExistingTags.Items.Add;
+            newItem.Caption := aTag.Key;
+            NewItem.SubItems.Add(IntToStr(aTag.TotalCount));
+            NewItem.Data := aTag;
+        end;
+    finally
+        tmp.Free;
+    end;
+end;
+
+procedure TFDetails.lvExistingTagsClick(Sender: TObject);
+begin
+    if assigned(lvExistingTags.ItemFocused) then
+    begin
+        Showmessage(
+        TTag(lvExistingTags.ItemFocused.Data).Key);
+7kkjkj
+    end;
+end;
+
 {
     --------------------------------------------------------
     Memo_LyricsKeyDown
@@ -2241,6 +2305,8 @@ begin
         end;
   end;
 end;
+
+
 procedure TFDetails.Memo_LyricsChange(Sender: TObject);
 begin
     if ValidMp3File then

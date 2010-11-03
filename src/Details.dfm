@@ -37,8 +37,9 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MpegInformation
+    ActivePage = Tab_MoreTags
     TabOrder = 1
+    OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
@@ -1072,7 +1073,7 @@ object FDetails: TFDetails
         TabOrder = 0
         object Lbl_VorbisArtist: TLabel
           Left = 8
-          Top = 27
+          Top = 28
           Width = 54
           Height = 13
           Alignment = taRightJustify
@@ -1350,8 +1351,8 @@ object FDetails: TFDetails
         Caption = 'Lyrics'
         TabOrder = 0
         object Btn_DeleteLyricFrame: TButton
-          Left = 349
-          Top = 13
+          Left = 335
+          Top = 14
           Width = 89
           Height = 21
           Caption = 'Delete lyrics'
@@ -1360,7 +1361,7 @@ object FDetails: TFDetails
           OnClick = Btn_DeleteLyricFrameClick
         end
         object BtnLyricWiki: TButton
-          Left = 344
+          Left = 335
           Top = 41
           Width = 89
           Height = 21
@@ -1369,8 +1370,8 @@ object FDetails: TFDetails
           OnClick = BtnLyricWikiClick
         end
         object BtnLyricWikiManual: TButton
-          Left = 344
-          Top = 64
+          Left = 335
+          Top = 68
           Width = 89
           Height = 21
           Caption = 'Manual search'
@@ -1414,8 +1415,8 @@ object FDetails: TFDetails
           Stretch = True
         end
         object Btn_NewPicture: TButton
-          Left = 344
-          Top = 16
+          Left = 335
+          Top = 13
           Width = 89
           Height = 21
           Caption = 'New'
@@ -1426,7 +1427,7 @@ object FDetails: TFDetails
           OnClick = Btn_NewPictureClick
         end
         object Btn_DeletePicture: TButton
-          Left = 344
+          Left = 335
           Top = 40
           Width = 89
           Height = 21
@@ -1438,8 +1439,8 @@ object FDetails: TFDetails
           OnClick = Btn_DeletePictureClick
         end
         object Btn_SavePictureToFile: TButton
-          Left = 344
-          Top = 72
+          Left = 335
+          Top = 67
           Width = 89
           Height = 21
           Caption = 'Save to file'
@@ -1461,7 +1462,7 @@ object FDetails: TFDetails
       end
     end
     object Tab_ExtendedID3v2: TTabSheet
-      Caption = 'More'
+      Caption = ' Mp3- and ID3-Details'
       ImageIndex = 3
       object GrpBox_Mpeg: TGroupBox
         Left = 8
@@ -1808,6 +1809,67 @@ object FDetails: TFDetails
         end
       end
     end
+    object Tab_MoreTags: TTabSheet
+      Caption = 'Tags for tagcloud'
+      ImageIndex = 5
+      object GrpBox_TagCloud: TGroupBox
+        Left = 8
+        Top = 0
+        Width = 443
+        Height = 169
+        Caption = 'Tags'
+        TabOrder = 0
+        object Lbl_TagCloudInfo2: TLabel
+          Left = 8
+          Top = 16
+          Width = 417
+          Height = 33
+          AutoSize = False
+          Caption = 
+            'Type some tags here (one tag per line) or choose some from the l' +
+            'ist below by double-clicking'
+          WordWrap = True
+        end
+      end
+      object GrpBox_ExistingTags: TGroupBox
+        Left = 8
+        Top = 175
+        Width = 443
+        Height = 250
+        Caption = 'Existing Tags in medialibrary'
+        TabOrder = 1
+        object Btn_GetTags: TButton
+          Left = 252
+          Top = 15
+          Width = 133
+          Height = 25
+          Hint = 'Get all tags used in the library and list the often used ones.'
+          Caption = 'Refresh existing tags'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+          OnClick = Btn_GetTagsClick
+        end
+        object lvExistingTags: TListView
+          Left = 8
+          Top = 21
+          Width = 238
+          Height = 220
+          Columns = <
+            item
+              Caption = 'Tag'
+              Width = 150
+            end
+            item
+              Caption = 'Count'
+            end>
+          ReadOnly = True
+          TabOrder = 1
+          ViewStyle = vsReport
+          OnDblClick = lvExistingTagsClick
+        end
+      end
+    end
   end
   object ___CB_StayOnTop: TCheckBox
     Left = 16
@@ -1842,7 +1904,8 @@ object FDetails: TFDetails
     Enabled = False
     Interval = 250
     OnTimer = Timer1Timer
-    Left = 384
+    Left = 448
+    Top = 200
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True
@@ -1853,12 +1916,12 @@ object FDetails: TFDetails
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 412
-    Top = 40
+    Left = 444
+    Top = 152
   end
   object PM_URLCopy: TPopupMenu
-    Left = 340
-    Top = 8
+    Left = 444
+    Top = 256
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick
@@ -1868,13 +1931,14 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 420
+    Left = 436
+    Top = 48
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
-    Left = 424
-    Top = 128
+    Left = 432
+    Top = 96
   end
 end

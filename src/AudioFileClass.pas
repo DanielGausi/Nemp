@@ -157,6 +157,9 @@ type
         procedure SetUnknown;
 
         procedure QuickUpdateMP3Tag(aFilename: String = '');
+        procedure QuickUpdateOggTag(aFilename: String = '');
+        procedure QuickUpdateFlacTag(aFilename: String = '');
+
 
         procedure SetMp3Data(filename: UnicodeString; Flags: Integer = 0);
         procedure SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0);
@@ -1696,6 +1699,7 @@ end;
     QuickFileUpdate
     Write Rating and PlayCounter to the file
     Used by the Player-Postprocessor
+            and the Rating-Star-Images-Click
     --------------------------------------------------------
 }
 procedure TAudioFile.QuickUpdateTag(aFilename: String = '');
@@ -1717,17 +1721,17 @@ begin
               or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp1')
             then
                 QuickUpdateMP3Tag(localName)
-sdsdds
-
-            //else
-            //    if AnsiLowerCase(ExtractFileExt(filename)) = '.ogg' then
-            //        QuickSetOggInfo(Filename)
+            else
+                if AnsiLowerCase(ExtractFileExt(localName)) = '.ogg' then
+                    QuickUpdateOggTag(localName)
+            else
+                if AnsiLowerCase(ExtractFileExt(localName)) = '.flac' then
+                    QuickUpdateFlacTag(localName)
         except
 
         end;
     end;
 end;
-
 
 procedure TAudioFile.QuickUpdateMP3Tag(aFilename: String);
 var ID3v2Tag:TID3V2Tag;
@@ -1773,6 +1777,49 @@ begin
         finally
             ID3v2Tag.Free;
         end;
+    end;
+end;
+
+procedure TAudioFile.QuickUpdateOggTag(aFilename: String);
+var OggVorbisFile: TOggVorbisFile;
+begin
+    OggVorbisFile := TOggVorbisFile.Create;
+    try
+        OggVorbisFile.ReadFromFile(aFilename);
+        if Playcounter > 0 then
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+        else
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
+        if Rating > 0 then
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+        else
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
+
+        OggVorbisFile.WriteToFile(aFilename);
+    finally
+        OggVorbisFile.Free;
+    end;
+end;
+
+procedure TAudioFile.QuickUpdateFlacTag(aFilename: String);
+var FlacFile: TFlacFile;
+begin
+    FlacFile := TFlacFile.Create;
+    try
+        FlacFile.ReadFromFile(aFilename);
+
+        if Playcounter > 0 then
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+        else
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
+        if Rating > 0 then
+            FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+        else
+            FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
+
+        FlacFile.WriteToFile(aFilename);
+    finally
+        FlacFile.Free;
     end;
 end;
 
