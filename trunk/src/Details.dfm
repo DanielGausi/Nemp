@@ -1826,25 +1826,55 @@ object FDetails: TFDetails
           Height = 33
           AutoSize = False
           Caption = 
-            'Type some tags here (one tag per line) or choose some from the l' +
-            'ist below by double-clicking'
+            'Insert some Tags here (one Tag per line), choose some from the l' +
+            'ist of existing Tags, or try getting Tags from LastFM.'
           WordWrap = True
+        end
+        object Memo_Tags: TMemo
+          Left = 10
+          Top = 49
+          Width = 324
+          Height = 105
+          ScrollBars = ssVertical
+          TabOrder = 0
+          WordWrap = False
+          OnChange = Memo_TagsChange
+          OnKeyDown = Memo_LyricsKeyDown
+        end
+        object Btn_GetTagsLastFM: TButton
+          Left = 340
+          Top = 51
+          Width = 91
+          Height = 25
+          Hint = 'Add Tags from LastFM'
+          Caption = 'LastFM'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+          OnClick = Btn_GetTagsLastFMClick
         end
       end
       object GrpBox_ExistingTags: TGroupBox
         Left = 8
-        Top = 175
+        Top = 174
         Width = 443
         Height = 250
-        Caption = 'Existing Tags in medialibrary'
+        Caption = 'Existing Tags in medialibrary (double-click to insert)'
         TabOrder = 1
+        object Label1: TLabel
+          Left = 256
+          Top = 24
+          Width = 103
+          Height = 13
+          Caption = 'Number of Tags in list'
+        end
         object Btn_GetTags: TButton
-          Left = 252
-          Top = 15
-          Width = 133
+          Left = 256
+          Top = 92
+          Width = 120
           Height = 25
-          Hint = 'Get all tags used in the library and list the often used ones.'
-          Caption = 'Refresh existing tags'
+          Hint = 'Refresh the list of tags with these settings'
+          Caption = 'Refresh list'
           ParentShowHint = False
           ShowHint = True
           TabOrder = 0
@@ -1852,7 +1882,7 @@ object FDetails: TFDetails
         end
         object lvExistingTags: TListView
           Left = 8
-          Top = 21
+          Top = 20
           Width = 238
           Height = 220
           Columns = <
@@ -1867,6 +1897,30 @@ object FDetails: TFDetails
           TabOrder = 1
           ViewStyle = vsReport
           OnDblClick = lvExistingTagsClick
+        end
+        object cb_HideAutoTags: TCheckBox
+          Left = 256
+          Top = 70
+          Width = 172
+          Height = 17
+          Hint = 'Do not list Tags which are set automatically by Nemp.'
+          Caption = 'Hide Auto-Tags'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 2
+        end
+        object se_NumberOfTags: TSpinEdit
+          Left = 256
+          Top = 42
+          Width = 121
+          Height = 22
+          Hint = 'Maximum number of tags shown in the list beside'
+          MaxValue = 1000
+          MinValue = 0
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
+          Value = 150
         end
       end
     end
@@ -1904,8 +1958,8 @@ object FDetails: TFDetails
     Enabled = False
     Interval = 250
     OnTimer = Timer1Timer
-    Left = 448
-    Top = 200
+    Left = 280
+    Top = 440
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True
@@ -1916,12 +1970,12 @@ object FDetails: TFDetails
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 444
-    Top = 152
+    Left = 332
+    Top = 440
   end
   object PM_URLCopy: TPopupMenu
-    Left = 444
-    Top = 256
+    Left = 164
+    Top = 448
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick
@@ -1931,14 +1985,14 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 436
-    Top = 48
+    Left = 116
+    Top = 448
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
-    Left = 432
-    Top = 96
+    Left = 240
+    Top = 448
   end
 end

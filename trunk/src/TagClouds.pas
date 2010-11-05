@@ -295,7 +295,7 @@ type
           // Build a Tag-Cloud for the AudioFiles given in Source
           procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
 
-          procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TObjectList; Target: TObjectList);
+          procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TObjectList; Target: TObjectList; HideAutoTags: Boolean = False);
 
           // Show the Tags in the Cloud
           procedure ShowTags;
@@ -1035,7 +1035,7 @@ end;
     --------------------------------------------------------
 }
 procedure TTagCloud.GetTopTags(ResultCount: Integer; Offset: Integer;
-    BibSource: TObjectList; Target: TObjectList);
+    BibSource: TObjectList; Target: TObjectList; HideAutoTags: Boolean = False);
 var tmpList: TObjectList;
     i: Integer;
 begin
@@ -1043,8 +1043,13 @@ begin
     try
         // copy all tags to temporary list
         for i := 0 to Tags.Count - 1 do
-            if TTag(Tags[i]).TotalCount >= Offset then
-                tmpList.Add(Tags[i]);
+            if (TTag(Tags[i]).TotalCount >= Offset) then
+            begin
+                if (HideAutoTags and TTag(Tags[i]).IsAutoTag) then
+                    // nothing
+                else
+                    tmpList.Add(Tags[i]);
+            end;
         // sort list by totalcount
         tmplist.Sort(Sort_TotalCount);
         // ensure maxcount entries in the list

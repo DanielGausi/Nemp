@@ -33,7 +33,7 @@ unit Taghelper;
 
 interface
 
-uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs;
+uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs, AudioFileClass;
 
 type
 
@@ -97,6 +97,9 @@ const
     Def_MergeList  = 'default_tag_merge'  ;
     Usr_IgnoreList = 'tag_ignore' ;
     Usr_MergeList  = 'tag_merge'  ;
+
+function ControlRawTag(af: TAudioFile; newTags: String;
+      aIgnoreList: TStringList; aMergeList: TObjectList): String;
 
 function Sort_OriginalKey(item1, item2: Pointer): Integer;
 function Sort_OriginalKey_DESC(item1, item2: Pointer): Integer;
@@ -171,6 +174,77 @@ begin
     end;
 end;
 
+
+{
+    --------------------------------------------------------
+    ControlRawtag
+    - Correct RawTags from lastFM
+      af: Current AudioFile
+      newTags: String with new tags (result from LastFM)
+      aIgnorelist, aMergeList: Data how to change newTags
+      Result: The new #13#10-seperated TagString, including the old ones
+    --------------------------------------------------------
+}
+function ControlRawTag(af: TAudioFile; newTags: String;
+  aIgnoreList: TStringList; aMergeList: TObjectList): String;
+var oldTagList, newTagList: TStringList;
+    i: Integer;
+    aMergeItem: tTagMergeItem;
+
+        function GetMatchingMergeItem(aKey: String): TTagMergeItem;
+        var i: Integer;
+        begin
+            result := Nil;
+            for i := 0 to aMergeList.Count - 1 do
+            begin
+                if AnsiSameText(TTagMergeItem(aMergeList[i]).OriginalKey, aKey) then
+                begin
+                    result := TTagMergeItem(aMergeList[i]);
+                    break;
+                end;
+            end;
+        end;
+
+begin
+    oldTagList := TStringList.Create;
+    newTagList := TStringList.Create;
+    try
+        oldTagList.Text := af.RawTagLastFM;
+        newTagList.Text := newTags;
+
+        // 1.) delete duplicates, i.e. new tags, that are already there
+        for i := newTagList.Count - 1 downto 0 do
+            if oldTagList.IndexOf(newTagList[i]) >= 0 then
+                newTagList.Delete(i);
+
+        // 2.) delete ignored tags
+        for i := newTagList.Count - 1 downto 0 do
+            if aIgnoreList.IndexOf(newTagList[i]) >= 0 then
+                newTagList.Delete(i);
+
+        // 3.) Change Tags as described in aMergeList
+        for i := 0 to newTagList.Count - 1 do
+        begin
+            aMergeItem := GetMatchingMergeItem(newTagList[i]);
+            if assigned(aMergeItem) then
+                // change key
+                newTagList[i] := aMergeItem.ReplaceKey;
+        end;
+
+        // 4.) Add new Tags to oldTagList, check for duplicates EVERY time,
+        //     as by 3.) we could have generated duplicates again.
+        for i := 0 to newTagList.Count - 1 do
+        begin
+            if oldTagList.IndexOf(newTagList[i]) = -1 then
+                oldTagList.Add(newtagList[i]);
+        end;
+
+        result := trim(oldTagList.Text);
+    finally
+        oldTagList.Free;
+        newTagList.Free;
+    end;
+end;
 
 { TIgnoreTagString }
 
