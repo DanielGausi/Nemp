@@ -227,7 +227,7 @@ type
         procedure fBugFixID3Tags;     // BugFix-Method
 
         // ControlRawTag. Result: The new rawTag for the audiofile, including the previous existing
-        function ControlRawTag(af: TAudioFile; newTags: String; aIgnoreList: TStringList; aMergeList: TObjectList): String;
+        //function ControlRawTag(af: TAudioFile; newTags: String; aIgnoreList: TStringList; aMergeList: TObjectList): String;
 
         // General Note:
         // "Artist" and "Album" are not necessary the artist and album, but
@@ -494,7 +494,7 @@ type
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList;       // -"- of CoverLists
         procedure ReBuildTagCloud;        // -"- of the TagCloud
-        procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList);
+        procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
         procedure RestoreTagCloudNavigation;
         procedure RepairBrowseListsAfterDelete; // Rebuild, but sorting is not needed
         procedure RepairBrowseListsAfterChange; // Another Repair-method :?
@@ -1943,12 +1943,12 @@ end;
 procedure TMedienBibliothek.fGetLyrics;
 var i: Integer;
     aAudioFile: TAudioFile;
-    ID3v2tag: TID3v2Tag;
+    //ID3v2tag: TID3v2Tag;
     LyricWikiResponse: String;
     done, failed: Integer;
     Lyrics: TLyrics;
 begin
-    ID3v2tag := TID3v2tag.Create;
+    //ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
 
     done := 0;
@@ -1964,7 +1964,7 @@ begin
 
                 aAudioFile := tAudioFile(UpdateList[i]);
                 if FileExists(aAudioFile.Pfad)
-                   AND (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                   // AND (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
                 then
                 begin
                     // call the vcl, that we will edit this file now
@@ -1980,39 +1980,47 @@ begin
                     LyricWikiResponse := Lyrics.GetLyrics(aAudiofile.Artist, aAudiofile.Titel);
                     if LyricWikiResponse <> '' then
                     begin
-                        // ok, Lyrics found
-                        // Lyrics speichern
-                        // 1. id3Tag ermitteln
-                        ID3v2tag.ReadFromFile(aAudioFile.Pfad);
-                        if not Id3v2Tag.exists then
-                        begin
-                            // Tag erstellen und sinnvoll füllen
-                            if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
-                                ID3v2tag.Title  := aAudioFile.Titel;
-                            if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
-                                ID3v2tag.Artist := aAudioFile.Artist;
-                            if aAudioFile.Album <> AUDIOFILE_UNKOWN then
-                                ID3v2tag.album  := aAudioFile.Album;
-                            if aAudioFile.Comment <> AUDIOFILE_UNKOWN then
-                                ID3v2tag.Comment:= aAudioFile.Comment;
-                            ID3v2tag.Year   := aAudioFile.Year;
-                            ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
-                            ID3v2tag.Genre  := aAudioFile.Genre;
-                        end;
-                        Id3v2Tag.Lyrics := LyricWikiResponse;
+                        aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
+                        Changed := True;
+                        aAudioFile.SetAudioData(SAD_Both);
+                        inc(done);
 
-                        if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
-                        begin
-                            aAudioFile.Lyrics := UTF8Encode(Id3v2Tag.Lyrics);
-                            Changed := True;
-                            inc(done);
-                        end else
-                        begin
-                            // Datei konnte nicht aktualisiert werden.
-                            // (Schreibgeschützt, oder jemand anders greift grade auf die Datei zu)
-                            // nichts an den Lyrics ändern, aber
-                            inc(failed);
-                        end;
+                        // hier: einfach aAudioFile.SetAudioData(SAD_Both);    wie bei tags auch
+
+                       {     // ok, Lyrics found
+                            // Lyrics speichern
+                            // 1. id3Tag ermitteln
+                            ID3v2tag.ReadFromFile(aAudioFile.Pfad);
+                            if not Id3v2Tag.exists then
+                            begin
+                                // Tag erstellen und sinnvoll füllen
+                                if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
+                                    ID3v2tag.Title  := aAudioFile.Titel;
+                                if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
+                                    ID3v2tag.Artist := aAudioFile.Artist;
+                                if aAudioFile.Album <> AUDIOFILE_UNKOWN then
+                                    ID3v2tag.album  := aAudioFile.Album;
+                                if aAudioFile.Comment <> AUDIOFILE_UNKOWN then
+                                    ID3v2tag.Comment:= aAudioFile.Comment;
+                                ID3v2tag.Year   := aAudioFile.Year;
+                                ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
+                                ID3v2tag.Genre  := aAudioFile.Genre;
+                            end;
+                            Id3v2Tag.Lyrics := LyricWikiResponse;
+
+                            if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
+                            begin
+                                aAudioFile.Lyrics := UTF8Encode(Id3v2Tag.Lyrics);
+                                Changed := True;
+                                inc(done);
+                            end else
+                            begin
+                                // Datei konnte nicht aktualisiert werden.
+                                // (Schreibgeschützt, oder jemand anders greift grade auf die Datei zu)
+                                // nichts an den Lyrics ändern, aber
+                                inc(failed);
+                            end;
+                       }
                     end
                     else
                         inc(failed);
@@ -2068,7 +2076,7 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                         Integer(PChar(MediaLibrary_SearchLyricsComplete_NoneFound)))
     end;
-    id3v2Tag.free;
+    //id3v2Tag.free;
     // UnblockMEssage is sent via CleanUpTMPLists
 end;
 
@@ -2180,76 +2188,7 @@ begin
                     Integer(PWideChar('')));
 end;
 
-{
-    --------------------------------------------------------
-    ControlRawtag
-    - Correct RawTags from lastFM
-      af: Current AudioFile
-      newTags: String with new tags (result from LastFM)
-      aIgnorelist, aMergeList: Data how to change newTags
-      Result: The new #13#10-seperated TagString, including the old ones
-    --------------------------------------------------------
-}
-function TMedienBibliothek.ControlRawTag(af: TAudioFile; newTags: String;
-  aIgnoreList: TStringList; aMergeList: TObjectList): String;
-var oldTagList, newTagList: TStringList;
-    i: Integer;
-    aMergeItem: tTagMergeItem;
 
-        function GetMatchingMergeItem(aKey: String): TTagMergeItem;
-        var i: Integer;
-        begin
-            result := Nil;
-            for i := 0 to aMergeList.Count - 1 do
-            begin
-                if AnsiSameText(TTagMergeItem(aMergeList[i]).OriginalKey, aKey) then
-                begin
-                    result := TTagMergeItem(aMergeList[i]);
-                    break;
-                end;
-            end;
-        end;
-
-begin
-    oldTagList := TStringList.Create;
-    newTagList := TStringList.Create;
-    try
-        oldTagList.Text := af.RawTagLastFM;
-        newTagList.Text := newTags;
-
-        // 1.) delete duplicates, i.e. new tags, that are already there
-        for i := newTagList.Count - 1 downto 0 do
-            if oldTagList.IndexOf(newTagList[i]) >= 0 then
-                newTagList.Delete(i);
-
-        // 2.) delete ignored tags
-        for i := newTagList.Count - 1 downto 0 do
-            if aIgnoreList.IndexOf(newTagList[i]) >= 0 then
-                newTagList.Delete(i);
-
-        // 3.) Change Tags as described in aMergeList
-        for i := 0 to newTagList.Count - 1 do
-        begin
-            aMergeItem := GetMatchingMergeItem(newTagList[i]);
-            if assigned(aMergeItem) then
-                // change key
-                newTagList[i] := aMergeItem.ReplaceKey;
-        end;
-
-        // 4.) Add new Tags to oldTagList, check for duplicates EVERY time,
-        //     as by 3.) we could have generated duplicates again.
-        for i := 0 to newTagList.Count - 1 do
-        begin
-            if oldTagList.IndexOf(newTagList[i]) = -1 then
-                oldTagList.Add(newtagList[i]);
-        end;
-
-        result := trim(oldTagList.Text);
-    finally
-        oldTagList.Free;
-        newTagList.Free;
-    end;
-end;
 
 
 {
@@ -3183,9 +3122,9 @@ begin
     TagCloud.RestoreNavigation(Mp3ListeArtistSort);
 end;
 
-procedure TMedienBibliothek.GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList);
+procedure TMedienBibliothek.GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
 begin
-    TagCloud.GetTopTags(ResultCount, Offset, Mp3ListeArtistSort, Target);
+    TagCloud.GetTopTags(ResultCount, Offset, Mp3ListeArtistSort, Target, HideAutoTags);
 end;
 
 

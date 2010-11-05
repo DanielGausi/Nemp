@@ -44,7 +44,7 @@ uses
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
   Nemp_RessourceStrings,  IdBaseComponent, IdComponent, TagClouds,
-  IdTCPConnection, IdTCPClient, IdHTTP, Menus, RatingCtrls;
+  IdTCPConnection, IdTCPClient, IdHTTP, Menus, RatingCtrls, Spin;
 
 type
   TFDetails = class(TForm)
@@ -217,6 +217,11 @@ type
     Btn_GetTags: TButton;
     lvExistingTags: TListView;
     Lbl_TagCloudInfo2: TLabel;
+    cb_HideAutoTags: TCheckBox;
+    se_NumberOfTags: TSpinEdit;
+    Label1: TLabel;
+    Memo_Tags: TMemo;
+    Btn_GetTagsLastFM: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -306,6 +311,8 @@ type
     procedure Btn_GetTagsClick(Sender: TObject);
     procedure lvExistingTagsClick(Sender: TObject);
     procedure MainPageControlChange(Sender: TObject);
+    procedure Memo_TagsChange(Sender: TObject);
+    procedure Btn_GetTagsLastFMClick(Sender: TObject);
 
   private
     Coverpfade : TStringList;
@@ -327,6 +334,7 @@ type
     ID3v2HasChanged: Boolean;
     VorbisCommentHasChanged: Boolean;
 
+
     // ForceChange: ShowDetails without showing a "Do you want to save..."-Message
     fForceChange: Boolean;
 
@@ -340,6 +348,8 @@ type
     procedure EnablePictureButtons;
     procedure ShowPictures;
     procedure ShowLyrics;
+    procedure ShowAdditionalTags;
+
     //procedure ShowRating(Value: Integer);
     procedure FillFrameView;
     procedure ShowID3v2Details;
@@ -377,7 +387,7 @@ var
 
 implementation
 
-Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper;
+Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper;
 
 {$R *.dfm}
 
@@ -500,7 +510,10 @@ begin
     if Not (ValidMP3File or ValidOggFile or ValidFlacFile) then
         Exit;
 
-    // Note from 04.03.2010: Redo "DenyID3-Edit-stuff" here. - This will have to do something with partymode
+// oder doch?? LastFMTags, Lyric immer editierbar machen?
+        sasas
+
+
 
     PictureHasChanged := False;
     ID3v1HasChanged := False;
@@ -523,8 +536,14 @@ begin
         if ValidFlacFile then
             UpdateFlacInFile;
 
+        AktuellesAudioFile.RawTagLastFM := Trim(Memo_Tags.Text);
+
+
         // get the information again and store them in the audiofile-object
-        AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Cover or GAD_Rating);
+        AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Rating);
+        //Dont get Cover here again.  //, GAD_Cover or GAD_Rating);
+
+
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
         try
@@ -1630,6 +1649,53 @@ begin
     //BtnLyricWikiManual can be always activated
 end;
 
+procedure TFDetails.ShowAdditionalTags;
+var ext: String;
+    TagStream: TMemoryStream;
+    localtags: UTF8String;
+begin
+    Memo_Tags.ReadOnly := (AktuellesAudioFile = NIL) or (not FileExists(AktuellesAudioFile.Pfad));
+
+   {ext := AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad));
+    if (AktuellesAudioFile <> NIL)
+        AND ((ext = '.mp3') or (ext = '.ogg') or (ext = '.flac') )
+        AND (not FileExists(AktuellesAudioFile.Pfad))
+        AND (trim(UnicodeString(AktuellesAudioFile.RawTagLastFM)) <> '')
+    then
+    begin
+        // d.h. es ist ein mp3/ogg/flac-File, was gerade nicht da ist,
+        Memo_Tags.Text :=  UTF8ToString(AktuellesAudioFile.RawTagLastFM);
+    end else
+        Memo_Tags.Text := '';
+   }
+
+    if ValidMp3File then
+    begin
+        // get Nemp/Tags
+        localtags := '';
+        TagStream := TMemoryStream.Create;
+        try
+            if id3v2tag.GetPrivateFrame('NEMP/Tags', TagStream) and (TagStream.Size > 0) then
+            begin
+                // We found a Tag-Frame with Information in the ID3Tag
+                TagStream.Position := 0;
+                SetLength(localtags, TagStream.Size);
+                TagStream.Read(localtags[1], TagStream.Size);
+            end;
+        finally
+            TagStream.Free;
+        end;
+        Memo_Tags.Text := localtags;
+    end
+    else
+        if ValidOggFile then
+            Memo_Tags.Text := OggVorbisFile.GetPropertyByFieldname(VORBIS_CATEGORIES)
+        else
+            if ValidFlacFile then
+                Memo_Tags.Text := FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES)
+            else
+                Memo_Tags.Text := AktuellesAudioFile.RawTagLastFM;
+end;
 
 {
     --------------------------------------------------------
@@ -2002,6 +2068,8 @@ begin
       ShowLyrics;
   end;
 
+  ShowAdditionalTags;
+
 
   PictureHasChanged := False;
   ID3v1HasChanged := False;
@@ -2037,6 +2105,8 @@ begin
     id3v1Tag.RemoveFromFile(Dateipfad);
 end;
 procedure TFDetails.UpdateID3v2InFile;
+var ms: TMemoryStream;
+    s: UTF8String;
 begin
   //if (ID3v2Activated or (cbWriteRatingToTag.Checked and cbWriteRatingToTag.Enabled)) and ValidMp3File then
   if ID3v2Activated and ValidMp3File then
@@ -2058,6 +2128,21 @@ begin
     // if (cbWriteRatingToTag.Checked) and (cbWriteRatingToTag.Enabled) then
     ID3v2Tag.Rating := ActualRating;
 
+    s := Utf8String(Trim(Memo_Tags.Text));
+    if length(s) > 0 then
+    begin
+        ms := TMemoryStream.Create;
+        try
+            ms.Write(s[1], length(s));
+            ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+        finally
+            ms.Free;
+        end;
+    end else
+        // delete Tags-Frame
+        ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+
+
     id3v2Tag.WriteToFile(Dateipfad);
   end else
     id3v2Tag.RemoveFromFile(Dateipfad);
@@ -2078,6 +2163,7 @@ begin
         OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
         OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
         OggVorbisFile.WriteToFile(Dateipfad);
     end;
@@ -2097,6 +2183,7 @@ begin
         FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
         FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+        FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
         FlacFile.WriteToFile(Dateipfad);
     end;
@@ -2247,23 +2334,21 @@ end;
 
 
 procedure TFDetails.Btn_GetTagsClick(Sender: TObject);
-var
-    tmp: TObjectList;
+var tmp: TObjectList;
     i: Integer;
     aTag: TTag;
     newItem: TListItem;
-
 begin
     if MedienBib.BrowseMode <> 2 then
         MedienBib.ReBuildTagCloud;
 
-      // clear ChecklistBox
+    // clear ChecklistBox
     lvExistingTags.Clear;
 
     tmp := TObjectList.Create(False);
     try
         // Get Tags
-        MedienBib.GetTopTags(150, 10, tmp);
+        MedienBib.GetTopTags(se_NumberOfTags.Value, 10, tmp, cb_HideAutoTags.Checked);
         // Show Tags
         for i := 0 to tmp.Count - 1 do
         begin
@@ -2278,14 +2363,70 @@ begin
     end;
 end;
 
+procedure TFDetails.Btn_GetTagsLastFMClick(Sender: TObject);
+var s: String;
+    af: TAudioFile;
+    TagPostProcessor: TTagPostProcessor;
+begin
+    // use a temporary AudioFile here
+    af := TAudioFile.Create;
+    try
+        af.Assign(AktuellesAudioFile);
+        af.RawTagLastFM := UTF8String(Trim(Memo_Tags.Text));
+
+        TagPostProcessor := TTagPostProcessor.Create;
+        try
+            TagPostProcessor.LoadFiles;
+            s := MedienBib.BibScrobbler.GetTags(af);
+            if trim(s) = '' then
+            begin
+                MessageDlg(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
+            end else
+            begin
+                // process new Tags. Rename, delete ignored and duplicates.
+                af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
+                af.SetAudioData(SAD_Both);
+            end;
+
+            Memo_Tags.Text := af.RawTagLastFM;
+        finally
+            TagPostProcessor.Free;
+        end;
+    finally
+        af.Free
+    end;
+end;
+
 procedure TFDetails.lvExistingTagsClick(Sender: TObject);
+var clickedTag: String;
+    i: Integer;
+    okToAdd: Boolean;
 begin
     if assigned(lvExistingTags.ItemFocused) then
     begin
-        Showmessage(
-        TTag(lvExistingTags.ItemFocused.Data).Key);
-7kkjkj
+        clickedTag := TTag(lvExistingTags.ItemFocused.Data).Key;
+        okToAdd := True;
+        for i := 0 to Memo_Tags.Lines.Count - 1 do
+            if AnsiSameText(Memo_Tags.Lines[i], clickedTag)  then
+                okToAdd := False;
+
+        if okToAdd then
+        begin
+            Memo_Tags.Lines.Add(clickedTag);
+            if ValidMp3File then
+                ID3v2HasChanged := True;
+            if ValidOggFile or ValidflacFile then
+                VorbisCommentHasChanged := True;
+        end;
     end;
+end;
+
+procedure TFDetails.Memo_TagsChange(Sender: TObject);
+begin
+    if ValidMp3File then
+        ID3v2HasChanged := True;
+    if ValidOggFile or ValidflacFile then
+        VorbisCommentHasChanged := True;
 end;
 
 {
@@ -2301,11 +2442,10 @@ begin
     $41: if ssCtrl in Shift then
         begin
           key := 0;
-          Memo_Lyrics.SelectAll;
+          (Sender as TMemo).SelectAll;
         end;
   end;
 end;
-
 
 procedure TFDetails.Memo_LyricsChange(Sender: TObject);
 begin
@@ -2377,37 +2517,43 @@ begin
     if Not assigned(aktuellesAudioFile) then
         exit; // no current AudioFile, no changes.
 
-    if not ValidMp3File then
-        exit;                 // we can't edit non-mp3-Files here
+    if ValidOggFile then
+        result := VorbisCommentHasChanged;
 
-    // aktuellesAudiofile is not NIL here.
-    if (Id3v1Tag.Exists <> CBID3v1.Checked)
-        or (Id3v2Tag.Exists <> CBID3v2.Checked)
-    then
-    begin
-        result := True;     // User changed existance of the ID3Tags
-        exit;
-    end;
+    if ValidFlacFile then
+        result := VorbisCommentHasChanged or PictureHasChanged;
 
-    if (Id3v1Tag.Exists) and (CBID3v1.Checked)  // ID3v1Tag exists
-        and ID3v1HasChanged                     // and changed
-    then
+    if ValidMp3File then
     begin
-        result := True;
-        exit;
-    end;
+        // aktuellesAudiofile is not NIL here.
+        if (Id3v1Tag.Exists <> CBID3v1.Checked)
+            or (Id3v2Tag.Exists <> CBID3v2.Checked)
+        then
+        begin
+            result := True;     // User changed existance of the ID3Tags
+            exit;
+        end;
 
-    if (Id3v2Tag.Exists) and (CBID3v2.Checked)  // ID3v2Tag exists
-        and
-        (
-          ID3v2HasChanged                      // and changed
-          or PictureHasChanged
-          or (ActualRating <> AktuellesAudioFile.Rating)
-        )
-    then
-    begin
-        result := True;
-        exit;
+        if (Id3v1Tag.Exists) and (CBID3v1.Checked)  // ID3v1Tag exists
+            and ID3v1HasChanged                     // and changed
+        then
+        begin
+            result := True;
+            exit;
+        end;
+
+        if (Id3v2Tag.Exists) and (CBID3v2.Checked)  // ID3v2Tag exists
+            and
+            (
+              ID3v2HasChanged                      // and changed
+              or PictureHasChanged
+              or (ActualRating <> AktuellesAudioFile.Rating)
+            )
+        then
+        begin
+            result := True;
+            exit;
+        end;
     end;
 end;
 

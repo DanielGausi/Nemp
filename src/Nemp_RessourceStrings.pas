@@ -527,6 +527,7 @@ MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in you
 MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
 MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
 MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. Please check your internet configuration.';
+MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
 MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
 MediaLibrary_SearchTagsStats         = ' (found %d/%d)';
 MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file cannot be found.';
