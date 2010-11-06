@@ -709,7 +709,15 @@ begin
     if trim(RawTagLastFM) <> '' then
         result := StringReplace(Trim(RawTagLastFM), #13#10, ', ', [rfreplaceAll])
     else
-        result := Tags_AddTags;
+    begin
+        if (AnsiLowercase(Extension) = 'mp3')
+        or (AnsiLowercase(Extension) = 'ogg')
+        or (AnsiLowercase(Extension) = 'flac')
+        then
+            result := Tags_AddTags
+        else
+            result := Tags_AddTagsNotPossible;
+    end;
 end;
 
 {
@@ -1843,6 +1851,8 @@ begin
     begin
         SetMp3Data(pfad, flags);
     end;
+
+    X
 
     if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
         SetOggVorbisData(pfad, flags);

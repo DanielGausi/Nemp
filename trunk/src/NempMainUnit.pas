@@ -4846,7 +4846,13 @@ begin
     if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
         exit;
 
-    if (not MedienBib.CurrentAudioFile.isStream) then
+    if (not MedienBib.CurrentAudioFile.isStream)
+    and (
+           (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'mp3')
+        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'ogg')
+        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'flac')
+        )
+    then
     begin
         MemBibTags.Top := LblBibDuration.Top;
         MemBibTags.Left := LblBibDuration.Left - 4;
@@ -7736,9 +7742,9 @@ begin
               else imageIndex := 7;
 
           CON_LASTFMTAGS :
-                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 14
+                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 14;
               //else imageIndex := 15;
-
+          // Con_Titel: imageIndex := 10;
         end;
       end;
   end;

@@ -530,11 +530,19 @@ MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. P
 MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
 MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
 MediaLibrary_SearchTagsStats         = ' (found %d/%d)';
+
 MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file cannot be found.';
 MediaLibrary_SearchLyricsComplete_AllFound = 'Lyricsearch complete. All Lyrics found.';
 MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyricsearch complete. %d of %d lyrics found. You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
-MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
-MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.';
+MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are supported only in *.mp3, *.ogg and *.flac-files.';
+MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are supported only in *.mp3, *.ogg and *.flac-files.';
+
+MediaLibrary_SearchTagsComplete_SingleNotFound = 'Sorry, for this file are no additional Tags available.';
+MediaLibrary_SearchTagsComplete_AllFound = 'Tagsearch complete. Added some Tags for every file.';
+MediaLibrary_SearchTagsComplete_ManyFound = 'Tagsearch complete. Found Tags for %d of %d files.';
+MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
+MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
+
 MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
 MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet. If you close this window now, these files remain inconsistent to the data in the library. Do you really want to close this window now?';
 
@@ -634,6 +642,7 @@ TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it a
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
+Tags_AddTagsNotPossible = 'No additional Tags set. (Only available for *.mp3, *.ogg and *.flac-files.)';
 Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?';
 
 MenuItem_Partymode = 'Activate Party-Mode';

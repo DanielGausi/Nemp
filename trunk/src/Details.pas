@@ -387,7 +387,8 @@ var
 
 implementation
 
-Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper;
+Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
+    AudioFileHelper;
 
 {$R *.dfm}
 
@@ -510,9 +511,7 @@ begin
     if Not (ValidMP3File or ValidOggFile or ValidFlacFile) then
         Exit;
 
-// oder doch?? LastFMTags, Lyric immer editierbar machen?
-        sasas
-
+// oder doch?? LastFMTags, Lyric immer editierbar machen? NEIN
 
 
     PictureHasChanged := False;
@@ -536,13 +535,15 @@ begin
         if ValidFlacFile then
             UpdateFlacInFile;
 
-        AktuellesAudioFile.RawTagLastFM := Trim(Memo_Tags.Text);
-
-
         // get the information again and store them in the audiofile-object
-        AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Rating);
-        //Dont get Cover here again.  //, GAD_Cover or GAD_Rating);
-
+        // AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Rating);
+        //if (ValidMP3File or ValidOggFile or ValidFlacFile) then
+        SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
+        //else
+        //begin
+        //    AktuellesAudioFile.RawTagLastFM := Trim(Memo_Tags.Text);
+        //    AktuellesAudioFile.Lyrics := Trim(Memo_Lyrics.Text);
+        //end;
 
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
@@ -604,7 +605,10 @@ begin
     begin
         // Read file information from disk
         if Fileexists(AktuellesAudioFile.Pfad) then
-            AktuellesAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
+        begin
+            //AktuellesAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
+            SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
+        end;
 
         // Generate a List of Files which should be updated now
         ListOfFiles := TObjectList.Create(False);
@@ -2015,11 +2019,13 @@ begin
   Tab_Lyrics.Visible          := ValidMp3File or ValidFlacFile or ValidOggFile;
   Tab_VorbisComments.Visible  := ValidFlacFile or ValidOggFile;
   Tab_ExtendedID3v2.Visible   := ValidMp3File;
+  Tab_MoreTags.Visible        := ValidMp3File or ValidFlacFile or ValidOggFile;
 
   Tab_MpegInformation.TabVisible := ValidMp3File; // This is the one with id3v1 // id3v2
   Tab_Lyrics.TabVisible          := ValidMp3File or ValidFlacFile or ValidOggFile;
   Tab_VorbisComments.TabVisible  := ValidFlacFile or ValidOggFile;
   Tab_ExtendedID3v2.TabVisible   := ValidMp3File;
+  Tab_MoreTags.TabVisible        := ValidMp3File or ValidFlacFile or ValidOggFile;
 
   if (ci = 1) or (ci=2) then
   begin
