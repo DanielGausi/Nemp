@@ -1964,7 +1964,12 @@ begin
 
                 aAudioFile := tAudioFile(UpdateList[i]);
                 if FileExists(aAudioFile.Pfad)
-                   // AND (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                    AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                    (
+                       (AnsiLowercase(aAudioFile.Extension) = 'mp3')
+                    or (AnsiLowercase(aAudioFile.Extension) = 'ogg')
+                    or (AnsiLowercase(aAudioFile.Extension) = 'flac')
+                    )
                 then
                 begin
                     // call the vcl, that we will edit this file now
@@ -2026,14 +2031,14 @@ begin
                         inc(failed);
                 end
                 else begin
-                    aAudioFile.FileIsPresent:=False;
+                    if Not FileExists(aAudioFile.Pfad) then
+                        aAudioFile.FileIsPresent:=False;
                     inc(failed);
                 end;
             end;
     finally
             Lyrics.Free;
     end;
-
 
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
@@ -2143,7 +2148,14 @@ begin
 
             af := TAudioFile(UpdateList[i]);
 
-            if FileExists(af.Pfad) then
+            if FileExists(af.Pfad)
+                    AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                    (
+                       (AnsiLowercase(af.Extension) = 'mp3')
+                    or (AnsiLowercase(af.Extension) = 'ogg')
+                    or (AnsiLowercase(af.Extension) = 'flac')
+                    )
+            then
             begin
                 // call the vcl, that we will edit this file now
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
@@ -2172,6 +2184,11 @@ begin
                     af.SetAudioData(SAD_Both);
                     Changed := True;
                 end;
+            end else
+            begin
+                if Not FileExists(af.Pfad) then
+                    af.FileIsPresent:=False;
+                inc(failed);
             end;
         end;
     finally
@@ -2186,6 +2203,34 @@ begin
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
+
+    if done + failed = 1 then
+    begin
+        // ein einzelnes File wurde angefordert
+        // Bei Mißerfolg einen Hinweis geben.
+        if (done = 0) then
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                Integer(PChar(MediaLibrary_SearchTagsComplete_SingleNotFound)))
+    end else
+    begin
+        // mehrere Dateien wurden gesucht.
+        if failed = 0 then
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                Integer(PChar((MediaLibrary_SearchTagsComplete_AllFound))))
+        else
+            if done > 0.5 * (failed + done) then
+                // ganz gutes Ergebnis - mehr als die Hälfte gefunden
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                    Integer(PChar(Format(MediaLibrary_SearchTagsComplete_ManyFound, [done, done + failed]))))
+            else
+                if done > 0 then
+                    // Nicht so tolles Ergebnis
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                        Integer(PChar(Format(MediaLibrary_SearchTagsComplete_FewFound, [done, done + failed]))))
+                else
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                        Integer(PChar(MediaLibrary_SearchTagsComplete_NoneFound)))
+    end;
 end;
 
 
