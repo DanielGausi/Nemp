@@ -1944,9 +1944,11 @@ procedure TMedienBibliothek.fGetLyrics;
 var i: Integer;
     aAudioFile: TAudioFile;
     //ID3v2tag: TID3v2Tag;
-    LyricWikiResponse: String;
+    LyricWikiResponse, backup: String;
     done, failed: Integer;
     Lyrics: TLyrics;
+    aErr: TAudioError;
+    ErrorOcurred: Boolean;
 begin
     //ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
@@ -1954,6 +1956,8 @@ begin
     done := 0;
     failed := 0;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
+    ErrorOcurred := False;
 
     Lyrics :=  TLyrics.create;
     try
@@ -1985,47 +1989,29 @@ begin
                     LyricWikiResponse := Lyrics.GetLyrics(aAudiofile.Artist, aAudiofile.Titel);
                     if LyricWikiResponse <> '' then
                     begin
+                        backup := aAudioFile.Lyrics;
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
-                        Changed := True;
-                        aAudioFile.SetAudioData(SAD_Both);
-                        inc(done);
-
-                        // hier: einfach aAudioFile.SetAudioData(SAD_Both);    wie bei tags auch
-
-                       {     // ok, Lyrics found
-                            // Lyrics speichern
-                            // 1. id3Tag ermitteln
-                            ID3v2tag.ReadFromFile(aAudioFile.Pfad);
-                            if not Id3v2Tag.exists then
-                            begin
-                                // Tag erstellen und sinnvoll füllen
-                                if aAudioFile.Titel <> AUDIOFILE_UNKOWN then
-                                    ID3v2tag.Title  := aAudioFile.Titel;
-                                if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
-                                    ID3v2tag.Artist := aAudioFile.Artist;
-                                if aAudioFile.Album <> AUDIOFILE_UNKOWN then
-                                    ID3v2tag.album  := aAudioFile.Album;
-                                if aAudioFile.Comment <> AUDIOFILE_UNKOWN then
-                                    ID3v2tag.Comment:= aAudioFile.Comment;
-                                ID3v2tag.Year   := aAudioFile.Year;
-                                ID3v2Tag.Track  := IntToStr(aAudioFile.Track);
-                                ID3v2tag.Genre  := aAudioFile.Genre;
-                            end;
-                            Id3v2Tag.Lyrics := LyricWikiResponse;
-
-                            if Id3v2Tag.WriteToFile(aAudioFile.Pfad) = MP3ERR_None then
-                            begin
-                                aAudioFile.Lyrics := UTF8Encode(Id3v2Tag.Lyrics);
-                                Changed := True;
-                                inc(done);
-                            end else
-                            begin
-                                // Datei konnte nicht aktualisiert werden.
-                                // (Schreibgeschützt, oder jemand anders greift grade auf die Datei zu)
-                                // nichts an den Lyrics ändern, aber
-                                inc(failed);
-                            end;
-                       }
+                        aErr := aAudioFile.SetAudioData(SAD_Both);
+                        if aErr = AUDIOERR_None then
+                        begin
+                            inc(done);
+                            Changed := True;
+                        end else
+                        begin
+                            // discard new lyrics
+                            aAudioFile.Lyrics := backup;
+                            inc(failed);
+                            ErrorOcurred := True;
+                            // FehlerMessage senden
+                            SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
+                                LParam(PChar(
+                                    'Lyric search:'#13#10
+                                    + aAudioFile.Pfad + #13#10
+                                    + 'Error: ' + AudioErrorString[aErr]
+                                    + #13#10 + '------'
+                                ))
+                            );
+                        end;
                     end
                     else
                         inc(failed);
@@ -2081,6 +2067,11 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                         Integer(PChar(MediaLibrary_SearchLyricsComplete_NoneFound)))
     end;
+
+    if ErrorOcurred then
+    begin
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+    end;
     //id3v2Tag.free;
     // UnblockMEssage is sent via CleanUpTMPLists
 end;
@@ -2131,11 +2122,14 @@ procedure TMedienBibliothek.fGetTags;
 var i: Integer;
     done, failed: Integer;
     af: TAudioFile;
-    s: String;
+    s, backup: String;
     TagPostProcessor: TTagPostProcessor;
+    aErr: TAudioError;
+    ErrorOcurred: Boolean;
 begin
     done := 0;
     failed := 0;
+    ErrorOcurred := false;
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
@@ -2178,11 +2172,29 @@ begin
                     inc(failed);
                 end else
                 begin
-                    inc(done);
+                    backup := af.RawTagLastFM;
                     // process new Tags. Rename, delete ignored and duplicates.
                     af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
-                    af.SetAudioData(SAD_Both);
-                    Changed := True;
+                    aErr := af.SetAudioData(SAD_Both);
+                    if aErr = AUDIOERR_None then
+                    begin
+                        Changed := True;
+                        inc(done);
+                    end
+                    else
+                    begin
+                        inc(failed);
+                        ErrorOcurred := True;
+                        // FehlerMessage senden
+                        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
+                            LParam(PChar(
+                                'Searching additional Tags'#13#10
+                                + af.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------'
+                            ))
+                        );
+                    end;
                 end;
             end else
             begin
@@ -2231,6 +2243,11 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                         Integer(PChar(MediaLibrary_SearchTagsComplete_NoneFound)))
     end;
+
+    if ErrorOcurred then
+    begin
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+    end;
 end;
 
 
@@ -2272,9 +2289,12 @@ end;
 procedure TMedienBibliothek.fUpdateId3tags;
 var i: Integer;
     af: TAudioFile;
+    aErr: TAudioError;
+    ErrorOcurred: Boolean;
 begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
+    ErrorOcurred := False;
     for i := 0 to UpdateList.Count - 1 do
     begin
         if not UpdateFortsetzen then break;
@@ -2296,10 +2316,21 @@ begin
 
             af.FileIsPresent := True;
 
-            af.SetAudioData(SAD_Both);
-            af.ID3TagNeedsUpdate := False;
-
-            Changed := True;
+            aErr := af.SetAudioData(SAD_Both);
+            if aErr = AUDIOERR_None then
+            begin
+                af.ID3TagNeedsUpdate := False;
+                Changed := True;
+            end else
+            begin
+                ErrorOcurred := True;
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
+                            LParam(PChar(
+                                'Updating Tag-Cloud'#13#10
+                                + af.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------')) );
+            end;
         end;
     end;
 
@@ -2310,6 +2341,11 @@ begin
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                     Integer(PWideChar('')));
+
+    if ErrorOcurred then
+    begin
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+    end;
 end;
 
 

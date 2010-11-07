@@ -85,6 +85,8 @@ function ShowFileProperties(const hWndOwner: HWnd; FileName, Caption: PChar): Bo
 // Get the time the file was created
 function GetFileCreationDateTime(Filename:String):TDateTime;
 
+function FileIsWriteProtected(Filename: String): Boolean;
+
 implementation
 
 var
@@ -433,6 +435,11 @@ begin
  GetFileAttributesEx(pchar(FileName),GetFileExInfoStandard,@t);
  FileTimeToSystemTime(t.ftCreationTime,Zeit);
  Result:=SystemTimeToDateTime(zeit);
+end;
+
+function FileIsWriteProtected(Filename: String): Boolean;
+begin
+    result := FileGetAttr(FileName) and faReadOnly  > 0;
 end;
 
 end.

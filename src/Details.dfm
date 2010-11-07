@@ -37,14 +37,14 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_Lyrics
+    ActivePage = Tab_General
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
         Left = 8
-        Top = 0
+        Top = 1
         Width = 441
         Height = 105
         Caption = 'File'

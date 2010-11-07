@@ -708,6 +708,13 @@ begin
 
         end;
 
+        MB_ErrorLog: begin
+              AddErrorLog(PChar(aMsg.LParam));
+        end;
+        MB_ErrorLogHint: begin
+            MessageDlg(MediaLibrary_SomeErrorsOccured, mtWarning, [MBOK], 0);
+        end;
+
   end;
 end;
 
