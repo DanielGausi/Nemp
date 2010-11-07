@@ -123,7 +123,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB;
+    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB, ErrorForm;
 
 procedure CorrectVolButton;
 begin
@@ -1474,6 +1474,15 @@ end;
 procedure AddErrorLog(aString: String);
 begin
     ErrorLog.Add(aString);
+    if assigned(FError) and Ferror.Visible then
+    begin
+        if ErrorLogCount = 0 then
+            FError.Memo_Error.Lines.Clear;
+        FError.Memo_Error.Lines.Add(aString);
+    end;
+
+    inc(ErrorLogCount);
+    Nemp_MainForm.MM_H_ErrorLog.Caption := Format(MainForm_MainMenu_Messages, [ErrorLogCount]);
     Nemp_MainForm.MM_H_ErrorLog.Visible := True;
 end;
 

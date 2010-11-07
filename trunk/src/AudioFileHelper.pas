@@ -886,7 +886,8 @@ begin
         Medienbib.InitCover(aNewFile);
     mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
     if assigned(mbAF) then
-        aNewFile.Rating := mbAf.Rating;
+        aNewFile.Assign(mbAF);
+        // aNewFile.Rating := mbAf.Rating;
 end;
 
 {
@@ -967,7 +968,6 @@ begin
                               aAudioFile.FileIsPresent := True;
                               if AutoScan then
                               begin
-                                  //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
                                   SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                                   aAudiofile.GetCueList;
                               end else
@@ -1003,7 +1003,6 @@ begin
                         aAudioFile.FileIsPresent := True;
                         if AutoScan then
                         begin
-                            //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
                             SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                             aAudiofile.GetCueList;
                         end else
@@ -1062,7 +1061,6 @@ begin
           aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
           if AutoScan then
           begin
-              //aAudioFile.GetAudioData(newFilename, GAD_Cover);
               SynchronizeAudioFile(aAudioFile, newFilename, False);
               aAudiofile.GetCueList;
           end;
@@ -1160,7 +1158,6 @@ begin
                             aAudioFile.FileIsPresent := True;
                             if AutoScan then
                             begin
-                                //aAudiofile.GetAudioData(ExpandFilename(s), GAD_Cover);
                                 SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
                                 aAudiofile.GetCueList;
                             end else

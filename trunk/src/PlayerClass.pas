@@ -1208,7 +1208,6 @@ begin
       // Jetzt das Audiofile ggf. ändern
       // zunächst mit eigenen Methoden rangehen
       if not MainAudioFile.IsStream then
-          //MainAudioFile.GetAudioData(MainAudioFile.Pfad, GAD_Cover);
           SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
       // dann ggf. von der bass korrigieren lassen
       If Mainstream <> 0 then

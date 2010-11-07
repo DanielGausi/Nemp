@@ -1008,12 +1008,6 @@ begin
       if (Not AudioFile.FileChecked) AND (Not AudioFile.isStream) then
       begin
           SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
-          {AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover OR GAD_RATING);
-
-          mbAf := MedienBib.GetAudioFileWithFilename(AudioFile.Pfad);
-          if assigned(mbAF) then
-              AudioFile.Rating := mbAf.Rating;
-          }
       end;
       if (Not AudioFile.isStream) and (not assigned(AudioFile.CueList)) then
       begin
@@ -1125,12 +1119,6 @@ begin
   if not PathSeemsToBeURL(aAudiofileName) then
   begin
       SynchronizeAudioFile(NewFile, aAudioFileName);
-      {NewFile.GetAudioData(aAudiofileName, GAD_Cover OR GAD_Rating);
-      Medienbib.InitCover(NewFile);
-      mbAf := MedienBib.GetAudioFileWithFilename(aAudiofileName);
-      if assigned(mbAF) then
-          NewFile.Rating := mbAf.Rating;
-      }
   end
   else
   begin
@@ -1180,12 +1168,6 @@ begin
   if not PathSeemsToBeURL(aAudiofileName) then
   begin
       SynchronizeAudioFile(NewFile, aAudioFileName);
-      {NewFile.GetAudioData(aAudiofileName, GAD_Cover OR GAD_Rating);
-      Medienbib.InitCover(NewFile);
-      mbAf := MedienBib.GetAudioFileWithFilename(aAudiofileName);
-      if assigned(mbAF) then
-          NewFile.Rating := mbAf.Rating;
-      }
   end
   else
   begin

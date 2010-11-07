@@ -84,7 +84,8 @@ uses
   OptionsComplete in 'OptionsComplete.pas' {OptionsCompleteForm},
   CreateHelper in 'CreateHelper.pas',
   ExPopupList in 'ExPopupList.pas',
-  PlaylistToUSB in 'PlaylistToUSB.pas' {PlaylistCopyForm};
+  PlaylistToUSB in 'PlaylistToUSB.pas' {PlaylistCopyForm},
+  ErrorForm in 'ErrorForm.pas' {FError};
 
 //,  classes;
 
@@ -112,8 +113,7 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-
-    Graphics.DefFontData.Name := 'Tahoma';
+  Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
     Application.Name  := NEMP_NAME;

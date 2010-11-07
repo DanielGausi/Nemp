@@ -436,6 +436,7 @@ function Handle_MedienBibMessage(Var aMsg: TMessage): Boolean;
 var i: Integer;
     srList: TObjectList;
     af: TAudiofile;
+    aErr: TAudioError;
 begin
   result := True;
 
@@ -595,7 +596,14 @@ begin
 
         MB_RefreshAudioFile: begin
             af := TAudioFile(aMsg.LParam);
-            af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating);
+            aErr := af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating);
+            if aErr <> AUDIOERR_None then
+            begin
+                AddErrorLog ('Refreshing file-information:'#13#10 + af.Pfad + #13#10
+                    + 'Error: ' + AudioErrorString[aErr]
+                    + #13#10 + '------');
+            end;
+
             MedienBib.InitCover(af);
         end;
 
@@ -1007,6 +1015,7 @@ begin
         SC_TooMuchErrors: begin
             // 3 oder mehr Fehler in Reihe - Nempscrobbler fällt zurück auf Handshake.
             NempPlayer.NempScrobbler.LogList.Add('Oops. More than 3 errors in a row occured. Falling back to Handshake.');
+            AddErrorLog('Scrobbler:'#13#10'Oops. More than 3 errors in a row occured. Falling back to Handshake.'#13#10'-----');
         end;
 
 
@@ -1018,6 +1027,7 @@ begin
             // Im LParam steckt der Errorcode drin. Banned, Baduth, etc.
             NempPlayer.NempScrobbler.LogList.Add('HandShake failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
             NempPlayer.NempScrobbler.HandleHandshakeFailure(TScrobbleStatus(aMsg.LParam));
+            AddErrorLog('Scrobbler:'#13#10 + 'HandShake failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
 
             if not NempPlayer.NempScrobbler.IgnoreErrors then
                 MessageDlg(ScrobbleFailureWait, mtWarning, [mbOK], 0);
@@ -1031,7 +1041,7 @@ begin
             // Handshake wurde unterbunden
             // LParam: ca. Zeit bis nächster Handshake erlaubt ist
             NempPlayer.NempScrobbler.LogList.Add('Scrobbling disabled for some time. Next try in approx.' + IntToStr(aMsg.lParam) + ' minutes.');
-
+            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling disabled for some time. Next try in approx.' + IntToStr(aMsg.lParam) + ' minutes.' + #13#10'-----');
             NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_OK); // D.h. Eigentlich alles Ok. ;-) => einfach nur fWorking auf False setzen.
         end;
 
@@ -1039,7 +1049,7 @@ begin
             // LParam: ErrorMessage
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
             NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_EXCEPTION);
-
+            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
             if not NempPlayer.NempScrobbler.IgnoreErrors then
                 MessageDlg(ScrobbleFailureWait, mtWarning, [mbOK], 0);
 
@@ -1067,6 +1077,7 @@ begin
                 end else
                 begin
                     NempPlayer.NempScrobbler.LogList.Add('Some strange error occured while handshaking.');
+                    AddErrorLog('Scrobbler:'#13#10 + 'Some strange error occured while handshaking.' + #13#10'-----');
                     //NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
                     NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_UnknownFailure);
                 end;
@@ -1080,12 +1091,15 @@ begin
         // ======================================================
         SC_NowPlayingError: begin
             NempPlayer.NempScrobbler.LogList.Add('Scrobbling ("Now Playing Notification") failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
+            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling ("Now Playing Notification") failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
+
             NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
             NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
         end;
         SC_NowPlayingException: begin
             // lparam: ErrorMessage
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
+            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
             NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
             // Hier NICHT NempPlayer.NempScrobbler.ScrobbleAgain;
         end;
@@ -1100,12 +1114,15 @@ begin
         // ======================================================
         SC_SubmissionError: begin
             NempPlayer.NempScrobbler.LogList.Add('Scrobbling failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
+            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
             NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
             NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
         end;
         SC_SubmissionException: begin
             // lparam: ErrorMessage
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
+            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
+
             // NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
             // Hier NICHT NempPlayer.NempScrobbler.ScrobbleAgain;
         end;
@@ -1439,6 +1456,7 @@ Var
   FileCount: Integer;
   Filename: PChar;
   AudioFile:TAudioFile;
+  aErr: TAudioError;
 Begin
     result := True;
 
@@ -1489,7 +1507,14 @@ Begin
                               if Not MedienBib.AudioFileExists(filename) then
                               begin
                                 AudioFile:=TAudioFile.Create;
-                                AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating);
+                                aErr := AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating);
+                                if aErr <> AUDIOERR_None then
+                                begin
+                                    AddErrorLog ('Dropped Files:'#13#10 + AudioFile.Pfad + #13#10
+                                        + 'Error: ' + AudioErrorString[aErr]
+                                        + #13#10 + '------');
+                                end;
+
                                 MedienBib.InitCover(AudioFile);
                                 MedienBib.UpdateList.Add(AudioFile);
                               end;
@@ -1536,6 +1561,7 @@ var NewFile: UnicodeString;
   audioFile: TAudiofile;
   jas: TJustaString;
   ext: String;
+  aErr: TAudioError;
 begin
     With Nemp_MainForm do
     begin
@@ -1558,7 +1584,14 @@ begin
                 if Not MedienBib.AudioFileExists(NewFile) then
                 begin
                     AudioFile:=TAudioFile.Create;
-                    AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating);
+                    aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating);
+                    if aErr <> AUDIOERR_None then
+                    begin
+                        AddErrorLog ('New file:'#13#10 + AudioFile.Pfad + #13#10
+                            + 'Error: ' + AudioErrorString[aErr]
+                            + #13#10 + '------');
+                    end;
+
                     MedienBib.InitCover(AudioFile);
                     MedienBib.UpdateList.Add(AudioFile);
                 end;

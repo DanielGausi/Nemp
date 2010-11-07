@@ -490,6 +490,9 @@ MainForm_MenuCaptionsSearchForTitle  = 'Search for this title';
 MainForm_MenuCaptionsSearchForArtist = 'Search for this artist';
 MainForm_MenuCaptionsSearchForAlbum  = 'Search for this album';
 
+MainForm_MainMenu_Messages = 'Messages (%d)';
+MainForm_MainMenu_NoMessages = 'Messages';
+ErrorForm_NoMessages = 'No new messages, everything is fine. :)';
 
 MainForm_Summary_FileCount  = '%d file(s); ' ;
 MainForm_Summary_SelectedFileCount = '%d file(s) selected; ';
