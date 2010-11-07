@@ -42,6 +42,10 @@ object FDetails: TFDetails
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 8
         Top = 1
@@ -573,7 +577,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -582,6 +586,10 @@ object FDetails: TFDetails
     object Tab_MpegInformation: TTabSheet
       Caption = 'ID3-Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_ID3v1: TGroupBox
         Left = 8
         Top = 0
@@ -785,7 +793,7 @@ object FDetails: TFDetails
           AutoCloseUp = True
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 8
           OnChange = Lblv1Change
@@ -1054,7 +1062,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 11
           OnChange = Lblv2Change
@@ -1064,6 +1072,10 @@ object FDetails: TFDetails
     object Tab_VorbisComments: TTabSheet
       Caption = 'Vorbis Comments'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_StandardVorbisComments: TGroupBox
         Left = 8
         Top = 0
@@ -1250,7 +1262,7 @@ object FDetails: TFDetails
           Width = 145
           Height = 21
           AutoComplete = False
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
         end
@@ -1343,6 +1355,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 8
         Top = 0
@@ -1455,7 +1471,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnChange = cbPicturesChange
         end
@@ -1464,6 +1480,10 @@ object FDetails: TFDetails
     object Tab_ExtendedID3v2: TTabSheet
       Caption = ' Mp3- and ID3-Details'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Mpeg: TGroupBox
         Left = 8
         Top = 8
@@ -1812,6 +1832,10 @@ object FDetails: TFDetails
     object Tab_MoreTags: TTabSheet
       Caption = 'Tags for tagcloud'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_TagCloud: TGroupBox
         Left = 8
         Top = 0

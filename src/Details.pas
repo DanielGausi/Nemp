@@ -508,10 +508,8 @@ var ListOfFiles: TObjectList;
 begin
 
     // Do not Change anything in non-mp3-Files here!
-    // Do Not GetAudioData on Non-mp3/ogg/flac-Files here!
     if Not (ValidMP3File or ValidOggFile or ValidFlacFile) then
         Exit;
-
 
     PictureHasChanged := False;
     ID3v1HasChanged := False;
@@ -545,15 +543,7 @@ begin
         end;
 
 
-        // get the information again and store them in the audiofile-object
-        // AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Rating);
-        //if (ValidMP3File or ValidOggFile or ValidFlacFile) then
         SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
-        //else
-        //begin
-        //    AktuellesAudioFile.RawTagLastFM := Trim(Memo_Tags.Text);
-        //    AktuellesAudioFile.Lyrics := Trim(Memo_Lyrics.Text);
-        //end;
 
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
@@ -616,7 +606,6 @@ begin
         // Read file information from disk
         if Fileexists(AktuellesAudioFile.Pfad) then
         begin
-            //AktuellesAudioFile.GetAudioData(AktuellesAudioFile.Pfad, GAD_Cover or GAD_Rating);
             SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
         end;
 

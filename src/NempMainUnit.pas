@@ -1548,7 +1548,8 @@ var
 
   LanguageList: TStrings;
 
-  ErrorLog: TStringList; 
+  ErrorLog: TStringList;
+  ErrorLogCount: Integer;
 
 implementation
 
@@ -1558,7 +1559,7 @@ uses   Splash, MultimediaKeys,
   BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
-  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB;
+  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm;
 
 
 {$R *.dfm}
@@ -1767,7 +1768,8 @@ begin
     ALbenVST.NodeDataSize    := SizeOf(TStringTreeData);
     PlaylistVST.NodeDataSize := SizeOf(TTreeData);
 
-    ErrorLog := TStringList.Create; 
+    ErrorLog := TStringList.Create;
+    ErrorLogCount := 0;
     AlphaBlendBMP := TBitmap.Create;
 
     // Create FileSearcher
@@ -3748,6 +3750,7 @@ var
     oldArtist, oldAlbum: UnicodeString;
     oldID: String;
     einUpdate: boolean;
+    aErr: TAudioError;
 begin
   SelectedMp3s := Nil;
   if MedienBib.StatusBibUpdate <> 0 then
@@ -3783,7 +3786,14 @@ begin
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
-                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  if aErr <> AUDIOERR_None then
+                  begin
+                      AddErrorLog ('Refreshing file-information:'#13#10 + AudioFile.Pfad + #13#10
+                          + 'Error: ' + AudioErrorString[aErr]
+                          + #13#10 + '------');
+                  end;
+
                   MedienBib.InitCover(AudioFile);
                   VST.Invalidate;
               end
@@ -3813,7 +3823,13 @@ begin
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
-                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  if aErr <> AUDIOERR_None then
+                  begin
+                      AddErrorLog ('Refreshing file-information:'#13#10 + AudioFile.Pfad + #13#10
+                          + 'Error: ' + AudioErrorString[aErr]
+                          + #13#10 + '------');
+                  end;
                   MedienBib.InitCover(AudioFile);
                   if  (oldArtist <> AudioFile.Strings[MedienBib.NempSortArray[1]])
                        OR (oldAlbum <> AudioFile.Strings[MedienBib.NempSortArray[2]])
@@ -6844,6 +6860,7 @@ end;
 procedure TNemp_MainForm.PM_PL_ExtendedAddToMedialibraryClick(Sender: TObject);
 var i: integer;
   AudioFile: TAudioFile;
+  aErr: TAudioError;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
@@ -6868,7 +6885,14 @@ begin
         if AudioFile = Nil then
         begin
           AudioFile := TAudioFile.Create;
-          AudioFile.GetAudioData((NempPlaylist.Playlist[i] as TAudioFile).Pfad, GAD_Cover or GAD_Rating);
+          aErr := AudioFile.GetAudioData((NempPlaylist.Playlist[i] as TAudioFile).Pfad, GAD_Cover or GAD_Rating);
+          if aErr <> AUDIOERR_None then
+          begin
+              AddErrorLog ('Adding file to Library:'#13#10 + AudioFile.Pfad + #13#10
+                  + 'Error: ' + AudioErrorString[aErr]
+                  + #13#10 + '------');
+          end;
+
           MedienBib.InitCover(AudioFile);
           MedienBib.UpdateList.Add(AudioFile);
         end;
@@ -7013,7 +7037,7 @@ var
   i, numFiles: Integer;
   AudioFile: TAudiofile;
   JobList: TStringList;
-
+  aErr: TAudioError;
 begin
   if not Clipboard.HasFormat(CF_HDROP) then
     Exit;
@@ -7072,7 +7096,14 @@ begin
                       if Not MedienBib.AudioFileExists(buffer) then
                       begin
                         AudioFile:=TAudioFile.Create;
-                        AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating);
+                        aErr := AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating);
+                        if aErr <> AUDIOERR_None then
+                        begin
+                            AddErrorLog ('Paste from Clipboard:'#13#10 + AudioFile.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------');
+                        end;
+
                         MedienBib.InitCover(AudioFile);
                         MedienBib.UpdateList.Add(AudioFile);
                       end;
@@ -7995,7 +8026,7 @@ end;
 
 procedure TNemp_MainForm.ButtonNextEQClick(Sender: TObject);
 var //currentSetting: String;
-    i, currentIdx, maxIdx, nextIdx: Integer;
+    currentIdx, maxIdx, nextIdx: Integer;
     newSetting: String;
     Ini: TMeminiFile;
 begin
@@ -10872,7 +10903,7 @@ var point: TPoint;
 
 // lyrics: TLyrics;
 //  s: String;
-  sl: TStringList;
+//  sl: TStringList;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11077,7 +11108,11 @@ end;
 
 procedure TNemp_MainForm.MM_H_ErrorLogClick(Sender: TObject);
 begin
-  ShowMessage(ErrorLog.Text);
+    if not assigned(FError) then
+      Application.CreateForm(TFError, FError);
+
+    FError.Show;
+    // ShowMessage(ErrorLog.Text);
 end;
 
 procedure TNemp_MainForm.VolButtonKeyDown(Sender: TObject; var Key: Word;
