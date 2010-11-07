@@ -814,6 +814,7 @@ type
     PM_ML_MagicCopyToClipboard: TMenuItem;
     PM_PL_CopyPlaylistToUSB: TMenuItem;
     MM_PL_CopyPlaylistToUSB: TMenuItem;
+    MM_H_ErrorLog: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1363,6 +1364,7 @@ type
     procedure MM_ML_WebradioClick(Sender: TObject);
     procedure PM_PL_MagicCopyToClipboardClick(Sender: TObject);
     procedure PM_PL_CopyPlaylistToUSBClick(Sender: TObject);
+    procedure MM_H_ErrorLogClick(Sender: TObject);
 
   private
 
@@ -1545,6 +1547,8 @@ var
   SavePath: UnicodeString; // Programmdir oder Userdir
 
   LanguageList: TStrings;
+
+  ErrorLog: TStringList; 
 
 implementation
 
@@ -1763,6 +1767,7 @@ begin
     ALbenVST.NodeDataSize    := SizeOf(TStringTreeData);
     PlaylistVST.NodeDataSize := SizeOf(TTreeData);
 
+    ErrorLog := TStringList.Create; 
     AlphaBlendBMP := TBitmap.Create;
 
     // Create FileSearcher
@@ -3551,6 +3556,7 @@ var CurrentAF, listFile :TAudioFile;
     newRating: Integer;
     detUpdate, TagMod100: Integer;
     LocalTree: TVirtualStringTree;
+    aErr: TAudioError;
 begin
     // preparation
     SelectedMp3s := Nil;
@@ -3604,7 +3610,12 @@ begin
                           listFile.Rating := newRating;
                       end;
                       // write the rating into the file on disk
-                      CurrentAF.QuickUpdateTag;
+                      aErr := CurrentAF.QuickUpdateTag;
+                      if aErr <> AUDIOERR_None then
+                          AddErrorLog('Note: Rating NOT saved into file'#13#10 + CurrentAF.Pfad + #13#10            
+                              + 'Error: ' + AudioErrorString[aErr]
+                              + #13#10 + '------'); 
+                                            
                       // correct GUI
                       CorrectVCLAfterAudioFileEdit(CurrentAF);
             end;
@@ -4673,6 +4684,7 @@ procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
+    aErr: TAudioError;
 begin
     if (not NempSkin.NempPartyMode.DoBlockTreeEdit) and (Button = mbLeft) then
     begin
@@ -4692,7 +4704,12 @@ begin
                       listFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                   end;
                   // write the rating into the file on disk
-                  MedienBib.CurrentAudioFile.QuickUpdateTag;
+                  aErr := MedienBib.CurrentAudioFile.QuickUpdateTag;
+                  if aErr <> AUDIOERR_None then
+                      AddErrorLog('Note: Rating NOT saved into file'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10            
+                          + 'Error: ' + AudioErrorString[aErr]
+                          + #13#10 + '------'); 
+                  
                   MedienBib.Changed := True;
               finally
                   ListOfFiles.Free;
@@ -4838,7 +4855,13 @@ begin
     if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
         exit;
 
-    if (not MedienBib.CurrentAudioFile.isStream) then
+    if (not MedienBib.CurrentAudioFile.isStream)
+    and (
+           (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'mp3')
+        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'ogg')
+        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'flac')
+        )
+    then
         AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
@@ -4881,6 +4904,8 @@ procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     ListFile, BibFile: TAudioFile;
     i: Integer;
+    aErr: TAudioError;
+    backup: String;
 begin
     if Assigned(MedienBib.CurrentAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
@@ -4889,6 +4914,7 @@ begin
     begin
         if Sender = BtnApplyEditTags then   // else: it was the Cancel-Button
         begin
+            backup := MedienBib.CurrentAudioFile.RawTagLastFM;
             if CommasInString(MemBibTags.Text) then
             begin
                 if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
@@ -4899,28 +4925,38 @@ begin
             else
                 MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
 
-            LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
-
-            // Generate a List of Files which should be updated now
-            ListOfFiles := TObjectList.Create(False);
-            try
-                GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
-                for i := 0 to ListOfFiles.Count - 1 do
-                begin
-                    listFile := TAudioFile(ListOfFiles[i]);
-                    listFile.RawTagLastFM := MedienBib.CurrentAudioFile.RawTagLastFM;
-                end;
-            finally
-                ListOfFiles.Free;
-            end;
             // write Data to the file
-            MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
-            // Correct GUI (player, Details, Detailform, VSTs))
-            CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
-            // Update the TagCloud
-            BibFile := MedienBib.GetAudioFileWithFilename(MedienBib.CurrentAudioFile.Pfad);
-            if assigned(BibFile) then
-                MedienBib.TagCloud.UpdateAudioFile(BibFile);
+            aErr := MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+            if aErr = AUDIOERR_None then
+            begin                
+                // Generate a List of Files which should be updated now
+                ListOfFiles := TObjectList.Create(False);
+                try
+                    GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+                    for i := 0 to ListOfFiles.Count - 1 do
+                    begin
+                        listFile := TAudioFile(ListOfFiles[i]);
+                        listFile.RawTagLastFM := MedienBib.CurrentAudioFile.RawTagLastFM;
+                    end;
+                finally
+                    ListOfFiles.Free;
+                end;
+                // Correct GUI (player, Details, Detailform, VSTs))
+                CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
+                // Update the TagCloud
+                BibFile := MedienBib.GetAudioFileWithFilename(MedienBib.CurrentAudioFile.Pfad);
+                if assigned(BibFile) then
+                    MedienBib.TagCloud.UpdateAudioFile(BibFile);
+            end else
+            begin
+                MedienBib.CurrentAudioFile.RawTagLastFM := backup;
+                AddErrorLog('Manual input'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------');
+                MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);            
+            end;
+
+            LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
         end;
     end;
     HideTagMemo;
@@ -4956,8 +4992,9 @@ begin
 end;
 procedure TNemp_MainForm.EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
 var ListOfFiles: TObjectList;
-    listFile: TAudioFile;
+    listFile, backupFile: TAudioFile;
     i: Integer;
+    aErr: TAudioError;
 begin
     case Ord(key) of
         VK_Escape: begin
@@ -4970,29 +5007,55 @@ begin
                   and (MedienBib.CurrentThreadFilename <> MedienBib.CurrentAudioFile.Pfad)
               then
               begin
-                  // Generate a List of Files which should be updated now
-                  ListOfFiles := TObjectList.Create(False);
-                  try
-                      GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
-                      // edit these files
-                      for i := 0 to ListOfFiles.Count - 1 do
+                  backupFile := TAudioFile.Create;
+                  try                      
+                      backupFile.Assign(MedienBib.CurrentAudioFile);
+                      // Change current File
+                      case (Sender as TControl).Tag of
+                          0: MedienBib.CurrentAudioFile.Artist := EdtBibArtist.Text;
+                          1: MedienBib.CurrentAudioFile.Titel  := EdtBibTitle.Text;
+                          2: MedienBib.CurrentAudioFile.Album  := EdtBibAlbum.Text;
+                          3: MedienBib.CurrentAudioFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
+                          4: MedienBib.CurrentAudioFile.Year   := EdtBibYear.Text;
+                          5: MedienBib.CurrentAudioFile.Genre  := EdtBibGenre.Text;
+                      end;                     
+              
+                      // write Data to file                                                    
+                      aErr := MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+                      if aErr = AUDIOERR_None  then
                       begin
-                          // recycle var bibfile here
-                          listFile := TAudioFile(ListOfFiles[i]);
-                          // set the matching property of the files
-                          case (Sender as TControl).Tag of
-                              0: listFile.Artist := EdtBibArtist.Text;
-                              1: listFile.Titel  := EdtBibTitle.Text;
-                              2: listFile.Album  := EdtBibAlbum.Text;
-                              3: listFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
-                              4: listFile.Year   := EdtBibYear.Text;
-                              5: listFile.Genre  := EdtBibGenre.Text;
+                          // Generate a List of Files which should be updated now
+                          ListOfFiles := TObjectList.Create(False);
+                          try                  
+                              GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+                              // edit these files
+                              for i := 0 to ListOfFiles.Count - 1 do
+                              begin
+                                  // recycle var bibfile here
+                                  listFile := TAudioFile(ListOfFiles[i]);
+                                  // set the matching property of the files
+                                  case (Sender as TControl).Tag of
+                                      0: listFile.Artist := EdtBibArtist.Text;
+                                      1: listFile.Titel  := EdtBibTitle.Text;
+                                      2: listFile.Album  := EdtBibAlbum.Text;
+                                      3: listFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
+                                      4: listFile.Year   := EdtBibYear.Text;
+                                      5: listFile.Genre  := EdtBibGenre.Text;
+                                  end;
+                              end;                          
+                          finally
+                              ListOfFiles.Free;
                           end;
+                      end else
+                      begin
+                          MedienBib.CurrentAudioFile.Assign(backupFile);         
+                          AddErrorLog('Manual input'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------');
+                          MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);                     
                       end;
-                      // write Data to file
-                      MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
                   finally
-                      ListOfFiles.Free;
+                      backupFile.Free;
                   end;
                   //  FillBibDetailLabels(MedienBib.CurrentAudioFile);
                   // Correct GUI (player, Details, Detailform, VSTs))
@@ -6274,6 +6337,7 @@ procedure TNemp_MainForm.RatingImageMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
+    aErr: TAudioError;
 begin
     if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating) and (Button = mbLeft)  then
     begin
@@ -6294,7 +6358,12 @@ begin
                           listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
                       end;
                       // write the rating into the file on disk
-                      NempPlayer.MainAudioFile.QuickUpdateTag;
+                      aErr := NempPlayer.MainAudioFile.QuickUpdateTag;
+                      if aErr <> AUDIOERR_None then
+                          AddErrorLog('Note: Rating NOT saved into file'#13#10 + NempPlayer.MainAudioFile.Pfad + #13#10            
+                              + 'Error: ' + AudioErrorString[aErr]
+                              + #13#10 + '------');
+                          
                       MedienBib.Changed := True;
                   finally
                       ListOfFiles.Free;
@@ -9125,7 +9194,8 @@ begin
     LanguageList.Free;
     NempUpdater.Free;
 
-   //ST_Playlist.Free;
+    FreeAndNil(ErrorLog);
+    //ST_Playlist.Free;
     //ST_Medienliste.Free;
 end;
 
@@ -9827,7 +9897,7 @@ begin
         else
             af := Nil;
 
-        if assigned(af) and (FileExists(af.Pfad)) then
+        if assigned(af) and (FileExists(af.Pfad)) then       
         begin
             if MedienBib.StatusBibUpdate > 1 then
                 // if the library is in the "hot phase" of an update: Do not allow edit
@@ -9843,7 +9913,17 @@ begin
                     CON_STANDARDCOMMENT,
                     CON_YEAR,
                     CON_GENRE,
-                    CON_TRACKNR,
+                    CON_TRACKNR: begin
+                        if ( (AnsiLowercase(af.Extension) = 'mp3')
+                            or (AnsiLowercase(af.Extension) = 'ogg')
+                            or (AnsiLowercase(af.Extension) = 'flac'))
+                        then
+                        begin
+                            ClearShortCuts;
+                            allowed := True;
+                        end else
+                            allowed := False;
+                    end;
                     CON_RATING: begin
                             ClearShortCuts;
                             allowed := True;
@@ -9871,7 +9951,7 @@ begin
               RatingGraphics.SetBackGround(VST.Canvas, aRect);
               EditLink := TRatingEditLink.Create;
               EditingVSTRating := True;
-              EditingVSTRating := False;
+              EditingVSTRating := False;        
         end
     else
         begin
@@ -9899,6 +9979,7 @@ var
   ListOfFiles: TObjectList;
   listFile: TAudioFile;
   i: Integer;
+  aErr: TAudioError;
 begin
     if NempSkin.NempPartyMode.DoBlockTreeEdit then
         exit;
@@ -9920,24 +10001,42 @@ begin
         and (MedienBib.CurrentThreadFilename <> af.Pfad)
     then
     begin
-        // Generate a List of Files which should be updated now
-        ListOfFiles := TObjectList.Create(False);
-        try
-            GetListOfAudioFileCopies(af, ListOfFiles);
-            for i := 0 to ListOfFiles.Count - 1 do
+        aErr := af.SetAudioData(SAD_BOTH);
+        if aErr = AUDIOERR_None then
+        begin
+            // Generate a List of Files which should be updated now
+            ListOfFiles := TObjectList.Create(False);
+            try
+                GetListOfAudioFileCopies(af, ListOfFiles);
+                for i := 0 to ListOfFiles.Count - 1 do
+                begin
+                    listFile := TAudioFile(ListOfFiles[i]);
+                    // Data of the af was set in VSTNewText or TRatingEditLink.EndEdit
+                    // copy Data from af to the files in the list.
+                    listFile.Assign(af);
+                end;
+            finally
+                ListOfFiles.Free;
+            end;        
+            MedienBib.Changed := True;
+            CorrectVCLAfterAudioFileEdit(af);
+        end
+        else
+        begin
+            // Read old Data again, if we edited something else than RATING
+            if VST.Header.Columns[column].Tag <> CON_RATING then            
             begin
-                listFile := TAudioFile(ListOfFiles[i]);
-                // Data of the af was set in VSTNewText or TRatingEditLink.EndEdit
-                // copy Data from af to the files in the list.
-                listFile.Assign(af);
-            end;
-        finally
-            ListOfFiles.Free;
+                SynchronizeAudioFile(af, af.Pfad, True);
+                AddErrorLog('Direct Edit:'#13#10 + af.Pfad + #13#10            
+                    + 'Error: ' + AudioErrorString[aErr]
+                    + #13#10 + '------');
+                MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+            end else
+                // on Rating-Edit: Just an entry in the Error-Log
+                AddErrorLog('Note: Rating NOT saved into file'#13#10 + af.Pfad + #13#10            
+                    + 'Error: ' + AudioErrorString[aErr]
+                    + #13#10 + '------');                
         end;
-
-        af.SetAudioData(SAD_BOTH);
-        MedienBib.Changed := True;
-        CorrectVCLAfterAudioFileEdit(af);
     end else
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
@@ -10974,6 +11073,11 @@ end;
 procedure TNemp_MainForm.MM_H_CheckForUpdatesClick(Sender: TObject);
 begin
     NempUpdater.CheckForUpdatesManually;
+end;
+
+procedure TNemp_MainForm.MM_H_ErrorLogClick(Sender: TObject);
+begin
+  ShowMessage(ErrorLog.Text);
 end;
 
 procedure TNemp_MainForm.VolButtonKeyDown(Sender: TObject; var Key: Word;

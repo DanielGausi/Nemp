@@ -82,7 +82,7 @@ type
             // Change the PlayCounter of an Audiofile as specified in aJob
             procedure ChangePlayCounter;
             // Update the File on Harddisk
-            procedure UpdateFile;
+            function UpdateFile: TAudioError;
 
         public
             //constructor Create(filename: String; IncCounter: Boolean; AddRating: Integer);
@@ -277,10 +277,12 @@ begin
     end;
 end;
 
-procedure TPostProcessJob.UpdateFile;
+function TPostProcessJob.UpdateFile: TAudioError;
 begin
     if fWriteToFiles then
-        fAudioFile.QuickUpdateTag;
+        result := fAudioFile.QuickUpdateTag
+    else
+        result := AUDIOERR_None;
 end;
 
 
@@ -458,6 +460,7 @@ procedure fDoJobList(ap: TPostProcessor);
 var i: Integer;
     aJob: TPostProcessJob;
     aAudioFile: TAudioFile;
+    aErr: TAudioError;
 begin
     try
         for i := 0 to ap.fThreadJobList.Count - 1 do
@@ -483,7 +486,15 @@ begin
                     // 2. Change the PlayCounter
                     aJob.ChangePlayCounter;
                     // 3. Update The file
-                    aJob.UpdateFile;
+                    aErr := aJob.UpdateFile;
+
+                    if aErr <> AUDIOERR_None then
+                        SendMessage(ap.fMainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(
+                            PChar('Note: Automatic Rating/Playcounter NOT saved into file'#13#10 + aAudioFile.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------'
+                    )));
+
                     // ok. We have processed the file in the library so far.
                     // Now we should unify the ratings for this file in the playlist.
                     // We are in a Thread, and the Playlist is VCL-only, so

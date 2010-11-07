@@ -44,6 +44,75 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
 
 type
 
+    TAudioError = (
+                AUDIOERR_None,  // everthing's fine
+                // General File-Errors
+                AUDIO_FILEERR_NoFile,
+                AUDIO_FILEERR_FOpenCrt,  // FileOpen failed (used in Stream-Methods)
+                AUDIO_FILEERR_FOpenR,    // OpenRead failed (ReadfromFile)
+                AUDIO_FILEERR_FOpenRW,   // OpenReadWrite failed (WriteToFile)
+                AUDIO_FILEERR_FOpenW,    // unused
+                AUDIO_FILEERR_SRead,     // reading from Stream failed
+                AUDIO_FILEERR_SWrite,    // writing into Stream failed
+                // ID3-Tags
+                AUDIO_ID3ERR_Cache,      // Caching AudioData failed
+                AUDIO_ID3ERR_NoTag,      // No ID3Tag found (should be ignored)
+                AUDIO_ID3ERR_Invalid_Header,  // invalid Id3v2-Subversion
+                AUDIO_ID3ERR_Compression,     // Compressed ID3v2-Tag (unparsable for Mp3FileUtils)
+                AUDIO_ID3ERR_Unclassified,    // Some other Exception, MessageBox will popup
+                // MPEG
+                AUDIO_MPEGERR_NoFrame,        // Not a valid mp3File
+               // OggVorbis // OVErr_None, OVErr_NoFile, OVErr_FileCreate, OVErr_FileOpenR, OVErr_FileOpenRW as above
+                AUDIO_OVErr_InvalidFirstPageHeader,
+                AUDIO_OVErr_InvalidFirstPage,
+                AUDIO_OVErr_InvalidSecondPageHeader,
+                AUDIO_OVErr_InvalidSecondPage,
+                AUDIO_OVErr_CommentTooLarge,
+                AUDIO_OVErr_BackupFailed,
+                AUDIO_OVErr_DeleteBackupFailed,
+                // Flac // FlacErr_None, FlacErr_NoFile, FlacErr_FileCreate, FlacErr_FileOpenR, FlacErr_FileOpenRW as above
+
+                AUDIO_FlacErr_InvalidFlacFile,      // Invalid FlacFile
+                AUDIO_FlacErr_MetaDataTooLarge,      // MetaData too large to write
+                AUDIOERR_UnsupportedMediaFile,
+                AUDIOERR_Unkown
+                // FlacErr_BackupFailed, FlacErr_DeleteBackupFailed as in Ogg
+    );
+
+ const
+    AudioErrorString: Array[TAudioError] of String = (
+              'No Error',
+              'File not found',
+              'FileCreate failed.',
+              'Could not read from file',
+              'Cannot save meta-data: File is read-only',
+              'Cannot save meta-data: File is read-only',
+              'Read from Stream failed',
+              'Cannot save meta-data: Write to Stream failed',
+              // Id3
+              'Caching Audiodata failed',
+              'No ID3-Tag found',
+              'Invalid Header for ID3v2-Tag',
+              'Compressed ID3-Tag found',
+              'Unknown ID3-Error',
+              // mpeg
+              'Invalid MP3-File: No Audioframe found',
+              // Ogg
+              'Invalid Ogg-Vorbis-File: First Vorbis-Header corrupt',
+              'Invalid Ogg-Vorbis-File: First Ogg-Page corrupt',
+              'Invalid Ogg-Vorbis-File: Second Vorbis-Header corrupt',
+              'Invalid Ogg-Vorbis-File: Second Ogg-Page corrupt',
+              'Comment too large (sorry, Flogger limitation)',
+              'Backup failed',
+              'Delete backup failed',
+              // Flac
+              'Invalid Flac-File',
+              'Metadata-Block exceeds maximum size',
+              'Type of Audiofile is not supported - use mp3, ogg or flac',
+              'Unknown Error'
+    );
+
+ type
     // Class TTag: Used for the TagCloud
     TTag = class
       private
@@ -156,15 +225,14 @@ type
         // no tags found - set default values
         procedure SetUnknown;
 
-        procedure QuickUpdateMP3Tag(aFilename: String = '');
-        procedure QuickUpdateOggTag(aFilename: String = '');
-        procedure QuickUpdateFlacTag(aFilename: String = '');
+        function QuickUpdateMP3Tag(aFilename: String = ''): TMP3Error;
+        function QuickUpdateOggTag(aFilename: String = ''): TOggVorbisError;
+        function QuickUpdateFlacTag(aFilename: String = ''): TFlacError;
 
 
-        procedure SetMp3Data(filename: UnicodeString; Flags: Integer = 0);
-        procedure SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0);
-        procedure SetFlacData(filename: UnicodeString; Flags: Integer = 0);
-
+        function SetMp3Data(filename: UnicodeString; Flags: Integer = 0): TMP3Error;
+        function SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0): TOggVorbisError;
+        function SetFlacData(filename: UnicodeString; Flags: Integer = 0): TFlacError;
 
         // Write a string in a stream. In previous versions several encodings were
         // written, now only UTF8 is used
@@ -278,7 +346,7 @@ type
 
         // Write the Meta-Data back to the file
         // This method will call a proper sub-methode like SetMp3Info
-        procedure SetAudioData(Flags: Integer = 0);
+        function SetAudioData(Flags: Integer = 0): TAudioError;
 
         // save the data here in a ";"-separated string for csv-export
         function GenerateCSVString: UnicodeString;
@@ -298,7 +366,7 @@ type
 
         // QuickFileUpdate:
         // Set only the Rating and the Playcounter and write it to the file
-        procedure QuickUpdateTag(aFilename: String = '');
+        function QuickUpdateTag(aFilename: String = ''): TAudioError;
     end;
 
     // Okay. This doesnt make any sense. I wanted to create subclasses of
@@ -423,12 +491,77 @@ procedure GetMp3Details(filename:UnicodeString;
       var ID3v2Tag: TID3v2Tag;
       var id3v1tag:Tid3v1tag);
 
+function Mp3ToAudioError(aError: TMP3Error): TAudioError;
+function OggToAudioError(aError: TOggVorbisError): TAudioError;
+function FlacToAudioError(aError: TFlacError): TAudioError;
 
 implementation
 
 uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings, SystemHelper;
 
  {$I-}
+
+
+function Mp3ToAudioError(aError: TMP3Error): TAudioError;
+begin
+    case aError of
+      MP3ERR_None     : result := AUDIOERR_None ;
+      MP3ERR_NoFile   : result := AUDIO_FILEERR_NoFile ;
+      MP3ERR_FOpenCrt : result := AUDIO_FILEERR_FOpenCrt;
+      MP3ERR_FOpenR   : result := AUDIO_FILEERR_FOpenR ;
+      MP3ERR_FOpenRW  : result := AUDIO_FILEERR_FOpenRW;
+      MP3ERR_FOpenW   : result := AUDIO_FILEERR_FOpenW ;
+      MP3ERR_SRead    : result := AUDIO_FILEERR_SRead  ;
+      MP3ERR_SWrite   : result := AUDIO_FILEERR_SWrite ;
+      ID3ERR_Cache    : result := AUDIO_ID3ERR_Cache;
+      ID3ERR_NoTag    : result := AUDIOERR_None;      // !!
+      ID3ERR_Invalid_Header : result := AUDIO_ID3ERR_Invalid_Header;
+      ID3ERR_Compression    : result := AUDIO_ID3ERR_Compression;
+      ID3ERR_Unclassified   : result := AUDIO_ID3ERR_Unclassified;
+      MPEGERR_NoFrame       : result := AUDIO_MPEGERR_NoFrame;
+    else
+      result := AUDIOERR_Unkown ;
+    end;
+
+end;
+
+function OggToAudioError(aError: TOggVorbisError): TAudioError;
+begin
+    case aError of
+      OVErr_None                      : result := AUDIOERR_None ;
+      OVErr_NoFile                    : result := AUDIO_FILEERR_NoFile ;
+      OVErr_FileCreate                : result := AUDIO_FILEERR_FOpenCrt;
+      OVErr_FileOpenR                 : result := AUDIO_FILEERR_FOpenR ;
+      OVErr_FileOpenRW                : result := AUDIO_FILEERR_FOpenRW;
+      OVErr_InvalidFirstPageHeader    : result := AUDIO_OVErr_InvalidFirstPageHeader ;
+      OVErr_InvalidFirstPage          : result := AUDIO_OVErr_InvalidFirstPage       ;
+      OVErr_InvalidSecondPageHeader   : result := AUDIO_OVErr_InvalidSecondPageHeader;
+      OVErr_InvalidSecondPage         : result := AUDIO_OVErr_InvalidSecondPage      ;
+      OVErr_CommentTooLarge           : result := AUDIO_OVErr_CommentTooLarge        ;
+      OVErr_BackupFailed              : result := AUDIO_OVErr_BackupFailed           ;
+      OVErr_DeleteBackupFailed        : result := AUDIO_OVErr_DeleteBackupFailed     ;
+    else
+      result := AUDIOERR_Unkown ;
+    end;
+end;
+
+function FlacToAudioError(aError: TFlacError): TAudioError;
+begin
+    case aError of
+      FlacErr_None                : result := AUDIOERR_None ;
+      FlacErr_NoFile              : result := AUDIO_FILEERR_NoFile ;
+      FlacErr_FileCreate          : result := AUDIO_FILEERR_FOpenCrt;
+      FlacErr_FileOpenR           : result := AUDIO_FILEERR_FOpenR ;
+      FlacErr_FileOpenRW          : result := AUDIO_FILEERR_FOpenRW;
+      FlacErr_InvalidFlacFile     : result := AUDIO_FlacErr_InvalidFlacFile  ;
+      FlacErr_MetaDataTooLarge    : result := AUDIO_FlacErr_MetaDataTooLarge ;
+      FlacErr_BackupFailed        : result := AUDIO_OVErr_BackupFailed       ;
+      FlacErr_DeleteBackupFailed  : result := AUDIO_OVErr_DeleteBackupFailed ;
+    else
+      result := AUDIOERR_Unkown ;
+    end;
+end;
+
 
 
  { TTag }
@@ -800,7 +933,7 @@ end;
 {
     --------------------------------------------------------
     GetAudioData, main method of this class
-    Flags are only used in mp3-files.
+    Flags are only used in mp3/ogg/flac-files.
     Notes:
       * Covers contained in mp3-Files are recognized
         If no Cover in the id3tag was found, the MedieLibrary
@@ -1710,9 +1843,11 @@ end;
             and the Rating-Star-Images-Click
     --------------------------------------------------------
 }
-procedure TAudioFile.QuickUpdateTag(aFilename: String = '');
+function TAudioFile.QuickUpdateTag(aFilename: String = ''): TAudioError;
 var localName: String;
 begin
+    result := AUDIOERR_UnsupportedMediaFile;
+
     if aFileName = '' then
         localName := self.Pfad
     else
@@ -1728,22 +1863,23 @@ begin
               or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp2')
               or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp1')
             then
-                QuickUpdateMP3Tag(localName)
+                result := Mp3ToAudioError(QuickUpdateMP3Tag(localName))
             else
                 if AnsiLowerCase(ExtractFileExt(localName)) = '.ogg' then
-                    QuickUpdateOggTag(localName)
+                    result := OggToAudioError(QuickUpdateOggTag(localName))
             else
                 if AnsiLowerCase(ExtractFileExt(localName)) = '.flac' then
-                    QuickUpdateFlacTag(localName)
+                    result := FlacToAudioError(QuickUpdateFlacTag(localName))
         except
 
         end;
     end;
 end;
 
-procedure TAudioFile.QuickUpdateMP3Tag(aFilename: String);
+function TAudioFile.QuickUpdateMP3Tag(aFilename: String): TMP3Error;
 var ID3v2Tag:TID3V2Tag;
 begin
+    result := MP3ERR_None;
     // Rating and PlayCounter can only be stored in the ID3v2-Tag
     if FileExists(aFileName) then
     begin
@@ -1781,16 +1917,17 @@ begin
             end;
 
             // Update File
-            ID3v2Tag.WriteToFile(aFilename);
+            result := ID3v2Tag.WriteToFile(aFilename);
         finally
             ID3v2Tag.Free;
         end;
     end;
 end;
 
-procedure TAudioFile.QuickUpdateOggTag(aFilename: String);
+function TAudioFile.QuickUpdateOggTag(aFilename: String): TOggVorbisError;
 var OggVorbisFile: TOggVorbisFile;
 begin
+    result := OVErr_None;
     OggVorbisFile := TOggVorbisFile.Create;
     try
         OggVorbisFile.ReadFromFile(aFilename);
@@ -1803,15 +1940,16 @@ begin
         else
             OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
 
-        OggVorbisFile.WriteToFile(aFilename);
+        result := OggVorbisFile.WriteToFile(aFilename);
     finally
         OggVorbisFile.Free;
     end;
 end;
 
-procedure TAudioFile.QuickUpdateFlacTag(aFilename: String);
+function TAudioFile.QuickUpdateFlacTag(aFilename: String): TFlacError;
 var FlacFile: TFlacFile;
 begin
+    result := FlacErr_None;
     FlacFile := TFlacFile.Create;
     try
         FlacFile.ReadFromFile(aFilename);
@@ -1825,7 +1963,7 @@ begin
         else
             FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
 
-        FlacFile.WriteToFile(aFilename);
+        result := FlacFile.WriteToFile(aFilename);
     finally
         FlacFile.Free;
     end;
@@ -1838,8 +1976,10 @@ end;
     Used, in MainVST.
     --------------------------------------------------------
 }
-procedure TAudioFile.SetAudioData(Flags: Integer);
+function TAudioFile.SetAudioData(Flags: Integer): TAudioError;
 begin
+    result := AUDIOERR_UnsupportedMediaFile;
+
     if IsStream then
     // we cannot write tags into a webstream
         exit;
@@ -1849,15 +1989,14 @@ begin
           or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp1')
     then
     begin
-        SetMp3Data(pfad, flags);
+        result := Mp3ToAudioError(SetMp3Data(pfad, flags));
     end;
 
-    X
-
     if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
-        SetOggVorbisData(pfad, flags);
+        result := OggToAudioError(SetOggVorbisData(pfad, flags));
+
     if (AnsiLowerCase(ExtractFileExt(pfad)) = '.flac') then
-        SetFlacData(pfad, flags);
+        result := FlacToAudioError(SetFlacData(pfad, flags));
 
 end;
 
@@ -1871,12 +2010,13 @@ end;
         SAD_Both     // write both Tags (i.e. create v1 if it does not exist)
     --------------------------------------------------------
 }
-procedure TAudioFile.SetMp3Data(filename: UnicodeString; Flags: Integer);
+function TAudioFile.SetMp3Data(filename: UnicodeString; Flags: Integer): TMP3Error;
 var
     ID3v2Tag:TID3V2Tag;
     ID3v1Tag:TID3v1Tag;
     ms: TMemoryStream;
 begin
+    result := MP3ERR_None;
     if Flags = SAD_None then
         // Do not update the file
         exit;
@@ -1944,7 +2084,7 @@ begin
             // delete Tags-Frame
             ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
-        ID3v2Tag.WriteToFile(filename);
+        result := ID3v2Tag.WriteToFile(filename);
 
     finally
         ID3v1Tag.Free;
@@ -1952,9 +2092,10 @@ begin
     end;
 end;
 
-procedure TAudioFile.SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0);
+function TAudioFile.SetOggVorbisData(filename: UnicodeString; Flags: Integer = 0): TOggVorbisError;
 var OggVorbisFile: TOggVorbisFile;
 begin
+    result := OVErr_None;
     if Flags = SAD_None then
         // Do not update the file
         exit;
@@ -1989,14 +2130,16 @@ begin
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
         OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
 
-        OggVorbisFile.WriteToFile(filename);
+        result := OggVorbisFile.WriteToFile(filename);
     finally
         OggVorbisFile.Free;
     end;
 end;
-procedure TAudioFile.SetFlacData(filename: UnicodeString; Flags: Integer = 0);
+function TAudioFile.SetFlacData(filename: UnicodeString; Flags: Integer = 0): TFlacError;
 var FlacFile: TFlacFile;
 begin
+    result := FlacErr_None;
+
     if Flags = SAD_None then
         // Do not update the file
         exit;
@@ -2031,7 +2174,7 @@ begin
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
         FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
 
-        FlacFile.WriteToFile(filename);
+        result := FlacFile.WriteToFile(filename);
     finally
         FlacFile.Free;
     end;

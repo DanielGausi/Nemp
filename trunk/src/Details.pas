@@ -359,10 +359,10 @@ type
 
 
     // Save information to ID3-Tag
-    procedure UpdateID3v1InFile;
-    procedure UpdateID3v2InFile;
-    procedure UpdateOggVorbisInFile;
-    procedure UpdateFlacInFile;
+    function UpdateID3v1InFile: TMP3Error;
+    function UpdateID3v2InFile: TMP3Error;
+    function UpdateOggVorbisInFile: TOggVorbisError;
+    function UpdateFlacInFile: TFlacError;
 
 
 
@@ -504,14 +504,13 @@ procedure TFDetails.BtnApplyClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
+    aErr: TAudioError;
 begin
 
     // Do not Change anything in non-mp3-Files here!
-    // Do Not GetAudioData on Non-mp3-Files here!
+    // Do Not GetAudioData on Non-mp3/ogg/flac-Files here!
     if Not (ValidMP3File or ValidOggFile or ValidFlacFile) then
         Exit;
-
-// oder doch?? LastFMTags, Lyric immer editierbar machen? NEIN
 
 
     PictureHasChanged := False;
@@ -524,16 +523,27 @@ begin
         and (MedienBib.CurrentThreadFilename <> AktuellesAudioFile.Pfad)
     then
     begin
+        aErr := AUDIOERR_None;
         // write Tags to file
         if ValidMp3File then
         begin
-            UpdateID3v1InFile;
-            UpdateID3v2InFile;
+            aErr := Mp3ToAudioError(UpdateID3v1InFile);
+            aErr := Mp3ToAudioError(UpdateID3v2InFile);
         end;
         if ValidOggFile then
-            UpdateOggVorbisInFile;
+            aErr := OggToAudioError(UpdateOggVorbisInFile);
         if ValidFlacFile then
-            UpdateFlacInFile;
+            aErr := FlacToAudioError(UpdateFlacInFile);
+
+        if aErr <> AUDIOERR_None then
+        begin
+            MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+            AddErrorLog('Editing Details'#13#10 + AktuellesAudioFile.Pfad + #13#10
+                                + 'Error: ' + AudioErrorString[aErr]
+                                + #13#10 + '------');
+            exit;
+        end;
+
 
         // get the information again and store them in the audiofile-object
         // AktuellesAudioFile.GetAudioData(Dateipfad, GAD_Rating);
@@ -1179,9 +1189,6 @@ begin
         Timer1.Enabled := False;
         with AktuellesAudioFile do
         begin
-          FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), Dateiname]);
-
-
           If not (Fileexists(Pfad) OR AktuellesAudioFile.isStream) then
           begin
             Lbl_Warnings.Caption := (Warning_FileNotFound);
@@ -1189,13 +1196,14 @@ begin
             PnlWarnung.Visible := True;
           end;
 
-
           DateiPfad := Pfad;
           LBLPfad.Caption := Ordner;
           LBLName.Caption := DateiName;
 
           if AktuellesAudioFile.isStream then
           begin
+            FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), Ordner]);
+
             LlblConst_Path.Caption := (DetailForm_InfoLblWebStream);
             LlblConst_Filename.Caption := (DetailForm_InfoLblDescription);
             Lblsize.Font.Style := [fsbold];
@@ -1214,6 +1222,14 @@ begin
           end
           else
           begin
+            FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), Dateiname]);
+
+            if Not FileExists(AktuellesAudioFile.Pfad) then
+                FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_FileNotFound
+            else
+                if FileIsWriteProtected(AktuellesAudioFile.Pfad) then
+                    FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_WriteProtected ;
+
             LlblConst_Path.Caption := (DetailForm_InfoLblPath);
             LlblConst_Filename.Caption := (DetailForm_InfoLblFilename);
             Lblsize.Font.Style := [];
@@ -2076,6 +2092,8 @@ begin
 
   ShowAdditionalTags;
 
+  BtnApply.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile);
+  BtnUndo.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile);
 
   PictureHasChanged := False;
   ID3v1HasChanged := False;
@@ -2095,66 +2113,66 @@ end;
             so saving here saves everything. ;-)
     --------------------------------------------------------
 }
-procedure TFDetails.UpdateID3v1InFile;
+function TFDetails.UpdateID3v1InFile: TMP3Error;
 begin
-  if ID3v1Activated and ValidMp3File then
-  begin
-    Id3v1Tag.Title := Lblv1Titel.Text;
-    Id3v1Tag.Artist := Lblv1Artist.Text;
-    Id3v1Tag.Album := Lblv1Album.Text;
-    Id3v1Tag.Comment := Lblv1Comment.Text;
-    Id3v1Tag.Genre := cbIDv1Genres.Text;
-    Id3v1Tag.Track := Lblv1Track.Text;
-    Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
-    id3v1Tag.WriteToFile(Dateipfad);
-  end else
-    id3v1Tag.RemoveFromFile(Dateipfad);
+    if ID3v1Activated and ValidMp3File then
+    begin
+        Id3v1Tag.Title := Lblv1Titel.Text;
+        Id3v1Tag.Artist := Lblv1Artist.Text;
+        Id3v1Tag.Album := Lblv1Album.Text;
+        Id3v1Tag.Comment := Lblv1Comment.Text;
+        Id3v1Tag.Genre := cbIDv1Genres.Text;
+        Id3v1Tag.Track := Lblv1Track.Text;
+        Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
+        result := id3v1Tag.WriteToFile(Dateipfad);
+    end else
+        result := id3v1Tag.RemoveFromFile(Dateipfad);
 end;
-procedure TFDetails.UpdateID3v2InFile;
+function TFDetails.UpdateID3v2InFile: TMP3Error;
 var ms: TMemoryStream;
     s: UTF8String;
 begin
   //if (ID3v2Activated or (cbWriteRatingToTag.Checked and cbWriteRatingToTag.Enabled)) and ValidMp3File then
   if ID3v2Activated and ValidMp3File then
   begin
-    Id3v2Tag.Title := Lblv2Titel.Text;
-    Id3v2Tag.Artist := Lblv2Artist.Text;
-    Id3v2Tag.Album := Lblv2Album.Text;
-    Id3v2Tag.Comment := Lblv2Comment.Text;
-    Id3v2Tag.Genre := cbIDv2Genres.Text;
-    Id3v2Tag.Track := Lblv2Track.Text;
-    Id3v2Tag.Year := Lblv2Year.Text;
-    // weitere Frames
-    ID3v2Tag.Copyright := Lblv2Copyright.Text;
-    // Lyrics
-    ID3v2Tag.Lyrics := Memo_Lyrics.Text;
+      Id3v2Tag.Title := Lblv2Titel.Text;
+      Id3v2Tag.Artist := Lblv2Artist.Text;
+      Id3v2Tag.Album := Lblv2Album.Text;
+      Id3v2Tag.Comment := Lblv2Comment.Text;
+      Id3v2Tag.Genre := cbIDv2Genres.Text;
+      Id3v2Tag.Track := Lblv2Track.Text;
+      Id3v2Tag.Year := Lblv2Year.Text;
+      // weitere Frames
+      ID3v2Tag.Copyright := Lblv2Copyright.Text;
+      // Lyrics
+      ID3v2Tag.Lyrics := Memo_Lyrics.Text;
 
-    // Bewertung. Nur schreiben, wenn gechecked
-    // No write always - rating-image is now an ID3v2-Page
-    // if (cbWriteRatingToTag.Checked) and (cbWriteRatingToTag.Enabled) then
-    ID3v2Tag.Rating := ActualRating;
+      // Bewertung. Nur schreiben, wenn gechecked
+      // No write always - rating-image is now an ID3v2-Page
+      // if (cbWriteRatingToTag.Checked) and (cbWriteRatingToTag.Enabled) then
+      ID3v2Tag.Rating := ActualRating;
 
-    s := Utf8String(Trim(Memo_Tags.Text));
-    if length(s) > 0 then
-    begin
-        ms := TMemoryStream.Create;
-        try
-            ms.Write(s[1], length(s));
-            ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
-        finally
-            ms.Free;
-        end;
-    end else
-        // delete Tags-Frame
-        ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+      s := Utf8String(Trim(Memo_Tags.Text));
+      if length(s) > 0 then
+      begin
+          ms := TMemoryStream.Create;
+          try
+              ms.Write(s[1], length(s));
+              ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+          finally
+              ms.Free;
+          end;
+      end else
+          // delete Tags-Frame
+          ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
 
-    id3v2Tag.WriteToFile(Dateipfad);
+      result := id3v2Tag.WriteToFile(Dateipfad);
   end else
-    id3v2Tag.RemoveFromFile(Dateipfad);
+    result := id3v2Tag.RemoveFromFile(Dateipfad);
 end;
 
-procedure TFDetails.UpdateOggVorbisInFile;
+function TFDetails.UpdateOggVorbisInFile: TOggVorbisError;
 begin
     if ValidOggFile then
     begin
@@ -2171,10 +2189,11 @@ begin
         OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
         OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
-        OggVorbisFile.WriteToFile(Dateipfad);
-    end;
+        result := OggVorbisFile.WriteToFile(Dateipfad);
+    end else
+        result := OVErr_NoFile;
 end;
-procedure TFDetails.UpdateFlacInFile;
+function TFDetails.UpdateFlacInFile: TFlacError;
 begin
     if ValidFlacFile then
     begin
@@ -2191,8 +2210,9 @@ begin
         FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
         FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
-        FlacFile.WriteToFile(Dateipfad);
-    end;
+        result := FlacFile.WriteToFile(Dateipfad);
+    end else
+        result := FlacErr_NoFile;
 end;
 
 {
@@ -2391,9 +2411,8 @@ begin
             begin
                 // process new Tags. Rename, delete ignored and duplicates.
                 af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
-                af.SetAudioData(SAD_Both);
             end;
-
+            // Show tags of temporary file in teh memo
             Memo_Tags.Text := af.RawTagLastFM;
         finally
             TagPostProcessor.Free;

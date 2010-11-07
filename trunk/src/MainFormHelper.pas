@@ -115,6 +115,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     // (e.g.: use it to copy the playlist to a USB-Stick or portable player
     function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 
+    procedure AddErrorLog(aString: String);
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1466,6 +1468,13 @@ begin
         tmpPlaylist.Free;
     end;
 
+end;
+
+
+procedure AddErrorLog(aString: String);
+begin
+    ErrorLog.Add(aString);
+    Nemp_MainForm.MM_H_ErrorLog.Visible := True;
 end;
 
 end.

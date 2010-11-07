@@ -68,6 +68,9 @@ Time_HourShort = 'h';
 
 // Detail-Form
 DetailForm_Caption = 'File properties';
+DetailForm_Caption_FileNotFound = '(File not found)';
+DetailForm_Caption_WriteProtected = '(write protected)';
+
 DetailForm_InfoLblWebStream = 'URL';
 DetailForm_InfoLblDescription = 'Description';
 DetailForm_InfoLblHint     = 'Hint:';
@@ -543,6 +546,8 @@ MediaLibrary_SearchTagsComplete_ManyFound = 'Tagsearch complete. Found Tags for 
 MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
 MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
 
+MediaLibrary_SomeErrorsOccured = 'Some unexpected errors appeared during the process. Please view the Error-Log for details.';
+
 MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
 MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet. If you close this window now, these files remain inconsistent to the data in the library. Do you really want to close this window now?';
 
@@ -680,7 +685,6 @@ CopyToUSB_ERROR_PATH_NOT_FOUND = 'The destination path can not be found. Choose 
 CopyToUSB_ERROR_TOO_MANY_OPEN_FILES = 'Too many open files. Choose OK to continue with next file, or cancel the copying process.';
 CopyToUSB_ERROR_ACCESS_DENIED = 'Access denied. Choose OK to continue with next file, or cancel the copying process.';
 CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue with next file, or cancel the copying process.';
-
 
 
 implementation
