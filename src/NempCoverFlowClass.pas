@@ -283,8 +283,8 @@ end;
 procedure TNempCoverFlow.DownloadCover(aCover: TNempCover; aIdx: Integer);
 begin
     if (aCover.Album <> 'Unknown compilation')
-        and (aCover.Artist <> AUDIOFILE_UNKOWN)
-        and (aCover.Album <> AUDIOFILE_UNKOWN)
+        and (not UnKownInformation(aCover.Artist))
+        and (not UnKownInformation(aCover.Album))
     then
         fDownloadThread.AddJob(aCover, aIdx);
 end;

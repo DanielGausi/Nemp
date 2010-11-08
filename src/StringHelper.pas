@@ -121,50 +121,58 @@ begin
   end;
 
   if Strings.Count > 0 then
-  repeat
-        // Den String mit minimaler Länge bestimmen
-        minlength := length(Strings[0]);
-        minidx := 0;
-        for i := 1 to Strings.Count - 1 do
-        begin
-          if length(Strings[i]) < minlength then
+  begin
+      repeat
+            // Den String mit minimaler Länge bestimmen
+            minlength := length(Strings[0]);
+            minidx := 0;
+            for i := 1 to Strings.Count - 1 do
+            begin
+              if length(Strings[i]) < minlength then
+              begin
+                minlength := length(Strings[i]);
+                minidx := i;
+              end;
+            end;
+            checkStr := Strings[minidx];
+            // diesen String aus der Liste entfernen, damit er beim nächsten Durchlauf nicht wieder gefunden wird
+            Strings.Delete(minidx);
+
+            // Den Rest der Stringliste überprüfen, ob dieser String "passt"
+            // ErrorCount zählt dabei die Strings, die nicht passen
+            errorCount := 0;
+            Fehlstelle := 0;
+            for i := 0 to Strings.Count - 1 do
+            begin
+              if not SameString(checkStr, Strings[i], tolerance, Fehlstelle) then
+                inc(errorCount);
+              if errorCount > 1 then break;
+            end;
+
+            // Situation hier:
+            // Wenn errorCount <= 1, dann ist CheckStr ein guter String für die Liste
+            // Wenn nicht, dann probieren wir das nochmal.
+            inc(durchlauf);
+      until (durchlauf > durchlaufmax) or (errorCount <= 1) or (strings.Count = 0);
+
+      if ErrorCount <= 1 then
+          result := CheckStr
+      else
+      begin
+          if fehlstelle <= length(CheckStr) Div 2 +1 then
+              result := ''
+          else
           begin
-            minlength := length(Strings[i]);
-            minidx := i;
+              result := copy(CheckStr, 1, fehlstelle - 1) + ' ... ';
+              fehlstelle := 0;
           end;
-        end;
-        checkStr := Strings[minidx];
-        // diesen String aus der Liste entfernen, damit er beim nächsten Durchlauf nicht wieder gefunden wird
-        Strings.Delete(minidx);
+      end;
 
-        // Den Rest der Stringliste überprüfen, ob dieser String "passt"
-        // ErrorCount zählt dabei die Strings, die nicht passen
-        errorCount := 0;
-        Fehlstelle := 0;
-        for i := 0 to Strings.Count - 1 do
-        begin
-          if not SameString(checkStr, Strings[i], tolerance, Fehlstelle) then
-            inc(errorCount);
-          if errorCount > 1 then break;
-        end;
-
-        // Situation hier:
-        // Wenn errorCount <= 1, dann ist CheckStr ein guter String für die Liste
-        // Wenn nicht, dann probieren wir das nochmal.
-        inc(durchlauf);
-  until (durchlauf > durchlaufmax) or (errorCount <= 1) or (strings.Count = 0);
-
-  if ErrorCount <= 1 then
-    result := CheckStr
+  end
   else
   begin
-    if fehlstelle <= length(CheckStr) Div 2 +1 then
-      result := ''
-    else
-    begin
-      result := copy(CheckStr, 1, fehlstelle - 1) + ' ... ';
-      fehlstelle := 0;
-    end;
+      result := '<N/A>'; // = AUDIOFILE_UNKOWN;
+      Fehlstelle := 0;
   end;
 
 end;

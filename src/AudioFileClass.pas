@@ -496,6 +496,8 @@ function Mp3ToAudioError(aError: TMP3Error): TAudioError;
 function OggToAudioError(aError: TOggVorbisError): TAudioError;
 function FlacToAudioError(aError: TFlacError): TAudioError;
 
+function UnKownInformation(aString: String): Boolean;
+
 implementation
 
 uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings, SystemHelper;
@@ -561,6 +563,11 @@ begin
     else
       result := AUDIOERR_Unkown ;
     end;
+end;
+
+function UnKownInformation(aString: String): Boolean;
+begin
+    result := (trim(aString) = '') or (aString = AUDIOFILE_UNKOWN);
 end;
 
 
@@ -806,10 +813,10 @@ begin
   end
   else
   begin
-    if Artist = AUDIOFILE_UNKOWN then
-      result := Titel
+    if UnKownInformation(Artist) then
+        result := Titel
     else
-      result := Artist + ' - ' + Titel;
+        result := Artist + ' - ' + Titel;
   end;
 
   if result = '' then
@@ -822,7 +829,7 @@ begin
       result := '//' // invalid Filename ;-)
   else
   begin
-      if Artist = AUDIOFILE_UNKOWN then
+      if UnKownInformation(Artist) then
       begin
           if Titel <> Dateiname then
               result := Titel + '.' + self.Extension
@@ -1080,25 +1087,29 @@ begin
     if mpeginfo.FirstHeaderPosition>-1 then
     begin
         // aus dem ID3 Tag
-        if id3v2tag.artist<>'' then Artist:=(id3v2tag.artist)
-            else if id3v1tag.artist<>'' then Artist:=(id3v1tag.artist)
-                else Artist:=AUDIOFILE_UNKOWN;
-        if id3v2tag.title<>'' then Titel:=(id3v2tag.title)
-            else if id3v1tag.title<>'' then Titel:=(id3v1tag.title)
-                else Titel:=Dateiname;
-        if id3v2tag.album<>'' then Album:=(id3v2tag.album)
-            else if id3v1tag.album<>'' then Album:=(id3v1tag.album)
-                else album:=AUDIOFILE_UNKOWN;
-        if id3v2tag.Year<>'' then Year:=(id3v2tag.Year)
-            else if id3v1tag.Year<>'' then Year := Trim(UnicodeString(id3v1tag.Year))
-                else Year:='';
+        if id3v2tag.artist <> '' then
+            Artist := id3v2tag.artist
+        else Artist := id3v1tag.artist;
+
+        if id3v2tag.title <> '' then
+            Titel := id3v2tag.title
+        else Titel := id3v1tag.title;
+
+        if id3v2tag.album <> '' then
+            Album := id3v2tag.album
+        else Album := id3v1tag.album;
+
+        if id3v2tag.Year <> '' then
+            Year := id3v2tag.Year
+        else Year := Trim(UnicodeString(id3v1tag.Year));
+
         if id3v2tag.genre<>'' then
-          genre := id3v2tag.genre
+            genre := id3v2tag.genre
         else
           if id3v1tag.exists then
-            genre := id3v1tag.genre
+              genre := id3v1tag.genre
           else
-            genre := '';
+              genre := '';
         Track := GetTrackFromV2TrackString(Id3v2tag.Track);
         if Track = 0 then
             Track := StrToIntDef(Id3v1tag.Track, 0);
@@ -1273,20 +1284,9 @@ begin
         end;
 
         // Vorbis-Comments
-        if FlacFile.Artist <> '' then
-            Artist := FlacFile.Artist
-        else
-            Artist := AUDIOFILE_UNKOWN;
-
-        if FlacFile.Title <> '' then
-            Titel := FlacFile.Title
-        else
-            Titel := Dateiname;
-
-        if FlacFile.Album <> '' then
-            Album := FlacFile.Album
-        else
-            Album := AUDIOFILE_UNKOWN;
+        Artist := FlacFile.Artist;
+        Titel := FlacFile.Title;
+        Album := FlacFile.Album;
 
         Track := GetTrackFromV2TrackString(FlacFile.TrackNumber);
         Year  := FlacFile.Date;
@@ -1305,88 +1305,6 @@ begin
     end;
 
 end;
-
-(*
-procedure TAudioFile.GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0);
-var FLACfile: TFLACfile;
-begin
-    FileIsPresent := False;
-    Pfad := Filename;
-    if NOT FileExists(Filename) then
-    begin
-      SetUnknown;
-      exit;
-    end;
-    FileIsPresent := True;
-    FileChecked := True;
-    isStream := False;
-
-
-    FLACfile := TFLACfile.Create;
-
-    if FileExists(FileName) then
-    { Load FLAC data }
-    if FLACfile.ReadFromFile(FileName) then
-      if FLACfile.Valid then
-      begin
-          fFileSize := FLACfile.FileLength;
-
-          if FLACfile.artist <> '' then
-              Artist := FLACfile.artist
-          else Artist := AUDIOFILE_UNKOWN;
-
-          if FLACfile.title <> '' then
-              Titel := FLACfile.title
-          else Titel := Dateiname;
-
-          if FLACfile.album <> '' then
-              Album := FLACfile.album
-          else Album := AUDIOFILE_UNKOWN;
-
-          // Jahr
-          if FLACfile.Year <> '' then
-              Year := FLACfile.Year
-          else Year := '';
-
-          if FLACfile.genre <> '' then
-              genre := FLACfile.genre
-          else
-              genre := '';
-
-          Track := StrToIntDef(FLACfile.TrackString, 0);
-
-          // ? FLACfile.xRating
-          //fRating := 0;
-
-          Lyrics := UTF8Encode(FLACfile.Lyrics);
-
-          Comment := FLACfile.Comment;
-
-          Duration := Round(FlacFile.Duration);
-          fBitrate := FlacFile.Bitrate;
-          fvbr := False;
-
-          case FlacFile.Channels of
-              1: fChannelModeIDX := 3; // Mono
-              2: fChannelModeIDX := 0; // Stereo
-          else
-              fChannelModeIdx := 4; // Unknown
-          end;
-          SetSampleRate(FlacFile.samplerate);
-      end
-      else
-        { Header not found }
-        SetUnknown
-    else
-      { Read error }
-      SetUnknown
-  else
-    { File does not exist }
-    SetUnknown;
-  FlacFile.Free;
-end;
-
-*)
 
 {
     --------------------------------------------------------
@@ -1431,20 +1349,9 @@ begin
         end;
 
         // Vorbis-Comments
-        if OggVorbisFile.Artist <> '' then
-            Artist := OggVorbisFile.Artist
-        else
-            Artist := AUDIOFILE_UNKOWN;
-
-        if OggVorbisFile.Title <> '' then
-            Titel := OggVorbisFile.Title
-        else
-            Titel := Dateiname;
-
-        if OggVorbisFile.Album <> '' then
-            Album := OggVorbisFile.Album
-        else
-            Album := AUDIOFILE_UNKOWN;
+        Artist := OggVorbisFile.Artist;
+        Titel := OggVorbisFile.Title;
+        Album := OggVorbisFile.Album;
 
         Track := GetTrackFromV2TrackString(OggVorbisFile.TrackNumber);
         Year  := OggVorbisFile.Date;
@@ -1463,179 +1370,6 @@ begin
     end;
 
 end;
-{
-    --------------------------------------------------------
-    GetOggInfo
-    Uses some weird code - I should replace this by the ATL soon
-    --------------------------------------------------------
-}
-(*
-procedure TAudioFile.GetOggInfo(filename: UnicodeString);
-var  F: File;
-    fsize:integer;
-    position,i,c, Idx:integer;
-    buffer: TBuffer;
-    valid:boolean;
-    sr,vendor_length,comment_list_length, comment_length: ^cardinal;
-    min_bitrate,nominal_bitrate,max_bitrate:^integer;
-
-    vendorstr,tmpstr, param: AnsiString;
-    value: UTF8String;
-    chmode:byte;
-begin
-    FileIsPresent:=False;
-    Pfad:=(filename);
-
-    // Zurücksetzen, damit die Funktion MedienBib.InitCover später anschlagen kann!
-    CoverID := '';
-
-    if NOT FileExists(filename) then
-    begin
-      SetUnknown;
-      exit;
-    end;
-    FileIsPresent:=True;
-    FileChecked := True;
-
-    AssignFile(F, filename);
-    FileMode := 0;
-    Reset(F,1);
-    fsize:=filesize(f);
-
-    nominal_bitrate := Nil;
-    chmode := 0;
-
-    fFileSize := fsize;
-    year := '';
-    if fsize=0 then
-    begin
-        CloseFile(F);
-        exit;
-    end;
-    if fsize>=5000 then setlength(buffer,5000) else
-        setlength(buffer,fsize);
-    blockread(f,buffer[0],length(buffer));
-    CloseFile(F);
-
-    position:=-1;
-    valid:=false;
-
-    while NOT ((valid) or (position>length(buffer)+1000)) do  // +1000 maßlos übertrieben, aber egal
-    begin
-        try
-            inc(position);
-            if       (ord(buffer[position])  = 01)  // 01: Audio-Infos
-                AND (buffer[position+1]  = $76)
-                AND (buffer[position+2]= $6F)
-                AND (buffer[position+3]= $72)
-                AND (buffer[position+4]= $62)
-                AND (buffer[position+5]= $69)
-                AND (buffer[position+6]= $73)    {'vorbis'}
-            then begin
-                // +7+8+9+10: sollten 0 sein, überprüfe ich erstmal nicht
-                // 11 : Audio-Channels
-                chmode := buffer[position+11];
-                case buffer[position+11] of
-                    //('S ','JS','DC','M ','--');
-                    1: fChannelmodeIDX := 3;
-                    2: fChannelmodeIDX := 0;
-                    else fChannelmodeIDX := 4;
-                end;
-                sr:=@(buffer[position+12]);
-                SetSampleRate(sr^);
-                min_bitrate := @(buffer[position+16]);
-                nominal_bitrate := @(buffer[position+20]);
-                max_bitrate := @(buffer[position+24]);
-                if (min_bitrate^=nominal_bitrate^)
-                    AND (nominal_bitrate^=max_bitrate^)
-                    AND (max_bitrate^<>0)
-                    then bitrate:=nominal_bitrate^ DIV 1000
-                    else if ((min_bitrate^=0) OR (min_bitrate^=-1)) // -1 = $FF FF FF
-                        AND (nominal_bitrate^<>0)
-                        AND ((max_bitrate^=0) OR (max_bitrate^=-1))
-                        then fbitrate:=nominal_bitrate^ DIV 1000
-                        else fbitrate := (max_bitrate^ + min_bitrate^) DIV 2000;
-            end;
-            if       (ord(buffer[position])  = 03)  //03: Titel-Infos
-                AND (buffer[position+1]  = $76)
-                AND (buffer[position+2] = $6F)
-                AND (buffer[position+3] = $72)
-                AND (buffer[position+4] = $62)
-                AND (buffer[position+5] = $69)
-                AND (buffer[position+6] = $73)
-            then begin
-                vendor_length := @(buffer[position+7]);
-                setlength(vendorstr,vendor_length^);
-                for i:=0 to vendor_length^-1 do
-                    vendorstr[i+1] := AnsiChar(chr(buffer[position+11+i]));
-                // Anzahl der Kommentarfelder
-                comment_list_length := @(buffer[position+11 + Integer(vendor_length^)]);
-                position:=position+15+ Integer(vendor_length^); // Position: länge des folgenden Kommentares
-                for c:=1 to comment_list_length^ do
-                begin
-                    comment_length := @(buffer[position]);
-                    setlength(tmpstr,comment_length^);
-
-                    // das solte doch mit move oder so besser gehen, oder???
-                    for i:=0 to comment_length^-1 do
-                        tmpstr[i+1] := AnsiChar(chr(buffer[position+4+i]));
-
-                    {.$Message Hint 'Code testen, anders machen! Nix mit TmpStringlist, das geht ohne Explode'}
-
-                    Idx := Pos('=', tmpstr);
-                    if Idx > 1 then
-                    begin
-                        param := AnsiLowerCase(Copy(tmpstr, 1, Idx-1));
-                        value := UTF8String(Copy(tmpstr, Idx+1, length(tmpstr)));
-
-                        if param = 'artist' then
-                          Artist := Utf8ToString(value)
-                        else
-                          if param = 'album' then
-                            Album := Utf8ToString(value)
-                          else
-                            if param = 'title' then
-                              Titel := Utf8ToString(value)
-                            else
-                              if param='tracknumber' then
-                                  Track := StrToIntDef(UTF8ToAnsi(value), 0);
-
-                                  {
-                                  tmpstrlist := explode('=',tmpstr);
-                                  if tmpstrlist.Count > 1 then
-                                  begin
-                                      if Ansilowercase(tmpstrlist[0])='artist'
-                                          then artist := UTF8ToString(tmpstrlist[1]);
-                                      if Ansilowercase(tmpstrlist[0])='album'
-                                          then album:=UTF8ToAnsi(tmpstrlist[1]);
-                                      if Ansilowercase(tmpstrlist[0])='title'
-                                          then titel:=UTF8ToAnsi(tmpstrlist[1]);
-                                      if AnsiLowerCase(tmpstrlist[0])='tracknumber'
-                                          then Track := StrToIntDef(UTF8ToAnsi(tmpstrlist[1]),0);
-                                  end;
-                                  inc(position,comment_length^+4);
-                                  tmpstrlist.free;
-                                  }
-                    end;
-                    inc(position,comment_length^+4);
-
-                end;
-
-                if (nominal_bitrate^ * chmode) <> 0 then
-                  Duration := round(fFileSize / bitrate / chmode /125*2)
-                else
-                  Duration := 0;
-                valid:=true;
-            end;
-        except
-        end;
-    end;
-    if titel='' then titel:=Dateiname;
-    if artist='' then artist := AUDIOFILE_UNKOWN;
-    if album='' then album := AUDIOFILE_UNKOWN;
-    fRating := 0; // Rating is not supported in Ogg-Files
-end;
-*)
 
 {
     --------------------------------------------------------
@@ -1667,15 +1401,9 @@ begin
   try
       if wmaFile.ReadFromFile(filename) then
       begin
-          if wmaFile.Title <> '' then
-              Titel := wmaFile.Title
-          else Titel := Dateiname;
-          if wmaFile.Artist <> '' then
-              Artist := wmaFile.Artist
-          else Artist := AUDIOFILE_UNKOWN;
-          if wmaFile.Album <> '' then
-              Album := wmaFile.Album
-          else ALbum := AUDIOFILE_UNKOWN;
+          Titel := wmaFile.Title;
+          Artist := wmaFile.Artist;
+          Album := wmaFile.Album;
 
           fRating := 0;  // Rating in WMA-Files is not supported
           Year := wmaFile.Year;
@@ -1774,8 +1502,8 @@ begin
     FileIsPresent:=True;
     FileChecked := True;
     Titel := Dateiname;
-    Artist := AUDIOFILE_UNKOWN;
-    Album := AUDIOFILE_UNKOWN;
+    Artist := '';
+    Album := '';
     Track := 0;
     Year := '';
     Genre := '';
@@ -1844,8 +1572,8 @@ end;
 procedure TAudioFile.SetUnknown;
 begin
   Titel:=Dateiname;
-  Artist := AUDIOFILE_UNKOWN;
-  Album := AUDIOFILE_UNKOWN;
+  Artist := '';
+  Album := '';
   Year := '';
   Genre := '';
   Duration := 0;
@@ -2065,13 +1793,13 @@ begin
 
         ID3v2Tag.ReadFromFile(filename);
 
-        if Titel <> AUDIOFILE_UNKOWN then
+        // if Titel <> AUDIOFILE_UNKOWN then
             ID3v2tag.Title  := Titel;
-        if Artist <> AUDIOFILE_UNKOWN then
+        // if Artist <> AUDIOFILE_UNKOWN then
             ID3v2tag.Artist := Artist;
-        if Album <> AUDIOFILE_UNKOWN then
+        // if Album <> AUDIOFILE_UNKOWN then
             ID3v2tag.album  := Album;
-        if Comment <> AUDIOFILE_UNKOWN then
+        // if Comment <> AUDIOFILE_UNKOWN then
             ID3v2tag.Comment:= Comment;
         if Lyrics <> '' then
             Id3v2Tag.Lyrics := Lyrics;

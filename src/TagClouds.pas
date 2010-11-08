@@ -1358,10 +1358,10 @@ procedure TTagCloud.GenerateAutoRawTags(aAudioFile: TAudioFile;
 var decade, year: Integer;
 begin
     // use Artist, Year, Decade and Genre as "Auto-Tags"
-    if aAudioFile.Artist <> AUDIOFILE_UNKOWN then
+    if Not UnKownInformation(aAudioFile.Artist) then
         Dest.Add(aAudioFile.Artist);
 
-    if aAudioFile.Album <> AUDIOFILE_UNKOWN then
+    if not UnKownInformation(aAudioFile.Album) then
         Dest.Add(aAudioFile.Album);
 
 //    if aAudioFile.Titel <> AUDIOFILE_UNKOWN then

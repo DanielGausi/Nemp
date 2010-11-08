@@ -2178,7 +2178,7 @@ begin
                          //    result := aAudioFile.Titel   // !! Achtung - bei Ogg-Streams kommen hier nähere Infos!!!
                          //else
                          begin
-                            if (aAudioFile.Artist = AUDIOFILE_UNKOWN) or (Trim(aAudioFile.Artist) = '') then
+                            if UnKownInformation(aAudioFile.Artist) then
                               result := aAudioFile.Titel
                             else
                               result := aAudioFile.Artist + ' - ' + aAudioFile.Titel;// + aaudiofile.Pfad;
@@ -2263,7 +2263,7 @@ begin
       end
   end else
   begin // normale Datei
-      if MainAudioFile.Artist = AUDIOFILE_UNKOWN then
+      if UnKownInformation(MainAudioFile.Artist)then
       begin
           if length(MainAudioFile.Titel) < MinLength then
               result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Titel + ' - '
@@ -2408,7 +2408,7 @@ begin
             b.Canvas.Brush.Style := bsClear;
             b.Canvas.Font.Size := 8;
 
-            if MainAudioFile.Artist <> AUDIOFILE_UNKOWN then
+            if Not UnKownInformation(MainAudioFile.Artist) then
             begin
                 s := StringReplace(MainAudioFile.Titel,'&','&&',[rfReplaceAll]);
                 r := Rect(102, 4, 198, 44);
@@ -2638,7 +2638,7 @@ var aTitel, aDate, aTime, aStreamName, MainFilename: UnicodeString;
 begin
   if assigned(MainAudioFile) then
   begin
-     if (MainAudioFile.Artist = AUDIOFILE_UNKOWN) or (Trim(MainAudioFile.Artist) = '') then
+     if UnKownInformation(MainAudioFile.Artist) then
         aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Titel)
      else
         aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Artist + ' - ' + MainAudioFile.Titel);
