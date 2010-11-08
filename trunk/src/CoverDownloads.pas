@@ -546,8 +546,8 @@ begin
         tmpCover.ID := 'dummy';
         GetCoverInfos(aAudioFileList, tmpCover);
         if (tmpCover.Album <> 'Unknown compilation')
-            and (tmpCover.Artist <> AUDIOFILE_UNKOWN)
-            and (tmpCover.Album <> AUDIOFILE_UNKOWN)
+            and (not UnKownInformation(tmpCover.Artist))
+            and (not UnKownInformation(tmpCover.Album))
         then
         begin
             fCurrentDownloadItem.Artist := tmpCover.Artist;

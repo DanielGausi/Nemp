@@ -359,7 +359,7 @@ begin
         until (Not assigned(result)) OR
                           (AnsiCompareText(currentString, aString) >= 0);
 
-        if assigned(result) and ((currentString = AUDIOFILE_UNKOWN) and (aString <> AUDIOFILE_UNKOWN) )  then
+      {  if assigned(result) and ((currentString = AUDIOFILE_UNKOWN) and (aString <> AUDIOFILE_UNKOWN) )  then
         begin
             result := aTree.GetNext(result);
             aData := aTree.GetNodeData(result);
@@ -372,6 +372,7 @@ begin
                 currentString := TJustAstring(aData^.FString).DataString;
             end;
         end;
+        }
     end
 end;
 

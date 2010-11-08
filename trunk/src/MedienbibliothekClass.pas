@@ -2921,15 +2921,17 @@ begin
       (Source[0] as TAudioFile).Key1 := aktualArtist;
 
   lastArtist := aktualArtist;
-  if lastArtist <> '' then
+  if lastArtist = '' then
+      Target.Add(TJustastring.create((Source[0] as TAudioFile).Key1 , AUDIOFILE_UNKOWN))
+  else
       Target.Add(TJustastring.create((Source[0] as TAudioFile).Key1 , lastArtist));
 
   for i := 1 to Source.Count - 1 do
   begin
     if NempSortArray[1] = siFileAge then
-      aktualArtist := (Source[i] as TAudioFile).FileAgeString
+        aktualArtist := (Source[i] as TAudioFile).FileAgeString
     else
-      aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+        aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
 
     // Copy current value for "artist" to key1
     if NempSortArray[1] = siFileAge then
@@ -2939,13 +2941,13 @@ begin
 
     if NOT AnsiSameText(aktualArtist, lastArtist) then
     begin
-      lastArtist := aktualArtist;
-      if lastArtist <> '' then
-          Target.Add(TJustastring.create((Source[i] as TAudioFile).Key1 , lastArtist));
+        lastArtist := aktualArtist;
+        if lastArtist <> '' then
+            Target.Add(TJustastring.create((Source[i] as TAudioFile).Key1 , lastArtist));
     end;
   end;
 
-  if (NempSortArray[1] <> siOrdner) then
+ { if (NempSortArray[1] <> siOrdner) then
   begin
     i := 3;      // <All> auslassen
     while (i < Target.Count) and (  AnsiCompareText(TJustastring(Target[i]).AnzeigeString, AUDIOFILE_UNKOWN) < 0  ) do
@@ -2962,6 +2964,9 @@ begin
         end;
     end;
   end;
+  }
+
+
 end;
 {
     --------------------------------------------------------
@@ -2993,8 +2998,10 @@ begin
 
   lastAlbum := aktualAlbum;
   // Ungültige Alben nicht einfügen
-  if lastAlbum <> '' then  // Hier noch eine bessere Überprüfung einbauen ???      (*)
-    Target.Add(lastAlbum);
+//  if lastAlbum = '' then  // Hier noch eine bessere Überprüfung einbauen ???      (*)
+//      Target.Add(AUDIOFILE_UNKOWN)
+//  else
+      Target.Add(lastAlbum);
 
   for i := 1 to Source.Count - 1 do
   begin
@@ -3013,8 +3020,13 @@ begin
     if NOT AnsiSameText(aktualAlbum, lastAlbum) then
     begin
       lastAlbum := aktualAlbum;
-      if lastAlbum <> '' then  // Hier noch eine bessere Überprüfung einbauen ???   (*)
-        Target.Add(lastAlbum);
+      //if lastAlbum <> '' then  // Hier noch eine bessere Überprüfung einbauen ???   (*)
+      //  Target.Add(lastAlbum);
+//      if lastAlbum = '' then  // Hier noch eine bessere Überprüfung einbauen ???      (*)
+//          Target.Add(AUDIOFILE_UNKOWN)
+//      else
+          Target.Add(lastAlbum);
+
     end;
   end;
 end;
@@ -3363,7 +3375,12 @@ begin
   if Artist = BROWSE_ALL then
   begin
       for i:=0 to AlleAlben.Count - 1 do
-          Alben.Add(TJustAString.create(AlleAlben[i]));
+      begin
+          if UnKownInformation(AlleAlben[i]) then
+              Alben.Add(TJustAString.create(AlleAlben[i], AUDIOFILE_UNKOWN))
+          else
+              Alben.Add(TJustAString.create(AlleAlben[i]));
+      end;
   end else
   if Artist = BROWSE_RADIOSTATIONS then
   begin
@@ -3419,7 +3436,12 @@ begin
             if NempSortArray[2] = siFileAge then
                 Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[start] as TAudioFile).FileAgeString ))
             else
-                Alben.Add(TJustastring.create(lastAlbum));
+            begin
+                if lastAlbum = '' then
+                    Alben.Add(TJustastring.create(lastAlbum, AUDIOFILE_UNKOWN))
+                else
+                    Alben.Add(TJustastring.create(lastAlbum));
+            end;
 
 
             for i := start+1 to Ende do
@@ -3431,12 +3453,17 @@ begin
                 if NempSortArray[2] = siFileAge then
                     Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[i] as TAudioFile).FileAgeString))
                 else
-                    Alben.Add(TJustastring.create(lastAlbum));
+                begin
+                    if lastAlbum = '' then
+                        Alben.Add(TJustastring.create(lastAlbum, AUDIOFILE_UNKOWN))
+                    else
+                        Alben.Add(TJustastring.create(lastAlbum));
+                end;
               end;
             end;
       end;
   end;
-
+  {
   if (NempSortArray[2] <> siOrdner)
     AND (Artist <> BROWSE_RADIOSTATIONS)
     AND (Artist <> BROWSE_PLAYLISTS)
@@ -3457,6 +3484,7 @@ begin
         end;
     end;
   end;
+  }
 end;
 
 {

@@ -940,7 +940,7 @@ begin
                               aAudiofile.Titel  := copy(s,pos(' - ',s)+3,length(s));
                           end else
                           begin   // it seems, that ther is no "real" extinf, just the filename
-                              aAudioFile.Artist := AUDIOFILE_UNKOWN;
+                              aAudioFile.Artist := '';
                               aAudiofile.Titel  := copy(s,pos(',',s)+1, length(s));
                           end;
                           // bei URLs soll die Exinf-Zeile ins Description feld
@@ -973,7 +973,7 @@ begin
                               end else
                               begin
                                   aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                                  aAudioFile.Artist := AUDIOFILE_UNKOWN;
+                                  aAudioFile.Artist := '';
                               end;
                           end;
                     end;
@@ -1008,7 +1008,7 @@ begin
                         end else
                         begin
                             aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                            aAudioFile.Artist := AUDIOFILE_UNKOWN;
+                            aAudioFile.Artist := '';
                         end;
                     end;
                     TargetList.Add(aAudiofile);
@@ -1163,7 +1163,7 @@ begin
                             end else
                             begin
                                 aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                                aAudioFile.Artist := AUDIOFILE_UNKOWN;
+                                aAudioFile.Artist := '';
                             end;
                         end;
                         TargetList.Add(aAudiofile);

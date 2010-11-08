@@ -730,7 +730,8 @@ begin
 
   aStringlist := TStringList.Create;
   for i := 0 to maxIdx do
-    aStringlist.Add(TAudioFile(AudioFileList[i]).Artist);
+      if (TAudioFile(AudioFileList[i]).Artist <> '') then
+          aStringlist.Add(TAudioFile(AudioFileList[i]).Artist);
 
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 0, fehlstelle);  // bei Test auf "String gleich?" keinen Fehler zulassen
@@ -743,7 +744,8 @@ begin
   aStringlist.Clear;
   // Dasselbe jetzt mit Album, aber mit Toleranz 1 bei den Strings
   for i := 0 to maxIdx do
-    aStringlist.Add(TAudioFile(AudioFileList[i]).Album);
+      if (TAudioFile(AudioFileList[i]).Album <> '') then
+          aStringlist.Add(TAudioFile(AudioFileList[i]).Album);
 
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
@@ -760,7 +762,7 @@ begin
   aStringlist.Clear;
   // Dasselbe jetzt mit Genre
   for i := 0 to maxIdx do
-    aStringlist.Add(TAudioFile(AudioFileList[i]).Genre);
+      aStringlist.Add(TAudioFile(AudioFileList[i]).Genre);
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
   if str1 = '' then
