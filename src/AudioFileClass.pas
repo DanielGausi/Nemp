@@ -207,12 +207,15 @@ type
         procedure SetString(Index: TAudioFileStringIndex; const Value: UnicodeString);
         function GetFileAgeSortString: String;
 
+        function GetReplaceString(ReplaceValue: Integer): String;
 
         function GetPath: UnicodeString;
         procedure SetPath(const Value: UnicodeString);
 
         function fGetPlaylistTitleString: UnicodeString;
+        function fGetNonEmptyTitle: UnicodeString;
         function fGetProperFilename: UnicodeString;
+
 
         function fGetTagDisplayString: String;
 
@@ -328,6 +331,7 @@ type
 
         property Taglist: TObjectList read fgetTagList;
         property TagDisplayString: String read fGetTagDisplayString;
+        property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
 
         constructor Create;
         destructor Destroy; override;
@@ -368,6 +372,19 @@ type
         // QuickFileUpdate:
         // Set only the Rating and the Playcounter and write it to the file
         function QuickUpdateTag(aFilename: String = ''): TAudioError;
+
+        // Used in VST, DetailForm, MainForm.Details to replace empty Values by the chosen one
+        // (Empty string)
+        // 'N/A'
+        // Filename
+        // Directory (last part)
+        // Directory
+        // Complete path
+
+        function GetReplacedArtist(ReplaceValue: Integer): String;
+        function GetReplacedTitle (ReplaceValue: Integer): String;
+        function GetReplacedAlbum (ReplaceValue: Integer): String;
+
     end;
 
     // Okay. This doesnt make any sense. I wanted to create subclasses of
@@ -766,6 +783,44 @@ begin
     //    result := FStrings[siOrdner] + '\' + Dateiname;
   end;
 end;
+
+function TAudioFile.GetReplaceString(ReplaceValue: Integer): String;
+begin
+    case ReplaceValue of
+        0: result := ''; // Empty String
+        1: result := AUDIOFILE_UNKOWN;
+        2: result := ChangeFileExt(Dateiname, '');
+        3: result := ExtractFileName(ExcludeTrailingPathDelimiter(Ordner));
+        4: result := Ordner;
+        5: result := Pfad;
+    else
+        result := '';
+    end;
+end;
+function TAudioFile.GetReplacedArtist(ReplaceValue: Integer): String;
+begin
+    if trim(Artist) = '' then
+        result := GetReplaceString(ReplaceValue)
+    else
+        result := Artist;
+end;
+function TAudioFile.GetReplacedTitle(ReplaceValue: Integer): String;
+begin
+    if trim(Titel) = '' then
+        result := GetReplaceString(ReplaceValue)
+    else
+        result := Titel;
+end;
+function TAudioFile.GetReplacedAlbum(ReplaceValue: Integer): String;
+begin
+    if trim(Album) = '' then
+        result := GetReplaceString(ReplaceValue)
+    else
+        result := Album;
+end;
+
+
+
 procedure TAudioFile.SetPath(const Value: UnicodeString);
 begin
   if IsStream then
@@ -807,20 +862,36 @@ function TAudioFile.fGetPlaylistTitleString: UnicodeString;
 begin
   if isStream then
   begin
-    result := Description;
-    if (titel <> '') and (titel <> pfad) then
-      result := result + ' (' + titel + ')';
+      result := Description;
+      if (titel <> '') and (titel <> pfad) then
+          result := result + ' (' + titel + ')';
   end
   else
   begin
-    if UnKownInformation(Artist) then
-        result := Titel
-    else
-        result := Artist + ' - ' + Titel;
+      if UnKownInformation(Artist) then
+          result := NonEmptyTitle
+      else
+          result := Artist + ' - ' + NonEmptyTitle;
   end;
 
   if result = '' then
-    result := Pfad;
+      result := Pfad;
+end;
+
+{
+    --------------------------------------------------------
+    fGetNonEmptyTitle
+    Needed in Nemp 4.1: if no title-information is found in the Meta-Tags,
+    the title-field will be left blank.
+    But sometimes we NEED some "title".
+    --------------------------------------------------------
+}
+function TAudioFile.fGetNonEmptyTitle: UnicodeString;
+begin
+    if UnKownInformation(Titel) then
+        result := ChangeFileExt(Dateiname, '')
+    else
+        result := Titel;
 end;
 
 function TAudioFile.fGetProperFilename: UnicodeString;
@@ -831,14 +902,18 @@ begin
   begin
       if UnKownInformation(Artist) then
       begin
-          if Titel <> Dateiname then
-              result := Titel + '.' + self.Extension
-          else
-              result := Dateiname;
+          //if NonEmptyTitle <> Dateiname then
+              result := NonEmptyTitle + '.' + self.Extension
+          //else
+          //    result := Dateiname;
       end
       else
-          result := Artist + ' - ' + Titel + '.' + self.Extension;
-
+      begin
+          //if NonEmptyTitle <> Dateiname then
+              result := Artist + ' - ' + NonEmptyTitle + '.' + self.Extension
+          //else
+          //    result := Artist + ' - ' + NonEmptyTitle;
+      end;
       result := ReplaceForbiddenFilenameChars(result);
   end;
 
@@ -945,6 +1020,8 @@ function TAudioFile.fGetLyricsExisting: Boolean;
 begin
   result := flyrics <> '';
 end;
+
+
 
 {
     --------------------------------------------------------
@@ -1501,7 +1578,7 @@ begin
     end;
     FileIsPresent:=True;
     FileChecked := True;
-    Titel := Dateiname;
+    Titel := ''; // Dateiname;
     Artist := '';
     Album := '';
     Track := 0;
@@ -1571,7 +1648,7 @@ end;
 }
 procedure TAudioFile.SetUnknown;
 begin
-  Titel:=Dateiname;
+  Titel := ''; //before Nemp 4.1: Dateiname;
   Artist := '';
   Album := '';
   Year := '';

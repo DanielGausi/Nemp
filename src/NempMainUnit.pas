@@ -3935,19 +3935,19 @@ begin
                               if Data^.FAudioFile.isStream then
                                 CellText := Format('(%s)', [AudioFileProperty_Webstream])
                               else
-                                CellText := Data^.FAudioFile.Artist;
+                                CellText := Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy);
                           end;
           CON_TITEL     : begin
                               if Data^.FAudioFile.isStream then
                                 CellText := Format('(%s)', [AudioFileProperty_Webstream])
                               else
-                                CellText := Data^.FAudioFile.Titel;
+                                CellText := Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy);
                           end;
           CON_ALBUM     : begin
                               if Data^.FAudioFile.isStream then
                                 CellText := Format('(%s)', [AudioFileProperty_Webstream])
                               else
-                                CellText := Data^.FAudioFile.Album;
+                                CellText := Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy);
                           end;
           CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
           CON_BITRATE   : if Data^.FAudioFile.Bitrate > 0 then
@@ -4528,9 +4528,9 @@ begin
             LblBibGenre     .Caption := '';
         end else
         begin
-            LblBibArtist    .Caption := SetString(aAudioFile.Artist, AudioFileProperty_Artist);
-            LblBibTitle     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
-            LblBibAlbum     .Caption := SetString(aAudioFile.Album, AudioFileProperty_Album);
+            LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
+            LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
+            LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
             LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
             LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
             LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
@@ -4786,9 +4786,9 @@ begin
     // Necessary here: (Re)Set aEdit.Text
     if Assigned(MedienBib.CurrentAudioFile) then
     begin
-        EdtBibArtist    .Text := MedienBib.CurrentAudioFile.Artist;
-        EdtBibTitle     .Text := MedienBib.CurrentAudioFile.Titel;
-        EdtBibAlbum     .Text := MedienBib.CurrentAudioFile.Album;
+        EdtBibArtist    .Text := MedienBib.CurrentAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy);
+        EdtBibTitle     .Text := MedienBib.CurrentAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy);
+        EdtBibAlbum     .Text := MedienBib.CurrentAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy);
         EdtBibTrack     .Text := IntToStr(MedienBib.CurrentAudioFile.Track);
         EdtBibYear      .Text := MedienBib.CurrentAudioFile.Year;
         if Trim(MedienBib.CurrentAudioFile.Genre) = '' then
@@ -9009,9 +9009,9 @@ begin
   else
   begin
     HintText :=
-         Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.Artist]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.Titel]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.Album]);
+         Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
+       + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)]) + #13#10
+       + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy)]);
 
     if Data^.FAudioFile.Track <> 0 then
       HintText := HintText + Format(' (%s %d)', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10

@@ -431,6 +431,7 @@ begin
   end;
 
   MainPageControl.ActivePageIndex := 0;
+  MainPageControl.ActivePage := Tab_General;
   DetailRatingHelper := TRatingHelper.Create;
   s := TBitmap.Create;
   h := TBitmap.Create;
@@ -466,6 +467,8 @@ end;
 procedure TFDetails.FormShow(Sender: TObject);
 begin
     MainPageControl.ActivePageIndex := 0;
+    MainPageControl.ActivePage := Tab_General;
+    refresh;
 //    UpdateID3ReadOnlyStatus;
 end;
 
@@ -1263,9 +1266,10 @@ begin
             DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
             LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [LocalPlayCounter]);
           end;
-          LBLArtist.Caption := Artist;
-          LBLTitel.Caption  := Titel;
-          LBLAlbum.Caption  := Album;
+          LBLArtist.Caption := GetReplacedArtist(Nemp_MainForm.NempOptions.ReplaceNAArtistBy); // Artist;
+          LBLTitel.Caption  := GetReplacedTitle(Nemp_MainForm.NempOptions.ReplaceNATitleBy)  ; // Titel;
+          LBLAlbum.Caption  := GetReplacedAlbum(Nemp_MainForm.NempOptions.ReplaceNAAlbumBy) ;  //Album;
+
           LBLTrack.Caption  := IntToStr(Track);
           LBLYear.Caption   := Year;
           LBLGenre.Caption  := genre;
@@ -2344,7 +2348,6 @@ begin
     begin
         Btn_GetTagsClick(Nil);
     end;
-
 end;
 
 
