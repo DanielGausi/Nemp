@@ -2179,9 +2179,9 @@ begin
                          //else
                          begin
                             if UnKownInformation(aAudioFile.Artist) then
-                              result := aAudioFile.Titel
+                                result := aAudioFile.NonEmptyTitle
                             else
-                              result := aAudioFile.Artist + ' - ' + aAudioFile.Titel;// + aaudiofile.Pfad;
+                                result := aAudioFile.Artist + ' - ' + aAudioFile.NonEmptyTitle;// + aaudiofile.Pfad;
                          end;
       MODE_PATH        : result := aAudioFile.Pfad;
       MODE_INFO        : if isURLtmp then
@@ -2265,17 +2265,17 @@ begin
   begin // normale Datei
       if UnKownInformation(MainAudioFile.Artist)then
       begin
-          if length(MainAudioFile.Titel) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Titel + ' - '
+          if length(MainAudioFile.NonEmptyTitle) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
           else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
       end
       else
       begin
-          if length(MainAudioFile.Artist + ' - ' + MainAudioFile.Titel) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.Titel + ' - '
+          if length(MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle) < MinLength then
+              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
           else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.Titel + ' - '
+              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
       end;
   end;
 end;
@@ -2410,7 +2410,7 @@ begin
 
             if Not UnKownInformation(MainAudioFile.Artist) then
             begin
-                s := StringReplace(MainAudioFile.Titel,'&','&&',[rfReplaceAll]);
+                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
                 r := Rect(102, 4, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
                 // get needed Height of the Artist-String
@@ -2438,7 +2438,7 @@ begin
             end else
             begin
                 // just the title
-                s := StringReplace(MainAudioFile.Titel,'&','&&',[rfReplaceAll]);
+                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
                 b.Canvas.Font.Color := Spectrum.PreviewTitleColor;
                 r := Rect(102, 4, 198, 44);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
@@ -2639,9 +2639,9 @@ begin
   if assigned(MainAudioFile) then
   begin
      if UnKownInformation(MainAudioFile.Artist) then
-        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Titel)
+        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.NonEmptyTitle)
      else
-        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Artist + ' - ' + MainAudioFile.Titel);
+        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle);
 
     aStreamName := ReplaceForbiddenFilenameChars(MainAudioFile.Description);
   end

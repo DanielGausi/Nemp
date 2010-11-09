@@ -427,11 +427,6 @@ type
     cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
     cb_PartyMode_BlockTools: TCheckBox;
     Edt_PartyModePassword: TLabeledEdit;
-    GrpBox_TabMedia3_CoverDetails: TGroupBox;
-    LblConst_CoverMode: TLabel;
-    cbCoverMode: TComboBox;
-    LblConst_DetailMode: TLabel;
-    cbDetailMode: TComboBox;
     cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
     CB_EditOnClick: TCheckBox;
     GrpBox_OpenGL: TGroupBox;
@@ -442,6 +437,18 @@ type
     cb_AutoStopHeadset: TCheckBox;
     cbFixCoverFlowOnStart: TCheckBox;
     BtnClearCoverCache: TButton;
+    GrpBox_TabMedia3_CoverDetails: TGroupBox;
+    LblConst_CoverMode: TLabel;
+    LblConst_DetailMode: TLabel;
+    cbCoverMode: TComboBox;
+    cbDetailMode: TComboBox;
+    GrpBox_NAInformation: TGroupBox;
+    LblReplaceArtistBy: TLabel;
+    cbReplaceArtistBy: TComboBox;
+    LblReplaceTitletBy: TLabel;
+    cbReplaceTitleBy: TComboBox;
+    cbReplaceAlbumBy: TComboBox;
+    LblReplaceAlbumBy: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1108,6 +1115,11 @@ begin
   CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
   CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
   cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
+
+  cbReplaceArtistBy.ItemIndex := Nemp_MainForm.NempOptions.ReplaceNAArtistBy;
+  cbReplaceTitleBy .ItemIndex := Nemp_MainForm.NempOptions.ReplaceNATitleBy ;
+  cbReplaceAlbumBy .ItemIndex := Nemp_MainForm.NempOptions.ReplaceNAAlbumBy ;
+
 
   CBAutoScan.Checked := MedienBib.AutoScanDirs;
   LBAutoScan.Enabled := MedienBib.AutoScanDirs;
@@ -2014,6 +2026,11 @@ begin
       MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
       MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
       MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
+
+
+      Nemp_MainForm.NempOptions.ReplaceNAArtistBy := cbReplaceArtistBy.ItemIndex;
+      Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
+      Nemp_MainForm.NempOptions.ReplaceNAAlbumBy := cbReplaceAlbumBy .ItemIndex;
 
       // MedienBib, Suchoptionen
       NeedTotalLyricStringUpdate := MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked;

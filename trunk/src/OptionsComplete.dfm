@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio9
+    ActivePage = TabAnzeige5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2131,6 +2131,61 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = BtnClearCoverCacheClick
         end
       end
+      object GrpBox_TabMedia3_CoverDetails: TGroupBox
+        Left = 12
+        Top = 364
+        Width = 434
+        Height = 76
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Cover && Details'
+        TabOrder = 2
+        object LblConst_CoverMode: TLabel
+          Left = 13
+          Top = 22
+          Width = 56
+          Height = 13
+          Hint = 'Display the cover and some other details in the library.'
+          Caption = 'Show cover'
+        end
+        object LblConst_DetailMode: TLabel
+          Left = 135
+          Top = 22
+          Width = 154
+          Height = 13
+          AutoSize = False
+          Caption = 'Show additional details'
+        end
+        object cbCoverMode: TComboBox
+          Left = 9
+          Top = 39
+          Width = 89
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 1
+          TabOrder = 0
+          Text = 'Left'
+          Items.Strings = (
+            'Disabled'
+            'Left'
+            'Right')
+        end
+        object cbDetailMode: TComboBox
+          Left = 135
+          Top = 41
+          Width = 106
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 1
+          TabOrder = 1
+          Text = 'Aside'
+          Items.Strings = (
+            'Disabled'
+            'Aside'
+            'Below')
+        end
+      end
     end
     object TabAnzeige5: TTabSheet
       Caption = 'Anzeige2 (View)'
@@ -2150,12 +2205,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_TabMedia3_Browseby: TGroupBox
         Left = 8
-        Top = 142
+        Top = 228
         Width = 434
         Height = 111
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Browsing in the medialibrary'
-        TabOrder = 1
+        TabOrder = 2
         object Label44: TLabel
           Left = 12
           Top = 20
@@ -2289,59 +2344,92 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 3
         end
       end
-      object GrpBox_TabMedia3_CoverDetails: TGroupBox
+      object GrpBox_NAInformation: TGroupBox
         Left = 8
-        Top = 255
-        Width = 434
-        Height = 83
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Cover && Details'
-        TabOrder = 2
-        object LblConst_CoverMode: TLabel
-          Left = 13
-          Top = 22
-          Width = 56
-          Height = 13
-          Hint = 'Display the cover and some other details in the library.'
-          Caption = 'Show cover'
-        end
-        object LblConst_DetailMode: TLabel
-          Left = 135
-          Top = 22
-          Width = 154
+        Top = 137
+        Width = 433
+        Height = 88
+        Caption = 
+          'Not available metadata (If ... is not available, use ... instead' +
+          ')'
+        TabOrder = 1
+        object LblReplaceArtistBy: TLabel
+          Left = 12
+          Top = 24
+          Width = 97
           Height = 13
           AutoSize = False
-          Caption = 'Show additional details'
+          Caption = 'Artist'
         end
-        object cbCoverMode: TComboBox
-          Left = 9
-          Top = 39
-          Width = 89
+        object LblReplaceTitletBy: TLabel
+          Left = 153
+          Top = 24
+          Width = 97
+          Height = 13
+          AutoSize = False
+          Caption = 'Title'
+        end
+        object LblReplaceAlbumBy: TLabel
+          Left = 297
+          Top = 24
+          Width = 97
+          Height = 13
+          AutoSize = False
+          Caption = 'Album'
+        end
+        object cbReplaceArtistBy: TComboBox
+          Left = 12
+          Top = 42
+          Width = 125
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          ItemIndex = 1
+          ItemIndex = 3
           TabOrder = 0
-          Text = 'Left'
+          Text = 'Directory (last part)'
           Items.Strings = (
-            'Disabled'
-            'Left'
-            'Right')
+            '(Empty string)'
+            #39'N/A'#39
+            'Filename'
+            'Directory (last part)'
+            'Directory'
+            'Complete path')
         end
-        object cbDetailMode: TComboBox
-          Left = 135
-          Top = 41
-          Width = 106
+        object cbReplaceTitleBy: TComboBox
+          Left = 153
+          Top = 42
+          Width = 125
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          ItemIndex = 1
+          ItemIndex = 2
           TabOrder = 1
-          Text = 'Aside'
+          Text = 'Filename'
           Items.Strings = (
-            'Disabled'
-            'Aside'
-            'Below')
+            '(Empty string)'
+            #39'N/A'#39
+            'Filename'
+            'Directory (last part)'
+            'Directory'
+            'Complete path')
+        end
+        object cbReplaceAlbumBy: TComboBox
+          Left = 297
+          Top = 42
+          Width = 125
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 4
+          TabOrder = 2
+          Text = 'Directory'
+          Items.Strings = (
+            '(Empty string)'
+            #39'N/A'#39
+            'Filename'
+            'Directory (last part)'
+            'Directory'
+            'Complete path')
         end
       end
     end
