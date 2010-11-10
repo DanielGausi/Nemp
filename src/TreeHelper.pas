@@ -347,33 +347,62 @@ end;
 function GetOldNode(aString: UnicodeString; aTree: TVirtualStringTree): PVirtualNode;
 var aData: PStringTreeData;
     currentString: UnicodeString;
+    c: Integer;
+    found: Boolean;
 begin
     result := aTree.GetFirst;
-    if assigned(result) then
-    begin
-        repeat
-            aData := aTree.GetNodeData(result);
-            currentString := TJustAstring(aData^.FString).DataString;
-            if AnsiCompareText(currentString, aString) < 0 then
-                result := aTree.GetNext(result);
-        until (Not assigned(result)) OR
-                          (AnsiCompareText(currentString, aString) >= 0);
 
-      {  if assigned(result) and ((currentString = AUDIOFILE_UNKOWN) and (aString <> AUDIOFILE_UNKOWN) )  then
+    // Search for the empty-DataString
+    // If it is not in the first 5 Nodes, it surely doesnt exist any longer.
+    // return first node then
+    if aString = '' then
+    begin
+        if assigned(result) then
         begin
-            result := aTree.GetNext(result);
-            aData := aTree.GetNodeData(result);
-            currentString := TJustAstring(aData^.FString).DataString;
-            // weitersuchen
-            while Assigned(result) and (AnsiCompareText(currentString, aString) < 0) do
+            c := 1;
+            found := False;
+            repeat
+                aData := aTree.GetNodeData(result);
+                if TJustAstring(aData^.FString).DataString = '' then
+                    found := True
+                else
+                begin
+                    inc(c);
+                    result := aTree.GetNext(result);
+                end;
+            until (Not assigned(result)) OR Found OR (C > 5);
+            if Not Found then
+                result := aTree.GetFirst;
+        end;
+    end else
+    begin
+        // some "real"-DataString. Search until Current >= aString
+        if assigned(result) then
+        begin
+            repeat
+                aData := aTree.GetNodeData(result);
+                currentString := TJustAstring(aData^.FString).DataString;
+                if AnsiCompareText(currentString, aString) < 0 then
+                    result := aTree.GetNext(result);
+            until (Not assigned(result)) OR
+                              (AnsiCompareText(currentString, aString) >= 0);
+
+          {  if assigned(result) and ((currentString = AUDIOFILE_UNKOWN) and (aString <> AUDIOFILE_UNKOWN) )  then
             begin
                 result := aTree.GetNext(result);
                 aData := aTree.GetNodeData(result);
                 currentString := TJustAstring(aData^.FString).DataString;
+                // weitersuchen
+                while Assigned(result) and (AnsiCompareText(currentString, aString) < 0) do
+                begin
+                    result := aTree.GetNext(result);
+                    aData := aTree.GetNodeData(result);
+                    currentString := TJustAstring(aData^.FString).DataString;
+                end;
             end;
-        end;
-        }
-    end
+            }
+        end
+    end;
 end;
 
 

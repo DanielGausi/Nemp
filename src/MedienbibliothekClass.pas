@@ -529,6 +529,8 @@ type
         procedure CompleteSearch(Keywords: TSearchKeyWords);
         // c. get all files from the library in the same directory
         procedure GetFilesInDir(aDirectory: UnicodeString);
+        // d. Special case: Search for Empty Strings
+        procedure EmptySearch(Mode: Integer);
 
         // Sorting the Lists
         procedure AddSorter(TreeHeaderColumnTag: Integer; FlipSame: Boolean = True);
@@ -3757,6 +3759,14 @@ begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
     BibSearcher.IPCQuickSearch(Keyword);
+    LeaveCriticalSection(CSUpdate);
+end;
+
+procedure TMedienBibliothek.EmptySearch(Mode: Integer);
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.EmptySearch(Mode);
     LeaveCriticalSection(CSUpdate);
 end;
 
