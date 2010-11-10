@@ -265,6 +265,8 @@ type
         procedure CompleteSearch(Keywords: TSearchKeyWords);
         // Search for IPC (as used in the Deskband)
         procedure IPCQuickSearch(Keyword: UnicodeString);
+
+        procedure EmptySearch(Mode: Integer);
     end;
 
 // Helpers for Quicksearch.
@@ -1500,6 +1502,62 @@ begin
     // show search results
     SetQuickSearchList(CurrentList);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
+end;
+
+{
+    --------------------------------------------------------
+    EmptySearch
+    Search only for emtpy strings
+    --------------------------------------------------------
+}
+procedure TBibSearcher.EmptySearch(Mode: Integer);
+var tmpList: TObjectList;
+    i: Integer;
+begin
+    tmpList := TObjectList.Create(False);
+    try
+        case Mode of
+            1: begin // Title
+                for i := 0 to MainList.Count - 1 do
+                begin
+                    if TAudioFile(MainList[i]).Titel = '' then
+                        tmpList.Add(MainList[i]);
+                end;
+
+            end;
+            2: begin // Artist
+                for i := 0 to MainList.Count - 1 do
+                begin
+                    if TAudioFile(MainList[i]).Artist = '' then
+                        tmpList.Add(MainList[i]);
+                end;
+            end;
+            3: begin // Album
+                for i := 0 to MainList.Count - 1 do
+                begin
+                    if TAudioFile(MainList[i]).Album = '' then
+                        tmpList.Add(MainList[i]);
+                end;
+            end;
+            42: begin
+                for i := 0 to MainList.Count - 1 do
+                begin
+                    if (TAudioFile(MainList[i]).Album = '')
+                      or (TAudioFile(MainList[i]).Artist = '')
+                      or (TAudioFile(MainList[i]).Titel = '')
+                    then
+                        tmpList.Add(MainList[i]);
+                end;
+
+            end;
+        end;
+
+        SetQuickSearchList(tmpList);
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(tmpList));
+    finally
+        tmpList.Free;
+    end;
+
 end;
 
 end.

@@ -490,6 +490,11 @@ MainForm_MenuCaptionsSearchForTitle  = 'Search for this title';
 MainForm_MenuCaptionsSearchForArtist = 'Search for this artist';
 MainForm_MenuCaptionsSearchForAlbum  = 'Search for this album';
 
+MainForm_MenuCaptionsSearchForEmptyTitle  = 'Show all files where "Title" is missing';
+MainForm_MenuCaptionsSearchForEmptyArtist = 'Show all files where "Artist" is missing';
+MainForm_MenuCaptionsSearchForEmptyAlbum  = 'Show all files where "Album" is missing';
+
+
 MainForm_MainMenu_Messages = 'Messages (%d)';
 MainForm_MainMenu_NoMessages = 'Messages';
 ErrorForm_NoMessages = 'No new messages, everything is fine. :)';

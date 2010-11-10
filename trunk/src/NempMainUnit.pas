@@ -815,6 +815,8 @@ type
     PM_PL_CopyPlaylistToUSB: TMenuItem;
     MM_PL_CopyPlaylistToUSB: TMenuItem;
     MM_H_ErrorLog: TMenuItem;
+    N76: TMenuItem;
+    PM_ML_ShowAllIncompleteTaggedFiles: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1365,6 +1367,7 @@ type
     procedure PM_PL_MagicCopyToClipboardClick(Sender: TObject);
     procedure PM_PL_CopyPlaylistToUSBClick(Sender: TObject);
     procedure MM_H_ErrorLogClick(Sender: TObject);
+    procedure PM_ML_ShowAllIncompleteTaggedFilesClick(Sender: TObject);
 
   private
 
@@ -3516,15 +3519,26 @@ begin
 
     if (aVST = VST) AND (aVST.FocusedNode <> NIL) then
     begin
-      Data := aVST.GetNodeData(aVST.FocusedNode);
-      PM_ML_ExtendedSearchTitle.Caption  := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Titel]);
-      PM_ML_ExtendedSearchArtist.Caption := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Artist]);
-      PM_ML_ExtendedSearchAlbum.Caption  := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Album]);
+        Data := aVST.GetNodeData(aVST.FocusedNode);
+        if Data.FAudioFile.Titel = '' then
+            PM_ML_ExtendedSearchTitle.Caption := MainForm_MenuCaptionsSearchForEmptyTitle
+        else
+            PM_ML_ExtendedSearchTitle.Caption  := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Titel]);
+
+        if Data.FAudioFile.Artist = '' then
+            PM_ML_ExtendedSearchArtist.Caption := MainForm_MenuCaptionsSearchForEmptyArtist
+        else
+            PM_ML_ExtendedSearchArtist.Caption := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Artist]);
+
+        if Data.FAudioFile.Album = '' then
+            PM_ML_ExtendedSearchAlbum.Caption := MainForm_MenuCaptionsSearchForEmptyAlbum
+        else
+            PM_ML_ExtendedSearchAlbum.Caption  := Format((MainForm_MenuCaptionsSearchForVar), [Data.FAudioFile.Album]);
     end else
     begin
-      PM_ML_ExtendedSearchTitle.Caption  := (MainForm_MenuCaptionsSearchForTitle);
-      PM_ML_ExtendedSearchArtist.Caption := (MainForm_MenuCaptionsSearchForArtist);
-      PM_ML_ExtendedSearchAlbum.Caption  := (MainForm_MenuCaptionsSearchForAlbum)
+        PM_ML_ExtendedSearchTitle.Caption  := (MainForm_MenuCaptionsSearchForTitle);
+        PM_ML_ExtendedSearchArtist.Caption := (MainForm_MenuCaptionsSearchForArtist);
+        PM_ML_ExtendedSearchAlbum.Caption  := (MainForm_MenuCaptionsSearchForAlbum)
     end;
 
     // Additional: Hide most of the items when opening from the Browse-Part
@@ -3652,6 +3666,8 @@ begin
     end else
         AktualisiereDetailForm(NIL, detUpdate);
 end;
+
+
 
 procedure TNemp_MainForm.PM_ML_ShowInExplorerClick(Sender: TObject);
 var
@@ -6739,6 +6755,7 @@ var aNode: pVirtualNode;
     Data: PTreeData;
     newComboBoxString: UnicodeString;
     KeyWords: TSearchKeyWords;
+    SearchString: String;
 begin
     Medienbib.BibSearcher.SearchOptions.SearchParam := 0;       // = New Search
     Medienbib.BibSearcher.SearchOptions.AllowErrors := False;  // no errors allowed
@@ -6756,28 +6773,50 @@ begin
 
     Data := VST.GetNodeData(aNode);
     case (Sender as TMenuItem).Tag of
-        1: KeyWords.Titel  := (Data^.FaudioFile).Titel;
-        2: KeyWords.Artist := (Data^.FaudioFile).Artist;
-        3: KeyWords.Album  := (Data^.FaudioFile).Album;
+        1: begin
+            KeyWords.Titel  := (Data^.FaudioFile).Titel;
+            SearchString := KeyWords.Titel;
+        end;
+        2: begin
+            KeyWords.Artist := (Data^.FaudioFile).Artist;
+            SearchString := KeyWords.Artist;
+        end;
+        3: begin
+            KeyWords.Album  := (Data^.FaudioFile).Album;
+            SearchString := KeyWords.Album;
+        end;
     end;
 
-    newComboBoxString := '';
-    StringAdd(newComboBoxString, KeyWords.General  );
-    StringAdd(newComboBoxString, KeyWords.Artist   );
-    StringAdd(newComboBoxString, KeyWords.Album    );
-    StringAdd(newComboBoxString, KeyWords.Titel    );
-    StringAdd(newComboBoxString, KeyWords.Pfad     );
-    StringAdd(newComboBoxString, KeyWords.Kommentar);
-    StringAdd(newComboBoxString, KeyWords.Lyric    );
-    if newComboBoxString = '' then
-        newComboBoxString := (MainForm_NoSearchKeywords);
+    if SearchString = '' then
+    begin
+        // MedienBib.EmptyArtist/Titel/AlbumSearch
+        MedienBib.EmptySearch((Sender as TMenuItem).Tag);
+    end else
+    begin
+        newComboBoxString := '';
+        StringAdd(newComboBoxString, KeyWords.General  );
+        StringAdd(newComboBoxString, KeyWords.Artist   );
+        StringAdd(newComboBoxString, KeyWords.Album    );
+        StringAdd(newComboBoxString, KeyWords.Titel    );
+        StringAdd(newComboBoxString, KeyWords.Pfad     );
+        StringAdd(newComboBoxString, KeyWords.Kommentar);
+        StringAdd(newComboBoxString, KeyWords.Lyric    );
+        if newComboBoxString = '' then
+            newComboBoxString := (MainForm_NoSearchKeywords);
 
-    KeyWords.ComboBoxString := newComboBoxString;
+        KeyWords.ComboBoxString := newComboBoxString;
 
-    Medienbib.BibSearcher.InitNewSearch(KeyWords);
-    Medienbib.BibSearcher.SearchOptions.SkipGenreCheck  := True;
-    Medienbib.BibSearcher.SearchOptions.SkipYearCheck  := True;
-    MedienBib.CompleteSearch(Keywords);
+        Medienbib.BibSearcher.InitNewSearch(KeyWords);
+        Medienbib.BibSearcher.SearchOptions.SkipGenreCheck  := True;
+        Medienbib.BibSearcher.SearchOptions.SkipYearCheck  := True;
+        MedienBib.CompleteSearch(Keywords);
+    end;
+end;
+
+procedure TNemp_MainForm.PM_ML_ShowAllIncompleteTaggedFilesClick(
+  Sender: TObject);
+begin
+    MedienBib.EmptySearch(42);
 end;
 
 
@@ -10685,6 +10724,8 @@ begin
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
         Lbl_CoverFlow.Caption := aCover.InfoString;
+
+        caption := aCover.key;
     end;
 end;
 
