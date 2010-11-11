@@ -134,10 +134,6 @@ type
         // new quicksearch-results should not change this list
         QuickSearchList: TObjectList;
 
-        // Contains the results of a quicksearch
-        QuickSearchResults: TObjectList;
-        QuickSearchAdditionalResults: TObjectList;
-
         fIPCSearchIsRunning: Boolean;
 
         // Some Flags for the search
@@ -201,6 +197,11 @@ type
       public
         // Main list. This is just a pointer to TMedienBibliothek.Mp3ListePfadSort
         MainList: TObjectList;
+
+        // Contains the results of a quicksearch
+        QuickSearchResults: TObjectList;
+        QuickSearchAdditionalResults: TObjectList;
+
 
         // The IPC-Search results for the Deskband. VCL only!!
         IPCSearchResults: TObjectList;

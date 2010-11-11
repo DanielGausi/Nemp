@@ -246,6 +246,9 @@ type
         // Get all Cover from the Library (TNempCover, used for browsing)
         procedure GenerateCoverList(Source: TObjectlist; Target: TObjectlist);
 
+        procedure GenerateCoverListFromSearchResult(Source: TObjectlist; Target: TObjectlist);
+
+
         // Helper for Browsing Between
         // "Start" and "Ende" are the files with the wanted "Name"
         procedure GetStartEndIndex(Liste: TObjectlist; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
@@ -492,8 +495,10 @@ type
         //    see private methods, called during update-process
         // 2. Regenerate BrowseLists
         Procedure ReBuildBrowseLists;     // Complete Rebuild
-        procedure ReBuildCoverList;       // -"- of CoverLists
+        procedure ReBuildCoverList(FromScratch: Boolean = True);       // -"- of CoverLists
+        procedure ReBuildCoverListFromList(aList, bList: TObjectList);  // used to refresh coverflow on QuickSearch
         procedure ReBuildTagCloud;        // -"- of the TagCloud
+
         procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
         procedure RestoreTagCloudNavigation;
         procedure RepairBrowseListsAfterDelete; // Rebuild, but sorting is not needed
@@ -3101,39 +3106,39 @@ begin
 
   for i := 1 to Source.Count - 1 do
   begin
-    aktualAudioFile := (Source[i] as TAudioFile);
-    aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
-    aktualID := aktualAudioFile.CoverID;
-    if SameText(aktualID, lastID) then
-    begin
-      AudioFilesWithSameCover.Add(aktualAudioFile);
-    end else
-    begin
-      // Checklist (liste, cover)
-      GetCoverInfos(AudioFilesWithSameCover, newCover);
-
-      // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
-      if HideNACover then
+      aktualAudioFile := (Source[i] as TAudioFile);
+      aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
+      aktualID := aktualAudioFile.CoverID;
+      if SameText(aktualID, lastID) then
       begin
-          if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
-          begin
-              // discard current cover
-              NewCover.Free;
-              Target.Delete(Target.Count - 1);
-          end;
-      end;
+          AudioFilesWithSameCover.Add(aktualAudioFile);
+      end else
+      begin
+          // Checklist (liste, cover)
+          GetCoverInfos(AudioFilesWithSameCover, newCover);
 
-      // Neues Cover erstellen und neue Liste anfangen
-      lastID := aktualID;
-      newCover := TNempCover.Create;
-      newCover.ID := aktualAudioFile.CoverID;
-      newCover.key := newCover.ID;
-      NewCover.Year := StrToIntDef(aktualAudioFile.Year, 0);
-      NewCover.Genre := aktualAudioFile.Genre;
-      Target.Add(NewCover);
-      AudioFilesWithSameCover.Clear;
-      AudioFilesWithSameCover.Add(aktualAudioFile);
-    end;
+          // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
+          if HideNACover then
+          begin
+              if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
+              begin
+                  // discard current cover
+                  NewCover.Free;
+                  Target.Delete(Target.Count - 1);
+              end;
+          end;
+
+          // Neues Cover erstellen und neue Liste anfangen
+          lastID := aktualID;
+          newCover := TNempCover.Create;
+          newCover.ID := aktualAudioFile.CoverID;
+          newCover.key := newCover.ID;
+          NewCover.Year := StrToIntDef(aktualAudioFile.Year, 0);
+          NewCover.Genre := aktualAudioFile.Genre;
+          Target.Add(NewCover);
+          AudioFilesWithSameCover.Clear;
+          AudioFilesWithSameCover.Add(aktualAudioFile);
+      end;
   end;
 
   // Check letzte List
@@ -3170,6 +3175,84 @@ begin
   }
 end;
 
+procedure TMedienBibliothek.GenerateCoverListFromSearchResult(Source,
+  Target: TObjectlist);
+var i: Integer;
+    newCover: TNempCover;
+    AudioFilesWithSameCover: TObjectlist;
+    currentAudioFile: TAudioFile;
+    currentID, lastID: String;
+
+begin
+    for i := 0 to Target.Count - 1 do
+        TNempCover(Target[i]).Free;
+    Target.Clear;
+
+    newCover := TNempCover.Create;
+    newCover.ID := 'searchresult';
+    newCover.key := 'searchresult';
+    newCover.Artist := 'All artists';
+    Newcover.Album := 'Current search result';
+    Target.Add(NewCover);
+
+    if Source.Count < 1 then
+    begin
+        GetRandomCover(Target);
+        exit;
+    end;
+
+    AudioFilesWithSameCover := TObjectlist.Create(False);
+    try
+        i := 0;
+        while i <= Source.Count - 1 do
+        begin
+            currentAudioFile := (Source[i] as TAudioFile);
+            currentAudioFile.Key1 := currentAudioFile.CoverID;   // copy ID to key1
+
+            // create cover with ID of the current AudioFile
+            currentID := currentAudioFile.CoverID;
+            lastID := currentID;
+
+            newCover := TNempCover.Create;
+            newCover.ID := currentAudioFile.CoverID;
+            newCover.key := newCover.ID;
+            NewCover.Artist := currentAudioFile.Artist;
+            NewCover.Album := currentAudioFile.Album;
+            NewCover.Year := StrToIntDef(currentAudioFile.Year, 0);
+            NewCover.Genre := currentAudioFile.Genre;
+            Target.Add(NewCover);
+            // get all AudioFiles with this ID from the COMPLETE List
+            GetTitelListFromCoverID(AudioFilesWithSameCover, currentID);
+
+            // get Infos from these files
+            GetCoverInfos(AudioFilesWithSameCover, newCover);
+
+            // get index of first audiofile with a different CoverID
+            repeat
+                inc (i);
+            until (i > Source.Count - 1) or ((Source[i] as TAudioFile).CoverID <> currentID);
+        end; // while
+
+        // Coverliste sortieren
+        case CoverSortorder of
+            1: Target.Sort(CoverSort_Artist);
+            2: Target.Sort(CoverSort_Album);
+            3: Target.Sort(CoverSort_Genre);
+            4: Target.Sort(CoverSort_Jahr);
+            5: Target.Sort(CoverSort_GenreYear);
+            6: Target.Sort(CoverSort_DirectoryArtist);
+            7: Target.Sort(CoverSort_DirectoryAlbum);
+            8: Target.Sort(CoverSort_FileAgeAlbum);
+            9: Target.Sort(CoverSort_FileAgeArtist);
+        end;
+        GetRandomCover(Target);
+
+    finally
+        AudioFilesWithSameCover.Free;
+    end;
+
+end;
+
 {
     --------------------------------------------------------
     ReBuildBrowseLists
@@ -3193,11 +3276,35 @@ end;
     - update the coverlist
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.ReBuildCoverList;
+procedure TMedienBibliothek.ReBuildCoverList(FromScratch: Boolean = True);
 begin
-  Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-  Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+  if FromScratch then
+  begin
+      Mp3ListeArtistSort.Sort(Sortieren_CoverID);
+      Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+  end;
   GenerateCoverList(Mp3ListeArtistSort, CoverList);
+end;
+
+procedure TMedienBibliothek.ReBuildCoverListFromList(aList, bList: TObjectList);
+var tmpList: TObjectList;
+    i: integer;
+begin
+    // copy Items, SourceList should not be sorted
+    tmpList := TObjectList.Create(False);
+    try
+        for i := 0 to aList.Count - 1 do
+            tmpList.Add(aList[i]);
+        for i := 0 to bList.Count - 1 do
+            tmpList.Add(bList[i]);
+
+        tmpList.Sort(Sortieren_CoverID);
+
+        GenerateCoverListFromSearchResult(tmpList, CoverList);
+
+    finally
+        tmpList.Free;
+    end;
 end;
 
 {
@@ -3594,17 +3701,28 @@ procedure TMedienBibliothek.GetTitelListFromCoverID(Target: TObjectlist; aCoverI
 var i, Start, Ende: integer;
 begin
   Target.Clear;
-  Start := 0;
-  Ende := Mp3ListeArtistSort.Count - 1;
 
-  if (aCoverID <> 'all') then // and (aCoverID <> '') then
-    GetStartEndIndexCover(Mp3ListeArtistSort, aCoverID, Start, Ende);
+  if aCoverID = 'searchresult' then
+  begin
+      // special case: Show all Files in Quicksearchlist
+      for i := 0 to BibSearcher.QuickSearchResults.Count - 1 do
+          Target.Add(BibSearcher.QuickSearchResults[i]);
+      for i := 0 to BibSearcher.QuickSearchAdditionalResults.Count - 1 do
+          Target.Add(BibSearcher.QuickSearchAdditionalResults[i]);
+  end else
+  begin
+      Start := 0;
+      Ende := Mp3ListeArtistSort.Count - 1;
 
-  if (start > Mp3ListeArtistSort.Count - 1) OR (Mp3ListeArtistSort.Count < 1) or (start < 0) then
-      exit;
+      if (aCoverID <> 'all') then // and (aCoverID <> '') then
+        GetStartEndIndexCover(Mp3ListeArtistSort, aCoverID, Start, Ende);
 
-  for i := Start to Ende do
-      Target.Add(Mp3ListeArtistSort[i]);
+      if (start > Mp3ListeArtistSort.Count - 1) OR (Mp3ListeArtistSort.Count < 1) or (start < 0) then
+          exit;
+
+      for i := Start to Ende do
+          Target.Add(Mp3ListeArtistSort[i]);
+  end;
 end;
 {
     --------------------------------------------------------
@@ -3709,6 +3827,7 @@ begin
     nextIdx := (nextIdx + 1) Mod (Coverlist.Count);
   until erfolg or (nextIdx = StartIdx);
 end;
+
 
 
 {
