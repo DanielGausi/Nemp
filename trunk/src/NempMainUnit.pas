@@ -817,6 +817,7 @@ type
     MM_H_ErrorLog: TMenuItem;
     N76: TMenuItem;
     PM_ML_ShowAllIncompleteTaggedFiles: TMenuItem;
+    RefreshCoverFlowTimer: TTimer;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1368,6 +1369,7 @@ type
     procedure PM_PL_CopyPlaylistToUSBClick(Sender: TObject);
     procedure MM_H_ErrorLogClick(Sender: TObject);
     procedure PM_ML_ShowAllIncompleteTaggedFilesClick(Sender: TObject);
+    procedure RefreshCoverFlowTimerTimer(Sender: TObject);
 
   private
 
@@ -5388,6 +5390,20 @@ begin
 end;
 
 
+procedure TNemp_MainForm.RefreshCoverFlowTimerTimer(Sender: TObject);
+begin
+    RefreshCoverFlowTimer.Enabled := False;
+    MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2);
+
+    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
+
+    If MedienBib.Coverlist.Count > 3 then
+        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+    else
+        CoverScrollbar.Max := 3;
+    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+end;
+
 procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
   const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType);
@@ -8981,6 +8997,7 @@ begin
     EditFastSearch.OnChange := Nil;
     EditFastSearch.Text := MainForm_GlobalQuickSearch;
     EditFastSearch.OnChange := EDITFastSearchChange;
+    RestoreCoverFlowAfterSearch;
     MedienBib.ShowQuickSearchList;
 end;
 
@@ -8991,14 +9008,23 @@ begin
           begin
             key := #0;
             if Trim(EDITFastSearch.Text)= '' then
-                MedienBib.ShowQuickSearchList
+            begin
+                MedienBib.ShowQuickSearchList;
+                RestoreCoverFlowAfterSearch;
+            end
             else
+            begin
+                RefreshCoverFlowTimer.Enabled := False;
                 DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
+                // Restart Timer
+                RefreshCoverFlowTimer.Enabled := True;
+            end;
           end;
       VK_ESCAPE:
           begin
               key := #0;
               EDITFastSearch.Text := '';
+              RestoreCoverFlowAfterSearch;
           end
   end;
 end;
@@ -9009,10 +9035,21 @@ begin
   If MedienBib.BibSearcher.QuickSearchOptions.WhileYouType then
   begin
       if Trim(EDITFastSearch.Text)= '' then
-          MedienBib.ShowQuickSearchList
+      begin
+          MedienBib.ShowQuickSearchList;
+          RestoreCoverFlowAfterSearch;
+      end
       else
           if Length(Trim(EDITFastSearch.Text)) >= 2 then
-              DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType)
+          begin
+              RefreshCoverFlowTimer.Enabled := False;
+              DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
+              if (MedienBib.AnzeigeListe.Count) + (MedienBib.AnzeigeListe2.Count) > 1 then
+              begin
+                  // Restart Timer
+                  RefreshCoverFlowTimer.Enabled := True;
+              end;
+          end
           else
           begin
               MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
@@ -10724,8 +10761,6 @@ begin
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
         Lbl_CoverFlow.Caption := aCover.InfoString;
-
-        caption := aCover.key;
     end;
 end;
 

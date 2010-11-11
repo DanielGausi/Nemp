@@ -136,6 +136,8 @@ var tmp1:integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -152,6 +154,8 @@ var tmp1:integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -167,6 +171,8 @@ function CoverSort_Genre(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -179,6 +185,8 @@ function CoverSort_GenreYear(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -191,6 +199,8 @@ function CoverSort_Jahr(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -203,6 +213,8 @@ function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -215,6 +227,8 @@ function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -227,6 +241,8 @@ function CoverSort_DirectoryArtist(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
@@ -239,6 +255,8 @@ function CoverSort_DirectoryAlbum(item1,item2:pointer):integer;
 begin
   if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
   if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+  if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+  if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin

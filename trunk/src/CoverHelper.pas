@@ -647,7 +647,7 @@ function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: tBitmap; aDir: String
 var aJpg: TJpegImage;
 begin
     result := true;
-    if aCoverID = 'all' then
+    if (aCoverID = 'all') or (aCoverID = 'searchresult') then
     begin
         // PaintPersonalCover
         PaintPersonalMainCover(aCoverBmp);

@@ -88,6 +88,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
     procedure SwitchBrowsePanel(NewMode: Integer);
 
+    procedure RestoreCoverFlowAfterSearch;
+
 //    procedure BackupComboboxes;    // We dont have any comboboxes on the mainform
 //    procedure RestoreComboboxes;   // except the genre-box
     procedure ReTranslateNemp(LanguageCode: String);
@@ -932,6 +934,26 @@ begin
         end;
         //MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
     end;
+end;
+
+procedure RestoreCoverFlowAfterSearch;
+begin
+    with Nemp_MainForm do
+    begin
+        RefreshCoverFlowTimer.Enabled := False;
+        MedienBib.ReBuildCoverList(False);
+        MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+
+        If MedienBib.Coverlist.Count > 3 then
+            CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+        else
+            CoverScrollbar.Max := 3;
+        CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+
+        hier noch irgendwie für "Lbl_CoverFlow.Caption := aCover.InfoString;" sorgen
+
+    end;
+
 end;
 
 (*

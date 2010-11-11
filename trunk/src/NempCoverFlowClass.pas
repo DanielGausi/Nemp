@@ -92,7 +92,7 @@ type
 
             // After a reinit of the library (swapping lists)
             // we need to correct the CoverList-Pointer
-            procedure SetNewList(aList: TObjectList);
+            procedure SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
 
             // Clear Textures and force redrawing
             procedure ClearTextures;
@@ -103,7 +103,7 @@ type
 
             // After a sorting of the Coverlist, the current selected cover should be selected
             // again. FindCurrentItemAgain finds it in the List and Set the CurrentItem properly
-            procedure FindCurrentItemAgain;
+            procedure FindCurrentItemAgain(FallBackToZero: Boolean = False);
 
             // ReInitAfterSort: Used by ClassicMode.
             // FlyingCow doesnt need a sorted copy of the NempCoverList
@@ -215,7 +215,7 @@ begin
     end;
 end;
 
-procedure TNempCoverFlow.FindCurrentItemAgain;
+procedure TNempCoverFlow.FindCurrentItemAgain(FallBackToZero: Boolean = False);
 var i, newItem: Integer;
 begin
     newItem := -1;
@@ -226,16 +226,21 @@ begin
         break;
     end;
     if newItem = -1 then
+    begin
         // Change item, so there is a "change" notified by the main window. ;-)
-        newItem := fCurrentItem - 1;
-    if (newItem >= fCoverlist.Count) or (newItem < 0) then
-        newItem := 0;
-
+        if FallBackToZero then
+            newItem := 0
+        else
+        begin
+            newItem := fCurrentItem - 1;
+            if (newItem >= fCoverlist.Count) or (newItem < 0) then
+                newItem := 0;
+        end;
+    end;
 
     Currentitem := newItem;
     if fMode = cm_OpenGL then
         fFlyingCow.Cleartextures;
-
 end;
 
 procedure TNempCoverFlow.ReInitAfterSort;
@@ -374,7 +379,7 @@ begin
     end;
 end;
 
-procedure TNempCoverFlow.SetNewList(aList: TObjectList);
+procedure TNempCoverFlow.SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
 var i: Integer;
 begin
     fCoverList := aList;
@@ -397,7 +402,7 @@ begin
               fFlyingCow.DoSomeDrawing(10);
         end;
     end;
-    FindCurrentItemAgain;
+    FindCurrentItemAgain(FallBackToZero);
 end;
 
 procedure TNempCoverFlow.ClearTextures;
