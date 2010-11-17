@@ -2090,6 +2090,10 @@ begin
             MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
             Lbl_CoverFlow.Caption := aCover.InfoString;
         end;
+    end else
+    begin
+        aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+        Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
     CoverScrollbar.OnChange := CoverScrollbarChange;
 end;
@@ -5393,15 +5397,27 @@ end;
 procedure TNemp_MainForm.RefreshCoverFlowTimerTimer(Sender: TObject);
 begin
     RefreshCoverFlowTimer.Enabled := False;
+
+    if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
+        exit;
+
+
     MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2);
 
-    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
 
+    CoverScrollbar.OnChange := Nil;
     If MedienBib.Coverlist.Count > 3 then
         CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
     else
         CoverScrollbar.Max := 3;
-    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+
+    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
+
+    CoverScrollbar.OnChange := CoverScrollbarChange;
+
+    MedienBib.NewCoverFlow.Paint(10);
+
+    //CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
 end;
 
 procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
@@ -9017,7 +9033,10 @@ begin
                 RefreshCoverFlowTimer.Enabled := False;
                 DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
                 // Restart Timer
-                RefreshCoverFlowTimer.Enabled := True;
+                if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
+                    AND (MedienBib.BrowseMode = 1)
+                then
+                    RefreshCoverFlowTimer.Enabled := True;
             end;
           end;
       VK_ESCAPE:
@@ -9047,7 +9066,10 @@ begin
               if (MedienBib.AnzeigeListe.Count) + (MedienBib.AnzeigeListe2.Count) > 1 then
               begin
                   // Restart Timer
-                  RefreshCoverFlowTimer.Enabled := True;
+                  if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
+                      AND (MedienBib.BrowseMode = 1)
+                  then
+                      RefreshCoverFlowTimer.Enabled := True;
               end;
           end
           else
@@ -10783,6 +10805,8 @@ begin
     CoverImgDownX := X;
     CoverImgDownY := Y;
     CoverScrollbar.SetFocus;
+
+    MedienBib.NewCoverFlow.Paint(2);
 end;
 
 procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
@@ -10833,6 +10857,12 @@ begin
       ActualIndex := CoverScrollbar.Position;
       Newindex := MedienBib.GetCoverWithPrefix(OldSelectionPrefix, (ActualIndex + 1) Mod MedienBib.Coverlist.Count);
       CoverScrollbar.Position := NewIndex;
+    end;
+    VK_ESCAPE: begin
+        ////key := #0;
+        ////EDITFastSearch.Text := '';
+        // show all covers again
+        RestoreCoverFlowAfterSearch;
     end;
   end;
 end;

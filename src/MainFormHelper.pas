@@ -125,7 +125,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
-    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB, ErrorForm;
+    spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
+    ErrorForm, CoverHelper;
 
 procedure CorrectVolButton;
 begin
@@ -937,6 +938,7 @@ begin
 end;
 
 procedure RestoreCoverFlowAfterSearch;
+var aCover: tNempCover;
 begin
     with Nemp_MainForm do
     begin
@@ -950,8 +952,12 @@ begin
             CoverScrollbar.Max := 3;
         CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
 
-        hier noch irgendwie für "Lbl_CoverFlow.Caption := aCover.InfoString;" sorgen
-
+        if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverList.Count) then
+        begin
+            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+            Lbl_CoverFlow.Caption := aCover.InfoString;
+        end else
+            Lbl_CoverFlow.Caption := '';
     end;
 
 end;

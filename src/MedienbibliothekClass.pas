@@ -106,6 +106,7 @@ type
         tmpAllPlaylistsPfadSort: TObjectList;  // Contain "TJustAString"-Objects
         AllPlaylistsNameSort: TObjectList;     // Same list, sorted by name for display
 
+        fBackupCoverlist: TObjectList;  // Backup of the Coverlist, contains real Copies of the covers, not just pointers
         // Status of the Library
         // Note: This is a legacy from older versions, e.g.
         //       No-ID3-Editing on status 1 is due to GetLyrics, where Tags are also
@@ -591,7 +592,7 @@ type
   var //CSStatusChange: RTL_CRITICAL_SECTION;
       CSUpdate: RTL_CRITICAL_SECTION;
       CSAccessDriveList: RTL_CRITICAL_SECTION;
-
+      CSAccessBackupCoverList: RTL_CRITICAL_SECTION;
 
 implementation
 
@@ -640,6 +641,7 @@ begin
   AlleArtists  := TObjectlist.create(False);
   tmpAlleArtists  := TObjectlist.create(False);
   Coverlist := tObjectList.create(False);
+  fBackupCoverlist := TObjectList.Create; // Destroy Objects when clearing this list
   tmpCoverlist := tObjectList.create(False);
 
   Alben        := TObjectlist.create(False);
@@ -749,6 +751,7 @@ begin
   ST_Ordnerlist.Free;
   tmpCoverlist.Free;
   Coverlist.Free;
+  fBackupCoverlist.Free;
   BibSearcher.Free;
 
 
@@ -1228,7 +1231,7 @@ begin
   end;
 
   //MB.StatusBibUpdate := 0;         // note: This is dangerous
-  {$Message Hint 'STATUS MUST NOT be set to zero here, unless it is sure that this ends here '}
+  {.$Message Hint 'STATUS MUST NOT be set to zero here, unless it is sure that this ends here '}
   /// status-Comment: The only problem is AutoScanDirs files.
   ///  If AutoScanDirs do not call NewFilesUpdate (because there are no new files)
   ///  ///  NO. NewFilesUpdate is called everytime on ST_Finish, whether there are 0 files or not.
@@ -3073,6 +3076,10 @@ begin
     TNempCover(Target[i]).Free;
   Target.Clear;
 
+  EnterCriticalSection(CSAccessBackupCoverList);
+  fBackupCoverlist.Clear;
+  LeaveCriticalSection(CSAccessBackupCoverList);
+
   newCover := TNempCover.Create;
   newCover.ID := 'all';
   newCover.key := 'all';
@@ -3191,7 +3198,7 @@ begin
     newCover := TNempCover.Create;
     newCover.ID := 'searchresult';
     newCover.key := 'searchresult';
-    newCover.Artist := 'All artists';
+    newCover.Artist := 'Various artists';
     Newcover.Album := 'Current search result';
     Target.Add(NewCover);
 
@@ -3277,19 +3284,55 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.ReBuildCoverList(FromScratch: Boolean = True);
+var i: Integer;
+    newCover: TNempCover;
 begin
-  if FromScratch then
+  if FromScratch or (fBackupCoverlist.Count = 0) then
   begin
-      Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-      Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+      if FromScratch then
+      begin
+          Mp3ListeArtistSort.Sort(Sortieren_CoverID);
+          Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+      end;
+      GenerateCoverList(Mp3ListeArtistSort, CoverList); // fBackupCoverlist is cleared there
+  end
+  else
+  begin
+      for i := 0 to CoverList.Count - 1 do
+          TNempCover(CoverList[i]).Free;
+      CoverList.Clear;
+
+      EnterCriticalSection(CSAccessBackupCoverList);
+      for i := 0 to fBackupCoverlist.Count - 1 do
+      begin
+          newCover := TNempCover.Create;
+          newCover.Assign(TNempCover(fBackupCoverlist[i]));
+          CoverList.Add(newCover);
+      end;
+      fBackupCoverlist.Clear;
+      LeaveCriticalSection(CSAccessBackupCoverList);
   end;
-  GenerateCoverList(Mp3ListeArtistSort, CoverList);
 end;
 
 procedure TMedienBibliothek.ReBuildCoverListFromList(aList, bList: TObjectList);
 var tmpList: TObjectList;
     i: integer;
+    newCover: TNempCover;
 begin
+
+    // Backup Coverlist if BackUpList.Count = 0
+    if fBackupCoverlist.Count = 0 then
+    begin
+        EnterCriticalSection(CSAccessBackupCoverList);
+        for i := 0 to CoverList.Count - 1 do
+        begin
+            newCover := TNempCover.Create;
+            newCover.Assign(TNempCover(CoverList[i]));
+            fBackupCoverlist.Add(newCover);
+        end;
+        LeaveCriticalSection(CSAccessBackupCoverList);
+    end;
+
     // copy Items, SourceList should not be sorted
     tmpList := TObjectList.Create(False);
     try
@@ -3301,7 +3344,6 @@ begin
         tmpList.Sort(Sortieren_CoverID);
 
         GenerateCoverListFromSearchResult(tmpList, CoverList);
-
     finally
         tmpList.Free;
     end;
@@ -5050,11 +5092,12 @@ initialization
 
   InitializeCriticalSection(CSUpdate);
   InitializeCriticalSection(CSAccessDriveList);
+  InitializeCriticalSection(CSAccessBackupCoverList);
 
 finalization
 
   DeleteCriticalSection(CSUpdate);
   DeleteCriticalSection(CSAccessDriveList);
-
+  DeleteCriticalSection(CSAccessBackupCoverList);
 end.
 

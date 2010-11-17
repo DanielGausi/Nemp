@@ -82,6 +82,7 @@ type
         WhileYouType: Boolean;
         AllowErrorsOnType: Boolean;
         AllowErrorsOnEnter: Boolean;
+        ChangeCoverFlow: Boolean;
     end;
 
 
@@ -413,6 +414,7 @@ begin
     QuickSearchOptions.WhileYouType       := Ini.ReadBool('MedienBib', 'QSWhileYouType', True);
     QuickSearchOptions.AllowErrorsOnEnter := Ini.ReadBool('MedienBib', 'QSAllowErrorsOnEnter', True);
     QuickSearchOptions.AllowErrorsOnType  := Ini.ReadBool('MedienBib', 'QSAllowErrorsOnType', False);
+    QuickSearchOptions.ChangeCoverFlow    := Ini.ReadBool('MedienBib', 'QSChangeCoverFlow', True);
 end;
 procedure TBibSearcher.SaveToIni(Ini: TMemIniFile);
 begin
@@ -424,6 +426,7 @@ begin
     Ini.WriteBool('MedienBib', 'QSWhileYouType', QuickSearchOptions.WhileYouType);
     Ini.WriteBool('MedienBib', 'QSAllowErrorsOnEnter', QuickSearchOptions.AllowErrorsOnEnter);
     Ini.WriteBool('MedienBib', 'QSAllowErrorsOnType', QuickSearchOptions.AllowErrorsOnType);
+    Ini.WriteBool('MedienBib', 'QSChangeCoverFlow', QuickSearchOptions.ChangeCoverFlow);
 end;
 
 {
