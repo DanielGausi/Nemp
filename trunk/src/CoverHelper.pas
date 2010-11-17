@@ -61,6 +61,7 @@ type
       FileAge: TDateTime;
 
       property InfoString: String read fGetInfoString;
+      procedure Assign(aCover: TNempCover);
     end;
 
 
@@ -157,6 +158,18 @@ begin
 end;
 
 { TNempCover }
+
+procedure TNempCover.Assign(aCover: TNempCover);
+begin
+    ID       := aCover.ID        ;
+    key      := aCover.key       ;
+    Artist   := aCover.Artist    ;
+    Album    := aCover.Album     ;
+    Year     := aCover.Year      ;
+    Genre    := aCover.Genre     ;
+    Directory:= aCover.Directory ;
+    FileAge  := aCover.FileAge   ;
+end;
 
 function TNempCover.fGetInfoString: String;
 begin
@@ -823,7 +836,7 @@ begin
     GoodCoverList := TObjectList.Create(False);
     try
         // fill GoodCoverList with "good covers", i.e. a cover-bitmap exists
-        for i :=0 to SourceCoverList.Count - 1 do
+        for i := 1 to SourceCoverList.Count - 1 do
         begin
             if (TNempCover(SourceCoverlist[i]).ID <> '')
                 and(TNempCover(SourceCoverlist[i]).ID[1] <> '_')

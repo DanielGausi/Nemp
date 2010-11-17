@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAnzeige5
+    ActivePage = TabExtended1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -4621,13 +4621,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 7
         Top = 168
         Width = 434
-        Height = 129
+        Height = 147
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Quicksearch options'
         TabOrder = 1
         DesignSize = (
           434
-          129)
+          147)
         object LblConst_QuickSearchNote: TLabel
           Left = 24
           Top = 64
@@ -4677,6 +4677,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Allow errors on [Enter]'
           TabOrder = 1
+        end
+        object cb_ChangeCoverflowOnSearch: TCheckBox
+          Left = 8
+          Top = 117
+          Width = 409
+          Height = 17
+          Caption = 'Change Coverflow according to results'
+          TabOrder = 3
         end
       end
     end

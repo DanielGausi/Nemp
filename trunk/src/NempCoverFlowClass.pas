@@ -220,11 +220,11 @@ var i, newItem: Integer;
 begin
     newItem := -1;
     for i := 0 to fCoverlist.Count -  1 do
-    if tNempCover(fCoverlist[i]).ID = fCurrentCoverID then
-    begin
-        newItem := i;
-        break;
-    end;
+        if tNempCover(fCoverlist[i]).key = fCurrentCoverID then
+        begin
+            newItem := i;
+            break;
+        end;
     if newItem = -1 then
     begin
         // Change item, so there is a "change" notified by the main window. ;-)
