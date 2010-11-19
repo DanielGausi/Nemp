@@ -47,6 +47,7 @@ function Handle_WndProc(var Message: TMessage): Boolean;
 
 function Handle_DropFilesForPlaylist(Var aMsg: TMessage): Boolean;
 function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean;
+function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
 
 procedure Handle_STStart(var Msg: TMessage);
 procedure Handle_STNewFile(var Msg: TMessage);
@@ -1536,6 +1537,89 @@ Begin
                 // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
                 MedienBib.NewFilesUpdateBib;
           end;
+    end;
+end;
+
+function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
+Var
+  Size,
+  FileCount: Integer;
+  Filename: PChar;
+  AudioFile:TAudioFile;
+  aErr: TAudioError;
+
+      procedure AddFileToHeadSet(af: String);
+      begin
+          AudioFile := TAudioFile.Create;
+          try
+              aErr := AudioFile.GetAudioData(af, GAD_Cover or GAD_Rating);
+              if aErr <> AUDIOERR_None then
+              begin
+                  AddErrorLog ('Dropped Files:'#13#10 + AudioFile.Pfad + #13#10
+                      + 'Error: ' + AudioErrorString[aErr]
+                      + #13#10 + '------');
+              end;
+              // Play new song in headset
+              NempPlayer.PlayInHeadset(AudioFile);
+              // Show Details
+              Nemp_MainForm.ShowHeadsetDetails(AudioFile);
+          finally
+              AudioFile.Free
+          end;
+      end;
+
+begin
+    result := True;
+    with Nemp_MainForm do
+    begin
+        if (DragSource <> DS_VST) then    // Files kommen von Außerhalb
+        begin
+            FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
+
+            if FileCount = 1 then
+            begin
+                // ok, one file for headphone
+                // ... TODO
+                Size := DragQueryFile (aMsg.WParam, 0, nil, 0) + 2;
+                Filename := StrAlloc(Size);
+                If DragQueryFile (aMsg.WParam, 0, Filename, Size) = 2 Then { nothing } ;
+
+                if (FileGetAttr(UnicodeString(Filename)) AND faDirectory = faDirectory) then
+                begin
+                    // Directory, put it into the library
+                    Handle_DropFilesForLibrary(aMsg);
+                    exit;
+                end
+                else // eine Datei in der gedroppten Liste gefunden
+                begin
+                    if ValidAudioFile(filename, true) then
+                    begin
+                        // AudioFile found, put it into the HeadPhone
+                        AddFileToHeadSet(filename);
+                    end;
+                end;
+            end else
+            begin
+                // more than one file, put them into the library
+                Handle_DropFilesForLibrary(aMsg);
+                exit;
+            end;
+
+            DragFinish (aMsg.WParam);
+            DragSource := DS_EXTERN;
+        end
+        else
+        begin   // Quelle ist der VST -> in die Playlist einfügen
+            if DragDropList.Count = 1 then
+            begin
+                // AudioFile found, put it into the HeadPhone
+                AddFileToHeadSet(DragDropList[0]);
+            end;
+            DragDropList.Clear;
+            IMGMedienBibCover.EndDrag(true);
+            DragFinish (aMsg.WParam);
+            DragSource := DS_EXTERN;
+        end;
     end;
 end;
 
