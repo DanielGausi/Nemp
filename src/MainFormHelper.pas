@@ -66,6 +66,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     function GetObjectAt(form: TForm; x,y: integer): TControl;
     function ObjectIsPlaylist(aName:string): Boolean;
+    function ObjectIsHeadphone(aName:string): Boolean;
+
 
     // Blockiert GUI-Elemente, die ein Hinzufügen/Löschen von Elementen in der Medienbib verursachen
     procedure BlockeMedienListeUpdate(block: Boolean);
@@ -532,7 +534,12 @@ end;
 
 function ObjectIsPlaylist(aName:string): Boolean;
 begin
-  result := (aName = 'PlaylistVST_IMG') OR (aName = 'PlaylistVST');
+  result := (aName = 'PlaylistVST') or (aName = 'PlaylistVST_IMG');
+end;
+
+function ObjectIsHeadphone(aName:string): Boolean;
+begin
+  result := (aName = 'GRPBOXHeadset');
 end;
 
 

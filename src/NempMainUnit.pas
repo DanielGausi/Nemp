@@ -1370,6 +1370,10 @@ type
     procedure MM_H_ErrorLogClick(Sender: TObject);
     procedure PM_ML_ShowAllIncompleteTaggedFilesClick(Sender: TObject);
     procedure RefreshCoverFlowTimerTimer(Sender: TObject);
+    procedure ImgDetailCoverMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ImgDetailCoverMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
 
   private
 
@@ -2644,7 +2648,15 @@ Begin
     if ObjectIsPlaylist(o.Name) then
         Handle_DropFilesForPlaylist(aMsg)
     else
-        Handle_DropFilesForLibrary(aMsg);
+    begin
+        if NOT (o is TNempPanel) then
+            // get parent, should be the HeadPhone-Groupbox
+            o := o.Parent;
+        if assigned(o) and ObjectIsHeadphone(o.Name) then
+            Handle_DropFilesForHeadPhone(aMsg)
+        else
+            Handle_DropFilesForLibrary(aMsg);
+    end;
 end;
 
 
@@ -4644,6 +4656,50 @@ begin
     end;
 end;
 
+procedure TNemp_MainForm.ImgDetailCoverMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    CoverImgDownX := X;
+    CoverImgDownY := Y;
+end;
+
+
+procedure TNemp_MainForm.ImgDetailCoverMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+var af: TAudioFile;
+begin
+    if ssleft in shift then
+    begin
+      if (abs(X - CoverImgDownX) > 5) or  (abs(Y - CoverImgDownY) > 5) then
+      begin
+          if Sender = HeadSetCoverImage then
+              af := NempPlayer.HeadSetAudioFile
+          else
+          if Sender = ImgDetailCover then
+              af := MedienBib.CurrentAudioFile
+          else
+              af := Nil;
+
+          if Assigned(af) then
+          begin
+              DragSource := DS_VST;
+              // Add files selected to DragFilesSrc1 list
+              DragFilesSrc1.ClearFiles;
+              DragDropList.Clear;
+              DragFilesSrc1.AddFile(af.Pfad);
+              DragDropList.Add(af.Pfad);
+              // This is the START of the drag (FROM) operation.
+              DragFilesSrc1.Execute;
+          end;
+      end;
+    end
+    else
+    begin
+        CoverImgDownX := 0;
+        CoverImgDownY := 0;
+    end;
+end;
+
 procedure TNemp_MainForm.VDTCoverInfoPanelResize(Sender: TObject);
 begin
     LblBibTags.Width := VDTCoverInfoPanel.Width - 18;
@@ -4789,6 +4845,8 @@ begin
     Nemp_MainForm.NempOptions.DetailMode := (Sender as TMenuItem).Tag;
     Nemp_MainForm.ActualizeVDTCover;
 end;
+
+
 
 procedure TNemp_MainForm.ImgDetailSwitchClick(Sender: TObject);
 begin
