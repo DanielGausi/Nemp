@@ -430,8 +430,11 @@ begin
       cb_VorbisGenre.Items.Add(Genres[i]);
   end;
 
+  MainPageControl.OnChange := Nil;
   MainPageControl.ActivePageIndex := 0;
   MainPageControl.ActivePage := Tab_General;
+  MainPageControl.OnChange := MainPageControlChange;
+
   DetailRatingHelper := TRatingHelper.Create;
   s := TBitmap.Create;
   h := TBitmap.Create;
@@ -466,9 +469,13 @@ end;
 
 procedure TFDetails.FormShow(Sender: TObject);
 begin
+    MainPageControl.OnChange := Nil;
+
     MainPageControl.ActivePageIndex := 0;
     MainPageControl.ActivePage := Tab_General;
     refresh;
+
+    MainPageControl.OnChange := MainPageControlChange;
 //    UpdateID3ReadOnlyStatus;
 end;
 
@@ -1905,6 +1912,7 @@ procedure TFDetails.ShowDetails(AudioFile:TAudioFile; Source: Integer = SD_MEDIE
 var OggResult: TOggVorbisError;
     FlacResult: TFlacError;
     ci: Integer;
+    ct: TTabSheet;
 begin
 
   // Hier auch die Abfrage zum Speichern rein
@@ -2020,8 +2028,10 @@ begin
       ID3v2Activated := False;
   end;
 
+  MainPageControl.OnChange := Nil;
   // backup Current active Page
   ci := MainPageControl.ActivePageIndex;
+  ct := MainPageControl.ActivePage;
 
   // Set proper Tabs (in)visible
   Tab_MpegInformation.Visible := ValidMp3File; // This is the one with id3v1 // id3v2
@@ -2041,10 +2051,18 @@ begin
       // current page was "ID3-tags" or "Vorbis-Comments"
       // => Set this Page as new page
       if Tab_VorbisComments.Visible then
+      begin
           MainPageControl.ActivePageIndex := 2;
+          MainPageControl.ActivePage := Tab_VorbisComments;
+      end;
       if Tab_MpegInformation.Visible then
+      begin
           MainPageControl.ActivePageIndex := 1;
+          MainPageControl.ActivePage := Tab_MpegInformation;
+      end;
   end;
+
+  MainPageControl.OnChange := MainPageControlChange;
 
   // Medien-Bib-Infos
   UpdateMediaBibEnabledStatus;

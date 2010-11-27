@@ -244,6 +244,8 @@ type
         // No threaded tmp-list stuff needed here.
         // => call it AFTER swaplists
         procedure InitPlayListsList;
+
+        procedure SortCoverList(aList: TObjectList);
         // Get all Cover from the Library (TNempCover, used for browsing)
         procedure GenerateCoverList(Source: TObjectlist; Target: TObjectlist);
 
@@ -362,6 +364,7 @@ type
         CoverSearchLastFM: Integer;
         CoverSearchLastFMInit: Boolean;  // used for the first "do you want this"-message on first start
         HideNACover: Boolean;
+        MissingCoverMode: Integer;
         // Einstellungen für Standard-Cover
         // Eines für alle. Ist eins nicht da: Fallback auf Default
         //UseNempDefaultCover: Boolean;
@@ -1027,6 +1030,10 @@ begin
         CoverSearchLastFMInit    := True;
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
+        MissingCoverMode := ini.ReadInteger('MedienBib', 'MissingCoverMode', 1);
+        if (MissingCoverMode < 0) OR (MissingCoverMode > 2) then
+            MissingCoverMode := 1;
+
         //UseNempDefaultCover      := Ini.ReadBool('MedienBib', 'UseNempDefaultCover', True);
         //PersonalizeMainCover     := Ini.ReadBool('MedienBib', 'PersonalizeMainCover', True);
         //WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
@@ -1133,6 +1140,7 @@ begin
         ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (CoverSearchSisterDirName));
         ini.WriteInteger('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
+        ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
         //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
         //Ini.WriteBool('MedienBib', 'PersonalizeMainCover', PersonalizeMainCover);
         //Ini.Writebool('MedienBib','WriteRatingToTag', WriteRatingToTag);
@@ -3057,6 +3065,50 @@ begin
     AllPlaylistsNameSort.Sort(PlaylistSort_Name);
 end;
 
+
+procedure TMedienBibliothek.SortCoverList(aList: TObjectList);
+begin
+    case MissingCoverMode of
+        0: begin
+            case CoverSortorder of
+                1: aList.Sort(CoverSort_ArtistMissingFirst);
+                2: aList.Sort(CoverSort_AlbumMissingFirst);
+                3: aList.Sort(CoverSort_GenreMissingFirst);
+                4: aList.Sort(CoverSort_JahrMissingFirst);
+                5: aList.Sort(CoverSort_GenreYearMissingFirst);
+                6: aList.Sort(CoverSort_DirectoryArtistMissingFirst);
+                7: aList.Sort(CoverSort_DirectoryAlbumMissingFirst);
+                8: aList.Sort(CoverSort_FileAgeAlbumMissingFirst);
+                9: aList.Sort(CoverSort_FileAgeArtistMissingFirst);
+            end;
+        end;
+        2: begin
+            case CoverSortorder of
+                1: aList.Sort(CoverSort_ArtistMissingLast);
+                2: aList.Sort(CoverSort_AlbumMissingLast);
+                3: aList.Sort(CoverSort_GenreMissingLast);
+                4: aList.Sort(CoverSort_JahrMissingLast);
+                5: aList.Sort(CoverSort_GenreYearMissingLast);
+                6: aList.Sort(CoverSort_DirectoryArtistMissingLast);
+                7: aList.Sort(CoverSort_DirectoryAlbumMissingLast);
+                8: aList.Sort(CoverSort_FileAgeAlbumMissingLast);
+                9: aList.Sort(CoverSort_FileAgeArtistMissingLast);
+            end;
+        end;
+    else
+        case CoverSortorder of
+            1: aList.Sort(CoverSort_Artist);
+            2: aList.Sort(CoverSort_Album);
+            3: aList.Sort(CoverSort_Genre);
+            4: aList.Sort(CoverSort_Jahr);
+            5: aList.Sort(CoverSort_GenreYear);
+            6: aList.Sort(CoverSort_DirectoryArtist);
+            7: aList.Sort(CoverSort_DirectoryAlbum);
+            8: aList.Sort(CoverSort_FileAgeAlbum);
+            9: aList.Sort(CoverSort_FileAgeArtist);
+        end;
+    end;
+end;
 {
     --------------------------------------------------------
     GenerateCoverList
@@ -3153,17 +3205,8 @@ begin
   AudioFilesWithSameCover.Free;
 
   // Coverliste sortieren
-  case CoverSortorder of
-      1: Target.Sort(CoverSort_Artist);
-      2: Target.Sort(CoverSort_Album);
-      3: Target.Sort(CoverSort_Genre);
-      4: Target.Sort(CoverSort_Jahr);
-      5: Target.Sort(CoverSort_GenreYear);
-      6: Target.Sort(CoverSort_DirectoryArtist);
-      7: Target.Sort(CoverSort_DirectoryAlbum);
-      8: Target.Sort(CoverSort_FileAgeAlbum);
-      9: Target.Sort(CoverSort_FileAgeArtist);
-  end;
+  SortCoverList(Target);
+
   GetRandomCover(Target);
 
 ///// das im Hauptthread mit der neuen Liste machen  NewCoverFlow.SetNewList(Target);
@@ -3234,6 +3277,18 @@ begin
             // get Infos from these files
             GetCoverInfos(AudioFilesWithSameCover, newCover);
 
+            // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
+            if HideNACover then
+            begin
+                if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
+                begin
+                    // discard current cover
+                    NewCover.Free;
+                    Target.Delete(Target.Count - 1);
+                end;
+            end;
+
+
             // get index of first audiofile with a different CoverID
             repeat
                 inc (i);
@@ -3241,17 +3296,7 @@ begin
         end; // while
 
         // Coverliste sortieren
-        case CoverSortorder of
-            1: Target.Sort(CoverSort_Artist);
-            2: Target.Sort(CoverSort_Album);
-            3: Target.Sort(CoverSort_Genre);
-            4: Target.Sort(CoverSort_Jahr);
-            5: Target.Sort(CoverSort_GenreYear);
-            6: Target.Sort(CoverSort_DirectoryArtist);
-            7: Target.Sort(CoverSort_DirectoryAlbum);
-            8: Target.Sort(CoverSort_FileAgeAlbum);
-            9: Target.Sort(CoverSort_FileAgeArtist);
-        end;
+        SortCoverList(Target);
         GetRandomCover(Target);
 
     finally

@@ -188,6 +188,7 @@ type
           fAllowPlaylistDownload : Longbool;
           fAllowLibraryAccess    : Longbool;
           fAllowRemoteControl    : Longbool;
+          fPort                  : Word;
 
           // VCL-Variable
           fActive: Boolean;
@@ -277,6 +278,7 @@ type
           property AllowLibraryAccess    : Longbool read fGetAllowLibraryAccess    write fSetAllowLibraryAccess   ;
           property AllowRemoteControl    : Longbool read fGetAllowRemoteControl    write fSetAllowRemoteControl   ;
 
+          property Port : Word    read fPort write fPort;
           property Count: Integer read fGetCount;
 
           property Active: Boolean read fActive write SetActive;
@@ -375,7 +377,7 @@ begin
 end;                                                          
                                                               
 procedure TNempWebServer.LoadfromIni;                         
-var ini:TMemIniFile;                                          
+var ini:TMemIniFile;
 begin
     ini := TMeminiFile.Create(SavePath + 'NempWebServer.ini', TEncoding.UTF8);
     try
@@ -386,6 +388,7 @@ begin
         AllowLibraryAccess    := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
         AllowRemoteControl    := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
 
+        Port               := Ini.ReadInteger('Remote', 'Port', 80);
         Username           := Ini.ReadString('Remote', 'Username'        , 'admin');
         Password           := Ini.ReadString('Remote', 'Password'        , 'pass');
     finally
@@ -405,6 +408,7 @@ begin
       Ini.WriteBool('Remote', 'AllowPlaylistDownload' , AllowPlaylistDownload);
       Ini.WriteBool('Remote', 'AllowLibraryAccess'    , AllowLibraryAccess);
       Ini.WriteBool('Remote', 'AllowRemoteControl'    , AllowRemoteControl);
+      Ini.WriteInteger('Remote', 'Port', Port);
       Ini.WriteString('Remote', 'Username'        , Username);
       Ini.WriteString('Remote', 'Password'        , Password);
       try
@@ -969,6 +973,11 @@ begin
         // Server aktivieren
         success := True;
         try
+            IdHTTPServer1.Active := False;
+            IdHTTPServer1.Bindings.Clear;
+            IdHTTPServer1.DefaultPort := Port;
+            //IdHTTPServer1.Bindings.DefaultPort := Port;
+
             IdHTTPServer1.Active := True;
         except
             on E: Exception do
@@ -984,7 +993,7 @@ begin
             fLastErrorString := '';
             SendMessage(fMainHandle, WM_WebServer, WS_StringLog,
                   Integer(PChar(DateTimeToStr(Now, fLocalFormatSettings)
-                             + ', Server acticated, Files in library: '
+                             + ', Server acticated at Port ' + IntToStr(IdHTTPServer1.DefaultPort) + ', Files in library: '
                              + IntToStr(Count))));
         end
         else

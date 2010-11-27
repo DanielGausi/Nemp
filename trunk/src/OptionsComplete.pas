@@ -450,6 +450,10 @@ type
     cbReplaceAlbumBy: TComboBox;
     LblReplaceAlbumBy: TLabel;
     cb_ChangeCoverflowOnSearch: TCheckBox;
+    LblWebServer_Port: TLabel;
+    seWebServer_Port: TSpinEdit;
+    cbMissingCoverMode: TComboBox;
+    Label6: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1084,6 +1088,7 @@ begin
  end;
 
  cbHideNACover.Checked := MedienBib.HideNACover;
+ cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
  cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 
@@ -1349,6 +1354,7 @@ begin
   NempWebServer.LoadfromIni;
   EdtUsername.Text  := NempWebServer.Username;
   EdtPassword.Text  := NempWebServer.Password;
+  seWebServer_Port.Value := NempWebServer.Port;
   cbOnlyLAN.Checked := NempWebServer.OnlyLAN;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
   cbPermitPlaylistDownload.Checked := NempWebServer.AllowPlaylistDownload;
@@ -1989,6 +1995,7 @@ begin
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
   MedienBib.HideNACover := cbHideNACover.Checked;
 
+
   //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
@@ -2010,11 +2017,15 @@ begin
           AND
           (MedienBib.BrowseMode = 0)
           )
-
           OR
-
           (
           ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
+          AND
+          (MedienBib.BrowseMode = 1)
+          )
+          OR
+          (
+          ((cbMissingCoverMode.ItemIndex) <> MedienBib.MissingCoverMode)
           AND
           (MedienBib.BrowseMode = 1)
           )
@@ -2028,7 +2039,7 @@ begin
       MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
       MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
       MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
-
+      MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
 
       Nemp_MainForm.NempOptions.ReplaceNAArtistBy := cbReplaceArtistBy.ItemIndex;
       Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
@@ -2055,6 +2066,7 @@ begin
     CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
     CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
     cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
+    cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
   end;
 
   MedienBib.AutoScanDirs := CBAutoScan.Checked;
@@ -2528,6 +2540,12 @@ begin
   NempWebServer.Username := EdtUsername.Text;
   NempWebServer.Password := EdtPassword.Text;
   NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
+
+  if (NempWebServer.Port <> seWebServer_Port.Value) and (NempWebServer.Active) then
+      MessageDLG((WebServer_PortChangeFailed), mtInformation, [MBOK], 0);
+
+  NempWebServer.Port := seWebServer_Port.Value;
+
   NempWebServer.AllowLibraryAccess    := cbPermitLibraryAccess.Checked;
   NempWebServer.AllowPlaylistDownload := cbPermitPlaylistDownload.Checked;
   NempWebServer.AllowRemoteControl    := cbAllowRemoteControl.Checked;
@@ -3139,6 +3157,7 @@ begin
         // 1.) Daten übernehmen
         NempWebServer.Username := EdtUsername.Text;
         NempWebServer.Password := EdtPassword.Text;
+        NempWebServer.Port     := seWebServer_Port.Value;
         NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
         NempWebServer.AllowPlaylistDownload := cbPermitPlaylistDownload.Checked;

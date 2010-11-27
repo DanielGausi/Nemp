@@ -319,6 +319,7 @@ WebServer_DeActivateServer = 'Deactivate server';
 // WebServer_GetIPFailes      = 'Cannot get IP-address. Please check your internet configuration.';
 WebServer_GetIPFailedShort = 'Failed.';
 WebServer_GettingIP        = 'Connecting...';
+WebServer_PortChangeFailed = 'The Nemp Webserver is running. The new Port is not valid until you restart it.';
 
 NempUpdate_ConnectError = 'Could not connect to server. Please check your internet configuration.';
 NempUpdate_Error = 'Could not get update information from server.';
