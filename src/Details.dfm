@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_General
+    ActivePage = Tab_VorbisComments
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet

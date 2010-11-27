@@ -85,13 +85,35 @@ Const SO_Pfad = 0;
   function CoverSort_Jahr(item1,item2:pointer):integer;
   function CoverSort_FileAgeAlbum(item1,item2:pointer):integer;
   function CoverSort_FileAgeArtist(item1,item2:pointer):integer;
-
   // Note: These two coversort-Methods are almost the same, as
   //       in one Directory there is (almost everytime) only one
   //       "cover" (except covers are set by the ID3.tag)
   //       Used for the BrowseBy-Menu in MainForm
   function CoverSort_DirectoryArtist(item1,item2:pointer):integer;
   function CoverSort_DirectoryAlbum(item1,item2:pointer):integer;
+
+  // Same as above, but missing cover will be collected at the beginning
+  function CoverSort_ArtistMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_AlbumMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_GenreMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_GenreYearMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_JahrMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_FileAgeAlbumMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_FileAgeArtistMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_DirectoryArtistMissingFirst(item1,item2:pointer):integer;
+  function CoverSort_DirectoryAlbumMissingFirst(item1,item2:pointer):integer;
+
+    // Same as above, but missing cover will be collected at the end
+  function CoverSort_ArtistMissingLast(item1,item2:pointer):integer;
+  function CoverSort_AlbumMissingLast(item1,item2:pointer):integer;
+  function CoverSort_GenreMissingLast(item1,item2:pointer):integer;
+  function CoverSort_GenreYearMissingLast(item1,item2:pointer):integer;
+  function CoverSort_JahrMissingLast(item1,item2:pointer):integer;
+  function CoverSort_FileAgeAlbumMissingLast(item1,item2:pointer):integer;
+  function CoverSort_FileAgeArtistMissingLast(item1,item2:pointer):integer;
+  function CoverSort_DirectoryArtistMissingLast(item1,item2:pointer):integer;
+  function CoverSort_DirectoryAlbumMissingLast(item1,item2:pointer):integer;
+
 
 
   function PlaylistSort_Pfad(item1,item2:pointer):integer;
@@ -265,6 +287,181 @@ begin
       result := CoverSort_Album(item1, item2);
   end;
 end;
+
+
+function MissingFirstHelper(item1,item2:pointer):integer;
+begin
+    if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
+    if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+    if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+    if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
+
+    if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
+    begin
+        // item1 is a missing cover
+        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
+            // both cover are missing
+            result := 0
+        else
+            result := -1;
+    end else
+        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
+        begin
+            // item2 is missing
+            if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
+                // both are missing
+                result := 0
+            else
+                result := 1;
+        end else
+            // none is missing
+            result := 0;
+end;
+
+function CoverSort_ArtistMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Artist(item1, item2);
+end;
+function CoverSort_AlbumMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Album(item1, item2);
+end;
+function CoverSort_GenreMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Genre(item1, item2);
+end;
+function CoverSort_GenreYearMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_GenreYear(item1, item2);
+end;
+function CoverSort_JahrMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Jahr(item1, item2);
+end;
+function CoverSort_FileAgeAlbumMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_FileAgeAlbum(item1, item2);
+end;
+function CoverSort_FileAgeArtistMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_FileAgeArtist(item1, item2);
+end;
+function CoverSort_DirectoryArtistMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_DirectoryArtist(item1, item2);
+end;
+function CoverSort_DirectoryAlbumMissingFirst(item1,item2:pointer):integer;
+begin
+    result := MissingFirstHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_DirectoryAlbum(item1, item2);
+end;
+
+
+
+
+function MissingLastHelper(item1,item2:pointer):integer;
+begin
+    if (TNempCover(item1).ID = 'all') and (TNempCover(item2).ID <> 'all') then result := -1 else
+    if (TNempCover(item2).ID = 'all') and (TNempCover(item1).ID <> 'all') then result := 1 else
+    if (TNempCover(item1).ID = 'searchresult') and (TNempCover(item2).ID <> 'searchresult') then result := -1 else
+    if (TNempCover(item2).ID = 'searchresult') and (TNempCover(item1).ID <> 'searchresult') then result := 1 else
+
+    if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
+    begin
+        // item1 is a missing cover
+        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
+            // both cover are missing
+            result := 0
+        else
+            result := 1;
+    end else
+        if (TNempCover(item2).ID <> '') and (TNempCover(item2).ID[1] = '_') then
+        begin
+            // item2 is missing
+            if (TNempCover(item1).ID <> '') and (TNempCover(item1).ID[1] = '_') then
+                // both are missing
+                result := 0
+            else
+                result := -11;
+        end else
+            // none is missing
+            result := 0;
+end;
+
+function CoverSort_ArtistMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Artist(item1, item2);
+end;
+function CoverSort_AlbumMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Album(item1, item2);
+end;
+function CoverSort_GenreMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Genre(item1, item2);
+end;
+function CoverSort_GenreYearMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_GenreYear(item1, item2);
+end;
+function CoverSort_JahrMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_Jahr(item1, item2);
+end;
+function CoverSort_FileAgeAlbumMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_FileAgeAlbum(item1, item2);
+end;
+function CoverSort_FileAgeArtistMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_FileAgeArtist(item1, item2);
+end;
+function CoverSort_DirectoryArtistMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_DirectoryArtist(item1, item2);
+end;
+function CoverSort_DirectoryAlbumMissingLast(item1,item2:pointer):integer;
+begin
+    result := MissingLastHelper(item1,item2);
+    if result = 0 then
+        result := CoverSort_DirectoryAlbum(item1, item2);
+end;
+
+
+
 
 function PlaylistSort_Pfad(item1,item2:pointer):integer;
 begin

@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabExtended1
+    ActivePage = TabAnzeige5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2207,7 +2207,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 228
         Width = 434
-        Height = 111
+        Height = 150
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Browsing in the medialibrary'
         TabOrder = 2
@@ -2220,19 +2220,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Sort orders in classic mode:'
         end
         object Label61: TLabel
-          Left = 248
-          Top = 20
-          Width = 114
+          Left = 12
+          Top = 65
+          Width = 110
           Height = 13
           Hint = 'Select the sorting criteria for browsing the library.'
-          Caption = 'Sort order in cover-flow'
+          Caption = 'Sort order in coverflow'
         end
         object LblNACoverHint: TLabel
-          Left = 33
-          Top = 86
+          Left = 30
+          Top = 125
           Width = 276
           Height = 13
           Caption = '(Changes will take effect after a rebuild of the coverflow)'
+        end
+        object Label6: TLabel
+          Left = 194
+          Top = 64
+          Width = 125
+          Height = 13
+          Hint = 'Select the sorting criteria for browsing the library.'
+          Caption = 'Missing cover in coverflow'
         end
         object CBSortArray1: TComboBox
           Left = 12
@@ -2271,8 +2279,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Fileage')
         end
         object cbCoverSortOrder: TComboBox
-          Left = 248
-          Top = 37
+          Left = 12
+          Top = 81
           Width = 145
           Height = 21
           Style = csDropDownList
@@ -2290,17 +2298,32 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Fileage, Artist')
         end
         object cbHideNACover: TCheckBox
-          Left = 15
-          Top = 69
+          Left = 12
+          Top = 108
           Width = 402
           Height = 17
           Caption = 'Hide cover with no tag-information in coverflow'
           TabOrder = 3
         end
+        object cbMissingCoverMode: TComboBox
+          Left = 194
+          Top = 81
+          Width = 215
+          Height = 21
+          Style = csDropDownList
+          ItemHeight = 13
+          ItemIndex = 1
+          TabOrder = 4
+          Text = 'No special handling of missing cover'
+          Items.Strings = (
+            'All missing cover at the beginning'
+            'No special handling of missing cover'
+            'All missing cover at the end')
+        end
       end
       object GrpBox_TabMedia3_Other: TGroupBox
         Left = 8
-        Top = 340
+        Top = 384
         Width = 433
         Height = 93
         Caption = 'Other'
@@ -4147,7 +4170,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 434
-        Height = 170
+        Height = 188
         Caption = 'Configuration'
         TabOrder = 0
         object LblConst_Username2: TLabel
@@ -4159,17 +4182,24 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Username'
         end
         object LblConst_Password2: TLabel
-          Left = 128
-          Top = 19
+          Left = 118
+          Top = 20
           Width = 46
           Height = 13
           Hint = 'Set username and password to access your library'
           Caption = 'Password'
         end
+        object LblWebServer_Port: TLabel
+          Left = 220
+          Top = 20
+          Width = 20
+          Height = 13
+          Caption = 'Port'
+        end
         object BtnServerActivate: TButton
-          Left = 250
-          Top = 30
-          Width = 129
+          Left = 301
+          Top = 33
+          Width = 123
           Height = 25
           Caption = 'Activate server'
           TabOrder = 2
@@ -4222,15 +4252,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object EdtUsername: TEdit
           Left = 16
           Top = 35
-          Width = 98
+          Width = 95
           Height = 21
           TabOrder = 0
           OnKeyPress = EdtUsernameKeyPress
         end
         object EdtPassword: TEdit
-          Left = 128
+          Left = 117
           Top = 35
-          Width = 98
+          Width = 97
           Height = 21
           TabOrder = 1
           OnKeyPress = EdtPasswordKeyPress
@@ -4244,12 +4274,22 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Activate webserver on start'
           TabOrder = 7
         end
+        object seWebServer_Port: TSpinEdit
+          Left = 220
+          Top = 35
+          Width = 75
+          Height = 22
+          MaxValue = 65535
+          MinValue = 0
+          TabOrder = 8
+          Value = 80
+        end
       end
       object GrpBoxIP: TGroupBox
         Left = 8
-        Top = 191
+        Top = 201
         Width = 434
-        Height = 83
+        Height = 76
         Hint = 
           'Your IP-configuration. Tell your friends these IPs to access you' +
           'r library.'
@@ -4311,26 +4351,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBoxLog: TGroupBox
         Left = 8
-        Top = 275
+        Top = 279
         Width = 434
-        Height = 158
+        Height = 161
         Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Log'
         TabOrder = 2
         DesignSize = (
           434
-          158)
+          161)
         object WebServerLogMemo: TMemo
           Left = 4
           Top = 17
           Width = 422
-          Height = 133
+          Height = 136
           Anchors = [akLeft, akTop, akRight, akBottom]
           Lines.Strings = (
             '')
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
+          ExplicitHeight = 133
         end
       end
     end
