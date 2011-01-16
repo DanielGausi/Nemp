@@ -147,6 +147,8 @@ type
         TabStopAtPlayerControls: Boolean;
         TabStopAtTabs: Boolean;
 
+        DisplayApp: String;
+
 
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
@@ -822,6 +824,7 @@ uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 var i: integer;
+    tmp: String;
 
       procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
       begin
@@ -841,6 +844,10 @@ begin
         IgnoreVolumeUpDownKeys := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
+
+        DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', '');
+        // "Kill" relative Paths
+        DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
         FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);

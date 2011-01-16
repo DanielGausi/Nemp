@@ -191,6 +191,7 @@ type TLcdG15 = class(TComponent)
    LOnSoftButtonsCB : TOnSoftButtonsCB;
    LOnConfigureCB : TOnConfigureCB;
   public
+    CreateComplete: Boolean;
    property OnSoftButtons : TOnSoftButtonsCB read LOnSoftButtonsCB write LOnSoftButtonsCB;
    property OnConfigure : TOnConfigureCB read LOnConfigureCB write LOnConfigureCB;
    property LcdCanvas : TCanvas read LCanvas write LCanvas;
@@ -255,12 +256,16 @@ var ConnectContext : lgLcdConnectContextA;
     DeviceDescription : lgLcdDeviceDesc;
     Status : integer;
 begin
+  CreateComplete := False;
   LCanvas := Nil;
 
 
   //init display
   Status := lgLcdInit();
-  assert(status = 0);
+
+  if Status <> 0 then
+      exit;
+
 
   //init connect to display
   ConnectContext.appFriendlyName := pAnsiChar(ApplicationName);
@@ -282,12 +287,16 @@ begin
 
   //connect
   Status := lgLcdConnectA(ConnectContext);
-  assert(status = 0);
-  assert(ConnectContext.connection <> -1);
+  // assert(status = 0);
+  if (Status <> 0) or (ConnectContext.connection = -1) then
+      exit;
+  //assert(ConnectContext.connection <> -1);
 
   //enum display. connect to display 0 !
   Status :=lgLcdEnumerate(ConnectContext.connection,0,DeviceDescription);
-  assert(status = 0);
+  if Status <> 0 then
+      exit;
+  //assert(status = 0);
 
   LOpenContext.connection := ConnectContext.connection;
   LOpenContext.index := 0;
@@ -295,8 +304,14 @@ begin
   LOpenContext.onSoftbuttonsChanged.softbuttonsChangedContext := self;
   LOpenContext.device := -1;
   Status := lgLcdOpen(LOpenContext);
-  assert(status = 0);
-  assert(LOpenContext.device <> -1);
+  if (Status <> 0) or (LOpenContext.device = -1) then
+      exit;
+  //assert(status = 0);
+  //assert(LOpenContext.device <> -1);
+
+  CreateComplete := True;
+
+
 end;
 
 destructor TLcdG15.Destroy();

@@ -42,7 +42,7 @@ interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees,
 
-    dialogs;
+    dialogs, shellApi;
 
 
     procedure UpdateSplashScreen(status: String);
@@ -89,6 +89,9 @@ begin
             ReadNempOptions(ini, NempOptions);
             if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
                 Uselanguage(NempOptions.Language);
+
+            if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
+                shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp + '"'),'autostart',0,sw_hide);
 
             //Player-Einstellungen lesen
             NempPlayer.LoadFromIni(Ini);

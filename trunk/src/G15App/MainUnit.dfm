@@ -3,8 +3,8 @@ object MainForm: TMainForm
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Nemp G15 Applet'
-  ClientHeight = 229
-  ClientWidth = 199
+  ClientHeight = 230
+  ClientWidth = 306
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -30,29 +30,70 @@ object MainForm: TMainForm
       Height = 43
     end
   end
-  object Button1: TButton
+  object BtnHide: TButton
     Left = 8
-    Top = 184
+    Top = 198
     Width = 75
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Hide'
     TabOrder = 1
+    OnClick = BtnHideClick
+  end
+  object GrpBoxSettings: TGroupBox
+    Left = 8
+    Top = 87
+    Width = 290
+    Height = 105
+    Caption = 'Settings'
+    TabOrder = 2
+    object cbHighStartPriority: TCheckBox
+      Left = 16
+      Top = 47
+      Width = 249
+      Height = 17
+      Caption = 'Show Nemp G15 App in foreground on start'
+      TabOrder = 0
+    end
+    object cbHighPriority: TCheckBox
+      Left = 16
+      Top = 70
+      Width = 249
+      Height = 17
+      Caption = 'Hold Nemp G15 App in foreground'
+      TabOrder = 1
+    end
+    object cbStartWithNemp: TCheckBox
+      Left = 16
+      Top = 24
+      Width = 265
+      Height = 17
+      Caption = 'Start Nemp G15 App when Nemp starts'
+      TabOrder = 2
+    end
+  end
+  object Button1: TButton
+    Left = 192
+    Top = 198
+    Width = 106
+    Height = 25
+    Caption = 'Save settings'
+    TabOrder = 3
     OnClick = Button1Click
   end
   object MainTimer: TTimer
     Enabled = False
     Interval = 250
     OnTimer = MainTimerTimer
-    Left = 80
-    Top = 72
+    Left = 256
+    Top = 16
   end
   object ImageList1: TImageList
     Height = 43
     Width = 160
-    Left = 16
-    Top = 88
+    Left = 176
+    Top = 16
     Bitmap = {
-      494C0101010008005C00A0002B00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101010008006000A0002B00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800200002B000000010020000000000000AE
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3609,7 +3650,7 @@ object MainForm: TMainForm
   object StartTimer: TTimer
     Interval = 50
     OnTimer = StartTimerTimer
-    Left = 128
-    Top = 88
+    Left = 216
+    Top = 16
   end
 end
