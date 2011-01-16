@@ -3,8 +3,8 @@ unit lcdg15Nemp;
 interface
 
 uses
-    Windows, SysUtils,  Classes, Graphics, Controls, ExtCtrls,
-     nempApi, lcdg15;
+    Windows, SysUtils, StrUtils, Classes, Graphics, Controls, ExtCtrls, ShlObj,
+    ActiveX, iniFiles, nempApi, lcdg15;
 
 
 type TNempG15Applet = class(TObject)
@@ -20,13 +20,18 @@ type TNempG15Applet = class(TObject)
         CurrentPlayListPosMin: Integer;
         CurrentPlayListPosMax: Integer;
 
+        fSavePath: String;
+
         fStartPriority: Integer;   // Priority of the first SendToDisplay
         fDisplayPriority: Integer; //  Priority of the other SendToDisplay
+        fStartWithNemp: Boolean;
 
         function GetOnConfig: TOnConfigureCB;
         procedure SetOnConfig(value: TOnConfigureCB);
 
         procedure ResetTimerTimer(Sender: TObject);
+
+        procedure InitSettings;
 
     public
         MainBitmap: TBitmap;
@@ -40,6 +45,7 @@ type TNempG15Applet = class(TObject)
         property OnConfig: TOnConfigureCB Read GetOnConfig write SetOnConfig;
         property StartPriority: Integer read fStartPriority write fStartPriority;
         property DisplayPriority: Integer read fDisplayPriority write fDisplayPriority;
+        property StartWithNemp: Boolean read fStartWithNemp write fStartWithNemp;
 
         constructor Create;
         destructor Destroy; Override;
@@ -50,12 +56,61 @@ type TNempG15Applet = class(TObject)
 
 
         procedure myCallbackSoftButtons(dwButtons:integer);
+        procedure SaveSettings;
 
 end;
 
 
 
 implementation
+
+function IsExeInProgramSubDir: Boolean;
+var p1: String;
+begin
+    result := false;
+    p1 := IncludeTrailingPathDelimiter(GetEnvironmentVariable('ProgramFiles'));
+    if AnsiStartsText(p1, ParamStr(0)) then
+        result := true
+    else
+    begin
+        p1 := GetEnvironmentVariable('ProgramW6432');
+        if p1 <> '' then
+            result := AnsiStartsText(IncludeTrailingPathDelimiter(p1), ParamStr(0));
+    end;
+end;
+
+function GetShellFolder(CSIDL: integer): string;
+var
+  pidl              : PItemIdList;
+  FolderPath        : string;
+  SystemFolder      : Integer;
+  Malloc            : IMalloc;
+begin
+  Malloc := nil;
+  FolderPath := '';
+  SHGetMalloc(Malloc);
+  if Malloc = nil then
+  begin
+    Result := FolderPath;
+    Exit;
+  end;
+  try
+    SystemFolder := CSIDL;
+    if SUCCEEDED(SHGetSpecialFolderLocation(0, SystemFolder, pidl)) then
+    begin
+      SetLength(FolderPath, max_path);
+      if SHGetPathFromIDList(pidl, PChar(FolderPath)) then
+      begin
+        SetLength(FolderPath, length(PChar(FolderPath)));
+      end;
+    end;
+    Result := FolderPath;
+  finally
+    Malloc.Free(pidl);
+  end;
+end;
+
+
 
 // From: http://www.delphipraxis.net/37489-microsoft-cleartype-ein-aus.html
 procedure ChangeCleartype(canvas:Tcanvas;ClearType:boolean);
@@ -96,6 +151,9 @@ end;
 // callback for Config: Should be done in MainForm, so use a property here
 constructor TNempG15Applet.Create;
 begin
+
+    InitSettings;
+
     MainBitmap := TBitmap.Create;
     SplashImage:= TBitmap.Create;
     MainBitmap.Height := LGLCD_BMP_HEIGHT;
@@ -119,11 +177,13 @@ begin
     ResetTimer.Interval := 10000;
     ResetTimer.OnTimer := ResetTimerTimer;
 
-    fStartPriority   := 255;   // todo: Read from INI
-    fDisplayPriority := 1;     // todo: Read from INI
-
     try
         g15Display := TLcdG15.Create('Nemp: G15-Addon', false, true, true);
+        if Not g15Display.CreateComplete then
+        begin
+            FreeAndNil(g15Display);
+        end;
+
         g15Display.OnSoftButtons := myCallbackSoftButtons;
 
         g15Display.LcdCanvas := MainBitmap.Canvas;
@@ -142,6 +202,75 @@ begin
     inherited;
 end;
 
+procedure TNempG15Applet.InitSettings;
+var ini: TMemIniFile;
+    tmp: String;
+begin
+    // Get Savepath for settings
+    if IsExeInProgramSubDir then
+    begin
+        // Nemp liegt im System-Programmverzeichnis
+        fSavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
+        try
+            ForceDirectories(fSavePath);
+        except
+            fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+        end;
+    end else
+    begin
+        // Nemp liegt woanders
+        fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+    end;
+
+
+    ini := TMeminiFile.Create(fSavePath + 'g15.ini', TEncoding.Utf8);
+    try
+        fStartPriority   := ini.ReadInteger('NempG15', 'StartPriority'    , 255 );
+        fDisplayPriority := ini.ReadInteger('NempG15', 'fDisplayPriority' , 1   );
+    finally
+        ini.Free;
+    end;
+
+    ini := TMeminiFile.Create(fSavePath + 'Nemp.ini', TEncoding.Utf8);
+    try
+        ini.Encoding := TEncoding.UTF8;
+        tmp := Ini.ReadString('Allgemein', 'DisplayApp', '');
+        fStartWithNemp := tmp = ExtractFilename(ParamStr(0));
+    finally
+        ini.Free;
+    end;
+
+end;
+
+procedure TNempG15Applet.SaveSettings;
+var ini: TMemIniFile;
+begin
+    ini := TMeminiFile.Create(fSavePath + 'g15.ini', TEncoding.Utf8);
+    try
+        ini.WriteInteger('NempG15', 'StartPriority'   , fStartPriority   );
+        ini.WriteInteger('NempG15', 'fDisplayPriority', fDisplayPriority );
+    finally
+        ini.Free;
+    end;
+
+    ini := TMeminiFile.Create(fSavePath + 'Nemp.ini', TEncoding.Utf8);
+    try
+        ini.Encoding := TEncoding.UTF8;
+        if fStartWithNemp then
+            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)))
+        else
+            Ini.WriteString('Allgemein', 'DisplayApp', '');
+
+    finally
+        ini.UpdateFile;
+        ini.Free;
+    end;
+
+
+end;
+
+
+
 function TNempG15Applet.GetOnConfig: TOnConfigureCB;
 begin
     if assigned(g15Display) then
@@ -149,6 +278,9 @@ begin
     else
         result := Nil;
 end;
+
+
+
 
 procedure TNempG15Applet.SetOnConfig(value: TOnConfigureCB);
 begin
