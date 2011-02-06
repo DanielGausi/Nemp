@@ -286,6 +286,7 @@ type
         procedure LoadFromFile4(aStream: TStream);
 
     public
+        CloseAfterUpdate: Boolean; // flag used in OnCloseQuery
         // Some Beta-Options
         //BetaDontUseThreadedUpdate: Boolean;
 
@@ -627,6 +628,7 @@ constructor TMedienBibliothek.Create(aWnd: DWord; CFHandle: DWord);
 var i: Integer;
 begin
   inherited create;
+  CloseAfterUpdate := False;
   MainWindowHandle := aWnd;
 
   Mp3ListePfadSort   := TObjectlist.Create(False);
@@ -1252,7 +1254,12 @@ begin
           if MB.AutoScanDirs then
           begin
               MB.Initializing := init_AutoScanDir;
-              SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartAutoScanDirs, 0);
+
+              if not MB.CloseAfterUpdate then
+                  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartAutoScanDirs, 0)
+              else
+                  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+
               // Scanning is done in a separate thread.
               // Problem: Another Thread (VCL, in preparation for Player.PostProcess)
               //          could have gotten the Status=0 from above and start working
@@ -1263,7 +1270,7 @@ begin
               // Not really "Complete", but after this we have nothing more special to do here
               MB.Initializing := Init_Complete;
               // No Autoscan wanted, but maybe we want to activate the WebServer now.
-              if MB.AutoActivateWebServer then
+              if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
               begin
                   SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ActivateWebServer, 0);
                   // Activation is done in VCL-Thread.
@@ -1274,7 +1281,7 @@ begin
       end;
       init_AutoScanDir: begin
           // AutoScandir has been completed, so WebServer-Activation is the next thing to do.
-          if MB.AutoActivateWebServer then
+          if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
           begin
               MB.Initializing := Init_Complete;
               SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ActivateWebServer, 0);
