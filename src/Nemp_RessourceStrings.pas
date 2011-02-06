@@ -104,6 +104,7 @@ Bitrate_Constant = 'Constant bitrate';
 Bitrate_Variable = 'Variable bitrate';
 
 Warning_MedienBibIsBusy = 'The operation could not be processed, because the medialibrary is busy. Please try again later or cancel the running operation by pressing ESC.';
+Warning_MedienBibIsBusyOnClose = 'Nemp is searching for new files or updating the library. Do you really want to quit now?';
 Warning_MedienBibIsBusyCritical = 'The library is in a critical update-process right now. Editing files is not possible. Please try again in a few seconds.';
 Warning_MedienBibIsBusy_Options
            = 'Some settings could not be changed, because the medialibrary is busy. Please try again later or cancel the running operation by pressing ESC.';

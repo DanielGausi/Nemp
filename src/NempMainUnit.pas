@@ -8841,7 +8841,29 @@ procedure TNemp_MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := (MedienBib.StatusBibUpdate = 0) AND (NempPlaylist.Status = 0);
   if not CanClose then
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+  begin
+      if MessageDLG((Warning_MedienBibIsBusyOnClose), mtWarning, [MBYes, MBNo], 0) = mrYES then
+      begin
+          if MedienBib.StatusBibUpdate = 0 then
+              // if the dialog was open for a longer time ... ;-)
+              CanClose := True
+          else
+          begin
+              MedienBib.CloseAfterUpdate := True;
+
+              ContinueWithPlaylistAdding := False;
+              NempPlaylist.ST_Ordnerlist.Clear;
+              Medienbib.ST_Ordnerlist.Clear;
+              ST_Playlist.Break;
+              ST_Medienliste.Break;
+              MedienBib.Abort;
+              fspTaskbarManager.ProgressState := fstpsNoProgress;
+              // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
+              NempPlaylist.AcceptInput := True;
+              LangeAktionWeitermachen := False;
+          end;
+      end;
+  end;
 end;
 
 procedure TNemp_MainForm.PM_P_MinimizeClick(Sender: TObject);

@@ -446,6 +446,8 @@ begin
         // Changing the status of the library MUST be done in the VCL-Thread!
         MB_SetStatus: begin
             MedienBib.StatusBibUpdate := aMsG.LParam;
+            if (aMsg.LParam = 0) and (MedienBib.CloseAfterUpdate) then
+                PostMessage(Nemp_MainForm.Handle, WM_Close, 0,0);
         end;
 
         MB_BlockUpdateStart: begin

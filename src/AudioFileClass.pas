@@ -862,9 +862,14 @@ function TAudioFile.fGetPlaylistTitleString: UnicodeString;
 begin
   if isStream then
   begin
-      result := Description;
-      if (titel <> '') and (titel <> pfad) then
-          result := result + ' (' + titel + ')';
+      if (artist <> '') and (titel <> '') then  // could be the case on remote ogg-files (through "DoOggMeta")
+          result := Artist + ' - ' + NonEmptyTitle
+      else
+      begin
+          result := Description;
+          if (titel <> '') and (titel <> pfad) then
+              result := result + ' (' + titel + ')';
+      end;
   end
   else
   begin
