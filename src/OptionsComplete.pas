@@ -454,6 +454,7 @@ type
     seWebServer_Port: TSpinEdit;
     cbMissingCoverMode: TComboBox;
     Label6: TLabel;
+    cbUseStreamnameAsDirectory: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1044,6 +1045,7 @@ begin
   EdtDownloadDir.Text := NempPlayer.DownloadDir;
   cbFilenameFormat.Text := NempPlayer.FilenameFormat;
   cbAutoSplitByTitle.Checked := NempPlayer.AutoSplitByTitle;
+  cbUseStreamnameAsDirectory.Checked := NempPlayer.UseStreamnameAsDirectory;
 
   cbAutoSplitBySize.Checked := NempPlayer.AutoSplitByTime;
   SE_AutoSplitMaxSize.Enabled := NempPlayer.AutoSplitByTime;
@@ -1932,6 +1934,7 @@ begin
   NempPlayer.DownloadDir := IncludeTrailingPathDelimiter(EdtDownloadDir.Text);
   NempPlayer.FilenameFormat := cbFilenameFormat.Text;
   NempPlayer.AutoSplitByTitle := cbAutoSplitByTitle.Checked;
+  NempPlayer.UseStreamnameAsDirectory := cbUseStreamnameAsDirectory.Checked;
 
   NempPlayer.AutoSplitByTime := cbAutoSplitBySize.Checked;
   NempPlayer.AutoSplitBySize := cbAutoSplitByTime.Checked;
