@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio4
+    ActivePage = TabAudio5
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -3353,16 +3353,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
         449
         443)
       object GrpBox_WebradioRecording: TGroupBox
-        Left = 8
-        Top = 91
+        Left = 12
+        Top = 94
         Width = 434
-        Height = 315
+        Height = 329
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recording options'
         TabOrder = 1
         DesignSize = (
           434
-          315)
+          329)
         object LblConst_DownloadDir: TLabel
           Left = 8
           Top = 16
@@ -3372,35 +3372,35 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object LblConst_FilenameFormat: TLabel
           Left = 8
-          Top = 64
+          Top = 78
           Width = 101
           Height = 13
           Caption = 'Pattern for filenames'
         end
         object LblConst_FilenameExtension: TLabel
           Left = 8
-          Top = 112
+          Top = 120
           Width = 231
           Height = 13
           Caption = '(A proper extension will be added automatically)'
         end
         object LblConst_MaxSize: TLabel
           Left = 104
-          Top = 182
+          Top = 192
           Width = 50
           Height = 13
           Caption = 'MB per file'
         end
         object LblConst_MaxTime: TLabel
           Left = 104
-          Top = 230
+          Top = 240
           Width = 73
           Height = 13
           Caption = 'Minutes per file'
         end
         object LblConst_WebradioNote: TLabel
           Left = 32
-          Top = 256
+          Top = 266
           Width = 29
           Height = 13
           Caption = 'Note:'
@@ -3413,7 +3413,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object LblConst_WebradioHint: TLabel
           Left = 32
-          Top = 272
+          Top = 282
           Width = 385
           Height = 33
           AutoSize = False
@@ -3435,7 +3435,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cbAutoSplitByTitle: TCheckBox
           Left = 8
-          Top = 136
+          Top = 146
           Width = 417
           Height = 17
           Hint = 
@@ -3448,7 +3448,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cbAutoSplitByTime: TCheckBox
           Left = 8
-          Top = 208
+          Top = 218
           Width = 417
           Height = 17
           Hint = 'Split recordings by time.'
@@ -3458,7 +3458,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object SE_AutoSplitMaxSize: TSpinEdit
           Left = 32
-          Top = 178
+          Top = 188
           Width = 65
           Height = 22
           MaxValue = 2000
@@ -3468,7 +3468,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cbAutoSplitBySize: TCheckBox
           Left = 8
-          Top = 160
+          Top = 170
           Width = 417
           Height = 17
           Hint = 'Split recordings by size.'
@@ -3478,7 +3478,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object SE_AutoSplitMaxTime: TSpinEdit
           Left = 32
-          Top = 226
+          Top = 236
           Width = 65
           Height = 22
           MaxValue = 1440
@@ -3496,7 +3496,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cbFilenameFormat: TComboBox
           Left = 8
-          Top = 79
+          Top = 93
           Width = 385
           Height = 21
           ItemHeight = 13
@@ -3508,6 +3508,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
             '<date>, <time> - <streamname> - <title>'
             '<title>'
             '<streamname> - <title>')
+        end
+        object cbUseStreamnameAsDirectory: TCheckBox
+          Left = 8
+          Top = 56
+          Width = 393
+          Height = 17
+          Caption = 'Use streamname as directory'
+          TabOrder = 8
         end
       end
       object RGroup_Playlist: TRadioGroup
@@ -3581,7 +3589,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 432
         Height = 123
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Jingles (playback via F9)'
+        Caption = 'Jingles (playback via F9, Push-to-talk via F8 )'
         TabOrder = 2
         object LblJingleReduce: TLabel
           Left = 92

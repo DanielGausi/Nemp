@@ -4403,7 +4403,10 @@ begin
         Data := VST.GetNodeData(Node);
         NempPlayer.PlayJingle(Data^.FAudioFile);
       end;
+    end;
 
+    VK_F8: begin
+        NempPlayer.PlayJingle(Nil);
     end;
   end;
 end;
@@ -4457,7 +4460,6 @@ begin
               PM_P_ViewStayOnTopClick(NIL);
            end;
 
-    VK_F8,
     VK_F7: begin
               if Not NempSkin.NempPartyMode.Active then
               begin
@@ -6797,6 +6799,10 @@ begin
       end;
     end;
 
+    VK_F8: begin
+        NempPlayer.PlayJingle(Nil);
+    end;
+
     96..105: begin // NumPad 0..9
         NempPlaylist.ProcessKeypress(key - 96, PlaylistVST.FocusedNode);
     end;
@@ -6812,7 +6818,7 @@ procedure TNemp_MainForm.PlaylistVSTKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
  case key of
-    VK_F9: NempPlayer.StopJingle;
+    VK_F9, VK_F8: NempPlayer.StopJingle;
   end;
 end;
 

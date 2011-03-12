@@ -237,6 +237,7 @@ type
         // settings for webradio
         DownloadDir: UnicodeString;
         FilenameFormat: String;     // Muster für die Dateibenennung. Muss entsprechend geparsed werden
+        UseStreamnameAsDirectory: Boolean;
         AutoSplitByTitle: Boolean;  // Jeden Titel in eigene Datei schreiben
         AutoSplitByTime: Boolean;
         AutoSplitBySize: Boolean;
@@ -820,10 +821,10 @@ begin
 
 
   FilenameFormat := ini.ReadString('Player', 'WebRadioFilenameFormat', '<date>, <time> - <title>');
+  UseStreamnameAsDirectory := ini.ReadBool('Player', 'UseStreamnameAsDirectory', False);
   AutoSplitByTitle := ini.ReadBool('Player', 'WebRadioAutoSplitFiles', True);
-
-  AutoSplitByTime := ini.ReadBool('Player', 'WebRadioAutoSplitByTime', False);
-  AutoSplitBySize := ini.ReadBool('Player', 'WebRadioAutoSplitBySize', False);
+  AutoSplitByTime  := ini.ReadBool('Player', 'WebRadioAutoSplitByTime', False);
+  AutoSplitBySize  := ini.ReadBool('Player', 'WebRadioAutoSplitBySize', False);
 
   AutoSplitMaxTime := Ini.ReadInteger('Player', 'WebRadioAutoSplitMaxTime', 30);
   if (AutoSplitMaxTime < 0) or (AutoSplitMaxTime > 1440) then AutoSplitMaxTime := 30;
@@ -911,6 +912,7 @@ begin
   Ini.WriteInteger('Player','JingleVolume', JingleVolume);
 
   ini.WriteString('Player', 'WebradioDownloadDir', (DownloadDir));
+  ini.WriteBool('Player', 'UseStreamnameAsDirectory', UseStreamnameAsDirectory);
   ini.WriteString('Player', 'WebRadioFilenameFormat', FilenameFormat);
   ini.WriteBool('Player', 'WebRadioAutoSplitFiles', AutoSplitByTitle);
 
@@ -1433,17 +1435,22 @@ begin
     if ReduceMainVolumeOnJingle then
       BASS_ChannelSlideAttribute(MainStream,BASS_ATTRIB_VOL,
                  fMainVolume * ReduceMainVolumeOnJingleValue/100, SeekFadingInterval);
-    Jinglestream := NEMP_CreateStream(aAudioFile.Pfad,
-                       False, // kein Tempostream
-                       False,  // kein ReverseStream
-                       true); // Check for Easteregg
 
-    BASS_ChannelFlags(Jinglestream, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP);
-    // Attribute setzen
-    tmp := fMainVolume * JingleVolume/100;
-    if tmp > 1 then tmp := 1;
-    BASS_ChannelSetAttribute(JingleStream, BASS_ATTRIB_VOL, tmp);
-    BASS_ChannelPlay(JingleStream, true);
+    JingleStream := 1; // <> 0
+    if assigned(aAudioFile) then
+    begin
+        Jinglestream := NEMP_CreateStream(aAudioFile.Pfad,
+                           False, // kein Tempostream
+                           False,  // kein ReverseStream
+                           true); // Check for Easteregg
+
+        BASS_ChannelFlags(Jinglestream, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP);
+        // Attribute setzen
+        tmp := fMainVolume * JingleVolume/100;
+        if tmp > 1 then tmp := 1;
+        BASS_ChannelSetAttribute(JingleStream, BASS_ATTRIB_VOL, tmp);
+        BASS_ChannelPlay(JingleStream, true);
+    end;
   end;
 end;
 
@@ -2631,7 +2638,7 @@ end;
     --------------------------------------------------------
 }
 function TNempPlayer.GenerateRecordingFilename(Extension: String): UnicodeString;
-var aTitel, aDate, aTime, aStreamName, MainFilename: UnicodeString;
+var aTitel, aDate, aTime, aStreamName, MainFilename, localDir: UnicodeString;
     i : Integer;
     tmpResult: UnicodeString;
     newLength: Integer;
@@ -2660,19 +2667,24 @@ begin
 
   MainFilename := ReplaceForbiddenFilenameChars(MainFilename);
 
+  if UseStreamnameAsDirectory then
+      localDir := IncludeTrailingPathDelimiter(DownloadDir + aStreamName)
+  else
+      localDir := DownloadDir;
+
   // Prüfen, ob Verzeichnis existiert, bei Bedarf erstellen
   // oder ausweich-Ordner nehmen
-  if not DirectoryExists(DownloadDir) then
+  if not DirectoryExists(localDir) then
   begin
       try
-          ForceDirectories(DownloadDir);
+          ForceDirectories(localDir);
       except
-          if Not DirectoryExists(DownloadDir) then
-              DownloadDir := Savepath;
+          if Not DirectoryExists(localDir) then
+              localDir := Savepath;
       end;
   end;
 
-  tmpResult := DownloadDir + MainFilename + Extension;
+  tmpResult := localDir + MainFilename + Extension;
   result := '';
 
   if FileExists(tmpResult) then
@@ -2682,21 +2694,21 @@ begin
          // (x) dranhängen
          i := 1;
          repeat
-            result := DownloadDir + MainFilename + '_' + IntToStr(i) + Extension;
+            result := localDir + MainFilename + '_' + IntToStr(i) + Extension;
             inc(i);
          until not FileExists(result);
       end else
       begin
           // erst kürzen
-          newLength := 244 - length(Extension) - length(DownloadDir);
+          newLength := 244 - length(Extension) - length(localDir);
           if newlength > 0 then
           begin
               MainFilename := Copy(MainFilename, 1, newLength);
-              result := DownloadDir + MainFilename + Extension;
+              result := localDir + MainFilename + Extension;
               i := 1;
               while FileExists(result) and (i < 100) do
               begin
-                 result := DownloadDir + MainFilename + '_' + IntToStr(i) + Extension;
+                 result := localDir + MainFilename + '_' + IntToStr(i) + Extension;
                  inc(i);
               end;
           end else
@@ -2713,15 +2725,15 @@ begin
       begin
           // erst kürzen
           //Showmessage('kürze...');
-          newLength := 244 - length(Extension) - length(DownloadDir);
+          newLength := 244 - length(Extension) - length(localDir);
           if newlength > 1 then
           begin
               MainFilename := Copy(MainFilename, 1, newLength);
-              result := DownloadDir + MainFilename + Extension;
+              result := localDir + MainFilename + Extension;
               i := 1;
               while FileExists(result) and (i < 100) do
               begin
-                 result := DownloadDir + MainFilename + '_' + IntToStr(i) + Extension;
+                 result := localDir + MainFilename + '_' + IntToStr(i) + Extension;
                  inc(i);
               end;
           end else
