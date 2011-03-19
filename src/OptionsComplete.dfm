@@ -3620,7 +3620,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 409
           Height = 17
           Hint = 'Reduce main volume before when playing a jingle'
-          Caption = 'Reduce main volume by'
+          Caption = 'Reduce main volume to'
           TabOrder = 0
           OnClick = CBJingleReduceClick
         end
