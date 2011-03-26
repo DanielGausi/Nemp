@@ -696,6 +696,13 @@ CopyToUSB_ERROR_TOO_MANY_OPEN_FILES = 'Too many open files. Choose OK to continu
 CopyToUSB_ERROR_ACCESS_DENIED = 'Access denied. Choose OK to continue with next file, or cancel the copying process.';
 CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue with next file, or cancel the copying process.';
 
+StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display the current title (and some other stuff) on it.'
+                      +#13#10+#13#10
+                      +'It is possible to use other apps for other keyboards. However, I only own a G15, so I can test only this one.'
+                      +#13#10
+                      +'If you want to create an app for your keyboard, feel free to contact me.'
+                      +#13#10+#13#10
+                      +'So, do you want to start the G15 App now?';
 
 implementation
 

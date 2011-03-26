@@ -76,7 +76,7 @@ begin
     // Init is done by the StartTimer-OnTimer.
     NempG15Applet := Nil;
 
-    BtnHide.Visible := ParamCount = 1;
+    // BtnHide.Visible := ParamCount = 1;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -98,7 +98,6 @@ begin
     ImageList1.GetBitmap(0, NempG15Applet.SplashImage);
 
     if Not assigned(NempG15Applet.g15Display) then
-
         MessageDLG('NempG15Applet could not be loaded: Another copy is already running, or no G15 can be found.', mtError, [MBOK], 0);
 
     MainTimer.Enabled := True;

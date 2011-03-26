@@ -65,7 +65,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Top = 8
     Width = 692
     Height = 381
-    ActivePage = Tab_Favourites
+    ActivePage = Tab_Shoutcast
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
     object Tab_Favourites: TTabSheet
@@ -203,13 +203,32 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Top = 376
         Width = 3
         Height = 13
+        Enabled = False
+      end
+      object lblShoutcastAPIchanged: TLabel
+        Left = 16
+        Top = 3
+        Width = 657
+        Height = 32
+        AutoSize = False
+        Caption = 
+          'Shoutcast changed the API and its terms of use. Therefore OpenSo' +
+          'urce-Software like Nemp can no longer use it.'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clRed
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        WordWrap = True
       end
       object VST_ShoutcastQuery: TVirtualStringTree
         Left = 8
-        Top = 64
+        Top = 96
         Width = 668
-        Height = 249
+        Height = 217
         Anchors = [akLeft, akTop, akRight, akBottom]
+        Enabled = False
         Header.AutoSizeIndex = 0
         Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
@@ -257,16 +276,18 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       end
       object GrpBox_GeneralSearch: TGroupBox
         Left = 8
-        Top = 8
+        Top = 41
         Width = 281
         Height = 49
         Caption = 'General search'
+        Enabled = False
         TabOrder = 2
         object Edt_Search: TEdit
           Left = 8
           Top = 16
           Width = 185
           Height = 21
+          Enabled = False
           TabOrder = 0
           OnKeyPress = Edt_SearchKeyPress
         end
@@ -276,16 +297,18 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Width = 73
           Height = 21
           Caption = 'Ok'
+          Enabled = False
           TabOrder = 1
           OnClick = Btn_SearchClick
         end
       end
       object GrpBox_SearchGenre: TGroupBox
         Left = 296
-        Top = 8
+        Top = 41
         Width = 241
         Height = 49
         Caption = 'Search by genre'
+        Enabled = False
         TabOrder = 3
         object CB_SearchGenre: TComboBox
           Left = 8
@@ -294,6 +317,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Height = 21
           Style = csDropDownList
           DropDownCount = 23
+          Enabled = False
           ItemHeight = 13
           ItemIndex = 0
           TabOrder = 0
@@ -328,6 +352,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Width = 73
           Height = 21
           Caption = 'Ok'
+          Enabled = False
           TabOrder = 1
           OnClick = Btn_SearchGenreClick
         end
@@ -339,6 +364,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Height = 25
         Anchors = [akLeft, akBottom]
         Caption = 'Add selected to favorites'
+        Enabled = False
         TabOrder = 1
         OnClick = Btn_AddSelectedClick
       end

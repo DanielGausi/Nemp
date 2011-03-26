@@ -105,6 +105,7 @@ type
     cbSortMode: TComboBox;
     BtnSetCustomSort: TButton;
     BtnNewStation: TButton;
+    lblShoutcastAPIchanged: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Btn_OkClick(Sender: TObject);
