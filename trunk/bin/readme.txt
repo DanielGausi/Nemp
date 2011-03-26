@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - August 2010
+      Januar 2005 - April 2011
 
-      Version: 4.0.1
+      Version: 4.1.0
 
 
 -----------------------------------------------------------
@@ -120,6 +120,57 @@ Verwendete Units/Komponenten:
   http://www.delphipraxis.net
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
+
+
+
+
+Version 4.1.0, April 2011
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+* Unterstützung von Flac- und Ogg-Tags (lesen und schreiben)
+* Unterstützung für das Display der Logitech G15 (durch Zusatztool)
+* Copy&Paste: Bei Strg+Shift+C wird eine passende m3u-Liste mit kopiert
+* Funktion "Playlist auf USB-Stick kopieren". Dabei auch optional passende 
+  Umbenennung der Dateien
+* Eqalizer-Steuerung: Leichteres Umschalten zwischen Voreinstellungen
+* Webserver: Option für die PORT-Einstellung
+* Push-To-Talk-taste (F8)
+* Datei-Details: Bearbeiten von zusätzlichen Tags (die für die Tagwolke)
+* Webradio-Aufnahme: Option "Stream als Ordner"
+* Coverflow: - bei der Schnellsuche auch anpassen
+             - Sortierung: Fehlende Cover zuerst/am Ende
+             - Option für das Leeren des Cover-Caches
+* ID3-Tag-Editor: readonly-Flag der Dateien berücksichtigen
+* Funktion "nicht getaggte Dateien auflisten" (unter "erweitert")
+
+Änderungen:
+-----------
+* Datei in "Letzte Playlists" nicht gefunden: "Eintrag löschen" anbieten
+* Webradio einfügen: Bei der Playlist nur einfache Input-Box zeigen, 
+  wie auch beim Play-Button
+* Nicht mp3/ogg/flac-Files können nicht mehr editiert werden (auch keine 
+  Lyrics und weitere Tags) 
+  Einzige Ausnahme: Rating
+* Bei nicht getaggten Dateien Auswahl was wie angezeigt werden soll,
+  z.B. "Pfad in der Spalte Album"
+* Nemp kann jetzt auch geschlossen werden, wenn die Medienbibliothek gerade 
+  ein Update durchführt.
+* GUI: - Drag&Drop auf Kopfhörer, von Kopfhörer in Playlist,
+       - Drag&Drop vom Detail-Cover in die Playlist und Kopfhörer
+
+Bugfixes:
+---------
+* Funktion "Player reinitialisieren" führte beim Aufruf der Einstellungen zu
+  einem Fehler
+* Wenn keine Track-Nr-Info vorliegt, wird jetzt nicht mehr "0" dafür im 
+  ID3v2Tag gespeichert, sondern nichts
+* falsches Label bei Jingles: Lautstärke reduzieren AUF, nicht UM!
+
+Deaktivierte Funktionen:
+------------------------
+* Browsen in der Shoutcast-Datenbank. Die API wurde geändert, und die
+  Nutzungsbedingungen schließt OpenSource aus.
 
   
 

@@ -818,6 +818,8 @@ type
     N76: TMenuItem;
     PM_ML_ShowAllIncompleteTaggedFiles: TMenuItem;
     RefreshCoverFlowTimer: TTimer;
+    MM_T_KeyboardDisplay: TMenuItem;
+    PM_P_KeyboardDisplay: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1374,6 +1376,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure ImgDetailCoverMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure PM_P_KeyboardDisplayClick(Sender: TObject);
 
   private
 
@@ -11140,6 +11143,25 @@ begin
         ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal)
   else
         MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
+end;
+
+procedure TNemp_MainForm.PM_P_KeyboardDisplayClick(Sender: TObject);
+var tmp: String;
+begin
+    if MessageDlg((StartG15ToolQuestion), mtInformation, [mbYes,MBNo], 0) = mrYes then
+    begin
+        if NempOptions.DisplayApp = '' then
+            tmp := 'NempG15App.exe'
+        else
+            tmp := NempOptions.DisplayApp;
+
+        shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + tmp + '"'),'autostart',0,sw_show);
+
+    // if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
+    //
+
+
+    end;
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesDataClick(Sender: TObject);

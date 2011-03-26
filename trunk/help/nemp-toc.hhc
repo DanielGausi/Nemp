@@ -58,7 +58,7 @@
 			<param name="Local" value="kopfhoerer.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Jingles">
+			<param name="Name" value="Jingles/Push-To-Talk">
 			<param name="Local" value="jingles.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -126,6 +126,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Der Tagwolken-Editor">
 			<param name="Local" value="medienbib_cloudeditor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Keyboard-Display">
+			<param name="Local" value="keyboardapps.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">

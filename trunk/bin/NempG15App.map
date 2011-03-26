@@ -1,6 +1,6 @@
 
  Start         Length     Name                   Class
- 0001:00401000 00072BDCH .text                   CODE
+ 0001:00401000 00072BC4H .text                   CODE
  0002:00474000 000007ECH .itext                  ICODE
  0003:00475000 0000201CH .data                   DATA
  0004:00478000 000051D4H .bss                    BSS
@@ -55,8 +55,8 @@ Detailed map of segments
  0001:00070408 0000030F C=CODE     S=.text    G=(none)   M=lcdg15   ACBP=A9
  0001:00070718 000002B6 C=CODE     S=.text    G=(none)   M=NempApi  ACBP=A9
  0001:000709D0 000019C0 C=CODE     S=.text    G=(none)   M=lcdg15Nemp ACBP=A9
- 0001:00072390 00000623 C=CODE     S=.text    G=(none)   M=MainUnit ACBP=A9
- 0001:000729B4 00000228 C=CODE     S=.text    G=(none)   M=NempG15App ACBP=A9
+ 0001:00072390 0000060B C=CODE     S=.text    G=(none)   M=MainUnit ACBP=A9
+ 0001:0007299C 00000228 C=CODE     S=.text    G=(none)   M=NempG15App ACBP=A9
  0002:00000000 000000AE C=ICODE    S=.itext   G=(none)   M=System   ACBP=A9
  0002:000000B0 00000011 C=ICODE    S=.itext   G=(none)   M=Windows  ACBP=A9
  0002:000000C4 00000094 C=ICODE    S=.itext   G=(none)   M=SysUtils ACBP=A9
@@ -2908,10 +2908,10 @@ Detailed map of segments
  0001:0007267C       MainUnit.TMainForm.BtnHideClick
  0001:00072684       MainUnit.TMainForm.Button1Click
  0001:00072708       MainUnit.TMainForm.FormCreate
- 0001:0007272C       MainUnit.TMainForm.FormDestroy
- 0001:000728EC       MainUnit.TMainForm.MainTimerTimer
- 0001:0007296C       MainUnit.TMainForm.myCallbackConfigure
- 0001:00072740       MainUnit.TMainForm.StartTimerTimer
+ 0001:00072714       MainUnit.TMainForm.FormDestroy
+ 0001:000728D4       MainUnit.TMainForm.MainTimerTimer
+ 0001:00072954       MainUnit.TMainForm.myCallbackConfigure
+ 0001:00072728       MainUnit.TMainForm.StartTimerTimer
  0004:000050F8       Menus..01
  0001:0003E910       Menus..EMenuError
  0001:0003F1F4       Menus..TMainMenu
@@ -3190,7 +3190,7 @@ Detailed map of segments
  0001:000707B4       NempApi.SetNempPlayListPos
  0001:00070744       NempApi.SetNemp_User
  0003:00001B84       NempApi.WINDOW_NAME
- 0001:000729B4       NempG15App.Finalization
+ 0001:0007299C       NempG15App.Finalization
  0002:00000798       NempG15App.NempG15App
  0004:00005058       Printers..3
  0001:00039834       Printers.Finalization
@@ -9009,11 +9009,11 @@ Detailed map of segments
  0001:0007267C       MainUnit.TMainForm.BtnHideClick
  0001:00072684       MainUnit.TMainForm.Button1Click
  0001:00072708       MainUnit.TMainForm.FormCreate
- 0001:0007272C       MainUnit.TMainForm.FormDestroy
- 0001:00072740       MainUnit.TMainForm.StartTimerTimer
- 0001:000728EC       MainUnit.TMainForm.MainTimerTimer
- 0001:0007296C       MainUnit.TMainForm.myCallbackConfigure
- 0001:000729B4       NempG15App.Finalization
+ 0001:00072714       MainUnit.TMainForm.FormDestroy
+ 0001:00072728       MainUnit.TMainForm.StartTimerTimer
+ 0001:000728D4       MainUnit.TMainForm.MainTimerTimer
+ 0001:00072954       MainUnit.TMainForm.myCallbackConfigure
+ 0001:0007299C       NempG15App.Finalization
  0002:00000000       System.System
  0002:000000B0       Windows.Windows
  0002:000000C4       SysUtils.SysUtils
@@ -9741,16 +9741,15 @@ Line numbers for MainUnit(MainUnit.pas) segment .text
     52 0001:0007267C    53 0001:00072681    56 0001:00072684    58 0001:00072687
     59 0001:0007269E    60 0001:000726B0    62 0001:000726BF    64 0001:000726CC
     65 0001:000726DE    67 0001:000726ED    69 0001:000726FA    70 0001:00072705
-    74 0001:00072708    77 0001:0007270B    79 0001:00072713    80 0001:00072727
-    84 0001:0007272C    85 0001:00072736    86 0001:0007273D    90 0001:00072740
-    91 0001:00072744    92 0001:00072751    95 0001:0007275E    96 0001:00072772
-    97 0001:0007277F    98 0001:0007278E   100 0001:0007279E   102 0001:000727AA
-   104 0001:000727BF   106 0001:000727CC   107 0001:000727E4   108 0001:00072802
-   109 0001:00072820   115 0001:000728EC   116 0001:000728F0   117 0001:00072906
-   118 0001:00072912   121 0001:0007291C   123 0001:00072925   125 0001:00072941
-   128 0001:0007294E   129 0001:0007295A   131 0001:00072961   134 0001:00072966
-   139 0001:0007296C   144 0001:0007296F   145 0001:0007297E   148 0001:000729A2
-   150 0001:000729B1   154 0001:000729E1
+    77 0001:00072708    80 0001:00072710    84 0001:00072714    85 0001:0007271E
+    86 0001:00072725    90 0001:00072728    91 0001:0007272C    92 0001:00072739
+    95 0001:00072746    96 0001:0007275A    97 0001:00072767    98 0001:00072776
+   100 0001:00072786   101 0001:00072792   103 0001:000727A7   105 0001:000727B4
+   106 0001:000727CC   107 0001:000727EA   108 0001:00072808   114 0001:000728D4
+   115 0001:000728D8   116 0001:000728EE   117 0001:000728FA   120 0001:00072904
+   122 0001:0007290D   124 0001:00072929   127 0001:00072936   128 0001:00072942
+   130 0001:00072949   133 0001:0007294E   138 0001:00072954   143 0001:00072957
+   144 0001:00072966   147 0001:0007298A   149 0001:00072999   153 0001:000729C9
 
 Line numbers for NempG15App(NempG15App.dpr) segment .itext
 

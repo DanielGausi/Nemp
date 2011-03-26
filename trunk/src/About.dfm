@@ -30,7 +30,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2010 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2011 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
       'Website: [url="http://www.gausi.de"]http://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
