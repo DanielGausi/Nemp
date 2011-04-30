@@ -276,12 +276,11 @@ end;
 
 destructor TNempCoverFlow.Destroy;
 begin
-    Mode := cm_None; // This will also free the sub-coverflows
-
     fDownloadThread.Terminate;
     fDownloadThread.WaitFor;
     fDownloadThread.Free;
 
+    Mode := cm_None; // This will also free the sub-coverflows
     inherited Destroy;
 end;
 

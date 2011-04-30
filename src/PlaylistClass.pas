@@ -884,9 +884,14 @@ begin
     begin
         aIdx := HistoryList.IndexOf(fCurrentHistoryFile);
         if aIdx < HistoryList.Count-1 then
-            fCurrentHistoryFile := TAudioFile(HistoryList[aIdx])
+        begin
+            if aIdx >= 0 then
+                fCurrentHistoryFile := TAudioFile(HistoryList[aIdx])
+            else
+                fCurrentHistoryFile := Nil;
+        end
         else
-            if aIdx - 1 > 0 then
+            if aIdx - 1 >= 0 then
                 fCurrentHistoryFile := TAudioFile(HistoryList[aIdx - 1])
             else
                 fCurrentHistoryFile := Nil;
