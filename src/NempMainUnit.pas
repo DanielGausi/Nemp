@@ -4474,6 +4474,10 @@ begin
               end;
            end;
 
+    VK_F8: begin
+        NempPlayer.PlayJingle(Nil);
+    end;
+
 (*    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
                 //if (ssCtrl in Shift) AND (ssAlt in Shift) then
                 //  PlayPrevBTNClick(PlayPrevBTN)
