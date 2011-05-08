@@ -222,9 +222,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         443)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
-        Top = 88
+        Top = 78
         Width = 434
-        Height = 228
+        Height = 229
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hotkeys configuration'
         TabOrder = 1
@@ -1037,12 +1037,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 74
+        Height = 64
         Caption = 'Media keys'
         TabOrder = 0
         object CB_IgnoreVolume: TCheckBox
           Left = 8
-          Top = 44
+          Top = 35
           Width = 417
           Height = 17
           Hint = 
@@ -1055,18 +1055,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cb_RegisterMediaHotkeys: TCheckBox
           Left = 8
-          Top = 25
+          Top = 16
           Width = 417
           Height = 17
-          Caption = 'Use media keys if Nemp is in the background'
+          Caption = 'Use media keys, even if Nemp is in the background'
           TabOrder = 1
         end
       end
       object GrpBox_TabulatorOptions: TGroupBox
         Left = 8
-        Top = 448
+        Top = 312
         Width = 433
-        Height = 57
+        Height = 58
         Caption = 'Tabulators'
         TabOrder = 2
         object CB_TabStopAtPlayerControls: TCheckBox
