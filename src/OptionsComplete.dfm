@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio5
+    ActivePage = TabSystem1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -222,9 +222,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         443)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
-        Top = 208
+        Top = 88
         Width = 434
-        Height = 233
+        Height = 228
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hotkeys configuration'
         TabOrder = 1
@@ -1037,65 +1037,28 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 193
+        Height = 74
         Caption = 'Media keys'
         TabOrder = 0
-        object LblConst_MultimediaKeys_Hint: TLabel
-          Left = 8
-          Top = 16
-          Width = 401
-          Height = 81
-          AutoSize = False
-          Caption = 
-            'Nemp is able to hook media keys (like play/stop on some keyboard' +
-            's). This enables Nemp to react on these keys even if Nemp is not' +
-            ' the active window. Unfortunately the hook must not be activated' +
-            ' in case of special software like Logitech iTouch is installed. ' +
-            'Start the configuration to detect wether the hook can be install' +
-            'ed without complications.'
-          WordWrap = True
-        end
-        object LblConst_MultimediaKeys_Status: TLabel
-          Left = 8
-          Top = 96
-          Width = 209
-          Height = 13
-          Caption = 'Current state of media keys handling'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-        object Lbl_MultimediaKeys_Status: TLabel
-          Left = 8
-          Top = 112
-          Width = 12
-          Height = 13
-          Caption = '...'
-        end
-        object Btn_ConfigureMediaKeys: TButton
-          Left = 9
-          Top = 136
-          Width = 233
-          Height = 25
-          Hint = 'Try to auto-configure mutlimedia keys properly.'
-          Caption = 'Configure media keys'
-          TabOrder = 0
-          OnClick = Btn_ConfigureMediaKeysClick
-        end
         object CB_IgnoreVolume: TCheckBox
           Left = 8
-          Top = 168
+          Top = 44
           Width = 417
           Height = 17
           Hint = 
             'If checked, Nemp will ignore volume keys, to allow global volume' +
             ' control by these keys.'
-          Caption = 'Ignore volume up/down keys'
+          Caption = 'Use volume up/down keys for system-wide volume control'
           Checked = True
           State = cbChecked
+          TabOrder = 0
+        end
+        object cb_RegisterMediaHotkeys: TCheckBox
+          Left = 8
+          Top = 25
+          Width = 417
+          Height = 17
+          Caption = 'Use media keys if Nemp is in the background'
           TabOrder = 1
         end
       end

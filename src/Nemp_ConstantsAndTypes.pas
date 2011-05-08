@@ -39,9 +39,6 @@ uses Windows, Messages, Graphics, IniFiles, Forms,  Classes, Controls,
 
 type
 
-    TInstallHook = function(Hwnd: THandle): Boolean; stdcall;
-    TUninstallHook = function: Boolean; stdcall;
-
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
     TDefaultCoverType = (dcAllFiles, dcWebRadio, dcNoCover, dcError);
@@ -143,6 +140,8 @@ type
         AllowOnlyOneInstance: Boolean;
         RegisterHotKeys: Boolean;
         IgnoreVolumeUpDownKeys: Boolean;
+        RegisterMediaHotkeys: Boolean;
+
 
         TabStopAtPlayerControls: Boolean;
         TabStopAtTabs: Boolean;
@@ -421,8 +420,16 @@ const
     APPCOMMAND_MEDIA_PLAY           = $2e0000;
     APPCOMMAND_MEDIA_PAUSE          = $2f0000;
 
-    APPCOMMAND_VOLUME_DOWN          = $90000; 
+    APPCOMMAND_VOLUME_DOWN          = $90000;
     APPCOMMAND_VOLUME_UP            = $a0000;
+
+    VK_VOLUME_MUTE      = $AD;
+    VK_VOLUME_DOWN      = $AE;
+    VK_VOLUME_UP        = $AF;
+    VK_MEDIA_NEXT_TRACK = $B0;
+    VK_MEDIA_PREV_TRACK = $B1;
+    VK_MEDIA_STOP       = $B2;
+    VK_MEDIA_PLAY_PAUSE = $B3;
 
     PBT_APMRESUMESUSPEND = 7;
     PBT_APMSUSPEND = 4;
@@ -813,7 +820,12 @@ var
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions);
+procedure UnInstallHotKeys(Handle: HWND);
+procedure UninstallMediakeyHotkeys(Handle: HWND);
+
 procedure InstallHotkeys(aIniPath: UnicodeString; Handle: HWND);
+procedure InstallMediakeyHotkeys(IgnoreVolume: Boolean; Handle: HWND);
+
 
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 
@@ -838,10 +850,11 @@ begin
   With Options do
   begin
         //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
-        StartMinimized  := ini.ReadBool('Allgemein', 'StartMinimized', False);
+        StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
-        RegisterHotKeys := ini.ReadBool('Allgemein', 'RegisterHotKeys', True);
-        IgnoreVolumeUpDownKeys := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
+        RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', True);
+        RegisterMediaHotkeys := ini.ReadBool('Allgemein', 'RegisterMediaHotkeys', True);
+        IgnoreVolumeUpDownKeys  := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
 
@@ -994,6 +1007,7 @@ begin
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
         ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
+        ini.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);
         ini.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
         ini.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
@@ -1103,6 +1117,35 @@ begin
   end;
 end;
 
+procedure UnInstallHotKeys(Handle: HWND);
+var i: Integer;
+begin
+    for i := 0 to 9 do
+        UnRegisterHotkey(Handle, i);
+end;
+
+procedure UninstallMediakeyHotkeys(Handle: HWND);
+var i: Integer;
+begin
+    for i := 11 to 17 do
+        UnRegisterHotkey(Handle, i);
+end;
+
+procedure InstallMediakeyHotkeys(IgnoreVolume: Boolean; Handle: HWND);
+begin
+    if not IgnoreVolume then
+    begin
+        RegisterHotkey(Handle, 11, 0, VK_VOLUME_MUTE     );
+        RegisterHotkey(Handle, 12, 0, VK_VOLUME_DOWN     );
+        RegisterHotkey(Handle, 13, 0, VK_VOLUME_UP       );
+    end;
+
+    RegisterHotkey(Handle, 14, 0, VK_MEDIA_NEXT_TRACK);
+    RegisterHotkey(Handle, 15, 0, VK_MEDIA_PREV_TRACK);
+    RegisterHotkey(Handle, 16, 0, VK_MEDIA_STOP      );
+    RegisterHotkey(Handle, 17, 0, VK_MEDIA_PLAY_PAUSE);
+end;
+
 procedure InstallHotkeys(aIniPath: UnicodeString; Handle: HWND);
 var Ini: TMemIniFile;
     hMod: Cardinal;
@@ -1174,7 +1217,6 @@ begin
          hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Mute', ord('0'));
          RegisterHotkey(Handle, 9, HMod, hKey);
        end;
-
   finally
     ini.Free;
   end;

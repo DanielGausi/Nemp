@@ -31,7 +31,6 @@ uses
   spectrum_vis in 'spectrum_vis.pas',
   Hilfsfunktionen in 'Hilfsfunktionen.pas',
   TreeHelper in 'TreeHelper.pas',
-  MultimediaKeys in 'MultimediaKeys.pas' {FormMediaKeyInit},
   About in 'About.pas' {AboutForm},
   StreamVerwaltung in 'StreamVerwaltung.pas' {FormStreamVerwaltung},
   Nemp_ConstantsAndTypes in 'Nemp_ConstantsAndTypes.pas',
