@@ -1,9 +1,5 @@
 The dll-files contained in this directory are NOT all covered by the GPL.
 
-- The KBHook.dll is closed source, as I lost the code for it.
-  Maybe I will find it again someday. 
-  It implements a shellhook for hooking multimediakeys. 
-
 - Most of the bass*.dll are covered by the bass-license, see 
   http://www.un4seen.com for details. Some of them may be covered 
   by other licenses.
@@ -11,3 +7,6 @@ The dll-files contained in this directory are NOT all covered by the GPL.
   qualify as "fair use".
 
 - the bass_aac.dll is covered by the GPL.
+
+- lgLcdWrapper.dll is used for the G15App. 
+  Downloaded from www.g15-applets.de, licence unknown

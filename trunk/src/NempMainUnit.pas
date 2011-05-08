@@ -69,7 +69,6 @@ type
     BassTimer: TTimer;
     Splitter2: TSplitter;
     Nemp_MainMenu: TMainMenu;
-    MMKeyTimer: TTimer;
     PlayListImageList: TImageList;
     PlaylistPanel: TNempPanel;
     GRPBOXLyrics: TNempPanel;
@@ -1001,7 +1000,6 @@ type
     procedure Splitter2Moved(Sender: TObject);
     procedure Btn_EffectsOffClick(Sender: TObject);
     procedure PlayListSaveDialogTypeChange(Sender: TObject);
-    procedure MMKeyTimerTimer(Sender: TObject);
     procedure PM_TNA_CloseClick(Sender: TObject);
     procedure PM_TNA_RestoreClick(Sender: TObject);
     procedure AnzeigeBTNClick(Sender: TObject);
@@ -1380,8 +1378,8 @@ type
 
   private
 
-    MediaTest: Boolean;
-    MediaCount: Integer;
+    // MediaTest: Boolean;
+    // MediaCount: Integer;
 
     CoverImgDownX: Integer;
     CoverImgDownY: Integer;
@@ -1436,8 +1434,6 @@ type
     WebRadioInsertMode: Integer;
 
     { Public declarations }
-    DoHookInstall: Boolean;
-    SchonMalEineMediaTasteGedrueckt: Boolean;
     EqualizerButtons: Array[0..9] of TSkinButton;
 
     PlayListSkinImageList: TImageList;
@@ -1543,13 +1539,10 @@ var
 
   CueSyncHandle: DWord;
 
-  InstallHook: TInstallHook;
-  UninstallHook: TUninstallHook;
-  HookIsInstalled: Boolean;
 
   AcceptApiCommands: Boolean = False; // am Ende des OnShows auf True setzen.
                                       // Beim Close auf False
-  lib: Cardinal;
+  // lib: Cardinal;
 
   NempPlayer: TNempPlayer;
   NempPlayList: TNempPlaylist; // Die Playlist halt ;-)
@@ -1565,8 +1558,7 @@ var
 
 implementation
 
-uses   Splash, MultimediaKeys,
-    About, OptionsComplete, StreamVerwaltung,
+uses   Splash, About, OptionsComplete, StreamVerwaltung,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   BirthdayShow, RandomPlaylist,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
@@ -1754,8 +1746,6 @@ begin
     DragSource := DS_EXTERN;
 
     NewDrivesNotificationCount := 0;
-    MediaCount                 := 0;
-    MediaTest                  := False;
     NempIsClosing              := False;
     ReadyForGetFileApiCommands := False;
     LangeAktionWeitermachen    := False;
@@ -1968,8 +1958,6 @@ begin
             ini.WriteInteger('Spalten', 'Breite' + IntToStr(i), VST.Header.Columns[s].Width);
         end;
 
-        ini.Writebool('Multimediatasten','BereitsGedrueckt',SchonMalEineMediaTasteGedrueckt);
-        ini.Writebool('Multimediatasten','HookInstall',DoHookInstall);
         ini.WriteBool('Allgemein', 'LastExitOK', True);
 
         ini.Encoding := TEncoding.UTF8;
@@ -2020,17 +2008,14 @@ begin
     CoverScrollbar.WindowProc := OldScrollbarWindowProc;
     LyricsMemo.WindowProc := OldLyricMemoWindowProc;
 
-    // Kopie ausm Destroy
-    if HookIsInstalled then UninstallHook;
-
     ST_Playlist.Free;
     ST_Medienliste.Free;
     FreeAndNil(DragDropList);
 
     Set8087CW(Default8087CW);
 
-    for i := 0 to 9 do
-      UnRegisterHotkey(Handle, i);
+    UnInstallHotKeys(Handle);
+    UninstallMediakeyHotkeys(Handle);
 
 end;
 
@@ -2605,30 +2590,30 @@ end;
 procedure TNemp_MainForm.hotkey(var msg:Tmessage);
 begin
   case msg.wparam of
-    1: if NempPlayer.Status = PLAYER_ISPLAYING then
+    1,17: if NempPlayer.Status = PLAYER_ISPLAYING then
         PlayPauseBTNIMGClick(Nil)
       else
         PlayPauseBTNIMGClick(NIL);
-    2: StopBTNIMGClick(Nil);
-    3: PlayNextBTNIMGClick(PlayNextBTN);
-    4: PlayPrevBTNIMGClick(PlayPrevBTN);
+    2,16: StopBTNIMGClick(Nil);
+    3,14: PlayNextBTNIMGClick(PlayNextBTN);
+    4,15: PlayPrevBTNIMGClick(PlayPrevBTN);
     5: SlideForwardBTNIMGClick(NIL);
     6: SlideBackBTNIMGClick(NIL);
-    7: begin
+    7,13: begin
         VolTimer.Enabled := False;
         NempPlayer.VolStep := NempPlayer.VolStep + 1;
         NempPlayer.Volume := NempPlayer.Volume + 1 + (NempPlayer.VolStep DIV 3);
         VolTimer.Enabled := True;
         CorrectVolButton;
       end;
-    8: begin
+    8,12: begin
         VolTimer.Enabled := False;
         NempPlayer.VolStep := NempPlayer.VolStep + 1;
         NempPlayer.Volume := NempPlayer.Volume - 1 - (NempPlayer.VolStep DIV 3);
         VolTimer.Enabled := True;
         CorrectVolButton;
       end;
-    9,10: begin
+    9,11: begin
           if NempPlayer.IsMute then
             NempPlayer.UnMute
           else
@@ -2665,49 +2650,6 @@ end;
 
 procedure TNemp_MainForm.MediaKey (Var aMSG: tMessage);
 begin
-  if not SchonMalEineMediaTasteGedrueckt then
-  begin
-      if MediaTest then
-      begin
-        // MediaTest läuft
-        // => auf Eingabe in Form2 reagieren
-        if (aMSG.LParam = APPCOMMAND_MEDIA_PLAY_PAUSE)
-        then begin
-          inc(MediaCount);
-          aMsg.result := 1;
-          if not assigned(FormMediaKeyInit) then
-            Application.CreateForm(TFormMediaKeyInit, FormMediaKeyInit);
-          FormMediaKeyInit.ReactOnMMKey;
-        end;
-      end else  // Medientest läuft noch nicht
-      begin
-        if   (aMSG.LParam = APPCOMMAND_MEDIA_STOP)
-          OR (aMSG.LParam = APPCOMMAND_MEDIA_PLAY_PAUSE)
-          OR (aMSG.LParam = APPCOMMAND_MEDIA_NEXTTRACK)
-          OR (aMSG.LParam = APPCOMMAND_MEDIA_PREVIOUSTRACK)
-        then
-        begin
-            if GetForeGroundWindow = Nemp_MainForm.Handle then
-            begin
-                // Taste im Vordergrund-Fenster gedrückt
-                // Es kann sein, dass iTouch etc. läuft
-                // => MediaTest Starten
-                aMsg.result := 1;
-                MMKeyTimer.Enabled := True; // im OnTimer wird der Test ausgeführt
-            end else
-            begin
-              // Fenster ist NICHT im Vordergrund
-              // => iTouch o.Ä. läuft
-              //    (Fenster erhält auch ohne Hook und Ohne Fokus den Befehl)
-              SchonMalEineMediaTasteGedrueckt := True;
-              DoHookInstall := False;
-              aMsg.result := 1;
-            end;
-        end else
-           aMsg.Result := DefWindowProc(self.handle, aMsg.Msg, aMsg.WParam, aMsg.LParam);
-      end;
-  end
-  else // SchonMalEineMediaTasteGedrueckt= true
   // ganz normal auf die Tasten reagieren
   begin
       if Not NempPlaylist.AcceptInput then exit;
@@ -7836,53 +7778,6 @@ begin
   SampleRateButtonMouseDown(SampleRateButton, mbright, [], 0,0);
 end;
 
-
-procedure TNemp_MainForm.MMKeyTimerTimer(Sender: TObject);
-begin
-  MMKeyTimer.Enabled := False;
-
-  try
-    if Not HookIsInstalled then InstallHook(Nemp_MainForm.Handle);
-  except
-    //showmessage('nicht installiert');
-  end;
-
-  MediaCount := 0;
-  MediaTest := True;
-
-  if not assigned(FormMediaKeyInit) then
-    Application.CreateForm(TFormMediaKeyInit, FormMediaKeyInit);
-
-  if FormMediaKeyInit.Showmodal = mrOK then
-  begin
-    if (MediaCount > 1) OR (MediaCount = 0) then
-      try
-        SchonMalEineMediaTasteGedrueckt := True;
-        DoHookInstall := False;
-        MessageDLG(_('Your system is already prepared to handle media keys with Nemp properly. No changes neccessary.'), mtInformation, [mbOK],0);
-        if HookIsInstalled then UninstallHook;
-        HookIsInstalled := False;
-        if assigned(OptionsCompleteForm) then
-          OptionsCompleteForm.Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Standard);
-      except end
-      else
-      begin
-        SchonMalEineMediaTasteGedrueckt := True;
-        DoHookInstall := True;
-        MessageDLG(_('Nemp will hook media keys. In case of unpleasant behaviour you can deactivate this within the preferences.'), mtInformation, [mbOK],0);
-        if assigned(OptionsCompleteForm) then
-          OptionsCompleteForm.Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Hook);
-      end;
-  end else // FormMediaKeyInit Abgebrochen
-    try
-      SchonMalEineMediaTasteGedrueckt := True;
-      DoHookInstall := False;
-      if HookIsInstalled then UninstallHook;
-      HookIsInstalled := False;
-    except
-    end;
-  MediaTest := False;
-end;
 
 procedure TNemp_MainForm.PM_TNA_CloseClick(Sender: TObject);
 begin

@@ -195,10 +195,6 @@ type
     CB_StartMinimized: TCheckBox;
     CBRegisterHotKeys: TCheckBox;
     GrpBox_MultimediaKeys: TGroupBox;
-    Btn_ConfigureMediaKeys: TButton;
-    LblConst_MultimediaKeys_Hint: TLabel;
-    LblConst_MultimediaKeys_Status: TLabel;
-    Lbl_MultimediaKeys_Status: TLabel;
     GrpBox_FileFormats: TGroupBox;
     Label1: TLabel;
     CBFileTypes: TCheckListBox;
@@ -455,6 +451,7 @@ type
     cbMissingCoverMode: TComboBox;
     Label6: TLabel;
     cbUseStreamnameAsDirectory: TCheckBox;
+    cb_RegisterMediaHotkeys: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -487,7 +484,6 @@ type
     procedure cbSkinAuswahlChange(Sender: TObject);
     procedure BTNApplyClick(Sender: TObject);
     procedure CBStartCountDownClick(Sender: TObject);
-    procedure Btn_ConfigureMediaKeysClick(Sender: TObject);
     procedure Btn_ReinitPlayerEngineClick(Sender: TObject);
     procedure EditCountdownSongChange(Sender: TObject);
     procedure EditBirthdaySongChange(Sender: TObject);
@@ -1144,6 +1140,7 @@ begin
   CB_StartMinimized.Checked := Nemp_MainForm.NempOptions.StartMinimized;
   CBRegisterHotKeys.Checked := Nemp_MainForm.NempOptions.RegisterHotKeys;
 
+  cb_RegisterMediaHotkeys.Checked := Nemp_MainForm.NempOptions.RegisterMediaHotkeys;
   CB_IgnoreVolume.Checked := Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys;
 
   CB_TabStopAtPlayerControls.Checked := Nemp_MainForm.NempOptions.TabStopAtPlayerControls;
@@ -1176,10 +1173,6 @@ begin
   CBHideDeskbandOnRestore.Checked  := Nemp_MainForm.NempOptions.HideDeskbandOnRestore;
   CBHideDeskbandOnClose.Checked    := Nemp_MainForm.NempOptions.HideDeskbandOnClose;
 
-  if Nemp_MainForm.DoHookInstall then
-    Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Hook)
-  else
-    Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Standard);
 
   // Artist/alben-Größen
   SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
@@ -2098,7 +2091,7 @@ begin
   SetTabStopsPlayer;
   SetTabStopsTabs;
 
-
+  Nemp_MainForm.NempOptions.RegisterMediaHotkeys   := cb_RegisterMediaHotkeys.Checked;
   Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
 
   MedienBib.IncludeAll := cbIncludeAll.Checked;
@@ -2328,8 +2321,8 @@ begin
   end;
 
   // Hotkeys neu setzen, Ini Speichern
-  for i := 0 to 9 do
-    UnRegisterHotkey(Nemp_MainForm.Handle, i);
+  UnInstallHotKeys(Nemp_MainForm.Handle);
+  UninstallMediakeyHotkeys(Nemp_MainForm.Handle);
 
   ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
   try
@@ -2339,72 +2332,54 @@ begin
           hKey := IndexToKey(CB_Key_Play.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_Play', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_Play', hKey);
-        if CB_Activate_Play.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 1, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_Stop'       , CB_Activate_Stop.Checked);
           hMod := IndexToMod(CB_Mod_Stop.ItemIndex);
           hKey := IndexToKey(CB_Key_Stop.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_Stop', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_Stop', hKey);
-        if CB_Activate_Stop.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 2, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_Next'       , CB_Activate_Next.Checked);
           hMod := IndexToMod(CB_Mod_Next.ItemIndex);
           hKey := IndexToKey(CB_Key_Next.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_Next', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_Next', hKey);
-        if CB_Activate_Next.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 3, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_Prev'       , CB_Activate_Prev.Checked);
           hMod := IndexToMod(CB_Mod_Prev.ItemIndex);
           hKey := IndexToKey(CB_Key_Prev.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_Prev', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_Prev', hKey);
-        if CB_Activate_Prev.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 4, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_JumpForward', CB_Activate_JumpForward.Checked);
           hMod := IndexToMod(CB_Mod_JumpForward.ItemIndex);
           hKey := IndexToKey(CB_Key_JumpForward.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_JumpForward', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_JumpForward', hKey);
-        if CB_Activate_JumpForward.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 5, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_JumpBack'   , CB_Activate_JumpBack.Checked);
           hMod := IndexToMod(CB_Mod_JumpBack.ItemIndex);
           hKey := IndexToKey(CB_Key_JumpBack.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_JumpBack', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_JumpBack', hKey);
-        if CB_Activate_JumpBack.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 6, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_IncVol'     , CB_Activate_IncVol.Checked);
           hMod := IndexToMod(CB_Mod_IncVol.ItemIndex);
           hKey := IndexToKey(CB_Key_IncVol.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_IncVol', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_IncVol', hKey);
-        if CB_Activate_IncVol.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 7, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_DecVol'     , CB_Activate_DecVol.Checked);
           hMod := IndexToMod(CB_Mod_DecVol.ItemIndex);
           hKey := IndexToKey(CB_Key_DecVol.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_DecVol', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_DecVol', hKey);
-        if CB_Activate_DecVol.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 8, HMod, hKey);
 
         Ini.WriteBool('HotKeys','InstallHotkey_Mute'       , CB_Activate_mute.Checked);
           hMod := IndexToMod(CB_Mod_Mute.ItemIndex);
           hKey := IndexToKey(CB_Key_Mute.ItemIndex);
           Ini.WriteInteger('HotKeys', 'HotkeyMod_Mute', hMod);
           Ini.WriteInteger('HotKeys', 'HotkeyKey_Mute', hKey);
-        if CB_Activate_Mute.Checked AND CBRegisterHotKeys.Checked then
-          RegisterHotkey(Nemp_MainForm.Handle, 9, HMod, hKey);
         try
             Ini.UpdateFile;
         except
@@ -2413,6 +2388,12 @@ begin
   finally
     Ini.Free;
   end;
+
+  if Nemp_MainForm.NempOptions.RegisterHotKeys then
+      InstallHotkeys(SavePath, Nemp_MainForm.Handle);
+  if Nemp_MainForm.NempOptions.RegisterMediaHotkeys then
+      InstallMediakeyHotkeys(Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys, Nemp_MainForm.Handle);
+
 
   //========================================================
   // In 3.0 final neue Optionen für die Anzeige:
@@ -2592,43 +2573,6 @@ begin
   BtnCountDownSong.Enabled := CBStartCountDown.Checked;
   BtnGetCountDownTitel.Enabled := CBStartCountDown.Checked;
   LBlCountDownWarning.Enabled := CBStartCountDown.Checked;
-end;
-
-procedure TOptionsCompleteForm.Btn_ConfigureMediaKeysClick(Sender: TObject);
-var WinVersionInfo: TWindowsVersionInfo;
-
-    procedure StartConfig;
-    begin
-        with Nemp_MainForm do
-        begin
-            // Um die Reaktionen auf die Tasten "umzuschalten"
-          SchonMalEineMediaTasteGedrueckt := False;
-          // Den Medientasten-Test starten
-          MMKeyTimer.Enabled := True;
-        end;
-    end;
-
-begin
-    WinVersionInfo := TWindowsVersionInfo.Create;
-    try
-        if WinVersionInfo.ProcessorArchitecture = pax64 then
-        begin
-            if MessageDLG((WinX64WarningHook), mtWarning, [MBYes, MBNO], 0) = mrYes then
-                StartConfig
-            else
-            begin
-                Nemp_MainForm.SchonMalEineMediaTasteGedrueckt := True;
-                Nemp_MainForm.DoHookInstall := False;
-                if HookIsInstalled then
-                    UninstallHook;
-                HookIsInstalled := False;
-                Lbl_MultimediaKeys_Status.Caption := (MediaKeys_Status_Standard);
-            end;
-        end else
-            StartConfig;
-    finally
-        WinVersionInfo.Free;
-    end;
 end;
 
 procedure TOptionsCompleteForm.Btn_ReinitPlayerEngineClick(Sender: TObject);

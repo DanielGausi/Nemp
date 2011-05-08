@@ -132,30 +132,6 @@ begin
                 VST_ColumnPopup.Items.Insert(i, aMenuItem);
             end;
 
-            // Hook-Funktionen initialisieren
-            lib := LoadLibraryW(PWideChar(ExtractFilePath(Paramstr(0))+'KBHook.dll'));
-            if lib <> INVALID_HANDLE_VALUE then
-            begin
-                InstallHook := GetProcAddress(lib, 'InstallHook');
-                UnInstallHook := GetProcAddress(lib, 'UninstallHook');
-            end;
-            // Initialisierung des Hooks
-            if lib <> INVALID_HANDLE_VALUE then
-            begin
-                SchonMalEineMediaTasteGedrueckt := ini.ReadBool('Multimediatasten','BereitsGedrueckt',False);
-                DoHookInstall := ini.ReadBool('Multimediatasten','HookInstall',False);
-                if DoHookInstall then
-                begin
-                    InstallHook(Nemp_MainForm.Handle);
-                    HookIsInstalled := True;
-                end else
-                    HookIsInstalled := False;
-            end
-            else begin
-                SchonMalEineMediaTasteGedrueckt := True;
-                DoHookInstall := False;
-            end;
-
             NempUpdater.LoadFromIni(Ini);
             NempSkin.NempPartyMode.LoadFromIni(ini);
 
@@ -485,6 +461,8 @@ begin
 
         if NempOptions.RegisterHotKeys then
             InstallHotkeys (SavePath, Handle);
+        if NempOptions.RegisterMediaHotkeys then
+            InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys, Handle);
 
         Spectrum.Mode := 1;
         Spectrum.LineFallOff := 7;

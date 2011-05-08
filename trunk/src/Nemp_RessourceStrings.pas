@@ -179,9 +179,6 @@ CoverFlowLastFM_HintInvalid      = 'Downloading a cover from LastFM cancelled.' 
 
     //Warning_No_PNG = 'PNG-Images are not supported.';
 
-MediaKeys_Status_Standard = 'Windows standard';
-MediaKeys_Status_Hook     = 'Mediakeys are hooked by Nemp';
-
 FloatingPointChannels_On = 'Current status: On';
 FloatingPointChannels_Off = 'Current status: Off';
 
@@ -271,7 +268,6 @@ SelectDirectoryDialog_RemoteNemp = 'Select download directory';
 AutoScanDir_AlreadyExists = 'The selected directory (or a parent directory) is already in the list.';
 AutoSacnDir_SubDirExisted = 'A subdirectory of the selected directory was removed from the list: ';
 
-WinX64WarningHook = 'You are using a 64Bit-Version of Windows. It is NOT recommended to use a special handling of multimedia keys. Continue anyway?';
 WinX64WarningDeskband = 'You are using a 64Bit-Version of Windows. Installing a Deskband is unfortunately not possible.';
 WinVistaWarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later.';
 Win7WarningDeskband = 'The Nemp Deskband is not compatible with Windows Vista or later. Use the buttons in the Windows Taskbar-preview instead.';

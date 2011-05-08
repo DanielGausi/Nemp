@@ -125,7 +125,7 @@ implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
-    MultimediaKeys, NewPicture, NewStation, OptionsComplete, RandomPlaylist,
+    NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper;
@@ -1043,14 +1043,9 @@ begin
         if assigned(FDetails             ) then ReTranslateComponent(FDetails            );
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
-        if assigned(FormMediaKeyInit     ) then ReTranslateComponent(FormMediaKeyInit    );
         if assigned(PasswordDlg          ) then ReTranslateComponent(PasswordDlg         );
         if assigned(FormBibSearch        ) then ReTranslateComponent(FormBibSearch       );
         if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
-
-
-
-
 
         //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
         if assigned(OptionsCompleteForm  ) then
