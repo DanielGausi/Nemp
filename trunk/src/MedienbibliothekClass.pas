@@ -2620,7 +2620,10 @@ begin
   if StatusBibUpdate >= 2 then exit;
   EnterCriticalSection(CSUpdate);
   for i := 0 to Mp3ListeArtistSort.Count - 1 do
-    (Mp3ListeArtistSort[i] as TAudioFile).Rating := 0;
+  begin
+      (Mp3ListeArtistSort[i] as TAudioFile).Rating := 0;
+      (Mp3ListeArtistSort[i] as TAudioFile).PlayCounter := 0;
+  end;
   Changed := True;
   LeaveCriticalSection(CSUpdate);
 end;

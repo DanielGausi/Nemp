@@ -3533,6 +3533,7 @@ var CurrentAF, listFile :TAudioFile;
     Node:PVirtualNode;
     SelectedFiles, ListOfFiles: TObjectList;
     newRating: Integer;
+    resetCounter: Boolean;
     detUpdate, TagMod100: Integer;
     LocalTree: TVirtualStringTree;
     aErr: TAudioError;
@@ -3560,9 +3561,16 @@ begin
     ListOfFiles := TObjectList.Create(False);
     try
         if TagMod100 = 10 then
-            newRating := 0
+        begin
+            newRating := 0;
+            resetCounter := True;
+        end
         else
+        begin
             newRating := Round(TagMod100 * 25.5) + 20;
+            resetCounter := False;
+        end;
+
         if newRating > 255 then newRating := 255;
 
 
@@ -3587,6 +3595,8 @@ begin
                       begin
                           listFile := TAudioFile(ListOfFiles[iList]);
                           listFile.Rating := newRating;
+                          if resetCounter then
+                              listFile.PlayCounter := 0;
                       end;
                       // write the rating into the file on disk
                       aErr := CurrentAF.QuickUpdateTag;

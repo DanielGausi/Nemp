@@ -3271,7 +3271,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object MM_ML_SetRatingsOfSelectedFilesReset: TMenuItem
           Tag = 110
-          Caption = 'Reset rating'
+          Caption = 'Reset rating/playcounter'
           ImageIndex = 24
           OnClick = PM_ML_SetRatingsOfSelectedFilesClick
         end
@@ -3295,7 +3295,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_ML_RefreshAllClick
       end
       object MM_ML_ResetRatings: TMenuItem
-        Caption = 'Reset all ratings'
+        Caption = 'Reset all ratings/playcounter'
         ImageIndex = 20
         OnClick = MM_ML_ResetRatingsClick
       end
@@ -3974,7 +3974,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300CC050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300D4050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4539,7 +4539,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012000F8060C0710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012000F806140710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6090,7 +6090,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object PM_ML_ResetRating: TMenuItem
         Tag = 110
-        Caption = 'Reset rating'
+        Caption = 'Reset rating/playcounter'
         ImageIndex = 24
         ShortCut = 16432
         OnClick = PM_ML_SetRatingsOfSelectedFilesClick
@@ -6350,7 +6350,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object PM_PL_ResetRating: TMenuItem
         Tag = 10
-        Caption = 'Reset rating'
+        Caption = 'Reset rating/playcounter'
         ImageIndex = 24
         ShortCut = 16432
         OnClick = PM_ML_SetRatingsOfSelectedFilesClick
@@ -7461,7 +7461,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800740310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101080028007C0310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -1737,7 +1737,9 @@ begin
             // ID3v2Tag has some "Auto-Delete-Frame"-Feature, and Rating and Playcounter are
             // stored in the same Frame. So setting one of these to zero, it will delete the frame
             // an also te other <>0-Value
-            if (Rating = 0) and (PlayCounter = 0) then
+
+            ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
+            {if (Rating = 0) and (PlayCounter = 0) then
             begin
                 // ok, both values are 0, we can just delete the Frame
                 ID3v2Tag.Rating := Rating;
@@ -1750,6 +1752,7 @@ begin
                 if PlayCounter <> 0 then
                     ID3v2Tag.PlayCounter := PlayCounter;
             end;
+            }
 
             // Update File
             result := ID3v2Tag.WriteToFile(aFilename);
@@ -1892,7 +1895,9 @@ begin
 
         ID3v2Tag.Genre := Genre;
 
-        if (Rating = 0) and (PlayCounter = 0) then
+
+        ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
+        {if (Rating = 0) and (PlayCounter = 0) then
         begin
             // ok, both values are 0, we can just delete the Frame
             ID3v2Tag.Rating := Rating;
@@ -1905,6 +1910,7 @@ begin
             if PlayCounter <> 0 then
                 ID3v2Tag.PlayCounter := PlayCounter;
         end;
+        }
 
         if length(RawTagLastFM) > 0 then
         begin

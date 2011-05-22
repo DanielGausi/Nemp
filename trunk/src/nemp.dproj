@@ -193,7 +193,7 @@
 						<VersionInfo Name="MajorVer">4</VersionInfo>
 						<VersionInfo Name="MinorVer">1</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">461</VersionInfo>
+						<VersionInfo Name="Build">462</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -205,7 +205,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.1.0.461</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">4.1.0.462</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2011, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>
