@@ -217,7 +217,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerPlaylist    = 'Playlist';
     OptionsTree_AudioPlaylist     = 'Playlist';
     OptionsTree_PlayerMedialibrary= 'Media library';
-    OptionsTree_PlayerAutomaticRating = 'Automatic rating';
+    OptionsTree_PlayerMetaDataAccess = 'Metadata (e.g. ID3Tags)';
     OptionsTree_PlayerWebradio    = 'Webstreams';
     OptionsTree_PlayerEffects     = 'Effects';
     OptionsTree_PlayerEvents      = 'Events';
@@ -540,6 +540,12 @@ MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
 MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
 MediaLibrary_SearchTagsStats         = ' (found %d/%d)';
 
+MediaLibrary_PermissionToChangeTagsRequired = 'You denied quick access to metadata (e.g. ID3-Tags), to protect your files from unintented changes.'
+                    +#13#10+'However, this function only works properly, if changing metadata is allowed.'
+                    +#13#10
+                    +#13#10+'Do you want to allow Nemp changing metadata in the selected files?';
+
+MediaLibrary_OperationCancelled = 'Operation cancelled';
 MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file cannot be found.';
 MediaLibrary_SearchLyricsComplete_AllFound = 'Lyricsearch complete. All Lyrics found.';
 MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyricsearch complete. %d of %d lyrics found. You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
@@ -653,6 +659,7 @@ TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it a
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
+Tags_NoTagsAccessDenied = 'No additional Tags set.';
 Tags_AddTagsNotPossible = 'No additional Tags set. (Only available for *.mp3, *.ogg and *.flac-files.)';
 Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?';
 

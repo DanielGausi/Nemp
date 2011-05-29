@@ -1251,6 +1251,9 @@ begin
 
   case MB.Initializing of
       init_nothing: begin
+          // the bib was loaded
+          // todo: Check the playingfile (as the rating could be different!)
+          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ReCheckPlaylingFile, 0);
           if MB.AutoScanDirs then
           begin
               MB.Initializing := init_AutoScanDir;
@@ -2016,7 +2019,9 @@ begin
                     begin
                         backup := aAudioFile.Lyrics;
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
-                        aErr := aAudioFile.SetAudioData(SAD_Both);
+                        aErr := aAudioFile.SetAudioData(True);
+                            // SetAudioData(True) : Check before entering this thread, whether this operation
+                            //                      is allowed. If NOT: Do not enter this thread at all!
                         if aErr = AUDIOERR_None then
                         begin
                             inc(done);
@@ -2200,7 +2205,9 @@ begin
                     backup := af.RawTagLastFM;
                     // process new Tags. Rename, delete ignored and duplicates.
                     af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
-                    aErr := af.SetAudioData(SAD_Both);
+                    aErr := af.SetAudioData(True);
+                            // SetAudioData(True) : Check before entering this thread, whether this operation
+                            //                      is allowed. If NOT: Do not enter this thread at all!
                     if aErr = AUDIOERR_None then
                     begin
                         Changed := True;
@@ -2341,7 +2348,9 @@ begin
 
             af.FileIsPresent := True;
 
-            aErr := af.SetAudioData(SAD_Both);
+            aErr := af.SetAudioData(True);
+                    // SetAudioData(True) : Check before entering this thread, whether this operation
+                    //                      is allowed. If NOT: Do not enter this thread at all!
             if aErr = AUDIOERR_None then
             begin
                 af.ID3TagNeedsUpdate := False;
@@ -3692,6 +3701,7 @@ begin
   end;
   }
 end;
+
 
 {
     --------------------------------------------------------

@@ -123,6 +123,14 @@ Verwendete Units/Komponenten:
 
 
 
+Version 4.2.0, (noch nicht veröffentlicht)
+----------------------------------------------------------- 
+* Multimediatasten nicht länger per Hook, sondern durch Hotkey
+* Option "Schnellen Zugriff auf Metadaten erlauben" hinzugefügt. 
+  Damit können ggf. unbeabsichtigte Änderungen an den ID3Tags 
+  (z.B. beim Bewerten verhindert werden)   
+* Optionen beim Automatischen bewerten entrümpelt
+
 
 Version 4.1.0, April 2011
 ----------------------------------------------------------- 

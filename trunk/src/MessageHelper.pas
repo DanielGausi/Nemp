@@ -640,6 +640,16 @@ begin
                               MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
                             end;
 
+        MB_ReCheckPlaylingFile: begin
+              if assigned(NempPlayer.MainAudioFile) and
+                 (not NempPlayer.MainAudioFile.IsStream)
+              then
+              begin
+                  SynchronizeAudioFile(NempPlayer.MainAudioFile, NempPlayer.MainAudioFile.Pfad, False);
+                  CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile);
+              end;
+        end;
+
         MB_StartAutoScanDirs: begin
             ST_Medienliste.Mask := GenerateMedienBibSTFilter;
 

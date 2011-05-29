@@ -886,7 +886,9 @@ begin
         Medienbib.InitCover(aNewFile);
     mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
     if assigned(mbAF) then
+    begin
         aNewFile.Assign(mbAF);
+    end;
         // aNewFile.Rating := mbAf.Rating;
 end;
 

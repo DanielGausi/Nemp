@@ -95,6 +95,8 @@ begin
 
             //Player-Einstellungen lesen
             NempPlayer.LoadFromIni(Ini);
+            // Copy AllowQuickAccessToMetadata-Setting to the PostProcessor
+            NempPlayer.PostProcessor.WriteToFiles := NempOptions.AllowQuickAccessToMetadata;
 
             //Player initialisieren, Load Plugins.
             NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
@@ -106,6 +108,8 @@ begin
             // MedienBib-Einstellungen laden
             MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
             MedienBib.LoadFromIni(Ini);
+            // MedienBib.AllowQuickAccessToMetadata := NempOptions.AllowQuickAccessToMetadata;
+
 
             UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
             SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp3');
