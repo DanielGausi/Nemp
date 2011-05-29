@@ -401,12 +401,10 @@ type
     Lbl_PartyMode_ResizeFactor: TLabel;
     CB_PartyMode_ResizeFactor: TComboBox;
     TabAudio2: TTabSheet;
-    GroupBox1: TGroupBox;
+    GrpBox_AutoRating: TGroupBox;
     cb_RatingActive: TCheckBox;
     cb_RatingIgnoreShortFiles: TCheckBox;
     cb_RatingChangeCounter: TCheckBox;
-    cb_RatingWriteToFiles: TCheckBox;
-    cb_RatingIgnoreCounterOnAbortedTracks: TCheckBox;
     cb_RatingIncreaseRating: TCheckBox;
     cb_RatingDecreaseRating: TCheckBox;
     StaticText1: TStaticText;
@@ -452,6 +450,9 @@ type
     Label6: TLabel;
     cbUseStreamnameAsDirectory: TCheckBox;
     cb_RegisterMediaHotkeys: TCheckBox;
+    GrpBox_Metadata: TGroupBox;
+    cb_AccessMetadata: TCheckBox;
+    Lbl_QuickMetadataHint: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -684,7 +685,7 @@ begin
       OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerMedialibrary;
       OptionsArrayAudio[2].TabSheet := TabAudio8;
 
-      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerAutomaticRating;
+      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerMetaDataAccess;
       OptionsArrayAudio[3].TabSheet := TabAudio2;
 
 
@@ -1381,20 +1382,22 @@ begin
   Edt_PartyModePassword.Text := Nemp_MainForm.NempSkin.NempPartyMode.password;
 
 
+  // quick access to metadata
+  cb_AccessMetadata                     .checked := Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata;
   // Automatic ratings
   // Set settings:
   cb_RatingActive                       .checked := NempPlayer.PostProcessor.Active                       ;
   cb_RatingIgnoreShortFiles             .checked := NempPlayer.PostProcessor.IgnoreShortFiles             ;
-  cb_RatingWriteToFiles                 .checked := NempPlayer.PostProcessor.WriteToFiles;
+  // cb_RatingWriteToFiles                 .checked := NempPlayer.PostProcessor.WriteToFiles;
   cb_RatingChangeCounter                .checked := NempPlayer.PostProcessor.ChangeCounter                ;
-  cb_RatingIgnoreCounterOnAbortedTracks .checked := NempPlayer.PostProcessor.IgnoreCounterOnAbortedTracks ;
+  // (nonsense?? ) cb_RatingIgnoreCounterOnAbortedTracks .checked := NempPlayer.PostProcessor.IgnoreCounterOnAbortedTracks ;
   cb_RatingIncreaseRating               .checked := NempPlayer.PostProcessor.IncPlayedFiles               ;
   cb_RatingDecreaseRating               .checked := NempPlayer.PostProcessor.DecAbortedFiles              ;
   // Set Enabled/Disabled
   cb_RatingIgnoreShortFiles             .Enabled := NempPlayer.PostProcessor.Active;
-  cb_RatingWriteToFiles                 .Enabled := NempPlayer.PostProcessor.Active;
+  // cb_RatingWriteToFiles                 .Enabled := NempPlayer.PostProcessor.Active;
   cb_RatingChangeCounter                .Enabled := NempPlayer.PostProcessor.Active;
-  cb_RatingIgnoreCounterOnAbortedTracks .Enabled := NempPlayer.PostProcessor.Active and NempPlayer.PostProcessor.ChangeCounter;
+  // cb_RatingIgnoreCounterOnAbortedTracks .Enabled := NempPlayer.PostProcessor.Active and NempPlayer.PostProcessor.ChangeCounter;
   cb_RatingIncreaseRating               .Enabled := NempPlayer.PostProcessor.Active;
   cb_RatingDecreaseRating               .Enabled := NempPlayer.PostProcessor.Active;
 
@@ -1540,16 +1543,16 @@ end;
 procedure TOptionsCompleteForm.cb_RatingActiveClick(Sender: TObject);
 begin
   cb_RatingIgnoreShortFiles             .Enabled := cb_RatingActive.Checked;
-  cb_RatingWriteToFiles                 .Enabled := cb_RatingActive.Checked;
+  // cb_RatingWriteToFiles                 .Enabled := cb_RatingActive.Checked;
   cb_RatingChangeCounter                .Enabled := cb_RatingActive.Checked;
-  cb_RatingIgnoreCounterOnAbortedTracks .Enabled := cb_RatingActive.Checked and cb_RatingChangeCounter.Checked;
+  // cb_RatingIgnoreCounterOnAbortedTracks .Enabled := cb_RatingActive.Checked and cb_RatingChangeCounter.Checked;
   cb_RatingIncreaseRating               .Enabled := cb_RatingActive.Checked;
   cb_RatingDecreaseRating               .Enabled := cb_RatingActive.Checked;
 end;
 
 procedure TOptionsCompleteForm.cb_RatingChangeCounterClick(Sender: TObject);
 begin
-  cb_RatingIgnoreCounterOnAbortedTracks .Enabled := cb_RatingActive.Checked and cb_RatingChangeCounter.Checked;
+  // cb_RatingIgnoreCounterOnAbortedTracks .Enabled := cb_RatingActive.Checked and cb_RatingChangeCounter.Checked;
 end;
 
 procedure TOptionsCompleteForm.CB_visualClick(Sender: TObject);
@@ -2548,12 +2551,14 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate  := cb_PartyMode_ShowPasswordOnActivate .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
+  Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
+
   // automatic rating
   NempPlayer.PostProcessor.Active                       := cb_RatingActive                       .checked ;
   NempPlayer.PostProcessor.IgnoreShortFiles             := cb_RatingIgnoreShortFiles             .checked ;
-  NempPlayer.PostProcessor.WriteToFiles                 := cb_RatingWriteToFiles                 .checked ;
+  NempPlayer.PostProcessor.WriteToFiles                 := cb_AccessMetadata                 .checked ;
   NempPlayer.PostProcessor.ChangeCounter                := cb_RatingChangeCounter                .checked ;
-  NempPlayer.PostProcessor.IgnoreCounterOnAbortedTracks := cb_RatingIgnoreCounterOnAbortedTracks .checked ;
+  // NempPlayer.PostProcessor.IgnoreCounterOnAbortedTracks := cb_RatingIgnoreCounterOnAbortedTracks .checked ;
   NempPlayer.PostProcessor.IncPlayedFiles               := cb_RatingIncreaseRating               .checked ;
   NempPlayer.PostProcessor.DecAbortedFiles              := cb_RatingDecreaseRating               .checked ;
 

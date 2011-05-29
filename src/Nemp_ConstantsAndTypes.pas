@@ -196,6 +196,7 @@ type
 
 
         WriteAccessPossible: Boolean;
+        AllowQuickAccessToMetadata: Boolean;
 
         // Steuerung des Deskbands:
         //Folgende Nachrichten werden registriert und an ein Deskband gesendet:
@@ -367,6 +368,8 @@ const
     MB_DeadFilesWarning = 14;
     // Warnung: Duplikate in der Bib gefunden. Das sollte eigentlich nicht mehr vorkommen
     MB_DuplicateWarning = 15;
+    // Recheck Current playingfile after the bib was initially loaded (rating!)
+    MB_ReCheckPlaylingFile = 35;
     // AutScan der Ordner starten
     MB_StartAutoScanDirs = 16;
     // WebServer automatisch starten
@@ -862,6 +865,8 @@ begin
         // "Kill" relative Paths
         DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
+        AllowQuickAccessToMetadata := Ini.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', True);
+
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
         FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
 
@@ -1011,6 +1016,9 @@ begin
         ini.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
         ini.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
+
+        Ini.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
+
 
         ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
         ini.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);

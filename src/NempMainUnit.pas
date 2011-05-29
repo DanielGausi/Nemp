@@ -3599,7 +3599,7 @@ begin
                               listFile.PlayCounter := 0;
                       end;
                       // write the rating into the file on disk
-                      aErr := CurrentAF.QuickUpdateTag;
+                      aErr := CurrentAF.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
                       if aErr <> AUDIOERR_None then
                           AddErrorLog('Note: Rating NOT saved into file'#13#10 + CurrentAF.Pfad + #13#10            
                               + 'Error: ' + AudioErrorString[aErr]
@@ -4593,7 +4593,7 @@ begin
       LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
       ImgBibRating.Visible := True;
       BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
-      LblBibTags.Caption := aAudioFile.TagDisplayString; //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+      LblBibTags.Caption := aAudioFile.GetTagDisplayString(NempOptions.AllowQuickAccessToMetadata); //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
       LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
   end;
 end;
@@ -4741,7 +4741,9 @@ var ListOfFiles: TObjectList;
     i: Integer;
     aErr: TAudioError;
 begin
-    if (not NempSkin.NempPartyMode.DoBlockTreeEdit) and (Button = mbLeft) then
+    if      (not NempSkin.NempPartyMode.DoBlockTreeEdit)
+        and (Button = mbLeft)
+    then
     begin
         if Assigned(MedienBib.CurrentAudioFile)
            and (MedienBib.StatusBibUpdate <= 1)
@@ -4759,7 +4761,7 @@ begin
                       listFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                   end;
                   // write the rating into the file on disk
-                  aErr := MedienBib.CurrentAudioFile.QuickUpdateTag;
+                  aErr := MedienBib.CurrentAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
                   if aErr <> AUDIOERR_None then
                       AddErrorLog('Note: Rating NOT saved into file'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10            
                           + 'Error: ' + AudioErrorString[aErr]
@@ -4780,7 +4782,8 @@ end;
 
 procedure TNemp_MainForm.ImgBibRatingMouseLeave(Sender: TObject);
 begin
-    if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if (not NempSkin.NempPartyMode.DoBlockTreeEdit)
+    then
     begin
         if Assigned(MedienBib.CurrentAudioFile) then
             BibRatingHelper.DrawRatingInStarsOnBitmap(MedienBib.CurrentAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height)
@@ -4793,7 +4796,8 @@ procedure TNemp_MainForm.ImgBibRatingMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var rat: Integer;
 begin
-  if not NempSkin.NempPartyMode.DoBlockTreeEdit then
+  if (not NempSkin.NempPartyMode.DoBlockTreeEdit)
+  then
   begin
       // draw stars according to current mouse position
       rat := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
@@ -4909,7 +4913,10 @@ end;
 // OnKeyEnter  : Show the Label again, update the Information
 procedure TNemp_MainForm.LblBibArtistClick(Sender: TObject);
 begin
-    if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if    (not Assigned(MedienBib.CurrentAudioFile))
+       or (not NempOptions.AllowQuickAccessToMetadata)
+       or NempSkin.NempPartyMode.DoBlockTreeEdit
+    then
         exit;
 
     if (not MedienBib.CurrentAudioFile.isStream)
@@ -4923,7 +4930,10 @@ begin
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
 begin
-    if (not Assigned(MedienBib.CurrentAudioFile)) or NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if (not Assigned(MedienBib.CurrentAudioFile))
+        or NempSkin.NempPartyMode.DoBlockTreeEdit
+        or (not NempOptions.AllowQuickAccessToMetadata)
+    then
         exit;
 
     if (not MedienBib.CurrentAudioFile.isStream)
@@ -4983,7 +4993,7 @@ begin
                 MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
 
             // write Data to the file
-            aErr := MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+            aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
             if aErr = AUDIOERR_None then
             begin                
                 // Generate a List of Files which should be updated now
@@ -5013,7 +5023,7 @@ begin
                 MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);            
             end;
 
-            LblBibTags.Caption := MedienBib.CurrentAudioFile.TagDisplayString;
+            LblBibTags.Caption := MedienBib.CurrentAudioFile.GetTagDisplayString(NempOptions.AllowQuickAccessToMetadata);
         end;
     end;
     HideTagMemo;
@@ -5078,7 +5088,7 @@ begin
                       end;                     
               
                       // write Data to file                                                    
-                      aErr := MedienBib.CurrentAudioFile.SetAudioData(SAD_BOTH);
+                      aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
                       if aErr = AUDIOERR_None  then
                       begin
                           // Generate a List of Files which should be updated now
@@ -5173,6 +5183,8 @@ begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
+        if not GetSpecialPermissionToChangeMetaData then exit;
+
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
 
@@ -5205,6 +5217,7 @@ begin
         MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
+        if not GetSpecialPermissionToChangeMetaData then exit;
 
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
@@ -6407,7 +6420,8 @@ procedure TNemp_MainForm.RatingImageMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 var rat: Integer;
 begin
-  if not NempSkin.NempPartyMode.DoBlockCurrentTitleRating then
+  if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating)
+  then
   begin
       // draw stars according to current mouse position
       rat := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
@@ -6422,7 +6436,8 @@ var ListOfFiles: TObjectList;
     i: Integer;
     aErr: TAudioError;
 begin
-    if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating) and (Button = mbLeft)  then
+    if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating)
+        and (Button = mbLeft)  then
     begin
         if Assigned(NempPlayer.MainAudioFile) then
         begin
@@ -6441,7 +6456,7 @@ begin
                           listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
                       end;
                       // write the rating into the file on disk
-                      aErr := NempPlayer.MainAudioFile.QuickUpdateTag;
+                      aErr := NempPlayer.MainAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
                       if aErr <> AUDIOERR_None then
                           AddErrorLog('Note: Rating NOT saved into file'#13#10 + NempPlayer.MainAudioFile.Pfad + #13#10            
                               + 'Error: ' + AudioErrorString[aErr]
@@ -6463,7 +6478,8 @@ end;
 
 procedure TNemp_MainForm.RatingImageMouseLeave(Sender: TObject);
 begin
-    if not NempSkin.NempPartyMode.DoBlockCurrentTitleRating then
+    if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating)
+    then
     begin
         if assigned(NempPlayer.MainAudioFile) then
             Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating)
@@ -9950,8 +9966,10 @@ begin
   // further action (like Click).
   // For this, the Edit of other Rating-Nodes should be cancelled first.
 
-  if NempSkin.NempPartyMode.DoBlockTreeEdit then
-      exit; // dont do anythin here
+  if   (NempSkin.NempPartyMode.DoBlockTreeEdit)
+    // or (not NempOptions.AllowQuickAccessToMetadata)
+  then
+      exit; // dont do anything here
 
   if not self.Active then
       exit;
@@ -10012,8 +10030,8 @@ var
   Data: PTreeData;
   af: tAudioFile;
 begin
-
-    if NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if (NempSkin.NempPartyMode.DoBlockTreeEdit)
+    then
         allowed := false
     else
     begin
@@ -10047,7 +10065,7 @@ begin
                         then
                         begin
                             ClearShortCuts;
-                            allowed := True;
+                            allowed := NempOptions.AllowQuickAccessToMetadata;
                         end else
                             allowed := False;
                     end;
@@ -10108,7 +10126,9 @@ var
   i: Integer;
   aErr: TAudioError;
 begin
-    if NempSkin.NempPartyMode.DoBlockTreeEdit then
+    if (NempSkin.NempPartyMode.DoBlockTreeEdit)
+        // or (not NempOptions.AllowQuickAccessToMetadata)
+    then
         exit;
 
     //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
@@ -10128,8 +10148,8 @@ begin
         and (MedienBib.CurrentThreadFilename <> af.Pfad)
     then
     begin
-        aErr := af.SetAudioData(SAD_BOTH);
-        if aErr = AUDIOERR_None then
+        aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+        if (aErr = AUDIOERR_None) or (VST.Header.Columns[column].Tag = CON_RATING) then
         begin
             // Generate a List of Files which should be updated now
             ListOfFiles := TObjectList.Create(False);
@@ -10147,8 +10167,8 @@ begin
             end;        
             MedienBib.Changed := True;
             CorrectVCLAfterAudioFileEdit(af);
-        end
-        else
+        end;
+        if (aErr <> AUDIOERR_None) then
         begin
             // Read old Data again, if we edited something else than RATING
             if VST.Header.Columns[column].Tag <> CON_RATING then            

@@ -60,12 +60,13 @@ type
 
 
             // Write new values into ID3-Tag
+            // Setting from NempOptions.AllowQuickAccessToMetadata
             fWriteToFiles: Boolean;
             // 2. Counter
             // Inc PlayCounter after Playback
             fChangeCounter: Boolean;
             // ... but not when the track was aborted to fast
-            fIgnoreCounterOnAbortedTracks: Boolean;
+            // (nonsense???) fIgnoreCounterOnAbortedTracks: Boolean;
             // 3. Ratings
             // Increase rating on played files
             fIncPlayedFiles: Boolean;
@@ -127,7 +128,7 @@ type
             fWriteToFiles: Boolean;        // Write new values into ID3-Tag
             // 2. Counter
             fChangeCounter: Boolean;                 // Inc PlayCounter after Playback
-            fIgnoreCounterOnAbortedTracks: Boolean;  // ... but not when the track was aborted to fast
+            // fIgnoreCounterOnAbortedTracks: Boolean;  // ... but not when the track was aborted to fast
             // 3. Ratings
             fIncPlayedFiles: Boolean;    // Increase rating on played files
             fDecAbortedFiles: Boolean;   // Decrease rating on aborted files
@@ -162,7 +163,7 @@ type
             // Inc PlayCounter after Playback
             property ChangeCounter: Boolean read fChangeCounter write fChangeCounter;
             // ... but not when the track was aborted to fast
-            property IgnoreCounterOnAbortedTracks: Boolean read fIgnoreCounterOnAbortedTracks write fIgnoreCounterOnAbortedTracks;
+            // property IgnoreCounterOnAbortedTracks: Boolean read fIgnoreCounterOnAbortedTracks write fIgnoreCounterOnAbortedTracks;
             // 3. Ratings
             // Increase rating on played files
             property IncPlayedFiles: Boolean read fIncPlayedFiles write fIncPlayedFiles;
@@ -215,7 +216,7 @@ begin
     fWriteToFiles := parent.WriteToFiles;
 
     fChangeCounter := parent.ChangeCounter;
-    fIgnoreCounterOnAbortedTracks := parent.IgnoreCounterOnAbortedTracks;
+    //fIgnoreCounterOnAbortedTracks := parent.IgnoreCounterOnAbortedTracks;
 
     fIncPlayedFiles := parent.IncPlayedFiles;
     fDecAbortedFiles := parent.DecAbortedFiles;
@@ -272,7 +273,7 @@ procedure TPostProcessJob.ChangePlayCounter;
 begin
     if fChangeCounter then
     begin
-        if FileWasPlayedLongEnough or (not fIgnoreCounterOnAbortedTracks) then
+        if FileWasPlayedLongEnough then // or (not fIgnoreCounterOnAbortedTracks) then
             fAudioFile.PlayCounter := fAudioFile.PlayCounter + 1;
     end;
 end;
@@ -280,9 +281,9 @@ end;
 function TPostProcessJob.UpdateFile: TAudioError;
 begin
     if fWriteToFiles then
-        result := fAudioFile.QuickUpdateTag
+        result := fAudioFile.QuickUpdateTag(fWriteToFiles)
     else
-        result := AUDIOERR_None;
+        result := AUDIOERR_EditingDenied;
 end;
 
 
@@ -312,10 +313,10 @@ procedure TPostProcessor.LoadFromIni(Ini: TMemIniFile);
 begin
     fActive        := Ini.ReadBool('PostProcessor', 'Active', True);
     fIgnoreShortFiles := Ini.ReadBool('PostProcessor', 'IgnoreShortFiles', True);
-    fWriteToFiles  := Ini.ReadBool('PostProcessor', 'WriteToFiles', True);
+    //fWriteToFiles  := Ini.ReadBool('PostProcessor', 'WriteToFiles', True);
 
     fChangeCounter := Ini.ReadBool('PostProcessor', 'ChangeCounter', True);
-    fIgnoreCounterOnAbortedTracks := Ini.ReadBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', False);
+    // fIgnoreCounterOnAbortedTracks := Ini.ReadBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', False);
 
     fIncPlayedFiles  := Ini.ReadBool('PostProcessor', 'IncPlayedFiles', True);
     fDecAbortedFiles := Ini.ReadBool('PostProcessor', 'DecAbortedFiles', False);
@@ -324,10 +325,10 @@ procedure TPostProcessor.WriteToIni(Ini: TMemIniFile);
 begin
     Ini.WriteBool('PostProcessor', 'Active', fActive);
     Ini.WriteBool('PostProcessor', 'IgnoreShortFiles', fIgnoreShortFiles);
-    Ini.WriteBool('PostProcessor', 'WriteToFiles', fWriteToFiles);
+    // Ini.WriteBool('PostProcessor', 'WriteToFiles', fWriteToFiles);
 
     Ini.WriteBool('PostProcessor', 'ChangeCounter', fChangeCounter);
-    Ini.WriteBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', fIgnoreCounterOnAbortedTracks);
+    // Ini.WriteBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', fIgnoreCounterOnAbortedTracks);
 
     Ini.WriteBool('PostProcessor', 'IncPlayedFiles', fIncPlayedFiles);
     Ini.WriteBool('PostProcessor', 'DecAbortedFiles', fDecAbortedFiles);
@@ -403,8 +404,6 @@ begin
                 // Ok, file is long enough or should NOT be ignored.
                 if IsJustPlaying then
                     PlayAmount := PlayAmount + SecondsBetween(Now, StartTimeLocal);
-
-
                 NewJob := TPostProcessJob.Create(self);
                 // decide, whether the file was played or aborted
                 if ((PlayAmount > 240) or (PlayAmount > (fPlayingFileLength Div 2))) then

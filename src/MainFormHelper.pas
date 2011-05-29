@@ -121,6 +121,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure AddErrorLog(aString: String);
 
+    function GetSpecialPermissionToChangeMetaData:Boolean;
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1514,6 +1516,28 @@ begin
     inc(ErrorLogCount);
     Nemp_MainForm.MM_H_ErrorLog.Caption := Format(MainForm_MainMenu_Messages, [ErrorLogCount]);
     Nemp_MainForm.MM_H_ErrorLog.Visible := True;
+end;
+
+function GetSpecialPermissionToChangeMetaData:Boolean;
+begin
+    with Nemp_MainForm do
+    begin
+        if Not NempOptions.AllowQuickAccessToMetadata then
+        begin
+            // User dont want Files to be changed. But this is necessary here.
+            // so get a special permission (or cancel the process)
+            if MessageDlg((MediaLibrary_PermissionToChangeTagsRequired)
+               , mtConfirmation, [MBYes, MBNo], 0, MBNo) = mrYes
+            then
+                result := True
+            else
+            begin
+                result := False;
+                MessageDlg(MediaLibrary_OperationCancelled, mtInformation, [mbOK], 0);
+            end;
+        end else
+            result := True;
+    end;
 end;
 
 end.

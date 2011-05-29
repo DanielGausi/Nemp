@@ -917,6 +917,8 @@ begin
         MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
     else
     begin
+        if not GetSpecialPermissionToChangeMetaData then exit;
+
         MedienBib.StatusBibUpdate := 1;
         BlockeMedienListeUpdate(True);
         LblUpdateWarning.Visible := True;
