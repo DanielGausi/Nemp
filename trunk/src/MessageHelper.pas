@@ -722,8 +722,8 @@ begin
             if assigned(FDetails)
                 and FDetails.Visible
                 and assigned(af)
-                and assigned(FDetails.AktuellesAudioFile)
-                and (FDetails.AktuellesAudioFile.Pfad = af.Pfad)
+                and assigned(FDetails.CurrentAudioFile)
+                and (FDetails.CurrentAudioFile.Pfad = af.Pfad)
             then
                 FDetails.ReloadTimer.Enabled := True;
 

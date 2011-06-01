@@ -446,7 +446,7 @@ object FDetails: TFDetails
         Height = 121
         Caption = 'Quality'
         TabOrder = 2
-        object RatingImageRO: TImage
+        object RatingImageBib: TImage
           Left = 84
           Top = 52
           Width = 70
@@ -936,15 +936,15 @@ object FDetails: TFDetails
           ParentFont = False
           Transparent = True
         end
-        object RatingImage: TImage
+        object RatingImageID3: TImage
           Left = 64
           Top = 163
           Width = 70
           Height = 14
           Transparent = True
-          OnMouseDown = RatingImageMouseDown
-          OnMouseLeave = RatingImageMouseLeave
-          OnMouseMove = RatingImageMouseMove
+          OnMouseDown = RatingImageID3MouseDown
+          OnMouseLeave = RatingImageID3MouseLeave
+          OnMouseMove = RatingImageID3MouseMove
         end
         object CBID3v2: TCheckBox
           Left = 64
@@ -1058,6 +1058,18 @@ object FDetails: TFDetails
           Sorted = True
           TabOrder = 11
           OnChange = Lblv2Change
+        end
+        object BtnSynchRatingID3: TButton
+          Left = 234
+          Top = 163
+          Width = 142
+          Height = 21
+          Hint = 'Synchronize rating in the ID3-Tag with the rating in the library'
+          Caption = 'Synchronize rating'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 12
+          OnClick = BtnSynchRatingID3Click
         end
       end
     end
@@ -1212,9 +1224,9 @@ object FDetails: TFDetails
           Width = 70
           Height = 14
           Transparent = True
-          OnMouseDown = RatingImageMouseDown
-          OnMouseLeave = RatingImageMouseLeave
-          OnMouseMove = RatingImageMouseMove
+          OnMouseDown = RatingImageID3MouseDown
+          OnMouseLeave = RatingImageID3MouseLeave
+          OnMouseMove = RatingImageID3MouseMove
         end
         object Edt_VorbisArtist: TEdit
           Left = 64
@@ -1288,6 +1300,18 @@ object FDetails: TFDetails
           LabelPosition = lpLeft
           LabelSpacing = 1
           TabOrder = 8
+        end
+        object BtnSynchRatingOggVorbis: TButton
+          Left = 234
+          Top = 147
+          Width = 142
+          Height = 21
+          Hint = 'Synchronize rating in the ID3-Tag with the rating in the library'
+          Caption = 'Synchronize rating'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 9
+          OnClick = BtnSynchRatingID3Click
         end
       end
       object GrpBox_AllVorbisComments: TGroupBox
