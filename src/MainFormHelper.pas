@@ -1193,8 +1193,8 @@ begin
         Target.Add(NempPlayer.MainAudioFile);
 
     // 3. The Detailform-File
-    if assigned(fDetails) and NeededFile(fDetails.AktuellesAudioFile) then
-        Target.Add(fDetails.AktuellesAudioFile);
+    if assigned(fDetails) and NeededFile(fDetails.CurrentAudioFile) then
+        Target.Add(fDetails.CurrentAudioFile);
 
     // 4. The "currentfile" from the library (this is the one displayed in the VST-Details)
     if NeededFile(Medienbib.CurrentAudioFile) then
@@ -1259,7 +1259,7 @@ begin
     // ... Detail-Form
     if assigned(fDetails)
         and Nemp_MainForm.AutoShowDetailsTMP
-        and SameFile(fDetails.AktuellesAudioFile)
+        and SameFile(fDetails.CurrentAudioFile)
     then
         // Note: a call of AktualisiereDetailForm(af, SD_MEDIENBIB)
         //       will produce some strange AVs here - so we do it quick&dirty with a timer

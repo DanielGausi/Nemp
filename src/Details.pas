@@ -94,7 +94,7 @@ type
     LblConst_Id3v2Size: TLabel;
     Lblv2_Size: TLabel;
     Lblv2_Version: TLabel;
-    RatingImageRO: TImage;
+    RatingImageBib: TImage;
     IdHTTP1: TIdHTTP;
     BtnLyricWikiManual: TButton;
     PM_URLCopy: TPopupMenu;
@@ -181,7 +181,7 @@ type
     Memo_Lyrics: TMemo;
     ReloadTimer: TTimer;
     LblRatingImage: TLabel;
-    RatingImage: TImage;
+    RatingImageID3: TImage;
     BtnResetRating: TButton;
     LblPlayCounter: TLabel;
     cbIDv1Genres: TComboBox;
@@ -222,6 +222,8 @@ type
     Label1: TLabel;
     Memo_Tags: TMemo;
     Btn_GetTagsLastFM: TButton;
+    BtnSynchRatingID3: TButton;
+    BtnSynchRatingOggVorbis: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -244,11 +246,11 @@ type
     procedure Btn_ActualizeClick(Sender: TObject);
 
     // Procedures for editing the rating of the current file
-    procedure RatingImageMouseMove(Sender: TObject; Shift: TShiftState; X,
+    procedure RatingImageID3MouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure RatingImageMouseDown(Sender: TObject; Button: TMouseButton;
+    procedure RatingImageID3MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure RatingImageMouseLeave(Sender: TObject);
+    procedure RatingImageID3MouseLeave(Sender: TObject);
     procedure BtnResetRatingClick(Sender: TObject);
 
     // EventHandler for Cover on page 1
@@ -313,10 +315,11 @@ type
     procedure MainPageControlChange(Sender: TObject);
     procedure Memo_TagsChange(Sender: TObject);
     procedure Btn_GetTagsLastFMClick(Sender: TObject);
+    procedure BtnSynchRatingID3Click(Sender: TObject);
 
   private
     Coverpfade : TStringList;
-    DateiPfad : String;
+    // DateiPfad : String;
 
     PictureFrames: TObjectList;
 
@@ -328,7 +331,9 @@ type
     // Speichert die "temporäre Existenz" der ID3Tags, d.h. ob der User sie aktiviert hat oder nicht
     ID3v1Activated: Boolean;
     ID3v2Activated: Boolean;
-    ActualRating: Integer;
+    CurrentTagRatingChanged: Boolean;
+    CurrentTagRating: Byte;
+    CurrentBibRating: Byte;
     PictureHasChanged: Boolean;
     ID3v1HasChanged: Boolean;
     ID3v2HasChanged: Boolean;
@@ -372,7 +377,7 @@ type
     ID3v2Tag: TID3V2Tag; // wird in NewPicture benötigt
     FlacFile: TFlacFile;
     OggVorbisFile: TOggVorbisFile;
-    AktuellesAudioFile : TAudioFile;
+    CurrentAudioFile : TAudioFile;
 
     // Gibt an, ob aktuelles AudioFile ein gültiges MP3-File ist
     ValidMp3File: Boolean;
@@ -482,7 +487,7 @@ end;
 procedure TFDetails.FormHide(Sender: TObject);
 begin
     Nemp_MainForm.AutoShowDetailsTMP := False;
-    AktuellesAudioFile := Nil;
+    CurrentAudioFile := Nil;
 end;
 
 {
@@ -526,9 +531,9 @@ begin
     ID3v2HasChanged := False;
     VorbisCommentHasChanged := False;
 
-    if assigned(AktuellesAudioFile)
+    if assigned(CurrentAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
-        and (MedienBib.CurrentThreadFilename <> AktuellesAudioFile.Pfad)
+        and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad)
     then
     begin
         aErr := AUDIOERR_None;
@@ -546,40 +551,40 @@ begin
         if aErr <> AUDIOERR_None then
         begin
             MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
-            AddErrorLog('Editing Details'#13#10 + AktuellesAudioFile.Pfad + #13#10
+            AddErrorLog('Editing Details'#13#10 + CurrentAudioFile.Pfad + #13#10
                                 + 'Error: ' + AudioErrorString[aErr]
                                 + #13#10 + '------');
             exit;
         end;
 
 
-        SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
+        SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
 
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
         try
-            GetListOfAudioFileCopies(AktuellesAudioFile, ListOfFiles);
+            GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
             for i := 0 to ListOfFiles.Count - 1 do
             begin
                 listFile := TAudioFile(ListOfFiles[i]);
                 // copy Data from AktuellesAudioFile to the files in the list.
-                listFile.Assign(AktuellesAudioFile);
+                listFile.Assign(CurrentAudioFile);
             end;
         finally
             ListOfFiles.Free;
         end;
         MedienBib.Changed := True;
         // Correct GUI
-        CorrectVCLAfterAudioFileEdit(AktuellesAudioFile);
+        CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
     if fFilefromMedienBib then
-        ShowDetails(AktuellesAudioFile, SD_MedienBib)
+        ShowDetails(CurrentAudioFile, SD_MedienBib)
     else
-        ShowDetails(AktuellesAudioFile, SD_PLAYLIST);
+        ShowDetails(CurrentAudioFile, SD_PLAYLIST);
 end;
 procedure TFDetails.Btn_CloseClick(Sender: TObject);
 begin
@@ -595,46 +600,46 @@ end;
 }
 procedure TFDetails.Btn_ExploreClick(Sender: TObject);
 begin
-  if DirectoryExists(ExtractFilePath(dateipfad)) then
+  if DirectoryExists(ExtractFilePath(CurrentAudioFile.pfad)) then
         ShellExecute(Handle, 'open' ,'explorer.exe'
-                      , Pchar('/e,/select,"'+dateipfad+'"'), '', sw_ShowNormal);
+                      , Pchar('/e,/select,"'+CurrentAudioFile.Pfad+'"'), '', sw_ShowNormal);
 end;
 procedure TFDetails.Btn_PropertiesClick(Sender: TObject);
 begin
-  ShowFileProperties(Nemp_MainForm.Handle, pChar(dateipfad),'');
+  ShowFileProperties(Nemp_MainForm.Handle, pChar(CurrentAudioFile.Pfad),'');
 end;
 procedure TFDetails.Btn_ActualizeClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
 begin
-    if assigned(AktuellesAudioFile)
+    if assigned(CurrentAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
-        and (MedienBib.CurrentThreadFilename <> AktuellesAudioFile.Pfad)
+        and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad)
     then
     begin
         // Read file information from disk
-        if Fileexists(AktuellesAudioFile.Pfad) then
+        if Fileexists(CurrentAudioFile.Pfad) then
         begin
-            SynchronizeAudioFile(AktuellesAudioFile, AktuellesAudioFile.Pfad, True);
+            SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
         end;
 
         // Generate a List of Files which should be updated now
         ListOfFiles := TObjectList.Create(False);
         try
-            GetListOfAudioFileCopies(AktuellesAudioFile, ListOfFiles);
+            GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
             for i := 0 to ListOfFiles.Count - 1 do
             begin
                 listFile := TAudioFile(ListOfFiles[i]);
                 // copy Data from AktuellesAudioFile to the files in the list.
-                listFile.Assign(AktuellesAudioFile);
+                listFile.Assign(CurrentAudioFile);
             end;
         finally
             ListOfFiles.Free;
         end;
         MedienBib.Changed := True;
         // Correct GUI
-        CorrectVCLAfterAudioFileEdit(AktuellesAudioFile);
+        CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
@@ -648,7 +653,7 @@ end;
     - Edit the rating of the current audiofile
     --------------------------------------------------------
 }
-procedure TFDetails.RatingImageMouseMove(Sender: TObject; Shift: TShiftState; X,
+procedure TFDetails.RatingImageID3MouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 var rat: Integer;
 begin
@@ -660,24 +665,35 @@ begin
 end;
 
 
-procedure TFDetails.RatingImageMouseDown(Sender: TObject;
+procedure TFDetails.RatingImageID3MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-    ActualRating := DetailRatingHelper.MousePosToRating(x, 70);
+    CurrentTagRating := DetailRatingHelper.MousePosToRating(x, 70);
+    CurrentTagRatingChanged := True;
     // Actualize Read-Only-Image
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
+    // No. This is changed only after "Save changes"
+    // DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
 end;
-procedure TFDetails.RatingImageMouseLeave(Sender: TObject);
+procedure TFDetails.RatingImageID3MouseLeave(Sender: TObject);
 begin
-    if RatingImage.Enabled then
-        DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, (Sender as TImage).Picture.Bitmap, (Sender as TImage).Width, (Sender as TImage).Height);
+    if RatingImageID3.Enabled then
+        DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, (Sender as TImage).Picture.Bitmap, (Sender as TImage).Width, (Sender as TImage).Height);
 end;
 procedure TFDetails.BtnResetRatingClick(Sender: TObject);
 begin
-    ActualRating := 0;
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+    CurrentTagRating := 0;
+    CurrentTagRatingChanged := True;
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
+    // DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+end;
+
+procedure TFDetails.BtnSynchRatingID3Click(Sender: TObject);
+begin
+    CurrentTagRating := CurrentAudioFile.Rating;
+    CurrentTagRatingChanged := True;
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
 end;
 
 {
@@ -767,9 +783,9 @@ begin
     fForceChange := True;
     ReloadTimer.Enabled := False;
     if fFilefromMedienBib then
-        ShowDetails(AktuellesAudioFile, SD_MedienBib)
+        ShowDetails(CurrentAudioFile, SD_MedienBib)
     else
-        ShowDetails(AktuellesAudioFile, SD_PLAYLIST);
+        ShowDetails(CurrentAudioFile, SD_PLAYLIST);
     fForceChange := False;
 end;
 
@@ -782,8 +798,8 @@ end;
 procedure TFDetails.UpdateMediaBibEnabledStatus;
 var ControlsEnable, ButtonsEnable: Boolean;
 begin
-  ButtonsEnable := (AktuellesAudioFile <> NIL) AND FileExists(AktuellesAudioFile.Pfad);
-  ControlsEnable:= (AktuellesAudioFile <> NIL);
+  ButtonsEnable := (CurrentAudioFile <> NIL) AND FileExists(CurrentAudioFile.Pfad);
+  ControlsEnable:= (CurrentAudioFile <> NIL);
 
   Btn_Properties.Enabled := ButtonsEnable;
   Btn_Explore.Enabled := ButtonsEnable;
@@ -913,16 +929,17 @@ begin
   Lblv2Comment.Enabled := ControlsEnable;
   Lblv2Track.Enabled := ControlsEnable;
   LblRatingImage.Enabled := ControlsEnable;
-  RatingImage.Enabled := ControlsEnable;
+  RatingImageID3.Enabled := ControlsEnable;
   BtnResetRating.Enabled := ControlsEnable;
   if ControlsEnable then
-      DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height)
+      DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height)
   else
   begin
       if FileExists(ExtractFilePath(ParamStr(0)) + 'Images\stardisabled.bmp') then
-          RatingImage.Picture.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Images\stardisabled.bmp');
+          RatingImageID3.Picture.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Images\stardisabled.bmp');
   end;
 
+  BtnSynchRatingID3.Visible := ControlsEnable;
   LblConst_ID3v2Artist.Enabled := ControlsEnable;
   LblConst_ID3v2Title.Enabled := ControlsEnable;
   LblConst_ID3v2Album.Enabled := ControlsEnable;
@@ -1153,9 +1170,9 @@ var i: Integer;
     FirstCoverIsFromMB: Boolean;
     LocalPlayCounter: Integer;
 begin
-  if AktuellesAudioFile = Nil then
+  if CurrentAudioFile = Nil then
   begin
-      AktuellesAudioFile := NIL;
+      CurrentAudioFile := NIL;
       CoverBox.Items.Add((Warning_Coverbox_NoCover));
       CoverImage.Picture.Bitmap.Assign(NIL);
       CoverImage.Visible := False;
@@ -1186,149 +1203,146 @@ begin
   end else
   begin
         Timer1.Enabled := False;
-        with AktuellesAudioFile do
+        If not (Fileexists(CurrentAudioFile.Pfad) OR CurrentAudioFile.isStream) then
         begin
-          If not (Fileexists(Pfad) OR AktuellesAudioFile.isStream) then
+          Lbl_Warnings.Caption := (Warning_FileNotFound);
+          Lbl_Warnings.Hint := (Warning_FileNotFound_Hint);
+          PnlWarnung.Visible := True;
+        end;
+
+        //DateiPfad := Pfad;
+        LBLPfad.Caption := CurrentAudioFile.Ordner;
+        LBLName.Caption := CurrentAudioFile.DateiName;
+
+        if CurrentAudioFile.isStream then
+        begin
+          FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Ordner]);
+
+          LlblConst_Path.Caption := (DetailForm_InfoLblWebStream);
+          LlblConst_Filename.Caption := (DetailForm_InfoLblDescription);
+          Lblsize.Font.Style := [fsbold];
+          LlblConst_FileSize.Font.Style := [fsbold];
+          LlblConst_Filesize.Caption := (DetailForm_InfoLblHint);
+          LBLSize.Caption := (DetailForm_InfoLblHinttext);
+          LBLPfad.Font.Color := clblue;
+          LBLPfad.Font.Style := [fsUnderline];
+          LBLPfad.OnClick := LBLPfadClick;
+          LBLPfad.PopupMenu := PM_URLCopy;
+          LBLPfad.Cursor := crHandPoint;
+          LBLDauer.Caption := '(inf)';
+          LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
+          LBLSamplerate.Caption := '-';
+          LblPlayCounter.Caption := '';
+        end
+        else
+        begin
+          FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Dateiname]);
+
+          if Not FileExists(CurrentAudioFile.Pfad) then
+              FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_FileNotFound
+          else
+              if FileIsWriteProtected(CurrentAudioFile.Pfad) then
+                  FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_WriteProtected ;
+
+          LlblConst_Path.Caption := (DetailForm_InfoLblPath);
+          LlblConst_Filename.Caption := (DetailForm_InfoLblFilename);
+          Lblsize.Font.Style := [];
+          LlblConst_Filesize.Font.Style := [];
+          LlblConst_FileSize.Caption := (DetailForm_InfoLblFileSize);
+          LBLSize.Caption := FloatToStrF((CurrentAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB'
+                          + ' (' + inttostr(CurrentAudioFile.Size) + ' Bytes)' ;
+          LBLPfad.Font.Color := clWindowText;
+          LBLPfad.Font.Style := [];
+          LBLPfad.OnClick := NIL;
+          LBLPfad.PopupMenu := NIL;
+          LBLPfad.Cursor := crDefault;
+          LBLDauer.Caption  := SekToZeitString(CurrentAudioFile.Duration);
+
+          if CurrentAudioFile.vbr then
+              LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s (vbr)'
+          else
+              LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
+          LBLSamplerate.Caption := CurrentAudioFile.Samplerate + ', ' + CurrentAudioFile.ChannelMode;
+
+
+          if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
           begin
-            Lbl_Warnings.Caption := (Warning_FileNotFound);
-            Lbl_Warnings.Hint := (Warning_FileNotFound_Hint);
-            PnlWarnung.Visible := True;
-          end;
-
-          DateiPfad := Pfad;
-          LBLPfad.Caption := Ordner;
-          LBLName.Caption := DateiName;
-
-          if AktuellesAudioFile.isStream then
-          begin
-            FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), Ordner]);
-
-            LlblConst_Path.Caption := (DetailForm_InfoLblWebStream);
-            LlblConst_Filename.Caption := (DetailForm_InfoLblDescription);
-            Lblsize.Font.Style := [fsbold];
-            LlblConst_FileSize.Font.Style := [fsbold];
-            LlblConst_Filesize.Caption := (DetailForm_InfoLblHint);
-            LBLSize.Caption := (DetailForm_InfoLblHinttext);
-            LBLPfad.Font.Color := clblue;
-            LBLPfad.Font.Style := [fsUnderline];
-            LBLPfad.OnClick := LBLPfadClick;
-            LBLPfad.PopupMenu := PM_URLCopy;
-            LBLPfad.Cursor := crHandPoint;
-            LBLDauer.Caption := '(inf)';
-            LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
-            LBLSamplerate.Caption := '-';
-            LblPlayCounter.Caption := '';
+              CurrentBibRating := CurrentAudioFile.Rating;
+              LocalPlayCounter := CurrentAudioFile.PlayCounter;
           end
           else
           begin
-            FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), Dateiname]);
-
-            if Not FileExists(AktuellesAudioFile.Pfad) then
-                FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_FileNotFound
-            else
-                if FileIsWriteProtected(AktuellesAudioFile.Pfad) then
-                    FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_WriteProtected ;
-
-            LlblConst_Path.Caption := (DetailForm_InfoLblPath);
-            LlblConst_Filename.Caption := (DetailForm_InfoLblFilename);
-            Lblsize.Font.Style := [];
-            LlblConst_Filesize.Font.Style := [];
-            LlblConst_FileSize.Caption := (DetailForm_InfoLblFileSize);
-            LBLSize.Caption := FloatToStrF((Size / 1024 / 1024),ffFixed,4,2) + ' MB'
-                            + ' (' + inttostr(Size) + ' Bytes)' ;
-            LBLPfad.Font.Color := clWindowText;
-            LBLPfad.Font.Style := [];
-            LBLPfad.OnClick := NIL;
-            LBLPfad.PopupMenu := NIL;
-            LBLPfad.Cursor := crDefault;
-            LBLDauer.Caption  := SekToZeitString(Duration);
-
-            if vbr then
-                LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s (vbr)'
-            else
-                LBLBitrate.Caption := inttostr(Bitrate) + ' kbit/s';
-            LBLSamplerate.Caption := Samplerate + ', ' + ChannelMode;
-
-
-            if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
-            begin
-                ActualRating := Rating;
-                LocalPlayCounter := PlayCounter;
-            end
-            else
-            begin
-                mbAudioFile := MedienBib.GetAudioFileWithFilename(AktuellesAudioFile.Pfad);
-                if assigned(mbAudioFile) then
-                begin
-                    ActualRating := mbAudioFile.Rating;
-                    AktuellesAudioFile.Rating := mbAudioFile.Rating;
-                    LocalPlayCounter := mbAudioFile.PlayCounter;
-                end else
-                begin
-                    // File is not in MediaLibrary, but PlaylistFile
-                    ActualRating := ID3v2Tag.Rating;
-                    LocalPlayCounter := ID3v2Tag.PlayCounter;
-                end;
-            end;
-            DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageRO.Picture.Bitmap, RatingImageRO.Width, RatingImageRO.Height);
-            LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [LocalPlayCounter]);
+              mbAudioFile := MedienBib.GetAudioFileWithFilename(CurrentAudioFile.Pfad);
+              if assigned(mbAudioFile) then
+              begin
+                  CurrentBibRating := mbAudioFile.Rating;
+                  CurrentAudioFile.Rating := mbAudioFile.Rating;
+                  LocalPlayCounter := mbAudioFile.PlayCounter;
+              end else
+              begin
+                  // File is not in MediaLibrary, but PlaylistFile
+                  CurrentBibRating := ID3v2Tag.Rating;
+                  LocalPlayCounter := ID3v2Tag.PlayCounter;
+              end;
           end;
-          LBLArtist.Caption := GetReplacedArtist(Nemp_MainForm.NempOptions.ReplaceNAArtistBy); // Artist;
-          LBLTitel.Caption  := GetReplacedTitle(Nemp_MainForm.NempOptions.ReplaceNATitleBy)  ; // Titel;
-          LBLAlbum.Caption  := GetReplacedAlbum(Nemp_MainForm.NempOptions.ReplaceNAAlbumBy) ;  //Album;
+          DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
+          LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [LocalPlayCounter]);
+        end;
+        LBLArtist.Caption := CurrentAudioFile.GetReplacedArtist(Nemp_MainForm.NempOptions.ReplaceNAArtistBy); // Artist;
+        LBLTitel.Caption  := CurrentAudioFile.GetReplacedTitle(Nemp_MainForm.NempOptions.ReplaceNATitleBy)  ; // Titel;
+        LBLAlbum.Caption  := CurrentAudioFile.GetReplacedAlbum(Nemp_MainForm.NempOptions.ReplaceNAAlbumBy) ;  //Album;
 
-          LBLTrack.Caption  := IntToStr(Track);
-          LBLYear.Caption   := Year;
-          LBLGenre.Caption  := genre;
-          LblKommentar.Caption := Comment;
-          LBLSamplerate.Caption := Samplerate + ', ' + ChannelMode;
+        LBLTrack.Caption  := IntToStr(CurrentAudioFile.Track);
+        LBLYear.Caption   := CurrentAudioFile.Year;
+        LBLGenre.Caption  := CurrentAudioFile.genre;
+        LblKommentar.Caption := CurrentAudioFile.Comment;
+        LBLSamplerate.Caption := CurrentAudioFile.Samplerate + ', ' + CurrentAudioFile.ChannelMode;
 
-          CoverBox.Items.Clear;
-          Coverpfade.Clear;
+        CoverBox.Items.Clear;
+        Coverpfade.Clear;
 
-          // ToDo:  Hinzufügen: Das "Hash-Cover"
-          if (AktuellesAudioFile.CoverID <> 'all')
-          and (AktuellesAudioFile.CoverID <> '')
-          and FileExists(MedienBib.CoverSavePath + AktuellesAudioFile.CoverID + '.jpg') then
-          begin
-            Coverpfade.Add(MedienBib.CoverSavePath + AktuellesAudioFile.CoverID + '.jpg');
-            FirstCoverIsFromMB := True;
-          end else
-            FirstCoverIsFromMB := False;
+        // ToDo:  Hinzufügen: Das "Hash-Cover"
+        if (CurrentAudioFile.CoverID <> 'all')
+        and (CurrentAudioFile.CoverID <> '')
+        and FileExists(MedienBib.CoverSavePath + CurrentAudioFile.CoverID + '.jpg') then
+        begin
+          Coverpfade.Add(MedienBib.CoverSavePath + CurrentAudioFile.CoverID + '.jpg');
+          FirstCoverIsFromMB := True;
+        end else
+          FirstCoverIsFromMB := False;
 
-          Medienbib.GetCoverListe(AktuellesAudioFile,  Coverpfade);
+        Medienbib.GetCoverListe(CurrentAudioFile,  Coverpfade);
 
-          if Coverpfade.Count = 0 then
-          begin
-            CoverBox.Items.Add((Warning_Coverbox_NoCover));
-            CoverImage.Picture.Bitmap.Assign(NIL);
-            CoverImage.Visible := False;
-            Btn_OpenImage.Enabled := False;
-            CoverBox.ItemIndex := 0;
-            CoverBox.Enabled := False;
-            Lbl_FoundCovers.Enabled := False;
-          end else
-          begin // Cover gefunden
-            if FirstCoverIsFromMB then
-              CoverBox.Items.Add('<Cover>')
-            else
-              CoverBox.Items.Add(ExtractFilename(CoverPfade[0]));
+        if Coverpfade.Count = 0 then
+        begin
+          CoverBox.Items.Add((Warning_Coverbox_NoCover));
+          CoverImage.Picture.Bitmap.Assign(NIL);
+          CoverImage.Visible := False;
+          Btn_OpenImage.Enabled := False;
+          CoverBox.ItemIndex := 0;
+          CoverBox.Enabled := False;
+          Lbl_FoundCovers.Enabled := False;
+        end else
+        begin // Cover gefunden
+          if FirstCoverIsFromMB then
+            CoverBox.Items.Add('<Cover>')
+          else
+            CoverBox.Items.Add(ExtractFilename(CoverPfade[0]));
 
-            for i := 1 to Coverpfade.Count-1 do
-              CoverBox.Items.Add(ExtractFilename(CoverPfade[i]));
+          for i := 1 to Coverpfade.Count-1 do
+            CoverBox.Items.Add(ExtractFilename(CoverPfade[i]));
 
-            if FirstCoverIsFromMB then
-              CoverBox.ItemIndex := 0
-            else
-              CoverBox.ItemIndex := GetFrontCover(CoverBox.Items);
-            CoverImage.Visible := True;
-            Btn_OpenImage.Enabled := True;
-            // ZeigeBild(CoverPfade[CoverBox.ItemIndex]);
-            // aber mit einer Verzögerung --- Timer1
-            Timer1.Enabled := True;
-            CoverBox.Enabled := True;
-            Lbl_FoundCovers.Enabled := True;
-          end;
+          if FirstCoverIsFromMB then
+            CoverBox.ItemIndex := 0
+          else
+            CoverBox.ItemIndex := GetFrontCover(CoverBox.Items);
+          CoverImage.Visible := True;
+          Btn_OpenImage.Enabled := True;
+          // ZeigeBild(CoverPfade[CoverBox.ItemIndex]);
+          // aber mit einer Verzögerung --- Timer1
+          Timer1.Enabled := True;
+          CoverBox.Enabled := True;
+          Lbl_FoundCovers.Enabled := True;
         end;
   end;
 end;
@@ -1339,7 +1353,7 @@ end;
 }
 procedure TFDetails.ShowMPEGDetails;
 begin
-    if ValidMP3File and (AktuellesAudioFile <> NIL) then
+    if ValidMP3File and (CurrentAudioFile <> NIL) then
     begin
         if MpegInfo.vbr then
           LblDETBitrate.Caption := inttostr(MpegInfo.bitrate) + 'kbit/s (vbr)'
@@ -1450,7 +1464,11 @@ begin
     //Edt_VorbisContact.Text   := OggVorbisFile.Contact;
     cb_VorbisGenre.Text      := OggVorbisFile.Genre;
 
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+    CurrentTagRatingChanged := False;
+    CurrentTagRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+
+    BtnSynchRatingOggVorbis.Visible := CurrentTagRating <> CurrentBibRating;
 
     lv_VorbisComments.Items.Clear;
     comments := TStringList.Create;
@@ -1489,7 +1507,10 @@ begin
     //Edt_VorbisContact.Text   := FlacFile.Contact;
     cb_VorbisGenre.Text      := FlacFile.Genre;
 
-    DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+    CurrentTagRatingChanged := False;
+    CurrentTagRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+    BtnSynchRatingOggVorbis.Visible := CurrentTagRating <> CurrentBibRating;
 
     lv_VorbisComments.Items.Clear;
     comments := TStringList.Create;
@@ -1636,18 +1657,18 @@ var ButtonsEnable: Boolean;
     ext: String;
 begin
     ButtonsEnable := (ValidMp3File and ID3v2Activated) or (ValidOggFile) or (ValidFlacFile);
-    ext := AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad));
+    ext := AnsiLowerCase(ExtractFileExt(CurrentAudioFile.Pfad));
     // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
-    if (AktuellesAudioFile <> NIL)
+    if (CurrentAudioFile <> NIL)
         AND ((ext = '.mp3') or (ext = '.ogg') or (ext = '.flac') )
-        AND (not FileExists(AktuellesAudioFile.Pfad))
-        AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
+        AND (not FileExists(CurrentAudioFile.Pfad))
+        AND (trim(UnicodeString(CurrentAudioFile.Lyrics)) <> '')
     then
     begin
         // d.h. es ist ein mp3/ogg/flac-File, was gerade nicht da ist, das aber Lyrics in der DB hat
         Memo_Lyrics.ReadOnly := True;
         Memo_Lyrics.Enabled := True;
-        Memo_Lyrics.Text :=  UTF8ToString(AktuellesAudioFile.Lyrics);
+        Memo_Lyrics.Text :=  UTF8ToString(CurrentAudioFile.Lyrics);
     end else
     begin
         Memo_Lyrics.ReadOnly := False;
@@ -1674,7 +1695,7 @@ var ext: String;
     TagStream: TMemoryStream;
     localtags: UTF8String;
 begin
-    Memo_Tags.ReadOnly := (AktuellesAudioFile = NIL) or (not FileExists(AktuellesAudioFile.Pfad));
+    Memo_Tags.ReadOnly := (CurrentAudioFile = NIL) or (not FileExists(CurrentAudioFile.Pfad));
 
    {ext := AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad));
     if (AktuellesAudioFile <> NIL)
@@ -1714,7 +1735,7 @@ begin
             if ValidFlacFile then
                 Memo_Tags.Text := FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES)
             else
-                Memo_Tags.Text := AktuellesAudioFile.RawTagLastFM;
+                Memo_Tags.Text := CurrentAudioFile.RawTagLastFM;
 end;
 
 {
@@ -1845,7 +1866,10 @@ begin
         Lblv2Comment.Text := tmp;
         Lblv2Track.Text := Id3v2Tag.Track;
 
-        DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
+        CurrentTagRatingChanged := False;
+        CurrentTagRating := Id3v2Tag.Rating;
+        DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
+        BtnSynchRatingID3.Visible := CurrentTagRating <> CurrentBibRating;
 
         if IsValidYearString(Lblv2Year.Text)
         then
@@ -1929,9 +1953,9 @@ begin
   if Source <> -1 then
     fFilefromMedienBib := Source = SD_MedienBib;
 
-  AktuellesAudioFile := AudioFile;
+  CurrentAudioFile := AudioFile;
 
-  if (Nemp_MainForm.AutoShowDetailsTMP) AND (AktuellesAudioFile <> NIL) then
+  if (Nemp_MainForm.AutoShowDetailsTMP) AND (CurrentAudioFile <> NIL) then
       FDetails.Visible := True
   else
       exit;
@@ -2135,9 +2159,9 @@ begin
         Id3v1Tag.Genre := cbIDv1Genres.Text;
         Id3v1Tag.Track := Lblv1Track.Text;
         Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
-        result := id3v1Tag.WriteToFile(Dateipfad);
+        result := id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
     end else
-        result := id3v1Tag.RemoveFromFile(Dateipfad);
+        result := id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad);
 end;
 function TFDetails.UpdateID3v2InFile: TMP3Error;
 var ms: TMemoryStream;
@@ -2161,7 +2185,17 @@ begin
       // Bewertung. Nur schreiben, wenn gechecked
       // No write always - rating-image is now an ID3v2-Page
       // if (cbWriteRatingToTag.Checked) and (cbWriteRatingToTag.Enabled) then
-      ID3v2Tag.Rating := ActualRating;
+      if CurrentTagRatingChanged then
+      begin
+          ID3v2Tag.Rating := CurrentTagRating;
+          // copy Playcounter as well
+          ID3v2Tag.PlayCounter := CurrentAudioFile.PlayCounter;
+          CurrentTagRatingChanged := False;
+          // Change Bib-Rating!!
+          // IMPORTANT for later call of SynchronizeAudioFile,
+          // as the rating should NOT be changed in that sync!
+          CurrentAudioFile.Rating := CurrentTagRating;
+      end;
 
       s := Utf8String(Trim(Memo_Tags.Text));
       if length(s) > 0 then
@@ -2178,9 +2212,9 @@ begin
           ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
 
-      result := id3v2Tag.WriteToFile(Dateipfad);
+      result := id3v2Tag.WriteToFile(CurrentAudioFile.Pfad);
   end else
-    result := id3v2Tag.RemoveFromFile(Dateipfad);
+    result := id3v2Tag.RemoveFromFile(CurrentAudioFile.Pfad);
 end;
 
 function TFDetails.UpdateOggVorbisInFile: TOggVorbisError;
@@ -2197,10 +2231,20 @@ begin
 
         OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+        if CurrentTagRatingChanged then
+        begin
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(CurrentTagRating));
+            // copy playcounter as well
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentAudioFile.PlayCounter));
+            CurrentTagRatingChanged := False;
+            // Change Bib-Rating!!
+            // IMPORTANT for later call of SynchronizeAudioFile,
+            // as the rating should NOT be changed in that sync!
+            CurrentAudioFile.Rating := CurrentTagRating;
+        end;
         OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
-        result := OggVorbisFile.WriteToFile(Dateipfad);
+        result := OggVorbisFile.WriteToFile(CurrentAudioFile.Pfad);
     end else
         result := OVErr_NoFile;
 end;
@@ -2218,10 +2262,19 @@ begin
 
         FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
-        FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(ActualRating));
+        if CurrentTagRatingChanged then
+        begin
+            FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(CurrentTagRating));
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentAudioFile.PlayCounter));
+            CurrentTagRatingChanged := False;
+            // Change Bib-Rating!!
+            // IMPORTANT for later call of SynchronizeAudioFile,
+            // as the rating should NOT be changed in that sync!
+            CurrentAudioFile.Rating := CurrentTagRating;
+        end;
         FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
-        result := FlacFile.WriteToFile(Dateipfad);
+        result := FlacFile.WriteToFile(CurrentAudioFile.Pfad);
     end else
         result := FlacErr_NoFile;
 end;
@@ -2407,7 +2460,7 @@ begin
     // use a temporary AudioFile here
     af := TAudioFile.Create;
     try
-        af.Assign(AktuellesAudioFile);
+        af.Assign(CurrentAudioFile);
         af.RawTagLastFM := UTF8String(Trim(Memo_Tags.Text));
 
         TagPostProcessor := TTagPostProcessor.Create;
@@ -2505,10 +2558,10 @@ begin
         //   AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
         if ValidMp3File or ValidOggFile or ValidFlacFile then
         begin
-            AktuellesAudioFile.FileIsPresent:=True;
+            CurrentAudioFile.FileIsPresent:=True;
             Lyrics := TLyrics.Create;
             try
-                LyricString := Lyrics.GetLyrics(AktuellesAudioFile.Artist, AktuellesAudioFile.Titel);
+                LyricString := Lyrics.GetLyrics(CurrentAudioFile.Artist, CurrentAudioFile.Titel);
 
                 if LyricString = '' then
                 begin
@@ -2535,7 +2588,7 @@ begin
             end;
         end
         else
-            AktuellesAudioFile.FileIsPresent:=False;
+            CurrentAudioFile.FileIsPresent:=False;
 end;
 procedure TFDetails.BtnLyricWikiManualClick(Sender: TObject);
 var LyricQuery: AnsiString;
@@ -2549,7 +2602,7 @@ end;
 function TFDetails.CurrentFileHasBeenChanged: Boolean;
 begin
     result := False;
-    if Not assigned(aktuellesAudioFile) then
+    if Not assigned(CurrentAudioFile) then
         exit; // no current AudioFile, no changes.
 
     if ValidOggFile then
@@ -2582,7 +2635,7 @@ begin
             (
               ID3v2HasChanged                      // and changed
               or PictureHasChanged
-              or (ActualRating <> AktuellesAudioFile.Rating)
+              or (CurrentTagRatingChanged)
             )
         then
         begin
