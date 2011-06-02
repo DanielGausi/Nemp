@@ -89,7 +89,6 @@ object Nemp_MainForm: TNemp_MainForm
         OnResize = GRPBOXArtistsAlbenResize
         OnPaint = NewPanelPaint
         OwnerDraw = False
-        ExplicitTop = 29
         DesignSize = (
           300
           630)
@@ -2285,12 +2284,13 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 0
         OnPaint = NewPanelPaint
         OwnerDraw = False
+        ExplicitLeft = 4
         DesignSize = (
           320
           630)
         object PlaylistVST: TVirtualStringTree
-          Left = 6
-          Top = 2
+          Left = 246
+          Top = 34
           Width = 312
           Height = 622
           Anchors = [akLeft, akTop, akRight, akBottom]
@@ -3295,11 +3295,6 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
       end
-      object MM_ML_ResetRatings: TMenuItem
-        Caption = 'Reset all ratings/playcounter'
-        ImageIndex = 20
-        OnClick = MM_ML_ResetRatingsClick
-      end
       object N71: TMenuItem
         Caption = '-'
       end
@@ -3975,7 +3970,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C010111001300E8050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010111001300F0050E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4540,7 +4535,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012000F806280710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012000F806300710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5975,11 +5970,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Refresh all'
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
-      end
-      object PM_ML_ResetRatings: TMenuItem
-        Caption = 'Reset Ratings'
-        ImageIndex = 20
-        OnClick = MM_ML_ResetRatingsClick
       end
       object PM_ML_MedialibrarySave: TMenuItem
         Caption = 'Save'
@@ -7462,7 +7452,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800900310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800980310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

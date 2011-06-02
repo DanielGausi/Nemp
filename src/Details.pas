@@ -333,7 +333,9 @@ type
     ID3v2Activated: Boolean;
     CurrentTagRatingChanged: Boolean;
     CurrentTagRating: Byte;
+    CurrentTagCounter: Cardinal;
     CurrentBibRating: Byte;
+    CurrentBibCounter: Cardinal;
     PictureHasChanged: Boolean;
     ID3v1HasChanged: Boolean;
     ID3v2HasChanged: Boolean;
@@ -520,6 +522,8 @@ var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
     aErr: TAudioError;
+    backupRating: Byte;
+    backupCounter: Cardinal;
 begin
 
     // Do not Change anything in non-mp3-Files here!
@@ -557,8 +561,14 @@ begin
             exit;
         end;
 
-
+        /// SynchronizeAudioFile on a File from the Library will delete the
+        /// Rating/Counter-Data in the library: So: backup, synch file, write rating back
+        ///  (this works, as we set CurrentFile.Rating in the UpdateID3/Ogg/Flac-Methods)
+        backupRating := CurrentBibRating; // CurrentAudioFile.Rating;
+        backupCounter:= CurrentBibCounter; //CurrentAudioFile.PlayCounter;
         SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
+        CurrentAudioFile.Rating      := backupRating ;
+        CurrentAudioFile.PlayCounter := backupCounter;
 
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
@@ -581,10 +591,12 @@ begin
 end;
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
+    fForceChange := True;
     if fFilefromMedienBib then
         ShowDetails(CurrentAudioFile, SD_MedienBib)
     else
         ShowDetails(CurrentAudioFile, SD_PLAYLIST);
+    fForceChange := False;
 end;
 procedure TFDetails.Btn_CloseClick(Sender: TObject);
 begin
@@ -669,6 +681,7 @@ procedure TFDetails.RatingImageID3MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
     CurrentTagRating := DetailRatingHelper.MousePosToRating(x, 70);
+    CurrentTagCounter := CurrentBibCounter;
     CurrentTagRatingChanged := True;
     // Actualize Read-Only-Image
     // No. This is changed only after "Save changes"
@@ -681,7 +694,14 @@ begin
 end;
 procedure TFDetails.BtnResetRatingClick(Sender: TObject);
 begin
+    if CurrentBibCounter > 20 then
+    begin
+         if MessageDLG(Format(DetailForm_HighPlayCounter,[CurrentBibCounter]), mtConfirmation, [MBOk, MBCancel], 0, MBCancel)
+            = mrCancel then EXIT;
+    end;
+
     CurrentTagRating := 0;
+    CurrentTagCounter := 0;
     CurrentTagRatingChanged := True;
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
     // DetailRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
@@ -690,7 +710,8 @@ end;
 
 procedure TFDetails.BtnSynchRatingID3Click(Sender: TObject);
 begin
-    CurrentTagRating := CurrentAudioFile.Rating;
+    CurrentTagRating  := CurrentBibRating; //CurrentAudioFile.Rating;
+    CurrentTagCounter := CurrentBibCounter;
     CurrentTagRatingChanged := True;
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
@@ -1168,7 +1189,6 @@ procedure TFDetails.ShowMediaBibDetails;
 var i: Integer;
     mbAudioFile: TAudioFile;
     FirstCoverIsFromMB: Boolean;
-    LocalPlayCounter: Integer;
 begin
   if CurrentAudioFile = Nil then
   begin
@@ -1268,7 +1288,7 @@ begin
           if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
           begin
               CurrentBibRating := CurrentAudioFile.Rating;
-              LocalPlayCounter := CurrentAudioFile.PlayCounter;
+              CurrentBibCounter:= CurrentAudioFile.PlayCounter;
           end
           else
           begin
@@ -1276,17 +1296,38 @@ begin
               if assigned(mbAudioFile) then
               begin
                   CurrentBibRating := mbAudioFile.Rating;
-                  CurrentAudioFile.Rating := mbAudioFile.Rating;
-                  LocalPlayCounter := mbAudioFile.PlayCounter;
+                  CurrentBibCounter:= mbAudioFile.PlayCounter;
+                  // CurrentAudioFile.Rating := mbAudioFile.Rating;
+
               end else
               begin
                   // File is not in MediaLibrary, but PlaylistFile
-                  CurrentBibRating := ID3v2Tag.Rating;
-                  LocalPlayCounter := ID3v2Tag.PlayCounter;
+                  // use data from the metatag
+                  if ValidMp3File then
+                  begin
+                      CurrentBibRating := ID3v2Tag.Rating;
+                      CurrentBibCounter:= ID3v2Tag.PlayCounter;
+                  end;
+                  if ValidOggFile then
+                  begin
+                      CurrentBibRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
+                      CurrentBibCounter:= StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+
+                      //CurrentBibRating := OggVorbisFile.Rating;
+                      //CurrentBibCounter:= OggVorbisFile.PlayCounter;
+                  end;
+                  if ValidFlacFile then
+                  begin
+                      CurrentBibRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
+                      CurrentBibCounter:= StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+
+                      //CurrentBibRating := FlacFile.Rating;
+                      //CurrentBibCounter:= FlacFile.PlayCounter;
+                  end;
               end;
           end;
           DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
-          LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [LocalPlayCounter]);
+          LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [CurrentBibCounter]);
         end;
         LBLArtist.Caption := CurrentAudioFile.GetReplacedArtist(Nemp_MainForm.NempOptions.ReplaceNAArtistBy); // Artist;
         LBLTitel.Caption  := CurrentAudioFile.GetReplacedTitle(Nemp_MainForm.NempOptions.ReplaceNATitleBy)  ; // Titel;
@@ -1466,6 +1507,7 @@ begin
 
     CurrentTagRatingChanged := False;
     CurrentTagRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
+    CurrentTagCounter:= StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
 
     BtnSynchRatingOggVorbis.Visible := CurrentTagRating <> CurrentBibRating;
@@ -1509,6 +1551,7 @@ begin
 
     CurrentTagRatingChanged := False;
     CurrentTagRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
+    CurrentTagCounter:= StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
     BtnSynchRatingOggVorbis.Visible := CurrentTagRating <> CurrentBibRating;
 
@@ -1868,6 +1911,7 @@ begin
 
         CurrentTagRatingChanged := False;
         CurrentTagRating := Id3v2Tag.Rating;
+        CurrentTagCounter:= Id3v2Tag.PlayCounter;
         DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageID3.Picture.Bitmap, RatingImageID3.Width, RatingImageID3.Height);
         BtnSynchRatingID3.Visible := CurrentTagRating <> CurrentBibRating;
 
@@ -2189,12 +2233,13 @@ begin
       begin
           ID3v2Tag.Rating := CurrentTagRating;
           // copy Playcounter as well
-          ID3v2Tag.PlayCounter := CurrentAudioFile.PlayCounter;
+          ID3v2Tag.PlayCounter := CurrentTagCounter; //CurrentAudioFile.PlayCounter;
           CurrentTagRatingChanged := False;
           // Change Bib-Rating!!
           // IMPORTANT for later call of SynchronizeAudioFile,
           // as the rating should NOT be changed in that sync!
-          CurrentAudioFile.Rating := CurrentTagRating;
+          CurrentBibRating  := CurrentTagRating;
+          CurrentBibCounter := CurrentTagCounter;
       end;
 
       s := Utf8String(Trim(Memo_Tags.Text));
@@ -2235,12 +2280,15 @@ begin
         begin
             OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(CurrentTagRating));
             // copy playcounter as well
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentAudioFile.PlayCounter));
+            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentTagCounter));
             CurrentTagRatingChanged := False;
             // Change Bib-Rating!!
             // IMPORTANT for later call of SynchronizeAudioFile,
             // as the rating should NOT be changed in that sync!
-            CurrentAudioFile.Rating := CurrentTagRating;
+            //CurrentAudioFile.Rating := CurrentTagRating;
+            //CurrentAudioFile.PlayCounter := CurrentTagCounter;
+            CurrentBibRating  := CurrentTagRating;
+            CurrentBibCounter := CurrentTagCounter;
         end;
         OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 
@@ -2265,12 +2313,14 @@ begin
         if CurrentTagRatingChanged then
         begin
             FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(CurrentTagRating));
-            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentAudioFile.PlayCounter));
+            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentTagCounter));
             CurrentTagRatingChanged := False;
             // Change Bib-Rating!!
             // IMPORTANT for later call of SynchronizeAudioFile,
             // as the rating should NOT be changed in that sync!
-            CurrentAudioFile.Rating := CurrentTagRating;
+            //CurrentAudioFile.Rating := CurrentTagRating;
+            CurrentBibRating  := CurrentTagRating;
+            CurrentBibCounter := CurrentTagCounter;
         end;
         FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
 

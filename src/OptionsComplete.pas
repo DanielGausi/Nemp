@@ -1102,7 +1102,7 @@ begin
   EDTCoverSubDirName.Text    := MedienBib.CoverSearchSubDirName;
   EDTCoverSisterDirName.Text := MedienBib.CoverSearchSisterDirName;
 
-  CB_CoverSearch_LastFM.Checked := (MedienBib.CoverSearchLastFM = BoolTrue);
+  CB_CoverSearch_LastFM.Checked := MedienBib.CoverSearchLastFM;
 
   //cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
@@ -1975,7 +1975,14 @@ begin
   MedienBib.CoverSearchInParentDir := CB_CoverSearch_inParentDir.Checked;
   MedienBib.CoverSearchInSubDir    := CB_CoverSearch_inSubDir.Checked;
   MedienBib.CoverSearchInSisterDir := CB_CoverSearch_inSisterDir.Checked;
-  if CB_CoverSearch_LastFM.Checked then
+
+  // clear coverflow, if setting is changed
+  if MedienBib.CoverSearchLastFM <> CB_CoverSearch_LastFM.Checked then
+  begin
+      MedienBib.CoverSearchLastFM := CB_CoverSearch_LastFM.Checked;
+      MedienBib.NewCoverFlow.ClearTextures;
+  end;
+  {if CB_CoverSearch_LastFM.Checked then
   begin
       if MedienBib.CoverSearchLastFM <> BoolTrue then // i.e. false ore undefined
       begin
@@ -1989,6 +1996,7 @@ begin
           MedienBib.CoverSearchLastFM  := BoolFalse;
           MedienBib.NewCoverFlow.ClearTextures;
       end;
+  }
 
   MedienBib.CoverSearchSubDirName := EDTCoverSubDirName.Text ;
   MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;

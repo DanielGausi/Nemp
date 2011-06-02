@@ -83,6 +83,7 @@ DetailForm_InfoLblFileSize = 'Filesize';
 DetailForm_ID3v2Info = '%d Bytes (%d used)';
 
 DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
+DetailForm_HighPlayCounter = 'This file was played %d times. This information will be irretrievably deleted if you reset the rating.';
 
 Warning_FileNotFound = 'File not found';
 Warning_FileNotFound_Hint = 'The specified file can not be found. Maybe it is on an external drive which is not connected.';
@@ -114,7 +115,7 @@ Warning_MedienBibIsBusyEdit = 'The medialibrary is busy at the moment, so your i
 Warning_MedienBibBusyThread = 'The library blocked this very file by an automated background-process right now. Please try again in a few seconds.'  + #13#10
                  + 'Note: The probability for this message is almost zero (unless Gausi made some bad mistakes). You should play Lotto this week!';
 
-MedienBib_ConfirmResetRatings = 'This will reset the rating of all files in the library. Ratings within the ID3-tags will not be changed. Continue?';           
+// // MedienBib_ConfirmResetRatings = 'This will reset the rating of all files in the library. Ratings within the ID3-tags will not be changed. Continue?';
 
 Warning_TooManyFiles = 'Operation cancelled: Too many files for drag&&drop and copy&&paste respectively.'
                       + #13#10
@@ -169,7 +170,7 @@ CoverFlowText_UnkownCompilation = 'Unknown compilation';
 //CoverFlowText_NoCover           = 'Albums without cover';
 CoverFlowText_AllArtists        = 'All artists';
 CoverFlowText_WholeLibrary      = 'Your media-library';
-CoverFlowLastFM_Confirmation    = 'Nemp can download missing covers using a webservice from LastFM. Is this ok for you?';
+//CoverFlowLastFM_Confirmation    = 'Nemp can download missing covers using a webservice from LastFM. Is this ok for you?';
 CoverFlowLastFM_HintConnectError = 'Downloading a cover from LastFM failed.' +#13#10 + 'There is a problem with your internet connection.';
 CoverFlowLastFM_HintFail         = 'Downloading a cover from LastFM failed.' +#13#10 + 'No proper cover found.';
 CoverFlowLastFM_HintOK           = 'This cover was just downloaded from LastFM.';
@@ -698,6 +699,8 @@ CopyToUSB_ERROR_PATH_NOT_FOUND = 'The destination path can not be found. Choose 
 CopyToUSB_ERROR_TOO_MANY_OPEN_FILES = 'Too many open files. Choose OK to continue with next file, or cancel the copying process.';
 CopyToUSB_ERROR_ACCESS_DENIED = 'Access denied. Choose OK to continue with next file, or cancel the copying process.';
 CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue with next file, or cancel the copying process.';
+
+WizardCancel = 'You cancelled the Nemp Wizard. Some features may be disabled.';
 
 StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display the current title (and some other stuff) on it.'
                       +#13#10+#13#10

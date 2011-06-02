@@ -721,8 +721,8 @@ begin
         //--
         MM_ML_RefreshAll          .Visible := vis;
         MM_ML_RefreshAll          .Enabled := vis;
-        MM_ML_ResetRatings        .Visible := vis;
-        MM_ML_ResetRatings        .Enabled := vis;
+        //MM_ML_ResetRatings        .Visible := vis;
+        //MM_ML_ResetRatings        .Enabled := vis;
         // Playlist
         MM_PL_SetRatingofSelectedFilesTo .Visible := vis;
         MM_PL_SetRatingofSelectedFilesTo .Enabled := vis;

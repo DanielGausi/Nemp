@@ -84,7 +84,8 @@ uses
   CreateHelper in 'CreateHelper.pas',
   ExPopupList in 'ExPopupList.pas',
   PlaylistToUSB in 'PlaylistToUSB.pas' {PlaylistCopyForm},
-  ErrorForm in 'ErrorForm.pas' {FError};
+  ErrorForm in 'ErrorForm.pas' {FError},
+  BasicSettingsWizard in 'BasicSettingsWizard.pas' {Wizard};
 
 //,  classes;
 
@@ -147,6 +148,9 @@ ShowWindow
     end;
 
     FSplash.Visible := False;
+
+    RunWizard;
+
     Application.Run;
 
 end.

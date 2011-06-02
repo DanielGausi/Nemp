@@ -362,8 +362,8 @@ type
         CoverSearchInSisterDir: Boolean;
         CoverSearchSubDirName: UnicodeString;
         CoverSearchSisterDirName: UnicodeString;
-        CoverSearchLastFM: Integer;
-        CoverSearchLastFMInit: Boolean;  // used for the first "do you want this"-message on first start
+        CoverSearchLastFM: Boolean;
+        //CoverSearchLastFMInit: Boolean;  // used for the first "do you want this"-message on first start
         HideNACover: Boolean;
         MissingCoverMode: Integer;
         // Einstellungen für Standard-Cover
@@ -463,7 +463,7 @@ type
         function DeleteAudioFile(aAudioFile: tAudioFile): Boolean;
         function DeletePlaylist(aPlaylist: TJustAString): Boolean;
         procedure Abort;        // abort running update-threads
-        procedure ResetRatings;
+        //////procedure ResetRatings;
         // Check, whether Key1 and Key2 matches strings[sortarray[1/2]]
         function ValidKeys(aAudioFile: TAudioFile): Boolean;
         // set fBrowseListsNeedUpdate to true
@@ -1028,8 +1028,8 @@ begin
         CoverSearchInSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
         CoverSearchSubDirName    := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
         CoverSearchSisterDirName := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
-        CoverSearchLastFM        := ini.ReadInteger('MedienBib', 'CoverSearchLastFM', BoolUnDef);
-        CoverSearchLastFMInit    := True;
+        CoverSearchLastFM        := ini.ReadBool('MedienBib', 'CoverSearchLastFM', False);
+        //CoverSearchLastFMInit    := True;
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
         MissingCoverMode := ini.ReadInteger('MedienBib', 'MissingCoverMode', 1);
@@ -1140,7 +1140,7 @@ begin
         ini.Writebool('MedienBib', 'CoverSearchInSisterDir', CoverSearchInSisterDir);
         ini.WriteString('MedienBib', 'CoverSearchSubDirName', (CoverSearchSubDirName));
         ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (CoverSearchSisterDirName));
-        ini.WriteInteger('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
+        ini.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
         //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
@@ -2623,6 +2623,7 @@ end;
     Note: Ratings in the ID3-Tags are untouched!
     --------------------------------------------------------
 }
+(*
 procedure TMedienBibliothek.ResetRatings;
 var i: Integer;
 begin
@@ -2636,6 +2637,7 @@ begin
   Changed := True;
   LeaveCriticalSection(CSUpdate);
 end;
+*)
 
 
 {

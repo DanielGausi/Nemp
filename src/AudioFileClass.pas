@@ -421,7 +421,7 @@ type
 const
       // GAD_xxx: Flags for GetAudioData-Methods
       GAD_Cover = 1;
-      GAD_Rating = 2;
+      GAD_Rating = 2;  // !!!!  ignored by the subfunctions
       // note for future extensions:
       // this is planned as bitmasks, so use 4,8,16,32,.. for additional flags
 
