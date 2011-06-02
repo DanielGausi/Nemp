@@ -311,7 +311,7 @@ end;
 
 procedure TPostProcessor.LoadFromIni(Ini: TMemIniFile);
 begin
-    fActive        := Ini.ReadBool('PostProcessor', 'Active', True);
+    fActive        := Ini.ReadBool('PostProcessor', 'Active', False);
     fIgnoreShortFiles := Ini.ReadBool('PostProcessor', 'IgnoreShortFiles', True);
     //fWriteToFiles  := Ini.ReadBool('PostProcessor', 'WriteToFiles', True);
 
@@ -319,7 +319,7 @@ begin
     // fIgnoreCounterOnAbortedTracks := Ini.ReadBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', False);
 
     fIncPlayedFiles  := Ini.ReadBool('PostProcessor', 'IncPlayedFiles', True);
-    fDecAbortedFiles := Ini.ReadBool('PostProcessor', 'DecAbortedFiles', False);
+    fDecAbortedFiles := Ini.ReadBool('PostProcessor', 'DecAbortedFiles', True);
 end;
 procedure TPostProcessor.WriteToIni(Ini: TMemIniFile);
 begin

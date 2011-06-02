@@ -725,7 +725,10 @@ object FDetails: TFDetails
           Top = 14
           Width = 139
           Height = 21
+          Hint = 'Copy data from the ID3v2-Tag'
           Caption = 'Copy from ID3 v2'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 7
           OnClick = BtnCopyFromV2Click
         end
@@ -941,6 +944,8 @@ object FDetails: TFDetails
           Top = 163
           Width = 70
           Height = 14
+          ParentShowHint = False
+          ShowHint = False
           Transparent = True
           OnMouseDown = RatingImageID3MouseDown
           OnMouseLeave = RatingImageID3MouseLeave
@@ -960,7 +965,10 @@ object FDetails: TFDetails
           Top = 14
           Width = 139
           Height = 21
+          Hint = 'Copy data from the ID3v1-Tag'
           Caption = 'Copy from ID3 v1'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 7
           OnClick = BtnCopyFromV1Click
         end
@@ -1043,7 +1051,10 @@ object FDetails: TFDetails
           Top = 163
           Width = 81
           Height = 21
+          Hint = 'Set rating and playcounter to zero'
           Caption = 'Reset'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 10
           OnClick = BtnResetRatingClick
         end
@@ -1064,7 +1075,9 @@ object FDetails: TFDetails
           Top = 163
           Width = 142
           Height = 21
-          Hint = 'Synchronize rating in the ID3-Tag with the rating in the library'
+          Hint = 
+            'Synchronize rating/playcounter in the ID3-Tag with the rating/pl' +
+            'aycounter in the library'
           Caption = 'Synchronize rating'
           ParentShowHint = False
           ShowHint = True
@@ -1285,7 +1298,10 @@ object FDetails: TFDetails
           Top = 147
           Width = 81
           Height = 21
+          Hint = 'Set rating and playcounter to zero'
           Caption = 'Reset'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 7
           OnClick = BtnResetRatingClick
         end
@@ -1306,7 +1322,9 @@ object FDetails: TFDetails
           Top = 147
           Width = 142
           Height = 21
-          Hint = 'Synchronize rating in the ID3-Tag with the rating in the library'
+          Hint = 
+            'Synchronize rating/playcounter in the Comments with the rating/p' +
+            'laycounter in the library'
           Caption = 'Synchronize rating'
           ParentShowHint = False
           ShowHint = True

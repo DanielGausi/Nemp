@@ -106,7 +106,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
 
-    procedure CheckAndDoCoverDownloaderQuery;
+    // procedure CheckAndDoCoverDownloaderQuery;
 
     procedure HandleStopAfterTitleClick;
     procedure HandleStopNowClick;
@@ -558,11 +558,11 @@ begin
         MM_ML_DeleteMissingFiles.Enabled := block;
         MM_ML_DeleteSelectedFiles.Enabled := block;
         MM_ML_RefreshAll.Enabled := block;
-        MM_ML_ResetRatings.Enabled := block;
+        //MM_ML_ResetRatings.Enabled := block;
         // Einträge im Popup-Menü der Medienliste
         PM_ML_MedialibraryDeleteNotExisting.Enabled := block;
         PM_ML_MedialibraryRefresh.Enabled := block;
-        PM_ML_ResetRatings.Enabled := block;
+        //PM_ML_ResetRatings.Enabled := block;
         PM_ML_MedialibrarySave.Enabled := block;
         PM_ML_MedialibraryLoad.Enabled := block;
         PM_ML_MedialibraryDelete.Enabled := block;
@@ -1342,7 +1342,7 @@ begin
         TabBtn_TagCloud.Refresh;
     end;
 end;
-
+         {
 procedure CheckAndDoCoverDownloaderQuery;
 begin
           if (MedienBib.CoverSearchLastFM = BoolUnDef)
@@ -1357,8 +1357,7 @@ begin
               else
                   MedienBib.CoverSearchLastFM := BoolFalse;
           end;
-
-end;
+end;       }
 
 procedure HandleStopAfterTitleClick;
 begin

@@ -206,7 +206,6 @@ type
     N21: TMenuItem;
     MM_ML_DeleteMissingFiles: TMenuItem;
     MM_ML_RefreshAll: TMenuItem;
-    MM_ML_ResetRatings: TMenuItem;
     MM_Playlist: TMenuItem;
     MM_PL_Files: TMenuItem;
     MM_PL_Directory: TMenuItem;
@@ -370,7 +369,6 @@ type
     PM_ML_Medialibrary: TMenuItem;
     PM_ML_MedialibraryDeleteNotExisting: TMenuItem;
     PM_ML_MedialibraryRefresh: TMenuItem;
-    PM_ML_ResetRatings: TMenuItem;
     PM_ML_MedialibrarySave: TMenuItem;
     PM_ML_MedialibraryLoad: TMenuItem;
     PM_ML_MedialibraryExport: TMenuItem;
@@ -1171,7 +1169,7 @@ type
     procedure VSTAfterCellPaint(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       CellRect: TRect);
-    procedure MM_ML_ResetRatingsClick(Sender: TObject);
+    //procedure MM_ML_ResetRatingsClick(Sender: TObject);
     procedure Player_PopupMenuPopup(Sender: TObject);
     procedure VST_ColumnPopupPopup(Sender: TObject);
     procedure Splitter4CanResize(Sender: TObject; var NewSize: Integer;
@@ -2111,10 +2109,10 @@ begin
           success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
-          if (not success) then
-              CheckAndDoCoverDownloaderQuery;
+          //if (not success) then
+          //    CheckAndDoCoverDownloaderQuery;
 
-          if (not success) and (MedienBib.CoverSearchLastFM = BoolTrue) then
+          if (not success) and (MedienBib.CoverSearchLastFM) then
               Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
       end;
   finally
@@ -3714,6 +3712,7 @@ begin
   MedienBib.RefreshFiles;
 end;
 
+(*
 procedure TNemp_MainForm.MM_ML_ResetRatingsClick(Sender: TObject);
 begin
   if MedienBib.StatusBibUpdate <> 0 then
@@ -3727,6 +3726,7 @@ begin
       VST.Invalidate;
   end;
 end;
+*)
 
 procedure TNemp_MainForm.PM_ML_RefreshSelectedClick(Sender: TObject);
 var
@@ -6728,8 +6728,8 @@ begin
   CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);
   if not success then
   begin
-      CheckAndDoCoverDownloaderQuery;
-      if (MedienBib.CoverSearchLastFM = BoolTrue) then
+      //CheckAndDoCoverDownloaderQuery;
+      if MedienBib.CoverSearchLastFM then
           Medienbib.NewCoverFlow.DownloadPlayerCover(aAudioFile);
   end;
 
@@ -7159,8 +7159,9 @@ begin
   begin
         JobList := NempPlaylist.ST_Ordnerlist;
         ST_PLaylist.Mask := GeneratePlaylistSTFilter;
-    // XXXXXXX ???
-        NempPlaylist.InsertNode := Nil; // evtl. später nochmal überprüfen!! Evtl. focussed Node? XXXXX
+        // NempPlaylist.InsertNode := Nil; // evtl. später nochmal überprüfen!! Evtl. focussed Node? XXXXX
+        NempPlaylist.InsertNode := PlaylistVST.FocusedNode;
+
   end else
   begin
         if MedienBib.StatusBibUpdate = 0 then

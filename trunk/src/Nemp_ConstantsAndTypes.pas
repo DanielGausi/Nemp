@@ -137,6 +137,7 @@ type
     TNempOptions = record
         // etaws Kleinkram und allgemeine Optionen
         //DenyID3Edit: Boolean;
+        LastKnownVersion: Integer;
         AllowOnlyOneInstance: Boolean;
         RegisterHotKeys: Boolean;
         IgnoreVolumeUpDownKeys: Boolean;
@@ -263,9 +264,9 @@ const
     MP3DB_SUBVERSION: Byte = 1;     // subversion changed to 1 in Nemp 4.0
 
     // "Extended Boolean", used for "unset" settings
-    BoolUnDef = 0;
-    BoolTrue = 1;
-    BoolFalse = 2;
+    //BoolUnDef = 0;
+    //BoolTrue = 1;
+    //BoolFalse = 2;
 
     //-------------
     // Zeug für die Anzeige:
@@ -273,7 +274,7 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'v4.1';// 'v3.3';
+    NEMP_VERSION_SPLASH = 'v4.2';// 'v3.3';
 
     NEMP_TIPSIZE = 128;
 
@@ -839,7 +840,6 @@ uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 var i: integer;
-    tmp: String;
 
       procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
       begin
@@ -853,6 +853,7 @@ begin
   With Options do
   begin
         //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
+        LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
         StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
         RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', True);
@@ -865,7 +866,7 @@ begin
         // "Kill" relative Paths
         DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
-        AllowQuickAccessToMetadata := Ini.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', True);
+        AllowQuickAccessToMetadata := Ini.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
 
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
         FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
