@@ -336,10 +336,10 @@ NempUpdate_InfoNewestVersion = 'Newest version: %s';
 NempUpdate_InfoLastRelease = 'Latest release: %s (%s)';
 NempUpdate_InfoLastStableRelease = 'Latest stable release: %s';
 NempUpdate_InfoNote = 'Note: %s';
-NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) for the first time. Nemp will now search for a newer version (even if it is probably up-to-date)' +#13#10
-                            + 'to show you this function. After this Nemp will search once a week for an update without showing this message.'
-                            + #13#10#13#10
-                            + 'No personal information will be sent. You can deactivate this function within the preferences (and change the interval), or right now by clicking "Cancel".';
+//NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) for the first time. Nemp will now search for a newer version (even if it is probably up-to-date)' +#13#10
+//                            + 'to show you this function. After this Nemp will search once a week for an update without showing this message.'
+//                            + #13#10#13#10
+//                            + 'No personal information will be sent. You can deactivate this function within the preferences (and change the interval), or right now by clicking "Cancel".';
 
 
   NempShutDown_StopNemp  = 'Nemp will stop now.';
