@@ -1637,6 +1637,7 @@ begin
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
       if CBFileTypes.Checked[i] then
       begin
+          ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
           ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
           ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
       end;

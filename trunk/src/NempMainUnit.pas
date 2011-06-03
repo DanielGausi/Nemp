@@ -817,6 +817,8 @@ type
     RefreshCoverFlowTimer: TTimer;
     MM_T_KeyboardDisplay: TMenuItem;
     PM_P_KeyboardDisplay: TMenuItem;
+    MM_O_Wizard: TMenuItem;
+    PM_P_Wizard: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1373,6 +1375,7 @@ type
     procedure ImgDetailCoverMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure PM_P_KeyboardDisplayClick(Sender: TObject);
+    procedure MM_O_WizardClick(Sender: TObject);
 
   private
 
@@ -1558,7 +1561,7 @@ implementation
 
 uses   Splash, About, OptionsComplete, StreamVerwaltung,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
-  BirthdayShow, RandomPlaylist,
+  BirthdayShow, RandomPlaylist, BasicSettingsWizard,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm;
@@ -8644,6 +8647,13 @@ begin
       NempSkin.NempPartyMode.Active := False;
 
   UpdateFormDesignNeu;
+end;
+
+procedure TNemp_MainForm.MM_O_WizardClick(Sender: TObject);
+begin
+    if not assigned(Wizard) then
+        Application.CreateForm(TWizard, Wizard);
+    Wizard.Show;
 end;
 
 procedure TNemp_MainForm.PM_P_PartyModeClick(Sender: TObject);

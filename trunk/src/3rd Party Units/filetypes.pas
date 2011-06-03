@@ -62,6 +62,7 @@ type
     function DeleteHandler(const HandlerVerb: string): boolean;
     function DeleteDirectoryHandler(const HandlerVerb: string): boolean;
 
+    function DeleteUserChoice(const Extension: String): Boolean;
     function DeleteSpecialSetting(const Extension: string): Boolean;
 
     function ExtensionOpensWithApplication(const Extension, InternalName, AppName: string): boolean;
@@ -502,6 +503,23 @@ begin
   end;
 end;
 
+function TFileTypeRegistration.DeleteUserChoice(
+  const Extension: String): Boolean;
+var ucKey: string;
+begin
+    // Standardergebnis
+    Result := false;
+    if(FRegConnector = nil)
+        then exit;
+
+    ucKey := //FRegConnector.RootKey
+       '\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\'
+      + Extension + '\UserChoice';
+    Result :=
+        FRegConnector.KeyExists(ucKey) and
+        FRegConnector.DeleteKey(ucKey);
+end;
+
 
 function TFileTypeRegistration.DeleteHandler(const HandlerVerb: string):
   boolean;
@@ -549,6 +567,8 @@ begin
   end;
 
 end;
+
+
 
 function TFileTypeRegistration.SetDefaultHandler: boolean;
 begin

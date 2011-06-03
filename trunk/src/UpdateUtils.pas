@@ -97,8 +97,10 @@ type
             function GetLastCheck: TDateTime;
             procedure SetLastCheck(Value: TDateTime);
 
-            property LastCheck: TDateTime read GetLastCheck write SetLastCheck;
+
         public
+            property LastCheck: TDateTime read GetLastCheck write SetLastCheck;
+
             // Gibt an, ob gerade ein Check (d.h. ein Thread zum runterladen) läuft oder nicht
             property Checking: LongBool read GetChecking write SetChecking;
 
@@ -231,18 +233,8 @@ begin
         ///  New in Nemp 3.3.3: First MessageDlg canceled.
         ///  Reason: People should know this function now
         ///     and: starting from a CD will cause this dialog EVERY time.
-        if LastCheck = 0 then
-        begin
-            // This would be our first check
-            if fWriteAccessPossible
-                and (MessageDlg(NempUpdate_InfoFirstStart, mtInformation, [mbOK, mbCancel], 0) = mrOK)
-            then
-                CheckForUpdatesManually
-            else
-                AutoCheck := False;
-        end else
-            // ok, AutoCheck is true, so do it
-            CheckForUpdatesAutomatically;
+        // ok, AutoCheck is true, so do it
+        CheckForUpdatesAutomatically;
     end;
 end;
 
