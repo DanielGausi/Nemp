@@ -836,7 +836,7 @@ function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 
 implementation
 
-uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit;
+uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSettingsWizard;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 var i: integer;
@@ -1011,6 +1011,7 @@ begin
   begin
         //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
+        ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_VERSION);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
         ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
         ini.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);

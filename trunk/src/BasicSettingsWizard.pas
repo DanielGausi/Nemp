@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
@@ -124,9 +124,13 @@ procedure RunWizard;
 begin
     if Nemp_MainForm.NempOptions.LastKnownVersion < WIZ_CURRENT_VERSION then
     begin
-        if not assigned(Wizard) then
-            Application.CreateForm(TWizard, Wizard);
-        Wizard.Show;
+        // Show Wizard only if Writeaccess is possible (i.e. dont show it everytime when starting from CD/DVD)
+        if Nemp_MainForm.NempOptions.WriteAccessPossible then
+        begin
+            if not assigned(Wizard) then
+                Application.CreateForm(TWizard, Wizard);
+            Wizard.Show;
+        end;
     end;
 
 end;
@@ -142,6 +146,8 @@ procedure TWizard.FormCreate(Sender: TObject);
 var filename: String;
 
 begin
+    TranslateComponent (self);
+
     TabSheet1.TabVisible := False;
     TabSheet2.TabVisible := False;
     TabSheet3.TabVisible := False;
