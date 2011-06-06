@@ -130,7 +130,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
-    ErrorForm, CoverHelper;
+    ErrorForm, CoverHelper, BasicSettingsWizard;
 
 procedure CorrectVolButton;
 begin
@@ -1048,6 +1048,7 @@ begin
         if assigned(PasswordDlg          ) then ReTranslateComponent(PasswordDlg         );
         if assigned(FormBibSearch        ) then ReTranslateComponent(FormBibSearch       );
         if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
+        if assigned(Wizard               ) then ReTranslateComponent(Wizard              );
 
         //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
         if assigned(OptionsCompleteForm  ) then
