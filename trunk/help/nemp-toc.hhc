@@ -102,6 +102,10 @@
 			<param name="Name" value="Weitere Funktionen">
 			<param name="Local" value="medienbib_weitereFunktionen.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Eigenschaften, Dateidetails">
+			<param name="Local" value="nemp_anzeige_dateidetails.html">
+			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Tools">
@@ -185,7 +189,7 @@
 			<param name="Local" value="optionen_c_medienbibliothek.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Automatische Bewertung">
+			<param name="Name" value="Metadaten (ID3-Tags)">
 			<param name="Local" value="optionen_d_Automatic-rating.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
