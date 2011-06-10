@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Mai 2011
+      Januar 2005 - Juni 2011
 
-      Version: 4.1.0
+      Version: 4.2.0
 
 
 -----------------------------------------------------------
@@ -123,12 +123,13 @@ Verwendete Units/Komponenten:
 
 
 
-Version 4.2.0, (noch nicht veröffentlicht)
+Version 4.2.0, Juni 2011
 ----------------------------------------------------------- 
+* Wizard erstellt, der einige wichtige Einstellung beim ersten Start abfragt
 * Multimediatasten nicht länger per Hook, sondern durch Hotkey
 * Option "Schnellen Zugriff auf Metadaten erlauben" hinzugefügt. 
   Damit können ggf. unbeabsichtigte Änderungen an den ID3Tags 
-  (z.B. beim Bewerten verhindert werden)   
+  (z.B. beim Bewerten) verhindert werden
 * Optionen beim Automatischen bewerten entrümpelt
 
 

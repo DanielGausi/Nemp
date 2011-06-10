@@ -187,19 +187,17 @@ begin
 
     Lbl_Version.Caption := 'Version ' + GetFileVersionString('');
 
+    pc_Wizard.ActivePage := TabSheet1;
+end;
+
+procedure TWizard.FormShow(Sender: TObject);
+begin
     st_Introduction.Caption := StringReplace(st_Introduction.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_Updates.Caption := StringReplace(st_Updates.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_MetaData.Caption := StringReplace(st_MetaData.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_Rating.Caption := StringReplace(st_Rating.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_LastFM.Caption := StringReplace(st_LastFM.Caption, '#13#10', #13#10, [rfReplaceAll] );
     st_Filetypes.Caption := StringReplace(st_Filetypes.Caption, '#13#10', #13#10, [rfReplaceAll] );
-
-
-    pc_Wizard.ActivePage := TabSheet1;
-end;
-
-procedure TWizard.FormShow(Sender: TObject);
-begin
     pc_Wizard.ActivePage := TabSheet1;
 end;
 

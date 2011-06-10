@@ -25,16 +25,12 @@ object Wizard: TWizard
     Top = 8
     Width = 512
     Height = 288
-    ActivePage = TabSheet2
+    ActivePage = TabSheet4
     Anchors = [akLeft, akTop, akBottom]
     MultiLine = True
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Lbl_Welcome: TLabel
         Left = 152
         Top = 16
@@ -64,7 +60,7 @@ object Wizard: TWizard
       object st_Introduction: TStaticText
         Left = 152
         Top = 64
-        Width = 321
+        Width = 331
         Height = 126
         AutoSize = False
         Caption = 
@@ -150,7 +146,7 @@ object Wizard: TWizard
       object st_Updates: TStaticText
         Left = 152
         Top = 45
-        Width = 329
+        Width = 349
         Height = 105
         AutoSize = False
         Caption = 
@@ -193,10 +189,6 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageMetaData: TImage
         Left = 8
         Top = 32
@@ -266,7 +258,7 @@ object Wizard: TWizard
       object st_Metadata: TStaticText
         Left = 152
         Top = 45
-        Width = 329
+        Width = 337
         Height = 105
         AutoSize = False
         Caption = 
@@ -292,10 +284,6 @@ object Wizard: TWizard
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageRating: TImage
         Left = 8
         Top = 32
@@ -346,7 +334,7 @@ object Wizard: TWizard
       object st_Rating: TStaticText
         Left = 152
         Top = 45
-        Width = 329
+        Width = 337
         Height = 105
         AutoSize = False
         Caption = 
@@ -390,10 +378,6 @@ object Wizard: TWizard
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageLastFM: TImage
         Left = 8
         Top = 32
@@ -444,7 +428,7 @@ object Wizard: TWizard
       object st_LastFM: TStaticText
         Left = 152
         Top = 45
-        Width = 329
+        Width = 337
         Height = 105
         AutoSize = False
         Caption = 
@@ -487,10 +471,6 @@ object Wizard: TWizard
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageFiletypes: TImage
         Left = 8
         Top = 32
@@ -541,7 +521,7 @@ object Wizard: TWizard
       object st_filetypes: TStaticText
         Left = 152
         Top = 45
-        Width = 329
+        Width = 331
         Height = 105
         AutoSize = False
         Caption = 
@@ -585,10 +565,6 @@ object Wizard: TWizard
       Caption = '(summary)'
       ImageIndex = 5
       OnShow = TabSheet7Show
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImgSummary: TImage
         Left = 8
         Top = 32
