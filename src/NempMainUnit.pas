@@ -40,7 +40,7 @@ uses
   Dialogs, StdCtrls, AudioFileClass, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst,
   WinampFunctions, Buttons,  VirtualTrees, VSTEditControls,
-  jpeg, activeX, XPMan, DateUtils,
+  jpeg, activeX, XPMan, DateUtils,                       cddaUtils,
    Mp3FileUtils, spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
@@ -3054,17 +3054,13 @@ end;
 
 procedure TNemp_MainForm.HandleFiles(aList: TObjectList; how: integer);
 var i:integer;
-    datei_pfad: UnicodeString;
     Abspielen: Boolean;
     imax: integer;
     tmp: PvirtualNode;
 begin
     if aList.Count = 0 then exit;
 
-    datei_pfad := (aList[0] as TAudiofile).Pfad;
-    if Not (aList[0] as TAudiofile).isStream then
-        (aList[0] as TAudiofile).FileIsPresent := FileExists(datei_pfad);
-
+    (aList[0] as TAudiofile).ReCheckExistence;
 
     if How = PLAYER_PLAY_FILES then // erst PlayList löschen
         NempPlaylist.ClearPlaylist;
@@ -3110,9 +3106,7 @@ begin
     // weitere Dateien einfügen
     for i:=1 to iMax do
     begin
-      datei_pfad := (aList[i] as TAudiofile).Pfad;
-      if Not (aList[i] as TAudiofile).isStream then
-          (aList[i] as TAudiofile).FileIsPresent := FileExists(datei_pfad);
+      (aList[i] as TAudiofile).ReCheckExistence;
 
       tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
       if How=PLAYER_PLAY_NEXT then
@@ -3923,34 +3917,11 @@ begin
         Data:=Sender.GetNodeData(Node);
 
         case VST.Header.Columns[column].Tag of
-          CON_ARTIST    : begin
-                              if Data^.FAudioFile.isStream then
-                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                              else
-                                CellText := Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy);
-                          end;
-          CON_TITEL     : begin
-                              if Data^.FAudioFile.isStream then
-                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                              else
-                                CellText := Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy);
-                          end;
-          CON_ALBUM     : begin
-                              if Data^.FAudioFile.isStream then
-                                CellText := Format('(%s)', [AudioFileProperty_Webstream])
-                              else
-                                CellText := Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy);
-                          end;
-          CON_DAUER     : CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
-          CON_BITRATE   : if Data^.FAudioFile.Bitrate > 0 then
-                          begin
-                              if Data^.FAudioFile.vbr then
-                                  CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s' + ' (vbr)'
-                              else
-                                  CellText := inttostr(Data^.FAudioFile.Bitrate) + ' kbit/s';
-                          end
-                          else
-                              CellText := '-?-';
+          CON_ARTIST    : CellText := Data^.FAudioFile.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
+          CON_TITEL     : CellText := Data^.FAudioFile.GetTitleForVST(NempOptions.ReplaceNATitleBy);
+          CON_ALBUM     : CellText := Data^.FAudioFile.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
+          CON_DAUER     : CellText := Data^.FAudioFile.GetDurationForVST;
+          CON_BITRATE   : CellText := Data^.FAudioFile.GetBitrateForVST;
           CON_CBR       : if Data^.FAudioFile.vbr then CellText := 'vbr'
                           else CellText := 'cbr';
           CON_MODE            : CellText := Data^.FAudioFile.ChannelModeShort;
@@ -3971,7 +3942,8 @@ begin
           CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
 
           CON_LASTFMTAGS : CellText := ' ';// Data^.FAudioFile.RawTagLastFM;
-        else CellText := ' ';
+        else
+          CellText := ' ';
         end;
         // Correct CellText for toAutoSpan to a non-empty-string
         if CellText = '' then Celltext := ' ';
@@ -4142,7 +4114,7 @@ begin
     begin
         if Not NempSkin.NempPartyMode.Active then
         begin
-            if NempOptions.ChangeFontSizeOnLength AND (NOT AudioFile.isStream) AND (Sender.GetNodeLevel(Node)=0)  then
+            if NempOptions.ChangeFontSizeOnLength AND (AudioFile.AudioType <> at_Stream) AND (Sender.GetNodeLevel(Node)=0)  then
                 font.Size := LengthToSize(AudioFile.Duration,NempOptions.DefaultFontSize)
             else
                 font.Size := NempOptions.DefaultFontSize;
@@ -4465,21 +4437,21 @@ begin
 
   c := VST.SelectedCount;
   SelectedMP3s := VST.GetSortedSelection(False);
-  if c=0 then
+  if c = 0 then
   begin
-    MedienListeStatusLBL.Caption := '';
-    exit;
+      MedienListeStatusLBL.Caption := '';
+      exit;
   end;
   dauer:=0;
   groesse:=0;
 
   for i:=0 to VST.SelectedCount-1 do
   begin
-    aNode := SelectedMP3s[i];
-    Data := VST.GetNodeData(aNode);
-    AudioFile := Data^.FAudioFile;
-    dauer := dauer + AudioFile.Duration;
-    groesse := groesse + AudioFile.Size;
+      aNode := SelectedMP3s[i];
+      Data := VST.GetNodeData(aNode);
+      AudioFile := Data^.FAudioFile;
+      dauer := dauer + AudioFile.Duration;
+      groesse := groesse + AudioFile.Size;
   end;
 
   MedienListeStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCount), [c] )
@@ -4490,16 +4462,7 @@ begin
   begin
       Data := VST.GetNodeData(aNode);
       AudioFile := Data^.FAudioFile;
-
-      if AudioFile.isStream then
-      begin
-          //nothing
-      end else
-      begin
-          AudioFile.FileIsPresent := FileExists(AudioFile.Pfad);
-          VST.InvalidateNode(aNode);
-      end;
-
+      AudioFile.ReCheckExistence;
       ShowVSTDetails(AudioFile);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
   end
@@ -4516,22 +4479,27 @@ procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
 begin
     if assigned(aAudioFile) then
     begin
-        if aAudioFile.isStream then
-        begin
-            LblBibArtist    .Caption := SetString(aAudioFile.Description, AudioFileProperty_Name);
-            LblBibTitle     .Caption := SetString(aAudioFile.Ordner, AudioFileProperty_URL);
-            LblBibAlbum     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
-            LblBibTrack     .Caption := '(' + AudioFileProperty_Webstream + ')';
-            LblBibYear      .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
-            LblBibGenre     .Caption := '';
-        end else
-        begin
-            LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
-            LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
-            LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
-            LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
-            LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
-            LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+        case aAudioFile.AudioType of
+            at_Undef  : LblBibArtist    .Caption := 'ERROR: UNDEFINED AUDIOTYPE'; // should never happen
+            at_File   : begin
+                LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
+                LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
+                LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
+                LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
+                LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
+                LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+            end;
+            at_Stream : begin
+                LblBibArtist    .Caption := SetString(aAudioFile.Description, AudioFileProperty_Name);
+                LblBibTitle     .Caption := SetString(aAudioFile.Ordner, AudioFileProperty_URL);
+                LblBibAlbum     .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
+                LblBibTrack     .Caption := '(' + AudioFileProperty_Webstream + ')';
+                LblBibYear      .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
+                LblBibGenre     .Caption := '';
+            end;
+            at_CDDA   : begin
+                // todo
+            end;
         end;
     end;
 end;
@@ -4569,35 +4537,41 @@ begin
   if not assigned(aAudiofile) then
        exit;
 
-  if aAudioFile.isStream then
-  begin
-      ImgBibRating.Visible := False;
-      LblBibDuration  .Caption := '';
-      LblBibPlayCounter.Caption := '';
-      LblBibTags.Caption := '';
-      LblBibQuality.Caption := '';
-  end else
-  begin
-      EdtBibArtist    .Text := aAudioFile.Artist;
-      EdtBibTitle     .Text := aAudioFile.Titel;
-      EdtBibAlbum     .Text := aAudioFile.Album;
-      EdtBibTrack     .Text := IntToStr(aAudioFile.Track);
-      EdtBibYear      .Text := aAudioFile.Year;
-      if Trim(aAudioFile.Genre) = '' then
-          EdtBibGenre     .Text := 'Other'
-      else
-          EdtBibGenre     .Text := aAudioFile.Genre;
-      LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
-                                + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
-      if aAudioFile.vbr then
-          tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
-      else
-          tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
-      LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
-      ImgBibRating.Visible := True;
-      BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
-      LblBibTags.Caption := aAudioFile.GetTagDisplayString(NempOptions.AllowQuickAccessToMetadata); //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
-      LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
+  case aAudioFile.AudioType of
+      at_File: begin
+          EdtBibArtist    .Text := aAudioFile.Artist;
+          EdtBibTitle     .Text := aAudioFile.Titel;
+          EdtBibAlbum     .Text := aAudioFile.Album;
+          EdtBibTrack     .Text := IntToStr(aAudioFile.Track);
+          EdtBibYear      .Text := aAudioFile.Year;
+          if Trim(aAudioFile.Genre) = '' then
+              EdtBibGenre     .Text := 'Other'
+          else
+              EdtBibGenre     .Text := aAudioFile.Genre;
+          LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
+                                    + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
+          if aAudioFile.vbr then
+              tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
+          else
+              tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
+          LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
+          ImgBibRating.Visible := True;
+          BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+          LblBibTags.Caption := aAudioFile.GetTagDisplayString(NempOptions.AllowQuickAccessToMetadata); //  StringReplace(aAudioFile.RawTagLastFM, #13#10, ', ', [rfreplaceAll]);
+          LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
+      end;
+
+      at_Stream: begin
+          ImgBibRating.Visible := False;
+          LblBibDuration  .Caption := '';
+          LblBibPlayCounter.Caption := '';
+          LblBibTags.Caption := '';
+          LblBibQuality.Caption := '';
+      end;
+
+      at_CDDA: begin
+          // todo
+      end;
   end;
 end;
 
@@ -4922,13 +4896,7 @@ begin
     then
         exit;
 
-    if (not MedienBib.CurrentAudioFile.isStream)
-    and (
-           (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'mp3')
-        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'ogg')
-        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'flac')
-        )
-    then
+    if MedienBib.CurrentAudioFile.IsQuickEditable then
         AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
@@ -4939,13 +4907,7 @@ begin
     then
         exit;
 
-    if (not MedienBib.CurrentAudioFile.isStream)
-    and (
-           (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'mp3')
-        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'ogg')
-        or (AnsiLowercase(MedienBib.CurrentAudioFile.Extension) = 'flac')
-        )
-    then
+    if MedienBib.CurrentAudioFile.IsQuickEditable then
     begin
         MemBibTags.Top := LblBibDuration.Top;
         MemBibTags.Left := LblBibDuration.Left - 4;
@@ -5821,13 +5783,9 @@ begin
     0: cellText := Data^.FAudioFile.PlaylistTitle;
     1:  begin
           if PlaylistVST.GetNodeLevel(Node) = 0 then
-          begin
-            if Data^.FAudioFile.isStream then
-              CellText := '(inf)'
-            else
-              CellText := SekIntToMinStr(Data^.FAudioFile.Duration);
-          end else
-            CellText := '@' + SekIntToMinStr(Round(Data^.FAudioFile.Index01));// Da steht der INdex drin
+              CellText := Data^.FAudioFile.GetDurationForVST
+          else
+              CellText := '@' + SekIntToMinStr(Round(Data^.FAudioFile.Index01));// Da steht der INdex drin
         end;
   end;
 end;
@@ -6661,12 +6619,7 @@ begin
 
     //if assigned(FDetails) then // sollte aber hier immer so sein ;-)
     //  SetWindowPos(FDetails.Handle,HWND_TOP,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-
-    if not (FileExists(AudioFile.Pfad) OR AudioFile.isStream) then
-    begin
-      AudioFile.FileIsPresent := False;
-      PlaylistVST.InvalidateNode(Node);
-    end;
+    AudioFile.ReCheckExistence;
 end;
 
 procedure TNemp_MainForm.PlaylistVSTChange(Sender: TBaseVirtualTree;
@@ -6684,23 +6637,27 @@ begin
   SelectedMP3s := PlaylistVST.GetSortedSelection(False);
   if c=0 then
   begin
-    PlayListStatusLBL.Caption := '';
-    exit;
+      PlayListStatusLBL.Caption := '';
+      exit;
   end;
   dauer:=0;
   groesse:=0;
 
   for i:=0 to length(SelectedMP3s) - 1 do
   begin
-    aNode := SelectedMP3s[i];
-    Data := PlaylistVST.GetNodeData(aNode);
-    AudioFile := Data^.FAudioFile;
-    if Not AudioFile.isStream then
-    begin
-      dauer := dauer + AudioFile.Duration;
-      groesse := groesse + AudioFile.Size;
-    end;
+      aNode := SelectedMP3s[i];
+      Data := PlaylistVST.GetNodeData(aNode);
+      AudioFile := Data^.FAudioFile;
+      case AudioFile.AudioType of
+          at_File: begin
+              dauer := dauer + AudioFile.Duration;
+              groesse := groesse + AudioFile.Size;
+          end;
+
+          at_CDDA: dauer := dauer + AudioFile.Duration; // size is not available
+      end;
   end;
+
   PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCount), [c])
                                 + SizeToString(groesse)
                                 + SekToZeitString(dauer);
@@ -6710,7 +6667,7 @@ begin
 
   if PlaylistVST.GetNodeLevel(aNode)>0 then exit;
 
-  NempPlaylist.ActualizeNode(aNode);
+  NempPlaylist.ActualizeNode(aNode, false);
 
   Data := PlaylistVST.GetNodeData(aNode);
   AudioFile := Data^.FAudioFile;
@@ -6772,8 +6729,8 @@ begin
         if not Assigned(Node) then
           Exit;
         Data := PlaylistVST.GetNodeData(Node);
-        if PathSeemsToBeURL(Data^.FAudioFile.Pfad) then exit;
-        NempPlayer.PlayJingle(Data^.FAudioFile);
+        if Data^.FAudioFile.AudioType = at_File then
+            NempPlayer.PlayJingle(Data^.FAudioFile);
       end;
     end;
 
@@ -6992,7 +6949,7 @@ begin
   for i := 0 to NempPlaylist.Count - 1 do
   begin
 
-    if NOT (NempPlaylist.Playlist[i] as TAudioFile).isStream then
+    if (NempPlaylist.Playlist[i] as TAudioFile).IsFile then
     begin
         AudioFile := MedienBib.GetAudioFileWithFilename((NempPlaylist.Playlist[i] as TAudioFile).Pfad);
         if AudioFile = Nil then
@@ -7851,42 +7808,32 @@ begin
         else
         begin
             case Column of
-              0:  // main column
-                if (Data.FAudioFile.isStream) AND NOT (Node = NempPlaylist.PlayingNode) then
-                begin
-                  imageIndex := 9;
-                  exit;  // Anmerkung: Streams können nur Level 0 haben, daher ist das "if Level..." im Else-Zweik ausreichend!
-                end else
-                begin
-                    if Sender.GetNodeLevel(Node) = 0 then
-                    begin
-                            if Not Data.FAudioFile.FileIsPresent then
+              0:  begin  // main column
+                      if Sender.GetNodeLevel(Node) = 0 then
+                      begin
+                          if Not Data.FAudioFile.FileIsPresent then
                               imageIndex := 5
-                            else
+                          else
+                          begin
                               if Node = NempPlayList.PlayingNode then
-                                case NempPlayer.Status of
-                                   PLAYER_ISPLAYING: ImageIndex := 2;
-                                   PLAYER_ISPAUSED:  ImageIndex := 3;
-                                   else              ImageIndex := 4;
-                                end// Case
-
-                                else
-                                begin
-                                  if Data.FAudioFile.FileChecked then
-                                  begin
-                                    if Data.FAudioFile.LyricsExisting then
-                                      ImageIndex := 1
-                                    else
-                                      ImageIndex := 0;
-                                    // Cue-Sheet vorhanden?
-                                    if assigned(Data.FAudioFile.CueList) and (Data.FAudioFile.CueList.Count > 0) then
-                                      ImageIndex := 10;
-                                  end
-                                  else // Datei noch nicht untersucht => "?-Note"
-                                    imageIndex := 8;
-                                end;
-                    end else // level=1
-                      ;// nix - kein Bild anzeigen!
+                                  case NempPlayer.Status of
+                                      PLAYER_ISPLAYING: ImageIndex := 2;
+                                      PLAYER_ISPAUSED:  ImageIndex := 3;
+                                  else
+                                      ImageIndex := 4;
+                                  end// Case  NempPlayer.Status
+                              else
+                              begin
+                                  // not the playing node
+                                  case Data.FAudioFile.AudioType of
+                                      at_Undef  : ImageIndex := 8;
+                                      at_File   : ImageIndex := 0;
+                                      at_Stream : ImageIndex := 9;
+                                      at_CDDA   : ImageIndex := 11;
+                                  end;
+                              end;
+                          end;
+                      end;
                 end; // case Column
             end;
         end;
@@ -7919,17 +7866,13 @@ end;
 
 procedure TNemp_MainForm.PM_PL_ExtendedScanFilesClick(Sender: TObject);
 var Node: PVirtualNode;
-    i: integer;
 begin
-  for i := 0 to NempPlaylist.Count - 1 do
-      TAudioFile(NempPlaylist.Playlist[i]).FileChecked := False;
-
   LangeAktionWeitermachen := True;
 
   Node := PlaylistVST.GetFirst;
   while assigned(Node) and LangeAktionWeitermachen do
   begin
-      NempPlaylist.ActualizeNode(Node);
+      NempPlaylist.ActualizeNode(Node, True);
       Node := PlaylistVST.GetNextSibling(Node);
   end;
   LangeAktionWeitermachen := False;
@@ -9122,32 +9065,41 @@ procedure TNemp_MainForm.PlaylistVSTGetHint(Sender: TBaseVirtualTree;
 var Data: PTreeData;
 begin
   Data := Sender.GetNodeData(Node);
-
   if not assigned(Data) then exit;
 
-  if Data^.FAudioFile.isStream then
-    HintText := ' ' + (AudioFileProperty_Webstream) + #13#10
+  case Data^.FAudioFile.AudioType of
+      at_Undef: HintText := 'ERROR: UNDEFINED AUDIOTYPE';
+
+      at_File: begin
+          HintText :=
+                 Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
+               + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)]) + #13#10
+               + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy)]);
+
+          if Data^.FAudioFile.Track <> 0 then
+              HintText := HintText + Format(' (%s %d)', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
+          else
+              HintText := HintText + #13#10;
+
+          HintText := HintText
+               + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)]) + #13#10
+               + Format(' %s: %s kbit/s' , [(AudioFileProperty_Bitrate)   ,IntTostr(Data^.FAudioFile.Bitrate)]) + #13#10
+               + Format(' %s: %s MB'     , [(AudioFileProperty_Filesize)  ,FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2)]) + #13#10
+               + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Data^.FAudioFile.Ordner]) + #13#10
+               + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Data^.FAudioFile.Dateiname]);
+      end;
+
+      at_Stream: begin
+          HintText := ' ' + (AudioFileProperty_Webstream) + #13#10
                + Format(' %s: %s', [(AudioFileProperty_Name), Data^.FAudioFile.Description]) + #13#10
                + Format(' %s: %s', [(AudioFileProperty_URL) , Data^.FAudioFile.Pfad])
-  else
-  begin
-    HintText :=
-         Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy)]);
+      end;
 
-    if Data^.FAudioFile.Track <> 0 then
-      HintText := HintText + Format(' (%s %d)', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
-    else
-      HintText := HintText + #13#10;
-
-    HintText := HintText
-       + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)]) + #13#10
-       + Format(' %s: %s kbit/s' , [(AudioFileProperty_Bitrate)   ,IntTostr(Data^.FAudioFile.Bitrate)]) + #13#10
-       + Format(' %s: %s MB'     , [(AudioFileProperty_Filesize)  ,FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2)]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Data^.FAudioFile.Ordner]) + #13#10
-       + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Data^.FAudioFile.Dateiname]);
-    end;
+      at_CDDA: begin
+          HintText := 'CD-Audio';
+          // Todo
+      end;
+  end;
 
 end;
 
@@ -10070,10 +10022,7 @@ begin
                     CON_YEAR,
                     CON_GENRE,
                     CON_TRACKNR: begin
-                        if ( (AnsiLowercase(af.Extension) = 'mp3')
-                            or (AnsiLowercase(af.Extension) = 'ogg')
-                            or (AnsiLowercase(af.Extension) = 'flac'))
-                        then
+                        if af.IsQuickEditable then
                         begin
                             ClearShortCuts;
                             allowed := NempOptions.AllowQuickAccessToMetadata;
@@ -11039,6 +10988,8 @@ var point: TPoint;
 // lyrics: TLyrics;
 //  s: String;
 //  sl: TStringList;
+c: TCDDAFile;
+err: TCDDAError;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11049,8 +11000,23 @@ begin
 //   exit;
 //CloudViewer.SetFocus;
 
+    c := TCDDAFile.Create;
+    err := c.GetData('cda://G,11,asa', False);
+
+    showmessage(
+    inttostr(Integer(err)) +
+    c.Artist + #13#10 +
+    c.Title + #13#10 +
+    c.Album + #13#10 +
+    IntToStr(c.Track) + #13#10 +
+    IntToStr(c.Duration) + #13#10
+    );
+
+
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
+
+
 
   { lyrics := TLyrics.Create;
    try
@@ -11341,7 +11307,7 @@ begin
         begin
             // nur neu Scrobbeln, wenn es vorher nicht getan wurde.
             // Sonst wird der Zeitzähler zurückgesetzt, und Submitten ggf. unterbunden
-            if not NempPlayer.MainAudioFile.IsStream then
+            if NempPlayer.MainAudioFile.IsFile then
             begin
                 NempPlayer.NempScrobbler.ChangeCurrentPlayingFile(NempPlayer.MainAudioFile);
                 NempPlayer.NempScrobbler.PlaybackStarted;

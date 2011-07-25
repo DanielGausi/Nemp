@@ -118,8 +118,8 @@ type
       fDefaultCoverIsLoaded: Boolean;
 
 
-      // Basic method for creating a stream from a given filename
-      function NEMP_CreateStream(aFilename: UnicodeString;
+      // Basic method for creating a stream from a given file   //filename
+      function NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
                            aNoMickyMaus: boolean;
                            aReverse: boolean;
                            checkEasterEgg: boolean = False): DWord;
@@ -555,6 +555,7 @@ begin
     ValidExtensions.Add('.xm'); ValidExtensions.Add('.s3m');
     ValidExtensions.Add('.mtm'); ValidExtensions.Add('.mod');
     ValidExtensions.Add('.umx');
+    ValidExtensions.Add('.cda');
 
     isMute := False;
     ReadyForRecord := False;
@@ -686,6 +687,7 @@ begin
     finally
         Windows.FindClose(fh);
     end;
+
     // PLugins geladen
     // Filter "Alle Dateien" hinzufügen
     tmpfilter := '*.mp3';
@@ -693,7 +695,9 @@ begin
         tmpfilter := tmpfilter + ';*' + ValidExtensions[i];
 
     Filter := 'All supported files|' + tmpfilter
-                                       + Filter;
+                                       + Filter
+                                       + '|CD-Audio|*.cda'
+                                       ;
 end;
 
 procedure TNempPlayer.ReInitBassEngine;
@@ -719,6 +723,8 @@ begin
   ValidExtensions.Add('.xm'); ValidExtensions.Add('.s3m');
   ValidExtensions.Add('.mtm'); ValidExtensions.Add('.mod');
   ValidExtensions.Add('.umx');
+  ValidExtensions.Add('.cda');
+
   //neu Initialisieren
   InitBassEngine(fMainWindowHandle, fPathToDlls, dummy);
 end;
@@ -956,64 +962,70 @@ end;
     Main-method for creating streams
     --------------------------------------------------------
 }
-function TNempPlayer.NEMP_CreateStream(aFilename: UnicodeString;
+function TNempPlayer.NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
                            aNoMickyMaus: boolean;
                            aReverse: boolean;
                            checkEasterEgg: boolean = False): DWord;
-var extension: String;
+var extension, localPath: String;
   flags: DWORD;
   DecodeFlag: DWord;
   StreamDec, StreamRev: DWord;
 begin
+  localPath := aFile.Pfad; // copy pfad here, as the getter has to build the path from filename and Directory
 
-  if checkEasterEgg and CheckForEasteregg(aFilename) then
-      RepairCorruptFile(aFilename);
+  if checkEasterEgg and CheckForEasteregg(localPath) then
+      RepairCorruptFile(localPath);
 
-
-  extension := AnsiLowerCase(ExtractFileExt(aFilename));
-
+  // get extension (if its not a file, we need the "else-part", so dont check for AudioType here)
+  extension := AnsiLowerCase(ExtractFileExt(localPath));
   if (   (extension = '.mp3')
       OR (extension = '.mp2')
       OR (extension = '.mp1')   )
   then
       flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable
   else
-    flags :=  BASS_UNICODE OR fSoftwareFlag or fFloatable;
+      flags :=  BASS_UNICODE OR fSoftwareFlag or fFloatable;
 
   // zunächst nur Decode?
   if aReverse OR aNoMickyMaus then
-    DecodeFlag := BASS_STREAM_DECODE
+      DecodeFlag := BASS_STREAM_DECODE
   else
-    DecodeFlag := 0;
+      DecodeFlag := 0;
 
-  if PathSeemsToBeURL(aFilename) then
-      result := BASS_StreamCreateURL(PAnsiChar(Ansistring(aFilename)), 0, BASS_STREAM_STATUS , @StatusProc, nil)
-  else
-  begin
-      result := BASS_StreamCreateFile(False, PChar(Pointer(aFilename)), 0, 0, DecodeFlag OR flags);
+  case aFile.AudioType of
+      at_File, at_cdda: begin
+          result := BASS_StreamCreateFile(False, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR flags);
+          // Vorgang oben fehlgeschlagen? Dann mit Music probieren
+          if result = 0 then
+              result := BASS_MusicLoad(FALSE, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR BASS_MUSIC_RAMP or {BASS_SAMPLE_FX OR} BASS_MUSIC_PRESCAN ,0);
 
-      // Vorgang oben fehlgeschlagen? Dann mit Music probieren
-      if result = 0 then
-          result := BASS_MusicLoad(FALSE, PChar(Pointer(aFilename)), 0, 0, DecodeFlag OR BASS_MUSIC_RAMP or {BASS_SAMPLE_FX OR} BASS_MUSIC_PRESCAN ,0);
-
-      // Decodier-Stream nachbehandeln
-      if aReverse AND (result <> 0) then
-      begin
-          StreamDec := result;
-          // einen Reverse-Stream erzeugen
-          if aNoMickyMaus then
+          // Decodier-Stream nachbehandeln
+          if aReverse AND (result <> 0) then
           begin
-              StreamRev := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE or BASS_STREAM_DECODE);
-              if StreamRev <> 0 then
-                  result := BASS_FX_TempoCreate(StreamRev, BASS_FX_FREESOURCE)
-              else result := 0;
-          end
-          else
-              result := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE);
-      end else
-          if aNoMickyMaus AND (result <> 0) then
-              // einen TempoStream erzeugen
-              result := BASS_FX_TempoCreate(result, BASS_FX_FREESOURCE);
+              StreamDec := result;
+              // einen Reverse-Stream erzeugen
+              if aNoMickyMaus then
+              begin
+                  StreamRev := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE or BASS_STREAM_DECODE);
+                  if StreamRev <> 0 then
+                      result := BASS_FX_TempoCreate(StreamRev, BASS_FX_FREESOURCE)
+                  else result := 0;
+              end
+              else
+                  result := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE);
+          end else
+              if aNoMickyMaus AND (result <> 0) then
+                  // einen TempoStream erzeugen
+                  result := BASS_FX_TempoCreate(result, BASS_FX_FREESOURCE);
+      end;
+
+      at_Stream: begin
+          result := BASS_StreamCreateURL(PAnsiChar(Ansistring(localPath)), 0, BASS_STREAM_STATUS , @StatusProc, nil);
+      end;
+
+      //at_CDDA: begin
+          // todo
+      //end;
   end;
 end;
 
@@ -1025,40 +1037,40 @@ end;
 }
 procedure TNempPlayer.StopAndFree(StartPlayAfterStop: Boolean = False);
 begin
-  if assigned(MainAudioFile) and (not MainAudioFile.IsStream) then
-  begin
-      PostProcessor.UserStoppedThePlayer := (LastUserWish = USER_WANT_STOP);
-      PostProcessor.Process(Status = PLAYER_ISPLAYING);
-  end;
-  // EndSyncs löschen - Sonst ggf. doppeltes Next
-  RemoveEndSyncs;
-  StopRecording;
-  // Wiedergabe stoppen und Handles freigeben
-  if UseFading AND fReallyUseFading
-  AND not (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream, Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
-  And ((not IgnoreFadingOnStop) or StartPlayAfterStop)
-  then
-  begin
-    fSlideIsStopSlide := True;
-    BASS_ChannelFlags(MainStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL,-2,FadingInterval)
-  end
-  else begin
-    BASS_ChannelStop(MainStream);
-    BASS_StreamFree(MainStream);
-    SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
-  end;
-  BASS_ChannelStop(SlideStream);
-  BASS_StreamFree(SlideStream);
+    if assigned(MainAudioFile) and (MainAudioFile.IsFile) then
+    begin
+        PostProcessor.UserStoppedThePlayer := (LastUserWish = USER_WANT_STOP);
+        PostProcessor.Process(Status = PLAYER_ISPLAYING);
+    end;
+    // EndSyncs löschen - Sonst ggf. doppeltes Next
+    RemoveEndSyncs;
+    StopRecording;
+    // Wiedergabe stoppen und Handles freigeben
+    if UseFading AND fReallyUseFading
+        AND not (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream, Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
+        And ((not IgnoreFadingOnStop) or StartPlayAfterStop)
+    then
+    begin
+        fSlideIsStopSlide := True;
+        BASS_ChannelFlags(MainStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL,-2,FadingInterval)
+    end
+    else begin
+        BASS_ChannelStop(MainStream);
+        BASS_StreamFree(MainStream);
+        SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
+    end;
+    BASS_ChannelStop(SlideStream);
+    BASS_StreamFree(SlideStream);
 
-  spectrum.DrawClear;
-  Spectrum.DrawText('', False);
-  Spectrum.DrawTime('  00:00');
-  MainStream := 0;
-  SlideStream := 0;
+    spectrum.DrawClear;
+    Spectrum.DrawText('', False);
+    Spectrum.DrawTime('  00:00');
+    MainStream := 0;
+    SlideStream := 0;
   
-  UpdateDeskband(NEMP_API_STOPPED, 0);
-  ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
+    UpdateDeskband(NEMP_API_STOPPED, 0);
+    ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
 end;
 
 {
@@ -1089,13 +1101,20 @@ begin
   begin
       extension := AnsiLowerCase(ExtractFileExt(MainAudioFile.Pfad));
 
-      if PathSeemsToBeURL(MainAudioFile.Pfad) then
-        Spectrum.DrawText('Connecting to ' +  MainAudioFile.Pfad, False)
-      else
-        Spectrum.DrawText('Starting ' +  MainAudioFile.Dateiname, False);
+      case MainAudioFile.AudioType of
+          at_File: begin
+              Spectrum.DrawText('Starting ' +  MainAudioFile.Dateiname, False);
+          end;
+          at_Stream: begin
+              Spectrum.DrawText('Connecting to ' +  MainAudioFile.Pfad, False)
+          end;
+          at_CDDA: begin
+              // todo
+          end;
+      end;
 
       // Mainstream erzeugen
-      Mainstream := NEMP_CreateStream(MainAudioFile.Pfad, AvoidMickyMausEffect, False, True);
+      Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, True);
       // Fehlerbehandlung
       if (MainStream = 0) then
       begin
@@ -1112,117 +1131,126 @@ begin
       BASS_ChannelGetAttribute(Mainstream, BASS_ATTRIB_FREQ, OrignalSamplerate{!!});
       InitStreamEqualizer(MainStream);
 
+
       // URL oder Dateiname??
       // BEI URLS ist einiges etwas anders - z.B. kein Tempo
-      if PathSeemsToBeURL(MainAudioFile.Pfad) then
-      begin
-            fIsURLStream := True;
-            MainStreamIsReverseStream := False;
+      case MainAudioFile.AudioType of
+          at_File, at_cdda: begin
+              fIsURLStream := False;
+              aAudioFile.FileIsPresent := FileExists(MainAudioFile.Pfad);
+              MainStreamIsTempoStream := AvoidMickyMausEffect;
 
-            // Stratplay künstlich auf True setzen!
-            StartPlay := True;
+              // Bestimmen, ob Faden oder nicht
+              if UseFading AND fReallyUseFading
+                           // (...Und Titel ist auch lang genug)
+                           AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
+              then // zunächst stummschalten, und dann einfaden
+              begin
+                    // Attribute setzen
+                    if MainStreamIsTempoStream then
+                        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
+                    else
+                        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
 
-            // Wenn Faden
-            if UseFading AND fReallyUseFading then
-            begin
-              // Lautstärke zunächst auf 0
-              BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
-              BASS_ChannelPlay(MainStream , True);
-              BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
-            end
-            else begin // also kein Fading, Lautstärke mormal
-              BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
-              BASS_ChannelPlay(MainStream , True);
-            end;
-            fStatus := PLAYER_ISPLAYING;
+                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
 
-            // Hier werden die Details ermittelt, Die Hauptform benachrichtigt
-            // und MetaSyncs gesetzt, Playingtitel wird da auch gesetzt
-            GetURLDetails;
+                    if StartPos <> 0 then
+                      Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
 
-      end else // Pfad ist ein Dateiname
-      begin
-          fIsURLStream := False;
-          aAudioFile.FileIsPresent := FileExists(MainAudioFile.Pfad);
-          MainStreamIsTempoStream := AvoidMickyMausEffect;
+                    if StartPlay then
+                    begin
+                      BASS_ChannelPlay(MainStream , False);
+                      BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, Interval);
+                    end;
+              end else
+              begin // also kein Fading
+                    if MainStreamIsTempoStream then
+                        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
+                    else
+                        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
 
-          // Bestimmen, ob Faden oder nicht
-          if UseFading AND fReallyUseFading
-                       // (...Und Titel ist auch lang genug)
-                       AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
-          then // zunächst stummschalten, und dann einfaden
-          begin
-                // Attribute setzen
+                    if StartPos <> 0 then
+                      Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
+
+                    if StartPlay then
+                      BASS_ChannelPlay(MainStream , False);
+              end;
+              MainStreamIsReverseStream := False;
+
+              // Anzeige initialisieren
+              StreamType := GetStreamType(Mainstream);
+
+              // Bei Audio-CDs kann kein zweiter Stream erzeugt werden!
+              if extension <> '.cda' then
+              begin
+                SlideStream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False);
+                SetEndSyncs(SlideStream);
+                InitStreamEqualizer(SlideStream);
                 if MainStreamIsTempoStream then
-                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
+                    BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
                 else
-                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+                    BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+                BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
+                fReallyUseFading := True;
+              end else
+              begin
+                Slidestream := 0;
+                fReallyUseFading := False;
+              end;
 
+          end;
+
+          at_Stream: begin
+              fIsURLStream := True;
+              MainStreamIsReverseStream := False;
+
+              // Stratplay künstlich auf True setzen!
+              StartPlay := True;
+
+              // Wenn Faden
+              if UseFading AND fReallyUseFading then
+              begin
+                // Lautstärke zunächst auf 0
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
-
-                if StartPos <> 0 then
-                  Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
-
-                if StartPlay then
-                begin
-                  BASS_ChannelPlay(MainStream , False);
-                  BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, Interval);
-                end;
-          end else
-          begin // also kein Fading
-                if MainStreamIsTempoStream then
-                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
-                else
-                    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+                BASS_ChannelPlay(MainStream , True);
+                BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+              end
+              else begin // also kein Fading, Lautstärke mormal
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+                BASS_ChannelPlay(MainStream , True);
+              end;
+              fStatus := PLAYER_ISPLAYING;
 
-                if StartPos <> 0 then
-                  Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
-
-                if StartPlay then
-                  BASS_ChannelPlay(MainStream , False);
+              // Hier werden die Details ermittelt, Die Hauptform benachrichtigt
+              // und MetaSyncs gesetzt, Playingtitel wird da auch gesetzt
+              GetURLDetails;
           end;
-          MainStreamIsReverseStream := False;
 
-          // Anzeige initialisieren
-          StreamType := GetStreamType(Mainstream);
-
-          // Bei Audio-CDs kann kein zweiter Stream erzeugt werden!
-          if extension <> '.cda' then
-          begin
-            SlideStream := NEMP_CreateStream(MainAudioFile.Pfad, AvoidMickyMausEffect, False);
-            SetEndSyncs(SlideStream);
-            InitStreamEqualizer(SlideStream);
-            if MainStreamIsTempoStream then
-                BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
-            else
-                BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
-            BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
-            fReallyUseFading := True;
-          end else
-          begin
-            Slidestream := 0;
-            fReallyUseFading := False;
-          end;
+          //at_CDDA: begin
+              // todo
+          //    Slidestream := 0;
+          //    fReallyUseFading := False;
+          //end;
       end;
+
 
       // Stream ist jetzt fertig von der Bass erzeugt.
       // Jetzt das Audiofile ggf. ändern
       // zunächst mit eigenen Methoden rangehen
-      if not MainAudioFile.IsStream then
+      if MainAudioFile.IsFile then
           SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
       // dann ggf. von der bass korrigieren lassen
       If Mainstream <> 0 then
       begin
-        BASS_ChannelGetInfo(Mainstream, ChannelINfo);
-        MainAudioFile.SetSampleRate(ChannelInfo.freq);
-
-        if not MainAudioFile.IsStream then
-        begin
-            basstime := BASS_ChannelBytes2Seconds(Mainstream,BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE));
-            basslen := BASS_StreamGetFilePosition(Mainstream,BASS_FILEPOS_END);
-            MainAudioFile.Bitrate := Round((basslen/(125*basstime)+0.5));
-        end
+          BASS_ChannelGetInfo(Mainstream, ChannelINfo);
+          MainAudioFile.SetSampleRate(ChannelInfo.freq);
+          if not MainAudioFile.IsStream then
+          begin
+              basstime := BASS_ChannelBytes2Seconds(Mainstream,BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE));
+              basslen := BASS_StreamGetFilePosition(Mainstream,BASS_FILEPOS_END);
+              MainAudioFile.Bitrate := Round((basslen/(125*basstime)+0.5));
+          end
       end;
 
       SetCueSyncs;
@@ -1236,7 +1264,7 @@ begin
           UpdateDeskband(NEMP_API_PLAYING, 0);
           ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
 
-          if not MainAudioFile.IsStream then
+          if MainAudioFile.IsFile then
           begin
               PostProcessor.ChangeCurrentPlayingFile(MainAudioFile);
               PostProcessor.PlaybackStarted;
@@ -1391,7 +1419,7 @@ begin
       end else
       begin
         // Rückwärts abspielen
-          tmpMain := NEMP_CreateStream(MainAudiofile.Pfad,
+          tmpMain := NEMP_CreateStream(MainAudiofile,
                                //False, // kein Tempostream
                                AvoidMickyMausEffect,
                                True  // ReverseStream
@@ -1439,7 +1467,7 @@ begin
     JingleStream := 1; // <> 0
     if assigned(aAudioFile) then
     begin
-        Jinglestream := NEMP_CreateStream(aAudioFile.Pfad,
+        Jinglestream := NEMP_CreateStream(aAudioFile,
                            False, // kein Tempostream
                            False,  // kein ReverseStream
                            true); // Check for Easteregg
@@ -1482,7 +1510,7 @@ begin
   begin
       fHeadsetIsURLStream := PathSeemsToBeURL(HeadSetAudioFile.Pfad);
       Bass_ChannelStop(HeadsetStream);
-      HeadsetStream := NEMP_CreateStream(HeadSetAudioFile.Pfad, False, False, True);
+      HeadsetStream := NEMP_CreateStream(HeadSetAudioFile, False, False, True);
       BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
       Bass_ChannelPlay(HeadsetStream, True);
 
@@ -2173,13 +2201,11 @@ begin
 end;
 
 function TNempPlayer.GenerateTitelString(aAudioFile: TAudioFile; aMode: Integer): UnicodeString;
-var isURLtmp: Boolean;
 begin
   if aAudioFile = Nil then
     result := ''
   else
   begin
-    isURLtmp := PathSeemsToBeURL(aAudioFile.Pfad);
     case aMode of
       MODE_ARTIST_TITEL: //if isURLtmp then
                          //    result := aAudioFile.Titel   // !! Achtung - bei Ogg-Streams kommen hier nähere Infos!!!
@@ -2191,45 +2217,58 @@ begin
                                 result := aAudioFile.Artist + ' - ' + aAudioFile.NonEmptyTitle;// + aaudiofile.Pfad;
                          end;
       MODE_PATH        : result := aAudioFile.Pfad;
-      MODE_INFO        : if isURLtmp then
-                          begin
-                            result := Format('%s, %s: %dkbit/s (%s)'
-                              , [(Infostring_Webstream), (Infostring_Bitrate), aAudioFile.Bitrate, self.StreamType])
-                            //result := 'Webstream, Bitrate: ' + IntToStr(aAudioFile.Bitrate) + 'kbit/s' + ' (' + aAudioFile.StreamType + ')';
-                         end else
-                         begin
-                            result := Format('%s: %s, ',
+      MODE_INFO        : case aAudioFile.AudioType of
+                            at_File : begin
+                                result := Format('%s: %s, ',
                                       [(Infostring_Duration), SekToZeitString(aAudioFile.Duration)]);
 
-                            if aAudioFile.Bitrate > 0 then
-                            begin
-                              result := result + Format('%s: %dkbit/s', [(Infostring_Bitrate), aAudioFile.Bitrate]);
-                              if aAudioFile.vbr then
-                                result := result + ' (vbr), '
-                              else
-                                result := result + ', ';
+                                if aAudioFile.Bitrate > 0 then
+                                begin
+                                  result := result + Format('%s: %dkbit/s', [(Infostring_Bitrate), aAudioFile.Bitrate]);
+                                  if aAudioFile.vbr then
+                                    result := result + ' (vbr), '
+                                  else
+                                    result := result + ', ';
+                                end;
+                                result := result + Format('%s: %s, %s, ',
+                                          [(Infostring_Samplerate),
+                                          aAudioFile.Samplerate,
+                                          aAudioFile.Channelmode]);
+                                result := result + ' (' + self.StreamType + ')';
                             end;
-                            result := result + Format('%s: %s, %s, ',
-                                      [(Infostring_Samplerate),
-                                      aAudioFile.Samplerate,
-                                      aAudioFile.Channelmode]);
-                            result := result + ' (' + self.StreamType + ')';
+
+                            at_Stream: begin
+                                result := Format('%s, %s: %dkbit/s (%s)'
+                                  , [(Infostring_Webstream), (Infostring_Bitrate), aAudioFile.Bitrate, self.StreamType]);
+                            end;
+
+                            at_CDDA: begin
+                                // todo
+                                result := 'CDDA';
+                            end;
                          end;
 
-      MODE_LYRICS      :if isURLtmp then
-                        begin
-                            // im Namen steht die Beschreibung des Sender drin, das dürfte
-                            // dem am nächsten kommen
-                            result := aAudioFile.Description;
-                        end else
-                        begin
-                            if aAudioFile.LyricsExisting then
-                              result := (StringReplace(UTF8ToString(aAudioFile.Lyrics), #13#10, ' ', [rfReplaceAll]))
-                            else
-                              result := (Infostring_NoLyrics);
-                        end;
-    else
-      result := '-';
+      MODE_LYRICS      : case aAudioFile.AudioType of
+                            at_File: begin
+                                if aAudioFile.LyricsExisting then
+                                  result := (StringReplace(UTF8ToString(aAudioFile.Lyrics), #13#10, ' ', [rfReplaceAll]))
+                                else
+                                  result := (Infostring_NoLyrics);
+                            end;
+
+                            at_Stream: begin
+                                // im Namen steht die Beschreibung des Sender drin, das dürfte
+                                // dem am nächsten kommen
+                                result := aAudioFile.Description;
+                            end;
+
+                            at_CDDA: begin
+                                // todo
+                                result := 'CDDA';
+                            end;
+                         end;
+      else
+          result := '-';
     end;
   end;
 
@@ -2245,45 +2284,16 @@ begin
 end;
 
 function TNempPlayer.GenerateTaskbarTitel: UnicodeString;
-const MinLength = 10;
 begin
   if NOT assigned(MainAudioFile) then
+      result := NEMP_NAME_TASK
+  else
   begin
-    result := NEMP_NAME_TASK;
-    exit;
-  end;
-
-  if MainAudioFile.isStream then
-  begin
-      if trim(MainAudioFile.Titel) = '' then
-      begin
-          if length(MainAudioFile.Description) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Description + ' - '
-          else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Description + ' - '
-      end else
-      begin
-          if length(MainAudioFile.Titel) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Titel + ' - '
-          else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Titel + ' - '
-      end
-  end else
-  begin // normale Datei
-      if UnKownInformation(MainAudioFile.Artist)then
-      begin
-          if length(MainAudioFile.NonEmptyTitle) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
-          else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
-      end
+      result := MainAudioFile.PlaylistTitle;
+      if length(Result) < 10 then
+          result := NEMP_NAME_TASK_LONG + ' - ' + result + ' - '
       else
-      begin
-          if length(MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle) < MinLength then
-              result := NEMP_NAME_TASK_LONG + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
-          else
-              result := NEMP_NAME_TASK + ' - ' + MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle + ' - '
-      end;
+          result := NEMP_NAME_TASK + ' - ' + result + ' - '
   end;
 end;
 
@@ -2556,50 +2566,70 @@ end;
 
 function TNempPlayer.GetCountDownLength(aFilename: UnicodeString): Integer;
 var tmpstream: DWord;
+    af: TAudioFile;
 begin
-  tmpStream := NEMP_CreateStream(aFilename,
-                           False, // kein Tempostream
-                           False  // ReverseStream
-                           );
-  if tmpStream <> 0 then
-    Result := Round(Bass_ChannelBytes2Seconds(tmpStream,Bass_ChannelGetLength(tmpStream, BASS_POS_BYTE)))
-  else
-    Result := 0;
+    af := TAudioFile.Create;
+    try
+        af.Pfad := aFilename; // set path, determine AudioType
 
-  BASS_StreamFree(tmpstream);
+        tmpStream := NEMP_CreateStream(af,
+                                 False, // kein Tempostream
+                                 False  // ReverseStream
+                                 );
+        if tmpStream <> 0 then
+          Result := Round(Bass_ChannelBytes2Seconds(tmpStream,Bass_ChannelGetLength(tmpStream, BASS_POS_BYTE)))
+        else
+          Result := 0;
+
+        BASS_StreamFree(tmpstream);
+    finally
+        af.Free;
+    end;
 end;
 
 Procedure TNempPlayer.PlayCountDown; // Countdown abspielen mit setzen der Syncs
+var af: TAudioFile;
 begin
-  CountDownStream := NEMP_CreateStream(NempBirthdayTimer.CountDownFileName,
-                           False, // kein Tempostream
-                           False  // ReverseStream
-                           );
+    af := TAudioFile.Create;
+    try
+        af.Pfad := NempBirthdayTimer.CountDownFileName; // set path, determine AudioType
 
-  BASS_ChannelFlags(CountDownStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-    // Attribute setzen
+        CountDownStream := NEMP_CreateStream(af,
+                                 False, // kein Tempostream
+                                 False  // ReverseStream
+                                 );
+        BASS_ChannelFlags(CountDownStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+          // Attribute setzen
+        BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume);
+        BirthdayCountDownSyncHandle :=
+          Bass_ChannelSetSync(CountDownStream, BASS_SYNC_END, 0, @EndCountdownProc, self);
 
-  BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume);
-  BirthdayCountDownSyncHandle :=
-    Bass_ChannelSetSync(CountDownStream, BASS_SYNC_END, 0, @EndCountdownProc, self);
-
-  BASS_ChannelPlay(CountDownStream, true);
-
+        BASS_ChannelPlay(CountDownStream, true);
+    finally
+        af.Free;
+    end;
 end;
 Procedure TNempPlayer.PlayBirthday; // Geburtstagslied abspielen
+var af: TAudioFile;
 begin
-  BirthdayStream := NEMP_CreateStream(NempBirthdayTimer.BirthdaySongFilename,
-                           False, // kein Tempostream
-                           False  // ReverseStream
-                           );
-  BASS_ChannelFlags(BirthdayStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
-  if NempBirthdayTimer.ContinueAfter then
-      BirthdaySyncHandle :=
-          Bass_ChannelSetSync(BirthdayStream, BASS_SYNC_END, 0, @EndBirthdayProc, self);
+    af := TAudioFile.Create;
+    try
+        af.Pfad := NempBirthdayTimer.BirthdaySongFilename; // set path, determine AudioType
+        BirthdayStream := NEMP_CreateStream(af,
+                                 False, // kein Tempostream
+                                 False  // ReverseStream
+                                 );
+        BASS_ChannelFlags(BirthdayStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+        if NempBirthdayTimer.ContinueAfter then
+            BirthdaySyncHandle :=
+                Bass_ChannelSetSync(BirthdayStream, BASS_SYNC_END, 0, @EndBirthdayProc, self);
 
-    // Attribute setzen
-  BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, fMainVolume);
-  BASS_ChannelPlay(BirthdayStream, true);
+          // Attribute setzen
+        BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, fMainVolume);
+        BASS_ChannelPlay(BirthdayStream, true);
+    finally
+        af.Free;
+    end;
 end;
 
 Procedure TNempPlayer.AbortBirthday;
@@ -2757,7 +2787,7 @@ begin
     FreeAndNil(RecordStream);
 
   result := False;
-  if not assigned(MainAudioFile) or Not MainAudioFile.isStream then exit;
+  if (not assigned(MainAudioFile)) or (not MainAudioFile.isStream) then exit;
 
   Extension := GetStreamExtension(MainStream);
   RecordStream := Nil;

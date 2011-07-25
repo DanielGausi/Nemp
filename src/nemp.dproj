@@ -156,6 +156,7 @@
 			<DCCReference Include="BasicSettingsWizard.pas">
 				<Form>Wizard</Form>
 			</DCCReference>
+			<DCCReference Include="cddaUtils.pas"/>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

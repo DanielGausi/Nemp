@@ -115,6 +115,9 @@ type
     );
 
  type
+    TAudioType = (at_Undef, at_File, at_Stream, at_CDDA);
+
+
     // Class TTag: Used for the TagCloud
     TTag = class
       private
@@ -167,6 +170,8 @@ type
         // CoverID: a md5-hash-like string
         fCoverID: String;
 
+        fAudioType: TAudioType; // undef, File, Stream, CD-Audio
+
         // In the playlist, every AudioFile can have a list
         // of TAudiofiles (CueList), if there is a cuefile present
         // These subfiles starts at position Index01
@@ -218,6 +223,10 @@ type
         function fGetNonEmptyTitle: UnicodeString;
         function fGetProperFilename: UnicodeString;
 
+        function fGetIsFile: Boolean;
+        function fGetIsStream: Boolean;
+
+
 
         // Read tags from the filetype and convert the data to TAudiofile-Data
         function GetMp3Info(filename: UnicodeString; Flags: Integer = 0): TMP3Error;
@@ -225,6 +234,7 @@ type
         function GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0): TFlacError;
         function GetWmaInfo(filename: UnicodeString): TAudioError;
         function GetWavInfo(WaveFile: UnicodeString): TAudioError;
+        function GetCDDAInfo(Filename: UnicodeString; Flags: Integer = 0): TAudioError;
 
         // no tags found - set default values
         procedure SetUnknown;
@@ -251,8 +261,6 @@ type
 
         // some fields used quite often in several ways.
         FileIsPresent: Boolean;
-        FileChecked: Boolean;
-        isStream: Boolean;
 
         // Counter for Random playback
         // If a file was played, it will be "blocked" for some time
@@ -333,6 +341,12 @@ type
         // property TagDisplayString: String read fGetTagDisplayString;
         property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
 
+        property AudioType: TAudioType read fAudioType write fAudioType;
+
+        // isFile: True if the AudioFile is actually a File
+        property IsFile: Boolean read fGetIsFile;
+        property isStream: Boolean read fGetIsStream;
+
         constructor Create;
         destructor Destroy; override;
 
@@ -345,6 +359,10 @@ type
 
         // Change the Driveletter from a file
         procedure SetNewDriveChar(aChar: WideChar);
+
+        // Check, whether the file exist, cdda is present, ..
+        // and set FileIsPresent again
+        function ReCheckExistence: Boolean;
 
         function GetAudioData(filename: UnicodeString; Flags: Integer = 0): TAudioError;
         function GetCueList(aCueFilename: UnicodeString =''; aAudioFilename: UnicodeString = ''): boolean; // Rückgabewert: Liste erstellt/nicht erstellt
@@ -381,11 +399,20 @@ type
         // Directory
         // Complete path
 
+        function GetArtistForVST(ReplaceValue: Integer): String;
+        function GetTitleForVST(ReplaceValue: Integer): String;
+        function GetAlbumForVST(ReplaceValue: Integer): String;
+        function GetBitrateForVST: String;
+        function GetDurationForVST: String;
+
+
         function GetReplacedArtist(ReplaceValue: Integer): String;
         function GetReplacedTitle (ReplaceValue: Integer): String;
         function GetReplacedAlbum (ReplaceValue: Integer): String;
 
         function GetTagDisplayString(allowEdit: Boolean): String;
+
+        function IsQuickEditable: Boolean;
 
     end;
 
@@ -517,6 +544,8 @@ function FlacToAudioError(aError: TFlacError): TAudioError;
 
 function UnKownInformation(aString: String): Boolean;
 
+function GetAudioTypeFromFilename(aFilename: String): TAudioType;
+
 implementation
 
 uses NempMainUnit, Dialogs, CoverHelper, Nemp_RessourceStrings, SystemHelper;
@@ -587,6 +616,26 @@ end;
 function UnKownInformation(aString: String): Boolean;
 begin
     result := (trim(aString) = '') or (aString = AUDIOFILE_UNKOWN);
+end;
+
+function GetAudioTypeFromFilename(aFilename: String): TAudioType;
+begin
+    // determine AudioType
+    if (pos('://', aFilename) > 0) then
+    begin
+        if AnsiStartsText('cda', aFilename)
+            or AnsiStartsText('cdda', aFilename)
+        then
+            result := at_CDDA     // CD-Audio
+        else
+            result := at_Stream;  // Webradio
+    end else
+    begin
+        if AnsiLowerCase(ExtractFileExt(aFilename)) = '.cda' then
+            result := at_CDDA         // CD-Audio (.cda-File)
+        else
+            result := at_File         // File
+    end;
 end;
 
 
@@ -676,8 +725,6 @@ begin
     FileIsPresent := True;
     Genre := 'Other';
     Year := '';
-    FileChecked := False;
-    isStream := False;
     LastPlayed := 0;
     Track := 0;
     coverID := '';
@@ -698,6 +745,7 @@ begin
 
   inherited destroy;
 end;
+
 procedure TAudioFile.Assign(aAudioFile: TAudioFile);
 begin
     Description        := aAudioFile.Description         ;
@@ -709,8 +757,6 @@ begin
     fChannelModeIDX    := aAudioFile.fChannelModeIDX     ;
     fSamplerateIDX     := aAudioFile.fSamplerateIDX      ;
     FileIsPresent      := aAudioFile.FileIsPresent       ;
-    isStream           := aAudioFile.isStream            ;
-    FileChecked        := aAudioFile.FileChecked         ;
     Titel              := aAudioFile.Titel               ;
     Artist             := aAudioFile.Artist              ;
     Album              := aAudioFile.Album               ;
@@ -722,6 +768,7 @@ begin
     CoverID            := aAudioFile.CoverID             ;
     Rating             := aAudioFile.Rating              ;
     PlayCounter        := aAudioFile.PlayCounter         ;
+    fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
     RawTagLastFM       := aAudioFile.RawTagLastFM        ;
 end;
@@ -736,8 +783,7 @@ begin
     fChannelModeIDX    := aAudioFile.fChannelModeIDX     ;
     fSamplerateIDX     := aAudioFile.fSamplerateIDX      ;
     FileIsPresent      := aAudioFile.FileIsPresent       ;
-    isStream           := aAudioFile.isStream            ;
-    FileChecked        := aAudioFile.FileChecked         ;
+
     Titel              := aAudioFile.Titel               ;
     Artist             := aAudioFile.Artist              ;
     Album              := aAudioFile.Album               ;
@@ -749,6 +795,7 @@ begin
     CoverID            := aAudioFile.CoverID             ;
     Rating             := aAudioFile.Rating              ;
     PlayCounter        := aAudioFile.PlayCounter         ;
+    fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
 end;
 
@@ -768,6 +815,31 @@ begin
   end;
 end;
 
+
+{
+    --------------------------------------------------------
+    ReCheckExistence
+    Check, whether the file exist, cdda is present, ..
+           and set FileIsPresent again
+           used for striking out non existing files
+    --------------------------------------------------------
+}
+function TAudioFile.ReCheckExistence: Boolean;
+begin
+    case AudioType of
+        at_Undef: FileIsPresent := False;
+        at_File: FileIsPresent := FileExists(Pfad);
+        at_Stream: FileIsPresent := True;
+
+        at_CDDA: begin
+            // more todo
+            FileIsPresent := True;
+        end;
+    end;
+
+    result := FileIsPresent;
+end;
+
 {
     --------------------------------------------------------
     Setter and Getter for Path
@@ -775,16 +847,106 @@ end;
 }
 function TAudioFile.GetPath: UnicodeString;
 begin
-  if IsStream then
-      result := fStrings[siOrdner]
-  else
-  begin
-    //if (length(FStrings[siOrdner]) > 0) and (FStrings[siOrdner][length(FStrings[siOrdner])] = '\') then
-        result := FStrings[siOrdner] + Dateiname
-    //else
-    //    result := FStrings[siOrdner] + '\' + Dateiname;
-  end;
+    case fAudioType of
+        at_Undef  : result := fStrings[siOrdner];
+        at_File   : result := FStrings[siOrdner] + Dateiname ;
+        at_Stream : result := fStrings[siOrdner];
+        at_CDDA   : result := fStrings[siOrdner];
+    end;
 end;
+
+procedure TAudioFile.SetPath(const Value: UnicodeString);
+begin
+    if fAudioType = at_Undef then
+        fAudioType := GetAudioTypeFromFilename(Value);
+
+    case fAudioType of
+        at_File: begin
+            FStrings[siOrdner] := ExtractFilePath(Value);//ExtractFileDir(Value);
+            FStrings[siDateiname] := ExtractFileName(Value);
+        end;
+
+        at_Stream: begin
+            FStrings[siOrdner] := Value;
+            FStrings[siDateiname] := '';
+        end;
+
+        at_CDDA: begin
+            // todo
+            if AnsiLowerCase(ExtractFileExt(Value)) = '.cda' then
+            begin // we have a "file" here
+                FStrings[siOrdner] := ExtractFilePath(Value);
+                FStrings[siDateiname] := ExtractFileName(Value);
+            end else
+            begin
+                // no cda-File
+                FStrings[siOrdner] := Value;
+                FStrings[siDateiname] := '';
+            end;
+        end;
+    end;
+end;
+
+function TAudioFile.fGetIsFile: Boolean;
+begin
+    result := fAudioType = at_File;
+end;
+
+function TAudioFile.fGetIsStream: Boolean;
+begin
+    result := fAudioType = at_Stream;
+end;
+
+function TAudioFile.GetArtistForVST(ReplaceValue: Integer): String;
+begin
+    case self.fAudioType of
+        at_Undef: result := 'Error: Undefined AudioType!';
+        at_File: result := GetReplacedArtist(ReplaceValue);
+        at_Stream: result := Format('(%s)', [AudioFileProperty_Webstream]);
+        at_CDDA: ;
+    end;
+end;
+function TAudioFile.GetTitleForVST(ReplaceValue: Integer): String;
+begin
+    case self.fAudioType of
+        at_Undef: result := 'Error: Undefined AudioType!';
+        at_File: result := GetReplacedTitle(ReplaceValue);
+        at_Stream: result := Format('(%s)', [AudioFileProperty_Webstream]);
+        at_CDDA: ;
+    end;
+end;
+function TAudioFile.GetAlbumForVST(ReplaceValue: Integer): String;
+begin
+    case self.fAudioType of
+        at_Undef  : result := 'Error: Undefined AudioType!';
+        at_File   : result := GetReplacedAlbum(ReplaceValue);
+        at_Stream : result := Format('(%s)', [AudioFileProperty_Webstream]);
+        at_CDDA   : ;
+    end;
+end;
+function TAudioFile.GetBitrateForVST: String;
+begin
+    if Bitrate > 0 then
+    begin
+        if vbr then
+            result := inttostr(Bitrate) + ' kbit/s' + ' (vbr)'
+        else
+            result := inttostr(Bitrate) + ' kbit/s';
+    end
+    else
+        result := '-?-';
+end;
+
+function TAudioFile.GetDurationForVST: String;
+begin
+    case fAudioType of
+        at_Undef  : result := 'Error: Undefined AudioType!';
+        at_File   : result := SekIntToMinStr(Duration);
+        at_Stream : result := '(inf)';
+        at_CDDA   : result := 'CDDA';
+    end;
+end;
+
 
 function TAudioFile.GetReplaceString(ReplaceValue: Integer): String;
 begin
@@ -822,21 +984,6 @@ begin
 end;
 
 
-
-procedure TAudioFile.SetPath(const Value: UnicodeString);
-begin
-  if IsStream then
-  begin
-      FStrings[siOrdner] := Value;
-      FStrings[siDateiname] := '';
-  end
-  else
-  begin
-      FStrings[siOrdner] := ExtractFilePath(Value);//ExtractFileDir(Value);
-      FStrings[siDateiname] := ExtractFileName(Value);
-  end;
-end;
-
 {
     --------------------------------------------------------
     Setter and Getter for String Values
@@ -862,27 +1009,32 @@ end;
 
 function TAudioFile.fGetPlaylistTitleString: UnicodeString;
 begin
-  if isStream then
-  begin
-      if (artist <> '') and (titel <> '') then  // could be the case on remote ogg-files (through "DoOggMeta")
-          result := Artist + ' - ' + NonEmptyTitle
-      else
-      begin
-          result := Description;
-          if (titel <> '') and (titel <> pfad) then
-              result := result + ' (' + titel + ')';
-      end;
-  end
-  else
-  begin
-      if UnKownInformation(Artist) then
-          result := NonEmptyTitle
-      else
-          result := Artist + ' - ' + NonEmptyTitle;
-  end;
+    case fAudioType of
+        at_Undef  : result := '';
 
-  if result = '' then
-      result := Pfad;
+        at_File,
+        at_CDDA   : begin
+            if UnKownInformation(Artist) then
+                result := NonEmptyTitle
+            else
+                result := Artist + ' - ' + NonEmptyTitle;
+        end;
+
+        at_Stream : begin
+            if (artist <> '') and (titel <> '') then  // could be the case on remote ogg-files (through "DoOggMeta")
+                result := Artist + ' - ' + NonEmptyTitle
+            else
+            begin
+                result := Description;
+                if (titel <> '') and (titel <> pfad) then
+                    result := result + ' (' + titel + ')';
+            end;
+
+        end;
+    end;
+
+    if result = '' then
+        result := Pfad;
 end;
 
 {
@@ -899,33 +1051,45 @@ begin
         result := ChangeFileExt(Dateiname, '')
     else
         result := Titel;
+
+    if result = '' then // possible at CD-DA, as there is no filename? (Check, if cdda-support is complete. ;-))
+        result := Pfad;
 end;
 
+{
+    --------------------------------------------------------
+    fGetProperFilename
+    Used for Copying the Playlist to USB (or whatever)
+    Only real files can be copied, no cdda, no webstreams
+    --------------------------------------------------------
+}
 function TAudioFile.fGetProperFilename: UnicodeString;
 begin
-  if isStream then
-      result := '//' // invalid Filename ;-)
-  else
-  begin
-      if UnKownInformation(Artist) then
-      begin
-          //if NonEmptyTitle <> Dateiname then
-              result := NonEmptyTitle + '.' + self.Extension
-          //else
-          //    result := Dateiname;
-      end
-      else
-      begin
-          //if NonEmptyTitle <> Dateiname then
-              result := Artist + ' - ' + NonEmptyTitle + '.' + self.Extension
-          //else
-          //    result := Artist + ' - ' + NonEmptyTitle;
-      end;
-      result := ReplaceForbiddenFilenameChars(result);
-  end;
+    case fAudioType of
+        at_Undef,
+        at_Stream,
+        at_CDDA: result := '//';  // invalid Filename ;-)
 
-  if result = '' then
-      result := ReplaceForbiddenFilenameChars(Dateiname);
+        at_File: begin
+              if UnKownInformation(Artist) then
+              begin
+                  //if NonEmptyTitle <> Dateiname then
+                      result := NonEmptyTitle + '.' + self.Extension
+                  //else
+                  //    result := Dateiname;
+              end
+              else
+              begin
+                  //if NonEmptyTitle <> Dateiname then
+                      result := Artist + ' - ' + NonEmptyTitle + '.' + self.Extension
+                  //else
+                  //    result := Artist + ' - ' + NonEmptyTitle;
+              end;
+              result := ReplaceForbiddenFilenameChars(result);
+        end;
+    end;
+    if result = '' then
+        result := ReplaceForbiddenFilenameChars(Dateiname);
 end;
 
 function TAudioFile.fGetTagList: TObjectList;
@@ -1023,6 +1187,7 @@ begin
     else
         Result := '';
 end;
+
 {
     --------------------------------------------------------
     Getter for LyricsExisting
@@ -1032,8 +1197,6 @@ function TAudioFile.fGetLyricsExisting: Boolean;
 begin
   result := flyrics <> '';
 end;
-
-
 
 {
     --------------------------------------------------------
@@ -1060,64 +1223,62 @@ end;
 function TAudioFile.GetAudioData(filename: UnicodeString; Flags: Integer = 0): TAudioError;
 var F: File;
 begin
-  // Set Filechecked to false.
-  FileChecked := False;
 
-  if PathSeemsToBeURL(filename) then
-  begin
-      IsStream := True;
-      Pfad := filename;
-      fFileSize := 0;
-      fFileAge  := Now;
-      result := AUDIOERR_None;
-  end
-  else
-  begin
-      try
-        IsStream := False;
-        fFileAge := GetFileCreationDateTime(filename);
-        // Get the extension and call the proper private method.
-        if (AnsiLowerCase(ExtractFileExt(filename)) = '.mp3')
-          or (AnsiLowerCase(ExtractFileExt(filename)) = '.mp2')
-          or (AnsiLowerCase(ExtractFileExt(filename)) = '.mp1')
-        then
-            result := Mp3ToAudioError(GetMp3Info(Filename, Flags))
-        else
-          if AnsiLowerCase(ExtractFileExt(filename)) = '.wma' then
-            result := GetWMAInfo(Filename)
-          else
-            if AnsiLowerCase(ExtractFileExt(filename)) = '.ogg' then
-              result := OggToAudioError(GetOggInfo(Filename, Flags))
-            else
-              if AnsiLowerCase(ExtractFileExt(filename)) = '.wav' then
-                result := GetWavInfo(Filename)
+  Pfad := filename; // Set Path and determine Audiotype (file, stream, CD-Audio)
+
+  case fAudioType of
+      at_File: begin
+          try
+              fFileAge := GetFileCreationDateTime(filename);
+              // Get the extension and call the proper private method.
+              if (AnsiLowerCase(ExtractFileExt(filename)) = '.mp3')
+                or (AnsiLowerCase(ExtractFileExt(filename)) = '.mp2')
+                or (AnsiLowerCase(ExtractFileExt(filename)) = '.mp1')
+              then
+                  result := Mp3ToAudioError(GetMp3Info(Filename, Flags))
               else
-                if AnsiLowerCase(ExtractFileExt(filename)) = '.flac' then
-                  result := FlacToAudioError(GetFlacInfo(filename, Flags))
+                if AnsiLowerCase(ExtractFileExt(filename)) = '.wma' then
+                  result := GetWMAInfo(Filename)
                 else
-                begin
-                    Pfad:=filename;
-                    result := AUDIOERR_UnsupportedMediaFile;
-                    FileIsPresent := FileExists(filename);
-                    FileChecked := FileIsPresent;
-                    if FileIsPresent then
-                    begin
-                      AssignFile(F, filename);
-                      FileMode := 0;
-                      Reset(F,1);
-                      fFileSize := filesize(f);
-                      CloseFile(F);
-                    end else
-                      fFileSize := 0;
-                    SetUnknown;
-                end;
-      except
-        Pfad:=filename;
-        result := AUDIOERR_Unkown;
-        FileIsPresent := FileExists(filename);
-        FileChecked := FileIsPresent;
-        fFileSize := 0;
-        SetUnknown;
+                  if AnsiLowerCase(ExtractFileExt(filename)) = '.ogg' then
+                    result := OggToAudioError(GetOggInfo(Filename, Flags))
+                  else
+                    if AnsiLowerCase(ExtractFileExt(filename)) = '.wav' then
+                      result := GetWavInfo(Filename)
+                    else
+                      if AnsiLowerCase(ExtractFileExt(filename)) = '.flac' then
+                        result := FlacToAudioError(GetFlacInfo(filename, Flags))
+                      else
+                      begin
+                          result := AUDIOERR_UnsupportedMediaFile;
+                          FileIsPresent := FileExists(filename);
+                          if FileIsPresent then
+                          begin
+                              AssignFile(F, filename);
+                              FileMode := 0;
+                              Reset(F,1);
+                              fFileSize := filesize(f);
+                              CloseFile(F);
+                          end else
+                              fFileSize := 0;
+                          SetUnknown;
+                      end;
+          except
+              result := AUDIOERR_Unkown;
+              FileIsPresent := FileExists(filename);
+              fFileSize := 0;
+              SetUnknown;
+          end;
+      end; // at_File
+
+      at_Stream: begin
+            fFileSize := 0;
+            fFileAge  := Now;
+            result := AUDIOERR_None;
+      end;
+
+      at_CDDA: begin
+
       end;
   end;
 end;
@@ -1150,7 +1311,6 @@ begin
         exit;
     end;
     FileIsPresent:=True;
-    FileChecked := True;
     mpeginfo:=TMpegInfo.Create;
     ID3v2Tag:=TID3V2Tag.Create;
     ID3v1tag:=TID3v1Tag.Create;
@@ -1167,8 +1327,6 @@ begin
 
     // read Tags from File
     result := GetMp3Details(filename,mpegInfo,ID3v2Tag,ID3v1tag);
-
-
 
     // If file was valid mp3-file:
     // Put the tag-info into the audiofile-structure.
@@ -1323,8 +1481,6 @@ begin
         exit;
     end;
     FileIsPresent := True;
-    FileChecked := True;
-    isStream := False;
 
     FlacFile := TFlacFile.Create;
     try
@@ -1413,8 +1569,6 @@ begin
         exit;
     end;
     FileIsPresent := True;
-    FileChecked := True;
-    isStream := False;
 
     OggVorbisFile := TOggVorbisFile.Create;
     try
@@ -1485,7 +1639,6 @@ begin
     end;
 
   FileIsPresent:=True;
-  FileChecked := True;
   wmaFile := TWMAFile.create;
   try
       if wmaFile.ReadFromFile(filename) then
@@ -1528,6 +1681,8 @@ begin
       wmaFile.Free;
   end;
 end;
+
+
 
 {
     --------------------------------------------------------
@@ -1589,7 +1744,6 @@ begin
         exit;
     end;
     FileIsPresent:=True;
-    FileChecked := True;
     Titel := ''; // Dateiname;
     Artist := '';
     Album := '';
@@ -1652,6 +1806,15 @@ begin
     end;
 end;
 
+
+function TAudioFile.GetCDDAInfo(Filename: UnicodeString;
+  Flags: Integer): TAudioError;
+begin
+//
+    //EnsureDriveList;
+end;
+
+
 {
     --------------------------------------------------------
     SetUnknown
@@ -1679,6 +1842,21 @@ end;
 
 {
     --------------------------------------------------------
+    IsQuickEditable
+    --------------------------------------------------------
+}
+function TAudioFile.IsQuickEditable: Boolean;
+begin
+    result := (fAudioType = at_File)
+          and (
+               (AnsiLowercase(Extension) = 'mp3')
+            or (AnsiLowercase(Extension) = 'ogg')
+            or (AnsiLowercase(Extension) = 'flac')
+          );
+end;
+
+{
+    --------------------------------------------------------
     QuickFileUpdate
     Write Rating and PlayCounter to the file
     Used by the Player-Postprocessor
@@ -1693,15 +1871,9 @@ begin
     else
     begin
         result := AUDIOERR_UnsupportedMediaFile;
-        //if aFileName = '' then
-        localName := self.Pfad;
-        //else
-        //    localName := aFileName;
-
-        if PathSeemsToBeURL(localName) then
-            // Nothing to do.
-        else
+        if fAudioType = at_File then
         begin
+            localName := self.Pfad;
             try
                 // Get the extension and call the proper private method.
                 if (AnsiLowerCase(ExtractFileExt(localName)) = '.mp3')
@@ -1716,7 +1888,7 @@ begin
                     if AnsiLowerCase(ExtractFileExt(localName)) = '.flac' then
                         result := FlacToAudioError(QuickUpdateFlacTag(localName))
             except
-
+                // silent exception
             end;
         end;
     end;
@@ -1833,25 +2005,21 @@ begin
     begin
         result := AUDIOERR_UnsupportedMediaFile;
 
-        if IsStream then
-        // we cannot write tags into a webstream
-            exit;
-
-        if (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp3')
-              or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp2')
-              or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp1')
-        then
+        if IsFile then
         begin
-            result := Mp3ToAudioError(SetMp3Data(pfad));
+            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp3')
+                or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp2')
+                or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp1')
+            then
+                result := Mp3ToAudioError(SetMp3Data(pfad));
+
+            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
+                result := OggToAudioError(SetOggVorbisData(pfad));
+
+            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.flac') then
+                result := FlacToAudioError(SetFlacData(pfad));
         end;
-
-        if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
-            result := OggToAudioError(SetOggVorbisData(pfad));
-
-        if (AnsiLowerCase(ExtractFileExt(pfad)) = '.flac') then
-            result := FlacToAudioError(SetFlacData(pfad));
     end;
-
 end;
 
 {
@@ -2257,6 +2425,7 @@ begin
   end;
 end;
 
+
 {
     --------------------------------------------------------
     LoadFromStream
@@ -2373,17 +2542,14 @@ begin
         case ID of
             MP3DB_PFAD: begin
                 tmp := ReadTextFromStream(aStream);
-                if PathSeemsToBeURL(tmp) then
+                Pfad := tmp;
+                if fAudioType = at_File then
                 begin
-                    isStream := True;
-                    FileIsPresent := True;
-                    Pfad := tmp;
+                    pfad := ExpandFilename(tmp);
                 end else
                 begin
-                    isStream := False;
-                    pfad := ExpandFilename(tmp);
+                    FileIsPresent := True;
                 end;
-
             end;
             MP3DB_ARTIST: Artist := ReadTextFromStream(aStream);
             MP3DB_TITEL: Titel := ReadTextFromStream(aStream);

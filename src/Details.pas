@@ -1223,112 +1223,109 @@ begin
   end else
   begin
         Timer1.Enabled := False;
-        If not (Fileexists(CurrentAudioFile.Pfad) OR CurrentAudioFile.isStream) then
+        if not CurrentAudioFile.ReCheckExistence then
         begin
-          Lbl_Warnings.Caption := (Warning_FileNotFound);
-          Lbl_Warnings.Hint := (Warning_FileNotFound_Hint);
-          PnlWarnung.Visible := True;
+            Lbl_Warnings.Caption := (Warning_FileNotFound);
+            Lbl_Warnings.Hint := (Warning_FileNotFound_Hint);
+            PnlWarnung.Visible := True;
         end;
 
         //DateiPfad := Pfad;
         LBLPfad.Caption := CurrentAudioFile.Ordner;
         LBLName.Caption := CurrentAudioFile.DateiName;
 
-        if CurrentAudioFile.isStream then
-        begin
-          FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Ordner]);
+        case CurrentAudioFile.AudioType of
+            at_File: begin
+                    FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Dateiname]);
 
-          LlblConst_Path.Caption := (DetailForm_InfoLblWebStream);
-          LlblConst_Filename.Caption := (DetailForm_InfoLblDescription);
-          Lblsize.Font.Style := [fsbold];
-          LlblConst_FileSize.Font.Style := [fsbold];
-          LlblConst_Filesize.Caption := (DetailForm_InfoLblHint);
-          LBLSize.Caption := (DetailForm_InfoLblHinttext);
-          LBLPfad.Font.Color := clblue;
-          LBLPfad.Font.Style := [fsUnderline];
-          LBLPfad.OnClick := LBLPfadClick;
-          LBLPfad.PopupMenu := PM_URLCopy;
-          LBLPfad.Cursor := crHandPoint;
-          LBLDauer.Caption := '(inf)';
-          LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
-          LBLSamplerate.Caption := '-';
-          LblPlayCounter.Caption := '';
-        end
-        else
-        begin
-          FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Dateiname]);
+                    if Not FileExists(CurrentAudioFile.Pfad) then
+                        FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_FileNotFound
+                    else
+                        if FileIsWriteProtected(CurrentAudioFile.Pfad) then
+                            FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_WriteProtected ;
 
-          if Not FileExists(CurrentAudioFile.Pfad) then
-              FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_FileNotFound
-          else
-              if FileIsWriteProtected(CurrentAudioFile.Pfad) then
-                  FDetails.Caption := FDetails.Caption + ' ' + DetailForm_Caption_WriteProtected ;
+                    LlblConst_Path.Caption := (DetailForm_InfoLblPath);
+                    LlblConst_Filename.Caption := (DetailForm_InfoLblFilename);
+                    Lblsize.Font.Style := [];
+                    LlblConst_Filesize.Font.Style := [];
+                    LlblConst_FileSize.Caption := (DetailForm_InfoLblFileSize);
+                    LBLSize.Caption := FloatToStrF((CurrentAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB'
+                                    + ' (' + inttostr(CurrentAudioFile.Size) + ' Bytes)' ;
+                    LBLPfad.Font.Color := clWindowText;
+                    LBLPfad.Font.Style := [];
+                    LBLPfad.OnClick := NIL;
+                    LBLPfad.PopupMenu := NIL;
+                    LBLPfad.Cursor := crDefault;
+                    LBLDauer.Caption  := SekToZeitString(CurrentAudioFile.Duration);
 
-          LlblConst_Path.Caption := (DetailForm_InfoLblPath);
-          LlblConst_Filename.Caption := (DetailForm_InfoLblFilename);
-          Lblsize.Font.Style := [];
-          LlblConst_Filesize.Font.Style := [];
-          LlblConst_FileSize.Caption := (DetailForm_InfoLblFileSize);
-          LBLSize.Caption := FloatToStrF((CurrentAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB'
-                          + ' (' + inttostr(CurrentAudioFile.Size) + ' Bytes)' ;
-          LBLPfad.Font.Color := clWindowText;
-          LBLPfad.Font.Style := [];
-          LBLPfad.OnClick := NIL;
-          LBLPfad.PopupMenu := NIL;
-          LBLPfad.Cursor := crDefault;
-          LBLDauer.Caption  := SekToZeitString(CurrentAudioFile.Duration);
+                    if CurrentAudioFile.vbr then
+                        LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s (vbr)'
+                    else
+                        LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
+                    LBLSamplerate.Caption := CurrentAudioFile.Samplerate + ', ' + CurrentAudioFile.ChannelMode;
 
-          if CurrentAudioFile.vbr then
-              LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s (vbr)'
-          else
-              LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
-          LBLSamplerate.Caption := CurrentAudioFile.Samplerate + ', ' + CurrentAudioFile.ChannelMode;
+                    if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
+                    begin
+                        CurrentBibRating := CurrentAudioFile.Rating;
+                        CurrentBibCounter:= CurrentAudioFile.PlayCounter;
+                    end
+                    else
+                    begin
+                        mbAudioFile := MedienBib.GetAudioFileWithFilename(CurrentAudioFile.Pfad);
+                        if assigned(mbAudioFile) then
+                        begin
+                            CurrentBibRating := mbAudioFile.Rating;
+                            CurrentBibCounter:= mbAudioFile.PlayCounter;
+                        end else
+                        begin
+                            // File is not in MediaLibrary, but PlaylistFile
+                            // use data from the metatag
+                            if ValidMp3File then
+                            begin
+                                CurrentBibRating := ID3v2Tag.Rating;
+                                CurrentBibCounter:= ID3v2Tag.PlayCounter;
+                            end;
+                            if ValidOggFile then
+                            begin
+                                CurrentBibRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
+                                CurrentBibCounter:= StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                            end;
+                            if ValidFlacFile then
+                            begin
+                                CurrentBibRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
+                                CurrentBibCounter:= StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                            end;
+                        end;
+                    end;
+                    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
+                    LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [CurrentBibCounter]);
+            end;
 
+            at_Stream: begin
+                    FDetails.Caption := Format('%s (%s)', [(DetailForm_Caption), CurrentAudioFile.Ordner]);
+                    LlblConst_Path.Caption := (DetailForm_InfoLblWebStream);
+                    LlblConst_Filename.Caption := (DetailForm_InfoLblDescription);
+                    Lblsize.Font.Style := [fsbold];
+                    LlblConst_FileSize.Font.Style := [fsbold];
+                    LlblConst_Filesize.Caption := (DetailForm_InfoLblHint);
+                    LBLSize.Caption := (DetailForm_InfoLblHinttext);
+                    LBLPfad.Font.Color := clblue;
+                    LBLPfad.Font.Style := [fsUnderline];
+                    LBLPfad.OnClick := LBLPfadClick;
+                    LBLPfad.PopupMenu := PM_URLCopy;
+                    LBLPfad.Cursor := crHandPoint;
+                    LBLDauer.Caption := '(inf)';
+                    LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
+                    LBLSamplerate.Caption := '-';
+                    LblPlayCounter.Caption := '';
+            end;
 
-          if fFilefromMedienBib and (NOT MedienBib.AnzeigeShowsPlaylistFiles) then
-          begin
-              CurrentBibRating := CurrentAudioFile.Rating;
-              CurrentBibCounter:= CurrentAudioFile.PlayCounter;
-          end
-          else
-          begin
-              mbAudioFile := MedienBib.GetAudioFileWithFilename(CurrentAudioFile.Pfad);
-              if assigned(mbAudioFile) then
-              begin
-                  CurrentBibRating := mbAudioFile.Rating;
-                  CurrentBibCounter:= mbAudioFile.PlayCounter;
-                  // CurrentAudioFile.Rating := mbAudioFile.Rating;
+            at_CDDA: begin
+                // todo
 
-              end else
-              begin
-                  // File is not in MediaLibrary, but PlaylistFile
-                  // use data from the metatag
-                  if ValidMp3File then
-                  begin
-                      CurrentBibRating := ID3v2Tag.Rating;
-                      CurrentBibCounter:= ID3v2Tag.PlayCounter;
-                  end;
-                  if ValidOggFile then
-                  begin
-                      CurrentBibRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                      CurrentBibCounter:= StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
-
-                      //CurrentBibRating := OggVorbisFile.Rating;
-                      //CurrentBibCounter:= OggVorbisFile.PlayCounter;
-                  end;
-                  if ValidFlacFile then
-                  begin
-                      CurrentBibRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                      CurrentBibCounter:= StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
-
-                      //CurrentBibRating := FlacFile.Rating;
-                      //CurrentBibCounter:= FlacFile.PlayCounter;
-                  end;
-              end;
-          end;
-          DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
-          LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [CurrentBibCounter]);
+            end;
         end;
+
         LBLArtist.Caption := CurrentAudioFile.GetReplacedArtist(Nemp_MainForm.NempOptions.ReplaceNAArtistBy); // Artist;
         LBLTitel.Caption  := CurrentAudioFile.GetReplacedTitle(Nemp_MainForm.NempOptions.ReplaceNATitleBy)  ; // Titel;
         LBLAlbum.Caption  := CurrentAudioFile.GetReplacedAlbum(Nemp_MainForm.NempOptions.ReplaceNAAlbumBy) ;  //Album;
