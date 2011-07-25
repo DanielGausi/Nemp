@@ -85,7 +85,8 @@ uses
   ExPopupList in 'ExPopupList.pas',
   PlaylistToUSB in 'PlaylistToUSB.pas' {PlaylistCopyForm},
   ErrorForm in 'ErrorForm.pas' {FError},
-  BasicSettingsWizard in 'BasicSettingsWizard.pas' {Wizard};
+  BasicSettingsWizard in 'BasicSettingsWizard.pas' {Wizard},
+  cddaUtils in 'cddaUtils.pas';
 
 //,  classes;
 

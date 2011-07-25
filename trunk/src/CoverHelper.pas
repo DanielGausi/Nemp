@@ -631,7 +631,6 @@ begin
                 begin // in Dateien rund um das Audiofile nach nem Bild suchen
                     coverliste := TStringList.Create;
                     Medienbib.GetCoverListe(aAudioFile,coverliste);
-
                     try
                         if Not GetCoverFromList(CoverListe, aCoverbmp) then
                         begin
@@ -643,11 +642,8 @@ begin
                         GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
                         result := false;
                     end;
-
                     coverliste.free;
-
                 end;
-
             end;
       end;
   except

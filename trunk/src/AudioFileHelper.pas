@@ -956,26 +956,36 @@ begin
 
                     begin
                           s := myList[i];
-                          if PathSeemsToBeURL(s) then
-                          begin
-                              aAudioFile.isStream := True;
-                              aAudioFile.FileIsPresent := True;
-                              aAudioFile.Pfad := s;
-                              aAudioFile.Artist := ''; // Titel und Artist stehen im Tag des Streams,
-                              aAudiofile.Titel  := ''; // der noch gar nicht da ist
-                              aAudioFile.Titel := aAudioFile.Pfad
-                          end else
-                          begin
-                              aAudioFile.Pfad := ExpandFilename(s);
-                              aAudioFile.FileIsPresent := True;
-                              if AutoScan then
-                              begin
-                                  SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
-                                  aAudiofile.GetCueList;
-                              end else
-                              begin
-                                  aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                                  aAudioFile.Artist := '';
+                          case GetAudioTypeFromFilename(s) of
+                              at_File: begin
+                                  aAudioFile.AudioType := at_File;
+                                  aAudioFile.Pfad := ExpandFilename(s);
+                                  aAudioFile.FileIsPresent := True;
+                                  if AutoScan then
+                                  begin
+                                      SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                      aAudiofile.GetCueList;
+                                  end else
+                                  begin
+                                      aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
+                                      aAudioFile.Artist := '';
+                                  end;
+
+                              end;
+
+                              at_Stream: begin
+                                  aAudioFile.AudioType := at_Stream;
+                                  aAudioFile.FileIsPresent := True;
+                                  aAudioFile.Pfad := s;
+                                  aAudioFile.Artist := ''; // Titel und Artist stehen im Tag des Streams,
+                                  aAudiofile.Titel  := ''; // der noch gar nicht da ist
+                                  aAudioFile.Titel := aAudioFile.Pfad
+                              end;
+
+                              at_CDDA: begin
+                                  aAudioFile.AudioType := at_CDDA;
+                                  aAudioFile.Pfad := s;
+                                  // todo
                               end;
                           end;
                     end;
@@ -993,24 +1003,32 @@ begin
                     s := mylist[i];
                     if trim(s)='' then continue;
                     aAudioFile := TPlaylistfile.create;
-                    if PathSeemsToBeURL(s) then
-                    begin
-                        aAudioFile.isStream := True;
-                        aAudioFile.FileIsPresent := True;
-                        aAudioFile.Pfad := s;
-                        aAudioFile.Titel := aAudioFile.Pfad
-                    end else
-                    begin
-                        aAudioFile.Pfad := ExpandFilename(s);
-                        aAudioFile.FileIsPresent := True;
-                        if AutoScan then
-                        begin
-                            SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
-                            aAudiofile.GetCueList;
-                        end else
-                        begin
-                            aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                            aAudioFile.Artist := '';
+
+                    case GetAudioTypeFromFilename(s) of
+                        at_File: begin
+                            aAudioFile.AudioType := at_File;
+                            aAudioFile.Pfad := ExpandFilename(s);
+                            aAudioFile.FileIsPresent := True;
+                            if AutoScan then
+                            begin
+                                SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                aAudiofile.GetCueList;
+                            end else
+                            begin
+                                aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
+                                aAudioFile.Artist := '';
+                            end;
+                        end;
+
+                        at_Stream: begin
+                            aAudioFile.AudioType := at_Stream;
+                            aAudioFile.FileIsPresent := True;
+                            aAudioFile.Pfad := s;
+                            aAudioFile.Titel := aAudioFile.Pfad
+                        end;
+
+                        at_CDDA: begin
+                            aAudioFile.AudioType := at_CDDA;
                         end;
                     end;
                     TargetList.Add(aAudiofile);
@@ -1042,30 +1060,38 @@ begin
 
         aAudioFile := TPlaylistfile.create;
 
-        if PathSeemsToBeURL(newFilename) then
-        begin
-          aAudioFile.isStream := True;
-          aAudioFile.FileIsPresent := True;
-          aAudioFile.Pfad := newFilename;
-          newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
-          //if newTitel <> '' then
-              aAudioFile.Description :=  NewTitel
-          //else
-          //    aAudioFile.Description := aAudioFile.Pfad;
-          // aAudioFile.Titel := aAudioFile.Description;
-        end else
-        begin
-          newFilename := ExpandFilename(newFilename);
-          aAudioFile.Pfad := newFilename;
-          aAudioFile.Duration := Ini.ReadInteger('playlist','Length'+IntToStr(i),0);
-          newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
-          aAudioFile.Artist := copy(newTitel,1, pos(' - ',newTitel));
-          aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
-          if AutoScan then
-          begin
-              SynchronizeAudioFile(aAudioFile, newFilename, False);
-              aAudiofile.GetCueList;
-          end;
+        case GetAudioTypeFromFilename(newFilename) of
+            at_File: begin
+                newFilename := ExpandFilename(newFilename);
+                aAudioFile.AudioType := at_File;
+                aAudioFile.Pfad := newFilename;
+                aAudioFile.Duration := Ini.ReadInteger('playlist','Length'+IntToStr(i),0);
+                newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
+                aAudioFile.Artist := copy(newTitel,1, pos(' - ',newTitel));
+                aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
+                if AutoScan then
+                begin
+                    SynchronizeAudioFile(aAudioFile, newFilename, False);
+                    aAudiofile.GetCueList;
+                end;
+            end;
+
+            at_Stream: begin
+                aAudioFile.AudioType := at_Stream;
+                aAudioFile.FileIsPresent := True;
+                aAudioFile.Pfad := newFilename;
+                newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
+                //if newTitel <> '' then
+                    aAudioFile.Description :=  NewTitel
+                //else
+                //    aAudioFile.Description := aAudioFile.Pfad;
+                // aAudioFile.Titel := aAudioFile.Description;
+            end;
+
+            at_CDDA: begin
+                aAudioFile.AudioType := at_CDDA;
+                // todo
+            end;
         end;
         TargetList.Add(aAudiofile);
       end;
@@ -1103,11 +1129,11 @@ begin
                       //if NewAudioFile.isStream then
                       //  NewAudioFile.Description := NewAudioFile.Titel;
 
-                      if AutoScan and not NewAudioFile.isStream then
-                          NewAudioFile.FileIsPresent := FileExists(NewAudioFile.Pfad)
+                      if AutoScan then
+                          NewAudioFile.ReCheckExistence
                       else
                           NewAudioFile.FileIsPresent := True;
-                      NewAudioFile.FileChecked := True;
+
                       TargetList.Add(NewAudioFile);
                   end;
               end else
@@ -1148,26 +1174,35 @@ begin
 
                         aAudiofile := TPlaylistfile.Create;
 
-                        if PathSeemsToBeURL(s) then
-                        begin
-                            aAudioFile.isStream := True;
-                            aAudioFile.FileIsPresent := True;
-                            aAudioFile.Pfad := s;
-                            aAudioFile.Titel := aAudioFile.Pfad
-                        end else
-                        begin
-                            aAudioFile.Pfad := ExpandFilename(s);
-                            aAudioFile.FileIsPresent := True;
-                            if AutoScan then
-                            begin
-                                SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
-                                aAudiofile.GetCueList;
-                            end else
-                            begin
-                                aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
-                                aAudioFile.Artist := '';
+                        case GetAudioTypeFromFilename(s) of
+                            at_File: begin
+                                aAudioFile.AudioType := at_File;
+                                aAudioFile.Pfad := ExpandFilename(s);
+                                aAudioFile.FileIsPresent := True;
+                                if AutoScan then
+                                begin
+                                    SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                    aAudiofile.GetCueList;
+                                end else
+                                begin
+                                    aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
+                                    aAudioFile.Artist := '';
+                                end;
+                            end;
+
+                            at_Stream: begin
+                                aAudioFile.AudioType := at_Stream;
+                                aAudioFile.FileIsPresent := True;
+                                aAudioFile.Pfad := s;
+                                aAudioFile.Titel := aAudioFile.Pfad
+                            end;
+
+                            at_CDDA: begin
+                                aAudioFile.AudioType := at_CDDA;
+                                // todo
                             end;
                         end;
+
                         TargetList.Add(aAudiofile);
                     end;
                 end;

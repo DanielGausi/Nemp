@@ -224,7 +224,7 @@ type
       procedure ActualizeCue;
       // Get Audiodata from the current selected Node and repaint it
       // used e.g. in OnChange of the TreeView
-      procedure ActualizeNode(aNode: pVirtualNode);
+      procedure ActualizeNode(aNode: pVirtualNode; SynchFile: Boolean);
       procedure UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
       function ShowPlayListSummary: Int64;
 
@@ -467,10 +467,8 @@ begin
         ScrollToPlayingNode;
         // Anzeige Im Baum aktualisieren
         VST.Invalidate;
-        // Knoten aktualisieren - u.A. AudioDaten neu einlesen
-        // bei Player.Play() kommt zuerst GetAudioData, dann Korrekturen der bass dran
-        // d.h. Hier wird dann GetAudioData nicht erneut ausgeführt!
-        ActualizeNode(fPlayingNode);
+        // Knoten aktualisieren
+        ActualizeNode(fPlayingNode, false);
         ActualizeCue;
       end;
 
@@ -842,15 +840,13 @@ var i: Integer;
 begin
   for i := Playlist.Count - 1 downto 0 do
   begin
-    if (NOT TPlaylistFile(Playlist.Items[i]).isStream)
-        AND (NOT FileExists(TPlaylistFile(Playlist.Items[i]).Pfad))
-        then
-        begin
-            PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
-            HistoryList.Remove(TPlaylistFile(Playlist.Items[i]));
-            RemoveFileFromHistory(TPlaylistFile(Playlist.Items[i]));
-            Playlist.Delete(i);
-        end;
+      if not TPlaylistFile(Playlist.Items[i]).ReCheckExistence then
+      begin
+          PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
+          HistoryList.Remove(TPlaylistFile(Playlist.Items[i]));
+          RemoveFileFromHistory(TPlaylistFile(Playlist.Items[i]));
+          Playlist.Delete(i);
+      end;
   end;
   ReIndexPrebookedFiles;
   FillPlaylistView;
@@ -993,33 +989,45 @@ begin
     VST.Invalidate;
 end;
 
-procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode);
+procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode; SynchFile: Boolean);
 var Data: PTreeData;
     AudioFile: TPlaylistFile;
     OldLength: Int64;
+
 begin
     if not assigned(aNode) then exit;
     Data := VST.GetNodeData(aNode);
     AudioFile := Data^.FAudioFile;
     OldLength := AudioFile.Duration;
-    if not (FileExists(AudioFile.Pfad) OR AudioFile.isStream) then
-    begin
-      AudioFile.FileIsPresent := False;
-      AudioFile.Duration := 0;
-    end
-    else
-    begin
-      AudioFile.FileIsPresent := True;
-      if (Not AudioFile.FileChecked) AND (Not AudioFile.isStream) then
-      begin
-          SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
-      end;
-      if (Not AudioFile.isStream) and (not assigned(AudioFile.CueList)) then
-      begin
-        // nach einer Liste suchen und erstellen
-        AudioFile.GetCueList;
-        AddCueListNodes(AudioFile, aNode);
-      end;
+
+    AudioFile.ReCheckExistence;
+
+    case AudioFile.AudioType of
+        at_File   : begin
+            if not AudioFile.FileIsPresent then
+                AudioFile.Duration := 0;
+
+            if SynchFile then
+                SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
+
+            if not assigned(AudioFile.CueList) then
+            begin
+              // nach einer Liste suchen und erstellen
+              AudioFile.GetCueList;
+              AddCueListNodes(AudioFile, aNode);
+            end;
+        end;
+
+        at_Stream : begin
+            AudioFile.Duration := 0;
+        end;
+
+        at_CDDA   : begin
+            // todo
+            // wenn snchfile, dann infos neu lesen. sonst nicht
+            // dabei Fallunterscheidung. Bei Nempotions.readCDDB mit cddb, sonst ohne
+            //       (geht über Flags bei GetAudioData)
+        end;
     end;
     fDauer := fDauer + (AudioFile.Duration - OldLength);
     VST.Header.Columns[1].Text := SekToPlaylistZeitString(fDauer);
@@ -1099,7 +1107,6 @@ var NewNode: PVirtualNode;
 begin
   newAudiofile := TAudioFile.Create;
   newAudiofile.Assign(AudioFile);
-  newAudiofile.FileChecked := True;
 
   Playlist.Add(newAudiofile);
   NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
@@ -1120,16 +1127,11 @@ function TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName
 var NewFile: TPlaylistfile;
 begin
   NewFile := TPlaylistfile.Create;
+  NewFile.Pfad := aAudiofileName;
 
-  if not PathSeemsToBeURL(aAudiofileName) then
-  begin
+  if NewFile.AudioType = at_File then
       SynchronizeAudioFile(NewFile, aAudioFileName);
-  end
-  else
-  begin
-      NewFile.isStream := True;
-      NewFile.Pfad := aAudiofileName;
-  end;
+
   result := AddFileToPlaylist(NewFile, aCueName);
   NewFile.Free;
 end;
@@ -1140,8 +1142,6 @@ var NewNode: PVirtualNode;
 begin
   newAudiofile := TAudioFile.Create;
   newAudiofile.Assign(AudioFile);
-
-  newAudiofile.FileChecked := True;
 
   if InsertNode <> NIL then
   begin
@@ -1170,15 +1170,10 @@ function TNempPlaylist.InsertFileToPlayList(aAudiofileName: UnicodeString; aCueN
 var NewFile: TPlaylistfile;
 begin
   NewFile := TPlaylistfile.Create;
-  if not PathSeemsToBeURL(aAudiofileName) then
-  begin
+  NewFile.Pfad := aAudiofileName;
+
+  if NewFile.AudioType = at_File then
       SynchronizeAudioFile(NewFile, aAudioFileName);
-  end
-  else
-  begin
-      NewFile.isStream := True;
-      NewFile.Pfad := aAudiofileName;
-  end;
 
   result := InsertFileToPlayList(NewFile, aCueName);
   NewFile.Free;
@@ -1481,16 +1476,19 @@ begin
       begin
           aAudiofile := Playlist[i] as TPlaylistfile;
 
-          if PathSeemsToBeURL(aAudioFile.Pfad) then
-          begin
-              myAList.add('#EXTINF:' + '0,' + aAudioFile.Description);
-              myAList.Add(aAudioFile.Pfad);
-          end
-          else
-          begin
-              myAList.add('#EXTINF:' + IntTostr(aAudiofile.Duration) + ','
-                  + aAudioFile.Artist + ' - ' + aAudioFile.Titel);
-              myAList.Add(ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+          case aAudioFile.AudioType of
+              at_File: begin
+                  myAList.add('#EXTINF:' + IntTostr(aAudiofile.Duration) + ','
+                      + aAudioFile.Artist + ' - ' + aAudioFile.Titel);
+                  myAList.Add(ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+              end;
+              at_Stream: begin
+                  myAList.add('#EXTINF:' + '0,' + aAudioFile.Description);
+                  myAList.Add(aAudioFile.Pfad);
+              end;
+              at_CDDA: begin
+                  // todo
+              end;
           end;
       end;
       try
@@ -1516,19 +1514,21 @@ begin
           // erster Index in pls ist 1, nicht 0
           begin
               aAudiofile := Playlist[i-1] as TPlaylistfile;
-              if PathSeemsToBeURL(aAudioFile.Pfad) then
-              begin
-                  ini.WriteString ('playlist', 'File'  + IntToStr(i), aAudioFile.Pfad );
-                  ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Description);
-                  ini.WriteInteger('playlist', 'Length'+ IntToStr(i), 0);
-              end
-              else
-              begin
-                  ini.WriteString ('playlist', 'File'  + IntToStr(i), ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
-                  ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Artist + ' - ' + aAudioFile.Titel);
-                  ini.WriteInteger('playlist', 'Length'+ IntToStr(i), aAudioFile.Duration);
+              case aAudioFile.AudioType of
+                  at_File: begin
+                      ini.WriteString ('playlist', 'File'  + IntToStr(i), ExtractRelativePathNew(aFilename, aAudioFile.Pfad ));
+                      ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Artist + ' - ' + aAudioFile.Titel);
+                      ini.WriteInteger('playlist', 'Length'+ IntToStr(i), aAudioFile.Duration);
+                  end;
+                  at_Stream: begin
+                      ini.WriteString ('playlist', 'File'  + IntToStr(i), aAudioFile.Pfad );
+                      ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Description);
+                      ini.WriteInteger('playlist', 'Length'+ IntToStr(i), 0);
+                  end;
+                  at_CDDA:  begin
+                      // todo
+                  end;
               end;
-
           end;
           ini.WriteInteger('playlist', 'NumberOfEntries', PlayList.Count);
           ini.WriteInteger('playlist', 'Version', 2);
@@ -1559,10 +1559,17 @@ begin
           for i := 0 to Playlist.Count - 1 do
           begin
               aAudioFile := TAudioFile(Playlist[i]);
-              if PathSeemsToBeURL(aAudioFile.Pfad) then
-                  aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
-              else
-                  aAudioFile.SaveToStream(tmpStream, ExtractRelativePathNew(aFilename, TAudioFile(Playlist[i]).Pfad ) );
+              case aAudioFile.AudioType of
+                  at_File: begin
+                      aAudioFile.SaveToStream(tmpStream, ExtractRelativePathNew(aFilename, TAudioFile(Playlist[i]).Pfad ) );
+                  end;
+                  at_Stream: begin
+                      aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
+                  end;
+                  at_CDDA: begin
+                      // todo
+                  end;
+              end;
           end;
           try
               tmpStream.SaveToFile(aFilename);

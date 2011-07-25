@@ -793,7 +793,6 @@ begin
                                   tmpPlaylist  := TObjectList.Create(True);
                                   try
                                       tmpAudioFile := TAudioFile.Create;
-                                      tmpAudioFile.isStream := True;
                                       tmpAudioFile.Pfad := String(PChar(aMsg.LParam));
 
                                       tmpPlaylist.Add(tmpAudioFile);

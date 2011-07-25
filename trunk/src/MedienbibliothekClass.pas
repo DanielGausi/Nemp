@@ -4568,7 +4568,8 @@ begin
             begin
                 newURL := ini.ReadString('playlist','File'+ IntToStr(i),'');
                 if newURL = '' then continue;
-                if PathSeemsToBeURL(newURL) then
+
+                if GetAudioTypeFromFilename(newURL) = at_Stream then
                 begin
                     NewStation := TStation.Create(MainWindowHandle);
                     NewStation.URL := newURL;

@@ -2524,7 +2524,7 @@ begin
       begin
           // nur neu Scrobbeln, wenn es vorher nicht getan wurde.
           // Sonst wird der Zeitzähler zurückgesetzt, und Submitten ggf. unterbunden
-          if not NempPlayer.MainAudioFile.IsStream then
+          if NempPlayer.MainAudioFile.IsFile then
           begin
               NempPlayer.NempScrobbler.ChangeCurrentPlayingFile(NempPlayer.MainAudioFile);
               NempPlayer.NempScrobbler.PlaybackStarted;
