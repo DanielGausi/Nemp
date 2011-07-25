@@ -51,12 +51,18 @@ type
             property Duration : Integer read fDuration  ;
             property Track    : Integer read fTrack     ;
 
+            constructor Create;
+
             function GetData(aPath: String; UseCDDB: Boolean): TCddaError;
 
     end;
 
     procedure EnsureDriveListIsFilled;
     function BassErrorToCDError(aError: Integer): TCddaError;
+
+    function SameDrive(A, B: String): Boolean;
+    function AudioDriveNumber(aPath: String): Integer;
+
 
 
 var
@@ -98,6 +104,35 @@ begin
         BASS_ERROR_NOCD     : result := cddaErr_DriveNotReady;
         BASS_ERROR_CDTRACK  : result := cddaErr_invalidTrackNumber;
         BASS_ERROR_NOTAUDIO : result := cddaErr_NoAudioTrack;
+    end;
+end;
+
+function SameDrive(A, B: String): Boolean;
+var cd: TCDDAFile;
+    DriveA: Char;
+begin
+    cd := TCDDAFile.Create;
+    try
+        DriveA := cd.fGetDriveChar(A);
+        result := DriveA = cd.fGetDriveChar(B);
+    finally
+        cd.Free;
+    end;
+end;
+
+function AudioDriveNumber(aPath: String): Integer;
+var cd: TCDDAFile;
+    DriveA: Char;
+begin
+    cd := TCDDAFile.Create;
+    try
+        if cd.fGetDriveChar(aPath) <> #0 then
+            // Get DriveNumber from DriveLetter
+            result := cd.fGetDriveNumber(cd.fDriveLetter)
+        else
+            result := -1;
+    finally
+        cd.Free;
     end;
 end;
 
@@ -194,6 +229,12 @@ end;
     Get Artist/Titel/Album from CD-Text
     --------------------------------------------------------
 }
+constructor TCDDAFile.Create;
+begin
+    // Get List of all Drives, if not already done
+    EnsureDriveListIsFilled;
+end;
+
 function TCDDAFile.fGetDataFromCDText(aDrive, aTrack: Integer): Boolean;
 var CompleteText: PAnsiChar;
     OneEntry: PAnsiChar;
@@ -219,68 +260,20 @@ begin
     CompleteText := BASS_CD_GetID(aDrive, BASS_CDID_TEXT);
     if CompleteText <> NIL then
     begin
+        result := True;
         fAlbum := GetValue('TITLE0', CompleteText);
         fTitle := GetValue('TITLE'+IntToStr(aTrack), CompleteText);
         fArtist:= GetValue('PERFORMER'+IntToStr(aTrack), CompleteText);
         if fArtist = '' then
             fArtist:= GetValue('PERFORMER0', CompleteText); // Album-Artist
-
-
-
-    {
-    TITLE0=Ana Johnsson   The Way I Am
-TITLE1=We Are (Video Version)
-TITLE2=Don't Cry For Pain (Album Version)
-TITLE3=The Way I Am (Album Version)
-TITLE4=I'm Stupid (Album Version)
-TITLE5=Life (Album Version)
-TITLE6=6 Feet Under (Album Version)
-TITLE7=Coz I Can (Re-mix)
-TITLE8=Crest Of The Way (Album Version)
-TITLE9=L.A. (Album Version)
-TITLE10=Now It's Gone (Album Version)
-TITLE11=Here I Go Again (Album Version)
-PERFORMER0=Ana Johnsson
-    }
-
     end else
         result := False;
-{
-
-         tag := Format('TITLE%d=', [a + 1]); // the CD-TEXT tag to look for
-
-         if (Copy(t, 1, Length(tag)) = tag) then // found the track title...
-         begin
-           text := Copy(t, Length(tag)+1, Length(t) - Length(tag)); // replace "track x" with title
-           Break;
-         end;
-
-
-var s, t: PAnsiChar;
-begin
-    Memo1.lines.Clear;
-
-    s := BASS_CD_GetID(curdrive, BASS_CDID_TEXT);
-    t := s;
-
-    while (trim(t) <> '') do
-    begin
-        showmessage(t);
-        Memo1.Lines.Add(t);
-        t := t + Length(t) +1 ;
-    end;
-
-
-}
-
 end;
 
 
 function TCDDAFile.GetData(aPath: String; UseCDDB: Boolean): TCddaError;
 var ByteLength: DWord;
 begin
-    // Get List of all Drives, if not already done
-    EnsureDriveListIsFilled;
 
     // Get DriveLetter from Path
     if fGetDriveChar(aPath) <> #0 then

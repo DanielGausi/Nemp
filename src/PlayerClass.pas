@@ -34,8 +34,8 @@ unit PlayerClass;
 interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
-      ShellApi, IniFiles, Dialogs, Graphics,
-      bass, bass_fx, spectrum_vis, DateUtils,
+      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils,
+      bass, bass_fx, basscd, spectrum_vis, DateUtils,
       AudioFileClass,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst, Easteregg, ScrobblerUtils;
 
@@ -993,7 +993,7 @@ begin
       DecodeFlag := 0;
 
   case aFile.AudioType of
-      at_File, at_cdda: begin
+      at_File: begin
           result := BASS_StreamCreateFile(False, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR flags);
           // Vorgang oben fehlgeschlagen? Dann mit Music probieren
           if result = 0 then
@@ -1023,9 +1023,10 @@ begin
           result := BASS_StreamCreateURL(PAnsiChar(Ansistring(localPath)), 0, BASS_STREAM_STATUS , @StatusProc, nil);
       end;
 
-      //at_CDDA: begin
+      at_CDDA: begin
           // todo
-      //end;
+          result := BASS_CD_StreamCreate(AudioDriveNumber(localPath), aFile.Track - 1, flags );
+      end;
   end;
 end;
 
@@ -1084,12 +1085,21 @@ var
   ChannelInfo: BASS_CHANNELINFO;
   basstime: Double;
   basslen: DWord;
+  JustCDChange, CDChangeSuccess: Boolean;
 begin
   // Alte Wiedergabe stoppen
   // Es macht keinen Sinn, einen neuen Mainstream zu erzeugen,
   // wenn der alte noch l‰uft!!
   // Vorteil: Das stoppen muss nicht explizit von auﬂen aufgerufen werden!
-  StopAndFree(StartPlay);
+  //         Aber: Wenn innerhalb einer CD gewechselt werden soll, dann NICHT
+
+  JustCDChange := assigned(MainAudioFile) and assigned(aAudioFile)   // both files are set
+                  and (Mainstream <> 0)
+                  and MainAudioFile.isCDDA and aAudioFile.isCDDA     // both are CDDA
+                  and SameDrive(MainAudioFile.Pfad, aAudioFile.Pfad); // both on the same drive
+
+  if not JustCDChange then
+      StopAndFree(StartPlay);
 
   MainAudioFile := aAudioFile;
   // First: Think pessimistic. The AudioFile is not present atm.
@@ -1109,17 +1119,24 @@ begin
               Spectrum.DrawText('Connecting to ' +  MainAudioFile.Pfad, False)
           end;
           at_CDDA: begin
-              // todo
+              Spectrum.DrawText('Starting ' +  MainAudioFile.Pfad, False);
           end;
       end;
 
-      // Mainstream erzeugen
-      Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, True);
+      CDChangeSuccess := True;
+      if JustCDChange then
+          CDChangeSuccess := BASS_CD_StreamSetTrack(MainStream, MainAudioFile.Track - 1)
+      else
+          // Mainstream erzeugen
+          Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, True);
+
       // Fehlerbehandlung
-      if (MainStream = 0) then
+      if (MainStream = 0) or (not CDChangeSuccess) then
       begin
-        if BassErrorString(Bass_ErrorGetCode) <> '' then
-          Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
+          if BassErrorString(Bass_ErrorGetCode) <> '' then
+          showmessage(BassErrorString(Bass_ErrorGetCode));
+
+              Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
           // something is wrong
           MainAudioFileIsPresentAndPlaying := False;
       end;
@@ -1135,7 +1152,7 @@ begin
       // URL oder Dateiname??
       // BEI URLS ist einiges etwas anders - z.B. kein Tempo
       case MainAudioFile.AudioType of
-          at_File, at_cdda: begin
+          at_File: begin
               fIsURLStream := False;
               aAudioFile.FileIsPresent := FileExists(MainAudioFile.Pfad);
               MainStreamIsTempoStream := AvoidMickyMausEffect;
@@ -1182,8 +1199,8 @@ begin
               StreamType := GetStreamType(Mainstream);
 
               // Bei Audio-CDs kann kein zweiter Stream erzeugt werden!
-              if extension <> '.cda' then
-              begin
+              //if extension <> '.cda' then
+              //begin
                 SlideStream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False);
                 SetEndSyncs(SlideStream);
                 InitStreamEqualizer(SlideStream);
@@ -1193,11 +1210,11 @@ begin
                     BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
                 BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
                 fReallyUseFading := True;
-              end else
-              begin
-                Slidestream := 0;
-                fReallyUseFading := False;
-              end;
+              //end else
+              //begin
+              //  Slidestream := 0;
+              //  fReallyUseFading := False;
+              //end;
 
           end;
 
@@ -1227,11 +1244,28 @@ begin
               GetURLDetails;
           end;
 
-          //at_CDDA: begin
+          at_CDDA: begin
               // todo
-          //    Slidestream := 0;
-          //    fReallyUseFading := False;
-          //end;
+              Slidestream := 0;
+              fReallyUseFading := False;
+              MainStreamIsReverseStream := False;
+
+              StartPlay := True;
+              // Wenn Faden
+              if UseFading AND fReallyUseFading then
+              begin
+                // Lautst‰rke zun‰chst auf 0
+                BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
+                BASS_ChannelPlay(MainStream , True);
+                BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+              end
+              else begin // also kein Fading, Lautst‰rke mormal
+                BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+                BASS_ChannelPlay(MainStream , True);
+              end;
+              fStatus := PLAYER_ISPLAYING;
+
+          end;
       end;
 
 
