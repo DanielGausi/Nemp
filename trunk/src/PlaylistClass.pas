@@ -1488,6 +1488,9 @@ begin
               end;
               at_CDDA: begin
                   // todo
+                  myAList.add('#EXTINF:' + IntTostr(aAudiofile.Duration) + ','
+                      + aAudioFile.Artist + ' - ' + aAudioFile.Titel);
+                  myAList.Add(aAudioFile.Pfad);
               end;
           end;
       end;
@@ -1527,6 +1530,9 @@ begin
                   end;
                   at_CDDA:  begin
                       // todo
+                      ini.WriteString ('playlist', 'File'  + IntToStr(i), aAudioFile.Pfad );
+                      ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Artist + ' - ' + aAudioFile.Titel);
+                      ini.WriteInteger('playlist', 'Length'+ IntToStr(i), aAudioFile.Duration);
                   end;
               end;
           end;
@@ -1568,6 +1574,7 @@ begin
                   end;
                   at_CDDA: begin
                       // todo
+                      aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
                   end;
               end;
           end;

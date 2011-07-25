@@ -37,7 +37,7 @@ interface
 
 uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
   ID3v2Frames,
-  OggVorbis, Flac, VorbisComments,
+  OggVorbis, Flac, VorbisComments, cddaUtils,
   ComObj, graphics, variants, ATL_WMAfile,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
   DateUtils;
@@ -76,6 +76,8 @@ type
                 AUDIO_FlacErr_MetaDataTooLarge,      // MetaData too large to write
                 AUDIOERR_UnsupportedMediaFile,
                 AUDIOERR_EditingDenied,
+                AUDIOERR_DriveNotReady,
+                AUDIOERR_NoAudioTrack,
                 AUDIOERR_Unkown
                 // FlacErr_BackupFailed, FlacErr_DeleteBackupFailed as in Ogg
     );
@@ -111,6 +113,10 @@ type
               'Metadata-Block exceeds maximum size',
               'Type of Metadata is not supported - use mp3, ogg or flac',
               'Cannot save metadata: Quick access to metadata denied',
+              // CDDA
+              'Drive not ready',
+              'No Audio track',
+              // unknown
               'Unknown Error'
     );
 
@@ -225,6 +231,7 @@ type
 
         function fGetIsFile: Boolean;
         function fGetIsStream: Boolean;
+        function fGetIsCDDA: Boolean;
 
 
 
@@ -234,7 +241,7 @@ type
         function GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0): TFlacError;
         function GetWmaInfo(filename: UnicodeString): TAudioError;
         function GetWavInfo(WaveFile: UnicodeString): TAudioError;
-        function GetCDDAInfo(Filename: UnicodeString; Flags: Integer = 0): TAudioError;
+        function GetCDDAInfo(Filename: UnicodeString; Flags: Integer = 0): TCDDAError;
 
         // no tags found - set default values
         procedure SetUnknown;
@@ -346,6 +353,7 @@ type
         // isFile: True if the AudioFile is actually a File
         property IsFile: Boolean read fGetIsFile;
         property isStream: Boolean read fGetIsStream;
+        property isCDDA: Boolean read fGetIsCDDA;
 
         constructor Create;
         destructor Destroy; override;
@@ -541,6 +549,7 @@ function GetMp3Details(filename:UnicodeString;
 function Mp3ToAudioError(aError: TMP3Error): TAudioError;
 function OggToAudioError(aError: TOggVorbisError): TAudioError;
 function FlacToAudioError(aError: TFlacError): TAudioError;
+function CDToAudioError(aError: TCddaError): TAudioError;
 
 function UnKownInformation(aString: String): Boolean;
 
@@ -610,6 +619,18 @@ begin
       FlacErr_DeleteBackupFailed  : result := AUDIO_OVErr_DeleteBackupFailed ;
     else
       result := AUDIOERR_Unkown ;
+    end;
+end;
+
+function CDToAudioError(aError: TCddaError): TAudioError;
+begin
+    case aError of
+      cddaErr_None               : result := AUDIOERR_None;
+      cddaErr_invalidPath        : result := AUDIO_FILEERR_NoFile;
+      cddaErr_invalidDrive       : result := AUDIO_FILEERR_NoFile;
+      cddaErr_invalidTrackNumber : result := AUDIO_FILEERR_NoFile;
+      cddaErr_DriveNotReady      : result := AUDIOERR_DriveNotReady;
+      cddaErr_NoAudioTrack       : result := AUDIOERR_NoAudioTrack;
     end;
 end;
 
@@ -895,6 +916,11 @@ end;
 function TAudioFile.fGetIsStream: Boolean;
 begin
     result := fAudioType = at_Stream;
+end;
+
+function TAudioFile.fGetIsCDDA: Boolean;
+begin
+    result := fAudioType = at_CDDA;
 end;
 
 function TAudioFile.GetArtistForVST(ReplaceValue: Integer): String;
@@ -1278,7 +1304,7 @@ begin
       end;
 
       at_CDDA: begin
-
+          result := CDToAudioError(GetCDDAInfo(Filename, Flags));
       end;
   end;
 end;
@@ -1808,10 +1834,26 @@ end;
 
 
 function TAudioFile.GetCDDAInfo(Filename: UnicodeString;
-  Flags: Integer): TAudioError;
+  Flags: Integer): TCDDAError;
+var cdFile: TCDDAFile;
+
 begin
-//
-    //EnsureDriveList;
+    cdFile := TCDDAFile.Create;
+    try
+        result := cdFile.GetData(Filename, False);
+        if result = cddaErr_None then
+        begin
+            fTrack := cdFile.Track;
+            Artist := cdFile.Artist;
+            Titel := cdFile.Title;
+            Album := cdFile.Album;
+            fDuration := cdFile.Duration;
+        end
+
+
+    finally
+        cdFile.Free;
+    end;
 end;
 
 

@@ -985,6 +985,11 @@ begin
                               at_CDDA: begin
                                   aAudioFile.AudioType := at_CDDA;
                                   aAudioFile.Pfad := s;
+                                  if AutoScan and
+                                      (aAudioFile.Artist = '') // dont scan again, if ExtInf-Data was found
+                                                               // we do not want cddb-queries here, only CD-Text
+                                  then
+                                      aAudioFile.GetAudioData(s, 0);
                                   // todo
                               end;
                           end;
@@ -1029,6 +1034,14 @@ begin
 
                         at_CDDA: begin
                             aAudioFile.AudioType := at_CDDA;
+                            aAudioFile.Pfad := s;
+                            if AutoScan then
+                                aAudioFile.GetAudioData(s, 0)
+                            else
+                            begin
+                                aAudioFile.Titel := s;
+                                aAudioFile.Artist := '';
+                            end;
                         end;
                     end;
                     TargetList.Add(aAudiofile);
@@ -1090,6 +1103,13 @@ begin
 
             at_CDDA: begin
                 aAudioFile.AudioType := at_CDDA;
+                aAudioFile.Pfad := newFilename;
+                aAudioFile.Duration := Ini.ReadInteger('playlist','Length'+IntToStr(i),0);
+                newTitel := ini.ReadString('playlist','Title'+ IntToStr(i),'');
+                aAudioFile.Artist := copy(newTitel,1, pos(' - ',newTitel));
+                aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
+                if AutoScan and (aAudioFile.Artist = '') then
+                    aAudioFile.GetAudioData(newFilename, 0)
                 // todo
             end;
         end;
@@ -1199,7 +1219,8 @@ begin
 
                             at_CDDA: begin
                                 aAudioFile.AudioType := at_CDDA;
-                                // todo
+                                aAudioFile.Pfad := s;
+                                // todo ??
                             end;
                         end;
 
