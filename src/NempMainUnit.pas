@@ -4481,7 +4481,8 @@ begin
     begin
         case aAudioFile.AudioType of
             at_Undef  : LblBibArtist    .Caption := 'ERROR: UNDEFINED AUDIOTYPE'; // should never happen
-            at_File   : begin
+            at_File,
+            at_CDDA : begin
                 LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
                 LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
                 LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
@@ -4497,9 +4498,14 @@ begin
                 LblBibYear      .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
                 LblBibGenre     .Caption := '';
             end;
-            at_CDDA   : begin
-                // todo
-            end;
+            {at_CDDA   : begin
+                LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
+                LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
+                LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
+                LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
+                LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
+                LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
+            end; }
         end;
     end;
 end;
@@ -4570,7 +4576,11 @@ begin
       end;
 
       at_CDDA: begin
-          // todo
+          LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration) ;
+          LblBibQuality.Caption := 'CD-Audio';
+          ImgBibRating.Visible := False;
+          LblBibTags.Caption := '';
+          LblBibPlayCounter.Caption := '';
       end;
   end;
 end;
@@ -9096,8 +9106,20 @@ begin
       end;
 
       at_CDDA: begin
-          HintText := 'CD-Audio';
-          // Todo
+          if trim(Data^.FAudioFile.Artist) = '' then
+              HintText :=
+                     'CD-Audio, '
+                   + Format(' %s %d' , [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
+                   + Format(' %s: %s', [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)])
+          else
+              HintText :=
+                     Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.Artist]) + #13#10
+                   + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.Titel]) + #13#10
+                   + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.Album]) + #13#10
+                   // we have always a Track here ;-)
+                   + Format(' %s %d', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
+                   + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)]) + #13#10
+                   + 'CD-Audio';
       end;
   end;
 

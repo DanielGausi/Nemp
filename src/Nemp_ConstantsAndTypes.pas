@@ -198,6 +198,7 @@ type
 
         WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
+        UseCDDB: Boolean;
 
         // Steuerung des Deskbands:
         //Folgende Nachrichten werden registriert und an ein Deskband gesendet:
@@ -867,6 +868,7 @@ begin
         DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
         AllowQuickAccessToMetadata := Ini.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
+        UseCDDB                    := Ini.ReadBool('Allgemein', 'UseCDDB', False);
 
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
         FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
@@ -1020,6 +1022,7 @@ begin
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
 
         Ini.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
+        Ini.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
 
 
         ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);

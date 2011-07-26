@@ -1024,7 +1024,6 @@ begin
       end;
 
       at_CDDA: begin
-          // todo
           result := BASS_CD_StreamCreate(AudioDriveNumber(localPath), aFile.Track - 1, flags );
       end;
   end;
@@ -1134,7 +1133,6 @@ begin
       if (MainStream = 0) or (not CDChangeSuccess) then
       begin
           if BassErrorString(Bass_ErrorGetCode) <> '' then
-          showmessage(BassErrorString(Bass_ErrorGetCode));
 
               Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
           // something is wrong
@@ -1245,7 +1243,6 @@ begin
           end;
 
           at_CDDA: begin
-              // todo
               Slidestream := 0;
               fReallyUseFading := False;
               MainStreamIsReverseStream := False;
@@ -1264,7 +1261,6 @@ begin
                 BASS_ChannelPlay(MainStream , True);
               end;
               fStatus := PLAYER_ISPLAYING;
-
           end;
       end;
 
@@ -2277,13 +2273,14 @@ begin
                             end;
 
                             at_CDDA: begin
-                                // todo
-                                result := 'CDDA';
+                                result := Format('%s: %s, CD-Audio',
+                                      [(Infostring_Duration), SekToZeitString(aAudioFile.Duration)]);
                             end;
                          end;
 
       MODE_LYRICS      : case aAudioFile.AudioType of
-                            at_File: begin
+                            at_File,
+                            at_CDDA: begin
                                 if aAudioFile.LyricsExisting then
                                   result := (StringReplace(UTF8ToString(aAudioFile.Lyrics), #13#10, ' ', [rfReplaceAll]))
                                 else
@@ -2294,11 +2291,6 @@ begin
                                 // im Namen steht die Beschreibung des Sender drin, das dürfte
                                 // dem am nächsten kommen
                                 result := aAudioFile.Description;
-                            end;
-
-                            at_CDDA: begin
-                                // todo
-                                result := 'CDDA';
                             end;
                          end;
       else

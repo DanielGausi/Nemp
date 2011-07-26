@@ -455,8 +455,9 @@ type
 
 const
       // GAD_xxx: Flags for GetAudioData-Methods
-      GAD_Cover = 1;
+      GAD_Cover  = 1;
       GAD_Rating = 2;  // !!!!  ignored by the subfunctions
+      GAD_CDDB   = 4;
       // note for future extensions:
       // this is planned as bitmasks, so use 4,8,16,32,.. for additional flags
 
@@ -553,6 +554,8 @@ function CDToAudioError(aError: TCddaError): TAudioError;
 
 function UnKownInformation(aString: String): Boolean;
 
+procedure SetCDDADefaultInformation(af: TAudioFile);
+
 function GetAudioTypeFromFilename(aFilename: String): TAudioType;
 
 implementation
@@ -637,6 +640,14 @@ end;
 function UnKownInformation(aString: String): Boolean;
 begin
     result := (trim(aString) = '') or (aString = AUDIOFILE_UNKOWN);
+end;
+
+procedure SetCDDADefaultInformation(af: TAudioFile);
+begin
+    // fixed values
+    af.fSamplerateIDX  := 7; // 44.1 kHz
+    af.fChannelModeIDX := 0; // Stereo
+    af.Bitrate := 1411;   // CD audio is always 44100hz stereo 16-bit. That is 176400 bytes per second = 1411200 kbps
 end;
 
 function GetAudioTypeFromFilename(aFilename: String): TAudioType;
@@ -929,7 +940,7 @@ begin
         at_Undef: result := 'Error: Undefined AudioType!';
         at_File: result := GetReplacedArtist(ReplaceValue);
         at_Stream: result := Format('(%s)', [AudioFileProperty_Webstream]);
-        at_CDDA: ;
+        at_CDDA: result := GetReplacedArtist(ReplaceValue);
     end;
 end;
 function TAudioFile.GetTitleForVST(ReplaceValue: Integer): String;
@@ -938,7 +949,7 @@ begin
         at_Undef: result := 'Error: Undefined AudioType!';
         at_File: result := GetReplacedTitle(ReplaceValue);
         at_Stream: result := Format('(%s)', [AudioFileProperty_Webstream]);
-        at_CDDA: ;
+        at_CDDA: result := GetReplacedTitle(ReplaceValue);
     end;
 end;
 function TAudioFile.GetAlbumForVST(ReplaceValue: Integer): String;
@@ -947,7 +958,7 @@ begin
         at_Undef  : result := 'Error: Undefined AudioType!';
         at_File   : result := GetReplacedAlbum(ReplaceValue);
         at_Stream : result := Format('(%s)', [AudioFileProperty_Webstream]);
-        at_CDDA   : ;
+        at_CDDA   : result := GetReplacedAlbum(ReplaceValue);
     end;
 end;
 function TAudioFile.GetBitrateForVST: String;
@@ -969,7 +980,7 @@ begin
         at_Undef  : result := 'Error: Undefined AudioType!';
         at_File   : result := SekIntToMinStr(Duration);
         at_Stream : result := '(inf)';
-        at_CDDA   : result := 'CDDA';
+        at_CDDA   : result := SekIntToMinStr(Duration);
     end;
 end;
 
@@ -1038,8 +1049,7 @@ begin
     case fAudioType of
         at_Undef  : result := '';
 
-        at_File,
-        at_CDDA   : begin
+        at_File, at_CDDA : begin
             if UnKownInformation(Artist) then
                 result := NonEmptyTitle
             else
@@ -1055,7 +1065,6 @@ begin
                 if (titel <> '') and (titel <> pfad) then
                     result := result + ' (' + titel + ')';
             end;
-
         end;
     end;
 
@@ -1079,7 +1088,15 @@ begin
         result := Titel;
 
     if result = '' then // possible at CD-DA, as there is no filename? (Check, if cdda-support is complete. ;-))
-        result := Pfad;
+    begin
+        case fAudioType of
+            at_Undef,
+            at_File,
+            at_Stream: result := Pfad;
+            at_CDDA: Result := 'CD-Audio, Track ' + IntToStr(Track);
+        end;
+
+    end;
 end;
 
 {
@@ -1838,9 +1855,10 @@ function TAudioFile.GetCDDAInfo(Filename: UnicodeString;
 var cdFile: TCDDAFile;
 
 begin
+    SetCDDADefaultInformation(self);
     cdFile := TCDDAFile.Create;
     try
-        result := cdFile.GetData(Filename, False);
+        result := cdFile.GetData(Filename, (Flags and GAD_CDDB) = GAD_CDDB);
         if result = cddaErr_None then
         begin
             fTrack := cdFile.Track;
@@ -1849,7 +1867,6 @@ begin
             Album := cdFile.Album;
             fDuration := cdFile.Duration;
         end
-
 
     finally
         cdFile.Free;

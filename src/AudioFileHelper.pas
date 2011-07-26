@@ -983,6 +983,7 @@ begin
                               end;
 
                               at_CDDA: begin
+                                  SetCDDADefaultInformation(aAudioFile);
                                   aAudioFile.AudioType := at_CDDA;
                                   aAudioFile.Pfad := s;
                                   if AutoScan and
@@ -990,7 +991,6 @@ begin
                                                                // we do not want cddb-queries here, only CD-Text
                                   then
                                       aAudioFile.GetAudioData(s, 0);
-                                  // todo
                               end;
                           end;
                     end;
@@ -1034,6 +1034,7 @@ begin
 
                         at_CDDA: begin
                             aAudioFile.AudioType := at_CDDA;
+                            SetCDDADefaultInformation(aAudioFile);
                             aAudioFile.Pfad := s;
                             if AutoScan then
                                 aAudioFile.GetAudioData(s, 0)
@@ -1102,6 +1103,7 @@ begin
             end;
 
             at_CDDA: begin
+                SetCDDADefaultInformation(aAudioFile);
                 aAudioFile.AudioType := at_CDDA;
                 aAudioFile.Pfad := newFilename;
                 aAudioFile.Duration := Ini.ReadInteger('playlist','Length'+IntToStr(i),0);
@@ -1110,7 +1112,6 @@ begin
                 aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
                 if AutoScan and (aAudioFile.Artist = '') then
                     aAudioFile.GetAudioData(newFilename, 0)
-                // todo
             end;
         end;
         TargetList.Add(aAudiofile);
@@ -1145,6 +1146,9 @@ begin
                   begin
                       NewAudioFile := TAudioFile.Create;
                       NewAudioFile.LoadFromStreamForPlaylist(aStream);
+
+                      if NewAudioFile.isCDDA then
+                          SetCDDADefaultInformation(NewAudioFile);
 
                       //if NewAudioFile.isStream then
                       //  NewAudioFile.Description := NewAudioFile.Titel;
@@ -1218,9 +1222,9 @@ begin
                             end;
 
                             at_CDDA: begin
+                                SetCDDADefaultInformation(aAudioFile);
                                 aAudioFile.AudioType := at_CDDA;
                                 aAudioFile.Pfad := s;
-                                // todo ??
                             end;
                         end;
 
