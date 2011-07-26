@@ -453,6 +453,8 @@ type
     GrpBox_Metadata: TGroupBox;
     cb_AccessMetadata: TCheckBox;
     Lbl_QuickMetadataHint: TLabel;
+    GrpBox_CDAudio: TGroupBox;
+    cb_UseCDDB: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1384,6 +1386,7 @@ begin
 
   // quick access to metadata
   cb_AccessMetadata                     .checked := Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata;
+  cb_UseCDDB                            .checked := Nemp_MainForm.NempOptions.UseCDDB                   ;
   // Automatic ratings
   // Set settings:
   cb_RatingActive                       .checked := NempPlayer.PostProcessor.Active                       ;
@@ -2561,6 +2564,7 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
   Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
+  Nemp_MainForm.NempOptions.UseCDDB                     := cb_UseCDDB                            .checked;
 
   // automatic rating
   NempPlayer.PostProcessor.Active                       := cb_RatingActive                       .checked ;

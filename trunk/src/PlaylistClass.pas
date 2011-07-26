@@ -1024,7 +1024,15 @@ begin
 
         at_CDDA   : begin
             // todo
-            // wenn snchfile, dann infos neu lesen. sonst nicht
+            if SynchFile then
+            begin
+                if Nemp_MainForm.NempOptions.UseCDDB then
+                    AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
+                else
+                    AudioFile.GetAudioData(AudioFile.Pfad, 0);
+            end;
+
+            // wenn synchfile, dann infos neu lesen. sonst nicht
             // dabei Fallunterscheidung. Bei Nempotions.readCDDB mit cddb, sonst ohne
             //       (geht über Flags bei GetAudioData)
         end;
@@ -1487,7 +1495,6 @@ begin
                   myAList.Add(aAudioFile.Pfad);
               end;
               at_CDDA: begin
-                  // todo
                   myAList.add('#EXTINF:' + IntTostr(aAudiofile.Duration) + ','
                       + aAudioFile.Artist + ' - ' + aAudioFile.Titel);
                   myAList.Add(aAudioFile.Pfad);
@@ -1529,7 +1536,6 @@ begin
                       ini.WriteInteger('playlist', 'Length'+ IntToStr(i), 0);
                   end;
                   at_CDDA:  begin
-                      // todo
                       ini.WriteString ('playlist', 'File'  + IntToStr(i), aAudioFile.Pfad );
                       ini.WriteString ('playlist', 'Title' + IntToStr(i), aAudioFile.Artist + ' - ' + aAudioFile.Titel);
                       ini.WriteInteger('playlist', 'Length'+ IntToStr(i), aAudioFile.Duration);
@@ -1573,7 +1579,6 @@ begin
                       aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
                   end;
                   at_CDDA: begin
-                      // todo
                       aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
                   end;
               end;
