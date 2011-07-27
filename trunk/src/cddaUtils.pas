@@ -43,6 +43,8 @@ type
             fAlbum    : String;
             fDuration : Integer;
             fTrack    : Integer;
+            fYear     : String;
+            fGenre    : String;
 
             fDriveLetter : Char;
             fDriveNumber : Integer;
@@ -64,6 +66,8 @@ type
             property Album    : String  read fAlbum     ;
             property Duration : Integer read fDuration  ;
             property Track    : Integer read fTrack     ;
+            property Year     : String  read fYear      ;
+            property Genre    : String  read fGenre     ;
 
             constructor Create;
 
@@ -76,6 +80,8 @@ type
 
     function SameDrive(A, B: String): Boolean;
     function AudioDriveNumber(aPath: String): Integer;
+
+    procedure ClearCDDBCache;
 
 
 
@@ -150,6 +156,21 @@ begin
     end;
 end;
 
+
+procedure ClearCDDBCache;
+var i: Integer;
+begin
+    if assigned(CDDriveList) then
+    begin
+        for i := 0 to CDDriveList.Count - 1 do
+        begin
+            TCDDADrive(CDDriveList[i]).fCachedCddbData := '';
+            TCDDADrive(CDDriveList[i]).fCachedCddbID   := '';
+            TCDDADrive(CDDriveList[i]).fIsCompilation  := False;
+            TCDDADrive(CDDriveList[i]).fDelimter       := #0;
+        end;
+    end;
+end;
 
 { TCDDADrive }
 
@@ -244,17 +265,14 @@ begin
                     // some error occured
                     fCachedCddbData := '';
                     // fCachedCddbID := '';
-                    showmessage(queryReply);
+                    // showmessage(queryReply);
                     result := '';
                 end;
             end;
 
             result := fCachedCddbData;
-
-            showmessage(result);
-
+            // showmessage(result);
         end;
-
     end else
         result := '';
 end;
@@ -383,6 +401,8 @@ begin
     if CompleteText <> NIL then
     begin
         result := True;
+        fGenre := '';
+        fYear  := '';
         fAlbum := GetValue('TITLE0', CompleteText);
         fTitle := GetValue('TITLE'+IntToStr(aTrack), CompleteText);
         fArtist:= GetValue('PERFORMER'+IntToStr(aTrack), CompleteText);
@@ -405,6 +425,24 @@ end;
 }
 function TCDDAFile.fGetDataFromCDDB(aDrive, aTrack: Integer): Boolean;
 var CompleteData: AnsiString;
+    sl: TStringList;
+    idx: Integer;
+    tmp: String;
+
+    function GetValue(aKey: String): String;
+    var i: Integer;
+    begin
+        result := '';
+        for i := 0 to sl.Count - 1 do
+        begin
+            if AnsiStartsText(aKey, sl[i]) then
+            begin
+                result := Copy(sl[i], Length(aKey)+2, Length(sl[i]) - Length(aKey));
+                break;
+            end;
+        end;
+    end;
+
 begin
     // get DISC-freedb-ID
     // check, whether the drive aDrive has Cached this
@@ -413,6 +451,47 @@ begin
 
 
     CompleteData := TCDDADrive(CDDriveList[aDrive]).GetCDDBData;
+
+    if CompleteData <> '' then
+    begin
+        sl := TStringList.Create;
+        try
+            sl.Text := String(CompleteData);
+
+            fYear  := GetValue('DYEAR');
+            fGenre := GetValue('DGENRE');
+            tmp    := GetValue('DTITLE');
+
+            idx := Pos(' - ', tmp);
+            if idx = 0 then
+                idx := Pos(' / ', tmp);
+            if idx > 0 then
+            begin
+                fAlbum  := Copy(tmp, idx + 3, Length(tmp));
+                fArtist := Copy(tmp, 1, idx);
+            end else
+                fAlbum := tmp;
+
+
+            if TCDDADrive(CDDriveList[aDrive]).fIsCompilation then
+            begin
+                // Get Title and Artist
+                tmp := GetValue('TTITLE' + IntToStr(aTrack));
+
+                idx := Pos(' '+TCDDADrive(CDDriveList[aDrive]).fDelimter+' ', tmp);
+                fTitle := Copy(tmp, idx + 3, Length(tmp));
+                fArtist := Copy(tmp, 1, idx);
+            end else
+            begin
+                fTitle := GetValue('TTITLE' + IntToStr(aTrack));
+            end;
+
+
+        finally
+            sl.Free
+        end;
+    end;
+
 
     ///  DTITLE=Sampler / Bravo Hits 06 CD1
     ///  DYEAR=1994
@@ -457,7 +536,7 @@ begin
                         begin
                             if UseCDDB then
                                 // get data from cddb
-                                fGetDataFromCDDB(fDriveNumber, fTrack);
+                                fGetDataFromCDDB(fDriveNumber, fTrack-1);
                         end;
 
 

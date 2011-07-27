@@ -7879,6 +7879,7 @@ var Node: PVirtualNode;
 begin
   LangeAktionWeitermachen := True;
 
+  ClearCDDBCache;
   Node := PlaylistVST.GetFirst;
   while assigned(Node) and LangeAktionWeitermachen do
   begin
@@ -11010,8 +11011,8 @@ var point: TPoint;
 // lyrics: TLyrics;
 //  s: String;
 //  sl: TStringList;
-c: TCDDAFile;
-err: TCDDAError;
+//c: TCDDAFile;
+//err: TCDDAError;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
@@ -11022,17 +11023,17 @@ begin
 //   exit;
 //CloudViewer.SetFocus;
 
-    c := TCDDAFile.Create;
-    err := c.GetData('cda://G,11,asa', False);
+    //c := TCDDAFile.Create;
+    //err := c.GetData('cda://G,11,asa', False);
 
-    showmessage(
-    inttostr(Integer(err)) +
-    c.Artist + #13#10 +
-    c.Title + #13#10 +
-    c.Album + #13#10 +
-    IntToStr(c.Track) + #13#10 +
-    IntToStr(c.Duration) + #13#10
-    );
+    //showmessage(
+    //inttostr(Integer(err)) +
+    //c.Artist + #13#10 +
+    //c.Title + #13#10 +
+    //c.Album + #13#10 +
+    //IntToStr(c.Track) + #13#10 +
+    //IntToStr(c.Duration) + #13#10
+    //);
 
 
   GetCursorPos(Point);

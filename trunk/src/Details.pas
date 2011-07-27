@@ -40,7 +40,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, AudioFileClass, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
   ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, U_CharCode,
-  OggVorbis, Flac, VorbisComments,
+  OggVorbis, Flac, VorbisComments, cddaUtils,
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
   Nemp_RessourceStrings,  IdBaseComponent, IdComponent, TagClouds,
@@ -484,6 +484,7 @@ begin
 
     MainPageControl.OnChange := MainPageControlChange;
 //    UpdateID3ReadOnlyStatus;
+
 end;
 
 procedure TFDetails.FormHide(Sender: TObject);
@@ -630,26 +631,38 @@ begin
         and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad)
     then
     begin
-        // Read file information from disk
-        if Fileexists(CurrentAudioFile.Pfad) then
-        begin
-            SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
-        end;
+        case CurrentAudioFile.AudioType of
 
-        // Generate a List of Files which should be updated now
-        ListOfFiles := TObjectList.Create(False);
-        try
-            GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
-            for i := 0 to ListOfFiles.Count - 1 do
-            begin
-                listFile := TAudioFile(ListOfFiles[i]);
-                // copy Data from AktuellesAudioFile to the files in the list.
-                listFile.Assign(CurrentAudioFile);
+            at_File: begin
+                // Read file information from disk
+                if Fileexists(CurrentAudioFile.Pfad) then
+                begin
+                    SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
+                end;
+
+                // Generate a List of Files which should be updated now
+                ListOfFiles := TObjectList.Create(False);
+                try
+                    GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
+                    for i := 0 to ListOfFiles.Count - 1 do
+                    begin
+                        listFile := TAudioFile(ListOfFiles[i]);
+                        // copy Data from AktuellesAudioFile to the files in the list.
+                        listFile.Assign(CurrentAudioFile);
+                    end;
+                finally
+                    ListOfFiles.Free;
+                end;
+                MedienBib.Changed := True;
             end;
-        finally
-            ListOfFiles.Free;
+            at_CDDA: begin
+                ClearCDDBCache;
+                if Nemp_MainForm.NempOptions.UseCDDB then
+                    CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, gad_CDDB)
+                else
+                    CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, 0);
+            end;
         end;
-        MedienBib.Changed := True;
         // Correct GUI
         CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
@@ -819,12 +832,12 @@ end;
 procedure TFDetails.UpdateMediaBibEnabledStatus;
 var ControlsEnable, ButtonsEnable: Boolean;
 begin
-  ButtonsEnable := (CurrentAudioFile <> NIL) AND FileExists(CurrentAudioFile.Pfad);
+  ButtonsEnable := (CurrentAudioFile <> NIL) AND (CurrentAudioFile.IsFile) AND FileExists(CurrentAudioFile.Pfad);
   ControlsEnable:= (CurrentAudioFile <> NIL);
 
   Btn_Properties.Enabled := ButtonsEnable;
   Btn_Explore.Enabled := ButtonsEnable;
-  Btn_Actualize.Enabled := ButtonsEnable;
+  Btn_Actualize.Enabled := assigned(CurrentAudioFile) AND ((CurrentAudioFile.isCDDA) or (CurrentAudioFile.IsFile));
   LlblConst_FileSize.Enabled := ControlsEnable;
   LlblConst_Path.Enabled := ControlsEnable;
   LlblConst_Filename.Enabled := ControlsEnable;
@@ -1322,7 +1335,12 @@ begin
 
             at_CDDA: begin
                 // todo
+                LBLDauer.Caption  := SekToZeitString(CurrentAudioFile.Duration);
+                LBLBitrate.Caption := '1.4 mbit/s (CD-Audio)';
+                LBLSamplerate.Caption := '44.1 kHz, Stereo';
 
+                DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
+                LblPlayCounter.Caption := '';
             end;
         end;
 
