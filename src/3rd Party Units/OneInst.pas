@@ -78,6 +78,7 @@ var
   Msg: TMsg;
   Wnd: HWND;
   Dat: TCopyDataStruct;
+  AResult: DWORD;
 begin
   // MessageBox(0, 'läuft schon', nil, MB_ICONINFORMATION);
   {----------------------------------------------------------------------------}
@@ -88,7 +89,7 @@ begin
   { (Broadcast sollten _NUR_ mit registrierten Nachrichten-Ids erfolgen!)      }
   {----------------------------------------------------------------------------}
 
-  SendMessage(HWND_BROADCAST, SecondInstMsgId, GetCurrentThreadId, 0);
+  SendMessageTimeOut(HWND_BROADCAST, SecondInstMsgId, GetCurrentThreadId, 0, SMTO_ABORTIFHUNG, 500, AResult );
 
   { Wir warten auf die Antwort der ersten Instanz                        }
   { Für die, die es nicht wußten - auch Threads haben Message-Queues ;o) }
