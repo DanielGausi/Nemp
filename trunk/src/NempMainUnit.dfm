@@ -1,7 +1,7 @@
 object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
-  Caption = 'Nemp - Noch ein MP3-Player'
+  Caption = 'Nemp - Noch ein MP3-Player (SendmessageTimeout Test)'
   ClientHeight = 786
   ClientWidth = 858
   Color = clBtnFace
