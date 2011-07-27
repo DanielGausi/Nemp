@@ -1137,8 +1137,10 @@ begin
   NewFile := TPlaylistfile.Create;
   NewFile.Pfad := aAudiofileName;
 
-  if NewFile.AudioType = at_File then
-      SynchronizeAudioFile(NewFile, aAudioFileName);
+  case NewFile.AudioType of
+      at_File: SynchronizeAudioFile(NewFile, aAudioFileName);
+      at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
+  end;
 
   result := AddFileToPlaylist(NewFile, aCueName);
   NewFile.Free;
@@ -1180,8 +1182,10 @@ begin
   NewFile := TPlaylistfile.Create;
   NewFile.Pfad := aAudiofileName;
 
-  if NewFile.AudioType = at_File then
-      SynchronizeAudioFile(NewFile, aAudioFileName);
+  case NewFile.AudioType of
+      at_File: SynchronizeAudioFile(NewFile, aAudioFileName);
+      at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
+  end;
 
   result := InsertFileToPlayList(NewFile, aCueName);
   NewFile.Free;

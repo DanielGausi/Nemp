@@ -634,6 +634,8 @@ begin
       cddaErr_invalidTrackNumber : result := AUDIO_FILEERR_NoFile;
       cddaErr_DriveNotReady      : result := AUDIOERR_DriveNotReady;
       cddaErr_NoAudioTrack       : result := AUDIOERR_NoAudioTrack;
+    else
+        result := AUDIOERR_Unkown ;
     end;
 end;
 
@@ -883,7 +885,7 @@ begin
         at_Undef  : result := fStrings[siOrdner];
         at_File   : result := FStrings[siOrdner] + Dateiname ;
         at_Stream : result := fStrings[siOrdner];
-        at_CDDA   : result := fStrings[siOrdner];
+        at_CDDA   : result := fStrings[siOrdner] + Dateiname;
     end;
 end;
 
@@ -1321,8 +1323,11 @@ begin
       end;
 
       at_CDDA: begin
+          //showmessage(filename + '   ....   ');
           result := CDToAudioError(GetCDDAInfo(Filename, Flags));
-      end;
+      end
+  else
+      result := AUDIOERR_None;
   end;
 end;
 
@@ -1855,6 +1860,10 @@ function TAudioFile.GetCDDAInfo(Filename: UnicodeString;
 var cdFile: TCDDAFile;
 
 begin
+
+//result := cddaErr_None;
+//exit;
+
     SetCDDADefaultInformation(self);
     cdFile := TCDDAFile.Create;
     try
@@ -1866,6 +1875,8 @@ begin
             Titel := cdFile.Title;
             Album := cdFile.Album;
             fDuration := cdFile.Duration;
+            Genre := cdFile.Genre;
+            Year := cdFile.Year;
         end
 
     finally

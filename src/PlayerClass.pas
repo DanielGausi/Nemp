@@ -1024,7 +1024,25 @@ begin
       end;
 
       at_CDDA: begin
-          result := BASS_CD_StreamCreate(AudioDriveNumber(localPath), aFile.Track - 1, flags );
+          result := BASS_CD_StreamCreate(AudioDriveNumber(localPath), aFile.Track - 1, DecodeFlag or flags );
+          // Decodier-Stream nachbehandeln
+          if aReverse AND (result <> 0) then
+          begin
+              StreamDec := result;
+              // einen Reverse-Stream erzeugen
+              if aNoMickyMaus then
+              begin
+                  StreamRev := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE or BASS_STREAM_DECODE);
+                  if StreamRev <> 0 then
+                      result := BASS_FX_TempoCreate(StreamRev, BASS_FX_FREESOURCE)
+                  else result := 0;
+              end
+              else
+                  result := BASS_FX_ReverseCreate(StreamDec, 1, BASS_FX_FREESOURCE);
+          end else
+              if aNoMickyMaus AND (result <> 0) then
+                  // einen TempoStream erzeugen
+                  result := BASS_FX_TempoCreate(result, BASS_FX_FREESOURCE);
       end;
   end;
 end;
@@ -1094,6 +1112,7 @@ begin
 
   JustCDChange := assigned(MainAudioFile) and assigned(aAudioFile)   // both files are set
                   and (Mainstream <> 0)
+                  and (not MainStreamIsReverseStream)
                   and MainAudioFile.isCDDA and aAudioFile.isCDDA     // both are CDDA
                   and SameDrive(MainAudioFile.Pfad, aAudioFile.Pfad); // both on the same drive
 
@@ -1263,7 +1282,6 @@ begin
               fStatus := PLAYER_ISPLAYING;
           end;
       end;
-
 
       // Stream ist jetzt fertig von der Bass erzeugt.
       // Jetzt das Audiofile ggf. ändern
@@ -1449,15 +1467,18 @@ begin
       end else
       begin
         // Rückwärts abspielen
+          fReallyUseFading := False;
+          OldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
+          StopAndFree;
+
           tmpMain := NEMP_CreateStream(MainAudiofile,
                                //False, // kein Tempostream
                                AvoidMickyMausEffect,
                                True  // ReverseStream
                                );
           MainStreamIsTempoStream := AvoidMickyMausEffect;
-          fReallyUseFading := False;
-          OldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
-          StopAndFree;
+
+
           MainStream := tmpMain;
 
           if Not FromBeginning then
@@ -1541,6 +1562,8 @@ begin
       fHeadsetIsURLStream := PathSeemsToBeURL(HeadSetAudioFile.Pfad);
       Bass_ChannelStop(HeadsetStream);
       HeadsetStream := NEMP_CreateStream(HeadSetAudioFile, False, False, True);
+      BASS_ChannelFlags(HeadsetStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
+
       BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
       Bass_ChannelPlay(HeadsetStream, True);
 

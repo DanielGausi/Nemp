@@ -641,8 +641,11 @@ begin
                             end;
 
         MB_ReCheckPlaylingFile: begin
+              // this is only called after loading the library.
+              // And only to show a proper rating in the player
+              // (as the rating in the library can be different from ID3-Rating)
               if assigned(NempPlayer.MainAudioFile) and
-                 (not NempPlayer.MainAudioFile.IsStream)
+                 (NOT NempPlayer.MainAudioFile.isCDDA)
               then
               begin
                   SynchronizeAudioFile(NempPlayer.MainAudioFile, NempPlayer.MainAudioFile.Pfad, False);

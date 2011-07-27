@@ -526,6 +526,7 @@ procedure TCoverDownloadWorkerThread.CollectAudioInformation(
   source: TStringList; Target: TObjectList);
 var i: Integer;
     newAudioFile: TAudioFile;
+
 begin
     for i := 0 to source.Count - 1 do
     begin
@@ -574,6 +575,7 @@ var FileList: TStringList;
     AudioFileList: TObjectList;
 
 begin
+
     FileList := TStringList.Create;
     try
         // search harddisk for files
