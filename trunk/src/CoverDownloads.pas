@@ -59,12 +59,15 @@ type
         Artist: String;
         Album: String;
         Directory: String;
+        CoverDestination: String; // Destination for the downloaded Coverfile.
+                                  // = Directory for files, /Cover/ for CDDA
         QueryType: TQueryType;
         FileType: String;
         Index: Integer;         // used in CoverFlow
         distance: Integer;      // distance to MostImportantIndex
         lastChecked: TDateTime; // time of last query for this Item
         queryCount: Integer;    // Used to increase the Cache-Interval
+
 
         procedure LoadFromStream(aStream: TStream); // loading/saving in Thread-Context
         procedure SaveToStream(aStream: TStream);

@@ -658,14 +658,6 @@ begin
           end;
 
       end;
-
-      if aAudioFile.isStream then
-      begin
-
-      end else
-      begin
-
-      end;
   except
       GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
       result := false;
