@@ -42,7 +42,8 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math,
-  MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes;
+  MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes,
+  cddaUtils, basscd;
 
 
 type
@@ -599,52 +600,71 @@ end;
 function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
+    baseName: String;
 begin
   try
+      case aAudioFile.AudioType of
+          at_Stream: begin
+              GetDefaultCover(dcWebRadio, aCoverbmp, cmUseBibDefaults);
+              result := True;
+          end;
+          at_File: begin
+              if (aAudioFile.CoverID <> '') And FileExists(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg') then
+              begin
+                  aGraphic := TPicture.Create;
+                  try
+                      aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
+                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                      begin
+                          FitBitmapIn(aCoverbmp, aGraphic.Graphic);
+                          aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
+                      end else
+                          AssignBitmap(aCoverBmp, aGraphic);
+                      result := True;
+                  finally
+                      aGraphic.Free;
+                  end;
+              end else
+              begin
+                  // erstmal im ID3-Tag nach nem Bild suchen
+                  if GetCoverFromID3(aAudioFile, aCoverbmp) then
+                      result := True
+                  else
+                  begin // in Dateien rund um das Audiofile nach nem Bild suchen
+                      coverliste := TStringList.Create;
+                      Medienbib.GetCoverListe(aAudioFile,coverliste);
+                      try
+                          if Not GetCoverFromList(CoverListe, aCoverbmp) then
+                          begin
+                              GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                              result := False;
+                          end else
+                              result := True;
+                      except
+                          GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                          result := false;
+                      end;
+                      coverliste.free;
+                  end;
+              end;
+          end;
+          at_CDDA: begin
+              // get a Covername from cddb-id
+              baseName := CoverFilenameFromCDDA(aAudioFile.Pfad);
+              Showmessage(baseName) ;
+              // testen, ob Datei schon da. wenn ja: Laden
+              // wenn nein: Neue art von Coverdownload.job starten oder alten Player-cover-code anpassen.
+
+          end;
+
+      end;
+
       if aAudioFile.isStream then
       begin
-          GetDefaultCover(dcWebRadio, aCoverbmp, cmUseBibDefaults);
-          result := True;
+
       end else
       begin
-            if (aAudioFile.CoverID <> '') And FileExists(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg') then
-            begin
-                aGraphic := TPicture.Create;
-                try
-                    aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
-                    if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                    begin
-                        FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-                        aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-                    end else
-                        AssignBitmap(aCoverBmp, aGraphic);
-                    result := True;
-                finally
-                    aGraphic.Free;
-                end;
-            end else
-            begin
-                // erstmal im ID3-Tag nach nem Bild suchen
-                if GetCoverFromID3(aAudioFile, aCoverbmp) then
-                    result := True
-                else
-                begin // in Dateien rund um das Audiofile nach nem Bild suchen
-                    coverliste := TStringList.Create;
-                    Medienbib.GetCoverListe(aAudioFile,coverliste);
-                    try
-                        if Not GetCoverFromList(CoverListe, aCoverbmp) then
-                        begin
-                            GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
-                            result := False;
-                        end else
-                            result := True;
-                    except
-                        GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
-                        result := false;
-                    end;
-                    coverliste.free;
-                end;
-            end;
+
       end;
   except
       GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
