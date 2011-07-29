@@ -600,8 +600,9 @@ end;
 function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
-    baseName: String;
+    baseName, completeName: String;
 begin
+  result := false;
   try
       case aAudioFile.AudioType of
           at_Stream: begin
@@ -651,12 +652,33 @@ begin
           at_CDDA: begin
               // get a Covername from cddb-id
               baseName := CoverFilenameFromCDDA(aAudioFile.Pfad);
-              Showmessage(baseName) ;
-              // testen, ob Datei schon da. wenn ja: Laden
-              // wenn nein: Neue art von Coverdownload.job starten oder alten Player-cover-code anpassen.
+              completeName := '';
+              if FileExists(Medienbib.CoverSavePath + baseName + '.jpg') then
+                  completeName := Medienbib.CoverSavePath + baseName + '.jpg'
+              else if FileExists(Medienbib.CoverSavePath + baseName + '.png') then
+                  completeName := Medienbib.CoverSavePath + baseName + '.png';
 
+              if completeName <> '' then
+              begin
+                  aGraphic := TPicture.Create;
+                  try
+                      aGraphic.LoadFromFile(completeName);
+                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                      begin
+                          FitBitmapIn(aCoverbmp, aGraphic.Graphic);
+                          aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
+                      end else
+                          AssignBitmap(aCoverBmp, aGraphic);
+                      result := True;
+                  finally
+                      aGraphic.Free;
+                  end;
+              end else
+              begin
+                  GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                  result := false;
+              end;
           end;
-
       end;
   except
       GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
