@@ -54,14 +54,16 @@ type
     TPicType = (ptNone, ptJPG, ptPNG);
 
     TQueryType = (qtCoverFlow, qtPlayer);
+    TSubQueryType = (sqtFile, sqtCDDA);
 
     TCoverDownloadItem = class
         Artist: String;
         Album: String;
         Directory: String;
-        CoverDestination: String; // Destination for the downloaded Coverfile.
+        //nö. CoverDestination: String; // Destination for the downloaded Coverfile.
                                   // = Directory for files, /Cover/ for CDDA
         QueryType: TQueryType;
+        SubQueryType: TSubQueryType; // used for qtPlayer (file/cdda)
         FileType: String;
         Index: Integer;         // used in CoverFlow
         distance: Integer;      // distance to MostImportantIndex
@@ -112,6 +114,8 @@ type
             procedure CollectAudioInformation(source: TStringList; Target: TObjectList);
             function IsProperAlbum(aAudioFileList: TObjectList): Boolean;
             function CollectAlbumInformation: Boolean;
+            function CollectCDInformation: Boolean;
+
 
 
             // Thread-methods. Downloading, parsing, ...
@@ -324,7 +328,13 @@ begin
                         EnterCriticalSection(CSAccessCacheList);
 
                         if fCurrentDownloadItem.QueryType = qtPlayer then
-                            ProperAlbum := CollectAlbumInformation
+                        begin
+                            if fCurrentDownloadItem.SubQueryType = sqtFile then
+                                ProperAlbum := CollectAlbumInformation
+                            else
+                                ProperAlbum := CollectCDInformation
+
+                        end
                         else
                             ProperAlbum := True;
 
@@ -605,6 +615,17 @@ begin
     end;
 end;
 
+{
+    --------------------------------------------------------
+    CollectCDInformation:
+    - get proper Album-Information for the current AudioCD
+    --------------------------------------------------------
+}
+function TCoverDownloadWorkerThread.CollectCDInformation: Boolean;
+begin
+
+end;
+
 
 
 
@@ -879,6 +900,7 @@ begin
     NewDownloadItem.Album     := aCover.Album;
     NewDownloadItem.Directory := aCover.Directory;
     NewDownloadItem.QueryType := qtCoverFlow;
+    NewDownloadItem.SubQueryType := sqtFile;
     NewDownloadItem.FileType  := '';
     NewDownloadItem.Index     := Idx;
     fJobList.Insert(0, NewDownloadItem);
@@ -895,8 +917,19 @@ begin
     NewDownloadItem := TCoverDownloadItem.Create;
     NewDownloadItem.Artist    := aAudioFile.Artist;
     NewDownloadItem.Album     := aAudioFile.Album;
-    NewDownloadItem.Directory := aAudioFile.Ordner;     // including the "\"
+
     NewDownloadItem.QueryType := qtPlayer;
+    if aAudioFile.IsFile then
+    begin
+        NewDownloadItem.SubQueryType := sqtFile;
+        NewDownloadItem.Directory := aAudioFile.Ordner;     // including the "\"
+    end;
+    if aAudioFile.isCDDA then
+    begin
+        NewDownloadItem.SubQueryType := sqtCDDA;
+        NewDownloadItem.Directory := aAudioFile.Pfad;     // complete Path on CDDA
+    end;
+
     NewDownloadItem.FileType  := aAudioFile.Extension;  // i.e. "mp3", without the leading "."
     NewDownloadItem.Index     := 0;
 
@@ -979,12 +1012,13 @@ begin
         FWorkToDo := True;
         // Copy the Item from the List, so the Thread can savely work on this
         fi := TCoverDownloadItem(fJobList.Items[0]);
-        fCurrentDownloadItem.Artist      := fi.Artist    ;
-        fCurrentDownloadItem.Album       := fi.Album     ;
-        fCurrentDownloadItem.Directory   := fi.Directory ;
-        fCurrentDownloadItem.Index       := fi.Index     ;
-        fCurrentDownloadItem.QueryType   := fi.QueryType ;
-        fCurrentDownloadItem.FileType    := fi.FileType  ;
+        fCurrentDownloadItem.Artist       := fi.Artist      ;
+        fCurrentDownloadItem.Album        := fi.Album       ;
+        fCurrentDownloadItem.Directory    := fi.Directory   ;
+        fCurrentDownloadItem.Index        := fi.Index       ;
+        fCurrentDownloadItem.QueryType    := fi.QueryType   ;
+        fCurrentDownloadItem.SubQueryType := fi.SubQueryType;
+        fCurrentDownloadItem.FileType     := fi.FileType    ;
         fJobList.Delete(0);
     end else
         fEvent.ResetEvent;
