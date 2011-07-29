@@ -81,6 +81,7 @@ type
     function SameDrive(A, B: String): Boolean;
     function AudioDriveNumber(aPath: String): Integer;
     function CoverFilenameFromCDDA(aPath: String): String;
+    function CddbIDFromCDDA(aPath: String): String;
 
     procedure ClearCDDBCache;
 
@@ -165,6 +166,13 @@ begin
     result := StringReplace(result, ' ', '-', [rfReplaceAll]);
     if Length(result) > 32 then
         SetLength(Result, 32);
+end;
+
+function CddbIDFromCDDA(aPath: String): String;
+var aDrive: Integer;
+begin
+    aDrive := AudioDriveNumber(aPath);
+    result := BASS_CD_GetID(aDrive,BASS_CDID_CDDB);
 end;
 
 

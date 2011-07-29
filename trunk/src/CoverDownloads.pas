@@ -37,7 +37,8 @@ uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
   IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException,
-  CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes, SyncObjs;
+  CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, cddaUtils,
+  Nemp_ConstantsAndTypes, SyncObjs;
 
 const
     ccArtist     = 0;
@@ -64,7 +65,9 @@ type
                                   // = Directory for files, /Cover/ for CDDA
         QueryType: TQueryType;
         SubQueryType: TSubQueryType; // used for qtPlayer (file/cdda)
-        FileType: String;
+        FileType: String;       // On files: used to collect artist-album-data from other files
+                                //           in current directory with the same extension
+                                // On CDDA: the cddb-id of the disc
         Index: Integer;         // used in CoverFlow
         distance: Integer;      // distance to MostImportantIndex
         lastChecked: TDateTime; // time of last query for this Item
@@ -333,7 +336,6 @@ begin
                                 ProperAlbum := CollectAlbumInformation
                             else
                                 ProperAlbum := CollectCDInformation
-
                         end
                         else
                             ProperAlbum := True;
@@ -363,7 +365,7 @@ begin
                                       begin
                                           if assigned(CurrentCacheItem) then
                                               fCacheList.Remove(CurrentCacheItem);
-                                          SavePicStreamToFile;             // save downloaded picture to a file
+                                          Synchronize(SavePicStreamToFile); // save downloaded picture to a file
                                           Synchronize(SyncUpdateMedialib); // update Medialibrary
                                       end else
                                       begin
@@ -382,7 +384,12 @@ begin
                                               begin
                                                   // create new cache entry
                                                   NewCacheItem := TCoverDownloadItem.Create;
-                                                  NewCacheItem.Artist := fCurrentDownloadItem.Artist;
+                                                  if (fCurrentDownloadItem.QueryType = qtPlayer)
+                                                    and (fCurrentDownloadItem.SubQueryType = sqtCDDA)
+                                                  then
+                                                      NewCacheItem.Artist := fCurrentDownloadItem.FileType // i.e. the cddb-id of the disc
+                                                  else
+                                                      NewCacheItem.Artist := fCurrentDownloadItem.Artist;
                                                   NewCacheItem.Album  := fCurrentDownloadItem.Album ;
                                                   NewCacheItem.Directory := fCurrentDownloadItem.Directory;
                                                   NewCacheItem.queryCount := 1;
@@ -623,7 +630,10 @@ end;
 }
 function TCoverDownloadWorkerThread.CollectCDInformation: Boolean;
 begin
+    result := (fCurrentDownloadItem.Artist <> '') and (fCurrentDownloadItem.Album <> '');
 
+    fCurrentDownloadItem.FileType := CddbIDFromCDDA(fCurrentDownloadItem.Directory);
+    // Directory is complete path on cdda
 end;
 
 
@@ -642,15 +652,33 @@ begin
     // Block CacheList
     EnterCriticalSection(CSAccessCacheList);
     result := Nil;
-    for i := 0 to fCacheList.Count - 1 do
+
+    if (fCurrentDownloadItem.QueryType = qtPlayer)
+       and (fCurrentDownloadItem.SubQueryType = sqtCDDA)
+    then
     begin
-        aItem := TCoverDownloadItem(fCacheList[i]);
-        if (aItem.Artist = fCurrentDownloadItem.Artist)
-            and (aItem.Album = fCurrentDownloadItem.Album)
-        then
+        for i := 0 to fCacheList.Count - 1 do
         begin
-            result := aItem;
-            break;
+            aItem := TCoverDownloadItem(fCacheList[i]);
+            // in this case: Artist is the cddb-ID
+            if (aItem.Artist = fCurrentDownloadItem.FileType) then
+            begin
+                result := aItem;
+                break;
+            end;
+        end;
+    end else
+    begin
+        for i := 0 to fCacheList.Count - 1 do
+        begin
+            aItem := TCoverDownloadItem(fCacheList[i]);
+            if (aItem.Artist = fCurrentDownloadItem.Artist)
+                and (aItem.Album = fCurrentDownloadItem.Album)
+            then
+            begin
+                result := aItem;
+                break;
+            end;
         end;
     end;
     LeaveCriticalSection(CSAccessCacheList);
@@ -871,11 +899,23 @@ end;
 }
 procedure TCoverDownloadWorkerThread.SavePicStreamToFile;
 begin
-    case fDataType of
-        ptJPG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).jpg';
-        ptPNG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).png';
-    else
-        fNewCoverFilename := '';
+    if (fCurrentDownloadItem.QueryType = qtPlayer) and
+       (fCurrentDownloadItem.SubQueryType = sqtCDDA)
+    then begin
+        case fDataType of
+            ptJPG:  fNewCoverFilename := Medienbib.CoverSavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.jpg';
+            ptPNG:  fNewCoverFilename := Medienbib.CoverSavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.png';
+        else
+            fNewCoverFilename := '';
+        end;
+    end else
+    begin
+        case fDataType of
+            ptJPG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).jpg';
+            ptPNG:  fNewCoverFilename := fCurrentDownloadItem.Directory + 'front (NempAutoCover).png';
+        else
+            fNewCoverFilename := '';
+        end;
     end;
 
     if fNewCoverFilename <> '' then
@@ -884,6 +924,7 @@ begin
     except
         // nothing. saving failed
     end;
+
 end;
 
 {
@@ -992,9 +1033,13 @@ end;
 
 function TCoverDownloadWorkerThread.DownloadItemStillMatchesPlayer: Boolean;
 begin
-    result := assigned(NempPlayer.MainAudioFile)
+    if (fCurrentDownloadItem.SubQueryType = sqtFile) then
+        result := assigned(NempPlayer.MainAudioFile)
             and
-            (NempPlayer.MainAudioFile.Ordner = fCurrentDownloadItem.Directory);
+            (NempPlayer.MainAudioFile.Ordner = fCurrentDownloadItem.Directory)
+    else
+        result := assigned(NempPlayer.MainAudioFile)
+            and (CddbIDFromCDDA(NempPlayer.MainAudioFile.Pfad) = fCurrentDownloadItem.FileType)
 end;
 
 {
