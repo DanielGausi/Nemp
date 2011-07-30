@@ -87,7 +87,8 @@ uses
   ErrorForm in 'ErrorForm.pas' {FError},
   BasicSettingsWizard in 'BasicSettingsWizard.pas' {Wizard},
   cddaUtils in 'cddaUtils.pas',
-  CDSelection in 'CDSelection.pas' {FormCDDBSelect};
+  CDSelection in 'CDSelection.pas' {FormCDDBSelect},
+  CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog};
 
 //,  classes;
 
@@ -115,7 +116,6 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TFormCDDBSelect, FormCDDBSelect);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

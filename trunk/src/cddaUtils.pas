@@ -32,7 +32,7 @@ type
             Revision : AnsiString;
             Letter   : Char;
 
-            function GetCDDBData: AnsiString;
+            function GetCDDBData(CheckOnline: Boolean): AnsiString;
             procedure CheckForCompilation(aData: AnsiString);
     end;
 
@@ -45,6 +45,7 @@ type
             fTrack    : Integer;
             fYear     : String;
             fGenre    : String;
+            fCddbID   : String;
 
             fDriveLetter : Char;
             fDriveNumber : Integer;
@@ -56,7 +57,7 @@ type
 
             function fGetDataFromCDText(aDrive, aTrack: Integer): Boolean;
 
-            function fGetDataFromCDDB(aDrive, aTrack: Integer): Boolean;
+            function fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean): Boolean;
 
 
 
@@ -68,6 +69,7 @@ type
             property Track    : Integer read fTrack     ;
             property Year     : String  read fYear      ;
             property Genre    : String  read fGenre     ;
+            property CddbID   : String  read fCddbID    ;
 
             constructor Create;
 
@@ -83,7 +85,7 @@ type
     function CoverFilenameFromCDDA(aPath: String): String;
     function CddbIDFromCDDA(aPath: String): String;
 
-    procedure ClearCDDBCache;
+    procedure ClearCDDBCache(aIdx: Integer = -1);
 
 
 
@@ -176,18 +178,31 @@ begin
 end;
 
 
-procedure ClearCDDBCache;
+procedure ClearCDDBCache(aIdx: Integer = -1);
 var i: Integer;
 begin
     if assigned(CDDriveList) then
     begin
-        for i := 0 to CDDriveList.Count - 1 do
+        if aIdx = -1 then
+            for i := 0 to CDDriveList.Count - 1 do
+            begin
+                TCDDADrive(CDDriveList[i]).fCachedCddbData := '';
+                TCDDADrive(CDDriveList[i]).fCachedCddbID   := '';
+                TCDDADrive(CDDriveList[i]).fIsCompilation  := False;
+                TCDDADrive(CDDriveList[i]).fDelimter       := #0;
+            end
+        else
         begin
-            TCDDADrive(CDDriveList[i]).fCachedCddbData := '';
-            TCDDADrive(CDDriveList[i]).fCachedCddbID   := '';
-            TCDDADrive(CDDriveList[i]).fIsCompilation  := False;
-            TCDDADrive(CDDriveList[i]).fDelimter       := #0;
+            // just the index
+            if (aIdx >= 0) and (aIdx < CDDriveList.Count) then
+            begin
+                TCDDADrive(CDDriveList[aIdx]).fCachedCddbData := '';
+                TCDDADrive(CDDriveList[aIdx]).fCachedCddbID   := '';
+                TCDDADrive(CDDriveList[aIdx]).fIsCompilation  := False;
+                TCDDADrive(CDDriveList[aIdx]).fDelimter       := #0;
+            end;
         end;
+
     end;
 end;
 
@@ -234,7 +249,7 @@ begin
 
 end;
 
-function TCDDADrive.GetCDDBData: AnsiString;
+function TCDDADrive.GetCDDBData(CheckOnline: Boolean): AnsiString;
 var newCddbID, queryReply: PAnsiChar;
 
 begin
@@ -247,50 +262,54 @@ begin
             result := fCachedCddbData
         else
         begin
-            // get new DATA
-            fCachedCddbID := newCddbID;
-
-            // 1. Query
-            queryReply := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_QUERY);
-
-            if AnsiStartsText('200', queryReply) then
+            if CheckOnline then
             begin
-                // only one entry for this disc found
-                fCachedCddbData := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_READ + 0);
-            end else
-            begin
-                if AnsiStartsText('210', queryReply)
-                    or AnsiStartsText('211', queryReply)
-                then
+                // get new DATA
+                fCachedCddbID := newCddbID;
+
+                // 1. Query
+                queryReply := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_QUERY);
+
+                if AnsiStartsText('200', queryReply) then
                 begin
-                    // User selection needed
-                    if not assigned(FormCDDBSelect) then
-                        Application.CreateForm(TFormCDDBSelect, FormCDDBSelect);
-                    FormCDDBSelect.FillView(queryReply);
-
-                    if FormCDDBSelect.ShowModal = mrOK then
-                    begin
-                        fCachedCddbData := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_READ + FormCDDBSelect.SelectedEntry);
-                        CheckForCompilation(fCachedCddbData);
-                    end else
-                    begin
-                        // canceled by user
-                        fCachedCddbID := '';
-                        fCachedCddbData := '';
-                        result := '';
-                    end;
+                    // only one entry for this disc found
+                    fCachedCddbData := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_READ + 0);
                 end else
                 begin
-                    // some error occured
-                    fCachedCddbData := '';
-                    // fCachedCddbID := '';
-                    // showmessage(queryReply);
-                    result := '';
-                end;
-            end;
+                    if AnsiStartsText('210', queryReply)
+                        or AnsiStartsText('211', queryReply)
+                    then
+                    begin
+                        // User selection needed
+                        if not assigned(FormCDDBSelect) then
+                            Application.CreateForm(TFormCDDBSelect, FormCDDBSelect);
+                        FormCDDBSelect.FillView(queryReply);
 
-            result := fCachedCddbData;
-            // showmessage(result);
+                        if FormCDDBSelect.ShowModal = mrOK then
+                        begin
+                            fCachedCddbData := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_READ + FormCDDBSelect.SelectedEntry);
+                            CheckForCompilation(fCachedCddbData);
+                        end else
+                        begin
+                            // canceled by user
+                            // fCachedCddbID := '';
+                            fCachedCddbData := '';
+                            result := '';
+                        end;
+                    end else
+                    begin
+                        // some error occured
+                        fCachedCddbData := '';
+                        // fCachedCddbID := '';
+                        // showmessage(queryReply);
+                        result := '';
+                    end;
+                end;
+                result := fCachedCddbData;
+
+            end
+            else // No Online-Check
+                result := '';
         end;
     end else
         result := '';
@@ -442,7 +461,7 @@ end;
     Get Artist/Titel/Album from CDDB // freeDB
     --------------------------------------------------------
 }
-function TCDDAFile.fGetDataFromCDDB(aDrive, aTrack: Integer): Boolean;
+function TCDDAFile.fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean): Boolean;
 var CompleteData: AnsiString;
     sl: TStringList;
     idx: Integer;
@@ -469,7 +488,7 @@ begin
     //    Yes: Use cached Data
 
 
-    CompleteData := TCDDADrive(CDDriveList[aDrive]).GetCDDBData;
+    CompleteData := TCDDADrive(CDDriveList[aDrive]).GetCDDBData(CheckOnline);
 
     if CompleteData <> '' then
     begin
@@ -510,17 +529,6 @@ begin
             sl.Free
         end;
     end;
-
-
-    ///  DTITLE=Sampler / Bravo Hits 06 CD1
-    ///  DYEAR=1994
-    ///  DGENRE=Pop
-    ///
-    ///
-    // Get Line with "TTITLEX" with X= aTrack-1 (starting at 0)
-    // get Artist / Titel (check for compilation)
-
-
 end;
 
 
@@ -551,11 +559,13 @@ begin
                         // CD audio is always 44100hz stereo 16-bit. That is 176400 bytes per second.
                         fDuration := ByteLength Div 176400;
 
+                        fCddbID := BASS_CD_GetID(fDriveNumber, BASS_CDID_CDDB);
+
                         if not fGetDataFromCDText(fDriveNumber, fTrack) then
                         begin
-                            if UseCDDB then
+                            // if UseCDDB then
                                 // get data from cddb
-                                fGetDataFromCDDB(fDriveNumber, fTrack-1);
+                                fGetDataFromCDDB(fDriveNumber, fTrack-1, UseCDDB);
                         end;
 
 

@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player (SendmessageTimeout Test)'
-  ClientHeight = 726
+  ClientHeight = 806
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2441,7 +2441,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 64
+    Height = 144
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
@@ -2452,7 +2452,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 28
       Width = 858
-      Height = 36
+      Height = 116
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2463,12 +2463,12 @@ object Nemp_MainForm: TNemp_MainForm
       OwnerDraw = False
       DesignSize = (
         858
-        36)
+        116)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 26
+        Height = 106
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
@@ -2477,7 +2477,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 400
           Top = 0
           Width = 4
-          Height = 26
+          Height = 106
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2487,7 +2487,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 26
+          Height = 106
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2626,7 +2626,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 26
+          Height = 106
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -3974,7 +3974,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C0101110013003C060E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011100130044060E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4539,7 +4539,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806900710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806980710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6193,6 +6193,10 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Add directory'
       OnClick = MM_PL_DirectoryClick
     end
+    object PM_PL_AddCDAudio: TMenuItem
+      Caption = 'Add CD-Audio'
+      OnClick = PM_PL_AddCDAudioClick
+    end
     object PM_PL_AddWebstream: TMenuItem
       Caption = 'Add webradio'
       ShortCut = 16457
@@ -7295,6 +7299,10 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Play webstream'
       OnClick = PM_PlayWebstreamClick
     end
+    object PM_PlayCDAudio: TMenuItem
+      Caption = 'Play CD-Audio'
+      OnClick = PM_PlayCDAudioClick
+    end
   end
   object PopupStop: TPopupMenu
     OnPopup = PopupStopPopup
@@ -7461,7 +7469,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800E40310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800EC0310001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

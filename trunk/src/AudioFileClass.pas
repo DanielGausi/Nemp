@@ -1877,6 +1877,7 @@ begin
             fDuration := cdFile.Duration;
             Genre := cdFile.Genre;
             Year := cdFile.Year;
+            Comment := cdFile.CddbID;
         end
 
     finally
