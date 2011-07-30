@@ -710,6 +710,8 @@ StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display th
                       +#13#10+#13#10
                       +'So, do you want to start the G15 App now?';
 
+CDDA_NoDrivesFound = 'No CD drives found.';
+
 implementation
 
 end.

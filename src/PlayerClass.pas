@@ -1141,6 +1141,16 @@ begin
           end;
       end;
 
+      if MainAudioFile.isCDDA then
+      begin
+          // check, whether the current cd is valid for the AudioFile-Object
+          // this is VERY important for the cover-downloading:
+          // if album-Artist-data does not match the cddb-id, a wrong cover will be downloaded
+          // and displayed permanently
+          if (CddbIDFromCDDA(MainAudioFile.Pfad) <> MainAudioFile.Comment ) then
+              MainAudioFile.GetAudioData(MainAudioFile.Pfad, 0);
+      end;
+
       CDChangeSuccess := True;
       if JustCDChange then
           CDChangeSuccess := BASS_CD_StreamSetTrack(MainStream, MainAudioFile.Track - 1)

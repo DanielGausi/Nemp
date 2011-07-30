@@ -160,6 +160,9 @@
 			<DCCReference Include="CDSelection.pas">
 				<Form>FormCDDBSelect</Form>
 			</DCCReference>
+			<DCCReference Include="CDOpenDialogs.pas">
+				<Form>CDOpenDialog</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

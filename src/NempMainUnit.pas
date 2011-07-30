@@ -819,6 +819,8 @@ type
     PM_P_KeyboardDisplay: TMenuItem;
     MM_O_Wizard: TMenuItem;
     PM_P_Wizard: TMenuItem;
+    PM_PlayCDAudio: TMenuItem;
+    PM_PL_AddCDAudio: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1376,6 +1378,8 @@ type
       Y: Integer);
     procedure PM_P_KeyboardDisplayClick(Sender: TObject);
     procedure MM_O_WizardClick(Sender: TObject);
+    procedure PM_PlayCDAudioClick(Sender: TObject);
+    procedure PM_PL_AddCDAudioClick(Sender: TObject);
 
   private
 
@@ -1564,7 +1568,8 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   BirthdayShow, RandomPlaylist, BasicSettingsWizard,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
-  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm;
+  TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
+  CDOpenDialogs;
 
 
 {$R *.dfm}
@@ -6334,6 +6339,28 @@ begin
     NempPlayer.StopHeadset;
 end;
 
+procedure TNemp_MainForm.PM_PlayCDAudioClick(Sender: TObject);
+var CurrentIdx, i: Integer;
+begin
+    CurrentIdx := NempPlaylist.Count; // CurrentIdx ist der erwartete Index des ersten neu eingefügten Files
+
+    if not assigned(CDOpenDialog) then
+        Application.CreateForm(TCDOpenDialog, CDOpenDialog);
+
+    if CDOpenDialog.ShowModal = mrOK then
+    begin
+        for i := 0 to CDOpenDialog.Files.Count - 1 do
+            NempPlaylist.AddFileToPlaylist(CDOpenDialog.Files[i]);
+        if (NempPlaylist.Count > CurrentIdx) then
+        begin
+            NempPlayer.LastUserWish := USER_WANT_PLAY;
+            NempPlaylist.Play(CurrentIdx, 0, True);
+        end;
+    end;
+
+
+end;
+
 procedure TNemp_MainForm.PM_PlayFilesClick(Sender: TObject);
 var CurrentIdx, i: Integer;
 begin
@@ -6903,6 +6930,34 @@ begin
   finally
       fb.Free;
   end;
+end;
+
+procedure TNemp_MainForm.PM_PL_AddCDAudioClick(Sender: TObject);
+var i: integer;
+  Abspielen: Boolean;
+begin
+    // Playlistlänge merken
+    Abspielen := NempPlaylist.Count = 0;
+
+    // Show CD-Open-Dialog, insert files, ...
+
+    if not assigned(CDOpenDialog) then
+        Application.CreateForm(TCDOpenDialog, CDOpenDialog);
+
+    if CDOpenDialog.ShowModal = mrOK then
+    begin
+        for i := 0 to CDOpenDialog.Files.Count - 1 do
+            NempPlaylist.AddFileToPlaylist(CDOpenDialog.Files[i]);
+    end;
+
+    // ggf. abspielen
+    if abspielen AND (NempPlaylist.Count > 0) then
+    begin
+      //StopAndFree;
+      NempPlayer.LastUserWish := USER_WANT_PLAY;
+      NempPlaylist.Play(0, 0, True);
+    end;
+
 end;
 
 procedure TNemp_MainForm.MM_PL_FilesClick(Sender: TObject);
@@ -10287,6 +10342,8 @@ begin
     // manually call OnResize, to put details below or aside the coverimage
     VDTCoverResize(VDTCover);
 end;
+
+
 
 
 procedure TNemp_MainForm.PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
