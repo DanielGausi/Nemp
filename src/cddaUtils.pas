@@ -550,7 +550,22 @@ begin
                     // Get Duration
                     ByteLength := BASS_CD_GetTrackLength(fDriveNumber, fTrack-1); // This method wants Track=0 for the first track ;-)
                     if ByteLength = High(DWord) then
-                        result := BassErrorToCDError(BASS_ErrorGetCode)
+                    begin
+                        {case BASS_ErrorGetCode of
+                            BASS_ERROR_NOTAUDIO:
+                             begin
+                                fArtist := '';
+                                fTitle := '';
+                                fAlbum := '';
+                                fGenre := '';
+                                fYear  := '';
+                                result := cddaErr_None;
+                            end
+                        else}
+                            result := BassErrorToCDError(BASS_ErrorGetCode)
+                        {end;}
+
+                    end
                     else
                     begin
                         // There is a CD, the track is valid. So: we can finally begin to check for
@@ -567,8 +582,6 @@ begin
                                 // get data from cddb
                                 fGetDataFromCDDB(fDriveNumber, fTrack-1, UseCDDB);
                         end;
-
-
                     end;
                 end else
                     result := cddaErr_DriveNotReady;

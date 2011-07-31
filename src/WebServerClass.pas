@@ -216,10 +216,10 @@ type
 
 
           function fGenerateHTMLMainMenu: UTf8String;
-          function fGenerateHTMLPlaylistActionMenu(aFilename: String; aID: Integer; isStream: Boolean): UTf8String;
+          function fGenerateHTMLPlaylistActionMenu(aFilename: String; aID: Integer; isFile: Boolean): UTf8String;
           function fGenerateHTMLMedienBibActionMenu(aFilename: String; aID: Integer): UTf8String;
 
-          function fGenerateHTMLPlayerActionMenu(aFilename: String; aID: Integer): UTf8String;
+          function fGenerateHTMLPlayerActionMenu(aFilename: String; aID: Integer; isFile: Boolean): UTf8String;
 
           function fGetCount: Integer;
 
@@ -523,9 +523,9 @@ begin
   end;
 end;
 
-function TNempWebServer.fGenerateHTMLPlaylistActionMenu(aFilename: String; aID: Integer; isStream: Boolean): UTf8String;
+function TNempWebServer.fGenerateHTMLPlaylistActionMenu(aFilename: String; aID: Integer; isFile: Boolean): UTf8String;
 begin
-    if isStream then
+    if Not isFile then
     begin
         if AllowRemoteControl then
         begin
@@ -574,13 +574,13 @@ begin
                      + #13#10 + '</div>';
 end;
 
-function TNempWebServer.fGenerateHTMLPlayerActionMenu(aFilename: String; aID: Integer): UTf8String;
+function TNempWebServer.fGenerateHTMLPlayerActionMenu(aFilename: String; aID: Integer; isFile: Boolean): UTf8String;
 begin
     if AllowPlaylistDownload or AllowRemoteControl then
     begin
         result := '<div class="actionmenu">'
                   + #13#10 + '<ul class="actionmenu">';
-        if AllowPlaylistDownload then
+        if AllowPlaylistDownload and isFile then
             result := result + #13#10 +
                 '<li> <a href="' +
                 HRefEncode((aFilename)) + '?id=' + UTf8String(IntToStr(aID)) + '&Action=download_pl">Download</a></li>';
@@ -672,11 +672,11 @@ begin
         fn := af.Dateiname;
         title := UTf8String(EscapeHTMLChars(af.PlaylistTitle));
         if af.isStream then
-            duration := '(inf)'
+            duration := 'webradio'
         else
             duration := UTf8String(SekIntToMinStr(af.Duration));
 
-        tmp := tmp + '<div class="currenttitle">Now playing: ' + title +  '</div>';  // '<div class="currenttitle">' + title + '</div>';
+        tmp := tmp + '<div class="currenttitle">Now playing: ' + title +  ' (' + duration + ')</div>';  // '<div class="currenttitle">' + title + '</div>';
 
         if (af.CoverID <> '') and (FileExists(CoverSavePath + af.CoverID + '.jpg')) then
             tmp := tmp + '<div class="currentimage"><img src="cover?id=' + UTf8String(af.CoverID) + '" border="0"></div>';
@@ -687,7 +687,8 @@ begin
         fn := '';
     end;
 
-    tmp := tmp  + fGenerateHTMLPlayerActionMenu(fn, -1) + HTML_Footer;
+    tmp := tmp  + fGenerateHTMLPlayerActionMenu(fn, -1, assigned(af) and af.IsFile) + HTML_Footer;
+
     HTML_Player := tmp;
 end;
 
@@ -757,7 +758,7 @@ begin
 
     if assigned(aAudioFile) then
     begin
-        aAudioFile.FileIsPresent := aAudioFile.isStream or FileExists(aAudioFile.Pfad);
+        aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
         if Not aAudioFile.FileIsPresent then
             tmp := tmp + '<div class="warning"> Warning: File not found. </div>';
 
@@ -776,7 +777,7 @@ begin
             //if (aAudiofile.CoverID <> '') and (FileExists(CoverSavePath + aAudioFile.CoverID + '.jpg')) then
             //    tmp := tmp + '<li><img src="cover?id=' + aAudiofile.CoverID + '" border="0"> </li>';
 
-            tmp := tmp + '</ul>' + fGenerateHTMLPlaylistActionMenu(aAudioFile.Dateiname, aAudioFile.WebServerID, True) + HTML_Footer;
+            tmp := tmp + '</ul>' + fGenerateHTMLPlaylistActionMenu(aAudioFile.Dateiname, aAudioFile.WebServerID, aAudioFile.IsFile) + HTML_Footer;
 
         end
         else
@@ -789,19 +790,25 @@ begin
             quality := quality + aAudioFile.SampleRate; //+ channel_modes[aAudioFile.ChannelModeIDX];
 
             tmp := tmp + '<ul  class="details">'
-                     + #13#10 + '<li>Title: ' + UTf8String(EscapeHTMLChars((aAudioFile.Titel))) + '</li>'
-                     + #13#10 + '<li>Artist: ' + UTf8String(EscapeHTMLChars((aAudioFile.Artist))) + '</li>'
-                     + #13#10 + '<li>Album: ' + UTf8String(EscapeHTMLChars((aAudioFile.Album))) + '</li>'
-                     + #13#10 + '<li>Duration: ' + UTf8String(EscapeHTMLChars((duration))) + '</li>'
-                     + #13#10 + '<li>Filesize: ' + UTf8String(EscapeHTMLChars((FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2)))) + 'mb </li>'
-                     + #13#10 + '<li>Filetype: ' + UTf8String(EscapeHTMLChars((AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))))) + '</li>'
-                     + #13#10 + '<li>Quality: ' + UTf8String(EscapeHTMLChars((quality))) + '</li>'
-                     ;
+                      + #13#10 + '<li>Title: ' + UTf8String(EscapeHTMLChars((aAudioFile.Titel))) + '</li>'
+                      + #13#10 + '<li>Artist: ' + UTf8String(EscapeHTMLChars((aAudioFile.Artist))) + '</li>'
+                      + #13#10 + '<li>Album: ' + UTf8String(EscapeHTMLChars((aAudioFile.Album))) + '</li>'
+                      + #13#10 + '<li>Duration: ' + UTf8String(EscapeHTMLChars((duration))) + '</li>';
+
+            if aAudioFile.IsFile then
+                tmp := tmp
+                      + #13#10 + '<li>Filesize: ' + UTf8String(EscapeHTMLChars((FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2)))) + 'mb </li>'
+                      + #13#10 + '<li>Filetype: ' + UTf8String(EscapeHTMLChars((AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))))) + '</li>'
+                      + #13#10 + '<li>Quality: ' + UTf8String(EscapeHTMLChars((quality))) + '</li>'
+            else
+                tmp := tmp
+                      + #13#10 + '<li>Quality: ' + UTf8String(EscapeHTMLChars((quality))) + ' (CD-Audio) </li>';
+
             if (aAudiofile.CoverID <> '') and (FileExists(CoverSavePath + aAudioFile.CoverID + '.jpg')) then
                 tmp := tmp + '<li><img src="cover?id=' + UTf8String(aAudiofile.CoverID) + '" border="0"> </li>';
 
 
-            tmp := tmp + '</ul>' + fGenerateHTMLPlaylistActionMenu(aAudioFile.Dateiname, aAudioFile.WebServerID, False) + HTML_Footer;
+            tmp := tmp + '</ul>' + fGenerateHTMLPlaylistActionMenu(aAudioFile.Dateiname, aAudioFile.WebServerID, aAudioFile.IsFile) + HTML_Footer;
         end;
 
 
@@ -817,7 +824,7 @@ begin
     tmp := HTML_Header;
     tmp := tmp + Mainmenu + HTML_DetailsHeader + #13#10;
 
-    aAudioFile.FileIsPresent := aAudioFile.isStream or FileExists(aAudioFile.Pfad);
+    aAudioFile.FileIsPresent := Not aAudioFile.IsFile or FileExists(aAudioFile.Pfad);
     if Not aAudioFile.FileIsPresent then
         tmp := tmp + '<div class="warning"> Warning: File not found. </div>';
 

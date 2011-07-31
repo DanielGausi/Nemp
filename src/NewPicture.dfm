@@ -48,7 +48,7 @@ object FNewPicture: TFNewPicture
     Width = 193
     Height = 21
     Style = csDropDownList
-    ItemHeight = 0
+    ItemHeight = 13
     TabOrder = 0
   end
   object EdtPictureDescription: TEdit
@@ -57,6 +57,7 @@ object FNewPicture: TFNewPicture
     Width = 193
     Height = 21
     TabOrder = 2
+    OnChange = EdtPictureDescriptionChange
   end
   object PnlWarnung: TPanel
     Left = 152

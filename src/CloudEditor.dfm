@@ -60,6 +60,7 @@ object CloudEditorForm: TCloudEditorForm
     Anchors = [akRight, akBottom]
     Caption = 'BugFix'
     TabOrder = 1
+    Visible = False
     OnClick = BtnBugFixClick
   end
   object PC_Select: TPageControl

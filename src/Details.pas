@@ -87,7 +87,7 @@ type
     BtnCopyFromV2: TButton;
     BtnCopyFromV1: TButton;
     Lblv2Copyright: TLabeledEdit;
-    Lblv2URL: TLabeledEdit;
+    Lblv2Composer: TLabeledEdit;
     LvFrames: TListView;
     GrpBox_ID3v2Info: TGroupBox;
     LblConst_Id3v2Version: TLabel;
@@ -1005,7 +1005,7 @@ begin
   // ID3Image.Visible := ControlsEnable;
   // Seite 4
   Lblv2Copyright.Enabled := ControlsEnable;
-  Lblv2URL.Enabled := ControlsEnable;
+  Lblv2Composer.Enabled := ControlsEnable;
 ////  Lblv2EncodedBy.Enabled := ControlsEnable;
 
   //Btn_NewPicture.Enabled       := ButtonsEnable;
@@ -1948,6 +1948,7 @@ begin
         //Memo_Lyrics.Text := ID3v2Tag.Lyrics;
         //ShowPictures;
         Lblv2Copyright.Text        := Id3v2Tag.Copyright;
+        Lblv2Composer.Text         := Id3v2Tag.Composer;
   end else
   begin
         //Btn_DeletePicture.Enabled := False;
@@ -1982,6 +1983,7 @@ begin
         Lblv2Comment.Text := '';
         Lblv2Track.Text := '0';
         Lblv2Copyright.Text        := '';
+        Lblv2Composer.Text         := '';
   end;
 end;
 
@@ -2238,6 +2240,7 @@ begin
       Id3v2Tag.Year := Lblv2Year.Text;
       // weitere Frames
       ID3v2Tag.Copyright := Lblv2Copyright.Text;
+      Id3v2Tag.Composer  := Lblv2Composer.Text;
       // Lyrics
       ID3v2Tag.Lyrics := Memo_Lyrics.Text;
 
