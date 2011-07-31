@@ -61,8 +61,10 @@ type
 
     function CheckDescription:boolean;
     procedure FormShow(Sender: TObject);
+    procedure EdtPictureDescriptionChange(Sender: TObject);
   private
     { Private-Deklarationen }
+    procedure UpdateWarning;
   public
     { Public-Deklarationen }
   end;
@@ -79,41 +81,53 @@ uses Details;
 procedure TFNewPicture.FormCreate(Sender: TObject);
 var i:integer;
 begin
-  TranslateComponent (self);
-  for i := 0 to 20 do
-      cbPicturetype.Items.Add(Picture_Types[i]);
-  cbPictureType.ItemIndex := 0;
+    TranslateComponent (self);
+    for i := 0 to 20 do
+        cbPicturetype.Items.Add(Picture_Types[i]);
+    cbPictureType.ItemIndex := 0;
 end;
 
 procedure TFNewPicture.FormShow(Sender: TObject);
 begin
-  cbPictureType.ItemIndex := 0;
-  EdtPictureDescription.Text := '';
-  Image1.Picture.Assign(NIL);
-  Image1.Visible := False;
-  Btn_OK.Enabled := False;
-  if CheckDescription then
-  begin
-      Btn_OK.Enabled := Image1.Visible;
-      PnlWarnung.Visible := False;
-  end else
-  begin
-      Btn_OK.Enabled := False;
-      PnlWarnung.Visible := True;
-  end;
+    cbPictureType.ItemIndex := 0;
+    EdtPictureDescription.Text := '';
+    Image1.Picture.Assign(NIL);
+    Image1.Visible := False;
+    Btn_OK.Enabled := False;
+    UpdateWarning;
 end;
 
 
 function TFNewPicture.CheckDescription:boolean;
 begin
-  result := False;
-
-  if FDetails.ValidMp3File then
-      result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
-
-  if FDetails.ValidFlacFile then
-      result := True; // No restrictions here
+    if FDetails.ValidMp3File then
+        result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text)
+    else
+        if FDetails.ValidFlacFile then
+            result := True // No restrictions here
+        else
+            result := false;
 end;
+
+procedure TFNewPicture.EdtPictureDescriptionChange(Sender: TObject);
+begin
+    UpdateWarning;
+end;
+
+procedure TFNewPicture.UpdateWarning;
+begin
+    if CheckDescription then
+    begin
+        Btn_OK.Enabled := Image1.Visible;
+        PnlWarnung.Visible := False;
+    end else
+    begin
+        Btn_OK.Enabled := False;
+        PnlWarnung.Visible := True;
+    end;
+end;
+
+
 
 procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);
 var
@@ -133,15 +147,8 @@ begin
           end;
           Image1.Visible := True;
 
-          if CheckDescription then
-          begin
-              Btn_OK.Enabled := Image1.Visible;
-              PnlWarnung.Visible := False;
-          end else
-          begin
-              Btn_OK.Enabled := False;
-              PnlWarnung.Visible := True;
-          end;
+          UpdateWarning;
+
       except
           Image1.Picture.Assign(NIL);
           Image1.Visible := False;

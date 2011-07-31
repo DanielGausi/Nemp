@@ -1278,16 +1278,21 @@ begin
 
               StartPlay := True;
               // Wenn Faden
-              if UseFading AND fReallyUseFading then
+              if UseFading then // AND fReallyUseFading then
               begin
                 // Lautstärke zunächst auf 0
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
-                BASS_ChannelPlay(MainStream , True);
+                if StartPos <> 0 then
+                    Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
+                BASS_ChannelPlay(MainStream , False);
                 BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
               end
               else begin // also kein Fading, Lautstärke mormal
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
-                BASS_ChannelPlay(MainStream , True);
+                if StartPos <> 0 then
+                      Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
+
+                BASS_ChannelPlay(MainStream , False);
               end;
               fStatus := PLAYER_ISPLAYING;
           end;
@@ -1553,7 +1558,7 @@ end;
 procedure TNempPlayer.PlayInHeadset(aAudioFile: TAudioFile); // kein PlaylistFile, weil auch aus der Medienliste ein Jingle gespielt werden kann
 begin
   if not Bass_SetDevice(HeadsetDevice) then
-    exit;
+      exit;
 
   if not assigned(HeadSetAudioFile) then
   begin
@@ -1567,9 +1572,21 @@ begin
   if assigned(aAudioFile) then
       HeadSetAudioFile.Assign(aAudioFile);
 
+
   if assigned(HeadSetAudioFile) then
   begin
-      fHeadsetIsURLStream := PathSeemsToBeURL(HeadSetAudioFile.Pfad);
+      // before we start, we should check some cdda-stuff, as only one stream per cd can be created
+      if assigned(MainAudioFile) and MainAudioFile.isCDDA then
+      begin
+          if SameDrive(MainAudioFile.Pfad, HeadSetAudioFile.Pfad) then
+          begin
+              MessageDlg(CDDA_NoHeadsetPossible, mtInformation, [mbOK], 0);
+              exit;
+          end;
+      end;
+
+
+      fHeadsetIsURLStream := HeadSetAudioFile.isStream;
       Bass_ChannelStop(HeadsetStream);
       HeadsetStream := NEMP_CreateStream(HeadSetAudioFile, False, False, True);
       BASS_ChannelFlags(HeadsetStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);

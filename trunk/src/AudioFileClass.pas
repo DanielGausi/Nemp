@@ -1384,7 +1384,10 @@ begin
         // aus dem ID3 Tag
         if id3v2tag.artist <> '' then
             Artist := id3v2tag.artist
-        else Artist := id3v1tag.artist;
+        else
+            if id3v2tag.Composer <> '' then
+                Artist := id3v2tag.Composer
+            else Artist := id3v1tag.artist;
 
         if id3v2tag.title <> '' then
             Titel := id3v2tag.title
@@ -1878,7 +1881,18 @@ begin
             Genre := cdFile.Genre;
             Year := cdFile.Year;
             Comment := cdFile.CddbID;
-        end
+        end else
+        begin
+            fTrack := 0;
+            Artist := '';
+            Titel := 'Invalid Track';
+            Album := '';
+            fDuration := 0;
+            Genre := '';
+            Year := '';
+            Comment := '';
+            Pfad := 'cdda://';
+        end;
 
     finally
         cdFile.Free;

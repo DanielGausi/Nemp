@@ -4336,7 +4336,8 @@ begin
         if not Assigned(Node) then
           Exit;
         Data := VST.GetNodeData(Node);
-        NempPlayer.PlayJingle(Data^.FAudioFile);
+        if Data^.FAudioFile.AudioType = at_File then
+            NempPlayer.PlayJingle(Data^.FAudioFile);
       end;
     end;
 
@@ -4529,6 +4530,18 @@ begin
       ImgDetailCover.Visible := True;
       VDTCoverInfoPanel.Visible := NempOptions.DetailMode > 0;
   end;
+
+
+  if assigned(aAudioFile) and (aAudioFile.isCDDA) then
+  begin
+      // check, whether the current cd is valid for the AudioFile-Object
+      // this is VERY important for the cover-downloading:
+      // if album-Artist-data does not match the cddb-id, a wrong cover will be downloaded
+      // and displayed permanently
+      if (CddbIDFromCDDA(aAudioFile.Pfad) <> aAudioFile.Comment) then
+          aAudioFile.GetAudioData(aAudioFile.Pfad, 0);
+  end;
+
 
   FillBibDetailLabels(aAudioFile);
   // Get Cover

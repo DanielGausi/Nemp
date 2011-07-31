@@ -711,6 +711,7 @@ StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display th
                       +'So, do you want to start the G15 App now?';
 
 CDDA_NoDrivesFound = 'No CD drives found.';
+CDDA_NoHeadsetPossible = 'Nemp is currently playing a track from this CD. Playing another one at the same time is not possible.';
 
 implementation
 

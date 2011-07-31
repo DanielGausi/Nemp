@@ -180,7 +180,7 @@ begin
             else
                 newAudioFile.GetAudioData(newAudioFile.Pfad, 0);
 
-            lbTracks.Items.Add(newAudioFile.PlaylistTitle);
+            lbTracks.Items.Add(IntToStr(newAudioFile.Track) + ' - ' + newAudioFile.PlaylistTitle);
         end;
     end;
 end;
