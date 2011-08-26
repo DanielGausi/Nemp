@@ -1202,6 +1202,7 @@ procedure TFDetails.ShowMediaBibDetails;
 var i: Integer;
     mbAudioFile: TAudioFile;
     FirstCoverIsFromMB: Boolean;
+    baseName: String;
 begin
   if CurrentAudioFile = Nil then
   begin
@@ -1338,6 +1339,7 @@ begin
                 LBLDauer.Caption  := SekToZeitString(CurrentAudioFile.Duration);
                 LBLBitrate.Caption := '1.4 mbit/s (CD-Audio)';
                 LBLSamplerate.Caption := '44.1 kHz, Stereo';
+                LBLSize.Caption := '';
 
                 DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
                 LblPlayCounter.Caption := '';
@@ -1367,7 +1369,22 @@ begin
         end else
           FirstCoverIsFromMB := False;
 
-        Medienbib.GetCoverListe(CurrentAudioFile,  Coverpfade);
+        if CurrentAudioFile.isCDDA then
+        begin
+            // Todo
+            //wuppdi;
+            FirstCoverIsFromMB := true;
+
+            baseName := CoverFilenameFromCDDA(CurrentAudioFile.Pfad);
+            //completeName := '';
+            if FileExists(Medienbib.CoverSavePath + baseName + '.jpg') then
+                  Coverpfade.Add(Medienbib.CoverSavePath + baseName + '.jpg')
+              else if FileExists(Medienbib.CoverSavePath + baseName + '.png') then
+                  Coverpfade.Add(Medienbib.CoverSavePath + baseName + '.png');
+
+            //Coverpfade.Add(CurrentAudioFile.CoverID)
+        end else
+            Medienbib.GetCoverListe(CurrentAudioFile,  Coverpfade);
 
         if Coverpfade.Count = 0 then
         begin
@@ -1749,8 +1766,7 @@ begin
 end;
 
 procedure TFDetails.ShowAdditionalTags;
-var ext: String;
-    TagStream: TMemoryStream;
+var TagStream: TMemoryStream;
     localtags: UTF8String;
 begin
     Memo_Tags.ReadOnly := (CurrentAudioFile = NIL) or (not FileExists(CurrentAudioFile.Pfad));

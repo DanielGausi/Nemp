@@ -15,8 +15,8 @@ type
                   cddaErr_invalidDrive,
                   cddaErr_invalidTrackNumber,
                   cddaErr_DriveNotReady,
-                  cddaErr_NoAudioTrack
-
+                  cddaErr_NoAudioTrack,
+                  cddaErr_Unknown
                   );
 
     TCDDADrive = class
@@ -32,6 +32,7 @@ type
             Revision : AnsiString;
             Letter   : Char;
 
+            procedure Assign(aDrive: TCDDADrive);
             function GetCDDBData(CheckOnline: Boolean): AnsiString;
             procedure CheckForCompilation(aData: AnsiString);
     end;
@@ -57,7 +58,7 @@ type
 
             function fGetDataFromCDText(aDrive, aTrack: Integer): Boolean;
 
-            function fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean): Boolean;
+            procedure fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean);
 
 
 
@@ -78,6 +79,7 @@ type
     end;
 
     procedure EnsureDriveListIsFilled;
+    procedure UpdateDriveList;
     function BassErrorToCDError(aError: Integer): TCddaError;
 
     function SameDrive(A, B: String): Boolean;
@@ -121,6 +123,69 @@ begin
     end;
 end;
 
+procedure UpdateDriveList;
+var cdi : BASS_CD_INFO ;
+    newCDDrive, aDrive: TCDDADrive;
+    idx, idxDrives, FoundIdx: Integer;
+    tmpDriveList: TObjectList;
+begin
+    if not assigned(CDDriveList) then
+        CDDriveList := TObjectList.Create(True);
+
+    tmpDriveList := TObjectList.Create(False);
+    try
+        // Get list of available drives
+        idx := 0;
+        while (idx < MAXDRIVES) and BASS_CD_GetInfo(idx, cdi) do
+        begin
+            // search Drive in List
+            FoundIdx := -1;
+            for idxDrives := 0 to CDDriveList.Count - 1 do
+            begin
+                aDrive :=  TCDDADrive(CDDriveList[idxDrives]);
+                if (aDrive.Vendor = cdi.vendor)
+                  and (aDrive.Product = cdi.product)
+                  and (aDrive.Revision = cdi.rev)
+                  and (aDrive.Letter = Char(cdi.letter + Ord('A')))
+                  // Check ID from new Index, compare with cached entry
+                  and (BASS_CD_GetID(idx, BASS_CDID_CDDB) = aDrive.fCachedCddbID)
+                then begin
+                    // drive is already there
+                    // Change index, copy other stuff from current this drive
+                    FoundIdx := idxDrives;
+                    break;
+                end;
+            end;
+
+            newCDDrive := TCDDADrive.Create;
+
+            if FoundIdx > -1  then
+            begin
+                newCDDrive.Assign(TCDDADrive(CDDriveList[FoundIdx]));
+                newCDDrive.fIndex := idx;
+            end else
+            begin
+                newCDDrive.Vendor    := cdi.vendor;
+                newCDDrive.Product   := cdi.product;
+                newCDDrive.Revision  := cdi.rev;
+                newCDDrive.Letter    := Char(cdi.letter + Ord('A'));
+                newCDDrive.fIndex    := idx;
+            end;
+            tmpDriveList.Add(newCDDrive);
+
+            inc(idx);
+        end;
+
+        // now: delete old list and copy tmp list to original list
+        CDDriveList.Clear;
+        for idx := 0 to tmpDriveList.Count - 1 do
+            CDDriveList.Add(tmpDriveList[idx]);
+
+    finally
+        tmpDriveList.Free;
+    end;
+end;
+
 function BassErrorToCDError(aError: Integer): TCddaError;
 begin
     case aError of
@@ -128,6 +193,8 @@ begin
         BASS_ERROR_NOCD     : result := cddaErr_DriveNotReady;
         BASS_ERROR_CDTRACK  : result := cddaErr_invalidTrackNumber;
         BASS_ERROR_NOTAUDIO : result := cddaErr_NoAudioTrack;
+    else
+        result := cddaErr_Unknown;
     end;
 end;
 
@@ -146,7 +213,6 @@ end;
 
 function AudioDriveNumber(aPath: String): Integer;
 var cd: TCDDAFile;
-    DriveA: Char;
 begin
     cd := TCDDAFile.Create;
     try
@@ -207,6 +273,19 @@ begin
 end;
 
 { TCDDADrive }
+
+procedure TCDDADrive.Assign(aDrive: TCDDADrive);
+begin
+    fCachedCddbData := aDrive.fCachedCddbData;
+    fCachedCddbID   := aDrive.fCachedCddbID  ;
+    fIndex          := aDrive.fIndex         ;
+    fIsCompilation  := aDrive.fIsCompilation ;
+    fDelimter       := aDrive.fDelimter      ;
+    Vendor          := aDrive.Vendor         ;
+    Product         := aDrive.Product        ;
+    Revision        := aDrive.Revision       ;
+    Letter          := aDrive.Letter         ;
+end;
 
 procedure TCDDADrive.CheckForCompilation(aData: AnsiString);
 var sl: TStringList;
@@ -415,7 +494,6 @@ end;
 }
 function TCDDAFile.fGetDataFromCDText(aDrive, aTrack: Integer): Boolean;
 var CompleteText: PAnsiChar;
-    OneEntry: PAnsiChar;
 
       function GetValue(aKey: AnsiString; aText: PAnsiChar): AnsiString;
       var tmp: PAnsiChar;
@@ -461,7 +539,7 @@ end;
     Get Artist/Titel/Album from CDDB // freeDB
     --------------------------------------------------------
 }
-function TCDDAFile.fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean): Boolean;
+procedure TCDDAFile.fGetDataFromCDDB(aDrive, aTrack: Integer; CheckOnline: Boolean);
 var CompleteData: AnsiString;
     sl: TStringList;
     idx: Integer;
@@ -523,8 +601,6 @@ begin
             begin
                 fTitle := GetValue('TTITLE' + IntToStr(aTrack));
             end;
-
-
         finally
             sl.Free
         end;

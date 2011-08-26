@@ -1044,6 +1044,8 @@ begin
                   // einen TempoStream erzeugen
                   result := BASS_FX_TempoCreate(result, BASS_FX_FREESOURCE);
       end;
+      else
+          result := 0;
   end;
 end;
 

@@ -34,7 +34,7 @@ type
     { Private-Deklarationen }
     CurrentDrive: Integer;
     localAudioFiles: TObjectList;
-    procedure UpdateDriveList;
+    procedure UpdateDriveListView;
     procedure UpdateTrackList(UseCddb: Boolean);
   public
     { Public-Deklarationen }
@@ -66,7 +66,6 @@ begin
 end;
 
 procedure TCDOpenDialog.FormShow(Sender: TObject);
-var cdi : BASS_CD_INFO ;
 begin
     // Get list of available drives
     EnsureDriveListIsFilled;     // from cddaUtils
@@ -78,7 +77,7 @@ begin
         PostMessage(self.Handle, WM_Close, 0, 0);
         exit;
     end;
-    UpdateDriveList;
+    UpdateDriveListView;
 end;
 
 
@@ -103,8 +102,8 @@ end;
 
 procedure TCDOpenDialog.BtnRefreshClick(Sender: TObject);
 begin
-    FreeAndNil(CDDriveList);      // Besser machen TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    EnsureDriveListIsFilled;
+    UpdateDriveList;
+    UpdateDriveListView;
 end;
 
 procedure TCDOpenDialog.cb_DrivesChange(Sender: TObject);
@@ -114,7 +113,6 @@ begin
 end;
 
 procedure TCDOpenDialog.BtnSelectAllClick(Sender: TObject);
-var i: Integer;
 begin
     lbTracks.SelectAll;
 end;
@@ -126,7 +124,7 @@ begin
 end;
 
 
-procedure TCDOpenDialog.UpdateDriveList;
+procedure TCDOpenDialog.UpdateDriveListView;
 var aDrive: TCDDADrive;
     i: Integer;
 begin
@@ -140,19 +138,15 @@ begin
             + aDrive.Product  ); // + ' v' + aDrive.Revision );
     end;
     cb_Drives.ItemIndex := 0;
+    CurrentDrive := 0;
     UpdateTrackList(cb_AutoCddb.Checked);
 end;
 
 
 procedure TCDOpenDialog.UpdateTrackList(UseCddb: Boolean);
-var
-  vol, spd: Single;
-  cdtext, t: PAnsiChar;
-  a, tc, l: Integer;
-  text, tag: String;
-
-  newAudioFile: TAudioFile;
-  TrackCount, i: Integer;
+var l: Integer;
+    newAudioFile: TAudioFile;
+    TrackCount, i: Integer;
 begin
     TrackCount := BASS_CD_GetTracks(CurrentDrive);
 

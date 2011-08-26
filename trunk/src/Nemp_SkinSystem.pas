@@ -2012,7 +2012,6 @@ var NewName, ext: String;
 
 begin
   // First: Select the correct scaled file
-  ScaleCorrectionNeeded := False;
   if Scaled and (NempPartyMode.Active) then
   begin
       // Get scaling-suffix

@@ -109,7 +109,6 @@ var minlength, minidx, i: Integer;
     durchlauf, durchlaufmax, errorCount: Integer;
 begin
   durchlauf := 0;
-  errorCount := 0;
   Fehlstelle := 0;
   CheckStr := '';
   case Strings.Count of

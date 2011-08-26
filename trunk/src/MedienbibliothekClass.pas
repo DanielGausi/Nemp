@@ -2933,9 +2933,8 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.GenerateArtistList(Source: TObjectlist; Target: TObjectlist);
-var i, start: integer;
+var i: integer;
   aktualArtist, lastArtist: UnicodeString;
-  tmpJaS: TJustaString;
 begin
   for i := 0 to Target.Count - 1 do
     TJustaString(Target[i]).Free;
@@ -3582,7 +3581,6 @@ procedure TMedienBibliothek.GetAlbenList(Artist: UnicodeString);
 var i,start, Ende: integer;
   aktualAlbum, lastAlbum: UnicodeString;
   tmpstrlist: TStringList;
-  tmpJaS: TJustaString;
 begin
   for i := 0 to Alben.Count - 1 do
     TJustaString(Alben[i]).Free;
