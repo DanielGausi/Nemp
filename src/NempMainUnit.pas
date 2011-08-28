@@ -5780,7 +5780,7 @@ procedure TNemp_MainForm.BassTimerTimer(Sender: TObject);
 begin
   if NempPlayer.BassStatus = BASS_ACTIVE_PLAYING then
   begin
-        NempPlayer.DrawInfo;
+        NempPlayer.DrawInfo(SlideBarButton.Tag = 0);
 
         if SlideBarButton.Tag = 0 then // d.h. der Button wird grade nicht gedraggt
           SlideBarButton.Left := SlideBarShape.Left + Round((SlideBarShape.Width-SlideBarButton.Width) * NempPlayer.Progress);
@@ -6063,7 +6063,8 @@ begin
             if NewPos >= SlideBarShape.Width  + SlideBarShape.Left - SlideBarButton.Width then
                 NewPos := SlideBarShape.Width + SlideBarShape.Left - SlideBarButton.Width;
 
-          SlideBarButton.Left := NewPos;
+        SlideBarButton.Left := NewPos;
+        NempPlayer.DrawTimeFromProgress((SlideBarButton.Left-SlideBarShape.Left) / (SlideBarShape.Width-SlideBarButton.Width));
     end else
     if Source = VolButton then
     begin

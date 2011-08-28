@@ -373,7 +373,8 @@ type
         function GenerateTaskbarTitel: UnicodeString;
 
         // Aktualisiert den Text, die Zeit und das Spectrum in der Anzeige
-        procedure DrawInfo;
+        procedure DrawInfo(IncludingTime: Boolean = True);
+        procedure DrawTimeFromProgress(aProgress: Single);
 
         function RefreshCoverBitmap: Boolean;
         function DrawPreview( DestWidth : Integer; DestHeight : Integer;
@@ -2418,7 +2419,7 @@ begin
   end;
 end;
 
-procedure TNempPlayer.DrawInfo;
+procedure TNempPlayer.DrawInfo(IncludingTime: Boolean = True);
 var FFTFata : TFFTData;
 begin
   if UseVisualization then
@@ -2428,10 +2429,21 @@ begin
   end;
   Spectrum.DrawText(PlayingTitel, ScrollAnzeigeTitel);
 
-  Case TimeMode of
-      0: Spectrum.DrawTime('  '+ SecToStr(Time));
-      1: Spectrum.DrawTime(' -' + SecToStr(Dauer - Time ));
-  end;
+  if IncludingTime then
+      Case TimeMode of
+          0: Spectrum.DrawTime('  '+ SecToStr(Time));
+          1: Spectrum.DrawTime(' -' + SecToStr(Dauer - Time ));
+      end;
+end;
+
+procedure TNempPlayer.DrawTimeFromProgress(aProgress: Single);
+var tmpTime: Integer;
+begin
+    tmpTime :=  Round(Dauer * aProgress);
+    Case TimeMode of
+      0: Spectrum.DrawTime('  '+ SecToStr(tmpTime));
+      1: Spectrum.DrawTime(' -' + SecToStr(Dauer - tmpTime ));
+    end;
 end;
 
 
