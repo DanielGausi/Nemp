@@ -661,7 +661,7 @@ TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
 Tags_NoTagsAccessDenied = 'No additional Tags set.';
-Tags_AddTagsNotPossible = 'No additional Tags set. (Only available for *.mp3, *.ogg and *.flac-files.)';
+//Tags_AddTagsNotPossible = 'No additional Tags set. (Only available for *.mp3, *.ogg and *.flac-files.)';
 Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. However, tags should be entered line by line here. Do you want Nemp to treat your input as a comma-separated list?';
 
 MenuItem_Partymode = 'Activate Party-Mode';
