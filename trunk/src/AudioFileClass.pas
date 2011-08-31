@@ -1161,7 +1161,7 @@ begin
                 result := Tags_NoTagsAccessDenied;
         end
         else
-            result := Tags_AddTagsNotPossible;
+            result := ''; //Tags_AddTagsNotPossible;
     end;
 end;
 
