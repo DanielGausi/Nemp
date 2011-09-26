@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio2
+    ActivePage = TabAudio0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2694,7 +2694,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 433
-        Height = 90
+        Height = 111
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Output devices'
         TabOrder = 0
@@ -2736,12 +2736,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ItemHeight = 13
           TabOrder = 0
         end
+        object BtnRefreshDevices: TButton
+          Left = 288
+          Top = 73
+          Width = 75
+          Height = 25
+          Caption = 'Refresh'
+          TabOrder = 2
+          OnClick = BtnRefreshDevicesClick
+        end
       end
       object GrpBox_TabAudio2_Fading: TGroupBox
         Left = 8
-        Top = 102
+        Top = 126
         Width = 433
-        Height = 151
+        Height = 156
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fading'
         TabOrder = 1
