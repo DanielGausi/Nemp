@@ -656,6 +656,7 @@ begin
   AnzeigeShowsPlaylistFiles := False;
 
   BibSearcher := TBibSearcher.Create(aWnd);
+  BibSearcher.MainList := Mp3ListePfadSort;
 
   RadioStationList    := TObjectlist.Create;
   UpdateList   := TObjectlist.create(False);
@@ -1977,6 +1978,7 @@ var i: Integer;
     Lyrics: TLyrics;
     aErr: TAudioError;
     ErrorOcurred: Boolean;
+    ErrorLog: TErrorLog;
 begin
     //ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
@@ -2033,14 +2035,12 @@ begin
                             inc(failed);
                             ErrorOcurred := True;
                             // FehlerMessage senden
-                            SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
-                                LParam(PChar(
-                                    'Lyric search:'#13#10
-                                    + aAudioFile.Pfad + #13#10
-                                    + 'Error: ' + AudioErrorString[aErr]
-                                    + #13#10 + '------'
-                                ))
-                            );
+                            ErrorLog := TErrorLog.create(afa_LyricSearch, aAudioFile, aErr, false);
+                            try
+                                SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                            finally
+                                ErrorLog.Free;
+                            end;
                         end;
                     end
                     else
@@ -2156,6 +2156,7 @@ var i: Integer;
     TagPostProcessor: TTagPostProcessor;
     aErr: TAudioError;
     ErrorOcurred: Boolean;
+    ErrorLog: TErrorLog;
 begin
     done := 0;
     failed := 0;
@@ -2218,14 +2219,12 @@ begin
                         inc(failed);
                         ErrorOcurred := True;
                         // FehlerMessage senden
-                        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
-                            LParam(PChar(
-                                'Searching additional Tags'#13#10
-                                + af.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------'
-                            ))
-                        );
+                        ErrorLog := TErrorLog.create(afa_TagSearch, af, aErr, false);
+                        try
+                            SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                        finally
+                            ErrorLog.Free;
+                        end;
                     end;
                 end;
             end else
@@ -2323,6 +2322,7 @@ var i: Integer;
     af: TAudioFile;
     aErr: TAudioError;
     ErrorOcurred: Boolean;
+    ErrorLog: TErrorLog;
 begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
@@ -2358,12 +2358,12 @@ begin
             end else
             begin
                 ErrorOcurred := True;
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog,
-                            LParam(PChar(
-                                'Updating Tag-Cloud'#13#10
-                                + af.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------')) );
+                ErrorLog := TErrorLog.create(afa_TagCloud, af, aErr, false);
+                try
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                finally
+                    ErrorLog.Free;
+                end;
             end;
         end;
     end;

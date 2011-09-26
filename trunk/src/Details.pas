@@ -553,12 +553,12 @@ begin
         if ValidFlacFile then
             aErr := FlacToAudioError(UpdateFlacInFile);
 
+
+
         if aErr <> AUDIOERR_None then
         begin
             MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
-            AddErrorLog('Editing Details'#13#10 + CurrentAudioFile.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------');
+            HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
             exit;
         end;
 

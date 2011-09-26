@@ -43,6 +43,20 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms, Mp3FileUtils,
   DateUtils;
 
 type
+    TAudioFileAction = (afa_None,
+                        afa_SaveRating,
+                        afa_RefreshingFileInformation,
+                        afa_AddingFileToLibrary,
+                        afa_PasteFromClipboard,
+                        afa_DroppedFiles,
+                        afa_NewFile,
+                        afa_DirectEdit,
+                        afa_EditingDetails,
+                        afa_LyricSearch,
+                        afa_TagSearch,
+                        afa_TagCloud
+
+                        );
 
     TAudioError = (
                 AUDIOERR_None,  // everthing's fine
@@ -88,10 +102,10 @@ type
               'File not found',
               'FileCreate failed.',
               'Could not read from file',
-              'Cannot save metadata: File is read-only',
-              'Cannot save metadata: File is read-only',
-              'Read from stream failed',
-              'Cannot save meta-data: Write to stream failed',
+              'File is read-only',
+              'File is read-only',
+              'Reading from stream failed',
+              'Writing to stream failed',
               // Id3
               'Caching audiodata failed',
               'No ID3-Tag found',
@@ -112,7 +126,7 @@ type
               'Invalid Flac-File',
               'Metadata-Block exceeds maximum size',
               'Type of Metadata is not supported - use mp3, ogg or flac',
-              'Cannot save metadata: Quick access to metadata denied',
+              'Quick access to metadata denied',
               // CDDA
               'Drive not ready',
               'No Audio track',
@@ -440,6 +454,16 @@ type
     PCoverTreeData = ^TCoverTreeData;
     TCoverTreeData = record
         Image: TBitmap;
+    end;
+
+    TErrorLog = class
+        public
+            Action: TAudioFileAction;
+            AudioFile: TAudioFile;
+            Error: TAudioError;
+            Important: Boolean;
+            constructor create(aAction: TAudioFileAction; aFile: TAudioFile;
+                aErr: TAudioError; aImportant: Boolean);
     end;
 
 
@@ -2851,6 +2875,17 @@ begin
 end;
 
 
+
+{ TErrorLog }
+
+constructor TErrorLog.create(aAction: TAudioFileAction; aFile: TAudioFile;
+  aErr: TAudioError; aImportant: Boolean);
+begin
+    Action := aAction;
+    AudioFile := aFile;
+    Error := aErr ;
+    Important := aImportant;
+end;
 
 initialization
 

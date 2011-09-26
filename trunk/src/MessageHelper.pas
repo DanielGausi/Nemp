@@ -438,6 +438,7 @@ var i: Integer;
     srList: TObjectList;
     af: TAudiofile;
     aErr: TAudioError;
+    ErrorLog : TErrorLog;
 begin
   result := True;
 
@@ -601,11 +602,7 @@ begin
             af := TAudioFile(aMsg.LParam);
             aErr := af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating);
             if aErr <> AUDIOERR_None then
-            begin
-                AddErrorLog ('Refreshing file-information:'#13#10 + af.Pfad + #13#10
-                    + 'Error: ' + AudioErrorString[aErr]
-                    + #13#10 + '------');
-            end;
+                HandleError(afa_RefreshingFileInformation, af, aErr);
 
             MedienBib.InitCover(af);
         end;
@@ -733,7 +730,8 @@ begin
         end;
 
         MB_ErrorLog: begin
-              AddErrorLog(PChar(aMsg.LParam));
+              ErrorLog := TErrorLog(aMsg.LParam);
+              HandleError(ErrorLog.Action, ErrorLog.AudioFile, ErrorLog.Error, ErrorLog.Important);
         end;
         MB_ErrorLogHint: begin
             MessageDlg(MediaLibrary_SomeErrorsOccured, mtWarning, [MBOK], 0);
@@ -1523,12 +1521,7 @@ Begin
                               begin
                                 AudioFile:=TAudioFile.Create;
                                 aErr := AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating);
-                                if aErr <> AUDIOERR_None then
-                                begin
-                                    AddErrorLog ('Dropped Files:'#13#10 + AudioFile.Pfad + #13#10
-                                        + 'Error: ' + AudioErrorString[aErr]
-                                        + #13#10 + '------');
-                                end;
+                                HandleError(afa_DroppedFiles, AudioFile, aErr);
 
                                 MedienBib.InitCover(AudioFile);
                                 MedienBib.UpdateList.Add(AudioFile);
@@ -1567,12 +1560,7 @@ Var
           AudioFile := TAudioFile.Create;
           try
               aErr := AudioFile.GetAudioData(af, GAD_Cover or GAD_Rating);
-              if aErr <> AUDIOERR_None then
-              begin
-                  AddErrorLog ('Dropped Files:'#13#10 + AudioFile.Pfad + #13#10
-                      + 'Error: ' + AudioErrorString[aErr]
-                      + #13#10 + '------');
-              end;
+              HandleError(afa_DroppedFiles, AudioFile, aErr);
               // Play new song in headset
               NempPlayer.PlayInHeadset(AudioFile);
               // Show Details
@@ -1683,12 +1671,7 @@ begin
                 begin
                     AudioFile:=TAudioFile.Create;
                     aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating);
-                    if aErr <> AUDIOERR_None then
-                    begin
-                        AddErrorLog ('New file:'#13#10 + AudioFile.Pfad + #13#10
-                            + 'Error: ' + AudioErrorString[aErr]
-                            + #13#10 + '------');
-                    end;
+                    HandleError(afa_NewFile, AudioFile, aErr);
 
                     MedienBib.InitCover(AudioFile);
                     MedienBib.UpdateList.Add(AudioFile);

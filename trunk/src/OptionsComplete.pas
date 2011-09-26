@@ -455,6 +455,7 @@ type
     Lbl_QuickMetadataHint: TLabel;
     GrpBox_CDAudio: TGroupBox;
     cb_UseCDDB: TCheckBox;
+    BtnRefreshDevices: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -542,6 +543,7 @@ type
     procedure cb_RatingChangeCounterClick(Sender: TObject);
     procedure CBAlwaysSortAnzeigeListClick(Sender: TObject);
     procedure BtnClearCoverCacheClick(Sender: TObject);
+    procedure BtnRefreshDevicesClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1628,6 +1630,44 @@ begin
     CBFileTypes.Checked[i] := True;
   for i := 0 to CBPlaylistTypes.Count-1 do
     CBPlaylistTypes.Checked[i] := True;
+end;
+
+procedure TOptionsCompleteForm.BtnRefreshDevicesClick(Sender: TObject);
+var count: Integer;
+    BassInfo: BASS_DEVICEINFO;
+begin
+    count := 1;
+
+    //showmessage(inttostr(NempPlayer.MainDevice) + ' - ' + inttostr(NempPlayer.HeadsetDevice));
+
+    MainDeviceCB.Items.Clear;
+    HeadPhonesDeviceCB.Items.Clear;
+
+    while (Bass_GetDeviceInfo(count, BassInfo)) do
+    begin
+      MainDeviceCB.Items.Add(String(BassInfo.Name));
+      HeadPhonesDeviceCB.Items.Add(String(BassInfo.Name));
+      inc(count);
+    end;
+
+    if MainDeviceCB.Items.Count > Integer(NempPlayer.MainDevice) then
+        MainDeviceCB.ItemIndex := NempPlayer.MainDevice - 1
+    else
+      if Count >= 1 then
+          MainDeviceCB.ItemIndex := 0;
+
+
+    if (HeadPhonesDeviceCB.Items.Count > Integer(NempPlayer.HeadsetDevice)) then
+        HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice - 1
+    else
+        if Count >= 1 then
+            HeadPhonesDeviceCB.ItemIndex := Count - 1
+    else
+    begin
+        HeadPhonesDeviceCB.Enabled := False;
+        LblConst_Headphones.Enabled := False;
+    end;
+
 end;
 
 procedure TOptionsCompleteForm.BtnRegistryUpdateClick(Sender: TObject);

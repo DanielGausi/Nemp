@@ -460,6 +460,7 @@ var i: Integer;
     aJob: TPostProcessJob;
     aAudioFile: TAudioFile;
     aErr: TAudioError;
+    ErrorLog: TErrorLog;
 begin
     try
         for i := 0 to ap.fThreadJobList.Count - 1 do
@@ -488,11 +489,16 @@ begin
                     aErr := aJob.UpdateFile;
 
                     if aErr <> AUDIOERR_None then
-                        SendMessage(ap.fMainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(
-                            PChar('Note: Automatic Rating/Playcounter NOT saved into file'#13#10 + aAudioFile.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------'
-                    )));
+                    begin
+                        ErrorLog := TErrorLog.create(afa_SaveRating, aAudioFile, aErr, false);
+                        try
+                            SendMessage(ap.fMainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                        finally
+                            ErrorLog.Free;
+                        end;
+
+                    end;
+
 
                     // ok. We have processed the file in the library so far.
                     // Now we should unify the ratings for this file in the playlist.

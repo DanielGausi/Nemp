@@ -3600,11 +3600,7 @@ begin
                       end;
                       // write the rating into the file on disk
                       aErr := CurrentAF.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
-                      if aErr <> AUDIOERR_None then
-                          AddErrorLog('Note: Rating NOT saved into file'#13#10 + CurrentAF.Pfad + #13#10            
-                              + 'Error: ' + AudioErrorString[aErr]
-                              + #13#10 + '------'); 
-                                            
+                      HandleError(afa_SaveRating, CurrentAF, aErr);
                       // correct GUI
                       CorrectVCLAfterAudioFileEdit(CurrentAF);
             end;
@@ -3778,12 +3774,7 @@ begin
               begin
                   AudioFile.FileIsPresent:=True;
                   aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-                  if aErr <> AUDIOERR_None then
-                  begin
-                      AddErrorLog ('Refreshing file-information:'#13#10 + AudioFile.Pfad + #13#10
-                          + 'Error: ' + AudioErrorString[aErr]
-                          + #13#10 + '------');
-                  end;
+                  HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
 
                   MedienBib.InitCover(AudioFile);
                   VST.Invalidate;
@@ -3815,12 +3806,7 @@ begin
               begin
                   AudioFile.FileIsPresent:=True;
                   aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-                  if aErr <> AUDIOERR_None then
-                  begin
-                      AddErrorLog ('Refreshing file-information:'#13#10 + AudioFile.Pfad + #13#10
-                          + 'Error: ' + AudioErrorString[aErr]
-                          + #13#10 + '------');
-                  end;
+                  HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
                   MedienBib.InitCover(AudioFile);
                   if  (oldArtist <> AudioFile.Strings[MedienBib.NempSortArray[1]])
                        OR (oldAlbum <> AudioFile.Strings[MedienBib.NempSortArray[2]])
@@ -4767,10 +4753,7 @@ begin
                   end;
                   // write the rating into the file on disk
                   aErr := MedienBib.CurrentAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
-                  if aErr <> AUDIOERR_None then
-                      AddErrorLog('Note: Rating NOT saved into file'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10            
-                          + 'Error: ' + AudioErrorString[aErr]
-                          + #13#10 + '------'); 
+                  HandleError(afa_SaveRating, MedienBib.CurrentAudioFile, aErr);
                   
                   MedienBib.Changed := True;
               finally
@@ -5010,9 +4993,7 @@ begin
             end else
             begin
                 MedienBib.CurrentAudioFile.RawTagLastFM := backup;
-                AddErrorLog('Manual input'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------');
+                HandleError(afa_EditingDetails, MedienBib.CurrentAudioFile, aErr);
                 MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);            
             end;
 
@@ -5108,10 +5089,8 @@ begin
                           end;
                       end else
                       begin
-                          MedienBib.CurrentAudioFile.Assign(backupFile);         
-                          AddErrorLog('Manual input'#13#10 + MedienBib.CurrentAudioFile.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------');
+                          MedienBib.CurrentAudioFile.Assign(backupFile);
+                          HandleError(afa_EditingDetails, MedienBib.CurrentAudioFile, aErr);
                           MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);                     
                       end;
                   finally
@@ -6469,11 +6448,7 @@ begin
                       end;
                       // write the rating into the file on disk
                       aErr := NempPlayer.MainAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
-                      if aErr <> AUDIOERR_None then
-                          AddErrorLog('Note: Rating NOT saved into file'#13#10 + NempPlayer.MainAudioFile.Pfad + #13#10            
-                              + 'Error: ' + AudioErrorString[aErr]
-                              + #13#10 + '------');
-                          
+                      HandleError(afa_SaveRating, NempPlayer.MainAudioFile, aErr);
                       MedienBib.Changed := True;
                   finally
                       ListOfFiles.Free;
@@ -7035,12 +7010,7 @@ begin
         begin
           AudioFile := TAudioFile.Create;
           aErr := AudioFile.GetAudioData((NempPlaylist.Playlist[i] as TAudioFile).Pfad, GAD_Cover or GAD_Rating);
-          if aErr <> AUDIOERR_None then
-          begin
-              AddErrorLog ('Adding file to Library:'#13#10 + AudioFile.Pfad + #13#10
-                  + 'Error: ' + AudioErrorString[aErr]
-                  + #13#10 + '------');
-          end;
+          HandleError(afa_NewFile, AudioFile, aErr);
 
           MedienBib.InitCover(AudioFile);
           MedienBib.UpdateList.Add(AudioFile);
@@ -7247,13 +7217,7 @@ begin
                       begin
                         AudioFile:=TAudioFile.Create;
                         aErr := AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating);
-                        if aErr <> AUDIOERR_None then
-                        begin
-                            AddErrorLog ('Paste from Clipboard:'#13#10 + AudioFile.Pfad + #13#10
-                                + 'Error: ' + AudioErrorString[aErr]
-                                + #13#10 + '------');
-                        end;
-
+                        HandleError(afa_PasteFromClipboard, AudioFile, aErr);
                         MedienBib.InitCover(AudioFile);
                         MedienBib.UpdateList.Add(AudioFile);
                       end;
@@ -10222,19 +10186,16 @@ begin
         end;
         if (aErr <> AUDIOERR_None) then
         begin
+
             // Read old Data again, if we edited something else than RATING
-            if VST.Header.Columns[column].Tag <> CON_RATING then            
+            if VST.Header.Columns[column].Tag <> CON_RATING then
             begin
                 SynchronizeAudioFile(af, af.Pfad, True);
-                AddErrorLog('Direct Edit:'#13#10 + af.Pfad + #13#10            
-                    + 'Error: ' + AudioErrorString[aErr]
-                    + #13#10 + '------');
                 MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+                HandleError(afa_DirectEdit, af, aErr, True);
             end else
+                HandleError(afa_SaveRating, af, aErr);
                 // on Rating-Edit: Just an entry in the Error-Log
-                AddErrorLog('Note: Rating NOT saved into file'#13#10 + af.Pfad + #13#10            
-                    + 'Error: ' + AudioErrorString[aErr]
-                    + #13#10 + '------');                
         end;
     end else
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);

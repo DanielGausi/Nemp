@@ -120,6 +120,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 
     procedure AddErrorLog(aString: String);
+    procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TAudioError; Important: Boolean = false);
+
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
 
@@ -1516,6 +1518,66 @@ begin
     inc(ErrorLogCount);
     Nemp_MainForm.MM_H_ErrorLog.Caption := Format(MainForm_MainMenu_Messages, [ErrorLogCount]);
     Nemp_MainForm.MM_H_ErrorLog.Visible := True;
+end;
+
+procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TAudioError; Important: Boolean = false);  overload;
+var s: String;
+begin
+    if aErr <> AUDIOERR_None then
+    begin
+
+        case aAction of
+          afa_None:           s := '';
+          afa_SaveRating:     s := 'Note: Rating Not saved into file'  ;
+          afa_RefreshingFileInformation: s := 'Error while refreshing file information:'  ;
+          afa_AddingFileToLibrary: s := 'Error while adding file to library:'  ;
+          afa_PasteFromClipboard:  s := 'Error while Copy&Paste from clipboard:'  ;
+          afa_DroppedFiles:        s := 'Error while Drag&Drop files:'  ;
+          afa_NewFile:             s := 'Error with new found file:'  ;
+          afa_DirectEdit:          s := 'Error while editing file properties directly:'  ;
+          afa_EditingDetails:      s := 'Error while editing file properties'  ;
+          afa_LyricSearch:         s := 'Error while searching lyrics:' ;
+          afa_TagSearch:           s := 'Error while searching additional Tags:';
+          afa_TagCloud:            s := 'Error while updating the Tagcloud:'
+        end;
+        s := s + #13#10;
+        if assigned(aFile) then
+            s := s + aFile.Pfad + #13#10;
+        s := s + 'Errormessage: ' + AudioErrorString[aErr] + #13#10
+           + '------';
+
+        case aErr of
+          AUDIO_FILEERR_NoFile,
+          AUDIO_FILEERR_FOpenCrt,
+          AUDIO_FILEERR_FOpenR,
+          AUDIO_FILEERR_FOpenRW,
+          AUDIO_FILEERR_FOpenW,
+          AUDIO_FILEERR_SRead,
+          AUDIO_FILEERR_SWrite,
+          AUDIO_ID3ERR_Cache,
+          AUDIO_ID3ERR_NoTag,
+          AUDIO_ID3ERR_Invalid_Header,
+          AUDIO_ID3ERR_Compression,
+          AUDIO_ID3ERR_Unclassified,
+          AUDIO_MPEGERR_NoFrame,
+          AUDIO_OVErr_InvalidFirstPageHeader,
+          AUDIO_OVErr_InvalidFirstPage,
+          AUDIO_OVErr_InvalidSecondPageHeader,
+          AUDIO_OVErr_InvalidSecondPage,
+          AUDIO_OVErr_CommentTooLarge,
+          AUDIO_OVErr_BackupFailed,
+          AUDIO_OVErr_DeleteBackupFailed,
+          AUDIO_FlacErr_InvalidFlacFile,
+          AUDIO_FlacErr_MetaDataTooLarge,
+          AUDIOERR_DriveNotReady,
+          AUDIOERR_NoAudioTrack,
+          AUDIOERR_Unkown:            AddErrorLog(s);   // Post always, this is something strange
+
+
+          AUDIOERR_UnsupportedMediaFile,
+          AUDIOERR_EditingDenied: if Important then AddErrorLog(s);
+        end;
+    end;
 end;
 
 function GetSpecialPermissionToChangeMetaData:Boolean;
