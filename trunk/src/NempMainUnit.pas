@@ -11099,9 +11099,17 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
+var x :Integer;
 begin
   if DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
-        ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal)
+  begin
+        x := ShellExecute(Handle, 'open' ,'explorer.exe', PChar('/e "'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal);
+        showmessage(Inttostr(x) + SysErrorMessage(GetLastError) + NempPlayer.DownloadDir);
+
+        x := SE_ERR_ACCESSDENIED;
+
+  end
+
   else
         MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
 end;

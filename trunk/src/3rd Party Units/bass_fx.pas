@@ -66,7 +66,7 @@ const
   BASS_BFX_CHAN8    = 128;      // see above info
 
 // If you have more than 8 channels, use this macro
-function BASS_BFX_CHANNEL_N(n: DWORD): DWORD;
+//XX//  function BASS_BFX_CHANNEL_N(n: DWORD): DWORD;
 
 // DSP effects
 const
@@ -258,8 +258,8 @@ const
   BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS       = $10015;    // 12 default
 
 function BASS_FX_TempoCreate(chan, flags: DWORD): HSTREAM; stdcall; external 'bass_fx.dll' name 'BASS_FX_TempoCreate';
-function BASS_FX_TempoGetSource(chan: HSTREAM): DWORD; stdcall; external 'bass_fx.dll' name 'BASS_FX_TempoGetSource';
-function BASS_FX_TempoGetRateRatio(chan: HSTREAM): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_TempoGetRateRatio';
+//XX//  function BASS_FX_TempoGetSource(chan: HSTREAM): DWORD; stdcall; external 'bass_fx.dll' name 'BASS_FX_TempoGetSource';
+//XX//  function BASS_FX_TempoGetRateRatio(chan: HSTREAM): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_TempoGetRateRatio';
 
 {=============================================================================================
         R E V E R S E
@@ -277,7 +277,7 @@ const
   BASS_FX_RVS_FORWARD = 1;
 
 function BASS_FX_ReverseCreate(chan: HSTREAM; dec_block: FLOAT; flags: DWORD): HSTREAM; stdcall; external 'bass_fx.dll' name 'BASS_FX_ReverseCreate';
-function BASS_FX_ReverseGetSource(chan: HSTREAM): HSTREAM; stdcall; external 'bass_fx.dll' name 'BASS_FX_ReverseGetSource';
+//XX//  function BASS_FX_ReverseGetSource(chan: HSTREAM): HSTREAM; stdcall; external 'bass_fx.dll' name 'BASS_FX_ReverseGetSource';
 
 {=============================================================================================
         B P M (Beats Per Minute)
@@ -297,27 +297,27 @@ const
   BASS_FX_BPM_TRAN_2PERCENT = 3;     // BPM value to Percents
   BASS_FX_BPM_TRAN_PERCENT2 = 4;     // Percents to BPM value
 
-type BPMPROCESSPROC = procedure(chan: DWORD; percent: FLOAT); stdcall;
-type BPMPROC = procedure(handle: DWORD; bpm: FLOAT; user: DWORD); stdcall;
+//XX//type BPMPROCESSPROC = procedure(chan: DWORD; percent: FLOAT); stdcall;
+//XX//type BPMPROC = procedure(handle: DWORD; bpm: FLOAT; user: DWORD); stdcall;
 
-function BASS_FX_BPM_DecodeGet(chan: DWORD; startSec, endSec: DOUBLE; minMaxBPM, flags: DWORD; proc: BPMPROCESSPROC): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_DecodeGet';
-function BASS_FX_BPM_CallbackSet(handle: DWORD; proc: BPMPROC; period: DOUBLE; minMaxBPM, flags, user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_CallbackSet';
-function BASS_FX_BPM_CallbackReset(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_CallbackReset';
-function BASS_FX_BPM_Translate(handle: DWORD; val2tran: FLOAT; trans: DWORD): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_Translate';
-function BASS_FX_BPM_Free(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_Free';
+//XX//function BASS_FX_BPM_DecodeGet(chan: DWORD; startSec, endSec: DOUBLE; minMaxBPM, flags: DWORD; proc: BPMPROCESSPROC): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_DecodeGet';
+//XX//function BASS_FX_BPM_CallbackSet(handle: DWORD; proc: BPMPROC; period: DOUBLE; minMaxBPM, flags, user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_CallbackSet';
+//XX//function BASS_FX_BPM_CallbackReset(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_CallbackReset';
+//XX//function BASS_FX_BPM_Translate(handle: DWORD; val2tran: FLOAT; trans: DWORD): FLOAT; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_Translate';
+//XX//function BASS_FX_BPM_Free(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_Free';
 
 {=============================================================================================
         B E A T
 =============================================================================================}
 
-type BPMBEATPROC = procedure(handle: DWORD; beatpos: DOUBLE; user: DWORD); stdcall;
+//XX//type BPMBEATPROC = procedure(handle: DWORD; beatpos: DOUBLE; user: DWORD); stdcall;
 
-function BASS_FX_BPM_BeatCallbackSet(handle: DWORD; proc: BPMBEATPROC; user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatCallbackSet';
-function BASS_FX_BPM_BeatCallbackReset(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatCallbackReset';
-function BASS_FX_BPM_BeatDecodeGet(chan: DWORD; startSec, endSec: DOUBLE; flags: DWORD; proc: BPMBEATPROC; user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatDecodeGet';
-function BASS_FX_BPM_BeatSetParameters(handle: DWORD; bandwidth, centerfreq, beat_rtime: FLOAT): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatSetParameters';
-function BASS_FX_BPM_BeatGetParameters(handle: DWORD; var bandwidth, centerfreq, beat_rtime: FLOAT): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatGetParameters';
-function BASS_FX_BPM_BeatFree(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatFree';
+//XX//function BASS_FX_BPM_BeatCallbackSet(handle: DWORD; proc: BPMBEATPROC; user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatCallbackSet';
+//XX//function BASS_FX_BPM_BeatCallbackReset(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatCallbackReset';
+//XX//function BASS_FX_BPM_BeatDecodeGet(chan: DWORD; startSec, endSec: DOUBLE; flags: DWORD; proc: BPMBEATPROC; user: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatDecodeGet';
+//XX//function BASS_FX_BPM_BeatSetParameters(handle: DWORD; bandwidth, centerfreq, beat_rtime: FLOAT): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatSetParameters';
+//XX//function BASS_FX_BPM_BeatGetParameters(handle: DWORD; var bandwidth, centerfreq, beat_rtime: FLOAT): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatGetParameters';
+//XX//function BASS_FX_BPM_BeatFree(handle: DWORD): BOOL; stdcall; external 'bass_fx.dll' name 'BASS_FX_BPM_BeatFree';
 
 implementation
 
