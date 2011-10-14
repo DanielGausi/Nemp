@@ -135,7 +135,7 @@ type
     );
 
  type
-    TAudioType = (at_Undef, at_File, at_Stream, at_CDDA);
+    TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
 
 
     // Class TTag: Used for the TagCloud
@@ -893,6 +893,7 @@ begin
             // more todo
             FileIsPresent := True;
         end;
+        at_CUE: FileIsPresent := True;
     end;
 
     result := FileIsPresent;
@@ -910,6 +911,7 @@ begin
         at_File   : result := FStrings[siOrdner] + Dateiname ;
         at_Stream : result := fStrings[siOrdner];
         at_CDDA   : result := fStrings[siOrdner] + Dateiname;
+        at_CUE    : result := FStrings[siOrdner] + Dateiname ;
     end;
 end;
 
@@ -927,6 +929,11 @@ begin
         at_Stream: begin
             FStrings[siOrdner] := Value;
             FStrings[siDateiname] := '';
+        end;
+
+        at_CUE : begin
+            FStrings[siOrdner] := ExtractFilePath(Value);//ExtractFileDir(Value);
+            FStrings[siDateiname] := ExtractFileName(Value);
         end;
 
         at_CDDA: begin
@@ -1075,7 +1082,7 @@ begin
     case fAudioType of
         at_Undef  : result := '';
 
-        at_File, at_CDDA : begin
+        at_File, at_CDDA, at_CUE: begin
             if UnKownInformation(Artist) then
                 result := NonEmptyTitle
             else
@@ -1118,7 +1125,8 @@ begin
         case fAudioType of
             at_Undef,
             at_File,
-            at_Stream: result := Pfad;
+            at_Stream,
+            at_CUE : result := Pfad;
             at_CDDA: Result := 'CD-Audio, Track ' + IntToStr(Track);
         end;
 
@@ -2416,6 +2424,8 @@ begin
       case GetCueID(tmplist[i]) of
         CUE_ID_TRACK: begin
                         aCue := TAudioFile.Create;
+                        aCue.AudioType := at_CUE;
+                        aCue.Pfad := Pfad;
                         CueList.Add(aCue);
                       end;
         CUE_ID_TITLE: begin

@@ -1253,19 +1253,23 @@ begin
               MainStreamIsReverseStream := False;
 
               // Stratplay künstlich auf True setzen!
-              StartPlay := True;
+              // StartPlay := True;          // why ?????
 
               // Wenn Faden
               if UseFading AND fReallyUseFading then
               begin
                 // Lautstärke zunächst auf 0
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
-                BASS_ChannelPlay(MainStream , True);
-                BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                if StartPlay then
+                begin
+                    BASS_ChannelPlay(MainStream , True);
+                    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                end;
               end
               else begin // also kein Fading, Lautstärke mormal
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
-                BASS_ChannelPlay(MainStream , True);
+                if StartPlay then
+                    BASS_ChannelPlay(MainStream , True);
               end;
               fStatus := PLAYER_ISPLAYING;
 
@@ -1279,7 +1283,8 @@ begin
               fReallyUseFading := False;
               MainStreamIsReverseStream := False;
 
-              StartPlay := True;
+              // StartPlay := True;    // why ?????
+
               // Wenn Faden
               if UseFading then // AND fReallyUseFading then
               begin
@@ -1287,15 +1292,18 @@ begin
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
                 if StartPos <> 0 then
                     Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
-                BASS_ChannelPlay(MainStream , False);
-                BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                if StartPlay then
+                begin
+                    BASS_ChannelPlay(MainStream , False);
+                    BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+                end;
               end
               else begin // also kein Fading, Lautstärke mormal
                 BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
                 if StartPos <> 0 then
                       Bass_ChannelSetPosition(Mainstream, BASS_ChannelSeconds2Bytes(MainStream, StartPos), BASS_POS_BYTE);
-
-                BASS_ChannelPlay(MainStream , False);
+                if StartPlay then
+                    BASS_ChannelPlay(MainStream , False);
               end;
               fStatus := PLAYER_ISPLAYING;
           end;

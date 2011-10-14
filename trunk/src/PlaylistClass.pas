@@ -157,6 +157,7 @@ type
       MainWindowHandle: DWord;  // The Handle to the Nemp main window
 
       ST_Ordnerlist: TStringList; // Joblist for SearchTools
+      InitialDialogFolder: String;
 
       Status: Integer;
 
@@ -353,6 +354,7 @@ begin
   SavePositionInTrack   := ini.ReadBool('Playlist', 'SavePositionInTrack', True);
   PositionInTrack       := ini.ReadInteger('Playlist', 'PositionInTrack', 0);
   BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', False);
+  InitialDialogFolder   := Ini.ReadString('Playlist', 'InitialDialogFolder', '');
 end;
 
 procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
@@ -394,6 +396,7 @@ begin
   Ini.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
   Ini.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
   Ini.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
+  Ini.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);
 end;
 
 
