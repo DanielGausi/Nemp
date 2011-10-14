@@ -348,6 +348,8 @@ type
         // Also die, die ncoh nicht gescannt wurden.
         AutoScanToDoList: TStringList;
 
+        InitialDialogFolder: String;  // last used folder for "scan for audiofiles"
+
         // Bei neuen Ordnern (per Drag&Drop o.ä.) Dialog anzeigen, ob sie in die Auto-Liste eingefügt werden sollen
         AskForAutoAddNewDirs: Boolean;
         // Automatisch neue Ordner in die Scanlist einfügen
@@ -1089,6 +1091,8 @@ begin
         NempCharCodeOptions.AutoDetectCodePage := ini.ReadBool('MedienBib', 'AutoDetectCharCode', True);
         NempCharCodeOptions.AlwaysWriteUnicode := ini.ReadBool('MedienBib', 'AlwaysWriteUnicode', False);
 
+        InitialDialogFolder := Ini.ReadString('MedienBib', 'InitialDialogFolder', '');
+
         AutoScanDirs := Ini.ReadBool('MedienBib', 'AutoScanDirs', True);
         AskForAutoAddNewDirs  := Ini.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
         AutoAddNewDirs        := Ini.ReadBool('MedienBib', 'AutoAddNewDirs', True);
@@ -1164,6 +1168,7 @@ begin
         ini.WriteBool('MedienBib', 'AutoDetectCharCode', NempCharCodeOptions.AutoDetectCodePage);
         ini.WriteBool('MedienBib', 'AlwaysWriteUnicode', NempCharCodeOptions.AlwaysWriteUnicode);
 
+        Ini.WriteString('MedienBib', 'InitialDialogFolder', InitialDialogFolder);
         Ini.WriteBool('MedienBib', 'AutoScanDirs', AutoScanDirs);
         Ini.WriteInteger('MedienBib', 'dircount', AutoScanDirList.Count);
         Ini.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);

@@ -547,7 +547,7 @@ type
   private
     { Private-Deklarationen }
     OldFontSize: integer;
-    CurrentScanDir: String;
+    //CurrentScanDir: String;
     //VerlaufBitmap: TBitmap;
     //procedure RePaintVerlauf(Verlauf: Boolean);
     procedure GetSkins;
@@ -628,7 +628,6 @@ begin
   Testskin := TNempSkin.create;
 
   DTPBirthdayTime.Format := 'HH:mm';
-  CurrentScanDir := '';
 
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
   begin
@@ -2667,17 +2666,17 @@ var tmp, newdir: UnicodeString;
     i: Integer;
     FB: TFolderBrowser;
 begin
-  if CurrentScanDir = '' then
-      CurrentScanDir := GetShellFolder(CSIDL_MYMUSIC);
+  if MedienBib.InitialDialogFolder = '' then
+      MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
 
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, CurrentScanDir);
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder);
   try
       if fb.Execute then
       begin
           newdir := Fb.SelectedItem;
           // save selected dir for next call of this dialog
-          CurrentScanDir := Fb.SelectedItem;
+          MedienBib.InitialDialogFolder := Fb.SelectedItem;
 
           // Parentdir schon drin? - Nicht einfügen
           if MedienBib.ScanListContainsParentDir(newdir) <> '' then

@@ -1408,8 +1408,8 @@ type
 
     NempIsClosing: Boolean;
 
-    CurrentScanDir: String;
-    CurrentPlaylistDir: String;
+    //CurrentScanDir: String;
+    //CurrentPlaylistDir: String;
 
     // Setzt alle DragOver-Eventhandler auf das der Effekte-Groupbox
     procedure SetGroupboxEffectsDragover;
@@ -1758,8 +1758,6 @@ begin
     NempRegionsDistance.Docked := True;
     MinimizedIndicator         := False;
     Decimalseparator   := '.';
-    CurrentScanDir     := '';
-    CurrentPlaylistDir := '';
 
     OldScrollbarWindowProc    := CoverScrollbar.WindowProc;
     CoverScrollbar.WindowProc := NewScrollBarWndProc;
@@ -2998,10 +2996,10 @@ begin
     exit;
   end;
 
-  if CurrentScanDir = ''  then
-      CurrentScanDir := GetShellFolder(CSIDL_MYMUSIC);
+  if MedienBib.InitialDialogFolder = ''  then
+      MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-  if MedienBib.NempSortArray[1] = siOrdner then
+  {if MedienBib.NempSortArray[1] = siOrdner then
   begin
       aNode := ArtistsVST.FocusedNode;
       if assigned(aNode) and (ArtistsVST.GetNodeLevel(aNode) > 0) then
@@ -3009,17 +3007,17 @@ begin
           Data := ArtistsVST.GetNodeData(aNode);
           CurrentScanDir := Data.FString.DataString;
       end;
-  end;
+  end;}
 
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, CurrentScanDir );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder );
   try
       if fb.Execute then
       begin
           fspTaskbarManager.ProgressValue := 0;
           fspTaskbarManager.ProgressState := fstpsIndeterminate;
           newdir := fb.SelectedItem;
-          CurrentScanDir := fb.SelectedItem;
+          MedienBib.InitialDialogFolder := fb.SelectedItem;
           MedienBib.ST_Ordnerlist.Add(newdir);
           // DateiSuche starten
           if (Not ST_Medienliste.IsSearching) then
@@ -6891,15 +6889,15 @@ procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
 begin
-  if (CurrentPlaylistDir = '') then
-      CurrentPlaylistDir := GetShellFolder(CSIDL_MYMUSIC);
+  if (NempPlaylist.InitialDialogFolder = '') then
+      NempPlaylist.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption, CurrentPlaylistDir );
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_PlaylistCaption, NempPlaylist.InitialDialogFolder );
   try
       if fb.Execute then
       begin
           newdir := fb.SelectedItem;
-          CurrentPlaylistDir := fb.SelectedItem;
+          NempPlaylist.InitialDialogFolder := fb.SelectedItem;
 
           NempPlaylist.InsertNode := Nil;
           ST_Playlist.Mask := GeneratePlaylistSTFilter;
@@ -9139,6 +9137,14 @@ begin
                + Format(' %s: %s', [(AudioFileProperty_URL) , Data^.FAudioFile.Pfad])
       end;
 
+      at_cue: begin
+          HintText := 'Cue-Sheet ' + #13#10 //+ Data^.FAudioFile.Dateiname + #13#10
+                + Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
+                + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)])+ #13#10
+                + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Data^.FAudioFile.Ordner]) + #13#10
+                + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Data^.FAudioFile.Dateiname]);
+      end;
+
       at_CDDA: begin
           if trim(Data^.FAudioFile.Artist) = '' then
               HintText :=
@@ -11099,17 +11105,15 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
-var x :Integer;
 begin
   if DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
   begin
-        x := ShellExecute(Handle, 'open' ,'explorer.exe', PChar('/e "'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal);
-        showmessage(Inttostr(x) + SysErrorMessage(GetLastError) + NempPlayer.DownloadDir);
 
-        x := SE_ERR_ACCESSDENIED;
-
+        //if ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal) <= 32
+        if ShellExecute(Handle,  'explore', PChar('"'+NempPlayer.DownloadDir+'"'), NIL, NIL, sw_ShowNormal) <= 32
+        then
+            showmessage(SysErrorMessage(GetLastError));
   end
-
   else
         MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
 end;
@@ -11136,7 +11140,7 @@ end;
 procedure TNemp_MainForm.PM_P_DirectoriesDataClick(Sender: TObject);
 begin
   if DirectoryExists(ExtractFilePath(SavePath)) then
-      ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+SavePath+'"'), '', sw_ShowNormal)
+      ShellExecute(Handle, 'explore', PChar('"'+SavePath+'"'), Nil, '', sw_ShowNormal)
   else
       MessageDLG((Warning_DataDirNotFound), mtWarning, [mbOk], 0);
 end;
