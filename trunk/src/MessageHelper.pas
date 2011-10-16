@@ -1165,6 +1165,8 @@ end;
 function Handle_WndProc(var Message: TMessage): Boolean;
 var devType: Integer;
   Datos: PDevBroadcastHdr;
+//  VolInfo: PDevBroadcastVolume;
+//  UnitMask: DWord;
 begin
   result := True;
 
@@ -1187,6 +1189,27 @@ begin
                       begin
                           Datos := PDevBroadcastHdr(Message.lParam);
                           devType := Datos^.dbch_devicetype;
+
+                          {if (devType = DBT_DEVTYP_DEVICEINTERFACE)
+                          then showmessage('DBT_DEVTYP_DEVICEINTERFACE');
+
+                          if (devType = DBT_DEVTYP_VOLUME)
+                          then showmessage('DBT_DEVTYP_VOLUME');  }
+
+                        {
+                          if (devType = DBT_DEVTYP_VOLUME) and (Message.wParam = DBT_DEVICEARRIVAL) then
+                          begin
+                              //repair playlist
+                              // treat lParam now as PDevBroadcastVolume
+                              VolInfo := PDevBroadcastVolume(Message.lParam);
+
+                              UnitMask := VolInfo^.dbcv_unitmask;
+                              Showmessage(Inttostr(unitmask));
+
+                          end;
+
+                         }
+
                           if (devType = DBT_DEVTYP_DEVICEINTERFACE) or (devType = DBT_DEVTYP_VOLUME) then
                           begin // USB Device
                             if Message.wParam = DBT_DEVICEARRIVAL then

@@ -1362,7 +1362,6 @@ type
     procedure GRPBOXHeadsetClick(Sender: TObject);
     procedure BtnHeadsetToPlaylistClick(Sender: TObject);
     procedure PM_PL_ClearPlaylistClick(Sender: TObject);
-    procedure test1Click(Sender: TObject);
     procedure SlideBackHeadsetBTNClick(Sender: TObject);
     procedure SlideForwardHeadsetBTNClick(Sender: TObject);
     procedure ButtonNextEQClick(Sender: TObject);
@@ -11054,66 +11053,19 @@ var point: TPoint;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
-//   a.GenerateCSVString;
- //  aDrive := TDrive.Create;
- //  aDrive.GetInfo('E:\');
- //  Showmessage(aDrive.Name + #13#10 + IntToStr(aDrive.SerialNr));
-//   exit;
-//CloudViewer.SetFocus;
-
-    //c := TCDDAFile.Create;
-    //err := c.GetData('cda://G,11,asa', False);
-
-    //showmessage(
-    //inttostr(Integer(err)) +
-    //c.Artist + #13#10 +
-    //c.Title + #13#10 +
-    //c.Album + #13#10 +
-    //IntToStr(c.Track) + #13#10 +
-    //IntToStr(c.Duration) + #13#10
-    //);
 
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
 
 
-
-  { lyrics := TLyrics.Create;
-   try
-      s := Lyrics.GetLyrics(
-          MedienBib.CurrentAudioFile.Artist,
-          MedienBib.CurrentAudioFile.Titel);
-
-
-      sl := TStringList.Create;
-      sl.Text := s;
-      sl.SaveToFile(savePath + 'lyric.txt');
-      sl.Free;
-
-   finally
-      lyrics.Free;
-   end;
-   }
-
 end;
 
-
-procedure TNemp_MainForm.test1Click(Sender: TObject);
-begin
-         //   nothing
-end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
 begin
   if DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
-  begin
-
-        //if ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal) <= 32
-        if ShellExecute(Handle,  'explore', PChar('"'+NempPlayer.DownloadDir+'"'), NIL, NIL, sw_ShowNormal) <= 32
-        then
-            showmessage(SysErrorMessage(GetLastError));
-  end
+        ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal)
   else
         MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
 end;
@@ -11140,7 +11092,7 @@ end;
 procedure TNemp_MainForm.PM_P_DirectoriesDataClick(Sender: TObject);
 begin
   if DirectoryExists(ExtractFilePath(SavePath)) then
-      ShellExecute(Handle, 'explore', PChar('"'+SavePath+'"'), Nil, '', sw_ShowNormal)
+      ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+SavePath+'"'), '', sw_ShowNormal)
   else
       MessageDLG((Warning_DataDirNotFound), mtWarning, [mbOk], 0);
 end;
