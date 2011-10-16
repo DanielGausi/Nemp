@@ -87,6 +87,16 @@ type
     dbch_reserved: DWORD;
   end;
 
+  {PDevBroadcastVolume = ^DEV_BROADCAST_VOLUME;
+  DEV_BROADCAST_VOLUME = packed record
+    dbcv_size       : DWORD;
+    dbcv_devicetype : DWORD;
+    dbcv_reserved   : DWORD;
+    dbcv_unitmask   : DWORD;
+    dbcv_flags      : WORD;
+  end;
+  // DEV_BROADCAST_VOLUME, *PDEV_BROADCAST_VOLUME;
+  }
 
   const
       GUID_DEVINTERFACE_USB_DEVICE: TGUID = '{A5DCBF10-6530-11D2-901F-00C04FB951ED}';

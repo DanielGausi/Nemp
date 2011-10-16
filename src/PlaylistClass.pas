@@ -215,6 +215,8 @@ type
       procedure DeleteDeadFiles;    // Delete dead (non existing) files
       procedure RemovePlayingFile;  // Remove the current file from the list
       procedure RemoveFileFromHistory(aFile: TAudioFile);
+      procedure RepairPlaylist(NewDriveMask: DWord); // repair the playlist when a new drive is connected
+                                                     // NewDriveMask is a Bitmask as in DEV_BROADCAST_VOLUME
 
       //// Some GUI-Stuff
       // Get the InsertNode from current playing position
@@ -870,6 +872,20 @@ begin
   end;
   fDauer := ShowPlayListSummary;
 end;
+
+{
+    --------------------------------------------------------
+    RepairPlaylist
+    Check Non-Existing files, whether the are on the new drive.
+    --------------------------------------------------------
+}
+procedure TNempPlaylist.RepairPlaylist(NewDriveMask: DWord);
+begin
+
+end;
+
+
+
 {
     --------------------------------------------------------
     RemoveFileFromHistory
@@ -1982,6 +1998,7 @@ begin
     Player.Time := OldTime;
   end
 end;
+
 
 {
     --------------------------------------------------------

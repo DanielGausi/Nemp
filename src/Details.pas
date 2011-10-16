@@ -616,9 +616,6 @@ begin
   if DirectoryExists(ExtractFilePath(CurrentAudioFile.pfad)) then
         ShellExecute(Handle, 'open' ,'explorer.exe'
         , Pchar('/e,/select,"\'+CurrentAudioFile.Pfad+'"'), '', sw_ShowNormal);
-        //Showmessage(inttostr(ShellExecute(Handle, 'explore'
-        //              , Pchar('/e,/select,"'+CurrentAudioFile.Pfad+'"'), NIL, '', sw_ShowNormal)));
-
 end;
 procedure TFDetails.Btn_PropertiesClick(Sender: TObject);
 begin
