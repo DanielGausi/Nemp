@@ -1105,7 +1105,7 @@ var
   ChannelInfo: BASS_CHANNELINFO;
   basstime: Double;
   basslen: DWord;
-  JustCDChange, CDChangeSuccess: Boolean;
+  //JustCDChange, CDChangeSuccess: Boolean;
 begin
   // Alte Wiedergabe stoppen
   // Es macht keinen Sinn, einen neuen Mainstream zu erzeugen,
@@ -1113,13 +1113,15 @@ begin
   // Vorteil: Das stoppen muss nicht explizit von auﬂen aufgerufen werden!
   //         Aber: Wenn innerhalb einer CD gewechselt werden soll, dann NICHT
 
-  JustCDChange := assigned(MainAudioFile) and assigned(aAudioFile)   // both files are set
-                  and (Mainstream <> 0)
-                  and (not MainStreamIsReverseStream)
-                  and MainAudioFile.isCDDA and aAudioFile.isCDDA     // both are CDDA
-                  and SameDrive(MainAudioFile.Pfad, aAudioFile.Pfad); // both on the same drive
+  //JustCDChange := assigned(MainAudioFile) and assigned(aAudioFile)   // both files are set
+  //                and (Mainstream <> 0)
+  //                and (not MainStreamIsReverseStream)
+  //                and MainAudioFile.isCDDA and aAudioFile.isCDDA     // both are CDDA
+  //                and SameDrive(MainAudioFile.Pfad, aAudioFile.Pfad); // both on the same drive
 
-  if not JustCDChange then
+  //JustCDChange := False;
+
+  //if not JustCDChange then
       StopAndFree(StartPlay);
 
   MainAudioFile := aAudioFile;
@@ -1154,19 +1156,23 @@ begin
               MainAudioFile.GetAudioData(MainAudioFile.Pfad, 0);
       end;
 
-      CDChangeSuccess := True;
-      if JustCDChange then
-          CDChangeSuccess := BASS_CD_StreamSetTrack(MainStream, MainAudioFile.Track - 1)
-      else
+      //CDChangeSuccess := True;
+      //if JustCDChange then
+      //begin
+      //    CDChangeSuccess := BASS_CD_StreamSetTrack(MainStream, MainAudioFile.Track - 1);
+      //    showmessage('changed ' + inttostr(MainAudioFile.Track - 1));
+      //end
+      //else
           // Mainstream erzeugen
           Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, True);
 
       // Fehlerbehandlung
-      if (MainStream = 0) or (not CDChangeSuccess) then
+      if (MainStream = 0) {or (not CDChangeSuccess)} then
       begin
           if BassErrorString(Bass_ErrorGetCode) <> '' then
 
               Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
+              showmessage(BassErrorString(Bass_ErrorGetCode));
           // something is wrong
           MainAudioFileIsPresentAndPlaying := False;
       end;

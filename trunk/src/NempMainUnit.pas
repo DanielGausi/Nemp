@@ -7869,7 +7869,7 @@ begin
                                       at_Undef  : ImageIndex := 8;
                                       at_File   : ImageIndex := 0;
                                       at_Stream : ImageIndex := 9;
-                                      at_CDDA   : ImageIndex := 11;
+                                      at_CDDA   : ImageIndex := 10;
                                   end;
                               end;
                           end;
@@ -7896,7 +7896,7 @@ begin
               else imageIndex := 7;
 
           CON_LASTFMTAGS :
-                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 14;
+                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 11;
               //else imageIndex := 15;
           // Con_Titel: imageIndex := 10;
         end;
