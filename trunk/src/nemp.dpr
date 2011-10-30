@@ -88,7 +88,8 @@ uses
   BasicSettingsWizard in 'BasicSettingsWizard.pas' {Wizard},
   cddaUtils in 'cddaUtils.pas',
   CDSelection in 'CDSelection.pas' {FormCDDBSelect},
-  CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog};
+  CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog},
+  DeleteHelper in 'DeleteHelper.pas';
 
 //,  classes;
 

@@ -34,7 +34,7 @@ unit MessageHelper;
 interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs,
-    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees;
+    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
@@ -439,6 +439,9 @@ var i: Integer;
     af: TAudiofile;
     aErr: TAudioError;
     ErrorLog : TErrorLog;
+
+    tmpString: String;
+    delData: TDeleteData;
 begin
   result := True;
 
@@ -737,6 +740,26 @@ begin
             MessageDlg(MediaLibrary_SomeErrorsOccured, mtWarning, [MBOK], 0);
         end;
 
+        MB_UserInputDeadFiles: begin
+            srList := TObjectList(aMsg.LParam);
+            tmpString := '';
+            for i := 0 to srList.Count - 1 do
+            begin
+                delData := TDeleteData(srList[i]);
+                tmpString := tmpString + #13#10 + delData.DriveString;
+                case delData.Recommendation of
+                  dr_Keep: tmpString := tmpString + ' behalten, denn';
+                  dr_Delete: tmpString := tmpString + ' löschen, denn';
+                end;
+                case delData.Hint of
+                  dh_DivePresent: tmpString := tmpString + ' Laufwerk ist da';
+                  dh_DriveMissing: tmpString := tmpString + ' Laufwerk ist nicht da';
+                  dh_NetworkPresent: tmpString := tmpString + ' PC ist da';
+                  dh_NetworkMissing: tmpString := tmpString + ' PC ist nicht da';
+                end;
+            end;
+            ShowMessage(tmpString);
+        end;
   end;
 end;
 
