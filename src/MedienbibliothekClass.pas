@@ -588,6 +588,8 @@ type
         procedure PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
         procedure ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
 
+        function GetDriveFromUsedDrives(aChar: Char): TDrive;
+
   end;
 
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
@@ -1658,7 +1660,6 @@ begin
     // Clear temporary lists
     MB.CleanUpTmpLists;                   // status: ok, no change allowed
 
-
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
     try
         CloseHandle(MB.fHND_DeleteFilesThread);
@@ -1746,7 +1747,6 @@ var i: Integer;
         result := c;
     end;
 
-
 begin
     // prepare data - check whether the drive of the issing files exists etc.
     Drives := TObjectList.Create;
@@ -1773,13 +1773,13 @@ begin
                         begin
                             // complete Drive is NOT there
                             newDeleteData.DoDelete       := False;
-                            newDeleteData.Recommendation := dr_Keep;
+                            //newDeleteData.Recommendation := dr_Keep;
                             newDeleteData.Hint           := dh_DriveMissing;
                         end else
                         begin
                             // drive is there => just the file is not present
                             newDeleteData.DoDelete       := True;
-                            newDeleteData.Recommendation := dr_Delete;
+                            //newDeleteData.Recommendation := dr_Delete;
                             newDeleteData.Hint           := dh_DivePresent;
                         end;
                         DeleteDataList.Add(newDeleteData);
@@ -1794,7 +1794,7 @@ begin
                         newDeleteData.DriveString := currentPC ;
                         // assume that its missing, further check after this loop
                         newDeleteData.DoDelete       := False;
-                        newDeleteData.Recommendation := dr_Keep;
+                        //newDeleteData.Recommendation := dr_Keep;
                         newDeleteData.Hint           := dh_NetworkMissing;
 
                         DeleteDataList.Add(newDeleteData);
@@ -1816,22 +1816,14 @@ begin
                 begin
                     // some files on this ressource can be found
                     TDeleteData(DeleteDatalist[i]).DoDelete       := True;
-                    TDeleteData(DeleteDatalist[i]).Recommendation := dr_Delete;
+                    //TDeleteData(DeleteDatalist[i]).Recommendation := dr_Delete;
                     TDeleteData(DeleteDatalist[i]).Hint           := dh_NetworkPresent;
                 end;
             end;
         end;
-
-        // Now: ShowUser-Interface
-
     finally
         Drives.Free;
     end;
-
-
-    /// procedure GetLogicalDrives(Drives: TObjectList);
-    ///  function GetDriveFromListByChar(aList: TObjectList; c: Char): TDrive;
-
 end;
 {
     --------------------------------------------------------
@@ -5334,6 +5326,11 @@ begin
           if not Silent then
               MessageDLG(E.Message, mtError, [MBOK], 0)
   end;
+end;
+
+function TMedienBibliothek.GetDriveFromUsedDrives(aChar: Char): TDrive;
+begin
+    result := GetDriveFromListByChar(fUsedDrives, aChar);
 end;
 
 

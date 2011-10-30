@@ -62,7 +62,8 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass, Details,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
-    SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor;
+    SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
+    DeleteSelect;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -743,13 +744,26 @@ begin
         MB_UserInputDeadFiles: begin
             srList := TObjectList(aMsg.LParam);
             tmpString := '';
-            for i := 0 to srList.Count - 1 do
+
+            DeleteSelection.DataFromMedienBib := srList;
+
+            if DeleteSelection.showModal <> mrOK then
+            begin
+                // the user cancelled the dialog - Do not delete any files
+                for i := 0 to srList.Count - 1 do
+                begin
+                    delData := TDeleteData(srList[i]);
+                    delData.DoDelete := False;
+                end;
+            end;
+
+           { for i := 0 to srList.Count - 1 do
             begin
                 delData := TDeleteData(srList[i]);
                 tmpString := tmpString + #13#10 + delData.DriveString;
-                case delData.Recommendation of
-                  dr_Keep: tmpString := tmpString + ' behalten, denn';
-                  dr_Delete: tmpString := tmpString + ' löschen, denn';
+                case delData.DoDelete of
+                  False: tmpString := tmpString + ' behalten, denn';
+                  True: tmpString := tmpString + ' löschen, denn';
                 end;
                 case delData.Hint of
                   dh_DivePresent: tmpString := tmpString + ' Laufwerk ist da';
@@ -759,6 +773,7 @@ begin
                 end;
             end;
             ShowMessage(tmpString);
+            }
         end;
   end;
 end;

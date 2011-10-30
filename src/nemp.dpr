@@ -89,7 +89,8 @@ uses
   cddaUtils in 'cddaUtils.pas',
   CDSelection in 'CDSelection.pas' {FormCDDBSelect},
   CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog},
-  DeleteHelper in 'DeleteHelper.pas';
+  DeleteHelper in 'DeleteHelper.pas',
+  DeleteSelect in 'DeleteSelect.pas' {DeleteSelection};
 
 //,  classes;
 
@@ -117,6 +118,7 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Application.CreateForm(TDeleteSelection, DeleteSelection);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

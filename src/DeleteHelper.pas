@@ -12,14 +12,14 @@ type
     //TNetResourceArray = array[0..100] of TNetResourceA;
 
 
-    TDeleteRecommendation = (dr_Keep, dr_Delete);
+    //TDeleteRecommendation = (dr_Keep, dr_Delete);
     TDeleteHint = (dh_DivePresent, dh_DriveMissing, dh_NetworkPresent, dh_NetworkMissing);
 
     TDeleteData = class
         public
             DriveString : String;    // i.e. "c:\" or "\\MyOtherPC\"
             DoDelete    : Boolean;   // User-Input
-            Recommendation : TDeleteRecommendation; // What should be done?
+            // Recommendation : TDeleteRecommendation; // What should be done?
             Hint: TDeleteHint;                      // ... and why?
             Files: TObjectList;
 
