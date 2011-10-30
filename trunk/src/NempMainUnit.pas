@@ -11056,25 +11056,26 @@ begin
 // commented code is just temporary here. ;-)
 
 
-sl := tStringlist.create;
+//sl := tStringlist.create;
 
 
 //if RechnerInWG(handle, 0, Nil, sl ) then
 
-ScanNetworkResources(RESOURCETYPE_DISK, RESOURCEDISPLAYTYPE_SERVER, sl);
+//ScanNetworkResources(RESOURCETYPE_DISK, RESOURCEDISPLAYTYPE_SERVER, sl);
 
-showmessage(sl.Text)
+//showmessage(sl.Text)
 // else
 //wuppdi;
 ;
-exit;
+//exit;
 
-
+    {
 delList := TObjectList.Create;
 
 MedienBib.UserInputDeadFiles(delList);
 SendMessage(Handle, WM_MedienBib, MB_UserInputDeadFiles, lParam(delList));
 delList.Free;
+      }
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
