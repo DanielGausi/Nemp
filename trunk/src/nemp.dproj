@@ -164,6 +164,9 @@
 				<Form>CDOpenDialog</Form>
 			</DCCReference>
 			<DCCReference Include="DeleteHelper.pas"/>
+			<DCCReference Include="DeleteSelect.pas">
+				<Form>DeleteSelection</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

@@ -43,7 +43,7 @@ uses Windows, Messages, Classes, ContNrs, SysUtils, dialogs, Forms;
 
 
 const  DriveTypeTexts: array[DRIVE_UNKNOWN..DRIVE_RAMDISK] of String =
-   ('Unbekannt', 'Kein Wurzelverzeichnis', 'Diskette', 'Festplatte', 'Netzlaufwerk', 'CDROM', 'RAMDisk');
+   ('Unknown', 'No root', 'Removable drive', 'Harddisk', 'Shared directory', 'CDROM', 'RAMDisk');
 
 type
 
@@ -177,15 +177,15 @@ begin
     aStream.Read(SerialNr, SizeOf(DWord));
 
     aStream.Read(len, SizeOf(len));
-    setlength(Drive, len);
+    setlength(Drive, len Div 2);
     aStream.Read(Drive[1], len);
 
     aStream.Read(len, SizeOf(len));
-    setlength(Typ, len);
+    setlength(Typ, len Div 2);
     aStream.Read(Typ[1], len);
 
     aStream.Read(len, SizeOf(len));
-    setlength(Name, len);
+    setlength(Name, len Div 2);
     aStream.Read(Name[1], len);
 end;
 
@@ -195,15 +195,15 @@ begin
     aStream.Write(ID, SizeOf(Integer));
     aStream.Write(SerialNr, SizeOf(DWord));
 
-    len := length(Drive);
+    len := length(Drive) * SizeOf(Char);
     aStream.Write(len, SizeOf(len));
     aStream.Write(Drive[1], len);
 
-    len := length(Typ);
+    len := length(Typ) * SizeOf(Char);
     aStream.Write(len, SizeOf(len));
     aStream.Write(Typ[1], len);
 
-    len := length(Name);
+    len := length(Name) * SizeOf(Char);
     aStream.Write(len, SizeOf(len));
     aStream.Write(Name[1], len);
 end;

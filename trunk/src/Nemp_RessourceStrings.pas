@@ -713,6 +713,29 @@ StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display th
 CDDA_NoDrivesFound = 'No CD drives found.';
 CDDA_NoHeadsetPossible = 'Nemp is currently playing a track from this CD. Playing another one at the same time is not possible.';
 
+//DeleteHelper_DrivePresent   = 'The drive is available, but some files are not.' + #13#10 + #13#10 + 'Recommendation: Remove the missing files from the library.';
+//DeleteHelper_DriveMissing   = 'The drive is missing. Probably the external drive is not connected at the moment.' + #13#10 + #13#10 + 'Recommendation: Keep the files in the library and connect the drive to your PC.';
+//DeleteHelper_NetworkPresent = 'The network ressource seems to be available, but some files can''t be found.' + #13#10 + #13#10 + 'Recommendation: Remove the missing files from the library.';
+//DeleteHelper_NetworkMissing = 'None of the files on this network ressource can be found - it may be not available at the moment.' + #13#10 + #13#10 + 'Recommendation: Keep the files in the library and check your network settings.';
+
+DeleteHelper_DrivePresent   = 'The drive is available.';
+DeleteHelper_DriveMissing   = 'The drive is NOT available.';
+DeleteHelper_NetworkPresent = 'The network ressource is available';
+DeleteHelper_NetworkMissing = 'The network ressource seems to be offline';
+
+DeleteHelper_DoWithDrivePresent   = 'You should remove the missing files from the library.';
+DeleteHelper_DoWithDriveMissing   = 'You should keep files in the library, connect the drive to your computer and try again later.';
+DeleteHelper_DoWithNetworkPresent = 'You should remove the missing files from the library.';
+DeleteHelper_DoWithNetworkMissing = 'You should keep the files in the library, check your network settings and try again later.';
+
+DeleteHelper_Readme = 'Sometimes it is not appropriate to remove every missing file from the library. '
+    + 'E.g.: If you store large parts of your music files on an external harddrive which is currently not connected to your PC.'
+    + #13#10 + #13#10
+    + 'In this dialog you can choose what to do with the missing files on the specified drives.' + #13#10
+    + 'Missing files from the checked drives will be removed from the library, the others will not be removed.'
+    ;
+
+
 implementation
 
 end.
