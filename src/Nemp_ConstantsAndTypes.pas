@@ -408,6 +408,8 @@ const
     //
     MB_ErrorLogHint = 34;
 
+    MB_UserInputDeadFiles = 36;
+
     MB_SetStatus = 100;
 
 

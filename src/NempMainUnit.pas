@@ -48,7 +48,7 @@ uses
   Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
    Nemp_SkinSystem, NempPanel, SkinButtons, math,
 
-  PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, MyDialogs,
+  PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, MyDialogs,    deleteHelper,
 
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
@@ -11047,13 +11047,34 @@ var point: TPoint;
 
 // lyrics: TLyrics;
 //  s: String;
-//  sl: TStringList;
+  sl: TStringList;
 //c: TCDDAFile;
+delList: TObjectList;
 //err: TCDDAError;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
 
+
+sl := tStringlist.create;
+
+
+//if RechnerInWG(handle, 0, Nil, sl ) then
+
+ScanNetworkResources(RESOURCETYPE_DISK, RESOURCEDISPLAYTYPE_SERVER, sl);
+
+showmessage(sl.Text)
+// else
+//wuppdi;
+;
+exit;
+
+
+delList := TObjectList.Create;
+
+MedienBib.UserInputDeadFiles(delList);
+SendMessage(Handle, WM_MedienBib, MB_UserInputDeadFiles, lParam(delList));
+delList.Free;
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
