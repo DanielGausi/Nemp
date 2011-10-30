@@ -585,7 +585,8 @@ type
         procedure PutAllFilesToUpdateList;    // Put these files into the updatelist
 
 
-        procedure UserInputDeadFiles(DeleteDataList: TObjectList);
+        procedure PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
+        procedure ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
 
   end;
 
@@ -1634,14 +1635,16 @@ begin
     begin
         DeleteDataList := TObjectList.Create(False);
         try
-            MB.UserInputDeadFiles(DeleteDataList);
-
+            MB.PrepareUserInputDeadFiles(DeleteDataList);
             SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
+            // user can change DeleteDataList (set the DoDelete-property of the objects)
+            // so: Change the DeadFiles-list and fill it with the files that should be deleted.
+            MB.ReFillDeadFilesByDataList(DeleteDataList);
         finally
             DeleteDataList.Free;
         end;
     end;
-  {
+
     MB.PrepareDeleteFilesUpdate;          // status: ok, change via SendMessage
     if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
        MB.Changed := True;
@@ -1654,7 +1657,7 @@ begin
     MB.CleanUpDeadFiles;                  // status: ok, no change needed
     // Clear temporary lists
     MB.CleanUpTmpLists;                   // status: ok, no change allowed
-  }
+
 
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
     try
@@ -1704,15 +1707,13 @@ end;
     - change DeadFiles acording to user input
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.UserInputDeadFiles(DeleteDataList: TObjectList);
+procedure TMedienBibliothek.PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
 var i: Integer;
     Drives: TObjectList;
     currentDir: String;
     currentDrive: Char;
     currentPC: String;
     newDeleteData: TDeleteData;
-    NetworkPCs: TStrings;
-
 
     function IsLocalDir(aFilename: String): Boolean;
     begin
@@ -1722,14 +1723,6 @@ var i: Integer;
             result := False;
     end;
 
-    procedure LoadNetworkPCs;
-    begin
-        if Not assigned(NetworkPCs) then
-        begin
-            NetworkPCs := TStringList.Create;
-            ScanNetworkResources(RESOURCETYPE_DISK, RESOURCEDISPLAYTYPE_SERVER, NetworkPCs);
-        end;
-    end;
 
     function ExtractPCNameFromPath(aDir: String): String;
     var posSlash: Integer;
@@ -1741,32 +1734,30 @@ var i: Integer;
             result := '';
     end;
 
-    function IsPCOnline(aPC: String): Boolean;
-    var j: Integer;
+    function RessourceCount(aPC: String): Integer;
+    var j, c: Integer;
     begin
-        result := False;
-        for j := 0 to NetworkPCs.Count - 1 do
+        c := 0;
+        for j := 0 to mp3ListePfadSort.Count - 1 do
         begin
-            if NetworkPCs[j] = aPC then
-            begin
-                result := True;
-                break;
-            end;
+            if AnsiStartsText(aPC, TAudioFile(Mp3ListePfadSort[j]).Ordner) then
+                inc(c);
         end;
+        result := c;
     end;
+
 
 begin
     // prepare data - check whether the drive of the issing files exists etc.
     Drives := TObjectList.Create;
     try
         GetLogicalDrives(Drives); // get connected logical drives
-        NetworkPCs := NIL;
         currentDrive := ' '; // invalid drive letter
         currentPC    := 'XXX'; // invalid PC-Name
         newDeleteData := Nil;
-        for i := 0 to Mp3ListePfadSort.Count - 1 do
+        for i := 0 to DeadFiles.Count - 1 do
         begin
-            currentDir := TAudioFile(Mp3ListePfadSort[i]).Ordner;
+            currentDir := TAudioFile(DeadFiles[i]).Ordner;
             if length(currentDir) > 0 then
             begin
                 if IsLocalDir(currentDir) then
@@ -1795,48 +1786,72 @@ begin
                     end;
                 end else
                 begin
-
                     // File on another pc in the network
-                    LoadNetworkPCs;
                     if not AnsiStartsText(currentPC, currentDir)  then
                     begin
                         currentPC := ExtractPCNameFromPath(currentDir);
                         newDeleteData := TDeleteData.Create;
                         newDeleteData.DriveString := currentPC ;
+                        // assume that its missing, further check after this loop
+                        newDeleteData.DoDelete       := False;
+                        newDeleteData.Recommendation := dr_Keep;
+                        newDeleteData.Hint           := dh_NetworkMissing;
 
-                        if NOT IsPCOnline(currentPC) then
-                        begin
-                            newDeleteData.DoDelete       := False;
-                            newDeleteData.Recommendation := dr_Keep;
-                            newDeleteData.Hint           := dh_NetworkMissing;
-                        end else
-                        begin
-                            newDeleteData.DoDelete       := True;
-                            newDeleteData.Recommendation := dr_Delete;
-                            newDeleteData.Hint           := dh_NetworkPresent;
-                        end;
                         DeleteDataList.Add(newDeleteData);
                     end;
-
                 end;
             end; // otherwise something is really wrong with the file. ;-)
             // Add file to the DeleteData-Objects FileList
             if assigned(newDeleteData) then
-                newDeleteData.Files.Add(Mp3ListePfadSort[i]);
+                newDeleteData.Files.Add(DeadFiles[i]);
+        end;
+
+        // Try to determine, whether network-ressources are online or not
+        for i := 0 to DeleteDataList.Count - 1 do
+        begin
+            if TDeleteData(DeleteDatalist[i]).DriveString[1] = '\' then
+            begin
+                if RessourceCount(TDeleteData(DeleteDatalist[i]).DriveString) >
+                   TDeleteData(DeleteDatalist[i]).Files.Count then
+                begin
+                    // some files on this ressource can be found
+                    TDeleteData(DeleteDatalist[i]).DoDelete       := True;
+                    TDeleteData(DeleteDatalist[i]).Recommendation := dr_Delete;
+                    TDeleteData(DeleteDatalist[i]).Hint           := dh_NetworkPresent;
+                end;
+            end;
         end;
 
         // Now: ShowUser-Interface
 
     finally
         Drives.Free;
-        if assigned(NetworkPCs) then
-            NetworkPCs.Free;
     end;
 
 
     /// procedure GetLogicalDrives(Drives: TObjectList);
     ///  function GetDriveFromListByChar(aList: TObjectList; c: Char): TDrive;
 
+end;
+{
+    --------------------------------------------------------
+    ReFillDeadFilesByDataList
+    - Refill the DeadFiles-List according to which files
+      the user wants to be deleted
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
+var i, f: Integer;
+    currentData: TDeleteData;
+begin
+    DeadFiles.Clear;
+    for i := 0 to DeleteDataList.Count - 1 do
+    begin
+        currentData := TDeleteData(DeleteDataList[i]);
+        if currentData.DoDelete then
+            for f := 0 to currentData.Files.Count - 1 do
+                DeadFiles.Add(currentData.Files[f]);
+    end;
 end;
 {
     --------------------------------------------------------

@@ -8,8 +8,8 @@ uses windows, classes, SysUtils, Contnrs, strUtils,
 type
 
     // Network-Code from http://www.delphi-forum.de/viewtopic.php?t=1907
-    PNetResourceArray = ^TNetResourceArray;
-    TNetResourceArray = array[0..100] of TNetResourceA;
+    //PNetResourceArray = ^TNetResourceArray;
+    //TNetResourceArray = array[0..100] of TNetResourceA;
 
 
     TDeleteRecommendation = (dr_Keep, dr_Delete);
@@ -28,12 +28,12 @@ type
 
     end;
 
-    procedure ScanNetworkResources(ResourceType, DisplayType: DWord; List: TStrings);
-    function RechnerInWG(hwnd: HWND; hdc: HDC ; lpnr: PNetResource; Clients: TStrings ): Boolean;
+    //procedure ScanNetworkResources(ResourceType, DisplayType: DWord; List: TStrings);
+    //function RechnerInWG(hwnd: HWND; hdc: HDC ; lpnr: PNetResource; Clients: TStrings ): Boolean;
 
 implementation
 
-
+      (*
 function RechnerInWG(hwnd: HWND; hdc: HDC ; lpnr: PNetResource; Clients: TStrings ): Boolean;
 var
     cbBuffer: DWORD; // = 16384;
@@ -114,7 +114,7 @@ begin
         end;
     end;
 end;
-                      aasa
+
 
 procedure ScanNetworkResources(ResourceType, DisplayType: DWord; List: TStrings);
 
@@ -146,6 +146,7 @@ procedure ScanNetworkResources(ResourceType, DisplayType: DWord; List: TStrings)
 begin
     ScanLevel(Nil);
 end;
+*)
 
 { TDeleteData }
 
