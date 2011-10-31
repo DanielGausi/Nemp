@@ -118,7 +118,6 @@ ShowWindow
 
 
     Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TDeleteSelection, DeleteSelection);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

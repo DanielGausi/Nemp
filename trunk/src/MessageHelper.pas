@@ -745,6 +745,10 @@ begin
             srList := TObjectList(aMsg.LParam);
             tmpString := '';
 
+            if not assigned(DeleteSelection) then
+                Application.CreateForm(TDeleteSelection, DeleteSelection);
+
+
             DeleteSelection.DataFromMedienBib := srList;
 
             if DeleteSelection.showModal <> mrOK then

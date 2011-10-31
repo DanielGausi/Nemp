@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Contnrs, Dialogs, StdCtrls, basscd, AudioFileClass, cddaUtils;
+  Contnrs, Dialogs, StdCtrls, basscd, AudioFileClass, cddaUtils, gnuGetText;
 
 type
   TCDOpenDialog = class(TForm)
@@ -55,6 +55,7 @@ uses Nemp_RessourceStrings;
 
 procedure TCDOpenDialog.FormCreate(Sender: TObject);
 begin
+    TranslateComponent (self);
     localAudioFiles := TObjectList.Create(True);
     Files := TStringList.Create;
 end;

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ContNrs, AudioFileClass, DeleteHelper,
-  DriveRepairTools, ExtCtrls, ImgList;
+  DriveRepairTools, ExtCtrls, ImgList, GnuGetText;
 
 type
   TDeleteSelection = class(TForm)
@@ -194,6 +194,7 @@ end;
 
 procedure TDeleteSelection.FormCreate(Sender: TObject);
 begin
+    TranslateComponent (self);
     DriveData := TObjectList.Create(False);
     DummyDrive := TDrive.Create;
     DummyDrive.Typ := DriveTypeTexts[DRIVE_REMOTE];

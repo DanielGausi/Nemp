@@ -79,7 +79,6 @@ object DeleteSelection: TDeleteSelection
     ScrollBars = ssVertical
     TabOrder = 0
     WordWrap = False
-    ExplicitWidth = 567
   end
   object cbDrives: TCheckListBox
     Left = 8
@@ -103,8 +102,6 @@ object DeleteSelection: TDeleteSelection
     ParentShowHint = False
     ShowHint = True
     TabOrder = 2
-    ExplicitLeft = 390
-    ExplicitTop = 387
   end
   object Btncancel: TButton
     Left = 521
@@ -119,8 +116,6 @@ object DeleteSelection: TDeleteSelection
     ParentShowHint = False
     ShowHint = True
     TabOrder = 3
-    ExplicitLeft = 501
-    ExplicitTop = 387
   end
   object BtnHelp: TButton
     Left = 8
@@ -131,7 +126,6 @@ object DeleteSelection: TDeleteSelection
     Caption = 'Help'
     TabOrder = 4
     OnClick = BtnHelpClick
-    ExplicitTop = 387
   end
   object ImageList1: TImageList
     Height = 64
@@ -139,7 +133,7 @@ object DeleteSelection: TDeleteSelection
     Left = 288
     Top = 168
     Bitmap = {
-      494C010108002800580040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101080028005C0040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000000010000C000000001002000000000000000
       0300000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

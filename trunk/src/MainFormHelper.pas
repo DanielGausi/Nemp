@@ -132,7 +132,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     NewPicture, NewStation, OptionsComplete, RandomPlaylist,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
-    ErrorForm, CoverHelper, BasicSettingsWizard;
+    ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
+    CDOpenDialogs;
 
 procedure CorrectVolButton;
 begin
@@ -1091,6 +1092,10 @@ begin
             ReTranslateComponent(PlaylistCopyForm     );
             PlaylistCopyForm.RestoreComboBoxes;
         end;
+
+        if assigned(FormCDDBSelect)  then ReTranslateComponent(FormCDDBSelect  );
+        if assigned(CDOpenDialog)    then ReTranslateComponent(CDOpenDialog    );
+        if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
 
 
          // Todo:
