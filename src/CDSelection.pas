@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, StrUtils;
+  Dialogs, ComCtrls, StdCtrls, StrUtils, gnuGettext;
 
 type
   TFormCDDBSelect = class(TForm)
@@ -14,6 +14,7 @@ type
     procedure BtnCancelClick(Sender: TObject);
     procedure BtnOKClick(Sender: TObject);
     procedure lvSelectCDDblClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private-Deklarationen }
     function BetterLookingTitle(aTitle: String): String;
@@ -69,6 +70,11 @@ begin
     finally
         sl.Free;
     end;
+end;
+
+procedure TFormCDDBSelect.FormCreate(Sender: TObject);
+begin
+    TranslateComponent (self);
 end;
 
 procedure TFormCDDBSelect.lvSelectCDDblClick(Sender: TObject);
