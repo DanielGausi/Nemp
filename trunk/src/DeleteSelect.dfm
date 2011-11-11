@@ -32,7 +32,7 @@ object DeleteSelection: TDeleteSelection
   end
   object LblFiles: TLabel
     Left = 8
-    Top = 97
+    Top = 96
     Width = 433
     Height = 13
     Caption = 
@@ -61,7 +61,7 @@ object DeleteSelection: TDeleteSelection
   end
   object LblWhatToDo: TLabel
     Left = 247
-    Top = 46
+    Top = 57
     Width = 279
     Height = 27
     Anchors = [akLeft, akTop, akRight]
@@ -69,11 +69,24 @@ object DeleteSelection: TDeleteSelection
     Caption = '...'
     WordWrap = True
   end
+  object LblExplaination2: TLabel
+    Left = 247
+    Top = 42
+    Width = 82
+    Height = 13
+    Caption = '...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object MemoFiles: TMemo
     Left = 9
-    Top = 116
+    Top = 115
     Width = 587
-    Height = 107
+    Height = 108
     Anchors = [akLeft, akTop, akRight, akBottom]
     ReadOnly = True
     ScrollBars = ssVertical
@@ -84,7 +97,7 @@ object DeleteSelection: TDeleteSelection
     Left = 8
     Top = 24
     Width = 233
-    Height = 67
+    Height = 66
     ItemHeight = 13
     TabOrder = 1
     OnClick = cbDrivesClick
@@ -133,7 +146,7 @@ object DeleteSelection: TDeleteSelection
     Left = 288
     Top = 168
     Bitmap = {
-      494C0101080028005C0040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800600040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000000010000C000000001002000000000000000
       0300000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

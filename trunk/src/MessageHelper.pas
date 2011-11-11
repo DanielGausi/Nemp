@@ -588,10 +588,10 @@ begin
         //MB_SearchAutoAbort: MessageDLG((MediaLibrary_PreciseQuery), mtWarning, [MBOK], 0); // Wird aber nie ausgelöst ;-)
 
         MB_DeadFilesWarning: begin
-            if (aMsg.LParam < 2000) AND (aMsg.LParam < MedienBib.Count DIV 10) then // weniger als 10% fehlen
+            //if (aMsg.LParam < 2000) AND (aMsg.LParam < MedienBib.Count DIV 10) then // weniger als 10% fehlen
                 MessageDlg(Format((MediaLibrary_FilesNotFound), [aMsg.LParam]), mtWarning, [MBOK], 0)
-            else // mehr als 10% fehlen => Laufwerk fehlt?
-                MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [aMsg.LParam]), mtWarning, [MBOK], 0);
+            //else // mehr als 10% fehlen => Laufwerk fehlt?
+            //    MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [aMsg.LParam]), mtWarning, [MBOK], 0);
         end;
 
         MB_DuplicateWarning: MessageDlg((MediaLibrary_DuplicatesWarning)

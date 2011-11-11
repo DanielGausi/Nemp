@@ -700,7 +700,6 @@ type
     MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
     MM_ML_DeleteSelectedFiles: TMenuItem;
-    N70: TMenuItem;
     MM_ML_GetAdditionalTags: TMenuItem;
     MM_ML_GetLyrics: TMenuItem;
     N71: TMenuItem;
@@ -3735,6 +3734,7 @@ var
     oldID: String;
     einUpdate: boolean;
     aErr: TAudioError;
+
 begin
   SelectedMp3s := Nil;
   if MedienBib.StatusBibUpdate <> 0 then
@@ -3825,14 +3825,13 @@ begin
           end;
 
           if tot > 0 then
-              if (tot < 2000) AND (tot < MedienBib.Count DIV 10) then // weniger als 10% fehlen
-                  MessageDlg(Format((MediaLibrary_FilesNotFound), [tot]), mtWarning, [MBOK], 0)
-              else // mehr als 10% fehlen => Laufwerk fehlt?
-                  MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [tot]), mtWarning, [MBOK], 0);
+              MessageDlg(MediaLibrary_FilesNotFoundJustHint, mtWarning, [MBOK], 0);
 
           if einUpdate then
           begin
               MedienBib.RepairBrowseListsAfterChange;
+              MedienBib.BuildTotalString;
+              MedienBib.BuildTotalLyricString;
               ReFillBrowseTrees(True);
           end;
           MedienBib.Changed := True;

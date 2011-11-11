@@ -717,7 +717,7 @@ begin
         MM_ML_GetLyrics           .Enabled := vis;
         MM_ML_GetAdditionalTags   .Visible := vis;
         MM_ML_GetAdditionalTags   .Enabled := vis;
-        N70                       .Visible := vis;
+        //N70                       .Visible := vis;
         //--
         MM_ML_RefreshAll          .Visible := vis;
         MM_ML_RefreshAll          .Enabled := vis;

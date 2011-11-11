@@ -2002,18 +2002,19 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.fRefreshFiles;
-var i, toteFilesCount, freq: Integer;
+var i, freq: Integer; // toteFilesCount
     AudioFile: TAudioFile;
     oldArtist, oldAlbum: UnicodeString;
     oldID: string;
     einUpdate: boolean;
+    DeleteDataList: TObjectList;
 begin
   // AudioFiles will be changed. Block everything.
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0); //
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
-  toteFilesCount := 0;
+  // toteFilesCount := 0;
   einUpdate := False;
 
   EnterCriticalSection(CSUpdate);
@@ -2044,7 +2045,8 @@ begin
     else
     begin
         AudioFile.FileIsPresent:=False;
-        inc(toteFilesCount);
+        //inc(toteFilesCount);
+        DeadFiles.Add(AudioFile);
     end;
     if i mod freq = 0 then
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefresh, Round(i/MP3ListePfadSort.Count * 100));
@@ -2052,9 +2054,7 @@ begin
     if Not UpdateFortsetzen then break;
   end;
 
-  if toteFilesCount > 0 then
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, toteFilesCount);
-
+  // first: adjust Browse&Search stuff for the new data
   if einUpdate then
   begin
       // Listen sortieren
@@ -2080,15 +2080,38 @@ begin
           2: begin
               // Nothing to do here. TagCloud will be rebuild in VCL-Thread
               // by MB_RefillTrees
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
           end;
       end;
-
       // Build TotalStrings
       BibSearcher.BuildTotalString(Mp3ListePfadSort);
       BibSearcher.BuildTotalLyricString(Mp3ListePfadSort);
 
       // Nachricht diesbzgl. an die VCL
       SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, LParam(True));
+  end;
+
+  // After this: Handle missing files
+  if DeadFiles.Count > 0 then
+  begin
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, LParam(DeadFiles.Count));
+      DeleteDataList := TObjectList.Create(False);
+      try
+          PrepareUserInputDeadFiles(DeleteDataList);
+          SendMessage(MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
+          // user can change DeleteDataList (set the DoDelete-property of the objects)
+          // so: Change the DeadFiles-list and fill it with the files that should be deleted.
+          ReFillDeadFilesByDataList(DeleteDataList);
+      finally
+          DeleteDataList.Free;
+      end;
+
+      PrepareDeleteFilesUpdate;
+      SwapLists;
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
+      CleanUpDeadFiles;
+      CleanUpTmpLists;
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
   end;
 
   LeaveCriticalSection(CSUpdate);
