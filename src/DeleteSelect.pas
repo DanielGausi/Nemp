@@ -20,6 +20,7 @@ type
     DriveImage: TImage;
     LblExplaination: TLabel;
     LblWhatToDo: TLabel;
+    LblExplaination2: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure cbDrivesClick(Sender: TObject);
@@ -148,20 +149,24 @@ begin
 
         case currentData.Hint of
             dh_DivePresent    : begin
-                          LblExplaination.Caption := DeleteHelper_DrivePresent    ;
-                          LblWhatToDo.Caption := DeleteHelper_DoWithDrivePresent;
+                          LblExplaination.Caption  := DeleteHelper_DrivePresent  ;
+                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
+                          LblWhatToDo.Caption      := DeleteHelper_DoWithDrivePresent;
             end;
             dh_DriveMissing   : begin
-                          LblExplaination.Caption := DeleteHelper_DriveMissing    ;
-                          LblWhatToDo.Caption := DeleteHelper_DoWithDriveMissing;
+                          LblExplaination.Caption  := DeleteHelper_DriveMissing    ;
+                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
+                          LblWhatToDo.Caption      := DeleteHelper_DoWithDriveMissing;
             end;
             dh_NetworkPresent : begin
-                          LblExplaination.Caption := DeleteHelper_NetworkPresent  ;
-                          LblWhatToDo.Caption := DeleteHelper_DoWithNetworkPresent;
+                          LblExplaination.Caption  := DeleteHelper_NetworkPresent  ;
+                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
+                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkPresent;
             end;
             dh_NetworkMissing : begin
-                          LblExplaination.Caption := DeleteHelper_NetworkMissing  ;
-                          LblWhatToDo.Caption := DeleteHelper_DoWithNetworkMissing;
+                          LblExplaination.Caption  := DeleteHelper_NetworkMissing  ;
+                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
+                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkMissing;
             end;
         end;
     end else

@@ -3172,7 +3172,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MM_ML_Search: TMenuItem
-        Caption = 'Search in the medialibrary'
+        Caption = 'Search in the library'
         ShortCut = 16454
         OnClick = MM_ML_SearchClick
       end
@@ -3195,8 +3195,13 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_ML_SaveClick
       end
       object MM_ML_DeleteMissingFiles: TMenuItem
-        Caption = 'Cleanup medialibrary (delete &missing files)'
+        Caption = 'Cleanup library (delete &missing files)'
         OnClick = DatenbankUpdateTBClick
+      end
+      object MM_ML_RefreshAll: TMenuItem
+        Caption = '&Refresh library (rescan all files)'
+        ShortCut = 16500
+        OnClick = MM_ML_RefreshAllClick
       end
       object MM_ML_ExportAsCSV: TMenuItem
         Caption = '&Export as csv'
@@ -3285,14 +3290,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Get additional tags for selected files'
         ImageIndex = 18
         OnClick = PM_ML_GetTagsClick
-      end
-      object N70: TMenuItem
-        Caption = '-'
-      end
-      object MM_ML_RefreshAll: TMenuItem
-        Caption = '&Refresh all files'
-        ShortCut = 16500
-        OnClick = MM_ML_RefreshAllClick
       end
       object N71: TMenuItem
         Caption = '-'
@@ -3974,7 +3971,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D001300D8060E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D001300DC060E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4438,7 +4435,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806F00710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806F40710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7368,7 +7365,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800440410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800480410001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

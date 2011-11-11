@@ -531,8 +531,12 @@ MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
 MediaLibrary_SearchingNewFiles       = '(%d) Searching %s';
 MediaLibrary_StartSearchingNewFiles  = 'Start searching...';
 // MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
-MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
-MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
+
+MediaLibrary_FilesNotFound           = 'There are %d missing files. Please select the files you want to keep or delete from the library.';
+MediaLibrary_FilesNotFoundJustHint   = 'Some of the selected files are missing. You may cleanup your library now to remove the missing files.';
+//MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
+//MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
+
 MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your medialibrary. This is not supposed to happen. If this message appears frequently feel free to contact me via e-mail. Thank you!';
 MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
 MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
@@ -720,8 +724,12 @@ CDDA_NoHeadsetPossible = 'Nemp is currently playing a track from this CD. Playin
 
 DeleteHelper_DrivePresent   = 'The drive is available.';
 DeleteHelper_DriveMissing   = 'The drive is NOT available.';
-DeleteHelper_NetworkPresent = 'The network ressource is available';
-DeleteHelper_NetworkMissing = 'The network ressource seems to be offline';
+DeleteHelper_NetworkPresent = 'The network ressource is available.';
+DeleteHelper_NetworkMissing = 'The network ressource seems to be offline.';
+
+DeleteHelper_DrivePresentFileMissing  = 'Some files are definitely missing.';
+DeleteHelper_DriveMissingFileMissing  = 'It is unknown wheater the files still exist.';
+
 
 DeleteHelper_DoWithDrivePresent   = 'You should remove the missing files from the library.';
 DeleteHelper_DoWithDriveMissing   = 'You should keep files in the library, connect the drive to your computer and try again later.';
