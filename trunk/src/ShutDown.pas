@@ -65,7 +65,7 @@ var
 
 implementation
 
-uses Systemhelper, NempMainUnit;
+uses Systemhelper, NempMainUnit, MainFormHelper;
 
 {$R *.dfm}
 
@@ -104,6 +104,14 @@ begin
   if Timer1.Tag <= 0 then
   begin
     Timer1.Enabled := False;
+
+    // Set Shutdownmode back to "disabled"
+    Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := False;
+    Nemp_MainForm.MM_T_ShutdownOff.Checked := True;
+    Nemp_MainForm.PM_P_ShutdownOff.Checked := True;
+    Nemp_MainForm.PM_S_ShutdownOff.Checked := True;
+    ReArrangeToolImages;
+
     case Nemp_MainForm.NempOptions.ShutDownMode of
         SHUTDOWNMODE_StopNemp : NempPlayer.stop;
         SHUTDOWNMODE_ExitNemp : Nemp_MainForm.Close;

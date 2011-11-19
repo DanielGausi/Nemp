@@ -154,7 +154,7 @@ object AboutForm: TAboutForm
       'The Avatar Soundtrack'
       ''
       
-        '[url="http://www.jamendo.com/de/album/55571"]Kendra Springer - H' +
+        '[url="http://www.jamendo.com/de/album/78275"]Kendra Springer - H' +
         'ope[/url]'
       ''
       'I think its ok to mention some amazing billion-dollar-stuff '
