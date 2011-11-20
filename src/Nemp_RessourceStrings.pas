@@ -250,15 +250,20 @@ FloatingPointChannels_Off = 'Current status: Off';
     Scrobble_ConnectError = 'Could not connect to server. Please check your internet configuration.';
     Scrobble_ProtocolError = 'Could not get proper information from server.';
     Scrobble_UnkownError = 'An error occured while connecting LastFM server.';
+    Scrobble_ErrorPleaseReport = 'Please report this error.';
 
     Scrobble_Active = 'Scrobble Log (Status: Sending data...)';
     Scrobble_InActive = 'Scrobble Log (Status: Idle)';
     Scrobble_Offline = 'Scrobble Log (Status: Offline)';
 
-    ScrobbleFailureWait = 'Something is wrong with scrobbling. See the log-entries within the settings-dialog for details.';
+    ScrobblingSkipped = 'Skrobbling skipped for approx  %d minutes. ';
+    ScrobbleFailureWait = 'Something is wrong with scrobbling. Nemp will disable it for approx %d minutes. '
+      +#13#10+'See the log entries within the settings dialog for details.';
 
-    ScrobbleSettings_Incomplete = 'Settings for Scrobbling are incomplete. Do you want to configure it now?';
-    
+    ScrobbleSettings_Incomplete = 'Your LastFM Session Key is missing or invalid. Do you want to (re)authenticate scrobbling now?';
+
+    ScrobbleException = 'Something is terribly wrong with scrobbling - Nemp will disable it now permanently. See the log entries within the settings dialog for details.'
+    +#13#10+'If this message occurs continuously, please report this to mail@gausi.de. Thank you.';
 
 
 SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the medialibrary.';

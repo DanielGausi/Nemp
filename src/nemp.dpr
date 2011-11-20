@@ -90,7 +90,8 @@ uses
   CDSelection in 'CDSelection.pas' {FormCDDBSelect},
   CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog},
   DeleteHelper in 'DeleteHelper.pas',
-  DeleteSelect in 'DeleteSelect.pas' {DeleteSelection};
+  DeleteSelect in 'DeleteSelect.pas' {DeleteSelection},
+  CustomizedScrobbler in 'CustomizedScrobbler.pas';
 
 //,  classes;
 

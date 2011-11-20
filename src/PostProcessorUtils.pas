@@ -40,7 +40,8 @@ interface
 uses Windows, Classes, SysUtils, Contnrs, DateUtils,
       ShellApi, IniFiles,  Dialogs,   math,
       AudioFileClass, Nemp_ConstantsAndTypes,
-      MP3FileUtils, gnuGettext, Nemp_RessourceStrings,  ScrobblerUtils;
+      MP3FileUtils, gnuGettext, Nemp_RessourceStrings,
+      ScrobblerUtils, CustomizedScrobbler;
 
 
 type

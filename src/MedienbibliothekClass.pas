@@ -62,7 +62,8 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      //Indys:
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
-     NempCoverFlowClass, TagClouds, ScrobblerUtils, DeleteHelper;
+     NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
+     DeleteHelper;
 
 
 type
