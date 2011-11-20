@@ -2970,7 +2970,7 @@ end;
 
 procedure TOptionsCompleteForm.BtnScrobbleWizardClick(Sender: TObject);
 var aScrobbler: TScrobbler;
-    authUrl: String;
+    authUrl: AnsiString;
 begin
     case (Sender as TButton).Tag of
         0: begin
@@ -2984,15 +2984,17 @@ begin
             BtnScrobbleWizard.Enabled := False;
             BtnScrobbleWizard.Caption := 'Please Wait';
             // Token holen
+            NempPlayer.NempScrobbler.JobStarts;
             aScrobbler := TScrobbler.Create(Handle);
+            aScrobbler.Parent := NempPlayer.NempScrobbler;
             aScrobbler.GetToken;
             // Auf Message warten -> Dann enablen und Tag auf 2 setzen
         end;
 
         2: begin
             // Token ist da. Browser öffnen
-            authUrl := 'http://www.last.fm/api/auth/?api_key=' + api_key + '&token=' + NempPlayer.NempScrobbler.Token;
-            ShellExecute(Handle, 'open', PChar(authUrl), nil, nil, SW_SHOW);
+            authUrl := 'http://www.last.fm/api/auth/?api_key=' + NempPlayer.NempScrobbler.ApiKey + '&token=' + NempPlayer.NempScrobbler.Token;
+            ShellExecuteA(Handle, 'open', PAnsiChar(authUrl), nil, nil, SW_SHOW);
             // User muss im Browser arbeiten
             LblScrobble1.Caption := ScrobbleWizardYesIDid;
             // Hier arbeitet kein Thread. ;-)
@@ -3011,8 +3013,9 @@ begin
             // Nur einmal drücken erlauben
             BtnScrobbleWizard.Enabled := False;
             BtnScrobbleWizard.Caption := 'Please Wait';
-
+            NempPlayer.NempScrobbler.JobStarts;
             aScrobbler := TScrobbler.Create(Handle);
+            aScrobbler.Parent := NempPlayer.NempScrobbler;
             aScrobbler.Token := NempPlayer.NempScrobbler.Token;
             aScrobbler.GetSession;
             // Auf Message warten
@@ -3030,41 +3033,45 @@ end;
 
 procedure TOptionsCompleteForm.Btn_ScrobbleAgainClick(Sender: TObject);
 begin
-    NempPlayer.NempScrobbler.AllowHandShakingAgain;
+    NempPlayer.NempScrobbler.ProblemSolved;
+    NempPlayer.NempScrobbler.DoScrobble := True;
+    CB_ScrobbleThisSession.Checked := True;
+
+    NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
 end;
 
 Procedure TOptionsCompleteForm.ScrobblerMessage(Var aMsg: TMessage);
-var aList: TStrings;
-    responseString: String;
-    ini: TMemIniFile;
+var ini: TMemIniFile;
+    solved: Boolean;
 begin
     Case aMsg.WParam of
 
-        SC_Message: begin
-            aList := TStringlist.Create;
-            try
-                aList.CommaText := PChar(aMsg.LParam);
-                MemoScrobbleLog.Lines.AddStrings(aList);
-                NempPlayer.NempScrobbler.LogList.AddStrings(aList);
-            finally
-                aList.Free;
-            end;
+        SC_Message,
+        SC_Hint,
+        SC_Error: begin
+                MemoScrobbleLog.Lines.Add(PChar(aMsg.LParam));
+                NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
         end;
 
-        SC_GetTokenException: begin
+        SC_BeginWork: GrpBox_ScrobbleLog.Caption := Scrobble_Active;
+        SC_EndWork: GrpBox_ScrobbleLog.Caption := Scrobble_InActive;
+        SC_JobIsDone: NempPlayer.NempScrobbler.JobDone;
+
+        SC_GetAuthException: begin
             // LParam: ErrorMessage
             MemoScrobbleLog.Lines.Add(PChar(aMsg.LParam));
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
             SetScrobbleButtonOnError;
         end;
+        SC_InvalidToken: SetScrobbleButtonOnError;
+
         SC_GetToken: begin
-            responseString := PChar(aMsg.LParam);
             //fToken aus Antwort bestimmen
-            NempPlayer.NempScrobbler.Token := GetTokenFromResponse(responseString);
+            NempPlayer.NempScrobbler.Token := PAnsiChar(aMsg.LParam);
             if NempPlayer.NempScrobbler.Token <> '' then
             begin
-                MemoScrobbleLog.Lines.Add('GetToken: OK ... ' + NempPlayer.NempScrobbler.Token);
-                NempPlayer.NempScrobbler.LogList.Add('GetToken: OK ... ' + NempPlayer.NempScrobbler.Token);
+                MemoScrobbleLog.Lines.Add('GetToken: OK ... ' + UnicodeString(NempPlayer.NempScrobbler.Token));
+                NempPlayer.NempScrobbler.LogList.Add('GetToken: OK ... ' + UnicodeString(NempPlayer.NempScrobbler.Token));
                 BtnScrobbleWizard.Enabled := True;
                 BtnScrobbleWizard.Caption := 'Next';
                 BtnScrobbleWizard.Tag := 2;
@@ -3079,15 +3086,10 @@ begin
             end;
         end;
 
-        SC_GetSessionException: begin
-            // LParam: ErrorMessage
-            MemoScrobbleLog.Lines.Add(PChar(aMsg.LParam));
-            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            SetScrobbleButtonOnError;
-        end;
-        SC_GetSession:begin
-                responseString := PChar(aMsg.LParam);
-                NempPlayer.NempScrobbler.Username := GetUserNameFromResponse(responseString);
+        SC_GetSession: begin
+                NempPlayer.NempScrobbler.Username := PSessionResponse(aMsg.LParam).Username;
+                NempPlayer.NempScrobbler.SessionKey := PSessionResponse(aMsg.LParam).SessionKey;
+                solved := True;
                 if NempPlayer.NempScrobbler.Username <> '' then
                 begin
                     MemoScrobbleLog.Lines.Add('GetUserName: OK ... ' + NempPlayer.NempScrobbler.Username);
@@ -3099,33 +3101,36 @@ begin
                     NempPlayer.NempScrobbler.LogList.Add('GetUserName: FAILED ... ');
                 end;
 
-                NempPlayer.NempScrobbler.SessionKey := GetSessionKeyFromResponse(responseString);
                 if NempPlayer.NempScrobbler.SessionKey <> '' then
                 begin
-                    MemoScrobbleLog.Lines.Add('GetSessionKey: OK ... ' + NempPlayer.NempScrobbler.SessionKey);
-                    NempPlayer.NempScrobbler.LogList.Add('GetSessionKey: OK ... ' + NempPlayer.NempScrobbler.SessionKey);
+                    MemoScrobbleLog.Lines.Add('GetSessionKey: OK ... ' + UnicodeString(NempPlayer.NempScrobbler.SessionKey));
+                    NempPlayer.NempScrobbler.LogList.Add('GetSessionKey: OK ... ' + UnicodeString(NempPlayer.NempScrobbler.SessionKey));
                 end
                 else
                 begin
+                    solved := False;
                     MemoScrobbleLog.Lines.Add('GetSessionKey: FAILED ... ');
                     NempPlayer.NempScrobbler.LogList.Add('GetSessionKey: FAILED ... ');
                 end;
 
-                NempPlayer.NempScrobbler.AllowHandShakingAgain;
+                if solved then
+                begin
+                    NempPlayer.NempScrobbler.ProblemSolved;
 
-                // Daten in Ini speichern. Die braucht man später wieder. ;-)
-                ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.UTF8);
-                try
-                    ini.Encoding := TEncoding.UTF8;
-                    NempPlayer.NempScrobbler.SaveToIni(Ini);
-                    ini.Encoding := TEncoding.UTF8;
+                    // Daten in Ini speichern. Die braucht man später wieder. ;-)
+                    ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.UTF8);
                     try
-                        Ini.UpdateFile;
-                    except
+                        ini.Encoding := TEncoding.UTF8;
+                        NempPlayer.NempScrobbler.SaveToIni(Ini);
+                        ini.Encoding := TEncoding.UTF8;
+                        try
+                            Ini.UpdateFile;
+                        except
 
+                        end;
+                    finally
+                        Ini.Free;
                     end;
-                finally
-                    Ini.Free;
                 end;
 
                 LblScrobble1.Caption := ScrobbleWizardComplete;

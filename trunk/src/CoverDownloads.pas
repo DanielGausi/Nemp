@@ -717,7 +717,7 @@ function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
 var url: UTF8String;
 begin
     url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
-        + '&api_key=' + api_key
+        + '&api_key=' + NempPlayer.NempScrobbler.ApiKey
         + '&artist=' + StringToURLStringAnd(AnsiLowerCase(fCurrentDownloadItem.Artist))
         + '&album='  + StringToURLStringAnd(AnsiLowerCase(fCurrentDownloadItem.Album));
     try

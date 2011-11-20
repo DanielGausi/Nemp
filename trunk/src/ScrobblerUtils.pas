@@ -1,35 +1,70 @@
 {
 
-    Unit ScrobblerUtils
+  ScrobblerUtils, Version 0.2
 
-    - a class to "Scrobble"
+  A Borland/Codegear/Embarcadero Delphi-Class for Last.Fm scrobbling support.
+  See http://www.last.fm in case you dont know what "scrobbling" means
 
-    Note: This Unit _IS NOT_ the same as the "ScrobblerUtils" that can be downloaded
-          at my website. Here are some minor changes, e.g. key/secret, version etc.
+}
+{
+  -------------------------------------------------------
 
-    ---------------------------------------------------------------
-    Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
-    http://www.gausi.de
-    mail@gausi.de
-    ---------------------------------------------------------------
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  Copyright (C) 2009, Daniel Gaussmann
+                      www.gausi.de
+                      mail@gausi.de
+  All rights reserved.
 
-    This program is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-    for more details.
+  *******************************************************
 
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+  Note: Read and accept the "Terms of Use" on LastFM before
+        using this unit.
 
-    See license.txt for more information
+        http://www.last.fm/api/tos
 
-    ---------------------------------------------------------------
+  -------------------------------------------------------
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.
+
+  -------------------------------------------------------
+}
+
+{
+  Version History:
+  -------------------------------------------------------
+
+  v0.2, November 2011
+  -------------------
+    * switched to Scrobble-API 2.0
+    * (almost) everything is WideString/UnicodeString/PWideChar now
+
+  v0.1a, march 2009:
+  ------------------
+    * replaced "PChar" by "PAnsiChar"
+    
+  v0.1, march 2009:
+  -----------------
+    * First release
+
+  -------------------------------------------------------
 }
 
 unit ScrobblerUtils;
@@ -39,281 +74,265 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, StrUtils,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException,
-  Dialogs, md5, StdCtrls, ShellApi, DateUtils, IniFiles, Contnrs, 
-
-  AudioFileClass,
-  Systemhelper, Nemp_RessourceStrings, HtmlHelper;//Hilfsfunktionen;
+  Dialogs, md5, StdCtrls, ShellApi, DateUtils, Contnrs;
 
 const
     UnixStartDate: TDateTime = 25569.0;
 
     BaseApiURL = 'http://ws.audioscrobbler.com/2.0/';
-    BaseScrobbleURL = 'http://post.audioscrobbler.com/';
+    /// BaseScrobbleURL = 'http://post.audioscrobbler.com/';
 
-    api_key = '542ec0c3e5e7b84030181176f3d0f264';
-    // Note: This is a poor attempt to hide my "lastFM-secret" a little bit.
-    // I know, that you are able to get it within a few seconds ;-)
-    bd7fab7ec5900abf : Array[0..15] of Byte = ( $8a, $60, $99, $bf, $55, $74, $b4, $8a, $08, $46, $ff, $18, $49, $9e, $a2, $7c);
-    effa65ecb689fccd : Array[0..15] of Byte = ( $95, $7b, $d2, $30, $20, $a0, $2c, $48, $d4, $4b, $3d, $25, $25, $e3, $4f, $4f);
+    Scrobble_GetSessionError = 'Invalid response to GetSession. ';
+    Scrobble_GetTokenError = 'Invalid response to GetToken. ';
+    Scrobble_ProtocolError = 'Protocol exception';
+    Scrobble_ConnectError = 'Network exception. Please check your internet connection.';
+    Scrobble_UnkownError = 'An unknown error occurred.';
+    ///ScrobbleFailureWait = 'Da stimmt was nicht mit dem Scrobbeln. Log-Einträge lesen für weitere Details.';
+    Scrobble_FileTooShort = 'Submission skipped: Track too short (min. 30 seconds)';
+    Scrobble_PlayAmount = 'Submission skipped: Playback too short (min. 50% or 4 minutes)';
 
-    // Some Message-Constants
+
     WM_Scrobbler = WM_User + 850;
 
-    SC_Message = 1000;
-
-    SC_HandShakeError = 1;
-    SC_HandShakeCancelled = 2;
-    SC_HandShakeException = 3;
-
-    SC_NowPlayingError = 4;
-    SC_NowPlayingException = 5;
-
-    SC_SubmissionError = 6;
-    SC_SubmissionException = 7;
-
+    ///SC_HandShakeError = 1;
+    ///SC_HandShakeCancelled = 2;
+    ///SC_HandShakeException = 3;
+    ///SC_NowPlayingError = 4;
+    ///SC_NowPlayingException = 5;
+    ///SC_SubmissionError = 6;
+    ///SC_SubmissionException = 7;
     SC_GetToken = 10;
-    SC_GetTokenException = 11;
-
+    //SC_GetTokenException = 11;
     SC_GetSession = 12;
-    SC_GetSessionException = 13;
-
-    SC_HandShakeComplete = 14;
+    //SC_GetSessionException = 13;
+    ///SC_HandShakeComplete = 14;
     SC_NowPlayingComplete = 15;
     SC_SubmissionComplete = 16;
-    SC_SubmissionSkipped = 17;
+    ///SC_SubmissionSkipped = 17;
+
+    // new for 2.0
+    SC_ScrobblingSkipped = 18;       // Scrobbling paused for a while
+    SC_InvalidSessionKey = 19;       // Invalid Session Key: STOP
+    SC_ServiceUnavailable = 20;      // Server Failure: Count Error, try Again
+    SC_IPSpam = 21;                  // Spam: Pause
+    SC_ScrobbleException = 22;       // Probably a Bug in implementation : DoScrobble = False
+    SC_UnknownScrobbleError = 23;    // Unknown Failure: Count Error, try Again
+    SC_IndyException = 24;           // Indy-Exception
+    SC_JobIsDone = 25;               // Job is done, EndWork MUST be called by VCL
+    SC_GetAuthException = 26;        // Error during authentification process
+    SC_InvalidToken = 27;            // The Token was invalid (during getSession)
+
+    SC_ScrobblingSkippedAgain = 28;  // repeated SC_ScrobblingSkipped message
 
     SC_BeginWork = 50;
     SC_EndWork = 51;
-    SC_TooMuchErrors = 100;
+    ///SC_TooMuchErrors = 100;
+
+    SC_Message = 1000;  // general Message  // not used
+    SC_Hint = 1001;     // Hint, something wasn't perfect
+    SC_Error = 1002;    // Error, something was wrong
+    
+type
+
+    TScrobbleStatus = (hs_OK=1,
+               // hs_EXCEPTION,
+               hs_UnknownFailure,
+               hs_InvalidToken,
+               // hs_BANNED,
+               // hs_BADAUTH,
+               // hs_BADTIME,
+               hs_FAILED,
+               hs_BADSESSION,
+               // hs_HANDSHAKECANCELLED,
+               hs_SPAM,
+               hs_SCROBBLINGEXCEPTION // Scrobbling Exception (bug in implementation)
+               );
+
+    TScrobbleHint = (hs_Artist=1, hs_Track, hs_Album);
+
 
 type
 
-    TScrobbleStatus = (hs_OK=1, hs_EXCEPTION, hs_UnknownFailure, hs_UNAUTHORIZED, hs_BANNED, hs_BADAUTH, hs_BADTIME, hs_FAILED, hs_BADSESSION, hs_HANDSHAKECANCELLED);
+  {$IFNDEF UNICODE}
+      UnicodeString = WideString;
+  {$ENDIF}
 
-const
-
-    ScrobbleStatusStrings: Array[1..10] of String =
-        ( '(OK)',
-          '(Exception)',
-          '(Unknown failure.)',
-          'Unauthorized. Please reconfigure scrobbling. ',
-          'Client banned. Please update Nemp',
-          'Bad Authorization. Please reconfigure scrobbling. ',
-          'Bad Time. Please check your Windows date/time settings.',
-          'Server Failure. Please try again later.',
-          'Bad Session. New handshake required.',
-          'Too much Errors occured. Handshaking disabled for some time.'    );
-
-type
-
-    TScrobbleFile = Class
-          Artist: UTF8String;
-          Title: UTF8String;
-          Album: UTF8String;
-          Length: UTF8String;     // Lengt of the Track in seconds, '' if unknown
-          TrackNr: UTF8String;    // TrackNumber, '' if unknown
-          MBTrackID: UTF8String;  // Music-Brainz-TrackID. Whatever it ist - I do not support it yet.
-
-          DisplayTitle: String;
-          // zusätzlich fürs Submitten:
-          StartTime: UTF8String;
-          Source: UTF8String;
-          Rating: UTF8String;
-
-          procedure Assign(aAudioFile: TAudioFile; aStartTimeUTC: TSystemTime);
-          procedure CopyFrom(aScrobbleFile: TScrobbleFile);
+    TParameter = record
+        name: UnicodeString;
+        value: UnicodeString;
     end;
 
+    PSessionResponse = ^TSessionResponse;
+    TSessionResponse = record
+        Username: UnicodeString;
+        SessionKey: AnsiString;
+    end;
+
+
+    TValueArray = Array of TParameter;
+
+    TScrobbleMode = (sm_Auth, sm_NowPlaying, sm_Scrobble);
+
+    TScrobbleFile = Class
+          Interpret: UnicodeString;
+          Title: UnicodeString;
+          Album: UnicodeString;
+          AlbumArtist: UnicodeString; //not used
+          Length: UnicodeString;      // Duration of the track in seconds
+          TrackNr: UnicodeString;
+          MBTrackID: UnicodeString;   // Music-Brainz-TrackID, not used
+
+          DisplayTitle: UnicodeString; // e.g. "Artist - Album"
+          StartTime: UnicodeString;
+
+          procedure Assign(aScrobbleFile: TScrobbleFile);
+    end;
+
+    // Class TScrobbler
+    // For each job one instance of tis class is created.
+    // It begins a new thread, which do the designated job.
+    // At the end the object frees itself.
+    TApplicationScrobbler = class;
     TScrobbler = class
       private
-          // private Felder für die Dinger, die sich nicht ändern bei den Post/Get-Anfragen
-          // im Constructor setzen
-          p: String; //  = 'p=1.2.1' // Protokoll-Version
-          c: String; // Client-ID      // noch zu beschaffen. erstmal: 'c=tst'
-          v: String; // Client-Version //                     erstmal: 'v=1.0'
-
-          fWindowHandle: HWND; // Handle zum Scrobble-Fenster zum Schicken der Nachrichten (Parameter im Create)
+          fWindowHandle: HWND; // Messages will be sent to this Handle
           fThread: Integer;
-
           fIDHttp: TIdHttp;
-          //Die "f"-Methoden werden in einem separaten Thread ausgeführt.
+          fParent: TApplicationScrobbler;
 
-          // Authentifizierung
-          // -----------------------------------
-          // GetToken: Schritt 1
-          // Liefert ein Token zurück. Dieses ist ca. eine Stunde gültig
-          // und muss vom LastFM-User authentifiziert werden.
-          // Dies Geschieht im Browser über einen Speziellen Link, der
-          // eben dieses Token enthält
-          // Darüber wird "Nemp" erlaubt, im Userprofil zu arbeiten.
+          fToken: AnsiString;   // needed for GetSession
+          Username: UnicodeString;
+          SessionKey: AnsiString;
+
+          ParamList: TStrings;
+          SuccessMessage: UnicodeString;
+
+          // All "f"-methods are executed in a secondary thread
+
+          // Authentification
+
+          // 1st step: GetToken
+          // Get a Token from LastFM. Such a token is valid for approx.1 hour.
+          // It MUST be authenticated by the lastFM user.
+          // This is done through a link to last.fm containing the token
+          // After this your app is alowed to edit the users LastFM user profile.
           procedure fGetToken;
 
-          // Schritt 2: Nutzer klickt im Browser auf "OK - Nemp darf"
+          // 2nd step: The user has to click on "OK - This App good for me" on the lastFM website
 
-          // GetSession: Schritt 3
-          // Das vorher authentifizierte Token wird benutzt, um einen
-          // Session-KEY zu erhalten. In der Antwort vom LastFM-Server
-          // ist der Username und eben dieser Session-Key enthalten.
-          // Der Session-Key ist beliebig lange gültig. und kann z.B.
-          // in einer Ini-Datei gespeichert werden und später wiederverwendet
-          // werden
-          // Der User kann Nemp in seinem Profil deaktivieren - dann
-          // erst wird der Session-Key ungültig
+          // 3rd step: GetSession
+          // The authenticated token is used to get a Session Key and Username
+          // This session key has an infinity lifetime per default.
+          // You should save it for later use (e.g. inifiles)
           procedure fGetSession;
 
+          // Scrobbling (2.0)
 
-          // Scrobbling
-          // ---------------------------------------
-          // Handshake:
-          // Username und Session-Key werden benutzt, um eine Scrobbling-Session
-          // zu starten.
-          // Antwort enthält eine Session-ID, sowie zwei Links zur weiteren
-          // Kommunikation. Ist einmal beim Start von Nemp nötig
-          // Fehler:
-          // BANNED: Nemp hat zu oft Mist gebaut und darf nicht mehr mit LastFM spielen. => Nemp-Update
-          // BADAUTH: Wahrscheinlich Username, Session-KEY, oder auth-Token (gebildet aus "Secret")
-          //          falsch. => Neu authentifizieren
-          // BADTIME: Uhr geht falsch. => User soll Uhr neu stellen.
-          // FAILED <reason>: Server-Fehler => Später nochmal probieren
-          function fPerformHandShake: TScrobbleStatus;
-          function ParseHandShakeResult(aResponse: string): TScrobbleStatus;
+          // parsing methods to parse the responsefrom the lastFM webserver
+          function ParseLfmError(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
+          function ParseGetTokenResult(aResponse: UnicodeString): AnsiString;
+          function ParseGetSessionResult(aResponse: UnicodeString): TSessionResponse;
+          procedure ParseScrobbledFile(aResponse: UnicodeString);
+          function ParseNowPlayingResult(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
 
-          // NowPlaying:
-          // Session-ID und eine der Links wird verwendet, um Daten über das
-          // aktuelle AudioFile zu senden
-          // Fehler:
-          // BADSESSION: Session-ID ungültig. => Neuer Handshake.
-          function fPerformNowPlayingNotification: TScrobbleStatus;
-          function fPerformSubmissionNotification: TScrobbleStatus;
-
-          function ParseNowPlayingResult(aResponse: string): TScrobbleStatus;
-          function ParseSubmissionResult(aResponse: string): TScrobbleStatus;
-
+          // the main scrobbling methods
           procedure fScrobbleNowPlaying;
           procedure fScrobbleSubmit;
 
+          // begins the new thread with the proper method
+          procedure ScrobbleNowPlaying;
+          procedure ScrobbleSubmit;
+
       public
-          Token: String;   // Über GetToken ermitteln lassen
-
-          // GetSession
-          Username: String;     // Name des LastFM-Users
-          SessionKey: String;   // Session-Key fürs Scrobblen. Muss (einmalig) über diverse Funktionen angefordert werden.
-
-          // fürs "NowPlaying"
-          SessionID: String;
-          NowPlayingURL: String;
-          SubmissionURL: String;
-
-          ParamList: TStrings;
-
-          SuccessMessage: String;
-          EarliestNextHandshake: TDateTime;
+          property Parent: TApplicationScrobbler read fParent write fParent;
+          property Token: AnsiString read fToken write fToken;
 
           constructor Create(aHandle: HWnd);
           destructor Destroy; override;
 
-          // Startet Thread
+          // begins the new thread with the proper method
           procedure GetToken;
-          procedure GetSession;       // Als Parameter das Token nehmen? Ja.
-          procedure ScrobbleNowPlaying;      // Als Parameter ein AudioFile liefern? Und die ganzen Variablen ins Private verschieben? Ja. ;-)
-          procedure ScrobbleSubmit;
+          procedure GetSession;
+    end;
 
-          function GetUTCTimeStamp: String;
-  end;
 
-    TNempScrobbler = class
+    // Class TApplicationScrobbler
+    // See readme.txt for further comments
+    TApplicationScrobbler = class
         private
             fMainWindowHandle: HWND;
             ErrorInARowCount: Integer;
 
             StartTimeUTC: TSystemTime;
             StartTimeLocal: TDateTime;
-            PlayAmount: Integer; // in Seconds
+            PlayAmount: Integer; // in seconds
 
-            // Gibt an, ob gerade gescrobbelt wird.
-            fWorking: Boolean;
+            fWorking: Boolean;      // True iff a TScrobbler is working right now
             FScrobbleJobCount: Integer;
 
-            fNewFile: Boolean; // gibt an, ob was neues da ist: Könnte ja sein, dass beim NP-Scrobbeln das File direkt neu gesetzt wird.
-            fPlayingFile: TScrobbleFile;
-            fCurrentFileAdded: Boolean;
-
-            EarliestNextHandshake: TDateTime;
+            ValidSessionKey : Boolean;
+            EarliestNextScrobbleAttempt: TDateTime;
             TimeToWaitInterval: Integer;
 
-            // LastFM allows only 5 calls per Second
-            // The GetTag-Method will be calles very often - so we need a speed-limit here!
-            fLastCall: DWord;
+            // Check for errors.
+            // used by TScrobbler in Thread to decide to scrobble or not
+            function fScrobblingAllowed: Boolean;
 
-            // Setzt fWorking und setzt eine Message ab.
-            procedure BeginWork;
-            procedure EndWork;
+            procedure CountError;
+            procedure CountSuccess;
 
             procedure ScrobbleCurrentFile;
             procedure ScrobbleJobList;
 
-            function EncodeSessionKey(PlainKey: String): String;
-            function DecodeSessionKey(CryptedKey: String): String;
+            function SortParams(params: TValueArray): UnicodeString;
 
-            // Parse GetTags-RawString (XML-structure)
-            // result: tag1(count1), tag2(count2), ...
-            function ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
+        protected
+            fPlayingFile: TScrobbleFile;
+            fNewFile: Boolean;
+            fCurrentFileAdded: Boolean;
 
+            procedure BeginWork;
+            procedure EndWork;
+
+            // YOU MUST implement GenerateSignature in your own TMyAppScrobbler!
+            function GenerateSignature(SortedParams: UnicodeString): UnicodeString; virtual; abstract;
 
         public
-            SessionKey: String; // Der quasi allzeit gültige Session-Key  // "Sicher" in Ini-Datei speichern
-            Username: String; // Der Username des LastFM-Users            // in Ini-Datei speichern
+            ApiKey: AnsiString;      // constant. Get it on YOUR lastFM user profile
+            Token: AnsiString;
+            SessionKey: AnsiString;
+            Username: UnicodeString;
 
-            AlwaysScrobble: Boolean; // Immer Scrobbeln, beim Start von Nemp aktivieren, in Ini speichern
-
-            DoScrobble: Boolean; // Laufzeit-Variable, kann vom User manuell gesetzt werden. (Übers Tools-Menü)
-            IgnoreErrors: Boolean;
-            Status: TScrobbleStatus;                                      // Status des Scrobblers. Nur Socrobblen, wenn "OK"
-
-            Token: String;            // getToken-Ergebnis. Muss der LastFM-User authentifizieren
-            SessionID: String;        // Erhält man beim Handshake
-            NowPlayingURL: String;    // Erhält man beim Handshake
-            SubmissionURL: String;    // Erhält man beim Handshake
+            AlwaysScrobble: Boolean; // global (i.e. start scrobbling when app starts)
+            DoScrobble: Boolean;     // local (during one app session)
 
             JobList: TObjectList;
             LogList: TStrings;
 
-            property Working: Boolean Read fWorking; 
+            property Working: Boolean Read fWorking;
             constructor Create(aHandle: HWND);
             destructor Destroy; override;
 
-            procedure LoadFromIni(Ini: TMemIniFile);
-            procedure SaveToIni(Ini: TMemIniFile);
+            procedure JobDone;
 
-            // Wenn man was gescrobbelt hat, könnte in der Zwischenzeit was neues dazu gekommen sein, oder sich geändert haben
-            // daher: Beim "OK" sollte die VCL das anstoßen
+            procedure GetToken;
+            procedure GetSession;
+
+            // scrobble next file (iv available)
             procedure ScrobbleNext(PlayerIsPlaying: Boolean);
             procedure ScrobbleNextCurrentFile(PlayerIsPlaying: Boolean);
 
-            // wird in den Message-Handlern bei Fehlern aufgerufen
+            // Retry
             Procedure ScrobbleAgain(PlayerIsPlaying: Boolean);
 
-            //Neue Routinen, die von außen das Scrobbeln anleiern sollen:
-            function AddToScrobbleList(IsJustPlaying: Boolean): Boolean; // result: hinzugefügt oder nicht
-            procedure ChangeCurrentPlayingFile(aAudioFile: TAudioFile); // setzt das aktuelle Audiofile um und scrobbelt es ggf.
+            // User thinks, that he has solved some issues - allow scrobbling again
+            procedure ProblemSolved;
 
-            procedure HandleHandshakeFailure(aFailure: TScrobbleStatus);
-            procedure CountError(aFailure: TScrobbleStatus);
-            procedure CountSuccess;
-
+            function AddToScrobbleList(IsJustPlaying: Boolean): Boolean;
+            procedure ChangeCurrentPlayingFile(Interpret, Title, Album: UnicodeString; Length, TrackNr: Integer);
             procedure PlaybackStarted;
             procedure PlaybackPaused;
             procedure PlaybackResumed;
-
-            procedure AllowHandShakingAgain;
-
-            // Additional Methods
-
-            // Get the Tags for an AudioFile
-            // No Authorization required. No Thread
-            //  - calling function (MedienBib.GetTags?) should create a Thread
-            function GetTags(aAudioFile: tAudioFile): String;
-
     end;
 
 
@@ -323,153 +342,55 @@ type
   procedure StartScrobbleNowPlaying(Scrobbler: TScrobbler);
   procedure StartScrobbleSubmit(Scrobbler: TScrobbler);
 
-  //Ermittelt aus einer Server-Antwort das Token
-  function GetTokenFromResponse(aResponseString: String): String;
-  // Ermittelt aus einer Server-Antwort den Usernamen des LastFM-Accounts
-  function GetUserNameFromResponse(aResponseString: String): String;
-  // Ermittelt den (allzeit gültigen) Session-Key aus der Server-Antwort
-  function GetSessionKeyFromResponse(aResponseString: String): String;
-
 
 implementation
 
 
-
-function faae65f530febc67: string;
-var i: integer;
-begin
-    result := '';
-    for i := 0 to 15 do
-        result := result + IntToHex( (bd7fab7ec5900abf[i] + effa65ecb689fccd[i]) mod 256, 2);
-
-    result := lowercase(result);
-end;
-
-
-// Einige lose Funktionen. Werden im Hauptthread ausgeführt und liefern der Anwendung
-// Daten für den weiteren Verlauf des "Scrobbelns"
-
-// Ermitteln eines Tokens. Erwartetes Format:
-            {
-             <?xml
-            version="1.0"
-            encoding="utf-8"?>
-            <lfm
-            status="ok">
-            <token>  (md5-Hash-String)  </token></lfm>
-            }
-function GetTokenFromResponse(aResponseString: String): String;
-var idx: Integer;
-begin
-    idx := Pos('<token>', aResponseString );
-    if idx >= 1 then
-        result := copy(aResponseString, idx + length('<token>'), 32)
-    else
-        result := '';
-end;
-
-  // Ermittelt aus einer Server-Antwort den Usernamen des LastFM-Accounts. Format:
-            {
-            <?xml
-            version="1.0"
-            encoding="utf-8"?>
-            <lfm
-            status="ok">
-            <session>
-            <name>someUsername</name>                                 !!!
-            <key>some MD5-like string</key>         !!!
-            <subscriber>0</subscriber>
-            </session></lfm>
-            }
-function GetUserNameFromResponse(aResponseString: String): String;
-var start, ende: Integer;
-begin
-    start := Pos('<name>', aResponseString);
-    ende  := Pos('</name>', aResponseString);
-    if (start < ende) and (ende > 1) then
-        result := copy(aResponseString, start + length('<name>'), ende - (start + length('<name>')) )
-    else
-        result := '';
-end;
-  // Ermittelt den (allzeit gültigen) Session-Key aus der Server-Antwort. Format wie bei Username
-function GetSessionKeyFromResponse(aResponseString: String): String;
-var idx: Integer;
-begin
-    idx := Pos('<key>', aResponseString );
-    if idx >= 1 then
-        result := copy(aResponseString, idx + length('<key>'), 32)
-    else
-        result := '';
-end;
-
-
-// von den Indys abgeguckt
-function ParamsEncode(const ASrc: UTF8String): UTF8String;
+// copied from the den Indys, added '&'
+function ParamsEncode(const ASrc: UTF8String): UnicodeString;
 var i: Integer;
 begin
   Result := '';
   for i := 1 to Length(ASrc) do
   begin
     if (ASrc[i] in ['&', '*','#','%','<','>',' ','[',']'])
-       or (not (ASrc[i] in [#33..#128]))
+       or (not (ASrc[i] in [#33..#127]))
     then
     begin
-      Result := Result + UTF8Encode('%' + IntToHex(Ord(ASrc[i]), 2));
+      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
     end
     else
     begin
-      Result := Result + UTF8Encode(ASrc[i]);
+      Result := Result + WideChar(ASrc[i]);
     end;
   end;
 end;
 
 
-procedure TScrobbleFile.Assign(aAudioFile: TAudioFile; aStartTimeUTC: TSystemTime);
-var StartTimeDelphi: TDateTime;
-    diff: LongInt;
-begin
-    DisplayTitle := aAudioFile.Artist + ' - ' + aAudioFile.Titel;
-
-    Artist := ParamsEncode(UTF8Encode(aAudioFile.Artist));
-    Title  := ParamsEncode(UTF8Encode(aAudioFile.Titel));
-    Album  := ParamsEncode(UTF8Encode(aAudioFile.Album));
-    Length := UTF8Encode(IntToStr(aAudioFile.Duration));
-    MBTrackID := '';
-
-    if aAudioFile.Track <> 0 then
-        TrackNr := UTF8Encode(IntToStr(aAudioFile.Track))
-    else
-        TrackNr := '';
-
-    // zusätzlich fürs Submitten:
-    StartTimeDelphi := EncodeDateTime(aStartTimeUTC.wYear, aStartTimeUTC.wMonth, aStartTimeUTC.wDay, aStartTimeUTC.wHour, aStartTimeUTC.wMinute, aStartTimeUTC.wSecond, aStartTimeUTC.wMilliSeconds);
-    diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
-    StartTime := UTF8Encode(IntToStr(Diff));
-
-    Rating := ''; // oder 'L' für "Love"?
-    Source := 'P'; // Bei Webstreams: 'R'
-end;
-
-procedure TScrobbleFile.CopyFrom(aScrobbleFile: TScrobbleFile);
+procedure TScrobbleFile.Assign(aScrobbleFile: TScrobbleFile);
 begin
     if assigned(aScrobbleFile) then
     begin
-        Artist       := aScrobbleFile.Artist       ;
+        Interpret    := aScrobbleFile.Interpret    ;
         Title        := aScrobbleFile.Title        ;
         Album        := aScrobbleFile.Album        ;
         Length       := aScrobbleFile.Length       ;
         TrackNr      := aScrobbleFile.TrackNr      ;
         MBTrackID    := aScrobbleFile.MBTrackID    ;
         DisplayTitle := aScrobbleFile.DisplayTitle ;
-
         StartTime    := aScrobbleFile.StartTime    ;
-        Source       := aScrobbleFile.Source       ;
-        Rating       := aScrobbleFile.Rating       ;
     end;
 end;
 
 
-constructor TNempScrobbler.Create(aHandle: HWND);
+// -------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
+// Class TApplicationScrobbler
+// -------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------
+
+
+constructor TApplicationScrobbler.Create(aHandle: HWND);
 begin
     inherited Create;
     fMainWindowHandle := aHandle;
@@ -478,11 +399,13 @@ begin
     fPlayingFile := TScrobbleFile.Create;
     fCurrentFileAdded := False;
     ErrorInARowCount := 0;
-    EarliestNextHandshake := Now;
+    EarliestNextScrobbleAttempt := Now;
+    ValidSessionKey := True;
     TimeToWaitInterval := 1;
-    fLastCall := GetTickCount;
+
+    DoScrobble := False;
 end;
-destructor TNempScrobbler.Destroy;
+destructor TApplicationScrobbler.Destroy;
 begin
     LogList.Free;
     JobList.Free;
@@ -490,230 +413,79 @@ begin
     inherited destroy;
 end;
 
-procedure TNempScrobbler.BeginWork;
+procedure TApplicationScrobbler.BeginWork;
 begin
     fWorking := True;
     SendMessage(fMainWindowHandle, WM_Scrobbler, SC_BeginWork, 0);
 end;
 
-procedure TNempScrobbler.EndWork;
+procedure TApplicationScrobbler.EndWork;
 begin
     fWorking := False;
     SendMessage(fMainWindowHandle, WM_Scrobbler, SC_EndWork, 0);
 end;
 
-
-function TNempScrobbler.ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
-var oneTag, name, c: String;
-    tagBegin, tagEnd: Integer;
-    name1, name2, c1, c2: Integer;
+procedure TApplicationScrobbler.JobDone;
 begin
-
-    tagBegin := pos('<tag>', aRawString);
-    tagEnd := pos('</tag>', aRawString);
-    result := '';
-    while (tagBegin <> 0) do
-    begin
-        oneTag := copy(aRawString, tagBegin + 5, tagEnd - tagBegin - 5);
-
-        name1 := pos('<name>', oneTag);
-        name2 := pos('</name>', oneTag);
-        name := copy(oneTag, name1 + 6, name2 - name1 - 6);
-
-        c1 := pos('<count>', oneTag);
-        c2 := pos('</count>', oneTag);
-        c := copy(oneTag, c1 + 7, c2 - c1 - 7);
-
-        if StrToIntDef(c, -1) >= 10 then          // ToDo: MinValue veränderbar, settings
-        if result = '' then
-            result := name
-        else
-            result := result + #13#10 + name;
-            // note: if we change the #13#10 here, we MUST also change it in TagCloud.RenameTag
-
-        tagBegin := posEx('<tag>', aRawString, tagEnd);
-        tagEnd := posEx('</tag>', aRawString, tagEnd + 4);
-    end;
-end;
-
-function TNempScrobbler.GetTags(aAudioFile: tAudioFile): String;
-var url: UTF8String;
-    aIDHttp: TIdHttp;
-    raw: String;
-    n: Dword;
-begin
-    if not assigned(aAudioFile) then
-    begin
-        result := '';
-        exit;
-    end;
-
-    // We MUST NOT call this methode more than 5x per second.
-    // So: Sleep for a while before the next call.
-    // DO NOT Change this - Otherwise Nemp could be banned from LastFM-Services!
-    n := GetTickCount;
-    if n - fLastCall < 250 then  // ok, this will result in 3-4 calls per second.
-        sleep(250);
-
-    fLastCall := GetTickCount;
-    url := 'http://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
-    + '&artist=' + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Artist))
-    + '&track='  + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Titel))
-    + '&api_key=' + api_key;
-
-
-    aIDHttp := TIdHttp.Create;
-    try
-        aIDHttp.ConnectTimeout:= 20000;
-        aIDHttp.ReadTimeout:= 20000;
-        aIDHttp.Request.UserAgent := 'Mozilla/3.0';
-        aIDHttp.HTTPOptions :=  [];
-        try
-            raw := aIDHttp.Get(url);
-        except
-            raw := '';
-        end;
-        result := ParseRawTag(raw, Nil);
-
-
-    finally
-        aIDhttp.Free;
-    end;
-end;
-
-function MD5StringToDigest(const aString: String): TMD5Digest;
-var i: Integer;
-    aByteStr: String;
-begin
-    if length(aString) <> 32 then
-    begin
-        for i := 0 to 15 do
-            result.v[i] := 0;
-    end
-    else
-        for i := 0 to 15 do
-        begin
-            aByteStr := '$' + aString[2*i + 1] + aString[2*i + 2];
-            result.v[i] := StrToIntDef(aByteStr, 0);
-        end;
-end;
-
-function TNempScrobbler.EncodeSessionKey(PlainKey: String): String;
-var plainDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
-    i: Integer;
-const CSIDL_APPDATA = $001a;
-begin
-    if length(PlainKey) = 32 then
-    begin
-        //  PlainKey in Ziffern übersetzen
-        plainDigest := MD5StringToDigest(PlainKey);
-        //die anderen HashSummen ermitteln
-        VolumeSrnNrDigest := MD5String(AnsiString(GetVolumeSerialNr('C')));
-        FolderDigest      := MD5String(AnsiString(GetShellFolder(CSIDL_APPDATA)));
-
-        // addieren
-        for i := 0 to 15 do
-            resultDigest.v[i] := (plainDigest.v[i] + VolumeSrnNrDigest.v[i] + FolderDigest.v[i]) Mod 256;
-
-        result := Lowercase(MD5DigestToStr(resultDigest));
-    end
-    else
-        result := PlainKey;
-end;
-
-function TNempScrobbler.DecodeSessionKey(CryptedKey: String): String;
-var cryptedDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
-    i: Integer;
-const CSIDL_APPDATA = $001a;
-begin
-    if length(CryptedKey) = 32 then
-    begin
-        //  PlainKey in Ziffern übersetzen
-        cryptedDigest := MD5StringToDigest(CryptedKey);
-        //die anderen HashSummen ermitteln
-        VolumeSrnNrDigest := MD5String(AnsiString(GetVolumeSerialNr('C')));
-        FolderDigest      := MD5String(AnsiString(GetShellFolder(CSIDL_APPDATA)));
-
-        // addieren
-        for i := 0 to 15 do
-            resultDigest.v[i] := (cryptedDigest.v[i] + 256 + 256 - VolumeSrnNrDigest.v[i] - FolderDigest.v[i]) Mod 256;
-
-        result := Lowercase(MD5DigestToStr(resultDigest));
-    end
-    else
-        result := CryptedKey;
-end;
-
-
-procedure TNempScrobbler.LoadFromIni(Ini: TMemIniFile);
-var cryptedKey: String;
-begin
-    // Der quasi allzeit gültige Session-Key
-    cryptedKey := Ini.ReadString('Scrobbler', 'SessionKey', '');
-    SessionKey := DecodeSessionKey(cryptedKey);
-
-    Username   := Ini.ReadString('Scrobbler', 'Username', '');
-    if (Username = '') or (SessionKey = '') then
-    begin
-        Status := hs_UNAUTHORIZED;
-        LogList.Add('Loading Settings: No username/sessionkey found.');
-    end
-    else
-    begin
-        Status := hs_OK;
-        LogList.Add('Username: ' + Username);
-        LogList.Add('Sessionkey: ' + Sessionkey);
-    end;
-
-    AlwaysScrobble := Ini.ReadBool('Scrobbler', 'AlwaysScrobble', False);
-    DoScrobble := AlwaysScrobble;
-    IgnoreErrors := Ini.ReadBool('Scrobbler', 'IgnoreErrors', True);
-end;
-procedure TNempScrobbler.SaveToIni(Ini: TMemIniFile);
-var cryptedKey: String;
-begin
-    cryptedKey := EncodeSessionKey(SessionKey);
-    Ini.WriteString('Scrobbler', 'SessionKey', cryptedKey);
-    Ini.WriteString('Scrobbler', 'Username', Username);
-
-    Ini.WriteBool('Scrobbler', 'AlwaysScrobble', AlwaysScrobble);
-    Ini.WriteBool('Scrobbler', 'IgnoreErrors', IgnoreErrors);
-end;
-
-procedure TNempScrobbler.CountError(aFailure: TScrobbleStatus);
-begin
-    inc(ErrorInARowCount);
-    if ErrorInARowCount >= 10 then // 3
-    begin
-        // Zurückfallen zum Handshake: ID auf '' setzen.
-        SessionID := '';
-        SendMessage(fMainWindowHandle, WM_Scrobbler, SC_TooMuchErrors, 0);
-    end;
-end;
-
-procedure TNempScrobbler.CountSuccess;
-begin
-    ErrorInARowCount := 0;
-    TimeToWaitInterval := 1;
-end;
-
-procedure TNempScrobbler.HandleHandshakeFailure(aFailure: TScrobbleStatus);
-begin
-    SessionID := '';
-    if aFailure <> hs_Ok then
-    begin
-        EarliestNextHandshake := IncMinute(Now, TimeToWaitInterval);
-        SendMessage(fMainWindowHandle, WM_Scrobbler, SC_Message, LParam(PChar('Scrobbling will be disabled for approx. ' + IntToStr(TimeToWaitInterval) + ' minutes.'  )));
-
-        if TimeToWaitInterval < 60 then
-            TimeToWaitInterval := TimeToWaitInterval * 2
-        else
-            TimeToWaitInterval := 120;
-    end;
     EndWork;
 end;
 
-function TNempScrobbler.AddToScrobbleList(IsJustPlaying: Boolean): Boolean; // result: hinzugefügt oder nicht
+// fScrobblingAllowed, works in secondary Thread
+function TApplicationScrobbler.fScrobblingAllowed: Boolean;
+var SendWarning: Boolean;
+begin
+    if ValidSessionKey then
+    begin
+        SendWarning := False;
+        if ErrorInARowCount >= 5 then // or 3? 5? 10?
+        begin
+            // we had a lot of errors recently. Just take a timout.
+            EarliestNextScrobbleAttempt := IncMinute(Now, TimeToWaitInterval);
+            ErrorInARowCount := 0;
+            SendWarning := True;
+            // increase TimeToWait (i.e. wait longer, if the errors occur again after the timeout)
+            if TimeToWaitInterval < 60 then
+                TimeToWaitInterval := TimeToWaitInterval * 2
+            else
+                TimeToWaitInterval := 120;
+        end;
+
+        if Now < EarliestNextScrobbleAttempt then
+        begin
+            result := False;
+            // notify main window
+            if SendWarning then
+                SendMessage(fMainWindowHandle, WM_Scrobbler, SC_ScrobblingSkipped,
+                      LParam(MinutesBetween(Now, EarliestNextScrobbleAttempt)+1))
+            else
+                SendMessage(fMainWindowHandle, WM_Scrobbler, SC_ScrobblingSkippedAgain,
+                      LParam(MinutesBetween(Now, EarliestNextScrobbleAttempt)+1));
+
+            SendMessage(fMainWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+        end else
+            result := True;
+    end else
+    begin
+        SendMessage(fMainWindowHandle, WM_Scrobbler, SC_InvalidSessionKey, 0);
+        SendMessage(fMainWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+        result := False;
+    end;
+end;
+
+procedure TApplicationScrobbler.CountError;
+begin
+    inc(ErrorInARowCount);
+end;
+
+procedure TApplicationScrobbler.CountSuccess;
+begin
+    ErrorInARowCount := 0;
+    TimeToWaitInterval := 1;
+    ValidSessionKey := True;
+    EarliestNextScrobbleAttempt := Now;
+end;
+
+function TApplicationScrobbler.AddToScrobbleList(IsJustPlaying: Boolean): Boolean;
 var aScrobbleFile: TScrobbleFile;
     StartTimeDelphi: TDateTime;
     diff: LongInt;
@@ -724,20 +496,20 @@ begin
 
     if DoScrobble then
     begin
-        if ((PlayAmount > 240) or (PlayAmount > ( StrToIntDef(String(fPlayingFile.Length), 0) Div 2 )) )
+        if ((PlayAmount > 240) or (PlayAmount > ( StrToIntDef(fPlayingFile.Length, 0) Div 2 )) )
            AND
-           (StrToIntDef(String(fPlayingFile.Length), 0) > 30)
+           (StrToIntDef(fPlayingFile.Length, 0) > 30)
         then
         begin
             if (not fCurrentFileAdded) then   // hier beim else nichts senden, daher so. ;-)
             begin
                 aScrobbleFile := TScrobbleFile.Create;
-                aScrobbleFile.CopyFrom(fPlayingFile);
+                aScrobbleFile.Assign(fPlayingFile);
                 StartTimeDelphi := EncodeDateTime(StartTimeUTC.wYear, StartTimeUTC.wMonth, StartTimeUTC.wDay, StartTimeUTC.wHour, StartTimeUTC.wMinute, StartTimeUTC.wSecond, StartTimeUTC.wMilliSeconds);
                 diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
-                aScrobbleFile.StartTime := Utf8Encode(IntToStr(Diff));
+                aScrobbleFile.StartTime := IntToStr(Diff);
 
-                JobList.Add(aScrobbleFile); // AudioFile kann man dann auch wieder vergessen: Infos stecken im Scrobblefile drin
+                JobList.Add(aScrobbleFile);
                 fCurrentFileAdded := True;
                 Result := True;
                 if not fWorking then
@@ -752,27 +524,104 @@ begin
             begin
                 fCurrentFileAdded := True;  // so tun als ob. Sonst kommt diee Message evt. mehrfach
                 // Scrobbeln verweigert, weil zu kurz...
-                if (StrToIntDef(String(fPlayingFile.Length), 0) <= 30) then
-                    SendMessage(fMainWindowHandle, WM_Scrobbler, SC_SubmissionSkipped, Lparam(Pchar('Submission skipped: File too short (min. 30seconds)')))
+                if (StrToIntDef(fPlayingFile.Length, 0) <= 30) then
+                    SendMessage(fMainWindowHandle, WM_Scrobbler, SC_Hint, Lparam(PWideChar(UnicodeString(Scrobble_FileTooShort))))
                 else
-                    SendMessage(fMainWindowHandle, WM_Scrobbler, SC_SubmissionSkipped, Lparam(Pchar('Submission skipped: Playback too short (min. 50% or 4 minutes).')));
+                    SendMessage(fMainWindowHandle, WM_Scrobbler, SC_Hint, Lparam(PWideChar(UnicodeString(Scrobble_PlayAmount))));
             end;
         end;
     end;
 end;
 
-procedure TNempScrobbler.ChangeCurrentPlayingFile(aAudioFile: TAudioFile); // setzt das aktuelle Audiofile um und scrobbelt es ggf.
+procedure TApplicationScrobbler.ChangeCurrentPlayingFile(Interpret, Title, Album: UnicodeString; Length, TrackNr: Integer);
 var s: TSystemTime;
+    StartTimeDelphi: TDateTime;
+    diff: LongInt;
 begin
     GetSystemTime(s);
-    fPlayingFile.Assign(aAudioFile, s); // s wird zum NP-Scrobbling aber nicht benötigt.
+    fPlayingFile.DisplayTitle := Interpret + ' - ' + Title;
+
+    fPlayingFile.Interpret := Interpret;
+    fPlayingFile.Title     := Title;
+    fPlayingFile.Album     := Album;
+    fPlayingFile.Length    := IntToStr(Length);
+
+    if TrackNr <> 0 then
+        fPlayingFile.TrackNr := IntToStr(TrackNr)
+    else
+        fPlayingFile.TrackNr := '';
+
+    StartTimeDelphi := EncodeDateTime(s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, s.wMilliSeconds);
+    diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
+    fPlayingFile.StartTime := IntToStr(diff);
+
     fNewFile := True;
     fCurrentFileAdded := False;
 end;
 
 
-procedure TNempScrobbler.ScrobbleCurrentFile;
+procedure TApplicationScrobbler.GetToken;
 var aScrobbler: TScrobbler;
+begin
+    BeginWork;
+    aScrobbler := TScrobbler.Create(fMainWindowHandle);
+    try
+        //aScrobbler.ApiKey := ApiKey;
+        aScrobbler.Parent := self;
+        aScrobbler.GetToken;
+    except
+        aScrobbler.Free;
+        EndWork;
+    end;
+end;
+
+
+procedure TApplicationScrobbler.GetSession;
+var aScrobbler: TScrobbler;
+begin
+    BeginWork;
+    aScrobbler := TScrobbler.Create(fMainWindowHandle);
+    try
+        //aScrobbler.ApiKey := ApiKey;
+        aScrobbler.Token := Token;
+        aScrobbler.Parent := self;
+        aScrobbler.GetSession;
+    except
+        aScrobbler.Free;
+        EndWork;
+    end;
+end;
+
+function TApplicationScrobbler.SortParams(params: TValueArray): UnicodeString;
+var complete: Boolean;
+    tmp: TParameter;
+    i: integer;
+begin
+    // quick bubblesort
+    complete := false;
+    while not complete do
+    begin
+        complete := true;
+        for i := 0 to length(params) - 2 do
+            if params[i].name > params[i+1].name then
+            begin
+                tmp := params[i];
+                params[i] := params[i+1];
+                params[i+1] := tmp;
+                complete := false;
+            end;
+    end;
+    result := '';
+    for i := 0 to length(params)-1  do
+        result := result + params[i].name + params[i].value;
+end;
+
+procedure TApplicationScrobbler.ScrobbleCurrentFile;
+var aScrobbler: TScrobbler;
+    Params: TValueArray;
+    ParamCount: Integer;
+    sig: UnicodeString;
+  i: Integer;
 begin
     fNewFile := False;
     if DoScrobble then
@@ -780,19 +629,56 @@ begin
         BeginWork;
         aScrobbler := TScrobbler.Create(fMainWindowHandle);
         try
-            aScrobbler.EarliestNextHandshake := EarliestNextHandshake;
+            aScrobbler.Parent := self;
+            //aScrobbler.ApiKey := ApiKey;
             aScrobbler.Username   := self.Username;
             aScrobbler.SessionKey := self.SessionKey;
-            aScrobbler.SessionID  := SessionID;
-            aScrobbler.ParamList.Add('s=' + SessionID);
-            aScrobbler.ParamList.Add('a=' + String(fPlayingFile.Artist   ));
-            aScrobbler.ParamList.Add('t=' + String(fPlayingFile.Title    ));
-            aScrobbler.ParamList.Add('b=' + String(fPlayingFile.Album    ));
-            aScrobbler.ParamList.Add('l=' + String(fPlayingFile.Length   ));
-            aScrobbler.ParamList.Add('n=' + String(fPlayingFile.TrackNr  ));
-            aScrobbler.ParamList.Add('m=' + String(fPlayingFile.MBTrackID));
-            aScrobbler.NowPlayingURL := NowPlayingURL;
-            aScrobbler.SubmissionURL := SubmissionURL;
+
+            SetLength(Params, 10); // we have at most 10 Parameters to add;
+            // Required Parameters
+            Params[0].name := 'api_key'; Params[0].value := UnicodeString(ApiKey)    ;
+            Params[1].name := 'artist';
+            if fPlayingFile.Interpret = '' then
+                Params[1].value := 'Unknown Artist'
+            else
+                Params[1].value := fPlayingFile.Interpret   ;
+
+            Params[2].name := 'method';  Params[2].value := 'track.updateNowPlaying' ;
+            Params[3].name := 'sk';      Params[3].value := UnicodeString(SessionKey);
+            Params[4].name := 'track';
+            if fPlayingFile.Title = '' then
+                Params[4].value := 'Unknown Title'
+            else
+                Params[4].value := fPlayingFile.Title;
+
+            ParamCount := 5;
+            // optional parameters
+            if fPlayingFile.Album <> '' then
+            begin
+                Params[ParamCount].name  := 'album' ;
+                Params[ParamCount].value := fPlayingFile.Album;
+                inc(ParamCount);
+            end;
+            if fPlayingFile.TrackNr <> '' then
+            begin
+                Params[ParamCount].name  := 'trackNumber' ;
+                Params[ParamCount].value := fPlayingFile.TrackNr;
+                inc(ParamCount);
+            end;
+            if fPlayingFile.Length <> '' then
+            begin
+                Params[ParamCount].name  := 'duration' ;
+                Params[ParamCount].value := fPlayingFile.Length;
+                inc(ParamCount);
+            end;
+            SetLength(Params, ParamCount); // cut Array
+
+            for i := 0 to length(params) - 1 do
+                aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+
+            sig := GenerateSignature(SortParams(params));
+            aScrobbler.ParamList.Add('api_sig=' + sig);
+
             aScrobbler.SuccessMessage := 'Now Playing Notification: OK. ' + fPlayingFile.DisplayTitle;
             aScrobbler.ScrobbleNowPlaying;
         except
@@ -802,7 +688,7 @@ begin
     end;
 end;
 
-procedure TNempScrobbler.ScrobbleNextCurrentFile(PlayerIsPlaying: Boolean);
+procedure TApplicationScrobbler.ScrobbleNextCurrentFile(PlayerIsPlaying: Boolean);
 begin
     if DoScrobble then
     begin
@@ -816,52 +702,72 @@ begin
 end;
 
 
-// Unterscheid zur früheren Fassung:
-// - Es wird direkt alles gescrobbelt (d.h. max. 50, ich mach hier mal nur 10)
-// - Die Parameterliste wird HIER erzeugt, und die Liste dem TScrobbler übergeben
-procedure TNempScrobbler.ScrobbleJobList;
-var i: Integer;
+procedure TApplicationScrobbler.ScrobbleJobList;
+var i, idx: Integer;
     aScrobbleFile: TScrobbleFile;
     aScrobbler: TScrobbler;
-begin
-    // scrobbelcount setzen! Wichtig fürs löschen aus der Joblist bei erfolg
-    FScrobbleJobCount := JobList.Count;
+    Params: TValueArray;
+    sig: UnicodeString;
 
-    if FScrobbleJobCount > 10 then
-        FScrobbleJobCount := 10;
+    procedure AddParam(name, value: String; required: Boolean);
+    begin
+        if (value <> '') or required then
+        begin
+            inc(idx);
+            Params[idx].name := name;
+            if value = '' then
+                Params[idx].value := 'Unknown'
+            else
+                Params[idx].value := value;
+        end;
+    end;
+
+begin
+    // scrobbelcount setzen! Wichtig fürs löschen aus der Joblist bei Erfolg
+    FScrobbleJobCount := JobList.Count - 1;
+    if FScrobbleJobCount > 9 then
+        FScrobbleJobCount := 9;
     // eigentlich sind bis zu 50 erlaubt
     // 10 am Stück reichen aber auch.
     // Der Rest wird dann ggf. danach gescrobbelt
 
+    BeginWork;
     aScrobbler := TScrobbler.Create(fMainWindowHandle);
     try
-          BeginWork;
+          aScrobbler.Parent := self;
+          //aScrobbler.ApiKey := ApiKey;
           aScrobbler.Username    := Username;
           aScrobbler.SessionKey  := SessionKey;
-          aScrobbler.SessionID   := SessionID;
-          aScrobbler.EarliestNextHandshake := EarliestNextHandshake;
 
-          aScrobbler.ParamList.Add('s=' + SessionID);
-          for i := 0 to JobList.Count -1 do
+          SetLength(Params, (FScrobbleJobCount+1)*6 + 3);
+
+          Params[0].name := 'api_key'; Params[0].value := UnicodeString(ApiKey)    ;
+          Params[1].name := 'method';  Params[1].value := 'track.scrobble' ;
+          Params[2].name := 'sk';      Params[2].value := UnicodeString(SessionKey);
+          idx := 2;
+
+          for i := 0 to FScrobbleJobCount do
           begin
               aScrobbleFile := TScrobbleFile(Joblist[i]);
-              aScrobbler.ParamList.Add('a[' + IntToStr(i) + ']=' + String(aScrobbleFile.Artist   ));
-              aScrobbler.ParamList.Add('t[' + IntToStr(i) + ']=' + String(aScrobbleFile.Title    ));
-              aScrobbler.ParamList.Add('i[' + IntToStr(i) + ']=' + String(aScrobbleFile.StartTime));
-              aScrobbler.ParamList.Add('o[' + IntToStr(i) + ']=' + String(aScrobbleFile.Source   ));
-              aScrobbler.ParamList.Add('r[' + IntToStr(i) + ']=' + String(aScrobbleFile.Rating   ));
-              aScrobbler.ParamList.Add('b[' + IntToStr(i) + ']=' + String(aScrobbleFile.Album    ));
-              aScrobbler.ParamList.Add('l[' + IntToStr(i) + ']=' + String(aScrobbleFile.Length   ));
-              aScrobbler.ParamList.Add('n[' + IntToStr(i) + ']=' + String(aScrobbleFile.TrackNr  ));
-              aScrobbler.ParamList.Add('m[' + IntToStr(i) + ']=' + String(aScrobbleFile.MBTrackID));
+              AddParam('artist[' + IntToStr(i) + ']'     , aScrobbleFile.Interpret, True );
+              AddParam('track[' + IntToStr(i) + ']'      , aScrobbleFile.Title    , True );
+              AddParam('timestamp[' + IntToStr(i) + ']'  , aScrobbleFile.StartTime, True );
+              AddParam('album[' + IntToStr(i) + ']'      , aScrobbleFile.Album    , False);
+              AddParam('duration[' + IntToStr(i) + ']'   , aScrobbleFile.Length   , False);
+              AddParam('trackNumber[' + IntToStr(i) + ']', aScrobbleFile.TrackNr  , False);
           end;
-          aScrobbler.NowPlayingURL := NowPlayingURL;
-          aScrobbler.SubmissionURL := SubmissionURL;
+          SetLength(Params, idx+1); // cut Array
+
+          for i := 0 to length(params) - 1 do
+                aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+
+          sig := GenerateSignature(SortParams(Params));
+          aScrobbler.ParamList.Add('api_sig=' + sig);
 
           if JobList.Count = 1 then
               aScrobbler.SuccessMessage := 'Scrobble: OK. ' + TScrobbleFile(Joblist[0]).DisplayTitle
           else
-              aScrobbler.SuccessMessage := 'Scrobble: OK. (' + IntToStr(FScrobbleJobCount) + ' Files)';
+              aScrobbler.SuccessMessage := 'Scrobble: OK. (' + IntToStr(FScrobbleJobCount) + ' Dateien)';
 
           aScrobbler.ScrobbleSubmit;
     except
@@ -870,34 +776,19 @@ begin
     end;
 end;
 
-Procedure TNempScrobbler.ScrobbleNext(PlayerIsPlaying: Boolean);
+Procedure TApplicationScrobbler.ScrobbleNext(PlayerIsPlaying: Boolean);
 var i: Integer;
 begin
     // Diese Proc wird aufgerufen, wenn das Submitten per "ScrobbleJobList" erfolgreich war.
     // d.h.: Die gescrobbelten Dateien aus der JobListe entfernen
-    for i := 1 to FScrobbleJobCount do
+    for i := 0 to FScrobbleJobCount do
         JobList.Remove(JobList[0]);
     FScrobbleJobCount := 0;
 
-    if DoScrobble then
-    begin
-        if JobList.Count > 0 then
-            // erstmal die Liste weiter scrobblen
-            ScrobbleJobList
-        else
-        begin
-            if PlayerIsPlaying then
-                ScrobbleCurrentFile  // muss nochmal gesendet werden, wird vom Submitten wohl überdeckt.
-            else
-                EndWork;
-        end;
-    end
-    else
-        EndWork;
+    ScrobbleAgain(PlayerIsPlaying);
 end;
 
-
-Procedure TNempScrobbler.ScrobbleAgain(PlayerIsPlaying: Boolean);
+Procedure TApplicationScrobbler.ScrobbleAgain(PlayerIsPlaying: Boolean);
 begin
     if DoScrobble then
     begin
@@ -915,9 +806,7 @@ begin
         EndWork;
 end;
 
-
-
-procedure TNempScrobbler.PlaybackStarted;
+procedure TApplicationScrobbler.PlaybackStarted;
 begin
     GetSystemTime(StartTimeUTC);
     StartTimeLocal := Now;
@@ -930,29 +819,31 @@ begin
             ScrobbleCurrentFile
     end;
 end;
-procedure TNempScrobbler.PlaybackPaused;
+
+procedure TApplicationScrobbler.ProblemSolved;
+begin
+    ErrorInARowCount := 0;
+    TimeToWaitInterval := 1;
+    ValidSessionKey := True;
+    EarliestNextScrobbleAttempt := Now;
+end;
+
+procedure TApplicationScrobbler.PlaybackPaused;
 begin
     PlayAmount := PlayAmount + SecondsBetween(Now, StartTimeLocal);
 end;
-procedure TNempScrobbler.PlaybackResumed;
+
+procedure TApplicationScrobbler.PlaybackResumed;
 begin
     StartTimeLocal := Now;
 end;
 
-procedure TNempScrobbler.AllowHandShakingAgain;
-begin
-    self.EarliestNextHandshake := Now;
-end;
-
-
 
 // -------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------
+// Class TScrobbler
 // -------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------
-
 
 
 constructor TScrobbler.Create(aHandle: HWnd);
@@ -960,44 +851,118 @@ begin
     inherited Create;
     fWindowHandle := aHandle;
     fThread := 0;
-    p  := '1.2.1'; // Protokoll-Version
-    c  := 'nem';   //'tst' ;
-    v  := '3.3';   //'1.0' ;
 
     fIDHttp := TIdHttp.Create;
     fIDHttp.ConnectTimeout:= 20000;
     fIDHttp.ReadTimeout:= 20000;
 
     fIDHttp.Request.UserAgent := 'Mozilla/3.0';
-    //fIDHttp.HTTPOptions :=  [hoForceEncodeParams];
-    fIDHttp.HTTPOptions :=  [];
-
-    EarliestNextHandshake := Now;
+    fIDHttp.HTTPOptions :=  [];  // Hinweis: hoForceEncodeParams maskiert keine '&',
+                                 // was zu Problemen bei der einen oder anderen Band führt. ;-)
 
     ParamList := TStringList.Create;
 end;
 
 destructor TScrobbler.Destroy;
 begin
-    //WaitForSingleObject(fThread, 15000);
     fIDHttp.Free;
     ParamList.Free;
     inherited destroy;
 end;
 
-function TScrobbler.GetUTCTimeStamp: String;
-var SystemTime: TSystemTime;
-    currentTime: TDateTime;
-    diff: LongInt;
+
+function TScrobbler.ParseLfmError(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
+var p,p2,p3: Integer;
+    errorCode: Integer;
+    errorMessage: UnicodeString;
 begin
-    GetSystemTime(SystemTime);
-    currentTime :=
-        EncodeDateTime(SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute, SystemTime.wSecond, SystemTime.wMilliSeconds);
-    diff := Round((currentTime - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
-    result := IntToStr(Diff);
+    result := hs_UnknownFailure;
+
+    if pos('<lfm status="failed">', aResponse) > 0 then
+    begin
+        // something went wrong. Get the errorcode.
+        // expected format:  <error code="XX">An Error Message</error>
+        p := pos('<error code="', aResponse);
+        if p > 0 then
+        begin
+            p2 := posEx('"', aResponse, p+13);
+            errorCode := StrToIntDef(Copy(aResponse, p+13, p2-p-13), 8);
+            p3 := posEx('</error>', aResponse, p2);
+            errorMessage := Copy(aResponse, p2+2, p3-p2-2);
+
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Error, LParam(PWideChar(UnicodeString('Error code ' + IntToStr(ErrorCode)))));
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Error, LParam(PWideChar(errorMessage)));
+
+            case errorCode of
+                4,  // Invalid authentication token supplied
+                14, // This token has not been authorized
+                15: // This token has expired
+                   begin
+                    result := hs_InvalidToken;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_InvalidToken, 0);
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                   end;
+
+                9: begin
+                    // invalid Session Key
+                    // STOP scrobbling
+                    result := hs_BADSESSION;
+                    Parent.ValidSessionKey := False;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_InvalidSessionKey, 0);
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
+                11, 16: begin
+                    // Server Offline, temp. unavailable
+                    // Count Error, Try again
+                    result := hs_FAILED;
+                    if mode <> sm_Auth then
+                    begin
+                        Parent.CountError;
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_ServiceUnavailable, LParam(mode));
+                    end else
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+
+                end;
+                29: begin
+                    // IP-Spam, wait a few minutes
+                    result := hs_SPAM;
+                    Parent.EarliestNextScrobbleAttempt := IncMinute(Now, 5);
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_IPSpam, 0);
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
+            else
+                begin
+                    // something strange is going on.
+                    // Probably something with the implementation is wrong - STOP
+                    result := hs_SCROBBLINGEXCEPTION;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_ScrobbleException, 0);
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
+            end;
+        end;
+    end else
+    begin
+        // something else is wrong
+        if mode <> sm_Auth then
+            Parent.CountError
+    end;
 end;
 
-
+{ GetToken-Response:
+     <?xml version="1.0" encoding="utf-8"?>
+    <lfm status="ok">
+       <token>  ...some md5-hash... </token>
+    </lfm>
+}
+function TScrobbler.ParseGetTokenResult(aResponse: UnicodeString): AnsiString;
+var idx: Integer;
+begin
+    idx := Pos('<token>', aResponse );
+    if idx >= 1 then
+        result := AnsiString(copy(aResponse, idx + length('<token>'), 32) )
+    else
+        result := '';
+end;
 
 procedure TScrobbler.GetToken;
 var Dummy: Cardinal;
@@ -1009,36 +974,57 @@ begin
     Scrobbler.fGetToken;
 end;
 procedure TScrobbler.fGetToken;
-var Sig: String;
-    Response, MessageText: String;
+var Sig: UnicodeString;
+    Response, MessageText: UnicodeString;
+    tmpStat: TScrobbleStatus;
+    ParsedResponse: AnsiString;
 begin
   try
-      Sig := 'api_key' + api_key
-              + 'method' + 'auth.gettoken'
-              + faae65f530febc67;
+      Sig := Parent.GenerateSignature('api_key' + String(Parent.ApiKey)
+              + 'method' + 'auth.gettoken');
       try
           Response := fIDHTTP.Get( BaseApiURL + '?method=auth.gettoken'
-                            + '&' + 'api_key=' + api_key
-                            + '&' + 'api_sig=' + Lowercase(MD5DigestToStr(MD5String(AnsiString(sig)))));
-          SendMessage(fWindowHandle, WM_Scrobbler, SC_GetToken, lParam(PChar(Response)));
+                            + '&' + 'api_key=' + String(Parent.ApiKey)
+                            + '&' + 'api_sig=' + Sig);
+          ParsedResponse := ParseGetTokenResult(Response);
+
+          if (ParsedResponse <> '')  then
+          begin
+              SendMessage(fWindowHandle, WM_Scrobbler, SC_GetToken, lParam(PAnsiChar(ParsedResponse)));
+              SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+          end
+          else
+          begin
+              MessageText := Scrobble_GetTokenError + #13#10 + Response;
+              SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+              SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+          end;
+
       except
             on E: EIdHTTPProtocolException do
             begin
-                MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + Response;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetTokenException, lParam(PChar(MessageText)));
+                tmpStat := ParseLfmError(E.ErrorMessage, sm_Auth);
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
                 //(z.B. 404)
             end;
 
             on E: EIdSocketError do
             begin
                 MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetTokenException, lParam(PChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
 
             on E: EIdexception do
             begin
                 MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetTokenException, lParam(PChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
         end;
      finally
@@ -1046,6 +1032,31 @@ begin
      end;
 end;
 
+{  GetSession-Repsonse:
+      <?xml version="1.0" encoding="utf-8"?>
+      <lfm status="ok">
+      <session>
+         <name> ...username... </name>
+         <key> ...some md5-hash... </key>
+         <subscriber>0</subscriber>
+      </session></lfm>
+}
+function TScrobbler.ParseGetSessionResult(aResponse: UnicodeString): TSessionResponse;
+var start, ende: Integer;
+begin
+    start := Pos('<name>', aResponse);
+    ende  := Pos('</name>', aResponse);
+    if (start < ende) and (ende > 1) then
+        result.Username := copy(aResponse, start + length('<name>'), ende - (start + length('<name>')) )
+    else
+        result.Username := '';
+
+    start := Pos('<key>', aResponse );
+    if start >= 1 then
+        result.SessionKey := AnsiString(copy(aResponse, start + length('<key>'), 32))
+    else
+        result.SessionKey := '';
+end;
 
 procedure TScrobbler.GetSession;
 var Dummy: Cardinal;
@@ -1057,38 +1068,58 @@ begin
     Scrobbler.fGetSession;
 end;
 procedure TScrobbler.fGetSession;
-var Sig: String;
-    Response, MessageText: String;
+var Sig: UnicodeString;
+    Response, MessageText: UnicodeString;
+    ParsedResponse: TSessionResponse;
+    tmpStat: TScrobbleStatus;
 begin
     try
-        Sig := 'api_key' + api_key
+        Sig := Parent.GenerateSignature('api_key' + String(Parent.ApiKey)
               + 'method' + 'auth.getsession'
-              + 'token' + Token
-              + faae65f530febc67;
+              + 'token' + String(Token));
         try
             Response := fIDHTTP.Get( BaseApiURL + '?method=auth.getsession'
-                            + '&' + 'api_key=' + api_key
-                            + '&' + 'token=' + Token
-                            + '&' + 'api_sig=' + Lowercase(MD5DigestToStr(MD5String(AnsiString(sig)))));
-            SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSession, lParam(PChar(Response)));
+                            + '&' + 'api_key=' + String(Parent.ApiKey)
+                            + '&' + 'token=' + String(Token)
+                            + '&' + 'api_sig=' + Sig);
+
+            ParsedResponse := ParseGetSessionResult(Response);
+            if (ParsedResponse.Username <> '') and (ParsedResponse.SessionKey <> '') then
+            begin
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSession, lParam(@ParsedResponse));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+            end
+            else
+            begin
+                MessageText := Scrobble_GetSessionError + #13#10 + Response;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+            end;
         except
             on E: EIdHTTPProtocolException do
             begin
-                MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + Response;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSessionException, lParam(PChar(MessageText)));
+                tmpStat := ParseLfmError(E.ErrorMessage, sm_Auth);
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
                 //(z.B. 404)
             end;
 
             on E: EIdSocketError do
             begin
                 MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSessionException, lParam(PChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
 
             on E: EIdexception do
             begin
                 MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSessionException, lParam(PChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
         end;
     finally
@@ -1096,170 +1127,90 @@ begin
     end;
 end;
 
-function TScrobbler.ParseHandShakeResult(aResponse: string): TScrobbleStatus;
-var aList: TStringList;
-    stat: String;
-begin
-    aList := TStringlist.Create;
-    try
-        aList.CommaText := aResponse;
-        if (aList.Count >= 4) and (Uppercase(Trim(aList[0])) = 'OK') then
-        begin
-            SessionID := aList[1];
-            NowPlayingURL := aList[2];
-            SubmissionURL := aList[3]; //'http://post2.audioscrobbler.com:80/protocol_1.2'; //aList[2];  // 3
-            Result := hs_OK;
-        end else
-        begin
-            if aList.Count = 0 then
-                Result := hs_UnknownFailure
-            else
-            begin
-                stat := Uppercase(Trim(aList[0]));
-                if stat = 'BANNED' then
-                  Result := hs_BANNED
-                else
-                  if stat = 'BADAUTH' then
-                    Result := hs_BADAUTH
-                  else
-                    if stat = 'BADTIME' then
-                      result := hs_BADTIME
-                    else
-                      if Pos('FAILED', Stat) > 0 then
-                        result := hs_FAILED
-                      else
-                        result := hs_UnknownFailure
-            end;
-        end;
-    finally
-        aList.Free;
+
+
+procedure TScrobbler.ParseScrobbledFile(aResponse: UnicodeString);
+    function ParseHTMLChars(s: UnicodeString): UnicodeString;
+    begin
+        result := StringReplace(s, '&amp;', '&', [rfReplaceAll]);
+        result := StringReplace(result, '&lt;', '<', [rfReplaceAll]);
+        result := StringReplace(result, '&gt;', '>', [rfReplaceAll]);
+        result := StringReplace(result, '&quot;', '"', [rfReplaceAll]);
     end;
+var p,p2: Integer;
+    correctedValue: UnicodeString;
+begin
+        p := pos('<track corrected="1">', aResponse);
+        if p > 0 then
+        begin
+            p2 := posEx('</track>', aResponse, p);
+            correctedValue := ParseHTMLChars(Copy(aresponse, p + 21, p2-p-21));
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Hint, lParam(PWideChar(UnicodeString('Hint: Track corrected to ' + correctedValue))));
+        end;
+
+        p := pos('<artist corrected="1">', aResponse);
+        if p > 0 then
+        begin
+            p2 := posEx('</artist>', aResponse, p);
+            correctedValue := ParseHTMLChars(Copy(aresponse, p + 22, p2-p-22));
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Hint, lParam(PWideChar(UnicodeString('Hint: Artist corrected to ' + correctedValue))));
+        end;
+
+        p := pos('<album corrected="1">', aResponse);
+        if p > 0 then
+        begin
+            p2 := posEx('</album>', aResponse, p);
+            correctedValue := ParseHTMLChars(Copy(aresponse, p + 20, p2-p-20));
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Hint, lParam(PWideChar(UnicodeString('Hint: Album corrected to ' + correctedValue))));
+        end;
+
+        p := pos('<ignoredMessage code="1">', aResponse);
+        if p > 0 then
+        begin
+            p2 := posEx('</ignoredMessage>', aResponse, p);
+            correctedValue := ParseHTMLChars(Copy(aresponse, p + 25, p2-p-25));
+            SendMessage(fWindowHandle, WM_Scrobbler, SC_Hint, lParam(PWideChar(UnicodeString('Hint: Scrobbling ignored: ' + correctedValue))));
+        end;
 end;
 
-function TScrobbler.fPerformHandShake: TScrobbleStatus;
-var authToken: String;
-    Response, MessageText: String;
-    t: String;
+function TScrobbler.ParseNowPlayingResult(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
+var p,p2: Integer;
+    partOfResponse: UnicodeString;
 begin
-    if Now < EarliestNextHandshake then
+    if pos('<lfm status="ok">', aResponse) > 0  then
     begin
-        result := hs_HANDSHAKECANCELLED;
-        SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeCancelled, lParam(MinutesBetween(Now, EarliestNextHandshake)+1 ));
-        exit;
-    end;
+        result := hs_OK;
+        Parent.CountSuccess;
 
-    if (Username = '') or (SessionKey = '') then
-    begin
-        // ABBRECHEN! User hat sich noch nicht angemeldet
-        result := hs_UNAUTHORIZED;
-        SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeError, lParam(Result));
-        //
+        case Mode of
+            sm_Auth: ; // this method will not be called during Authentification (GetToken/GetSession)
+            sm_NowPlaying: SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingComplete, LParam(PWideChar(SuccessMessage)));
+            sm_Scrobble: SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionComplete, LParam(PWideChar(SuccessMessage)));
+        end;
 
-        //  Das ist ein sehr harter Fehler - Der User muss sich erst anmelden Alles weitere ist komplett sinnfrei.
+        // Scan scrobbled Data for additional Hints (like "Artist corrected")
+        case Mode of
+            sm_Auth: ;
+            sm_NowPlaying: begin
+                p := pos('<nowplaying>', aResponse);
+                p2 := posEx('</nowplaying>', aResponse, p);
+                partOfResponse := Copy(aResponse, p+12, p2-p-12);
+                ParseScrobbledFile(partOfResponse);
+            end;
 
-        //
-    end
-    else
-    begin
-        t := GetUTCTimeStamp;
-        authToken := Lowercase(MD5DigestToStr(MD5String(AnsiString(faae65f530febc67 + t))));
-        try
-            Response := fIDHTTP.Get( BaseScrobbleURL + '?hs=true'
-                            + '&' + 'p=' + p
-                            + '&' + 'c=' + c
-                            + '&' + 'v=' + v
-                            + '&' + 'u=' + Username
-                            + '&' + 't=' + t
-                            + '&' + 'a=' + authToken
-                            + '&' + 'api_key=' + api_key
-                            + '&' + 'sk=' + SessionKey);
-            result := ParseHandShakeResult(Response);
-
-            case result of
-                // Wenn alles Ok war, sind damit SessionID, NowPlayingURL und SubmissionURL gesetzt
-                hs_OK: SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeComplete, lParam(PChar(Response)));
-                else
+            sm_Scrobble: begin
+                p := pos('<scrobble>', aResponse);
+                while p > 0 do
                 begin
-                    // Wenn nicht, dann ist der Handshake fehlgeschlagen.
-                    SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeError, lParam(Result));
-                    if result = hs_failed then
-                        // Some Failure => Text senden
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_Message, lParam(Response));
+                    p2 := posEx('</scrobble>', aResponse, p);
+                    partOfResponse := Copy(aResponse, p+10, p2-p-10);
+                    ParseScrobbledFile(partOfResponse);
+                    p := posEx('<scrobble>', aResponse, p2);
                 end;
             end;
-
-        except
-            on E: EIdHTTPProtocolException do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:' + #13#10 + E.Message + #13#10 + Response;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeException, lParam(PChar(MessageText)));
-                //(z.B. 404)
-            end;
-
-            on E: EIdSocketError do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeException, lParam(PChar(MessageText)));
-            end;
-
-            on E: EIdexception do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_HandShakeException, lParam(PChar(MessageText)));
-            end;
         end;
-    end;
-end;
-
-
-function TScrobbler.ParseNowPlayingResult(aResponse: string): TScrobbleStatus;
-var stat: String;
-begin
-    stat := Uppercase(Trim(aResponse));
-    if stat = 'OK' then
-      result := hs_OK
-    else
-      if stat = 'BADSESSION' then
-        result := hs_BADSESSION
-      else
-        result := hs_UnknownFailure;
-end;
-
-function TScrobbler.fPerformNowPlayingNotification: TScrobbleStatus;
-var Response, MessageText: String;
-begin
-        try
-            ParamList[0] := 's=' + SessionID;
-            Response := fIDHTTP.Post(NowPlayingURL, ParamList);
-            result := ParseNowPlayingResult(Response);
-        except
-
-            on E: EIdHTTPProtocolException do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + Response;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingException, lParam(PChar(MessageText)));
-                //(z.B. 404)
-            end;
-
-            on E: EIdSocketError do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingException, lParam(PChar(MessageText)));
-            end;
-
-            on E: EIdexception do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingException, lParam(PChar(MessageText)));
-            end;
-        end;
-
+    end else
+        result := ParseLfmError(aResponse, Mode)
 end;
 
 
@@ -1274,99 +1225,64 @@ begin
 end;
 procedure TScrobbler.fScrobbleNowPlaying;
 var tmpStat: TScrobbleStatus;
+    Response: UnicodeString;
+    MessageText: UnicodeString;
 begin
     try
-        if SessionID = '' then
-            tmpStat := fPerformHandShake
-        else
-            tmpStat := hs_OK;
-
-        if tmpStat = hs_Ok then
-        begin
-            tmpStat := fPerformNowPlayingNotification;
-            if tmpStat = hs_Ok then
-                // Scrobbeln erfolgreich
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingComplete, LParam(PChar(SuccessMessage)))
-            else
+        try
+            // 1st: Check, whether it is ok to scrobble
+            // should be done in this thread, as we eventually change the corresponding values
+            // if something is wrong here (Errorcount, nextAllowedScrobbelTime, etc.)
+            if Parent.fScrobblingAllowed then
             begin
-                // Scrobbeln war nicht erfolgreich. d.h.: (alte) Session-ID ist ungültig.
-                // also: Neuer Handshake und zweiter Versuch.
-                if tmpStat = hs_BADSESSION then
-                    tmpStat := fPerformHandShake
-                else
-                    tmpStat := hs_OK; // einfach neu probieren
-                if tmpStat = hs_Ok then
+                Response := fIDHTTP.Post(BaseApiURL, ParamList);
+                // Parse the Response and react properly
+                tmpStat := ParseNowPlayingResult(Response, sm_NowPlaying);
+                if tmpStat = hs_UnknownFailure then
                 begin
-                    // Handshake war ok, nochmal Scrobbeln
-                    tmpStat := fPerformNowPlayingNotification;
-                    if tmpStat = hs_Ok then
-                        // Scrobbeln erfolgreich
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingComplete, LParam(PChar(SuccessMessage)))
-                    else
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_NowPlayingError, lParam(tmpStat));
+                    MessageText := Scrobble_UnkownError + #13#10 + 'Server message:'#13#10 + Response;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
                 end;
             end;
+            // else: the main window was notified by the fScrobblingAllowed-method,
+            // that the scobbling was skipped and Endwork will be called via "JobDone"
+
+        except
+            on E: EIdHTTPProtocolException do
+            begin
+                //(z.B. 404)
+                // Parse the ErrorMessage and react properly
+                // here we get the lfm-errorcodes as InvalidSessionKey etc.
+                tmpStat := ParseNowPlayingResult(E.ErrorMessage, sm_NowPlaying);
+
+                // if the Status is hs_UnknownFailure
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
+                end;
+            end;
+
+            on E: EIdSocketError do
+            begin
+                Parent.CountError;
+                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
+            end;
+
+            on E: EIdexception do
+            begin
+                Parent.CountError;
+                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
+            end;
+
         end;
     finally
         self.free;
     end;
 end;
 
-
-function TScrobbler.ParseSubmissionResult(aResponse: string): TScrobbleStatus;
-var stat: String;
-begin
-    stat := Uppercase(Trim(aResponse));
-    if stat = 'OK' then
-      result := hs_OK
-    else
-      if stat = 'BADSESSION' then
-        result := hs_BADSESSION
-      else
-        if Pos('FAILED', Stat) > 0 then
-          result := hs_FAILED
-        else
-          result := hs_UnknownFailure;
-end;
-
-function TScrobbler.fPerformSubmissionNotification: TScrobbleStatus;
-var Response, MessageText: String;
-begin
-        try
-            ParamList[0] := 's=' + SessionID;
-            Response := fIDHTTP.Post(SubmissionURL, ParamList);
-            result := ParseSubmissionResult(Response);
-
-            if result = hs_failed then
-            // Some Failure => Text senden
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_Message, lParam(Response));
-
-        except
-            on E: EIdHTTPProtocolException do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ProtocolError + #13#10 + 'Server message: '#13#10 + E.Message + #13#10 + Response;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionException, lParam(PChar(MessageText)));
-                //(z.B. 404)
-            end;
-
-            on E: EIdSocketError do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionException, lParam(PChar(MessageText)));
-            end;
-
-            on E: EIdexception do
-            begin
-                result := hs_Exception;
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionException, lParam(PChar(MessageText)));
-            end;
-
-
-        end;                                                                   
-end;
 
 procedure TScrobbler.ScrobbleSubmit;
 var Dummy: Cardinal;
@@ -1379,44 +1295,52 @@ begin
 end;
 procedure TScrobbler.fScrobbleSubmit;
 var tmpStat: TScrobbleStatus;
+    Response, MessageText: UnicodeString;
 begin
     try
-        if SessionID = '' then
-            tmpStat := fPerformHandShake
-        else
-            tmpStat := hs_OK;
-
-        if tmpStat = hs_Ok then
-        begin
-            tmpStat := fPerformSubmissionNotification;
-            if tmpStat = hs_Ok then
-                // Scrobbeln erfolgreich
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionComplete, LParam(PChar(SuccessMessage)))
-            else
+        try
+            if Parent.fScrobblingAllowed then
             begin
-                // Scrobbeln war nicht erfolgreich. d.h.: (alte) Session-ID ist ungültig.
-                // also: Neuer Handshake und zweiter Versuch.
-                if tmpStat = hs_BADSESSION then
-                    tmpStat := fPerformHandShake
-                else
-                    tmpStat := hs_OK; // einfach neu probieren
-
-                if tmpStat = hs_Ok then
+                Response := fIDHTTP.Post(BaseApiURL, ParamList);
+                // Parse the Response and react properly
+                tmpStat := ParseNowPlayingResult(Response, sm_Scrobble);
+                if tmpStat = hs_UnknownFailure then
                 begin
-                    // Handshake war ok, nochmal Scrobbeln
-                    tmpStat := fPerformSubmissionNotification;
-                    if tmpStat = hs_Ok then
-                        // Scrobbeln erfolgreich
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionComplete, LParam(PChar(SuccessMessage)))
-                    else
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_SubmissionError, lParam(tmpStat));
+                    MessageText := Scrobble_UnkownError + #13#10 + 'Server message:'#13#10 + Response;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
                 end;
             end;
+        except
+            on E: EIdHTTPProtocolException do
+            begin
+                tmpStat := ParseNowPlayingResult(E.ErrorMessage, sm_Scrobble);
+
+                // if the Status is hs_UnknownFailure
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
+                end;
+            end;
+
+            on E: EIdSocketError do
+            begin
+                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
+            end;
+
+            on E: EIdexception do
+            begin
+                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
+            end;
         end;
+
     finally
         self.free;
     end;
 end;
+
 
 end.
 

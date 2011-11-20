@@ -1042,20 +1042,13 @@ begin
 end;
 
 function Handle_ScrobblerMessage(Var aMsg: TMessage): Boolean;
-var aList: TStrings;
 begin
     result := True;
     with Nemp_MainForm do
     Case aMsg.WParam of
-        SC_Message: begin
-            //aList := TStringlist.Create;
-            try
-                //aList.CommaText := PChar(aMsg.LParam);
-                NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            finally
-                //aList.Free;
-            end;
-        end;
+        SC_Message,
+        SC_Hint,
+        SC_Error: NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
 
         SC_BeginWork: begin
             if Assigned(OptionsCompleteForm) and OptionsCompleteForm.Visible then
@@ -1067,130 +1060,84 @@ begin
                 OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_InActive;
         end;
 
-        SC_TooMuchErrors: begin
-            // 3 oder mehr Fehler in Reihe - Nempscrobbler fällt zurück auf Handshake.
-            NempPlayer.NempScrobbler.LogList.Add('Oops. More than 3 errors in a row occured. Falling back to Handshake.');
-            AddErrorLog('Scrobbler:'#13#10'Oops. More than 3 errors in a row occured. Falling back to Handshake.'#13#10'-----');
-        end;
+        SC_JobIsDone: NempPlayer.NempScrobbler.JobDone;
 
-
-
-        // ======================================================
-        // HandShake
-        // ======================================================
-        SC_HandShakeError: Begin
-            // Im LParam steckt der Errorcode drin. Banned, Baduth, etc.
-            NempPlayer.NempScrobbler.LogList.Add('HandShake failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
-            NempPlayer.NempScrobbler.HandleHandshakeFailure(TScrobbleStatus(aMsg.LParam));
-            AddErrorLog('Scrobbler:'#13#10 + 'HandShake failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
-
-            if not NempPlayer.NempScrobbler.IgnoreErrors then
-                MessageDlg(ScrobbleFailureWait, mtWarning, [mbOK], 0);
-
-            //NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            // hier: Stop for 1, 2, 4, 8, .. Minutes
-            // Kein ErrorCount, das muss gesondert behandelt werden
-        end;
-
-        SC_HandShakeCancelled: begin
-            // Handshake wurde unterbunden
-            // LParam: ca. Zeit bis nächster Handshake erlaubt ist
-            NempPlayer.NempScrobbler.LogList.Add('Scrobbling disabled for some time. Next try in approx.' + IntToStr(aMsg.lParam) + ' minutes.');
-            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling disabled for some time. Next try in approx.' + IntToStr(aMsg.lParam) + ' minutes.' + #13#10'-----');
-            NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_OK); // D.h. Eigentlich alles Ok. ;-) => einfach nur fWorking auf False setzen.
-        end;
-
-        SC_HandShakeException: Begin
-            // LParam: ErrorMessage
-            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_EXCEPTION);
-            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
-            if not NempPlayer.NempScrobbler.IgnoreErrors then
-                MessageDlg(ScrobbleFailureWait, mtWarning, [mbOK], 0);
-
-            //NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            // hier: Stop for 1, 2, 4, 8, .. Minutes
-            // Kein ErrorCount, das muss gesondert behandelt werden
-        end;
-
-        // Message kommt nur an, wenn result = OK, trotzdem minimal gegenchecken. ;-)
-        SC_HandShakeComplete: begin
-            // LParam: Liste mit 'OK', ID, 2xURL
-            aList := TStringlist.Create;
-            try
-                aList.CommaText := PChar(aMsg.LParam);
-                if aList.Count >= 4 then
-                begin
-                    NempPlayer.NempScrobbler.SessionID     := aList[1];
-                    NempPlayer.NempScrobbler.NowPlayingURL := aList[2];
-                    NempPlayer.NempScrobbler.SubmissionURL := aList[3];
-                    NempPlayer.NempScrobbler.LogList.Add('HandShake Complete:');
-                    NempPlayer.NempScrobbler.LogList.Add('    SessionID: ' + NempPlayer.NempScrobbler.SessionID);
-                    NempPlayer.NempScrobbler.LogList.Add('    NowPlayingURL: ' + NempPlayer.NempScrobbler.NowPlayingURL);
-                    NempPlayer.NempScrobbler.LogList.Add('    SubmissionURL: ' + NempPlayer.NempScrobbler.SubmissionURL);
-                    NempPlayer.NempScrobbler.CountSuccess;
-                end else
-                begin
-                    NempPlayer.NempScrobbler.LogList.Add('Some strange error occured while handshaking.');
-                    AddErrorLog('Scrobbler:'#13#10 + 'Some strange error occured while handshaking.' + #13#10'-----');
-                    //NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-                    NempPlayer.NempScrobbler.HandleHandshakeFailure(hs_UnknownFailure);
-                end;
-            finally
-                aList.Free;
+        SC_ServiceUnavailable: begin
+            // try again.
+            // - after a few failures scrobbling will stop for a few minutes.
+            // LPAram: Mode (sm_auth, sm_nowplaying, sm_Scrobble)
+            case TScrobbleMode(aMsg.LParam) of
+                sm_auth: ; // Authentification was not possible. User should try again later.
+                sm_NowPlaying,
+                sm_Scrobble: // try again
+                    NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
             end;
         end;
 
         // ======================================================
-        // NowPlaying-Notification
+        // Scrobbling
         // ======================================================
-        SC_NowPlayingError: begin
-            NempPlayer.NempScrobbler.LogList.Add('Scrobbling ("Now Playing Notification") failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
-            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling ("Now Playing Notification") failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
-
-            NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
-        end;
-        SC_NowPlayingException: begin
-            // lparam: ErrorMessage
-            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
-            NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            // Hier NICHT NempPlayer.NempScrobbler.ScrobbleAgain;
-        end;
         SC_NowPlayingComplete: begin
             NempPlayer.NempScrobbler.LogList.Add((PChar(aMsg.LParam)));
-            NempPlayer.NempScrobbler.CountSuccess;
             NempPlayer.NempScrobbler.ScrobbleNextCurrentFile(NempPlayer.Status = PLAYER_ISPLAYING);
-        end;
-
-        // ======================================================
-        // Submission
-        // ======================================================
-        SC_SubmissionError: begin
-            NempPlayer.NempScrobbler.LogList.Add('Scrobbling failed: ' + ScrobbleStatusStrings[aMsg.LParam]);
-            AddErrorLog('Scrobbler:'#13#10 + 'Scrobbling failed: ' + ScrobbleStatusStrings[aMsg.LParam] + #13#10'-----');
-            NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
-        end;
-        SC_SubmissionException: begin
-            // lparam: ErrorMessage
-            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            AddErrorLog('Scrobbler:'#13#10 + PChar(aMsg.LParam) + #13#10'-----');
-
-            // NempPlayer.NempScrobbler.CountError(TScrobbleStatus(aMsg.LParam));
-            // Hier NICHT NempPlayer.NempScrobbler.ScrobbleAgain;
         end;
         SC_SubmissionComplete: begin
             NempPlayer.NempScrobbler.LogList.Add((PChar(aMsg.LParam)));
-            NempPlayer.NempScrobbler.CountSuccess;
             NempPlayer.NempScrobbler.ScrobbleNext(NempPlayer.Status = PLAYER_ISPLAYING);
         end;
-        SC_SubmissionSkipped: begin
+        SC_ScrobblingSkipped: begin
+            NempPlayer.NempScrobbler.LogList.Add(Format(ScrobblingSkipped, [Integer(aMsg.LParam)]));
+            AddErrorLog('Scrobbler:'#13#10 + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
+            if not NempPlayer.NempScrobbler.IgnoreErrors then
+                MessageDlg(Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]), mtWarning, [mbOK], 0);
+        end;
+        SC_ScrobblingSkippedAgain : begin
+            // no Messagebox here
+            NempPlayer.NempScrobbler.LogList.Add(Format(ScrobblingSkipped, [Integer(aMsg.LParam)]));
+            AddErrorLog('Scrobbler:'#13#10 + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
+        end;
+
+        SC_InvalidSessionKey: begin
+            NempPlayer.NempScrobbler.DoScrobble := False;
+            ReArrangeToolImages;
+            AddErrorLog('Scrobbler:'#13#10 + 'LastFM Session Key is missing or invalid');
+
+            if not NempPlayer.NempScrobbler.IgnoreErrors then
+            begin
+                if MessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+                begin
+                    if Not Assigned(OptionsCompleteForm) then
+                        Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+                    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
+                    OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
+                    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio9;
+                    OptionsCompleteForm.Show;
+                end;
+            end;
+        end;
+
+        SC_IPSpam: ; // nothing.
+
+        SC_UnknownScrobbleError: begin
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
+            AddErrorLog('Scrobbler:'#13#10 + Scrobble_UnkownError);
+            NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
+        end;
+        SC_IndyException: begin
+            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
+            AddErrorLog('Scrobbler:'#13#10 + Scrobble_ConnectError);
+            NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
+        end;
 
-            // gibts erstmal nicht mehr, da die Dinger alle in die Jobliste kommen und von da aussortiert werden
+        SC_ScrobbleException: begin
+            NempPlayer.NempScrobbler.LogList.Add(Scrobble_ErrorPleaseReport);
+            NempPlayer.NempScrobbler.LogList.Add('');
+            NempPlayer.NempScrobbler.DoScrobble := False;
+            ReArrangeToolImages;
 
+            AddErrorLog('Scrobbler:'#13#10 + ScrobbleException);
+            if not NempPlayer.NempScrobbler.IgnoreErrors then
+                MessageDlg(ScrobbleException, mtWarning, [mbOK], 0);
         end;
     end;
 

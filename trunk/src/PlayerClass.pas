@@ -37,7 +37,8 @@ uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnr
       ShellApi, IniFiles, Dialogs, Graphics, cddaUtils,
       bass, bass_fx, basscd, spectrum_vis, DateUtils,
       AudioFileClass,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
-      Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst, Easteregg, ScrobblerUtils;
+      Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
+      Easteregg, ScrobblerUtils, CustomizedScrobbler;
 
 const USER_WANT_PLAY = 1;
       USER_WANT_STOP = 2;
@@ -567,6 +568,7 @@ begin
     MainStation := TStation.Create(aHnd);
 
     NempScrobbler := TNempScrobbler.Create(aHnd);
+    NempScrobbler.InitScrobbler;
     PostProcessor := TPostProcessor.Create(aHnd);
     PostProcessor.NempScrobbler := NempScrobbler;
 
