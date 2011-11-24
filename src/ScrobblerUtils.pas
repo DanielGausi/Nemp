@@ -1,6 +1,6 @@
 {
 
-  ScrobblerUtils, Version 0.2
+  ScrobblerUtils, Version 0.2a
 
   A Borland/Codegear/Embarcadero Delphi-Class for Last.Fm scrobbling support.
   See http://www.last.fm in case you dont know what "scrobbling" means
@@ -51,6 +51,11 @@
   Version History:
   -------------------------------------------------------
 
+  v0.2a, November 2011
+  -------------------
+    * deleted some "uses"
+    * moved methods/fields of TApplicationScrobbler from "private" to "protected"
+
   v0.2, November 2011
   -------------------
     * switched to Scrobble-API 2.0
@@ -73,8 +78,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, StrUtils,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException,
-  Dialogs, md5, StdCtrls, ShellApi, DateUtils, Contnrs;
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack,
+  IdException, md5, StdCtrls, DateUtils, Contnrs;
 
 const
     UnixStartDate: TDateTime = 25569.0;
@@ -91,10 +96,9 @@ const
     Scrobble_FileTooShort = 'Submission skipped: Track too short (min. 30 seconds)';
     Scrobble_PlayAmount = 'Submission skipped: Playback too short (min. 50% or 4 minutes)';
 
-
     WM_Scrobbler = WM_User + 850;
 
-    ///SC_HandShakeError = 1;
+    ///SC_HandShakeError = 1;                     // old messages, used in v0.1
     ///SC_HandShakeCancelled = 2;
     ///SC_HandShakeException = 3;
     ///SC_NowPlayingError = 4;
@@ -259,9 +263,8 @@ type
     // Class TApplicationScrobbler
     // See readme.txt for further comments
     TApplicationScrobbler = class
-        private
+        protected
             fMainWindowHandle: HWND;
-            ErrorInARowCount: Integer;
 
             StartTimeUTC: TSystemTime;
             StartTimeLocal: TDateTime;
@@ -271,29 +274,25 @@ type
             FScrobbleJobCount: Integer;
 
             ValidSessionKey : Boolean;
+            ErrorInARowCount: Integer;
             EarliestNextScrobbleAttempt: TDateTime;
             TimeToWaitInterval: Integer;
 
-            // Check for errors.
-            // used by TScrobbler in Thread to decide to scrobble or not
-            function fScrobblingAllowed: Boolean;
-
-            procedure CountError;
-            procedure CountSuccess;
-
-            procedure ScrobbleCurrentFile;
-            procedure ScrobbleJobList;
-
-            function SortParams(params: TValueArray): UnicodeString;
-
-        protected
             fPlayingFile: TScrobbleFile;
             fNewFile: Boolean;
             fCurrentFileAdded: Boolean;
+            // Check for errors.
+            // used by TScrobbler in Thread to decide to scrobble or not
+            function fScrobblingAllowed: Boolean;
+            procedure CountError;
+            procedure CountSuccess;
+            procedure ScrobbleCurrentFile;
+            procedure ScrobbleJobList;
 
             procedure BeginWork;
             procedure EndWork;
 
+            function SortParams(params: TValueArray): UnicodeString;
             // YOU MUST implement GenerateSignature in your own TMyAppScrobbler!
             function GenerateSignature(SortedParams: UnicodeString): UnicodeString; virtual; abstract;
 
@@ -342,6 +341,8 @@ type
   procedure StartScrobbleNowPlaying(Scrobbler: TScrobbler);
   procedure StartScrobbleSubmit(Scrobbler: TScrobbler);
 
+  function ParseHTMLChars(s: UnicodeString): UnicodeString;
+
 
 implementation
 
@@ -364,6 +365,14 @@ begin
       Result := Result + WideChar(ASrc[i]);
     end;
   end;
+end;
+
+function ParseHTMLChars(s: UnicodeString): UnicodeString;
+begin
+    result := StringReplace(s, '&amp;', '&', [rfReplaceAll]);
+    result := StringReplace(result, '&lt;', '<', [rfReplaceAll]);
+    result := StringReplace(result, '&gt;', '>', [rfReplaceAll]);
+    result := StringReplace(result, '&quot;', '"', [rfReplaceAll]);
 end;
 
 
@@ -552,7 +561,7 @@ begin
         fPlayingFile.TrackNr := '';
 
     StartTimeDelphi := EncodeDateTime(s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, s.wMilliSeconds);
-    diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
+    diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Seconds per day
     fPlayingFile.StartTime := IntToStr(diff);
 
     fNewFile := True;
@@ -566,7 +575,6 @@ begin
     BeginWork;
     aScrobbler := TScrobbler.Create(fMainWindowHandle);
     try
-        //aScrobbler.ApiKey := ApiKey;
         aScrobbler.Parent := self;
         aScrobbler.GetToken;
     except
@@ -582,7 +590,6 @@ begin
     BeginWork;
     aScrobbler := TScrobbler.Create(fMainWindowHandle);
     try
-        //aScrobbler.ApiKey := ApiKey;
         aScrobbler.Token := Token;
         aScrobbler.Parent := self;
         aScrobbler.GetSession;
@@ -597,7 +604,7 @@ var complete: Boolean;
     tmp: TParameter;
     i: integer;
 begin
-    // quick bubblesort
+    // bubblesort
     complete := false;
     while not complete do
     begin
@@ -630,7 +637,6 @@ begin
         aScrobbler := TScrobbler.Create(fMainWindowHandle);
         try
             aScrobbler.Parent := self;
-            //aScrobbler.ApiKey := ApiKey;
             aScrobbler.Username   := self.Username;
             aScrobbler.SessionKey := self.SessionKey;
 
@@ -735,7 +741,6 @@ begin
     aScrobbler := TScrobbler.Create(fMainWindowHandle);
     try
           aScrobbler.Parent := self;
-          //aScrobbler.ApiKey := ApiKey;
           aScrobbler.Username    := Username;
           aScrobbler.SessionKey  := SessionKey;
 
@@ -1130,13 +1135,6 @@ end;
 
 
 procedure TScrobbler.ParseScrobbledFile(aResponse: UnicodeString);
-    function ParseHTMLChars(s: UnicodeString): UnicodeString;
-    begin
-        result := StringReplace(s, '&amp;', '&', [rfReplaceAll]);
-        result := StringReplace(result, '&lt;', '<', [rfReplaceAll]);
-        result := StringReplace(result, '&gt;', '>', [rfReplaceAll]);
-        result := StringReplace(result, '&quot;', '"', [rfReplaceAll]);
-    end;
 var p,p2: Integer;
     correctedValue: UnicodeString;
 begin
