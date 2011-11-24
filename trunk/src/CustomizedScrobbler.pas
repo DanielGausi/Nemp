@@ -1,13 +1,32 @@
 {
 
-  unit CustomizedScrobbler
+    Unit CustomizedScrobbler
 
-  Part of
-  ScrobblerUtils
+    - a customized ApplicationScrobbler, for Nemp
 
-  A Borland/Codegear/Embarcadero Delphi-Class for Last.Fm scrobbling support.
-  See http://www.last.fm in case you dont know what "scrobbling" means
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2010, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
 }
 
 
@@ -17,16 +36,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, ShellApi, DateUtils,
-  IniFiles, Contnrs, ScrobblerUtils, md5, AudioFileClass,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException;
+  IniFiles, Contnrs, ScrobblerUtils, md5, AudioFileClass, StrUtils,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
+  IdStack, IdException, HTMLHelper;
 
 type
-
-    // class TMyApplicationScrobbler
-
-    // Example how to use ScrobblerUtils in an application
-    // You MUST use your own class "TMyApplicationScrobbler",
-    // where you manage ApiKey/Secret and UserData the way you want
 
     TNempScrobbler = class(TApplicationScrobbler)
         private
@@ -34,6 +48,8 @@ type
 
             function EncodeSessionKey(PlainKey: String): String;
             function DecodeSessionKey(CryptedKey: String): String;
+
+            function ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
 
         protected
             function GenerateSignature(SortedParams: UnicodeString): UnicodeString; override;
@@ -76,7 +92,6 @@ begin
             result.v[i] := StrToIntDef(aByteStr, 0);
         end;
 end;
-
 
 
 procedure TNempScrobbler.InitScrobbler;
@@ -169,7 +184,7 @@ var cryptedKey: String;
 begin
     // Der quasi allzeit gültige Session-Key
     cryptedKey := Ini.ReadString('Scrobbler', 'SessionKey', '');
-    SessionKey := DecodeSessionKey(cryptedKey);
+    SessionKey := AnsiString(DecodeSessionKey(cryptedKey));
 
     Username   := Ini.ReadString('Scrobbler', 'Username', '');
     if (Username = '') or (SessionKey = '') then
@@ -181,46 +196,22 @@ begin
     begin
         //Status := hs_OK;
         LogList.Add('Username: ' + Username);
-        LogList.Add('Sessionkey: ' + Sessionkey);
+        LogList.Add('Sessionkey: ' + UnicodeString(Sessionkey));
     end;
 
     AlwaysScrobble := Ini.ReadBool('Scrobbler', 'AlwaysScrobble', False);
     DoScrobble := AlwaysScrobble;
     IgnoreErrors := Ini.ReadBool('Scrobbler', 'IgnoreErrors', True);
-
-
-   {
-    // The SessionKey (unfinite lifetime)
-    SessionKey := AnsiString(Ini.ReadString('Scrobbler', 'SessionKey', ''));
-    // Username of the lastFM user
-    Username   := Ini.ReadString('Scrobbler', 'Username', '');
-    if (Username = '') or (SessionKey = '') then
-    begin
-        LogList.Add('Loading Settings: No username/sessionkey found.');
-    end
-    else
-    begin
-        LogList.Add('Username: ' + Username);
-        LogList.Add('Sessionkey: ' + String(Sessionkey));
-    end;
-
-    AlwaysScrobble := Ini.ReadBool('Scrobbler', 'AlwaysScrobble', False);
-    DoScrobble := AlwaysScrobble;
-    }
 end;
 procedure TNempScrobbler.SaveToIni(Ini: TMemIniFile);
 var cryptedKey: String;
 begin
-    cryptedKey := EncodeSessionKey(SessionKey);
+    cryptedKey := EncodeSessionKey(UnicodeString(SessionKey));
     Ini.WriteString('Scrobbler', 'SessionKey', cryptedKey);
     Ini.WriteString('Scrobbler', 'Username', Username);
 
     Ini.WriteBool('Scrobbler', 'AlwaysScrobble', AlwaysScrobble);
     Ini.WriteBool('Scrobbler', 'IgnoreErrors', IgnoreErrors);
-
-    //Ini.WriteString('Scrobbler', 'SessionKey', String(SessionKey));
-    //Ini.WriteString('Scrobbler', 'Username', Username);
-    //Ini.WriteBool('Scrobbler', 'AlwaysScrobble', AlwaysScrobble);
 end;
 
 procedure TNempScrobbler.ChangeCurrentPlayingFile(aAudioFile: TAudioFile); // setzt das aktuelle Audiofile um und scrobbelt es ggf.
@@ -240,22 +231,55 @@ begin
     fPlayingFile.MBTrackID := '';
 
     if aAudioFile.Track <> 0 then
-        fPlayingFile.TrackNr := UTF8Encode(IntToStr(aAudioFile.Track))
+        fPlayingFile.TrackNr := IntToStr(aAudioFile.Track)
     else
         fPlayingFile.TrackNr := '';
 
     // zusätzlich fürs Submitten:
     StartTimeDelphi := EncodeDateTime(s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond, s.wMilliSeconds);
     diff := Round((StartTimeDelphi - UnixStartDate) * 86400); // 86400: Sekunden pro Tag
-    fPlayingFile.StartTime := UTF8Encode(IntToStr(Diff));
+    fPlayingFile.StartTime := IntToStr(Diff);
 
 
     fNewFile := True;
     fCurrentFileAdded := False;
 end;
 
+function TNempScrobbler.ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
+var oneTag, name, c: String;
+    tagBegin, tagEnd: Integer;
+    name1, name2, c1, c2: Integer;
+begin
+
+    tagBegin := pos('<tag>', aRawString);
+    tagEnd := pos('</tag>', aRawString);
+    result := '';
+    while (tagBegin <> 0) do
+    begin
+        oneTag := copy(aRawString, tagBegin + 5, tagEnd - tagBegin - 5);
+
+        name1 := pos('<name>', oneTag);
+        name2 := pos('</name>', oneTag);
+        name := ParseHTMLChars(copy(oneTag, name1 + 6, name2 - name1 - 6));
+
+        c1 := pos('<count>', oneTag);
+        c2 := pos('</count>', oneTag);
+        c := copy(oneTag, c1 + 7, c2 - c1 - 7);
+
+        if StrToIntDef(c, -1) >= 10 then          // ToDo: MinValue veränderbar, settings
+        if result = '' then
+            result := name
+        else
+            result := result + #13#10 + name;
+            // note: if we change the #13#10 here, we MUST also change it in TagCloud.RenameTag
+
+        tagBegin := posEx('<tag>', aRawString, tagEnd);
+        tagEnd := posEx('</tag>', aRawString, tagEnd + 4);
+    end;
+end;
+
 function TNempScrobbler.GetTags(aAudioFile: tAudioFile): UnicodeString;
-var url: UTF8String;
+var url: AnsiString;
     aIDHttp: TIdHttp;
     raw: String;
     n: Dword;
@@ -266,7 +290,7 @@ begin
         exit;
     end;
 
-{    // We MUST NOT call this methode more than 5x per second.
+    // We MUST NOT call this methode more than 5x per second.
     // So: Sleep for a while before the next call.
     // DO NOT Change this - Otherwise Nemp could be banned from LastFM-Services!
     n := GetTickCount;
@@ -275,10 +299,9 @@ begin
 
     fLastCall := GetTickCount;
     url := 'http://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
-    + '&artist=' + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Artist))
-    + '&track='  + StringToURLStringAnd(AnsiLowerCase(aAudioFile.Titel))
-    + '&api_key=' + api_key;
-
+    + '&artist=' + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Artist)))
+    + '&track='  + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Titel)))
+    + '&api_key=' + ApiKey;
 
     aIDHttp := TIdHttp.Create;
     try
@@ -287,17 +310,15 @@ begin
         aIDHttp.Request.UserAgent := 'Mozilla/3.0';
         aIDHttp.HTTPOptions :=  [];
         try
-            raw := aIDHttp.Get(url);
+            raw := aIDHttp.Get(UnicodeString(url));
         except
             raw := '';
         end;
         result := ParseRawTag(raw, Nil);
 
-
     finally
         aIDhttp.Free;
     end;
-}
 end;
 
 end.

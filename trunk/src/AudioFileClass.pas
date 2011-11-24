@@ -102,7 +102,7 @@ type
               'File not found',
               'FileCreate failed.',
               'Could not read from file',
-              'File is read-only',
+              'Could not write into file',
               'File is read-only',
               'Reading from stream failed',
               'Writing to stream failed',
