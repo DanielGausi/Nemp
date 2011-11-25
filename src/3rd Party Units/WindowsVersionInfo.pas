@@ -186,7 +186,9 @@ type
     function IsWorkstation : boolean;
     function IsMediaCenterEdition : boolean;
     function IsTabletPCEdition : boolean;
+  {$IFDEF USE_VCL}
   published
+  {$ENDIF}
     { Published declarations }
     property MajorVersion           : Byte read FMajorVersion;
     property MinorVersion           : Byte read FMinorVersion;

@@ -220,8 +220,6 @@ var NEMP_NAME: WideString;
   Savepath: WideString;
   ini: TMeminiFile;
 begin
-    result := True;
-
     NEMP_NAME := 'Nemp';
     //if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
     if IsExeInProgramSubDir then

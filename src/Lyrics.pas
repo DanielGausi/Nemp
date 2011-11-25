@@ -65,7 +65,7 @@ uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils,
               function DownloadCode(Source: String): String;
 
               // Get the HTML-Code and parse it
-              function GetLyricsFromURL(aURL: AnsiString): Boolean;
+              function GetLyricsFromURL(aURL: String): Boolean;
 
               // if this fails: Get all titles for the artist
               procedure GetAllTitlesFromArtist;
@@ -366,7 +366,7 @@ end;
       try to get the LyricBox from the code
     --------------------------------------------------------
 }
-function TLyrics.GetLyricsFromURL(aURL: AnsiString): Boolean;
+function TLyrics.GetLyricsFromURL(aURL: String): Boolean;
 var code: String;
     lStart, LEnd, i: Integer;
     rawLyrics, charcode, newline: String;

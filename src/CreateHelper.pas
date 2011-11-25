@@ -91,7 +91,7 @@ begin
                 Uselanguage(NempOptions.Language);
 
             if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
-                shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp + '"'),'autostart',0,sw_hide);
+                shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp + '"'),'autostart', Nil, sw_hide);
 
             //Player-Einstellungen lesen
             NempPlayer.LoadFromIni(Ini);

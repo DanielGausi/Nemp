@@ -1131,7 +1131,6 @@ const
   Check1: AnsiString = 'NempPlaylist';
   Check2: AnsiString = '3.1';
 begin
-      aStream := Nil;
       try
           aStream := TFileStream.Create(aFileName, fmOpenRead or fmShareDenyWrite);
           try

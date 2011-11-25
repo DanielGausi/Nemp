@@ -209,7 +209,7 @@ begin
     oldTagList := TStringList.Create;
     newTagList := TStringList.Create;
     try
-        oldTagList.Text := af.RawTagLastFM;
+        oldTagList.Text := String(af.RawTagLastFM);
         newTagList.Text := newTags;
 
         // 1.) delete duplicates, i.e. new tags, that are already there

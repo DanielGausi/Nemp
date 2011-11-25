@@ -279,7 +279,7 @@ begin
 end;
 
 function TNempScrobbler.GetTags(aAudioFile: tAudioFile): UnicodeString;
-var url: AnsiString;
+var url: String;
     aIDHttp: TIdHttp;
     raw: String;
     n: Dword;
@@ -301,7 +301,7 @@ begin
     url := 'http://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
     + '&artist=' + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Artist)))
     + '&track='  + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Titel)))
-    + '&api_key=' + ApiKey;
+    + '&api_key=' + String(ApiKey);
 
     aIDHttp := TIdHttp.Create;
     try
@@ -310,7 +310,7 @@ begin
         aIDHttp.Request.UserAgent := 'Mozilla/3.0';
         aIDHttp.HTTPOptions :=  [];
         try
-            raw := aIDHttp.Get(UnicodeString(url));
+            raw := aIDHttp.Get(url);
         except
             raw := '';
         end;

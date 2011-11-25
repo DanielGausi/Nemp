@@ -108,7 +108,7 @@ type
           property Width: Integer read fWidth;
           property Height: Integer read fheight;
 
-          constructor Create(aKey: UTF8String);
+          constructor Create(aKey: String);
 
           procedure MeasureOutput(aCanvas: TCanvas);
           procedure Paint(aCanvas: TCanvas);
@@ -235,7 +235,7 @@ type
           procedure ClearBreadCrumbs(Above: Integer);
 
           // Get a TTag-Object with a matching key
-          function GetTag(aKey: UTF8String): TTag;
+          function GetTag(aKey: String): TTag;
 
           function fGetTagList: TObjectList;
 
@@ -501,7 +501,7 @@ end;
 
 procedure TTagCloud.LoadFromIni(Ini: TMemIniFile);
 var NavDepth, i: Integer;
-    aTagString: UTF8String;
+    aTagString: String;
     newTag: TTag;
 begin
     NavDepth := Ini.ReadInteger('MedienBib', 'TagCloudNavDepth', 0);
@@ -1249,7 +1249,7 @@ end;
     --------------------------------------------------------
 }
 
-function TTagCloud.GetTag(aKey: UTF8String): TTag;
+function TTagCloud.GetTag(aKey: String): TTag;
 var i: Integer;
     tmp: TTag;
     KeyHashList: TObjectList;
@@ -1433,12 +1433,12 @@ begin
         autoCount := alltags.Count;
 
         // Add the Tags from the two RawTag-Strings to allTag-List
-        tmpTags.Text := aAudioFile.RawTagLastFM;
+        tmpTags.Text := String(aAudioFile.RawTagLastFM);
         for i := 0 to tmpTags.Count - 1 do
             if trim(tmpTags[i]) <> '' then
                 allTags.Add(trim(tmptags[i]));
 
-        tmpTags.Text := aAudioFile.RawTagUserDefined;
+        tmpTags.Text := String(aAudioFile.RawTagUserDefined);
         for i := 0 to tmpTags.Count - 1 do
             if trim(tmpTags[i]) <> '' then
                 allTags.Add(trim(tmptags[i]));
@@ -1528,7 +1528,7 @@ begin
         // Split the RawTagString. Use Stringlist for that purpose
         sl := TStringList.Create;
         try
-            sl.Text := af.RawTagLastFM;
+            sl.Text := String(af.RawTagLastFM);
             // Delete OldKey
             oi := sl.IndexOf(oldTag.Key);
             if (oi >= 0) and (oi < sl.Count) then
@@ -1537,7 +1537,7 @@ begin
             if sl.IndexOf(NewKey) = -1 then
                 sl.Add(NewKey);
             // Set RawTag
-            af.RawTagLastFM := sl.Text;
+            af.RawTagLastFM := UTF8String(sl.Text);
         finally
             sl.Free;
         end;
@@ -1585,14 +1585,14 @@ begin
         // Split the RawTagString. Use Stringlist for that purpose
         sl := TStringList.Create;
         try
-            sl.Text := af.RawTagLastFM;
+            sl.Text := String(af.RawTagLastFM);
             // Delete OldKey
             oi := sl.IndexOf(aTag.Key);
             if (oi >= 0) and (oi < sl.Count) then
                 sl.Delete(oi);
             // Set RawTag
             if sl.Count > 0 then
-                af.RawTagLastFM := sl.Text
+                af.RawTagLastFM := UTf8String(sl.Text)
             else
                 af.RawTagLastFM := ''; // just to be sure, empty Stringlist my return "#13#10"?
         finally
@@ -1661,7 +1661,7 @@ end;
 
 { TPaintTag }
 
-constructor TPaintTag.Create(aKey: UTF8String);
+constructor TPaintTag.Create(aKey: String);
 begin
     inherited Create(aKey);
     fHover := False;

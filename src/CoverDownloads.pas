@@ -99,8 +99,8 @@ type
             fJobList: TObjectList;   // Access only from VCL !!!
 
             fInternetConnectionLost: Boolean;
-            fXMLData: AnsiString;        // API-Response
-            fBestCoverURL: AnsiString;   // URL of the "extra-large" cover, if available
+            fXMLData: String;        // API-Response
+            fBestCoverURL: String;   // URL of the "extra-large" cover, if available
             fDataStream: TMemoryStream;  // Stream containing the Picture-Data
             fNewCoverFilename: String;   // Local Filename of the downloaded Coverfile
             fDataType: TPicType;
@@ -714,12 +714,12 @@ end;
     --------------------------------------------------------
 }
 function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
-var url: UTF8String;
+var url: String;
 begin
     url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
-        + '&api_key=' + NempPlayer.NempScrobbler.ApiKey
-        + '&artist=' + StringToURLStringAnd(AnsiLowerCase(fCurrentDownloadItem.Artist))
-        + '&album='  + StringToURLStringAnd(AnsiLowerCase(fCurrentDownloadItem.Album));
+        + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
+        + '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
+        + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
     try
         fXMLData := fIDHttp.Get(url);
         result := True;

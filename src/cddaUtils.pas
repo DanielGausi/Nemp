@@ -230,7 +230,7 @@ function CoverFilenameFromCDDA(aPath: String): String;
 var aDrive: Integer;
 begin
     aDrive := AudioDriveNumber(aPath);
-    result := BASS_CD_GetID(aDrive,BASS_CDID_CDDB);
+    result := String(BASS_CD_GetID(aDrive,BASS_CDID_CDDB));
     result := StringReplace(result, ' ', '-', [rfReplaceAll]);
     if Length(result) > 32 then
         SetLength(Result, 32);
@@ -240,7 +240,7 @@ function CddbIDFromCDDA(aPath: String): String;
 var aDrive: Integer;
 begin
     aDrive := AudioDriveNumber(aPath);
-    result := BASS_CD_GetID(aDrive,BASS_CDID_CDDB);
+    result := String(BASS_CD_GetID(aDrive,BASS_CDID_CDDB));
 end;
 
 
@@ -349,14 +349,14 @@ begin
                 // 1. Query
                 queryReply := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_QUERY);
 
-                if AnsiStartsText('200', queryReply) then
+                if AnsiStartsText('200', String(queryReply)) then
                 begin
                     // only one entry for this disc found
                     fCachedCddbData := BASS_CD_GetID(self.fIndex, BASS_CDID_CDDB_READ + 0);
                 end else
                 begin
-                    if AnsiStartsText('210', queryReply)
-                        or AnsiStartsText('211', queryReply)
+                    if AnsiStartsText('210', String(queryReply))
+                        or AnsiStartsText('211', String(queryReply))
                     then
                     begin
                         // User selection needed
@@ -450,7 +450,7 @@ begin
     numberFound := False;
     for i := 1 to length(aPath) do
     begin
-        if aPath[i] in ['0','1','2','3','4','5','6','7','8','9'] then
+        if CharInSet(apath[i], ['0','1','2','3','4','5','6','7','8','9']) then
         begin
             numberFound := True;
             numberString := numberString + aPath[i];
@@ -495,17 +495,17 @@ end;
 function TCDDAFile.fGetDataFromCDText(aDrive, aTrack: Integer): Boolean;
 var CompleteText: PAnsiChar;
 
-      function GetValue(aKey: AnsiString; aText: PAnsiChar): AnsiString;
+      function GetValue(aKey: String; aText: PAnsiChar): String;
       var tmp: PAnsiChar;
       begin
           result := '';
           tmp := aText;
-          while (trim(tmp) <> '') do
+          while (trim(String(tmp)) <> '') do
           begin
-              if AnsiStartsText(aKey, tmp) then
+              if AnsiStartsText(string(aKey), string(tmp)) then
               begin
                   // we found the entry
-                  result := Copy(tmp, Length(aKey)+2, Length(tmp) - Length(aKey));
+                  result := String(Copy(tmp, Length(aKey)+2, Length(tmp) - Length(aKey)));
                   break;
               end;
               tmp := tmp + Length(tmp) +1 ;
@@ -650,7 +650,7 @@ begin
                         // CD audio is always 44100hz stereo 16-bit. That is 176400 bytes per second.
                         fDuration := ByteLength Div 176400;
 
-                        fCddbID := BASS_CD_GetID(fDriveNumber, BASS_CDID_CDDB);
+                        fCddbID := String(BASS_CD_GetID(fDriveNumber, BASS_CDID_CDDB));
 
                         if not fGetDataFromCDText(fDriveNumber, fTrack) then
                         begin
