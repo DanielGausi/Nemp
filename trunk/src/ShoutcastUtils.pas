@@ -608,22 +608,22 @@ begin
     aStream.Read(len, SizeOf(len));
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
-    fMediaType := tmp;
+    fMediaType := String(tmp);
 
     aStream.Read(len, SizeOf(len));
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
-    fURL := tmp;
+    fURL := String(tmp);
 
     aStream.Read(len, SizeOf(len));
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
-    fGenre := tmp;
+    fGenre := String(tmp);
 
     aStream.Read(len, SizeOf(len));
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
-    fCurrentTitle := tmp;
+    fCurrentTitle := String(tmp);
 end;
 procedure TStation.SaveToStream(aStream: TStream);
 var len: Integer;

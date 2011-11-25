@@ -2218,7 +2218,7 @@ begin
                     LyricWikiResponse := Lyrics.GetLyrics(aAudiofile.Artist, aAudiofile.Titel);
                     if LyricWikiResponse <> '' then
                     begin
-                        backup := aAudioFile.Lyrics;
+                        backup := String(aAudioFile.Lyrics);
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
                         aErr := aAudioFile.SetAudioData(True);
                             // SetAudioData(True) : Check before entering this thread, whether this operation
@@ -2230,7 +2230,7 @@ begin
                         end else
                         begin
                             // discard new lyrics
-                            aAudioFile.Lyrics := backup;
+                            aAudioFile.Lyrics := Utf8String(backup);
                             inc(failed);
                             ErrorOcurred := True;
                             // FehlerMessage senden
@@ -2402,9 +2402,9 @@ begin
                     inc(failed);
                 end else
                 begin
-                    backup := af.RawTagLastFM;
+                    backup := String(af.RawTagLastFM);
                     // process new Tags. Rename, delete ignored and duplicates.
-                    af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
+                    af.RawTagLastFM := Utf8String(ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList));
                     aErr := af.SetAudioData(True);
                             // SetAudioData(True) : Check before entering this thread, whether this operation
                             //                      is allowed. If NOT: Do not enter this thread at all!

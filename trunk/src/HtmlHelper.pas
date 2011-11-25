@@ -40,7 +40,7 @@ uses Windows, Messages, SysUtils, Variants, Classes,
 function WordUppercase(s: String): String;
 function ReplaceGeneralEntities(s: String): String;
 function EscapeHTMLChars(s: String): String;
-function StringToURLStringAnd(aUTF8String: UTF8String): AnsiString;
+function StringToURLStringAnd(aUTF8String: UTF8String): String;
 
 
 implementation
@@ -193,12 +193,12 @@ begin
 end;
 
 
-function StringToURLStringAnd(aUTF8String: UTF8String): AnsiString;
+function StringToURLStringAnd(aUTF8String: UTF8String): String;
 var i: integer;
 begin
     result := '';
     for i := 1 to length(aUTF8String) do
-        result := result + '%'  + AnsiString(IntToHex(Ord(aUTF8String[i]),2));
+        result := result + '%'  + IntToHex(Ord(aUTF8String[i]),2);
 end;
 
 

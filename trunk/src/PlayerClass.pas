@@ -476,12 +476,12 @@ procedure DoMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
 var
   p: Integer;
   oldTitel: UnicodeString;
-  meta: PAnsiChar;
+  meta: String;
 begin
   oldTitel := '';
-  meta := BASS_ChannelGetTags(channel, BASS_TAG_META);
+  meta := String(BASS_ChannelGetTags(channel, BASS_TAG_META));
 
-  if (meta <> nil) AND (TNempPlayer(User).MainAudioFile <> NIL) then
+  if (meta <> '') AND (TNempPlayer(User).MainAudioFile <> NIL) then
   begin
         oldTitel := TNempPlayer(User).PlayingTitel;
         p := Pos('StreamTitle=', meta);
@@ -503,6 +503,7 @@ procedure DoOggMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
 var
   oldTitel: UnicodeString;
   meta: PAnsiChar;
+  metaStr: String;
 begin
   oldTitel := '';
 
@@ -516,13 +517,14 @@ begin
           try
               while (meta^ <> #0) do
               begin
-                  if (AnsiUppercase(Copy(meta, 1, 7)) = 'ARTIST=') then
+                  metaStr := String(meta);
+                  if (AnsiUppercase(Copy(metaStr, 1, 7)) = 'ARTIST=') then
                   begin
-                    TNempPlayer(User).MainAudioFile.Artist := Copy(meta, 8, Length(meta) - 7);
+                    TNempPlayer(User).MainAudioFile.Artist := Copy(metaStr, 8, Length(metaStr) - 7);
                   end else
-                    if (AnsiUppercase(Copy(meta,1,6)) = 'TITLE=') then
+                    if (AnsiUppercase(Copy(metaStr,1,6)) = 'TITLE=') then
                     begin
-                      TNempPlayer(User).MainAudioFile.Titel := trim(Copy(meta, 7, Length(meta) - 6 ));
+                      TNempPlayer(User).MainAudioFile.Titel := trim(Copy(metaStr, 7, Length(metaStr) - 6 ));
                     end;
                   meta := meta + Length(meta) + 1;
               end;
@@ -2395,6 +2397,7 @@ end;
 procedure TNempPlayer.GetURLDetails;
 var
   icy: PAnsiChar;
+  icyStr: String;
 begin
   begin
     // Dies hier wird einmalig beim Starten des Streams aufgerufen!
@@ -2407,19 +2410,21 @@ begin
       try
         while (icy^ <> #0) do
         begin
-          if (Copy(icy, 1, 9) = 'icy-name:') then
-          begin
-            MainAudioFile.Description := trim(Copy(icy, 10, Length(icy) - 9));
-          end
-          else if (Copy(icy, 1, 7) = 'icy-br:') then
-          begin
-            MainAudioFile.Bitrate := StrTointDef(Copy(icy, 8, Length(icy) - 7),-1);
-          end else
-            if (Copy(icy,1,10) = 'icy-genre:') then
+            icyStr := String(icy);
+            if (Copy(icyStr, 1, 9) = 'icy-name:') then
             begin
-              MainAudioFile.Genre := trim(Copy(icy, 11, Length(icy) - 10 ));
-            end;
-          icy := icy + Length(icy) + 1;
+                MainAudioFile.Description := trim(Copy(icyStr, 10, Length(icyStr) - 9));
+            end
+            else if (Copy(icyStr, 1, 7) = 'icy-br:') then
+            begin
+                MainAudioFile.Bitrate := StrTointDef(Copy(icyStr, 8, Length(icyStr) - 7),-1);
+            end
+            else
+                if (Copy(icyStr,1,10) = 'icy-genre:') then
+                begin
+                    MainAudioFile.Genre := trim(Copy(icyStr, 11, Length(icyStr) - 10 ));
+                end;
+              icy := icy + Length(icy) + 1;
         end;
       except
         // Wenn was schief gelaufen ist: Dann gibts halt keine Tags...
@@ -2491,7 +2496,7 @@ var
   s: String;
   r: TRect;
 begin
-    Result := 0;
+    //Result := 0;
     ddc := CreateCompatibleDC(0);
 
     b := TBitmap.create;

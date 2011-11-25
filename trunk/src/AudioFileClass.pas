@@ -142,7 +142,7 @@ type
     TTag = class
       private
           // The key of the tag, e.g. 'Pop', 'really great song', '80s', ...
-          fKey: UTF8String;
+          fKey: String;
 
           //
           fBreadCrumbIndex: Integer;
@@ -156,12 +156,12 @@ type
           AudioFiles: TObjectList;
           // The number of AudioFiles tagged with this Tag.
           property count: Integer read GetCount;
-          property Key: UTF8String read fKey;
+          property Key: String read fKey;
           property IsAutoTag: Boolean read fIsAutoTag write fIsAutoTag;
           property TotalCount: Integer read fTotalCount write fTotalCount;
 
           property BreadCrumbIndex: Integer read fBreadCrumbIndex write fBreadCrumbIndex;
-          constructor Create(aKey: UTF8String);
+          constructor Create(aKey: String);
           destructor Destroy; override;
     end;
 
@@ -700,7 +700,7 @@ end;
 
  { TTag }
 
-constructor TTag.Create(aKey: UTF8String);
+constructor TTag.Create(aKey: String);
 begin
     inherited create;
     AudioFiles := TObjectList.Create(False);
@@ -738,7 +738,7 @@ var
     Stream: TFileStream;
     tmp: TMP3Error;
 begin
-    result := MP3ERR_None;
+    //result := MP3ERR_None;
     try
         Stream := TFileStream.Create(filename, fmOpenRead or fmShareDenyWrite);
         try
@@ -1178,8 +1178,8 @@ end;
 
 function TAudioFile.GetTagDisplayString(allowEdit: Boolean): String;
 begin
-    if trim(RawTagLastFM) <> '' then
-        result := StringReplace(Trim(RawTagLastFM), #13#10, ', ', [rfreplaceAll])
+    if trim(String(RawTagLastFM)) <> '' then
+        result := StringReplace(Trim(String(RawTagLastFM)), #13#10, ', ', [rfreplaceAll])
     else
     begin
         if (AnsiLowercase(Extension) = 'mp3')
@@ -1622,12 +1622,12 @@ begin
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
         Comment := FlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
-        Lyrics  := FlacFile.GetPropertyByFieldname(VORBIS_LYRICS);
+        Lyrics  := UTF8String(FlacFile.GetPropertyByFieldname(VORBIS_LYRICS));
         // Playcounter/Rating: Maybe incompatible with other Taggers
         PlayCounter := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
         Rating :=  StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        RawTagLastFM := FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
+        RawTagLastFM := UTF8String(FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
     finally
         FlacFile.Free;
     end;
@@ -1685,12 +1685,12 @@ begin
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
         Comment := OggVorbisFile.GetPropertyByFieldname(VORBIS_COMMENT);
-        Lyrics  := OggVorbisFile.GetPropertyByFieldname(VORBIS_LYRICS);
+        Lyrics  := UTF8String(OggVorbisFile.GetPropertyByFieldname(VORBIS_LYRICS));
         // Playcounter/Rating: Maybe incompatible with other Taggers
         PlayCounter := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
         Rating :=  StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING), 0);
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        RawTagLastFM := OggVorbisFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
+        RawTagLastFM := UTF8String(OggVorbisFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
     finally
         OggVorbisFile.Free;
     end;
@@ -1820,6 +1820,7 @@ begin
     // Zurücksetzen, damit die Funktion MedienBib.InitCover später anschlagen kann!
       CoverID := '';
 
+    result := AUDIOERR_None;
     if NOT FileExists(WaveFile) then
     begin
         SetUnknown;
@@ -2065,7 +2066,7 @@ end;
 function TAudioFile.QuickUpdateOggTag(aFilename: String): TOggVorbisError;
 var OggVorbisFile: TOggVorbisFile;
 begin
-    result := OVErr_None;
+    //result := OVErr_None;
     OggVorbisFile := TOggVorbisFile.Create;
     try
         OggVorbisFile.ReadFromFile(aFilename);
@@ -2087,7 +2088,7 @@ end;
 function TAudioFile.QuickUpdateFlacTag(aFilename: String): TFlacError;
 var FlacFile: TFlacFile;
 begin
-    result := FlacErr_None;
+    //result := FlacErr_None;
     FlacFile := TFlacFile.Create;
     try
         FlacFile.ReadFromFile(aFilename);
@@ -2155,7 +2156,7 @@ var
     ID3v1Tag:TID3v1Tag;
     ms: TMemoryStream;
 begin
-    result := MP3ERR_None;
+    // result := MP3ERR_None;
     //if Flags = SAD_None then
         // Do not update the file
     //    exit;
@@ -2188,7 +2189,7 @@ begin
         // if Comment <> AUDIOFILE_UNKOWN then
             ID3v2tag.Comment:= Comment;
         if Lyrics <> '' then
-            Id3v2Tag.Lyrics := Lyrics;
+            Id3v2Tag.Lyrics := String(Lyrics);
 
         ID3v2Tag.Year := Year;
         if Track > 0 then
@@ -2237,7 +2238,7 @@ end;
 function TAudioFile.SetOggVorbisData(filename: UnicodeString): TOggVorbisError;
 var OggVorbisFile: TOggVorbisFile;
 begin
-    result := OVErr_None;
+    //result := OVErr_None;
     //if Flags = SAD_None then
         // Do not update the file
     //    exit;
@@ -2257,7 +2258,7 @@ begin
         OggVorbisFile.Genre := Genre;
 
         OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Lyrics);
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
         // Playcounter/Rating: Maybe incompatible with other Taggers
         if Playcounter > 0 then
             OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
@@ -2270,7 +2271,7 @@ begin
             OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
 
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
 
         result := OggVorbisFile.WriteToFile(filename);
     finally
@@ -2280,7 +2281,7 @@ end;
 function TAudioFile.SetFlacData(filename: UnicodeString): TFlacError;
 var FlacFile: TFlacFile;
 begin
-    result := FlacErr_None;
+    //result := FlacErr_None;
 
     //if Flags = SAD_None then
         // Do not update the file
@@ -2301,7 +2302,7 @@ begin
         FlacFile.Genre := Genre;
 
         FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
-        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Lyrics);
+        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
         // Playcounter/Rating: Maybe incompatible with other Taggers
         if Playcounter > 0 then
             FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
@@ -2314,7 +2315,7 @@ begin
             FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
 
         // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, RawTagLastFM);
+        FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
 
         result := FlacFile.WriteToFile(filename);
     finally
@@ -2618,7 +2619,7 @@ begin
             MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
-            MP3DB_LASTFM_TAGS : RawTagLastFM := ReadTextFromStream(aStream);
+            MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
@@ -2709,7 +2710,7 @@ begin
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
-            MP3DB_LASTFM_TAGS : RawTagLastFM := ReadTextFromStream(aStream);
+            MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
             MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
 
@@ -2782,7 +2783,7 @@ begin
       WriteTextToStream(aStream, MP3DB_ALBUM, Album);
 
     if RawTagLastFM <> '' then
-        WriteTextToStream(aStream, MP3DB_LASTFM_TAGS, RawTagLastFM);
+        WriteTextToStream(aStream, MP3DB_LASTFM_TAGS, String(RawTagLastFM));
 
     if Duration <> 0 then
     begin

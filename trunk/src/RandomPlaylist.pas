@@ -371,7 +371,7 @@ begin
     LastCheckedTags.Clear;
     for i := 0 to cbGenres.Count - 1 do
         if cbGenres.Checked[i] then
-            LastCheckedTags.Add(TTag(cbGenres.Items.Objects[i]).Key);
+            LastCheckedTags.Add(String(TTag(cbGenres.Items.Objects[i]).Key));
 end;
 
 procedure TRandomPlaylistForm.RecheckLastCheckedTags;
@@ -379,7 +379,7 @@ var i: Integer;
 begin
     for i := 0 to cbGenres.Count - 1 do
     begin
-        cbGenres.Checked[i] := LastCheckedTags.IndexOf( TTag(cbGenres.Items.Objects[i]).Key ) >= 0;
+        cbGenres.Checked[i] := LastCheckedTags.IndexOf(String(TTag(cbGenres.Items.Objects[i]).Key)) >= 0;
     end;
 end;
 
@@ -396,7 +396,7 @@ begin
     for i := 0 to LocalTopTags.Count - 1 do
     begin
         aTag := TTag(LocalTopTags[i]);
-        cbGenres.AddItem( aTag.key + ' (' + IntToStr(aTag.TotalCount)+')', aTag);
+        cbGenres.AddItem(String(aTag.key) + ' (' + IntToStr(aTag.TotalCount)+')', aTag);
     end;
 end;
 
@@ -517,7 +517,7 @@ begin
         begin
             Ini.WriteString('GenreSetting' + IntToStr(idx),
                             'Check' + IntToStr(GenresCount),
-                            TTag(cbGenres.Items.Objects[i]).Key );
+                            String(TTag(cbGenres.Items.Objects[i]).Key) );
             inc(GenresCount);
         end;
     end;

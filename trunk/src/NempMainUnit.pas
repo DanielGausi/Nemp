@@ -2985,8 +2985,6 @@ end;
 procedure TNemp_MainForm.MM_ML_SearchDirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
-    aNode: PVirtualNode;
-    Data: PStringTreeData;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
@@ -4226,8 +4224,8 @@ begin
     if assigned(NewNode) then
     begin
         tmpNode := NewNode;
-        if (vsDisabled in NewNode.States) then
-            NewNode := NewNode.NextSibling;
+        //if (vsDisabled in NewNode.States) then
+        //    NewNode := NewNode.NextSibling;
 
         Allowed:= not (vsDisabled in tmpNode.States);
     end
@@ -4928,7 +4926,7 @@ begin
         BtnCancelEditTags.Top  := MemBibTags.Top - 19; //+ MemBibTags.Height - 21;
         BtnCancelEditTags.Left := MemBibTags.Left + MemBibTags.Width - 28 - 29;
 
-        MemBibTags.Text := MedienBib.CurrentAudioFile.RawTagLastFM;
+        MemBibTags.Text := String(MedienBib.CurrentAudioFile.RawTagLastFM);
 
         LblBibTags.Visible := False;
         MemBibTags.Visible := True;
@@ -4944,7 +4942,7 @@ var ListOfFiles: TObjectList;
     ListFile, BibFile: TAudioFile;
     i: Integer;
     aErr: TAudioError;
-    backup: String;
+    backup: UTF8String;
 begin
     if Assigned(MedienBib.CurrentAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
@@ -4957,12 +4955,12 @@ begin
             if CommasInString(MemBibTags.Text) then
             begin
                 if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
-                    MedienBib.CurrentAudioFile.RawTagLastFM := Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text)))
+                    MedienBib.CurrentAudioFile.RawTagLastFM := UTF8String(Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text))))
                 else
-                    MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+                    MedienBib.CurrentAudioFile.RawTagLastFM := UTF8String(Trim(MemBibTags.Text));
             end
             else
-                MedienBib.CurrentAudioFile.RawTagLastFM := Trim(MemBibTags.Text);
+                MedienBib.CurrentAudioFile.RawTagLastFM := UTF8String(Trim(MemBibTags.Text));
 
             // write Data to the file
             aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
@@ -5254,7 +5252,7 @@ begin
               Brush.Style := bsClear;
               Font.Size := 8; // fixed size. Otherwise the Indent can be to small
               Font.Style := [fsUnderline];
-              TextOut(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top,
+              TextOut(ItemRect.Left + Integer(PlaylistVST.Indent), ItemRect.Top,
                       IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
           end;
       end;
@@ -11040,45 +11038,14 @@ end;
 
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
-//a: TAudiofile;
-// aDrive: TDrive;
-// t: TDateTime;
-
-// lyrics: TLyrics;
-//  s: String;
-  sl: TStringList;
-//c: TCDDAFile;
-delList: TObjectList;
-//err: TCDDAError;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
 
 
-//sl := tStringlist.create;
-
-
-//if RechnerInWG(handle, 0, Nil, sl ) then
-
-//ScanNetworkResources(RESOURCETYPE_DISK, RESOURCEDISPLAYTYPE_SERVER, sl);
-
-//showmessage(sl.Text)
-// else
-//wuppdi;
-;
-//exit;
-
-    {
-delList := TObjectList.Create;
-
-MedienBib.UserInputDeadFiles(delList);
-SendMessage(Handle, WM_MedienBib, MB_UserInputDeadFiles, lParam(delList));
-delList.Free;
-      }
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
-
 
 end;
 
@@ -11101,7 +11068,7 @@ begin
         else
             tmp := NempOptions.DisplayApp;
 
-        shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + tmp + '"'),'autostart',0,sw_show);
+        shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + tmp + '"'),'autostart',NIL,sw_show);
 
     // if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
     //

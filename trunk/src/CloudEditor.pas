@@ -126,7 +126,7 @@ type
 
     procedure FillTagTree(reselect: Boolean = False);
     procedure SortTags;                          // Resort the Tags
-    procedure ReselectNode(aKey: UTF8String);    // Reselect a node with the given key
+    procedure ReselectNode(aKey: String);    // Reselect a node with the given key
 
 
     procedure ReselectIgnoreNode(aKey: String);
@@ -268,7 +268,7 @@ begin
 end;
 
 
-procedure TCloudEditorForm.ReselectNode(aKey: UTF8String);
+procedure TCloudEditorForm.ReselectNode(aKey: String);
 var aNode: PVirtualNode;
     Data: PTagTreeData;
 begin
@@ -289,7 +289,7 @@ procedure TCloudEditorForm.FillTagTree(reselect: Boolean = False);
 var i: integer;
     oldNode: PVirtualNode;
     oldData: PTagTreeData;
-    oldKey: UTf8String;
+    oldKey: String;
 begin
     if Reselect then
     begin
@@ -927,6 +927,7 @@ begin
         MedienBib.UpdateId3tags;
     end;
 end;
+
 
 {
     --------------------------------------------------------

@@ -545,7 +545,7 @@ begin
         // write Tags to file
         if ValidMp3File then
         begin
-            aErr := Mp3ToAudioError(UpdateID3v1InFile);
+            Mp3ToAudioError(UpdateID3v1InFile);
             aErr := Mp3ToAudioError(UpdateID3v2InFile);
         end;
         if ValidOggFile then
@@ -1800,7 +1800,7 @@ begin
         finally
             TagStream.Free;
         end;
-        Memo_Tags.Text := localtags;
+        Memo_Tags.Text := String(localtags);
     end
     else
         if ValidOggFile then
@@ -1809,7 +1809,7 @@ begin
             if ValidFlacFile then
                 Memo_Tags.Text := FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES)
             else
-                Memo_Tags.Text := CurrentAudioFile.RawTagLastFM;
+                Memo_Tags.Text := String(CurrentAudioFile.RawTagLastFM);
 end;
 
 {
@@ -2013,7 +2013,7 @@ procedure TFDetails.ShowDetails(AudioFile:TAudioFile; Source: Integer = SD_MEDIE
 var OggResult: TOggVorbisError;
     FlacResult: TFlacError;
     ci: Integer;
-    ct: TTabSheet;
+    //ct: TTabSheet;
 begin
 
   // Hier auch die Abfrage zum Speichern rein
@@ -2132,7 +2132,7 @@ begin
   MainPageControl.OnChange := Nil;
   // backup Current active Page
   ci := MainPageControl.ActivePageIndex;
-  ct := MainPageControl.ActivePage;
+  //ct := MainPageControl.ActivePage;
 
   // Set proper Tabs (in)visible
   Tab_MpegInformation.Visible := ValidMp3File; // This is the one with id3v1 // id3v2
@@ -2557,10 +2557,10 @@ begin
             end else
             begin
                 // process new Tags. Rename, delete ignored and duplicates.
-                af.RawTagLastFM := ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList);
+                af.RawTagLastFM := UTF8String(ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList));
             end;
             // Show tags of temporary file in teh memo
-            Memo_Tags.Text := af.RawTagLastFM;
+            Memo_Tags.Text := String(af.RawTagLastFM);
         finally
             TagPostProcessor.Free;
         end;

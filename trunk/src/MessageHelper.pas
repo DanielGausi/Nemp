@@ -801,7 +801,7 @@ begin
                                end;
         ST_PlaylistDownloadComplete : begin
                                   s := PAnsiChar(aMsg.LParam);
-                                  FS := Nil;
+                                  //FS := Nil;
                                   if s <> '' then
                                   begin
                                       filename := GetProperFilenameForPlaylist(s);

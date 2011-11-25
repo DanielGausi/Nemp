@@ -59,7 +59,7 @@ object CDOpenDialog: TCDOpenDialog
       Width = 248
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemHeight = 0
       TabOrder = 1
       OnChange = cb_DrivesChange
     end

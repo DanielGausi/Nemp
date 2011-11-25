@@ -135,8 +135,8 @@ begin
         aDrive := TCDDADrive(CDDriveList[i]);
         cb_Drives.Items.Add(
               aDrive.Letter + ':\ '
-            + aDrive.Vendor + ' '
-            + aDrive.Product  ); // + ' v' + aDrive.Revision );
+            + String(aDrive.Vendor) + ' '
+            + String(aDrive.Product)  ); // + ' v' + aDrive.Revision );
     end;
     cb_Drives.ItemIndex := 0;
     CurrentDrive := 0;
