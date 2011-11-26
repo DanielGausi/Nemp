@@ -74,7 +74,9 @@ end;
 
 procedure TCDOpenDialog.FormShow(Sender: TObject);
 begin
+    cb_AutoCddb.OnClick := Nil;
     cb_AutoCddb.checked := Nemp_MainForm.NempOptions.UseCDDB;
+    cb_AutoCddb.OnClick := cb_AutoCddbClick;
     // Get list of available drives
     EnsureDriveListIsFilled;     // from cddaUtils
     // Clear Files

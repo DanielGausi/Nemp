@@ -47,8 +47,8 @@ object DeleteSelection: TDeleteSelection
     Anchors = [akTop, akRight]
   end
   object LblExplaination: TLabel
-    Left = 247
-    Top = 27
+    Left = 167
+    Top = 24
     Width = 9
     Height = 13
     Caption = '...'
@@ -60,9 +60,9 @@ object DeleteSelection: TDeleteSelection
     ParentFont = False
   end
   object LblWhatToDo: TLabel
-    Left = 247
+    Left = 167
     Top = 57
-    Width = 279
+    Width = 359
     Height = 27
     Anchors = [akLeft, akTop, akRight]
     AutoSize = False
@@ -70,9 +70,9 @@ object DeleteSelection: TDeleteSelection
     WordWrap = True
   end
   object LblExplaination2: TLabel
-    Left = 247
-    Top = 42
-    Width = 82
+    Left = 167
+    Top = 40
+    Width = 9
     Height = 13
     Caption = '...'
     Font.Charset = DEFAULT_CHARSET
@@ -96,7 +96,7 @@ object DeleteSelection: TDeleteSelection
   object cbDrives: TCheckListBox
     Left = 8
     Top = 24
-    Width = 233
+    Width = 153
     Height = 66
     ItemHeight = 13
     TabOrder = 1
@@ -146,7 +146,7 @@ object DeleteSelection: TDeleteSelection
     Left = 288
     Top = 168
     Bitmap = {
-      494C010108002800600040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800640040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000000010000C000000001002000000000000000
       0300000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
