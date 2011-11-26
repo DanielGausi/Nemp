@@ -37,7 +37,7 @@ object AboutForm: TAboutForm
       ''
       
         '[url="http://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/172' +
-        '590512836097"]Nemp auf Facebook[/url]'
+        '590512836097"]Nemp on Facebook[/url]'
       ''
       ''
       '[row="250"]'

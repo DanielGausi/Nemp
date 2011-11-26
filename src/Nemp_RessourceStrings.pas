@@ -256,7 +256,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     Scrobble_InActive = 'Scrobble Log (Status: Idle)';
     Scrobble_Offline = 'Scrobble Log (Status: Offline)';
 
-    ScrobblingSkipped = 'Skrobbling skipped for approx  %d minutes. ';
+    ScrobblingSkipped = 'Scrobbling skipped for approx  %d minutes. ';
     ScrobbleFailureWait = 'Something is wrong with scrobbling. Nemp will disable it for approx %d minutes. '
       +#13#10+'See the log entries within the settings dialog for details.';
 
@@ -733,7 +733,7 @@ DeleteHelper_NetworkPresent = 'The network ressource is available.';
 DeleteHelper_NetworkMissing = 'The network ressource seems to be offline.';
 
 DeleteHelper_DrivePresentFileMissing  = 'Some files are definitely missing.';
-DeleteHelper_DriveMissingFileMissing  = 'It is unknown wheater the files still exist.';
+DeleteHelper_DriveMissingFileMissing  = 'It is unknown whether the files still exist.';
 
 
 DeleteHelper_DoWithDrivePresent   = 'You should remove the missing files from the library.';
