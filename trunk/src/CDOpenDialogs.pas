@@ -20,6 +20,10 @@ type
     cbInsertMode: TComboBox;
     LblSelectionMode: TLabel;
     procedure FormShow(Sender: TObject);
+
+    procedure BackupComboboxes;
+    procedure RestoreComboboxes;
+
     procedure cb_DrivesChange(Sender: TObject);
     procedure BtnRefreshClick(Sender: TObject);
     procedure cb_AutoCddbClick(Sender: TObject);
@@ -48,14 +52,16 @@ const MAXDRIVES = 10; // maximum number of drives
 
 implementation
 
-uses Nemp_RessourceStrings;
+uses Nemp_RessourceStrings, NempMainUnit;
 
 {$R *.dfm}
 
 
 procedure TCDOpenDialog.FormCreate(Sender: TObject);
 begin
+    BackupComboboxes;
     TranslateComponent (self);
+    RestoreComboboxes;
     localAudioFiles := TObjectList.Create(True);
     Files := TStringList.Create;
 end;
@@ -68,6 +74,7 @@ end;
 
 procedure TCDOpenDialog.FormShow(Sender: TObject);
 begin
+    cb_AutoCddb.checked := Nemp_MainForm.NempOptions.UseCDDB;
     // Get list of available drives
     EnsureDriveListIsFilled;     // from cddaUtils
     // Clear Files
@@ -79,6 +86,22 @@ begin
         exit;
     end;
     UpdateDriveListView;
+end;
+
+
+procedure TCDOpenDialog.BackupComboboxes;
+var i: Integer;
+begin
+    for i := 0 to self.ComponentCount - 1 do
+        if (Components[i] is TComboBox) then
+            Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
+end;
+procedure TCDOpenDialog.RestoreComboboxes;
+var i: Integer;
+begin
+    for i := 0 to self.ComponentCount - 1 do
+        if (Components[i] is TComboBox) then
+            (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
 end;
 
 
@@ -97,6 +120,8 @@ end;
 procedure TCDOpenDialog.BtnCDDBClick(Sender: TObject);
 begin
     ClearCDDBCache(cb_Drives.ItemIndex);
+
+    ClearCDDBCache(-1);
     UpdateTrackList(True);
 end;
 
@@ -187,6 +212,8 @@ begin
     for i := 0 to localAudioFiles.Count - 1 do
         if lbTracks.Selected[i] or (cbInsertMode.ItemIndex = 0) then
             Files.Add(TAudioFile(localAudioFiles[i]).Pfad);
+
+    Nemp_MainForm.NempOptions.UseCDDB := cb_AutoCddb.checked;
 end;
 
 end.

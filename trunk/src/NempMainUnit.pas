@@ -11314,7 +11314,7 @@ begin
         begin
             // nur neu Scrobbeln, wenn es vorher nicht getan wurde.
             // Sonst wird der Zeitzähler zurückgesetzt, und Submitten ggf. unterbunden
-            if NempPlayer.MainAudioFile.IsFile then
+            if (NempPlayer.MainAudioFile.IsFile) or (NempPlayer.MainAudioFile.IsCDDA) then
             begin
                 NempPlayer.NempScrobbler.ChangeCurrentPlayingFile(NempPlayer.MainAudioFile);
                 NempPlayer.NempScrobbler.PlaybackStarted;

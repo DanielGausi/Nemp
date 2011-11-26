@@ -35,6 +35,10 @@ object AboutForm: TAboutForm
       'Website: [url="http://www.gausi.de"]http://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
       ''
+      
+        '[url="http://www.facebook.com/pages/Nemp-Noch-ein-mp3-Player/172' +
+        '590512836097"]Nemp auf Facebook[/url]'
+      ''
       ''
       '[row="250"]'
       ''

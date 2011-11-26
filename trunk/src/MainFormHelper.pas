@@ -1094,7 +1094,13 @@ begin
         end;
 
         if assigned(FormCDDBSelect)  then ReTranslateComponent(FormCDDBSelect  );
-        if assigned(CDOpenDialog)    then ReTranslateComponent(CDOpenDialog    );
+        if assigned(CDOpenDialog)    then
+        begin
+            CDOpenDialog.BackupComboboxes;
+            ReTranslateComponent(CDOpenDialog    );
+            CDOpenDialog.RestoreComboboxes;
+        end;
+
         if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
 
 
