@@ -1062,7 +1062,7 @@ end;
 }
 procedure TNempPlayer.StopAndFree(StartPlayAfterStop: Boolean = False);
 begin
-    if assigned(MainAudioFile) and (MainAudioFile.IsFile) then
+    if assigned(MainAudioFile) and ((MainAudioFile.IsFile) or (MainAudioFile.isCDDA)) then
     begin
         PostProcessor.UserStoppedThePlayer := (LastUserWish = USER_WANT_STOP);
         PostProcessor.Process(Status = PLAYER_ISPLAYING);
@@ -1348,7 +1348,7 @@ begin
           UpdateDeskband(NEMP_API_PLAYING, 0);
           ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
 
-          if MainAudioFile.IsFile then
+          if (MainAudioFile.IsFile) or (MainAudioFile.isCDDA)  then
           begin
               PostProcessor.ChangeCurrentPlayingFile(MainAudioFile);
               PostProcessor.PlaybackStarted;

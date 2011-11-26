@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Juni 2011
+      Januar 2005 - November 2011
 
-      Version: 4.2.0
+      Version: 4.3.0
 
 
 -----------------------------------------------------------
@@ -121,6 +121,38 @@ Verwendete Units/Komponenten:
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
 
+
+
+Version 4.3.0, November 2011
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+* bessere Unterstützung für CD-Audio 
+* Optionen: Neues einlesen der Soundkarten
+* Verzeichnis-Dialoge: Letzter Wert wird gespeichert
+
+Änderungen:
+-----------
+* "Medienbib aufräumen" und "Dateien neu einlesen" besser gestaltet
+* Scrobbeln auf die neue API umgestellt
+* Beim Ziehen des Positions-Reglers wird die Zielzeit angezeigt
+* "Nachrichten" werden weniger häufig generiert, z.B. wenn "rating"
+  fehlschlägt
+* Symbole in der Playlist geändert, vor allem auch im Nemp3-Skin
+* Neue bass_fx.dll: Läuft auch auf Windows8 64Bit
+* Gui-Änderung: "keine zusätzlichen Tags" jetzt nicht mehr bei wma etc.
+
+Bugfixes:
+---------
+* Übergabe von Dateien an laufende Instanz klappte manchmal nicht
+* "Neues Bild"-Dialog in ID3v2-Tag-Editor funktionierte nicht richtig
+* Im Detailfenster war das URL-Feld ohne Funktion - ersetzt durch "Composer"
+* Parameter "Beim Start mit Wiedergabe beginnen" wurde bei Webstreams 
+  ignoriert
+* "In Ruhezustand versetzen" wird nur noch einmal ausgeführt 
+  (beim Aufwachen ist das wieder deaktiviert)
+* "Laufwerke" wurden nicht korrekt gespeichert
+  (hatte aber keinen Einfluss auf die Funktion)
 
 
 Version 4.2.0, Juni 2011
