@@ -86,7 +86,8 @@ type
     procedure FormShow(Sender: TObject);
     procedure TagVSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure TagVSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+    procedure TagVSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure TagVSTColumnDblClick(Sender: TBaseVirtualTree;
       Column: TColumnIndex; Shift: TShiftState);
     procedure TagVSTPaintText(Sender: TBaseVirtualTree;
@@ -112,8 +113,8 @@ type
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure IgnoreTagVSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure MergeTagVSTHeaderClick(Sender: TVTHeader;
-      HitInfo: TVTHeaderHitInfo);
+    procedure MergeTagVSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure BtnDeleteIgnoreTagClick(Sender: TObject);
     procedure BtnDeleteMergeTagClick(Sender: TObject);
   private
@@ -562,21 +563,21 @@ end;
     - Sort the Tags (by name or by count)
     --------------------------------------------------------
 }
-procedure TCloudEditorForm.TagVSTHeaderClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TCloudEditorForm.TagVSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if (HitInfo.Button = mbLeft) then
+  if (Button = mbLeft) then
   begin
-      if (HitInfo.Column > -1 ) then
+      if (Column > -1 ) then
       begin
-          if HitInfo.Column = TagVST.Header.SortColumn then
+          if Column = TagVST.Header.SortColumn then
               // Swap SortDirection
               case TagVST.Header.SortDirection of
                   sdAscending:  TagVST.Header.SortDirection := sdDescending;
                   sdDescending: TagVST.Header.SortDirection := sdAscending;
               end;
           // Set SortColumn
-          TagVST.Header.SortColumn := HitInfo.Column;
+          TagVST.Header.SortColumn := Column;
 
           SortTags;
           // Show Tags in TreeView
@@ -585,21 +586,21 @@ begin
   end;
 end;
 
-procedure TCloudEditorForm.MergeTagVSTHeaderClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TCloudEditorForm.MergeTagVSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-    if (HitInfo.Button = mbLeft) then
+    if (Button = mbLeft) then
     begin
-        if (HitInfo.Column > -1 ) then
+        if (Column > -1 ) then
         begin
-            if HitInfo.Column = MergeTagVST.Header.SortColumn then
+            if Column = MergeTagVST.Header.SortColumn then
                 // Swap SortDirection
                 case MergeTagVST.Header.SortDirection of
                     sdAscending:  MergeTagVST.Header.SortDirection := sdDescending;
                     sdDescending: MergeTagVST.Header.SortDirection := sdAscending;
                 end;
             // Set SortColumn
-            MergeTagVST.Header.SortColumn := HitInfo.Column;
+            MergeTagVST.Header.SortColumn := Column;
 
             SortMergeTags;
             // Show in TreeView

@@ -116,8 +116,8 @@ type
     procedure Edt_SearchKeyPress(Sender: TObject; var Key: Char);
     procedure VST_ShoutcastQueryColumnDblClick(Sender: TBaseVirtualTree;
       Column: TColumnIndex; Shift: TShiftState);
-    procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader;
-      HitInfo: TVTHeaderHitInfo);
+    procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure HideTimerTimer(Sender: TObject);
     procedure Btn_AddSelectedClick(Sender: TObject);
     procedure Btn_SearchGenreClick(Sender: TObject);
@@ -141,8 +141,8 @@ type
       var CellText: string);
     procedure VST_FavoritesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure VST_FavoritesHeaderClick(Sender: TVTHeader;
-      HitInfo: TVTHeaderHitInfo);
+    procedure VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure udSortFavoritesClick(Sender: TObject; Button: TUDBtnType);
     procedure VST_FavoritesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure cbSortModeChange(Sender: TObject);
@@ -576,16 +576,16 @@ begin
   end;
 end;
 
-procedure TFormStreamVerwaltung.VST_ShoutcastQueryHeaderClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TFormStreamVerwaltung.VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var i: Integer;
 begin
-    if HitInfo.Button = mbLeft then
+    if Button = mbLeft then
     begin
         if VST_ShoutcastQuery.Header.SortDirection = sdAscending then
         begin
             VST_ShoutcastQuery.Header.SortDirection := sdDescending;
-            case HitInfo.Column of
+            case Column of
                0: StationList.Sort(Sort_Name_Desc);
                1: StationList.Sort(Sort_CurrentTitle_Desc);
                2: StationList.Sort(Sort_MediaType_Desc);
@@ -595,7 +595,7 @@ begin
         end else
         begin
             VST_ShoutcastQuery.Header.SortDirection := sdAscending;
-            case HitInfo.Column of
+            case Column of
                0: StationList.Sort(Sort_Name_Asc);
                1: StationList.Sort(Sort_CurrentTitle_Asc);
                2: StationList.Sort(Sort_MediaType_Asc);
@@ -610,18 +610,18 @@ begin
 end;
 
 
-procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var i: Integer;
 begin
-    if HitInfo.Button = mbLeft then
+    if Button = mbLeft then
     begin
-        cbSortMode.ItemIndex := HitInfo.Column;
+        cbSortMode.ItemIndex := Column;
 
         if VST_Favorites.Header.SortDirection = sdAscending then
         begin
             VST_Favorites.Header.SortDirection := sdDescending;
-            case HitInfo.Column of
+            case Column of
                 0: begin
                   FavoriteList.Sort(Sort_Name_Desc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Desc);
@@ -642,7 +642,7 @@ begin
         end else
         begin
             VST_Favorites.Header.SortDirection := sdAscending;
-            case HitInfo.Column of
+            case Column of
                 0: begin
                   FavoriteList.Sort(Sort_Name_Asc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Asc);
