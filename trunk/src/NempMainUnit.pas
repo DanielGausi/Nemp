@@ -1263,8 +1263,10 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure RatingImageMouseLeave(Sender: TObject);
     procedure PanelCoverBrowseAfterPaint(Sender: TObject);
-    procedure VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
-    procedure VSTHeaderDblClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+    procedure VSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure VSTHeaderDblClick(Sender: TVTHeader; Column: TColumnIndex;
+            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
       Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
@@ -3984,20 +3986,20 @@ if VST.Header.Columns[column].Tag = CON_RATING then
     MaxWidth := 80;
 end;
 
-procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+          Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var oldAudioFile: TAudioFile;
 begin
   VST.CancelEditNode;
-  if (HitInfo.Button = mbLeft) then
+  if (Button = mbLeft) then
   begin
-      if (HitInfo.Column > -1 ) then
+      if (Column > -1 ) then
       begin
           oldAudioFile := GetFocussedAudioFile;
           VST.Enabled := False;
 
-          MedienBib.AddSorter(VST.Header.Columns[HitInfo.Column].Tag);
-          VST.Header.SortColumn := HitInfo.Column;
+          MedienBib.AddSorter(VST.Header.Columns[Column].Tag);
+          VST.Header.SortColumn := Column;
           if MedienBib.SortParams[0].Direction = sd_Ascending then
               VST.Header.SortDirection := sdAscending
           else
@@ -4013,8 +4015,8 @@ begin
   end else
   begin
       VST_ColumnPopup.Popup(
-      VST.ClientToScreen(Point(HitInfo.x,HitInfo.y)).X,
-      VST.ClientToScreen(Point(HitInfo.x,HitInfo.y)).Y
+      VST.ClientToScreen(Point(x,y)).X,
+      VST.ClientToScreen(Point(x,y)).Y
       );
   end;
 end;
@@ -8394,8 +8396,8 @@ end;
 
 
 
-procedure TNemp_MainForm.VSTHeaderDblClick(Sender: TVTHeader;
-  HitInfo: TVTHeaderHitInfo);
+procedure TNemp_MainForm.VSTHeaderDblClick(Sender: TVTHeader; Column: TColumnIndex;
+    Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 exit;
 end;
