@@ -74,8 +74,8 @@ object AboutForm: TAboutForm
         '/url] of the [url="http://mac.sourceforge.net/atl/"]ATL[/url]'
       ''
       
-        '[url="http://www.gausi.de/mp3fileutils.html"]Mp3FileUtils 0.5[/u' +
-        'rl]'
+        '[url="http://www.gausi.de/mp3fileutils.html"]Mp3FileUtils 0.6a[/' +
+        'url]'
       ''
       
         '[url="http://www.delphi-forum.de/viewtopic.php?t=48936"]SearchTo' +
