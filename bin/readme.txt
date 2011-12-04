@@ -153,6 +153,8 @@ Bugfixes:
   (beim Aufwachen ist das wieder deaktiviert)
 * "Laufwerke" wurden nicht korrekt gespeichert
   (hatte aber keinen Einfluss auf die Funktion)
+* "Automatische Bewertung" bei bisher unbewertet Dateien führte zu einer
+  sehr geringen Bewertung
 
 
 Version 4.2.0, Juni 2011

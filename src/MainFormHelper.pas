@@ -1587,6 +1587,8 @@ begin
 
           AUDIOERR_UnsupportedMediaFile,
           AUDIOERR_EditingDenied: if Important then AddErrorLog(s);
+          else
+              AddErrorLog(s);
         end;
     end;
 end;
