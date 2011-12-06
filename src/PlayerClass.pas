@@ -1174,9 +1174,7 @@ begin
       if (MainStream = 0) {or (not CDChangeSuccess)} then
       begin
           if BassErrorString(Bass_ErrorGetCode) <> '' then
-
               Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
-              showmessage(BassErrorString(Bass_ErrorGetCode));
           // something is wrong
           MainAudioFileIsPresentAndPlaying := False;
       end;
