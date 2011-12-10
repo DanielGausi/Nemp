@@ -140,6 +140,7 @@ Neue Funktionen:
   fehlschlägt
 * Symbole in der Playlist geändert, vor allem auch im Nemp3-Skin
 * Neue bass_fx.dll: Läuft auch auf Windows8 64Bit
+* "Default"-Einstellung für Soundkarten hinzugefügt
 * Gui-Änderung: "keine zusätzlichen Tags" jetzt nicht mehr bei wma etc.
 
 Bugfixes:
