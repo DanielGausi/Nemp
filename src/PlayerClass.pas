@@ -634,11 +634,7 @@ begin
     BASS_SetConfig(BASS_CONFIG_FLOATDSP, 1);
 
     BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);
-
-    BASS_SetConfig(
-    BASS_CONFIG_DEV_DEFAULT,
-    1
-    );
+    BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, 1);
 
     if NOT BASS_Init(MainDevice, 44100, 0, HND, nil) then
     begin

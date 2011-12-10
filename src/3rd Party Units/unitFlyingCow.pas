@@ -284,9 +284,13 @@ destructor TFlyingCow.Destroy;
 begin
     BeginUpdate;
     Clear;
-    fThread.Terminate;
-    fThread.WaitFor;
-    fThread.Free;
+    try
+        fThread.Terminate;
+        fThread.WaitFor;
+        fThread.Free;
+    except
+        // nothing
+    end;
     fItem.Free;
     fThread := Nil;
     inherited destroy;

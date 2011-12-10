@@ -1635,18 +1635,20 @@ procedure TOptionsCompleteForm.BtnRefreshDevicesClick(Sender: TObject);
 var count: Integer;
     BassInfo: BASS_DEVICEINFO;
 begin
-    count := 1;
-
     //showmessage(inttostr(NempPlayer.MainDevice) + ' - ' + inttostr(NempPlayer.HeadsetDevice));
+
+    NempPlaylist.RepairBassEngine(True);
 
     MainDeviceCB.Items.Clear;
     HeadPhonesDeviceCB.Items.Clear;
 
+    count := 1;
     while (Bass_GetDeviceInfo(count, BassInfo)) do
     begin
-      MainDeviceCB.Items.Add(String(BassInfo.Name));
-      HeadPhonesDeviceCB.Items.Add(String(BassInfo.Name));
-      inc(count);
+        // BASS_Init(count, 44100, 0, Nemp_MainForm.Handle, nil);
+        MainDeviceCB.Items.Add(String(BassInfo.Name));
+        HeadPhonesDeviceCB.Items.Add(String(BassInfo.Name));
+        inc(count);
     end;
 
     if MainDeviceCB.Items.Count > Integer(NempPlayer.MainDevice) then
@@ -1657,7 +1659,7 @@ begin
 
 
     if (HeadPhonesDeviceCB.Items.Count > Integer(NempPlayer.HeadsetDevice)) then
-        HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice - 1
+        HeadPhonesDeviceCB.ItemIndex := NempPlayer.HeadsetDevice //- 1
     else
         if Count >= 1 then
             HeadPhonesDeviceCB.ItemIndex := Count - 1
