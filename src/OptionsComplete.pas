@@ -1356,7 +1356,7 @@ begin
   seWebServer_Port.Value := NempWebServer.Port;
   cbOnlyLAN.Checked := NempWebServer.OnlyLAN;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
-  cbPermitPlaylistDownload.Checked := NempWebServer.AllowPlaylistDownload;
+  cbPermitPlaylistDownload.Checked := NempWebServer.AllowFileDownload;
   cbAllowRemoteControl.Checked     := NempWebServer.AllowRemoteControl;
   WebServerLogMemo.Lines.Assign(NempWebServer.LogList);
 
@@ -2587,7 +2587,7 @@ begin
   NempWebServer.Port := seWebServer_Port.Value;
 
   NempWebServer.AllowLibraryAccess    := cbPermitLibraryAccess.Checked;
-  NempWebServer.AllowPlaylistDownload := cbPermitPlaylistDownload.Checked;
+  NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
   NempWebServer.AllowRemoteControl    := cbAllowRemoteControl.Checked;
   MedienBib.AutoActivateWebServer     := CBAutoStartWebServer.Checked;
   NempWebServer.SaveToIni;
@@ -3171,7 +3171,7 @@ begin
         NempWebServer.Port     := seWebServer_Port.Value;
         NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
-        NempWebServer.AllowPlaylistDownload := cbPermitPlaylistDownload.Checked;
+        NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
         NempWebServer.AllowRemoteControl := cbAllowRemoteControl.Checked;
         // 2.) Medialib kopieren
         NempWebServer.CopyLibrary(MedienBib);

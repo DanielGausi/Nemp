@@ -865,6 +865,7 @@ begin
         WS_PlaylistPlayID: begin
                               if AcceptApiCommands then
                               begin
+                                  aMsg.Result := 0;
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
                                   if idx > -1 then
                                   begin
@@ -872,6 +873,7 @@ begin
                                       begin
                                           NempPlayer.LastUserWish := USER_WANT_PLAY;
                                           NempPlaylist.Play(idx, NempPlayer.FadingInterval, True);
+                                          aMsg.Result := 1;
                                       end;
                                   end;
                               end;
@@ -879,6 +881,23 @@ begin
         WS_PlaylistDownloadID: begin
                               if AcceptApiCommands then
                               begin
+                                  // default value: File not found
+                                  NempWebserver.QueriedPlaylistFilename := '';
+                                  // is the requested ID the current playing file?
+                                  if assigned(NempPlayer.MainAudioFile)
+                                      and (NempPlayer.MainAudioFile.WebServerID = aMsg.LParam)
+                                  then
+                                      NempWebserver.QueriedPlaylistFilename := NempPlayer.MainAudioFile.Pfad
+                                  else
+                                  begin
+                                      // it is somewhere in the Playlist?
+                                      idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                      if (idx > -1) and (NempPlaylist.Count > idx) then
+                                          NempWebserver.QueriedPlaylistFilename := TAudioFile(NempPlaylist.Playlist[idx]).Pfad;
+                                  end;
+                              end;
+
+                                 {
                                   if aMsg.LParam = -1 then
                                   begin
                                       if assigned(NempPlayer.MainAudioFile) then
@@ -895,7 +914,8 @@ begin
                                           else NempWebserver.QueriedPlaylistFilename := '';
                                       end else NempWebserver.QueriedPlaylistFilename := '';
                                   end;
-                              end;
+                                  }
+
                               end;
 
         WS_InsertNext : begin
@@ -930,9 +950,9 @@ begin
                                 if (idx > -1) then
                                 begin
                                       //NempWebserver.QueriedPlaylistFilename := TAudioFile(NempPlaylist.Playlist[idx]).Pfad;
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]));
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx);
                                 end else
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NIL);
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0);
                           end;
 
         WS_StringLog: begin

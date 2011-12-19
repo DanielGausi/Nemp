@@ -1,0 +1,1 @@
+<li> <a href="playlistcontrol?id={{ID}}&action={{Action}}">Play now</a></li>                

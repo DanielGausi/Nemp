@@ -16,6 +16,9 @@ body {
 input.text {width: 98%; }
 input.submit {}
 
+.hidden {
+	display: none ! important;
+}
 
 a {
 	text-decoration: none;
@@ -73,10 +76,14 @@ ul.mainmenu li {
 	list-style: none;
 	display: inline;
 	color: #202020;
-	background-color: #dddddd;
+	background-color: #bbbbbb;
 	border: 1px solid white;
 	padding: 8px 2px;
 	margin: 2px;
+}
+ul.mainmenu li.active {
+	border-color: red;
+	background-color: #dddddd;
 }
 
 ul.mainmenu a{
@@ -154,7 +161,7 @@ ul.searchresults li{
          margin:0;
 }
 
-div.playlistentrycurrent{
+div.playlist .Current{
         /*	background-color: #404040;*/
          color: #dddddd;
          border: 1px solid red;
