@@ -1,7 +1,5 @@
 <div class="library">
 {{Menu}}
-<h2>Nemp: Library</h2>
-
 <form action="/library" method="get">
 <table width="100%">
 <tr><td>Search for:</td></tr>

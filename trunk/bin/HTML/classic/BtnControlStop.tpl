@@ -1,1 +1,1 @@
-<a href="playercontrol?action=stop">Stop</a>
+<a class="button btnstop" href="playercontrol?action=stop"><img src="images/playback-stop.png" width="32" height="32" alt="stop" /></a>

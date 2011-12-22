@@ -28,12 +28,43 @@ a {
 h2 {
 	padding-left: 5px;
 	border-bottom: 2px solid #404040;
-	font-size: 1.3em;
+	font-size: 1.2em;
 }
 
 
 div.menu {
 	margin 5px;
+	padding: 10px;
+	border-bottom: 1px solid #404040;
+}
+
+ul.mainmenu {
+	margin: 0;
+	padding: 10px 0px;
+	text-align: center;
+	color: #202020;
+	width: 236;	
+}
+
+ul.mainmenu li {
+	list-style: none;
+	display: inline;
+	color: #202020;
+	background-color: #dddddd;
+	border: 1px solid white;
+	padding: 8px 2px;
+	margin: 2px;
+}
+ul.mainmenu li.active {	
+	background-color: #fafafa;
+}
+
+ul.mainmenu a{
+	color: #202020;
+	padding: 8px 20px;
+}
+ul.mainmenu li:hover{
+	background-color: #fafafa;
 }
 
 div.warning {
@@ -49,12 +80,9 @@ div.error {
 	padding: 10px;
 }
 
-div.currenttitle {
-	padding-left: 5px;
-	border-bottom: 1px solid #404040;
-	font-size: 1em;
+div.currenttitle {	
 	margin-bottom: 10px;
-         text-align: center;
+	text-align: center;	
 }
 
 div.currentimage {
@@ -62,59 +90,39 @@ div.currentimage {
 }
 
 
-ul.mainmenu {
-	margin: 0;
-	padding: 10px 0px;
+.playercontrol {
+	padding: 10px;
+	margin-bottom: 10px;
 	text-align: center;
-	background-color: #202020;
-	color: #202020;
-	width: 236;
-	border: 1px solid #dddddd;
+	border-bottom: 1px solid #404040;
 }
-
-ul.mainmenu li {
-	list-style: none;
-	display: inline;
-	color: #202020;
-	background-color: #bbbbbb;
-	border: 1px solid white;
-	padding: 8px 2px;
-	margin: 2px;
-}
-ul.mainmenu li.active {
-	border-color: red;
-	background-color: #dddddd;
-}
-
-ul.mainmenu a{
-	color: #202020;
-	padding: 8px 20px;
-}
-
-ul.actionmenu {
-	margin-top: 10px;
-	padding: 0;
-}
-
-ul.actionmenu li, .button{
-	list-style: none;
-	color: #202020;
-	background-color: #dddddd;
-	border: 1px solid white;
-	padding: 2px;
-	margin: 2px;
+a.button{
+	color: #202020;	
+	background-color: #fafafa;
+	border: 1px solid white;	
+	padding: 2px 5px;
 	text-align: center;
+	background-repeat: no-repeat;
+	background-position: center;	
+	display:inline-block;
 }
 
-.button{
-	color: #202020;
-	background-color: #dddddd;
-	border: 1px solid white;
-	padding: 8px 20px;
-	margin: 2px;
-         cursor: pointer;
-	text-align: center;
+a.button img{
+vertical-align: middle;
+	
 }
+
+
+.player a:hover{
+	background-color: #fafafa;
+	border: 1px solid #ffffff;
+}
+
+.player .filecontrol{
+	text-align: center;
+	padding-top: 15px;
+}
+
 
 ul.actionmenu li a{
 	color: #202020;
@@ -122,9 +130,6 @@ ul.actionmenu li a{
 	padding-top:5px;
 	padding-bottom:5px;
 
-}
-ul.actionmenu li a:hover{
-	font-weight: bold;
 }
 
 
@@ -237,4 +242,19 @@ div.playlistcontrol ul li {
 	padding-left: 5px;
 	padding-right:0;
 
+}
+
+ul.actionmenu {
+	margin-top: 10px;
+	padding: 0;
+}
+
+ul.actionmenu li, .button{
+	list-style: none;
+	color: #202020;
+	background-color: #dddddd;
+	border: 1px solid white;
+	padding: 2px;
+	margin: 2px;
+	text-align: center;
 }

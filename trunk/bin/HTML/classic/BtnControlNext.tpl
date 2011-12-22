@@ -1,1 +1,1 @@
-<a href="playercontrol?action=next">Next</a>
+<a class="button btnnext" href="playercontrol?action=next"><img src="images/skip-forward.png" width="32" height="32" alt="forward" /></a>

@@ -324,6 +324,16 @@ WebServer_GetIPFailedShort = 'Failed.';
 WebServer_GettingIP        = 'Connecting...';
 WebServer_PortChangeFailed = 'The Nemp Webserver is running. The new Port is not valid until you restart it.';
 
+WebServer_UnknownError = 'Unknown error';
+WebServer_SomeError = 'Some error occured. Please try again.';
+WebServer_RemoteControlDenied = 'Remote control denied.';
+WebServer_DownloadDenied = 'Download denied.';
+WebServer_LibraryAccessDenied = 'Library access denied.';
+WebServer_AccessDenied = 'Access denied.';
+WebServer_FileNotFound = 'File not found.';
+WebServer_InvalidParameter = 'Invalid parameter.';
+WebServer_NoFile = 'No file loaded.';
+
 NempUpdate_ConnectError = 'Could not connect to server. Please check your internet configuration.';
 NempUpdate_Error = 'Could not get update information from server.';
 NempUpdate_UnkownError = 'An error occured while getting update information from server.';
