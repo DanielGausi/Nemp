@@ -1,14 +1,10 @@
 <div class="player">
 {{Menu}}
-<h2>Nemp: Player</h2>
-{{ItemPlayer}}
-
-<div class="actionmenu">
-<ul class="actionmenu">
+<div class="playercontrol">
 	{{BtnControlPlayPause}}
 	{{BtnControlStop}}
-	{{BtnControlNext}}
 	{{BtnControlPrev}}
-</ul>
+	{{BtnControlNext}}	
 </div>
+{{ItemPlayer}}
 </div>

@@ -1,1 +1,1 @@
-<a href="playlistcontrol?id={{ID}}&action={{Action}}">Down</a>
+<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}">Down</a>
