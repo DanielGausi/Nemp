@@ -1,0 +1,1 @@
+<a href="playlistcontrol?id={{ID}}&action={{Action}}">Up</a>

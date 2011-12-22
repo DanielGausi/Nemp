@@ -1,1 +1,1 @@
-<li> <a href="playercontrol?action=stop">Stop</a></li>
+<a href="playercontrol?action=stop">Stop</a>

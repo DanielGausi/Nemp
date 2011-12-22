@@ -216,9 +216,9 @@ type
 
 
           PatternMenu : String;
-          PatternItemPlayer: String;   // the item on the PLAYER page
 
           PatternPlayerPage: String;
+          PatternItemPlayer: String;   // the item on the PLAYER page
 
           PatternPlaylistPage: String;
           PatternItemPlaylist: String;  // one item on the PLAYLIST page
@@ -226,7 +226,12 @@ type
           PatternPlaylistDetailsPage : String;
           PatternItemPlaylistDetails : String; // the item on the Detail-Page
 
+          PatternSearchPage: String;
+          PatternSearchResultPage: String;
+          PatternItemSearchlist: String;  // one item on the SEARCHLIST page
 
+          PatternSearchDetailsPage : String;
+          PatternItemSearchDetails : String; // the item on the Search-Detail-Page
 
           //PatternPlayerControl : String;
           //PatternPlayerData : String;
@@ -371,7 +376,6 @@ type
           procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer);
           procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
           procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
-
 
           // Das kann im Indy-Thread geamcht werden, daher mit Result
           function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
@@ -1030,14 +1034,9 @@ begin
         PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{ItemPlaylistDetails}}', FileData, [rfReplaceAll]);
 
-
-
-
-
         // nö PageData := fSetControlButtons(PageData);
 
         // PageData := fGenerateHTMLPlayerActionMenu(PageData, aAudioFile.Dateiname, -1, assigned(aAudioFile) and aAudioFile.IsFile);
-
 
 
        { if Not aAudioFile.FileIsPresent then
@@ -1098,10 +1097,138 @@ begin
         HTML_PlaylistDetails := '';
 end;
 
+
+function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
+var ResultList: TObjectlist;
+    af: TAudioFile;
+    i: Integer;
+    duration: String;
+    entry, title, aClass: UTf8String;
+    PageData, menu, Item, Items: String;
+begin
+
+    //result := HTML_Header + Mainmenu(2) + HTML_LibraryHeader;  // + suchheader// wird noch geändert auf Medienbib Menü
+
+    //result := result + HTML_SearchMedialibrary1;
+
+    // {{SearchString}}
+    // {{SearchResultItems}}
+    // {{SearchCount}}
+
+    {
+    PatternSearchPage: String;
+          PatternSearchResultPage: String;
+          PatternItemSearchlist: String;  // one item on the SEARCHLIST page
+
+
+    }
+
+    menu := Mainmenu(2);
+
+    if aSearchString = '' then
+        PageData := PatternSearchPage
+    else
+        PageData := PatternSearchResultPage;
+
+
+    PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{SearchString}}', aSearchString, [rfReplaceAll]);
+
+    if aSearchString <> '' then
+    begin
+        Items := '';
+                //result := result + HTML_SearchResultsHeader;
+
+        ResultList := TObjectList.Create(False);
+        SearchLibrary(aSearchString, ResultList);
+
+        if ResultList.Count > 0 then
+        begin
+            for i := 0 to ResultList.Count - 1 do
+            begin
+                af := TAudioFile(ResultList[i]);
+                // ID generieren/setzen
+                EnsureFileHasID(af);
+
+                Item := PatternItemSearchlist;
+                Item := StringReplace(Item, '{{ID}}'           , IntToStr(af.WebServerID), [rfReplaceAll]);
+                aClass := '';
+                // replace tags
+                Item := fSetBasicFileData(af, Item, aClass);
+                Item := fSetFileButtons(af, Item, 2);
+                Items := Items + Item;
+
+                {if af.isStream then
+                    duration := '(inf)'
+                else
+                    duration := SekIntToMinStr(af.Duration);
+
+                title := UTf8String(EscapeHTMLChars(af.PlaylistTitle));
+
+                entry := UTf8String(Format(HTML_SearchResultPattern, [af.WebServerID, title, duration])) + #13#10;
+
+                result := result + entry;  }
+            end;
+        end;
+        //else
+        //    result := result + '<li>No results found for: ' + UTf8String(EscapeHTMLChars((aSearchString))) +  ' </li>';
+        PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{SearchCount}}', IntToStr(ResultList.Count), [rfReplaceAll]);
+
+        ResultList.Free;
+        //result + HTML_SearchResultsFooter + HTML_Footer;
+    end else
+    begin
+        PageData := StringReplace(PageData, '{{SearchResultItems}}', '', [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{SearchCount}}', '0', [rfReplaceAll]);
+    end;
+
+
+    result := StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]);;
+
+    // BUG: hier fehlt der Footer im ELSE
+end;
+
+
+
 function TNempWebServer.GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile): UTf8String;
 var duration, quality: String;
     tmp: UTf8String;
+
+    PageData, FileData, control: String;
+    menu: String;
+
 begin
+
+    menu := MainMenu(2);
+
+    if assigned(aAudioFile) then
+    begin
+        aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
+
+        FileData := PatternItemSearchDetails;
+        FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
+
+        FileData := fSetBasicFileData(aAudioFile, FileData, '');
+        FileData := fSetFileButtons(aAudioFile, FileData, 1);
+
+
+        PageData := PatternSearchDetailsPage;
+        PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{ItemSearchDetails}}', FileData, [rfReplaceAll]);
+    end else
+    begin
+        PageData := ''; // oder ne Warnung oder so. Todo
+    end;
+
+
+    result := StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]);;
+
+
+
+        //PatternSearchDetailsPage
+        //PatternItemSearchDetails
+  {
     tmp := HTML_Header;
     tmp := tmp + Mainmenu(2) + HTML_DetailsHeader + #13#10;
 
@@ -1135,63 +1262,9 @@ begin
 
     tmp := tmp + '</ul>' + fGenerateHTMLMedienBibActionMenu(aAudioFile.Dateiname, aAudioFile.WebServerID) + HTML_Footer;
     result := tmp;
+    }
 end;
 
-
-
-function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
-var ResultList: TObjectlist;
-    af: TAudioFile;
-    i: Integer;
-    duration: String;
-    entry, title: UTf8String;
-begin
-
-    result := HTML_Header + Mainmenu(2) + HTML_LibraryHeader;  // + suchheader// wird noch geändert auf Medienbib Menü
-
-    result := result + HTML_SearchMedialibrary1;
-
-    if aSearchString <> '' then
-    begin
-        result := result + HTML_SearchResultsHeader;
-
-        ResultList := TObjectList.Create(False);
-        SearchLibrary(aSearchString, ResultList);
-
-        if ResultList.Count > 0 then
-        begin
-            for i := 0 to ResultList.Count - 1 do
-            begin
-                af := TAudioFile(ResultList[i]);
-                // ID generieren/setzen
-                EnsureFileHasID(af);
-                //if af.WebServerID = 0 then
-                //begin
-                //    af.WebServerID := fCurrentIDmaxLib;
-                //    inc(fCurrentIDmaxLib);
-                //end;
-
-                if af.isStream then
-                    duration := '(inf)'
-                else
-                    duration := SekIntToMinStr(af.Duration);
-
-                title := UTf8String(EscapeHTMLChars(af.PlaylistTitle));
-
-                entry := UTf8String(Format(HTML_SearchResultPattern, [af.WebServerID, title, duration])) + #13#10;
-
-                result := result + entry;
-            end;
-        end
-        else
-            result := result + '<li>No results found for: ' + UTf8String(EscapeHTMLChars((aSearchString))) +  ' </li>';
-
-        ResultList.Free;
-
-        result := result + HTML_SearchResultsFooter + HTML_Footer;
-    end;
-    // BUG: hier fehlt der Footer im ELSE
-end;
 
 procedure TNempWebServer.CopyLibrary(OriginalLib: TMedienBibliothek);
 begin
@@ -1275,9 +1348,20 @@ begin
         sl.LoadFromFile(fLocalDir + 'BtnFileDownload.tpl');
         PatternButtonFileDownload := sl.Text;
 
-
         sl.LoadFromFile(fLocalDir + 'BtnFilePlayNow.tpl');
         PatternButtonFilePlayNow := sl.Text;
+
+
+        sl.LoadFromFile(fLocalDir + 'BtnFileAdd.tpl');
+        PatternButtonFileAdd := sl.Text;
+        sl.LoadFromFile(fLocalDir + 'BtnFileAddNext.tpl');
+        PatternButtonFileAddNext := sl.Text;
+
+
+        sl.LoadFromFile(fLocalDir + 'BtnFileMoveUp.tpl');
+        PatternButtonFileMoveUp := sl.Text;
+        sl.LoadFromFile(fLocalDir + 'BtnFileMoveDown.tpl');
+        PatternButtonFileMoveDown := sl.Text;
 
          {
 
@@ -1309,6 +1393,20 @@ begin
         sl.LoadFromFile(fLocalDir + 'ItemPlaylistDetails.tpl');
         PatternItemPlaylistDetails := sl.Text;
 
+        // The LIBRARY page
+
+        sl.LoadFromFile(fLocalDir + 'PageLibrary.tpl');
+        PatternSearchPage := sl.Text;
+        sl.LoadFromFile(fLocalDir + 'PageLibrarySearchResults.tpl');
+        PatternSearchResultPage := sl.Text;
+        sl.LoadFromFile(fLocalDir + 'ItemSearchResult.tpl');
+        PatternItemSearchlist := sl.Text;
+
+        // The LIBRARY DETAILS page
+        sl.LoadFromFile(fLocalDir + 'PageLibraryDetails.tpl');
+        PatternSearchDetailsPage := sl.Text;
+        sl.LoadFromFile(fLocalDir + 'ItemSearchDetails.tpl');
+        PatternItemSearchDetails := sl.Text;
 
     finally
         sl.Free;
@@ -1514,6 +1612,7 @@ end;
 function TNempWebServer.ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
+    af: TAudioFile;
 begin
     if AllowRemoteControl then
     begin
@@ -1531,12 +1630,51 @@ begin
                 result := qrPermit;
             end else
                 result := HandleError(AResponseInfo, qrInvalidParameter)
+        end
+        else
+        if queriedAction = 'file_add' then
+        begin
+            EnterCriticalSection(CS_AccessLibrary);
+            result := qrPermit;
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            af := GetAudioFileFromWebServerID(queriedID);
+            if assigned(af) then
+            begin
+                // sende Audiofile an Nemp-Hauptfenster/playlist
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
+                AResponseInfo.Redirect('/playlist');
+                AResponseInfo.ContentStream := Nil;
+            end else // not in bib
+            begin
+                result := HandleError(AResponseInfo, qrInvalidParameter);
+            end;
+            LeaveCriticalSection(CS_AccessLibrary);
         end;
-                     a
+        if queriedAction = 'file_addnext' then
+        begin
+            EnterCriticalSection(CS_AccessLibrary);
+            result := qrPermit;
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            af := GetAudioFileFromWebServerID(queriedID);
+            if assigned(af) then
+            begin
+                // sende Audiofile an Nemp-Hauptfenster/playlist
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af));
+                AResponseInfo.Redirect('/playlist');
+                AResponseInfo.ContentStream := Nil;
+            end else
+            begin
+                result := HandleError(AResponseInfo, qrInvalidParameter);
+            end;
+            LeaveCriticalSection(CS_AccessLibrary);
+        end;
+
+
+
         /// file_add
-        /// file_addNext
+        /// file_addNext                     /insertnext
         ///  delete
-        ///  moveUp
+        ///  moveUp                          /addtoplaylist
         ///  MoveDown
 
         //SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0);
@@ -1960,29 +2098,30 @@ begin
             exit;
         end;
 
-
         if RequestedDocument = '/player' then permit := ResponsePlayer(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/playlist' then permit := ResponsePlaylistView(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/library' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo)
         else
-        if RequestedDocument = '/playlist' then permit := ResponsePlaylistView(ARequestInfo, AResponseInfo)
-        else
         if RequestedDocument = '/playlist_details' then permit := ResponsePlaylistDetails(ARequestInfo, AResponseInfo)
-        else
-        if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo)
-        else
-   c     if RequestedDocument = '/play' then permit := ResponsePlay(ARequestInfo, AResponseInfo)
-        else
-        if RequestedDocument = '/search' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/library_details' then permit := ResponseLibraryDetails(ARequestInfo, AResponseInfo)
         else
-   b     if RequestedDocument = '/insertnext' then permit := ResponseInsertNext(ARequestInfo, AResponseInfo)
+        {
+        if RequestedDocument = '/play' then permit := ResponsePlay(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/insertnext' then permit := ResponseInsertNext(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/addtoplaylist' then permit := ResponseAddToPlaylist(ARequestInfo, AResponseInfo)
         else
+        }
         begin
 
             // Hier: Erstmal testen, obs der Versuch ist, eine Datei runterzuladen

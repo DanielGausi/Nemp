@@ -1,1 +1,1 @@
-<li><a href="playercontrol?action=previous">Previous</a></li>
+<a href="playercontrol?action=previous">Previous</a>
