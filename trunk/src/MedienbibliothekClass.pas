@@ -1288,6 +1288,8 @@ begin
           begin
               // Not really "Complete", but after this we have nothing more special to do here
               MB.Initializing := Init_Complete;
+              SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+
               // No Autoscan wanted, but maybe we want to activate the WebServer now.
               if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
               begin
@@ -1295,7 +1297,6 @@ begin
                   // Activation is done in VCL-Thread.
                   // So the WebServer IS activated when SendMessage returns
               end;
-              SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
           end;
       end;
       init_AutoScanDir: begin

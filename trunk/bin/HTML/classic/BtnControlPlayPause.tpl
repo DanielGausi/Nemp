@@ -1,1 +1,1 @@
-<li><a href="playercontrol?action=playpause">Play/Pause</a></li>
+<a href="playercontrol?action=playpause">Play/Pause</a>
