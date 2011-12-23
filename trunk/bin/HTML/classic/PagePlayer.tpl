@@ -8,3 +8,4 @@
 </div>
 {{ItemPlayer}}
 </div>
+<div style="clear:both;"></div>

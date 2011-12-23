@@ -279,6 +279,8 @@ type
       // The links in the html-code will contain these IDs, so they will be valid
       // until the "real" Nemp-User deletes a file from the playlist.
       function GetPlaylistIndex(aID: Int64): Integer;
+      function SwapFiles(a, b: Integer): Boolean;   // a and b must be siblings!!
+      procedure DeleteAFile(aIdx: Integer); // delete a file (for WebServer)
   end;
 
 implementation
@@ -811,6 +813,7 @@ begin
 
         fDauer := ShowPlayListSummary;
 end;
+
 
 procedure TNempPlaylist.ClearPlaylist(StopPlayer: Boolean = True);
 begin
@@ -2020,6 +2023,78 @@ begin
             break;
         end;
     end;
+end;
+
+procedure TNempPlaylist.DeleteAFile(aIdx: Integer);
+var aNode: PVirtualNode;
+    i: Integer;
+    aData: PTreeData;
+begin
+    VST.BeginUpdate;
+
+    aNode := VST.GetFirst;
+    for i := 0 to aIdx-1 do
+        aNode := VST.GetNextSibling(aNode);
+
+    if aNode = fPlayingNode then
+        fPlayingNode := Nil;
+
+    aData := VST.GetNodeData(aNode);
+
+    if (aData^.FAudioFile) = fPlayingFile then
+    begin
+        fPlayingIndex := aNode.Index;
+        // Backup playing file
+        fBackUpFile.Assign(fPlayingFile);
+        // Set the pointer to the backup-file
+        fPlayingFile := fBackUpFile;
+        Player.MainAudioFile := fBackUpFile;
+    end;
+    PrebookList.Remove(aData^.FAudioFile);
+    RemoveFileFromHistory(aData^.FAudioFile);
+    Playlist.Delete(aNode.Index);
+    VST.DeleteNode(aNode,True);
+
+    ReIndexPrebookedFiles;
+
+    VST.EndUpdate;
+    VST.Invalidate;
+
+    fDauer := ShowPlayListSummary;
+end;
+
+function TNempPlaylist.SwapFiles(a, b: Integer): Boolean;
+var tmp, i: Integer;
+    NodeA, NodeB: PVirtualNode;
+
+begin
+    if a > b then
+    begin
+        tmp := a;
+        a := b;
+        b := tmp;
+    end;
+
+    if (a > -1) and (b > -1) and (a < Playlist.Count) and (b < Playlist.Count) then
+    begin
+        NodeA := VST.GetFirst;
+        for i := 0 to a-1 do
+            NodeA := VST.GetNextSibling(NodeA);
+        NodeB := NodeA;
+        for i := a to b-1 do
+            NodeB := VST.GetNextSibling(NodeB);
+        // change fPlayingIndex
+        if NodeA = fPlayingNode then
+            fPlayingIndex := NodeB.Index
+        else
+            if NodeB = fPlayingNode then
+                fPlayingIndex := NodeA.Index;
+
+        Playlist.Move(a,b);
+        VST.MoveTo(NodeA, NodeB, amInsertAfter, false);
+        result := True;
+    end else
+        result := False;
 end;
 
 {

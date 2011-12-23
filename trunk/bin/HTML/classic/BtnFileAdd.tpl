@@ -1,1 +1,1 @@
-<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}">Add to Playlist</a>
+<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}"><img src="images/add.png" width="24" height="24" alt="add to playlist" />Add to playlist</a>
