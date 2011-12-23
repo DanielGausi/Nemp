@@ -938,6 +938,49 @@ begin
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
                               end;
                            end;
+        WS_PlaylistMoveUp : begin
+                              if AcceptApiCommands then
+                              begin
+                                  aMsg.Result := 0;
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  if idx > 0 then
+                                  begin
+                                      if NempPlaylist.SwapFiles(idx, idx-1) then
+                                          aMsg.Result := 1;
+                                  end else
+                                  if idx = 0 then
+                                      aMsg.Result := 2; // move up of the first title
+                              end;
+                           end;
+        WS_PlaylistMoveDown : begin
+                              if AcceptApiCommands then
+                              begin
+                                  aMsg.Result := 0;
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  if (idx > -1) and (idx < NempPlaylist.Count - 1) then
+                                  begin
+                                      NempPlaylist.SwapFiles(idx, idx+1);
+                                      //Playlist.Move(idx, idx+1);
+                                      //NempPlaylist.FillPlaylistView;
+                                      aMsg.Result := 1;
+                                  end else
+                                      if idx = NempPlaylist.Count - 1 then
+                                          aMsg.Result := 2;// move down of the last title
+                              end;
+                           end;
+        WS_PlaylistDelete : begin
+                              if AcceptApiCommands then
+                              begin
+                                  aMsg.Result := 0;
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  if (idx > -1) then
+                                  begin
+                                      NempPlaylist.DeleteAFile(idx);
+                                      aMsg.Result := 1;
+                                  end;
+                              end;
+                           end;
+
         WS_QueryPlayer: begin
                             NempWebServer.GenerateHTMLfromPlayer(NempPlayer);
                         end;

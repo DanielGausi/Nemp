@@ -1,1 +1,1 @@
-<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}">Down</a>
+<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}"><img src="images/move-down.png" width="24" height="24" alt="move down" /></a>

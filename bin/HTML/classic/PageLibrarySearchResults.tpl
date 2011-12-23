@@ -15,3 +15,4 @@
 {{SearchResultItems}}
 </ul>
 </div>
+<div style="clear:both;"></div>

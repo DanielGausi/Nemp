@@ -7,5 +7,5 @@
 <tr><td><input type="submit" value="Search" class="button"></td></tr>
 </table>
 </form>
-
 </div>
+<div style="clear:both;"></div>

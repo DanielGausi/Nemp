@@ -75,6 +75,10 @@ const
     WS_InsertNext = 4;
     WS_AddToPlaylist = 5;
 
+    WS_PlaylistMoveUp = 7;
+    WS_PlaylistMoveDown = 8;
+    WS_PlaylistDelete = 9;
+
 
     //    WM_QueryPlaylistDownload = 5553;
     WS_PlaylistDownloadID = 6;
@@ -736,6 +740,7 @@ end;
 function TNempWebServer.fSetBasicFileData(af: TAudioFile; aPattern, baseClass: String): String;
 var duration, aClass: String;
     quality, filesize, filetype, path: String;
+    notfound: Boolean;
 begin
     // IDs/Index MUST be replaced befor calling this method
     // (these are specific for playlist/library-view)
@@ -753,17 +758,21 @@ begin
     aClass := baseClass;
     case af.AudioType of
         at_Undef  : aClass := aClass + 'unknown';
-        at_File   : aClass := aClass + 'File';
-        at_Stream : aClass := aClass + 'Stream';
-        at_CDDA   : aClass := aClass + 'CDDA';
-        at_CUE    : aClass := aClass + 'CUE';
+        at_File   : aClass := aClass + 'file';
+        at_Stream : aClass := aClass + 'stream';
+        at_CDDA   : aClass := aClass + 'cdda';
+        at_CUE    : aClass := aClass + 'cue';
     end;
-    if Not af.FileIsPresent then
+    notfound := False;
+    if Not FileExists(af.Pfad) then
     begin
         case af.AudioType of
             at_File,
             at_Undef,
-            at_CDDA   : aClass := aClass + ' FileNotFound';
+            at_CDDA   : begin
+                  aClass := aClass + ' FileNotFound';
+                  notfound := True;
+            end;
         end;
     end;
 
@@ -813,6 +822,12 @@ begin
     result := StringReplace(result, '{{Filetype}}'  , EscapeHTMLChars(filetype), [rfReplaceAll]);
     result := StringReplace(result, '{{URL}}'       , EscapeHTMLChars(path), [rfReplaceAll]);
     result := StringReplace(result, '{{Quality}}'   , EscapeHTMLChars(quality), [rfReplaceAll]);
+
+    if notfound then
+        result := StringReplace(result, '{{Warning}}' , WebServer_FileNotFound, [rfReplaceAll])
+    else
+        result := StringReplace(result, '{{Warning}}' , '', [rfReplaceAll]);
+
 
     if (af.CoverID <> '') and (FileExists(CoverSavePath + af.CoverID + '.jpg')) then
         result := StringReplace(result, '{{CoverID}}'   , EscapeHTMLChars(af.CoverID), [rfReplaceAll])
@@ -964,7 +979,7 @@ begin
 
         // Set "Current" class
         if af = aNempPlaylist.PlayingFile then
-            aClass := 'Current '
+            aClass := 'current '
         else
             aClass := '';
 
@@ -1168,17 +1183,20 @@ begin
 
         // Buttons for File-Handling
         sl.LoadFromFile(fLocalDir + 'BtnFileDownload.tpl');
-        PatternButtonFileDownload := sl.Text;
+        PatternButtonFileDownload := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnFilePlayNow.tpl');
-        PatternButtonFilePlayNow := sl.Text;
+        PatternButtonFilePlayNow := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnFileAdd.tpl');
-        PatternButtonFileAdd := sl.Text;
+        PatternButtonFileAdd := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnFileAddNext.tpl');
-        PatternButtonFileAddNext := sl.Text;
+        PatternButtonFileAddNext := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnFileMoveUp.tpl');
-        PatternButtonFileMoveUp := sl.Text;
+        PatternButtonFileMoveUp := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnFileMoveDown.tpl');
-        PatternButtonFileMoveDown := sl.Text;
+        PatternButtonFileMoveDown := trim(sl.Text);
+        sl.LoadFromFile(fLocalDir + 'BtnFileDelete.tpl');
+        PatternButtonFileDelete := trim(sl.Text);
+
 
         // The PLAYER page
         sl.LoadFromFile(fLocalDir + 'ItemPlayer.tpl');
@@ -1469,8 +1487,42 @@ begin
             end;
             LeaveCriticalSection(CS_AccessLibrary);
         end;
-
-
+        if queriedAction = 'file_moveup' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID) >= 1 then
+            begin
+                // todo: Hier ggf. ein result erwarten und auswerten?
+                AResponseInfo.Redirect('/playlist');
+                AResponseInfo.ContentStream := Nil;
+                result := qrPermit;
+            end else
+                result := HandleError(AResponseInfo, qrInvalidParameter);
+        end;
+        if queriedAction = 'file_movedown' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID) >= 1 then
+            begin
+                // todo: Hier ggf. ein result erwarten und auswerten?
+                AResponseInfo.Redirect('/playlist');
+                AResponseInfo.ContentStream := Nil;
+                result := qrPermit;
+            end else
+                result := HandleError(AResponseInfo, qrInvalidParameter);
+        end;
+        if queriedAction = 'file_delete' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) = 1 then
+            begin
+                // todo: Hier ggf. ein result erwarten und auswerten?
+                AResponseInfo.Redirect('/playlist');
+                AResponseInfo.ContentStream := Nil;
+                result := qrPermit;
+            end else
+                result := HandleError(AResponseInfo, qrInvalidParameter);
+        end;
 
         /// file_add
         /// file_addNext                     /insertnext

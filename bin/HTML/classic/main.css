@@ -10,6 +10,9 @@ body {
     	/*width: 240px;*/
     	max-width: 500px;
     	min-width: 240px;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #404040;
 }
 
 
@@ -31,11 +34,27 @@ h2 {
 	font-size: 1.2em;
 }
 
+p {
+margin:0;
+padding:0;
+}
+
+
+.FileNotFound,
+.FileNotFound a{
+	text-decoration: line-through ! important;
+}
+
+p.warning {
+	color: red;
+}
+
 
 div.menu {
 	margin 5px;
 	padding: 10px;
 	border-bottom: 1px solid #404040;
+	margin-bottom:10px;
 }
 
 ul.mainmenu {
@@ -91,15 +110,15 @@ div.currentimage {
 
 
 .playercontrol {
-	padding: 10px;
+	padding-bottom: 10px;
 	margin-bottom: 10px;
 	text-align: center;
 	border-bottom: 1px solid #404040;
 }
 a.button{
-	color: #202020;	
-	background-color: #fafafa;
-	border: 1px solid white;	
+	//color: #202020;	
+	//background-color: #fafafa;
+	border: 1px solid #202020;	
 	padding: 2px 5px;
 	text-align: center;
 	background-repeat: no-repeat;
@@ -108,14 +127,12 @@ a.button{
 }
 
 a.button img{
-vertical-align: middle;
-	
+	vertical-align: middle;
 }
 
-
 .player a:hover{
-	background-color: #fafafa;
-	border: 1px solid #ffffff;
+	//background-color: #fafafa;
+	border-color: #ffffff;
 }
 
 .player .filecontrol{
@@ -123,73 +140,122 @@ vertical-align: middle;
 	padding-top: 15px;
 }
 
-
-ul.actionmenu li a{
-	color: #202020;
-        display:block;
-	padding-top:5px;
-	padding-bottom:5px;
-
-}
-
-
-ul.playlist {
-	background-color: #202020;
-         margin: 0; padding: 0px;
-}
-
-ul.playlist li{
-         list-style: none;
-         padding-right: 5px;
-         padding-left: 5px;
-         margin:0;
-}
-
-div.playlistentry{
-         color: #dddddd;
-         border-bottom: 1px solid #404040;
-         padding-left: 0px;
-         width: 100%;
-         padding-bottom: 0px;
-         margin-bottom: 0px;
-}
-
-ul.searchresults {
-	background-color: #202020;
-         margin: 0; padding: 0px;
-}
-
-ul.searchresults li{
-         list-style: none;
-         padding-right: 5px;
-         padding-left: 5px;
-         margin:0;
-}
-
-div.playlist .Current{
-        /*	background-color: #404040;*/
-         color: #dddddd;
-         border: 1px solid red;
-         padding-left: 0px;
-         width: 100%;
-         padding-bottom: 0px;
-         margin-bottom: 0px;
-}
-
-div.playlistentry table{
-	width: 100%;
+.playlist .button,
+.search .button{
+	border: 0px;
 	padding: 0;
 	margin: 0;
+	width: 24px;  /* hide text */
+	height: 24px; /* hide text */
+	overflow: hidden;
 }
 
-div.playlistentry table tr{
-	padding: 0;
-	margin: 0;
+.playlist li,
+.search li {
+	clear: both;
 }
+
+.playlist li div,
+.search li div{
+	float: left;
+}
+
+.playlist .controls{
+	width: 120px;
+	text-align:right;
+}
+
+.search .controls{
+	width: 60px;
+	text-align:right;
+}
+
+.playlist .title{
+	width: 140px;
+	padding-left:3px;
+}
+
+.search .title{
+	width: 200px;
+	padding-left:3px;
+}
+.playlist .title a,
+.search .title a{
+	display:block;
+}
+
+.playlist .duration,
+.search .index{
+	color: #999999;
+}
+
+.playlist .index{
+	height:24px;
+	vertical-align:super;
+	margin-right:3px;
+}
+
+.playlist .cover,
+.search .cover  {
+	width: 50px;
+}
+
+ul.playlist,
+ul.search {
+	margin: 0; padding: 0px;
+}
+
+ul.playlist li,
+ul.search li{
+	list-style: none;
+	margin:0;
+}
+
+ul.playlist li div.file,
+ul.search li div.file{
+	padding:3px;
+}
+
+ul.playlist li div.file:hover,
+ul.search li div.file:hover{
+	background-color: #707070;
+}
+
+div.playlist .current{
+	background-color: #707070;
+	color: #dddddd;
+}
+
+.details .left {
+	width: 50%;
+	float: left;
+	padding-left:5px;
+}
+
+.details .artist, 
+.details .title {
+	font-size: 1.1em;
+}
+.details .album{
+	color: #999999;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #404040;
+}
+
+.details .data {
+	color: #999999;
+	margin-top: 5px;
+}
+
+.details .controls {
+	clear: both;
+	text-align: center;
+}
+
 
 ul.details {
 	background-color: #202020;
-         margin: 0; padding: 0px;
+    margin: 0; padding: 0px;
 }
 
 ul.details li{
@@ -200,22 +266,6 @@ ul.details li{
 }
 
 
-td.title{
-	color: #dddddd;
-	width: 100%;
-	padding: 0;
-	margin: 0;
-}
-
-td.title a:hover{
-	color: red;
-	text-decoration: none;
-}
-
-td.duration{
-	width: 20%;
-	text-align: right;
-}
 
 table.filenotfound{
 	text-decoration: line-through;
@@ -247,14 +297,4 @@ div.playlistcontrol ul li {
 ul.actionmenu {
 	margin-top: 10px;
 	padding: 0;
-}
-
-ul.actionmenu li, .button{
-	list-style: none;
-	color: #202020;
-	background-color: #dddddd;
-	border: 1px solid white;
-	padding: 2px;
-	margin: 2px;
-	text-align: center;
 }

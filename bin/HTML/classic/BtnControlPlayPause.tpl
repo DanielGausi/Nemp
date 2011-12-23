@@ -1,1 +1,1 @@
-<a class="button btnplaypause" href="playercontrol?action=playpause"><img src="images/playback-start.png" width="64" height="32" alt="playpause" /></a>
+<a class="button btnplaypause" href="playercontrol?action=playpause"><img src="images/playback-start.png" width="32" height="32" alt="playpause" /></a>
