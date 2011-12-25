@@ -131,7 +131,6 @@ a.button img{
 }
 
 .player a:hover{
-	//background-color: #fafafa;
 	border-color: #ffffff;
 }
 
@@ -139,6 +138,10 @@ a.button img{
 	text-align: center;
 	padding-top: 15px;
 }
+
+
+
+
 
 .playlist .button,
 .search .button{
@@ -150,33 +153,44 @@ a.button img{
 	overflow: hidden;
 }
 
-.playlist li,
-.search li {
-	clear: both;
+.playlist table tr td,
+.library table tr td{
+	padding-top:3px;
+	padding-bottom: 3px;
 }
 
-.playlist li div,
-.search li div{
-	float: left;
+.playlist table tr td,
+.library table tr td{
+	vertical-align:top;
 }
 
 .playlist .controls{
-	width: 120px;
+	width: 96px;
 	text-align:right;
+	padding-left: 3px;
 }
 
 .search .controls{
-	width: 60px;
+	min-width: 52px;
 	text-align:right;
+	padding-left: 3px;
+}
+.playlist .index {
+	text-align:right;
+	min-width: 20px;
+	padding-right:5px;
 }
 
-.playlist .title{
-	width: 140px;
-	padding-left:3px;
+span.prebook{
+	font-size:0.9em;
+	color: #666666;
+}
+span.noprebook {
+		font-size:0.9em;
+		display: none;
 }
 
 .search .title{
-	width: 200px;
 	padding-left:3px;
 }
 .playlist .title a,
@@ -185,39 +199,20 @@ a.button img{
 }
 
 .playlist .duration,
-.search .index{
+.search .index,
+.search .duration,
+.player .duration{
 	color: #999999;
-}
-
-.playlist .index{
-	height:24px;
-	vertical-align:super;
-	margin-right:3px;
 }
 
 .playlist .cover,
 .search .cover  {
 	width: 50px;
+	padding-right:3px;
 }
 
-ul.playlist,
-ul.search {
-	margin: 0; padding: 0px;
-}
-
-ul.playlist li,
-ul.search li{
-	list-style: none;
-	margin:0;
-}
-
-ul.playlist li div.file,
-ul.search li div.file{
-	padding:3px;
-}
-
-ul.playlist li div.file:hover,
-ul.search li div.file:hover{
+.playlist .file:hover,
+.search .file:hover{
 	background-color: #707070;
 }
 
@@ -226,6 +221,11 @@ div.playlist .current{
 	color: #dddddd;
 }
 
+
+
+
+
+
 .details .left {
 	width: 50%;
 	float: left;
@@ -233,7 +233,8 @@ div.playlist .current{
 }
 
 .details .artist, 
-.details .title {
+.details .title,
+.player .currenttitle {
 	font-size: 1.1em;
 }
 .details .album{
@@ -253,19 +254,6 @@ div.playlist .current{
 }
 
 
-ul.details {
-	background-color: #202020;
-    margin: 0; padding: 0px;
-}
-
-ul.details li{
-         list-style: none;
-         padding-right: 5px;
-         padding-left: 5px;
-         margin:0;
-}
-
-
 
 table.filenotfound{
 	text-decoration: line-through;
@@ -279,22 +267,3 @@ div.playlistcontrol{
          clear: both;
 	}
 
-div.playlistcontrol ul{
-	/*background-color: #404040;*/
-	margin: 0; padding: 0px;
-	color: #808080;
-}
-
-div.playlistcontrol ul li {
-	list-style: none;
-	display: inline;
-	margin: 0em;
-	padding-left: 5px;
-	padding-right:0;
-
-}
-
-ul.actionmenu {
-	margin-top: 10px;
-	padding: 0;
-}

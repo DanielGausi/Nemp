@@ -11,8 +11,8 @@
 </form>
 
 <h2>Search results for {{SearchString}}: {{SearchCount}}</h2>
-<ul class="search">
+<table class="search" cellpadding="0" cellspacing="0">
 {{SearchResultItems}}
-</ul>
+</table>
 </div>
 <div style="clear:both;"></div>
