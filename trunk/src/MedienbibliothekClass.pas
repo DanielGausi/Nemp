@@ -874,7 +874,8 @@ begin
               newAF.WebServerID := AF.WebServerID;
           dest.Add(newAF);
       end;
-  end;
+  end;// else
+      // wuppdi;
 end;
 
 {
@@ -1301,6 +1302,8 @@ begin
       end;
       init_AutoScanDir: begin
           // AutoScandir has been completed, so WebServer-Activation is the next thing to do.
+          MB.Initializing := Init_Complete;
+          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
           if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
           begin
               MB.Initializing := Init_Complete;
@@ -1308,8 +1311,6 @@ begin
               // Activation is done in VCL-Thread.
               // So the WebServer IS activated when SendMessage returns
           end;
-          MB.Initializing := Init_Complete;
-          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
       end;
       init_complete: begin
           // nothing more to do.

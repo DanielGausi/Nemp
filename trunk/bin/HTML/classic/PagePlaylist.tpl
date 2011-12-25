@@ -1,7 +1,7 @@
 <div class="playlist">
 {{Menu}}
-<ul class="playlist">
+<table class="playlist" cellpadding="0" cellspacing="0">
 {{PlaylistItems}}
-</ul>
+</table>
 </div>
 <div style="clear:both;">&nbsp;</div>

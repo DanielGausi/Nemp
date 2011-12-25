@@ -677,6 +677,8 @@ begin
                 // This is good, but in this case we dont run fNewFilesUpdate a
                 // second time, so Auto-Activation of the server will not be done
                 // So: Start it directly here
+                // Anyway, we have te set the status to zero here
+                MedienBib.StatusBibUpdate := 0;
                 if MedienBib.AutoActivateWebServer then
                 begin
                     MedienBib.Initializing := Init_Complete;
@@ -943,13 +945,31 @@ begin
                               begin
                                   aMsg.Result := 0;
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
-                                  if idx > 0 then
+
+                                  if (idx > -1) then
                                   begin
-                                      if NempPlaylist.SwapFiles(idx, idx-1) then
-                                          aMsg.Result := 1;
-                                  end else
-                                  if idx = 0 then
-                                      aMsg.Result := 2; // move up of the first title
+                                      af := TPlaylistFile(NempPlaylist.Playlist[idx]);
+                                      if af.PrebookIndex > 0 then
+                                      begin
+                                          if af.PrebookIndex > 1 then
+                                          begin
+                                              NempPlaylist.SetNewPrebookIndex(af, af.PrebookIndex - 1);
+                                              aMsg.Result := 1;
+                                          end
+                                          else
+                                              aMsg.Result := 2; // move up of the firstfile in prebooklist
+                                      end
+                                      else
+                                      begin
+                                          if idx > 0 then
+                                          begin
+                                              if NempPlaylist.SwapFiles(idx, idx-1) then
+                                                  aMsg.Result := 1;
+                                          end else
+                                          if idx = 0 then
+                                              aMsg.Result := 2; // move up of the first title
+                                      end;
+                                  end;
                               end;
                            end;
         WS_PlaylistMoveDown : begin
@@ -957,15 +977,39 @@ begin
                               begin
                                   aMsg.Result := 0;
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
-                                  if (idx > -1) and (idx < NempPlaylist.Count - 1) then
+
+                                  if (idx > -1) then
                                   begin
-                                      NempPlaylist.SwapFiles(idx, idx+1);
-                                      //Playlist.Move(idx, idx+1);
-                                      //NempPlaylist.FillPlaylistView;
-                                      aMsg.Result := 1;
-                                  end else
-                                      if idx = NempPlaylist.Count - 1 then
-                                          aMsg.Result := 2;// move down of the last title
+                                      af := TPlaylistFile(NempPlaylist.Playlist[idx]);
+                                      if af.PrebookIndex > 0 then
+                                      begin
+                                          if af.PrebookIndex < NempPlaylist.PrebookCount then
+                                          begin
+                                              NempPlaylist.SetNewPrebookIndex(af, af.PrebookIndex + 1);
+                                              aMsg.Result := 1;
+                                          end
+                                          else
+                                          begin
+                                              // move down of the last file in prebooklist
+                                              // => delete from prebooklist
+                                              NempPlaylist.SetNewPrebookIndex(af, 0);
+                                              aMsg.Result := 1;
+
+                                          end;
+                                      end
+                                      else
+                                      begin
+                                          if (idx > -1) and (idx < NempPlaylist.Count - 1) then
+                                          begin
+                                              NempPlaylist.SwapFiles(idx, idx+1);
+                                              //Playlist.Move(idx, idx+1);
+                                              //NempPlaylist.FillPlaylistView;
+                                              aMsg.Result := 1;
+                                          end else
+                                              if idx = NempPlaylist.Count - 1 then
+                                                  aMsg.Result := 2;// move down of the last title
+                                      end;
+                                  end;
                               end;
                            end;
         WS_PlaylistDelete : begin
@@ -975,8 +1019,16 @@ begin
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
                                   if (idx > -1) then
                                   begin
-                                      NempPlaylist.DeleteAFile(idx);
-                                      aMsg.Result := 1;
+                                      af := TPlaylistFile(NempPlaylist.Playlist[idx]);
+                                      if af.PrebookIndex > 0 then
+                                      begin
+                                          NempPlaylist.SetNewPrebookIndex(af, 0);
+                                          aMsg.Result := 1;
+                                      end else
+                                      begin
+                                          NempPlaylist.DeleteAFile(idx);
+                                          aMsg.Result := 1;
+                                      end;
                                   end;
                               end;
                            end;

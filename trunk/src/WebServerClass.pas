@@ -975,6 +975,14 @@ begin
         // create new Item
         Item := PatternItemPlaylist;
         Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
+
+        if af.PrebookIndex > 0 then
+            Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+        else
+            Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
+        Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
+
+
         Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
 
         // Set "Current" class
@@ -1014,6 +1022,12 @@ begin
 
         FileData := PatternItemPlaylistDetails;
         FileData := StringReplace(FileData, '{{Index}}' , IntToStr(aIdx + 1)              , [rfReplaceAll]);
+        if aAudioFile.PrebookIndex > 0 then
+            FileData := Stringreplace(FileData, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+        else
+            FileData := Stringreplace(FileData, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
+        FileData := StringReplace(FileData, '{{PrebookIndex}}', IntToStr(aAudioFile.PrebookIndex) , [rfReplaceAll]);
+
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
         FileData := fSetFileButtons(aAudioFile, FileData, 1);

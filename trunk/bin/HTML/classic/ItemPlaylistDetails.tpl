@@ -7,7 +7,8 @@
 <p class="data">{{Duration}}min <br />
 {{Size}}mb, {{Quality}} <br />
 Filetype: {{Filetype}} <br />
-Position in playlist: {{Index}} <br />
+Position in playlist: {{Index}}
+<span class="{{PrebookClass}}"><br />Position in prebook list: {{PrebookIndex}}</span>
 </p>
 <p class="warning">{{Warning}}</p>
 </div>
