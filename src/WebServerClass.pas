@@ -188,6 +188,7 @@ type
 
           fUsername: String;
           fPassword: String;
+          fRootDir : String;
 
           fOnlyLAN               : Longbool;
           fAllowPlaylistDownload : Longbool;
@@ -253,6 +254,9 @@ type
           procedure fSetUsername(Value: String);
           function fGetPassword: String;
           procedure fSetPassword(Value: String);
+
+          function fGetRootDir: String;
+          procedure fSetRootDir(Value: String);
 
           procedure fSetOnlyLAN              (Value: Longbool);
           procedure fSetAllowPlaylistDownload(Value: Longbool);
@@ -333,6 +337,7 @@ type
 
           property Username: string read fGetUsername write fSetUsername;
           property Password: string read fGetPassword write fSetPassword;
+          property RootDir : String read fGetRootDir  write fSetRootDir;
           property OnlyLAN               : Longbool read fGetOnlyLAN               write fSetOnlyLAN              ;
           property AllowFileDownload     : Longbool read fGetAllowPlaylistDownload write fSetAllowPlaylistDownload;
           property AllowLibraryAccess    : Longbool read fGetAllowLibraryAccess    write fSetAllowLibraryAccess   ;
@@ -355,6 +360,8 @@ type
           destructor Destroy; override;
           procedure LoadfromIni;
           procedure SaveToIni;
+
+          procedure GetThemes(out Themes: TStrings);
 
           // Im VCL-Thread ausführen, mit CS geschützt
           // d.h. Message an Form Senden, die das dann ausführt
@@ -411,13 +418,13 @@ begin
     fMainHandle := aHandle;
     fMainWindowHandle := aHandle;
     fCurrentMaxID  := 1;
+    Active := False;
     // fCurrentIDmaxLib := 1;
     fWebMedienBib := TObjectlist.Create(False);
     IdHTTPServer1 := TIdHTTPServer.Create(Nil);
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
     GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
-    fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\classic\';
     Username := 'admin';
     Password := 'pass';
     LogList := TStringList.Create;
@@ -448,10 +455,10 @@ begin
         AllowFileDownload     := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
         AllowLibraryAccess    := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
         AllowRemoteControl    := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
-
         Port               := Ini.ReadInteger('Remote', 'Port', 80);
-        Username           := Ini.ReadString('Remote', 'Username'        , 'admin');
-        Password           := Ini.ReadString('Remote', 'Password'        , 'pass');
+        RootDir            := Ini.ReadString('Remote', 'RootDir' , 'Extended');
+        Username           := Ini.ReadString('Remote', 'Username', 'admin'  );
+        Password           := Ini.ReadString('Remote', 'Password', 'pass'   );
     finally
         ini.Free;
     end;
@@ -469,8 +476,9 @@ begin
       Ini.WriteBool('Remote', 'AllowLibraryAccess'    , AllowLibraryAccess);
       Ini.WriteBool('Remote', 'AllowRemoteControl'    , AllowRemoteControl);
       Ini.WriteInteger('Remote', 'Port', Port);
-      Ini.WriteString('Remote', 'Username'        , Username);
-      Ini.WriteString('Remote', 'Password'        , Password);
+      Ini.WriteString('Remote', 'RootDir' , RootDir);
+      Ini.WriteString('Remote', 'Username', Username);
+      Ini.WriteString('Remote', 'Password', Password);
       try
           Ini.UpdateFile;
       except
@@ -480,6 +488,8 @@ begin
       ini.Free;
   end;
 end;
+
+
 
 
 function TNempWebServer.fGetUsername: String;
@@ -505,6 +515,19 @@ procedure TNempWebServer.fSetPassword(Value: String);
 begin
     EnterCriticalSection(CS_Authentification);
     fPassword := Value;
+    LeaveCriticalSection(CS_Authentification);
+end;
+
+function TNempWebServer.fGetRootDir: String;
+begin
+    EnterCriticalSection(CS_Authentification);
+    result := fRootDir;
+    LeaveCriticalSection(CS_Authentification);
+end;
+procedure TNempWebServer.fSetRootDir(Value: String);
+begin
+    EnterCriticalSection(CS_Authentification);
+    fRootDir := Value;
     LeaveCriticalSection(CS_Authentification);
 end;
 
@@ -1176,6 +1199,7 @@ end;
 procedure TNempWebServer.LoadTemplates;
 var sl: TStringList;
 begin
+    fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + RootDir + '\';
     sl := TStringList.Create;
     try
         sl.LoadFromFile(fLocalDir + 'Body.tpl');
@@ -1322,6 +1346,17 @@ begin
         end;
     end;
     LeaveCriticalSection(CS_AccessLibrary);
+end;
+
+procedure TNempWebServer.GetThemes(out Themes: TStrings);
+var SR: TSearchRec;
+begin
+    if (FindFirst(ExtractFilePath(Paramstr(0)) + 'HTML\' + '*', faDirectory, SR)=0) then
+        repeat
+          if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
+              Themes.Add(Sr.Name);
+        until FindNext(SR)<>0;
+    FindClose(SR);
 end;
 
 function TNempWebServer.fGetCount: Integer;

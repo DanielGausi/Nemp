@@ -1,0 +1,1 @@
+<a class="button" href="{{Filename}}?id={{ID}}&action={{Action}}"><img src="images/download.png" width="32" height="32" alt="download" /> Download</a>

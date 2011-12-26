@@ -116,6 +116,8 @@ div.currentimage {
 	border-bottom: 1px solid #404040;
 }
 a.button{
+	//color: #202020;	
+	//background-color: #fafafa;
 	border: 1px solid #202020;	
 	padding: 2px 5px;
 	text-align: center;
@@ -136,6 +138,9 @@ a.button img{
 	text-align: center;
 	padding-top: 15px;
 }
+
+
+
 
 
 .playlist .button,
@@ -159,6 +164,17 @@ a.button img{
 	vertical-align:top;
 }
 
+.playlist .controls{
+	width: 96px;
+	text-align:right;
+	padding-left: 3px;
+}
+
+.search .controls{
+	min-width: 52px;
+	text-align:right;
+	padding-left: 3px;
+}
 .playlist .index {
 	text-align:right;
 	min-width: 20px;
@@ -186,8 +202,13 @@ span.noprebook {
 .search .index,
 .search .duration,
 .player .duration{
-	padding-left:5px;
 	color: #999999;
+}
+
+.playlist .cover,
+.search .cover  {
+	width: 50px;
+	padding-right:3px;
 }
 
 .playlist .file:hover,
@@ -199,6 +220,8 @@ div.playlist .current{
 	background-color: #707070;
 	color: #dddddd;
 }
+
+
 
 
 
