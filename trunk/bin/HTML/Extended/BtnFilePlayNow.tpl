@@ -1,0 +1,1 @@
+<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}"><img src="images/playback-start.png" width="24" height="24" alt="play now" /> Play now</a>

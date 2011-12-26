@@ -456,6 +456,8 @@ type
     GrpBox_CDAudio: TGroupBox;
     cb_UseCDDB: TCheckBox;
     BtnRefreshDevices: TButton;
+    cbWebserverRootDir: TComboBox;
+    LblWebServerTheme: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -899,7 +901,7 @@ var i,s: integer;
     hKey: Byte;
     //aBmp: TBitmap;
     ftr: TFileTypeRegistration;
-    tmpIPs: TStrings;
+    tmpIPs, tmpThemes: TStrings;
 begin
   // Beta-Option
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
@@ -1350,7 +1352,19 @@ begin
       GrpBox_ScrobbleLog.Caption := Scrobble_Offline;
 
   // Webserver-Daten auslesen und Controls setzen
+
   NempWebServer.LoadfromIni;
+  tmpThemes := tStringList.Create;
+  try
+      NempWebServer.GetThemes(tmpThemes);
+      cbWebServerRootDir.Items.Assign(tmpThemes);
+  finally
+      tmpThemes.Free;
+  end;
+
+  if cbWebServerRootDir.Items.IndexOf(NempWebServer.RootDir) >-1 then
+      cbWebServerRootDir.ItemIndex := cbWebServerRootDir.Items.IndexOf(NempWebServer.RootDir);
+
   EdtUsername.Text  := NempWebServer.Username;
   EdtPassword.Text  := NempWebServer.Password;
   seWebServer_Port.Value := NempWebServer.Port;
@@ -1366,8 +1380,10 @@ begin
   if cbLANIPs.Items.Count > 0 then
       cbLANIPs.ItemIndex := 0;
 
-  EdtUsername.Enabled := NempWebServer.Active;
-  EdtPassword.Enabled := NempWebServer.Active;
+  EdtUsername.Enabled := NOT NempWebServer.Active;
+  EdtPassword.Enabled := NOT NempWebServer.Active;
+  cbWebServerRootDir.Enabled := NOT NempWebServer.Active;
+  seWebServer_Port.Enabled := NOT NempWebServer.Active;
   if NempWebServer.Active then
       BtnServerActivate.Caption := WebServer_DeActivateServer
   else
@@ -2579,6 +2595,8 @@ begin
   // Webserver
   NempWebServer.Username := EdtUsername.Text;
   NempWebServer.Password := EdtPassword.Text;
+  NempWebServer.RootDir := cbWebServerRootDir.Text;
+
   NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
 
   if (NempWebServer.Port <> seWebServer_Port.Value) and (NempWebServer.Active) then
@@ -3168,6 +3186,7 @@ begin
         // 1.) Daten übernehmen
         NempWebServer.Username := EdtUsername.Text;
         NempWebServer.Password := EdtPassword.Text;
+        NempWebServer.RootDir  := cbWebServerRootDir.Text;
         NempWebServer.Port     := seWebServer_Port.Value;
         NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
@@ -3187,6 +3206,8 @@ begin
             BtnServerActivate.Caption := WebServer_DeActivateServer;
             EdtUsername.Enabled := False;
             EdtPassword.Enabled := False;
+            seWebServer_Port.Enabled := False;
+            cbWebServerRootDir.Enabled := False;
             //BtnUpdateAuth.Enabled := False;
             //LogMemo.Lines.Add(DateTimeToStr(Now, LocalFormatSettings) + ', Server acticated, Files in library: ' + IntToStr(NempWebserver.Count));
         end else
@@ -3204,6 +3225,8 @@ begin
         BtnServerActivate.Caption := WebServer_ActivateServer;
         EdtUsername.Enabled := True;
         EdtPassword.Enabled := True;
+        seWebServer_Port.Enabled := True;
+        cbWebServerRootDir.Enabled := True;
         //BtnUpdateAuth.Enabled := True;
         //LogMemo.Lines.Add(DateTimeToStr(Now, LocalFormatSettings) + ', Server shutdown.');
         ReArrangeToolImages;
