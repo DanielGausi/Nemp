@@ -321,8 +321,6 @@ type
           procedure SetActive(Value: Boolean);
           procedure LoadTemplates;
 
-
-
       public
           SavePath: UnicodeString;
           CoverSavePath: UnicodeString;
@@ -407,7 +405,6 @@ implementation
 uses Nemp_RessourceStrings;
 
 
-
 constructor TNempWebServer.Create(aHandle: DWord);
 begin
     inherited create;
@@ -418,6 +415,7 @@ begin
     fWebMedienBib := TObjectlist.Create(False);
     IdHTTPServer1 := TIdHTTPServer.Create(Nil);
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
+
     GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
     fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\classic\';
     Username := 'admin';
