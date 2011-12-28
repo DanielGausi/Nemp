@@ -3,7 +3,7 @@
 <div class="left">
 <p class="artist">{{Artist}}</p> 
 <p class="title">{{Title}}</p> 
-<p class="album">{{Album}}</p> 
+<p class="album">{{Album}} <span class="{{TrackClass}}">(Track {{Track}})</span></p> 
 <p class="data">{{Duration}}min <br />
 {{Size}}mb, {{Quality}} <br />
 Filetype: {{Filetype}} <br />
