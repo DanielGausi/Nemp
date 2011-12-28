@@ -834,15 +834,23 @@ begin
     result := StringReplace(result, '{{Class}}'        , aClass, [rfReplaceAll]);
 
     result := StringReplace(result, '{{PlaylistTitle}}', EscapeHTMLChars(af.PlaylistTitle), [rfReplaceAll]);
-    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.Titel), [rfReplaceAll]);
+    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.Titel) , [rfReplaceAll]);
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
-    result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album), [rfReplaceAll]);
+    result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
 
-    result := StringReplace(result, '{{Duration}}'  , duration, [rfReplaceAll]);
-    result := StringReplace(result, '{{Size}}'      , EscapeHTMLChars(filesize), [rfReplaceAll]);
-    result := StringReplace(result, '{{Filetype}}'  , EscapeHTMLChars(filetype), [rfReplaceAll]);
-    result := StringReplace(result, '{{URL}}'       , EscapeHTMLChars(path), [rfReplaceAll]);
-    result := StringReplace(result, '{{Quality}}'   , EscapeHTMLChars(quality), [rfReplaceAll]);
+    if af.Track = 0 then
+        result := StringReplace(result, '{{TrackClass}}', 'hidden', [rfReplaceAll])
+    else
+        result := StringReplace(result, '{{TrackClass}}', 'track' , [rfReplaceAll]);
+
+    result := StringReplace(result, '{{Track}}'     , IntToStr(af.Track)        , [rfReplaceAll]);
+
+
+    result := StringReplace(result, '{{Duration}}'  , duration                  , [rfReplaceAll]);
+    result := StringReplace(result, '{{Size}}'      , EscapeHTMLChars(filesize) , [rfReplaceAll]);
+    result := StringReplace(result, '{{Filetype}}'  , EscapeHTMLChars(filetype) , [rfReplaceAll]);
+    result := StringReplace(result, '{{URL}}'       , EscapeHTMLChars(path)     , [rfReplaceAll]);
+    result := StringReplace(result, '{{Quality}}'   , EscapeHTMLChars(quality)  , [rfReplaceAll]);
 
     if notfound then
         result := StringReplace(result, '{{Warning}}' , WebServer_FileNotFound, [rfReplaceAll])
