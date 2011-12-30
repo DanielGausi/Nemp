@@ -1,0 +1,1 @@
+<a class="button btnprev" href="playercontrol?action=previous"><img src="images/skip-backward.png" width="32" height="32" alt="backward" /></a>

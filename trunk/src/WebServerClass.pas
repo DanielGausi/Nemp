@@ -76,8 +76,13 @@ const
     WS_AddToPlaylist = 5;
 
     WS_PlaylistMoveUp = 7;
+    WS_PlaylistMoveUpCheck = 17;
+
     WS_PlaylistMoveDown = 8;
+    WS_PlaylistMoveDownCheck  = 18;
+
     WS_PlaylistDelete = 9;
+
 
 
     //    WM_QueryPlaylistDownload = 5553;
@@ -306,6 +311,9 @@ type
           function ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
           function ResponseCover (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 
+          function ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+
+
           //function ResponsePlay (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult; //PlaylistEintrag
           //function ResponseInsertNext (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult; // MedienBib-Eintrag
           //function ResponseAddToPlaylist (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult; // MedienBib-Eintrag
@@ -367,10 +375,10 @@ type
           // d.h. Message an Form Senden, die das dann ausführt
 
           function ValidIP(aIP, bIP: String): Boolean;
-          procedure QueryPlayer; // Message senden...
+          //procedure QueryPlayer; // Message senden...
 
-          procedure QueryPlaylist; // Message senden...
-          procedure QueryPlaylistDetails(aID: Integer);
+          // procedure QueryPlaylist; // Message senden...
+          // procedure QueryPlaylistDetails(aID: Integer);
 
           // konvertiert die Playlist in ein HTML-Formular
           // in VCL-Threads ausführen, mit CS geschützt
@@ -943,10 +951,10 @@ begin
 end;
 
 
-procedure TNempWebServer.QueryPlayer;
-begin
-    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayer, 0);
-end;
+//procedure TNempWebServer.QueryPlayer;
+//begin
+//    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayer, 0);
+//end;
 
 procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer);
 var menu, PageData, PlayerData: String;
@@ -977,10 +985,10 @@ begin
 end;
 
 
-procedure TNempWebServer.QueryPlaylist; // Message senden...
-begin
-    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylist, 0);
-end;
+//procedure TNempWebServer.QueryPlaylist; // Message senden...
+//begin
+//    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylist, 0);
+//end;
 
 // konvertiert die Playlist in ein HTML-Formular
 // in VCL-Threads ausführen. Zugriff auf den HTML-String ist durch den Setter Threadsafe.
@@ -1033,12 +1041,12 @@ begin
     HTML_PlaylistView := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
-procedure TNempWebServer.QueryPlaylistDetails(aID: Integer);
-begin
+//procedure TNempWebServer.QueryPlaylistDetails(aID: Integer);
+//begin
     // dadurch wird im VCL-Thread das AudioFile zur ID ermittelt
     // und die nachfolgende Prozedur aufgerufen
-    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, aID);
-end;
+//    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, aID);
+//end;
 
 procedure TNempWebServer.GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
 var PageData, FileData: String;
@@ -1448,7 +1456,7 @@ var ms: TMemoryStream;
 begin
         ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
-            QueryPlayer;
+            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayer, 0); //QueryPlayer;
             html := HTML_Player;
             LeaveCriticalSection(CS_AccessHTMLCode);
         if html = '' then html := ' ';
@@ -1496,7 +1504,7 @@ begin
         if queriedAction = 'file_playnow' then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) = 1 then
+            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) > 0 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
                 AResponseInfo.Redirect('/playlist');
@@ -1601,6 +1609,90 @@ begin
     begin
         result := HandleError(AResponseInfo, qrRemoteControlDenied)
     end;
+end;
+
+function TNempWebServer.ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+var queriedAction: String;
+    queriedID: Integer;
+    af: TAudioFile;
+    res: Integer;
+    Item, aClass: String;
+
+    function BuildStream(aContent: UTF8String): TMemoryStream;
+    begin
+        result := tMemoryStream.Create;
+        result.Write(aContent[1], length(aContent))
+    end;
+
+
+begin
+    if AllowRemoteControl then
+    begin
+        result := qrPermit;
+        queriedAction := aRequestInfo.Params.Values['action'];
+
+        if queriedAction = 'file_playnow' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID);
+            if res > 0 then
+            begin
+                    AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+                    result := qrPermit;
+            end else
+                result := HandleError(AResponseInfo, qrInvalidParameter)
+        end;
+
+        if queriedAction = 'file_moveupcheck' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUpCheck, queriedID);
+            if  res <> 0 then
+            begin
+                try
+
+                ne, hier nur ID liefern
+
+                    af := TAudioFile(res);
+                    Item := PatternItemPlaylist;
+                    Item := StringReplace(Item, '{{Index}}'  , IntToStr(af.ViewCounter) , [rfReplaceAll]);
+
+                    if af.PrebookIndex > 0 then
+                        Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+                    else
+                        Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
+                    Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
+                    Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
+
+                    // Set "Current" class
+                    if af.ID3TagNeedsUpdate then
+                        aClass := 'current '
+                    else
+                        aClass := '';
+
+                    // replace tags
+                    Item := fSetBasicFileData(af, Item, aClass);
+                    Item := fSetFileButtons(af, Item, 1);
+
+                    AResponseInfo.ContentStream := BuildStream(UTF8String(Item));
+                finally
+                    af.Free;
+                end;
+
+                result := qrPermit;
+            end else
+            begin
+                AResponseInfo.ContentStream := BuildStream(UTF8String('first'));
+                result := qrPermit
+            end;
+        end;
+
+    end
+    else
+    begin
+        result := HandleError(AResponseInfo, qrRemoteControlDenied)
+    end;
+
 
 end;
 
@@ -1610,7 +1702,7 @@ var ms: TMemoryStream;
 begin
        ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
-            QueryPlaylist;
+            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylist, 0);
             html := HTML_PlaylistView;
             LeaveCriticalSection(CS_AccessHTMLCode);
         if html = '' then html := ' ';
@@ -1628,7 +1720,7 @@ var ms: TMemoryStream;
 begin
         EnterCriticalSection(CS_AccessHTMLCode);
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-        QueryPlaylistDetails(queriedID);
+        SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, queriedID);
         html := HTML_PlaylistDetails;
         LeaveCriticalSection(CS_AccessHTMLCode);
         if html <> '' then
@@ -1934,6 +2026,8 @@ begin
         if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playlist_details' then permit := ResponsePlaylistDetails(ARequestInfo, AResponseInfo)
         else
