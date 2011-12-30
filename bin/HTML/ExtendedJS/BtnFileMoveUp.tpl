@@ -1,0 +1,1 @@
+<a class="button" onclick="moveup({{ID}})"><img src="images/move-up.png" width="24" height="24" alt="move up" /></a>

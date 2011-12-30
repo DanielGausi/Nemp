@@ -875,7 +875,11 @@ begin
                                       begin
                                           NempPlayer.LastUserWish := USER_WANT_PLAY;
                                           NempPlaylist.Play(idx, NempPlayer.FadingInterval, True);
-                                          aMsg.Result := 1;
+
+                                          if assigned(NempPlaylist.PlayingFile) then
+                                              aMsg.Result := NempPlaylist.PlayingFile.WebServerID
+                                          else
+                                              aMsg.Result := 0;
                                       end;
                                   end;
                               end;
@@ -940,6 +944,30 @@ begin
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
                               end;
                            end;
+        WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist
+                              if AcceptApiCommands then
+                              begin
+                                  aMsg.Result := 0;
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+
+                              hier nur ID zurückliefern
+                              todo: Message generate playlistentry(idx) => html-Code => speichern
+                                                     playlistentry(noch ein idx) = html-Code => auch speichern
+
+                                  if (idx > 0) then
+                                  begin
+                                      af := TAudioFile.Create;
+                                      af.Assign(TAudioFile(NempPlaylist.Playlist[idx-1]));
+                                      af.WebServerID := TAudioFile(NempPlaylist.Playlist[idx-1]).WebServerID;
+                                      af.ViewCounter := idx-1; // we abuse the viewcounter and ID3TagNeedsUpdate here for other purposes ;-)
+                                      af.ID3TagNeedsUpdate := NempPlaylist.PlayingFile = TAudioFile(NempPlaylist.Playlist[idx-1]);
+                                      aMsg.Result := Integer(af);
+                                  end
+                                  else
+                                      aMsg.Result := 0;
+                              end;
+
+        end;
         WS_PlaylistMoveUp : begin
                               if AcceptApiCommands then
                               begin
