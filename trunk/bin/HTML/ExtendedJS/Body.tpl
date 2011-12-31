@@ -128,14 +128,38 @@
 					}
 					else {
 						//alert("reload");					
-						reloadplaylist();						
+						reloadplaylist();
 					}
 				}}
-			}
-			
+			}			
 		};
 		
+		function filedelete(aID){
+			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_delete", dataType:"text", success: filedelete2});
+			function filedelete2(data, textStatus, jqXHR){
+				if (data == "1") {
+					// delete item from DOM
+					$("#js"+aID).remove();				
+				} else
+				{	// invalid item or prebook-delete => reload playlist
+					reloadplaylist();
+				}				
+			}		
+		}
 		
+		function addnext(aID){
+			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_addnext", dataType:"text", success: fileaddnext2});
+			function fileaddnext2(data, textStatus, jqXHR){				
+					$("#btnAddNext"+aID)[0].outerHTML = data;
+				}
+		}
+		
+		function add(aID){
+			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_add", dataType:"text", success: fileadd2});
+			function fileadd2(data, textStatus, jqXHR){
+				$("#btnAdd"+aID)[0].outerHTML = data;
+			}
+		}
 		
 		
 	</script>

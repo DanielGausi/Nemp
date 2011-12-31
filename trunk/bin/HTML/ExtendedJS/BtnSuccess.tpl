@@ -1,0 +1,1 @@
+<a class="button btnsuccess"><img src="images/success.png" width="24" height="24" alt="operation: success" /></a>

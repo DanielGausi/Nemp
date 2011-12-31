@@ -1078,7 +1078,7 @@ begin
                                       if af.PrebookIndex > 0 then
                                       begin
                                           NempPlaylist.SetNewPrebookIndex(af, 0);
-                                          aMsg.Result := 1;
+                                          aMsg.Result := 2;
                                       end else
                                       begin
                                           NempPlaylist.DeleteAFile(idx);
