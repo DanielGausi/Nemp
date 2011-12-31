@@ -947,26 +947,28 @@ begin
         WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist
                               if AcceptApiCommands then
                               begin
-                                  aMsg.Result := 0;
+                                  aMsg.Result := -3;   // invalid
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
-
-                              hier nur ID zurückliefern
-                              todo: Message generate playlistentry(idx) => html-Code => speichern
-                                                     playlistentry(noch ein idx) = html-Code => auch speichern
-
-                                  if (idx > 0) then
+                                  if (idx > -1) then
                                   begin
-                                      af := TAudioFile.Create;
-                                      af.Assign(TAudioFile(NempPlaylist.Playlist[idx-1]));
-                                      af.WebServerID := TAudioFile(NempPlaylist.Playlist[idx-1]).WebServerID;
-                                      af.ViewCounter := idx-1; // we abuse the viewcounter and ID3TagNeedsUpdate here for other purposes ;-)
-                                      af.ID3TagNeedsUpdate := NempPlaylist.PlayingFile = TAudioFile(NempPlaylist.Playlist[idx-1]);
-                                      aMsg.Result := Integer(af);
-                                  end
-                                  else
-                                      aMsg.Result := 0;
+                                      af := TPlaylistFile(NempPlaylist.Playlist[idx]);
+                                      if af.PrebookIndex > 0 then
+                                      begin
+                                          if af.PrebookIndex > 1 then
+                                              aMsg.Result := -1  // reload of playlist is recommended
+                                          else
+                                              aMsg.Result := -2; // move up of the firstfile in prebooklist
+                                      end
+                                      else
+                                      begin
+                                          if idx > 0 then
+                                              aMsg.Result := TAudioFile(NempPlaylist.Playlist[idx-1]).WebServerID
+                                          else
+                                          if idx = 0 then
+                                              aMsg.Result := -2; // move up of the first title
+                                      end;
+                                  end;
                               end;
-
         end;
         WS_PlaylistMoveUp : begin
                               if AcceptApiCommands then
@@ -1000,6 +1002,32 @@ begin
                                   end;
                               end;
                            end;
+        WS_PlaylistMoveDownCheck: begin
+                              if AcceptApiCommands then
+                              begin
+                                  aMsg.Result := -3;   // invalid
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  if (idx > -1) then
+                                  begin
+                                      af := TPlaylistFile(NempPlaylist.Playlist[idx]);
+                                      if af.PrebookIndex > 0 then
+                                      begin
+                                          if af.PrebookIndex < NempPlaylist.PrebookCount then
+                                              aMsg.Result := -1  // reload of playlist is recommended
+                                          else
+                                              aMsg.Result := -1; //reload // move down of the last file in prebooklist
+                                      end
+                                      else
+                                      begin
+                                          if (idx < NempPlaylist.Count - 1) then
+                                              aMsg.Result := TAudioFile(NempPlaylist.Playlist[idx+1]).WebServerID
+                                          else
+                                          if idx = NempPlaylist.Count - 1 then
+                                              aMsg.Result := -2; // move down of the last title
+                                      end;
+                                  end;
+                              end;
+        end;
         WS_PlaylistMoveDown : begin
                               if AcceptApiCommands then
                               begin
@@ -1022,7 +1050,6 @@ begin
                                               // => delete from prebooklist
                                               NempPlaylist.SetNewPrebookIndex(af, 0);
                                               aMsg.Result := 1;
-
                                           end;
                                       end
                                       else
@@ -1066,6 +1093,16 @@ begin
                         end;
         WS_QueryPlaylist: begin
                               NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist);
+                          end;
+        WS_QueryPlaylistItem: begin
+                              if aMsg.lParam = -1 then
+                                  // get ALL items
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1)
+                              else
+                              begin
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx);
+                              end;
                           end;
         WS_QueryPlaylistDetail: begin
                                 // ID aus Lparam lesen

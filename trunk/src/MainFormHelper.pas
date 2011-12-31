@@ -954,22 +954,25 @@ var aCover: tNempCover;
 begin
     with Nemp_MainForm do
     begin
-        RefreshCoverFlowTimer.Enabled := False;
-        MedienBib.ReBuildCoverList(False);
-        MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-
-        If MedienBib.Coverlist.Count > 3 then
-            CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-        else
-            CoverScrollbar.Max := 3;
-        CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-
-        if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverList.Count) then
+        if MedienBib.BrowseMode = 1 then
         begin
-            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
-            Lbl_CoverFlow.Caption := aCover.InfoString;
-        end else
-            Lbl_CoverFlow.Caption := '';
+            RefreshCoverFlowTimer.Enabled := False;
+            MedienBib.ReBuildCoverList(False);
+            MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+
+            If MedienBib.Coverlist.Count > 3 then
+                CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+            else
+                CoverScrollbar.Max := 3;
+            CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+
+            if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverList.Count) then
+            begin
+                aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+                Lbl_CoverFlow.Caption := aCover.InfoString;
+            end else
+                Lbl_CoverFlow.Caption := '';
+        end;
     end;
 
 end;

@@ -10,7 +10,7 @@
       Programmiert mit CodeGear Delphi 2009
       Januar 2005 - Dezember 2011
 
-      Version: 4.3.0
+      Version: 4.3.1
 
 
 -----------------------------------------------------------
@@ -122,6 +122,12 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
 
+Version 4.3.1, November 2011
+----------------------------------------------------------- 
+Bugfix: 
+-------
+* Nach einem Löschen der Schnellsuche (Klick auf x) funktionierte die
+  Vorauswahl nicht mehr (außer im Coverflow)
 
 Version 4.3.0, November 2011
 ----------------------------------------------------------- 

@@ -77,9 +77,10 @@ const
 
     WS_PlaylistMoveUp = 7;
     WS_PlaylistMoveUpCheck = 17;
-
     WS_PlaylistMoveDown = 8;
     WS_PlaylistMoveDownCheck  = 18;
+
+    WS_QueryPlaylistItem = 20;
 
     WS_PlaylistDelete = 9;
 
@@ -395,6 +396,8 @@ type
           procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer);
           procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
           procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
+
+          function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer): String;
 
           // Das kann im Indy-Thread geamcht werden, daher mit Result
           function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
@@ -993,17 +996,19 @@ end;
 // konvertiert die Playlist in ein HTML-Formular
 // in VCL-Threads ausführen. Zugriff auf den HTML-String ist durch den Setter Threadsafe.
 procedure TNempWebServer.GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
-var i: Integer;
-    af: TAudioFile;
-    aClass: String;
-    Item, Items, PageData: String;
+var //i: Integer;
+    //af: TAudioFile;
+    //aClass: String;
+    //Item,
+    Items, PageData: String;
     menu: String;
 
 begin
-    Items := '';
     menu := MainMenu(1);
 
-    for i := 0 to aNempPlayList.Count - 1 do
+    Items := GenerateHTMLfromPlaylistItem(aNempPlaylist, -1);
+
+    (*for i := 0 to aNempPlayList.Count - 1 do
     begin
         af := TAudioFile(aNempPlayList.Playlist[i]);
         // ID generieren/setzen
@@ -1033,6 +1038,7 @@ begin
         Item := fSetFileButtons(af, Item, 1);
         Items := Items + Item;
     end;
+    *)
 
     PageData := PatternPlaylistPage;
     PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
@@ -1041,12 +1047,80 @@ begin
     HTML_PlaylistView := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
-//procedure TNempWebServer.QueryPlaylistDetails(aID: Integer);
-//begin
-    // dadurch wird im VCL-Thread das AudioFile zur ID ermittelt
-    // und die nachfolgende Prozedur aufgerufen
-//    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, aID);
-//end;
+function TNempWebServer.GenerateHTMLfromPlaylistItem(
+  aNempPlayList: TNempPlaylist; aIdx: Integer): String;
+var Item, Items, aClass: String;
+    af: tAudioFile;
+    i: Integer;
+begin
+    if aIdx = -1 then
+    begin
+        // get All items
+        Items := '';
+        for i := 0 to aNempPlayList.Count - 1 do
+        begin
+            af := TAudioFile(aNempPlayList.Playlist[i]);
+            // ID generieren/setzen
+            EnsureFileHasID(af);
+
+            // create new Item
+            Item := PatternItemPlaylist;
+            Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
+
+            if af.PrebookIndex > 0 then
+                Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+            else
+                Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
+            Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
+
+
+            Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
+
+            // Set "Current" class
+            if af = aNempPlaylist.PlayingFile then
+                aClass := 'current '
+            else
+                aClass := '';
+
+            // replace tags
+            Item := fSetBasicFileData(af, Item, aClass);
+            Item := fSetFileButtons(af, Item, 1);
+            Items := Items + Item;
+        end;
+        result := Items;
+        HTML_PlaylistView := UTF8String(Items);
+    end else
+    begin
+        if (aIdx >= 0) and (aIdx < aNempPlaylist.Count) then
+        begin
+            af := TAudioFile(aNempPlayList.Playlist[aIdx]);
+            Item := PatternItemPlaylist;
+            Item := StringReplace(Item, '{{Index}}'  , IntToStr(aIdx + 1)         , [rfReplaceAll]);
+
+            if af.PrebookIndex > 0 then
+                Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+            else
+                Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
+            Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
+
+            Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
+
+            // Set "Current" class
+            if af = aNempPlaylist.PlayingFile then
+                aClass := 'current '
+            else
+                aClass := '';
+
+            // replace tags
+            Item := fSetBasicFileData(af, Item, aClass);
+            Item := fSetFileButtons(af, Item, 1);
+        end else
+            Item := 'fail';
+
+        result := Item;
+        HTML_PlaylistView := UTF8String(Item);
+    end;
+end;
 
 procedure TNempWebServer.GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
 var PageData, FileData: String;
@@ -1614,16 +1688,16 @@ end;
 function TNempWebServer.ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
-    af: TAudioFile;
     res: Integer;
-    Item, aClass: String;
+    html: UTF8String;
 
     function BuildStream(aContent: UTF8String): TMemoryStream;
     begin
+        if aContent = '' then aContent := ' ';
+        
         result := tMemoryStream.Create;
         result.Write(aContent[1], length(aContent))
     end;
-
 
 begin
     if AllowRemoteControl then
@@ -1647,44 +1721,49 @@ begin
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUpCheck, queriedID);
-            if  res <> 0 then
-            begin
-                try
+            // res = -1: Moveup of a prebook-list-item. reload of Playlist is recommended
+            // res = -2: moveup of first item, no action required
+            // res >= 0: moveup of a file, swapping required
 
-                ne, hier nur ID liefern
+            // send moveup-message to player
+            if  res >= -1 then
+            SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID);
 
-                    af := TAudioFile(res);
-                    Item := PatternItemPlaylist;
-                    Item := StringReplace(Item, '{{Index}}'  , IntToStr(af.ViewCounter) , [rfReplaceAll]);
+            // send ID/res to browser
+            AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+            result := qrPermit;
+        end;
 
-                    if af.PrebookIndex > 0 then
-                        Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
-                    else
-                        Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
-                    Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
-                    Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
+        if queriedAction = 'file_movedowncheck' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDownCheck, queriedID);
+            // res = -1: Moveup of a prebook-list-item. reload of Playlist is recommended
+            // res = -2: moveup of first item, no action required
+            // res >= 0: moveup of a file, swapping required
 
-                    // Set "Current" class
-                    if af.ID3TagNeedsUpdate then
-                        aClass := 'current '
-                    else
-                        aClass := '';
+            // send moveup-message to player
+            if  res >= -1 then
+            SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID);
 
-                    // replace tags
-                    Item := fSetBasicFileData(af, Item, aClass);
-                    Item := fSetFileButtons(af, Item, 1);
+            // send ID/res to browser
+            AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+            result := qrPermit;
+        end;
 
-                    AResponseInfo.ContentStream := BuildStream(UTF8String(Item));
-                finally
-                    af.Free;
-                end;
 
-                result := qrPermit;
-            end else
-            begin
-                AResponseInfo.ContentStream := BuildStream(UTF8String('first'));
-                result := qrPermit
-            end;
+        if queriedAction = 'loaditem' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+
+            // return one (or all) item of the playlist
+            EnterCriticalSection(CS_AccessHTMLCode);
+            SendMessage(fMainWindowHandle, WM_WebServer, WS_QueryPlaylistItem, queriedID);
+            html := HTML_PlaylistView;
+            LeaveCriticalSection(CS_AccessHTMLCode);
+
+            AResponseInfo.ContentStream := BuildStream(html);
+            result := qrPermit;
         end;
 
     end
