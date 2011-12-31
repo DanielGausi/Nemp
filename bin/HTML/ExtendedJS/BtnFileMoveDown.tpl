@@ -1,1 +1,1 @@
-<a class="button" href="playlistcontrol?id={{ID}}&amp;action={{Action}}"><img src="images/move-down.png" width="24" height="24" alt="move down" /></a>
+<a class="button" onclick="movedown({{ID}})"><img src="images/move-down.png" width="24" height="24" alt="move down" /></a>

@@ -16,24 +16,121 @@
 			{ 
 				$(".current").removeClass("current");				
 				$("#js"+data).addClass("current");
+			}			
+		};
+		
+		function reloadplaylist(){
+			// alert("lade playlist neu");
+			//document.location.reload(true);
+			// document.location="playlist";
+			$.ajax({url:"playlistcontrolJS?id=-1&action=loaditem", dataType:"html", success: replacePlaylist});
+		}		
+		function replacePlaylist(data, textStatus, jqXHR) {			
+			$("#playlist").html(data);			
+		}
+		
+		function moveup(aID){
+			var $newHtml1;
+			var $newHtml2;
+		
+			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_moveupcheck", dataType:"text", success: moveup2});
+				
+			function moveup2(data, textStatus, jqXHR) {		
+				
+				function moveup3(data, textStatus, jqXHR) {
+					// store data ...
+					$newHtml1 = data;
+					// ... and load second element
+					$.ajax({url:"playlistcontrolJS?id="+$domID.substr(2)+"&action=loaditem", dataType:"text", success: moveup4});					
+				}
+				
+				function moveup4(data, textStatus, jqXHR) {
+					$newHtml2 = data;					
+					// both new parts are loaded - swap them
+					var	$currentDOM = $("#js"+aID);
+					var	$prevDOM = $("#js"+aID).prev();					
+					$currentDOM[0].outerHTML = $newHtml2;
+					$prevDOM[0].outerHTML = $newHtml1;
+				}
+			
+				if (data == "-1") {
+					// moveup of a Prebooklist-Item. reloading playlist is recommended
+					reloadplaylist();
+				} else
+				{
+				if (data == "-2") {
+					// moveup of first item, no further action required
+					alert("Item ist schon ganz oben");					
+				} else
+				{
+					// check, whether previous element in NEMP has the same ID as the
+					// previous element in DOM
+					var $domID = $("#js"+aID).prev().attr("id");
+					var $nempID = "js"+data;
+					
+					if ($domID == $nempID) {
+						// load first new element
+						$.ajax({url:"playlistcontrolJS?id="+aID+"&action=loaditem", dataType:"text", success: moveup3});
+					}
+					else {
+						//alert("reload");					
+						reloadplaylist();						
+					}
+				}}
 			}
 			
 		};
 		
-		function moveup(aID){
-			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_moveupcheck", dataType:"html", success: moveup2});
+		
+		
+		function movedown(aID){
+			var $newHtml1;
+			var $newHtml2;
+		
+			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_movedowncheck", dataType:"text", success: movedown2});
 				
-			function moveup2(data, textStatus, jqXHR) {		
-				var $current = $("#js"+aID).prev();
+			function movedown2(data, textStatus, jqXHR) {		
 				
-				if ($current[0].outerHTML == data) 
-					{alert("gleich");}
-				else
-					{alert("upsi");}
+				function movedown3(data, textStatus, jqXHR) {
+					// store data ...
+					$newHtml1 = data;
+					// ... and load second element
+					$.ajax({url:"playlistcontrolJS?id="+$domID.substr(2)+"&action=loaditem", dataType:"text", success: movedown4});					
+				}
 				
-				alert($current[0].outerHTML);
-				//alert(aID);
-				alert(data);
+				function movedown4(data, textStatus, jqXHR) {
+					$newHtml2 = data;					
+					// both new parts are loaded - swap them
+					var	$currentDOM = $("#js"+aID);
+					var	$prevDOM = $("#js"+aID).next();					
+					$currentDOM[0].outerHTML = $newHtml2;
+					$prevDOM[0].outerHTML = $newHtml1;
+				}
+			
+				if (data == "-1") {
+					// movedown of a Prebooklist-Item. reloading playlist is recommended
+					reloadplaylist();
+				} else
+				{
+				if (data == "-2") {
+					// movedown of lasst item, no further action required
+					alert("Item ist schon ganz unten");					
+				} else
+				{
+					// check, whether previous element in NEMP has the same ID as the
+					// previous element in DOM
+					var $domID = $("#js"+aID).next().attr("id");
+					var $nempID = "js"+data;
+					
+					if ($domID == $nempID) {
+						// load first new element
+						$.ajax({url:"playlistcontrolJS?id="+aID+"&action=loaditem", dataType:"text", success: movedown3});
+					}
+					else {
+						//alert("reload");					
+						reloadplaylist();						
+					}
+				}}
 			}
 			
 		};
