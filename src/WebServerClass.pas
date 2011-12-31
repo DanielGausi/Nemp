@@ -224,7 +224,8 @@ type
           PatternButtonFilePlayNow  : String;
           PatternButtonFileAdd      : String;
           PatternButtonFileAddnext  : String;
-
+          PatternButtonSuccess      : String;
+          PatternButtonFail         : String;
 
           PatternMenu : String;
 
@@ -1297,15 +1298,20 @@ begin
 
         // Buttons for Player Control
         sl.LoadFromFile(fLocalDir + 'BtnControlNext.tpl');
-        PatternButtonNext := sl.Text;
+        PatternButtonNext := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnControlPlayPause.tpl');
-        PatternButtonPlayPause := sl.Text;
+        PatternButtonPlayPause := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnControlPrev.tpl');
-        PatternButtonPrev := sl.Text;
+        PatternButtonPrev := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'BtnControlStop.tpl');
-        PatternButtonStop := sl.Text;
+        PatternButtonStop := trim(sl.Text);
         sl.LoadFromFile(fLocalDir + 'Menu.tpl');
         PatternMenu := sl.Text;
+
+        sl.LoadFromFile(fLocalDir + 'BtnSuccess.tpl');
+        PatternButtonSuccess := trim(sl.Text);
+        sl.LoadFromFile(fLocalDir + 'BtnFail.tpl');
+        PatternButtonFail := trim(sl.Text);
 
         // Buttons for File-Handling
         sl.LoadFromFile(fLocalDir + 'BtnFileDownload.tpl');
@@ -1651,7 +1657,7 @@ begin
         if queriedAction = 'file_delete' then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) = 1 then
+            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) > 0 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
                 AResponseInfo.Redirect('/playlist');
@@ -1660,25 +1666,6 @@ begin
             end else
                 result := HandleError(AResponseInfo, qrInvalidParameter);
         end;
-
-        /// file_add
-        /// file_addNext                     /insertnext
-        ///  delete
-        ///  moveUp                          /addtoplaylist
-        ///  MoveDown
-
-        //SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0);
-        {else
-        if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, 0)
-        else
-        if queriedAction = 'next' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_NEXTTITLE, 0)
-        else
-        if queriedAction = 'previous' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PREVTITLE, 0)
-        else
-            result := qrInvalidParameter;
-        }
-        //AResponseInfo.Redirect('/playlist');
-        //AResponseInfo.ContentStream := Nil;
     end else
     begin
         result := HandleError(AResponseInfo, qrRemoteControlDenied)
@@ -1690,6 +1677,7 @@ var queriedAction: String;
     queriedID: Integer;
     res: Integer;
     html: UTF8String;
+    af: TAudioFile;
 
     function BuildStream(aContent: UTF8String): TMemoryStream;
     begin
@@ -1749,6 +1737,48 @@ begin
             // send ID/res to browser
             AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
             result := qrPermit;
+        end;
+
+        if queriedAction = 'file_delete' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID);
+            //if res > 0 then
+            //begin
+                // 0 : Invalid, reload playlist
+                // 1 : File deleted, hide item
+                // 2 : File removed from Prebooklist, reload Playlist
+                AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+                result := qrPermit;
+            //end else
+            //    result := HandleError(AResponseInfo, qrInvalidParameter);
+        end;
+
+        if (queriedAction = 'file_addnext')
+            or (queriedAction = 'file_add')
+        then
+        begin
+            EnterCriticalSection(CS_AccessLibrary);
+            result := qrPermit;
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            af := GetAudioFileFromWebServerID(queriedID);
+            if assigned(af) then
+            begin
+                // sende Audiofile an Nemp-Hauptfenster/playlist
+                if (queriedAction = 'file_addnext') then
+                    SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af))
+                else
+                    SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
+
+                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess));
+                // AResponseInfo.Redirect('/playlist');
+                // AResponseInfo.ContentStream := Nil;
+            end else
+            begin
+                // result := HandleError(AResponseInfo, qrInvalidParameter);
+                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonFail));
+            end;
+            LeaveCriticalSection(CS_AccessLibrary);
         end;
 
 
