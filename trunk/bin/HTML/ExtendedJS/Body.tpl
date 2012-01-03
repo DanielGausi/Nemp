@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="nemp.js"></script>
 	<link href="main.css" rel="stylesheet" type="text/css">
-	<script>			
+	<script type="text/javascript">			
 	
 		function playtitle(aID){			
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_playnow", dataType:"html", success: showtest});		

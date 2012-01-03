@@ -1,0 +1,1 @@
+<span class="tagcloud" style="font-size:{{Font}};"><a href="{{Link}}">{{Value}}</a></span>
