@@ -16,9 +16,6 @@ body {
 }
 
 
-input.text {width: 98%; }
-input.submit {}
-
 .hidden {
 	display: none ! important;
 }
@@ -266,4 +263,55 @@ div.playlistcontrol{
 	width: 100%;
          clear: both;
 	}
+	
+form {
+	margin-bottom: 5px;
+	display: inline;
+}
 
+input.text {
+	width: 80px; 
+	padding: 0px;
+}
+input.button {
+	//height: 20px;
+	padding: 0;
+}
+	
+ul.browsemenu{
+	display: inline;
+}
+	
+ul.browsemenu,
+ul.charselection {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding:0;
+}
+	
+ul.browsemenu li,
+ul.charselection li  {
+	display: inline;
+}
+
+ul.browsemenu li.active,
+ul.charselection li.active {
+	border: 1px solid red;
+}
+
+.browsealbum,
+.browseartist {
+	padding:5px;
+}
+.browsealbum .title,
+.browseartist .title {
+	max-width: 250px;
+}
+
+.tagcloud {	
+	padding: 3px;	
+}
+
+span.tagcloud a:hover {	
+	color: red;
+}

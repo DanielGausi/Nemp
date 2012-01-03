@@ -48,6 +48,7 @@ function Sortieren_TitelArtist_asc(item1,item2:pointer):integer;
 function Sortieren_Pfad_asc(item1,item2:pointer):integer;
 function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
 function Sortieren_Jahr_asc(item1,item2:pointer):integer;
+function Sortieren_Genre_asc(item1,item2:pointer):integer;
 
 function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
 function Sortieren_String2String1Titel_asc(item1,item2:pointer):integer;
@@ -334,6 +335,10 @@ begin
     result := AnsiCompareText(TAudioFile(item1).Year,TAudioFile(item2).Year);
     if result = 0 then
       result := Sortieren_ArtistTitel_asc(item1,item2); //Sortieren_ArtistAlbumTitel_asc
+end;
+function Sortieren_Genre_asc(item1,item2:pointer):integer;
+begin
+    result := AnsiCompareText(TAudioFile(item1).Genre, TAudioFile(item2).Genre)
 end;
 
 (*
