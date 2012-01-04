@@ -860,6 +860,7 @@ function Handle_WebServerMessage(Var aMsg: TMessage): Boolean;
 var idx: Integer;
     af: TAudioFile;
     newNode: PVirtualNode;
+    NodeData: pTreeData;
 begin
     result := True;
     with Nemp_MainForm do
@@ -881,6 +882,10 @@ begin
                                           else
                                               aMsg.Result := 0;
                                       end;
+                                  end else
+                                  begin
+                                      // file is not in the playlist - insert and play it!
+                                      // (this is done in the webserver-class if aMsg.result = 0)
                                   end;
                               end;
                            end;
@@ -933,15 +938,27 @@ begin
                                   NempPlaylist.AddNodeToPrebookList(newNode);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
+
+                                  NodeData := PlaylistVST.GetNodeData(newNode);
+                                  af := NodeData^.FAudioFile;
+                                  NempWebserver.EnsureFileHasID(af);
+
+                                  aMsg.Result := af.WebServerID;
+                                  //result: the new AudioFile-Object
                               end;
                         end;
         WS_AddToPlaylist : begin
                               if AcceptApiCommands then
                               begin
                                   af := TAudioFile(aMsg.LParam);
-                                  NempPlaylist.AddFileToPlaylist(af);
+                                  newNode := NempPlaylist.AddFileToPlaylist(af);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
+
+                                  NodeData := PlaylistVST.GetNodeData(newNode);
+                                  af := NodeData^.FAudioFile;
+                                  NempWebserver.EnsureFileHasID(af);
+                                  aMsg.Result := af.WebServerID;
                               end;
                            end;
         WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist

@@ -158,6 +158,12 @@ type
 
           PatternMenu : String;
           PatternBrowseMenu : String;
+          PatternPagination : String;
+          PatternPaginationNext : String;
+          PatternPaginationPrev : String;
+          PatternPaginationOther: String;
+          PatternPaginationMain: String;
+
 
           PatternPlayerPage: String;
           PatternItemPlayer: String;   // the item on the PLAYER page
@@ -180,6 +186,7 @@ type
 
           PatternItemSearchDetails : String; // the item on the Search-Detail-Page
 
+          PatternNoFilesHint: String;
           PatternErrorPage: String;
 
           // Lists for Browsing in the Library
@@ -207,10 +214,8 @@ type
           function fGetAllowLibraryAccess   : Longbool;
           function fGetAllowRemoteControl   : Longbool;
 
-          procedure EnsureFileHasID(af: tAudioFile);
-
           function MainMenu(aPage: Integer = -1): String;
-          function BrowseSubMenu(aMode: String; aLetter: Char): String;
+          function BrowseSubMenu(aMode: String; aLetter: Char; aValue: String): String;
 
           function fGetCount: Integer;
 
@@ -311,16 +316,19 @@ type
           function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer): String;
 
           // Das kann im Indy-Thread geamcht werden, daher mit Result
-          function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
+          function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer): UTf8String;
           function GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile): UTf8String;
 
           function GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other: Boolean): UTf8String;
+          function GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer): UTf8String;
 
           procedure Shutdown;
           procedure CopyLibrary(OriginalLib: TMedienBibliothek);
 
           procedure SearchLibrary(Keyword: UnicodeString; DestList: TObjectlist);
           function GetAudioFileFromWebServerID(aID: Integer): TAudioFile;
+
+          procedure EnsureFileHasID(af: tAudioFile);
 
   end;
 
@@ -333,10 +341,32 @@ var
 const
     GoodArtist = 5;
     GoodAlbum  = 5;
+    MaxCountPerPage = 100;
 
 implementation
 
 uses Nemp_RessourceStrings, AudioFileHelper;
+
+
+// copied from the den Indys, added '&'
+function ParamsEncode(const ASrc: UTF8String): UnicodeString;
+var i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(ASrc) do
+  begin
+    if (ASrc[i] in ['&', '*','#','%','<','>',' ','[',']'])
+       or (not (ASrc[i] in [#33..#127]))
+    then
+    begin
+      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+    end
+    else
+    begin
+      Result := Result + WideChar(ASrc[i]);
+    end;
+  end;
+end;
 
 
 { TCountedString }
@@ -548,7 +578,7 @@ begin
         result := StringReplace(result, '{{LibraryClass}}', 'hidden', [rfReplaceAll]);
 end;
 
-function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char): String;
+function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char; aValue: String): String;
 var sub: String;
     c: Char;
     letterClass: String;
@@ -570,8 +600,18 @@ begin
     else
         result := StringReplace(result, '{{GenreClass}}', 'genre', [rfReplaceAll]);
 
-    if (aMode = 'genre') or (aMode = '') then
-        sub := ''
+
+    if aMode = '' then // fallback
+        sub := '';
+
+
+    if (aMode = 'genre')then
+    begin
+        if aValue = '' then
+            sub := ''
+        else
+            sub := '<ul class="charselection"> <li class="genre active">' +  aValue + '</li></ul>';
+    end
     else
     begin
         if aLetter = '0' then
@@ -981,14 +1021,15 @@ begin
 end;
 
 
-function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString): UTf8String;
+function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer): UTf8String;
 var ResultList: TObjectlist;
     af: TAudioFile;
-    i: Integer;
-    aClass, PageData, menu, browsemenu, Item, Items: String;
+    i, maxIdx: Integer;
+    aClass, PageData, Pagination, menu, browsemenu, Item, Items, warning: String;
+    btnPrev, BtnNext, Link: String;
 begin
     menu := Mainmenu(2);
-    browsemenu := BrowseSubMenu('', '"');
+    browsemenu := BrowseSubMenu('', '"', '');
     //if aSearchString = '' then
         PageData := PatternSearchPage;
     //else
@@ -1001,13 +1042,20 @@ begin
     if aSearchString <> '' then
     begin
         Items := '';
+        maxIdx := 0;
+        if Start < 0 then
+            Start := 0;
 
         ResultList := TObjectList.Create(False);
         try
             SearchLibrary(aSearchString, ResultList);
             if ResultList.Count > 0 then
             begin
-                for i := 0 to ResultList.Count - 1 do
+                maxIdx := Start + MaxCountPerPage - 1;
+                if maxIdx > (ResultList.Count - 1) then
+                    maxIdx := ResultList.Count - 1;
+
+                for i := Start to maxIdx do
                 begin
                     af := TAudioFile(ResultList[i]);
                     // ID generieren/setzen
@@ -1021,6 +1069,48 @@ begin
                     Items := Items + Item;
                 end;
             end;
+
+            // Build Pagination
+            if (Start > 0) then
+            begin
+                BtnPrev := PatternPaginationPrev;
+                Link := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + aSearchString;
+                BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
+            end
+            else
+                BtnPrev := '';
+
+            if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
+            begin
+                BtnNext := PatternPaginationNext;
+                Link := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + aSearchString;
+                BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
+
+            end
+            else
+                BtnNext := '';
+
+            if (BtnNext = '') and (BtnPrev = '') then
+                Pagination := ''
+            else
+            begin
+                Pagination := StringReplace(PatternPagination, '{{NextPage}}', BtnNext, [rfReplaceAll]);
+                Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
+                Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
+                Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
+                Pagination := StringReplace(Pagination       , '{{Count}}' , IntToStr(ResultList.Count), [rfReplaceAll]);
+            end;
+
+            if ResultList.Count = 0 then
+            begin
+                warning := PatternNoFilesHint;
+                warning := StringReplace(warning, '{{Value}}', aSearchString  , [rfReplaceAll]);
+                PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
+            end
+            else
+                PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
+
+            PageData := StringReplace(PageData, '{{Pagination}}', Pagination, [rfReplaceAll]);
             PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
             PageData := StringReplace(PageData, '{{SearchCount}}', IntToStr(ResultList.Count), [rfReplaceAll]);
         finally
@@ -1028,6 +1118,7 @@ begin
         end;
     end else
     begin
+        PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{SearchResultItems}}', '', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{SearchCount}}', '0', [rfReplaceAll]);
     end;
@@ -1035,29 +1126,9 @@ begin
     result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
-// copied from the den Indys, added '&'
-function ParamsEncode(const ASrc: UTF8String): UnicodeString;
-var i: Integer;
-begin
-  Result := '';
-  for i := 1 to Length(ASrc) do
-  begin
-    if (ASrc[i] in ['&', '*','#','%','<','>',' ','[',']'])
-       or (not (ASrc[i] in [#33..#127]))
-    then
-    begin
-      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
-    end
-    else
-    begin
-      Result := Result + WideChar(ASrc[i]);
-    end;
-  end;
-end;
-
 
 function TNempWebServer.GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other: Boolean): UTf8String;
-var PageData, FileData, menu, browsemenu: String;
+var PageData, menu, browsemenu, pagination: String;
     Items, Item, baseLink, Link, ItemPattern: String;
     i, ListIdx: Integer;
     aList: TObjectlist;
@@ -1073,6 +1144,8 @@ var PageData, FileData, menu, browsemenu: String;
             if TCountedString(aList[i]).Count > result then
                 result := TCountedString(aList[i]).Count;
         end;
+        if result < 200 then
+            result := 200;
     end;
 
     function PoperSize(aMax, c: Integer): Integer;
@@ -1082,16 +1155,15 @@ var PageData, FileData, menu, browsemenu: String;
             result := 22;
     end;
 
-
-
 begin
     menu := MainMenu(2);
-    browsemenu := BrowseSubMenu(aMode, aChar);
+    browsemenu := BrowseSubMenu(aMode, aChar, '');
 
     PageData := PatternSearchPage;
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
 
     if CharInSet(aChar, ['A'..'Z']) then
         ListIdx := ord(aChar) - ord('A') + 1
@@ -1138,9 +1210,164 @@ begin
         Items := Items + Item;
     end;
 
+    if aMode='artist' then
+    begin
+        // todo: pagination hier erstzen durch link zu other/main
+        if Other then
+        begin
+            pagination := PatternPaginationMain;
+            Link := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;other=0';
+        end
+        else
+        begin
+            pagination := PatternPaginationOther;
+            Link := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;other=1';
+        end;
+        pagination := StringReplace(pagination, '{{Letter}}', aChar, [rfReplaceAll]);
+        pagination := StringReplace(pagination, '{{Link}}', Link, [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{Pagination}}', pagination, [rfReplaceAll]);
+    end
+    else
+        PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
+
     PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
     //PageData := StringReplace(PageData, '{{SearchResultItems}}', 'Hier kommen die Files mit '+ aChar, [rfReplaceAll]);
     result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+end;
+
+function TNempWebServer.GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer): UTf8String;
+var PageData, menu, browsemenu: String;
+    Items, warning: String;
+    btnPrev, BtnNext, Pagination, Link: String;
+    i,  maxIdx: Integer;
+    af: TAudioFile;
+    ResultList: TObjectList;
+
+    procedure AddItem(afile: TAudioFile);
+    var aClass, Item: String;
+    begin
+        //if c < 1000 then
+        //begin
+            EnsureFileHasID(af);
+            Item := PatternItemSearchlist;
+            Item := StringReplace(Item, '{{ID}}'  , IntToStr(afile.WebServerID), [rfReplaceAll]);
+            aClass := '';
+            // replace tags
+            Item := fSetBasicFileData(afile, Item, aClass);
+            Item := fSetFileButtons(afile, Item, 2);
+            Items := Items + Item;
+        //end;
+        //inc(c);
+    end;
+
+begin
+    menu := MainMenu(2);
+    browsemenu := BrowseSubMenu(aMode, ' ', aValue);
+
+    PageData := PatternSearchPage;
+    PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
+    Items := '';
+
+    EnterCriticalSection(CS_AccessLibrary);
+
+    ResultList := TObjectList.Create(False);
+    try
+        if aMode='artist' then
+            for i := 0 to fWebMedienBib.Count - 1 do
+            begin
+                af := TAudioFile(fWebMedienBib[i]);
+                if AnsiSameText(af.Artist, aValue) then
+                    ResultList.Add(af);
+                    //AddItem(af);
+            end;
+
+        if aMode='album' then
+            for i := 0 to fWebMedienBib.Count - 1 do
+            begin
+                af := TAudioFile(fWebMedienBib[i]);
+                if AnsiSameText(af.Album, aValue) then
+                    ResultList.Add(af);
+                    //AddItem(af);
+            end;
+
+        if aMode='genre' then
+            for i := 0 to fWebMedienBib.Count - 1 do
+            begin
+                af := TAudioFile(fWebMedienBib[i]);
+                if AnsiSameText(af.genre, aValue) then
+                    ResultList.Add(af);
+                    //AddItem(af);
+            end;
+
+        if Start < 0 then Start := 0;
+
+        maxIdx := Start + MaxCountPerPage - 1;
+        if maxIdx > (ResultList.Count - 1) then
+            maxIdx := ResultList.Count - 1;
+
+        for i := Start to maxIdx do
+            AddItem(TAudioFile(ResultList[i]));
+
+        // Build Pagination
+        if (Start > 0) then
+        begin
+            BtnPrev := PatternPaginationPrev;
+            Link := 'browse?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + aMode + '&amp;value=' + aValue;
+            BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
+        end
+        else
+            BtnPrev := '';
+
+        if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
+        begin
+            BtnNext := PatternPaginationNext;
+            Link := 'browse?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + aMode + '&amp;value=' + aValue;
+            BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
+        end
+        else
+            BtnNext := '';
+
+        if (BtnNext = '') and (BtnPrev = '') then
+            Pagination := ''
+        else
+        begin
+            Pagination := StringReplace(PatternPagination, '{{NextPage}}', BtnNext, [rfReplaceAll]);
+            Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
+            Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
+            Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
+            Pagination := StringReplace(Pagination       , '{{Count}}' , IntToStr(ResultList.Count), [rfReplaceAll]);
+        end;
+
+        if ResultList.Count = 0 then
+        begin
+            warning := PatternNoFilesHint;
+            warning := StringReplace(warning, '{{Value}}', aValue  , [rfReplaceAll]);
+            PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
+        end
+        else
+            PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll])
+
+    //if c <= 1000 then
+    //    PageData := StringReplace(PageData, '{{TooManyFilesWarning}}', ''  , [rfReplaceAll])
+    //else
+    //begin
+    //    warning := PatternTooManyFilesWarning;
+    //    warning := StringReplace(warning, '{{Count}}', IntToStr(c)  , [rfReplaceAll]);
+    //    PageData := StringReplace(PageData, '{{TooManyFilesWarning}}', warning  , [rfReplaceAll]);
+    //end;
+
+    finally
+        ResultList.Free;
+    end;
+
+    LeaveCriticalSection(CS_AccessLibrary);
+
+    PageData := StringReplace(PageData, '{{Pagination}}', Pagination, [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
+    result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+
 end;
 
 
@@ -1230,95 +1457,79 @@ end;
 
 procedure TNempWebServer.LoadTemplates;
 var sl: TStringList;
+
+    function GetTemplate(aFilename: String): String;
+    begin
+        if FileExists(aFilename) then
+        begin
+            sl.LoadFromFile(aFilename);
+            result := sl.Text;
+        end else
+            result := '';
+    end;
+
 begin
     fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + RootDir + '\';
     sl := TStringList.Create;
     try
-        sl.LoadFromFile(fLocalDir + 'Body.tpl');
-        PatternBody := sl.Text;
+        PatternBody := GetTemplate(fLocalDir + 'Body.tpl');
+        PatternMenu := GetTemplate(fLocalDir + 'Menu.tpl');
+        PatternBrowseMenu := GetTemplate(fLocalDir + 'MenuLibraryBrowse.tpl');
+
+        PatternPagination      := GetTemplate(fLocalDir + 'Pagination.tpl');
+        PatternPaginationNext  := GetTemplate(fLocalDir + 'PaginationNextPage.tpl');
+        PatternPaginationPrev  := GetTemplate(fLocalDir + 'PaginationPrevPage.tpl');
+        PatternPaginationOther := GetTemplate(fLocalDir + 'PaginationOther.tpl');
+        PatternPaginationMain  := GetTemplate(fLocalDir + 'PaginationMain.tpl');
+
 
         // Buttons for Player Control
-        sl.LoadFromFile(fLocalDir + 'BtnControlNext.tpl');
-        PatternButtonNext := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnControlPlayPause.tpl');
-        PatternButtonPlayPause := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnControlPrev.tpl');
-        PatternButtonPrev := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnControlStop.tpl');
-        PatternButtonStop := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'Menu.tpl');
-        PatternMenu := sl.Text;
+        PatternButtonNext := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
+        PatternButtonPlayPause := trim(GetTemplate(fLocalDir + 'BtnControlPlayPause.tpl'));
+        PatternButtonPrev := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
+        PatternButtonStop := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
 
-        sl.LoadFromFile(fLocalDir + 'MenuLibraryBrowse.tpl');
-        PatternBrowseMenu := sl.Text;
-
-        sl.LoadFromFile(fLocalDir + 'BtnSuccess.tpl');
-        PatternButtonSuccess := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFail.tpl');
-        PatternButtonFail := trim(sl.Text);
+        PatternButtonSuccess := trim(GetTemplate(fLocalDir + 'BtnSuccess.tpl'));
+        PatternButtonFail := trim(GetTemplate(fLocalDir + 'BtnFail.tpl'));
 
         // Buttons for File-Handling
-        sl.LoadFromFile(fLocalDir + 'BtnFileDownload.tpl');
-        PatternButtonFileDownload := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFilePlayNow.tpl');
-        PatternButtonFilePlayNow := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFileAdd.tpl');
-        PatternButtonFileAdd := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFileAddNext.tpl');
-        PatternButtonFileAddNext := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFileMoveUp.tpl');
-        PatternButtonFileMoveUp := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFileMoveDown.tpl');
-        PatternButtonFileMoveDown := trim(sl.Text);
-        sl.LoadFromFile(fLocalDir + 'BtnFileDelete.tpl');
-        PatternButtonFileDelete := trim(sl.Text);
-
+        PatternButtonFileDownload := trim(GetTemplate(fLocalDir + 'BtnFileDownload.tpl'));
+        PatternButtonFilePlayNow := trim(GetTemplate(fLocalDir + 'BtnFilePlayNow.tpl'));
+        PatternButtonFileAdd := trim(GetTemplate(fLocalDir + 'BtnFileAdd.tpl'));
+        PatternButtonFileAddNext := trim(GetTemplate(fLocalDir + 'BtnFileAddNext.tpl'));
+        PatternButtonFileMoveUp := trim(GetTemplate(fLocalDir + 'BtnFileMoveUp.tpl'));
+        PatternButtonFileMoveDown := trim(GetTemplate(fLocalDir + 'BtnFileMoveDown.tpl'));
+        PatternButtonFileDelete := trim(GetTemplate(fLocalDir + 'BtnFileDelete.tpl'));
 
         // The PLAYER page
-        sl.LoadFromFile(fLocalDir + 'ItemPlayer.tpl');
-        PatternItemPlayer := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'PagePlayer.tpl');
-        PatternPlayerPage := sl.Text;
+        PatternItemPlayer := trim(GetTemplate(fLocalDir + 'ItemPlayer.tpl'));
+        PatternPlayerPage := GetTemplate(fLocalDir + 'PagePlayer.tpl');
 
         // The PLAYLIST page
-        sl.LoadFromFile(fLocalDir + 'PagePlaylist.tpl');
-        PatternPlaylistPage := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'ItemPlaylist.tpl');
-        PatternItemPlaylist := sl.Text;
+        PatternPlaylistPage := GetTemplate(fLocalDir + 'PagePlaylist.tpl');
+        PatternItemPlaylist := GetTemplate(fLocalDir + 'ItemPlaylist.tpl');
 
         // The PLAYLIST DETAILS page
-        sl.LoadFromFile(fLocalDir + 'PagePlaylistDetails.tpl');
-        PatternPlaylistDetailsPage := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'ItemPlaylistDetails.tpl');
-        PatternItemPlaylistDetails := sl.Text;
+        PatternPlaylistDetailsPage := GetTemplate(fLocalDir + 'PagePlaylistDetails.tpl');
+        PatternItemPlaylistDetails := GetTemplate(fLocalDir + 'ItemPlaylistDetails.tpl');
 
         // The LIBRARY page
-        sl.LoadFromFile(fLocalDir + 'PageLibrary.tpl');
-        PatternSearchPage := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'PageLibrarySearchResults.tpl');
-        PatternSearchResultPage := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'ItemSearchResult.tpl');
-        PatternItemSearchlist := sl.Text;
+        PatternSearchPage := GetTemplate(fLocalDir + 'PageLibrary.tpl');
+        PatternSearchResultPage := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
+        PatternItemSearchlist := GetTemplate(fLocalDir + 'ItemSearchResult.tpl');
 
-        sl.LoadFromFile(fLocalDir + 'ItemBrowseArtist.tpl');
-        PatternItemBrowseArtist := sl.Text;
-
-        sl.LoadFromFile(fLocalDir + 'ItemBrowseAlbum.tpl');
-        PatternItemBrowseAlbum := sl.Text;
-
-        sl.LoadFromFile(fLocalDir + 'ItemBrowseGenre.tpl');
-        PatternItemBrowseGenre := sl.Text;
-
+        PatternItemBrowseArtist := GetTemplate(fLocalDir + 'ItemBrowseArtist.tpl');
+        PatternItemBrowseAlbum := GetTemplate(fLocalDir + 'ItemBrowseAlbum.tpl');
+        PatternItemBrowseGenre := GetTemplate(fLocalDir + 'ItemBrowseGenre.tpl');
 
         // The LIBRARY DETAILS page
-        sl.LoadFromFile(fLocalDir + 'PageLibraryDetails.tpl');
-        PatternSearchDetailsPage := sl.Text;
-        sl.LoadFromFile(fLocalDir + 'ItemSearchDetails.tpl');
-        PatternItemSearchDetails := sl.Text;
+        PatternSearchDetailsPage := GetTemplate(fLocalDir + 'PageLibraryDetails.tpl');
+        PatternItemSearchDetails := GetTemplate(fLocalDir + 'ItemSearchDetails.tpl');
 
         // The ERROR page
-        sl.LoadFromFile(fLocalDir + 'PageError.tpl');
-        PatternErrorPage := sl.Text;
+        PatternErrorPage := GetTemplate(fLocalDir + 'PageError.tpl');
+        PatternNoFilesHint := GetTemplate(fLocalDir + 'WarningNoFiles.tpl');
+
     finally
         sl.Free;
     end;
@@ -1411,7 +1622,6 @@ begin
         currentAlbum := TAudioFile(fWebMedienBib[0]).Album;
         currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
         c := 1;
-
 
         for i := 1 to fWebMedienBib.Count - 1 do
         begin
@@ -1782,7 +1992,7 @@ end;
 function TNempWebServer.ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
-    res: Integer;
+    res, newID: Integer;
     html: UTF8String;
     af: TAudioFile;
 
@@ -1794,6 +2004,51 @@ var queriedAction: String;
         result.Write(aContent[1], length(aContent))
     end;
 
+    function Addnext(aAction: String; doPlay: Boolean=False): TQueryResult;
+    begin
+        EnterCriticalSection(CS_AccessLibrary);
+        result := qrPermit;
+        queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+        af := GetAudioFileFromWebServerID(queriedID);
+        if assigned(af) then
+        begin
+            // sende Audiofile an Nemp-Hauptfenster/playlist
+            if (aAction = 'file_addnext') then
+                newID := SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af))
+            else
+                newID := SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
+
+            if DoPlay then
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, newID);
+
+            if NOT DoPlay then
+                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess));
+        end
+        else
+        begin
+
+            result := qrInvalidParameter;
+        end;
+        LeaveCriticalSection(CS_AccessLibrary);
+    end;
+
+    function PlayNow(aID: Integer): tQueryResult;
+    begin
+        res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID);
+        if res > 0 then
+        begin
+            AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+            result := qrPermit;
+        end else
+        begin
+            // result := HandleError(AResponseInfo, qrInvalidParameter)
+            Addnext('file_addnext', True);
+            AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(newID)));
+            result := qrPermit;
+        end;
+    end;
+
+
 begin
     if AllowRemoteControl then
     begin
@@ -1803,13 +2058,7 @@ begin
         if queriedAction = 'file_playnow' then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID);
-            if res > 0 then
-            begin
-                    AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
-                    result := qrPermit;
-            end else
-                result := HandleError(AResponseInfo, qrInvalidParameter)
+            result := PlayNow(queriedID);
         end;
 
         if queriedAction = 'file_moveupcheck' then
@@ -1865,27 +2114,7 @@ begin
             or (queriedAction = 'file_add')
         then
         begin
-            EnterCriticalSection(CS_AccessLibrary);
-            result := qrPermit;
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            af := GetAudioFileFromWebServerID(queriedID);
-            if assigned(af) then
-            begin
-                // sende Audiofile an Nemp-Hauptfenster/playlist
-                if (queriedAction = 'file_addnext') then
-                    SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af))
-                else
-                    SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
-
-                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess));
-                // AResponseInfo.Redirect('/playlist');
-                // AResponseInfo.ContentStream := Nil;
-            end else
-            begin
-                // result := HandleError(AResponseInfo, qrInvalidParameter);
-                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonFail));
-            end;
-            LeaveCriticalSection(CS_AccessLibrary);
+            addNext(queriedAction, False);
         end;
 
 
@@ -2077,17 +2306,18 @@ var ms: TMemoryStream;
     html: UTf8String;
     searchstring: String;
     a: AnsiString;
-    i: Integer;
+    i, Start: Integer;
 
 begin
     if AllowLibraryAccess then
     begin
+        Start  := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
 
-        i := pos('=', ARequestInfo.UnparsedParams);
+        i := pos('query=', ARequestInfo.UnparsedParams);
         if i > 0 then
         begin
             // UnparsedParams sollte nur Ascii-Zeichen anthalten - also ist das ok
-            a := AnsiString(copy(ARequestInfo.UnparsedParams, i+1, length(ARequestInfo.UnparsedParams) - i));
+            a := AnsiString(copy(ARequestInfo.UnparsedParams, i+6, length(ARequestInfo.UnparsedParams) - i));
             // die Parameter sind utf-kodiert als %12%43%82%20 ...
             // also: Die %xx in UTF8String dekodieren, das Ergebnis zu UnicodeString
             SearchString := Utf8ToString(utf8URLDecode(a));
@@ -2095,7 +2325,7 @@ begin
             SearchString := '';
 
         ms := TMemoryStream.Create;
-        html := GenerateHTMLMedienbibSearchFormular(searchstring);
+        html := GenerateHTMLMedienbibSearchFormular(searchstring, Start);
         if html = '' then html := ' ';
             ms.Write(html[1], length(html));
         AddNoCacheHeader(AResponseInfo);
@@ -2109,22 +2339,34 @@ function TNempWebServer.ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInf
 var QueryMode, QueryLetter, QueryValue, QueryOther: String;
     ms: TMemoryStream;
     html: UTf8String;
+    i, Start: Integer;
+    a: AnsiString;
 begin
     if AllowLibraryAccess then
     begin
+        Start       := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
         QueryMode   := aRequestInfo.Params.Values['mode'];
         QueryLetter := UpperCase(aRequestInfo.Params.Values['l']);
-        QueryValue  := aRequestInfo.Params.Values['value'];
+        //QueryValue  := aRequestInfo.Params.Values['value'];
+
+        i := pos('value=', ARequestInfo.UnparsedParams);
+        if i > 0 then
+        begin
+            // UnparsedParams sollte nur Ascii-Zeichen anthalten - also ist das ok
+            a := AnsiString(copy(ARequestInfo.UnparsedParams, i+6, length(ARequestInfo.UnparsedParams) - i));
+            // die Parameter sind utf-kodiert als %12%43%82%20 ...
+            // also: Die %xx in UTF8String dekodieren, das Ergebnis zu UnicodeString
+            QueryValue := Utf8ToString(utf8URLDecode(a));
+        end else
+            QueryValue := '';
+
         QueryOther  := aRequestInfo.Params.Values['other'];
 
         if QueryValue = '' then
         begin
-
             if QueryLetter = '' then
                 QueryLetter := 'A';
             // generate List of Artists/Albums/Genres according to QueryMode (+ Letter)
-
-            // {{browsesubmenu}}
 
             ms := TMemoryStream.Create;
             html := GenerateHTMLMedienbibBrowseList(Querymode, QueryLetter[1], QueryOther='1');
@@ -2137,6 +2379,12 @@ begin
         end else
         begin
             // generate List of Titles according to QueryMode + Value
+            ms := TMemoryStream.Create;
+            html := GenerateHTMLMedienbibBrowseResult(Querymode, QueryValue, Start);
+            if html = '' then html := ' ';
+                ms.Write(html[1], length(html));
+            AddNoCacheHeader(AResponseInfo);
+            AResponseInfo.ContentStream := ms;
 
             result := qrPermit;
         end;

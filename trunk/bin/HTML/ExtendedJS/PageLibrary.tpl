@@ -1,14 +1,11 @@
 <div class="library">
 {{Menu}}
 {{BrowseMenu}}
-
-
+{{NoFilesHint}}
+<div>
 {{SearchResultItems}}
-
-
-<table class="search" cellpadding="0" cellspacing="0">
-<tr><td>wuppdi</td></tr>
-</table>
+</div>
+{{Pagination}}
 </div>
 
 <div style="clear:both;"></div>
