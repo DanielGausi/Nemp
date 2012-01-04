@@ -137,11 +137,14 @@ a.button img{
 }
 
 
-
+.playlist table,
+.library table {
+	width:100%;
+}
 
 
 .playlist .button,
-.search .button{
+.library .button{
 	border: 0px;
 	padding: 0;
 	margin: 0;
@@ -155,6 +158,9 @@ a.button img{
 	padding-top:3px;
 	padding-bottom: 3px;
 }
+.library table tr td.controls{
+	min-width:52px;
+}
 
 .playlist table tr td,
 .library table tr td{
@@ -162,9 +168,20 @@ a.button img{
 }
 
 .playlist .controls{
-	width: 96px;
+	min-width: 96px;
 	text-align:right;
 	padding-left: 3px;
+}
+
+.playlist td.title{
+	width: 100%;
+}
+.library td.title{
+	width: 100%;
+}
+
+.library div.title{
+	max-width: 220px;
 }
 
 .search .controls{
@@ -203,13 +220,13 @@ span.noprebook {
 }
 
 .playlist .cover,
-.search .cover  {
+.library .cover  {
 	width: 50px;
 	padding-right:3px;
 }
 
-.playlist .file:hover,
-.search .file:hover{
+.playlist tr:hover,
+.library tr:hover{
 	background-color: #707070;
 }
 
@@ -277,6 +294,12 @@ input.button {
 	//height: 20px;
 	padding: 0;
 }
+
+div.browsemenu{
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #404040;
+}
 	
 ul.browsemenu{
 	display: inline;
@@ -308,10 +331,26 @@ ul.charselection li.active {
 	max-width: 250px;
 }
 
-.tagcloud {	
-	padding: 3px;	
+span.tagcloud {	
+	margin: 2px;
+}
+
+span.tagcloud a{	
+	//
 }
 
 span.tagcloud a:hover {	
 	color: red;
+}
+
+div.pagination{
+	text-align: center;
+	border-top: 1px solid #404040;
+	margin-top:5px;
+	padding-top:5px;
+}
+a.pagination {
+padding-left:5px;
+padding-right:5px;
+
 }

@@ -9,6 +9,5 @@
 			Search <input class="text" type="text" name="query" size=30 maxlength=100 value="{{SearchString}}">
 			<input type="submit" value="ok" class="button">		
 </form>
-
 {{BrowseSubmenu}}
 </div>

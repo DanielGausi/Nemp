@@ -13,7 +13,10 @@
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_playnow", dataType:"html", success: showtest});		
 			
 			function showtest(data, textStatus, jqXHR)
-			{ 
+			{ 				
+				if (data == "0") {
+					alert("Playing failed. Please reload this page and try again.");
+				}				
 				$(".current").removeClass("current");				
 				$("#js"+data).addClass("current");
 			}			
