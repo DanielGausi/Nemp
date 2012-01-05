@@ -97,10 +97,12 @@ type
           fValue: String;
           fCount: Integer;
           fCoverID: String;
+          fFontSize: Integer;
       public
           property Value: String read fValue;
           property Count: Integer read fCount;
           property CoverID: String read fCoverID;
+          property FontSize: Integer read fFontSize;
           constructor Create(aValue: String; c: Integer; aCoverID: String);
   end;
 
@@ -260,6 +262,7 @@ type
           procedure SetActive(Value: Boolean);
           procedure LoadTemplates;
 
+          procedure SetFontSizes(aList: TObjectList);
           procedure ClearHelperLists;
           procedure PrepareArtists;
           procedure PrepareAlbums;
@@ -340,7 +343,7 @@ var
 
 const
     GoodArtist = 5;
-    GoodAlbum  = 5;
+    GoodAlbum  = 3;
     MaxCountPerPage = 100;
 
 implementation
@@ -381,6 +384,8 @@ begin
         fCoverID := '1'
     else
         fCoverID := aCoverID;
+
+    fFontSize := 10;
 end;
 
 
@@ -582,6 +587,7 @@ function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char; aValue: Stri
 var sub: String;
     c: Char;
     letterClass: String;
+    idx: Integer;
 begin
     result := PatternBrowseMenu;
 
@@ -600,10 +606,8 @@ begin
     else
         result := StringReplace(result, '{{GenreClass}}', 'genre', [rfReplaceAll]);
 
-
     if aMode = '' then // fallback
         sub := '';
-
 
     if (aMode = 'genre')then
     begin
@@ -614,11 +618,18 @@ begin
     end
     else
     begin
+        sub := '<ul class="charselection">';
+
         if aLetter = '0' then
             letterClass := 'other active'
         else
             letterClass := 'other';
-        sub := '<ul class="charselection"> <li class="' + letterClass + '"> <a href="browse?mode=' + aMode + '&l=0">0-9</a></li>'#13#10;
+
+        if ((aMode = 'artist') and (MainArtists[0].Count + OtherArtists[0].Count > 0))
+          or ((aMode = 'album') and (Albums[0].Count > 0))
+        then
+            sub := sub +  '<li class="' + letterClass + '"> <a href="browse?mode=' + aMode + '&l=0">0-9</a></li>'#13#10;
+
         for c := 'A' to 'Z' do
         begin
             if c = aLetter then
@@ -626,8 +637,12 @@ begin
             else
                 letterClass := c;
 
-            sub := sub + '<li class="' + letterClass +'"> <a href="browse?mode=' + aMode + '&l=' + c + '">' + c + '</a></li>'#13#10;
+            idx := ord(c) - ord('A') + 1;
 
+            if ((aMode = 'artist') and (MainArtists[idx].Count + OtherArtists[idx].Count > 0))
+              or ((aMode = 'album') and (Albums[idx].Count > 0))
+            then
+                sub := sub + '<li class="' + letterClass +'"> <a href="browse?mode=' + aMode + '&l=' + c + '">' + c + '</a></li>'#13#10;
         end;
 
         sub := sub + '</ul>'
@@ -1074,7 +1089,7 @@ begin
             if (Start > 0) then
             begin
                 BtnPrev := PatternPaginationPrev;
-                Link := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + aSearchString;
+                Link := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
                 BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
             end
             else
@@ -1083,7 +1098,7 @@ begin
             if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
             begin
                 BtnNext := PatternPaginationNext;
-                Link := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + aSearchString;
+                Link := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
                 BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
 
             end
@@ -1131,11 +1146,11 @@ function TNempWebServer.GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Ch
 var PageData, menu, browsemenu, pagination: String;
     Items, Item, baseLink, Link, ItemPattern: String;
     i, ListIdx: Integer;
-    aList: TObjectlist;
+    aList, LinkList: TObjectlist;
     ab: TCountedString;
-    maxC: Integer;
+    //maxC: Integer;
 
-    function GetMaxCount(aList: TObjectList): Integer;
+    {function GetMaxCount(aList: TObjectList): Integer;
     var i: Integer;
     begin
         result := 1;
@@ -1147,13 +1162,14 @@ var PageData, menu, browsemenu, pagination: String;
         if result < 200 then
             result := 200;
     end;
+    }
 
-    function PoperSize(aMax, c: Integer): Integer;
+   { function PoperSize(aMax, c: Integer): Integer;
     begin
         result := round((c*sqrt(c))/aMax * 14) + 10;
         if result > 22 then
             result := 22;
-    end;
+    end; }
 
 begin
     menu := MainMenu(2);
@@ -1171,14 +1187,37 @@ begin
         ListIdx := 0;
 
     aList := MainArtists[1]; // fallback
+    LinkList := Nil;
     ItemPattern := PatternItemBrowseArtist;
     if aMode = 'artist' then
     begin
         ItemPattern := PatternItemBrowseArtist;
         if other then
-            aList := OtherArtists[ListIdx]
+        begin
+            aList := OtherArtists[ListIdx];
+            LinkList := MainArtists[ListIdx];
+            if LinkList.Count = 0 then
+                LinkList := Nil;
+            if aList.Count = 0 then
+            begin
+                aList := MainArtists[ListIdx]; // Fallback
+                other := False;
+                LinkList := Nil;
+            end;
+        end
         else
+        begin
             aList := MainArtists[ListIdx];
+            LinkList := OtherArtists[ListIdx];
+            if LinkList.Count = 0 then
+                LinkList := Nil;
+            if aList.Count = 0 then
+            begin
+                aList := OtherArtists[ListIdx]; // Fallback
+                other := True;
+                LinkList := Nil;
+            end;
+        end;
     end;
     if aMode = 'album' then
     begin
@@ -1194,7 +1233,7 @@ begin
     Items := '';
     baseLink := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;value=';
 
-    maxC := GetMaxCount(aList);
+    // maxC := GetMaxCount(aList);
 
     for i := 0 to aList.Count - 1 do
     begin
@@ -1203,7 +1242,8 @@ begin
         Link := baseLink + ParamsEncode(UTF8String(ab.Value));
 
         Item := StringReplace(Item, '{{Link}}'   , Link, [rfReplaceAll]);
-        Item := StringReplace(Item, '{{Font}}'   , IntToStr(PoperSize(maxC, ab.Count)) + 'px', [rfReplaceAll]);
+        //Item := StringReplace(Item, '{{Font}}'   , IntToStr(PoperSize(maxC, ab.Count)) + 'px', [rfReplaceAll]);
+        Item := StringReplace(Item, '{{Font}}'   , IntToStr(ab.FontSize) + 'px', [rfReplaceAll]);
         Item := StringReplace(Item, '{{Value}}'  , EscapeHTMLChars(ab.Value), [rfReplaceAll]);
         Item := StringReplace(Item, '{{Count}}'  , IntToStr(ab.Count), [rfReplaceAll]);
         Item := StringReplace(Item, '{{CoverID}}', EscapeHTMLChars(ab.CoverID), [rfReplaceAll]);
@@ -1212,26 +1252,28 @@ begin
 
     if aMode='artist' then
     begin
-        // todo: pagination hier erstzen durch link zu other/main
-        if Other then
+        if assigned(LinkList) then
         begin
-            pagination := PatternPaginationMain;
-            Link := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;other=0';
-        end
-        else
-        begin
-            pagination := PatternPaginationOther;
-            Link := 'browse?mode=' + EscapeHTMLChars(aMode) + '&amp;l=' + EscapeHTMLChars(aChar) + '&amp;other=1';
-        end;
-        pagination := StringReplace(pagination, '{{Letter}}', aChar, [rfReplaceAll]);
-        pagination := StringReplace(pagination, '{{Link}}', Link, [rfReplaceAll]);
+            if Other then
+            begin
+                pagination := PatternPaginationMain;
+                Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=0';
+            end
+            else
+            begin
+                pagination := PatternPaginationOther;
+                Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=1';
+            end;
+            pagination := StringReplace(pagination, '{{Letter}}', aChar, [rfReplaceAll]);
+            pagination := StringReplace(pagination, '{{Link}}', Link, [rfReplaceAll]);
+        end else
+            pagination := '';
         PageData := StringReplace(PageData, '{{Pagination}}', pagination, [rfReplaceAll]);
     end
     else
         PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
 
     PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
-    //PageData := StringReplace(PageData, '{{SearchResultItems}}', 'Hier kommen die Files mit '+ aChar, [rfReplaceAll]);
     result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
@@ -1314,7 +1356,7 @@ begin
         if (Start > 0) then
         begin
             BtnPrev := PatternPaginationPrev;
-            Link := 'browse?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + aMode + '&amp;value=' + aValue;
+            Link := 'browse?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
             BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
         end
         else
@@ -1323,7 +1365,7 @@ begin
         if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
         begin
             BtnNext := PatternPaginationNext;
-            Link := 'browse?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + aMode + '&amp;value=' + aValue;
+            Link := 'browse?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
             BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
         end
         else
@@ -1535,6 +1577,18 @@ begin
     end;
 end;
 
+procedure TNempWebServer.ClearHelperLists;
+var i: Integer;
+begin
+    for i := 0 to 26 do
+    begin
+        MainArtists[i].Clear;
+        OtherArtists[i].Clear;
+        Albums[i].Clear;
+    end;
+    Genres.Clear;
+end;
+
 function CorrectIndex(s: String): Integer;
 var tmp: String;
 begin
@@ -1542,6 +1596,7 @@ begin
         result := 0
     else
     begin
+        s := AnsiUppercase(s);
         tmp := s[1];
         case tmp[1] of
             'Ä': tmp := 'A';
@@ -1554,18 +1609,6 @@ begin
         else
             result := 0;
     end;
-end;
-
-procedure TNempWebServer.ClearHelperLists;
-var i: Integer;
-begin
-    for i := 0 to 26 do
-    begin
-        MainArtists[i].Clear;
-        OtherArtists[i].Clear;
-        Albums[i].Clear;
-    end;
-    Genres.Clear;
 end;
 
 procedure TNempWebServer.PrepareArtists;
@@ -1608,6 +1651,25 @@ begin
                     currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
             end;
         end;
+
+        // add last item
+        if trim(currentArtist) <> '' then
+        begin
+            // insert currentArtist into one of the Artists-Lists
+            idx := CorrectIndex(currentArtist);
+            newEntry := TCountedString.Create(currentArtist, c, currentCoverID);
+            if c >= GoodArtist then
+                MainArtists[idx].Add(newEntry)
+            else
+                OtherArtists[idx].Add(newEntry);
+        end; // otherwise: Do not add this artist at all
+
+        // set Font Sizes
+        for i := 0 to 26 do
+        begin
+            SetFontSizes(MainArtists[i]);
+            SetFontSizes(OtherArtists[i]);
+        end;
     end;
 end;
 
@@ -1647,6 +1709,19 @@ begin
                     currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
             end;
         end;
+
+        // insert last item
+        if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
+        begin
+            // insert currentAlbum into one of the Album-Lists
+            idx := CorrectIndex(currentAlbum);
+            newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
+            Albums[idx].Add(newEntry);
+        end;
+
+        // set Font Sizes
+        for i := 0 to 26 do
+            SetFontSizes(Albums[i]);
     end;
 end;
 
@@ -1683,6 +1758,83 @@ begin
                 inc(c);
             end;
         end;
+        newEntry := TCountedString.Create(currentGenre, c, '1');
+        Genres.Add(newEntry);
+
+        SetFontSizes(Genres);
+    end;
+end;
+
+procedure TNempWebServer.SetFontSizes(aList: TObjectList);
+var i, cMin, cMax: integer;
+    aItem: TCountedString;
+    //TreshHolds: Array[1..8] of Double;
+    //Delta: Double;
+    //Flag: Boolean;
+
+const FontSizes : Array[1..8] of Integer = (10,12,14,16,18,20,22,24);
+
+begin
+    // 1. finding min/max
+    if aList.Count > 0 then
+    begin
+        aItem := TCountedString(aList[0]);
+        cMin := aItem.Count;
+        cMax := aItem.Count;
+    end else
+        exit;
+
+    for i := 1 to aList.Count - 1 do
+    begin
+        aItem := TCountedString(aList[i]);
+        if aItem.Count > cMax then
+            cMax := aItem.Count;
+        if aItem.Count < cMin then
+            cMin := aItem.Count;
+    end;
+
+    // really small values ("other Artists")
+    if cMax < 20 then
+        cMax := 20
+    else
+        // small values (normal artists)
+        if cMax < 250 then
+            cMax := 250;
+
+    // 2. setting Treshholds
+    // Delta := (cMax - cMin) / 8;
+    // for i := 1 to 8 do
+    //    TreshHolds[i] := 100* ln(cMin + i*Delta) + 2;
+
+    // 3. setting Fonts
+    for i := 0 to aList.Count - 1 do
+    begin
+        aItem := TCountedString(aList[i]);
+        aItem.fFontSize := round((aItem.Count * sqrt(aItem.Count)) / cMax * 14) + 10;  // see note below
+        if aItem.fFontSize > 24 then
+            aItem.fFontSize := 24;
+
+        ///  note:
+        ///  the commented code is from http://www.echochamberproject.com/node/247,
+        ///  which is cited by http://en.wikipedia.org/wiki/Tag_cloud
+        ///  However, this logarithmic scale does not work well on my collection
+        ///  especially on "genre" ("Pop" is used VERY often and destroys even the
+        ///  "good look" of a logarithmic scale)
+        ///  the -erm- "semi-quadratic" (x^(1.5)) scheme yields to good results
+        ///  (on my collection, imho)
+
+        {Flag := False;
+        for f := 1 to 8 do
+        begin
+            if (not Flag) and (100* ln(2*aItem.Count + 2) <= TreshHolds[f]) then
+            begin
+                aItem.fFontSize := FontSizes[f];
+                Flag := True;
+            end;
+            if (not Flag) then
+                aItem.fFontSize := FontSizes[8];
+        end;
+        }
     end;
 end;
 
