@@ -2374,8 +2374,8 @@ begin
     NempPlaylist.InsertNode := NIL;
 
   newnode := NempPlaylist.InsertFileToPlayList(filename);
-  if Mode=PLAYER_PLAY_NEXT then
-      NempPlaylist.AddNodeToPrebookList(newnode);
+  // DONT - Most users dont get it ;-)  if Mode=PLAYER_PLAY_NEXT then
+  // DONT - Most users dont get it ;-)      NempPlaylist.AddNodeToPrebookList(newnode);
 
 
   if (Mode in [PLAYER_PLAY_NOW, PLAYER_PLAY_FILES]) AND (NempPlaylist.Count > NempPlaylist.InsertIndex-1) then
@@ -3080,8 +3080,8 @@ begin
     // Erste Datei einfügen und ggf. Abspielen
     tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[0]));
 
-    if How=PLAYER_PLAY_NEXT then
-        NempPlaylist.AddNodeToPrebookList(tmp);
+    // DONT - Most users dont get it ;-) if How=PLAYER_PLAY_NEXT then
+    // DONT - Most users dont get it ;-)  NempPlaylist.AddNodeToPrebookList(tmp);
 
     if assigned(tmp) then
       PlayListVST.ScrollIntoView( tmp, False, True);
@@ -3110,8 +3110,8 @@ begin
       (aList[i] as TAudiofile).ReCheckExistence;
 
       tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
-      if How=PLAYER_PLAY_NEXT then
-          NempPlaylist.AddNodeToPrebookList(tmp);
+      // DONT - Most users dont get it ;-)  if How=PLAYER_PLAY_NEXT then
+      // DONT - Most users dont get it ;-)    NempPlaylist.AddNodeToPrebookList(tmp);
       if i Mod 20 = 0 then
       begin
           PlayListVST.ScrollIntoView( tmp, False, True);
@@ -9393,7 +9393,7 @@ begin
                 // enqueue (in th prebook-list)
                 NempPlaylist.GetInsertNodeFromPlayPosition;
                 tmp := NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
-                NempPlaylist.AddNodeToPrebookList(tmp);
+                // DONT - Most users dont get it ;-)  NempPlaylist.AddNodeToPrebookList(tmp);
             end;
             3: begin
                   // just play

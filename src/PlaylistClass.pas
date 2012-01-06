@@ -462,6 +462,8 @@ begin
 
       if Assigned(NewFile) then
       begin
+        SetNewPrebookIndex(NewFile, 0);
+
         OriginalLength := NewFile.Duration;
         fPlayingFile := NewFile;
         fPlayingFileUserInput := False;

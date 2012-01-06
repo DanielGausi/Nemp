@@ -322,13 +322,23 @@ ul.charselection li.active {
 	border: 1px solid red;
 }
 
-.browsealbum,
 .browseartist {
 	padding:5px;
 }
 .browsealbum .title,
 .browseartist .title {
 	max-width: 250px;
+}
+
+div.browsealbum{
+height: 60px;
+overflow: hidden;
+padding: 5px;
+margin-bottom:5px;
+margin-right:5px;
+background-color:#303030;
+border: 1px solid #404040;
+float:left;
 }
 
 span.tagcloud {	

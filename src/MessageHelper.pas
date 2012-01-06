@@ -935,7 +935,7 @@ begin
                                   af := TAudioFile(aMsg.LParam);
                                   NempPlaylist.GetInsertNodeFromPlayPosition;
                                   newNode := NempPlaylist.InsertFileToPlayList(af);
-                                  NempPlaylist.AddNodeToPrebookList(newNode);
+                                  // NempPlaylist.AddNodeToPrebookList(newNode);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
 
