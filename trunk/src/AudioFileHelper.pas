@@ -44,6 +44,7 @@ uses Windows, Classes, Contnrs, SysUtils, StrUtils, Math, IniFiles, Dialogs,
 const SORT_MAX = 10;
 
 function Sortieren_ArtistTitel_asc(item1,item2:pointer):integer;
+function Sortieren_ArtistAlbumTrackTitel_asc(item1,item2:pointer):integer;
 function Sortieren_TitelArtist_asc(item1,item2:pointer):integer;
 function Sortieren_Pfad_asc(item1,item2:pointer):integer;
 function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
@@ -302,6 +303,19 @@ begin
     if tmp=0 then
         result := AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
     else result:= tmp;
+end;
+
+function Sortieren_ArtistAlbumTrackTitel_asc(item1,item2:pointer):integer;
+begin
+    result := AnsiCompareText(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
+    if result=0 then
+        result := AnsiCompareText(TAudioFile(item1).Album, TAudioFile(item2).Album);
+    if result=0 then
+        result := CompareValue(TAudioFile(item1).Track,TAudioFile(item2).Track);
+    if result=0 then
+        result := AnsiCompareText(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname);
+    if result=0 then
+        result := AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel);
 end;
 
 function Sortieren_TitelArtist_asc(item1,item2:pointer):integer;

@@ -772,9 +772,20 @@ begin
     result := StringReplace(result, '{{Class}}'        , aClass, [rfReplaceAll]);
 
     result := StringReplace(result, '{{PlaylistTitle}}', EscapeHTMLChars(af.PlaylistTitle), [rfReplaceAll]);
-    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.Titel) , [rfReplaceAll]);
+    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.NonEmptyTitle) , [rfReplaceAll]);
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
+
+    if af.Artist = '' then
+        result := StringReplace(result, '{{ArtistClass}}', 'hidden', [rfReplaceAll])
+    else
+        result := StringReplace(result, '{{ArtistClass}}', 'artist' , [rfReplaceAll]);
+
+    if af.Album = '' then
+        result := StringReplace(result, '{{AlbumClass}}', 'hidden', [rfReplaceAll])
+    else
+        result := StringReplace(result, '{{AlbumClass}}', 'album' , [rfReplaceAll]);
+
 
     if af.Track = 0 then
         result := StringReplace(result, '{{TrackClass}}', 'hidden', [rfReplaceAll])
@@ -1133,6 +1144,7 @@ begin
         end;
     end else
     begin
+        PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{SearchResultItems}}', '', [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{SearchCount}}', '0', [rfReplaceAll]);
@@ -1444,9 +1456,10 @@ begin
     OriginalLib.CopyLibrary(fWebMedienBib, fCurrentMaxID);
 
     ClearHelperLists;
-    PrepareArtists;
+
     PrepareAlbums;
     PrepareGenres;
+    PrepareArtists;
 
     LeaveCriticalSection(CS_AccessLibrary);
 end;
@@ -1617,7 +1630,7 @@ var currentArtist, currentCoverID: String;
     newEntry: TCountedString;
 
 begin
-    fWebMedienBib.Sort(Sortieren_ArtistTitel_asc);
+    fWebMedienBib.Sort(Sortieren_ArtistAlbumTrackTitel_asc);
 
     if fWebMedienBib.Count > 0 then
     begin
@@ -2480,7 +2493,7 @@ begin
         html := GenerateHTMLMedienbibSearchFormular(searchstring, Start);
         if html = '' then html := ' ';
             ms.Write(html[1], length(html));
-        AddNoCacheHeader(AResponseInfo);
+        // NOT necessary here AddNoCacheHeader(AResponseInfo);
         AResponseInfo.ContentStream := ms;
         result := qrPermit;
     end else
@@ -2524,7 +2537,7 @@ begin
             html := GenerateHTMLMedienbibBrowseList(Querymode, QueryLetter[1], QueryOther='1');
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
-            AddNoCacheHeader(AResponseInfo);
+            // NOT necessary here AddNoCacheHeader(AResponseInfo);
             AResponseInfo.ContentStream := ms;
             result := qrPermit;
 
@@ -2535,7 +2548,7 @@ begin
             html := GenerateHTMLMedienbibBrowseResult(Querymode, QueryValue, Start);
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
-            AddNoCacheHeader(AResponseInfo);
+            // NOT necessary here AddNoCacheHeader(AResponseInfo);
             AResponseInfo.ContentStream := ms;
 
             result := qrPermit;
@@ -2562,7 +2575,7 @@ begin
                 ms := TMemoryStream.Create;
                 if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
-                AddNoCacheHeader(AResponseInfo);
+                // NOT necessary here AddNoCacheHeader(AResponseInfo);
                 AResponseInfo.ContentStream := ms;
                 result := qrPermit;
             end else // not in bib
