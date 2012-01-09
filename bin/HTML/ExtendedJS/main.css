@@ -105,13 +105,31 @@ div.currentimage {
 	text-align: center;
 }
 
+div.progresscontainer{	
+	padding:10px 20px;
+}
 
-.playercontrol,
-#playercontrol {
+div.volumecontainer{
+	width: 60px;
+	float: left;
+	height: 40px;
+	padding-left: 10px;
+}
+
+#playercontrol{
+		float: left;
+		height: 40px;
+		width:200px;
+}
+
+.playercontrol {
 	padding-bottom: 10px;
-	margin-bottom: 10px;
+	margin: 10px auto;
 	text-align: center;
 	border-bottom: 1px solid #404040;
+	height: 70px;
+	width: 300px;
+	
 }
 a.button{
 	//color: #202020;	

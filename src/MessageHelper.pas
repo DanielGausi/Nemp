@@ -1136,12 +1136,23 @@ begin
                                     NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0);
                           end;
 
-        WS_IPC_GETPROGRESS: begin
-                      aMsg.Result := Round(100 * NempPlayer.Progress);
-        end;
-        WS_IPC_SETPROGRESS: begin
-                      NempPlayer.Progress := aMsg.LParam / 100;
-        end;
+        WS_IPC_GETPROGRESS: if AcceptAPICommands then
+                                aMsg.Result := Round(100 * NempPlayer.Progress)
+                            else
+                                aMsg.Result := := -1;
+        WS_IPC_SETPROGRESS: if AcceptAPICommands then
+                                NempPlayer.Progress := aMsg.LParam / 100;
+
+        WS_IPC_GETVOLUME:  if AcceptAPICommands then
+                                aMsg.Result := Round(NempPlayer.Volume)
+                            else
+                                aMsg.Result := 0;
+
+        WS_IPC_SETVOLUME:  if AcceptAPICommands then
+                           begin
+                                NempPlayer.Volume := aMsg.LParam;
+                                CorrectVolButton;
+                           end;
 
         WS_StringLog: begin
                           NempWebServer.LogList.Add(PChar(aMsg.LParam));

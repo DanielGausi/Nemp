@@ -90,6 +90,10 @@ const
     WS_IPC_GETPROGRESS = 401;  // for webserver. Values between 0 and 100
     WS_IPC_SETPROGRESS = 402; // for webserver. Values between 0 and 100
 
+    WS_IPC_GETVOLUME = 403;  // for webserver. Values between 0 and 100
+    WS_IPC_SETVOLUME = 404;  // for webserver. Values between 0 and 100
+
+
 
 
 type
@@ -2068,20 +2072,43 @@ end;
 function TNempWebServer.ResponsePlayerJS(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
-    queriedPart: String;
+    queriedAction, queriedPart: String;
+    aProgress, aVolume: Integer;
 begin
-        queriedPart := aRequestInfo.Params.Values['part'];
-        ms := TMemoryStream.Create;
-            EnterCriticalSection(CS_AccessHTMLCode);
-            if queriedPart= 'controls' then
-                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 1)
-            else
-                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 2); //QueryPlayer;
-            html := HTML_Player;
-            LeaveCriticalSection(CS_AccessHTMLCode);
-        if html = '' then html := ' ';
-        ms.Write(html[1], length(html));
-        AResponseInfo.ContentStream := ms;
+        queriedAction := aRequestInfo.Params.Values['action'];
+        if queriedAction = 'getprogress' then
+        begin
+            aProgress := SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_GETPROGRESS, 0);
+            ms := TMemoryStream.Create;
+            html := IntToStr(aProgress);
+            ms.Write(html[1], length(html));
+            AResponseInfo.ContentStream := ms;
+        end else
+        if queriedAction = 'getvolume' then
+        begin
+            aVolume := SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_GETVOLUME, 0);
+            ms := TMemoryStream.Create;
+            html := IntToStr(aVolume);
+            ms.Write(html[1], length(html));
+            AResponseInfo.ContentStream := ms;
+        end
+        else
+        begin
+            queriedPart := aRequestInfo.Params.Values['part'];
+
+            ms := TMemoryStream.Create;
+                EnterCriticalSection(CS_AccessHTMLCode);
+                if queriedPart= 'controls' then
+                    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 1)
+                else
+                    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 2); //QueryPlayer;
+                html := HTML_Player;
+                LeaveCriticalSection(CS_AccessHTMLCode);
+            if html = '' then html := ' ';
+            ms.Write(html[1], length(html));
+            AResponseInfo.ContentStream := ms;
+        end;
+
         result := qrPermit;
 end;
 
@@ -2112,7 +2139,7 @@ end;
 
 function TNempWebServer.ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction, queriedValue: String;
-    aProgress: Integer;
+    aProgress, aVolume: Integer;
 begin
   if AllowRemoteControl then
   begin
@@ -2126,13 +2153,27 @@ begin
       else
       if queriedAction = 'previous' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PREVTITLE, 0)
       else
+      //if queriedAction = 'getprogress' then
+          // nothing. all is done in responseplayerJS
+      //if queriedAction = 'getvolume' then
+          // nothing. all is done in responseplayerJS
+      //else
       if queriedAction = 'setprogress' then
       begin
           queriedValue := aRequestInfo.Params.Values['value'];
           aProgress := StrToIntDef(queriedValue, -1);
           if aProgress <> -1 then
               SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETPROGRESS, aProgress);
+      end
+      else
+      if queriedAction = 'setvolume' then
+      begin
+          queriedValue := aRequestInfo.Params.Values['value'];
+          aVolume := StrToIntDef(queriedValue, -1);
+          if aProgress <> -1 then
+              SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETVolume, aVolume);
       end;
+
       //else
       //    result := qrInvalidParameter;
       ;
