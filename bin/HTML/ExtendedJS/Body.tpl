@@ -5,9 +5,52 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=320">
 	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jquery-ui.min.js"></script>
 	<script type="text/javascript" src="nemp.js"></script>
 	<link href="main.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript">			
+	<link href="jquery-ui.css" rel="stylesheet" type="text/css">	
+	<script type="text/javascript">		
+		
+		$(document).ready(function() {
+			//$("#slider").slider();
+			$( "#slider" ).slider({ stop: function(event, ui) { 
+				//alert("wuppdi"+ ui.value);
+				$.ajax({url:"playercontrolJS?action=setprogress&value="+ui.value, dataType:"html"});
+				}});
+		});
+		
+		
+		
+
+				
+		function loadplayercontrols(data, textStatus, jqXHR){			
+			var	$currentDOM = $("#playercontrol");			
+			//alert($currentDOM[0].outerHTML);
+			//alert($currentDOM.outerHTML);
+			//alert($currentDOM.html());			
+			$currentDOM.html(data);		
+			$.ajax({url:"playercontrolJS?part=data", dataType:"html", success: loadplayerdata});			
+		};
+				
+		function loadplayerdata(data, textStatus, jqXHR){			
+			var	$currentDOM = $("#playerdata");
+			$currentDOM.html(data);					
+		};
+				
+		function playercontrol_playpause(){			
+			$.ajax({url:"playercontrolJS?action=playpause&part=controls", dataType:"html", success: loadplayercontrols});					
+		};
+		function playercontrol_stop(){
+			$.ajax({url:"playercontrolJS?action=stop&part=controls", dataType:"html", success: loadplayercontrols});		
+		};
+		function playercontrol_playnext(){
+			$.ajax({url:"playercontrolJS?action=next&part=controls", dataType:"html", success: loadplayercontrols});		
+		};
+		function playercontrol_playprevious(){
+			$.ajax({url:"playercontrolJS?action=previous&part=controls", dataType:"html", success: loadplayercontrols});		
+		};
+				
+			
 	
 		function playtitle(aID){			
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_playnow", dataType:"html", success: showtest});		
@@ -27,10 +70,10 @@
 			//document.location.reload(true);
 			// document.location="playlist";
 			$.ajax({url:"playlistcontrolJS?id=-1&action=loaditem", dataType:"html", success: replacePlaylist});
-		}		
+		};		
 		function replacePlaylist(data, textStatus, jqXHR) {			
 			$("#playlist").html(data);			
-		}
+		};
 		
 		function moveup(aID){
 			var $newHtml1;
@@ -148,7 +191,7 @@
 					reloadplaylist();
 				}				
 			}		
-		}
+		};
 		
 		function addnext(aID){
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_addnext", dataType:"text", success: fileaddnext2});
@@ -162,7 +205,7 @@
 			function fileadd2(data, textStatus, jqXHR){
 				$("#btnAdd"+aID)[0].outerHTML = data;
 			}
-		}
+		};
 		
 		
 	</script>

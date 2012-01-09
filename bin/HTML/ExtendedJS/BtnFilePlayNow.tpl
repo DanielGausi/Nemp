@@ -1,1 +1,1 @@
-<a class="button" title="Play this title now" onclick="playtitle({{ID}})"><img src="images/playback-start.png" width="24" height="24" alt="play now" /> Play now</a>
+<a class="button" title="Play this title now" onclick="playtitle({{ID}})"><img src="images/playback-start.png" width="24" height="24" alt="play now"></a>

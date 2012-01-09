@@ -64,6 +64,7 @@ const
     WM_WebServer = WM_USER + 800;
 
     WS_QueryPlayer = 10;
+    WS_QueryPlayerJS = 11;
     WS_QueryPlaylist = 1;
     WS_QueryPlaylistDetail = 2;
 
@@ -85,6 +86,10 @@ const
     WS_PlaylistDownloadID = 6;
 
     WS_StringLog = 100;
+
+    WS_IPC_GETPROGRESS = 401;  // for webserver. Values between 0 and 100
+    WS_IPC_SETPROGRESS = 402; // for webserver. Values between 0 and 100
+
 
 
 type
@@ -143,8 +148,11 @@ type
 
           PatternBody: String;
           // Buttons for Player Control
+          PatternPlayerControls: String;
           PatternButtonNext : String;
-          PatternButtonPlayPause : String;
+          // PatternButtonPlayPause : String;
+          PatternButtonPause : String;
+          PatternButtonPlay : String;
           PatternButtonPrev : String;
           PatternButtonStop : String;
           // Buttons for Files
@@ -226,7 +234,7 @@ type
           // replace InsertTags for Buttons
           function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer): String;
 
-          function fSetControlButtons(aPattern: String): String;
+          function fSetControlButtons(aPattern: String; isPlaying: Boolean): String;
 
           // The following methods have been methods of a WebServerForm-Class
           // ---->
@@ -238,7 +246,10 @@ type
 
           procedure AddNoCacheHeader(AResponseInfo: TIdHTTPResponseInfo);
           function ResponsePlayer (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponsePlayerJS (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
           function ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+
           function ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 
           function ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
@@ -312,7 +323,7 @@ type
 
           function ValidIP(aIP, bIP: String): Boolean;
 
-          procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer);
+          procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer=0);
           procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
           procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
 
@@ -863,13 +874,18 @@ begin
     result := buttons;
 end;
 
-function TNempWebServer.fSetControlButtons(aPattern: String): String;
+function TNempWebServer.fSetControlButtons(aPattern: String; isPlaying: Boolean): String;
 var buttons: String;
 begin
     buttons := aPattern;
+    buttons := StringReplace(buttons, '{{PlayerControls}}'     , PatternPlayerControls      , [rfReplaceAll]);
+
     if AllowRemoteControl then
     begin
-        buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPlayPause , [rfReplaceAll]);
+        if isPlaying then
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPause , [rfReplaceAll])
+        else
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPlay , [rfReplaceAll]);
         buttons := StringReplace(buttons, '{{BtnControlStop}}'     , PatternButtonStop      , [rfReplaceAll]);
         buttons := StringReplace(buttons, '{{BtnControlNext}}'     , PatternButtonNext      , [rfReplaceAll]);
         buttons := StringReplace(buttons, '{{BtnControlPrev}}'     , PatternButtonPrev      , [rfReplaceAll]);
@@ -892,7 +908,7 @@ begin
 end;
 
 
-procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer);
+procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer=0);
 var menu, PageData, PlayerData: String;
     af: TAudioFile;
 begin
@@ -903,21 +919,40 @@ begin
         // ID generieren/setzen
         EnsureFileHasID(af);
 
-        PlayerData := PatternItemPlayer;
-        PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
-        PlayerData := fSetBasicFileData(af, PlayerData, '');
-        PlayerData := fSetFileButtons(af, PlayerData, 0);
+        case aPart of
+            1: begin
+                // 1: Controls  [[PlayerControls]]
+                HTML_Player := UTF8String(fSetControlButtons(PatternPlayerControls, aNempPlayer.Status = PLAYER_ISPLAYING));
+            end;
+            2: begin
+                // 2: Playerdata [[ItemPlayer]]
+                PlayerData := PatternItemPlayer;
+                PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
+                PlayerData := fSetBasicFileData(af, PlayerData, '');
+                PlayerData := fSetFileButtons(af, PlayerData, 0);
+                HTML_Player := UTF8String(PlayerData);
+            end;
+        else
+            begin
+                PlayerData := PatternItemPlayer;
+                PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
+                PlayerData := fSetBasicFileData(af, PlayerData, '');
+                PlayerData := fSetFileButtons(af, PlayerData, 0);
+                PageData := PatternPlayerPage;
+                PageData := fSetControlButtons(PatternPlayerPage, aNempPlayer.Status = PLAYER_ISPLAYING);
+                PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
+                PageData := StringReplace(PageData, '{{ItemPlayer}}', PlayerData, [rfReplaceAll]);
+                HTML_Player := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]))
+            end;
+        end;
 
-        PageData := PatternPlayerPage;
-        PageData := fSetControlButtons(PatternPlayerPage);
-        PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
-        PageData := StringReplace(PageData, '{{ItemPlayer}}', PlayerData, [rfReplaceAll]);
     end else
     begin
-        PageData := GenerateErrorPage(WebServer_NoFile, 0);
+        if (aPart=0) then
+            PageData := GenerateErrorPage(WebServer_NoFile, 0)
+        else
+            PageData := 'fail';
     end;
-
-    HTML_Player := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 // konvertiert die Playlist in ein HTML-Formular
@@ -1539,10 +1574,13 @@ begin
 
 
         // Buttons for Player Control
-        PatternButtonNext := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
-        PatternButtonPlayPause := trim(GetTemplate(fLocalDir + 'BtnControlPlayPause.tpl'));
-        PatternButtonPrev := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
-        PatternButtonStop := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
+        // PatternButtonPlayPause := trim(GetTemplate(fLocalDir + 'BtnControlPlayPause.tpl'));
+        PatternPlayerControls := trim(GetTemplate(fLocalDir + 'PlayerControls.tpl'));
+        PatternButtonPause := trim(GetTemplate(fLocalDir + 'BtnControlPause.tpl'));
+        PatternButtonPlay  := trim(GetTemplate(fLocalDir + 'BtnControlPlay.tpl'));
+        PatternButtonNext  := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
+        PatternButtonPrev  := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
+        PatternButtonStop  := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
 
         PatternButtonSuccess := trim(GetTemplate(fLocalDir + 'BtnSuccess.tpl'));
         PatternButtonFail := trim(GetTemplate(fLocalDir + 'BtnFail.tpl'));
@@ -2027,6 +2065,25 @@ begin
         AResponseInfo.ContentStream := ms;
         result := qrPermit;
 end;
+function TNempWebServer.ResponsePlayerJS(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+var ms: TMemoryStream;
+    html: UTf8String;
+    queriedPart: String;
+begin
+        queriedPart := aRequestInfo.Params.Values['part'];
+        ms := TMemoryStream.Create;
+            EnterCriticalSection(CS_AccessHTMLCode);
+            if queriedPart= 'controls' then
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 1)
+            else
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 2); //QueryPlayer;
+            html := HTML_Player;
+            LeaveCriticalSection(CS_AccessHTMLCode);
+        if html = '' then html := ' ';
+        ms.Write(html[1], length(html));
+        AResponseInfo.ContentStream := ms;
+        result := qrPermit;
+end;
 
 function TNempWebServer.ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction: String;
@@ -2047,6 +2104,40 @@ begin
           result := qrInvalidParameter;
       AResponseInfo.Redirect('/player');
       AResponseInfo.ContentStream := Nil;
+  end else
+  begin
+      result := HandleError(AResponseInfo, qrRemoteControlDenied)
+  end;
+end;
+
+function TNempWebServer.ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+var queriedAction, queriedValue: String;
+    aProgress: Integer;
+begin
+  if AllowRemoteControl then
+  begin
+      result := qrPermit;
+      queriedAction := aRequestInfo.Params.Values['action'];
+      if queriedAction = 'stop' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0)
+      else
+      if queriedAction = 'playpause' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PLAY, 0)
+      else
+      if queriedAction = 'next' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_NEXTTITLE, 0)
+      else
+      if queriedAction = 'previous' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PREVTITLE, 0)
+      else
+      if queriedAction = 'setprogress' then
+      begin
+          queriedValue := aRequestInfo.Params.Values['value'];
+          aProgress := StrToIntDef(queriedValue, -1);
+          if aProgress <> -1 then
+              SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETPROGRESS, aProgress);
+      end;
+      //else
+      //    result := qrInvalidParameter;
+      ;
+
+      result := ResponsePlayerJS(ARequestInfo, AResponseInfo);
   end else
   begin
       result := HandleError(AResponseInfo, qrRemoteControlDenied)
@@ -2619,6 +2710,8 @@ begin
         if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo)
+        else
+        if RequestedDocument = '/playercontrolJS' then permit := ResponseJSPlayerControl(ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo)
         else
