@@ -10,26 +10,55 @@
 	<link href="main.css" rel="stylesheet" type="text/css">
 	<link href="jquery-ui.css" rel="stylesheet" type="text/css">	
 	<script type="text/javascript">		
+	
+		var currentProgress=0;
+		var t;
 		
-		$(document).ready(function() {
-			//$("#slider").slider();
-			$( "#slider" ).slider({ stop: function(event, ui) { 
-				//alert("wuppdi"+ ui.value);
-				$.ajax({url:"playercontrolJS?action=setprogress&value="+ui.value, dataType:"html"});
-				}});
+		$(document).ready(function() {			
+			if ( $("#progress").length > 0 ) {
+				$("#progress").slider({ stop: function(event, ui) { 				
+					$.ajax({url:"playercontrolJS?action=setprogress&value="+ui.value, dataType:"html"});},
+					animate: 1000					
+					} );				
+				t=setTimeout("checkProgress()",1000);
+			};
+			
+			if ( $("#volume").length > 0 ){
+				$("#volume").slider( 
+						{ stop: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"});},
+						  slide: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"});}						
+						} );
+				checkVolume();
+			}
 		});
 		
+		function checkVolume() {
+			$.ajax({url:"playercontrolJS?action=getvolume", dataType:"text", success: 
+				function(data, textStatus, jqXHR){$("#volume").slider( "value" , data);}
+				});				
+		}
 		
+		function checkProgress(){
+			$.ajax({url:"playercontrolJS?action=getprogress", dataType:"text", success: setslider});
+		};
 		
-
-				
+		function setslider(data, textStatus, jqXHR){
+			if (currentProgress > data){
+				// reload playerdata/controls
+				$.ajax({url:"playercontrolJS?part=controls", dataType:"html", success: loadplayercontrols});
+			}
+			currentProgress = data;
+			$("#progress").slider( "value" , data);
+			
+			if ( $("#progress").length > 0 ) {
+					t=setTimeout("checkProgress()",1000);
+				}
+		}
+		
 		function loadplayercontrols(data, textStatus, jqXHR){			
 			var	$currentDOM = $("#playercontrol");			
-			//alert($currentDOM[0].outerHTML);
-			//alert($currentDOM.outerHTML);
-			//alert($currentDOM.html());			
 			$currentDOM.html(data);		
-			$.ajax({url:"playercontrolJS?part=data", dataType:"html", success: loadplayerdata});			
+			$.ajax({url:"playercontrolJS?part=data", dataType:"html", success: loadplayerdata});						
 		};
 				
 		function loadplayerdata(data, textStatus, jqXHR){			
