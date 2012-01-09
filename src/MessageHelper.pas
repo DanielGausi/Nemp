@@ -1139,7 +1139,7 @@ begin
         WS_IPC_GETPROGRESS: if AcceptAPICommands then
                                 aMsg.Result := Round(100 * NempPlayer.Progress)
                             else
-                                aMsg.Result := := -1;
+                                aMsg.Result := -1;
         WS_IPC_SETPROGRESS: if AcceptAPICommands then
                                 NempPlayer.Progress := aMsg.LParam / 100;
 
