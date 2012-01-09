@@ -1,11 +1,11 @@
-<div class="player">
+<div id="jsPlayer" class="player">
 {{Menu}}
-<div class="playercontrol">
-	{{BtnControlPlayPause}}
-	{{BtnControlStop}}
-	{{BtnControlPrev}}
-	{{BtnControlNext}}	
+<div id="playercontrol">
+	{{PlayerControls}}	
 </div>
-{{ItemPlayer}}
+<div id="slider"></div>
+<div id="playerdata">
+	{{ItemPlayer}}
+</div>
 </div>
 <div style="clear:both;"></div>

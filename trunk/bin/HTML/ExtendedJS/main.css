@@ -106,7 +106,8 @@ div.currentimage {
 }
 
 
-.playercontrol {
+.playercontrol,
+#playercontrol {
 	padding-bottom: 10px;
 	margin-bottom: 10px;
 	text-align: center;
@@ -159,7 +160,7 @@ a.button img{
 	padding-bottom: 3px;
 }
 .library table tr td.controls{
-	min-width:52px;
+	width:50px;
 }
 
 .playlist table tr td,
@@ -167,17 +168,18 @@ a.button img{
 	vertical-align:top;
 }
 
-.playlist .controls{
+.playlist table tr td.controls{
 	min-width: 96px;
+	width: 96px;
 	text-align:right;
 	padding-left: 3px;
 }
 
 .playlist td.title{
-	width: 100%;
+	width: 200px;
 }
 .library td.title{
-	width: 100%;
+	width: 220px;
 }
 
 .library div.title{
@@ -185,13 +187,13 @@ a.button img{
 }
 
 .search .controls{
-	min-width: 52px;
+	width: 52px;
 	text-align:right;
 	padding-left: 3px;
 }
 .playlist .index {
 	text-align:right;
-	min-width: 20px;
+	width: 20px;
 	padding-right:5px;
 }
 

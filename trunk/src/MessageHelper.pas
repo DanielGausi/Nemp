@@ -1105,9 +1105,13 @@ begin
                               end;
                            end;
 
-        WS_QueryPlayer: begin
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer);
-                        end;
+        WS_QueryPlayer: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0);
+        WS_QueryPlayerJS: begin
+                        if aMsg.LParam = 1 then
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1)   // 1: Controls  [[PlayerControls]]
+                        else
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2);  // 2: Playerdata [[ItemPlayer]]
+        end;
         WS_QueryPlaylist: begin
                               NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist);
                           end;
@@ -1131,6 +1135,13 @@ begin
                                 end else
                                     NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0);
                           end;
+
+        WS_IPC_GETPROGRESS: begin
+                      aMsg.Result := Round(100 * NempPlayer.Progress);
+        end;
+        WS_IPC_SETPROGRESS: begin
+                      NempPlayer.Progress := aMsg.LParam / 100;
+        end;
 
         WS_StringLog: begin
                           NempWebServer.LogList.Add(PChar(aMsg.LParam));
