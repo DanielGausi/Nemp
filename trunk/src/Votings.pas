@@ -168,25 +168,20 @@ end;
     GetLibFileFromID: Search in the Library for a File with this ID
 }
 function TVoteMachine.GetLibFileFromID(aFileID: Integer): TAudioFile;
+var i: Integer;
 begin
-
-
-result := Nil;
-    for i := 0 to fWebMedienBib.Count - 1 do
-    begin
-        if TAudioFile(fWebMedienBib[i]).WebServerID = aID then
+    result := Nil;
+    for i := 0 to LibraryList.Count - 1 do
+        if TAudioFile(LibraryList[i]).WebServerID = aID then
         begin
-            result := TAudioFile(fWebMedienBib[i]);
+            result := TAudioFile(LibraryList[i]);
             break;
         end;
-    end;
-
-
 end;
 
 {
     getUserforIP: returns a User with the current IP
-    If no User can be found, a new obne is created
+    If no User can be found, a new one is created
 }
 function TVoteMachine.getUserforIP(aIP: String): TUser;
 var i: Integer;
@@ -214,6 +209,7 @@ end;
 
 function TVoteMachine.ProcessVote(aFileID: Integer; aIP: String): Boolean;
 var currentUser: TUser;
+    aFile: TAudioFile;
 begin
     EnterCriticalSection(CS_Vote);
     currentUser := getUserforIP(aIP);
@@ -231,7 +227,14 @@ begin
             // => Get the file with aFileID from the Library-List
             //    Check, whether a file with the same FILENAME is in the playlist and get its ID
             //    Check VoteAllowed for this ID and Vote
+            aFile := GetLibFileFromID(aFileID);
+            if assigned(aFile) then
+            begin
 
+            end
+            else
+                // File with this ID neither in Playlist nor in Library
+                result := False;
         end;
 
 
@@ -241,9 +244,6 @@ begin
         result := False;
     end;
 
-
-
-    // doing a lot of stuff ;-)
 
     LeaveCriticalSection(CS_Vote);
 end;
