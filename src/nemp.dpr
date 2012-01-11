@@ -91,7 +91,8 @@ uses
   CDOpenDialogs in 'CDOpenDialogs.pas' {CDOpenDialog},
   DeleteHelper in 'DeleteHelper.pas',
   DeleteSelect in 'DeleteSelect.pas' {DeleteSelection},
-  CustomizedScrobbler in 'CustomizedScrobbler.pas';
+  CustomizedScrobbler in 'CustomizedScrobbler.pas',
+  Votings in 'Votings.pas';
 
 //,  classes;
 
