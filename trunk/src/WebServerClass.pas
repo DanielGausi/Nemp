@@ -87,6 +87,8 @@ const
 
     WS_StringLog = 100;
 
+    WS_VoteID = 25;
+
     WS_IPC_GETPROGRESS = 401;  // for webserver. Values between 0 and 100
     WS_IPC_SETPROGRESS = 402; // for webserver. Values between 0 and 100
 

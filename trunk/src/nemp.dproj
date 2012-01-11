@@ -169,6 +169,7 @@
 				<Form>DeleteSelection</Form>
 			</DCCReference>
 			<DCCReference Include="CustomizedScrobbler.pas"/>
+			<DCCReference Include="Votings.pas"/>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>
