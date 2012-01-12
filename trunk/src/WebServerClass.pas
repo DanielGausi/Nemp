@@ -57,7 +57,7 @@ uses Windows, Classes, Messages, ContNrs, SysUtils,  dialogs,
   IdCustomHTTPServer, IdHTTPServer, IdContext,
   MP3FileUtils, AudioFileClass, Hilfsfunktionen, HtmlHelper,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
-  MedienbibliothekClass, BibSearchClass;
+  MedienbibliothekClass, BibSearchClass, Votings;
 
 const
     // Messages für WebServer:
@@ -87,7 +87,12 @@ const
 
     WS_StringLog = 100;
 
-    WS_VoteID = 25;
+    // Messages for voting.
+    // use these only inside the criticalSection "CS_Vote" !!!
+    WS_VoteID = 25;                 // Vote for the file with this ID
+    WS_VoteFilename = 26;  // Vote for a given Filename (more complicated!!)
+    WS_AddAndVoteThisFile = 27;
+
 
     WS_IPC_GETPROGRESS = 401;  // for webserver. Values between 0 and 100
     WS_IPC_SETPROGRESS = 402; // for webserver. Values between 0 and 100
@@ -295,6 +300,8 @@ type
           //       IDhttpServer will add strings via SendMessage.
           LogList: TStringList;
 
+          VoteMachine: TVoteMachine;
+
 
           property Username: string read fGetUsername write fSetUsername;
           property Password: string read fGetPassword write fSetPassword;
@@ -422,6 +429,8 @@ begin
     Username := 'admin';
     Password := 'pass';
     LogList := TStringList.Create;
+    VoteMachine := TVoteMachine.Create(aHandle);
+    VoteMachine.LibraryList := fWebMedienBib;
 
     for i := 0 to 26 do
     begin

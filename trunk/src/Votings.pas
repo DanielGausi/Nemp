@@ -15,7 +15,6 @@ type
             fID: Integer;
             fTime: TDateTime;
         public
-
             property ID: Integer read fID;  // ID of the TAudiofile in the Playlist
             property Time: TDateTime read fTime; // Time of the vote
 
@@ -31,7 +30,7 @@ type
             property IP: String read fIP;
 
             constructor Create(aIP: String);
-            destructor Destroy;
+            destructor Destroy; override;
             procedure CleanUpVotes;
             function VoteAllowed(aFileID: Integer): Boolean;
             procedure UpdateVotings(aFileID: Integer);
@@ -40,15 +39,22 @@ type
     TVoteMachine = class
         private
             fMainWindowHandle: DWord;
+            fcurrentUser: TUser;  // global property. ONLY ONE THREAD VOTES AT A GIVEN TIME !!!
             function getUserforIP(aIP: String): TUser;
         public
             Users: TObjectList;
             LibraryList: TObjectList;
 
             constructor Create(Hnd: DWord);
-            destructor Destroy;
+            destructor Destroy; override;
 
             function GetLibFileFromID(aFileID: Integer): TAudioFile;
+
+            function VCLDoVote(aFileID: Integer; aPlaylist: TNempPlaylist): Integer;
+            function VCLDoVoteFilename(aFilename: String; aPlaylist: TNempPlaylist): Integer;
+            function VCLAddAndVoteFile(aFile: TAudioFile; aPlaylist: TNempPlaylist): Integer;
+
+
 
             function ProcessVote(aFileID: Integer; aIP: String ): Boolean;
             /// ProcessVote is directly called from the webserver (i.e. secondary thread!)
@@ -172,7 +178,7 @@ var i: Integer;
 begin
     result := Nil;
     for i := 0 to LibraryList.Count - 1 do
-        if TAudioFile(LibraryList[i]).WebServerID = aID then
+        if TAudioFile(LibraryList[i]).WebServerID = aFileID then
         begin
             result := TAudioFile(LibraryList[i]);
             break;
@@ -207,34 +213,104 @@ begin
 
 end;
 
+// this is called from the Messagehandler for "WS_VoteID"
+function TVoteMachine.VCLDoVote(aFileID: Integer; aPlaylist: TNempPlaylist): Integer;
+var i: integer;
+    af: TAudioFile;
+begin
+    result := 0;  // fail
+    for i := 0 to aPlaylist.Playlist.Count - 1 do
+    begin
+        af := TAudioFile(aPlaylist.Playlist[i]);
+        if af.WebServerID = aFileID then
+        begin
+            af.VoteCounter := af.VoteCounter + 1;   // user clicked a "vote" on a playlist-Item   +1
+            fcurrentUser.UpdateVotings(aFileID);
+            result := 1;  // success
+            break;
+        end;
+    end;
+    // todo:
+    // resort Playlist
+
+end;
+
+function TVoteMachine.VCLDoVoteFilename(aFilename: String; aPlaylist: TNempPlaylist): Integer;
+var i: integer;
+    af: TAudioFile;
+begin
+    result := 0;  // fail
+    for i := 0 to aPlaylist.Playlist.Count - 1 do
+    begin
+        af := TAudioFile(aPlaylist.Playlist[i]);
+        if af.Pfad = aFilename then
+        begin
+            if fCurrentUser.VoteAllowed(af.WebServerID) then
+            begin
+                // vote is allowed
+                af.VoteCounter := af.VoteCounter + 1;  // user searched in the library for an existing file: +1
+                fcurrentUser.UpdateVotings(af.WebServerID);
+                result := 1;  // success
+            end else
+                result := 2;
+            break;
+        end;
+    end;
+    // todo:
+    // resort Playlist
+end;
+
+function TVoteMachine.VCLAddAndVoteFile(aFile: TAudioFile; aPlaylist: TNempPlaylist): Integer;
+begin
+    todo: Add to playlist
+    vote
+    resort
+end;
+
+
+
 function TVoteMachine.ProcessVote(aFileID: Integer; aIP: String): Boolean;
-var currentUser: TUser;
+var
     aFile: TAudioFile;
+    playlistID: Integer;
 begin
     EnterCriticalSection(CS_Vote);
-    currentUser := getUserforIP(aIP);
-    currentUser.CleanUpVotes;
-    if currentUser.VoteAllowed(aFileID) then
+    fcurrentUser := getUserforIP(aIP);
+    fcurrentUser.CleanUpVotes;
+    result := True; // thin positive. ;-)
+
+    if fcurrentUser.VoteAllowed(aFileID) then
     begin
         // Vote allowed
+        // WS_VoteID will call VCLDoVote
         if SendMessage(fMainWindowHandle, WM_WebServer, WS_VoteID, aFileID) = 1 then
-            // voting was successful, update users Votings
-            currentUser.UpdateVotings(aFileID)
+            result := True // voting was successful
         else
         begin
             // voting was NOT successful
             // probable reason: User voted a FileID, which cannot be found in the playlist
-            // => Get the file with aFileID from the Library-List
-            //    Check, whether a file with the same FILENAME is in the playlist and get its ID
-            //    Check VoteAllowed for this ID and Vote
+            // => search it in the library and vote this file
             aFile := GetLibFileFromID(aFileID);
             if assigned(aFile) then
             begin
-
+                // WS_VoteFilename will call VCLDoVoteFilename
+                case SendMessage(fMainWindowHandle, WM_WebServer, WS_VoteFilename, lParam(PWideChar(aFile.Pfad))) of
+                    1: result := true;  // voting was successful
+                    2: result := false; // vote NOT allowed
+                    0: begin
+                          // filename not in playlist
+                          // => add it to the playlist and vote for it
+                          //    (this will call VCLAddAndVoteFile )
+                          if SendMessage(fMainWindowHandle, WM_WebServer, WS_AddAndVoteThisFile, LParam(aFile)) = 1 then
+                              result := True   // voting was successful
+                          else
+                              result := false; // insert/voting failed
+                    end;
+                end;
             end
             else
                 // File with this ID neither in Playlist nor in Library
-                result := False;
+                result := False; // file deleted from playlist?
         end;
 
 
@@ -247,7 +323,6 @@ begin
 
     LeaveCriticalSection(CS_Vote);
 end;
-
 
 
 

@@ -1154,6 +1154,20 @@ begin
                                 CorrectVolButton;
                            end;
 
+        WS_VoteID: begin
+                  aMsg.Result := NempWebServer.VoteMachine.VCLDoVote(aMsg.Lparam, NempPlaylist);
+        end;
+
+        WS_VoteFilename: begin
+                  aMsg.Result := NempWebServer.VoteMachine.VCLDoVoteFilename(UnicodeString(PWideChar(aMsg.Lparam)), NempPlaylist);
+        end;
+
+        WS_AddAndVoteThisFile: begin
+                  aMsg.Result := NempWebServer.VoteMachine.VCLAddAndVoteFile(TAudioFile(aMsg.Lparam), NempPlaylist);
+        end;
+
+
+
         WS_StringLog: begin
                           NempWebServer.LogList.Add(PChar(aMsg.LParam));
                           if NempWebServer.LogList.Count > 500 then

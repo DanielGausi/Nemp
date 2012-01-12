@@ -190,6 +190,8 @@ type
         // CoverID: a md5-hash-like string
         fCoverID: String;
 
+        fVoteCounter: Integer;
+
         fAudioType: TAudioType; // undef, File, Stream, CD-Audio
 
         // In the playlist, every AudioFile can have a list
@@ -368,6 +370,8 @@ type
         property IsFile: Boolean read fGetIsFile;
         property isStream: Boolean read fGetIsStream;
         property isCDDA: Boolean read fGetIsCDDA;
+
+        property VoteCounter: Integer read fVoteCounter write fVoteCounter;
 
         constructor Create;
         destructor Destroy; override;
