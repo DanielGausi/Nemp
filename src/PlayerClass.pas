@@ -1137,6 +1137,7 @@ begin
 
   if MainAudioFile <> NIL then
   begin
+      MainAudioFile.VoteCounter := 0; // We play this file now, so all votes are deleted
       extension := AnsiLowerCase(ExtractFileExt(MainAudioFile.Pfad));
 
       case MainAudioFile.AudioType of

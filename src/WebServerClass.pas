@@ -174,8 +174,11 @@ type
           PatternButtonFilePlayNow  : String;
           PatternButtonFileAdd      : String;
           PatternButtonFileAddnext  : String;
+          PatternButtonFileVote     : String;
+
           PatternButtonSuccess      : String;
           PatternButtonFail         : String;
+
 
           PatternMenu : String;
           PatternBrowseMenu : String;
@@ -267,7 +270,7 @@ type
           function ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
           function ResponseCover (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 
-          function ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 
           function ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 
@@ -802,6 +805,14 @@ begin
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
 
+    result := StringReplace(result, '{{Votes}}'    , EscapeHTMLChars(IntToStr(af.VoteCounter)) , [rfReplaceAll]);
+
+    if af.VoteCounter = 0 then
+        result := StringReplace(result, '{{VoteClass}}', 'hidden', [rfReplaceAll])
+    else
+        result := StringReplace(result, '{{VoteClass}}', 'votes' , [rfReplaceAll]);
+
+
     if af.Artist = '' then
         result := StringReplace(result, '{{ArtistClass}}', 'hidden', [rfReplaceAll])
     else
@@ -864,6 +875,9 @@ begin
 
     if AllowRemoteControl then
     begin
+        btnTmp := replaceTag(PatternButtonFileVote, 'file_vote');
+        buttons := StringReplace(buttons, '{{BtnFileVote}}', btnTmp, [rfReplaceAll]);
+
         btnTmp := replaceTag(PatternButtonFileMoveUp, 'file_moveup');
         buttons := StringReplace(buttons, '{{BtnFileMoveUp}}', btnTmp, [rfReplaceAll]);
         btnTmp := replaceTag(PatternButtonFileMoveDown, 'file_movedown');
@@ -1608,6 +1622,7 @@ begin
         PatternButtonFileMoveUp := trim(GetTemplate(fLocalDir + 'BtnFileMoveUp.tpl'));
         PatternButtonFileMoveDown := trim(GetTemplate(fLocalDir + 'BtnFileMoveDown.tpl'));
         PatternButtonFileDelete := trim(GetTemplate(fLocalDir + 'BtnFileDelete.tpl'));
+        PatternButtonFileVote := trim(GetTemplate(fLocalDir + 'BtnFileVote.tpl'));
 
         // The PLAYER page
         PatternItemPlayer := trim(GetTemplate(fLocalDir + 'ItemPlayer.tpl'));
@@ -2297,7 +2312,7 @@ begin
     end;
 end;
 
-function TNempWebServer.ResponseJSPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
     res, newID: Integer;
@@ -2368,6 +2383,18 @@ begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             result := PlayNow(queriedID);
         end;
+
+        if queriedAction = 'file_vote' then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            case Votemachine.ProcessVote(queriedID, AContext.Binding.PeerIP) of
+                vr_Success   : AResponseInfo.ContentStream := BuildStream(UTF8String('ok'));
+                vr_TotalVotesExceeded : AResponseInfo.ContentStream := BuildStream(UTF8String('spam'));
+                vr_FileVotesExceeded  : AResponseInfo.ContentStream := BuildStream(UTF8String('already voted'));
+                vr_Exception : AResponseInfo.ContentStream := BuildStream(UTF8String('exception'));
+            end;
+        end;
+
 
         if queriedAction = 'file_moveupcheck' then
         begin
@@ -2767,7 +2794,7 @@ begin
         else
         if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo)
         else
-        if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(AContext, ARequestInfo, AResponseInfo)
         else
         if RequestedDocument = '/playlist_details' then permit := ResponsePlaylistDetails(ARequestInfo, AResponseInfo)
         else
