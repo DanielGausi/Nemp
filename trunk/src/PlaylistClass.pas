@@ -240,6 +240,7 @@ type
       // adding files into the playlist
       // return value: the new node in the treeeview. Used for scrolling to this node
       function AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode; overload;
+      function AddFileToPlaylistWebServer(aAudiofile: TAudioFile; aCueName: UnicodeString = ''): TAudioFile;
       function InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode; overload;
       function AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode; overload;
       function InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode; overload;
@@ -281,6 +282,8 @@ type
       function GetPlaylistIndex(aID: Int64): Integer;
       function SwapFiles(a, b: Integer): Boolean;   // a and b must be siblings!!
       procedure DeleteAFile(aIdx: Integer); // delete a file (for WebServer)
+
+      procedure ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
   end;
 
 implementation
@@ -1153,6 +1156,28 @@ begin
   Result := NewNode;
   fDauer := fDauer + newAudiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+end;
+
+function TNempPlaylist.AddFileToPlaylistWebServer(aAudiofile: TAudioFile; aCueName: UnicodeString = ''): TAudioFile;
+var NewNode: PVirtualNode;
+    newAudiofile: TAudioFile;
+begin
+    newAudiofile := TAudioFile.Create;
+    newAudiofile.Assign(aAudioFile);
+
+    Playlist.Add(newAudiofile);
+    NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
+    if not assigned(newAudiofile.CueList) then
+    begin
+        // nach einer Liste suchen und erstellen
+        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
+        AddCueListNodes(newAudiofile, NewNode);
+    end;
+
+    VST.Invalidate;
+    Result := newAudiofile;
+    fDauer := fDauer + newAudiofile.Duration;
+    UpdatePlayListHeader(VST, Playlist.Count, fDauer);
 end;
 
 function TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
@@ -2097,6 +2122,80 @@ begin
         result := True;
     end else
         result := False;
+end;
+
+procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
+var i, newIdx: Integer;
+    currentNode, iNode: PVirtualNode;
+    iData: PTreeData;
+    iFile: TAudioFile;
+begin
+    // get the node with the voted Audiofile
+    currentNode := VST.GetFirst;
+    for i := 0 to aIndex-1 do
+        currentNode := VST.GetNextSibling(currentNode);
+
+    if currentNode = fPlayingNode then
+        exit; // no action required
+
+    // get the node, where it should be moved to
+    GetInsertNodeFromPlayPosition;
+    iNode := InsertNode;
+    if assigned(iNode) then
+    begin
+        iData := VST.GetNodeData(iNode);
+        iFile := iData.FAudioFile;
+        while assigned(iNode) and (iNode <> currentNode) and (iFile.VoteCounter >= aFile.VoteCounter) do
+        begin
+            iNode := VST.GetNextSibling(iNode);
+            if assigned(iNode) then
+            begin
+                iData := VST.GetNodeData(iNode);
+                iFile := iData.FAudioFile;
+            end;
+        end;
+        // votes of iFile are < aFile.VoteCounter now
+        // (or iNode = Nil)
+        if (iNode <> currentNode) then
+        begin
+            if assigned(iNode) then
+            begin
+                if aIndex < iNode.Index then
+                    newIdx := iNode.Index - 1
+                else
+                    newIdx := iNode.Index;
+                Playlist.Move(aIndex, newIdx);
+                VST.MoveTo(currentNode, iNode, amInsertBefore, false);
+            end else
+            begin
+                iNode := VST.GetLast;
+                if assigned(iNode) then
+                begin
+                    Playlist.Move(aIndex, Playlist.Count - 1);
+                    VST.MoveTo(currentNode, iNode, amInsertAfter, false);
+                end // else: Nothing to do, there is no Node in the Tree
+            end;
+        end;
+
+    end else
+    begin
+        // move aFile to the end of the playlist
+        iNode := VST.GetLast;
+        if assigned(iNode) then
+        begin
+            Playlist.Move(aIndex, Playlist.Count - 1);
+            VST.MoveTo(currentNode, iNode, amInsertAfter, false);
+        end
+    end;
+
+
+
+    // fPlayingIndex korrigieren
+    ReInitPlaylist;
+
+
+
+
 end;
 
 {

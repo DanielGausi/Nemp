@@ -3,12 +3,14 @@ unit Votings;
 interface
 
 uses Windows, Classes, Messages, ContNrs, SysUtils, IniFiles,  StrUtils,
-  DateUtils,
+  DateUtils, VirtualTrees,
   MP3FileUtils, AudioFileClass, Hilfsfunktionen,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
   MedienbibliothekClass;
 
 type
+
+    TVoteResult = (vr_Success, vr_TotalVotesExceeded, vr_FileVotesExceeded, vr_Exception);
 
     TVote = class
         private
@@ -32,7 +34,7 @@ type
             constructor Create(aIP: String);
             destructor Destroy; override;
             procedure CleanUpVotes;
-            function VoteAllowed(aFileID: Integer): Boolean;
+            function VoteAllowed(aFileID: Integer): TVoteResult;
             procedure UpdateVotings(aFileID: Integer);
     end;
 
@@ -56,7 +58,7 @@ type
 
 
 
-            function ProcessVote(aFileID: Integer; aIP: String ): Boolean;
+            function ProcessVote(aFileID: Integer; aIP: String ): TVoteResult;
             /// ProcessVote is directly called from the webserver (i.e. secondary thread!)
             /// TODO:
             ///     Check aIP's VoteList for "aFileID"
@@ -131,18 +133,19 @@ end;
 {
     VoteAllowed: Search for a Vote for the specified FileID
 }
-function TUser.VoteAllowed(aFileID: Integer): Boolean;
+function TUser.VoteAllowed(aFileID: Integer): TVoteResult;
 var i: Integer;
 begin
-    result := True;
+    result := vr_Success;
+
     if Votes.Count > 20 then
         // Hardcoded spam-limit: 20 votes in 60 seconds
-        result := False
+        result := vr_TotalVotesExceeded
     else
     begin
         for i := 0 to Votes.Count - 1 do
             if TVote(Votes[i]).ID = aFileID then
-                result := False;
+                result := vr_FileVotesExceeded;
     end;
 end;
 
@@ -226,12 +229,12 @@ begin
         begin
             af.VoteCounter := af.VoteCounter + 1;   // user clicked a "vote" on a playlist-Item   +1
             fcurrentUser.UpdateVotings(aFileID);
+            aPlaylist.ResortVotedFile(af, i);
             result := 1;  // success
             break;
         end;
     end;
-    // todo:
-    // resort Playlist
+
 
 end;
 
@@ -245,14 +248,19 @@ begin
         af := TAudioFile(aPlaylist.Playlist[i]);
         if af.Pfad = aFilename then
         begin
-            if fCurrentUser.VoteAllowed(af.WebServerID) then
-            begin
-                // vote is allowed
-                af.VoteCounter := af.VoteCounter + 1;  // user searched in the library for an existing file: +1
-                fcurrentUser.UpdateVotings(af.WebServerID);
-                result := 1;  // success
-            end else
-                result := 2;
+            case fCurrentUser.VoteAllowed(af.WebServerID) of
+                vr_TotalVotesExceeded: result := 3;
+                vr_FileVotesExceeded : result := 2;
+                vr_success:  begin
+                    // vote is allowed
+                    af.VoteCounter := af.VoteCounter + 1;  // user searched in the library for an existing file: +1
+                    fcurrentUser.UpdateVotings(af.WebServerID);
+                    aPlaylist.ResortVotedFile(af, i);
+                    result := 1;  // success
+                end;
+            else
+                result := 4;
+            end;
             break;
         end;
     end;
@@ -261,30 +269,33 @@ begin
 end;
 
 function TVoteMachine.VCLAddAndVoteFile(aFile: TAudioFile; aPlaylist: TNempPlaylist): Integer;
+var newFile: TAudioFile;
 begin
-    todo: Add to playlist
-    vote
-    resort
+    newFile := aPlaylist.AddFileToPlaylistWebServer(aFile);
+    newFile.VoteCounter := newFile.VoteCounter + 1;
+    aPlaylist.ResortVotedFile(newFile, aPlaylist.Count - 1);
+    result := 1;
+    // todo:
+    // resort Playlist
 end;
 
 
 
-function TVoteMachine.ProcessVote(aFileID: Integer; aIP: String): Boolean;
-var
-    aFile: TAudioFile;
-    playlistID: Integer;
+function TVoteMachine.ProcessVote(aFileID: Integer; aIP: String): TVoteResult;
+var aFile: TAudioFile;
+    voteResult: TVoteResult;
 begin
     EnterCriticalSection(CS_Vote);
     fcurrentUser := getUserforIP(aIP);
     fcurrentUser.CleanUpVotes;
-    result := True; // thin positive. ;-)
+    result := vr_Success; // thin positive. ;-)
 
-    if fcurrentUser.VoteAllowed(aFileID) then
-    begin
-        // Vote allowed
+    voteResult := fcurrentUser.VoteAllowed(aFileID);
+    if voteResult = vr_Success then
+    begin// Vote allowed
         // WS_VoteID will call VCLDoVote
         if SendMessage(fMainWindowHandle, WM_WebServer, WS_VoteID, aFileID) = 1 then
-            result := True // voting was successful
+            result := vr_Success // voting was successful
         else
         begin
             // voting was NOT successful
@@ -295,31 +306,27 @@ begin
             begin
                 // WS_VoteFilename will call VCLDoVoteFilename
                 case SendMessage(fMainWindowHandle, WM_WebServer, WS_VoteFilename, lParam(PWideChar(aFile.Pfad))) of
-                    1: result := true;  // voting was successful
-                    2: result := false; // vote NOT allowed
+                    1: result := vr_Success;  // voting was successful
+                    2: result := vr_FileVotesExceeded; // vote NOT allowed
+                    3: result := vr_TotalVotesExceeded;
+                    4: result := vr_Exception;
                     0: begin
                           // filename not in playlist
                           // => add it to the playlist and vote for it
                           //    (this will call VCLAddAndVoteFile )
                           if SendMessage(fMainWindowHandle, WM_WebServer, WS_AddAndVoteThisFile, LParam(aFile)) = 1 then
-                              result := True   // voting was successful
+                              result := vr_Success   // voting was successful
                           else
-                              result := false; // insert/voting failed
+                              result := vr_Exception; // insert/voting failed
                     end;
                 end;
             end
             else
                 // File with this ID neither in Playlist nor in Library
-                result := False; // file deleted from playlist?
+                result := vr_Exception; // file deleted from playlist?
         end;
-
-
     end else
-    begin
-        // vote not allowed
-        result := False;
-    end;
-
+        result := voteResult;
 
     LeaveCriticalSection(CS_Vote);
 end;
