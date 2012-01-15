@@ -5,11 +5,10 @@ body {
 	margin: 0px auto;
 	padding-top: 0px;
 	background-color: #202020;
-         font-size: 0.83em;
-	color: #dddddd;
-    	/*width: 240px;*/
-    	max-width: 500px;
-    	min-width: 240px;
+    font-size: 0.83em;
+	color: #dddddd;    	
+    max-width: 500px;
+    min-width: 240px;
 	padding-bottom: 10px;
 	margin-bottom: 10px;
 	border-bottom: 1px solid #404040;
@@ -32,8 +31,8 @@ h2 {
 }
 
 p {
-margin:0;
-padding:0;
+	margin:0;
+	padding:0;
 }
 
 
@@ -48,39 +47,36 @@ p.warning {
 
 
 div.menu {
-	margin 5px;
-	padding: 10px;
+	text-align: center;
+	padding: 10px 0px;
 	border-bottom: 1px solid #404040;
 	margin-bottom:10px;
 }
 
+img.menuicon {
+	margin-right: 5px;
+	vertical-align: middle;
+}
+
+
 ul.mainmenu {
 	margin: 0;
-	padding: 10px 0px;
+	padding: 0px 0px;
 	text-align: center;
-	color: #202020;
-	width: 236;	
 }
 
 ul.mainmenu li {
 	list-style: none;
-	display: inline;
-	color: #202020;
-	background-color: #dddddd;
-	border: 1px solid white;
-	padding: 8px 2px;
-	margin: 2px;
+	display: inline;	
+	border: 1px solid #202020;
+	padding: 9px 2px;
 }
-ul.mainmenu li.active {	
-	background-color: #fafafa;
+ul.mainmenu li.active{	
+	border-color: #fafafa;
 }
 
-ul.mainmenu a{
-	color: #202020;
-	padding: 8px 20px;
-}
-ul.mainmenu li:hover{
-	background-color: #fafafa;
+ul.mainmenu a:hover{
+	color: red;
 }
 
 div.warning {
@@ -134,6 +130,7 @@ div.volumecontainer{
 a.button{
 	//color: #202020;	
 	//background-color: #fafafa;
+	cursor: pointer;
 	border: 1px solid #202020;	
 	padding: 2px 5px;
 	text-align: center;
@@ -188,13 +185,13 @@ a.button img{
 	min-width: 30px;
 	width: 30px;
 	text-align:right;
-	padding-left: 3px;
+	padding-right: 3px;
 }
 .playlist .index {
 	text-align:right;
-	width: 25px;
-	min-width: 25px;	
-	padding-right:5px;
+	width: 20px;
+	min-width: 20px;	
+	color: #dddddd;	
 }
 
 span.votes{
@@ -236,6 +233,8 @@ span.noprebook {
 .playlist .cover,
 .library .cover  {
 	width: 50px;
+	max-width:50px;
+	overflow: hidden;
 	padding-right:3px;
 }
 
