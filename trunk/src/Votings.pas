@@ -273,10 +273,12 @@ var newFile: TAudioFile;
 begin
     newFile := aPlaylist.AddFileToPlaylistWebServer(aFile);
     newFile.VoteCounter := newFile.VoteCounter + 1;
+    /// note: The vote is not logged in the users Votelist.
+    /// This would be a little tricky, as "newfile" has no WebserverID, yet
+    ///  The WebServerID is assigned by the webserver, but not until it is displayed in a browser!
+    ///  So, we skip this here. ;-)
     aPlaylist.ResortVotedFile(newFile, aPlaylist.Count - 1);
     result := 1;
-    // todo:
-    // resort Playlist
 end;
 
 

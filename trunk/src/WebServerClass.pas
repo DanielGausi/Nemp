@@ -207,7 +207,6 @@ type
           PatternItemBrowseAlbum   : String;
           PatternItemBrowseGenre   : String;
 
-
           PatternItemSearchDetails : String; // the item on the Search-Detail-Page
 
           PatternNoFilesHint: String;
