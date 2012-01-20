@@ -64,9 +64,14 @@ const
     WM_WebServer = WM_USER + 800;
 
     WS_QueryPlayer = 10;
+    WS_QueryPlayerAdmin = 110;
     WS_QueryPlayerJS = 11;
+    WS_QueryPlayerJSAdmin = 111;
     WS_QueryPlaylist = 1;
+    WS_QueryPlaylistAdmin = 101;
+
     WS_QueryPlaylistDetail = 2;
+    WS_QueryPlaylistDetailAdmin = 102;
 
     WS_PlaylistPlayID = 3;
 
@@ -79,6 +84,7 @@ const
     WS_PlaylistMoveDownCheck  = 18;
 
     WS_QueryPlaylistItem = 20;
+    WS_QueryPlaylistItemAdmin = 120;
 
     WS_PlaylistDelete = 9;
 
@@ -122,6 +128,8 @@ type
           constructor Create(aValue: String; c: Integer; aCoverID: String);
   end;
 
+  TDoubleString = Array[Boolean] of String;
+
 
   TNempWebServer = class
       private
@@ -139,14 +147,19 @@ type
 
           fHTML_MedienbibSearchForPlay: UTf8String;
 
-          fUsername: String;
-          fPassword: String;
-          fRootDir : String;
+          fUsernameU: String;
+          fPasswordU: String;
+
+          fUsernameA: String;
+          fPasswordA: String;
+
+          fTheme : String;
 
           fOnlyLAN               : Longbool;
           fAllowPlaylistDownload : Longbool;
           fAllowLibraryAccess    : Longbool;
           fAllowRemoteControl    : Longbool;
+          fAllowVotes            : LongBool;
           fPort                  : Word;
 
           // VCL-Variable
@@ -157,60 +170,60 @@ type
           fLocalDir: UnicodeString;
           fLastErrorString: String;
 
-          PatternBody: String;
+          PatternBody: TDoubleString;
           // Buttons for Player Control
-          PatternPlayerControls: String;
-          PatternButtonNext : String;
+          PatternPlayerControls: TDoubleString;
+          PatternButtonNext : TDoubleString;
           // PatternButtonPlayPause : String;
-          PatternButtonPause : String;
-          PatternButtonPlay : String;
-          PatternButtonPrev : String;
-          PatternButtonStop : String;
+          PatternButtonPause : TDoubleString;
+          PatternButtonPlay : TDoubleString;
+          PatternButtonPrev : TDoubleString;
+          PatternButtonStop : TDoubleString;
           // Buttons for Files
-          PatternButtonFileDownload : String;
-          PatternButtonFileMoveUp   : String;
-          PatternButtonFileMoveDown : String;
-          PatternButtonFileDelete   : String;
-          PatternButtonFilePlayNow  : String;
-          PatternButtonFileAdd      : String;
-          PatternButtonFileAddnext  : String;
-          PatternButtonFileVote     : String;
+          PatternButtonFileDownload : TDoubleString;
+          PatternButtonFileMoveUp   : TDoubleString;
+          PatternButtonFileMoveDown : TDoubleString;
+          PatternButtonFileDelete   : TDoubleString;
+          PatternButtonFilePlayNow  : TDoubleString;
+          PatternButtonFileAdd      : TDoubleString;
+          PatternButtonFileAddnext  : TDoubleString;
+          PatternButtonFileVote     : TDoubleString;
 
-          PatternButtonSuccess      : String;
-          PatternButtonFail         : String;
-
-
-          PatternMenu : String;
-          PatternBrowseMenu : String;
-          PatternPagination : String;
-          PatternPaginationNext : String;
-          PatternPaginationPrev : String;
-          PatternPaginationOther: String;
-          PatternPaginationMain: String;
+          PatternButtonSuccess      : TDoubleString;
+          PatternButtonFail         : TDoubleString;
 
 
-          PatternPlayerPage: String;
-          PatternItemPlayer: String;   // the item on the PLAYER page
+          PatternMenu : TDoubleString;
+          PatternBrowseMenu : TDoubleString;
+          PatternPagination : TDoubleString;
+          PatternPaginationNext : TDoubleString;
+          PatternPaginationPrev : TDoubleString;
+          PatternPaginationOther: TDoubleString;
+          PatternPaginationMain: TDoubleString;
 
-          PatternPlaylistPage: String;
-          PatternItemPlaylist: String;  // one item on the PLAYLIST page
 
-          PatternPlaylistDetailsPage : String;
-          PatternItemPlaylistDetails : String; // the item on the Detail-Page
+          PatternPlayerPage: TDoubleString;
+          PatternItemPlayer: TDoubleString;   // the item on the PLAYER page
 
-          PatternSearchPage: String;
-          PatternSearchResultPage: String;
-          PatternItemSearchlist: String;  // one item on the SEARCHLIST page
+          PatternPlaylistPage: TDoubleString;
+          PatternItemPlaylist: TDoubleString;  // one item on the PLAYLIST page
 
-          PatternSearchDetailsPage : String;
-          PatternItemBrowseArtist  : String;
-          PatternItemBrowseAlbum   : String;
-          PatternItemBrowseGenre   : String;
+          PatternPlaylistDetailsPage : TDoubleString;
+          PatternItemPlaylistDetails : TDoubleString; // the item on the Detail-Page
 
-          PatternItemSearchDetails : String; // the item on the Search-Detail-Page
+          PatternSearchPage: TDoubleString;
+          PatternSearchResultPage: TDoubleString;
+          PatternItemSearchlist: TDoubleString;  // one item on the SEARCHLIST page
 
-          PatternNoFilesHint: String;
-          PatternErrorPage: String;
+          PatternSearchDetailsPage : TDoubleString;
+          PatternItemBrowseArtist  : TDoubleString;
+          PatternItemBrowseAlbum   : TDoubleString;
+          PatternItemBrowseGenre   : TDoubleString;
+
+          PatternItemSearchDetails : TDoubleString; // the item on the Search-Detail-Page
+
+          PatternNoFilesHint: TDoubleString;
+          PatternErrorPage: TDoubleString;
 
           // Lists for Browsing in the Library
           MainArtists  : Array [0..26] of TObjectList;
@@ -219,63 +232,70 @@ type
           Genres       : TObjectList;
 
 
-          function fGetUsername: String;
-          procedure fSetUsername(Value: String);
-          function fGetPassword: String;
-          procedure fSetPassword(Value: String);
+          function fGetUsernameU: String;
+          procedure fSetUsernameU(Value: String);
+          function fGetPasswordU: String;
+          procedure fSetPasswordU(Value: String);
 
-          function fGetRootDir: String;
-          procedure fSetRootDir(Value: String);
+          function fGetUsernameA: String;
+          procedure fSetUsernameA(Value: String);
+          function fGetPasswordA: String;
+          procedure fSetPasswordA(Value: String);
+
+          function fGetTheme: String;
+          procedure fSetTheme(Value: String);
 
           procedure fSetOnlyLAN              (Value: Longbool);
           procedure fSetAllowPlaylistDownload(Value: Longbool);
           procedure fSetAllowLibraryAccess   (Value: Longbool);
           procedure fSetAllowRemoteControl   (Value: Longbool);
+          procedure fSetAllowVotes           (Value: Longbool);
 
           function fGetOnlyLAN              : Longbool;
           function fGetAllowPlaylistDownload: Longbool;
           function fGetAllowLibraryAccess   : Longbool;
           function fGetAllowRemoteControl   : Longbool;
+          function fGetAllowVotes           : Longbool;
 
-          function MainMenu(aPage: Integer = -1): String;
-          function BrowseSubMenu(aMode: String; aLetter: Char; aValue: String): String;
+          function MainMenu(aPage: Integer; IsAdmin: Boolean): String;
+          function BrowseSubMenu(aMode: String; aLetter: Char; aValue: String; IsAdmin: Boolean): String;
 
           function fGetCount: Integer;
 
           // replace basic Insert-tags like {{artist}} in a given pattern
           function fSetBasicFileData(af: TAudioFile; aPattern, baseClass: String): String;
           // replace InsertTags for Buttons
-          function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer): String;
+          function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean): String;
 
-          function fSetControlButtons(aPattern: String; isPlaying: Boolean): String;
+          function fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
 
           // The following methods have been methods of a WebServerForm-Class
           // ---->
           procedure logQuery(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; Permit: TQueryResult);
           procedure logQueryAuth(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo);
 
-          function HandleError(AResponseInfo: TIdHTTPResponseInfo; Error: TQueryResult): TQueryResult;
-          function GenerateErrorPage(aErrorMessage: String; aPage: Integer): String;
+          function HandleError(AResponseInfo: TIdHTTPResponseInfo; Error: TQueryResult; isAdmin: Boolean): TQueryResult;
+          function GenerateErrorPage(aErrorMessage: String; aPage: Integer; isAdmin: Boolean): String;
 
           procedure AddNoCacheHeader(AResponseInfo: TIdHTTPResponseInfo);
-          function ResponsePlayer (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponsePlayerJS (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponsePlayer (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponsePlayerJS (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponseCover (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseCover (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseSearchInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
-          function ResponseLibraryDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+          function ResponseSearchInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseLibraryDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
           procedure IdHTTPServer1CommandGet(AContext: TIdContext;
               ARequestInfo: TIdHTTPRequestInfo;
@@ -284,7 +304,7 @@ type
           // ---->
 
           procedure SetActive(Value: Boolean);
-          procedure LoadTemplates;
+          procedure LoadTemplates(isAdmin: Boolean);
 
           procedure SetFontSizes(aList: TObjectList);
           procedure ClearHelperLists;
@@ -305,13 +325,16 @@ type
           VoteMachine: TVoteMachine;
 
 
-          property Username: string read fGetUsername write fSetUsername;
-          property Password: string read fGetPassword write fSetPassword;
-          property RootDir : String read fGetRootDir  write fSetRootDir;
+          property UsernameU: string read fGetUsernameU write fSetUsernameU;
+          property PasswordU: string read fGetPasswordU write fSetPasswordU;
+          property UsernameA: string read fGetUsernameA write fSetUsernameA;
+          property PasswordA: string read fGetPasswordA write fSetPasswordA;
+          property Theme : String read fGetTheme  write fSetTheme;
           property OnlyLAN               : Longbool read fGetOnlyLAN               write fSetOnlyLAN              ;
           property AllowFileDownload     : Longbool read fGetAllowPlaylistDownload write fSetAllowPlaylistDownload;
           property AllowLibraryAccess    : Longbool read fGetAllowLibraryAccess    write fSetAllowLibraryAccess   ;
           property AllowRemoteControl    : Longbool read fGetAllowRemoteControl    write fSetAllowRemoteControl   ;
+          property AllowVotes            : Longbool read fGetAllowVotes            write fSetAllowVotes           ;
 
           property Port : Word    read fPort write fPort;
           property Count: Integer read fGetCount;
@@ -338,18 +361,18 @@ type
 
           function ValidIP(aIP, bIP: String): Boolean;
 
-          procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer=0);
-          procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
-          procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
+          procedure GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer; isAdmin: Boolean);
+          procedure GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist; isAdmin: Boolean);
+          procedure GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer; isAdmin: Boolean);
 
-          function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer): String;
+          function GenerateHTMLfromPlaylistItem(aNempPlayList: TNempPlaylist; aIdx: Integer; isAdmin: Boolean): String;
 
           // Das kann im Indy-Thread geamcht werden, daher mit Result
-          function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer): UTf8String;
-          function GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile): UTf8String;
+          function GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer; isAdmin: Boolean): UTf8String;
+          function GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
 
-          function GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other: Boolean): UTf8String;
-          function GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer): UTf8String;
+          function GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other, isAdmin: Boolean): UTf8String;
+          function GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer; isAdmin: Boolean): UTf8String;
 
           procedure Shutdown;
           procedure CopyLibrary(OriginalLib: TMedienBibliothek);
@@ -428,8 +451,12 @@ begin
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
     GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
-    Username := 'admin';
-    Password := 'pass';
+    UsernameU := 'user';
+    PasswordU := 'pass';
+
+    UsernameA := 'master';
+    PasswordA := 'key';
+
     LogList := TStringList.Create;
     VoteMachine := TVoteMachine.Create(aHandle);
     VoteMachine.LibraryList := fWebMedienBib;
@@ -472,14 +499,17 @@ begin
     try
         ini.Encoding := TEncoding.UTF8;
         // aus der Ini lesen
-        OnlyLAN               := Ini.ReadBool('Remote', 'OnlyLAN'               , True);
-        AllowFileDownload     := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
-        AllowLibraryAccess    := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
-        AllowRemoteControl    := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
-        Port               := Ini.ReadInteger('Remote', 'Port', 80);
-        RootDir            := Ini.ReadString('Remote', 'RootDir' , 'Extended');
-        Username           := Ini.ReadString('Remote', 'Username', 'admin'  );
-        Password           := Ini.ReadString('Remote', 'Password', 'pass'   );
+        OnlyLAN             := Ini.ReadBool('Remote', 'OnlyLAN'               , True);
+        AllowFileDownload   := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
+        AllowLibraryAccess  := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
+        AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , True);
+        AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
+        Port                := Ini.ReadInteger('Remote', 'Port', 80);
+        Theme               := Ini.ReadString('Remote', 'Theme' , 'Party');
+        UsernameU           := Ini.ReadString('Remote', 'UsernameU', 'user'  );
+        PasswordU           := Ini.ReadString('Remote', 'PasswordU', 'pass'   );
+        UsernameA           := Ini.ReadString('Remote', 'UsernameA', 'master'  );
+        PasswordA           := Ini.ReadString('Remote', 'PasswordA', 'key'   );
     finally
         ini.Free;
     end;
@@ -496,10 +526,13 @@ begin
       Ini.WriteBool('Remote', 'AllowPlaylistDownload' , AllowFileDownload);
       Ini.WriteBool('Remote', 'AllowLibraryAccess'    , AllowLibraryAccess);
       Ini.WriteBool('Remote', 'AllowRemoteControl'    , AllowRemoteControl);
+      Ini.WriteBool('Remote', 'AllowVotes'            , AllowVotes);
       Ini.WriteInteger('Remote', 'Port', Port);
-      Ini.WriteString('Remote', 'RootDir' , RootDir);
-      Ini.WriteString('Remote', 'Username', Username);
-      Ini.WriteString('Remote', 'Password', Password);
+      Ini.WriteString('Remote', 'Theme' , Theme);
+      Ini.WriteString('Remote', 'UsernameU', UsernameU);
+      Ini.WriteString('Remote', 'PasswordU', PasswordU);
+      Ini.WriteString('Remote', 'UsernameA', UsernameA);
+      Ini.WriteString('Remote', 'PasswordA', PasswordA);
       try
           Ini.UpdateFile;
       except
@@ -513,42 +546,68 @@ end;
 
 
 
-function TNempWebServer.fGetUsername: String;
+function TNempWebServer.fGetUsernameU: String;
 begin
     EnterCriticalSection(CS_Authentification);
-    result := fUsername;
+    result := fUsernameU;
     LeaveCriticalSection(CS_Authentification);
 end;
-procedure TNempWebServer.fSetUsername(Value: String);
+procedure TNempWebServer.fSetUsernameU(Value: String);
 begin
     EnterCriticalSection(CS_Authentification);
-    fUsername := Value;
-    LeaveCriticalSection(CS_Authentification);
-end;
-
-function TNempWebServer.fGetPassword: String;
-begin
-    EnterCriticalSection(CS_Authentification);
-    result := fPassword;
-    LeaveCriticalSection(CS_Authentification);
-end;
-procedure TNempWebServer.fSetPassword(Value: String);
-begin
-    EnterCriticalSection(CS_Authentification);
-    fPassword := Value;
+    fUsernameU := Value;
     LeaveCriticalSection(CS_Authentification);
 end;
 
-function TNempWebServer.fGetRootDir: String;
+function TNempWebServer.fGetPasswordU: String;
 begin
     EnterCriticalSection(CS_Authentification);
-    result := fRootDir;
+    result := fPasswordU;
     LeaveCriticalSection(CS_Authentification);
 end;
-procedure TNempWebServer.fSetRootDir(Value: String);
+procedure TNempWebServer.fSetPasswordU(Value: String);
 begin
     EnterCriticalSection(CS_Authentification);
-    fRootDir := Value;
+    fPasswordU := Value;
+    LeaveCriticalSection(CS_Authentification);
+end;
+
+function TNempWebServer.fGetUsernameA: String;
+begin
+    EnterCriticalSection(CS_Authentification);
+    result := fUsernameA;
+    LeaveCriticalSection(CS_Authentification);
+end;
+procedure TNempWebServer.fSetUsernameA(Value: String);
+begin
+    EnterCriticalSection(CS_Authentification);
+    fUsernameA := Value;
+    LeaveCriticalSection(CS_Authentification);
+end;
+
+function TNempWebServer.fGetPasswordA: String;
+begin
+    EnterCriticalSection(CS_Authentification);
+    result := fPasswordA;
+    LeaveCriticalSection(CS_Authentification);
+end;
+procedure TNempWebServer.fSetPasswordA(Value: String);
+begin
+    EnterCriticalSection(CS_Authentification);
+    fPasswordA := Value;
+    LeaveCriticalSection(CS_Authentification);
+end;
+
+function TNempWebServer.fGetTheme: String;
+begin
+    EnterCriticalSection(CS_Authentification);
+    result := fTheme;
+    LeaveCriticalSection(CS_Authentification);
+end;
+procedure TNempWebServer.fSetTheme(Value: String);
+begin
+    EnterCriticalSection(CS_Authentification);
+    fTheme := Value;
     LeaveCriticalSection(CS_Authentification);
 end;
 
@@ -568,6 +627,11 @@ procedure TNempWebServer.fSetAllowRemoteControl(Value: Longbool);
 begin
     InterLockedExchange(Integer(fAllowRemoteControl), Integer(Value));
 end;
+procedure TNempWebServer.fSetAllowVotes(Value: Longbool);
+begin
+    InterLockedExchange(Integer(fAllowVotes), Integer(Value));
+end;
+
 function TNempWebServer.fGetOnlyLAN: Longbool;
 begin
   InterLockedExchange(Integer(Result), Integer(fOnlyLAN));
@@ -584,11 +648,14 @@ function TNempWebServer.fGetAllowRemoteControl: Longbool;
 begin
   InterLockedExchange(Integer(Result), Integer(fAllowRemoteControl));
 end;
-
-
-function TNempWebServer.MainMenu(aPage: Integer = -1): String;
+function TNempWebServer.fGetAllowVotes: Longbool;
 begin
-    result := PatternMenu;
+  InterLockedExchange(Integer(Result), Integer(fAllowVotes));
+end;
+
+function TNempWebServer.MainMenu(aPage: Integer; IsAdmin: Boolean): String;
+begin
+    result := PatternMenu[isAdmin];
 
     if aPage = 0 then
         result := StringReplace(result, '{{PlayerClass}}', 'player active', [rfReplaceAll])
@@ -600,7 +667,7 @@ begin
     else
         result := StringReplace(result, '{{PlaylistClass}}', 'playlist', [rfReplaceAll]);
 
-    if AllowLibraryAccess then
+    if AllowLibraryAccess or IsAdmin then
     begin
         if aPage = 2 then
             result := StringReplace(result, '{{LibraryClass}}', 'library active', [rfReplaceAll])
@@ -611,13 +678,13 @@ begin
         result := StringReplace(result, '{{LibraryClass}}', 'hidden', [rfReplaceAll]);
 end;
 
-function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char; aValue: String): String;
+function TNempWebServer.BrowseSubMenu(aMode: String; aLetter: Char; aValue: String; isAdmin: Boolean): String;
 var sub: String;
     c: Char;
     letterClass: String;
     idx: Integer;
 begin
-    result := PatternBrowseMenu;
+    result := PatternBrowseMenu[isAdmin];
 
     if aMode = 'artist' then
         result := StringReplace(result, '{{ArtistClass}}', 'artist active', [rfReplaceAll])
@@ -849,7 +916,7 @@ begin
         result := StringReplace(result, '{{CoverID}}', '0', [rfReplaceAll]);
 end;
 
-function TNempWebServer.fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer): String;
+function TNempWebServer.fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean): String;
 var buttons, btnTmp: String;
 
     function replaceTag(btnPattern: String; aAction: String): String;
@@ -862,9 +929,9 @@ var buttons, btnTmp: String;
 begin
     buttons := aPattern;
 
-    if AllowFileDownload and af.isFile then
+    if (AllowFileDownload or isAdmin) and af.isFile then
     begin
-        btnTmp := PatternButtonFileDownload;
+        btnTmp := PatternButtonFileDownload[isAdmin];
         btnTmp := StringReplace(btnTmp, '{{Filename}}'          , HRefEncode(af.Dateiname) , [rfReplaceAll]);
         btnTmp := StringReplace(btnTmp, '{{ID}}'                , IntToStr(af.WebServerID) , [rfReplaceAll]);
         btnTmp := StringReplace(btnTmp, '{{Action}}'            , 'file_download'          , [rfReplaceAll]);
@@ -872,22 +939,28 @@ begin
     end else
         buttons := StringReplace(buttons, '{{BtnFileDownload}}' , '', [rfReplaceAll]);
 
-    if AllowRemoteControl then
-    begin
-        btnTmp := replaceTag(PatternButtonFileVote, 'file_vote');
-        buttons := StringReplace(buttons, '{{BtnFileVote}}', btnTmp, [rfReplaceAll]);
 
-        btnTmp := replaceTag(PatternButtonFileMoveUp, 'file_moveup');
+    if AllowVotes or isAdmin then
+    begin
+        btnTmp := replaceTag(PatternButtonFileVote[isAdmin], 'file_vote');
+        buttons := StringReplace(buttons, '{{BtnFileVote}}', btnTmp, [rfReplaceAll]);
+    end else
+        buttons := StringReplace(buttons, '{{BtnFileVote}}'   , '', [rfReplaceAll]);
+
+
+    if AllowRemoteControl or isAdmin then
+    begin
+        btnTmp := replaceTag(PatternButtonFileMoveUp[isAdmin], 'file_moveup');
         buttons := StringReplace(buttons, '{{BtnFileMoveUp}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileMoveDown, 'file_movedown');
+        btnTmp := replaceTag(PatternButtonFileMoveDown[isAdmin], 'file_movedown');
         buttons := StringReplace(buttons, '{{BtnFileMoveDown}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileDelete, 'file_delete');
+        btnTmp := replaceTag(PatternButtonFileDelete[isAdmin], 'file_delete');
         buttons := StringReplace(buttons, '{{BtnFileDelete}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFilePlayNow, 'file_playnow');
+        btnTmp := replaceTag(PatternButtonFilePlayNow[isAdmin], 'file_playnow');
         buttons := StringReplace(buttons, '{{BtnFilePlayNow}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileAdd, 'file_add');
+        btnTmp := replaceTag(PatternButtonFileAdd[isAdmin], 'file_add');
         buttons := StringReplace(buttons, '{{BtnFileAdd}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileAddnext, 'file_addnext');
+        btnTmp := replaceTag(PatternButtonFileAddnext[isAdmin], 'file_addnext');
         buttons := StringReplace(buttons, '{{BtnFileAddNext}}', btnTmp, [rfReplaceAll]);
     end else
     begin
@@ -902,21 +975,21 @@ begin
     result := buttons;
 end;
 
-function TNempWebServer.fSetControlButtons(aPattern: String; isPlaying: Boolean): String;
+function TNempWebServer.fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
 var buttons: String;
 begin
     buttons := aPattern;
-    buttons := StringReplace(buttons, '{{PlayerControls}}'     , PatternPlayerControls      , [rfReplaceAll]);
+    buttons := StringReplace(buttons, '{{PlayerControls}}'     , PatternPlayerControls[isAdmin]   , [rfReplaceAll]);
 
     if AllowRemoteControl then
     begin
         if isPlaying then
-            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPause , [rfReplaceAll])
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPause[isAdmin] , [rfReplaceAll])
         else
-            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPlay , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlStop}}'     , PatternButtonStop      , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlNext}}'     , PatternButtonNext      , [rfReplaceAll]);
-        buttons := StringReplace(buttons, '{{BtnControlPrev}}'     , PatternButtonPrev      , [rfReplaceAll]);
+            buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPlay[isAdmin] , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlStop}}'     , PatternButtonStop[isAdmin]      , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlNext}}'     , PatternButtonNext[isAdmin]      , [rfReplaceAll]);
+        buttons := StringReplace(buttons, '{{BtnControlPrev}}'     , PatternButtonPrev[isAdmin]      , [rfReplaceAll]);
     end else
     begin
         buttons := StringReplace(buttons, '{{BtnControlPlayPause}}' , '' , [rfReplaceAll]);
@@ -927,20 +1000,20 @@ begin
     result := buttons;
 end;
 
-function TNempWebServer.GenerateErrorPage(aErrorMessage: String; aPage: Integer): String;
+function TNempWebServer.GenerateErrorPage(aErrorMessage: String; aPage: Integer; isAdmin: Boolean): String;
 var menu: String;
 begin
-    menu := MainMenu(aPage);
-    result := StringReplace(PatternErrorPage, '{{Menu}}', menu, [rfreplaceAll]);
+    menu := MainMenu(aPage, isAdmin);
+    result := StringReplace(PatternErrorPage[isAdmin], '{{Menu}}', menu, [rfreplaceAll]);
     result := StringReplace(result, '{{message}}', aErrorMessage, [rfreplaceAll]);
 end;
 
 
-procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer=0);
+procedure TNempWebServer.GenerateHTMLfromPlayer(aNempPlayer: TNempPlayer; aPart: Integer; isAdmin: Boolean);
 var menu, PageData, PlayerData: String;
     af: TAudioFile;
 begin
-    menu := MainMenu(0);
+    menu := MainMenu(0, isAdmin);
     af := aNempPlayer.MainAudioFile;
     if assigned(af) then
     begin
@@ -950,34 +1023,34 @@ begin
         case aPart of
             1: begin
                 // 1: Controls  [[PlayerControls]]
-                HTML_Player := UTF8String(fSetControlButtons(PatternPlayerControls, aNempPlayer.Status = PLAYER_ISPLAYING));
+                HTML_Player := UTF8String(fSetControlButtons(PatternPlayerControls[isAdmin], aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin));
             end;
             2: begin
                 // 2: Playerdata [[ItemPlayer]]
-                PlayerData := PatternItemPlayer;
+                PlayerData := PatternItemPlayer[isAdmin];
                 PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
                 PlayerData := fSetBasicFileData(af, PlayerData, '');
-                PlayerData := fSetFileButtons(af, PlayerData, 0);
+                PlayerData := fSetFileButtons(af, PlayerData, 0, isAdmin);
                 HTML_Player := UTF8String(PlayerData);
             end;
         else
             begin
-                PlayerData := PatternItemPlayer;
+                PlayerData := PatternItemPlayer[isAdmin];
                 PlayerData := StringReplace(PlayerData, '{{ID}}'    , IntToStr(af.WebServerID), [rfReplaceAll]);
                 PlayerData := fSetBasicFileData(af, PlayerData, '');
-                PlayerData := fSetFileButtons(af, PlayerData, 0);
-                PageData := PatternPlayerPage;
-                PageData := fSetControlButtons(PatternPlayerPage, aNempPlayer.Status = PLAYER_ISPLAYING);
+                PlayerData := fSetFileButtons(af, PlayerData, 0, isAdmin);
+                PageData := PatternPlayerPage[isAdmin];
+                PageData := fSetControlButtons(PatternPlayerPage[isAdmin], aNempPlayer.Status = PLAYER_ISPLAYING, isAdmin);
                 PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
                 PageData := StringReplace(PageData, '{{ItemPlayer}}', PlayerData, [rfReplaceAll]);
-                HTML_Player := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]))
+                HTML_Player := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]))
             end;
         end;
 
     end else
     begin
         if (aPart=0) then
-            PageData := GenerateErrorPage(WebServer_NoFile, 0)
+            PageData := GenerateErrorPage(WebServer_NoFile, 0, isAdmin)
         else
             PageData := 'fail';
     end;
@@ -985,7 +1058,7 @@ end;
 
 // konvertiert die Playlist in ein HTML-Formular
 // in VCL-Threads ausführen. Zugriff auf den HTML-String ist durch den Setter Threadsafe.
-procedure TNempWebServer.GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist);
+procedure TNempWebServer.GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist; isAdmin: Boolean);
 var //i: Integer;
     //af: TAudioFile;
     //aClass: String;
@@ -994,18 +1067,18 @@ var //i: Integer;
     menu: String;
 
 begin
-    menu := MainMenu(1);
-    Items := GenerateHTMLfromPlaylistItem(aNempPlaylist, -1);
+    menu := MainMenu(1, isAdmin);
+    Items := GenerateHTMLfromPlaylistItem(aNempPlaylist, -1, isAdmin);
 
-    PageData := PatternPlaylistPage;
+    PageData := PatternPlaylistPage[isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{PlaylistItems}}', Items, [rfReplaceAll]);
 
-    HTML_PlaylistView := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    HTML_PlaylistView := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 function TNempWebServer.GenerateHTMLfromPlaylistItem(
-  aNempPlayList: TNempPlaylist; aIdx: Integer): String;
+  aNempPlayList: TNempPlaylist; aIdx: Integer; isAdmin: Boolean): String;
 var Item, Items, aClass: String;
     af: tAudioFile;
     i: Integer;
@@ -1021,7 +1094,7 @@ begin
             EnsureFileHasID(af);
 
             // create new Item
-            Item := PatternItemPlaylist;
+            Item := PatternItemPlaylist[isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
 
             if af.PrebookIndex > 0 then
@@ -1029,7 +1102,6 @@ begin
             else
                 Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
             Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
-
 
             Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
 
@@ -1041,7 +1113,7 @@ begin
 
             // replace tags
             Item := fSetBasicFileData(af, Item, aClass);
-            Item := fSetFileButtons(af, Item, 1);
+            Item := fSetFileButtons(af, Item, 1, isAdmin);
             Items := Items + Item;
         end;
         result := Items;
@@ -1051,7 +1123,7 @@ begin
         if (aIdx >= 0) and (aIdx < aNempPlaylist.Count) then
         begin
             af := TAudioFile(aNempPlayList.Playlist[aIdx]);
-            Item := PatternItemPlaylist;
+            Item := PatternItemPlaylist[isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(aIdx + 1)         , [rfReplaceAll]);
 
             if af.PrebookIndex > 0 then
@@ -1070,7 +1142,7 @@ begin
 
             // replace tags
             Item := fSetBasicFileData(af, Item, aClass);
-            Item := fSetFileButtons(af, Item, 1);
+            Item := fSetFileButtons(af, Item, 1, isAdmin);
         end else
             Item := 'fail';
 
@@ -1079,16 +1151,16 @@ begin
     end;
 end;
 
-procedure TNempWebServer.GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer);
+procedure TNempWebServer.GenerateHTMLfromPlaylist_Details(aAudioFile: TAudioFile; aIdx: Integer; isAdmin: Boolean);
 var PageData, FileData: String;
     menu: String;
 begin
-    menu := MainMenu(1);
+    menu := MainMenu(1, isAdmin);
     if assigned(aAudioFile) then
     begin
         aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
 
-        FileData := PatternItemPlaylistDetails;
+        FileData := PatternItemPlaylistDetails[isAdmin];
         FileData := StringReplace(FileData, '{{Index}}' , IntToStr(aIdx + 1)              , [rfReplaceAll]);
         if aAudioFile.PrebookIndex > 0 then
             FileData := Stringreplace(FileData, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
@@ -1098,32 +1170,30 @@ begin
 
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
-        FileData := fSetFileButtons(aAudioFile, FileData, 1);
+        FileData := fSetFileButtons(aAudioFile, FileData, 1, isAdmin);
 
-        PageData := PatternPlaylistDetailsPage;
+        PageData := PatternPlaylistDetailsPage[isAdmin];
         PageData := StringReplace(PageData, '{{Menu}}'               , menu     , [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{ItemPlaylistDetails}}', FileData , [rfReplaceAll]);
     end else
-        PageData := GenerateErrorPage(WebServer_InvalidParameter, 1);
+        PageData := GenerateErrorPage(WebServer_InvalidParameter, 1, isAdmin);
 
-    HTML_PlaylistDetails := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    HTML_PlaylistDetails := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
-function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString; Start: Integer): UTf8String;
+function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString;
+    Start: Integer; isAdmin: Boolean): UTf8String;
 var ResultList: TObjectlist;
     af: TAudioFile;
     i, maxIdx: Integer;
     aClass, PageData, Pagination, menu, browsemenu, Item, Items, warning: String;
     btnPrev, BtnNext, Link: String;
 begin
-    menu := Mainmenu(2);
-    browsemenu := BrowseSubMenu('', '"', '');
-    //if aSearchString = '' then
-        PageData := PatternSearchPage;
-    //else
-    //    PageData := PatternSearchResultPage;
+    menu := Mainmenu(2, isAdmin);
+    browsemenu := BrowseSubMenu('', '"', '', isAdmin);
 
+    PageData := PatternSearchPage[isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'       , menu         , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{BrowseMenu}}' , browsemenu, [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', aSearchString, [rfReplaceAll]);
@@ -1149,12 +1219,12 @@ begin
                     af := TAudioFile(ResultList[i]);
                     // ID generieren/setzen
                     EnsureFileHasID(af);
-                    Item := PatternItemSearchlist;
+                    Item := PatternItemSearchlist[isAdmin];
                     Item := StringReplace(Item, '{{ID}}'  , IntToStr(af.WebServerID), [rfReplaceAll]);
                     aClass := '';
                     // replace tags
                     Item := fSetBasicFileData(af, Item, aClass);
-                    Item := fSetFileButtons(af, Item, 2);
+                    Item := fSetFileButtons(af, Item, 2, isAdmin);
                     Items := Items + Item;
                 end;
             end;
@@ -1162,7 +1232,7 @@ begin
             // Build Pagination
             if (Start > 0) then
             begin
-                BtnPrev := PatternPaginationPrev;
+                BtnPrev := PatternPaginationPrev[isAdmin];
                 Link := 'library?start=' + IntToStr(start-MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
                 BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
             end
@@ -1171,7 +1241,7 @@ begin
 
             if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
             begin
-                BtnNext := PatternPaginationNext;
+                BtnNext := PatternPaginationNext[isAdmin];
                 Link := 'library?start=' + IntToStr(start+MaxCountPerPage) + '&amp;query=' + ParamsEncode(UTF8String(aSearchString));
                 BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
 
@@ -1183,7 +1253,7 @@ begin
                 Pagination := ''
             else
             begin
-                Pagination := StringReplace(PatternPagination, '{{NextPage}}', BtnNext, [rfReplaceAll]);
+                Pagination := StringReplace(PatternPagination[isAdmin], '{{NextPage}}', BtnNext, [rfReplaceAll]);
                 Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
                 Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
                 Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
@@ -1192,7 +1262,7 @@ begin
 
             if ResultList.Count = 0 then
             begin
-                warning := PatternNoFilesHint;
+                warning := PatternNoFilesHint[isAdmin];
                 warning := StringReplace(warning, '{{Value}}', aSearchString  , [rfReplaceAll]);
                 PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
             end
@@ -1213,11 +1283,11 @@ begin
         PageData := StringReplace(PageData, '{{SearchCount}}', '0', [rfReplaceAll]);
     end;
 
-    result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
-function TNempWebServer.GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other: Boolean): UTf8String;
+function TNempWebServer.GenerateHTMLMedienbibBrowseList(aMode: String; aChar: Char; other, isAdmin: Boolean): UTf8String;
 var PageData, menu, browsemenu, pagination: String;
     Items, Item, baseLink, Link, ItemPattern: String;
     i, ListIdx: Integer;
@@ -1247,10 +1317,10 @@ var PageData, menu, browsemenu, pagination: String;
     end; }
 
 begin
-    menu := MainMenu(2);
-    browsemenu := BrowseSubMenu(aMode, aChar, '');
+    menu := MainMenu(2, isAdmin);
+    browsemenu := BrowseSubMenu(aMode, aChar, '', isAdmin);
 
-    PageData := PatternSearchPage;
+    PageData := PatternSearchPage[isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
@@ -1263,10 +1333,10 @@ begin
 
     aList := MainArtists[1]; // fallback
     LinkList := Nil;
-    ItemPattern := PatternItemBrowseArtist;
+    ItemPattern := PatternItemBrowseArtist[isAdmin];
     if aMode = 'artist' then
     begin
-        ItemPattern := PatternItemBrowseArtist;
+        ItemPattern := PatternItemBrowseArtist[isAdmin];
         if other then
         begin
             aList := OtherArtists[ListIdx];
@@ -1296,12 +1366,12 @@ begin
     end;
     if aMode = 'album' then
     begin
-        ItemPattern := PatternItemBrowseAlbum;
+        ItemPattern := PatternItemBrowseAlbum[isAdmin];
         aList := Albums[ListIdx];
     end;
     if aMode = 'genre' then
     begin
-        ItemPattern := PatternItemBrowseGenre;
+        ItemPattern := PatternItemBrowseGenre[isAdmin];
         aList := Genres;
     end;
 
@@ -1331,12 +1401,12 @@ begin
         begin
             if Other then
             begin
-                pagination := PatternPaginationMain;
+                pagination := PatternPaginationMain[isAdmin];
                 Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=0';
             end
             else
             begin
-                pagination := PatternPaginationOther;
+                pagination := PatternPaginationOther[isAdmin];
                 Link := 'browse?mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;l=' + ParamsEncode(UTF8String(aChar)) + '&amp;other=1';
             end;
             pagination := StringReplace(pagination, '{{Letter}}', aChar, [rfReplaceAll]);
@@ -1349,10 +1419,11 @@ begin
         PageData := StringReplace(PageData, '{{Pagination}}', '', [rfReplaceAll]);
 
     PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
-    result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
-function TNempWebServer.GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String; Start: Integer): UTf8String;
+function TNempWebServer.GenerateHTMLMedienbibBrowseResult(aMode: String; aValue: String;
+    Start: Integer; isAdmin: Boolean): UTf8String;
 var PageData, menu, browsemenu: String;
     Items, warning: String;
     btnPrev, BtnNext, Pagination, Link: String;
@@ -1366,22 +1437,22 @@ var PageData, menu, browsemenu: String;
         //if c < 1000 then
         //begin
             EnsureFileHasID(af);
-            Item := PatternItemSearchlist;
+            Item := PatternItemSearchlist[isAdmin];
             Item := StringReplace(Item, '{{ID}}'  , IntToStr(afile.WebServerID), [rfReplaceAll]);
             aClass := '';
             // replace tags
             Item := fSetBasicFileData(afile, Item, aClass);
-            Item := fSetFileButtons(afile, Item, 2);
+            Item := fSetFileButtons(afile, Item, 2, isAdmin);
             Items := Items + Item;
         //end;
         //inc(c);
     end;
 
 begin
-    menu := MainMenu(2);
-    browsemenu := BrowseSubMenu(aMode, ' ', aValue);
+    menu := MainMenu(2, isAdmin);
+    browsemenu := BrowseSubMenu(aMode, ' ', aValue, isAdmin);
 
-    PageData := PatternSearchPage;
+    PageData := PatternSearchPage[isAdmin];
     PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
@@ -1430,7 +1501,7 @@ begin
         // Build Pagination
         if (Start > 0) then
         begin
-            BtnPrev := PatternPaginationPrev;
+            BtnPrev := PatternPaginationPrev[isAdmin];
             Link := 'browse?start=' + IntToStr(start-MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
             BtnPrev := StringReplace(BtnPrev, '{{Link}}', Link, [rfReplaceAll]);
         end
@@ -1439,7 +1510,7 @@ begin
 
         if (Start + MaxCountPerPage) < (ResultList.Count - 1) then
         begin
-            BtnNext := PatternPaginationNext;
+            BtnNext := PatternPaginationNext[isAdmin];
             Link := 'browse?start=' + IntToStr(start+MaxCountPerPage) + '&amp;mode=' + ParamsEncode(UTF8String(aMode)) + '&amp;value=' + ParamsEncode(UTF8String(aValue));
             BtnNext := StringReplace(BtnNext, '{{Link}}', Link, [rfReplaceAll]);
         end
@@ -1450,7 +1521,7 @@ begin
             Pagination := ''
         else
         begin
-            Pagination := StringReplace(PatternPagination, '{{NextPage}}', BtnNext, [rfReplaceAll]);
+            Pagination := StringReplace(PatternPagination[isAdmin], '{{NextPage}}', BtnNext, [rfReplaceAll]);
             Pagination := StringReplace(Pagination       , '{{PrevPage}}', BtnPrev, [rfReplaceAll]);
             Pagination := StringReplace(Pagination       , '{{Start}}' , IntToStr(Start+1)           , [rfReplaceAll]);
             Pagination := StringReplace(Pagination       , '{{End}}'   , IntToStr(MaxIdx+1)          , [rfReplaceAll]);
@@ -1459,7 +1530,7 @@ begin
 
         if ResultList.Count = 0 then
         begin
-            warning := PatternNoFilesHint;
+            warning := PatternNoFilesHint[isAdmin];
             warning := StringReplace(warning, '{{Value}}', aValue  , [rfReplaceAll]);
             PageData := StringReplace(PageData, '{{NoFilesHint}}', warning  , [rfReplaceAll]);
         end
@@ -1483,33 +1554,33 @@ begin
 
     PageData := StringReplace(PageData, '{{Pagination}}', Pagination, [rfReplaceAll]);
     PageData := StringReplace(PageData, '{{SearchResultItems}}', Items, [rfReplaceAll]);
-    result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 
 end;
 
 
-function TNempWebServer.GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile): UTf8String;
+function TNempWebServer.GenerateHTMLfromMedienbibSearch_Details(aAudioFile: TAudioFile; isAdmin: Boolean): UTf8String;
 var PageData, FileData, menu: String;
 begin
-    menu := MainMenu(2);
+    menu := MainMenu(2, isAdmin);
 
     if assigned(aAudioFile) then
     begin
         aAudioFile.FileIsPresent := (not aAudioFile.IsFile) or FileExists(aAudioFile.Pfad);
 
-        FileData := PatternItemSearchDetails;
+        FileData := PatternItemSearchDetails[isAdmin];
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
-        FileData := fSetFileButtons(aAudioFile, FileData, 1);
+        FileData := fSetFileButtons(aAudioFile, FileData, 1, isAdmin);
 
-        PageData := PatternSearchDetailsPage;
+        PageData := PatternSearchDetailsPage[isAdmin];
         PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
         PageData := StringReplace(PageData, '{{ItemSearchDetails}}', FileData, [rfReplaceAll]);
     end
     else
-        PageData := GenerateErrorPage(WebServer_InvalidParameter, 2);
+        PageData := GenerateErrorPage(WebServer_InvalidParameter, 2, isAdmin);
 
-    result := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
 
@@ -1573,7 +1644,7 @@ begin
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 
-procedure TNempWebServer.LoadTemplates;
+procedure TNempWebServer.LoadTemplates(isAdmin: Boolean);
 var sl: TStringList;
 
     function GetTemplate(aFilename: String): String;
@@ -1587,70 +1658,73 @@ var sl: TStringList;
     end;
 
 begin
-    fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + RootDir + '\';
+    if isAdmin then
+        fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\Admin\'
+    else
+        fLocalDir := ExtractFilePath(Paramstr(0)) + 'HTML\' + Theme + '\';
     sl := TStringList.Create;
     try
-        PatternBody := GetTemplate(fLocalDir + 'Body.tpl');
-        PatternMenu := GetTemplate(fLocalDir + 'Menu.tpl');
-        PatternBrowseMenu := GetTemplate(fLocalDir + 'MenuLibraryBrowse.tpl');
+        PatternBody[isAdmin] := GetTemplate(fLocalDir + 'Body.tpl');
+        PatternMenu[isAdmin] := GetTemplate(fLocalDir + 'Menu.tpl');
+        PatternBrowseMenu[isAdmin] := GetTemplate(fLocalDir + 'MenuLibraryBrowse.tpl');
 
-        PatternPagination      := GetTemplate(fLocalDir + 'Pagination.tpl');
-        PatternPaginationNext  := GetTemplate(fLocalDir + 'PaginationNextPage.tpl');
-        PatternPaginationPrev  := GetTemplate(fLocalDir + 'PaginationPrevPage.tpl');
-        PatternPaginationOther := GetTemplate(fLocalDir + 'PaginationOther.tpl');
-        PatternPaginationMain  := GetTemplate(fLocalDir + 'PaginationMain.tpl');
+        PatternPagination[isAdmin]      := GetTemplate(fLocalDir + 'Pagination.tpl');
+        PatternPaginationNext[isAdmin]  := GetTemplate(fLocalDir + 'PaginationNextPage.tpl');
+        PatternPaginationPrev[isAdmin]  := GetTemplate(fLocalDir + 'PaginationPrevPage.tpl');
+        PatternPaginationOther[isAdmin] := GetTemplate(fLocalDir + 'PaginationOther.tpl');
+        PatternPaginationMain[isAdmin]  := GetTemplate(fLocalDir + 'PaginationMain.tpl');
 
 
         // Buttons for Player Control
         // PatternButtonPlayPause := trim(GetTemplate(fLocalDir + 'BtnControlPlayPause.tpl'));
-        PatternPlayerControls := trim(GetTemplate(fLocalDir + 'PlayerControls.tpl'));
-        PatternButtonPause := trim(GetTemplate(fLocalDir + 'BtnControlPause.tpl'));
-        PatternButtonPlay  := trim(GetTemplate(fLocalDir + 'BtnControlPlay.tpl'));
-        PatternButtonNext  := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
-        PatternButtonPrev  := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
-        PatternButtonStop  := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
+        PatternPlayerControls[isAdmin] := trim(GetTemplate(fLocalDir + 'PlayerControls.tpl'));
+        PatternButtonPause[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnControlPause.tpl'));
+        PatternButtonPlay[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlPlay.tpl'));
+        PatternButtonNext[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlNext.tpl'));
+        PatternButtonPrev[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
+        PatternButtonStop[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
 
-        PatternButtonSuccess := trim(GetTemplate(fLocalDir + 'BtnSuccess.tpl'));
-        PatternButtonFail := trim(GetTemplate(fLocalDir + 'BtnFail.tpl'));
+        PatternButtonSuccess[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnSuccess.tpl'));
+        PatternButtonFail[isAdmin]    := trim(GetTemplate(fLocalDir + 'BtnFail.tpl'));
 
         // Buttons for File-Handling
-        PatternButtonFileDownload := trim(GetTemplate(fLocalDir + 'BtnFileDownload.tpl'));
-        PatternButtonFilePlayNow := trim(GetTemplate(fLocalDir + 'BtnFilePlayNow.tpl'));
-        PatternButtonFileAdd := trim(GetTemplate(fLocalDir + 'BtnFileAdd.tpl'));
-        PatternButtonFileAddNext := trim(GetTemplate(fLocalDir + 'BtnFileAddNext.tpl'));
-        PatternButtonFileMoveUp := trim(GetTemplate(fLocalDir + 'BtnFileMoveUp.tpl'));
-        PatternButtonFileMoveDown := trim(GetTemplate(fLocalDir + 'BtnFileMoveDown.tpl'));
-        PatternButtonFileDelete := trim(GetTemplate(fLocalDir + 'BtnFileDelete.tpl'));
-        PatternButtonFileVote := trim(GetTemplate(fLocalDir + 'BtnFileVote.tpl'));
+        PatternButtonFileDownload[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnFileDownload.tpl'));
+        PatternButtonFilePlayNow[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnFilePlayNow.tpl'));
+        PatternButtonFileAdd[isAdmin]      := trim(GetTemplate(fLocalDir + 'BtnFileAdd.tpl'));
+        PatternButtonFileAddNext[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnFileAddNext.tpl'));
+        PatternButtonFileMoveUp[isAdmin]   := trim(GetTemplate(fLocalDir + 'BtnFileMoveUp.tpl'));
+        PatternButtonFileMoveDown[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnFileMoveDown.tpl'));
+        PatternButtonFileDelete[isAdmin]   := trim(GetTemplate(fLocalDir + 'BtnFileDelete.tpl'));
+        PatternButtonFileVote[isAdmin]     := trim(GetTemplate(fLocalDir + 'BtnFileVote.tpl'));
 
         // The PLAYER page
-        PatternItemPlayer := trim(GetTemplate(fLocalDir + 'ItemPlayer.tpl'));
-        PatternPlayerPage := GetTemplate(fLocalDir + 'PagePlayer.tpl');
+        PatternItemPlayer[isAdmin] := trim(GetTemplate(fLocalDir + 'ItemPlayer.tpl'));
+        PatternPlayerPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlayer.tpl');
 
         // The PLAYLIST page
-        PatternPlaylistPage := GetTemplate(fLocalDir + 'PagePlaylist.tpl');
-        PatternItemPlaylist := GetTemplate(fLocalDir + 'ItemPlaylist.tpl');
+        PatternPlaylistPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlaylist.tpl');
+        PatternItemPlaylist[isAdmin] := GetTemplate(fLocalDir + 'ItemPlaylist.tpl');
 
         // The PLAYLIST DETAILS page
-        PatternPlaylistDetailsPage := GetTemplate(fLocalDir + 'PagePlaylistDetails.tpl');
-        PatternItemPlaylistDetails := GetTemplate(fLocalDir + 'ItemPlaylistDetails.tpl');
+        PatternPlaylistDetailsPage[isAdmin] := GetTemplate(fLocalDir + 'PagePlaylistDetails.tpl');
+        PatternItemPlaylistDetails[isAdmin] := GetTemplate(fLocalDir + 'ItemPlaylistDetails.tpl');
 
         // The LIBRARY page
-        PatternSearchPage := GetTemplate(fLocalDir + 'PageLibrary.tpl');
-        PatternSearchResultPage := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
-        PatternItemSearchlist := GetTemplate(fLocalDir + 'ItemSearchResult.tpl');
+        PatternSearchPage[isAdmin]       := GetTemplate(fLocalDir + 'PageLibrary.tpl');
+        PatternSearchResultPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
+        PatternItemSearchlist[isAdmin]   := GetTemplate(fLocalDir + 'ItemSearchResult.tpl');
 
-        PatternItemBrowseArtist := GetTemplate(fLocalDir + 'ItemBrowseArtist.tpl');
-        PatternItemBrowseAlbum := GetTemplate(fLocalDir + 'ItemBrowseAlbum.tpl');
-        PatternItemBrowseGenre := GetTemplate(fLocalDir + 'ItemBrowseGenre.tpl');
+        PatternItemBrowseArtist[isAdmin] := GetTemplate(fLocalDir + 'ItemBrowseArtist.tpl');
+        PatternItemBrowseAlbum[isAdmin]  := GetTemplate(fLocalDir + 'ItemBrowseAlbum.tpl');
+        PatternItemBrowseGenre[isAdmin]  := GetTemplate(fLocalDir + 'ItemBrowseGenre.tpl');
 
         // The LIBRARY DETAILS page
-        PatternSearchDetailsPage := GetTemplate(fLocalDir + 'PageLibraryDetails.tpl');
-        PatternItemSearchDetails := GetTemplate(fLocalDir + 'ItemSearchDetails.tpl');
+        PatternSearchDetailsPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibraryDetails.tpl');
+        PatternItemSearchDetails[isAdmin] := GetTemplate(fLocalDir + 'ItemSearchDetails.tpl');
 
         // The ERROR page
-        PatternErrorPage := GetTemplate(fLocalDir + 'PageError.tpl');
-        PatternNoFilesHint := GetTemplate(fLocalDir + 'WarningNoFiles.tpl');
+        PatternErrorPage[isAdmin]   := GetTemplate(fLocalDir + 'PageError.tpl');
+        PatternNoFilesHint[isAdmin] := GetTemplate(fLocalDir + 'WarningNoFiles.tpl');
 
     finally
         sl.Free;
@@ -1937,7 +2011,9 @@ begin
             IdHTTPServer1.Bindings.Clear;
             IdHTTPServer1.DefaultPort := Port;
 
-            LoadTemplates;
+            LoadTemplates(True);
+            LoadTemplates(False);
+
 
             IdHTTPServer1.Active := True;
         except
@@ -2044,7 +2120,8 @@ begin
 end;
 
 
-function TNempWebServer.HandleError(AResponseInfo: TIdHTTPResponseInfo; Error: TQueryResult): TQueryResult;
+function TNempWebServer.HandleError(AResponseInfo: TIdHTTPResponseInfo;
+      Error: TQueryResult; isAdmin: Boolean): TQueryResult;
 var ErrorMessage, PageData: String;
     Body: UTF8String;
     ms: TMemoryStream;
@@ -2061,8 +2138,8 @@ begin
         ErrorMessage := WebServer_UnknownError;
     end;
 
-    PageData := GenerateErrorPage(ErrorMessage, -1);
-    Body := UTF8String(StringReplace(PatternBody, '{{Content}}', PageData, [rfReplaceAll]));
+    PageData := GenerateErrorPage(ErrorMessage, -1, isAdmin);
+    Body := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 
     AResponseInfo.ContentType := 'text/html';
     ms := TMemoryStream.Create;
@@ -2079,13 +2156,17 @@ begin
     AResponseInfo.CustomHeaders.Add('Pragma: no-cache');
 end;
 
-function TNempWebServer.ResponsePlayer(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponsePlayer(ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
 begin
         ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
-            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayer, 0); //QueryPlayer;
+            if isAdmin then
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerAdmin, 0)
+            else
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayer, 0); //QueryPlayer;
             html := HTML_Player;
             LeaveCriticalSection(CS_AccessHTMLCode);
         if html = '' then html := ' ';
@@ -2094,11 +2175,13 @@ begin
         AResponseInfo.ContentStream := ms;
         result := qrPermit;
 end;
-function TNempWebServer.ResponsePlayerJS(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponsePlayerJS(ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
     queriedAction, queriedPart: String;
     aProgress, aVolume: Integer;
+    aMessage: Integer;
 begin
         queriedAction := aRequestInfo.Params.Values['action'];
         if queriedAction = 'getprogress' then
@@ -2123,10 +2206,15 @@ begin
 
             ms := TMemoryStream.Create;
                 EnterCriticalSection(CS_AccessHTMLCode);
-                if queriedPart= 'controls' then
-                    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 1)
+                if isAdmin then
+                    aMessage := WS_QueryPlayerJSAdmin
                 else
-                    SendMessage(fMainHandle, WM_WebServer, WS_QueryPlayerJS, 2); //QueryPlayer;
+                    aMessage := WS_QueryPlayerJS;
+
+                if queriedPart= 'controls' then
+                    SendMessage(fMainHandle, WM_WebServer, aMessage, 1)
+                else
+                    SendMessage(fMainHandle, WM_WebServer, aMessage, 2); //QueryPlayer;
                 html := HTML_Player;
                 LeaveCriticalSection(CS_AccessHTMLCode);
             if html = '' then html := ' ';
@@ -2137,10 +2225,11 @@ begin
         result := qrPermit;
 end;
 
-function TNempWebServer.ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
 begin
-  if AllowRemoteControl then
+  if AllowRemoteControl or isAdmin then
   begin
       result := qrPermit;
       queriedAction := aRequestInfo.Params.Values['action'];
@@ -2154,19 +2243,25 @@ begin
       if queriedAction = 'previous' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_PREVTITLE, 0)
       else
           result := qrInvalidParameter;
-      AResponseInfo.Redirect('/player');
+
+      if isAdmin then
+          AResponseInfo.Redirect('/admin/player')
+      else
+          AResponseInfo.Redirect('/player');
+
       AResponseInfo.ContentStream := Nil;
   end else
   begin
-      result := HandleError(AResponseInfo, qrRemoteControlDenied)
+      result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
   end;
 end;
 
-function TNempWebServer.ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction, queriedValue: String;
     aProgress, aVolume: Integer;
 begin
-  if AllowRemoteControl then
+  if AllowRemoteControl or isAdmin then
   begin
       result := qrPermit;
       queriedAction := aRequestInfo.Params.Values['action'];
@@ -2199,23 +2294,29 @@ begin
               SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETVolume, aVolume);
       end;
 
-      //else
-      //    result := qrInvalidParameter;
-      ;
-
-      result := ResponsePlayerJS(ARequestInfo, AResponseInfo);
+      result := ResponsePlayerJS(ARequestInfo, AResponseInfo, isAdmin);
   end else
   begin
-      result := HandleError(AResponseInfo, qrRemoteControlDenied)
+      result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
   end;
 end;
 
-function TNempWebServer.ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
     af: TAudioFile;
+
+    procedure DoRedirect;
+    begin
+        if isAdmin then
+            AResponseInfo.Redirect('/admin/playlist')
+        else
+            AResponseInfo.Redirect('/playlist');
+        AResponseInfo.ContentStream := Nil;
+    end;
 begin
-    if AllowRemoteControl then
+    if AllowRemoteControl or isAdmin then
     begin
         result := qrPermit;
         queriedAction := aRequestInfo.Params.Values['action'];
@@ -2226,11 +2327,10 @@ begin
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) > 0 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
                 result := qrPermit;
             end else
-                result := HandleError(AResponseInfo, qrInvalidParameter)
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin)
         end
         else
         if queriedAction = 'file_add' then
@@ -2243,11 +2343,10 @@ begin
             begin
                 // sende Audiofile an Nemp-Hauptfenster/playlist
                 SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
             end else // not in bib
             begin
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
             end;
             LeaveCriticalSection(CS_AccessLibrary);
         end;
@@ -2261,11 +2360,10 @@ begin
             begin
                 // sende Audiofile an Nemp-Hauptfenster/playlist
                 SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af));
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
             end else
             begin
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
             end;
             LeaveCriticalSection(CS_AccessLibrary);
         end;
@@ -2275,11 +2373,10 @@ begin
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID) >= 1 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
                 result := qrPermit;
             end else
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end;
         if queriedAction = 'file_movedown' then
         begin
@@ -2287,11 +2384,10 @@ begin
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID) >= 1 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
                 result := qrPermit;
             end else
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end;
         if queriedAction = 'file_delete' then
         begin
@@ -2299,24 +2395,25 @@ begin
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) > 0 then
             begin
                 // todo: Hier ggf. ein result erwarten und auswerten?
-                AResponseInfo.Redirect('/playlist');
-                AResponseInfo.ContentStream := Nil;
+                DoRedirect;
                 result := qrPermit;
             end else
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end;
     end else
     begin
-        result := HandleError(AResponseInfo, qrRemoteControlDenied)
+        result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
     end;
 end;
 
-function TNempWebServer.ResponseJSPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseJSPlaylistControl(AContext: TIdContext;
+    ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
     res, newID: Integer;
     html: UTF8String;
     af: TAudioFile;
+    localVote, localControl, requestDone: Boolean;
 
     function BuildStream(aContent: UTF8String): TMemoryStream;
     begin
@@ -2344,7 +2441,7 @@ var queriedAction: String;
                 SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, newID);
 
             if NOT DoPlay then
-                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess));
+                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess[isAdmin]));
         end
         else
         begin
@@ -2372,19 +2469,25 @@ var queriedAction: String;
 
 
 begin
-    if AllowRemoteControl then
+    if AllowRemoteControl or isAdmin or AllowVotes then
     begin
+        localVote := AllowVotes or isAdmin;
+        localControl := AllowRemoteControl or isAdmin;
+        requestDone := False;
+
         result := qrPermit;
         queriedAction := aRequestInfo.Params.Values['action'];
 
-        if queriedAction = 'file_playnow' then
+        if (queriedAction = 'file_playnow') and localControl then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             result := PlayNow(queriedID);
         end;
 
-        if queriedAction = 'file_vote' then
+        if (queriedAction = 'file_vote') and localVote then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             case Votemachine.ProcessVote(queriedID, AContext.Binding.PeerIP) of
                 vr_Success   : AResponseInfo.ContentStream := BuildStream(UTF8String('ok'));
@@ -2395,8 +2498,9 @@ begin
         end;
 
 
-        if queriedAction = 'file_moveupcheck' then
+        if (queriedAction = 'file_moveupcheck') and localControl then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUpCheck, queriedID);
             // res = -1: Moveup of a prebook-list-item. reload of Playlist is recommended
@@ -2405,15 +2509,16 @@ begin
 
             // send moveup-message to player
             if  res >= -1 then
-            SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID);
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID);
 
             // send ID/res to browser
             AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
             result := qrPermit;
         end;
 
-        if queriedAction = 'file_movedowncheck' then
+        if (queriedAction = 'file_movedowncheck') and localControl then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDownCheck, queriedID);
             // res = -1: Moveup of a prebook-list-item. reload of Playlist is recommended
@@ -2422,15 +2527,16 @@ begin
 
             // send moveup-message to player
             if  res >= -1 then
-            SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID);
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID);
 
             // send ID/res to browser
             AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
             result := qrPermit;
         end;
 
-        if queriedAction = 'file_delete' then
+        if (queriedAction = 'file_delete') and localControl then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID);
             //if res > 0 then
@@ -2444,21 +2550,26 @@ begin
             //    result := HandleError(AResponseInfo, qrInvalidParameter);
         end;
 
-        if (queriedAction = 'file_addnext')
-            or (queriedAction = 'file_add')
+        if ((queriedAction = 'file_addnext')
+            or (queriedAction = 'file_add'))  and localControl
         then
         begin
+            requestDone := True;
             addNext(queriedAction, False);
         end;
 
 
-        if queriedAction = 'loaditem' then
+        if (queriedAction = 'loaditem') then
         begin
+            requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
 
             // return one (or all) item of the playlist
             EnterCriticalSection(CS_AccessHTMLCode);
-            SendMessage(fMainWindowHandle, WM_WebServer, WS_QueryPlaylistItem, queriedID);
+            if isAdmin then
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_QueryPlaylistItemAdmin, queriedID)
+            else
+                SendMessage(fMainWindowHandle, WM_WebServer, WS_QueryPlaylistItem, queriedID);
             html := HTML_PlaylistView;
             LeaveCriticalSection(CS_AccessHTMLCode);
 
@@ -2466,22 +2577,28 @@ begin
             result := qrPermit;
         end;
 
+        if not requestDone then
+            result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
     end
     else
     begin
-        result := HandleError(AResponseInfo, qrRemoteControlDenied)
+        result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
     end;
 
 
 end;
 
-function TNempWebServer.ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
 begin
        ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
-            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylist, 0);
+            if isAdmin then
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistAdmin, 0)
+            else
+                SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylist, 0);
             html := HTML_PlaylistView;
             LeaveCriticalSection(CS_AccessHTMLCode);
         if html = '' then html := ' ';
@@ -2492,14 +2609,19 @@ begin
 end;
 
 
-function TNempWebServer.ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
     queriedID: Integer;
 begin
         EnterCriticalSection(CS_AccessHTMLCode);
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-        SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, queriedID);
+
+        if isAdmin then
+            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetailAdmin, queriedID)
+        else
+            SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetail, queriedID);
         html := HTML_PlaylistDetails;
         LeaveCriticalSection(CS_AccessHTMLCode);
         if html <> '' then
@@ -2510,10 +2632,11 @@ begin
             AResponseInfo.ContentStream := ms;
             result := qrPermit;
         end else
-            result := HandleError(AResponseInfo, qrInvalidParameter);
+            result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
 end;
 
-function TNempWebServer.ResponseCover (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseCover (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedCover: String;
     fn: UnicodeString;
 begin
@@ -2530,14 +2653,15 @@ begin
             AResponseInfo.ContentStream := TFileStream.Create(fn, fmOpenRead or fmShareDenyWrite);
             result := qrPermit;
         except
-            result := HandleError(AResponseInfo, qrError);
+            result := HandleError(AResponseInfo, qrError, isAdmin);
         end;
     end else
         result := qrFileNotFound;
 end;
 
 
-function TNempWebServer.ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseFileDownload (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedID: Integer;
     fn: UnicodeString;
     af: TAudioFile;
@@ -2570,7 +2694,7 @@ begin
         if fn = '' then
         begin
             // ID was not found in Bib nor Playlist => Invalid request
-            result := HandleError(AResponseInfo, qrInvalidParameter);
+            result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end else
         begin
             if (FileExists(fn)) then
@@ -2583,17 +2707,17 @@ begin
                     result := qrPermit;
                 except
                     //error
-                    result := HandleError(AResponseInfo, qrError);
+                    result := HandleError(AResponseInfo, qrError, isAdmin);
                 end;
             end else
             begin
                 // File not found
-                result := HandleError(AResponseInfo, qrFileNotFound);
+                result := HandleError(AResponseInfo, qrFileNotFound, isAdmin);
             end;
         end;
     end else
     begin
-        result := HandleError(AResponseInfo, qrDownloadDenied);
+        result := HandleError(AResponseInfo, qrDownloadDenied, isAdmin);
     end;
 end;
 
@@ -2635,7 +2759,8 @@ begin
 end;
 
 
-function TNempWebServer.ResponseSearchInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseSearchInLibrary (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var ms: TMemoryStream;
     html: UTf8String;
     searchstring: String;
@@ -2659,17 +2784,18 @@ begin
             SearchString := '';
 
         ms := TMemoryStream.Create;
-        html := GenerateHTMLMedienbibSearchFormular(searchstring, Start);
+        html := GenerateHTMLMedienbibSearchFormular(searchstring, Start, isAdmin);
         if html = '' then html := ' ';
             ms.Write(html[1], length(html));
         // NOT necessary here AddNoCacheHeader(AResponseInfo);
         AResponseInfo.ContentStream := ms;
         result := qrPermit;
     end else
-        result := HandleError(AResponseInfo, qrLibraryAccessDenied);
+        result := HandleError(AResponseInfo, qrLibraryAccessDenied, isAdmin);
 end;
 
-function TNempWebServer.ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseBrowseInLibrary (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var QueryMode, QueryLetter, QueryValue, QueryOther: String;
     ms: TMemoryStream;
     html: UTf8String;
@@ -2703,7 +2829,7 @@ begin
             // generate List of Artists/Albums/Genres according to QueryMode (+ Letter)
 
             ms := TMemoryStream.Create;
-            html := GenerateHTMLMedienbibBrowseList(Querymode, QueryLetter[1], QueryOther='1');
+            html := GenerateHTMLMedienbibBrowseList(Querymode, QueryLetter[1], QueryOther='1', isAdmin);
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
             // NOT necessary here AddNoCacheHeader(AResponseInfo);
@@ -2714,7 +2840,7 @@ begin
         begin
             // generate List of Titles according to QueryMode + Value
             ms := TMemoryStream.Create;
-            html := GenerateHTMLMedienbibBrowseResult(Querymode, QueryValue, Start);
+            html := GenerateHTMLMedienbibBrowseResult(Querymode, QueryValue, Start, isAdmin);
             if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
             // NOT necessary here AddNoCacheHeader(AResponseInfo);
@@ -2723,10 +2849,11 @@ begin
             result := qrPermit;
         end;
     end  else
-        result := HandleError(AResponseInfo, qrLibraryAccessDenied);
+        result := HandleError(AResponseInfo, qrLibraryAccessDenied, isAdmin);
 end;
 
-function TNempWebServer.ResponseLibraryDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo): TQueryResult;
+function TNempWebServer.ResponseLibraryDetails (ARequestInfo: TIdHTTPRequestInfo;
+    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedID: Integer;
     af: TAudioFile;
     html: UTf8String;
@@ -2740,7 +2867,7 @@ begin
             af := GetAudioFileFromWebServerID(queriedID);
             if assigned(af) then
             begin
-                html := GenerateHTMLfromMedienbibSearch_Details(af);
+                html := GenerateHTMLfromMedienbibSearch_Details(af, isAdmin);
                 ms := TMemoryStream.Create;
                 if html = '' then html := ' ';
                 ms.Write(html[1], length(html));
@@ -2748,10 +2875,10 @@ begin
                 AResponseInfo.ContentStream := ms;
                 result := qrPermit;
             end else // not in bib
-                result := HandleError(AResponseInfo, qrInvalidParameter);
+                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         LeaveCriticalSection(CS_AccessLibrary);
     end else
-        result := HandleError(AResponseInfo, qrLibraryAccessDenied);
+        result := HandleError(AResponseInfo, qrLibraryAccessDenied, isAdmin);
 end;
 
 procedure TNempWebServer.IdHTTPServer1CommandGet(AContext: TIdContext;
@@ -2761,43 +2888,64 @@ var //ms: TMemoryStream;
     permit: TQueryResult;
     fn: UnicodeString;
     queriedAction: String;
+    isAdmin: Boolean;
+    UserLoginOK, AdminLoginOK: Boolean;
 begin
 
     if ValidIP(AContext.Binding.PeerIP, AContext.Binding.IP) then
     begin
         RequestedDocument := aRequestInfo.Document;
-        if RequestedDocument = '/' then
+
+        if AnsiStartsStr('/admin', RequestedDocument) then
+        begin
+            RequestedDocument := Copy(RequestedDocument, 7, length(RequestedDocument));
+            isAdmin := True;
+        end else
+            isAdmin := False;
+
+        if (RequestedDocument = '/') or (RequestedDocument = '') then
             RequestedDocument := '/player';
 
-        if ((ARequestInfo.AuthUsername <> Username) or (ARequestInfo.AuthPassword <> Password)) then
+
+        UserLoginOK := (ARequestInfo.AuthUsername = UsernameU) and (ARequestInfo.AuthPassword = PasswordU);
+        AdminLoginOK := (ARequestInfo.AuthUsername = UsernameA) and (ARequestInfo.AuthPassword = PasswordA);
+
+        if isAdmin and (not AdminLoginOK) then
         begin
             logQueryAuth(AContext, aRequestInfo);
-            AResponseInfo.ContentText := 'Enter your username and password';
+            AResponseInfo.ContentText := 'Administrator verification needed';
             AResponseInfo.AuthRealm := 'Nemp webserver login';
             exit;
-        end;
+        end else
+            if (not UserLoginOK) and (not AdminLoginOK) then
+            begin
+                logQueryAuth(AContext, aRequestInfo);
+                AResponseInfo.ContentText := 'Enter your username and password';
+                AResponseInfo.AuthRealm := 'Nemp webserver login';
+                exit;
+            end;
 
-        if RequestedDocument = '/player' then permit := ResponsePlayer(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/player' then permit := ResponsePlayer(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playlist' then permit := ResponsePlaylistView(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playlist' then permit := ResponsePlaylistView(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/library' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/library' then permit := ResponseSearchInLibrary(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/browse' then permit := ResponseBrowseInLibrary(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/browse' then permit := ResponseBrowseInLibrary(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/cover' then permit := ResponseCover(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playercontrolJS' then permit := ResponseJSPlayerControl(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playercontrolJS' then permit := ResponseJSPlayerControl(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(AContext, ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(AContext, ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playlist_details' then permit := ResponsePlaylistDetails(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/playlist_details' then permit := ResponsePlaylistDetails(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/library_details' then permit := ResponseLibraryDetails(ARequestInfo, AResponseInfo)
+        if RequestedDocument = '/library_details' then permit := ResponseLibraryDetails(ARequestInfo, AResponseInfo, isAdmin)
         else
         begin
             // Hier: Erstmal testen, obs der Versuch ist, eine Datei runterzuladen
@@ -2814,16 +2962,16 @@ begin
                         AResponseInfo.ContentStream := TFileStream.Create(fn, fmOpenRead or fmShareDenyWrite);
                         permit := qrPermit;
                     except
-                        permit := HandleError(AResponseInfo, qrError);
+                        permit := HandleError(AResponseInfo, qrError, isAdmin);
                     end
                 end
                 else
-                    permit := HandleError(AResponseInfo, qrFileNotFound);
+                    permit := HandleError(AResponseInfo, qrFileNotFound, isAdmin);
 
             end else
                 if queriedAction = 'file_download' then
                 begin
-                    permit := ResponseFileDownload(ARequestInfo, AResponseInfo);
+                    permit := ResponseFileDownload(ARequestInfo, AResponseInfo, isAdmin);
                 end
                 else
                     permit := qrDeny;

@@ -1105,35 +1105,60 @@ begin
                               end;
                            end;
 
-        WS_QueryPlayer: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0);
+        WS_QueryPlayer: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0, False);
+        WS_QueryPlayerAdmin: NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 0, True);
+
         WS_QueryPlayerJS: begin
                         if aMsg.LParam = 1 then
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1)   // 1: Controls  [[PlayerControls]]
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1, False)   // 1: Controls  [[PlayerControls]]
                         else
-                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2);  // 2: Playerdata [[ItemPlayer]]
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2, False);  // 2: Playerdata [[ItemPlayer]]
         end;
-        WS_QueryPlaylist: begin
-                              NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist);
-                          end;
+        WS_QueryPlayerJSAdmin: begin
+                        if aMsg.LParam = 1 then
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 1, True)   // 1: Controls  [[PlayerControls]]
+                        else
+                            NempWebServer.GenerateHTMLfromPlayer(NempPlayer, 2, True);  // 2: Playerdata [[ItemPlayer]]
+        end;
+
+        WS_QueryPlaylist: NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist, False);
+        WS_QueryPlaylistAdmin: NempWebServer.GenerateHTMLfromPlaylist_View(NempPlaylist, True);
+
         WS_QueryPlaylistItem: begin
                               if aMsg.lParam = -1 then
                                   // get ALL items
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1)
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, False)
                               else
                               begin
                                   idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
-                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx);
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, False);
+                              end;
+                          end;
+        WS_QueryPlaylistItemAdmin: begin
+                              if aMsg.lParam = -1 then
+                                  // get ALL items
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, True)
+                              else
+                              begin
+                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, True);
                               end;
                           end;
         WS_QueryPlaylistDetail: begin
                                 // ID aus Lparam lesen
                                 idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
                                 if (idx > -1) then
-                                begin
-                                      //NempWebserver.QueriedPlaylistFilename := TAudioFile(NempPlaylist.Playlist[idx]).Pfad;
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx);
-                                end else
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0);
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx, False)
+                                else
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0, False);
+                          end;
+        WS_QueryPlaylistDetailAdmin: begin
+                                // ID aus Lparam lesen
+                                idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                if (idx > -1) then
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx, True)
+                                else
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0, True);
                           end;
 
         WS_IPC_GETPROGRESS: if AcceptAPICommands then
@@ -1166,18 +1191,10 @@ begin
                   aMsg.Result := NempWebServer.VoteMachine.VCLAddAndVoteFile(TAudioFile(aMsg.Lparam), NempPlaylist);
         end;
 
-
-
         WS_StringLog: begin
                           NempWebServer.LogList.Add(PChar(aMsg.LParam));
-                          if NempWebServer.LogList.Count > 500 then
+                          if NempWebServer.LogList.Count > 1000 then
                               NempWebServer.LogList.Delete(0);
-                          if assigned(OptionsCompleteForm) then
-                          begin
-                              OptionsCompleteForm.WebServerLogMemo.Lines.Add(PChar(aMsg.LParam));
-                              if OptionsCompleteForm.WebServerLogMemo.Lines.Count > 500 then
-                                  OptionsCompleteForm.WebServerLogMemo.Lines.Delete(0);
-                          end;
                       end;
     end;
 end;

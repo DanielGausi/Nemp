@@ -4172,147 +4172,118 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabAudio10: TTabSheet
       Caption = 'Audio7 (Webserver)'
       ImageIndex = 18
-      DesignSize = (
-        449
-        443)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
         Width = 434
-        Height = 188
+        Height = 187
         Caption = 'Configuration'
         TabOrder = 0
-        object LblConst_Username2: TLabel
-          Left = 16
-          Top = 19
-          Width = 48
-          Height = 13
-          Hint = 'Set username and password to access your library.'
-          Caption = 'Username'
-        end
-        object LblConst_Password2: TLabel
-          Left = 118
-          Top = 20
-          Width = 46
-          Height = 13
-          Hint = 'Set username and password to access your library'
-          Caption = 'Password'
-        end
         object LblWebServer_Port: TLabel
-          Left = 220
-          Top = 20
+          Left = 183
+          Top = 16
           Width = 20
           Height = 13
           Caption = 'Port'
         end
         object LblWebServerTheme: TLabel
-          Left = 167
-          Top = 65
+          Left = 16
+          Top = 16
           Width = 32
           Height = 13
           Caption = 'Theme'
         end
+        object Label7: TLabel
+          Left = 16
+          Top = 109
+          Width = 88
+          Height = 13
+          Hint = 'Set username and password to access your library.'
+          Caption = 'Username (Admin)'
+        end
+        object Label8: TLabel
+          Left = 116
+          Top = 110
+          Width = 86
+          Height = 13
+          Hint = 'Set username and password to access your library'
+          Caption = 'Password (Admin)'
+        end
         object BtnServerActivate: TButton
-          Left = 301
-          Top = 33
-          Width = 123
+          Left = 296
+          Top = 153
+          Width = 125
           Height = 25
           Caption = 'Activate server'
-          TabOrder = 2
+          TabOrder = 0
           OnClick = BtnServerActivateClick
         end
         object cbOnlyLAN: TCheckBox
-          Left = 17
-          Top = 91
+          Left = 16
+          Top = 64
           Width = 393
           Height = 13
-          Hint = 'Deny access to your library from "the internet".'
+          Hint = 'Deny access from "the internet".'
           Caption = 'Permit access only from LAN'
-          TabOrder = 3
+          TabOrder = 1
           OnClick = cbOnlyLANClick
         end
-        object cbPermitLibraryAccess: TCheckBox
-          Left = 17
-          Top = 123
-          Width = 393
-          Height = 13
-          Hint = 
-            'Decide, whether searching and downloading files from your librar' +
-            'y is allowed.'
-          Caption = 'Permit access to the media library (read only)'
-          TabOrder = 5
-          OnClick = cbPermitLibraryAccessClick
-        end
-        object cbPermitPlaylistDownload: TCheckBox
-          Left = 17
-          Top = 107
-          Width = 393
-          Height = 13
-          Hint = 'Decide, whether downloading files from your playlist is allowed.'
-          Caption = 'Permit downloading files from the playlist'
-          TabOrder = 4
-          OnClick = cbPermitPlaylistDownloadClick
-        end
-        object cbAllowRemoteControl: TCheckBox
-          Left = 17
-          Top = 139
-          Width = 393
-          Height = 13
-          Hint = 
-            'Permit remote control like "play", "stop", "next file" of the pl' +
-            'ayer.'
-          Caption = 'Permit remote control of the player'
-          TabOrder = 6
-          OnClick = cbAllowRemoteControlClick
-        end
-        object EdtUsername: TEdit
-          Left = 16
-          Top = 35
-          Width = 95
-          Height = 21
-          TabOrder = 0
-          OnKeyPress = EdtUsernameKeyPress
-        end
-        object EdtPassword: TEdit
-          Left = 117
-          Top = 35
-          Width = 97
-          Height = 21
-          TabOrder = 1
-          OnKeyPress = EdtPasswordKeyPress
-        end
         object CBAutoStartWebServer: TCheckBox
-          Left = 17
-          Top = 161
+          Left = 16
+          Top = 80
           Width = 393
           Height = 17
           Hint = 'Automatically activate the webserver when Nemp starts.'
           Caption = 'Activate webserver on start'
-          TabOrder = 7
+          TabOrder = 2
         end
         object seWebServer_Port: TSpinEdit
-          Left = 220
-          Top = 35
+          Left = 183
+          Top = 31
           Width = 75
           Height = 22
           MaxValue = 65535
           MinValue = 0
-          TabOrder = 8
+          TabOrder = 3
           Value = 80
         end
         object cbWebserverRootDir: TComboBox
           Left = 16
-          Top = 61
-          Width = 145
+          Top = 32
+          Width = 155
           Height = 21
           Style = csDropDownList
           ItemHeight = 13
-          TabOrder = 9
+          TabOrder = 4
+        end
+        object EdtUsernameAdmin: TEdit
+          Left = 16
+          Top = 125
+          Width = 95
+          Height = 21
+          TabOrder = 5
+          OnKeyPress = EdtUsernameAdminKeyPress
+        end
+        object EdtPasswordAdmin: TEdit
+          Left = 115
+          Top = 125
+          Width = 97
+          Height = 21
+          TabOrder = 6
+          OnKeyPress = EdtPasswordKeyPress
+        end
+        object BtnShowWebserverLog: TButton
+          Left = 159
+          Top = 153
+          Width = 125
+          Height = 25
+          Caption = 'Show Log'
+          TabOrder = 7
         end
       end
       object GrpBoxIP: TGroupBox
         Left = 8
-        Top = 201
+        Top = 347
         Width = 434
         Height = 76
         Hint = 
@@ -4374,28 +4345,86 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Text = '?'
         end
       end
-      object GrpBoxLog: TGroupBox
+      object GrpBoxWebserverUserRights: TGroupBox
         Left = 8
-        Top = 279
-        Width = 434
-        Height = 161
-        Anchors = [akLeft, akTop, akRight, akBottom]
-        Caption = 'Log'
+        Top = 201
+        Width = 433
+        Height = 140
+        Caption = 'User rights'
         TabOrder = 2
-        DesignSize = (
-          434
-          161)
-        object WebServerLogMemo: TMemo
-          Left = 4
+        object LblConst_Username2: TLabel
+          Left = 16
           Top = 17
-          Width = 422
-          Height = 136
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          Lines.Strings = (
-            '')
-          ReadOnly = True
-          ScrollBars = ssVertical
+          Width = 48
+          Height = 13
+          Hint = 'Set username and password to access your library.'
+          Caption = 'Username'
+        end
+        object LblConst_Password2: TLabel
+          Left = 116
+          Top = 18
+          Width = 46
+          Height = 13
+          Hint = 'Set username and password to access your library'
+          Caption = 'Password'
+        end
+        object cbAllowRemoteControl: TCheckBox
+          Left = 16
+          Top = 113
+          Width = 393
+          Height = 15
+          Hint = 'Let the user control the player (play/stop/next/volume/...)'
+          Caption = 'Permit remote control of the player'
           TabOrder = 0
+          OnClick = cbAllowRemoteControlClick
+        end
+        object cbPermitVote: TCheckBox
+          Left = 16
+          Top = 64
+          Width = 392
+          Height = 15
+          Hint = 
+            'Let the user vote for files - files with many votes will be play' +
+            'ed first'
+          Caption = 'Permit voting for files'
+          TabOrder = 1
+          OnClick = cbAllowRemoteControlClick
+        end
+        object cbPermitLibraryAccess: TCheckBox
+          Left = 16
+          Top = 81
+          Width = 393
+          Height = 15
+          Hint = 'Let the user search and browse in your library'
+          Caption = 'Permit access to the media library (read only)'
+          TabOrder = 2
+          OnClick = cbPermitLibraryAccessClick
+        end
+        object cbPermitPlaylistDownload: TCheckBox
+          Left = 16
+          Top = 97
+          Width = 393
+          Height = 15
+          Hint = 'Let the user download files from your playlist and/or library'
+          Caption = 'Permit downloading files from the playlist'
+          TabOrder = 3
+          OnClick = cbPermitPlaylistDownloadClick
+        end
+        object EdtUsername: TEdit
+          Left = 17
+          Top = 33
+          Width = 95
+          Height = 21
+          TabOrder = 4
+          OnKeyPress = EdtUsernameKeyPress
+        end
+        object EdtPassword: TEdit
+          Left = 115
+          Top = 33
+          Width = 97
+          Height = 21
+          TabOrder = 5
+          OnKeyPress = EdtPasswordKeyPress
         end
       end
     end
