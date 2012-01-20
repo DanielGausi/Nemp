@@ -370,23 +370,14 @@ type
     CloseIMG: TSkinButton;
     TabAudio10: TTabSheet;
     GrpBoxConfig: TGroupBox;
-    LblConst_Username2: TLabel;
-    LblConst_Password2: TLabel;
     BtnServerActivate: TButton;
     cbOnlyLAN: TCheckBox;
-    cbPermitLibraryAccess: TCheckBox;
-    cbPermitPlaylistDownload: TCheckBox;
-    cbAllowRemoteControl: TCheckBox;
-    EdtUsername: TEdit;
-    EdtPassword: TEdit;
     GrpBoxIP: TGroupBox;
     LblConst_IPWAN: TLabel;
     LabelLANIP: TLabel;
     BtnGetIPs: TButton;
     cbLANIPs: TComboBox;
     EdtGlobalIP: TEdit;
-    GrpBoxLog: TGroupBox;
-    WebServerLogMemo: TMemo;
     IDHttpWebServerGetIP: TIdHTTP;
     CBAutoStartWebServer: TCheckBox;
     GrpBox_TabMedia3_Cover: TGroupBox;
@@ -458,6 +449,20 @@ type
     BtnRefreshDevices: TButton;
     cbWebserverRootDir: TComboBox;
     LblWebServerTheme: TLabel;
+    Label7: TLabel;
+    EdtUsernameAdmin: TEdit;
+    Label8: TLabel;
+    EdtPasswordAdmin: TEdit;
+    GrpBoxWebserverUserRights: TGroupBox;
+    cbAllowRemoteControl: TCheckBox;
+    cbPermitVote: TCheckBox;
+    cbPermitLibraryAccess: TCheckBox;
+    cbPermitPlaylistDownload: TCheckBox;
+    LblConst_Username2: TLabel;
+    EdtUsername: TEdit;
+    LblConst_Password2: TLabel;
+    EdtPassword: TEdit;
+    BtnShowWebserverLog: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -532,7 +537,6 @@ type
     procedure Btn_ScrobbleAgainClick(Sender: TObject);
     procedure Image2Click(Sender: TObject);
     procedure NewPlayerPanelOptionsPaint(Sender: TObject);
-    procedure BtnUpdateAuthClick(Sender: TObject);
     procedure BtnServerActivateClick(Sender: TObject);
     procedure EdtUsernameKeyPress(Sender: TObject; var Key: Char);
     procedure EdtPasswordKeyPress(Sender: TObject; var Key: Char);
@@ -546,6 +550,7 @@ type
     procedure CBAlwaysSortAnzeigeListClick(Sender: TObject);
     procedure BtnClearCoverCacheClick(Sender: TObject);
     procedure BtnRefreshDevicesClick(Sender: TObject);
+    procedure EdtUsernameAdminKeyPress(Sender: TObject; var Key: Char);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1362,17 +1367,20 @@ begin
       tmpThemes.Free;
   end;
 
-  if cbWebServerRootDir.Items.IndexOf(NempWebServer.RootDir) >-1 then
-      cbWebServerRootDir.ItemIndex := cbWebServerRootDir.Items.IndexOf(NempWebServer.RootDir);
+  if cbWebServerRootDir.Items.IndexOf(NempWebServer.Theme) >-1 then
+      cbWebServerRootDir.ItemIndex := cbWebServerRootDir.Items.IndexOf(NempWebServer.Theme);
 
-  EdtUsername.Text  := NempWebServer.Username;
-  EdtPassword.Text  := NempWebServer.Password;
+  EdtUsername.Text      := NempWebServer.UsernameU;
+  EdtPassword.Text      := NempWebServer.PasswordU;
+  EdtUsernameAdmin.Text := NempWebServer.UsernameA;
+  EdtPasswordAdmin.Text := NempWebServer.PasswordA;
+
   seWebServer_Port.Value := NempWebServer.Port;
   cbOnlyLAN.Checked := NempWebServer.OnlyLAN;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
   cbPermitPlaylistDownload.Checked := NempWebServer.AllowFileDownload;
   cbAllowRemoteControl.Checked     := NempWebServer.AllowRemoteControl;
-  WebServerLogMemo.Lines.Assign(NempWebServer.LogList);
+  cbPermitVote.Checked             := NempWebServer.AllowVotes;
 
   tmpIPs := getIPs;
   cbLANIPs.Items.Assign(tmpIPs);
@@ -1382,6 +1390,9 @@ begin
 
   EdtUsername.Enabled := NOT NempWebServer.Active;
   EdtPassword.Enabled := NOT NempWebServer.Active;
+  EdtUsernameAdmin.Enabled := NOT NempWebServer.Active;
+  EdtPasswordAdmin.Enabled := NOT NempWebServer.Active;
+
   cbWebServerRootDir.Enabled := NOT NempWebServer.Active;
   seWebServer_Port.Enabled := NOT NempWebServer.Active;
   if NempWebServer.Active then
@@ -2593,9 +2604,11 @@ begin
   end;
 
   // Webserver
-  NempWebServer.Username := EdtUsername.Text;
-  NempWebServer.Password := EdtPassword.Text;
-  NempWebServer.RootDir := cbWebServerRootDir.Text;
+  NempWebServer.UsernameU := EdtUsername.Text;
+  NempWebServer.PasswordU := EdtPassword.Text;
+  NempWebServer.UsernameA := EdtUsernameAdmin.Text;
+  NempWebServer.PasswordA := EdtPasswordAdmin.Text;
+  NempWebServer.Theme := cbWebServerRootDir.Text;
 
   NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
 
@@ -2605,9 +2618,11 @@ begin
   NempWebServer.Port := seWebServer_Port.Value;
 
   NempWebServer.AllowLibraryAccess    := cbPermitLibraryAccess.Checked;
-  NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
+  NempWebServer.AllowFileDownload     := cbPermitPlaylistDownload.Checked;
   NempWebServer.AllowRemoteControl    := cbAllowRemoteControl.Checked;
   MedienBib.AutoActivateWebServer     := CBAutoStartWebServer.Checked;
+  NempWebServer.AllowVotes            := cbPermitVote.Checked;
+
   NempWebServer.SaveToIni;
 
 
@@ -3184,14 +3199,18 @@ begin
     begin
         // Server aktivieren
         // 1.) Daten übernehmen
-        NempWebServer.Username := EdtUsername.Text;
-        NempWebServer.Password := EdtPassword.Text;
-        NempWebServer.RootDir  := cbWebServerRootDir.Text;
+        NempWebServer.UsernameU := EdtUsername.Text;
+        NempWebServer.PasswordU := EdtPassword.Text;
+        NempWebServer.UsernameA := EdtUsernameAdmin.Text;
+        NempWebServer.PasswordA := EdtPasswordAdmin.Text;
+
+        NempWebServer.Theme    := cbWebServerRootDir.Text;
         NempWebServer.Port     := seWebServer_Port.Value;
         NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
         NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
         NempWebServer.AllowRemoteControl := cbAllowRemoteControl.Checked;
+        NempWebServer.AllowVotes := cbPermitVote.Checked;
         // 2.) Medialib kopieren
         NempWebServer.CopyLibrary(MedienBib);
         NempWebServer.Active := True;
@@ -3206,6 +3225,9 @@ begin
             BtnServerActivate.Caption := WebServer_DeActivateServer;
             EdtUsername.Enabled := False;
             EdtPassword.Enabled := False;
+            EdtUsernameAdmin.Enabled := False;
+            EdtPasswordAdmin.Enabled := False;
+
             seWebServer_Port.Enabled := False;
             cbWebServerRootDir.Enabled := False;
             //BtnUpdateAuth.Enabled := False;
@@ -3225,6 +3247,9 @@ begin
         BtnServerActivate.Caption := WebServer_ActivateServer;
         EdtUsername.Enabled := True;
         EdtPassword.Enabled := True;
+        EdtUsernameAdmin.Enabled := True;
+        EdtPasswordAdmin.Enabled := True;
+
         seWebServer_Port.Enabled := True;
         cbWebServerRootDir.Enabled := True;
         //BtnUpdateAuth.Enabled := True;
@@ -3234,13 +3259,23 @@ begin
 end;
 
 
+procedure TOptionsCompleteForm.EdtUsernameAdminKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+    case Word(key) of
+        VK_RETURN: begin
+            key:=#0;
+            ActiveControl := EdtPasswordAdmin;
+        end;
+    end;
+end;
+
 procedure TOptionsCompleteForm.EdtUsernameKeyPress(Sender: TObject;
   var Key: Char);
 begin
     case Word(key) of
         VK_RETURN: begin
             key:=#0;
-            BtnUpdateAuthClick(Sender);
             ActiveControl := EdtPassword;
         end;
     end;
@@ -3252,7 +3287,6 @@ begin
     case Word(key) of
         VK_RETURN: begin
             key:=#0;
-            BtnUpdateAuthClick(Sender);
         end;
     end;
 end;
@@ -3289,11 +3323,6 @@ end;
 procedure TOptionsCompleteForm.cbAllowRemoteControlClick(Sender: TObject);
 begin
 //    NempWebServer.AllowRemoteControl := cbAllowRemoteControl.Checked;
-end;
-procedure TOptionsCompleteForm.BtnUpdateAuthClick(Sender: TObject);
-begin
-//    NempWebServer.Username := EdtUsername.Text;
-//    NempWebServer.Password := EdtPassword.Text;
 end;
 
 
