@@ -305,6 +305,7 @@ type
 
           procedure SetActive(Value: Boolean);
           procedure LoadTemplates(isAdmin: Boolean);
+          procedure TemplateFallback;
 
           procedure SetFontSizes(aList: TObjectList);
           procedure ClearHelperLists;
@@ -1731,6 +1732,64 @@ begin
     end;
 end;
 
+procedure TNempWebServer.TemplateFallback;
+
+    procedure ProcessTemplate(var aDoubleString: TDoubleString);
+    begin
+        if aDoubleString[True] = '' then
+            aDoubleString[True] := aDoubleString[False]
+    end;
+
+begin
+        ProcessTemplate(PatternBody);
+        ProcessTemplate(PatternMenu           );
+        ProcessTemplate(PatternBrowseMenu     );
+        ProcessTemplate(PatternPagination     );
+        ProcessTemplate(PatternPaginationNext );
+        ProcessTemplate(PatternPaginationPrev );
+        ProcessTemplate(PatternPaginationOther);
+        ProcessTemplate(PatternPaginationMain );
+        ProcessTemplate(PatternPlayerControls );
+        ProcessTemplate(PatternButtonPause    );
+        ProcessTemplate(PatternButtonPlay     );
+        ProcessTemplate(PatternButtonNext     );
+        ProcessTemplate(PatternButtonPrev     );
+        ProcessTemplate(PatternButtonStop     );
+        ProcessTemplate(PatternButtonSuccess  );
+        ProcessTemplate(PatternButtonFail     );
+        // Buttons for File-Handling
+        ProcessTemplate(PatternButtonFileDownload  );
+        ProcessTemplate(PatternButtonFilePlayNow   );
+        ProcessTemplate(PatternButtonFileAdd       );
+        ProcessTemplate(PatternButtonFileAddNext   );
+        ProcessTemplate(PatternButtonFileMoveUp    );
+        ProcessTemplate(PatternButtonFileMoveDown  );
+        ProcessTemplate(PatternButtonFileDelete    );
+        ProcessTemplate(PatternButtonFileVote      );
+        // The PLAYER page
+        ProcessTemplate(PatternItemPlayer          );
+        ProcessTemplate(PatternPlayerPage          );
+        // The PLAYLIST page
+        ProcessTemplate(PatternPlaylistPage        );
+        ProcessTemplate(PatternItemPlaylist        );
+        // The PLAYLIST DETAILS page
+        ProcessTemplate(PatternPlaylistDetailsPage );
+        ProcessTemplate(PatternItemPlaylistDetails );
+        // The LIBRARY page
+        ProcessTemplate(PatternSearchPage          );
+        ProcessTemplate(PatternSearchResultPage    );
+        ProcessTemplate(PatternItemSearchlist      );
+        ProcessTemplate(PatternItemBrowseArtist    );
+        ProcessTemplate(PatternItemBrowseAlbum     );
+        ProcessTemplate(PatternItemBrowseGenre     );
+        // The LIBRARY DETAILS page
+        ProcessTemplate(PatternSearchDetailsPage   );
+        ProcessTemplate(PatternItemSearchDetails   );
+        // The ERROR page
+        ProcessTemplate(PatternErrorPage           );
+        ProcessTemplate(PatternNoFilesHint         );
+end;
+
 procedure TNempWebServer.ClearHelperLists;
 var i: Integer;
 begin
@@ -2011,8 +2070,10 @@ begin
             IdHTTPServer1.Bindings.Clear;
             IdHTTPServer1.DefaultPort := Port;
 
-            LoadTemplates(True);
+            LoadTemplates(True);    // DO NOT SWAP THESE LINES !!
             LoadTemplates(False);
+
+            TemplateFallback;
 
 
             IdHTTPServer1.Active := True;
