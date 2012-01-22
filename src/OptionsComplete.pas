@@ -551,6 +551,7 @@ type
     procedure BtnClearCoverCacheClick(Sender: TObject);
     procedure BtnRefreshDevicesClick(Sender: TObject);
     procedure EdtUsernameAdminKeyPress(Sender: TObject; var Key: Char);
+    procedure BtnShowWebserverLogClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -596,7 +597,8 @@ var
 
 implementation
 
-uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo;
+uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
+  WebServerLog;
 
 {$R *.dfm}
 
@@ -3258,6 +3260,13 @@ begin
     end;
 end;
 
+
+procedure TOptionsCompleteForm.BtnShowWebserverLogClick(Sender: TObject);
+begin
+    if not assigned(WebServerLogForm) then
+        Application.CreateForm(TWebServerLogForm, WebServerLogForm);
+    WebServerLogForm.Show;
+end;
 
 procedure TOptionsCompleteForm.EdtUsernameAdminKeyPress(Sender: TObject;
   var Key: Char);

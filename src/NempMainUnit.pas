@@ -820,6 +820,9 @@ type
     PM_P_Wizard: TMenuItem;
     PM_PlayCDAudio: TMenuItem;
     PM_PL_AddCDAudio: TMenuItem;
+    PM_W_WebServerShowLog: TMenuItem;
+    MM_T_WebServerShowLog: TMenuItem;
+    PM_P_WebServerShowLog: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1380,6 +1383,7 @@ type
     procedure MM_O_WizardClick(Sender: TObject);
     procedure PM_PlayCDAudioClick(Sender: TObject);
     procedure PM_PL_AddCDAudioClick(Sender: TObject);
+    procedure PM_W_WebServerShowLogClick(Sender: TObject);
 
   private
 
@@ -1569,7 +1573,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
-  CDOpenDialogs;
+  CDOpenDialogs, WebServerLog;
 
 
 {$R *.dfm}
@@ -7813,6 +7817,13 @@ end;
 procedure TNemp_MainForm.PM_TNA_RestoreClick(Sender: TObject);
 begin
   RestoreNemp;
+end;
+
+procedure TNemp_MainForm.PM_W_WebServerShowLogClick(Sender: TObject);
+begin
+    if not assigned(WebServerLogForm) then
+        Application.CreateForm(TWebServerLogForm, WebServerLogForm);
+    WebServerLogForm.Show;
 end;
 
 procedure TNemp_MainForm.AnzeigeBTNMouseDown(Sender: TObject; Button: TMouseButton;

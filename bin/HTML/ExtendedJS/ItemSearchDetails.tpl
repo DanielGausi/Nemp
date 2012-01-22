@@ -16,9 +16,10 @@ Filetype: {{Filetype}} <br />
 </div>
 
 <div class="controls">
-	{{BtnFileDownload}}	
-	{{BtnFilePlayNow}}	
-	{{BtnFileAdd}}
+	{{BtnFileDownload}}	<br />
+	{{BtnFileVote}}	<br />
+	{{BtnFilePlayNow}}	<br />
+	{{BtnFileAdd}}	<br />
 	{{BtnFileAddNext}}
 </div>
 
