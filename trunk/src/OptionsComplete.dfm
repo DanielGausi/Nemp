@@ -4279,6 +4279,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 25
           Caption = 'Show Log'
           TabOrder = 7
+          OnClick = BtnShowWebserverLogClick
         end
       end
       object GrpBoxIP: TGroupBox

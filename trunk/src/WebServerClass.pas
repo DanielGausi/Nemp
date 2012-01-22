@@ -189,10 +189,6 @@ type
           PatternButtonFileAddnext  : TDoubleString;
           PatternButtonFileVote     : TDoubleString;
 
-          PatternButtonSuccess      : TDoubleString;
-          PatternButtonFail         : TDoubleString;
-
-
           PatternMenu : TDoubleString;
           PatternBrowseMenu : TDoubleString;
           PatternPagination : TDoubleString;
@@ -212,7 +208,7 @@ type
           PatternItemPlaylistDetails : TDoubleString; // the item on the Detail-Page
 
           PatternSearchPage: TDoubleString;
-          PatternSearchResultPage: TDoubleString;
+          //PatternSearchResultPage: TDoubleString;
           PatternItemSearchlist: TDoubleString;  // one item on the SEARCHLIST page
 
           PatternSearchDetailsPage : TDoubleString;
@@ -1685,9 +1681,6 @@ begin
         PatternButtonPrev[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlPrev.tpl'));
         PatternButtonStop[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnControlStop.tpl'));
 
-        PatternButtonSuccess[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnSuccess.tpl'));
-        PatternButtonFail[isAdmin]    := trim(GetTemplate(fLocalDir + 'BtnFail.tpl'));
-
         // Buttons for File-Handling
         PatternButtonFileDownload[isAdmin] := trim(GetTemplate(fLocalDir + 'BtnFileDownload.tpl'));
         PatternButtonFilePlayNow[isAdmin]  := trim(GetTemplate(fLocalDir + 'BtnFilePlayNow.tpl'));
@@ -1712,7 +1705,7 @@ begin
 
         // The LIBRARY page
         PatternSearchPage[isAdmin]       := GetTemplate(fLocalDir + 'PageLibrary.tpl');
-        PatternSearchResultPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
+        //PatternSearchResultPage[isAdmin] := GetTemplate(fLocalDir + 'PageLibrarySearchResults.tpl');
         PatternItemSearchlist[isAdmin]   := GetTemplate(fLocalDir + 'ItemSearchResult.tpl');
 
         PatternItemBrowseArtist[isAdmin] := GetTemplate(fLocalDir + 'ItemBrowseArtist.tpl');
@@ -1755,8 +1748,6 @@ begin
         ProcessTemplate(PatternButtonNext     );
         ProcessTemplate(PatternButtonPrev     );
         ProcessTemplate(PatternButtonStop     );
-        ProcessTemplate(PatternButtonSuccess  );
-        ProcessTemplate(PatternButtonFail     );
         // Buttons for File-Handling
         ProcessTemplate(PatternButtonFileDownload  );
         ProcessTemplate(PatternButtonFilePlayNow   );
@@ -1777,7 +1768,7 @@ begin
         ProcessTemplate(PatternItemPlaylistDetails );
         // The LIBRARY page
         ProcessTemplate(PatternSearchPage          );
-        ProcessTemplate(PatternSearchResultPage    );
+        //ProcessTemplate(PatternSearchResultPage    );
         ProcessTemplate(PatternItemSearchlist      );
         ProcessTemplate(PatternItemBrowseArtist    );
         ProcessTemplate(PatternItemBrowseAlbum     );
@@ -1954,7 +1945,7 @@ begin
             if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Genre, currentGenre) then
             begin
                 if (trim(currentGenre) <> '')
-                  and (currentGenre <> 'Other')
+                  // and (currentGenre <> 'Other')
                   and ( not ( (length(currentGenre) <= 5) and CharinSet(trim(currentGenre)[1], ['0'..'9', '('] ) ))
                 then
                 begin
@@ -2156,8 +2147,7 @@ procedure TNempWebServer.logQuery(AContext: TIdContext; ARequestInfo: TIdHTTPReq
 var logstr: String;
 begin
     logstr := DateTimeToStr(Now, fLocalFormatSettings) + ', ' + AContext.Binding.PeerIP + ', ' +
-         (aRequestInfo.Document) + ', ' + trim((aRequestInfo.Params.Text));
-
+         (aRequestInfo.Document) + ', ' + trim((aRequestInfo.Params.CommaText));
     case permit of
         qrError: logstr := logstr + ' (Error)';
         qrPermit: ;
@@ -2502,11 +2492,11 @@ var queriedAction: String;
                 SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, newID);
 
             if NOT DoPlay then
-                AResponseInfo.ContentStream := BuildStream(UTF8String(PatternButtonSuccess[isAdmin]));
+                AResponseInfo.ContentStream := BuildStream(UTF8String('ok'));
         end
         else
         begin
-
+            AResponseInfo.ContentStream := BuildStream(UTF8String('invalid parameter'));
             result := qrInvalidParameter;
         end;
         LeaveCriticalSection(CS_AccessLibrary);
@@ -2950,9 +2940,9 @@ var //ms: TMemoryStream;
     fn: UnicodeString;
     queriedAction: String;
     isAdmin: Boolean;
-    UserLoginOK, AdminLoginOK: Boolean;
+    UserLoginOK, AdminLoginOK, DoLog: Boolean;
 begin
-
+    DoLog := True;
     if ValidIP(AContext.Binding.PeerIP, AContext.Binding.IP) then
     begin
         RequestedDocument := aRequestInfo.Document;
@@ -2998,7 +2988,11 @@ begin
         else
         if RequestedDocument = '/playercontrol' then permit := ResponseClassicPlayerControl(ARequestInfo, AResponseInfo, isAdmin)
         else
-        if RequestedDocument = '/playercontrolJS' then permit := ResponseJSPlayerControl(ARequestInfo, AResponseInfo, isAdmin)
+        if RequestedDocument = '/playercontrolJS' then begin
+            permit := ResponseJSPlayerControl(ARequestInfo, AResponseInfo, isAdmin);
+            queriedAction := aRequestInfo.Params.Values['action'];
+            DoLog := queriedAction <> 'getprogress';
+        end
         else
         if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo, isAdmin)
         else
@@ -3019,6 +3013,7 @@ begin
                 fn := fLocalDir + StringReplace(RequestedDocument, '/', '\', [rfReplaceAll]);
                 if FileExists(fn) then
                 begin
+                    DoLog := False;
                     try
                         AResponseInfo.ContentStream := TFileStream.Create(fn, fmOpenRead or fmShareDenyWrite);
                         permit := qrPermit;
@@ -3040,7 +3035,8 @@ begin
     end else
         permit := qrDeny;
 
-    logQuery(AContext, aRequestInfo, permit);
+    if DoLog then
+        logQuery(AContext, aRequestInfo, permit);
 end;
 
 

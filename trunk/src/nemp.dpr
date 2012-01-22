@@ -92,7 +92,8 @@ uses
   DeleteHelper in 'DeleteHelper.pas',
   DeleteSelect in 'DeleteSelect.pas' {DeleteSelection},
   CustomizedScrobbler in 'CustomizedScrobbler.pas',
-  Votings in 'Votings.pas';
+  Votings in 'Votings.pas',
+  WebServerLog in 'WebServerLog.pas' {WebServerLogForm};
 
 //,  classes;
 

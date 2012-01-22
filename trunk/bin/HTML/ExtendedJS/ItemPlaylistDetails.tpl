@@ -18,8 +18,10 @@ Position in playlist: {{Index}}
 </div>
 
 <div class="controls">
+{{BtnFileDownload}} <br />
+{{BtnFileVote}}	<br />
 {{BtnFilePlayNow}}
-{{BtnFileDownload}}
+
 </div>
 
 </div>

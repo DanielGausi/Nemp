@@ -170,6 +170,9 @@
 			</DCCReference>
 			<DCCReference Include="CustomizedScrobbler.pas"/>
 			<DCCReference Include="Votings.pas"/>
+			<DCCReference Include="WebServerLog.pas">
+				<Form>WebServerLogForm</Form>
+			</DCCReference>
 			<RcItem Include="playlist_3248_ohneAlpha.ico">
 				<ResourceType>Icon</ResourceType>
 				<ResourceId>Icon_2</ResourceId>

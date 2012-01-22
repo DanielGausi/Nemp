@@ -1,18 +1,21 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 <head>
 	<title>Nemp Webserver</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="viewport" content="width=320">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta name="viewport" content="width=320" />
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="jquery-ui.min.js"></script>
 	<script type="text/javascript" src="nemp.js"></script>
-	<link href="main.css" rel="stylesheet" type="text/css">
-	<link href="jquery-ui.css" rel="stylesheet" type="text/css">	
+	<link href="main.css" rel="stylesheet" type="text/css" />
+	<link href="jquery-ui.css" rel="stylesheet" type="text/css" />	
 	<script type="text/javascript">		
 	
 		var currentProgress=0;
 		var t;
+		var successBtn = "<img src='images/success.png' width='24' height='24' alt='operation: success' />"
+		var failBtn = "<img src='images/fail.png' width='24' height='24' alt='operation: failed' />"
 		
 		$(document).ready(function() {			
 			if ( $("#progress").length > 0 ) {
@@ -105,108 +108,22 @@
 		};
 		
 		function moveup(aID){
-			var $newHtml1;
-			var $newHtml2;
-		
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_moveupcheck", dataType:"text", success: moveup2});
 				
 			function moveup2(data, textStatus, jqXHR) {		
-				
-				function moveup3(data, textStatus, jqXHR) {
-					// store data ...
-					$newHtml1 = data;
-					// ... and load second element
-					$.ajax({url:"playlistcontrolJS?id="+$domID.substr(2)+"&action=loaditem", dataType:"text", success: moveup4});					
-				}
-				
-				function moveup4(data, textStatus, jqXHR) {
-					$newHtml2 = data;					
-					// both new parts are loaded - swap them
-					var	$currentDOM = $("#js"+aID);
-					var	$prevDOM = $("#js"+aID).prev();					
-					$currentDOM[0].outerHTML = $newHtml2;
-					$prevDOM[0].outerHTML = $newHtml1;
-				}
-			
-				if (data == "-1") {
-					// moveup of a Prebooklist-Item. reloading playlist is recommended
-					reloadplaylist();
-				} else
-				{
-				if (data == "-2") {
-					// moveup of first item, no further action required
-					alert("Item ist schon ganz oben");					
-				} else
-				{
-					// check, whether previous element in NEMP has the same ID as the
-					// previous element in DOM
-					var $domID = $("#js"+aID).prev().attr("id");
-					var $nempID = "js"+data;
-					
-					if ($domID == $nempID) {
-						// load first new element
-						$.ajax({url:"playlistcontrolJS?id="+aID+"&action=loaditem", dataType:"text", success: moveup3});
-					}
-					else {
-						//alert("reload");					
-						reloadplaylist();						
-					}
-				}}
-			}
-			
+				// moveup of a Prebooklist-Item. reloading playlist is recommended
+				reloadplaylist();
+			}		
 		};
 		
-		
-		
-		function movedown(aID){
-			var $newHtml1;
-			var $newHtml2;
-		
+		function movedown(aID){	
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_movedowncheck", dataType:"text", success: movedown2});
 				
 			function movedown2(data, textStatus, jqXHR) {		
-				
-				function movedown3(data, textStatus, jqXHR) {
-					// store data ...
-					$newHtml1 = data;
-					// ... and load second element
-					$.ajax({url:"playlistcontrolJS?id="+$domID.substr(2)+"&action=loaditem", dataType:"text", success: movedown4});					
-				}
-				
-				function movedown4(data, textStatus, jqXHR) {
-					$newHtml2 = data;					
-					// both new parts are loaded - swap them
-					var	$currentDOM = $("#js"+aID);
-					var	$prevDOM = $("#js"+aID).next();					
-					$currentDOM[0].outerHTML = $newHtml2;
-					$prevDOM[0].outerHTML = $newHtml1;
-				}
-			
-				if (data == "-1") {
+								
 					// movedown of a Prebooklist-Item. reloading playlist is recommended
 					reloadplaylist();
-				} else
-				{
-				if (data == "-2") {
-					// movedown of lasst item, no further action required
-					alert("Item ist schon ganz unten");					
-				} else
-				{
-					// check, whether previous element in NEMP has the same ID as the
-					// previous element in DOM
-					var $domID = $("#js"+aID).next().attr("id");
-					var $nempID = "js"+data;
-					
-					if ($domID == $nempID) {
-						// load first new element
-						$.ajax({url:"playlistcontrolJS?id="+aID+"&action=loaditem", dataType:"text", success: movedown3});
-					}
-					else {
-						//alert("reload");					
-						reloadplaylist();
-					}
-				}}
-			}			
+			}
 		};
 		
 		function filedelete(aID){
@@ -224,17 +141,43 @@
 		
 		function addnext(aID){
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_addnext", dataType:"text", success: fileaddnext2});
-			function fileaddnext2(data, textStatus, jqXHR){				
-					$("#btnAddNext"+aID)[0].outerHTML = data;
+			function fileaddnext2(data, textStatus, jqXHR){						
+				if (data == "ok") { 
+					$("#btnAddNext"+aID).html(successBtn); } 
+				else {
+					$("#btnAddNext"+aID).html(failBtn); }
+				$("#btnAddNext"+aID).removeAttr('onclick');
 				}
 		}
 		
 		function add(aID){
 			$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_add", dataType:"text", success: fileadd2});
 			function fileadd2(data, textStatus, jqXHR){
-				$("#btnAdd"+aID)[0].outerHTML = data;
+				if (data == "ok") { 
+					$("#btnAdd"+aID).html(successBtn); } 
+				else {
+					$("#btnAdd"+aID).html(failBtn); }
+				$("#btnAdd"+aID).removeAttr('onclick');
 			}
-		};
+		}
+		
+		function vote(aID){
+				$.ajax({url:"playlistcontrolJS?id="+aID+"&action=file_vote", dataType:"html", success: votereply});
+				
+				function votereply(data, textStatus, jqXHR){
+					if (data == "ok") { 
+						if ( $("#playlist").length > 0 ) {reloadplaylist();}
+						else // replace ID with Success-button
+							{ 
+							$("#btnVote"+aID).html(successBtn);
+							$("#btnVote"+aID).removeAttr('onclick');
+							}
+						} 
+					else if (data == "already voted") { alert("You can't vote for the same file that fast again."); }
+					else if (data == "spam") { alert("Don't you think you liked enough files for now? - Voting not accepted."); }
+					else if (data == "exception") { alert("Failure. Please reload.");}
+				}
+		}
 		
 		
 	</script>

@@ -7,8 +7,9 @@ body {
 	background-color: #202020;
     font-size: 0.83em;
 	color: #dddddd;    	
-    max-width: 500px;
-    min-width: 240px;
+    //max-width: 500px;
+    //min-width: 240px;
+	width: 360px;
 	padding-bottom: 10px;
 	margin-bottom: 10px;
 	border-bottom: 1px solid #404040;

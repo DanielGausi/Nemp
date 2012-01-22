@@ -1,1 +1,0 @@
-<a class="button btnfail" title="Failed. Please reload the page and try again."><img src="images/fail.png" width="24" height="24" alt="operation: failed" /></a>
