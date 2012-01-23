@@ -279,7 +279,7 @@ type
           function ResponseClassicPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
           function ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
-          function ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+          function ResponseClassicPlaylistControl(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 
           function ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
           function ResponsePlaylistDetails (ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
@@ -706,7 +706,7 @@ begin
         if aValue = '' then
             sub := ''
         else
-            sub := '<ul class="charselection"> <li class="genre active">' +  aValue + '</li></ul>';
+            sub := '<ul class="charselection"> <li class="genre active">' +  EscapeHTMLChars(aValue) + '</li></ul>';
     end
     else
     begin
@@ -2352,11 +2352,12 @@ begin
   end;
 end;
 
-function TNempWebServer.ResponseClassicPlaylistControl(ARequestInfo: TIdHTTPRequestInfo;
-    AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
+function TNempWebServer.ResponseClassicPlaylistControl(AContext: TIdContext;
+ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
     queriedID: Integer;
     af: TAudioFile;
+    localVote, localControl: Boolean;
 
     procedure DoRedirect;
     begin
@@ -2367,12 +2368,15 @@ var queriedAction: String;
         AResponseInfo.ContentStream := Nil;
     end;
 begin
-    if AllowRemoteControl or isAdmin then
+    localVote := AllowVotes or isAdmin;
+    localControl := AllowRemoteControl or isAdmin;
+
+    if AllowRemoteControl or isAdmin or AllowVotes then
     begin
         result := qrPermit;
         queriedAction := aRequestInfo.Params.Values['action'];
 
-        if queriedAction = 'file_playnow' then
+        if (queriedAction = 'file_playnow') and localControl then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) > 0 then
@@ -2382,9 +2386,18 @@ begin
                 result := qrPermit;
             end else
                 result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin)
-        end
-        else
-        if queriedAction = 'file_add' then
+        end;
+        if (queriedAction = 'file_vote') and localVote then
+        begin
+            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+            case Votemachine.ProcessVote(queriedID, AContext.Binding.PeerIP) of
+                vr_Success            : begin result := qrPermit; DoRedirect; end;
+                vr_TotalVotesExceeded : begin result := qrDeny;   DoRedirect; end;
+                vr_FileVotesExceeded  : begin result := qrDeny;   DoRedirect; end;
+                vr_Exception          : result := HandleError(AResponseInfo, qrError, isAdmin);
+            end;
+        end;
+        if (queriedAction = 'file_add') and localControl then
         begin
             EnterCriticalSection(CS_AccessLibrary);
             result := qrPermit;
@@ -2401,7 +2414,7 @@ begin
             end;
             LeaveCriticalSection(CS_AccessLibrary);
         end;
-        if queriedAction = 'file_addnext' then
+        if (queriedAction = 'file_addnext') and localControl then
         begin
             EnterCriticalSection(CS_AccessLibrary);
             result := qrPermit;
@@ -2418,7 +2431,7 @@ begin
             end;
             LeaveCriticalSection(CS_AccessLibrary);
         end;
-        if queriedAction = 'file_moveup' then
+        if (queriedAction = 'file_moveup') and localControl then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID) >= 1 then
@@ -2429,7 +2442,7 @@ begin
             end else
                 result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end;
-        if queriedAction = 'file_movedown' then
+        if (queriedAction = 'file_movedown') and localControl then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID) >= 1 then
@@ -2440,7 +2453,7 @@ begin
             end else
                 result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
         end;
-        if queriedAction = 'file_delete' then
+        if (queriedAction = 'file_delete') and localControl then
         begin
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) > 0 then
@@ -2549,7 +2562,7 @@ begin
         end;
 
 
-        if (queriedAction = 'file_moveupcheck') and localControl then
+        if (queriedAction = 'file_moveup') and localControl then
         begin
             requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
@@ -2567,7 +2580,7 @@ begin
             result := qrPermit;
         end;
 
-        if (queriedAction = 'file_movedowncheck') and localControl then
+        if (queriedAction = 'file_movedown') and localControl then
         begin
             requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
@@ -2994,7 +3007,7 @@ begin
             DoLog := queriedAction <> 'getprogress';
         end
         else
-        if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(ARequestInfo, AResponseInfo, isAdmin)
+        if RequestedDocument = '/playlistcontrol' then permit := ResponseClassicPlaylistControl(AContext, ARequestInfo, AResponseInfo, isAdmin)
         else
         if RequestedDocument = '/playlistcontrolJS' then permit := ResponseJSPlaylistControl(AContext, ARequestInfo, AResponseInfo, isAdmin)
         else
