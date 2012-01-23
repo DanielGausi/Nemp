@@ -1,1 +1,0 @@
-<a class="button" href="playlistcontrol?id={{ID}}&action={{Action}}"><img src="images/addnext.png" width="24" height="24" alt="add next" />Insert after current title</a>

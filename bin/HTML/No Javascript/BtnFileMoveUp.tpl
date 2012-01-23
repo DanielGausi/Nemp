@@ -1,0 +1,1 @@
+<a class="button" href="playlistcontrol?id={{ID}}&amp;action=file_moveup" title="Move this title one position upwards"><img src="images/move-up.png" width="24" height="24" alt="move up"></a>
