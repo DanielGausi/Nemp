@@ -1,1 +1,0 @@
-<div class="warning">No results for "{{Value}}" found.</div>

@@ -144,7 +144,7 @@ div.playlistitem .cover {
 	vertical-align: top;
 }
 div.playlistitem .controls{
-	width: 25px;
+	width: 96px;
 }
 div.playlistitem .index{
 	width: 25px;
@@ -152,7 +152,7 @@ div.playlistitem .index{
 	text-align:right;	
 }
 div.playlistitem .title{
-	width: 241px;
+	width: 170px;
 	padding-left: 3px;
 }
 div.playlistitem .cover{
@@ -191,10 +191,10 @@ div.libraryitem .cover {
 	vertical-align: top;
 }
 div.libraryitem .controls{
-	width: 30px;
+	width: 74px;
 }
 div.libraryitem .title{
-	width: 265px;
+	width: 220px;
 	padding-left: 3px;
 }
 div.libraryitem .cover{
@@ -215,12 +215,23 @@ div.currentimage {
 div.progresscontainer{	
 	padding:10px 20px;
 }
-
+div.volumecontainer{
+	width: 60px;
+	float: left;
+	height: 40px;
+	padding-left: 10px;
+}
+#playercontrol{
+		float: left;
+		height: 40px;
+		width: 200px;
+		margin-left: 30px;
+}
 .playercontrol {
 	padding-bottom: 10px;	
 	text-align: center;
 	border-bottom: 1px solid #404040;
-	height: 40px;
+	height: 70px;
 	width: 360px;
 	position: relative;	
 }

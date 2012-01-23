@@ -1,1 +1,0 @@
-<span class="tagcloud" style="font-size:{{Font}};"><a href="{{Link}}" title="Show all {{Count}} {{Value}}-Tracks.">{{Value}}</a></span>
