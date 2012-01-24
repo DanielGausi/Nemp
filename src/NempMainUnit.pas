@@ -2367,7 +2367,7 @@ begin
 end;
 
 procedure TNemp_MainForm.HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
-var newnode: PVirtualNode;
+// var newnode: PVirtualNode;
 begin
   if Mode = PLAYER_PLAY_FILES then
     NempPlaylist.ClearPlaylist;
@@ -2377,7 +2377,7 @@ begin
   else
     NempPlaylist.InsertNode := NIL;
 
-  newnode := NempPlaylist.InsertFileToPlayList(filename);
+  {newnode := }NempPlaylist.InsertFileToPlayList(filename);
   // DONT - Most users dont get it ;-)  if Mode=PLAYER_PLAY_NEXT then
   // DONT - Most users dont get it ;-)      NempPlaylist.AddNodeToPrebookList(newnode);
 
@@ -9384,7 +9384,7 @@ begin
 end;
 
 procedure TNemp_MainForm.BtnHeadsetToPlaylistClick(Sender: TObject);
-var tmp: PvirtualNode;
+//var tmp: PvirtualNode;
 begin
     if assigned(NempPlayer.HeadSetAudioFile) then
     begin
@@ -9403,7 +9403,7 @@ begin
             2: begin
                 // enqueue (in th prebook-list)
                 NempPlaylist.GetInsertNodeFromPlayPosition;
-                tmp := NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+                {tmp := }NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
                 // DONT - Most users dont get it ;-)  NempPlaylist.AddNodeToPrebookList(tmp);
             end;
             3: begin
