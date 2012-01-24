@@ -502,7 +502,7 @@ begin
         AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , True);
         AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
         Port                := Ini.ReadInteger('Remote', 'Port', 80);
-        Theme               := Ini.ReadString('Remote', 'Theme' , 'Party');
+        Theme               := Ini.ReadString('Remote', 'Theme' , 'Default');
         UsernameU           := Ini.ReadString('Remote', 'UsernameU', 'user'  );
         PasswordU           := Ini.ReadString('Remote', 'PasswordU', 'pass'   );
         UsernameA           := Ini.ReadString('Remote', 'UsernameA', 'master'  );
@@ -1002,7 +1002,7 @@ var menu: String;
 begin
     menu := MainMenu(aPage, isAdmin);
     result := StringReplace(PatternErrorPage[isAdmin], '{{Menu}}', menu, [rfreplaceAll]);
-    result := StringReplace(result, '{{message}}', aErrorMessage, [rfreplaceAll]);
+    result := StringReplace(result, '{{ErrorMessage}}', aErrorMessage, [rfreplaceAll]);
 end;
 
 
@@ -1845,7 +1845,7 @@ begin
                 end; // otherwise: Do not add this artist at all
                 // start counting again
                 currentArtist := TAudioFile(fWebMedienBib[i]).Artist;
-                currentCoverID := '';
+                currentCoverID := '';   hier coverid richtig setze???
                 c := 1;
             end else
             begin
@@ -1903,7 +1903,7 @@ begin
                 end; // otherwise do not add this album
                 // start counting again
                 currentAlbum := TAudioFile(fWebMedienBib[i]).Album;
-                currentCoverID := '';
+                currentCoverID := '';           hier cover id richtig setzen ???
                 c := 1;
             end else
             begin
@@ -2239,7 +2239,7 @@ begin
         begin
             aProgress := SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_GETPROGRESS, 0);
             ms := TMemoryStream.Create;
-            html := IntToStr(aProgress);
+            html := UTF8String(IntToStr(aProgress));
             ms.Write(html[1], length(html));
             AResponseInfo.ContentStream := ms;
         end else
@@ -2247,7 +2247,7 @@ begin
         begin
             aVolume := SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_GETVOLUME, 0);
             ms := TMemoryStream.Create;
-            html := IntToStr(aVolume);
+            html := UTF8String(IntToStr(aVolume));
             ms.Write(html[1], length(html));
             AResponseInfo.ContentStream := ms;
         end
@@ -2314,7 +2314,6 @@ var queriedAction, queriedValue: String;
 begin
   if AllowRemoteControl or isAdmin then
   begin
-      result := qrPermit;
       queriedAction := aRequestInfo.Params.Values['action'];
       if queriedAction = 'stop' then SendMessage(fMainWindowHandle, WM_COMMAND, NEMP_BUTTON_STOP, 0)
       else
@@ -2341,7 +2340,7 @@ begin
       begin
           queriedValue := aRequestInfo.Params.Values['value'];
           aVolume := StrToIntDef(queriedValue, -1);
-          if aProgress <> -1 then
+          if aVolume <> -1 then
               SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETVolume, aVolume);
       end;
 
