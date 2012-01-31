@@ -72,9 +72,8 @@ end;
 function LoadSettings: Boolean;
 var i, s: Integer;
     ini: TMemIniFile;
-    // tmpLastExitOK: boolean;
     aMenuItem: TMenuItem;
-    tmpwstr: UnicodeString;
+    tmpwstr, g15path: UnicodeString;
 begin
     UpdateSplashScreen(SplashScreen_LoadingPreferences);
     with Nemp_MainForm do
@@ -90,8 +89,9 @@ begin
             if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
                 Uselanguage(NempOptions.Language);
 
-            if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
-                shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp + '"'),'autostart', Nil, sw_hide);
+            g15path := ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp;
+            if (NempOptions.DisplayApp <> '') and FileExists(g15Path) then
+                shellexecute(Handle,'open',pchar('"' + g15Path + '"'),'autostart', Nil, sw_hide);
 
             //Player-Einstellungen lesen
             NempPlayer.LoadFromIni(Ini);

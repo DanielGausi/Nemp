@@ -869,12 +869,17 @@ begin
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
 
     result := StringReplace(result, '{{Votes}}'    , EscapeHTMLChars(IntToStr(af.VoteCounter)) , [rfReplaceAll]);
+    result := StringReplace(result, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
 
     if af.VoteCounter = 0 then
         result := StringReplace(result, '{{VoteClass}}', 'hidden', [rfReplaceAll])
     else
         result := StringReplace(result, '{{VoteClass}}', 'votes' , [rfReplaceAll]);
 
+    if af.PrebookIndex > 0 then
+        result := Stringreplace(result, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
+    else
+        result := Stringreplace(result, '{{PrebookClass}}', 'hidden', [rfReplaceAll]);
 
     if af.Artist = '' then
         result := StringReplace(result, '{{ArtistClass}}', 'hidden', [rfReplaceAll])
@@ -1093,13 +1098,6 @@ begin
             // create new Item
             Item := PatternItemPlaylist[isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
-
-            if af.PrebookIndex > 0 then
-                Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
-            else
-                Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
-            Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
-
             Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
 
             // Set "Current" class
@@ -1122,12 +1120,6 @@ begin
             af := TAudioFile(aNempPlayList.Playlist[aIdx]);
             Item := PatternItemPlaylist[isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(aIdx + 1)         , [rfReplaceAll]);
-
-            if af.PrebookIndex > 0 then
-                Item := Stringreplace(Item, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
-            else
-                Item := Stringreplace(Item, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
-            Item := StringReplace(Item, '{{PrebookIndex}}', IntToStr(af.PrebookIndex) , [rfReplaceAll]);
 
             Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
 
@@ -1159,11 +1151,6 @@ begin
 
         FileData := PatternItemPlaylistDetails[isAdmin];
         FileData := StringReplace(FileData, '{{Index}}' , IntToStr(aIdx + 1)              , [rfReplaceAll]);
-        if aAudioFile.PrebookIndex > 0 then
-            FileData := Stringreplace(FileData, '{{PrebookClass}}', 'prebook', [rfReplaceAll])
-        else
-            FileData := Stringreplace(FileData, '{{PrebookClass}}', 'noprebook', [rfReplaceAll]);
-        FileData := StringReplace(FileData, '{{PrebookIndex}}', IntToStr(aAudioFile.PrebookIndex) , [rfReplaceAll]);
 
         FileData := StringReplace(FileData, '{{ID}}'    , IntToStr(aAudioFile.WebServerID), [rfReplaceAll]);
         FileData := fSetBasicFileData(aAudioFile, FileData, '');
@@ -1845,7 +1832,7 @@ begin
                 end; // otherwise: Do not add this artist at all
                 // start counting again
                 currentArtist := TAudioFile(fWebMedienBib[i]).Artist;
-                currentCoverID := '';   hier coverid richtig setze???
+                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
                 c := 1;
             end else
             begin
@@ -1903,7 +1890,7 @@ begin
                 end; // otherwise do not add this album
                 // start counting again
                 currentAlbum := TAudioFile(fWebMedienBib[i]).Album;
-                currentCoverID := '';           hier cover id richtig setzen ???
+                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
                 c := 1;
             end else
             begin
@@ -1930,7 +1917,7 @@ begin
 end;
 
 procedure TNempWebServer.PrepareGenres;
-var currentGenre: String;
+var currentGenre, currentCoverID: String;
     c, i: Integer;
     newEntry: TCountedString;
 begin
@@ -1938,6 +1925,7 @@ begin
     if fWebMedienBib.Count > 0 then
     begin
         currentGenre := TAudioFile(fWebMedienBib[0]).Genre;
+        currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
         c := 1;
 
         for i := 1 to fWebMedienBib.Count - 1 do
@@ -1950,16 +1938,19 @@ begin
                 then
                 begin
                     // insert currentGenre into the Genres-List
-                    newEntry := TCountedString.Create(currentGenre, c, '1');
+                    newEntry := TCountedString.Create(currentGenre, c, currentCoverID);
                     Genres.Add(newEntry);
                 end;
                 // start counting again
                 currentGenre := TAudioFile(fWebMedienBib[i]).Genre;
+                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
                 c := 1;
             end else
             begin
                 // just count this file to the current-Artist-Count
                 inc(c);
+                if currentCoverID = '' then
+                    currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
             end;
         end;
         newEntry := TCountedString.Create(currentGenre, c, '1');
