@@ -823,6 +823,7 @@ type
     PM_W_WebServerShowLog: TMenuItem;
     MM_T_WebServerShowLog: TMenuItem;
     PM_P_WebServerShowLog: TMenuItem;
+    BtnHeadsetPlaynow: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1384,6 +1385,7 @@ type
     procedure PM_PlayCDAudioClick(Sender: TObject);
     procedure PM_PL_AddCDAudioClick(Sender: TObject);
     procedure PM_W_WebServerShowLogClick(Sender: TObject);
+    procedure BtnHeadsetPlaynowClick(Sender: TObject);
 
   private
 
@@ -9414,6 +9416,13 @@ begin
         end;
     end;
 end;
+
+procedure TNemp_MainForm.BtnHeadsetPlaynowClick(Sender: TObject);
+begin
+    if assigned(NempPlayer.HeadSetAudioFile) then
+        NempPlaylist.PlayHeadsetFile(NempPlayer.HeadSetAudioFile, NempPlayer.FadingInterval, NempPlayer.HeadsetTime);
+end;
+
 
 procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);
 begin

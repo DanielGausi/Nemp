@@ -201,6 +201,8 @@ type
       procedure Play(aIndex: Integer; aInterval: Integer; Startplay: Boolean; Startpos: Double = 0);
       procedure PlayBibFile(aFile: TAudioFile; aInterval: Integer);
 
+      procedure PlayHeadsetFile(aFile: TAudioFile; aInterval: Integer; aPosition: Double);
+
       procedure PlayNextFile(aUserinput: Boolean = False);
       procedure PlayNext(aUserinput: Boolean = False);
       procedure PlayPrevious(aUserinput: Boolean = False);
@@ -592,6 +594,27 @@ begin
       tid := timeSetEvent(300, 10, @APM, MainWindowHandle, TIME_ONESHOT);
   end;
 
+end;
+
+procedure TNempPlaylist.PlayHeadsetFile(aFile: TAudioFile; aInterval: Integer; aPosition: Double);
+var i: Integer;
+    NewNode: PVirtualNode;
+begin
+    // Get InssertPosition
+    if fPlayingNode <> NIL then
+        InsertNode := fPlayingNode.NextSibling
+    else
+    begin
+        InsertNode := VST.GetFirst;
+        for i := 0 to fPlayingIndex-1 do
+        begin
+            if assigned(InsertNode) then
+                InsertNode := InsertNode.NextSibling;
+        end;
+    end;
+    // Add File to Playlist
+    NewNode := InsertFileToPlayList(aFile);
+    Play(NewNode.Index, Player.FadingInterval, True, aPosition);
 end;
 
 procedure TNempPlaylist.PlayNext(aUserinput: Boolean = False);

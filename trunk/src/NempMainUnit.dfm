@@ -2064,8 +2064,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseDown = SlideBarShapeHeadsetMouseDown
         end
         object VolShapeHeadset: TShape
-          Left = 144
-          Top = 86
+          Left = 166
+          Top = 130
           Width = 6
           Height = 33
           Brush.Color = clGradientActiveCaption
@@ -2135,8 +2135,8 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
         object BtnLoadHeadset: TSkinButton
-          Left = 134
-          Top = 25
+          Left = 150
+          Top = 30
           Width = 24
           Height = 24
           Hint = 'Load selected file into headset (Ctrl+H)'
@@ -2174,8 +2174,8 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
         object VolButtonHeadset: TSkinButton
-          Left = 141
-          Top = 104
+          Left = 163
+          Top = 148
           Width = 12
           Height = 12
           Hint = 'Volume'
@@ -2239,8 +2239,8 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
         object BtnHeadsetToPlaylist: TSkinButton
-          Left = 134
-          Top = 52
+          Left = 150
+          Top = 57
           Width = 24
           Height = 24
           Hint = 'Add current file to playlist'
@@ -2249,6 +2249,25 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 7
           OnClick = BtnHeadsetToPlaylistClick
           OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnHeadsetPlaynow: TSkinButton
+          Left = 150
+          Top = 85
+          Width = 24
+          Height = 24
+          Hint = 'Add file to playlist and begin playback from current position'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          TabOrder = 8
+          OnClick = BtnHeadsetPlaynowClick
           DrawMode = dm_Windows
           NumGlyphsX = 5
           NumGlyphsY = 1
@@ -3975,7 +3994,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D001300D8070E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D001300E8070E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4439,7 +4458,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806F00810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806000910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7377,7 +7396,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800440510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800540510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

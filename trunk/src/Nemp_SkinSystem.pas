@@ -1291,6 +1291,15 @@ begin
                 AssignNemp3Glyph(BtnHeadsetToPlaylist,  Path + '\BtnHeadsetToPlaylist', True);
                 BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
 
+                if FileExists(Path + '\BtnHeadsetPlaynow.bmp')
+                or FileExists(Path + '\BtnHeadsetPlaynow.png')
+                or FileExists(Path + '\BtnHeadsetPlaynow.jpg')
+                then
+                    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnHeadsetPlaynow', True)
+                else
+                    AssignNemp3Glyph(BtnHeadsetPlaynow,  Path + '\BtnPlayPauseHeadset', True);
+                BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
+
                 AssignNemp3Glyph(PlayPauseHeadSetBtn,  Path + '\BtnPlayPauseHeadset', True);
                 PlayPauseHeadSetBtn.GlyphLine := PlayPauseHeadSetBtn.GlyphLine;
 
@@ -2360,6 +2369,14 @@ begin
             BtnHeadsetToPlaylist.NempGlyph.Assign(tmpBitmap);
             BtnHeadsetToPlaylist.GlyphLine := BtnHeadsetToPlaylist.GlyphLine;
             BtnHeadsetToPlaylist.Refresh;
+
+            BtnHeadsetPlaynow .drawMode := dm_Windows;
+            BtnHeadsetPlaynow .NumGlyphs := 1;
+            BtnHeadsetPlaynow .NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnHeadsetPlaynow', True);
+            BtnHeadsetPlaynow.NempGlyph.Assign(tmpBitmap);
+            BtnHeadsetPlaynow.GlyphLine := BtnHeadsetPlaynow.GlyphLine;
+            BtnHeadsetPlaynow.Refresh;
 
             PlayPauseHeadSetBtn .drawMode := dm_Windows;
             PlayPauseHeadSetBtn .NumGlyphs := 1;
