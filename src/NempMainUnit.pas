@@ -7328,7 +7328,7 @@ end;
 procedure TNemp_MainForm.GRPBOXHeadsetClick(Sender: TObject);
 begin
     try
-    FocusControl(VolButtonHeadset);
+        FocusControl(SlidebarButton_Headset);
     except
 
     end;
@@ -7337,15 +7337,21 @@ end;
 procedure TNemp_MainForm.GRPBOXHeadsetMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-    NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume - 1;
-    CorrectVolButton;
+    NempPlayer.HeadsetTime := NempPlayer.HeadsetTime - 1;
+    SlideBarButton_HeadSet.Left := SlideBarShapeHeadset.Left
+          + Round((SlideBarShapeHeadset.Width - SlideBarButton_HeadSet.Width) * NempPlayer.HeadsetProgress);
+    // NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume - 1;
+    // CorrectVolButton;
 end;
 
 procedure TNemp_MainForm.GRPBOXHeadsetMouseWheelUp(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-    NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume + 1;
-    CorrectVolButton;
+    NempPlayer.HeadsetTime := NempPlayer.HeadsetTime + 1;
+    SlideBarButton_HeadSet.Left := SlideBarShapeHeadset.Left
+          + Round((SlideBarShapeHeadset.Width - SlideBarButton_HeadSet.Width) * NempPlayer.HeadsetProgress);
+    // NempPlayer.HeadsetVolume := NempPlayer.HeadsetVolume + 1;
+    // CorrectVolButton;
 end;
 
 procedure TNemp_MainForm.EqualizerButton1EndDrag(Sender, Target: TObject;
@@ -11060,11 +11066,20 @@ end;
 
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
+    //asknomore: Boolean;
 begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
 
 
+//asknomore := False;
+
+  { MessageDlgWithNoMorebox
+              ((AutoScanDirsDialog_Caption),
+               (AutoScanDirsDialog_Text),
+               mtConfirmation, [mbYes, mbNo, mbAbort, mbRetry], 0, 0, asknomore,
+              (AutoScanDirsDialog_ShowAgain));
+   }
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);

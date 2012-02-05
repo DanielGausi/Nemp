@@ -2345,7 +2345,7 @@ end;
 function TNempWebServer.ResponseClassicPlaylistControl(AContext: TIdContext;
 ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
-    queriedID: Integer;
+    queriedID, newID: Integer;
     af: TAudioFile;
     localVote, localControl: Boolean;
 
@@ -2365,94 +2365,146 @@ begin
     begin
         result := qrPermit;
         queriedAction := aRequestInfo.Params.Values['action'];
+        if (queriedAction = 'file_playnow') then
+        begin
+            if localControl then
+            begin
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) > 0 then
+                begin
+                    // todo: Hier ggf. ein result erwarten und auswerten?
+                    DoRedirect;
+                    result := qrPermit;
+                end else
+                begin
+                    // file is not in the playlist yet. add it and sart play.
+                    af := GetAudioFileFromWebServerID(queriedID);
+                    if assigned(af) then
+                    begin
+                        // send Audiofile to Nemp main window/playlist
+                        newID := SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af));
+                        // try to play this file
+                        if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, newID) > 0 then
+                        begin
+                            DoRedirect;
+                            result := qrPermit;
+                        end else
+                            result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                    end else
+                        result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                end
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
+        end;
 
-        if (queriedAction = 'file_playnow') and localControl then
+        if (queriedAction = 'file_vote') then
         begin
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistPlayID, queriedID) > 0 then
+            if localVote then
             begin
-                // todo: Hier ggf. ein result erwarten und auswerten?
-                DoRedirect;
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                case Votemachine.ProcessVote(queriedID, AContext.Binding.PeerIP) of
+                    vr_Success            : begin result := qrPermit; DoRedirect; end;
+                    vr_TotalVotesExceeded : begin result := qrDeny;   DoRedirect; end;
+                    vr_FileVotesExceeded  : begin result := qrDeny;   DoRedirect; end;
+                    vr_Exception          : result := HandleError(AResponseInfo, qrError, isAdmin);
+                end;
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
+        end;
+
+        if (queriedAction = 'file_add') then
+        begin
+            if localControl then
+            begin
+                EnterCriticalSection(CS_AccessLibrary);
                 result := qrPermit;
-            end else
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin)
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                af := GetAudioFileFromWebServerID(queriedID);
+                if assigned(af) then
+                begin
+                    // sende Audiofile an Nemp-Hauptfenster/playlist
+                    SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
+                    DoRedirect;
+                end else // not in bib
+                begin
+                    result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                end;
+                LeaveCriticalSection(CS_AccessLibrary);
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
         end;
-        if (queriedAction = 'file_vote') and localVote then
+        if (queriedAction = 'file_addnext') then
         begin
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            case Votemachine.ProcessVote(queriedID, AContext.Binding.PeerIP) of
-                vr_Success            : begin result := qrPermit; DoRedirect; end;
-                vr_TotalVotesExceeded : begin result := qrDeny;   DoRedirect; end;
-                vr_FileVotesExceeded  : begin result := qrDeny;   DoRedirect; end;
-                vr_Exception          : result := HandleError(AResponseInfo, qrError, isAdmin);
-            end;
-        end;
-        if (queriedAction = 'file_add') and localControl then
-        begin
-            EnterCriticalSection(CS_AccessLibrary);
-            result := qrPermit;
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            af := GetAudioFileFromWebServerID(queriedID);
-            if assigned(af) then
+            if localControl then
             begin
-                // sende Audiofile an Nemp-Hauptfenster/playlist
-                SendMessage(fMainWindowHandle, WM_WebServer, WS_AddToPlaylist, LParam(af));
-                DoRedirect;
-            end else // not in bib
-            begin
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
-            end;
-            LeaveCriticalSection(CS_AccessLibrary);
-        end;
-        if (queriedAction = 'file_addnext') and localControl then
-        begin
-            EnterCriticalSection(CS_AccessLibrary);
-            result := qrPermit;
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            af := GetAudioFileFromWebServerID(queriedID);
-            if assigned(af) then
-            begin
-                // sende Audiofile an Nemp-Hauptfenster/playlist
-                SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af));
-                DoRedirect;
-            end else
-            begin
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
-            end;
-            LeaveCriticalSection(CS_AccessLibrary);
-        end;
-        if (queriedAction = 'file_moveup') and localControl then
-        begin
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID) >= 1 then
-            begin
-                // todo: Hier ggf. ein result erwarten und auswerten?
-                DoRedirect;
+                EnterCriticalSection(CS_AccessLibrary);
                 result := qrPermit;
-            end else
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                af := GetAudioFileFromWebServerID(queriedID);
+                if assigned(af) then
+                begin
+                    // sende Audiofile an Nemp-Hauptfenster/playlist
+                    SendMessage(fMainWindowHandle, WM_WebServer, WS_InsertNext, LParam(af));
+                    DoRedirect;
+                end else
+                begin
+                    result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                end;
+                LeaveCriticalSection(CS_AccessLibrary);
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
         end;
-        if (queriedAction = 'file_movedown') and localControl then
+        if (queriedAction = 'file_moveup') then
         begin
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID) >= 1 then
+            if localControl then
             begin
-                // todo: Hier ggf. ein result erwarten und auswerten?
-                DoRedirect;
-                result := qrPermit;
-            end else
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveUp, queriedID) >= 1 then
+                begin
+                    // todo: Hier ggf. ein result erwarten und auswerten?
+                    DoRedirect;
+                    result := qrPermit;
+                end else
+                    result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
         end;
-        if (queriedAction = 'file_delete') and localControl then
+        if (queriedAction = 'file_movedown') then
         begin
-            queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
-            if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) > 0 then
+            if localControl then
             begin
-                // todo: Hier ggf. ein result erwarten und auswerten?
-                DoRedirect;
-                result := qrPermit;
-            end else
-                result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistMoveDown, queriedID) >= 1 then
+                begin
+                    // todo: Hier ggf. ein result erwarten und auswerten?
+                    DoRedirect;
+                    result := qrPermit;
+                end else
+                    result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
+        end;
+        if (queriedAction = 'file_delete') then
+        begin
+            if localControl then
+            begin
+                queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+                if  SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID) > 0 then
+                begin
+                    // todo: Hier ggf. ein result erwarten und auswerten?
+                    DoRedirect;
+                    result := qrPermit;
+                end else
+                    result := HandleError(AResponseInfo, qrInvalidParameter, isAdmin);
+            end
+            else
+                result := HandleError(AResponseInfo, qrRemoteControlDenied, isAdmin)
         end;
     end else
     begin

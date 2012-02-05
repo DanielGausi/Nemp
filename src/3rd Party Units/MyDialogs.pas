@@ -33,17 +33,61 @@ function MessageDlgWithNoMorebox(const aCaption : string;
 
 implementation
 
-uses Windows, Classes, Controls, stdctrls, sysutils, forms;
+uses Windows, Classes, Controls, stdctrls, sysutils, forms, gnugettext;
 
-{$DEFINE STANDARDCAPTIONS}
+{.$DEFINE STANDARDCAPTIONS}
+
+resourcestring
+  //{.$IFDEF GERMAN}
+ { cmbYes = '&Ja';
+  cmbNo = '&Nein';
+  cmbOK = 'OK';
+  cmbCancel = 'Abbrechen';
+  cmbHelp = '&Hilfe';
+  cmbAbort = '&Abbrechen';
+  cmbRetry = '&Wiederholen';
+  cmbIgnore = '&Ignorieren';
+  cmbAll = '&Alle';
+  cmbNoToAll = 'N&ein für alle';
+  cmbYesToAll = 'Ja für &alle';  }
+  //{.$ELSE}
+  XcmbYes = '&Yes'; //'&Yes';
+  XcmbNo = '&No';
+  XcmbOK = 'OK';
+  XcmbCancel = 'Cancel';
+  XcmbHelp = '&Help';
+  XcmbAbort = '&Abort';
+  XcmbRetry = '&Retry';
+  XcmbIgnore = '&Ignore';
+  XcmbAll = '&All';
+  XcmbNoToAll = 'N&o to All';
+  XcmbYesToAll = 'Yes to &All';
+  //{.$ENDIF}
 
 const { Copied from Dialogs }
   ModalResults : array[TMsgDlgBtn] of integer = (mrYes, mrNo, mrOk,
     mrCancel, mrAbort, mrRetry, mrIgnore, mrAll,
     mrNoToAll, mrYesToAll, 0,0);
 
-var { Filled during unit initialization }
-  ButtonCaptions : array[TMsgDlgBtn] of string;
+var
+  MyButtonCaptions : array[TMsgDlgBtn] of string;
+
+
+procedure InitButtonCaptions;
+begin
+  MyButtonCaptions[mbYes]      := XcmbYes;
+  MyButtonCaptions[mbNo]       := XcmbNo;
+  MyButtonCaptions[mbOK]       := XcmbOK;
+  MyButtonCaptions[mbCancel]   := XcmbCancel;
+  MyButtonCaptions[mbAbort]    := XcmbAbort;
+  MyButtonCaptions[mbRetry]    := XcmbRetry;
+  MyButtonCaptions[mbIgnore]   := XcmbIgnore;
+  MyButtonCaptions[mbAll]      := XcmbAll;
+  MyButtonCaptions[mbNoToAll]  := XcmbNoToAll;
+  MyButtonCaptions[mbYesToAll] := XcmbYesToAll;
+  MyButtonCaptions[mbHelp]     := XcmbHelp;
+end; { InitButtonCaptions }
+
 
   { Convert a modal result to a TMsgDlgBtn code. }
 function ModalResultToBtn(res : TModalResult): TMsgDlgBtn;
@@ -150,6 +194,8 @@ var
   i : integer;
   btn : TButton;
 begin
+    InitButtonCaptions;
+
   with aForm do
   begin
     if Length(aCaption) > 0 then
@@ -163,15 +209,11 @@ begin
         btn.Default := btn.ModalResult = DefButton;
         if btn.Default then
           ActiveControl := Btn;
-        {$IFNDEF STANDARDCAPTIONS}
-        btn.Caption :=
-          ButtonCaptions[ModalResultToBtn(btn.Modalresult)];
-        {$ENDIF}
+        btn.Caption := MyButtonCaptions[ModalResultToBtn(btn.Modalresult)];
       end;
     end; { For }
-    {$IFNDEF STANDARDCAPTIONS}
+
     AdjustButtons(aForm);
-    {$ENDIF}
   end;
 end; { InitMsgForm }
 
@@ -205,11 +247,7 @@ begin { DefMessageDlg }
 end; { DefMessageDlg }
 
 resourcestring
-  {.$IFDEF GERMAN}
-  //AskNoMoreCaption = 'Diesen Dialog nicht mehr anzeigen';
-  {.$ELSE}
   AskNoMoreCaption = 'Don''t show this dialog again';
-  {.$ENDIF}
 
   {-- MessageDlgWithNoMorebox -------------------------------------------}
 {: Creates a MessageDlg with translated button captions and a configurable
@@ -261,50 +299,6 @@ begin { MessageDlgWithNoMorebox }
   end;
 end; { MessageDlgWithNoMorebox }
 
-resourcestring
-  {.$IFDEF GERMAN}
- { cmbYes = '&Ja';
-  cmbNo = '&Nein';
-  cmbOK = 'OK';
-  cmbCancel = 'Abbrechen';
-  cmbHelp = '&Hilfe';
-  cmbAbort = '&Abbrechen';
-  cmbRetry = '&Wiederholen';
-  cmbIgnore = '&Ignorieren';
-  cmbAll = '&Alle';
-  cmbNoToAll = 'N&ein für alle';
-  cmbYesToAll = 'Ja für &alle';  }
-  {.$ELSE}
-  cmbYes = '&Yes';
-  cmbNo = '&No';
-  cmbOK = 'OK';
-  cmbCancel = 'Cancel';
-  cmbHelp = '&Help';
-  cmbAbort = '&Abort';
-  cmbRetry = '&Retry';
-  cmbIgnore = '&Ignore';
-  cmbAll = '&All';
-  cmbNoToAll = 'N&o to All';
-  cmbYesToAll = 'Yes to &All';
-  {.$ENDIF}
 
-procedure InitButtonCaptions;
-begin
-  ButtonCaptions[mbYes] := cmbYes;
-  ButtonCaptions[mbNo] := cmbNo;
-  ButtonCaptions[mbOK] := cmbOK;
-  ButtonCaptions[mbCancel] := cmbCancel;
-  ButtonCaptions[mbAbort] := cmbAbort;
-  ButtonCaptions[mbRetry] := cmbRetry;
-  ButtonCaptions[mbIgnore] := cmbIgnore;
-  ButtonCaptions[mbAll] := cmbAll;
-  ButtonCaptions[mbNoToAll] := cmbNoToAll;
-  ButtonCaptions[mbYesToAll] := cmbYesToAll;
-  ButtonCaptions[mbHelp] := cmbHelp;
-end; { InitButtonCaptions }
-
-
-initialization
-  InitButtonCaptions;
 end.
  
