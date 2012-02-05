@@ -944,7 +944,7 @@ begin
                                   NempWebserver.EnsureFileHasID(af);
 
                                   aMsg.Result := af.WebServerID;
-                                  //result: the new AudioFile-Object
+                                  //result: the ID of the new AudioFile-Object
                               end;
                         end;
         WS_AddToPlaylist : begin
@@ -1649,11 +1649,13 @@ Begin
 
     LangeAktionWeitermachen := True;
 
+    p := PlayListVST.ScreenToClient(Mouse.CursorPos);
+    NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
+    if assigned(NempPlaylist.InsertNode) then
+        NempPlaylist.InsertNode := PlayListVST.GetNextSibling(NempPlaylist.InsertNode);
+
     if (DragSource <> DS_VST) then    // Files kommen von Außerhalb
     begin
-        p := PlayListVST.ScreenToClient(Mouse.CursorPos);
-        NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
-
         ST_Playlist.Mask := GeneratePlaylistSTFilter;
         FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
 
@@ -1703,9 +1705,6 @@ Begin
     end
     else
     begin   // Quelle ist der VST -> in die Playlist einfügen
-        p := PlayListVST.ScreenToClient(Mouse.CursorPos);
-        NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
-
         for idx := 0 to DragDropList.Count - 1 do
             NempPlaylist.InsertFileToPlayList(DragDropList[idx]);
 
