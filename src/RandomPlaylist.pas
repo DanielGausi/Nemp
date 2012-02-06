@@ -35,7 +35,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs,
+  Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs, MyDialogs,
   Menus,   Hilfsfunktionen, AudioFileClass,
   MP3FileUtils, Nemp_ConstantsAndTypes,
   gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls;
@@ -672,7 +672,7 @@ begin
 
   if assigned(DateiListe) and (Dateiliste.Count <= 10) then
   begin
-      if MessageDlg(
+      if TranslateMessageDLG(
           Format((Hint_RandomPlaylist_NotEnoughTitlesFound), [Dateiliste.Count]),
           mtConfirmation, [mbYes, mbNo], 0) = mrYes then
       begin

@@ -44,7 +44,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles,
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs,
 
   Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
   SystemHelper, fldBrows, AudioFileClass, Hilfsfunktionen
@@ -465,7 +465,7 @@ procedure TPlaylistCopyForm.FormCloseQuery(Sender: TObject;
 begin
     if ThreadIsActive then
     begin
-        case MessageDLG((CopyToUSB_AbortQuery), mtWarning, [MBYes, MBNO], 0) of
+        case TranslateMessageDLG((CopyToUSB_AbortQuery), mtWarning, [MBYes, MBNO], 0) of
             mrYes: begin
                 CancelCopy := True;
                 CanClose := True;
@@ -538,28 +538,28 @@ begin
             close;
     end;
     CEXM_PLAYLISTFAILED: begin
-        MessageDlg(Format((CopyToUSB_SavingPlaylistFailed), [pChar(Msg.wParam)] ), mtWarning, [mbOk], 0);
+        TranslateMessageDLG(Format((CopyToUSB_SavingPlaylistFailed), [pChar(Msg.wParam)] ), mtWarning, [mbOk], 0);
     end;
 
     CEXM_ERROR: begin
         // display sme known errors that might occur
         case Integer(Msg.wParam) of
             ERROR_FILE_NOT_FOUND:
-                Msg.Result := Integer(MessageDlg((CopyToUSB_ERROR_FILE_NOT_FOUND), mtError, [mbOk, mbCancel], 0) = mrOK);
+                Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_FILE_NOT_FOUND), mtError, [mbOk, mbCancel], 0) = mrOK);
 
             ERROR_PATH_NOT_FOUND:
-                Msg.Result := Integer(MessageDlg((CopyToUSB_ERROR_PATH_NOT_FOUND), mtError, [mbOk, mbCancel], 0) = mrOK);
+                Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_PATH_NOT_FOUND), mtError, [mbOk, mbCancel], 0) = mrOK);
 
             ERROR_TOO_MANY_OPEN_FILES:
-                Msg.Result := Integer(MessageDlg((CopyToUSB_ERROR_TOO_MANY_OPEN_FILES), mtError, [mbOk, mbCancel], 0) = mrOK);
+                Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_TOO_MANY_OPEN_FILES), mtError, [mbOk, mbCancel], 0) = mrOK);
 
             ERROR_ACCESS_DENIED:
-                Msg.Result := Integer(MessageDlg((CopyToUSB_ERROR_ACCESS_DENIED), mtError, [mbOk, mbCancel], 0) = mrOK);
+                Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_ACCESS_DENIED), mtError, [mbOk, mbCancel], 0) = mrOK);
 
             ERROR_NOT_ENOUGH_MEMORY:
-                Msg.Result := Integer(MessageDlg((CopyToUSB_ERROR_NOT_ENOUGH_MEMORY), mtError, [mbOk, mbCancel], 0) = mrOK);
+                Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_NOT_ENOUGH_MEMORY), mtError, [mbOk, mbCancel], 0) = mrOK);
         else
-            Msg.Result := Integer(MessageDlg( Format(CopyToUSB_ERROR_UNKOWN, [Integer(Msg.wparam)]), mtError, [mbOk, mbCancel], 0) = mrOK);
+            Msg.Result := Integer(TranslateMessageDLG( Format(CopyToUSB_ERROR_UNKOWN, [Integer(Msg.wparam)]), mtError, [mbOk, mbCancel], 0) = mrOK);
         end;
     end;
 
@@ -604,18 +604,18 @@ begin
             if Trim(EditDirectory.Text) = '' then
             begin
                 // note: ForceDirectories will raise an exception with an empty string.
-                MessageDlg(CopyToUSB_ChooseDestination, mtWarning, [mbOk], 0);
+                TranslateMessageDLG(CopyToUSB_ChooseDestination, mtWarning, [mbOk], 0);
                 exit;
             end;
             // check the destination directory
             if Not DirectoryExists(EditDirectory.Text) then
             begin
-                if MessageDlg(CopyToUSB_DestinationDirDoesNotexist, mtConfirmation, [mbYes, mbNo, mbAbort], 0) = mrYes then
+                if TranslateMessageDLG(CopyToUSB_DestinationDirDoesNotexist, mtConfirmation, [mbYes, mbNo, mbAbort], 0) = mrYes then
                 begin
                     if not ForceDirectories(EditDirectory.Text) then
                     begin
                         // Directory couldnt be created. Probably the user entered some crap in the edit
-                        MessageDlg(CopyToUSB_DestinationDirCreateFailed, mtError, [mbOk], 0);
+                        TranslateMessageDLG(CopyToUSB_DestinationDirCreateFailed, mtError, [mbOk], 0);
                         exit;
                     end;
                 end else

@@ -13,7 +13,7 @@ unit MyDialogs;
 
 interface
 
-uses Dialogs;
+uses Windows, Classes, Controls, stdctrls, sysutils, forms, Dialogs;
 
 function DefMessageDlg(const aCaption : string;
   const Msg : string;
@@ -31,9 +31,12 @@ function MessageDlgWithNoMorebox(const aCaption : string;
   var askNoMore : boolean;
   CBCaption: String): integer;
 
+function TranslateMessageDlg(const Msg : string; DlgType : TMsgDlgType;
+    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : integer = mrOK): integer;
+
 implementation
 
-uses Windows, Classes, Controls, stdctrls, sysutils, forms, gnugettext;
+uses gnugettext;
 
 {.$DEFINE STANDARDCAPTIONS}
 
@@ -217,6 +220,33 @@ begin
   end;
 end; { InitMsgForm }
 
+
+procedure InitTranslateMessageDlg(aForm : TForm; helpCtx : longint; DefButton: Integer);
+var
+  i : integer;
+  btn : TButton;
+begin
+    InitButtonCaptions;
+
+    with aForm do
+    begin
+        HelpContext := HelpCtx;
+        for i := 0 to ComponentCount - 1 do
+        begin
+            if Components[i] is TButton then
+            begin
+                btn := TButton(Components[i]);
+                btn.Default := btn.ModalResult = DefButton;
+                if btn.Default then
+                    ActiveControl := Btn;
+                btn.Caption := MyButtonCaptions[ModalResultToBtn(btn.Modalresult)];
+            end;
+        end; { For }
+
+        AdjustButtons(aForm);
+    end;
+end; { InitMsgForm }
+
 {-- DefMessageDlg -----------------------------------------------------}
 {: Creates a MessageDlg with translated button captions and a configurable
    default button and caption.
@@ -297,6 +327,22 @@ begin { MessageDlgWithNoMorebox }
       aForm.Free;
     end;
   end;
+end; { MessageDlgWithNoMorebox }
+
+
+
+function TranslateMessageDlg(const Msg : string; DlgType : TMsgDlgType;
+    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : integer = mrOK): integer;
+var
+  aForm : TForm;
+begin { MessageDlgWithNoMorebox }
+    aForm := CreateMessageDialog(Msg, DlgType, Buttons);
+    try
+      InitTranslateMessageDlg(aForm, helpCtx, DefButton);
+      Result := aForm.ShowModal;
+    finally
+      aForm.Free;
+    end;
 end; { MessageDlgWithNoMorebox }
 
 

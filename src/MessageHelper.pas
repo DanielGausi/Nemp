@@ -33,7 +33,7 @@ unit MessageHelper;
 
 interface
 
-uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs,
+uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs, myDialogs,
     ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper;
 
 
@@ -1221,7 +1221,7 @@ begin
 
       UPDATE_NEWER_VERSION  : begin
                                   // Neue Version: immer anzeigen
-                                  if MessageDlg(
+                                  if TranslateMessageDLG(
                                       NempUpdate_NewerVersion + #13#10#13#10 +
                                       Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
                                       Format(NempUpdate_InfoNewestVersion, [TNempUpdateInfo(aMsg.LParam).StableRelease ])
@@ -1233,7 +1233,7 @@ begin
       UPDATE_TEST_VERSION   : begin
                                   if NempUpdater.NotifyOnBetas then
                                   begin
-                                      if MessageDlg(
+                                      if TranslateMessageDLG(
                                           NempUpdate_TestVersionAvailable + #13#10#13#10 +
                                           Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
                                           Format(NempUpdate_InfoLastRelease, [TNempUpdateInfo(aMsg.LParam).LastRelease, TNempUpdateInfo(aMsg.LParam).ReleaseStatus ]) + #13#10 +
@@ -1260,7 +1260,7 @@ begin
                                   //if NempUpdater.NotifyOnBetas then
                                   //begin
                                   // No. Wenn man schon eine Beta nutzt, werden auch neue gezeigt!
-                                      if MessageDlg(
+                                      if TranslateMessageDLG(
                                           NempUpdate_NewerTestVersionAvailable + #13#10#13#10 +
                                           Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
                                           Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
@@ -1279,7 +1279,7 @@ begin
       UPDATE_PRIVATE_VERSION: begin
                                 if NempUpdater.ManualCheck then
                                 begin
-                                     MessageDlg(
+                                     TranslateMessageDLG(
                                         NempUpdate_PrivateVersion + #13#10#13#10 +
                                         Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
                                         Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
@@ -1354,7 +1354,7 @@ begin
 
             if not NempPlayer.NempScrobbler.IgnoreErrors then
             begin
-                if MessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+                if TranslateMessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
                 begin
                     if Not Assigned(OptionsCompleteForm) then
                         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);

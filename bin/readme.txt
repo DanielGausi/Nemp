@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Dezember 2011
+      Januar 2005 - Februar 2012
 
-      Version: 4.3.1
+      Version: 4.4.0
 
 
 -----------------------------------------------------------
@@ -120,6 +120,44 @@ Verwendete Units/Komponenten:
   http://www.delphipraxis.net
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
+
+
+
+Version 4.4.0, Februar 2012
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+* Stark überarbeiteter Webserver:
+  - Anpassbar in Aussehen und Funktionsumfang durch Themes
+  - Drei vorgefertigte Themes: "Default", "No Javascript" und "Party"
+  - Einfügen, Umsortieren und entfernen von Dateien aus der Playlist
+  - "Voten" für Dateien: Dateien mit vielen Stimmen werden zuerst abgespielt
+  - Browsen in der Medienbibliothek nach Interpret, Album oder Genre
+  - Optional zwei User-Gruppen (user und Admins) mit unterschiedlichen Rechten
+  - Unterstützung von AJAX
+* Neue Funktion: Kopfhörer-Titel in Playlist einfügen und ab aktueller Position
+  abspielen
+
+Änderungen:
+-----------
+* Drag&Drop in die Playlist bewirkt nun ein Einfügen der Titel HINTER den 
+  gewählten Titel, nicht mehr VOR die Markierung.
+* Option "Einfügen ans Ende der Vormerkliste" wieder geändert zu "Einfügen
+  hinter aktuellen Titel". Das mit der Vormerkliste ist zu verwirrend, und 
+  insbesondere in Kombination mit dem Webserver nicht verständlich
+* In der Kopfhörer-Steuerung bewirkt ein Scrollen des Mausrades ein Spulen
+  im Titel, nicht mehr die Lautstärke-Änderung
+
+Bugfix: 
+-------
+* Beim Starten per Doppelklick auf eine Musikdatei wurde die G15-App nicht
+  mit gestartet
+* Das zufällige Sammelcover am Anfang wurde nach dem Zurücksetzen der Suche
+  nicht aktualisiert
+* Die Beschriftungen der Buttons in den Dialogen sind jetzt in der gewählten 
+  Sprache. (Das betrifft nicht die, wo nur ein "OK"-Button ist. Die bleiben 
+  auf "OK", auch wenn das in einer anderen Sprache anders heißen sollte.)
+
 
 
 Version 4.3.1, November 2011
