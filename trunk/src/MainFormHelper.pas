@@ -34,7 +34,7 @@ unit MainFormHelper;
 interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
-    AudioFileClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs;
+    AudioFileClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, MyDialogs;
 
 
 // passt die VCL an die Player-Werte an
@@ -1605,14 +1605,14 @@ begin
         begin
             // User dont want Files to be changed. But this is necessary here.
             // so get a special permission (or cancel the process)
-            if MessageDlg((MediaLibrary_PermissionToChangeTagsRequired)
-               , mtConfirmation, [MBYes, MBNo], 0, MBNo) = mrYes
+            if TranslateMessageDLG((MediaLibrary_PermissionToChangeTagsRequired)
+               , mtConfirmation, [MBYes, MBNo], 0, mrNo) = mrYes
             then
                 result := True
             else
             begin
                 result := False;
-                MessageDlg(MediaLibrary_OperationCancelled, mtInformation, [mbOK], 0);
+                TranslateMessageDLG(MediaLibrary_OperationCancelled, mtInformation, [mbOK], 0);
             end;
         end else
             result := True;

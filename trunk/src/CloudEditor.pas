@@ -35,7 +35,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext,
+  Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs,
 
   AudioFileClass, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls
   ;
@@ -219,7 +219,7 @@ begin
     c := MedienBib.CountInconsistentFiles;
 
     if c > 0 then
-        CanClose := MessageDLG((MediaLibrary_InconsistentFilesWarning), mtWarning, [MBYes, MBNo], 0) = mrYes
+        CanClose := TranslateMessageDLG((MediaLibrary_InconsistentFilesWarning), mtWarning, [MBYes, MBNo], 0) = mrYes
     else
         CanClose := True;
 end;
@@ -946,7 +946,7 @@ begin
         MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
     else
     begin
-        if MessageDLG('Nemp wird nun alle Dateien auf Inkonsistenzen in den ID3Tags untersuchen, '
+        if TranslateMessageDLG('Nemp wird nun alle Dateien auf Inkonsistenzen in den ID3Tags untersuchen, '
           + 'die durch einen Fehler in einer früheren Pre-Alpha-Version verursacht werden konnten.'
           + #13#10+#13#10
           + 'Einen Bericht darüber finden sie danach in der Datei "ID3TagBugFix.log".'

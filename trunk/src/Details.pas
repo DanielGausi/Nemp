@@ -39,7 +39,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, AudioFileClass, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
-  ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, U_CharCode,
+  ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, U_CharCode, myDialogs,
   OggVorbis, Flac, VorbisComments, cddaUtils,
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
@@ -403,7 +403,7 @@ procedure TFDetails.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
     if CurrentFileHasBeenChanged then
     begin
-        case MessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
+        case TranslateMessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
           mrYes   : begin
                 BtnApply.Click;   // save Changes
                 CanClose := True;
@@ -557,7 +557,7 @@ begin
 
         if aErr <> AUDIOERR_None then
         begin
-            MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+            TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
             HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
             exit;
         end;
@@ -588,7 +588,7 @@ begin
         // Correct GUI
         CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
-        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+        TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 procedure TFDetails.BtnUndoClick(Sender: TObject);
 begin
@@ -666,7 +666,7 @@ begin
         // Correct GUI
         CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
-        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+        TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 
 {
@@ -709,7 +709,7 @@ procedure TFDetails.BtnResetRatingClick(Sender: TObject);
 begin
     if CurrentBibCounter > 20 then
     begin
-         if MessageDLG(Format(DetailForm_HighPlayCounter,[CurrentBibCounter]), mtConfirmation, [MBOk, MBCancel], 0, MBCancel)
+         if TranslateMessageDLG(Format(DetailForm_HighPlayCounter,[CurrentBibCounter]), mtConfirmation, [MBOk, MBCancel], 0, mrCancel)
             = mrCancel then EXIT;
     end;
 
@@ -779,7 +779,7 @@ begin
               begin
                   GetDefaultCover(dcNoCover, aCoverBmp, 0);
                   CoverIMAGE.Picture.Bitmap.Assign(aCoverbmp);
-                  MessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
+                  TranslateMessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
               end;
           end;
       finally
@@ -2019,7 +2019,7 @@ begin
   // Hier auch die Abfrage zum Speichern rein
   if (not fForceChange) and CurrentFileHasBeenChanged then
   begin
-      case MessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
+      case TranslateMessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
         mrYes   : BtnApply.Click;   // save Changes
         mrNo    : ;                 // Nothing to do
         mrAbort : Exit;             // Abort showing Details
@@ -2487,7 +2487,7 @@ begin
             try
                 Stream.SaveToFile(saveDialog1.FileName);
             except
-                on E: Exception do MessageDLG(E.Message, mtError, [mbOK], 0);
+                on E: Exception do TranslateMessageDLG(E.Message, mtError, [mbOK], 0);
             end;
         end;
     finally
@@ -2552,13 +2552,10 @@ begin
             TagPostProcessor.LoadFiles;
             s := MedienBib.BibScrobbler.GetTags(af);
             if trim(s) = '' then
-            begin
-                MessageDlg(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
-            end else
-            begin
+                TranslateMessageDLG(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
+            else
                 // process new Tags. Rename, delete ignored and duplicates.
                 af.RawTagLastFM := UTF8String(ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList));
-            end;
             // Show tags of temporary file in teh memo
             Memo_Tags.Text := String(af.RawTagLastFM);
         finally
@@ -2651,11 +2648,11 @@ begin
                 begin
                     if Lyrics.ExceptionOccured then
                         // no connection
-                        MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0)
+                        TranslateMessageDLG(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0)
                     else
                     begin
                         // no lyrics found
-                        if (MessageDlg(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
+                        if (TranslateMessageDLG(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
                             BtnLyricWikiManual.Click;
                     end;
                 end else

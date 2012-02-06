@@ -2,15 +2,10 @@
 <html>
 <head>
 
-
-  
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-
-  
-
-
-  
   <title>Nemp Webserver</title>
+
+
   <style title="" media="" type="text/css">
 .head { margin: 0px;
 padding: 0px;
@@ -31,38 +26,28 @@ font-size: 12px;
 
 <body>
 
-
 <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
-
 
   <tbody>
 
-
     <tr>
-
 
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
-
       <td>
-      
       <h2 class="head">Der Nemp Webserver</h2>
-
 
       </td>
 
-
     </tr>
 
-
-  
   </tbody>
 </table>
 
-
 <hr style="width: 100%; height: 2px;"><br>
 
-Der Nemp Webserver bietet die M&ouml;glichkeit, von einem Browser aus &uuml;ber ein Netzwerk auf den Player zuzugreifen.<br>
+Der Nemp Webserver bietet die M&ouml;glichkeit, von einem Browser
+aus &uuml;ber ein Netzwerk auf den Player zuzugreifen.<br>
 
 <br>
 
@@ -82,27 +67,48 @@ Sie k&ouml;nnen mit dem Webserver&nbsp;<br>
 
   <li>Den aktuellen Titel des Players im Browser sehen</li>
 
-  <li>Den aktuellen Titel herunterladen (z.B. auf das Handy, mit dem Sie Nemp betrachten)</li>
+  <li>Den aktuellen Titel herunterladen (z.B. auf das Handy, mit
+dem Sie Nemp betrachten)</li>
 
   <li>Den Player steuern</li>
 
-  <li>Die Playliste anzeigen lassen und einzelne Titel herunterladen</li>
+  <li>Die Playliste anzeigen lassen und einzelne Titel
+herunterladen</li>
 
   <li>In der Medienbibliothek suchen und Titel herunterladen</li>
 
-  <li>Titel zur Playlist hinzuf&uuml;gen</li>
+  <li>Titel zur Playlist hinzuf&uuml;gen, l&ouml;schen,
+umsortieren</li>
 
 </ul>
 
 Sie k&ouml;nnen f&uuml;r den Zugriff auf den Webserver einen
 Nutzernamen und Passwort eingeben, um Unbefugten den Zugriff zu
 verweigern. <br>
+Es ist auch m&ouml;glich zus&auml;tzlich zu dem User-Zugang einen Administrator-Bereich mit weiteren Funktionen anzulegen.<br>
+<br>
+
+Je nach gew&auml;hltem Theme steht ein unterschiedlich
+gro&szlig;er Funktionsumfang zur Verf&uuml;gung. <br>
+
+<ul style="list-style-type: circle;">
+
+  <li>Im&nbsp;Theme "Default" stehen allen Usern alle Funktionen zur
+Verf&uuml;gung (sofern sie nicht in den User Berechtigungen verweigert
+werden). Dieses Theme verwendet Javascript.&nbsp;</li>
+  <li>Das Theme "No Javascript" bietet allen Usern (fast) alle
+Funktionen, ohne die Verwendung von Javascript. Spulen im aktuellen
+Titel und Lautst&auml;rkeregelung sind ohne Javascript nicht
+m&ouml;glich.</li>
+  <li>Im Theme "Party" gibt es eingeschr&auml;nkte Funktionen f&uuml;r normaler User. Als Administrator hat man vollen Zugriff.</li>
+
+</ul>
+
 
 <br>
 
-<br>
-
-<span style="font-weight: bold;">Zugriff aus dem lokalen Netz</span><br>
+<span style="font-weight: bold;">Zugriff aus dem lokalen
+Netz</span><br>
 
 Geben Sie in ihrem Browser die "Eigene IP (LAN)" ein. Wenn Sie den
 Webserver auf dem Rechner testen wollen, auf dem auch gerade Nemp
@@ -110,8 +116,11 @@ l&auml;uft, verwenden Sie die IP 127.0.0.1. <br>
 
 Die IP-Adresse m&uuml;ssen Sie da eingeben, wo Sie sonst z.B.
 www.gausi.de aufrufen - in der Adresszeile des Browsers. Das Suchfeld
-von Google ist <span style="font-style: italic;">nicht</span> die Adresszeile.<br>
-Wenn Sie nicht den HTTP-Standardport 80 verwenden, m&uuml;ssen Sie den
+von Google ist <span style="font-style: italic;">nicht</span>
+die Adresszeile.<br>
+
+Wenn Sie nicht den HTTP-Standardport 80 verwenden, m&uuml;ssen Sie
+den
 Port mit einem Doppelpunkt abgetrennt angeben, also z.B.
 http://127.0.0.1:12345<br>
 
@@ -119,25 +128,35 @@ http://127.0.0.1:12345<br>
 
 <br>
 
-<span style="font-weight: bold;">Zugriff von au&szlig;erhalb</span><br>
-Wenn Sie Zugriff von au&szlig;erhalb erlauben wollen, m&uuml;ssen Sie
+<span style="font-weight: bold;">Zugriff von
+au&szlig;erhalb</span><br>
+
+Wenn Sie Zugriff von au&szlig;erhalb erlauben wollen,
+m&uuml;ssen Sie
 zun&auml;chst Ihre Internet-IP ermitteln lassen. Das geschieht
 &uuml;ber ein kleines PHP-Script auf meiner Seite www.gausi.de, das
 durch Klick auf den Button "IP-Adresse ermitteln" aufgerufen wird.
-Diese IP&nbsp;m&uuml;ssen Sie Ihren Freunden zusammen mit Nutzernamen
+Diese IP&nbsp;m&uuml;ssen Sie Ihren Freunden zusammen mit
+Nutzernamen
 und Passwort mitteilen. Auch hier gilt: Wenn Sie einen anderen Port als
 80 eingestellt haben, m&uuml;ssen Sie diesen auch weitergeben.<br>
+
 <br>
 
-<span style="font-style: italic;">Hinweis: Der Aufruf dieses Scripts
-von Ihrer Adresse wird zwar (wie jeder Seitenaufruf fast &uuml;berall
+<span style="font-style: italic;">Hinweis: Der Aufruf
+dieses Scripts
+von Ihrer Adresse wird zwar (wie jeder Seitenaufruf fast
+&uuml;berall
 im internet) von dem Apache auf dem Server geloggt. Sie wird aber nicht
 weiter verwendet oder gar an Dritte weitergegeben. Nat&uuml;rlich
-k&ouml;nnen Sie daf&uuml;r auch andere Dienste im Netz zur Ermittlung
+k&ouml;nnen Sie daf&uuml;r auch andere Dienste im Netz zur
+Ermittlung
 Ihrer IP-Adresse verwenden.</span> <br>
 
 <br>
-Zus&auml;tzlich m&uuml;ssen&nbsp;Sie ggf. in der Konfiguration Ihres
+
+Zus&auml;tzlich m&uuml;ssen&nbsp;Sie ggf. in der
+Konfiguration Ihres
 Routers den Port 80 (oder halt den, den Sie in den Einstellungen
 angegeben haben) auf Ihre lokale IP-Adresse weiterleiten. Dadurch
 ist sichergestellt, dass die HTTP-Anfragen aus "dem Internet" bei Nemp
@@ -159,18 +178,20 @@ urheberrechtlich gesch&uuml;tzte Lieder zum Download an.<br>
 
 <br style="font-weight: bold;">
 
-</span><span style="font-weight: bold;">Das ist eine sehr schlechte Idee und kann sehr kostenintensive Folgen haben!</span><br style="font-weight: bold;">
+</span><span style="font-weight: bold;">Das ist eine
+sehr schlechte Idee und kann sehr kostenintensive Folgen haben!</span><br style="font-weight: bold;">
 
 <br>
 
 <br>
 
-Sie k&ouml;nnen den Zugriff daher generell&nbsp;auf das lokale Netz
-beschr&auml;nken. HTTP-Anfragen von au&szlig;erhalb werden dann mit
+Sie k&ouml;nnen den Zugriff daher generell&nbsp;auf das lokale
+Netz
+beschr&auml;nken. HTTP-Anfragen von au&szlig;erhalb werden dann
+mit
 einer Fehlermeldung beantwortet.<br>
 
 <br>
-
 
 </body>
 </html>

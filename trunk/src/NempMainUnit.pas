@@ -40,7 +40,7 @@ uses
   Dialogs, StdCtrls, AudioFileClass, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst,
   WinampFunctions, Buttons,  VirtualTrees, VSTEditControls,
-  jpeg, activeX, XPMan, DateUtils,                       cddaUtils,
+  jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
    Mp3FileUtils, spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
@@ -48,7 +48,7 @@ uses
   Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
    Nemp_SkinSystem, NempPanel, SkinButtons, math,
 
-  PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, MyDialogs,    deleteHelper,
+  PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, deleteHelper,
 
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
@@ -1597,7 +1597,7 @@ begin
             NempPlaylist.Play(NempPlaylist.PlayingIndex, NempPlayer.FadingInterval, StartPlay);
           basstimer.Enabled := StartPlay;
         except
-           on E: Exception do MessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
+           on E: Exception do TranslateMessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
         end;
     end;
     //sleep(2000);
@@ -2917,12 +2917,12 @@ begin
         0: begin
             if MedienBib.AnzeigeShowsPlaylistFiles then
             begin
-                MessageDLG((Medialibrary_GUIError3), mtInformation, [MBOK], 0);
+                TranslateMessageDLG((Medialibrary_GUIError3), mtInformation, [MBOK], 0);
             end else
             begin
                 if MedienBib.StatusBibUpdate <> 0 then
                 begin
-                    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+                    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
                     exit;
                 end;
                 VST.BeginUpdate;
@@ -2973,7 +2973,7 @@ end;
 
 procedure TNemp_MainForm.MM_ML_DeleteClick(Sender: TObject);
 begin
-    if MessageDlg((Medialibrary_QueryReallyDelete), mtWarning, [mbYes,MBNo], 0) = mrYes then
+    if TranslateMessageDLG((Medialibrary_QueryReallyDelete), mtWarning, [mbYes,MBNo], 0) = mrYes then
     begin
         MedienBib.Clear;
         MedienListeStatusLBL.Caption := '';
@@ -2996,7 +2996,7 @@ var newdir: UnicodeString;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
 
@@ -3193,7 +3193,7 @@ begin
               if Integer(aNode.Index) < MedienBib.RadioStationList.Count then
                   TStation(MedienBib.RadioStationList[aNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
               else
-                  MessageDlg(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
+                  TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
               FreeFilesInHandleFilesList := True;
           end else
           begin
@@ -3229,7 +3229,7 @@ begin
             aList.Sort(Sortieren_AlbumTrack_asc);
       end;
   else
-    MessageDlg('Uh-Oh. Something strange happens (GenerateListForHandleFiles). Please report this error.'
+    TranslateMessageDLG('Uh-Oh. Something strange happens (GenerateListForHandleFiles). Please report this error.'
       + #13#10 + 'Param: ' + InttoStr(what) , mtWarning, [mbOK], 0);
   end;
 end;
@@ -3269,7 +3269,7 @@ begin
   begin
       if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
       begin
-        if MessageDlg((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+        if TranslateMessageDLG((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
               HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
       end
       else
@@ -3544,7 +3544,7 @@ begin
     SelectedMp3s := Nil;
     if MedienBib.StatusBibUpdate <> 0 then
     begin
-        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+        TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
         exit;
     end;
     MedienBib.StatusBibUpdate := 3;
@@ -3694,7 +3694,7 @@ end;
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
 begin
   if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
-    MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
+    TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
   else
     ShellExecute(Handle, 'open'
                       ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
@@ -3706,7 +3706,7 @@ procedure TNemp_MainForm.MM_ML_RefreshAllClick(Sender: TObject);
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
   MedienBib.RefreshFiles;
@@ -3745,7 +3745,7 @@ begin
   SelectedMp3s := Nil;
   if MedienBib.StatusBibUpdate <> 0 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
 
@@ -3831,7 +3831,7 @@ begin
           end;
 
           if tot > 0 then
-              MessageDlg(MediaLibrary_FilesNotFoundJustHint, mtWarning, [MBOK], 0);
+              TranslateMessageDLG(MediaLibrary_FilesNotFoundJustHint, mtWarning, [MBOK], 0);
 
           if einUpdate then
           begin
@@ -4061,7 +4061,7 @@ begin
 
         if length(SelectedMp3s) > MAX_DRAGFILECOUNT then
         begin
-          MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+          TranslateMessageDLG((Warning_TooManyFiles), mtInformation, [MBOK], 0);
           exit;
         end;
 
@@ -4355,24 +4355,18 @@ begin
            begin
 
               if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
-                MessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
+                TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
               else
                 ShellExecute(Handle, 'open'
                       ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
                       , nil, nil, SW_SHOWNORMAl);
            end;
     VK_F2: if ssShift in shift then
-           begin
-              PM_P_ViewSeparateWindows_PlaylistClick(NIL)
-           end;
+              PM_P_ViewSeparateWindows_PlaylistClick(NIL);
     VK_F3: if ssShift in shift then
-           begin
               PM_P_ViewSeparateWindows_MedialistClick(NIL);
-           end;
     VK_F4: if ssShift in shift then
-           begin
               PM_P_ViewSeparateWindows_BrowseClick(NIL);
-           end;
     $52 {R}: if ssCtrl in shift then
              begin
                 Nemp_MainForm.NempOptions.DetailMode := (Nemp_MainForm.NempOptions.DetailMode + 1) mod 3;
@@ -4380,9 +4374,7 @@ begin
              end;
 
     $54 {T}: if ssCtrl in shift then
-           begin
               PM_P_ViewStayOnTopClick(NIL);
-           end;
 
     VK_F7: begin
               if Not NempSkin.NempPartyMode.Active then
@@ -4395,9 +4387,7 @@ begin
               end;
            end;
 
-    VK_F8: begin
-        NempPlayer.PlayJingle(Nil);
-    end;
+    VK_F8: NempPlayer.PlayJingle(Nil);
 
 (*    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
                 //if (ssCtrl in Shift) AND (ssAlt in Shift) then
@@ -4765,7 +4755,7 @@ begin
               CorrectVCLAfterAudioFileEdit(MedienBib.CurrentAudioFile);
         end else
         begin
-            MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+            TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
         end;
     end;
 end;
@@ -4962,7 +4952,7 @@ begin
             backup := MedienBib.CurrentAudioFile.RawTagLastFM;
             if CommasInString(MemBibTags.Text) then
             begin
-                if MessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
+                if TranslateMessageDLG((Tags_CommasFound), mtConfirmation, [MBYES, MBNO], 0) = mrYes then
                     MedienBib.CurrentAudioFile.RawTagLastFM := UTF8String(Trim(ReplaceCommasbyLinebreaks(Trim(MemBibTags.Text))))
                 else
                     MedienBib.CurrentAudioFile.RawTagLastFM := UTF8String(Trim(MemBibTags.Text));
@@ -4996,7 +4986,7 @@ begin
             begin
                 MedienBib.CurrentAudioFile.RawTagLastFM := backup;
                 HandleError(afa_EditingDetails, MedienBib.CurrentAudioFile, aErr);
-                MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);            
+                TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
             end;
 
             LblBibTags.Caption := MedienBib.CurrentAudioFile.GetTagDisplayString(NempOptions.AllowQuickAccessToMetadata);
@@ -5093,7 +5083,7 @@ begin
                       begin
                           MedienBib.CurrentAudioFile.Assign(backupFile);
                           HandleError(afa_EditingDetails, MedienBib.CurrentAudioFile, aErr);
-                          MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);                     
+                          TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
                       end;
                   finally
                       backupFile.Free;
@@ -5107,7 +5097,7 @@ begin
               end
               else
               begin
-                  MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+                  TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
               end;
               key := #0;
         end;
@@ -5148,13 +5138,13 @@ begin
     SelectedMp3s := Nil;
     if MedienBib.StatusBibUpdate <> 0 then
     begin
-      MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+      TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
       exit;
     end;
 
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
-        MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
+        TranslateMessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
         if not GetSpecialPermissionToChangeMetaData then exit;
@@ -5182,13 +5172,13 @@ begin
     SelectedMp3s := Nil;
     if MedienBib.StatusBibUpdate <> 0 then
     begin
-      MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+      TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
       exit;
     end;
 
     if MedienBib.AnzeigeShowsPlaylistFiles then
     begin
-        MessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
+        TranslateMessageDLG((Medialibrary_GUIError5), mtInformation, [MBOK], 0);
     end else
     begin
         if not GetSpecialPermissionToChangeMetaData then exit;
@@ -5566,7 +5556,7 @@ begin
           AuswahlStatusLBL.Caption := Station.GetInfoString;
       end
       else
-          MessageDlg(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
+          TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
       ShowVSTDetails(NIL);
   end else
       MedienBib.GenerateAnzeigeListe(Artist, Album);
@@ -5647,11 +5637,9 @@ begin
       if artist = BROWSE_RADIOSTATIONS then
       begin
           if Integer(AlbumNode.Index) < MedienBib.RadioStationList.Count then
-          begin
-              TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist);
-          end
+              TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
           else
-              MessageDlg(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
+              TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
       end else
       if (artist <> BROWSE_PLAYLISTS) then
       begin
@@ -5688,11 +5676,9 @@ begin
   if artist = BROWSE_RADIOSTATIONS then
   begin
       if Integer(AlbumNode.Index) < MedienBib.RadioStationList.Count then
-      begin
-          TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist);
-      end
+          TStation(MedienBib.RadioStationList[AlbumNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
       else
-          MessageDlg(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
+          TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
   end else
   begin
       if (artist <> BROWSE_PLAYLISTS) then
@@ -6459,7 +6445,7 @@ begin
                   CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile);
             end else
             begin
-                MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+                TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
             end;
         end; // else nothing to do
     end;
@@ -6882,7 +6868,7 @@ end;
 procedure TNemp_MainForm.MM_H_ShowReadmeClick(Sender: TObject);
 begin
   if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'readme.txt') then
-    MessageDLG((Error_ReadmeFileNotFound), mtError, [mbOK], 0)
+    TranslateMessageDLG((Error_ReadmeFileNotFound), mtError, [mbOK], 0)
   else
     ShellExecute(Handle, 'open'
                       ,PChar(ExtractFilePath(Paramstr(0)) + 'readme.txt')
@@ -6916,7 +6902,7 @@ begin
             end;
           end
           else
-            MessageDlg((Playlist_NotEverything), mtInformation, [MBOK], 0);
+            TranslateMessageDLG((Playlist_NotEverything), mtInformation, [MBOK], 0);
       end;
   finally
       fb.Free;
@@ -6990,7 +6976,7 @@ var i: integer;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
 
@@ -7144,7 +7130,7 @@ begin
         if tmpPlaylist <> '' then
             FileString := FileString + tmpPlaylist + #0
         else
-            MessageDlg(Warning_MagicCopyFailed, mtInformation, [MBOK], 0);
+            TranslateMessageDLG(Warning_MagicCopyFailed, mtInformation, [MBOK], 0);
     end;
 
     if FileString<>'' then
@@ -7182,7 +7168,7 @@ begin
           JobList := MedienBib.ST_Ordnerlist;
         end else
         begin
-          MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+          TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
           LangeAktionWeitermachen := False;
           exit;
         end;
@@ -8142,7 +8128,7 @@ begin
       0: begin
             // Gewählte Einstellung erkennen
             PresetName := (Sender as TMenuItem).Caption;
-            if MessageDlg(Format(MainForm_BtnEqualizerOverwriteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
+            if TranslateMessageDLG(Format(MainForm_BtnEqualizerOverwriteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
             begin
                 // Daten aus Ini laden
                 ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
@@ -8186,7 +8172,7 @@ begin
                       end;
                   end;
                   if Not Check then
-                      Cancel := MessageDLG(MainForm_EqualizerInvalidInput, mtWarning, [mbOk, mbCancel], 0) = mrCancel
+                      Cancel := TranslateMessageDLG(MainForm_EqualizerInvalidInput, mtWarning, [mbOk, mbCancel], 0) = mrCancel
                   else
                   begin
                       // OK und Check ok => speichern!
@@ -8208,7 +8194,7 @@ begin
                           // Abfrage, ob überschrieben werden soll
                           if NewNameExists then
                           begin
-                              GoOn := MessageDLG(Format(MainForm_BtnEqualizerOverwriteQuery, [NewName]), mtInformation, [mbOk, mbCancel], 0) = mrOK
+                              GoOn := TranslateMessageDLG(Format(MainForm_BtnEqualizerOverwriteQuery, [NewName]), mtInformation, [mbOk, mbCancel], 0) = mrOK
                           end else
                               GoOn := True;
 
@@ -8257,7 +8243,7 @@ var i, c, idx: integer;
     PresetName, EQName: String;
 begin
     PresetName := (Sender as TMenuItem).Caption;
-    if MessageDlg(Format(MainForm_BtnEqualizerDeleteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
+    if TranslateMessageDLG(Format(MainForm_BtnEqualizerDeleteQuery, [PresetName]), mtInformation, [mbYes, mbNo], 0) = mrYes then
     begin
           Ini := TMemIniFile.Create(SavePath + 'Nemp_EQ.ini');
           try
@@ -8310,7 +8296,7 @@ var i, OldMax, iSearch, g, preset: integer;
     Ini: TMemIniFile;
     ValueFound: Boolean;
 begin
-  if MessageDlg((Player_RestoreDefaultEqualizer), mtInformation, [mbOK, mbABORT], 0) = mrAbort then
+  if TranslateMessageDLG((Player_RestoreDefaultEqualizer), mtInformation, [mbOK, mbABORT], 0) = mrAbort then
       exit;
 
   Ini := TMemIniFile.Create(SavePath + 'Nemp_EQ.ini');
@@ -8670,11 +8656,11 @@ begin
         then
             NempSkin.NempPartyMode.Active := not NempSkin.NempPartyMode.Active
         else
-            MessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
+            TranslateMessageDLG(ParrtyMode_WrongPassword, mtError, [mbOK], 0);
     end else
     begin
         if NempSkin.NempPartyMode.ShowPasswordOnActivate then
-            MessageDlg(
+            TranslateMessageDLG(
                 Format(_(ParrtyMode_Password_PromptOnActivate), [NempSkin.NempPartyMode.Password]),
                 mtInformation, [mbOK], 0);
 
@@ -8762,7 +8748,7 @@ procedure TNemp_MainForm.PM_ML_MedialibraryExportClick(Sender: TObject);
 begin
   if MedienBib.StatusBibUpdate >= 2 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
 
@@ -8770,7 +8756,7 @@ begin
   SaveDialog1.Filter := (MediaLibrary_CSVFilter) + ' (*.csv)|*.csv';
   if SaveDialog1.Execute then
       if not MedienBib.SaveAsCSV(SaveDialog1.FileName) then
-        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+        TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
 end;
 
 procedure TNemp_MainForm.PM_P_CloseClick(Sender: TObject);
@@ -8789,7 +8775,7 @@ begin
   CanClose := (MedienBib.StatusBibUpdate = 0) AND (NempPlaylist.Status = 0);
   if not CanClose then
   begin
-      if MessageDLG((Warning_MedienBibIsBusyOnClose), mtWarning, [MBYes, MBNo], 0) = mrYES then
+      if TranslateMessageDLG((Warning_MedienBibIsBusyOnClose), mtWarning, [MBYes, MBNo], 0) = mrYES then
       begin
           if MedienBib.StatusBibUpdate = 0 then
               // if the dialog was open for a longer time ... ;-)
@@ -8849,7 +8835,7 @@ begin
 
       if DateiListe.Count > MAX_DRAGFILECOUNT then
       begin
-        MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+        TranslateMessageDLG((Warning_TooManyFiles), mtInformation, [MBOK], 0);
         if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
         FreeAndNil(Dateiliste);
         exit;
@@ -9264,7 +9250,7 @@ procedure TNemp_MainForm.SortierAuswahl1POPUPClick(Sender: TObject);
 begin
   if MedienBib.StatusBibUpdate >= 2 then
   begin
-    MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+    TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
 
@@ -9731,7 +9717,7 @@ var DlgResult: Integer;
 begin
     if NempPlaylist.WiedergabeMode <> NEMP_API_NOREPEAT then
     begin
-        DlgResult := MessageDlg(NempShutDown_AtEndOfPlaylist_Dlg,
+        DlgResult := TranslateMessageDLG(NempShutDown_AtEndOfPlaylist_Dlg,
             mtWarning, [MBYes, MBNO, MBAbort], 0);
     end else
         DlgResult := mrNone;
@@ -9856,7 +9842,7 @@ begin
      end
   end else
   begin
-      if MessageDLG((Playlist_FileNotFound), mtWarning, [MBYES, MBNO, MBABORT], 0) = mrYes then
+      if TranslateMessageDLG((Playlist_FileNotFound), mtWarning, [MBYES, MBNO, MBABORT], 0) = mrYes then
       begin
           if DeleteFileFromRecentList(idx) then
               SetRecentPlaylistsMenuItems;
@@ -10221,14 +10207,14 @@ begin
             if VST.Header.Columns[column].Tag <> CON_RATING then
             begin
                 SynchronizeAudioFile(af, af.Pfad, True);
-                MessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+                TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
                 HandleError(afa_DirectEdit, af, aErr, True);
             end else
                 HandleError(afa_SaveRating, af, aErr);
                 // on Rating-Edit: Just an entry in the Error-Log
         end;
     end else
-        MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+        TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
 end;
 
 procedure TNemp_MainForm.VSTNewText(Sender: TBaseVirtualTree;
@@ -10269,10 +10255,10 @@ begin
                 //    SetBrowseTabWarning(True);
             end
             else
-                MessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
+                TranslateMessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
         end
         else
-            MessageDLG(Warning_MedienBibIsBusyEdit, mtWarning, [mbOK], 0);
+            TranslateMessageDLG(Warning_MedienBibIsBusyEdit, mtWarning, [mbOK], 0);
     end;
 end;
 
@@ -10675,7 +10661,7 @@ begin
 
   if Not NempPlayer.CheckBirthdaySettings then
       begin
-        if MessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+        if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
         begin
           if Not Assigned(OptionsCompleteForm) then
             Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
@@ -10718,7 +10704,7 @@ begin
         dlgresult := MessageDlgWithNoMorebox
               ((AutoScanDirsDialog_Caption),
                (AutoScanDirsDialog_Text),
-               mtConfirmation, [mbYes, mbNo], 0, 0, asknomore,
+               mtConfirmation, [mbYes, mbNo], mrYes, 0, asknomore,
               (AutoScanDirsDialog_ShowAgain));
 
         MedienBib.AutoAddNewDirs := dlgresult = mrYes;
@@ -11071,8 +11057,7 @@ begin
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
 
-
-//asknomore := False;
+    //asknomore := False;
 
   { MessageDlgWithNoMorebox
               ((AutoScanDirsDialog_Caption),
@@ -11080,6 +11065,8 @@ begin
                mtConfirmation, [mbYes, mbNo, mbAbort, mbRetry], 0, 0, asknomore,
               (AutoScanDirsDialog_ShowAgain));
    }
+   // TranslateMessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbYes, mbNo, mbAbort, mbRetry], 0);
+   // MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbYes, mbNo, mbAbort, mbRetry], 0);
 
   GetCursorPos(Point);
   PlayListPOPUP.Popup(Point.X, Point.Y+10);
@@ -11092,13 +11079,13 @@ begin
   if DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
         ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal)
   else
-        MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
+        TranslateMessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbOk], 0);
 end;
 
 procedure TNemp_MainForm.PM_P_KeyboardDisplayClick(Sender: TObject);
 var tmp: String;
 begin
-    if MessageDlg((StartG15ToolQuestion), mtInformation, [mbYes,MBNo], 0) = mrYes then
+    if TranslateMessageDLG((StartG15ToolQuestion), mtInformation, [mbYes,MBNo], 0) = mrYes then
     begin
         if NempOptions.DisplayApp = '' then
             tmp := 'NempG15App.exe'
@@ -11119,7 +11106,7 @@ begin
   if DirectoryExists(ExtractFilePath(SavePath)) then
       ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+SavePath+'"'), '', sw_ShowNormal)
   else
-      MessageDLG((Warning_DataDirNotFound), mtWarning, [mbOk], 0);
+      TranslateMessageDLG((Warning_DataDirNotFound), mtWarning, [mbOk], 0);
 end;
 
 
@@ -11326,7 +11313,7 @@ procedure TNemp_MainForm.PM_P_ScrobblerActivateClick(Sender: TObject);
 begin
     if (NempPlayer.NempScrobbler.Username = '') or (NempPlayer.NempScrobbler.SessionKey = '') then
     begin
-        if MessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+        if TranslateMessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
         begin
             if Not Assigned(OptionsCompleteForm) then
                 Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
@@ -11438,7 +11425,7 @@ begin
         end else
         begin
             // OOps, an error occured
-            MessageDLG('Server activation failed:' + #13#10 + NempWebServer.LastErrorString, mtError, [mbOK], 0);
+            TranslateMessageDLG('Server activation failed:' + #13#10 + NempWebServer.LastErrorString, mtError, [mbOK], 0);
         end;
     end
 end;
