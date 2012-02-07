@@ -126,6 +126,7 @@ type
           property CoverID: String read fCoverID;
           property FontSize: Integer read fFontSize;
           constructor Create(aValue: String; c: Integer; aCoverID: String);
+          procedure Assign(aCS: tCountedString);
   end;
 
   TDoubleString = Array[Boolean] of String;
@@ -306,6 +307,8 @@ type
           procedure SetFontSizes(aList: TObjectList);
           procedure ClearHelperLists;
           procedure PrepareArtists;
+          procedure MergeArtistsIfNecessary;
+          
           procedure PrepareAlbums;
           procedure PrepareGenres;
 
@@ -390,6 +393,7 @@ var
 const
     GoodArtist = 5;
     GoodAlbum  = 3;
+    MergeArtistConst = 50;
     MaxCountPerPage = 100;
 
 implementation
@@ -419,6 +423,14 @@ end;
 
 
 { TCountedString }
+procedure TCountedString.Assign(aCS: tCountedString);
+begin
+    fValue    := aCS.fValue;
+    fCount    := aCS.fCount;
+    fCoverID  := aCS.fCoverID;
+    fFontSize := aCS.fFontSize;
+end;
+
 constructor TCountedString.Create(aValue: String; c: Integer; aCoverID: String);
 begin
     if trim(aValue) = '' then
@@ -1802,6 +1814,27 @@ begin
     end;
 end;
 
+function SortCountedString(item1, item2: Pointer): Integer;
+begin
+    result := AnsiCompareText(TCountedString(item1).fValue, TCountedString(item2).fValue);
+end;
+
+procedure TNempWebServer.MergeArtistsIfNecessary;
+var i, c: Integer;    
+begin
+    for i := 0 to 26 - 1 do
+    begin
+        if MainArtists[i].Count + OtherArtists[i].Count < MergeArtistConst then
+        begin
+            OtherArtists[i].OwnsObjects := False;
+            for c := 0 to OtherArtists[i].Count - 1 do
+                MainArtists[i].Add(OtherArtists[i][c]);
+            OtherArtists[i].Clear;
+            MainArtists[i].Sort(SortCountedString);          
+        end;        
+    end;    
+end;
+
 procedure TNempWebServer.PrepareArtists;
 var currentArtist, currentCoverID: String;
     c, i, idx: Integer;
@@ -1854,6 +1887,9 @@ begin
             else
                 OtherArtists[idx].Add(newEntry);
         end; // otherwise: Do not add this artist at all
+
+        // check List counts, and merge eventually
+        MergeArtistsIfNecessary;
 
         // set Font Sizes
         for i := 0 to 26 do
@@ -3001,6 +3037,12 @@ begin
     if ValidIP(AContext.Binding.PeerIP, AContext.Binding.IP) then
     begin
         RequestedDocument := aRequestInfo.Document;
+
+        if RequestedDocument = '/admin' then
+        begin
+            AResponseInfo.Redirect('/admin/player');
+            exit;
+        end;
 
         if AnsiStartsStr('/admin', RequestedDocument) then
         begin

@@ -463,6 +463,8 @@ type
     LblConst_Password2: TLabel;
     EdtPassword: TEdit;
     BtnShowWebserverLog: TButton;
+    LblWebserverAdminURL: TLabel;
+    LblWebserverUserURL: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -552,6 +554,9 @@ type
     procedure BtnRefreshDevicesClick(Sender: TObject);
     procedure EdtUsernameAdminKeyPress(Sender: TObject; var Key: Char);
     procedure BtnShowWebserverLogClick(Sender: TObject);
+    procedure LblWebserverAdminURLClick(Sender: TObject);
+    procedure LblWebserverUserURLClick(Sender: TObject);
+    procedure ChangeWebserverLinks(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1434,6 +1439,7 @@ begin
   cb_RatingIncreaseRating               .Enabled := NempPlayer.PostProcessor.Active;
   cb_RatingDecreaseRating               .Enabled := NempPlayer.PostProcessor.Active;
 
+  ChangeWebserverLinks(Nil);
 
 
 
@@ -2759,6 +2765,39 @@ begin
   end;
 end;
 
+
+procedure TOptionsCompleteForm.ChangeWebserverLinks(Sender: TObject);
+var newUrl: String;
+begin
+    if cbLanIPs.Items.Count > 0 then
+    begin
+        newUrl := 'http://' + cbLanIPs.Items[cbLanIPs.ItemIndex];
+        if seWebServer_Port.Value <> 80 then
+            newUrl := newUrl + ':' + IntToStr(seWebServer_Port.Value);
+    end else
+    begin
+        // use localhost
+        if seWebServer_Port.Value = 80 then
+            newUrl := 'http://localhost'
+        else
+            newUrl := 'http://localhost:'  + IntToStr(seWebServer_Port.Value)
+    end;
+
+    LblWebserverUserURL.Caption  := newURL;
+    LblWebserverAdminURL.Caption := newURL + '/admin'
+end;
+
+
+procedure TOptionsCompleteForm.LblWebserverUserURLClick(Sender: TObject);
+begin
+    ShellExecute(Handle, 'open', PChar(LblWebserverUserURL.Caption), nil, nil, SW_SHOW);
+end;
+
+procedure TOptionsCompleteForm.LblWebserverAdminURLClick(Sender: TObject);
+begin
+    ShellExecute(Handle, 'open', PChar(LblWebserverAdminURL.Caption), nil, nil, SW_SHOW);
+end;
+
 procedure TOptionsCompleteForm.CB_Activate_PlayClick(Sender: TObject);
 begin
   CB_MOD_Play.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
@@ -2981,6 +3020,7 @@ begin
     BtnScrobbleWizard.Tag := 100;
     BtnScrobbleWizard.Enabled := True;
 end;
+
 
 procedure TOptionsCompleteForm.ResetScrobbleButton;
 begin
