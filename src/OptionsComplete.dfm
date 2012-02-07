@@ -4209,6 +4209,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Set username and password to access your library'
           Caption = 'Password (Admin)'
         end
+        object LblWebserverAdminURL: TLabel
+          Left = 224
+          Top = 128
+          Width = 106
+          Height = 13
+          Cursor = crHandPoint
+          Caption = 'http://localhost/admin'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsUnderline]
+          ParentFont = False
+          OnClick = LblWebserverAdminURLClick
+        end
         object BtnServerActivate: TButton
           Left = 296
           Top = 153
@@ -4246,6 +4261,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           MinValue = 0
           TabOrder = 3
           Value = 80
+          OnChange = ChangeWebserverLinks
         end
         object cbWebserverRootDir: TComboBox
           Left = 16
@@ -4330,6 +4346,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Style = csDropDownList
           ItemHeight = 13
           TabOrder = 0
+          OnChange = ChangeWebserverLinks
           Items.Strings = (
             '')
         end
@@ -4368,6 +4385,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Hint = 'Set username and password to access your library'
           Caption = 'Password'
+        end
+        object LblWebserverUserURL: TLabel
+          Left = 224
+          Top = 37
+          Width = 74
+          Height = 13
+          Cursor = crHandPoint
+          Caption = 'http://localhost'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsUnderline]
+          ParentFont = False
+          OnClick = LblWebserverUserURLClick
         end
         object cbAllowRemoteControl: TCheckBox
           Left = 16
