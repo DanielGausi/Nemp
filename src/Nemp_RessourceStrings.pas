@@ -332,7 +332,10 @@ WebServer_LibraryAccessDenied = 'Library access denied.';
 WebServer_AccessDenied = 'Access denied.';
 WebServer_FileNotFound = 'File not found.';
 WebServer_InvalidParameter = 'Invalid parameter.';
-WebServer_NoFile = 'No file loaded.';
+// WebServer_NoFile = 'No file loaded.';
+WebServer_EmptyPlaylist = 'No files to display. The playlist is empty.';
+WebServer_PlayerNotReady = 'The Player is not ready: No file was loaded.';
+WebServer_EmptyLibrary = 'Nothing to display. The library is empty.';
 
 NempUpdate_ConnectError = 'Could not connect to server. Please check your internet configuration.';
 NempUpdate_Error = 'Could not get update information from server.';
