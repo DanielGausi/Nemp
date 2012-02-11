@@ -460,8 +460,8 @@ begin
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
     GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
-    UsernameU := 'user';
-    PasswordU := 'pass';
+    UsernameU := '';
+    PasswordU := '';
 
     UsernameA := 'master';
     PasswordA := 'key';
@@ -512,11 +512,11 @@ begin
         AllowFileDownload   := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
         AllowLibraryAccess  := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
         AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , True);
-        AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl', False);
+        AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl'    , True);
         Port                := Ini.ReadInteger('Remote', 'Port', 80);
         Theme               := Ini.ReadString('Remote', 'Theme' , 'Default');
-        UsernameU           := Ini.ReadString('Remote', 'UsernameU', 'user'  );
-        PasswordU           := Ini.ReadString('Remote', 'PasswordU', 'pass'   );
+        UsernameU           := Ini.ReadString('Remote', 'UsernameU', ''  );
+        PasswordU           := Ini.ReadString('Remote', 'PasswordU', ''   );
         UsernameA           := Ini.ReadString('Remote', 'UsernameA', 'master'  );
         PasswordA           := Ini.ReadString('Remote', 'PasswordA', 'key'   );
     finally
@@ -1020,6 +1020,7 @@ begin
     menu := MainMenu(aPage, isAdmin);
     result := StringReplace(PatternErrorPage[isAdmin], '{{Menu}}', menu, [rfreplaceAll]);
     result := StringReplace(result, '{{ErrorMessage}}', aErrorMessage, [rfreplaceAll]);
+    result := StringReplace(result, '{{BrowseMenu}}'  , '' , [rfReplaceAll]);
 end;
 
 
@@ -1064,30 +1065,31 @@ begin
     end else
     begin
         if (aPart=0) then
-            PageData := GenerateErrorPage(WebServer_NoFile, 0, isAdmin)
+            PageData := GenerateErrorPage(WebServer_PlayerNotReady, 0, isAdmin)
         else
             PageData := 'fail';
+
+        HTML_Player := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
     end;
 end;
 
 // konvertiert die Playlist in ein HTML-Formular
 // in VCL-Threads ausführen. Zugriff auf den HTML-String ist durch den Setter Threadsafe.
 procedure TNempWebServer.GenerateHTMLfromPlaylist_View(aNempPlayList: TNempPlaylist; isAdmin: Boolean);
-var //i: Integer;
-    //af: TAudioFile;
-    //aClass: String;
-    //Item,
-    Items, PageData: String;
+var Items, PageData: String;
     menu: String;
-
 begin
     menu := MainMenu(1, isAdmin);
     Items := GenerateHTMLfromPlaylistItem(aNempPlaylist, -1, isAdmin);
-
-    PageData := PatternPlaylistPage[isAdmin];
-    PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{PlaylistItems}}', Items, [rfReplaceAll]);
-
+    if Items = '' then
+    begin
+        PageData := GenerateErrorPage(WebServer_EmptyPlaylist, 1, isAdmin)
+    end else
+    begin
+        PageData := PatternPlaylistPage[isAdmin];
+        PageData := StringReplace(PageData, '{{Menu}}', menu, [rfReplaceAll]);
+        PageData := StringReplace(PageData, '{{PlaylistItems}}', Items, [rfReplaceAll]);
+    end;
     HTML_PlaylistView := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
@@ -1316,12 +1318,6 @@ begin
     menu := MainMenu(2, isAdmin);
     browsemenu := BrowseSubMenu(aMode, aChar, '', isAdmin);
 
-    PageData := PatternSearchPage[isAdmin];
-    PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
-    PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
-
     if CharInSet(aChar, ['A'..'Z']) then
         ListIdx := ord(aChar) - ord('A') + 1
     else
@@ -1390,6 +1386,14 @@ begin
         Item := StringReplace(Item, '{{CoverID}}', EscapeHTMLChars(ab.CoverID), [rfReplaceAll]);
         Items := Items + Item;
     end;
+
+
+    PageData := PatternSearchPage[isAdmin];
+    PageData := StringReplace(PageData, '{{Menu}}'        , menu       , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{BrowseMenu}}'  , browsemenu , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{SearchString}}', ''         , [rfReplaceAll]);
+    PageData := StringReplace(PageData, '{{NoFilesHint}}', ''  , [rfReplaceAll]);
+
 
     if aMode='artist' then
     begin

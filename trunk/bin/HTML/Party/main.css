@@ -60,11 +60,9 @@ div.warning {
 	padding-bottom: 10px;
 }
 div.error {
-	color: red;
-	border: red 2px solid;
+	color: red;	
 	margin-bottom: 5px;
 	margin-top: 5px;
-	padding: 10px;
 }
 
 /*

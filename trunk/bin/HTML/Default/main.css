@@ -61,10 +61,6 @@ div.warning {
 }
 div.error {
 	color: red;
-	border: red 2px solid;
-	margin-bottom: 5px;
-	margin-top: 5px;
-	padding: 10px;
 }
 
 /*
