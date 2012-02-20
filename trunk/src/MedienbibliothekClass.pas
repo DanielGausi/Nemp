@@ -2942,7 +2942,7 @@ end;
 }
 function TMedienBibliothek.AudioFileExists(aFilename: UnicodeString): Boolean;
 begin
-    result := binaersuche(Mp3ListePfadSort, ExtractFilePath(aFilename), ExtractFileName(aFilename), 0,Mp3ListePfadSort.Count-1) > -1;
+    result := binaersuche(Mp3ListePfadSort, ExtractFileDir(aFilename), ExtractFileName(aFilename), 0,Mp3ListePfadSort.Count-1) > -1;
 end;
 function TMedienBibliothek.PlaylistFileExists(aFilename: UnicodeString): Boolean;
 begin
@@ -2951,7 +2951,7 @@ end;
 function TMedienBibliothek.GetAudioFileWithFilename(aFilename: UnicodeString): TAudioFile;
 var idx: Integer;
 begin
-  idx := binaersuche(Mp3ListePfadSort,ExtractFilePath(aFilename), ExtractFileName(aFilename),0,Mp3ListePfadSort.Count-1);
+  idx := binaersuche(Mp3ListePfadSort,ExtractFileDir(aFilename), ExtractFileName(aFilename),0,Mp3ListePfadSort.Count-1);
   if idx = -1 then
     result := Nil
   else
@@ -3147,11 +3147,12 @@ begin
 
   if Source.Count < 1 then exit;
 
-
-  if NempSortArray[1] = siFileAge then
-      aktualArtist := (Source[0] as TAudioFile).FileAgeString
+  case NempSortArray[1] of
+      siFileAge: aktualArtist := (Source[0] as TAudioFile).FileAgeString;
+      siOrdner : aktualArtist := (Source[0] as TAudioFile).Ordner;// + '\';
   else
       aktualArtist := (Source[0] as TAudioFile).Strings[NempSortArray[1]];
+  end;
 
   // Copy current value for "artist" to key1
   if NempSortArray[1] = siFileAge then
@@ -3167,10 +3168,16 @@ begin
 
   for i := 1 to Source.Count - 1 do
   begin
-    if NempSortArray[1] = siFileAge then
-        aktualArtist := (Source[i] as TAudioFile).FileAgeString
+    //if NempSortArray[1] = siFileAge then
+    //    aktualArtist := (Source[i] as TAudioFile).FileAgeString
+    //else
+    //    aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+    case NempSortArray[1] of
+        siFileAge: aktualArtist := (Source[i] as TAudioFile).FileAgeString;
+        siOrdner : aktualArtist := (Source[i] as TAudioFile).Ordner;// + '\';
     else
         aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+    end;
 
     // Copy current value for "artist" to key1
     if NempSortArray[1] = siFileAge then
@@ -3538,6 +3545,7 @@ begin
   Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
   Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
   GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
+
   InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
   //...ein Senden dieser nachricht ist daher ok.
   // d.h. einfach die Bäume neufüllen. Ein markieren der zuletzt markierten Knoten ist unsinnig
@@ -3686,6 +3694,7 @@ end;
 procedure TMedienBibliothek.GetStartEndIndex(Liste: TObjectlist; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
 var einIndex: integer;
   min, max:integer;
+  NameWithoutSlash: String;
 begin
   // Bereich festlegen, in dem gesucht werden darf.
   min := Start;
@@ -3694,9 +3703,12 @@ begin
         SEARCH_ARTIST:
                 begin
                   if NempSortArray[1] = siOrdner then
-                    einIndex := BinaerArtistSuche_JustContains(Liste, name, Start, Ende)
+                  begin
+                      NameWithoutSlash := ExcludeTrailingPathDelimiter(name);
+                      einIndex := BinaerArtistSuche_JustContains(Liste, NameWithoutSlash, Start, Ende)
+                  end
                   else
-                    einIndex := BinaerArtistSuche(Liste, name, Start, Ende);
+                      einIndex := BinaerArtistSuche(Liste, name, Start, Ende);
 
                   Start := EinIndex;
                   Ende := EinIndex;
@@ -3706,27 +3718,28 @@ begin
 
                   if NempSortArray[1] = siOrdner then
                   begin
-                    while (Start > min) AND (Pos(name,(Liste[Start-1] as TAudiofile).Key1) = 1) do
-                        dec(Start);
-                    while (Ende < max) AND (Pos(name,(Liste[Ende+1] as TAudiofile).Key1) = 1) do
-                        inc(Ende);
+                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Start-1] as TAudiofile).Key1 + '\') = 1) do
+                          dec(Start);
+                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Ende+1] as TAudiofile).Key1 + '\') = 1) do
+                          inc(Ende);
                   end else begin
-                    // note: AnsiSameText uses correct Unicode
-                    while (Start > min) AND (AnsiSameText(name,(Liste[Start-1] as TAudiofile).Key1)) do
-                        dec(Start);
-                    while (Ende < max) AND (AnsiSameText(name,(Liste[Ende+1] as TAudiofile).Key1)) do
-                        inc(Ende);
+                      // note: AnsiSameText uses correct Unicode
+                      while (Start > min) AND (AnsiSameText(name,(Liste[Start-1] as TAudiofile).Key1)) do
+                          dec(Start);
+                      while (Ende < max) AND (AnsiSameText(name,(Liste[Ende+1] as TAudiofile).Key1)) do
+                          inc(Ende);
                   end;
                   //ShowMessage('Artists* ' +  InttoStr(Start) + ' - ' + Inttostr(Ende) + ': ' + Inttostr(Ende - Start));
         end;
         SEARCH_ALBUM: begin
                   // Suchart : Search_album
                   if NempSortArray[2] = siOrdner then
-                    einIndex := BinaerAlbumSuche_JustContains(Liste, name, Start, Ende)
+                  begin
+                      NameWithoutSlash := ExcludeTrailingPathDelimiter(name);
+                      einIndex := BinaerAlbumSuche_JustContains(Liste, NameWithoutSlash, Start, Ende);
+                  end
                   else
                     einIndex := BinaerAlbumSuche(Liste, name, Start, Ende);
-
-
 
                   Start := EinIndex;
                   Ende := EinIndex;
@@ -3735,15 +3748,15 @@ begin
                   end;
                   if NempSortArray[2] = siOrdner then
                   begin
-                    while (Start > min) AND (Pos(name,(Liste[Start-1] as TAudiofile).Key2) = 1) do
-                        dec(Start);
-                    while (Ende < max) AND (Pos(name,(Liste[Ende+1] as TAudiofile).Key2) = 1) do
-                        inc(Ende);
+                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Start-1] as TAudiofile).Key2 + '\') = 1) do
+                          dec(Start);
+                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Ende+1] as TAudiofile).Key2 + '\') = 1) do
+                          inc(Ende);
                   end else begin
-                    while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).Key2,name)) do
-                        dec(Start);
-                    while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key2,name)) do
-                        inc(Ende);
+                      while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).Key2,name)) do
+                          dec(Start);
+                      while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key2,name)) do
+                          inc(Ende);
                   end;
 
                   //ShowMessage(InttoStr(Start) + ' - ' + Inttostr(Ende) + ': ' + Inttostr(Ende - Start));
@@ -3819,7 +3832,11 @@ begin
       // Dann bei jedem Albumwechsel das Album einfügen
       Start := 0;
       Ende := Mp3ListeArtistSort.Count-1;
+
       GetStartEndIndex(Mp3ListeArtistSort, Artist, SEARCH_ARTIST, Start, Ende);
+
+      //showmessage(inttostr(start) + '-' + inttostr(ende));
+
 
       if (start > Mp3ListeArtistSort.Count-1) OR (Mp3ListeArtistSort.Count < 1)  or (start < 0) then exit;
 
@@ -3922,10 +3939,21 @@ begin
       if Album <> BROWSE_ALL then
       begin
           GetStartEndIndex(Mp3ListeAlbenSort, Album, SEARCH_ALBUM, Start, Ende);
-          GetStartEndIndex(Mp3ListeAlbenSort, Artist, SEARCH_ARTIST, Start, Ende);
-          if (start > Mp3ListeAlbenSort.Count - 1) OR (Mp3ListeAlbenSort.Count < 1) or (start < 0) then exit;
-          for i := Start to Ende do
-            Target.Add(Mp3ListeAlbenSort[i]);
+          if NempSortArray[2] = siOrdner then
+          begin
+              // the area between start - ende is not necessarly sorted by "artist" now
+              // as we could have different sub-directories within the selected dir
+              // so we need to do a linear search here
+              for i := start to Ende do
+                  if AnsiSameText(TAudioFile(Mp3ListeAlbenSort[i]).Key1, Artist) then
+                      Target.Add(Mp3ListeAlbenSort[i]);
+          end else
+          begin
+              GetStartEndIndex(Mp3ListeAlbenSort, Artist, SEARCH_ARTIST, Start, Ende);
+              if (start > Mp3ListeAlbenSort.Count - 1) OR (Mp3ListeAlbenSort.Count < 1) or (start < 0) then exit;
+              for i := Start to Ende do
+                  Target.Add(Mp3ListeAlbenSort[i]);
+          end;
       end else
       begin
         //alle Titel eines Artists - Jetzt ist wieder die Artist-Liste gefragt
