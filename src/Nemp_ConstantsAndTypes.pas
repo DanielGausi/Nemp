@@ -447,7 +447,7 @@ const
     SEARCH_EXTENDED = 1;
     //SEARCH_LYRICs = 2;
 
-    Spaltenzahl = 22;
+    Spaltenzahl = 23;
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
     CON_ARTIST    = 0 ;
     CON_TITEL     = 1 ;
@@ -467,6 +467,7 @@ const
     CON_GENRE     = 14;
     CON_LYRICSEXISTING = 15;
     CON_TRACKNR   = 16;
+    CON_CD        = 22;
     CON_RATING    = 17;
     CON_PLAYCOUNTER = 18;
     CON_LASTFMTAGS = 19;
@@ -626,7 +627,7 @@ const
          'Techno'
          );
 
-      DefaultSpalten : array[0..21] of TSpalte =
+      DefaultSpalten : array[0..22] of TSpalte =
       (
         (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 122 ;sortAscending: True),
         (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
@@ -650,7 +651,8 @@ const
         (Bezeichnung: 'Play counter' ;Inhalt: CON_PLAYCOUNTER;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
-        (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True)
+        (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
+        (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =
@@ -813,6 +815,7 @@ const
       VORBIS_RATING = 'RATING';
       VORBIS_PLAYCOUNT = 'PLAYCOUNT';
       VORBIS_CATEGORIES = 'CATEGORIES';
+      VORBIS_DISCNUMBER = 'DISCNUMBER';
 
 
 var

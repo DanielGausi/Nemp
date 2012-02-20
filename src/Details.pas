@@ -224,6 +224,10 @@ type
     Btn_GetTagsLastFM: TButton;
     BtnSynchRatingID3: TButton;
     BtnSynchRatingOggVorbis: TButton;
+    LblConst_ID3v2CD: TLabel;
+    Lblv2CD: TEdit;
+    Lbl_VorbisCD: TLabel;
+    Edt_VorbisCD: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -959,6 +963,7 @@ begin
   Lblv2Album.Enabled := ControlsEnable;
   Lblv2Titel.Enabled := ControlsEnable;
   Lblv2Year.Enabled := ControlsEnable;
+  Lblv2CD.Enabled := ControlsEnable;
   cbIDv2Genres.Enabled := ControlsEnable;
   Lblv2Comment.Enabled := ControlsEnable;
   Lblv2Track.Enabled := ControlsEnable;
@@ -1536,6 +1541,7 @@ begin
     //Edt_VorbisLicense.Text   := OggVorbisFile.License;
     //Edt_VorbisContact.Text   := OggVorbisFile.Contact;
     cb_VorbisGenre.Text      := OggVorbisFile.Genre;
+    Edt_VorbisCD.Text        := OggVorbisFile.GetPropertyByFieldname(VORBIS_DISCNUMBER);
 
     CurrentTagRatingChanged := False;
     CurrentTagRating := StrToIntDef(OggVorbisFile.GetPropertyByFieldname(VORBIS_RATING),0);
@@ -1580,6 +1586,7 @@ begin
     //Edt_VorbisLicense.Text   := FlacFile.License;
     //Edt_VorbisContact.Text   := FlacFile.Contact;
     cb_VorbisGenre.Text      := FlacFile.Genre;
+    Edt_VorbisCD.Text        := FlacFile.GetPropertyByFieldname(VORBIS_DISCNUMBER);
 
     CurrentTagRatingChanged := False;
     CurrentTagRating := StrToIntDef(FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
@@ -1939,6 +1946,7 @@ begin
         tmp := StringReplace(tmp, #13, ' ', [rfReplaceAll]);
         Lblv2Comment.Text := tmp;
         Lblv2Track.Text := Id3v2Tag.Track;
+        Lblv2CD.Text := ID3v2Tag.GetText(IDv2_PARTOFASET);
 
         CurrentTagRatingChanged := False;
         CurrentTagRating := Id3v2Tag.Rating;
@@ -1998,6 +2006,7 @@ begin
         cbIDv2Genres.Text := '';
         Lblv2Comment.Text := '';
         Lblv2Track.Text := '0';
+        Lblv2CD.Text := '';
         Lblv2Copyright.Text        := '';
         Lblv2Composer.Text         := '';
   end;
@@ -2253,6 +2262,7 @@ begin
       Id3v2Tag.Comment := Lblv2Comment.Text;
       Id3v2Tag.Genre := cbIDv2Genres.Text;
       Id3v2Tag.Track := Lblv2Track.Text;
+      ID3v2Tag.SetText(IDv2_PARTOFASET, Lblv2CD.Text);
       Id3v2Tag.Year := Lblv2Year.Text;
       // weitere Frames
       ID3v2Tag.Copyright := Lblv2Copyright.Text;
@@ -2308,6 +2318,7 @@ begin
         OggVorbisFile.Date        := Edt_VorbisYear.Text;
         OggVorbisFile.Copyright   := Edt_VorbisCopyright.Text;
 
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edt_VorbisCD.Text);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
         if CurrentTagRatingChanged then
@@ -2342,6 +2353,7 @@ begin
         FlacFile.Date        := Edt_VorbisYear.Text;
         FlacFile.Copyright   := Edt_VorbisCopyright.Text;
 
+        FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edt_VorbisCD.Text);
         FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edt_VorbisComment.Text);
         FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
         if CurrentTagRatingChanged then
