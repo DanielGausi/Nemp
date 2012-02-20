@@ -224,7 +224,10 @@ begin
 end;
 function AFComparePath(a1,a2: tAudioFile): Integer;
 begin
-    result := AnsiCompareText(a1.Pfad, a2.Pfad);
+//    result := AnsiCompareText(a1.Pfad, a2.Pfad);
+  result := AnsiCompareText(a1.Ordner, a2.Ordner);
+  if result = 0 then
+      result := AnsiCompareText(a1.Dateiname, a2.Dateiname);
 end;
 function AFCompareDirectory(a1,a2: tAudioFile): Integer;
 begin
@@ -315,6 +318,8 @@ begin
     result := AnsiCompareText(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
     if result=0 then
         result := AnsiCompareText(TAudioFile(item1).Album, TAudioFile(item2).Album);
+    if result = 0 then
+        result := AnsiCompareText(TAudioFile(item1).CD, TAudioFile(item2).CD);
     if result=0 then
         result := CompareValue(TAudioFile(item1).Track,TAudioFile(item2).Track);
     if result=0 then
@@ -665,12 +670,12 @@ end;
 *)
 
 function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
+var tmp1,tmp2: Integer;
 begin
     if MedienBib.NempSortArray[1] = siFileAge then
         tmp1 := AnsiCompareText(TAudioFile(item1).FileAgeSortString, TAudioFile(item2).FileAgeSortString)
     else
-        tmp1:=AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
+        tmp1 := AnsiCompareText(TAudioFile(item1).Strings[MedienBib.NempSortArray[1]], TAudioFile(item2).Strings[MedienBib.NempSortArray[1]]);
     if tmp1=0 then
     begin
         if MedienBib.NempSortArray[2] = siFileAge then
@@ -762,6 +767,7 @@ begin
     begin
         m:=(l+r) DIV 2;
         // strm:=(Liste[m] as TAudioFile).Strings[SortArray[2]]; //Album;
+
         strm:=(Liste[m] as TAudioFile).Key2;
         c := AnsiCompareText(album,strm);
         if l=r then
@@ -855,11 +861,11 @@ begin
         c := AnsiCompareText(artist,strm);
         if l=r then
         begin
-            if (c=0) OR (AnsiStartsText(artist,strm)) then result:=l
+            if (c=0) OR (AnsiStartsText(artist + '\' ,strm)) then result:=l
             else result:=-1;
         end else
         begin
-            if  (c=0) OR (AnsiStartsText(artist,strm)) then
+            if  (c=0) OR (AnsiStartsText(artist + '\', strm)) then
                 result:=m
             else if c > 0 then
                 result := BinaerArtistSuche_JustContains(Liste,artist,m+1,r)
@@ -884,11 +890,11 @@ begin
         c := AnsiCompareText(album,strm);
         if l=r then
         begin
-            if (c=0) OR (AnsiStartsText(album,strm)) then result:=l
+            if (c=0) OR (AnsiStartsText(album + '\',strm)) then result:=l
             else result:=-1;
         end else
         begin
-            if  (c=0)  OR (AnsiStartsText(album,strm)) then
+            if  (c=0)  OR (AnsiStartsText(album + '\',strm)) then
                 result:=m
             else if c > 0 then
                 result := BinaerAlbumSuche_JustContains(Liste,album,m+1,r)

@@ -918,10 +918,13 @@ function TAudioFile.GetPath: UnicodeString;
 begin
     case fAudioType of
         at_Undef  : result := fStrings[siOrdner];
-        at_File   : result := FStrings[siOrdner] + Dateiname ;
+        at_File   : result := FStrings[siOrdner] + '\' + Dateiname ;
         at_Stream : result := fStrings[siOrdner];
-        at_CDDA   : result := fStrings[siOrdner] + Dateiname;
-        at_CUE    : result := FStrings[siOrdner] + Dateiname ;
+        at_CDDA   : if FStrings[siDateiname] = '' then
+                        result := fStrings[siOrdner]
+                    else
+                        result := fStrings[siOrdner] + '\' + Dateiname;
+        at_CUE    : result := FStrings[siOrdner] + '\' + Dateiname ;
     end;
 end;
 
@@ -932,7 +935,7 @@ begin
 
     case fAudioType of
         at_File: begin
-            FStrings[siOrdner] := ExtractFilePath(Value);//ExtractFileDir(Value);
+            FStrings[siOrdner] := ExtractFileDir(Value); // now without the last '\'  // ExtractFilePath(Value);//
             FStrings[siDateiname] := ExtractFileName(Value);
         end;
 
@@ -942,15 +945,14 @@ begin
         end;
 
         at_CUE : begin
-            FStrings[siOrdner] := ExtractFilePath(Value);//ExtractFileDir(Value);
+            FStrings[siOrdner] := ExtractFileDir(Value); // ExtractFilePath(Value);
             FStrings[siDateiname] := ExtractFileName(Value);
         end;
 
         at_CDDA: begin
-            // todo
             if AnsiLowerCase(ExtractFileExt(Value)) = '.cda' then
             begin // we have a "file" here
-                FStrings[siOrdner] := ExtractFilePath(Value);
+                FStrings[siOrdner] := ExtractFileDir(Value); //ExtractFilePath(Value);
                 FStrings[siDateiname] := ExtractFileName(Value);
             end else
             begin

@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 786
+  ClientHeight = 846
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2460,7 +2460,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 124
+    Height = 184
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
@@ -2472,7 +2472,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 28
       Width = 858
-      Height = 96
+      Height = 156
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2484,12 +2484,12 @@ object Nemp_MainForm: TNemp_MainForm
       ExplicitHeight = 76
       DesignSize = (
         858
-        96)
+        156)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 86
+        Height = 146
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
@@ -2499,7 +2499,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 400
           Top = 0
           Width = 4
-          Height = 86
+          Height = 146
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2509,7 +2509,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 86
+          Height = 146
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2652,7 +2652,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 86
+          Height = 146
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
