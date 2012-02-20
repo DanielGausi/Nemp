@@ -176,6 +176,7 @@ type
         fLyrics: UTF8String;
         //fDescription: UnicodeString;
         fTrack: Byte;
+        fCD: UnicodeString;
         fRating: Byte;
         fPlayCounter: Cardinal;
         // some more properties
@@ -337,6 +338,7 @@ type
 
         property CoverID: String read fCoverID write fCoverID;
         property Track: Byte read fTrack write fTrack;
+        property CD: UnicodeString read fCD write fCD;
         property Duration: Integer read fDuration write fDuration;
         property Rating: Byte read fRating write fRating;
         property PlayCounter: Cardinal read fPlayCounter write fPlayCounter;
@@ -536,7 +538,8 @@ const
       MP3DB_DUMMY_Int3   = 32;
       //MP3DB_DUMMY_Text1  = 33;
       MP3DB_LASTFM_TAGS  = 33;
-      MP3DB_DUMMY_Text2  = 34;
+      //MP3DB_DUMMY_Text2  = 34;
+      MP3DB_CD = 34;    // new in 4.5 (Part of aSet)
       MP3DB_DUMMY_Text3  = 35;
       // 42 marks the end of an AudioFile
       MP3DB_ENDOFINFO = 42;
@@ -789,6 +792,7 @@ begin
     Year := '';
     LastPlayed := 0;
     Track := 0;
+    CD := '';
     coverID := '';
     fRating := 0;
     fFileAge := 40300;    // this is May 2nd, 2010, so all files from Nemp3 will appear as may 2010
@@ -825,6 +829,7 @@ begin
     Genre              := aAudioFile.Genre               ;
     Year               := aAudioFile.Year                ;
     Track              := aAudioFile.Track               ;
+    CD                 := aAudioFile.CD                  ;
     Comment            := aAudioFile.Comment             ;
     Lyrics             := aAudioFile.Lyrics              ;
     CoverID            := aAudioFile.CoverID             ;
@@ -852,6 +857,7 @@ begin
     Genre              := aAudioFile.Genre               ;
     Year               := aAudioFile.Year                ;
     Track              := aAudioFile.Track               ;
+    CD                 := aAudioFile.CD                  ;
     Comment            := aAudioFile.Comment             ;
     // No Lyrics here!
     CoverID            := aAudioFile.CoverID             ;
@@ -1447,6 +1453,8 @@ begin
         Track := GetTrackFromV2TrackString(Id3v2tag.Track);
         if Track = 0 then
             Track := StrToIntDef(Id3v1tag.Track, 0);
+        CD := ID3v2Tag.GetText(IDv2_PARTOFASET);
+
         Lyrics := UTF8Encode(id3v2tag.Lyrics);
 
         if id3v2tag.Comment<>'' then Comment := id3v2tag.Comment
@@ -1625,6 +1633,7 @@ begin
         Genre := FlacFile.Genre;
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
+        CD      := FlacFile.GetPropertyByFieldname(VORBIS_DISCNUMBER);
         Comment := FlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
         Lyrics  := UTF8String(FlacFile.GetPropertyByFieldname(VORBIS_LYRICS));
         // Playcounter/Rating: Maybe incompatible with other Taggers
@@ -1688,6 +1697,7 @@ begin
         Genre := OggVorbisFile.Genre;
 
         // Additional Fields, not OGG-VORBIS-Standard but probably ok
+        CD      := OggVorbisFile.GetPropertyByFieldname(VORBIS_DISCNUMBER);
         Comment := OggVorbisFile.GetPropertyByFieldname(VORBIS_COMMENT);
         Lyrics  := UTF8String(OggVorbisFile.GetPropertyByFieldname(VORBIS_LYRICS));
         // Playcounter/Rating: Maybe incompatible with other Taggers
@@ -1956,6 +1966,7 @@ begin
   fChannelmodeIDX := 4;
   fSamplerateIDX := 9;
   Track := 0;
+  CD := '';
   fRating := 0;
   // Zurücksetzen, damit die Funktion MedienBib.InitCover später anschlagen kann!
   CoverID := '';
@@ -2199,6 +2210,8 @@ begin
         if Track > 0 then
             ID3v2Tag.Track := IntToStr(Track);  // else: DO nothing, dont change "TrackNr"
 
+        ID3v2Tag.SetText(IDv2_PARTOFASET, CD);
+
         ID3v2Tag.Genre := Genre;
 
 
@@ -2261,6 +2274,7 @@ begin
         OggVorbisFile.Date := Year;
         OggVorbisFile.Genre := Genre;
 
+        OggVorbisFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
         OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
         // Playcounter/Rating: Maybe incompatible with other Taggers
@@ -2305,6 +2319,7 @@ begin
         FlacFile.Date := Year;
         FlacFile.Genre := Genre;
 
+        FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
         FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
         FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
         // Playcounter/Rating: Maybe incompatible with other Taggers
@@ -2599,7 +2614,9 @@ begin
             MP3DB_FILESIZE: aStream.Read(fFileSize,SizeOf(fFileSize));
             // new again in Nemp 4.0: FileAge
             MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
-            MP3DB_TRACK: aStream.Read(fTrack, SizeOf(fTrack));
+            MP3DB_TRACK : aStream.Read(fTrack, SizeOf(fTrack));
+            MP3DB_CD    : CD := ReadTextFromStream(aStream);    // New in 4.5
+
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
             MP3DB_YEAR: begin
                 aStream.Read(WYear, SizeOf(WYear));
@@ -2625,7 +2642,7 @@ begin
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
-            MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
+            //MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
 
             else begin
@@ -2687,6 +2704,7 @@ begin
             // new again in Nemp 4.0: FileAge
             MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
             MP3DB_TRACK: aStream.Read(fTrack, SizeOf(fTrack));
+            MP3DB_CD   : CD := ReadTextFromStream(aStream);
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
             MP3DB_YEAR: begin
                 aStream.Read(WYear, SizeOf(WYear));
@@ -2715,7 +2733,7 @@ begin
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
-            MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
+            // MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream(aStream);
 
             else begin
@@ -2836,6 +2854,9 @@ begin
       aStream.Write(ID, SizeOf(Id));
       aStream.Write(Track, SizeOf(Track));
     end;
+
+    if CD <> '' then
+        WriteTextToStream(aStream, MP3DB_CD, CD);
 
     if fRating <> 0 then
     begin

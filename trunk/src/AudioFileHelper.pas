@@ -148,6 +148,7 @@ function AFCompareFilesize(a1,a2: tAudioFile): Integer;
 function AFCompareFileAge(a1,a2: tAudioFile): Integer;
 function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
 function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
+function AFCompareCD(a1,a2: tAudioFile): Integer;
 
 function MainSort(item1, item2: Pointer): Integer;
 
@@ -292,6 +293,10 @@ begin
             result := 1
         else
             result := -1;
+end;
+function AFCompareCD(a1,a2: tAudioFile): Integer;
+begin
+    result := AnsiCompareText(a1.CD, a2.CD);
 end;
 
 

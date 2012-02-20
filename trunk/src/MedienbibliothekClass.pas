@@ -4253,6 +4253,7 @@ begin
         CON_RATING              : NewSortMethod := AFCompareRating;
         CON_PLAYCOUNTER         : NewSortMethod := AFComparePlayCounter;
         CON_LASTFMTAGS          : NewSortMethod := AFCompareLastFMTagsExists;
+        CON_CD                  : NewSortMethod := AFCompareCD;
     else
         NewSortMethod := AFComparePath;
     end;

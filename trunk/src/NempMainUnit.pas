@@ -3931,6 +3931,7 @@ begin
                                else CellText := ' ';
           CON_EXTENSION : CellText := Data^.FAudioFile.Extension;
           CON_TRACKNR   : CellText := IntToStr(Data^.FAudioFile.Track);
+          CON_CD        :  CellText := Data^.FAudioFile.CD;
           CON_RATING    : CellText := '     ';//IntToStr(Data^.FAudioFile.Rating);//'';//
           CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
 
@@ -10093,7 +10094,8 @@ begin
                     CON_STANDARDCOMMENT,
                     CON_YEAR,
                     CON_GENRE,
-                    CON_TRACKNR: begin
+                    CON_TRACKNR,
+                    CON_CD: begin
                         if af.IsQuickEditable then
                         begin
                             ClearShortCuts;
@@ -10244,6 +10246,7 @@ begin
                     CON_YEAR : af.Year := NewText;
                     CON_GENRE: af.Genre := NewText;
                     CON_TRACKNR: af.Track := StrToIntDef(NewText, 0);
+                    CON_CD: af.CD := NewText;
                 else
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
                     CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
