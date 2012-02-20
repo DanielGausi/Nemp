@@ -343,6 +343,8 @@ function Sortieren_AlbumTrack_asc(item1,item2:pointer):integer;
 begin
   result := AnsiCompareText(TAudioFile(item1).Album,TAudioFile(item2).Album);
   if result = 0 then
+      result := AnsiCompareText(TAudioFile(item1).CD, TAudioFile(item2).CD);
+  if result = 0 then
       result := AnsiCompareText(TAudioFile(item1).Ordner, TAudioFile(item2).Ordner);
   if result = 0 then
       result := CompareValue(TAudioFile(item1).Track,TAudioFile(item2).Track);
