@@ -2914,7 +2914,7 @@ var ms: TMemoryStream;
     i, Start: Integer;
 
 begin
-    if AllowLibraryAccess then
+    if AllowLibraryAccess or isAdmin then
     begin
         Start  := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
 
@@ -2948,7 +2948,7 @@ var QueryMode, QueryLetter, QueryValue, QueryOther: String;
     i, Start: Integer;
     a: AnsiString;
 begin
-    if AllowLibraryAccess then
+    if AllowLibraryAccess or isAdmin then
     begin
         Start       := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
         QueryMode   := aRequestInfo.Params.Values['mode'];
@@ -3005,7 +3005,7 @@ var queriedID: Integer;
     html: UTf8String;
     ms: TMemoryStream;
 begin
-    if AllowLibraryAccess then
+    if AllowLibraryAccess or isAdmin then
     begin
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
         // Ja, doppelt eintreten hält besser! Nach dem Verlassen von getAudioFilefromLib könnte sonst die Liste geleert werden!!

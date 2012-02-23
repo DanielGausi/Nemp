@@ -2466,7 +2466,6 @@ object Nemp_MainForm: TNemp_MainForm
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 104
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
@@ -2481,7 +2480,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 76
       DesignSize = (
         858
         156)
@@ -2494,7 +2492,6 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 66
         object Splitter4: TSplitter
           Left = 400
           Top = 0
@@ -2575,7 +2572,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 66
           Columns = <
             item
               Position = 0
@@ -2662,7 +2658,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 66
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -4002,7 +3997,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D0013002C080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130030080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4466,7 +4461,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806440910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806480910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7404,7 +7399,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800980510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101080028009C0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
