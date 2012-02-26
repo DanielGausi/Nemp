@@ -158,6 +158,7 @@ type
         SetStarBitmap: TBitmap;
         HalfStarBitmap: TBitmap;
         UnSetStarBitmap: TBitmap;
+        ABrepeatBitmap: TBitmap;
 
         // Originaler Offset des SKins
         PlayerPageOffsetXOrig: Integer;
@@ -302,6 +303,7 @@ type
         procedure AssignNemp3Glyph(aButton: TSkinButton; aFilename: UnicodeString; Scaled: Boolean=False);
 
         procedure AssignStarGraphics;
+        procedure AssignABGraphics;
 
 
   end;
@@ -330,10 +332,12 @@ begin
   SetStarBitmap := TBitmap.Create;
   HalfStarBitmap:= TBitmap.Create;
   UnSetStarBitmap := TBitmap.Create;
+  ABrepeatBitmap := TBitmap.Create;
 
   SetStarBitmap.Transparent := True;
   HalfStarBitmap.Transparent := True;
   UnSetStarBitmap.Transparent := True;
+  ABrepeatBitmap.Transparent := True;
   SetStarBitmap.Width := 14;
   SetStarBitmap.Height := 14;
   SetStarBitmap.Canvas.Rectangle(0,0,14,14);
@@ -343,6 +347,9 @@ begin
   HalfStarBitmap.Width := 14;
   HalfStarBitmap.Height := 14;
   HalfStarBitmap.Canvas.Rectangle(0,0,14,14);
+  ABrepeatBitmap.Width := 13;
+  ABrepeatBitmap.Height := 14;
+  ABrepeatBitmap.Canvas.Rectangle(0,0,14,14);
 
   isActive := False;
 
@@ -419,6 +426,7 @@ begin
   SetStarBitmap.Free;
   HalfStarBitmap.Free;
   UnSetStarBitmap.Free;
+  ABRepeatBitmap.Free;
 
   NempPartyMode.Free;
 
@@ -1242,6 +1250,7 @@ begin
         AssignButtonSizes;
 
         AssignStarGraphics;
+        AssignABGraphics;
 
         case ButtonMode of
             0: begin
@@ -1284,6 +1293,9 @@ begin
 
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
+
+                AssignNemp3Glyph(BtnABRepeat,  Path + '\BtnABRepeat', True);
+                BtnABRepeat.GlyphLine := BtnABRepeat.GlyphLine;
 
                 AssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
                 BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
@@ -1552,6 +1564,7 @@ begin
         AssignWindowsTabGlyphs(False);
 
         AssignStarGraphics;
+        AssignABGraphics;
 
         for i := 0 to 17 do
         begin
@@ -2285,6 +2298,29 @@ begin
     end;
 end;
 
+procedure TNempSkin.AssignABGraphics;
+var BaseDir: String;
+begin
+    if isActive and (not UseDefaultStarBitmaps) then
+        BaseDir := path + '\'
+    else
+        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+    // fallback
+    if not (FileExists(BaseDir + 'ab-repeat.bmp')
+        or FileExists(BaseDir + 'ab-repeat.png'))
+    then
+        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+    LoadGraphicFromBaseName(ABRepeatBitmap, BaseDir + 'ab-repeat');
+
+    with Nemp_MainForm do
+    begin
+        ab1.Picture.Bitmap.Assign(ABRepeatBitmap);
+        ab2.Picture.Bitmap.Assign(ABRepeatBitmap);
+    end;
+end;
+
 
 procedure TNempSkin.AssignStarGraphics;
 var BaseDir: String;
@@ -2353,6 +2389,14 @@ begin
             DirectionPositionBTN.NempGlyph.Assign(tmpBitmap);
             DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
             DirectionPositionBTN.Refresh;
+
+            BtnABRepeat .drawMode := dm_Windows;
+            BtnABRepeat .NumGlyphs := 1;
+            BtnABRepeat.NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeat', True);
+            BtnABRepeat.NempGlyph.Assign(tmpBitmap);
+            BtnABRepeat.GlyphLine := BtnABRepeat.GlyphLine;
+            BtnABRepeat.Refresh;
 
             BtnLoadHeadset .drawMode := dm_Windows;
             BtnLoadHeadset .NumGlyphs := 1;

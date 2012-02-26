@@ -460,6 +460,9 @@ MainForm_PlaylistMenu_NoStopAfterTitle = 'Do not stop after current title';
 MainForm_ReverseBtnHint_PlayNormal  = 'Play forwards';
 MainForm_ReverseBtnHint_PlayReverse = 'Play backwards';
 
+MainForm_ABRepeatBtnHint_Show = 'Show controls for A-B-Repeat';
+MainForm_ABRepeatBtnHint_Hide = 'Disable A-B-Repeat';
+
 MainForm_ShuttingDownHint          = 'Shutting down...';
 MainForm_ShuttingDownHint_MediaLib = 'Saving medialibrary...';
 

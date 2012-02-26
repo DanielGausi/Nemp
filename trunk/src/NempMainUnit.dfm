@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 846
+  ClientHeight = 926
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -742,6 +742,40 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseLeave = RatingImageMouseLeave
           OnMouseMove = RatingImageMouseMove
         end
+        object ab1: TImage
+          Left = 50
+          Top = 71
+          Width = 13
+          Height = 14
+          Hint = 'A-B Repeat'
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          PopupMenu = PopupRepeatAB
+          Proportional = True
+          Stretch = True
+          Transparent = True
+          Visible = False
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = ab1EndDrag
+          OnStartDrag = ab1StartDrag
+        end
+        object ab2: TImage
+          Left = 63
+          Top = 71
+          Width = 13
+          Height = 14
+          Hint = 'A-B Repeat'
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          PopupMenu = PopupRepeatAB
+          Proportional = True
+          Stretch = True
+          Transparent = True
+          Visible = False
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = ab1EndDrag
+          OnStartDrag = ab1StartDrag
+        end
         object SlideBarButton: TSkinButton
           Left = 20
           Top = 82
@@ -1238,246 +1272,6 @@ object Nemp_MainForm: TNemp_MainForm
           ReadOnly = True
           TabOrder = 0
           OnKeyDown = LyricsMemoKeyDown
-        end
-      end
-      object GRPBOXEffekte: TNempPanel
-        Tag = 5
-        Left = 14
-        Top = 417
-        Width = 191
-        Height = 180
-        BevelOuter = bvNone
-        TabOrder = 2
-        OnDragOver = GRPBOXEffekteDragOver
-        OnPaint = PanelPaint
-        OwnerDraw = False
-        object HallShape: TShape
-          Left = 13
-          Top = 35
-          Width = 125
-          Height = 4
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnMouseDown = HallShapeMouseDown
-        end
-        object HallLBL: TLabel
-          Left = 149
-          Top = 30
-          Width = 3
-          Height = 13
-          Transparent = True
-        end
-        object EchoWetDryMixShape: TShape
-          Left = 13
-          Top = 67
-          Width = 125
-          Height = 4
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnMouseDown = EchoWetDryMixShapeMouseDown
-        end
-        object EchoTimeShape: TShape
-          Left = 13
-          Top = 83
-          Width = 125
-          Height = 4
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnMouseDown = EchoTimeShapeMouseDown
-        end
-        object EchoTimeLBL: TLabel
-          Left = 149
-          Top = 78
-          Width = 3
-          Height = 13
-          Transparent = True
-        end
-        object EchoMixLBL: TLabel
-          Left = 149
-          Top = 62
-          Width = 3
-          Height = 13
-          Transparent = True
-        end
-        object EffekteLBL2: TLabel
-          Left = 13
-          Top = 51
-          Width = 23
-          Height = 13
-          Caption = 'Echo'
-          Transparent = True
-        end
-        object EffekteLBL1: TLabel
-          Left = 13
-          Top = 19
-          Width = 17
-          Height = 13
-          Caption = 'Hall'
-          Transparent = True
-        end
-        object SampleRateShape: TShape
-          Left = 13
-          Top = 115
-          Width = 125
-          Height = 4
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnMouseDown = SampleRateShapeMouseDown
-        end
-        object SampleRateLBL: TLabel
-          Left = 149
-          Top = 110
-          Width = 3
-          Height = 13
-          Transparent = True
-        end
-        object EffekteLBL3: TLabel
-          Left = 13
-          Top = 99
-          Width = 30
-          Height = 13
-          Caption = 'Speed'
-          Transparent = True
-        end
-        object DirectionPositionBTN: TSkinButton
-          Left = 9
-          Top = 131
-          Width = 24
-          Height = 24
-          Hint = 'Play backwards'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 4
-          OnClick = DirectionPositionBTNClick
-          DrawMode = dm_Skin
-          NumGlyphsX = 5
-          NumGlyphsY = 2
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object Btn_EffectsOff: TBitBtn
-          Left = 50
-          Top = 137
-          Width = 99
-          Height = 25
-          Caption = 'Disable effects'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
-          TabOrder = 5
-          OnClick = Btn_EffectsOffClick
-        end
-        object EchoWetDryMixButton: TSkinButton
-          Tag = 1
-          Left = 13
-          Top = 64
-          Width = 25
-          Height = 10
-          DoubleBuffered = True
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          ParentDoubleBuffered = False
-          TabOrder = 1
-          OnDragOver = GRPBOXEffekteDragOver
-          OnEndDrag = EffectsButtonEndDrag
-          OnKeyDown = EchoWetDryMixButtonKeyDown
-          OnMouseDown = EchoWetDryMixButtonMouseDown
-          OnStartDrag = EchoWetDryMixButtonStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object HallButton: TSkinButton
-          Tag = 1
-          Left = 13
-          Top = 32
-          Width = 25
-          Height = 10
-          DoubleBuffered = True
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          ParentDoubleBuffered = False
-          TabOrder = 0
-          OnDragOver = GRPBOXEffekteDragOver
-          OnEndDrag = EffectsButtonEndDrag
-          OnKeyDown = HallButtonKeyDown
-          OnMouseDown = HallButtonMouseDown
-          OnStartDrag = HallButtonStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object EchoTimeButton: TSkinButton
-          Tag = 1
-          Left = 13
-          Top = 80
-          Width = 25
-          Height = 10
-          DoubleBuffered = True
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          ParentDoubleBuffered = False
-          TabOrder = 2
-          OnDragOver = GRPBOXEffekteDragOver
-          OnEndDrag = EffectsButtonEndDrag
-          OnKeyDown = EchoTimeButtonKeyDown
-          OnMouseDown = EchoTimeButtonMouseDown
-          OnStartDrag = EchoWetDryMixButtonStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object SampleRateButton: TSkinButton
-          Tag = 1
-          Left = 63
-          Top = 113
-          Width = 25
-          Height = 10
-          DoubleBuffered = True
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          ParentDoubleBuffered = False
-          TabOrder = 3
-          OnDragOver = GRPBOXEffekteDragOver
-          OnEndDrag = EffectsButtonEndDrag
-          OnKeyDown = SampleRateButtonKeyDown
-          OnMouseDown = SampleRateButtonMouseDown
-          OnStartDrag = SampleRateButtonStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
         end
       end
       object GRPBOXEqualizer: TNempPanel
@@ -2278,6 +2072,267 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
       end
+      object GRPBOXEffekte: TNempPanel
+        Tag = 5
+        Left = 30
+        Top = 345
+        Width = 191
+        Height = 180
+        BevelOuter = bvNone
+        TabOrder = 2
+        OnDragOver = GRPBOXEffekteDragOver
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        object HallShape: TShape
+          Left = 13
+          Top = 23
+          Width = 125
+          Height = 4
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnMouseDown = HallShapeMouseDown
+        end
+        object HallLBL: TLabel
+          Left = 149
+          Top = 18
+          Width = 3
+          Height = 13
+          Transparent = True
+        end
+        object EchoWetDryMixShape: TShape
+          Left = 13
+          Top = 51
+          Width = 125
+          Height = 4
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnMouseDown = EchoWetDryMixShapeMouseDown
+        end
+        object EchoTimeShape: TShape
+          Left = 13
+          Top = 64
+          Width = 125
+          Height = 4
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnMouseDown = EchoTimeShapeMouseDown
+        end
+        object EchoTimeLBL: TLabel
+          Left = 149
+          Top = 59
+          Width = 3
+          Height = 13
+          Transparent = True
+        end
+        object EchoMixLBL: TLabel
+          Left = 149
+          Top = 46
+          Width = 3
+          Height = 13
+          Transparent = True
+        end
+        object EffekteLBL2: TLabel
+          Left = 13
+          Top = 35
+          Width = 23
+          Height = 13
+          Caption = 'Echo'
+          Transparent = True
+        end
+        object EffekteLBL1: TLabel
+          Left = 13
+          Top = 7
+          Width = 17
+          Height = 13
+          Caption = 'Hall'
+          Transparent = True
+        end
+        object SampleRateShape: TShape
+          Left = 13
+          Top = 94
+          Width = 125
+          Height = 4
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnMouseDown = SampleRateShapeMouseDown
+        end
+        object SampleRateLBL: TLabel
+          Left = 149
+          Top = 90
+          Width = 3
+          Height = 13
+          Transparent = True
+        end
+        object EffekteLBL3: TLabel
+          Left = 13
+          Top = 79
+          Width = 30
+          Height = 13
+          Caption = 'Speed'
+          Transparent = True
+        end
+        object DirectionPositionBTN: TSkinButton
+          Left = 13
+          Top = 110
+          Width = 24
+          Height = 24
+          Hint = 'Play backwards'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 4
+          OnClick = DirectionPositionBTNClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 2
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object Btn_EffectsOff: TBitBtn
+          Left = 13
+          Top = 142
+          Width = 99
+          Height = 25
+          Caption = 'Disable effects'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          TabOrder = 6
+          OnClick = Btn_EffectsOffClick
+        end
+        object EchoWetDryMixButton: TSkinButton
+          Tag = 1
+          Left = 13
+          Top = 48
+          Width = 25
+          Height = 10
+          DoubleBuffered = True
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          ParentDoubleBuffered = False
+          TabOrder = 1
+          OnDragOver = GRPBOXEffekteDragOver
+          OnEndDrag = EffectsButtonEndDrag
+          OnKeyDown = EchoWetDryMixButtonKeyDown
+          OnMouseDown = EchoWetDryMixButtonMouseDown
+          OnStartDrag = EchoWetDryMixButtonStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object HallButton: TSkinButton
+          Tag = 1
+          Left = 13
+          Top = 20
+          Width = 25
+          Height = 10
+          DoubleBuffered = True
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          ParentDoubleBuffered = False
+          TabOrder = 0
+          OnDragOver = GRPBOXEffekteDragOver
+          OnEndDrag = EffectsButtonEndDrag
+          OnKeyDown = HallButtonKeyDown
+          OnMouseDown = HallButtonMouseDown
+          OnStartDrag = HallButtonStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object EchoTimeButton: TSkinButton
+          Tag = 1
+          Left = 13
+          Top = 61
+          Width = 25
+          Height = 10
+          DoubleBuffered = True
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          ParentDoubleBuffered = False
+          TabOrder = 2
+          OnDragOver = GRPBOXEffekteDragOver
+          OnEndDrag = EffectsButtonEndDrag
+          OnKeyDown = EchoTimeButtonKeyDown
+          OnMouseDown = EchoTimeButtonMouseDown
+          OnStartDrag = EchoWetDryMixButtonStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object SampleRateButton: TSkinButton
+          Tag = 1
+          Left = 63
+          Top = 92
+          Width = 25
+          Height = 10
+          DoubleBuffered = True
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          ParentDoubleBuffered = False
+          TabOrder = 3
+          OnDragOver = GRPBOXEffekteDragOver
+          OnEndDrag = EffectsButtonEndDrag
+          OnKeyDown = SampleRateButtonKeyDown
+          OnMouseDown = SampleRateButtonMouseDown
+          OnStartDrag = SampleRateButtonStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object BtnABRepeat: TSkinButton
+          Left = 61
+          Top = 110
+          Width = 38
+          Height = 24
+          Hint = 'Show controls for A-B-Repeat'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
+          OnClick = BtnABRepeatClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 2
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+      end
     end
     object PlaylistPanel: TNempPanel
       Tag = 1
@@ -2460,18 +2515,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 184
+    Height = 264
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 184
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 858
-      Height = 156
+      Height = 236
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2480,23 +2536,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 156
       DesignSize = (
         858
-        156)
+        236)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 146
+        Height = 226
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 146
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 146
+          Height = 226
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2506,7 +2564,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 146
+          Height = 226
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2572,6 +2630,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 146
           Columns = <
             item
               Position = 0
@@ -2648,7 +2707,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 146
+          Height = 226
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2658,6 +2717,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 146
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3997,7 +4057,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00130030080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130034080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4461,7 +4521,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806480910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F8064C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7270,6 +7330,13 @@ object Nemp_MainForm: TNemp_MainForm
       RadioItem = True
       OnClick = PM_RepeatMenuClick
     end
+    object N70: TMenuItem
+      Caption = '-'
+    end
+    object PM_ABRepeat: TMenuItem
+      Caption = 'A-B Repeat'
+      OnClick = BtnABRepeatClick
+    end
   end
   object ScrobblerPopup: TPopupMenu
     Left = 749
@@ -7399,7 +7466,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C0101080028009C0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800A00510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7848,5 +7915,13 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = RefreshCoverFlowTimerTimer
     Left = 96
     Top = 624
+  end
+  object PopupRepeatAB: TPopupMenu
+    Left = 688
+    Top = 400
+    object PM_StopABrepeat: TMenuItem
+      Caption = 'Disable A-B-Repeat'
+      OnClick = BtnABRepeatClick
+    end
   end
 end
