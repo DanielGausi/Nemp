@@ -320,6 +320,8 @@ begin
         //SetOriginalPosition(LblPlayerArtist     , i);
         //SetOriginalPosition(LblPlayerAlbum      , i);
         SetOriginalPosition(SlideBarButton      , i);
+        SetOriginalPosition(ab1                 , i);
+        SetOriginalPosition(ab2                 , i);
         SetOriginalPosition(VolButton           , i);
         SetOriginalPosition(AudioPanel          , i);
         SetOriginalPosition(TabBtn_Cover        , i);
@@ -340,6 +342,7 @@ begin
         SetOriginalPosition(SampleRateLBL       , i);
         SetOriginalPosition(EffekteLBL3         , i);
         SetOriginalPosition(DirectionPositionBTN, i);
+        SetOriginalPosition(BtnABRepeat         , i);
         SetOriginalPosition(Btn_EffectsOff      , i);
         SetOriginalPosition(EchoWetDryMixButton , i);
         SetOriginalPosition(HallButton          , i);

@@ -84,6 +84,12 @@ type
       fFileNearEndSyncHandleS: DWord;
       fSlideEndSyncM: DWord;
       fSlideEndSyncS: DWord;
+      fABRepeatSyncM: DWord;
+      fABRepeatSyncS: DWord;
+      fABRepeatStartPosition: Double;
+      fABRepeatEndPosition: Double;
+      fABRepeatActive: Boolean;
+
 
       fHeadsetFileEndSyncHandle: DWord;
 
@@ -318,6 +324,11 @@ type
         property UseFloatingPointChannels: Integer read fUseFloatingPointChannels write fUseFloatingPointChannels;
         property UseHardwareMixing: Boolean read fUseHardwareMixing write fUseHardwareMixing;
 
+        property ABRepeatA: Double read fABRepeatStartPosition;
+        property ABRepeatB: Double read fABRepeatEndPosition;
+        property ABRepeatActive: Boolean read fABRepeatActive;
+
+
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
 
@@ -388,8 +399,11 @@ type
         // eben diese Sync entfernen - sonst kann es bei Pause/Stop mit Fading
         // zu einem Playnext kommen ;-)
         procedure RemoveEndSyncs;
-
         procedure SetSlideEndSyncs;
+
+        procedure SetABSyncs(p1, p2: Double);
+        procedure RemoveABSyncs;
+
         function GetActiveCue: integer;
         function JumpToNextCue: Boolean;
         function JumpToPrevCue: Boolean;
@@ -460,6 +474,13 @@ begin
     if TNempPlayer(User).fSlideIsStopSlide then
         SendMessage(TNempPlayer(User).MainWindowHandle, WM_PlayerStop, 0, 0);
     TNempPlayer(User).fSlideIsStopSlide := False;
+end;
+
+procedure ABRepeatProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+begin
+    TNempPlayer(User).Progress := TNempPlayer(User).fABRepeatStartPosition;
+    // refresh Cue stuff
+    SendMessage(TNempPlayer(User).MainWindowHandle, WM_NextCue, 0, 0);
 end;
 
 procedure EndCountdownProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -580,6 +601,7 @@ begin
     PreviewBackGround := TBitmap.Create;
     PreviewBackGround.Width :=200;
     PreviewBackGround.Height := 145;
+    fABRepeatActive := False;
 end;
 
 destructor TNempPlayer.Destroy;
@@ -2187,9 +2209,68 @@ begin
     fStopStatus := PLAYER_STOP_AFTERTITLE;
 end;
 
+procedure TNempPlayer.SetABSyncs(p1, p2: Double);
+var tmp, t1: Double;
+    syncpos: LongWord;
+
+begin
+    if p2 = -1 then
+    begin
+        // get automatic p2: p1 + 10 seconds
+        t1 := BASS_ChannelBytes2seconds(MainStream,
+              Round(BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE) * p1)) + 10;
+        SyncPos := BASS_ChannelSeconds2bytes(MainStream, t1);
+
+        fABRepeatEndPosition := SyncPos / BASS_ChannelGetLength(mainstream, BASS_POS_BYTE);
+
+    end else
+    begin
+        if p1 > p2 then
+        begin
+            // swap
+            tmp := p1;
+            p1 := p2;
+            p2 := tmp;
+        end;
+
+        if p2 > 0.999 then
+            p2 := 0.999;
+
+        fABRepeatEndPosition := p2;
+        SyncPos := (Round(BASS_ChannelGetLength(MainStream, BASS_POS_BYTE) * p2));
+    end;
+    fABRepeatStartPosition := p1;
+    fABRepeatActive := True;
+
+    RemoveEndSyncs; // no automatic title change in AB-repeat mode
+    // delete old AB Syncs
+    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncM);
+    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncS);
+    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncM);
+    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncS);
+
+    fABRepeatSyncM := Bass_ChannelSetSync(MainStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+    fABRepeatSyncS := Bass_ChannelSetSync(SlideStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+end;
+
+procedure TNempPlayer.RemoveABSyncs;
+begin
+    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncM);
+    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncS);
+    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncM);
+    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncS);
+    SetEndSyncs(MainStream);
+    SetEndSyncs(SlideStream);
+    fABRepeatActive := False;
+end;
+
 procedure TNempPlayer.RemoveEndSyncs;
 begin
-    BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM); //then
+    BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM);
     BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleM);
     BASS_ChannelRemoveSync(SlideStream, fFileNearEndSyncHandleS);
     BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleS);

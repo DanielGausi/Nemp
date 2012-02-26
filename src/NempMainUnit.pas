@@ -824,6 +824,13 @@ type
     MM_T_WebServerShowLog: TMenuItem;
     PM_P_WebServerShowLog: TMenuItem;
     BtnHeadsetPlaynow: TSkinButton;
+    ab1: TImage;
+    ab2: TImage;
+    BtnABRepeat: TSkinButton;
+    N70: TMenuItem;
+    PM_ABRepeat: TMenuItem;
+    PopupRepeatAB: TPopupMenu;
+    PM_StopABrepeat: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1386,6 +1393,9 @@ type
     procedure PM_PL_AddCDAudioClick(Sender: TObject);
     procedure PM_W_WebServerShowLogClick(Sender: TObject);
     procedure BtnHeadsetPlaynowClick(Sender: TObject);
+    procedure ab1StartDrag(Sender: TObject; var DragObject: TDragObject);
+    procedure ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
+    procedure BtnABRepeatClick(Sender: TObject);
 
   private
 
@@ -4936,6 +4946,31 @@ begin
     end;
 end;
 
+procedure TNemp_MainForm.BtnABRepeatClick(Sender: TObject);
+begin
+    if NempPlayer.ABRepeatActive then
+    begin
+        // currently active => Deactivate it
+        NempPlayer.RemoveABSyncs;
+        BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Show;
+        BtnABRepeat.GlyphLine := 0;
+    end else
+    begin
+        // currently not active => Activate it
+        NempPlayer.SetABSyncs(NempPlayer.Progress, -1);
+        ab1.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width-SlideBarButton.Width)) - (ab1.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
+        ab2.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width-SlideBarButton.Width)) - (ab2.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
+        BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Hide;
+        BtnABRepeat.GlyphLine := 1;
+    end;
+
+    ab1.Visible := NempPlayer.ABRepeatActive;
+    ab2.Visible := NempPlayer.ABRepeatActive;
+    BtnABRepeat.Refresh;
+
+    PM_ABRepeat.Checked := NempPlayer.ABRepeatActive;
+end;
+
 procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     ListFile, BibFile: TAudioFile;
@@ -6005,6 +6040,37 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.ab1StartDrag(Sender: TObject;
+  var DragObject: TDragObject);
+var AREct: tRect;
+begin
+    with (Sender as TControl) do
+        Begindrag(false);
+
+    (Sender as TControl).BringToFront;
+    SlideBarButton.BringToFront;
+
+    ARect.TopLeft :=  (PlayerPanel.ClientToScreen(Point(NewPlayerPanel.Left, NewPlayerPanel.Top)));
+    ARect.BottomRight :=  (PlayerPanel.ClientToScreen(Point(NewPlayerPanel.Left + NewPlayerPanel.Width, NewPlayerPanel.Top + NewPlayerPanel.Height)));
+    SlideBarButton.Tag := 1;
+    ClipCursor(@Arect);
+end;
+
+
+procedure TNemp_MainForm.ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
+begin
+    ClipCursor(NIL);
+    SlideBarButton.Tag := 0;
+
+    //NempPlaylist.Progress :=
+    //(SlideBarButton.Left-SlideBarShape.Left) / (SlideBarShape.Width-SlideBarButton.Width);
+
+    NempPlayer.SetABSyncs(
+        (ab1.Left + (ab1.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width),
+        (ab2.Left + (ab2.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width)
+        );
+end;
+
 procedure TNemp_MainForm.SlidebarButton_HeadsetKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
@@ -6048,6 +6114,21 @@ begin
             NewPos := VolShape.Top + VolShape.Height - (VolButton.Height Div 2);
         VolButton.Top := NewPos;
         NempPlayer.Volume := VCLVolToPlayer;
+    end else
+    if (source = ab1) or (source = ab2) then
+    begin
+        if (Sender is TNempPanel) then
+            NewPos := x - ((source as TControl).Width Div 2)
+        else
+            NewPos := (Sender as TControl).Left + x - ((source as TControl).Width Div 2);
+
+        if NewPos <= SlideBarShape.Left - ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2) then
+            NewPos := SlideBarShape.Left - ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2)
+        else
+            if NewPos >= SlideBarShape.Width  + SlideBarShape.Left - SlideBarButton.Width - ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2) then
+                NewPos := SlideBarShape.Width + SlideBarShape.Left - SlideBarButton.Width - ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2);
+        (source as TControl).Left := NewPos;
+        NempPlayer.DrawTimeFromProgress(((source as TControl).Left + ((source as TControl).Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width-SlideBarButton.Width));
     end else
     if source = SlidebarButton_Headset then
     begin
@@ -10303,6 +10384,7 @@ begin
     SetForeGroundWindow(AuswahlForm.Handle);
   SetForeGroundWindow(Handle);
 end;
+
 
 procedure TNemp_MainForm.ActualizeVDTCover;
 begin
