@@ -1091,6 +1091,7 @@ begin
         PostProcessor.Process(Status = PLAYER_ISPLAYING);
     end;
     // EndSyncs löschen - Sonst ggf. doppeltes Next
+    RemoveABSyncs;
     RemoveEndSyncs;
     StopRecording;
     // Wiedergabe stoppen und Handles freigeben
@@ -1116,7 +1117,7 @@ begin
     Spectrum.DrawTime('  00:00');
     MainStream := 0;
     SlideStream := 0;
-  
+
     UpdateDeskband(NEMP_API_STOPPED, 0);
     ActualizePlayPauseBtn(NEMP_API_STOPPED, 0);
 end;
