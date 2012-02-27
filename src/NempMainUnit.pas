@@ -4949,26 +4949,10 @@ end;
 procedure TNemp_MainForm.BtnABRepeatClick(Sender: TObject);
 begin
     if NempPlayer.ABRepeatActive then
-    begin
-        // currently active => Deactivate it
-        NempPlayer.RemoveABSyncs;
-        BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Show;
-        BtnABRepeat.GlyphLine := 0;
-    end else
-    begin
-        // currently not active => Activate it
+        NempPlayer.RemoveABSyncs
+    else
         NempPlayer.SetABSyncs(NempPlayer.Progress, -1);
-        ab1.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width-SlideBarButton.Width)) - (ab1.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
-        ab2.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width-SlideBarButton.Width)) - (ab2.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
-        BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Hide;
-        BtnABRepeat.GlyphLine := 1;
-    end;
-
-    ab1.Visible := NempPlayer.ABRepeatActive;
-    ab2.Visible := NempPlayer.ABRepeatActive;
-    BtnABRepeat.Refresh;
-
-    PM_ABRepeat.Checked := NempPlayer.ABRepeatActive;
+    CorrectVCLForABRepeat;
 end;
 
 procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
@@ -10661,6 +10645,8 @@ begin
     DirectionPositionBTN.Tag := 0;
     DirectionPositionBTN.Hint := (MainForm_ReverseBtnHint_PlayReverse);
   end;
+
+  CorrectVCLForABRepeat;
 
   //Einige Buttons dis/enablen, je nachdem ob ne URL grade im Player läuft
   tmp := not NempPlayer.URLStream;
