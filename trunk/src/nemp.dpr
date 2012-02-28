@@ -93,7 +93,8 @@ uses
   DeleteSelect in 'DeleteSelect.pas' {DeleteSelection},
   CustomizedScrobbler in 'CustomizedScrobbler.pas',
   Votings in 'Votings.pas',
-  WebServerLog in 'WebServerLog.pas' {WebServerLogForm};
+  WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
+  SilenceDetection in 'SilenceDetection.pas';
 
 //,  classes;
 
