@@ -38,7 +38,7 @@ uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnr
       bass, bass_fx, basscd, spectrum_vis, DateUtils,
       AudioFileClass,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
-      Easteregg, ScrobblerUtils, CustomizedScrobbler;
+      Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection;
 
 const USER_WANT_PLAY = 1;
       USER_WANT_STOP = 2;
@@ -76,12 +76,19 @@ type
 
       // handles for sliding, crossfading, ...
       // *M / *S: Mainstream/SlideStream
+      fFileEndSyncHandleM: DWord;  // really the end of the file
+      fFileEndSyncHandleS: DWord;  // set it always, in case the other syncs are missed
+
+      fSilenceBeginSyncHandleM: DWord; // Syncs where the Silence begin
+      fSilenceBeginSyncHandleS: DWord; //
+
+      fFileNearEndSyncHandleM: DWord; // for fading into the next track
+      fFileNearEndSyncHandleS: DWord; // (x seconds before file end OR SilenceBegin)
+
+
       fCueSyncHandleM: DWord;
       fCueSyncHandleS: DWord;
-      fFileEndSyncHandleM: DWord;
-      fFileEndSyncHandleS: DWord;
-      fFileNearEndSyncHandleM: DWord;
-      fFileNearEndSyncHandleS: DWord;
+
       fSlideEndSyncM: DWord;
       fSlideEndSyncS: DWord;
       fABRepeatSyncM: DWord;
@@ -90,8 +97,13 @@ type
       fABRepeatEndPosition: Double;
       fABRepeatActive: Boolean;
 
-
       fHeadsetFileEndSyncHandle: DWord;
+
+      fSilenceDetected: Boolean;
+      fSilenceStart: Double;     // Position in Seconds
+
+      fDoSilenceDetection: Boolean;
+      fSilenceThreshold: Integer;
 
       fStatus: Integer;       // Playing, paused, stopped
       fStopStatus: Integer;   // "normal Stop" or "Stop after title"
@@ -175,6 +187,8 @@ type
       procedure ActualizePlayPauseBtn(wParam, lParam: Integer);
       // send a Message to the Deskband (set play/pause-button there as well)
       procedure UpdateDeskband(wParam, lParam: Integer);
+
+      procedure StartSilenceDetection;
 
     public
         MainAudioFile: TPlaylistFile;
@@ -328,6 +342,9 @@ type
         property ABRepeatB: Double read fABRepeatEndPosition;
         property ABRepeatActive: Boolean read fABRepeatActive;
 
+        property DoSilenceDetection: Boolean read fDoSilenceDetection write fDoSilenceDetection;
+        property SilenceThreshold: Integer read fSilenceThreshold write fSilenceThreshold;
+
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
@@ -427,6 +444,7 @@ type
         // Ermitteln, ob neue Daten noch in den Stream passen, oder ob ein neuer Angefangen werden soll
         function SplitRecordStreamNow(BufLen: DWORD): Boolean;  // BufLen: Länge des neuen Buffers
 
+        procedure ProcessSilenceDetection(aSilenceDetector: TSilenceDetector);
   end;
 
 
@@ -824,6 +842,9 @@ begin
   IgnoreFadingOnPause   := ini.ReadBool('Player', 'IgnoreOnPause', True);
   IgnoreFadingOnStop    := ini.ReadBool('Player', 'IgnoreOnStop', True);
 
+  DoSilenceDetection    := ini.ReadBool('Player', 'DoSilenceDetection', True);
+  SilenceThreshold      := Ini.ReadInteger('Player', 'SilenceThreshold', -40);
+
   fPlayingTitelMode     := ini.ReadInteger('Player','AnzeigeModus',0);
   UseVisualization      := ini.ReadBool('Player','UseVisual',True);
   VisualizationInterval := ini.ReadInteger('Player','Visualinterval',40);
@@ -919,6 +940,9 @@ begin
   ini.WriteBool('Player', 'IgnoreOnShortTracks', IgnoreFadingOnShortTracks);
   ini.WriteBool('Player', 'IgnoreOnPause', IgnoreFadingOnPause);
   ini.WriteBool('Player', 'IgnoreOnStop', IgnoreFadingOnStop);
+
+  ini.WriteBool('Player', 'DoSilenceDetection', DoSilenceDetection);
+  ini.WriteInteger('Player', 'SilenceThreshold', SilenceThreshold);
 
   ini.WriteInteger('Player','AnzeigeModus', fPlayingTitelMode);
   ini.WriteBool('Player','UseVisual', UseVisualization);
@@ -1157,6 +1181,8 @@ begin
   MainAudioFileIsPresentAndPlaying := False;
   // We begin a new File:
   EndFileProcReached := False;
+  fSilenceDetected := False;
+  fSilenceStart := 0;
 
   if MainAudioFile <> NIL then
   begin
@@ -1273,12 +1299,9 @@ begin
                     BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
                 BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_VOL, 0);
                 fReallyUseFading := True;
-              //end else
-              //begin
-              //  Slidestream := 0;
-              //  fReallyUseFading := False;
-              //end;
 
+                if DoSilenceDetection then
+                    StartSilenceDetection;
           end;
 
           at_Stream: begin
@@ -1590,6 +1613,19 @@ begin
         BASS_ChannelPlay(JingleStream, true);
     end;
   end;
+end;
+
+procedure TNempPlayer.ProcessSilenceDetection(
+  aSilenceDetector: TSilenceDetector);
+begin
+    if aSilenceDetector.SilenceStart > 0 then
+    begin
+        fSilenceDetected := True;
+        fSilenceStart := aSilenceDetector.SilenceStart;
+
+        SetEndSyncs(MainStream);
+        SetEndSyncs(SlideStream);
+    end;
 end;
 
 procedure TNempPlayer.StopJingle;
@@ -2139,24 +2175,45 @@ begin
 end;
 
 procedure TNempPlayer.SetEndSyncs(Dest: DWord);
-var syncpos: LongWord;
+var silencepos, syncposFading: LongWord;
 begin
+
     // ruhig die Dauer des mainstreams nehmen - sonst is eh was verkehrt ;-)
-    syncpos := Bass_ChannelSeconds2Bytes(mainstream, Dauer - (FadingInterval / 1000));
+    if fSilenceDetected then
+    begin
+        syncposFading := Bass_ChannelSeconds2Bytes(mainstream, fSilenceStart - (FadingInterval / 1000));
+        silencepos := Bass_ChannelSeconds2Bytes(mainstream, fSilenceStart);
+    end
+    else
+    begin
+        syncposFading := Bass_ChannelSeconds2Bytes(mainstream, Dauer - (FadingInterval / 1000));
+        silencepos := 0;
+    end;
+
     if dest = Mainstream then
     begin
           BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleM); //then
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleM);
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleS);
           BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleS);
+          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleM);
+          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleS);
           // Sync im Mainstream setzen
           if UseFading And fReallyUsefading
                 AND (Dauer > FadingInterval DIV 200)
                 AND (Not MainStreamIsReverseStream)
           then
               fFileNearEndSyncHandleM := Bass_ChannelSetSync(MainStream,
-                    BASS_SYNC_POS, syncpos,
-                    @EndFileProc, Self);
+                    BASS_SYNC_POS, syncposFading,
+                    @EndFileProc, Self)
+          else
+          begin
+              // no fading, so set sync at the beginning of silence (if detected)
+              if fSilenceDetected then
+                  fSilenceBeginSyncHandleM := Bass_ChannelSetSync(MainStream,
+                      BASS_SYNC_POS, silencepos,
+                      @EndFileProc, Self)
+          end;
           // Das hier immer setzen
           fFileEndSyncHandleM := Bass_ChannelSetSync(MainStream,
                     BASS_SYNC_END, 0,
@@ -2167,15 +2224,26 @@ begin
           BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleM);
           BASS_ChannelRemoveSync(SlideStream, fFileNearEndSyncHandleS);
           BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleS);
-         // Sync im SlideStream setzen
-         if UseFading And fReallyUsefading
+          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleM);
+          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleS);
+          // Sync im SlideStream setzen
+          if UseFading And fReallyUsefading
               AND (Dauer > FadingInterval DIV 200)
               AND (Not MainStreamIsReverseStream)
-         then
+          then
               fFileNearEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
-                    BASS_SYNC_POS, syncpos,
-                    @EndFileProc, Self);
-         fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
+                    BASS_SYNC_POS, syncposFading,
+                    @EndFileProc, Self)
+          else
+          begin
+              // no fading, so set sync at the beginning of silence (if detected)
+              if fSilenceDetected then
+                  fSilenceBeginSyncHandleS := Bass_ChannelSetSync(SlideStream,
+                      BASS_SYNC_POS, silencepos,
+                      @EndFileProc, Self)
+          end;
+
+          fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
                     BASS_SYNC_END, 0,
                     @EndFileProc, Self);
     end;
@@ -2191,6 +2259,8 @@ begin
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleM);
           BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleS);
           BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleS);
+          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleM);
+          BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleS);
           // Sync im Mainstream setzen
           fFileEndSyncHandleM := Bass_ChannelSetSync(MainStream,
                     BASS_SYNC_END, 0,
@@ -2201,6 +2271,8 @@ begin
           BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleM);
           BASS_ChannelRemoveSync(SlideStream, fFileNearEndSyncHandleS);
           BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleS);
+          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleM);
+          BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleS);
          // Sync im SlideStream setzen
          fFileEndSyncHandleS := Bass_ChannelSetSync(SlideStream,
                     BASS_SYNC_END, 0,
@@ -2279,6 +2351,10 @@ begin
     BASS_ChannelRemoveSync(SlideStream, fFileEndSyncHandleM);
     BASS_ChannelRemoveSync(MainStream, fFileNearEndSyncHandleS);
     BASS_ChannelRemoveSync(MainStream, fFileEndSyncHandleS);
+    BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleM);
+    BASS_ChannelRemoveSync(MainStream, fSilenceBeginSyncHandleS);
+    BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleM);
+    BASS_ChannelRemoveSync(SlideStream, fSilenceBeginSyncHandleS);
     SendMessage(MainWindowHandle, WM_ChangeStopBtn, 0, 0);
     fStopStatus := PLAYER_STOP_NORMAL;
 end;
@@ -3029,6 +3105,23 @@ begin
       MessageDlg(Player_FilenameWebradioTooLong, mtWarning, [mbOK], 0);
   end;
 
+end;
+
+procedure TNempPlayer.StartSilenceDetection;
+var aSilenceDetector: TSilenceDetector;
+begin
+    if assigned(MainAudioFile)
+        and (MainStream <> 0)
+        and (Bass_ChannelBytes2Seconds(MainStream, Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) >= 2)
+    then
+    begin
+        aSilenceDetector := TSilenceDetector.Create(MainWindowHandle, MainAudioFile.Pfad);
+        try
+            aSilenceDetector.GetSilenceLength(fSilenceThreshold);
+        finally
+            // dont free it, there is a secondary Thread running!
+        end;
+    end;
 end;
 
 procedure TNempPlayer.StopRecording;

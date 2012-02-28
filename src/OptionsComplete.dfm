@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio10
+    ActivePage = TabAudio0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2846,6 +2846,53 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Ignore fading when stopping the player.'
           Caption = 'Ignore on stop'
           TabOrder = 5
+        end
+      end
+      object GrpBox_TabAudio2_Silence: TGroupBox
+        Left = 8
+        Top = 285
+        Width = 433
+        Height = 93
+        Caption = 'Silence detection'
+        TabOrder = 2
+        object Lbl_SilenceThreshold: TLabel
+          Left = 24
+          Top = 39
+          Width = 47
+          Height = 13
+          Caption = 'Threshold'
+        end
+        object Lbl_SilenceDB: TLabel
+          Left = 87
+          Top = 59
+          Width = 12
+          Height = 13
+          Caption = 'dB'
+        end
+        object CB_SilenceDetection: TCheckBox
+          Left = 8
+          Top = 16
+          Width = 409
+          Height = 17
+          Hint = 
+            'Automatically detect and skip the silent parts at the end of the' +
+            ' tracks '
+          Caption = 'Skip silence at the end of tracks'
+          TabOrder = 0
+          OnClick = CB_SilenceDetectionClick
+        end
+        object SE_SilenceThreshold: TSpinEdit
+          Left = 24
+          Top = 55
+          Width = 57
+          Height = 22
+          Hint = 
+            'Threshold for "silence". A threshold of -5dB to -10dB will skip ' +
+            'a lot, -40dB and below will skip only really quiet parts.'
+          MaxValue = -5
+          MinValue = -100
+          TabOrder = 1
+          Value = -40
         end
       end
     end

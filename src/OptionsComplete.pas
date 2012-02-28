@@ -465,6 +465,11 @@ type
     BtnShowWebserverLog: TButton;
     LblWebserverAdminURL: TLabel;
     LblWebserverUserURL: TLabel;
+    GrpBox_TabAudio2_Silence: TGroupBox;
+    CB_SilenceDetection: TCheckBox;
+    Lbl_SilenceThreshold: TLabel;
+    SE_SilenceThreshold: TSpinEdit;
+    Lbl_SilenceDB: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -557,6 +562,7 @@ type
     procedure LblWebserverAdminURLClick(Sender: TObject);
     procedure LblWebserverUserURLClick(Sender: TObject);
     procedure ChangeWebserverLinks(Sender: TObject);
+    procedure CB_SilenceDetectionClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -975,6 +981,12 @@ begin
   LblConst_ms2.Enabled := CB_Fading.Checked;
   LblConst_TitleChange.Enabled := CB_Fading.Checked;
   LblConst_TitleFade.Enabled := CB_Fading.Checked;
+
+  CB_SilenceDetection.Checked  := NempPlayer.DoSilenceDetection;
+  SE_SilenceThreshold.Value    := NempPlayer.SilenceThreshold;
+  Lbl_SilenceThreshold.Enabled := NempPlayer.DoSilenceDetection;
+  SE_SilenceThreshold.Enabled  := NempPlayer.DoSilenceDetection;
+  Lbl_SilenceDB.Enabled        := NempPlayer.DoSilenceDetection;
 
   if NempPlayer.MainDevice > 0 then
       MainDeviceCB.ItemIndex := NempPlayer.MainDevice - 1
@@ -1579,6 +1591,13 @@ begin
   LblConst_ms2.Enabled := CB_Fading.Checked;
 end;
 
+procedure TOptionsCompleteForm.CB_SilenceDetectionClick(Sender: TObject);
+begin
+  Lbl_SilenceThreshold.Enabled := CB_SilenceDetection.Checked;
+  SE_SilenceThreshold.Enabled  := CB_SilenceDetection.Checked;
+  Lbl_SilenceDB.Enabled        := CB_SilenceDetection.Checked;
+end;
+
 procedure TOptionsCompleteForm.cb_RatingActiveClick(Sender: TObject);
 begin
   cb_RatingIgnoreShortFiles             .Enabled := cb_RatingActive.Checked;
@@ -1610,6 +1629,7 @@ procedure TOptionsCompleteForm.CB_ScrollTitleInMainWindowClick(
 begin
     CB_AnzeigeDelay.Enabled := CB_ScrollTitleInMainWindow.Checked;
 end;
+
 
 procedure TOptionsCompleteForm.CB_AutoPlayOnStartClick(Sender: TObject);
 begin
@@ -1948,6 +1968,9 @@ begin
   NempPlayer.IgnoreFadingOnShortTracks := CB_IgnoreFadingOnShortTracks.Checked;
   NempPlayer.IgnoreFadingOnPause := CB_IgnoreFadingOnPause.Checked;
   NempPlayer.IgnoreFadingOnStop := CB_IgnoreFadingOnStop.Checked;
+
+  NempPlayer.DoSilenceDetection := CB_SilenceDetection.Checked ;
+  NempPlayer.SilenceThreshold   := SE_SilenceThreshold.Value   ;
 
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;

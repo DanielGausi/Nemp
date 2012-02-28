@@ -321,6 +321,8 @@ const
 
     WM_PlayerHeadSetEnd = WM_USER + 515;
 
+    WM_PlayerSilenceDetected = WM_USER + 516;
+
     //---------------------------------------
 
     // Messages der Medienbibliothek

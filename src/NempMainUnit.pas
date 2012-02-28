@@ -58,7 +58,7 @@ uses
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage,
 
-  ExPopupList;
+  ExPopupList, SilenceDetection;
 
 type
 
@@ -11124,7 +11124,35 @@ end;
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
     //asknomore: Boolean;
+    //aNode: PVirtualNode;
+    //Data: PTreeData;
+    //AudioFile: TAudioFile;
+    //sd: TSilenceDetector;
 begin
+    {if AktiverTree = VST then
+        aNode := VST.FocusedNode
+    else
+        aNode := PlaylistVST.FocusedNode;
+
+  if Assigned(aNode) then
+  begin
+      Data := VST.GetNodeData(aNode);
+      AudioFile := Data^.FAudioFile;
+
+      sd := TSilenceDetector.Create(self.Handle, AudioFile.Pfad);
+      try
+          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-10)));
+          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-20)));
+          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-30)));
+          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-40)));
+          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-50)));
+      finally
+          sd.Free;
+      end;
+
+  end;
+
+     }
 // Note: I Use this EventHandler testing several things
 // commented code is just temporary here. ;-)
 

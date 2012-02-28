@@ -34,7 +34,7 @@ unit MessageHelper;
 interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs, myDialogs,
-    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper;
+    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper, SilenceDetection;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
@@ -1607,13 +1607,15 @@ begin
     WM_PlayerHeadSetEnd : begin
           SlidebarButton_Headset.Left := SlidebarShapeHeadset.Left;
           PlayPauseHeadsetBtn.GlyphLine := 0;
-
-
     end;
     WM_PlayerStopRecord : begin
                                  // Aufnahme wurde beendet
                                 RecordBtn.GlyphLine := 0;
                                 RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
+    end;
+
+    WM_PlayerSilenceDetected: begin
+        NempPlayer.ProcessSilenceDetection(TSilenceDetector(Message.wParam));
     end;
 
     WM_PlayerAcceptInput: NempPlaylist.AcceptInput := True;
