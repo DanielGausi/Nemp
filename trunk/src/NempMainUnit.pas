@@ -831,6 +831,11 @@ type
     PM_ABRepeat: TMenuItem;
     PopupRepeatAB: TPopupMenu;
     PM_StopABrepeat: TMenuItem;
+    PM_ABRepeatSetA: TMenuItem;
+    PM_ABRepeatSetB: TMenuItem;
+    PM_SetA: TMenuItem;
+    PM_SetB: TMenuItem;
+    N78: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1396,6 +1401,8 @@ type
     procedure ab1StartDrag(Sender: TObject; var DragObject: TDragObject);
     procedure ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure BtnABRepeatClick(Sender: TObject);
+    procedure PM_ABRepeatSetAClick(Sender: TObject);
+    procedure PM_ABRepeatSetBClick(Sender: TObject);
 
   private
 
@@ -4796,6 +4803,8 @@ begin
   end
 end;
 
+
+
 procedure TNemp_MainForm.PM_Cover_DontShowDetailsClick(Sender: TObject);
 begin
     Nemp_MainForm.NempOptions.DetailMode := (Sender as TMenuItem).Tag;
@@ -4952,6 +4961,18 @@ begin
         NempPlayer.RemoveABSyncs
     else
         NempPlayer.SetABSyncs(NempPlayer.Progress, -1);
+    CorrectVCLForABRepeat;
+end;
+
+procedure TNemp_MainForm.PM_ABRepeatSetAClick(Sender: TObject);
+begin
+    NempPlayer.SetASync(NempPlayer.Progress);
+    CorrectVCLForABRepeat;
+end;
+
+procedure TNemp_MainForm.PM_ABRepeatSetBClick(Sender: TObject);
+begin
+    NempPlayer.SetBSync(NempPlayer.Progress);
     CorrectVCLForABRepeat;
 end;
 

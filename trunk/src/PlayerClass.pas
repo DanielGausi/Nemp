@@ -419,7 +419,10 @@ type
         procedure SetSlideEndSyncs;
 
         procedure SetABSyncs(p1, p2: Double);
+        procedure SetASync(p1: Double);
+        procedure SetBSync(p1: Double);
         procedure RemoveABSyncs;
+        procedure ClearABSyncs;
 
         function GetActiveCue: integer;
         function JumpToNextCue: Boolean;
@@ -2285,57 +2288,145 @@ end;
 procedure TNempPlayer.SetABSyncs(p1, p2: Double);
 var tmp, t1: Double;
     syncpos: LongWord;
+    ByteLength: LongWord;
 
 begin
-    if p2 = -1 then
+
+    ByteLength := BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE);
+    if ByteLength > 0 then
     begin
-        // get automatic p2: p1 + 10 seconds
-        t1 := BASS_ChannelBytes2seconds(MainStream,
-              Round(BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE) * p1)) + 10;
-        SyncPos := BASS_ChannelSeconds2bytes(MainStream, t1);
-
-        fABRepeatEndPosition := SyncPos / BASS_ChannelGetLength(mainstream, BASS_POS_BYTE);
-
+        if p2 = -1 then
+        begin
+            // get automatic p2: p1 + 10 seconds
+            t1 := BASS_ChannelBytes2seconds(MainStream,
+                  Round(ByteLength * p1)) + 10;
+            SyncPos := BASS_ChannelSeconds2bytes(MainStream, t1);
+            if SyncPos > ByteLength then
+                SyncPos := ByteLength;
+            fABRepeatEndPosition := SyncPos / ByteLength;
+        end else
+        begin
+            if p1 > p2 then
+            begin
+                // swap
+                tmp := p1;
+                p1 := p2;
+                p2 := tmp;
+            end;
+            if p2 > 0.999 then
+                p2 := 0.999;
+            fABRepeatEndPosition := p2;
+            SyncPos := (Round(ByteLength * p2));
+        end;
+        fABRepeatStartPosition := p1;
+        fABRepeatActive := True;
     end else
     begin
-        if p1 > p2 then
-        begin
-            // swap
-            tmp := p1;
-            p1 := p2;
-            p2 := tmp;
-        end;
-
-        if p2 > 0.999 then
-            p2 := 0.999;
-
-        fABRepeatEndPosition := p2;
-        SyncPos := (Round(BASS_ChannelGetLength(MainStream, BASS_POS_BYTE) * p2));
+        SyncPos := 0;
+        fABRepeatStartPosition := 0;
+        fABRepeatEndPosition := 0;
+        fABRepeatActive := False;
     end;
-    fABRepeatStartPosition := p1;
-    fABRepeatActive := True;
 
     RemoveEndSyncs; // no automatic title change in AB-repeat mode
     // delete old AB Syncs
+    ClearABSyncs;
+
+    if fABRepeatActive then
+    begin
+        fABRepeatSyncM := Bass_ChannelSetSync(MainStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+        fABRepeatSyncS := Bass_ChannelSetSync(SlideStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+    end;
+end;
+
+procedure TNempPlayer.SetASync(p1: Double);
+var ByteLength: Integer;
+begin
+    if p1 < 0 then p1 := 0;
+    if p1 > 0.999 then p1 := 0.999;
+
+    ByteLength := BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE);
+    if ByteLength > 0 then
+    begin
+        // Start position is here
+        fABRepeatStartPosition := p1;
+        fABRepeatActive := True;
+
+        if fABRepeatEndPosition < fABRepeatStartPosition then
+        begin
+            // the new Start-Positon is after the current End-Position
+            // (or B is not set yet)
+            // so, remove AB syncs (if necessary)
+            ClearABSyncs;
+            // and
+            fABRepeatEndPosition := p1;
+        end;
+    end else
+    begin
+        // otherwise the channel is invalid
+        fABRepeatStartPosition := 0;
+        fABRepeatEndPosition := 0;
+        fABRepeatActive := False;
+    end;
+end;
+
+procedure TNempPlayer.SetBSync(p1: Double);
+var ByteLength: Integer;
+    SyncPos: LongWord;
+begin
+    if p1 < 0 then p1 := 0;
+    if p1 > 0.999 then p1 := 0.999;
+
+    ByteLength := BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE);
+    if ByteLength > 0 then
+    begin
+        // Channel is valid
+        fABRepeatEndPosition := p1;
+        fABRepeatActive := True;
+        if fABRepeatStartPosition > fABRepeatEndPosition then
+        begin
+            ClearABSyncs;
+            fABRepeatStartPosition := p1;
+        end else
+        begin
+            // clear old syncs
+            ClearABSyncs;
+            // set new syncs
+            SyncPos := Round(fABRepeatEndPosition * ByteLength);
+            fABRepeatSyncM := Bass_ChannelSetSync(MainStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+            fABRepeatSyncS := Bass_ChannelSetSync(SlideStream,
+                    BASS_SYNC_POS, SyncPos,
+                    @ABRepeatProc, Self);
+            // and start loop
+            Progress := fABRepeatStartPosition;
+            // refresh Cue stuff
+            SendMessage(MainWindowHandle, WM_NextCue, 0, 0);
+        end;
+    end else
+    begin
+        fABRepeatStartPosition := 0;
+        fABRepeatEndPosition := 0;
+        fABRepeatActive := False;
+    end;
+end;
+
+procedure TNempPlayer.ClearABSyncs;
+begin
     BASS_ChannelRemoveSync(MainStream, fABRepeatSyncM);
     BASS_ChannelRemoveSync(MainStream, fABRepeatSyncS);
     BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncM);
     BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncS);
-
-    fABRepeatSyncM := Bass_ChannelSetSync(MainStream,
-                    BASS_SYNC_POS, SyncPos,
-                    @ABRepeatProc, Self);
-    fABRepeatSyncS := Bass_ChannelSetSync(SlideStream,
-                    BASS_SYNC_POS, SyncPos,
-                    @ABRepeatProc, Self);
 end;
 
 procedure TNempPlayer.RemoveABSyncs;
 begin
-    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncM);
-    BASS_ChannelRemoveSync(MainStream, fABRepeatSyncS);
-    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncM);
-    BASS_ChannelRemoveSync(SlideStream, fABRepeatSyncS);
+    ClearABSyncs;
     SetEndSyncs(MainStream);
     SetEndSyncs(SlideStream);
     fABRepeatActive := False;
