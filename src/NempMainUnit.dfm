@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 926
+  ClientHeight = 986
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2515,18 +2515,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 264
+    Height = 324
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 264
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 858
-      Height = 236
+      Height = 296
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2535,23 +2536,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 236
       DesignSize = (
         858
-        236)
+        296)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 226
+        Height = 286
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 226
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 226
+          Height = 286
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2561,7 +2564,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 226
+          Height = 286
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2627,6 +2630,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 226
           Columns = <
             item
               Position = 0
@@ -2703,7 +2707,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 226
+          Height = 286
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2713,6 +2717,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 226
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -4052,7 +4057,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00130040080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130044080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4516,7 +4521,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806580910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F8065C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6439,7 +6444,7 @@ object Nemp_MainForm: TNemp_MainForm
   object Equalizer_PopupMenu: TPopupMenu
     AutoHotkeys = maManual
     Left = 652
-    Top = 452
+    Top = 460
     object PM_EQ_Disabled: TMenuItem
       Caption = 'Disable equalizer'
       OnClick = PM_EQ_DisabledClick
@@ -6469,7 +6474,7 @@ object Nemp_MainForm: TNemp_MainForm
     Images = MenuImages
     OnPopup = Player_PopupMenuPopup
     Left = 552
-    Top = 314
+    Top = 306
     object PM_P_Preferences: TMenuItem
       Caption = 'Preferences'
       ImageIndex = 5
@@ -7300,8 +7305,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 653
-    Top = 402
+    Left = 605
+    Top = 410
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
       RadioItem = True
@@ -7331,6 +7336,14 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ABRepeat: TMenuItem
       Caption = 'A-B Repeat'
       OnClick = BtnABRepeatClick
+    end
+    object PM_ABRepeatSetA: TMenuItem
+      Caption = 'Set start point (A)'
+      OnClick = PM_ABRepeatSetAClick
+    end
+    object PM_ABRepeatSetB: TMenuItem
+      Caption = 'Set end point (B)'
+      OnClick = PM_ABRepeatSetBClick
     end
   end
   object ScrobblerPopup: TPopupMenu
@@ -7461,7 +7474,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800AC0510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800B00510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7901,8 +7914,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 250
     OnTimer = HeadSetTimerTimer
-    Left = 560
-    Top = 376
+    Left = 552
+    Top = 352
   end
   object RefreshCoverFlowTimer: TTimer
     Enabled = False
@@ -7912,8 +7925,19 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 624
   end
   object PopupRepeatAB: TPopupMenu
-    Left = 688
-    Top = 400
+    Left = 552
+    Top = 408
+    object PM_SetA: TMenuItem
+      Caption = 'Set start point (A)'
+      OnClick = PM_ABRepeatSetAClick
+    end
+    object PM_SetB: TMenuItem
+      Caption = 'Set end point (B)'
+      OnClick = PM_ABRepeatSetBClick
+    end
+    object N78: TMenuItem
+      Caption = '-'
+    end
     object PM_StopABrepeat: TMenuItem
       Caption = 'Disable A-B-Repeat'
       OnClick = BtnABRepeatClick
