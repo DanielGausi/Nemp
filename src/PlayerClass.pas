@@ -2430,6 +2430,8 @@ begin
     SetEndSyncs(MainStream);
     SetEndSyncs(SlideStream);
     fABRepeatActive := False;
+    fABRepeatEndPosition := 0;
+    fABRepeatStartPosition := 0;
 end;
 
 procedure TNempPlayer.RemoveEndSyncs;

@@ -342,7 +342,9 @@ begin
         SetOriginalPosition(SampleRateLBL       , i);
         SetOriginalPosition(EffekteLBL3         , i);
         SetOriginalPosition(DirectionPositionBTN, i);
-        SetOriginalPosition(BtnABRepeat         , i);
+        SetOriginalPosition(BtnABRepeatSetA     , i);
+        SetOriginalPosition(BtnABRepeatSetB     , i);
+
         SetOriginalPosition(Btn_EffectsOff      , i);
         SetOriginalPosition(EchoWetDryMixButton , i);
         SetOriginalPosition(HallButton          , i);

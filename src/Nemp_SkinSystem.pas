@@ -1294,8 +1294,14 @@ begin
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
 
-                AssignNemp3Glyph(BtnABRepeat,  Path + '\BtnABRepeat', True);
-                BtnABRepeat.GlyphLine := BtnABRepeat.GlyphLine;
+                AssignNemp3Glyph(BtnABRepeatSetA,  Path + '\BtnABRepeatSetA', True);
+                BtnABRepeatSetA.GlyphLine := BtnABRepeatSetA.GlyphLine;
+
+                AssignNemp3Glyph(BtnABRepeatSetB,  Path + '\BtnABRepeatSetB', True);
+                BtnABRepeatSetB.GlyphLine := BtnABRepeatSetB.GlyphLine;
+
+                AssignNemp3Glyph(BtnABRepeatUnset,  Path + '\BtnABRepeatUnset', True);
+                BtnABRepeatUnset.GlyphLine := BtnABRepeatUnset.GlyphLine;
 
                 AssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
                 BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
@@ -2390,13 +2396,29 @@ begin
             DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
             DirectionPositionBTN.Refresh;
 
-            BtnABRepeat .drawMode := dm_Windows;
-            BtnABRepeat .NumGlyphs := 1;
-            BtnABRepeat.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeat', True);
-            BtnABRepeat.NempGlyph.Assign(tmpBitmap);
-            BtnABRepeat.GlyphLine := BtnABRepeat.GlyphLine;
-            BtnABRepeat.Refresh;
+            BtnABRepeatSetA .drawMode := dm_Windows;
+            BtnABRepeatSetA .NumGlyphs := 1;
+            BtnABRepeatSetA.NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatSetA', True);
+            BtnABRepeatSetA.NempGlyph.Assign(tmpBitmap);
+            BtnABRepeatSetA.GlyphLine := BtnABRepeatSetA.GlyphLine;
+            BtnABRepeatSetA.Refresh;
+
+            BtnABRepeatSetB .drawMode := dm_Windows;
+            BtnABRepeatSetB .NumGlyphs := 1;
+            BtnABRepeatSetB.NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatSetB', True);
+            BtnABRepeatSetB.NempGlyph.Assign(tmpBitmap);
+            BtnABRepeatSetB.GlyphLine := BtnABRepeatSetB.GlyphLine;
+            BtnABRepeatSetB.Refresh;
+
+            BtnABRepeatUnset .drawMode := dm_Windows;
+            BtnABRepeatUnset .NumGlyphs := 1;
+            BtnABRepeatUnset.NempGlyph.Assign(Nil);
+            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatUnset', True);
+            BtnABRepeatUnset.NempGlyph.Assign(tmpBitmap);
+            BtnABRepeatUnset.GlyphLine := BtnABRepeatUnset.GlyphLine;
+            BtnABRepeatUnset.Refresh;
 
             BtnLoadHeadset .drawMode := dm_Windows;
             BtnLoadHeadset .NumGlyphs := 1;

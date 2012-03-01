@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 986
+  ClientHeight = 1004
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2074,8 +2074,8 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object GRPBOXEffekte: TNempPanel
         Tag = 5
-        Left = 30
-        Top = 345
+        Left = 37
+        Top = 338
         Width = 191
         Height = 180
         BevelOuter = bvNone
@@ -2204,7 +2204,7 @@ object Nemp_MainForm: TNemp_MainForm
           Caption = 'Disable effects'
           DoubleBuffered = True
           ParentDoubleBuffered = False
-          TabOrder = 6
+          TabOrder = 5
           OnClick = Btn_EffectsOffClick
         end
         object EchoWetDryMixButton: TSkinButton
@@ -2311,21 +2311,63 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
           AcceptArrowKeys = True
         end
-        object BtnABRepeat: TSkinButton
-          Left = 61
+        object BtnABRepeatSetA: TSkinButton
+          Left = 65
           Top = 110
-          Width = 38
+          Width = 24
           Height = 24
-          Hint = 'Show controls for A-B-Repeat'
+          Hint = 'Set start point (A)'
           DoubleBuffered = True
           ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 5
+          TabOrder = 6
+          OnClick = PM_ABRepeatSetAClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnABRepeatSetB: TSkinButton
+          Left = 89
+          Top = 110
+          Width = 24
+          Height = 24
+          Hint = 'Set end point (B)'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 7
+          OnClick = PM_ABRepeatSetBClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnABRepeatUnset: TSkinButton
+          Left = 113
+          Top = 110
+          Width = 24
+          Height = 24
+          Hint = 'Disable A-B repeat'
+          DoubleBuffered = True
+          ParentDoubleBuffered = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 8
           OnClick = BtnABRepeatClick
           DrawMode = dm_Skin
           NumGlyphsX = 5
-          NumGlyphsY = 2
+          NumGlyphsY = 1
           GlyphLine = 0
           CustomRegion = False
           FocusDrawMode = fdm_Windows
@@ -2515,19 +2557,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 324
+    Height = 342
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
-    ExplicitHeight = 264
+    ExplicitHeight = 324
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 858
-      Height = 296
+      Height = 314
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2536,25 +2578,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
-      ExplicitHeight = 236
+      ExplicitHeight = 296
       DesignSize = (
         858
-        296)
+        314)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 286
+        Height = 304
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
-        ExplicitHeight = 226
+        ExplicitHeight = 286
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 286
+          Height = 304
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2564,7 +2606,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 286
+          Height = 304
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2630,7 +2672,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
-          ExplicitHeight = 226
+          ExplicitHeight = 286
           Columns = <
             item
               Position = 0
@@ -2707,7 +2749,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 286
+          Height = 304
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2717,7 +2759,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
-          ExplicitHeight = 226
+          ExplicitHeight = 286
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -4057,7 +4099,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00130044080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130048080E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4521,7 +4563,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F8065C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806600910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7305,7 +7347,7 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 605
+    Left = 621
     Top = 410
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
@@ -7334,7 +7376,7 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object PM_ABRepeat: TMenuItem
-      Caption = 'A-B Repeat'
+      Caption = 'A-B repeat'
       OnClick = BtnABRepeatClick
     end
     object PM_ABRepeatSetA: TMenuItem
@@ -7474,7 +7516,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800B00510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800B40510001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7939,7 +7981,7 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object PM_StopABrepeat: TMenuItem
-      Caption = 'Disable A-B-Repeat'
+      Caption = 'Disable A-B repeat'
       OnClick = BtnABRepeatClick
     end
   end

@@ -826,7 +826,6 @@ type
     BtnHeadsetPlaynow: TSkinButton;
     ab1: TImage;
     ab2: TImage;
-    BtnABRepeat: TSkinButton;
     N70: TMenuItem;
     PM_ABRepeat: TMenuItem;
     PopupRepeatAB: TPopupMenu;
@@ -836,6 +835,9 @@ type
     PM_SetA: TMenuItem;
     PM_SetB: TMenuItem;
     N78: TMenuItem;
+    BtnABRepeatSetA: TSkinButton;
+    BtnABRepeatSetB: TSkinButton;
+    BtnABRepeatUnset: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 

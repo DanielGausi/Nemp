@@ -1296,27 +1296,23 @@ begin
 end;
 
 procedure CorrectVCLForABRepeat;
+var EnableControls: Boolean;
 begin
     with Nemp_MainForm do
     begin
-        if NempPlayer.ABRepeatActive then
-        begin
-            BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Hide;
-            BtnABRepeat.GlyphLine := 1;
-        end else
-        begin
-            BtnABRepeat.Hint := MainForm_ABRepeatBtnHint_Show;
-            BtnABRepeat.GlyphLine := 0;
-        end;
-
         ab1.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width-SlideBarButton.Width)) - (ab1.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
         ab2.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width-SlideBarButton.Width)) - (ab2.Width Div 2) + SlideBarShape.Left + (SlideBarButton.Width Div 2);
         ab1.Visible := NempPlayer.ABRepeatActive;
         ab2.Visible := NempPlayer.ABRepeatActive;
-
-        BtnABRepeat.Refresh;
-
         PM_ABRepeat.Checked := NempPlayer.ABRepeatActive;
+
+        EnableControls   := Assigned(NempPlayer.MainAudioFile) and (not NempPlayer.MainAudioFile.isStream);
+        BtnABRepeatUnSet .Enabled := NempPlayer.ABRepeatActive and EnableControls;
+        PM_ABRepeat      .Enabled := EnableControls;
+        PM_ABRepeatSetA  .Enabled := EnableControls;
+        PM_ABRepeatSetB  .Enabled := EnableControls;
+        BtnABRepeatSetA  .Enabled := EnableControls;
+        BtnABRepeatSetB  .Enabled := EnableControls;
     end;
 end;
 
