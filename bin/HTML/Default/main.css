@@ -87,7 +87,7 @@ ul.mainmenu li {
 	list-style: none;
 	float: left;
 	border: 1px solid #202020;
-	padding: 5px 9px;	
+	padding: 5px 4px;	
 	height: 32px;
 }
 ul.mainmenu li.active{		

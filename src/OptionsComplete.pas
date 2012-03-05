@@ -470,6 +470,7 @@ type
     Lbl_SilenceThreshold: TLabel;
     SE_SilenceThreshold: TSpinEdit;
     Lbl_SilenceDB: TLabel;
+    CB_AutoPlayEnqueueTitle: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1027,7 +1028,9 @@ begin
   cb_SavePositionInTrack.Checked := NempPlaylist.SavePositionInTrack;
   cb_SavePositionInTrack.Enabled := CB_AutoPlayOnStart.Checked;
 
-  CB_AutoPlayNewTitle.Checked := NempPlaylist.AutoPlayNewTitle;
+  CB_AutoPlayNewTitle.Checked     := NempPlaylist.AutoPlayNewTitle;
+  CB_AutoPlayEnqueueTitle.Checked := NempPlaylist.AutoPlayEnqueuedTitle;
+
   CB_AutoSavePlaylist.Checked := NempPlaylist.AutoSave;
 
   CB_AutoDeleteFromPlaylist.Checked := NempPlaylist.AutoDelete;
@@ -2009,6 +2012,7 @@ begin
   NempPlaylist.AutoPlayOnStart  := CB_AutoPlayOnStart.Checked;
   NempPlaylist.SavePositionInTrack := cb_SavePositionInTrack.Checked;
   NempPlaylist.AutoPlayNewTitle := CB_AutoPlayNewTitle.Checked;
+  NempPlaylist.AutoPlayEnqueuedTitle := CB_AutoPlayEnqueueTitle.Checked;
 
   NempPlaylist.AutoSave         := CB_AutoSavePlaylist.Checked;
   //NempPlaylist.AutoSaveInterval := SEAutoSavePlaylistInterval.Value;

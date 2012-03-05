@@ -131,6 +131,7 @@ type
       SavePositionInTrack: Boolean; // save current position in track and restore it on next start
       PositionInTrack: Integer;
       AutoPlayNewTitle: Boolean;    // Play new title when the user selects "Enqueue in Nemp" in the explorer (and Nemp is not running, yet)
+      AutoPlayEnqueuedTitle: Boolean; // PLay the enqueued track (even if Nemp is already running)
       AutoSave: Boolean;            // Save Playlist every 5 minutes
       AutoScan: Boolean;            // Scan files with Mp3fileUtils
       AutoDelete: Boolean;                  // Delete File after playback
@@ -347,6 +348,7 @@ begin
   AutoScan              := ini.ReadBool('Playlist','AutoScan', True);
   AutoPlayOnStart       := ini.ReadBool('Playlist','AutoPlayOnStart', True);
   AutoPlayNewTitle      := ini.ReadBool('Playlist','AutoPlayNewTitle', True);
+  AutoPlayEnqueuedTitle := ini.ReadBool('Playlist','AutoPlayEnqueuedTitle', False);
   AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
   AutoDelete            := ini.ReadBool('Playlist','AutoDelete', False);
   DisableAutoDeleteAtSlide        := ini.ReadBool('Playlist','DisableAutoDeleteAtSlide', True);
@@ -390,6 +392,7 @@ begin
   ini.WriteBool('Playlist','AutoScan', AutoScan);
   ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
   ini.WriteBool('Playlist','AutoPlayNewTitle', AutoPlayNewTitle);
+  ini.WriteBool('Playlist','AutoPlayEnqueuedTitle', AutoPlayEnqueuedTitle);
   Ini.WriteBool('Playlist','AutoSave', AutoSave);
 
   Ini.WriteBool('Playlist','AutoDelete', AutoDelete);
@@ -1442,10 +1445,12 @@ begin
 end;
 
 procedure TNempPlaylist.ProcessBufferStringlist;
-var i: Integer;
+var i, oldCount: Integer;
 begin
   ProcessingBufferlist := True;
   if LastCommandWasPlay then ClearPlaylist;
+
+  oldCount := Playlist.Count;
 
   for i := 0 to BufferStringList.Count - 1 do
   begin
@@ -1460,7 +1465,12 @@ begin
   end else
   begin
       if LastCommandWasPlay and (Playlist.Count  > 0) then
-        NempPlaylist.Play(0, NempPlayer.FadingInterval, true);
+          NempPlaylist.Play(0, NempPlayer.FadingInterval, true)
+      else
+      begin
+          if AutoPlayEnqueuedTitle and (Playlist.Count > oldCount) then
+              NempPlaylist.Play(oldCount, NempPlayer.FadingInterval, true)
+      end;
   end;
 end;
 
