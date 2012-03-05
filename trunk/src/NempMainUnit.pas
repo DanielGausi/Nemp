@@ -2563,7 +2563,7 @@ begin
   if (MsG.CopyDataStruct.dwData = SecondInstMsgId) AND (SecondInstMsgId <> 0) then
   begin
       if (not NempIsClosing) then
-          ProcessCommandline(Msg.CopyDataStruct.lpData, False) // False: Nicht Play
+          ProcessCommandline(Msg.CopyDataStruct.lpData, NempPlaylist.AutoPlayEnqueuedTitle)
       else
       begin
           inherited;

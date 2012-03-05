@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabAudio0
+    ActivePage = TabSystem0
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -64,12 +64,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem0: TTabSheet
       Caption = 'System (Main)'
       ImageIndex = 6
+      ExplicitLeft = -1
+      ExplicitTop = 124
       DesignSize = (
         449
         443)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
-        Top = 192
+        Top = 218
         Width = 434
         Height = 138
         Anchors = [akLeft, akTop, akRight]
@@ -125,18 +127,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
       end
       object GrpBox_StartingNemp: TGroupBox
-        Left = 8
-        Top = 8
+        Left = 7
+        Top = 10
         Width = 433
-        Height = 177
+        Height = 205
         Caption = 'Starting Nemp'
         TabOrder = 0
         DesignSize = (
           433
-          177)
+          205)
         object CB_AllowMultipleInstances: TCheckBox
           Left = 8
-          Top = 112
+          Top = 128
           Width = 409
           Height = 17
           Hint = 'Allow multiple instances of Nemp.'
@@ -145,7 +147,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CB_StartMinimized: TCheckBox
           Left = 8
-          Top = 128
+          Top = 144
           Width = 409
           Height = 17
           Hint = 'Do not show Nemp window on start - directly minimize it.'
@@ -185,7 +187,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CBAutoLoadMediaList: TCheckBox
           Left = 8
-          Top = 72
+          Top = 88
           Width = 409
           Height = 17
           Hint = 'Automatically load the Nemp medialibrary.'
@@ -194,7 +196,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CBAutoSaveMediaList: TCheckBox
           Left = 8
-          Top = 88
+          Top = 104
           Width = 409
           Height = 17
           Hint = 'Automatically save the Nemp medialibrary.'
@@ -203,7 +205,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cb_StayOnTop: TCheckBox
           Left = 8
-          Top = 152
+          Top = 169
           Width = 409
           Height = 17
           Hint = 
@@ -211,6 +213,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'window-mode.'
           Caption = 'Stay on top (not in compact view)'
           TabOrder = 7
+        end
+        object CB_AutoPlayEnqueueTitle: TCheckBox
+          Left = 28
+          Top = 66
+          Width = 389
+          Height = 17
+          Hint = 
+            'Stop playback of the current file, when the user double-clicks a' +
+            ' new file in the Windows explorer'
+          Caption = 
+            'Switch to enqueued file (even if another track is already playin' +
+            'g)'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 8
         end
       end
     end
