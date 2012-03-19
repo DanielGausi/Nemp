@@ -822,7 +822,7 @@ begin
   begin
     AudioFileList.Sort(Sortieren_Jahr_asc);
     aCover.Year := StrToIntDef(TAudioFile(AudioFileList[AudioFileList.Count Div 2]).Year, 0);
-    aCover.Directory := TAudioFile(AudioFileList[0]).Ordner;
+    aCover.Directory := IncludeTrailingPathDelimiter(TAudioFile(AudioFileList[0]).Ordner);
   end;
 
   newestAge := 0;

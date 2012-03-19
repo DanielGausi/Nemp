@@ -1052,8 +1052,7 @@ begin
           result := BASS_StreamCreateFile(False, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR flags);
           // Vorgang oben fehlgeschlagen? Dann mit Music probieren
           if result = 0 then
-              result := BASS_MusicLoad(FALSE, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR BASS_MUSIC_RAMP or {BASS_SAMPLE_FX OR} BASS_MUSIC_PRESCAN ,0);
-
+              result := BASS_MusicLoad(FALSE, PChar(Pointer(localPath)), 0, 0, BASS_MUSIC_RAMP or DecodeFlag or BASS_MUSIC_PRESCAN or BASS_UNICODE ,0);
           // Decodier-Stream nachbehandeln
           if aReverse AND (result <> 0) then
           begin
