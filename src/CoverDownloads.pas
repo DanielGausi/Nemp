@@ -939,7 +939,7 @@ begin
     NewDownloadItem := TCoverDownloadItem.Create;
     NewDownloadItem.Artist    := aCover.Artist;
     NewDownloadItem.Album     := aCover.Album;
-    NewDownloadItem.Directory := aCover.Directory;
+    NewDownloadItem.Directory := IncludeTrailingPathDelimiter(aCover.Directory);
     NewDownloadItem.QueryType := qtCoverFlow;
     NewDownloadItem.SubQueryType := sqtFile;
     NewDownloadItem.FileType  := '';
