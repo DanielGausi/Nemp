@@ -35,7 +35,7 @@ unit BibHelper;
 interface
 
 uses Windows, Classes, SysUtils, ContNrs, Math, Nemp_ConstantsAndTypes,
-    AudioFileClass;
+    NempAudioFiles;
 
 
 Const SO_Pfad = 0;

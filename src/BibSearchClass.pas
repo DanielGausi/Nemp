@@ -43,7 +43,7 @@ unit BibSearchClass;
 interface
 
 uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, IniFiles,
-     AudioFileClass,
+     NempAudioFiles,
      Hilfsfunktionen, StringSearchHelper, StrUtils, Nemp_ConstantsAndTypes,
      Nemp_RessourceStrings;
 

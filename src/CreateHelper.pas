@@ -53,7 +53,7 @@ implementation
 
 uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
-    Nemp_ConstantsAndTypes, AudioFileClass, Nemp_RessourceStrings,
+    Nemp_ConstantsAndTypes, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
     SplitForm_Hilfsfunktionen, Mp3FileUtils,
 

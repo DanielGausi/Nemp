@@ -42,7 +42,7 @@ uses
   DateUtils,  IniFiles, jpeg, PNGImage, GifImg, math,
   bass, fldbrows, StringHelper, MainFormHelper,
 
-   AudioFileClass, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
+   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, U_Charcode,
   Nemp_SkinSystem, UpdateUtils,
 

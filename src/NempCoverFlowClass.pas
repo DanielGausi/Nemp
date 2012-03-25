@@ -40,7 +40,7 @@ interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
     ClassicCoverFlowClass, unitFlyingCow, CoverHelper, dialogs, CoverDownloads,
-    AudioFileClass;
+    NempAudioFiles;
 
 type
 

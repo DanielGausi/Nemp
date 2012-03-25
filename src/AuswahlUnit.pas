@@ -46,7 +46,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, shellApi,
   ImgList, VirtualTrees, 
   Dialogs, ExtCtrls, StdCtrls, Buttons,  Nemp_ConstantsAndTypes,
-  AudioFileClass, Hilfsfunktionen, Menus,
+  NempAudioFiles, Hilfsfunktionen, Menus,
   gnuGettext, Nemp_RessourceStrings, SkinButtons, NempPanel;
 
 type

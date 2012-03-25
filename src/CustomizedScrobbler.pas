@@ -36,7 +36,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, ShellApi, DateUtils,
-  IniFiles, Contnrs, ScrobblerUtils, md5, AudioFileClass, StrUtils,
+  IniFiles, Contnrs, ScrobblerUtils, md5, NempAudioFiles, StrUtils,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
   IdStack, IdException, HTMLHelper;
 

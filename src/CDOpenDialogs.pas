@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Contnrs, Dialogs, StdCtrls, basscd, AudioFileClass, cddaUtils, gnuGetText;
+  Contnrs, Dialogs, StdCtrls, basscd, NempAudioFiles, cddaUtils, gnuGetText;
 
 type
   TCDOpenDialog = class(TForm)

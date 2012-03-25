@@ -55,7 +55,8 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math, Lyrics,
-     AudioFileClass, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
+     AudioFileBasics,
+     NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
@@ -2177,7 +2178,7 @@ var i: Integer;
     LyricWikiResponse, backup: String;
     done, failed: Integer;
     Lyrics: TLyrics;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
 begin
@@ -2355,7 +2356,7 @@ var i: Integer;
     af: TAudioFile;
     s, backup: String;
     TagPostProcessor: TTagPostProcessor;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
 begin
@@ -2521,7 +2522,7 @@ end;
 procedure TMedienBibliothek.fUpdateId3tags;
 var i: Integer;
     af: TAudioFile;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
 begin

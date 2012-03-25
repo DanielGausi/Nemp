@@ -37,7 +37,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, AudioFileClass, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
+  Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst,
   WinampFunctions, Buttons,  VirtualTrees, VSTEditControls,
   jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
@@ -3557,7 +3557,7 @@ var CurrentAF, listFile :TAudioFile;
     resetCounter: Boolean;
     detUpdate, TagMod100: Integer;
     LocalTree: TVirtualStringTree;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
 begin
     // preparation
     SelectedMp3s := Nil;
@@ -3758,7 +3758,7 @@ var
     oldArtist, oldAlbum: UnicodeString;
     oldID: String;
     einUpdate: boolean;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
 
 begin
   SelectedMp3s := Nil;
@@ -4742,7 +4742,7 @@ procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
 begin
     if      (not NempSkin.NempPartyMode.DoBlockTreeEdit)
         and (Button = mbLeft)
@@ -4982,7 +4982,7 @@ procedure TNemp_MainForm.BtnApplyEditTagsClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     ListFile, BibFile: TAudioFile;
     i: Integer;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     backup: UTF8String;
 begin
     if Assigned(MedienBib.CurrentAudioFile)
@@ -5070,7 +5070,7 @@ procedure TNemp_MainForm.EdtBibArtistKeyPress(Sender: TObject; var Key: Char);
 var ListOfFiles: TObjectList;
     listFile, backupFile: TAudioFile;
     i: Integer;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
 begin
     case Ord(key) of
         VK_Escape: begin
@@ -6502,7 +6502,7 @@ procedure TNemp_MainForm.RatingImageMouseDown(Sender: TObject;
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
 begin
     if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating)
         and (Button = mbLeft)  then
@@ -7061,7 +7061,7 @@ end;
 procedure TNemp_MainForm.PM_PL_ExtendedAddToMedialibraryClick(Sender: TObject);
 var i: integer;
   AudioFile: TAudioFile;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 begin
   if MedienBib.StatusBibUpdate <> 0 then
   begin
@@ -7233,7 +7233,7 @@ var
   i, numFiles: Integer;
   AudioFile: TAudiofile;
   JobList: TStringList;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 begin
   if not Clipboard.HasFormat(CF_HDROP) then
     Exit;
@@ -10246,7 +10246,7 @@ var
   ListOfFiles: TObjectList;
   listFile: TAudioFile;
   i: Integer;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 begin
     if (NempSkin.NempPartyMode.DoBlockTreeEdit)
         // or (not NempOptions.AllowQuickAccessToMetadata)

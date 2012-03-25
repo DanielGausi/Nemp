@@ -55,7 +55,7 @@ interface
 uses Windows, Classes, Messages, ContNrs, SysUtils,  dialogs,
   IniFiles,  StrUtils, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdCustomHTTPServer, IdHTTPServer, IdContext,
-  MP3FileUtils, AudioFileClass, Hilfsfunktionen, HtmlHelper,
+  MP3FileUtils, NempAudioFiles, Hilfsfunktionen, HtmlHelper,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
   MedienbibliothekClass, BibSearchClass, Votings;
 

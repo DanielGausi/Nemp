@@ -45,7 +45,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   ShellApi, VirtualTrees,
-  Dialogs, ExtCtrls, ImgList, Nemp_ConstantsAndTypes, AudioFileClass, Hilfsfunktionen,
+  Dialogs, ExtCtrls, ImgList, Nemp_ConstantsAndTypes, NempAudioFiles, Hilfsfunktionen,
   Menus,gnuGettext,
   Nemp_RessourceStrings,  StdCtrls, Buttons, SkinButtons, NempPanel;
 

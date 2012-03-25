@@ -167,7 +167,7 @@ var RatingGraphics: TRatingGraphics ;
 
 implementation
 
-uses AudioFileClass;//, NempMainUnit, mmSystem;
+uses NempAudioFiles;//, NempMainUnit, mmSystem;
 
 {
     --------------------------------------------------------

@@ -57,7 +57,7 @@ procedure Handle_STFinish(var Msg: TMessage);
 implementation
 
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, AudioFileClass, Details,
+uses NempMainUnit, Nemp_ConstantsAndTypes, NempAudioFiles, Details,
     MainFormHelper, CoverHelper, AudioFileHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
@@ -438,7 +438,7 @@ function Handle_MedienBibMessage(Var aMsg: TMessage): Boolean;
 var i: Integer;
     srList: TObjectList;
     af: TAudiofile;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     ErrorLog : TErrorLog;
 
     tmpString: String;
@@ -1732,7 +1732,7 @@ Var
   FileCount: Integer;
   Filename: PChar;
   AudioFile:TAudioFile;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 Begin
     result := True;
 
@@ -1816,7 +1816,7 @@ Var
   FileCount: Integer;
   Filename: PChar;
   AudioFile:TAudioFile;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 
       procedure AddFileToHeadSet(af: String);
       begin
@@ -1910,7 +1910,7 @@ var NewFile: UnicodeString;
   audioFile: TAudiofile;
   jas: TJustaString;
   ext: String;
-  aErr: TAudioError;
+  aErr: TNempAudioError;
 begin
     With Nemp_MainForm do
     begin

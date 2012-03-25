@@ -42,7 +42,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math,
-  MP3FileUtils, ID3v2Frames, AudioFileClass, Nemp_ConstantsAndTypes,
+  MP3FileUtils, ID3v2Frames, NempAudioFiles, Nemp_ConstantsAndTypes,
   cddaUtils, basscd;
 
 

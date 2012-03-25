@@ -3,8 +3,7 @@ unit SilenceDetection;
 interface
 
 uses  Windows, Classes, SysUtils, Contnrs, math,
-      bass, AudioFileClass,  Nemp_ConstantsAndTypes;
-
+      bass, NempAudioFiles,  Nemp_ConstantsAndTypes;
 
 type
     TSilenceDetector = class

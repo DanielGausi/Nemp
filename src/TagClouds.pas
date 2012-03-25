@@ -33,7 +33,7 @@ unit TagClouds;
 
 interface
 
-uses windows, classes, SysUtils, Controls, Contnrs, AudioFileClass, Math, stdCtrls,
+uses windows, classes, SysUtils, Controls, Contnrs, NempAudioFiles, Math, stdCtrls,
     ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils;
 
 const
