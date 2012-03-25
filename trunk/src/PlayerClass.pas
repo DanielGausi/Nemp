@@ -36,7 +36,7 @@ interface
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
       ShellApi, IniFiles, Dialogs, Graphics, cddaUtils,
       bass, bass_fx, basscd, spectrum_vis, DateUtils,
-      AudioFileClass,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
+      NempAudioFiles,  Nemp_ConstantsAndTypes, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
       Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection;
 

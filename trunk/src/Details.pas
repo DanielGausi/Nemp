@@ -38,9 +38,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
-  Dialogs, AudioFileClass, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
+  Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
   ShellApi, ComCtrls, Mp3FileUtils, id3v2Frames, U_CharCode, myDialogs,
-  OggVorbis, Flac, VorbisComments, cddaUtils,
+  AudioFileBasics,
+  OggVorbisFiles, FlacFiles, VorbisComments, cddaUtils,
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
   Nemp_RessourceStrings,  IdBaseComponent, IdComponent, TagClouds,
@@ -370,10 +371,10 @@ type
 
 
     // Save information to ID3-Tag
-    function UpdateID3v1InFile: TMP3Error;
-    function UpdateID3v2InFile: TMP3Error;
-    function UpdateOggVorbisInFile: TOggVorbisError;
-    function UpdateFlacInFile: TFlacError;
+    function UpdateID3v1InFile: TMp3Error;
+    function UpdateID3v2InFile: TMp3Error;
+    function UpdateOggVorbisInFile: TAudioError;
+    function UpdateFlacInFile: TAudioError;
 
 
 
@@ -526,7 +527,7 @@ procedure TFDetails.BtnApplyClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     backupRating: Byte;
     backupCounter: Cardinal;
 begin
@@ -553,9 +554,9 @@ begin
             aErr := Mp3ToAudioError(UpdateID3v2InFile);
         end;
         if ValidOggFile then
-            aErr := OggToAudioError(UpdateOggVorbisInFile);
+            aErr := AudioToNempAudioError(UpdateOggVorbisInFile);
         if ValidFlacFile then
-            aErr := FlacToAudioError(UpdateFlacInFile);
+            aErr := AudioToNempAudioError(UpdateFlacInFile);
 
 
 
@@ -1535,8 +1536,8 @@ begin
     Edt_VorbisTitle.Text     := OggVorbisFile.Title;
     Edt_VorbisAlbum.Text     := OggVorbisFile.Album;
     Edt_VorbisComment.Text   := OggVorbisFile.GetPropertyByFieldname(VORBIS_COMMENT);
-    Edt_VorbisYear.Text      := OggVorbisFile.Date;
-    Edt_VorbisTrack.Text     := OggVorbisFile.TrackNumber;
+    Edt_VorbisYear.Text      := OggVorbisFile.Year;
+    Edt_VorbisTrack.Text     := OggVorbisFile.Track;
     Edt_VorbisCopyright.Text := OggVorbisFile.Copyright;
     //Edt_VorbisLicense.Text   := OggVorbisFile.License;
     //Edt_VorbisContact.Text   := OggVorbisFile.Contact;
@@ -1580,8 +1581,8 @@ begin
     Edt_VorbisTitle.Text     := FlacFile.Title;
     Edt_VorbisAlbum.Text     := FlacFile.Album;
     Edt_VorbisComment.Text   := FlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
-    Edt_VorbisYear.Text      := FlacFile.Date;
-    Edt_VorbisTrack.Text     := FlacFile.TrackNumber;
+    Edt_VorbisYear.Text      := FlacFile.Year;
+    Edt_VorbisTrack.Text     := FlacFile.Track;
     Edt_VorbisCopyright.Text := FlacFile.Copyright;
     //Edt_VorbisLicense.Text   := FlacFile.License;
     //Edt_VorbisContact.Text   := FlacFile.Contact;
@@ -2019,8 +2020,8 @@ end;
     --------------------------------------------------------
 }
 procedure TFDetails.ShowDetails(AudioFile:TAudioFile; Source: Integer = SD_MEDIENBIB);
-var OggResult: TOggVorbisError;
-    FlacResult: TFlacError;
+var OggResult: TAudioError;
+    FlacResult: TAudioError;
     ci: Integer;
     //ct: TTabSheet;
 begin
@@ -2103,10 +2104,10 @@ begin
       begin
           ValidOggFile := True;
           OggResult :=  OggVorbisFile.ReadFromFile(AudioFile.Pfad);
-          if OggResult <> OVErr_None then
+          if OggResult <> FileErr_None then
           begin
               ValidOggFile := False;
-              Lbl_Warnings.Caption := OggVorbisErrorString[OggResult];
+              Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(OggResult)];
               Lbl_Warnings.Hint := (Warning_ReadError_Hint);
               PnlWarnung.Visible := True;
           end;
@@ -2117,10 +2118,10 @@ begin
       begin
           ValidFlacFile := True;
           FlacResult := FlacFile.ReadFromFile(AudioFile.Pfad);
-          if FlacResult <> FlacErr_None then
+          if FlacResult <> FileErr_None then
           begin
               ValidFlacFile := False;
-              Lbl_Warnings.Caption := FlacErrorErrorString[FlacResult];
+              Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(FlacResult)];
               Lbl_Warnings.Hint := (Warning_ReadError_Hint);
               PnlWarnung.Visible := True;
           end;
@@ -2234,7 +2235,7 @@ end;
             so saving here saves everything. ;-)
     --------------------------------------------------------
 }
-function TFDetails.UpdateID3v1InFile: TMP3Error;
+function TFDetails.UpdateID3v1InFile: TMp3Error;
 begin
     if ID3v1Activated and ValidMp3File then
     begin
@@ -2249,7 +2250,7 @@ begin
     end else
         result := id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad);
 end;
-function TFDetails.UpdateID3v2InFile: TMP3Error;
+function TFDetails.UpdateID3v2InFile: TMp3Error;
 var ms: TMemoryStream;
     s: UTF8String;
 begin
@@ -2306,7 +2307,7 @@ begin
     result := id3v2Tag.RemoveFromFile(CurrentAudioFile.Pfad);
 end;
 
-function TFDetails.UpdateOggVorbisInFile: TOggVorbisError;
+function TFDetails.UpdateOggVorbisInFile: TAudioError;
 begin
     if ValidOggFile then
     begin
@@ -2314,8 +2315,8 @@ begin
         OggVorbisFile.Title  := Edt_VorbisTitle.Text;
         OggVorbisFile.Album  := Edt_VorbisAlbum.Text;
         OggVorbisFile.Genre  := cb_VorbisGenre.Text;
-        OggVorbisFile.TrackNumber := Edt_VorbisTrack.Text;
-        OggVorbisFile.Date        := Edt_VorbisYear.Text;
+        OggVorbisFile.Track  := Edt_VorbisTrack.Text;
+        OggVorbisFile.Year        := Edt_VorbisYear.Text;
         OggVorbisFile.Copyright   := Edt_VorbisCopyright.Text;
 
         OggVorbisFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edt_VorbisCD.Text);
@@ -2339,9 +2340,9 @@ begin
 
         result := OggVorbisFile.WriteToFile(CurrentAudioFile.Pfad);
     end else
-        result := OVErr_NoFile;
+        result := FileErr_NoFile;
 end;
-function TFDetails.UpdateFlacInFile: TFlacError;
+function TFDetails.UpdateFlacInFile: TAudioError;
 begin
     if ValidFlacFile then
     begin
@@ -2349,8 +2350,8 @@ begin
         FlacFile.Title  := Edt_VorbisTitle.Text;
         FlacFile.Album  := Edt_VorbisAlbum.Text;
         FlacFile.Genre  := cb_VorbisGenre.Text;
-        FlacFile.TrackNumber := Edt_VorbisTrack.Text;
-        FlacFile.Date        := Edt_VorbisYear.Text;
+        FlacFile.Track  := Edt_VorbisTrack.Text;
+        FlacFile.Year        := Edt_VorbisYear.Text;
         FlacFile.Copyright   := Edt_VorbisCopyright.Text;
 
         FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edt_VorbisCD.Text);
@@ -2372,7 +2373,7 @@ begin
 
         result := FlacFile.WriteToFile(CurrentAudioFile.Pfad);
     end else
-        result := FlacErr_NoFile;
+        result := FileErr_NoFile;
 end;
 
 {

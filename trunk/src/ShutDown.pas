@@ -37,7 +37,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, AudioFileClass, StrUtils, 
+  Dialogs, ExtCtrls, StdCtrls, NempAudioFiles, StrUtils,
 
   Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
 

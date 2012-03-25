@@ -25,7 +25,7 @@ uses
   NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
   WinampFunctions in 'WinampFunctions.pas',
   Details in 'Details.pas' {FDetails},
-  AudioFileClass in 'AudioFileClass.pas',
+  NempAudioFiles in 'NempAudioFiles.pas',
   NewPicture in 'NewPicture.pas' {FNewPicture},
   Splash in 'Splash.pas' {FSplash},
   spectrum_vis in 'spectrum_vis.pas',

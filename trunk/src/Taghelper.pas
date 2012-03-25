@@ -33,7 +33,7 @@ unit Taghelper;
 
 interface
 
-uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs, AudioFileClass;
+uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs, NempAudioFiles;
 
 type
 

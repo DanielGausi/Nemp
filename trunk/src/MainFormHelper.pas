@@ -34,7 +34,7 @@ unit MainFormHelper;
 interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
-    AudioFileClass, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, MyDialogs;
+    NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, MyDialogs;
 
 
 // passt die VCL an die Player-Werte an
@@ -122,7 +122,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 
     procedure AddErrorLog(aString: String);
-    procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TAudioError; Important: Boolean = false);
+    procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);
 
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
@@ -1559,7 +1559,7 @@ begin
     Nemp_MainForm.MM_H_ErrorLog.Visible := True;
 end;
 
-procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TAudioError; Important: Boolean = false);  overload;
+procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);  overload;
 var s: String;
 begin
     if aErr <> AUDIOERR_None then

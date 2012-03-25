@@ -39,7 +39,7 @@ unit AudioFileHelper;
 interface
 
 uses Windows, Classes, Contnrs, SysUtils, StrUtils, Math, IniFiles, Dialogs,
-    Nemp_ConstantsAndTypes, Hilfsfunktionen, AudioFileClass, DateUtils;
+    Nemp_ConstantsAndTypes, Hilfsfunktionen, NempAudioFiles, DateUtils;
 
 const SORT_MAX = 10;
 

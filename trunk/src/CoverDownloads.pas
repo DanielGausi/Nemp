@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
   IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException,
-  CoverHelper, MP3FileUtils, ID3v2Frames, AudioFileClass, cddaUtils,
+  CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs;
 
 const

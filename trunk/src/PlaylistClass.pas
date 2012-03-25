@@ -37,7 +37,7 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     Dialogs, MMSystem, oneinst,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
-    AudioFileClass, AudioFileHelper, WinampFunctions,  PlayerClass,
+    NempAudioFiles, AudioFileHelper, WinampFunctions,  PlayerClass,
     gnuGettext, Nemp_RessourceStrings;
 
 type

@@ -47,7 +47,7 @@ uses
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs,
 
   Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
-  SystemHelper, fldBrows, AudioFileClass, Hilfsfunktionen
+  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen
 
   ;
 

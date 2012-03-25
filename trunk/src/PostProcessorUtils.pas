@@ -39,7 +39,8 @@ interface
 
 uses Windows, Classes, SysUtils, Contnrs, DateUtils,
       ShellApi, IniFiles,  Dialogs,   math,
-      AudioFileClass, Nemp_ConstantsAndTypes,
+      NempAudioFiles, Nemp_ConstantsAndTypes,
+      AudioFileBasics,
       MP3FileUtils, gnuGettext, Nemp_RessourceStrings,
       ScrobblerUtils, CustomizedScrobbler;
 
@@ -84,7 +85,7 @@ type
             // Change the PlayCounter of an Audiofile as specified in aJob
             procedure ChangePlayCounter;
             // Update the File on Harddisk
-            function UpdateFile: TAudioError;
+            function UpdateFile: TNempAudioError;
 
         public
             //constructor Create(filename: String; IncCounter: Boolean; AddRating: Integer);
@@ -279,7 +280,7 @@ begin
     end;
 end;
 
-function TPostProcessJob.UpdateFile: TAudioError;
+function TPostProcessJob.UpdateFile: TNempAudioError;
 begin
     if fWriteToFiles then
         result := fAudioFile.QuickUpdateTag(fWriteToFiles)
@@ -460,7 +461,7 @@ procedure fDoJobList(ap: TPostProcessor);
 var i: Integer;
     aJob: TPostProcessJob;
     aAudioFile: TAudioFile;
-    aErr: TAudioError;
+    aErr: TNempAudioError;
     ErrorLog: TErrorLog;
 begin
     try
