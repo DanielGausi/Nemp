@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_Lyrics
+    ActivePage = Tab_VorbisComments
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
@@ -1272,6 +1272,7 @@ object FDetails: TFDetails
           Width = 313
           Height = 21
           TabOrder = 0
+          OnChange = Edt_VorbisChange
         end
         object Edt_VorbisTitle: TEdit
           Left = 64
@@ -1279,6 +1280,7 @@ object FDetails: TFDetails
           Width = 313
           Height = 21
           TabOrder = 1
+          OnChange = Edt_VorbisChange
         end
         object Edt_VorbisAlbum: TEdit
           Left = 64
@@ -1286,6 +1288,7 @@ object FDetails: TFDetails
           Width = 229
           Height = 21
           TabOrder = 2
+          OnChange = Edt_VorbisChange
         end
         object Edt_VorbisComment: TEdit
           Left = 64
@@ -1293,6 +1296,7 @@ object FDetails: TFDetails
           Width = 313
           Height = 21
           TabOrder = 9
+          OnChange = Edt_VorbisChange
         end
         object cb_VorbisGenre: TComboBox
           Left = 64
@@ -1303,6 +1307,7 @@ object FDetails: TFDetails
           ItemHeight = 13
           Sorted = True
           TabOrder = 4
+          OnChange = Edt_VorbisChange
         end
         object Edt_VorbisYear: TEdit
           Left = 336
@@ -1310,6 +1315,7 @@ object FDetails: TFDetails
           Width = 41
           Height = 21
           TabOrder = 3
+          OnChange = Edt_VorbisChange
         end
         object Edt_VorbisTrack: TEdit
           Left = 254
@@ -1317,6 +1323,7 @@ object FDetails: TFDetails
           Width = 41
           Height = 21
           TabOrder = 5
+          OnChange = Edt_VorbisChange
         end
         object Btn_ResetVorbisRating: TButton
           Left = 147
@@ -1341,6 +1348,7 @@ object FDetails: TFDetails
           LabelPosition = lpLeft
           LabelSpacing = 1
           TabOrder = 10
+          OnChange = Edt_VorbisChange
         end
         object BtnSynchRatingOggVorbis: TButton
           Left = 234
@@ -1362,6 +1370,7 @@ object FDetails: TFDetails
           Width = 41
           Height = 21
           TabOrder = 6
+          OnChange = Edt_VorbisChange
         end
       end
       object GrpBox_AllVorbisComments: TGroupBox
@@ -1394,23 +1403,16 @@ object FDetails: TFDetails
           Height = 171
           ReadOnly = True
           ScrollBars = ssVertical
-          TabOrder = 0
+          TabOrder = 1
         end
-        object lv_VorbisComments: TListView
+        object lv_VorbisComments: TListBox
           Left = 8
           Top = 30
           Width = 159
           Height = 171
-          Columns = <
-            item
-              Caption = 'Key'
-              Width = 135
-            end>
-          ReadOnly = True
-          ShowColumnHeaders = False
-          TabOrder = 1
-          ViewStyle = vsReport
-          OnChange = lv_VorbisCommentsChange
+          ItemHeight = 13
+          TabOrder = 0
+          OnClick = lv_VorbisCommentsClick
         end
       end
     end

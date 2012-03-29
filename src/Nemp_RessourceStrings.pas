@@ -82,6 +82,9 @@ DetailForm_InfoLblFilename = 'Filename';
 DetailForm_InfoLblFileSize = 'Filesize';
 DetailForm_ID3v2Info = '%d Bytes (%d used)';
 
+DetailForm_VorbisCaption = 'Vorbis Comments';
+DetailForm_ApeCaption    = 'Apev2 Tags';
+
 DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
 DetailForm_HighPlayCounter = 'This file was played %d times. This information will be irretrievably deleted if you reset the rating.';
 

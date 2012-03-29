@@ -37,7 +37,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
-  PNGImage, GifImg, gnuGettext,  CoverHelper,
+  PNGImage, GifImg, gnuGettext,  CoverHelper, AudioFiles,
   Nemp_RessourceStrings;
 
 type
@@ -72,6 +72,30 @@ type
 var
   FNewPicture: TFNewPicture;
 
+const picKeys: Array [0..20] of String =
+      ( 'Cover Art (other)',
+        'Cover Art (icon)',
+        'Cover Art (other icon)',
+        'Cover Art (front)',
+        'Cover Art (back)',
+        'Cover Art (leaflet)',
+        'Cover Art (media)',
+        'Cover Art (lead)',
+        'Cover Art (artist)',
+        'Cover Art (conductor)',
+        'Cover Art (band)',
+        'Cover Art (composer)',
+        'Cover Art (lyricist)',
+        'Cover Art (studio)',
+        'Cover Art (recording)',
+        'Cover Art (performance)',
+        'Cover Art (movie scene)',
+        'Cover Art (colored fish)',
+        'Cover Art (illustration)',
+        'Cover Art (band logo)',
+        'Cover Art (publisher logo)'
+      );
+
 implementation
 
 uses Details;
@@ -83,7 +107,7 @@ var i:integer;
 begin
     TranslateComponent (self);
     for i := 0 to 20 do
-        cbPicturetype.Items.Add(Picture_Types[i]);
+        cbPicturetype.Items.Add(picKeys[i]);
     cbPictureType.ItemIndex := 0;
 end;
 
@@ -100,15 +124,17 @@ end;
 
 function TFNewPicture.CheckDescription:boolean;
 begin
-
-   { if FDetails.ValidMp3File then
-        result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text)
+    case FDetails.CurrentTagObject.FileType of
+        at_mp3: result := FDetails.CurrentTagObject.MP3File.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+        at_Flac: result := True;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: result := True;
     else
-        if FDetails.ValidFlacFile then
-            result := True // No restrictions here
-        else
-            result := false;
-    }
+        result := False;
+    end;
 end;
 
 procedure TFNewPicture.EdtPictureDescriptionChange(Sender: TObject);
@@ -176,14 +202,26 @@ begin
           else
               mime := AnsiString('image/jpeg');
 
-          {if FDetails.ValidMp3File then
-              FDetails.ID3v2Tag.SetPicture(mime,
+          case FDetails.CurrentTagObject.FileType of
+              at_mp3: FDetails.CurrentTagObject.Mp3File.ID3v2Tag.SetPicture(mime,
                                        cbPicturetype.Itemindex,
                                        EdtPictureDescription.Text,
                                        str);
-           }
-          if FDetails.ValidFlacFile then
-              FDetails.FlacFile.AddPicture(str, cbPicturetype.Itemindex, mime, EdtPictureDescription.Text);
+
+              at_Flac: FDetails.CurrentTagObject.FlacFile.AddPicture(str,
+                                       cbPicturetype.Itemindex,
+                                       mime,
+                                       EdtPictureDescription.Text);
+
+              at_Monkey,
+              at_WavPack,
+              at_MusePack,
+              at_OptimFrog,
+              at_TrueAudio: FDetails.CurrentTagObject.BaseApeFile.SetPicture(
+                                      AnsiString(cbPictureType.Text),
+                                      EdtPictureDescription.Text,
+                                      str) ;
+          end;
       finally
           str.Free;
       end;
