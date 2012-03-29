@@ -1064,7 +1064,7 @@ begin
           CoverSortorder := 1;
 
         IncludeAll := ini.ReadBool('MedienBib', 'other', True);
-        IncludeFilter := Ini.ReadString('MedienBib', 'includefilter', '*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.wma');
+        IncludeFilter := Ini.ReadString('MedienBib', 'includefilter', '*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.wma;*.ape;*.flac');
         AutoLoadMediaList := ini.ReadBool('MedienBib', 'autoload', True);
         AutoSaveMediaList := ini.ReadBool('MedienBib', 'autosave', AutoLoadMediaList);
 
@@ -2202,9 +2202,10 @@ begin
                 if FileExists(aAudioFile.Pfad)
                     AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
                     (
-                       (AnsiLowercase(aAudioFile.Extension) = 'mp3')
-                    or (AnsiLowercase(aAudioFile.Extension) = 'ogg')
-                    or (AnsiLowercase(aAudioFile.Extension) = 'flac')
+                    aAudioFile.HasSupportedTagFormat
+                    //   (AnsiLowercase(aAudioFile.Extension) = 'mp3')
+                    //or (AnsiLowercase(aAudioFile.Extension) = 'ogg')
+                    //or (AnsiLowercase(aAudioFile.Extension) = 'flac')
                     )
                 then
                 begin
@@ -2378,9 +2379,10 @@ begin
             if FileExists(af.Pfad)
                     AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
                     (
-                       (AnsiLowercase(af.Extension) = 'mp3')
-                    or (AnsiLowercase(af.Extension) = 'ogg')
-                    or (AnsiLowercase(af.Extension) = 'flac')
+                        af.HasSupportedTagFormat
+                    //   (AnsiLowercase(af.Extension) = 'mp3')
+                    //or (AnsiLowercase(af.Extension) = 'ogg')
+                    //or (AnsiLowercase(af.Extension) = 'flac')
                     )
             then
             begin

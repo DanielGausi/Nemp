@@ -100,13 +100,15 @@ end;
 
 function TFNewPicture.CheckDescription:boolean;
 begin
-    if FDetails.ValidMp3File then
+
+   { if FDetails.ValidMp3File then
         result := FDetails.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text)
     else
         if FDetails.ValidFlacFile then
             result := True // No restrictions here
         else
             result := false;
+    }
 end;
 
 procedure TFNewPicture.EdtPictureDescriptionChange(Sender: TObject);
@@ -174,12 +176,12 @@ begin
           else
               mime := AnsiString('image/jpeg');
 
-          if FDetails.ValidMp3File then
+          {if FDetails.ValidMp3File then
               FDetails.ID3v2Tag.SetPicture(mime,
                                        cbPicturetype.Itemindex,
                                        EdtPictureDescription.Text,
                                        str);
-
+           }
           if FDetails.ValidFlacFile then
               FDetails.FlacFile.AddPicture(str, cbPicturetype.Itemindex, mime, EdtPictureDescription.Text);
       finally
