@@ -3620,7 +3620,7 @@ begin
                               listFile.PlayCounter := 0;
                       end;
                       // write the rating into the file on disk
-                      aErr := CurrentAF.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
+                      aErr := CurrentAF.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
                       HandleError(afa_SaveRating, CurrentAF, aErr);
                       // correct GUI
                       CorrectVCLAfterAudioFileEdit(CurrentAF);
@@ -4764,7 +4764,7 @@ begin
                       listFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                   end;
                   // write the rating into the file on disk
-                  aErr := MedienBib.CurrentAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
+                  aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
                   HandleError(afa_SaveRating, MedienBib.CurrentAudioFile, aErr);
                   
                   MedienBib.Changed := True;
@@ -4921,7 +4921,7 @@ begin
     then
         exit;
 
-    if MedienBib.CurrentAudioFile.IsQuickEditable then
+    if MedienBib.CurrentAudioFile.HasSupportedTagFormat then
         AdjustEditToLabel(GetCorrespondingEdit(Sender as TLabel), Sender as TLabel);
 end;
 procedure TNemp_MainForm.LblBibTagsClick(Sender: TObject);
@@ -4932,7 +4932,7 @@ begin
     then
         exit;
 
-    if MedienBib.CurrentAudioFile.IsQuickEditable then
+    if MedienBib.CurrentAudioFile.HasSupportedTagFormat then
     begin
         MemBibTags.Top := LblBibDuration.Top;
         MemBibTags.Left := LblBibDuration.Left - 4;
@@ -6524,7 +6524,7 @@ begin
                           listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
                       end;
                       // write the rating into the file on disk
-                      aErr := NempPlayer.MainAudioFile.QuickUpdateTag(NempOptions.AllowQuickAccessToMetadata);
+                      aErr := NempPlayer.MainAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
                       HandleError(afa_SaveRating, NempPlayer.MainAudioFile, aErr);
                       MedienBib.Changed := True;
                   finally
@@ -10184,7 +10184,7 @@ begin
                     CON_GENRE,
                     CON_TRACKNR,
                     CON_CD: begin
-                        if af.IsQuickEditable then
+                        if af.HasSupportedTagFormat then
                         begin
                             ClearShortCuts;
                             allowed := NempOptions.AllowQuickAccessToMetadata;

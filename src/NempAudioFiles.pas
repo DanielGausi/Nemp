@@ -40,6 +40,7 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   Mp3Files, FlacFiles, OggVorbisFiles,
   VorbisComments, cddaUtils,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
+  Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
   DateUtils;
 
@@ -266,6 +267,7 @@ type
         procedure GetOggInfo(aOggFile: TOggVorbisFile; Flags: Integer = 0);
         procedure GetWmaInfo(aWmaFile: TWmaFile);
         procedure GetWavInfo(aWavFile: TWavFile);
+        procedure GetExoticInfo(aBaseApeFile: TBaseApeFile; aType: TAudioFileType; Flags: Integer = 0);
 
         // Read tags from the filetype and convert the data to TAudiofile-Data
         //function GetMp3Info(filename: UnicodeString; Flags: Integer = 0): TMp3Error;
@@ -278,14 +280,17 @@ type
         // no tags found - set default values
         procedure SetUnknown;
 
-        function QuickUpdateMP3Tag(aFilename: String = ''): TMP3Error;
-        function QuickUpdateOggTag(aFilename: String = ''): TAudioError;
-        function QuickUpdateFlacTag(aFilename: String = ''): TAudioError;
+        //function QuickUpdateMP3Tag(aFilename: String = ''): TMP3Error;
+        //function QuickUpdateOggTag(aFilename: String = ''): TAudioError;
+        //function QuickUpdateFlacTag(aFilename: String = ''): TAudioError;
 
-
-        function SetMp3Data(filename: UnicodeString): TMP3Error;
-        function SetOggVorbisData(filename: UnicodeString): TAudioError;
-        function SetFlacData(filename: UnicodeString): TAudioError;
+        procedure SetMp3Data(aMp3File: TMp3File);
+        procedure SetOggVorbisData(aOggFile: TOggVorbisFile);
+        procedure SetFlacData(aFlacFile: TFlacFile);
+        procedure SetExoticInfo(aBaseApeFile: TBaseApeFile);
+        //function SetMp3Data(filename: UnicodeString): TMP3Error;
+        //function SetOggVorbisData(filename: UnicodeString): TAudioError;
+        //function SetFlacData(filename: UnicodeString): TAudioError;
 
         // Write a string in a stream. In previous versions several encodings were
         // written, now only UTF8 is used
@@ -432,7 +437,7 @@ type
 
         // QuickFileUpdate:
         // Set only the Rating and the Playcounter and write it to the file
-        function QuickUpdateTag(allowChange: Boolean): TNempAudioError;
+        //function QuickUpdateTag(allowChange: Boolean): TNempAudioError;
 
         // Used in VST, DetailForm, MainForm.Details to replace empty Values by the chosen one
         // (Empty string)
@@ -455,7 +460,7 @@ type
 
         function GetTagDisplayString(allowEdit: Boolean): String;
 
-        function IsQuickEditable: Boolean;
+        function HasSupportedTagFormat: Boolean;
 
     end;
 
@@ -1258,15 +1263,16 @@ begin
         result := StringReplace(Trim(String(RawTagLastFM)), #13#10, ', ', [rfreplaceAll])
     else
     begin
-        if (AnsiLowercase(Extension) = 'mp3')
-        or (AnsiLowercase(Extension) = 'ogg')
-        or (AnsiLowercase(Extension) = 'flac')
-        then
+        if HasSupportedTagFormat then
+        //if (AnsiLowercase(Extension) = 'mp3')
+        //or (AnsiLowercase(Extension) = 'ogg')
+        //or (AnsiLowercase(Extension) = 'flac')
+        //then
         begin
             if allowEdit then
                 result := Tags_AddTags
             else
-                result := Tags_NoTagsAccessDenied;
+                result := ''; // Tags_NoTagsAccessDenied;
         end
         else
             result := ''; //Tags_AddTagsNotPossible;
@@ -1375,6 +1381,7 @@ end;
 }
 function TAudioFile.GetAudioData(filename: UnicodeString; Flags: Integer = 0): TNempAudioError;
 var MainFile: TGeneralAudioFile;
+    fs: TFileStream;
 begin
 
   Pfad := filename; // Set Path and determine Audiotype (file, stream, CD-Audio)
@@ -1400,11 +1407,11 @@ begin
                       at_Mp3:  GetMp3Info(MainFile.MP3File, filename, Flags);
                       at_Ogg: GetOggInfo(Mainfile.OggFile, Flags);
                       at_Flac: GetFlacInfo(MainFile.FlacFile, Flags);
-                      at_Monkey: ;
-                      at_WavPack: ;
-                      at_MusePack: ;
-                      at_OptimFrog: ;
-                      at_TrueAudio: ;
+                      at_Monkey,
+                      at_WavPack,
+                      at_MusePack,
+                      at_OptimFrog,
+                      at_TrueAudio: GetExoticInfo(MainFile.BaseApeFile, MainFile.FileType, Flags);
                       at_Wma: GetWmaInfo(MainFile.WmaFile);
                       at_wav: GetWavInfo(MainFile.WavFile);
                   end;
@@ -1423,30 +1430,29 @@ begin
                   // Audio
                   fFileSize := MainFile.FileSize;
                   fDuration := MainFile.Duration;
-                  fBitrate := MainFile.Bitrate;
+                  fBitrate := MainFile.Bitrate Div 1000;
                   SetSampleRate(MainFile.Samplerate);
 
-                  {  if AnsiLowerCase(ExtractFileExt(filename)) = '.wma' then
-                      result := GetWMAInfo(Filename)
-                    else
-                        if AnsiLowerCase(ExtractFileExt(filename)) = '.wav' then
-                          result := GetWavInfo(Filename)
-                        else
-                          begin
-                              result := AUDIOERR_UnsupportedMediaFile;
-                              FileIsPresent := FileExists(filename);
-                              if FileIsPresent then
-                              begin
-                                  AssignFile(F, filename);
-                                  FileMode := 0;
-                                  Reset(F,1);
-                                  fFileSize := filesize(f);
-                                  CloseFile(F);
-                              end else
-                                  fFileSize := 0;
-                              SetUnknown;
+                  if fFileSize = 0 then
+                  begin
+                      // this means: TGeneralAudioFile.Create(filename)
+                      // could not determine the filetype from the file - so get at least its size
+                      result := AUDIOERR_None;
+                      if AudioFileExists(filename) then
+                      begin
+                          try
+                              fs := TAudioFileStream.Create(filename, fmOpenRead or fmShareDenyWrite);
+                              try
+                                  fFileSize := fs.Size;
+                              finally
+                                  fs.Free;
+                              end;
+                          except
+                              result := AUDIO_FILEERR_FOpenR;
                           end;
-                        }
+                      end else
+                          result := AUDIO_FILEERR_NoFile;
+                  end;
               end
           except
               result := AUDIOERR_Unkown;
@@ -1679,6 +1685,100 @@ begin
     //fRating := 0;  // Rating in WMA-Files is not supported
 end;
 
+{
+    --------------------------------------------------------
+    GetExoticInfo
+    --------------------------------------------------------
+}
+procedure TAudioFile.GetExoticInfo(aBaseApeFile: TBaseApeFile; aType: TAudioFileType; Flags: Integer);
+var picList: TStringList;
+    i: Integer;
+    description: UnicodeString;
+    CoverStream: TMemoryStream;
+    aBMP: TBitmap;
+    newID: String;
+begin
+    fVBR := False;
+    // Get additonal Info from Apev2tags
+    CD           := aBaseApeFile.GetValueByKey(APE_DISCNUMBER);
+    Comment      := aBaseApeFile.GetValueByKey(APE_COMMENT);
+    Lyrics       := UTF8String(aBaseApeFile.GetValueByKey(APE_LYRICS));
+    PlayCounter  := StrToIntDef(aBaseApeFile.GetValueByKey(APE_PLAYCOUNT), 0);
+    Rating       := StrToIntDef(aBaseApeFile.GetValueByKey(APE_RATING), 0);
+    RawTagLastFM := UTF8String(aBaseApeFile.GetValueByKey(APE_CATEGORIES));
+
+    // Get Cover from Tags
+    if (Flags and GAD_Cover) = GAD_Cover then
+    begin
+        // clear ID, so MediaLibrary.GetCover can do its job
+        CoverID := '';
+        picList := TStringList.Create;
+        try
+            aBaseApeFile.GetAllPictureFrames(picList);
+            if picList.Count > 0 then
+            begin
+                CoverStream := TMemoryStream.Create;
+                try
+
+                    for i := PicList.Count - 1 downto 0 do
+                    begin
+                        CoverStream.Clear;
+                        aBaseApeFile.GetPicture(AnsiString(PicList[i]), CoverStream, description);
+                        if PicList[i] = TPictureTypeStrings[apt_Front] then
+                            break;
+                    end;
+                    aBMP := TBitmap.Create;
+                    try
+                        if not PicStreamToImage(CoverStream, 'image/jpeg', aBMP) then
+                            if not PicStreamToImage(CoverStream, 'image/png', aBMP) then
+                                PicStreamToImage(CoverStream, 'image/bmp', aBMP);
+                        if not aBMP.Empty then
+                        begin
+                            CoverStream.Seek(0, soFromBeginning);
+                            newID := MD5DigestToStr(MD5Stream(CoverStream));
+                            if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                                CoverID := newID;
+                        end;
+                    finally
+                        aBMP.Free;
+                    end;
+                finally
+                    CoverStream.Free;
+                end;
+            end;
+        finally
+            picList.Free;
+        end;
+    end;
+
+
+    // Get ChannelMode
+    case aType of
+        // MPP_MODE: array [0..2] of string = ('Unknown', 'Stereo', 'Joint Stereo');
+        at_MusePack: begin
+            case TMusePackFile(aBaseApeFile).ChannelModeID of
+                1: fChannelModeIDX := 0; // Stereo
+                2: fChannelModeIDX := 1; // Joint Stereo
+            else
+                fChannelModeIDX := 4; // unknown
+            end;
+        end;
+        at_Monkey,
+        at_WavPack,
+        at_OptimFrog,
+        at_TrueAudio: begin
+            case aBaseApeFile.Channels of
+                0: fChannelModeIDX := 4; // Stereo
+                1: fChannelModeIDX := 3; // Mono
+                2: fChannelModeIDX := 0; // invalid
+            else
+                fChannelModeIDX := 5; // MultiChannel
+            end
+        end;
+    else
+        // nothing to do
+    end;
+end;
 
 
 {
@@ -1765,16 +1865,33 @@ end;
 
 {
     --------------------------------------------------------
-    IsQuickEditable
+    HasSupportedTagFormat
     --------------------------------------------------------
 }
-function TAudioFile.IsQuickEditable: Boolean;
+function TAudioFile.HasSupportedTagFormat: Boolean;
+var ext: String;
 begin
+    ext := AnsiLowercase(Extension);
+
     result := (fAudioType = at_File)
           and (
-               (AnsiLowercase(Extension) = 'mp3')
-            or (AnsiLowercase(Extension) = 'ogg')
-            or (AnsiLowercase(Extension) = 'flac')
+               (ext = 'mp3')
+            or (ext = 'ogg')
+            or (ext = 'flac')
+            or (ext = 'ape')
+            or (ext = 'mpc')
+            // other extensions or really rare used formats
+            or (ext = 'mp2')
+            or (ext = 'mp1')
+            or (ext = 'oga')
+            or (ext = 'fla')
+            or (ext = 'mac')
+            or (ext = 'wv')
+            or (ext = 'mp+')
+            or (ext = 'mpp')
+            or (ext = 'ofr')
+            or (ext = 'ofs')
+            or (ext = 'tta')
           );
 end;
 
@@ -1785,7 +1902,7 @@ end;
     Used by the Player-Postprocessor
             and the Rating-Star-Images-Click
     --------------------------------------------------------
-}
+
 function TAudioFile.QuickUpdateTag(allowChange: Boolean): TNempAudioError;
 var localName: String;
 begin
@@ -1840,25 +1957,7 @@ begin
             end;
 
             // Set New Information
-            // ID3v2Tag has some "Auto-Delete-Frame"-Feature, and Rating and Playcounter are
-            // stored in the same Frame. So setting one of these to zero, it will delete the frame
-            // an also te other <>0-Value
-
             ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
-            {if (Rating = 0) and (PlayCounter = 0) then
-            begin
-                // ok, both values are 0, we can just delete the Frame
-                ID3v2Tag.Rating := Rating;
-                ID3v2Tag.PlayCounter := PlayCounter;
-            end else
-            begin
-                // at least one value is <> 0
-                if Rating <> 0 then
-                    ID3v2Tag.Rating := Rating;
-                if PlayCounter <> 0 then
-                    ID3v2Tag.PlayCounter := PlayCounter;
-            end;
-            }
 
             // Update File
             result := ID3v2Tag.WriteToFile(aFilename);
@@ -1911,7 +2010,7 @@ begin
     finally
         FlacFile.Free;
     end;
-end;
+end;      }
 
 {
     --------------------------------------------------------
@@ -1921,6 +2020,7 @@ end;
     --------------------------------------------------------
 }
 function TAudioFile.SetAudioData(allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
 begin
     if Not AllowChange then
         result := AUDIOERR_EditingDenied
@@ -1930,206 +2030,118 @@ begin
 
         if IsFile then
         begin
-            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp3')
-                or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp2')
-                or (AnsiLowerCase(ExtractFileExt(pfad)) = '.mp1')
-            then
-                result := Mp3ToAudioError(SetMp3Data(pfad));
+            MainFile := TGeneralAudioFile.Create(pfad);
+            try
+                if MainFile.LastError = FileErr_NotSupportedFileType then
+                    result := AUDIOERR_UnsupportedMediaFile
+                else
+                begin
+                    MainFile.Artist := Artist;
+                    MainFile.Title  := Titel ;
+                    MainFile.Album  := Album ;
+                    MainFile.Genre  := Genre ;
+                    MainFile.Year   := Year  ;
+                    if Track > 0 then
+                        MainFile.Track := IntToStr(Track);
 
-            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.ogg') then
-                result := AudioToNempAudioError(SetOggVorbisData(pfad));
+                    case MainFile.FileType of
+                        at_Mp3      : SetMp3Data(MainFile.MP3File);
+                        at_Ogg      : SetOggVorbisData(MainFile.OggFile);
+                        at_Flac     : SetFlacData(MainFile.FlacFile);
+                        at_Monkey,
+                        at_WavPack,
+                        at_MusePack,
+                        at_OptimFrog,
+                        at_TrueAudio: SetExoticInfo(MainFile.BaseApeFile);
+                        at_Wma: ;
+                        at_Wav: ;
+                    end;
 
-            if (AnsiLowerCase(ExtractFileExt(pfad)) = '.flac') then
-                result := AudioToNempAudioError(SetFlacData(pfad));
+                    result := AudioToNempAudioError(MainFile.UpdateFile);
+                end;
+            finally
+                MainFile.Free;
+            end;
         end;
     end;
 end;
 
 {
     --------------------------------------------------------
-    SetMp3Data
-    Write all Data to the ID3Tag of an AudioFile
-    Determine which Tag should be set
-        SAD_None     // Do not write at all
-        SAD_Existing // write existing (i.e. write v1 if it exists; v2 has to be created)
-        SAD_Both     // write both Tags (i.e. create v1 if it does not exist)
+    Set<Type>Data
+    Set additional data according to the type of the AudioFile
     --------------------------------------------------------
 }
-function TAudioFile.SetMp3Data(filename: UnicodeString): TMP3Error;
-var
-    ID3v2Tag:TID3V2Tag;
-    ID3v1Tag:TID3v1Tag;
-    ms: TMemoryStream;
+procedure TAudioFile.SetMp3Data(aMp3File: TMp3File);
+var ms: TMemoryStream;
 begin
-    // result := MP3ERR_None;
-    //if Flags = SAD_None then
-        // Do not update the file
-    //    exit;
-
-    ID3v1Tag := TID3v1Tag.Create;
-    ID3v2Tag := TID3V2Tag.Create;
-    try
-        ID3v1Tag.ReadFromFile(filename);
-        //if ID3v1Tag.Exists or ((Flags AND SAD_Both) = SAD_Both) then
-        //begin
-            // Update ID3v1-Tag
-            ID3v1Tag.Artist := Artist;
-            ID3v1Tag.Title := Titel;
-            ID3v1Tag.Album := Album;
-            ID3v1Tag.Comment := Comment;
-            ID3v1Tag.Year := ShortString(Year);
-            ID3v1Tag.Track := IntToStr(Track);
-            ID3v1Tag.Genre := Genre;
-            ID3v1Tag.WriteToFile(filename);
-        //end;
-
-        ID3v2Tag.ReadFromFile(filename);
-
-        // if Titel <> AUDIOFILE_UNKOWN then
-            ID3v2tag.Title  := Titel;
-        // if Artist <> AUDIOFILE_UNKOWN then
-            ID3v2tag.Artist := Artist;
-        // if Album <> AUDIOFILE_UNKOWN then
-            ID3v2tag.album  := Album;
-        // if Comment <> AUDIOFILE_UNKOWN then
-            ID3v2tag.Comment:= Comment;
-        if Lyrics <> '' then
-            Id3v2Tag.Lyrics := String(Lyrics);
-
-        ID3v2Tag.Year := Year;
-        if Track > 0 then
-            ID3v2Tag.Track := IntToStr(Track);  // else: DO nothing, dont change "TrackNr"
-
-        ID3v2Tag.SetText(IDv2_PARTOFASET, CD);
-
-        ID3v2Tag.Genre := Genre;
-
-
-        ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
-        {if (Rating = 0) and (PlayCounter = 0) then
-        begin
-            // ok, both values are 0, we can just delete the Frame
-            ID3v2Tag.Rating := Rating;
-            ID3v2Tag.PlayCounter := PlayCounter;
-        end else
-        begin
-            // at least one value is <> 0
-            if Rating <> 0 then
-                ID3v2Tag.Rating := Rating;
-            if PlayCounter <> 0 then
-                ID3v2Tag.PlayCounter := PlayCounter;
+    aMp3File.Comment := Comment;
+    aMp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, CD);
+    aMp3File.ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
+    if Lyrics <> '' then
+        aMp3File.ID3v2Tag.Lyrics := String(Lyrics);
+    if length(RawTagLastFM) > 0 then
+    begin
+        ms := TMemoryStream.Create;
+        try
+            ms.Write(RawTagLastFM[1], length(RawTagLastFM));
+            aMp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+        finally
+            ms.Free;
         end;
-        }
-
-        if length(RawTagLastFM) > 0 then
-        begin
-            ms := TMemoryStream.Create;
-            try
-                ms.Write(RawTagLastFM[1], length(RawTagLastFM));
-                ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
-            finally
-                ms.Free;
-            end;
-        end else
-            // delete Tags-Frame
-            ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
-
-        result := ID3v2Tag.WriteToFile(filename);
-
-    finally
-        ID3v1Tag.Free;
-        ID3v2Tag.Free;
-    end;
+    end else
+        // delete Tags-Frame
+        aMp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 end;
 
-function TAudioFile.SetOggVorbisData(filename: UnicodeString): TAudioError;
-var OggVorbisFile: TOggVorbisFile;
+procedure TAudioFile.SetOggVorbisData(aOggFile: TOggVorbisFile);
 begin
-    //result := OVErr_None;
-    //if Flags = SAD_None then
-        // Do not update the file
-    //    exit;
+    aOggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
+    aOggFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
+    aOggFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
+    // Playcounter/Rating: Maybe incompatible with other Taggers
+    if Playcounter > 0 then
+         aOggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+    else aOggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
 
-    OggVorbisFile := TOggVorbisFile.Create;
-    try
-        OggVorbisFile.ReadFromFile(filename);
-
-        OggVorbisFile.Artist := Artist;
-        OggVorbisFile.Title  := Titel;
-        OggVorbisFile.Album  := Album;
-
-        if Track > 0 then
-            OggVorbisFile.Track := IntToStr(Track);
-
-        OggVorbisFile.Year := Year;
-        OggVorbisFile.Genre := Genre;
-
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
-        // Playcounter/Rating: Maybe incompatible with other Taggers
-        if Playcounter > 0 then
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
-        else
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
-
-        if Rating > 0 then
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
-        else
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
-
-        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        OggVorbisFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
-
-        result := OggVorbisFile.WriteToFile(filename);
-    finally
-        OggVorbisFile.Free;
-    end;
+    if Rating > 0 then
+         aOggFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+    else aOggFile.SetPropertyByFieldname(VORBIS_RATING, '');
+    // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+    aOggFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
 end;
-function TAudioFile.SetFlacData(filename: UnicodeString): TAudioError;
-var FlacFile: TFlacFile;
+
+procedure TAudioFile.SetFlacData(aFlacFile: TFlacFile);
 begin
-    //result := FlacErr_None;
+      aFlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
+      aFlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
+      aFlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
+      // Playcounter/Rating: Maybe incompatible with other Taggers
+      if Playcounter > 0 then
+           aFlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
+      else aFlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
 
-    //if Flags = SAD_None then
-        // Do not update the file
-    //    exit;
+      if Rating > 0 then
+           aFlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
+      else aFlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
 
-    FlacFile := TFlacFile.Create;
-    try
-        FlacFile.ReadFromFile(filename);
+      // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+      aFlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
+end;
 
-        FlacFile.Artist := Artist;
-        FlacFile.Title  := Titel;
-        FlacFile.Album  := Album;
+procedure TAudioFile.SetExoticInfo(aBaseApeFile: TBaseApeFile);
+begin
+    aBaseApeFile.SetValueByKey(APE_DISCNUMBER , CD          );
+    aBaseApeFile.SetValueByKey(APE_COMMENT    , Comment     );
+    aBaseApeFile.SetValueByKey(APE_LYRICS     , String(Lyrics));
+    if Playcounter > 0 then
+         aBaseApeFile.SetValueByKey(APE_PLAYCOUNT  , IntToStr(PlayCounter))
+    else aBaseApeFile.SetValueByKey(APE_PLAYCOUNT  , '');
+    if Rating > 0 then
+         aBaseApeFile.SetValueByKey(APE_RATING     , IntToStr(Rating))
+    else aBaseApeFile.SetValueByKey(APE_RATING     , '');
 
-        if Track > 0 then
-            FlacFile.Track := IntToStr(Track);
-
-        FlacFile.Year := Year;
-        FlacFile.Genre := Genre;
-
-        FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, CD);
-        FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Comment);
-        FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(Lyrics));
-        // Playcounter/Rating: Maybe incompatible with other Taggers
-        if Playcounter > 0 then
-            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
-        else
-            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
-
-        if Rating > 0 then
-            FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
-        else
-            FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
-
-        // LastFM-Tags/CATEGORIES: Probably Nemp-Only
-        FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
-
-        result := FlacFile.WriteToFile(filename);
-    finally
-        FlacFile.Free;
-    end;
+    aBaseApeFile.SetValueByKey(APE_CATEGORIES , String(RawTagLastFM));
 end;
 
 

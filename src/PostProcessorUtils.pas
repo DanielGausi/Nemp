@@ -283,7 +283,7 @@ end;
 function TPostProcessJob.UpdateFile: TNempAudioError;
 begin
     if fWriteToFiles then
-        result := fAudioFile.QuickUpdateTag(fWriteToFiles)
+        result := fAudioFile.SetAudioData(fWriteToFiles)
     else
         result := AUDIOERR_EditingDenied;
 end;

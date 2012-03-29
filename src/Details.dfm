@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_VorbisComments
+    ActivePage = Tab_Lyrics
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
@@ -573,7 +573,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -788,7 +788,7 @@ object FDetails: TFDetails
           AutoCloseUp = True
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
+          ItemHeight = 13
           Sorted = True
           TabOrder = 4
           OnChange = Lblv1Change
@@ -1073,7 +1073,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ItemHeight = 0
+          ItemHeight = 13
           Sorted = True
           TabOrder = 4
           OnChange = Lblv2Change
@@ -1300,7 +1300,7 @@ object FDetails: TFDetails
           Width = 145
           Height = 21
           AutoComplete = False
-          ItemHeight = 0
+          ItemHeight = 13
           Sorted = True
           TabOrder = 4
         end
@@ -1529,7 +1529,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = cbPicturesChange
         end
