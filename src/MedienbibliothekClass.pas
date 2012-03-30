@@ -74,6 +74,7 @@ type
         MainWindowHandle: DWord;  // Handle of Nemp Main Window, Destination for all the messages
 
         // Thread-Handles
+        fHND_LoadThread: DWord;
         fHND_UpdateThread: DWord;
         fHND_DeleteFilesThread: DWord;
         fHND_RefreshFilesThread: DWord;
@@ -81,6 +82,9 @@ type
         fHND_GetTagsThread: DWord;
         fHND_UpdateID3TagsThread: DWord;
         fHND_BugFixID3TagsThread: DWord;
+
+        // filename for Thread-based loading
+        fBibFilename: UnicodeString;
 
         // General note:
         //     all lists beginning with "tmp" are temporary lists, which stores the library
@@ -289,6 +293,8 @@ type
         procedure SaveRadioStationsToStream(aStream: TStream);
 
         procedure LoadFromFile4(aStream: TStream);
+
+        procedure fLoadFromFile(aFilename: UnicodeString);
 
     public
         CloseAfterUpdate: Boolean; // flag used in OnCloseQuery
@@ -580,7 +586,7 @@ type
         // b. Loading/Saving the *.gmp-File
         // will call several private methods
         procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
-        procedure LoadFromFile(aFilename: UnicodeString);
+        procedure LoadFromFile(aFilename: UnicodeString; Threaded: Boolean = False);
 
         function CountInconsistentFiles: Integer;      // Count "ID3TagNeedsUpdate"-AudioFiles
         procedure PutInconsistentFilesToUpdateList;    // Put these files into the updatelist
@@ -594,6 +600,7 @@ type
 
   end;
 
+  Procedure fLoadLibrary(MB: TMedienbibliothek);
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
   Procedure fDeleteFilesUpdate(MB: TMedienbibliothek);
   procedure fRefreshFilesThread(MB: TMedienbibliothek);
@@ -5270,13 +5277,36 @@ end;
     - Load a gmp-File
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadFromFile(aFilename: UnicodeString);
+procedure TMedienBibliothek.LoadFromFile(aFilename: UnicodeString; Threaded: Boolean = False);
+var Dummy: Cardinal;
+begin
+    StatusBibUpdate := 2;
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
+
+    if Threaded then
+    begin
+        fBibFilename := aFilename;
+        fHND_LoadThread := (BeginThread(Nil, 0, @fLoadLibrary, Self, 0, Dummy));
+    end else
+        fLoadFromFile(aFilename);
+end;
+
+Procedure fLoadLibrary(MB: TMedienbibliothek);
+begin
+    MB.fLoadFromFile(MB.fBibFilename);
+    try
+      CloseHandle(MB.fHND_LoadThread);
+    except
+    end;
+end;
+
+procedure TMedienBibliothek.fLoadFromFile(aFilename: UnicodeString);
 var
     aStream: TMemoryStream;
     Header: AnsiString;
     version, Subversion: byte;
 begin
-    if StatusBibUpdate <> 0 then exit;
+    // if StatusBibUpdate <> 0 then exit;
 
     if FileExists(aFilename) then
     begin

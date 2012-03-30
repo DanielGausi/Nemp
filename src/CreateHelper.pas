@@ -70,10 +70,11 @@ begin
 end;
 
 function LoadSettings: Boolean;
-var i, s: Integer;
+var i, s,e: Integer;
     ini: TMemIniFile;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
+
 begin
     UpdateSplashScreen(SplashScreen_LoadingPreferences);
     with Nemp_MainForm do
@@ -84,6 +85,14 @@ begin
 
             // result is the lastExit-Value
             result := ini.ReadBool('Allgemein', 'LastExitOK', True);
+
+            NempOptions.ShowSplashScreen := ini.ReadBool('Allgemein', 'ShowSplashScreen', True);
+            if NempOptions.ShowSplashScreen then
+            begin
+                FSplash.Show;
+                FSplash.Update;
+            end;
+
 
             ReadNempOptions(ini, NempOptions);
             if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
@@ -106,7 +115,9 @@ begin
             //Playlist-Einstellungen laden
             NempPlaylist.LoadFromIni(Ini);
             // MedienBib-Einstellungen laden
-            MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+            //MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+            MedienBib.NewCoverFlow.InitList(MedienBib.Coverlist);
+
             MedienBib.LoadFromIni(Ini);
             // MedienBib.AllowQuickAccessToMetadata := NempOptions.AllowQuickAccessToMetadata;
 
@@ -175,7 +186,6 @@ begin
             ini.Free;
         end;
         }
-
 
         ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
         try
@@ -324,7 +334,10 @@ begin
     with Nemp_MainForm do
     begin
         if MedienBib.AutoLoadMediaList then
-            MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp')
+        begin
+            LblEmptyLibraryHint.Caption := MainForm_LibraryIsLoading;
+            MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp', True)
+        end
         else
         begin
             case MedienBib.BrowseMode of
@@ -460,9 +473,6 @@ begin
         AutoSavePlaylistTimer.Enabled := NempPlaylist.AutoSave;
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
-        // Anzeige oben links initialisieren
-        SwitchBrowsePanel(MedienBib.BrowseMode);
-
         if NempOptions.RegisterHotKeys then
             InstallHotkeys (SavePath, Handle);
         if NempOptions.RegisterMediaHotkeys then
@@ -527,6 +537,9 @@ begin
             TabBtn_Equalizer.ResetGlyph;
         end;
 
+        // Anzeige oben links initialisieren
+        SwitchBrowsePanel(MedienBib.BrowseMode);
+
         NempOptions.StartMinimizedByParameter := False;
         if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') or (trim(paramstr(1)) = '/safemode') then
         begin
@@ -563,17 +576,34 @@ end;
 
 procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
+    s,e: Cardinal;
+    s1,e1: Cardinal;
 begin
+    //s1 := gettickcount;
     with Nemp_MainForm do
     begin
+        LockWindowUpdate(Handle);
+
+        //s := gettickcount;
         TmpLastExitWasOK := LoadSettings;
         SearchSkins;
         SearchLanguages;
-        AutoLoadPlaylist(TmpLastExitWasOK);
-        ApplySettings;
-        ApplyLayout;
-        AutoLoadBib;
 
+
+        //s := gettickcount;
+        AutoLoadPlaylist(TmpLastExitWasOK);
+        //e := gettickcount;
+        //ShowMessage('Loading Playlist: ' + IntToStr(e - s));
+
+        //s := gettickcount;
+        ApplySettings;
+        //e := gettickcount;
+        //ShowMessage('Apply Settings: ' + IntToStr(e - s));
+
+
+        ApplyLayout;
+
+        //s := gettickcount;
         UpdateSplashScreen(SplashScreen_GenerateWindows);
         // Place some controls correctly
         GRPBoxCover      .Parent := AudioPanel;
@@ -600,6 +630,8 @@ begin
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
 
         UpdateFormDesignNeu;
+        //e := gettickcount;
+        //ShowMessage('Form Design: ' + IntToStr(e - s));
 
 
         if NempSkin.isActive then
@@ -611,7 +643,7 @@ begin
 
         ReTranslateNemp(GetCurrentLanguage);
 
-        Spectrum.DrawClear;
+
         if NempPlayer.MainStream = 0 then
             ReInitPlayerVCL; // otherwise it has been done in player.play
         ReArrangeToolImages;
@@ -624,7 +656,21 @@ begin
         EditFastSearch.OnChange := EDITFastSearchChange;
         NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
         EdtBibGenre.Items := Genres;
+
+
+        LockWindowUpdate(0);
+
+        //s := gettickcount;
+        AutoLoadBib;
+        //e := gettickcount;
+        //ShowMessage('Bib Load: ' + IntToStr(e - s));
+
+        //LblEmptyLibraryHint.Refresh;
     end;
+
+    //e1 := gettickcount;
+    //ShowMessage('Complete: ' + IntToStr(e1 - s1));
+
 
 end;
 

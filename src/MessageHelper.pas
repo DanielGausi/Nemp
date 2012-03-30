@@ -54,6 +54,7 @@ procedure Handle_STNewFile(var Msg: TMessage);
 procedure Handle_STFinish(var Msg: TMessage);
 
 
+
 implementation
 
 
@@ -434,6 +435,7 @@ begin
     end;
 end;
 
+
 function Handle_MedienBibMessage(Var aMsg: TMessage): Boolean;
 var i: Integer;
     srList: TObjectList;
@@ -473,10 +475,7 @@ begin
         MB_RefillTrees: begin
 
           ReFillBrowseTrees(LongBool(aMsg.LParam));
-          PanelStandardBrowse.Visible := MedienBib.BrowseMode = 0;
-          PanelCoverBrowse.Visible    := MedienBib.BrowseMode = 1;
-          PanelTagCloudBrowse.Visible := MedienBib.BrowseMode = 2;
-
+          ResetBrowsePanels;
          { if MedienBib.BrowseMode = 1 then
           begin
               //Done in    ReFillBrowseTrees
@@ -495,6 +494,11 @@ begin
             BlockeMedienListeUpdate(False);
             BlockeMedienListeWriteAcces(False);
             BlockeMedienListeReadAccess(False);
+
+            if MedienBib.Count = 0 then
+                LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty
+            else
+                LblEmptyLibraryHint.Caption := '';
 
             //UnBlockMedienListe;
             LangeAktionWeitermachen := False;
@@ -650,7 +654,7 @@ begin
               then
               begin
                   SynchronizeAudioFile(NempPlayer.MainAudioFile, NempPlayer.MainAudioFile.Pfad, False);
-                  CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile);
+                  CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile, False);
               end;
         end;
 
@@ -1892,6 +1896,11 @@ procedure CurDir(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
 begin
   Nemp_MainForm.AuswahlStatusLbl.Caption :=
       Format((MediaLibrary_SearchingNewFiles),  [MedienBib.UpdateList.Count, ST_Medienliste.CurrentDir]);
+
+  Nemp_MainForm.LblEmptyLibraryHint.Caption :=
+      Format((MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
+
+
   Nemp_MainForm.AuswahlStatusLbl.Update;
 end;
 

@@ -471,6 +471,7 @@ type
     SE_SilenceThreshold: TSpinEdit;
     Lbl_SilenceDB: TLabel;
     CB_AutoPlayEnqueueTitle: TCheckBox;
+    cb_ShowSplashScreen: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1169,6 +1170,7 @@ begin
   CBAskForAutoAddNewDirs.Checked := MedienBib.AskForAutoAddNewDirs;
   CBAutoAddNewDirs.Checked       := MedienBib.AutoAddNewDirs;
 
+  cb_ShowSplashScreen.Checked := Nemp_MainForm.NempOptions.ShowSplashScreen;
   CB_AllowMultipleInstances.Checked := Not Nemp_MainForm.NempOptions.AllowOnlyOneInstance;
   CB_StartMinimized.Checked := Nemp_MainForm.NempOptions.StartMinimized;
   CBRegisterHotKeys.Checked := Nemp_MainForm.NempOptions.RegisterHotKeys;
@@ -2200,6 +2202,7 @@ begin
   else
       Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions - [toEditOnClick];
 
+  Nemp_MainForm.NempOptions.ShowSplashScreen := cb_ShowSplashScreen.Checked;
   Nemp_MainForm.NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
   Nemp_MainForm.NempOptions.StartMinimized  := CB_StartMinimized.Checked;
   Nemp_MainForm.NempOptions.RegisterHotKeys := CBRegisterHotKeys.Checked;

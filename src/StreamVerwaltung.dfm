@@ -70,10 +70,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     TabOrder = 3
     object Tab_Favourites: TTabSheet
       Caption = 'Favorites'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         684
         353)
@@ -199,10 +195,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         684
         353)
