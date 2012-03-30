@@ -99,11 +99,7 @@ type
                 AUDIOERR_EditingDenied,
                 AUDIOERR_DriveNotReady,
                 AUDIOERR_NoAudioTrack,
-                AUDIOERR_Unkown
-
-
-                // FlacErr_BackupFailed, FlacErr_DeleteBackupFailed as in Ogg
-    );
+                AUDIOERR_Unkown   );
 
  const
     AudioErrorString: Array[TNempAudioError] of String = (
@@ -134,9 +130,11 @@ type
               // Flac
               'Invalid Flac-File',
               'Metadata-Block exceeds maximum size',
+              //
               'Invalid Ape File',
               'Invalid Apev2Tag' ,
-              'Type of Metadata is not supported - use mp3, ogg, flac or ape',
+              //
+              'Metadata is not supported in this file type',
               'Quick access to metadata denied',
               // CDDA
               'Drive not ready',
@@ -269,28 +267,15 @@ type
         procedure GetWavInfo(aWavFile: TWavFile);
         procedure GetExoticInfo(aBaseApeFile: TBaseApeFile; aType: TAudioFileType; Flags: Integer = 0);
 
-        // Read tags from the filetype and convert the data to TAudiofile-Data
-        //function GetMp3Info(filename: UnicodeString; Flags: Integer = 0): TMp3Error;
-        //function GetFlacInfo(Filename: UnicodeString; Flags: Integer = 0): TAudioError;
-        //function GetOggInfo(filename: UnicodeString; Flags: Integer = 0): TAudioError;
-        //function GetWmaInfo(filename: UnicodeString): TNempAudioError;
-        //function GetWavInfo(WaveFile: UnicodeString): TNempAudioError;
         function GetCDDAInfo(Filename: UnicodeString; Flags: Integer = 0): TCDDAError;
 
         // no tags found - set default values
         procedure SetUnknown;
 
-        //function QuickUpdateMP3Tag(aFilename: String = ''): TMP3Error;
-        //function QuickUpdateOggTag(aFilename: String = ''): TAudioError;
-        //function QuickUpdateFlacTag(aFilename: String = ''): TAudioError;
-
         procedure SetMp3Data(aMp3File: TMp3File);
         procedure SetOggVorbisData(aOggFile: TOggVorbisFile);
         procedure SetFlacData(aFlacFile: TFlacFile);
         procedure SetExoticInfo(aBaseApeFile: TBaseApeFile);
-        //function SetMp3Data(filename: UnicodeString): TMP3Error;
-        //function SetOggVorbisData(filename: UnicodeString): TAudioError;
-        //function SetFlacData(filename: UnicodeString): TAudioError;
 
         // Write a string in a stream. In previous versions several encodings were
         // written, now only UTF8 is used
@@ -600,9 +585,6 @@ function GetMp3Details(filename:UnicodeString;
 
 function AudioToNempAudioError(aError: TAudioError): TNempAudioError;
 function Mp3ToAudioError(aError: TMp3Error): TNempAudioError;
-//function OggToAudioError(aError: TAudioError): TNempAudioError;
-//function FlacToAudioError(aError: TAudioError): TNempAudioError;
-
 function CDToAudioError(aError: TCddaError): TNempAudioError;
 
 function UnKownInformation(aString: String): Boolean;
@@ -685,46 +667,6 @@ begin
     end;
 end;
 
-
-       {
-
-function OggToAudioError(aError: TOggVorbisError): TNempAudioError;
-begin
-    case aError of
-      OVErr_None                      : result := AUDIOERR_None ;
-      OVErr_NoFile                    : result := AUDIO_FILEERR_NoFile ;
-      OVErr_FileCreate                : result := AUDIO_FILEERR_FOpenCrt;
-      OVErr_FileOpenR                 : result := AUDIO_FILEERR_FOpenR ;
-      OVErr_FileOpenRW                : result := AUDIO_FILEERR_FOpenRW;
-      OVErr_InvalidFirstPageHeader    : result := AUDIO_OVErr_InvalidFirstPageHeader ;
-      OVErr_InvalidFirstPage          : result := AUDIO_OVErr_InvalidFirstPage       ;
-      OVErr_InvalidSecondPageHeader   : result := AUDIO_OVErr_InvalidSecondPageHeader;
-      OVErr_InvalidSecondPage         : result := AUDIO_OVErr_InvalidSecondPage      ;
-      OVErr_CommentTooLarge           : result := AUDIO_OVErr_CommentTooLarge        ;
-      OVErr_BackupFailed              : result := AUDIO_OVErr_BackupFailed           ;
-      OVErr_DeleteBackupFailed        : result := AUDIO_OVErr_DeleteBackupFailed     ;
-    else
-      result := AUDIOERR_Unkown ;
-    end;
-end;
-
-function FlacToAudioError(aError: TFlacError): TNempAudioError;
-begin
-    case aError of
-      FlacErr_None                : result := AUDIOERR_None ;
-      FlacErr_NoFile              : result := AUDIO_FILEERR_NoFile ;
-      FlacErr_FileCreate          : result := AUDIO_FILEERR_FOpenCrt;
-      FlacErr_FileOpenR           : result := AUDIO_FILEERR_FOpenR ;
-      FlacErr_FileOpenRW          : result := AUDIO_FILEERR_FOpenRW;
-      FlacErr_InvalidFlacFile     : result := AUDIO_FlacErr_InvalidFlacFile  ;
-      FlacErr_MetaDataTooLarge    : result := AUDIO_FlacErr_MetaDataTooLarge ;
-      FlacErr_BackupFailed        : result := AUDIO_OVErr_BackupFailed       ;
-      FlacErr_DeleteBackupFailed  : result := AUDIO_OVErr_DeleteBackupFailed ;
-    else
-      result := AUDIOERR_Unkown ;
-    end;
-end;
-               }
 function CDToAudioError(aError: TCddaError): TNempAudioError;
 begin
     case aError of
@@ -1470,7 +1412,6 @@ begin
       end;
 
       at_CDDA: begin
-          //showmessage(filename + '   ....   ');
           result := CDToAudioError(GetCDDAInfo(Filename, Flags));
       end
   else
@@ -1894,123 +1835,6 @@ begin
             or (ext = 'tta')
           );
 end;
-
-{
-    --------------------------------------------------------
-    QuickFileUpdate
-    Write Rating and PlayCounter to the file
-    Used by the Player-Postprocessor
-            and the Rating-Star-Images-Click
-    --------------------------------------------------------
-
-function TAudioFile.QuickUpdateTag(allowChange: Boolean): TNempAudioError;
-var localName: String;
-begin
-    if not allowChange then
-        result := AUDIOERR_EditingDenied
-    else
-    begin
-        result := AUDIOERR_UnsupportedMediaFile;
-        if fAudioType = at_File then
-        begin
-            localName := self.Pfad;
-            try
-                // Get the extension and call the proper private method.
-                if (AnsiLowerCase(ExtractFileExt(localName)) = '.mp3')
-                  or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp2')
-                  or (AnsiLowerCase(ExtractFileExt(localName)) = '.mp1')
-                then
-                    result := Mp3ToAudioError(QuickUpdateMP3Tag(localName))
-                else
-                    if AnsiLowerCase(ExtractFileExt(localName)) = '.ogg' then
-                        result := AudioToNempAudioError(QuickUpdateOggTag(localName))
-                else
-                    if AnsiLowerCase(ExtractFileExt(localName)) = '.flac' then
-                        result := AudioToNempAudioError(QuickUpdateFlacTag(localName))
-            except
-                // silent exception
-            end;
-        end;
-    end;
-end;
-
-function TAudioFile.QuickUpdateMP3Tag(aFilename: String): TMP3Error;
-var ID3v2Tag:TID3V2Tag;
-begin
-    result := MP3ERR_None;
-    // Rating and PlayCounter can only be stored in the ID3v2-Tag
-    if FileExists(aFileName) then
-    begin
-        ID3v2Tag := TID3V2Tag.Create;
-        try
-            ID3v2Tag.ReadFromFile(aFilename);
-            if Not Id3v2Tag.Exists then
-            begin
-                // No ID3v2Tag exists in the file.
-                // Set basic Information
-                Id3v2Tag.Artist := Artist;
-                ID3v2Tag.Title := Titel;
-                ID3v2Tag.Album := Album;
-                ID3v2Tag.Genre := Genre;
-                ID3v2Tag.Year := Year;
-                ID3v2Tag.Track := IntToStr(Track);
-            end;
-
-            // Set New Information
-            ID3v2Tag.SetRatingAndCounter('*', Rating, PlayCounter);
-
-            // Update File
-            result := ID3v2Tag.WriteToFile(aFilename);
-        finally
-            ID3v2Tag.Free;
-        end;
-    end;
-end;
-
-function TAudioFile.QuickUpdateOggTag(aFilename: String): TAudioError;
-var OggVorbisFile: TOggVorbisFile;
-begin
-    //result := OVErr_None;
-    OggVorbisFile := TOggVorbisFile.Create;
-    try
-        OggVorbisFile.ReadFromFile(aFilename);
-        if Playcounter > 0 then
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
-        else
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
-        if Rating > 0 then
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
-        else
-            OggVorbisFile.SetPropertyByFieldname(VORBIS_RATING, '');
-
-        result := OggVorbisFile.WriteToFile(aFilename);
-    finally
-        OggVorbisFile.Free;
-    end;
-end;
-
-function TAudioFile.QuickUpdateFlacTag(aFilename: String): TAudioError;
-var FlacFile: TFlacFile;
-begin
-    //result := FlacErr_None;
-    FlacFile := TFlacFile.Create;
-    try
-        FlacFile.ReadFromFile(aFilename);
-
-        if Playcounter > 0 then
-            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(PlayCounter))
-        else
-            FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, '');
-        if Rating > 0 then
-            FlacFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
-        else
-            FlacFile.SetPropertyByFieldname(VORBIS_RATING, '');
-
-        result := FlacFile.WriteToFile(aFilename);
-    finally
-        FlacFile.Free;
-    end;
-end;      }
 
 {
     --------------------------------------------------------
