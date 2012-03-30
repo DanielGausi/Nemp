@@ -37,13 +37,13 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_VorbisComments
+    ActivePage = Tab_MpegInformation
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
-        Left = 10
+        Left = 8
         Top = 1
         Width = 441
         Height = 105
@@ -447,7 +447,7 @@ object FDetails: TFDetails
         Caption = 'Quality'
         TabOrder = 2
         object RatingImageBib: TImage
-          Left = 84
+          Left = 88
           Top = 52
           Width = 70
           Height = 14
@@ -526,10 +526,38 @@ object FDetails: TFDetails
           Transparent = True
         end
         object LblPlayCounter: TLabel
-          Left = 84
+          Left = 88
           Top = 72
-          Width = 3
+          Width = 55
           Height = 13
+          Caption = 'dssdsdsdsd'
+        end
+        object LblConst_Format: TLabel
+          Left = 8
+          Top = 89
+          Width = 70
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Format'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          Transparent = True
+        end
+        object LblFormat: TLabel
+          Left = 88
+          Top = 89
+          Width = 113
+          Height = 29
+          AutoSize = False
+          Caption = 'sdsdsd'
+          ShowAccelChar = False
+          Transparent = True
+          WordWrap = True
         end
       end
       object GrpBox_Cover: TGroupBox
@@ -2001,24 +2029,13 @@ object FDetails: TFDetails
       end
     end
   end
-  object ___CB_StayOnTop: TCheckBox
-    Left = 16
-    Top = 480
-    Width = 169
-    Height = 17
-    Caption = 'Stay on top'
-    Checked = True
-    State = cbChecked
-    TabOrder = 2
-    Visible = False
-  end
   object BtnApply: TButton
     Left = 392
     Top = 479
     Width = 75
     Height = 25
     Caption = 'Apply'
-    TabOrder = 3
+    TabOrder = 2
     OnClick = BtnApplyClick
   end
   object BtnUndo: TButton
@@ -2027,7 +2044,7 @@ object FDetails: TFDetails
     Width = 75
     Height = 25
     Caption = 'Undo'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = BtnUndoClick
   end
   object Timer1: TTimer

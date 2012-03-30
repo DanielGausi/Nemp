@@ -63,7 +63,6 @@ type
     CoverIMAGE: TImage;
     Btn_OpenImage: TButton;
     Tab_MpegInformation: TTabSheet;
-    ___CB_StayOnTop: TCheckBox;
     GrpBox_ID3v1: TGroupBox;
     GrpBox_ID3v2: TGroupBox;
     Btn_Properties: TButton;
@@ -231,6 +230,8 @@ type
     Lbl_VorbisCD: TLabel;
     Edt_VorbisCD: TEdit;
     lv_VorbisComments: TListBox;
+    LblConst_Format: TLabel;
+    LblFormat: TLabel;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -245,7 +246,6 @@ type
     procedure BtnApplyClick(Sender: TObject);
     procedure BtnUndoClick(Sender: TObject);
     procedure Btn_CloseClick(Sender: TObject);
-////    procedure ___CB_StayOnTopClick(Sender: TObject);
 
     // Some EventHandler for page 1
     procedure Btn_ExploreClick(Sender: TObject);
@@ -367,26 +367,19 @@ type
     procedure ShowFlacDetails(flac: TFlacFile);
     procedure ShowApeDetails(ape: TBaseApeFile);
 
-
     // Save information to ID3-Tag
     function UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
     function UpdateID3v2InFile(mp3: TMp3File): TMp3Error;
     function UpdateOggVorbisInFile(ogg: TOggVorbisFile): TAudioError;
     function UpdateFlacInFile(flac: TFlacFile): TAudioError;
+    function UpdateApeTagInFile(ape: TbaseApeFile): TAudioError;
+
 
 
     function CurrentFileHasBeenChanged: Boolean;
 
   public
-    //ID3v1tag: TID3v1Tag;
-    //mpegInfo:TMpegInfo;
-    //ID3v2Tag: TID3V2Tag; // wird in NewPicture benötigt
-
-    // FlacFile: TFlacFile;
-    // OggVorbisFile: TOggVorbisFile;
-
     CurrentTagObject: TGeneralAudioFile;
-
     CurrentAudioFile : TAudioFile;
 
     // Gibt an, ob aktuelles AudioFile ein gültiges MP3-File ist
@@ -433,11 +426,6 @@ begin
   TranslateComponent (self);
   CurrentTagObject := Nil;
   Coverpfade := TStringList.Create;
-  //mpegInfo := TMpegInfo.create;
-  //ID3v1tag := TID3v1Tag.Create;
-  //ID3v2Tag := TID3V2Tag.Create;
-  //FlacFile := TFlacFile.Create;
-  // OggVorbisFile := TOggVorbisFile.Create;
 
   cbIDv1Genres.Items := Genres;
   cbIDv1Genres.Items.Add('');
@@ -474,16 +462,9 @@ procedure TFDetails.FormDestroy(Sender: TObject);
 begin
   if assigned(PictureFrames) then
       PictureFrames.Free;
-
   if assigned(CurrentTagObject) then
       FreeAndNil(CurrentTagObject);
-
   Coverpfade.Free;
-  //ID3v2Tag.Free;
-  //ID3v1Tag.Free;
-  //mpegInfo.free;
-  // FlacFile.Free;
-  // OggVorbisFile.Free;
   DetailRatingHelper.Free;
 end;
 
@@ -491,14 +472,11 @@ end;
 procedure TFDetails.FormShow(Sender: TObject);
 begin
     MainPageControl.OnChange := Nil;
-
     MainPageControl.ActivePageIndex := 0;
     MainPageControl.ActivePage := Tab_General;
     refresh;
 
     MainPageControl.OnChange := MainPageControlChange;
-//    UpdateID3ReadOnlyStatus;
-
 end;
 
 procedure TFDetails.FormHide(Sender: TObject);
@@ -565,11 +543,11 @@ begin
                     end;
             at_Ogg: aErr := AudioToNempAudioError(UpdateOggVorbisInFile(CurrentTagObject.OggFile));
             at_Flac: aErr := AudioToNempAudioError(UpdateFlacInFile(CurrentTagObject.FlacFile));
-            at_Monkey: ;
-            at_WavPack: ;
-            at_MusePack: ;
-            at_OptimFrog: ;
-            at_TrueAudio: ;
+            at_Monkey,
+            at_WavPack,
+            at_MusePack,
+            at_OptimFrog,
+            at_TrueAudio: aErr := AudioToNempAudioError(UpdateApeTagInFile(CurrenttagObject.BaseApeFile));
             at_Wma: ;
             at_Wav: ;
             at_Invalid: ;
@@ -887,48 +865,6 @@ begin
   LblSamplerate.Enabled := ControlsEnable;
   LblPlayCounter.Enabled := ControlsEnable;
 end;
-{
-    --------------------------------------------------------
-    UpdateID3ReadOnlyStatus
-    - Set ReadOnly to the ID3-Edits
-    --------------------------------------------------------
-
-Procedure TFDetails.UpdateID3ReadOnlyStatus;
-var ControlsEnable, ControlsReadOnly: Boolean;
-begin
-  ControlsEnable := True;
-  ControlsReadOnly := False;
-
-  CBID3v1.Enabled := ControlsEnable;
-  CBID3v2.Enabled := ControlsEnable;
-
-  Lblv1Artist.ReadOnly := ControlsReadOnly;
-  Lblv1Album.ReadOnly := ControlsReadOnly;
-  Lblv1Titel.ReadOnly := ControlsReadOnly;
-  Lblv1Year.ReadOnly := ControlsReadOnly;
-  Lblv1Comment.ReadOnly := ControlsReadOnly;
-  Lblv1Track.ReadOnly := ControlsReadOnly;
-  pnlIDv1Genre.Enabled := ControlsEnable;
-
-  Lblv2Artist.ReadOnly := ControlsReadOnly;
-  Lblv2Album.ReadOnly := ControlsReadOnly;
-  Lblv2Titel.ReadOnly := ControlsReadOnly;
-  Lblv2Year.ReadOnly := ControlsReadOnly;
-  Lblv2Comment.ReadOnly := ControlsReadOnly;
-  Lblv2Track.ReadOnly := ControlsReadOnly;
-  pnlIDv2Genre.Enabled := ControlsEnable;
-  Memo_Lyrics.ReadOnly := ControlsReadOnly;
-  Lblv2Copyright.ReadOnly := ControlsReadOnly;
-////  Lblv2EncodedBy.ReadOnly := ControlsReadOnly;
-  Btn_DeleteLyricFrame.Enabled := ControlsEnable;
-  BtnLyricWiki.Enabled := ControlsEnable;
-  Btn_NewPicture.Enabled := ControlsEnable;
-  Btn_DeletePicture.Enabled := ControlsEnable;
-  Btn_SavePictureToFile.Enabled := ControlsEnable;
-  BtnCopyFromV2.Enabled := ControlsEnable;
-  BtnCopyFromV1.Enabled := ControlsEnable;
-end;
-}
 
 {
     --------------------------------------------------------
@@ -1004,35 +940,11 @@ begin
   LblConst_ID3v2Track.Enabled := ControlsEnable;
   LblConst_ID3v2Year.Enabled := ControlsEnable;
   BtnCopyFromV2.Enabled := ControlsEnable;
-  // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
-  //if (AktuellesAudioFile <> NIL)
-  //  AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
-  //  AND (not FileExists(AktuellesAudioFile.Pfad))
-  //  AND (trim(UnicodeString(AktuellesAudioFile.Lyrics)) <> '')
-  //  then
-  //begin
-      // d.h. es ist ein mp3File, was gerade nicht da ist, das aber Lyrics in der DB hat
-  //    Memo_Lyrics.ReadOnly := True;
-  //    Memo_Lyrics.Enabled := True;
-  //end else
-  //begin
-  //    Memo_Lyrics.ReadOnly := False;
-  //    Memo_Lyrics.Enabled := ControlsEnable;
-  //end;
-  //Btn_DeleteLyricFrame.Enabled := ButtonsEnable;
-  //BtnLyricWiki.Enabled       := ButtonsEnable;
 
   LvFrames.Enabled := ControlsEnable;
-  // cbPictures.Enabled := ControlsEnable;
-  // ID3Image.Visible := ControlsEnable;
   // Seite 4
   Lblv2Copyright.Enabled := ControlsEnable;
   Lblv2Composer.Enabled := ControlsEnable;
-////  Lblv2EncodedBy.Enabled := ControlsEnable;
-
-  //Btn_NewPicture.Enabled       := ButtonsEnable;
-  //Btn_DeletePicture.Enabled    := ButtonsEnable;
-  //Btn_SavePictureToFile.Enabled := ButtonsEnable;
 
   LblConst_Id3v2Version.Enabled := ControlsEnable;
   LblConst_Id3v2Size.Enabled := ControlsEnable;
@@ -1321,7 +1233,7 @@ begin
                         begin
                             // File is not in MediaLibrary, but PlaylistFile
                             // use data from the metatag
-                            case self.CurrentTagObject.FileType of
+                            case CurrentTagObject.FileType of
                                 at_Mp3: begin
                                             CurrentBibRating := CurrentTagObject.MP3File.ID3v2Tag.Rating;
                                             CurrentBibCounter:= CurrentTagObject.MP3File.ID3v2Tag.PlayCounter;
@@ -1350,6 +1262,10 @@ begin
                     end;
                     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
                     LblPlayCounter.Caption := Format(DetailForm_PlayCounter, [CurrentBibCounter]);
+                    if CurrentTagObject.FileType = at_Invalid then
+                        LblFormat.Caption := CurrentAudioFile.Extension
+                    else
+                        LblFormat.Caption := CurrentTagObject.FileTypeName;
             end;
 
             at_Stream: begin
@@ -1369,6 +1285,7 @@ begin
                     LBLBitrate.Caption := inttostr(CurrentAudioFile.Bitrate) + ' kbit/s';
                     LBLSamplerate.Caption := '-';
                     LblPlayCounter.Caption := '';
+                    LblFormat.Caption := 'Webstream';
             end;
 
             at_CDDA: begin
@@ -1380,6 +1297,7 @@ begin
 
                 DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, RatingImageBib.Picture.Bitmap, RatingImageBib.Width, RatingImageBib.Height);
                 LblPlayCounter.Caption := '';
+                LblFormat.Caption := 'Compact Disc Digital Audio';
             end;
         end;
 
@@ -1409,7 +1327,6 @@ begin
         if CurrentAudioFile.isCDDA then
         begin
             // Todo
-            //wuppdi;
             FirstCoverIsFromMB := true;
 
             baseName := CoverFilenameFromCDDA(CurrentAudioFile.Pfad);
@@ -1418,8 +1335,6 @@ begin
                   Coverpfade.Add(Medienbib.CoverSavePath + baseName + '.jpg')
               else if FileExists(Medienbib.CoverSavePath + baseName + '.png') then
                   Coverpfade.Add(Medienbib.CoverSavePath + baseName + '.png');
-
-            //Coverpfade.Add(CurrentAudioFile.CoverID)
         end else
             Medienbib.GetCoverListe(CurrentAudioFile,  Coverpfade);
 
@@ -1582,8 +1497,6 @@ begin
     Edt_VorbisYear.Text      := Flac.Year;
     Edt_VorbisTrack.Text     := Flac.Track;
     Edt_VorbisCopyright.Text := Flac.Copyright;
-    //Edt_VorbisLicense.Text   := FlacFile.License;
-    //Edt_VorbisContact.Text   := FlacFile.Contact;
     cb_VorbisGenre.Text      := Flac.Genre;
     Edt_VorbisCD.Text        := Flac.GetPropertyByFieldname(VORBIS_DISCNUMBER);
 
@@ -1612,8 +1525,6 @@ begin
     Edt_VorbisYear.Text      := ape.Year;
     Edt_VorbisTrack.Text     := ape.Track;
     Edt_VorbisCopyright.Text := ape.Copyright;
-    //Edt_VorbisLicense.Text   := FlacFile.License;
-    //Edt_VorbisContact.Text   := FlacFile.Contact;
     cb_VorbisGenre.Text      := ape.Genre;
     Edt_VorbisCD.Text        := ape.GetValueByKey(APE_DISCNUMBER);
 
@@ -1786,52 +1697,6 @@ begin
         at_Wma: ;
         at_Wav: ;
     end;
-
-
-   { if ValidFlacFile then
-    begin
-        if not assigned(PictureFrames) then
-            PictureFrames := TObjectList.Create(False);
-        FlacFile.GetAllPictureBlocks(PictureFrames);
-
-        for i := PictureFrames.Count - 1 downto 0 do
-        begin
-            PicType := TFlacPictureBlock(PictureFrames[i]).PictureType;
-            Description := TFlacPictureBlock(PictureFrames[i]).Description;
-            if PicType < length(Picture_Types) then
-                cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[PicType], Description]))
-            else
-                cbPictures.Items.Insert(0, Format('[%s] %s', [Picture_Types[0], Description]));
-        end;
-
-        Btn_DeletePicture.Enabled := cbPictures.Items.Count > 0;
-        Btn_SavePictureToFile.Enabled := cbPictures.Items.Count > 0;
-        ID3Image.Visible := cbPictures.Items.Count > 0;
-        Btn_NewPicture.Enabled := True;
-
-        if cbPictures.Items.Count > 0 then
-        begin
-            cbPictures.ItemIndex := 0;
-            //stream.Seek(0, soFromBeginning);
-            stream := TMemoryStream.Create;
-            try
-                TFlacPictureBlock(PictureFrames[0]).CopyPicData(stream);
-                PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[0]).Mime, ID3IMAGE.Picture.Bitmap);
-            finally
-                stream.Free;
-            end;
-        end else
-        begin
-            cbPictures.ItemIndex := -1;
-            ID3Image.Picture.Assign(NIL);
-        end;
-    end;
-      }
-   // if not (validMp3File or ValidFlacFile) then
-   // begin
-   //     cbPictures.ItemIndex := -1;
-   //     ID3Image.Picture.Assign(NIL);
-   // end;
 end;
 
 procedure TFDetails.ShowLyrics;
@@ -2461,6 +2326,40 @@ begin
         result := FileErr_NoFile;
 end;
 
+function TFDetails.UpdateApeTagInFile(ape: TbaseApeFile): TAudioError;
+begin
+    if ValidApeFile then
+    begin
+        ape.Artist := Edt_VorbisArtist.Text;
+        ape.Title  := Edt_VorbisTitle.Text;
+        ape.Album  := Edt_VorbisAlbum.Text;
+        ape.Genre  := cb_VorbisGenre.Text;
+        ape.Track  := Edt_VorbisTrack.Text;
+        ape.Year        := Edt_VorbisYear.Text;
+        ape.Copyright   := Edt_VorbisCopyright.Text;
+
+        ape.SetValueByKey(APE_DISCNUMBER, Edt_VorbisCD.Text);
+        ape.SetValueByKey(APE_COMMENT, Edt_VorbisComment.Text);
+        ape.SetValueByKey(APE_LYRICS, Trim(Memo_Lyrics.Text));
+        if CurrentTagRatingChanged then
+        begin
+            ape.SetValueByKey(APE_RATING, IntToStr(CurrentTagRating));
+            ape.SetValueByKey(APE_PLAYCOUNT, IntToStr(CurrentTagCounter));
+            CurrentTagRatingChanged := False;
+            // Change Bib-Rating!!
+            // IMPORTANT for later call of SynchronizeAudioFile,
+            // as the rating should NOT be changed in that sync!
+            //CurrentAudioFile.Rating := CurrentTagRating;
+            CurrentBibRating  := CurrentTagRating;
+            CurrentBibCounter := CurrentTagCounter;
+        end;
+        ape.SetValueByKey(APE_CATEGORIES, Trim(Memo_Tags.Text));
+
+        result := ape.WriteToFile(CurrentAudioFile.Pfad);
+    end else
+        result := FileErr_NoFile;
+end;
+
 {
     --------------------------------------------------------
     Btn_DeleteLyricFrameClick
@@ -2550,11 +2449,11 @@ begin
         at_Mp3: CurrentTagObject.MP3File.Id3v2Tag.DeleteFrame(PictureFrames[cbPictures.ItemIndex] as TID3v2Frame );
         at_Ogg: ;
         at_Flac: CurrentTagObject.FlacFile.DeletePicture(TFlacPictureBlock(PictureFrames[cbPictures.ItemIndex]));
-        at_Monkey: ;
-        at_WavPack: ;
-        at_MusePack: ;
-        at_OptimFrog: ;
-        at_TrueAudio: ;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: CurrentTagObject.BaseApeFile.SetPicture(AnsiString(cbPictures.Text), '', NIL );
         at_Wma: ;
         at_Wav: ;
     end;
@@ -2573,14 +2472,16 @@ var Stream: TMemoryStream;
     PicType: Byte;
     Description: UnicodeString;
     idx: Integer;
+    tmpBmp: TBitmap;
 begin
     Stream := TMemoryStream.Create;
     try
+        mime := ''; // invalid
+
         // Get Picture-Data from current Frame/MetaBlock
         if ValidMP3File then
-        begin
             (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
-        end;
+
         if ValidFlacFile then
         begin
             idx := cbPictures.ItemIndex;
@@ -2590,7 +2491,20 @@ begin
 
         if ValidApeFile then
         begin
-            // TODO
+            if CurrentTagObject.BaseApeFile.GetPicture(AnsiString(cbPictures.Text), Stream, Description) then
+            begin
+                // try to get the MimeType
+                tmpBmp := TBitmap.Create;
+                try
+                    if PicStreamToImage(Stream, 'image/jpeg', tmpBmp) then
+                        mime := 'image/jpeg'
+                    else
+                        if PicStreamToImage(Stream, 'image/png', tmpBmp) then
+                            mime := 'image/png'
+                finally
+                      tmpBmp.Free;
+                end;
+            end;
         end;
 
         // Get proper Filter for SaveDialog
