@@ -133,13 +133,14 @@ ShowWindow
     Nemp_MainForm.Top := 10000;
 
     Application.CreateForm(TFSplash, FSplash);
-    FSplash.Show;
-    FSplash.Update;
+//X//    FSplash.Show;
+//X//    FSplash.Update;
 
     Application.CreateForm(TPlaylistForm   , PlaylistForm   );
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
+
 
     StuffToDoAfterCreate ;
 

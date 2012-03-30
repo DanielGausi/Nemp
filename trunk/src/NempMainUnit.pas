@@ -838,6 +838,7 @@ type
     BtnABRepeatSetA: TSkinButton;
     BtnABRepeatSetB: TSkinButton;
     BtnABRepeatUnset: TSkinButton;
+    LblEmptyLibraryHint: TLabel;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1452,6 +1453,8 @@ type
 
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
 
+    procedure CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
+
     { Private declarations }
   public
 
@@ -1928,6 +1931,11 @@ begin
       FSplash.Close;
 end;
 
+procedure TNemp_MainForm.CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
+begin
+    Application.Terminate;
+end;
+
 procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction);
     var i:integer;
     ini:TMemIniFile;
@@ -1935,117 +1943,122 @@ procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction)
     PosAndSize : PWindowPlacement;
 begin
     NempIsClosing := True;
-
-    NempTrayIcon.Visible := False;
-
-    NempWebServer.Free;
-
-    AcceptApiCommands := False;
-    AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint);
-    AuswahlStatusLBL.Update;
-
-    GetMem(PosAndSize,SizeOf(TWindowPlacement));
     try
-      PosAndSize^.Length := SizeOf(TWindowPlacement);
-      if GetWindowPlacement(Handle,PosAndSize) then
-      begin
-        NempOptions.NempFormAufteilung[Tag].FormWidth := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
-        NempOptions.NempFormAufteilung[Tag].FormHeight := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
-        NempOptions.NempFormAufteilung[Tag].FormTop := PosAndSize^.rcNormalPosition.Top;
-        NempOptions.NempFormAufteilung[Tag].FormLeft := PosAndSize^.rcNormalPosition.Left;
-      end;
-    finally
-      FreeMem(PosAndSize,SizeOf(TWindowPlacement))
-    end;
-    NempOptions.NempFormAufteilung[Tag].TopMainPanelHeight := TopMainPanel.Height;
-    NempOptions.NempFormAufteilung[Tag].AuswahlPanelWidth  := AuswahlPanel.Width;
-    NempOptions.NempFormAufteilung[Tag].ArtistWidth        := ArtistsVST.Width;
-    NempOptions.NempFormAufteilung[Tag].Maximized          := WindowState = wsMaximized;
-    NempOptions.CoverWidth := VDTCover.Width;
+        Application.OnException := CatchAllExceptionsOnShutDown;
 
-    ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-    try
-        ini.Encoding := TEncoding.UTF8;
-        WriteNempOptions(ini, NempOptions);
+        NempTrayIcon.Visible := False;
 
-        Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
-        ini.WriteBool('Fenster', 'UseSkin', UseSkin);
-        ini.WriteString('Fenster','SkinName', SkinName);
+        UnInstallHotKeys(Handle);
+        UninstallMediakeyHotkeys(Handle);
 
-        NempPlayer.WriteToIni(Ini);
-        NempPlaylist.WriteToIni(Ini);
-        MedienBib.WriteToIni(Ini);
-        NempUpdater.WriteToIni(Ini);
+        NempWebServer.Free;
 
-        NempSkin.NempPartyMode.WriteToIni(ini);
+        AcceptApiCommands := False;
+        AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint);
+        AuswahlStatusLBL.Update;
 
-        for i:=0 to Spaltenzahl-1 do
-        begin
-            s := GetColumnIDfromPosition(VST, i);
-            ini.WriteInteger('Spalten', 'Inhalt' + IntToStr(i), VST.Header.Columns[s].Tag);
-            ini.Writebool('Spalten', 'visible'  + IntToStr(i), (coVisible in VST.Header.Columns[s].Options));
-            ini.WriteInteger('Spalten', 'Breite' + IntToStr(i), VST.Header.Columns[s].Width);
-        end;
-
-        ini.WriteBool('Allgemein', 'LastExitOK', True);
-
-        ini.Encoding := TEncoding.UTF8;
+        GetMem(PosAndSize,SizeOf(TWindowPlacement));
         try
-            Ini.UpdateFile;
-        except
-            // Silent Exception
+          PosAndSize^.Length := SizeOf(TWindowPlacement);
+          if GetWindowPlacement(Handle,PosAndSize) then
+          begin
+            NempOptions.NempFormAufteilung[Tag].FormWidth := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
+            NempOptions.NempFormAufteilung[Tag].FormHeight := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
+            NempOptions.NempFormAufteilung[Tag].FormTop := PosAndSize^.rcNormalPosition.Top;
+            NempOptions.NempFormAufteilung[Tag].FormLeft := PosAndSize^.rcNormalPosition.Left;
+          end;
+        finally
+          FreeMem(PosAndSize,SizeOf(TWindowPlacement))
         end;
-    finally
-        ini.Free
+        NempOptions.NempFormAufteilung[Tag].TopMainPanelHeight := TopMainPanel.Height;
+        NempOptions.NempFormAufteilung[Tag].AuswahlPanelWidth  := AuswahlPanel.Width;
+        NempOptions.NempFormAufteilung[Tag].ArtistWidth        := ArtistsVST.Width;
+        NempOptions.NempFormAufteilung[Tag].Maximized          := WindowState = wsMaximized;
+        NempOptions.CoverWidth := VDTCover.Width;
+
+        ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
+        try
+            ini.Encoding := TEncoding.UTF8;
+            WriteNempOptions(ini, NempOptions);
+
+            Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
+            ini.WriteBool('Fenster', 'UseSkin', UseSkin);
+            ini.WriteString('Fenster','SkinName', SkinName);
+
+            NempPlayer.WriteToIni(Ini);
+            NempPlaylist.WriteToIni(Ini);
+            MedienBib.WriteToIni(Ini);
+            NempUpdater.WriteToIni(Ini);
+
+            NempSkin.NempPartyMode.WriteToIni(ini);
+
+            for i:=0 to Spaltenzahl-1 do
+            begin
+                s := GetColumnIDfromPosition(VST, i);
+                ini.WriteInteger('Spalten', 'Inhalt' + IntToStr(i), VST.Header.Columns[s].Tag);
+                ini.Writebool('Spalten', 'visible'  + IntToStr(i), (coVisible in VST.Header.Columns[s].Options));
+                ini.WriteInteger('Spalten', 'Breite' + IntToStr(i), VST.Header.Columns[s].Width);
+            end;
+
+            ini.WriteBool('Allgemein', 'LastExitOK', True);
+
+            ini.Encoding := TEncoding.UTF8;
+            try
+                Ini.UpdateFile;
+            except
+                // Silent Exception
+            end;
+        finally
+            ini.Free
+        end;
+
+        // PlayList abspeichern
+        NempPlaylist.SaveToFile(SavePath + NEMP_NAME + '.npl', True);
+
+        // Do not Postprocess files any longer
+        NempPlayer.LastUserWish := USER_WANT_STOP;
+        NempPlayer.PostProcessor.NempIsClosing := True;
+
+        NempPlaylist.Stop;
+        bassTimer.Enabled :=False;
+
+        visible := False;
+        if assigned(FDetails) then FDetails.Hide;
+        if assigned(Auswahlform) then Auswahlform.Hide;
+        if assigned(MedienlisteForm) then MedienlisteForm.Hide;
+        if assigned(PlaylistForm) then PlaylistForm.Hide;
+        if assigned(ExtendedControlForm) then ExtendedControlForm.Hide;
+
+        if NempOptions.HideDeskbandOnClose then
+            NotifyDeskband(NempDeskbandDeActivateMessage);
+
+        if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
+        begin
+          AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint_MediaLib);
+          AuswahlStatusLBL.Update;
+          MedienBib.SaveToFile(SavePath + NEMP_NAME + '.gmp', True);
+        end;
+
+        PlaylistPanel.Parent := Nemp_MainForm;
+        AuswahlPanel.Parent := Nemp_MainForm;
+        VSTPanel.Parent := Nemp_MainForm;
+
+        AudioPanel.Parent := PlayerPanel;
+        AudioPanel.Left := 2;
+        AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
+
+        CoverScrollbar.WindowProc := OldScrollbarWindowProc;
+        LyricsMemo.WindowProc := OldLyricMemoWindowProc;
+
+        ST_Playlist.Free;
+        ST_Medienliste.Free;
+        FreeAndNil(DragDropList);
+
+        Set8087CW(Default8087CW);
+
+    except
+        halt;
     end;
-
-    // PlayList abspeichern
-    NempPlaylist.SaveToFile(SavePath + NEMP_NAME + '.npl', True);
-
-    // Do not Postprocess files any longer
-    NempPlayer.LastUserWish := USER_WANT_STOP;
-    NempPlayer.PostProcessor.NempIsClosing := True;
-
-    NempPlaylist.Stop;
-    bassTimer.Enabled :=False;
-
-    visible := False;
-    if assigned(FDetails) then FDetails.Hide;
-    if assigned(Auswahlform) then Auswahlform.Hide;
-    if assigned(MedienlisteForm) then MedienlisteForm.Hide;
-    if assigned(PlaylistForm) then PlaylistForm.Hide;
-    if assigned(ExtendedControlForm) then ExtendedControlForm.Hide;
-
-    if NempOptions.HideDeskbandOnClose then
-        NotifyDeskband(NempDeskbandDeActivateMessage);
-
-    if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
-    begin
-      AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint_MediaLib);
-      AuswahlStatusLBL.Update;
-      MedienBib.SaveToFile(SavePath + NEMP_NAME + '.gmp', True);
-    end;
-
-    PlaylistPanel.Parent := Nemp_MainForm;
-    AuswahlPanel.Parent := Nemp_MainForm;
-    VSTPanel.Parent := Nemp_MainForm;
-
-    AudioPanel.Parent := PlayerPanel;
-    AudioPanel.Left := 2;
-    AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
-
-    CoverScrollbar.WindowProc := OldScrollbarWindowProc;
-    LyricsMemo.WindowProc := OldLyricMemoWindowProc;
-
-    ST_Playlist.Free;
-    ST_Medienliste.Free;
-    FreeAndNil(DragDropList);
-
-    Set8087CW(Default8087CW);
-
-    UnInstallHotKeys(Handle);
-    UninstallMediakeyHotkeys(Handle);
-
 end;
 
 procedure TNemp_MainForm.WMQueryEndSession(var M: TWMQueryEndSession);
@@ -2113,8 +2126,11 @@ begin
         end;
     end else
     begin
-        aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
-        Lbl_CoverFlow.Caption := aCover.InfoString;
+        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+        begin
+            aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+            Lbl_CoverFlow.Caption := aCover.InfoString;
+        end;
     end;
     CoverScrollbar.OnChange := CoverScrollbarChange;
 end;
@@ -2792,6 +2808,13 @@ begin
     if newWidth < 50 then
         newWidth := 50;
     ArtistsVST.Width := newWidth;
+
+
+    LblEmptyLibraryHint.Width := (GRPBOXArtistsAlben.Width - 50);
+    LblEmptyLibraryHint.Left := 25;
+    LblEmptyLibraryHint.Top := (GRPBOXArtistsAlben.Height - LblEmptyLibraryHint.Height) Div 2;
+
+
 end;
 
 Procedure TNemp_MainForm.AnzeigeSortMENUClick(Sender: TObject);
@@ -2984,6 +3007,8 @@ begin
                 MedienListeStatusLBL.Caption := '';
                 BeendeLangeAktion;
                 MedienBib.StatusBibUpdate := BIB_Status_Free;
+
+                ResetBrowsePanels;
             end;
         end;
     end; // case
@@ -2998,6 +3023,7 @@ begin
         MedienListeStatusLBL.Caption := '';
         AuswahlStatusLBL.Caption := '';
         Caption:= Nemp_Caption;
+        ResetBrowsePanels;
     end;
     AktualisiereDetailForm(NIL, SD_MEDIENBIB);
 end;
@@ -3235,8 +3261,8 @@ begin
       3: begin
         // Quelle ist das Cover-Flow-Image
         //MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).ID);
-        MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
-
+        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+            MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
         // Sortieren
         if aList.Count <= 5000 then
             aList.Sort(Sortieren_AlbumTrack_asc);
@@ -8828,8 +8854,11 @@ end;
 
 procedure TNemp_MainForm.TABPanelAuswahlClick(Sender: TObject);
 begin
-    SwitchBrowsePanel((Sender as TControl).Tag);
-    SwitchMediaLibrary((Sender as TControl).Tag);
+    if MedienBib.Count > 0 then
+    begin
+        SwitchBrowsePanel((Sender as TControl).Tag);
+        SwitchMediaLibrary((Sender as TControl).Tag);
+    end;
 end;
 
 
@@ -9430,33 +9459,24 @@ end;
 
 procedure TNemp_MainForm.TntFormDestroy(Sender: TObject);
 begin
-    CoverScrollbar.WindowProc := OldScrollbarWindowProc;
-    LyricsMemo.WindowProc := OldLyricMemoWindowProc;
-
-    AlphaBlendBMP.Free;
     try
-      Spectrum.Free;
+        CoverScrollbar.WindowProc := OldScrollbarWindowProc;
+        LyricsMemo.WindowProc := OldLyricMemoWindowProc;
+        AlphaBlendBMP.Free;
+        Spectrum.Free;
+        NempSkin.Free;
+        NempPlaylist.Free;
+        NempPlayer.Free;
+        MedienBib.Free;
+        BibRatingHelper.Free;
+        LanguageList.Free;
+        NempUpdater.Free;
+        FreeAndNil(ErrorLog);
+        //ST_Playlist.Free;
+        //ST_Medienliste.Free;
     except
+        halt;
     end;
-
-    // nur zur Sicherheit
-    try
-      NempSkin.Free;
-    except
-    end;
-
-    NempPlaylist.Free;
-    NempPlayer.Free;
-
-    MedienBib.Free;
-    BibRatingHelper.Free;
-
-    LanguageList.Free;
-    NempUpdater.Free;
-
-    FreeAndNil(ErrorLog);
-    //ST_Playlist.Free;
-    //ST_Medienliste.Free;
 end;
 
 
@@ -11130,7 +11150,6 @@ begin
   RepaintOtherForms;
 
   RepaintAll;
-
 end;
 
 procedure TNemp_MainForm.PM_P_BirthdayOptionsClick(Sender: TObject);

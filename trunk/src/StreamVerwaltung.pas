@@ -242,6 +242,8 @@ begin
   Progressbar1.Top := 2;
   Progressbar1.Height := 15;
 
+  Tab_Shoutcast.TabVisible := False;
+
 
   for i := 0 to MedienBib.RadioStationList.Count - 1 do
   begin

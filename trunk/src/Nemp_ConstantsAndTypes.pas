@@ -143,13 +143,12 @@ type
         IgnoreVolumeUpDownKeys: Boolean;
         RegisterMediaHotkeys: Boolean;
 
-
         TabStopAtPlayerControls: Boolean;
         TabStopAtTabs: Boolean;
 
         DisplayApp: String;
 
-
+        ShowSplashScreen: Boolean;
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
         EditOnClick: Boolean;
@@ -1027,6 +1026,8 @@ begin
   begin
         //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
+
+        ini.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
         ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_VERSION);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
         ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);

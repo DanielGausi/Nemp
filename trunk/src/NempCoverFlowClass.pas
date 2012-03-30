@@ -93,6 +93,7 @@ type
             // After a reinit of the library (swapping lists)
             // we need to correct the CoverList-Pointer
             procedure SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
+            procedure InitList(aList: TObjectList);
 
             // Clear Textures and force redrawing
             procedure ClearTextures;
@@ -375,6 +376,15 @@ begin
         cm_OpenGL  : begin
             fFlyingCow.SetColor(r,g,b);
         end;
+    end;
+end;
+
+procedure TNempCoverFlow.InitList(aList: TObjectList);
+begin
+    fCoverList := aList;
+    case fMode of
+        cm_Classic : fClassicFlow.CoverList := aList;
+        cm_OpenGL  : ;
     end;
 end;
 

@@ -85,6 +85,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure ReArrangeToolImages;
 
+    procedure ResetBrowsePanels;
     // Switch MediaLibrary: Umschalten zwischen Listen/Coverflow/Tagwolke
     procedure SwitchMediaLibrary(NewMode: Integer);
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
@@ -101,7 +102,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     // Select all files with the same path as MedienBib.CurrentAudioFile
     function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
-    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
+    procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
 
     procedure CorrectVCLForABRepeat;
 
@@ -822,6 +823,18 @@ begin
     end;
 end;
 
+procedure ResetBrowsePanels;
+begin
+    with Nemp_MainForm do
+    begin
+          PanelStandardBrowse.Visible := (MedienBib.BrowseMode = 0) and (MedienBib.Count > 0);
+          PanelCoverBrowse.Visible    := (MedienBib.BrowseMode = 1) and (MedienBib.Count > 0);
+          PanelTagCloudBrowse.Visible := (MedienBib.BrowseMode = 2) and (MedienBib.Count > 0);
+
+          if MedienBib.Count = 0 then
+              LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
+    end;
+end;
 
 procedure SwitchMediaLibrary(NewMode: Integer);
 begin
@@ -867,9 +880,7 @@ begin
             end;
         end;
 
-        PanelStandardBrowse.Visible := NewMode = 0;
-        PanelCoverBrowse.Visible    := NewMode = 1;
-        PanelTagCloudBrowse.Visible := NewMode = 2;
+        ResetBrowsePanels;
 
         BeendeLangeAktion;
         FSplash.Close;
@@ -882,11 +893,20 @@ procedure SwitchBrowsePanel(NewMode: Integer);
 begin
     with Nemp_MainForm do
     begin
+        {if MedienBib.Count = 0 then
+        begin
+                PanelCoverBrowse.visible := False;
+                PanelStandardBrowse.Visible := False;
+                PanelTagCloudBrowse.Visible := False;
+        end
+
+        else }
+
         case Newmode of
             0: begin
                 // Zeige Browse-Listen
                 PanelCoverBrowse.visible := False;
-                PanelStandardBrowse.Visible := True;
+                PanelStandardBrowse.Visible := MedienBib.Count > 0;
                 PanelTagCloudBrowse.Visible := False;
 
                 PanelStandardBrowse.Left := 4;
@@ -907,7 +927,7 @@ begin
                 // Zeige CoverFlow
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := False;
-                PanelCoverBrowse.Visible := True;
+                PanelCoverBrowse.Visible := MedienBib.Count > 0;
 
                 PanelCoverBrowse.Left := 4;
                 PanelCoverBrowse.Width := AuswahlPanel.Width - 8;
@@ -928,7 +948,7 @@ begin
                 // Hier Code für Tagwolke einfügen
                 // Zeige CoverFlow
                 PanelStandardBrowse.Visible := False;
-                PanelTagCloudBrowse.Visible := True;
+                PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
 
                 PanelTagCloudBrowse.Left := 4;
@@ -1248,7 +1268,7 @@ end;
         PlaylistVST
         Detailform
 }
-procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile);
+procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
 var OriginalPath: String;
     bibFile: TAudioFile;
 
@@ -1287,11 +1307,14 @@ begin
         FDetails.ReloadTimer.Enabled := True;
 
     // TabWarning
-    bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
-    if SameFile(bibFile) then
+    if CheckTrees then
     begin
-        if Not MedienBib.ValidKeys(bibFile) then
-            SetBrowseTabWarning(True);
+        bibFile := MedienBib.GetAudioFileWithFilename(aFile.Pfad);
+        if SameFile(bibFile) then
+        begin
+            if Not MedienBib.ValidKeys(bibFile) then
+                SetBrowseTabWarning(True);
+        end;
     end;
 end;
 

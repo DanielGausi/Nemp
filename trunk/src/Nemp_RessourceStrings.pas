@@ -517,6 +517,8 @@ MainForm_MenuCaptionsSearchForEmptyTitle  = 'Show all files where "Title" is mis
 MainForm_MenuCaptionsSearchForEmptyArtist = 'Show all files where "Artist" is missing';
 MainForm_MenuCaptionsSearchForEmptyAlbum  = 'Show all files where "Album" is missing';
 
+MainForm_LibraryIsEmpty = 'You music library is empty. Drop some files here to start.';
+MainForm_LibraryIsLoading = 'Loading library. Please wait...';
 
 MainForm_MainMenu_Messages = 'Messages (%d)';
 MainForm_MainMenu_NoMessages = 'Messages';
@@ -553,6 +555,7 @@ MediaLibrary_SearchingFuzzyMatchings = 'Searching fuzzy matchings (%d%%)';
 MediaLibrary_RefreshingFiles         = 'Refreshing file information (%d%%)';
 MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
 MediaLibrary_SearchingNewFiles       = '(%d) Searching %s';
+MediaLibrary_SearchingNewFilesBigLabel = 'Collecting files (%d) ...';
 MediaLibrary_StartSearchingNewFiles  = 'Start searching...';
 // MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
 
