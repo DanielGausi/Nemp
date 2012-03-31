@@ -1409,9 +1409,6 @@ type
 
   private
 
-    // MediaTest: Boolean;
-    // MediaCount: Integer;
-
     CoverImgDownX: Integer;
     CoverImgDownY: Integer;
     TagCloudDownX: Integer;
@@ -1433,9 +1430,6 @@ type
     LastVSTMouseOverNode: PVirtualNode;
 
     NempIsClosing: Boolean;
-
-    //CurrentScanDir: String;
-    //CurrentPlaylistDir: String;
 
     // Setzt alle DragOver-Eventhandler auf das der Effekte-Groupbox
     procedure SetGroupboxEffectsDragover;
@@ -1552,15 +1546,10 @@ type
 
     procedure NewSelected (Var Msg: TMessage); message WM_FC_SELECT;
 
-    ///procedure FCTest (var msg : TMessage); message WM_FLYINGCOWTEST;
-
-
     procedure STStart    (var Msg: TMessage); message ST_Start    ;
     procedure STNewFile  (var Msg: TMessage); message ST_NewFile  ;
     procedure STFinish   (var Msg: TMessage); message ST_Finish   ;
-
-
-  end;
+   end;
 
 
 var
@@ -1572,10 +1561,8 @@ var
 
   CueSyncHandle: DWord;
 
-
   AcceptApiCommands: Boolean = False; // am Ende des OnShows auf True setzen.
                                       // Beim Close auf False
-  // lib: Cardinal;
 
   NempPlayer: TNempPlayer;
   NempPlayList: TNempPlaylist; // Die Playlist halt ;-)
@@ -1605,7 +1592,6 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
 
 procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 begin
-    //sleep(2000);
     if StartPlay then
         NempPlayer.LastUserWish := USER_WANT_PLAY
     else
@@ -1622,7 +1608,6 @@ begin
            on E: Exception do TranslateMessageDLG('Error in InitPlayingFile: ' + #13#10 + E.Message,mtError, [mbOK], 0);
         end;
     end;
-    //sleep(2000);
 end;
 
 
@@ -1651,7 +1636,6 @@ begin
     begin
       if (abs(X - TagCloudDownX) > 5) or  (abs(Y - TagCloudDownY) > 5) then
       begin
-      //showmessage( inttostr(abs(X - CoverImgDownX)) + '----' + inttostr(abs(Y - CoverImgDownY)) );
           Dateiliste := TObjectlist.Create(False);
           GenerateListForHandleFiles(DateiListe, 4);
           DragSource := DS_VST;
@@ -1862,8 +1846,6 @@ begin
     CloudViewer.OnPaint      := CloudPaint;
     CloudViewer.OnAfterPaint := CloudAfterPaint;
     NewPlayerPanel.DoubleBuffered := True;
-
-    //ImgScrollCover.DoubleBuffered := True;
 
     // Create Player
     NempPlayer            := TNempPlayer.Create(Handle);
@@ -2100,9 +2082,8 @@ end;
 
 procedure TNemp_MainForm.WMEndSession(var M: TWMEndSession);
 begin
-  M.Result := 0;
-
-  close;
+    M.Result := 0;
+    close;
 end;
 
 procedure TNemp_MainForm.DeactivateNemp(Sender: TObject);
@@ -2468,7 +2449,6 @@ begin
           NEMP_BUTTON_STOP      : StopBTNIMGClick(Nil);
           NEMP_BUTTON_NEXTTITLE : PlayNextBTNIMGClick(NIL);
           //COMMAND_RESTORE       : if MinimizedIndicator then RestoreNemp else application.Minimize;
-
 
           NEMP_VOLUMEUP: begin
                             NempPlayer.Volume := NempPlayer.Volume + 1;
@@ -3048,16 +3028,6 @@ begin
   if MedienBib.InitialDialogFolder = ''  then
       MedienBib.InitialDialogFolder := GetShellFolder(CSIDL_MYMUSIC);
 
-  {if MedienBib.NempSortArray[1] = siOrdner then
-  begin
-      aNode := ArtistsVST.FocusedNode;
-      if assigned(aNode) and (ArtistsVST.GetNodeLevel(aNode) > 0) then
-      begin
-          Data := ArtistsVST.GetNodeData(aNode);
-          CurrentScanDir := Data.FString.DataString;
-      end;
-  end;}
-
   ST_Medienliste.Mask := GenerateMedienBibSTFilter;
   FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, MedienBib.InitialDialogFolder );
   try
@@ -3087,6 +3057,7 @@ begin
   if Opendialog1.Execute then
   begin
       MedienBib.Clear;
+      LblEmptyLibraryHint.Caption := MainForm_LibraryIsLoading;
       MedienBib.LoadFromFile(OpenDialog1.FileName);
   end;
 end;
@@ -3714,24 +3685,27 @@ begin
   // ???
   Liste := MedienBib.Anzeigeliste;
 
-  if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
+  if MedienBib.Count = 0 then
+      AuswahlStatusLBL.Caption := ''
+  else
   begin
-      AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCount, [MedienBib.Alben.Count])
-  end else
-  if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) then
-  begin
-      AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCount, [MedienBib.RadioStationList.Count]);
-  end else
-  begin
-      for i:=0 to Liste.Count-1 do
+      if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
+          AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCount, [MedienBib.Alben.Count])
+      else
+      if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) then
+          AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCount, [MedienBib.RadioStationList.Count])
+      else
       begin
-        dauer := dauer + (Liste[i] as TAudioFile).Duration;
-        groesse := groesse + (Liste[i] as TAudioFile).Size;
-      end;
+          for i:=0 to Liste.Count-1 do
+          begin
+              dauer := dauer + (Liste[i] as TAudioFile).Duration;
+              groesse := groesse + (Liste[i] as TAudioFile).Size;
+          end;
 
-      AuswahlStatusLBL.Caption := Format((MainForm_Summary_FileCount),[Liste.Count])
-                         + SizeToString(groesse)
-                         + SekToZeitString(dauer);
+          AuswahlStatusLBL.Caption := Format((MainForm_Summary_FileCount),[Liste.Count])
+                             + SizeToString(groesse)
+                             + SekToZeitString(dauer);
+      end;
   end;
 end;
 
@@ -3756,22 +3730,6 @@ begin
   end;
   MedienBib.RefreshFiles;
 end;
-
-(*
-procedure TNemp_MainForm.MM_ML_ResetRatingsClick(Sender: TObject);
-begin
-  if MedienBib.StatusBibUpdate <> 0 then
-  begin
-      MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-      exit;
-  end;
-  if MessageDlg(MedienBib_ConfirmResetRatings, mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-  begin
-      MedienBib.ResetRatings;
-      VST.Invalidate;
-  end;
-end;
-*)
 
 procedure TNemp_MainForm.PM_ML_RefreshSelectedClick(Sender: TObject);
 var
@@ -4434,22 +4392,6 @@ begin
            end;
 
     VK_F8: NempPlayer.PlayJingle(Nil);
-
-(*    $42 {B}: if (Anzeigemode = 0) OR Auswahlform.Visible then begin
-                //if (ssCtrl in Shift) AND (ssAlt in Shift) then
-                //  PlayPrevBTNClick(PlayPrevBTN)
-                //else
-                  if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_Browse.Click;
-            end;
-*)
-    //$46 {F}: if (Anzeigemode = 0) OR Auswahlform.Visible then
-    //                if (ssctrl in Shift) and not LangeAktionWeitermachen then TabBtn_CoverFlow.Click;
-
-    //$31 {1}: if (ssctrl in Shift) then TabBtn_Cover.Click;
-    //$32 {2}: if (ssctrl in Shift) then TabBtn_Lyrics.Click;
-    //$33 {3}: if (ssctrl in Shift) then TabBtn_Equalizer.Click;
-    //$34 {4}: if (ssctrl in Shift) then TabBtn_Effects.Click;
-
   end;
 end;
 
@@ -4528,14 +4470,6 @@ begin
                 LblBibYear      .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
                 LblBibGenre     .Caption := '';
             end;
-            {at_CDDA   : begin
-                LblBibArtist    .Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
-                LblBibTitle     .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
-                LblBibAlbum     .Caption := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
-                LblBibTrack     .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
-                LblBibYear      .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
-                LblBibGenre     .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
-            end; }
         end;
     end;
 end;
@@ -5121,7 +5055,7 @@ begin
                           4: MedienBib.CurrentAudioFile.Year   := EdtBibYear.Text;
                           5: MedienBib.CurrentAudioFile.Genre  := EdtBibGenre.Text;
                       end;                     
-              
+
                       // write Data to file                                                    
                       aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
                       if aErr = AUDIOERR_None  then
@@ -5462,13 +5396,10 @@ end;
 procedure TNemp_MainForm.RefreshCoverFlowTimerTimer(Sender: TObject);
 begin
     RefreshCoverFlowTimer.Enabled := False;
-
     if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
         exit;
 
-
     MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2);
-
 
     CoverScrollbar.OnChange := Nil;
     If MedienBib.Coverlist.Count > 3 then
@@ -5477,12 +5408,8 @@ begin
         CoverScrollbar.Max := 3;
 
     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
-
     CoverScrollbar.OnChange := CoverScrollbarChange;
-
     MedienBib.NewCoverFlow.Paint(10);
-
-    //CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
 end;
 
 procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
@@ -6094,10 +6021,6 @@ procedure TNemp_MainForm.ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
 begin
     ClipCursor(NIL);
     SlideBarButton.Tag := 0;
-
-    //NempPlaylist.Progress :=
-    //(SlideBarButton.Left-SlideBarShape.Left) / (SlideBarShape.Width-SlideBarButton.Width);
-
     NempPlayer.SetABSyncs(
         (ab1.Left + (ab1.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width),
         (ab2.Left + (ab2.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width)
@@ -9146,6 +9069,8 @@ begin
     EditFastSearch.OnChange := EDITFastSearchChange;
     RestoreCoverFlowAfterSearch;
     MedienBib.ShowQuickSearchList;
+
+    EditFastSearch.SetFocus;
 end;
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
@@ -11165,53 +11090,9 @@ end;
 
 procedure TNemp_MainForm.TabPanelPlaylistClick(Sender: TObject);
 var point: TPoint;
-    //asknomore: Boolean;
-    //aNode: PVirtualNode;
-    //Data: PTreeData;
-    //AudioFile: TAudioFile;
-    //sd: TSilenceDetector;
 begin
-    {if AktiverTree = VST then
-        aNode := VST.FocusedNode
-    else
-        aNode := PlaylistVST.FocusedNode;
-
-  if Assigned(aNode) then
-  begin
-      Data := VST.GetNodeData(aNode);
-      AudioFile := Data^.FAudioFile;
-
-      sd := TSilenceDetector.Create(self.Handle, AudioFile.Pfad);
-      try
-          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-10)));
-          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-20)));
-          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-30)));
-          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-40)));
-          //Showmessage(SekIntToMinStr(Sd.GetSilenceLength(-50)));
-      finally
-          sd.Free;
-      end;
-
-  end;
-
-     }
-// Note: I Use this EventHandler testing several things
-// commented code is just temporary here. ;-)
-
-    //asknomore := False;
-
-  { MessageDlgWithNoMorebox
-              ((AutoScanDirsDialog_Caption),
-               (AutoScanDirsDialog_Text),
-               mtConfirmation, [mbYes, mbNo, mbAbort, mbRetry], 0, 0, asknomore,
-              (AutoScanDirsDialog_ShowAgain));
-   }
-   // TranslateMessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbYes, mbNo, mbAbort, mbRetry], 0);
-   // MessageDLG((Warning_RecordingDirNotFound), mtWarning, [mbYes, mbNo, mbAbort, mbRetry], 0);
-
-  GetCursorPos(Point);
-  PlayListPOPUP.Popup(Point.X, Point.Y+10);
-
+    GetCursorPos(Point);
+    PlayListPOPUP.Popup(Point.X, Point.Y+10);
 end;
 
 
@@ -11232,13 +11113,7 @@ begin
             tmp := 'NempG15App.exe'
         else
             tmp := NempOptions.DisplayApp;
-
         shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + tmp + '"'),'autostart',NIL,sw_show);
-
-    // if (NempOptions.DisplayApp <> '') and FileExists(NempOptions.DisplayApp) then
-    //
-
-
     end;
 end;
 
@@ -11404,7 +11279,6 @@ begin
       Application.CreateForm(TFError, FError);
 
     FError.Show;
-    // ShowMessage(ErrorLog.Text);
 end;
 
 procedure TNemp_MainForm.VolButtonKeyDown(Sender: TObject; var Key: Word;
