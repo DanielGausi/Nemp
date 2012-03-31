@@ -501,7 +501,8 @@ begin
 
           fDauer := fDauer  - OriginalLength;
 
-          PlayNext; // bei der nächsten Datei einen neuen verusch starten
+          SendMessage(MainWindowHandle, WM_NextFile, 0, 0);
+          //PlayNext;
         end else
         begin
           AcceptInput := True;

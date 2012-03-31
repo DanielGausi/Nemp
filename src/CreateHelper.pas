@@ -340,6 +340,7 @@ begin
         end
         else
         begin
+            LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty;
             case MedienBib.BrowseMode of
                 0: MedienBib.ReBuildBrowseLists;
                 1: begin
