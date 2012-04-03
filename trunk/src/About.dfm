@@ -65,17 +65,17 @@ object AboutForm: TAboutForm
       ''
       '[b]Used components/units[/b]'
       ''
-      '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
-      ''
       'The [url="http://www.un4seen.com"]bass.dll[/url] and add-ons'
       ''
       
-        'Slightly [url="http://www.gausi.de/wmatags.html"]modified parts[' +
-        '/url] of the [url="http://mac.sourceforge.net/atl/"]ATL[/url]'
+        '[url="http://gausi.de/delphi.htmll"]Audio Werkzeuge Bibliothek[/' +
+        'url]'
+      ''
+      '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
       ''
       
-        '[url="http://www.gausi.de/mp3fileutils.html"]Mp3FileUtils 0.6a[/' +
-        'url]'
+        '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
+        'l] by Mat'#237'as Andr'#233's Moreno'
       ''
       
         '[url="http://www.delphi-forum.de/viewtopic.php?t=48936"]SearchTo' +
@@ -100,13 +100,7 @@ object AboutForm: TAboutForm
         '[url="http://delphi.fsprolabs.com/"]FSPro Windows 7 Taskbar Comp' +
         'onents[/url]'
       ''
-      
-        '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
-        'l] by Mat'#237'as Andr'#233's Moreno'
-      ''
       '[url="http://www.last.fm/api/intro"]The LastFM API[/url]'
-      ''
-      '[url="http://www.shoutcast.com/"]The SHOUTcast API[/url]'
       ''
       '[url="http://www.madshi.net/"]MadExcept[/url] by Mathias Rauen'
       ''
@@ -140,14 +134,11 @@ object AboutForm: TAboutForm
       ''
       '... by nagging about peanuts'
       ''
+      '... by sending test material'
+      ''
       
         '... just by saying "thank you, this is a fine piece of software"' +
         ' '
-      ''
-      ''
-      '[b]Special Thanks to[/b]'
-      ''
-      'pol... for his "concrete feedback"'
       ''
       ''
       '[row="200"]'

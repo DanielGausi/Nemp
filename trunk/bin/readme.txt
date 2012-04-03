@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - Februar 2012
+      Januar 2005 - April 2012
 
-      Version: 4.4.0
+      Version: 4.5.0
 
 
 -----------------------------------------------------------
@@ -81,12 +81,8 @@ Verwendete Units/Komponenten:
 - MP3-Wiedergabe-Engine: bass.dll
   Download unter http://www.un4seen.com/
 
-- Mp3FileUtils 
+- Audio Werkzeuge Bibliothek
   http://www.gausi.de/delphi
-
-- Teile der AudioToolsLibrary (ATL)
-  http://mac.sourceforge.net/atl/
-  http://www.gausi.de
 
 - SearchTools von Heiko Thiel
   http://www.delphi-forum.de/viewtopic.php?t=48936
@@ -109,9 +105,6 @@ Verwendete Units/Komponenten:
 - LastFM API
   http://www.last.fm/api/intro
 
-- SHOUTcast API
-  http://www.shoutcast.com
-
 - MadExcept by Mathias Rauen 
   http://www.madshi.net/
   
@@ -120,6 +113,37 @@ Verwendete Units/Komponenten:
   http://www.delphipraxis.net
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
+
+
+
+Version 4.5.0, April 2012
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+* Unterstützung von Apev2-Tags 
+* A-B-Wiederholung 
+* Überspringen von Stille am Ende eines Titels 
+* Auswerten der Meta-Information "CD-Nr." bzw. "Part of a Set" bei Multi-CD-Alben 
+* Einstellungen
+  - Kein Splashscreen beim Start
+  - Wechsel zu neu eingefügtem Titel (bei Doppelklick im Explorer und laufendem Player)
+
+Änderungen:
+-----------
+* Laden der Bibliotheksdatei im Hintergrund (schnellerer Startvorgang)
+* Für Einsteiger: "Ihre Medienbibliothek ist leer"-Hinweis
+* Klick auf [X] bei der Schnellsuche: Fokus zurück ins Eingabefeld
+
+Bugfixes:
+---------
+* Trackermodul-Dateien (z.B. mod, xm, s3m) wurden nicht abgespielt
+* Wiederhol-Modus "No-Repeat" + letzter Eintrag in Playlist fehlt: Doch repeat
+* Sortierung nach Dateiname bei bestimmten Ordnerstrukturen fehlerhaft
+* Sekundäre Sortierung nach Ordner funktionierte nicht richtig
+* Webserver: Zugriff auf Bibliothek wurde auch Admins verweigert 
+  (wenn es für User so eingestellt ist)
+* Webserver-css: Fix bei "großen Schriftarten"
+* Gelegentliche Fehlermeldungen beim Beenden sollten jetzt unterbunden werden
 
 
 
