@@ -141,8 +141,8 @@ Bugfixes:
 * Sortierung nach Dateiname bei bestimmten Ordnerstrukturen fehlerhaft
 * Sekundäre Sortierung nach Ordner funktionierte nicht richtig
 * Webserver: Zugriff auf Bibliothek wurde auch Admins verweigert 
-  (wenn es für User so eingestellt ist)
-* Webserver-css: Fix bei "großen Schriftarten"
+  (wenn es für User so eingestellt war)
+* Webserver-css: Layout-Fix bei "großen Schriftarten"
 * Gelegentliche Fehlermeldungen beim Beenden sollten jetzt unterbunden werden
 
 
