@@ -528,9 +528,8 @@ object FDetails: TFDetails
         object LblPlayCounter: TLabel
           Left = 88
           Top = 72
-          Width = 55
+          Width = 3
           Height = 13
-          Caption = 'dssdsdsdsd'
         end
         object LblConst_Format: TLabel
           Left = 8
@@ -554,7 +553,6 @@ object FDetails: TFDetails
           Width = 113
           Height = 29
           AutoSize = False
-          Caption = 'sdsdsd'
           ShowAccelChar = False
           Transparent = True
           WordWrap = True
