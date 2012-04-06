@@ -740,6 +740,7 @@ StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display th
                       +'If you want to create an app for your keyboard, feel free to contact me.'
                       +#13#10+#13#10
                       +'So, do you want to start the G15 App now?';
+StartG15AppNotFound = 'The app for the keyboard display could not be found';
 
 CDDA_NoDrivesFound = 'No CD drives found.';
 CDDA_NoHeadsetPossible = 'Nemp is currently playing a track from this CD. Playing another one at the same time is not possible.';

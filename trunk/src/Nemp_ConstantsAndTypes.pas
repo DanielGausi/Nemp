@@ -870,7 +870,7 @@ begin
         LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
         StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
-        RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', True);
+        RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', False);
         RegisterMediaHotkeys := ini.ReadBool('Allgemein', 'RegisterMediaHotkeys', True);
         IgnoreVolumeUpDownKeys  := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);

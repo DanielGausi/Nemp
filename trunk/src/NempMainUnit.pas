@@ -11113,7 +11113,12 @@ begin
             tmp := 'NempG15App.exe'
         else
             tmp := NempOptions.DisplayApp;
-        shellexecute(Handle,'open',pchar('"' + ExtractFilepath(paramStr(0)) + tmp + '"'),'autostart',NIL,sw_show);
+
+        tmp := ExtractFilepath(paramStr(0)) + tmp;
+        if FileExists(tmp) then
+            shellexecute(Handle,'open',pchar('"' + tmp + '"'),'autostart',NIL,sw_show)
+        else
+            TranslateMessageDLG((StartG15AppNotFound), mtWarning, [mbOK], 0)
     end;
 end;
 

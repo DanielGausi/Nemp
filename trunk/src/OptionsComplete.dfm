@@ -56,7 +56,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 457
     Height = 543
-    ActivePage = TabSystem0
+    ActivePage = TabSystem1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1

@@ -1460,7 +1460,7 @@ begin
 
 
 
-  SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+  //SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;
 
 Function TOptionsCompleteForm.ModToIndex(aMod: Cardinal): Integer;
