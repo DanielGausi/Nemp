@@ -67,9 +67,7 @@ object AboutForm: TAboutForm
       ''
       'The [url="http://www.un4seen.com"]bass.dll[/url] and add-ons'
       ''
-      
-        '[url="http://gausi.de/delphi.html"]Audio Werkzeuge Bibliothek[/u' +
-        'rl]'
+      '[url="http://gausi.de/awb.html"]Audio Werkzeuge Bibliothek[/url]'
       ''
       '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
       ''

@@ -1665,7 +1665,7 @@ begin
                     begin
                         CoverStream.Clear;
                         aBaseApeFile.GetPicture(AnsiString(PicList[i]), CoverStream, description);
-                        if PicList[i] = TPictureTypeStrings[apt_Front] then
+                        if PicList[i] = String(TPictureTypeStrings[apt_Front]) then
                             break;
                     end;
                     aBMP := TBitmap.Create;

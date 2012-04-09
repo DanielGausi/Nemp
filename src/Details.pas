@@ -1046,7 +1046,7 @@ begin
   Lblv1Artist.Text  := Lblv2Artist.Text  ;
   Lblv1Album.Text   := Lblv2Album.Text   ;
   Lblv1Comment.Text := Lblv2Comment.Text ;
-  Lblv1Year.Text    := AnsiString(Lblv2Year.Text)    ;
+  Lblv1Year.Text    := Lblv2Year.Text    ;
   Lblv1Track.Text   := Lblv2Track.Text   ;
   cbIDv1Genres.Text := cbIDv2Genres.Text ;
 end;
@@ -1538,7 +1538,7 @@ begin
     if lv_VorbisComments.Items.Count > 0 then
     begin
         lv_VorbisComments.ItemIndex := 0;
-        Memo_Vorbis.Text := ape.GetValueByKey(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex])
+        Memo_Vorbis.Text := ape.GetValueByKey(AnsiString(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex]))
     end else
         Memo_Vorbis.Text := '';
 end;
@@ -1558,7 +1558,7 @@ begin
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: Memo_Vorbis.Text := CurrentTagObject.BaseApeFile.GetValueByKey(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex])
+        at_TrueAudio: Memo_Vorbis.Text := CurrentTagObject.BaseApeFile.GetValueByKey(AnsiString(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex]))
     end;
 
 end;
