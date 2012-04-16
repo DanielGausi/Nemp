@@ -53,6 +53,8 @@ type
       ContinueAfter: Boolean;
     end;
 
+  TPrescanMode = (ps_None, ps_Now, ps_Later);
+
   TNempPlayer = class
     private
 
@@ -136,11 +138,17 @@ type
 
       fDefaultCoverIsLoaded: Boolean;
 
+      fPrescanFiles: TObjectList;  // a List of AudioFiles, marked for threaded Prescan.
+      fPrescanInProgress: Boolean; // Flag, whether Precan-Thread is already running
+      ThreadedMainStream: DWord;
+      ThreadedSlideStream: DWord;
+
 
       // Basic method for creating a stream from a given file   //filename
       function NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
                            aNoMickyMaus: boolean;
                            aReverse: boolean;
+                           PrescanMode: TPrescanMode;
                            checkEasterEgg: boolean = False): DWord;
 
       function EqualizerIsNeeded: boolean;
@@ -188,7 +196,7 @@ type
       // send a Message to the Deskband (set play/pause-button there as well)
       procedure UpdateDeskband(wParam, lParam: Integer);
 
-      procedure StartSilenceDetection;
+      procedure StartPrescanThread;
 
     public
         MainAudioFile: TPlaylistFile;
@@ -199,6 +207,7 @@ type
         SlideStream: DWord;
         Jinglestream: DWORD;
         HeadsetStream: DWord;
+
 
         CountDownStream: DWord;
         BirthdayStream: DWord;
@@ -345,6 +354,8 @@ type
         property DoSilenceDetection: Boolean read fDoSilenceDetection write fDoSilenceDetection;
         property SilenceThreshold: Integer read fSilenceThreshold write fSilenceThreshold;
 
+        property PrescanInProgress: Boolean read fPrescanInProgress;
+
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
@@ -447,8 +458,13 @@ type
         // Ermitteln, ob neue Daten noch in den Stream passen, oder ob ein neuer Angefangen werden soll
         function SplitRecordStreamNow(BufLen: DWORD): Boolean;  // BufLen: Länge des neuen Buffers
 
+        procedure StartSilenceDetection;
         procedure ProcessSilenceDetection(aSilenceDetector: TSilenceDetector);
+
+        function SwapStreams(ScannedFile: TAudioFile): Integer;
   end;
+
+var CSPrescanList: RTL_CRITICAL_SECTION;
 
 
 Const
@@ -623,6 +639,9 @@ begin
     PreviewBackGround.Width :=200;
     PreviewBackGround.Height := 145;
     fABRepeatActive := False;
+
+    fPrescanFiles := TObjectList.Create(True);
+    fPrescanInProgress := False;
 end;
 
 destructor TNempPlayer.Destroy;
@@ -645,6 +664,13 @@ begin
 
     if assigned(HeadSetAudioFile) then
         HeadSetAudioFile.Free;
+
+    fPrescanInProgress := False;
+    EnterCriticalSection(CSPrescanList);
+    fPrescanFiles.Free;
+    fPrescanFiles := Nil;
+    LeaveCriticalSection(CSPrescanList);
+
     inherited Destroy;
 end;
 
@@ -1020,6 +1046,7 @@ end;
 function TNempPlayer.NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
                            aNoMickyMaus: boolean;
                            aReverse: boolean;
+                           PrescanMode: TPrescanMode;
                            checkEasterEgg: boolean = False): DWord;
 var extension, localPath: String;
   flags: DWORD;
@@ -1033,13 +1060,23 @@ begin
 
   // get extension (if its not a file, we need the "else-part", so dont check for AudioType here)
   extension := AnsiLowerCase(ExtractFileExt(localPath));
-  if (   (extension = '.mp3')
+  if  (PrescanMode = ps_Now)
+      AND
+      (   (extension = '.mp3')
       OR (extension = '.mp2')
-      OR (extension = '.mp1')   )
+      OR (extension = '.mp1')  )
   then
-      flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable
+  begin
+      flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable;
+      //showmessage('prescan');
+  end
   else
+  begin
       flags :=  BASS_UNICODE OR fSoftwareFlag or fFloatable;
+      //showmessage('KEIN Scan');
+  end;
+
+  //flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable;
 
   // zunächst nur Decode?
   if aReverse OR aNoMickyMaus then
@@ -1049,7 +1086,12 @@ begin
 
   case aFile.AudioType of
       at_File: begin
+
           result := BASS_StreamCreateFile(False, PChar(Pointer(localPath)), 0, 0, DecodeFlag OR flags);
+
+
+          //showmessage('Create Done: ' + Inttostr(BASS_ErrorGetCode) + ' ---  ' + InttoStr(Bass_ChannelGetlength(result, BASS_POS_BYTE)));
+
           // Vorgang oben fehlgeschlagen? Dann mit Music probieren
           if result = 0 then
               result := BASS_MusicLoad(FALSE, PChar(Pointer(localPath)), 0, 0, BASS_MUSIC_RAMP or DecodeFlag or BASS_MUSIC_PRESCAN or BASS_UNICODE ,0);
@@ -1159,6 +1201,7 @@ var
   ChannelInfo: BASS_CHANNELINFO;
   basstime: Double;
   basslen: DWord;
+  ScanMode: TPrescanMode;
   //JustCDChange, CDChangeSuccess: Boolean;
 begin
   // Alte Wiedergabe stoppen
@@ -1221,7 +1264,21 @@ begin
       //end
       //else
           // Mainstream erzeugen
-          Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, True);
+
+      if StartPos <> 0 then
+          ScanMode := ps_Now
+      else
+        if (extension = '.mp3')
+        OR (extension = '.mp2')
+        OR (extension = '.mp1')  then
+            ScanMode := ps_Later
+        else
+            ScanMode := ps_None;
+
+
+      // ScanMode := ps_Now;
+
+      Mainstream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, ScanMode, True);
 
       // Fehlerbehandlung
       if (MainStream = 0) {or (not CDChangeSuccess)} then
@@ -1292,7 +1349,7 @@ begin
               // Bei Audio-CDs kann kein zweiter Stream erzeugt werden!
               //if extension <> '.cda' then
               //begin
-                SlideStream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False);
+                SlideStream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, ScanMode);
                 SetEndSyncs(SlideStream);
                 InitStreamEqualizer(SlideStream);
                 if MainStreamIsTempoStream then
@@ -1303,7 +1360,11 @@ begin
                 fReallyUseFading := True;
 
                 if DoSilenceDetection then
-                    StartSilenceDetection;
+                    case Scanmode of
+                        ps_None: StartSilenceDetection;
+                        ps_Now: StartSilenceDetection;
+                        ps_Later: ; // SilenceDetection is done after
+                    end;
           end;
 
           at_Stream: begin
@@ -1372,17 +1433,27 @@ begin
       // zunächst mit eigenen Methoden rangehen
       if MainAudioFile.IsFile then
           SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
-      // dann ggf. von der bass korrigieren lassen
-      If Mainstream <> 0 then
+
+      if ScanMode = ps_Now then
       begin
-          BASS_ChannelGetInfo(Mainstream, ChannelINfo);
-          MainAudioFile.SetSampleRate(ChannelInfo.freq);
-          if not MainAudioFile.IsStream then
+          // dann ggf. von der bass korrigieren lassen
+          If Mainstream <> 0 then
           begin
-              basstime := BASS_ChannelBytes2Seconds(Mainstream,BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE));
-              basslen := BASS_StreamGetFilePosition(Mainstream,BASS_FILEPOS_END);
-              MainAudioFile.Bitrate := Round((basslen/(125*basstime)+0.5));
-          end
+              BASS_ChannelGetInfo(Mainstream, ChannelINfo);
+              MainAudioFile.SetSampleRate(ChannelInfo.freq);
+              if not MainAudioFile.IsStream then
+              begin
+                  basstime := BASS_ChannelBytes2Seconds(Mainstream,BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE));
+                  basslen := BASS_StreamGetFilePosition(Mainstream,BASS_FILEPOS_END);
+                  MainAudioFile.Bitrate := Round((basslen/(125*basstime)+0.5));
+              end
+          end;
+      end;
+
+      case ScanMode of
+        ps_None: ; // no prescan needed (i.e. no mp3 file)
+        ps_Now: ;  // prescan already done
+        ps_Later: StartPrescanThread;
       end;
 
       SetCueSyncs;
@@ -1415,6 +1486,14 @@ begin
       end;
 
   end;
+
+  {showmessage(
+   inttostr(round(
+  BASS_ChannelBytes2Seconds(Mainstream,BASS_ChannelGetLength(Mainstream, BASS_POS_BYTE))
+                  )
+  )         )
+   }
+
 end;
 {
     --------------------------------------------------------
@@ -1558,8 +1637,8 @@ begin
           tmpMain := NEMP_CreateStream(MainAudiofile,
                                //False, // kein Tempostream
                                AvoidMickyMausEffect,
-                               True  // ReverseStream
-                               );
+                               True,  // ReverseStream
+                               ps_Now );
           MainStreamIsTempoStream := AvoidMickyMausEffect;
 
 
@@ -1605,6 +1684,7 @@ begin
         Jinglestream := NEMP_CreateStream(aAudioFile,
                            False, // kein Tempostream
                            False,  // kein ReverseStream
+                           ps_None,
                            true); // Check for Easteregg
 
         BASS_ChannelFlags(Jinglestream, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP, BASS_STREAM_AUTOFREE OR BASS_SAMPLE_LOOP);
@@ -1670,7 +1750,7 @@ begin
 
       fHeadsetIsURLStream := HeadSetAudioFile.isStream;
       Bass_ChannelStop(HeadsetStream);
-      HeadsetStream := NEMP_CreateStream(HeadSetAudioFile, False, False, True);
+      HeadsetStream := NEMP_CreateStream(HeadSetAudioFile, False, False, ps_Now, True);
       BASS_ChannelFlags(HeadsetStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
 
       BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadSetVolume);
@@ -2155,7 +2235,7 @@ begin
       BASS_ChannelRemoveSync(mainstream, fCueSyncHandleM);
       BASS_ChannelRemoveSync(mainstream, fCueSyncHandleS);
 
-      // das auch??
+      // das auch??     z
       BASS_ChannelRemoveSync(slidestream, fCueSyncHandleM);
       BASS_ChannelRemoveSync(slidestream, fCueSyncHandleS);
 
@@ -2935,7 +3015,8 @@ begin
 
         tmpStream := NEMP_CreateStream(af,
                                  False, // kein Tempostream
-                                 False  // ReverseStream
+                                 False,  // ReverseStream
+                                 ps_Now
                                  );
         if tmpStream <> 0 then
           Result := Round(Bass_ChannelBytes2Seconds(tmpStream,Bass_ChannelGetLength(tmpStream, BASS_POS_BYTE)))
@@ -2957,7 +3038,8 @@ begin
 
         CountDownStream := NEMP_CreateStream(af,
                                  False, // kein Tempostream
-                                 False  // ReverseStream
+                                 False,  // ReverseStream
+                                 ps_Now
                                  );
         BASS_ChannelFlags(CountDownStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
           // Attribute setzen
@@ -2978,7 +3060,8 @@ begin
         af.Pfad := NempBirthdayTimer.BirthdaySongFilename; // set path, determine AudioType
         BirthdayStream := NEMP_CreateStream(af,
                                  False, // kein Tempostream
-                                 False  // ReverseStream
+                                 False,  // ReverseStream
+                                 ps_Now
                                  );
         BASS_ChannelFlags(BirthdayStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
         if NempBirthdayTimer.ContinueAfter then
@@ -3134,6 +3217,8 @@ begin
   end;
 end;
 
+
+
 function TNempPlayer.StartRecording: Boolean;
 var newID3v2Tag: TID3v2Tag;
     newArtist, newTitel: UnicodeString;
@@ -3244,5 +3329,140 @@ begin
       fAutoSplitMaxSizeByte := Value * 1024 * 1024 ;
 end;
 
+
+procedure DoPrescan(aPlayer: TNempPlayer);
+var aFile: TAudioFile;
+    c: Integer;
+begin
+    aFile := TAudioFile.Create;
+    try
+        repeat
+            // get last Element in Prescan-List (others are not needed any more)
+            EnterCriticalSection(CSPrescanList);
+            c := aPlayer.fPrescanFiles.Count;
+            if c > 0 then
+                aFile.Assign(TAudioFile(aPlayer.fPrescanFiles[c-1]));
+            aPlayer.fPrescanFiles.Clear;
+            LeaveCriticalSection(CSPrescanList);
+
+            //sleep(2000);
+
+            BASS_SetDevice(aPlayer.MainDevice);
+            aPlayer.ThreadedMainStream  := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
+            aPlayer.ThreadedSlideStream := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
+
+            c := SendMessage(aPlayer.MainWindowHandle, WM_PlayerPrescanComplete, wParam(aFile), 0);
+        until c = 0;
+    finally
+        aFile.Free;
+    end;
+end;
+
+procedure TNempPlayer.StartPrescanThread;
+var FileCopy: TAudioFile;
+    Dummy: Cardinal;
+begin
+    if assigned(MainAudioFile) and MainAudioFile.IsFile then
+    begin
+        FileCopy := TAudioFile.Create;
+        FileCopy.Assign(MainAudioFile);
+
+        EnterCriticalSection(CSPrescanList);
+        fPrescanFiles.Add(FileCopy);
+        LeaveCriticalSection(CSPrescanList);
+
+        if not fPrescanInProgress then
+        begin
+            fPrescanInProgress := True;
+            CloseHandle(BeginThread(Nil, 0, @DoPrescan, Self, 0, Dummy));
+        end;
+    end;
+end;
+
+// This runs in VCL
+function TNempPlayer.SwapStreams(ScannedFile: TAudioFile): Integer;
+var oldMain, oldSlide: Dword;
+    oldVol: Single;
+    oldPosition: QWord;
+begin
+
+    EnterCriticalSection(CSPrescanList);
+    result := fPrescanFiles.Count;
+    LeaveCriticalSection(CSPrescanList);
+
+    if result = 0 then
+    begin
+        if (not assigned(MainAudioFile))
+           or (ScannedFile.Pfad <> MainAudioFile.Pfad)
+        then
+            result := -1;
+    end;
+
+    if result = 0 then
+    begin
+        oldMain  := MainStream;
+        oldSlide := SlideStream;
+
+        if MainStreamIsTempoStream then
+        begin
+            BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100);
+            BASS_ChannelSetAttribute(ThreadedSlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100);
+        end
+        else
+        begin
+            BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+            BASS_ChannelSetAttribute(ThreadedSlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+        end;
+
+        InitStreamEqualizer(ThreadedMainStream);
+        InitStreamEqualizer(ThreadedSlideStream);
+
+        // Set Volume
+        //if UseFading AND fReallyUseFading
+        //            AND NOT (IgnoreFadingOnShortTracks
+        //                      AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
+        //then
+        begin
+            BASS_ChannelGetAttribute(MainStream, BASS_ATTRIB_VOL, oldVol);
+            BASS_ChannelSetAttribute(ThreadedMainStream, BASS_ATTRIB_VOL, oldVol);
+        end;
+
+        //Set Position
+        oldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
+        BASS_ChannelSetPosition(ThreadedMainStream, oldPosition, BASS_POS_BYTE);
+
+        MainStream := ThreadedMainStream;
+        Bass_ChannelPlay(MainStream, False);
+        BASS_ChannelStop(oldMain);
+        if fMainVolume <> 0 then
+            BASS_ChannelSlideAttribute (ThreadedMainStream,
+                      BASS_ATTRIB_VOL, fMainVolume,
+                      Round((fMainVolume - oldVol)/(fMainVolume) * FadingInterval));
+        BASS_StreamFree(oldMain);
+
+        SlideStream := ThreadedSlideStream;
+        BASS_ChannelStop(oldSlide);
+        BASS_StreamFree(oldSlide);
+
+        SetCueSyncs;
+        SetEndSyncs(MainStream);
+        SetEndSyncs(SlideStream);
+        SetSlideEndSyncs;
+
+        fPrescanInProgress := False;
+
+        // todo: Controls enable/Disable
+        // Dauer korrigieren in VCL??
+    end;
+end;
+
+
+initialization
+
+  InitializeCriticalSection(CSPrescanList);
+
+finalization
+
+  DeleteCriticalSection(CSPrescanList);
 
 end.

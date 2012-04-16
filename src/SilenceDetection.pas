@@ -52,8 +52,6 @@ begin
     fFilename := aFilename;
     fWindowHandle := aHandle;
     fSilenceStart := 0;
-    fChannel := BASS_StreamCreateFile(False, PChar(Pointer(fFilename)), 0, 0,
-            BASS_STREAM_PRESCAN OR BASS_UNICODE or BASS_STREAM_DECODE);
 end;
 
 destructor TSilenceDetector.Destroy;
@@ -105,6 +103,9 @@ var IntThreshold: Integer;
     pos, count: DWORD;
     buf: array[0..100000] of Smallint;
 begin
+
+    fChannel := BASS_StreamCreateFile(False, PChar(Pointer(fFilename)), 0, 0,
+            BASS_STREAM_PRESCAN OR BASS_UNICODE or BASS_STREAM_DECODE);
 
     try
         IntThreshold := fGetThreshHoldfromDB(fThreshold);

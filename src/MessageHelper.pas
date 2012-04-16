@@ -1408,6 +1408,7 @@ end;
 function Handle_WndProc(var Message: TMessage): Boolean;
 var devType: Integer;
   Datos: PDevBroadcastHdr;
+  tmp: Boolean;
 //  VolInfo: PDevBroadcastVolume;
 //  UnitMask: DWord;
 begin
@@ -1620,6 +1621,38 @@ begin
 
     WM_PlayerSilenceDetected: begin
         NempPlayer.ProcessSilenceDetection(TSilenceDetector(Message.wParam));
+        caption := 'Silence detected';
+    end;
+
+    WM_PlayerPrescanComplete: begin
+            //if assigned(NempPlayer.MainAudioFile)
+            //and (TAudioFile(Message.wParam).Pfad = NempPlayer.MainAudioFile.Pfad) then
+            //begin
+                caption := 'swapping ' + inttostr(random(10000));
+                Message.Result := NempPlayer.SwapStreams(TAudioFile(Message.wParam));
+                if Message.Result = 0 then
+                begin
+                    // Swapping streams was succesful
+                    // otherwise the prescanlist was not empty, and another precan is needed
+                    tmp := (not NempPlayer.URLStream);
+                    SlideBackBTN.Enabled := tmp;
+                    SlideForwardBtn.Enabled := tmp;
+                    SlideBarShape.Enabled := tmp;
+                    SlidebarButton.Enabled := tmp;
+                    // Geschwindigkeit disablen, das macht bei Streams keinen Sinn
+                    EffekteLBL3.Enabled := tmp;
+                    SampleRateLBL.Enabled := tmp;
+                    SamplerateShape.Enabled := tmp;
+                    SampleRateButton.Enabled := tmp;
+                    // Rückwärtsspielen disablen
+                    DirectionPositionBTN.Enabled := tmp;
+
+                    if NempPlayer.DoSilenceDetection then
+                        NempPlayer.StartSilenceDetection;
+                end;
+            //end else
+            //    Message.Result := 1;
+            // else: nothing to do: scanned file is not the current one any more
     end;
 
     WM_PlayerAcceptInput: NempPlaylist.AcceptInput := True;

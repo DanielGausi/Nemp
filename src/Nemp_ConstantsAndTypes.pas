@@ -322,6 +322,8 @@ const
 
     WM_PlayerSilenceDetected = WM_USER + 516;
 
+    WM_PlayerPrescanComplete = WM_USER + 517;
+
     //---------------------------------------
 
     // Messages der Medienbibliothek
