@@ -10617,7 +10617,7 @@ begin
   CorrectVCLForABRepeat;
 
   //Einige Buttons dis/enablen, je nachdem ob ne URL grade im Player läuft
-  tmp := not NempPlayer.URLStream;
+  tmp := (not NempPlayer.URLStream) and (not NempPlayer.PrescanInProgress);
   SlideBackBTN.Enabled := tmp;
   SlideForwardBtn.Enabled := tmp;
   SlideBarShape.Enabled := tmp;
