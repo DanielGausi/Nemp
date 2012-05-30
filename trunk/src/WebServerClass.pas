@@ -2812,7 +2812,7 @@ var queriedID: Integer;
     fn: UnicodeString;
     af: TAudioFile;
 begin
-    if AllowFileDownload then
+    if AllowFileDownload or isAdmin then
     begin
         // Check first in the playlist
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
