@@ -995,7 +995,7 @@ begin
     buttons := aPattern;
     buttons := StringReplace(buttons, '{{PlayerControls}}'     , PatternPlayerControls[isAdmin]   , [rfReplaceAll]);
 
-    if AllowRemoteControl then
+    if AllowRemoteControl or isAdmin then
     begin
         if isPlaying then
             buttons := StringReplace(buttons, '{{BtnControlPlayPause}}', PatternButtonPause[isAdmin] , [rfReplaceAll])
