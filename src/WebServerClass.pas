@@ -1114,6 +1114,11 @@ begin
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(i + 1)         , [rfReplaceAll]);
             Item := StringReplace(Item, '{{ID}}'     , IntToStr(af.WebServerID), [rfReplaceAll]);
 
+            if af = aNempPlaylist.PlayingFile then
+                Item := StringReplace(Item, '{{Anchor}}'     , 'name="currentTrack"', [rfReplaceAll])
+            else
+                Item := StringReplace(Item, '{{Anchor}}'     , '', [rfReplaceAll]);
+
             // Set "Current" class
             if af = aNempPlaylist.PlayingFile then
                 aClass := 'current '
