@@ -1621,14 +1621,14 @@ begin
 
     WM_PlayerSilenceDetected: begin
         NempPlayer.ProcessSilenceDetection(TSilenceDetector(Message.wParam));
-        caption := 'Silence detected';
+        //caption := 'Silence detected';
     end;
 
     WM_PlayerPrescanComplete: begin
             //if assigned(NempPlayer.MainAudioFile)
             //and (TAudioFile(Message.wParam).Pfad = NempPlayer.MainAudioFile.Pfad) then
             //begin
-                caption := 'swapping ' + inttostr(random(10000));
+                //caption := 'swapping ' + inttostr(random(10000));
                 Message.Result := NempPlayer.SwapStreams(TAudioFile(Message.wParam));
                 if Message.Result = 0 then
                 begin
