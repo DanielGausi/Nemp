@@ -1431,6 +1431,8 @@ begin
     begin
       // Oops. Send Warning to MainWindow
       SendMessage(MainWindowHandle, WM_MedienBib, MB_DuplicateWarning, Integer(pWideChar(TAudioFile(tmpMp3ListePfadSort[i]).Pfad)));
+      ChangeAfterUpdate := True; // We need to save the changed library after the cleanup
+
       AnzeigeListe.Clear;
       AnzeigeListe2.Clear;
       AnzeigeListIsCurrentlySorted := False;
@@ -4998,7 +5000,8 @@ begin
                 end;
             end;
         else
-            MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'ID falsch: ' + inttostr(ID)), mtError, [MBOK], 0);
+            MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'Expected value: 0 or 1, given value: ' + inttostr(ID)), mtError, [MBOK], 0);
+            aStream.Position := aStream.Position - SizeOf(ID);
             exit;
         end;
     end;
@@ -5012,15 +5015,18 @@ var tmpStream: TMemoryStream;
     MainID, ID: Byte;
     c: Integer;
     tmpid: Integer;
+    ERROROCCURRED, DoMessageShow: Boolean;
 begin
     tmpStream := TMemoryStream.Create;
     tmpStream.Size := 2000 * Mp3ListePfadSort.Count;
     c := Mp3ListePfadSort.Count;
     tmpStream.Write(c, sizeOf(c));
     CurrentDriveChar := '-';
+    DoMessageShow := True;
 
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
+        ERROROCCURRED := False;
         aAudioFile := TAudioFile(MP3ListePfadSort[i]);
         if aAudioFile.Ordner[1] <> CurrentDriveChar then
         begin
@@ -5036,8 +5042,11 @@ begin
                     CurrentDriveChar := aAudioFile.Ordner[1];
                 end else
                 begin
-                    MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                    exit;
+                    if DoMessageShow then
+                        MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
+                    //    exit;
+                    DoMessageShow := False;
+                    ERROROCCURRED := True;
                 end;
             end else
             begin
@@ -5048,9 +5057,12 @@ begin
                     CurrentDriveChar := aAudioFile.Ordner[1];
             end;
         end;
-        ID := 0;
-        tmpStream.Write(ID, SizeOf(ID));
-        aAudioFile.SaveToStream(tmpStream, '');
+        if not ERROROCCURRED then
+        begin
+            ID := 0;
+            tmpStream.Write(ID, SizeOf(ID));
+            aAudioFile.SaveToStream(tmpStream, '');
+        end;
     end;
     tmpStream.size := tmpStream.Position;
 

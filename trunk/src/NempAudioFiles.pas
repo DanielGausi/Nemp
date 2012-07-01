@@ -929,13 +929,13 @@ function TAudioFile.GetPath: UnicodeString;
 begin
     case fAudioType of
         at_Undef  : result := fStrings[siOrdner];
-        at_File   : result := FStrings[siOrdner] + '\' + Dateiname ;
+        at_File   : result := IncludeTrailingPathDelimiter(FStrings[siOrdner]) {+ '\'} + Dateiname ;
         at_Stream : result := fStrings[siOrdner];
         at_CDDA   : if FStrings[siDateiname] = '' then
                         result := fStrings[siOrdner]
                     else
-                        result := fStrings[siOrdner] + '\' + Dateiname;
-        at_CUE    : result := FStrings[siOrdner] + '\' + Dateiname ;
+                        result := IncludeTrailingPathDelimiter(fStrings[siOrdner]) {+ '\'} + Dateiname;
+        at_CUE    : result := IncludeTrailingPathDelimiter(FStrings[siOrdner]) {+ '\'} + Dateiname ;
     end;
 end;
 
@@ -1749,6 +1749,7 @@ begin
     cdFile := TCDDAFile.Create;
     try
         result := cdFile.GetData(Filename, (Flags and GAD_CDDB) = GAD_CDDB);
+
         if result = cddaErr_None then
         begin
             fTrack := cdFile.Track;
@@ -1769,7 +1770,7 @@ begin
             Genre := '';
             Year := '';
             Comment := '';
-            Pfad := 'cdda://';
+            // Pfad := 'cdda:\\';     // do not do this!!!
         end;
 
     finally

@@ -1215,7 +1215,10 @@ begin
 
   case NewFile.AudioType of
       at_File: SynchronizeAudioFile(NewFile, aAudioFileName);
-      at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
+      at_CDDA: begin
+          NewFile.GetAudioData(aAudioFileName, 0);
+      end;
+
   end;
 
   result := AddFileToPlaylist(NewFile, aCueName);
