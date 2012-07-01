@@ -566,7 +566,10 @@ begin
         ///  (this works, as we set CurrentFile.Rating in the UpdateID3/Ogg/Flac-Methods)
         backupRating := CurrentBibRating; // CurrentAudioFile.Rating;
         backupCounter:= CurrentBibCounter; //CurrentAudioFile.PlayCounter;
+
+        das hier ist mist
         SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
+
         CurrentAudioFile.Rating      := backupRating ;
         CurrentAudioFile.PlayCounter := backupCounter;
 
