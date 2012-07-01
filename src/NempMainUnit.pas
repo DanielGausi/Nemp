@@ -5124,12 +5124,17 @@ begin
   else // Aufnahme in die Medienliste verlangt, und nicht "alles rein" in den Optionen gewählt
   // also genauer prüfen
   begin
-      if MedienBib.IncludeAll then
-          // include any valid extension
-          result := NempPlayer.ValidExtensions.IndexOf(extension) > -1
+      if extension = '.cda' then
+          result := false
       else
-          // include files as given in the Bib.Filterstring
-          result := pos('*'+Extension, MedienBib.IncludeFilter) > 0;
+      begin
+          if MedienBib.IncludeAll then
+              // include any valid extension
+              result := NempPlayer.ValidExtensions.IndexOf(extension) > -1
+          else
+              // include files as given in the Bib.Filterstring
+              result := pos('*'+Extension, MedienBib.IncludeFilter) > 0;
+      end;
   end;
 end;
 
@@ -6750,7 +6755,8 @@ begin
   else
     LyricsMemo.Text := (MainForm_Lyrics_NoLyrics);
 
-  NempTrayIcon.Hint := StringReplace(aAudioFile.Artist + ' - ' + aAudioFile.Titel, '&', '&&&', [rfReplaceAll]);
+  //NempTrayIcon.Hint := StringReplace(aAudioFile.Artist + ' - ' + aAudioFile.Titel, '&', '&&&', [rfReplaceAll]);
+  NempTrayIcon.Hint := StringReplace(aAudioFile.PlaylistTitle, '&', '&&&', [rfReplaceAll]);
 end;
 
 procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
@@ -10011,7 +10017,8 @@ begin
     begin
         result := '*' + NempPlayer.ValidExtensions[0];
         for i := 1  to NempPlayer.ValidExtensions.Count-1 do
-            result := result + ';*' + NempPlayer.ValidExtensions[i];
+            if NempPlayer.ValidExtensions[i] <> '.cda' then
+                result := result + ';*' + NempPlayer.ValidExtensions[i];
     end else
         result := MedienBib.IncludeFilter;
     // Ja, das ist so richtig. In die Medienbib kommen Playlist-Dateien rein.

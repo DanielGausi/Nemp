@@ -1748,34 +1748,37 @@ var TagStream: TMemoryStream;
 begin
     Memo_Tags.ReadOnly := (CurrentAudioFile = NIL) or (not FileExists(CurrentAudioFile.Pfad));
 
-    case self.CurrentTagObject.FileType of
-        at_Mp3: begin
-                    // get Nemp/Tags
-                    localtags := '';
-                    TagStream := TMemoryStream.Create;
-                    try
-                        if CurrentTagObject.MP3File.ID3v2Tag.GetPrivateFrame('NEMP/Tags', TagStream) and (TagStream.Size > 0) then
-                        begin
-                            // We found a Tag-Frame with Information in the ID3Tag
-                            TagStream.Position := 0;
-                            SetLength(localtags, TagStream.Size);
-                            TagStream.Read(localtags[1], TagStream.Size);
+    if assigned(CurrentTagObject) then
+    begin
+        case self.CurrentTagObject.FileType of
+            at_Mp3: begin
+                        // get Nemp/Tags
+                        localtags := '';
+                        TagStream := TMemoryStream.Create;
+                        try
+                            if CurrentTagObject.MP3File.ID3v2Tag.GetPrivateFrame('NEMP/Tags', TagStream) and (TagStream.Size > 0) then
+                            begin
+                                // We found a Tag-Frame with Information in the ID3Tag
+                                TagStream.Position := 0;
+                                SetLength(localtags, TagStream.Size);
+                                TagStream.Read(localtags[1], TagStream.Size);
+                            end;
+                        finally
+                            TagStream.Free;
                         end;
-                    finally
-                        TagStream.Free;
+                        Memo_Tags.Text := String(localtags);
                     end;
-                    Memo_Tags.Text := String(localtags);
-                end;
-        at_Ogg: Memo_Tags.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
-        at_Flac: Memo_Tags.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
-        at_Monkey,
-        at_WavPack,
-        at_MusePack,
-        at_OptimFrog,
-        at_TrueAudio: Memo_Tags.Text := CurrentTagObject.BaseApeFile.GetValueByKey(APE_CATEGORIES);
-        at_Invalid,
-        at_Wma,
-        at_Wav: Memo_Tags.Text := '';
+            at_Ogg: Memo_Tags.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
+            at_Flac: Memo_Tags.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
+            at_Monkey,
+            at_WavPack,
+            at_MusePack,
+            at_OptimFrog,
+            at_TrueAudio: Memo_Tags.Text := CurrentTagObject.BaseApeFile.GetValueByKey(APE_CATEGORIES);
+            at_Invalid,
+            at_Wma,
+            at_Wav: Memo_Tags.Text := '';
+        end;
     end;
 
     // else   ???  28.03.2012 Does this make any sense ???
@@ -2079,6 +2082,11 @@ begin
       // Datei existiert nicht
       ID3v1Activated := False;
       ID3v2Activated := False;
+
+      if assigned(CurrentTagObject) then
+          FreeAndNil(CurrentTagObject);
+
+      CurrentTagObject := TGeneralAudioFile.Create(AudioFile.Pfad);
   end;
 
   MainPageControl.OnChange := Nil;

@@ -1399,6 +1399,7 @@ begin
 
           at_CDDA: begin
               Slidestream := 0;
+              fIsURLStream := False;
               fReallyUseFading := False;
               MainStreamIsReverseStream := False;
 

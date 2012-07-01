@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MpegInformation
+    ActivePage = Tab_General
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
@@ -599,7 +599,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
+          ItemHeight = 13
           TabOrder = 0
           OnChange = CoverBoxChange
         end
