@@ -9364,7 +9364,7 @@ begin
             if Not Assigned(OptionsCompleteForm) then
               Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
             OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.VorauswahlNode;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAnzeige5;
+            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabView0;
             OptionsCompleteForm.Show;
         end;
   end;
@@ -10713,7 +10713,7 @@ begin
             Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
           OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
           OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-          OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio7;
+          OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
           OptionsCompleteForm.Show;
         end;
         exit;
@@ -11090,7 +11090,7 @@ begin
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
   OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
   OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio7;
+  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
   OptionsCompleteForm.Show;
 end;
 
@@ -11346,7 +11346,7 @@ begin
                 Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
             OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
             OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio9;
+            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
             OptionsCompleteForm.Show;
         end;
         exit;
@@ -11392,7 +11392,7 @@ begin
       Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
   OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
   OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio9;
+  OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
   OptionsCompleteForm.Show;
 end;
 
@@ -11481,7 +11481,7 @@ begin
         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.WebServerNode;
     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.WebServerNode] := True;
-    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio10;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer8;
     OptionsCompleteForm.Show;
 end;
 

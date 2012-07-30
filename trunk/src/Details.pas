@@ -567,7 +567,6 @@ begin
         backupRating := CurrentBibRating; // CurrentAudioFile.Rating;
         backupCounter:= CurrentBibCounter; //CurrentAudioFile.PlayCounter;
 
-        das hier ist mist
         SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
 
         CurrentAudioFile.Rating      := backupRating ;
