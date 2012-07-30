@@ -55,16 +55,16 @@ uses
 type
   TOptionsCompleteForm = class(TForm)
     OptionsVST: TVirtualStringTree;
-    TabAnzeige0: TTabSheet;
+    TabView0: TTabSheet;
     TabSystem0: TTabSheet;
     BTNok: TButton;
     BTNCancel: TButton;
     BTNApply: TButton;
     ColorDialog1: TColorDialog;
     PageControl1: TPageControl;
-    TabAudio0: TTabSheet;
+    TabPlayer0: TTabSheet;
     TabSystem2: TTabSheet;
-    TabAnzeige1: TTabSheet;
+    TabView3: TTabSheet;
     GrpBox_Fonts: TGroupBox;
     LblConst_FontVBR: TLabel;
     LblConst_FontCBR: TLabel;
@@ -72,7 +72,7 @@ type
     CBChangeFontOnCbrVbr: TCheckBox;
     CBFontNameVBR: TComboBox;
     CBFontNameCBR: TComboBox;
-    TabAudio5: TTabSheet;
+    TabPlayer5: TTabSheet;
     TabSystem3: TTabSheet;
     BtnRegistryUpdate: TButton;
     TabSystem1: TTabSheet;
@@ -86,20 +86,14 @@ type
     GrpBox_Effects: TGroupBox;
     CB_UseDefaultEffects: TCheckBox;
     CB_UseDefaultEqualizer: TCheckBox;
-    TabAudio3: TTabSheet;
+    TabPlayer2: TTabSheet;
     GrpBox_PlaylistBehaviour: TGroupBox;
-    CB_AutoDeleteFromPlaylist: TCheckBox;
-    CB_AutoMixPlaylist: TCheckBox;
     CB_AutoSavePlaylist: TCheckBox;
-    GrpBox_RandomOptions: TGroupBox;
-    LblConst_ReallyRandom: TLabel;
-    LblConst_AvoidRepetitions: TLabel;
-    TBRandomRepeat: TTrackBar;
     GrpBox_DefaultAction: TRadioGroup;
     CB_AutoScanPlaylist: TCheckBox;
-    TabExtended0: TTabSheet;
-    TabAudio8: TTabSheet;
-    TabExtended2: TTabSheet;
+    TabView4: TTabSheet;
+    TabFiles0: TTabSheet;
+    TabFiles4: TTabSheet;
     GrpBox_TabMedia5_ID3: TGroupBox;
     CBAlwaysWriteUnicode: TCheckBox;
     CBAutoDetectCharCode: TCheckBox;
@@ -112,11 +106,7 @@ type
     LblConst_Chinese: TLabel;
     LblConst_Greek: TLabel;
     LblConst_Japanese: TLabel;
-    CB_DisableAutoDeleteAtSlide: TCheckBox;
-    CB_DisableAutoDeleteAtPause: TCheckBox;
-    CB_DisAbleAutoDeleteAtStop: TCheckBox;
-    CB_DisableAutoDeleteAtTitleChange: TCheckBox;
-    TabAudio7: TTabSheet;
+    TabPlayer6: TTabSheet;
     GrpBox_TabAudio7_Countdown: TGroupBox;
     lblCountDownTitel: TLabel;
     CBStartCountDown: TCheckBox;
@@ -129,7 +119,7 @@ type
     BtnBirthdaySong: TButton;
     BtnGetBirthdayTitel: TButton;
     CBContinueAfter: TCheckBox;
-    TabAnzeige4: TTabSheet;
+    TabView2: TTabSheet;
     LBlCountDownWarning: TLabel;
     LblEventWarning: TLabel;
     GrpBox_Hotkeys: TGroupBox;
@@ -142,7 +132,7 @@ type
     CB_Activate_IncVol: TCheckBox;
     CB_Activate_DecVol: TCheckBox;
     CB_Activate_Mute: TCheckBox;
-    TabAudio4: TTabSheet;
+    TabPlayer4: TTabSheet;
     GrpBox_WebradioRecording: TGroupBox;
     LblConst_DownloadDir: TLabel;
     BtnChooseDownloadDir: TButton;
@@ -151,9 +141,9 @@ type
     LblConst_FilenameExtension: TLabel;
     Btn_InstallDeskband: TButton;
     Btn_UninstallDeskband: TButton;
-    TabAnzeige5: TTabSheet;
+    TabFiles2: TTabSheet;
     CB_JumpToNextCue: TCheckBox;
-    TabExtended1: TTabSheet;
+    TabFiles3: TTabSheet;
     GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox;
     CB_AccelerateSearch: TCheckBox;
     LblConst_AccelerateSearchNote: TLabel;
@@ -192,7 +182,6 @@ type
     Btn_CHeckNowForUpdates: TButton;
     GrpBox_StartingNemp: TGroupBox;
     CB_AllowMultipleInstances: TCheckBox;
-    CB_StartMinimized: TCheckBox;
     CBRegisterHotKeys: TCheckBox;
     GrpBox_MultimediaKeys: TGroupBox;
     GrpBox_FileFormats: TGroupBox;
@@ -206,29 +195,10 @@ type
     CBEnqueueStandardLists: TCheckBox;
     CBDirectorySupport: TCheckBox;
     CBiTouch: TCheckBox;
-    RGrp_View: TRadioGroup;
-    GrpBox_ViewSeperate: TGroupBox;
-    cb_ShowEffectsWindow: TCheckBox;
-    cb_ShowPlaylistWindow: TCheckBox;
-    CB_ShowMedialistWindow: TCheckBox;
-    CB_ShowBrowseWindow: TCheckBox;
     CB_AutoPlayNewTitle: TCheckBox;
     CB_SavePositionInTrack: TCheckBox;
     CB_AutoPlayOnStart: TCheckBox;
-    CBAutoLoadMediaList: TCheckBox;
-    CBAutoSaveMediaList: TCheckBox;
-    GrpBox_TabMedia3_Columns: TGroupBox;
-    GrpBox_TabMedia3_Browseby: TGroupBox;
-    Label44: TLabel;
-    Label61: TLabel;
-    GrpBox_TabMedia3_Other: TGroupBox;
-    CBFullRowSelect: TCheckBox;
-    CBShowHintsInMedialist: TCheckBox;
-    CB_ShowHintsInPlaylist: TCheckBox;
-    GrpBox_Skins: TGroupBox;
-    LblConst_Preview: TLabel;
-    LblConst_Choose: TLabel;
-    GrpBox_TabAudio2_View: TGroupBox;
+    GrpBox_ViewVis_Scrolling: TGroupBox;
     Lbl_Framerate: TLabel;
     CB_visual: TCheckBox;
     TB_Refresh: TTrackBar;
@@ -255,38 +225,18 @@ type
     CBJingleReduce: TCheckBox;
     SEJingleReduce: TSpinEdit;
     SEJingleVolume: TSpinEdit;
-    GrpBox_Directories: TGroupBox;
+    GrpBox_FilesMain_Directories: TGroupBox;
     CBAutoScan: TCheckBox;
     BtnAutoScanAdd: TButton;
     BtnAutoScanDelete: TButton;
     CBAutoAddNewDirs: TCheckBox;
     CBAskForAutoAddNewDirs: TCheckBox;
-    GrpBox_TabMedia1_Filetypes: TGroupBox;
+    GrpBox_FilesMain_FileTypes: TGroupBox;
     LblConst_OnlythefollowingTypes: TLabel;
     cbIncludeAll: TCheckBox;
-    GrpBox_ExtendedAudio: TGroupBox;
-    LblConst_Buffersize: TLabel;
-    SEBufferSize: TSpinEdit;
-    LblConst_ms: TLabel;
-    LblConst_UseFloatingPoint: TLabel;
-    CB_FloatingPoint: TComboBox;
-    LblConst_Mixing: TLabel;
-    CB_Mixing: TComboBox;
-    Lbl_FloatingPoints_Status: TLabel;
-    GrpBox_TabMedia1_Medialist: TGroupBox;
-    CBAutoScanPlaylistFilesOnView: TCheckBox;
-    CBAlwaysSortAnzeigeList: TCheckBox;
-    GrpBox_Hibernate: TGroupBox;
-    LBlConst_ReInitPlayerEngine_Hint: TLabel;
-    cbPauseOnSuspend: TCheckBox;
-    cbReInitAfterSuspend: TCheckBox;
-    Btn_ReinitPlayerEngine: TButton;
-    GrpBox_Language: TGroupBox;
-    cb_Language: TComboBox;
-    cb_StayOnTop: TCheckBox;
     CB_IgnoreVolume: TCheckBox;
     CB_AutoCheckNotifyOnBetas: TCheckBox;
-    TabAudio9: TTabSheet;
+    TabPlayer7: TTabSheet;
     GrpBox_Scrobble: TGroupBox;
     LblScrobble1: TLabel;
     BtnScrobbleWizard: TButton;
@@ -302,8 +252,6 @@ type
     GrpBox_TabulatorOptions: TGroupBox;
     CB_TabStopAtPlayerControls: TCheckBox;
     CB_TabStopAtTabs: TCheckBox;
-    GrpBox_BetaOptions: TGroupBox;
-    XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
     OpenDlg_CountdownSongs: TOpenDialog;
     EdtDownloadDir: TEdit;
     EditCountdownSong: TEdit;
@@ -327,12 +275,8 @@ type
     CB_Key_DecVol: TComboBox;
     CB_Mod_Mute: TComboBox;
     CB_Key_Mute: TComboBox;
-    cbSkinAuswahl: TComboBox;
     CB_TaskBarDelay: TComboBox;
     CB_AnzeigeDelay: TComboBox;
-    CBSortArray1: TComboBox;
-    CBSortArray2: TComboBox;
-    cbCoverSortOrder: TComboBox;
     HeadphonesDeviceCB: TComboBox;
     MainDeviceCB: TComboBox;
     cbFilenameFormat: TComboBox;
@@ -348,27 +292,7 @@ type
     OpenDlg_DefaultCover: TOpenPictureDialog;
     LBAutoscan: TListBox;
     RGroup_Playlist: TRadioGroup;
-    NewPlayerPanelOptions: TNempPanel;
-    PaintFrame: TImage;
-    TextAnzeigeIMAGE: TImage;
-    TimePaintBox: TImage;
-    SlidebarShape: TShape;
-    VolShape: TShape;
-    RatingImage: TImage;
-    SlideBarButton: TSkinButton;
-    SlideBackBTN: TSkinButton;
-    PlayPrevBTN: TSkinButton;
-    PlayPauseBTN: TSkinButton;
-    StopBTN: TSkinButton;
-    RecordBtn: TSkinButton;
-    PlayNextBTN: TSkinButton;
-    SlideForwardBTN: TSkinButton;
-    RepeatBitBTN: TSkinButton;
-    VolButton: TSkinButton;
-    Menu1Img: TSkinButton;
-    MinimizeIMG: TSkinButton;
-    CloseIMG: TSkinButton;
-    TabAudio10: TTabSheet;
+    TabPlayer8: TTabSheet;
     GrpBoxConfig: TGroupBox;
     BtnServerActivate: TButton;
     cbOnlyLAN: TCheckBox;
@@ -380,18 +304,11 @@ type
     EdtGlobalIP: TEdit;
     IDHttpWebServerGetIP: TIdHTTP;
     CBAutoStartWebServer: TCheckBox;
-    GrpBox_TabMedia3_Cover: TGroupBox;
-    CB_CoverSearch_inDir: TCheckBox;
-    CB_CoverSearch_inSubDir: TCheckBox;
-    CB_CoverSearch_inParentDir: TCheckBox;
-    CB_CoverSearch_inSisterDir: TCheckBox;
-    EDTCoverSubDirName: TEdit;
-    EDTCoverSisterDirName: TEdit;
-    TabAnzeige6: TTabSheet;
-    GrpBoxPartyMode: TGroupBox;
+    TabView1: TTabSheet;
+    GrpBox_ViewPartymode_Amplification: TGroupBox;
     Lbl_PartyMode_ResizeFactor: TLabel;
     CB_PartyMode_ResizeFactor: TComboBox;
-    TabAudio2: TTabSheet;
+    TabFiles1: TTabSheet;
     GrpBox_AutoRating: TGroupBox;
     cb_RatingActive: TCheckBox;
     cb_RatingIgnoreShortFiles: TCheckBox;
@@ -400,45 +317,22 @@ type
     cb_RatingDecreaseRating: TCheckBox;
     StaticText1: TStaticText;
     StaticText2: TStaticText;
-    CBSkipSortOnLargeLists: TCheckBox;
     CB_RememberInterruptedPlayPosition: TCheckBox;
     LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;
     CBChangeFontColoronBitrate: TCheckBox;
-    cbHideNACover: TCheckBox;
-    LblNACoverHint: TLabel;
-    CB_CoverSearch_LastFM: TCheckBox;
-    cb_PartyMode_BlockTreeEdit: TCheckBox;
-    cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
-    cb_PartyMode_BlockTools: TCheckBox;
-    Edt_PartyModePassword: TLabeledEdit;
-    cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
-    CB_EditOnClick: TCheckBox;
-    GrpBox_OpenGL: TGroupBox;
-    cb_UseClassicCoverflow: TCheckBox;
     GrpBox_Headset: TGroupBox;
     LblHeadsetDefaultAction: TLabel;
     GrpBox_HeadsetDefaultAction: TComboBox;
     cb_AutoStopHeadset: TCheckBox;
-    cbFixCoverFlowOnStart: TCheckBox;
-    BtnClearCoverCache: TButton;
-    GrpBox_TabMedia3_CoverDetails: TGroupBox;
+    GrpBox_ViewVis_CoverDetails: TGroupBox;
     LblConst_CoverMode: TLabel;
     LblConst_DetailMode: TLabel;
     cbCoverMode: TComboBox;
     cbDetailMode: TComboBox;
-    GrpBox_NAInformation: TGroupBox;
-    LblReplaceArtistBy: TLabel;
-    cbReplaceArtistBy: TComboBox;
-    LblReplaceTitletBy: TLabel;
-    cbReplaceTitleBy: TComboBox;
-    cbReplaceAlbumBy: TComboBox;
-    LblReplaceAlbumBy: TLabel;
     cb_ChangeCoverflowOnSearch: TCheckBox;
     LblWebServer_Port: TLabel;
     seWebServer_Port: TSpinEdit;
-    cbMissingCoverMode: TComboBox;
-    Label6: TLabel;
     cbUseStreamnameAsDirectory: TCheckBox;
     cb_RegisterMediaHotkeys: TCheckBox;
     GrpBox_Metadata: TGroupBox;
@@ -471,7 +365,94 @@ type
     SE_SilenceThreshold: TSpinEdit;
     Lbl_SilenceDB: TLabel;
     CB_AutoPlayEnqueueTitle: TCheckBox;
+    GrpBox_StartingExtended: TGroupBox;
+    CBAutoLoadMediaList: TCheckBox;
+    CBAutoSaveMediaList: TCheckBox;
     cb_ShowSplashScreen: TCheckBox;
+    CB_StartMinimized: TCheckBox;
+    cb_StayOnTop: TCheckBox;
+    GrpBox_ViewMain_Columns: TGroupBox;
+    GrpBox_ViewMain_BrowseClassic: TGroupBox;
+    Label44: TLabel;
+    CBSortArray1: TComboBox;
+    CBSortArray2: TComboBox;
+    GrpBox_ViewMain_Sorting: TGroupBox;
+    CBAlwaysSortAnzeigeList: TCheckBox;
+    CBSkipSortOnLargeLists: TCheckBox;
+    GrpBox_TabMedia3_Cover: TGroupBox;
+    CB_CoverSearch_inDir: TCheckBox;
+    CB_CoverSearch_inSubDir: TCheckBox;
+    CB_CoverSearch_inParentDir: TCheckBox;
+    CB_CoverSearch_inSisterDir: TCheckBox;
+    EDTCoverSubDirName: TEdit;
+    EDTCoverSisterDirName: TEdit;
+    GrpBox_Files_Cover_LastFM: TGroupBox;
+    CB_CoverSearch_LastFM: TCheckBox;
+    BtnClearCoverCache: TButton;
+    GrpBox_FilesMain_Playlists: TGroupBox;
+    CBAutoScanPlaylistFilesOnView: TCheckBox;
+    GrpBox_ViewVis_CoverFlow: TGroupBox;
+    cb_UseClassicCoverflow: TCheckBox;
+    cbFixCoverFlowOnStart: TCheckBox;
+    TabSystem4: TTabSheet;
+    GrpBox_Hibernate: TGroupBox;
+    LBlConst_ReInitPlayerEngine_Hint: TLabel;
+    cbPauseOnSuspend: TCheckBox;
+    cbReInitAfterSuspend: TCheckBox;
+    Btn_ReinitPlayerEngine: TButton;
+    GrpBox_ViewMain_BrowseCoverflow: TGroupBox;
+    Label61: TLabel;
+    Label6: TLabel;
+    cbCoverSortOrder: TComboBox;
+    cbMissingCoverMode: TComboBox;
+    cbHideNACover: TCheckBox;
+    LblNACoverHint: TLabel;
+    Label9: TLabel;
+    GrpBox_ViewPartymode_Functions: TGroupBox;
+    GrpBox_ViewPartymode_Password: TGroupBox;
+    cb_PartyMode_BlockTreeEdit: TCheckBox;
+    cb_PartyMode_BlockCurrentTitleRating: TCheckBox;
+    cb_PartyMode_BlockTools: TCheckBox;
+    Edt_PartyModePassword: TLabeledEdit;
+    cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
+    GrpBox_ViewExt_NoMetadata: TGroupBox;
+    LblReplaceArtistBy: TLabel;
+    LblReplaceTitletBy: TLabel;
+    LblReplaceAlbumBy: TLabel;
+    cbReplaceArtistBy: TComboBox;
+    cbReplaceTitleBy: TComboBox;
+    cbReplaceAlbumBy: TComboBox;
+    GrpBox_ViewExt_Select: TGroupBox;
+    CBFullRowSelect: TCheckBox;
+    CB_EditOnClick: TCheckBox;
+    GrpBox_ViewExt_Hints: TGroupBox;
+    CBShowHintsInMedialist: TCheckBox;
+    CB_ShowHintsInPlaylist: TCheckBox;
+    TabPlayer1: TTabSheet;
+    GrpBox_ExtendedAudio: TGroupBox;
+    LblConst_Buffersize: TLabel;
+    LblConst_ms: TLabel;
+    LblConst_UseFloatingPoint: TLabel;
+    LblConst_Mixing: TLabel;
+    Lbl_FloatingPoints_Status: TLabel;
+    SEBufferSize: TSpinEdit;
+    CB_FloatingPoint: TComboBox;
+    CB_Mixing: TComboBox;
+    TabPlayer3: TTabSheet;
+    GrpBox_RandomOptions: TGroupBox;
+    LblConst_ReallyRandom: TLabel;
+    LblConst_AvoidRepetitions: TLabel;
+    TBRandomRepeat: TTrackBar;
+    GrpBox_PlayerExt2_Playlist: TGroupBox;
+    CB_AutoMixPlaylist: TCheckBox;
+    CB_DisableAutoDeleteAtTitleChange: TCheckBox;
+    CB_DisAbleAutoDeleteAtStop: TCheckBox;
+    CB_DisableAutoDeleteAtPause: TCheckBox;
+    CB_DisableAutoDeleteAtSlide: TCheckBox;
+    CB_AutoDeleteFromPlaylist: TCheckBox;
+    cb_SettingsMode: TComboBox;
+    GrpBox_BetaOptions: TGroupBox;
+    XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -565,6 +546,7 @@ type
     procedure LblWebserverUserURLClick(Sender: TObject);
     procedure ChangeWebserverLinks(Sender: TObject);
     procedure CB_SilenceDetectionClick(Sender: TObject);
+    procedure cb_SettingsModeChange(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -589,6 +571,8 @@ type
     VorauswahlNode: pVirtualNode;
     procedure BackupComboboxes;
     procedure RestoreComboboxes;
+
+    procedure ShowSettings(ExtendedSettings: Boolean);
 
   end;
 
@@ -616,10 +600,10 @@ uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
 {$R *.dfm}
 
 var
- OptionsArraySystem : array[0..3] of TOptionData;
+ OptionsArraySystem : array[0..4] of TOptionData;
  OptionsArrayAnzeige: array[0..4] of TOptionData;
  OptionsArrayAudio  : array[0..8] of TOptionData;
- OptionsArrayExtended: Array[0..2] of TOptionData;
+ OptionsArrayFiles  : Array[0..4] of TOptionData;
  Testskin: TNempSkin;
 
 
@@ -640,7 +624,6 @@ end;
 
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
 var i, s, count: integer;
-  MainNode : PVirtualNode;
   BassInfo: BASS_DEVICEINFO;
 begin
   BackUpComboBoxes;
@@ -672,6 +655,8 @@ begin
 
   OptionsVST.NodeDataSize := SizeOf(TOptionsTreeData);
 
+
+  // MAIN
   OptionsArraySystem[0].Eintrag := OptionsTree_SystemGeneral;
   OptionsArraySystem[0].TabSheet:= TabSystem0;
       OptionsArraySystem[1].Eintrag := OptionsTree_SystemFiletyps;
@@ -680,76 +665,66 @@ begin
       OptionsArraySystem[2].TabSheet:= TabSystem1;
       OptionsArraySystem[3].Eintrag  := OptionsTree_SystemTaskbar;
       OptionsArraySystem[3].TabSheet := TabSystem3;
+      OptionsArraySystem[4].Eintrag  := OptionsTree_SystemHibernate;
+      OptionsArraySystem[4].TabSheet := TabSystem4;
 
-  MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArraySystem[0]);
-  for i := 1 to High(OptionsArraySystem) do
-    AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i]);
-
+  // VIEW
   OptionsArrayAnzeige[0].Eintrag := OptionsTree_ViewMain;
-  OptionsArrayAnzeige[0].TabSheet:= TabAnzeige0;
-      OptionsArrayAnzeige[1].Eintrag := OptionsTree_ViewPlayer;
-      OptionsArrayAnzeige[1].TabSheet:= TabAnzeige4;
-      OptionsArrayAnzeige[2].Eintrag := OptionsTree_ViewView;
-      OptionsArrayAnzeige[2].TabSheet:= TabAnzeige5;
+  OptionsArrayAnzeige[0].TabSheet:= TabView0;
+      OptionsArrayAnzeige[1].Eintrag := OptionsTree_PartyMode;
+      OptionsArrayAnzeige[1].TabSheet:= TabView1;
+
+      OptionsArrayAnzeige[2].Eintrag := OptionsTree_ViewPlayer;
+      OptionsArrayAnzeige[2].TabSheet:= TabView2;
+
       OptionsArrayAnzeige[3].Eintrag := OptionsTree_ViewFonts;
-      OptionsArrayAnzeige[3].TabSheet:= TabAnzeige1;
+      OptionsArrayAnzeige[3].TabSheet:= TabView3;
 
-      OptionsArrayAnzeige[4].Eintrag := OptionsTree_PartyMode;
-      OptionsArrayAnzeige[4].TabSheet:= TabAnzeige6;
+      OptionsArrayAnzeige[4].Eintrag  := OptionsTree_ViewExtended;//'[leer]'; //OptionsTree_PlayerMedialibrary
+      OptionsArrayAnzeige[4].TabSheet := TabView4;
 
-  MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAnzeige[0]);
-  for i := 1 to High(OptionsArrayAnzeige) do
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[i]);
-
-
+  // PLAYER
   OptionsArrayAudio[0].Eintrag  := OptionsTree_PlayerMain;
-  OptionsArrayAudio[0].TabSheet := TabAudio0;
+  OptionsArrayAudio[0].TabSheet := TabPlayer0;
+      OptionsArrayAudio[1].Eintrag  := OptionsTree_PlayerExtendedPlayer;
+      OptionsArrayAudio[1].TabSheet := TabPlayer1;
 
-      OptionsArrayAudio[1].Eintrag  := OptionsTree_PlayerPlaylist;
-      OptionsArrayAudio[1].TabSheet := TabAudio3;
-      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerMedialibrary;
-      OptionsArrayAudio[2].TabSheet := TabAudio8;
-
-      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerMetaDataAccess;
-      OptionsArrayAudio[3].TabSheet := TabAudio2;
-
-
+      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerPlaylist;
+      OptionsArrayAudio[2].TabSheet := TabPlayer2;
+      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerExtendedPlaylist;
+      OptionsArrayAudio[3].TabSheet := TabPlayer3;
 
       OptionsArrayAudio[4].Eintrag  := OptionsTree_PlayerWebradio;
-      OptionsArrayAudio[4].TabSheet := TabAudio4;
+      OptionsArrayAudio[4].TabSheet := TabPlayer4;
       OptionsArrayAudio[5].Eintrag  := OptionsTree_PlayerEffects;
-      OptionsArrayAudio[5].TabSheet := TabAudio5;
+      OptionsArrayAudio[5].TabSheet := TabPlayer5;
       OptionsArrayAudio[6].Eintrag  := OptionsTree_PlayerEvents;
-      OptionsArrayAudio[6].TabSheet := TabAudio7;            // Birthday
+      OptionsArrayAudio[6].TabSheet := TabPlayer6;            // Birthday
       OptionsArrayAudio[7].Eintrag  := OptionsTree_PlayerScrobbler;
-      OptionsArrayAudio[7].TabSheet := TabAudio9;          // Scrobbler
+      OptionsArrayAudio[7].TabSheet := TabPlayer7;          // Scrobbler
       OptionsArrayAudio[8].Eintrag  := OptionsTree_PlayerWebServer;
-      OptionsArrayAudio[8].TabSheet := TabAudio10;          // WebServer
+      OptionsArrayAudio[8].TabSheet := TabPlayer8;          // WebServer
 
-  MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAudio[0]);
-  for i := 1 to High(OptionsArrayAudio) do
-  begin
-      case i of
-          6: BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
-          7: ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
-          8: WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
-      else
-          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
-      end;
-  end;
+  // FILE MANAGEMENT
 
-  OptionsArrayExtended[0].Eintrag := OptionsTree_ExtendedMain;
-  OptionsArrayExtended[0].TabSheet := TabExtended0;
-      OptionsArrayExtended[1].Eintrag := OptionsTree_MediabibSearch;
-      OptionsArrayExtended[1].TabSheet := TabExtended1;
-      OptionsArrayExtended[2].Eintrag := OptionsTree_MediabibUnicode;
-      OptionsArrayExtended[2].TabSheet := TabExtended2;
+  OptionsArrayFiles[0].Eintrag  := OptionsTree_FilesMain;
+  OptionsArrayFiles[0].TabSheet := TabFiles0;
 
-  MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayExtended[0]);
-  VorauswahlNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayExtended[1]);
-  for i := 2 to High(OptionsArrayExtended) do
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayExtended[i]);
+      OptionsArrayFiles[1].Eintrag  := OptionsTree_PlayerMetaDataAccess;
+      OptionsArrayFiles[1].TabSheet := TabFiles1;
 
+      OptionsArrayFiles[2].Eintrag := OptionsTree_FilesCover;
+      OptionsArrayFiles[2].TabSheet:= TabFiles2;
+
+
+      OptionsArrayFiles[3].Eintrag  := OptionsTree_MediabibSearch;
+      OptionsArrayFiles[3].TabSheet := TabFiles3;
+      OptionsArrayFiles[4].Eintrag  := OptionsTree_MediabibUnicode;
+      OptionsArrayFiles[4].TabSheet := TabFiles4;
+
+
+  // Fill Tree
+  ShowSettings(False);
 
   OptionsVST.FullExpand(Nil);
 
@@ -757,26 +732,31 @@ begin
   TabSystem1.TabVisible := False;
   TabSystem2.TabVisible := False;
   TabSystem3.TabVisible := False;
+  TabSystem4.TabVisible := False;
 
-  TabAnzeige0.TabVisible := False;
-  TabAnzeige1.TabVisible := False;
-  TabAnzeige4.TabVisible := False;
-  TabAnzeige5.TabVisible := False;
-  TabAnzeige6.TabVisible := False;
+  TabView0.TabVisible := False;
+  TabView1.TabVisible := False;
+  TabView2.TabVisible := False;
+  TabView3.TabVisible := False;
+  TabView4.TabVisible := False;
 
-  TabAudio0.TabVisible := False;
-  TabAudio2.TabVisible := False;
-  TabAudio3.TabVisible := False;
-  TabAudio4.TabVisible := False;
-  TabAudio5.TabVisible := False;
-  TabAudio7.TabVisible := False;
-  TabAudio8.TabVisible := False;
-  TabAudio9.TabVisible := False;
-  TabAudio10.TabVisible := False;
 
-  TabExtended0.TabVisible := False;
-  TabExtended1.TabVisible := False;
-  TabExtended2.TabVisible := False;
+  TabPlayer0.TabVisible := False;
+  TabPlayer1.TabVisible := False;
+  TabPlayer2.TabVisible := False;
+  TabPlayer3.TabVisible := False;
+  TabPlayer4.TabVisible := False;
+  TabPlayer5.TabVisible := False;
+  TabPlayer6.TabVisible := False;
+  TabPlayer7.TabVisible := False;
+  TabPlayer8.TabVisible := False;
+
+  TabFiles0.TabVisible := False;
+  TabFiles1.TabVisible := False;
+  TabFiles2.TabVisible := False;
+  TabFiles3.TabVisible := False;
+  TabFiles4.TabVisible := False;
+
 
   // Die Auswahlboxen mit den entsprechenden Zeichensätzen füllen
   for i := 0 to High(ArabicEncodings) do
@@ -844,21 +824,16 @@ begin
   for i := 0 to Length(CBSpalten)-1 do
   begin
     CBSpalten[i] := TCheckBox.Create(self);
-    CBSpalten[i].Parent := GrpBox_TabMedia3_Columns;
+    CBSpalten[i].Parent := GrpBox_ViewMain_Columns;
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-    CBSpalten[i].Top := 16 + (i mod 6)*16;
-    CBSpalten[i].Left := 8 + (i div 6) * 100;
+    CBSpalten[i].Top := 20 + (i mod 6)*16;
+    CBSpalten[i].Left := 16 + (i div 6) * 100;
   end;
 
   cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
   cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
-
-  //Sprachen initialisieren
-  cb_Language.Items.Add('English');
-  for i := 0 to LanguageList.Count - 1 do
-    cb_Language.Items.Add(getlanguagename(LanguageList[i]));
 
   PageControl1.ActivePageIndex := 0;
 
@@ -871,6 +846,82 @@ begin
 
   OpenDlg_CountdownSongs.Filter := Nemp_MainForm.PlaylistDateienOpenDialog.Filter;
 end;
+
+
+procedure TOptionsCompleteForm.ShowSettings(ExtendedSettings: Boolean);
+var MainNode, Firstnode : PVirtualNode;
+    i: Integer;
+begin
+    GrpBox_StartingExtended.Visible := ExtendedSettings;
+    GrpBox_TabulatorOptions.Visible := ExtendedSettings;
+
+    OptionsVST.Clear;
+
+    // MAIN
+    MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArraySystem[0]);
+    Firstnode := MainNode;
+    if ExtendedSettings then
+        for i := 1 to High(OptionsArraySystem) do
+            AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i])
+    else
+        for i := 1 to High(OptionsArraySystem) - 1 do            // Dont show Hibernate-Page
+            AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i]);
+
+    // VIEW
+    MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAnzeige[0]);
+    VorauswahlNode := MainNode;
+    if ExtendedSettings then
+        for i := 1 to High(OptionsArrayAnzeige) do
+            AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[i])
+    else
+        AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[1]);
+
+    // PLAYER
+    MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAudio[0]);
+
+    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]);
+    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]);
+    BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]);
+    ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]);
+    WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[8]);
+
+    {for i := 1 to High(OptionsArrayAudio) do
+    begin
+        case i of
+            4: BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
+            5: ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
+            6: WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
+        else
+            AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[i]);
+        end;
+    end;}
+
+    // FILE MANAGEMENT
+    MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayFiles[0]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[1]);
+
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[2]);
+    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
+    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[4]);
+
+    //for i := 2 to High(OptionsArrayFiles) do
+    //    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[i]);
+
+    OptionsVST.FullExpand(Nil);
+
+    OptionsVST.FocusedNode := Firstnode;
+    PageControl1.ActivePage := TabSystem0;
+end;
+
+
+procedure TOptionsCompleteForm.cb_SettingsModeChange(Sender: TObject);
+begin
+    ShowSettings(cb_SettingsMode.ItemIndex = 1);
+end;
+
 
 
 procedure TOptionsCompleteForm.OptionsVSTFocusChanged(
@@ -1337,16 +1388,6 @@ begin
   end;
   CBRegisterHotKeysClick(Nil);
 
-  // In 3.0 final  neu hinzugekommene Optionen für die Anzeige setzen
-  RGrp_View.ItemIndex := Nemp_MainForm.AnzeigeMode Mod 2;
-
-  cb_ShowEffectsWindow.Checked    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-  cb_ShowPlaylistWindow.Checked   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistVisible;
-  CB_ShowMedialistWindow.Checked  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-  CB_ShowBrowseWindow.Checked     := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-
-  cb_Language.ItemIndex :=
-    cb_Language.Items.IndexOf(getlanguagename(GetCurrentLanguage));
 
   cb_StayOnTop.Checked := Nemp_MainForm.NempOptions.MiniNempStayOnTop;
 
@@ -1513,32 +1554,7 @@ begin
 end;
 
 procedure TOptionsCompleteForm.GetSkins;
-var SR: TSearchrec;
-
 begin
-  cbSkinAuswahl.Items.Clear;
-  cbSkinAuswahl.Items.Add('Windows standard');
-  if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
-    repeat
-      if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-        cbSkinAuswahl.Items.Add('<private> ' +Sr.Name);
-    until FindNext(SR)<>0;
-  FindClose(SR);
-
-  if (FindFirst(ExtractFilePath(Paramstr(0)) + 'Skins\' +'*',faDirectory,SR)=0) then
-    repeat
-      if (SR.Name<>'.') and (SR.Name<>'..') and ((SR.Attr AND faDirectory)= faDirectory) then
-        cbSkinAuswahl.Items.Add('<public> ' + Sr.Name);
-    until FindNext(SR)<>0;
-  FindClose(SR);
-
-  if cbSkinAuswahl.Items.Count = 0 then
-    cbSkinAuswahl.Items.Add((Warning_NoSkinFound)); //'keine Skins'
-
-  if Nemp_MainForm.UseSkin then
-      cbSkinAuswahl.ItemIndex := cbSkinAuswahl.Items.IndexOf(Nemp_MainForm.SkinName)
-  else
-      cbSkinAuswahl.ItemIndex := 0;
 end;
 
 procedure TOptionsCompleteForm.FormHide(Sender: TObject);
@@ -1869,40 +1885,8 @@ end;
 
 
 procedure TOptionsCompleteForm.cbSkinAuswahlChange(Sender: TObject);
-var SkinDir: UnicodeString;
+
 begin
-  //GRPBOXControl.OwnerDraw := CBSkinAuswahl.Itemindex > 0;
-  //GRPBOXSpectrum.OwnerDraw := CBSkinAuswahl.Itemindex > 0;
-  //GRPBOXTextAnzeige.OwnerDraw := CBSkinAuswahl.Itemindex > 0;
-  NewPlayerPanelOptions.OwnerDraw := CBSkinAuswahl.Itemindex > 0;
-
-  if CBSkinAuswahl.Itemindex > 0 then
-  begin
-      Skindir := StringReplace(CBSkinAuswahl.Items[CBSkinAuswahl.Itemindex],
-                  '<public> ', ExtractFilePath(ParamStr(0)) + 'Skins\', []);
-
-      Skindir := StringReplace(Skindir,
-                  '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
-
-      TestSkin.LoadFromDir(SkinDir, False);
-
-      VolShape.Brush.Color := TestSkin.SkinColorScheme.ShapeBrushCL;
-      VolShape.Pen.Color := TestSkin.SkinColorScheme.ShapePenCL;
-      SlidebarShape.Brush.Color := TestSkin.SkinColorScheme.ShapeBrushCL;
-      SlidebarShape.Pen.Color := TestSkin.SkinColorScheme.ShapePenCL;
-  end else
-  begin
-      VolShape.Brush.Color := clGradientActiveCaption;
-      VolShape.Pen.Color := clBlack;
-      SlidebarShape.Brush.Color := clGradientActiveCaption;
-      SlidebarShape.Pen.Color := clBlack;
-  end;
-
-  TestSkin.DrawPreview(NewPlayerPanelOptions);
-  NewPlayerPanelOptions.Repaint;
-  //GRPBOXControl.Repaint;
-  //GRPBOXSpectrum.Repaint;
-  //GRPBOXTextAnzeige.Repaint;
 end;
 
 (*
@@ -1919,7 +1903,7 @@ end;
 
 procedure TOptionsCompleteForm.BTNApplyClick(Sender: TObject);
 var i,s,l, maxfont:integer;
-  NeedUpdate, NeedFormUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate: boolean;
+  NeedUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate: boolean;
   newLanguage: String;
   ReDrawVorauswahlTrees, ReDrawPlaylistTree, ReDrawMedienlistTree: Boolean;
   Ini: TMemIniFile;
@@ -2517,19 +2501,6 @@ begin
 
 
   //========================================================
-  // In 3.0 final neue Optionen für die Anzeige:
-  NeedFormUpdate := (RGrp_View.ItemIndex <> (Nemp_MainForm.AnzeigeMode Mod 2))
-                    OR (Nemp_MainForm.NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible <> cb_ShowEffectsWindow.Checked   )
-                    OR (Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistVisible           <> cb_ShowPlaylistWindow.Checked  )
-                    OR (Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteVisible        <> CB_ShowMedialistWindow.Checked )
-                    OR (Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheVisible       <> CB_ShowBrowseWindow.Checked    );
-
-
-  Nemp_MainForm.AnzeigeMode := RGrp_View.ItemIndex;
-  Nemp_MainForm.NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible := cb_ShowEffectsWindow.Checked    ;
-  Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistVisible           := cb_ShowPlaylistWindow.Checked   ;
-  Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteVisible        := CB_ShowMedialistWindow.Checked  ;
-  Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheVisible       := CB_ShowBrowseWindow.Checked     ;
 
   Nemp_MainForm.NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
   // Todo: Menu-Check-Einträge umsetzen
@@ -2546,53 +2517,11 @@ begin
     MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
   end;
 
-  // Form an neue Ansicht anpassen
-  if NeedFormUpdate then
-      UpdateFormDesignNeu;
-
   Nemp_MainForm.RepairZOrder;
   Show;
 
 
-  l := cb_Language.ItemIndex - 1;
-  if l > -2 then
-  begin
-      Case l of
-          -2,-1: newLanguage := 'en';
-          else begin
-              if l <= LanguageList.Count -1 then
-                newLanguage := LanguageList[l]
-              else
-                newLanguage := 'en';
-              end;
-        end;
-        Nemp_MainForm.NempOptions.Language := newLanguage;
-        ReTranslateNemp(newLanguage);
-  end;
-
-
   //========================================================
-
-  if CBSkinAuswahl.Itemindex = 0 then
-  begin
-      Nemp_MainForm.NempSkin.DeActivateSkin;
-      Nemp_MainForm.UseSkin := False;
-      Nemp_MainForm.RePaintPanels;
-      Nemp_MainForm.RepaintOtherForms;
-      Nemp_MainForm.RepaintAll;
-  end else
-  begin
-      // Skin komplett laden
-      TestSkin.LoadFromDir(Testskin.Path, True);
-      // setzen
-      Nemp_MainForm.UseSkin := True;
-      Nemp_MainForm.NempSkin.copyFrom(TestSkin);
-      Nemp_MainForm.NempSkin.ActivateSkin;
-      Nemp_MainForm.SkinName := CBSkinAuswahl.Items[CBSkinAuswahl.Itemindex];
-      Nemp_MainForm.RePaintPanels;
-      Nemp_MainForm.RepaintOtherForms;
-      Nemp_MainForm.RepaintAll;
-  end;
 
   // Update-Optionen
   NempUpdater.AutoCheck := CB_AutoCheck.Checked;
@@ -3050,6 +2979,8 @@ begin
     BtnScrobbleWizard.Tag := 100;
     BtnScrobbleWizard.Enabled := True;
 end;
+
+
 
 
 procedure TOptionsCompleteForm.ResetScrobbleButton;

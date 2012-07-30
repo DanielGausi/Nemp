@@ -186,36 +186,19 @@ CoverFlowLastFM_HintInvalid      = 'Downloading a cover from LastFM cancelled.' 
 FloatingPointChannels_On = 'Current status: On';
 FloatingPointChannels_Off = 'Current status: Off';
 
-// in den Optionen gibts ne Kopie hiervon, die zum initialien Füllen der Bäume benutzt wird!
-// Ne, nicht mehr. oder war das nötig???
-    //OptionsTree_SystemMediaKeys  = 'Media keys';
-    //OptionsTree_SystemOther      = 'Shutdown';
-    //OptionsTree_ViewFontColor    = 'Font color';
-    //OptionsTree_ViewFontsize     = 'Font size';
-    //OptionsTree_ViewSkins        = 'Skins';
-    //OptionsTree_AudioMain        = 'Audio options';
-    //OptionsTree_AudioDevices     = 'Devices';
-    //OptionsTree_AudioPlayer      = 'Player';
-    //OptionsTree_PlayerMedialibrary = 'Media library';
-    //OptionsTree_PlayerWebradio    = 'Webstreams';
-    //OptionsTree_PlayerEffects     = 'Effects';
-    //OptionsTree_PlayerEvents      = 'Events';
-    //OptionsTree_MediabibList         = 'Media list';
-    //OptionsTree_MediabibDirectories  = 'Directories';
-    //OptionsTree_MediabibView         = 'View';
-    //OptionsTree_AudioJingles     = 'Jingles';
-    //OptionsTree_SystemMain       = 'System';
 
     OptionsTree_SystemGeneral     = 'General settings';
     OptionsTree_SystemFiletyps    = 'File types registration';
     OptionsTree_SystemControl     = 'Controls';
     OptionsTree_SystemTaskbar     = 'Taskbar and tray';
+    OptionsTree_SystemHibernate   = 'Hibernate / Stand by';
 
     OptionsTree_ViewMain          = 'Viewing options';
     OptionsTree_ViewPlayer        = 'Player and Cover';
-    OptionsTree_ViewView          = 'View';
+    //OptionsTree_ViewView          = 'View';
     OptionsTree_ViewFonts         = 'Fonts';
     OptionsTree_PartyMode         = 'Party-Mode';
+    OptionsTree_ViewExtended      = 'Extended viewing settings';
 
     OptionsTree_PlayerMain        = 'Player settings';
     OptionsTree_PlayerPlaylist    = 'Playlist';
@@ -227,10 +210,18 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerEvents      = 'Events';
     OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
     OptionsTree_PlayerWebServer   = 'WebServer';
+    OptionsTree_PlayerExtendedPlayer   = 'Player (extended)';
+    OptionsTree_PlayerExtendedPlaylist = 'Playlist (extended)';
+
+    OptionsTree_FilesMain         = 'File management';
+    OptionsTree_FilesCover        = 'Cover';
+
 
     OptionsTree_ExtendedMain      = 'Extended settings';
     OptionsTree_MediabibSearch    = 'Search options';
     OptionsTree_MediabibUnicode   = 'Unicode';
+
+
 
     Warning_NoSkinFound = 'No skins found';
     FiletypeRegistration_AudioFileEnqueue  = 'Enqueue in Nemp';

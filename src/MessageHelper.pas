@@ -1364,7 +1364,7 @@ begin
                         Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
                     OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.ScrobbleNode;
                     OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.ScrobbleNode] := True;
-                    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabAudio9;
+                    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer7;
                     OptionsCompleteForm.Show;
                 end;
             end;
