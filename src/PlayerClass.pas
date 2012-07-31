@@ -132,6 +132,7 @@ type
       fSoftwareFlag: DWord;
       fUseFloatingPointChannels: Integer; // 0: Auto-Detect, 1: Aus, 2: An
       fUseHardwareMixing: Boolean;        // False: OR BASS_SAMPLE_SOFTWARE
+      fSafePlayback: Boolean;
 
       fMainWindowHandle: HWND;    // the main window, where some messages are sent to
       fPathToDlls: String;        // the path to the bass.dll-addons
@@ -346,6 +347,7 @@ type
         property Floatable: Boolean read GetFloatable;
         property UseFloatingPointChannels: Integer read fUseFloatingPointChannels write fUseFloatingPointChannels;
         property UseHardwareMixing: Boolean read fUseHardwareMixing write fUseHardwareMixing;
+        property SafePlayback: Boolean read fSafePlayback write fSafePlayback;
 
         property ABRepeatA: Double read fABRepeatStartPosition;
         property ABRepeatB: Double read fABRepeatEndPosition;
@@ -862,7 +864,7 @@ begin
   if fUseFloatingPointChannels < 0 then fUseFloatingPointChannels := 0;
 
   fUseHardwareMixing := Ini.ReadBool('Player', 'HardwareMixing', True);  // False: OR BASS_SAMPLE_SOFTWARE
-
+  fSafePlayback := ini.ReadBool('Player', 'SafePlayback', False);
 
   UseFading             := ini.ReadBool('Player','UseFading',True);
   FadingInterval        := ini.ReadInteger('Player','FadingInterval',2000);
@@ -962,6 +964,7 @@ begin
 
   Ini.WriteInteger('Player', 'FloatingPointChannels', fUseFloatingPointChannels);
   Ini.WriteBool('Player', 'HardwareMixing', fUseHardwareMixing);
+  Ini.WriteBool('Player', 'SafePlayback', fSafePlayback);
 
   ini.WriteBool('Player','UseFading',UseFading);
   ini.WriteInteger('Player','FadingInterval',FadingInterval);
@@ -1265,7 +1268,7 @@ begin
       //else
           // Mainstream erzeugen
 
-      if StartPos <> 0 then
+      if (StartPos <> 0) or (fSafePlayback) then
           ScanMode := ps_Now
       else
         if (extension = '.mp3')
@@ -1435,7 +1438,7 @@ begin
       if MainAudioFile.IsFile then
           SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
 
-      if ScanMode = ps_Now then
+      if ScanMode <> ps_Later then
       begin
           // dann ggf. von der bass korrigieren lassen
           If Mainstream <> 0 then

@@ -453,6 +453,8 @@ type
     cb_SettingsMode: TComboBox;
     GrpBox_BetaOptions: TGroupBox;
     XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
+    GrpBox_PlayerExt_SafePlayback: TGroupBox;
+    cb_SafePlayback: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -854,6 +856,7 @@ var MainNode, Firstnode : PVirtualNode;
 begin
     GrpBox_StartingExtended.Visible := ExtendedSettings;
     GrpBox_TabulatorOptions.Visible := ExtendedSettings;
+    GrpBox_PlayerExt_SafePlayback.Visible := ExtendedSettings;
 
     OptionsVST.Clear;
 
@@ -1228,6 +1231,8 @@ begin
 
   cb_RegisterMediaHotkeys.Checked := Nemp_MainForm.NempOptions.RegisterMediaHotkeys;
   CB_IgnoreVolume.Checked := Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys;
+
+  cb_SafePlayback.Checked := NempPlayer.SafePlayback;
 
   CB_TabStopAtPlayerControls.Checked := Nemp_MainForm.NempOptions.TabStopAtPlayerControls;
   CB_TabStopAtTabs          .Checked := Nemp_MainForm.NempOptions.TabStopAtTabs;
@@ -2199,6 +2204,8 @@ begin
   Nemp_MainForm.NempOptions.RegisterMediaHotkeys   := cb_RegisterMediaHotkeys.Checked;
   Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
 
+  NempPlayer.SafePlayback := cb_SafePlayback.Checked;
+
   MedienBib.IncludeAll := cbIncludeAll.Checked;
 
   if Not MedienBib.IncludeAll then
@@ -2406,19 +2413,21 @@ begin
   // Geburtstags-Optionen
   with NempPlayer.NempBirthdayTimer do
   begin
-    UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text)<> '');
-
     if (CountDownFileName <> EditCountdownSong.Text)
       or (BirthdaySongFilename <> EditBirthdaySong.Text)
-    then begin
+      or (UseCountDown <> CBStartCountDown.Checked)
+      or (StartTime <> DTPBirthdayTime.Time)
+    then
+    begin
         CountDownFileName := EditCountdownSong.Text;
         BirthdaySongFilename := EditBirthdaySong.Text;
-        StartTime := //TimeOf
-                    (DTPBirthdayTime.Time);
+        StartTime := (DTPBirthdayTime.Time);
+        UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text)<> '');
+
         if UseCountDown then
-          StartCountDownTime := IncSecond(StartTime, - NempPlayer.GetCountDownLength(CountDownFileName))
+            StartCountDownTime := IncSecond(StartTime, - NempPlayer.GetCountDownLength(CountDownFileName))
         else
-          StartCountDownTime := StartTime;
+            StartCountDownTime := StartTime;
     end;
 
     ContinueAfter := CBContinueAfter.Checked;

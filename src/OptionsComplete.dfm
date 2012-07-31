@@ -50,8 +50,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
-    ExplicitWidth = 193
-    ExplicitHeight = 442
     Columns = <>
   end
   object PageControl1: TPageControl
@@ -59,18 +57,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 455
-    ActivePage = TabPlayer7
+    ActivePage = TabPlayer6
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
     TabStop = False
-    ExplicitLeft = 206
-    ExplicitHeight = 445
     object TabSystem0: TTabSheet
       Caption = 'Sys (Main)'
       ImageIndex = 6
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -82,7 +76,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Nemp auto-updater'
         TabOrder = 1
-        ExplicitWidth = 434
         object CB_AutoCheck: TCheckBox
           Left = 16
           Top = 20
@@ -241,7 +234,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Start minimized (you can also use the parameter "/minimized")'
           TabOrder = 3
-          ExplicitWidth = 409
         end
         object cb_StayOnTop: TCheckBox
           Left = 16
@@ -259,8 +251,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'Sys (Control)'
       ImageIndex = 5
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -272,7 +262,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hotkeys configuration'
         TabOrder = 1
-        ExplicitWidth = 434
         object CB_Activate_Play: TCheckBox
           Left = 34
           Top = 40
@@ -1137,8 +1126,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'Sys (Files)'
       ImageIndex = 6
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -1299,8 +1286,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'Sys (Tray)'
       ImageIndex = 20
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -1340,7 +1325,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Notification of a deskband'
         TabOrder = 1
-        ExplicitWidth = 434
         object CBShowDeskbandOnStart: TCheckBox
           Left = 16
           Top = 20
@@ -1398,8 +1382,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem4: TTabSheet
       Caption = 'Sys (Hibernate)'
       ImageIndex = 21
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -1411,7 +1393,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hibernate/standby'
         TabOrder = 0
-        ExplicitWidth = 434
         object LBlConst_ReInitPlayerEngine_Hint: TLabel
           Left = 36
           Top = 52
@@ -1481,8 +1462,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView0: TTabSheet
       Caption = 'View (Main)'
       ImageIndex = 1
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -1495,7 +1474,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show the following columns in the medialist'
         TabOrder = 0
-        ExplicitWidth = 434
       end
       object GrpBox_ViewMain_BrowseClassic: TGroupBox
         Left = 8
@@ -1505,7 +1483,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Browsing (classic)'
         TabOrder = 1
-        ExplicitWidth = 434
         object Label44: TLabel
           Left = 16
           Top = 20
@@ -1567,7 +1544,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Sorting'
         TabOrder = 2
-        ExplicitWidth = 434
         object CBAlwaysSortAnzeigeList: TCheckBox
           Left = 16
           Top = 20
@@ -1666,8 +1642,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView1: TTabSheet
       Caption = 'View (Party)'
       ImageIndex = 19
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -1766,9 +1740,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView2: TTabSheet
       Caption = 'View (Vis)'
       ImageIndex = 20
-      ExplicitLeft = 0
-      ExplicitWidth = 449
-      ExplicitHeight = 351
       DesignSize = (
         446
         355)
@@ -1780,7 +1751,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'While playing'
         TabOrder = 0
-        ExplicitWidth = 434
         object Lbl_Framerate: TLabel
           Left = 191
           Top = 46
@@ -1869,7 +1839,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Cover && Details'
         TabOrder = 1
-        ExplicitWidth = 434
         object LblConst_CoverMode: TLabel
           Left = 16
           Top = 22
@@ -1925,7 +1894,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Coverflow'
         TabOrder = 2
-        ExplicitWidth = 434
         object cb_UseClassicCoverflow: TCheckBox
           Left = 16
           Top = 20
@@ -1949,8 +1917,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView3: TTabSheet
       Caption = 'View (Fonts)'
       ImageIndex = 7
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -1962,7 +1928,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fonts'
         TabOrder = 0
-        ExplicitWidth = 434
         object LblConst_FontVBR: TLabel
           Left = 35
           Top = 79
@@ -2041,7 +2006,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Font size (browselists)'
         TabOrder = 2
-        ExplicitWidth = 434
         object Label34: TLabel
           Left = 152
           Top = 20
@@ -2087,7 +2051,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Font size (playlist and medialist)'
         TabOrder = 1
-        ExplicitWidth = 434
         object LblConst_RowHeight: TLabel
           Left = 152
           Top = 20
@@ -2143,9 +2106,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView4: TTabSheet
       Caption = 'View (Ext)'
       ImageIndex = 21
-      ExplicitLeft = 0
-      ExplicitWidth = 449
-      ExplicitHeight = 351
       DesignSize = (
         446
         355)
@@ -2298,8 +2258,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles0: TTabSheet
       Caption = 'Files (Main)'
       ImageIndex = 22
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -2365,7 +2323,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 5
         end
         object LBAutoscan: TListBox
-          Left = 34
+          Left = 33
           Top = 37
           Width = 299
           Height = 90
@@ -2373,7 +2331,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ItemHeight = 13
           TabOrder = 1
           OnKeyDown = LBAutoscanKeyDown
-          ExplicitWidth = 301
         end
       end
       object GrpBox_FilesMain_FileTypes: TGroupBox
@@ -2384,9 +2341,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Filetypes for the library'
         TabOrder = 1
-        ExplicitWidth = 434
         object LblConst_OnlythefollowingTypes: TLabel
-          Left = 34
+          Left = 33
           Top = 43
           Width = 120
           Height = 13
@@ -2405,7 +2361,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = cbIncludeAllClick
         end
         object cbIncludeFiles: TCheckListBox
-          Left = 34
+          Left = 33
           Top = 58
           Width = 391
           Height = 108
@@ -2438,8 +2394,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles1: TTabSheet
       Caption = 'Files (Metadata)'
       ImageIndex = 20
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -2578,10 +2532,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles2: TTabSheet
       Caption = 'Files (Cover)'
       ImageIndex = 24
-      ExplicitLeft = 0
-      ExplicitTop = 98
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -2693,10 +2643,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles3: TTabSheet
       Caption = 'Files (Search)'
       ImageIndex = 25
-      ExplicitLeft = 0
-      ExplicitTop = 97
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -2708,7 +2654,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Global search options'
         TabOrder = 0
-        ExplicitWidth = 434
         DesignSize = (
           431
           178)
@@ -2726,7 +2671,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ExplicitWidth = 394
         end
         object LblConst_AccelerateSearchNote2: TLabel
-          Left = 55
+          Left = 53
           Top = 109
           Width = 371
           Height = 33
@@ -2736,7 +2681,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Note: This will affect the search results of "Quicksearch" and "' +
             'General search".'
           WordWrap = True
-          ExplicitWidth = 374
         end
         object CB_AccelerateSearch: TCheckBox
           Left = 16
@@ -2748,10 +2692,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Accelerate search'
           TabOrder = 0
           OnClick = CB_AccelerateSearchClick
-          ExplicitWidth = 410
         end
         object CB_AccelerateSearchIncludePath: TCheckBox
-          Left = 35
+          Left = 34
           Top = 75
           Width = 392
           Height = 17
@@ -2759,10 +2702,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Including filenames'
           TabOrder = 1
-          ExplicitWidth = 395
         end
         object CB_AccelerateSearchIncludeComment: TCheckBox
-          Left = 36
+          Left = 34
           Top = 91
           Width = 391
           Height = 17
@@ -2770,7 +2712,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Including comments'
           TabOrder = 2
-          ExplicitWidth = 394
         end
         object CB_AccelerateLyricSearch: TCheckBox
           Left = 16
@@ -2781,7 +2722,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Accelerate lyrics search'
           TabOrder = 3
-          ExplicitWidth = 410
         end
       end
       object GrpBox_TabMedia4_QuickSearchOptions: TGroupBox
@@ -2792,12 +2732,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Quicksearch options'
         TabOrder = 1
-        ExplicitWidth = 434
         DesignSize = (
           431
           161)
         object LblConst_QuickSearchNote: TLabel
-          Left = 32
+          Left = 35
           Top = 69
           Width = 375
           Height = 41
@@ -2809,7 +2748,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ' options is activated. The last one is not recommended unless yo' +
             'ur medialibrary is not too big or your computer is really fast.'
           WordWrap = True
-          ExplicitWidth = 378
         end
         object CB_QuickSearchWhileYouType: TCheckBox
           Left = 16
@@ -2822,7 +2760,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = '"While you type"'
           TabOrder = 0
-          ExplicitWidth = 410
         end
         object CB_QuickSearchAllowErrorsWhileTyping: TCheckBox
           Left = 16
@@ -2835,7 +2772,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Allow errors while typing'
           TabOrder = 2
-          ExplicitWidth = 410
         end
         object CB_QuickSearchAllowErrorsOnEnter: TCheckBox
           Left = 16
@@ -2848,7 +2784,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Allow errors on [Enter]'
           TabOrder = 1
-          ExplicitWidth = 410
         end
         object cb_ChangeCoverflowOnSearch: TCheckBox
           Left = 16
@@ -2863,8 +2798,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles4: TTabSheet
       Caption = 'Files (Unicode)'
       ImageIndex = 23
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -2876,7 +2809,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'ID3-tags'
         TabOrder = 0
-        ExplicitWidth = 434
         object CBAlwaysWriteUnicode: TCheckBox
           Left = 16
           Top = 20
@@ -2907,7 +2839,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Charsets for auto-detection'
         TabOrder = 1
-        ExplicitWidth = 434
         object LblConst_Arabic: TLabel
           Left = 16
           Top = 20
@@ -3041,9 +2972,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer0: TTabSheet
       Caption = 'Player (Main)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitWidth = 449
-      ExplicitHeight = 351
       DesignSize = (
         446
         355)
@@ -3055,7 +2983,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Output devices'
         TabOrder = 0
-        ExplicitWidth = 434
         object LblConst_MainDevice: TLabel
           Left = 16
           Top = 20
@@ -3110,7 +3037,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Fading'
         TabOrder = 1
-        ExplicitWidth = 434
         object LblConst_TitleChange: TLabel
           Left = 32
           Top = 44
@@ -3257,8 +3183,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer1: TTabSheet
       Caption = 'Player (Ext)'
       ImageIndex = 22
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -3357,12 +3281,31 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Software')
         end
       end
+      object GrpBox_PlayerExt_SafePlayback: TGroupBox
+        Left = 8
+        Top = 171
+        Width = 431
+        Height = 50
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Safe playback'
+        TabOrder = 1
+        DesignSize = (
+          431
+          50)
+        object cb_SafePlayback: TCheckBox
+          Left = 8
+          Top = 20
+          Width = 409
+          Height = 17
+          Anchors = [akLeft, akTop, akRight]
+          Caption = 'Use safe playback'
+          TabOrder = 0
+        end
+      end
     end
     object TabPlayer2: TTabSheet
       Caption = 'Player (Playlist)'
       ImageIndex = 19
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -3374,7 +3317,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Behaviour of the playlist'
         TabOrder = 1
-        ExplicitWidth = 434
         object CB_AutoSavePlaylist: TCheckBox
           Left = 8
           Top = 33
@@ -3433,7 +3375,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           'Enqueue after current track'
           'Just play focussed file (don'#39't change the playlist)')
         TabOrder = 0
-        ExplicitWidth = 434
       end
       object GrpBox_Headset: TGroupBox
         Left = 7
@@ -3443,7 +3384,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Headset'
         TabOrder = 2
-        ExplicitWidth = 434
         object LblHeadsetDefaultAction: TLabel
           Left = 12
           Top = 19
@@ -3482,8 +3422,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer3: TTabSheet
       Caption = 'Player (List-Ext)'
       ImageIndex = 23
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -3498,7 +3436,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Random playback'
         TabOrder = 0
-        ExplicitWidth = 434
         object LblConst_ReallyRandom: TLabel
           Left = 8
           Top = 16
@@ -3595,8 +3532,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer4: TTabSheet
       Caption = 'Player (Streams)'
       ImageIndex = 23
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -3608,7 +3543,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Recording options'
         TabOrder = 1
-        ExplicitWidth = 434
         DesignSize = (
           431
           350)
@@ -3681,7 +3615,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = '...'
           TabOrder = 1
           OnClick = BtnChooseDownloadDirClick
-          ExplicitLeft = 401
         end
         object cbAutoSplitByTitle: TCheckBox
           Left = 16
@@ -3743,7 +3676,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 0
-          ExplicitWidth = 379
         end
         object cbFilenameFormat: TComboBox
           Left = 16
@@ -3790,10 +3722,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer5: TTabSheet
       Caption = 'Player (Effects)'
       ImageIndex = 15
-      ExplicitLeft = 0
-      ExplicitTop = 81
-      ExplicitWidth = 449
-      ExplicitHeight = 469
       DesignSize = (
         446
         355)
@@ -3809,7 +3737,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           'Keep pitch'
           '"Micky Mouse effect"')
         TabOrder = 0
-        ExplicitWidth = 434
       end
       object GrpBox_Effects: TGroupBox
         Left = 8
@@ -3819,7 +3746,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Effects/Equalizer'
         TabOrder = 1
-        ExplicitWidth = 434
         object CB_UseDefaultEffects: TCheckBox
           Left = 16
           Top = 43
@@ -3849,7 +3775,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Jingles (playback via F9, Push-to-talk via F8 )'
         TabOrder = 2
-        ExplicitWidth = 434
         object LblJingleReduce: TLabel
           Left = 91
           Top = 47
@@ -3910,10 +3835,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer6: TTabSheet
       Caption = 'Player (Event)'
       ImageIndex = 19
-      ExplicitLeft = 0
-      ExplicitTop = 97
-      ExplicitWidth = 449
-      ExplicitHeight = 451
       DesignSize = (
         446
         355)
@@ -3925,7 +3846,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Countdown'
         TabOrder = 0
-        ExplicitWidth = 434
         DesignSize = (
           431
           125)
@@ -3970,7 +3890,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = '...'
           TabOrder = 2
           OnClick = BtnCountDownSongClick
-          ExplicitLeft = 391
         end
         object BtnGetCountDownTitel: TButton
           Left = 36
@@ -3990,7 +3909,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           OnChange = EditCountdownSongChange
-          ExplicitWidth = 349
         end
       end
       object GrpBox_TabAudio7_Event: TGroupBox
@@ -4001,7 +3919,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Event'
         TabOrder = 1
-        ExplicitWidth = 434
         DesignSize = (
           431
           126)
@@ -4059,7 +3976,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = '...'
           TabOrder = 2
           OnClick = BtnBirthdaySongClick
-          ExplicitLeft = 385
         end
         object BtnGetBirthdayTitel: TButton
           Left = 16
@@ -4079,7 +3995,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 1
           OnChange = EditBirthdaySongChange
-          ExplicitWidth = 363
         end
       end
       object CBContinueAfter: TCheckBox
@@ -4095,8 +4010,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer7: TTabSheet
       Caption = 'Player (Scrobble)'
       ImageIndex = 17
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -4383,7 +4296,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           ReadOnly = True
           ScrollBars = ssVertical
           TabOrder = 0
-          ExplicitWidth = 417
         end
       end
       object GrpBox_ScrobbleSettings: TGroupBox
@@ -4449,8 +4361,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer8: TTabSheet
       Caption = 'Player (Webserver)'
       ImageIndex = 18
-      ExplicitWidth = 449
-      ExplicitHeight = 443
       DesignSize = (
         446
         355)
@@ -4789,11 +4699,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
     ItemHeight = 13
     ItemIndex = 0
     TabOrder = 5
-    Text = 'Standard settings'
+    Text = 'Commonly used settings'
     OnChange = cb_SettingsModeChange
     Items.Strings = (
-      'Standard settings'
-      'Extended settings')
+      'Commonly used settings'
+      'All settings')
   end
   object ColorDialog1: TColorDialog
     Left = 104
