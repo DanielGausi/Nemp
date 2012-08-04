@@ -3005,7 +3005,7 @@ begin
         Caption:= Nemp_Caption;
         ResetBrowsePanels;
     end;
-    AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+    // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
 end;
 
 procedure TNemp_MainForm.MM_ML_SearchClick(Sender: TObject);

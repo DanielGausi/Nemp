@@ -515,8 +515,8 @@ var ListOfFiles: TObjectList;
     listFile: TAudioFile;
     i: Integer;
     aErr: TNempAudioError;
-    backupRating: Byte;
-    backupCounter: Cardinal;
+//    backupRating: Byte;
+//    backupCounter: Cardinal;
 begin
 
     // Do not Change anything in non-mp3-Files here!
@@ -553,6 +553,9 @@ begin
             at_Invalid: ;
         end;
 
+        // Read FileInfo from File again
+        // (Set the fields in the CurrentAudioFile-Object properly)
+        CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, GAD_Rating);
 
         if aErr <> AUDIOERR_None then
         begin
@@ -564,13 +567,11 @@ begin
         /// SynchronizeAudioFile on a File from the Library will delete the
         /// Rating/Counter-Data in the library: So: backup, synch file, write rating back
         ///  (this works, as we set CurrentFile.Rating in the UpdateID3/Ogg/Flac-Methods)
-        backupRating := CurrentBibRating; // CurrentAudioFile.Rating;
-        backupCounter:= CurrentBibCounter; //CurrentAudioFile.PlayCounter;
-
-        SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
-
-        CurrentAudioFile.Rating      := backupRating ;
-        CurrentAudioFile.PlayCounter := backupCounter;
+        // backupRating := CurrentBibRating; // CurrentAudioFile.Rating;
+        // backupCounter:= CurrentBibCounter; //CurrentAudioFile.PlayCounter;
+        // SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
+        // CurrentAudioFile.Rating      := backupRating ;
+        // CurrentAudioFile.PlayCounter := backupCounter;
 
         // Update other copies of this file
         ListOfFiles := TObjectList.Create(False);
@@ -581,10 +582,17 @@ begin
                 listFile := TAudioFile(ListOfFiles[i]);
                 // copy Data from AktuellesAudioFile to the files in the list.
                 listFile.Assign(CurrentAudioFile);
+                // Set Rating/Playcounter to Bib-Values
+                // ( If rating was changed manually, the CurrentBibRating was
+                //   set by the Update<Type>InFile-methods )
+                listFile.Rating      := CurrentBibRating;
+                listFile.PlayCounter := CurrentBibCounter;
             end;
         finally
             ListOfFiles.Free;
         end;
+
+
         MedienBib.Changed := True;
         // Correct GUI
         CorrectVCLAfterAudioFileEdit(CurrentAudioFile);

@@ -405,15 +405,16 @@ begin
             begin
               VST.Selected[NewNode] := True;
               VST.FocusedNode := NewNode;
-              AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+            //  AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
               ShowVSTDetails(tmpAudioFile);
-            end else
-              AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            end
+            // else
+            //  AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         end
         else
         begin
             // no file in view
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+        //    AktualisiereDetailForm(NIL, SD_MEDIENBIB);
             ShowVSTDetails(Nil);
         end;
     end;
@@ -451,16 +452,16 @@ begin
             begin
                 VST.Selected[NewNode] := True;
                 VST.FocusedNode := NewNode;
-                AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+                //AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
                 ShowVSTDetails(tmpAudioFile);
             end else
             begin
-                AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+                //AktualisiereDetailForm(NIL, SD_MEDIENBIB);
                 ShowVSTDetails(Nil);
             end;
         end else
         begin
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            //AktualisiereDetailForm(NIL, SD_MEDIENBIB);
             ShowVSTDetails(Nil);
         end;
     end;
@@ -476,7 +477,7 @@ begin
         AddVSTMp3(VST, NIL, Dummy);
 
         VST.EndUpdate;
-        AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+        // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         ShowVSTDetails(Nil);
     end;
 end;
@@ -509,17 +510,17 @@ begin
             VST.Selected[NewNode] := True;
             VST.FocusedNode := NewNode;
             ShowVSTDetails(tmpAudioFile);
-            AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
+            // AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
           end
           else
           begin
-              AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+              // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
               ShowVSTDetails(Nil);
           end;
         end
         else
         begin
-            AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
             ShowVSTDetails(Nil);
         end;
     end;
