@@ -99,49 +99,13 @@
 			<param name="Local" value="optionen_a_player-einstellungen.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Playlist">
-			<param name="Local" value="optionen_b_Playlist.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Medienbibliothek">
+			<param name="Name" value="Dateiverwaltung">
 			<param name="Local" value="optionen_c_medienbibliothek.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Metadaten (ID3-Tags)">
-			<param name="Local" value="optionen_d_Automatic-rating.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Webradio">
-			<param name="Local" value="optionen_e_webradio.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Effekte">
-			<param name="Local" value="optionen_f_effekte.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Erweiterte Einstellungen">
-			<param name="Local" value="optionen_j_erweiterte.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Suchoptionen">
-			<param name="Local" value="optionen_k_suchoptionen.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Unicode">
-			<param name="Local" value="optionen_l_unicode.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Tipps und Tricks">
-		<param name="Local" value="Tipps.html">
-		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Fehlerbehebung">
 		<param name="Local" value="Fehlerbehebung.html">
-		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Weitere Fragen">
-		<param name="Local" value="Fragen.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Lizenz">
