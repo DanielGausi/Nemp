@@ -65,7 +65,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Top = 8
     Width = 692
     Height = 381
-    ActivePage = Tab_Shoutcast
+    ActivePage = Tab_Favourites
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 3
     object Tab_Favourites: TTabSheet
@@ -521,6 +521,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     end
     object MM_Shoutcast: TMenuItem
       Caption = 'Shoutcast'
+      Visible = False
       object MM_SC_AddToPlaylist: TMenuItem
         Caption = 'Add to playlist'
         OnClick = PM_SC_AddToPlaylistClick

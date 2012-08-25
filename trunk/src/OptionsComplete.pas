@@ -602,10 +602,10 @@ uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
 {$R *.dfm}
 
 var
- OptionsArraySystem : array[0..4] of TOptionData;
+ OptionsArraySystem : array[0..3] of TOptionData;
  OptionsArrayAnzeige: array[0..4] of TOptionData;
  OptionsArrayAudio  : array[0..8] of TOptionData;
- OptionsArrayFiles  : Array[0..4] of TOptionData;
+ OptionsArrayFiles  : Array[0..5] of TOptionData;
  Testskin: TNempSkin;
 
 
@@ -661,14 +661,12 @@ begin
   // MAIN
   OptionsArraySystem[0].Eintrag := OptionsTree_SystemGeneral;
   OptionsArraySystem[0].TabSheet:= TabSystem0;
-      OptionsArraySystem[1].Eintrag := OptionsTree_SystemFiletyps;
-      OptionsArraySystem[1].TabSheet:= TabSystem2;
-      OptionsArraySystem[2].Eintrag := OptionsTree_SystemControl;
-      OptionsArraySystem[2].TabSheet:= TabSystem1;
-      OptionsArraySystem[3].Eintrag  := OptionsTree_SystemTaskbar;
-      OptionsArraySystem[3].TabSheet := TabSystem3;
-      OptionsArraySystem[4].Eintrag  := OptionsTree_SystemHibernate;
-      OptionsArraySystem[4].TabSheet := TabSystem4;
+      OptionsArraySystem[1].Eintrag := OptionsTree_SystemControl;
+      OptionsArraySystem[1].TabSheet:= TabSystem1;
+      OptionsArraySystem[2].Eintrag  := OptionsTree_SystemTaskbar;
+      OptionsArraySystem[2].TabSheet := TabSystem3;
+      OptionsArraySystem[3].Eintrag  := OptionsTree_SystemHibernate;
+      OptionsArraySystem[3].TabSheet := TabSystem4;
 
   // VIEW
   OptionsArrayAnzeige[0].Eintrag := OptionsTree_ViewMain;
@@ -712,17 +710,19 @@ begin
   OptionsArrayFiles[0].Eintrag  := OptionsTree_FilesMain;
   OptionsArrayFiles[0].TabSheet := TabFiles0;
 
-      OptionsArrayFiles[1].Eintrag  := OptionsTree_PlayerMetaDataAccess;
-      OptionsArrayFiles[1].TabSheet := TabFiles1;
+      OptionsArrayFiles[1].Eintrag := OptionsTree_SystemFiletyps;
+      OptionsArrayFiles[1].TabSheet:= TabSystem2;
 
-      OptionsArrayFiles[2].Eintrag := OptionsTree_FilesCover;
-      OptionsArrayFiles[2].TabSheet:= TabFiles2;
+      OptionsArrayFiles[2].Eintrag  := OptionsTree_PlayerMetaDataAccess;
+      OptionsArrayFiles[2].TabSheet := TabFiles1;
 
+      OptionsArrayFiles[3].Eintrag := OptionsTree_FilesCover;
+      OptionsArrayFiles[3].TabSheet:= TabFiles2;
 
-      OptionsArrayFiles[3].Eintrag  := OptionsTree_MediabibSearch;
-      OptionsArrayFiles[3].TabSheet := TabFiles3;
-      OptionsArrayFiles[4].Eintrag  := OptionsTree_MediabibUnicode;
-      OptionsArrayFiles[4].TabSheet := TabFiles4;
+      OptionsArrayFiles[4].Eintrag  := OptionsTree_MediabibSearch;
+      OptionsArrayFiles[4].TabSheet := TabFiles3;
+      OptionsArrayFiles[5].Eintrag  := OptionsTree_MediabibUnicode;
+      OptionsArrayFiles[5].TabSheet := TabFiles4;
 
 
   // Fill Tree
@@ -907,8 +907,10 @@ begin
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[1]);
 
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[2]);
-    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
+    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
+    //if ExtendedSettings then
     if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[4]);
+    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[5]);
 
     //for i := 2 to High(OptionsArrayFiles) do
     //    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[i]);

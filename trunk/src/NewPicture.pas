@@ -37,7 +37,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
-  PNGImage, GifImg, gnuGettext,  CoverHelper, AudioFiles,
+  PNGImage, GifImg, gnuGettext,  CoverHelper, AudioFiles, M4aAtoms,
   Nemp_RessourceStrings;
 
 type
@@ -127,6 +127,7 @@ begin
     case FDetails.CurrentTagObject.FileType of
         at_mp3: result := FDetails.CurrentTagObject.MP3File.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
         at_Flac: result := True;
+        at_M4a: result := True;
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -193,14 +194,21 @@ end;
 procedure TFNewPicture.Btn_OKClick(Sender: TObject);
 var str: TFilestream;
     mime: AnsiString;
+    m4aPictype: TM4APicTypes;
 begin
   try
       str := TFilestream.Create(OpenPictureDialog1.FileName, fmOpenread);
       try
           if (AnsiLowerCase(ExtractFileExt(OpenPictureDialog1.FileName))='.png') then
-              mime := AnsiString('image/png')
+          begin
+              mime := AnsiString('image/png');
+              m4aPictype := M4A_PNG;
+          end
           else
+          begin
               mime := AnsiString('image/jpeg');
+              m4aPictype := M4A_JPG;
+          end;
 
           case FDetails.CurrentTagObject.FileType of
               at_mp3: FDetails.CurrentTagObject.Mp3File.ID3v2Tag.SetPicture(mime,
@@ -212,6 +220,8 @@ begin
                                        cbPicturetype.Itemindex,
                                        mime,
                                        EdtPictureDescription.Text);
+
+              at_M4a: FDetails.CurrentTagObject.M4aFile.SetPicture(str, m4aPictype);
 
               at_Monkey,
               at_WavPack,

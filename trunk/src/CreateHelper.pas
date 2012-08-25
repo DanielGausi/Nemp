@@ -42,7 +42,7 @@ interface
 
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees,
 
-    dialogs, shellApi;
+    dialogs, shellApi, ID3GenreList;
 
 
     procedure UpdateSplashScreen(status: String);
@@ -70,7 +70,7 @@ begin
 end;
 
 function LoadSettings: Boolean;
-var i, s,e: Integer;
+var i, s: Integer;
     ini: TMemIniFile;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
@@ -577,8 +577,6 @@ end;
 
 procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
-    s,e: Cardinal;
-    s1,e1: Cardinal;
 begin
     //s1 := gettickcount;
     with Nemp_MainForm do
@@ -656,7 +654,7 @@ begin
         AcceptApiCommands := True;
         EditFastSearch.OnChange := EDITFastSearchChange;
         NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
-        EdtBibGenre.Items := Genres;
+        EdtBibGenre.Items := ID3Genres;
 
 
         LockWindowUpdate(0);

@@ -1485,10 +1485,14 @@ begin
     WM_NextFile: begin
                       ///--// NempPlayer.StopAndFree;  // das hab ich da grade eben (8.Oktober 2008) eingefügt
                                                       /// UND WARUM BITTESCHÖN ????
+
+                      // set AcceptInput to true
+                      // (otherwise we have no auto-playnext at very short tracks)
+                      NempPlaylist.AcceptInput := True;
                       case NempPlaylist.WiedergabeMode of
                           0,2: begin
                                   //NempPlaylist.UpdateHistory;
-                                  NempPlaylist.PlayNext
+                                  NempPlaylist.PlayNext;
                           end;
                           1: NempPlaylist.PlayAgain;
                           3: begin
