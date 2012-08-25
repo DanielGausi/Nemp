@@ -41,8 +41,9 @@ uses
   Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
   ShellApi, ComCtrls, U_CharCode, myDialogs,
 
-  AudioFileBasics, Mp3FileUtils, ID3v2Frames, Mp3Files, FlacFiles, OggVorbisFiles,
+  AudioFileBasics, Mp3FileUtils, ID3v2Frames, ID3GenreList, Mp3Files, FlacFiles, OggVorbisFiles,
   VorbisComments, AudioFiles, Apev2Tags, ApeTagItem, MusePackFiles, cddaUtils,
+  M4AFiles, M4AAtoms,
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
@@ -343,6 +344,7 @@ type
     ID3v2HasChanged: Boolean;
     VorbisCommentHasChanged: Boolean;
     ApeTagHasChanged: Boolean;
+    M4aTagHasChanged: Boolean;
 
     // ForceChange: ShowDetails without showing a "Do you want to save..."-Message
     fForceChange: Boolean;
@@ -366,12 +368,14 @@ type
     procedure ShowOggDetails(ogg: TOggVorbisFile);
     procedure ShowFlacDetails(flac: TFlacFile);
     procedure ShowApeDetails(ape: TBaseApeFile);
+    procedure ShowM4ADeatils(m4a: TM4AFile);
 
     // Save information to ID3-Tag
     function UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
     function UpdateID3v2InFile(mp3: TMp3File): TMp3Error;
     function UpdateOggVorbisInFile(ogg: TOggVorbisFile): TAudioError;
     function UpdateFlacInFile(flac: TFlacFile): TAudioError;
+    function UpdateM4AInFile(m4a: TM4AFile): TAudioError;
     function UpdateApeTagInFile(ape: TbaseApeFile): TAudioError;
 
 
@@ -386,6 +390,7 @@ type
     ValidMp3File: Boolean;
     ValidOggFile: Boolean;
     ValidFlacFile: Boolean;
+    ValidM4AFile: Boolean;
     ValidApeFile: Boolean;
   end;
 
@@ -427,12 +432,12 @@ begin
   CurrentTagObject := Nil;
   Coverpfade := TStringList.Create;
 
-  cbIDv1Genres.Items := Genres;
+  cbIDv1Genres.Items := ID3Genres;
   cbIDv1Genres.Items.Add('');
-  for i := 0 to Genres.Count - 1 do
+  for i := 0 to ID3Genres.Count - 1 do
   begin
-      cbIDv2Genres.Items.Add(Genres[i]);
-      cb_VorbisGenre.Items.Add(Genres[i]);
+      cbIDv2Genres.Items.Add(ID3Genres[i]);
+      cb_VorbisGenre.Items.Add(ID3Genres[i]);
   end;
 
   MainPageControl.OnChange := Nil;
@@ -520,7 +525,7 @@ var ListOfFiles: TObjectList;
 begin
 
     // Do not Change anything in non-mp3-Files here!
-    if Not (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile) then
+    if Not (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile) then
         Exit;
 
     PictureHasChanged := False;
@@ -528,6 +533,7 @@ begin
     ID3v2HasChanged := False;
     VorbisCommentHasChanged := False;
     ApeTagHasChanged := False;
+    M4aTagHasChanged := False;
 
     if assigned(CurrentAudioFile)
         and (MedienBib.StatusBibUpdate <= 1)
@@ -543,6 +549,7 @@ begin
                     end;
             at_Ogg: aErr := AudioToNempAudioError(UpdateOggVorbisInFile(CurrentTagObject.OggFile));
             at_Flac: aErr := AudioToNempAudioError(UpdateFlacInFile(CurrentTagObject.FlacFile));
+            at_M4A: aErr := AudioToNempAudioError(UpdateM4AInFile(CurrentTagObject.M4AFile));
             at_Monkey,
             at_WavPack,
             at_MusePack,
@@ -591,7 +598,6 @@ begin
         finally
             ListOfFiles.Free;
         end;
-
 
         MedienBib.Changed := True;
         // Correct GUI
@@ -964,12 +970,13 @@ procedure TFDetails.Edt_VorbisChange(Sender: TObject);
 begin
     VorbisCommentHasChanged := True;
     ApeTagHasChanged := True;
+    M4aTagHasChanged := True;
 end;
 
 procedure TFDetails.EnablePictureButtons;
 var picsEnabled: Boolean;
 begin
-    picsEnabled  := (ValidMp3File and ID3v2Activated) or ValidFlacFile or ValidApeFile;
+    picsEnabled  := (ValidMp3File and ID3v2Activated) or ValidFlacFile or ValidApeFile or ValidM4AFile;
 
     cbPictures.Enabled := picsEnabled;
     ID3Image.Visible := picsEnabled;
@@ -1146,6 +1153,7 @@ end;
     - Showing information saved in the medialibrary (page 1)
     --------------------------------------------------------
 }
+
 procedure TFDetails.ShowMediaBibDetails;
 var i: Integer;
     mbAudioFile: TAudioFile;
@@ -1167,6 +1175,7 @@ begin
       ID3v1Activated := False;
       ID3v2Activated := False;
       ValidApeFile := False;
+      ValidM4AFile := False;
       FDetails.Caption := Format('%s [N/A]', [(DetailForm_Caption)]);
 
       LblName.Caption := 'N/A';
@@ -1553,6 +1562,36 @@ begin
         Memo_Vorbis.Text := '';
 end;
 
+procedure TFDetails.ShowM4ADeatils(m4a: TM4AFile);
+begin
+    Tab_VorbisComments.Caption := DetailForm_iTunesCaption;
+    Edt_VorbisArtist.Text    := m4a.Artist;
+    Edt_VorbisTitle.Text     := m4a.Title;
+    Edt_VorbisAlbum.Text     := m4a.Album;
+    Edt_VorbisComment.Text   := m4a.Comment;
+    Edt_VorbisYear.Text      := m4a.Year;
+    Edt_VorbisTrack.Text     := m4a.Track;
+    Edt_VorbisCopyright.Text := m4a.Copyright;
+    cb_VorbisGenre.Text      := m4a.Genre;
+    Edt_VorbisCD.Text        := m4a.Disc;
+
+    CurrentTagRatingChanged := False;
+
+    CurrentTagCounter := StrToIntDef(m4a.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
+    CurrentTagRating  := StrToIntDef(m4a.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
+
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentTagRating, RatingImageVorbis.Picture.Bitmap, RatingImageVorbis.Width, RatingImageVorbis.Height);
+    BtnSynchRatingOggVorbis.Visible := CurrentTagRating <> CurrentBibRating;
+
+    m4a.GetAllTextAtomDescriptions(lv_VorbisComments.Items);
+    if lv_VorbisComments.Items.Count > 0 then
+    begin
+        lv_VorbisComments.ItemIndex := 0;
+        Memo_Vorbis.Text := m4a.GetTextDataByDescription(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex]);
+    end else
+        Memo_Vorbis.Text := '';
+end;
+
 {
     --------------------------------------------------------
     lv_VorbisCommentsChange
@@ -1564,6 +1603,7 @@ begin
     case self.CurrentTagObject.FileType of
         at_Ogg: Memo_Vorbis.Text := CurrentTagObject.OggFile.GetPropertyByIndex(lv_VorbisComments.ItemIndex);
         at_Flac: Memo_Vorbis.Text := CurrentTagObject.FlacFile.GetPropertyByIndex(lv_VorbisComments.ItemIndex);
+        at_M4A: Memo_Vorbis.Text := CurrentTagObject.M4aFile.GetTextDataByDescription(lv_VorbisComments.Items[lv_VorbisComments.ItemIndex]);
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -1609,6 +1649,7 @@ var i: Integer;
   stream: TMemoryStream;
   mime: AnsiString;
   PicType: Byte;
+  m4aPictype: TM4APicTypes;
   Description: UnicodeString;
 begin
     if assigned(PictureFrames) then
@@ -1690,6 +1731,30 @@ begin
                           ID3Image.Picture.Assign(NIL);
                       end;
                   end;
+        at_M4A: begin
+                      // Show Picture
+                      stream := TMemoryStream.Create;
+                      try
+                          if CurrentTagObject.M4aFile.GetPictureStream(stream, m4aPictype) then
+                          begin
+                              case m4aPictype of
+                                M4A_JPG: mime := 'image/jpeg';
+                                M4A_PNG: mime := 'image/png';
+                                M4A_Invalid: mime := '-'; // invalid
+                              end;
+                              cbPictures.Items.Add(DetailForm_OnlyOneM4ACover);
+                              cbPictures.ItemIndex := 0;
+                              PicStreamToImage(stream, mime, ID3IMAGE.Picture.Bitmap);
+                          end else
+                          begin
+                              cbPictures.ItemIndex := -1;
+                              ID3Image.Picture.Assign(NIL);
+                          end;
+                      finally
+                          stream.Free;
+                      end;
+
+                  end;
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -1713,7 +1778,7 @@ procedure TFDetails.ShowLyrics;
 var ButtonsEnable: Boolean;
     ext: String;
 begin
-    ButtonsEnable := (ValidMp3File and ID3v2Activated) or (ValidOggFile) or (ValidFlacFile) or ValidApeFile;
+    ButtonsEnable := (ValidMp3File and ID3v2Activated) or (ValidOggFile) or (ValidFlacFile) or ValidApeFile or ValidM4AFile;
     ext := AnsiLowerCase(ExtractFileExt(CurrentAudioFile.Pfad));
     // Sonderstatus Lyrics: Auch anzeigen, wenn Datei gerade nicht zu finden ist.
     if (CurrentAudioFile <> NIL)
@@ -1737,6 +1802,7 @@ begin
         at_Mp3: Memo_Lyrics.Text := CurrentTagObject.MP3File.ID3v2Tag.Lyrics;
         at_Ogg: Memo_Lyrics.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_LYRICS);
         at_Flac: Memo_Lyrics.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_LYRICS);
+        at_M4A: Memo_Lyrics.Text := CurrentTagObject.M4aFile.Lyrics;
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -1780,6 +1846,7 @@ begin
                     end;
             at_Ogg: Memo_Tags.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
             at_Flac: Memo_Tags.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
+            at_M4A: Memo_Tags.Text := CurrentTagObject.M4aFile.Keywords;
             at_Monkey,
             at_WavPack,
             at_MusePack,
@@ -2012,6 +2079,7 @@ begin
   ValidOggFile  := False;
   ValidFlacFile := False;
   ValidApeFile  := False;
+  ValidM4AFile  := False;
 
   if FileExists(AudioFile.Pfad) then
   begin
@@ -2067,6 +2135,15 @@ begin
                             PnlWarnung.Visible := True;
                         end;
                     end;
+          at_M4a: begin
+                        ValidM4AFile := (CurrentTagObject.LastError = FileErr_None);
+                        if not ValidM4AFile then
+                        begin
+                            Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(CurrentTagObject.LastError)];
+                            Lbl_Warnings.Hint := (Warning_ReadError_Hint);
+                            PnlWarnung.Visible := True;
+                        end;
+                  end;
           at_Monkey,
           at_WavPack,
           at_MusePack,
@@ -2105,16 +2182,16 @@ begin
 
   // Set proper Tabs (in)visible
   Tab_MpegInformation.Visible := ValidMp3File; // This is the one with id3v1 // id3v2
-  Tab_Lyrics.Visible          := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile;
-  Tab_VorbisComments.Visible  := ValidFlacFile or ValidOggFile or ValidApeFile;
+  Tab_Lyrics.Visible          := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
+  Tab_VorbisComments.Visible  := ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
   Tab_ExtendedID3v2.Visible   := ValidMp3File;
-  Tab_MoreTags.Visible        := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile;
+  Tab_MoreTags.Visible        := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
 
   Tab_MpegInformation.TabVisible := ValidMp3File; // This is the one with id3v1 // id3v2
-  Tab_Lyrics.TabVisible          := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile;
-  Tab_VorbisComments.TabVisible  := ValidFlacFile or ValidOggFile or ValidApeFile;
+  Tab_Lyrics.TabVisible          := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
+  Tab_VorbisComments.TabVisible  := ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
   Tab_ExtendedID3v2.TabVisible   := ValidMp3File;
-  Tab_MoreTags.TabVisible        := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile;
+  Tab_MoreTags.TabVisible        := ValidMp3File or ValidFlacFile or ValidOggFile or ValidApeFile or ValidM4AFile;
 
   if (ci = 1) or (ci=2) then
   begin
@@ -2171,6 +2248,14 @@ begin
       ShowLyrics;
   end;
 
+  if ValidM4AFile then
+  begin
+      EnablePictureButtons;
+      ShowM4ADeatils(CurrentTagObject.M4aFile);
+      ShowPictures;
+      ShowLyrics;
+  end;
+
   if ValidApeFile then
   begin
       EnablePictureButtons;
@@ -2181,14 +2266,15 @@ begin
 
   ShowAdditionalTags;
 
-  BtnApply.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile);
-  BtnUndo.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile);
+  BtnApply.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile);
+  BtnUndo.Enabled := (ValidMP3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile);
 
   PictureHasChanged := False;
   ID3v1HasChanged := False;
   ID3v2HasChanged := False;
   VorbisCommentHasChanged := False;
   ApeTagHasChanged := False;
+  M4aTagHasChanged := False;
 end;
 
 
@@ -2344,6 +2430,41 @@ begin
         result := FileErr_NoFile;
 end;
 
+function TFDetails.UpdateM4AInFile(m4a: TM4AFile): TAudioError;
+begin
+    if ValidM4AFile then
+    begin
+        m4a.Artist := Edt_VorbisArtist.Text;
+        m4a.Title  := Edt_VorbisTitle.Text;
+        m4a.Album  := Edt_VorbisAlbum.Text;
+        m4a.Genre  := cb_VorbisGenre.Text;
+        m4a.Track  := Edt_VorbisTrack.Text;
+        m4a.Year        := Edt_VorbisYear.Text;
+        m4a.Copyright   := Edt_VorbisCopyright.Text;
+
+        m4a.Disc := Edt_VorbisCD.Text;
+        m4a.Comment := Edt_VorbisComment.Text;
+        m4a.Lyrics := Trim(Memo_Lyrics.Text);
+
+        if CurrentTagRatingChanged then
+        begin
+            m4a.SetSpecialData(DEFAULT_MEAN, M4ARating, IntToStr(CurrentTagRating));
+            m4a.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, IntToStr(CurrentTagCounter));
+            CurrentTagRatingChanged := False;
+            // Change Bib-Rating!!
+            // IMPORTANT for later call of SynchronizeAudioFile,
+            // as the rating should NOT be changed in that sync!
+            //CurrentAudioFile.Rating := CurrentTagRating;
+            CurrentBibRating  := CurrentTagRating;
+            CurrentBibCounter := CurrentTagCounter;
+        end;
+        m4a.Keywords := Trim(Memo_Tags.Text);
+
+        result := m4a.WriteToFile(CurrentAudioFile.Pfad);
+    end else
+        result := FileErr_NoFile;
+end;
+
 function TFDetails.UpdateApeTagInFile(ape: TbaseApeFile): TAudioError;
 begin
     if ValidApeFile then
@@ -2402,6 +2523,10 @@ begin
                     CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, '');
                     VorbisCommentHasChanged := True;
                 end;
+        at_M4A: begin
+                    CurrentTagObject.M4aFile.Lyrics := '';
+                    M4aTagHasChanged := True;
+                end;
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -2455,6 +2580,11 @@ begin
   if Not Assigned(FNewPicture) then
       Application.CreateForm(TFNewPicture, FNewPicture);
 
+  FNewPicture.LblConst_PictureType.Enabled := CurrentTagObject.FileType <> at_M4A;
+  FNewPicture.LblConst_PictureDescription.Enabled := CurrentTagObject.FileType <> at_M4A;
+  FNewPicture.cbPictureType.Enabled := CurrentTagObject.FileType <> at_M4A;
+  FNewPicture.EdtPictureDescription.Enabled := CurrentTagObject.FileType <> at_M4A;
+
   if FNewPicture.Showmodal = MROK then
       PictureHasChanged := True;
 
@@ -2467,6 +2597,7 @@ begin
         at_Mp3: CurrentTagObject.MP3File.Id3v2Tag.DeleteFrame(PictureFrames[cbPictures.ItemIndex] as TID3v2Frame );
         at_Ogg: ;
         at_Flac: CurrentTagObject.FlacFile.DeletePicture(TFlacPictureBlock(PictureFrames[cbPictures.ItemIndex]));
+        at_M4A: CurrentTagObject.M4aFile.SetPicture(Nil, M4A_Invalid);
         at_Monkey,
         at_WavPack,
         at_MusePack,
@@ -2488,6 +2619,7 @@ procedure TFDetails.Btn_SavePictureToFileClick(Sender: TObject);
 var Stream: TMemoryStream;
     mime: AnsiString;
     PicType: Byte;
+    m4aPictype: TM4APicTypes;
     Description: UnicodeString;
     idx: Integer;
     tmpBmp: TBitmap;
@@ -2505,6 +2637,19 @@ begin
             idx := cbPictures.ItemIndex;
             mime := TFlacPictureBlock(PictureFrames[idx]).Mime;
             TFlacPictureBlock(PictureFrames[idx]).CopyPicData(stream);
+        end;
+
+        if ValidM4AFile then
+        begin
+            mime := '';
+            if CurrentTagObject.M4aFile.GetPictureStream(stream, m4aPictype) then
+            begin
+                case m4aPictype of
+                  M4A_JPG: mime := 'image/jpeg';
+                  M4A_PNG: mime := 'image/png';
+                  M4A_Invalid: mime := '-'; // invalid
+                end;
+            end;
         end;
 
         if ValidApeFile then
@@ -2643,6 +2788,8 @@ begin
                 VorbisCommentHasChanged := True;
             if ValidApeFile then
                 ApeTagHasChanged := True;
+            if ValidM4AFile then
+                M4aTagHasChanged := True;
         end;
     end;
 end;
@@ -2655,6 +2802,8 @@ begin
         VorbisCommentHasChanged := True;
     if ValidApeFile then
         ApeTagHasChanged := True;
+    if ValidM4aFile then
+        M4aTagHasChanged := True;
 end;
 
 {
@@ -2683,6 +2832,8 @@ begin
         VorbisCommentHasChanged := True;
     if ValidApeFile then
         ApeTagHasChanged := True;
+    if ValidM4AFile then
+        M4aTagHasChanged := True;
 end;
 {
     --------------------------------------------------------
@@ -2698,7 +2849,7 @@ var Lyrics: TLyrics;
 begin
         //if Fileexists(AktuellesAudioFile.Pfad)
         //   AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
-        if ValidMp3File or ValidOggFile or ValidFlacFile or ValidApeFile then
+        if ValidMp3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile then
         begin
             CurrentAudioFile.FileIsPresent:=True;
             Lyrics := TLyrics.Create;
@@ -2726,6 +2877,8 @@ begin
                         VorbisCommentHasChanged := True;
                     if ValidApeFile then
                         ApeTagHasChanged := True;
+                    if ValidM4AFile then
+                        M4aTagHasChanged := True;
                 end;
             finally
                 Lyrics.Free;
@@ -2784,6 +2937,7 @@ begin
                 end;
         at_Ogg: result := VorbisCommentHasChanged;
         at_Flac: result := VorbisCommentHasChanged or PictureHasChanged;
+        at_M4A: result := M4aTagHasChanged or PictureHasChanged;
         at_Monkey,
         at_WavPack,
         at_MusePack,

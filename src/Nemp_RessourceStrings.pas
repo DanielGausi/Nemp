@@ -84,6 +84,9 @@ DetailForm_ID3v2Info = '%d Bytes (%d used)';
 
 DetailForm_VorbisCaption = 'Vorbis Comments';
 DetailForm_ApeCaption    = 'Apev2 Tags';
+DetailForm_iTunesCaption = 'iTunes Tags';
+
+DetailForm_OnlyOneM4ACover = '(only one cover supported)';
 
 DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
 DetailForm_HighPlayCounter = 'This file was played %d times. This information will be irretrievably deleted if you reset the rating.';
@@ -572,14 +575,14 @@ MediaLibrary_OperationCancelled = 'Operation cancelled';
 MediaLibrary_SearchLyricsComplete_SingleNotFound = 'Sorry, the lyrics for this file cannot be found.';
 MediaLibrary_SearchLyricsComplete_AllFound = 'Lyricsearch complete. All Lyrics found.';
 MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyricsearch complete. %d of %d lyrics found. You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
-MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are supported only in *.mp3, *.ogg and *.flac-files.';
-MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are supported only in *.mp3, *.ogg and *.flac-files.';
+MediaLibrary_SearchLyricsComplete_FewFound = 'Lyricsearch complete. Only %d of %d lyrics found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are not supported in some filetypes (e.g. wma or wav).';
+MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but nothing found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that lyrics are not supported in some filetypes (e.g. wma or wav).';
 
 MediaLibrary_SearchTagsComplete_SingleNotFound = 'Sorry, for this file are no additional Tags available.';
 MediaLibrary_SearchTagsComplete_AllFound = 'Tagsearch complete. Added some Tags for every file.';
 MediaLibrary_SearchTagsComplete_ManyFound = 'Tagsearch complete. Found Tags for %d of %d files.';
-MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
-MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are supported only in *.mp3, *.ogg and *.flac-files.';
+MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
+MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
 
 MediaLibrary_SomeErrorsOccured = 'Some unexpected errors appeared during the process. Please view the Error-Log for details.';
 

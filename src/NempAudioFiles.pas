@@ -36,8 +36,8 @@ unit NempAudioFiles;
 interface
 
 uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
-  AudioFileBasics, Mp3FileUtils, ID3v2Frames,
-  Mp3Files, FlacFiles, OggVorbisFiles,
+  AudioFileBasics, Mp3FileUtils, ID3v2Frames, ID3GenreList,
+  Mp3Files, FlacFiles, OggVorbisFiles, M4AFiles, M4aAtoms,
   VorbisComments, cddaUtils,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
   Apev2Tags, ApeTagItem, MusePackFiles,
@@ -94,6 +94,14 @@ type
                 AUDIO_ApeErr_InvalidApeFile,
                 AUDIO_ApeErr_InvalidApeTag,
 
+                AUDIO_M4aErr_Invalid_TopLevelAtom,
+                AUDIO_M4aErr_Invalid_UDTA,
+                AUDIO_M4aErr_Invalid_METAVersion,
+                AUDIO_M4aErr_Invalid_MDHD,
+                AUDIO_M4aErr_Invalid_STSD,
+                AUDIO_M4aErr_Invalid_STCO,
+                AUDIO_M4aErr_Invalid_DuplicateUDTA,
+                AUDIO_M4aErr_Invalid_DuplicateTRAK,
 
                 AUDIOERR_UnsupportedMediaFile,
                 AUDIOERR_EditingDenied,
@@ -134,6 +142,16 @@ type
               'Invalid Ape File',
               'Invalid Apev2Tag' ,
               //
+
+              'Invalid Top-Level Atom',
+              'Invalid UDTA Atom',
+              'Invalid META Version',
+              'Invalid MDHD Atom',
+              'Invalid STSD Atom',
+              'Invalid STCO Atom',
+              'Duplicate UDTA Atoms',
+              'Duplicate TRAK Atoms',
+              //
               'Metadata is not supported in this file type',
               'Quick access to metadata denied',
               // CDDA
@@ -142,6 +160,10 @@ type
               // unknown
               'Unknown Error'
     );
+
+    M4ARating: AnsiString = 'NEMP RATING';
+    M4APlayCounter: AnsiString = 'NEMP PLAYCOUNTER';
+
 
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
@@ -262,6 +284,7 @@ type
 
         procedure GetMp3Info(aMp3File: TMp3File; filename: UnicodeString; Flags: Integer = 0);
         procedure GetFlacInfo(aFlacFile: TFlacFile; Flags: Integer = 0);
+        procedure GetM4AInfo(aM4AFile: TM4aFile; Flags: Integer = 0);
         procedure GetOggInfo(aOggFile: TOggVorbisFile; Flags: Integer = 0);
         procedure GetWmaInfo(aWmaFile: TWmaFile);
         procedure GetWavInfo(aWavFile: TWavFile);
@@ -275,6 +298,7 @@ type
         procedure SetMp3Data(aMp3File: TMp3File);
         procedure SetOggVorbisData(aOggFile: TOggVorbisFile);
         procedure SetFlacData(aFlacFile: TFlacFile);
+        procedure SetM4AData(aM4AFile: TM4AFile);
         procedure SetExoticInfo(aBaseApeFile: TBaseApeFile);
 
         // Write a string in a stream. In previous versions several encodings were
@@ -640,6 +664,18 @@ begin
         WavErr_WritingNotSupported  : result := AUDIOERR_Unkown; // Nemp does not permit this
 
         FileErr_NotSupportedFileType: result := AUDIOERR_UnsupportedMediaFile;
+
+        M4aErr_Invalid_TopLevelAtom : result := AUDIO_M4aErr_Invalid_TopLevelAtom ;
+        M4aErr_Invalid_UDTA         : result := AUDIO_M4aErr_Invalid_UDTA         ;
+        M4aErr_Invalid_METAVersion  : result := AUDIO_M4aErr_Invalid_METAVersion  ;
+        M4aErr_Invalid_MDHD         : result := AUDIO_M4aErr_Invalid_MDHD         ;
+        M4aErr_Invalid_STSD         : result := AUDIO_M4aErr_Invalid_STSD         ;
+        M4aErr_Invalid_STCO         : result := AUDIO_M4aErr_Invalid_STCO         ;
+        M4aErr_Invalid_DuplicateUDTA: result := AUDIO_M4aErr_Invalid_DuplicateUDTA;
+        M4aErr_Invalid_DuplicateTRAK: result := AUDIO_M4aErr_Invalid_DuplicateTRAK;
+
+        M4aErr_RemovingNotSupported : result := AUDIOERR_Unkown; // Nemp does not permit this
+
     else
         result := AUDIOERR_Unkown ;
     end;
@@ -1349,6 +1385,7 @@ begin
                       at_Mp3:  GetMp3Info(MainFile.MP3File, filename, Flags);
                       at_Ogg: GetOggInfo(Mainfile.OggFile, Flags);
                       at_Flac: GetFlacInfo(MainFile.FlacFile, Flags);
+                      at_M4A: GetM4AInfo(MainFile.M4AFile, Flags);
                       at_Monkey,
                       at_WavPack,
                       at_MusePack,
@@ -1615,6 +1652,76 @@ end;
 
 {
     --------------------------------------------------------
+    GetM4AInfo
+    --------------------------------------------------------
+}
+procedure TAudioFile.GetM4AInfo(aM4AFile: TM4aFile; Flags: Integer);
+var CoverStream: TMemoryStream;
+    picType: TM4APicTypes;
+    aBMP: TBitmap;
+    newID: String;
+    aMime: AnsiString;
+begin
+
+    CD      := aM4AFile.Disc;
+    Comment := aM4AFile.Comment;
+    Lyrics  := UTF8String(aM4AFile.Lyrics);
+    // Playcounter/Rating: Maybe incompatible with other Taggers
+    // PlayCounter := StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
+    // Rating :=  StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
+    // LastFM-Tags/CATEGORIES: Probably Nemp-Only
+    RawTagLastFM := UTF8String(aM4AFile.Keywords);
+    fVBR := False;
+    case aM4AFile.Channels of
+        1: fChannelModeIDX := 3; // Mono
+        2: fChannelModeIDX := 0; // Stereo
+        3..100: fChannelModeIDX := 5; // Multichannel
+    else
+        fChannelModeIDX := 4; // unknown
+    end;
+
+    PlayCounter := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
+    Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
+
+    if (Flags and GAD_Cover) = GAD_Cover then
+    begin
+        // clear ID, so MediaLibrary.GetCover can do its job
+        CoverID := '';
+        CoverStream := TMemoryStream.Create;
+        try
+            if aM4AFile.GetPictureStream(CoverStream, picType) then
+            begin
+                case picType of
+                  M4A_JPG: aMime := 'image/jpeg';
+                  M4A_PNG: aMime := 'image/png';
+                  M4A_Invalid: aMime := '-'; // invalid
+                end;
+                // Cover in FlacFile Found
+                aBMP := TBitmap.Create;
+                try
+                    PicStreamToImage(CoverStream, aMime, aBMP);
+                    if not aBMP.Empty then
+                    begin
+                        CoverStream.Seek(0, soFromBeginning);
+                        newID := MD5DigestToStr(MD5Stream(CoverStream));
+                        if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                            CoverID := newID;
+                    end;
+                finally
+                    aBMP.Free;
+                end;
+
+            end;
+        finally
+            CoverStream.Free;
+        end;
+    end;
+
+
+end;
+
+{
+    --------------------------------------------------------
     GetWmaInfo
     Uses ATL
     --------------------------------------------------------
@@ -1820,6 +1927,8 @@ begin
                (ext = 'mp3')
             or (ext = 'ogg')
             or (ext = 'flac')
+            or (ext = 'm4a')
+            or (ext = 'mp4')
             or (ext = 'ape')
             or (ext = 'mpc')
             // other extensions or really rare used formats
@@ -1873,6 +1982,7 @@ begin
                         at_Mp3      : SetMp3Data(MainFile.MP3File);
                         at_Ogg      : SetOggVorbisData(MainFile.OggFile);
                         at_Flac     : SetFlacData(MainFile.FlacFile);
+                        at_M4A      : SetM4AData(MainFile.M4aFile);
                         at_Monkey,
                         at_WavPack,
                         at_MusePack,
@@ -1952,6 +2062,23 @@ begin
 
       // LastFM-Tags/CATEGORIES: Probably Nemp-Only
       aFlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
+end;
+
+procedure TAudioFile.SetM4AData(aM4AFile: TM4AFile);
+begin
+    aM4AFile.Disc := CD;
+    aM4AFile.Comment := Comment;
+    aM4AFile.Lyrics := String(Lyrics);
+
+    if Playcounter > 0 then
+         aM4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, IntToStr(PlayCounter))
+    else aM4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, '');
+
+    if Rating > 0 then
+         aM4AFile.SetSpecialData(DEFAULT_MEAN, M4ARating, IntToStr(Rating))
+    else aM4AFile.SetSpecialData(DEFAULT_MEAN, M4ARating, '');
+
+    aM4AFile.Keywords := String(RawTagLastFM);
 end;
 
 procedure TAudioFile.SetExoticInfo(aBaseApeFile: TBaseApeFile);
@@ -2252,7 +2379,7 @@ begin
             MP3DB_GENRE: begin
                 aStream.Read(GenreIDX,SizeOf(GenreIDX));
                 if GenreIDX <= 125 then
-                  genre := Genres[GenreIDX]
+                  genre := ID3Genres[GenreIDX]
                 else
                   genre := '';
             end;
@@ -2340,7 +2467,7 @@ begin
             MP3DB_GENRE: begin
                 aStream.Read(GenreIDX,SizeOf(GenreIDX));
                 if GenreIDX <= 125 then
-                  genre := Genres[GenreIDX]
+                  genre := ID3Genres[GenreIDX]
                 else
                   genre := '';
             end;
@@ -2508,7 +2635,7 @@ begin
     end;
 
 
-    GenreIDXint := Genres.IndexOf(genre);
+    GenreIDXint := ID3Genres.IndexOf(genre);
     if GenreIDXint = -1 then
     begin
           // No Standard-Genre - write String
