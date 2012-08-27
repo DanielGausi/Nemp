@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Nemp - Noch ein mp3-Player">
+		<param name="Local" value="nemp_start.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Grundlagen">
+		<param name="Local" value="nemp_basics.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Player und Playlist">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Anzeigen im Player">
+			<param name="Local" value="player_controls.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Erweiterte Steuerung">
+			<param name="Local" value="player_controls_extended.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Die Playlist">
+			<param name="Local" value="player_playlist.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Scrobbeln mit Nemp">
+			<param name="Local" value="scrobbeln.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Geburtstagsmodus">
+			<param name="Local" value="geburtstagsmodus.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Nemp Webserver">
+			<param name="Local" value="webserver.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Keyboard-Display">
+			<param name="Local" value="keyboardapps.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Special Features">
+			<param name="Local" value="player_special_features.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Die Medienbibliothek">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Der Coverflow">
+			<param name="Local" value="nemp_coverflow.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Die Tagwolke">
+			<param name="Local" value="nemp_tagcloud.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pflege der Medienbibliothek">
+			<param name="Local" value="medienbib_pflege.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Der Tagwolken-Editor">
+			<param name="Local" value="medienbib_cloudeditor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Webradio">
+			<param name="Local" value="webradio_verwaltung.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Eigenschaften, Dateidetails">
+			<param name="Local" value="nemp_anzeige_dateidetails.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Einstellungen">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Allgemeine Einstellungen">
+			<param name="Local" value="optionen_1_allgemein.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Ansicht">
+			<param name="Local" value="optionen_7_Ansicht.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Player-Einstellungen">
+			<param name="Local" value="optionen_a_player-einstellungen.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Dateiverwaltung">
+			<param name="Local" value="optionen_c_medienbibliothek.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Fehlerbehebung">
+		<param name="Local" value="Fehlerbehebung.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Lizenz">
+		<param name="Local" value="lizenz.html">
+		</OBJECT>
+</UL>
+</BODY></HTML>
