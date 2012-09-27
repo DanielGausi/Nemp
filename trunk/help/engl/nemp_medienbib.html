@@ -2,15 +2,10 @@
 <html>
 <head>
 
-
-  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>The Media Library</title>
 
-  
 
-
-  
-  <title>Nemp: Die Medienbibliothek</title>
   <style title="" media="" type="text/css">
 .head { margin: 0px;
 padding: 0px;
@@ -28,197 +23,157 @@ font-size: 12px;
 
 <body>
 
-
 <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
-
 
   <tbody>
 
-
     <tr>
-
 
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
-
       <td>
-      
-      <h2 class="head">Die Medienbibliothek</h2>
-
+      <h2 class="head">The Media Library</h2>
 
       </td>
 
-
     </tr>
 
-
-  
   </tbody>
 </table>
 
-
 <hr style="width: 100%; height: 2px;"><br>
 
-
-Nemp kann auf Ihrem Computer nach Audiodateien suchen, diese in einer
-Liste verwalten und nach verschiedenen Kriterien sortiert anzeigen.
-&Uuml;ber eine Schnellsuche finden Sie in Nullkommanichts den
-gew&uuml;nschten Titel und k&ouml;nnen ihn der Playlist
-hinzuf&uuml;gen.<br>
-
+Nemp can search your computer for audio files and organize them in the
+Nemp media library. This library can be sorted by several criteria, so
+that you can browse in your music collection. Through the Quicksearch
+feature you have a very fast access to specific files.<br>
 
 <br>
 
 <br>
 
+<span style="font-weight: bold;">Search for audio files,
+building the media library<br>
 
-<span style="font-weight: bold;">Computer nach
-Audiodateien untersuchen</span><br>
+</span>Choose "Medialibrary -&gt; Scan harddisk for audio
+files" and select your music directory. Nemp will then search this
+directory (and all of its subdirectories) and add all audio files into
+the media library.<br>
 
-
-W&auml;hlen Sie im Men&uuml; "Medienbibliothek -&gt;
-Computer nach Audiodateien untersuchen" und w&auml;hlen Sie den
-Ordner mit Ihren Musikdateien aus. Nemp scannt dann dieses Verzeichnis
-inklusive aller Unterordner und sortiert gefundene Audiodateien in die
-Medienbibliothek ein.<br>
-
-
-Dieser Vorgang kann eine ganze Zeit lang dauern - Nemp schafft
-ungef&auml;hr 20-40 Dateien pro Sekunde. Sie k&ouml;nnen Nemp
-aber w&auml;hrenddessen weiter benutzen - auch wenn einiges dann
-nicht ganz so fl&uuml;ssig l&auml;uft.<br>
-
+This may take some time, Nemp can analyse approximately 20-40 files per
+second, mostly depending on the disk speed.&nbsp;<br>
 
 <br>
 
 <br>
 
+<span style="font-weight: bold;">Browsing the media library</span><br>
 
-<span style="font-weight: bold;">Browsen in der
-Medienbibliothek</span><br>
-
-
-Es gibt drei grundlegende M&ouml;glichkeiten, in der
-Medienbibliothek zu st&ouml;bern. Sie k&ouml;nnen zwischen den
-drei Browsemodi mit den Buttons im oberen Bereich umschalten.<br>
-
+Nemp offers three ways of browsing in your media library. You can
+switch between them with these three Buttons in the top left of the
+main window.<br>
 
 <br>
-
 
 <div style="text-align: center;"><img style="width: 72px; height: 24px;" alt="browsebuttons" src="TabBtnBrowse.png"><br>
 
-
 </div>
-
 
 <br>
 
+The <span style="font-weight: bold;">"classic view"</span>
+is named "classic", as it was the first mode (and the only one in
+earlier Versions). The files in your library are sorted by two criteria
+(e.g. Artist+Album or Year+Artist). In the left part you can find all
+(e.g.) Artists. After selecting one artist, the right part displays all
+(e.g.) Albums from this artist (this includes samplers with at least on
+track from this artist). The title list (bootom part of the main
+window) shows you all titles by the selected artist.<br>
 
-Die <span style="font-weight: bold;">"klassische Ansicht"</span> war zuerst da. Hier wird die Medienbibliothek
-nach zwei Kriterien gefiltert angezeigt - z.B. Interpret und Album. In
-der linken H&auml;lfte werden dann alle Interpreten aufgelistet.
-Wenn Sie einen Interpreten markieren, werden erstens in der Liste
-daneben alle Alben und Sampler angezeigt, auf denen dieser Interpret
-vertreten ist, und in der gro&szlig;en Liste unten alle Titel
-dieses Interpreten.<br>
+By selecting an specific album on the right part, you can limit the
+title list to the titles on this album.<br>
 
-
-&Uuml;ber das Kontextmen&uuml; "Browsen nach -&gt; ..."
-k&ouml;nnen Sie ausw&auml;hlen, nach welchen Kriterien sie in
-dieser Ansicht st&ouml;bern wollen.<br>
-
+By "Browse by -&gt; ..." on the context menu you can choose the
+sorting criteria.<br>
 
 <span style="font-style: italic;"><br>
 
+</span>The <span style="font-weight: bold;">"Coverflow"</span>
+displays all your albums in a - yes, really! - coverflow. Nemp tries to
+find a matching cover for each of your audiofiles. For this you should
+have organized your file structure by albums (in some way). Nemp will
+search the directory of the audiofile for image files, and if there is
+a file named (e.g.) "front.jpg", it will assume that this is a proper
+cover art for the audio file. (The exact procedure is a little bit more
+complex, but that should be enough here). Some audio filesmay have
+embedded cover art - this one will be preferred by Nemp.<br>
 
-</span>Der <span style="font-weight: bold;">"Coverflow"</span> sortiert die Lieder nach Covern. Hierzu
-scannt Nemp beim Suchen nach Audiodateien nicht nur
-die&nbsp;Musikdateien, sondern sucht zu jedem Lied auch ein
-passendes Cover auf der Platte. <br>
-
-
-Hierzu nimmt Nemp an, dass die Ordnerstruktur in etwa der Albenstruktur
-entspricht, d.h. Sie haben auf Ihrer Platte pro Album einen Ordner.<br>
-
-
-Wenn kein Cover gefunden wird, kann Nemp im Internet nach einem
-passenden Cover suchen.<br>
-
+If no cover art can be found, Nemp can try to find a proper image
+online, using the LastFM webservice.<br>
 
 <br>
 
+The <span style="font-weight: bold;">"Tagcloud"</span>
+puts all the information like Artist, Album, Genre, Year, Decade, ...
+together in one big list and displays the most common used. If you
+resize the main window, the tag cloud can display more tags. <br>
 
-In der <span style="font-weight: bold;">"Tagwolke"</span> werden alle Eigenschaften wie Interpret, Album, Genre,
-Jahr, Jahrzehnt in einen gro&szlig;en Topf geworfen, und die
-h&auml;ufigsten Eigenschaften werden angezeigt - immer soviel, wie
-gerade in dem Fenster Platz ist. Wenn Sie auf einen Tag klicken,
-bekommen Sie alle Titel mit diesem Tag angezeigt. Wenn Sie einen Tag
-doppelt anklicken, wird eine neue Tagwolke gebildet, die nur Titel mit
-diesem Tag ber&uuml;cksichtigt.<br>
-
-
-<br>
-
-<br>
-
-<span style="font-weight: bold;">Die Schnellsuche</span><br>
-
-Wenn Sie einen bestimmten Titel h&ouml;ren wollen, dann k&ouml;nnen Sie
-daf&uuml;r die Schnellsuche benutzen. Fangen Sie einfach an zu tippen,
-und Nemp zeigt Ihnen w&auml;hrend des Tippens alle Titel an, die dazu
-passen. <br>
-
-<span style="font-style: italic;">Tip: In der Voreinstellung werden
-"w&auml;hrend des Tippens" nur exakte Treffer aufgelistet. Wenn Sie die
-Entertaste bet&auml;tigen, f&uuml;hrt Nemp einen ungenauen Durchlauf
-durch, der auch Rechtschreibfehler ber&uuml;cksichtigt. Dann werden
-auch Titel von "P!nk" &nbsp;gefunden, wenn Sie nach "Pink" gesucht
-haben. Und wenn Sie sich nicht sicher sind, wieviele r, s und t in
-"Alanis Morissette" vorkommen, ist das auch nicht schlimm.</span><br style="font-style: italic;">
+Click on a tag will show you all titles with this tag. After a
+doubleclick a new tag cloud is build considering only these titles, so
+you can refine your search - e.g. all "Female Vocalists" from the "90s"
+doing "Alternative Rock".<br>
 
 <br>
 
 <br>
 
-<span style="font-weight: bold;">
-Von der Medienliste in die Playlist</span><br>
+<span style="font-weight: bold;">The Quicksearch</span><br>
 
+If you want to listen to a specific song, you can use the quicksearch.
+Just start typing the title and/or artist, album, filename of the song.
+<br>
 
-Sie k&ouml;nnen dann einen einzelnen Titel, oder ein ganzes Album (oder was sonst grade in der Browseliste angezeigt wird)
-in die Playlist einf&uuml;gen - entweder &uuml;ber das
-Kontextmen&uuml; oder per Drag&amp;Drop.<br>
+<span style="font-style: italic;">Tipp: The default
+setting gives you only exact matches of your search "while you type".
+If you hit the Enter key, Nemp will do an additional fuzzy search. This
+will find e.g. titles from "P!nk" if you search for "Pink", and it will
+ignore some typos (Do you know how many r, s and t are correct in
+"Alanis Morisette"?).<br style="font-style: italic;">
 
-Wenn Sie in der unteren Liste einen Titel doppelt anklicken, dann
-passiert das, was Sie in den Optionen als Standard-Aktion eingestellt
-haben.<br>
-
-<ul style="list-style-type: circle;">
-
-  <li>In die Playlist einf&uuml;gen (Voreinstellung). Der Titel wird ans Ende der Playlist angeh&auml;ngt</li>
-
-  <li>Abspielen (und alte Playlist l&ouml;schen). Die aktuelle Playlist wird geleert und eine neue begonnen.</li>
-
-  <li>Einf&uuml;gen hinter den aktuellen Titel.&nbsp;Nach dem aktuellen
-Titel einf&uuml;gen. Der neue Titel wird dann in die Vormerkliste
-eingef&uuml;gt, damit er auch wirklich als n&auml;chstes abgespielt
-wird.</li>
-
-  <li>Einfach abspielen. Die Wiedergabe der Playlist wird unterbrochen
-und das Lied wird "einfach so" abgespielt. Wenn Sie im Player auf
-"n&auml;chstes Lied" klicken, setzt die Wiedergabe der Playlist an der
-unterbrochenen Stelle wieder ein.</li>
-
-</ul>
-
-
-<span style="font-style: italic;">Tip: Drag&amp;Drop
-funktioniert auch aus dem Player heraus, um z.B. ein Lied auf einen
-mobilen mp3-Player zu kopieren.
 </span><br>
 
 <br>
 
+<span style="font-weight: bold;">
+Form the media library into the playlist</span><br>
+
+You can add a single track, a list of tracks or a complete album into
+the playlist by using the context menu or drag&amp;drop. If you use
+a double click on one item in the title list, the default action is
+executed (Player settings -&gt; Playlist)<br>
+
+<ul style="list-style-type: circle;">
+
+  <li>Enqueue at the end of the playlist: Just add the file to
+the playlist</li>
+
+  <li>Play (and clear current playlist) deletes the current
+playlist and starts a new one with the selected file(s)</li>
+
+  <li>Enqueue after the current track inserts the selected
+file(s) after the currently plaing track</li>
+
+  <li>Just play focussed &nbsp;file starts playback of the
+focussed file without changing the playlist. After the playback is
+complete, Nemp will proceed with the playlist.</li>
+
+</ul>
+
+<span style="font-style: italic;">Tipp: Drag&amp;Drop
+also works from Nemp to external programs. So you can copy some files
+just by Drag&amp;Drop from Nemp to the Windows Explorer.</span><br>
+
+<br>
 
 </body>
 </html>
