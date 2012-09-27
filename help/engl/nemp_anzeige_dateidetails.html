@@ -3,7 +3,7 @@
 <head>
 
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>Eigenschaften, Dateidetails</title>
+  <title>Properties, File Details</title>
 
 
   <style title="" media="" type="text/css">
@@ -32,7 +32,7 @@ font-size: 12px;
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
       <td>
-      <h2 class="head">Eigenschaften, Dateidetails</h2>
+      <h2 class="head">Properties, File Details</h2>
 
       </td>
 
@@ -42,62 +42,75 @@ font-size: 12px;
 </table>
 
 <hr style="width: 100%; height: 2px;"><br>
-Wenn Sie eine Datei in der Playlist oder in der Medienbibliothek
-markieren, und &uuml;ber das Popupmen&uuml; den Punkt "Eigenschaften"
-w&auml;hlen, dann bekommen Sie in einem weiteren Fenster eine ganze
-Reihe Eigenschaften dieser Datei angezeigt.<br>
-<br>
-<span style="font-weight: bold;">Allgemein</span><br>
-Auf der ersten Seite finden Sie die Daten, die in der Medienbibliothek
-&uuml;ber diese Datei gespeichert sind. &Uuml;ber den Button "Explorer"
-bekommen Sie die Datei im Windows-Explorer angezeigt, &uuml;ber
-"Eigenschaften" erhalten Sie den Windows-Eigenschaftsdialog dazu.<br>
-Der Button "Aktualisieren" liest die Daten erneut aus dem ID3-Tag (bei
-mp3, sonst halt andere Metatags) und &uuml;berschreibt die Daten aus
-der Medienbibliothek mit diesen Daten.<br>
-Au&szlig;erdem finden Sie auf dieser Seite die Bilddateien, die Nemp
-f&uuml;r die Coverauswahl gefunden hat. Durch einen Doppelklick auf das
-Bild wird es mit dem Standard-Bildbetrachter ge&ouml;ffnet.<br>
-<br>
-<span style="font-weight: bold;">Id3Tags (mp3) / Vorbis Kommentare (ogg, flac)</span><br>
-Auf der zweiten Seite k&ouml;nnen Sie die Metadaten der Datei
-bearbeiten. Unterst&uuml;tzt werden dabei mp3-Dateien (ID3-Tags), sowie
-ogg- und flac-Dateien (Vorbis Kommentare).<br>
-Wenn Sie hier Daten ver&auml;ndern, und unten auf "&Uuml;bernehmen"
-klicken, werden die Daten in die Datei geschrieben. Dies ist
-unabh&auml;ngig von der Einstellung bei den <a href="optionen_d_Automatic-rating.html">Metadaten</a>.<br>
-Da die Bewertungen auch unabh&auml;ngig von der Medienbibliothek
-gespeichert werden k&ouml;nnen, gibt es hier einen (oder zwei)
-Button(s). &Uuml;ber "Zur&uuml;cksetzen" setzen Sie die Bewertung und
-den Abspielz&auml;hler zur&uuml;ck auf Null.<br>
-Wenn die Bewertung aus der Medienbibliothek nicht mit der in den Tags
-gespeicherten Bewertung &uuml;bereinstimmt, gibt es auch einen Button
-"Bewertung synchronisieren", der die Daten aus der Medienbibliothek in
-den Tag &uuml;bernimmt.<br>
-<br>
-<span style="font-weight: bold;">Lyrics &amp; Bilder</span><br>
-Auch Liedtexte und Cover k&ouml;nnen direkt in der Musikdatei
-gespeichert werden (Cover nur bei mp3 und flac). Die Liedtexte
-k&ouml;nnen auch automatisiert &uuml;ber lyrics.wikia.com abgerufen
-werden.<br>
-<br>
-<span style="font-weight: bold;">MP3- und ID3-Details</span><br>
-Hier werden weitere Informationen &uuml;ber die mp3-Datei angezeigt.
-Viele Daten sind f&uuml;r den Normalanwender relativ unwichtig - einzig
-die ID3v2-Informationen sind h&auml;ufiger interessant: Wenn die
-Version 2.4.0 verwendet wird, hat Windows damit einige Probleme. Wenn
-es unter Windows zu Anzeigeproblemen kommt, dann liegt das h&auml;ufig
-an dieser Tag-Version.<br>
+
+When you select a file in the playlist or in the media library, you can
+choose "Properties" from the context menu. There you can see more
+detailed information about the file.<br>
 
 <br>
-<span style="font-weight: bold;">Tags f&uuml;r die Tagwolke</span><br>
-Nemp kann auch weitere Tags in den Dateien speichern, die von anderen
-Playern nicht verwendet werden k&ouml;nnen. Diese "weiteren Tags"
-werden f&uuml;r die Bildung der Tagwolke benutzt. Diese erweiterten
-Tags k&ouml;nnen v&ouml;llig beliebig gew&auml;hlt werden. Es sind
-sowohl alternative Genre-Einordnungen m&ouml;glich, aber auch sehr
-pers&ouml;nliche wie "Lieblingslied" oder "Skiurlaub 2010/11".<br>
+
+<span style="font-weight: bold;">General</span><br>
+
+On the first page you can find the information stored in the media
+library for this file. Through the button "Explorer" you can open the
+file in the Windows Explorer, and throught the button "Properties" you
+will get the Windows-Property dialog for this file.<br>
+
+Via "Refresh" Nemp will reread the ID3-Tags (or other types of
+metadata) and refresh the stored information in the media library.<br>
+
+Additionally you can see all the images Nemp has found for this file on
+your harddisk. A Doubleclick on the image will open it in your
+defaultimage viewer.<br>
+
 <br>
+
+<span style="font-weight: bold;">Id3-Tags (mp3) / Vorbis
+Comments (ogg, flac) / ...</span><br>
+
+The second page gives you a more detailed view on the file. Note that
+not all types of audio files supports metadata (e.g. wav) and that Nemp
+does not support all types of metadata (e.g. wma). Right now Nemp
+supports ID3-Tags (found in mp3 files), Ogg-Vorbis (*.ogg), Flac-
+Comments (*.flac), Apev2-Tags (e.g. *.ape, *.mpc) and iTunes-Tags
+(*.m4a).<br>
+
+You can edit the information, which is written into the file after
+click on the button "Apply".<br>
+
+The button "Reset rating" will reset the rating of the file back to 0,
+which will appear as 2.5 stars. In case the rating of the
+file&nbsp;in the media library is different from the rating stored
+in the metadata of the file, you will see a button to synchronize the
+rating.<br>
+
 <br>
+
+<span style="font-weight: bold;">Lyrics &amp; Pictures</span><br>
+
+Nemp can store lyrics and cover art directly into the file (cover art
+not supported for *.ogg). The lyrics can be downloaded from
+lyrics.wikia.com automatically, or (if theyare not available there)
+edited manually.<br>
+
+<br>
+
+<span style="font-weight: bold;">MP3- and ID3-Details</span><br>
+
+This is some nerdy stuff. Only the ID3v2-Version may be of interest. If
+it is 2.4.0, Windows may have some problems reading the metadata from
+the file. Most of the mp3-files should have the version 2.3.0.<br>
+
+<br>
+
+<span style="font-weight: bold;">Tags for tagcloud<br>
+
+</span>Nemp can store additional Tags in to the file, which may
+not be useful for other players. These "Additional Tags" are used for
+the tagcloud. You may enter some alternative genres, or personal
+information as "Holiday 2011/12". <br>
+
+<br>
+
 </body>
 </html>
