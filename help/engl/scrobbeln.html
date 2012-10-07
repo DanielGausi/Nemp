@@ -3,7 +3,7 @@
 <head>
 
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-  <title>Scrobbeln mit Nemp</title>
+  <title>Scrobble with Nemp</title>
 
 
   <style title="" media="" type="text/css">
@@ -35,7 +35,7 @@ font-size: 12px;
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
       <td>
-      <h2 class="head">Scrobbeln mit Nemp</h2>
+      <h2 class="head">Scrobble with Nemp</h2>
 
       </td>
 
@@ -45,74 +45,83 @@ font-size: 12px;
 </table>
 
 <hr style="width: 100%; height: 2px;"><br>
-Scrobbeln ist eine Erfindung von last.fm - einem sozialen Netzwerk im
-Internet mit dem Schwerpunkt auf Musik. Scrobbeln bedeutet, dass das,
-was Sie gerade h&ouml;ren, in Ihrem Benutzerprofil auf dieser Seite
-auftaucht. &Uuml;ber die Lieder, die Sie im Laufe der zeit h&ouml;ren,
-kristallisiert sich ein Musikgeschmack heraus, und Sie k&ouml;nnen
-&uuml;ber dieses Netzwerk Leute mit &auml;hnlichem Musikgeschmack
-finden und kennenlernen.<br>
+
+To Scrobble is a concept of LastFM - a social network with focus on
+music. Scrobling means, to&nbsp;share the information what you are
+currently listening to with your friends. LastFM will analyse your
+taste of music and recommends other users with a similar one.<br>
+
 <br>
-Nemp kann scrobbeln.<br>
+
+You can scrobble with Nemp.<br>
+
 <br>
+
 <br>
-<span style="font-weight: bold;">Scrobbler konfigurieren</span><br>
-Zuerst m&uuml;ssen Sie Nemp den Zugriff auf Ihr last.fm-Nutzerprofil
-erlauben. Rufen Sie dazu den Einstellungsdialog auf starten Sie die
-Konfiguration.<br>
-<ol>
-  <li>Online gehen und auf "Weiter" klicken. Nemp fordert bei last.fm
-ein so genanntes Token an, das im weiteren Verlauf f&uuml;r die
-Authentifizierung ben&ouml;tigt wird.</li>
-  <li>Klicken Sie erneut auf "Weiter". Sie werden dann in Ihrem Browser
-auf last.fm geschickt, wo Sie sich anmelden m&uuml;ssen. Nach der
-Anmeldung werden Sie auf eine Seite weitergeleitet, auf der das
-Nemp-Logo zu sehen ist. Klicken Sie dort auf "Zugriff erlauben" und
-wechseln Sie zur&uuml;ck zu Nemp.</li>
-  <li>Klicken Sie noch einmal auf "Weiter" (und direkt nocheinmal).
-Nemp kann jetzt mit Hilfe des Tokens, das sie durch den Klick auf den
-"Zulassen"-Button auf der Webseite mit Ihrem Account verkn&uuml;pft
-haben, von last.fm Ihren Nutzernamen und einen "Sessionkey" abrufen.
-Dieser Key wird (leicht verschl&uuml;sselt) in der
-Nemp-Konfigurationsdatei gespeichert und wird f&uuml;r das Scrobbeln
-ben&ouml;tigt.</li>
-</ol>
-<span style="font-weight: bold;"><br>
-Scrobbler aktivieren</span><br>
-Setzen Sie bei den Scrobbel-Einstellungen &nbsp;unter "Diese Sitzung
-scrobbeln" ein H&auml;kchen und klicken unten auf "&Uuml;bernehmen".
-Wenn Sie grunds&auml;tzlich immer scrobbeln wollen, setzen Sie auch ein
-H&auml;kchen bei "Immer scrobbeln".<br>
-Wenn das scrobbbeln aktiviert ist, wird im Hauptfenster ein
-Symbol <img style="width: 16px; height: 16px;" src="scrobbler.png" alt="">&nbsp;eingeblendet. <br>
+
+<span style="font-weight: bold;">Configure Nemp for
+scrobbling</span><br>
+
+At first Nemp needs access to your user profile on LastFM: Choose
+Settings -&gt; LastFM and click the Button "Start" and follow the
+instructions.<br>
+
 <br>
+
+<span style="font-weight: bold;">Activate scrobbling</span><br>
+
+Within teh settings dialog you can choose to scrobble just the current
+session (scrobble until you close Nemp), or to scrobble always.
+Scrobbling will start after click on the "Ok" button.<br>
+
+When Nemp is scrobbling your playlist, there will be an icon <img style="width: 16px; height: 16px;" src="scrobbler.png" alt=""> in the main window. You can stop scrobbling by a
+click on this icon.<br>
+
 <br>
-<span style="font-weight: bold;">Was wird gescrobbelt?</span><br>
-Das scrobbeln l&auml;uft in zwei Phasen ab. <br>
+
+<span style="font-weight: bold;">What does Nemp do while
+scrobbling?</span><br>
+
+Scrobbling consists of to stages.<br>
+
 <ul style="list-style-type: circle;">
-  <li>Die "Now-Playing"-Nachricht. Diese wird beim Start eines neuen
-Titels abgesetzt. In Ihrem Profil erscheint dann "h&ouml;rt gerade
-&lt;aktueller Titel&gt;".</li>
-  <li>Die "Submission"-Nachricht. Diese wird am Ende eines Titels
-gesendet, wenn mindestens 50% oder 4 Minuten des Titels abgespielt
-wurden. Zu kurze Titel (weniger als 30 Sekunden) werden generell nicht
-gescrobbelt. Diese Titel erscheinen dann in der History in Ihrem
-Nutzerprofil.</li>
+
+  <li>The "Now-Playing"-message. Every time a new track starts,
+nemp will notify LastFM. On your LastFM profile will appear something
+like&nbsp;"currently listens to&nbsp;&lt;current
+track&gt;".</li>
+
+  <li>The "Submission"-Message. This notification is sent at the
+end of a track. Note that Nemp will only "submit" the track, if at
+least 50% (or 4 minutes, whatever occurs first) of the track has been
+played. Short tracks (less than 30 seconds) are completely&nbsp;
+ignored. After a submit the track will appear in your history on LastFM.</li>
+
 </ul>
-<span style="font-weight: bold;"><br>
-Fehler beheben</span><br>
-Es kann manchmal zu Fehlern beim scrobbeln kommen. Nemp beendet dann
-das scrobbeln um den Dienst nicht unn&ouml;tig zu belasten.
-M&ouml;gliche Fehlerquellen sind<br>
+
+<span style="font-weight: bold;">Troubleshooting</span><br>
+
+Sometimes scrobbling doesn't work properly. Nemp will stop scrobbling
+in these cases.
+Possible error sources are<br>
+
 <ul style="list-style-type: circle;">
-  <li>Fehlende Internetverbindung</li>
-  <li>Eine Firewall blockiert die Kommunikation von Nemp mit last.fm</li>
-  <li>Der Sessionkey ist ung&uuml;ltig. Dann m&uuml;ssen Sie die Konfigurationsschritte 1.) bis 3.) erneut durchf&uuml;hren</li>
-  <li>Ihr Account ist gesperrt. Wenden Sie sich an last.fm</li>
+
+  <li>No internet connection</li>
+
+  <li>A firewall is blocking Nemp</li>
+
+  <li>The LastFM session key is invalid. You should restart the
+configuration to get a new session key.</li>
+
+  <li>Your account was blocked. You should contact LastFM for
+further assistance.</li>
+
 </ul>
-Wenn Sie glauben, dass Sie die Fehlerursache beseitigt haben,
-k&ouml;nnen Sie durch Klick auf "Wieder scrobbeln" einen neuen Versuch
-starten.<br>
+
+When you think, that you have fixed the source of error, you can click
+on "Scrobble again" in the settings dialog to try again..<br>
+
 <br>
 
 </body>
