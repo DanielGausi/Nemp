@@ -3,7 +3,7 @@
 <head>
 
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-  <title>Dateiverwaltung</title>
+  <title>File management</title>
 
 
   <style title="" media="" type="text/css">
@@ -35,7 +35,7 @@ font-size: 12px;
       <td style="width: 50px;"><img style="width: 47px; height: 27px;" src="hilfe.png" alt=""></td>
 
       <td>
-      <h2 class="head">Dateiverwaltung</h2>
+      <h2 class="head">File management</h2>
 
       </td>
 
@@ -46,81 +46,129 @@ font-size: 12px;
 
 <hr style="width: 100%; height: 2px;"><br>
 
-Stellen Sie das Verhalten der Medienbibliothek ein.<br>
-<br>
-<span style="font-weight: bold;">Verzeichnisse</span><br>
+Configure the media library.<br>
 
-Nemp kann einige Verzeichnisse beim Start nach neuen Dateien
-untersuchen, um die Medienbibliothek automatisch aktuell zu halten.<br>
+<br>
+
+<span style="font-weight: bold;">Directories</span><br>
+
+Nemp can scan your music directories for new files on every start to
+keep your media library up-to-date.<br>
 
 <ul style="list-style-type: circle;">
 
-  <li><span style="font-style: italic;">Automatisch neue Verzeichnisse &uuml;berwachen</span>
-f&uuml;gt ein
-Verzeichnis in die Liste der zu &uuml;berwachenden Verzeichnisse ein, wenn Sie es per Drag&amp;Drop in
-die
-Medienbibliothek einf&uuml;gen oder &uuml;ber das Men&uuml;
-neue Ordner
-untersuchen.</li>
+  <li><span style="font-style: italic;">Automatically
+monitor new directories</span>: Whenever you add a directory to
+your library (e.g. by dropping it from the Windows explorer), this
+directory will be added to this list.</li>
 
-  <li><span style="font-style: italic;">Bei neuen Verzeichnissen nachfragen</span> bewirkt, dass das erst
-auf Nachfragee passiert.</li>
+  <li><span style="font-style: italic;">Show query
+dialog when adding new directories</span> will show
+a&nbsp;dialog whether Nemp should monitor this directory or not.</li>
 
 </ul>
 
 <br>
 
-<span style="font-weight: bold;">Dateitypen f&uuml;r
-die Medienbibliothek</span><br>
+<span style="font-weight: bold;">Filetypes for the library</span><br>
 
-Nemp kann zwar ziemlich viele Dateien abspielen, aber
-vern&uuml;nftig
-untersuchen kann es nicht alle Typen. Sie k&ouml;nnen daher
-angeben,
-dass beim Scannen nach neuen Dateien z.B. wav- oder midi-Dateien nicht
-in die Medienbibliothek aufgenommen werden sollen.<br>
-<span style="font-style: italic;">Tipp: Nemp kommt sehr gut mit
-folgenden Dateitypen klar: mp3, ogg, flac sowie einigen exotischen
-Formaten wie ape, mpc, ofr, wv und tta.</span><br style="font-style: italic;">
-<span style="font-style: italic;">Die Formate f&uuml;r Windows (wma) und Apple (m4a) werden zurzeit noch nicht sinnvoll unterst&uuml;tzt.</span><br>
+Nemp is able to play a lot of filetypes, but some of them can not be
+analyzed for the media library. Therefore you can choose the filetypes
+you want to add to the library.&nbsp;<br>
+
+<span style="font-style: italic;">Tip: Nemp can handle
+very well the following types: mp3, ogg, flac, m4, ape, mpc, ofr, wv
+and tta. Windows Media Audio (wma) is not fully supported</span><span style="font-style: italic;">.</span><br>
 
 <br>
-<h3>Metadaten</h3>
-Nemp speichert "nebenbei" einige Informationen in den Metadaten
-("ID3-Tags") der Audiodateien. Zum Beispiel auch die Bewertung und den
-Abspielz&auml;hler. Nemp kann die Bewertung und den Abspielz&auml;hler
-automatisch anpassen.<br>
+
+<h3>File type registration</h3>
+
+Register Nemp as the default player for audio files and specify what to
+do with new files. "Enqueue" will add the new file to the last
+playlist, otherwise the current playlist is cleared and the new file
+will be the only one in the playlist.<br>
+
 <br>
+
+<h3>Meta data (e.g. ID3-Tags)</h3>
+
+Nemp uses meta tags to store some information directly into the files,
+e.g. the user rating and the play counter. This will change the files
+quite often, which may collide with your backup strategy. <br>
+
+<span style="font-style: italic;">Note 1: This setting is
+OPT-IN, and one of the Nemp wizard settings.</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">Note 2: The file is
+definitely changed, when you use the "Properties" dialog to change the
+meta data.</span><br>
+
+<br>
+
 <h3>Cover</h3>
-Nemp&nbsp;sucht beim Aufbau der Medienbibliothek auch nach passenden
-Covern. Wo genau gesucht werden soll, kann hier eingestellt werden.
-N&auml;heres dazu beim <a href="nemp_coverflow.html">Coverflow</a>.<br>
+
+While adding files to your library, Nemp will search for matching cover
+art for the audio files. Nemp will use the embedded cover art in the
+files and image files on your hard disk, if there are any. You can
+specify, where Nemp should scan for a matching cover art.<br>
+
 <br>
-<h3>Suchoptionen</h3>
-Damit die Schnellsuche in Nemp so schnell sein kann, werden mehr
-Ressourcen (Speicher und/oder Rechenpower) ben&ouml;tigt. Wenn Nemp auf
-einem &auml;lteren Rechner laufen soll, und die Schnellsuche nicht
-fl&uuml;ssig arbeitet, sollten Sie die Schnellsuche anpassen.<br>
-<ul style="list-style-type: circle;">
-  <li><span style="font-style: italic;">Suche beschleunigen</span>
-ben&ouml;tigt mehr Speicher, ca. 1 mb f&uuml;r 4000 Dateien. F&uuml;r
-beschleunigte Lyric-Suche wird entsprechend noch mehr Speicher
-verwendet.</li>
-  <li><span style="font-style: italic;">"W&auml;hrend Sie tippen"</span> durchsucht die Medienbibliothek w&auml;hrend des Tippens, ohne auf Bet&auml;tigung der Enter-Taste zu warten. <br>
-    <span style="font-style: italic;">Hinweis: Das geht in der Regel nur dann fl&uuml;ssig, wenn die Beschleunigung aktiviert ist</span></li>
-  <li><span style="font-style: italic;">Erlaube Fehler</span> f&uuml;hrt eine unscharfe Suche aus, d.h. kleine Fehler in den ID3-Tags werden &uuml;berlesen.<br>
-    <span style="font-style: italic;">Tipp: Das ist besonders sinnvoll bei Interpreten wie Pink (oder P!nk?) oder "</span><span style="font-style: italic;">Alanis Morissette</span><span style="font-style: italic;">", bei der man nie so genau wei&szlig;, wieviele r, s und t richtig sind.</span></li>
-</ul>
-<h3>Unicode</h3>
-Nemp kann einige Ungereimtheiten bzgl. Unicode und Zeichens&auml;tze
-ausb&uuml;geln. Das ist in vielen F&auml;llen nicht n&ouml;tig, und in
-den verbleibenden F&auml;llen nicht immer automatisch m&ouml;glich. Die
-<span style="font-style: italic;">Automatische Erkennung</span> probiert das dennoch.<br>
+
+<h3>Search options (extended settings)</h3>
+
+As almost everytime in computer science, you have the choice to do
+something fast (using a lot of memory), or to do it a bit slower (with
+less memory). <br>
+
+The Nemp quicksearch feature gives you the choice to adjust the memory
+usage.<br>
+
 <br>
-<span style="font-style: italic;"><span style="font-weight: bold;">Warnung:</span>
-Wenn Sie "In ID3v-Tags immer Unicode schreiben" aktivieren, k&ouml;nnen
-&auml;ltere Programme die Informationen m&ouml;glicherweise nicht mehr
-lesen.<br>
+
+Recommended is the accelerated search, which will use approximately 1mb
+for 4000 files, maybe some more if you include filenames (recommended)
+and comments (often not useful).<br>
+
+<br>
+
+<span style="font-style: italic;">Note: If you exclude
+filenames, the files should contain proper meta data if you want to
+find them through the quicksearch.</span><br>
+
+<br>
+
+<span style="font-weight: bold;">Quicksearch options<br>
+
+</span>Nemp can give you proper search results in (almost) real
+time, "while you type". If you have many files in your library
+(&gt; 10.000 files), accelerated search is strongly recommended for
+this feature.<br>
+
+In addition, Nemp can do a fuzzy search to handle some typos (in your
+search query as well as in the media library). This will take a little
+bit more time, so the fuzzy search is only done after hitting the enter
+key (default setting). If your PC is pretty fast, an on the fly fuzzy
+search may work as well.<br>
+
+<br>
+
+<span style="font-style: italic;">Tip: Fuzzy search is
+also useful for artists like Pink (or P!nk?) and Alanis Morissette (how
+many r, s, t are correct?).</span><br>
+
+<h3>Unicode (extended settings)</h3>
+
+Some mp3 files doesn't support unicode very well, and use corrupt char
+encoding. Nemp can try to guess the correct one by analyzing the
+filename: If a file is named with a lot of greek letters, it can be
+assumed that the information within the ID3-Tags is also in greek.<br>
+
+<span style="font-style: italic;">Tip: If you dont know
+what I'm talking about: Just ignore this setting. ;-)</span><br>
+
+<span style="font-style: italic;"><br>
+
 </span>
 </body>
 </html>

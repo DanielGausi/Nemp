@@ -4,14 +4,19 @@
 
 
 
+
+  
   
   
   <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 
+
   
 
 
+  
+  
   
   
   
@@ -38,7 +43,9 @@ font-size: 12px;
 
 
 
+
 <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+
 
 
 
@@ -46,7 +53,9 @@ font-size: 12px;
 
 
 
+
     <tr>
+
 
 
 
@@ -54,10 +63,13 @@ font-size: 12px;
 
 
 
+
       <td>
       
       
-      <h2 class="head">Player-Einstellungen</h2>
+      
+      <h2 class="head">Player settings XXXXXXXXXX</h2>
+
 
 
 
@@ -65,10 +77,13 @@ font-size: 12px;
 
 
 
+
     </tr>
 
 
 
+
+  
   
   
   </tbody>
@@ -76,68 +91,100 @@ font-size: 12px;
 
 
 
+
 <hr style="width: 100%; height: 2px;"><br>
-
-
-
-Stellen Sie den Player nach ihren W&uuml;nschen ein.<br>
+Configure the player according to your preferences. Some of the settings should be quie clear and are not mentioned here.<br>
 <br>
-<span style="font-style: italic;">Tipp: F&uuml;r einen &Uuml;bergang
-zwischen zwei Titeln in der Playlist ohne Stille aktivieren sie "Stille
-erkennen" und "Fading". Je n&auml;her der Schwellwert an 0dB liegt,
-desto fr&uuml;her wird der neue Titel gestartet.<br>
+<span style="font-weight: bold;">Output devices</span><br>
+If you use the "default" setting, Nemp will always use the default
+sound device on your system and switch instantly the playback, if you
+change the setting in the Windows Control Panel. <br>
+
 <br>
+<span style="font-weight: bold;">Fading</span><br>
+Nemp can fade between the tracks. Useful for many cases, but not for live recordings or classical music.<br>
+
+<span style="font-style: italic;">Tip: For a fading between two tracks
+without any silence, you should use "Silence detection" with a treshold
+of -20dB (or even -10dB) and a fading time of 4000 ms on title change.<br>
+
+<br>
+
 </span>
 <h3>Playlist</h3>
-<span style="font-style: italic;">Standardaktion f&uuml;r Audiodateien </span>wirkt
-sich auf das Einf&uuml;gen per Doppelklick oder &lt;Enter&gt; von der
-Titelanzeige der Medienbibliothek in die Playlist aus.<br>
+
+The <span style="font-style: italic;">Default action for audio files </span>is
+used when you hit the enter key (or double click) after selecting a
+title in the title list of the media library to add it into the
+playlist.&nbsp;<br>
+
 <br>
-<span style="font-style: italic;">Standardaktion f&uuml;r Kopfh&ouml;rer</span> wirkt sich auf das Einf&uuml;gen vom Kopfh&ouml;rer-Player in die Playlist aus, wenn Sie auf den Button <img style="width: 24px; height: 24px;" alt="headsetbtn" src="BtnHeadsetToPlaylist.png" align="middle"> klicken.<br>
+
+The <span style="font-style: italic;">Default setting for headset </span>is used when you click the button <img style="width: 24px; height: 24px;" alt="headsetbtn" src="BtnHeadsetToPlaylist.png" align="middle"> to add the current headphone file into the playlist.<br>
+
 <br>
-<span style="font-style: italic;">Merke Position im aktuellen Track beim Abspielen direkt aus der Medienbibliothek</span>
-bewirkt, dass bei "Datei einfach abspielen" als Standardaktion und
-Klick auf "n&auml;chster Titel" die Wiedergabe der Playlist genau dort
-fortgef&uuml;hrt wird, wo sie vorher unterbrochen wurde.<br>
-<span style="font-style: italic;">Tipp: Damit ist ein schnelles Reinh&ouml;ren in einen Titel m&ouml;glich, ohne die eigentliche Playlist zu ver&auml;ndern.</span><br>
+
+<span style="font-style: italic;">Remember track position when playing a song directly from the library</span>
+is used when you choose the "Just play" option above. When the "just
+played" track is completely played (or aborted by the user), Nemp will
+continue at the exact position of the previously played track.<br>
+<span style="font-style: italic;">Tip: Use this to preview a track without changing the the playlist itself.</span><br>
+
 <br>
-<h3>Webradio</h3>
-<span style="font-weight: bold;">Stream-Playlist parsen</span><br>
-Viele Sender 
-bieten eine *.pls-Datei zum Anh&ouml;ren an. Das ist eigentlich ein 
-Playlisten-Format, in dem mehrere Dateien oder Adressen angegeben sein k&ouml;nnen. 
-Bei Webradio-Sendern werden oft mehrere Adressen angegeben, die alle dasselbe 
-senden, aber die Last auf mehrere Server verteilen.<br>
-Nemp bietet die 
-M&ouml;glichkeit, all diese Adressen in die Playlist aufzunehmen - dann erscheint ein 
-Sender ggf. mehrfach in der Playlist. Ansonsten w&auml;hlt Nemp intern eine zuf&auml;llige 
-Adresse aus dieser Liste aus.<br>
+
+<h3>Webstreams</h3>
+
+<span style="font-weight: bold;">Parse stream playlist&nbsp;</span><br>
+Many webradio stations offer you a *.pls file to tune in. In fact, this
+is a well known format to store playlists (and supported by Nemp).
+Quite often these pls files contains a list of several servers.
+Sometimes all servers will stream the same content, but maybe with a
+different quality setting or encoding.<br>
+Nemp can parse the pls file and add all the servers to the playlist, or
+Nemp can just add the pls file itself to the playlist, and the server
+is choosen automatically.<br>
 <br>
-<span style="font-weight: bold;">Aufnahmeoptionen</span><br>
+<br>
+
+<span style="font-weight: bold;">Recording settings</span><br>
+
 Geben Sie an, in welchem Verzeichnis Nemp die Aufnahmen von Webradio speichern 
 soll, und welche Dateibenennung sie bevorzugen.<br>
+
 Der Punkt "Bei 
 Titelwechsel neue Datei beginnen" funktioniert ledier nur dann richtig, wenn der 
 Sender vern&uuml;nftige Tags mitsendet, die einen neuen Titel ank&uuml;ndigen. Anhand der 
 reinen Audiodaten kann leider kein Titelwechsel erkannt werden.<br>
+
 Sie 
 k&ouml;nnen die Dateien auch nach Gr&ouml;&szlig;e oder Dauer aufteilen. Beachten Sie dabei, 
 dass das nur ungef&auml;hre Werte sind. Die Dauer kann um einige Sekunden und die 
 Gr&ouml;&szlig;e um einige Kilobyte von der gew&uuml;nschhten Gr&ouml;&szlig;e abweichen.<br>
+
 <span style="font-style: italic;">Hinweis: Nemp kann nur Sender aufnehmen, die im mp3- 
 oder im aac-Format senden. Sender, die im Windows-Format oder Ogg-Vorbis senden, 
 k&ouml;nnen nicht aufgenommen werden.</span><br>
+
 <br>
+
 <h3>Effekte</h3>
+
 <span style="font-weight: bold;">&Auml;nderung der Geschwindigkeit</span><br>
+
 Nemp 
 kann die Wiedergabe eines Liedes schneller oder langsamer ablaufen lassen. 
 Technisch sehr einfach l&auml;sst es sich realisieren, wenn man dabei eine 
 Ver&auml;nderung der Tonh&ouml;he in Kauf nimmt. Das h&ouml;rt sich lustig an, ist aber nicht 
 immer gew&uuml;nscht.<br>
+
 Wenn man die CPU etwas mehr rechnen l&auml;sst, kann man diesen 
 Effekt recht gut vermeiden.<br>
 <br>
+<h3>Events</h3>
+
+<br>
+<br>
+
 
 
 
