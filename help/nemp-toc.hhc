@@ -17,6 +17,10 @@
 		<param name="Local" value="nemp_basics.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Der Nemp Wizard">
+		<param name="Local" value="wizard.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Player und Playlist">
 		</OBJECT>
 	<UL>
