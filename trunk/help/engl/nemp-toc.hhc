@@ -13,31 +13,35 @@
 		<param name="Local" value="nemp_start.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Grundlagen">
+		<param name="Name" value="Basics">
 		<param name="Local" value="nemp_basics.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Player und Playlist">
+		<param name="Name" value="The Nemp wizard">
+		<param name="Local" value="wizard.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Player and playlist">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Anzeigen im Player">
+			<param name="Name" value="Display/Controls of the player">
 			<param name="Local" value="player_controls.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Erweiterte Steuerung">
+			<param name="Name" value="Display (extended)">
 			<param name="Local" value="player_controls_extended.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Die Playlist">
+			<param name="Name" value="The playlist">
 			<param name="Local" value="player_playlist.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Scrobbeln mit Nemp">
+			<param name="Name" value="Scrobble with Nemp">
 			<param name="Local" value="scrobbeln.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Geburtstagsmodus">
+			<param name="Name" value="Birthday mode">
 			<param name="Local" value="geburtstagsmodus.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -45,32 +49,36 @@
 			<param name="Local" value="webserver.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Keyboard-Display">
+			<param name="Name" value="Keyboard display">
 			<param name="Local" value="keyboardapps.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Special Features">
+			<param name="Name" value="Special features">
 			<param name="Local" value="player_special_features.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Die Medienbibliothek">
+		<param name="Name" value="The media library">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Der Coverflow">
+			<param name="Name" value="The media library">
+			<param name="Local" value="nemp_medienbib.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="The coverflow">
 			<param name="Local" value="nemp_coverflow.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Die Tagwolke">
+			<param name="Name" value="The tag cloud">
 			<param name="Local" value="nemp_tagcloud.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Pflege der Medienbibliothek">
+			<param name="Name" value="Maintenance of the media library">
 			<param name="Local" value="medienbib_pflege.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Der Tagwolken-Editor">
+			<param name="Name" value="The tag cloud editor">
 			<param name="Local" value="medienbib_cloudeditor.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -78,37 +86,37 @@
 			<param name="Local" value="webradio_verwaltung.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Eigenschaften, Dateidetails">
+			<param name="Name" value="Properties, file details">
 			<param name="Local" value="nemp_anzeige_dateidetails.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Einstellungen">
+		<param name="Name" value="Settings">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Allgemeine Einstellungen">
+			<param name="Name" value="General settings">
 			<param name="Local" value="optionen_1_allgemein.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Ansicht">
+			<param name="Name" value="Display">
 			<param name="Local" value="optionen_7_Ansicht.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Player-Einstellungen">
+			<param name="Name" value="Player settings">
 			<param name="Local" value="optionen_a_player-einstellungen.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Dateiverwaltung">
+			<param name="Name" value="File management">
 			<param name="Local" value="optionen_c_medienbibliothek.html">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Fehlerbehebung">
+		<param name="Name" value="Troubleshooting">
 		<param name="Local" value="Fehlerbehebung.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Lizenz">
+		<param name="Name" value="License">
 		<param name="Local" value="lizenz.html">
 		</OBJECT>
 </UL>
