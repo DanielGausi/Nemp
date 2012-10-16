@@ -226,7 +226,6 @@ type
     MM_PL_Load: TMenuItem;
     MM_PL_Save: TMenuItem;
     MM_PL_AddPlaylist: TMenuItem;
-    N1: TMenuItem;
     N26: TMenuItem;
     MM_PL_ExtendedAddToMedialibrary: TMenuItem;
     MM_PL_ExtendedScanFiles: TMenuItem;
@@ -412,7 +411,6 @@ type
     PM_PL_SavePlaylist: TMenuItem;
     PM_PL_AddPlaylist: TMenuItem;
     N12: TMenuItem;
-    PM_PL_AddToPrebookListEnd: TMenuItem;
     PM_PL_PlayInHeadset: TMenuItem;
     N13: TMenuItem;
     PM_PL_ExtendedAddToMedialibrary: TMenuItem;
@@ -683,7 +681,6 @@ type
     ImgDetailCover: TImage;
     PanelTagCloudBrowse: TNempPanel;
     PM_ML_GetTags: TMenuItem;
-    PM_PL_RemoveFromPrebookList: TMenuItem;
     fspTaskbarManager: TfspTaskbarMgr;
     fspTaskbarPreviews1: TfspTaskbarPreviews;
     PM_ML_CloudEditor: TMenuItem;
@@ -696,8 +693,6 @@ type
     PM_PL_ShowInExplorer: TMenuItem;
     N69: TMenuItem;
     MM_PL_ShowInExplorer: TMenuItem;
-    MM_PL_AddSelectionToPreBooklistEnd: TMenuItem;
-    MM_PL_RemoveSelectionFromPrebooklist: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
     MM_ML_DeleteSelectedFiles: TMenuItem;
     MM_ML_GetAdditionalTags: TMenuItem;
@@ -870,6 +865,7 @@ type
     procedure PM_ML_ShowInExplorerClick(Sender: TObject);
 
     procedure ShowSummary;
+    procedure ShowHelp;
 
     procedure ToolButton7Click(Sender: TObject);
     procedure MM_ML_RefreshAllClick(Sender: TObject);
@@ -3710,14 +3706,30 @@ begin
 end;
 
 
+procedure TNemp_MainForm.ShowHelp;
+var ProperHelpFile: String;
+begin
+    if NempOptions.Language = 'de' then
+    begin
+        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.chm';
+        if NOT FileExists(ProperHelpFile) then
+            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
+    end else
+    begin
+        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
+        if NOT FileExists(ProperHelpFile) then
+            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.chm';
+    end;
+
+    if NOT FileExists(ProperHelpFile) then
+        TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
+    else
+        ShellExecute(Handle, 'open', PChar(ProperHelpFile), nil, nil, SW_SHOWNORMAl);
+end;
+
 procedure TNemp_MainForm.ToolButton7Click(Sender: TObject);
 begin
-  if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
-    TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
-  else
-    ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
-                      , nil, nil, SW_SHOWNORMAl);
+    ShowHelp;
 end;
 
 
@@ -4353,18 +4365,9 @@ begin
         ClipCursor(Nil);
     end;
     VK_F1: if ssShift in shift then
-           begin
-              PM_P_ViewSeparateWindows_EqualizerClick(NIL);
-           end else
-           begin
-
-              if NOT FileExists(ExtractFilePath(Paramstr(0))+'nemp-help.chm') then
-                TranslateMessageDLG((Error_HelpFileNotFound), mtError, [mbOK], 0)
-              else
-                ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'nemp-help.chm')
-                      , nil, nil, SW_SHOWNORMAl);
-           end;
+              PM_P_ViewSeparateWindows_EqualizerClick(NIL)
+           else
+              ShowHelp;
     VK_F2: if ssShift in shift then
               PM_P_ViewSeparateWindows_PlaylistClick(NIL);
     VK_F3: if ssShift in shift then
@@ -7057,7 +7060,7 @@ begin
 end;
 
 procedure TNemp_MainForm.PlayListPOPUPPopup(Sender: TObject);
-var prebookAllowed: Boolean;
+// var prebookAllowed: Boolean;
 begin
   if (PlayListVST.FocusedNode= NIL) then
   begin
@@ -7084,8 +7087,8 @@ begin
   end;
 
   // we could allow more, but this would be enough. ;-)
-  prebookAllowed := PlaylistVST.SelectedCount + NempPlaylist.PrebookCount <= 99;
-  PM_PL_AddToPrebookListEnd.Enabled := prebookAllowed;
+  //prebookAllowed := PlaylistVST.SelectedCount + NempPlaylist.PrebookCount <= 99;
+  //PM_PL_AddToPrebookListEnd.Enabled := prebookAllowed;
   // PM_PL_AddToPrebookListBeginning.Enabled := prebookAllowed;
 
   If NempPlaylist.Count = 0 then

@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 766
+  ClientHeight = 926
   ClientWidth = 858
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2571,18 +2571,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 858
-    Height = 104
+    Height = 264
     Align = alClient
     BevelOuter = bvNone
     Caption = '3'
     TabOrder = 1
     OnResize = VSTPanelResize
+    ExplicitHeight = 104
     object GRPBOXVST: TNempPanel
       Tag = 3
       Left = 0
       Top = 28
       Width = 858
-      Height = 76
+      Height = 236
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2591,23 +2592,25 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnPaint = NewPanelPaint
       OwnerDraw = False
+      ExplicitHeight = 76
       DesignSize = (
         858
-        76)
+        236)
       object VSTSubPanel: TNempPanel
         Left = 4
         Top = 4
         Width = 850
-        Height = 66
+        Height = 226
         Anchors = [akLeft, akTop, akRight, akBottom]
         BevelOuter = bvNone
         TabOrder = 0
         OwnerDraw = False
+        ExplicitHeight = 66
         object Splitter4: TSplitter
           Left = 400
           Top = 0
           Width = 4
-          Height = 66
+          Height = 226
           OnCanResize = Splitter4CanResize
           OnMoved = Splitter4Moved
           ExplicitLeft = 250
@@ -2617,7 +2620,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 404
           Top = 0
           Width = 446
-          Height = 66
+          Height = 226
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -2683,6 +2686,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseMove = VSTMouseMove
           OnNewText = VSTNewText
           OnStartDrag = VSTStartDrag
+          ExplicitHeight = 66
           Columns = <
             item
               Position = 0
@@ -2759,7 +2763,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 0
           Width = 400
-          Height = 66
+          Height = 226
           Align = alLeft
           BevelOuter = bvNone
           Constraints.MinWidth = 20
@@ -2769,6 +2773,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = VDTCoverResize
           OnPaint = PanelPaint
           OwnerDraw = False
+          ExplicitHeight = 66
           object ImgDetailCover: TImage
             Left = 2
             Top = 2
@@ -3133,9 +3138,9 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 32
     Top = 376
     object MM_Medialibrary: TMenuItem
-      Caption = '&Medialibrary'
+      Caption = '&Media library'
       object MM_ML_SearchDirectory: TMenuItem
-        Caption = '&Scan hard disk for audiofiles'
+        Caption = '&Scan hard disk for audio files'
         ImageIndex = 3
         ShortCut = 16462
         OnClick = MM_ML_SearchDirectoryClick
@@ -3305,7 +3310,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MM_ML_Search: TMenuItem
-        Caption = 'Search in the library'
+        Caption = 'Search'
         ShortCut = 16454
         OnClick = MM_ML_SearchClick
       end
@@ -3313,26 +3318,26 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '-'
       end
       object MM_ML_Delete: TMenuItem
-        Caption = '&Delete medialibrary'
+        Caption = '&Delete'
         ImageIndex = 12
         OnClick = MM_ML_DeleteClick
       end
       object MM_ML_Load: TMenuItem
-        Caption = '&Load a medialibrary'
+        Caption = '&Load'
         ImageIndex = 0
         OnClick = MM_ML_LoadClick
       end
       object MM_ML_Save: TMenuItem
-        Caption = 'Sa&ve medialibrary'
+        Caption = 'Sa&ve'
         ImageIndex = 1
         OnClick = MM_ML_SaveClick
       end
       object MM_ML_DeleteMissingFiles: TMenuItem
-        Caption = 'Cleanup library (delete &missing files)'
+        Caption = 'Cleanup (remove &missing files)'
         OnClick = DatenbankUpdateTBClick
       end
       object MM_ML_RefreshAll: TMenuItem
-        Caption = '&Refresh library (rescan all files)'
+        Caption = '&Refresh (rescan all files)'
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
       end
@@ -3345,7 +3350,7 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '-'
       end
       object MM_ML_DeleteSelectedFiles: TMenuItem
-        Caption = 'Delete selected files from the library'
+        Caption = 'Remove selected files'
         OnClick = PM_ML_DeleteSelectedClick
       end
       object MM_ML_SetRatingSelected: TMenuItem
@@ -3491,20 +3496,20 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MitzuflligenEintrgenausderMedienbibliothekfllen1Click
       end
       object MM_PL_Load: TMenuItem
-        Caption = '&Load playlist (and clear current list)'
+        Caption = '&Load (and clear current list)'
         ImageIndex = 0
         ShortCut = 16463
         OnClick = PM_PL_LoadPlaylistClick
       end
       object MM_PL_AddPlaylist: TMenuItem
-        Caption = 'L&oad  playlist (add files to current list)'
+        Caption = 'L&oad (add files to current list)'
         OnClick = MM_PL_AddPlaylistClick
       end
       object MM_PL_RecentPlaylists: TMenuItem
         Caption = '&Recent playlists'
       end
       object MM_PL_Save: TMenuItem
-        Caption = '&Save playlist'
+        Caption = '&Save'
         ImageIndex = 1
         ShortCut = 16467
         OnClick = PM_PL_SavePlaylistClick
@@ -3513,15 +3518,15 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '-'
       end
       object MM_PL_ClearPlaylist: TMenuItem
-        Caption = 'Clear playlist'
+        Caption = 'Clear'
         OnClick = PM_PL_ClearPlaylistClick
       end
       object MM_PL_DeleteSelected: TMenuItem
-        Caption = 'Delete selected'
+        Caption = 'Remove selected files'
         OnClick = PM_PL_DeleteSelectedClick
       end
       object MM_PL_DeleteMissingFiles: TMenuItem
-        Caption = 'Cleanup playlist (delete missing files)'
+        Caption = 'Cleanup (remove missing files)'
         OnClick = Nichtvorhandenelschen1Click
       end
       object MM_PL_SetRatingofSelectedFilesTo: TMenuItem
@@ -3589,26 +3594,15 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = PM_ML_SetRatingsOfSelectedFilesClick
         end
       end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object MM_PL_AddSelectionToPreBooklistEnd: TMenuItem
-        Caption = 'Add selection to prebook-list (end)'
-        OnClick = PM_PL_AddToPrebookListEndClick
-      end
-      object MM_PL_RemoveSelectionFromPrebooklist: TMenuItem
-        Caption = 'Remove selection from prebook-list'
-        OnClick = PM_PL_RemoveFromPrebookListClick
-      end
       object N26: TMenuItem
         Caption = '-'
       end
       object MM_PL_ExtendedAddToMedialibrary: TMenuItem
-        Caption = 'Add all files to the medialibrary'
+        Caption = 'Add all files to the media library'
         OnClick = PM_PL_ExtendedAddToMedialibraryClick
       end
       object MM_PL_CopyPlaylistToUSB: TMenuItem
-        Caption = 'Copy playlist into one directory'
+        Caption = 'Copy files'
         OnClick = PM_PL_CopyPlaylistToUSBClick
       end
       object N33: TMenuItem
@@ -3619,7 +3613,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = PM_PL_ExtendedScanFilesClick
       end
       object MM_PL_ShowInExplorer: TMenuItem
-        Caption = 'Show in explorer'
+        Caption = 'Show in Windows Explorer'
         OnClick = PM_PL_ShowInExplorerClick
       end
       object MM_PL_Properties: TMenuItem
@@ -3671,13 +3665,13 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = PM_P_ViewSeparateWindows_PlaylistClick
         end
         object MM_O_ViewSeparateWindows_Medialist: TMenuItem
-          Caption = 'Show &medialist'
+          Caption = 'Show &media library (title list)'
           Checked = True
           ShortCut = 8306
           OnClick = PM_P_ViewSeparateWindows_MedialistClick
         end
         object MM_O_ViewSeparateWindows_Browse: TMenuItem
-          Caption = 'Show &browselists'
+          Caption = 'Show media libary (&browse list)'
           Checked = True
           ShortCut = 8307
           OnClick = PM_P_ViewSeparateWindows_BrowseClick
@@ -3691,7 +3685,7 @@ object Nemp_MainForm: TNemp_MainForm
           Caption = '-'
         end
         object MM_O_PartyMode: TMenuItem
-          Caption = 'Party-Mode'
+          Caption = 'Party mode'
           OnClick = PM_P_PartyModeClick
         end
       end
@@ -3699,7 +3693,7 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '&Skins'
         ImageIndex = 8
         object MM_O_Skins_WindowsStandard: TMenuItem
-          Caption = 'Windows standard'
+          Caption = 'Windows default'
           OnClick = WindowsStandardClick
         end
         object N38: TMenuItem
@@ -4050,12 +4044,12 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MM_T_CloudEditor: TMenuItem
-        Caption = 'Cloud editor'
+        Caption = 'Tag cloud editor'
         ImageIndex = 19
         OnClick = PM_ML_CloudEditorClick
       end
       object MM_T_KeyboardDisplay: TMenuItem
-        Caption = 'Keyboard-Display'
+        Caption = 'Keyboard display'
         ImageIndex = 31
         OnClick = PM_P_KeyboardDisplayClick
       end
@@ -4108,7 +4102,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D0013001C090E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130020090E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4572,7 +4566,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806340A10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806380A10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5998,13 +5992,13 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object PM_ML_Medialibrary: TMenuItem
-      Caption = 'Medialibrary'
+      Caption = 'Media library'
       object PM_ML_MedialibraryDeleteNotExisting: TMenuItem
-        Caption = 'Cleanup (delete missing files)'
+        Caption = 'Cleanup (remove missing files)'
         OnClick = DatenbankUpdateTBClick
       end
       object PM_ML_MedialibraryRefresh: TMenuItem
-        Caption = 'Refresh all'
+        Caption = 'Refresh (rescan all files)'
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
       end
@@ -6040,12 +6034,12 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = MM_ML_WebradioClick
     end
     object PM_ML_HideSelected: TMenuItem
-      Caption = 'Hide selected'
+      Caption = 'Hide selected files'
       ShortCut = 46
       OnClick = PM_ML_HideSelectedClick
     end
     object PM_ML_DeleteSelected: TMenuItem
-      Caption = 'Delete selected files from library'
+      Caption = 'Remove selected files'
       ShortCut = 16430
       OnClick = PM_ML_DeleteSelectedClick
     end
@@ -6137,7 +6131,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_ML_GetTagsClick
     end
     object PM_ML_CloudEditor: TMenuItem
-      Caption = 'Cloud editor'
+      Caption = 'Tag cloud editor'
       ImageIndex = 19
       OnClick = PM_ML_CloudEditorClick
     end
@@ -6203,7 +6197,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_ML_RefreshSelectedClick
     end
     object PM_ML_ShowInExplorer: TMenuItem
-      Caption = 'Show in explorer'
+      Caption = 'Show in Windows Explorer'
       OnClick = PM_ML_ShowInExplorerClick
     end
     object PM_ML_Properties: TMenuItem
@@ -6282,20 +6276,20 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = MitzuflligenEintrgenausderMedienbibliothekfllen1Click
     end
     object PM_PL_LoadPlaylist: TMenuItem
-      Caption = 'Load playlist (and clear current list)'
+      Caption = 'Load (and clear current list)'
       ImageIndex = 0
       ShortCut = 16463
       OnClick = PM_PL_LoadPlaylistClick
     end
     object PM_PL_AddPlaylist: TMenuItem
-      Caption = 'Load playlist (add files to current list)'
+      Caption = 'Load (add files to current list)'
       OnClick = MM_PL_AddPlaylistClick
     end
     object PM_PL_RecentPlaylists: TMenuItem
       Caption = 'Recent playlists'
     end
     object PM_PL_SavePlaylist: TMenuItem
-      Caption = 'Save playlist'
+      Caption = 'Save'
       ImageIndex = 1
       ShortCut = 16467
       OnClick = PM_PL_SavePlaylistClick
@@ -6304,17 +6298,17 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object PM_PL_ClearPlaylist: TMenuItem
-      Caption = 'Clear playlist'
+      Caption = 'Clear'
       Visible = False
       OnClick = PM_PL_ClearPlaylistClick
     end
     object PM_PL_DeleteSelected: TMenuItem
-      Caption = 'Delete Selected'
+      Caption = 'Remove selected'
       ShortCut = 46
       OnClick = PM_PL_DeleteSelectedClick
     end
     object PM_PL_DeleteMissingFiles: TMenuItem
-      Caption = 'Cleanup playlist (delete missing files)'
+      Caption = 'Cleanup (remove missing files)'
       OnClick = Nichtvorhandenelschen1Click
     end
     object PM_PL_SetRatingofSelectedFilesTo: TMenuItem
@@ -6391,14 +6385,6 @@ object Nemp_MainForm: TNemp_MainForm
     object N68: TMenuItem
       Caption = '-'
     end
-    object PM_PL_AddToPrebookListEnd: TMenuItem
-      Caption = 'Add selection to prebook-list (end)'
-      OnClick = PM_PL_AddToPrebookListEndClick
-    end
-    object PM_PL_RemoveFromPrebookList: TMenuItem
-      Caption = 'Remove selection from prebook-list'
-      OnClick = PM_PL_RemoveFromPrebookListClick
-    end
     object PM_PL_PlayInHeadset: TMenuItem
       Caption = 'Play in headset'
       ImageIndex = 7
@@ -6409,7 +6395,7 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object PM_PL_ExtendedAddToMedialibrary: TMenuItem
-      Caption = 'Add all files to the medialibrary'
+      Caption = 'Add all files to the media library'
       OnClick = PM_PL_ExtendedAddToMedialibraryClick
     end
     object PM_PL_ExtendedCopyToClipboard: TMenuItem
@@ -6418,7 +6404,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_ML_CopyToClipboardClick
     end
     object PM_PL_MagicCopyToClipboard: TMenuItem
-      Caption = '... and include a proper playlist-file'
+      Caption = '... and include a proper playlist file'
       OnClick = PM_PL_MagicCopyToClipboardClick
     end
     object PM_PL_ExtendedPasteFromClipboard: TMenuItem
@@ -6427,7 +6413,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_ML_PasteFromClipboardClick
     end
     object PM_PL_CopyPlaylistToUSB: TMenuItem
-      Caption = 'Copy playlist into one directory'
+      Caption = 'Copy files'
       OnClick = PM_PL_CopyPlaylistToUSBClick
     end
     object N48: TMenuItem
@@ -6439,7 +6425,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_PL_ExtendedScanFilesClick
     end
     object PM_PL_ShowInExplorer: TMenuItem
-      Caption = 'Show in Explorer'
+      Caption = 'Show in Windows Explorer'
       OnClick = PM_PL_ShowInExplorerClick
     end
     object PM_PL_Properties: TMenuItem
@@ -6567,13 +6553,13 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = PM_P_ViewSeparateWindows_PlaylistClick
       end
       object PM_P_ViewSeparateWindows_Medialist: TMenuItem
-        Caption = 'Show medialist'
+        Caption = 'Show media library (title list)'
         Checked = True
         ShortCut = 8306
         OnClick = PM_P_ViewSeparateWindows_MedialistClick
       end
       object PM_P_ViewSeparateWindows_Browse: TMenuItem
-        Caption = 'Show browselists'
+        Caption = 'Show media library (browse list)'
         Checked = True
         ShortCut = 8307
         OnClick = PM_P_ViewSeparateWindows_BrowseClick
@@ -6587,7 +6573,7 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '-'
       end
       object PM_P_PartyMode: TMenuItem
-        Caption = 'Party-Mode'
+        Caption = 'Party mode'
         OnClick = PM_P_PartyModeClick
       end
     end
@@ -6945,7 +6931,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
     object PM_P_KeyboardDisplay: TMenuItem
-      Caption = 'Keyboard-Display'
+      Caption = 'Keyboard display'
       ImageIndex = 31
       OnClick = PM_P_KeyboardDisplayClick
     end
@@ -7525,7 +7511,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800880610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C0101080028008C0610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7945,18 +7931,18 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 576
     object PM_Cover_Aside: TMenuItem
       Tag = 1
-      Caption = 'Show details aside the cover'
+      Caption = 'Details aside the cover'
       ImageIndex = 29
       OnClick = PM_Cover_DontShowDetailsClick
     end
     object PM_Cover_Below: TMenuItem
       Tag = 2
-      Caption = 'Show details below the cover'
+      Caption = 'Details below the cover'
       ImageIndex = 30
       OnClick = PM_Cover_DontShowDetailsClick
     end
     object PM_Cover_DontShowDetails: TMenuItem
-      Caption = 'Do not show details'
+      Caption = 'No details'
       ImageIndex = 28
       OnClick = PM_Cover_DontShowDetailsClick
     end
