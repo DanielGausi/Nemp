@@ -25,7 +25,7 @@ object Wizard: TWizard
     Top = 8
     Width = 512
     Height = 288
-    ActivePage = TabSheet4
+    ActivePage = TabSheet3
     Anchors = [akLeft, akTop, akBottom]
     MultiLine = True
     TabOrder = 0
@@ -99,9 +99,9 @@ object Wizard: TWizard
       object Lbl_CheckUpdates: TLabel
         Left = 152
         Top = 16
-        Width = 153
+        Width = 152
         Height = 23
-        Caption = 'Check for Updates'
+        Caption = 'Check for updates'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -115,7 +115,7 @@ object Wizard: TWizard
         Width = 321
         Height = 46
         AutoSize = False
-        Caption = 'Allow Nemp to check for Updates periodically?'
+        Caption = 'Allow Nemp to check for updates periodically?'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -201,7 +201,7 @@ object Wizard: TWizard
         Width = 321
         Height = 46
         AutoSize = False
-        Caption = 'Allow Nemp to change metadata in audiofiles?'
+        Caption = 'Allow Nemp to change meta data in audio files?'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -387,9 +387,9 @@ object Wizard: TWizard
       object Lbl_LastFM: TLabel
         Left = 152
         Top = 16
-        Width = 120
+        Width = 141
         Height = 23
-        Caption = 'Missing covers'
+        Caption = 'Missing cover art'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -403,7 +403,7 @@ object Wizard: TWizard
         Width = 331
         Height = 50
         AutoSize = False
-        Caption = 'Automatically download missing covers from LastFM?'
+        Caption = 'Automatically download missing cover art from last.fm?'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -432,11 +432,11 @@ object Wizard: TWizard
         Height = 105
         AutoSize = False
         Caption = 
-          'Nemp tries to find a proper cover image for your music files wit' +
-          'hin the ID3-Tags or the directory of the file. If no cover image' +
-          ' was found, Nemp can try to download the missing cover from last' +
-          '.fm. This image will be saved within the directory of the respec' +
-          'tive music file. '
+          'Nemp tries to find a proper cover art for your audio files withi' +
+          'n the ID3-Tag or the directory of the file. If no cover art was ' +
+          'found, Nemp can try to download the missing cover art from last.' +
+          'fm. This image will be saved within the directory of the respect' +
+          'ive audio file. '
         TabOrder = 3
       end
       object Btn_LastFMBack: TButton
@@ -496,7 +496,7 @@ object Wizard: TWizard
         Width = 331
         Height = 50
         AutoSize = False
-        Caption = 'Use Nemp as the default player for music files?'
+        Caption = 'Use Nemp as the default player for audio files?'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -19
@@ -526,10 +526,10 @@ object Wizard: TWizard
         AutoSize = False
         Caption = 
           'Nemp can be installed as the default audio player. If you double' +
-          '-click a music file or a playlist in the windows explorer, this ' +
+          ' click a music file or a playlist in the Windows Explorer, this ' +
           'file will be opened with Nemp.#13#10If you want to select the fi' +
-          'letypes associated with Nemp, you can do it later in the setting' +
-          's dialog.'
+          'le types associated with Nemp, you can do it later in the settin' +
+          'gs dialog.'
         TabOrder = 3
       end
       object Btn_FiletypesBack: TButton
@@ -616,9 +616,9 @@ object Wizard: TWizard
       object lbl_sumLastFM: TLabel
         Left = 184
         Top = 120
-        Width = 200
+        Width = 192
         Height = 13
-        Caption = 'Download missing cover files from Last.fm'
+        Caption = 'Download missing cover art from last.fm'
       end
       object lbl_sumRating: TLabel
         Left = 184

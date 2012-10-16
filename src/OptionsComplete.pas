@@ -89,7 +89,6 @@ type
     TabPlayer2: TTabSheet;
     GrpBox_PlaylistBehaviour: TGroupBox;
     CB_AutoSavePlaylist: TCheckBox;
-    GrpBox_DefaultAction: TRadioGroup;
     CB_AutoScanPlaylist: TCheckBox;
     TabView4: TTabSheet;
     TabFiles0: TTabSheet;
@@ -455,6 +454,9 @@ type
     XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
     GrpBox_PlayerExt_SafePlayback: TGroupBox;
     cb_SafePlayback: TCheckBox;
+    GrpBox_HeadsetBehaviour: TGroupBox;
+    GrpBox_DefaultAction: TComboBox;
+    Label10: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
