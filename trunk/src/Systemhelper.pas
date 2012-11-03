@@ -87,6 +87,9 @@ function GetFileCreationDateTime(Filename:String):TDateTime;
 
 function FileIsWriteProtected(Filename: String): Boolean;
 
+// http://michael-puff.de/Programmierung/Delphi/Code-Snippets/SystemPowerStatus.shtml
+function GetPowerStatus(var HasBattery: Boolean; var LoadstatusPercent: Integer): DWORD;
+
 implementation
 
 var
@@ -440,6 +443,53 @@ end;
 function FileIsWriteProtected(Filename: String): Boolean;
 begin
     result := FileGetAttr(FileName) and faReadOnly  > 0;
+end;
+
+// http://michael-puff.de/Programmierung/Delphi/Code-Snippets/SystemPowerStatus.shtml
+function GetPowerStatus(var HasBattery: Boolean; var LoadstatusPercent: Integer): DWORD;
+var
+  SystemPowerStatus: TSystemPowerStatus;
+  Text: string;
+{resourcestring
+  rsLoadStatusUnknown = 'Unbekannter Status';
+  rsLoadStatusNoBattery = 'Es existiert keine Batterie';
+  rsLoadStatusHigh = 'Hoher Ladezustand';
+  rsLoadStatusLow = 'Niedriger Ladezustand';
+  rsLoadStatusCritical = 'Kritischer Ladezustand';
+  rsLoadStatusLoading = 'Batterie wird geladen';
+  rsLoadSatusUnknownLoading = 'Unbekannter Ladezustand';}
+begin
+  SetLastError(0);
+  if GetSystemPowerStatus(SystemPowerStatus) then
+    with SystemPowerStatus do
+    begin
+      HasBattery := ACLineStatus = 0;
+      {
+      // Ladezustand der Batterie
+      if (BatteryFlag = 255) then
+        Text := rsLoadStatusUnknown
+      else if (BatteryFlag and 128 = 128) then
+        Text := rsLoadStatusNoBattery
+      else
+      begin
+        case (BatteryFlag and (1 or 2 or 4)) of
+          1: Text := rsLoadStatusHigh;
+          2: Text := rsLoadStatusLow;
+          4: Text := rsLoadStatusCritical;
+        else
+          Text := rsLoadSatusUnknownLoading
+        end;
+        if (BatteryFlag and 8 = 8) then
+          LoadStatusString := Text + rsLoadStatusLoading;
+      end;
+      }
+      // Ladezustand in Prozent
+      if (BatteryLifePercent <> 255) then
+        LoadstatusPercent := BatteryLifePercent
+      else
+        LoadstatusPercent := -1;
+  end;
+  Result := GetLastError;
 end;
 
 end.

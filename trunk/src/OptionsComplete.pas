@@ -457,6 +457,8 @@ type
     GrpBox_HeadsetBehaviour: TGroupBox;
     GrpBox_DefaultAction: TComboBox;
     Label10: TLabel;
+    GroupBox1: TGroupBox;
+    cb_UseWalkmanMode: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1119,6 +1121,7 @@ begin
   SEJingleReduce.Value := NempPlayer.ReduceMainVolumeOnJingleValue;
   SEJingleVolume.Value := NempPlayer.JingleVolume;
 
+  cb_UseWalkmanMode.Checked := NempPlayer.UseWalkmanMode;
 
 
   if NempPlayer.AvoidMickyMausEffect then
@@ -1992,6 +1995,10 @@ begin
   NempPlayer.ReduceMainVolumeOnJingleValue := SEJingleReduce.Value;
   NempPlayer.JingleVolume := SEJingleVolume.Value;
 
+  NempPlayer.UseWalkmanMode := cb_UseWalkmanMode.Checked;
+  Nemp_MainForm.WalkmanModeTimer.Enabled := cb_UseWalkmanMode.Checked;
+  if Not NempPlayer.UseWalkmanMode then
+      StopFluttering;
 
   if Not NempPlayer.ScrollAnzeigeTitel then
   begin

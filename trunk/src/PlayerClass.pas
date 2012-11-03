@@ -264,6 +264,7 @@ type
         ReduceMainVolumeOnJingle: Boolean;
         ReduceMainVolumeOnJingleValue: Integer;
         JingleVolume: Integer;
+        UseWalkmanMode: Boolean;
 
         // settings for webradio
         DownloadDir: UnicodeString;
@@ -440,6 +441,8 @@ type
         function GetActiveCue: integer;
         function JumpToNextCue: Boolean;
         function JumpToPrevCue: Boolean;
+
+        procedure Flutter(aValue: single; t: Integer);
 
         Procedure SetEqualizer(band: Integer; gain: Single);
 
@@ -902,6 +905,7 @@ begin
   ReduceMainVolumeOnJingle      := ini.ReadBool('Player','ReduceMainVolumeOnJingle', True);
   ReduceMainVolumeOnJingleValue := ini.ReadInteger('Player','ReduceMainVolumeOnJingleValue',50);
   JingleVolume                  := ini.ReadInteger('Player','JingleVolume',100);
+  UseWalkmanMode                := ini.ReadBool('Player','WalkmanMode',True);
 
   DownloadDir    := (IncludeTrailingPathDelimiter(ini.ReadString('Player', 'WebradioDownloadDir', Savepath + 'Webradio\')));
 
@@ -1000,6 +1004,7 @@ begin
   Ini.WriteBool('Player','ReduceMainVolumeOnJingle', ReduceMainVolumeOnJingle);
   Ini.WriteInteger('Player','ReduceMainVolumeOnJingleValue', ReduceMainVolumeOnJingleValue);
   Ini.WriteInteger('Player','JingleVolume', JingleVolume);
+  Ini.WriteBool('Player','WalkmanMode', UseWalkmanMode);
 
   ini.WriteString('Player', 'WebradioDownloadDir', (DownloadDir));
   ini.WriteBool('Player', 'UseStreamnameAsDirectory', UseStreamnameAsDirectory);
@@ -2201,6 +2206,23 @@ begin
       BassFXEcho.fLeftDelay := fEchoTime;
       BassFXEcho.fRightDelay := fEchoTime;
       BASS_FXSetParameters(EchoSlideHnd, @BassFXEcho);
+end;
+
+procedure TNempPlayer.Flutter(aValue: single; t: Integer);
+begin
+    if fIsURLStream then exit;
+    if aValue > 3 then aValue := 3;
+    if aValue < 0.33 then aValue := 0.33;
+
+    if MainStreamIsTempoStream then
+    begin
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100, t);
+        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100, t);
+    end else
+    begin
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * aValue, t);
+        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_FREQ, OrignalSamplerate * aValue, t);
+    end;
 end;
 
 Procedure TNempPlayer.SetSamplerateFactor(Value: Single);

@@ -834,6 +834,8 @@ type
     BtnABRepeatSetB: TSkinButton;
     BtnABRepeatUnset: TSkinButton;
     LblEmptyLibraryHint: TLabel;
+    WalkmanModeTimer: TTimer;
+    WalkmanImage: TImage;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1402,6 +1404,8 @@ type
     procedure BtnABRepeatClick(Sender: TObject);
     procedure PM_ABRepeatSetAClick(Sender: TObject);
     procedure PM_ABRepeatSetBClick(Sender: TObject);
+    procedure WalkmanModeTimerTimer(Sender: TObject);
+    procedure WalkmanImageClick(Sender: TObject);
 
   private
 
@@ -1580,7 +1584,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
-  CDOpenDialogs, WebServerLog;
+  CDOpenDialogs, WebServerLog, Lowbattery;
 
 
 {$R *.dfm}
@@ -11411,6 +11415,74 @@ var point: TPoint;
 begin
   GetCursorPos(Point);
   SleepPopup.Popup(Point.X, Point.Y+10);
+end;
+
+procedure TNemp_MainForm.WalkmanImageClick(Sender: TObject);
+begin
+    if Not Assigned(FormLowBattery) then
+      Application.CreateForm(TFormLowBattery, FormLowBattery);
+
+    case FormLowBattery.ShowModal of
+        1: ; // nothing to do
+        2: begin
+              StopFluttering; // it will start again in 2 minutes. ;-)
+              ReArrangeToolImages;
+        end;
+        3: begin
+              StopFluttering;
+              ReArrangeToolImages;
+              NempPlayer.UseWalkmanMode := False;
+              WalkmanModeTimer.Enabled := False;
+        end;
+    end;
+end;
+
+procedure TNemp_MainForm.WalkmanModeTimerTimer(Sender: TObject);
+var hasBattery: Boolean;
+    LoadPercent: Integer;
+    factor: integer;
+begin
+    if GetPowerStatus(hasBattery, LoadPercent) = 0 then
+    begin
+        if (hasBattery and (LoadPercent <= 10)) then            // NOT WEG
+        begin
+            WalkmanModeTimer.Interval := 2000; // 2 seconds
+
+            if WalkmanModeTimer.Tag = 0 then
+            begin
+                WalkmanModeTimer.Tag := 1; // fluttering active
+                ReArrangeToolImages;
+            end;
+
+            // loadPercent := 5;                                        // WEG
+
+            factor := Round((11  -  LoadPercent) * 2.5);
+
+            // start fluttering
+            if Random >= 0.6 then
+            begin
+                // faster
+                NempPlayer.Flutter(Random(factor) / 100 + 1, 2000);
+            end else
+            begin
+                // slower
+                NempPlayer.Flutter(1 - (Random(factor)/ 100), 2000);
+            end;
+        end
+        else
+        // begin
+            if (WalkmanModeTimer.Tag = 1) then
+            begin
+                StopFluttering;
+                ReArrangeToolImages;
+            end;
+        //    // Disable nonsense
+        //    if (WalkmanModeTimer.Interval = 2000) then
+        //        NempPlayer.Flutter(1, 1000);
+            // Set Timer-Interval to long, check battery every 2 minutes
+        //    WalkmanModeTimer.Interval := 120000; // 2 minutes
+        //end;
+    end;
 end;
 
 procedure TNemp_MainForm.WebserverImageClick(Sender: TObject);

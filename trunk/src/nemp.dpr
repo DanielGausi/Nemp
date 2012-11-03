@@ -94,7 +94,8 @@ uses
   CustomizedScrobbler in 'CustomizedScrobbler.pas',
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
-  SilenceDetection in 'SilenceDetection.pas';
+  SilenceDetection in 'SilenceDetection.pas',
+  Lowbattery in 'Lowbattery.pas' {FormLowBattery};
 
 //,  classes;
 
