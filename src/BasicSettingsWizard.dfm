@@ -25,7 +25,7 @@ object Wizard: TWizard
     Top = 8
     Width = 512
     Height = 288
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akBottom]
     MultiLine = True
     TabOrder = 0

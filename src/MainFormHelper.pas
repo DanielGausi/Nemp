@@ -52,6 +52,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function VCLEchoMixToPlayer: Single;
     function VCLEchoTimeToPlayer: Single;
 
+    procedure StopFluttering;
+
     procedure HandleNewConnectedDrive;
 
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
@@ -267,7 +269,14 @@ begin
   end;
 end;
 
-
+procedure StopFluttering;
+begin
+    Nemp_MainForm.WalkmanModeTimer.Interval := 120000; //120000; // 2 minutes
+    Nemp_MainForm.WalkmanModeTimer.Tag := 0;
+    NempPlayer.Flutter(1, 1000);
+    NempPlayer.Speed := 1;
+    CorrectSpeedButton;
+end;
 
 
 // TODO: Event bei "neues Drive angeschlossen"
@@ -818,9 +827,18 @@ begin
             SleepImage.Top := newTop;
             SleepImage.Left := currentLeft;
             SleepImage.Visible := True;
-            //dec(currentLeft, 18);
+            inc(currentLeft, decvalue);
         end else
             SleepImage.Visible := False;
+
+        if WalkmanModeTimer.Tag = 1 then
+        begin
+            WalkmanImage.Top := newTop;
+            WalkmanImage.Left := currentLeft;
+            WalkmanImage.Visible := True;
+        end else
+            WalkmanImage.Visible := False;
+
     end;
 end;
 

@@ -398,6 +398,8 @@ begin
         SetTabStopsPlayer;
         SetTabStopsTabs;
 
+        WalkmanModeTimer.Enabled := NempPlayer.UseWalkmanMode;
+
         // Hier auch Scrobbler.Checked setzen
         MM_T_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
         PM_P_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
