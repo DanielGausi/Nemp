@@ -271,7 +271,7 @@ end;
 
 procedure StopFluttering;
 begin
-    Nemp_MainForm.WalkmanModeTimer.Interval := 120000; //120000; // 2 minutes
+    Nemp_MainForm.WalkmanModeTimer.Interval := 60000; //120000; // 1 minute
     Nemp_MainForm.WalkmanModeTimer.Tag := 0;
     NempPlayer.Flutter(1, 1000);
     NempPlayer.Speed := 1;
