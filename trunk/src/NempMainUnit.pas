@@ -11444,44 +11444,33 @@ var hasBattery: Boolean;
 begin
     if GetPowerStatus(hasBattery, LoadPercent) = 0 then
     begin
-        if (hasBattery and (LoadPercent <= 10)) then            // NOT WEG
+        if (hasBattery and (LoadPercent <= 10)) then
         begin
-            WalkmanModeTimer.Interval := 2000; // 2 seconds
-
             if WalkmanModeTimer.Tag = 0 then
             begin
-                WalkmanModeTimer.Tag := 1; // fluttering active
+                WalkmanModeTimer.Tag := 1;
+                WalkmanModeTimer.Interval := 2000;
                 ReArrangeToolImages;
             end;
-
-            // loadPercent := 5;                                        // WEG
-
+            //loadPercent := 5;
             factor := Round((11  -  LoadPercent) * 2.5);
+
+            WalkmanImage.Hint := Format(Hint_BatteryLow, [Loadpercent]);
 
             // start fluttering
             if Random >= 0.6 then
-            begin
-                // faster
-                NempPlayer.Flutter(Random(factor) / 100 + 1, 2000);
-            end else
-            begin
-                // slower
-                NempPlayer.Flutter(1 - (Random(factor)/ 100), 2000);
-            end;
+                NempPlayer.Flutter(Random(factor) / 100 + 1, 2000)  // faster
+            else
+                NempPlayer.Flutter(1 - (Random(factor)/ 100), 2000) // slower
         end
         else
-        // begin
+        begin
             if (WalkmanModeTimer.Tag = 1) then
             begin
-                StopFluttering;
+                StopFluttering;  // Timer.Tag and .Interval  is set there
                 ReArrangeToolImages;
             end;
-        //    // Disable nonsense
-        //    if (WalkmanModeTimer.Interval = 2000) then
-        //        NempPlayer.Flutter(1, 1000);
-            // Set Timer-Interval to long, check battery every 2 minutes
-        //    WalkmanModeTimer.Interval := 120000; // 2 minutes
-        //end;
+        end;
     end;
 end;
 

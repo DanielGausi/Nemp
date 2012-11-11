@@ -765,6 +765,8 @@ DeleteHelper_Readme = 'Sometimes it is not appropriate to remove every missing f
     + 'Missing files from the checked drives will be removed from the library, the others will not be removed.'
     ;
 
+Hint_BatteryLow = 'Low battery (%d%%). Click for more information.';
+
 
 implementation
 
