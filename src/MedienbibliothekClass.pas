@@ -1108,7 +1108,6 @@ begin
         NempCharCodeOptions.Japanese := JapaneseEncodings[tmpcharcode];
 
         NempCharCodeOptions.AutoDetectCodePage := ini.ReadBool('MedienBib', 'AutoDetectCharCode', True);
-        NempCharCodeOptions.AlwaysWriteUnicode := ini.ReadBool('MedienBib', 'AlwaysWriteUnicode', False);
 
         InitialDialogFolder := Ini.ReadString('MedienBib', 'InitialDialogFolder', '');
 
@@ -1185,7 +1184,6 @@ begin
         ini.WriteInteger('MedienBib', 'CharSetChinese', NempCharCodeOptions.Chinese.Index);
         ini.WriteInteger('MedienBib', 'CharSetJapanese', NempCharCodeOptions.Japanese.Index);
         ini.WriteBool('MedienBib', 'AutoDetectCharCode', NempCharCodeOptions.AutoDetectCodePage);
-        ini.WriteBool('MedienBib', 'AlwaysWriteUnicode', NempCharCodeOptions.AlwaysWriteUnicode);
 
         Ini.WriteString('MedienBib', 'InitialDialogFolder', InitialDialogFolder);
         Ini.WriteBool('MedienBib', 'AutoScanDirs', AutoScanDirs);

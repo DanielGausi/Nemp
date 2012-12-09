@@ -4,7 +4,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 592
+  ClientHeight = 540
   ClientWidth = 665
   Color = clBtnFace
   Constraints.MinHeight = 520
@@ -25,14 +25,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   OnShow = FormShow
   DesignSize = (
     665
-    592)
+    540)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionsVST: TVirtualStringTree
     Left = 8
     Top = 8
     Width = 191
-    Height = 546
+    Height = 494
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
     Header.DefaultHeight = 17
@@ -50,24 +50,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
+    ExplicitHeight = 546
     Columns = <>
   end
   object PageControl1: TPageControl
     Left = 204
     Top = 6
     Width = 454
-    Height = 549
-    ActivePage = TabPlayer5
+    Height = 497
+    ActivePage = TabPlayer2
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
     TabStop = False
+    ExplicitHeight = 549
     object TabSystem0: TTabSheet
       Caption = 'Sys (Main)'
       ImageIndex = 6
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
         Top = 134
@@ -251,9 +254,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'Sys (Control)'
       ImageIndex = 5
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
         Top = 78
@@ -1126,9 +1130,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'Sys (Files)'
       ImageIndex = 6
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object Label3: TLabel
         Left = 16
         Top = 336
@@ -1286,9 +1291,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'Sys (Tray)'
       ImageIndex = 20
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object LblTaskbarWin7: TLabel
         Left = 24
         Top = 149
@@ -1382,9 +1388,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem4: TTabSheet
       Caption = 'Sys (Hibernate)'
       ImageIndex = 21
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_Hibernate: TGroupBox
         Left = 8
         Top = 8
@@ -1462,9 +1469,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView0: TTabSheet
       Caption = 'View (Main)'
       ImageIndex = 1
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_ViewMain_Columns: TGroupBox
         Left = 8
         Top = 8
@@ -1642,9 +1650,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView1: TTabSheet
       Caption = 'View (Party)'
       ImageIndex = 19
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_ViewPartymode_Amplification: TGroupBox
         Left = 8
         Top = 8
@@ -1740,9 +1749,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView2: TTabSheet
       Caption = 'View (Vis)'
       ImageIndex = 20
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_ViewVis_Scrolling: TGroupBox
         Left = 8
         Top = 8
@@ -1917,9 +1927,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView3: TTabSheet
       Caption = 'View (Fonts)'
       ImageIndex = 7
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_Fonts: TGroupBox
         Left = 8
         Top = 8
@@ -2106,9 +2117,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView4: TTabSheet
       Caption = 'View (Ext)'
       ImageIndex = 21
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_ViewExt_NoMetadata: TGroupBox
         Left = 7
         Top = 159
@@ -2258,9 +2270,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles0: TTabSheet
       Caption = 'Files (Main)'
       ImageIndex = 22
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_FilesMain_Directories: TGroupBox
         Left = 8
         Top = 8
@@ -2334,10 +2347,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
       end
       object GrpBox_FilesMain_FileTypes: TGroupBox
-        Left = 8
-        Top = 189
+        Left = 12
+        Top = 191
         Width = 431
-        Height = 177
+        Height = 222
         Anchors = [akLeft, akTop, akRight]
         Caption = 'File types for the media library'
         TabOrder = 1
@@ -2364,16 +2377,26 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 33
           Top = 58
           Width = 391
-          Height = 108
+          Height = 134
           Hint = 'List of supported audio files.'
           Columns = 4
           ItemHeight = 13
           TabOrder = 1
         end
+        object BtnRecommendedFiletypes: TButton
+          Left = 32
+          Top = 194
+          Width = 85
+          Height = 21
+          Hint = 'Select recommended filetypes only'
+          Caption = 'Recommended'
+          TabOrder = 2
+          OnClick = RecommendedFiletypesClick
+        end
       end
       object GrpBox_FilesMain_Playlists: TGroupBox
         Left = 8
-        Top = 372
+        Top = 415
         Width = 434
         Height = 50
         Caption = 'Playlists'
@@ -2394,9 +2417,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles1: TTabSheet
       Caption = 'Files (Metadata)'
       ImageIndex = 20
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_AutoRating: TGroupBox
         Left = 8
         Top = 147
@@ -2532,9 +2556,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles2: TTabSheet
       Caption = 'Files (Cover)'
       ImageIndex = 24
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_TabMedia3_Cover: TGroupBox
         Left = 8
         Top = 8
@@ -2643,9 +2668,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles3: TTabSheet
       Caption = 'Files (Search)'
       ImageIndex = 25
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
         Left = 8
         Top = 8
@@ -2798,41 +2824,33 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles4: TTabSheet
       Caption = 'Files (Unicode)'
       ImageIndex = 23
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_TabMedia5_ID3: TGroupBox
         Left = 8
         Top = 8
         Width = 431
-        Height = 65
+        Height = 51
         Anchors = [akLeft, akTop, akRight]
         Caption = 'ID3-tags'
         TabOrder = 0
-        object CBAlwaysWriteUnicode: TCheckBox
-          Left = 16
-          Top = 20
-          Width = 409
-          Height = 17
-          Hint = 'If you don'#39't know what this means: Just let it unchecked. ;-)'
-          Caption = 'Always write Unicode in ID3v2-tags'
-          TabOrder = 0
-        end
         object CBAutoDetectCharCode: TCheckBox
           Left = 16
-          Top = 40
+          Top = 20
           Width = 409
           Height = 17
           Hint = 
             'Use a uber-ingenious special method for better tag-reading in fi' +
             'les with "unicode-filenames".'
           Caption = 'Auto-detect (probably) used charset'
-          TabOrder = 1
+          TabOrder = 0
         end
       end
       object GrpBox_TabMedia5_Charsets: TGroupBox
         Left = 8
-        Top = 79
+        Top = 66
         Width = 431
         Height = 225
         Hint = 'Adjust charset-detection.'
@@ -2972,9 +2990,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer0: TTabSheet
       Caption = 'Player (Main)'
       ImageIndex = 2
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_Devices: TGroupBox
         Left = 8
         Top = 8
@@ -3183,9 +3202,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer1: TTabSheet
       Caption = 'Player (Ext)'
       ImageIndex = 22
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_ExtendedAudio: TGroupBox
         Left = 8
         Top = 8
@@ -3306,9 +3326,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer2: TTabSheet
       Caption = 'Player (Playlist)'
       ImageIndex = 19
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_PlaylistBehaviour: TGroupBox
         Left = 8
         Top = 8
@@ -3370,7 +3391,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 431
         Height = 97
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Headset settings'
+        Caption = 'Default action (from headset into the playlist)'
         TabOrder = 1
         object LblHeadsetDefaultAction: TLabel
           Left = 12
@@ -3412,7 +3433,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 431
         Height = 73
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Default action for audio files'
+        Caption = 'Default action (from media list into the playlist)'
         TabOrder = 2
         object Label10: TLabel
           Left = 12
@@ -3420,7 +3441,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 405
           Height = 13
           AutoSize = False
-          Caption = 'Insert mode for audio files'
+          Caption = 'Insert mode'
         end
         object GrpBox_DefaultAction: TComboBox
           Left = 12
@@ -3443,9 +3464,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer3: TTabSheet
       Caption = 'Player (List-Ext)'
       ImageIndex = 23
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_RandomOptions: TGroupBox
         Left = 8
         Top = 8
@@ -3553,9 +3575,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer4: TTabSheet
       Caption = 'Player (Streams)'
       ImageIndex = 23
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_WebradioRecording: TGroupBox
         Left = 8
         Top = 88
@@ -3743,9 +3766,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer5: TTabSheet
       Caption = 'Player (Effects)'
       ImageIndex = 15
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
@@ -3874,9 +3898,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer6: TTabSheet
       Caption = 'Player (Event)'
       ImageIndex = 19
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_TabAudio7_Countdown: TGroupBox
         Left = 8
         Top = 8
@@ -4049,9 +4074,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer7: TTabSheet
       Caption = 'Player (Scrobble)'
       ImageIndex = 17
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4400,9 +4426,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer8: TTabSheet
       Caption = 'Player (Webserver)'
       ImageIndex = 18
+      ExplicitHeight = 449
       DesignSize = (
         446
-        449)
+        397)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
@@ -4698,17 +4725,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNApply: TButton
     Left = 583
-    Top = 562
+    Top = 510
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Apply'
     TabOrder = 2
     OnClick = BTNApplyClick
+    ExplicitTop = 562
   end
   object BTNCancel: TButton
     Left = 503
-    Top = 562
+    Top = 510
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4716,10 +4744,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Cancel'
     TabOrder = 3
     OnClick = BTNCancelClick
+    ExplicitTop = 562
   end
   object BTNok: TButton
     Left = 423
-    Top = 562
+    Top = 510
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4727,10 +4756,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Default = True
     TabOrder = 4
     OnClick = BTNokClick
+    ExplicitTop = 562
   end
   object cb_SettingsMode: TComboBox
     Left = 8
-    Top = 560
+    Top = 508
     Width = 191
     Height = 21
     Style = csDropDownList
@@ -4743,6 +4773,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Items.Strings = (
       'Commonly used settings'
       'All settings')
+    ExplicitTop = 560
   end
   object ColorDialog1: TColorDialog
     Left = 104

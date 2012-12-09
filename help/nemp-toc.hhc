@@ -62,6 +62,10 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Die Medienbibliothek">
+			<param name="Local" value="nemp_medienbib.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Der Coverflow">
 			<param name="Local" value="nemp_coverflow.html">
 			</OBJECT>

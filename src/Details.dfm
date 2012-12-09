@@ -599,7 +599,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -814,7 +814,7 @@ object FDetails: TFDetails
           AutoCloseUp = True
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Lblv1Change
@@ -1101,7 +1101,7 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Lblv2Change
@@ -1334,7 +1334,7 @@ object FDetails: TFDetails
           Width = 145
           Height = 21
           AutoComplete = False
-          ItemHeight = 13
+          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Edt_VorbisChange
@@ -1561,7 +1561,7 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
           OnChange = cbPicturesChange
         end

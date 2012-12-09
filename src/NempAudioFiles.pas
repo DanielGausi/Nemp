@@ -1480,7 +1480,6 @@ begin
 
     aMp3File.ID3v1Tag.AutoCorrectCodepage := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
     aMp3File.ID3v2Tag.AutoCorrectCodepage := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
-    aMp3File.ID3v2Tag.AlwaysWriteUnicode  := MedienBib.NempCharCodeOptions.AlwaysWriteUnicode;
 
     CD          := aMp3File.ID3v2Tag.GetText(IDv2_PARTOFASET);
     Lyrics      := UTF8Encode(aMp3File.id3v2tag.Lyrics);

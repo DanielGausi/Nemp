@@ -94,7 +94,6 @@ type
     TabFiles0: TTabSheet;
     TabFiles4: TTabSheet;
     GrpBox_TabMedia5_ID3: TGroupBox;
-    CBAlwaysWriteUnicode: TCheckBox;
     CBAutoDetectCharCode: TCheckBox;
     GrpBox_TabMedia5_Charsets: TGroupBox;
     LblConst_Arabic: TLabel;
@@ -459,6 +458,7 @@ type
     Label10: TLabel;
     GroupBox1: TGroupBox;
     cb_UseWalkmanMode: TCheckBox;
+    BtnRecommendedFiletypes: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -553,6 +553,7 @@ type
     procedure ChangeWebserverLinks(Sender: TObject);
     procedure CB_SilenceDetectionClick(Sender: TObject);
     procedure cb_SettingsModeChange(Sender: TObject);
+    procedure RecommendedFiletypesClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1246,6 +1247,7 @@ begin
 
   cbIncludeAll.Checked := MedienBib.IncludeAll;
   cbIncludeFiles.Enabled := NOT cbIncludeAll.Checked;
+  BtnRecommendedFiletypes.Enabled := NOT cbIncludeAll.Checked;
   LblConst_OnlythefollowingTypes.Enabled := NOT cbIncludeAll.Checked;
 
   CBAutoLoadMediaList.Checked := MedienBib.AutoLoadMediaList;
@@ -1307,7 +1309,6 @@ begin
       CBKorean.ItemIndex   := NempCharCodeOptions.Korean.Index;
       CBThai.ItemIndex     := NempCharCodeOptions.Thai.Index;
       CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
-      CBAlwaysWriteUnicode.Checked := NempCharCodeOptions.AlwaysWriteUnicode;
   end;
 
   // Geburtstags-Optionen
@@ -1646,6 +1647,7 @@ begin
   // cb_RatingIgnoreCounterOnAbortedTracks .Enabled := cb_RatingActive.Checked and cb_RatingChangeCounter.Checked;
 end;
 
+
 procedure TOptionsCompleteForm.CB_visualClick(Sender: TObject);
 begin
   TB_Refresh.Enabled := CB_Visual.Checked;
@@ -1822,7 +1824,33 @@ end;
 procedure TOptionsCompleteForm.cbIncludeAllClick(Sender: TObject);
 begin
   cbIncludeFiles.Enabled := NOT cbIncludeAll.Checked;
+  BtnRecommendedFiletypes.Enabled := NOT cbIncludeAll.Checked;
   LblConst_OnlythefollowingTypes.Enabled := NOT cbIncludeAll.Checked;
+end;
+
+procedure TOptionsCompleteForm.RecommendedFiletypesClick(Sender: TObject);
+var i: Integer;
+begin
+    for i := 0 to CBIncludeFiles.Count - 1 do
+    begin
+        CBIncludeFiles.Checked[i] :=
+            (CBIncludeFiles.Items[i] = '.mp3')
+            or (CBIncludeFiles.Items[i] = '.ogg')
+            or (CBIncludeFiles.Items[i] = '.mp1')
+            or (CBIncludeFiles.Items[i] = '.mp2')
+            or (CBIncludeFiles.Items[i] = '.flac')
+            or (CBIncludeFiles.Items[i] = '.fla')
+            or (CBIncludeFiles.Items[i] = '.oga')
+            or (CBIncludeFiles.Items[i] = '.wma')
+            or (CBIncludeFiles.Items[i] = '.mp4')
+            or (CBIncludeFiles.Items[i] = '.m4a')
+            or (CBIncludeFiles.Items[i] = '.ape')
+            or (CBIncludeFiles.Items[i] = '.mpc')
+            or (CBIncludeFiles.Items[i] = '.ofr')
+            or (CBIncludeFiles.Items[i] = '.ofs')
+            or (CBIncludeFiles.Items[i] = '.tta')
+            or (CBIncludeFiles.Items[i] = '.wv');
+    end;
 end;
 
 procedure TOptionsCompleteForm.CBJingleReduceClick(Sender: TObject);
@@ -2411,7 +2439,6 @@ begin
       NempCharCodeOptions.Korean    := KoreanEncodings[CBKorean.Itemindex];
       NempCharCodeOptions.Thai      := ThaiEncodings[CBThai.Itemindex];
       NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
-      NempCharCodeOptions.AlwaysWriteUnicode := CBAlwaysWriteUnicode.Checked;
   end;
 
   if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
