@@ -2115,7 +2115,6 @@ begin
                       end; //else: Standardwerte behalten
                       mp3.ID3v1Tag.AutoCorrectCodepage := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
                       mp3.ID3v2Tag.AutoCorrectCodepage := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
-                      mp3.ID3v2Tag.AlwaysWriteUnicode := MedienBib.NempCharCodeOptions.AlwaysWriteUnicode;
                   end;
           at_Ogg: begin
                       ValidOggFile := CurrentTagObject.LastError = FileErr_None;
