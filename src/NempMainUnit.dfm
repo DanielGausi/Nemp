@@ -230,6 +230,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvNone
             BevelOuter = bvNone
             BorderStyle = bsNone
+            BorderWidth = 1
             Constraints.MinWidth = 20
             DefaultNodeHeight = 14
             DragMode = dmAutomatic
@@ -240,16 +241,14 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
-            Header.DefaultHeight = 17
             Header.Font.Charset = DEFAULT_CHARSET
             Header.Font.Color = clWindowText
             Header.Font.Height = -11
             Header.Font.Name = 'Tahoma'
             Header.Font.Style = []
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
-            Header.Style = hsXPStyle
             IncrementalSearch = isAll
-            Indent = 12
+            Indent = 14
             Margin = 0
             ParentFont = False
             PopupMenu = Medialist_PopupMenu
@@ -257,9 +256,10 @@ object Nemp_MainForm: TNemp_MainForm
             TabOrder = 0
             TextMargin = 0
             TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
-            TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+            TreeOptions.PaintOptions = [toShowBackground, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
             TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
             OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+            OnAfterCellPaint = ArtistsVSTAfterCellPaint
             OnAfterItemErase = VSTAfterItemErase
             OnClick = ArtistsVSTClick
             OnFocusChanged = ArtistsVSTFocusChanged
@@ -274,7 +274,7 @@ object Nemp_MainForm: TNemp_MainForm
               item
                 MinWidth = 0
                 Position = 0
-                Width = 73
+                Width = 71
               end>
           end
           object AlbenVST: TVirtualStringTree
@@ -287,6 +287,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvNone
             BevelOuter = bvNone
             BorderStyle = bsNone
+            BorderWidth = 1
             Constraints.MinWidth = 20
             DefaultNodeHeight = 14
             DragMode = dmAutomatic
@@ -297,16 +298,14 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
-            Header.DefaultHeight = 17
             Header.Font.Charset = DEFAULT_CHARSET
             Header.Font.Color = clWindowText
             Header.Font.Height = -11
             Header.Font.Name = 'Tahoma'
             Header.Font.Style = []
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
-            Header.Style = hsXPStyle
             IncrementalSearch = isAll
-            Indent = 12
+            Indent = 14
             Margin = 0
             ParentFont = False
             PopupMenu = Medialist_PopupMenu
@@ -332,7 +331,7 @@ object Nemp_MainForm: TNemp_MainForm
               item
                 MinWidth = 0
                 Position = 0
-                Width = 214
+                Width = 212
               end>
           end
         end
@@ -372,8 +371,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show context menu'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
@@ -395,8 +392,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Browse your medialibrary'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
@@ -418,8 +413,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Coverflow'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
@@ -473,8 +466,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Tag cloud'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Medialist_PopupMenu
           ShowHint = True
@@ -836,10 +827,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 82
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 0
           OnDragOver = GRPBOXControlDragOver
           OnEndDrag = SlideBarButtonEndDrag
@@ -862,8 +851,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 14
           Hint = 'Slide backward'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -884,8 +871,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 14
           Hint = 'Previous title'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           Spacing = 14
@@ -907,8 +892,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 20
           Hint = 'Play/Pause'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = PopupPlayPause
           ShowHint = True
@@ -930,8 +913,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 14
           Hint = 'Stop'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = PopupStop
           ShowHint = True
@@ -952,8 +933,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 97
           Width = 14
           Height = 14
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 5
@@ -974,8 +953,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 14
           Hint = 'Next title'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 6
@@ -997,8 +974,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 14
           Height = 14
           Hint = 'Slide forward'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 7
@@ -1018,8 +993,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 97
           Width = 14
           Height = 14
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = PopupRepeat
           ShowHint = True
@@ -1041,10 +1014,8 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 12
           Height = 12
           Hint = 'Volume'
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 9
@@ -1069,8 +1040,6 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 12
           Hint = 'Show menu'
           Anchors = [akTop, akRight]
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 10
@@ -1092,8 +1061,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 12
           Height = 12
           Hint = 'Minimize'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 11
@@ -1115,8 +1082,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 12
           Height = 12
           Hint = 'Close Nemp'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 12
@@ -1152,8 +1117,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show cover'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Player_PopupMenu
           ShowHint = True
@@ -1176,8 +1139,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show lyrics'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Player_PopupMenu
           ShowHint = True
@@ -1200,8 +1161,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show equalizer'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Player_PopupMenu
           ShowHint = True
@@ -1224,8 +1183,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show effects'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Player_PopupMenu
           ShowHint = True
@@ -1248,8 +1205,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Headset-controls'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           PopupMenu = Player_PopupMenu
           ShowHint = True
@@ -1592,10 +1547,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 0
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1618,10 +1571,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 1
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1644,10 +1595,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 2
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1670,10 +1619,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 4
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1696,10 +1643,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 3
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1722,10 +1667,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 5
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1748,10 +1691,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 6
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1774,10 +1715,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 7
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1800,10 +1739,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 8
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1826,10 +1763,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 54
           Width = 10
           Height = 25
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 9
           OnDragOver = EqualizerButton1DragOver
           OnEndDrag = EqualizerButton1EndDrag
@@ -1852,8 +1787,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 126
           Height = 21
           Caption = 'Select'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 10
           OnClick = Btn_EqualizerPresetsClick
           DrawMode = dm_Windows
@@ -1945,10 +1878,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 129
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 0
           OnDragOver = GRPBOXControlDragOver
           OnEndDrag = SlidebarButton_HeadsetEndDrag
@@ -1969,8 +1900,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 147
           Width = 24
           Height = 24
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 1
           OnClick = PLayPauseBtnHeadsetClick
           OnDragOver = GRPBOXControlDragOver
@@ -1989,8 +1918,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Load selected file into headset (Ctrl+H)'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 2
           OnClick = BtnLoadHeadsetClick
           OnDragOver = GRPBOXControlDragOver
@@ -2008,8 +1935,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 147
           Width = 24
           Height = 24
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 3
           OnClick = StopHeadSetBtnClick
           OnDragOver = GRPBOXControlDragOver
@@ -2028,10 +1953,8 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 12
           Height = 12
           Hint = 'Volume'
-          DoubleBuffered = True
           DragCursor = crSizeNS
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 4
@@ -2054,8 +1977,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 148
           Width = 22
           Height = 22
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 5
           OnClick = SlideForwardHeadsetBTNClick
           OnDragOver = GRPBOXControlDragOver
@@ -2073,8 +1994,6 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 148
           Width = 22
           Height = 22
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 6
           OnClick = SlideBackHeadsetBTNClick
           OnDragOver = GRPBOXControlDragOver
@@ -2093,8 +2012,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Add current file to playlist'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 7
           OnClick = BtnHeadsetToPlaylistClick
           OnDragOver = GRPBOXControlDragOver
@@ -2113,8 +2030,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Add file to playlist and begin playback from current position'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 8
           OnClick = BtnHeadsetPlaynowClick
           DrawMode = dm_Windows
@@ -2236,8 +2151,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Play backwards'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 4
@@ -2257,8 +2170,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 99
           Height = 25
           Caption = 'Disable effects'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           TabOrder = 5
           OnClick = Btn_EffectsOffClick
         end
@@ -2268,10 +2179,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 48
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 1
           OnDragOver = GRPBOXEffekteDragOver
           OnEndDrag = EffectsButtonEndDrag
@@ -2294,10 +2203,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 20
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 0
           OnDragOver = GRPBOXEffekteDragOver
           OnEndDrag = EffectsButtonEndDrag
@@ -2320,10 +2227,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 61
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 2
           OnDragOver = GRPBOXEffekteDragOver
           OnEndDrag = EffectsButtonEndDrag
@@ -2346,10 +2251,8 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 92
           Width = 25
           Height = 10
-          DoubleBuffered = True
           DragCursor = crSizeWE
           DragMode = dmAutomatic
-          ParentDoubleBuffered = False
           TabOrder = 3
           OnDragOver = GRPBOXEffekteDragOver
           OnEndDrag = EffectsButtonEndDrag
@@ -2372,8 +2275,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Set start point (A)'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 6
@@ -2393,8 +2294,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Set end point (B)'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 7
@@ -2414,8 +2313,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Disable A-B repeat'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 8
@@ -2467,6 +2364,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvNone
           BevelOuter = bvNone
           BorderStyle = bsNone
+          BorderWidth = 1
           DefaultPasteMode = amInsertAfter
           DragImageKind = diMainColumnOnly
           DragMode = dmAutomatic
@@ -2478,14 +2376,12 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = -1
           Header.Background = clWindow
-          Header.DefaultHeight = 17
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
           Header.Font.Name = 'Tahoma'
           Header.Font.Style = []
           Header.Options = [hoDrag, hoVisible]
-          Header.Style = hsXPStyle
           HintMode = hmHint
           Images = PlayListImageList
           Indent = 12
@@ -2497,7 +2393,7 @@ object Nemp_MainForm: TNemp_MainForm
           ShowHint = True
           TabOrder = 0
           TextMargin = 0
-          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
           TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
           TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
           OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
@@ -2588,8 +2484,6 @@ object Nemp_MainForm: TNemp_MainForm
           Width = 24
           Height = 24
           Hint = 'Show context menu'
-          DoubleBuffered = True
-          ParentDoubleBuffered = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -2663,6 +2557,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvNone
           BevelOuter = bvNone
           BorderStyle = bsNone
+          BorderWidth = 1
           Constraints.MinHeight = 26
           DragImageKind = diMainColumnOnly
           DragMode = dmAutomatic
@@ -2675,7 +2570,6 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = -1
           Header.Background = clWindow
-          Header.DefaultHeight = 17
           Header.Font.Charset = DEFAULT_CHARSET
           Header.Font.Color = clWindowText
           Header.Font.Height = -11
@@ -2683,7 +2577,6 @@ object Nemp_MainForm: TNemp_MainForm
           Header.Font.Style = []
           Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
           Header.SortColumn = 0
-          Header.Style = hsXPStyle
           HintMode = hmHint
           IncrementalSearch = isAll
           Indent = 0
@@ -2708,6 +2601,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnEditCancelled = VSTEditCancelled
           OnEdited = VSTEdited
           OnEditing = VSTEditing
+          OnEndDrag = VSTEndDrag
           OnEnter = VSTEnter
           OnFocusChanging = VSTFocusChanging
           OnGetText = VSTGetText
@@ -2977,7 +2871,6 @@ object Nemp_MainForm: TNemp_MainForm
               Top = 134
               Width = 150
               Height = 21
-              ItemHeight = 13
               Sorted = True
               TabOrder = 4
               Visible = False
@@ -3121,8 +3014,6 @@ object Nemp_MainForm: TNemp_MainForm
         Width = 24
         Height = 24
         Hint = 'Show context menu'
-        DoubleBuffered = True
-        ParentDoubleBuffered = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 3
@@ -3142,8 +3033,6 @@ object Nemp_MainForm: TNemp_MainForm
         Top = 6
         Width = 16
         Height = 16
-        DoubleBuffered = True
-        ParentDoubleBuffered = False
         ParentShowHint = False
         ShowHint = True
         Spacing = 2
@@ -4138,7 +4027,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D0013004C090E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00130090090E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4599,10 +4488,11 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 104
   end
   object MenuImages: TImageList
+    ShareImages = True
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100F806640A10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100F806A80A10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7547,7 +7437,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108002800B80610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800FC0610001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8021,5 +7911,22 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = WalkmanModeTimerTimer
     Left = 560
     Top = 248
+  end
+  object CorrectSkinRegionsTimer: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = CorrectSkinRegionsTimerTimer
+    Left = 200
+    Top = 392
+  end
+  object TreeImages: TImageList
+    Height = 11
+    Width = 11
+    Left = 168
+    Top = 328
+  end
+  object XPManifest1: TXPManifest
+    Left = 136
+    Top = 96
   end
 end

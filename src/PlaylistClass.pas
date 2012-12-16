@@ -37,7 +37,7 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     Dialogs, MMSystem, oneinst,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
-    NempAudioFiles, AudioFileHelper, WinampFunctions,  PlayerClass,
+    NempAudioFiles, AudioFileHelper, PlayerClass,
     gnuGettext, Nemp_RessourceStrings;
 
 type
@@ -265,7 +265,7 @@ type
       procedure LoadFromFile(aFilename: UnicodeString);
       procedure SaveToFile(aFilename: UnicodeString; Silent: Boolean = True);
       // copy it from Winamp
-      procedure GetFromWinamp;
+      // procedure GetFromWinamp; No. Not any more. *g*
 
       // The user wants us something todo => Set ErrorCount to 0
       procedure UserInput;
@@ -1686,6 +1686,7 @@ begin
   end;
 end;
 
+(*
 procedure TNempPlaylist.GetFromWinamp;
 var maxW,i : integer;
     Dateiname: String;
@@ -1708,6 +1709,7 @@ begin
       end;
   end;
 end;
+*)
 
  {
     --------------------------------------------------------

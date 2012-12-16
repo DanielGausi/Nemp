@@ -38,7 +38,7 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, VirtualTrees, ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
+  Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
   DateUtils,  IniFiles, jpeg, PNGImage, GifImg, math,
   bass, fldbrows, StringHelper, MainFormHelper,
 
@@ -53,6 +53,11 @@ uses
   IdTCPClient, IdHTTP;
 
 type
+
+  //TVirtualStringTree = VirtualTrees.TVirtualStringTree;
+
+  //TGroupbox = StdCtrls.TGroupBox;
+
   TOptionsCompleteForm = class(TForm)
     OptionsVST: TVirtualStringTree;
     TabView0: TTabSheet;
@@ -554,6 +559,9 @@ type
     procedure CB_SilenceDetectionClick(Sender: TObject);
     procedure cb_SettingsModeChange(Sender: TObject);
     procedure RecommendedFiletypesClick(Sender: TObject);
+    procedure OptionsVSTBeforeItemErase(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
+      var ItemColor: TColor; var EraseAction: TItemEraseAction);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -633,6 +641,22 @@ procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
 var i, s, count: integer;
   BassInfo: BASS_DEVICEINFO;
 begin
+
+//optionsVST.StyleElements := [];
+
+
+//optionsVST.TreeOptions.PaintOptions
+//Header.Options := optionsVST.Header.Options + [hoOwnerDraw];
+
+//optionsVST.Color := clWhite;
+//optionsVST.Font.Color := clred;
+
+//BtnOK.StyleElements := [];
+
+
+//UnSkinForm(self);
+
+
   BackUpComboBoxes;
   TranslateComponent (self);
   RestoreComboboxes;
@@ -934,6 +958,22 @@ end;
 
 
 
+procedure TOptionsCompleteForm.OptionsVSTBeforeItemErase(
+  Sender: TBaseVirtualTree; TargetCanvas: TCanvas; Node: PVirtualNode;
+  ItemRect: TRect; var ItemColor: TColor; var EraseAction: TItemEraseAction);
+begin
+  exit;
+  with TargetCanvas do
+  begin
+      if Node.Index mod 2 = 0 then
+        ItemColor := $EEEEEE  //$49DDEF // $70A33F // $436BFF
+      else
+        ItemColor := Graphics.clWindow;
+      EraseAction := eaColor;
+  end;
+end;
+
+
 procedure TOptionsCompleteForm.OptionsVSTFocusChanged(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 var aNode: PVirtualNode;
@@ -974,6 +1014,7 @@ begin
   Data:=Sender.GetNodeData(Node);
   CellText := _((Data^.FOptionData).Eintrag);
 end;
+
 
 procedure TOptionsCompleteForm.FormShow(Sender: TObject);
 var i,s: integer;

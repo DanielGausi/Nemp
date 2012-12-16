@@ -34,8 +34,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Width = 191
     Height = 494
     Anchors = [akLeft, akTop, akRight, akBottom]
+    BevelInner = bvNone
+    BevelOuter = bvNone
+    BorderStyle = bsNone
+    BorderWidth = 1
     Header.AutoSizeIndex = 0
-    Header.DefaultHeight = 17
     Header.Font.Charset = DEFAULT_CHARSET
     Header.Font.Color = clWindowText
     Header.Font.Height = -11
@@ -48,9 +51,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TabOrder = 0
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
+    OnBeforeItemErase = OptionsVSTBeforeItemErase
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
-    ExplicitHeight = 546
     Columns = <>
   end
   object PageControl1: TPageControl
@@ -58,16 +61,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 497
-    ActivePage = TabPlayer2
+    ActivePage = TabSystem1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
     TabStop = False
-    ExplicitHeight = 549
     object TabSystem0: TTabSheet
       Caption = 'Sys (Main)'
       ImageIndex = 6
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -254,7 +259,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem1: TTabSheet
       Caption = 'Sys (Control)'
       ImageIndex = 5
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1130,7 +1138,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem2: TTabSheet
       Caption = 'Sys (Files)'
       ImageIndex = 6
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1291,7 +1302,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem3: TTabSheet
       Caption = 'Sys (Tray)'
       ImageIndex = 20
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1388,7 +1402,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabSystem4: TTabSheet
       Caption = 'Sys (Hibernate)'
       ImageIndex = 21
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1469,7 +1486,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView0: TTabSheet
       Caption = 'View (Main)'
       ImageIndex = 1
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1650,7 +1670,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView1: TTabSheet
       Caption = 'View (Party)'
       ImageIndex = 19
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1749,7 +1772,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView2: TTabSheet
       Caption = 'View (Vis)'
       ImageIndex = 20
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1927,7 +1953,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView3: TTabSheet
       Caption = 'View (Fonts)'
       ImageIndex = 7
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -1984,7 +2013,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 3
         end
         object CBFontNameCBR: TComboBox
@@ -1993,7 +2022,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 161
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 4
         end
         object CBChangeFontColoronBitrate: TCheckBox
@@ -2117,7 +2146,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabView4: TTabSheet
       Caption = 'View (Ext)'
       ImageIndex = 21
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2270,7 +2302,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles0: TTabSheet
       Caption = 'Files (Main)'
       ImageIndex = 22
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2417,7 +2452,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles1: TTabSheet
       Caption = 'Files (Metadata)'
       ImageIndex = 20
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2556,7 +2594,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles2: TTabSheet
       Caption = 'Files (Cover)'
       ImageIndex = 24
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2668,7 +2709,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles3: TTabSheet
       Caption = 'Files (Search)'
       ImageIndex = 25
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2824,7 +2868,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabFiles4: TTabSheet
       Caption = 'Files (Unicode)'
       ImageIndex = 23
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -2919,7 +2966,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
         end
         object CBChinese: TComboBox
@@ -2928,7 +2975,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 1
         end
         object CBHebrew: TComboBox
@@ -2937,7 +2984,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 3
         end
         object CBJapanese: TComboBox
@@ -2946,7 +2993,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 4
         end
         object CBGreek: TComboBox
@@ -2955,7 +3002,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 2
         end
         object CBKorean: TComboBox
@@ -2964,7 +3011,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 5
         end
         object CBCyrillic: TComboBox
@@ -2973,7 +3020,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 6
         end
         object CBThai: TComboBox
@@ -2982,7 +3029,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 200
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 7
         end
       end
@@ -2990,7 +3037,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer0: TTabSheet
       Caption = 'Player (Main)'
       ImageIndex = 2
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3025,7 +3075,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Hint = 'The secondary device.'
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 1
         end
         object MainDeviceCB: TComboBox
@@ -3035,7 +3085,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 21
           Hint = 'The main device.'
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 0
         end
         object BtnRefreshDevices: TButton
@@ -3202,7 +3252,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer1: TTabSheet
       Caption = 'Player (Ext)'
       ImageIndex = 22
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3326,7 +3379,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer2: TTabSheet
       Caption = 'Player (Playlist)'
       ImageIndex = 19
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3464,7 +3520,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer3: TTabSheet
       Caption = 'Player (List-Ext)'
       ImageIndex = 23
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3575,7 +3634,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer4: TTabSheet
       Caption = 'Player (Streams)'
       ImageIndex = 23
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3766,7 +3828,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer5: TTabSheet
       Caption = 'Player (Effects)'
       ImageIndex = 15
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -3898,7 +3963,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer6: TTabSheet
       Caption = 'Player (Event)'
       ImageIndex = 19
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -4074,7 +4142,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer7: TTabSheet
       Caption = 'Player (Scrobble)'
       ImageIndex = 17
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -4426,7 +4497,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     object TabPlayer8: TTabSheet
       Caption = 'Player (Webserver)'
       ImageIndex = 18
-      ExplicitHeight = 449
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         446
         397)
@@ -4528,7 +4602,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 155
           Height = 21
           Style = csDropDownList
-          ItemHeight = 13
+          ItemHeight = 0
           TabOrder = 4
         end
         object EdtUsernameAdmin: TEdit
@@ -4732,7 +4806,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Apply'
     TabOrder = 2
     OnClick = BTNApplyClick
-    ExplicitTop = 562
   end
   object BTNCancel: TButton
     Left = 503
@@ -4744,7 +4817,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Caption = 'Cancel'
     TabOrder = 3
     OnClick = BTNCancelClick
-    ExplicitTop = 562
   end
   object BTNok: TButton
     Left = 423
@@ -4756,7 +4828,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Default = True
     TabOrder = 4
     OnClick = BTNokClick
-    ExplicitTop = 562
   end
   object cb_SettingsMode: TComboBox
     Left = 8
@@ -4773,7 +4844,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Items.Strings = (
       'Commonly used settings'
       'All settings')
-    ExplicitTop = 560
   end
   object ColorDialog1: TColorDialog
     Left = 104
@@ -4792,6 +4862,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
     ProxyParams.BasicAuthentication = False
     ProxyParams.ProxyPort = 0
     Request.ContentLength = -1
+    Request.ContentRangeEnd = -1
+    Request.ContentRangeStart = -1
+    Request.ContentRangeInstanceLength = -1
     Request.Accept = 'text/html, */*'
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'

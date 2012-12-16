@@ -35,6 +35,7 @@
 unit WindowsVersionInfo;
 
 {$I Jedi.inc}
+{$I xe.inc}
 
 interface
 
@@ -1474,7 +1475,7 @@ Begin
     End
   finally
   end;
-  DecimalSeparator := '.';
+  {$IFDEF USESTYLES}FormatSettings.{$ENDIF}DecimalSeparator := '.';
   try
     Result := StrToFloat( StrPas( Ident) );
   except on E : EConvertError Do

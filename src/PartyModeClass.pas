@@ -278,8 +278,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 110);
-    SetLength(fPartyControls, 110);
+    Setlength(fPositionArray, 115);
+    SetLength(fPartyControls, 115);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -344,6 +344,7 @@ begin
         SetOriginalPosition(DirectionPositionBTN, i);
         SetOriginalPosition(BtnABRepeatSetA     , i);
         SetOriginalPosition(BtnABRepeatSetB     , i);
+        SetOriginalPosition(BtnABRepeatUnset    , i);
 
         SetOriginalPosition(Btn_EffectsOff      , i);
         SetOriginalPosition(EchoWetDryMixButton , i);
@@ -383,6 +384,8 @@ begin
         SetOriginalPosition(EqualizerButton9    , i);
         SetOriginalPosition(EqualizerButton10   , i);
         SetOriginalPosition(Btn_EqualizerPresets, i);
+        SetOriginalPosition(ButtonPrevEQ, i);
+        SetOriginalPosition(ButtonNextEQ, i);
         SetOriginalPosition(GRPBOXLyrics        , i);
         SetOriginalPosition(LyricsMemo          , i);
 

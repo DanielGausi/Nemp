@@ -866,7 +866,7 @@ var
 begin
   StrData.Ident := Ident;
   StrData.Str := '';
-  EnumResourceModules(SysUtilsEnumStringModules, @StrData);
+  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  EnumResourceModules(SysUtilsEnumStringModules, @StrData);
   Result := StrData.Str;
 end;
 

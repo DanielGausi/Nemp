@@ -6,8 +6,6 @@ program nemp;
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
 
-
-
 {$R *.dres}
 
 uses
@@ -23,7 +21,6 @@ uses
   SysUtils,
   Graphics,
   NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
-  WinampFunctions in 'WinampFunctions.pas',
   Details in 'Details.pas' {FDetails},
   NempAudioFiles in 'NempAudioFiles.pas',
   NewPicture in 'NewPicture.pas' {FNewPicture},
@@ -73,7 +70,7 @@ uses
   PartyModeClass in 'PartyModeClass.pas',
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas' {/,  classes;},
+  TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
   CoverDownloads in 'CoverDownloads.pas',
@@ -95,7 +92,9 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  Lowbattery in 'Lowbattery.pas' {FormLowBattery};
+  Lowbattery in 'Lowbattery.pas' {FormLowBattery},
+  Vcl.Themes,
+  Vcl.Styles;
 
 //,  classes;
 
@@ -121,8 +120,7 @@ suchen nach SetWindowLong
 ShowWindow
  }
 
-
-    Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
@@ -155,7 +153,7 @@ ShowWindow
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin
         // DAS HIER DIENT DEM VERSTECKEN, NICHT DEM ANZEIGEN
-       PostMessage(Nemp_MainForm.Handle, WM_Command, COMMAND_RESTORE, 0);
+       PostMessage(Nemp_MainForm.FOwnMessageHandler, WM_Command, COMMAND_RESTORE, 0);
     end;
 
     FSplash.Visible := False;

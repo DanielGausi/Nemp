@@ -69,13 +69,13 @@ var
 begin
   TranslateComponent (self);
 
-  filename := ExtractFilePath(ParamStr(0)) + 'Images\splash.jpg';
+  filename := ExtractFilePath(ParamStr(0)) + 'Images\splash2.png';
 
   if FileExists(filename) then
       image1.Picture.LoadFromFile(filename);
 
 
-  xpleft   := 0;
+  (*xpleft   := 0;
         xptop    := 0; //+ 5 ;// + 19;
         xpright  := xpleft + 218 {GRPBOXSpectrum.Width} - 1 + 4;  //width-8;  //-14
         xpbottom := xptop + 25 {GRPBOXTextAnzeige.Height} -1 + 3;
@@ -96,17 +96,19 @@ begin
         CombineRgn( formregion, formregion, formregion1, RGN_OR );
 
         SetWindowRgn( handle, formregion, true );
+  *)
 
-  LAbel2.Caption := NEMP_VERSION_SPLASH;
+  Label2.Caption := NEMP_VERSION_SPLASH;
 
 end;
 
 procedure TFSplash.Image1Click(Sender: TObject);
 begin
-FSplash.StatusLBL.caption := Inttostr(Nemp_MainForm.top) + ' - '
+{FSplash.StatusLBL.caption := Inttostr(Nemp_MainForm.top) + ' - '
     + Inttostr(Nemp_MainForm.NempRegionsDistance.Top) + ' - '
     + Inttostr(Nemp_MainForm.NempRegionsDistance.RelativPositionY)
     ;
+}
 end;
 
 end.

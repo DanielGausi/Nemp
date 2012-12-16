@@ -528,16 +528,16 @@ MainForm_Summary_WebradioCount = '%d webradio station(s)';
 MainForm_Cover_NoCover   = 'No cover available';
 MainForm_Lyrics_NoLyrics = 'No lyrics available';
 
-    SplashScreen_Loading            = 'Loading...';
-    SplashScreen_LoadingPreferences = 'Loading preferences...';
-    SplashScreen_Loadingplaylist    = 'Loading playlist...';
-    SplashScreen_SearchSkins        = 'Searching for skins...';
-    SplashScreen_InitPlayer         = 'Initializing player...';
-    SplashScreen_LoadingMediaLib    = 'Loading medialibrary...';
-    SplashScreen_GenerateWindows    = 'Generating windows...';
-    SplashScreen_PleaseWaitaMoment  = 'Please wait a moment...';
-    SplashScreen_NewDriveConnected  = 'New drive connected. Please wait...';
-    SplashScreen_NewDriveConnected2 = 'Rebuilding library...';
+    SplashScreen_Loading            = 'Loading';
+    SplashScreen_LoadingPreferences = 'Loading preferences';
+    SplashScreen_Loadingplaylist    = 'Loading playlist';
+    SplashScreen_SearchSkins        = 'Searching for skins';
+    SplashScreen_InitPlayer         = 'Initializing player';
+    SplashScreen_LoadingMediaLib    = 'Loading medialibrary';
+    SplashScreen_GenerateWindows    = 'Generating windows';
+    SplashScreen_PleaseWaitaMoment  = 'Preparing media library';
+    SplashScreen_NewDriveConnected  = 'New drive connected: Collecting data.';
+    SplashScreen_NewDriveConnected2 = 'Preparing media library';
 
 // Warning_NempDidntShutDownRegular = 'Nemp didn''t shutdown tidily last time.';
 // Warning_NempDidntShutDownRegular_NoBackup = 'Nemp didn''t shutdown tidily. A backup of the playlist couldn''t be found.';

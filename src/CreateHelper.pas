@@ -108,7 +108,7 @@ begin
             NempPlayer.PostProcessor.WriteToFiles := NempOptions.AllowQuickAccessToMetadata;
 
             //Player initialisieren, Load Plugins.
-            NempPlayer.InitBassEngine(Handle, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
+            NempPlayer.InitBassEngine(FOwnMessageHandler, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
             // VCL an den Player anpassen
             PlaylistDateienOpenDialog.Filter := tmpwstr;
 
@@ -477,9 +477,9 @@ begin
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
         if NempOptions.RegisterHotKeys then
-            InstallHotkeys (SavePath, Handle);
+            InstallHotkeys (SavePath, FOwnMessageHandler);
         if NempOptions.RegisterMediaHotkeys then
-            InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys, Handle);
+            InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys, FOwnMessageHandler);
 
         Spectrum.Mode := 1;
         Spectrum.LineFallOff := 7;
