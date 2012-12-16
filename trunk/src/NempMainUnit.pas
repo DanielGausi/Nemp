@@ -33,13 +33,15 @@
 
 Unit NempMainUnit;
 
+{$I xe.inc}
+
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst,
-  WinampFunctions, Buttons,  VirtualTrees, VSTEditControls,
+  Buttons,  VirtualTrees, VSTEditControls,
   jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
    Mp3FileUtils, spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
@@ -56,9 +58,9 @@ uses
   UpdateUtils, uDragFilesSrc,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage,
-
-  ExPopupList, SilenceDetection;
+  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
+  ;
 
 type
 
@@ -836,8 +838,12 @@ type
     LblEmptyLibraryHint: TLabel;
     WalkmanModeTimer: TTimer;
     WalkmanImage: TImage;
+    CorrectSkinRegionsTimer: TTimer;
+    TreeImages: TImageList;
+    XPManifest1: TXPManifest;
 
     procedure FormCreate(Sender: TObject);
+
 
     procedure InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 
@@ -1280,10 +1286,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure RatingImageMouseLeave(Sender: TObject);
     procedure PanelCoverBrowseAfterPaint(Sender: TObject);
-    procedure VSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure VSTHeaderDblClick(Sender: TVTHeader; Column: TColumnIndex;
-            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
+    procedure VSTHeaderDblClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
     procedure VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
       Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
     procedure VSTFocusChanging(Sender: TBaseVirtualTree; OldNode,
@@ -1406,9 +1410,13 @@ type
     procedure PM_ABRepeatSetBClick(Sender: TObject);
     procedure WalkmanModeTimerTimer(Sender: TObject);
     procedure WalkmanImageClick(Sender: TObject);
+    procedure VSTEndDrag(Sender, Target: TObject; X, Y: Integer);
+    procedure ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
+      TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+      CellRect: TRect);
+    procedure CorrectSkinRegionsTimerTimer(Sender: TObject);
 
   private
-
     CoverImgDownX: Integer;
     CoverImgDownY: Integer;
     TagCloudDownX: Integer;
@@ -1429,13 +1437,15 @@ type
     EditingVSTRating: Boolean;
     LastVSTMouseOverNode: PVirtualNode;
 
-    NempIsClosing: Boolean;
+
 
     // Setzt alle DragOver-Eventhandler auf das der Effekte-Groupbox
     procedure SetGroupboxEffectsDragover;
     // ... der Equalizer-Groupbox
     procedure SetGroupboxEQualizerDragover;
 
+
+    procedure OwnMessageProc(var msg: TMessage);
     procedure NewScrollBarWndProc(var Message: TMessage);
     procedure NewLyricMemoWndProc(var Message: TMessage);
     procedure WMStartEditing(var Msg: TMessage); Message WM_STARTEDITING;
@@ -1453,6 +1463,11 @@ type
   public
 
       CloudViewer: TCloudViewer;
+
+    NempIsClosing: Boolean;
+
+    FOwnMessageHandler: HWND;
+
 
     // Zählt die Nachrichten "Neues Laufwerk angeschlossen"
     // nötig, da ein Update der Bib nicht möglich ist, wenn ein Update bereits läuft
@@ -1750,9 +1765,16 @@ begin
     TagCloudDownY := 0;
 end;
 
+procedure TNemp_MainForm.OwnMessageProc(var msg: TMessage);
+begin
+    msg.Result := sendmessage(self.Handle, msg.Msg, msg.WParam, msg.LParam);
+end;
+
 
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 begin
+
+
     TranslateComponent (self);
     Randomize;
     // Diverse Exceptions abschalten
@@ -1769,7 +1791,7 @@ begin
     LangeAktionWeitermachen    := False;
     NempRegionsDistance.Docked := True;
     MinimizedIndicator         := False;
-    Decimalseparator   := '.';
+    {$IFDEF USESTYLES}FormatSettings.{$ENDIF}Decimalseparator   := '.';
 
     OldScrollbarWindowProc    := CoverScrollbar.WindowProc;
     CoverScrollbar.WindowProc := NewScrollBarWndProc;
@@ -1797,7 +1819,7 @@ begin
     begin
         ID      := ST_ID_Medialist;
         Recurse := True;
-        MHandle := Handle;
+        MHandle := FOwnMessageHandler;
         MCurrentDir := mkNoneMessage;
         MFound      := mkSendMessage;
     end;
@@ -1805,7 +1827,7 @@ begin
     begin
         ID      := ST_ID_Playlist;
         Recurse := True;
-        MHandle := Handle;
+        MHandle := FOwnMessageHandler;
         MCurrentDir := mkNoneMessage;
         MFound      := mkSendMessage;
     end;
@@ -1828,6 +1850,8 @@ begin
         SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
     end;
 
+
+
     // Create additional controls
     CloudViewer           := TCloudViewer.Create(self);
     CloudViewer.Parent    := PanelTagCloudBrowse;
@@ -1847,18 +1871,25 @@ begin
     CloudViewer.OnAfterPaint := CloudAfterPaint;
     NewPlayerPanel.DoubleBuffered := True;
 
+    FOwnMessageHandler := AllocateHWND( OwnMessageProc );
+
+
     // Create Player
-    NempPlayer            := TNempPlayer.Create(Handle);
+    NempPlayer            := TNempPlayer.Create(FOwnMessageHandler);
     NempPlayer.Statusproc := StatusProc;
     // Create Playlist
     NempPlaylist        := TNempPlaylist.Create;
     NempPlaylist.VST    := PlaylistVST;
     NempPlaylist.Player := NempPlayer;
-    NempPlaylist.MainWindowHandle := Handle;
+    NempPlaylist.MainWindowHandle := FOwnMessageHandler;
 
     BibRatingHelper := TRatingHelper.Create;
     // Create Medialibrary
-    MedienBib := TMedienBibliothek.Create(self.Handle, PanelCoverBrowse.Handle);
+    //Application.CreateForm(TMsgForm, MsgForm);
+
+
+
+    MedienBib := TMedienBibliothek.Create(FOwnMessageHandler, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
     MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
     MedienBib.SavePath := SavePath;
@@ -1869,7 +1900,7 @@ begin
     MedienBib.NewCoverFlow.ScrollImage := ImgScrollCover;
     // Needed for FlyingCow
     MedienBib.NewCoverFlow.Window := PanelCoverBrowse.Handle ;
-    MedienBib.NewCoverFlow.events_window := Self.Handle;
+    MedienBib.NewCoverFlow.events_window := FOwnMessageHandler;
     try
         ForceDirectories(MedienBib.CoverSavePath);
     except
@@ -1884,10 +1915,10 @@ begin
     PlayListSkinImageList.Width := 14;
 
     // Create Updater
-    NempUpdater := TNempUpdater.Create(Handle);
+    NempUpdater := TNempUpdater.Create(FOwnMessageHandler);
 
     // create WebServer
-    NempWebServer := TNempWebServer.Create(Nemp_MainForm.Handle);
+    NempWebServer := TNempWebServer.Create(FOwnMessageHandler);
     NempWebServer.SavePath := SavePath;
     NempWebServer.CoverSavePath := MedienBib.CoverSavePath;
 
@@ -1930,8 +1961,8 @@ begin
 
         NempTrayIcon.Visible := False;
 
-        UnInstallHotKeys(Handle);
-        UninstallMediakeyHotkeys(Handle);
+        UnInstallHotKeys(FOwnMessageHandler);
+        UninstallMediakeyHotkeys(FOwnMessageHandler);
 
         NempWebServer.Free;
 
@@ -2198,8 +2229,10 @@ begin
 
       MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
     end;
+  else
+      OldScrollbarWindowProc(Message);
   end;
-  OldScrollbarWindowProc(Message);
+
 end;
 
 
@@ -2422,6 +2455,8 @@ begin
   wnd :=  FindWindowEx(wnd, 0, 'TNempDeskBand', Nil);
   SendMessage(wnd, aMsg, GetCurrentThreadId, 0);
 end;
+
+
 
 Procedure TNemp_MainForm.NempAPI_Commands(Var aMSG: tMessage);
 begin
@@ -2751,6 +2786,8 @@ begin
   NempSkin.LoadFromDir(tmpstr);
   NempSkin.ActivateSkin;
 
+
+
   if NempSkin.NempPartyMode.Active then
   begin
       // I have no idea, why I need to reactivate PartyMode to
@@ -2763,6 +2800,8 @@ begin
   RepaintOtherForms;
 
   RepaintAll;
+
+ // CorrectSkinRegionsTimer.Enabled := True;
 end;
 
 
@@ -2857,6 +2896,8 @@ begin
 
   VST.Enabled := True;
 end;
+
+
 
 
 procedure TNemp_MainForm.PM_ML_HideSelectedClick(Sender: TObject);
@@ -4012,20 +4053,19 @@ if VST.Header.Columns[column].Tag = CON_RATING then
     MaxWidth := 80;
 end;
 
-procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-          Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TNemp_MainForm.VSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
 var oldAudioFile: TAudioFile;
 begin
   VST.CancelEditNode;
-  if (Button = mbLeft) then
+  if (HitInfo.Button = mbLeft) then
   begin
-      if (Column > -1 ) then
+      if (HitInfo.Column > -1 ) then
       begin
           oldAudioFile := GetFocussedAudioFile;
           VST.Enabled := False;
 
-          MedienBib.AddSorter(VST.Header.Columns[Column].Tag);
-          VST.Header.SortColumn := Column;
+          MedienBib.AddSorter(VST.Header.Columns[HitInfo.Column].Tag);
+          VST.Header.SortColumn := HitInfo.Column;
           if MedienBib.SortParams[0].Direction = sd_Ascending then
               VST.Header.SortDirection := sdAscending
           else
@@ -4041,8 +4081,8 @@ begin
   end else
   begin
       VST_ColumnPopup.Popup(
-      VST.ClientToScreen(Point(x,y)).X,
-      VST.ClientToScreen(Point(x,y)).Y
+      VST.ClientToScreen(Point(HitInfo.x,HitInfo.y)).X,
+      VST.ClientToScreen(Point(HitInfo.x,HitInfo.y)).Y
       );
   end;
 end;
@@ -5801,6 +5841,7 @@ begin
   NempPlayer.LastUserWish := USER_WANT_PLAY;
   NempPlaylist.PlayFocussed;
   Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
+
 end;
 
 procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject;
@@ -5936,6 +5977,12 @@ end;
 procedure TNemp_MainForm.PlaylistVSTDragDrop(Sender: TBaseVirtualTree;
   Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
   Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+begin
+//exit;
+end;
+
+
+procedure TNemp_MainForm.VSTEndDrag(Sender, Target: TObject; X, Y: Integer);
 begin
   ClipCursor(Nil);
   DragSource := DS_EXTERN;
@@ -6764,6 +6811,15 @@ begin
 
   //NempTrayIcon.Hint := StringReplace(aAudioFile.Artist + ' - ' + aAudioFile.Titel, '&', '&&&', [rfReplaceAll]);
   NempTrayIcon.Hint := StringReplace(aAudioFile.PlaylistTitle, '&', '&&&', [rfReplaceAll]);
+end;
+
+procedure TNemp_MainForm.CorrectSkinRegionsTimerTimer(Sender: TObject);
+begin
+    DragAcceptFiles (Handle, True);
+    CorrectSkinRegionsTimer.Enabled := False;
+
+    NempSkin.SetRegionsAgain;
+    MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
 end;
 
 procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
@@ -8452,8 +8508,7 @@ end;
 
 
 
-procedure TNemp_MainForm.VSTHeaderDblClick(Sender: TVTHeader; Column: TColumnIndex;
-    Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TNemp_MainForm.VSTHeaderDblClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
 begin
 exit;
 end;
@@ -10314,6 +10369,7 @@ end;
 
 
 
+
 procedure TNemp_MainForm.VSTEnter(Sender: TObject);
 begin
   AktiverTree := VST;
@@ -11239,6 +11295,33 @@ end;
 procedure TNemp_MainForm.AlbenVSTClick(Sender: TObject);
 begin
     AlbenVSTFocusChanged(AlbenVST, AlbenVST.FocusedNode, 0);
+end;
+
+procedure TNemp_MainForm.ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
+  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+  CellRect: TRect);
+var
+  r : TRect;
+  nd : PStringTreeData;
+  t: Integer;
+begin
+  nd := Sender.GetNodeData(Node);
+
+  // vsExpanded,          // Set if the node is expanded.
+  // vsHasChildren,
+
+  if (vsHasChildren in Node.States) then
+  begin
+      r := Sender.GetDisplayRect(Node, Column, true, false);
+
+      t := ((Cellrect.Bottom - Cellrect.Top) - (11)) Div 2;
+
+      if vsExpanded in Node.States then
+          TreeImages.Draw(TargetCanvas, r.Left-14, t{CellRect.Top}, 1)
+      else
+          TreeImages.Draw(TargetCanvas, r.Left-14, t{CellRect.Top}, 0)
+
+  end;
 end;
 
 procedure TNemp_MainForm.ArtistsVSTClick(Sender: TObject);

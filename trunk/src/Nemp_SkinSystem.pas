@@ -33,12 +33,14 @@
 
 unit Nemp_SkinSystem;
 
+{$I xe.inc}
+
 interface
 
 uses Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
 iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons,
 
-Nemp_ConstantsAndTypes, PartyModeClass;
+Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
@@ -224,11 +226,15 @@ type
         //----
         HideMainMenu: Boolean;
 
+        // XE2:
+        UseAdvancedSkin: Boolean;
+
         //OldUseDefaultButtons: Boolean;
         ButtonMode: Integer;  // 0: Windows, 1: Nemp klassisch, 2: Nemp3.0
         SlideButtonMode: Integer;
 
         UseDefaultListImages: Boolean;
+        UseDefaultTreeImages: Boolean;
 
         UseDefaultStarBitmaps: Boolean;
 
@@ -270,6 +276,7 @@ type
         Procedure UpdateSpectrumGraphics;
         procedure ActivateSkin(SetFlowColor: Boolean = True);
         procedure DeActivateSkin(SetFlowColor: Boolean = True);
+        procedure SetRegionsAgain;
 
         procedure TileGraphic(const ATile: TBitmap; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
 
@@ -307,6 +314,10 @@ type
 
 
   end;
+
+  {$IFDEF USESTYLES}
+  procedure UnSkinForm(aForm: TForm);
+  {$ENDIF}
 
 
 const CustomColorNames : Array [0..15] of string = ('ColorA','ColorB','ColorC','ColorD','ColorE','ColorF','ColorG','ColorH','ColorI','ColorJ','ColorK','ColorL','ColorM','ColorN','ColorO','ColorP');
@@ -441,7 +452,7 @@ end;
 procedure TNempSkin.LoadFromDir(DirName: UnicodeString; Complete: Boolean = True);
 var i,idx: integer;
   ini: TMemIniFile;
-  SectionStr, n: String;
+  SectionStr, n {$IFDEF USESTYLES}, StyleFilename{$ENDIF}: String;
    Buttontmp, ListenCompletebmp: TBitmap;
   tmpjpg: TJpegImage;
   aPoint: TPoint;
@@ -512,7 +523,31 @@ begin
         UseBlendedTagCloud       := Ini.ReadBool('Options','UseBlendedTagCloud'     , False);
 
         //----
-        HideMainMenu                     := Ini.ReadBool('Options','HideMainMenu'  , False);
+        HideMainMenu     := Ini.ReadBool('Options','HideMainMenu'  , False);
+
+        {$IFDEF USESTYLES}
+        UseAdvancedSkin  := Ini.ReadBool('Options','UseAdvancedSkin'  , False);
+        {$ELSE}
+        UseAdvancedSkin := False;
+        {$ENDIF}
+
+
+        {$IFDEF USESTYLES}
+        StyleFilename := path + '\' + name + '.vsf';
+        if UseAdvancedSkin and FileExists(StyleFilename) then
+        begin
+            if TStyleManager.IsValidStyle(StyleFilename) then
+            begin
+                try
+                    TStyleManager.LoadFromFile(StyleFilename); //beware in this line you are only loading and registering a VCL Style and not setting as the current style.
+                except
+                end
+            end
+            else
+                UseAdvancedSkin := False;
+        end;
+        {$ENDIF}
+
 
         ButtonMode                       := Ini.ReadInteger('Options', 'ButtonMode', 0);
         //if ButtonMode = -1 then
@@ -533,6 +568,7 @@ begin
 
         //UseDefaultSlideButtons           := Ini.ReadBool('Options','UseDefaultSlideButtons', False);
         UseDefaultListImages             := Ini.ReadBool('Options','UseDefaultListImages', False);
+        UseDefaultTreeImages             := Ini.ReadBool('Options','UseDefaultTreeImages', False);
         UseDefaultStarBitmaps  := Ini.ReadBool('Options','UseDefaultStarBitmaps', True);
         UseSeparatePlayerBitmap          := Ini.ReadBool('Options', 'UseSeparatePlayerBitmap', False);
         //----
@@ -729,6 +765,37 @@ begin
   end;
   ListenCompletebmp.Free;
 
+  // Load Tree images [+] [-]
+  if NOT UseDefaultTreeImages then
+  begin
+      ListenCompletebmp := TBitmap.Create;
+      try
+          if LoadGraphicFromBaseName(ListenCompletebmp, DirName + '\tree', false) then
+          begin
+              Nemp_MainForm.TreeImages.Clear;
+              ButtonTmp := TBitmap.Create;
+              try
+                  Buttontmp.PixelFormat := pf32bit;
+                  ButtonTmp.Width := 11;
+                  Buttontmp.Height := 11;
+                  ButtonTmp.Canvas.CopyRect(
+                      rect(0,0,11,11), ListenCompletebmp.Canvas,
+                      rect(0,0,11, 11));
+                  Nemp_MainForm.TreeImages.AddMasked(ButtonTmp, Buttontmp.Canvas.Pixels[0,0]);
+                  ButtonTmp.Canvas.CopyRect(
+                      rect(0,0,11,11), ListenCompletebmp.Canvas,
+                      rect(11,0,22,11));
+                  Nemp_MainForm.TreeImages.AddMasked(ButtonTmp, Buttontmp.Canvas.Pixels[0,0]);
+              finally
+                  ButtonTmp.Free;
+              end;
+          end
+          else
+              UseDefaultTreeImages := True;
+      finally
+          ListenCompletebmp.Free;
+      end;
+  end;
 
   {if UseSkinGraphics then
             BaseDir := Path + '\'
@@ -1193,6 +1260,9 @@ var i, idx: integer;
 
 begin
   isActive := True;
+
+
+
   //zunächst: Ownerdraw der Boxen/Panels setzen
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
@@ -1237,15 +1307,23 @@ begin
            2: begin
                   for i := 0 to 17 do
                   begin
-                      SlideButtons[i].Button.DrawMode := dm_Skin;
+
                       AssignNemp3Glyph(SlideButtons[i].Button,
                             path + '\' + SlideButtons[i].GlyphFile, True);
+
+                      SlideButtons[i].Button.DrawMode := dm_Skin;
+
+                      {$IFDEF USESTYLES}
+                      SlideButtons[i].Button.StyleElements := [];
+                      {$ENDIF}
+
                       SlideButtons[i].Button.CustomRegion := True;
                       SlideButtons[i].Button.Refresh;
                   end;
            end;
         end;
 
+        
         // Buttons / Images konfigurieren.
         AssignButtonSizes;
 
@@ -1331,9 +1409,6 @@ begin
                 AssignNemp3Glyph(SlideForwardHeadsetBTN,  Path + '\BtnSlideForwardHeadset', True);
                 SlideForwardHeadsetBTN.GlyphLine := SlideForwardHeadsetBTN.GlyphLine;
 
-
-
-
                 AssignNemp3Glyph(CB_MedienBibGlobalQuickSearch,  Path + '\BtnQuickSearch', True);
                 CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
 
@@ -1345,6 +1420,21 @@ begin
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
+      if UseDefaultTreeImages then
+      begin
+          Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nil;
+          Nemp_MainForm.AlbenVST.OnAfterCellPaint := Nil;
+          Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions := Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions + [toShowButtons];
+          Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions + [toShowButtons];
+      end else
+      begin
+          Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nemp_MainForm.ArtistsVSTAfterCellPaint;
+          Nemp_MainForm.AlbenVST.OnAfterCellPaint := Nemp_MainForm.ArtistsVSTAfterCellPaint;
+          Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions := Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions - [toShowButtons];
+          Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions - [toShowButtons];
+      end;
+
+
       Nemp_MainForm.BibRatingHelper.UsebackGround := True;
 
       if (UseBackGroundImageVorauswahl)  then ArtistsVST.Background.Assign(CompleteBitmap)
@@ -1530,6 +1620,49 @@ begin
   UpdateSpectrumGraphics;
   Nemp_MainForm.RepaintVisOnPause;
 
+  {$IFDEF USESTYLES}
+  if UseAdvancedSkin then
+      TStylemanager.TrySetStyle(self.name)
+  else
+      TStyleManager.SetStyle('Windows');
+  {$ENDIF}
+
+  Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+
+end;
+
+procedure TNempSkin.SetRegionsAgain;
+var i: Integer;
+    j: TControlButtons;
+
+begin
+    with Nemp_MainForm do
+    begin
+
+        case SlideButtonMode of
+           2: begin
+                  for i := 0 to 17 do
+                  begin
+                      SlideButtons[i].Button.CustomRegion := True;
+                      SlideButtons[i].Button.Refresh;
+                  end;
+           end;
+        end;
+
+        for j := low(Controlbuttons) to High(Controlbuttons) do
+                begin
+                        ControlButtons[j].CustomRegion := True;
+                        ControlButtons[j].Refresh;
+                end;
+
+        for i := Low(TabButtons) to High(TabButtons) do
+        begin
+              TabButtons[i].Button.CustomRegion := True;
+              TabButtons[i].Button.Refresh;
+        end;
+
+    end;
+
 end;
 
 
@@ -1595,6 +1728,11 @@ begin
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
+      Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nil;
+      Nemp_MainForm.AlbenVST.OnAfterCellPaint := Nil;
+      Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions := Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions + [toShowButtons];
+      Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions + [toShowButtons];
+
       ArtistsVST.Background.Assign(Nil);
       AlbenVST.Background.Assign(Nil);
       PlaylistVST.Background.Assign(Nil);
@@ -1742,7 +1880,12 @@ begin
     RepaintVisOnPause;
 
     if Nemp_MainForm.AnzeigeMode = 0 then
-      Menu := Nemp_MainMenu;
+        Menu := Nemp_MainMenu;
+
+    {$IFDEF USESTYLES}
+    TStyleManager.SetStyle('Windows');
+    {$ENDIF}
+    Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
   end;
 end;
 
@@ -2516,6 +2659,9 @@ procedure TNempSkin.AssignNemp3Glyph(aButton: TSkinButton; aFilename: UnicodeStr
 var tmpBitmap: TBitmap;
 begin
     aButton.DrawMode := dm_Skin;
+    {$IFDEF USESTYLES}
+    aButton.StyleElements := [];
+    {$ENDIF}
     aButton.NumGlyphsX := 5;
     tmpBitmap := TBitmap.Create;
     try
@@ -2526,6 +2672,23 @@ begin
         tmpBitmap.Free;
     end;
 end;
+
+
+{$IFDEF USESTYLES}
+procedure UnSkinForm(aForm: TForm);
+var i: Integer;
+begin
+    aForm.StyleElements := [];
+    for i := 0 to aForm.ComponentCount - 1 do
+    begin
+        if aForm.Components[i] is TControl then
+            TControl(aForm.Components[i]).StyleElements := [];
+
+        if aForm.Components[i] is tGroupbox then
+            tGroupbox(aForm.Components[i]).StyleElements := [];
+    end;
+end;
+{$ENDIF}
 
 
 end.

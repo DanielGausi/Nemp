@@ -117,8 +117,8 @@ object CloudEditorForm: TCloudEditorForm
         Width = 379
         Height = 251
         Anchors = [akLeft, akTop, akRight, akBottom]
+        BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
         Header.Font.Height = -11
@@ -222,8 +222,8 @@ object CloudEditorForm: TCloudEditorForm
         Width = 379
         Height = 292
         Anchors = [akLeft, akTop, akRight, akBottom]
+        BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
         Header.Font.Height = -11
@@ -283,8 +283,8 @@ object CloudEditorForm: TCloudEditorForm
         Width = 379
         Height = 292
         Anchors = [akLeft, akTop, akRight, akBottom]
+        BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.DefaultHeight = 17
         Header.Font.Charset = DEFAULT_CHARSET
         Header.Font.Color = clWindowText
         Header.Font.Height = -11

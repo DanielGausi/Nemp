@@ -2,9 +2,11 @@ unit BasicSettingsWizard;
 
 interface
 
+{$I xe.inc}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
@@ -188,6 +190,10 @@ begin
     Lbl_Version.Caption := 'Version ' + GetFileVersionString('');
 
     pc_Wizard.ActivePage := TabSheet1;
+
+    {$IFDEF USESTYLES}
+    //UnskinForm(self);
+    {$ENDIF}
 end;
 
 procedure TWizard.FormShow(Sender: TObject);

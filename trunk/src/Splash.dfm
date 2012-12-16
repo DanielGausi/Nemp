@@ -4,7 +4,7 @@ object FSplash: TFSplash
   BorderStyle = bsNone
   Caption = 'Nemp'
   ClientHeight = 178
-  ClientWidth = 222
+  ClientWidth = 285
   Color = clWhite
   TransparentColorValue = clMaroon
   Font.Charset = DEFAULT_CHARSET
@@ -21,26 +21,38 @@ object FSplash: TFSplash
   object Image1: TImage
     Left = 0
     Top = 0
-    Width = 220
+    Width = 283
     Height = 173
     OnClick = Image1Click
   end
   object Label2: TLabel
-    Left = 184
-    Top = 8
-    Width = 25
+    Left = 4
+    Top = 157
+    Width = 125
     Height = 13
     AutoSize = False
-    Caption = '...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clSilver
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     Transparent = True
   end
   object StatusLBL: TLabel
     Left = 8
-    Top = 8
-    Width = 169
+    Top = 112
+    Width = 269
     Height = 13
+    Alignment = taCenter
     AutoSize = False
     Caption = '...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clSilver
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     Transparent = True
   end
 end

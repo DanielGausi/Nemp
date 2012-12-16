@@ -49,6 +49,7 @@ object Wizard: TWizard
         Top = 32
         Width = 128
         Height = 128
+        Transparent = True
       end
       object Lbl_Version: TLabel
         Left = 152
@@ -96,6 +97,10 @@ object Wizard: TWizard
     object TabSheet2: TTabSheet
       Caption = '(Updates)'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Lbl_CheckUpdates: TLabel
         Left = 152
         Top = 16
@@ -129,6 +134,7 @@ object Wizard: TWizard
         Top = 32
         Width = 128
         Height = 128
+        Transparent = True
       end
       object Label1: TLabel
         Left = 8
@@ -189,11 +195,16 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ImageMetaData: TImage
         Left = 8
         Top = 32
         Width = 128
         Height = 128
+        Transparent = True
       end
       object Lbl_QueryMetadata: TLabel
         Left = 152
@@ -284,6 +295,10 @@ object Wizard: TWizard
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ImageRating: TImage
         Left = 8
         Top = 32
@@ -378,6 +393,10 @@ object Wizard: TWizard
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ImageLastFM: TImage
         Left = 8
         Top = 32
@@ -471,6 +490,10 @@ object Wizard: TWizard
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ImageFiletypes: TImage
         Left = 8
         Top = 32
@@ -565,6 +588,10 @@ object Wizard: TWizard
       Caption = '(summary)'
       ImageIndex = 5
       OnShow = TabSheet7Show
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ImgSummary: TImage
         Left = 8
         Top = 32
