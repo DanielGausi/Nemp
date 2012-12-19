@@ -365,11 +365,11 @@ if active then
   with Nemp_MainForm do
   begin
       grpPoint := PaintFrame.ClientToScreen(Point(0,0));
-      OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
       if NempSkin.UseSeparatePlayerBitmap then
       begin
           localOffsetX := 0;
           localOffsetY := 0;
+          OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
           sourceBmp := NempSkin.PlayerBitmap;
           //stretch := NempSkin.NempPartyMode.Active;
           stretch := False;
@@ -377,6 +377,7 @@ if active then
       begin
           localOffsetX := NempSkin.PlayerPageOffsetX;
           localOffsetY := NempSkin.PlayerPageOffsetY;
+          OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
           sourceBmp := NempSkin.CompleteBitmap;
           stretch := False;
       end;
@@ -405,7 +406,6 @@ if active then
   with Nemp_MainForm do
   begin
     grpPoint := TextAnzeigeIMAGE.ClientToScreen(Point(0,0));
-    OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
     if NempSkin.UseSeparatePlayerBitmap then
     begin
         localOffsetX := 0;
@@ -418,6 +418,7 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
+        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
@@ -438,7 +439,6 @@ if active then
   with Nemp_MainForm do
   begin
     grpPoint := TimePaintBox.ClientToScreen(Point(0,0));
-    OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
     if NempSkin.UseSeparatePlayerBitmap then
     begin
         localOffsetX := 0;
@@ -451,6 +451,7 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
+        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
@@ -471,11 +472,11 @@ if active then
   with Nemp_MainForm do
   begin
     grpPoint := RatingImage.ClientToScreen(Point(0,0));
-    OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
     if NempSkin.UseSeparatePlayerBitmap then
     begin
         localOffsetX := 0;
         localOffsetY := 0;
+        OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.PlayerBitmap;
         //stretch := NempSkin.NempPartyMode.Active;
         stretch := False;
@@ -483,6 +484,7 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
+        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
