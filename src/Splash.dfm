@@ -3,8 +3,8 @@ object FSplash: TFSplash
   Top = 83
   BorderStyle = bsNone
   Caption = 'Nemp'
-  ClientHeight = 178
-  ClientWidth = 285
+  ClientHeight = 173
+  ClientWidth = 283
   Color = clWhite
   TransparentColorValue = clMaroon
   Font.Charset = DEFAULT_CHARSET
