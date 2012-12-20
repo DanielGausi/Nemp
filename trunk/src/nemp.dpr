@@ -92,9 +92,8 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  Lowbattery in 'Lowbattery.pas' {FormLowBattery},
-  Vcl.Themes,
-  Vcl.Styles;
+  Lowbattery in 'Lowbattery.pas' {FormLowBattery}
+  ;
 
 //,  classes;
 

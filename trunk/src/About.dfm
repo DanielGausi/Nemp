@@ -202,8 +202,8 @@ object AboutForm: TAboutForm
     OnClick = BtnDonateClick
   end
   object ImageList1: TImageList
-    Height = 112
-    Width = 155
+    Height = 122
+    Width = 200
     Left = 24
     Top = 272
   end
