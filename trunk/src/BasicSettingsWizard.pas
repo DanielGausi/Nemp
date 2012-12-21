@@ -6,13 +6,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem, MyDialogs
+  ;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
     WIZ_CURRENT_VERSION = 42;
 
+    WIZ_CURRENT_SKINVERSION = 46;
+
 type
+
+
   TWizard = class(TForm)
     pc_Wizard: TPageControl;
     TabSheet1: TTabSheet;
@@ -135,6 +140,18 @@ begin
         end;
     end;
 
+    if Nemp_MainForm.NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION then
+    begin
+        if (Nemp_MainForm.SkinName <> '<public> Nemp 4.6') and  Nemp_MainForm.NempOptions.WriteAccessPossible then
+        begin
+          if TranslateMessageDLG((Wizard_NewSkin), mtInformation, [MBYES, MBNO], 0) = mrYES then
+          begin
+              Nemp_MainForm.UseSkin := True;
+              Nemp_MainForm.SkinName := '<public> Nemp 4.6';
+              Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Nemp 4.6');
+          end;
+        end;
+    end;
 end;
 
 procedure TWizard.BtnCancelClick(Sender: TObject);
@@ -192,7 +209,7 @@ begin
     pc_Wizard.ActivePage := TabSheet1;
 
     {$IFDEF USESTYLES}
-    //UnskinForm(self);
+    UnskinForm(self);
     {$ENDIF}
 end;
 

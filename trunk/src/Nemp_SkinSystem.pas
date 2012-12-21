@@ -544,7 +544,10 @@ begin
                 end
             end
             else
+            begin
                 UseAdvancedSkin := False;
+                wuppdi;
+            end;
         end;
         {$ENDIF}
 
@@ -1314,7 +1317,7 @@ begin
                       SlideButtons[i].Button.DrawMode := dm_Skin;
 
                       {$IFDEF USESTYLES}
-                      SlideButtons[i].Button.StyleElements := [];
+                      //YYYYY SlideButtons[i].Button.StyleElements := [];
                       {$ENDIF}
 
                       SlideButtons[i].Button.CustomRegion := True;
@@ -1621,8 +1624,11 @@ begin
   Nemp_MainForm.RepaintVisOnPause;
 
   {$IFDEF USESTYLES}
+
   if UseAdvancedSkin then
-      TStylemanager.TrySetStyle(self.name)
+  begin
+      TStylemanager.SetStyle(self.name);
+  end
   else
       TStyleManager.SetStyle('Windows');
   {$ENDIF}
@@ -2660,7 +2666,7 @@ var tmpBitmap: TBitmap;
 begin
     aButton.DrawMode := dm_Skin;
     {$IFDEF USESTYLES}
-    aButton.StyleElements := [];
+    //YYYYY aButton.StyleElements := [];
     {$ENDIF}
     aButton.NumGlyphsX := 5;
     tmpBitmap := TBitmap.Create;
@@ -2678,7 +2684,7 @@ end;
 procedure UnSkinForm(aForm: TForm);
 var i: Integer;
 begin
-    aForm.StyleElements := [];
+{    aForm.StyleElements := [];
     for i := 0 to aForm.ComponentCount - 1 do
     begin
         if aForm.Components[i] is TControl then
@@ -2687,6 +2693,7 @@ begin
         if aForm.Components[i] is tGroupbox then
             tGroupbox(aForm.Components[i]).StyleElements := [];
     end;
+}
 end;
 {$ENDIF}
 

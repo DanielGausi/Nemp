@@ -840,7 +840,6 @@ type
     WalkmanImage: TImage;
     CorrectSkinRegionsTimer: TTimer;
     TreeImages: TImageList;
-    XPManifest1: TXPManifest;
 
     procedure FormCreate(Sender: TObject);
 
@@ -848,6 +847,7 @@ type
     procedure InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 
     procedure Skinan1Click(Sender: TObject);
+    procedure ActivateSkin(aName: String);
 
     procedure ChangeLanguage(Sender: TObject);
 
@@ -1774,6 +1774,7 @@ end;
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 begin
 
+    FOwnMessageHandler := AllocateHWND( OwnMessageProc );
 
     TranslateComponent (self);
     Randomize;
@@ -1870,8 +1871,6 @@ begin
     CloudViewer.OnPaint      := CloudPaint;
     CloudViewer.OnAfterPaint := CloudAfterPaint;
     NewPlayerPanel.DoubleBuffered := True;
-
-    FOwnMessageHandler := AllocateHWND( OwnMessageProc );
 
 
     // Create Player
@@ -2769,6 +2768,26 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.ActivateSkin(aName: String);
+begin
+    NempSkin.LoadFromDir(aName);
+    NempSkin.ActivateSkin;
+
+    if NempSkin.NempPartyMode.Active then
+    begin
+        // I have no idea, why I need to reactivate PartyMode to
+        // get proper results with the player-image... :(
+        NempSkin.NempPartyMode.Active := false;
+        NempSkin.NempPartyMode.Active := true;
+    end;
+
+    RePaintPanels;
+    RepaintOtherForms;
+
+    RepaintAll;
+
+end;
+
 // Ein paar Routinen, die das Skinnen erleichtren
 procedure TNemp_MainForm.Skinan1Click(Sender: TObject);
 var tmpstr: UnicodeString;
@@ -2783,23 +2802,7 @@ begin
   tmpstr := StringReplace(tmpstr,
               '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
 
-  NempSkin.LoadFromDir(tmpstr);
-  NempSkin.ActivateSkin;
-
-
-
-  if NempSkin.NempPartyMode.Active then
-  begin
-      // I have no idea, why I need to reactivate PartyMode to
-      // get proper results with the player-image... :(
-      NempSkin.NempPartyMode.Active := false;
-      NempSkin.NempPartyMode.Active := true;
-  end;
-
-  RePaintPanels;
-  RepaintOtherForms;
-
-  RepaintAll;
+  ActivateSkin(tmpStr);
 
  // CorrectSkinRegionsTimer.Enabled := True;
 end;

@@ -1030,7 +1030,7 @@ begin
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
 
         ini.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
-        ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_VERSION);
+        ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
         ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
         ini.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);
