@@ -727,6 +727,8 @@ CopyToUSB_ERROR_NOT_ENOUGH_MEMORY  = 'Not enough memory. Choose OK to continue w
 
 WizardCancel = 'You cancelled the Nemp Wizard. Some features may be disabled.';
 
+Wizard_NewSkin = 'Nemp 4.6 comes with a new default skin. Do you want to use the new one?';
+
 StartG15ToolQuestion = 'If you have a Logitech G15 keyboard, Nemp can display the current title (and some other stuff) on it.'
                       +#13#10+#13#10
                       +'It is possible to use other apps for other keyboards. However, I only own a G15, so I can test only this one.'

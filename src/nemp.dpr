@@ -6,7 +6,10 @@ program nemp;
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
 
+
+
 {$R *.dres}
+{$I xe.inc}
 
 uses
   madExcept,
@@ -94,7 +97,6 @@ uses
   SilenceDetection in 'SilenceDetection.pas',
   Lowbattery in 'Lowbattery.pas' {FormLowBattery}
   ;
-
 //,  classes;
 
 {$R *.res}
@@ -106,6 +108,8 @@ begin
     ReportMemoryLeaksOnShutdown := False;
 
     Application.Initialize;
+
+
     //Application.MainFormOnTaskBar := True;
 {
 SetWindowLong mit Application.handle funktioniert, wenn MainFormOnTaskbar = False;

@@ -123,7 +123,7 @@ begin
 
 
             UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
-            SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp3');
+            SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp 4.6');
 
             for i:=0 to Spaltenzahl-1 do
             begin
