@@ -138,7 +138,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
-    CDOpenDialogs;
+    CDOpenDialogs, LowBattery;
 
 procedure CorrectVolButton;
 begin
@@ -1148,6 +1148,12 @@ begin
 
         if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
 
+        if assigned(FormLowBattery) then
+        begin
+            FormLowBattery.BackUpComboBoxes;
+            ReTranslateComponent(FormLowBattery);
+            FormLowBattery.RestoreComboboxes;
+        end;
 
          // Todo:
         // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)

@@ -96,12 +96,15 @@ uses
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
   Lowbattery in 'Lowbattery.pas' {FormLowBattery}
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 //,  classes;
 
 {$R *.res}
 
 var EVILHACKX, EVILHACKY: INTEGER;
+
+
 
 begin
 
@@ -122,6 +125,10 @@ Mit MainForm.handle funktioniert das Splash- gedöns nicht mehr!! und Win 7
 suchen nach SetWindowLong
 ShowWindow
  }
+
+  {$IFDEF USESTYLES}
+    TStyleManager.Engine.RegisterStyleHook(TNemp_MainForm, TFormStyleHookFix);
+  {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Graphics.DefFontData.Name := 'Tahoma';

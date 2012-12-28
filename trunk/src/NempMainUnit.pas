@@ -64,6 +64,17 @@ uses
 
 type
 
+  {$IFDEF USESTYLES}
+  TFormStyleHookFix= class (TFormStyleHook)
+  procedure CMDialogChar(var Message: TWMKey); message CM_DIALOGCHAR;
+  end;
+
+  TFormStyleHookHelper= class  helper for TFormStyleHook
+  private
+     function CheckHotKeyItem(ACharCode: Word): Boolean;
+  end;
+  {$ENDIF}
+
   TNemp_MainForm = class(TNempForm)
     Splitter1: TSplitter;
     TopMainPanel: TPanel;
@@ -1605,6 +1616,30 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
 {$R *.dfm}
 
 
+{$IFDEF USESTYLES}
+{ TFormStyleHookFix }
+
+procedure TFormStyleHookFix.CMDialogChar(var Message: TWMKey);
+begin
+   if ((Message.KeyData and $20000000) <> 0 ) and (CheckHotKeyItem(Message.CharCode)) then
+    begin
+      Message.Result := 1;
+      Handled := True;
+    end
+end;
+
+{ TFormStyleHookHelper }
+function TFormStyleHookHelper.CheckHotKeyItem(ACharCode: Word): Boolean;
+begin
+  Result:=False;
+  if Self.FMainMenuBarHook<>nil then
+   Result:=Self.FMainMenuBarHook.CheckHotKeyItem(ACharCode);
+end;
+{$ENDIF}
+
+
+
+
 procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 begin
     if StartPlay then
@@ -2067,6 +2102,8 @@ begin
         FreeAndNil(DragDropList);
 
         Set8087CW(Default8087CW);
+
+
 
     except
         halt;
@@ -9468,6 +9505,7 @@ begin
         LanguageList.Free;
         NempUpdater.Free;
         FreeAndNil(ErrorLog);
+        DeallocateHWnd(FOwnMessageHandler);
         //ST_Playlist.Free;
         //ST_Medienliste.Free;
     except
@@ -10990,6 +11028,7 @@ var Newindex, ActualIndex: Integer;
 
 begin
   if ssctrl in Shift then exit;
+
   case key of
     $41..$5A, $30..$39,32,
     $BA..$C0, $DB..$DE, $E2:
@@ -11509,17 +11548,25 @@ begin
       Application.CreateForm(TFormLowBattery, FormLowBattery);
 
     case FormLowBattery.ShowModal of
-        1: ; // nothing to do
-        2: begin
-              StopFluttering; // it will start again in 2 minutes. ;-)
-              ReArrangeToolImages;
+        mrOK: begin
+            case FormLowbattery.cb_ToDo.ItemIndex of
+                0: begin
+                    // nothing to do
+                end;
+                1: begin
+                    StopFluttering; // it will start again in 2 minutes. ;-)
+                    ReArrangeToolImages;
+                end;
+                2: begin
+                    StopFluttering;
+                    ReArrangeToolImages;
+                    NempPlayer.UseWalkmanMode := False;
+                    WalkmanModeTimer.Enabled := False;
+                end;
+            end;
         end;
-        3: begin
-              StopFluttering;
-              ReArrangeToolImages;
-              NempPlayer.UseWalkmanMode := False;
-              WalkmanModeTimer.Enabled := False;
-        end;
+    else
+        ; //nothing to do
     end;
 end;
 
