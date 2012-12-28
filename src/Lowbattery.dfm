@@ -60,6 +60,8 @@ object FormLowBattery: TFormLowBattery
     Width = 75
     Height = 25
     Caption = 'Ok'
+    Default = True
+    ModalResult = 1
     TabOrder = 1
   end
   object cb_ToDo: TComboBox
@@ -68,10 +70,7 @@ object FormLowBattery: TFormLowBattery
     Width = 337
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
-    ItemIndex = 0
     TabOrder = 2
-    Text = 'Nothing, but thank you for the information.'
     OnChange = cb_ToDoChange
     Items.Strings = (
       'Nothing, but thank you for the information.'
@@ -79,5 +78,15 @@ object FormLowBattery: TFormLowBattery
         'Stop fluttering now, I will go get a power cable as fast as I ca' +
         'n.'
       'Stop the "Walkman mode" completely.')
+  end
+  object BtnCancel: TButton
+    Left = 333
+    Top = 193
+    Width = 75
+    Height = 25
+    Cancel = True
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 3
   end
 end

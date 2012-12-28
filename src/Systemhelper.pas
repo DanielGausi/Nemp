@@ -449,7 +449,7 @@ end;
 function GetPowerStatus(var HasBattery: Boolean; var LoadstatusPercent: Integer): DWORD;
 var
   SystemPowerStatus: TSystemPowerStatus;
-  Text: string;
+//  Text: string;
 {resourcestring
   rsLoadStatusUnknown = 'Unbekannter Status';
   rsLoadStatusNoBattery = 'Es existiert keine Batterie';

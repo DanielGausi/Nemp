@@ -358,15 +358,18 @@ begin
                                       GetBestCoverUrlFromXML;      // Get a Cover-URL from the XML-File
                                       DownloadBestCoverToStream;   // download the Cover from the URL
 
-                                      Synchronize(SyncUpdateCover);  // after this: Cover is really ok
-                                                                     // i.e. downloaded Data is valid Picture-data
+                                      if not terminated then
+                                          Synchronize(SyncUpdateCover);  // after this: Cover is really ok
+                                                                        // i.e. downloaded Data is valid Picture-data
 
                                       if fCurrentDownloadComplete then
                                       begin
                                           if assigned(CurrentCacheItem) then
                                               fCacheList.Remove(CurrentCacheItem);
-                                          Synchronize(SavePicStreamToFile); // save downloaded picture to a file
-                                          Synchronize(SyncUpdateMedialib); // update Medialibrary
+                                          if not terminated then
+                                              Synchronize(SavePicStreamToFile); // save downloaded picture to a file
+                                          if not terminated then
+                                              Synchronize(SyncUpdateMedialib); // update Medialibrary
                                       end else
                                       begin
                                           // the current job was not completed
@@ -400,12 +403,16 @@ begin
                                       end;
 
                                   end else
-                                      Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
+                                  begin
+                                      if not terminated then
+                                          Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
+                                  end;
 
                         end // Proper Album
                         else
                         begin
-                            Synchronize(SyncUpdateInvalidCover);
+                            if not terminated then
+                                Synchronize(SyncUpdateInvalidCover);
                         end;
                         LeaveCriticalSection(CSAccessCacheList);
 

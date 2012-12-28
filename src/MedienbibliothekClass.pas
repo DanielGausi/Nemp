@@ -719,7 +719,7 @@ end;
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
-  NewCoverFlow.Clear;
+  //NewCoverFlow.Clear;
   NewCoverFlow.free;
 
   TagCloud.Free;

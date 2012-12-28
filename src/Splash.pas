@@ -62,9 +62,9 @@ uses NempMainUnit;
 
 procedure TFSplash.FormCreate(Sender: TObject);
 var
-  formregion,
-  formregion1: HRGN;
-  xpbottom, xptop, xpleft, xpright: integer;
+  //formregion,
+  //formregion1: HRGN;
+  //xpbottom, xptop, xpleft, xpright: integer;
   filename: String;
 begin
   TranslateComponent (self);
@@ -74,6 +74,7 @@ begin
   if FileExists(filename) then
       image1.Picture.LoadFromFile(filename);
 
+  Label2.Caption := NEMP_VERSION_SPLASH;
 
   (*xpleft   := 0;
         xptop    := 0; //+ 5 ;// + 19;
@@ -97,9 +98,6 @@ begin
 
         SetWindowRgn( handle, formregion, true );
   *)
-
-  Label2.Caption := NEMP_VERSION_SPLASH;
-
 end;
 
 procedure TFSplash.Image1Click(Sender: TObject);
