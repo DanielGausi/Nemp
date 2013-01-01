@@ -744,7 +744,6 @@ const
       IPC_GETSEARCHLISTARTIST    = 42216;
       IPC_GETSEARCHLISTALBUM     = 42217;
       IPC_GETSEARCHLISTTITLEONLY = 42218;
-
       //
       IPC_GETPLAYLISTFILE_W   = 51211;
       IPC_GETPLAYLISTTITLE_W  = 51212;
@@ -758,6 +757,17 @@ const
       IPC_GETSEARCHLISTARTIST_W    = 52216;
       IPC_GETSEARCHLISTALBUM_W     = 52217;
       IPC_GETSEARCHLISTTITLEONLY_W = 52218;
+
+      // Nemp_Only (4.6, December 2012)
+      IPC_GETCURRENTTITLEDATA = 42222;     // Filename/Title/Artist/... by second parameter
+      IPC_GETCURRENTTITLEDATA_W = 52222;   // IPC_CF_***
+
+      IPC_CF_FILENAME  = 0;
+      IPC_CF_TITLE     = 1;
+      IPC_CF_ARTIST    = 2;
+      IPC_CF_TITLEONLY = 3;
+      IPC_CF_ALBUM     = 4;
+
 
       // Anfrage zum Cover:
       IPC_QUERYCOVER = 52400;

@@ -384,7 +384,8 @@ var NeuerFilename: UnicodeString;
     CurrentPos : Integer;
 begin
     Neuerstatus     := GetNempState;  // 1: Playing, 3: Paused, 0: Not Playing
-    neuerFilename   := GetNempPlaylistFileNameW(-1);
+    neuerFilename   := GetNempCurrentTitleW(IPC_CF_FILENAME);
+    //GetNempPlaylistFileNameW(-1);
     //NeuerRandomMode := GetNempRandomMode;
 
     // Position im Track bestimmen und anzeigen
@@ -394,7 +395,7 @@ begin
     begin
         // Get information about the new track
         CurrentFileName := neuerFilename;
-        CurrentTitle := GetNempPlaylistTitelW(-1);
+        CurrentTitle := GetNempCurrentTitleW(IPC_CF_TITLE); //GetNempPlaylistTitelW(-1);
 
         CurrentTrackLength := GetNemp_TrackLength;
         CurrentTrackLengthString := SekIntToMinStr(CurrentTrackLength);
