@@ -70,8 +70,8 @@ object FormLowBattery: TFormLowBattery
     Width = 337
     Height = 21
     Style = csDropDownList
+    ItemHeight = 13
     TabOrder = 2
-    OnChange = cb_ToDoChange
     Items.Strings = (
       'Nothing, but thank you for the information.'
       
