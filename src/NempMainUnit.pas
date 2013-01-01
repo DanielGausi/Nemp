@@ -11582,19 +11582,19 @@ begin
             if WalkmanModeTimer.Tag = 0 then
             begin
                 WalkmanModeTimer.Tag := 1;
-                WalkmanModeTimer.Interval := 2000;
+                WalkmanModeTimer.Interval := 1000;
                 ReArrangeToolImages;
             end;
             //loadPercent := 5;
-            factor := Round((11  -  LoadPercent) * 2.5);
+            factor := Round((11  -  LoadPercent) * 2.8);
 
             WalkmanImage.Hint := Format(Hint_BatteryLow, [Loadpercent]);
 
             // start fluttering
             if Random >= 0.6 then
-                NempPlayer.Flutter(Random(factor) / 100 + 1, 2000)  // faster
+                NempPlayer.Flutter(Random(factor) / 100 + 1, 1000)  // faster
             else
-                NempPlayer.Flutter(1 - (Random(factor)/ 100), 2000) // slower
+                NempPlayer.Flutter(1 - (Random(factor)/ 100), 1000) // slower
         end
         else
         begin

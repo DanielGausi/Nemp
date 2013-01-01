@@ -16,7 +16,6 @@ type
     LblWhatNow: TLabel;
     BtnCancel: TButton;
     procedure FormCreate(Sender: TObject);
-    procedure cb_ToDoChange(Sender: TObject);
   private
     { Private-Deklarationen }
   public
@@ -32,15 +31,11 @@ implementation
 
 {$R *.dfm}
 
-procedure TFormLowBattery.cb_ToDoChange(Sender: TObject);
-begin
-    BtnOK.ModalResult := cb_ToDo.ItemIndex + 1;
-end;
-
 procedure TFormLowBattery.FormCreate(Sender: TObject);
 var filename: String;
 begin
     TranslateComponent (self);
+    cb_ToDo.ItemIndex := 0;
     BtnOK.ModalResult := mrOk;
     filename := ExtractFilePath(ParamStr(0)) + 'Images\lowBattery.png';
     if FileExists(filename) then
