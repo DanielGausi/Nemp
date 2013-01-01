@@ -62,6 +62,8 @@ function GetNempSearchlistAlbum(data:Integer): AnsiString;            // Nemp
 function GetNempSearchlistArtist(data:Integer): AnsiString;           // Nemp
 function GetNempSearchlistTitleOnly(data:Integer): AnsiString;        // Nemp
 
+function GetNempCurrentTitle(kind: Integer): AnsiString;  // Nemp (version 4.6)
+
 function GetNempNextTitel:AnsiString;                // Nemp / Winamp
 function GetNempPrevTitel:AnsiString;                // Nemp / Winamp
 
@@ -80,6 +82,8 @@ function GetNempSearchlistTitelW(data:Integer): WideString;            // Nemp
 function GetNempSearchlistAlbumW(data:Integer): WideString;            // Nemp
 function GetNempSearchlistArtistW(data:Integer): WideString;           // Nemp
 function GetNempSearchlistTitleOnlyW(data:Integer): WideString;        // Nemp
+
+function GetNempCurrentTitleW(kind: Integer): WideString;  // Nemp (version 4.6)
 
 function GetNempNextTitelW:WideString;           // Nemp
 function GetNempPrevTitelW:WideString;           // Nemp
@@ -248,6 +252,17 @@ const
         IPC_GETSEARCHLISTARTIST_W    = 52216;
         IPC_GETSEARCHLISTALBUM_W     = 52217;
         IPC_GETSEARCHLISTTITLEONLY_W = 52218;
+
+        // Nemp_Only (4.6, December 2012)
+        IPC_GETCURRENTTITLEDATA = 42222;     // Filename/Title/Artist/... by second parameter
+        IPC_GETCURRENTTITLEDATA_W = 52222;   // IPC_CF_***
+        IPC_CF_FILENAME  = 0;
+        IPC_CF_TITLE     = 1;
+        IPC_CF_ARTIST    = 2;
+        IPC_CF_TITLEONLY = 3;
+        IPC_CF_ALBUM     = 4;
+
+
 
         // Anfrage zum Cover:
         IPC_QUERYCOVER = 52400;
@@ -421,7 +436,31 @@ begin
     result := GetNemp_SearchListString(data, IPC_GETSEARCHLISTTITLEONLY);
 end;
 
-
+function GetNempCurrentTitle(kind: Integer): AnsiString;  // Nemp (version 4.6)
+var hwndNemp, TempHandle : THandle;
+    dat2: array[0..500] of AnsiChar;
+    MPointer: Integer;
+    temp: Cardinal;
+begin
+    hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
+    if hwndNemp = 0 then
+    begin
+        result := ''
+    end else
+    begin
+        MPointer := SendMessage(hwndNemp, WM_USER, kind, IPC_GETCURRENTTITLEDATA);
+        if MPointer = -1 then
+        begin
+          result := '';
+          exit;
+        end;
+        GetWindowThreadProcessId(hwndNemp, TempHandle);
+        hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
+        ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 500, temp);
+        CloseHandle(hwndNemp);
+        Result := AnsiString(dat2);
+    end;
+end;
 
 
 function GetNempNextTitel:AnsiString;
@@ -613,6 +652,32 @@ end;
 function GetNempSearchlistTitleOnlyW(data:Integer): WideString;
 begin
     result := GetNemp_SearchListStringW(data, IPC_GETSEARCHLISTTITLEONLY_W);
+end;
+
+function GetNempCurrentTitleW(kind: Integer): WideString;  // Nemp (version 4.6)
+var hwndNemp, TempHandle : THandle;
+    dat2: array[0..500] of WideChar;
+    MPointer: Integer;
+    temp: Cardinal;
+begin
+    hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
+    if hwndNemp = 0 then
+    begin
+        result := ''
+    end else
+    begin
+        MPointer := SendMessage(hwndNemp, WM_USER, kind, IPC_GETCURRENTTITLEDATA_W);
+        if MPointer = -1 then
+        begin
+          result := '';
+          exit;
+        end;
+        GetWindowThreadProcessId(hwndNemp, TempHandle);
+        hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
+        ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 1000, temp);
+        CloseHandle(hwndNemp);
+        Result := WideString(dat2);
+    end;
 end;
 
 function GetNempNextTitelW:WideString;

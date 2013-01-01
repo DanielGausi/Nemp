@@ -232,6 +232,58 @@ begin
                           end;
 
 
+        IPC_GETCURRENTTITLEDATA: if AcceptApiCommands AND ReadyForGetFileApiCommands then
+                      begin
+                            FillChar(NEMP_API_InfoString[0], length(NEMP_API_InfoString), #0);
+
+                            if assigned(NempPlayer.MainAudioFile) then
+                            begin
+                                case aMsg.WParam of
+                                    IPC_CF_FILENAME : resultString := AnsiString(NempPlayer.MainAudioFile.Pfad);
+                                    IPC_CF_TITLE    : resultString := AnsiString(NempPlayer.MainAudioFile.PlaylistTitle);
+                                    IPC_CF_ARTIST   : resultString := AnsiString(NempPlayer.MainAudioFile.Artist);
+                                    IPC_CF_TITLEONLY: resultString := AnsiString(NempPlayer.MainAudioFile.Titel);
+                                    IPC_CF_ALBUM    : resultString := AnsiString(NempPlayer.MainAudioFile.Album);
+                                end;
+                            end else
+                                resultString := '';
+
+                            max := length(resultString);
+                            if max > length(NEMP_API_InfoString)-1 then
+                                max := length(NEMP_API_InfoString)-1;
+                            if length(resultString) > 0 then
+                                Move(resultString[1], NEMP_API_InfoString[0], max);
+                            aMsg.result := Integer(@NEMP_API_InfoString[0]);
+                      end else
+                            aMsg.Result := -1;
+
+        IPC_GETCURRENTTITLEDATA_W: if AcceptApiCommands AND ReadyForGetFileApiCommands then
+                      begin
+                            FillChar(NEMP_API_InfoStringW[0], sizeof(WideChar) * length(NEMP_API_InfoStringW), #0);
+                            if assigned(NempPlayer.MainAudioFile) then
+                            begin
+                                case aMsg.WParam of
+                                    IPC_CF_FILENAME : resultStringW := NempPlayer.MainAudioFile.Pfad;
+                                    IPC_CF_TITLE    : resultStringW := NempPlayer.MainAudioFile.PlaylistTitle;
+                                    IPC_CF_ARTIST   : resultStringW := NempPlayer.MainAudioFile.Artist;
+                                    IPC_CF_TITLEONLY: resultStringW := NempPlayer.MainAudioFile.Titel;
+                                    IPC_CF_ALBUM    : resultStringW := NempPlayer.MainAudioFile.Album;
+                                else
+                                    resultStringW := NempPlayer.MainAudioFile.Pfad;
+                                end;
+                            end else
+                                resultStringW := '';
+
+                            max := length(resultStringW);
+                            if max > length(NEMP_API_InfoStringW)-1 then
+                                max := length(NEMP_API_InfoStringW)-1;
+                            if length(resultStringW) > 0 then
+                                Move(resultStringW[1], NEMP_API_InfoStringW[0], sizeof(WideChar) * max);
+                            aMsg.result := Integer(@NEMP_API_InfoStringW[0]);
+                      end else
+                            aMsg.Result := -1;
+
+
         // Dateinamen des Titels liefern, Nummer steht in WParam
         IPC_GETPLAYLISTFILE,
         IPC_GETPLAYLISTTITLE,
