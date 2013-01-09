@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 unit NempApi;
 
+{$I xe.inc}
+
 interface
 
 uses Windows, Messages, SysUtils;
@@ -62,6 +64,8 @@ function GetNempSearchlistAlbum(data:Integer): AnsiString;            // Nemp
 function GetNempSearchlistArtist(data:Integer): AnsiString;           // Nemp
 function GetNempSearchlistTitleOnly(data:Integer): AnsiString;        // Nemp
 
+function GetNempCurrentTitle(kind: Integer): AnsiString;  // Nemp (version 4.6)
+
 function GetNempNextTitel:AnsiString;                // Nemp / Winamp
 function GetNempPrevTitel:AnsiString;                // Nemp / Winamp
 
@@ -80,6 +84,8 @@ function GetNempSearchlistTitelW(data:Integer): WideString;            // Nemp
 function GetNempSearchlistAlbumW(data:Integer): WideString;            // Nemp
 function GetNempSearchlistArtistW(data:Integer): WideString;           // Nemp
 function GetNempSearchlistTitleOnlyW(data:Integer): WideString;        // Nemp
+
+function GetNempCurrentTitleW(kind: Integer): WideString;  // Nemp (version 4.6)
 
 function GetNempNextTitelW:WideString;           // Nemp
 function GetNempPrevTitelW:WideString;           // Nemp
@@ -249,6 +255,17 @@ const
         IPC_GETSEARCHLISTALBUM_W     = 52217;
         IPC_GETSEARCHLISTTITLEONLY_W = 52218;
 
+        // Nemp_Only (4.6, December 2012)
+        IPC_GETCURRENTTITLEDATA = 42222;     // Filename/Title/Artist/... by second parameter
+        IPC_GETCURRENTTITLEDATA_W = 52222;   // IPC_CF_***
+        IPC_CF_FILENAME  = 0;
+        IPC_CF_TITLE     = 1;
+        IPC_CF_ARTIST    = 2;
+        IPC_CF_TITLEONLY = 3;
+        IPC_CF_ALBUM     = 4;
+
+
+
         // Anfrage zum Cover:
         IPC_QUERYCOVER = 52400;
         IPC_SENDCOVER = 52401;
@@ -286,9 +303,13 @@ const
         NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
         NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
 
-
 var
-        WINDOW_NAME : String =  NEMP_WINDOW_NAME;
+    NempDeskbandActivateMessage: UINT = 0;
+    NempDeskbandDeActivateMessage: UINT = 0;
+    NempDeskbandUpdateMessage: UINT = 0;
+
+    WINDOW_NAME : String =  NEMP_WINDOW_NAME;
+
 
 implementation
 
@@ -325,7 +346,12 @@ var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of AnsiChar;
     TrackPos: Integer;
     MPointer: Integer;
+
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp = 0 then
@@ -343,7 +369,7 @@ begin
           result := '';
           exit;
         end;
-        GetWindowThreadProcessId(hwndNemp, TempHandle);
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
         hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
         ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 500, temp);
         CloseHandle(hwndNemp);
@@ -378,7 +404,12 @@ function GetNemp_SearchListString(param, kind: Integer): AnsiString;
 var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of AnsiChar;
     MPointer: Integer;
+
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -391,7 +422,7 @@ begin
           result := '';
           exit;
         end;
-        GetWindowThreadProcessId(hwndNemp,TempHandle);
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
         hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
         ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,500,temp);
         CloseHandle(hwndNemp);
@@ -421,7 +452,35 @@ begin
     result := GetNemp_SearchListString(data, IPC_GETSEARCHLISTTITLEONLY);
 end;
 
-
+function GetNempCurrentTitle(kind: Integer): AnsiString;  // Nemp (version 4.6)
+var hwndNemp, TempHandle : THandle;
+    dat2: array[0..500] of AnsiChar;
+    MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
+    temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
+begin
+    hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
+    if hwndNemp = 0 then
+    begin
+        result := ''
+    end else
+    begin
+        MPointer := SendMessage(hwndNemp, WM_USER, kind, IPC_GETCURRENTTITLEDATA);
+        if MPointer = -1 then
+        begin
+          result := '';
+          exit;
+        end;
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
+        hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
+        ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 500, temp);
+        CloseHandle(hwndNemp);
+        Result := AnsiString(dat2);
+    end;
+end;
 
 
 function GetNempNextTitel:AnsiString;
@@ -429,7 +488,11 @@ var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of AnsiChar;
     TrackPos,maxpos: Integer;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -458,7 +521,7 @@ begin
               result := '';
               exit;
             end;
-            GetWindowThreadProcessId(hwndNemp,TempHandle);
+            GetWindowThreadProcessId(hwndNemp, @TempHandle);
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,500,temp);
             CloseHandle(hwndNemp);
@@ -474,7 +537,11 @@ var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of AnsiChar;
     TrackPos,maxpos: Integer;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -503,7 +570,7 @@ begin
               result := '';
               exit;
             end;
-            GetWindowThreadProcessId(hwndNemp,TempHandle);
+            GetWindowThreadProcessId(hwndNemp, @TempHandle);
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,500,temp);
             CloseHandle(hwndNemp);
@@ -519,7 +586,11 @@ var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of WideChar;
     TrackPos: Integer;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp = 0 then
@@ -537,7 +608,7 @@ begin
           result := '';
           exit;
         end;
-        GetWindowThreadProcessId(hwndNemp, TempHandle);
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
         hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
         ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 1000, temp);
         CloseHandle(hwndNemp);
@@ -573,7 +644,11 @@ function GetNemp_SearchListStringW(param, kind: Integer): WideString;
 var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of WideChar;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -586,7 +661,7 @@ begin
           result := '';
           exit;
         end;
-        GetWindowThreadProcessId(hwndNemp,TempHandle);
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
         hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
         ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,1000,temp);
         CloseHandle(hwndNemp);
@@ -615,12 +690,46 @@ begin
     result := GetNemp_SearchListStringW(data, IPC_GETSEARCHLISTTITLEONLY_W);
 end;
 
+function GetNempCurrentTitleW(kind: Integer): WideString;  // Nemp (version 4.6)
+var hwndNemp, TempHandle : THandle;
+    dat2: array[0..500] of WideChar;
+    MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
+    temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
+begin
+    hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
+    if hwndNemp = 0 then
+    begin
+        result := ''
+    end else
+    begin
+        MPointer := SendMessage(hwndNemp, WM_USER, kind, IPC_GETCURRENTTITLEDATA_W);
+        if MPointer = -1 then
+        begin
+          result := '';
+          exit;
+        end;
+        GetWindowThreadProcessId(hwndNemp, @TempHandle);
+        hwndNemp := OpenProcess(PROCESS_VM_READ, False, TempHandle);
+        ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2, 1000, temp);
+        CloseHandle(hwndNemp);
+        Result := WideString(dat2);
+    end;
+end;
+
 function GetNempNextTitelW:WideString;
 var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of WideChar;
     TrackPos,maxpos: Integer;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -649,7 +758,7 @@ begin
               result := '';
               exit;
             end;
-            GetWindowThreadProcessId(hwndNemp,TempHandle);
+            GetWindowThreadProcessId(hwndNemp, @TempHandle);
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,1000,temp);
             CloseHandle(hwndNemp);
@@ -665,7 +774,11 @@ var hwndNemp, TempHandle : THandle;
     dat2: array[0..500] of WideChar;
     TrackPos,maxpos: Integer;
     MPointer: Integer;
+    {$IFDEF OLDREADPROCESSMEMORY}
     temp: Cardinal;
+    {$ELSE}
+    temp: NativeUInt;
+    {$ENDIF}
 begin
     hwndNemp:= FindWindow(PChar(WINDOW_NAME),nil);
     if hwndNemp= 0 then
@@ -694,7 +807,7 @@ begin
               result := '';
               exit;
             end;
-            GetWindowThreadProcessId(hwndNemp,TempHandle);
+            GetWindowThreadProcessId(hwndNemp, @TempHandle);
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,1000,temp);
             CloseHandle(hwndNemp);
@@ -975,5 +1088,13 @@ begin
   else
     result := SendMessage(hwndNemp, WM_USER, QueryHnd, IPC_QUERYCOVER);
 end;
+
+initialization
+  NempDeskbandActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_ACTIVATE);
+  NempDeskbandDeActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_DEACTIVATE);
+  NempDeskbandUpdateMessage := RegisterWindowMessage(NEMP_DESKBAND_UPDATE);
+
+finalization
+  // nothing todo
 
 end.

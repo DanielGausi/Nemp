@@ -40,7 +40,8 @@ uses
   InfoUnit in 'InfoUnit.pas' {InfoForm},
   SearchUnit in 'SearchUnit.pas' {SuchForm},
   TaskbarStuff in 'TaskbarStuff.pas',
-  PlaylistUnit in 'PlaylistUnit.pas' {PlaylistForm};
+  PlaylistUnit in 'PlaylistUnit.pas' {PlaylistForm},
+  NempApi in '..\common\NempApi.pas';
 
 exports
   DllGetClassObject,

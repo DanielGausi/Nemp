@@ -679,7 +679,7 @@ const
       IPC_MODE_BITRATE = 1;
       IPC_MODE_CHANNELS = 2;
 
-      IPC_PLAYFILE    = 100;
+(*      IPC_PLAYFILE    = 100;
       IPC_ENQUEUEFILE = 100;
 
       IPC_ISPLAYING  = 104;
@@ -798,6 +798,8 @@ const
       NEMP_API_SHUFFLE = 2;
       NEMP_API_NOREPEAT = 3;
 
+    *)
+
       cmNoStretch = 1;
       // Note: These 3 Flags has been used in Nemp3
       // They are still used in the Code, but has no effect after all
@@ -819,9 +821,9 @@ const
 
 
 
-      NEMP_DESKBAND_ACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Activate'#0;
-      NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
-      NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
+      //NEMP_DESKBAND_ACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Activate'#0;
+      //NEMP_DESKBAND_DEACTIVATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Deactivate'#0;
+      //NEMP_DESKBAND_UPDATE: array [0..MAX_PATH] of Char = 'NEMP - Deskband Update'#0;
 
       VORBIS_COMMENT = 'COMMENT';
       VORBIS_LYRICS = 'UNSYNCEDLYRICS';
@@ -836,16 +838,6 @@ const
       APE_PLAYCOUNT = 'PLAYCOUNT';
       APE_CATEGORIES = 'CATEGORIES';
       APE_DISCNUMBER = 'DISCNUMBER';
-
-
-var
-
-  NempDeskbandActivateMessage: UINT = 0;
-  NempDeskbandDeActivateMessage: UINT = 0;
-  NempDeskbandUpdateMessage: UINT = 0;
-
-
-
 
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
@@ -1275,14 +1267,6 @@ begin
         end;
     end;
 end;
-
-initialization
-  NempDeskbandActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_ACTIVATE);
-  NempDeskbandDeActivateMessage := RegisterWindowMessage(NEMP_DESKBAND_DEACTIVATE);
-  NempDeskbandUpdateMessage := RegisterWindowMessage(NEMP_DESKBAND_UPDATE);
-
-finalization
-  // nothing todo
 
 
 end.

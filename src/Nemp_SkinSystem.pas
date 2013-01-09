@@ -1519,7 +1519,7 @@ begin
         DestVST.Font.Color                             := SkinColorScheme.Tree_FontColor[idx]                    ;
         DestVST.Header.Background                      := SkinColorScheme.Tree_HeaderBackgroundColor[idx]        ;
         DestVST.Header.Font.Color                      := SkinColorScheme.Tree_HeaderFontColor[idx]              ;
-        DestVST.Colors.BorderColor                     := SkinColorScheme.Tree_BorderColor[idx]                  ;
+        DestVST.Colors.BorderColor                     := clred; //SkinColorScheme.Tree_BorderColor[idx]                  ;
         DestVST.Colors.DisabledColor                   := SkinColorScheme.Tree_DisabledColor[idx]                ;
         DestVST.Colors.DropMarkColor                   := SkinColorScheme.Tree_DropMarkColor[idx]                ;
         DestVST.Colors.DropTargetBorderColor           := SkinColorScheme.Tree_DropTargetBorderColor[idx]        ;

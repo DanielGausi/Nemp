@@ -7,10 +7,10 @@
       von Daniel 'Gausi' Gaußmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit CodeGear Delphi 2009
-      Januar 2005 - April 2012
+      Programmiert mit CodeGear Delphi 2009 and XE2
+      Januar 2005 - Januar 2013
 
-      Version: 4.5.0
+      Version: 4.6.0
 
 
 -----------------------------------------------------------
@@ -114,6 +114,25 @@ Verwendete Units/Komponenten:
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
 
+
+
+Version 4.6.0, April 2013
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+* Unterstützung von iTunes-Tags
+* Schnellerer Start der Wiedergabe (besonders bei Netzwerk-Laufwerken)
+* Walkman-Modus: Leiern bei schwachem Akku
+
+Änderungen:
+-----------
+* Neuer Standard-Skin, inklusive neuem Logo
+* Einstellungs-Dialog überarbeitet
+
+Bugfixes:
+---------
+* Deskband und G15-App zeigten manchmal falsche Daten an
+* gelegentliche Fehler beim Anzeigen der Details von Webradio-Stationen
 
 
 Version 4.5.0, April 2012

@@ -53,7 +53,7 @@ implementation
 
 uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
-    Nemp_ConstantsAndTypes, NempAudioFiles, Nemp_RessourceStrings,
+    Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
     SplitForm_Hilfsfunktionen, Mp3FileUtils,
 
@@ -629,6 +629,12 @@ begin
         TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
         GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
+
+
+        ArtistsVST.BorderWidth := 0;
+        AlbenVST.BorderWidth := 0;
+        PlaylistVST.BorderWidth := 0;
+        VST.BorderWidth := 0;
 
         UpdateFormDesignNeu;
         //e := gettickcount;

@@ -58,7 +58,7 @@ procedure Handle_STFinish(var Msg: TMessage);
 implementation
 
 
-uses NempMainUnit, Nemp_ConstantsAndTypes, NempAudioFiles, Details,
+uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     MainFormHelper, CoverHelper, AudioFileHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
