@@ -40,14 +40,14 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
-  Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst,
+  Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst, //madexcept,
   Buttons,  VirtualTrees, VSTEditControls,
   jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
    Mp3FileUtils, spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
       fldbrows, MainFormHelper, MessageHelper, BibSearchClass,
-  Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
+  Nemp_ConstantsAndTypes, NempApi, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
    Nemp_SkinSystem, NempPanel, SkinButtons, math,
 
   PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, deleteHelper,
@@ -145,11 +145,10 @@ type
     AutoSavePlaylistTimer: TTimer;
     DragFilesSrc1: TDragFilesSrc;
     DragDropTimer: TTimer;
-    VSTPanel: TPanel;
+    VSTPanel: TNempPanel;
     GRPBOXVST: TNempPanel;
     PlaylistFillPanel: TNempPanel;
     GRPBOXPlaylist: TNempPanel;
-    PlaylistVST: TVirtualStringTree;
     SleepTimer: TTimer;
     BirthdayTimer: TTimer;
     VolTimer: TTimer;
@@ -157,8 +156,6 @@ type
     PanelCoverBrowse: TNempPanel;
     CoverScrollbar: TScrollBar;
     MenuImages: TImageList;
-    VSTSubPanel: TNempPanel;
-    VST: TVirtualStringTree;
     Splitter4: TSplitter;
     VDTCover: TNempPanel;
     TabBtn_Playlist: TSkinButton;
@@ -851,6 +848,8 @@ type
     WalkmanImage: TImage;
     CorrectSkinRegionsTimer: TTimer;
     TreeImages: TImageList;
+    PlaylistVST: TVirtualStringTree;
+    VST: TVirtualStringTree;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1990,6 +1989,7 @@ procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction)
     PosAndSize : PWindowPlacement;
 begin
     NempIsClosing := True;
+    //PauseMadExcept(True);
     try
         Application.OnException := CatchAllExceptionsOnShutDown;
 
@@ -2102,8 +2102,6 @@ begin
         FreeAndNil(DragDropList);
 
         Set8087CW(Default8087CW);
-
-
 
     except
         halt;
@@ -10516,6 +10514,7 @@ end;
 
 procedure TNemp_MainForm.PanelPaint(Sender: TObject);
 begin
+
     if (Sender as TNempPanel).Tag <= 3 then
         NempSkin.DrawAPanel((Sender as TNempPanel), NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag])
     else

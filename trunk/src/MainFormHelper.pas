@@ -928,10 +928,10 @@ begin
                 PanelStandardBrowse.Visible := MedienBib.Count > 0;
                 PanelTagCloudBrowse.Visible := False;
 
-                PanelStandardBrowse.Left := 4;
-                PanelStandardBrowse.Width := AuswahlPanel.Width - 8;
-                PanelStandardBrowse.Top := 4;
-                PanelStandardBrowse.Height := GRPBOXArtistsAlben.Height - 8;
+                PanelStandardBrowse.Left := 2;
+                PanelStandardBrowse.Width := AuswahlPanel.Width - 4;
+                PanelStandardBrowse.Top := 2;
+                PanelStandardBrowse.Height := GRPBOXArtistsAlben.Height - 4;
                 PanelStandardBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
                 // TabButtons-Glyphs neu setzen
@@ -948,10 +948,10 @@ begin
                 PanelTagCloudBrowse.Visible := False;
                 PanelCoverBrowse.Visible := MedienBib.Count > 0;
 
-                PanelCoverBrowse.Left := 4;
-                PanelCoverBrowse.Width := AuswahlPanel.Width - 8;
-                PanelCoverBrowse.Top := 4;
-                PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 8;
+                PanelCoverBrowse.Left := 2;
+                PanelCoverBrowse.Width := AuswahlPanel.Width - 4;
+                PanelCoverBrowse.Top := 2;
+                PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 4;
                 PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
 
@@ -970,10 +970,10 @@ begin
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
 
-                PanelTagCloudBrowse.Left := 4;
-                PanelTagCloudBrowse.Width := AuswahlPanel.Width - 8;
-                PanelTagCloudBrowse.Top := 4;
-                PanelTagCloudBrowse.Height := GRPBOXArtistsAlben.Height - 8;
+                PanelTagCloudBrowse.Left := 2;
+                PanelTagCloudBrowse.Width := AuswahlPanel.Width - 4;
+                PanelTagCloudBrowse.Top := 2;
+                PanelTagCloudBrowse.Height := GRPBOXArtistsAlben.Height - 4;
                 PanelTagCloudBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
                 // TabButtons-Glyphs neu setzen

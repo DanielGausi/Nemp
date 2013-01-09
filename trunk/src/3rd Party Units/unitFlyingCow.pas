@@ -659,7 +659,8 @@ begin
                         if fCurrentItem > High(fItem)  then
                             fCurrentItem := High(fItem);
 
-                        PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
+                        if not Terminated then
+                            PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
 
                         fSelectedItem := -1;
                         UpdateItems;
@@ -693,7 +694,8 @@ begin
                    (not MoreNeeded) Then
                 begin
  //////////////////XXXX
-                    PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
+                    if not terminated then
+                        PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
                     fSelectedItem := fCurrentItem;
                     fDoRender := False;
                     ///////////////////////////////sleep(1);
@@ -853,8 +855,7 @@ begin
   gluUnProject(X, Y_new, 0.0, modelview, projection, viewport, @Result[0], @Result[1], @Result[2]);
 
   if not terminated then
-
-   PostMessage (fEventsWindow, WM_FLYINGCOWTEST, WParam(Round(1000 * Result[0])), LParam(Round(1000*Result[1])));
+     PostMessage (fEventsWindow, WM_FLYINGCOWTEST, WParam(Round(1000 * Result[0])), LParam(Round(1000*Result[1])));
 
 end;
 

@@ -7,7 +7,8 @@ uses
   InfoUnit in 'InfoUnit.pas' {InfoForm},
   SearchUnit in 'SearchUnit.pas' {SuchForm},
   PlaylistUnit in 'PlaylistUnit.pas' {PlaylistForm},
-  TaskbarStuff in 'TaskbarStuff.pas';
+  TaskbarStuff in 'TaskbarStuff.pas',
+  NempApi in '..\common\NempApi.pas';
 
 {$R *.res}
 

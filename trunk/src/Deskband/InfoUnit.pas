@@ -92,16 +92,16 @@ var NeuerFilename:WideString;
     pos : Integer;
 
 begin
-  neuerFilename := GetNempPlaylistFileNameW(-1);
+  neuerFilename := GetNempCurrentTitleW(IPC_CF_FILENAME);
   pos := GetNemp_TrackPosition;
 
   if (NeuerFilename <> NempFilename) then
   begin
       NempFilename := NeuerFilename;
-      LblTitel.Caption := GetNempPlaylistTitleOnlyW(-1);
-      LblArtist.Caption := GetNempPlaylistArtistW(-1);
+      LblTitel.Caption := GetNempCurrentTitleW(IPC_CF_TITLEONLY); //GetNempPlaylistTitleOnlyW(-1);
+      LblArtist.Caption := GetNempCurrentTitleW(IPC_CF_ARTIST);
 
-      LblFileInfo.Caption := GetNempPlaylistAlbumW(-1); //ExtractFilename(neuerFilename);
+      LblFileInfo.Caption := GetNempCurrentTitleW(IPC_CF_ALBUM); //ExtractFilename(neuerFilename);
       NempTrackLength := GetNemp_TrackLength;
 
       CoverPresent := Nemp_QueryCover(Handle) = 1 ;

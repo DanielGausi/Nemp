@@ -4,8 +4,8 @@ uses
   Forms,
   MainUnit in 'MainUnit.pas' {MainForm},
   lcdg15 in 'lcdg15.pas',
-  NempApi in 'NempApi.pas',
-  lcdg15Nemp in 'lcdg15Nemp.pas';
+  lcdg15Nemp in 'lcdg15Nemp.pas',
+  NempApi in '..\common\NempApi.pas';
 
 {$R *.res}
 
