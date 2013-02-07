@@ -1361,6 +1361,7 @@ function TAudioFile.GetAudioData(filename: UnicodeString; Flags: Integer = 0): T
 var MainFile: TGeneralAudioFile;
     fs: TFileStream;
 begin
+  result := AUDIOERR_Unkown; // default value
 
   Pfad := filename; // Set Path and determine Audiotype (file, stream, CD-Audio)
 
@@ -1377,40 +1378,44 @@ begin
                   fFileAge := GetFileCreationDateTime(filename);
 
                   MainFile := TGeneralAudioFile.Create(filename);
-                  result := AudioToNempAudioError(MainFile.LastError);
+                  try
+                      result := AudioToNempAudioError(MainFile.LastError);
 
-                  // get detailed information (format-specific)
-                  case MainFile.FileType of
-                      at_Invalid: SetUnknown;
-                      at_Mp3:  GetMp3Info(MainFile.MP3File, filename, Flags);
-                      at_Ogg: GetOggInfo(Mainfile.OggFile, Flags);
-                      at_Flac: GetFlacInfo(MainFile.FlacFile, Flags);
-                      at_M4A: GetM4AInfo(MainFile.M4AFile, Flags);
-                      at_Monkey,
-                      at_WavPack,
-                      at_MusePack,
-                      at_OptimFrog,
-                      at_TrueAudio: GetExoticInfo(MainFile.BaseApeFile, MainFile.FileType, Flags);
-                      at_Wma: GetWmaInfo(MainFile.WmaFile);
-                      at_wav: GetWavInfo(MainFile.WavFile);
+                      // get detailed information (format-specific)
+                      case MainFile.FileType of
+                          at_Invalid: SetUnknown;
+                          at_Mp3:  GetMp3Info(MainFile.MP3File, filename, Flags);
+                          at_Ogg: GetOggInfo(Mainfile.OggFile, Flags);
+                          at_Flac: GetFlacInfo(MainFile.FlacFile, Flags);
+                          at_M4A: GetM4AInfo(MainFile.M4AFile, Flags);
+                          at_Monkey,
+                          at_WavPack,
+                          at_MusePack,
+                          at_OptimFrog,
+                          at_TrueAudio: GetExoticInfo(MainFile.BaseApeFile, MainFile.FileType, Flags);
+                          at_Wma: GetWmaInfo(MainFile.WmaFile);
+                          at_wav: GetWavInfo(MainFile.WavFile);
+                      end;
+
+                      // get general information from the file
+                      // do this AFTER the specialized information because:
+                      // the id3-stuff is a little bit more complicated here (charcode...)
+                      // in the mp3-special-method the contained ID3-Settings are done.
+                      // this should affect also the Getters in the TGeneralAudioFile
+                      Artist := MainFile.Artist;
+                      Titel  := MainFile.Title;
+                      Album  := MainFile.Album;
+                      Year   := MainFile.Year;
+                      Track  := GetTrackFromV2TrackString(MainFile.Track);
+                      Genre  := MainFile.Genre;
+                      // Audio
+                      fFileSize := MainFile.FileSize;
+                      fDuration := MainFile.Duration;
+                      fBitrate := MainFile.Bitrate Div 1000;
+                      SetSampleRate(MainFile.Samplerate);
+                  finally
+                      MainFile.Free;
                   end;
-
-                  // get general information from the file
-                  // do this AFTER the specialized information because:
-                  // the id3-stuff is a little bit more complicated here (charcode...)
-                  // in the mp3-special-method the contained ID3-Settings are done.
-                  // this should affect also the Getters in the TGeneralAudioFile
-                  Artist := MainFile.Artist;
-                  Titel  := MainFile.Title;
-                  Album  := MainFile.Album;
-                  Year   := MainFile.Year;
-                  Track  := GetTrackFromV2TrackString(MainFile.Track);
-                  Genre  := MainFile.Genre;
-                  // Audio
-                  fFileSize := MainFile.FileSize;
-                  fDuration := MainFile.Duration;
-                  fBitrate := MainFile.Bitrate Div 1000;
-                  SetSampleRate(MainFile.Samplerate);
 
                   if fFileSize = 0 then
                   begin

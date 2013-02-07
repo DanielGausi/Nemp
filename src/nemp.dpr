@@ -165,7 +165,7 @@ ShowWindow
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin
         // DAS HIER DIENT DEM VERSTECKEN, NICHT DEM ANZEIGEN
-       PostMessage(Nemp_MainForm.FOwnMessageHandler, WM_Command, COMMAND_RESTORE, 0);
+       PostMessage(FOwnMessageHandler, WM_Command, COMMAND_RESTORE, 0);
     end;
 
     FSplash.Visible := False;

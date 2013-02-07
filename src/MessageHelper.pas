@@ -308,7 +308,7 @@ begin
                               aList := MedienBib.BibSearcher.IPCSearchResults;
                             end;
 
-                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam > -1) then
+                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam >= 0)then
                             begin
                               aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of
@@ -384,7 +384,7 @@ begin
                               aList := MedienBib.BibSearcher.IPCSearchResults
                             end;
 
-                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam > -1) then
+                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam >= 0) then
                             begin
                               aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of

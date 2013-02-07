@@ -92,8 +92,8 @@ object Nemp_MainForm: TNemp_MainForm
           300
           630)
         object LblEmptyLibraryHint: TLabel
-          Left = 58
-          Top = 0
+          Left = 60
+          Top = 4
           Width = 205
           Height = 116
           AutoSize = False
@@ -255,12 +255,11 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Medialist_PopupMenu
             ScrollBarOptions.ScrollBars = ssVertical
             TabOrder = 0
-            TextMargin = 0
+            TextMargin = 2
             TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
-            TreeOptions.PaintOptions = [toShowBackground, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+            TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
             TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
             OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-            OnAfterCellPaint = ArtistsVSTAfterCellPaint
             OnAfterItemErase = VSTAfterItemErase
             OnClick = ArtistsVSTClick
             OnFocusChanged = ArtistsVSTFocusChanged
@@ -312,7 +311,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Medialist_PopupMenu
             ScrollBarOptions.ScrollBars = ssVertical
             TabOrder = 1
-            TextMargin = 0
+            TextMargin = 2
             TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
             TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
             TreeOptions.SelectionOptions = [toFullRowSelect, toRightClickSelect]
@@ -4017,7 +4016,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A200A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000A380A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4482,7 +4481,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300B500B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300B680B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7427,7 +7426,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C078C0710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07A40710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

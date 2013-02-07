@@ -120,7 +120,7 @@ Version 4.6.0, April 2013
 ----------------------------------------------------------- 
 Neue Funktionen:
 ----------------
-* Unterstützung von iTunes-Tags
+* Unterstützung von iTunes-Tags (m4a)
 * Schnellerer Start der Wiedergabe (besonders bei Netzwerk-Laufwerken)
 * Walkman-Modus: Leiern bei schwachem Akku
 
@@ -133,6 +133,7 @@ Bugfixes:
 ---------
 * Deskband und G15-App zeigten manchmal falsche Daten an
 * gelegentliche Fehler beim Anzeigen der Details von Webradio-Stationen
+* Speicherleck beim Einlesen neuer Dateien beseitigt
 
 
 Version 4.5.0, April 2012

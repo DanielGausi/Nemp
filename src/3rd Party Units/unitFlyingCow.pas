@@ -444,7 +444,7 @@ begin
   fr := 0.0;
   fg := 0.0;
   fb := 0.0;
-  Resume;
+  resume;
 end;
 
 procedure TRenderThread.DeleteTexture (index : LongInt);

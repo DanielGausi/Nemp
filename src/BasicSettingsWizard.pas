@@ -209,7 +209,7 @@ begin
     pc_Wizard.ActivePage := TabSheet1;
 
     {$IFDEF USESTYLES}
-    UnskinForm(self);
+    // UnskinForm(self);
     {$ENDIF}
 end;
 
