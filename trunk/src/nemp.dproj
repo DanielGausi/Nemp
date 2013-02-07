@@ -14,6 +14,11 @@
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+			<Base_Win32>true</Base_Win32>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
 			<Cfg_1>true</Cfg_1>
 			<CfgParent>Base</CfgParent>
@@ -58,6 +63,13 @@
 			<DCC_F>false</DCC_F>
 			<DCC_K>false</DCC_K>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win32)'!=''">
+			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
+			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
+			<VerInfo_Build>546</VerInfo_Build>
+			<Manifest_File>None</Manifest_File>
+			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.546;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4;Comments=</VerInfo_Keys>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
@@ -65,7 +77,7 @@
 			<DCC_DebugInformation>false</DCC_DebugInformation>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-			<Icon_MainIcon>New Icons\NempMainIcon.ico</Icon_MainIcon>
+			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
 			<Manifest_File>None</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -76,7 +88,7 @@
 			<DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<Icon_MainIcon>New Icons\NempMainIcon.ico</Icon_MainIcon>
+			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
@@ -246,7 +258,7 @@
 						<VersionInfo Name="MajorVer">4</VersionInfo>
 						<VersionInfo Name="MinorVer">6</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">561</VersionInfo>
+						<VersionInfo Name="Build">567</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -258,7 +270,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.6.0.561</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">4.6.0.567</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>

@@ -705,6 +705,7 @@ begin
     fWebMedienBib.Free;
     LeaveCriticalSection(CS_AccessLibrary);
     IdHTTPServer1.Free;
+    VoteMachine.Free;
     LogList.Free;
     inherited;
 end;                                                          

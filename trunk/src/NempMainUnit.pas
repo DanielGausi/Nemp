@@ -1421,9 +1421,9 @@ type
     procedure WalkmanModeTimerTimer(Sender: TObject);
     procedure WalkmanImageClick(Sender: TObject);
     procedure VSTEndDrag(Sender, Target: TObject; X, Y: Integer);
-    procedure ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
-      TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-      CellRect: TRect);
+    //procedure ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
+    //  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
+    //  CellRect: TRect);
     procedure CorrectSkinRegionsTimerTimer(Sender: TObject);
 
   private
@@ -1475,8 +1475,6 @@ type
       CloudViewer: TCloudViewer;
 
     NempIsClosing: Boolean;
-
-    FOwnMessageHandler: HWND;
 
 
     // Zählt die Nachrichten "Neues Laufwerk angeschlossen"
@@ -1580,6 +1578,7 @@ type
 var
 
   Nemp_MainForm: TNemp_MainForm;
+  FOwnMessageHandler: HWND;
 
   ST_Playlist       : TSearchTool;
   ST_Medienliste    : TSearchTool;
@@ -1801,7 +1800,10 @@ end;
 
 procedure TNemp_MainForm.OwnMessageProc(var msg: TMessage);
 begin
-    msg.Result := sendmessage(self.Handle, msg.Msg, msg.WParam, msg.LParam);
+    if NempIsClosing then
+        msg.Result := 0
+    else
+        msg.Result := sendmessage(self.Handle, msg.Msg, msg.WParam, msg.LParam);
 end;
 
 
@@ -9503,7 +9505,7 @@ begin
         LanguageList.Free;
         NempUpdater.Free;
         FreeAndNil(ErrorLog);
-        DeallocateHWnd(FOwnMessageHandler);
+        //DeallocateHWnd(FOwnMessageHandler);
         //ST_Playlist.Free;
         //ST_Medienliste.Free;
     except
@@ -10540,19 +10542,25 @@ end;
 
 Procedure TNemp_MainForm.RepaintPanels;
 begin
-    PlayerPanel.Repaint;
-    AudioPanel.Repaint;
-    PlaylistPanel.Repaint;
-    AuswahlPanel.Repaint;
-    VSTPanel.Repaint;
+    try
+        // Note this try..except seems to be necessary sometimes
+        // (invalid winwdow handle when switching VCL styles)
+        PlayerPanel.Repaint;
+        AudioPanel.Repaint;
+        PlaylistPanel.Repaint;
+        AuswahlPanel.Repaint;
+        VSTPanel.Repaint;
 
-    MedienlisteFillPanel.Repaint;
-    AuswahlFillPanel.Repaint;
-    PlaylistFillPanel.Repaint;
+        MedienlisteFillPanel.Repaint;
+        AuswahlFillPanel.Repaint;
+        PlaylistFillPanel.Repaint;
 
-    AuswahlHeaderPanel.Repaint;
-    MedienBibHeaderPanel.Repaint;
-    PlayerHeaderPanel.Repaint;
+        AuswahlHeaderPanel.Repaint;
+        MedienBibHeaderPanel.Repaint;
+        PlayerHeaderPanel.Repaint;
+    except
+        // nothing
+    end;
 end;
 
 Procedure TNemp_MainForm.RepaintPlayerPanel;
@@ -11338,6 +11346,8 @@ begin
     AlbenVSTFocusChanged(AlbenVST, AlbenVST.FocusedNode, 0);
 end;
 
+(*
+  // for skinning the [+] and [-] Buttons in teh Treeview
 procedure TNemp_MainForm.ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
   CellRect: TRect);
@@ -11351,6 +11361,7 @@ begin
   // vsExpanded,          // Set if the node is expanded.
   // vsHasChildren,
 
+
   if (vsHasChildren in Node.States) then
   begin
       r := Sender.GetDisplayRect(Node, Column, true, false);
@@ -11363,7 +11374,8 @@ begin
           TreeImages.Draw(TargetCanvas, r.Left-14, t{CellRect.Top}, 0)
 
   end;
-end;
+
+end; *)
 
 procedure TNemp_MainForm.ArtistsVSTClick(Sender: TObject);
 begin
@@ -11680,6 +11692,12 @@ begin
     OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer8;
     OptionsCompleteForm.Show;
 end;
+
+initialization
+
+finalization
+
+    DeallocateHWnd(FOwnMessageHandler);
 
 
 end.

@@ -316,7 +316,8 @@ type
   end;
 
   {$IFDEF USESTYLES}
-  procedure UnSkinForm(aForm: TForm);
+  // not used atm
+  //procedure UnSkinForm(aForm: TForm);
   {$ENDIF}
 
 
@@ -1423,6 +1424,9 @@ begin
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
+
+      {
+      // for skinning the [+] and [-] Buttons in teh Treeview
       if UseDefaultTreeImages then
       begin
           Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nil;
@@ -1436,6 +1440,7 @@ begin
           Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions := Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions - [toShowButtons];
           Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions - [toShowButtons];
       end;
+      }
 
 
       Nemp_MainForm.BibRatingHelper.UsebackGround := True;
@@ -1734,10 +1739,13 @@ begin
   // Eigenschaften der Bäume
   with Nemp_MainForm do
   begin
+      {
+      // for skinning the [+] and [-] Buttons in teh Treeview
       Nemp_MainForm.ArtistsVST.OnAfterCellPaint := Nil;
       Nemp_MainForm.AlbenVST.OnAfterCellPaint := Nil;
       Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions := Nemp_MainForm.ArtistsVST.TreeOptions.PaintOptions + [toShowButtons];
       Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions := Nemp_MainForm.AlbenVST.TreeOptions.PaintOptions + [toShowButtons];
+      }
 
       ArtistsVST.Background.Assign(Nil);
       AlbenVST.Background.Assign(Nil);
@@ -2680,11 +2688,11 @@ begin
 end;
 
 
-{$IFDEF USESTYLES}
+{$IFDEF USESTYLES}  {
 procedure UnSkinForm(aForm: TForm);
 var i: Integer;
 begin
-{    aForm.StyleElements := [];
+    aForm.StyleElements := [];
     for i := 0 to aForm.ComponentCount - 1 do
     begin
         if aForm.Components[i] is TControl then
@@ -2693,8 +2701,8 @@ begin
         if aForm.Components[i] is tGroupbox then
             tGroupbox(aForm.Components[i]).StyleElements := [];
     end;
-}
-end;
+
+end; }
 {$ENDIF}
 
 

@@ -581,8 +581,8 @@ MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyricsearch complete. Sorry, but 
 MediaLibrary_SearchTagsComplete_SingleNotFound = 'Sorry, for this file are no additional Tags available.';
 MediaLibrary_SearchTagsComplete_AllFound = 'Tagsearch complete. Added some Tags for every file.';
 MediaLibrary_SearchTagsComplete_ManyFound = 'Tagsearch complete. Found Tags for %d of %d files.';
-MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
-MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
+MediaLibrary_SearchTagsComplete_FewFound = 'Tagsearch complete. Found Tags for only %d of %d files. Either the files are not properly tagged, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
+MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no additional Tags found. Either the files are not properly tagged, or you have a special taste in music.'#13#10'Please note, that additional Tags are not supported in some filetypes (e.g. wma or wav).';
 
 MediaLibrary_SomeErrorsOccured = 'Some unexpected errors appeared during the process. Please view the Error-Log for details.';
 

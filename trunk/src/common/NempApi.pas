@@ -525,7 +525,7 @@ begin
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,500,temp);
             CloseHandle(hwndNemp);
-            if fileexists(GetNempPlaylistFilename(Trackpos)) then
+            if fileexists(GetNempPlaylistFilenameW(Trackpos)) then
                 Result := AnsiString(dat2)
             else Result := 'N/A [File not found]';
         end;
@@ -574,7 +574,7 @@ begin
             hwndNemp:= OpenProcess(PROCESS_VM_READ,False,TempHandle);
             ReadProcessMemory(hwndNemp, Pointer(MPointer), @dat2,500,temp);
             CloseHandle(hwndNemp);
-            if fileexists(GetNempPlaylistFilename(Trackpos)) then
+            if fileexists(GetNempPlaylistFilenameW(Trackpos)) then
                 Result := AnsiString(dat2)
             else Result := 'N/A [File not found]';
         end;

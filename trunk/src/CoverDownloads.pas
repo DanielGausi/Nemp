@@ -278,8 +278,6 @@ begin
 
     //fSemaphore := CreateSemaphore(Nil, 0, maxInt, Nil);
     fEvent := TEvent.Create(Nil, True, False, '');
-
-
     FreeOnTerminate := False;
 
     fIDHttp.ConnectTimeout:= 5000;
