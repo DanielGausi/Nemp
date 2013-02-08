@@ -8,7 +8,7 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009 and XE2
-      Januar 2005 - Januar 2013
+      Januar 2005 - Februar 2013
 
       Version: 4.6.0
 
