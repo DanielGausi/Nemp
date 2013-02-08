@@ -2,7 +2,7 @@ object FormLowBattery: TFormLowBattery
   Left = 0
   Top = 0
   Caption = 'Nemp Walkman mode: Low battery'
-  ClientHeight = 228
+  ClientHeight = 230
   ClientWidth = 503
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object FormLowBattery: TFormLowBattery
     Height = 117
   end
   object Lbl_Warning: TLabel
-    Left = 150
+    Left = 152
     Top = 16
     Width = 98
     Height = 23
@@ -70,7 +70,6 @@ object FormLowBattery: TFormLowBattery
     Width = 337
     Height = 21
     Style = csDropDownList
-    ItemHeight = 13
     TabOrder = 2
     Items.Strings = (
       'Nothing, but thank you for the information.'
