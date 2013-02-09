@@ -220,9 +220,6 @@
 				<Form>WebServerLogForm</Form>
 			</DCCReference>
 			<DCCReference Include="SilenceDetection.pas"/>
-			<DCCReference Include="Lowbattery.pas">
-				<Form>FormLowBattery</Form>
-			</DCCReference>
 			<DCCReference Include="common\NempApi.pas">
 				<Form>$ENDIF</Form>
 			</DCCReference>
@@ -258,7 +255,7 @@
 						<VersionInfo Name="MajorVer">4</VersionInfo>
 						<VersionInfo Name="MinorVer">6</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">567</VersionInfo>
+						<VersionInfo Name="Build">573</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -270,7 +267,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.6.0.567</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">4.6.0.573</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>

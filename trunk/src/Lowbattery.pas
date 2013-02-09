@@ -10,7 +10,7 @@ type
   TFormLowBattery = class(TForm)
     Image1: TImage;
     Lbl_Warning: TLabel;
-    st_Metadata: TStaticText;
+    st_Metadata: TLabel;
     BtnOk: TButton;
     cb_ToDo: TComboBox;
     LblWhatNow: TLabel;

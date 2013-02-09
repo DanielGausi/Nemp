@@ -77,9 +77,9 @@ type
     cbAutoAddIgnoreTags: TCheckBox;
     MergeTagVST: TVirtualStringTree;
     IgnoreTagVST: TVirtualStringTree;
-    LblMergeTagHint: TStaticText;
+    LblMergeTagHint: TLabel;
     BtnDeleteMergeTag: TButton;
-    LblDeleteTagHint: TStaticText;
+    LblDeleteTagHint: TLabel;
     BtnDeleteIgnoreTag: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);

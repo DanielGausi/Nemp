@@ -318,8 +318,8 @@ type
     cb_RatingChangeCounter: TCheckBox;
     cb_RatingIncreaseRating: TCheckBox;
     cb_RatingDecreaseRating: TCheckBox;
-    StaticText1: TStaticText;
-    StaticText2: TStaticText;
+    StaticText1: TLabel;
+    StaticText2: TLabel;
     CB_RememberInterruptedPlayPosition: TCheckBox;
     LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;

@@ -213,9 +213,25 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Merged/renamed tags'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         498
         350)
+      object LblMergeTagHint: TLabel
+        Left = 3
+        Top = 3
+        Width = 492
+        Height = 46
+        Anchors = [akLeft, akTop, akRight]
+        AutoSize = False
+        Caption = 
+          'This list is used to adjust new tags from LastFM. Tags in this l' +
+          'ist are automatically replaced when getting new tags.'
+        WordWrap = True
+      end
       object MergeTagVST: TVirtualStringTree
         Left = 3
         Top = 55
@@ -248,7 +264,28 @@ object CloudEditorForm: TCloudEditorForm
             WideText = 'Replace with'
           end>
       end
-      object LblMergeTagHint: TStaticText
+      object BtnDeleteMergeTag: TButton
+        Left = 388
+        Top = 55
+        Width = 107
+        Height = 25
+        Anchors = [akTop, akRight]
+        Caption = 'Delete from list'
+        TabOrder = 1
+        OnClick = BtnDeleteMergeTagClick
+      end
+    end
+    object TS_DeleteTags: TTabSheet
+      Caption = 'Deleted tags'
+      ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      DesignSize = (
+        498
+        350)
+      object LblDeleteTagHint: TLabel
         Left = 3
         Top = 3
         Width = 492
@@ -257,26 +294,9 @@ object CloudEditorForm: TCloudEditorForm
         AutoSize = False
         Caption = 
           'This list is used to adjust new tags from LastFM. Tags in this l' +
-          'ist are automatically replaced when getting new tags.'
-        TabOrder = 1
+          'ist are automatically deleted when getting new tags.'
+        WordWrap = True
       end
-      object BtnDeleteMergeTag: TButton
-        Left = 388
-        Top = 55
-        Width = 107
-        Height = 25
-        Anchors = [akTop, akRight]
-        Caption = 'Delete from list'
-        TabOrder = 2
-        OnClick = BtnDeleteMergeTagClick
-      end
-    end
-    object TS_DeleteTags: TTabSheet
-      Caption = 'Deleted tags'
-      ImageIndex = 1
-      DesignSize = (
-        498
-        350)
       object IgnoreTagVST: TVirtualStringTree
         Left = 3
         Top = 55
@@ -303,18 +323,6 @@ object CloudEditorForm: TCloudEditorForm
             WideText = 'Key'
           end>
       end
-      object LblDeleteTagHint: TStaticText
-        Left = 3
-        Top = 3
-        Width = 492
-        Height = 46
-        Anchors = [akLeft, akTop, akRight]
-        AutoSize = False
-        Caption = 
-          'This list is used to adjust new tags from LastFM. Tags in this l' +
-          'ist are automatically deleted when getting new tags.'
-        TabOrder = 1
-      end
       object BtnDeleteIgnoreTag: TButton
         Left = 388
         Top = 55
@@ -322,7 +330,7 @@ object CloudEditorForm: TCloudEditorForm
         Height = 25
         Anchors = [akTop, akRight]
         Caption = 'Delete from list'
-        TabOrder = 2
+        TabOrder = 1
         OnClick = BtnDeleteIgnoreTagClick
       end
     end
