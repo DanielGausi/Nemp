@@ -22,7 +22,7 @@ type
     pc_Wizard: TPageControl;
     TabSheet1: TTabSheet;
     Lbl_Welcome: TLabel;
-    st_Introduction: TStaticText;
+    st_Introduction: TLabel;
     ImgWelcome: TImage;
     Lbl_Version: TLabel;
     BtnContinue: TButton;

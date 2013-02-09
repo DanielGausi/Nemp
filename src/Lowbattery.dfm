@@ -40,7 +40,7 @@ object FormLowBattery: TFormLowBattery
     Height = 13
     Caption = 'What do you want to do now?'
   end
-  object st_Metadata: TStaticText
+  object st_Metadata: TLabel
     Left = 152
     Top = 45
     Width = 337
@@ -52,7 +52,7 @@ object FormLowBattery: TFormLowBattery
       ' cassette players). The fluttering will become worse on even low' +
       'er battery status. Fluttering will end, if you start charging th' +
       'e battery.'
-    TabOrder = 0
+    WordWrap = True
   end
   object BtnOk: TButton
     Left = 414
@@ -62,7 +62,7 @@ object FormLowBattery: TFormLowBattery
     Caption = 'Ok'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
   object cb_ToDo: TComboBox
     Left = 152
@@ -86,6 +86,6 @@ object FormLowBattery: TFormLowBattery
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 3
+    TabOrder = 1
   end
 end

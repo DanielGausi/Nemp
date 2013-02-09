@@ -46,7 +46,7 @@ interface
 
 // If the conditional define DXGETTEXTDEBUG is defined, debugging log is activated.
 // Use DefaultInstance.DebugLogToFile() to write the log to a file.
-{ $define DXGETTEXTDEBUG}
+{.$define DXGETTEXTDEBUG}
 
 {$ifdef VER140}
   // Delphi 6
@@ -833,7 +833,7 @@ type
     Str: String;
   end;
   
-function SysUtilsEnumStringModules(Instance: Longint; Data: Pointer): Boolean;
+function SysUtilsEnumStringModules(Instance: NativeInt; Data: Pointer): Boolean;
 {$IFDEF MSWINDOWS}
 var
   Buffer: array [0..1023] of Char; // WideChar in Delphi 2008, AnsiChar before that
@@ -866,7 +866,7 @@ var
 begin
   StrData.Ident := Ident;
   StrData.Str := '';
-  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  EnumResourceModules(SysUtilsEnumStringModules, @StrData);
+  EnumResourceModules(SysUtilsEnumStringModules, @StrData);
   Result := StrData.Str;
 end;
 
@@ -2983,6 +2983,7 @@ initialization
   param0:='';
 
 finalization
+  //DefaultInstance.DebugLogToFile('');
   FreeAndNil (DefaultInstance);
   FreeAndNil (ResourceStringDomainListCS);
   FreeAndNil (ResourceStringDomainList);

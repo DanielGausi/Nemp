@@ -31,10 +31,6 @@ object Wizard: TWizard
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Lbl_Welcome: TLabel
         Left = 152
         Top = 16
@@ -62,7 +58,7 @@ object Wizard: TWizard
         Height = 13
         Caption = '...'
       end
-      object st_Introduction: TStaticText
+      object st_Introduction: TLabel
         Left = 152
         Top = 64
         Width = 331
@@ -75,7 +71,7 @@ object Wizard: TWizard
           'rams that mess about with their system without being asked - and' +
           ' so do I.#13#10#13#10This Wizard will explain these features and' +
           ' ask for your permission to activate them.'
-        TabOrder = 2
+        WordWrap = True
       end
       object BtnContinue: TButton
         Left = 408
@@ -153,19 +149,19 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object st_Updates: TStaticText
+      object st_Updates: TLabel
         Left = 152
         Top = 45
         Width = 349
         Height = 105
         AutoSize = False
-        Caption = 
+        Caption =
           'Nemp can check for updates and notify you if a newer version of ' +
           'Nemp is available. It will contact www.gausi.de once a week (def' +
           'ault setting, interval can be changed) and ask for the newest ve' +
           'rsion. There is no auto-installer - you have to download and ins' +
           'tall the new version by hand.'
-        TabOrder = 3
+        WordWrap = True
       end
       object BtnUpdateYes: TButton
         Left = 408
@@ -270,13 +266,13 @@ object Wizard: TWizard
         TabOrder = 0
         OnClick = BtnUpdateYesClick
       end
-      object st_Metadata: TStaticText
+      object st_Metadata: TLabel
         Left = 152
         Top = 45
         Width = 337
         Height = 105
         AutoSize = False
-        Caption = 
+        Caption =
           'If you change the artist, album, rating, ... of a title, or sear' +
           'ch for lyrics or extended tags, Nemp can save these data in the ' +
           'metadata (e.g. ID3-Tags) of the file. This is pretty normal for ' +
@@ -284,7 +280,7 @@ object Wizard: TWizard
           ' may collide with your backup or filesharing strategy.#13#10Note' +
           ': You can always change the metadata explicitly in the "Properti' +
           'es" window.'
-        TabOrder = 3
+        WordWrap = True
       end
       object Btn_MetaNo: TButton
         Left = 328
@@ -350,20 +346,20 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object st_Rating: TStaticText
+      object st_Rating: TLabel
         Left = 152
         Top = 45
         Width = 337
         Height = 105
         AutoSize = False
-        Caption = 
+        Caption =
           'Nemp can adjust the rating of your music files automatically. If' +
           ' you frequently play a song, it will be rated better. On the oth' +
           'er side: If you abort a song in your playlist, its rating will b' +
           'e decreased a little.#13#10Note: This will be saved within the f' +
           'ile, if you answered the previous question with "yes", so the fi' +
           'les are changed quite often then.'
-        TabOrder = 3
+        WordWrap = True
       end
       object Btn_AutoBack: TButton
         Left = 152
@@ -448,19 +444,19 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object st_LastFM: TStaticText
+      object st_LastFM: TLabel
         Left = 152
         Top = 45
         Width = 337
         Height = 105
         AutoSize = False
-        Caption = 
+        Caption =
           'Nemp tries to find a proper cover art for your audio files withi' +
           'n the ID3-Tag or the directory of the file. If no cover art was ' +
           'found, Nemp can try to download the missing cover art from last.' +
           'fm. This image will be saved within the directory of the respect' +
           'ive audio file. '
-        TabOrder = 3
+        WordWrap = True
       end
       object Btn_LastFMBack: TButton
         Left = 152
@@ -545,19 +541,19 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
-      object st_filetypes: TStaticText
+      object st_filetypes: TLabel
         Left = 152
         Top = 45
         Width = 331
         Height = 105
         AutoSize = False
-        Caption = 
+        Caption =
           'Nemp can be installed as the default audio player. If you double' +
           ' click a music file or a playlist in the Windows Explorer, this ' +
           'file will be opened with Nemp.#13#10If you want to select the fi' +
           'le types associated with Nemp, you can do it later in the settin' +
           'gs dialog.'
-        TabOrder = 3
+        WordWrap = True
       end
       object Btn_FiletypesBack: TButton
         Left = 152

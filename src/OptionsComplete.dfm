@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 497
-    ActivePage = TabPlayer7
+    ActivePage = TabFiles1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -2386,6 +2386,29 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Automatic rating/playcounter of played audiofiles'
         TabOrder = 0
+        object StaticText1: TLabel
+          Left = 16
+          Top = 135
+          Width = 393
+          Height = 31
+          AutoSize = False
+          Caption = 
+            'A track is treated as "played", if more than 50% were played or ' +
+            'at least 4 minutes. '
+          WordWrap = True
+        end
+        object StaticText2: TLabel
+          Left = 16
+          Top = 165
+          Width = 393
+          Height = 52
+          AutoSize = False
+          Caption = 
+            'A track is treated as "aborted" if it is not "played" and the pl' +
+            'ayer is not stopped. So the rating will not be decreased when yo' +
+            'u press the stop button or close the player.'
+          WordWrap = True
+        end
         object cb_RatingActive: TCheckBox
           Left = 16
           Top = 20
@@ -2436,29 +2459,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ' be smaller the higher the playcounter is.'
           Caption = 'Decrease rating on aborted tracks'
           TabOrder = 4
-        end
-        object StaticText1: TStaticText
-          Left = 16
-          Top = 135
-          Width = 393
-          Height = 31
-          AutoSize = False
-          Caption = 
-            'A track is treated as "played", if more than 50% were played or ' +
-            'at least 4 minutes. '
-          TabOrder = 5
-        end
-        object StaticText2: TStaticText
-          Left = 16
-          Top = 165
-          Width = 393
-          Height = 52
-          AutoSize = False
-          Caption = 
-            'A track is treated as "aborted" if it is not "played" and the pl' +
-            'ayer is not stopped. So the rating will not be decreased when yo' +
-            'u press the stop button or close the player.'
-          TabOrder = 6
         end
       end
       object GrpBox_Metadata: TGroupBox

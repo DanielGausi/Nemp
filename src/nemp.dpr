@@ -95,10 +95,8 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  Lowbattery in 'Lowbattery.pas' {FormLowBattery},
   NempApi in 'common\NempApi.pas'
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
-  ;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 //,  classes;
 
