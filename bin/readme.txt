@@ -116,7 +116,7 @@ Verwendete Units/Komponenten:
 
 
 
-Version 4.6.0, April 2013
+Version 4.6.0, Februar 2013
 ----------------------------------------------------------- 
 Neue Funktionen:
 ----------------
@@ -128,12 +128,23 @@ Neue Funktionen:
 -----------
 * Neuer Standard-Skin, inklusive neuem Logo
 * Einstellungs-Dialog überarbeitet
+* Webserver: Playlist-Link oben mit Anker zum aktuellen Titel
+* Infos im Datei-Details werden nur noch bei Klick auf ein Item 
+  gewechselt, nicht mehr beim Browsen in der Medienbibliothek
 
 Bugfixes:
 ---------
 * Deskband und G15-App zeigten manchmal falsche Daten an
 * gelegentliche Fehler beim Anzeigen der Details von Webradio-Stationen
 * Speicherleck beim Einlesen neuer Dateien beseitigt
+* "Doppelte Einträge" in der Medienbib durch cda-Dateien
+* Zeitänderung beim Geburtstagsmodus wurde nicht übernommen
+* Gelegentlich kein Abspielen des nächsten Titels bei sehr kurzen Stücken
+* Einige Buttons wurden nicht skaliert im partymodus
+* Problem mit Pfadnamen gelöst, wenn mp3-Dateien direkt im Stammverzeichnis
+* Bei Änderungen der ID3-Tags von Dateien in der Playlist wurde die 
+  Titelanzeige nicht aktualisiert
+  eines Laufwerks liegen
 
 
 Version 4.5.0, April 2012
