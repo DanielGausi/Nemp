@@ -315,6 +315,8 @@ type
 
   end;
 
+  function GetSkinDirFromSkinName(aName: String): String;
+
   {$IFDEF USESTYLES}
   // not used atm
   //procedure UnSkinForm(aForm: TForm);
@@ -328,7 +330,17 @@ implementation
 
 uses NempMainUnit, OptionsComplete, Hilfsfunktionen, spectrum_vis,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
-    VSTEditControls, MedienBibliothekClass, TagClouds;
+    VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper;
+
+function GetSkinDirFromSkinName(aName: String): String;
+begin
+    result := StringReplace(aName,
+              '<public> ', ExtractFilePath(ParamStr(0)) + 'Skins\', []);
+
+    result := StringReplace(result,
+              '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
+
+end;
 
 constructor TNempSkin.create;
 var i: Integer;
@@ -535,7 +547,7 @@ begin
 
         {$IFDEF USESTYLES}
         StyleFilename := path + '\' + name + '.vsf';
-        if UseAdvancedSkin and FileExists(StyleFilename) then
+        if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
         begin
             if TStyleManager.IsValidStyle(StyleFilename) then
             begin
@@ -547,7 +559,6 @@ begin
             else
             begin
                 UseAdvancedSkin := False;
-                wuppdi;
             end;
         end;
         {$ENDIF}
@@ -1629,8 +1640,7 @@ begin
   Nemp_MainForm.RepaintVisOnPause;
 
   {$IFDEF USESTYLES}
-
-  if UseAdvancedSkin then
+  if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
   begin
       TStylemanager.SetStyle(self.name);
   end

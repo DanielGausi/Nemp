@@ -130,6 +130,8 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
 
+    procedure SetSkinRadioBox(aName: String);
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -1690,5 +1692,44 @@ begin
             result := True;
     end;
 end;
+
+
+procedure SetSkinRadioBox(aName: String);
+var i: Integer;
+    captionString: String;
+begin
+    with Nemp_MainForm do
+    begin
+        if aName = '' then
+        begin
+            MM_O_Skins_WindowsStandard.Checked := True;
+            PM_P_Skins_WindowsStandard.Checked := True;
+
+            for i := 3 to MM_O_Skins.Count - 1 do
+                MM_O_Skins.Items[i].Checked := False;
+
+            for i := 3 to PM_P_Skins.Count - 1 do
+                PM_P_Skins.Items[i].Checked := False;
+        end else
+        begin
+            captionString := StringReplace(aName,'&','&&',[rfReplaceAll]);
+            MM_O_Skins_WindowsStandard.Checked := False;
+            PM_P_Skins_WindowsStandard.Checked := False;
+
+            for i := 3 to MM_O_Skins.Count - 1 do
+            begin
+                if MM_O_Skins.Items[i].Caption = captionString then
+                    MM_O_Skins.Items[i].Checked := True;
+            end;
+
+            for i := 3 to PM_P_Skins.Count - 1 do
+            begin
+                if PM_P_Skins.Items[i].Caption = captionString then
+                    PM_P_Skins.Items[i].Checked := True;
+            end;
+        end;
+    end;
+end;
+
 
 end.

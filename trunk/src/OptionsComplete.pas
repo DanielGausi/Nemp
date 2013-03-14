@@ -36,6 +36,8 @@ unit OptionsComplete;
 
 interface
 
+{$I xe.inc}
+
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
@@ -50,7 +52,8 @@ uses
   gnuGettext, languageCodes, 
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   SkinButtons, NempPanel, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdHTTP;
+  IdTCPClient, IdHTTP, MyDialogs
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
 
@@ -464,6 +467,8 @@ type
     GroupBox1: TGroupBox;
     cb_UseWalkmanMode: TCheckBox;
     BtnRecommendedFiletypes: TButton;
+    grpBoxUseAdvancedSkin: TGroupBox;
+    cbUseAdvancedSkin: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1449,6 +1454,7 @@ begin
   CB_AutoCheck.Checked := NempUpdater.AutoCheck;
   CB_AutoCheckNotifyOnBetas.Checked := NempUpdater.NotifyOnBetas;
 
+  cbUseAdvancedSkin.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
 
   CBBOX_UpdateInterval.Enabled := CB_AutoCheck.Checked;
   case NempUpdater.CheckInterval of
@@ -1995,10 +2001,18 @@ begin
   // Beta-Optionen
 //  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
 
+
+
   if cb_UseClassicCoverflow.Checked then
-      MedienBib.NewCoverFlow.Mode := cm_Classic
-  else
-      MedienBib.NewCoverFlow.Mode := cm_OpenGL;
+  begin
+      if MedienBib.NewCoverFlow.Mode <> cm_Classic then
+          MedienBib.NewCoverFlow.Mode := cm_Classic
+  end else
+  begin
+      if MedienBib.NewCoverFlow.Mode <> cm_OpenGL then
+          MedienBib.NewCoverFlow.Mode := cm_OpenGL;
+  end;
+
 
   Nemp_MainForm.NempOptions.FixCoverFlowOnStart := cbFixCoverFlowOnStart.Checked;
 
@@ -2615,7 +2629,6 @@ begin
   NempUpdater.AutoCheck := CB_AutoCheck.Checked;
   NempUpdater.NotifyOnBetas := CB_AutoCheckNotifyOnBetas.Checked;
 
-
   case CBBOX_UpdateInterval.ItemIndex  of
       0: NempUpdater.CheckInterval := 0;
       1: NempUpdater.CheckInterval := 1;
@@ -2703,6 +2716,34 @@ begin
   // NempPlayer.PostProcessor.IgnoreCounterOnAbortedTracks := cb_RatingIgnoreCounterOnAbortedTracks .checked ;
   NempPlayer.PostProcessor.IncPlayedFiles               := cb_RatingIncreaseRating               .checked ;
   NempPlayer.PostProcessor.DecAbortedFiles              := cb_RatingDecreaseRating               .checked ;
+
+  if Nemp_MainForm.GlobalUseAdvancedSkin <> cbUseAdvancedSkin.Checked then
+  begin
+      Nemp_MainForm.GlobalUseAdvancedSkin := cbUseAdvancedSkin.Checked;
+
+      Nemp_MainForm.MM_O_Skin_UseAdvanced.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
+      Nemp_MainForm.PM_P_Skin_UseAdvancedSkin.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
+
+      {$IFDEF USESTYLES}
+      // deactivate it immediately
+      if Not Nemp_MainForm.GlobalUseAdvancedSkin then
+      begin
+          TStyleManager.SetStyle('Windows');
+          Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+      end else
+      begin
+          // refresh skin, if a skin is used, and it supports advanced skinning
+          if Nemp_MainForm.UseSkin then
+          begin
+              if Nemp_MainForm.NempSkin.UseAdvancedSkin then
+                  Nemp_MainForm.ActivateSkin(GetSkinDirFromSkinName(Nemp_MainForm.SkinName))
+              else
+                  TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
+          end;
+      end;
+      {$ENDIF}
+  end;
+
 
   ReArrangeToolImages;
 end;

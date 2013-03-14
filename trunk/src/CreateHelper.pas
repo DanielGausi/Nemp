@@ -40,6 +40,8 @@ unit CreateHelper;
 
 interface
 
+{$I xe.inc}
+
     uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees,
 
     dialogs, shellApi, ID3GenreList;
@@ -57,7 +59,8 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
     SplitForm_Hilfsfunktionen, Mp3FileUtils,
 
-    MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit;
+    MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
+    WindowsVersionInfo;
 
 
 procedure UpdateSplashScreen(status: String);
@@ -74,6 +77,10 @@ var i, s: Integer;
     ini: TMemIniFile;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
+    defaultAdvanced: Boolean;
+    {$IFDEF USESTYLES}
+        WinVersionInfo: TWindowsVersionInfo;
+    {$ENDIF}
 
 begin
     UpdateSplashScreen(SplashScreen_LoadingPreferences);
@@ -124,6 +131,22 @@ begin
 
             UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
             SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp 4.6');
+
+            {$IFDEF USESTYLES}
+                WinVersionInfo := TWindowsVersionInfo.Create;
+                try
+                    // use advanced Skin on Windows Vista and above (6)
+                    // but not on XP and below (5)
+                    defaultAdvanced := WinVersionInfo.MajorVersion >= 6;
+                finally
+                    WinVersionInfo.Free;
+                end;
+                GlobalUseAdvancedSkin     := ini.ReadBool('Fenster', 'UseAdvancedSkin', defaultAdvanced);
+            {$ELSE}
+                GlobalUseAdvancedSkin := False;
+            {$ENDIF}
+
+
 
             for i:=0 to Spaltenzahl-1 do
             begin
@@ -208,6 +231,8 @@ begin
     UpdateSplashScreen(SplashScreen_SearchSkins);
     with Nemp_MainForm do
     begin
+        MM_O_Skin_UseAdvanced.Checked := GlobalUseAdvancedSkin;
+        PM_P_Skin_UseAdvancedSkin.Checked := GlobalUseAdvancedSkin;
         // Skin-MenuItems setzen
         if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
         repeat
@@ -217,12 +242,18 @@ begin
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
               aMenuItem.AutoHotkeys := maManual;
               aMenuItem.OnClick := SkinAn1Click;
+              aMenuItem.RadioItem := True;
+              aMenuItem.AutoCheck := True;
+              aMenuItem.GroupIndex := 3;
               aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
               PM_P_Skins.Add(aMenuItem);
 
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
               aMenuItem.AutoHotkeys := maManual;
               aMenuItem.OnClick := SkinAn1Click;
+              aMenuItem.RadioItem := True;
+              aMenuItem.AutoCheck := True;
+              aMenuItem.GroupIndex := 3;
               aMenuItem.Caption := tmpstr; //'<private> ' + Sr.Name;
               MM_O_Skins.Add(aMenuItem);
           end;
@@ -238,12 +269,18 @@ begin
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
               aMenuItem.AutoHotkeys := maManual;
               aMenuItem.OnClick := SkinAn1Click;
+              aMenuItem.RadioItem := True;
+              aMenuItem.AutoCheck := True;
+              aMenuItem.GroupIndex := 3;
               aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
               PM_P_Skins.Add(aMenuItem);
 
               aMenuItem := TMenuItem.Create(Nemp_MainForm);
               aMenuItem.AutoHotkeys := maManual;
               aMenuItem.OnClick := SkinAn1Click;
+              aMenuItem.RadioItem := True;
+              aMenuItem.AutoCheck := True;
+              aMenuItem.GroupIndex := 3;
               aMenuItem.Caption := tmpstr; ///'<public> ' + Sr.Name;
               MM_O_Skins.Add(aMenuItem);
           end;
@@ -527,6 +564,7 @@ begin
 
         if Useskin then
         begin
+            SetSkinRadioBox(SkinName);
             tmpstr := StringReplace(SkinName,
                     '<public> ', ExtractFilePath(Paramstr(0)) + 'Skins\', []);
             tmpstr := StringReplace(tmpstr,
@@ -536,6 +574,7 @@ begin
             RandomBtn.GlyphLine := NempPlaylist.WiedergabeMode;
         end else
         begin
+            SetSkinRadioBox('');
             NempSkin.DeActivateSkin(False);
             TabBtn_Equalizer.ResetGlyph;
         end;
