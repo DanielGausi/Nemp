@@ -3608,10 +3608,17 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 8
         object MM_O_Skins_WindowsStandard: TMenuItem
           Caption = 'Windows default'
+          RadioItem = True
           OnClick = WindowsStandardClick
+        end
+        object MM_O_Skin_UseAdvanced: TMenuItem
+          Caption = 'Use advanced skinning'
+          GroupIndex = 1
+          OnClick = MM_O_Skin_UseAdvancedClick
         end
         object N38: TMenuItem
           Caption = '-'
+          GroupIndex = 1
         end
       end
       object MM_O_Languages: TMenuItem
@@ -4016,7 +4023,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A4C0A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000A580A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4481,7 +4488,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300B7C0B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300B880B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6497,10 +6504,16 @@ object Nemp_MainForm: TNemp_MainForm
       ImageIndex = 8
       object PM_P_Skins_WindowsStandard: TMenuItem
         Caption = 'Windows standard'
+        RadioItem = True
         OnClick = WindowsStandardClick
+      end
+      object PM_P_Skin_UseAdvancedSkin: TMenuItem
+        Caption = 'Use advanced skinning'
+        OnClick = MM_O_Skin_UseAdvancedClick
       end
       object N30: TMenuItem
         Caption = '-'
+        GroupIndex = 2
       end
     end
     object PM_P_Languages: TMenuItem
@@ -7426,7 +7439,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07B80710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07C40710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

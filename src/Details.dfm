@@ -37,7 +37,7 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_Lyrics
+    ActivePage = Tab_ExtendedID3v2
     TabOrder = 1
     OnChange = MainPageControlChange
     object Tab_General: TTabSheet
@@ -599,7 +599,6 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Style = csDropDownList
-          ItemHeight = 0
           TabOrder = 0
           OnChange = CoverBoxChange
         end
@@ -814,7 +813,6 @@ object FDetails: TFDetails
           AutoCloseUp = True
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
-          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Lblv1Change
@@ -1101,7 +1099,6 @@ object FDetails: TFDetails
           Height = 21
           AutoComplete = False
           Anchors = [akLeft, akTop, akRight, akBottom]
-          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Lblv2Change
@@ -1334,7 +1331,6 @@ object FDetails: TFDetails
           Width = 145
           Height = 21
           AutoComplete = False
-          ItemHeight = 0
           Sorted = True
           TabOrder = 4
           OnChange = Edt_VorbisChange
@@ -1561,7 +1557,6 @@ object FDetails: TFDetails
           Width = 321
           Height = 21
           Style = csDropDownList
-          ItemHeight = 0
           TabOrder = 0
           OnChange = cbPicturesChange
         end
@@ -2061,9 +2056,14 @@ object FDetails: TFDetails
     ProxyParams.BasicAuthentication = False
     ProxyParams.ProxyPort = 0
     Request.ContentLength = -1
+    Request.ContentRangeEnd = -1
+    Request.ContentRangeStart = -1
+    Request.ContentRangeInstanceLength = -1
     Request.Accept = 'text/html, */*'
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    Request.Ranges.Units = 'bytes'
+    Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
     Left = 428
     Top = 96

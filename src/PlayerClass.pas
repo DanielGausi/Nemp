@@ -3458,7 +3458,8 @@ begin
         BASS_ChannelSetPosition(ThreadedMainStream, oldPosition, BASS_POS_BYTE);
 
         MainStream := ThreadedMainStream;
-        Bass_ChannelPlay(MainStream, False);
+        if Status = PLAYER_ISPLAYING then
+            Bass_ChannelPlay(MainStream, False);
         BASS_ChannelStop(oldMain);
         if fMainVolume <> 0 then
             BASS_ChannelSlideAttribute (ThreadedMainStream,

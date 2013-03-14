@@ -31,6 +31,10 @@ object Wizard: TWizard
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Lbl_Welcome: TLabel
         Left = 152
         Top = 16
@@ -155,7 +159,7 @@ object Wizard: TWizard
         Width = 349
         Height = 105
         AutoSize = False
-        Caption =
+        Caption = 
           'Nemp can check for updates and notify you if a newer version of ' +
           'Nemp is available. It will contact www.gausi.de once a week (def' +
           'ault setting, interval can be changed) and ask for the newest ve' +
@@ -247,6 +251,22 @@ object Wizard: TWizard
         Font.Style = []
         ParentFont = False
       end
+      object st_Metadata: TLabel
+        Left = 152
+        Top = 45
+        Width = 337
+        Height = 105
+        AutoSize = False
+        Caption = 
+          'If you change the artist, album, rating, ... of a title, or sear' +
+          'ch for lyrics or extended tags, Nemp can save these data in the ' +
+          'metadata (e.g. ID3-Tags) of the file. This is pretty normal for ' +
+          'an mp3-player. However, the files will be changed by this, which' +
+          ' may collide with your backup or filesharing strategy.#13#10Note' +
+          ': You can always change the metadata explicitly in the "Properti' +
+          'es" window.'
+        WordWrap = True
+      end
       object Btn_MetaBack: TButton
         Left = 152
         Top = 240
@@ -265,22 +285,6 @@ object Wizard: TWizard
         Default = True
         TabOrder = 0
         OnClick = BtnUpdateYesClick
-      end
-      object st_Metadata: TLabel
-        Left = 152
-        Top = 45
-        Width = 337
-        Height = 105
-        AutoSize = False
-        Caption =
-          'If you change the artist, album, rating, ... of a title, or sear' +
-          'ch for lyrics or extended tags, Nemp can save these data in the ' +
-          'metadata (e.g. ID3-Tags) of the file. This is pretty normal for ' +
-          'an mp3-player. However, the files will be changed by this, which' +
-          ' may collide with your backup or filesharing strategy.#13#10Note' +
-          ': You can always change the metadata explicitly in the "Properti' +
-          'es" window.'
-        WordWrap = True
       end
       object Btn_MetaNo: TButton
         Left = 328
@@ -352,7 +356,7 @@ object Wizard: TWizard
         Width = 337
         Height = 105
         AutoSize = False
-        Caption =
+        Caption = 
           'Nemp can adjust the rating of your music files automatically. If' +
           ' you frequently play a song, it will be rated better. On the oth' +
           'er side: If you abort a song in your playlist, its rating will b' +
@@ -450,7 +454,7 @@ object Wizard: TWizard
         Width = 337
         Height = 105
         AutoSize = False
-        Caption =
+        Caption = 
           'Nemp tries to find a proper cover art for your audio files withi' +
           'n the ID3-Tag or the directory of the file. If no cover art was ' +
           'found, Nemp can try to download the missing cover art from last.' +
@@ -547,7 +551,7 @@ object Wizard: TWizard
         Width = 331
         Height = 105
         AutoSize = False
-        Caption =
+        Caption = 
           'Nemp can be installed as the default audio player. If you double' +
           ' click a music file or a playlist in the Windows Explorer, this ' +
           'file will be opened with Nemp.#13#10If you want to select the fi' +

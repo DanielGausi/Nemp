@@ -6,8 +6,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem, MyDialogs
-  ;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, gnuGettext, Nemp_SkinSystem, MyDialogs,
+  MainFormHelper ;
 
 const
     //WIZ_SHOW_AGAIN     = 41;
@@ -29,7 +29,7 @@ type
     BtnCancel: TButton;
     TabSheet2: TTabSheet;
     Lbl_CheckUpdates: TLabel;
-    st_Updates: TStaticText;
+    st_Updates: TLabel;
     Lbl_QeryUpdate: TLabel;
     BtnUpdateYes: TButton;
     BtnUpdateNo: TButton;
@@ -40,13 +40,13 @@ type
     ImageMetaData: TImage;
     Btn_MetaYes: TButton;
     Lbl_QueryMetadata: TLabel;
-    st_Metadata: TStaticText;
+    st_Metadata: TLabel;
     Btn_MetaNo: TButton;
     Lbl_SaveMetadata: TLabel;
     TabSheet4: TTabSheet;
     ImageRating: TImage;
     Lbl_Rating: TLabel;
-    st_Rating: TStaticText;
+    st_Rating: TLabel;
     Lbl_QueryRating: TLabel;
     Btn_AutoBack: TButton;
     Btn_AutoNo: TButton;
@@ -54,7 +54,7 @@ type
     TabSheet5: TTabSheet;
     ImageLastFM: TImage;
     Lbl_LastFM: TLabel;
-    st_LastFM: TStaticText;
+    st_LastFM: TLabel;
     Lbl_QueryLastFM: TLabel;
     Btn_LastFMBack: TButton;
     Btn_LastFMNo: TButton;
@@ -70,7 +70,7 @@ type
     ImageFiletypes: TImage;
     Lbl_Filetypes: TLabel;
     Lbl_QueryFiletypes: TLabel;
-    st_filetypes: TStaticText;
+    st_filetypes: TLabel;
     Btn_FiletypesBack: TButton;
     Btn_FiletypesNo: TButton;
     Btn_FiletypesYes: TButton;
@@ -149,6 +149,7 @@ begin
               Nemp_MainForm.UseSkin := True;
               Nemp_MainForm.SkinName := '<public> Nemp 4.6';
               Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Nemp 4.6');
+              SetSkinRadioBox(Nemp_MainForm.SkinName);
           end;
         end;
     end;

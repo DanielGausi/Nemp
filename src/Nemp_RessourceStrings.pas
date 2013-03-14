@@ -227,6 +227,7 @@ FloatingPointChannels_Off = 'Current status: Off';
 
 
     Warning_NoSkinFound = 'No skins found';
+    AdvancedSkinActivateHint = 'Note: The current skin does not support advanced skinning.';
     FiletypeRegistration_AudioFileEnqueue  = 'Enqueue in Nemp';
     FiletypeRegistration_AudioFilePlay     = 'Play in Nemp';
     FiletypeRegistration_PlaylistEnqueue   = 'Enqueue in Nemp';

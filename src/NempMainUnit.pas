@@ -850,6 +850,8 @@ type
     TreeImages: TImageList;
     PlaylistVST: TVirtualStringTree;
     VST: TVirtualStringTree;
+    MM_O_Skin_UseAdvanced: TMenuItem;
+    PM_P_Skin_UseAdvancedSkin: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1425,6 +1427,7 @@ type
     //  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
     //  CellRect: TRect);
     procedure CorrectSkinRegionsTimerTimer(Sender: TObject);
+    procedure MM_O_Skin_UseAdvancedClick(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -1529,6 +1532,7 @@ type
 
     AnzeigeMode: Integer;
     UseSkin: Boolean;
+    GlobalUseAdvancedSkin: Boolean;
     SkinName: UnicodeString;
 
     AktiverTree: TVirtualStringTree;
@@ -2033,6 +2037,7 @@ begin
             Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
             ini.WriteBool('Fenster', 'UseSkin', UseSkin);
             ini.WriteString('Fenster','SkinName', SkinName);
+            ini.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
 
             NempPlayer.WriteToIni(Ini);
             NempPlaylist.WriteToIni(Ini);
@@ -2805,6 +2810,34 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.MM_O_Skin_UseAdvancedClick(Sender: TObject);
+begin
+    GlobalUseAdvancedSkin := NOT GlobalUseAdvancedSkin;
+
+    MM_O_Skin_UseAdvanced.Checked := GlobalUseAdvancedSkin;
+    PM_P_Skin_UseAdvancedSkin.Checked := GlobalUseAdvancedSkin;
+
+    {$IFDEF USESTYLES}
+    // deactivate it immediately
+    if Not Nemp_MainForm.GlobalUseAdvancedSkin then
+    begin
+        TStyleManager.SetStyle('Windows');
+        Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+    end else
+    begin
+        // refresh skin, if a skin is used, and it supports advanced skinning
+        if UseSkin then
+        begin
+            if NempSkin.UseAdvancedSkin then
+                ActivateSkin(GetSkinDirFromSkinName(SkinName))
+            else
+                TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
+        end;
+    end;
+    {$ENDIF}
+end;
+
+
 procedure TNemp_MainForm.ActivateSkin(aName: String);
 begin
     NempSkin.LoadFromDir(aName);
@@ -2822,24 +2855,37 @@ begin
     RepaintOtherForms;
 
     RepaintAll;
-
 end;
+
+procedure TNemp_MainForm.WindowsStandardClick(Sender: TObject);
+begin
+  NempSkin.DeActivateSkin;
+  SetSkinRadioBox('');
+  UseSkin := False;
+  RePaintPanels;
+  RepaintOtherForms;
+
+  RepaintAll;
+end;
+
 
 // Ein paar Routinen, die das Skinnen erleichtren
 procedure TNemp_MainForm.Skinan1Click(Sender: TObject);
-var tmpstr: UnicodeString;
+//var tmpstr: UnicodeString;
 begin
   UseSkin := True;
   SkinName := StringReplace((Sender as TMenuItem).Caption,'&&','&',[rfReplaceAll]);
 
   // SkinName ist die Globale Var, die in die ini gespeichert wird -> da muss das privat//global mit rein!!!
-  tmpstr := StringReplace(SkinName,
+{  tmpstr := StringReplace(SkinName,
               '<public> ', ExtractFilePath(ParamStr(0)) + 'Skins\', []);
 
   tmpstr := StringReplace(tmpstr,
               '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
+ }
+  ActivateSkin(GetSkinDirFromSkinName(SkinName));
 
-  ActivateSkin(tmpStr);
+  SetSkinRadioBox(SkinName);
 
  // CorrectSkinRegionsTimer.Enabled := True;
 end;
@@ -11186,15 +11232,6 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.WindowsStandardClick(Sender: TObject);
-begin
-  NempSkin.DeActivateSkin;
-  UseSkin := False;
-  RePaintPanels;
-  RepaintOtherForms;
-
-  RepaintAll;
-end;
 
 procedure TNemp_MainForm.PM_P_BirthdayOptionsClick(Sender: TObject);
 begin
