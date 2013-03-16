@@ -87,6 +87,7 @@ end;
 
 
 procedure TMainForm.StartTimerTimer(Sender: TObject);
+var autoStart: Boolean;
 begin
     StartTimer.Enabled := False;
     if assigned(NempG15Applet) then
@@ -97,7 +98,8 @@ begin
     NempG15Applet.ControlImage := Image1;
     ImageList1.GetBitmap(0, NempG15Applet.SplashImage);
 
-    if Not assigned(NempG15Applet.g15Display) then
+    autoStart := (ParamCount >= 1) and (ParamStr(1) = 'autostart');
+    if (Not assigned(NempG15Applet.g15Display)) and (not autoStart) then
         MessageDLG('NempG15Applet could not be loaded: Another copy is already running, or no G15 can be found.', mtError, [MBOK], 0);
 
     MainTimer.Enabled := True;
@@ -117,7 +119,8 @@ begin
       close
   else
   begin
-      MainTimer.Tag := MainTimer.Tag + 1;
+      if MainTimer.Tag < 10 then
+          MainTimer.Tag := MainTimer.Tag + 1;
 
       if (MainTimer.Tag < 10) or (hwndNemp = 0) or (Not assigned(NempG15Applet.g15Display)) then
       begin
