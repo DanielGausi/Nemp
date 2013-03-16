@@ -1739,8 +1739,9 @@ Begin
   result := True;
   with Nemp_MainForm do
   begin
-    // Größe der Playlist merken
-    abspielen := NempPlaylist.Count = 0;
+    // Größe der Playlist und Status des Players merken
+    // abspielen := NempPlaylist.Count = 0;
+    abspielen :=  (NempPlaylist.Count = 0) and (NempPlayer.MainStream = 0);
 
     LangeAktionWeitermachen := True;
 

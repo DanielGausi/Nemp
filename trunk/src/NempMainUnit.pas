@@ -3215,11 +3215,9 @@ begin
     if How = PLAYER_PLAY_FILES then // erst PlayList löschen
         NempPlaylist.ClearPlaylist;
 
-    // Hier Überprüfen, ob die Playlist leer ist
-    // ebtweder, weil sie gerade eben gelöscht wurde,
-    // oder weil sie halt schon leer war.
-    // Auf jeden Fall macht es dann Sinn, die erste Datei abzuspielen:
-    Abspielen := NempPlaylist.Count = 0;
+    // Check, whether the player is currently playing
+    // or the user selected "play now"
+    Abspielen := ((NempPlaylist.Count = 0) and (NempPlayer.MainStream = 0)) OR (How = PLAYER_PLAY_FILES);
 
     if How in [{PLAYER_PLAY_NOW, }PLAYER_PLAY_NEXT] then
         NempPlaylist.GetInsertNodeFromPlayPosition
@@ -11272,7 +11270,7 @@ begin
 
         tmp := ExtractFilepath(paramStr(0)) + tmp;
         if FileExists(tmp) then
-            shellexecute(Handle,'open',pchar('"' + tmp + '"'),'autostart',NIL,sw_show)
+            shellexecute(Handle,'open',pchar('"' + tmp + '"'),'userstart',NIL,sw_show)
         else
             TranslateMessageDLG((StartG15AppNotFound), mtWarning, [mbOK], 0)
     end;
