@@ -106,7 +106,7 @@ begin
                 Uselanguage(NempOptions.Language);
 
             g15path := ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp;
-            if (NempOptions.DisplayApp <> '') and FileExists(g15Path) then
+            if NempOptions.UseDisplayApp and (NempOptions.DisplayApp <> '') and FileExists(g15Path) then
                 shellexecute(Handle,'open',pchar('"' + g15Path + '"'),'autostart', Nil, sw_hide);
 
             //Player-Einstellungen lesen

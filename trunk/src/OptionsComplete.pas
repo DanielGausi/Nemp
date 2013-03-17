@@ -469,6 +469,7 @@ type
     BtnRecommendedFiletypes: TButton;
     grpBoxUseAdvancedSkin: TGroupBox;
     cbUseAdvancedSkin: TCheckBox;
+    cb_UseG15Display: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1285,6 +1286,7 @@ begin
 
   cb_RegisterMediaHotkeys.Checked := Nemp_MainForm.NempOptions.RegisterMediaHotkeys;
   CB_IgnoreVolume.Checked := Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys;
+  cb_UseG15Display.Checked := Nemp_MainForm.NempOptions.UseDisplayApp;
 
   cb_SafePlayback.Checked := NempPlayer.SafePlayback;
 
@@ -1991,7 +1993,7 @@ end;
 procedure TOptionsCompleteForm.BTNApplyClick(Sender: TObject);
 var i,s,l, maxfont:integer;
   NeedUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate: boolean;
-  newLanguage: String;
+  newLanguage, tmp: String;
   ReDrawVorauswahlTrees, ReDrawPlaylistTree, ReDrawMedienlistTree: Boolean;
   Ini: TMemIniFile;
     hMod: Cardinal;
@@ -2297,6 +2299,23 @@ begin
 
   Nemp_MainForm.NempOptions.RegisterMediaHotkeys   := cb_RegisterMediaHotkeys.Checked;
   Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
+
+  if cb_UseG15Display.Checked and (NOT Nemp_MainForm.NempOptions.UseDisplayApp) then
+  begin
+      // G15 App is not currently active -> activate it!
+      if Nemp_MainForm.NempOptions.DisplayApp = '' then
+            tmp := 'NempG15App.exe'
+        else
+            tmp := Nemp_MainForm.NempOptions.DisplayApp;
+
+        tmp := ExtractFilepath(paramStr(0)) + tmp;
+        if FileExists(tmp) then
+            shellexecute(Handle,'open',pchar('"' + tmp + '"'),'userstart',NIL,sw_hide)
+        else
+            TranslateMessageDLG((StartG15AppNotFound), mtWarning, [mbOK], 0)
+  end;
+
+  Nemp_MainForm.NempOptions.UseDisplayApp          := cb_UseG15Display.Checked;
 
   NempPlayer.SafePlayback := cb_SafePlayback.Checked;
 

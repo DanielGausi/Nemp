@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 496
-    ActivePage = TabSystem0
+    ActivePage = TabSystem1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -276,7 +276,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         396)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
-        Top = 78
+        Top = 103
         Width = 431
         Height = 229
         Anchors = [akLeft, akTop, akRight]
@@ -1073,13 +1073,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 64
+        Height = 89
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Media keys'
+        Caption = 'Media keys and special keyboards'
         TabOrder = 0
         object CB_IgnoreVolume: TCheckBox
           Left = 16
-          Top = 39
+          Top = 40
           Width = 413
           Height = 17
           Hint = 
@@ -1098,10 +1098,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Use media keys, even if Nemp is in the background'
           TabOrder = 1
         end
+        object cb_UseG15Display: TCheckBox
+          Left = 16
+          Top = 60
+          Width = 401
+          Height = 17
+          Caption = 
+            'Use keyboard display (Logitech G15 keyboard or compatible requir' +
+            'ed)'
+          TabOrder = 2
+        end
       end
       object GrpBox_TabulatorOptions: TGroupBox
         Left = 8
-        Top = 312
+        Top = 337
         Width = 431
         Height = 65
         Anchors = [akLeft, akTop, akRight]

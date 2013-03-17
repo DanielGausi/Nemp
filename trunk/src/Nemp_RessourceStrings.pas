@@ -520,10 +520,16 @@ MainForm_MainMenu_Messages = 'Messages (%d)';
 MainForm_MainMenu_NoMessages = 'Messages';
 ErrorForm_NoMessages = 'No new messages, everything is fine. :)';
 
-MainForm_Summary_FileCount  = '%d file(s); ' ;
-MainForm_Summary_SelectedFileCount = '%d file(s) selected; ';
-MainForm_Summary_PlaylistCount = '%d playlist(s)';
-MainForm_Summary_WebradioCount = '%d webradio station(s)';
+MainForm_Summary_FileCountSingle         = '%d file; ' ;
+MainForm_Summary_SelectedFileCountSingle = '%d file selected; ';
+MainForm_Summary_PlaylistCountSingle     = '%d playlist';
+MainForm_Summary_WebradioCountSingle     = '%d webradio station';
+
+MainForm_Summary_FileCountMulti         = '%d files; ' ;
+MainForm_Summary_SelectedFileCountMulti = '%d files selected; ';
+MainForm_Summary_PlaylistCountMulti     = '%d playlists';
+MainForm_Summary_WebradioCountMulti     = '%d webradio stations';
+
 
 
 MainForm_Cover_NoCover   = 'No cover available';
@@ -692,6 +698,9 @@ Tags_CommasFound = 'It looks like you entered a comma-separated list of tags. Ho
 
 MenuItem_Partymode = 'Activate Party-Mode';
 MenuItem_PartymodeExit = 'Exit Party-Mode';
+
+MenuItem_Activate = 'Activate';
+MenuItem_Deactivate = 'Deactivate';
 
 ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. Or go back to the party and have some fun.';
 ParrtyMode_Password_Caption = 'Nemp Party-Mode';

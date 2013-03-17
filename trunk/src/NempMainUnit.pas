@@ -319,17 +319,14 @@ type
     MM_T_ShutDown_EndofPlaylist4: TMenuItem;
     MM_T_Birthday: TMenuItem;
     MM_T_BirthdayActivate: TMenuItem;
-    MM_T_BirthdayDeactivate: TMenuItem;
     N24: TMenuItem;
     MM_T_BirthdayOptions: TMenuItem;
     MM_T_RemoteNemp: TMenuItem;
     MM_T_WebServerActivate: TMenuItem;
-    MM_T_WebServerDeactivate: TMenuItem;
     N64: TMenuItem;
     MM_T_WebServerOptions: TMenuItem;
     MM_T_Scrobbler: TMenuItem;
     MM_T_ScrobblerActivate: TMenuItem;
-    MM_T_ScrobblerDeactivate: TMenuItem;
     N62: TMenuItem;
     MM_T_ScrobblerOptions: TMenuItem;
     MM_T_Directories: TMenuItem;
@@ -521,17 +518,14 @@ type
     PM_P_ShutDown_EndofPlaylist4: TMenuItem;
     PM_P_Birthday: TMenuItem;
     PM_P_BirthdayActivate: TMenuItem;
-    PM_P_BirthdayDeactivate: TMenuItem;
     N41: TMenuItem;
     PM_P_BirthdayOptions: TMenuItem;
     PM_P_RemoteNemp: TMenuItem;
     PM_P_WebServerActivate: TMenuItem;
-    PM_P_WebServerDeactivate: TMenuItem;
     N65: TMenuItem;
     PM_P_WebServerOptions: TMenuItem;
     PM_P_Scrobbler: TMenuItem;
     PM_P_ScrobblerActivate: TMenuItem;
-    PM_P_ScrobblerDectivate: TMenuItem;
     N61: TMenuItem;
     PM_P_ScrobblerOptions: TMenuItem;
     PM_P_Directories: TMenuItem;
@@ -604,7 +598,6 @@ type
     PM_S_ShutDown_EndofPlaylist4: TMenuItem;
     _Birthdaymode: TMenuItem;
     PM_B_BirthdayActivate: TMenuItem;
-    PM_B_BirthdayDeactivate: TMenuItem;
     N461: TMenuItem;
     PM_B_BirthdayOptions: TMenuItem;
     N58: TMenuItem;
@@ -622,12 +615,10 @@ type
     PM_RepeatOff: TMenuItem;
     _Scrobbler: TMenuItem;
     PM_S_ScrobblerActivate: TMenuItem;
-    PM_S_ScrobblerDeactivate: TMenuItem;
     N63: TMenuItem;
     PM_S_ScrobblerOptions: TMenuItem;
     _Webserver: TMenuItem;
     PM_W_WebServerActivate: TMenuItem;
-    PM_W_WebServerDeactivate: TMenuItem;
     N66: TMenuItem;
     PM_W_WebServerOptions: TMenuItem;
     LyricsMemo: TMemo;
@@ -3815,10 +3806,20 @@ begin
   else
   begin
       if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) then
-          AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCount, [MedienBib.Alben.Count])
+      begin
+          if MedienBib.Alben.Count = 1 then
+              AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCountSingle, [MedienBib.Alben.Count])
+          else
+              AuswahlStatusLBL.Caption := Format(MainForm_Summary_PlaylistCountMulti, [MedienBib.Alben.Count])
+      end
       else
       if (MedienBib.BrowseMode = 0) and (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) then
-          AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCount, [MedienBib.RadioStationList.Count])
+      begin
+          if MedienBib.RadioStationList.Count = 1 then
+              AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCountSingle, [MedienBib.RadioStationList.Count])
+          else
+              AuswahlStatusLBL.Caption := Format(MainForm_Summary_WebradioCountMulti, [MedienBib.RadioStationList.Count])
+      end
       else
       begin
           for i:=0 to Liste.Count-1 do
@@ -3826,10 +3827,14 @@ begin
               dauer := dauer + (Liste[i] as TAudioFile).Duration;
               groesse := groesse + (Liste[i] as TAudioFile).Size;
           end;
-
-          AuswahlStatusLBL.Caption := Format((MainForm_Summary_FileCount),[Liste.Count])
+          if Liste.Count = 1 then
+              AuswahlStatusLBL.Caption := Format((MainForm_Summary_FileCountSingle),[Liste.Count])
                              + SizeToString(groesse)
-                             + SekToZeitString(dauer);
+                             + SekToZeitString(dauer)
+          else
+              AuswahlStatusLBL.Caption := Format((MainForm_Summary_FileCountMulti),[Liste.Count])
+                             + SizeToString(groesse)
+                             + SekToZeitString(dauer)
       end;
   end;
 end;
@@ -4557,7 +4562,12 @@ begin
       groesse := groesse + AudioFile.Size;
   end;
 
-  MedienListeStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCount), [c] )
+  if c = 1 then
+      MedienListeStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountSingle), [c] )
+                                  + SizeToString(groesse)
+                                  + SekToZeitString(dauer)
+  else
+      MedienListeStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountMulti), [c] )
                                   + SizeToString(groesse)
                                   + SekToZeitString(dauer);
   aNode := VST.FocusedNode;
@@ -6853,9 +6863,15 @@ begin
       end;
   end;
 
-  PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCount), [c])
+  if c = 1 then
+      PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountSingle), [c])
+                                + SizeToString(groesse)
+                                + SekToZeitString(dauer)
+  else
+      PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountMulti), [c])
                                 + SizeToString(groesse)
                                 + SekToZeitString(dauer);
+
 
   aNode := PlaylistVST.FocusedNode;
   if not Assigned(aNode) then Exit;
@@ -10847,43 +10863,51 @@ end;
 
 procedure TNemp_MainForm.MenuBirthdayAusClick(Sender: TObject);
 begin
-  BirthdayTimer.Enabled := False;
+{  BirthdayTimer.Enabled := False;
   if assigned(BirthdayForm) then
     BirthdayForm.Close;
 
-  ReArrangeToolImages;
+  ReArrangeToolImages;}
 end;
 
 procedure TNemp_MainForm.MenuBirthdayStartClick(Sender: TObject);
 var timeleft: Integer;
 begin
-  // Einstellungen lesen
-  NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
+    // Einstellungen lesen
+    NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
 
-  if Not NempPlayer.CheckBirthdaySettings then
-      begin
-        if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
-        begin
-          if Not Assigned(OptionsCompleteForm) then
-            Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-          OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
-          OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
-          OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
-          OptionsCompleteForm.Show;
-        end;
-        exit;
-      end;
+    if Not NempPlayer.CheckBirthdaySettings then
+    begin
+          if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+          begin
+            if Not Assigned(OptionsCompleteForm) then
+              Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+            OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
+            OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
+            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;
+            OptionsCompleteForm.Show;
+          end;
+          exit;
+    end;
 
-  timeleft := SecondsUntil(NempPlayer.NempBirthdayTimer.StartCountDownTime);
-  if timeleft > 120 then
-    Nemp_MainForm.BirthdayTimer.Interval := 60000
-  else
-    Nemp_MainForm.BirthdayTimer.Interval := 1000;
+    if BirthdayTimer.Enabled then
+    begin
+        BirthdayTimer.Enabled := False;
+        if assigned(BirthdayForm) then
+            BirthdayForm.Close;
+    end else
+    begin
+        timeleft := SecondsUntil(NempPlayer.NempBirthdayTimer.StartCountDownTime);
+        if timeleft > 120 then
+          BirthdayTimer.Interval := 60000
+        else
+          BirthdayTimer.Interval := 1000;
 
-  Nemp_MainForm.BirthdayTimer.Enabled := True;
+        BirthdayTimer.Enabled := True;
+    end;
 
-  ReArrangeToolImages;
-  BirthdayImage.Hint := Format((BirthdayCountDown_Hint),  [SekToZeitString(timeleft, true)] );
+    ReArrangeToolImages;
+    BirthdayImage.Hint := Format((BirthdayCountDown_Hint),  [SekToZeitString(timeleft, true)] );
 end;
 
 procedure TNemp_MainForm.VolTimerTimer(Sender: TObject);
@@ -11516,6 +11540,7 @@ end;
 
 procedure TNemp_MainForm.PM_P_ScrobblerActivateClick(Sender: TObject);
 begin
+
     if (NempPlayer.NempScrobbler.Username = '') or (NempPlayer.NempScrobbler.SessionKey = '') then
     begin
         if TranslateMessageDLG((ScrobbleSettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
@@ -11549,19 +11574,29 @@ begin
                 NempPlayer.NempScrobbler.PlaybackStarted;
             end;
         end;
+    end else
+    begin
+        //stop scrobbling
+        NempPlayer.NempScrobbler.DoScrobble := False;
+        if assigned(OptionsCompleteForm) and (OptionsCompleteForm.Visible) then
+        begin
+            OptionsCompleteForm.CB_ScrobbleThisSession.Checked := False;
+            OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_Offline;
+        end;
     end;
     ReArrangeToolImages;
 end;
 
 procedure TNemp_MainForm.PM_P_ScrobblerDeactivateClick(Sender: TObject);
 begin
-    NempPlayer.NempScrobbler.DoScrobble := False;
+{    NempPlayer.NempScrobbler.DoScrobble := False;
     if assigned(OptionsCompleteForm) and (OptionsCompleteForm.Visible) then
     begin
         OptionsCompleteForm.CB_ScrobbleThisSession.Checked := False;
         OptionsCompleteForm.GrpBox_ScrobbleLog.Caption := Scrobble_Offline;
     end;
     ReArrangeToolImages;
+}
 end;
 
 procedure TNemp_MainForm.PM_P_ScrobblerOptionsClick(Sender: TObject);
@@ -11669,7 +11704,21 @@ end;
 
 procedure TNemp_MainForm.MM_T_WebServerActivateClick(Sender: TObject);
 begin
-    if not NempWebServer.Active then
+    if NempWebServer.Active then
+    begin
+        // Server deaktivieren
+        NempWebServer.Active := False;
+        ReArrangeToolImages;
+
+        // Anzeige setzen
+        if assigned(OptionsCompleteForm) then
+            with OptionsCompleteForm do
+            begin
+                BtnServerActivate.Caption := WebServer_ActivateServer;
+                EdtUsername.Enabled := True;
+                EdtPassword.Enabled := True;
+            end;
+    end else
     begin
         // Server aktivieren
         // 1. Einstellungen laden
@@ -11702,7 +11751,7 @@ end;
 
 procedure TNemp_MainForm.MM_T_WebServerDeactivateClick(Sender: TObject);
 begin
-    if NempWebServer.Active then
+   { if NempWebServer.Active then
     begin
         // Server deaktivieren
         NempWebServer.Active := False;
@@ -11715,7 +11764,7 @@ begin
                 EdtPassword.Enabled := True;
             end;
             ReArrangeToolImages;
-    end;
+    end;    }
 end;
 
 procedure TNemp_MainForm.MM_T_WebServerOptionsClick(Sender: TObject);
