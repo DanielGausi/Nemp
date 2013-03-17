@@ -205,6 +205,7 @@ end;
 procedure TNempG15Applet.InitSettings;
 var ini: TMemIniFile;
     tmp: String;
+    useapp: Boolean;
 begin
     // Get Savepath for settings
     if IsExeInProgramSubDir then
@@ -235,7 +236,9 @@ begin
     try
         ini.Encoding := TEncoding.UTF8;
         tmp := Ini.ReadString('Allgemein', 'DisplayApp', '');
-        fStartWithNemp := tmp = ExtractFilename(ParamStr(0));
+        useapp := Ini.ReadBool('Allgemein', 'UseDisplayApp', tmp <> '');
+
+        fStartWithNemp := useapp and (tmp = ExtractFilename(ParamStr(0)));
     finally
         ini.Free;
     end;
@@ -257,9 +260,15 @@ begin
     try
         ini.Encoding := TEncoding.UTF8;
         if fStartWithNemp then
-            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)))
+        begin
+            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
+            Ini.WriteBool('Allgemein', 'UseDisplayApp', True);
+        end
         else
-            Ini.WriteString('Allgemein', 'DisplayApp', '');
+        begin
+            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
+            Ini.WriteBool('Allgemein', 'UseDisplayApp', False);
+        end;
 
     finally
         ini.UpdateFile;

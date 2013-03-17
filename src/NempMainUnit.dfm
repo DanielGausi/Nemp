@@ -2419,6 +2419,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
+          ExplicitLeft = 0
+          ExplicitTop = 111
           Columns = <
             item
               Margin = 0
@@ -3910,10 +3912,6 @@ object Nemp_MainForm: TNemp_MainForm
           Caption = 'Activate'
           OnClick = MenuBirthdayStartClick
         end
-        object MM_T_BirthdayDeactivate: TMenuItem
-          Caption = 'Deactivate'
-          OnClick = MenuBirthdayAusClick
-        end
         object N24: TMenuItem
           Caption = '-'
         end
@@ -3928,10 +3926,6 @@ object Nemp_MainForm: TNemp_MainForm
         object MM_T_WebServerActivate: TMenuItem
           Caption = 'Activate'
           OnClick = MM_T_WebServerActivateClick
-        end
-        object MM_T_WebServerDeactivate: TMenuItem
-          Caption = 'Deactivate'
-          OnClick = MM_T_WebServerDeactivateClick
         end
         object N64: TMenuItem
           Caption = '-'
@@ -3951,10 +3945,6 @@ object Nemp_MainForm: TNemp_MainForm
         object MM_T_ScrobblerActivate: TMenuItem
           Caption = 'Activate'
           OnClick = PM_P_ScrobblerActivateClick
-        end
-        object MM_T_ScrobblerDeactivate: TMenuItem
-          Caption = 'Deactivate'
-          OnClick = PM_P_ScrobblerDeactivateClick
         end
         object N62: TMenuItem
           Caption = '-'
@@ -4023,7 +4013,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A600A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000A640A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4488,7 +4478,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300B900B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300B940B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -6804,10 +6794,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Activate'
         OnClick = MenuBirthdayStartClick
       end
-      object PM_P_BirthdayDeactivate: TMenuItem
-        Caption = 'Deactivate'
-        OnClick = MenuBirthdayAusClick
-      end
       object N41: TMenuItem
         Caption = '-'
       end
@@ -6822,10 +6808,6 @@ object Nemp_MainForm: TNemp_MainForm
       object PM_P_WebServerActivate: TMenuItem
         Caption = 'Activate'
         OnClick = MM_T_WebServerActivateClick
-      end
-      object PM_P_WebServerDeactivate: TMenuItem
-        Caption = 'Deactivate'
-        OnClick = MM_T_WebServerDeactivateClick
       end
       object N65: TMenuItem
         Caption = '-'
@@ -6845,10 +6827,6 @@ object Nemp_MainForm: TNemp_MainForm
       object PM_P_ScrobblerActivate: TMenuItem
         Caption = 'Activate'
         OnClick = PM_P_ScrobblerActivateClick
-      end
-      object PM_P_ScrobblerDectivate: TMenuItem
-        Caption = 'Deactivate'
-        OnClick = PM_P_ScrobblerDeactivateClick
       end
       object N61: TMenuItem
         Caption = '-'
@@ -6911,8 +6889,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object SleepPopup: TPopupMenu
     OnPopup = Player_PopupMenuPopup
-    Left = 749
-    Top = 309
+    Left = 845
+    Top = 453
     object _Shutdown: TMenuItem
       Caption = 'Shutdown'
       Enabled = False
@@ -7185,8 +7163,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object BirthdayPopup: TPopupMenu
-    Left = 749
-    Top = 404
+    Left = 845
+    Top = 396
     object _Birthdaymode: TMenuItem
       Caption = 'Birthday mode'
       Enabled = False
@@ -7194,10 +7172,6 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_B_BirthdayActivate: TMenuItem
       Caption = 'Activate'
       OnClick = MenuBirthdayStartClick
-    end
-    object PM_B_BirthdayDeactivate: TMenuItem
-      Caption = 'Deactivate'
-      OnClick = MenuBirthdayAusClick
     end
     object N461: TMenuItem
       Caption = '-'
@@ -7270,7 +7244,7 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 621
+    Left = 653
     Top = 410
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
@@ -7312,8 +7286,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object ScrobblerPopup: TPopupMenu
-    Left = 749
-    Top = 452
+    Left = 845
+    Top = 292
     object _Scrobbler: TMenuItem
       Caption = 'Scrobbler'
       Enabled = False
@@ -7321,10 +7295,6 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_S_ScrobblerActivate: TMenuItem
       Caption = 'Activate'
       OnClick = PM_P_ScrobblerActivateClick
-    end
-    object PM_S_ScrobblerDeactivate: TMenuItem
-      Caption = 'Deactivate'
-      OnClick = PM_P_ScrobblerDeactivateClick
     end
     object N63: TMenuItem
       Caption = '-'
@@ -7335,8 +7305,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object WebServerPopup: TPopupMenu
-    Left = 749
-    Top = 356
+    Left = 845
+    Top = 348
     object _Webserver: TMenuItem
       Caption = 'Nemp Webserver'
       Enabled = False
@@ -7344,10 +7314,6 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_W_WebServerActivate: TMenuItem
       Caption = 'Activate'
       OnClick = MM_T_WebServerActivateClick
-    end
-    object PM_W_WebServerDeactivate: TMenuItem
-      Caption = 'Deactivate'
-      OnClick = MM_T_WebServerDeactivateClick
     end
     object N66: TMenuItem
       Caption = '-'
@@ -7439,7 +7405,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07CC0710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07D00710001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

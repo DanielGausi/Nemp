@@ -788,6 +788,7 @@ procedure ReArrangeToolImages;
 var currentLeft: Integer;
     decvalue: Integer;
     newtop: Integer;
+    MenuString: String;
 begin
 
     with Nemp_MainForm do
@@ -803,8 +804,17 @@ begin
             ScrobblerImage.Left := currentLeft;
             ScrobblerImage.Visible := True;
             inc(currentLeft, decvalue);
+            MenuString := MenuItem_Deactivate;
         end else
+        begin
             ScrobblerImage.Visible := False;
+            MenuString := MenuItem_Activate;
+        end;
+        // Set Scrobble-Menu
+        MM_T_ScrobblerActivate.Caption := MenuString;
+        PM_P_ScrobblerActivate.Caption := MenuString;
+        PM_S_ScrobblerActivate.Caption := MenuString;
+
 
         If assigned(NempWebserver) and NempWebserver.Active then
         begin
@@ -812,8 +822,16 @@ begin
             WebserverImage.Left := currentLeft;
             WebserverImage.Visible := True;
             inc(currentLeft, decvalue);
+            MenuString := MenuItem_Deactivate;
         end else
+        begin
             WebserverImage.Visible := False;
+            MenuString := MenuItem_Activate;
+        end;
+        // Set the Webserver-Menu
+        MM_T_WebServerActivate.Caption := MenuString;
+        PM_P_WebServerActivate.Caption := MenuString;
+        PM_W_WebServerActivate.Caption := MenuString;
 
         if BirthdayTimer.Enabled then
         begin
@@ -821,8 +839,16 @@ begin
             BirthdayImage.Left := currentLeft;
             BirthdayImage.Visible := True;
             inc(currentLeft, decvalue);
+            MenuString := MenuItem_Deactivate;
         end else
+        begin
             BirthdayImage.Visible := False;
+            MenuString := MenuItem_Activate;
+        end;
+        // Set the Birthday-Menu
+        MM_T_BirthdayActivate.Caption := MenuString;
+        PM_P_BirthdayActivate.Caption := MenuString;
+        PM_B_BirthdayActivate.Caption := MenuString;
 
         if (SleepTimer.Enabled) or (NempOptions.ShutDownAtEndOfPlaylist) then
         begin

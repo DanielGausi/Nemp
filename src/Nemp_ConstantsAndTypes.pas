@@ -146,6 +146,7 @@ type
         TabStopAtPlayerControls: Boolean;
         TabStopAtTabs: Boolean;
 
+        UseDisplayApp: Boolean;
         DisplayApp: String;
 
         ShowSplashScreen: Boolean;
@@ -881,6 +882,7 @@ begin
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
 
         DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', '');
+        UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', DisplayApp <> '');
         // "Kill" relative Paths
         DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
@@ -1039,6 +1041,9 @@ begin
         ini.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
         ini.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
+
+        Ini.WriteBool('Allgemein', 'UseDisplayApp', UseDisplayApp);
+        // Note: The Display-App-String is written by the G15-App only
 
         Ini.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
         Ini.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
