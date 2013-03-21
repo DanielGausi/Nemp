@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009 and XE2
-      Januar 2005 - Februar 2013
+      Januar 2005 - März 2013
 
-      Version: 4.6.0
+      Version: 4.6.1
 
 
 -----------------------------------------------------------
@@ -114,6 +114,30 @@ Verwendete Units/Komponenten:
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
 
+
+
+Version 4.6.1, März 2013
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+- Globale Abschaltmöglichkeit für das erweiterte Skinssystem, mit Default-Off für Windows XP
+
+Änderungen:
+-----------
+- Bei leerer Playlist, aber laufendem Titel wird dieser jetzt zuende abgespielt, wenn 
+  neue Dateien in die Playlist eingefügt werden. 
+  Ausnahme: "Abspielen und alte Playlist löschen" 
+- GUI: Scrobbler/Birthday/Webserver an/aus in je einem Menüpunkt
+- GUI: Der aktive Skin ist jetzt im Menü markiert
+- GUI: Angaben wie "x Datei(en) markiert" jetzt nach Singular/Plural getrennt
+
+Bugfixes:
+---------
+- Einstellung "Beim Start NICHT mit der Wiedergabe beginnen" funktionierte nicht, wenn
+  vor dem letzten beenden die Wiedergabe gestoppt war
+- G15-App meldet jetzt keinen Fehler mehr beim Start, wenn keine G15 da ist.
+  Verwendung kann jetzt auch Im Nemp-Einstellungsdialog (de)aktiviert werden, nicht 
+  nur in der App selbst.
 
 
 Version 4.6.0, Februar 2013
