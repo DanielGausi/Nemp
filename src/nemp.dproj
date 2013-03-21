@@ -88,9 +88,10 @@
 			<DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<VerInfo_Release>1</VerInfo_Release>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-			<VerInfo_Build>547</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.547;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
+			<VerInfo_Build>549</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.1.549;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
 			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
 		</PropertyGroup>
 		<ItemGroup>

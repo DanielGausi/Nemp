@@ -1,6 +1,7 @@
 1. Kontextmenü des Explorers: neue Default.po erstellen
 
 2. msgcat -o newdefault.po delphi7.po Default.po
+bzw.  - o newdefault.po ALTE_default.po, NEUE_default.po
    // newdefault.po wird neu erstellt!
 
 3. C:\Programme\dxgettext\ggmerge.exe
