@@ -116,6 +116,13 @@ Verwendete Units/Komponenten:
 
 
 
+Version 4.6.2, April 2013
+----------------------------------------------------------- 
+Bugfixes:
+---------
+- Nicht-ASCII-Zeichen wurden im Webserver falsch angezeigt, und die Suche danach funktionierte nicht
+
+
 Version 4.6.1, März 2013
 ----------------------------------------------------------- 
 Neue Funktionen:
