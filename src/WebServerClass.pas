@@ -117,16 +117,19 @@ type
   type TCountedString = class
       private
           fValue: String;
+          fSecondValue: String; // used for "artist" at counted strings of type "ALBUM"
           fCount: Integer;
           fCoverID: String;
           fFontSize: Integer;
       public
           property Value: String read fValue;
+          property SecondValue: String read fSecondValue;
           property Count: Integer read fCount;
           property CoverID: String read fCoverID;
           property FontSize: Integer read fFontSize;
           constructor Create(aValue: String; c: Integer; aCoverID: String);
           procedure Assign(aCS: tCountedString);
+          procedure getSecondValue(SourceList: TStringList);
   end;
 
   TDoubleString = Array[Boolean] of String;
@@ -308,7 +311,7 @@ type
           procedure ClearHelperLists;
           procedure PrepareArtists;
           procedure MergeArtistsIfNecessary;
-          
+
           procedure PrepareAlbums;
           procedure PrepareGenres;
 
@@ -591,7 +594,7 @@ const
 
 implementation
 
-uses Nemp_RessourceStrings, AudioFileHelper;
+uses Nemp_RessourceStrings, AudioFileHelper, StringHelper;
 
 function FileType2MimeType(const AFileName: string): string;
 var
@@ -637,6 +640,7 @@ begin
     fCount    := aCS.fCount;
     fCoverID  := aCS.fCoverID;
     fFontSize := aCS.fFontSize;
+    fSecondValue := aCS.fSecondValue;
 end;
 
 constructor TCountedString.Create(aValue: String; c: Integer; aCoverID: String);
@@ -651,9 +655,18 @@ begin
     else
         fCoverID := aCoverID;
 
+    fSecondValue := '';
     fFontSize := 10;
 end;
 
+
+procedure TCountedString.getSecondValue(SourceList: TStringlist);
+var fehlstelle: Integer;
+begin
+    fSecondValue := GetCommonString(SourceList, 0, fehlstelle);
+    if fSecondValue = '' then
+        fSecondValue := 'Various artists';
+end;
 
 constructor TNempWebServer.Create(aHandle: DWord);
 var i: Integer;
@@ -666,6 +679,7 @@ begin
     fWebMedienBib := TObjectlist.Create(False);
     IdHTTPServer1 := TIdHTTPServer.Create(Nil);
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
+
 
     GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
     UsernameU := '';
@@ -1596,6 +1610,8 @@ begin
         //Item := StringReplace(Item, '{{Font}}'   , IntToStr(PoperSize(maxC, ab.Count)) + 'px', [rfReplaceAll]);
         Item := StringReplace(Item, '{{Font}}'   , IntToStr(ab.FontSize) + 'px', [rfReplaceAll]);
         Item := StringReplace(Item, '{{Value}}'  , EscapeHTMLChars(ab.Value), [rfReplaceAll]);
+        Item := StringReplace(Item, '{{SecondValue}}'  , EscapeHTMLChars(ab.SecondValue), [rfReplaceAll]);
+
         Item := StringReplace(Item, '{{Count}}'  , IntToStr(ab.Count), [rfReplaceAll]);
         Item := StringReplace(Item, '{{CoverID}}', EscapeHTMLChars(ab.CoverID), [rfReplaceAll]);
         Items := Items + Item;
@@ -2122,51 +2138,67 @@ procedure TNempWebServer.PrepareAlbums;
 var currentAlbum, currentCoverID: String;
     c, i, idx: Integer;
     newEntry: TCountedString;
+    tmpArtistStrings: TStringList;
+
 begin
     fWebMedienBib.Sort(Sortieren_AlbumTrack_asc);
     if fWebMedienBib.Count > 0 then
     begin
-        currentAlbum := TAudioFile(fWebMedienBib[0]).Album;
-        currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
-        c := 1;
-
-        for i := 1 to fWebMedienBib.Count - 1 do
-        begin
-
-            if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Album, currentAlbum) then
+        tmpArtistStrings := TStringList.Create;
+        try
+            currentAlbum := TAudioFile(fWebMedienBib[0]).Album;
+            currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
+            c := 1;
+            tmpArtistStrings.Add(TAudioFile(fWebMedienBib[0]).Artist);
+            for i := 1 to fWebMedienBib.Count - 1 do
             begin
-                if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
+
+                if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Album, currentAlbum) then
                 begin
-                    // insert currentAlbum into one of the Album-Lists
-                    idx := CorrectIndex(currentAlbum);
-                    newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
-                    Albums[idx].Add(newEntry);
-                end; // otherwise do not add this album
-                // start counting again
-                currentAlbum := TAudioFile(fWebMedienBib[i]).Album;
-                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
-                c := 1;
-            end else
-            begin
-                // just count this file to the current-Artist-Count
-                inc(c);
-                if currentCoverID = '' then
+                    if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
+                    begin
+                        // insert currentAlbum into one of the Album-Lists
+                        idx := CorrectIndex(currentAlbum);
+
+                        newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
+                        // get a proper Artist for the album
+                        newEntry.getSecondValue(tmpArtistStrings);
+                        // clear current artist list
+                        tmpArtistStrings.Clear;
+
+                        Albums[idx].Add(newEntry);
+                    end; // otherwise do not add this album
+                    // start counting again
+                    currentAlbum := TAudioFile(fWebMedienBib[i]).Album;
                     currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                    c := 1;
+                end else
+                begin
+                    // just count this file to the current-Artist-Count
+                    inc(c);
+                    if currentCoverID = '' then
+                        currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                    tmpArtistStrings.Add(TAudioFile(fWebMedienBib[i]).Artist);
+                end;
             end;
-        end;
 
-        // insert last item
-        if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
-        begin
-            // insert currentAlbum into one of the Album-Lists
-            idx := CorrectIndex(currentAlbum);
-            newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
-            Albums[idx].Add(newEntry);
-        end;
+            // insert last item
+            if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
+            begin
+                // insert currentAlbum into one of the Album-Lists
+                idx := CorrectIndex(currentAlbum);
+                newEntry := TCountedString.Create(currentAlbum, c, currentCoverID);
+                // get a proper Artist for the album
+                newEntry.getSecondValue(tmpArtistStrings);
+                Albums[idx].Add(newEntry);
+            end;
 
-        // set Font Sizes
-        for i := 0 to 26 do
-            SetFontSizes(Albums[i]);
+            // set Font Sizes
+            for i := 0 to 26 do
+                SetFontSizes(Albums[i]);
+        finally
+            tmpArtistStrings.Free;
+        end;
     end;
 end;
 
@@ -2422,6 +2454,7 @@ var ErrorMessage, PageData: String;
     Body: UTF8String;
     ms: TMemoryStream;
 begin
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     case Error of
         qrError              : ErrorMessage := WebServer_SomeError;
         qrRemoteControlDenied: ErrorMessage := WebServer_RemoteControlDenied;
@@ -2457,6 +2490,7 @@ function TNempWebServer.ResponsePlayer(ARequestInfo: TIdHTTPRequestInfo;
 var ms: TMemoryStream;
     html: UTf8String;
 begin
+        AResponseInfo.ContentType := 'text/html; charset=utf-8';
         ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
             if isAdmin then
@@ -2479,6 +2513,7 @@ var ms: TMemoryStream;
     aProgress, aVolume: Integer;
     aMessage: Integer;
 begin
+        AResponseInfo.ContentType := 'text/html; charset=utf-8';
         queriedAction := aRequestInfo.Params.Values['action'];
         if queriedAction = 'getprogress' then
         begin
@@ -2525,6 +2560,7 @@ function TNempWebServer.ResponseClassicPlayerControl(ARequestInfo: TIdHTTPReques
     AResponseInfo: TIdHTTPResponseInfo; isAdmin: Boolean): TQueryResult;
 var queriedAction: String;
 begin
+  AResponseInfo.ContentType := 'text/html; charset=utf-8';
   if AllowRemoteControl or isAdmin then
   begin
       result := qrPermit;
@@ -2557,6 +2593,7 @@ function TNempWebServer.ResponseJSPlayerControl(ARequestInfo: TIdHTTPRequestInfo
 var queriedAction, queriedValue: String;
     aProgress, aVolume: Integer;
 begin
+  AResponseInfo.ContentType := 'text/html; charset=utf-8';
   if AllowRemoteControl or isAdmin then
   begin
       queriedAction := aRequestInfo.Params.Values['action'];
@@ -2615,6 +2652,7 @@ begin
     localVote := AllowVotes or isAdmin;
     localControl := AllowRemoteControl or isAdmin;
 
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowRemoteControl or isAdmin or AllowVotes then
     begin
         result := qrPermit;
@@ -2829,6 +2867,7 @@ var queriedAction: String;
 
 
 begin
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowRemoteControl or isAdmin or AllowVotes then
     begin
         localVote := AllowVotes or isAdmin;
@@ -2953,6 +2992,7 @@ function TNempWebServer.ResponsePlaylistView (ARequestInfo: TIdHTTPRequestInfo;
 var ms: TMemoryStream;
     html: UTf8String;
 begin
+        AResponseInfo.ContentType := 'text/html; charset=utf-8';
        ms := TMemoryStream.Create;
             EnterCriticalSection(CS_AccessHTMLCode);
             if isAdmin then
@@ -2977,6 +3017,7 @@ var ms: TMemoryStream;
 begin
         EnterCriticalSection(CS_AccessHTMLCode);
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
+        AResponseInfo.ContentType := 'text/html; charset=utf-8';
 
         if isAdmin then
             SendMessage(fMainHandle, WM_WebServer, WS_QueryPlaylistDetailAdmin, queriedID)
@@ -3128,6 +3169,7 @@ var ms: TMemoryStream;
     i, Start: Integer;
 
 begin
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowLibraryAccess or isAdmin then
     begin
         Start  := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
@@ -3162,6 +3204,7 @@ var QueryMode, QueryLetter, QueryValue, QueryOther: String;
     i, Start: Integer;
     a: AnsiString;
 begin
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowLibraryAccess or isAdmin then
     begin
         Start       := StrToIntDef(aRequestInfo.Params.Values['start'], 0);
@@ -3219,6 +3262,7 @@ var queriedID: Integer;
     html: UTf8String;
     ms: TMemoryStream;
 begin
+    AResponseInfo.ContentType := 'text/html; charset=utf-8';
     if AllowLibraryAccess or isAdmin then
     begin
         queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
@@ -3275,6 +3319,7 @@ begin
 
         UserLoginOK := (ARequestInfo.AuthUsername = UsernameU) and (ARequestInfo.AuthPassword = PasswordU);
         AdminLoginOK := (ARequestInfo.AuthUsername = UsernameA) and (ARequestInfo.AuthPassword = PasswordA);
+
 
         if isAdmin and (not AdminLoginOK) then
         begin
