@@ -187,7 +187,8 @@ begin
     fTitleList.Clear;
 
     // build proper URL
-    LyricQuery := 'http://lyrics.wikia.com/'
+    // october 2016: + 'wiki/'
+    LyricQuery := 'http://lyrics.wikia.com/wiki/'
                         + StringToURLStringAND(UTF8Encode(WordUppercase(fInterpret)))
                   + ':' + StringToURLStringAND(UTF8Encode(WordUppercase(fTitle)));
     // Try to get Lyrics from this URL
@@ -373,13 +374,15 @@ var code: String;
     sl: TStringList;
     a,b, c: Integer;
 const LyricBox = '<div class=''lyricbox''>';
+      ScriptEnd = '</script>';
 
 begin
     code := DownloadCode(aURL);
     if code = '' then
-        result := False
+        result := false
     else
     begin
+        (*
         // parse it
         // current design of the site:
         {
@@ -405,6 +408,28 @@ begin
             lEnd := PosEx('<!--', code, lStart)
         else
             lEnd := 0;
+        *)
+
+        // changes october, 2015
+        // <div class='lyricbox'><script> ...
+        // ... </script>
+        // LYRICS
+        // <!--
+
+        // search for <div class=''lyricbox''>
+        lStart := Pos(LyricBox, code);
+        if lStart > 0 then
+            // ... the closing tag of the script
+            lStart := PosEx(ScriptEnd, code, lStart + Length(LyricBox));
+        if lStart > 0 then
+            // inc Start, so at Start is the first interesting letter
+            lStart := lStart + length(ScriptEnd);
+        // search for the "end marker"
+        if lStart > 0 then
+            lEnd := PosEx('<!--', code, lStart)
+        else
+            lEnd := 0;
+
 
         if (lStart > 0) and (lEnd > 0) then
         begin
