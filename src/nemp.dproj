@@ -88,10 +88,10 @@
 			<DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<VerInfo_Release>2</VerInfo_Release>
+			<VerInfo_Release>3</VerInfo_Release>
 			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-			<VerInfo_Build>553</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.2.553;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
+			<VerInfo_Build>554</VerInfo_Build>
+			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.3.554;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
 			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
 		</PropertyGroup>
 		<ItemGroup>
@@ -259,7 +259,7 @@
 						<VersionInfo Name="MajorVer">4</VersionInfo>
 						<VersionInfo Name="MinorVer">6</VersionInfo>
 						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">574</VersionInfo>
+						<VersionInfo Name="Build">575</VersionInfo>
 						<VersionInfo Name="Debug">False</VersionInfo>
 						<VersionInfo Name="PreRelease">False</VersionInfo>
 						<VersionInfo Name="Special">False</VersionInfo>
@@ -271,7 +271,7 @@
 					<VersionInfoKeys>
 						<VersionInfoKeys Name="CompanyName"/>
 						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.6.0.574</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">4.6.0.575</VersionInfoKeys>
 						<VersionInfoKeys Name="InternalName"/>
 						<VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
 						<VersionInfoKeys Name="LegalTrademarks"/>
