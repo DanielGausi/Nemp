@@ -134,6 +134,8 @@ type
       fUseHardwareMixing: Boolean;        // False: OR BASS_SAMPLE_SOFTWARE
       fSafePlayback: Boolean;
 
+      fAvoidMickyMausEffect: LongBool; // this is also used in the Prescan-Thread: therefore: InterLockedExchange
+
       fMainWindowHandle: HWND;    // the main window, where some messages are sent to
       fPathToDlls: String;        // the path to the bass.dll-addons
 
@@ -164,6 +166,10 @@ type
       function GetProgress: Double;               // Progress
       procedure SetProgress(Value: Double);
       function GetLength: Double;                 // Length of a song
+
+      function GetAvoidMickyMausEffect: LongBool;
+      procedure SetAvoidMickyMausEffect(aValue: LongBool);
+
 
       procedure SetHeadsetVolume(Value: Single);    // the same stuff for the
       function GetHeadsetVolume: Single;
@@ -244,7 +250,7 @@ type
         IgnoreFadingOnPause: Boolean;
         IgnoreFadingOnStop: Boolean;
 
-        AvoidMickyMausEffect: Boolean;
+
         UseDefaultEffects: Boolean;
         UseDefaultEqualizer: Boolean;
         PlayBufferSize: DWORD;
@@ -349,6 +355,8 @@ type
         property UseFloatingPointChannels: Integer read fUseFloatingPointChannels write fUseFloatingPointChannels;
         property UseHardwareMixing: Boolean read fUseHardwareMixing write fUseHardwareMixing;
         property SafePlayback: Boolean read fSafePlayback write fSafePlayback;
+
+        property AvoidMickyMausEffect: LongBool read GetAvoidMickyMausEffect write SetAvoidMickyMausEffect;
 
         property ABRepeatA: Double read fABRepeatStartPosition;
         property ABRepeatB: Double read fABRepeatEndPosition;
@@ -1993,6 +2001,17 @@ begin
   result := BASS_ChannelIsActive(HeadSetStream);
 end;
 
+function TNempPlayer.GetAvoidMickyMausEffect: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fAvoidMickyMausEffect));
+end;
+
+procedure TNempPlayer.SetAvoidMickyMausEffect(aValue: LongBool);
+begin
+    InterLockedExchange(Integer(fAvoidMickyMausEffect), Integer(aValue));
+end;
+
+
 {
     --------------------------------------------------------
     Equalizer & Effects
@@ -3374,8 +3393,12 @@ begin
             //sleep(2000);
 
             BASS_SetDevice(aPlayer.MainDevice);
-            aPlayer.ThreadedMainStream  := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
-            aPlayer.ThreadedSlideStream := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
+
+            //aPlayer.ThreadedMainStream  := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
+            //aPlayer.ThreadedSlideStream := aPlayer.NEMP_CreateStream(aFile, false, false, ps_now);
+            // bugfix März 2016: mp3s mit "No-Micky-Maus" laufen falsch.
+            aPlayer.ThreadedMainStream  := aPlayer.NEMP_CreateStream(aFile, aPlayer.AvoidMickyMausEffect , false, ps_now);
+            aPlayer.ThreadedSlideStream := aPlayer.NEMP_CreateStream(aFile, aPlayer.AvoidMickyMausEffect, false, ps_now);
 
             c := SendMessage(aPlayer.MainWindowHandle, WM_PlayerPrescanComplete, wParam(aFile), 0);
         until c = 0;
