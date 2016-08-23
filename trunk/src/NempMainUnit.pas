@@ -843,6 +843,7 @@ type
     VST: TVirtualStringTree;
     MM_O_Skin_UseAdvanced: TMenuItem;
     PM_P_Skin_UseAdvancedSkin: TMenuItem;
+    CoverFlowRefreshViewTimer: TTimer;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1419,6 +1420,11 @@ type
     //  CellRect: TRect);
     procedure CorrectSkinRegionsTimerTimer(Sender: TObject);
     procedure MM_O_Skin_UseAdvancedClick(Sender: TObject);
+    procedure PanelCoverBrowseMouseWheelDown(Sender: TObject;
+      Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure PanelCoverBrowseMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure CoverFlowRefreshViewTimerTimer(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -6922,6 +6928,7 @@ begin
     MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
 end;
 
+
 procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
 begin
   if NempPlaylist.PlayingFile = Nil then Exit;
@@ -10337,7 +10344,8 @@ begin
         end
     else
         begin
-            EditLink := TModStringEditLink.Create;
+            /// EditLink := TModStringEditLink.Create;
+            EditLink := TStringEditLink.Create;
             EditingVSTRating := False;
             EditingVSTStrings := True;
         end;
@@ -11082,6 +11090,35 @@ begin
 
     MedienBib.NewCoverFlow.Paint(2);
 end;
+
+procedure TNemp_MainForm.PanelCoverBrowseMouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    if CoverFlowRefreshViewTimer.Enabled then exit;
+    MedienBib.NewCoverFlow.CurrentItem := MedienBib.NewCoverFlow.CurrentItem + 1;
+    //CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+    CoverFlowRefreshViewTimer.Enabled := True;
+end;
+
+procedure TNemp_MainForm.PanelCoverBrowseMouseWheelUp(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+    if CoverFlowRefreshViewTimer.Enabled then exit;
+    MedienBib.NewCoverFlow.CurrentItem := MedienBib.NewCoverFlow.CurrentItem - 1;
+    //CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+    CoverFlowRefreshViewTimer.Enabled := True;
+end;
+
+procedure TNemp_MainForm.CoverFlowRefreshViewTimerTimer(Sender: TObject);
+var aCover: tNempCover;
+begin
+    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+    aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
+    MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
+    Lbl_CoverFlow.Caption := aCover.InfoString;
+    CoverFlowRefreshViewTimer.Enabled := False;
+end;
+
 
 procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
 begin

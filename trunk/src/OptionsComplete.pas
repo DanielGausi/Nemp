@@ -2467,20 +2467,20 @@ begin
   //Nemp_MainForm.NempOptions.MiddleToMaxComputing := CBMiddleToMaxComputing.ItemIndex;
 
   // Basis-Value für [3] nehmen
-  Nemp_MainForm.NempOptions.FontSize[3] :=  SEFontSize.Value;
+  /// Nemp_MainForm.NempOptions.FontSize[3] :=  SEFontSize.Value;
 
-  Nemp_MainForm.NempOptions.FontSize[1] :=  max(4,
-                  Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 2));
+  /// Nemp_MainForm.NempOptions.FontSize[1] :=  max(4,
+  ///                 Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 2));
 
-  Nemp_MainForm.NempOptions.FontSize[2] :=  max(4,
-                  Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 4));
+  /// Nemp_MainForm.NempOptions.FontSize[2] :=  max(4,
+  ///                 Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 4));
 
-  Nemp_MainForm.NempOptions.FontSize[4] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 4);
-  Nemp_MainForm.NempOptions.FontSize[5] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 2);
+  /// Nemp_MainForm.NempOptions.FontSize[4] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 4);
+  /// Nemp_MainForm.NempOptions.FontSize[5] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 2);
   Nemp_MainForm.NempOptions.RowHeight := SERowHeight.Value;
 
   if Nemp_MainForm.NempOptions.ChangeFontSizeOnLength then
-      maxFont := Nemp_MainForm.NempOptions.FontSize[5]
+      maxFont := MaxFontSize(Nemp_MainForm.NempOptions.DefaultFontSize)
   else
       maxFont := Nemp_MainForm.NempOptions.DefaultFontSize;
 

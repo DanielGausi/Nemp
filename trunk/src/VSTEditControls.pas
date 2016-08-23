@@ -137,7 +137,7 @@ type
   // the tree. That seems to be a good idea, but we have often to small
   // values for the height, which causes some annoying stuff, like a missing
   // text-cursor (this blinking "|" thingy)
-  TModStringEditLink = class(TInterfacedObject, IVTEditLink)
+(*  TModStringEditLink = class(TInterfacedObject, IVTEditLink)
   private
     FEdit: TWinControl;
     FTree: TVirtualStringTree;
@@ -155,7 +155,7 @@ type
     procedure ProcessMessage(var Message: TMessage); stdcall;
     procedure SetBounds(R: TRect); stdcall;
   end;
-
+*)
    { TODO : Combobox-Editor zur Genre-Bearbeitung }
 
 
@@ -356,6 +356,7 @@ end;
     See VST Tutorials, Demos, whatever for Details.
     --------------------------------------------------------
 }
+(*
 destructor TModStringEditLink.Destroy;
 begin
   FEdit.Free;
@@ -467,6 +468,7 @@ begin
      end;
     End; //case
 end;
+*)
 
 
 initialization

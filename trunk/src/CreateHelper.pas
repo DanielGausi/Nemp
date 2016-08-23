@@ -482,13 +482,7 @@ begin
         VST.DefaultNodeHeight         := NempOptions.RowHeight;
         PlaylistVST.DefaultNodeHeight := NempOptions.RowHeight;
         if NempOptions.ChangeFontSizeOnLength then
-        begin
-            maxFont := NempOptions.FontSize[1];
-            if NempOptions.FontSize[2] > maxFont then maxFont := NempOptions.FontSize[2];
-            if NempOptions.FontSize[3] > maxFont then maxFont := NempOptions.FontSize[3];
-            if NempOptions.FontSize[4] > maxFont then maxFont := NempOptions.FontSize[4];
-            if NempOptions.FontSize[5] > maxFont then maxFont := NempOptions.FontSize[5];
-        end
+            maxFont := MaxFontSize(Nemp_MainForm.NempOptions.DefaultFontSize)
         else
             maxFont := NempOptions.DefaultFontSize;
 

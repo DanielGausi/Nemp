@@ -1,296 +1,327 @@
-﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-		<PropertyGroup>
-			<ProjectGuid>{B9B2D972-A999-4FCC-A09E-1AA479CF129B}</ProjectGuid>
-			<MainSource>nemp.dpr</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
-			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>14.4</ProjectVersion>
-			<FrameworkType>VCL</FrameworkType>
-			<Base>True</Base>
-			<Platform Condition="'$(Platform)'==''">Win32</Platform>
-			<TargetedPlatforms>1</TargetedPlatforms>
-			<AppType>Application</AppType>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
-			<Base_Win32>true</Base_Win32>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
-			<Cfg_1>true</Cfg_1>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
-			<Cfg_1_Win32>true</Cfg_1_Win32>
-			<CfgParent>Cfg_1</CfgParent>
-			<Cfg_1>true</Cfg_1>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
-			<Cfg_2>true</Cfg_2>
-			<CfgParent>Base</CfgParent>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-			<Cfg_2_Win32>true</Cfg_2_Win32>
-			<CfgParent>Cfg_2</CfgParent>
-			<Cfg_2>true</Cfg_2>
-			<Base>true</Base>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base)'!=''">
-			<VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
-			<VerInfo_Locale>1031</VerInfo_Locale>
-			<VerInfo_Build>544</VerInfo_Build>
-			<VerInfo_MajorVer>4</VerInfo_MajorVer>
-			<VerInfo_MinorVer>6</VerInfo_MinorVer>
-			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.544;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4;Comments=</VerInfo_Keys>
-			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
-			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
-			<DCC_DcuOutput>..\dcu\</DCC_DcuOutput>
-			<DCC_UsePackage>vclx;vcl;dbrtl;Rave76VCL;bdertl;rtl;vclactnband;vcldb;vcldbx;dsnap;dsnapcon;TeeUI;TeeDB;Tee;adortl;vclib;ibxpress;IndyCore;IndySystem;IndyProtocols;xmlrtl;inet;intrawebdb_100_120;Intraweb_100_120;VclSmp;vclie;websnap;webdsnap;inetdbbde;inetdbxpress;soaprtl;vclribbon;DbxCommonDriver;DbxClientDriver;DBXInterBaseDriver;DBXMySQLDriver;dbexpress;dbxcds;NempKomponenten;dwWin7Controls_2009;Aviant_Credits;VirtualTreesD12;madBasic_;madDisAsm_;madExcept_;$(DCC_UsePackage)</DCC_UsePackage>
-			<DCC_ExeOutput>..\bin\</DCC_ExeOutput>
-			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_E>false</DCC_E>
-			<DCC_Platform>x86</DCC_Platform>
-			<DCC_DependencyCheckOutputName>..\bin\nemp.exe</DCC_DependencyCheckOutputName>
-			<DCC_N>false</DCC_N>
-			<DCC_S>false</DCC_S>
-			<DCC_F>false</DCC_F>
-			<DCC_K>false</DCC_K>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
-			<VerInfo_Build>546</VerInfo_Build>
-			<Manifest_File>None</Manifest_File>
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.546;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4;Comments=</VerInfo_Keys>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_1)'!=''">
-			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
-			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
-			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-			<DCC_DebugInformation>false</DCC_DebugInformation>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
-			<Manifest_File>None</Manifest_File>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.544;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
-			<Manifest_File>None</Manifest_File>
-			<Icon_MainIcon>nemp_Icon.ico</Icon_MainIcon>
-			<DCC_MapFile>3</DCC_MapFile>
-			<DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<VerInfo_Release>4</VerInfo_Release>
-			<VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-			<VerInfo_Build>555</VerInfo_Build>
-			<VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.4.555;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
-			<Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
-		</PropertyGroup>
-		<ItemGroup>
-			<DelphiCompile Include="$(MainSource)">
-				<MainSource>MainSource</MainSource>
-			</DelphiCompile>
-			<DCCReference Include="3rd Party Units\OneInst.pas"/>
-			<DCCReference Include="NempMainUnit.pas">
-				<Form>Nemp_MainForm</Form>
-			</DCCReference>
-			<DCCReference Include="Details.pas">
-				<Form>FDetails</Form>
-			</DCCReference>
-			<DCCReference Include="NempAudioFiles.pas"/>
-			<DCCReference Include="NewPicture.pas">
-				<Form>FNewPicture</Form>
-			</DCCReference>
-			<DCCReference Include="Splash.pas">
-				<Form>FSplash</Form>
-			</DCCReference>
-			<DCCReference Include="spectrum_vis.pas"/>
-			<DCCReference Include="Hilfsfunktionen.pas"/>
-			<DCCReference Include="TreeHelper.pas"/>
-			<DCCReference Include="About.pas">
-				<Form>AboutForm</Form>
-			</DCCReference>
-			<DCCReference Include="StreamVerwaltung.pas">
-				<Form>FormStreamVerwaltung</Form>
-			</DCCReference>
-			<DCCReference Include="Nemp_ConstantsAndTypes.pas"/>
-			<DCCReference Include="PlaylistUnit.pas">
-				<Form>PlaylistForm</Form>
-			</DCCReference>
-			<DCCReference Include="AuswahlUnit.pas">
-				<Form>AuswahlForm</Form>
-			</DCCReference>
-			<DCCReference Include="MedienlisteUnit.pas">
-				<Form>MedienlisteForm</Form>
-			</DCCReference>
-			<DCCReference Include="SplitForm_Hilfsfunktionen.pas"/>
-			<DCCReference Include="ShutDown.pas">
-				<Form>ShutDownForm</Form>
-			</DCCReference>
-			<DCCReference Include="Nemp_SkinSystem.pas"/>
-			<DCCReference Include="BirthdayShow.pas">
-				<Form>BirthdayForm</Form>
-			</DCCReference>
-			<DCCReference Include="PlaylistClass.pas"/>
-			<DCCReference Include="PlayerClass.pas"/>
-			<DCCReference Include="MedienbibliothekClass.pas"/>
-			<DCCReference Include="RandomPlaylist.pas">
-				<Form>RandomPlaylistForm</Form>
-			</DCCReference>
-			<DCCReference Include="Nemp_RessourceStrings.pas"/>
-			<DCCReference Include="ShutDownEdit.pas">
-				<Form>ShutDownEditForm</Form>
-			</DCCReference>
-			<DCCReference Include="DriveRepairTools.pas"/>
-			<DCCReference Include="ShoutcastUtils.pas"/>
-			<DCCReference Include="NewStation.pas">
-				<Form>NewStationForm</Form>
-			</DCCReference>
-			<DCCReference Include="WebServerClass.pas"/>
-			<DCCReference Include="Easteregg.pas"/>
-			<DCCReference Include="UpdateUtils.pas"/>
-			<DCCReference Include="ScrobblerUtils.pas"/>
-			<DCCReference Include="BibSearch.pas">
-				<Form>FormBibSearch</Form>
-			</DCCReference>
-			<DCCReference Include="BibSearchClass.pas"/>
-			<DCCReference Include="AudioFileHelper.pas"/>
-			<DCCReference Include="CoverHelper.pas"/>
-			<DCCReference Include="Systemhelper.pas"/>
-			<DCCReference Include="StringSearchHelper.pas"/>
-			<DCCReference Include="StringHelper.pas"/>
-			<DCCReference Include="BibHelper.pas"/>
-			<DCCReference Include="MainFormHelper.pas"/>
-			<DCCReference Include="MessageHelper.pas"/>
-			<DCCReference Include="BassHelper.pas"/>
-			<DCCReference Include="VSTEditControls.pas"/>
-			<DCCReference Include="ClassicCoverflowClass.pas"/>
-			<DCCReference Include="NempCoverFlowClass.pas"/>
-			<DCCReference Include="ExtendedControlsUnit.pas">
-				<Form>ExtendedControlForm</Form>
-			</DCCReference>
-			<DCCReference Include="PartyModeClass.pas"/>
-			<DCCReference Include="PostProcessorUtils.pas"/>
-			<DCCReference Include="RatingCtrls.pas"/>
-			<DCCReference Include="TagClouds.pas">
-				<Form>/,  classes;</Form>
-			</DCCReference>
-			<DCCReference Include="CloudEditor.pas">
-				<Form>CloudEditorForm</Form>
-			</DCCReference>
-			<DCCReference Include="Taghelper.pas"/>
-			<DCCReference Include="CoverDownloads.pas"/>
-			<DCCReference Include="PartymodePassword.pas">
-				<Form>PasswordDlg</Form>
-			</DCCReference>
-			<DCCReference Include="Lyrics.pas"/>
-			<DCCReference Include="HtmlHelper.pas"/>
-			<DCCReference Include="OptionsComplete.pas">
-				<Form>OptionsCompleteForm</Form>
-			</DCCReference>
-			<DCCReference Include="CreateHelper.pas"/>
-			<DCCReference Include="ExPopupList.pas"/>
-			<DCCReference Include="PlaylistToUSB.pas">
-				<Form>PlaylistCopyForm</Form>
-			</DCCReference>
-			<DCCReference Include="ErrorForm.pas">
-				<Form>FError</Form>
-			</DCCReference>
-			<DCCReference Include="BasicSettingsWizard.pas">
-				<Form>Wizard</Form>
-			</DCCReference>
-			<DCCReference Include="cddaUtils.pas"/>
-			<DCCReference Include="CDSelection.pas">
-				<Form>FormCDDBSelect</Form>
-			</DCCReference>
-			<DCCReference Include="CDOpenDialogs.pas">
-				<Form>CDOpenDialog</Form>
-			</DCCReference>
-			<DCCReference Include="DeleteHelper.pas"/>
-			<DCCReference Include="DeleteSelect.pas">
-				<Form>DeleteSelection</Form>
-			</DCCReference>
-			<DCCReference Include="CustomizedScrobbler.pas"/>
-			<DCCReference Include="Votings.pas"/>
-			<DCCReference Include="WebServerLog.pas">
-				<Form>WebServerLogForm</Form>
-			</DCCReference>
-			<DCCReference Include="SilenceDetection.pas"/>
-			<DCCReference Include="common\NempApi.pas">
-				<Form>$ENDIF</Form>
-			</DCCReference>
-			<BuildConfiguration Include="Debug">
-				<Key>Cfg_2</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Base">
-				<Key>Base</Key>
-			</BuildConfiguration>
-			<BuildConfiguration Include="Release">
-				<Key>Cfg_1</Key>
-				<CfgParent>Base</CfgParent>
-			</BuildConfiguration>
-		</ItemGroup>
-		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<ProjectExtensions>
-			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
-			<Borland.ProjectType>VCLApplication</Borland.ProjectType>
-			<BorlandProject>
-				<Delphi.Personality>
-					<Source>
-						<Source Name="MainSource">nemp.dpr</Source>
-					</Source>
-					<Parameters>
-						<Parameters Name="UseLauncher">False</Parameters>
-						<Parameters Name="LoadAllSymbols">True</Parameters>
-						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
-					</Parameters>
-					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
-						<VersionInfo Name="AutoIncBuild">True</VersionInfo>
-						<VersionInfo Name="MajorVer">4</VersionInfo>
-						<VersionInfo Name="MinorVer">6</VersionInfo>
-						<VersionInfo Name="Release">0</VersionInfo>
-						<VersionInfo Name="Build">575</VersionInfo>
-						<VersionInfo Name="Debug">False</VersionInfo>
-						<VersionInfo Name="PreRelease">False</VersionInfo>
-						<VersionInfo Name="Special">False</VersionInfo>
-						<VersionInfo Name="Private">False</VersionInfo>
-						<VersionInfo Name="DLL">False</VersionInfo>
-						<VersionInfo Name="Locale">1031</VersionInfo>
-						<VersionInfo Name="CodePage">1252</VersionInfo>
-					</VersionInfo>
-					<VersionInfoKeys>
-						<VersionInfoKeys Name="CompanyName"/>
-						<VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-						<VersionInfoKeys Name="FileVersion">4.6.0.575</VersionInfoKeys>
-						<VersionInfoKeys Name="InternalName"/>
-						<VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
-						<VersionInfoKeys Name="LegalTrademarks"/>
-						<VersionInfoKeys Name="OriginalFilename"/>
-						<VersionInfoKeys Name="ProductName"/>
-						<VersionInfoKeys Name="ProductVersion">4</VersionInfoKeys>
-						<VersionInfoKeys Name="Comments"/>
-					</VersionInfoKeys>
-					<Excluded_Packages>
-						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
-						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
-					</Excluded_Packages>
-				</Delphi.Personality>
-				<Platforms>
-					<Platform value="Win64">False</Platform>
-					<Platform value="Win32">True</Platform>
-				</Platforms>
-			</BorlandProject>
-			<ProjectFileVersion>12</ProjectFileVersion>
-		</ProjectExtensions>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
-	</Project>
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B9B2D972-A999-4FCC-A09E-1AA479CF129B}</ProjectGuid>
+        <MainSource>nemp.dpr</MainSource>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <ProjectVersion>14.4</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <Base>True</Base>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <VerInfo_AutoGenVersion>true</VerInfo_AutoGenVersion>
+        <VerInfo_Locale>1031</VerInfo_Locale>
+        <VerInfo_Build>544</VerInfo_Build>
+        <VerInfo_MajorVer>4</VerInfo_MajorVer>
+        <VerInfo_MinorVer>6</VerInfo_MinorVer>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.544;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4;Comments=</VerInfo_Keys>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
+        <DCC_DcuOutput>..\dcu\</DCC_DcuOutput>
+        <DCC_UsePackage>vclx;vcl;dbrtl;Rave76VCL;bdertl;rtl;vclactnband;vcldb;vcldbx;dsnap;dsnapcon;TeeUI;TeeDB;Tee;adortl;vclib;ibxpress;IndyCore;IndySystem;IndyProtocols;xmlrtl;inet;intrawebdb_100_120;Intraweb_100_120;VclSmp;vclie;websnap;webdsnap;inetdbbde;inetdbxpress;soaprtl;vclribbon;DbxCommonDriver;DbxClientDriver;DBXInterBaseDriver;DBXMySQLDriver;dbexpress;dbxcds;NempKomponenten;dwWin7Controls_2009;Aviant_Credits;VirtualTreesD12;madBasic_;madDisAsm_;madExcept_;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_ExeOutput>..\bin\</DCC_ExeOutput>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_E>false</DCC_E>
+        <DCC_Platform>x86</DCC_Platform>
+        <DCC_DependencyCheckOutputName>..\bin\nemp.exe</DCC_DependencyCheckOutputName>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
+        <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
+        <VerInfo_Build>546</VerInfo_Build>
+        <Manifest_File>None</Manifest_File>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.546;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>false</DCC_DebugInformation>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
+        <Manifest_File>None</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.0.544;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
+        <Manifest_File>None</Manifest_File>
+        <Icon_MainIcon>nemp_Icon.ico</Icon_MainIcon>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_Define>DEBUG;madExcept;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_Release>4</VerInfo_Release>
+        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
+        <VerInfo_Build>555</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.4.555;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
+        <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="3rd Party Units\OneInst.pas"/>
+        <DCCReference Include="NempMainUnit.pas">
+            <Form>Nemp_MainForm</Form>
+        </DCCReference>
+        <DCCReference Include="Details.pas">
+            <Form>FDetails</Form>
+        </DCCReference>
+        <DCCReference Include="NempAudioFiles.pas"/>
+        <DCCReference Include="NewPicture.pas">
+            <Form>FNewPicture</Form>
+        </DCCReference>
+        <DCCReference Include="Splash.pas">
+            <Form>FSplash</Form>
+        </DCCReference>
+        <DCCReference Include="spectrum_vis.pas"/>
+        <DCCReference Include="Hilfsfunktionen.pas"/>
+        <DCCReference Include="TreeHelper.pas"/>
+        <DCCReference Include="About.pas">
+            <Form>AboutForm</Form>
+        </DCCReference>
+        <DCCReference Include="StreamVerwaltung.pas">
+            <Form>FormStreamVerwaltung</Form>
+        </DCCReference>
+        <DCCReference Include="Nemp_ConstantsAndTypes.pas"/>
+        <DCCReference Include="PlaylistUnit.pas">
+            <Form>PlaylistForm</Form>
+        </DCCReference>
+        <DCCReference Include="AuswahlUnit.pas">
+            <Form>AuswahlForm</Form>
+        </DCCReference>
+        <DCCReference Include="MedienlisteUnit.pas">
+            <Form>MedienlisteForm</Form>
+        </DCCReference>
+        <DCCReference Include="SplitForm_Hilfsfunktionen.pas"/>
+        <DCCReference Include="ShutDown.pas">
+            <Form>ShutDownForm</Form>
+        </DCCReference>
+        <DCCReference Include="Nemp_SkinSystem.pas"/>
+        <DCCReference Include="BirthdayShow.pas">
+            <Form>BirthdayForm</Form>
+        </DCCReference>
+        <DCCReference Include="PlaylistClass.pas"/>
+        <DCCReference Include="PlayerClass.pas"/>
+        <DCCReference Include="MedienbibliothekClass.pas"/>
+        <DCCReference Include="RandomPlaylist.pas">
+            <Form>RandomPlaylistForm</Form>
+        </DCCReference>
+        <DCCReference Include="Nemp_RessourceStrings.pas"/>
+        <DCCReference Include="ShutDownEdit.pas">
+            <Form>ShutDownEditForm</Form>
+        </DCCReference>
+        <DCCReference Include="DriveRepairTools.pas"/>
+        <DCCReference Include="ShoutcastUtils.pas"/>
+        <DCCReference Include="NewStation.pas">
+            <Form>NewStationForm</Form>
+        </DCCReference>
+        <DCCReference Include="WebServerClass.pas"/>
+        <DCCReference Include="Easteregg.pas"/>
+        <DCCReference Include="UpdateUtils.pas"/>
+        <DCCReference Include="ScrobblerUtils.pas"/>
+        <DCCReference Include="BibSearch.pas">
+            <Form>FormBibSearch</Form>
+        </DCCReference>
+        <DCCReference Include="BibSearchClass.pas"/>
+        <DCCReference Include="AudioFileHelper.pas"/>
+        <DCCReference Include="CoverHelper.pas"/>
+        <DCCReference Include="Systemhelper.pas"/>
+        <DCCReference Include="StringSearchHelper.pas"/>
+        <DCCReference Include="StringHelper.pas"/>
+        <DCCReference Include="BibHelper.pas"/>
+        <DCCReference Include="MainFormHelper.pas"/>
+        <DCCReference Include="MessageHelper.pas"/>
+        <DCCReference Include="BassHelper.pas"/>
+        <DCCReference Include="VSTEditControls.pas"/>
+        <DCCReference Include="ClassicCoverflowClass.pas"/>
+        <DCCReference Include="NempCoverFlowClass.pas"/>
+        <DCCReference Include="ExtendedControlsUnit.pas">
+            <Form>ExtendedControlForm</Form>
+        </DCCReference>
+        <DCCReference Include="PartyModeClass.pas"/>
+        <DCCReference Include="PostProcessorUtils.pas"/>
+        <DCCReference Include="RatingCtrls.pas"/>
+        <DCCReference Include="TagClouds.pas">
+            <Form>/,  classes;</Form>
+        </DCCReference>
+        <DCCReference Include="CloudEditor.pas">
+            <Form>CloudEditorForm</Form>
+        </DCCReference>
+        <DCCReference Include="Taghelper.pas"/>
+        <DCCReference Include="CoverDownloads.pas"/>
+        <DCCReference Include="PartymodePassword.pas">
+            <Form>PasswordDlg</Form>
+        </DCCReference>
+        <DCCReference Include="Lyrics.pas"/>
+        <DCCReference Include="HtmlHelper.pas"/>
+        <DCCReference Include="OptionsComplete.pas">
+            <Form>OptionsCompleteForm</Form>
+        </DCCReference>
+        <DCCReference Include="CreateHelper.pas"/>
+        <DCCReference Include="ExPopupList.pas"/>
+        <DCCReference Include="PlaylistToUSB.pas">
+            <Form>PlaylistCopyForm</Form>
+        </DCCReference>
+        <DCCReference Include="ErrorForm.pas">
+            <Form>FError</Form>
+        </DCCReference>
+        <DCCReference Include="BasicSettingsWizard.pas">
+            <Form>Wizard</Form>
+        </DCCReference>
+        <DCCReference Include="cddaUtils.pas"/>
+        <DCCReference Include="CDSelection.pas">
+            <Form>FormCDDBSelect</Form>
+        </DCCReference>
+        <DCCReference Include="CDOpenDialogs.pas">
+            <Form>CDOpenDialog</Form>
+        </DCCReference>
+        <DCCReference Include="DeleteHelper.pas"/>
+        <DCCReference Include="DeleteSelect.pas">
+            <Form>DeleteSelection</Form>
+        </DCCReference>
+        <DCCReference Include="CustomizedScrobbler.pas"/>
+        <DCCReference Include="Votings.pas"/>
+        <DCCReference Include="WebServerLog.pas">
+            <Form>WebServerLogForm</Form>
+        </DCCReference>
+        <DCCReference Include="SilenceDetection.pas"/>
+        <DCCReference Include="common\NempApi.pas">
+            <Form>,
+  bass in &apos;3rd Party Units\bass.pas&apos;,
+  bass_fx in &apos;3rd Party Units\bass_fx.pas&apos;,
+  basscd in &apos;3rd Party Units\basscd.pas&apos;;
+
+uses
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
+  OneInst in &apos;3rd Party Units\OneInst.pas&apos;,
+  gnuGettext,
+  Forms,
+  Windows,
+  SysUtils,
+  Graphics,
+  NempMainUnit in &apos;NempMainUnit.pas&apos; {Nemp_MainForm</Form>
+        </DCCReference>
+        <DCCReference Include="3rd Party Units\bass.pas"/>
+        <DCCReference Include="3rd Party Units\bass_fx.pas"/>
+        <DCCReference Include="3rd Party Units\basscd.pas"/>
+        <DCCReference Include="3rd Party Units\md5.pas"/>
+        <DCCReference Include="3rd Party Units\MyDialogs.pas"/>
+        <DCCReference Include="3rd Party Units\unitFlyingCow.pas"/>
+        <DCCReference Include="3rd Party Units\dglOpenGL.pas"/>
+        <DCCReference Include="3rd Party Units\fldbrows.pas"/>
+        <DCCReference Include="3rd Party Units\SearchTool.pas"/>
+        <DCCReference Include="3rd Party Units\filetypes.pas"/>
+        <DCCReference Include="3rd Party Units\WindowsVersionInfo.pas"/>
+        <DCCReference Include="3rd Party Units\Windows_Fragment.pas"/>
+        <DCCReference Include="3rd Party Units\gnugettext.pas"/>
+        <DCCReference Include="3rd Party Units\languagecodes.pas"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">nemp.dpr</Source>
+                </Source>
+                <Parameters>
+                    <Parameters Name="UseLauncher">False</Parameters>
+                    <Parameters Name="LoadAllSymbols">True</Parameters>
+                    <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+                </Parameters>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">True</VersionInfo>
+                    <VersionInfo Name="MajorVer">4</VersionInfo>
+                    <VersionInfo Name="MinorVer">6</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">575</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1031</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">4.6.0.575</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">4</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+</Project>

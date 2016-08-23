@@ -410,20 +410,30 @@ begin
             lEnd := 0;
         *)
 
-        // changes october, 2015
+        // changes october, 2015 (unpublished)
         // <div class='lyricbox'><script> ...
         // ... </script>
         // LYRICS
         // <!--
 
+        // August 2016
+        // <div class='lyricbox'>
+        // LYRICS
+        // <!--
+
         // search for <div class=''lyricbox''>
         lStart := Pos(LyricBox, code);
-        if lStart > 0 then
-            // ... the closing tag of the script
-            lStart := PosEx(ScriptEnd, code, lStart + Length(LyricBox));
+        //if lStart > 0 then
+        //    // ... the closing tag of the script
+        //    lStart := PosEx(ScriptEnd, code, lStart + Length(LyricBox));
+        //if lStart > 0 then
+        //    // inc Start, so at Start is the first interesting letter
+        //    lStart := lStart + length(ScriptEnd);
+
         if lStart > 0 then
             // inc Start, so at Start is the first interesting letter
-            lStart := lStart + length(ScriptEnd);
+            lStart := lStart + length(LyricBox);
+
         // search for the "end marker"
         if lStart > 0 then
             lEnd := PosEx('<!--', code, lStart)
