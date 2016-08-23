@@ -6,9 +6,6 @@ program nemp;
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
 
-
-
-
 {$I xe.inc}
 
 uses
@@ -18,7 +15,6 @@ uses
   madListProcesses,
   madListModules,
   OneInst in '3rd Party Units\OneInst.pas',
-  gnuGettext,
   Forms,
   Windows,
   SysUtils,
@@ -95,11 +91,30 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  NempApi in 'common\NempApi.pas'
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
+  NempApi in 'common\NempApi.pas',
+  bass in '3rd Party Units\bass.pas',
+  bass_fx in '3rd Party Units\bass_fx.pas',
+  basscd in '3rd Party Units\basscd.pas',
+  md5 in '3rd Party Units\md5.pas',
+  MyDialogs in '3rd Party Units\MyDialogs.pas',
+  unitFlyingCow in '3rd Party Units\unitFlyingCow.pas',
+  dglOpenGL in '3rd Party Units\dglOpenGL.pas',
+  fldbrows in '3rd Party Units\fldbrows.pas',
+  SearchTool in '3rd Party Units\SearchTool.pas',
+  filetypes in '3rd Party Units\filetypes.pas',
+  WindowsVersionInfo in '3rd Party Units\WindowsVersionInfo.pas',
+  Windows_Fragment in '3rd Party Units\Windows_Fragment.pas',
 
-//,  classes;
+  gnugettext in '3rd Party Units\gnugettext.pas',
+  languagecodes in '3rd Party Units\languagecodes.pas',
 
+
+  //{$IFDEF USESTYLES}
+   vcl.themes, vcl.styles
+
+   //{$ENDIF};
+
+   ;
 {$R *.res}
 
 var EVILHACKX, EVILHACKY: INTEGER;

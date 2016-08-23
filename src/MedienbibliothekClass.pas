@@ -2286,26 +2286,26 @@ begin
         // Bei Mißerfolg einen Hinweis geben.
         if (done = 0) then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                Integer(PChar(MediaLibrary_SearchLyricsComplete_SingleNotFound)))
+                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SingleNotFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
         if failed = 0 then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                Integer(PChar((MediaLibrary_SearchLyricsComplete_AllFound))))
+                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
         else
             if done > 0.5 * (failed + done) then
                 // ganz gutes Ergebnis - mehr als die Hälfte gefunden
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                    Integer(PChar(Format(MediaLibrary_SearchLyricsComplete_ManyFound, [done, done + failed]))))
+                    Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_ManyFound), [done, done + failed]))))
             else
                 if done > 0 then
                     // Nicht so tolles Ergebnis
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                        Integer(PChar(Format(MediaLibrary_SearchLyricsComplete_FewFound, [done, done + failed]))))
+                        Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_FewFound), [done, done + failed]))))
                 else
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                        Integer(PChar(MediaLibrary_SearchLyricsComplete_NoneFound)))
+                        Integer(PChar(_(MediaLibrary_SearchLyricsComplete_NoneFound))))
     end;
 
     if ErrorOcurred then
@@ -2464,26 +2464,26 @@ begin
         // Bei Mißerfolg einen Hinweis geben.
         if (done = 0) then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                Integer(PChar(MediaLibrary_SearchTagsComplete_SingleNotFound)))
+                Integer(PChar(_(MediaLibrary_SearchTagsComplete_SingleNotFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
         if failed = 0 then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                Integer(PChar((MediaLibrary_SearchTagsComplete_AllFound))))
+                Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
         else
             if done > 0.5 * (failed + done) then
                 // ganz gutes Ergebnis - mehr als die Hälfte gefunden
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                    Integer(PChar(Format(MediaLibrary_SearchTagsComplete_ManyFound, [done, done + failed]))))
+                    Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_ManyFound), [done, done + failed]))))
             else
                 if done > 0 then
                     // Nicht so tolles Ergebnis
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                        Integer(PChar(Format(MediaLibrary_SearchTagsComplete_FewFound, [done, done + failed]))))
+                        Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_FewFound), [done, done + failed]))))
                 else
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
-                        Integer(PChar(MediaLibrary_SearchTagsComplete_NoneFound)))
+                        Integer(PChar(_(MediaLibrary_SearchTagsComplete_NoneFound))))
     end;
 
     if ErrorOcurred then

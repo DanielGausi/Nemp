@@ -176,7 +176,7 @@ type
         // MiddleToMinComputing: Byte;
         // MiddleToMaxComputing: Byte;
         MaxDauer: Array[1..4] of Integer;
-        FontSize: Array[1..5] of Integer;
+        /// FontSize: Array[1..5] of Integer;
         RowHeight: Integer;
         ChangeFontColorOnBitrate:boolean;
         ChangeFontSizeOnLength:boolean;
@@ -1004,15 +1004,15 @@ begin
         //MiddleToMinComputing := Ini.ReadInteger('Font', 'MiddleToMinComputing', 2);
         //MiddleToMaxComputing := Ini.ReadInteger('Font', 'MiddleToMaxComputing', 2);
 
-        MaxDauer[1] := Ini.ReadInteger('Font', 'Maxdauer1',  59);
-        MaxDauer[2] := Ini.ReadInteger('Font', 'Maxdauer2', 149);
-        MaxDauer[3] := Ini.ReadInteger('Font', 'Maxdauer3', 359);
-        MaxDauer[4] := Ini.ReadInteger('Font', 'Maxdauer4', 899);
-        FontSize[1] := Ini.ReadInteger('Font', 'FontSize1', 6  );
-        FontSize[2] := Ini.ReadInteger('Font', 'FontSize2', 6  );
-        FontSize[3] := Ini.ReadInteger('Font', 'FontSize3', 8  );
-        FontSize[4] := Ini.ReadInteger('Font', 'FontSize4', 10 );
-        FontSize[5] := Ini.ReadInteger('Font', 'FontSize5', 12 );
+        MaxDauer[1] := Ini.ReadInteger('Font', 'Maxdauer1',  60);
+        MaxDauer[2] := Ini.ReadInteger('Font', 'Maxdauer2', 150);
+        MaxDauer[3] := Ini.ReadInteger('Font', 'Maxdauer3', 360);
+        MaxDauer[4] := Ini.ReadInteger('Font', 'Maxdauer4', 900);
+        ///FontSize[1] := Ini.ReadInteger('Font', 'FontSize1', 6  );
+        ///FontSize[2] := Ini.ReadInteger('Font', 'FontSize2', 6  );
+        ///FontSize[3] := Ini.ReadInteger('Font', 'FontSize3', 8  );
+        ///FontSize[4] := Ini.ReadInteger('Font', 'FontSize4', 10 );
+        ///FontSize[5] := Ini.ReadInteger('Font', 'FontSize5', 12 );
 
         ChangeFontStyleOnMode := ini.ReadBool('Font','ChangeFontStyleOnMode',True);
         ChangeFontOnCbrVbr := ini.ReadBool('Font','ChangeFontOnCbrVbr',False);
@@ -1132,11 +1132,11 @@ begin
         Ini.WriteInteger('Font', 'Maxdauer2', MaxDauer[2]);
         Ini.WriteInteger('Font', 'Maxdauer3', MaxDauer[3]);
         Ini.WriteInteger('Font', 'Maxdauer4', MaxDauer[4]);
-        Ini.WriteInteger('Font', 'FontSize1', FontSize[1]);
-        Ini.WriteInteger('Font', 'FontSize2', FontSize[2]);
-        Ini.WriteInteger('Font', 'FontSize3', FontSize[3]);
-        Ini.WriteInteger('Font', 'FontSize4', FontSize[4]);
-        Ini.WriteInteger('Font', 'FontSize5', FontSize[5]);
+        /// Ini.WriteInteger('Font', 'FontSize1', FontSize[1]);
+        /// Ini.WriteInteger('Font', 'FontSize2', FontSize[2]);
+        /// Ini.WriteInteger('Font', 'FontSize3', FontSize[3]);
+        /// Ini.WriteInteger('Font', 'FontSize4', FontSize[4]);
+        /// Ini.WriteInteger('Font', 'FontSize5', FontSize[5]);
 
         //Ini.WriteString('Font','MinColor'   , '$'+InttoHex(Integer( MinFontColor ),8)  );
         //Ini.WriteString('Font','MiddleColor', '$'+InttoHex(Integer( MiddleFontColor ),8)  );

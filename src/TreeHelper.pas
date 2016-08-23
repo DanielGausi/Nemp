@@ -53,6 +53,8 @@ type
   PStringTreeData = ^TStringTreeData;
 
   function LengthToSize(len:integer; def:integer):integer;
+  function MaxFontSize(default: Integer): Integer;
+
   function ModeToStyle(m:Byte):TFontstyles;
 
   function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
@@ -77,16 +79,30 @@ var  ZusatzJustaStringsArtists: TObjectlist;
      ZusatzJustaStringsAlben: TObjectlist;
 
 
+function MaxFontSize(default: Integer): Integer;
+begin
+    // sync with function LengthToSize!
+    result := default + 2;
+end;
 
 function LengthToSize(len:integer;def:integer):integer;
 begin
   with Nemp_MainForm do
   begin
-    if len < NempOptions.MaxDauer[1] then result := NempOptions.FontSize[1]
-    else if len < NempOptions.MaxDauer[2] then result := NempOptions.FontSize[2]
-    else if len < NempOptions.MaxDauer[3] then result := NempOptions.FontSize[3]
-    else if len < NempOptions.MaxDauer[4] then result := NempOptions.FontSize[4]
-    else  result := NempOptions.FontSize[5]
+    //if len < NempOptions.MaxDauer[1] then result := NempOptions.FontSize[1]
+    //else if len < NempOptions.MaxDauer[2] then result := NempOptions.FontSize[2]
+    //else if len < NempOptions.MaxDauer[3] then result := NempOptions.FontSize[3]
+    //else if len < NempOptions.MaxDauer[4] then result := NempOptions.FontSize[4]
+    //else  result := NempOptions.FontSize[5]
+
+    if len < NempOptions.MaxDauer[1] then result := def - 2
+    else if len < NempOptions.MaxDauer[2] then result := def - 1
+    else if len < NempOptions.MaxDauer[3] then result := def
+    else if len < NempOptions.MaxDauer[4] then result := def + 1
+    else  result := def + 2;
+
+    if result < 4 then
+        result := 4;
   end;
 end;
 
