@@ -380,7 +380,7 @@ type
         procedure WriteToIni(Ini: TMemIniFile);
 
         // Play: Spielt ein Audiofile ab.
-        procedure play(aAudioFile: TPlaylistFile; Interval: Integer; StartPlay: Boolean; StartPos: Float = 0);
+        procedure play(aAudioFile: TPlaylistFile; Interval: Integer; StartPlay: Boolean; StartPos: Double = 0);
         // Hält die Wiedergabe an.
         // Bei Streams wird gestoppt, bei Dateien pausiert
         procedure pause;
@@ -1132,7 +1132,7 @@ begin
       end;
 
       at_Stream: begin
-          result := BASS_StreamCreateURL(PAnsiChar(Ansistring(localPath)), 0, BASS_STREAM_STATUS , @StatusProc, nil);
+          result := BASS_StreamCreateURL(PChar(Pointer(localPath)), 0, BASS_STREAM_STATUS or BASS_UNICODE , @StatusProc, nil);
       end;
 
       at_CDDA: begin
@@ -1211,7 +1211,7 @@ end;
     Playn a Audiofile
     --------------------------------------------------------
 }
-procedure TNempPlayer.Play(aAudioFile: TPlaylistFile; Interval: Integer; StartPlay: Boolean; StartPos: Float = 0);
+procedure TNempPlayer.Play(aAudioFile: TPlaylistFile; Interval: Integer; StartPlay: Boolean; StartPos: Double = 0);
 var
   extension: String;
   ChannelInfo: BASS_CHANNELINFO;
