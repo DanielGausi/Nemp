@@ -1,15 +1,19 @@
 {
   BASSCD 2.4 Delphi unit
-  Copyright (c) 2003-2011 Un4seen Developments Ltd.
+  Copyright (c) 2003-2014 Un4seen Developments Ltd.
 
   See the BASSCD.CHM file for more detailed documentation
 }
 
-unit BassCD;
+unit BASSCD;
 
 interface
 
-uses Windows, Bass;
+{$IFDEF MSWINDOWS}
+uses BASS, Windows;
+{$ELSE}
+uses BASS;
+{$ENDIF}
 
 const
   // additional error codes returned by BASS_ErrorGetCode
@@ -81,6 +85,7 @@ const
 
   // BASS_CD_GetTOC modes
   BASS_CD_TOC_TIME              = $100;
+  BASS_CD_TOC_INDEX             = $200; // + track #
 
   // BASS_CD_TOC_TRACK "adrcon" flags
   BASS_CD_TOC_CON_PRE           = 1;
@@ -91,9 +96,13 @@ const
   BASS_CD_DATA_SUBCHANNEL       = 0;
   BASS_CD_DATA_C2               = 1;
 
+  BASS_CD_TRACK_PREGAP          = $FFFF;
+
   // BASS_CHANNELINFO type
   BASS_CTYPE_STREAM_CD          = $10200;
 
+  // BASS_ChannelGetLength/GetPosition/SetPosition mode
+  BASS_POS_CD_TRACK             = 4; // track number
 
 type
   BASS_CD_INFO = record
@@ -127,7 +136,7 @@ type
     tracks: Array[0..99] of BASS_CD_TOC_TRACK; // up to 100 tracks
   end;
 
-  CDDATAPROC = procedure(handle: HSTREAM; pos: Integer; type_: DWORD; buffer: Pointer; length: DWORD; user: Pointer); stdcall;
+  CDDATAPROC = procedure(handle: HSTREAM; pos: Integer; type_: DWORD; buffer: Pointer; length: DWORD; user: Pointer); {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
   {
     Sub-channel/C2 reading callback function.
     handle : The CD stream handle
@@ -140,37 +149,42 @@ type
 
 
 const
+{$IFDEF MSWINDOWS}
   basscddll = 'basscd.dll';
+{$ENDIF}
+{$IFDEF LINUX}
+  basscddll = 'libbasscd.so';
+{$ENDIF}
 
-function BASS_CD_SetInterface(iface:DWORD): DWORD; stdcall; external basscddll;
+function BASS_CD_SetInterface(iface:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
 
-function BASS_CD_GetInfo(drive:DWORD; var info:BASS_CD_INFO): BOOL; stdcall; external basscddll;
-function BASS_CD_Door(drive,action:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_DoorIsOpen(drive:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_DoorIsLocked(drive:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_IsReady(drive:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_GetTracks(drive:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_GetTrackLength(drive,track:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_GetTrackPregap(drive,track:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_GetTOC(drive,mode:DWORD; var toc:BASS_CD_TOC): BOOL; stdcall; external basscddll;
-function BASS_CD_GetID(drive,id:DWORD): PAnsiChar; stdcall; external basscddll;
-function BASS_CD_GetSpeed(drive:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_SetSpeed(drive,speed:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_SetOffset(drive:DWORD; offset:Integer): BOOL; stdcall; external basscddll;
-function BASS_CD_Release(drive:DWORD): BOOL; stdcall; external basscddll;
+function BASS_CD_GetInfo(drive:DWORD; var info:BASS_CD_INFO): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Door(drive,action:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_DoorIsOpen(drive:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_DoorIsLocked(drive:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_IsReady(drive:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetTracks(drive:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetTrackLength(drive,track:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetTrackPregap(drive,track:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetTOC(drive,mode:DWORD; var toc:BASS_CD_TOC): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetID(drive,id:DWORD): PAnsiChar; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_GetSpeed(drive:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_SetSpeed(drive,speed:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_SetOffset(drive:DWORD; offset:Integer): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Release(drive:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
 
-function BASS_CD_StreamCreate(drive,track,flags:DWORD): HSTREAM; stdcall; external basscddll;
-function BASS_CD_StreamCreateFile(f:PChar; flags:DWORD): HSTREAM; stdcall; external basscddll;
-function BASS_CD_StreamCreateEx(drive,track,flags:DWORD; proc:CDDATAPROC; user:Pointer): HSTREAM; stdcall; external basscddll;
-function BASS_CD_StreamCreateFileEx(f:PChar; flags:DWORD; proc:CDDATAPROC; user:Pointer): HSTREAM; stdcall; external basscddll;
-function BASS_CD_StreamGetTrack(handle:HSTREAM): DWORD; stdcall; external basscddll;
-function BASS_CD_StreamSetTrack(handle:HSTREAM; track:DWORD): BOOL; stdcall; external basscddll;
+function BASS_CD_StreamCreate(drive,track,flags:DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_StreamCreateFile(f:PChar; flags:DWORD): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_StreamCreateEx(drive,track,flags:DWORD; proc:CDDATAPROC; user:Pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_StreamCreateFileEx(f:PChar; flags:DWORD; proc:CDDATAPROC; user:Pointer): HSTREAM; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_StreamGetTrack(handle:HSTREAM): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_StreamSetTrack(handle:HSTREAM; track:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
 
-function BASS_CD_Analog_Play(drive,track,pos:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_Analog_PlayFile(f:PAnsiChar; pos:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_Analog_Stop(drive:DWORD): BOOL; stdcall; external basscddll;
-function BASS_CD_Analog_IsActive(drive:DWORD): DWORD; stdcall; external basscddll;
-function BASS_CD_Analog_GetPosition(drive:DWORD): DWORD; stdcall; external basscddll;
+function BASS_CD_Analog_Play(drive,track,pos:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Analog_PlayFile(f:PAnsiChar; pos:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Analog_Stop(drive:DWORD): BOOL; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Analog_IsActive(drive:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
+function BASS_CD_Analog_GetPosition(drive:DWORD): DWORD; {$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF}; external basscddll;
 
 implementation
 
