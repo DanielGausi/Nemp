@@ -86,6 +86,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Header.Font.Height = -11
         Header.Font.Name = 'Tahoma'
         Header.Font.Style = []
+        Header.Height = 17
         Header.Options = [hoColumnResize, hoDrag, hoVisible]
         Indent = 0
         PopupMenu = PM_Favorites
@@ -94,7 +95,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toRightClickSelect]
         OnChange = VST_FavoritesChange
-        OnColumnDblClick = VST_ShoutcastQueryColumnDblClick
         OnGetText = VST_FavoritesGetText
         OnHeaderClick = VST_FavoritesHeaderClick
         OnKeyDown = VST_FavoritesKeyDown
@@ -159,7 +159,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Width = 145
         Height = 21
         Style = csDropDownList
-        ItemHeight = 13
         ItemIndex = 5
         TabOrder = 4
         Text = 'Unsorted'
@@ -236,17 +235,13 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Header.Font.Height = -11
         Header.Font.Name = 'Tahoma'
         Header.Font.Style = []
+        Header.Height = 17
         Header.Options = [hoColumnResize, hoDrag, hoVisible]
         Indent = 0
-        PopupMenu = PM_Shoutcast
         TabOrder = 0
         TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning]
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
-        OnColumnDblClick = VST_ShoutcastQueryColumnDblClick
-        OnGetText = VST_ShoutcastQueryGetText
-        OnHeaderClick = VST_ShoutcastQueryHeaderClick
-        OnKeyDown = VST_ShoutcastQueryKeyDown
         Columns = <
           item
             Position = 0
@@ -289,7 +284,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Height = 21
           Enabled = False
           TabOrder = 0
-          OnKeyPress = Edt_SearchKeyPress
         end
         object Btn_Search: TButton
           Left = 200
@@ -299,7 +293,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Caption = 'Ok'
           Enabled = False
           TabOrder = 1
-          OnClick = Btn_SearchClick
         end
       end
       object GrpBox_SearchGenre: TGroupBox
@@ -318,7 +311,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Style = csDropDownList
           DropDownCount = 23
           Enabled = False
-          ItemHeight = 13
           ItemIndex = 0
           TabOrder = 0
           Text = '70s'
@@ -354,7 +346,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
           Caption = 'Ok'
           Enabled = False
           TabOrder = 1
-          OnClick = Btn_SearchGenreClick
         end
       end
       object Btn_AddSelected: TButton
@@ -366,7 +357,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Caption = 'Add selected to favorites'
         Enabled = False
         TabOrder = 1
-        OnClick = Btn_AddSelectedClick
       end
     end
   end
@@ -406,9 +396,14 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     ProxyParams.BasicAuthentication = False
     ProxyParams.ProxyPort = 0
     Request.ContentLength = -1
+    Request.ContentRangeEnd = -1
+    Request.ContentRangeStart = -1
+    Request.ContentRangeInstanceLength = -1
     Request.Accept = 'text/html, */*'
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0'
+    Request.Ranges.Units = 'bytes'
+    Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
     Left = 396
     Top = 392
@@ -442,7 +437,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object PM_SC_AddToFavorites: TMenuItem
       Caption = 'Add to favorites'
       ShortCut = 16454
-      OnClick = PM_SC_AddToFavoritesClick
     end
   end
   object PM_Favorites: TPopupMenu
@@ -529,7 +523,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
       object MM_SC_AddToFavorites: TMenuItem
         Caption = 'Add to favorites'
         ShortCut = 16454
-        OnClick = PM_SC_AddToFavoritesClick
       end
     end
   end

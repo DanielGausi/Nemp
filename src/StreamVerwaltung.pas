@@ -112,49 +112,51 @@ type
     procedure Btn_ShoutcastClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Btn_IcecastClick(Sender: TObject);
-    procedure Btn_SearchClick(Sender: TObject);
-    procedure Edt_SearchKeyPress(Sender: TObject; var Key: Char);
-    procedure VST_ShoutcastQueryColumnDblClick(Sender: TBaseVirtualTree;
-      Column: TColumnIndex; Shift: TShiftState);
-    procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    //procedure Btn_SearchClick(Sender: TObject);
+    //procedure Edt_SearchKeyPress(Sender: TObject; var Key: Char);
+    //procedure __VST_ShoutcastQueryColumnDblClick(Sender: TBaseVirtualTree;
+    //  Column: TColumnIndex; Shift: TShiftState);
+    //procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+    //        Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure HideTimerTimer(Sender: TObject);
-    procedure Btn_AddSelectedClick(Sender: TObject);
-    procedure Btn_SearchGenreClick(Sender: TObject);
+    //procedure Btn_AddSelectedClick(Sender: TObject);
+    //procedure Btn_SearchGenreClick(Sender: TObject);
     procedure Btn_NewClick(Sender: TObject);
     procedure Btn_EditClick(Sender: TObject);
     procedure Btn_DeleteSelectedClick(Sender: TObject);
-    procedure VST_ShoutcastQueryKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    //procedure VST_ShoutcastQueryKeyDown(Sender: TObject; var Key: Word;
+    //  Shift: TShiftState);
     procedure VST_FavoritesKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure PM_SC_AddToPlaylistClick(Sender: TObject);
-    procedure PM_SC_AddToFavoritesClick(Sender: TObject);
+    // procedure PM_SC_AddToFavoritesClick(Sender: TObject);
     procedure PM_Fav_NewStationClick(Sender: TObject);
     procedure PM_Fav_EditClick(Sender: TObject);
     procedure PM_Fav_DeleteClick(Sender: TObject);
     procedure PM_Fav_ExportClick(Sender: TObject);
     procedure PM_Fav_ImportClick(Sender: TObject);
     procedure PM_Fav_AddToPlaylistClick(Sender: TObject);
-    procedure VST_ShoutcastQueryGetText(Sender: TBaseVirtualTree;
-      Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
-      var CellText: string);
+    //procedure VST_ShoutcastQueryGetText(Sender: TBaseVirtualTree;
+    //  Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
+    //  var CellText: string);
     procedure VST_FavoritesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
-    procedure VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    //procedure __VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+    //        Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure udSortFavoritesClick(Sender: TObject; Button: TUDBtnType);
     procedure VST_FavoritesChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure cbSortModeChange(Sender: TObject);
     procedure BtnSetCustomSortClick(Sender: TObject);
     procedure SaveDialogFavoritesTypeChange(Sender: TObject);
+    procedure VST_FavoritesHeaderClick(Sender: TVTHeader;
+      HitInfo: TVTHeaderHitInfo);
   private
     { Private-Deklarationen }
     StationList: TObjectlist;
     FavoriteList: TObjectlist;
 
   protected
-      Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
+      //Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
   public
     { Public-Deklarationen }
     ShoutcastQuery: TShoutcastQuery;
@@ -255,7 +257,7 @@ begin
       AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 end;
 
-
+(*
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
 var i: Integer;
     aList: TObjectList;
@@ -353,6 +355,7 @@ begin
     end;
 
 end;
+*)
 
 procedure TFormStreamVerwaltung.VST_FavoritesChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
@@ -495,7 +498,7 @@ begin
     udSortFavorites.Enabled := cbSortMode.ItemIndex = 5;
 end;
 
-procedure TFormStreamVerwaltung.Btn_SearchClick(Sender: TObject);
+(*procedure TFormStreamVerwaltung.Btn_SearchClick(Sender: TObject);
 begin
   if ShoutcastQuery.Status = 0 then
   begin
@@ -546,11 +549,11 @@ begin
     key := #0;
     Btn_SearchClick(Nil);
   end;
-end;
+end;       *)
 
 
 
-procedure TFormStreamVerwaltung.VST_ShoutcastQueryColumnDblClick(
+(*procedure TFormStreamVerwaltung.__VST_ShoutcastQueryColumnDblClick(
   Sender: TBaseVirtualTree; Column: TColumnIndex; Shift: TShiftState);
 var Node: PVirtualNode;
     Data: PStationTreeData;
@@ -577,6 +580,7 @@ begin
     4: CellText := IntToStr(Data^.fStation.Count);
   end;
 end;
+
 
 procedure TFormStreamVerwaltung.VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
             Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -610,20 +614,25 @@ begin
             AddVSTStation(VST_ShoutcastQuery, NIL, (StationList[i] as TStation));
   end;
 end;
+*)
 
 
-procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader;
+  HitInfo: TVTHeaderHitInfo);
+
+
+//procedure TFormStreamVerwaltung.__VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
+//            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var i: Integer;
 begin
-    if Button = mbLeft then
+    if HitInfo.Button = mbLeft then
     begin
-        cbSortMode.ItemIndex := Column;
+        cbSortMode.ItemIndex := HitInfo.Column;
 
         if VST_Favorites.Header.SortDirection = sdAscending then
         begin
             VST_Favorites.Header.SortDirection := sdDescending;
-            case Column of
+            case HitInfo.Column of
                 0: begin
                   FavoriteList.Sort(Sort_Name_Desc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Desc);
@@ -644,7 +653,7 @@ begin
         end else
         begin
             VST_Favorites.Header.SortDirection := sdAscending;
-            case Column of
+            case HitInfo.Column of
                 0: begin
                   FavoriteList.Sort(Sort_Name_Asc);
                   Medienbib.RadioStationList.Sort(Sort_Name_Asc);
@@ -706,7 +715,7 @@ begin
     cbSortMode.ItemIndex := 4;
 end;
 
-procedure TFormStreamVerwaltung.Btn_AddSelectedClick(Sender: TObject);
+(*procedure TFormStreamVerwaltung.Btn_AddSelectedClick(Sender: TObject);
 var SelectedStations: TNodeArray;
     aNode: PVirtualNode;
     Data: PStationTreeData;
@@ -738,7 +747,7 @@ begin
         FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
     end;
 end;
-
+*)
 
 procedure TFormStreamVerwaltung.Btn_NewClick(Sender: TObject);
 var NewStation: TStation;
@@ -857,7 +866,7 @@ begin
     VST_Favorites.Invalidate;
 end;
 
-procedure TFormStreamVerwaltung.VST_ShoutcastQueryKeyDown(Sender: TObject;
+(*procedure TFormStreamVerwaltung.VST_ShoutcastQueryKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 var aNode: PVirtualNode;
     Data: PStationTreeData;
@@ -872,7 +881,7 @@ begin
       end;
   end;
 end;
-
+*)
 
 procedure TFormStreamVerwaltung.VST_FavoritesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
@@ -887,6 +896,7 @@ begin
     3: CellText := Data^.fStation.URL;
   end;
 end;
+
 
 
 
@@ -928,10 +938,12 @@ begin
     Data^.fStation.TuneIn(not CB_ParseStreamURL.Checked);
 end;
 
+(*
 procedure TFormStreamVerwaltung.PM_SC_AddToFavoritesClick(Sender: TObject);
 begin
     Btn_AddSelectedClick(Nil);
 end;
+*)
 
 procedure TFormStreamVerwaltung.PM_Fav_NewStationClick(Sender: TObject);
 begin

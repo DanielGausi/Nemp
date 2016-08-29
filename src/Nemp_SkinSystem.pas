@@ -544,7 +544,6 @@ begin
         UseAdvancedSkin := False;
         {$ENDIF}
 
-
         {$IFDEF USESTYLES}
         StyleFilename := path + '\' + name + '.vsf';
         if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
@@ -1329,7 +1328,7 @@ begin
                       SlideButtons[i].Button.DrawMode := dm_Skin;
 
                       {$IFDEF USESTYLES}
-                      //YYYYY SlideButtons[i].Button.StyleElements := [];
+                      SlideButtons[i].Button.StyleElements := [];
                       {$ENDIF}
 
                       SlideButtons[i].Button.CustomRegion := True;
@@ -2684,7 +2683,7 @@ var tmpBitmap: TBitmap;
 begin
     aButton.DrawMode := dm_Skin;
     {$IFDEF USESTYLES}
-    //YYYYY aButton.StyleElements := [];
+     aButton.StyleElements := [];
     {$ENDIF}
     aButton.NumGlyphsX := 5;
     tmpBitmap := TBitmap.Create;

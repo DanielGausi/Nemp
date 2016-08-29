@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 1004
+  ClientHeight = 1003
   ClientWidth = 903
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -2506,7 +2506,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 903
-    Height = 342
+    Height = 341
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -2518,7 +2518,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 28
       Width = 903
-      Height = 314
+      Height = 313
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2531,7 +2531,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 402
         Top = 2
         Width = 4
-        Height = 310
+        Height = 309
         OnCanResize = Splitter4CanResize
         OnMoved = Splitter4Moved
         ExplicitLeft = 250
@@ -2543,7 +2543,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 2
         Top = 2
         Width = 400
-        Height = 310
+        Height = 309
         Align = alLeft
         BevelOuter = bvNone
         Constraints.MinWidth = 20
@@ -2799,7 +2799,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 406
         Top = 2
         Width = 495
-        Height = 310
+        Height = 309
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -4011,7 +4011,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A9C0A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000AA80A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4476,7 +4476,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300BCC0B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300BD80B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7403,7 +7403,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07080810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07140810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

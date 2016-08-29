@@ -106,15 +106,13 @@ uses
   Windows_Fragment in '3rd Party Units\Windows_Fragment.pas',
 
   gnugettext in '3rd Party Units\gnugettext.pas',
-  languagecodes in '3rd Party Units\languagecodes.pas',
+  languagecodes in '3rd Party Units\languagecodes.pas'
 
 
-  //{$IFDEF USESTYLES}
-   vcl.themes, vcl.styles
+  {$IFDEF USESTYLES}
+   ,vcl.themes, vcl.styles
+   {$ENDIF};
 
-   //{$ENDIF};
-
-   ;
 {$R *.res}
 
 var EVILHACKX, EVILHACKY: INTEGER;
@@ -174,6 +172,8 @@ ShowWindow
     Application.ProcessMessages;
     Nemp_MainForm.Top := EVILHACKY;
     Nemp_MainForm.Left := EVILHACKX;
+
+    UpdateFormDesignNeu;
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin
