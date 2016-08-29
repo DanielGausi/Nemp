@@ -2831,6 +2831,7 @@ begin
                 TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
         end;
     end;
+    UpdateFormDesignNeu;
     {$ENDIF}
 end;
 
