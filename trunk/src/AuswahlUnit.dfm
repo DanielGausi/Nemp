@@ -48,8 +48,6 @@ object AuswahlForm: TAuswahlForm
       Height = 12
       Hint = 'Close browse window'
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0

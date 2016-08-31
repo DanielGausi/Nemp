@@ -41,14 +41,13 @@ object ExtendedControlForm: TExtendedControlForm
       Top = 0
       Width = 12
       Height = 12
-      Hint = 'Close medialist window'
+      Hint = 'Close'
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
       TabStop = False
+      OnClick = CloseImageClick
       DrawMode = dm_Skin
       NumGlyphsX = 5
       NumGlyphsY = 1

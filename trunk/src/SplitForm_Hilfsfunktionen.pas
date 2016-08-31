@@ -30,9 +30,12 @@
 }
 unit SplitForm_Hilfsfunktionen;
 
+{$I xe.inc}
+
 interface
 
-uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs;
+uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} ;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -46,6 +49,8 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure ReInitDocks;
 
   function GetResizeDirection(Sender: TObject; Shift: TShiftState; X, Y: Integer):Cardinal;
+
+  procedure SwapWindowMode(newMode: Integer);
 
   procedure SplitMainForm;
   procedure JoinMainForm;
@@ -697,6 +702,43 @@ begin
 end;
 
 
+procedure SwapWindowMode(newMode: Integer);
+var reactivate: boolean;
+begin
+    with Nemp_MainForm do
+    begin
+                      {$IFDEF USESTYLES}
+                      reactivate := False;
+                      if  (GlobalUseAdvancedSkin) AND
+                          (UseSkin AND NempSkin.UseAdvancedSkin)
+                      then
+                      begin
+                          // deactivate advanced skin temporary
+                          TStyleManager.SetStyle('Windows');
+                          reactivate := True;
+                      end;
+                      {$ENDIF}
+
+                      Anzeigemode := newMode mod 2;
+
+                      if Anzeigemode = 1 then
+                          // Party-mode in Separate-Window-Mode is not allowed.
+                          NempSkin.NempPartyMode.Active := False;
+
+                      UpdateFormDesignNeu;
+
+                      {$IFDEF USESTYLES}
+                      if reactivate then
+                      begin
+                          TStylemanager.SetStyle(NempSkin.name);
+                          CorrectSkinRegionsTimer.Enabled := True;
+                      end;
+                      {$ENDIF}
+    end;
+end;
+
+
+
 
 procedure SplitMainForm;
 begin
@@ -745,12 +787,23 @@ begin
       AudioPanel.OnMouseDown := ExtendedControlForm.OnMouseDown;
       AudioPanel.OnMouseMove := ExtendedControlForm.OnMouseMove;
       AudioPanel.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
+      //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
       CoverImage.OnMouseDown := ExtendedControlForm.OnMouseDown;
       CoverImage.OnMouseMove := ExtendedControlForm.OnMouseMove;
       CoverImage.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
       GRPBOXEqualizer.OnMouseDown := ExtendedControlForm.OnMouseDown;
       GRPBOXEqualizer.OnMouseMove := ExtendedControlForm.OnMouseMove;
       GRPBOXEqualizer.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
+      GRPBOXCover.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      GRPBOXCover.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      GRPBOXCover.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
       GRPBOXEffekte.OnMouseDown := ExtendedControlForm.OnMouseDown;
       GRPBOXEffekte.OnMouseMove := ExtendedControlForm.OnMouseMove;
       GRPBOXEffekte.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
@@ -839,6 +892,11 @@ begin
     CoverImage.OnMouseDown := Nil;
     CoverImage.OnMouseMove := Nil;
     CoverImage.OnMouseUp   := Nil;
+
+    GRPBOXCover.OnMouseDown := Nil;
+    GRPBOXCover.OnMouseMove := Nil;
+    GRPBOXCover.OnMouseUp   := Nil;
+
     // Andere Controls im Equalizer-Teil
     AudioPanel.OnMouseDown := Nil;
     AudioPanel.OnMouseMove := Nil;
@@ -952,8 +1010,12 @@ var i: Integer;
 begin
   with Nemp_MainForm do
   begin
-      SnapActive := False;
+      //LockWindowUpdate (CoverScrollbar.Handle);
 
+      // one attempt to get rid of several AV with this scrollbar
+      //CoverScrollbar.Visible := False;
+
+      SnapActive := False;
       // Beim ersten Mal nach Start der Anwendung ni!cht tun!!
       if Tag in [0,1] then
       begin
@@ -978,7 +1040,6 @@ begin
         if NOT ({Nempskin.isActive And } NempSkin.HideMainMenu) then
             Nemp_MainForm.Menu := Nemp_MainMenu;
       end;
-
 
       // Menu-Einträge Dis-/Enablen
           PM_P_ViewSeparateWindows_Equalizer.Enabled := AnzeigeMode = 1;
@@ -1213,9 +1274,6 @@ begin
           OR (ArtistsVST.Width < 40) then
               ArtistsVST.Width := AuswahlPanel.width DIV 2;
 
-
-
-
       SnapActive := True;
 
       if Tag = -1 then
@@ -1253,7 +1311,7 @@ begin
       RepairZOrder;
       // evtl. Form neu zeichnen. Stichwort "Schwarze Ecken"
 
-    // teilweise auskommentiert für Windows 7
+      // teilweise auskommentiert für Windows 7
       if (AnzeigeMode = 0) AND (Tag in [0,1]) then
       begin
           SetWindowRgn( handle, 0, Not _IsThemeActive );
@@ -1262,8 +1320,24 @@ begin
 
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+      // necessary on advanced skins
+      DragAcceptFiles (PlaylistForm.Handle, True);
+      DragAcceptFiles (AuswahlForm.Handle, True);
+      DragAcceptFiles (MedienlisteForm.Handle, True);
+      DragAcceptFiles (Nemp_MainForm.Handle, True);
 
       Tag := AnzeigeMode;
+
+      //CoverScrollbar.WindowProc := NewScrollBarWndProc;
+      //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);
+
+      //CoverScrollbar.StyleElements := [seFont,seClient,seBorder]
+
+      // one attempt to get rid of several AV with this scrollbar
+      //CoverScrollbar.Visible := True;
+
+
+
   end;
 end;
 

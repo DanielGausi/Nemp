@@ -31,6 +31,8 @@ object MedienlisteForm: TMedienlisteForm
     Height = 180
     Align = alClient
     BevelOuter = bvNone
+    DoubleBuffered = False
+    ParentDoubleBuffered = False
     TabOrder = 0
     OnMouseDown = ContainerPanelMedienBibFormMouseDown
     OnMouseMove = ContainerPanelMedienBibFormMouseMove
@@ -47,8 +49,6 @@ object MedienlisteForm: TMedienlisteForm
       Height = 12
       Hint = 'Close medialist window'
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0

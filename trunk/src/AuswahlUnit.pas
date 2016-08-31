@@ -92,6 +92,7 @@ type
     Resizing: Boolean;
 
     procedure InitForm;
+    procedure RepaintForm;
   end;
 
 var
@@ -124,6 +125,8 @@ begin
   NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
   Caption := NEMP_CAPTION;
 end;
+
+
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
 procedure TAuswahlForm.FormShow(Sender: TObject);
@@ -255,8 +258,8 @@ begin
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
     If Nemp_MainForm.NempSkin.isActive then
     begin
-      Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
-      Repaint;
+        Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+      //Repaint;
     end;
   end;
 end;
@@ -280,20 +283,30 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    If Nemp_MainForm.NempSkin.isActive then
+    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
-      Nemp_MainForm.NempSkin.RepairSkinOffset;
-      Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+        Nemp_MainForm.NempSkin.RepairSkinOffset;
+        Nemp_MainForm.NempSkin.SetArtistAlbumOffsets;
+        RepaintForm;
+    end;
+end;
+
+procedure TAuswahlForm.RepaintForm;
+begin
       Repaint;
       Nemp_MainForm.AuswahlPanel.Repaint;
       Nemp_MainForm.AuswahlFillPanel.Repaint;
       Nemp_MainForm.GRPBOXArtistsAlben.Repaint;
       Nemp_MainForm.PanelCoverBrowse.Repaint;
       Nemp_MainForm.PanelStandardBrowse.Repaint;
-      Nemp_MainForm.PanelTagCloudBrowse.Repaint;
-    end;
 
+      if MedienBib.BrowseMode = 2 then
+      begin
+          Nemp_MainForm.PanelTagCloudBrowse.Repaint;
+          MedienBib.TagCloud.  ShowTags;
+      end;
 end;
+
 
 procedure TAuswahlForm.WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING);
 var tmp: Boolean;

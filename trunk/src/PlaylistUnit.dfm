@@ -47,8 +47,6 @@ object PlaylistForm: TPlaylistForm
       Height = 12
       Hint = 'Close playlist window'
       Anchors = [akTop, akRight]
-      DoubleBuffered = True
-      ParentDoubleBuffered = False
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0

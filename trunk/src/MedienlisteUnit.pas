@@ -92,6 +92,8 @@ type
     //NempRegionsDistance: TNempRegionsDistance;
     procedure InitForm;
 
+    procedure RepaintForm;
+
   end;
 
 var
@@ -123,6 +125,8 @@ begin
   NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
   Caption := NEMP_CAPTION;
 end;
+
+
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
 procedure TMedienlisteForm.FormShow(Sender: TObject);
@@ -230,7 +234,7 @@ begin
   If Nemp_MainForm.NempSkin.isActive then
   begin
       Nemp_MainForm.NempSkin.SetVSTOffsets;
-      Repaint;
+      //Repaint;
   end;
 end;
 
@@ -243,10 +247,11 @@ begin
     Top := Top +  Y - DownY;
     NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
     NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
+
     If Nemp_MainForm.NempSkin.isActive then
     begin
       Nemp_MainForm.NempSkin.SetVSTOffsets;
-      Repaint;
+      //Repaint;
     end;
   end;
 end;
@@ -270,17 +275,26 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    If Nemp_MainForm.NempSkin.isActive then
+    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
-      Nemp_MainForm.NempSkin.RepairSkinOffset;
-      Nemp_MainForm.NempSkin.SetVSTOffsets;
-      Repaint;
-      Nemp_MainForm.VSTPanel.Repaint;
-      //Nemp_MainForm.TabPanelMedienliste.Repaint;
-      Nemp_MainForm.MedienlisteFillPanel.Repaint;
-      Nemp_MainForm.GRPBOXVST.Repaint;
+        Nemp_MainForm.NempSkin.RepairSkinOffset;
+        Nemp_MainForm.NempSkin.SetVSTOffsets;
+        RepaintForm;
     end;
 
+end;
+
+procedure TMedienlisteForm.RepaintForm;
+begin
+    Repaint;
+    Nemp_MainForm.VSTPanel.Repaint;
+    Nemp_MainForm.VDTCoverInfoPanel.Repaint;
+    Nemp_MainForm.VDTCover.Repaint;
+
+    //Nemp_MainForm.TabPanelMedienliste.Repaint;
+    Nemp_MainForm.MedienBibHeaderPanel.Repaint;
+    Nemp_MainForm.MedienlisteFillPanel.Repaint;
+    Nemp_MainForm.GRPBOXVST.Repaint;
 end;
 
 procedure TMedienlisteForm.WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING);
