@@ -38,13 +38,13 @@
 
 unit CreateHelper;
 
-interface
-
 {$I xe.inc}
 
-    uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees,
+interface
 
-    dialogs, shellApi, ID3GenreList;
+    uses Forms, Windows, Graphics, Classes, Menus, Controls, SysUtils, IniFiles, VirtualTrees, Messages,
+    dialogs, shellApi, ID3GenreList
+    {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 
     procedure UpdateSplashScreen(status: String);
@@ -616,13 +616,23 @@ begin
     //s1 := gettickcount;
     with Nemp_MainForm do
     begin
-        LockWindowUpdate(Handle);
+        //LockWindowUpdate(Handle);
 
         //s := gettickcount;
         TmpLastExitWasOK := LoadSettings;
+
+        {$IFDEF USESTYLES}
+        //this seems to solve some issues with HINT-Windows in the VST
+        // in single-window-mode
+        // !!!! another call MUST be done at the end of this procedure !!!
+        if UseSkin AND GlobalUseAdvancedSkin then
+        begin
+            SendMessage( Handle, WM_SETREDRAW, 0, 0);
+        end;
+        {$ENDIF}
+
         SearchSkins;
         SearchLanguages;
-
 
         //s := gettickcount;
         AutoLoadPlaylist(TmpLastExitWasOK);
@@ -633,7 +643,6 @@ begin
         ApplySettings;
         //e := gettickcount;
         //ShowMessage('Apply Settings: ' + IntToStr(e - s));
-
 
         ApplyLayout;
 
@@ -697,8 +706,15 @@ begin
         NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
         EdtBibGenre.Items := ID3Genres;
 
+        //LockWindowUpdate(0);
+        {$IFDEF USESTYLES}
+        if UseSkin AND GlobalUseAdvancedSkin then
+        begin
+            SendMessage(Handle, WM_SETREDRAW, 1, 0);
+            Refresh;
+        end;
+        {$ENDIF}
 
-        LockWindowUpdate(0);
 
         //s := gettickcount;
         AutoLoadBib;

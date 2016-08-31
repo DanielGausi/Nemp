@@ -64,6 +64,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ContainerPanelExtendedControlsFormPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
+    procedure CloseImageClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -78,6 +79,7 @@ type
     { Public-Deklarationen }
     procedure SetPartySize(w,h: Integer);
     procedure InitForm;
+    procedure RepaintForm;
   end;
 
 var
@@ -89,6 +91,17 @@ uses NempMainUnit, MedienlisteUnit, AuswahlUnit, PlaylistUnit;
 
 {$R *.dfm}
 
+
+procedure TExtendedControlForm.CloseImageClick(Sender: TObject);
+begin
+    with Nemp_MainForm do
+    begin
+      NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible := NOT NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
+      PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
+      MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
+    end;
+    close;
+end;
 
 procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaint(
   Sender: TObject);
@@ -104,6 +117,7 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
+  CloseImage.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 
   if Nemp_MainForm.AnzeigeMode = 1 then
       // still in seperate-window-mode
@@ -133,6 +147,7 @@ BWidth := Width;
   Caption := NEMP_CAPTION;
 end;
 
+
 procedure TExtendedControlForm.FormHide(Sender: TObject);
 begin
   if Nemp_MainForm.AnzeigeMode = 1 then
@@ -156,7 +171,12 @@ end;
 
 procedure TExtendedControlForm.FormMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var newp: TPoint;
 begin
+
+
+
+  newp := self.ScreenToClient((Sender as TControl).ClientToScreen(Point(x,y)));
   DownX := X;
   DownY := Y;
   NempRegionsDistance.docked := False;
@@ -164,9 +184,12 @@ end;
 
 procedure TExtendedControlForm.FormMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
+var newp: TPoint;
 begin
+
   if (ssLeft in Shift) then
   begin
+    newp := self.ScreenToClient((Sender as TControl).ClientToScreen(Point(x,y)));
     Left := Left + X - DownX;
     Top := Top +  Y - DownY;
     NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
@@ -200,17 +223,22 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    If Nemp_MainForm.NempSkin.isActive then
+    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
-      Nemp_MainForm.NempSkin.RepairSkinOffset;
-      //Nemp_MainForm.NempSkin.SetPlaylistOffsets;
-      Repaint;
-      //Nemp_MainForm.PlaylistPanel.Repaint;
-      //Nemp_MainForm.GRPBOXPlaylist.Repaint;
-      //Nemp_MainForm.PlaylistFillPanel.Repaint;
-      //Nemp_MainForm.TabPanelPlaylist.Repaint;
+        Nemp_MainForm.NempSkin.RepairSkinOffset;
+        RepaintForm;
     end;
+end;
 
+procedure TExtendedControlForm.RepaintForm;
+begin
+    Repaint;
+    Nemp_MainForm.AudioPanel.Repaint;
+    Nemp_MainForm.GRPBOXEffekte.Repaint;
+    Nemp_MainForm.GRPBOXEqualizer.Repaint;
+    Nemp_MainForm.GRPBOXHeadset.Repaint;
+    Nemp_MainForm.GRPBOXLyrics.Repaint;
+    Nemp_MainForm.GRPBOXCover.Repaint
 end;
 
 procedure TExtendedControlForm.FormShow(Sender: TObject);
@@ -225,11 +253,11 @@ begin
 
   //Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 26;
 
- { CloseImage.Parent := Nemp_MainForm.PlaylistPanel;
-  CloseImage.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImage.Width - 10;
-  CloseImage.Top := 3; //6              // PlaylistPanel
+  CloseImage.Parent := Nemp_MainForm.AudioPanel;
+  CloseImage.Left := Nemp_MainForm.AudioPanel.Width - CloseImage.Width - 5;
+  CloseImage.Top := 3; //6
   CloseImage.BringToFront;
- }
+
   //
 
   //SetRegion(Nemp_MainForm.AudioPanel, self, NempRegionsDistance, handle);

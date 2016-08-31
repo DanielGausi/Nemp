@@ -1233,8 +1233,6 @@ begin
   TagCustomizer.OffSetX := PlayerPageOffsetX + (pnlPoint.X - OffsetPoint.X);
   TagCustomizer.OffSetY := PlayerPageOffsetY + (pnlPoint.Y - OffsetPoint.Y);
 
-  Nemp_MainForm.PanelTagCloudBrowse.Repaint;
-
 end;
 
 procedure TNempSkin.SetVSTOffsets;
@@ -1382,6 +1380,12 @@ begin
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
                     PlaylistForm.CloseImage.GlyphLine := PlaylistForm.CloseImage.GlyphLine;
+
+                AssignNemp3Glyph(
+                        ExtendedControlForm.CloseImage,
+                        Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
+                        True);
+                    ExtendedControlForm.CloseImage.GlyphLine := ExtendedControlForm.CloseImage.GlyphLine;
 
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
@@ -2670,6 +2674,10 @@ begin
             PlaylistForm.CloseImage.NempGlyph.Assign(tmpBitmap);
             PlaylistForm.CloseImage.NumGlyphsX := 1;
             PlaylistForm.CloseImage.NumGlyphs := 1;
+
+            ExtendedControlForm.CloseImage.NempGlyph.Assign(tmpBitmap);
+            ExtendedControlForm.CloseImage.NumGlyphsX := 1;
+            ExtendedControlForm.CloseImage.NumGlyphs := 1;
 
         finally
             tmpBitmap.Free;

@@ -2259,20 +2259,17 @@ var z: smallint;
 begin
   case Message.Msg of
     WM_MouseWheel: begin
-      z := hiWord(Message.wParam);
-      if z > 0 then
-        CoverScrollbar.Position := CoverScrollbar.Position - 1
-      else
-        CoverScrollbar.Position := CoverScrollbar.Position + 1;
-
-      MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
+        z := hiWord(Message.wParam);
+        if z > 0 then
+            CoverScrollbar.Position := CoverScrollbar.Position - 1
+        else
+            CoverScrollbar.Position := CoverScrollbar.Position + 1;
+            MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
     end;
   else
-      OldScrollbarWindowProc(Message);
+    OldScrollbarWindowProc(Message);
   end;
-
 end;
-
 
 procedure TNemp_MainForm.NewLyricMemoWndProc(var Message: TMessage);
 var z: smallint;
@@ -2862,7 +2859,6 @@ begin
   UseSkin := False;
   RePaintPanels;
   RepaintOtherForms;
-
   RepaintAll;
 end;
 
@@ -4497,6 +4493,7 @@ end;
 
 procedure TNemp_MainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
+  var reactivate : Boolean;
 begin
   case key of
     VK_ESCAPE: begin
@@ -4524,6 +4521,37 @@ begin
               PM_P_ViewStayOnTopClick(NIL);
 
     VK_F7: begin
+        SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
+                     (* {$IFDEF USESTYLES}
+                      reactivate := False;
+                      if  (Nemp_MainForm.GlobalUseAdvancedSkin) AND
+                          (UseSkin AND NempSkin.UseAdvancedSkin)
+                      then
+                      begin
+                          // deactivate advanced skin temporary
+                          TStyleManager.SetStyle('Windows');
+                          reactivate := True;
+                      end;
+                      {$ENDIF}
+
+                      Anzeigemode := (AnzeigeMode + 1) mod 2;
+
+                      if Anzeigemode = 1 then
+                          // Party-mode in Separate-Window-Mode is not allowed.
+                          NempSkin.NempPartyMode.Active := False;
+
+                      UpdateFormDesignNeu;
+
+                      {$IFDEF USESTYLES}
+                      if reactivate then
+                      begin
+                          TStylemanager.SetStyle(NempSkin.name);
+                          Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+                      end;
+                      {$ENDIF}
+                      *)
+
+    {
               if Not NempSkin.NempPartyMode.Active then
               begin
                   Anzeigemode := (AnzeigeMode + 1) mod 2;
@@ -4532,6 +4560,12 @@ begin
                       NempSkin.NempPartyMode.Active := False;
                   UpdateFormDesignNeu;
               end;
+
+     }
+
+
+
+
            end;
 
     VK_F8: NempPlayer.PlayJingle(Nil);
@@ -6488,7 +6522,10 @@ begin
         Coverbmp.Height := 250;
 
         // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-        success := GetCover(aAudioFile, Coverbmp);
+        if assigned(aAudioFile) then
+            success := GetCover(aAudioFile, Coverbmp)
+        else
+            success := false;
         // HeadsetCoverImage.Visible := success;
         if success then
         begin
@@ -6922,11 +6959,11 @@ end;
 
 procedure TNemp_MainForm.CorrectSkinRegionsTimerTimer(Sender: TObject);
 begin
-    DragAcceptFiles (Handle, True);
     CorrectSkinRegionsTimer.Enabled := False;
 
     NempSkin.SetRegionsAgain;
     MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
+    UpdateFormDesignNeu;
 end;
 
 
@@ -8719,6 +8756,7 @@ procedure TNemp_MainForm.PaintFrameMouseMove(Sender: TObject; Shift: TShiftState
 begin
       ClipCursor(Nil);
 
+
       if (ssLeft in Shift) AND (WindowState <> wsMaximized) then
       begin
         Left := Left + X - PaintFrameDownX;
@@ -8795,6 +8833,7 @@ begin
   Message.Result := 0;
 end;
 
+
 procedure TNemp_MainForm.PaintFrameMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -8841,14 +8880,45 @@ begin
   
 end;
 
+
 procedure TNemp_MainForm.MM_O_ViewCompactCompleteClick(Sender: TObject);
+var reactivate: Boolean;
 begin
+
+    if (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
+        SwapWindowMode(Anzeigemode + 1);
+(*
+  {$IFDEF USESTYLES}
+  reactivate := False;
+  if (Nemp_MainForm.GlobalUseAdvancedSkin) AND
+    (UseSkin AND NempSkin.UseAdvancedSkin) AND
+    (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
+  begin
+        // deactivate it immediately
+        TStyleManager.SetStyle('Windows');
+        //Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+        reactivate := True;
+       // wuppdi;
+    end;
+
+    {$ENDIF}
+
   Anzeigemode := (Sender as TMenuItem).Tag mod 2;
+
   if Anzeigemode = 1 then
       // Party-mode in Separate-Window-Mode is not allowed.
       NempSkin.NempPartyMode.Active := False;
 
   UpdateFormDesignNeu;
+
+  {$IFDEF USESTYLES}
+  if reactivate then
+  begin
+      TStylemanager.SetStyle(NempSkin.name);
+      Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+  end;
+  {$ENDIF}
+          *)
 end;
 
 procedure TNemp_MainForm.MM_O_WizardClick(Sender: TObject);
@@ -9672,12 +9742,33 @@ end;
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_BrowseClick(
   Sender: TObject);
+var reactivate: Boolean;
 begin
   NempOptions.NempEinzelFormOptions.AuswahlSucheVisible := NOT NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
   PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
   MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
 
+
+                      {$IFDEF USESTYLES}
+                      reactivate := False;
+                      if  (GlobalUseAdvancedSkin) AND
+                          (UseSkin AND NempSkin.UseAdvancedSkin)
+                      then
+                      begin
+                          // deactivate advanced skin temporary
+                          TStyleManager.SetStyle('Windows');
+                          reactivate := True;
+                      end;
+                      {$ENDIF}
   AuswahlForm.Visible := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+                      {$IFDEF USESTYLES}
+                      if reactivate then
+                      begin
+                          TStylemanager.SetStyle(NempSkin.name);
+                          CorrectSkinRegionsTimer.Enabled := True;
+                      end;
+                      {$ENDIF}
+
   if AuswahlForm.Visible then
   begin
       FormPosAndSizeCorrect(AuswahlForm);
@@ -10614,13 +10705,24 @@ begin
     try
         // Note this try..except seems to be necessary sometimes
         // (invalid winwdow handle when switching VCL styles)
-        PlayerPanel.Repaint;
+        RepaintPlayerPanel;
+
         AudioPanel.Repaint;
         PlaylistPanel.Repaint;
         AuswahlPanel.Repaint;
-        VSTPanel.Repaint;
 
+        if MedienBib.BrowseMode = 2 then
+        begin
+            PanelTagCloudBrowse.Repaint;
+            MedienBib.TagCloud.  ShowTags;
+        end;
+
+        VSTPanel.Repaint;
         MedienlisteFillPanel.Repaint;
+        GRPBOXVST.Repaint;
+        VDTCover.Repaint;
+        VDTCoverInfoPanel.Repaint;
+
         AuswahlFillPanel.Repaint;
         PlaylistFillPanel.Repaint;
 
@@ -10637,23 +10739,23 @@ begin
   if NempSkin.isActive and NOT Nempskin.FixedBackGround then
   begin
     PlayerPanel.Repaint;
-    if NOT _IsThemeActive then
-    begin
+    //if NOT _IsThemeActive then // some issues with windows 10 - always paint everything
+    //begin
       NewPlayerPanel.Repaint;
       GRPBOXLyrics.Repaint;
       GRPBOXEffekte.Repaint;
       GRPBOXEqualizer.Repaint;
       GRPBOXCover.Repaint;
-    end;
+    //end;
   end;
 end;
 
 Procedure TNemp_MainForm.RepaintOtherForms;
 begin
-  if PlaylistForm.Visible then PlaylistForm.Repaint;
-  if MedienlisteForm.Visible then MedienlisteForm.Repaint;
-  if AuswahlForm.Visible then AuswahlForm.Repaint;
-  if ExtendedControlForm.Visible then ExtendedControlForm.Repaint;
+  if PlaylistForm.Visible then PlaylistForm.RepaintForm;
+  if MedienlisteForm.Visible then MedienlisteForm.RepaintForm;
+  if AuswahlForm.Visible then AuswahlForm.RepaintForm;
+  if ExtendedControlForm.Visible then ExtendedControlForm.RepaintForm;
 end;
 
 procedure TNemp_MainForm.RepaintAll;

@@ -90,6 +90,7 @@ type
     Resizing: Boolean;
     //NempRegionsDistance: TNempRegionsDistance;
     procedure InitForm;
+    procedure RepaintForm;
   end;
 
 var
@@ -123,6 +124,8 @@ begin
 
   Caption := NEMP_CAPTION;
 end;
+
+
 
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
@@ -284,18 +287,22 @@ begin
 
     NempRegionsDistance.docked := tmp;
 
-    If Nemp_MainForm.NempSkin.isActive then
+    if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
     begin
-      Nemp_MainForm.NempSkin.RepairSkinOffset;
-      Nemp_MainForm.NempSkin.SetPlaylistOffsets;
-      Repaint;
-      Nemp_MainForm.PlaylistPanel.Repaint;
-      Nemp_MainForm.GRPBOXPlaylist.Repaint;
-      Nemp_MainForm.PlaylistFillPanel.Repaint;
-      //Nemp_MainForm.TabPanelPlaylist.Repaint;
+        Nemp_MainForm.NempSkin.RepairSkinOffset;
+        Nemp_MainForm.NempSkin.SetPlaylistOffsets;
+        RepaintForm;
     end;
 end;
 
+
+procedure TPlaylistForm.RepaintForm;
+begin
+    Repaint;
+    Nemp_MainForm.PlaylistPanel.Repaint;
+    Nemp_MainForm.GRPBOXPlaylist.Repaint;
+    Nemp_MainForm.PlaylistFillPanel.Repaint;
+end;
 
 procedure TPlaylistForm.WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING);
 var tmp: Boolean;
