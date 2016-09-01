@@ -7,10 +7,10 @@
       von Daniel 'Gausi' Gaußmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit CodeGear Delphi 2009 and XE2
-      Januar 2005 - März 2013
+      Programmiert mit CodeGear Delphi 2009, XE2, XE3
+      Januar 2005 - September 2016
 
-      Version: 4.6.1
+      Version: 4.6.3
 
 
 -----------------------------------------------------------
@@ -114,6 +114,30 @@ Verwendete Units/Komponenten:
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
 
+
+
+Version 4.6.3, September 2016
+----------------------------------------------------------- 
+Änderungen:
+-----------
+- automatische Lyricsuche repariert (d.h. an das neue Seitenlayout der Quelle angepasst)
+- neue Liste mit Default-Webradio-Stationen
+- Variable Schriftgrößen für unterschiedlich lange Stücke überarbeitet (weniger Unterschied) 
+- Neue Versionen der bass.dll und Erweiterungen
+
+Bugfixes:
+---------
+- schnelleres/langsameres Abspielen *ohne* Micky-Maus-Effekt funktionierte nicht 
+  bei mp3-Dateien
+- Bitrate und Spieldauer bei mp3-Dateien mit konstanter Bitrate unf INFO-Tag wurden 
+  falsch berechnet
+- Mausrad im Coverflow funktioniert wieder (Windows-10-Problem?)
+- Drag&Drop in Einzelfenster bei erweitertem Skinsystem funktionierte nicht
+- Verschieben des Fensters mit Cover, Equalizer- und Effekte-Steuerung führte oft 
+  zu einer chaotischen Verschiebung des Player-Fensters
+- Einige Meldungen bzgl. Lyricsuche waren immer auf englisch
+- kleinere Fixes in der deutschen Übersetzung
+- Einige Fehlermeldungen ("Abstürze") sollten deutlich seltener auftreten
 
 
 Version 4.6.2, April 2013

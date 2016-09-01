@@ -4493,7 +4493,6 @@ end;
 
 procedure TNemp_MainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
-  var reactivate : Boolean;
 begin
   case key of
     VK_ESCAPE: begin
@@ -8882,7 +8881,6 @@ end;
 
 
 procedure TNemp_MainForm.MM_O_ViewCompactCompleteClick(Sender: TObject);
-var reactivate: Boolean;
 begin
 
     if (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
@@ -9760,7 +9758,9 @@ begin
                           reactivate := True;
                       end;
                       {$ENDIF}
+
   AuswahlForm.Visible := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+
                       {$IFDEF USESTYLES}
                       if reactivate then
                       begin
