@@ -114,8 +114,8 @@ type
     procedure Btn_IcecastClick(Sender: TObject);
     //procedure Btn_SearchClick(Sender: TObject);
     //procedure Edt_SearchKeyPress(Sender: TObject; var Key: Char);
-    //procedure __VST_ShoutcastQueryColumnDblClick(Sender: TBaseVirtualTree;
-    //  Column: TColumnIndex; Shift: TShiftState);
+    procedure VST_ShoutcastQueryColumnDblClick(Sender: TBaseVirtualTree;
+      Column: TColumnIndex; Shift: TShiftState);
     //procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
     //        Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure HideTimerTimer(Sender: TObject);
@@ -156,7 +156,7 @@ type
     FavoriteList: TObjectlist;
 
   protected
-      //Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
+      Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
   public
     { Public-Deklarationen }
     ShoutcastQuery: TShoutcastQuery;
@@ -257,7 +257,7 @@ begin
       AddVSTStation(VST_Favorites, NIL, (FavoriteList[i] as TStation));
 end;
 
-(*
+
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
 var i: Integer;
     aList: TObjectList;
@@ -355,7 +355,7 @@ begin
     end;
 
 end;
-*)
+
 
 procedure TFormStreamVerwaltung.VST_FavoritesChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
@@ -553,7 +553,7 @@ end;       *)
 
 
 
-(*procedure TFormStreamVerwaltung.__VST_ShoutcastQueryColumnDblClick(
+procedure TFormStreamVerwaltung.VST_ShoutcastQueryColumnDblClick(
   Sender: TBaseVirtualTree; Column: TColumnIndex; Shift: TShiftState);
 var Node: PVirtualNode;
     Data: PStationTreeData;
@@ -566,6 +566,7 @@ begin
   Data^.fStation.TuneIn(Not CB_ParseStreamURL.Checked);
 end;
 
+(*
 procedure TFormStreamVerwaltung.VST_ShoutcastQueryGetText(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType; var CellText: string);
