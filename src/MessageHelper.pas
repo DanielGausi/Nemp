@@ -64,7 +64,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
-    DeleteSelect;
+    DeleteSelect, GnuGetText;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -1985,10 +1985,10 @@ end;
 procedure CurDir(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
 begin
   Nemp_MainForm.AuswahlStatusLbl.Caption :=
-      Format((MediaLibrary_SearchingNewFiles),  [MedienBib.UpdateList.Count, ST_Medienliste.CurrentDir]);
+      Format(_(MediaLibrary_SearchingNewFiles),  [MedienBib.UpdateList.Count, ST_Medienliste.CurrentDir]);
 
   Nemp_MainForm.LblEmptyLibraryHint.Caption :=
-      Format((MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
+      Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
 
 
   Nemp_MainForm.AuswahlStatusLbl.Update;
