@@ -95,6 +95,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toRightClickSelect]
         OnChange = VST_FavoritesChange
+        OnColumnDblClick = VST_ShoutcastQueryColumnDblClick
         OnGetText = VST_FavoritesGetText
         OnHeaderClick = VST_FavoritesHeaderClick
         OnKeyDown = VST_FavoritesKeyDown
