@@ -129,7 +129,7 @@ Bugfixes:
 ---------
 - schnelleres/langsameres Abspielen *ohne* Micky-Maus-Effekt funktionierte nicht 
   bei mp3-Dateien
-- Bitrate und Spieldauer bei mp3-Dateien mit konstanter Bitrate unf INFO-Tag wurden 
+- Bitrate und Spieldauer bei mp3-Dateien mit konstanter Bitrate und INFO-Tag wurden 
   falsch berechnet
 - Mausrad im Coverflow funktioniert wieder (Windows-10-Problem?)
 - Drag&Drop in Einzelfenster bei erweitertem Skinsystem funktionierte nicht
