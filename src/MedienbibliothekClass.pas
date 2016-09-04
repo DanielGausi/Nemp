@@ -3370,11 +3370,11 @@ begin
   fBackupCoverlist.Clear;
   LeaveCriticalSection(CSAccessBackupCoverList);
 
-  newCover := TNempCover.Create;
+  newCover := TNempCover.Create(True);
   newCover.ID := 'all';
   newCover.key := 'all';
-  newCover.Artist := 'All artists';
-  Newcover.Album := 'Your media-library';
+  newCover.Artist := CoverFlowText_VariousArtists;
+  Newcover.Album  := CoverFlowText_WholeLibrary; //'Your media-library';
   Target.Add(NewCover);
 
   if Source.Count < 1 then
@@ -3412,17 +3412,14 @@ begin
       end else
       begin
           // Checklist (liste, cover)
-          GetCoverInfos(AudioFilesWithSameCover, newCover);
+          newCover.GetCoverInfos(AudioFilesWithSameCover);
 
           // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
-          if HideNACover then
+          if HideNACover and NewCover.InvalidData then
           begin
-              if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
-              begin
                   // discard current cover
                   NewCover.Free;
                   Target.Delete(Target.Count - 1);
-              end;
           end;
 
           // Neues Cover erstellen und neue Liste anfangen
@@ -3439,7 +3436,7 @@ begin
   end;
 
   // Check letzte List
-  GetCoverInfos(AudioFilesWithSameCover, newCover);
+  newCover.GetCoverInfos(AudioFilesWithSameCover);
   AudioFilesWithSameCover.Free;
 
   // Coverliste sortieren
@@ -3476,11 +3473,11 @@ begin
         TNempCover(Target[i]).Free;
     Target.Clear;
 
-    newCover := TNempCover.Create;
+    newCover := TNempCover.Create(True);
     newCover.ID := 'searchresult';
     newCover.key := 'searchresult';
-    newCover.Artist := 'Various artists';
-    Newcover.Album := 'Current search result';
+    newCover.Artist := CoverFlowText_VariousArtists; // 'Various artists';
+    Newcover.Album := CoverFlowText_WholeLibrarySearchResults;
     Target.Add(NewCover);
 
     if Source.Count < 1 then
@@ -3513,19 +3510,15 @@ begin
             GetTitelListFromCoverID(AudioFilesWithSameCover, currentID);
 
             // get Infos from these files
-            GetCoverInfos(AudioFilesWithSameCover, newCover);
+            newCover.GetCoverInfos(AudioFilesWithSameCover);
 
             // to do here: if info = <N/A> then ignore this cover, i.e. delete it from the list.
-            if HideNACover then
+            if HideNACover and NewCover.InvalidData then
             begin
-                if (newCover.Artist = AUDIOFILE_UNKOWN) and (newCover.Album = AUDIOFILE_UNKOWN) then
-                begin
-                    // discard current cover
-                    NewCover.Free;
-                    Target.Delete(Target.Count - 1);
-                end;
+                // discard current cover
+                NewCover.Free;
+                Target.Delete(Target.Count - 1);
             end;
-
 
             // get index of first audiofile with a different CoverID
             repeat

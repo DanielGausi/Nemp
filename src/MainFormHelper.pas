@@ -1230,6 +1230,9 @@ begin
         end;
         AlbenVST.Invalidate;
 
+        if Medienbib.BrowseMode = 1 then
+            CoverScrollbarChange(Nil); // trigger redraw of label
+
         Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
     end;
 end;

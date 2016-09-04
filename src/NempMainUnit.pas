@@ -11003,6 +11003,7 @@ begin
 
     if BirthdayTimer.Enabled then
     begin
+        timeleft := 0;
         BirthdayTimer.Enabled := False;
         if assigned(BirthdayForm) then
             BirthdayForm.Close;
@@ -11167,6 +11168,7 @@ begin
         MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
+
         Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
 end;

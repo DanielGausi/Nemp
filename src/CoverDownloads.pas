@@ -570,7 +570,7 @@ begin
     tmpCover := TNempCover.Create;
     try
         tmpCover.ID := 'dummy';
-        GetCoverInfos(aAudioFileList, tmpCover);
+        tmpCover.GetCoverInfos(aAudioFileList);
         if (tmpCover.Album <> 'Unknown compilation')
             and (not UnKownInformation(tmpCover.Artist))
             and (not UnKownInformation(tmpCover.Album))

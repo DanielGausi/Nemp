@@ -175,7 +175,9 @@ CoverFlowText_VariousArtists    = 'Various artists';
 CoverFlowText_UnkownCompilation = 'Unknown compilation';
 //CoverFlowText_NoCover           = 'Albums without cover';
 CoverFlowText_AllArtists        = 'All artists';
-CoverFlowText_WholeLibrary      = 'Your media-library';
+CoverFlowText_WholeLibrary      = 'Your media library';
+CoverFlowText_WholeLibrarySearchResults = 'Your media library (curent search results)';
+
 //CoverFlowLastFM_Confirmation    = 'Nemp can download missing covers using a webservice from LastFM. Is this ok for you?';
 CoverFlowLastFM_HintConnectError = 'Downloading a cover from LastFM failed.' +#13#10 + 'There is a problem with your internet connection.';
 CoverFlowLastFM_HintFail         = 'Downloading a cover from LastFM failed.' +#13#10 + 'No proper cover found.';
