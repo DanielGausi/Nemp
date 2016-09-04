@@ -1063,9 +1063,9 @@ begin
         //WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
 
 
-        BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 0);
+        BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 1);
         if (BrowseMode < 0) OR (BrowseMode > 2) then
-          BrowseMode := 0;
+          BrowseMode := 1;
         CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 1);
         if (CoverSortOrder < 1) OR (CoverSortOrder > 9) then
           CoverSortorder := 1;
