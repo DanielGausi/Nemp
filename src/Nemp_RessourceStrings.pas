@@ -37,6 +37,19 @@ Resourcestring
 
 //TreeEntry_All = '<All>';
 
+  // for Dialogs (copy of myDialogs.pas)
+  XcmbYes = '&Yes'; //'&Yes';
+  XcmbNo = '&No';
+  XcmbOK = 'OK';
+  XcmbCancel = 'Cancel';
+  XcmbHelp = '&Help';
+  XcmbAbort = '&Abort';
+  XcmbRetry = '&Retry';
+  XcmbIgnore = '&Ignore';
+  XcmbAll = '&All';
+  XcmbNoToAll = 'N&o to All';
+  XcmbYesToAll = 'Yes to &All';
+
 // Optionen-Baum
 OptionsTree_Filetypes = 'Filetypes (Windows Registry)';
 OptionsTree_Controls = 'Controls';
