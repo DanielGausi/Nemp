@@ -35,7 +35,7 @@ unit SplitForm_Hilfsfunktionen;
 interface
 
 uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} ;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -849,10 +849,10 @@ begin
     AuswahlPanel.OnResize := AuswahlPanelResize;
     Nemp_MainForm.OnResize := FormResize;
 
-    Medienlisteform.Close;
-    Playlistform.Close;
-    Auswahlform.Close;
-    ExtendedControlForm.Close;
+    if Medienlisteform.visible then Medienlisteform.Close;
+    if Playlistform.visible then Playlistform.Close;
+    if Auswahlform.Visible then Auswahlform.Close;
+    if ExtendedControlForm.visible then ExtendedControlForm.Close;
 
     PlaylistPanel.OnMouseDown := NIL;
     PlaylistPanel.OnMouseMove := NIL;
@@ -1014,9 +1014,8 @@ begin
 
       // one attempt to get rid of several AV with this scrollbar
       //CoverScrollbar.Visible := False;
-
       SnapActive := False;
-      // Beim ersten Mal nach Start der Anwendung ni!cht tun!!
+      // Beim ersten Mal nach Start der Anwendung nicht tun!!
       if Tag in [0,1] then
       begin
         NempOptions.NempFormAufteilung[Tag].Maximized := WindowState=wsMaximized;
@@ -1232,12 +1231,10 @@ begin
       if AnzeigeMode = 0 then
       begin
           TopMainPanel.Constraints.MaxHeight := Height - 160;
-
           NempRegionsDistance.Top := 0;
           NempRegionsDistance.Bottom := height;
           NempRegionsDistance.Right := width;
           NempRegionsDistance.Left := 0;
-
           TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
       end
       else
@@ -1247,14 +1244,16 @@ begin
 
       if Tag in [0,1] then
       begin
+
           FormPosAndSizeCorrect(Nemp_MainForm);
+
           FormPosAndSizeCorrect(AuswahlForm);
+
           FormPosAndSizeCorrect(PlaylistForm);
           FormPosAndSizeCorrect(MedienlisteForm);
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
       end;
-
       // This seems useless.
       // But the setter will call SetCustomregion, which seems to be
       // necessary, as the ParentForm of these buttons has changed.
@@ -1300,7 +1299,6 @@ begin
                   TopMainPanel.Height := TopMainPanel.Height - 1  ;
           end;
       end;
-
 
       if NempOptions.NempFormAufteilung[Anzeigemode].Maximized then
           WindowState := wsMaximized;

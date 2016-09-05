@@ -83,6 +83,7 @@ type
     BTop: Integer;
     BWidth: Integer;
     BHeight: Integer;
+
     ResizeFlag: Cardinal;
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
     Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;

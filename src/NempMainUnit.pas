@@ -4521,49 +4521,6 @@ begin
 
     VK_F7: begin
         SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
-                     (* {$IFDEF USESTYLES}
-                      reactivate := False;
-                      if  (Nemp_MainForm.GlobalUseAdvancedSkin) AND
-                          (UseSkin AND NempSkin.UseAdvancedSkin)
-                      then
-                      begin
-                          // deactivate advanced skin temporary
-                          TStyleManager.SetStyle('Windows');
-                          reactivate := True;
-                      end;
-                      {$ENDIF}
-
-                      Anzeigemode := (AnzeigeMode + 1) mod 2;
-
-                      if Anzeigemode = 1 then
-                          // Party-mode in Separate-Window-Mode is not allowed.
-                          NempSkin.NempPartyMode.Active := False;
-
-                      UpdateFormDesignNeu;
-
-                      {$IFDEF USESTYLES}
-                      if reactivate then
-                      begin
-                          TStylemanager.SetStyle(NempSkin.name);
-                          Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-                      end;
-                      {$ENDIF}
-                      *)
-
-    {
-              if Not NempSkin.NempPartyMode.Active then
-              begin
-                  Anzeigemode := (AnzeigeMode + 1) mod 2;
-                  if Anzeigemode = 1 then
-                      // Party-mode in Separate-Window-Mode is not allowed.
-                      NempSkin.NempPartyMode.Active := False;
-                  UpdateFormDesignNeu;
-              end;
-
-     }
-
-
-
 
            end;
 
@@ -6959,7 +6916,6 @@ end;
 procedure TNemp_MainForm.CorrectSkinRegionsTimerTimer(Sender: TObject);
 begin
     CorrectSkinRegionsTimer.Enabled := False;
-
     NempSkin.SetRegionsAgain;
     MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
     UpdateFormDesignNeu;
@@ -8882,41 +8838,8 @@ end;
 
 procedure TNemp_MainForm.MM_O_ViewCompactCompleteClick(Sender: TObject);
 begin
-
     if (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
         SwapWindowMode(Anzeigemode + 1);
-(*
-  {$IFDEF USESTYLES}
-  reactivate := False;
-  if (Nemp_MainForm.GlobalUseAdvancedSkin) AND
-    (UseSkin AND NempSkin.UseAdvancedSkin) AND
-    (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
-  begin
-        // deactivate it immediately
-        TStyleManager.SetStyle('Windows');
-        //Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-        reactivate := True;
-       // wuppdi;
-    end;
-
-    {$ENDIF}
-
-  Anzeigemode := (Sender as TMenuItem).Tag mod 2;
-
-  if Anzeigemode = 1 then
-      // Party-mode in Separate-Window-Mode is not allowed.
-      NempSkin.NempPartyMode.Active := False;
-
-  UpdateFormDesignNeu;
-
-  {$IFDEF USESTYLES}
-  if reactivate then
-  begin
-      TStylemanager.SetStyle(NempSkin.name);
-      Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-  end;
-  {$ENDIF}
-          *)
 end;
 
 procedure TNemp_MainForm.MM_O_WizardClick(Sender: TObject);
