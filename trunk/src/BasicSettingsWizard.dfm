@@ -31,10 +31,6 @@ object Wizard: TWizard
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Lbl_Welcome: TLabel
         Left = 152
         Top = 16
@@ -71,10 +67,9 @@ object Wizard: TWizard
         Caption = 
           'Nemp has a lot of cool features. Some of these features create n' +
           'ew files on your disk or change files in the background. Some pe' +
-          'ople (well-known klingon generals in particular) don'#39't like prog' +
-          'rams that mess about with their system without being asked - and' +
-          ' so do I.#13#10#13#10This Wizard will explain these features and' +
-          ' ask for your permission to activate them.'
+          'ople don'#39't like programs that mess about with their system witho' +
+          'ut being asked - and so do I.#13#10#13#10This Wizard will explai' +
+          'n these features and ask for your permission to activate them.'
         WordWrap = True
       end
       object BtnContinue: TButton
@@ -101,10 +96,6 @@ object Wizard: TWizard
     object TabSheet2: TTabSheet
       Caption = '(Updates)'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Lbl_CheckUpdates: TLabel
         Left = 152
         Top = 16
@@ -199,10 +190,6 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageMetaData: TImage
         Left = 8
         Top = 32
@@ -299,10 +286,6 @@ object Wizard: TWizard
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageRating: TImage
         Left = 8
         Top = 32
@@ -397,10 +380,6 @@ object Wizard: TWizard
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageLastFM: TImage
         Left = 8
         Top = 32
@@ -494,10 +473,6 @@ object Wizard: TWizard
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageFiletypes: TImage
         Left = 8
         Top = 32
@@ -592,10 +567,6 @@ object Wizard: TWizard
       Caption = '(summary)'
       ImageIndex = 5
       OnShow = TabSheet7Show
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImgSummary: TImage
         Left = 8
         Top = 32
