@@ -108,7 +108,7 @@ type
           property Width: Integer read fWidth;
           property Height: Integer read fheight;
 
-          constructor Create(aKey: String);
+          constructor Create(aKey: String; aTranslate: Boolean);
 
           procedure MeasureOutput(aCanvas: TCanvas);
           procedure Paint(aCanvas: TCanvas);
@@ -385,7 +385,7 @@ var
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Nemp_RessourceStrings, gnuGetText;
 
 
 function Sort_Count(item1,item2:pointer):integer;
@@ -470,7 +470,10 @@ begin
     CloudPainter := TCloudPainter.Create;
     fBackUpBreadCrumbs := TObjectList.create(False);
 
-    fClearTag := TPaintTag.Create('<Your library>');
+    fClearTag := TPaintTag.Create('Your media library', True);
+    //TPaintTag.Create(TagCloud_YourLibrary, True);  // this does not work properly ...
+
+
     fClearTag.BreadCrumbIndex := -2;
     Tags.Add(ClearTag);
 
@@ -1290,7 +1293,7 @@ begin
         result := tmp
     else
     begin
-        result := TPaintTag.Create(aKey);
+        result := TPaintTag.Create(aKey, False);
         // Add the new tag to the Taglist // todo !!! and the correct list in the Array of Lists!
         Tags.Add(result);
         KeyHashList.Add(result);
@@ -1661,19 +1664,29 @@ end;
 
 { TPaintTag }
 
-constructor TPaintTag.Create(aKey: String);
+constructor TPaintTag.Create(aKey: String; aTranslate: Boolean);
 begin
-    inherited Create(aKey);
+    inherited Create(aKey, aTranslate);
     fHover := False;
     fFocussed := False;
+    fTranslate := aTranslate;
+    if fTranslate then
+        fKey := aKey;
 end;
 
 
 procedure TPaintTag.MeasureOutput(aCanvas: TCanvas);
 begin
     aCanvas.Font.Size := FontSize;
-    fWidth := aCanvas.TextWidth(Key) + 4 * BORDER_WIDTH;
-    fHeight := aCanvas.TextHeight(Key) + 4 * BORDER_HEIGHT;
+    if self.fTranslate then
+    begin
+        fWidth := aCanvas.TextWidth(_(Key)) + 4 * BORDER_WIDTH;
+        fHeight := aCanvas.TextHeight(_(Key)) + 4 * BORDER_HEIGHT;
+    end else
+    begin
+        fWidth := aCanvas.TextWidth(Key) + 4 * BORDER_WIDTH;
+        fHeight := aCanvas.TextHeight(Key) + 4 * BORDER_HEIGHT;
+    end;
 end;
 
 {
@@ -1739,7 +1752,10 @@ begin
     aCanvas.Font.Color := TagCustomizer.FontColor;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
+    if fTranslate then
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
+    else
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
 end;
 
 
@@ -1765,7 +1781,10 @@ begin
     aCanvas.Font.Color := TagCustomizer.HoverFontColor;
     aCanvas.Font.Style := [fsUnderline];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
+    if fTranslate then
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
+    else
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key)
 end;
 
 procedure TPaintTag.PaintFocussed(aCanvas: TCanvas);
@@ -1787,7 +1806,10 @@ begin
     aCanvas.Font.Color := TagCustomizer.FocusFontColor;
     aCanvas.Font.Style := [];
     aCanvas.Font.Size := FontSize;
-    aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
+    if fTranslate then
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, _(Key))
+    else
+        aCanvas.TextOut(fLeft + 2*BORDER_WIDTH, fTop + 2*BORDER_Height, Key);
 end;
 
 

@@ -1233,6 +1233,9 @@ begin
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label
 
+        if Medienbib.BrowseMode = 2 then
+            MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
+
         Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
     end;
 end;
