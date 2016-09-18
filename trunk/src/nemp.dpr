@@ -173,7 +173,7 @@ ShowWindow
     Nemp_MainForm.Top := EVILHACKY;
     Nemp_MainForm.Left := EVILHACKX;
 
-    UpdateFormDesignNeu;
+    //UpdateFormDesignNeu;
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin

@@ -6918,7 +6918,9 @@ begin
     CorrectSkinRegionsTimer.Enabled := False;
     NempSkin.SetRegionsAgain;
     MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
+    //ReAcceptDragFiles;
     UpdateFormDesignNeu;
+
 end;
 
 

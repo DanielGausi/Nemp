@@ -172,9 +172,6 @@ type
     // Class TTag: Used for the TagCloud
     TTag = class
       private
-          // The key of the tag, e.g. 'Pop', 'really great song', '80s', ...
-          fKey: String;
-
           //
           fBreadCrumbIndex: Integer;
           fIsAutoTag: Boolean;
@@ -182,6 +179,11 @@ type
           fTotalCount: Integer; // the total count of this Tag. (= Count in initial cloud)
 
           function GetCount: Integer;
+      protected
+          // The key of the tag, e.g. 'Pop', 'really great song', '80s', ...
+          fKey: String;
+
+          fTranslate: Boolean;
       public
           // Stores all AudioFiles with this Tag.
           AudioFiles: TObjectList;
@@ -192,7 +194,7 @@ type
           property TotalCount: Integer read fTotalCount write fTotalCount;
 
           property BreadCrumbIndex: Integer read fBreadCrumbIndex write fBreadCrumbIndex;
-          constructor Create(aKey: String);
+          constructor Create(aKey: String; aTranslate: Boolean);
           destructor Destroy; override;
     end;
 
@@ -754,12 +756,16 @@ end;
 
  { TTag }
 
-constructor TTag.Create(aKey: String);
+constructor TTag.Create(aKey: String; aTranslate: Boolean);
 begin
     inherited create;
     AudioFiles := TObjectList.Create(False);
-    fKey := AnsiLowercase(aKey);
+    if aTranslate then
+        fKey := aKey // for the default "your library"
+    else
+        fKey := AnsiLowercase(aKey);
     fIsAutoTag := False;
+    fTranslate := aTranslate;
     BreadCrumbIndex := High(Integer);
 end;
 

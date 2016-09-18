@@ -55,6 +55,8 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure SplitMainForm;
   procedure JoinMainForm;
 
+  procedure ReAcceptDragFiles;
+
   procedure UpdateSmallMainForm;
   procedure UpdateFormDesignNeu;
 
@@ -1318,11 +1320,9 @@ begin
 
 
       MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+
       // necessary on advanced skins
-      DragAcceptFiles (PlaylistForm.Handle, True);
-      DragAcceptFiles (AuswahlForm.Handle, True);
-      DragAcceptFiles (MedienlisteForm.Handle, True);
-      DragAcceptFiles (Nemp_MainForm.Handle, True);
+      ReAcceptDragFiles;
 
       Tag := AnzeigeMode;
 
@@ -1337,6 +1337,15 @@ begin
 
 
   end;
+end;
+
+procedure ReAcceptDragFiles;
+begin
+      DragAcceptFiles (PlaylistForm.Handle, True);
+      DragAcceptFiles (AuswahlForm.Handle, True);
+      DragAcceptFiles (MedienlisteForm.Handle, True);
+      DragAcceptFiles (ExtendedControlForm.Handle, True);
+      DragAcceptFiles (Nemp_MainForm.Handle, True);
 end;
 
 
