@@ -841,7 +841,10 @@ begin
     AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
 
 
-    EditFastSearch.Width := 194;
+    if NempSkin.NempPartyMode.Active then
+        EditFastSearch.Width := Round(194 * NempSkin.NempPartyMode.ResizeFactor)
+    else
+        EditFastSearch.Width := 194;
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := VSTPanel.Width - MedienlisteFillPanel.Left;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
