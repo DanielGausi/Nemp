@@ -8,7 +8,7 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - September 2016
+      Januar 2005 - Dezember 2016
 
       Version: 4.6.3
 
@@ -116,7 +116,7 @@ Verwendete Units/Komponenten:
 
 
 
-Version 4.6.3, September 2016
+Version 4.6.3, Dezember 2016
 ----------------------------------------------------------- 
 Änderungen:
 -----------
