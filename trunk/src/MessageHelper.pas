@@ -1647,6 +1647,7 @@ begin
                         //if NempPlayer.StreamRecording AND (oldTitel<> NempPlayer.PlayingTitel) AND NempPlayer.AutoSplitFiles then
                         //    NempPlayer.StartRecording;
                         NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
+                        PlaylistVST.Invalidate;
                     end;
 
     WM_PlayerStop, WM_PlayerPlay: begin
