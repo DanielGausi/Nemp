@@ -124,6 +124,8 @@ Version 4.6.3, Dezember 2016
 - neue Liste mit Default-Webradio-Stationen
 - Variable Schriftgrößen für unterschiedlich lange Stücke überarbeitet (weniger Unterschied) 
 - Neue Versionen der bass.dll und Erweiterungen
+- Bei Webradio ändert sich auch der Titel in der Playlist automatisch, wenn der Sender 
+  neue Metadaten überträgt
 
 Bugfixes:
 ---------
