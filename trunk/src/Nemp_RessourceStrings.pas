@@ -445,6 +445,8 @@ MainForm_MoreSearchresults  = 'Additional results (not limited to current presel
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 
+MainForm_PlaylistSearch    = 'Search';
+
 MainForm_BtnEqualizerPresetsSelect = 'Select';
 MainForm_BtnEqualizerPresetsCustom = 'Custom';
 MainForm_BtnEqualizerSaveNewButton = 'New ...';

@@ -799,6 +799,10 @@ begin
             MessageDlg(MediaLibrary_SomeErrorsOccured, mtWarning, [MBOK], 0);
         end;
 
+        MB_InvalidGMPFile: begin
+            MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
+        end;
+
         MB_UserInputDeadFiles: begin
             srList := TObjectList(aMsg.LParam);
             tmpString := '';

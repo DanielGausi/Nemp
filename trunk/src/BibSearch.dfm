@@ -3,7 +3,7 @@ object FormBibSearch: TFormBibSearch
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Search in the library'
-  ClientHeight = 527
+  ClientHeight = 526
   ClientWidth = 536
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,6 +15,9 @@ object FormBibSearch: TFormBibSearch
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
+  DesignSize = (
+    536
+    526)
   PixelsPerInch = 96
   TextHeight = 13
   object GRPBOXSuchauswahl: TGroupBox
@@ -31,7 +34,6 @@ object FormBibSearch: TFormBibSearch
       Width = 510
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
       TabOrder = 0
       OnChange = CB_SearchHistoryChange
     end
@@ -99,25 +101,25 @@ object FormBibSearch: TFormBibSearch
       Caption = 'Lyrics'
     end
     object ArtistEDIT: TEdit
-      Left = 53
+      Left = 82
       Top = 71
-      Width = 289
+      Width = 260
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
     end
     object TitelEDIT: TEdit
-      Left = 53
+      Left = 82
       Top = 98
-      Width = 289
+      Width = 260
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
     end
     object AlbumEDIT: TEdit
-      Left = 53
+      Left = 82
       Top = 125
-      Width = 289
+      Width = 260
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 3
@@ -131,9 +133,9 @@ object FormBibSearch: TFormBibSearch
       TabOrder = 5
     end
     object PathEDIT: TEdit
-      Left = 53
+      Left = 82
       Top = 152
-      Width = 289
+      Width = 260
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 4
@@ -259,7 +261,6 @@ object FormBibSearch: TFormBibSearch
       Height = 21
       Style = csDropDownList
       Enabled = False
-      ItemHeight = 13
       ItemIndex = 0
       TabOrder = 1
       Text = 'Before'
@@ -342,5 +343,17 @@ object FormBibSearch: TFormBibSearch
     Caption = 'Extend search'
     TabOrder = 5
     OnClick = Btn_ExtendedSearchClick
+  end
+  object BtnCancel: TButton
+    Left = 367
+    Top = 472
+    Width = 154
+    Height = 46
+    Anchors = [akLeft, akBottom]
+    Cancel = True
+    Caption = 'Cancel'
+    TabOrder = 7
+    OnClick = BtnCancelClick
+    ExplicitTop = 473
   end
 end

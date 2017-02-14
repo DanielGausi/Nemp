@@ -67,7 +67,7 @@ var
 implementation
 
 uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsUnit,
-     SystemHelper;
+     SystemHelper, Inifiles;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
 var formregion,
@@ -706,6 +706,7 @@ end;
 
 procedure SwapWindowMode(newMode: Integer);
 var reactivate: boolean;
+    ini:TMemIniFile;
 begin
     with Nemp_MainForm do
     begin
@@ -720,6 +721,21 @@ begin
                           reactivate := True;
                       end;
                       {$ENDIF}
+
+                      // save current settings
+                      ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
+                      try
+                          ini.Encoding := TEncoding.UTF8;
+                          SaveWindowPositons(ini, NempOptions, AnzeigeMode);
+                          Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
+                          try
+                              Ini.UpdateFile;
+                          except
+                              // Silent Exception
+                          end;
+                      finally
+                          ini.Free
+                      end;
 
                       Anzeigemode := newMode mod 2;
 
@@ -848,6 +864,13 @@ begin
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := VSTPanel.Width - MedienlisteFillPanel.Left;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
+
+    if NempSkin.NempPartyMode.Active then
+        EditplaylistSearch.Width := Round(65 * NempSkin.NempPartyMode.ResizeFactor)
+    else
+        EditplaylistSearch.Width := 65;
+    PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
+    PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
     PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
 
@@ -1015,12 +1038,15 @@ var i: Integer;
 begin
   with Nemp_MainForm do
   begin
+
       //LockWindowUpdate (CoverScrollbar.Handle);
 
       // one attempt to get rid of several AV with this scrollbar
       //CoverScrollbar.Visible := False;
       SnapActive := False;
+
       // Beim ersten Mal nach Start der Anwendung nicht tun!!
+      //02.2017 // Bug mit MAXIMIZED-Over Taskleiste????
       if Tag in [0,1] then
       begin
         NempOptions.NempFormAufteilung[Tag].Maximized := WindowState=wsMaximized;
@@ -1034,6 +1060,7 @@ begin
         NempOptions.NempFormAufteilung[Tag].AuswahlPanelWidth  := AuswahlPanel.Width;
         NempOptions.NempFormAufteilung[Tag].ArtistWidth   := ArtistsVST.Width;
       end;
+
 
       // Zuerst: HauptMenü anzeigen // ausblenden
       // Das macht das Setzen Der Regions im Einzelfenster-Modus einfacher.
@@ -1305,6 +1332,7 @@ begin
           end;
       end;
 
+      //02.2017 // MAXIMIZED-OVer TAskleiste????
       if NempOptions.NempFormAufteilung[Anzeigemode].Maximized then
           WindowState := wsMaximized;
 

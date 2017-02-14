@@ -487,7 +487,7 @@ begin
             maxFont := NempOptions.DefaultFontSize;
 
         PlaylistVST.Canvas.Font.Size := maxFont;
-        PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
+        PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
         VST.Font.Size := NempOptions.DefaultFontSize;
         PlaylistVST.Font.Size := NempOptions.DefaultFontSize;
         if Screen.Fonts.IndexOf(NempOptions.FontNameVBR) = -1 then
@@ -625,7 +625,7 @@ begin
         //this seems to solve some issues with HINT-Windows in the VST
         // in single-window-mode
         // !!!! another call MUST be done at the end of this procedure !!!
-        if UseSkin AND GlobalUseAdvancedSkin then
+        if UseSkin AND GlobalUseAdvancedSkin {and (Anzeigemode = 0)} then
         begin
             SendMessage( Handle, WM_SETREDRAW, 0, 0);
         end;
@@ -708,7 +708,7 @@ begin
 
         //LockWindowUpdate(0);
         {$IFDEF USESTYLES}
-        if UseSkin AND GlobalUseAdvancedSkin then
+        if UseSkin AND GlobalUseAdvancedSkin {and (Anzeigemode = 1)} then
         begin
             SendMessage(Handle, WM_SETREDRAW, 1, 0);
             Refresh;

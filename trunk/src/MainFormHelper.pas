@@ -93,7 +93,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     // SwitchBrowsePanel: entsprechendes Anzeigen der Liste
     procedure SwitchBrowsePanel(NewMode: Integer);
 
-    procedure RestoreCoverFlowAfterSearch;
+    procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 
 //    procedure BackupComboboxes;    // We dont have any comboboxes on the mainform
 //    procedure RestoreComboboxes;   // except the genre-box
@@ -1018,12 +1018,14 @@ begin
     end;
 end;
 
-procedure RestoreCoverFlowAfterSearch;
+procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 var aCover: tNempCover;
 begin
     with Nemp_MainForm do
     begin
-        if MedienBib.BrowseMode = 1 then
+        if (MedienBib.BrowseMode = 1) and
+        ( MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow or ForceUpdate)
+        then
         begin
             RefreshCoverFlowTimer.Enabled := False;
             MedienBib.ReBuildCoverList(False);
@@ -1229,6 +1231,9 @@ begin
           else AlbenVST.Header.Columns[0].Text := '(N/A)';
         end;
         AlbenVST.Invalidate;
+
+        // refill playlist headers
+        NempPlaylist.ShowPlayListSummary;
 
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label

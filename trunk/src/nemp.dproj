@@ -95,10 +95,10 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Release>3</VerInfo_Release>
+        <VerInfo_Release>4</VerInfo_Release>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Build>565</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.3.565;InternalName=;LegalCopyright=2005-2016, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
+        <VerInfo_Build>568</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.4.568;InternalName=;LegalCopyright=2005-2016, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.6;Comments=</VerInfo_Keys>
         <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
     </PropertyGroup>
     <ItemGroup>
@@ -297,7 +297,7 @@ uses
                     <VersionInfo Name="MajorVer">4</VersionInfo>
                     <VersionInfo Name="MinorVer">6</VersionInfo>
                     <VersionInfo Name="Release">0</VersionInfo>
-                    <VersionInfo Name="Build">589</VersionInfo>
+                    <VersionInfo Name="Build">590</VersionInfo>
                     <VersionInfo Name="Debug">False</VersionInfo>
                     <VersionInfo Name="PreRelease">False</VersionInfo>
                     <VersionInfo Name="Special">False</VersionInfo>
@@ -309,7 +309,7 @@ uses
                 <VersionInfoKeys>
                     <VersionInfoKeys Name="CompanyName"/>
                     <VersionInfoKeys Name="FileDescription">Noch ein Mp3-Player</VersionInfoKeys>
-                    <VersionInfoKeys Name="FileVersion">4.6.0.589</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">4.6.0.590</VersionInfoKeys>
                     <VersionInfoKeys Name="InternalName"/>
                     <VersionInfoKeys Name="LegalCopyright">2005-2012, Daniel Gaussmann</VersionInfoKeys>
                     <VersionInfoKeys Name="LegalTrademarks"/>

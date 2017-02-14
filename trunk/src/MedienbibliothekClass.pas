@@ -280,16 +280,16 @@ type
         function DrivesHaveChanged: Boolean;
 
         // Saving/loading the *.gmp-File
-        procedure LoadDrivesFromStream(aStream: TStream);
+        function LoadDrivesFromStream(aStream: TStream): Boolean;
         procedure SaveDrivesToStream(aStream: TStream);
 
-        procedure LoadAudioFilesFromStream(aStream: TStream);
+        function LoadAudioFilesFromStream(aStream: TStream): Boolean;
         procedure SaveAudioFilesToStream(aStream: TStream);
 
-        procedure LoadPlaylistsFromStream(aStream: TStream);
+        function LoadPlaylistsFromStream(aStream: TStream): Boolean;
         procedure SavePlaylistsToStream(aStream: TStream);
 
-        procedure LoadRadioStationsFromStream(aStream: TStream);
+        function LoadRadioStationsFromStream(aStream: TStream): Boolean;
         procedure SaveRadioStationsToStream(aStream: TStream);
 
         procedure LoadFromFile4(aStream: TStream);
@@ -4900,11 +4900,12 @@ end;
     - Read/Write a List of TDrives
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadDrivesFromStream(aStream: TStream);
+function TMedienBibliothek.LoadDrivesFromStream(aStream: TStream): Boolean;
 var SavedDriveList: TObjectList;
     DriveCount, i: Integer;
     newDrive: TDrive;
 begin
+    result := True;
     SavedDriveList := TObjectList.Create;
     aStream.Read(DriveCount, SizeOf(Integer));
 
@@ -4946,12 +4947,13 @@ end;
     - Read/Write a List of TAudioFiles
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream);
+function TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream): Boolean;
 var FilesCount, i, DriveID: Integer;
     newAudioFile: TAudioFile;
     ID: Byte;
     CurrentDriveChar: WideChar;
 begin
+    result := True;
     CurrentDriveChar := 'C';
     aStream.Read(FilesCount, SizeOf(FilesCount));
     for i := 1 to FilesCount do
@@ -4973,7 +4975,12 @@ begin
                     aStream.Read(ID, SizeOf(ID));
                     if ID <> 0 then
                     begin
-                        MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ID <> 0'), mtError, [MBOK], 0);
+                        //MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ID <> 0'), mtError, [MBOK], 0);
+                        SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid audiofile data' +
+                                        #13#10 + 'DriveID: ID <> 0' )));
+                        result := False;
                         exit;
                     end;
                     if DriveID = -1 then
@@ -4986,12 +4993,22 @@ begin
                     UpdateList.Add(newAudioFile);
                 end else
                 begin
-                    MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ' + IntToStr(DriveID)), mtError, [MBOK], 0);
+                    //MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ' + IntToStr(DriveID)), mtError, [MBOK], 0);
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid audiofile data' +
+                                        #13#10 + 'invalid DriveID')));
+                    result := False;
                     exit;
                 end;
             end;
         else
-            MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'Expected value: 0 or 1, given value: ' + inttostr(ID)), mtError, [MBOK], 0);
+            // MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'Expected value: 0 or 1, given value: ' + inttostr(ID)), mtError, [MBOK], 0);
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                        #13#10 + 'invalid audiofile data' +
+                        #13#10 + 'invalid ID' )));
+            result := False;
             aStream.Position := aStream.Position - SizeOf(ID);
             exit;
         end;
@@ -5071,7 +5088,7 @@ end;
     - Read/Write a List of Playlist-Files (TJustaStrings)
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadPlaylistsFromStream(aStream: TStream);
+function TMedienBibliothek.LoadPlaylistsFromStream(aStream: TStream): Boolean;
 var FilesCount, i, DriveID: Integer;
     jas: TJustaString;
     ID: Byte;
@@ -5080,6 +5097,7 @@ var FilesCount, i, DriveID: Integer;
     tmpWs: UnicodeString;
     len: Integer;
 begin
+    result := True;
     CurrentDriveChar := 'C';
     aStream.Read(FilesCount, SizeOf(FilesCount));
     for i := 1 to FilesCount do
@@ -5105,7 +5123,12 @@ begin
                     aStream.Read(ID, SizeOf(ID));
                     if ID <> 0 then
                     begin
-                        MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ID <> 0'), mtError, [MBOK], 0);
+                        //MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ID <> 0'), mtError, [MBOK], 0);
+                        SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid playlist data' +
+                                        #13#10 + 'DriveID: ID <> 0' )));
+                        result := False;
                         exit;
                     end;
                     if DriveID = -1 then
@@ -5122,12 +5145,22 @@ begin
                     PlaylistUpdateList.Add(jas);
                 end else
                 begin
-                    MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ' + IntToStr(DriveID)), mtError, [MBOK], 0);
+                    //MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'DriveID falsch: ' + IntToStr(DriveID)), mtError, [MBOK], 0);
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid playlist data' +
+                                        #13#10 + 'invalid DriveID' )));
+                    result := False;
                     exit;
                 end;
             end;
         else
-            MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'ID falsch: ' + inttostr(ID)), mtError, [MBOK], 0);
+            //MessageDLG((Medialibrary_InvalidLibFile + #13#10 + 'ID falsch: ' + inttostr(ID)), mtError, [MBOK], 0);
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                            Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                #13#10 + 'invalid playlist data' +
+                                #13#10 + 'invalid ID' )));
+            result := False;
             exit;
         end;
     end;
@@ -5206,10 +5239,13 @@ end;
     - Read/Write a List of Webradio stations
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadRadioStationsFromStream(aStream: TStream);
+function TMedienBibliothek.LoadRadioStationsFromStream(aStream: TStream): Boolean;
 var i, c: Integer;
     NewStation: TStation;
 begin
+    // todo: Some error handling?
+    Result := True;
+
     aStream.Read(c, SizeOf(c));
     // Stationen laden
     for i := 1 to c do
@@ -5249,6 +5285,7 @@ end;
 procedure TMedienBibliothek.LoadFromFile4(aStream: TStream);
 var MainID: Byte;
     BlockSize: Integer;
+    GoOn: Boolean;
 begin
   // neues Format besteht aus mehreren "Blöcken"
   // Jeder Block beginnt mit einer ID (1 Byte)
@@ -5257,17 +5294,17 @@ begin
   // wichtig: Zuerst die Laufwerks-Liste in die Datei speichern,
   // DANACH die Audiodateien
   // Denn: In der Audioliste wird Bezug auf die UsedDrives genommen!!
-
-  While aStream.Position < aStream.Size do
+  GoOn := True;
+  While (aStream.Position < aStream.Size) and GoOn do
   begin
       aStream.Read(MainID, SizeOf(Byte));
       aStream.Read(BlockSize, SizeOf(Integer));
 
       case MainID of
-          1: LoadAudioFilesFromStream(aStream); // Audiodaten lesen
-          2: LoadDrivesFromStream(aStream); // Drive-Info lesen
-          3: LoadPlaylistsFromStream(aStream);
-          4: LoadRadioStationsFromStream(aStream);
+          1: GoOn := LoadAudioFilesFromStream(aStream); // Audiodaten lesen
+          2: GoOn := LoadDrivesFromStream(aStream); // Drive-Info lesen
+          3: GoOn := LoadPlaylistsFromStream(aStream);
+          4: GoOn := LoadRadioStationsFromStream(aStream);
       else
         aStream.Seek(BlockSize, soFromCurrent);
       end;
@@ -5308,9 +5345,11 @@ var
     aStream: TMemoryStream;
     Header: AnsiString;
     version, Subversion: byte;
+    success: Boolean;
 begin
     // if StatusBibUpdate <> 0 then exit;
 
+    success := True; // think positive!
     if FileExists(aFilename) then
     begin
         try
@@ -5326,8 +5365,14 @@ begin
                 if Header = 'GMP' then
                 begin
                     case Version of
-                        2: MessageDLG((Medialibrary_LibFileTooOld), mtError, [MBOK], 0);
-                        3: MessageDLG((Medialibrary_LibFileTooOld), mtError, [MBOK], 0);
+                        2,
+                        3: begin
+                            //MessageDLG((Medialibrary_LibFileTooOld), mtError, [MBOK], 0);
+                            SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_LibFileTooOld) )));
+
+                            success := False;
+                        end;
                         4: begin
                             if Subversion <= 1 then // new in Nemp 4.0: Subversion changed to 1
                                                     // (additional value in RadioStations)
@@ -5337,10 +5382,21 @@ begin
                                 LeaveCriticalSection(CSAccessDriveList);
                                 NewFilesUpdateBib(True);
                             end else
-                                MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
+                            begin
+                                //MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
+                                SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_LibFileTooYoung) )));
+                                success := False;
+                            end;
                         end
                         else
-                            MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
+                        begin
+                            //MessageDLG((Medialibrary_LibFileTooYoung), mtError, [MBOK], 0);
+                            SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                Integer(PWideChar(_(Medialibrary_LibFileTooYoung) )));
+
+                            success := False;
+                        end;
 
                     end; // case Version
 
@@ -5353,13 +5409,27 @@ begin
                                 ImportFavorites(SavePath + 'default.nwl')
                     end;
                 end else // if Header = 'GMP'
-                    MessageDLG((Medialibrary_InvalidLibFile), mtError, [MBOK], 0);
+                begin
+                    //MessageDLG((Medialibrary_InvalidLibFile), mtError, [MBOK], 0);
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                            Integer(PWideChar(_(Medialibrary_InvalidLibFile) )));
+                    success := False;
+                end;
 
+                if Not Success then
+                    // We have no valid library, but we have to update anyway,
+                    // as this ensures AutoScan and/or webserver-activation
+                    NewFilesUpdateBib(True);
             finally
                 FreeAndNil(aStream);
             end;
         except
-            on E: Exception do MessageDLG((ErrorLoadingMediaLib) + #13#10 + E.Message, mtError, [mbOK], 0);
+            on E: Exception do begin
+                //MessageDLG((ErrorLoadingMediaLib) + #13#10 + E.Message, mtError, [mbOK], 0);
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                        Integer(PWideChar((ErrorLoadingMediaLib) + #13#10 + E.Message )));
+                success := False;
+            end;
         end;
     end else
     begin

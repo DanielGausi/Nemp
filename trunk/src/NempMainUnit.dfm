@@ -2346,7 +2346,7 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alClient
         BevelInner = bvRaised
         BevelOuter = bvLowered
-        TabOrder = 0
+        TabOrder = 1
         OnPaint = NewPanelPaint
         OwnerDraw = False
         object PlaylistVST: TVirtualStringTree
@@ -2442,7 +2442,7 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 28
         Align = alTop
         BevelOuter = bvNone
-        TabOrder = 1
+        TabOrder = 0
         OnPaint = PanelPaint
         OwnerDraw = False
         DesignSize = (
@@ -2450,23 +2450,23 @@ object Nemp_MainForm: TNemp_MainForm
           28)
         object PlaylistFillPanel: TNempPanel
           Tag = 1
-          Left = 28
+          Left = 103
           Top = 2
-          Width = 337
+          Width = 262
           Height = 24
           Anchors = [akLeft, akTop, akRight]
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 0
+          TabOrder = 1
           OnPaint = TABPanelPaint
           OwnerDraw = False
           DesignSize = (
-            337
+            262
             24)
           object PlayListStatusLBL: TLabel
             Left = 8
             Top = 5
-            Width = 320
+            Width = 245
             Height = 13
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
@@ -2483,7 +2483,7 @@ object Nemp_MainForm: TNemp_MainForm
           Hint = 'Show context menu'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 1
+          TabOrder = 2
           TabStop = False
           OnClick = TabPanelPlaylistClick
           DrawMode = dm_Skin
@@ -2494,6 +2494,18 @@ object Nemp_MainForm: TNemp_MainForm
           FocusDrawMode = fdm_Windows
           Color1 = clBlack
           Color2 = clBlack
+        end
+        object EditPlaylistSearch: TEdit
+          Left = 32
+          Top = 3
+          Width = 65
+          Height = 21
+          TabOrder = 0
+          Text = 'Suche'
+          OnEnter = EditPlaylistSearchEnter
+          OnExit = EditPlaylistSearchExit
+          OnKeyDown = EditPlaylistSearchKeyDown
+          OnKeyPress = EditPlaylistSearchKeyPress
         end
       end
     end
@@ -3015,7 +3027,7 @@ object Nemp_MainForm: TNemp_MainForm
         Color2 = clBlack
       end
       object CB_MedienBibGlobalQuickSearch: TSkinButton
-        Left = 206
+        Left = 210
         Top = 6
         Width = 16
         Height = 16
@@ -3024,6 +3036,7 @@ object Nemp_MainForm: TNemp_MainForm
         Spacing = 2
         TabOrder = 1
         TabStop = False
+        Visible = False
         OnClick = CB_MedienBibGlobalQuickSearchClick
         DrawMode = dm_Skin
         NumGlyphsX = 1
@@ -3222,7 +3235,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_ML_Search: TMenuItem
         Caption = 'Search'
-        ShortCut = 16454
+        ShortCut = 24646
         OnClick = MM_ML_SearchClick
       end
       object N23: TMenuItem
@@ -4008,7 +4021,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000AB80A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000AF80A0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4473,7 +4486,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300BE80B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300B280C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5673,13 +5686,13 @@ object Nemp_MainForm: TNemp_MainForm
       'All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lis' +
       'ts|*.m3u|m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nem' +
       'p playlists|*.npl|WindowsMedia|*.asx;*.wax'
-    Left = 625
-    Top = 9
+    Left = 705
+    Top = 17
   end
   object PlaylistDateienOpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-    Left = 656
-    Top = 8
+    Left = 736
+    Top = 16
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'gmp'
@@ -5696,8 +5709,8 @@ object Nemp_MainForm: TNemp_MainForm
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     OnTypeChange = PlayListSaveDialogTypeChange
-    Left = 689
-    Top = 9
+    Left = 769
+    Top = 17
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = 'gmp'
@@ -7400,7 +7413,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07240810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07640810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
