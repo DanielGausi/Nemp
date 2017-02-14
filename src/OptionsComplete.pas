@@ -1992,7 +1992,7 @@ end;
 
 procedure TOptionsCompleteForm.BTNApplyClick(Sender: TObject);
 var i,s,l, maxfont:integer;
-  NeedUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate: boolean;
+  NeedUpdate, NeedTotalStringUpdate, NeedTotalLyricStringUpdate, NeedCoverFlowSearchUpdate: boolean;
   newLanguage, tmp: String;
   ReDrawVorauswahlTrees, ReDrawPlaylistTree, ReDrawMedienlistTree: Boolean;
   Ini: TMemIniFile;
@@ -2209,6 +2209,8 @@ begin
   NeedUpdate := False;
   NeedTotalStringUpdate := False;
   NeedTotalLyricStringUpdate := False;
+  NeedCoverFlowSearchUpdate := False;
+
   if MedienBib.StatusBibUpdate = 0 then
   begin
       if ((
@@ -2236,6 +2238,11 @@ begin
           // Update needed
           NeedUpdate := True;
       end;
+      if (MedienBib.BrowseMode = 1)  AND
+          (cb_ChangeCoverflowOnSearch.Checked <> MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow) 
+      then
+            NeedCoverFlowSearchUpdate := True;
+            
       // However, we can synchronize VCL and Data here always. ;-)
       MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
       MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
@@ -2422,6 +2429,10 @@ begin
   if NeedTotalLyricStringUpdate then Medienbib.BuildTotalLyricString;
   if NeedTotalStringUpdate then MedienBib.BuildTotalString;
 
+  if NeedCoverFlowSearchUpdate then
+      RestoreCoverFlowAfterSearch(True);
+
+      
   if NeedUpdate then
   begin
       // Browse-Listen neu aufbauen
@@ -2495,7 +2506,7 @@ begin
       VST.Font.Size := NempOptions.DefaultFontSize;
 
       PlaylistVST.Canvas.Font.Size := maxFont;
-      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99');
+      PlaylistVST.Header.Columns[1].Width := PlaylistVST.Canvas.TextWidth('@99:99hm');
       PlaylistVSTResize(Nil);
 
       PlaylistVST.Font.Size := NempOptions.DefaultFontSize;

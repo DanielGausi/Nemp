@@ -75,6 +75,7 @@ type
     BtnExtendSearch: TButton;
     CBFehlerToleranz: TCheckBox;
     BtnClear: TButton;
+    BtnCancel: TButton;
     procedure Btn_ExtendedSearchClick(Sender: TObject);
     procedure cbIgnoreGenresClick(Sender: TObject);
     procedure cbIgnoreYearClick(Sender: TObject);
@@ -82,6 +83,7 @@ type
     procedure CB_SearchHistoryChange(Sender: TObject);
     procedure BtnClearClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure BtnCancelClick(Sender: TObject);
   private
     { Private-Deklarationen }
     procedure FillSuchComboBox;
@@ -259,6 +261,11 @@ begin
   CB_SearchHistory.ItemIndex := 0;
 end;
 
+
+procedure TFormBibSearch.BtnCancelClick(Sender: TObject);
+begin
+    Close;
+end;
 
 procedure TFormBibSearch.BtnClearClick(Sender: TObject);
 begin

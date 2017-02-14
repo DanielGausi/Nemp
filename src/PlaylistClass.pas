@@ -93,6 +93,8 @@ type
       fCurrentHistoryFile: TAudioFile;
       HistoryList: TObjectList;
 
+      fLastHighlightedSearchResultNode: PVirtualNode;
+
       function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
@@ -191,6 +193,9 @@ type
       property InsertIndex: Integer read fInsertIndex;
       property PrebookCount: Integer read fGetPreBookCount;
 
+      property LastHighlightedSearchResultNode: PVirtualNode read fLastHighlightedSearchResultNode;
+
+
 
       constructor Create;
       destructor Destroy; override;
@@ -208,7 +213,7 @@ type
       procedure PlayNext(aUserinput: Boolean = False);
       procedure PlayPrevious(aUserinput: Boolean = False);
       procedure PlayPreviousFile(aUserinput: Boolean = False);
-      procedure PlayFocussed;
+      procedure PlayFocussed(aSelection: PVirtualNode = Nil);
       procedure PlayAgain(ForcePlay: Boolean = False);
       procedure Pause;
       procedure Stop;
@@ -287,11 +292,19 @@ type
       procedure DeleteAFile(aIdx: Integer); // delete a file (for WebServer)
 
       procedure ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
+
+      procedure ClearSearch(complete: Boolean = False);
+      procedure SearchAll(aString: String); 
+      procedure Search(aString: String; SearchNext: Boolean = False);
+
+      //procedure ScrollToNextSearchResult;
+      //procedure ScrollToPreviousSearchResult;
+
   end;
 
 implementation
 
-uses NempMainUnit, spectrum_vis;
+uses NempMainUnit, spectrum_vis, BibSearchClass;
 
 var tid      : Cardinal;
 
@@ -321,6 +334,7 @@ begin
   BufferStringList := TStringList.Create;
   ProcessingBufferlist := False;
   fFirstAction := True;
+  fLastHighlightedSearchResultNode := Nil;
 end;
 
 destructor TNempPlaylist.Destroy;
@@ -509,7 +523,7 @@ begin
           if assigned(fPlayingNode) then VST.InvalidateNode(fPlayingNode);
           fDauer := fDauer  - OriginalLength;
           Stop;
-          VST.Header.Columns[1].Text := SekToPlaylistZeitString(fDauer);
+          VST.Header.Columns[1].Text := SekToZeitString(fDauer);
           //showmessage(Inttostr(fDauer));
         end;
     except
@@ -529,7 +543,7 @@ begin
           //OldLength := fPlayingFile.Dauer;
           fPlayingFile.Duration := Round(Player.Dauer);
           fDauer := fDauer + (fPlayingFile.Duration - OriginalLength);
-          VST.Header.Columns[1].Text := SekToPlaylistZeitString(fDauer);
+          VST.Header.Columns[1].Text := SekToZeitString(fDauer);
           VST.Invalidate;
         end;
     except
@@ -710,15 +724,19 @@ begin
   end;
 end;
 
-procedure TNempPlaylist.PlayFocussed;
+procedure TNempPlaylist.PlayFocussed(aSelection: PVirtualNode = Nil);
 var Node, NewCueNode: PVirtualNode;
     Data: PTreeData;
     CueTime: Single;
 begin
   if not AcceptInput then exit;
-  Node := VST.FocusedNode;
+  if not assigned(aSelection) then
+      Node := VST.FocusedNode
+  else
+      Node := aSelection;
+
   if Not Assigned(Node) then Exit;
-  if Not VST.Selected[Node] then Exit;
+  if (Not VST.Selected[Node]) and (not assigned(aSelection)) then Exit;
 
   // add the current title into the history
   UpdateHistory;
@@ -864,6 +882,7 @@ begin
     HistoryList.Clear;
     PrebookList.Clear;
     Playlist.Clear;
+    fLastHighlightedSearchResultNode := Nil;
 
     fPlayingNode := Nil;
     fCurrentHistoryFile := Nil;
@@ -950,12 +969,171 @@ begin
 end;
 
 
+
+(*
+procedure TNempPlaylist.ScrollToNextSearchResult;
+begin
+    if not assigned(fVST) then exit;
+
+    if not assigned(fLastHighlightedSearchResultNode) then
+        fLastHighlightedSearchResultNode := fVst.GetFirstSelected
+    else
+        fLastHighlightedSearchResultNode := fVST.GetNextSelected(fLastHighlightedSearchResultNode);
+
+    // if there is no "next", take "first"
+    if not assigned(fLastHighlightedSearchResultNode) then
+        fLastHighlightedSearchResultNode := fVst.GetFirstSelected;
+
+    if assigned(fLastHighlightedSearchResultNode) then
+    begin
+        fVst.ScrollIntoView(fLastHighlightedSearchResultNode, False);
+        fVst.FocusedNode := fLastHighlightedSearchResultNode;
+    end;
+    fVst.Invalidate;
+end;
+
+procedure TNempPlaylist.ScrollToPreviousSearchResult;
+begin
+    if not assigned(fVST) then exit;
+
+    if not assigned(fLastHighlightedSearchResultNode) then
+        fLastHighlightedSearchResultNode := fVst.GetFirstSelected
+    else
+        fLastHighlightedSearchResultNode := fVST.GetPreviousSelected(fLastHighlightedSearchResultNode);
+
+    // if there is no "previous", take "last"
+    if not assigned(fLastHighlightedSearchResultNode) then
+    begin
+        fLastHighlightedSearchResultNode := fVst.GetLast;
+        fLastHighlightedSearchResultNode := fVST.GetPreviousSelected(fLastHighlightedSearchResultNode);
+    end;
+
+    if assigned(fLastHighlightedSearchResultNode) then
+    begin
+        fVst.ScrollIntoView(fLastHighlightedSearchResultNode, False);
+        fVst.FocusedNode := fLastHighlightedSearchResultNode;
+    end;
+    fVst.Invalidate;
+end;
+*)
+
+procedure TNempPlaylist.ClearSearch(complete: Boolean = False);
+var currentNode: PVirtualNode;
+begin
+    if not assigned(fVST) then exit;
+    currentNode := VST.GetFirst;
+    while assigned(currentNode) do
+    begin
+        fVst.Selected[currentNode] := False;
+        currentNode := fVST.GetNext(currentNode);
+    end;
+    if complete then    
+        fLastHighlightedSearchResultNode := Nil;
+
+    fVst.Invalidate;
+end;
+
+// just select all hits. No ScrollIntoFocus needed here
+procedure TNempPlaylist.SearchAll(aString: String);
+var Keywords: TStringList;
+    currentFile: TAudioFile;
+    currentNode: PVirtualNode;
+    Data:PTreeData;
+begin
+    if not assigned(fVST) then exit;
+
+    Keywords := ExplodeWithQuoteMarks(' ', aString);
+    currentNode := VST.GetFirst;
+    while assigned(currentNode) do
+    begin
+          Data := VST.GetNodeData(currentNode);
+          currentFile := Data^.FAudioFile;
+          if AudioFileMatchesKeywordsPlaylist(currentFile, Keywords) then
+          begin
+              VST.Selected[currentNode] := true;
+              if (currentNode.Parent <> NIL) then
+                  VST.Expanded[currentNode.Parent] := true;
+          end 
+          else
+              VST.Selected[currentNode] := False;
+          currentNode := VST.GetNext(currentNode);                    
+    end;
+    fVst.Invalidate;
+    Keywords.Free;
+end;
+
+procedure TNempPlaylist.Search(aString: String; SearchNext: Boolean = False);
+var Keywords: TStringList;
+    currentFile: TAudioFile;
+    currentNode, TargetNode, startNode: PVirtualNode;
+    Data:PTreeData;
+begin
+    if not assigned(fVST) then exit;
+
+    if assigned(fVst.FocusedNode) then
+        currentNode := VST.FocusedNode
+    else
+        currentNode := fVst.GetFirst;
+
+    if not assigned(currentNode) then exit;
+
+    // deselect this Node later (if needed)
+    // oldSelectedNode := currentNode;  
+    if SearchNext then
+    begin
+        if currentNode = fVst.GetLast then
+            currentNode := fVst.GetFirst
+        else
+            currentNode := fVst.GetNext(currentNode);
+    end else
+    begin
+        // we are searching a new keyword (probably)
+        // deselect all files
+        ClearSearch(False);
+    end;
+
+    Keywords := ExplodeWithQuoteMarks(' ', aString);
+    TargetNode := Nil;
+    startNode := currentNode;
+    repeat
+        Data := fVST.GetNodeData(currentNode);
+        currentFile := Data^.FAudioFile;
+        
+        if AudioFileMatchesKeywordsPlaylist(currentFile, Keywords) then           
+            // found the next hit!
+            TargetNode := currentNode;
+            
+        // if not: try next node
+        currentNode := fVST.GetNext(currentNode);
+        // or start again at the beginning
+        if not assigned(currentNode) then
+            currentNode := fVST.GetFirst;               
+    until (assigned(TargetNode) or (currentNode = startNode));
+    Keywords.Free;
+    
+    //if TargetNode <> oldSelectedNode then
+    //    fVST.Selected[oldSelectedNode] := False;            
+
+    fLastHighlightedSearchResultNode := TargetNode;
+    if assigned(fLastHighlightedSearchResultNode) then
+    begin
+        fVST.ScrollIntoView(fLastHighlightedSearchResultNode, True);
+        fVST.FocusedNode := fLastHighlightedSearchResultNode;
+        //fVST.Selected[fLastHighlightedSearchResultNode] := True;        
+    end;
+   
+    fVst.Invalidate;
+end;
+
+
+
 {
     --------------------------------------------------------
     Some GUI-stuff
     --------------------------------------------------------
 }
 // Setter for property InsertNode
+
 procedure TNempPlaylist.SetInsertNode(Value: PVirtualNode);
 begin
   if Assigned(Value) then
@@ -1017,6 +1195,8 @@ var i,c: integer;
   aData: PTreeData;
 begin
   if not assigned(fVST) then exit;
+
+  fLastHighlightedSearchResultNode := Nil;
   fVST.BeginUpdate;
   fVST.Clear;
   for i:=0 to Playlist.Count-1 do
@@ -1092,14 +1272,14 @@ begin
         end;
     end;
     fDauer := fDauer + (AudioFile.Duration - OldLength);
-    VST.Header.Columns[1].Text := SekToPlaylistZeitString(fDauer);
+    VST.Header.Columns[1].Text := SekToZeitString(fDauer);
     VST.Invalidate;
 end;
 
 procedure TNempPlaylist.UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
 begin
   aVST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Playlist.Count]);// 'Titel (' + IntToStr(Playlist.Count) + ')';
-  aVST.Header.Columns[1].Text := SekToPlaylistZeitString(fdauer);
+  aVST.Header.Columns[1].Text := SekToZeitString(fdauer);
 end;
 
 function TNempPlaylist.ShowPlayListSummary: Int64;
@@ -1108,8 +1288,9 @@ begin
   result := 0;
   for i:= 0 to PlayList.Count - 1 do
     result := result + (PlayList[i] as TAudioFile).Duration;
-  VST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Titles), Playlist.Count]);//'Titel (' + inttostr(PlayList.Count) + ')';
-  VST.Header.Columns[1].Text := SekToPlaylistZeitString(result);
+    //(TreeHeader_Titles)
+  VST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Playlist.Count]);//'Titel (' + inttostr(PlayList.Count) + ')';
+  VST.Header.Columns[1].Text := SekToZeitString(result);
 end;
 
 

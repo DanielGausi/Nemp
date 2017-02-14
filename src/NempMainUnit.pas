@@ -844,6 +844,7 @@ type
     MM_O_Skin_UseAdvanced: TMenuItem;
     PM_P_Skin_UseAdvancedSkin: TMenuItem;
     CoverFlowRefreshViewTimer: TTimer;
+    EditPlaylistSearch: TEdit;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1425,6 +1426,12 @@ type
     procedure PanelCoverBrowseMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure CoverFlowRefreshViewTimerTimer(Sender: TObject);
+    procedure EditPlaylistSearchEnter(Sender: TObject);
+    procedure EditPlaylistSearchExit(Sender: TObject);
+    procedure EditPlaylistSearchChange(Sender: TObject);
+    procedure EditPlaylistSearchKeyPress(Sender: TObject; var Key: Char);
+    procedure EditPlaylistSearchKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
 
   private
     CoverImgDownX: Integer;
@@ -2029,7 +2036,7 @@ begin
         ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
         try
             ini.Encoding := TEncoding.UTF8;
-            WriteNempOptions(ini, NempOptions);
+            WriteNempOptions(ini, NempOptions, AnzeigeMode);
 
             Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
             ini.WriteBool('Fenster', 'UseSkin', UseSkin);
@@ -2226,6 +2233,7 @@ begin
   // NEMPWINDOW_BOTH = 3;
   // NEMPWINDOW_BOTH_MIN_TRAY = 4;
 
+
   // nur minimiert im Tray: Icon erzeugen
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
     NempTrayIcon.Visible := True;
@@ -2311,11 +2319,16 @@ begin
   // NEMPWINDOW_BOTH = 3;
   // NEMPWINDOW_BOTH_MIN_TRAY = 4;
 
+
+
+
+
   if NempOptions.NempWindowView = NEMPWINDOW_TASKBAR_MIN_TRAY then
       NempTrayIcon.Visible := False;
 
+  ///02.2017
   ShowWindow(Application.Handle, SW_RESTORE);
-
+  ///02.2017
   SetForegroundWindow(Nemp_MainForm.Handle);
 
   RepairZOrder;
@@ -2326,7 +2339,9 @@ begin
   //    ShowWindow( Application.Handle, SW_HIDE );
 
   Show;
+  ///02.2017
   ShowApplication;
+  ///02.2017
   Application.ShowMainForm := True;
 
   if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
@@ -2542,6 +2557,7 @@ end;
 
 procedure TNemp_MainForm.NempTrayIconClick(Sender: TObject);
 begin
+    ///02.2017
     RestoreNemp;
 end;
 
@@ -4296,7 +4312,8 @@ begin
 
         if  (NempSkin.isActive) AND
             (vsSelected in Node.States) AND
-            (Sender.Focused) then
+            ((Sender.Focused) OR ((Sender = PlaylistVST) and EditPlaylistSearch.Focused))
+            then
         begin
           if Sender = PlaylistVST then
             font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[3]
@@ -4417,9 +4434,13 @@ var Node,ScrollNode: PVirtualNode;
             AudioFile := Data^.FAudioFile;
 
             case FocussedAttribut of
-                CON_ARTIST: aString := AudioFile.Artist;
-                CON_TITEL: aString := AudioFile.Titel;
-                CON_ALBUM: aString := AudioFile.Album;
+                CON_ARTIST    : aString := AudioFile.Artist;
+                CON_TITEL     : aString := AudioFile.Titel;
+                CON_ALBUM     : aString := AudioFile.Album;
+                CON_PFAD,
+                CON_ORDNER    : aString := AudioFile.Ordner;
+                CON_DATEINAME : aString := AudioFile.Dateiname;
+                CON_EXTENSION : aString := AudioFile.Extension;
             else
                 aString := AudioFile.Artist;
             end;
@@ -4439,7 +4460,7 @@ var Node,ScrollNode: PVirtualNode;
 begin
   // Das dann der Form.OnKEydown überlassen
   if ssctrl in Shift then exit;
-  
+
   case key of
     VK_Return: begin
         case NempPlaylist.DefaultAction of
@@ -4489,8 +4510,6 @@ end;
 
 
 
-
-
 procedure TNemp_MainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -4518,6 +4537,12 @@ begin
 
     $54 {T}: if ssCtrl in shift then
               PM_P_ViewStayOnTopClick(NIL);
+
+    $46: begin       // F
+        if (ssCtrl in Shift) then
+            EditFastSearch.SetFocus;
+    end;
+
 
     VK_F7: begin
         SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
@@ -5160,6 +5185,8 @@ begin
     HideTagMemo;
 end;
 
+
+
 procedure TNemp_MainForm.EdtBibArtistExit(Sender: TObject);
 begin
     ShowLabelAgain(Sender as TControl, GetCorrespondingLabel(Sender as TControl));
@@ -5383,6 +5410,25 @@ begin
               Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
               );
       end;
+
+      if (Node = NempPlaylist.LastHighlightedSearchResultNode) then
+      begin
+        if NempSkin.isActive then
+            Pen.Color := NempSkin.SkinColorScheme.PlaylistPlayingFileColor
+        else
+            Pen.Color := clGradientActiveCaption;
+        pen.Width := 1;//3;
+        pen.Style := psDot;
+
+        Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
+              );
+      end;
+
+
 
       Data := PlaylistVST.GetNodeData(Node);
       if assigned(Data) then
@@ -6944,6 +6990,26 @@ begin
        NempPlaylist.PlayFocussed;
        Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
     end;
+
+    $46: begin
+        if (ssCtrl in Shift) then
+            EditPlaylistSearch.SetFocus;
+    end;
+
+    VK_F3: begin
+          if (EditPlaylistSearch.Tag = 1) and (Length(Trim(EditPlaylistSearch.Text)) >= 3) then // search is active
+          // scroll into next node
+          // if (ssCtrl in Shift) then
+          //    NempPlaylist.ScrollToPreviousSearchResult;
+          // else
+          begin
+              // search again (to reselect nodes) ...
+              if Length(Trim(EditPlaylistSearch.Text)) >= 2 then
+                  NempPlaylist.Search(EditPlaylistSearch.Text, True);
+              //if NempPlaylist.Search(EditPlaylistSearch.Text, True) then
+              //    NempPlaylist.ScrollToNextSearchResult;
+          end;
+      end;
 
     VK_F9: begin
      if (NempPlayer.JingleStream = 0) then
@@ -9183,7 +9249,8 @@ end;
 
 procedure TNemp_MainForm.EDITFastSearchEnter(Sender: TObject);
 begin
-  if EditFastSearch.Font.Color = clGrayText then
+  //if EditFastSearch.Font.Color = clGrayText then
+  if EditFastSearch.Tag = 0 then
   begin
       EditFastSearch.OnChange := Nil;
       EditFastSearch.Text := '';
@@ -9193,6 +9260,7 @@ begin
       EditFastSearch.SelectAll;
   EditFastSearch.Font.Color := clWindowText;
   EditFastSearch.Font.Style := [];
+  EditFastSearch.Tag := 1;
 end;
 
 procedure TNemp_MainForm.EDITFastSearchExit(Sender: TObject);
@@ -9201,10 +9269,101 @@ begin
   begin
     EditFastSearch.Font.Color := clGrayText;
     EditFastSearch.Font.Style := [];
+    EditFastSearch.Tag := 0;
     EditFastSearch.OnChange := Nil;
     EditFastSearch.Text := MainForm_GlobalQuickSearch;
     EditFastSearch.OnChange := EDITFastSearchChange;
   end;
+end;
+
+
+//--------------------
+// Playlist-Search
+//--------------------
+procedure TNemp_MainForm.EditPlaylistSearchEnter(Sender: TObject);
+begin
+    if EditPlaylistSearch.Tag = 0 then
+    begin
+        EditPlaylistSearch.OnChange := Nil;
+        EditPlaylistSearch.Text := '';
+        EditPlaylistSearch.OnChange := EditPlaylistSearchChange;
+    end
+    else
+    begin
+        EditPlaylistSearch.SelectAll;
+        if Length(Trim(EditPlaylistSearch.Text)) >= 3 then
+            // do search ...
+            NempPlaylist.Search(EditPlaylistSearch.Text)
+    end;
+
+    EditPlaylistSearch.Font.Color := clWindowText;
+    EditPlaylistSearch.Font.Style := [];
+    EditPlaylistSearch.Tag := 1;
+end;
+
+procedure TNemp_MainForm.EditPlaylistSearchExit(Sender: TObject);
+begin
+    if Trim(EditPlaylistSearch.Text) = '' then
+    begin
+        EditPlaylistSearch.Font.Color := clGrayText;
+        EditPlaylistSearch.Font.Style := [];
+        EditPlaylistSearch.Tag := 0;
+        EditPlaylistSearch.OnChange := Nil;
+        EditPlaylistSearch.Text := MainForm_PlaylistSearch;
+        EditPlaylistSearch.OnChange := EditPlaylistSearchChange;
+    end;
+end;
+
+procedure TNemp_MainForm.EditPlaylistSearchKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+    case key of
+      VK_RETURN:
+          begin
+            key := 0;
+            if (ssShift in Shift) then
+                NempPlaylist.PlayFocussed(NempPlaylist.LastHighlightedSearchResultNode)
+            else
+            begin
+                if Length(Trim(EditPlaylistSearch.Text)) >= 2 then
+                    NempPlaylist.SearchAll(EditPlaylistSearch.Text)
+            end;
+          end;
+      VK_ESCAPE:
+          begin
+              key := 0;
+              EditPlaylistSearch.Text := '';
+              NempPlaylist.ClearSearch(True);
+          end;
+      VK_F3: begin
+          // scroll into next node
+          // if (ssCtrl in Shift) then
+          //    NempPlaylist.ScrollToPreviousSearchResult;
+          // else
+              //NempPlaylist.ScrollToNextSearchResult;
+          if Length(Trim(EditPlaylistSearch.Text)) >= 2 then
+              NempPlaylist.Search(EditPlaylistSearch.Text, True);
+      end;
+  end;
+end;
+
+procedure TNemp_MainForm.EditPlaylistSearchKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+    case ord(key) of
+        VK_RETURN: key := #0;
+    end;
+end;
+
+procedure TNemp_MainForm.EditPlaylistSearchChange(Sender: TObject);
+begin
+    if Trim(EditPlaylistSearch.Text)= '' then
+        // Deselect all
+        NempPlaylist.ClearSearch(True)
+    else
+        if Length(Trim(EditPlaylistSearch.Text)) >= 2 then
+            // do search ...
+            NempPlaylist.Search(EditPlaylistSearch.Text)
 end;
 
 procedure TNemp_MainForm.PM_P_ViewStayOnTopClick(Sender: TObject);
@@ -10505,6 +10664,8 @@ end;
 
 procedure TNemp_MainForm.RepairZOrder;
 begin
+  ///02.2017
+
   if (NempOptions.MiniNempStayOnTop) AND (AnzeigeMode = 1) then
   begin
     // Fenster in den Vordergrund setzen.
@@ -11032,7 +11193,26 @@ end;
 
 procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
 begin
-  PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
+    // handle Search-Edit-stuff
+    if PlaylistPanel.Width <= 120 then
+    begin
+        EditplaylistSearch.Width := 65 - (120 - PlaylistPanel.Width);
+    end else
+    begin
+        EditplaylistSearch.Width := 65;
+    end;
+
+    if PlaylistPanel.Parent <> TopMainPanel then
+    begin
+        PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
+        PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - 16;
+    end else
+    begin
+        PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
+        PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;
+    end;
+
+    PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 end;
 
 

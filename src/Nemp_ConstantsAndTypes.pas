@@ -414,6 +414,9 @@ const
 
     MB_UserInputDeadFiles = 36;
 
+    // Error during loading the gmp file
+    MB_InvalidGMPFile = 37;
+
     MB_SetStatus = 100;
 
 
@@ -841,8 +844,10 @@ const
       APE_DISCNUMBER = 'DISCNUMBER';
 
 
+procedure SaveWindowPositons(ini: TMemIniFile; var Options: TNempOptions; aMode: Integer);
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
-procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions);
+procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; aMode: Integer);
+
 procedure UnInstallHotKeys(Handle: HWND);
 procedure UninstallMediakeyHotkeys(Handle: HWND);
 
@@ -1025,7 +1030,51 @@ begin
 
 end;
 
-procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions);
+procedure SaveWindowPositons(ini: TMemIniFile; var Options: TNempOptions; aMode: Integer);
+begin
+    with Options do
+    begin
+        if aMode = 1 then
+        begin
+            ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
+            ini.WriteBool('EinzelFenster','MedienlisteVisible', NempEinzelFormOptions.MedienlisteVisible        );
+            ini.WriteBool('EinzelFenster','AuswahlVisible'    , NempEinzelFormOptions.AuswahlSucheVisible       );
+            ini.WriteBool('EinzelFenster','ControlsVisible'   , NempEinzelFormOptions.ErweiterteControlsVisible );
+
+            ini.WriteBool('EinzelFenster','PlaylistDocked'    , PlaylistForm.NempRegionsDistance.docked   );
+            ini.WriteBool('EinzelFenster','MedienlisteDocked' , MedienlisteForm.NempRegionsDistance.docked);
+            ini.WriteBool('EinzelFenster','AuswahlListeDocked', AuswahlForm.NempRegionsDistance.docked    );
+            ini.WriteBool('EinzelFenster','ExtendedControlsDocked', NempEinzelFormOptions.ExtendedControlsDocked);
+
+            Ini.WriteInteger('Einzelfenster', 'ExtendedControlsTop'   , ExtendedControlForm.Top);
+            Ini.WriteInteger('Einzelfenster', 'ExtendedControlsLeft'  , ExtendedControlForm.Left);
+
+
+            Ini.WriteInteger('Einzelfenster', 'PlaylistTop'   , PlaylistForm.Top   );
+            Ini.WriteInteger('Einzelfenster', 'PlaylistLeft'  , PlaylistForm.Left  );
+            Ini.WriteInteger('Einzelfenster', 'PlaylistHeight', PlaylistForm.Height);
+            Ini.WriteInteger('Einzelfenster', 'PlaylistWidth' , PlaylistForm.Width );
+
+            Ini.WriteInteger('Einzelfenster', 'MedienlisteTop'   , MedienlisteForm.Top   );
+            Ini.WriteInteger('Einzelfenster', 'MedienlisteLeft'  , MedienlisteForm.Left  );
+            Ini.WriteInteger('Einzelfenster', 'MedienlisteHeight', MedienlisteForm.Height);
+            Ini.WriteInteger('Einzelfenster', 'MedienlisteWidth' , MedienlisteForm.Width );
+
+            Ini.WriteInteger('Einzelfenster', 'AuswahlSucheTop'   , AuswahlForm.Top   );
+            Ini.WriteInteger('Einzelfenster', 'AuswahlSucheLeft'  , AuswahlForm.Left  );
+            Ini.WriteInteger('Einzelfenster', 'AuswahlSucheHeight', AuswahlForm.Height);
+            Ini.WriteInteger('Einzelfenster', 'AuswahlSucheWidth' , AuswahlForm.Width );
+        end else
+        begin
+            ini.WriteInteger('Fenster', 'Top_0'                , NempFormAufteilung[0].FormTop           );
+            ini.WriteInteger('Fenster', 'Left_0'               , NempFormAufteilung[0].FormLeft          );
+            ini.WriteInteger('Fenster', 'Width_0'              , NempFormAufteilung[0].FormWidth         );
+            ini.WriteInteger('Fenster', 'Height_0'             , NempFormAufteilung[0].FormHeight        );
+        end;
+    end;
+end;
+
+procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; aMode: Integer);
 var i: integer;
 begin
   With Options do
@@ -1055,10 +1104,12 @@ begin
         //ini.WriteInteger('Allgemein', 'ShutDownMode', ShutDownMode);
         Ini.WriteString('Allgemein', 'Language', Language);
 
-        ini.WriteInteger('Fenster', 'Top_0'                , NempFormAufteilung[0].FormTop           );
-        ini.WriteInteger('Fenster', 'Left_0'               , NempFormAufteilung[0].FormLeft          );
-        ini.WriteInteger('Fenster', 'Width_0'              , NempFormAufteilung[0].FormWidth         );
-        ini.WriteInteger('Fenster', 'Height_0'             , NempFormAufteilung[0].FormHeight        );
+        SaveWindowPositons(ini, options, aMode);
+
+        //ini.WriteInteger('Fenster', 'Top_0'                , NempFormAufteilung[0].FormTop           );
+        //ini.WriteInteger('Fenster', 'Left_0'               , NempFormAufteilung[0].FormLeft          );
+        //ini.WriteInteger('Fenster', 'Width_0'              , NempFormAufteilung[0].FormWidth         );
+        //ini.WriteInteger('Fenster', 'Height_0'             , NempFormAufteilung[0].FormHeight        );
         ini.WriteInteger('Fenster', 'Splitter1_0'          , NempFormAufteilung[0].TopMainPanelHeight);
         ini.WriteInteger('Fenster', 'BrowseListenWeite_0'  , NempFormAufteilung[0].AuswahlPanelWidth );
         ini.WriteInteger('Fenster', 'ArtisListenWeite_0'   , NempFormAufteilung[0].ArtistWidth       );
@@ -1078,7 +1129,7 @@ begin
         Ini.WriteInteger('Fenster', 'VDTCoverHeight' , NempFormRatios.VDTCoverHeight);
         Ini.WriteInteger('Fenster', 'ArtistWidth'    , NempFormRatios.ArtistWidth  );
 
-        ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
+        {ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
         ini.WriteBool('EinzelFenster','MedienlisteVisible', NempEinzelFormOptions.MedienlisteVisible        );
         ini.WriteBool('EinzelFenster','AuswahlVisible'    , NempEinzelFormOptions.AuswahlSucheVisible       );
         ini.WriteBool('EinzelFenster','ControlsVisible'   , NempEinzelFormOptions.ErweiterteControlsVisible );
@@ -1106,6 +1157,7 @@ begin
         Ini.WriteInteger('Einzelfenster', 'AuswahlSucheLeft'  , AuswahlForm.Left  );
         Ini.WriteInteger('Einzelfenster', 'AuswahlSucheHeight', AuswahlForm.Height);
         Ini.WriteInteger('Einzelfenster', 'AuswahlSucheWidth' , AuswahlForm.Width );
+        }
 
         Ini.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
         ini.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);

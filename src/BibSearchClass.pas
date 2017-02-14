@@ -279,7 +279,29 @@ function AudioFileMatchesKeywords(aAudioFile: TAudioFile; Keywords: TStringList)
 function AudioFileMatchesKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8StringList): Boolean;
 
 
+function AudioFileMatchesKeywordsPlaylist(aAudioFile: TAudioFile; Keywords: TStringList): Boolean;
+
 implementation
+
+
+function AudioFileMatchesKeywordsPlaylist(aAudioFile: TAudioFile; Keywords: TStringList): Boolean;
+var i: Integer;
+begin
+ result := true;
+ for i := 0 to Keywords.Count - 1 do
+ begin
+     if   (AnsiContainsText(aAudioFile.Artist    , Keywords[i]))
+       or (AnsiContainsText(aAudioFile.Titel     , Keywords[i]))
+     then  // nothing. Audiofile is valid (til here)
+     else
+     begin
+        // If a Keyword was not found:
+        // Audiofile doesn't match - break.
+        result := False;
+        break;
+     end;
+ end;
+end;
 
 
 // Helpers for Quicksearch.
