@@ -470,6 +470,7 @@ type
     grpBoxUseAdvancedSkin: TGroupBox;
     cbUseAdvancedSkin: TCheckBox;
     cb_UseG15Display: TCheckBox;
+    cb_ReplayCue: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1156,6 +1157,7 @@ begin
 
   CB_AutoMixPlaylist.Checked        := NempPlaylist.AutoMix;
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
+  cb_ReplayCue.Checked              := NempPlaylist.RepeatCueOnRepeatTitle;
   CB_RememberInterruptedPlayPosition.Checked := NempPlaylist.RememberInterruptedPlayPosition;
 
   CB_ShowHintsInPlaylist.Checked    := NempPlaylist.ShowHintsInPlaylist;
@@ -2113,8 +2115,9 @@ begin
         NempPlaylist.DisableAutoDeleteAtTitleChange  := CB_DisableAutoDeleteAtTitleChange.Checked   ;
 
 
-  NempPlaylist.AutoMix       := CB_AutoMixPlaylist.Checked;
-  NempPlaylist.JumpToNextCueOnNextClick := CB_JumpToNextCue.Checked;
+  NempPlaylist.AutoMix                         := CB_AutoMixPlaylist.Checked;
+  NempPlaylist.JumpToNextCueOnNextClick        := CB_JumpToNextCue.Checked;
+  NempPlaylist.RepeatCueOnRepeatTitle          := cb_ReplayCue.Checked;
   NempPlaylist.RememberInterruptedPlayPosition := CB_RememberInterruptedPlayPosition.Checked;
   NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
   Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;

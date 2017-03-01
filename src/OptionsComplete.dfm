@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 496
-    ActivePage = TabFiles3
+    ActivePage = TabPlayer2
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -3300,13 +3300,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 102
+        Height = 113
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Behaviour of the playlist'
         TabOrder = 0
         DesignSize = (
           431
-          102)
+          113)
         object CB_AutoSavePlaylist: TCheckBox
           Left = 8
           Top = 33
@@ -3341,21 +3341,32 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CB_RememberInterruptedPlayPosition: TCheckBox
           Left = 8
-          Top = 68
+          Top = 86
           Width = 409
           Height = 17
           Hint = 'Used in combination with "Just play focussed file"'
           Caption = 
             'Remember track position when playing a song directly from the li' +
             'brary'
+          TabOrder = 4
+        end
+        object cb_ReplayCue: TCheckBox
+          Left = 8
+          Top = 68
+          Width = 409
+          Height = 17
+          Hint = 
+            'Repeat only the current part of a file instead of the whole trac' +
+            'k when "Repeat title" is selected'
+          Caption = 'Repeat current entry in cuesheet on "Repeat title"'
           TabOrder = 3
         end
       end
       object GrpBox_Headset: TGroupBox
         Left = 7
-        Top = 192
+        Top = 207
         Width = 431
-        Height = 97
+        Height = 98
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default action (from headset into the playlist)'
         TabOrder = 1
@@ -3394,9 +3405,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_HeadsetBehaviour: TGroupBox
         Left = 8
-        Top = 115
+        Top = 127
         Width = 431
-        Height = 73
+        Height = 74
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default action (from media list into the playlist)'
         TabOrder = 2

@@ -59,6 +59,7 @@ type
       fWiedergabeMode: Integer;           // One after the other, Random, ...
       fAutoMix: Boolean;                  // Mix playlist after the last title
       fJumpToNextCueOnNextClick: Boolean; // Jump only to next cue on "Next"
+      fRepeatCueOnRepeatTitle: Boolean;   // repeat the current entry in cuesheet wehn "repeat title" is selected
       fShowHintsInPlaylist: Boolean;
       fPlayCounter: Integer;              // used for a "better random" selection
 
@@ -182,6 +183,7 @@ type
       property WiedergabeMode: Integer read fWiedergabeMode write fWiedergabeMode;
       property AutoMix: Boolean read fAutoMix write fAutoMix;
       property JumpToNextCueOnNextClick: Boolean read fJumpToNextCueOnNextClick write fJumpToNextCueOnNextClick;
+      property RepeatCueOnRepeatTitle: Boolean read fRepeatCueOnRepeatTitle write fRepeatCueOnRepeatTitle;
       property RememberInterruptedPlayPosition: Boolean read fRememberInterruptedPlayPosition write fRememberInterruptedPlayPosition;
 
       property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
@@ -371,6 +373,7 @@ begin
   DisableAutoDeleteAtTitleChange  := ini.ReadBool('Playlist','DisableAutoDeleteAtTitleChange', True);
   fAutoMix                        := ini.ReadBool('Playlist','AutoMix', False);
   fJumpToNextCueOnNextClick       := Ini.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
+  fRepeatCueOnRepeatTitle         := Ini.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
   fRememberInterruptedPlayPosition:= Ini.ReadBool('Playlist', 'RememberInterruptedPlayPosition', True);
   fShowHintsInPlaylist  := Ini.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
   RandomRepeat          := Ini.ReadInteger('Playlist', 'RandomRepeat', 25);
@@ -417,6 +420,7 @@ begin
 
   Ini.WriteBool('Playlist','AutoMix', fAutoMix);
   Ini.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
+  Ini.WriteBool('Playlist', 'RepeatCueOnRepeatTitle', fRepeatCueOnRepeatTitle);
   Ini.WriteBool('Playlist', 'RememberInterruptedPlayPosition', fRememberInterruptedPlayPosition);
 
   Ini.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
