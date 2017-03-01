@@ -1532,6 +1532,10 @@ begin
 
 
     WM_NextCue: begin
+            // play the current cue again, if wanted
+            if (NempPlaylist.WiedergabeMode = 1) and (NempPlaylist.RepeatCueOnRepeatTitle) then
+                NempPlayer.JumpToPrevCue;
+
             // Anzeige in der Playlist aktualisieren
             NempPlaylist.ActualizeCue;
             // Nächsten Sync setzen
