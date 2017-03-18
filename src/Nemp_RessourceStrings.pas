@@ -445,7 +445,13 @@ MainForm_MoreSearchresults  = 'Additional results (not limited to current presel
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
 
+MainForm_GlobalQuickSearchHint = 'Search in the media library';
+
 MainForm_PlaylistSearch    = 'Search';
+MainForm_PlaylistSearchHint = 'Search in the playlist'
+                    + #13#10 + '- F3: step through'
+                    + #13#10 + '- Enter: mark all'
+                    + #13#10 + '- Shift+Enter: play';
 
 MainForm_BtnEqualizerPresetsSelect = 'Select';
 MainForm_BtnEqualizerPresetsCustom = 'Custom';
