@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - Dezember 2016
+      Januar 2005 - März 2017
 
-      Version: 4.6.3
+      Version: 4.6.4
 
 
 -----------------------------------------------------------
@@ -113,6 +113,22 @@ Verwendete Units/Komponenten:
   http://www.delphipraxis.net
   http://www.dsdt.info
   http://www.swissdelphicenter.ch
+
+
+
+Version 4.6.4, März 2017
+----------------------------------------------------------- 
+Neue Funktionen:
+----------------
+- Suche in der Playlist. Nächster Treffer mit F3, Enter markiert alles, Shift+Enter spielt
+  das aktuell gewählte Stück ab
+- Option: Bei Wiedergabemodus "Wiederhole Titel" auch nur den aktuellen Eintrag in einem 
+  Cuesheet abspielen, und nicht die ganze Datei
+
+Bugfixes:
+---------
+- Zuverlässigere Speicherung der Fensterpositionen bei Wechsel zwischen kompakter Ansicht
+  und Einzelfenstermodus
 
 
 

@@ -837,6 +837,7 @@ begin
           if VST.GetNodeLevel(Selectedmp3s[i])=0 then
           begin
               if Selectedmp3s[i] = fPlayingNode then fPlayingNode := Nil;
+              if Selectedmp3s[i] = fLastHighlightedSearchResultNode then fLastHighlightedSearchResultNode := Nil;
               aData := VST.GetNodeData(Selectedmp3s[i]);
               if (aData^.FAudioFile) = fPlayingFile then
               begin
@@ -888,6 +889,7 @@ begin
     Playlist.Clear;
     fLastHighlightedSearchResultNode := Nil;
 
+    fLastHighlightedSearchResultNode := Nil;
     fPlayingNode := Nil;
     fCurrentHistoryFile := Nil;
 
@@ -922,6 +924,7 @@ begin
   aNode := GetNodeWithPlayingFile;
   if assigned(aNode) then
   begin
+      if aNode = fLastHighlightedSearchResultNode then fLastHighlightedSearchResultNode := Nil;
       PrebookList.Remove(fPlayingFile);
       RemoveFileFromHistory(fPlayingFile);
       Playlist.Remove(fPlayingfile);
