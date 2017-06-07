@@ -285,6 +285,7 @@ begin
     fIDHttp.Request.UserAgent := 'Mozilla/3.0';
     fIDHttp.HTTPOptions :=  [];
 
+
     Resume;
 end;
 
@@ -342,6 +343,7 @@ begin
                         if ProperAlbum then
                         begin
                                   CurrentCacheItem := GetMatchingCacheItem;
+
                                   if CacheItemCanBeRechecked(CurrentCacheItem) then
                                   begin
                                       n := GetTickCount;
@@ -400,7 +402,8 @@ begin
                                           end;
                                       end;
 
-                                  end else
+                                  end
+                                  else
                                   begin
                                       if not terminated then
                                           Synchronize(SyncUpdateCoverCacheBlocked);  // cache blocks downloading
@@ -532,7 +535,7 @@ procedure TCoverDownloadWorkerThread.CollectFiles(aList: TStringList);
 var sr : TSearchrec;
     Path:string;
 begin
-    Path := fCurrentDownloadItem.Directory;
+    Path := fCurrentDownloadItem.Directory ;
 
     if Findfirst(Path + '*.' + fCurrentDownloadItem.FileType, FaAnyfile, sr) = 0 then
     repeat
@@ -605,6 +608,7 @@ begin
     try
         // search harddisk for files
         CollectFiles(FileList);
+
         if FileList.Count <= 100 then
         begin
             AudioFileList := TObjectList.Create;
@@ -725,6 +729,7 @@ begin
         + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
         + '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
         + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
+
     try
         fXMLData := fIDHttp.Get(url);
         result := True;
@@ -773,6 +778,9 @@ begin
         result := False;
         fBestCoverURL := '';
     end;
+
+    // Note: Try to download through https:// in a later version ....
+    fBestCoverURL := Stringreplace(fBestCoverURL, 'https://', 'http://', [rfReplaceAll]);
 end;
 
 
@@ -805,6 +813,7 @@ begin
                 result := False;
                 fDataType := ptNone;
             end;
+
         end;
 
         if AnsiEndsText('.jpg', fBestCoverURL) then
@@ -968,7 +977,7 @@ begin
     if aAudioFile.IsFile then
     begin
         NewDownloadItem.SubQueryType := sqtFile;
-        NewDownloadItem.Directory := aAudioFile.Ordner;     // including the "\"
+        NewDownloadItem.Directory := aAudioFile.Ordner + '\';     // including the "\"
     end;
     if aAudioFile.isCDDA then
     begin
@@ -1107,7 +1116,7 @@ begin
 
         if fInternetConnectionLost then
         begin
-            GetDefaultCover(dcNoCover, bmp, 0);
+            GetDefaultCover(dcFile, bmp, 0);
             AddLogoToBitmap('lastfmConnectError', bmp);
             fCurrentDownloadComplete := False;
             HintString := CoverFlowLastFM_HintConnectError;
@@ -1117,7 +1126,7 @@ begin
 
             if Not fCurrentDownloadComplete then
             begin
-                GetDefaultCover(dcNoCover, bmp, 0);
+                GetDefaultCover(dcFile, bmp, 0);
                 AddLogoToBitmap('lastfmFail', bmp);
                 HintString := CoverFlowLastFM_HintFail;
             end else
@@ -1177,7 +1186,7 @@ begin
         bmp.PixelFormat := pf24bit;
         SetProperBitmapSize(bmp, fCurrentDownloadItem.QueryType);
 
-        GetDefaultCover(dcNoCover, bmp, 0);
+        GetDefaultCover(dcFile, bmp, 0);
         AddLogoToBitmap('lastfmCache', bmp);
 
         //bmp.Canvas.Brush.Style := bsClear;
@@ -1219,7 +1228,7 @@ begin
             and DownloadItemStillMatchesPlayer
         then
         begin
-            GetDefaultCover(dcNoCover, bmp, 0);
+            GetDefaultCover(dcFile, bmp, 0);
             AddLogoToBitmap('lastfmInvalid', bmp);
 
             NempPlayer.CoverBitmap.Assign(bmp);

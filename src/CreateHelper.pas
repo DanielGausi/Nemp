@@ -392,7 +392,7 @@ begin
                 end;
                 2: begin
                     MedienBib.ReBuildTagCloud;
-                    MedienBib.TagCloud.ShowTags;
+                    MedienBib.TagCloud.ShowTags(True);
                     MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
                 end;
             end;

@@ -112,7 +112,7 @@ end;
 procedure TRatingHelper.DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
 var i, p: Integer;
 begin
-
+    // note: use the same methond in Audiofile.fGetRoundedRating
 
     // Draw SetStars
     for i := 1 to (aRating div 51) do

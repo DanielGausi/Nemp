@@ -1354,6 +1354,9 @@ begin
         NempPlayer.RefreshPlayingTitel;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
+        Nemp_MainForm.PaintFrame.Hint := NempPlayer.MainAudioFile.GetHint(Nemp_MainForm.NempOptions.ReplaceNAArtistBy,
+                           Nemp_MainForm.NempOptions.ReplaceNATitleBy,
+                           Nemp_MainForm.NempOptions.ReplaceNAAlbumBy);
     end;
 
     // ... VST-Details

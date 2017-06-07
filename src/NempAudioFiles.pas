@@ -283,6 +283,7 @@ type
         function fGetIsStream: Boolean;
         function fGetIsCDDA: Boolean;
 
+        function fGetRoundedRating: Double;
 
         procedure GetMp3Info(aMp3File: TMp3File; filename: UnicodeString; Flags: Integer = 0);
         procedure GetFlacInfo(aFlacFile: TFlacFile; Flags: Integer = 0);
@@ -372,6 +373,7 @@ type
         property CD: UnicodeString read fCD write fCD;
         property Duration: Integer read fDuration write fDuration;
         property Rating: Byte read fRating write fRating;
+        property RoundedRating: Double read fGetRoundedRating;
         property PlayCounter: Cardinal read fPlayCounter write fPlayCounter;
         property ChannelMode: String read GetChannelMode;
         property ChannelModeShort: String read GetChannelModeShort;
@@ -463,6 +465,9 @@ type
         function GetAlbumForVST(ReplaceValue: Integer): String;
         function GetBitrateForVST: String;
         function GetDurationForVST: String;
+
+        // returns a Hint for playlist- and medialibrary- VST
+        function GetHint(naArtist, naTitle, naAlbum: Integer): UnicodeString;
 
 
         function GetReplacedArtist(ReplaceValue: Integer): String;
@@ -1030,6 +1035,111 @@ end;
 function TAudioFile.fGetIsCDDA: Boolean;
 begin
     result := fAudioType = at_CDDA;
+end;
+
+function TAudioFile.fGetRoundedRating: Double;
+var base: Integer;
+begin
+    if fRating = 0 then
+        base := 127
+    else
+        base := fRating;
+
+    // note: That is the same method as used in RatingCtrls
+    result := base div 51;
+
+    if (base div 51) <= 4 then
+    begin
+        if ((base mod 51) > 25) then
+            // add a full star
+            result := result + 1
+        else
+            // add only a half star
+            result := result + 0.5;
+    end;
+end;
+
+function TAudioFile.GetHint(naArtist, naTitle, naAlbum: Integer): UnicodeString;
+begin
+    case fAudioType of
+        at_Undef: result := 'ERROR: UNDEFINED AUDIOTYPE';
+
+        at_File: begin
+            result :=
+                   Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,GetReplacedArtist(naArtist)]) + #13#10
+                 + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,GetReplacedTitle(naTitle)]) + #13#10
+                 + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,GetReplacedAlbum(naAlbum)]);
+
+            if Track <> 0 then
+                result := result + Format(' (%s %d)', [AudioFileProperty_Track, Track]) + #13#10
+            else
+                result := result + #13#10;
+
+            result := result
+                 + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Duration)]) + #13#10
+                 + Format(' %s: %s kbit/s' , [(AudioFileProperty_Bitrate)   ,IntTostr(Bitrate)]) + #13#10
+                 + Format(' %s: %s MB'     , [(AudioFileProperty_Filesize)  ,FloatToStrF((Size / 1024 / 1024),ffFixed,4,2)]) + #13#10
+                 + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Ordner]) + #13#10
+                 + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Dateiname]);
+
+
+            result := result + #13#10
+                            + ' ' + Format(Audiofile_RatingHint, [FloatToStrF(RoundedRating,ffFixed,4,1)]);
+
+            if (PlayCounter > 0) then
+                result := result + ', '
+                            + Format(Audiofile_PlayCounterHint, [PlayCounter]);
+
+
+            {if (fRating <> 0) or (PlayCounter > 0) then
+            begin
+                if fRating = 0 then
+                    result := result + #13#10
+                            + ' ' + Audiofile_RatingHintNoRating
+                            + ' ' + Format(Audiofile_PlayCounterHint, [PlayCounter])
+                else
+                    result := result + #13#10
+                            + ' ' + Format(Audiofile_RatingHint, [FloatToStrF(RoundedRating,ffFixed,4,1)])
+                            + ', '
+                            + Format(Audiofile_PlayCounterHint, [PlayCounter]);
+            end else
+                result := result + #13#10
+                            + ' ' + Audiofile_RatingHintNoRating;
+            }
+
+        end;
+
+        at_Stream: begin
+            result := ' ' + (AudioFileProperty_Webstream) + #13#10
+                 + Format(' %s: %s', [(AudioFileProperty_Name), Description]) + #13#10
+                 + Format(' %s: %s', [(AudioFileProperty_URL) , Pfad])
+        end;
+
+        at_cue: begin
+            result := 'Cue-Sheet ' + #13#10 //+ Data^.FAudioFile.Dateiname + #13#10
+                  + Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,GetReplacedArtist(naArtist)]) + #13#10
+                  + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,GetReplacedTitle(naTitle)])+ #13#10
+                  + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Ordner]) + #13#10
+                  + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Dateiname]);
+        end;
+
+        at_CDDA: begin
+            if trim(Artist) = '' then
+                result :=
+                       'CD-Audio, '
+                     + Format(' %s %d' , [AudioFileProperty_Track, Track]) + #13#10
+                     + Format(' %s: %s', [(AudioFileProperty_Duration)  ,SekIntToMinStr(Duration)])
+            else
+                result :=
+                       Format(' %s: %s'        , [(AudioFileProperty_Artist)    , Artist]) + #13#10
+                     + Format(' %s: %s'        , [(AudioFileProperty_Title)     , Titel]) + #13#10
+                     + Format(' %s: %s'        , [(AudioFileProperty_Album)     , Album]) + #13#10
+                     // we have always a Track here ;-)
+                     + Format(' %s %d', [AudioFileProperty_Track, Track]) + #13#10
+                     + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Duration)]) + #13#10
+                     + 'CD-Audio';
+        end;
+    end;
 end;
 
 function TAudioFile.GetArtistForVST(ReplaceValue: Integer): String;

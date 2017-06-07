@@ -1432,6 +1432,7 @@ type
     procedure EditPlaylistSearchKeyPress(Sender: TObject; var Key: Char);
     procedure EditPlaylistSearchKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure PaintFrameDblClick(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -1677,7 +1678,7 @@ procedure TNemp_MainForm.PanelTagCloudBrowseDblClick(Sender: TObject);
 begin
     MedienBib.TagCloud.FocussedTag := MedienBib.TagCloud.MouseOverTag;
     MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-    MedienBib.TagCloud.  ShowTags;//(ListView1);
+    MedienBib.TagCloud.  ShowTags(True);//(ListView1);
 end;
 
 
@@ -1755,7 +1756,7 @@ begin
     if ord(Key) = vk_return then
     begin
         MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-        MedienBib.TagCloud.ShowTags;//(ListView1);
+        MedienBib.TagCloud.ShowTags(True);//(ListView1);
     end;
 end;
 
@@ -1767,7 +1768,7 @@ begin
         vk_Escape,
         vk_Back: begin
                 MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, True);
-                MedienBib.TagCloud.ShowTags;
+                MedienBib.TagCloud.ShowTags(True);
         end
     else
         MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
@@ -2845,6 +2846,9 @@ begin
         end;
     end;
     UpdateFormDesignNeu;
+
+    if assigned(FDetails) then
+        FDetails.LoadStarGraphics;
     {$ENDIF}
 end;
 
@@ -4322,7 +4326,10 @@ begin
         end;
 
         if NempOptions.ChangeFontStyleOnMode then
-          font.Style := ModeToStyle(AudioFile.ChannelmodeInt);
+            font.Style := ModeToStyle(AudioFile.ChannelmodeInt)
+        else
+            font.Style := Nemp_MainForm.NempOptions.DefaultFontStyles;
+
         if NempOptions.ChangeFontOnCbrVbr then
         begin
           if AudioFile.vbr then font.Name := NempOptions.FontNameVBR
@@ -5212,14 +5219,14 @@ begin
                   try                      
                       backupFile.Assign(MedienBib.CurrentAudioFile);
                       // Change current File
-                      case (Sender as TControl).Tag of
+                      case (Sender as TComponent).Tag of
                           0: MedienBib.CurrentAudioFile.Artist := EdtBibArtist.Text;
                           1: MedienBib.CurrentAudioFile.Titel  := EdtBibTitle.Text;
                           2: MedienBib.CurrentAudioFile.Album  := EdtBibAlbum.Text;
                           3: MedienBib.CurrentAudioFile.Track  := StrToIntDef(EdtBibTrack.Text, 0);
                           4: MedienBib.CurrentAudioFile.Year   := EdtBibYear.Text;
                           5: MedienBib.CurrentAudioFile.Genre  := EdtBibGenre.Text;
-                      end;                     
+                      end;
 
                       // write Data to file                                                    
                       aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
@@ -5235,7 +5242,7 @@ begin
                                   // recycle var bibfile here
                                   listFile := TAudioFile(ListOfFiles[i]);
                                   // set the matching property of the files
-                                  case (Sender as TControl).Tag of
+                                  case (Sender as TComponent).Tag of
                                       0: listFile.Artist := EdtBibArtist.Text;
                                       1: listFile.Titel  := EdtBibTitle.Text;
                                       2: listFile.Album  := EdtBibAlbum.Text;
@@ -5605,6 +5612,9 @@ procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
   const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
   TextType: TVSTTextType);
 begin
+
+  TargetCanvas.font.Style := Nemp_MainForm.NempOptions.ArtistAlbenFontStyles;
+
   if Sender = ArtistsVST then
       if (Node.Index <= 2) And (Node.Parent = (Sender as TBaseVirtualTree).RootNode) then
           TargetCanvas.Font.Style := TargetCanvas.Font.Style + [fsbold];
@@ -7364,7 +7374,7 @@ begin
     end;
     // navigate to whole library
     MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.ClearTag, True);
-    MedienBib.TagCloud.ShowTags;
+    MedienBib.TagCloud.ShowTags(True);
 
     if not assigned(CloudEditorForm) then
         Application.CreateForm(TCloudEditorForm, CloudEditorForm);
@@ -8759,6 +8769,12 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.PaintFrameDblClick(Sender: TObject);
+begin
+    if (NempPlayer.MainStream <> 0) then
+        ShowVSTDetails(NempPlayer.MainAudioFile);
+end;
+
 procedure TNemp_MainForm.PaintFrameMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -9483,60 +9499,9 @@ begin
   Data := Sender.GetNodeData(Node);
   if not assigned(Data) then exit;
 
-  case Data^.FAudioFile.AudioType of
-      at_Undef: HintText := 'ERROR: UNDEFINED AUDIOTYPE';
-
-      at_File: begin
-          HintText :=
-                 Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
-               + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)]) + #13#10
-               + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy)]);
-
-          if Data^.FAudioFile.Track <> 0 then
-              HintText := HintText + Format(' (%s %d)', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
-          else
-              HintText := HintText + #13#10;
-
-          HintText := HintText
-               + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)]) + #13#10
-               + Format(' %s: %s kbit/s' , [(AudioFileProperty_Bitrate)   ,IntTostr(Data^.FAudioFile.Bitrate)]) + #13#10
-               + Format(' %s: %s MB'     , [(AudioFileProperty_Filesize)  ,FloatToStrF((Data^.FAudioFile.Size / 1024 / 1024),ffFixed,4,2)]) + #13#10
-               + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Data^.FAudioFile.Ordner]) + #13#10
-               + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Data^.FAudioFile.Dateiname]);
-      end;
-
-      at_Stream: begin
-          HintText := ' ' + (AudioFileProperty_Webstream) + #13#10
-               + Format(' %s: %s', [(AudioFileProperty_Name), Data^.FAudioFile.Description]) + #13#10
-               + Format(' %s: %s', [(AudioFileProperty_URL) , Data^.FAudioFile.Pfad])
-      end;
-
-      at_cue: begin
-          HintText := 'Cue-Sheet ' + #13#10 //+ Data^.FAudioFile.Dateiname + #13#10
-                + Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy)]) + #13#10
-                + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy)])+ #13#10
-                + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Data^.FAudioFile.Ordner]) + #13#10
-                + Format(' %s: %s'        , [(AudioFileProperty_Filename)  ,Data^.FAudioFile.Dateiname]);
-      end;
-
-      at_CDDA: begin
-          if trim(Data^.FAudioFile.Artist) = '' then
-              HintText :=
-                     'CD-Audio, '
-                   + Format(' %s %d' , [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
-                   + Format(' %s: %s', [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)])
-          else
-              HintText :=
-                     Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,Data^.FAudioFile.Artist]) + #13#10
-                   + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,Data^.FAudioFile.Titel]) + #13#10
-                   + Format(' %s: %s'        , [(AudioFileProperty_Album)     ,Data^.FAudioFile.Album]) + #13#10
-                   // we have always a Track here ;-)
-                   + Format(' %s %d', [AudioFileProperty_Track, Data^.FAudioFile.Track]) + #13#10
-                   + Format(' %s: %s'        , [(AudioFileProperty_Duration)  ,SekIntToMinStr(Data^.FAudioFile.Duration)]) + #13#10
-                   + 'CD-Audio';
-      end;
-  end;
-
+  HintText := Data^.FAudioFile.GetHint(NempOptions.ReplaceNAArtistBy,
+                           NempOptions.ReplaceNATitleBy,
+                           NempOptions.ReplaceNAAlbumBy);
 end;
 
 procedure TNemp_MainForm.DragFilesSrc1Dropping(Sender: TObject);
@@ -9937,6 +9902,8 @@ begin
       end;
   end;
 end;
+
+
 
 procedure TNemp_MainForm.ResetShutDownCaptions;
 begin
@@ -10800,7 +10767,7 @@ begin
         if MedienBib.BrowseMode = 2 then
         begin
             PanelTagCloudBrowse.Repaint;
-            MedienBib.TagCloud.  ShowTags;
+            MedienBib.TagCloud.  ShowTags(False);
         end;
 
         VSTPanel.Repaint;
@@ -11016,9 +10983,14 @@ begin
     LyricsMemo.Text := (MainForm_Lyrics_NoLyrics);
 
     Spectrum.DrawRating(0);
+    PaintFrame.Hint := '';
   end else
   begin
       NempPlayer.RefreshPlayingTitel;
+      PaintFrame.Hint := NempPlayer.MainAudioFile.GetHint(NempOptions.ReplaceNAArtistBy,
+                           NempOptions.ReplaceNATitleBy,
+                           NempOptions.ReplaceNAAlbumBy);
+
       Application.Title := NempPlayer.GenerateTaskbarTitel;
       Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
       if NempPlayer.URLStream then
@@ -11078,7 +11050,7 @@ begin
           if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
           begin
             if Not Assigned(OptionsCompleteForm) then
-              Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+                Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
             OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.BirthdayNode;
             OptionsCompleteForm.OptionsVST.Selected[OptionsCompleteForm.BirthdayNode] := True;
             OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabPlayer6;

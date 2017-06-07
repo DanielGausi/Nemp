@@ -67,9 +67,8 @@ type
 
     function ExtensionOpensWithApplication(const Extension, InternalName, AppName: string): boolean;
 
-
-    function SetITouchMediaPlayer(CommandLine: string): boolean;
-
+    //removed 2017
+    //function SetITouchMediaPlayer(CommandLine: string): boolean;
 
     function SetDefaultHandler: boolean; overload;
     function SetDefaultHandler(const HandlerVerb: string): boolean; overload;
@@ -488,6 +487,8 @@ begin
     end;
 end;
 
+(*
+removed 2017
 function TFileTypeRegistration.SetITouchMediaPlayer(CommandLine: string): boolean;
 begin
   Result := False;
@@ -502,6 +503,7 @@ begin
     FRegConnector.CloseKey;
   end;
 end;
+*)
 
 function TFileTypeRegistration.DeleteUserChoice(
   const Extension: String): Boolean;

@@ -41,7 +41,7 @@ type
 
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
-    TDefaultCoverType = (dcAllFiles, dcWebRadio, dcNoCover, dcError);
+    TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
     TNempSortArray = Array[1..2] of TAudioFileStringIndex;
 
@@ -187,6 +187,12 @@ type
         DefaultFontSize:integer;
         ArtistAlbenFontSize: Integer;
         ArtistAlbenRowHeight: Integer;
+
+        DefaultFontStyle: Integer;
+        ArtistAlbenFontStyle: Integer;
+        DefaultFontStyles: TFontStyles;
+        ArtistAlbenFontStyles: TFontStyles;
+
         CoverMode: Integer;
         DetailMode: Integer;
         CoverWidth: Integer;
@@ -807,9 +813,9 @@ const
       cmNoStretch = 1;
       // Note: These 3 Flags has been used in Nemp3
       // They are still used in the Code, but has no effect after all
-      cmUseBibDefaults = 2;
-      cmUseDefaultCover = 4;
-      cmCustomizeMainCover= 8;
+      //cmUseBibDefaults = 2;
+      //cmUseDefaultCover = 4;
+      //cmCustomizeMainCover= 8;
 
 
       // For starting VST
@@ -860,7 +866,7 @@ function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 
 implementation
 
-uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSettingsWizard;
+uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSettingsWizard, Treehelper;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions);
 var i: integer;
@@ -996,11 +1002,17 @@ begin
         ReplaceNAAlbumBy  := ini.ReadInteger('Fenster', 'ReplaceNAAlbumBy' , 4);
         if not ReplaceNAAlbumBy in [0,1,2,3,4,5] then ReplaceNAAlbumBy := 4;
 
-        ArtistAlbenFontSize  := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
-        ArtistAlbenRowHeight := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
-        RowHeight   := Ini.ReadInteger('Font', 'RowHeight', 16 );
-        DefaultFontSize := ini.ReadInteger('Font','DefaultFontSize',8);
-        ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',True);
+        ArtistAlbenFontSize   := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
+        ArtistAlbenRowHeight  := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
+        RowHeight             := Ini.ReadInteger('Font', 'RowHeight', 16 );
+        DefaultFontSize       := ini.ReadInteger('Font', 'DefaultFontSize', 8);
+        DefaultFontStyle      := ini.ReadInteger('Font', 'DefaultFontStyle', 0);
+        ArtistAlbenFontStyle  := ini.ReadInteger('Font', 'ArtistAlbenFontStyle', 0);
+        // translate into actual font styles
+        DefaultFontStyles     := FontSelectorItemIndexToStyle(DefaultFontStyle);
+        ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(ArtistAlbenFontStyle);
+
+        ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',False);
         ChangeFontSizeOnLength := ini.ReadBool('Font','ChangeFontSizeOnLength',False);
 
         //MinFontColor   := StringToColor(Ini.ReadString('Font','MinColor'   , 'clred'   ));
@@ -1019,7 +1031,7 @@ begin
         ///FontSize[4] := Ini.ReadInteger('Font', 'FontSize4', 10 );
         ///FontSize[5] := Ini.ReadInteger('Font', 'FontSize5', 12 );
 
-        ChangeFontStyleOnMode := ini.ReadBool('Font','ChangeFontStyleOnMode',True);
+        ChangeFontStyleOnMode := ini.ReadBool('Font','ChangeFontStyleOnMode',False);
         ChangeFontOnCbrVbr := ini.ReadBool('Font','ChangeFontOnCbrVbr',False);
         FontNameVBR := ini.ReadString('Font','FontNameVBR','Tahoma');
         FontNameCBR := ini.ReadString('Font','FontNameCBR','Courier');
@@ -1178,6 +1190,9 @@ begin
         ini.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);
         Ini.WriteInteger('Font', 'RowHeight', RowHeight  );
         ini.WriteInteger('Font','DefaultFontSize',DefaultFontSize);
+        ini.WriteInteger('Font', 'DefaultFontStyle', DefaultFontStyle);
+        ini.WriteInteger('Font', 'ArtistAlbenFontStyle', ArtistAlbenFontStyle);
+
         ini.Writebool('Font','ChangeFontSizeOnLength',ChangeFontSizeOnLength);
         ini.Writebool('Font','ChangeFontColorOnBitrate',ChangeFontColorOnBitrate);
         Ini.WriteInteger('Font', 'Maxdauer1', MaxDauer[1]);

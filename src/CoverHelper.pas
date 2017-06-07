@@ -157,7 +157,7 @@ type
 implementation
 
 uses NempMainUnit, StringHelper, AudioFileHelper, GnuGetText, Nemp_RessourceStrings;
-// NempMainUnit is used, as some settings from the MediaLibrary are used here.
+// NempMainUnitm is used, as some settings from the MediaLibrary are used here.
 
 var
     CSAccessRandomCoverlist: RTL_CRITICAL_SECTION;
@@ -755,7 +755,7 @@ begin
   try
       case aAudioFile.AudioType of
           at_Stream: begin
-              GetDefaultCover(dcWebRadio, aCoverbmp, cmUseBibDefaults);
+              GetDefaultCover(dcWebRadio, aCoverbmp, 0);
               result := True;
           end;
           at_File: begin
@@ -786,12 +786,12 @@ begin
                       try
                           if Not GetCoverFromList(CoverListe, aCoverbmp) then
                           begin
-                              GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                              GetDefaultCover(dcFile, aCoverbmp, 0);
                               result := False;
                           end else
                               result := True;
                       except
-                          GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                          GetDefaultCover(dcFile, aCoverbmp, 0);
                           result := false;
                       end;
                       coverliste.free;
@@ -824,13 +824,13 @@ begin
                   end;
               end else
               begin
-                  GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+                  GetDefaultCover(dcCDDA, aCoverbmp, 0);
                   result := false;
               end;
           end;
       end;
   except
-      GetDefaultCover(dcNoCover, aCoverbmp, cmUseBibDefaults);
+      GetDefaultCover(dcFile, aCoverbmp, 0);
       result := false;
   end;
 end;
@@ -847,7 +847,7 @@ begin
     begin
         if aCoverID = '' then
         begin
-            GetDefaultCover(dcNoCover, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+            GetDefaultCover(dcFile, aCoverBmp, cmNoStretch);
             result := False;
         end else
         begin
@@ -859,7 +859,7 @@ begin
                         aJpg.LoadFromFile(aDir  + aCoverID + '.jpg');
                         aCoverBmp.Assign(aJpg);
                     except
-                        GetDefaultCover(dcError, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+                        GetDefaultCover(dcError, aCoverBmp,  cmNoStretch);
                         result := False;
                     end;
                 finally
@@ -867,7 +867,7 @@ begin
                 end;
             end else
             begin
-                GetDefaultCover(dcError, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+                GetDefaultCover(dcError, aCoverBmp, cmNoStretch);
                 result := False;
             end;
         end;
@@ -882,7 +882,14 @@ begin
     // Flags auswerten
     Stretch := (Flags and cmNoStretch) = 0;
 
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+    filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+    if not FileExists(filename) then
+        filename := MedienBib.CoverSavePath + '_default_cover.png';
+    if not FileExists(filename) then
+        filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+    if not FileExists(filename)  then
+        filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
+
     if FileExists(filename) then
     begin
         aGraphic := TPicture.Create;
@@ -898,6 +905,7 @@ begin
             aGraphic.Free;
         end;
     end;
+    // otherwise: just a blank image, do nothing.
 end;
 
 
@@ -985,7 +993,7 @@ begin
     if RandomCoverList.Count = 0 then
     begin
         // No Cover in the library. Just get the Default-Cover
-        GetDefaultCover(dcNoCover, aCoverBmp, cmUseBibDefaults or cmNoStretch);
+        GetDefaultCover(dcFile, aCoverBmp, cmNoStretch);
     end else
     begin
         // At least one cover in the library
@@ -1039,7 +1047,7 @@ begin
                         aGraphic.Free;
                     end;
                 end else
-                    GetDefaultCover(dcError, smallbmp, cmUseDefaultCover or cmNoStretch);
+                    GetDefaultCover(dcError, smallbmp,  cmNoStretch);
 
                 // smallbmp auf aCoverBmp kopieren.
                 SetStretchBltMode(aCoverBmp.Canvas.Handle, HALFTONE);

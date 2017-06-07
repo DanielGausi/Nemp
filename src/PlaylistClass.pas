@@ -138,10 +138,11 @@ type
       AutoSave: Boolean;            // Save Playlist every 5 minutes
       AutoScan: Boolean;            // Scan files with Mp3fileUtils
       AutoDelete: Boolean;                  // Delete File after playback
-        DisableAutoDeleteAtSlide: Boolean;  // ... but not after slide
-        DisableAutoDeleteAtPause: Boolean;  // ... after the user paused the title once
-        DisAbleAutoDeleteAtStop: Boolean;   // ... when the user clicks "stop"
-        DisableAutoDeleteAtTitleChange: Boolean;  // ...when the user clicks "next"
+          DisableAutoDeleteAtUserInput: Boolean;
+        //DisableAutoDeleteAtSlide: Boolean;  // ... but not after slide
+        //DisableAutoDeleteAtPause: Boolean;  // ... after the user paused the title once
+        //DisAbleAutoDeleteAtStop: Boolean;   // ... when the user clicks "stop"
+        //DisableAutoDeleteAtTitleChange: Boolean;  // ...when the user clicks "next"
       BassHandlePlaylist: Boolean;      // let the bass.dll handle webstream-playlists
       RandomRepeat: Integer;   // 0..100% - which part of the Playlist should be played before a song is selected "randomly" again?
 
@@ -367,10 +368,11 @@ begin
   AutoPlayEnqueuedTitle := ini.ReadBool('Playlist','AutoPlayEnqueuedTitle', False);
   AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
   AutoDelete            := ini.ReadBool('Playlist','AutoDelete', False);
-  DisableAutoDeleteAtSlide        := ini.ReadBool('Playlist','DisableAutoDeleteAtSlide', True);
-  DisableAutoDeleteAtPause        := ini.ReadBool('Playlist','DisableAutoDeleteAtPause', True);
-  DisAbleAutoDeleteAtStop         := ini.ReadBool('Playlist','DisAbleAutoDeleteAtStop', True);
-  DisableAutoDeleteAtTitleChange  := ini.ReadBool('Playlist','DisableAutoDeleteAtTitleChange', True);
+  DisableAutoDeleteAtUserInput    := ini.ReadBool('Playlist','DisableAutoDeleteAtUserInput', True);
+  //DisableAutoDeleteAtSlide        := ini.ReadBool('Playlist','DisableAutoDeleteAtSlide', True);
+  //DisableAutoDeleteAtPause        := ini.ReadBool('Playlist','DisableAutoDeleteAtPause', True);
+  //DisAbleAutoDeleteAtStop         := ini.ReadBool('Playlist','DisAbleAutoDeleteAtStop', True);
+  //DisableAutoDeleteAtTitleChange  := ini.ReadBool('Playlist','DisableAutoDeleteAtTitleChange', True);
   fAutoMix                        := ini.ReadBool('Playlist','AutoMix', False);
   fJumpToNextCueOnNextClick       := Ini.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
   fRepeatCueOnRepeatTitle         := Ini.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
@@ -413,10 +415,11 @@ begin
   Ini.WriteBool('Playlist','AutoSave', AutoSave);
 
   Ini.WriteBool('Playlist','AutoDelete', AutoDelete);
-  ini.WriteBool('Playlist','DisableAutoDeleteAtSlide', DisableAutoDeleteAtSlide);
-  ini.WriteBool('Playlist','DisableAutoDeleteAtPause', DisableAutoDeleteAtPause);
-  ini.WriteBool('Playlist','DisAbleAutoDeleteAtStop', DisAbleAutoDeleteAtStop);
-  ini.WriteBool('Playlist','DisableAutoDeleteAtTitleChange', DisableAutoDeleteAtTitleChange);
+  ini.WriteBool('Playlist','DisableAutoDeleteAtUserInput', DisableAutoDeleteAtUserInput);
+  //ini.WriteBool('Playlist','DisableAutoDeleteAtSlide', DisableAutoDeleteAtSlide);
+  //ini.WriteBool('Playlist','DisableAutoDeleteAtPause', DisableAutoDeleteAtPause);
+  //ini.WriteBool('Playlist','DisAbleAutoDeleteAtStop', DisAbleAutoDeleteAtStop);
+  //ini.WriteBool('Playlist','DisableAutoDeleteAtTitleChange', DisableAutoDeleteAtTitleChange);
 
   Ini.WriteBool('Playlist','AutoMix', fAutoMix);
   Ini.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
@@ -645,7 +648,7 @@ begin
   if not AcceptInput then exit;
 
   if aUserInput then
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
 
   if fJumpToNextCueOnNextClick and (Player.JumpToNextCue) then
   begin
@@ -670,7 +673,7 @@ begin
 
   Player.stop; // Neu im Oktober 2008
   if aUserInput then
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
 
   // GetNextAudioFileIndex can modify fInterruptedPlayPosition
   nextIdx := GetNextAudioFileIndex;
@@ -690,7 +693,7 @@ procedure TNempPlaylist.PlayPrevious(aUserinput: Boolean = False);
 begin
   if not AcceptInput then exit;
   if aUserInput then
-    fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+    fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
   if fJumpToNextCueOnNextClick and (Player.JumpToPrevCue) then
   begin
       ActualizeCue;   // nothing else todo. Jump complete :D
@@ -714,7 +717,7 @@ begin
   if not AcceptInput then exit;
   Player.stop; // Neu im Oktober 2008
   if aUserInput then
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
 
   if Player.Time > 5  then
       // just jump to beginning of the current file
@@ -748,10 +751,10 @@ begin
   if VST.GetNodeLevel(Node)=0 then
   begin
       Play(Node.Index, Player.FadingInterval, True);
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtTitleChange;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
   end else
   begin
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtSlide;
+      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
       Data := VST.GetNodeData(Node);
       if assigned(Data) then
           CueTime := Data^.FAudioFile.Index01
@@ -798,13 +801,13 @@ end;
 
 procedure TNempPlaylist.Pause;
 begin
-  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtPause;
+  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtPause;
   Player.pause;
 end;
 
 procedure TNempPlaylist.Stop;
 begin
-  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtStop;
+  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtStop;
   Player.stop;
 end;
 
@@ -1915,7 +1918,7 @@ end;
 procedure TNempPlaylist.SetTime(Value: Double);
 begin
   Player.Time := Value;
-  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtSlide;
+  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
   // Cue-Zeug neu setzen
   ActualizeCue;
 end;
@@ -1926,7 +1929,7 @@ end;
 procedure TNempPlaylist.SetProgress(Value: Double);
 begin
   Player.Progress := Value;
-  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtSlide;
+  fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
   // Cue-Zeug neu setzen
   ActualizeCue;
 end;
