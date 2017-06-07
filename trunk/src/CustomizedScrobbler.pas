@@ -46,11 +46,13 @@ type
         private
             fLastCall: TDateTime;
 
-            function EncodeSessionKey(PlainKey: String): String;
-            function DecodeSessionKey(CryptedKey: String): String;
+            //function EncodeSessionKey(PlainKey: String): String;
+            //function DecodeSessionKey(CryptedKey: String): String;
+
+            // a poor replacement for the previous encodings, but it should be sufficient
+            function Rot13(aString: String): String;
 
             function ParseRawTag(aRawString: String; aAudioFile: TAudioFile): String;
-
         protected
             function GenerateSignature(SortedParams: UnicodeString): UnicodeString; override;
         public
@@ -98,7 +100,6 @@ procedure TNempScrobbler.InitScrobbler;
 begin
     {.$MESSAGE 'YOU MUST NOT USE THIS KEY/SECRET IN YOUR APPLICATION. GO TO LAST.FM AND GET YOUR OWN!'}
     ApiKey := '542ec0c3e5e7b84030181176f3d0f264'
-    // 'f7fa672081fb6bf5a1e9ae618dcd4fdf';
 end;
 
 procedure TNempScrobbler.JobStarts;
@@ -113,7 +114,6 @@ var RawSig: UTF8String;
 const
     bd7fab7ec5900abf : Array[0..15] of Byte = ( $8a, $60, $99, $bf, $55, $74, $b4, $8a, $08, $46, $ff, $18, $49, $9e, $a2, $7c);
     effa65ecb689fccd : Array[0..15] of Byte = ( $95, $7b, $d2, $30, $20, $a0, $2c, $48, $d4, $4b, $3d, $25, $25, $e3, $4f, $4f);
-    // MyAPISecret = 'a8e2b589b4ef051044fabc287f9e09bd';
 
     function faae65f530febc67: string;
     var i: integer;
@@ -131,7 +131,8 @@ begin
 end;
 
 
-
+(*
+Session Keys are no longer md5-formatted strings. This method does not work anymore.
 function TNempScrobbler.EncodeSessionKey(PlainKey: String): String;
 var plainDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
     i: Integer;
@@ -152,12 +153,14 @@ begin
         result := Lowercase(MD5DigestToStr(resultDigest));
     end
     else
+    begin
         result := PlainKey;
+    end;
 end;
 
 function TNempScrobbler.DecodeSessionKey(CryptedKey: String): String;
 var cryptedDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
-    i: Integer;
+    i, tmp: Integer;
 const CSIDL_APPDATA = $001a;
 begin
     if length(CryptedKey) = 32 then
@@ -170,13 +173,19 @@ begin
 
         // addieren
         for i := 0 to 15 do
-            resultDigest.v[i] := (cryptedDigest.v[i] + 256 + 256 - VolumeSrnNrDigest.v[i] - FolderDigest.v[i]) Mod 256;
-
+        begin
+            tmp := (cryptedDigest.v[i] + 256 + 256 - VolumeSrnNrDigest.v[i] - FolderDigest.v[i]);
+            resultDigest.v[i] := tmp mod 256;
+            //(cryptedDigest.v[i] {+ 256 + 256 }- VolumeSrnNrDigest.v[i] - FolderDigest.v[i]) Mod 256;
+        end;
         result := Lowercase(MD5DigestToStr(resultDigest));
     end
     else
+    begin
         result := CryptedKey;
+    end;
 end;
+*)
 
 
 procedure TNempScrobbler.LoadFromIni(Ini: TMemIniFile);
@@ -184,7 +193,10 @@ var cryptedKey: String;
 begin
     // Der quasi allzeit gültige Session-Key
     cryptedKey := Ini.ReadString('Scrobbler', 'SessionKey', '');
-    SessionKey := AnsiString(DecodeSessionKey(cryptedKey));
+
+
+    //SessionKey := AnsiString(DecodeSessionKey(cryptedKey));
+    SessionKey := AnsiString(Rot13(cryptedKey));
 
     Username   := Ini.ReadString('Scrobbler', 'Username', '');
     if (Username = '') or (SessionKey = '') then
@@ -206,7 +218,9 @@ end;
 procedure TNempScrobbler.SaveToIni(Ini: TMemIniFile);
 var cryptedKey: String;
 begin
-    cryptedKey := EncodeSessionKey(UnicodeString(SessionKey));
+    //cryptedKey := EncodeSessionKey(UnicodeString(SessionKey));
+    cryptedKey := Rot13(UnicodeString(SessionKey));
+
     Ini.WriteString('Scrobbler', 'SessionKey', cryptedKey);
     Ini.WriteString('Scrobbler', 'Username', Username);
 
@@ -275,6 +289,18 @@ begin
 
         tagBegin := posEx('<tag>', aRawString, tagEnd);
         tagEnd := posEx('</tag>', aRawString, tagEnd + 4);
+    end;
+end;
+
+function TNempScrobbler.Rot13(aString: String): String;
+var i: Integer;
+begin
+    result := aString;
+    for i := 1 to length(aString) do
+    case aString[i] of
+        'A'..'Z': result[i] := chr((ord(aString[i])-ord('A')+13) mod 26+ord('A'));
+        'a'..'z': result[i] := chr((ord(aString[i])-ord('a')+13) mod 26+ord('a'));
+        '0'..'9': result[i] := chr((ord(aString[i])-ord('0')+5) mod 10+ord('0'));
     end;
 end;
 

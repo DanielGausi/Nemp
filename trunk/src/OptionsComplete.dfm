@@ -4,7 +4,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 539
+  ClientHeight = 571
   ClientWidth = 665
   Color = clBtnFace
   Constraints.MinHeight = 520
@@ -25,14 +25,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   OnShow = FormShow
   DesignSize = (
     665
-    539)
+    571)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionsVST: TVirtualStringTree
     Left = 8
     Top = 8
     Width = 191
-    Height = 493
+    Height = 525
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelInner = bvNone
     BevelOuter = bvNone
@@ -54,14 +54,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
     OnBeforeItemErase = OptionsVSTBeforeItemErase
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
+    ExplicitHeight = 594
     Columns = <>
   end
   object PageControl1: TPageControl
     Left = 204
     Top = 6
     Width = 454
-    Height = 496
-    ActivePage = TabPlayer2
+    Height = 528
+    ActivePage = TabView3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -71,7 +72,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
         Top = 134
@@ -143,7 +144,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Allow multiple instances of Nemp.'
           Caption = 'Allow multiple instances'
-          TabOrder = 3
+          TabOrder = 4
         end
         object CB_AutoPlayNewTitle: TCheckBox
           Left = 16
@@ -188,7 +189,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'g)'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 4
+          TabOrder = 3
         end
       end
       object GrpBox_StartingExtended: TGroupBox
@@ -198,7 +199,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 135
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Extended start settings'
-        TabOrder = 2
+        TabOrder = 3
         DesignSize = (
           431
           135)
@@ -209,7 +210,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Automatically load the Nemp medialibrary.'
           Caption = 'Load medialibrary on start'
-          TabOrder = 0
+          TabOrder = 3
         end
         object CBAutoSaveMediaList: TCheckBox
           Left = 16
@@ -218,7 +219,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Automatically save the Nemp medialibrary.'
           Caption = 'Save medialibrary on close'
-          TabOrder = 1
+          TabOrder = 4
         end
         object cb_ShowSplashScreen: TCheckBox
           Left = 16
@@ -226,7 +227,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 409
           Height = 17
           Caption = 'Show splash screen'
-          TabOrder = 2
+          TabOrder = 0
         end
         object CB_StartMinimized: TCheckBox
           Left = 16
@@ -236,7 +237,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Do not show Nemp window on start - directly minimize it.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Start minimized (you can also use the parameter "/minimized")'
-          TabOrder = 3
+          TabOrder = 1
         end
         object cb_StayOnTop: TCheckBox
           Left = 16
@@ -247,7 +248,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Hold the Nemp main window in foreground. Works only in seperate-' +
             'window-mode.'
           Caption = 'Stay on top (not in compact view)'
-          TabOrder = 4
+          TabOrder = 2
         end
       end
       object grpBoxUseAdvancedSkin: TGroupBox
@@ -257,7 +258,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 55
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Advanced Skinning'
-        TabOrder = 3
+        TabOrder = 2
         object cbUseAdvancedSkin: TCheckBox
           Left = 16
           Top = 24
@@ -273,7 +274,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 5
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
         Top = 103
@@ -1088,7 +1089,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Use volume up/down keys for system-wide volume control'
           Checked = True
           State = cbChecked
-          TabOrder = 0
+          TabOrder = 1
         end
         object cb_RegisterMediaHotkeys: TCheckBox
           Left = 16
@@ -1096,7 +1097,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 413
           Height = 17
           Caption = 'Use media keys, even if Nemp is in the background'
-          TabOrder = 1
+          TabOrder = 0
         end
         object cb_UseG15Display: TCheckBox
           Left = 16
@@ -1122,7 +1123,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 20
           Width = 401
           Height = 17
-          Caption = 'Tabstop at player-controls'
+          Caption = 'Tabstop at player controls'
           TabOrder = 0
         end
         object CB_TabStopAtTabs: TCheckBox
@@ -1140,10 +1141,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        396)
+        428)
       object Label3: TLabel
         Left = 16
-        Top = 336
+        Top = 312
         Width = 29
         Height = 13
         Caption = 'Note:'
@@ -1156,7 +1157,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object Label4: TLabel
         Left = 16
-        Top = 352
+        Top = 332
         Width = 420
         Height = 41
         AutoSize = False
@@ -1167,7 +1168,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object BtnRegistryUpdate: TButton
         Left = 16
-        Top = 400
+        Top = 380
         Width = 170
         Height = 25
         Hint = 'Register Nemp as default application for the selected filetypes.'
@@ -1183,14 +1184,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Filetypes'
         TabOrder = 0
-        object Label1: TLabel
+        object lbl_AudioFormats: TLabel
           Left = 16
           Top = 20
-          Width = 43
+          Width = 49
           Height = 13
-          Caption = 'Filetypes'
+          Caption = 'Audio files'
         end
-        object Label2: TLabel
+        object lbl_PlaylistFormats: TLabel
           Left = 312
           Top = 20
           Width = 73
@@ -1238,7 +1239,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 217
         Width = 431
-        Height = 113
+        Height = 88
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Windows Explorer settings'
         TabOrder = 1
@@ -1282,25 +1283,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           State = cbChecked
           TabOrder = 2
         end
-        object CBiTouch: TCheckBox
-          Left = 16
-          Top = 84
-          Width = 409
-          Height = 17
-          Hint = 
-            'For Logitech Keyboards with installed "iTouch"-Software: Start N' +
-            'emp when pressing the "play-key".'
-          Caption = 'Nemp as default player for "Logitech iTouch"'
-          TabOrder = 3
-        end
       end
     end
     object TabSystem3: TTabSheet
-      Caption = 'Sys (Tray)'
+      Caption = 'Sys (System)'
       ImageIndex = 20
       DesignSize = (
         446
-        396)
+        428)
       object LblTaskbarWin7: TLabel
         Left = 24
         Top = 149
@@ -1390,21 +1380,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = Btn_UninstallDeskbandClick
         end
       end
-    end
-    object TabSystem4: TTabSheet
-      Caption = 'Sys (Hibernate)'
-      ImageIndex = 21
-      DesignSize = (
-        446
-        396)
       object GrpBox_Hibernate: TGroupBox
         Left = 8
-        Top = 8
+        Top = 351
         Width = 431
         Height = 113
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hibernate/standby'
-        TabOrder = 0
+        TabOrder = 2
         object LBlConst_ReInitPlayerEngine_Hint: TLabel
           Left = 36
           Top = 52
@@ -1451,14 +1434,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = Btn_ReinitPlayerEngineClick
         end
       end
+    end
+    object TabSystem4: TTabSheet
+      Caption = 'XXX'
+      ImageIndex = 21
+      DesignSize = (
+        446
+        428)
       object GrpBox_BetaOptions: TGroupBox
-        Left = 8
-        Top = 140
+        Left = 12
+        Top = 20
         Width = 431
         Height = 45
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Beta-Settings'
-        TabOrder = 1
+        TabOrder = 0
         Visible = False
         object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
           Left = 13
@@ -1476,7 +1466,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 1
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_ViewMain_Columns: TGroupBox
         Left = 8
         Top = 8
@@ -1553,7 +1543,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 66
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Sorting'
-        TabOrder = 2
+        TabOrder = 3
         object CBAlwaysSortAnzeigeList: TCheckBox
           Left = 16
           Top = 20
@@ -1581,7 +1571,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 107
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Browsing (coverflow)'
-        TabOrder = 3
+        TabOrder = 2
         object Label61: TLabel
           Left = 16
           Top = 20
@@ -1652,7 +1642,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_ViewPartymode_Amplification: TGroupBox
         Left = 8
         Top = 8
@@ -1749,7 +1739,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_ViewVis_Scrolling: TGroupBox
         Left = 8
         Top = 8
@@ -1838,12 +1828,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_ViewVis_CoverDetails: TGroupBox
         Left = 8
-        Top = 201
+        Top = 404
         Width = 431
         Height = 76
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Cover && Details'
-        TabOrder = 1
+        Caption = 'Cover and details about a selected file'
+        TabOrder = 2
         object LblConst_CoverMode: TLabel
           Left = 16
           Top = 22
@@ -1889,31 +1879,58 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Below')
         end
       end
-      object GrpBox_ViewVis_CoverFlow: TGroupBox
+      object GrpBox_Files_Cover_Default: TGroupBox
         Left = 8
-        Top = 282
+        Top = 199
         Width = 431
-        Height = 71
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Coverflow'
-        TabOrder = 2
-        object cb_UseClassicCoverflow: TCheckBox
+        Height = 203
+        Caption = 'Default cover'
+        TabOrder = 1
+        object lbl_DefaultCover: TLabel
           Left = 16
-          Top = 20
-          Width = 409
+          Top = 24
+          Width = 401
           Height = 17
-          Hint = 'Classic coverflow for systems without OpenGL-support'
-          Caption = 'Use classic coverflow'
-          TabOrder = 0
+          AutoSize = False
+          Caption = 'Used when no proper cover art can be found.'
+          WordWrap = True
         end
-        object cbFixCoverFlowOnStart: TCheckBox
+        object img_DefaultCover: TImage
           Left = 16
-          Top = 39
-          Width = 409
-          Height = 17
-          Hint = 'Fix some issues with OpenGL-coverflow on some systems'
-          Caption = 'Fix coverflow on start'
+          Top = 47
+          Width = 137
+          Height = 137
+        end
+        object lbl_DefaultCoverHint: TLabel
+          Left = 168
+          Top = 109
+          Width = 241
+          Height = 76
+          AutoSize = False
+          Caption = 
+            'Note: Cover art already displayed in the player will not change ' +
+            'until the cover art is loaded again.'
+          WordWrap = True
+        end
+        object btn_DefaultCover: TButton
+          Left = 168
+          Top = 47
+          Width = 89
+          Height = 25
+          Hint = 'Select a file you want to use as cover art'
+          Caption = 'Select'
+          TabOrder = 0
+          OnClick = btn_DefaultCoverClick
+        end
+        object btn_DefaultCoverReset: TButton
+          Left = 168
+          Top = 78
+          Width = 89
+          Height = 25
+          Hint = 'Reset the default cover to the Nemp default cover'
+          Caption = 'Reset'
           TabOrder = 1
+          OnClick = btn_DefaultCoverResetClick
         end
       end
     end
@@ -1922,25 +1939,25 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 7
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_Fonts: TGroupBox
         Left = 8
-        Top = 8
+        Top = 160
         Width = 431
-        Height = 125
+        Height = 153
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Fonts'
-        TabOrder = 0
+        Caption = 'Font variations according to audio data'
+        TabOrder = 2
         object LblConst_FontVBR: TLabel
           Left = 35
-          Top = 79
+          Top = 98
           Width = 115
           Height = 13
           Caption = 'Font for variable bitrate'
         end
         object LblConst_FontCBR: TLabel
           Left = 227
-          Top = 79
+          Top = 98
           Width = 119
           Height = 13
           Caption = 'Font for constant bitrate'
@@ -1959,40 +1976,54 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object CBChangeFontOnCbrVbr: TCheckBox
           Left = 16
-          Top = 58
+          Top = 77
           Width = 401
           Height = 17
           Hint = 'Use different fonts for files with fixed or variable bitrate.'
           Caption = 'Change font according to constant/variable bitrate'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 2
+          TabOrder = 3
           WordWrap = True
           OnClick = CBChangeFontOnCbrVbrClick
         end
         object CBFontNameVBR: TComboBox
           Left = 35
-          Top = 95
-          Width = 161
-          Height = 21
-          Style = csDropDownList
-          TabOrder = 3
-        end
-        object CBFontNameCBR: TComboBox
-          Left = 227
-          Top = 95
+          Top = 114
           Width = 161
           Height = 21
           Style = csDropDownList
           TabOrder = 4
         end
+        object CBFontNameCBR: TComboBox
+          Left = 227
+          Top = 114
+          Width = 161
+          Height = 21
+          Style = csDropDownList
+          TabOrder = 5
+        end
         object CBChangeFontColoronBitrate: TCheckBox
           Left = 16
-          Top = 39
+          Top = 58
           Width = 393
           Height = 17
           Hint = 'Use different colors for different bitrates.'
           Caption = 'Change font color according to bitrate (if skin allows this)'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 2
+          WordWrap = True
+        end
+        object CBChangeFontSizeOnLength: TCheckBox
+          Left = 16
+          Top = 39
+          Width = 249
+          Height = 17
+          Hint = 
+            'User bigger fonts for long tracks and smaller ones for short tra' +
+            'cks.'
+          Caption = 'Change font size according to track length'
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
@@ -2001,12 +2032,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_FontSizePreselection: TGroupBox
         Left = 8
-        Top = 236
+        Top = 84
         Width = 431
         Height = 70
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Font size (browselists)'
-        TabOrder = 2
+        Caption = 'Font settings for browselists'
+        TabOrder = 1
         object Label34: TLabel
           Left = 152
           Top = 20
@@ -2022,6 +2053,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Font size'
           ParentShowHint = False
           ShowHint = True
+        end
+        object lbl_Browselist_FontStyle: TLabel
+          Left = 262
+          Top = 20
+          Width = 48
+          Height = 13
+          Caption = 'Font style'
         end
         object SEArtistAlbenRowHeight: TSpinEdit
           Left = 152
@@ -2043,15 +2081,30 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           Value = 16
         end
+        object cb_Browselist_FontStyle: TComboBox
+          Left = 262
+          Top = 39
+          Width = 129
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 2
+          Text = 'normal'
+          Items.Strings = (
+            'normal'
+            'bold'
+            'italic'
+            'bold italic')
+        end
       end
       object GrpBox_FontSize: TGroupBox
         Left = 8
-        Top = 138
+        Top = 8
         Width = 431
-        Height = 94
+        Height = 70
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Font size (playlist and medialist)'
-        TabOrder = 1
+        Caption = 'Font settings for playlist and medialist'
+        TabOrder = 0
         object LblConst_RowHeight: TLabel
           Left = 152
           Top = 20
@@ -2062,11 +2115,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object LblConst_BasicFontSize: TLabel
           Left = 16
           Top = 20
-          Width = 68
+          Width = 43
           Height = 13
-          Caption = 'Basic font size'
+          Caption = 'Font size'
           ParentShowHint = False
           ShowHint = True
+        end
+        object lbl_Medialist_FontStyle: TLabel
+          Left = 262
+          Top = 20
+          Width = 48
+          Height = 13
+          Caption = 'Font style'
         end
         object SERowHeight: TSpinEdit
           Left = 152
@@ -2078,20 +2138,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
           Value = 16
         end
-        object CBChangeFontSizeOnLength: TCheckBox
-          Left = 16
-          Top = 68
-          Width = 249
-          Height = 17
-          Hint = 
-            'User bigger fonts for long tracks and smaller ones for short tra' +
-            'cks.'
-          Caption = 'Change font size according to track length'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 2
-          WordWrap = True
-        end
         object SEFontSize: TSpinEdit
           Left = 16
           Top = 39
@@ -2102,6 +2148,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
           Value = 8
         end
+        object cb_Medialist_FontStyle: TComboBox
+          Left = 262
+          Top = 36
+          Width = 129
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 2
+          Text = 'normal'
+          Items.Strings = (
+            'normal'
+            'bold'
+            'italic'
+            'bold italic')
+        end
       end
     end
     object TabView4: TTabSheet
@@ -2109,7 +2170,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 21
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_ViewExt_NoMetadata: TGroupBox
         Left = 7
         Top = 159
@@ -2119,7 +2180,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 
           'Not available metadata (If ... is not available, use ... instead' +
           ')'
-        TabOrder = 0
+        TabOrder = 2
         object LblReplaceArtistBy: TLabel
           Left = 12
           Top = 24
@@ -2203,7 +2264,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 73
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Selection'
-        TabOrder = 1
+        TabOrder = 0
         object CBFullRowSelect: TCheckBox
           Left = 16
           Top = 22
@@ -2232,7 +2293,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 66
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Hints'
-        TabOrder = 2
+        TabOrder = 1
         object CBShowHintsInMedialist: TCheckBox
           Left = 16
           Top = 20
@@ -2252,13 +2313,40 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
         end
       end
+      object GrpBox_ViewVis_CoverFlow: TGroupBox
+        Left = 8
+        Top = 244
+        Width = 431
+        Height = 71
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Coverflow'
+        TabOrder = 3
+        object cb_UseClassicCoverflow: TCheckBox
+          Left = 16
+          Top = 20
+          Width = 409
+          Height = 17
+          Hint = 'Classic coverflow for systems without OpenGL-support'
+          Caption = 'Use classic coverflow'
+          TabOrder = 0
+        end
+        object cbFixCoverFlowOnStart: TCheckBox
+          Left = 16
+          Top = 39
+          Width = 409
+          Height = 17
+          Hint = 'Fix some issues with OpenGL-coverflow on some systems'
+          Caption = 'Fix coverflow on start'
+          TabOrder = 1
+        end
+      end
     end
     object TabFiles0: TTabSheet
       Caption = 'Files (Main)'
       ImageIndex = 22
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_FilesMain_Directories: TGroupBox
         Left = 8
         Top = 8
@@ -2404,7 +2492,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_AutoRating: TGroupBox
         Left = 8
         Top = 147
@@ -2412,7 +2500,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 228
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Automatic rating/playcounter of played audiofiles'
-        TabOrder = 0
+        TabOrder = 1
         object StaticText1: TLabel
           Left = 16
           Top = 135
@@ -2495,7 +2583,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 136
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Access to meta data (e.g. Id3-Tags)'
-        TabOrder = 1
+        TabOrder = 0
         object Lbl_QuickMetadataHint: TLabel
           Left = 37
           Top = 43
@@ -2542,7 +2630,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 24
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_TabMedia3_Cover: TGroupBox
         Left = 8
         Top = 8
@@ -2653,7 +2741,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 25
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
         Left = 8
         Top = 8
@@ -2808,7 +2896,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 23
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_TabMedia5_ID3: TGroupBox
         Left = 8
         Top = 8
@@ -2965,7 +3053,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 2
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_Devices: TGroupBox
         Left = 8
         Top = 8
@@ -3174,7 +3262,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 22
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_ExtendedAudio: TGroupBox
         Left = 8
         Top = 8
@@ -3295,7 +3383,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_PlaylistBehaviour: TGroupBox
         Left = 8
         Top = 8
@@ -3362,31 +3450,54 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 3
         end
       end
-      object GrpBox_Headset: TGroupBox
-        Left = 7
-        Top = 207
+      object GrpBox_HeadsetBehaviour: TGroupBox
+        Left = 8
+        Top = 127
         Width = 431
-        Height = 98
+        Height = 146
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Default action (from headset into the playlist)'
+        Caption = 'Default actions'
         TabOrder = 1
-        object LblHeadsetDefaultAction: TLabel
+        object Label10: TLabel
           Left = 12
           Top = 19
           Width = 405
           Height = 13
           AutoSize = False
-          Caption = 'Insert mode for headset files'
+          Caption = 'Insert mode from media list into the playlist'
+        end
+        object LblHeadsetDefaultAction: TLabel
+          Left = 12
+          Top = 67
+          Width = 405
+          Height = 13
+          AutoSize = False
+          Caption = 'Insert mode from headset to playlist'
+        end
+        object GrpBox_DefaultAction: TComboBox
+          Left = 12
+          Top = 36
+          Width = 285
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'Enqueue at the end of the playlist'
+          Items.Strings = (
+            'Enqueue at the end of the playlist'
+            'Play (and clear current playlist)'
+            'Enqueue after current track'
+            'Just play (don'#39't change the playlist)')
         end
         object GrpBox_HeadsetDefaultAction: TComboBox
           Left = 12
-          Top = 38
+          Top = 84
           Width = 285
           Height = 21
           Hint = 'Insert mode for files from the headset'
           Style = csDropDownList
           ItemIndex = 0
-          TabOrder = 0
+          TabOrder = 1
           Text = 'Enqueue at the end of the playlist'
           Items.Strings = (
             'Enqueue at the end of the playlist'
@@ -3396,55 +3507,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object cb_AutoStopHeadset: TCheckBox
           Left = 12
-          Top = 68
+          Top = 111
           Width = 389
           Height = 17
           Caption = 'Stop headset when switching to another tab'
-          TabOrder = 1
+          TabOrder = 2
         end
       end
-      object GrpBox_HeadsetBehaviour: TGroupBox
-        Left = 8
-        Top = 127
-        Width = 431
-        Height = 74
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Default action (from media list into the playlist)'
-        TabOrder = 2
-        object Label10: TLabel
-          Left = 12
-          Top = 19
-          Width = 405
-          Height = 13
-          AutoSize = False
-          Caption = 'Insert mode'
-        end
-        object GrpBox_DefaultAction: TComboBox
-          Left = 12
-          Top = 38
-          Width = 285
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 0
-          TabOrder = 0
-          Text = 'Enqueue at the end of the playlist'
-          Items.Strings = (
-            'Enqueue at the end of the playlist'
-            'Play (and clear current playlist)'
-            'Enqueue after current track'
-            'Just play (don'#39't change the playlist)')
-        end
-      end
-    end
-    object TabPlayer3: TTabSheet
-      Caption = 'Player (List-Ext)'
-      ImageIndex = 23
-      DesignSize = (
-        446
-        396)
       object GrpBox_RandomOptions: TGroupBox
-        Left = 8
-        Top = 8
+        Left = 7
+        Top = 275
         Width = 431
         Height = 77
         Hint = 
@@ -3452,9 +3524,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           'ns of the same song.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Random playback'
-        TabOrder = 0
+        TabOrder = 2
         object LblConst_ReallyRandom: TLabel
-          Left = 8
+          Left = 12
           Top = 16
           Width = 153
           Height = 13
@@ -3482,57 +3554,30 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
       end
       object GrpBox_PlayerExt2_Playlist: TGroupBox
-        Left = 8
-        Top = 91
+        Left = 7
+        Top = 357
         Width = 431
-        Height = 142
+        Height = 84
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Playlist'
-        TabOrder = 1
+        Caption = 'Deleting and mixing'
+        TabOrder = 3
         object CB_AutoMixPlaylist: TCheckBox
           Left = 8
-          Top = 109
+          Top = 56
           Width = 409
           Height = 17
           Hint = 'Randomize playlist after the last track.'
           Caption = 'Mix playlist after last track'
-          TabOrder = 0
-        end
-        object CB_DisableAutoDeleteAtTitleChange: TCheckBox
-          Left = 28
-          Top = 84
-          Width = 381
-          Height = 17
-          Hint = 'Exceptions for deleting a file from the playlist.'
-          Caption = 'Do not delete at manual title change'
-          TabOrder = 1
-        end
-        object CB_DisAbleAutoDeleteAtStop: TCheckBox
-          Left = 28
-          Top = 68
-          Width = 389
-          Height = 17
-          Hint = 'Exceptions for deleting a file from the playlist.'
-          Caption = 'Do not delete after stopping a track'
           TabOrder = 2
         end
-        object CB_DisableAutoDeleteAtPause: TCheckBox
-          Left = 28
-          Top = 52
-          Width = 373
-          Height = 17
-          Hint = 'Exceptions for deleting a file from the playlist.'
-          Caption = 'Do not delete after pausing the track'
-          TabOrder = 3
-        end
-        object CB_DisableAutoDeleteAtSlide: TCheckBox
+        object CB_DisableAutoDeleteAtUserInput: TCheckBox
           Left = 28
           Top = 36
           Width = 381
           Height = 17
           Hint = 'Exceptions for deleting a file from the playlist.'
-          Caption = 'Do not delete after manual sliding within the track'
-          TabOrder = 4
+          Caption = 'Do not delete after manual stop/pause/slide/next/previous'
+          TabOrder = 1
         end
         object CB_AutoDeleteFromPlaylist: TCheckBox
           Left = 8
@@ -3541,7 +3586,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'remove a track from the playlist after it is completely played.'
           Caption = 'Delete completely played tracks from the playlist'
-          TabOrder = 5
+          TabOrder = 0
           OnClick = CB_AutoDeleteFromPlaylistClick
         end
       end
@@ -3551,7 +3596,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 23
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_WebradioRecording: TGroupBox
         Left = 8
         Top = 88
@@ -3644,7 +3689,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Begin new file for every title'
           Checked = True
           State = cbChecked
-          TabOrder = 3
+          TabOrder = 4
         end
         object cbAutoSplitByTime: TCheckBox
           Left = 16
@@ -3653,7 +3698,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Split recordings by time.'
           Caption = 'Split files by time'
-          TabOrder = 6
+          TabOrder = 7
           OnClick = cbAutoSplitByTimeClick
         end
         object SE_AutoSplitMaxSize: TSpinEdit
@@ -3663,17 +3708,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 22
           MaxValue = 2000
           MinValue = 1
-          TabOrder = 5
+          TabOrder = 6
           Value = 10
         end
         object cbAutoSplitBySize: TCheckBox
-          Left = 16
-          Top = 181
+          Left = 15
+          Top = 180
           Width = 413
           Height = 17
           Hint = 'Split recordings by size.'
           Caption = 'Split files by size'
-          TabOrder = 4
+          TabOrder = 5
           OnClick = cbAutoSplitBySizeClick
         end
         object SE_AutoSplitMaxTime: TSpinEdit
@@ -3683,7 +3728,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 22
           MaxValue = 1440
           MinValue = 1
-          TabOrder = 7
+          TabOrder = 8
           Value = 10
         end
         object EdtDownloadDir: TEdit
@@ -3699,7 +3744,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 99
           Width = 379
           Height = 21
-          TabOrder = 2
+          TabOrder = 3
           Text = '<date>, <time> - <title>'
           OnChange = cbFilenameFormatChange
           Items.Strings = (
@@ -3714,7 +3759,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 393
           Height = 17
           Caption = 'Use streamname as directory'
-          TabOrder = 8
+          TabOrder = 2
         end
       end
       object RGroup_Playlist: TRadioGroup
@@ -3740,7 +3785,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 15
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
@@ -3871,7 +3916,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_TabAudio7_Countdown: TGroupBox
         Left = 8
         Top = 8
@@ -4046,7 +4091,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 17
       DesignSize = (
         446
-        396)
+        428)
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4397,7 +4442,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 18
       DesignSize = (
         446
-        396)
+        428)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
@@ -4467,7 +4512,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 13
           Hint = 'Deny access from "the internet".'
           Caption = 'Local network only'
-          TabOrder = 1
+          TabOrder = 3
           OnClick = cbOnlyLANClick
         end
         object CBAutoStartWebServer: TCheckBox
@@ -4477,7 +4522,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Hint = 'Automatically activate the webserver when Nemp starts.'
           Caption = 'Activate webserver on start'
-          TabOrder = 2
+          TabOrder = 4
         end
         object seWebServer_Port: TSpinEdit
           Left = 183
@@ -4486,7 +4531,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 22
           MaxValue = 65535
           MinValue = 0
-          TabOrder = 3
+          TabOrder = 2
           Value = 80
           OnChange = ChangeWebserverLinks
         end
@@ -4496,7 +4541,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 155
           Height = 21
           Style = csDropDownList
-          TabOrder = 4
+          TabOrder = 1
         end
         object EdtUsernameAdmin: TEdit
           Left = 16
@@ -4534,7 +4579,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           'r library.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Current IP-addresses'
-        TabOrder = 1
+        TabOrder = 2
         object LblConst_IPWAN: TLabel
           Left = 153
           Top = 20
@@ -4596,7 +4641,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Height = 140
         Anchors = [akLeft, akTop, akRight]
         Caption = 'User rights'
-        TabOrder = 2
+        TabOrder = 1
         object LblConst_Username2: TLabel
           Left = 16
           Top = 20
@@ -4635,7 +4680,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 15
           Hint = 'Let the user control the player (play/stop/next/volume/...)'
           Caption = 'Permit remote control of the player'
-          TabOrder = 0
+          TabOrder = 5
           OnClick = cbAllowRemoteControlClick
         end
         object cbPermitVote: TCheckBox
@@ -4647,7 +4692,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Let the user vote for files - files with many votes will be play' +
             'ed first'
           Caption = 'Permit voting for files'
-          TabOrder = 1
+          TabOrder = 2
           OnClick = cbAllowRemoteControlClick
         end
         object cbPermitLibraryAccess: TCheckBox
@@ -4657,7 +4702,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 15
           Hint = 'Let the user search and browse in your library'
           Caption = 'Permit access to the media library (read only)'
-          TabOrder = 2
+          TabOrder = 3
           OnClick = cbPermitLibraryAccessClick
         end
         object cbPermitPlaylistDownload: TCheckBox
@@ -4667,7 +4712,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 15
           Hint = 'Let the user download files from your playlist and/or library'
           Caption = 'Permit downloading files from the playlist'
-          TabOrder = 3
+          TabOrder = 4
           OnClick = cbPermitPlaylistDownloadClick
         end
         object EdtUsername: TEdit
@@ -4675,7 +4720,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 36
           Width = 95
           Height = 21
-          TabOrder = 4
+          TabOrder = 0
           OnKeyPress = EdtUsernameKeyPress
         end
         object EdtPassword: TEdit
@@ -4683,7 +4728,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 36
           Width = 97
           Height = 21
-          TabOrder = 5
+          TabOrder = 1
           OnKeyPress = EdtPasswordKeyPress
         end
       end
@@ -4691,7 +4736,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNApply: TButton
     Left = 583
-    Top = 509
+    Top = 541
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4701,7 +4746,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNCancel: TButton
     Left = 503
-    Top = 509
+    Top = 541
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4712,7 +4757,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNok: TButton
     Left = 423
-    Top = 509
+    Top = 541
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4721,9 +4766,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
     TabOrder = 4
     OnClick = BTNokClick
   end
-  object cb_SettingsMode: TComboBox
+  object _XXX_cb_SettingsMode: TComboBox
     Left = 8
-    Top = 507
+    Top = 539
     Width = 191
     Height = 21
     Style = csDropDownList
@@ -4731,7 +4776,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
     ItemIndex = 0
     TabOrder = 5
     Text = 'Commonly used settings'
-    OnChange = cb_SettingsModeChange
+    Visible = False
+    OnChange = _XXX_cb_SettingsModeChange
     Items.Strings = (
       'Commonly used settings'
       'All settings')

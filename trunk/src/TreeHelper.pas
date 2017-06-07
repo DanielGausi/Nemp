@@ -57,6 +57,9 @@ type
 
   function ModeToStyle(m:Byte):TFontstyles;
 
+  function FontSelectorItemIndexToStyle(m: Integer):TFontstyles;
+
+
   function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
   function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
 
@@ -114,7 +117,18 @@ begin
     1,4: result := [];
     else result := [fsitalic];
   end;
+end;
 
+function FontSelectorItemIndexToStyle(m: Integer): TFontstyles;
+begin
+    case m of
+        0: result := [];
+        1: result := [fsbold];
+        2: result := [fsitalic];
+        3: result := [fsbold, fsitalic];
+    else
+        result := [];
+    end;
 end;
 
 

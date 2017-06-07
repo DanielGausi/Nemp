@@ -328,7 +328,7 @@ const CustomColorNames : Array [0..15] of string = ('ColorA','ColorB','ColorC','
 implementation
 
 
-uses NempMainUnit, OptionsComplete, Hilfsfunktionen, spectrum_vis,
+uses NempMainUnit, Details, OptionsComplete, Hilfsfunktionen, spectrum_vis,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
     VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper;
 
@@ -2530,6 +2530,9 @@ begin
     HalfStarBitmap.Transparent := True;
 
     PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
+
+    if assigned(FDetails) then
+        FDetails.LoadStarGraphics;
 end;
 
 procedure TNempSkin.AssignWindowsGlyphs(UseSkinGraphics: Boolean);

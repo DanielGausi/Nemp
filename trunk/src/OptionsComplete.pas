@@ -181,7 +181,6 @@ type
     LblConst_RowHeight: TLabel;
     LblConst_BasicFontSize: TLabel;
     SERowHeight: TSpinEdit;
-    CBChangeFontSizeOnLength: TCheckBox;
     SEFontSize: TSpinEdit;
     GrpBox_NempUpdater: TGroupBox;
     CB_AutoCheck: TCheckBox;
@@ -191,16 +190,15 @@ type
     CBRegisterHotKeys: TCheckBox;
     GrpBox_MultimediaKeys: TGroupBox;
     GrpBox_FileFormats: TGroupBox;
-    Label1: TLabel;
+    lbl_AudioFormats: TLabel;
     CBFileTypes: TCheckListBox;
-    Label2: TLabel;
+    lbl_PlaylistFormats: TLabel;
     CBPlaylistTypes: TCheckListBox;
     Btn_SelectAll: TButton;
     GrpBoxFileFormatOptions: TGroupBox;
     CBEnqueueStandard: TCheckBox;
     CBEnqueueStandardLists: TCheckBox;
     CBDirectorySupport: TCheckBox;
-    CBiTouch: TCheckBox;
     CB_AutoPlayNewTitle: TCheckBox;
     CB_SavePositionInTrack: TCheckBox;
     CB_AutoPlayOnStart: TCheckBox;
@@ -327,10 +325,6 @@ type
     LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;
     CBChangeFontColoronBitrate: TCheckBox;
-    GrpBox_Headset: TGroupBox;
-    LblHeadsetDefaultAction: TLabel;
-    GrpBox_HeadsetDefaultAction: TComboBox;
-    cb_AutoStopHeadset: TCheckBox;
     GrpBox_ViewVis_CoverDetails: TGroupBox;
     LblConst_CoverMode: TLabel;
     LblConst_DetailMode: TLabel;
@@ -397,15 +391,7 @@ type
     BtnClearCoverCache: TButton;
     GrpBox_FilesMain_Playlists: TGroupBox;
     CBAutoScanPlaylistFilesOnView: TCheckBox;
-    GrpBox_ViewVis_CoverFlow: TGroupBox;
-    cb_UseClassicCoverflow: TCheckBox;
-    cbFixCoverFlowOnStart: TCheckBox;
     TabSystem4: TTabSheet;
-    GrpBox_Hibernate: TGroupBox;
-    LBlConst_ReInitPlayerEngine_Hint: TLabel;
-    cbPauseOnSuspend: TCheckBox;
-    cbReInitAfterSuspend: TCheckBox;
-    Btn_ReinitPlayerEngine: TButton;
     GrpBox_ViewMain_BrowseCoverflow: TGroupBox;
     Label61: TLabel;
     Label6: TLabel;
@@ -444,21 +430,7 @@ type
     SEBufferSize: TSpinEdit;
     CB_FloatingPoint: TComboBox;
     CB_Mixing: TComboBox;
-    TabPlayer3: TTabSheet;
-    GrpBox_RandomOptions: TGroupBox;
-    LblConst_ReallyRandom: TLabel;
-    LblConst_AvoidRepetitions: TLabel;
-    TBRandomRepeat: TTrackBar;
-    GrpBox_PlayerExt2_Playlist: TGroupBox;
-    CB_AutoMixPlaylist: TCheckBox;
-    CB_DisableAutoDeleteAtTitleChange: TCheckBox;
-    CB_DisAbleAutoDeleteAtStop: TCheckBox;
-    CB_DisableAutoDeleteAtPause: TCheckBox;
-    CB_DisableAutoDeleteAtSlide: TCheckBox;
-    CB_AutoDeleteFromPlaylist: TCheckBox;
-    cb_SettingsMode: TComboBox;
-    GrpBox_BetaOptions: TGroupBox;
-    XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
+    _XXX_cb_SettingsMode: TComboBox;
     GrpBox_PlayerExt_SafePlayback: TGroupBox;
     cb_SafePlayback: TCheckBox;
     GrpBox_HeadsetBehaviour: TGroupBox;
@@ -471,6 +443,38 @@ type
     cbUseAdvancedSkin: TCheckBox;
     cb_UseG15Display: TCheckBox;
     cb_ReplayCue: TCheckBox;
+    GrpBox_Hibernate: TGroupBox;
+    LBlConst_ReInitPlayerEngine_Hint: TLabel;
+    cbPauseOnSuspend: TCheckBox;
+    cbReInitAfterSuspend: TCheckBox;
+    Btn_ReinitPlayerEngine: TButton;
+    GrpBox_BetaOptions: TGroupBox;
+    XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
+    GrpBox_RandomOptions: TGroupBox;
+    LblConst_ReallyRandom: TLabel;
+    LblConst_AvoidRepetitions: TLabel;
+    TBRandomRepeat: TTrackBar;
+    GrpBox_PlayerExt2_Playlist: TGroupBox;
+    CB_AutoMixPlaylist: TCheckBox;
+    CB_DisableAutoDeleteAtUserInput: TCheckBox;
+    CB_AutoDeleteFromPlaylist: TCheckBox;
+    LblHeadsetDefaultAction: TLabel;
+    GrpBox_HeadsetDefaultAction: TComboBox;
+    cb_AutoStopHeadset: TCheckBox;
+    GrpBox_Files_Cover_Default: TGroupBox;
+    lbl_DefaultCover: TLabel;
+    img_DefaultCover: TImage;
+    lbl_DefaultCoverHint: TLabel;
+    btn_DefaultCover: TButton;
+    btn_DefaultCoverReset: TButton;
+    GrpBox_ViewVis_CoverFlow: TGroupBox;
+    cb_UseClassicCoverflow: TCheckBox;
+    cbFixCoverFlowOnStart: TCheckBox;
+    cb_Medialist_FontStyle: TComboBox;
+    lbl_Medialist_FontStyle: TLabel;
+    lbl_Browselist_FontStyle: TLabel;
+    cb_Browselist_FontStyle: TComboBox;
+    CBChangeFontSizeOnLength: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -564,23 +568,25 @@ type
     procedure LblWebserverUserURLClick(Sender: TObject);
     procedure ChangeWebserverLinks(Sender: TObject);
     procedure CB_SilenceDetectionClick(Sender: TObject);
-    procedure cb_SettingsModeChange(Sender: TObject);
+    procedure _XXX_cb_SettingsModeChange(Sender: TObject);
     procedure RecommendedFiletypesClick(Sender: TObject);
     procedure OptionsVSTBeforeItemErase(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
       var ItemColor: TColor; var EraseAction: TItemEraseAction);
+    procedure btn_DefaultCoverClick(Sender: TObject);
+    procedure btn_DefaultCoverResetClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
     //CurrentScanDir: String;
-    //VerlaufBitmap: TBitmap;
-    //procedure RePaintVerlauf(Verlauf: Boolean);
     procedure GetSkins;
     // Hilfsprozeduren für das Hotkey-Laden/Speichern
     Function ModToIndex(aMod: Cardinal): Integer;
     Function IndexToMod(aIndex: Integer): Cardinal;
     Function KeyToIndex(aKey: Byte): Integer;
     Function IndexToKey(aIndex: Integer): byte;
+
+    procedure LoadDefaultCover;
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
   public
@@ -622,9 +628,9 @@ uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
 {$R *.dfm}
 
 var
- OptionsArraySystem : array[0..3] of TOptionData;
+ OptionsArraySystem : array[0..2] of TOptionData;
  OptionsArrayAnzeige: array[0..4] of TOptionData;
- OptionsArrayAudio  : array[0..8] of TOptionData;
+ OptionsArrayAudio  : array[0..7] of TOptionData;
  OptionsArrayFiles  : Array[0..5] of TOptionData;
  Testskin: TNempSkin;
 
@@ -685,12 +691,6 @@ begin
       CBPlaylistTypes.Checked[i] := True;
 
 
-//  VerlaufBitmap := TBitmap.Create;
-//  VerlaufBitmap.Width := 320;
-//  VerlaufBitmap.Height := 17;
-
-// ok
-
   OptionsVST.NodeDataSize := SizeOf(TOptionsTreeData);
 
 
@@ -699,19 +699,20 @@ begin
   OptionsArraySystem[0].TabSheet:= TabSystem0;
       OptionsArraySystem[1].Eintrag := OptionsTree_SystemControl;
       OptionsArraySystem[1].TabSheet:= TabSystem1;
-      OptionsArraySystem[2].Eintrag  := OptionsTree_SystemTaskbar;
+      OptionsArraySystem[2].Eintrag  := OptionsTree_SystemSystem;
       OptionsArraySystem[2].TabSheet := TabSystem3;
-      OptionsArraySystem[3].Eintrag  := OptionsTree_SystemHibernate;
-      OptionsArraySystem[3].TabSheet := TabSystem4;
+      //OptionsArraySystem[3].Eintrag  := OptionsTree_SystemHibernate;
+      //OptionsArraySystem[3].TabSheet := TabSystem4;
 
   // VIEW
   OptionsArrayAnzeige[0].Eintrag := OptionsTree_ViewMain;
   OptionsArrayAnzeige[0].TabSheet:= TabView0;
-      OptionsArrayAnzeige[1].Eintrag := OptionsTree_PartyMode;
-      OptionsArrayAnzeige[1].TabSheet:= TabView1;
 
-      OptionsArrayAnzeige[2].Eintrag := OptionsTree_ViewPlayer;
-      OptionsArrayAnzeige[2].TabSheet:= TabView2;
+      OptionsArrayAnzeige[1].Eintrag := OptionsTree_ViewPlayer;
+      OptionsArrayAnzeige[1].TabSheet:= TabView2;
+
+      OptionsArrayAnzeige[2].Eintrag := OptionsTree_PartyMode;
+      OptionsArrayAnzeige[2].TabSheet:= TabView1;
 
       OptionsArrayAnzeige[3].Eintrag := OptionsTree_ViewFonts;
       OptionsArrayAnzeige[3].TabSheet:= TabView3;
@@ -722,24 +723,26 @@ begin
   // PLAYER
   OptionsArrayAudio[0].Eintrag  := OptionsTree_PlayerMain;
   OptionsArrayAudio[0].TabSheet := TabPlayer0;
-      OptionsArrayAudio[1].Eintrag  := OptionsTree_PlayerExtendedPlayer;
-      OptionsArrayAudio[1].TabSheet := TabPlayer1;
 
-      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerPlaylist;
-      OptionsArrayAudio[2].TabSheet := TabPlayer2;
-      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerExtendedPlaylist;
-      OptionsArrayAudio[3].TabSheet := TabPlayer3;
+      OptionsArrayAudio[1].Eintrag  := OptionsTree_PlayerPlaylist;
+      OptionsArrayAudio[1].TabSheet := TabPlayer2;
 
-      OptionsArrayAudio[4].Eintrag  := OptionsTree_PlayerWebradio;
-      OptionsArrayAudio[4].TabSheet := TabPlayer4;
-      OptionsArrayAudio[5].Eintrag  := OptionsTree_PlayerEffects;
-      OptionsArrayAudio[5].TabSheet := TabPlayer5;
-      OptionsArrayAudio[6].Eintrag  := OptionsTree_PlayerEvents;
-      OptionsArrayAudio[6].TabSheet := TabPlayer6;            // Birthday
-      OptionsArrayAudio[7].Eintrag  := OptionsTree_PlayerScrobbler;
-      OptionsArrayAudio[7].TabSheet := TabPlayer7;          // Scrobbler
-      OptionsArrayAudio[8].Eintrag  := OptionsTree_PlayerWebServer;
-      OptionsArrayAudio[8].TabSheet := TabPlayer8;          // WebServer
+      //OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerExtendedPlaylist;
+      //OptionsArrayAudio[3].TabSheet := TabPlayer3;
+
+      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerWebradio;
+      OptionsArrayAudio[2].TabSheet := TabPlayer4;
+      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerEffects;
+      OptionsArrayAudio[3].TabSheet := TabPlayer5;
+      OptionsArrayAudio[4].Eintrag  := OptionsTree_PlayerEvents;
+      OptionsArrayAudio[4].TabSheet := TabPlayer6;            // Birthday
+      OptionsArrayAudio[5].Eintrag  := OptionsTree_PlayerScrobbler;
+      OptionsArrayAudio[5].TabSheet := TabPlayer7;          // Scrobbler
+      OptionsArrayAudio[6].Eintrag  := OptionsTree_PlayerWebServer;
+      OptionsArrayAudio[6].TabSheet := TabPlayer8;          // WebServer
+
+      OptionsArrayAudio[7].Eintrag  := OptionsTree_PlayerExtendedPlayer;
+      OptionsArrayAudio[7].TabSheet := TabPlayer1;        // extended settings
 
   // FILE MANAGEMENT
 
@@ -762,7 +765,7 @@ begin
 
 
   // Fill Tree
-  ShowSettings(False);
+  ShowSettings(True);
 
   OptionsVST.FullExpand(Nil);
 
@@ -782,7 +785,7 @@ begin
   TabPlayer0.TabVisible := False;
   TabPlayer1.TabVisible := False;
   TabPlayer2.TabVisible := False;
-  TabPlayer3.TabVisible := False;
+  //TabPlayer3.TabVisible := False;
   TabPlayer4.TabVisible := False;
   TabPlayer5.TabVisible := False;
   TabPlayer6.TabVisible := False;
@@ -794,6 +797,7 @@ begin
   TabFiles2.TabVisible := False;
   TabFiles3.TabVisible := False;
   TabFiles4.TabVisible := False;
+
 
 
   // Die Auswahlboxen mit den entsprechenden Zeichensätzen füllen
@@ -899,33 +903,40 @@ begin
     // MAIN
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArraySystem[0]);
     Firstnode := MainNode;
-    if ExtendedSettings then
+    //if ExtendedSettings then
         for i := 1 to High(OptionsArraySystem) do
-            AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i])
-    else
-        for i := 1 to High(OptionsArraySystem) - 1 do            // Dont show Hibernate-Page
             AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i]);
+    //else
+    //    for i := 1 to High(OptionsArraySystem) - 1 do            // Dont show Hibernate-Page
+    //        AddVSTOptions(OptionsVST, MainNode, OptionsArraySystem[i]);
 
     // VIEW
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAnzeige[0]);
     VorauswahlNode := MainNode;
-    if ExtendedSettings then
+        //if ExtendedSettings then
         for i := 1 to High(OptionsArrayAnzeige) do
-            AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[i])
-    else
-        AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[1]);
+            AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[i]);
+        //else
+        //    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAnzeige[1]);
 
     // PLAYER
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAudio[0]);
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]); // Playlist
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]); // Webradio
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]); // Effects
+          BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]); // Birthday
+          ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]); // Scrobbler
+          WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]); // Webserver
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]); // extended
 
-    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]);
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]);
-    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]);
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]);
-    AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]);
-    BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]);
-    ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]);
-    WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[8]);
+    //if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]);
+    //AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]);
+    //if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]);
+    //AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]);
+    //AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]);
+    //BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]);
+    //ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]);
+    //WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[8]);
 
     {for i := 1 to High(OptionsArrayAudio) do
     begin
@@ -958,9 +969,10 @@ begin
 end;
 
 
-procedure TOptionsCompleteForm.cb_SettingsModeChange(Sender: TObject);
+procedure TOptionsCompleteForm._XXX_cb_SettingsModeChange(Sender: TObject);
 begin
-    ShowSettings(cb_SettingsMode.ItemIndex = 1);
+    // ShowSettings(cb_SettingsMode.ItemIndex = 1);
+    // removed june 2017. always show all settings
 end;
 
 
@@ -1031,6 +1043,7 @@ var i,s: integer;
     //aBmp: TBitmap;
     ftr: TFileTypeRegistration;
     tmpIPs, tmpThemes: TStrings;
+    Coverbmp: tBitmap;
 begin
   // Beta-Option
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
@@ -1144,16 +1157,17 @@ begin
   CB_AutoSavePlaylist.Checked := NempPlaylist.AutoSave;
 
   CB_AutoDeleteFromPlaylist.Checked := NempPlaylist.AutoDelete;
-      CB_DisableAutoDeleteAtSlide.Checked         := NempPlaylist.DisableAutoDeleteAtSlide          ;
-      CB_DisableAutoDeleteAtPause.Checked         := NempPlaylist.DisableAutoDeleteAtPause          ;
-      CB_DisAbleAutoDeleteAtStop.Checked          := NempPlaylist.DisAbleAutoDeleteAtStop           ;
-      CB_DisableAutoDeleteAtTitleChange.Checked   := NempPlaylist.DisableAutoDeleteAtTitleChange    ;
 
-      CB_DisableAutoDeleteAtSlide.Enabled         := NempPlaylist.AutoDelete          ;
-      CB_DisableAutoDeleteAtPause.Enabled         := NempPlaylist.AutoDelete          ;
-      CB_DisAbleAutoDeleteAtStop.Enabled          := NempPlaylist.AutoDelete           ;
-      CB_DisableAutoDeleteAtTitleChange.Enabled   := NempPlaylist.AutoDelete    ;
+      CB_DisableAutoDeleteAtUserInput.Checked := NempPlaylist.DisableAutoDeleteAtUserInput ;
+      CB_DisableAutoDeleteAtUserInput.Enabled := NempPlaylist.AutoDelete                   ;
 
+      //CB_DisableAutoDeleteAtSlide.Checked         := NempPlaylist.DisableAutoDeleteAtSlide          ;
+      //CB_DisableAutoDeleteAtPause.Checked         := NempPlaylist.DisableAutoDeleteAtPause          ;
+      //CB_DisAbleAutoDeleteAtStop.Checked          := NempPlaylist.DisAbleAutoDeleteAtStop           ;
+      //CB_DisableAutoDeleteAtTitleChange.Checked   := NempPlaylist.DisableAutoDeleteAtTitleChange    ;
+      //CB_DisableAutoDeleteAtPause.Enabled         := NempPlaylist.AutoDelete          ;
+      //CB_DisAbleAutoDeleteAtStop.Enabled          := NempPlaylist.AutoDelete           ;
+      //CB_DisableAutoDeleteAtTitleChange.Enabled   := NempPlaylist.AutoDelete    ;
 
   CB_AutoMixPlaylist.Checked        := NempPlaylist.AutoMix;
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
@@ -1214,6 +1228,9 @@ begin
   CBChangeFontOnCbrVbr.Checked := Nemp_MainForm.NempOptions.ChangeFontOnCbrVbr;
   SEFontSize.Value := Nemp_MainForm.NempOptions.DefaultFontSize;
   SERowHeight.Value := Nemp_MainForm.NempOptions.RowHeight;
+
+  cb_Medialist_FontStyle.ItemIndex := Nemp_MainForm.NempOptions.DefaultFontStyle ;
+  cb_Browselist_FontStyle.ItemIndex := Nemp_MainForm.NempOptions.ArtistAlbenFontStyle ;
 
   CBFontNameCBR.ItemIndex := CBFontNameCBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameCBR);
   CBFontNameVBR.ItemIndex := CBFontNameVBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameVBR);
@@ -1327,25 +1344,6 @@ begin
   // Artist/alben-Größen
   SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
   SEArtistAlbenRowHeight.Value := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
-
-  {// Farben
-  ShapeMinColor.Enabled          := CBChangeFontColoronBitrate.Checked;
-  ShapeMittelColor.Enabled       := CBChangeFontColoronBitrate.Checked;
-  ShapeMaxColor.Enabled          := CBChangeFontColoronBitrate.Checked;
-  CBMiddleToMinComputing.Enabled := CBChangeFontColoronBitrate.Checked;
-  CBMiddleToMaxComputing.Enabled := CBChangeFontColoronBitrate.Checked;
-
-  Label25.Enabled                := CBChangeFontColoronBitrate.Checked;
-  Label26.Enabled                := CBChangeFontColoronBitrate.Checked;
-  Label27.Enabled                := CBChangeFontColoronBitrate.Checked;
-  ShapeMinColor.Brush.Color   := Nemp_MainForm.NempOptions.MinFontColor;
-  ShapeMittelColor.Brush.Color:= Nemp_MainForm.NempOptions.MiddleFontColor;
-  ShapeMaxColor.Brush.Color   := Nemp_MainForm.NempOptions.MaxFontColor;
-  CBMiddleToMinComputing.ItemIndex := Nemp_MainForm.NempOptions.MiddleToMinComputing ;
-  CBMiddleToMaxComputing.ItemIndex := Nemp_MainForm.NempOptions.MiddleToMaxComputing ;
-  RePaintVerlauf(CBChangeFontColoronBitrate.Checked);
-  LblConst_FontColorHint.Enabled                := CBChangeFontColoronBitrate.Checked;
-  }
 
   // Zeichensätze
   With MedienBib do
@@ -1563,7 +1561,7 @@ begin
 
   ChangeWebserverLinks(Nil);
 
-
+  LoadDefaultCover;
 
   //SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;
@@ -1741,27 +1739,6 @@ begin
   CBFontNameCBR.Enabled := CBChangeFontOnCbrVbr.Checked;
 end;
 
-(*
-procedure TOptionsCompleteForm.RePaintVerlauf(Verlauf: Boolean);
-var i: integer;
-begin
-  for i:=0 to 320 do
-  begin
-    if Verlauf then
-      VerlaufBitmap.Canvas.Pen.Color := BitrateToColor (i,
-      ShapeMinColor.Brush.Color,
-      ShapeMittelColor.Brush.Color,
-      ShapeMaxColor.Brush.Color,
-      CBMiddleToMinComputing.ItemIndex,
-      CBMiddleToMaxComputing.ItemIndex )
-    else
-      VerlaufBitmap.Canvas.Pen.Color := clWindowText;
-    VerlaufBitmap.Canvas.MoveTo(i,0);
-    VerlaufBitmap.Canvas.LineTo(i,17);
-  end;
-  Image1.Picture.Assign(VerlaufBitmap);
-end;
-*)
 
 procedure TOptionsCompleteForm.Btn_SelectAllClick(Sender: TObject);
 var i: integer;
@@ -1864,8 +1841,9 @@ begin
   end;
 
   // iTouch-Player setzen
-  if CBiTouch.Checked then
-    ftr.SetITouchMediaPlayer('"' +  Paramstr(0) + '"');
+  // removed 2017
+  // if CBiTouch.Checked then
+  //  ftr.SetITouchMediaPlayer('"' +  Paramstr(0) + '"');
 
   ftr.UpdateShell;
   ftr.free;
@@ -1913,10 +1891,11 @@ end;
 procedure TOptionsCompleteForm.CB_AutoDeleteFromPlaylistClick(
   Sender: TObject);
 begin
-      CB_DisableAutoDeleteAtSlide.Enabled         := CB_AutoDeleteFromPlaylist.Checked  ;
-      CB_DisableAutoDeleteAtPause.Enabled         := CB_AutoDeleteFromPlaylist.Checked  ;
-      CB_DisAbleAutoDeleteAtStop.Enabled          := CB_AutoDeleteFromPlaylist.Checked  ;
-      CB_DisableAutoDeleteAtTitleChange.Enabled   := CB_AutoDeleteFromPlaylist.Checked  ;
+      CB_DisableAutoDeleteAtUserInput.Enabled := CB_AutoDeleteFromPlaylist.Checked  ;
+      //CB_DisableAutoDeleteAtSlide.Enabled         := CB_AutoDeleteFromPlaylist.Checked  ;
+      //CB_DisableAutoDeleteAtPause.Enabled         := CB_AutoDeleteFromPlaylist.Checked  ;
+      //CB_DisAbleAutoDeleteAtStop.Enabled          := CB_AutoDeleteFromPlaylist.Checked  ;
+      //CB_DisableAutoDeleteAtTitleChange.Enabled   := CB_AutoDeleteFromPlaylist.Checked  ;
 end;
 
 
@@ -2108,12 +2087,13 @@ begin
   Nemp_MainForm.AutoSavePlaylistTimer.Enabled := CB_AutoSavePlaylist.Checked;
   Nemp_MainForm.AutoSavePlaylistTimer.Interval := 5 * 60000;
 
-  NempPlaylist.AutoDelete     := CB_AutoDeleteFromPlaylist.Checked;
-        NempPlaylist.DisableAutoDeleteAtSlide        := CB_DisableAutoDeleteAtSlide.Checked         ;
-        NempPlaylist.DisableAutoDeleteAtPause        := CB_DisableAutoDeleteAtPause.Checked         ;
-        NempPlaylist.DisAbleAutoDeleteAtStop         := CB_DisAbleAutoDeleteAtStop.Checked          ;
-        NempPlaylist.DisableAutoDeleteAtTitleChange  := CB_DisableAutoDeleteAtTitleChange.Checked   ;
+  NempPlaylist.AutoDelete                   := CB_AutoDeleteFromPlaylist.Checked       ;
+  NempPlaylist.DisableAutoDeleteAtUserInput := CB_DisableAutoDeleteAtUserInput.Checked ;
 
+        //NempPlaylist.DisableAutoDeleteAtSlide        := CB_DisableAutoDeleteAtSlide.Checked         ;
+        //NempPlaylist.DisableAutoDeleteAtPause        := CB_DisableAutoDeleteAtPause.Checked         ;
+        //NempPlaylist.DisAbleAutoDeleteAtStop         := CB_DisAbleAutoDeleteAtStop.Checked          ;
+        //NempPlaylist.DisableAutoDeleteAtTitleChange  := CB_DisableAutoDeleteAtTitleChange.Checked   ;
 
   NempPlaylist.AutoMix                         := CB_AutoMixPlaylist.Checked;
   NempPlaylist.JumpToNextCueOnNextClick        := CB_JumpToNextCue.Checked;
@@ -2144,6 +2124,13 @@ begin
 
 
   Nemp_MainForm.NempOptions.DefaultFontSize := SEFontSize.Value;
+  Nemp_MainForm.NempOptions.DefaultFontStyle      := cb_Medialist_FontStyle.ItemIndex ;
+  Nemp_MainForm.NempOptions.ArtistAlbenFontStyle  := cb_Browselist_FontStyle.ItemIndex;
+  // translate into actual font styles
+  Nemp_MainForm.NempOptions.DefaultFontStyles     := FontSelectorItemIndexToStyle(Nemp_MainForm.NempOptions.DefaultFontStyle);
+  Nemp_MainForm.NempOptions.ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(Nemp_MainForm.NempOptions.ArtistAlbenFontStyle);
+
+
 
   for i := 0 to Spaltenzahl-1 do
   begin
@@ -2513,6 +2500,11 @@ begin
       PlaylistVSTResize(Nil);
 
       PlaylistVST.Font.Size := NempOptions.DefaultFontSize;
+
+      PlaylistVST.Invalidate;
+      VST.Invalidate;
+      ArtistsVST.Invalidate;
+      AlbenVST.Invalidate;
   end;
 
   // Zeichensätze
@@ -2726,7 +2718,6 @@ begin
 
   NempWebServer.SaveToIni;
 
-
   oldfactor := Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor;
 
   Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor :=
@@ -2913,6 +2904,8 @@ procedure TOptionsCompleteForm.LblWebserverUserURLClick(Sender: TObject);
 begin
     ShellExecute(Handle, 'open', PChar(LblWebserverUserURL.Caption), nil, nil, SW_SHOW);
 end;
+
+
 
 procedure TOptionsCompleteForm.LblWebserverAdminURLClick(Sender: TObject);
 begin
@@ -3120,6 +3113,60 @@ procedure TOptionsCompleteForm.Btn_CHeckNowForUpdatesClick(
   Sender: TObject);
 begin
     NempUpdater.CheckForUpdatesManually;
+end;
+
+procedure TOptionsCompleteForm.btn_DefaultCoverClick(Sender: TObject);
+var aGraphic: TPicture;
+begin
+    if OpenDlg_DefaultCover.Execute then
+    begin
+        aGraphic := TPicture.Create;
+        try
+            aGraphic.LoadFromFile(OpenDlg_DefaultCover.FileName);
+            if SafeResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
+                LoadDefaultCover
+            else
+                MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
+        finally
+            aGraphic.Free;
+        end;
+    end;
+end;
+
+procedure TOptionsCompleteForm.btn_DefaultCoverResetClick(Sender: TObject);
+var aGraphic: TPicture;
+    FileName: UnicodeString;
+begin
+    FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+    if not FileExists(FileName) then
+        FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
+
+    aGraphic := TPicture.Create;
+    try
+        aGraphic.LoadFromFile(FileName);
+        if SafeResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
+            LoadDefaultCover
+        else
+            MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
+    finally
+        aGraphic.Free;
+    end;
+end;
+
+procedure TOptionsCompleteForm.LoadDefaultCover;
+var Coverbmp: TBitmap;
+begin
+  Coverbmp := tBitmap.Create;
+  try
+      Coverbmp.Width := img_DefaultCover.Width;
+      Coverbmp.Height := img_DefaultCover.Height;
+      GetDefaultCover(dcFile, Coverbmp, 0);
+
+      img_DefaultCover.Picture.Bitmap.Assign(Coverbmp);
+      img_DefaultCover.Refresh;
+  finally
+      Coverbmp.Free;
+  end;
 end;
 
 procedure TOptionsCompleteForm.cbAutoSplitBySizeClick(Sender: TObject);

@@ -392,6 +392,8 @@ type
     ValidFlacFile: Boolean;
     ValidM4AFile: Boolean;
     ValidApeFile: Boolean;
+
+    procedure LoadStarGraphics;
   end;
 
 
@@ -423,8 +425,6 @@ end;
 
 procedure TFDetails.FormCreate(Sender: TObject);
 var i:integer;
-    s,h,u: TBitmap;
-    baseDir: String;
 begin
   PictureFrames := Nil;
   fForceChange := False;
@@ -440,28 +440,19 @@ begin
       cb_VorbisGenre.Items.Add(ID3Genres[i]);
   end;
 
-  MainPageControl.OnChange := Nil;
-  MainPageControl.ActivePageIndex := 0;
-  MainPageControl.ActivePage := Tab_General;
-  MainPageControl.OnChange := MainPageControlChange;
-
   DetailRatingHelper := TRatingHelper.Create;
-  s := TBitmap.Create;
-  h := TBitmap.Create;
-  u := TBitmap.Create;
-  BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-  try
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
-      DetailRatingHelper.SetStars(s,h,u);
-  finally
-      s.Free;
-      h.Free;
-      u.Free;
-  end;
+  LoadStarGraphics;
+
+  //MainPageControl.OnChange := Nil;
+  //MainPageControl.ActivePageIndex := 0;
+  //MainPageControl.ActivePage := Tab_General;
+  //MainPageControl.OnChange := MainPageControlChange;
+
+
+  //self.RatingImageID3.
   //doubleBuffered := True;
 end;
+
 
 procedure TFDetails.FormDestroy(Sender: TObject);
 begin
@@ -488,6 +479,45 @@ procedure TFDetails.FormHide(Sender: TObject);
 begin
     Nemp_MainForm.AutoShowDetailsTMP := False;
     CurrentAudioFile := Nil;
+end;
+
+procedure TFDetails.LoadStarGraphics;
+var i:integer;
+    s,h,u: TBitmap;
+    baseDir: String;
+
+begin
+  // exit;
+  s := TBitmap.Create;
+  h := TBitmap.Create;
+  u := TBitmap.Create;
+
+
+  if Nemp_MainForm.NempSkin.isActive
+      and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
+      and Nemp_MainForm.NempSkin.UseAdvancedSkin
+      and Nemp_MainForm.GlobalUseAdvancedSkin
+  then
+      BaseDir := Nemp_MainForm.NempSkin.Path + '\'
+  else
+      // Detail-Form is not skinned, use default images
+      BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+  try
+      s.Transparent := True;
+      h.Transparent := True;
+      u.Transparent := True;
+
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
+
+      DetailRatingHelper.SetStars(s,h,u);
+  finally
+      s.Free;
+      h.Free;
+      u.Free;
+  end;
 end;
 
 {
@@ -792,7 +822,7 @@ begin
           except
               on E: Exception do
               begin
-                  GetDefaultCover(dcNoCover, aCoverBmp, 0);
+                  GetDefaultCover(dcFile, aCoverBmp, 0);
                   CoverIMAGE.Picture.Bitmap.Assign(aCoverbmp);
                   TranslateMessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
               end;

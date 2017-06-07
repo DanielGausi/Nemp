@@ -298,7 +298,7 @@ type
           procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TObjectList; Target: TObjectList; HideAutoTags: Boolean = False);
 
           // Show the Tags in the Cloud
-          procedure ShowTags;
+          procedure ShowTags(Refocus: Boolean);
 
           // Backup/RestoreNavigation: Save the current Breadcrumbs and restore them after
           // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
@@ -983,13 +983,16 @@ begin
 end;
 
 
-procedure TTagCloud.ShowTags;
+procedure TTagCloud.ShowTags(Refocus: Boolean);
 begin
     MouseOverTag := Nil;
-    FocussedTag  := Nil;
+    if Refocus then
+        FocussedTag  := Nil;
 
     CloudPainter.Paint(CurrentTagList);
-    FocussedTag := CloudPainter.GetFirstNewTag;
+
+    if Refocus then
+        FocussedTag := CloudPainter.GetFirstNewTag;
 
     if assigned(FocussedTag) then
         FocussedTag.PaintFocussed(CloudPainter.Canvas);
@@ -2017,7 +2020,8 @@ begin
     for i := 1 to visibleTags.Count - 1 do
         if TPainttag(visibleTags[i]).BreadCrumbIndex = High(Integer) then
         begin
-            result := TPainttag(visibleTags[i]);
+            // Change in 2017. Focus on the last Breadcrumb-tag
+            result := TPainttag(visibleTags[i-1]);
             break;
         end;
 end;

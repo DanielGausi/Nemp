@@ -90,6 +90,7 @@ DetailForm_InfoLblHint     = 'Hint:';
 DetailForm_InfoLblHinttext = 'Some information could be obsolete or wrong.';
 DetailForm_PlayCounter     = 'Played %d times';
 
+
 DetailForm_InfoLblPath     = 'Path';
 DetailForm_InfoLblFilename = 'Filename';
 DetailForm_InfoLblFileSize = 'Filesize';
@@ -210,10 +211,11 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_SystemGeneral     = 'General settings';
     OptionsTree_SystemFiletyps    = 'File types registration';
     OptionsTree_SystemControl     = 'Controls';
+    OptionsTree_SystemSystem      = 'System';
     OptionsTree_SystemTaskbar     = 'Taskbar and tray';
     OptionsTree_SystemHibernate   = 'Hibernate / Stand by';
 
-    OptionsTree_ViewMain          = 'Viewing options';
+    OptionsTree_ViewMain          = 'Viewing settings';
     OptionsTree_ViewPlayer        = 'Player and Cover';
     //OptionsTree_ViewView          = 'View';
     OptionsTree_ViewFonts         = 'Fonts';
@@ -241,7 +243,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_MediabibSearch    = 'Search options';
     OptionsTree_MediabibUnicode   = 'Unicode';
 
-
+    OptionsForm_DefaultCoverChangeFailed = 'Sorry, some error occured while saving the new default cover art in the Nemp cover archive.';
 
     Warning_NoSkinFound = 'No skins found';
     AdvancedSkinActivateHint = 'Note: The current skin does not support advanced skinning.';
@@ -678,6 +680,9 @@ AudioFileProperty_Year        = 'Year';
 AudioFileProperty_Genre       = 'Genre';
 AudioFileProperty_Lyrics      = 'Lyrics';
 AudioFileProperty_Track       = 'Track';
+Audiofile_PlayCounterHint     = 'Played %d times';
+//Audiofile_RatingHintNoRating  = 'Rating: N/A';
+Audiofile_RatingHint          = 'Rating: %s of 5 stars';
 
 
     AutoScanDirsDialog_Caption = 'Confirmation';
