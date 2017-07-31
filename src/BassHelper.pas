@@ -51,6 +51,7 @@ begin
   begin
       if (length = 0) then
           Spectrum.DrawText(String(PAnsiChar(buffer)))
+          //AddErrorLog(String(PAnsiChar(buffer)));
       else
       begin
           if NempPlayer.StreamRecording and assigned(NempPlayer.RecordStream) then

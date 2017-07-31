@@ -42,7 +42,7 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
   Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
-  DateUtils;
+  DateUtils, RatingCtrls;
 
 type
     TAudioFileAction = (afa_None,
@@ -1038,9 +1038,11 @@ begin
 end;
 
 function TAudioFile.fGetRoundedRating: Double;
-var base: Integer;
+//var base: Integer;
 begin
-    if fRating = 0 then
+    // unit RatingCtrls
+    result := GetRoundedRating(fRating);
+{    if fRating = 0 then
         base := 127
     else
         base := fRating;
@@ -1057,6 +1059,7 @@ begin
             // add only a half star
             result := result + 0.5;
     end;
+}
 end;
 
 function TAudioFile.GetHint(naArtist, naTitle, naAlbum: Integer): UnicodeString;

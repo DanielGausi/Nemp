@@ -140,7 +140,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
-    CDOpenDialogs, LowBattery;
+    CDOpenDialogs, LowBattery, PlayWebstream;
 
 procedure CorrectVolButton;
 begin
@@ -1184,6 +1184,8 @@ begin
             ReTranslateComponent(FormLowBattery);
             FormLowBattery.RestoreComboboxes;
         end;
+
+        if assigned(FPlayWebstream) then ReTranslateComponent(FPlayWebstream);
 
          // Todo:
         // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)

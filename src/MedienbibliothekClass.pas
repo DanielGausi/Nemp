@@ -563,6 +563,9 @@ type
         // Generating RandomList (Random Playlist)
         procedure FillRandomList(aList: TObjectlist);
 
+        // copy all files into another list (used for counting ratings)
+        procedure FillListWithMedialibrary(aList: TObjectList);
+
         // Helper for AutoScan-Directories
         function ScanListContainsParentDir(NewDir: UnicodeString):UnicodeString;
         function ScanListContainsSubDirs(NewDir: UnicodeString):UnicodeString;
@@ -1066,7 +1069,7 @@ begin
         BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 1);
         if (BrowseMode < 0) OR (BrowseMode > 2) then
           BrowseMode := 1;
-        CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 1);
+        CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 8);
         if (CoverSortOrder < 1) OR (CoverSortOrder > 9) then
           CoverSortorder := 1;
 
@@ -4467,6 +4470,17 @@ begin
     aList.Delete(i);
 
   LeaveCriticalSection(CSUpdate);
+end;
+
+procedure TMedienBibliothek.FillListWithMedialibrary(aList: TObjectList);
+var sourceList: TObjectlist;
+    i: Integer;
+begin
+    EnterCriticalSection(CSUpdate);
+    SourceList := Mp3ListePfadSort;
+    for i := 0 to SourceList.Count - 1 do
+        aList.Add(SourceList[i]);
+    LeaveCriticalSection(CSUpdate);
 end;
 
 {

@@ -36,7 +36,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
-  IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException,
+  IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException, IdExceptionCore,
   CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs;
 
@@ -734,6 +734,19 @@ begin
         fXMLData := fIDHttp.Get(url);
         result := True;
     except
+        on E: EidIOHandlerPropInvalid  do
+        begin
+            fInternetConnectionLost := True;
+            fXMLData := '';
+            result := False;
+        end;
+
+        on E: EIDHttpProtocolException do
+        begin
+            fInternetConnectionLost := True;
+            fXMLData := '';
+            result := False;
+        end;
         on E: EIdSocketError do
         begin
             fInternetConnectionLost := True;
@@ -800,6 +813,19 @@ begin
         try
             fIDHttp.Get(fBestCoverURL, fDataStream);
         except
+
+            on E: EidIOHandlerPropInvalid  do
+            begin
+                fInternetConnectionLost := True;
+                fXMLData := '';
+                result := False;
+            end;
+            on E: EIDHttpProtocolException do
+            begin
+                fInternetConnectionLost := True;
+                fXMLData := '';
+                result := False;
+            end;
             on E: EIdSocketError do
             begin
                 fDataStream.Clear;

@@ -102,7 +102,11 @@ begin
 
 
             ReadNempOptions(ini, NempOptions);
-            if (NempOptions.Language <> '') and (NempOptions.Language <> GetCurrentLanguage) then
+            if NempOptions.Language = '' then
+                // overwrite the default setting with the curent system language
+                NempOptions.Language := GetCurrentLanguage;
+
+            if (NempOptions.Language <> GetCurrentLanguage) then // and (NempOptions.Language <> '') and
                 Uselanguage(NempOptions.Language);
 
             g15path := ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp;
@@ -470,10 +474,10 @@ begin
         else
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions - [toFullRowSelect];
 
-        if NempOptions.EditOnClick then
-            VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions + [toEditOnClick]
-        else
-            VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
+        //if NempOptions.EditOnClick then
+            VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions + [toEditOnClick];
+        //else
+        //    VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
 
 
         VST.ShowHint := MedienBib.ShowHintsInMedialist;
@@ -507,7 +511,7 @@ begin
                 RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
         end;
         BassTimer.Interval := NempPlayer.VisualizationInterval;
-        AutoSavePlaylistTimer.Enabled := NempPlaylist.AutoSave;
+        AutoSavePlaylistTimer.Enabled := True; // NempPlaylist.AutoSave;
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
         if NempOptions.RegisterHotKeys then
@@ -616,6 +620,7 @@ end;
 procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
 begin
+    Formatsettings.LongTimeFormat := 'HH:mm';
     //s1 := gettickcount;
     with Nemp_MainForm do
     begin

@@ -482,6 +482,9 @@ begin
                                     aMsg.Result := 0
                                  else
                                     aMsg.Result := 1;
+        IPC_SETUSEDISPLAYAPP: begin
+            NempOptions.UseDisplayApp := Boolean(aMsg.WParam);
+        end
         else
             result := False;
     end;

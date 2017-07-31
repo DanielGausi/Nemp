@@ -216,7 +216,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_SystemHibernate   = 'Hibernate / Stand by';
 
     OptionsTree_ViewMain          = 'Viewing settings';
-    OptionsTree_ViewPlayer        = 'Player and Cover';
+    OptionsTree_ViewPlayer        = 'Player';
     //OptionsTree_ViewView          = 'View';
     OptionsTree_ViewFonts         = 'Fonts';
     OptionsTree_PartyMode         = 'Party-Mode';
@@ -234,6 +234,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerWebServer   = 'WebServer';
     OptionsTree_PlayerExtendedPlayer   = 'Player (extended)';
     OptionsTree_PlayerExtendedPlaylist = 'Playlist (extended)';
+    OptionsTree_PlayerRandom      = 'Random playback';
 
     OptionsTree_FilesMain         = 'File management';
     OptionsTree_FilesCover        = 'Cover';
@@ -244,6 +245,9 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_MediabibUnicode   = 'Unicode';
 
     OptionsForm_DefaultCoverChangeFailed = 'Sorry, some error occured while saving the new default cover art in the Nemp cover archive.';
+    OptionsForm_InvalidTime = 'Invalid time. Try something between 00:00 and 23:59.';
+
+    OptionsForm_UnratedFilesHint = '* Including %d unrated files.';
 
     Warning_NoSkinFound = 'No skins found';
     AdvancedSkinActivateHint = 'Note: The current skin does not support advanced skinning.';
@@ -692,7 +696,7 @@ Audiofile_RatingHint          = 'Rating: %s of 5 stars';
     AutoScanDirsDialog_ShowAgain = 'Save selection and do not show this dialog again.';
 
 Shoutcast_Error_ConnectionFailed = 'Connection failed. Please check your internet configuration.';
-Shoutcast_Error_DownloadFailed = 'Download failed. Please check your internet configuration.';
+Shoutcast_Error_DownloadFailed = 'Download failed. If the stream is available in other players, disable the parsing of the playlist in the settings dialog and try again.';
 Shoutcast_Connecting = 'Connecting to shoutcast.com ...';
 Shoutcast_Connecting_MainForm = 'Connecting...';
 Shoutcast_Downloading = 'Downloading stationlist...';
@@ -718,6 +722,8 @@ TagEditor_RenameTag_Prompt = 'Enter a new name for the tag. If it already exists
 
 TagEditor_Merge_Caption = 'Merge Tags';
 TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it already exists, the tags are merged with this one.';
+
+TagEditor_Delete_Query = 'This will remove the selected tags from all files in the media library. Continue?';
 
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 

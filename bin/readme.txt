@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - März 2017
+      Januar 2005 - August 2017
 
-      Version: 4.6.4
+      Version: 4.7.0
 
 
 -----------------------------------------------------------
@@ -116,7 +116,7 @@ Verwendete Units/Komponenten:
 
 
 
-Version 4.6.4, März 2017
+Version 4.7.0, August 2017
 ----------------------------------------------------------- 
 Neue Funktionen:
 ----------------
@@ -124,11 +124,32 @@ Neue Funktionen:
   das aktuell gewählte Stück ab
 - Option: Bei Wiedergabemodus "Wiederhole Titel" auch nur den aktuellen Eintrag in einem 
   Cuesheet abspielen, und nicht die ganze Datei
+- Option: Gewichtete Zufallswiedergabe. Hoch bewertete Titel in der Playlist werden mit 
+  einer höheren Wahrscheinlichkeit zur Wiedergabe ausgewählt als solche mit einer geringen
+  Bewertung (oder auch genau umgekehrt)
+- Option: Standardcover auswählbar (wird angezeigt, wenn kein Cover gefunden wurde)
+
+Änderungen:
+-----------
+- Kleinere Änderungen am GUI der Tagwolke
+- Einstellungs-Fenster überarbeitet. Es werden immer alle Optionen angezeigt. 
+  Diese wurden aber teilweise sinnvoller sortiert und etwas entschlackt. Einige alte und
+  äußerst selten benutzte Optionen sind weggefallen, ein paar andere sind hinzugekommen
+- Änderungen an einigen Standardeinstellungen, die Relikte von früher waren und eher 
+  für Verwirrung als Klarheit gesorgt haben.
 
 Bugfixes:
 ---------
+- Die App für das Tastatur-Display zeigte nun beim Abspielen von Webradio den aktuellen Titel,
+  und nicht dauerhaft den Titel, der beim Start des Streams aktiv war 
+  (falls der Sender passende Metadaten sendet)
+- Einstellung in der Display-App "Display-App mit Nemp starten" wird jetzt von Nemp 
+  korrekt übernommen
 - Zuverlässigere Speicherung der Fensterpositionen bei Wechsel zwischen kompakter Ansicht
   und Einzelfenstermodus
+- Einige Webstreams schienen Nemp zu blocken, gefixed durch einen eigenen HTTP-User-Agenten 
+  an Stelle des bass.dll-Standards.
+- last.fm Sessionkey wurde nach einer Änderung des Service fehlerhaft gespeichert
 
 
 

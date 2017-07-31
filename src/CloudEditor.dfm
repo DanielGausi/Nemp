@@ -213,10 +213,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Merged/renamed tags'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         498
         350)
@@ -278,10 +274,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_DeleteTags: TTabSheet
       Caption = 'Deleted tags'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         498
         350)

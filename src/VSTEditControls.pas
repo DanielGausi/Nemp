@@ -108,7 +108,7 @@ type
   // is set, in OnMouseLeave the Editing is cancelled, in OnClick it ends.
   TRatingEditLink = class(TInterfacedObject, IVTEditLink)
   private
-    FEdit: TWinControl;        // TRatingControl here
+    FEdit: TRatingControl; //TWinControl;        // TRatingControl here
     FTree: TVirtualStringTree;
     FNode: PVirtualNode;
     FColumn: Integer;

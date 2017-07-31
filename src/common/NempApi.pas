@@ -169,6 +169,8 @@ function Nemp_GetSearchStatus: Integer;                          // Nemp
 // False: Nemp hat kein Bild zum Lied.
 function Nemp_QueryCover(QueryHnd: HWND): Integer;
 
+procedure Nemp_SetDisplayApp(value: Boolean);
+
 
 const
         // Konstanten, die auch für Winamp genutzt werden können
@@ -264,6 +266,10 @@ const
         IPC_CF_TITLEONLY = 3;
         IPC_CF_ALBUM     = 4;
 
+        // Nemp 4.7
+        // Notify Nemp Window to set the Display-App-Setting
+        // True/False in second Parameter
+        IPC_SETUSEDISPLAYAPP = 52500;
 
 
         // Anfrage zum Cover:
@@ -312,6 +318,8 @@ var
 
 
 implementation
+
+
 
 procedure SetNemp_User(value, kind: Integer);
 var hwndNemp:THandle;
@@ -1087,6 +1095,11 @@ begin
     result := -1
   else
     result := SendMessage(hwndNemp, WM_USER, QueryHnd, IPC_QUERYCOVER);
+end;
+
+procedure Nemp_SetDisplayApp(value: Boolean);
+begin
+  SetNemp_User(Integer(value), IPC_SETUSEDISPLAYAPP);
 end;
 
 initialization

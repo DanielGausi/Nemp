@@ -77,8 +77,57 @@ uses windows, classes, ExtCtrls, Graphics;
 
     end;
 
+    function GetRoundedRating(fRating: Integer): Double;
+    function RatingToArrayIndex(aRating: Integer): Integer;
 
 implementation
+
+
+function GetRoundedRating(fRating: Integer): Double;
+var base: Integer;
+begin
+    if fRating = 0 then
+        base := 127
+    else
+        base := fRating;
+
+    result := base div 51;
+
+    if (base div 51) <= 4 then
+    begin
+        if ((base mod 51) > 25) then
+            // add a full star
+            result := result + 1
+        else
+            // add only a half star
+            result := result + 0.5;
+    end;
+end;
+
+function RatingToArrayIndex(aRating: Integer): Integer;
+var base: Integer;
+begin
+    if aRating = 0 then
+        base := 127
+    else
+        base := aRating;
+
+    result := 2 * (base div 51);
+
+    if (base div 51) <= 4 then
+    begin
+        if ((base mod 51) > 25) then
+            // add a full star, or 2 in the index
+            result := result + 2
+        else
+            // add only a half star, only 1 in the index
+            result := result + 1;
+    end;
+    // to be sure: range check, default = 2.5 stars // index = 5
+    if (result < 0) or (result > 10) then
+        result := 5;
+end;
+
 
 { TRatingImage }
 

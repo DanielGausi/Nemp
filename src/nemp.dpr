@@ -104,14 +104,12 @@ uses
   filetypes in '3rd Party Units\filetypes.pas',
   WindowsVersionInfo in '3rd Party Units\WindowsVersionInfo.pas',
   Windows_Fragment in '3rd Party Units\Windows_Fragment.pas',
-
   gnugettext in '3rd Party Units\gnugettext.pas',
-  languagecodes in '3rd Party Units\languagecodes.pas'
-
-
+  languagecodes in '3rd Party Units\languagecodes.pas',
+  PlayWebstream in 'PlayWebstream.pas'
   {$IFDEF USESTYLES}
    ,vcl.themes, vcl.styles
-   {$ENDIF};
+  {$ENDIF};
 
 {$R *.res}
 
@@ -144,6 +142,7 @@ ShowWindow
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
+  //Application.CreateForm(TForm1, Form1);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

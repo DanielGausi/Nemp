@@ -57,18 +57,18 @@ object RandomPlaylistForm: TRandomPlaylistForm
       TabOrder = 2
       Value = 2007
     end
-    object cbIgnoreYear: TCheckBox
+    object cbRestrictTime: TCheckBox
       Left = 8
       Top = 16
       Width = 161
       Height = 17
-      Caption = 'Ignore'
+      Caption = 'Restrict time'
       Checked = True
       ParentShowHint = False
       ShowHint = True
       State = cbChecked
       TabOrder = 0
-      OnClick = cbIgnoreYearClick
+      OnClick = cbRestrictTimeClick
     end
     object SE_PeriodFrom: TSpinEdit
       Left = 24
@@ -115,18 +115,18 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Height = 13
       Caption = 'Audiofiles must match'
     end
-    object cbIgnoreGenres: TCheckBox
+    object cbRestrictTags: TCheckBox
       Left = 16
       Top = 20
       Width = 104
       Height = 17
-      Caption = 'Ignore'
+      Caption = 'Restrict tags'
       Checked = True
       ParentShowHint = False
       ShowHint = True
       State = cbChecked
       TabOrder = 0
-      OnClick = cbIgnoreGenresClick
+      OnClick = cbRestrictTagsClick
     end
     object cbGenres: TCheckListBox
       Left = 132
@@ -155,7 +155,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 108
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
       TabOrder = 1
       OnChange = cb_PreselectionChange
     end
@@ -165,7 +164,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 108
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 5
       TabOrder = 4
       Text = '150'
@@ -189,7 +187,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 108
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 1
       TabOrder = 5
       Text = 'almost all tags'
@@ -228,18 +225,17 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 97
       Height = 22
       Increment = 10
-      MaxValue = 1000
-      MinValue = 20
+      MaxValue = 50000
+      MinValue = 1
       TabOrder = 1
       Value = 100
     end
     object CBWholeBib: TComboBox
       Left = 16
       Top = 36
-      Width = 144
+      Width = 153
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 0
       TabOrder = 0
       Text = 'whole media library'
@@ -260,7 +256,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     OnClick = Btn_OkClick
   end
   object Btn_Cancel: TButton
-    Left = 413
+    Left = 410
     Top = 521
     Width = 75
     Height = 25
@@ -269,6 +265,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 4
+    OnClick = Btn_CancelClick
   end
   object CBInsertMode: TComboBox
     Left = 8
@@ -277,7 +274,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
     Height = 21
     Style = csDropDownList
     Anchors = [akLeft, akBottom]
-    ItemHeight = 13
     ItemIndex = 1
     TabOrder = 5
     Text = 'Play (and clear current playlist)'
@@ -309,7 +305,6 @@ object RandomPlaylistForm: TRandomPlaylistForm
       Width = 148
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 1
       TabOrder = 0
       Text = 'equal or better than'

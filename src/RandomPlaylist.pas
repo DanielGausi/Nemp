@@ -58,9 +58,9 @@ type
     LblConst_PeriodTo: TLabel;
     LblConst_PeriodFrom: TLabel;
     SE_PeriodTo: TSpinEdit;
-    cbIgnoreYear: TCheckBox;
+    cbRestrictTime: TCheckBox;
     GrpBox_Tags: TGroupBox;
-    cbIgnoreGenres: TCheckBox;
+    cbRestrictTags: TCheckBox;
     cbGenres: TCheckListBox;
     SE_PeriodFrom: TSpinEdit;
     GrpBox_General: TGroupBox;
@@ -89,8 +89,8 @@ type
     cbTagMatchType: TComboBox;
     LblTagMatchType: TLabel;
     procedure FormCreate(Sender: TObject);
-    procedure cbIgnoreYearClick(Sender: TObject);
-    procedure cbIgnoreGenresClick(Sender: TObject);
+    procedure cbRestrictTimeClick(Sender: TObject);
+    procedure cbRestrictTagsClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     function CheckNewName(aName: String; OwnIndex: Integer): Boolean;
     procedure Btn_OkClick(Sender: TObject);
@@ -109,6 +109,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure cbTagCountSelectionChange(Sender: TObject);
+    procedure Btn_CancelClick(Sender: TObject);
   private
     { Private-Deklarationen }
     //GenreSettings: Array [0..9] of TGenreSetting;
@@ -229,13 +230,13 @@ begin
     else
       CBWholeBib.ItemIndex := 1;
 
-    cbIgnoreYear.Checked := Ini.ReadBool('Allgemein', 'IgnoreYear', True);
-    cbIgnoreYearClick(Nil);
+    cbRestrictTime.Checked := NOT Ini.ReadBool('Allgemein', 'IgnoreYear', True);
+    cbRestrictTimeClick(Nil);
     SE_PeriodFrom.Value := Ini.ReadInteger('Allgemein', 'MinYear', 2000);
     SE_PeriodTo.Value := Ini.ReadInteger('Allgemein', 'MaxYear', 2007);
 
-    cbIgnoreGenres.Checked := Ini.ReadBool('Allgemein', 'IgnoreGenre', True);
-    cbIgnoreGenresClick(Nil);
+    cbRestrictTags.Checked := NOT Ini.ReadBool('Allgemein', 'IgnoreGenre', True);
+    cbRestrictTagsClick(Nil);
 
     // Rating gedöns auslesen
     idx := Ini.ReadInteger('Allgemein', 'Rating', 0);
@@ -418,12 +419,12 @@ begin
     RecheckLastCheckedTags;
 end;
 
-procedure TRandomPlaylistForm.cbIgnoreYearClick(Sender: TObject);
+procedure TRandomPlaylistForm.cbRestrictTimeClick(Sender: TObject);
 begin
-  LblConst_PeriodFrom.Enabled := NOT cbIgnoreYear.Checked;
-  LblConst_PeriodTo  .Enabled := NOT cbIgnoreYear.Checked;
-  SE_PeriodFrom.Enabled := NOT cbIgnoreYear.Checked;
-  SE_PeriodTo  .Enabled := NOT cbIgnoreYear.Checked;
+  LblConst_PeriodFrom.Enabled := cbRestrictTime.Checked;
+  LblConst_PeriodTo  .Enabled := cbRestrictTime.Checked;
+  SE_PeriodFrom.Enabled := cbRestrictTime.Checked;
+  SE_PeriodTo  .Enabled := cbRestrictTime.Checked;
 end;
 
 procedure TRandomPlaylistForm.CBMaxLengthClick(Sender: TObject);
@@ -449,17 +450,17 @@ begin
 end;
 
 
-procedure TRandomPlaylistForm.cbIgnoreGenresClick(Sender: TObject);
+procedure TRandomPlaylistForm.cbRestrictTagsClick(Sender: TObject);
 begin
-  cbGenres.Enabled := Not cbIgnoreGenres.Checked;
-  Btn_Save.Enabled := Not cbIgnoreGenres.Checked;
+  cbGenres.Enabled := cbRestrictTags.Checked;
+  Btn_Save.Enabled := cbRestrictTags.Checked;
 
-  LblTagViewCount    .Enabled := Not cbIgnoreGenres.Checked;
-  cbTagCountSelection.Enabled := Not cbIgnoreGenres.Checked;
-  LblTagMatchType    .Enabled := Not cbIgnoreGenres.Checked;
-  cbTagMatchType     .Enabled := Not cbIgnoreGenres.Checked;
-  Lbl_Preselection   .Enabled := Not cbIgnoreGenres.Checked;
-  cb_Preselection    .Enabled := Not cbIgnoreGenres.Checked;
+  LblTagViewCount    .Enabled := cbRestrictTags.Checked;
+  cbTagCountSelection.Enabled := cbRestrictTags.Checked;
+  LblTagMatchType    .Enabled := cbRestrictTags.Checked;
+  cbTagMatchType     .Enabled := cbRestrictTags.Checked;
+  Lbl_Preselection   .Enabled := cbRestrictTags.Checked;
+  cb_Preselection    .Enabled := cbRestrictTags.Checked;
 end;
 
 procedure TRandomPlaylistForm.Btn_SaveClick(Sender: TObject);
@@ -561,12 +562,12 @@ begin
     Ini.WriteInteger('Allgemein', 'LastSelection', LastSelection);
     Ini.WriteInteger('Allgemein', 'MaxAnzahl', seMaxCount.Value);
     Ini.WriteBool('Allgemein', 'GanzeBib', CBWholeBib.ItemIndex = 0);
-    Ini.WriteBool('Allgemein', 'IgnoreYear', cbIgnoreYear.Checked);
+    Ini.WriteBool('Allgemein', 'IgnoreYear', NOT cbRestrictTime.Checked);
 
     Ini.WriteInteger('Allgemein', 'MinYear', SE_PeriodFrom.Value);
     Ini.WriteInteger('Allgemein', 'MaxYear', SE_PeriodTo.Value);
 
-    Ini.WriteBool('Allgemein', 'IgnoreGenre', cbIgnoreGenres.Checked);
+    Ini.WriteBool('Allgemein', 'IgnoreGenre', NOT cbRestrictTags.Checked);
 
      // Rating gedöns speichern
     Ini.WriteInteger('Allgemein', 'Rating', CBRating.ItemIndex);
@@ -602,6 +603,11 @@ end;
 
 
 
+procedure TRandomPlaylistForm.Btn_CancelClick(Sender: TObject);
+begin
+    close;
+end;
+
 procedure TRandomPlaylistForm.Btn_OkClick(Sender: TObject);
 var i: Integer;
     DateiListe: TObjectList;
@@ -624,7 +630,7 @@ begin
       // for i := 0 to cbGenres.Items.Count - 1 do
       //    Medienbib.PlaylistFillOptions.GenreChecked[i] := cbGenres.Checked[i];
 
-      Medienbib.PlaylistFillOptions.SkipTagCheck  := (cbIgnoreGenres.Checked);
+      Medienbib.PlaylistFillOptions.SkipTagCheck  := not cbRestrictTags.Checked;
 
       if not Medienbib.PlaylistFillOptions.SkipTagCheck then
       begin
@@ -650,7 +656,7 @@ begin
       end else
           Medienbib.PlaylistFillOptions.Wantedtags := Nil;
 
-      Medienbib.PlaylistFillOptions.SkipYearCheck := cbIgnoreYear.Checked;
+      Medienbib.PlaylistFillOptions.SkipYearCheck := NOT cbRestrictTime.Checked;
       Medienbib.PlaylistFillOptions.MinYear       := SE_PeriodFrom.Value;
       Medienbib.PlaylistFillOptions.MaxYear       := SE_PeriodTo.Value;
       Medienbib.PlaylistFillOptions.MaxCount      := seMaxCount.Value;

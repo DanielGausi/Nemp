@@ -55,7 +55,7 @@ uses
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
   //dwTaskbarComponents, dwTaskbarThumbnails,
-  UpdateUtils, uDragFilesSrc,
+  UpdateUtils, uDragFilesSrc, PlayWebstream,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection
@@ -1088,7 +1088,7 @@ type
     procedure PlaylistVSTScroll(Sender: TBaseVirtualTree; DeltaX,
       DeltaY: Integer);
     procedure FormResize(Sender: TObject);
-    procedure MM_PL_WebStreamClick(Sender: TObject);
+    //procedure MM_PL_WebStreamClick(Sender: TObject);
     procedure PM_ML_DeleteSelectedClick(Sender: TObject);
     procedure EDITFastSearchEnter(Sender: TObject);
     procedure PM_P_ViewStayOnTopClick(Sender: TObject);
@@ -1433,6 +1433,7 @@ type
     procedure EditPlaylistSearchKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure PaintFrameDblClick(Sender: TObject);
+    procedure PM_ML_BrowseByMoreClick(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -3868,14 +3869,14 @@ var ProperHelpFile: String;
 begin
     if NempOptions.Language = 'de' then
     begin
-        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.chm';
+        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.pdf';
         if NOT FileExists(ProperHelpFile) then
             ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
     end else
     begin
         ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
         if NOT FileExists(ProperHelpFile) then
-            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.chm';
+            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.pdf';
     end;
 
     if NOT FileExists(ProperHelpFile) then
@@ -4552,8 +4553,8 @@ begin
 
 
     VK_F7: begin
-        SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
-
+            if NOT NempSkin.NempPartyMode.Active then
+                SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
            end;
 
     VK_F8: NempPlayer.PlayJingle(Nil);
@@ -6125,7 +6126,7 @@ procedure TNemp_MainForm.PlaylistVSTDragDrop(Sender: TBaseVirtualTree;
   Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
   Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
 begin
-//exit;
+    NempPlaylist.PlaylistHasChanged := True;
 end;
 
 
@@ -6607,11 +6608,29 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_PlayWebstreamClick(Sender: TObject);
-var
-  NewString: string;
-  ClickedOK: Boolean;
+//var
+//  NewString: string;
+//  ClickedOK: Boolean;
 begin
-  NewString := 'http://';
+    if not assigned(FPlayWebstream) then
+        Application.CreateForm(tFPlayWebstream, FPlayWebstream);
+
+
+    case FPlayWebstream.ShowModal of
+        mrOK: begin
+            NempPlayer.LastUserWish := USER_WANT_PLAY;
+            if Sender = PM_PlayWebstream then
+                WebRadioInsertMode := PLAYER_PLAY_NOW;
+            NempPlayer.MainStation.URL := FPlayWebstream.edtURL.Text;
+            NempPlayer.MainStation.TuneIn(NempPlaylist.BassHandlePlaylist);
+        end;
+        mrRetry: begin
+            if not assigned(FormStreamVerwaltung) then
+                Application.CreateForm(TFormStreamVerwaltung, FormStreamVerwaltung);
+            FormStreamVerwaltung.show;
+        end;
+    end;
+  {NewString := 'http://';
 
   ClickedOK := InputQuery(Shoutcast_InputStreamCaption, Shoutcast_InputStreamLabel, NewString);
   if ClickedOK then
@@ -6621,6 +6640,7 @@ begin
       NempPlayer.MainStation.URL := NewString;
       NempPlayer.MainStation.TuneIn(NempPlaylist.BassHandlePlaylist);
   end;
+  }
 end;
 
 procedure TNemp_MainForm.SlideBackBTNIMGClick(Sender: TObject);
@@ -7363,6 +7383,8 @@ begin
   end;
 
 end;
+
+
 
 procedure TNemp_MainForm.PM_ML_CloudEditorClick(Sender: TObject);
 begin
@@ -8922,6 +8944,9 @@ end;
 
 procedure TNemp_MainForm.MM_O_ViewCompactCompleteClick(Sender: TObject);
 begin
+    if NempSkin.NempPartyMode.Active then
+        exit;
+
     if (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
         SwapWindowMode(Anzeigemode + 1);
 end;
@@ -9239,7 +9264,7 @@ begin
   end;
 end;
 
-
+(*
 procedure TNemp_MainForm.MM_PL_WebStreamClick(Sender: TObject);
 var
   NewString: string;
@@ -9255,6 +9280,7 @@ begin
       NempPlayer.MainStation.TuneIn(NempPlaylist.BassHandlePlaylist);
   end;
 end;
+*)
 
 procedure TNemp_MainForm.MM_ML_WebradioClick(Sender: TObject);
 begin
@@ -9596,64 +9622,68 @@ begin
   // - Switch SwitchMediaLibrary according to current Browsemode (Lists/Flow)
 
   //(Sender as TMenuItem).Checked := True;
-  case (Sender as TMenuItem).Tag of
-    0:  begin
-            MedienBib.NempSortArray[1] := siArtist;
-            MedienBib.NempSortArray[2] := siAlbum;
-            MedienBib.CoverSortOrder := 1;
-        end;
-    1:  begin
-            MedienBib.NempSortArray[1] := siOrdner;
-            MedienBib.NempSortArray[2] := siArtist;
-            MedienBib.CoverSortOrder := 6;
-        end;
-    2:  begin
-            MedienBib.NempSortArray[1] := siOrdner;
-            MedienBib.NempSortArray[2] := siAlbum;
-            MedienBib.CoverSortOrder := 7;
-        end;
-    3:  begin
-            MedienBib.NempSortArray[1] := siGenre;
-            MedienBib.NempSortArray[2] := siArtist;
-            MedienBib.CoverSortOrder := 3;
-        end;
-    4:  begin
-            MedienBib.NempSortArray[1] := siGenre;
-            MedienBib.NempSortArray[2] := siJahr;
-            MedienBib.CoverSortOrder := 5;
-        end;
 
-    6: begin
-            MedienBib.NempSortArray[1] := siAlbum;
-            MedienBib.NempSortArray[2] := siArtist;
-            MedienBib.CoverSortOrder := 2;
-    end;
-    7: begin
-            MedienBib.NempSortArray[1] := siJahr;
-            MedienBib.NempSortArray[2] := siArtist;
-            MedienBib.CoverSortOrder := 4;
-    end;
-    8: begin
-            MedienBib.NempSortArray[1] := siFileAge;
-            MedienBib.NempSortArray[2] := siAlbum;
-            MedienBib.CoverSortOrder := 8;
-    end;
-    9: begin
-            MedienBib.NempSortArray[1] := siFileAge;
-            MedienBib.NempSortArray[2] := siArtist;
-            MedienBib.CoverSortOrder := 9;
-    end;
-
-
-    // 5: Coverflow - nothing to do here
-    100:  begin
-            // Weitere Sortierungen - Optionsfenster anzeigen
-            if Not Assigned(OptionsCompleteForm) then
-              Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
-            OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.VorauswahlNode;
-            OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabView0;
-            OptionsCompleteForm.Show;
-        end;
+  case MedienBib.BrowseMode of
+      0: begin
+            // classic browse mode
+            case (Sender as TMenuItem).Tag of
+                0:  begin
+                        MedienBib.NempSortArray[1] := siArtist;
+                        MedienBib.NempSortArray[2] := siAlbum;
+                    end;
+                1:  begin
+                        MedienBib.NempSortArray[1] := siOrdner;
+                        MedienBib.NempSortArray[2] := siArtist;
+                    end;
+                2:  begin
+                        MedienBib.NempSortArray[1] := siOrdner;
+                        MedienBib.NempSortArray[2] := siAlbum;
+                    end;
+                3:  begin
+                        MedienBib.NempSortArray[1] := siGenre;
+                        MedienBib.NempSortArray[2] := siArtist;
+                    end;
+                4:  begin
+                        MedienBib.NempSortArray[1] := siGenre;
+                        MedienBib.NempSortArray[2] := siJahr;
+                    end;
+                6:  begin
+                        MedienBib.NempSortArray[1] := siAlbum;
+                        MedienBib.NempSortArray[2] := siArtist;
+                    end;
+                7:  begin
+                        MedienBib.NempSortArray[1] := siJahr;
+                        MedienBib.NempSortArray[2] := siArtist;
+                    end;
+                8: begin
+                        MedienBib.NempSortArray[1] := siFileAge;
+                        MedienBib.NempSortArray[2] := siAlbum;
+                    end;
+                9:  begin
+                        MedienBib.NempSortArray[1] := siFileAge;
+                        MedienBib.NempSortArray[2] := siArtist;
+                    end;
+          end;
+      end;
+      1: begin
+          // Coverflow
+            case (Sender as TMenuItem).Tag of
+                0: MedienBib.CoverSortOrder := 1;
+                1: MedienBib.CoverSortOrder := 6;
+                2: MedienBib.CoverSortOrder := 7;
+                3: MedienBib.CoverSortOrder := 3;
+                4: MedienBib.CoverSortOrder := 5;
+                6: MedienBib.CoverSortOrder := 2;
+                7: MedienBib.CoverSortOrder := 4;
+                8: MedienBib.CoverSortOrder := 8;
+                9: MedienBib.CoverSortOrder := 9;
+            end;
+      end
+      else
+      begin
+          // Tagcloud. Do nothing.
+          // menu item is disabled anyway
+      end;
   end;
 
   case (Sender as TMenuItem).Tag of
@@ -9662,6 +9692,16 @@ begin
   end;
 end;
 
+
+procedure TNemp_MainForm.PM_ML_BrowseByMoreClick(Sender: TObject);
+begin
+    if Not Assigned(OptionsCompleteForm) then
+        Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+
+    OptionsCompleteForm.OptionsVST.FocusedNode := OptionsCompleteForm.VorauswahlNode;
+    OptionsCompleteForm.PageControl1.ActivePage := OptionsCompleteForm.TabView0;
+    OptionsCompleteForm.Show;
+end;
 
 procedure TNemp_MainForm.AuswahlPanelMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -10458,7 +10498,8 @@ begin
                     end;
                     CON_RATING: begin
                             ClearShortCuts;
-                            allowed := True;
+                            allowed := True; // always allow edit of ratings
+                            //allowed := NempOptions.AllowQuickAccessToMetadata;
                     end;
                 else
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
@@ -11021,7 +11062,7 @@ begin
 
   if timeleft <= 0 then
   begin
-    NempPlayer.pause;
+    NempPlayer.PauseForBirthday;
     if Not Assigned(BirthdayForm) then
         Application.CreateForm(TBirthdayForm, BirthdayForm);
     BirthdayForm.Show;
@@ -11067,6 +11108,14 @@ begin
             BirthdayForm.Close;
     end else
     begin
+        // Calculate the CountDownTime
+        if NempPlayer.NempBirthdayTimer.UseCountDown then
+            NempPlayer.NempBirthdayTimer.StartCountDownTime :=
+              IncSecond(NempPlayer.NempBirthdayTimer.StartTime,
+                      - NempPlayer.GetCountDownLength(NempPlayer.NempBirthdayTimer.CountDownFileName))
+        else
+            NempPlayer.NempBirthdayTimer.StartCountDownTime := NempPlayer.NempBirthdayTimer.StartTime;
+
         timeleft := SecondsUntil(NempPlayer.NempBirthdayTimer.StartCountDownTime);
         if timeleft > 120 then
           BirthdayTimer.Interval := 60000
@@ -11166,16 +11215,12 @@ end;
 procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
 begin
     // handle Search-Edit-stuff
-    if PlaylistPanel.Width <= 120 then
-    begin
-        EditplaylistSearch.Width := 65 - (120 - PlaylistPanel.Width);
-    end else
-    begin
-        EditplaylistSearch.Width := 65;
-    end;
-
     if PlaylistPanel.Parent <> TopMainPanel then
     begin
+        if PlaylistPanel.Width <= 120 then
+            EditplaylistSearch.Width := 65 - (120 - PlaylistPanel.Width)
+        else
+            EditplaylistSearch.Width := 65;
         PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
         PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - 16;
     end else
@@ -11193,7 +11238,10 @@ procedure TNemp_MainForm.MitzuflligenEintrgenausderMedienbibliothekfllen1Click(
 begin
   if Not Assigned(RandomPlaylistForm) then
         Application.CreateForm(TRandomPlaylistForm, RandomPlaylistForm);
-  RandomPlaylistForm.ShowModal;
+  /// RandomPlaylistForm.ShowModal;
+  ///  Why modal??
+
+  RandomPlaylistForm.Show;
 end;
 
 // Sinn dieses Timers:
