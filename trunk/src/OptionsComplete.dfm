@@ -4,7 +4,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 571
+  ClientHeight = 593
   ClientWidth = 665
   Color = clBtnFace
   Constraints.MinHeight = 520
@@ -25,14 +25,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   OnShow = FormShow
   DesignSize = (
     665
-    571)
+    593)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionsVST: TVirtualStringTree
     Left = 8
     Top = 8
     Width = 191
-    Height = 525
+    Height = 547
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelInner = bvNone
     BevelOuter = bvNone
@@ -54,15 +54,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
     OnBeforeItemErase = OptionsVSTBeforeItemErase
     OnFocusChanged = OptionsVSTFocusChanged
     OnGetText = OptionsVSTGetText
-    ExplicitHeight = 594
     Columns = <>
   end
   object PageControl1: TPageControl
     Left = 204
     Top = 6
     Width = 454
-    Height = 528
-    ActivePage = TabView3
+    Height = 550
+    ActivePage = TabPlayer4
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -72,7 +71,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
         Top = 134
@@ -274,7 +273,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 5
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
         Top = 103
@@ -1141,7 +1140,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        428)
+        450)
       object Label3: TLabel
         Left = 16
         Top = 312
@@ -1290,38 +1289,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        428)
-      object LblTaskbarWin7: TLabel
-        Left = 24
-        Top = 149
-        Width = 417
-        Height = 32
-        AutoSize = False
-        Caption = 
-          '(*) Not recommended under Windows7: The buttons in the preview w' +
-          'on'#39't work then.'
-        WordWrap = True
-      end
-      object GrpBox_TaskTray: TRadioGroup
-        Left = 8
-        Top = 8
-        Width = 431
-        Height = 137
-        Hint = 'Behavior of Nemp in the Windows Taskbar'
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Taskbar and/or tray'
-        ItemIndex = 4
-        Items.Strings = (
-          'Windows standard (taskbar only)'
-          'Taskbar only, trayicon only when minimized (*)'
-          'Trayicon only (*)'
-          'Taskbar and trayicon'
-          'Taskbar and trayicon, trayicon only when minimized (*)')
-        TabOrder = 0
-      end
+        450)
       object GrpBox_Deskband: TGroupBox
         Left = 8
-        Top = 182
+        Top = 103
         Width = 431
         Height = 163
         Anchors = [akLeft, akTop, akRight]
@@ -1382,7 +1353,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_Hibernate: TGroupBox
         Left = 8
-        Top = 351
+        Top = 272
         Width = 431
         Height = 113
         Anchors = [akLeft, akTop, akRight]
@@ -1434,16 +1405,52 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = Btn_ReinitPlayerEngineClick
         end
       end
+      object GrpBox_TaskTray: TGroupBox
+        Left = 8
+        Top = 8
+        Width = 431
+        Height = 89
+        Caption = 'Taskbar and/or tray'
+        TabOrder = 0
+        object LblTaskbarWin7: TLabel
+          Left = 16
+          Top = 51
+          Width = 401
+          Height = 32
+          AutoSize = False
+          Caption = 
+            '(*) Not recommended under Windows7 or later: The buttons in the ' +
+            'preview won'#39't work then.'
+          WordWrap = True
+        end
+        object cb_TaskTray: TComboBox
+          Left = 16
+          Top = 24
+          Width = 401
+          Height = 21
+          Hint = 'Behavior of Nemp in the Windows Taskbar'
+          Style = csDropDownList
+          ItemIndex = 3
+          TabOrder = 0
+          Text = 'Taskbar and trayicon'
+          Items.Strings = (
+            'Windows standard (taskbar only)'
+            'Taskbar only, trayicon only when minimized (*)'
+            'Trayicon only (*)'
+            'Taskbar and trayicon'
+            'Taskbar and trayicon, trayicon only when minimized (*)')
+        end
+      end
     end
-    object TabSystem4: TTabSheet
-      Caption = 'XXX'
+    object TabPlaylistRandom: TTabSheet
+      Caption = 'Random'
       ImageIndex = 21
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_BetaOptions: TGroupBox
-        Left = 12
-        Top = 20
+        Left = 3
+        Top = 372
         Width = 431
         Height = 45
         Anchors = [akLeft, akTop, akRight]
@@ -1451,13 +1458,375 @@ object OptionsCompleteForm: TOptionsCompleteForm
         TabOrder = 0
         Visible = False
         object XXX_CB_BetaDontUseThreadedUpdate: TCheckBox
-          Left = 13
-          Top = 15
+          Left = 11
+          Top = 25
           Width = 417
           Height = 17
           Hint = 'Beta-Settings. Do not change, unless you know what yo are doing!'
           Caption = 'Update library in Mainthread'
           TabOrder = 0
+        end
+      end
+      object GrpBox_RandomOptions: TGroupBox
+        Left = 8
+        Top = 8
+        Width = 431
+        Height = 77
+        Hint = 
+          'Random playback: Correct "real randomness" by avoiding repetitio' +
+          'ns of the same song.'
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Random playback'
+        TabOrder = 1
+        object LblConst_ReallyRandom: TLabel
+          Left = 12
+          Top = 16
+          Width = 153
+          Height = 13
+          AutoSize = False
+          Caption = 'Really random'
+        end
+        object LblConst_AvoidRepetitions: TLabel
+          Left = 248
+          Top = 16
+          Width = 162
+          Height = 13
+          Alignment = taRightJustify
+          AutoSize = False
+          Caption = 'Avoid repetitions'
+        end
+        object TBRandomRepeat: TTrackBar
+          Left = 8
+          Top = 32
+          Width = 409
+          Height = 33
+          Max = 75
+          Frequency = 5
+          Position = 25
+          TabOrder = 0
+        end
+      end
+      object grpBox_WeightedRandom: TGroupBox
+        Left = 8
+        Top = 90
+        Width = 431
+        Height = 263
+        Caption = 'Weighted random'
+        TabOrder = 2
+        object lbl_WeightedRandom: TLabel
+          Left = 34
+          Top = 43
+          Width = 170
+          Height = 13
+          Caption = 'Indivdual weights, based on rating.'
+        end
+        object RatingImage05: TImage
+          Left = 34
+          Top = 67
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage10: TImage
+          Left = 34
+          Top = 95
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage15: TImage
+          Left = 34
+          Top = 123
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage20: TImage
+          Left = 34
+          Top = 151
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage25: TImage
+          Left = 34
+          Top = 179
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage30: TImage
+          Left = 224
+          Top = 67
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage35: TImage
+          Left = 224
+          Top = 95
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage40: TImage
+          Left = 224
+          Top = 123
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage45: TImage
+          Left = 224
+          Top = 151
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object RatingImage50: TImage
+          Left = 224
+          Top = 179
+          Width = 70
+          Height = 14
+          ParentShowHint = False
+          ShowHint = False
+          Transparent = True
+        end
+        object lblCount30: TLabel
+          Left = 350
+          Top = 67
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount35: TLabel
+          Left = 350
+          Top = 94
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount40: TLabel
+          Left = 350
+          Top = 123
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount45: TLabel
+          Left = 350
+          Top = 151
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount50: TLabel
+          Left = 350
+          Top = 178
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount05: TLabel
+          Left = 159
+          Top = 67
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount10: TLabel
+          Left = 159
+          Top = 94
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount15: TLabel
+          Left = 159
+          Top = 123
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount20: TLabel
+          Left = 159
+          Top = 151
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount25: TLabel
+          Left = 159
+          Top = 178
+          Width = 38
+          Height = 13
+          Caption = '(99999)'
+          Visible = False
+        end
+        object lblCount00: TLabel
+          Left = 34
+          Top = 204
+          Width = 383
+          Height = 13
+          AutoSize = False
+          Caption = '* Including 1000 unrated files'
+          Visible = False
+        end
+        object cb_UseWeightedRNG: TCheckBox
+          Left = 16
+          Top = 20
+          Width = 401
+          Height = 17
+          Caption = 'Use weighted random'
+          TabOrder = 0
+          OnClick = cb_UseWeightedRNGClick
+        end
+        object RandomWeight05: TEdit
+          Left = 110
+          Top = 64
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 1
+          Text = '0'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight10: TEdit
+          Left = 110
+          Top = 91
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 2
+          Text = '0'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight15: TEdit
+          Left = 110
+          Top = 120
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 3
+          Text = '1'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight20: TEdit
+          Left = 110
+          Top = 148
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 4
+          Text = '2'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight25: TEdit
+          Left = 110
+          Top = 175
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 5
+          Text = '4'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight30: TEdit
+          Left = 300
+          Top = 64
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 6
+          Text = '7'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight35: TEdit
+          Left = 300
+          Top = 93
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 7
+          Text = '12'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight40: TEdit
+          Left = 300
+          Top = 120
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 8
+          Text = '20'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight45: TEdit
+          Left = 300
+          Top = 148
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 9
+          Text = '35'
+          OnExit = RandomWeight05Exit
+        end
+        object RandomWeight50: TEdit
+          Left = 300
+          Top = 175
+          Width = 43
+          Height = 21
+          NumbersOnly = True
+          TabOrder = 10
+          Text = '60'
+          OnExit = RandomWeight05Exit
+        end
+        object BtnCountRating: TButton
+          Left = 16
+          Top = 225
+          Width = 137
+          Height = 25
+          Hint = 
+            'Count how many files in the media library (or the playlist) exis' +
+            't with the specific rating.'
+          Caption = 'Count Ratings'
+          TabOrder = 11
+          OnClick = BtnCountRatingClick
+        end
+        object cbCountRatingOnlyPlaylist: TCheckBox
+          Left = 159
+          Top = 229
+          Width = 147
+          Height = 17
+          Caption = 'Restrict counting to playlist'
+          TabOrder = 12
         end
       end
     end
@@ -1466,7 +1835,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 1
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_ViewMain_Columns: TGroupBox
         Left = 8
         Top = 8
@@ -1636,13 +2005,66 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 2
         end
       end
+      object GrpBox_ViewVis_CoverDetails: TGroupBox
+        Left = 8
+        Top = 404
+        Width = 431
+        Height = 76
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Cover and details about a selected file'
+        TabOrder = 4
+        object LblConst_CoverMode: TLabel
+          Left = 16
+          Top = 22
+          Width = 56
+          Height = 13
+          Hint = 'Display the cover and some other details in the library.'
+          Caption = 'Show cover'
+        end
+        object LblConst_DetailMode: TLabel
+          Left = 138
+          Top = 22
+          Width = 154
+          Height = 13
+          AutoSize = False
+          Caption = 'Show additional details'
+        end
+        object cbCoverMode: TComboBox
+          Left = 16
+          Top = 39
+          Width = 89
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 1
+          TabOrder = 0
+          Text = 'Left'
+          Items.Strings = (
+            'Disabled'
+            'Left'
+            'Right')
+        end
+        object cbDetailMode: TComboBox
+          Left = 138
+          Top = 41
+          Width = 106
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 1
+          TabOrder = 1
+          Text = 'Aside'
+          Items.Strings = (
+            'Disabled'
+            'Aside'
+            'Below')
+        end
+      end
     end
     object TabView1: TTabSheet
       Caption = 'View (Party)'
       ImageIndex = 19
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_ViewPartymode_Amplification: TGroupBox
         Left = 8
         Top = 8
@@ -1663,6 +2085,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 39
           Width = 165
           Height = 21
+          Style = csDropDownList
           ItemIndex = 1
           TabOrder = 0
           Text = '1.5 (moderate amplification)'
@@ -1735,211 +2158,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
     end
     object TabView2: TTabSheet
-      Caption = 'View (Vis)'
+      Caption = 'XXX (Vis)'
       ImageIndex = 20
-      DesignSize = (
-        446
-        428)
-      object GrpBox_ViewVis_Scrolling: TGroupBox
-        Left = 8
-        Top = 8
-        Width = 431
-        Height = 187
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'While playing'
-        TabOrder = 0
-        object Lbl_Framerate: TLabel
-          Left = 191
-          Top = 46
-          Width = 12
-          Height = 13
-          Caption = '...'
-        end
-        object CB_visual: TCheckBox
-          Left = 16
-          Top = 20
-          Width = 321
-          Height = 17
-          Caption = 'Visualization'
-          TabOrder = 0
-          OnClick = CB_visualClick
-        end
-        object TB_Refresh: TTrackBar
-          Left = 32
-          Top = 40
-          Width = 153
-          Height = 33
-          Max = 90
-          Frequency = 10
-          Position = 20
-          TabOrder = 1
-          OnChange = TB_RefreshChange
-        end
-        object CB_ScrollTitelTaskBar: TCheckBox
-          Left = 16
-          Top = 76
-          Width = 401
-          Height = 17
-          Caption = 'Scroll title in taskbar'
-          TabOrder = 2
-          OnClick = CB_ScrollTitelTaskBarClick
-        end
-        object CB_ScrollTitleInMainWindow: TCheckBox
-          Left = 16
-          Top = 132
-          Width = 401
-          Height = 17
-          Caption = 'Scroll title/path/details/lyrics in mainwindow'
-          TabOrder = 4
-          OnClick = CB_ScrollTitleInMainWindowClick
-        end
-        object CB_TaskBarDelay: TComboBox
-          Left = 40
-          Top = 100
-          Width = 145
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 4
-          TabOrder = 3
-          Text = 'Very fast'
-          Items.Strings = (
-            'Very slow'
-            'Slower'
-            'Normal'
-            'Faster'
-            'Very fast')
-        end
-        object CB_AnzeigeDelay: TComboBox
-          Left = 40
-          Top = 156
-          Width = 145
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 4
-          TabOrder = 5
-          Text = 'Very fast'
-          Items.Strings = (
-            'Very slow'
-            'Slower'
-            'Normal'
-            'Faster'
-            'Very fast')
-        end
-      end
-      object GrpBox_ViewVis_CoverDetails: TGroupBox
-        Left = 8
-        Top = 404
-        Width = 431
-        Height = 76
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Cover and details about a selected file'
-        TabOrder = 2
-        object LblConst_CoverMode: TLabel
-          Left = 16
-          Top = 22
-          Width = 56
-          Height = 13
-          Hint = 'Display the cover and some other details in the library.'
-          Caption = 'Show cover'
-        end
-        object LblConst_DetailMode: TLabel
-          Left = 138
-          Top = 22
-          Width = 154
-          Height = 13
-          AutoSize = False
-          Caption = 'Show additional details'
-        end
-        object cbCoverMode: TComboBox
-          Left = 16
-          Top = 39
-          Width = 89
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 1
-          TabOrder = 0
-          Text = 'Left'
-          Items.Strings = (
-            'Disabled'
-            'Left'
-            'Right')
-        end
-        object cbDetailMode: TComboBox
-          Left = 138
-          Top = 41
-          Width = 106
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 1
-          TabOrder = 1
-          Text = 'Aside'
-          Items.Strings = (
-            'Disabled'
-            'Aside'
-            'Below')
-        end
-      end
-      object GrpBox_Files_Cover_Default: TGroupBox
-        Left = 8
-        Top = 199
-        Width = 431
-        Height = 203
-        Caption = 'Default cover'
-        TabOrder = 1
-        object lbl_DefaultCover: TLabel
-          Left = 16
-          Top = 24
-          Width = 401
-          Height = 17
-          AutoSize = False
-          Caption = 'Used when no proper cover art can be found.'
-          WordWrap = True
-        end
-        object img_DefaultCover: TImage
-          Left = 16
-          Top = 47
-          Width = 137
-          Height = 137
-        end
-        object lbl_DefaultCoverHint: TLabel
-          Left = 168
-          Top = 109
-          Width = 241
-          Height = 76
-          AutoSize = False
-          Caption = 
-            'Note: Cover art already displayed in the player will not change ' +
-            'until the cover art is loaded again.'
-          WordWrap = True
-        end
-        object btn_DefaultCover: TButton
-          Left = 168
-          Top = 47
-          Width = 89
-          Height = 25
-          Hint = 'Select a file you want to use as cover art'
-          Caption = 'Select'
-          TabOrder = 0
-          OnClick = btn_DefaultCoverClick
-        end
-        object btn_DefaultCoverReset: TButton
-          Left = 168
-          Top = 78
-          Width = 89
-          Height = 25
-          Hint = 'Reset the default cover to the Nemp default cover'
-          Caption = 'Reset'
-          TabOrder = 1
-          OnClick = btn_DefaultCoverResetClick
-        end
-      end
     end
     object TabView3: TTabSheet
       Caption = 'View (Fonts)'
       ImageIndex = 7
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_Fonts: TGroupBox
         Left = 8
         Top = 160
@@ -2170,17 +2397,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 21
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_ViewExt_NoMetadata: TGroupBox
-        Left = 7
-        Top = 159
+        Left = 8
+        Top = 287
         Width = 431
         Height = 82
         Anchors = [akLeft, akTop, akRight]
         Caption = 
           'Not available metadata (If ... is not available, use ... instead' +
           ')'
-        TabOrder = 2
+        TabOrder = 1
         object LblReplaceArtistBy: TLabel
           Left = 12
           Top = 24
@@ -2257,50 +2484,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Complete path')
         end
       end
-      object GrpBox_ViewExt_Select: TGroupBox
-        Left = 8
-        Top = 8
-        Width = 431
-        Height = 73
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Selection'
-        TabOrder = 0
-        object CBFullRowSelect: TCheckBox
-          Left = 16
-          Top = 22
-          Width = 401
-          Height = 17
-          Hint = 'Select full row or just a single cell in the library.'
-          Caption = 'Select full row in medialist'
-          TabOrder = 0
-        end
-        object CB_EditOnClick: TCheckBox
-          Left = 16
-          Top = 42
-          Width = 404
-          Height = 17
-          Hint = 
-            'Begin editing file information in the medialist after a slow dou' +
-            'bleclick'
-          Caption = 'Edit files at click'
-          TabOrder = 1
-        end
-      end
       object GrpBox_ViewExt_Hints: TGroupBox
-        Left = 9
-        Top = 87
+        Left = 8
+        Top = 199
         Width = 431
-        Height = 66
+        Height = 82
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Hints'
-        TabOrder = 1
+        Caption = 'Extended settings'
+        TabOrder = 0
         object CBShowHintsInMedialist: TCheckBox
           Left = 16
           Top = 20
           Width = 401
           Height = 17
           Hint = 'Show hints in the library or not.'
-          Caption = 'Show hints in the title list of the media library'
+          Caption = 'Show hints in the medialist'
           TabOrder = 0
         end
         object CB_ShowHintsInPlaylist: TCheckBox
@@ -2312,15 +2510,24 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Show hints in playlist'
           TabOrder = 1
         end
+        object CBFullRowSelect: TCheckBox
+          Left = 16
+          Top = 53
+          Width = 401
+          Height = 17
+          Hint = 'Select full row or just a single cell in the library.'
+          Caption = 'Select full row in medialist'
+          TabOrder = 2
+        end
       end
       object GrpBox_ViewVis_CoverFlow: TGroupBox
         Left = 8
-        Top = 244
+        Top = 375
         Width = 431
         Height = 71
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Coverflow'
-        TabOrder = 3
+        TabOrder = 2
         object cb_UseClassicCoverflow: TCheckBox
           Left = 16
           Top = 20
@@ -2340,13 +2547,99 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
         end
       end
+      object GrpBox_ViewVis_Scrolling: TGroupBox
+        Left = 8
+        Top = 8
+        Width = 431
+        Height = 187
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'While playing'
+        TabOrder = 3
+        object Lbl_Framerate: TLabel
+          Left = 191
+          Top = 46
+          Width = 12
+          Height = 13
+          Caption = '...'
+        end
+        object CB_visual: TCheckBox
+          Left = 16
+          Top = 20
+          Width = 321
+          Height = 17
+          Caption = 'Visualization'
+          TabOrder = 0
+          OnClick = CB_visualClick
+        end
+        object TB_Refresh: TTrackBar
+          Left = 32
+          Top = 40
+          Width = 153
+          Height = 33
+          Max = 90
+          Frequency = 10
+          Position = 20
+          TabOrder = 1
+          OnChange = TB_RefreshChange
+        end
+        object CB_ScrollTitelTaskBar: TCheckBox
+          Left = 16
+          Top = 76
+          Width = 401
+          Height = 17
+          Caption = 'Scroll title in taskbar'
+          TabOrder = 2
+          OnClick = CB_ScrollTitelTaskBarClick
+        end
+        object CB_ScrollTitleInMainWindow: TCheckBox
+          Left = 16
+          Top = 132
+          Width = 401
+          Height = 17
+          Caption = 'Scroll title/path/details/lyrics in mainwindow'
+          TabOrder = 4
+          OnClick = CB_ScrollTitleInMainWindowClick
+        end
+        object CB_TaskBarDelay: TComboBox
+          Left = 40
+          Top = 100
+          Width = 145
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 4
+          TabOrder = 3
+          Text = 'Very fast'
+          Items.Strings = (
+            'Very slow'
+            'Slower'
+            'Normal'
+            'Faster'
+            'Very fast')
+        end
+        object CB_AnzeigeDelay: TComboBox
+          Left = 40
+          Top = 156
+          Width = 145
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 4
+          TabOrder = 5
+          Text = 'Very fast'
+          Items.Strings = (
+            'Very slow'
+            'Slower'
+            'Normal'
+            'Faster'
+            'Very fast')
+        end
+      end
     end
     object TabFiles0: TTabSheet
       Caption = 'Files (Main)'
       ImageIndex = 22
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_FilesMain_Directories: TGroupBox
         Left = 8
         Top = 8
@@ -2492,7 +2785,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_AutoRating: TGroupBox
         Left = 8
         Top = 147
@@ -2624,13 +2917,33 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
         end
       end
+      object GrpBox_TabMedia5_ID3: TGroupBox
+        Left = 11
+        Top = 433
+        Width = 431
+        Height = 51
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'Unicode'
+        TabOrder = 3
+        object CBAutoDetectCharCode: TCheckBox
+          Left = 16
+          Top = 20
+          Width = 409
+          Height = 17
+          Hint = 
+            'Use a uber-ingenious special method for better tag-reading in fi' +
+            'les with "unicode-filenames".'
+          Caption = 'Auto-detect (probably) used charset'
+          TabOrder = 0
+        end
+      end
     end
     object TabFiles2: TTabSheet
       Caption = 'Files (Cover)'
       ImageIndex = 24
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_TabMedia3_Cover: TGroupBox
         Left = 8
         Top = 8
@@ -2735,13 +3048,67 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = BtnClearCoverCacheClick
         end
       end
+      object GrpBox_Files_Cover_Default: TGroupBox
+        Left = 8
+        Top = 253
+        Width = 431
+        Height = 203
+        Caption = 'Default cover'
+        TabOrder = 2
+        object lbl_DefaultCover: TLabel
+          Left = 16
+          Top = 24
+          Width = 401
+          Height = 17
+          AutoSize = False
+          Caption = 'Used when no proper cover art can be found.'
+          WordWrap = True
+        end
+        object img_DefaultCover: TImage
+          Left = 16
+          Top = 47
+          Width = 137
+          Height = 137
+        end
+        object lbl_DefaultCoverHint: TLabel
+          Left = 168
+          Top = 109
+          Width = 241
+          Height = 76
+          AutoSize = False
+          Caption = 
+            'Note: Cover art already displayed in the player will not change ' +
+            'until the cover art is loaded again.'
+          WordWrap = True
+        end
+        object btn_DefaultCover: TButton
+          Left = 168
+          Top = 47
+          Width = 89
+          Height = 25
+          Hint = 'Select a file you want to use as cover art'
+          Caption = 'Select'
+          TabOrder = 0
+          OnClick = btn_DefaultCoverClick
+        end
+        object btn_DefaultCoverReset: TButton
+          Left = 168
+          Top = 78
+          Width = 89
+          Height = 25
+          Hint = 'Reset the default cover to the Nemp default cover'
+          Caption = 'Reset'
+          TabOrder = 1
+          OnClick = btn_DefaultCoverResetClick
+        end
+      end
     end
     object TabFiles3: TTabSheet
       Caption = 'Files (Search)'
       ImageIndex = 25
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
         Left = 8
         Top = 8
@@ -2892,31 +3259,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
     end
     object TabFiles4: TTabSheet
-      Caption = 'Files (Unicode)'
+      Caption = 'XXX Unicode'
       ImageIndex = 23
       DesignSize = (
         446
-        428)
-      object GrpBox_TabMedia5_ID3: TGroupBox
-        Left = 8
-        Top = 8
-        Width = 431
-        Height = 51
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'ID3-tags'
-        TabOrder = 0
-        object CBAutoDetectCharCode: TCheckBox
-          Left = 16
-          Top = 20
-          Width = 409
-          Height = 17
-          Hint = 
-            'Use a uber-ingenious special method for better tag-reading in fi' +
-            'les with "unicode-filenames".'
-          Caption = 'Auto-detect (probably) used charset'
-          TabOrder = 0
-        end
-      end
+        450)
       object GrpBox_TabMedia5_Charsets: TGroupBox
         Left = 8
         Top = 66
@@ -2925,7 +3272,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Hint = 'Adjust charset-detection.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Charsets for auto-detection'
-        TabOrder = 1
+        TabOrder = 0
         object LblConst_Arabic: TLabel
           Left = 16
           Top = 20
@@ -3047,13 +3394,34 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 7
         end
       end
+      object __XXX__CB_AutoSavePlaylist: TCheckBox
+        Left = 24
+        Top = 25
+        Width = 401
+        Height = 17
+        Hint = 
+          'Backup the playlist every 5 minutes. When Nemp crashes, this bac' +
+          'kup will be loaded.'
+        Caption = 'Automatically save playlist every 5 minutes'
+        TabOrder = 1
+      end
+      object cbOnlyLAN: TCheckBox
+        Left = 8
+        Top = 297
+        Width = 393
+        Height = 13
+        Hint = 'Deny access from "the internet".'
+        Caption = 'Local network only'
+        TabOrder = 2
+        OnClick = cbOnlyLANClick
+      end
     end
     object TabPlayer0: TTabSheet
       Caption = 'Player (Main)'
       ImageIndex = 2
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_Devices: TGroupBox
         Left = 8
         Top = 8
@@ -3262,7 +3630,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 22
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_ExtendedAudio: TGroupBox
         Left = 8
         Top = 8
@@ -3383,29 +3751,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_PlaylistBehaviour: TGroupBox
         Left = 8
         Top = 8
         Width = 431
-        Height = 113
+        Height = 97
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Behaviour of the playlist'
         TabOrder = 0
         DesignSize = (
           431
-          113)
-        object CB_AutoSavePlaylist: TCheckBox
-          Left = 8
-          Top = 33
-          Width = 401
-          Height = 17
-          Hint = 
-            'Backup the playlist every 5 minutes. When Nemp crashes, this bac' +
-            'kup will be loaded.'
-          Caption = 'Automatically save playlist every 5 minutes'
-          TabOrder = 1
-        end
+          97)
         object CB_AutoScanPlaylist: TCheckBox
           Left = 8
           Top = 16
@@ -3415,46 +3772,46 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'Read metadata from the audiofiles or just use the data stored in' +
             ' the playlistfile.'
           Anchors = [akLeft, akTop, akRight]
-          Caption = 'Check files on start'
+          Caption = 'Check files when loading a playlist'
           TabOrder = 0
         end
         object CB_JumpToNextCue: TCheckBox
           Left = 8
-          Top = 51
+          Top = 34
           Width = 409
           Height = 17
           Hint = 'When clicking "next", jump to the next cuesheet (if available)'
           Caption = 'Jump to next entry in cuesheet on "next"'
-          TabOrder = 2
+          TabOrder = 1
         end
         object CB_RememberInterruptedPlayPosition: TCheckBox
           Left = 8
-          Top = 86
+          Top = 70
           Width = 409
           Height = 17
           Hint = 'Used in combination with "Just play focussed file"'
           Caption = 
             'Remember track position when playing a song directly from the li' +
             'brary'
-          TabOrder = 4
+          TabOrder = 3
         end
         object cb_ReplayCue: TCheckBox
           Left = 8
-          Top = 68
+          Top = 52
           Width = 409
           Height = 17
           Hint = 
             'Repeat only the current part of a file instead of the whole trac' +
             'k when "Repeat title" is selected'
           Caption = 'Repeat current entry in cuesheet on "Repeat title"'
-          TabOrder = 3
+          TabOrder = 2
         end
       end
       object GrpBox_HeadsetBehaviour: TGroupBox
         Left = 8
-        Top = 127
+        Top = 111
         Width = 431
-        Height = 146
+        Height = 138
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Default actions'
         TabOrder = 1
@@ -3514,53 +3871,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 2
         end
       end
-      object GrpBox_RandomOptions: TGroupBox
-        Left = 7
-        Top = 275
-        Width = 431
-        Height = 77
-        Hint = 
-          'Random playback: Correct "real randomness" by avoiding repetitio' +
-          'ns of the same song.'
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Random playback'
-        TabOrder = 2
-        object LblConst_ReallyRandom: TLabel
-          Left = 12
-          Top = 16
-          Width = 153
-          Height = 13
-          AutoSize = False
-          Caption = 'Really random'
-        end
-        object LblConst_AvoidRepetitions: TLabel
-          Left = 248
-          Top = 16
-          Width = 162
-          Height = 13
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = 'Avoid repetitions'
-        end
-        object TBRandomRepeat: TTrackBar
-          Left = 8
-          Top = 32
-          Width = 409
-          Height = 33
-          Max = 75
-          Frequency = 5
-          Position = 25
-          TabOrder = 0
-        end
-      end
       object GrpBox_PlayerExt2_Playlist: TGroupBox
         Left = 7
-        Top = 357
+        Top = 255
         Width = 431
-        Height = 84
+        Height = 82
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Deleting and mixing'
-        TabOrder = 3
+        TabOrder = 2
         object CB_AutoMixPlaylist: TCheckBox
           Left = 8
           Top = 56
@@ -3596,7 +3914,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 23
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_WebradioRecording: TGroupBox
         Left = 8
         Top = 88
@@ -3776,7 +4094,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ItemIndex = 1
         Items.Strings = (
           'Parse stream playlist and add all contained streams to playlist'
-          'Just add playlist URL to the playlist')
+          'Just add playlist URL to the playlist (recommended)')
         TabOrder = 0
       end
     end
@@ -3785,7 +4103,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 15
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
@@ -3916,15 +4234,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_TabAudio7_Countdown: TGroupBox
         Left = 8
-        Top = 8
+        Top = 174
         Width = 431
         Height = 125
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Countdown'
-        TabOrder = 0
+        TabOrder = 1
         DesignSize = (
           431
           125)
@@ -3992,15 +4310,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_TabAudio7_Event: TGroupBox
         Left = 8
-        Top = 139
+        Top = 8
         Width = 431
-        Height = 126
+        Height = 158
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Event'
-        TabOrder = 1
+        TabOrder = 0
         DesignSize = (
           431
-          126)
+          158)
         object Lbl_Const_EventTime: TLabel
           Left = 16
           Top = 20
@@ -4032,19 +4350,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object DTPBirthdayTime: TDateTimePicker
-          Left = 72
-          Top = 16
-          Width = 70
-          Height = 21
-          Hint = 
-            'Time when the birthday song should be played. The optional count' +
-            'down will end at this time.'
-          Date = 39144.687500000000000000
-          Time = 39144.687500000000000000
-          Kind = dtkTime
-          TabOrder = 0
-        end
         object BtnBirthdaySong: TButton
           Left = 390
           Top = 58
@@ -4075,15 +4380,26 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
           OnChange = EditBirthdaySongChange
         end
-      end
-      object CBContinueAfter: TCheckBox
-        Left = 24
-        Top = 275
-        Width = 417
-        Height = 17
-        Hint = 'Continue with the playlist after the birthday song.'
-        Caption = 'Continue with the playlist after playing the birthdaysong'
-        TabOrder = 2
+        object CBContinueAfter: TCheckBox
+          Left = 16
+          Top = 125
+          Width = 417
+          Height = 17
+          Hint = 'Continue with the playlist after the birthday song.'
+          Caption = 'Continue with the playlist after playing the birthdaysong'
+          TabOrder = 4
+        end
+        object mskEdt_BirthdayTime: TMaskEdit
+          Left = 64
+          Top = 17
+          Width = 41
+          Height = 21
+          EditMask = '!90:00;1;_'
+          MaxLength = 5
+          TabOrder = 0
+          Text = '  :  '
+          OnExit = mskEdt_BirthdayTimeExit
+        end
       end
     end
     object TabPlayer7: TTabSheet
@@ -4091,7 +4407,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 17
       DesignSize = (
         446
-        428)
+        450)
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4442,12 +4758,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 18
       DesignSize = (
         446
-        428)
+        450)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
         Width = 431
-        Height = 191
+        Height = 177
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Configuration'
         TabOrder = 0
@@ -4467,7 +4783,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object Label7: TLabel
           Left = 16
-          Top = 113
+          Top = 95
           Width = 88
           Height = 13
           Hint = 'Set username and password to access your library.'
@@ -4475,7 +4791,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object Label8: TLabel
           Left = 116
-          Top = 114
+          Top = 96
           Width = 86
           Height = 13
           Hint = 'Set username and password to access your library'
@@ -4483,7 +4799,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object LblWebserverAdminURL: TLabel
           Left = 224
-          Top = 132
+          Top = 114
           Width = 106
           Height = 13
           Cursor = crHandPoint
@@ -4498,31 +4814,21 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object BtnServerActivate: TButton
           Left = 296
-          Top = 157
+          Top = 139
           Width = 125
           Height = 25
           Caption = 'Activate server'
           TabOrder = 0
           OnClick = BtnServerActivateClick
         end
-        object cbOnlyLAN: TCheckBox
-          Left = 16
-          Top = 68
-          Width = 393
-          Height = 13
-          Hint = 'Deny access from "the internet".'
-          Caption = 'Local network only'
-          TabOrder = 3
-          OnClick = cbOnlyLANClick
-        end
         object CBAutoStartWebServer: TCheckBox
           Left = 16
-          Top = 84
+          Top = 66
           Width = 393
           Height = 17
           Hint = 'Automatically activate the webserver when Nemp starts.'
           Caption = 'Activate webserver on start'
-          TabOrder = 4
+          TabOrder = 3
         end
         object seWebServer_Port: TSpinEdit
           Left = 183
@@ -4545,33 +4851,33 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object EdtUsernameAdmin: TEdit
           Left = 16
-          Top = 129
+          Top = 111
           Width = 95
           Height = 21
-          TabOrder = 5
+          TabOrder = 4
           OnKeyPress = EdtUsernameAdminKeyPress
         end
         object EdtPasswordAdmin: TEdit
           Left = 115
-          Top = 129
+          Top = 111
           Width = 97
           Height = 21
-          TabOrder = 6
+          TabOrder = 5
           OnKeyPress = EdtPasswordKeyPress
         end
         object BtnShowWebserverLog: TButton
           Left = 159
-          Top = 157
+          Top = 139
           Width = 125
           Height = 25
           Caption = 'Show Log'
-          TabOrder = 7
+          TabOrder = 6
           OnClick = BtnShowWebserverLogClick
         end
       end
       object GrpBoxIP: TGroupBox
         Left = 8
-        Top = 347
+        Top = 328
         Width = 431
         Height = 70
         Hint = 
@@ -4580,6 +4886,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Current IP-addresses'
         TabOrder = 2
+        Visible = False
         object LblConst_IPWAN: TLabel
           Left = 153
           Top = 20
@@ -4636,7 +4943,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBoxWebserverUserRights: TGroupBox
         Left = 8
-        Top = 201
+        Top = 186
         Width = 431
         Height = 140
         Anchors = [akLeft, akTop, akRight]
@@ -4736,7 +5043,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNApply: TButton
     Left = 583
-    Top = 541
+    Top = 563
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4746,7 +5053,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNCancel: TButton
     Left = 503
-    Top = 541
+    Top = 563
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4757,7 +5064,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNok: TButton
     Left = 423
-    Top = 541
+    Top = 563
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -4768,7 +5075,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object _XXX_cb_SettingsMode: TComboBox
     Left = 8
-    Top = 539
+    Top = 561
     Width = 191
     Height = 21
     Style = csDropDownList

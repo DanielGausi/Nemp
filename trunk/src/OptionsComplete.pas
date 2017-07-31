@@ -41,8 +41,8 @@ interface
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
-  DateUtils,  IniFiles, jpeg, PNGImage, GifImg, math,
-  bass, fldbrows, StringHelper, MainFormHelper,
+  DateUtils,  IniFiles, jpeg, PNGImage, GifImg, math, Contnrs,
+  bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
 
    NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, U_Charcode,
@@ -52,7 +52,7 @@ uses
   gnuGettext, languageCodes, 
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   SkinButtons, NempPanel, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdHTTP, MyDialogs
+  IdTCPClient, IdHTTP, MyDialogs, Vcl.Mask
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
@@ -84,7 +84,6 @@ type
     TabSystem3: TTabSheet;
     BtnRegistryUpdate: TButton;
     TabSystem1: TTabSheet;
-    GrpBox_TaskTray: TRadioGroup;
     GrpBox_MickyMouse: TRadioGroup;
     GrpBox_Deskband: TGroupBox;
     CBShowDeskbandOnStart: TCheckBox;
@@ -96,13 +95,10 @@ type
     CB_UseDefaultEqualizer: TCheckBox;
     TabPlayer2: TTabSheet;
     GrpBox_PlaylistBehaviour: TGroupBox;
-    CB_AutoSavePlaylist: TCheckBox;
     CB_AutoScanPlaylist: TCheckBox;
     TabView4: TTabSheet;
     TabFiles0: TTabSheet;
     TabFiles4: TTabSheet;
-    GrpBox_TabMedia5_ID3: TGroupBox;
-    CBAutoDetectCharCode: TCheckBox;
     GrpBox_TabMedia5_Charsets: TGroupBox;
     LblConst_Arabic: TLabel;
     LblConst_hebrew: TLabel;
@@ -121,10 +117,8 @@ type
     GrpBox_TabAudio7_Event: TGroupBox;
     Lbl_Const_EventTime: TLabel;
     lblBirthdayTitel: TLabel;
-    DTPBirthdayTime: TDateTimePicker;
     BtnBirthdaySong: TButton;
     BtnGetBirthdayTitel: TButton;
-    CBContinueAfter: TCheckBox;
     TabView2: TTabSheet;
     LBlCountDownWarning: TLabel;
     LblEventWarning: TLabel;
@@ -202,12 +196,6 @@ type
     CB_AutoPlayNewTitle: TCheckBox;
     CB_SavePositionInTrack: TCheckBox;
     CB_AutoPlayOnStart: TCheckBox;
-    GrpBox_ViewVis_Scrolling: TGroupBox;
-    Lbl_Framerate: TLabel;
-    CB_visual: TCheckBox;
-    TB_Refresh: TTrackBar;
-    CB_ScrollTitelTaskBar: TCheckBox;
-    CB_ScrollTitleInMainWindow: TCheckBox;
     GrpBox_Devices: TGroupBox;
     LblConst_MainDevice: TLabel;
     LblConst_Headphones: TLabel;
@@ -279,8 +267,6 @@ type
     CB_Key_DecVol: TComboBox;
     CB_Mod_Mute: TComboBox;
     CB_Key_Mute: TComboBox;
-    CB_TaskBarDelay: TComboBox;
-    CB_AnzeigeDelay: TComboBox;
     HeadphonesDeviceCB: TComboBox;
     MainDeviceCB: TComboBox;
     cbFilenameFormat: TComboBox;
@@ -299,7 +285,6 @@ type
     TabPlayer8: TTabSheet;
     GrpBoxConfig: TGroupBox;
     BtnServerActivate: TButton;
-    cbOnlyLAN: TCheckBox;
     GrpBoxIP: TGroupBox;
     LblConst_IPWAN: TLabel;
     LabelLANIP: TLabel;
@@ -322,14 +307,8 @@ type
     StaticText1: TLabel;
     StaticText2: TLabel;
     CB_RememberInterruptedPlayPosition: TCheckBox;
-    LblTaskbarWin7: TLabel;
     cbIncludeFiles: TCheckListBox;
     CBChangeFontColoronBitrate: TCheckBox;
-    GrpBox_ViewVis_CoverDetails: TGroupBox;
-    LblConst_CoverMode: TLabel;
-    LblConst_DetailMode: TLabel;
-    cbCoverMode: TComboBox;
-    cbDetailMode: TComboBox;
     cb_ChangeCoverflowOnSearch: TCheckBox;
     LblWebServer_Port: TLabel;
     seWebServer_Port: TSpinEdit;
@@ -391,7 +370,7 @@ type
     BtnClearCoverCache: TButton;
     GrpBox_FilesMain_Playlists: TGroupBox;
     CBAutoScanPlaylistFilesOnView: TCheckBox;
-    TabSystem4: TTabSheet;
+    TabPlaylistRandom: TTabSheet;
     GrpBox_ViewMain_BrowseCoverflow: TGroupBox;
     Label61: TLabel;
     Label6: TLabel;
@@ -414,9 +393,6 @@ type
     cbReplaceArtistBy: TComboBox;
     cbReplaceTitleBy: TComboBox;
     cbReplaceAlbumBy: TComboBox;
-    GrpBox_ViewExt_Select: TGroupBox;
-    CBFullRowSelect: TCheckBox;
-    CB_EditOnClick: TCheckBox;
     GrpBox_ViewExt_Hints: TGroupBox;
     CBShowHintsInMedialist: TCheckBox;
     CB_ShowHintsInPlaylist: TCheckBox;
@@ -450,10 +426,6 @@ type
     Btn_ReinitPlayerEngine: TButton;
     GrpBox_BetaOptions: TGroupBox;
     XXX_CB_BetaDontUseThreadedUpdate: TCheckBox;
-    GrpBox_RandomOptions: TGroupBox;
-    LblConst_ReallyRandom: TLabel;
-    LblConst_AvoidRepetitions: TLabel;
-    TBRandomRepeat: TTrackBar;
     GrpBox_PlayerExt2_Playlist: TGroupBox;
     CB_AutoMixPlaylist: TCheckBox;
     CB_DisableAutoDeleteAtUserInput: TCheckBox;
@@ -461,12 +433,6 @@ type
     LblHeadsetDefaultAction: TLabel;
     GrpBox_HeadsetDefaultAction: TComboBox;
     cb_AutoStopHeadset: TCheckBox;
-    GrpBox_Files_Cover_Default: TGroupBox;
-    lbl_DefaultCover: TLabel;
-    img_DefaultCover: TImage;
-    lbl_DefaultCoverHint: TLabel;
-    btn_DefaultCover: TButton;
-    btn_DefaultCoverReset: TButton;
     GrpBox_ViewVis_CoverFlow: TGroupBox;
     cb_UseClassicCoverflow: TCheckBox;
     cbFixCoverFlowOnStart: TCheckBox;
@@ -475,6 +441,75 @@ type
     lbl_Browselist_FontStyle: TLabel;
     cb_Browselist_FontStyle: TComboBox;
     CBChangeFontSizeOnLength: TCheckBox;
+    GrpBox_TaskTray: TGroupBox;
+    cb_TaskTray: TComboBox;
+    LblTaskbarWin7: TLabel;
+    CBContinueAfter: TCheckBox;
+    mskEdt_BirthdayTime: TMaskEdit;
+    GrpBox_RandomOptions: TGroupBox;
+    LblConst_ReallyRandom: TLabel;
+    LblConst_AvoidRepetitions: TLabel;
+    TBRandomRepeat: TTrackBar;
+    grpBox_WeightedRandom: TGroupBox;
+    cb_UseWeightedRNG: TCheckBox;
+    lbl_WeightedRandom: TLabel;
+    RatingImage05: TImage;
+    RandomWeight05: TEdit;
+    RatingImage10: TImage;
+    RandomWeight10: TEdit;
+    RatingImage15: TImage;
+    RandomWeight15: TEdit;
+    RatingImage20: TImage;
+    RandomWeight20: TEdit;
+    RatingImage25: TImage;
+    RandomWeight25: TEdit;
+    RatingImage30: TImage;
+    RandomWeight30: TEdit;
+    RatingImage35: TImage;
+    RandomWeight35: TEdit;
+    RatingImage40: TImage;
+    RandomWeight40: TEdit;
+    RatingImage45: TImage;
+    RandomWeight45: TEdit;
+    RatingImage50: TImage;
+    RandomWeight50: TEdit;
+    BtnCountRating: TButton;
+    cbCountRatingOnlyPlaylist: TCheckBox;
+    lblCount30: TLabel;
+    lblCount35: TLabel;
+    lblCount40: TLabel;
+    lblCount45: TLabel;
+    lblCount50: TLabel;
+    lblCount05: TLabel;
+    lblCount10: TLabel;
+    lblCount15: TLabel;
+    lblCount20: TLabel;
+    lblCount25: TLabel;
+    lblCount00: TLabel;
+    GrpBox_TabMedia5_ID3: TGroupBox;
+    CBAutoDetectCharCode: TCheckBox;
+    CBFullRowSelect: TCheckBox;
+    __XXX__CB_AutoSavePlaylist: TCheckBox;
+    cbOnlyLAN: TCheckBox;
+    GrpBox_Files_Cover_Default: TGroupBox;
+    lbl_DefaultCover: TLabel;
+    img_DefaultCover: TImage;
+    lbl_DefaultCoverHint: TLabel;
+    btn_DefaultCover: TButton;
+    btn_DefaultCoverReset: TButton;
+    GrpBox_ViewVis_CoverDetails: TGroupBox;
+    LblConst_CoverMode: TLabel;
+    LblConst_DetailMode: TLabel;
+    cbCoverMode: TComboBox;
+    cbDetailMode: TComboBox;
+    GrpBox_ViewVis_Scrolling: TGroupBox;
+    Lbl_Framerate: TLabel;
+    CB_visual: TCheckBox;
+    TB_Refresh: TTrackBar;
+    CB_ScrollTitelTaskBar: TCheckBox;
+    CB_ScrollTitleInMainWindow: TCheckBox;
+    CB_TaskBarDelay: TComboBox;
+    CB_AnzeigeDelay: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -575,9 +610,15 @@ type
       var ItemColor: TColor; var EraseAction: TItemEraseAction);
     procedure btn_DefaultCoverClick(Sender: TObject);
     procedure btn_DefaultCoverResetClick(Sender: TObject);
+    procedure mskEdt_BirthdayTimeExit(Sender: TObject);
+    procedure cb_UseWeightedRNGClick(Sender: TObject);
+    procedure RandomWeight05Exit(Sender: TObject);
+    procedure BtnCountRatingClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
+    DetailRatingHelper: TRatingHelper;
+
     //CurrentScanDir: String;
     procedure GetSkins;
     // Hilfsprozeduren für das Hotkey-Laden/Speichern
@@ -585,8 +626,10 @@ type
     Function IndexToMod(aIndex: Integer): Cardinal;
     Function KeyToIndex(aKey: Byte): Integer;
     Function IndexToKey(aIndex: Integer): byte;
+    function ValidTime(aText: String): Boolean;
 
     procedure LoadDefaultCover;
+    procedure LoadStarGraphics;
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
   public
@@ -629,9 +672,9 @@ uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
 
 var
  OptionsArraySystem : array[0..2] of TOptionData;
- OptionsArrayAnzeige: array[0..4] of TOptionData;
- OptionsArrayAudio  : array[0..7] of TOptionData;
- OptionsArrayFiles  : Array[0..5] of TOptionData;
+ OptionsArrayAnzeige: array[0..3] of TOptionData;
+ OptionsArrayAudio  : array[0..8] of TOptionData;
+ OptionsArrayFiles  : Array[0..4] of TOptionData;
  Testskin: TNempSkin;
 
 
@@ -648,6 +691,45 @@ end;
 procedure TOptionsCompleteForm.BTNCancelClick(Sender: TObject);
 begin
   close;
+end;
+
+procedure TOptionsCompleteForm.LoadStarGraphics;
+var i:integer;
+    s,h,u: TBitmap;
+    baseDir: String;
+
+begin
+  // exit;
+  s := TBitmap.Create;
+  h := TBitmap.Create;
+  u := TBitmap.Create;
+
+
+  if Nemp_MainForm.NempSkin.isActive
+      and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
+      and Nemp_MainForm.NempSkin.UseAdvancedSkin
+      and Nemp_MainForm.GlobalUseAdvancedSkin
+  then
+      BaseDir := Nemp_MainForm.NempSkin.Path + '\'
+  else
+      // Detail-Form is not skinned, use default images
+      BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+  try
+      s.Transparent := True;
+      h.Transparent := True;
+      u.Transparent := True;
+
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
+
+      DetailRatingHelper.SetStars(s,h,u);
+  finally
+      s.Free;
+      h.Free;
+      u.Free;
+  end;
 end;
 
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
@@ -674,9 +756,23 @@ begin
   TranslateComponent (self);
   RestoreComboboxes;
 
+  DetailRatingHelper := TRatingHelper.Create;
+  LoadStarGraphics;
+
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(51 + 1, RatingImage15.Picture.Bitmap, RatingImage15.Width, RatingImage15.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(51+26 + 1, RatingImage20.Picture.Bitmap, RatingImage20.Width, RatingImage20.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51 + 1, RatingImage25.Picture.Bitmap, RatingImage25.Width, RatingImage25.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51+26 + 1, RatingImage30.Picture.Bitmap, RatingImage30.Width, RatingImage30.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51 + 1, RatingImage35.Picture.Bitmap, RatingImage35.Width, RatingImage35.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51+26 + 1, RatingImage40.Picture.Bitmap, RatingImage40.Width, RatingImage40.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
+  DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
+
   Testskin := TNempSkin.create;
 
-  DTPBirthdayTime.Format := 'HH:mm';
+  // DTPBirthdayTime.Format := 'HH:mm';
 
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
   begin
@@ -708,17 +804,17 @@ begin
   OptionsArrayAnzeige[0].Eintrag := OptionsTree_ViewMain;
   OptionsArrayAnzeige[0].TabSheet:= TabView0;
 
-      OptionsArrayAnzeige[1].Eintrag := OptionsTree_ViewPlayer;
-      OptionsArrayAnzeige[1].TabSheet:= TabView2;
+      //OptionsArrayAnzeige[1].Eintrag := OptionsTree_ViewPlayer;
+      //OptionsArrayAnzeige[1].TabSheet:= TabView2;
 
-      OptionsArrayAnzeige[2].Eintrag := OptionsTree_PartyMode;
-      OptionsArrayAnzeige[2].TabSheet:= TabView1;
+      OptionsArrayAnzeige[1].Eintrag := OptionsTree_PartyMode;
+      OptionsArrayAnzeige[1].TabSheet:= TabView1;
 
-      OptionsArrayAnzeige[3].Eintrag := OptionsTree_ViewFonts;
-      OptionsArrayAnzeige[3].TabSheet:= TabView3;
+      OptionsArrayAnzeige[2].Eintrag := OptionsTree_ViewFonts;
+      OptionsArrayAnzeige[2].TabSheet:= TabView3;
 
-      OptionsArrayAnzeige[4].Eintrag  := OptionsTree_ViewExtended;//'[leer]'; //OptionsTree_PlayerMedialibrary
-      OptionsArrayAnzeige[4].TabSheet := TabView4;
+      OptionsArrayAnzeige[3].Eintrag  := OptionsTree_ViewExtended;//'[leer]'; //OptionsTree_PlayerMedialibrary
+      OptionsArrayAnzeige[3].TabSheet := TabView4;
 
   // PLAYER
   OptionsArrayAudio[0].Eintrag  := OptionsTree_PlayerMain;
@@ -726,23 +822,21 @@ begin
 
       OptionsArrayAudio[1].Eintrag  := OptionsTree_PlayerPlaylist;
       OptionsArrayAudio[1].TabSheet := TabPlayer2;
+      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerRandom;
+      OptionsArrayAudio[2].TabSheet := TabPlaylistRandom;
+      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerWebradio;
+      OptionsArrayAudio[3].TabSheet := TabPlayer4;
+      OptionsArrayAudio[4].Eintrag  := OptionsTree_PlayerEffects;
+      OptionsArrayAudio[4].TabSheet := TabPlayer5;
+      OptionsArrayAudio[5].Eintrag  := OptionsTree_PlayerEvents;
+      OptionsArrayAudio[5].TabSheet := TabPlayer6;            // Birthday
+      OptionsArrayAudio[6].Eintrag  := OptionsTree_PlayerScrobbler;
+      OptionsArrayAudio[6].TabSheet := TabPlayer7;          // Scrobbler
+      OptionsArrayAudio[7].Eintrag  := OptionsTree_PlayerWebServer;
+      OptionsArrayAudio[7].TabSheet := TabPlayer8;          // WebServer
 
-      //OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerExtendedPlaylist;
-      //OptionsArrayAudio[3].TabSheet := TabPlayer3;
-
-      OptionsArrayAudio[2].Eintrag  := OptionsTree_PlayerWebradio;
-      OptionsArrayAudio[2].TabSheet := TabPlayer4;
-      OptionsArrayAudio[3].Eintrag  := OptionsTree_PlayerEffects;
-      OptionsArrayAudio[3].TabSheet := TabPlayer5;
-      OptionsArrayAudio[4].Eintrag  := OptionsTree_PlayerEvents;
-      OptionsArrayAudio[4].TabSheet := TabPlayer6;            // Birthday
-      OptionsArrayAudio[5].Eintrag  := OptionsTree_PlayerScrobbler;
-      OptionsArrayAudio[5].TabSheet := TabPlayer7;          // Scrobbler
-      OptionsArrayAudio[6].Eintrag  := OptionsTree_PlayerWebServer;
-      OptionsArrayAudio[6].TabSheet := TabPlayer8;          // WebServer
-
-      OptionsArrayAudio[7].Eintrag  := OptionsTree_PlayerExtendedPlayer;
-      OptionsArrayAudio[7].TabSheet := TabPlayer1;        // extended settings
+      OptionsArrayAudio[8].Eintrag  := OptionsTree_PlayerExtendedPlayer;
+      OptionsArrayAudio[8].TabSheet := TabPlayer1;        // extended settings
 
   // FILE MANAGEMENT
 
@@ -760,8 +854,8 @@ begin
 
       OptionsArrayFiles[4].Eintrag  := OptionsTree_MediabibSearch;
       OptionsArrayFiles[4].TabSheet := TabFiles3;
-      OptionsArrayFiles[5].Eintrag  := OptionsTree_MediabibUnicode;
-      OptionsArrayFiles[5].TabSheet := TabFiles4;
+      //OptionsArrayFiles[5].Eintrag  := OptionsTree_MediabibUnicode;
+      //OptionsArrayFiles[5].TabSheet := TabFiles4;
 
 
   // Fill Tree
@@ -773,7 +867,7 @@ begin
   TabSystem1.TabVisible := False;
   TabSystem2.TabVisible := False;
   TabSystem3.TabVisible := False;
-  TabSystem4.TabVisible := False;
+  //TabSystem4.TabVisible := False;
 
   TabView0.TabVisible := False;
   TabView1.TabVisible := False;
@@ -785,7 +879,7 @@ begin
   TabPlayer0.TabVisible := False;
   TabPlayer1.TabVisible := False;
   TabPlayer2.TabVisible := False;
-  //TabPlayer3.TabVisible := False;
+  TabPlaylistRandom.TabVisible := False;
   TabPlayer4.TabVisible := False;
   TabPlayer5.TabVisible := False;
   TabPlayer6.TabVisible := False;
@@ -801,6 +895,7 @@ begin
 
 
   // Die Auswahlboxen mit den entsprechenden Zeichensätzen füllen
+  {
   for i := 0 to High(ArabicEncodings) do
     CBArabic.Items.Add(ArabicEncodings[i].Description);
   for i := 0 to High(ChineseEncodings) do
@@ -817,7 +912,7 @@ begin
     CBKorean.Items.Add(KoreanEncodings[i].Description);
   for i := 0 to High(ThaiEncodings) do
     CBThai.Items.Add(ThaiEncodings[i].Description);
-
+  }
 
   //----------------------------------
   count := 1;
@@ -922,12 +1017,13 @@ begin
     // PLAYER
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAudio[0]);
           AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]); // Playlist
-          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]); // Webradio
-          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]); // Effects
-          BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]); // Birthday
-          ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]); // Scrobbler
-          WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]); // Webserver
-          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]); // extended
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]); // random
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]); // Webradio
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]); // Effects
+          BirthdayNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[5]); // Birthday
+          ScrobbleNode  := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[6]); // Scrobbler
+          WebServerNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[7]); // Webserver
+          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[8]); // extended
 
     //if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]);
     //AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]);
@@ -957,7 +1053,7 @@ begin
     AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[3]);
     //if ExtendedSettings then
     if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[4]);
-    if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[5]);
+    //if ExtendedSettings then AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[5]);
 
     //for i := 2 to High(OptionsArrayFiles) do
     //    AddVSTOptions(OptionsVST, MainNode, OptionsArrayFiles[i]);
@@ -1009,6 +1105,7 @@ procedure TOptionsCompleteForm.FormDestroy(Sender: TObject);
 var Data: POptionsTreeData;
     node: PVirtualNode;
 begin
+    DetailRatingHelper.Free;
     try
         node :=  OptionsVST.GetFirst;
         while assigned(node) do
@@ -1154,7 +1251,7 @@ begin
   CB_AutoPlayNewTitle.Checked     := NempPlaylist.AutoPlayNewTitle;
   CB_AutoPlayEnqueueTitle.Checked := NempPlaylist.AutoPlayEnqueuedTitle;
 
-  CB_AutoSavePlaylist.Checked := NempPlaylist.AutoSave;
+  // CB_AutoSavePlaylist.Checked := NempPlaylist.AutoSave;
 
   CB_AutoDeleteFromPlaylist.Checked := NempPlaylist.AutoDelete;
 
@@ -1177,6 +1274,20 @@ begin
   CB_ShowHintsInPlaylist.Checked    := NempPlaylist.ShowHintsInPlaylist;
 
   TBRandomRepeat.Position := NempPlaylist.RandomRepeat;
+
+  cb_UseWeightedRNG.Checked := NempPlaylist.UseWeightedRNG;
+  cb_UseWeightedRNGClick(Nil);
+  RandomWeight05.Text := IntToStr(NempPlaylist.RNGWeights[1]);
+  RandomWeight10.Text := IntToStr(NempPlaylist.RNGWeights[2]);
+  RandomWeight15.Text := IntToStr(NempPlaylist.RNGWeights[3]);
+  RandomWeight20.Text := IntToStr(NempPlaylist.RNGWeights[4]);
+  RandomWeight25.Text := IntToStr(NempPlaylist.RNGWeights[5]);
+  RandomWeight30.Text := IntToStr(NempPlaylist.RNGWeights[6]);
+  RandomWeight35.Text := IntToStr(NempPlaylist.RNGWeights[7]);
+  RandomWeight40.Text := IntToStr(NempPlaylist.RNGWeights[8]);
+  RandomWeight45.Text := IntToStr(NempPlaylist.RNGWeights[9]);
+  RandomWeight50.Text := IntToStr(NempPlaylist.RNGWeights[10]);
+
 
   CBJingleReduce.Checked := NempPlayer.ReduceMainVolumeOnJingle;
   SEJingleReduce.Enabled := NempPlayer.ReduceMainVolumeOnJingle;
@@ -1268,7 +1379,7 @@ begin
   //cbDenyId3Edit.Checked := Nemp_MainForm.NempOptions.DenyId3Edit;
 
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
-  CB_EditOnClick.Checked  := Nemp_MainForm.NempOptions.EditOnClick;
+  // CB_EditOnClick.Checked  := Nemp_MainForm.NempOptions.EditOnClick;
 
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
@@ -1333,7 +1444,7 @@ begin
   CB_QuickSearchAllowErrorsOnEnter    .Checked := MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter;
   CB_QuickSearchAllowErrorsWhileTyping.Checked := MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType;
 
-  GrpBox_TaskTray.ItemIndex := Nemp_MainForm.NempOptions.NempWindowView;
+  cb_TaskTray.ItemIndex := Nemp_MainForm.NempOptions.NempWindowView;
 
   CBShowDeskbandOnMinimize.Checked := Nemp_MainForm.NempOptions.ShowDeskbandOnMinimize;
   CBShowDeskbandOnStart.Checked    := Nemp_MainForm.NempOptions.ShowDeskbandOnStart;
@@ -1346,6 +1457,7 @@ begin
   SEArtistAlbenRowHeight.Value := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
 
   // Zeichensätze
+  {
   With MedienBib do
   begin
       CBArabic.ItemIndex   := NempCharCodeOptions.Arabic.Index;
@@ -1356,11 +1468,13 @@ begin
       CBJapanese.ItemIndex := NempCharCodeOptions.Japanese.Index;
       CBKorean.ItemIndex   := NempCharCodeOptions.Korean.Index;
       CBThai.ItemIndex     := NempCharCodeOptions.Thai.Index;
-      CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
   end;
+  }
 
+  CBAutoDetectCharCode.Checked := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
   // Geburtstags-Optionen
-  DTPBirthdayTime.Date := TDate(Now);
+  //DTPBirthdayTime.Date := TDate(Now);
+
   // Daten aus Ini lesen
   NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
   //Controls setzen
@@ -1375,7 +1489,8 @@ begin
 
     EditCountdownSong.Text := CountDownFileName;
     EditBirthdaySong.Text := BirthdaySongFilename;
-    DTPBirthdayTime.Time := TimeOf(StartTime);
+    //DTPBirthdayTime.Time := TimeOf(StartTime);
+    mskEdt_BirthdayTime.Text := TimeToStr(TimeOf(StartTime));
     CBContinueAfter.Checked := ContinueAfter;
 
     LBlCountDownWarning.Visible := NOT FileExists(CountDownFileName);
@@ -1503,7 +1618,7 @@ begin
   EdtPasswordAdmin.Text := NempWebServer.PasswordA;
 
   seWebServer_Port.Value := NempWebServer.Port;
-  cbOnlyLAN.Checked := NempWebServer.OnlyLAN;
+  // cbOnlyLAN.Checked := NempWebServer.OnlyLAN;
   cbPermitLibraryAccess.Checked    := NempWebServer.AllowLibraryAccess;
   cbPermitPlaylistDownload.Checked := NempWebServer.AllowFileDownload;
   cbAllowRemoteControl.Checked     := NempWebServer.AllowRemoteControl;
@@ -1564,6 +1679,28 @@ begin
   LoadDefaultCover;
 
   //SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+end;
+
+function TOptionsCompleteForm.ValidTime(aText: String): Boolean;
+var txt_time: String;
+    h, min: Integer;
+begin
+    txt_time := mskEdt_BirthdayTime.Text;
+    h := StrToInt(TrimRight(Copy(txt_time, 0, 2)));
+    min := StrToInt(TrimRight(Copy(txt_time, 4, 2)));
+
+    result := (min >= 0) AND (min < 60)
+            AND (h >= 0) AND (h < 24);
+end;
+
+procedure TOptionsCompleteForm.mskEdt_BirthdayTimeExit(Sender: TObject);
+begin
+    if not ValidTime(mskEdt_BirthdayTime.Text) then
+    begin
+        MessageDlg((OptionsForm_InvalidTime), mtWarning, [MBOK], 0);
+        mskEdt_BirthdayTime.Text := TimeToStr(TimeOf(NempPlayer.NempBirthdayTimer.StartTime));
+        mskEdt_BirthdayTime.SetFocus;
+    end;
 end;
 
 Function TOptionsCompleteForm.ModToIndex(aMod: Cardinal): Integer;
@@ -1679,6 +1816,26 @@ begin
   Lbl_SilenceThreshold.Enabled := CB_SilenceDetection.Checked;
   SE_SilenceThreshold.Enabled  := CB_SilenceDetection.Checked;
   Lbl_SilenceDB.Enabled        := CB_SilenceDetection.Checked;
+end;
+
+procedure TOptionsCompleteForm.RandomWeight05Exit(Sender: TObject);
+begin
+    if (Sender as TEdit).Text = '' then
+        (Sender as TEdit).Text := '1';
+end;
+
+procedure TOptionsCompleteForm.cb_UseWeightedRNGClick(Sender: TObject);
+begin
+    RandomWeight05.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight10.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight15.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight20.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight25.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight30.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight35.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight40.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight45.Enabled := cb_UseWeightedRNG.Checked;
+    RandomWeight50.Enabled := cb_UseWeightedRNG.Checked;
 end;
 
 procedure TOptionsCompleteForm.cb_RatingActiveClick(Sender: TObject);
@@ -1857,6 +2014,7 @@ begin
   LblConst_OnlythefollowingTypes.Enabled := NOT cbIncludeAll.Checked;
 end;
 
+
 procedure TOptionsCompleteForm.RecommendedFiletypesClick(Sender: TObject);
 var i: Integer;
 begin
@@ -1920,6 +2078,75 @@ procedure TOptionsCompleteForm.BtnCountDownSongClick(Sender: TObject);
 begin
   If OpenDlg_CountdownSongs.Execute then
     EditCountDownSong.Text := OpenDlg_CountdownSongs.FileName;
+end;
+
+procedure TOptionsCompleteForm.BtnCountRatingClick(Sender: TObject);
+var aList: TObjectList;
+    i, rawRating: Integer;
+    RatingCounts: Array[0..10] of Integer;
+begin
+    aList := TObjectList.Create(False);
+    try
+        if cbCountRatingOnlyPlaylist.Checked then
+        begin
+            // copy the playlist
+            for i := 0 to NempPlaylist.Playlist.Count-1 do
+                aList.Add(NempPlaylist.Playlist.Items[i]);
+        end
+        else
+        begin
+            if MedienBib.StatusBibUpdate <> 0 then
+                TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0)
+            else
+                MedienBib.FillListWithMedialibrary(aList);
+        end;
+
+        // do the counting
+        for i := 0 to 10 do
+            RatingCounts[i] := 0;
+
+        for i := 0 to aList.Count-1 do
+        begin
+            rawRating := TAudiofile(aList[i]).Rating;
+            if rawRating = 0 then
+                inc(RatingCounts[0]);
+            // that one as well (always), because a rating of "0" is treated as "127" in general
+            inc(RatingCounts[RatingToArrayIndex(rawRating)]);
+        end;
+
+        // show the results
+        lblCount00.caption := Format(OptionsForm_UnratedFilesHint, [RatingCounts[0]]);
+
+        lblCount05.Caption := '(' + IntToStr(RatingCounts[1]) + ')';
+        lblCount10.Caption := '(' + IntToStr(RatingCounts[2]) + ')';
+        lblCount15.Caption := '(' + IntToStr(RatingCounts[3]) + ')';
+        lblCount20.Caption := '(' + IntToStr(RatingCounts[4]) + ')';
+        if RatingCounts[0] > 0 then
+            lblCount25.Caption := '(' + IntToStr(RatingCounts[5]) + ')*'
+        else
+            lblCount25.Caption := '(' + IntToStr(RatingCounts[5]) + ')';
+        lblCount30.Caption := '(' + IntToStr(RatingCounts[6]) + ')';
+        lblCount35.Caption := '(' + IntToStr(RatingCounts[7]) + ')';
+        lblCount40.Caption := '(' + IntToStr(RatingCounts[8]) + ')';
+        lblCount45.Caption := '(' + IntToStr(RatingCounts[9]) + ')';
+        lblCount50.Caption := '(' + IntToStr(RatingCounts[10]) + ')';
+
+
+        lblCount00.Visible := RatingCounts[0] > 0;
+        lblCount05.Visible := True;
+        lblCount10.Visible := True;
+        lblCount15.Visible := True;
+        lblCount20.Visible := True;
+        lblCount25.Visible := True;
+        lblCount30.Visible := True;
+        lblCount35.Visible := True;
+        lblCount40.Visible := True;
+        lblCount45.Visible := True;
+        lblCount50.Visible := True;
+
+    finally
+        aList.Free;
+    end;
 end;
 
 procedure TOptionsCompleteForm.BtnBirthdaySongClick(Sender: TObject);
@@ -2082,10 +2309,10 @@ begin
   NempPlaylist.AutoPlayNewTitle := CB_AutoPlayNewTitle.Checked;
   NempPlaylist.AutoPlayEnqueuedTitle := CB_AutoPlayEnqueueTitle.Checked;
 
-  NempPlaylist.AutoSave         := CB_AutoSavePlaylist.Checked;
-  //NempPlaylist.AutoSaveInterval := SEAutoSavePlaylistInterval.Value;
-  Nemp_MainForm.AutoSavePlaylistTimer.Enabled := CB_AutoSavePlaylist.Checked;
-  Nemp_MainForm.AutoSavePlaylistTimer.Interval := 5 * 60000;
+  // NempPlaylist.AutoSave         := True; // CB_AutoSavePlaylist.Checked;
+  // NempPlaylist.AutoSaveInterval := SEAutoSavePlaylistInterval.Value;
+  // Nemp_MainForm.AutoSavePlaylistTimer.Enabled := True; // CB_AutoSavePlaylist.Checked;
+  // Nemp_MainForm.AutoSavePlaylistTimer.Interval := 5 * 60000;
 
   NempPlaylist.AutoDelete                   := CB_AutoDeleteFromPlaylist.Checked       ;
   NempPlaylist.DisableAutoDeleteAtUserInput := CB_DisableAutoDeleteAtUserInput.Checked ;
@@ -2103,6 +2330,24 @@ begin
   Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
 
   NempPlaylist.RandomRepeat := TBRandomRepeat.Position;
+
+  NempPlaylist.UseWeightedRNG := cb_UseWeightedRNG.Checked;
+  NempPlaylist.RNGWeights[1]  := StrToIntDef(RandomWeight05.Text, 1);
+  NempPlaylist.RNGWeights[2]  := StrToIntDef(RandomWeight10.Text, 1);
+  NempPlaylist.RNGWeights[3]  := StrToIntDef(RandomWeight15.Text, 1);
+  NempPlaylist.RNGWeights[4]  := StrToIntDef(RandomWeight20.Text, 1);
+  NempPlaylist.RNGWeights[5]  := StrToIntDef(RandomWeight25.Text, 1);
+  NempPlaylist.RNGWeights[6]  := StrToIntDef(RandomWeight30.Text, 1);
+  NempPlaylist.RNGWeights[7]  := StrToIntDef(RandomWeight35.Text, 1);
+  NempPlaylist.RNGWeights[8]  := StrToIntDef(RandomWeight40.Text, 1);
+  NempPlaylist.RNGWeights[9]  := StrToIntDef(RandomWeight45.Text, 1);
+  NempPlaylist.RNGWeights[10] := StrToIntDef(RandomWeight50.Text, 1);
+  // flag the playlist to re-initiate the fWeightedRandomIndices
+  // in most cases this is not necessary, as the weights are not changed everytime the
+  // settings dialog is called, but it doesn't hurt that much ... ;-)
+  if NempPlaylist.UseWeightedRNG then
+      NempPlaylist.PlaylistHasChanged := True;
+
 
   NempPlayer.DownloadDir := IncludeTrailingPathDelimiter(EdtDownloadDir.Text);
   NempPlayer.FilenameFormat := cbFilenameFormat.Text;
@@ -2189,7 +2434,7 @@ begin
 
   //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
-  Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
+  // Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
@@ -2279,10 +2524,10 @@ begin
   else
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions - [toFullRowSelect];
 
-  if Nemp_MainForm.NempOptions.EditOnClick then
-      Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions + [toEditOnClick]
-  else
-      Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions - [toEditOnClick];
+  // if Nemp_MainForm.NempOptions.EditOnClick then
+  //    Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions + [toEditOnClick]
+  //else
+  //    Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions - [toEditOnClick];
 
   Nemp_MainForm.NempOptions.ShowSplashScreen := cb_ShowSplashScreen.Checked;
   Nemp_MainForm.NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
@@ -2344,7 +2589,7 @@ begin
   //FDetails.UpdateID3ReadOnlyStatus;//SetID3EditsWritable(False);
 
   // Fensterverhalten:
-  if Nemp_MainForm.NempOptions.NempWindowView <> GrpBox_TaskTray.ItemIndex then
+  if Nemp_MainForm.NempOptions.NempWindowView <> cb_TaskTray.ItemIndex then
   begin
       // Hide Taskbar-entry
 
@@ -2354,7 +2599,7 @@ begin
     NEMPWINDOW_BOTH = 3;
     NEMPWINDOW_BOTH_MIN_TRAY = 4;}
 
-      if      (GrpBox_TaskTray.ItemIndex = NEMPWINDOW_TRAYONLY) // user want no taskbar-entry at all ...
+      if      (cb_TaskTray.ItemIndex = NEMPWINDOW_TRAYONLY) // user want no taskbar-entry at all ...
           and (Nemp_MainForm.NempOptions.NempWindowView in
                [  NEMPWINDOW_ONLYTASKBAR,
                   NEMPWINDOW_TASKBAR_MIN_TRAY,
@@ -2372,7 +2617,7 @@ begin
           ShowWindow( Application.Handle, SW_SHOW );
       end else
           if (Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY)   // user has no entry
-              and (GrpBox_TaskTray.ItemIndex in
+              and (cb_TaskTray.ItemIndex in
                   [ NEMPWINDOW_ONLYTASKBAR,
                     NEMPWINDOW_TASKBAR_MIN_TRAY,
                     NEMPWINDOW_BOTH,
@@ -2386,10 +2631,10 @@ begin
               ShowWindow( Application.Handle, SW_SHOW );
           end;
       // Set new value
-      Nemp_MainForm.NempOptions.NempWindowView := GrpBox_TaskTray.ItemIndex;
+      Nemp_MainForm.NempOptions.NempWindowView := cb_TaskTray.ItemIndex;
 
         // TrayIcon erzeugen, behalten oder löschen
-      if GrpBox_TaskTray.ItemIndex in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
+      if cb_TaskTray.ItemIndex in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
       begin
         // TrayIcon erzeugen oder beibehalten
         Nemp_MainForm.NempTrayIcon.Visible := True;
@@ -2508,6 +2753,7 @@ begin
   end;
 
   // Zeichensätze
+  {
   with MedienBib do
   begin
       NempCharCodeOptions.Arabic    := ArabicEncodings[CBArabic.Itemindex];
@@ -2518,8 +2764,9 @@ begin
       NempCharCodeOptions.Japanese  := JapaneseEncodings[CBJapanese.Itemindex];
       NempCharCodeOptions.Korean    := KoreanEncodings[CBKorean.Itemindex];
       NempCharCodeOptions.Thai      := ThaiEncodings[CBThai.Itemindex];
-      NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
   end;
+  }
+  MedienBib.NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
 
   if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
   if ReDrawPlaylistTree then
@@ -2529,28 +2776,34 @@ begin
   end;
 
   // Geburtstags-Optionen
-  with NempPlayer.NempBirthdayTimer do
+  if ValidTime(mskEdt_BirthdayTime.Text) then
   begin
-    if (CountDownFileName <> EditCountdownSong.Text)
-      or (BirthdaySongFilename <> EditBirthdaySong.Text)
-      or (UseCountDown <> CBStartCountDown.Checked)
-      or (StartTime <> DTPBirthdayTime.Time)
-    then
-    begin
-        CountDownFileName := EditCountdownSong.Text;
-        BirthdaySongFilename := EditBirthdaySong.Text;
-        StartTime := (DTPBirthdayTime.Time);
-        UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text)<> '');
+      with NempPlayer.NempBirthdayTimer do
+      begin
+          if (CountDownFileName <> EditCountdownSong.Text)
+            or (BirthdaySongFilename <> EditBirthdaySong.Text)
+            or (UseCountDown <> CBStartCountDown.Checked)
+            //or (StartTime <> DTPBirthdayTime.Time)
+            or (StartTime <> StrToTime(mskEdt_BirthdayTime.Text))
+          then
+          begin
+              CountDownFileName := EditCountdownSong.Text;
+              BirthdaySongFilename := EditBirthdaySong.Text;
+              //StartTime := (DTPBirthdayTime.Time);
+              StartTime := StrToTime(mskEdt_BirthdayTime.Text);
+              UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text)<> '');
 
-        if UseCountDown then
-            StartCountDownTime := IncSecond(StartTime, - NempPlayer.GetCountDownLength(CountDownFileName))
-        else
-            StartCountDownTime := StartTime;
-    end;
+              if UseCountDown then
+                  StartCountDownTime := IncSecond(StartTime, - NempPlayer.GetCountDownLength(CountDownFileName))
+              else
+                  StartCountDownTime := StartTime;
+          end;
 
-    ContinueAfter := CBContinueAfter.Checked;
-    NempPlayer.WriteBirthdayOptions(SavePath + NEMP_NAME + '.ini');
-  end;
+          ContinueAfter := CBContinueAfter.Checked;
+          NempPlayer.WriteBirthdayOptions(SavePath + NEMP_NAME + '.ini');
+      end;
+  end; //else
+       // just ignore it
 
   // Hotkeys neu setzen, Ini Speichern
   UnInstallHotKeys(Nemp_MainForm.Handle);
@@ -2703,7 +2956,7 @@ begin
   NempWebServer.PasswordA := EdtPasswordAdmin.Text;
   NempWebServer.Theme := cbWebServerRootDir.Text;
 
-  NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
+  // NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
 
   if (NempWebServer.Port <> seWebServer_Port.Value) and (NempWebServer.Active) then
       MessageDLG((WebServer_PortChangeFailed), mtInformation, [MBOK], 0);
@@ -3418,7 +3671,7 @@ begin
 
         NempWebServer.Theme    := cbWebServerRootDir.Text;
         NempWebServer.Port     := seWebServer_Port.Value;
-        NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
+        // NempWebServer.OnlyLAN := cbOnlyLAN.Checked;
         NempWebServer.AllowLibraryAccess := cbPermitLibraryAccess.Checked;
         NempWebServer.AllowFileDownload := cbPermitPlaylistDownload.Checked;
         NempWebServer.AllowRemoteControl := cbAllowRemoteControl.Checked;

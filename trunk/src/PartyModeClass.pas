@@ -129,7 +129,7 @@ type
 
 implementation
 
-uses NempMainUnit, MainFormHelper, spectrum_vis, TreeHelper;
+uses NempMainUnit, MainFormHelper, spectrum_vis, TreeHelper, OptionsComplete;
 
 
 { TNempPartyMode }
@@ -419,8 +419,8 @@ begin
 
         // Additional Controls
         i := 0;
-        Setlength(fAdditionalControls, 15);
-        SetLength(fAdditionalPositionsArray, 15);
+        Setlength(fAdditionalControls, 16);
+        SetLength(fAdditionalPositionsArray, 16);
 
         SetAdditionalOriginalPosition(AuswahlHeaderPanel, i);
         SetAdditionalOriginalPosition(AuswahlFillPanel, i);
@@ -438,8 +438,9 @@ begin
         SetAdditionalOriginalPosition(GRPBOXVST           , i);
         SetAdditionalOriginalPosition(EDITFastSearch               , i);
         SetAdditionalOriginalPosition(CB_MedienBibGlobalQuickSearch, i);
-
         SetAdditionalOriginalPosition(Lbl_CoverFlow, i);
+
+        SetAdditionalOriginalPosition(EditPlaylistSearch           , i);
 
 
         //SetAdditionalOriginalPosition(, i);
@@ -508,30 +509,54 @@ begin
         AuswahlStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[2].FontSize);
         GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[3].Top);
 
+
+
+
+
+
         PlayerHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[4].Height);
+
         PlaylistFillPanel.Left := ChangeProc(fAdditionalPositionsArray[5].Left);
         PlaylistFillPanel.Height := ChangeProc(fAdditionalPositionsArray[5].Height);
         PlaylistFillPanel.Top := ChangeProc(fAdditionalPositionsArray[5].Top);
-        PlaylistFillPanel.Width := PlayerHeaderPanel.Width - PlaylistFillPanel.Left;
+
+
         PlayListStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[6].Top);
         PlayListStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[6].Height);
         PlayListStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[6].FontSize);
+
         GRPBOXPlaylist.Top := ChangeProc(fAdditionalPositionsArray[7].Top);
 
+        PlaylistFillPanel.Width := PlayerHeaderPanel.Width - PlaylistFillPanel.Left;
+        EditPlaylistSearch.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
+        EditPlaylistSearch.Width := ChangeProc(fAdditionalPositionsArray[15].Width);
+        EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[15].Left);
+        EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[15].Top);
+        EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[15].FontSize);
+
+
+
         MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
+
         MedienlisteFillPanel.Left := ChangeProc(fAdditionalPositionsArray[9].Left);
         MedienlisteFillPanel.Height := ChangeProc(fAdditionalPositionsArray[9].Height);
         MedienlisteFillPanel.Top := ChangeProc(fAdditionalPositionsArray[9].Top);
+
         MedienListeStatusLBL.Top := ChangeProc(fAdditionalPositionsArray[10].Top);
         MedienListeStatusLBL.Height := ChangeProc(fAdditionalPositionsArray[10].Height);
         MedienListeStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[10].FontSize);
+
         GRPBOXVST.Top := ChangeProc(fAdditionalPositionsArray[11].Top);
+
         MedienlisteFillPanel.Width := MedienBibHeaderPanel.Width - MedienlisteFillPanel.Left;
         EDITFastSearch.Height := ChangeProc(fAdditionalPositionsArray[12].Height);
         EDITFastSearch.Width := ChangeProc(fAdditionalPositionsArray[12].Width);
         EDITFastSearch.Left := ChangeProc(fAdditionalPositionsArray[12].Left);
         EDITFastSearch.Top := ChangeProc(fAdditionalPositionsArray[12].Top);
         EDITFastSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[12].FontSize);
+
+
+
 
         CB_MedienBibGlobalQuickSearch.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
         CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
@@ -611,6 +636,9 @@ begin
         Nemp_MainForm.AutoShowDetailsTMP := False;
     end;
 
+    if assigned(OptionsCompleteForm) and OptionsCompleteForm.visible then
+        OptionsCompleteForm.Close;
+
 
     Nemp_MainForm.TopMainPanel.Constraints.MinHeight := ChangeProc(TOP_MIN_HEIGHT);
     Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
@@ -674,7 +702,9 @@ begin
         PM_P_Scrobbler  .visible := not DoBlockTools;
         PM_P_Directories.visible := not DoBlockTools;
         PM_P_CheckForUpdates.visible := not DoBlockTools;
+        PM_P_KeyboardDisplay.Visible := vis;
         // --
+        PM_P_Wizard                         .Visible := vis;
         PM_P_ViewCompact                    .Visible := vis;
         PM_P_ViewCompactComplete            .Visible := vis;
         N31                                 .Visible := vis;
@@ -689,6 +719,8 @@ begin
             PM_P_PartyMode.Caption := MenuItem_Partymode
         else
             PM_P_PartyMode.Caption := MenuItem_PartymodeExit;
+
+
 
         // Popup Playlist
         PM_PL_SetRatingofSelectedFilesTo .Visible := vis;
@@ -740,7 +772,8 @@ begin
         MM_PL_Properties                 .Visible := vis;
         MM_PL_Properties                 .Enabled := vis;
         // Settings
-        MM_O_Preferences.Visible := vis;
+        MM_O_Preferences                    .Visible := vis;
+        MM_O_Wizard                         .Visible := vis;
         MM_O_ViewCompact                    .Visible := vis;
         MM_O_ViewCompactComplete            .Visible := vis;
         N34                                 .Visible := vis;

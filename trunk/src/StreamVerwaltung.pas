@@ -66,8 +66,7 @@ type
     GrpBox_GeneralSearch: TGroupBox;
     GrpBox_SearchGenre: TGroupBox;
     CB_SearchGenre: TComboBox;
-    ProgressBar1: TProgressBar;
-    StatusBar1: TStatusBar;
+    xxx_ProgressBar1: TProgressBar;
     BtnExport: TButton;
     BtnImport: TButton;
     OpenDialog1: TOpenDialog;
@@ -99,7 +98,7 @@ type
     MM_Shoutcast: TMenuItem;
     MM_SC_AddToPlaylist: TMenuItem;
     MM_SC_AddToFavorites: TMenuItem;
-    CB_ParseStreamURL: TCheckBox;
+    XXXX_CB_ParseStreamURL: TCheckBox;
     udSortFavorites: TUpDown;
     Label1: TLabel;
     cbSortMode: TComboBox;
@@ -239,12 +238,13 @@ begin
   idHTTP1.ReadTimeout:= 5000;
 
   ShoutcastQuery := TShoutcastQuery.Create(Handle);
-  Progressbar1.Parent := Statusbar1;
-  Progressbar1.Left := 210;
-  Progressbar1.Top := 2;
-  Progressbar1.Height := 15;
+  //Progressbar1.Parent := Statusbar1;
+  //Progressbar1.Left := 210;
+  //Progressbar1.Top := 2;
+  //Progressbar1.Height := 15;
 
   Tab_Shoutcast.TabVisible := False;
+  Tab_Favourites.TabVisible := False;
 
 
   for i := 0 to MedienBib.RadioStationList.Count - 1 do
@@ -258,6 +258,7 @@ begin
 end;
 
 
+
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
 var i: Integer;
     aList: TObjectList;
@@ -267,59 +268,59 @@ var i: Integer;
 begin
     Case aMsg.WParam of
         SCQ_BeginDownload    : begin
-                                  ProgressBar1.Max := aMsg.lParam;
-                                  Btn_Search.Caption := Shoutcast_Cancel;
-                                  Btn_SearchGenre.Caption := Shoutcast_Cancel;
+                                  //ProgressBar1.Max := aMsg.lParam;
+                                  //Btn_Search.Caption := Shoutcast_Cancel;
+                                  //Btn_SearchGenre.Caption := Shoutcast_Cancel;
                                end;
         SCQ_ProgressDownload : begin
-                                  StatusBar1.Panels[0].Text := Shoutcast_Downloading;
-                                  ProgressBar1.Position := aMsg.lParam;
+                                  //StatusBar1.Panels[0].Text := Shoutcast_Downloading;
+                                  //ProgressBar1.Position := aMsg.lParam;
                                end;
         SCQ_FinishedDownload : begin
-                                  StatusBar1.Panels[0].Text := Shoutcast_ParsingXMLData;
+                                  //StatusBar1.Panels[0].Text := Shoutcast_ParsingXMLData;
                                end;
         SCQ_AbortedDownload   : begin
-                                  ProgressBar1.Visible := False;
-                                  StatusBar1.Panels[0].Text := '';
-                                  Btn_Search.Caption := Shoutcast_OK;
-                                  Btn_SearchGenre.Caption := Shoutcast_OK;
+                                  //ProgressBar1.Visible := False;
+                                  //StatusBar1.Panels[0].Text := '';
+                                  //Btn_Search.Caption := Shoutcast_OK;
+                                  //Btn_SearchGenre.Caption := Shoutcast_OK;
                                end;
         SCQ_ConnectionFailed  : begin
                                   MessageDlg(Shoutcast_Error_ConnectionFailed, mtWarning, [mbOK], 0);
-                                  ProgressBar1.Visible := False;
-                                  StatusBar1.Panels[0].Text := '';
-                                  //Lbl_Status.Visible := False;
-                                  Btn_Search.Caption := Shoutcast_OK;
-                                  Btn_SearchGenre.Caption := Shoutcast_OK;
+                                  //ProgressBar1.Visible := False;
+                                  //StatusBar1.Panels[0].Text := '';
+                                  ////Lbl_Status.Visible := False;
+                                  //Btn_Search.Caption := Shoutcast_OK;
+                                  //Btn_SearchGenre.Caption := Shoutcast_OK;
                                end;
         SCQ_ParsedList         : begin
-                                  StationList.Clear;
-                                  aList := TObjectList(aMsg.LParam);
-                                  for i := 0 to aList.Count - 1 do
-                                      StationList.Add(aList.Items[i]);
+                                  //StationList.Clear;
+                                  //aList := TObjectList(aMsg.LParam);
+                                  //for i := 0 to aList.Count - 1 do
+                                  //    StationList.Add(aList.Items[i]);
 
-                                  VST_ShoutcastQuery.Clear;
-                                  for i := 0 to StationList.Count - 1 do
-                                      AddVSTStation(VST_ShoutcastQuery, NIL, (StationList[i] as TStation));
+                                  //VST_ShoutcastQuery.Clear;
+                                  //for i := 0 to StationList.Count - 1 do
+                                  //    AddVSTStation(VST_ShoutcastQuery, NIL, (StationList[i] as TStation));
 
-                                  ProgressBar1.Visible := False;
+                                  //ProgressBar1.Visible := False;
                                   //Lbl_Status.Visible := False;
-                                  StatusBar1.Panels[0].Text := '';
-                                  Btn_Search.Caption := Shoutcast_OK;
-                                  Btn_SearchGenre.Caption := Shoutcast_OK;
+                                  //StatusBar1.Panels[0].Text := '';
+                                  //Btn_Search.Caption := Shoutcast_OK;
+                                  //Btn_SearchGenre.Caption := Shoutcast_OK;
                                end;
 
         ST_PlaylistDownloadConnecting: begin
-                                  //Lbl_Status.Visible := True;
-                                  ProgressBar1.Visible := True;
-                                  ProgressBar1.Position := 0;
-                                  StatusBar1.Panels[0].Text := Shoutcast_Connecting;
+                                  ////Lbl_Status.Visible := True;
+                                  //ProgressBar1.Visible := True;
+                                  //ProgressBar1.Position := 0;
+                                  //StatusBar1.Panels[0].Text := Shoutcast_Connecting;
                                end;
         ST_PlaylistDownloadBegins: begin
-                                  //Lbl_Status.Visible := True;
-                                  ProgressBar1.Visible := True;
-                                  ProgressBar1.Position := Progressbar1.Max Div 2;
-                                  StatusBar1.Panels[0].Text := Shoutcast_DownloadingPlaylist;
+                                  ////Lbl_Status.Visible := True;
+                                  //ProgressBar1.Visible := True;
+                                  //ProgressBar1.Position := Progressbar1.Max Div 2;
+                                  //StatusBar1.Panels[0].Text := Shoutcast_DownloadingPlaylist;
                                end;
         ST_PlaylistDownloadComplete : begin
                                   s := PAnsiChar(aMsg.LParam);
@@ -339,9 +340,9 @@ begin
                                           // saving failed. Nothing to do.
                                       end;
                                   end;
-                                  ProgressBar1.Position := Progressbar1.Max;
-                                  StatusBar1.Panels[0].Text := Shoutcast_DownloadComplete;
-                                  HideTimer.Enabled := True;
+                                  //ProgressBar1.Position := Progressbar1.Max;
+                                  //StatusBar1.Panels[0].Text := Shoutcast_DownloadComplete;
+                                  //HideTimer.Enabled := True;
                                end;
         ST_PlaylistStreamLink: begin
                                   sl := PChar(aMsg.LParam);
@@ -349,12 +350,13 @@ begin
                                end;
         ST_PlaylistDownloadFailed   : begin
                                   MessageDlg(Shoutcast_Error_DownloadFailed, mtWarning, [mbOK], 0);
-                                  StatusBar1.Panels[0].Text := '';
-                                  ProgressBar1.Visible := False;
+                                  //StatusBar1.Panels[0].Text := '';
+                                  //ProgressBar1.Visible := False;
                                end;
     end;
 
 end;
+
 
 
 procedure TFormStreamVerwaltung.VST_FavoritesChange(Sender: TBaseVirtualTree;
@@ -423,9 +425,9 @@ end;
 procedure TFormStreamVerwaltung.HideTimerTimer(Sender: TObject);
 begin
     //Lbl_Status.Visible := False;
-    StatusBar1.Panels[0].Text := '';
-    ProgressBar1 .Visible := False;
-    HideTimer.Enabled := False;
+    //StatusBar1.Panels[0].Text := '';
+    //ProgressBar1 .Visible := False;
+    //HideTimer.Enabled := False;
 end;
 
 procedure TFormStreamVerwaltung.FormDestroy(Sender: TObject);
@@ -563,7 +565,8 @@ begin
     Exit;
 
   Data := Sender.GetNodeData(Node);
-  Data^.fStation.TuneIn(Not CB_ParseStreamURL.Checked);
+  //Data^.fStation.TuneIn(Not CB_ParseStreamURL.Checked);
+  Data^.fStation.TuneIn(NempPlaylist.BassHandlePlaylist);
 end;
 
 (*
@@ -912,7 +915,7 @@ begin
             if not Assigned(aNode) then
               Exit;
             Data := VST_Favorites.GetNodeData(aNode);
-            Data^.fStation.TuneIn(not CB_ParseStreamURL.Checked);
+            Data^.fStation.TuneIn(NempPlaylist.BassHandlePlaylist);
       end;
   end;
 end;
@@ -925,7 +928,7 @@ begin
     if not Assigned(aNode) then
       Exit;
     Data := VST_ShoutcastQuery.GetNodeData(aNode);
-    Data^.fStation.TuneIn(not CB_ParseStreamURL.Checked);
+    Data^.fStation.TuneIn(NempPlaylist.BassHandlePlaylist);
 end;
 
 procedure TFormStreamVerwaltung.PM_Fav_AddToPlaylistClick(Sender: TObject);
@@ -936,7 +939,7 @@ begin
     if not Assigned(aNode) then
       Exit;
     Data := VST_Favorites.GetNodeData(aNode);
-    Data^.fStation.TuneIn(not CB_ParseStreamURL.Checked);
+    Data^.fStation.TuneIn(NempPlaylist.BassHandlePlaylist);
 end;
 
 (*

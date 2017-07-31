@@ -4,7 +4,7 @@ object BirthdayForm: TBirthdayForm
   BorderStyle = bsSingle
   Caption = 'Nemp: Event-mode'
   ClientHeight = 172
-  ClientWidth = 303
+  ClientWidth = 325
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object BirthdayForm: TBirthdayForm
   object Lbl_Congratulations: TLabel
     Left = 8
     Top = 16
-    Width = 289
+    Width = 309
     Height = 29
     Alignment = taCenter
     AutoSize = False
@@ -36,7 +36,7 @@ object BirthdayForm: TBirthdayForm
   object Label1: TLabel
     Left = 16
     Top = 64
-    Width = 273
+    Width = 301
     Height = 49
     AutoSize = False
     Caption = 
@@ -47,7 +47,7 @@ object BirthdayForm: TBirthdayForm
   object Label2: TLabel
     Left = 16
     Top = 112
-    Width = 273
+    Width = 301
     Height = 41
     AutoSize = False
     Caption = 'Close this window to continue with the normal playlist.'

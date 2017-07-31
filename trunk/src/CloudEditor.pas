@@ -850,20 +850,23 @@ begin
         SelectedTags := TagVST.GetSortedSelection(False);
         if Length(SelectedTags) > 0 then
         begin
-            for i := 0 to length(SelectedTags) - 1 do
+            if MessageDLG((TagEditor_Delete_Query), mtWarning, [MBYes, MBNo], 0) = mrYes then
             begin
-                // delete selected Tags
-                Data := TagVST.GetNodeData(SelectedTags[i]);
-                MedienBib.TagCloud.DeleteTag(Data^.FTag);
+                for i := 0 to length(SelectedTags) - 1 do
+                begin
+                    // delete selected Tags
+                    Data := TagVST.GetNodeData(SelectedTags[i]);
+                    MedienBib.TagCloud.DeleteTag(Data^.FTag);
 
+                    if cbAutoAddIgnoreTags.Checked then
+                        TagPostProcessor.AddIgnoreTag(Data^.FTag.Key);
+                end;
                 if cbAutoAddIgnoreTags.Checked then
-                    TagPostProcessor.AddIgnoreTag(Data^.FTag.Key);
+                    FillIgnoreTree;
+                ActualizeTreeView;
+                RefreshWarningLabel;
+                SetBrowseTabCloudWarning(True);
             end;
-            if cbAutoAddIgnoreTags.Checked then
-                FillIgnoreTree;
-            ActualizeTreeView;
-            RefreshWarningLabel;
-            SetBrowseTabCloudWarning(True);
         end;
     end;
 end;

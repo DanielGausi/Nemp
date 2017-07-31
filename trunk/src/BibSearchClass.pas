@@ -292,6 +292,8 @@ begin
  begin
      if   (AnsiContainsText(aAudioFile.Artist    , Keywords[i]))
        or (AnsiContainsText(aAudioFile.Titel     , Keywords[i]))
+       or (AnsiContainsText(aAudioFile.Album     , Keywords[i]))
+       or (AnsiContainsText(aAudioFile.Pfad      , Keywords[i]))
      then  // nothing. Audiofile is valid (til here)
      else
      begin

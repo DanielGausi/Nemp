@@ -60,9 +60,32 @@ type TNempG15Applet = class(TObject)
 
 end;
 
+TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
+
 
 
 implementation
+
+
+function GetAudioTypeFromFilename(aFilename: String): TAudioType;
+begin
+    // determine AudioType
+    if (pos('://', aFilename) > 0) then
+    begin
+        if AnsiStartsText('cda', aFilename)
+            or AnsiStartsText('cdda', aFilename)
+        then
+            result := at_CDDA     // CD-Audio
+        else
+            result := at_Stream;  // Webradio
+    end else
+    begin
+        if AnsiLowerCase(ExtractFileExt(aFilename)) = '.cda' then
+            result := at_CDDA         // CD-Audio (.cda-File)
+        else
+            result := at_File         // File
+    end;
+end;
 
 function IsExeInProgramSubDir: Boolean;
 var p1: String;
@@ -259,16 +282,22 @@ begin
     ini := TMeminiFile.Create(fSavePath + 'Nemp.ini', TEncoding.Utf8);
     try
         ini.Encoding := TEncoding.UTF8;
-        if fStartWithNemp then
-        begin
-            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
-            Ini.WriteBool('Allgemein', 'UseDisplayApp', True);
-        end
-        else
-        begin
-            Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
-            Ini.WriteBool('Allgemein', 'UseDisplayApp', False);
-        end;
+
+        Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
+        Ini.WriteBool('Allgemein', 'UseDisplayApp', fStartWithNemp);
+
+        Nemp_SetDisplayApp(fStartWithNemp);
+
+        //if fStartWithNemp then
+        //begin
+        //    Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
+        //    Ini.WriteBool('Allgemein', 'UseDisplayApp', True);
+        //end
+        //else
+        //begin
+        //    Ini.WriteString('Allgemein', 'DisplayApp', ExtractFilename(ParamStr(0)));
+        //    Ini.WriteBool('Allgemein', 'UseDisplayApp', False);
+        //end;
 
     finally
         ini.UpdateFile;
@@ -388,6 +417,7 @@ end;
 
 procedure TNempG15Applet.PaintCurrentTrackInfo;
 var NeuerFilename: UnicodeString;
+    NeuerTitel: UnicodeString;
     neuerstatus:integer;
     //NeuerRandomMode: integer;
     CurrentPos : Integer;
@@ -396,9 +426,6 @@ begin
     neuerFilename   := GetNempCurrentTitleW(IPC_CF_FILENAME);
     //GetNempPlaylistFileNameW(-1);
     //NeuerRandomMode := GetNempRandomMode;
-
-    // Position im Track bestimmen und anzeigen
-    CurrentPos := GetNemp_TrackPosition;
 
     if CurrentFileName <> neuerFilename then
     begin
@@ -414,6 +441,29 @@ begin
         ChangeCleartype(MainBitmap.Canvas, False);
         CurrentFileScrolling := MainBitmap.Canvas.TextWidth(CurrentTitle) > LGLCD_BMP_WIDTH;
     end;
+
+
+    // Position im Track bestimmen und anzeigen
+    if GetAudioTypeFromFilename(neuerFilename) = at_Stream then
+    begin
+        // check for a new title (if new Meta data has arrived in the meantime)
+        NeuerTitel := GetNempCurrentTitleW(IPC_CF_TITLE);
+        currentPos := 0;
+        if NeuerTitel <> CurrentTitle then
+        begin
+            CurrentTitle := NeuerTitel;
+
+            CurrentFileScrollPos := 0;
+            MainBitmap.Canvas.Font.Size := 10;
+            ChangeCleartype(MainBitmap.Canvas, False);
+            CurrentFileScrolling := MainBitmap.Canvas.TextWidth(CurrentTitle) > LGLCD_BMP_WIDTH;
+        end;
+    end else
+    begin
+        // just get the new position in the file
+        CurrentPos := GetNemp_TrackPosition;
+    end;
+
 
     // Clear Display
     MainBitmap.Canvas.Brush.Color := clWhite;

@@ -245,13 +245,13 @@ type
           function fGetTheme: String;
           procedure fSetTheme(Value: String);
 
-          procedure fSetOnlyLAN              (Value: Longbool);
+          //procedure fSetOnlyLAN              (Value: Longbool);
           procedure fSetAllowPlaylistDownload(Value: Longbool);
           procedure fSetAllowLibraryAccess   (Value: Longbool);
           procedure fSetAllowRemoteControl   (Value: Longbool);
           procedure fSetAllowVotes           (Value: Longbool);
 
-          function fGetOnlyLAN              : Longbool;
+          //function fGetOnlyLAN              : Longbool;
           function fGetAllowPlaylistDownload: Longbool;
           function fGetAllowLibraryAccess   : Longbool;
           function fGetAllowRemoteControl   : Longbool;
@@ -333,7 +333,7 @@ type
           property UsernameA: string read fGetUsernameA write fSetUsernameA;
           property PasswordA: string read fGetPasswordA write fSetPasswordA;
           property Theme : String read fGetTheme  write fSetTheme;
-          property OnlyLAN               : Longbool read fGetOnlyLAN               write fSetOnlyLAN              ;
+          // property OnlyLAN               : Longbool read fGetOnlyLAN               write fSetOnlyLAN              ;
           property AllowFileDownload     : Longbool read fGetAllowPlaylistDownload write fSetAllowPlaylistDownload;
           property AllowLibraryAccess    : Longbool read fGetAllowLibraryAccess    write fSetAllowLibraryAccess   ;
           property AllowRemoteControl    : Longbool read fGetAllowRemoteControl    write fSetAllowRemoteControl   ;
@@ -731,7 +731,7 @@ begin
     try
         ini.Encoding := TEncoding.UTF8;
         // aus der Ini lesen
-        OnlyLAN             := Ini.ReadBool('Remote', 'OnlyLAN'               , True);
+        // OnlyLAN             := True; //Ini.ReadBool('Remote', 'OnlyLAN'               , True);
         AllowFileDownload   := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
         AllowLibraryAccess  := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
         AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , True);
@@ -754,7 +754,7 @@ begin
   ini := TMeminiFile.Create(SavePath + 'NempWebServer.ini', TEncoding.UTF8);
   try
       Ini.Encoding := TEncoding.UTF8;
-      Ini.WriteBool('Remote', 'OnlyLAN'               , OnlyLAN);
+      // Ini.WriteBool('Remote', 'OnlyLAN'               , OnlyLAN);
       Ini.WriteBool('Remote', 'AllowPlaylistDownload' , AllowFileDownload);
       Ini.WriteBool('Remote', 'AllowLibraryAccess'    , AllowLibraryAccess);
       Ini.WriteBool('Remote', 'AllowRemoteControl'    , AllowRemoteControl);
@@ -843,10 +843,10 @@ begin
     LeaveCriticalSection(CS_Authentification);
 end;
 
-procedure TNempWebServer.fSetOnlyLAN(Value: Longbool);
-begin
-    InterLockedExchange(Integer(fOnlyLAN), Integer(Value));
-end;
+//procedure TNempWebServer.fSetOnlyLAN(Value: Longbool);
+//begin
+//    InterLockedExchange(Integer(fOnlyLAN), Integer(Value));
+//end;
 procedure TNempWebServer.fSetAllowPlaylistDownload(Value: Longbool);
 begin
     InterLockedExchange(Integer(fAllowPlaylistDownload), Integer(Value));
@@ -864,10 +864,10 @@ begin
     InterLockedExchange(Integer(fAllowVotes), Integer(Value));
 end;
 
-function TNempWebServer.fGetOnlyLAN: Longbool;
-begin
-  InterLockedExchange(Integer(Result), Integer(fOnlyLAN));
-end;
+//function TNempWebServer.fGetOnlyLAN: Longbool;
+//begin
+//  InterLockedExchange(Integer(Result), Integer(fOnlyLAN));
+//end;
 function TNempWebServer.fGetAllowPlaylistDownload: Longbool;
 begin
   InterLockedExchange(Integer(Result), Integer(fAllowPlaylistDownload));
@@ -998,17 +998,17 @@ function TNempWebServer.ValidIP(aIP, bIP: string): Boolean;
 var lastpoint: integer;
     CommonPart: string;
 begin
-  if Not OnlyLAN then
-      result := True
-  else
-  begin
+  //if Not OnlyLAN then
+  //    result := True
+  //else
+  //begin
       lastpoint := length(aIP);
       repeat
         dec(lastpoint);
       until (lastpoint < 1) or (aIP[lastpoint] = '.');
       CommonPart := copy(aIP, 1, lastpoint);
       result := AnsiStartsStr(CommonPart, bIP);
-  end;
+  //end;
 end;
 
 

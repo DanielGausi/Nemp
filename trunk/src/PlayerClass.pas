@@ -139,6 +139,8 @@ type
       fMainWindowHandle: HWND;    // the main window, where some messages are sent to
       fPathToDlls: String;        // the path to the bass.dll-addons
 
+      fNemp_BassUserAgent: String;
+
       fDefaultCoverIsLoaded: Boolean;
 
       fPrescanFiles: TObjectList;  // a List of AudioFiles, marked for threaded Prescan.
@@ -367,6 +369,8 @@ type
 
         property PrescanInProgress: Boolean read fPrescanInProgress;
 
+        property Nemp_BassUserAgent: String read fNemp_BassUserAgent;
+
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
@@ -457,6 +461,7 @@ type
         procedure ReadBirthdayOptions(aIniFilename: UnicodeString);
         procedure WriteBirthdayOptions(aIniFilename: UnicodeString);
         function GetCountDownLength(aFilename: UnicodeString): Integer;
+        procedure PauseForBirthday; // the same as nomale pause, but force fading
         Procedure PlayCountDown; // Countdown abspielen mit setzen der Syncs
         Procedure PlayBirthday; // Geburttsgalied abspielen
         Procedure AbortBirthday;
@@ -743,6 +748,7 @@ begin
     if Count < HeadsetDevice then
         HeadsetDevice := MainDevice;
 
+    BASS_SetConfigPtr(BASS_CONFIG_NET_AGENT or BASS_UNICODE, PChar(Nemp_BassUserAgent));
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
     UpdateFlags;
     Filter := '|Standard formats (*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.aif)' + '|'
@@ -870,7 +876,7 @@ begin
   fHeadsetVolume := ini.ReadInteger('Player','HeadsetVolume',80);
   fHeadsetVolume := fHeadsetVolume / 100;
 
-  fUseFloatingPointChannels := Ini.ReadInteger('Player', 'FloatingPointChannels', 1);// 0: Auto-Detect, 1: Aus, 2: An
+  fUseFloatingPointChannels := Ini.ReadInteger('Player', 'FloatingPointChannels', 0);// 0: Auto-Detect, 1: Aus, 2: An
   if fUseFloatingPointChannels > 2 then fUseFloatingPointChannels := 0;
   if fUseFloatingPointChannels < 0 then fUseFloatingPointChannels := 0;
 
@@ -962,6 +968,9 @@ begin
     for i := 0 to 9 do fxgain[i] := 0;
     EQSettingName := 'Auswahl';
   end;
+
+  // hidden feature: user agent
+  fNemp_BassUserAgent := ini.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
 
   NempScrobbler.LoadFromIni(Ini);
   PostProcessor.LoadFromIni(Ini);
@@ -1782,6 +1791,8 @@ begin
       ActualizePlayPauseBtn(NEMP_API_PLAYING, 1);
   end;
 end;
+
+
 
 procedure TNempPlayer.PauseHeadset;
 begin
@@ -3019,7 +3030,8 @@ begin
         ini.Encoding := TEncoding.UTF8;
         Ini.WriteBool('Event', 'UseCountDown', NempBirthdayTimer.UseCountDown);
         Ini.WriteTime('Event', 'StartTime'            , NempBirthdayTimer.StartTime);
-        Ini.WriteTime('Event', 'StartCountDownTime'   , NempBirthdayTimer.StartCountDownTime);
+        // StartCountDownTime will be calculated when the event is activated
+        // Ini.WriteTime('Event', 'StartCountDownTime'   , NempBirthdayTimer.StartCountDownTime);
         Ini.WriteString('Event', 'BirthdaySongFilename' , (NempBirthdayTimer.BirthdaySongFilename));
         Ini.WriteString('Event', 'CountDownFileName'    , (NempBirthdayTimer.CountDownFileName));
         Ini.WriteBool('Event', 'ContinueAfter'        , NempBirthdayTimer.ContinueAfter);
@@ -3041,7 +3053,7 @@ begin
         ini.Encoding := TEncoding.UTF8;
         NempBirthdayTimer.UseCountDown := Ini.ReadBool('Event', 'UseCountDown', True);
         NempBirthdayTimer.StartTime := Ini.ReadTime('Event', 'StartTime', 0 );
-        NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
+        // NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
         NempBirthdayTimer.BirthdaySongFilename := (Ini.ReadString('Event', 'BirthdaySongFilename', ''));
         NempBirthdayTimer.CountDownFileName := (Ini.ReadString('Event', 'CountDownFileName', ''));
         NempBirthdayTimer.ContinueAfter :=Ini.ReadBool('Event', 'ContinueAfter', True);
@@ -3074,6 +3086,29 @@ begin
     end;
 end;
 
+procedure TNempPlayer.PauseForBirthday;
+begin
+    if fIsURLStream then
+        Stop
+    else
+    begin
+        PostProcessor.PlaybackPaused;
+        RemoveEndSyncs;
+        //if UseFading AND fReallyUseFading
+        //    AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
+        //    AND NOT IgnoreFadingOnPause
+        //then
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_VOL,-2,FadingInterval);
+        //else
+        //begin
+        //  BASS_ChannelPause(MainStream);
+        //end;
+        fStatus := PLAYER_ISPAUSED;
+        UpdateDeskband(NEMP_API_PAUSED, 0);
+        ActualizePlayPauseBtn(NEMP_API_PAUSED, 0);
+    end;
+end;
+
 Procedure TNempPlayer.PlayCountDown; // Countdown abspielen mit setzen der Syncs
 var af: TAudioFile;
 begin
@@ -3088,11 +3123,16 @@ begin
                                  );
         BASS_ChannelFlags(CountDownStream, BASS_STREAM_AUTOFREE, BASS_STREAM_AUTOFREE);
           // Attribute setzen
-        BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume);
+        // BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume);
+        // no. fading is better
+        BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, 0);
+
         BirthdayCountDownSyncHandle :=
           Bass_ChannelSetSync(CountDownStream, BASS_SYNC_END, 0, @EndCountdownProc, self);
 
         BASS_ChannelPlay(CountDownStream, true);
+        BASS_ChannelSlideAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+
     finally
         af.Free;
     end;
@@ -3113,9 +3153,10 @@ begin
             BirthdaySyncHandle :=
                 Bass_ChannelSetSync(BirthdayStream, BASS_SYNC_END, 0, @EndBirthdayProc, self);
 
-          // Attribute setzen
-        BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, fMainVolume);
+        // Attribute setzen
+        BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, 0);
         BASS_ChannelPlay(BirthdayStream, true);
+        BASS_ChannelSlideAttribute(BirthdayStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
     finally
         af.Free;
     end;

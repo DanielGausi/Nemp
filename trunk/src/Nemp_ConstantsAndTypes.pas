@@ -152,7 +152,7 @@ type
         ShowSplashScreen: Boolean;
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
-        EditOnClick: Boolean;
+        // EditOnClick: Boolean;
         TippSpeed: Integer;
         NempFormAufteilung: Array [0..1] of TNempFormAufteilung;
         NempFormRatios: TNempMainFormRatios;
@@ -260,6 +260,7 @@ type
       NempRegionsDistance: TNempRegionsDistance;
     end;
 
+
 const
 
     // Diese Daten kommen  nur in den GMPs zum Einsatz!!
@@ -281,7 +282,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.6';// 'v3.3';
+    NEMP_VERSION_SPLASH = 'version 4.7';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.7';
 
     NEMP_TIPSIZE = 128;
 
@@ -892,8 +894,8 @@ begin
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
 
-        DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', '');
-        UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', DisplayApp <> '');
+        DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', 'NempG15App.exe');
+        UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', false);
         // "Kill" relative Paths
         DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
 
@@ -986,7 +988,7 @@ begin
         HideDeskbandOnClose     := ini.ReadBool('Fenster', 'HideDeskbandOnClose', True);
 
         FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
-        EditOnClick   := ini.ReadBool('Fenster', 'EditOnClick', True);
+        // EditOnClick   := ini.ReadBool('Fenster', 'EditOnClick', True);
 
         CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
         if not CoverMode in [0,1,2] then CoverMode := 1;
@@ -1177,7 +1179,7 @@ begin
         ini.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
         ini.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
-        ini.WriteBool('Fenster', 'EditOnClick', EditOnClick);
+        // ini.WriteBool('Fenster', 'EditOnClick', EditOnClick);
         ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
         ini.WriteInteger('Fenster', 'DetailMode', DetailMode);

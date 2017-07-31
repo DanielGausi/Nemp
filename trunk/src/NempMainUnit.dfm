@@ -437,6 +437,7 @@ object Nemp_MainForm: TNemp_MainForm
           Anchors = [akLeft, akTop, akRight]
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          PopupMenu = Medialist_PopupMenu
           TabOrder = 3
           OnPaint = TABPanelPaint
           OwnerDraw = False
@@ -2459,6 +2460,7 @@ object Nemp_MainForm: TNemp_MainForm
           Anchors = [akLeft, akTop, akRight]
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          PopupMenu = PlayListPOPUP
           TabOrder = 1
           OnPaint = TABPanelPaint
           OwnerDraw = False
@@ -2502,6 +2504,13 @@ object Nemp_MainForm: TNemp_MainForm
           Top = 3
           Width = 65
           Height = 21
+          AutoSize = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
           TabOrder = 0
           Text = 'Search'
           OnEnter = EditPlaylistSearchEnter
@@ -2990,6 +2999,7 @@ object Nemp_MainForm: TNemp_MainForm
         Anchors = [akLeft, akTop, akRight]
         BevelInner = bvRaised
         BevelOuter = bvLowered
+        PopupMenu = Medialist_PopupMenu
         TabOrder = 2
         OnPaint = TABPanelPaint
         OwnerDraw = False
@@ -3377,7 +3387,7 @@ object Nemp_MainForm: TNemp_MainForm
       object MM_PL_WebStream: TMenuItem
         Caption = 'Add &webradio'
         ShortCut = 16457
-        OnClick = MM_PL_WebStreamClick
+        OnClick = PM_PlayWebstreamClick
       end
       object MM_PL_SortBy: TMenuItem
         Caption = 'Sort &by'
@@ -4023,7 +4033,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A080B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000A2C0B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4488,7 +4498,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300B380C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012100300B5C0C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5688,7 +5698,7 @@ object Nemp_MainForm: TNemp_MainForm
       'All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lis' +
       'ts|*.m3u|m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nem' +
       'p playlists|*.npl|WindowsMedia|*.asx;*.wax'
-    Left = 705
+    Left = 697
     Top = 17
   end
   object PlaylistDateienOpenDialog: TOpenDialog
@@ -5907,7 +5917,7 @@ object Nemp_MainForm: TNemp_MainForm
         Tag = 100
         Caption = 'More...'
         RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
+        OnClick = PM_ML_BrowseByMoreClick
       end
     end
     object N5: TMenuItem
@@ -6149,7 +6159,7 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_PL_AddWebstream: TMenuItem
       Caption = 'Add webradio'
       ShortCut = 16457
-      OnClick = MM_PL_WebStreamClick
+      OnClick = PM_PlayWebstreamClick
     end
     object PM_PL_SortBy: TMenuItem
       Caption = 'Sort by'
@@ -7224,8 +7234,8 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object PopupPlayPause: TPopupMenu
-    Left = 653
-    Top = 312
+    Left = 645
+    Top = 304
     object PM_PlayFiles: TMenuItem
       Caption = 'Play files'
       OnClick = PM_PlayFilesClick
@@ -7415,7 +7425,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07740810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07980810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

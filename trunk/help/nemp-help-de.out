@@ -1,0 +1,67 @@
+\BOOKMARK [1][]{section.2}{1 Nemp Grundlagen}{}% 1
+\BOOKMARK [2][]{subsection.8}{1.1 Das Hauptfenster von Nemp}{section.2}% 2
+\BOOKMARK [2][]{subsection.9}{1.2 Allgemeine Steuerung}{section.2}% 3
+\BOOKMARK [2][]{subsection.10}{1.3 Skins und Einzelfenster}{section.2}% 4
+\BOOKMARK [3][]{section*.11}{Fehlerbehebung}{subsection.10}% 5
+\BOOKMARK [2][]{subsection.12}{1.4 Mobile Festplatten und Backups, Portabilit\344t}{section.2}% 6
+\BOOKMARK [2][]{subsection.13}{1.5 Grundlegende Einstellungen: Der Nemp Wizard}{section.2}% 7
+\BOOKMARK [1][]{section.14}{2 Player und Playlist}{}% 8
+\BOOKMARK [2][]{subsection.15}{2.1 Anzeige und Steuerung im Player}{section.14}% 9
+\BOOKMARK [2][]{subsection.16}{2.2 Weitere Anzeigen und Steuerungselemente}{section.14}% 10
+\BOOKMARK [3][]{section*.17}{Equalizer und Effekte}{subsection.16}% 11
+\BOOKMARK [3][]{section*.18}{Kopfh\366rer}{subsection.16}% 12
+\BOOKMARK [2][]{subsection.19}{2.3 Die Playlist}{section.14}% 13
+\BOOKMARK [2][]{subsection.20}{2.4 Der Party-Modus}{section.14}% 14
+\BOOKMARK [2][]{subsection.21}{2.5 Special Features}{section.14}% 15
+\BOOKMARK [1][]{section.22}{3 Die Medienbibliothek}{}% 16
+\BOOKMARK [2][]{subsection.23}{3.1 Medienbibliothek aufbauen}{section.22}% 17
+\BOOKMARK [2][]{subsection.24}{3.2 Browsen in der Medienbibliothek}{section.22}% 18
+\BOOKMARK [3][]{section*.25}{klassische Ansicht}{subsection.24}% 19
+\BOOKMARK [3][]{section*.26}{Coverflow}{subsection.24}% 20
+\BOOKMARK [3][]{section*.27}{Die Tagwolke}{subsection.24}% 21
+\BOOKMARK [2][]{subsection.28}{3.3 Die Schnellsuche}{section.22}% 22
+\BOOKMARK [2][]{subsection.29}{3.4 Die ausf\374hrliche Suche}{section.22}% 23
+\BOOKMARK [2][]{subsection.30}{3.5 Von der Medienbibliothek in die Playlist}{section.22}% 24
+\BOOKMARK [2][]{subsection.31}{3.6 Pflege der Medienbibliothek}{section.22}% 25
+\BOOKMARK [3][]{section*.32}{Einfache Bearbeitung der Metadaten}{subsection.31}% 26
+\BOOKMARK [3][]{section*.33}{Lyrics}{subsection.31}% 27
+\BOOKMARK [3][]{section*.34}{Erweiterte Tags}{subsection.31}% 28
+\BOOKMARK [3][]{section*.35}{Aktualisieren der Daten}{subsection.31}% 29
+\BOOKMARK [3][]{section*.36}{L\366schen von Dateien und Aufr\344umen der Medienbibliothek}{subsection.31}% 30
+\BOOKMARK [3][]{section*.37}{Details}{subsection.31}% 31
+\BOOKMARK [3][]{section*.38}{Webradio}{subsection.31}% 32
+\BOOKMARK [3][]{section*.39}{CSV-Export}{subsection.31}% 33
+\BOOKMARK [1][]{section.40}{4 Tools}{}% 34
+\BOOKMARK [2][]{subsection.41}{4.1 Scrobbeln mit Nemp}{section.40}% 35
+\BOOKMARK [3][]{section*.42}{Scrobbler konfigurieren}{subsection.41}% 36
+\BOOKMARK [3][]{section*.46}{Scrobbler aktivieren}{subsection.41}% 37
+\BOOKMARK [3][]{section*.47}{Was wird gescrobbelt?}{subsection.41}% 38
+\BOOKMARK [3][]{section*.48}{Fehler beheben}{subsection.41}% 39
+\BOOKMARK [2][]{subsection.49}{4.2 Der Geburtstagsmodus}{section.40}% 40
+\BOOKMARK [2][]{subsection.50}{4.3 Der Tagwolken-Editor}{section.40}% 41
+\BOOKMARK [2][]{subsection.51}{4.4 Der Nemp Webserver}{section.40}% 42
+\BOOKMARK [2][]{subsection.52}{4.5 Tastatur-Display}{section.40}% 43
+\BOOKMARK [2][]{subsection.53}{4.6 Automatischer Shutdown, Einschlaf-Timer}{section.40}% 44
+\BOOKMARK [1][]{section.54}{5 Einstellungen}{}% 45
+\BOOKMARK [2][]{subsection.55}{5.1 Allgemeine Einstellungen}{section.54}% 46
+\BOOKMARK [3][]{section*.56}{Steuerung}{subsection.55}% 47
+\BOOKMARK [3][]{section*.57}{System}{subsection.55}% 48
+\BOOKMARK [2][]{subsection.58}{5.2 Anzeige-Einstellungen}{section.54}% 49
+\BOOKMARK [3][]{section*.59}{Party-Modus}{subsection.58}% 50
+\BOOKMARK [3][]{section*.60}{Schriften}{subsection.58}% 51
+\BOOKMARK [3][]{section*.61}{Erweiterte Einstellungen}{subsection.58}% 52
+\BOOKMARK [2][]{subsection.62}{5.3 Player-Einstellungen}{section.54}% 53
+\BOOKMARK [3][]{section*.63}{Playlist}{subsection.62}% 54
+\BOOKMARK [3][]{section*.64}{Zufallswiedergabe}{subsection.62}% 55
+\BOOKMARK [3][]{section*.65}{Webradio}{subsection.62}% 56
+\BOOKMARK [3][]{section*.66}{Effekte}{subsection.62}% 57
+\BOOKMARK [3][]{section*.67}{Geburtstagsmodus}{subsection.62}% 58
+\BOOKMARK [3][]{section*.68}{LastFM}{subsection.62}% 59
+\BOOKMARK [3][]{section*.69}{Webserver}{subsection.62}% 60
+\BOOKMARK [3][]{section*.70}{Erweiterte Einstellungen}{subsection.62}% 61
+\BOOKMARK [2][]{subsection.71}{5.4 Datei-Management}{section.54}% 62
+\BOOKMARK [3][]{section*.72}{Dateitypen-Registrierung}{subsection.71}% 63
+\BOOKMARK [3][]{section*.73}{Metadaten}{subsection.71}% 64
+\BOOKMARK [3][]{section*.74}{Cover}{subsection.71}% 65
+\BOOKMARK [3][]{section*.75}{Suchoptionen}{subsection.71}% 66
+\BOOKMARK [1][]{section.76}{6 Versionsgeschichte}{}% 67

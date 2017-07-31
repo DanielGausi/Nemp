@@ -34,16 +34,21 @@ unit PlaylistClass;
 interface
 
 uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes, 
-    Dialogs, MMSystem, oneinst,
+    Dialogs, MMSystem, oneinst, math, RatingCtrls,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
     NempAudioFiles, AudioFileHelper, PlayerClass,
-    gnuGettext, Nemp_RessourceStrings;
+    gnuGettext, Nemp_RessourceStrings,
+
+
+    MainFormHelper;
 
 type
   DWORD = cardinal;
 
   TPreBookInsertMode = (pb_Beginning, pb_End);
+
+  TIndexArray = Array of Array of Integer;
 
   TNempPlaylist = Class
     private
@@ -96,6 +101,21 @@ type
 
       fLastHighlightedSearchResultNode: PVirtualNode;
 
+      // for  weighted random
+      fUseWeightedRNG: Boolean;
+      // first column : "RNG value" which is significant for the Random value
+      // second column: actual index of the file in the playlist
+      // size: Length(Playlist) x 2, but not all fields are necessarily filled,
+      //       as some files in the playlist may have no entry in this array
+      //       (meaning: probability to play this file is 0
+      //        ... well, almost, as it could be played in backup-mode)
+      fWeightedRandomIndices: TIndexArray;
+      // The maximum of the values in the first column of the array
+      fMaxWeightedValue: Integer;
+      fMaxWeightedIndex: Integer;
+      // Flag whether the playlist has been changed and a re-init of fWeightedRandomIndices is necessary
+      fPlaylistHasChanged: Boolean;
+
       function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
@@ -124,6 +144,12 @@ type
       // Inserts (if needed) currentfile at the end of the Historylist
       procedure UpdateHistory(Backwards: Boolean = False);
 
+      // for  weighted random
+      procedure RebuildWeighedArray;
+      procedure SetUseWeightedRNG(aValue: Boolean);
+
+      function GetRandomPlaylistIndex: Integer;
+
 
     public
       Playlist: TObjectlist;              // the list with the audiofiles
@@ -135,7 +161,7 @@ type
       PositionInTrack: Integer;
       AutoPlayNewTitle: Boolean;    // Play new title when the user selects "Enqueue in Nemp" in the explorer (and Nemp is not running, yet)
       AutoPlayEnqueuedTitle: Boolean; // PLay the enqueued track (even if Nemp is already running)
-      AutoSave: Boolean;            // Save Playlist every 5 minutes
+      // AutoSave: Boolean;            // Save Playlist every 5 minutes
       AutoScan: Boolean;            // Scan files with Mp3fileUtils
       AutoDelete: Boolean;                  // Delete File after playback
           DisableAutoDeleteAtUserInput: Boolean;
@@ -170,6 +196,9 @@ type
       ProcessingBufferlist: Boolean;    //like "play/enqueue in Nemp"
       BufferStringList: TStringList;
 
+      // The weights for files with rating from (0?- ) 0.5 - 5 stars
+      RNGWeights: Array[0..10] of Integer;
+
       property Dauer: Int64 read fDauer;
       property Count: Integer read GetCount;
 
@@ -197,8 +226,8 @@ type
       property PrebookCount: Integer read fGetPreBookCount;
 
       property LastHighlightedSearchResultNode: PVirtualNode read fLastHighlightedSearchResultNode;
-
-
+      property UseWeightedRNG: Boolean read fUseWeightedRNG write SetUseWeightedRNG;
+      property PlaylistHasChanged: Boolean read fPlaylistHasChanged write fPlaylistHasChanged;
 
       constructor Create;
       destructor Destroy; override;
@@ -323,6 +352,7 @@ end;
     --------------------------------------------------------
 }
 constructor TNempPlaylist.Create;
+var i: Integer;
 begin
   inherited create;
   Playlist := TObjectList.Create;
@@ -338,6 +368,26 @@ begin
   ProcessingBufferlist := False;
   fFirstAction := True;
   fLastHighlightedSearchResultNode := Nil;
+
+
+  //for i := 0 to 10 do
+  //    RNGWeights[i] := 1;
+
+  //tmp
+  {
+  self.fUseWeightedRNG := false;
+  RNGWeights[0]  := 0; // unused
+  RNGWeights[1]  := 0; // 0.5
+  RNGWeights[2]  := 0; // 1
+  RNGWeights[3]  := 1;
+  RNGWeights[4]  := 2;
+  RNGWeights[5]  := 4;
+  RNGWeights[6]  := 7;
+  RNGWeights[7]  := 12;
+  RNGWeights[8]  := 20;
+  RNGWeights[9]  := 35;
+  RNGWeights[10] := 60;
+  }
 end;
 
 destructor TNempPlaylist.Destroy;
@@ -366,7 +416,7 @@ begin
   AutoPlayOnStart       := ini.ReadBool('Playlist','AutoPlayOnStart', True);
   AutoPlayNewTitle      := ini.ReadBool('Playlist','AutoPlayNewTitle', True);
   AutoPlayEnqueuedTitle := ini.ReadBool('Playlist','AutoPlayEnqueuedTitle', False);
-  AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
+  // AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
   AutoDelete            := ini.ReadBool('Playlist','AutoDelete', False);
   DisableAutoDeleteAtUserInput    := ini.ReadBool('Playlist','DisableAutoDeleteAtUserInput', True);
   //DisableAutoDeleteAtSlide        := ini.ReadBool('Playlist','DisableAutoDeleteAtSlide', True);
@@ -383,8 +433,21 @@ begin
   fPlayingIndex         := ini.ReadInteger('Playlist','IndexinList',-1);
   SavePositionInTrack   := ini.ReadBool('Playlist', 'SavePositionInTrack', True);
   PositionInTrack       := ini.ReadInteger('Playlist', 'PositionInTrack', 0);
-  BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', False);
+  BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', True);
   InitialDialogFolder   := Ini.ReadString('Playlist', 'InitialDialogFolder', '');
+
+
+  fUseWeightedRNG := ini.ReadBool   ('Playlist', 'UseWeightedRNG', False);
+  RNGWeights[1]   := ini.ReadInteger('Playlist', 'RNGWeights05', 0  );
+  RNGWeights[2]   := ini.ReadInteger('Playlist', 'RNGWeights10', 0  );
+  RNGWeights[3]   := ini.ReadInteger('Playlist', 'RNGWeights15', 1  );
+  RNGWeights[4]   := ini.ReadInteger('Playlist', 'RNGWeights20', 2  );
+  RNGWeights[5]   := ini.ReadInteger('Playlist', 'RNGWeights25', 4  );
+  RNGWeights[6]   := ini.ReadInteger('Playlist', 'RNGWeights30', 7  );
+  RNGWeights[7]   := ini.ReadInteger('Playlist', 'RNGWeights35', 12 );
+  RNGWeights[8]   := ini.ReadInteger('Playlist', 'RNGWeights40', 20 );
+  RNGWeights[9]   := ini.ReadInteger('Playlist', 'RNGWeights45', 35 );
+  RNGWeights[10]  := ini.ReadInteger('Playlist', 'RNGWeights50', 60 );
 end;
 
 procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
@@ -412,7 +475,7 @@ begin
   ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
   ini.WriteBool('Playlist','AutoPlayNewTitle', AutoPlayNewTitle);
   ini.WriteBool('Playlist','AutoPlayEnqueuedTitle', AutoPlayEnqueuedTitle);
-  Ini.WriteBool('Playlist','AutoSave', AutoSave);
+  // Ini.WriteBool('Playlist','AutoSave', AutoSave);
 
   Ini.WriteBool('Playlist','AutoDelete', AutoDelete);
   ini.WriteBool('Playlist','DisableAutoDeleteAtUserInput', DisableAutoDeleteAtUserInput);
@@ -430,6 +493,19 @@ begin
   Ini.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
   Ini.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
   Ini.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);
+
+  ini.WriteBool   ('Playlist', 'UseWeightedRNG', fUseWeightedRNG);
+  ini.WriteInteger('Playlist', 'RNGWeights05', RNGWeights[1]  );
+  ini.WriteInteger('Playlist', 'RNGWeights10', RNGWeights[2]  );
+  ini.WriteInteger('Playlist', 'RNGWeights15', RNGWeights[3]  );
+  ini.WriteInteger('Playlist', 'RNGWeights20', RNGWeights[4]  );
+  ini.WriteInteger('Playlist', 'RNGWeights25', RNGWeights[5]  );
+  ini.WriteInteger('Playlist', 'RNGWeights30', RNGWeights[6]  );
+  ini.WriteInteger('Playlist', 'RNGWeights35', RNGWeights[7]  );
+  ini.WriteInteger('Playlist', 'RNGWeights40', RNGWeights[8]  );
+  ini.WriteInteger('Playlist', 'RNGWeights45', RNGWeights[9]  );
+  ini.WriteInteger('Playlist', 'RNGWeights50', RNGWeights[10] );
+
 end;
 
 
@@ -870,6 +946,7 @@ begin
         VST.Invalidate;
 
         fDauer := ShowPlayListSummary;
+        fPlaylistHasChanged := True;
 end;
 
 
@@ -899,6 +976,7 @@ begin
     fPlayingIndex := 0;
     FillPlaylistView;
     fDauer := ShowPlayListSummary;
+    fPlaylistHasChanged := True;
     SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
 end;
 
@@ -919,6 +997,7 @@ begin
   ReIndexPrebookedFiles;
   FillPlaylistView;
   fDauer := ShowPlayListSummary;
+  fPlaylistHasChanged := True;
 end;
 
 procedure TNempPlaylist.removePlayingFile;
@@ -935,6 +1014,7 @@ begin
       ReIndexPrebookedFiles;
   end;
   fDauer := ShowPlayListSummary;
+  fPlaylistHasChanged := True;
 end;
 
 {
@@ -1328,6 +1408,7 @@ begin
   Playlist.Sort(Compare);
   FillPlayListView;
   ReInitPlaylist;
+  fPlaylistHasChanged := True;
 end;
 
 Procedure TNempPlaylist.ReverseSortOrder;
@@ -1337,6 +1418,7 @@ begin
     Playlist.Exchange(i,Playlist.Count-1-i);
   FillPlayListView;
   ReInitPlaylist;
+  fPlaylistHasChanged := True;
 end;
 
 Procedure TNempPlaylist.Mix;
@@ -1346,6 +1428,7 @@ begin
     Playlist.Exchange(i,i + random(PlayList.Count-i));
   FillPlayListView;
   ReInitPlaylist;
+  fPlaylistHasChanged := True;
 end;
 
 
@@ -1374,6 +1457,7 @@ begin
   Result := NewNode;
   fDauer := fDauer + newAudiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+  fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.AddFileToPlaylistWebServer(aAudiofile: TAudioFile; aCueName: UnicodeString = ''): TAudioFile;
@@ -1396,6 +1480,7 @@ begin
     Result := newAudiofile;
     fDauer := fDauer + newAudiofile.Duration;
     UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+    fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
@@ -1444,6 +1529,7 @@ begin
   Result := NewNode;
   fDauer := fDauer + newAudiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+  fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
@@ -1563,6 +1649,7 @@ begin
     VST.Invalidate;
 end;
 
+
 procedure TNempPlaylist.ReIndexPrebookedFiles;
 var i:Integer;
 begin
@@ -1681,6 +1768,7 @@ begin
   FillPlaylistView;
   fDauer := ShowPlayListSummary;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+  fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
@@ -1922,10 +2010,13 @@ begin
   // Cue-Zeug neu setzen
   ActualizeCue;
 end;
+
+
 function TNempPlaylist.GetProgress: Double;
 begin
   result := Player.Progress;
 end;
+
 procedure TNempPlaylist.SetProgress(Value: Double);
 begin
   Player.Progress := Value;
@@ -2062,6 +2153,178 @@ end;
 
 {
     --------------------------------------------------------
+    rebuild the weighted index array used for the weighted RNG
+    --------------------------------------------------------
+}
+
+procedure TNempPlaylist.SetUseWeightedRNG(aValue: Boolean);
+begin
+    fUseWeightedRNG := aValue;
+    if fUseWeightedRNG then
+        RebuildWeighedArray;
+end;
+
+procedure TNempPlaylist.RebuildWeighedArray;
+var i, j, curIdx, totalWeight, curWeight: Integer;
+    af: TAudiofile;
+
+      {    function RatingToWeight(aRating: Integer): Integer;
+          var base, idx: Integer;
+          begin
+              if aRating = 0 then
+                  base := 127
+              else
+                  base := aRating;
+
+              // note: That is the same method as used in RatingCtrls
+              //       and Audiofile.fGetRoundedRating
+              idx := 2 * (base div 51);
+
+              if (base div 51) <= 4 then
+              begin
+                  if ((base mod 51) > 25) then
+                      // add a full star, or 2 in the index
+                      idx := idx + 2
+                  else
+                      // add only a half star, only 1 in the index
+                      idx := idx + 1;
+              end;
+              // to be sure: range check, default = 2.5 stars // index = 5
+              if (idx < 0) or (idx > 10) then
+                  idx := 5;
+
+              // get the actual weight for the file
+              result := RNGWeights[idx];
+          end;
+          }
+
+begin
+    // AddErrorLog('Weight array: rebuilt.');
+
+    SetLength(fWeightedRandomIndices, Playlist.Count, 2);
+    curIdx := -1;
+    totalWeight := 0;
+    // fill the array
+    for i := 0 to Playlist.Count-1 do
+    begin
+        af := TAudioFile(Playlist[i]);
+        curWeight := RNGWeights[RatingToArrayIndex(af.Rating)];
+        if curWeight > 0 then
+        begin
+            // it should be possible to randomly play this file
+            totalWeight := totalWeight + curWeight;
+            inc(curIdx);
+            fWeightedRandomIndices[curIdx, 0] := i; // the index of the current file in the playlist
+            fWeightedRandomIndices[curIdx, 1] := totalWeight;
+        end // else: Weight is 0, it should not be randomly played
+    end;
+
+    //for i := 0 to length(fWeightedRandomIndices) - 1 do
+    //begin
+    //    AddErrorLog(IntToStr(i) + ' ; ' + IntToStr(fWeightedRandomIndices[i, 0]) + ' ; ' + IntToStr(fWeightedRandomIndices[i, 1]));
+    //end;
+    //AddErrorLog('--------------');
+
+
+    fMaxWeightedValue := totalWeight;  // used for Random()
+    fMaxWeightedIndex := curIdx;       // used for binary search
+
+    fPlaylistHasChanged := False;
+end;
+
+function BinIndexSearch(aArray: TIndexArray; aValue: Integer; l, r: Integer): Integer;
+var m, mValue, c: Integer;
+begin
+    if r < l then
+    begin
+        if r > -1 then
+            result := r
+        else
+            // we do not want -1 as a result!
+            result := 0;
+    end else
+    begin
+        m := (l + r) DIV 2;
+        mValue := aArray[m, 1];
+        c := CompareValue(aValue, mValue);
+        if l = r then
+            // Suche endet. l Zurückgeben - Egal ob das an der Stelle stimmt oder nicht
+            result := l
+        else
+        begin
+            if  c = 0 then
+                result := m
+            else if c > 0 then
+                result := BinIndexSearch(aArray, aValue, m+1, r)
+                else
+                    result := BinIndexSearch(aArray, aValue, l, m-1);
+        end;
+    end;
+end;
+
+function TNempPlaylist.GetRandomPlaylistIndex: Integer;
+var rawIndex, searchL, searchR, weightedIndex: Integer;
+    //tmpStr: String;
+    //tmpWeight, tmpRating: Integer;
+
+begin
+    if not fUseWeightedRNG then
+        result := Random(Playlist.Count)
+    else
+    begin
+        if fPlaylistHasChanged then
+            RebuildWeighedArray;
+
+        searchL := 0;
+        searchR := fMaxWeightedIndex; // length(fWeightedRandomIndices) - 1;
+
+        // get a weighted result
+        rawIndex := Random(fMaxWeightedValue);
+        // get the playlist-Index from that index
+        weightedIndex := BinIndexSearch(fWeightedRandomIndices, rawIndex, searchL, searchR);
+
+        // AddErrorLog('Range: ' + IntToStr(searchL) + '-' + IntToStr(searchR) + ';  ' + IntToStr(fMaxWeightedValue));
+        // AddErrorLog('RNG RAW: ' + inttostr(rawIndex));
+        // AddErrorLog('maxIndex: ' + IntTostr(fMaxWeightedIndex));
+        // AddErrorLog('newIndex PL (raw) : ' + inttostr(fWeightedRandomIndices[weightedIndex,0]));
+
+        // binary search may not find the exact rawIndex, probably the first bigger or smaller entry
+        // we need always the bigger (or equal) one
+        if (fWeightedRandomIndices[weightedIndex, 1] < rawIndex)
+            and (length(fWeightedRandomIndices) > weightedIndex + 1)
+        then
+            inc(weightedIndex);
+
+        result := fWeightedRandomIndices[weightedIndex, 0];
+        // to be sure: range check
+        if (result < 0) or (result >= Playlist.Count ) then
+        begin
+            // fallback to regular random
+            result := Random(Playlist.Count);
+            // set flag to force rebuild of the index array the next time.
+            fPlaylistHasChanged := False;
+        end;
+
+        // for debugging, errorlog
+        //tmpWeight := fWeightedRandomIndices[weightedIndex, 1];
+        //if weightedIndex > 0 then
+        //    tmpWeight := tmpWeight - fWeightedRandomIndices[weightedIndex-1, 1];
+
+        //tmpStr := //'rawIndex: ' + inttostr(rawIndex) + #13#10 +
+        //          //'maxIndex: ' + IntTostr(fMaxWeightedIndex) + #13#10 +
+        //          'newIndex PL (processed) : ' + inttostr(result) + #13#10 +
+        //          'Weight: ' + inttostr(tmpWeight) + #13#10 +
+        //          'Rating: ' + FloatToStrF(TAudioFile(Playlist.Items[result]).RoundedRating ,ffFixed,4,1) + #13#10;
+
+        //AddErrorLog(tmpStr);
+
+    end;
+
+
+end;
+
+{
+    --------------------------------------------------------
     Getting an Audiofile
     --------------------------------------------------------
 }
@@ -2172,7 +2435,21 @@ begin
                 if Playlist.Count = 0 then
                     result := -1
                 else begin
-                    result := Random(Playlist.Count);
+                    result := GetRandomPlaylistIndex;
+
+                    // 1st round: Do some more random trials
+                    c := 0;
+                    tmpAudioFile := PlayList[result] as TPlaylistfile;
+                    while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
+                          AND (tmpAudioFile.LastPlayed <> 0)
+                          AND (c <= 5) do
+                    begin
+                        inc(c);
+                        result := GetRandomPlaylistIndex;
+                        tmpAudioFile := PlayList[result] as TPlaylistfile;
+                    end;
+
+                    //2nd round: just get the next file
                     c := 0;
                     tmpAudioFile := PlayList[result] as TPlaylistfile;
                     while ((fPlayCounter - tmpAudioFile.LastPlayed) <= Round(RandomRepeat * Playlist.Count/100))
@@ -2318,6 +2595,7 @@ begin
     VST.Invalidate;
 
     fDauer := ShowPlayListSummary;
+    fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.SwapFiles(a, b: Integer): Boolean;
@@ -2352,6 +2630,8 @@ begin
         result := True;
     end else
         result := False;
+
+    fPlaylistHasChanged := True;
 end;
 
 procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
@@ -2422,10 +2702,7 @@ begin
 
     // fPlayingIndex korrigieren
     ReInitPlaylist;
-
-
-
-
+    fPlaylistHasChanged := True;
 end;
 
 {
