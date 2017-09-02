@@ -193,8 +193,9 @@ type
         DefaultFontStyles: TFontStyles;
         ArtistAlbenFontStyles: TFontStyles;
 
-        CoverMode: Integer;
-        DetailMode: Integer;
+        //CoverMode: Integer;
+        //DetailMode: Integer;
+        ShowCoverAndDetails: Boolean;
         CoverWidth: Integer;
 
         ReplaceNAArtistBy  : Integer;
@@ -298,7 +299,8 @@ const
     // Minimale Höhe des oberen teils:
     TOP_MIN_HEIGHT = 323;//311///426;
 
-    MAX_DRAGFILECOUNT = 500;
+    MAX_DRAGFILECOUNT = 2500;
+    MIN_CUESHEET_DURATION = 600; // no automatic scanning for cue sheets for short tracks
 
     // Messages des Players
     //---------------------------------------
@@ -424,6 +426,8 @@ const
 
     // Error during loading the gmp file
     MB_InvalidGMPFile = 37;
+
+    MB_ID3TagUpdateComplete = 38;
 
     MB_SetStatus = 100;
 
@@ -990,12 +994,13 @@ begin
         FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
         // EditOnClick   := ini.ReadBool('Fenster', 'EditOnClick', True);
 
-        CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
-        if not CoverMode in [0,1,2] then CoverMode := 1;
+        ShowCoverAndDetails := ini.ReadBool('Fenster', 'ShowCoverAndDetails', True);
+        // CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
+        // if not CoverMode in [0,1,2] then CoverMode := 1;
         CoverWidth := ini.ReadInteger('Fenster', 'CoverWidth', 240);
         if (CoverWidth < 0) or (CoverWidth > 600) then CoverWidth := 450;
-        DetailMode := ini.ReadInteger('Fenster', 'DetailMode', 1);
-        if not DetailMode in [0,1,2] then DetailMode := 1;
+        // DetailMode := ini.ReadInteger('Fenster', 'DetailMode', 1);
+        // if not DetailMode in [0,1,2] then DetailMode := 1;
 
         ReplaceNAArtistBy := ini.ReadInteger('Fenster', 'ReplaceNAArtistBy', 3);
         if not ReplaceNAArtistBy in [0,1,2,3,4,5] then ReplaceNAArtistBy := 3;
@@ -1180,9 +1185,10 @@ begin
         ini.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
         // ini.WriteBool('Fenster', 'EditOnClick', EditOnClick);
-        ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
+        ini.WriteBool('Fenster', 'ShowCoverAndDetails', ShowCoverAndDetails);
+        //ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
-        ini.WriteInteger('Fenster', 'DetailMode', DetailMode);
+        //ini.WriteInteger('Fenster', 'DetailMode', DetailMode);
 
         ini.WriteInteger('Fenster', 'ReplaceNAArtistBy', ReplaceNAArtistBy);
         ini.WriteInteger('Fenster', 'ReplaceNATitleBy' , ReplaceNATitleBy );

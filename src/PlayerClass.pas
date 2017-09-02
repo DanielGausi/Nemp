@@ -2639,10 +2639,9 @@ function TNempPlayer.JumpToPrevCue: Boolean;
 var PrevCueIdx, CurrentCueIdx: Integer;
     startTime: Double;
 begin
-
-    if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) then
+    if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) and (MainAudioFile.CueList.Count > 0)  then
     begin
-        // we have a MainAudioFile and we have a cuelist
+        // we have a MainAudioFile and we have a (valid) cuelist
         // determine, where we are right now
         CurrentCueIdx := GetActiveCue;
         startTime := TPlaylistFile(MainAudioFile.CueList[CurrentCueIdx]).Index01;

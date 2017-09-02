@@ -712,7 +712,6 @@ begin
         AcceptApiCommands := True;
         EditFastSearch.OnChange := EDITFastSearchChange;
         NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
-        EdtBibGenre.Items := ID3Genres;
 
         //LockWindowUpdate(0);
         {$IFDEF USESTYLES}

@@ -38,11 +38,10 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MpegInformation
+    ActivePage = Tab_MoreTags
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 1
-    OnChange = MainPageControlChange
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
@@ -1921,111 +1920,67 @@ object FDetails: TFDetails
         Left = 8
         Top = 0
         Width = 443
-        Height = 169
+        Height = 425
         Caption = 'Tags'
         TabOrder = 0
-        object Lbl_TagCloudInfo2: TLabel
-          Left = 8
-          Top = 16
-          Width = 417
-          Height = 33
-          AutoSize = False
-          Caption = 
-            'Insert some Tags here (one Tag per line), choose some from the l' +
-            'ist of existing Tags, or try getting Tags from LastFM.'
-          WordWrap = True
-        end
-        object Memo_Tags: TMemo
-          Left = 10
-          Top = 49
-          Width = 324
-          Height = 105
-          ScrollBars = ssVertical
-          TabOrder = 0
-          WordWrap = False
-          OnChange = Memo_TagsChange
-          OnKeyDown = Memo_LyricsKeyDown
-        end
         object Btn_GetTagsLastFM: TButton
-          Left = 340
-          Top = 51
-          Width = 91
+          Left = 304
+          Top = 137
+          Width = 127
           Height = 25
           Hint = 'Add Tags from LastFM'
           Caption = 'LastFM'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 1
+          TabOrder = 0
           OnClick = Btn_GetTagsLastFMClick
         end
-      end
-      object GrpBox_ExistingTags: TGroupBox
-        Left = 8
-        Top = 174
-        Width = 443
-        Height = 250
-        Caption = 'Existing Tags in medialibrary (double-click to insert)'
-        TabOrder = 1
-        object Label1: TLabel
-          Left = 256
+        object lb_Tags: TListBox
+          Left = 13
           Top = 24
-          Width = 103
-          Height = 13
-          Caption = 'Number of Tags in list'
-        end
-        object Btn_GetTags: TButton
-          Left = 256
-          Top = 92
-          Width = 120
-          Height = 25
-          Hint = 'Refresh the list of tags with these settings'
-          Caption = 'Refresh list'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 0
-          OnClick = Btn_GetTagsClick
-        end
-        object lvExistingTags: TListView
-          Left = 8
-          Top = 20
-          Width = 238
-          Height = 220
-          Columns = <
-            item
-              Caption = 'Tag'
-              Width = 150
-            end
-            item
-              Caption = 'Count'
-            end>
-          ReadOnly = True
+          Width = 274
+          Height = 387
+          ItemHeight = 13
+          PopupMenu = PM_EditExtendedTags
           TabOrder = 1
-          ViewStyle = vsReport
-          OnDblClick = lvExistingTagsClick
+          OnDblClick = lb_TagsDblClick
+          OnKeyDown = lb_TagsKeyDown
         end
-        object cb_HideAutoTags: TCheckBox
-          Left = 256
-          Top = 70
-          Width = 172
-          Height = 17
-          Hint = 'Do not list Tags which are set automatically by Nemp.'
-          Caption = 'Hide Auto-Tags'
-          ParentShowHint = False
-          ShowHint = True
+        object btn_AddTag: TButton
+          Left = 304
+          Top = 24
+          Width = 127
+          Height = 25
+          Caption = 'Add tag'
           TabOrder = 2
+          OnClick = btn_AddTagClick
         end
-        object se_NumberOfTags: TSpinEdit
-          Left = 256
-          Top = 42
-          Width = 121
-          Height = 22
-          Hint = 'Maximum number of tags shown in the list beside'
-          MaxValue = 1000
-          MinValue = 0
-          ParentShowHint = False
-          ShowHint = True
+        object Btn_RemoveTag: TButton
+          Left = 304
+          Top = 86
+          Width = 127
+          Height = 25
+          Caption = 'Remove tag'
           TabOrder = 3
-          Value = 150
+          OnClick = Btn_RemoveTagClick
+        end
+        object Btn_RenameTag: TButton
+          Left = 304
+          Top = 55
+          Width = 127
+          Height = 25
+          Caption = 'Rename tag'
+          TabOrder = 4
+          OnClick = Btn_RenameTagClick
+        end
+        object Btn_TagCloudEditor: TButton
+          Left = 304
+          Top = 386
+          Width = 127
+          Height = 25
+          Caption = 'Cloud editor'
+          TabOrder = 5
+          OnClick = Btn_TagCloudEditorClick
         end
       end
     end
@@ -2052,8 +2007,8 @@ object FDetails: TFDetails
     Enabled = False
     Interval = 250
     OnTimer = Timer1Timer
-    Left = 424
-    Top = 144
+    Left = 16
+    Top = 464
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True
@@ -2069,12 +2024,12 @@ object FDetails: TFDetails
     Request.Ranges.Units = 'bytes'
     Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
-    Left = 428
-    Top = 96
+    Left = 164
+    Top = 448
   end
   object PM_URLCopy: TPopupMenu
-    Left = 428
-    Top = 240
+    Left = 20
+    Top = 48
     object PM_CopyURLToClipboard: TMenuItem
       Caption = 'Copy URL to clipboard'
       OnClick = PM_CopyURLToClipboardClick
@@ -2084,14 +2039,32 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 428
-    Top = 192
+    Left = 60
+    Top = 456
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
-    Left = 432
-    Top = 48
+    Left = 200
+    Top = 456
+  end
+  object PM_EditExtendedTags: TPopupMenu
+    Left = 392
+    Top = 344
+    object pm_AddTag: TMenuItem
+      Caption = 'Add tag'
+      OnClick = btn_AddTagClick
+    end
+    object pm_RenameTag: TMenuItem
+      Caption = 'Rename tag'
+      ShortCut = 113
+      OnClick = Btn_RenameTagClick
+    end
+    object pm_RemoveTag: TMenuItem
+      Caption = 'Remove tag'
+      ShortCut = 46
+      OnClick = Btn_RemoveTagClick
+    end
   end
 end

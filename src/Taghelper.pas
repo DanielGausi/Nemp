@@ -35,7 +35,32 @@ interface
 
 uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs, NempAudioFiles;
 
+// Flag constants for consistency-checking
+const
+    TAGFLAG_DUPLICATE = 1;
+    TAGFLAG_IGNORE    = 2;
+    // = 4
+    // = 8
+    // = 16
+
 type
+
+    TTagConsistencyError = (CONSISTENCY_OK,     // everthing is fine
+                            CONSISTENCY_HINT,   // some Hints (tag already exists), no user action required
+                            CONSISTENCY_WARNING // some warnings, user action recommended
+                            );
+
+
+
+    TTagError = ( TAGERR_NONE,                      // everthing's fine
+                  TAGERR_Consistency,               // some problems with the Ignore/Merge lists
+                  TAGERR_AddTagDuplicateFound,      // the (or one of the) tag to add was already in the file
+                  TAGERR_AddTagOnlyDuplicatesFound, // all Tags were already in the file
+                  TAGERR_AddTagIgnore,              // the new tag is on the "ignore List"
+                  TAGERR_AddTagAllIgnore,           // all new tags are on the "ignore List"
+                  TAGERR_AddTagMerge               // the new tag sould be renamed to another tag
+
+    );
 
     TIgnoreTagString = class
     public
@@ -62,33 +87,48 @@ type
             fIgnoreList: TStringList;  // List of Tag-Keys to ignore
             fMergeList: TObjectList;   // List of TTagMergeItems
 
+            fLogList: TStrings;    // LogList for warnings from the consistency check
+
 
             procedure AddRawMergeString(aString: String);
 
             // Search the Lists for a matching key
-            function IgnoreTagExists(aKey: String):Boolean;
-            function MergeTagExists(aOriginalKey, aReplaceKey: String): Boolean;
-            function IndexOfMergeTag(aOriginalKey, aReplaceKey: String): Integer;
+            function fIgnoreTagExists(aKey: String):Boolean;
+            function fMergeTagExists(aOriginalKey, aReplaceKey: String): Boolean;
+            function fIndexOfMergeTag(aOriginalKey, aReplaceKey: String): Integer;
 
         public
 
             property IgnoreList: TStringList read fIgnoreList;
             property MergeList: TObjectList read fMergeList;
+            property LogList: TStrings read fLogList;
 
             constructor Create;
             destructor Destroy; override;
 
             procedure LoadFiles;   // Load Data from the files
-            procedure SaveFiles;   // Save Data back to the files
+            procedure SaveFiles(silent: Boolean = True);   // Save Data back to the files
 
+            function AddIgnoreRuleConsistencyCheck(newIgnoreTag: String): TTagConsistencyError;
+            function AddMergeRuleConsistencyCheck(newOriginalTag, newReplaceTag: String): TTagConsistencyError;
+
+            function AddIgnoreRule(newIgnoreTag: String; IgnoreWarnings: Boolean): Boolean;
+            function AddMergeRule(newOriginalTag: string; var newReplaceTag: String; IgnoreWarnings: Boolean): Boolean;
+
+            // -----------Deprecated, remove later
             // Add new Tag to Ignore/Merge
             // result: False if Tag already existed
             function AddIgnoreTag(aKey: String): Boolean;
             function AddMergeTag(aOriginalKey, aReplaceKey: String): Boolean;
+            // -----------Deprecated, remove later
+
 
             // delete a Tag from the List
             procedure DeleteIgnoreTag(aKey: String);
             procedure DeleteMergeTag(aOriginalKey, aReplaceKey: String);
+
+            // check, whether aKey is in the Merge list and returns the replace-value
+            //function GetRenamedTag(aKey: String): String;
     end;
 
 const
@@ -98,8 +138,9 @@ const
     Usr_IgnoreList = 'tag_ignore' ;
     Usr_MergeList  = 'tag_merge'  ;
 
-function ControlRawTag(af: TAudioFile; newTags: String;
-      aIgnoreList: TStringList; aMergeList: TObjectList): String;
+// same as medienbib.addnewtag
+//function ControlRawTag(af: TAudioFile; newTags: String;
+//      aIgnoreList: TStringList; aMergeList: TObjectList): String;
 
 function Sort_OriginalKey(item1, item2: Pointer): Integer;
 function Sort_OriginalKey_DESC(item1, item2: Pointer): Integer;
@@ -108,11 +149,12 @@ function Sort_ReplaceKey_DESC(item1, item2: Pointer): Integer;
 
 function CommasInString(aString: String): Boolean;
 function ReplaceCommasbyLinebreaks(aString: String): String;
+function GetRenamedTag(aKey: String; aMergeList: tObjectList): String;
 
 
 implementation
 
-uses Systemhelper, Nemp_ConstantsAndTypes, OneInst;
+uses Systemhelper, Nemp_ConstantsAndTypes, OneInst, Nemp_RessourceStrings;
 
 
 function Sort_OriginalKey(item1, item2: Pointer): Integer;
@@ -141,15 +183,17 @@ begin
 end;
 
 function CommasInString(aString: String): Boolean;
-var i, c: integer;
+//var i, c: integer;
 begin
-    c := 0;
-    for i := 1 to length(aString) do
-        if aString[i] = ',' then
-            inc(c);
+    //change 2017: Do not allow a single comma in tags
+    result := pos(',', aString) <> 0;
+    //c := 0;
+    //for i := 1 to length(aString) do
+    //    if aString[i] = ',' then
+    //        inc(c);
     // Idea: more than one comma or  only one and short string may
     // indicate an comma-separated input of tags.
-    result := (c >= 2) or ((c > 0) and (length(aString) < 15));
+    // result := (c >= 2) or ((c > 0) and (length(aString) < 15));
 end;
 
 function ReplaceCommasbyLinebreaks(aString: String): String;
@@ -174,17 +218,34 @@ begin
     end;
 end;
 
+// used in threaded and non-threaded methods
+function GetRenamedTag(aKey: String; aMergeList: tObjectList): String;
+var i: integer;
+    aItem: TTagMergeItem;
+begin
+    result := '';
+    for i := 0 to aMergeList.Count - 1 do
+    begin
+        aItem := TTagMergeItem(aMergeList[i]);
+        if SameText(aItem.fOriginalKey, aKey) then
+        begin
+            result := aItem.fReplaceKey;
+            break;
+        end;
+    end;
+end;
 
 {
     --------------------------------------------------------
     ControlRawtag
+    // replaced with medienbib.addNewTag
     - Correct RawTags from lastFM
       af: Current AudioFile
       newTags: String with new tags (result from LastFM)
       aIgnorelist, aMergeList: Data how to change newTags
       Result: The new #13#10-seperated TagString, including the old ones
     --------------------------------------------------------
-}
+
 function ControlRawTag(af: TAudioFile; newTags: String;
   aIgnoreList: TStringList; aMergeList: TObjectList): String;
 var oldTagList, newTagList: TStringList;
@@ -245,6 +306,7 @@ begin
         newTagList.Free;
     end;
 end;
+}
 
 { TIgnoreTagString }
 
@@ -289,10 +351,15 @@ begin
     fIgnoreList.CaseSensitive := False;
     fIgnoreList.Sorted := True;
     fMergeList := TObjectList.Create;
+    fLogList := TStringlist.Create;
+
+    LoadFiles;
 end;
 
 destructor TTagPostProcessor.Destroy;
 begin
+    SaveFiles;
+    fLogList.Free;
     fIgnoreList.Free;
     fMergeList.Free;
     inherited;
@@ -379,34 +446,40 @@ begin
     end;
 end;
 
-procedure TTagPostProcessor.SaveFiles;
+procedure TTagPostProcessor.SaveFiles(silent: Boolean = True);
 var tmpList: TStringList;
     i: Integer;
     s: String;
 begin
-    ForceDirectories(fSavePath);
-
-    // 1. IgnoreList
-    // --------------
-    fIgnoreList.SaveToFile(fSavePath + Usr_IgnoreList, TEncoding.UTF8);
-
-    // 2. MergeList
-    // --------------
-    tmpList := TStringList.Create;
     try
-        // build strings "<key1>@@<key2>"
-        for i := 0 to fMergelist.Count - 1 do
-        begin
-            s := TTagMergeItem(fMergeList[i]).fOriginalKey
-                + '@@'
-                + TTagMergeItem(fMergeList[i]).fReplaceKey;
-            tmpList.Add(s);
+        ForceDirectories(fSavePath);
+
+        // 1. IgnoreList
+        // --------------
+        fIgnoreList.SaveToFile(fSavePath + Usr_IgnoreList, TEncoding.UTF8);
+
+        // 2. MergeList
+        // --------------
+        tmpList := TStringList.Create;
+        try
+            // build strings "<key1>@@<key2>"
+            for i := 0 to fMergelist.Count - 1 do
+            begin
+                s := TTagMergeItem(fMergeList[i]).fOriginalKey
+                    + '@@'
+                    + TTagMergeItem(fMergeList[i]).fReplaceKey;
+                tmpList.Add(s);
+            end;
+            // save the @@-List
+            tmpList.SaveToFile(fSavepath + Usr_MergeList, TEncoding.UTF8);
+        finally
+            tmpList.Free;
         end;
-        // save the @@-List
-        tmpList.SaveToFile(fSavepath + Usr_MergeList, TEncoding.UTF8);
-    finally
-        tmpList.Free;
-    end;
+    except
+      on e: Exception do
+          if not Silent then
+              MessageDLG(E.Message, mtError, [MBOK], 0)
+  end;
 end;
 
 {
@@ -415,12 +488,12 @@ end;
     - Search the Lists for a matchin key
     --------------------------------------------------------
 }
-function TTagPostProcessor.IgnoreTagExists(aKey: String): Boolean;
+function TTagPostProcessor.fIgnoreTagExists(aKey: String): Boolean;
 begin
     result := fIgnoreList.IndexOf(aKey) >= 0;
 end;
 
-function TTagPostProcessor.IndexOfMergeTag(aOriginalKey,
+function TTagPostProcessor.fIndexOfMergeTag(aOriginalKey,
   aReplaceKey: String): Integer;
 var i: integer;
     aItem: TTagMergeItem;
@@ -439,10 +512,10 @@ begin
     end;
 end;
 
-function TTagPostProcessor.MergeTagExists(aOriginalKey,
+function TTagPostProcessor.fMergeTagExists(aOriginalKey,
   aReplaceKey: String): Boolean;
 begin
-    result := IndexOfMergetag(aOriginalKey, aReplaceKey) >= 0;
+    result := fIndexOfMergetag(aOriginalKey, aReplaceKey) >= 0;
 end;
 
 {
@@ -451,9 +524,200 @@ end;
     - Add Ignore/Mergetag to the lists
     --------------------------------------------------------
 }
+
+function TTagPostProcessor.AddIgnoreRuleConsistencyCheck(newIgnoreTag: String): TTagConsistencyError;
+var aItem: TTagMergeItem;
+    i: Integer;
+begin
+    // newIgnoreTag should be a single tag without commas
+    result := CONSISTENCY_OK;
+    LogList.Clear;
+
+    // if IgnoreTagExists(newIgnoreTag) then // ok, fine. just don't add it again later
+
+    for i := 0 to fMergeList.Count - 1 do
+    begin
+        aItem := TTagMergeItem(fMergeList[i]);
+
+        // -a, a->b exists
+        if SameText(aItem.fOriginalKey, newIgnoreTag) then
+        begin
+            result := CONSISTENCY_WARNING;
+            LogList.Add(Format(TagManagement_IgnoreTagIsInRenameListOrig, [newIgnoreTag, aItem.fReplaceKey]));
+        end;
+
+        // -a, b->a exists
+        if SameText(aItem.fReplaceKey, newIgnoreTag) then
+        begin
+            result := CONSISTENCY_WARNING;
+            LogList.Add(Format(TagManagement_IgnoreTagIsInRenameListRename, [newIgnoreTag, aItem.fOriginalKey]));
+        end;
+    end;
+end;
+
+function TTagPostProcessor.AddMergeRuleConsistencyCheck(newOriginalTag, newReplaceTag: String): TTagConsistencyError;
+var aItem: TTagMergeItem;
+    i: Integer;
+begin
+    // newOriginalTag and newReplaceTag should be single tags without commas
+    result := CONSISTENCY_OK;
+    LogList.Clear;
+
+    // check for Ignore-Rules
+    // a->b, but -a already exists
+    if fIgnoreTagExists(newOriginalTag) then
+    begin
+        result := CONSISTENCY_WARNING;
+        LogList.Add(Format(TagManagement_RenameTagIsInIgnoreList, [newOriginalTag]));
+        // solution: remove -a
+        //           add a->b
+    end;
+
+    // a->b, but -b already exists
+    if fIgnoreTagExists(newReplaceTag) then
+    begin
+        result := CONSISTENCY_WARNING;
+        LogList.Add(Format(TagManagement_RenameTagIsInIgnoreList, [newReplaceTag]));
+        // solution: remove -b
+        //           add a->b
+    end;
+
+    // check for existing merge rules
+    for i := 0 to fMergeList.Count - 1 do
+    begin
+        aItem := TTagMergeItem(fMergeList[i]);
+        // a->b, and c->b already exists: Everything's fine, a is just another variant of c to replace with b
+
+        // a->b, but b->c exists
+        if SameText(newReplaceTag, aItem.fOriginalKey) then
+        begin
+            result := CONSISTENCY_WARNING;
+            LogList.Add(Format(TagManagement_RenameTagIsInMergeListOriginal, [newReplaceTag, aItem.fReplaceKey]));
+            // solution: CHANGE input a->b to a->c
+        end;
+
+        // a->b, but a->c already exists
+        if SameText(newOriginalTag, aItem.fOriginalKey) then
+        begin
+            result := CONSISTENCY_WARNING;
+            LogList.Add(Format(TagManagement_OriginalTagIsInMergeListOriginal, [newOriginalTag, aItem.fReplaceKey]));
+            // solution: remove a->c
+            //           add a->b
+            //      <=>  change a->c to a->b
+        end;
+
+        // a->b, but c->a already exists
+        if SameText(newOriginalTag, aItem.fReplaceKey) then
+        begin
+            result := CONSISTENCY_WARNING;
+            LogList.Add(Format(TagManagement_OriginalTagIsInMergeListRename, [newOriginalTag, aItem.fOriginalKey]));
+            // solution: change c->a to c->b
+            //           add a->b
+        end;
+    end;
+end;
+
+function TTagPostProcessor.AddIgnoreRule(newIgnoreTag: String; IgnoreWarnings: Boolean): Boolean;
+var aItem: TTagMergeItem;
+    i: Integer;
+begin
+    // newIgnoreTag should be a single tag without commas
+    if fIgnoreTagExists(newIgnoreTag) then
+        // nothing to do.
+        result := False
+    else
+    begin
+        if Not IgnoreWarnings then
+        begin
+            //resolve Issues, cleanup Merge Lists
+            for i := fMergeList.Count - 1 downto 0 do
+            begin
+                aItem := TTagMergeItem(fMergeList[i]);
+                //    -a, a->b exists
+                // or -a, b->a exists
+                if SameText(aItem.fOriginalKey, newIgnoreTag)
+                    OR SameText(aItem.fReplaceKey, newIgnoreTag)
+                then
+                    // delete existing Merge rule
+                    fMergeList.Delete(i);
+            end;
+        end;
+
+        // actually add the new tag to the ignore list
+        result := true;
+        fIgnoreList.Add(newIgnoreTag);
+    end;
+end;
+
+
+// newReplaceTag is a VAR parameter, as it may be changed during the procedure to resolve inconsistencies
+// this must also affect the value of newReplaceTag in the calling method, when other files are updated later
+function TTagPostProcessor.AddMergeRule(newOriginalTag: string; var newReplaceTag: String; IgnoreWarnings: Boolean): Boolean;
+var aItem: TTagMergeItem;
+    flagToDeleteMergeItem: Boolean;
+    i: Integer;
+begin
+    // newOriginalTag and newReplaceTag should be single tags without commas
+    if Not IgnoreWarnings then
+    begin
+        // check for Ignore-Rules
+        // a->b, but -a already exists
+        if fIgnoreTagExists(newOriginalTag) then
+            DeleteIgnoreTag(newOriginalTag);
+            // solution: remove -a
+            //           add a->b
+
+        // a->b, but -b already exists
+        if fIgnoreTagExists(newReplaceTag) then
+            DeleteIgnoreTag(newReplaceTag);
+            // solution: remove -b
+            //           add a->b
+
+        // check for existing merge rules
+        for i := fMergeList.Count - 1 downto 0 do
+        begin
+            aItem := TTagMergeItem(fMergeList[i]);
+            flagToDeleteMergeItem := False;
+            // a->b, and c->b already exists: Everything's fine, a is just another variant of c to replace with b
+
+            // a->b, but b->c exists
+            if SameText(newReplaceTag, aItem.fOriginalKey) then
+                newReplaceTag := aItem.fReplaceKey;
+                // CHANGE input a->b to a->c           // !!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            // a->b, but a->c already exists
+            if SameText(newOriginalTag, aItem.fOriginalKey) then
+                flagToDeleteMergeItem := True;
+                // solution: remove a->c
+                //           add a->b
+                //      <=>  change a->c to a->b
+
+            // a->b, but c->a already exists
+            if SameText(newOriginalTag, aItem.fReplaceKey) then
+                aItem.fReplaceKey := newReplaceTag;
+                // solution: change c->a to c->b
+                //           add a->b
+
+            if flagToDeleteMergeItem then
+                fMergeList.Delete(i);
+        end;
+    end;
+
+    // actually add the new rule to the list
+    if not fMergeTagExists(newOriginalTag, newReplaceTag) then
+    begin
+        fMergeList.Add(TTagMergeItem.Create(newOriginalTag, newReplaceTag));
+        result := True;
+    end
+    else
+        result := False;
+
+end;
+
+
 function TTagPostProcessor.AddIgnoreTag(aKey: String): Boolean;
 begin
-    if not IgnoreTagExists(aKey) then
+    if not fIgnoreTagExists(aKey) then
     begin
         fIgnoreList.Add(aKey);
         result := True;
@@ -464,7 +728,7 @@ end;
 function TTagPostProcessor.AddMergeTag(aOriginalKey,
   aReplaceKey: String): Boolean;
 begin
-    if not MergeTagExists(aOriginalKey, aReplaceKey) then
+    if not fMergeTagExists(aOriginalKey, aReplaceKey) then
     begin
         fMergeList.Add(TTagMergeItem.Create(aOriginalKey, aReplaceKey));
         result := True;
@@ -490,10 +754,11 @@ end;
 procedure TTagPostProcessor.DeleteMergeTag(aOriginalKey, aReplaceKey: String);
 var idx: integer;
 begin
-    idx := IndexOfMergeTag(aOriginalKey, aReplaceKey);
+    idx := fIndexOfMergeTag(aOriginalKey, aReplaceKey);
     if idx >= 0 then
         fMergeList.Delete(idx);
 end;
+
 
 
 end.

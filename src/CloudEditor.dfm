@@ -2,8 +2,8 @@ object CloudEditorForm: TCloudEditorForm
   Left = 0
   Top = 0
   Caption = 'Tagcloud: Editor'
-  ClientHeight = 425
-  ClientWidth = 523
+  ClientHeight = 465
+  ClientWidth = 551
   Color = clBtnFace
   Constraints.MinHeight = 350
   Constraints.MinWidth = 400
@@ -21,13 +21,13 @@ object CloudEditorForm: TCloudEditorForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   DesignSize = (
-    523
-    425)
+    551
+    465)
   PixelsPerInch = 96
   TextHeight = 13
   object LblUpdateWarning: TLabel
     Left = 8
-    Top = 392
+    Top = 432
     Width = 109
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -42,8 +42,8 @@ object CloudEditorForm: TCloudEditorForm
     ExplicitTop = 279
   end
   object BtnUpdateID3Tags: TButton
-    Left = 408
-    Top = 392
+    Left = 436
+    Top = 432
     Width = 107
     Height = 25
     Anchors = [akRight, akBottom]
@@ -53,8 +53,8 @@ object CloudEditorForm: TCloudEditorForm
     OnClick = BtnUpdateID3TagsClick
   end
   object BtnBugFix: TButton
-    Left = 295
-    Top = 392
+    Left = 323
+    Top = 432
     Width = 107
     Height = 25
     Anchors = [akRight, akBottom]
@@ -66,33 +66,38 @@ object CloudEditorForm: TCloudEditorForm
   object PC_Select: TPageControl
     Left = 8
     Top = 8
-    Width = 506
-    Height = 378
-    ActivePage = TS_ExistingTags
+    Width = 534
+    Height = 418
+    ActivePage = TS_DeleteTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
       DesignSize = (
-        498
-        350)
-      object lblMinTagCount: TLabel
-        Left = 63
-        Top = 31
-        Width = 408
-        Height = 13
+        526
+        390)
+      object lbl_ExistingTagsExplain: TLabel
+        Left = 378
+        Top = 112
+        Width = 137
+        Height = 242
+        Anchors = [akTop, akRight, akBottom]
         AutoSize = False
-        Caption = 'Minimum count of shown tags'
+        Caption = '..'
+        WordWrap = True
+        ExplicitLeft = 370
+        ExplicitHeight = 296
       end
       object cbHideAutoTags: TCheckBox
-        Left = 3
-        Top = 8
+        Left = 15
+        Top = 360
         Width = 468
         Height = 17
         Hint = 
           'Do not show Nemp-Auto-Tags like artist, albumname, genre, year a' +
           'nd decade.'
-        Caption = 'Hide Auto-Tags'
+        Anchors = [akLeft, akBottom]
+        Caption = 'Hide Tags automatically added by Nemp'
         Checked = True
         ParentShowHint = False
         ShowHint = True
@@ -100,22 +105,11 @@ object CloudEditorForm: TCloudEditorForm
         TabOrder = 0
         OnClick = cbHideAutoTagsClick
       end
-      object seMinTagCount: TSpinEdit
-        Left = 3
-        Top = 28
-        Width = 54
-        Height = 22
-        MaxValue = 10
-        MinValue = 1
-        TabOrder = 1
-        Value = 1
-        OnChange = seMinTagCountChange
-      end
       object TagVST: TVirtualStringTree
         Left = 3
-        Top = 96
-        Width = 379
-        Height = 251
+        Top = 3
+        Width = 358
+        Height = 351
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
@@ -127,7 +121,8 @@ object CloudEditorForm: TCloudEditorForm
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         IncrementalSearch = isAll
         Indent = 4
-        TabOrder = 2
+        PopupMenu = PopupExistingTags
+        TabOrder = 1
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
         OnBeforeItemErase = TagVSTBeforeItemErase
@@ -140,8 +135,8 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
-            Width = 250
-            WideText = 'Key'
+            Width = 217
+            WideText = 'Tag'
           end
           item
             Position = 1
@@ -149,90 +144,71 @@ object CloudEditorForm: TCloudEditorForm
             WideText = 'Count'
           end>
       end
-      object BtnTagRename: TButton
-        Left = 388
-        Top = 96
-        Width = 107
-        Height = 25
-        Anchors = [akTop, akRight]
-        Caption = 'Rename Tag'
-        TabOrder = 3
-        OnClick = BtnTagRenameClick
-      end
       object BtnMerge: TButton
-        Left = 388
-        Top = 127
-        Width = 107
+        Left = 378
+        Top = 9
+        Width = 137
         Height = 25
+        Hint = 'Rename an existing tag and add a "Rename rule"'
         Anchors = [akTop, akRight]
-        Caption = 'Merge Tags'
-        TabOrder = 4
-        OnClick = BtnMergeClick
+        Caption = 'Add "Rename rule"'
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+        OnClick = BtnAddRenameRuleClick
       end
       object BtnDeleteTags: TButton
-        Left = 388
-        Top = 158
-        Width = 107
+        Left = 378
+        Top = 40
+        Width = 137
         Height = 25
+        Hint = 'Remove an existing tag and add a "Ignore rule"'
         Anchors = [akTop, akRight]
-        Caption = 'Delete Tags'
-        TabOrder = 5
-        OnClick = BtnDeleteTagsClick
-      end
-      object cbAutoAddMergeTags: TCheckBox
-        Left = 3
-        Top = 55
-        Width = 468
-        Height = 17
-        Hint = 
-          'When getting new tags from LastFM, this list is used to correct ' +
-          'some tags'
-        Caption = 'Remember merged/renamed tags'
-        Checked = True
+        Caption = 'Add "Ignore rule"'
         ParentShowHint = False
         ShowHint = True
-        State = cbChecked
-        TabOrder = 6
+        TabOrder = 3
+        OnClick = BtnAddIgnoreRuleClick
       end
-      object cbAutoAddIgnoreTags: TCheckBox
-        Left = 3
-        Top = 73
-        Width = 468
-        Height = 17
+      object BtnJustRemoveTags: TButton
+        Left = 378
+        Top = 71
+        Width = 138
+        Height = 25
         Hint = 
-          'When getting new tags from LastFM, this list is used to ignore s' +
-          'ome tags'
-        Caption = 'Remember deleted tags'
-        Checked = True
+          'Just remove an existing tag from all files in the media library,' +
+          ' without a new "Ignore rule"'
+        Anchors = [akTop, akRight]
+        Caption = 'Just remove tags'
         ParentShowHint = False
         ShowHint = True
-        State = cbChecked
-        TabOrder = 7
+        TabOrder = 4
+        OnClick = BtnJustRemoveTagsClick
       end
     end
     object TS_MergedTags: TTabSheet
-      Caption = 'Merged/renamed tags'
+      Caption = 'Rename rules'
       ImageIndex = 2
       DesignSize = (
-        498
-        350)
+        526
+        390)
       object LblMergeTagHint: TLabel
-        Left = 3
-        Top = 3
-        Width = 492
-        Height = 46
-        Anchors = [akLeft, akTop, akRight]
+        Left = 380
+        Top = 40
+        Width = 126
+        Height = 333
+        Anchors = [akTop, akRight, akBottom]
         AutoSize = False
-        Caption = 
-          'This list is used to adjust new tags from LastFM. Tags in this l' +
-          'ist are automatically replaced when getting new tags.'
+        Caption = '..'
         WordWrap = True
+        ExplicitLeft = 327
+        ExplicitHeight = 481
       end
       object MergeTagVST: TVirtualStringTree
         Left = 3
-        Top = 55
-        Width = 379
-        Height = 292
+        Top = 3
+        Width = 358
+        Height = 384
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
@@ -243,6 +219,7 @@ object CloudEditorForm: TCloudEditorForm
         Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4
+        PopupMenu = PopupRenameRules
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
@@ -261,39 +238,40 @@ object CloudEditorForm: TCloudEditorForm
           end>
       end
       object BtnDeleteMergeTag: TButton
-        Left = 388
-        Top = 55
-        Width = 107
+        Left = 378
+        Top = 9
+        Width = 137
         Height = 25
+        Hint = 'Delete the selected "Rename rules"'
         Anchors = [akTop, akRight]
-        Caption = 'Delete from list'
+        Caption = 'Delete "Rename rule"'
+        ParentShowHint = False
+        ShowHint = True
         TabOrder = 1
-        OnClick = BtnDeleteMergeTagClick
+        OnClick = BtnDeleteRenameRuleClick
       end
     end
     object TS_DeleteTags: TTabSheet
-      Caption = 'Deleted tags'
+      Caption = 'Ignore rules'
       ImageIndex = 1
       DesignSize = (
-        498
-        350)
-      object LblDeleteTagHint: TLabel
-        Left = 3
-        Top = 3
-        Width = 492
-        Height = 46
-        Anchors = [akLeft, akTop, akRight]
+        526
+        390)
+      object Lbl_IgnoreTagHint: TLabel
+        Left = 378
+        Top = 40
+        Width = 126
+        Height = 333
+        Anchors = [akTop, akRight, akBottom]
         AutoSize = False
-        Caption = 
-          'This list is used to adjust new tags from LastFM. Tags in this l' +
-          'ist are automatically deleted when getting new tags.'
+        Caption = '..'
         WordWrap = True
       end
       object IgnoreTagVST: TVirtualStringTree
         Left = 3
-        Top = 55
-        Width = 379
-        Height = 292
+        Top = 3
+        Width = 358
+        Height = 384
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
@@ -304,6 +282,7 @@ object CloudEditorForm: TCloudEditorForm
         Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4
+        PopupMenu = PopupIgnoreRules
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
         TreeOptions.SelectionOptions = [toFullRowSelect, toMultiSelect]
@@ -316,15 +295,50 @@ object CloudEditorForm: TCloudEditorForm
           end>
       end
       object BtnDeleteIgnoreTag: TButton
-        Left = 388
-        Top = 55
-        Width = 107
+        Left = 378
+        Top = 9
+        Width = 137
         Height = 25
         Anchors = [akTop, akRight]
-        Caption = 'Delete from list'
+        Caption = 'Delete "Ignore rule"'
         TabOrder = 1
-        OnClick = BtnDeleteIgnoreTagClick
+        OnClick = BtnDeleteIgnoreRuleClick
       end
+    end
+  end
+  object PopupExistingTags: TPopupMenu
+    Left = 48
+    Top = 80
+    object pm_AddRenameRule: TMenuItem
+      Caption = 'Add "Rename rule"'
+      ShortCut = 113
+      OnClick = BtnAddRenameRuleClick
+    end
+    object pm_AddIgnoreRule: TMenuItem
+      Caption = 'Add "Ignore rule"'
+      ShortCut = 16430
+      OnClick = BtnAddIgnoreRuleClick
+    end
+    object pm_JustRemoveTags: TMenuItem
+      Caption = 'Just remove tags'
+      ShortCut = 46
+      OnClick = BtnJustRemoveTagsClick
+    end
+  end
+  object PopupRenameRules: TPopupMenu
+    Left = 40
+    Top = 160
+    object pm_DeleteRenameRule: TMenuItem
+      Caption = 'Delete "Rename rule"'
+      OnClick = BtnDeleteRenameRuleClick
+    end
+  end
+  object PopupIgnoreRules: TPopupMenu
+    Left = 40
+    Top = 248
+    object pm_DeleteIgnoreRule: TMenuItem
+      Caption = 'Delete "Ignore rule"'
+      OnClick = BtnDeleteIgnoreRuleClick
     end
   end
 end

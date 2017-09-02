@@ -280,10 +280,7 @@ type
 
           property MouseOverTag: TPaintTag read fMouseOverTag write SetMouseOverTag;
           property FocussedTag: TPaintTag read fFocussedTag write SetFocussedTag;
-
-
           property CurrentTagList: TObjectList read fGetTagList;
-
           property ClearTag: TTag read fCleartag;
 
           constructor Create;
@@ -304,7 +301,6 @@ type
           // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
           procedure BackUpNavigation;
           procedure RestoreNavigation(aList: TObjectList);
-
           procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
           // Add a file to the TagCloud
@@ -1444,10 +1440,10 @@ begin
             if trim(tmpTags[i]) <> '' then
                 allTags.Add(trim(tmptags[i]));
 
-        tmpTags.Text := String(aAudioFile.RawTagUserDefined);
-        for i := 0 to tmpTags.Count - 1 do
-            if trim(tmpTags[i]) <> '' then
-                allTags.Add(trim(tmptags[i]));
+        //tmpTags.Text := String(aAudioFile.RawTagUserDefined);
+        //for i := 0 to tmpTags.Count - 1 do
+        //    if trim(tmpTags[i]) <> '' then
+        //        allTags.Add(trim(tmptags[i]));
 
 
         // Add/Insert every Tag into the af.TagList

@@ -304,8 +304,6 @@ type
     cb_RatingChangeCounter: TCheckBox;
     cb_RatingIncreaseRating: TCheckBox;
     cb_RatingDecreaseRating: TCheckBox;
-    StaticText1: TLabel;
-    StaticText2: TLabel;
     CB_RememberInterruptedPlayPosition: TCheckBox;
     cbIncludeFiles: TCheckListBox;
     CBChangeFontColoronBitrate: TCheckBox;
@@ -316,7 +314,6 @@ type
     cb_RegisterMediaHotkeys: TCheckBox;
     GrpBox_Metadata: TGroupBox;
     cb_AccessMetadata: TCheckBox;
-    Lbl_QuickMetadataHint: TLabel;
     GrpBox_CDAudio: TGroupBox;
     cb_UseCDDB: TCheckBox;
     BtnRefreshDevices: TButton;
@@ -497,11 +494,6 @@ type
     lbl_DefaultCoverHint: TLabel;
     btn_DefaultCover: TButton;
     btn_DefaultCoverReset: TButton;
-    GrpBox_ViewVis_CoverDetails: TGroupBox;
-    LblConst_CoverMode: TLabel;
-    LblConst_DetailMode: TLabel;
-    cbCoverMode: TComboBox;
-    cbDetailMode: TComboBox;
     GrpBox_ViewVis_Scrolling: TGroupBox;
     Lbl_Framerate: TLabel;
     CB_visual: TCheckBox;
@@ -510,6 +502,11 @@ type
     CB_ScrollTitleInMainWindow: TCheckBox;
     CB_TaskBarDelay: TComboBox;
     CB_AnzeigeDelay: TComboBox;
+    cb_ShowCoverAndDetails: TCheckBox;
+    grpBox_AdditionalTags: TGroupBox;
+    cb_AutoResolveInconsistencies: TCheckBox;
+    cb_AskForAutoResolveInconsistencies: TCheckBox;
+    cb_ShowAutoResolveInconsistenciesHints: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -969,8 +966,8 @@ begin
     CBSpalten[i].Left := 16 + (i div 6) * 100;
   end;
 
-  cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
-  cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
+  // cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+  // cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 
   PageControl1.ActivePageIndex := 0;
 
@@ -1357,11 +1354,14 @@ begin
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
  end;
+ cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
+
+
 
  cbHideNACover.Checked := MedienBib.HideNACover;
  cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
- cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
- cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
+ // cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+ // cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 
   CB_CoverSearch_inDir.Checked       := MedienBib.CoverSearchInDir;
   CB_CoverSearch_inParentDir.Checked := MedienBib.CoverSearchInParentDir;
@@ -1656,7 +1656,11 @@ begin
 
   // quick access to metadata
   cb_AccessMetadata                     .checked := Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata;
-  cb_UseCDDB                            .checked := Nemp_MainForm.NempOptions.UseCDDB                   ;
+  cb_UseCDDB                            .checked := Nemp_MainForm.NempOptions.UseCDDB;
+  cb_AutoResolveInconsistencies         .checked := MedienBib.AutoResolveInconsistencies          ;
+  cb_AskForAutoResolveInconsistencies   .checked := MedienBib.AskForAutoResolveInconsistencies    ;
+  cb_ShowAutoResolveInconsistenciesHints.checked := MedienBib.ShowAutoResolveInconsistenciesHints ;
+
   // Automatic ratings
   // Set settings:
   cb_RatingActive                       .checked := NempPlayer.PostProcessor.Active                       ;
@@ -2068,9 +2072,10 @@ begin
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
  end;
+ cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
  //CBCoverColumn.Checked := Nemp_MainForm.VDTCover.Visible;
- cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
- cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
+ // cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
+ // cbDetailMode.ItemIndex := Nemp_MainForm.NempOptions.DetailMode;
 end;
 
 // GeburtstagsOptionen
@@ -2388,12 +2393,14 @@ begin
       Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
   end;
 
-  Nemp_MainForm.NempOptions.CoverMode := cbCoverMode.ItemIndex;
+  Nemp_MainForm.NempOptions.ShowCoverAndDetails := cb_ShowCoverAndDetails.Checked;
 
-  if Nemp_MainForm.NempOptions.DetailMode <> cbDetailMode.ItemIndex then
-  begin
-      Nemp_MainForm.NempOptions.DetailMode := cbDetailMode.ItemIndex;
-  end;
+  // Nemp_MainForm.NempOptions.CoverMode := cbCoverMode.ItemIndex;
+
+  //if Nemp_MainForm.NempOptions.DetailMode <> cbDetailMode.ItemIndex then
+  //begin
+  //    Nemp_MainForm.NempOptions.DetailMode := cbDetailMode.ItemIndex;
+  //end;
 
   Nemp_MainForm.ActualizeVDTCover;
 
@@ -2984,6 +2991,10 @@ begin
 
   Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
   Nemp_MainForm.NempOptions.UseCDDB                     := cb_UseCDDB                            .checked;
+
+  MedienBib.AutoResolveInconsistencies          := cb_AutoResolveInconsistencies         .checked ;
+  MedienBib.AskForAutoResolveInconsistencies    := cb_AskForAutoResolveInconsistencies   .checked ;
+  MedienBib.ShowAutoResolveInconsistenciesHints := cb_ShowAutoResolveInconsistenciesHints.checked ;
 
   // automatic rating
   NempPlayer.PostProcessor.Active                       := cb_RatingActive                       .checked ;

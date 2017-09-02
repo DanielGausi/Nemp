@@ -343,9 +343,9 @@ type
 
         // RawTags: #13#10-separated Tags
         // Management of these Strings (except loading/saving) is done in Class TTagCloud
-        //RawTagAuto: UTF8String;
+        // RawTagAuto: UTF8String;
         RawTagLastFM: UTF8String;
-        RawTagUserDefined: UTF8String;
+        // RawTagUserDefined: UTF8String; // Never used this
         // Used in TagEditor/CloudTag.RenameTag
         // True indicates that the ID3Tag of the file should be rewritten
         ID3TagNeedsUpdate: Boolean;
@@ -476,7 +476,24 @@ type
 
         function GetTagDisplayString(allowEdit: Boolean): String;
 
+        // for the Double-Click Action in the VTS-Details.
+        // check for values that "make sense"
+        function IsValidArtist: Boolean;
+        function IsValidTitle : Boolean;
+        function IsValidAlbum : Boolean;
+        function IsValidYear  : Boolean;
+        function IsValidGenre : Boolean;
+
         function HasSupportedTagFormat: Boolean;
+        // editing tags
+        // result: True iff the tag was contained in the file
+        function ChangeTag(oldTag, newTag: String): Boolean;
+        function ContainsTag(aTag: String): Boolean;
+        function RemoveTag(aTag: String): Boolean;
+
+        //function RemoveTag(aTag: String): Boolean;
+        //function RenameTag(oldTag, newTag: String): Boolean;
+
 
     end;
 
@@ -667,8 +684,8 @@ begin
         ApeErr_InvalidTag           : result := AUDIO_ApeErr_InvalidApeTag;
         ApeErr_NoTag                : result := AUDIOERR_None;   // Nemp does not handle this as "Error"
 
-        WmaErr_WritingNotSupported  : result := AUDIOERR_Unkown; // Nemp does not permit this
-        WavErr_WritingNotSupported  : result := AUDIOERR_Unkown; // Nemp does not permit this
+        WmaErr_WritingNotSupported  : result := AUDIOERR_UnsupportedMediaFile; // Nemp does not permit this
+        WavErr_WritingNotSupported  : result := AUDIOERR_UnsupportedMediaFile; // Nemp does not permit this
 
         FileErr_NotSupportedFileType: result := AUDIOERR_UnsupportedMediaFile;
 
@@ -1230,6 +1247,34 @@ begin
     else
         result := Album;
 end;
+
+
+function TAudioFile.IsValidArtist: Boolean;
+begin
+    result := trim(Artist) <> '';
+end;
+
+function TAudioFile.IsValidTitle : Boolean;
+begin
+    result := trim(Titel) <> '';
+end;
+
+function TAudioFile.IsValidAlbum : Boolean;
+begin
+    result := trim(Album) <> '';
+end;
+
+function TAudioFile.IsValidYear  : Boolean;
+begin
+    result := (trim(Year) <> '')
+              AND (trim(Year) <> '0');
+end;
+
+function TAudioFile.IsValidGenre : Boolean;
+begin
+    result := trim(Genre) <> '';
+end;
+
 
 
 {
@@ -2068,6 +2113,96 @@ begin
             or (ext = 'tta')
           );
 end;
+
+function TAudioFile.ChangeTag(oldTag, newTag: String): Boolean;
+var idx, idx1: Integer;
+    sl: TStringList;
+begin
+    if RawTagLastFM = '' then
+        // nothing to do
+        result := false
+    else
+    begin
+        sl := TStringList.Create;
+        try
+            sl.Text := String(RawTagLastFM);
+            sl.CaseSensitive := False;
+
+
+            idx := sl.IndexOf(oldTag);
+            if idx >= 0 then
+            begin
+                result := True;
+                ID3TagNeedsUpdate := True;
+
+                if newTag = '' then
+                    sl.Delete(idx)
+                else
+                begin
+                    idx1 := sl.IndexOf(newTag);
+                    if idx1 >= 0 then
+                        // newTag already exists
+                        sl.Delete(idx)
+                    else
+                        sl[idx] := newTag;
+                end;
+                // Set RawTag again
+                if sl.Count > 0 then
+                    RawTagLastFM := UTf8String(trim(sl.Text))
+                else
+                    RawTagLastFM := ''; // just to be sure, empty Stringlist may return "#13#10"?
+            end else
+                result := false;
+
+        finally
+            sl.Free
+        end;
+    end;
+end;
+
+function TAudioFile.ContainsTag(aTag: String): Boolean;
+var sl: TStringList;
+begin
+    if RawTagLastFM = '' then
+        // nothing to do
+        result := false
+    else
+    begin
+        sl := TStringList.Create;
+        try
+            sl.Text := String(RawTagLastFM);
+            sl.CaseSensitive := False;
+            result := sl.IndexOf(aTag) >= 0;
+        finally
+            sl.Free
+        end;
+    end;
+end;
+
+function TAudioFile.RemoveTag(aTag: String): Boolean;
+var currentTagList: TStringlist;
+    idx: Integer;
+begin
+    currentTagList := TStringlist.Create;
+    try
+        currentTagList.Text := String(RawTagLastFM);
+        currentTagList.CaseSensitive := False;
+
+        // get the index of oldTag and delete it
+        idx := currentTagList.IndexOf(aTag);
+        if idx > -1 then
+        begin
+            currentTaglist.Delete(idx);
+            // set RawTags again
+            RawTagLastFM := UTF8String(Trim(currentTaglist.Text));
+            result := True;
+        end else
+            result := False;
+    finally
+        currenttagList.Free;
+    end;
+end;
+
 
 {
     --------------------------------------------------------

@@ -215,14 +215,6 @@ type
     Lbl_VorbisKey: TLabel;
     Tab_MoreTags: TTabSheet;
     GrpBox_TagCloud: TGroupBox;
-    GrpBox_ExistingTags: TGroupBox;
-    Btn_GetTags: TButton;
-    lvExistingTags: TListView;
-    Lbl_TagCloudInfo2: TLabel;
-    cb_HideAutoTags: TCheckBox;
-    se_NumberOfTags: TSpinEdit;
-    Label1: TLabel;
-    Memo_Tags: TMemo;
     Btn_GetTagsLastFM: TButton;
     BtnSynchRatingID3: TButton;
     BtnSynchRatingOggVorbis: TButton;
@@ -233,6 +225,15 @@ type
     lv_VorbisComments: TListBox;
     LblConst_Format: TLabel;
     LblFormat: TLabel;
+    lb_Tags: TListBox;
+    btn_AddTag: TButton;
+    Btn_RemoveTag: TButton;
+    Btn_RenameTag: TButton;
+    PM_EditExtendedTags: TPopupMenu;
+    pm_AddTag: TMenuItem;
+    pm_RenameTag: TMenuItem;
+    pm_RemoveTag: TMenuItem;
+    Btn_TagCloudEditor: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -316,14 +317,20 @@ type
     procedure Lblv1Change(Sender: TObject);
     procedure Lblv2Change(Sender: TObject);
     procedure Memo_LyricsChange(Sender: TObject);
-    procedure Btn_GetTagsClick(Sender: TObject);
-    procedure lvExistingTagsClick(Sender: TObject);
-    procedure MainPageControlChange(Sender: TObject);
-    procedure Memo_TagsChange(Sender: TObject);
+    procedure TagsHasChanged(newIdx: Integer; hasChanged: Boolean = True);
     procedure Btn_GetTagsLastFMClick(Sender: TObject);
     procedure BtnSynchRatingID3Click(Sender: TObject);
     procedure lv_VorbisCommentsClick(Sender: TObject);
     procedure Edt_VorbisChange(Sender: TObject);
+    procedure btn_AddTagClick(Sender: TObject);
+    procedure Btn_RenameTagClick(Sender: TObject);
+    procedure Btn_RemoveTagClick(Sender: TObject);
+    procedure lb_TagsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure lb_TagsDblClick(Sender: TObject);
+    procedure Btn_TagCloudEditorClick(Sender: TObject);
+    //procedure pm_AddIgnoreRuleClick(Sender: TObject);
+    //procedure pm_AddRenameRuleClick(Sender: TObject);
 
   private
     Coverpfade : TStringList;
@@ -404,7 +411,7 @@ var
 implementation
 
 Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
-    AudioFileHelper;
+    AudioFileHelper, CloudEditor;
 
 {$R *.dfm}
 
@@ -467,12 +474,9 @@ end;
 
 procedure TFDetails.FormShow(Sender: TObject);
 begin
-    MainPageControl.OnChange := Nil;
     MainPageControl.ActivePageIndex := 0;
     MainPageControl.ActivePage := Tab_General;
     refresh;
-
-    MainPageControl.OnChange := MainPageControlChange;
 end;
 
 procedure TFDetails.FormHide(Sender: TObject);
@@ -658,14 +662,26 @@ end;
 }
 procedure TFDetails.Btn_ExploreClick(Sender: TObject);
 begin
-  if DirectoryExists(ExtractFilePath(CurrentAudioFile.pfad)) then
+  if DirectoryExists(CurrentAudioFile.Ordner) then
         ShellExecute(Handle, 'open' ,'explorer.exe'
-        , Pchar('/e,/select,"\'+CurrentAudioFile.Pfad+'"'), '', sw_ShowNormal);
+        , Pchar('/e,/select,"'+CurrentAudioFile.Pfad+'"'), '', sw_ShowNormal);
+
+
+    //datei_ordner := Data^.FAudioFile.Ordner;
+
+    // showmessage('/e,/select,"'+Data^.FAudioFile.Pfad+'"');
+    //if DirectoryExists(datei_ordner) then
+     //   ShellExecute(Handle, 'open' ,'explorer.exe'
+     //                 , PChar('/e,/select,"'+Data^.FAudioFile.Pfad+'"'), '', sw_ShowNormal);
+
+
 end;
 procedure TFDetails.Btn_PropertiesClick(Sender: TObject);
 begin
   ShowFileProperties(Nemp_MainForm.Handle, pChar(CurrentAudioFile.Pfad),'');
 end;
+
+
 procedure TFDetails.Btn_ActualizeClick(Sender: TObject);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
@@ -712,6 +728,109 @@ begin
         CorrectVCLAfterAudioFileEdit(CurrentAudioFile);
     end else
         TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+end;
+
+procedure TFDetails.btn_AddTagClick(Sender: TObject);
+var newTagDummy: String;
+    IgnoreWarningsDummy: Boolean;
+begin
+    if HandleSingleFileTagChange(CurrentAudioFile, '', newTagDummy, IgnoreWarningsDummy) then
+        TagsHasChanged(lb_Tags.Items.Count-1,  True);
+end;
+
+procedure TFDetails.Btn_RemoveTagClick(Sender: TObject);
+var CurrentTagToChange: String;
+    CurrentIdx: Integer;
+begin
+    CurrentIdx := lb_Tags.ItemIndex;
+    if (MedienBib.StatusBibUpdate <= 1)
+        and assigned(CurrentAudioFile)
+        and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad)
+        and (CurrentIdx >= 0)
+    then
+    begin
+        CurrentTagToChange := lb_Tags.Items[CurrentIdx];
+        if CurrentAudioFile.RemoveTag(CurrentTagToChange) then
+            TagsHasChanged(CurrentIdx, True);
+    end;
+end;
+
+procedure TFDetails.Btn_RenameTagClick(Sender: TObject);
+var newTagDummy, CurrentTagToChange: String;
+    IgnoreWarningsDummy: Boolean;
+    CurrentIdx: Integer;
+begin
+    CurrentIdx := lb_Tags.ItemIndex;
+    if (MedienBib.StatusBibUpdate <= 1)
+        and assigned(CurrentAudioFile)
+        and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad)
+        and (CurrentIdx >= 0)
+    then
+    begin
+        CurrentTagToChange := lb_Tags.Items[CurrentIdx];
+        if HandleSingleFileTagChange(CurrentAudioFile, CurrentTagToChange, newTagDummy, IgnoreWarningsDummy) then
+            TagsHasChanged(lb_Tags.Count - 1, true);
+    end;
+end;
+
+procedure TFDetails.Btn_TagCloudEditorClick(Sender: TObject);
+begin
+    if MedienBib.BrowseMode <> 2 then
+        MedienBib.ReBuildTagCloud;
+
+    if not assigned(CloudEditorForm) then
+        Application.CreateForm(TCloudEditorForm, CloudEditorForm);
+    CloudEditorForm.Show;
+end;
+
+
+{
+// DO NOT add "change rules" in Details-Dialog
+// Reason: adding rules will change files immediately. Other changes in ths dialog will
+// occur only after the user clicks "apply"
+procedure TFDetails.pm_AddIgnoreRuleClick(Sender: TObject);
+begin
+    // exit;
+end;
+
+procedure TFDetails.pm_AddRenameRuleClick(Sender: TObject);
+begin
+    // exit;
+end;
+}
+
+procedure TFDetails.lb_TagsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var newTagDummy, CurrentTagToChange: String;
+    IgnoreWarningsDummy: Boolean;
+    currentIdx: Integer;
+begin
+    {
+    currentIdx := lb_Tags.ItemIndex;
+
+    if (MedienBib.StatusBibUpdate <= 1)
+        and (currentIdx >= 0)
+        and assigned(CurrentAudioFile)
+        and (MedienBib.CurrentThreadFilename <> CurrentAudioFile.Pfad) then
+
+    begin
+          case key of
+              vk_F2: begin
+                      CurrentTagToChange := lb_Tags.Items[lb_Tags.ItemIndex];
+                      if HandleSingleFileTagChange(CurrentAudioFile, CurrentTagToChange, newTagDummy, IgnoreWarningsDummy) then
+                          TagsHasChanged(currentIdx, True);
+              end;
+
+              VK_DELETE: begin
+                  CurrentTagToChange := lb_Tags.Items[lb_Tags.ItemIndex];
+                  if CurrentAudioFile.RemoveTag(CurrentTagToChange) then
+                      TagsHasChanged(currentIdx, True);
+              end;
+
+              //was zum einfügen?
+          end;
+    end;
+    }
 end;
 
 {
@@ -1176,6 +1295,14 @@ begin
     ID3v2HasChanged := True;
   end;
 end;
+
+procedure TFDetails.lb_TagsDblClick(Sender: TObject);
+begin
+    if lb_Tags.ItemIndex > 0 then
+        MedienBib.GlobalQuickTagSearch(lb_Tags.Items[lb_Tags.ItemIndex]);
+end;
+
+
 
 {
     --------------------------------------------------------
@@ -1852,7 +1979,7 @@ procedure TFDetails.ShowAdditionalTags;
 var TagStream: TMemoryStream;
     localtags: UTF8String;
 begin
-    Memo_Tags.ReadOnly := (CurrentAudioFile = NIL) or (not FileExists(CurrentAudioFile.Pfad));
+    lb_Tags.Enabled := assigned(CurrentAudioFile) AND (FileExists(CurrentAudioFile.Pfad));
 
     if assigned(CurrentTagObject) then
     begin
@@ -1872,20 +1999,29 @@ begin
                         finally
                             TagStream.Free;
                         end;
-                        Memo_Tags.Text := String(localtags);
                     end;
-            at_Ogg: Memo_Tags.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
-            at_Flac: Memo_Tags.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES);
-            at_M4A: Memo_Tags.Text := CurrentTagObject.M4aFile.Keywords;
+            at_Ogg: localtags := UTF8String(CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
+            at_Flac: localtags := UTF8String(CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
+            at_M4A: localtags := UTF8String(CurrentTagObject.M4aFile.Keywords);
             at_Monkey,
             at_WavPack,
             at_MusePack,
             at_OptimFrog,
-            at_TrueAudio: Memo_Tags.Text := CurrentTagObject.BaseApeFile.GetValueByKey(APE_CATEGORIES);
+            at_TrueAudio: localtags := UTF8String(CurrentTagObject.BaseApeFile.GetValueByKey(APE_CATEGORIES));
             at_Invalid,
             at_Wma,
-            at_Wav: Memo_Tags.Text := '';
+            at_Wav: lb_Tags.Items.Text := '';
         end;
+
+        lb_Tags.Items.Text := String(localtags);
+        // in addition: Assign these tags from the File-Metadate to the
+        // CurrentAudioFile-Object (the file in the medialibrary/playlist)
+        // unsaved changes done to these tags (meddienbib-tags <> file-tags)
+        // will be lost then. Just as the warning said, as you closed Nemp without
+        // writing the change metadata (e.g. after adding ignore/rename rules) back into the files
+        CurrentAudioFile.RawTagLastFM := localTags;
+        // reason: The extendede tag-managament runs on TNempAudioFile(= currentAudioFile), not on TGeneralaudiofile (= CurrentTagObject)
+
     end;
 
     // else   ???  28.03.2012 Does this make any sense ???
@@ -2238,13 +2374,9 @@ begin
       end;
   end;
 
-  MainPageControl.OnChange := MainPageControlChange;
-
   // Medien-Bib-Infos
   UpdateMediaBibEnabledStatus;
   ShowMediaBibDetails;
-
-
 
   // MPEG INFOS
   if validMP3File then
@@ -2370,7 +2502,7 @@ begin
           CurrentBibCounter := CurrentTagCounter;
       end;
 
-      s := Utf8String(Trim(Memo_Tags.Text));
+      s := Utf8String(Trim(lb_Tags.Items.Text));
       if length(s) > 0 then
       begin
           ms := TMemoryStream.Create;
@@ -2419,7 +2551,7 @@ begin
             CurrentBibRating  := CurrentTagRating;
             CurrentBibCounter := CurrentTagCounter;
         end;
-        ogg.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
+        ogg.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
 
         result := ogg.WriteToFile(CurrentAudioFile.Pfad);
     end else
@@ -2452,7 +2584,7 @@ begin
             CurrentBibRating  := CurrentTagRating;
             CurrentBibCounter := CurrentTagCounter;
         end;
-        Flac.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(Memo_Tags.Text));
+        Flac.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
 
         result := Flac.WriteToFile(CurrentAudioFile.Pfad);
     end else
@@ -2487,7 +2619,7 @@ begin
             CurrentBibRating  := CurrentTagRating;
             CurrentBibCounter := CurrentTagCounter;
         end;
-        m4a.Keywords := Trim(Memo_Tags.Text);
+        m4a.Keywords := Trim(lb_Tags.Items.Text);
 
         result := m4a.WriteToFile(CurrentAudioFile.Pfad);
     end else
@@ -2521,7 +2653,7 @@ begin
             CurrentBibRating  := CurrentTagRating;
             CurrentBibCounter := CurrentTagCounter;
         end;
-        ape.SetValueByKey(APE_CATEGORIES, Trim(Memo_Tags.Text));
+        ape.SetValueByKey(APE_CATEGORIES, Trim(lb_Tags.Items.Text));
 
         result := ape.WriteToFile(CurrentAudioFile.Pfad);
     end else
@@ -2724,57 +2856,17 @@ begin
     end;
 end;
 
-procedure TFDetails.MainPageControlChange(Sender: TObject);
-begin
-    if (MainPageControl.ActivePage = Tab_MoreTags)
-    and (lvExistingTags.Items.Count = 0)
-    then
-    begin
-        Btn_GetTagsClick(Nil);
-    end;
-end;
-
-
-procedure TFDetails.Btn_GetTagsClick(Sender: TObject);
-var tmp: TObjectList;
-    i: Integer;
-    aTag: TTag;
-    newItem: TListItem;
-begin
-    if MedienBib.BrowseMode <> 2 then
-        MedienBib.ReBuildTagCloud;
-
-    // clear ChecklistBox
-    lvExistingTags.Clear;
-
-    tmp := TObjectList.Create(False);
-    try
-        // Get Tags
-        MedienBib.GetTopTags(se_NumberOfTags.Value, 10, tmp, cb_HideAutoTags.Checked);
-        // Show Tags
-        for i := 0 to tmp.Count - 1 do
-        begin
-            aTag := TTag(tmp[i]);
-            newItem := lvExistingTags.Items.Add;
-            newItem.Caption := aTag.Key;
-            NewItem.SubItems.Add(IntToStr(aTag.TotalCount));
-            NewItem.Data := aTag;
-        end;
-    finally
-        tmp.Free;
-    end;
-end;
 
 procedure TFDetails.Btn_GetTagsLastFMClick(Sender: TObject);
 var s: String;
     af: TAudioFile;
     TagPostProcessor: TTagPostProcessor;
 begin
-    // use a temporary AudioFile here
+    // use a temporary AudioFile here     WHY ????? Because CurrentTagObject has no "Extended tags"
     af := TAudioFile.Create;
     try
         af.Assign(CurrentAudioFile);
-        af.RawTagLastFM := UTF8String(Trim(Memo_Tags.Text));
+        af.RawTagLastFM := UTF8String(Trim(lb_Tags.Items.Text));
 
         TagPostProcessor := TTagPostProcessor.Create;
         try
@@ -2784,9 +2876,10 @@ begin
                 TranslateMessageDLG(MediaLibrary_GetTagsFailed, mtInformation, [MBOK], 0)
             else
                 // process new Tags. Rename, delete ignored and duplicates.
-                af.RawTagLastFM := UTF8String(ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList));
+                MedienBib.AddNewTag(af, s, False);
+
             // Show tags of temporary file in teh memo
-            Memo_Tags.Text := String(af.RawTagLastFM);
+            lb_Tags.Items.Text := String(af.RawTagLastFM);
         finally
             TagPostProcessor.Free;
         end;
@@ -2795,45 +2888,34 @@ begin
     end;
 end;
 
-procedure TFDetails.lvExistingTagsClick(Sender: TObject);
-var clickedTag: String;
-    i: Integer;
-    okToAdd: Boolean;
+// extended tags has changed
+procedure TFDetails.TagsHasChanged(newIdx: Integer; hasChanged: Boolean = True);
 begin
-    if assigned(lvExistingTags.ItemFocused) then
-    begin
-        clickedTag := TTag(lvExistingTags.ItemFocused.Data).Key;
-        okToAdd := True;
-        for i := 0 to Memo_Tags.Lines.Count - 1 do
-            if AnsiSameText(Memo_Tags.Lines[i], clickedTag)  then
-                okToAdd := False;
+    if ValidMp3File then
+        ID3v2HasChanged := hasChanged;
+    if ValidOggFile or ValidflacFile then
+        VorbisCommentHasChanged := hasChanged;
+    if ValidApeFile then
+        ApeTagHasChanged := hasChanged;
+    if ValidM4aFile then
+        M4aTagHasChanged := hasChanged;
 
-        if okToAdd then
-        begin
-            Memo_Tags.Lines.Add(clickedTag);
-            if ValidMp3File then
-                ID3v2HasChanged := True;
-            if ValidOggFile or ValidflacFile then
-                VorbisCommentHasChanged := True;
-            if ValidApeFile then
-                ApeTagHasChanged := True;
-            if ValidM4AFile then
-                M4aTagHasChanged := True;
-        end;
+    // refresh tags in the view
+    if assigned(currentAudioFile) then
+    begin
+        lb_Tags.Items.Text := String(currentAudioFile.RawTagLastFM);
+
+        if newIdx < 0 then
+            newIdx := 0;
+        if newIdx >= lb_Tags.Count then
+            newIdx := lb_Tags.Count-1;
+
+        if (newIdx < lb_Tags.Count) and (newIdx >= 0) then
+            lb_Tags.Selected[newIdx] := True;
     end;
 end;
 
-procedure TFDetails.Memo_TagsChange(Sender: TObject);
-begin
-    if ValidMp3File then
-        ID3v2HasChanged := True;
-    if ValidOggFile or ValidflacFile then
-        VorbisCommentHasChanged := True;
-    if ValidApeFile then
-        ApeTagHasChanged := True;
-    if ValidM4aFile then
-        M4aTagHasChanged := True;
-end;
+
 
 {
     --------------------------------------------------------
@@ -2852,6 +2934,8 @@ begin
         end;
   end;
 end;
+
+
 
 procedure TFDetails.Memo_LyricsChange(Sender: TObject);
 begin

@@ -64,7 +64,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
-     DeleteHelper;
+     DeleteHelper, TagHelper;
 
 
 type
@@ -113,6 +113,10 @@ type
         AllPlaylistsNameSort: TObjectList;     // Same list, sorted by name for display
 
         fBackupCoverlist: TObjectList;  // Backup of the Coverlist, contains real Copies of the covers, not just pointers
+
+        fIgnoreListCopy: TStringList;
+        fMergeListCopy: TObjectList;
+
         // Status of the Library
         // Note: This is a legacy from older versions, e.g.
         //       No-ID3-Editing on status 1 is due to GetLyrics, where Tags are also
@@ -232,7 +236,8 @@ type
         // Refreshing Library
         procedure fRefreshFiles;      // 1a. Refresh files OR
         procedure fGetLyrics;         // 1b. get Lyrics
-        procedure fGetTags;           // 1c. get Tags (from LastFM)
+        procedure fPrepareGetTags;    // 1c. get tags, but at first make a copy of the Ignore/rename-Rules in VCL-Thread
+        procedure fGetTags;           //     get Tags (from LastFM)
         procedure fUpdateId3tags;     // 2.  Write Library-Data into the id3-Tags (used in CloudEditor)
         procedure fBugFixID3Tags;     // BugFix-Method
 
@@ -416,6 +421,16 @@ type
         NewCoverFlow: TNempCoverFlow;
 
         TagCloud: TTagCloud;
+        TagPostProcessor: TTagPostProcessor;
+        AskForAutoResolveInconsistencies: Boolean;
+        ShowAutoResolveInconsistenciesHints: Boolean;
+        AutoResolveInconsistencies: Boolean;
+
+        AskForAutoResolveInconsistenciesRules: Boolean;
+        AutoResolveInconsistenciesRules: Boolean;
+        //ShowAutoResolveInconsistenciesHints: Boolean;
+
+
         // BibScrobbler: Link to Player.NempScrobbler
         BibScrobbler: TNempScrobbler;
 
@@ -482,9 +497,13 @@ type
         // set fBrowseListsNeedUpdate to true
         procedure HandleChangedCoverID;
 
+        // even more stuff for file managing: Additional Tags
+        function AddNewTagConsistencyCheck(aAudioFile: TAudioFile; newTag: String): TTagConsistencyError;
+        function AddNewTag(aAudioFile: TAudioFile; newTag: String; IgnoreWarnings: Boolean; Threaded: Boolean = False): TTagError;
+        //procedure RemoveTag(aAudioFile: TAudioFile; oldTag: String);
+
         // Not needed any longer
         // function RestoreSortOrderAfterItemChanged(aAudioFile: tAudioFile): Boolean;
-
 
         // Check, whether AudioFiles already exists in the library.
         function AudioFileExists(aFilename: UnicodeString): Boolean;
@@ -547,9 +566,12 @@ type
         // a. Quicksearch
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
         procedure IPCSearch(Keyword: UnicodeString);
+        // special case: Searching for a Tag
+        procedure GlobalQuickTagSearch(KeyTag: UnicodeString);
 
         // b. detailed search
         procedure CompleteSearch(Keywords: TSearchKeyWords);
+        procedure CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
         // c. get all files from the library in the same directory
         procedure GetFilesInDir(aDirectory: UnicodeString);
         // d. Special case: Search for Empty Strings
@@ -594,7 +616,8 @@ type
         function CountInconsistentFiles: Integer;      // Count "ID3TagNeedsUpdate"-AudioFiles
         procedure PutInconsistentFilesToUpdateList;    // Put these files into the updatelist
         procedure PutAllFilesToUpdateList;    // Put these files into the updatelist
-
+        function ChangeTags(oldTag, newTag: String): Integer;
+        function CountFilesWithTag(aTag: String): Integer;
 
         procedure PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
         procedure ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
@@ -623,7 +646,7 @@ type
 
 implementation
 
-uses fspTaskBarMgr, TagHelper;
+uses fspTaskBarMgr;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -672,6 +695,10 @@ begin
   fBackupCoverlist := TObjectList.Create; // Destroy Objects when clearing this list
   tmpCoverlist := tObjectList.create(False);
 
+  fIgnoreListCopy := TStringList.Create;
+  fMergeListCopy := TObjectList.Create;
+
+
   Alben        := TObjectlist.create(False);
   AnzeigeListe := TObjectlist.create(False);
   AnzeigeListe2 := TObjectlist.create(False);
@@ -718,13 +745,18 @@ begin
   NewCoverFlow := TNempCoverFlow.Create;// (CFHandle, aWnd);
 
   TagCloud := TTagCloud.Create;
+  TagPostProcessor := TTagPostProcessor.Create; // Data files are loaded automatically
+
 end;
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
   //NewCoverFlow.Clear;
   NewCoverFlow.free;
+  fIgnoreListCopy.Free;
+  fMergeListCopy.Free;
 
+  TagPostProcessor.Free;
   TagCloud.Free;
 
   for i := 0 to Mp3ListePfadSort.Count - 1 do
@@ -937,6 +969,31 @@ begin
         UpdateList.Add(MP3ListePfadSort[i]);
 end;
 
+
+function TMedienBibliothek.ChangeTags(oldTag, newTag: String): Integer;
+var i, c: Integer;
+begin
+    result := 0;
+    if StatusBibUpdate >= 2 then exit;
+    c := 0;
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+        if TAudioFile(Mp3ListePfadSort[i]).ChangeTag(oldTag, newTag) then
+            inc(c);
+    result := c;
+end;
+
+function TMedienBibliothek.CountFilesWithTag(aTag: String): Integer;
+var i, c: Integer;
+begin
+    result := 0;
+    if StatusBibUpdate >= 2 then exit;
+    c := 0;
+    for i := 0 to Mp3ListePfadSort.Count - 1 do
+        if TAudioFile(Mp3ListePfadSort[i]).ContainsTag(aTag) then
+            inc(c);
+    result := c;
+end;
+
 {
     --------------------------------------------------------
     Setter/Getter for some properties.
@@ -1118,6 +1175,14 @@ begin
         AskForAutoAddNewDirs  := Ini.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
         AutoAddNewDirs        := Ini.ReadBool('MedienBib', 'AutoAddNewDirs', True);
 
+        AutoResolveInconsistencies          := Ini.ReadBool('MedienBib', 'AutoResolveInconsistencies'      , True);
+        AskForAutoResolveInconsistencies    := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistencies', True);
+        ShowAutoResolveInconsistenciesHints := Ini.ReadBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', True);
+
+        AskForAutoResolveInconsistenciesRules := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistenciesRules', True);
+        AutoResolveInconsistenciesRules       := Ini.ReadBool('MedienBib', 'AutoResolveInconsistenciesRules'      , True);
+
+
         dircount := Ini.ReadInteger('MedienBib', 'dircount', 0);
         for i := 1 to dircount do
         begin
@@ -1194,6 +1259,12 @@ begin
         Ini.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);
         Ini.WriteBool('MedienBib', 'AutoAddNewDirs', AutoAddNewDirs);
         Ini.WriteBool('MedienBib', 'AutoActivateWebServer', AutoActivateWebServer);
+
+        Ini.WriteBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', ShowAutoResolveInconsistenciesHints);
+        Ini.WriteBool('MedienBib', 'AskForAutoResolveInconsistencies', AskForAutoResolveInconsistencies);
+        Ini.WriteBool('MedienBib', 'AutoResolveInconsistencies'      , AutoResolveInconsistencies);
+        Ini.WriteBool('MedienBib', 'AskForAutoResolveInconsistenciesRules' , AskForAutoResolveInconsistenciesRules);
+        Ini.WriteBool('MedienBib', 'AutoResolveInconsistenciesRules'       , AutoResolveInconsistenciesRules);
 
         ini.WriteInteger('MedienBib', 'BrowseMode', fBrowseMode);
         ini.WriteInteger('MedienBib', 'CoverSortOrder', fCoverSortOrder);
@@ -2336,7 +2407,28 @@ begin
     // But, to be sure:
     StatusBibUpdate := 1;
     UpdateFortsetzen := True;
+    // copy the Ignore- and Rename-Lists to make them thread-safe
+    fPrepareGetTags;
+    // start the thread
     fHND_GetTagsThread := BeginThread(Nil, 0, @fGetTagsThread, Self, 0, Dummy);
+end;
+
+procedure TMedienBibliothek.fPrepareGetTags;
+var i: Integer;
+    aTagMergeItem: TTagMergeItem;
+begin
+    fIgnoreListCopy.Clear;
+    fMergeListCopy.Clear;
+    for i := 0 to TagPostProcessor.IgnoreList.Count - 1 do
+        fIgnoreListCopy.Add(TagPostProcessor.IgnoreList[i]);
+
+    for i := 0 to TagPostProcessor.MergeList.Count-1 do
+    begin
+        aTagMergeItem := TTagMergeItem.Create(
+            TTagMergeItem(TagPostProcessor.MergeList[i]).OriginalKey,
+            TTagMergeItem(TagPostProcessor.MergeList[i]).ReplaceKey);
+        fMergeListCopy.Add(aTagMergeItem);
+    end;
 end;
 {
     --------------------------------------------------------
@@ -2366,7 +2458,7 @@ var i: Integer;
     done, failed: Integer;
     af: TAudioFile;
     s, backup: String;
-    TagPostProcessor: TTagPostProcessor;
+    //TagPostProcessor: TTagPostProcessor;
     aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
@@ -2377,79 +2469,80 @@ begin
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
-    TagPostProcessor := TTagPostProcessor.Create;
-    try
-        TagPostProcessor.LoadFiles;
-        for i := 0 to UpdateList.Count - 1 do
+    for i := 0 to UpdateList.Count - 1 do
+    begin
+        if not UpdateFortsetzen then break;
+
+        af := TAudioFile(UpdateList[i]);
+
+        if FileExists(af.Pfad)
+                AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
+                (
+                    af.HasSupportedTagFormat
+                //   (AnsiLowercase(af.Extension) = 'mp3')
+                //or (AnsiLowercase(af.Extension) = 'ogg')
+                //or (AnsiLowercase(af.Extension) = 'flac')
+                )
+        then
         begin
-            if not UpdateFortsetzen then break;
+            // call the vcl, that we will edit this file now
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
+                        Integer(PWideChar(af.Pfad)));
 
-            af := TAudioFile(UpdateList[i]);
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
+                        Integer(PWideChar(Format(_(MediaLibrary_SearchTagsStats), [done, done + failed]))));
 
-            if FileExists(af.Pfad)
-                    AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
-                    (
-                        af.HasSupportedTagFormat
-                    //   (AnsiLowercase(af.Extension) = 'mp3')
-                    //or (AnsiLowercase(af.Extension) = 'ogg')
-                    //or (AnsiLowercase(af.Extension) = 'flac')
-                    )
-            then
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
+            af.FileIsPresent:=True;
+
+            // GetTags will create the IDHttp-Object
+            s := BibScrobbler.GetTags(af);
+            // 08.2017: s is a comma-separated list of tags now
+
+            // bei einer exception ganz abbrechen??
+            // nein, manchmal kommen ja auch BadRequests...???
+
+            if trim(s) = '' then
             begin
-                // call the vcl, that we will edit this file now
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                            Integer(PWideChar(af.Pfad)));
-
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
-                            Integer(PWideChar(Format(_(MediaLibrary_SearchTagsStats), [done, done + failed]))));
-
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
-                af.FileIsPresent:=True;
-
-                // GetTags will create the IDHttp-Object
-                s := BibScrobbler.GetTags(af);
-
-                // bei einer exception ganz abbrechen??
-                // nein, manchmal kommen ja auch BadRequests...???
-
-                if trim(s) = '' then
-                begin
-                    inc(failed);
-                end else
-                begin
-                    backup := String(af.RawTagLastFM);
-                    // process new Tags. Rename, delete ignored and duplicates.
-                    af.RawTagLastFM := Utf8String(ControlRawTag(af, s, TagPostProcessor.IgnoreList, TagPostProcessor.MergeList));
-                    aErr := af.SetAudioData(True);
-                            // SetAudioData(True) : Check before entering this thread, whether this operation
-                            //                      is allowed. If NOT: Do not enter this thread at all!
-                    if aErr = AUDIOERR_None then
-                    begin
-                        Changed := True;
-                        inc(done);
-                    end
-                    else
-                    begin
-                        inc(failed);
-                        ErrorOcurred := True;
-                        // FehlerMessage senden
-                        ErrorLog := TErrorLog.create(afa_TagSearch, af, aErr, false);
-                        try
-                            SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
-                        finally
-                            ErrorLog.Free;
-                        end;
-                    end;
-                end;
+                inc(failed);
             end else
             begin
-                if Not FileExists(af.Pfad) then
-                    af.FileIsPresent:=False;
-                inc(failed);
+                backup := String(af.RawTagLastFM);
+                // process new Tags. Rename, delete ignored and duplicates.
+
+                // change to medienbib.addnewtag (THREADED)
+                // param false: do not ignore warnings but resolve inconsistencies
+                // param true: use therad-safe copies of rule-lists
+                AddNewTag(af, s, False, True);
+                //af.RawTagLastFM := Utf8String(ControlRawTag(af, s, fIgnoreListCopy, fMergeListCopy));
+
+                aErr := af.SetAudioData(True);
+                        // SetAudioData(True) : Check before entering this thread, whether this operation
+                        //                      is allowed. If NOT: Do not enter this thread at all!
+                if aErr = AUDIOERR_None then
+                begin
+                    Changed := True;
+                    inc(done);
+                end
+                else
+                begin
+                    inc(failed);
+                    ErrorOcurred := True;
+                    // FehlerMessage senden
+                    ErrorLog := TErrorLog.create(afa_TagSearch, af, aErr, false);
+                    try
+                        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                    finally
+                        ErrorLog.Free;
+                    end;
+                end;
             end;
+        end else
+        begin
+            if Not FileExists(af.Pfad) then
+                af.FileIsPresent:=False;
+            inc(failed);
         end;
-    finally
-        TagPostProcessor.Free;
     end;
 
     if done > 0 then
@@ -2521,6 +2614,7 @@ end;
 procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
 begin
     MB.fUpdateId3tags;
+
     // Note: CleanUpTmpLists and stuff is not necessary here.
     // We did not change the library, we "just" changed the ID3-Tags in some files
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
@@ -2583,8 +2677,11 @@ begin
     end;
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
-
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
+
+    if Updatefortsetzen then
+        // complete, show message
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ID3TagUpdateComplete, 0);
 
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
@@ -2781,6 +2878,10 @@ begin
 //     in the calling Method PM_ML_DeleteSelectedClick
 
   result := true;
+
+  if aAudioFile = CurrentAudioFile then
+      currentAudioFile := Nil;
+
   AnzeigeListe.Extract(aAudioFile);
   AnzeigeListe2.Extract(aAudioFile);
   if AnzeigeShowsPlaylistFiles then
@@ -2881,6 +2982,175 @@ procedure TMedienBibliothek.HandleChangedCoverID;
 begin
     fBrowseListsNeedUpdate := True;
 end;
+
+
+{
+    --------------------------------------------------------
+    Methods to add new Tags to an AudioFile with respect to the Ignore/Merge-Lists
+    --------------------------------------------------------
+}
+function TMedienBibliothek.AddNewTagConsistencyCheck(aAudioFile: TAudioFile; newTag: String): TTagConsistencyError;
+var currentTagList, newTagList: TStringlist;
+    i: Integer;
+    replaceTag: String;
+begin
+    result := CONSISTENCY_OK;
+    TagPostProcessor.LogList.Clear;
+
+    currentTagList := TStringlist.Create;
+    try
+        currentTagList.Text := String(aAudioFile.RawTagLastFM);
+        currentTagList.CaseSensitive := False;
+
+        newTagList := TStringlist.Create;
+        try
+              if CommasInString(NewTag) then
+                  // replace commas with linebreaks first
+                  NewTag := ReplaceCommasbyLinebreaks(Trim(NewTag));
+              // fill the Stringlist with the new Tags (probably only one)
+              newTagList.Text := Trim(NewTag);
+
+              for i := 0 to newTagList.Count-1 do
+              begin
+                  // duplicate in the list itself?
+                  if newTagList.IndexOf(newTagList[i]) < i then
+                  begin
+                      if result = CONSISTENCY_OK then
+                          result := CONSISTENCY_HINT; // Duplicate found, no user action required
+                      TagPostProcessor.LogList.Add(Format(TagManagement_TagDuplicateInput, [newTagList[i]]));
+                  end;
+                  // Does it already exist?
+                  if currentTagList.IndexOf(newTagList[i]) > -1 then
+                  begin
+                      if result = CONSISTENCY_OK then
+                          result := CONSISTENCY_HINT;  // Duplicate found, no user action required
+                      TagPostProcessor.LogList.Add(Format(TagManagement_TagAlreadyExists, [newTagList[i]]));
+                  end;
+                  // is it on the Igore list?
+                  if TagPostProcessor.IgnoreList.IndexOf(newTagList[i]) > -1 then
+                  begin
+                      result := CONSISTENCY_WARNING; // new Tag is on the Ignore List, User action required
+                      TagPostProcessor.LogList.Add(Format(TagManagement_TagIsOnIgnoreList, [newTagList[i]]));
+                  end;
+                  // is it on the Merge list?
+                  replaceTag := GetRenamedTag(newTagList[i], TagPostProcessor.MergeList);
+                  if replaceTag <> '' then
+                  begin
+                      result := CONSISTENCY_WARNING; // new tag is on the Merge list, User action required
+                      TagPostProcessor.LogList.Add(Format(TagManagement_TagIsOnRenameList, [newTagList[i], replaceTag]));
+                  end;
+              end;
+        finally
+            newTagList.Free;
+        end;
+    finally
+        currentTagList.Free;
+    end;
+end;
+
+
+function TMedienBibliothek.AddNewTag(aAudioFile: TAudioFile; newTag: String; IgnoreWarnings: Boolean; Threaded: Boolean = False): TTagError;
+var currentTagList, newTagList: TStringlist;
+    i: Integer;
+    replaceTag: String;
+    localIgnoreList: TStringList;
+    localMergeList: TObjectList;
+begin
+    currentTagList := TStringlist.Create;
+    try
+        currentTagList.Text := String(aAudioFile.RawTagLastFM);
+        currentTagList.CaseSensitive := False;
+
+        if Threaded then
+        begin
+            localIgnoreList := fIgnoreListCopy;
+            localMergeList  := fMergeListCopy;
+        end else
+        begin
+            localIgnoreList := TagPostProcessor.IgnoreList;
+            localMergeList  := TagPostProcessor.MergeList;
+        end;
+
+        newTagList := TStringlist.Create;
+        try
+              if CommasInString(NewTag) then
+                  // replace commas with linebreaks first
+                  NewTag := ReplaceCommasbyLinebreaks(Trim(NewTag));
+              // fill the Stringlist with the new Tags (probably only one)
+              newTagList.Text := Trim(NewTag);
+
+              // delete duplicate entries in the new taglist first
+              //for i := newTagList.Count-1 downto 0 do
+              //    if newTagList.IndexOf(newTagList[i]) < i then
+              //        newTagList.Delete(i);
+              // delete the entries the file is already tagged with
+              //for i := newTagList.Count-1 downto 0 do
+              //    if currentTagList.IndexOf(newTagList[i]) > -1 then
+              //        newTagList.Delete(i);
+
+              // process the tags
+              for i := newTagList.Count-1 downto 0 do
+              begin
+                  // is it on the Igore list?
+                  if (localIgnoreList.IndexOf(newTagList[i]) > -1) and (not IgnoreWarnings) then
+                      newTagList.Delete(i)
+                  else
+                  begin
+                      // is it on the Merge list?
+                      replaceTag := GetRenamedTag(newTagList[i], localMergeList);
+                      if (replaceTag <> '') and (not IgnoreWarnings) then
+                          newTagList[i] := replaceTag;
+                  end;
+              end;
+
+              // delete duplicate entries in the new taglist
+              for i := newTagList.Count-1 downto 0 do
+                  if newTagList.IndexOf(newTagList[i]) < i then
+                      newTagList.Delete(i);
+              // delete the entries the file is already tagged with
+              for i := newTagList.Count-1 downto 0 do
+                  if currentTagList.IndexOf(newTagList[i]) > -1 then
+                      newTagList.Delete(i);
+
+              // add the new tags to the current tags
+              newTag := Trim(newTagList.Text);
+              if newTag <> '' then
+              begin
+                  Changed := True;
+                  if aAudioFile.RawTagLastFM = '' then
+                      aAudioFile.RawTagLastFM := UTF8String(newTag)
+                  else
+                      aAudioFile.RawTagLastFM := trim(aAudioFile.RawTagLastFM) + #13#10 + UTF8String(newTag);
+              end;
+        finally
+            newTagList.Free;
+        end;
+    finally
+        currentTagList.Free;
+    end;
+end;
+
+{
+procedure TMedienBibliothek.RemoveTag(aAudioFile: TAudioFile; oldTag: String);
+var currentTagList: TStringlist;
+    idx: Integer;
+begin
+    currentTagList := TStringlist.Create;
+    try
+        currentTagList.Text := String(aAudioFile.RawTagLastFM);
+        currentTagList.CaseSensitive := False;
+
+        // get the index of oldTag and delete it
+        idx := currentTagList.IndexOf(oldTag);
+        if idx > -1 then
+            currentTaglist.Delete(idx);
+        // set RawTags again
+        aAudioFile.RawTagLastFM := UTF8String(Trim(currentTaglist.Text));
+        Changed := True;
+    finally
+        currenttagList.Free;
+    end;
+end;       }
 
 {
     --------------------------------------------------------
@@ -4214,12 +4484,28 @@ begin
     BibSearcher.CompleteSearch(KeyWords);
     LeaveCriticalSection(CSUpdate);
 end;
+procedure TMedienBibliothek.CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.CompleteSearchNoSubStrings(KeyWords);
+    LeaveCriticalSection(CSUpdate);
+end;
+
 
 procedure TMedienBibliothek.IPCSearch(Keyword: UnicodeString);
 begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
     BibSearcher.IPCQuickSearch(Keyword);
+    LeaveCriticalSection(CSUpdate);
+end;
+
+procedure TMedienBibliothek.GlobalQuickTagSearch(KeyTag: UnicodeString);
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.GlobalQuickTagSearch(KeyTag);
     LeaveCriticalSection(CSUpdate);
 end;
 

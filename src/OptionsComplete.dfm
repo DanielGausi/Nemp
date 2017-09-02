@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 550
-    ActivePage = TabPlayer4
+    ActivePage = TabFiles1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -254,13 +254,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 274
         Width = 431
-        Height = 55
+        Height = 53
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Advanced Skinning'
         TabOrder = 2
         object cbUseAdvancedSkin: TCheckBox
           Left = 16
-          Top = 24
+          Top = 20
           Width = 393
           Height = 17
           Caption = 'Use advanced skinning sytem (not recommended for Windows XP)'
@@ -1823,7 +1823,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cbCountRatingOnlyPlaylist: TCheckBox
           Left = 159
           Top = 229
-          Width = 147
+          Width = 258
           Height = 17
           Caption = 'Restrict counting to playlist'
           TabOrder = 12
@@ -1840,15 +1840,23 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 127
+        Height = 162
         Hint = 'Select the visible columns in the library.'
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Show the following columns in the medialist'
         TabOrder = 0
+        object cb_ShowCoverAndDetails: TCheckBox
+          Left = 16
+          Top = 128
+          Width = 225
+          Height = 17
+          Caption = 'Cover and additional details'
+          TabOrder = 0
+        end
       end
       object GrpBox_ViewMain_BrowseClassic: TGroupBox
         Left = 8
-        Top = 140
+        Top = 176
         Width = 431
         Height = 75
         Anchors = [akLeft, akTop, akRight]
@@ -1907,7 +1915,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_ViewMain_Sorting: TGroupBox
         Left = 8
-        Top = 334
+        Top = 370
         Width = 431
         Height = 66
         Anchors = [akLeft, akTop, akRight]
@@ -1935,7 +1943,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_ViewMain_BrowseCoverflow: TGroupBox
         Left = 8
-        Top = 221
+        Top = 257
         Width = 431
         Height = 107
         Anchors = [akLeft, akTop, akRight]
@@ -2003,59 +2011,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 17
           Caption = 'Hide cover with no tag-information'
           TabOrder = 2
-        end
-      end
-      object GrpBox_ViewVis_CoverDetails: TGroupBox
-        Left = 8
-        Top = 404
-        Width = 431
-        Height = 76
-        Anchors = [akLeft, akTop, akRight]
-        Caption = 'Cover and details about a selected file'
-        TabOrder = 4
-        object LblConst_CoverMode: TLabel
-          Left = 16
-          Top = 22
-          Width = 56
-          Height = 13
-          Hint = 'Display the cover and some other details in the library.'
-          Caption = 'Show cover'
-        end
-        object LblConst_DetailMode: TLabel
-          Left = 138
-          Top = 22
-          Width = 154
-          Height = 13
-          AutoSize = False
-          Caption = 'Show additional details'
-        end
-        object cbCoverMode: TComboBox
-          Left = 16
-          Top = 39
-          Width = 89
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 1
-          TabOrder = 0
-          Text = 'Left'
-          Items.Strings = (
-            'Disabled'
-            'Left'
-            'Right')
-        end
-        object cbDetailMode: TComboBox
-          Left = 138
-          Top = 41
-          Width = 106
-          Height = 21
-          Style = csDropDownList
-          ItemIndex = 1
-          TabOrder = 1
-          Text = 'Aside'
-          Items.Strings = (
-            'Disabled'
-            'Aside'
-            'Below')
         end
       end
     end
@@ -2788,35 +2743,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         450)
       object GrpBox_AutoRating: TGroupBox
         Left = 8
-        Top = 147
+        Top = 159
         Width = 431
-        Height = 228
+        Height = 130
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Automatic rating/playcounter of played audiofiles'
         TabOrder = 1
-        object StaticText1: TLabel
-          Left = 16
-          Top = 135
-          Width = 393
-          Height = 31
-          AutoSize = False
-          Caption = 
-            'A track is treated as "played", if more than 50% were played or ' +
-            'at least 4 minutes. '
-          WordWrap = True
-        end
-        object StaticText2: TLabel
-          Left = 16
-          Top = 165
-          Width = 393
-          Height = 52
-          AutoSize = False
-          Caption = 
-            'A track is treated as "aborted" if it is not "played" and the pl' +
-            'ayer is not stopped. So the rating will not be decreased when yo' +
-            'u press the stop button or close the player.'
-          WordWrap = True
-        end
         object cb_RatingActive: TCheckBox
           Left = 16
           Top = 20
@@ -2873,25 +2805,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 136
+        Height = 49
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Access to meta data (e.g. Id3-Tags)'
         TabOrder = 0
-        object Lbl_QuickMetadataHint: TLabel
-          Left = 37
-          Top = 43
-          Width = 380
-          Height = 80
-          AutoSize = False
-          Caption = 
-            'When editing file information in the main window, the data will ' +
-            'be saved in the metadata of the audio file. This applies to comm' +
-            'on information like artist and title, and to further data like l' +
-            'yrics, (automatic) rating and extended tags. If you don'#39't want y' +
-            'our files to be changed unintentionally (e.g. because of your ba' +
-            'ckup strategy), you should deny quick access. '
-          WordWrap = True
-        end
         object cb_AccessMetadata: TCheckBox
           Left = 16
           Top = 20
@@ -2903,9 +2820,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_CDAudio: TGroupBox
         Left = 8
-        Top = 379
-        Width = 434
-        Height = 52
+        Top = 295
+        Width = 431
+        Height = 50
         Caption = 'CD-Audio'
         TabOrder = 2
         object cb_UseCDDB: TCheckBox
@@ -2918,10 +2835,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
       end
       object GrpBox_TabMedia5_ID3: TGroupBox
-        Left = 11
-        Top = 433
+        Left = 8
+        Top = 351
         Width = 431
-        Height = 51
+        Height = 50
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Unicode'
         TabOrder = 3
@@ -2935,6 +2852,40 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'les with "unicode-filenames".'
           Caption = 'Auto-detect (probably) used charset'
           TabOrder = 0
+        end
+      end
+      object grpBox_AdditionalTags: TGroupBox
+        Left = 8
+        Top = 63
+        Width = 431
+        Height = 90
+        Caption = 'Extended tags (for tag cloud)'
+        TabOrder = 4
+        object cb_AutoResolveInconsistencies: TCheckBox
+          Left = 16
+          Top = 20
+          Width = 401
+          Height = 17
+          Caption = 'Automatically resolve inconsistencies when entering new tags'
+          TabOrder = 0
+        end
+        object cb_AskForAutoResolveInconsistencies: TCheckBox
+          Left = 33
+          Top = 43
+          Width = 384
+          Height = 17
+          Caption = 'If not: Show query dialog when inconsistencies occur'
+          TabOrder = 1
+        end
+        object cb_ShowAutoResolveInconsistenciesHints: TCheckBox
+          Left = 33
+          Top = 63
+          Width = 384
+          Height = 17
+          Caption = 
+            'If not: Show information dialog when minor inconsistencies occur' +
+            ' '
+          TabOrder = 2
         end
       end
     end
@@ -3635,13 +3586,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 161
+        Height = 170
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Extended audio settings'
         TabOrder = 0
         object LblConst_Buffersize: TLabel
-          Left = 8
-          Top = 16
+          Left = 16
+          Top = 20
           Width = 121
           Height = 13
           Hint = 'Increase this value, if the playback stutters sometimes.'
@@ -3649,16 +3600,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Buffer size'
         end
         object LblConst_ms: TLabel
-          Left = 72
-          Top = 36
+          Left = 80
+          Top = 40
           Width = 13
           Height = 13
           Hint = 'Increase this value, if the playback stutters sometimes.'
           Caption = 'ms'
         end
         object LblConst_UseFloatingPoint: TLabel
-          Left = 8
-          Top = 64
+          Left = 16
+          Top = 68
           Width = 121
           Height = 13
           Hint = 'Try to change this, if the playback is distorted.'
@@ -3666,8 +3617,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Floating-point channels'
         end
         object LblConst_Mixing: TLabel
-          Left = 8
-          Top = 112
+          Left = 16
+          Top = 116
           Width = 121
           Height = 13
           Hint = 'Try to change this, if the playback is distorted.'
@@ -3675,16 +3626,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Mixing'
         end
         object Lbl_FloatingPoints_Status: TLabel
-          Left = 160
-          Top = 84
+          Left = 168
+          Top = 88
           Width = 12
           Height = 13
           Hint = 'Try to change this, if the playback is distorted.'
           Caption = '...'
         end
         object SEBufferSize: TSpinEdit
-          Left = 8
-          Top = 32
+          Left = 16
+          Top = 36
           Width = 57
           Height = 22
           Hint = 'Increase this value, if the playback stutters sometimes.'
@@ -3695,8 +3646,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Value = 500
         end
         object CB_FloatingPoint: TComboBox
-          Left = 8
-          Top = 80
+          Left = 16
+          Top = 84
           Width = 145
           Height = 21
           Hint = 'Try to change this, if the playback is distorted.'
@@ -3710,8 +3661,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             'On')
         end
         object CB_Mixing: TComboBox
-          Left = 8
-          Top = 128
+          Left = 16
+          Top = 132
           Width = 145
           Height = 21
           Hint = 'Try to change this, if the playback is distorted.'
@@ -3726,17 +3677,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_PlayerExt_SafePlayback: TGroupBox
         Left = 8
-        Top = 171
+        Top = 184
         Width = 431
-        Height = 50
+        Height = 49
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Safe playback'
         TabOrder = 1
         DesignSize = (
           431
-          50)
+          49)
         object cb_SafePlayback: TCheckBox
-          Left = 8
+          Left = 16
           Top = 20
           Width = 409
           Height = 17
@@ -3756,16 +3707,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 97
+        Height = 106
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Behaviour of the playlist'
         TabOrder = 0
         DesignSize = (
           431
-          97)
+          106)
         object CB_AutoScanPlaylist: TCheckBox
-          Left = 8
-          Top = 16
+          Left = 16
+          Top = 20
           Width = 401
           Height = 17
           Hint = 
@@ -3776,8 +3727,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 0
         end
         object CB_JumpToNextCue: TCheckBox
-          Left = 8
-          Top = 34
+          Left = 16
+          Top = 38
           Width = 409
           Height = 17
           Hint = 'When clicking "next", jump to the next cuesheet (if available)'
@@ -3785,8 +3736,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
         end
         object CB_RememberInterruptedPlayPosition: TCheckBox
-          Left = 8
-          Top = 70
+          Left = 16
+          Top = 74
           Width = 409
           Height = 17
           Hint = 'Used in combination with "Just play focussed file"'
@@ -3796,8 +3747,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 3
         end
         object cb_ReplayCue: TCheckBox
-          Left = 8
-          Top = 52
+          Left = 16
+          Top = 56
           Width = 409
           Height = 17
           Hint = 
@@ -3809,7 +3760,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_HeadsetBehaviour: TGroupBox
         Left = 8
-        Top = 111
+        Top = 120
         Width = 431
         Height = 138
         Anchors = [akLeft, akTop, akRight]
@@ -3873,9 +3824,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_PlayerExt2_Playlist: TGroupBox
         Left = 7
-        Top = 255
+        Top = 264
         Width = 431
-        Height = 82
+        Height = 81
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Deleting and mixing'
         TabOrder = 2

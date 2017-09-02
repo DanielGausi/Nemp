@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs,
 
-  NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls
+  NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls, Vcl.Menus
   ;
 
 type
@@ -67,20 +67,25 @@ type
     TS_DeleteTags: TTabSheet;
     TS_MergedTags: TTabSheet;
     cbHideAutoTags: TCheckBox;
-    lblMinTagCount: TLabel;
-    seMinTagCount: TSpinEdit;
     TagVST: TVirtualStringTree;
-    BtnTagRename: TButton;
-    BtnMerge: TButton;
-    BtnDeleteTags: TButton;
-    cbAutoAddMergeTags: TCheckBox;
-    cbAutoAddIgnoreTags: TCheckBox;
     MergeTagVST: TVirtualStringTree;
     IgnoreTagVST: TVirtualStringTree;
     LblMergeTagHint: TLabel;
     BtnDeleteMergeTag: TButton;
-    LblDeleteTagHint: TLabel;
     BtnDeleteIgnoreTag: TButton;
+    BtnMerge: TButton;
+    BtnDeleteTags: TButton;
+    BtnJustRemoveTags: TButton;
+    lbl_ExistingTagsExplain: TLabel;
+    Lbl_IgnoreTagHint: TLabel;
+    PopupExistingTags: TPopupMenu;
+    PopupRenameRules: TPopupMenu;
+    PopupIgnoreRules: TPopupMenu;
+    pm_AddRenameRule: TMenuItem;
+    pm_AddIgnoreRule: TMenuItem;
+    pm_JustRemoveTags: TMenuItem;
+    pm_DeleteRenameRule: TMenuItem;
+    pm_DeleteIgnoreRule: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -93,14 +98,14 @@ type
       const TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       TextType: TVSTTextType);
     procedure cbHideAutoTagsClick(Sender: TObject);
-    procedure seMinTagCountChange(Sender: TObject);
+    procedure xxx___seMinTagCountChange(Sender: TObject);
     procedure TagVSTIncrementalSearch(Sender: TBaseVirtualTree;
       Node: PVirtualNode; const SearchText: string; var Result: Integer);
     procedure TagVSTKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure BtnTagRenameClick(Sender: TObject);
-    procedure BtnMergeClick(Sender: TObject);
+    procedure BtnJustRemoveTagsClick(Sender: TObject);
+    procedure BtnAddRenameRuleClick(Sender: TObject);
     procedure BtnUpdateID3TagsClick(Sender: TObject);
-    procedure BtnDeleteTagsClick(Sender: TObject);
+    procedure BtnAddIgnoreRuleClick(Sender: TObject);
     procedure TagVSTBeforeItemErase(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect;
       var ItemColor: TColor; var EraseAction: TItemEraseAction);
@@ -113,13 +118,13 @@ type
     procedure IgnoreTagVSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure MergeTagVSTHeaderClick(Sender: TVTHeader; HitInfo: TVTHeaderHitInfo);
-    procedure BtnDeleteIgnoreTagClick(Sender: TObject);
-    procedure BtnDeleteMergeTagClick(Sender: TObject);
+    procedure BtnDeleteIgnoreRuleClick(Sender: TObject);
+    procedure BtnDeleteRenameRuleClick(Sender: TObject);
   private
     { Private-Deklarationen }
     LocalTagList: TObjectList;
 
-    TagPostProcessor: TTagPostProcessor;
+    //TagPostProcessor: TTagPostProcessor;
 
     OldSelectionPrefix : String;
 
@@ -132,8 +137,7 @@ type
     procedure ReselectMergeNode(aOriginalKey, aReplaceKey: String);
 
     procedure ClearIgnoreTree;
-    procedure FillIgnoreTree(reselect: Boolean = False);
-    procedure FillMergeTree(reselect: Boolean = False);
+
 
     procedure SortMergetags;
 
@@ -142,8 +146,11 @@ type
   public
     { Public-Deklarationen }
     procedure ActualizeTreeView;      // get the tags from the cloud with current settings and show them in the tree
+    procedure FillIgnoreTree(reselect: Boolean = False);
+    procedure FillMergeTree(reselect: Boolean = False);
 
-    procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
+
+    //procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
   end;
 
 
@@ -205,37 +212,37 @@ begin
     MergeTagVST.NodeDataSize := SizeOf(TMergeTagData);
 
     LocalTagList := TObjectList.Create(False);
-    TagPostProcessor := TTagPostProcessor.Create;
 
     PC_Select.ActivePageIndex := 0;
+
+    lbl_ExistingTagsExplain.Caption := _(TagEditor_LabelExplainTagList);
+    LblMergeTagHint.Caption         := _(TagEditor_LabelExplainRenameList);
+    Lbl_IgnoreTagHint.Caption       := _(TagEditor_LabelExplainIgnoreList);
 end;
 
 procedure TCloudEditorForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
-var c: Integer;
+//var c: Integer;
 begin
-    c := MedienBib.CountInconsistentFiles;
-
-    if c > 0 then
-        CanClose := TranslateMessageDLG((MediaLibrary_InconsistentFilesWarning), mtWarning, [MBYes, MBNo], 0) = mrYes
-    else
+//    c := MedienBib.CountInconsistentFiles;
+//    if c > 0 then
+//        CanClose := TranslateMessageDLG((MediaLibrary_InconsistentFilesWarning), mtWarning, [MBYes, MBNo], 0) = mrYes
+//    else
         CanClose := True;
 end;
 procedure TCloudEditorForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-    TagPostProcessor.SaveFiles;
+    MedienBib.TagPostProcessor.SaveFiles;
 end;
 procedure TCloudEditorForm.FormDestroy(Sender: TObject);
 begin
     ClearIgnoreTree;
     LocalTagList.Free;
-    TagPostProcessor.Free;
 end;
 
 procedure TCloudEditorForm.FormShow(Sender: TObject);
 begin
     ActualizeTreeView;
-    TagPostProcessor.LoadFiles;
     FillMergeTree(False);
     FillIgnoreTree(False);
 end;
@@ -260,7 +267,7 @@ end;
 procedure TCloudEditorForm.ActualizeTreeView;
 begin
     // Get the tags from the TagCloud
-    MedienBib.TagCloud.CopyTags(LocalTagList, cbHideAutoTags.Checked, seMinTagCount.Value);
+    MedienBib.TagCloud.CopyTags(LocalTagList, cbHideAutoTags.Checked, 1); //seMinTagCount.Value);
     SortTags;
     // Fill the treeview
     FillTagTree;
@@ -330,13 +337,13 @@ procedure TCloudEditorForm.SortMergetags;
 begin
     if MergeTagVST.Header.SortDirection = sdDescending then
         case MergeTagVST.Header.SortColumn of
-            0: TagPostProcessor.MergeList.Sort(Sort_OriginalKey_DESC);
-            1: TagPostProcessor.MergeList.Sort(Sort_ReplaceKey_DESC);
+            0: MedienBib.TagPostProcessor.MergeList.Sort(Sort_OriginalKey_DESC);
+            1: MedienBib.TagPostProcessor.MergeList.Sort(Sort_ReplaceKey_DESC);
         end
     else
         case MergeTagVST.Header.SortColumn of
-            0: TagPostProcessor.MergeList.Sort(Sort_OriginalKey);
-            1: TagPostProcessor.MergeList.Sort(Sort_ReplaceKey);
+            0: MedienBib.TagPostProcessor.MergeList.Sort(Sort_OriginalKey);
+            1: MedienBib.TagPostProcessor.MergeList.Sort(Sort_ReplaceKey);
         end;
 end;
 
@@ -402,8 +409,8 @@ begin
     IgnoreTagVST.BeginUpdate;
     ClearIgnoreTree;
 
-    for i:=0 to TagPostProcessor.IgnoreList.Count-1 do
-        AddVSTIgnoreTag(IgnoreTagVST, Nil, TagPostProcessor.IgnoreList[i]);
+    for i:=0 to MedienBib.TagPostProcessor.IgnoreList.Count-1 do
+        AddVSTIgnoreTag(IgnoreTagVST, Nil, MedienBib.TagPostProcessor.IgnoreList[i]);
     IgnoreTagVST.EndUpdate;
 
     if Reselect then
@@ -448,8 +455,8 @@ begin
 
     MergeTagVST.BeginUpdate;
     MergeTagVST.Clear;
-    for i:=0 to TagPostProcessor.MergeList.Count-1 do
-        AddVSTMergeTag(MergeTagVST, Nil, TTagMergeItem(TagPostProcessor.MergeList[i]));
+    for i:=0 to MedienBib.TagPostProcessor.MergeList.Count-1 do
+        AddVSTMergeTag(MergeTagVST, Nil, TTagMergeItem(MedienBib.TagPostProcessor.MergeList[i]));
     MergeTagVST.EndUpdate;
 
     if Reselect then
@@ -457,6 +464,7 @@ begin
 end;
 
 
+{
 procedure TCloudEditorForm.RefreshWarningLabel;
 var c: Integer;
 begin
@@ -465,6 +473,7 @@ begin
     LblUpdateWarning.Visible := c > 0;
     BtnUpdateID3Tags.Enabled := c > 0;
 end;
+}
 
 
 {
@@ -478,7 +487,7 @@ procedure TCloudEditorForm.cbHideAutoTagsClick(Sender: TObject);
 begin
     ActualizeTreeView;
 end;
-procedure TCloudEditorForm.seMinTagCountChange(Sender: TObject);
+procedure TCloudEditorForm.xxx___seMinTagCountChange(Sender: TObject);
 begin
     ActualizeTreeView;
 end;
@@ -498,8 +507,9 @@ begin
     if assigned(aNode) then
     begin
         Data := TagVST.GetNodeData(aNode);
-        if assigned(Data) then
-            MedienBib.GenerateAnzeigeListeFromTagCloud(Data^.FTag, False);
+        MedienBib.GlobalQuickTagSearch(Data.FTag.Key);
+        //if assigned(Data) then
+        //    MedienBib.GenerateAnzeigeListeFromTagCloud(Data^.FTag, False);
     end;
 end;
 
@@ -519,7 +529,7 @@ begin
     begin
         case Column of
           0: CellText := Data^.FTag.Key;
-          1: CellText := IntToStr(Data^.FTag.count);
+          1: CellText := IntToStr(Data^.FTag.totalCount);
         end;
     end;
 end;
@@ -744,32 +754,41 @@ end;
     - Rename the focussed Tag
     --------------------------------------------------------
 }
-procedure TCloudEditorForm.BtnTagRenameClick(Sender: TObject);
-var newKey: String;
+procedure TCloudEditorForm.BtnJustRemoveTagsClick(Sender: TObject);
+var CurrentTagToChange: String;
     Data: PTagTreeData;
+    SelectedTags: TNodeArray;
+    i: Integer;
 begin
+    if TagVST.SelectedCount = 0 then
+    begin
+        TranslateMessageDLG(TagEditor_SelectTagRemoveHint, mtInformation, [mbOK], 0);
+        exit;
+    end;
     if MedienBib.StatusBibUpdate > 1 then
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
     else
-        if assigned(TagVST.FocusedNode) then
-        begin
-            Data := TagVST.GetNodeData(TagVST.FocusedNode);
+    begin
+        SelectedTags := TagVST.GetSortedSelection(False);
 
-            newKey := Data^.FTag.Key;
-            if InputQuery(TagEditor_RenameTag_Caption, TagEditor_RenameTag_Prompt, newKey) then
+        if MessageDLG((TagEditor_Delete_Query), mtWarning, [MBYes, MBNo], 0) = mrYes then
+        begin
+            for i := 0 to length(SelectedTags) - 1 do
             begin
-                MedienBib.TagCloud.RenameTag(Data^.FTag, newKey);
-                if cbAutoAddMergeTags.Checked then
-                begin
-                    TagPostProcessor.AddMergeTag(Data^.FTag.Key, newKey);
-                    FillMergeTree;
-                end;
-                ActualizeTreeView;
-                ReselectNode(newKey);
-                RefreshWarningLabel;
-                SetBrowseTabCloudWarning(True);
+                Data := TagVST.GetNodeData(SelectedTags[i]);
+                CurrentTagToChange := Data^.FTag.Key;
+
+                MedienBib.ChangeTags(CurrentTagToChange, '');
             end;
+
+            MedienBib.ReBuildTagCloud;
+            ActualizeTreeView;
+            FillMergeTree(False);
+            FillIgnoreTree(False);
+            SetGlobalWarningID3TagUpdate;
+            SetBrowseTabCloudWarning(True);
         end;
+    end;
 end;
 
 {
@@ -778,54 +797,126 @@ end;
     - Merge the selected Tags
     --------------------------------------------------------
 }
-procedure TCloudEditorForm.BtnMergeClick(Sender: TObject);
+procedure TCloudEditorForm.BtnAddRenameRuleClick(Sender: TObject);
 var SelectedTags: TNodeArray;
-    maxCount, i: Integer;
+    maxCount, i, dlgResult: Integer;
     Data: PTagTreeData;
-    maxKey: String;
+    newTag, CurrentTagToChange: String;
+    ClickedOK, askNoMore, updateDone: Boolean;
 begin
+    if TagVST.SelectedCount = 0 then
+    begin
+        TranslateMessageDLG(TagEditor_SelectTagRenameHint, mtInformation, [mbOK], 0);
+        exit;
+    end;
+
     if MedienBib.StatusBibUpdate > 1 then
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
     else
     begin
+        newTag := '';
         SelectedTags := TagVST.GetSortedSelection(False);
-        if Length(SelectedTags) > 0 then
+        if Length(SelectedTags) > 1 then
         begin
             maxCount := 0;
-            maxKey := '';
+            newTag := '';
             // Get Tag with maximum Count for newKey-suggestion
             for i := 0 to length(SelectedTags) - 1 do
             begin
                 Data := TagVST.GetNodeData(SelectedTags[i]);
                 if Data^.FTag.count > maxCount then
                 begin
-                    maxCount := Data^.FTag.count;
-                    maxKey := Data^.FTag.Key;
+                    maxCount := Data^.FTag.TotalCount;
+                    // this will be a suggestion for the new renamed tag
+                    newTag := Data^.FTag.Key;
                 end;
             end;
+        end;
 
-            // Get new key-name
-            if InputQuery(TagEditor_Merge_Caption, TagEditor_Merge_Prompt, maxKey) then
+        // Get new key-name
+        ClickedOK := InputQuery(MainForm_RenameTagQueryCaption, TagEditor_RenameTagQueryLabel, newTag);
+
+        if ClickedOK and (trim(newTag)<>'') then
+        begin
+            if CommasInString(NewTag) then
+                // ... but we do not allow a comma separated list of tags here
+                TranslateMessageDLG((TagManagement_RenameTagNoCommas), mtWarning, [MBOK], 0)
+            else
             begin
+                // valid tag input
                 for i := 0 to length(SelectedTags) - 1 do
                 begin
-                    // process selected tags: rename them to the new Keyname
                     Data := TagVST.GetNodeData(SelectedTags[i]);
-                    if Data^.FTag.Key <> maxKey then
+                    CurrentTagToChange := Data^.FTag.Key;
+                    if CurrentTagToChange <> newTag then
                     begin
-                        MedienBib.TagCloud.RenameTag(Data^.FTag, maxKey);
-                        if cbAutoAddMergeTags.Checked then
-                            TagPostProcessor.AddMergeTag(Data^.FTag.Key, maxKey);
-                    end;
-                end;
-                if cbAutoAddMergeTags.Checked then
-                    FillMergeTree;
+                        // Actually try to update the merge rules
+                        case MedienBib.TagPostProcessor.AddMergeRuleConsistencyCheck(CurrentTagToChange, newTag) of
 
-                ActualizeTreeView;
-                ReselectNode(maxKey);
-                RefreshWarningLabel;
-                SetBrowseTabCloudWarning(True);
-            end;
+                            CONSISTENCY_OK: begin
+                                    updateDone := True;
+                                    MedienBib.TagPostProcessor.AddMergeRule(CurrentTagToChange, newTag, False)
+                            end;
+
+                            CONSISTENCY_HINT,
+                            CONSISTENCY_WARNING: begin
+                                    if MedienBib.AskForAutoResolveInconsistenciesRules then
+                                    begin
+                                        askNoMore := not MedienBib.AskForAutoResolveInconsistenciesRules;
+                                        dlgresult := MessageDlgWithNoMorebox
+                                              ((TagManagementDialog_Caption),
+                                              (TagManagementDialog_TextRules) + MedienBib.TagPostProcessor.LogList.Text ,
+                                               mtWarning,
+                                               [mbIgnore, mbCancel, mbOK], mrOK, 0,
+                                               asknomore, (TagManagementDialog_ShowAgain));
+
+                                        case dlgresult of
+                                            mrIgnore: begin
+                                                MedienBib.AutoResolveInconsistenciesRules := False;
+                                                MedienBib.TagPostProcessor.AddMergeRule(CurrentTagToChange, newTag, True);
+                                                updateDone := True;
+                                                MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                            end;
+                                            mrOK: begin
+                                                MedienBib.AutoResolveInconsistenciesRules := True;
+                                                MedienBib.TagPostProcessor.AddMergeRule(CurrentTagToChange, newTag, False);
+                                                updateDone := True;
+                                                MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                            end;
+                                            mrCancel: begin
+                                                updateDone := False;
+                                                break;
+                                            end;
+                                        end;
+                                    end else
+                                    begin
+                                        // just do as the settings say
+                                        updateDone := true; //MedienBib.AutoResolveInconsistencies;
+                                        MedienBib.TagPostProcessor.AddMergeRule(CurrentTagToChange, newTag, not MedienBib.AutoResolveInconsistenciesRules);
+                                    end;
+                            end;
+                        end; // case AddMergeRuleConsistencyCheck
+
+                        // update all files, show hint to activate the Looooong procedure later.
+                        if updateDone then
+                            MedienBib.ChangeTags(CurrentTagToChange, newTag);
+                    end; // if Data^.FTag.Key <> newTag then
+
+
+
+
+                end;  // for selected Tags
+            end; // valid tag input
+
+            MedienBib.ReBuildTagCloud;
+
+            ActualizeTreeView;
+            ReselectNode(newTag);
+            FillMergeTree(False);
+            FillIgnoreTree(False);
+
+            SetGlobalWarningID3TagUpdate;
+            SetBrowseTabCloudWarning(True);
         end;
     end;
 end;
@@ -837,41 +928,95 @@ end;
     --------------------------------------------------------
 }
 
-procedure TCloudEditorForm.BtnDeleteTagsClick(Sender: TObject);
+procedure TCloudEditorForm.BtnAddIgnoreRuleClick(Sender: TObject);
 var SelectedTags: TNodeArray;
-    i: Integer;
+    i, dlgResult: Integer;
     Data: PTagTreeData;
-
+    askNoMore, updateDone: Boolean;
+    CurrentTagToChange: String;
 begin
+    if TagVST.SelectedCount = 0 then
+    begin
+        TranslateMessageDLG(TagEditor_SelectTagRemoveHint, mtInformation, [mbOK], 0);
+        exit;
+    end;
+
     if MedienBib.StatusBibUpdate > 1 then
         MessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0)
     else
     begin
         SelectedTags := TagVST.GetSortedSelection(False);
-        if Length(SelectedTags) > 0 then
-        begin
-            if MessageDLG((TagEditor_Delete_Query), mtWarning, [MBYes, MBNo], 0) = mrYes then
-            begin
-                for i := 0 to length(SelectedTags) - 1 do
-                begin
-                    // delete selected Tags
-                    Data := TagVST.GetNodeData(SelectedTags[i]);
-                    MedienBib.TagCloud.DeleteTag(Data^.FTag);
 
-                    if cbAutoAddIgnoreTags.Checked then
-                        TagPostProcessor.AddIgnoreTag(Data^.FTag.Key);
+        if MessageDLG((TagEditor_AddIgnoreRule_Query), mtWarning, [MBYes, MBNo], 0) = mrYes then
+        begin
+            for i := 0 to length(SelectedTags) - 1 do
+            begin
+                Data := TagVST.GetNodeData(SelectedTags[i]);
+                CurrentTagToChange := Data^.FTag.Key;
+
+                case MedienBib.TagPostProcessor.AddIgnoreRuleConsistencyCheck(CurrentTagToChange) of
+
+                    CONSISTENCY_OK: begin
+                            updateDone := True;
+                            MedienBib.TagPostProcessor.AddIgnoreRule(CurrentTagToChange, False);
+                    end;
+
+                    CONSISTENCY_HINT,
+                    CONSISTENCY_WARNING: begin
+                            if MedienBib.AskForAutoResolveInconsistenciesRules then
+                            begin
+                                askNoMore := not MedienBib.AskForAutoResolveInconsistenciesRules;
+                                dlgresult := MessageDlgWithNoMorebox
+                                      ((TagManagementDialog_Caption),
+                                      (TagManagementDialog_TextRules) + MedienBib.TagPostProcessor.LogList.Text ,
+                                       mtWarning,
+                                       [mbIgnore, mbCancel, mbOK], mrOK, 0,
+                                       asknomore, (TagManagementDialog_ShowAgain));
+
+                                case dlgresult of
+                                    mrIgnore: begin
+                                        MedienBib.AutoResolveInconsistenciesRules := False;
+                                        MedienBib.TagPostProcessor.AddIgnoreRule(CurrentTagToChange, True);
+                                        updateDone := True;
+                                        MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                    end;
+                                    mrOK: begin
+                                        MedienBib.AutoResolveInconsistenciesRules := True;
+                                        MedienBib.TagPostProcessor.AddIgnoreRule(CurrentTagToChange, False);
+                                        updateDone := True;
+                                        MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                    end;
+                                    mrCancel: begin
+                                        updateDone := False;
+                                    end;
+                                end;
+                            end else
+                            begin
+                                // just da as the settings say
+                                updateDone := true; //MedienBib.AutoResolveInconsistencies;
+                                MedienBib.TagPostProcessor.AddIgnoreRule(CurrentTagToChange, not MedienBib.AutoResolveInconsistenciesRules);
+                            end;
+                    end;
                 end;
-                if cbAutoAddIgnoreTags.Checked then
-                    FillIgnoreTree;
-                ActualizeTreeView;
-                RefreshWarningLabel;
-                SetBrowseTabCloudWarning(True);
+
+                // update all files, show hint to activate the Looooong procedure later.
+                if updateDone then
+                    MedienBib.ChangeTags(CurrentTagToChange, '');
+
             end;
+
+            MedienBib.ReBuildTagCloud;
+            ActualizeTreeView;
+            FillMergeTree(False);
+            FillIgnoreTree(False);
+
+            SetGlobalWarningID3TagUpdate;
+            SetBrowseTabCloudWarning(True);
         end;
     end;
 end;
 
-procedure TCloudEditorForm.BtnDeleteIgnoreTagClick(Sender: TObject);
+procedure TCloudEditorForm.BtnDeleteIgnoreRuleClick(Sender: TObject);
 var SelectedTags: TNodeArray;
     i: Integer;
     Data: PIgnoreTagData;
@@ -883,7 +1028,7 @@ begin
         for i := 0 to length(SelectedTags) - 1 do
         begin
             Data := IgnoreTagVST.GetNodeData(SelectedTags[i]);
-            TagPostProcessor.DeleteIgnoreTag(Data.fString.DataString);
+            MedienBib.TagPostProcessor.DeleteIgnoreTag(Data.fString.DataString);
             Data.fString.Free;
         end;
     end;
@@ -891,7 +1036,7 @@ begin
     IgnoreTagVST.EndUpdate;
 end;
 
-procedure TCloudEditorForm.BtnDeleteMergeTagClick(Sender: TObject);
+procedure TCloudEditorForm.BtnDeleteRenameRuleClick(Sender: TObject);
 var SelectedTags: TNodeArray;
     i: Integer;
     Data: PMergeTagData;
@@ -903,8 +1048,8 @@ begin
     begin
         for i := 0 to length(SelectedTags) - 1 do
         begin
-            Data :=MergeTagVST.GetNodeData(SelectedTags[i]);
-            TagPostProcessor.DeleteMergeTag(Data.fMergeTag.OriginalKey, Data.fMergeTag.ReplaceKey);
+            Data := MergeTagVST.GetNodeData(SelectedTags[i]);
+            MedienBib.TagPostProcessor.DeleteMergeTag(Data.fMergeTag.OriginalKey, Data.fMergeTag.ReplaceKey);
         end;
     end;
     MergeTagVST.DeleteSelectedNodes;

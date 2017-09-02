@@ -284,7 +284,9 @@ begin
         if result = '' then
             result := name
         else
-            result := result + #13#10 + name;
+            //result := result + #13#10 + name;
+            // change 08.2017: comma-separated new tags here
+            result := result + ',' + name;
             // note: if we change the #13#10 here, we MUST also change it in TagCloud.RenameTag
 
         tagBegin := posEx('<tag>', aRawString, tagEnd);
