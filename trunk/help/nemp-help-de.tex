@@ -148,8 +148,7 @@ Mehr dazu im Abschnitt \hyperref[sec_anzeige]{\emph{Anzeigen im Player}}.
 
 Rechts daneben (2) ist die Anzeige der Playlist angeordnet. Hier werden alle Titel in der aktuellen Playlist angezeigt. 
 
-\begin{tipp}
-Ziehen Sie per Drag\&Drop ein paar Dateien oder einen Ordner in diesen Bereich, wenn Sie ihre Playlist füllen möchten.
+\begin{tipp}Ziehen Sie per Drag\&Drop ein paar Dateien oder einen Ordner in diesen Bereich, wenn Sie ihre Playlist füllen möchten.
 \end{tipp} 
 
 Links neben dem Player-Teil (3) finden Sie die Übersicht Ihrer Medienbibliothek. In der Medienbibliothek werden all ihre Musikdateien verwaltet. Sie können auf drei verschiedene Arten in ihrer Musiksammlung stöbern. Zur Auswahl klicken Sie auf einen der drei Buttons.
@@ -159,16 +158,23 @@ Links neben dem Player-Teil (3) finden Sie die Übersicht Ihrer Medienbibliothek.
  
 \item[] \inlinegraphics{TabBtnCoverflow.png} Im \textbf{Coverflow} werden die einzelnen Alben in der Medienbibliothek über ihre Cover angezeigt. Das ist seit einiger Zeit die Standardeinstellung.
 
-\item[] \inlinegraphics{TabBtnTagCloud.png} In der \textbf{Tagcloud} werden die Titel in der Medienbibliothek nach Tags gruppiert. Das können ganz allgemeine sein wie \emph{Rock} oder \emph{90er}, oder sehr persönliche wie \emph{30.Geburtstag}.
+\item[] \inlinegraphics{TabBtnTagCloud.png} In der \textbf{Tagcloud} werden die Titel in der Medienbibliothek nach Tags gruppiert. Das können ganz allgemeine sein wie \emph{Rock} oder \emph{90er}, oder sehr persönliche wie \emph{30.Geburtstag}. Diese zusätzlichen Tags können Sie ganz individuell eingeben, oder automatisiert von last.fm beziehen, wo diese Tags von der Community gepflegt werden.
 \end{itemize}
 
 \begin{tipp} Ziehen Sie per Drag\&Drop ihren Musik-Ordner in diesen Bereich, um mit dem Aufbau der Medienbibliothek zu beginnen.
 \end{tipp}
 
-Im unteren Teil (4) werden einzelne Titel ihrer Musiksammlung aufgelistet. Entweder alle, oder aber nur die, die zur aktuellen Auswahl im Übersichtsteil (3) passen. Oder, wenn Sie die Schnellsuche verwenden, die Titel, die zum aktuellen Suchbegriff passen. Wenn Sie hier einen Titel markieren, werden daneben weitere Informationen zu diesem Titel angezeigt.
+Im unteren Teil (4) werden einzelne Titel ihrer Musiksammlung aufgelistet. Entweder alle, oder aber nur die, die zur aktuellen Auswahl im Übersichtsteil (3) passen. Oder, wenn Sie die Schnellsuche verwenden, die Titel, die zum aktuellen Suchbegriff passen. Wenn Sie hier einen Titel markieren, werden daneben weitere Informationen zu diesem Titel angezeigt. 
 
-\begin{tipp}Sie können per Drag\&Drop Titel von hier in die Playlist einfügen. Und auch in den Windows-Explorer oder andere Programme.
-\end{tipp}
+Mit Nemp 4.7 hat sich die Funktionalität dieser Informationsanzeige geändert. Konnten dort vorher die Informationen direkt bearbeitet werden, ist jetzt über einen Doppelklick auf die einzelnen Daten (Interpret, Album, Genre, usw.) ein Browsen in der Medienbibliothek möglich. Dadurch können Sie beispielsweise schneller alle Titel zu einem Album finden. Das erscheint mir sinnvoller als eine Bearbeitung des Titels. Im Kontextmenü können Sie über \textsc{Eigenschaften} die Daten weiterhin ändern. 
+
+Weiterhin möglich ist dort die Eingabe zusätzlicher Tags, die für die Tagwolke verwendet werden. Hinzugefügt wurde die Möglichkeit der Eingabe weiterer Regeln für möglichst sinnvolle Tags. Dadurch kann z.B. vermieden werden, dass Tags in verschiedenen Schreibweisen eingefügt werden, was das Wiederfinden eines Titels über einen Tag nicht gerade leichter macht. Z.B.: War ein Titel nun mit \emph{female vocalists} getagged, oder doch mit \emph{female-vocalists}?
+
+Weiteres dazu im Abschnitt \hyperref[sec_tagwolkeneditor]{Tagwolken-Editor}.
+
+
+%\begin{tipp}Sie können per Drag\&Drop Titel von hier in die Playlist einfügen. Und auch in den Windows-Explorer oder andere Programme.
+%\end{tipp}
 
 \subsection{Allgemeine Steuerung}
 
@@ -535,7 +541,9 @@ Das interessante ist nun die Möglichkeit, den Titeln weitere Tags zuzuordnen, di
 \includegraphics{tags.jpg}
 \end{center}
 
-Das ist natürlich etwas mühsam, das für seine gesamte Medienbibliothek zu machen. Aber wofür gibt es schließlich das Internet?
+Klicken Sie dafür doppelt auf \textsc{Tag hinzufügen}, und geben Sie einen neuen Tag ein. Sie können auch mehrere Tags gleichzeitig durch Kommas getrennt eingeben. 
+
+Es ist natürlich etwas mühsam, das für jeden einzelnen Titel in der gesamten Medienbibliothek zu machen. Aber wofür gibt es schließlich das Internet?
 
 Bei last.fm gibt es nicht nur Cover, sondern auch weitere Tags, die von der Community gepflegt werden - vielleicht haben Sie ja schon selbst einige Lieder darüber getaggt.
 
@@ -618,7 +626,6 @@ Ausgenommen davon ist die Bewertung der Titel. Diese ist immer möglich. Wenn jed
 \end{hinweis}
 
 
-
 \subsubsection{Das Detailfenster zur Bearbeitung der Metadaten}
 \label{sec_details}
 
@@ -690,6 +697,44 @@ Sie können die Favoritenliste auch Ihren Wünschen entsprechend sortieren.
 \subsubsection{CSV-Export}
 
 Eine Besonderheit ist wohl noch die Möglichkeit, die komplette Medienbibliothek als csv-Datei zu exportieren, inklusive der meisten Daten. Ausgenommen sind Liedtexte (es wird nur exportiert, ob welche vorhanden sind) und die erweiterten Tags. Diese csv-Datei kann dann von vielen anderen Programmen (z.B. Excel) importiert werden.
+
+
+\subsection{Der Tagwolken-Editor}
+\label{sec_tagwolkeneditor}
+Das automatische Beschaffen von weiteren Tags für die Tagwolke über last.fm ist eine durchaus praktische Funktion. Aber es gibt einen Haken dabei - es gibt bei last.fm oft verschiedene Schreibvarianten von ein und demselben Tag, und auch einige völlig sinnlose Tags. Ein Beispiel wäre der Tag, der angeben soll, dass in dem Lied eine Frau singt. Das ist bei einigen Liedern \emph{Female Vocalist}, bei anderen \emph{Female Vocalist\textbf{s}}
+
+Mit dem Tagwolken-Editor können Sie damit etwas aufräumen. Sie finden ihn im Menü unter \textsc{Tools - Tagwolken-Editor}.
+
+\begin{figure}[tbh]
+\centering
+\includegraphics[width=0.8\textwidth]{tagwolken-editor.png}
+%\caption{Der Tagwolken-Editor}
+\label{fig_tagwolke}
+\end{figure}
+
+
+Im ersten Tab \textbf{Existierende Tags} finden Sie eine Auflistung aller, wirklich aller Tags in der Medienbibliothek, von häufigen wie \emph{Singer-Songwriter} bis hin zu exotischen wie \emph{songs die so gut sind das ich meiner oma ihr klein haeuschen zwar nicht verkaufen aber zumindest dafuer beleihen wuerde}. Kein Witz, diesen Tag gibt es da wirklich.
+
+Sie können hier Tags umbenennen, zusammenführen oder löschen. Markieren Sie dazu einen oder mehrere Tags und klicken Sie den entsprechenden Button. Das wirkt sich dann auf alle Dateien in der Medienbibliothek aus, die mit diesem Tag markiert sind. 
+
+\begin{tipp}
+Ein Doppelklick auf einen Tag zeigt im Hauptfenster von Nemp alle Titel an, die mit diesem Tag markiert sind. Auf diese Weise können Sie sich also alle Lieder anzeigen lassen, die so gut sind, dass einige Nutzer von last.fm dafür \emph{ihrer Oma ihr klein Häuschen zwar nicht verkaufen aber zumindest beleihen würden}.
+\end{tipp}
+
+Die Option \textsc{Speichere verbundene/umbenannte} und \textsc{gelöschte Tags} sorgt dafür, dass Ihre Eingaben gespeichert und bei künftigen Abfragen an last.fm berücksichtigt werden. Einige wenige solcher Regeln bringt Nemp direkt mit, aber eine auch nur ansatzweise vollständige Liste möchte ich mir nicht antun.
+
+\textbf{Beispiel:} Sie führen die beiden Tags \emph{Female Vocalist} (ohne s am Ende) und \emph{Female Vocalists} (mit s am Ende) zu \emph{Female Vocalists} zusammen. Wenn sie später für ein Lied Tags von last.fm holen, und dieses Lied ist mit \emph{Female Vocalist} (ohne s) getaggt, wird dieser Tag automatisch zu \emph{Female Vocalists} (mit s) geändert.
+
+Die Option \textsc{Verstecke Auto-Tags} sorgt dafür, dass die Tags, die Nemp von sich aus erstellt hat (Interpret, Album, Jahr, Genre, Jahrzehnt) ausgeblendet werden. Diese Tags können Sie nicht gänzlich verändern oder löschen. Sie können aber diese \emph{AutoTags} für Dateien verändern, für die Nemp diesen Tag nicht selbst hinzugefügt hat.
+
+Im zweiten Tab \textbf{Zusammengeführte/umbenannte Tags} werden die Tags angezeigt, die sie zuvor umbenannt oder zusammengeführt haben. Diese Liste wird beim Holen neuer Tags von last.fm berücksichtigt, sodass die Tagwolke dadurch nicht wieder aufs neue zugemüllt wird.
+
+Im dritten Tab \textbf{Gelöschte Tags} sind die Tags, die sie nicht in Ihrer Tagwolke sehen wollen. Auch diese Liste wird beim Holen neuer Tags berücksichtigt.
+
+Das Löschen von Tags in der Medienbibliothek geht sehr zügig. In den ID3-Tags der einzelnen Musikdateien geht das nicht so schnell, da dafür die neuen Tags in die einzelnen Dateien geschrieben werden müssen. Im Extremfall muss dafür die gesamte Audiodatei neu geschrieben werden. Wenn Sie einige Tags bearbeitet haben, dann sind in den Musikdateien selbst noch die unbearbeiteten Tags gespeichert. Wenn Sie später die Daten neu einlesen, werden Sie wieder die unerwünschten Tags erhalten. 
+
+Dafür gibt es die Funktion \textbf{Dateien aktualisieren}, die die Daten zwischen Medienbibliothek und ID3-Tags wieder synchronisiert. Dieser Vorgang dauert eine Weile, in der Regel ein wenig länger als das Einlesen der Daten in die Medienbibliothek am Anfang.
+
 
 
 
@@ -834,41 +879,7 @@ In diesen 30 Sekunden wird die Lautstärke langsam heruntergeregelt und es wird k
 Dafür muss natürlich auch das Soundschema von Windows passend eingestellt sein. Nemp unterbindet nicht das möglicherweise recht laute \emph{Dingeling} von Windows, wenn der Computer heruntergefahren wird.
 \end{hinweis}
 
-\subsection{Der Tagwolken-Editor}
-\label{sec_tagwolkeneditor}
-Das automatische Beschaffen von weiteren Tags für die Tagwolke über last.fm ist eine durchaus praktische Funktion. Aber es gibt einen Haken dabei - es gibt bei last.fm oft verschiedene Schreibvarianten von ein und demselben Tag, und auch einige völlig sinnlose Tags. Ein Beispiel wäre der Tag, der angeben soll, dass in dem Lied eine Frau singt. Das ist bei einigen Liedern \emph{Female Vocalist}, bei anderen \emph{Female Vocalist\textbf{s}}
 
-Mit dem Tagwolken-Editor können Sie damit etwas aufräumen. Sie finden ihn im Menü unter \textsc{Tools - Tagwolken-Editor}.
-
-\begin{figure}[tbh]
-\centering
-\includegraphics[width=0.8\textwidth]{tagwolken-editor.png}
-%\caption{Der Tagwolken-Editor}
-\label{fig_tagwolke}
-\end{figure}
-
-
-Im ersten Tab \textbf{Existierende Tags} finden Sie eine Auflistung aller, wirklich aller Tags in der Medienbibliothek, von häufigen wie \emph{Singer-Songwriter} bis hin zu exotischen wie \emph{songs die so gut sind das ich meiner oma ihr klein haeuschen zwar nicht verkaufen aber zumindest dafuer beleihen wuerde}. Kein Witz, diesen Tag gibt es da wirklich.
-
-Sie können hier Tags umbenennen, zusammenführen oder löschen. Markieren Sie dazu einen oder mehrere Tags und klicken Sie den entsprechenden Button. Das wirkt sich dann auf alle Dateien in der Medienbibliothek aus, die mit diesem Tag markiert sind. 
-
-\begin{tipp}
-Ein Doppelklick auf einen Tag zeigt im Hauptfenster von Nemp alle Titel an, die mit diesem Tag markiert sind. Auf diese Weise können Sie sich also alle Lieder anzeigen lassen, die so gut sind, dass einige Nutzer von last.fm dafür \emph{ihrer Oma ihr klein Häuschen zwar nicht verkaufen aber zumindest beleihen würden}.
-\end{tipp}
-
-Die Option \textsc{Speichere verbundene/umbenannte} und \textsc{gelöschte Tags} sorgt dafür, dass Ihre Eingaben gespeichert und bei künftigen Abfragen an last.fm berücksichtigt werden. Einige wenige solcher Regeln bringt Nemp direkt mit, aber eine auch nur ansatzweise vollständige Liste möchte ich mir nicht antun.
-
-\textbf{Beispiel:} Sie führen die beiden Tags \emph{Female Vocalist} (ohne s am Ende) und \emph{Female Vocalists} (mit s am Ende) zu \emph{Female Vocalists} zusammen. Wenn sie später für ein Lied Tags von last.fm holen, und dieses Lied ist mit \emph{Female Vocalist} (ohne s) getaggt, wird dieser Tag automatisch zu \emph{Female Vocalists} (mit s) geändert.
-
-Die Option \textsc{Verstecke Auto-Tags} sorgt dafür, dass die Tags, die Nemp von sich aus erstellt hat (Interpret, Album, Jahr, Genre, Jahrzehnt) ausgeblendet werden. Diese Tags können Sie nicht gänzlich verändern oder löschen. Sie können aber diese \emph{AutoTags} für Dateien verändern, für die Nemp diesen Tag nicht selbst hinzugefügt hat.
-
-Im zweiten Tab \textbf{Zusammengeführte/umbenannte Tags} werden die Tags angezeigt, die sie zuvor umbenannt oder zusammengeführt haben. Diese Liste wird beim Holen neuer Tags von last.fm berücksichtigt, sodass die Tagwolke dadurch nicht wieder aufs neue zugemüllt wird.
-
-Im dritten Tab \textbf{Gelöschte Tags} sind die Tags, die sie nicht in Ihrer Tagwolke sehen wollen. Auch diese Liste wird beim Holen neuer Tags berücksichtigt.
-
-Das Löschen von Tags in der Medienbibliothek geht sehr zügig. In den ID3-Tags der einzelnen Musikdateien geht das nicht so schnell, da dafür die neuen Tags in die einzelnen Dateien geschrieben werden müssen. Im Extremfall muss dafür die gesamte Audiodatei neu geschrieben werden. Wenn Sie einige Tags bearbeitet haben, dann sind in den Musikdateien selbst noch die unbearbeiteten Tags gespeichert. Wenn Sie später die Daten neu einlesen, werden Sie wieder die unerwünschten Tags erhalten. 
-
-Dafür gibt es die Funktion \textbf{Dateien aktualisieren}, die die Daten zwischen Medienbibliothek und ID3-Tags wieder synchronisiert. Dieser Vorgang dauert eine Weile, in der Regel ein wenig länger als das Einlesen der Daten in die Medienbibliothek am Anfang.
 
 \section{Einstellungen}
 \label{sec_einstellungen}

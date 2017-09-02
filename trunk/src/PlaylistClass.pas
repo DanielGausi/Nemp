@@ -294,8 +294,9 @@ type
       procedure SetNewPrebookIndex(aFile: TAudioFile; NewIndex: Integer);
       procedure ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
       // Adding/removing selected Nodes form the PrebookList
-      procedure AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
-      procedure RemoveSelectedNodesFromPreBookList;
+      // not used any more. Too confusing
+      // procedure AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
+      // procedure RemoveSelectedNodesFromPreBookList;
 
       function SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
       // load/save playlist
@@ -328,9 +329,6 @@ type
       procedure ClearSearch(complete: Boolean = False);
       procedure SearchAll(aString: String); 
       procedure Search(aString: String; SearchNext: Boolean = False);
-
-      //procedure ScrollToNextSearchResult;
-      //procedure ScrollToPreviousSearchResult;
 
   end;
 
@@ -1059,54 +1057,6 @@ begin
 end;
 
 
-
-(*
-procedure TNempPlaylist.ScrollToNextSearchResult;
-begin
-    if not assigned(fVST) then exit;
-
-    if not assigned(fLastHighlightedSearchResultNode) then
-        fLastHighlightedSearchResultNode := fVst.GetFirstSelected
-    else
-        fLastHighlightedSearchResultNode := fVST.GetNextSelected(fLastHighlightedSearchResultNode);
-
-    // if there is no "next", take "first"
-    if not assigned(fLastHighlightedSearchResultNode) then
-        fLastHighlightedSearchResultNode := fVst.GetFirstSelected;
-
-    if assigned(fLastHighlightedSearchResultNode) then
-    begin
-        fVst.ScrollIntoView(fLastHighlightedSearchResultNode, False);
-        fVst.FocusedNode := fLastHighlightedSearchResultNode;
-    end;
-    fVst.Invalidate;
-end;
-
-procedure TNempPlaylist.ScrollToPreviousSearchResult;
-begin
-    if not assigned(fVST) then exit;
-
-    if not assigned(fLastHighlightedSearchResultNode) then
-        fLastHighlightedSearchResultNode := fVst.GetFirstSelected
-    else
-        fLastHighlightedSearchResultNode := fVST.GetPreviousSelected(fLastHighlightedSearchResultNode);
-
-    // if there is no "previous", take "last"
-    if not assigned(fLastHighlightedSearchResultNode) then
-    begin
-        fLastHighlightedSearchResultNode := fVst.GetLast;
-        fLastHighlightedSearchResultNode := fVST.GetPreviousSelected(fLastHighlightedSearchResultNode);
-    end;
-
-    if assigned(fLastHighlightedSearchResultNode) then
-    begin
-        fVst.ScrollIntoView(fLastHighlightedSearchResultNode, False);
-        fVst.FocusedNode := fLastHighlightedSearchResultNode;
-    end;
-    fVst.Invalidate;
-end;
-*)
-
 procedure TNempPlaylist.ClearSearch(complete: Boolean = False);
 var currentNode: PVirtualNode;
 begin
@@ -1200,16 +1150,12 @@ begin
             currentNode := fVST.GetFirst;               
     until (assigned(TargetNode) or (currentNode = startNode));
     Keywords.Free;
-    
-    //if TargetNode <> oldSelectedNode then
-    //    fVST.Selected[oldSelectedNode] := False;            
 
     fLastHighlightedSearchResultNode := TargetNode;
     if assigned(fLastHighlightedSearchResultNode) then
     begin
         fVST.ScrollIntoView(fLastHighlightedSearchResultNode, True);
         fVST.FocusedNode := fLastHighlightedSearchResultNode;
-        //fVST.Selected[fLastHighlightedSearchResultNode] := True;        
     end;
    
     fVst.Invalidate;
@@ -1337,6 +1283,7 @@ begin
             if not assigned(AudioFile.CueList) then
             begin
               // nach einer Liste suchen und erstellen
+              // yes, always, also on short tracks
               AudioFile.GetCueList;
               AddCueListNodes(AudioFile, aNode);
             end;
@@ -1446,7 +1393,7 @@ begin
 
   Playlist.Add(newAudiofile);
   NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
-  if not assigned(newAudiofile.CueList) then
+  if (newAudiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(newAudiofile.CueList)) then
   begin
     // nach einer Liste suchen und erstellen
     newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
@@ -1469,7 +1416,7 @@ begin
 
     Playlist.Add(newAudiofile);
     NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
-    if not assigned(newAudiofile.CueList) then
+    if (newAudiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(newAudiofile.CueList)) then
     begin
         // nach einer Liste suchen und erstellen
         newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
@@ -1515,21 +1462,27 @@ begin
     Inc(fInsertIndex);
     NewNode := VST.InsertNode(fInsertNode, amInsertBefore, newAudiofile);
 
-    newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-    AddCueListNodes(newAudiofile, NewNode);
-    VST.Invalidate;
+    if AudioFile.Duration > MIN_CUESHEET_DURATION then
+    begin
+        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
+        AddCueListNodes(newAudiofile, NewNode);
+    end;
   end else
   begin
     Playlist.Add(newAudiofile);
     // indexnode ist NIL, also am Ende einfügen
     NewNode := VST.AddChild(Nil, newAudiofile);
-    newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-    AddCueListNodes(newAudiofile, NewNode);
+    if AudioFile.Duration > MIN_CUESHEET_DURATION then
+    begin
+        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
+        AddCueListNodes(newAudiofile, NewNode);
+    end;
   end;
   Result := NewNode;
   fDauer := fDauer + newAudiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
   fPlaylistHasChanged := True;
+  VST.Invalidate;
 end;
 
 function TNempPlaylist.InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
@@ -1578,7 +1531,7 @@ begin
 
     end;
 end;
-
+{
 procedure TNempPlaylist.RemoveSelectedNodesFromPreBookList;
 var i:integer;
   Selectedmp3s: TNodeArray;
@@ -1605,6 +1558,7 @@ begin
     VST.EndUpdate;
     VST.Invalidate;
 end;
+
 
 procedure TNempPlaylist.AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
 var i:integer;
@@ -1648,6 +1602,7 @@ begin
     ReIndexPrebookedFiles;
     VST.Invalidate;
 end;
+}
 
 
 procedure TNempPlaylist.ReIndexPrebookedFiles;
@@ -2167,40 +2122,7 @@ end;
 procedure TNempPlaylist.RebuildWeighedArray;
 var i, j, curIdx, totalWeight, curWeight: Integer;
     af: TAudiofile;
-
-      {    function RatingToWeight(aRating: Integer): Integer;
-          var base, idx: Integer;
-          begin
-              if aRating = 0 then
-                  base := 127
-              else
-                  base := aRating;
-
-              // note: That is the same method as used in RatingCtrls
-              //       and Audiofile.fGetRoundedRating
-              idx := 2 * (base div 51);
-
-              if (base div 51) <= 4 then
-              begin
-                  if ((base mod 51) > 25) then
-                      // add a full star, or 2 in the index
-                      idx := idx + 2
-                  else
-                      // add only a half star, only 1 in the index
-                      idx := idx + 1;
-              end;
-              // to be sure: range check, default = 2.5 stars // index = 5
-              if (idx < 0) or (idx > 10) then
-                  idx := 5;
-
-              // get the actual weight for the file
-              result := RNGWeights[idx];
-          end;
-          }
-
 begin
-    // AddErrorLog('Weight array: rebuilt.');
-
     SetLength(fWeightedRandomIndices, Playlist.Count, 2);
     curIdx := -1;
     totalWeight := 0;
@@ -2218,13 +2140,6 @@ begin
             fWeightedRandomIndices[curIdx, 1] := totalWeight;
         end // else: Weight is 0, it should not be randomly played
     end;
-
-    //for i := 0 to length(fWeightedRandomIndices) - 1 do
-    //begin
-    //    AddErrorLog(IntToStr(i) + ' ; ' + IntToStr(fWeightedRandomIndices[i, 0]) + ' ; ' + IntToStr(fWeightedRandomIndices[i, 1]));
-    //end;
-    //AddErrorLog('--------------');
-
 
     fMaxWeightedValue := totalWeight;  // used for Random()
     fMaxWeightedIndex := curIdx;       // used for binary search
@@ -2264,9 +2179,6 @@ end;
 
 function TNempPlaylist.GetRandomPlaylistIndex: Integer;
 var rawIndex, searchL, searchR, weightedIndex: Integer;
-    //tmpStr: String;
-    //tmpWeight, tmpRating: Integer;
-
 begin
     if not fUseWeightedRNG then
         result := Random(Playlist.Count)
@@ -2282,11 +2194,6 @@ begin
         rawIndex := Random(fMaxWeightedValue);
         // get the playlist-Index from that index
         weightedIndex := BinIndexSearch(fWeightedRandomIndices, rawIndex, searchL, searchR);
-
-        // AddErrorLog('Range: ' + IntToStr(searchL) + '-' + IntToStr(searchR) + ';  ' + IntToStr(fMaxWeightedValue));
-        // AddErrorLog('RNG RAW: ' + inttostr(rawIndex));
-        // AddErrorLog('maxIndex: ' + IntTostr(fMaxWeightedIndex));
-        // AddErrorLog('newIndex PL (raw) : ' + inttostr(fWeightedRandomIndices[weightedIndex,0]));
 
         // binary search may not find the exact rawIndex, probably the first bigger or smaller entry
         // we need always the bigger (or equal) one
@@ -2304,23 +2211,7 @@ begin
             // set flag to force rebuild of the index array the next time.
             fPlaylistHasChanged := False;
         end;
-
-        // for debugging, errorlog
-        //tmpWeight := fWeightedRandomIndices[weightedIndex, 1];
-        //if weightedIndex > 0 then
-        //    tmpWeight := tmpWeight - fWeightedRandomIndices[weightedIndex-1, 1];
-
-        //tmpStr := //'rawIndex: ' + inttostr(rawIndex) + #13#10 +
-        //          //'maxIndex: ' + IntTostr(fMaxWeightedIndex) + #13#10 +
-        //          'newIndex PL (processed) : ' + inttostr(result) + #13#10 +
-        //          'Weight: ' + inttostr(tmpWeight) + #13#10 +
-        //          'Rating: ' + FloatToStrF(TAudioFile(Playlist.Items[result]).RoundedRating ,ffFixed,4,1) + #13#10;
-
-        //AddErrorLog(tmpStr);
-
     end;
-
-
 end;
 
 {

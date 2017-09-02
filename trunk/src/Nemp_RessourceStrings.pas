@@ -453,6 +453,66 @@ MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 
 
 MainForm_GlobalQuickSearchHint = 'Search in the media library';
 
+MainForm_DoublClickToSearchTags   = 'Doubleclick to show all files tagged with "%s"';
+MainForm_DoublClickToSearchArtist = 'Doubleclick to show all files from the artist "%s"';
+MainForm_DoublClickToSearchTitle  = 'Doubleclick to show all files with the title "%s"';
+MainForm_DoublClickToSearchAlbum  = 'Doubleclick to show all files from the album "%s"';
+MainForm_DoublClickToSearchYear   = 'Doubleclick to show all files from the year "%s"';
+MainForm_DoublClickToSearchGenre  = 'Doubleclick to show all files from the genre "%s"';
+MainForm_DoublClickToAddTagHint   = 'Doubleclick to add a new tag';
+MainForm_DoublClickToAddTag       = '[Add a tag]';
+MainForm_AddTagQueryCaption = 'Nemp: Add tags';
+MainForm_AddTagQueryLabel = 'New tag to add:';
+MainForm_RenameTagQueryCaption = 'Nemp: Rename tag';
+MainForm_RenameTagQueryLabel = 'Rename "%s" to:';
+
+
+MainForm_TagAlreadyExists = 'The file was already tagged with "%s".';
+MainForm_DuplicateTagsFound = 'Some duplicate tags has been removed.';
+MainForm_OnlyDuplicateTagsFound = 'The file was already tagged with all the tags you entered.';
+MainForm_TagNotSupportedFileFormat = 'Sorry. This file does not support additional tags.';
+MainForm_AddTagCommasFound = 'It looks like you entered more than one tag at once. Do you want Nemp to treat your input as a comma-separated list of tags?';
+
+TagManagement_TagDuplicateInput = 'Hint: The tag "%s" was entered more than once.';
+TagManagement_TagAlreadyExists = 'Hint: The file was already tagged with "%s".';
+TagManagement_TagIsOnIgnoreList = 'Warning: The tag "%s" is on the "Ignore list".';
+TagManagement_TagIsOnRenameList = 'Warning: The tag "%s" is on the "Rename list" and should be replaced with "%s".';
+TagManagement_RenameTagNoCommas = 'Pleaser enter only one tag, and not a comma separated list of tags.';
+
+TagManagement_FileCountWarning = 'This will affect up to %d files in your media library. Do you want to continue?';
+
+TagManagement_IgnoreTagIsInRenameListOrig      = 'Warning: The tag "%s" is already part of a "Rename rule" and is replaced with "%s".';
+TagManagement_IgnoreTagIsInRenameListRename    = 'Warning: The tag "%s" is already part of a "Rename rule" and is the replacement for "%s".';
+TagManagement_RenameTagIsInIgnoreList          = 'Warning: The tag "%s" is already on the "Ignore list".';
+TagManagement_RenameTagIsInMergeListOriginal   = 'Warning: The tag "%s" is already part of a "Rename rule" and is replaced with "%s".';
+TagManagement_OriginalTagIsInMergeListOriginal = 'Warning: The tag "%s" is already part of a "Rename rule" and is replaced with "%s".';
+TagManagement_OriginalTagIsInMergeListRename   = 'Warning: The tag "%s" is already part of a "Rename rule" and is the replacement for with "%s".';
+
+TagManagementDialog_Caption = 'Confirmation';
+TagManagementDialog_Text    = 'Nemp recognized some inconsistencies with the new tags (details below).'
+            +#13#10 + 'Click "OK" to resolve the inconsistencies automatically or'
+            +#13#10 + 'Click "Ignore" to ignore the warnings and set the new tags anyway.'
+            +#13#10 + #13#10;
+TagManagementDialog_ShowAgain = 'Save selection and do not show this dialog again.';
+
+TagManagementDialog_TextRules = 'Nemp recognized some inconsistencies with the new tag rules (details below).'
+            +#13#10 + 'Click "OK" to resolve the inconsistencies by removing/changing the existing rules or'
+            +#13#10 + 'Click "Ignore" to ignore the warnings and add the new tag rules anyway.'
+            +#13#10
+            +#13#10 + 'WARNING: Ignoring these inconsistencies could lead to unpredictable behavior when adding new tags to audio files.'
+            +#13#10 + #13#10;
+
+TagManagementDialogOnlyHint_Caption = 'Information';
+TagManagementDialogOnlyHint_Text = 'Nemp recognized and resolved some inconsistencies with the new tags (details below).'
+            +#13#10 + #13#10;
+
+TagManagementDialogOnlyHint_ShowAgain = 'Do not show this dialog again.';
+
+//TagManagement_ChangeArtist = 'Edit artist';
+//TagManagement_ChangeTitle  = 'Edit title';
+//TagManagement_ChangeAlbum  = 'Edit album';
+
+
 MainForm_PlaylistSearch    = 'Search';
 MainForm_PlaylistSearchHint = 'Search in the playlist'
                     + #13#10 + '- F3: step through'
@@ -501,7 +561,7 @@ SearchForm_CBAddExtendSearch = '(extended search)';
 
 MainForm_MenuCaptionsPlay      = 'Play (and clear current playlist)';
 MainForm_MenuCaptionsEnqueue   = 'Enqueue (at the end of the playlist)';
-MainForm_MenuCaptionsPlayNext  = 'Enqueue (at the end of the prebook-list)';
+MainForm_MenuCaptionsPlayNext  = 'Enqueue (after the current title)'; //'Enqueue (at the end of the prebook-list)';
 MainForm_MenuCaptionsPlayNow   = 'Just play focussed file (no playlist change)';
 
 
@@ -530,9 +590,9 @@ MainForm_MenuCaptionsEnqueueAllWebradio = 'Enqueue all tracks of this webradio s
 
 
 
-MainForm_MenuCaptionsPlayAll   = 'Play these tracks (and delete current playlist)';
-MainForm_MenuCaptionsEnqueueAll   = 'Enqueue these tracks (at the end of the playlist)';
-MainForm_MenuCaptionsPlayNextAll  = 'Enqueue these tracks (at the end of the prebook-list)';
+MainForm_MenuCaptionsPlayAll   = 'Play (and clear current playlist)';
+MainForm_MenuCaptionsEnqueueAll   = 'Enqueue (at the end of the playlist)';
+MainForm_MenuCaptionsPlayNextAll  = 'Enqueue (after the current title)';
 //MainForm_MenuCaptionsPlayNowAll   = 'Enqueue and play these tracks now'; // not possible any more
 MainForm_MenuCaptionsSearchForVar    = 'Search for ''%s''';
 MainForm_MenuCaptionsSearchForTitle  = 'Search for this title';
@@ -558,6 +618,7 @@ MainForm_Summary_WebradioCountSingle     = '%d webradio station';
 
 MainForm_Summary_FileCountMulti         = '%d files; ' ;
 MainForm_Summary_SelectedFileCountMulti = '%d files selected; ';
+MainForm_Summary_FileCountTotal         = '%d files in total';
 MainForm_Summary_PlaylistCountMulti     = '%d playlists';
 MainForm_Summary_WebradioCountMulti     = '%d webradio stations';
 
@@ -625,7 +686,11 @@ MediaLibrary_SearchTagsComplete_NoneFound = 'Tagsearch complete. Sorry, no addit
 MediaLibrary_SomeErrorsOccured = 'Some unexpected errors appeared during the process. Please view the Error-Log for details.';
 
 MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
-MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet. If you close this window now, these files remain inconsistent to the data in the library. Do you really want to close this window now?';
+MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet.'
+          +#13#10 + 'If you close Nemp now, these files remain inconsistent to the data in the library.'
+          +#13#10+#13#10 + 'Do you really want to close Nemp now?';
+MediaLibrary_InconsistentFilesCaption = 'Warning: %d file(s) need an update. Click here to start.';
+//MediaLibrary_InconsistentFilesHintCount = 'You have changed some tags in the library, but the mp3-files have not been updated yet. Do you want to update the %d changed files now?';
 
 MediaLibrary_Deleting                = 'Deleting from medialibrary (%d%%)';
 Medialibrary_QueryReallyDelete       = 'This will delete your complete medialibrary. Continue?';
@@ -717,15 +782,37 @@ TabBtnBrowse_Hint2 = 'Click to resort';
 TabBtnTagCloud_Hint1 = 'Tag cloud';
 TabBtnTagCloud_Hint2 = 'Click to rebuild';
 
-TagEditor_RenameTag_Caption = 'Rename Tag';
-TagEditor_RenameTag_Prompt = 'Enter a new name for the tag. If it already exists, the two tags are merged.';
+//TagEditor_RenameTag_Caption = 'Rename Tag';
+//TagEditor_RenameTag_Prompt = 'Enter a new name for the tag. If it already exists, the two tags are merged.';
 
-TagEditor_Merge_Caption = 'Merge Tags';
-TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it already exists, the tags are merged with this one.';
+TagEditor_RenameTagQueryLabel = 'Rename the selected tags to:';
+TagEditor_SelectTagRenameHint = 'Please select the tag you want to rename in the list.';
+TagEditor_SelectTagRemoveHint = 'Please select the tag you want to ignore in the list.';
 
-TagEditor_Delete_Query = 'This will remove the selected tags from all files in the media library. Continue?';
+TagEditor_LabelExplainTagList = 'A list of all tags in the media library. Changes will affect each audio file, which is marked with the selected tags. '
+            + #13#10 + #13#10 + 'Adding "Rename" and "Ignore" rules will rename (remove) these tags in all files of the media library and prevent adding these tags later. ';
+TagEditor_LabelExplainRenameList = 'A list of all "Rename rules". '
++ #13#10 + #13#10 + 'When you try to add one of these tags to an audio file (manually or automatically from last.fm), it is automatically replaced. This is done to avoid multiple similar tags with the same actual meaning.'
++ #13#10 + #13#10 + 'You can remove some of these rules here. To add a new one, use the buttons on the first page of this window.';
+
+TagEditor_LabelExplainIgnoreList = 'A list of all "Ignore rules". '
++ #13#10 + #13#10 + 'When you try to add one of these tags to an audio file (manually or automatically from last.fm), it is automatically ignored. This is done to avoid tags with actual no meaning.'
++ #13#10 + #13#10 + 'You can remove some of these rules here. To add a new one, use the buttons on the first page of this window.';
+
+
+//TagEditor_Merge_Caption = 'Merge Tags';
+//TagEditor_Merge_Prompt = 'Enter a new common name for the selected tags. If it already exists, the tags are merged with this one.';
+
+TagEditor_Delete_Query = 'This will remove the selected tags from all files in the media library.'
+  +#13#10 + #13#10 + 'Do you want to continue?';
+
+TagEditor_AddIgnoreRule_Query = 'This will add an "Ignore rule" for the selected tags and remove them from all files in the media library.'
+  +#13#10 + #13#10 + 'Do you want to continue?';
+
 
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
+
+TagEditor_FilesUpdateComplete = 'The ID3-Tags have been updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
 Tags_NoTagsAccessDenied = 'No additional Tags set.';

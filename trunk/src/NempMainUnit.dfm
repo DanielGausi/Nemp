@@ -2548,28 +2548,26 @@ object Nemp_MainForm: TNemp_MainForm
       OnPaint = NewPanelPaint
       OwnerDraw = False
       object Splitter4: TSplitter
-        Left = 402
+        Left = 497
         Top = 2
         Width = 4
         Height = 309
+        Align = alRight
         OnCanResize = Splitter4CanResize
         OnMoved = Splitter4Moved
-        ExplicitLeft = 250
-        ExplicitTop = 0
-        ExplicitHeight = 175
+        ExplicitLeft = 491
+        ExplicitTop = -2
       end
       object VDTCover: TNempPanel
         Tag = 3
-        Left = 2
+        Left = 501
         Top = 2
         Width = 400
         Height = 309
-        Align = alLeft
+        Align = alRight
         BevelOuter = bvNone
-        Constraints.MinWidth = 20
-        PopupMenu = CoverDetails_Popup
+        PopupMenu = PopupEditExtendedTags
         TabOrder = 0
-        OnClick = VDTCoverClick
         OnResize = VDTCoverResize
         OnPaint = PanelPaint
         OwnerDraw = False
@@ -2581,242 +2579,124 @@ object Nemp_MainForm: TNemp_MainForm
           Center = True
           Proportional = True
           Stretch = True
-          OnClick = VDTCoverClick
           OnMouseDown = ImgDetailCoverMouseDown
           OnMouseMove = ImgDetailCoverMouseMove
         end
-        object VDTCoverInfoPanel: TNempPanel
+        object LblBibArtist: TLabel
+          Left = 166
+          Top = 6
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+          ShowAccelChar = False
+          OnDblClick = DetailLabelDblClick
+          OnMouseEnter = DetailLabelMouseOver
+          OnMouseLeave = DetailLabelMouseLeave
+        end
+        object LblBibYear: TLabel
+          Tag = 4
+          Left = 166
+          Top = 74
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+          OnDblClick = DetailLabelDblClick
+          OnMouseEnter = DetailLabelMouseOver
+          OnMouseLeave = DetailLabelMouseLeave
+        end
+        object LblBibTrack: TLabel
           Tag = 3
+          Left = 166
+          Top = 57
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+        end
+        object LblBibTitle: TLabel
+          Tag = 1
+          Left = 166
+          Top = 21
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+          ShowAccelChar = False
+        end
+        object LblBibQuality: TLabel
+          Left = 166
+          Top = 125
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+        end
+        object LblBibPlayCounter: TLabel
+          Left = 165
+          Top = 164
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+        end
+        object LblBibGenre: TLabel
+          Tag = 5
+          Left = 166
+          Top = 91
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+          OnDblClick = DetailLabelDblClick
+          OnMouseEnter = DetailLabelMouseOver
+          OnMouseLeave = DetailLabelMouseLeave
+        end
+        object LblBibDuration: TLabel
+          Left = 166
+          Top = 106
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+        end
+        object LblBibAlbum: TLabel
+          Tag = 2
           Left = 158
-          Top = 0
-          Width = 236
-          Height = 447
-          BevelOuter = bvNone
-          TabOrder = 0
-          OnClick = VDTCoverClick
-          OnResize = VDTCoverInfoPanelResize
-          OnPaint = PanelPaint
-          OwnerDraw = False
-          object ImgBibRating: TImage
-            Left = 8
-            Top = 140
-            Width = 70
-            Height = 14
-            Visible = False
-            OnMouseDown = ImgBibRatingMouseDown
-            OnMouseLeave = ImgBibRatingMouseLeave
-            OnMouseMove = ImgBibRatingMouseMove
-          end
-          object LblBibAlbum: TLabel
-            Tag = 2
-            Left = 8
-            Top = 36
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibArtist: TLabel
-            Left = 8
-            Top = 2
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibDuration: TLabel
-            Left = 8
-            Top = 104
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-          end
-          object LblBibGenre: TLabel
-            Tag = 5
-            Left = 8
-            Top = 87
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibPlayCounter: TLabel
-            Left = 7
-            Top = 160
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-          end
-          object LblBibQuality: TLabel
-            Left = 8
-            Top = 121
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-          end
-          object LblBibTags: TLabel
-            Left = 7
-            Top = 179
-            Width = 50
-            Height = 59
-            AutoSize = False
-            Caption = '                    '
-            ShowAccelChar = False
-            WordWrap = True
-            OnClick = LblBibTagsClick
-          end
-          object LblBibTitle: TLabel
-            Tag = 1
-            Left = 8
-            Top = 19
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibTrack: TLabel
-            Tag = 3
-            Left = 8
-            Top = 53
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object LblBibYear: TLabel
-            Tag = 4
-            Left = 8
-            Top = 70
-            Width = 60
-            Height = 13
-            Caption = '                    '
-            ShowAccelChar = False
-            OnClick = LblBibArtistClick
-          end
-          object EdtBibAlbum: TEdit
-            Tag = 2
-            Left = 82
-            Top = 53
-            Width = 121
-            Height = 21
-            TabOrder = 2
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibArtist: TEdit
-            Left = 74
-            Top = 2
-            Width = 121
-            Height = 21
-            TabOrder = 3
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibGenre: TComboBox
-            Tag = 5
-            Left = 53
-            Top = 134
-            Width = 150
-            Height = 21
-            Sorted = True
-            TabOrder = 4
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibTitle: TEdit
-            Tag = 1
-            Left = 82
-            Top = 29
-            Width = 121
-            Height = 21
-            TabOrder = 5
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibTrack: TEdit
-            Tag = 3
-            Left = 82
-            Top = 80
-            Width = 121
-            Height = 21
-            NumbersOnly = True
-            TabOrder = 6
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object EdtBibYear: TEdit
-            Tag = 4
-            Left = 82
-            Top = 107
-            Width = 121
-            Height = 21
-            NumbersOnly = True
-            TabOrder = 7
-            Visible = False
-            OnExit = EdtBibArtistExit
-            OnKeyPress = EdtBibArtistKeyPress
-          end
-          object MemBibTags: TMemo
-            Left = 69
-            Top = 161
-            Width = 134
-            Height = 89
-            ScrollBars = ssVertical
-            TabOrder = 8
-            Visible = False
-            WordWrap = False
-            OnExit = MemBibTagsExit
-            OnKeyPress = MemBibTagsKeyPress
-          end
-          object BtnApplyEditTags: TButton
-            Left = 44
-            Top = 221
-            Width = 29
-            Height = 19
-            Caption = 'Ok'
-            TabOrder = 0
-            Visible = False
-            OnClick = BtnApplyEditTagsClick
-          end
-          object BtnCancelEditTags: TButton
-            Left = 79
-            Top = 222
-            Width = 29
-            Height = 19
-            Caption = 'Esc'
-            TabOrder = 1
-            Visible = False
-            OnClick = BtnApplyEditTagsClick
-          end
+          Top = 40
+          Width = 54
+          Height = 13
+          Caption = '                  '
+          ShowAccelChar = False
+          OnDblClick = DetailLabelDblClick
+          OnMouseEnter = DetailLabelMouseOver
+          OnMouseLeave = DetailLabelMouseLeave
+        end
+        object ImgBibRating: TImage
+          Left = 166
+          Top = 144
+          Width = 70
+          Height = 14
+          Hint = 'Click to change rating'
+          Visible = False
+          OnMouseDown = ImgBibRatingMouseDown
+          OnMouseLeave = ImgBibRatingMouseLeave
+          OnMouseMove = ImgBibRatingMouseMove
         end
       end
       object VST: TVirtualStringTree
-        Left = 406
+        Left = 2
         Top = 2
         Width = 495
         Height = 309
@@ -4026,6 +3906,12 @@ object Nemp_MainForm: TNemp_MainForm
       Visible = False
       OnClick = MM_H_ErrorLogClick
     end
+    object MM_Warning_ID3Tags: TMenuItem
+      Caption = 'Warning'
+      ImageIndex = 33
+      Visible = False
+      OnClick = MM_Warning_ID3TagsClick
+    end
   end
   object PlayListImageList: TImageList
     Height = 14
@@ -4033,7 +3919,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01010D00000A2C0B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010D00000A7C0B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000380000003800000001002000000000000031
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4498,7 +4384,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012100300B5C0C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012200300BD00C10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000009000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4510,113 +4396,113 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000F4F4F400E1E1E100CECECE00C9C9C900CBCBCA00D7D7D700EBEBEB00FAFA
-      FA00000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      FA000000000000000000000000000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000ECECEC009696
       9600292A2A002525280045444600686462005A56550039383A00222223005252
-      5200CACACA00FAFAFA0000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      5200CACACA00FAFAFA00000000000000000000000000FFFFFF00CED6DF00A7B3
+      C600AAB3CA00A7B2CC00A2B0CB00A3B2CB00A5B3CB00A3B0C900A5B0C7009FAE
+      CA0091A7C900C4CEDB00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000616161000000
       0000181819004242440069696B008D8A88007F7B7A005C5B5C00343435000707
-      07000C0C0D00C7C7C70000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      07000C0C0D00C7C7C700000000000000000000000000FFFFFF005F90C9000D6B
+      D3001076D7002186D8003A96D900459CD900469CD9004298D700298AD500137A
+      D9000072E2006496C900FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000343534000404
       0400141415003A3A3C00666566008B8786007B7878005656570029292A000B0B
-      0B0007070700BDBDBD0000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0B0007070700BDBDBD00000000000000000000000000FFFFFF0096B5DC000072
+      E7000088FF00159EFF002FB3FF0079D3FF008BDBFF003CB8FF0020A5FF000B9B
+      FF00007EEC0099B6D900FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000969696001111
       1100101011003B3B3D00666567008B8886007B78780057575800282828000E0E
-      0E00212121000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0E002121210000000000000000000000000000000000FFFFFF00F4EFEE00679F
+      D4000988F5000787FC000082FC0080C2FA00A8D8FA00038CFC000A8CFD00008D
+      FB003A86D100F1EDEC00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000D3D3D3001212
       12001616160037373900605F60008784820075727200504E5100292729001919
-      19003B3B3B000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      19003B3B3B0000000000000000000000000000000000FFFFFF00FFFFFF00C7D3
+      E3003693DC0026A2FC00007DFC003A9EFB0055ADFA000074FD00028CFE000887
+      ED00A6B5CF00FFFFFF00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000FCFCFC001212
       13000C0C0D0040414200787778009695930093929100706E6F00232223000909
-      0A00545454000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0A005454540000000000000000000000000000000000FFFFFF00F8FAFC00FBF9
+      F90079A7D100369EEA000C8AF000B3DAFA00EDEEFA000059F000008DFF004689
+      CB00FDFAF800FDFEFE00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000F4F4F4003A3A
       3A005A5A5A009C9D9B00B4B4B400BEC0BE00C0C0C000CDCCCB00B9B8B7006867
-      6500797979000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      65007979790000000000000000000000000000000000FFFFFF00FAFBFC00FFFF
+      FF00D7DEE8004B97D7001A8DE700AAD4F300D9E7F9000277F7000780E900C3CE
+      DD00FFFFFF00FCFDFE00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000DEDEDE0039383B00414242004D4E
       5000252427002B2A2E00292A2D00363538004B4A4C005F5E6100636262007675
-      7400A5A6A5000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      7400A5A6A50000000000000000000000000000000000FFFFFF00FFFFFF00FDFD
+      FD00FFFFFF0090B2D2002892E100A0CFF000C3E6FB000898FA006EA7D400F9F7
+      F700FCFDFE00FDFDFD00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000565657004342450054535500DBDB
       DB00A3A3A300131314000F0F100012121300141416001F1E2100353438003E3D
-      3F003A3A3B00ADADAE0000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      3F003A3A3B00ADADAE00000000000000000000000000FFFFFF00FEFEFE00FDFD
+      FD00FEFEFE00E7EBF1004E94CE004FACEF0041B1FD00359BE300CBD4E100FFFF
+      FF00FBFCFD00FEFEFE00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000007C7C7E00434145002D2D2E001515
       1500292B29006B6B6A0065656500292A29000C0C0C000C0D0C00131412002222
-      22002E2D3000343336002D2C2F00868586000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      22002E2D3000343336002D2C2F008685860000000000FFFFFF00FFFFFF00FEFE
+      FE00FCFDFE00FDFDFD00A2BFDB003EA3EC003CB2FD007CABD800FCFAFA00FBFC
+      FD00FEFEFD00FFFFFF00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000D4D4D5005D5D5F00444246004141
       4000333433002A2C2B00363635006F6F6F00717170004B4B4A001B1C1B001C1D
-      1C0031303400313033004C4B4E007E7E80000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      1C0031303400313033004C4B4E007E7E800000000000FFFFFF00FFFFFF00FFFF
+      FF00FCFDFD00FDFEFE00E5E8F00060ACE5004BA7E700DADEE600FEFFFF00FCFD
+      FD00FFFFFF00FEFEFE00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000000000AEAEB0006C6B6E005656
       590053535400505051004D4E4F00464647004A4A4B0078787900828182004545
-      430032323300A7A7A80000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      430032323300A7A7A800000000000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FEFEFE00FCFDFD00FFFFFF00C2D8ED00ADC8E200FFFFFF00FDFDFD00FEFE
+      FE00FEFEFE00FFFFFF00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000E6E5E600A8A8
       AA008D8C8E0088878900908F92009F9FA100A3A3A400C1C1C100DCDCDC00A4A4
-      A50073737400908F8E00B2B2B100C9C9C9000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      A50073737400908F8E00B2B2B100C9C9C90000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7209,28 +7095,10 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = '-'
     end
     object VST_ColumnPopupCover: TMenuItem
+      AutoCheck = True
       AutoHotkeys = maManual
-      Caption = 'Cover'
-      object VST_ColumnPopupCoverOff: TMenuItem
-        AutoCheck = True
-        Caption = 'Disabled'
-        RadioItem = True
-        OnClick = VST_ColumnPopupCoverOnClick
-      end
-      object VST_ColumnPopupCoverLeft: TMenuItem
-        Tag = 1
-        AutoCheck = True
-        Caption = 'Left'
-        RadioItem = True
-        OnClick = VST_ColumnPopupCoverOnClick
-      end
-      object VST_ColumnPopupCoverRight: TMenuItem
-        Tag = 2
-        AutoCheck = True
-        Caption = 'Right'
-        RadioItem = True
-        OnClick = VST_ColumnPopupCoverOnClick
-      end
+      Caption = 'Cover and additional details'
+      OnClick = VST_ColumnPopupCoverClick
     end
   end
   object PopupPlayPause: TPopupMenu
@@ -7414,18 +7282,11 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 728
     Top = 624
   end
-  object MemoDisableTimer: TTimer
-    Enabled = False
-    Interval = 150
-    OnTimer = MemoDisableTimerTimer
-    Left = 96
-    Top = 512
-  end
   object TaskBarImages: TImageList
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07980810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07E80810001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -7839,28 +7700,6 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Close this menu'
     end
   end
-  object CoverDetails_Popup: TPopupMenu
-    Images = MenuImages
-    Left = 32
-    Top = 576
-    object PM_Cover_Aside: TMenuItem
-      Tag = 1
-      Caption = 'Details aside the cover'
-      ImageIndex = 29
-      OnClick = PM_Cover_DontShowDetailsClick
-    end
-    object PM_Cover_Below: TMenuItem
-      Tag = 2
-      Caption = 'Details below the cover'
-      ImageIndex = 30
-      OnClick = PM_Cover_DontShowDetailsClick
-    end
-    object PM_Cover_DontShowDetails: TMenuItem
-      Caption = 'No details'
-      ImageIndex = 28
-      OnClick = PM_Cover_DontShowDetailsClick
-    end
-  end
   object HeadSetTimer: TTimer
     Enabled = False
     Interval = 250
@@ -7919,5 +7758,50 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = CoverFlowRefreshViewTimerTimer
     Left = 208
     Top = 464
+  end
+  object PopupEditExtendedTags: TPopupMenu
+    OnPopup = PopupEditExtendedTagsPopup
+    Left = 832
+    Top = 704
+    object PM_TagAudiofile: TMenuItem
+      Caption = 'This audio file'
+      Enabled = False
+      Visible = False
+    end
+    object PM_AddTagThisFile: TMenuItem
+      Caption = 'Add new tag to this file'
+      OnClick = DetailLabelDblClickNewTag
+    end
+    object PM_RenameTagThisFile: TMenuItem
+      Caption = 'Rename tag in this file'
+      OnClick = PM_RenameTagThisFileClick
+    end
+    object PM_RemoveTagThisFile: TMenuItem
+      Caption = 'Remove tag from this file'
+      OnClick = PM_RemoveTagThisFileClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object PM_TagTagCloud: TMenuItem
+      Caption = 'Nemp Tagcloud (Ignore/Rename rules)'
+      Enabled = False
+      Visible = False
+    end
+    object PM_TagIgnoreList: TMenuItem
+      Caption = 'Add "Ignore rule" and remove this tag from all files'
+      OnClick = PM_TagIgnoreListClick
+    end
+    object PM_TagMergeList: TMenuItem
+      Caption = 'Add "Rename rule" and rename this tag in all files'
+      OnClick = PM_TagMergeListClick
+    end
+    object N79: TMenuItem
+      Caption = '-'
+    end
+    object pm_TagDetails: TMenuItem
+      Caption = 'Properties'
+      OnClick = pm_TagDetailsClick
+    end
   end
 end

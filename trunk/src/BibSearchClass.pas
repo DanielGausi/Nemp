@@ -185,12 +185,15 @@ type
         procedure SearchFuzzy(Searchmode: Integer; UTF8LongestKeyword: UTF8String; KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
         procedure SearchExact(Searchmode: Integer; UTF8LongestKeyword: UTF8String; KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
         function IsOK(substr:UnicodeString; str: UnicodeString):boolean;
+        function IsOKNoSubStrings(substr:UnicodeString; str: UnicodeString):boolean;
         function IsOKApprox(substr: UTF8String; str: UnicodeString):boolean;
         function CheckGenre(Genre: UnicodeString):boolean;
         function CheckYear(Year: UnicodeString):boolean;
 
         function AudioFileMatchesCompleteKeywords(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
         function AudioFileMatchesCompleteKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8SearchKeywords): Boolean;
+
+        function AudioFileMatchesCompleteKeywordsNoSubStrings(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
 
         function GenerateKeywordList(aKeyword: UnicodeString): TStringList;
 
@@ -264,7 +267,10 @@ type
         procedure InitBetterSearch(Keywords: TSearchKeyWords);
 
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
+        procedure GlobalQuickTagSearch(KeyTag: UnicodeString);
+
         procedure CompleteSearch(Keywords: TSearchKeyWords);
+        procedure CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
         // Search for IPC (as used in the Deskband)
         procedure IPCQuickSearch(Keyword: UnicodeString);
 
@@ -675,20 +681,17 @@ end;
 }
 function TBibSearcher.IsOK(substr: UnicodeString; str: UnicodeString):boolean;
 begin
-  //if ExtendedSearchOptions.FindSubstrings then
-      result := (substr = '') or (AnsiContainsText(str, substr))
-  //else
-  //    result := (substr = '') or AnsiSameText(substr, str)
-  // ...
-  // Note: LOC commented out here remains from previous versions
-  // of searching. I think "FindSubstrings" is always wanted
+    result := (substr = '') or (AnsiContainsText(str, substr))
 end;
+function TBibSearcher.IsOKNoSubStrings(substr:UnicodeString; str: UnicodeString):boolean;
+begin
+    // Exact matching, used for doubleClick on Labels
+    result := (substr = '') or AnsiSameText(substr, str)
+end;
+
 function TBibSearcher.IsOKApprox(substr:UTF8String; str: UnicodeString):boolean;
 begin
-  //if ExtendedSearchOptions.FindSubstrings then
-      result := (substr = '') or (SearchDP(UTF8Encode(AnsiLowerCase(str)), substr, Length(substr) Div 4) > 0)
-  //else
-  //    result := (substr = '') or (ApproxDistance(UTF8Encode(AnsiLowerCase(str)), substr) <=  Length(substr) Div 4)
+    result := (substr = '') or (SearchDP(UTF8Encode(AnsiLowerCase(str)), substr, Length(substr) Div 4) > 0)
 end;
 
 {
@@ -741,6 +744,7 @@ end;
     AudioFileMatchesCompleteKeywordsApprox
     Check whether the audiofile matches the keywords
     (keywords here means separated by fields)
+    AudioFileMatchesCompleteKeywordsNoSubStrings: Exact matching, used for doubleClick on Labels
     --------------------------------------------------------
 }
 function TBibSearcher.AudioFileMatchesCompleteKeywords(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
@@ -765,6 +769,19 @@ begin
             or (AnsiContainsText(UTF8ToString(aAudioFile.Lyrics), Keywords.General))
           );
 end;
+
+function TBibSearcher.AudioFileMatchesCompleteKeywordsNoSubStrings(aAudioFile: TAudioFile; Keywords: TSearchKeywords): Boolean;
+begin
+    result := IsOKNoSubStrings(Keywords.Artist, aAudioFile.Artist)
+          AND IsOKNoSubStrings(Keywords.Titel, aAudioFile.Titel)
+          AND IsOKNoSubStrings(Keywords.Album, aAudioFile.Album)
+          AND IsOKNoSubStrings(Keywords.Pfad, aAudioFile.Pfad)
+          AND IsOKNoSubStrings(Keywords.Kommentar, aAudioFile.Comment)
+          AND CheckGenre(aAudioFile.Genre)
+          AND CheckYear(aAudioFile.Year);
+end;
+
+
 function TBibSearcher.AudioFileMatchesCompleteKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8SearchKeywords): Boolean;
 begin
     result := IsOKApprox(Keywords.Artist, aAudioFile.Artist)
@@ -1161,6 +1178,43 @@ begin
   Keywords.Free;
 end;
 
+procedure TBibSearcher.GlobalQuickTagSearch(KeyTag: UnicodeString);
+var i: Integer;
+    aAudioFile: TAudioFile;
+    tmpTagList: TStringList;
+begin
+    // we need only one list here
+    QuickSearchResults.Clear;
+    QuickSearchAdditionalResults.Clear;
+
+    tmpTagList := TStringList.Create;
+    try
+        for i := 0 to MainList.Count - 1 do
+        begin
+            aAudioFile := TAudioFile(MainList[i]);
+            if AnsiContainsText(aAudioFile.RawTagLastFM      , KeyTag) then
+            begin
+                // audiofile is possibly tagged with the KeyTag
+                tmpTagList.Text := String(aAudioFile.RawTagLastFM);
+                if tmpTagList.IndexOf(KeyTag) > -1 then
+                    QuickSearchResults.Add(aAudioFile);
+            end;
+        end;
+    finally
+        tmpTagList.Free;
+    end;
+
+    // show search results
+    SetQuickSearchList(QuickSearchResults);
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
+
+    // Copy SearchResults to VCL-Lists
+    //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetQuickSearchResults, lParam(QuickSearchResults));
+    //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetAdditionalQuickSearchResults, lParam(QuickSearchAdditionalResults));
+    // Show search results.
+    //SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(fDummyAudioFile));
+end;
+
 
 
 {
@@ -1530,6 +1584,23 @@ begin
     // show search results
     SetQuickSearchList(CurrentList);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
+end;
+
+// Exact matching, used for doubleClick on Labels
+procedure TBibSearcher.CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
+var i: Integer;
+begin
+    // we need only one list here
+    QuickSearchResults.Clear;
+    QuickSearchAdditionalResults.Clear;
+
+    for i := 0 to MainList.Count - 1 do
+        if AudioFileMatchesCompleteKeywordsNOSubStrings(TAudioFile(MainList[i]), Keywords) then
+            QuickSearchResults.Add(TAudioFile(MainList[i]));
+
+    // show search results
+    SetQuickSearchList(QuickSearchResults);
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
 end;
 
 {

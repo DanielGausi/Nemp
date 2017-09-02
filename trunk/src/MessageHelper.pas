@@ -575,9 +575,9 @@ begin
             FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
             if aMsg.LParam <> 0 then
-                MedienListeStatusLBL.Caption := Warning_FileNotFound
-            else
-                MedienListeStatusLBL.Caption := '';
+                MedienListeStatusLBL.Caption := Warning_FileNotFound;
+            //else
+            //    MedienListeStatusLBL.Caption := '';
         end;
 
         MB_ShowSearchResults: begin
@@ -634,12 +634,15 @@ begin
         end;
 
         MB_RefreshTagCloudFile: begin
-            CloudEditorForm.LblUpdateWarning.Caption := PChar(aMsg.LParam);
+            Nemp_MainForm.MM_Warning_ID3Tags.Caption := PChar(aMsg.LParam);
+
+            if assigned(CloudEditorForm) then
+                CloudEditorForm.LblUpdateWarning.Caption := PChar(aMsg.LParam);
+
             if PChar(aMsg.LParam) = '' then
-            begin
-                CloudEditorForm.LblUpdateWarning.Visible := False;
-                CloudEditorForm.RefreshWarningLabel;
-            end;
+                // end of operation (may be cancelled by user)
+                // refresh needed update information
+                SetGlobalWarningID3TagUpdate;
         end;
 
         MB_ProgressSearchDead: AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
@@ -804,6 +807,10 @@ begin
 
         MB_InvalidGMPFile: begin
             MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
+        end;
+
+        MB_ID3TagUpdateComplete: begin
+            MessageDlg(TagEditor_FilesUpdateComplete, mtInformation, [MBOK], 0);
         end;
 
         MB_UserInputDeadFiles: begin

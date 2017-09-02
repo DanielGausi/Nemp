@@ -1002,7 +1002,6 @@ begin
                                       aAudioFile.Titel := ExtractFileName(ExpandFilename(s));
                                       aAudioFile.Artist := '';
                                   end;
-
                               end;
 
                               at_Stream: begin

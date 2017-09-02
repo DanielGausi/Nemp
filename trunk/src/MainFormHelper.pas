@@ -102,14 +102,20 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure ClearShortCuts;
     procedure SetShortCuts;
 
+    function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String; Out newTag: String; out IgnoreWarnings: Boolean): Boolean;
+    function HandleIgnoreRule(aTag: String): Boolean;
+    function HandleMergeRule(aTag: String; out newTag: String): Boolean;
     // Select all files with the same path as MedienBib.CurrentAudioFile
     function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
     procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
+    procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
+    procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: String);
 
     procedure CorrectVCLForABRepeat;
 
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
+    procedure SetGlobalWarningID3TagUpdate;
 
     // procedure CheckAndDoCoverDownloaderQuery;
 
@@ -140,7 +146,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
-    CDOpenDialogs, LowBattery, PlayWebstream;
+    CDOpenDialogs, LowBattery, PlayWebstream, Taghelper;
 
 procedure CorrectVolButton;
 begin
@@ -366,11 +372,23 @@ var i: integer;
   NewNode:PVirtualNode;
   Data:PTreeData;
   tmpAudioFile: TAudioFile;
+
+  function SameFile(File1, File2: TAudioFile): Boolean;
+  begin
+      if assigned(File1) and assigned(File2) then
+          result := (File1.Dateiname = File2.Dateiname) AND (File1.Ordner = File2.Ordner)
+      else
+          result := False;
+  end;
 begin
     with Nemp_MainForm do
     begin
         VST.BeginUpdate;
         VST.Clear;
+
+        // testing 08.2017: Filling Label-Doubleclick-Search results (e.g.)
+        if not assigned(AudioFile) then
+            AudioFile := MedienBib.CurrentAudioFile;
 
         if (Not MedienBib.AnzeigeListIsCurrentlySorted) then
             VST.Header.SortColumn := -1
@@ -378,9 +396,8 @@ begin
             VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
 
         for i:=0 to MP3Liste.Count-1 do
-        begin
-          AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
-        end;
+            AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
+
         VST.EndUpdate;
 
         // Knoten mit AudioFile suchen und focussieren
@@ -389,15 +406,16 @@ begin
         begin
             Data := VST.GetNodeData(NewNode);
             tmpAudioFile := Data^.FAudioFile;
-            if tmpAudioFile <> AudioFile then
+            //if tmpAudioFile <> AudioFile then
+            if Not SameFile(tmpAudioFile, AudioFile) then
             repeat
-              NewNode := VST.GetNext(NewNode);
-              if assigned(NewNode) then
-              begin
-                  Data := VST.GetNodeData(NewNode);
-                  tmpAudioFile := Data^.FAudioFile;
-              end;
-            until (tmpAudioFile = AudioFile) OR (NewNode=NIL);
+                NewNode := VST.GetNext(NewNode);
+                if assigned(NewNode) then
+                begin
+                    Data := VST.GetNodeData(NewNode);
+                    tmpAudioFile := Data^.FAudioFile;
+                end;
+            until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
 
             // Ok, we didn't found our AudioFile.
             // get the first one in the list.
@@ -417,7 +435,7 @@ begin
               VST.Selected[NewNode] := True;
               VST.FocusedNode := NewNode;
             //  AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-              ShowVSTDetails(tmpAudioFile);
+              ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
             end
             // else
             //  AktualisiereDetailForm(NIL, SD_MEDIENBIB);
@@ -464,7 +482,7 @@ begin
                 VST.Selected[NewNode] := True;
                 VST.FocusedNode := NewNode;
                 //AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-                ShowVSTDetails(tmpAudioFile);
+                ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
             end else
             begin
                 //AktualisiereDetailForm(NIL, SD_MEDIENBIB);
@@ -520,7 +538,7 @@ begin
           begin
             VST.Selected[NewNode] := True;
             VST.FocusedNode := NewNode;
-            ShowVSTDetails(tmpAudioFile);
+            ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
             // AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
           end
           else
@@ -1267,6 +1285,265 @@ begin
     end;
 end;
 
+
+
+function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String; Out newTag: String; out IgnoreWarnings: Boolean): Boolean;
+// TagToReplace =  '' -> add new tag (commas allowed)
+// TagToReplace <> '' -> rename a existing tag (no cammas allowed)
+var ClickedOK, askNoMore: Boolean;
+    backup: String;
+    i, dlgresult: Integer;
+begin
+    result := False;
+    if not assigned(aAudioFile) then
+        exit;
+
+    if aAudioFile.HasSupportedTagFormat then
+    begin
+        backup := aAudioFile.RawTagLastFM;
+
+        if TagToReplace = '' then
+            ClickedOK := InputQuery(MainForm_AddTagQueryCaption, MainForm_AddTagQueryLabel, NewTag)
+        else
+            ClickedOK := InputQuery(MainForm_RenameTagQueryCaption, Format(MainForm_RenameTagQueryLabel, [TagToReplace]), NewTag);
+
+        if ClickedOK and (Trim(NewTag) <> '') and (Trim(NewTag) <> TagToReplace) then
+        // the third if is maybe just a duplicate, if we want to add a new tag
+        begin
+            if (TagToReplace <> '') and CommasInString(NewTag) then
+                TranslateMessageDLG((TagManagement_RenameTagNoCommas), mtWarning, [MBOK], 0)
+            else
+            begin
+                if (MedienBib.StatusBibUpdate <= 1)
+                    and (MedienBib.CurrentThreadFilename <> aAudioFile.Pfad)
+                then
+                begin
+                    case MedienBib.AddNewTagConsistencyCheck(aAudioFile, newTag) of
+
+                        CONSISTENCY_OK:  begin
+                                result := True;
+                                if (TagToReplace <> '') then
+                                    aAudioFile.RemoveTag( TagToReplace);
+                                MedienBib.AddNewTag(aAudioFile, newTag, False);
+                                IgnoreWarnings := False;
+                        end;
+
+                        CONSISTENCY_HINT: begin
+                                result := True;
+                                if (TagToReplace <> '') then
+                                    aAudioFile.RemoveTag(TagToReplace);
+                                MedienBib.AddNewTag(aAudioFile, newTag, False);
+                                IgnoreWarnings := False;
+                                // show information about changes, no user action  required, just "OK"
+                                if MedienBib.ShowAutoResolveInconsistenciesHints then
+                                begin
+                                    askNoMore := not MedienBib.ShowAutoResolveInconsistenciesHints;
+                                    MessageDlgWithNoMorebox
+                                          ((TagManagementDialogOnlyHint_Caption),
+                                          (TagManagementDialogOnlyHint_Text) + MedienBib.TagPostProcessor.LogList.Text ,
+                                           mtInformation,
+                                           [mbOK], mrOK, 0,
+                                           asknomore, (TagManagementDialogOnlyHint_ShowAgain));
+                                    MedienBib.ShowAutoResolveInconsistenciesHints := not asknomore;
+                                end;
+                        end;
+
+                        CONSISTENCY_WARNING: begin
+                                if MedienBib.AskForAutoResolveInconsistencies then
+                                begin
+                                    askNoMore := not MedienBib.AskForAutoResolveInconsistencies;
+                                    dlgresult := MessageDlgWithNoMorebox
+                                          ((TagManagementDialog_Caption),
+                                          (TagManagementDialog_Text) + MedienBib.TagPostProcessor.LogList.Text ,
+                                           mtWarning,
+                                           [mbIgnore, mbCancel, mbOK], mrOK, 0,
+                                           asknomore, (TagManagementDialog_ShowAgain));
+
+                                    case dlgresult of
+                                        mrIgnore: begin
+                                            MedienBib.AutoResolveInconsistencies := False;
+                                            result := True;
+                                            if (TagToReplace <> '') then
+                                                aAudioFile.RemoveTag(TagToReplace);
+                                            MedienBib.AddNewTag(aAudioFile, newTag, True);
+                                            IgnoreWarnings := True;
+                                            MedienBib.AskForAutoResolveInconsistencies := not asknomore;
+                                        end;
+                                        mrOK: begin
+                                            MedienBib.AutoResolveInconsistencies := True;
+                                            result := True;
+                                            if (TagToReplace <> '') then
+                                                aAudioFile.RemoveTag(TagToReplace);
+                                            MedienBib.AddNewTag(aAudioFile, newTag, False);
+                                            IgnoreWarnings := False;
+                                            MedienBib.AskForAutoResolveInconsistencies := not asknomore;
+                                        end;
+                                        mrCancel: begin
+                                            result := False;
+                                        end;
+                                    end;
+                                end else
+                                begin
+                                    // just da as the settings say
+                                    result := true; //MedienBib.AutoResolveInconsistencies;
+                                    if (TagToReplace <> '') then
+                                        aAudioFile.RemoveTag(TagToReplace);
+                                    MedienBib.AddNewTag(aAudioFile, newTag, not MedienBib.AutoResolveInconsistencies);
+                                    IgnoreWarnings := not MedienBib.AutoResolveInconsistencies;
+                                end;
+                        end;
+                    end;
+                end else
+                    TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
+            end;
+        end;
+    end else
+        TranslateMessageDLG((MainForm_TagNotSupportedFileFormat), mtWarning, [MBOK], 0);
+end;
+
+function HandleIgnoreRule(aTag: String): Boolean;
+var askNoMore: Boolean;
+    c, dlgresult: Integer;
+begin
+    result  := False;
+
+    c := Medienbib.CountFilesWithTag(aTag);
+    if c>1 then
+    begin
+        if TranslateMessageDLG((Format(TagManagement_FileCountWarning, [c])), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+            exit;
+    end;
+
+    case MedienBib.TagPostProcessor.AddIgnoreRuleConsistencyCheck(aTag) of
+
+        CONSISTENCY_OK: begin
+                result := True;
+                MedienBib.TagPostProcessor.AddIgnoreRule(aTag, False);
+        end;
+
+        CONSISTENCY_HINT,
+        CONSISTENCY_WARNING: begin
+                if MedienBib.AskForAutoResolveInconsistenciesRules then
+                begin
+                    askNoMore := not MedienBib.AskForAutoResolveInconsistenciesRules;
+                    dlgresult := MessageDlgWithNoMorebox
+                          ((TagManagementDialog_Caption),
+                          (TagManagementDialog_TextRules) + MedienBib.TagPostProcessor.LogList.Text ,
+                           mtWarning,
+                           [mbIgnore, mbCancel, mbOK], mrOK, 0,
+                           asknomore, (TagManagementDialog_ShowAgain));
+
+                    case dlgresult of
+                        mrIgnore: begin
+                            MedienBib.AutoResolveInconsistenciesRules := False;
+                            MedienBib.TagPostProcessor.AddIgnoreRule(aTag, True);
+                            result := True;
+                            MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                        end;
+                        mrOK: begin
+                            MedienBib.AutoResolveInconsistenciesRules := True;
+                            MedienBib.TagPostProcessor.AddIgnoreRule(aTag, False);
+                            result := True;
+                            MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                        end;
+                        mrCancel: begin
+                            result := False;
+                        end;
+                    end;
+                end else
+                begin
+                    // just do as the settings say
+                    result := true; //MedienBib.AutoResolveInconsistencies;
+                    MedienBib.TagPostProcessor.AddIgnoreRule(aTag, not MedienBib.AutoResolveInconsistenciesRules);
+                end;
+        end;
+    end;
+
+    if result and assigned(CloudEditorForm) then
+    begin
+        CloudEditorForm.FillIgnoreTree;
+        CloudEditorForm.FillMergeTree;
+    end;
+end;
+
+function HandleMergeRule(aTag: String; out newTag: String): Boolean;
+var ClickedOK, askNoMore: Boolean;
+    c, dlgResult: Integer;
+begin
+    result := False;
+    c := Medienbib.CountFilesWithTag(aTag);
+    if c>1 then
+    begin
+        if TranslateMessageDLG((Format(TagManagement_FileCountWarning, [c])), mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+            exit;
+    end;
+
+    ClickedOK := InputQuery(MainForm_RenameTagQueryCaption, Format(MainForm_RenameTagQueryLabel, [aTag]), NewTag);
+
+    if ClickedOK and (Trim(NewTag) <> '') and (Trim(NewTag) <> aTag) then
+    begin
+        // seems to be a valid input at first sight
+        if CommasInString(NewTag) then
+            // ... but we do not allow a comma separated list of tags here
+            TranslateMessageDLG((TagManagement_RenameTagNoCommas), mtWarning, [MBOK], 0)
+        else
+        begin
+            // Actually try to update the merge rules
+            case MedienBib.TagPostProcessor.AddMergeRuleConsistencyCheck(aTag, newTag) of
+
+                CONSISTENCY_OK: begin
+                        result := True;
+                        MedienBib.TagPostProcessor.AddMergeRule(aTag, newTag, False)
+                end;
+
+                CONSISTENCY_HINT,
+                CONSISTENCY_WARNING: begin
+                        if MedienBib.AskForAutoResolveInconsistenciesRules then
+                        begin
+                            askNoMore := not MedienBib.AskForAutoResolveInconsistenciesRules;
+                            dlgresult := MessageDlgWithNoMorebox
+                                  ((TagManagementDialog_Caption),
+                                  (TagManagementDialog_TextRules) + MedienBib.TagPostProcessor.LogList.Text ,
+                                   mtWarning,
+                                   [mbIgnore, mbCancel, mbOK], mrOK, 0,
+                                   asknomore, (TagManagementDialog_ShowAgain));
+
+                            case dlgresult of
+                                mrIgnore: begin
+                                    MedienBib.AutoResolveInconsistenciesRules := False;
+                                    MedienBib.TagPostProcessor.AddMergeRule(aTag, newTag, True);
+                                    result := True;
+                                    MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                end;
+                                mrOK: begin
+                                    MedienBib.AutoResolveInconsistenciesRules := True;
+                                    MedienBib.TagPostProcessor.AddMergeRule(aTag, newTag, False);
+                                    result := True;
+                                    MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
+                                end;
+                                mrCancel: begin
+                                    result := False;
+                                end;
+                            end;
+                        end else
+                        begin
+                            // just do as the settings say
+                            result := True; //MedienBib.AutoResolveInconsistencies;
+                            MedienBib.TagPostProcessor.AddMergeRule(aTag, newTag, not MedienBib.AutoResolveInconsistenciesRules);
+                        end;
+                end;
+            end;
+        end;
+    end;
+    if result and assigned(CloudEditorForm) then
+    begin
+        CloudEditorForm.FillIgnoreTree;
+        CloudEditorForm.FillMergeTree;
+    end;
+end;
+
+
+
 {
     GetListOfAudioFileCopies
     Collect all Files ithin the Nemp-Universe with the same filename.
@@ -1324,6 +1601,44 @@ begin
             result := False;
     //end;
 end;
+
+procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
+var i: Integer;
+    ListOfFiles: TObjectList;
+begin
+    ListOfFiles := TObjectList.Create(False);
+    try
+        GetListOfAudioFileCopies(aAudioFile, ListOfFiles);
+        for i := 0 to ListOfFiles.Count - 1 do
+            TAudioFile(ListOfFiles[i]).Assign(aAudioFile);
+    finally
+        ListOfFiles.Free;
+    end;
+end;
+
+procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: String);
+var aErr: TNempAudioError;
+    BibFile: TAudioFile;
+begin
+    aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
+    if aErr = AUDIOERR_None then
+    begin
+        aAudioFile.ID3TagNeedsUpdate := False;
+        SyncAudioFilesWith(aAudioFile);
+        // Correct GUI (player, Details, Detailform, VSTs))
+        CorrectVCLAfterAudioFileEdit(aAudioFile);
+        // Update the TagCloud
+        BibFile := MedienBib.GetAudioFileWithFilename(aAudioFile.Pfad);
+        if assigned(BibFile) then
+            MedienBib.TagCloud.UpdateAudioFile(BibFile);
+    end else
+    begin
+        aAudioFile.RawTagLastFM := backupTag;
+        HandleError(afa_EditingDetails, aAudioFile, aErr);
+        TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+    end;
+end;
+
 {
     CorrectVCLAfterAudioFileEdit
     After a File has been edited (and all of its copies)
@@ -1363,7 +1678,7 @@ begin
 
     // ... VST-Details
     if SameFile(MedienBib.CurrentAudioFile) then
-        Nemp_MainForm.ShowVSTDetails(MedienBib.CurrentAudioFile);
+        Nemp_MainForm.ShowVSTDetails(MedienBib.CurrentAudioFile, -1);  // -1: Do not change Source (playlist/medienbib)) of audiofile
 
     // ... Detail-Form
     if assigned(fDetails)
@@ -1452,7 +1767,7 @@ begin
             // Show a warning-sign
             if Medienbib.BrowseMode = 2 then
             begin
-                // Browsing by artist-album activated
+                // Browsing by tagcloud activated
                 TabBtn_TagCloud.GlyphLine := 2;
             end else
                 // Browsing by cover (or something else) activated
@@ -1474,6 +1789,23 @@ begin
         // Refresh the Button
         TabBtn_TagCloud.Refresh;
     end;
+end;
+
+procedure SetGlobalWarningID3TagUpdate;
+var c: Integer;
+begin
+    c := Medienbib.CountInconsistentFiles;
+    Nemp_MainForm.MM_Warning_ID3Tags.Caption := Format(MediaLibrary_InconsistentFilesCaption, [c]);
+    Nemp_MainForm.MM_Warning_ID3Tags.Visible := c > 0;
+    Nemp_MainForm.MM_Warning_ID3Tags.Tag := c;
+
+    if assigned(CloudEditorForm) then
+    begin
+        CloudEditorForm.LblUpdateWarning.Caption := Format(TagEditor_FilesNeedUpdate, [c]);
+        CloudEditorForm.LblUpdateWarning.Visible := c > 0;
+        CloudEditorForm.BtnUpdateID3Tags.Enabled := c > 0;
+    end;
+
 end;
          {
 procedure CheckAndDoCoverDownloaderQuery;
@@ -1557,13 +1889,10 @@ begin
 
   for idx := 0 to length(SelectedMP3s)-1 do
   begin
-      //if aTree.GetNodeLevel(SelectedMP3s[idx]) <> 0 then
-      //showmessage(inttostr(aTree.GetNodeLevel(SelectedMP3s[idx])));
-
       Data := aTree.GetNodeData(SelectedMP3s[idx]);
       if FileExists(Data^.FAudioFile.Pfad) then
           result := result + Data^.FAudioFile.Pfad + #0;
-      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  600)  )
+      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  MIN_CUESHEET_DURATION)  )
          AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
       then
           result := result + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;

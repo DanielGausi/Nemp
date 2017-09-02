@@ -288,7 +288,6 @@ procedure TMedienlisteForm.RepaintForm;
 begin
     Repaint;
     Nemp_MainForm.VSTPanel.Repaint;
-    Nemp_MainForm.VDTCoverInfoPanel.Repaint;
     Nemp_MainForm.VDTCover.Repaint;
 
     //Nemp_MainForm.TabPanelMedienliste.Repaint;
