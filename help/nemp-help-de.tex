@@ -41,6 +41,8 @@
 
 \newenvironment{hinweis}{\noindent{\bf Hinweis: }\itshape}{\par}
 
+\newenvironment{beispiel}{\noindent{\bf Beispiel: }\itshape}{\par}
+
 
 
 %\newcommand{\qed}{$\hfill\Box$\par\bigskip}
@@ -84,12 +86,12 @@ citecolor = black] {hyperref}
 \begin{titlepage}
 	\centering
 	{\scshape\LARGE Nemp - Noch ein mp3-Player \par}
+	Version 4.7 \par
 	\vspace{1cm}
 	\includegraphics[width=0.5\textwidth]{nemp.jpg}\par
 	\vspace{1cm}
-	{\Large Dokumentation und Bedienungsanleitung\par}
-	
-	\vfill
+	{\Large Dokumentation und Bedienungsanleitung\par}		
+	\vfill	
 	\copyright Daniel Gaußmann, 2005-2017
 \end{titlepage}
 
@@ -148,25 +150,25 @@ Mehr dazu im Abschnitt \hyperref[sec_anzeige]{\emph{Anzeigen im Player}}.
 
 Rechts daneben (2) ist die Anzeige der Playlist angeordnet. Hier werden alle Titel in der aktuellen Playlist angezeigt. 
 
-\begin{tipp}Ziehen Sie per Drag\&Drop ein paar Dateien oder einen Ordner in diesen Bereich, wenn Sie ihre Playlist füllen möchten.
+\begin{tipp}Ziehen Sie per Drag\&Drop ein paar Dateien oder einen Ordner in diesen Bereich, wenn Sie Ihre Playlist füllen möchten.
 \end{tipp} 
 
-Links neben dem Player-Teil (3) finden Sie die Übersicht Ihrer Medienbibliothek. In der Medienbibliothek werden all ihre Musikdateien verwaltet. Sie können auf drei verschiedene Arten in ihrer Musiksammlung stöbern. Zur Auswahl klicken Sie auf einen der drei Buttons.
+Links neben dem Player-Teil (3) finden Sie die Übersicht Ihrer Medienbibliothek. In der Medienbibliothek werden all Ihre Musikdateien verwaltet. Sie können auf drei verschiedene Arten in Ihrer Musiksammlung stöbern. Zur Auswahl klicken Sie auf einen der drei Buttons.
 
 \begin{itemize}
 \item[] \inlinegraphics{TabBtnClassic.png} In der \textbf{klassischen Ansicht} wird die Medienbibliothek nach zwei Kriterien vorsortiert, z.B. nach Interpret und Album. Sie können dann sehr schnell nach einem Interpreten und dann nach einem Album suchen.
  
-\item[] \inlinegraphics{TabBtnCoverflow.png} Im \textbf{Coverflow} werden die einzelnen Alben in der Medienbibliothek über ihre Cover angezeigt. Das ist seit einiger Zeit die Standardeinstellung.
+\item[] \inlinegraphics{TabBtnCoverflow.png} Im \textbf{Coverflow} werden die einzelnen Alben in der Medienbibliothek über Ihre Cover angezeigt. Das ist seit einiger Zeit die Standardeinstellung.
 
-\item[] \inlinegraphics{TabBtnTagCloud.png} In der \textbf{Tagcloud} werden die Titel in der Medienbibliothek nach Tags gruppiert. Das können ganz allgemeine sein wie \emph{Rock} oder \emph{90er}, oder sehr persönliche wie \emph{30.Geburtstag}. Diese zusätzlichen Tags können Sie ganz individuell eingeben, oder automatisiert von last.fm beziehen, wo diese Tags von der Community gepflegt werden.
+\item[] \inlinegraphics{TabBtnTagCloud.png} In der \textbf{Tagwolke} werden die Titel in der Medienbibliothek nach Tags gruppiert. Das können ganz allgemeine sein wie \emph{Rock} oder \emph{90er}, oder sehr persönliche wie \emph{30.Geburtstag}. Diese zusätzlichen Tags können Sie ganz individuell eingeben, oder automatisiert von last.fm beziehen, wo diese Tags von der Community gepflegt werden.
 \end{itemize}
 
-\begin{tipp} Ziehen Sie per Drag\&Drop ihren Musik-Ordner in diesen Bereich, um mit dem Aufbau der Medienbibliothek zu beginnen.
+\begin{tipp} Ziehen Sie per Drag\&Drop Ihren Musik-Ordner in diesen Bereich, um mit dem Aufbau der Medienbibliothek zu beginnen.
 \end{tipp}
 
-Im unteren Teil (4) werden einzelne Titel ihrer Musiksammlung aufgelistet. Entweder alle, oder aber nur die, die zur aktuellen Auswahl im Übersichtsteil (3) passen. Oder, wenn Sie die Schnellsuche verwenden, die Titel, die zum aktuellen Suchbegriff passen. Wenn Sie hier einen Titel markieren, werden daneben weitere Informationen zu diesem Titel angezeigt. 
+Im unteren Teil (4) werden einzelne Titel Ihrer Musiksammlung aufgelistet. Entweder alle, oder aber nur die, die zur aktuellen Auswahl im Übersichtsteil (3) passen. Oder, wenn Sie die Schnellsuche verwenden, die Titel, die zum aktuellen Suchbegriff passen. 
 
-Mit Nemp 4.7 hat sich die Funktionalität dieser Informationsanzeige geändert. Konnten dort vorher die Informationen direkt bearbeitet werden, ist jetzt über einen Doppelklick auf die einzelnen Daten (Interpret, Album, Genre, usw.) ein Browsen in der Medienbibliothek möglich. Dadurch können Sie beispielsweise schneller alle Titel zu einem Album finden. Das erscheint mir sinnvoller als eine Bearbeitung des Titels. Im Kontextmenü können Sie über \textsc{Eigenschaften} die Daten weiterhin ändern. 
+Wenn Sie in dieser Liste einen Titel markieren, werden daneben weitere Informationen (z.B. das Cover) zu diesem Titel angezeigt. Mit Nemp 4.7 hat sich die Funktionalität dieses Teils geändert. Konnten dort vorher die Informationen direkt bearbeitet werden (wie es auch immer noch in der Liste möglich ist), ist jetzt über einen Doppelklick auf die einzelnen Daten (Interpret, Album, Genre, usw.) ein Browsen in der Medienbibliothek möglich. Dadurch können Sie beispielsweise schneller alle Titel zu einem Album finden. Das erscheint mir sinnvoller als eine Bearbeitung des Titels. Im Kontextmenü können Sie über \textsc{Eigenschaften} die Daten weiterhin ändern. 
 
 Weiterhin möglich ist dort die Eingabe zusätzlicher Tags, die für die Tagwolke verwendet werden. Hinzugefügt wurde die Möglichkeit der Eingabe weiterer Regeln für möglichst sinnvolle Tags. Dadurch kann z.B. vermieden werden, dass Tags in verschiedenen Schreibweisen eingefügt werden, was das Wiederfinden eines Titels über einen Tag nicht gerade leichter macht. Z.B.: War ein Titel nun mit \emph{female vocalists} getagged, oder doch mit \emph{female-vocalists}?
 
@@ -185,21 +187,18 @@ Bei der Entwicklung von Nemp wurde versucht, viele Möglichkeiten zur Steuerung z
 \item Das Durchtabben durch die Bedienelemente mit der \textsc{Tab}-Taste und aktivieren des fokussierten Elements mit \textsc{Enter}.
 \item Kontextmenüs. Die vier Bereiche (teilweise auch einige einzelne Elemente) haben eigene Kontextmenüs, über die verschiedene Funktionen aufgerufen werden können. Sie erreichen das Kontextmenü wie üblich über die rechte Maustaste oder zusätzlich über einen Klick auf einen der Nemp-Buttons. \includegraphics{TabBtnNemp.png}
 \item Tastaturkürzel wie z.B. \textsc{Strg+F} für die Schnellsuche oder \textsc{Strg+D} für die Anzeige von Details zu einem markierten Titel.
-\item Für den Umgang mit Dateien stehen die unter Windows üblichen Methoden \emph{Drag\&Drop} und \emph{Copy\&Paste} zur Verfügung. Wenn Nemp das Ziel einer solchen Operation ist, wird dabei zwischen Playlist und Medienbibliothek unterschieden. Ein \emph{gedroppter} Ordner wird also entweder in die Playlist eingefügt, oder in die Medienbibliothek.
+\item Für den Umgang mit Dateien stehen die unter Windows üblichen Methoden \emph{Drag\&Drop} und \emph{Copy\&Paste} zur Verfügung. Wenn Nemp das Ziel einer solchen Operation ist, wird dabei zwischen Playlist und Medienbibliothek unterschieden. Ein \emph{gedroppter} Ordner wird also entweder in die Playlist eingefügt, oder in die Medienbibliothek. Wenn Musikdateien aus Nemp heraus in andere Programme eingefügt werden sollen, ist das aus Performancegründen auf aktuell 2500 Dateien beschränkt.
 \item Multimediatastaturen werden ebenfalls unterstützt. Ein Druck auf eine dieser Spezialtasten sollte auch in Nemp die gewünschte Aktion bewirken.
 \item Optional können globale Hotkeys definiert werden, z.B. \textsc{Strg+Shift+P} für Play. Das kann aber unter Umständen unerwünschte Nebenwirkungen mit anderen Programmen haben.
-\item ab Windows 7 gibt es in dem Taskleisteneintrag die Möglichkeit, ein paar Kontrollelemente einzufügen. Das macht Nemp dann auch.
-\begin{center}
-\includegraphics{taskleiste.jpg}
-\end{center}
-\item unter Windows XP (nur 32Bit) kann stattdessen ein sogenanntes \emph{Deskband} installiert werden
-\begin{center}
-\includegraphics{deskband.jpg}
-\end{center}
+\item Ab Windows 7 werden in dem Taskleisteneintrag ein paar Kontrollelemente zur grundlegenden Steuerung eingefügt.
+\item Unter Windows XP (nur 32Bit) kann stattdessen ein sogenanntes \emph{Deskband} installiert werden
 \item Und wenn das immer noch nicht genug ist, dann gibt es für Tastaturen mit Display die Möglichkeit, Nemp-Apps zu programmieren, um den Player darüber zu steuern. Für die G15 von Logitech liegt eine entsprechende Anwendung bei.
 \begin{center}
-\includegraphics[width=9cm]{g15.jpg}
+\includegraphics[scale=0.4]{taskleiste.jpg}
+\includegraphics[scale=0.4]{deskband.jpg}
+\includegraphics[scale=0.4]{g15.jpg}
 \end{center}
+
 \end{itemize}
 
 \subsection{Skins, Einzelfenster und Party-Modus}
@@ -236,14 +235,13 @@ Außerdem können hier einige Funktionen des Players deaktiviert werden, um unbeab
 
 Der Party-Modus kann über ein Passwort gesichert werden, das aber nur eine Alibi-Funktion hat. Es verhindert nicht, dass Nemp beendet werden kann, um dann im normalen Modus wieder neu gestartet zu werden.
 
-\textbf{Konfiguration des Party-Modus}
-\begin{itemize}
-\item \textbf{Vergrößerungsfaktor.} Option, wie stark die Player-Steuerung vergrößert werden soll, wenn der Party-Modus aktiviert wird.
-\item \textbf{Blockiere Bearbeiten von Datei-Informationen}. \emph{Standard: Ein.} Verhindert das Bearbeiten der Titelinformationen durch zweifachen Klick oder \textsc{F2} in der Titelliste der Medienbibliothek. Die Anzeige des Detailfensters mit erweiterten Bearbeitungsmöglichkeiten ist immer deaktiviert. 
-\item \textbf{Blockiere Ändern der Bewertung des aktuellen Titels}. \emph{Standard: Ein.} Verhindert das Ändern der Bewertung des aktuellen Titels. 
-\item \textbf{Passwort.} Das optionale Passwort wird für das Beenden des Party-Modus benötigt. Es wird ggf. bei Aktivierung kurz angezeigt. Sollte das Passwort vergessen werden: Nemp beenden und neu starten. Der Party-Modus ist dann deaktiviert.
-\end{itemize}
+\subsection{Sprachen}
 
+Nemp ist prinzipiell dafür ausgelegt, mehrere Sprachen zu unterstützen. Die Originalsprache ist aus Kompatibilitätsgründen englisch. Die von (vermutlich) den meisten verwendete deutsche Version ist eine Übersetzung.
+
+Mangels Sprachkenntnissen kann ich selbst keine weiteren Sprachen anbieten. Das System ist aber dafür ausgelegt, dass theoretisch jeder eine weitere Übersetzung anfertigen kann. Wenn Sie daran Interesse haben, dann können Sie für einen ersten Einblick den sogenannten Po-Editor von \textsc{https://poedit.net} herunterladen, und im Ordner \textsc{Languages} (bzw. den weiteren Unterordnern) im Nemp-Ordner die Datei \textsc{default.mo} zuerst decompilieren (über das Kontextmenü des Windows-Explorers), und anschließend die \textsc{default.po} mit dem Editor öffnen. Prinzipiell können Sie dann direkt loslegen und alles Übersetzen. Einige Übersetzungen müssen dabei gewissen Regeln folgen. Z.B. muss die Anzahl und Reihenfolge von bestimmten Zeichenfolgen wie \textsc{\%s} und \textsc{\%d} gleich bleiben, da diese von Nemp mit passenden Textstücken oder Zahlenwerten befüllt werden.
+
+Für weitere Informationen schicken Sei mir eine E-Mail, dann schauen wir weiter. Aber als Warnung: Das ist eine Sch***-Arbeit. ;-)
 
 
 \subsection{Mobile Festplatten und Backups, Portabilität}
@@ -252,19 +250,20 @@ Eines der Hauptziele bei der Entwicklung von Nemp war die Portabilität. Nemp sol
 
 Dafür werden in der Medienbibliothek nicht nur die Pfade zu den einzelnen Musikdateien gespeichert, sondern zusätzlich Informationen zu den Laufwerken, auf denen die Daten liegen. Nemp untersucht die Laufwerke beim Start und korrigiert ggf. die Pfadinformationen. 
 
-Das funktioniert auch während Nemp läuft. Wenn sie z.B. vor dem Starten von Nemp vergessen haben, die externe Festplatte mit ihrer Musiksammlung anzuschließen, dann macht das nichts. Sobald sie angeschlossen wird, merkt Nemp das und passt die Pfade während des Betriebs automatisch an.
+Das funktioniert auch während Nemp läuft. Wenn sie z.B. vor dem Starten von Nemp vergessen haben, die externe Festplatte mit Ihrer Musiksammlung anzuschließen, dann macht das nichts. Sobald sie angeschlossen wird, merkt Nemp das und passt die Pfade während des Betriebs automatisch an.
 
-Diese Methode funktioniert in den allermeisten Fällen sehr gut, hat aber eine Lücke: Wenn Sie ihre komplette Sammlung auf zwei verschiedenen Laufwerken haben, also ein Original und ein Backup, dann unterscheidet Nemp diese beiden Laufwerke, auch wenn beide immer unter dem gleichen Laufwerksbuchstaben im System erscheinen, und findet auf Grund der automatischen Laufwerksanpssung die Dateien nicht mehr - obwohl die Dateien da sind. Nemp \emph{korrigiert} die Pfade dann nicht, sondern macht sie \emph{kaputt}. Abhilfe dafür ist, immer die gleiche Platte anzuschließen, oder zwei Kopien der Medienbibliothek zu erstellen und je nach Festplatte die passende Medienbibliothek zu laden.
+Diese Methode funktioniert in den allermeisten Fällen sehr gut, hat aber eine Lücke: Wenn Sie Ihre komplette Sammlung auf zwei verschiedenen Laufwerken haben, also ein Original und ein Backup, dann unterscheidet Nemp diese beiden Laufwerke, auch wenn beide immer unter dem gleichen Laufwerksbuchstaben im System erscheinen, und findet auf Grund der automatischen Laufwerksanpssung die Dateien nicht mehr - obwohl die Dateien da sind. Nemp \emph{korrigiert} die Pfade dann nicht, sondern macht sie \emph{kaputt}. Abhilfe dafür ist, immer die gleiche Platte anzuschließen, oder zwei Kopien der Medienbibliothek zu erstellen und je nach Festplatte die passende Medienbibliothek zu laden.
 
 \subsection{Grundlegende Einstellungen: Der Nemp Wizard}
 \label{sec_wizard}
 
-\begin{wrapfigure}{R}{0.25\textwidth}
-\centering
-\includegraphics[width=0.25\textwidth]{wizard.png}
-\end{wrapfigure}
 
-Nemp hat eine Menge interessanter Features. Einige davon sind sehr nützlich (zumindest denke ich das), aber einige davon verändern ihre Musikdateien, oder suchen Zusatzinformationen im Internet.
+Nemp hat eine Menge interessanter Features. Einige davon sind sehr nützlich (zumindest denke ich das), aber einige davon verändern Ihre Musikdateien, oder suchen Zusatzinformationen im Internet.
+
+\begin{wrapfigure}{R}{0.2\textwidth}
+\centering
+\includegraphics[width=0.2\textwidth]{wizard.png}
+\end{wrapfigure}
 
 Ich denke, dass solche Dinge \textsc{Opt-in} sein sollten. Ich mag keine Player, die ungefragt irgendein Zeug in meine ID3-Tags schreiben. Ich mag auch keine Programme, die ständig von alleine ins Netz gehen um dort irgendwas zu machen. Daher wurde der Nemp Wizard eingeführt, der beim ersten Start von Nemp einige grundlegende Dinge abfragt. 
 
@@ -275,7 +274,7 @@ Für die folgenden Aktionen wird der Nemp Wizard um Erlaubnis fragen:
 
 \item Metadaten verändern: Nemp benutzt die Metadaten (ID3-Tags) der Audiodateien, um verschiedene Informationen zu speichern. Das Ver\-ändern dieser Daten ist sehr einfach - für das Ändern der Bewertung reicht in Klick - und könnte auch ungewollt passieren. Das ist aber eine weit verbreitete Funktion, und viele andere Player machen das einfach so. 
 
-\item Automatische Bewertung: Nemp kann die Bewertung ihrer Musik automatisch anpassen. Wenn Sie einen Titel oft hören, dann ist wohl anzunehmen, dass er ihnen gefällt. Wenn Sie ihn abbrechen, war er wohl nicht so toll. Die Bewertung wird auch in die Metadaten der Datei geschrieben. 
+\item Automatische Bewertung: Nemp kann die Bewertung Ihrer Musik automatisch anpassen. Wenn Sie einen Titel oft hören, dann ist wohl anzunehmen, dass er ihnen gefällt. Wenn Sie ihn abbrechen, war er wohl nicht so toll. Die Bewertung wird auch in die Metadaten der Datei geschrieben. 
 
 \item Fehlende Cover herunterladen: Wenn zu einer Musikdatei kein passendes Cover auf der Festplatte gefunden werden kann, kann Nemp über den last.fm Webservice versuchen, ein Cover aus dem Netz herunterzuladen. Dieses wird dann im Nemp-Coverordner gespeichert, und als \texttt{front (NempAutoCover).jpg} (oder \texttt{*.png}) in dem Verzeichnis, in dem auch die Musikdatei selbst liegt. 
 \item Nemp als Standard-Player: Registrieren Sie Nemp als den Standard-Player für Windows. Unter Windows 10 funktioniert das nicht unbedingt 100\%ig - Windows wird Sie vermutlich trotzdem nochmal fragen, mit welcher \emph{App} Sie eine mp3-Datei öffnen wollen.
@@ -313,8 +312,8 @@ Unter den Sternchen werden die aktiven \textbf{Tools} durch kleine Icons aufgeli
 \item[] \inlinegraphics{shutdown.png} Der Countdown zum Herunterfahren wurde aktiviert. Was genau wann passiert (z.B. Herunterfahren oder Ruhezustand), erfahren Sie über den Hinweis, der erscheint, wenn Sie mit dem Mauszeiger etwas länger auf dieses Symbol zeigen. 
 \item[] \inlinegraphics{geburtstag.png} Der Geburtstagsmodus wurde aktiviert. Nemp wird zu gegebener Zeit automatisch die Wiedergabe der Playlist für ein Geburtstagsständchen unterbrechen. 
 \item[] \inlinegraphics{webserver.png} Der Webserver ist aktiviert, um den Zugriff auf den Player über einen Webbrowser zu ermöglichen. 
-\item[] \inlinegraphics{scrobbler.png} Scrobbeln ist aktiviert. Die Lieder, die Sie gerade hören, werden in ihr Benutzerprofil auf last.fm übertragen.
- \item[] \inlinegraphics{warning.png} Eine kleine Spaßfunktion für Laptops, die nur mit Akku laufen: Der Walkman-Modus ist aktiv, und der Ladezustand des Akkus ist schwach. Nemp fängt dann an zu leiern um Sie darauf hinzuweisen, dass Sie den Laptop ans Stromnetz anschließen sollten.
+\item[] \inlinegraphics{scrobbler.png} Scrobbeln ist aktiviert. Die Lieder, die Sie gerade hören, werden in Ihr Benutzerprofil auf last.fm übertragen.
+ \item[] \inlinegraphics{warning.png} Schwacher Akku - Wiedergabe leiert. Eine kleine Spaßfunktion für Laptops, die nur mit Akku laufen. Der Walkman-Modus ist aktiv, und der Ladezustand des Akkus ist schwach. Nemp fängt dann an zu leiern, um Sie darauf hinzuweisen, dass Sie den Laptop ans Stromnetz anschließen sollten.
 \end{itemize}
 
 Die \textbf{Zeitanzeige} kann per Klick umgeschaltet werden zwischen Zeit- und Restzeit-Anzeige.
@@ -336,7 +335,7 @@ Darunter die obligatorischen Buttons für die \textbf{Player-Steuerung}, die hoff
 \begin{itemize}
  \item[] \inlinegraphics{BtnRandom1.png} Alles wiederholen: Nemp läuft die Playlist von oben nach unten durch und startet dann von vorne. 
  \item[] \inlinegraphics{BtnRandom2.png}  Titel wiederholen: Nur der aktuelle Titel wird wiederholt. 
- \item[] \inlinegraphics{BtnRandom3.png}  Zufallsmodus: Die Dateien werden in zufälliger Reihenfolge abgespielt. In den Optionen können Sie einstellen, ob der \emph{echte Zufall} modifiziert werden soll, um ein \emph{gefühlt zufälligeres} Verhalten zu erreichen, oder aber um die Titel abhängig von ihrer Bewertung mit höherer oder niedriger Wahrscheinlichkeit auszuwählen. Nähere Erläuterungen zu der Zufallswiedergabe im Abschnitt \hyperref[sec_random]{Zufallswiedergabe}.
+ \item[] \inlinegraphics{BtnRandom3.png}  Zufallsmodus: Die Dateien werden in zufälliger Reihenfolge abgespielt. In den Optionen können Sie einstellen, ob der \emph{echte Zufall} modifiziert werden soll, um ein \emph{gefühlt zufälligeres} Verhalten zu erreichen, oder aber um die Titel abhängig von Ihrer Bewertung mit höherer oder niedriger Wahrscheinlichkeit auszuwählen. Nähere Erläuterungen zu der Zufallswiedergabe im Abschnitt \hyperref[sec_random]{Zufallswiedergabe}.
  \item[] \inlinegraphics{BtnRandom4.png}  Kein wiederholen: Nemp spielt die Playlist ab und hält dann die Wiedergabe an. 
 \end{itemize}
 
@@ -360,7 +359,8 @@ Unter dem eigentlichen Player werden ein paar weitere Dinge angezeigt. Standardm
 \includegraphics[width=0.35\textwidth]{cover.jpg} \hspace{1cm}
 \includegraphics[width=0.35\textwidth]{lyrics.jpg}
 \end{center}
-Das angezeigte Cover kommt entweder aus dem ID3-Tag der Musikdatei, oder einer Bilddatei auf der Festplatte, die zu dem Stück gehören scheint (vgl. die Einstellungen zur Coversuche). Wird kein Bild gefunden, kann zusätzlich ein Bild aus dem Internet nachgeladen werden. Das kann über den \hyperref[sec_wizard]{\emph{Nemp Wizard}} aktiviert werden.
+Das angezeigte Cover kommt entweder aus dem ID3-Tag der Musikdatei, oder einer Bilddatei auf der Festplatte, die zu dem Stück gehören scheint (vgl. die Einstellungen zur
+\hyperref[sec_coversettings]{\emph{Coversuche}}). Wird kein Bild gefunden, kann zusätzlich ein Bild aus dem Internet nachgeladen werden. Letzteres kann auch über den \hyperref[sec_wizard]{\emph{Nemp Wizard}} aktiviert werden.
 
 Der Liedtext kann über den Editor im Detail-Fenster manuell eingegeben werden, oder in der Medienbibliothek über das Menü \textsc{Medienbibliothek - Hole Lyrics für markierte Dateien}. Der Liedtext wird im ID3-Tag der Datei gespeichert.
 
@@ -394,7 +394,7 @@ Eine besondere Funktion in Nemp ist die eingebaute \textbf{Kopfhörer-Wiedergabe}
 \includegraphics[width=0.35\textwidth]{head.jpg} 
 \end{center}
 
-Die Kopfhörerwiedergabe hat ihre eigene kleine Steuerung und Titelanzeige mit Cover.
+Die Kopfhörerwiedergabe hat Ihre eigene kleine Steuerung und Titelanzeige mit Cover.
 
 Interessanter sind die drei zusätzlichen Buttons neben dem Cover.
 
@@ -446,7 +446,7 @@ Der Zweck dieser zusätzlichen Playlist-Datei ist, dass die markierten Titel, die
 
 \item Wenn zu einer Audio-Datei (z.B. Mix-CDs) eine gleichnamige *.cue-Datei vorhanden ist (sogenannte \textbf{Cue-Sheets}), dann wird diese ausgewertet, und die einzelnen Titel des Mix sind direkt ansteuerbar. 
 
-\item Über das Menü können Sie nach bestimmten Kriterien eine \textbf{zufällige Playlist} aus ihrer Musiksammlung erstellen. 
+\item Über das Menü können Sie nach bestimmten Kriterien eine \textbf{zufällige Playlist} aus Ihrer Musiksammlung erstellen. 
 \end{itemize}
 
 
@@ -463,7 +463,7 @@ Wählen Sie im Menü \textsc{Medienbibliothek - Computer nach Audiodateien untersu
 
 Dieser Vorgang kann eine ganze Zeit lang dauern - Nemp schafft ungefähr 20-40 Dateien pro Sekunde. Sie können Nemp aber währenddessen weiter benutzen - auch wenn einiges dann nicht ganz so flüssig läuft.
 
-Alternativ können Sie einfach ihren Musikordner in den Medienbibliotheksbereich ziehen. Also in den Bereich links oben, oder den gesamten unteren Bereich. Nur halt nicht in die Playlist.
+Alternativ können Sie einfach Ihren Musikordner in den Medienbibliotheksbereich ziehen. Also in den Bereich links oben, oder den gesamten unteren Bereich. Nur halt nicht in die Playlist.
 
 \subsection{Browsen in der Medienbibliothek}
 Es gibt drei grundlegende Möglichkeiten, in der Medienbibliothek zu stöbern. Sie können zwischen den drei Browsemodi mit den Buttons im oberen Bereich umschalten. Die \textbf{klassische Ansicht}, der \textbf{Coverflow} und die \textbf{Tagwolke}.
@@ -535,17 +535,10 @@ Für die Tagwolke werden initial die Eigenschaften Interpret, Albumname, Genre, J
 
 Sie können dann z.B. den Tag \emph{00s} oder \emph{90s} anwählen und bekommen dann alle Titel aus den 2000er Jahren oder den 90ern angezeigt. Wenn Sie diesen Tag doppelt anklicken (oder die Entertaste betätigen), wird aus diesen Titeln eine neue Tagwolke erzeugt - das können Sie fast beliebig fortführen.
 
-Das interessante ist nun die Möglichkeit, den Titeln weitere Tags zuzuordnen, die auch in den mp3-Dateien selbst gespeichert werden. Z.B. können Sie einem Titel dadurch mehrere Genres zuordnen, oder andere Kommentare dort angeben, die das Lied klassifizieren.
+Das Interessante ist nun die Möglichkeit, den Titeln weitere Tags zuzuordnen, die auch in den mp3-Dateien selbst gespeichert werden. Z.B. können Sie einem Titel dadurch mehrere Genres zuordnen. Oder andere Kommentare dort angeben, die das Lied klassifizieren.
 
-\begin{center}
-\includegraphics{tags.jpg}
-\end{center}
 
-Klicken Sie dafür doppelt auf \textsc{Tag hinzufügen}, und geben Sie einen neuen Tag ein. Sie können auch mehrere Tags gleichzeitig durch Kommas getrennt eingeben. 
-
-Es ist natürlich etwas mühsam, das für jeden einzelnen Titel in der gesamten Medienbibliothek zu machen. Aber wofür gibt es schließlich das Internet?
-
-Bei last.fm gibt es nicht nur Cover, sondern auch weitere Tags, die von der Community gepflegt werden - vielleicht haben Sie ja schon selbst einige Lieder darüber getaggt.
+Es ist natürlich etwas mühsam, das für jeden einzelnen Titel in der gesamten Medienbibliothek zu machen. Aber wofür gibt es schließlich das Internet? Bei last.fm gibt es nicht nur Cover, sondern auch weitere Tags, die von der Community gepflegt werden - vielleicht haben Sie ja schon selbst einige Lieder darüber getaggt.
 
 Nemp kann die häufigsten Tags für ein Lied bei last.fm abfragen und in der Medienbibliothek speichern. Wählen Sie dafür die Dateien aus, die sie betaggen möchten und wählen im Menü \textsc{Zusätzliche Tags von last.fm holen}.
 
@@ -554,6 +547,13 @@ Das funktioniert nur, wenn die Dateien schon ordentliche Standard-ID3-Tags wie I
 \end{hinweis}
 
 Mit diesen zusätzlichen Tags wird die Tagwolke dann schon etwas aussagekräftiger. Leider gibt es bei last.fm viele Tags in unterschiedlichen Schreibweisen, wodurch ein wenig Unordnung entsteht. Abhilfe dafür verschafft das eingebaute Tool \hyperref[sec_tagwolkeneditor]{Tagwolken-Editor}.
+
+\subsubsection{Stöbern über die Anzeige}
+Unabhängig vom gewählten Modus (Klassisch, Coverflow, Tagwolke) kann über den aktuell markierten Titel in der Medienbibliothek gestöbert werden. 
+\begin{center}
+\includegraphics{tags.jpg}
+\end{center}
+Ein Doppelklick auf den Interpreten listet dann sämtliche Titel dieses Interpreten auf, ein Doppelklick auf das Album alle Titel des Albums usw. usf. Dabei werden nur exakte Übereinstimmungen aufgelistet. Ein Doppelklick auf den Titel \emph{Angels} von \emph{Robbie Williams} wird dann weder dazu führen, dass irgendwelche Titel von \emph{No Angels} aufgelistet werden, noch andere Titel wie \emph{When Angels Fall} von \emph{Beyond the Black}. Bei den erweiterten Tags gilt das auch. Selbst dann, wenn hier ein erweiterter Tag gesetzt ist, der dem Interpreten oder dem Erscheinungsjahr entspricht. Nemp hat keine eingebaute Logik, die erkennen kann, ob ein automatischer Tag als \emph{Interpret}, \emph{Genre} oder \emph{Jahr} interpretiert werden könnte. Ein Doppelklick auf einen erweiterten Tag listet also nur die Dateien auf, in denen dieser \emph{erweiterte Tag} explizit gesetzt ist.
 
 
 \subsection{Die Schnellsuche}
@@ -584,7 +584,7 @@ Als Bonus werden die letzten Suchverläufe gespeichert und können erneut aufgeruf
 
 Sie können einen einzelnen Titel, oder ein paar Titel, oder ein ganzes Album, oder alle Lieder mit einem bestimmten Tag, oder sonstwas in die Playlist einfügen - entweder über das Kontextmenü oder per Drag\&Drop. Sie können auch Drag\&Drop vom Coverflow oder Tagwolke aus starten. 
 
-Bei Drag\&Drop und Copy\&Paste gibt es ein Limit von 500 Dateien.
+Bei Drag\&Drop und Copy\&Paste gibt es ein Limit von aktuell 2500 Dateien. Das ist ein Schutz vor Fehlbedienungen mit anschließendem Absturz des Players - mit zu vielen Dateien in der Zwischenablage bekommt Windows irgendwann Probleme. Für das Einfügen beliebig vieler Stücke in die Playlist steht immer das Kontextmenü zur Verfügung.
 
 Wenn Sie in der unteren Liste einen einzelnen Titel doppelt anklicken, dann passiert das, was Sie in den Optionen als Standard-Aktion eingestellt haben.
 
@@ -616,9 +616,11 @@ Damit unterstützt Nemp Metatags unter anderen in *.mp3, *.ogg, *.flac, *.ape, *.
 
 \subsubsection{Einfache Bearbeitung der Metadaten}
 
-Nemp enthält zwar keinen Tag-Editor um massenweise ID3-Tags zu setzen, aber einzelne ID3-Tags bearbeiten geht schon ganz gut damit. Einfache Eigenschaften wie Titel und Interpret lassen sich direkt in der Liste bearbeiten. Dazu einfach einen Titel markieren, in die entsprechende Spalte navigieren und langsam 2x klicken, oder die Taste \textsc{F2} drücken.
+Nemp enthält zwar keinen Tag-Editor, um massenweise ID3-Tags zu setzen, aber einzelne ID3-Tags bearbeiten geht schon ganz gut damit. Einfache Eigenschaften wie Titel und Interpret lassen sich direkt in der Liste bearbeiten. Dazu einfach einen Titel markieren, in die entsprechende Spalte navigieren und langsam 2x klicken, oder die Taste \textsc{F2} drücken.
 
-Wenn die Basis-Informationen Interpret und Titel in den Dateien passend gesetzt sind, dann kann Nemp allerdings automatisch Liedtexte und sogenannte erweiterte Tags aus dem Internet beschaffen. Liedtexte sind sinnvoll, wenn man sich nicht mehr an den Titel, sondern nur eine Zeile aus dem Lied erinnern kann. Erweiterte Tags werden für das sinnvollere Browsen im Modus \emph{Tagwolke} benötigt.
+Die erweiterten Tags können Sie in der zusätzlichen Anzeige rechts neben der Liste bearbeiten. Zum Ändern oder Löschen eines vorhandenen Tags können Sie das Kontextmenü verwenden (mit der Maus auf den Tag zeigen, Rechtsklick, gewünschte Aktion auswählen). Für einen neuen Tag entweder ebenfalls das Kontextmenü verwenden, oder einen Doppelklick auf \textsc{Neuer Tag}. Sie können hier auch mehrere Tags gleichzeitig durch Kommas getrennt eingeben. 
+
+Wenn die Basis-Informationen Interpret und Titel in den Dateien passend gesetzt sind, dann kann Nemp automatisch Liedtexte und erweiterte Tags aus dem Internet beschaffen. Liedtexte sind sinnvoll, wenn man sich nicht mehr an den Titel, sondern nur eine Zeile aus dem Lied erinnern kann. Erweiterte Tags werden für das sinnvollere Browsen im Modus \emph{Tagwolke} benötigt.
 
 \begin{hinweis} Diese direkte Bearbeitung der Meta-Informationen ist nur möglich, wenn der Schnellzugriff auf Meta-Informationen erlaubt ist. Das kann über den \hyperref[sec_wizard]{Nemp Wizard} passieren, oder im Einstellungsdialog unter \hyperref[sec_metadaten]{Metadaten}. 
 
@@ -638,7 +640,7 @@ Für eine detailliertere Bearbeitung der Meta-Informationen hat Nemp ein  \textbf
 
 \begin{figure}[bth]
 \centering
-\includegraphics[width=0.8\textwidth]{details.png}
+\includegraphics[width=0.8\textwidth]{details.jpg}
 %\caption{Detailfenster von Nemp}
 \label{fig_detailfenster}
 \end{figure}
@@ -673,7 +675,7 @@ Wenn Sie einzelne Dateien mit anderen Programmen geändert haben, dann können Sie
 
 Zum Löschen von Dateien aus der Medienbibliothek wählen Sie \textsc{Entferne markierte Dateien}. Damit werden die Dateien aus der Bibliothek gelöscht, aber nicht von der Festplatte. 
 
-Wenn Sie Teile ihrer Musiksammlung in andere Ordner verschoben haben, sind die Dateipfade in der Nemp Medienbibliothek ungültig. Sie sollten dann nicht vorhandene Dateien entfernen (\textsc{Medienbibliothek - aufräumen}), und ggf. ihren (neuen) Musikordner neu der Medienbibliothek hinzufügen.
+Wenn Sie Teile Ihrer Musiksammlung in andere Ordner verschoben haben, sind die Dateipfade in der Nemp Medienbibliothek ungültig. Sie sollten dann nicht vorhandene Dateien entfernen (\textsc{Medienbibliothek - aufräumen}), und ggf. Ihren (neuen) Musikordner neu der Medienbibliothek hinzufügen.
 
 
 \subsubsection{Webradio}
@@ -685,7 +687,7 @@ In der klassischen Ansicht werden neben den Dateien auch die \textbf{Webradio-Fa
 Den Namen des Senders können Sie frei wählen, als URL sollten Sie die Adresse des Senders eingeben. Sehr häufig bekommt man diese auf der jeweiligen Webseite - in der Regel findet sich dort ein Link, der auf \texttt{.pls} endet. Diesen Link müssen Sie im URL-Feld eintragen.
 
 \begin{tipp}
-Viele Sender oder Webseiten bieten unterschiedliche Links für den Windows Media Player, Winamp oder den Real Player an. Am besten sollte Nemp mit dem Winamp-Link klarkommen.
+Viele Sender oder Webseiten bieten unterschiedliche Links für den Windows Media Player, Winamp oder vielleicht sogar noch den Real Player an. Am besten sollte Nemp mit dem Winamp-Link klarkommen.
 \end{tipp}
 
 Sie können die Favoritenliste auch Ihren Wünschen entsprechend sortieren.
@@ -701,9 +703,9 @@ Eine Besonderheit ist wohl noch die Möglichkeit, die komplette Medienbibliothek 
 
 \subsection{Der Tagwolken-Editor}
 \label{sec_tagwolkeneditor}
-Das automatische Beschaffen von weiteren Tags für die Tagwolke über last.fm ist eine durchaus praktische Funktion. Aber es gibt einen Haken dabei - es gibt bei last.fm oft verschiedene Schreibvarianten von ein und demselben Tag, und auch einige völlig sinnlose Tags. Ein Beispiel wäre der Tag, der angeben soll, dass in dem Lied eine Frau singt. Das ist bei einigen Liedern \emph{Female Vocalist}, bei anderen \emph{Female Vocalist\textbf{s}}
+Das automatische Beschaffen von weiteren Tags für die Tagwolke über last.fm ist eine durchaus praktische Funktion. Aber es gibt einen Haken dabei - es gibt bei last.fm oft verschiedene Schreibvarianten von ein und demselben Tag, und auch einige völlig sinnlose Tags. 
 
-Mit dem Tagwolken-Editor können Sie damit etwas aufräumen. Sie finden ihn im Menü unter \textsc{Tools - Tagwolken-Editor}.
+Mit dem Tagwolken-Editor können Sie damit etwas aufräumen. Sie finden ihn im Menü unter \textsc{Medienbibliothek - Tagwolken-Editor}. Damit können Sie Regeln definieren, wie Nemp mit neuen Tags umgehen soll oder global (d.h. für alle Titel in der Medienbibliothek) einige Tags bearbeiten und löschen.
 
 \begin{figure}[tbh]
 \centering
@@ -712,31 +714,35 @@ Mit dem Tagwolken-Editor können Sie damit etwas aufräumen. Sie finden ihn im Men
 \label{fig_tagwolke}
 \end{figure}
 
+Im ersten Tab \textbf{Existierende Tags} finden Sie eine Auflistung aller, wirklich aller Tags in der Medienbibliothek, von häufigen wie \emph{Singer-Songwriter} bis hin zu exotischen wie \emph{songs die so gut sind das ich meiner oma ihr klein haeuschen zwar nicht verkaufen aber zumindest dafuer beleihen wuerde}, mit dem tatsächlich einige Titel bei last.fm bestückt sind.
 
-Im ersten Tab \textbf{Existierende Tags} finden Sie eine Auflistung aller, wirklich aller Tags in der Medienbibliothek, von häufigen wie \emph{Singer-Songwriter} bis hin zu exotischen wie \emph{songs die so gut sind das ich meiner oma ihr klein haeuschen zwar nicht verkaufen aber zumindest dafuer beleihen wuerde}. Kein Witz, diesen Tag gibt es da wirklich.
+Durch markieren eines (oder mehreren) Tags können Sie neue Regeln aufstellen. Eine \emph{Änderungs-Regel} sorgt dafür, dass ein Tag automatisch geändert wird zu einem anderen Tag. Eine \emph{Ignorier-Regel} sorgt dafür, dass ein Tag ignoriert und nicht gespeichert wird. Die Funktion \emph{Tags entfernen} löscht die markierten Tags aus der Medienbibliothek, ohne eine neue Regel aufzustellen. Einige wenige dieser Regeln bringt Nemp von sich aus mit.
 
-Sie können hier Tags umbenennen, zusammenführen oder löschen. Markieren Sie dazu einen oder mehrere Tags und klicken Sie den entsprechenden Button. Das wirkt sich dann auf alle Dateien in der Medienbibliothek aus, die mit diesem Tag markiert sind. 
+\begin{beispiel} Sie haben viele Titel mit dem Tag \emph{Singer-Songwriter} in der Medienbibliothek, und ein paar weitere mit \emph{Singer and Songwriter}. Beide Tags meinen das Gleiche, aber wenn beide bleiben, erschwert das das Stöbern in der Tagwolke.
+
+Also: Beide Tags markieren und auf \textsc{Neue Änderungs-Regel} klicken. Nemp schlägt dann automatisch einen neuen Namen vor, nämlich den markierten Tag, mit dem die meisten Titel markiert sind. Natürlich können Sie auch eine neue Bezeichnung wählen. Wenn nur ein Tag markiert ist, gibt es natürlich keinen Vorschlag für eine neue Bezeichnung.
+\end{beispiel}
+
+\begin{beispiel}
+Sie holen sich regelmäßig automatisiert erweiterte Tags über last.fm. Dabei werden auch oft einige Titel mit \emph{favorites} markiert, auch wenn diese Titel nicht unbedingt zu Ihren persönlichen Favoriten zählen.
+
+Also: Markieren Sie den Tag \emph{favorites} in der Liste, und klicken Sie auf \textsc{Neue Ignorier-Regel}. Bei folgenden Aufrufen der automatisierten Tag-Suche wird Nemp dann diesen Tag ignorieren und die Titel nicht damit markieren. Ihre eigenen Favoriten sollten Sie dann aber mit einem anderen Tag markieren, sonst kommen Sie irgendwann durcheinander.
+\end{beispiel}
+
+\begin{beispiel}
+Sie haben sehr viele Tags, die nur ein- oder zweimal in der gesamten Medienbibliothek vorkommen. Diese Tags sind in aller Regel kaum sinnvoll. Für alle diese Tags eine Ignorier-Regel aufzustellen, ist aber auch nicht unbedingt nötig. 
+
+Also: Markieren Sie alle diese Tags und klicken Sie auf \textsc{Tags entfernen}. Nemp wird dann einfach diese Tags aus allen Dateien entfernen, ohne eine neue (relativ nutzlose) Ignorier-Regel zu speichern.
+\end{beispiel}
+
+Nach der Erstellung einer neuen Regel wird diese auch direkt auf die Medienbibliothek angewendet. Die Tags innerhalb der Nemp-Datenbank zu ändern, geht in Nullkommanichts. Das Ändern der Tags in den Dateien selbst benötigt aber etwas Zeit - in der Regel etwas länger als das Auslesen der Dateien in die Datenbank. Daher führt das Nemp nicht bei jeder neuen Regel aus, sondern erst auf direkte Anweisung. Klicken Sie dafür auf \textsc{Dateien aktualisieren}. Wenn Sie das nicht tun, dann warnt Nemp beim Beenden davor, dass es noch Inkonsistenzen zwischen den Daten in der Medienbibliothek und den Daten in den Musik-Dateien gibt, die behoben werden sollten. Wird Nemp dann trotzdem geschlossen, werden die Änderungen nicht in den Dateien gespeichert, und beim erneuten Einlesen der Dateien werden die Daten in der Medienbibliothek mit den Daten aus den Dateien überschrieben.
+
 
 \begin{tipp}
 Ein Doppelklick auf einen Tag zeigt im Hauptfenster von Nemp alle Titel an, die mit diesem Tag markiert sind. Auf diese Weise können Sie sich also alle Lieder anzeigen lassen, die so gut sind, dass einige Nutzer von last.fm dafür \emph{ihrer Oma ihr klein Häuschen zwar nicht verkaufen aber zumindest beleihen würden}.
 \end{tipp}
 
-Die Option \textsc{Speichere verbundene/umbenannte} und \textsc{gelöschte Tags} sorgt dafür, dass Ihre Eingaben gespeichert und bei künftigen Abfragen an last.fm berücksichtigt werden. Einige wenige solcher Regeln bringt Nemp direkt mit, aber eine auch nur ansatzweise vollständige Liste möchte ich mir nicht antun.
-
-\textbf{Beispiel:} Sie führen die beiden Tags \emph{Female Vocalist} (ohne s am Ende) und \emph{Female Vocalists} (mit s am Ende) zu \emph{Female Vocalists} zusammen. Wenn sie später für ein Lied Tags von last.fm holen, und dieses Lied ist mit \emph{Female Vocalist} (ohne s) getaggt, wird dieser Tag automatisch zu \emph{Female Vocalists} (mit s) geändert.
-
-Die Option \textsc{Verstecke Auto-Tags} sorgt dafür, dass die Tags, die Nemp von sich aus erstellt hat (Interpret, Album, Jahr, Genre, Jahrzehnt) ausgeblendet werden. Diese Tags können Sie nicht gänzlich verändern oder löschen. Sie können aber diese \emph{AutoTags} für Dateien verändern, für die Nemp diesen Tag nicht selbst hinzugefügt hat.
-
-Im zweiten Tab \textbf{Zusammengeführte/umbenannte Tags} werden die Tags angezeigt, die sie zuvor umbenannt oder zusammengeführt haben. Diese Liste wird beim Holen neuer Tags von last.fm berücksichtigt, sodass die Tagwolke dadurch nicht wieder aufs neue zugemüllt wird.
-
-Im dritten Tab \textbf{Gelöschte Tags} sind die Tags, die sie nicht in Ihrer Tagwolke sehen wollen. Auch diese Liste wird beim Holen neuer Tags berücksichtigt.
-
-Das Löschen von Tags in der Medienbibliothek geht sehr zügig. In den ID3-Tags der einzelnen Musikdateien geht das nicht so schnell, da dafür die neuen Tags in die einzelnen Dateien geschrieben werden müssen. Im Extremfall muss dafür die gesamte Audiodatei neu geschrieben werden. Wenn Sie einige Tags bearbeitet haben, dann sind in den Musikdateien selbst noch die unbearbeiteten Tags gespeichert. Wenn Sie später die Daten neu einlesen, werden Sie wieder die unerwünschten Tags erhalten. 
-
-Dafür gibt es die Funktion \textbf{Dateien aktualisieren}, die die Daten zwischen Medienbibliothek und ID3-Tags wieder synchronisiert. Dieser Vorgang dauert eine Weile, in der Regel ein wenig länger als das Einlesen der Daten in die Medienbibliothek am Anfang.
-
-
-
+In den beiden anderen Tabs sind die Änderungs- und Ignorier-Regeln aufgelistet. Sie können hier einige Regeln wieder löschen. Ein Bearbeiten vorhandener Regeln ist nicht möglich.
 
 
 
@@ -751,7 +757,7 @@ Nemp bietet neben den Basis-Funktionen \emph{Abspielen von Musik} und der Verwal
 \centering
 \includegraphics[width=0.35\textwidth]{lastfm_logo.jpg}
 \end{wrapfigure}
-Scrobbeln ist eine Erfindung von last.fm - einem sozialen Netzwerk im Internet mit dem Schwerpunkt auf Musik. Scrobbeln bedeutet, dass das, was Sie gerade hören, in Ihrem Benutzerprofil auf dieser Seite auftaucht. Über die Lieder, die Sie im Laufe der Zeit hören, kristallisiert sich ein Musikgeschmack heraus, und Sie können über dieses Netzwerk Leute mit ähnlichem Musikgeschmack finden und kennenlernen.
+Scrobbeln ist eine Erfindung von last.fm - einem sozialen Netzwerk im Internet mit dem Schwerpunkt auf Musik. Scrobbeln bedeutet, dass das, was Sie gerade hören, in Ihrem Benutzerprofil auf dieser Seite auftaucht. Über die Lieder, die Sie im Laufe der Zeit hören, kristallisiert sich ein Musikgeschmack heraus, und Sie können über dieses Netzwerk Leute mit ähnlichem Musikgeschmack finden und kennenlernen. Und darüber dann weitere Bands entdecken, die Ihnen auch gefallen könnten.
 
 Nemp kann scrobbeln.
 
@@ -760,7 +766,7 @@ Zuerst müssen Sie Nemp den Zugriff auf Ihr last.fm-Nutzerprofil erlauben. Rufen 
 
 \begin{enumerate}
 \item Starten sie die Konfiguration und klicken auf \textsc{Weiter}. Nemp fordert bei last.fm ein so genanntes Token an, das im weiteren Verlauf für die Authentifizierung benötigt wird. 
-\item Klicken Sie erneut auf \textsc{Weiter}. Sie werden dann in Ihrem Browser auf die Webseite von last.fm geschickt, wo Sie sich mit ihrem Account anmelden müssen. Nach der Anmeldung werden Sie auf eine Seite weitergeleitet, auf der das Nemp-Logo zu sehen ist. Klicken Sie dort auf \textsc{Zugriff erlauben} und wechseln Sie zurück zu Nemp. 
+\item Klicken Sie erneut auf \textsc{Weiter}. Sie werden dann in Ihrem Browser auf die Webseite von last.fm geschickt, wo Sie sich mit Ihrem Account anmelden müssen. Nach der Anmeldung werden Sie auf eine Seite weitergeleitet, auf der das Nemp-Logo zu sehen ist. Klicken Sie dort auf \textsc{Zugriff erlauben} und wechseln Sie zurück zu Nemp. 
 \item Klicken Sie noch einmal auf \textsc{Weiter} (und direkt noch einmal). Nemp kann jetzt mit Hilfe des Tokens, das sie durch den Klick auf den \textsc{Zulassen}-Button auf der Webseite mit Ihrem Account verknüpft haben, von last.fm Ihren Nutzernamen und einen Sessionkey abrufen. Dieser Key wird (leicht verschlüsselt) in der Nemp-Konfigurationsdatei gespeichert und wird für das Scrobbeln benötigt. Ihr last.fm-Passwort benötigt Nemp nicht.
 \end{enumerate}
 
@@ -810,7 +816,7 @@ Der Nemp Webserver bietet die Möglichkeit, von einem Browser aus über ein Netzwe
 Sie aktivieren den Webserver über das Menü \textsc{Tools - Nemp Webserver - Aktivieren}. Ist der Webserver aktiviert, wird im Hauptfenster ein Symbol \inlinegraphics{webserver.png} eingeblendet. 
 
 \begin{tipp}
-Probieren Sie das einfach mal aus! Gehen Sie mit ihrem Smartphone in ihr WLAN, und geben Sie im Handy-Browser die angegebene IP-Adresse ein. Alternativ \texttt{localhost} in der Adresszeile des Browsers auf dem Rechner, auf dem Nemp läuft.
+Probieren Sie das einfach mal aus! Gehen Sie mit Ihrem Smartphone in Ihr WLAN, und geben Sie im Handy-Browser die angegebene IP-Adresse ein. Alternativ \texttt{localhost} in der Adresszeile des Browsers auf dem Rechner, auf dem Nemp läuft.
 \end{tipp}
 
 \begin{center}
@@ -864,7 +870,7 @@ Die Unterstützung ist nicht direkt in Nemp integriert, sondern wird über ein Zus
 Die Funktionsweise der mittlerweile auf vielen Tastaturen vorhandenen Multimedia-Tasten ist davon unberührt. Die funktionieren natürlich unabhängig davon.
 
 \begin{tipp}
-Wenn Sie eine andere Tastatur mit Display haben, dann können Sie theoretisch ein eigenes Tool schreiben, um ihre Tastatur zu unterstützen. Wenn Sie selber programmieren können (oder jemand in ihrem Freundeskreis), dann kontaktieren Sie mich bitte für weitere Informationen. E-Mail: mail@gausi.de
+Wenn Sie eine andere Tastatur mit Display haben, dann können Sie theoretisch ein eigenes Tool schreiben, um Ihre Tastatur zu unterstützen. Wenn Sie selber programmieren können (oder jemand in Ihrem Freundeskreis), dann kontaktieren Sie mich bitte für weitere Informationen. E-Mail: mail@gausi.de
 \end{tipp}
 
 \subsection{Automatischer Shutdown, Einschlaf-Timer}
@@ -884,7 +890,7 @@ Dafür muss natürlich auch das Soundschema von Windows passend eingestellt sein. 
 \section{Einstellungen}
 \label{sec_einstellungen}
 
-Wenn Nemp eines im Überfluss hat, dann sind es Einstellungen. Im Laufe der Zeit kamen immer wieder Anfragen rein, ob man nicht dieses oder jenes machen könnte. Vieles davon wurde dann eingebaut und hat nach und nach die Fülle der Einstellungsmöglichkeiten erhöht.
+Wenn Nemp eines im Überfluss hat, dann sind es Einstellungen. Im Laufe der Zeit kamen immer wieder Anfragen rein, ob man nicht dieses oder jenes machen könnte. Vieles davon wurde dann eingebaut und hat nach und nach die Fülle der Einstellungsmöglichkeiten erhöht. Mit Version 4.7 wurden ein paar \emph{zu} nerdige Einstellungen entfernt, weil die wirklich keiner nutzt.
 
 \subsection{Allgemeine Einstellungen}
 Beim Starten von Nemp
@@ -935,9 +941,7 @@ Die Konfiguration der Tab-Taste ist eher sinnlos bzw. kurios, stört aber auch ni
 \end{itemize}
 
 \textbf{Benachrichtigung eines Deskbandes}. Ein \emph{Deskband} ist hauptsächlich für Nutzer von Windows XP interessant. Das ist ein Bereich in der Taskleiste, in den einige Kontrollelemente eingebettet sind. Nemp kann ein solches Deskand installieren (nur auf 32Bit-Windows), und das Verhalten konfigurieren.
-\begin{center}
-\includegraphics{deskband.jpg}
-\end{center}
+
 \begin{itemize}
 \item Beim Start anzeigen. \emph{(Standard)}
 \item Beim Beenden ausblenden.\emph{(Standard)}
@@ -957,11 +961,11 @@ Nemp kann darauf reagieren, wenn der PC in den Ruhezustand versetzt wird.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Anzeige-Einstellungen}
 \begin{itemize}
-\item \textbf{Spalten in der Medienliste}. Eine Auswahl der Spalten, die in der unteren Liste im Hauptfenster angezeigt werden. Kann auch direkt dort durch Rechtsklick auf den Spalten-Header ausgewählt werden.
+\item \textbf{Spalten in der Medienliste}. Eine Auswahl der Spalten, die in der unteren Liste im Hauptfenster angezeigt werden. Kann auch direkt dort durch Rechtsklick auf den Spalten-Header ausgewählt werden. Außerdem: Aktivierung der zusätzlichen Anzeige mit Cover und Details neben der Liste.
 \item \textbf{Sortierreihenfolge} für die klassische Übersichtsansicht und den Coverflow. In der Klassischen Ansicht werden zwei Sortierkriterien angegeben, die beliebig kombiniert werden können. Im Coverflow gibt es einige Vorauswahlen. Für den Coverflow sind außerdem Sonderbehandlungen für solche Alben einstellbar, für die kein Cover gefunden wurde, oder Titelzusammenstellungen ohne ordentliche Metadaten.
 \item \textbf{Sortieren der Anzeige.} \emph{Standard: Aus.} Über einen Klick auf einen Spalten-Header in der Medienliste kann die angezeigte Liste nach dem entsprechenden Kriterium sortiert werden. Über diese Einstellung hier wird diese Einstellung dann auch übernommen, wenn über die Übersichtslisten (klassische Ansicht, Coverflow, Tagwolke) eine neue Liste erstellt und angezeigt wird. Das führt aber zu einer kleinen Verzögerung in der Anzeige. \emph{Daher ...}
 \item \textbf{Bei langen Listen nicht sortieren.} \emph{Standard: Ein.} ... kann bei Aktivierung dieser Option das Sortieren sehr großer Listen deaktiviert werden, um zu große Verzögerungen zu vermeiden.
-\item \textbf{Zeige Cover und Details zum markierten Titel.} Auswahl ob und wo neben der Liste mit Titeln aus der Medienbibliothek im unteren Teil des Hauptfensters auch das Cover und ein paar weitere Angaben zum aktuell markierten Titel angezeigt werden.
+%\item \textbf{Zeige Cover und Details zum markierten Titel.} Auswahl ob und wo neben der Liste mit Titeln aus der Medienbibliothek im unteren Teil des Hauptfensters auch das Cover und ein paar weitere Angaben zum aktuell markierten Titel angezeigt werden.
 \end{itemize}
 
 %\subsubsection{Player und Cover}
@@ -971,7 +975,15 @@ Nemp kann darauf reagieren, wenn der PC in den Ruhezustand versetzt wird.
 
 \subsubsection{Party-Modus}
 
-Siehe Abschnitt \hyperref[sec_partmode]{Skins, Einzelfenster und Party-Modus}.
+%Siehe Abschnitt \hyperref[sec_partmode]{Skins, Einzelfenster und Party-Modus}.
+
+\begin{itemize}
+\item \textbf{Vergrößerungsfaktor.} Option, wie stark die Player-Steuerung vergrößert werden soll, wenn der Party-Modus aktiviert wird.
+\item \textbf{Blockiere Bearbeiten von Datei-Informationen}. \emph{Standard: Ein.} Verhindert das Bearbeiten der Titelinformationen durch zweifachen Klick oder \textsc{F2} in der Titelliste der Medienbibliothek. Die Anzeige des Detailfensters mit erweiterten Bearbeitungsmöglichkeiten ist immer deaktiviert. 
+\item \textbf{Blockiere Ändern der Bewertung des aktuellen Titels}. \emph{Standard: Ein.} Verhindert das Ändern der Bewertung des aktuellen Titels. 
+\item \textbf{Passwort.} Das optionale Passwort wird für das Beenden des Party-Modus benötigt. Es wird ggf. bei Aktivierung kurz angezeigt. Sollte das Passwort vergessen werden: Nemp beenden und neu starten. Der Party-Modus ist dann deaktiviert.
+\end{itemize}
+
 
 \subsubsection{Schriften}
 Die Konfigurierbarkeit der Schriften ist ein Relikt aus dem Ur-Nemp, bei dem es mir in erster Linie darum ging zu zeigen, was ich alles tolles aus mp3-Dateien auslesen kann. Mittlerweile halte ich diese Einstellungen für sehr wenig nützlich und habe sämtliche Werte auf \emph{Standard: Aus} gesetzt.
@@ -995,7 +1007,7 @@ Einige weitere Einstellungen, die eher wenig Nutzen haben, aber keinen Schaden d
 \item \textbf{Zeige Hinweise in der Playlist.} \emph{Standard: Ein.} Zeigt Hinweise mit einigen Details an, wenn man mit dem Mauszeiger für eine kurze Zeit über einem Eintrag in der Playlist verweilt.
 \item \textbf{Ganze Zeile in Medienliste markieren.} \emph{Standard: Ein.} Bei Klick auf einen Eintrag in der Medienliste im unteren Bereich wird die gesamte Zeile markiert. Andernfalls nur die geklickte Zelle in der Tabelle.
 \item \textbf{Fehlende Metadaten.} Nicht alle mp3-Dateien sind immer vollständig mit ID3-Tags versehen. Nemp kann dann stattdessen andere Informationen in der Übersichtsliste anzeigen. Welche sinnvoll sind, hängt auch davon ab, wie die eigene Musiksammlung organisiert ist.
-\item \textbf{Coverflow.} In einigen Fällen macht der Coverflow ein paar Problemchen. mit den beiden Einstellungen hier können diese im Zweifel behoben werden.
+\item \textbf{Coverflow.} In einigen Fällen macht der Coverflow ein paar Problemchen. Mit den beiden Einstellungen hier können diese im Zweifel behoben werden.
 %\item \textbf{Dateien bei Klick bearbeiten.} \emph{Standard: Ein.} Über einen langsamen, zweifachen Klick oder Druck auf die Taste \texttt{F2} lässt sich die markierte Eigenschaft des Titels bearbeiten. Bei Deaktivierung dieser Funktion ist die Bearbeitung nur noch über das Detail-Fenster möglich.
 \end{itemize}
 
@@ -1010,7 +1022,7 @@ In diesem Bereich können Dinge eingestellt werden, die das Abspielen von Dateien
 \item \textbf{Fading.} \emph{Standard: Ein.} Ermöglicht einen weicheren Übergang beim Titelwechsel und Spulen im Titel. Kann für einige Fälle bzw. Aktionen unterbunden werden.
 \item \textbf{Stille erkennen.} \emph{Standard: Ein.} Nemp kann Stille am Ende eines Titels erkennen und leitet dann ggf. das Abspielen des nächsten Titels früher ein, um ein Abspielen der Playlist ohne Pausen zu erreichen. 
 
-Der Schwellwert gibt an, ab welcher Lautstärke Nemp von \emph{Stille} ausgehen soll, die übersprungen werden soll. Kleine Werte von -5db oder -10db sorgen für einen sehr frühen Abbruch des Titels, wenn die Lautstärke nur minimal absinkt. Werte von -40db oder mehr springen erst zum nächsten Titel, wenn die Lautstärke des Titel bereits stark reduziert wurde. Voreingestellt ist ein Wert von -40db.
+Der Schwellwert gibt an, ab welcher Lautstärke Nemp von \emph{Stille} ausgehen soll, die übersprungen werden soll. Kleine Werte wie -10db sorgen für einen sehr frühen Abbruch des Titels, wenn die Lautstärke nur minimal absinkt. Werte von -40db oder mehr springen erst zum nächsten Titel, wenn die Lautstärke des Titel bereits stark reduziert wurde. Voreingestellt ist ein Wert von -40db.
 
 Da diese Erkennung erst gestartet wird, wenn der Titel bereits läuft und ein paar Sekündchen dauern kann, kann es vorkommen, dass diese Funktion bei sehr kurzen Titeln nicht immer so funktioniert wie erwartet. \emph{Sehr kurz} bedeutet dabei weniger als 5-10 Sekunden, das ist also für die allermeisten Fälle keine Einschränkung. 
 
@@ -1062,11 +1074,11 @@ Die Webradio-Funktionen in Nemp sind relativ rudimentär. Nemp unterstützt zwar W
 \end{hinweis}
 \item \textbf{Aufnahmeoptionen.} Nemp kann auch Webstreams im Mp3-Format aufnehmen. Hier kann eingestellt werden, wo die Aufnahmen gespeichert werden sollen, wie die Dateien benannt werden sollen, ob für jeden Sender ein eigener Unterordner verwendet werden soll, und ob und wie die Dateien geschnitten werden sollen.
 
-Das Beginnen einer neuen Datei bei Titelwechsel ist davon abhängig, wie genau der Sender die Meta-Informationen mitsendet. Bei einigen Senden klappt das sehr gut, bei einigen schlecht, bei wieder anderen praktisch gar nicht.
+Das Beginnen einer neuen Datei bei Titelwechsel ist davon abhängig, wie genau der Sender die Meta-Informationen mitsendet. Bei einigen Sendern klappt das sehr gut, bei einigen schlecht, bei wieder anderen praktisch gar nicht.
 
 Als Notoption steht dann das Schneiden nach einer bestimmten Zeit oder beim Erreichen einer gewissen Dateigröße zur Verfügung. Diese Schnittmarken sind nur ungefähre Werte. Die Dateigrößen bzw. Titellängen, die dabei entstehen, können von den angegebenen ein wenig abweichen.
 
-Streams, die nicht im Mp3-Format sondern in einem anderen Format codiert sind, können nicht aufgenommen werden.
+Streams, die nicht im Mp3-Format codiert sind, können nicht aufgenommen werden.
 \end{itemize}
 
 
@@ -1261,7 +1273,7 @@ Eine riesige Medienbibliothek nützt kaum etwas, wenn man nichts mehr darin finde
 
 Da der Dateiname auch den kompletten Pfad enthält, kann diese Option nützlich sein, wenn beispielsweise in einem Ordner der selbst zusammengestellte Sampler \emph{Urlaub 2016 in Barcelona} liegt. Dann finden eine Suche nach \emph{Barcelona} diesen Ordner, auch wenn die ID3-Tags nicht entsprechend gesetzt sind.
 
-Das Einschließen der Kommentare führt unter Umständen auch mal zu verwirrenden Suchtreffern, wenn der gesuchte Begriff nicht im Interpreten oder Titel vorkommt, sondern nur \gf{versteckt} in den Kommentaren. Wenn man aber die Kommentare für sinnvolle Informationen nutzen, sollten sie auch die Kommentare in die Schnellsuche aufnehmen.
+Das Einschließen der Kommentare führt unter Umständen auch mal zu verwirrenden Suchtreffern, wenn der gesuchte Begriff nicht im Interpreten oder Titel vorkommt, sondern nur \gf{versteckt} im Feld \emph{Kommentar} des ID3-Tags, das oft für nebensächliche Informationen wie Codec-Einstellungen genutzt wird. Wenn Sie aber die Kommentare für sinnvolle Informationen nutzen, sollten Sie auch die Kommentare in die Schnellsuche aufnehmen.
 
 \item \textbf{Suche nach Lyrics beschleunigen.} Etwas versteckt in Nemp kann man auch nach Lyrics suchen. Das geht nicht über die Schnellsuche, sondern nur über die ausführliche Suche, erreichbar über das Menü. Hier kann dasselbe Verfahren für die Beschleunigung der Suche angewendet werden. Bei großen Musiksammlungen, bei denen größtenteils die Liedtexte vorhanden sind, steigt der Speicherverbrauch dann etwas mehr. Falls die Funktion kaum genutzt wird, kann man das deaktivieren, muss man aber nicht.
 
@@ -1272,6 +1284,7 @@ Wenn für einen Suchbegriff kein Treffer gefunden wurde, kann das auch an Tippfeh
 \item \textbf{Coverflow anpassen.} Zusätzlich zur Präsentation der Suchtreffer in der Liste kann auch der Coverflow auf die Suchergebnisse reduziert werden. Dann lassen sich die Suchtreffer über den Coverflow weiter verfeinern.
 \end{itemize}
 
+\newpage
 
 
 \section{Versionsgeschichte}
