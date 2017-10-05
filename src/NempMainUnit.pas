@@ -3840,10 +3840,10 @@ begin
     begin
         ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.pdf';
         if NOT FileExists(ProperHelpFile) then
-            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
+            ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.pdf';
     end else
     begin
-        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.chm';
+        ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-en.pdf';
         if NOT FileExists(ProperHelpFile) then
             ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.pdf';
     end;
