@@ -68,7 +68,7 @@ object CloudEditorForm: TCloudEditorForm
     Top = 8
     Width = 534
     Height = 418
-    ActivePage = TS_DeleteTags
+    ActivePage = TS_MergedTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
@@ -193,7 +193,7 @@ object CloudEditorForm: TCloudEditorForm
         526
         390)
       object LblMergeTagHint: TLabel
-        Left = 380
+        Left = 378
         Top = 40
         Width = 126
         Height = 333
@@ -201,8 +201,6 @@ object CloudEditorForm: TCloudEditorForm
         AutoSize = False
         Caption = '..'
         WordWrap = True
-        ExplicitLeft = 327
-        ExplicitHeight = 481
       end
       object MergeTagVST: TVirtualStringTree
         Left = 3

@@ -227,13 +227,13 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_AudioPlaylist     = 'Playlist';
     OptionsTree_PlayerMedialibrary= 'Media library';
     OptionsTree_PlayerMetaDataAccess = 'Metadata (e.g. ID3Tags)';
-    OptionsTree_PlayerWebradio    = 'Webstreams';
+    OptionsTree_PlayerWebradio    = 'Web radio';
     OptionsTree_PlayerEffects     = 'Effects';
     OptionsTree_PlayerEvents      = 'Events';
     OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
     OptionsTree_PlayerWebServer   = 'WebServer';
-    OptionsTree_PlayerExtendedPlayer   = 'Player (extended)';
-    OptionsTree_PlayerExtendedPlaylist = 'Playlist (extended)';
+    OptionsTree_PlayerExtendedPlayer   = 'Extended player settings';
+    OptionsTree_PlayerExtendedPlaylist = 'Extended playlist settings';
     OptionsTree_PlayerRandom      = 'Random playback';
 
     OptionsTree_FilesMain         = 'File management';
@@ -486,7 +486,7 @@ TagManagement_IgnoreTagIsInRenameListRename    = 'Warning: The tag "%s" is alrea
 TagManagement_RenameTagIsInIgnoreList          = 'Warning: The tag "%s" is already on the "Ignore list".';
 TagManagement_RenameTagIsInMergeListOriginal   = 'Warning: The tag "%s" is already part of a "Rename rule" and is replaced with "%s".';
 TagManagement_OriginalTagIsInMergeListOriginal = 'Warning: The tag "%s" is already part of a "Rename rule" and is replaced with "%s".';
-TagManagement_OriginalTagIsInMergeListRename   = 'Warning: The tag "%s" is already part of a "Rename rule" and is the replacement for with "%s".';
+TagManagement_OriginalTagIsInMergeListRename   = 'Warning: The tag "%s" is already part of a "Rename rule" and is the replacement for "%s".';
 
 TagManagementDialog_Caption = 'Confirmation';
 TagManagementDialog_Text    = 'Nemp recognized some inconsistencies with the new tags (details below).'

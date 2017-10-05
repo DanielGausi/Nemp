@@ -650,6 +650,7 @@ begin
 end;
 procedure TFDetails.Btn_CloseClick(Sender: TObject);
 begin
+    BtnUndoClick(Sender);
     hide;
 end;
 

@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 550
-    ActivePage = TabFiles1
+    ActivePage = TabFiles3
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -208,7 +208,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 409
           Height = 17
           Hint = 'Automatically load the Nemp medialibrary.'
-          Caption = 'Load medialibrary on start'
+          Caption = 'Load media library on start'
           TabOrder = 3
         end
         object CBAutoSaveMediaList: TCheckBox
@@ -217,7 +217,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 409
           Height = 17
           Hint = 'Automatically save the Nemp medialibrary.'
-          Caption = 'Save medialibrary on close'
+          Caption = 'Save media library on close'
           TabOrder = 4
         end
         object cb_ShowSplashScreen: TCheckBox
@@ -1130,7 +1130,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 36
           Width = 401
           Height = 17
-          Caption = 'Tabstop at toolbuttons (cover, lyrics, ...)'
+          Caption = 'Tabstop at tool buttons (cover, lyrics, ...)'
           TabOrder = 1
         end
       end
@@ -1377,7 +1377,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 
             'Stop the player when the system hibernates, so the playback is s' +
             'topped when the PC is turned on again.'
-          Caption = 'Stop player when systems hibernates'
+          Caption = 'Stop player when system hibernates'
           Checked = True
           State = cbChecked
           TabOrder = 0
@@ -1390,7 +1390,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 
             'Use this, if the playback don'#39't work after hibernating the syste' +
             'm.'
-          Caption = 'Reinit player engine on wakeup'
+          Caption = 'Reinitialize player engine on wakeup'
           TabOrder = 1
           WordWrap = True
         end
@@ -1511,7 +1511,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Top = 90
         Width = 431
         Height = 263
-        Caption = 'Weighted random'
+        Caption = 'Weighted randomness'
         TabOrder = 2
         object lbl_WeightedRandom: TLabel
           Left = 34
@@ -2064,7 +2064,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 20
           Width = 350
           Height = 17
-          Caption = 'Block editing file information in the treeview'
+          Caption = 'Block editing file information in the media list'
           TabOrder = 0
         end
         object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
@@ -2107,7 +2107,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 63
           Width = 393
           Height = 17
-          Caption = 'Show password when activating the Nemp Party-Mode'
+          Caption = 'Show password when activating the Nemp Party Mode'
           TabOrder = 1
         end
       end
@@ -2150,7 +2150,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 409
           Height = 17
           Hint = 'Normal: Joint Stereo, Bold: Full Stereo, Italic: Mono'
-          Caption = 'Change style according to channelmode'
+          Caption = 'Change style according to channel mode'
           ParentShowHint = False
           ShowHint = True
           TabOrder = 0
@@ -2453,7 +2453,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 401
           Height = 17
           Hint = 'Show hints in the library or not.'
-          Caption = 'Show hints in the medialist'
+          Caption = 'Show hints in the media list'
           TabOrder = 0
         end
         object CB_ShowHintsInPlaylist: TCheckBox
@@ -2471,7 +2471,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 401
           Height = 17
           Hint = 'Select full row or just a single cell in the library.'
-          Caption = 'Select full row in medialist'
+          Caption = 'Select full row in media list'
           TabOrder = 2
         end
       end
@@ -2551,7 +2551,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 132
           Width = 401
           Height = 17
-          Caption = 'Scroll title/path/details/lyrics in mainwindow'
+          Caption = 'Scroll title/path/details/lyrics in main window'
           TabOrder = 4
           OnClick = CB_ScrollTitleInMainWindowClick
         end
@@ -2747,7 +2747,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 431
         Height = 130
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Automatic rating/playcounter of played audiofiles'
+        Caption = 'Automatic rating and play counter'
         TabOrder = 1
         object cb_RatingActive: TCheckBox
           Left = 16
@@ -3092,8 +3092,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           AutoSize = False
           Caption = 
-            'Note: This will affect the search results of "Quicksearch" and "' +
-            'General search".'
+            'Note: This will affect the search results of "Quick search" and ' +
+            '"General search".'
           WordWrap = True
         end
         object CB_AccelerateSearch: TCheckBox
@@ -3204,7 +3204,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 122
           Width = 409
           Height = 17
-          Caption = 'Change Coverflow according to results'
+          Caption = 'Change coverflow according to results'
           TabOrder = 3
         end
       end
@@ -3872,7 +3872,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Width = 431
         Height = 350
         Anchors = [akLeft, akTop, akRight]
-        Caption = 'Recording options'
+        Caption = 'Recording settings'
         TabOrder = 1
         DesignSize = (
           431
