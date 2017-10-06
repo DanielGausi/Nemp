@@ -3,51 +3,22 @@
 
 \usepackage[latin1]{inputenc}
 
-%\usepackage[T1]{fontenc}
-%\usepackage[german, ruled]{algorithm2e}
-%\SetKwComment{Comment}{//}{}
-%\SetKwProg{function}{function}{}{end}
-
-%\usepackage{listings}
 \usepackage{theorem}
 
 \usepackage[pdftex]{graphicx}
-%\usepackage{epstopdf}
 
-%\usepackage{epsfig}
 \usepackage{url}
 \usepackage{dsfont}
 
 \usepackage[parfill]{parskip}
 \usepackage{tabularx, calc}
 
-
-%\newtheorem{satz}{Satz}
-%\newtheorem{lemma}[satz]{Lemma}
-%\newtheorem{beobachtung}[satz]{Beobachtung}
-%\newtheorem{folgerung}[satz]{Folgerung}
-%\newtheorem{vermutung}[satz]{Vermutung}
-
-%{\theorembodyfont{\upshape} \newtheorem{definition}[satz]{Definition}}
-%{\theorembodyfont{\upshape} \newtheorem{bezeichnung}[satz]{Bezeichnung}}
-%{\theorembodyfont{\upshape} \newtheorem{bemerkung}[satz]{Bemerkung}}
-
-%\newenvironment{beweis}{\noindent{\bf Beweis. }}{$\hfill\Box$\par\bigskip}
-%\newenvironment{bezeichnung}{\noindent{\\[0.25ex]\bf Bezeichnung. }}{}
-%\newenvironment{beispiel}{\noindent{\bf Beispiel. }}{}%  {$\hfill\Box$\par\bigskip}
-%\newenvironment{hinweis}{\leftskip=1cm \rightskip=1cm{\emph{Hinweis.} }}{}
-
 \newenvironment{tipp}{\noindent{\bf Tipp: }\itshape}{\par}
-
 \newenvironment{hinweis}{\noindent{\bf Hinweis: }\itshape}{\par}
-
 \newenvironment{beispiel}{\noindent{\bf Beispiel: }\itshape}{\par}
 
 
-
-%\newcommand{\qed}{$\hfill\Box$\par\bigskip}
 \newcommand{\tweak}{\hspace*{1.5pt}}
-%\newcommand{\gansfuss}[1]{\mbox{,$\!\tweak$,}{#1}\mbox{``}}
 \newcommand{\gf}[1]{\glqq {#1}\grqq}
 
 %\parindent 0pt
@@ -1289,7 +1260,7 @@ Wenn für einen Suchbegriff kein Treffer gefunden wurde, kann das auch an Tippfeh
 
 \section{Versionsgeschichte}
 
-Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war.
+Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
 
 \subsection*{Version 4.7.0, August 2017}
 
@@ -1303,10 +1274,8 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \textbf{Änderungen}
 \begin{itemize}
-% \item Kleinere Änderungen am GUI der Tagwolke
 \item Einstellungs-Fenster überarbeitet. Es werden immer alle Optionen angezeigt. Diese wurden aber teilweise sinnvoller sortiert und etwas entschlackt. Einige alte und   äußerst selten benutzte Optionen sind weggefallen, ein paar andere sind hinzugekommen
-\item Änderungen an einigen Standardeinstellungen, die Relikte von früher waren und eher 
-  für Verwirrung als Klarheit gesorgt haben.
+\item Änderungen an einigen Standardeinstellungen, die Relikte von früher waren und eher für Verwirrung als Klarheit gesorgt haben.
 \end{itemize}
 
 \textbf{Bugfixes}
@@ -1325,26 +1294,9 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \begin{itemize}
 \item automatische Lyricsuche repariert (d.h. an das neue Seitenlayout der Quelle angepasst)
 \item neue Liste mit Default-Webradio-Stationen
-% \item Variable Schriftgrößen für unterschiedlich lange Stücke überarbeitet (weniger Unterschied) 
-\item Neue Versionen der bass.dll und Erweiterungen
 \item Bei Webradio ändert sich auch der Titel in der Playlist automatisch, wenn der Sender  neue Metadaten überträgt
-%\end{itemize}
-
-%\textbf{Bugfixes}
-%\begin{itemize}
-\item schnelleres/langsameres Abspielen *ohne* Micky-Maus-Effekt funktionierte nicht 
-  bei mp3-Dateien
-% \item Bitrate und Spieldauer bei mp3-Dateien mit konstanter Bitrate und INFO-Tag wurden 
-  falsch berechnet
-% \item Mausrad im Coverflow funktioniert wieder (Windows-10-Problem?)
-% \item Drag\&Drop in Einzelfenster bei erweitertem Skinsystem funktionierte nicht
-\item Verschieben des Fensters mit Cover, Equalizer- und Effekte-Steuerung führte oft 
-  zu einer chaotischen Verschiebung des Player-Fensters
-% \item Einige Meldungen bzgl. Lyricsuche waren immer auf englisch
-% \item kleinere Fixes in der deutschen Übersetzung
-% \item Einige Fehlermeldungen ( Abstürze ) sollten deutlich seltener auftreten
+\item Verschieben des Fensters mit Cover, Equalizer- und Effekte-Steuerung führte oft zu einer chaotischen Verschiebung des Player-Fensters
 \end{itemize}
-
 
 \subsection*{Version 4.6.2, April 2013}
 
@@ -1355,22 +1307,11 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \subsection*{Version 4.6.1, März 2013}
 
-%\textbf{Neue Funktionen}
 \begin{itemize}
 \item Globale Abschaltmöglichkeit für das erweiterte Skinssystem, mit Default-Off für Windows XP
-%\end{itemize}
 
-%\textbf{Änderungen}
-%\begin{itemize}
 \item Bei leerer Playlist, aber laufendem Titel wird dieser jetzt zu Ende abgespielt, wenn neue Dateien in die Playlist eingefügt werden.  Ausnahme:  Abspielen und alte Playlist löschen  
-% \item GUI: Scrobbler/Birthday/Webserver an/aus in je einem Menüpunkt
-% \item GUI: Der aktive Skin ist jetzt im Menü markiert
-% \item GUI: Angaben wie  \emph{x Datei(en) markiert}  jetzt nach Singular/Plural getrennt
-%\end{itemize}
 
-%\textbf{Bugfixes}
-%\begin{itemize}
-\item Einstellung  \emph{Beim Start NICHT mit der Wiedergabe beginnen}  funktionierte nicht, wenn  vor dem letzten beenden die Wiedergabe gestoppt war
 \item G15-App meldet jetzt keinen Fehler mehr beim Start, wenn keine G15 da ist.
   Verwendung kann jetzt auch Im Nemp-Einstellungsdialog (de)aktiviert werden, nicht 
   nur in der App selbst.
@@ -1378,87 +1319,30 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \subsection*{Version 4.6.0, Februar 2013}
 
-%\textbf{Neue Funktionen}
 \begin{itemize}
 \item Unterstützung von iTunes-Tags (m4a)
-% \item Schnellerer Start der Wiedergabe (besonders bei Netzwerk-Laufwerken)
 \item Walkman-Modus: Leiern bei schwachem Akku
-%\end{itemize}
-
-%\textbf{Änderungen}
-%\begin{itemize}
 \item Neuer Standard-Skin, inklusive neuem Logo
 \item Einstellungs-Dialog überarbeitet
-% \item Webserver: Playlist-Link oben mit Anker zum aktuellen Titel
-% \item Infos im Datei-Details werden nur noch bei Klick auf ein Item gewechselt, nicht mehr beim Browsen in der Medienbibliothek
 \end{itemize}
 
-%\textbf{Bugfixes}
-%\begin{itemize}
-% \item Deskband und G15-App zeigten manchmal falsche Daten an
-% \item gelegentliche Fehler beim Anzeigen der Details von Webradio-Stationen
-% \item Speicherleck beim Einlesen neuer Dateien beseitigt
-% \item  Doppelte Einträge  in der Medienbib durch cda-Dateien
-% \item Zeitänderung beim Geburtstagsmodus wurde nicht übernommen
-%\item Gelegentlich kein Abspielen des nächsten Titels bei sehr kurzen Stücken
-% \item Einige Buttons wurden nicht skaliert im partymodus
-%\item Problem mit Pfadnamen gelöst, wenn mp3-Dateien direkt im Stammverzeichnis eines Laufwerks liegen
-%\item Bei Änderungen der ID3-Tags von Dateien in der Playlist wurde die Titelanzeige nicht aktualisiert  
-%\end{itemize}
 
 \subsection*{Version 4.5.0, April 2012}
-%\textbf{Neue Funktionen}
 \begin{itemize}
 \item Unterstützung von Apev2-Tags 
 \item A-B-Wiederholung 
 \item Überspringen von Stille am Ende eines Titels 
-%\item Auswerten der Meta-Information  CD-Nr.  bzw.  Part of a Set  bei Multi-CD-Alben 
-%\item Einstellungen - Kein Splashscreen beim Start
-%\item Einstellungen - Wechsel zu neu eingefügtem Titel (bei Doppelklick im Explorer und laufendem Player)
-%\end{itemize}
-
-%\textbf{Änderungen}
-%\begin{itemize}
 \item Laden der Bibliotheksdatei im Hintergrund (schnellerer Startvorgang)
-%\item Für Einsteiger:  \emph{Ihre Medienbibliothek ist leer}-Hinweis
-%\item Klick auf [X] bei der Schnellsuche: Fokus zurück ins Eingabefeld
-%\end{itemize}
-
-%\textbf{Bugfixes}
-%\begin{itemize}
-%\item Trackermodul-Dateien (z.B. mod, xm, s3m) wurden nicht abgespielt
-%\item Wiederhol-Modus  \emph{No-Repeat}  + letzter Eintrag in Playlist fehlt: Doch repeat
-%\item Sortierung nach Dateiname bei bestimmten Ordnerstrukturen fehlerhaft
-% \item Sortierung nach Ordner funktionierte nicht richtig
-% \item Webserver: Zugriff auf Bibliothek wurde auch Admins verweigert  (wenn es für User so eingestellt war)
-% \item Webserver-css: Layout-Fix bei großen Schriftarten 
-%\item Gelegentliche Fehlermeldungen beim Beenden sollten jetzt unterbunden werden
 \end{itemize}
 
 
 \subsection*{Version 4.4.0, Februar 2012}
 
-%\textbf{Neue Funktionen}
 \begin{itemize}
 \item Stark überarbeiteter Webserver: Themes, voten, Usergruppen, AJAX
-\item Neue Funktion: Kopfhörer-Titel in Playlist einfügen und ab aktueller Position
-  abspielen
-%\end{itemize}
-
-%\textbf{Änderungen}
-%\begin{itemize}
-%\item Drag\&Drop in die Playlist bewirkt nun ein Einfügen der Titel HINTER den  gewählten Titel, nicht mehr VOR die Markierung.
+\item Neue Funktion: Kopfhörer-Titel in Playlist einfügen und ab aktueller Position abspielen
 \item Option  \emph{Einfügen ans Ende der Vormerkliste}  wieder geändert zu  \emph{Einfügen hinter aktuellen Titel} . Das mit der Vormerkliste ist zu verwirrend, und 
   insbesondere in Kombination mit dem Webserver nicht verständlich
-\item In der Kopfhörer-Steuerung bewirkt ein Scrollen des Mausrades ein Spulen
-  im Titel, nicht mehr die Lautstärke-Änderung
-%\end{itemize}
-
-%\textbf{Bugfix}
-%\begin{itemize}
-%\item Beim Starten per Doppelklick auf eine Musikdatei wurde die G15-App nicht mit gestartet
-%\item Das zufällige Sammelcover am Anfang wurde nach dem Zurücksetzen der Suche nicht aktualisiert
-%\item Die Beschriftungen der Buttons in den Dialogen sind jetzt in der gewählten  Sprache. (Das betrifft nicht die, wo nur ein  OK -Button ist. Die bleiben auf  OK , auch wenn das in einer anderen Sprache anders heißen sollte.)
 \end{itemize}
 
 
@@ -1471,101 +1355,41 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \subsection*{Version 4.3.0, November 2011}
 
-\textbf{Neue Funktionen und Änderungen}
 \begin{itemize}
 \item bessere Unterstützung für CD-Audio 
-%\item Optionen: Neues einlesen der Soundkarten
-% \item Verzeichnis-Dialoge: Letzter Wert wird gespeichert
-% \end{itemize}
-
-%\textbf{Änderungen}
-%\begin{itemize}
-\item Medienbib aufräumen  und  Dateien neu einlesen  besser gestaltet
-\item Scrobbeln auf die neue API umgestellt
 \item Beim Ziehen des Positions-Reglers wird die Zielzeit angezeigt
-%\item  \emph{Nachrichten}  werden weniger häufig generiert, z.B. wenn  \emph{rating}  fehlschlägt
-\item Symbole in der Playlist geändert, vor allem auch im Nemp3-Skin
-\item Neue bassfx.dll: Läuft auch auf Windows8 64Bit
-\item Default -Einstellung für Soundkarten hinzugefügt
-% \item Gui-Änderung:  \emph{keine zusätzlichen Tags}  jetzt nicht mehr bei wma etc.
 \end{itemize}
-
-\textbf{Bugfixes}
-\begin{itemize}
-\item Übergabe von Dateien an laufende Instanz klappte manchmal nicht
-% \item  \emph{Neues Bild}-Dialog in ID3v2-Tag-Editor funktionierte nicht richtig
-% \item Im Detailfenster war das URL-Feld ohne Funktion - ersetzt durch  \emph{Composer} 
-\item Parameter  \emph{Beim Start mit Wiedergabe beginnen}  wurde bei Webstreams 
-  ignoriert
-\item  \emph{In Ruhezustand versetzen}  wird nur noch einmal ausgeführt (beim Aufwachen ist das wieder deaktiviert)
-%\item  Laufwerke  wurden nicht korrekt gespeichert (hatte aber keinen Einfluss auf die Funktion)
-\item  Automatische Bewertung  bei bisher unbewerteten Dateien führte zu einer
-  sehr geringen Bewertung
-\end{itemize}
-
 
 \subsection*{Version 4.2.0, Juni 2011}
 \begin{itemize}
 \item Wizard erstellt, der einige wichtige Einstellung beim ersten Start abfragt
 \item Multimediatasten nicht länger per Hook, sondern durch Hotkey
 \item Option  \emph{Schnellen Zugriff auf Metadaten erlauben}  hinzugefügt. 
-  Damit können ggf. unbeabsichtigte Änderungen an den ID3Tags 
-  (z.B. beim Bewerten) verhindert werden
-\item Optionen beim automatischen Bewerten entrümpelt
+  Damit können ggf. unbeabsichtigte Änderungen an den ID3Tags  (z.B. beim Bewerten) verhindert werden
 \end{itemize}
 
 \subsection*{Version 4.1.0, April 2011}
 
-\textbf{Neue Funktionen und Änderungen}
 \begin{itemize}
 \item Unterstützung von Flac- und Ogg-Tags (lesen und schreiben)
 \item Unterstützung für das Display der Logitech G15 (durch Zusatztool)
 \item Copy\&Paste: Bei Strg+Shift+C wird eine passende m3u-Liste mit kopiert
 \item Funktion  \emph{Playlist auf USB-Stick kopieren}. Dabei auch optional passende 
   Umbenennung der Dateien
-% \item Equalizer-Steuerung: Leichteres Umschalten zwischen Voreinstellungen
-% \item Webserver: Option für die PORT-Einstellung
 \item Push-To-Talk-taste (F8)
 \item Datei-Details: Bearbeiten von zusätzlichen Tags (die für die Tagwolke)
-% \item Webradio-Aufnahme: Option  Stream als Ordner 
-% \item Coverflow: bei der Schnellsuche auch anpassen, 
-% \item Coverflow: Sortierung: Fehlende Cover zuerst/am Ende
-% \item Coverflow: Option für das Leeren des Cover-Caches
-\item ID3-Tag-Editor: readonly-Flag der Dateien berücksichtigen
-% \item Funktion  \emph{nicht getaggte Dateien auflisten} (unter  erweitert)
-%\end{itemize}
-
-%\textbf{Änderungen}
-%\begin{itemize}
 \item Datei in  \emph{Letzte Playlists}  nicht gefunden:  \emph{Eintrag löschen}  anbieten
-%\item Webradio einfügen: Bei der Playlist nur einfache Input-Box zeigen, wie auch beim Play-Button
-\item Nicht mp3/ogg/flac-Files können nicht mehr editiert werden (auch keine Lyrics und weitere Tags). Einzige Ausnahme: Rating
 \item Bei nicht getaggten Dateien Auswahl was wie angezeigt werden soll, z.B.  Pfad in der Spalte Album 
 \item Nemp kann jetzt auch geschlossen werden, wenn die Medienbibliothek gerade ein Update durchführt.
-%\item GUI: Drag\&Drop auf Kopfhörer, von Kopfhörer in Playlist,
-%\item GUI: Drag\&Drop vom Detail-Cover in die Playlist und Kopfhörer
 \item Browsen in der Shoutcast-Datenbank deaktiviert. Die API wurde geändert, und die
   Nutzungsbedingungen schließt OpenSource aus.
 \end{itemize}
 
-\textbf{Bugfixes}
-\begin{itemize}
-%\item Funktion \emph{Player reinitialisieren} führte beim Aufruf der Einstellungen zu  einem Fehler
-\item Wenn keine Track-Nr-Info vorliegt, wird jetzt nicht mehr  0  dafür im 
-  ID3v2Tag gespeichert, sondern nichts
-% \item falsches Label bei Jingles: Lautstärke reduzieren AUF, nicht UM!
-\end{itemize}
-
- 
 \subsection*{Version 4.0.1, August 2010}
 
 \begin{itemize}
-\item Bewertungen wurden nicht in den ID3-Tag übernommen, wenn der 
-  Abspielzähler auf 0 stand
+\item Bewertungen wurden nicht in den ID3-Tag übernommen, wenn der Abspielzähler auf 0 stand
 \end{itemize}
-
-
-\subsection*{Version 4.0.0, Mai-Juli 2010: Nemp wird Open-Source}
 
 \begin{figure}[tbh]
 \centering
@@ -1574,6 +1398,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \label{fig_4.0}
 \end{figure}
 
+\subsection*{Version 4.0.0, Mai-Juli 2010: Nemp wird Open-Source}
 
 \begin{itemize}
 \item Änderung der Lizenz von  Freeware  auf OpenSource: Nemp steht ab jetzt unter der GPL
@@ -1609,29 +1434,17 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
     aufgenommen
 \item Party-Modus: Größere Buttons mit reduzierter Funktion, um unbeabsichtigte Fehleingaben zu vermeiden.
 \item Webradio-Verwaltung verbessert. Sortiermöglichkeit für die Webradio-Stationen in der Medienbibliothek, Export der Webradio-Stationen als pls-Datei
-%\item Random-Playlist erweitert: Dauer der Dateien als Auswahl-Kriterium, Tags der Dateien als Auswahlkriterium  (dafür  Genre  entfernt)
-% \item GUI: Bei Klick in den Playerteil: Lautstärke-Regelung per Mausrad
-% \item GUI: Größenveränderung der Einzelfenster auch an den Rändern möglich, nicht nur unten rechts
 \item Intelligentere Größenveränderung der Komponenten bei Resize des Hauptfensters
 \item Kopfhörer-Steuerung in das Hauptfenster integriert: 
   leichtes Einfügen des aktuellen Kopfhörer-Titels in die Playlist
-%\item Erkennung von VBRI-Headern in mp3-Dateien
-%\item Erkennung von weiteren Genre-IDs
-%\item Bessere Hilfe-Datei erstellt
 \end{itemize}
 
 \textbf{Änderungen}
 \begin{itemize}
 
 \item Diverse Änderungen am GUI
-% \item Deskand-Installierung wird unter Windows Vista und 7 verweigert - da funktioniert das eh nicht richtig. Ebenso generell unter 64-Bit-Systemen
-% \item Auswahl  Jetzt abspielen, später abspielen, ...  anders
 \item  Kopfhörer-Ausgabe  auch auf derselben Soundkarte wie die Hauptwiedergabe möglich
 \item Skineditor aus dem Hauptprogramm entfernt
-%\item Optionen, Bitraten-Farben: Entfernt. Farben können nur über den Skin eingestellt  werden, in den Optionen kann das dann auf Wunsch abgeschaltet werden
-%\item Beim Bearbeiten von Dateieigenschaften im Detailfenster kommt beim Wechsel eine   Wollen Sie speichern -Abfrage
-% \item Effekt  Geschwindigkeit  von 33\% - 300\% erweitert
-% \item Option: Beim Start Webserver aktivieren hinzugefügt
 \item System  \emph{Schnellsuche}  überarbeitet. Es wird immer alles durchsucht, nicht nur  die  aktuelle Liste. Treffer aus dieser Liste werden aber zuerst angezeigt.
 \end{itemize}
 
@@ -1656,13 +1469,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \begin{itemize}
 \item Automatische Lyrics-Suche entfernt. LyricWiki musste auf Druck der Plattenfirmen 
   die API abschalten
-% \item Der Button  Änderungen übernehmen  im Einstellungsdialog ist jetzt groß genug
-% \item Bei Klick auf Stop springt die Titelanzeige jetzt zurück
-%\item Ein Starten des Webservers gibt es jetzt ne nettere Fehlermeldung, wenn z.B. XAMPP bereits läuft
-% \item Fading und  Ignorieren bei Stop  funktionierte nicht wie gewünscht
-\item Fehlende Dateien in der Playlist wurden nicht übersprungen, bzw. die Wiedergabe 
-  hielt danach automatisch an
-% \item Problem mit der Track-Nr bei WMA-Dateien behoben (hoffentlich)
+\item Fehlende Dateien in der Playlist wurden nicht übersprungen, bzw. die Wiedergabe  hielt danach automatisch an
 \end{itemize}
 
 
@@ -1678,8 +1485,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \subsection*{Version 3.3.1, April 2009}
 
 \begin{itemize}
-\item Bearbeiten von ID3-Tags führte zu Inkonsistenzen in der Medienbibliothek
-  (doppelte Dateien) oder zu einem Totalabsturz des Players
+\item Bearbeiten von ID3-Tags führte zu Inkonsistenzen in der Medienbibliothek (doppelte Dateien) oder zu einem Totalabsturz des Players
 \end{itemize}
 
 
@@ -1689,11 +1495,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \begin{itemize}
 \item LastFM-Scrobbeln. Abgespielte Titel werden im LastFM-Userprofil gespeichert.
 \item Updater-Funktion, d.h. automatische Benachrichtigung bei neuen Versionen
-%\item Beenden/Shutdown bei Ende der Playlist
-\item Equalizer-Einstellungen können unter eigenen Namen gespeichert werden
 \item Webradio-Aufnahme mit Auto-Cut nach Zeit/Dateigröße
-%\item Auch im Skin-Modus sind die Player-Buttons (Play, Next, etc) über die Tastatur steuerbar
-\item Schieberegeler (Lautstärke, Equalizer, ...) sind per Cursortasten steuerbar
 \item Wird ein neues Laufwerk angeschlossen, auf dem ein  überwachtes Verzeichnis  liegt, dann startet ggf. nachträglich das Scannen nach neuen Dateien
 \item Rudimentärer Windows7-Support (Taskleistenbuttons)
 \end{itemize}
@@ -1701,29 +1503,16 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \textbf{Änderungen}
 \begin{itemize}
 \item Einstellungsdialog überarbeitet
-\item Dateitypen-Registrierung erweitert, u.a. Anzeige der aktuell auf Nemp registrierten
-  Dateitypen
+\item Dateitypen-Registrierung erweitert, u.a. Anzeige der aktuell auf Nemp registrierten Dateitypen
 \item About-Dialog überarbeitet
-% \item Scrollgeschwindigkeit in der Taskleiste und im Hauptfenster einstellbar
-\item Heuristik der Coversuche modifiziert - in einigen Fällen wurde unsinniges
-  angezeigt
-% \item Bei Klick auf [N] im Deskband wird das Deskband jetzt ausgeblendet, wenn Nemp abgestürzt ist
-%\item Das Verzeichnis für Webradio-Aufnahmen wird jetzt erst bei Bedarf erstellt, nicht direkt beim Start von Nemp
-% \item Anzeige für aktivierten Geburtstags-/Sleepmodus verändert
-%\item Ein aktivierter Webserver wird jetzt auch im Hauptfenster angezeigt
 \end{itemize}
 
 \textbf{Bugfixes}
 \begin{itemize}
 \item Die Volume-Keys bei Multimedia-Tastaturen funktionierten nicht wie gewünscht
-% \item Nach dem Öffnen des Einstellungsdialoges und anschließendem Programmabsturz waren (fast) alle Einstellungen auf die Default-Einstellung zurückgesetzt
 \item Die Lautstärkeregelung bei Jingles war defekt
-% \item Löschen der Playlist führte zu einer Zugriffsverletzung beim anschließenden Versuch, etwas rückwärts abspielen zu wollen
 \item Die Playlist-Dateien hatten Probleme mit sehr langen Dateinamen
-% \item In den Hotkey-Optionen gab es zweimal  \textsc{Strg+Alt}
-% \item Die Sprachauswahl im Einstellungsdialog zeigte initial auf deutschen Systemen nichts an 
 \item Tags in  Lossless WMA -Dateien wurden nicht ausgelesen
-% \item Bei einer Schnellsuche verschwindet das  Sortierdreieck  in der Anzeige
 \end{itemize}
 
 
@@ -1731,12 +1520,8 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \subsection*{Version 3.2.1, Januar 2009}
 \begin{itemize}
 \item Wenn keine Medienbibliothek geladen wurde, funktionierte das Deskband nicht richtig
-% \item Im Dialog zu  \emph{Playlist laden}  wurden in der deutschen Version unter  Alle unterstützten Formate nicht die *.npl-Dateien angezeigt
 \item Nach Ausführen der Funktion  Fehlende Dateien löschen  kam es bei der Schnellsuche zu  Zugriffsverletzungen
-%\item Das Sortierdreieck in den Spalten der Medienliste wird jetzt ausgeblendet, wenn nach einem Wechsel der Vorauswahl die Sortierung verloren geht
-%\item Ein Umschalten zwischen  Suche  und  Browsen  im Modus  Coverflow  konnte unter bestimmten  Umständen zu Zugriffsverletzungen führen
 \item In der deutschen Version wurden im Coverflow einige Alben- oder Interpreten falsch angezeigt, z.B.  Pos1 , wenn das Album  Home  heißt
-% \item Die Schriftart wurde von  MS Sans Serif  auf  Tahoma  geändert, um ClearType zu unterstützen
 \end{itemize}
 
 
@@ -1744,22 +1529,12 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \textbf{Neue Funktionen und Änderungen}
 \begin{itemize}
 \item hidden feature ;-)
-%\end{itemize}
-
-%\textbf{Änderungen/Erweiterungen}
-%\begin{itemize}
-\item Schriftzug  \emph{kein Cover gefunden} durch ein Standardcover ersetzt. Ist über den Einstellungsdialog konfigurierbar.
 \item Im Coverflow ist das  Alle Dateien -Cover personalisierbar, d.h. es werden 1-8 zufällige Cover aus der Medienbibliothek dafür benutzt
-% \item Unterstützung für *.gif-Dateien 
 \end{itemize}
 
 \textbf{Bugfixes}
 \begin{itemize}
 \item Fehler in MP3FileUtils behoben, der unter Umständen das letzte Zeichen abschnitt
-% \item Der Geburtstagslied-Auswahl-Dialog zeigte alle Dateien an, nicht nur Audiodateien
-% \item Im Zufalls-Playlist-Erstellen-Dialog war der initiale Fokus unschön gesetzt
-\item Ein Bearbeiten von gespeicherten Webradio-Sendern wurde nicht automatisch gespeichert
-% \item Die Bedienfolge  Datei abspielen, Pause, Klick auf Next, Play  führte dazu (falls das nächste Stück ein Radiosender ist), dass die Aufnahme nicht möglich war.
 \end{itemize}
 
 
@@ -1846,36 +1621,19 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \textbf{Bugfixes}
 \begin{itemize}
-%\item Durch bestimmte Aktionen konnte die Playlist durcheinander geraten und Nemp unbedienbar werden.
-%\item Nach einem Drag\&Drop vom Explorer in die Playlist waren einige Einträge im Kontextmenü der Medienliste deaktiviert.
 \item Die Schnellsuche nach dem Leerstring war nicht wirklich schnell.
-% \item Wenn man bei laufender Wiedergabe die Playlist löschte, und nach Ende des   aktuellen Stückes den Play-Button klickte, gab es eine Fehlermeldung.
-% \item In der Hilfe waren ab dem Coverflow-Link alle Links verschoben.
-% \item Einige Schreibfehler in der deutschen Übersetzung behoben
-% \item Im Eigenschaftenfenster unter erweiterte id3v2-Frames war unten der  Button  Als Datei speichern  zu schmal.
 \item Über das Tray-Menü ließ sich der erste Eintrag in der Playliste nicht auswählen.
 \item Die Aktualisierung des Covers in der Medienbibliothek funktionierte teilweise 
   nicht richtig.
 \item Das ermitteln der Lyrics verursachte eine Fehler-Kaskade.
-% \item Die untere Liste war manchmal  zu groß.
 \end{itemize}
 
 \subsection*{Version 3.0.1, November 2007}
 
 \begin{itemize}
-\item Wenn Nemp nicht lief, und man eine mp3-Datei im Explorer doppelklickte, startete zwar  Nemp, aber die Wiedergabe startete nicht automatisch
-% \item Im Skin-Editor funktionierte der  Skin testen -Button nicht
-% \item Bei der Auswahl der Skins im Editor gab es immer den Punkt  Kein Skin vorhanden 
-% \item Das Erstellen eines neuen Skins führte zu einer Zugriffsverletzung, wenn der Optionsdialog vorher nicht geöffnet wurde
-% \item Bei Klick auf  Übernehmen  im Optionsdialog kam das Hauptfenster in den Vordergrund
 \item Wenn noch keine Sprache explizit eingestellt wurde, änderte sich beim ersten Aufruf des Optionsdialogs die Sprache auf Englisch, auch wenn beim Start korrekt deutsch erkannt wurde
-% \item Einige Kontrollelemente waren zu klein, was zu einem unvollständigen Text in der deutschen Fassung führte
-% \item Ein paar Rechtschreibfehler in der Übersetzungsdatei (deutsch) korrigiert
 \item Das Deskband hat das kaufmännische Und (\&) nicht richtig angezeigt
-\item alte Versionen der bass.dll und Addons aktualisiert
 \end{itemize}
-
-\subsection*{Version 3.0.0, Oktober 2007: Fast vollständige Überarbeitung}
 
 \begin{figure}[tbh]
 \centering
@@ -1884,6 +1642,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \label{fig_3.0}
 \end{figure}
 
+\subsection*{Version 3.0.0, Oktober 2007: Fast vollständige Überarbeitung}
 
 \textbf{Neue Funktionen}
 \begin{itemize}
@@ -1936,13 +1695,6 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \subsection*{Version 2.5d, November 2006}
 \begin{itemize}
 \item einige kleinere Bugfixes
-%\item Korrektur eines Fehlers bei  Suche nach diesem Artist/Titel/Album, der zu unsinnigen   Suchergebnissen oder auch Zugriffsverletzungen führen konnte.
-% \item Dabei auch  diesen Titel  durch den Titel ersetzt.
-%\item Parameterverarbeitung beim Start überarbeitet. Playlisten werden jetzt korrekt behandelt. 
-%\item  Ebenso sollte das  Autoplay beim Start  und  Neuen Titel abspielen  jetzt besser funktionieren.
-%\item Skinsystem leicht modifiziert. Bei  Hintergrundbild nicht verwenden für..  wird das Bild  jetzt nicht nur für den Baum nicht benutzt, sondern auch nicht für das drumherum. Das  erscheint mir sinniger. Den alten Effekt kann man immer noch mit Hilfe der   Halbtransparente Anzeige für...  erreichen.
-%\item Ein bisschen Sprengstoff (TNT ;-)) hinzugefügt, und ein paar weitere Strings  erweitert  (WideStrings). Damit sollte jetzt auch die Suche nach Unicode-Titeln/Namen/...    richtig funktionieren.
-% \item Bei Änderung der Anzeige des Trayicons über den Optionendialog wurde der Tray-Hint  nicht sofort richtig gesetzt, sondern erst bei einem Liedwechsel
 \end{itemize}
 
 
@@ -1950,24 +1702,16 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \subsection*{Version 2.5c, Oktober 2006}
 \begin{itemize}
-%\item Wiedergabemodus (Alles wiederholen, Titel wiederholen, Zufallswiedergabe) wird gespeichert
 \item Zufallswiedergabe verbessert (wiederholen eines Titels nach kurzer Zeit wird verhindert)
 \item Gesamtspieldauer der Playlist sollte jetzt korrekt sein
-% \item Schnelles mehrfaches Klicken auf  Rückwärts abspielen  führte zu einer mehrfachen Wiedergabe des Stückes
-% \item Das Fenster kann nun im maximierten Zusatnd nicht mehr verschoben werden
 \item Option  Jetzt abspielen 
-%\item Draggen von  Alle Alben  führte zu einem Draggen der Gesamten Medienliste, auch dann, wenn ein  bestimmter Artist markiert war
 \item Die Medienliste wird beim Start jetzt im Hintergrund geladen
-% \item  Ordner in Nemp einfügen  vom Kontextmenü des Explorers aus führte u.U. zu einer doppelten  aktuelles Stück -Markierung in der Playlist
-% \item Doppelklick auf einen leeren Bereich in der Playlist bewirkte ein Abspielen des fokussierten  Eintrags
  \end{itemize}
 
 
 \subsection*{Version 2.5b, September 2006}
 \begin{itemize}
 \item einige kleinere Bugfixes
-%\item Rechtsklick auf die Ecken der Einzelfenster startet nun nicht mehr das Vergrößern/Verkleinern  des Fensters
-%\item Die Kommunikation mit EvilLyrics funktioniert wieder
 \end{itemize}
 
 \subsection*{Version 2.5a, September 2006}
@@ -1981,9 +1725,6 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 % \item StayOnTop-System modifiziert, sollte jetzt weniger buggy sein
 \end{itemize}
 
-
-\subsection*{Version 2.5, September 2006}
-
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=0.7\textwidth]{v2_5.jpg}
@@ -1991,6 +1732,8 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 \label{fig_2.5}
 \end{figure}
 
+
+\subsection*{Version 2.5, September 2006}
 
 \textbf{Neue Funktionen}
 
@@ -2128,14 +1871,14 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 % \item Laden der Medienliste funktionierte unter gewissen Umständen nicht richtig
 \end{itemize}
 
-\subsection*{Version 2.1, Februar 2006: Nemp wird zum mp3-Player}
-
 \begin{figure}[tbh]
 \centering
 \includegraphics[width=0.7\textwidth]{v2_1.png}
 \caption{Der erste Nemp}
 \label{fig_2.1}
 \end{figure}
+
+\subsection*{Version 2.1, Februar 2006: Nemp wird zum mp3-Player}
 
 \textbf{Major Updates/Changes: }
 \begin{itemize}
