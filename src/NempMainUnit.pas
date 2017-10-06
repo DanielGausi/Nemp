@@ -6081,7 +6081,6 @@ begin
   NempPlayer.LastUserWish := USER_WANT_PLAY;
   NempPlaylist.PlayFocussed;
   Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
-
 end;
 
 procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject;
