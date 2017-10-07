@@ -3836,7 +3836,8 @@ end;
 procedure TNemp_MainForm.ShowHelp;
 var ProperHelpFile: String;
 begin
-    if NempOptions.Language = 'de' then
+    //if (NempOptions.Language = 'de') then
+    if (LeftStr(NempOptions.Language,2) = 'de') then
     begin
         ProperHelpFile := ExtractFilePath(Paramstr(0))+'nemp-help-de.pdf';
         if NOT FileExists(ProperHelpFile) then
@@ -4695,13 +4696,21 @@ begin
     multiSelect := length(VST.GetSortedSelection(False)) > 1;
     enableEditExtendeTag := CurrentTagToChange <>  '';
 
-    PM_RemoveTagThisFile.Enabled := enableEditExtendeTag;
-    PM_RenameTagThisFile.Enabled := enableEditExtendeTag;
+    PM_AddTagThisFile    .Visible := NempOptions.AllowQuickAccessToMetadata;
+    PM_RemoveTagThisFile .Visible := NempOptions.AllowQuickAccessToMetadata;
+    PM_RenameTagThisFile .Visible := NempOptions.AllowQuickAccessToMetadata;
+    PM_TagIgnoreList     .Visible := NempOptions.AllowQuickAccessToMetadata;
+    PM_TagMergeList      .Visible := NempOptions.AllowQuickAccessToMetadata;
+    N1                   .Visible := NempOptions.AllowQuickAccessToMetadata;
+    N79                  .Visible := NempOptions.AllowQuickAccessToMetadata;
+
+    PM_RemoveTagThisFile.Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
+    PM_RenameTagThisFile.Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
     //PM_AddTagAllFiles.Enabled    := multiSelect;
     //PM_RemoveTagAllFiles.Enabled := enableEdit and multiSelect;
     //PM_RenameTagAllFiles.Enabled := enableEdit and multiSelect;
-    PM_TagIgnoreList    .Enabled := enableEditExtendeTag;
-    PM_TagMergeList     .Enabled := enableEditExtendeTag;
+    PM_TagIgnoreList    .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
+    PM_TagMergeList     .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
 
     if not assigned(MedienBib.CurrentAudioFile) then
         exit;
@@ -5034,10 +5043,10 @@ begin
     baseLeft := ImgDetailCover.Left + ImgDetailCover.Width + 5;
     currentLeft := baseleft;
 
-    if NempOptions.AllowQuickAccessToMetadata then
-        VDTCover.PopupMenu := PopupEditExtendedTags
-    else
-        VDTCover.PopupMenu := Nil;
+    //if NempOptions.AllowQuickAccessToMetadata then
+    //    VDTCover.PopupMenu := PopupEditExtendedTags;
+    //else
+    //    VDTCover.PopupMenu := Nil;
 
     if assigned(aAudioFile) then
     begin
@@ -6990,6 +6999,7 @@ var aNode: PVirtualNode;
   dauer:int64;
   groesse:int64;
   SelectedMP3s: TNodeArray;
+  cueSelected: Boolean;
 begin
 
   c := PlaylistVST.SelectedCount;
@@ -7001,6 +7011,7 @@ begin
   end;
   dauer:=0;
   groesse:=0;
+  cueSelected := False;
 
   for i:=0 to length(SelectedMP3s) - 1 do
   begin
@@ -7013,19 +7024,40 @@ begin
               groesse := groesse + AudioFile.Size;
           end;
 
+          at_Cue: cueSelected := True;
+
           at_CDDA: dauer := dauer + AudioFile.Duration; // size is not available
       end;
   end;
 
-  if c = 1 then
-      PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountSingle), [c])
-                                + SizeToString(groesse)
-                                + SekToZeitString(dauer)
-  else
-      PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountMulti), [c])
-                                + SizeToString(groesse)
-                                + SekToZeitString(dauer);
+  if cueSelected then
+  begin
+      // Nemp does not (yet) get details about a "CUE-File", so put some "unknown" into the caption
+      if c = 1 then
+          PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCueCountSingle), [c])
 
+          // no further data available; only 1 cue sheet selected, nothing else
+      else begin
+          if dauer  = 0 then
+              // only cue sheets selected
+              PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCueCountMultiOnlyCue), [c])
+          else
+              // cue sheets and files selected
+              PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCueCountMulti), [c])
+                                              + SizeToString(groesse)
+                                              + SekToZeitString(dauer)
+      end;
+  end else
+  begin
+      if c = 1 then
+          PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountSingle), [c])
+                                    + SizeToString(groesse)
+                                    + SekToZeitString(dauer)
+      else
+          PlayListStatusLBL.Caption := Format((MainForm_Summary_SelectedFileCountMulti), [c])
+                                    + SizeToString(groesse)
+                                    + SekToZeitString(dauer);
+  end;
 
   aNode := PlaylistVST.FocusedNode;
   if not Assigned(aNode) then Exit;

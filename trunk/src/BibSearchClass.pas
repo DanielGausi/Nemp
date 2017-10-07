@@ -439,7 +439,7 @@ begin
     AccelerateSearch               := Ini.ReadBool('MedienBib', 'AccelerateSearch', True);
     AccelerateSearchIncludePath    := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludePath', True);
     AccelerateSearchIncludeComment := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeComment', False);
-    AccelerateLyricSearch          := Ini.ReadBool('MedienBib', 'AccelerateLyricSearch', True);
+    AccelerateLyricSearch          := Ini.ReadBool('MedienBib', 'AccelerateLyricSearch', False);
 
     QuickSearchOptions.WhileYouType       := Ini.ReadBool('MedienBib', 'QSWhileYouType', True);
     QuickSearchOptions.AllowErrorsOnEnter := Ini.ReadBool('MedienBib', 'QSAllowErrorsOnEnter', True);

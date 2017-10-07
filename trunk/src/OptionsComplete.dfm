@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 550
-    ActivePage = TabFiles3
+    ActivePage = TabPlayer6
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -4224,7 +4224,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 361
           Height = 17
           Hint = 'Signalize birthday song with a countdown.'
-          Caption = 'Start a countdown before the event'
+          Caption = 'Start a countdown before the actual time'
           TabOrder = 0
           OnClick = CBStartCountDownClick
         end
@@ -4283,9 +4283,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object lblBirthdayTitel: TLabel
           Left = 16
           Top = 43
-          Width = 63
+          Width = 66
           Height = 13
-          Caption = 'Birthdaysong'
+          Caption = 'Birthday song'
         end
         object LblEventWarning: TLabel
           Left = 301
@@ -4337,7 +4337,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Width = 417
           Height = 17
           Hint = 'Continue with the playlist after the birthday song.'
-          Caption = 'Continue with the playlist after playing the birthdaysong'
+          Caption = 'Continue with the playlist after playing the birthday song'
           TabOrder = 4
         end
         object mskEdt_BirthdayTime: TMaskEdit

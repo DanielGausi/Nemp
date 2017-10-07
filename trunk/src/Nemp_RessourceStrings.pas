@@ -229,7 +229,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerMetaDataAccess = 'Metadata (e.g. ID3Tags)';
     OptionsTree_PlayerWebradio    = 'Web radio';
     OptionsTree_PlayerEffects     = 'Effects';
-    OptionsTree_PlayerEvents      = 'Events';
+    OptionsTree_PlayerEvents      = 'Birthday mode';
     OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
     OptionsTree_PlayerWebServer   = 'WebServer';
     OptionsTree_PlayerExtendedPlayer   = 'Extended player settings';
@@ -622,6 +622,9 @@ MainForm_Summary_FileCountTotal         = '%d files in total';
 MainForm_Summary_PlaylistCountMulti     = '%d playlists';
 MainForm_Summary_WebradioCountMulti     = '%d webradio stations';
 
+MainForm_Summary_SelectedFileCueCountSingle       = '%d cue sheet track selected';
+MainForm_Summary_SelectedFileCueCountMulti        = '%d files (and cue sheet tracks); ';
+MainForm_Summary_SelectedFileCueCountMultiOnlyCue = '%d cue sheet tracks selected';
 
 
 MainForm_Cover_NoCover   = 'No cover available';
