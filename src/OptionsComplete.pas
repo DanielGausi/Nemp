@@ -2927,8 +2927,8 @@ begin
   NempPlayer.NempScrobbler.IgnoreErrors      := CB_SilentError        .Checked;
   NempPlayer.NempScrobbler.AlwaysScrobble    := CB_AlwaysScrobble     .Checked;
 
-  Nemp_MainForm.MM_T_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
-  Nemp_MainForm.PM_P_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
+  //Nemp_MainForm.MM_T_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
+  //Nemp_MainForm.PM_P_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
 
   if NempPlayer.NempScrobbler.DoScrobble <> CB_ScrobbleThisSession.Checked then
   begin
@@ -3533,6 +3533,9 @@ begin
         end;
         5: begin
             ResetScrobbleButton;
+            // activate scrobbling now automatically
+            // (this seems to make sense to me here)
+            CB_ScrobbleThisSession.Checked := True;
         end;
 
         100: begin

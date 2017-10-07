@@ -1167,6 +1167,8 @@ begin
         begin
             p2 := posEx('</ignoredMessage>', aResponse, p);
             correctedValue := ParseHTMLChars(Copy(aresponse, p + 25, p2-p-25));
+            if trim(correctedValue) = '' then
+                correctedValue := '(no reason specified)';
             SendMessage(fWindowHandle, WM_Scrobbler, SC_Hint, lParam(PWideChar(UnicodeString('Hint: Scrobbling ignored: ' + correctedValue))));
         end;
 end;

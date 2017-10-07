@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  6 OCT 2017 13:15
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  7 OCT 2017 18:31
 entering extended mode
 **./nemp-help-en.tex
 (nemp-help-en.tex
@@ -312,20 +312,20 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 (nemp-help-en.aux)
 \openout1 = `nemp-help-en.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 55.
-LaTeX Font Info:    ... okay on input line 55.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -361,7 +361,7 @@ File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package color Info: Driver file: pdftex.def on input line 144.
 )
-Package hyperref Info: Link coloring ON on input line 55.
+Package hyperref Info: Link coloring ON on input line 54.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -371,36 +371,36 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count121
 )
-LaTeX Info: Redefining \ref on input line 55.
-LaTeX Info: Redefining \pageref on input line 55.
-LaTeX Info: Redefining \nameref on input line 55.
+LaTeX Info: Redefining \ref on input line 54.
+LaTeX Info: Redefining \pageref on input line 54.
+LaTeX Info: Redefining \nameref on input line 54.
 
 (nemp-help-en.out) (nemp-help-en.out)
 \@outlinefile=\write3
 \openout3 = `nemp-help-en.out'.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 59.
+LaTeX Font Info:    Try loading font information for U+msa on input line 58.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 59.
+LaTeX Font Info:    Try loading font information for U+msb on input line 58.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<nemp.jpg, id=276, 200.75pt x 122.4575pt>
+<nemp.jpg, id=272, 200.75pt x 122.4575pt>
 File: nemp.jpg Graphic file (type jpg)
  <use nemp.jpg>
-Package pdftex.def Info: nemp.jpg used on input line 63.
+Package pdftex.def Info: nemp.jpg used on input line 62.
 (pdftex.def)             Requested size: 195.0pt x 118.95738pt.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 68.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 67.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omscmr.fd"
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 68.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 67.
  [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map} <./nemp.jpg>] (nemp-help-e
@@ -409,441 +409,435 @@ n.toc [1])
 \openout4 = `nemp-help-en.toc'.
 
 
-[2] <BtnPlay.png, id=371, 22.58438pt x 22.58438pt>
+[2] <BtnPlay.png, id=366, 22.58438pt x 22.58438pt>
 File: BtnPlay.png Graphic file (type png)
  <use BtnPlay.png>
-Package pdftex.def Info: BtnPlay.png used on input line 91.
+Package pdftex.def Info: BtnPlay.png used on input line 90.
 (pdftex.def)             Requested size: 22.5843pt x 22.5843pt.
 
-<nemp_start.jpg, id=374, 301.125pt x 225.84375pt>
+<nemp_start.jpg, id=369, 301.125pt x 225.84375pt>
 File: nemp_start.jpg Graphic file (type jpg)
  <use nemp_start.jpg>
-Package pdftex.def Info: nemp_start.jpg used on input line 105.
+Package pdftex.def Info: nemp_start.jpg used on input line 104.
 (pdftex.def)             Requested size: 312.00119pt x 234.0242pt.
- [3 <./BtnPlay.png>] <TabBtnClassic.png, id=386, 18.0675pt x 18.0675pt>
+ [3 <./BtnPlay.png>] <TabBtnClassic.png, id=381, 18.0675pt x 18.0675pt>
 File: TabBtnClassic.png Graphic file (type png)
 
 <use TabBtnClassic.png>
-Package pdftex.def Info: TabBtnClassic.png used on input line 120.
+Package pdftex.def Info: TabBtnClassic.png used on input line 119.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
- <TabBtnCoverflow.png, id=387, 18.0675pt x 18.0675pt>
+ <TabBtnCoverflow.png, id=382, 18.0675pt x 18.0675pt>
 File: TabBtnCoverflow.png Graphic file (type png)
 
 <use TabBtnCoverflow.png>
-Package pdftex.def Info: TabBtnCoverflow.png used on input line 124.
+Package pdftex.def Info: TabBtnCoverflow.png used on input line 123.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
- <TabBtnTagCloud.png, id=388, 18.0675pt x 18.0675pt>
+ <TabBtnTagCloud.png, id=383, 18.0675pt x 18.0675pt>
 File: TabBtnTagCloud.png Graphic file (type png)
 
 <use TabBtnTagCloud.png>
-Package pdftex.def Info: TabBtnTagCloud.png used on input line 126.
+Package pdftex.def Info: TabBtnTagCloud.png used on input line 125.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
  [4 <./nemp_start.jpg> <./TabBtnClassic.png> <./TabBtnCoverflow.png> <./TabBtnT
 agCloud.png>]
-<TabBtnNemp.png, id=397, 18.0675pt x 18.0675pt>
+<TabBtnNemp.png, id=392, 18.0675pt x 18.0675pt>
 File: TabBtnNemp.png Graphic file (type png)
  <use TabBtnNemp.png>
-Package pdftex.def Info: TabBtnNemp.png used on input line 152.
+Package pdftex.def Info: TabBtnNemp.png used on input line 151.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
- [5 <./TabBtnNemp.png>] <taskleiste.jpg, id=403, 177.66376pt x 180.675pt>
+ [5 <./TabBtnNemp.png>] <taskleiste.jpg, id=398, 177.66376pt x 180.675pt>
 File: taskleiste.jpg Graphic file (type jpg)
 
 <use taskleiste.jpg>
-Package pdftex.def Info: taskleiste.jpg used on input line 161.
+Package pdftex.def Info: taskleiste.jpg used on input line 160.
 (pdftex.def)             Requested size: 71.06424pt x 72.2687pt.
- <deskband.jpg, id=404, 265.99374pt x 114.4275pt>
+ <deskband.jpg, id=399, 265.99374pt x 114.4275pt>
 File: deskband.jpg Graphic file (type jpg)
 
 <use deskband.jpg>
-Package pdftex.def Info: deskband.jpg used on input line 162.
+Package pdftex.def Info: deskband.jpg used on input line 161.
 (pdftex.def)             Requested size: 106.3956pt x 45.77019pt.
- <g15.jpg, id=405, 336.50719pt x 144.54pt>
+ <g15.jpg, id=400, 336.50719pt x 144.54pt>
 File: g15.jpg Graphic file (type jpg)
  <use g15.jpg>
-Package pdftex.def Info: g15.jpg used on input line 163.
+Package pdftex.def Info: g15.jpg used on input line 162.
 (pdftex.def)             Requested size: 134.60048pt x 57.81496pt.
 
-<einzelfenster_en.jpg, id=406, 754.31813pt x 473.51906pt>
+<einzelfenster_en.jpg, id=401, 754.31813pt x 473.51906pt>
 File: einzelfenster_en.jpg Graphic file (type jpg)
 
 <use einzelfenster_en.jpg>
-Package pdftex.def Info: einzelfenster_en.jpg used on input line 177.
+Package pdftex.def Info: einzelfenster_en.jpg used on input line 176.
 (pdftex.def)             Requested size: 312.00119pt x 195.85646pt.
  [6 <./taskleiste.jpg> <./deskband.jpg> <./g15.jpg>]
-[7 <./einzelfenster_en.jpg>] [8] <wizard.png, id=421, 128.48pt x 128.48pt>
+[7 <./einzelfenster_en.jpg>] [8] <wizard.png, id=417, 128.48pt x 128.48pt>
 File: wizard.png Graphic file (type png)
 
 <use wizard.png>
-Package pdftex.def Info: wizard.png used on input line 228.
+Package pdftex.def Info: wizard.png used on input line 227.
 (pdftex.def)             Requested size: 77.99881pt x 78.00018pt.
-
-Overfull \hbox (2.8651pt too wide) in paragraph at lines 238--239
-[]\OT1/cmr/m/n/12 Change meta-data: Nemp uses the meta-data (ID3 tags)
- []
-
-[9 <./wizard.png (PNG copy)>] <player.jpg, id=427, 175.40532pt x 100.87688pt>
+ [9 <./wizard.png (PNG copy)>]
+<player.jpg, id=423, 175.40532pt x 100.87688pt>
 File: player.jpg Graphic file (type jpg)
-
-<use player.jpg>
-Package pdftex.def Info: player.jpg used on input line 260.
+ <use player.jpg>
+Package pdftex.def Info: player.jpg used on input line 259.
 (pdftex.def)             Requested size: 136.50238pt x 78.50969pt.
- [10 <./player.jpg>] <shutdown.png, id=435, 16.06pt x 16.06pt>
+
+<shutdown.png, id=426, 16.06pt x 16.06pt>
 File: shutdown.png Graphic file (type png)
-
-<use shutdown.png>
-Package pdftex.def Info: shutdown.png used on input line 277.
+ <use shutdown.png>
+Package pdftex.def Info: shutdown.png used on input line 276.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
- <geburtstag.png, id=436, 16.06pt x 16.06pt>
+ [10 <./player.jpg>] <geburtstag.png, id=432, 16.06pt x 16.06pt>
 File: geburtstag.png Graphic file (type png)
-
-<use geburtstag.png>
-Package pdftex.def Info: geburtstag.png used on input line 278.
+ <use geburtstag.png>
+Package pdftex.def Info: geburtstag.png used on input line 277.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
- <webserver.png, id=437, 16.06pt x 16.06pt>
+
+<webserver.png, id=433, 16.06pt x 16.06pt>
 File: webserver.png Graphic file (type png)
-
-<use webserver.png>
-Package pdftex.def Info: webserver.png used on input line 279.
+ <use webserver.png>
+Package pdftex.def Info: webserver.png used on input line 278.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
- <scrobbler.png, id=438, 16.06pt x 16.06pt>
+
+<scrobbler.png, id=434, 16.06pt x 16.06pt>
 File: scrobbler.png Graphic file (type png)
-
-<use scrobbler.png>
-Package pdftex.def Info: scrobbler.png used on input line 280.
+ <use scrobbler.png>
+Package pdftex.def Info: scrobbler.png used on input line 279.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
- <warning.png, id=439, 16.06pt x 16.06pt>
+
+<warning.png, id=435, 16.06pt x 16.06pt>
 File: warning.png Graphic file (type png)
  <use warning.png>
-Package pdftex.def Info: warning.png used on input line 281.
+Package pdftex.def Info: warning.png used on input line 280.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
 
-<BtnRandom1.png, id=440, 21.07875pt x 21.07875pt>
+<BtnRandom1.png, id=436, 21.07875pt x 21.07875pt>
 File: BtnRandom1.png Graphic file (type png)
  <use BtnRandom1.png>
-Package pdftex.def Info: BtnRandom1.png used on input line 300.
+Package pdftex.def Info: BtnRandom1.png used on input line 299.
 (pdftex.def)             Requested size: 21.07867pt x 21.07867pt.
 
-<BtnRandom2.png, id=441, 21.07875pt x 21.07875pt>
+<BtnRandom2.png, id=437, 21.07875pt x 21.07875pt>
 File: BtnRandom2.png Graphic file (type png)
  <use BtnRandom2.png>
-Package pdftex.def Info: BtnRandom2.png used on input line 302.
+Package pdftex.def Info: BtnRandom2.png used on input line 301.
 (pdftex.def)             Requested size: 21.07867pt x 21.07867pt.
 
-<BtnRandom3.png, id=442, 21.07875pt x 21.07875pt>
+<BtnRandom3.png, id=438, 21.07875pt x 21.07875pt>
 File: BtnRandom3.png Graphic file (type png)
  <use BtnRandom3.png>
-Package pdftex.def Info: BtnRandom3.png used on input line 304.
+Package pdftex.def Info: BtnRandom3.png used on input line 303.
+(pdftex.def)             Requested size: 21.07867pt x 21.07867pt.
+
+<BtnRandom4.png, id=440, 21.07875pt x 21.07875pt>
+File: BtnRandom4.png Graphic file (type png)
+ <use BtnRandom4.png>
+Package pdftex.def Info: BtnRandom4.png used on input line 305.
 (pdftex.def)             Requested size: 21.07867pt x 21.07867pt.
  [11 <./shutdown.png (PNG copy)> <./geburtstag.png (PNG copy)> <./webserver.png
  (PNG copy)> <./scrobbler.png (PNG copy)> <./warning.png (PNG copy)> <./BtnRand
-om1.png> <./BtnRandom2.png>] <BtnRandom4.png, id=450, 21.07875pt x 21.07875pt>
-File: BtnRandom4.png Graphic file (type png)
-
-<use BtnRandom4.png>
-Package pdftex.def Info: BtnRandom4.png used on input line 306.
-(pdftex.def)             Requested size: 21.07867pt x 21.07867pt.
- <BtnRecord.png, id=451, 13.55063pt x 13.55063pt>
+om1.png> <./BtnRandom2.png> <./BtnRandom3.png>]
+<BtnRecord.png, id=448, 13.55063pt x 13.55063pt>
 File: BtnRecord.png Graphic file (type png)
-
-<use BtnRecord.png>
-Package pdftex.def Info: BtnRecord.png used on input line 313.
+ <use BtnRecord.png>
+Package pdftex.def Info: BtnRecord.png used on input line 312.
 (pdftex.def)             Requested size: 13.55058pt x 13.55058pt.
- <BtnRecord_1.png, id=452, 13.55063pt x 13.55063pt>
+
+<BtnRecord_1.png, id=449, 13.55063pt x 13.55063pt>
 File: BtnRecord_1.png Graphic file (type png)
-
-<use BtnRecord_1.png>
-Package pdftex.def Info: BtnRecord_1.png used on input line 315.
+ <use BtnRecord_1.png>
+Package pdftex.def Info: BtnRecord_1.png used on input line 314.
 (pdftex.def)             Requested size: 13.55058pt x 13.55058pt.
 
-Overfull \hbox (13.54207pt too wide) in paragraph at lines 315--316
+Overfull \hbox (13.54207pt too wide) in paragraph at lines 314--315
 \OT1/cmr/m/n/12 can dis-play the di-rec-tory via the menu \OT1/cmr/m/sc/12 Tool
 s - Di-rec-to-ries - Record-
  []
 
-<BtnRecord_2.png, id=453, 13.55063pt x 13.55063pt>
+<BtnRecord_2.png, id=450, 13.55063pt x 13.55063pt>
 File: BtnRecord_2.png Graphic file (type png)
  <use BtnRecord_2.png>
-Package pdftex.def Info: BtnRecord_2.png used on input line 317.
+Package pdftex.def Info: BtnRecord_2.png used on input line 316.
 (pdftex.def)             Requested size: 13.55058pt x 13.55058pt.
 
-<cover.jpg, id=454, 175.40532pt x 140.77594pt>
+<cover.jpg, id=451, 175.40532pt x 140.77594pt>
 File: cover.jpg Graphic file (type jpg)
  <use cover.jpg>
-Package pdftex.def Info: cover.jpg used on input line 328.
+Package pdftex.def Info: cover.jpg used on input line 327.
 (pdftex.def)             Requested size: 136.50238pt x 109.56204pt.
 
-<lyrics.jpg, id=455, 175.40532pt x 140.77594pt>
+<lyrics.jpg, id=452, 175.40532pt x 140.77594pt>
 File: lyrics.jpg Graphic file (type jpg)
  <use lyrics.jpg>
-Package pdftex.def Info: lyrics.jpg used on input line 329.
+Package pdftex.def Info: lyrics.jpg used on input line 328.
 (pdftex.def)             Requested size: 136.50238pt x 109.56204pt.
- [12 <./BtnRandom3.png> <./BtnRandom4.png> <./BtnRecord.png> <./BtnRecord_1.png
-> <./BtnRecord_2.png> <./cover.jpg> <./lyrics.jpg>]
-<eq.jpg, id=468, 175.40532pt x 140.77594pt>
+ [12 <./BtnRandom4.png> <./BtnRecord.png> <./BtnRecord_1.png> <./BtnRecord_2.pn
+g> <./cover.jpg> <./lyrics.jpg>] <eq.jpg, id=464, 175.40532pt x 140.77594pt>
 File: eq.jpg Graphic file (type jpg)
  <use eq.jpg>
-Package pdftex.def Info: eq.jpg used on input line 342.
+Package pdftex.def Info: eq.jpg used on input line 341.
 (pdftex.def)             Requested size: 136.50238pt x 109.56204pt.
 
-<effekte.jpg, id=469, 175.40532pt x 140.77594pt>
+<effekte.jpg, id=465, 175.40532pt x 140.77594pt>
 File: effekte.jpg Graphic file (type jpg)
  <use effekte.jpg>
-Package pdftex.def Info: effekte.jpg used on input line 343.
+Package pdftex.def Info: effekte.jpg used on input line 342.
 (pdftex.def)             Requested size: 136.50238pt x 109.56204pt.
 
-<head.jpg, id=470, 175.40532pt x 140.77594pt>
+<head.jpg, id=466, 175.40532pt x 140.77594pt>
 File: head.jpg Graphic file (type jpg)
  <use head.jpg>
-Package pdftex.def Info: head.jpg used on input line 364.
+Package pdftex.def Info: head.jpg used on input line 363.
 (pdftex.def)             Requested size: 136.50238pt x 109.56204pt.
- [13 <./eq.jpg> <./effekte.jpg>] <BtnLoadHeadset.png, id=475, 18.0675pt x 18.06
+ [13 <./eq.jpg> <./effekte.jpg>] <BtnLoadHeadset.png, id=471, 18.0675pt x 18.06
 75pt>
 File: BtnLoadHeadset.png Graphic file (type png)
 
 <use BtnLoadHeadset.png>
-Package pdftex.def Info: BtnLoadHeadset.png used on input line 372.
+Package pdftex.def Info: BtnLoadHeadset.png used on input line 371.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
 
-<BtnHeadsetToPlaylist.png, id=476, 18.0675pt x 18.0675pt>
+<BtnHeadsetToPlaylist.png, id=472, 18.0675pt x 18.0675pt>
 File: BtnHeadsetToPlaylist.png Graphic file (type png)
 
 <use BtnHeadsetToPlaylist.png>
-Package pdftex.def Info: BtnHeadsetToPlaylist.png used on input line 374.
+Package pdftex.def Info: BtnHeadsetToPlaylist.png used on input line 373.
 (pdftex.def)             Requested size: 18.06744pt x 18.06744pt.
 
-<BtnHeadsetPlaynow.png, id=477, 16.56187pt x 16.56187pt>
+<BtnHeadsetPlaynow.png, id=473, 16.56187pt x 16.56187pt>
 File: BtnHeadsetPlaynow.png Graphic file (type png)
 
 <use BtnHeadsetPlaynow.png>
-Package pdftex.def Info: BtnHeadsetPlaynow.png used on input line 376.
+Package pdftex.def Info: BtnHeadsetPlaynow.png used on input line 375.
 (pdftex.def)             Requested size: 16.56183pt x 16.56183pt.
 
 
 LaTeX Warning: Hyper reference `sec_display' on page 14 undefined on input line
- 390.
+ 389.
 
 [14 <./head.jpg> <./BtnLoadHeadset.png> <./BtnHeadsetToPlaylist.png> <./BtnHead
-setPlaynow.png>] [15] <TabBtnBrowse.png, id=489, 54.2025pt x 18.0675pt>
+setPlaynow.png>] [15] <TabBtnBrowse.png, id=485, 54.2025pt x 18.0675pt>
 File: TabBtnBrowse.png Graphic file (type png)
 
 <use TabBtnBrowse.png>
-Package pdftex.def Info: TabBtnBrowse.png used on input line 438.
+Package pdftex.def Info: TabBtnBrowse.png used on input line 437.
 (pdftex.def)             Requested size: 54.20236pt x 18.06744pt.
  [16 <./TabBtnBrowse.png>]
-<browse_coverflow.jpg, id=495, 283.81032pt x 127.97812pt>
+<browse_coverflow.jpg, id=491, 283.81032pt x 127.97812pt>
 File: browse_coverflow.jpg Graphic file (type jpg)
 
 <use browse_coverflow.jpg>
-Package pdftex.def Info: browse_coverflow.jpg used on input line 460.
+Package pdftex.def Info: browse_coverflow.jpg used on input line 459.
 (pdftex.def)             Requested size: 283.80962pt x 127.9778pt.
  [17 <./browse_coverflow.jpg>]
-<lastfmOK.png, id=502, 23.08624pt x 23.08624pt>
+<lastfmOK.png, id=498, 23.08624pt x 23.08624pt>
 File: lastfmOK.png Graphic file (type png)
  <use lastfmOK.png>
-Package pdftex.def Info: lastfmOK.png used on input line 485.
+Package pdftex.def Info: lastfmOK.png used on input line 484.
 (pdftex.def)             Requested size: 23.08617pt x 23.08617pt.
 
-<lastfmFail.png, id=503, 23.08624pt x 23.08624pt>
+<lastfmFail.png, id=499, 23.08624pt x 23.08624pt>
 File: lastfmFail.png Graphic file (type png)
  <use lastfmFail.png>
-Package pdftex.def Info: lastfmFail.png used on input line 487.
+Package pdftex.def Info: lastfmFail.png used on input line 486.
 (pdftex.def)             Requested size: 23.08617pt x 23.08617pt.
 
-<lastfmCache.png, id=504, 23.08624pt x 23.08624pt>
+<lastfmCache.png, id=500, 23.08624pt x 23.08624pt>
 File: lastfmCache.png Graphic file (type png)
  <use lastfmCache.png>
-Package pdftex.def Info: lastfmCache.png used on input line 489.
+Package pdftex.def Info: lastfmCache.png used on input line 488.
 (pdftex.def)             Requested size: 23.08617pt x 23.08617pt.
 
-<lastfmConnectError.png, id=505, 23.08624pt x 23.08624pt>
+<lastfmConnectError.png, id=501, 23.08624pt x 23.08624pt>
 File: lastfmConnectError.png Graphic file (type png)
 
 <use lastfmConnectError.png>
-Package pdftex.def Info: lastfmConnectError.png used on input line 492.
+Package pdftex.def Info: lastfmConnectError.png used on input line 491.
 (pdftex.def)             Requested size: 23.08617pt x 23.08617pt.
 
-<lastfmInvalid.png, id=506, 23.08624pt x 23.08624pt>
+<lastfmInvalid.png, id=502, 23.08624pt x 23.08624pt>
 File: lastfmInvalid.png Graphic file (type png)
  <use lastfmInvalid.png>
-Package pdftex.def Info: lastfmInvalid.png used on input line 494.
+Package pdftex.def Info: lastfmInvalid.png used on input line 493.
 (pdftex.def)             Requested size: 23.08617pt x 23.08617pt.
 
 [18 <./lastfmOK.png (PNG copy)> <./lastfmFail.png (PNG copy)> <./lastfmCache.pn
 g (PNG copy)> <./lastfmConnectError.png (PNG copy)> <./lastfmInvalid.png (PNG c
-opy)>] <browse_tagwolke.jpg, id=512, 283.0575pt x 127.97812pt>
+opy)>] <browse_tagwolke.jpg, id=508, 283.0575pt x 127.97812pt>
 File: browse_tagwolke.jpg Graphic file (type jpg)
 
 <use browse_tagwolke.jpg>
-Package pdftex.def Info: browse_tagwolke.jpg used on input line 502.
+Package pdftex.def Info: browse_tagwolke.jpg used on input line 501.
 (pdftex.def)             Requested size: 283.0568pt x 127.9778pt.
  [19 <./browse_tagwolke.jpg>]
-<tags_en.jpg, id=518, 243.15843pt x 187.45032pt>
+<tags_en.jpg, id=514, 243.15843pt x 187.45032pt>
 File: tags_en.jpg Graphic file (type jpg)
  <use tags_en.jpg>
-Package pdftex.def Info: tags_en.jpg used on input line 524.
+Package pdftex.def Info: tags_en.jpg used on input line 523.
 (pdftex.def)             Requested size: 243.15784pt x 187.44984pt.
  [20 <./tags_en.jpg>] [21] [22]
 
 LaTeX Warning: Hyper reference `sec_metadata' on page 23 undefined on input lin
-e 595.
+e 594.
 
-<details_en.jpg, id=532, 362.10281pt x 410.2828pt>
+<details_en.jpg, id=528, 362.10281pt x 410.2828pt>
 File: details_en.jpg Graphic file (type jpg)
  <use details_en.jpg>
-Package pdftex.def Info: details_en.jpg used on input line 611.
+Package pdftex.def Info: details_en.jpg used on input line 610.
 (pdftex.def)             Requested size: 312.00119pt x 353.5187pt.
 
 [23] [24 <./details_en.jpg>] [25]
-<tagwolken-editor_en.png, id=548, 316.93407pt x 313.17pt>
+<tagwolken-editor_en.png, id=544, 316.93407pt x 313.17pt>
 File: tagwolken-editor_en.png Graphic file (type png)
 
 <use tagwolken-editor_en.png>
-Package pdftex.def Info: tagwolken-editor_en.png used on input line 663.
+Package pdftex.def Info: tagwolken-editor_en.png used on input line 662.
 (pdftex.def)             Requested size: 312.00119pt x 308.31895pt.
  [26] [27 <./tagwolken-editor_en.png>]
-<lastfm_logo.jpg, id=559, 216.81pt x 65.043pt>
+<lastfm_logo.jpg, id=555, 216.81pt x 65.043pt>
 File: lastfm_logo.jpg Graphic file (type jpg)
  <use lastfm_logo.jpg>
-Package pdftex.def Info: lastfm_logo.jpg used on input line 708.
+Package pdftex.def Info: lastfm_logo.jpg used on input line 707.
 (pdftex.def)             Requested size: 136.50238pt x 40.95248pt.
  [28]
 File: scrobbler.png Graphic file (type png)
 
 <use scrobbler.png>
-Package pdftex.def Info: scrobbler.png used on input line 727.
+Package pdftex.def Info: scrobbler.png used on input line 726.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
  [29 <./lastfm_logo.jpg>] [30]
 File: geburtstag.png Graphic file (type png)
  <use geburtstag.png>
-Package pdftex.def Info: geburtstag.png used on input line 759.
+Package pdftex.def Info: geburtstag.png used on input line 758.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
 File: webserver.png Graphic file (type png)
 
 <use webserver.png>
-Package pdftex.def Info: webserver.png used on input line 766.
+Package pdftex.def Info: webserver.png used on input line 765.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
- <webserver_screen.jpg, id=577, 379.4175pt x 377.41pt>
+ <webserver_screen.jpg, id=573, 379.4175pt x 377.41pt>
 File: webserver_screen.jpg Graphic file (type jpg)
 
 <use webserver_screen.jpg>
-Package pdftex.def Info: webserver_screen.jpg used on input line 773.
+Package pdftex.def Info: webserver_screen.jpg used on input line 772.
 (pdftex.def)             Requested size: 195.0pt x 193.96808pt.
  [31 <./webserver_screen.jpg>] [32]
 File: g15.jpg Graphic file (type jpg)
  <use g15.jpg>
-Package pdftex.def Info: g15.jpg used on input line 809.
+Package pdftex.def Info: g15.jpg used on input line 808.
 (pdftex.def)             Requested size: 195.0pt x 83.75826pt.
 File: shutdown.png Graphic file (type png)
 
 <use shutdown.png>
-Package pdftex.def Info: shutdown.png used on input line 822.
+Package pdftex.def Info: shutdown.png used on input line 821.
 (pdftex.def)             Requested size: 16.05995pt x 16.05995pt.
  [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43]
-Overfull \hbox (5.59554pt too wide) in paragraph at lines 1079--1080
+Overfull \hbox (5.59554pt too wide) in paragraph at lines 1078--1079
 \OT1/cmr/m/n/12 still know the Walk-mans (or \OT1/cmr/m/it/12 portable cas-sett
 e play-ers \OT1/cmr/m/n/12 from other brands).
  []
 
-[44] [45] [46] <encoding.png, id=650, 143.03438pt x 79.04532pt>
+[44] [45] [46] <encoding.png, id=646, 143.03438pt x 79.04532pt>
 File: encoding.png Graphic file (type png)
 
 <use encoding.png>
-Package pdftex.def Info: encoding.png used on input line 1159.
+Package pdftex.def Info: encoding.png used on input line 1158.
 (pdftex.def)             Requested size: 97.5pt x 53.88155pt.
  [47 <./encoding.png>]
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1204--1204
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1203--1203
 []   \OT1/cmtt/m/n/10.95 Track1.mp3[] 
  []
 
 
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1204--1204
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1203--1203
 []   \OT1/cmtt/m/n/10.95 Track2.mp3[] 
  []
 
 
-Overfull \hbox (0.81383pt too wide) in paragraph at lines 1216--1216
+Overfull \hbox (0.81383pt too wide) in paragraph at lines 1215--1215
 []     \OT1/cmtt/m/n/10.95 front.jpg[] 
  []
 
 
-Overfull \hbox (34.27895pt too wide) in paragraph at lines 1195--1246
+Overfull \hbox (34.27895pt too wide) in paragraph at lines 1194--1245
 [][] 
  []
 
 [48] [49]
-Overfull \hbox (5.50978pt too wide) in paragraph at lines 1266--1267
+Overfull \hbox (5.50978pt too wide) in paragraph at lines 1265--1266
 []\OT1/cmr/m/n/12 Including the com-ments may lead to con-fus-ing search hits, 
 if the searched
  []
 
-[50] [51] [52] [53] <v4_0.jpg, id=692, 734.745pt x 478.78876pt>
+[50] [51] [52] [53] <v4_0.jpg, id=688, 734.745pt x 478.78876pt>
 File: v4_0.jpg Graphic file (type jpg)
  <use v4_0.jpg>
-Package pdftex.def Info: v4_0.jpg used on input line 1408.
+Package pdftex.def Info: v4_0.jpg used on input line 1407.
 (pdftex.def)             Requested size: 272.99881pt x 177.90155pt.
 
 [54] [55 <./v4_0.jpg>]
-Overfull \hbox (12.55011pt too wide) in paragraph at lines 1463--1464
+Overfull \hbox (12.55011pt too wide) in paragraph at lines 1462--1463
 []\OT1/cmr/m/n/12 Fixed var-i-ous er-rors when boot-ing from CD/DVD or other wr
 ite-protected
  []
 
-[56] [57] [58] [59] <v3_0.jpg, id=731, 957.5775pt x 719.68875pt>
+[56] [57] [58] [59] <v3_0.jpg, id=727, 957.5775pt x 719.68875pt>
 File: v3_0.jpg Graphic file (type jpg)
 
 <use v3_0.jpg>
-Package pdftex.def Info: v3_0.jpg used on input line 1597.
+Package pdftex.def Info: v3_0.jpg used on input line 1596.
 (pdftex.def)             Requested size: 272.99881pt x 205.1793pt.
  [60]
-Overfull \hbox (3.42508pt too wide) in paragraph at lines 1609--1610
+Overfull \hbox (3.42508pt too wide) in paragraph at lines 1608--1609
 \OT1/cmr/m/n/12 browse the for-eign me-dia li-brary, down-load in-di-vid-ual ti
 -tles from friends,
  []
 
-[61 <./v3_0.jpg>] [62] <v2_5.jpg, id=749, 827.09pt x 611.28375pt>
+[61 <./v3_0.jpg>] [62] <v2_5.jpg, id=745, 827.09pt x 611.28375pt>
 File: v2_5.jpg Graphic file (type jpg)
 
 <use v2_5.jpg>
-Package pdftex.def Info: v2_5.jpg used on input line 1674.
+Package pdftex.def Info: v2_5.jpg used on input line 1673.
 (pdftex.def)             Requested size: 272.99881pt x 201.77089pt.
  [63] [64 <./v2_5.jpg>] [65]
-<v2_1.png, id=771, 679.78969pt x 487.06969pt>
+<v2_1.png, id=767, 679.78969pt x 487.06969pt>
 File: v2_1.png Graphic file (type png)
  <use v2_1.png>
-Package pdftex.def Info: v2_1.png used on input line 1757.
+Package pdftex.def Info: v2_1.png used on input line 1756.
 (pdftex.def)             Requested size: 272.99881pt x 195.60478pt.
 
-Overfull \hbox (6.68893pt too wide) in paragraph at lines 1770--1771
+Overfull \hbox (6.68893pt too wide) in paragraph at lines 1769--1770
 []\OT1/cmr/m/n/12 Classification into pre-de-fined cat-e-gories such as al-bums
 , sam-plers, sound-
  []
 
-[66 <./v2_1.png>] [67] <v1_0.png, id=784, 475.7775pt x 356.0803pt>
+[66 <./v2_1.png>] [67] <v1_0.png, id=780, 475.7775pt x 356.0803pt>
 File: v1_0.png Graphic file (type png)
 
 <use v1_0.png>
-Package pdftex.def Info: v1_0.png used on input line 1815.
+Package pdftex.def Info: v1_0.png used on input line 1814.
 (pdftex.def)             Requested size: 312.00119pt x 233.51956pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1821.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1820.
  [68 <./v1_0.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1821.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1820.
  (nemp-help-en.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1821.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1821.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1820.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1820.
 
 Package rerunfilecheck Info: File `nemp-help-en.out' has not changed.
-(rerunfilecheck)             Checksum: CE178E68742327F948CFE1E1329A5556;4672.
+(rerunfilecheck)             Checksum: 4C302FBCDE3C84FB8E9AAE15FAC0942A;4613.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1821.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1820.
  ) 
 Here is how much of TeX's memory you used:
- 6900 strings out of 493335
- 99306 string characters out of 3136677
- 183993 words of memory out of 3000000
- 10088 multiletter control sequences out of 15000+200000
+ 6899 strings out of 493335
+ 99293 string characters out of 3136677
+ 183995 words of memory out of 3000000
+ 10087 multiletter control sequences out of 15000+200000
  16395 words of font info for 64 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  29i,9n,28p,962b,426s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -860,9 +854,9 @@ x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x8
 /MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (x86)/M
 iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files (x86)/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on nemp-help-en.pdf (69 pages, 2101629 bytes).
+Output written on nemp-help-en.pdf (69 pages, 2098728 bytes).
 PDF statistics:
- 876 PDF objects out of 1000 (max. 8388607)
+ 872 PDF objects out of 1000 (max. 8388607)
  192 named destinations out of 1000 (max. 500000)
- 805 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 797 words of extra memory for PDF output out of 10000 (max. 10000000)
 
