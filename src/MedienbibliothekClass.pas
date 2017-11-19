@@ -4274,6 +4274,9 @@ begin
       PlaylistFiles.Clear;
       AnzeigeListe.Clear;
       AnzeigeListe2.Clear;
+      // bugfix Nemp 4.7.1
+      // (Bug created in 4.7, in context of the label-click-search-stuff)
+      CurrentAudioFile := Nil;
 
       if FileExists(Album) then
       begin

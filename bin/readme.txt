@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - Oktober 2017
+      Januar 2005 - November 2017
 
-      Version: 4.7.0
+      Version: 4.7.1
 
 
 -----------------------------------------------------------
@@ -116,7 +116,14 @@ Verwendete Units/Komponenten:
 
 
 
-Version 4.7.0, August 2017
+Version 4.7.1, November 2017
+----------------------------------------------------------- 
+Bugfix:
+-------
+- Zugriffsverletzung beim Stöbern in Wiedergabelisten behoben
+
+
+Version 4.7.0, Oktober 2017
 ----------------------------------------------------------- 
 Neue Funktionen:
 ----------------
