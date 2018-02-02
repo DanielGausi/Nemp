@@ -627,7 +627,6 @@ type
     AuswahlFillPanel: TNempPanel;
     AuswahlStatusLBL: TLabel;
     MedienBibHeaderPanel: TNempPanel;
-    CB_MedienBibGlobalQuickSearch: TSkinButton;
     EDITFastSearch: TEdit;
     MedienlisteFillPanel: TNempPanel;
     MedienListeStatusLBL: TLabel;
@@ -838,6 +837,31 @@ type
     PM_AddTagThisFile: TMenuItem;
     pm_TagDetails: TMenuItem;
     N79: TMenuItem;
+    PM_ML_MarkFile: TMenuItem;
+    TabBtn_Marker: TSkinButton;
+    PM_ML_Mark0: TMenuItem;
+    PM_ML_Mark1: TMenuItem;
+    PM_ML_Mark2: TMenuItem;
+    PM_ML_Mark3: TMenuItem;
+    N81: TMenuItem;
+    MM_ML_FlagSelectedFiles: TMenuItem;
+    MM_ML_Mark1: TMenuItem;
+    MM_ML_Mark2: TMenuItem;
+    MM_ML_Mark3: TMenuItem;
+    N84: TMenuItem;
+    MM_ML_Mark0: TMenuItem;
+    MM_PL_MarkFiles: TMenuItem;
+    MM_PL_Mark0: TMenuItem;
+    N85: TMenuItem;
+    MM_PL_Mark3: TMenuItem;
+    MM_PL_Mark2: TMenuItem;
+    MM_PL_Mark1: TMenuItem;
+    PM_PL_MarkFiles: TMenuItem;
+    PM_PL_Mark0: TMenuItem;
+    N86: TMenuItem;
+    PM_PL_Mark3: TMenuItem;
+    PM_PL_Mark2: TMenuItem;
+    PM_PL_Mark1: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1200,7 +1224,7 @@ type
 
     procedure VST_ColumnPopupOnClick(Sender: TObject);
     procedure EDITFastSearchChange(Sender: TObject);
-    procedure CB_MedienBibGlobalQuickSearchClick(Sender: TObject);
+    //procedure CB_MedienBibGlobalQuickSearchClick(Sender: TObject);
     procedure AlbenVSTClick(Sender: TObject);
     procedure ArtistsVSTClick(Sender: TObject);
     procedure PM_PlayFilesClick(Sender: TObject);
@@ -1419,6 +1443,14 @@ type
 
     //moved to MainFormHelper function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String; Out newTag: String; out IgnoreWarnings: Boolean): Boolean;
     procedure pm_TagDetailsClick(Sender: TObject);
+    procedure PM_ML_SetmarkerClick(Sender: TObject);
+
+    procedure SetMarker(Sender: TObject; aValue: Byte);
+    procedure TabBtn_MarkerClick(Sender: TObject);
+    procedure VSTColumnClick(Sender: TBaseVirtualTree; Column: TColumnIndex;
+      Shift: TShiftState);
+    procedure TabBtn_MarkerKeyPress(Sender: TObject; var Key: Char);
+    procedure CoverScrollbarEnter(Sender: TObject);
     //procedure PM_RenameTagSelectedFilesClick(Sender: TObject);
     //procedure PM_RemoveTagSelectedFilesClick(Sender: TObject);
     //procedure PM_AddTagSelectedFilesClick(Sender: TObject);
@@ -2367,22 +2399,28 @@ begin
   begin
       if filename[1] = '/' then
       begin
-        idx := Pos('/play', filename);
-        if idx > 0 then
-        begin
-          filename := Copy(filename, 8, length(filename));
-          enqueue := False;
-        end
-        else
-        begin
-          idx := Pos('/enqueue', filename);
+          idx := Pos('/close', filename);
           if idx > 0 then
-            filename := Copy(filename, 11, length(filename))
-
-          else
-              // unbekannter Paramter, oder '/minimized'
-              filename := '';
-        end;
+          begin
+              close;
+          end else
+          begin
+              idx := Pos('/play', filename);
+              if idx > 0 then
+              begin
+                  filename := Copy(filename, 8, length(filename));
+                  enqueue := False;
+              end
+              else
+              begin
+                  idx := Pos('/enqueue', filename);
+                  if idx > 0 then
+                      filename := Copy(filename, 11, length(filename))
+                  else
+                      // unbekannter Paramter, oder '/minimized'
+                      filename := '';
+              end;
+          end;
       end;
   end else
       RestoreNemp;
@@ -2965,8 +3003,10 @@ begin
   else
     VST.Header.SortDirection := sdDescending;
 
-  FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2,
-      MedienBib.BibSearcher.DummyAudioFile, oldAudioFile);
+  ///XXX///FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, ///MedienBib.AnzeigeListe2,
+  FillTreeView(MedienBib.AnzeigeListe, ///MedienBib.AnzeigeListe2,
+      ///MedienBib.BibSearcher.DummyAudioFile,
+      oldAudioFile);
 
   VST.Enabled := True;
 end;
@@ -2992,7 +3032,7 @@ begin
         begin
             Data := VST.GetNodeData(SelectedMP3s[i]);
             MedienBib.AnzeigeListe.Extract(Data^.FAudioFile);
-            MedienBib.AnzeigeListe2.Extract(Data^.FAudioFile);
+            ///MedienBib.AnzeigeListe2.Extract(Data^.FAudioFile);
         end;
         VST.DeleteSelectedNodes;
     end;
@@ -3106,6 +3146,8 @@ begin
         end;
     end; // case
 end;
+
+
 
 
 procedure TNemp_MainForm.MM_ML_DeleteClick(Sender: TObject);
@@ -3702,7 +3744,7 @@ begin
         SelectedFiles := TObjectList.Create(False);
         try
             // Collect Data
-            VSTSelectionToAudiofileList(VST, SelectedMP3s, SelectedFiles);
+            VSTSelectionToAudiofileList(LocalTree, SelectedMP3s, SelectedFiles);
 
             for iSel := 0 to SelectedFiles.Count-1 do
             begin
@@ -3759,6 +3801,106 @@ begin
         AktualisiereDetailForm(Data^.FAudioFile, detUpdate);
     end else
         AktualisiereDetailForm(NIL, detUpdate);
+end;
+
+
+procedure TNemp_MainForm.SetMarker(Sender: TObject; aValue: Byte);
+var CurrentAF :TAudioFile;
+    iSel, iList: Integer;
+    Data: PTreeData;
+    SelectedMp3s: TNodeArray;
+    Node:PVirtualNode;
+    SelectedFiles, ListOfFiles: TObjectList;
+    //newRating: Integer;
+    //resetCounter: Boolean;
+    detUpdate: Integer;
+    LocalTree: TVirtualStringTree;
+    //aErr: TNempAudioError;
+begin
+    // preparation
+    SelectedMp3s := Nil;
+    if MedienBib.StatusBibUpdate <> 0 then
+    begin
+        TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+        exit;
+    end;
+    MedienBib.StatusBibUpdate := 3;
+    BlockeMedienListeReadAccess(True);
+
+    if (Sender as TMenuItem).Tag >= 100 then
+        LocalTree := VST
+    else
+        LocalTree := PlaylistVST;
+
+    SelectedMP3s := LocalTree.GetSortedSelection(False);
+    ListOfFiles := TObjectList.Create(False);
+    try
+        SelectedFiles := TObjectList.Create(False);
+        try
+            // Collect Data
+            VSTSelectionToAudiofileList(LocalTree, SelectedMP3s, SelectedFiles);
+            for iSel := 0 to SelectedFiles.Count-1 do
+            begin
+                CurrentAF := TAudioFile(SelectedFiles[iSel]); //Data^.FAudioFile;
+                CurrentAF.Favorite := aValue;
+                // get List of this AudioFile
+                GetListOfAudioFileCopies(CurrentAF, ListOfFiles);
+                // edit all these files
+                for iList := 0 to ListOfFiles.Count - 1 do
+                    TAudioFile(ListOfFiles[iList]).Favorite := aValue;
+                // correct GUI
+                CorrectVCLAfterAudioFileEdit(CurrentAF);
+            end;
+        finally
+            SelectedFiles.Free;
+        end;
+    finally
+        ListOfFiles.Free;
+    end;
+    MedienBib.Changed := True;
+
+    // clean up stuff
+    BlockeMedienListeReadAccess(False);
+    BlockeMedienListeWriteAcces(False);
+    BlockeMedienListeUpdate(False);
+
+    //LangeAktionWeitermachen := False;
+    MedienBib.StatusBibUpdate := 0;
+    MedienListeStatusLBL.Caption := '';
+    ShowSummary;
+
+    Node := LocalTree.FocusedNode;
+    if LocalTree = VST then
+        detUpdate := SD_MEDIENBIB
+    else
+        detUpdate := SD_PLAYLIST;
+
+    if Assigned(Node) then
+    begin
+        Data := LocalTree.GetNodeData(Node);
+        AktualisiereDetailForm(Data^.FAudioFile, detUpdate);
+    end else
+        AktualisiereDetailForm(NIL, detUpdate);
+end;
+
+procedure TNemp_MainForm.PM_ML_SetmarkerClick(Sender: TObject);
+begin
+    SetMarker(Sender, ((Sender as TMenuItem).Tag Mod 100));
+end;
+
+procedure TNemp_MainForm.TabBtn_MarkerClick(Sender: TObject);
+begin
+    if Medienbib.StatusBibUpdate >= 2 then exit;
+
+    if (MedienBib.DisplayContent = DISPLAY_Favorites) or (TabBtn_Marker.Tag = 0) then
+    begin
+        // change the currently displayed marker
+        TabBtn_Marker.Tag := (TabBtn_Marker.Tag + 1) mod 5;
+        TabBtn_Marker.GlyphLine := TabBtn_Marker.Tag;
+    end;
+        // else: just re-display the current marker
+
+    MedienBib.ShowMarker(TabBtn_Marker.Tag);
 end;
 
 
@@ -4009,6 +4151,8 @@ begin
 end;
 
 
+
+
 procedure TNemp_MainForm.PM_ML_PropertiesClick(Sender: TObject);
 var AudioFile: TAudioFile;
     Node: PVirtualNode;
@@ -4077,6 +4221,9 @@ begin
           CON_RATING    : CellText := '     ';//IntToStr(Data^.FAudioFile.Rating);//'';//
           CON_PLAYCOUNTER : CellText := IntToStr(Data^.FAudioFile.PlayCounter);
 
+          CON_FAVORITE :  if Data^.FAudioFile.Favorite <> 0 then CellText := ' ' // fav
+                          else CellText := ' '; // noFav
+
           CON_LASTFMTAGS : CellText := ' ';// Data^.FAudioFile.RawTagLastFM;
         else
           CellText := ' ';
@@ -4095,6 +4242,9 @@ var Data: PTreeData;
 begin
   Data:=Sender.GetNodeData(Node);
 
+  if Data^.FAudioFile = MedienBib.BibSearcher.DummyAudioFile then
+      exit;
+
   case VST.Header.Columns[column].Tag of
      CON_RATING: begin
         TargetCanvas.Brush.Style := bsClear;
@@ -4106,12 +4256,31 @@ begin
 
         RatingGraphics.DrawRatingInStars(st, TargetCanvas, CellRect.Bottom - CellRect.Top, CellRect.Left);
      end;
+     //CON_Favorite: begin
+     //   TargetCanvas.Brush.Style := bsClear;
+     //
+     //   RatingGraphics.DrawFavStars(Data^.FAudioFile.Favorite, TargetCanvas, CellRect.Bottom - CellRect.Top, CellRect.Left);
+     //end;
   end;
 end;
 
 
-
-
+procedure TNemp_MainForm.VSTColumnClick(Sender: TBaseVirtualTree;
+  Column: TColumnIndex; Shift: TShiftState);
+var aFile: TAudioFile;
+begin
+    case VST.Header.Columns[column].Tag of
+      CON_FAVORITE: begin
+          aFile := GetFocussedAudioFile;
+          if assigned(aFile) then
+          begin
+              aFile.Favorite := (aFile.Favorite + 1) Mod 4;
+              VST.InvalidateNode(VST.FocusedNode);
+              MedienBib.Changed := True;
+          end;
+      end;
+    end;
+end;
 
 procedure TNemp_MainForm.VSTColumnDblClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
@@ -4155,8 +4324,10 @@ begin
 
           MedienBib.SortAnzeigeListe;
 
-          FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2,
-              MedienBib.BibSearcher.DummyAudioFile, oldAudioFile);
+          FillTreeView(MedienBib.AnzeigeListe,
+          //XXX///FillTreeViewQuickSearchReselect(MedienBib.AnzeigeListe, ///MedienBib.AnzeigeListe2,
+              //MedienBib.BibSearcher.DummyAudioFile,
+              oldAudioFile);
 
           VST.Enabled := true;
       end;
@@ -4684,7 +4855,7 @@ end;
 
 
 procedure TNemp_MainForm.PopupEditExtendedTagsPopup(Sender: TObject);
-var enableEditExtendeTag, multiSelect: Boolean;
+var enableEditExtendeTag: Boolean;
 begin
     CurrentTagToChange :=  '';
     if (PopupEditExtendedTags.PopupComponent is TLabel) then
@@ -4693,7 +4864,7 @@ begin
         CurrentTagToChange := (PopupEditExtendedTags.PopupComponent as TLabel).Caption;
     end;
 
-    multiSelect := length(VST.GetSortedSelection(False)) > 1;
+    //multiSelect := length(VST.GetSortedSelection(False)) > 1;
     enableEditExtendeTag := CurrentTagToChange <>  '';
 
     PM_AddTagThisFile    .Visible := NempOptions.AllowQuickAccessToMetadata;
@@ -4976,7 +5147,7 @@ begin
     if not assigned(MedienBib.CurrentAudioFile) then
         exit;
 
-    Medienbib.BibSearcher.SearchOptions.SearchParam := 0;      // New Search
+    //Medienbib.BibSearcher.SearchOptions.SearchParam := 0;      // New Search
     Medienbib.BibSearcher.SearchOptions.AllowErrors := False;  // no errors allowed
     KeyWords.General   := '';
     KeyWords.Artist    := '';
@@ -5033,7 +5204,7 @@ end;
 procedure TNemp_MainForm.CreateTagLabels(aAudioFile: TAudioFile);
 var newLabel: TLabel;
     i: Integer;
-    currentTop, CurrentLeft, newWidth, newHeight, newLeft: Integer;
+    currentTop, CurrentLeft, newWidth, newHeight: Integer;
     tmpTagList: TStringlist;
     baseLeft: Integer;
 begin
@@ -5113,13 +5284,13 @@ begin
                     begin
                         newLabel.Top := currentTop;
                         newLabel.Left := currentLeft;
-                        currentLeft := currentLeft + newWidth + 15;
+                        //currentLeft := currentLeft + newWidth + 15;
                     end else
                     begin
                         currentTop :=  currentTop + newHeight;
                         newLabel.Top := currentTop;
                         newLabel.Left := baseLeft;
-                        currentLeft := baseLeft + newWidth + 15;
+                        //currentLeft := baseLeft + newWidth + 15;
                     end;
                 end;
 
@@ -5168,17 +5339,20 @@ begin
   CreateTagLabels(aAudioFile);
 
   // Get Cover
-  Coverbmp := tBitmap.Create;
-  try
-      Coverbmp.Width := 250;
-      Coverbmp.Height := 250;
+  if assigned(aAudioFile) then
+  begin
+      Coverbmp := tBitmap.Create;
+      try
+          Coverbmp.Width := 250;
+          Coverbmp.Height := 250;
 
-      // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-      GetCover(aAudioFile, Coverbmp);
-      ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
-      ImgDetailCover.Refresh;
-  finally
-      Coverbmp.Free;
+          // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
+          GetCover(aAudioFile, Coverbmp);
+          ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
+          ImgDetailCover.Refresh;
+      finally
+          Coverbmp.Free;
+      end;
   end;
 
 
@@ -5697,7 +5871,7 @@ begin
     if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
         exit;
 
-    MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2);
+    MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe);// , MedienBib.AnzeigeListe2);
 
     CoverScrollbar.OnChange := Nil;
     If MedienBib.Coverlist.Count > 3 then
@@ -7196,7 +7370,7 @@ begin
   if Sender=PM_ML_ExtendedShowAllFilesInDir then
   begin
     MedienBib.AnzeigeListe.Clear;
-    MedienBib.AnzeigeListe2.Clear;
+    ///MedienBib.AnzeigeListe2.Clear;
   end;
 
   MedienBib.GetFilesInDir(aPfad);
@@ -7211,7 +7385,7 @@ var aNode: pVirtualNode;
     KeyWords: TSearchKeyWords;
     SearchString: String;
 begin
-    Medienbib.BibSearcher.SearchOptions.SearchParam := 0;       // = New Search
+    //Medienbib.BibSearcher.SearchOptions.SearchParam := 0;       // = New Search
     Medienbib.BibSearcher.SearchOptions.AllowErrors := False;  // no errors allowed
     KeyWords.General   := '';
     KeyWords.Artist    := '';
@@ -7390,8 +7564,10 @@ begin
   end;
 
   MedienBib.Anzeigeliste.Clear;
-  MedienBib.AnzeigeListe2.Clear;
+  ///MedienBib.AnzeigeListe2.Clear;
+  ///  DisplayContent := DISPLAY_
   Medienbib.AnzeigeShowsPlaylistFiles := False;
+  MedienBib.DisplayContent := DISPLAY_BrowseFiles;
   VST.Clear;
   MedienBib.ReInitCoverSearch;
 
@@ -8302,21 +8478,31 @@ procedure TNemp_MainForm.VSTGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
   var Ghosted: Boolean; var ImageIndex: Integer);
 var Data: PTreeData;
+
 begin
   case Kind of
     ikNormal, ikSelected:
       begin
-        Data := Sender.GetNodeData(Node);
-        case VST.Header.Columns[column].Tag of
-          CON_LYRICSEXISTING :
-              if Data^.FAudioFile.LyricsExisting then imageIndex := 6
-              else imageIndex := 7;
+          Data := Sender.GetNodeData(Node);
 
-          CON_LASTFMTAGS :
-                  if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 11;
-              //else imageIndex := 15;
-          // Con_Titel: imageIndex := 10;
-        end;
+          if Data^.FAudioFile = MedienBib.BibSearcher.DummyAudioFile then
+              imageIndex := -1
+          else
+
+              case VST.Header.Columns[column].Tag of
+                  CON_LYRICSEXISTING :
+                      if Data^.FAudioFile.LyricsExisting then imageIndex := 6
+                      else imageIndex := 7;
+
+                  CON_LASTFMTAGS :
+                          if Length(Data^.FAudioFile.RawTagLastFM) > 0 then imageIndex := 11;
+                      //else imageIndex := 15;
+                      // Con_Titel: imageIndex := 10;
+
+                  CON_Favorite: begin
+                      imageIndex := 12 + ((Data^.FAudioFile.Favorite mod 4));
+                  end;
+              end;
       end;
   end;
 end;
@@ -9410,6 +9596,21 @@ begin
   EditFastSearch.Font.Color := clWindowText;
   EditFastSearch.Font.Style := [];
   EditFastSearch.Tag := 1;
+
+  if (EditFastSearch.Text <> '')
+       AND (MedienBib.DisplayContent <> DISPLAY_QuickSearch)
+  then
+  begin
+      //restore last quicksearch
+      RefreshCoverFlowTimer.Enabled := False;
+      DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
+      // Restart Timer
+      if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
+          AND (MedienBib.BrowseMode = 1)
+      then
+          RefreshCoverFlowTimer.Enabled := True;
+
+  end;
 end;
 
 procedure TNemp_MainForm.EDITFastSearchExit(Sender: TObject);
@@ -9531,6 +9732,7 @@ begin
     MedienBib.GlobalQuickSearch(aString, AllowErr);
 end;
 
+(*
 procedure TNemp_MainForm.CB_MedienBibGlobalQuickSearchClick(
   Sender: TObject);
 begin
@@ -9543,7 +9745,7 @@ begin
     MedienBib.ShowQuickSearchList;
 
     EditFastSearch.SetFocus;
-end;
+end;    *)
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -9553,7 +9755,7 @@ begin
             key := #0;
             if Trim(EDITFastSearch.Text)= '' then
             begin
-                MedienBib.ShowQuickSearchList;
+                //MedienBib.ShowQuickSearchList;
                 RestoreCoverFlowAfterSearch;
             end
             else
@@ -9571,9 +9773,21 @@ begin
           begin
               key := #0;
               EDITFastSearch.Text := '';
+              //MedienBib.ShowQuickSearchList;
               RestoreCoverFlowAfterSearch;
           end
   end;
+end;
+
+procedure TNemp_MainForm.TabBtn_MarkerKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+    case ord(key) of
+        VK_ESCAPE: begin
+            key := #0;
+            //MedienBib.ShowQuickSearchList;
+        end;
+    end;
 end;
 
 
@@ -9583,7 +9797,7 @@ begin
   begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
-          MedienBib.ShowQuickSearchList;
+          //MedienBib.ShowQuickSearchList;
           RestoreCoverFlowAfterSearch;
       end
       else
@@ -9591,7 +9805,7 @@ begin
           begin
               RefreshCoverFlowTimer.Enabled := False;
               DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
-              if (MedienBib.AnzeigeListe.Count) + (MedienBib.AnzeigeListe2.Count) > 1 then
+              if (MedienBib.AnzeigeListe.Count) {+ (MedienBib.AnzeigeListe2.Count)} > 1 then
               begin
                   // Restart Timer
                   if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
@@ -9601,10 +9815,7 @@ begin
               end;
           end
           else
-          begin
-              MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
-              FillTreeViewQueryTooShort(MedienBib.BibSearcher.DummyAudioFile);
-          end;
+              FillTreeViewQueryTooShort;
   end;
 end;
 
@@ -11266,12 +11477,14 @@ begin
         if VSTPanel.Width <= 320 then
         begin
             EDITFastSearch.Width := 194 - (320 - VSTPanel.Width);
-            CB_MedienBibGlobalQuickSearch.Left := EditFastSearch.Left + EditFastSearch.Width - 17;
+            //CB_MedienBibGlobalQuickSearch.Left := EditFastSearch.Left + EditFastSearch.Width - 17;
         end else
         begin
             EditFastSearch.Width := 194;
-            CB_MedienBibGlobalQuickSearch.Left := 209;
+            //CB_MedienBibGlobalQuickSearch.Left := 209;
         end;
+
+
         MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
         MedienlisteFillPanel.Width := VSTPanel.Width - MedienlisteFillPanel.Left - 16;
     end else
@@ -11376,6 +11589,14 @@ begin
 
         Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
+end;
+
+procedure TNemp_MainForm.CoverScrollbarEnter(Sender: TObject);
+begin
+    if (Medienbib.DisplayContent <> DISPLAY_BrowseFiles)
+        and (Medienbib.DisplayContent <> DISPLAY_Search)
+    then
+        CoverScrollbarChange(Sender);
 end;
 
 procedure TNemp_MainForm.ImgScrollCoverMouseDown(Sender: TObject;
@@ -11881,6 +12102,8 @@ procedure TNemp_MainForm.TabBtn_CoverMouseMove(Sender: TObject;
 begin
     (Sender as TSkinbutton).ResetGlyph;
 end;
+
+
 
 procedure TNemp_MainForm.PM_P_ScrobblerActivateClick(Sender: TObject);
 begin

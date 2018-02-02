@@ -87,7 +87,8 @@ type
 
 
     TSearchOptions = record
-        SearchParam: Word; // NewSearch, extend search, refine search
+        // SearchParam: Word; // NewSearch, extend search, refine search
+                              // Nem p 4.7.3: Always "New search"
         AllowErrors: Boolean;
         SkipGenreCheck: boolean;
         IncludeNAGenres: boolean;
@@ -120,20 +121,8 @@ type
         // Used for "Better search"
         CurrentList: TObjectList;
 
-        // Count the views. This is used to check whether an Audiofile
-        // is currently displayed.
-        // (used for (global/not global)Quicksearch and "extend search")
-        fViewCounter: Integer;
-
-        // Dummy-Audiofile, which will be inserted between the two
-        // Quicksearch-Lists
+        // Dummy-Audiofiles
         fDummyAudioFile: TAudioFile;
-
-        // Contains the audiofile which are in the "current view"
-        // i.e. the files the user wants to quicksearch with higher priority
-        // Note: This is not identical with the real current view, as showing
-        // new quicksearch-results should not change this list
-        QuickSearchList: TObjectList;
 
         fIPCSearchIsRunning: Boolean;
 
@@ -181,7 +170,7 @@ type
         procedure SetAccelerateLyricSearch(Value: LongBool);
 
          //Some sub-methods for searching
-        procedure DeleteNotMatchingFiles(KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
+        //procedure DeleteNotMatchingFiles(KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
         procedure SearchFuzzy(Searchmode: Integer; UTF8LongestKeyword: UTF8String; KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
         procedure SearchExact(Searchmode: Integer; UTF8LongestKeyword: UTF8String; KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
         function IsOK(substr:UnicodeString; str: UnicodeString):boolean;
@@ -204,8 +193,7 @@ type
 
         // Contains the results of a quicksearch
         QuickSearchResults: TObjectList;
-        QuickSearchAdditionalResults: TObjectList;
-
+        //QuickSearchAdditionalResults: TObjectList;
 
         // The IPC-Search results for the Deskband. VCL only!!
         IPCSearchResults: TObjectList;
@@ -241,10 +229,6 @@ type
         procedure LoadFromIni(Ini: TMemIniFile);
         procedure SaveToIni(Ini: TMemIniFile);
 
-        // Fills the QuickSearchList with the AudioFiles from Source
-        procedure SetQuickSearchList(Source: TObjectList);
-        // Dispays the Quicksearchlist
-        procedure ShowQuickSearchList;
         // Displays a Searchresult-List
         procedure ShowSearchResults(aIndex: Integer);
 
@@ -264,7 +248,7 @@ type
         procedure SwapTotalStrings;
 
         procedure InitNewSearch(Keywords: TSearchKeyWords);
-        procedure InitBetterSearch(Keywords: TSearchKeyWords);
+        /// procedure InitBetterSearch(Keywords: TSearchKeyWords);
 
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
         procedure GlobalQuickTagSearch(KeyTag: UnicodeString);
@@ -275,6 +259,8 @@ type
         procedure IPCQuickSearch(Keyword: UnicodeString);
 
         procedure EmptySearch(Mode: Integer);
+        procedure SearchMarker(aIndex: Byte);
+
     end;
 
 // Helpers for Quicksearch.
@@ -369,12 +355,11 @@ var i: Integer;
 begin
     inherited Create;
     MainWindowHandle := aWnd;
-    QuickSearchList := TObjectList.Create(False);
     QuickSearchResults := TObjectList.Create(False);
-    QuickSearchAdditionalResults := TObjectList.Create(False);
     IPCSearchResults := TObjectList.Create(False);
     for i := 1 to 10 do
         SearchResultLists[i] := TObjectlist.Create(False);
+
     fDummyAudioFile := TAudioFile.Create;
 end;
 
@@ -382,9 +367,7 @@ destructor TBibSearcher.Destroy;
 var i: Integer;
 begin
     IPCSearchResults.Free;
-    QuickSearchList.Free;
     QuickSearchResults.Free;
-    QuickSearchAdditionalResults.Free;
     fDummyAudioFile.Free;
     for i := 1 to 10 do
         SearchResultLists[i].Free;
@@ -394,9 +377,7 @@ end;
 procedure TBibSearcher.Clear;
 var i: Integer;
 begin
-    QuickSearchList.Clear;
     QuickSearchResults.Clear;
-    QuickSearchAdditionalResults.Clear;
     for i := 1 to 10 do
         SearchResultLists[i].Clear;
     TotalString := '';
@@ -412,9 +393,7 @@ end;
 procedure TBibSearcher.RemoveAudioFileFromLists(aAudioFile: TAudioFile);
 var i: Integer;
 begin
-    QuickSearchList.Extract(aAudioFile);
     QuickSearchResults.Extract(aAudioFile);
-    QuickSearchAdditionalResults.Extract(aAudioFile);
     for i := 1 to 10 do
         SearchResultLists[i].Extract(aAudioFile);
 end;
@@ -444,7 +423,7 @@ begin
     QuickSearchOptions.WhileYouType       := Ini.ReadBool('MedienBib', 'QSWhileYouType', True);
     QuickSearchOptions.AllowErrorsOnEnter := Ini.ReadBool('MedienBib', 'QSAllowErrorsOnEnter', True);
     QuickSearchOptions.AllowErrorsOnType  := Ini.ReadBool('MedienBib', 'QSAllowErrorsOnType', False);
-    QuickSearchOptions.ChangeCoverFlow    := Ini.ReadBool('MedienBib', 'QSChangeCoverFlow', True);
+    QuickSearchOptions.ChangeCoverFlow    := Ini.ReadBool('MedienBib', 'QSChangeCoverFlow', False);
 end;
 procedure TBibSearcher.SaveToIni(Ini: TMemIniFile);
 begin
@@ -808,42 +787,6 @@ begin
           );
 end;
 
-{
-    --------------------------------------------------------
-    SetQuickSearchList
-    Sets the List which will be searched with higher priority
-    during quicksearch
-    // Note 31.05.2009 This is still ToDo.
-    // atm the user can choose between
-    // searching everything and searching QuickSearchlist
-    called from Medienbib.GenerateAnzeigeListe
-    --------------------------------------------------------
-}
-procedure TBibSearcher.SetQuickSearchList(Source: TObjectList);
-var i: integer;
-begin
-    QuickSearchList.Clear;
-    // increase the viewcounter
-    inc(fViewCounter);
-    for i := 0 to Source.Count - 1 do
-    begin
-        QuickSearchList.Add(Source[i]);
-        // Set viewcounter in all source files to the current value
-        TAudioFile(Source[i]).ViewCounter := fViewCounter;
-    end;
-end;
-
-{
-    --------------------------------------------------------
-    ShowQuickSearchList
-    Shows QuickSearchList in VST
-    called from OnChange-Event of quickSearchEdit if Text=''
-    --------------------------------------------------------
-}
-procedure TBibSearcher.ShowQuickSearchList;
-begin
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchList));
-end;
 
 {
     --------------------------------------------------------
@@ -855,15 +798,14 @@ end;
 }
 procedure TBibSearcher.ShowSearchResults(aIndex: Integer);
 begin
+    fDummyAudioFile.Titel := MainForm_NoSearchresults;
     if (aIndex >=1) and (aIndex <= 10) then
     begin
-        SetQuickSearchList(SearchResultLists[aIndex]);
         CurrentList := SearchResultLists[aIndex];
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(SearchResultLists[aIndex]));
     end
     else
     begin
-        SetQuickSearchList(SearchResultLists[1]);
         CurrentList := SearchResultLists[1];
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(SearchResultLists[1]));
     end;
@@ -920,56 +862,10 @@ begin
 
     CurrentList := SearchResultLists[1];
     // Show empty CurrentList in MainForm
+    fDummyAudioFile.Titel := MainForm_NoSearchresults; // ???
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
 end;
 
-
-procedure TBibSearcher.InitBetterSearch(Keywords: TSearchKeyWords);
-var i,l:integer;
-    tmpList: TObjectList;
-begin
-    // Backup CurrentList in temporary list
-    tmpList := TObjectList.Create(False);
-    try
-        tmpList.Capacity := CurrentList.Count + 1;
-        for i := 0 to CurrentList.Count - 1 do
-            tmpList.Add(CurrentList[i]);
-
-        // Swap ResultLists
-        for i:=9 downto 1 do
-        begin
-            SearchResultLists[i+1].Clear;
-            SearchResultLists[i+1].Capacity := SearchResultLists[i].Capacity;
-            for l:=0 to SearchResultLists[i].Count-1 do
-                SearchResultLists[i+1].Add(SearchResultLists[i][l]);
-            SearchKeyWords[i+1].General  := SearchKeyWords[i].General;
-            SearchKeyWords[i+1].Artist   := SearchKeyWords[i].Artist;
-            SearchKeyWords[i+1].Titel    := SearchKeyWords[i].Titel;
-            SearchKeyWords[i+1].Album    := SearchKeyWords[i].Album;
-            SearchKeyWords[i+1].Kommentar:= SearchKeyWords[i].Kommentar;
-            SearchKeyWords[i+1].Mode     := SearchKeyWords[i].Mode;
-            SearchKeyWords[i+1].ComboBoxString := SearchKeyWords[i].ComboBoxString;
-        end;
-        SearchKeyWords[1].General        := Keywords.General       ;
-        SearchKeyWords[1].Titel          := Keywords.Titel         ;
-        SearchKeyWords[1].Artist         := Keywords.Artist        ;
-        SearchKeyWords[1].Kommentar      := Keywords.Kommentar     ;
-        SearchKeyWords[1].Album          := Keywords.Album         ;
-        SearchKeyWords[1].Lyric          := Keywords.Lyric         ;
-        SearchKeyWords[1].ComboBoxString := Keywords.ComboBoxString;
-
-        // Copy backup of CurrentList to first List
-        SearchResultLists[1].Clear;
-        SearchResultLists[1].Capacity := tmpList.Capacity;
-        for i:= 0 to tmpList.Count - 1 do
-              SearchResultLists[1].Add(tmpList[i]);
-        // Set currentList as quicksearchlist, i.e. set viewcounter
-        SetQuickSearchList(SearchResultLists[1]);
-        CurrentList := SearchResultLists[1];
-    finally
-        tmpList.Free;
-    end;
-end;
 
 {
     --------------------------------------------------------
@@ -1006,7 +902,8 @@ var i, lmax: integer;
     NewIdx: Integer;
     // tmpList stores the Not exact matching files, for a sorted result
     // (exact matchings first)
-    tmpList, tmpList2: TObjectlist;
+    tmpList //// , tmpList2
+    : TObjectlist;
 begin
 
   Keywords := GenerateKeywordList(keyword);
@@ -1026,14 +923,12 @@ begin
   lmax := length(UTF8Keyword);
 
   QuickSearchResults.Clear;
-  QuickSearchAdditionalResults.Clear;
 
   if lmax > 0 then
   begin
       if AllowErr then
       begin
             tmpList  := TObjectlist.Create(False);
-            tmpList2 := TObjectlist.Create(False);
             if AccelerateSearch then
             begin
                 k := 0;
@@ -1053,27 +948,11 @@ begin
                         if NewIdx > 0 then dec(NewIdx);
 
                     // Check whether audiofile really matches the keywords
-               ///     If (QuickSearchOptions.GlobalQuickSearch) or (TAudioFile(MainList[NewIdx]).ViewCounter = fViewCounter) then
-               ////     begin
-
-                        if TAudioFile(MainList[NewIdx]).ViewCounter = fViewCounter then
-                        // Add File to the first List
-                        begin
-                            if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                                QuickSearchResults.Add(TAudioFile(MainList[NewIdx]))
-                            else
-                                if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
-                                    tmpList.Add(TAudioFile(MainList[NewIdx]));
-                        end else
-                        begin
-                            // Add File to the second List
-                            if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                                QuickSearchAdditionalResults.Add(TAudioFile(MainList[NewIdx]))
-                            else
-                                if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
-                                    tmpList2.Add(TAudioFile(MainList[NewIdx]));
-                        end;
-               ///     end;
+                    if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
+                        QuickSearchResults.Add(TAudioFile(MainList[NewIdx]))
+                    else
+                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
+                            tmpList.Add(TAudioFile(MainList[NewIdx]));
 
                     // continue with next audiofile
                     if NewIdx < length(TotalStringIndizes) - 1 then
@@ -1087,33 +966,19 @@ begin
                 // Check every single object
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if TAudioFile(MainList[i]).ViewCounter = fViewCounter then
-                    begin
-                        // Add File to first List
-                        if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
-                            QuickSearchResults.Add(TAudioFile(MainList[i]))
-                        else
-                            if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
-                                tmpList.Add(TAudioFile(MainList[i]));
-                    end else
-                    begin
-                        // Add File to second List
-                        if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
-                            QuickSearchAdditionalResults.Add(TAudioFile(MainList[i]))
-                        else
-                            if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
-                                tmpList2.Add(TAudioFile(MainList[i]));
-                    end;
+                    // Add File to first List
+                    if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
+                        QuickSearchResults.Add(TAudioFile(MainList[i]))
+                    else
+                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
+                            tmpList.Add(TAudioFile(MainList[i]));
                 end;
             end;
             // Exact matchings first, matchings with errors afterwards.
             for i := 0 to tmpList.Count - 1 do
                 QuickSearchResults.Add(tmpList[i]);
 
-            for i := 0 to tmpList2.Count - 1 do
-                QuickSearchAdditionalResults.Add(tmpList2[i]);
             tmpList.Free;
-            tmpList2.Free;
       end else
       begin
             // no errors allowed, exact matching
@@ -1132,16 +997,8 @@ begin
                     if TotalStringIndizes[NewIdx] > k then
                         if NewIdx > 0 then dec(NewIdx);
 
-
-                    If TAudioFile(MainList[NewIdx]).ViewCounter = fViewCounter then
-                    begin
-                        if OnlyOneWord or (AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords)) then
-                            QuickSearchResults.Add(TAudioFile(MainList[NewIdx]));
-                    end else
-                    begin
-                        if OnlyOneWord or (AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords)) then
-                            QuickSearchAdditionalResults.Add(TAudioFile(MainList[NewIdx]));
-                    end;
+                    if OnlyOneWord or (AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords)) then
+                        QuickSearchResults.Add(TAudioFile(MainList[NewIdx]));
 
                     if NewIdx < length(TotalStringIndizes) - 1 then
                         k := TotalStringIndizes[NewIdx + 1]
@@ -1151,30 +1008,13 @@ begin
             end else
             begin
                 for i := 0 to MainList.Count - 1 do
-                    if TAudioFile(MainList[i]).ViewCounter = fViewCounter then
-                    begin
-                        if (AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords)) then
-                            QuickSearchResults.Add(TAudioFile(MainList[i]));
-                    end else
-                    begin
-                        if (AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords)) then
-                            QuickSearchAdditionalResults.Add(TAudioFile(MainList[i]));
-                    end;
-
+                    if (AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords)) then
+                        QuickSearchResults.Add(TAudioFile(MainList[i]));
             end;
       end;
   end;
-  if (QuickSearchResults.Count = 0) and (QuickSearchAdditionalResults.Count = 0) then
-      fDummyAudioFile.Titel := MainForm_NoSearchresults
-  else
-      fDummyAudioFile.Titel := MainForm_MoreSearchresults;
-
-
-  // Copy SearchResults to VCL-Lists
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_GetQuickSearchResults, lParam(QuickSearchResults));
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_GetAdditionalQuickSearchResults, lParam(QuickSearchAdditionalResults));
-  // Show search results.
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(fDummyAudioFile));
+  fDummyAudioFile.Titel := MainForm_NoSearchresults;
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(QuickSearchResults));
   Keywords.Free;
 end;
 
@@ -1185,7 +1025,6 @@ var i: Integer;
 begin
     // we need only one list here
     QuickSearchResults.Clear;
-    QuickSearchAdditionalResults.Clear;
 
     tmpTagList := TStringList.Create;
     try
@@ -1205,14 +1044,8 @@ begin
     end;
 
     // show search results
-    SetQuickSearchList(QuickSearchResults);
+    fDummyAudioFile.Titel := MainForm_NoSearchresults;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
-
-    // Copy SearchResults to VCL-Lists
-    //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetQuickSearchResults, lParam(QuickSearchResults));
-    //SendMessage(MainWindowHandle, WM_MedienBib, MB_GetAdditionalQuickSearchResults, lParam(QuickSearchAdditionalResults));
-    // Show search results.
-    //SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(fDummyAudioFile));
 end;
 
 
@@ -1333,32 +1166,6 @@ end;
 
 {
     --------------------------------------------------------
-    DeleteNotMatchingFiles
-    delete not matching files from the current list
-    --------------------------------------------------------
-}
-procedure TBibSearcher.DeleteNotMatchingFiles(KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
-var i: Integer;
-    AudioFile: TAudioFile;
-begin
-    for i := CurrentList.Count-1 downto 0 do
-    begin
-        AudioFile := CurrentList[i] as TAudioFile;
-        if SearchOptions.AllowErrors then
-        begin
-            if not AudioFileMatchesCompleteKeywordsApprox(AudioFile, UTF8SearchKeywords) then
-               CurrentList.Delete(i);
-        end
-        else
-        begin
-            if not AudioFileMatchesCompleteKeywords(AudioFile, Keywords) then
-                CurrentList.Delete(i);
-        end;
-    end;
-end;
-
-{
-    --------------------------------------------------------
     SearchFuzzy
     Search the library with allowing errors
     Further comments: See QuickSearch-method
@@ -1396,7 +1203,6 @@ begin
             // No quicker search available
             // Check every single Audiofile
             for i := 0 to MainList.Count - 1 do
-                if (SearchOptions.SearchParam = 0) or (TAudioFile(MainList[i]).ViewCounter <> fViewCounter) then
                 begin
                     if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[i]), Keywords) then
                         CurrentList.Add(TAudioFile(MainList[i]))
@@ -1418,14 +1224,12 @@ begin
                 if LocalStringIndizes[NewIdx] > k then
                     if NewIdx > 0 then dec(NewIdx);
 
-                If (SearchOptions.SearchParam = 0) or (TAudioFile(MainList[NewIdx]).ViewCounter <> fViewCounter) then
-                begin
-                    if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                        CurrentList.Add(TAudioFile(MainList[NewIdx]))
-                    else
-                        if AudioFileMatchesCompleteKeywordsApprox(TAudioFile(MainList[NewIdx]), UTF8SearchKeywords) then
-                            tmpList.Add(TAudioFile(MainList[NewIdx]));
-                end;
+                if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
+                    CurrentList.Add(TAudioFile(MainList[NewIdx]))
+                else
+                    if AudioFileMatchesCompleteKeywordsApprox(TAudioFile(MainList[NewIdx]), UTF8SearchKeywords) then
+                        tmpList.Add(TAudioFile(MainList[NewIdx]));
+
                 if NewIdx < length(LocalStringIndizes) - 1 then
                     k := LocalStringIndizes[NewIdx + 1]
                 else
@@ -1473,17 +1277,10 @@ begin
     if SearchMode = smSlow then
     begin
         for i := 0 to MainList.Count - 1 do
-            if (SearchOptions.SearchParam = 0) or (TAudioFile(MainList[i]).ViewCounter <> fViewCounter) then
-            // d.h. neue Suche Oder Datei ist nicht in aktueller Ansicht (= letztes Suchergebnis)
-            //!!
-            //!!
-            //!!
-
-            begin
-                if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[i]), Keywords) then
-                    CurrentList.Add(TAudioFile(MainList[i]));
-            end;
-
+        begin
+            if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[i]), Keywords) then
+                CurrentList.Add(TAudioFile(MainList[i]));
+        end;
     end else
     begin
         k := 0;
@@ -1497,11 +1294,9 @@ begin
             if LocalStringIndizes[NewIdx] > k then
                 if NewIdx > 0 then dec(NewIdx);
 
-            If (SearchOptions.SearchParam = 0) or (TAudioFile(MainList[NewIdx]).ViewCounter <> fViewCounter) then
-            begin
-                if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                    CurrentList.Add(TAudioFile(MainList[NewIdx]));
-            end;
+            if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
+                CurrentList.Add(TAudioFile(MainList[NewIdx]));
+
             if NewIdx < length(LocalStringIndizes) - 1 then
                 k := LocalStringIndizes[NewIdx + 1]
             else
@@ -1568,21 +1363,16 @@ begin
         end;
     end;
 
-    if SearchOptions.SearchParam = 1 then
-    begin
-        DeleteNotMatchingFiles(KeyWords, UTF8SearchKeywords);
-    end else
-    begin
-        // passende AudioFiles suchen
-        if SearchOptions.AllowErrors then
-            // approximate search
-            SearchFuzzy(SearchMode, UTF8LongestKeyword, KeyWords, UTF8SearchKeywords)
-        else
-            // exact search
-            SearchExact(SearchMode, UTF8LongestKeyword, KeyWords, UTF8SearchKeywords);
-    end;
+    // passende AudioFiles suchen
+    if SearchOptions.AllowErrors then
+        // approximate search
+        SearchFuzzy(SearchMode, UTF8LongestKeyword, KeyWords, UTF8SearchKeywords)
+    else
+        // exact search
+        SearchExact(SearchMode, UTF8LongestKeyword, KeyWords, UTF8SearchKeywords);
+
     // show search results
-    SetQuickSearchList(CurrentList);
+    fDummyAudioFile.Titel := MainForm_NoSearchresults;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(CurrentList));
 end;
 
@@ -1592,14 +1382,13 @@ var i: Integer;
 begin
     // we need only one list here
     QuickSearchResults.Clear;
-    QuickSearchAdditionalResults.Clear;
 
     for i := 0 to MainList.Count - 1 do
         if AudioFileMatchesCompleteKeywordsNOSubStrings(TAudioFile(MainList[i]), Keywords) then
             QuickSearchResults.Add(TAudioFile(MainList[i]));
 
     // show search results
-    SetQuickSearchList(QuickSearchResults);
+    fDummyAudioFile.Titel := MainForm_NoSearchresults;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
 end;
 
@@ -1622,7 +1411,6 @@ begin
                     if TAudioFile(MainList[i]).Titel = '' then
                         tmpList.Add(MainList[i]);
                 end;
-
             end;
             2: begin // Artist
                 for i := 0 to MainList.Count - 1 do
@@ -1647,16 +1435,45 @@ begin
                     then
                         tmpList.Add(MainList[i]);
                 end;
-
             end;
         end;
 
-        SetQuickSearchList(tmpList);
+        fDummyAudioFile.Titel := MainForm_NoSearchresults;
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(tmpList));
     finally
         tmpList.Free;
     end;
+end;
 
+procedure TBibSearcher.SearchMarker(aIndex: Byte);
+var tmpList: TObjectList;
+    i: Integer;
+begin
+    tmpList := TObjectList.Create(False);
+    try
+        if aIndex = 4 then
+        begin
+            // list all marked files
+            for i := 0 to MainList.Count - 1 do
+            begin
+                if TAudioFile(MainList[i]).Favorite <> 0 then
+                    tmpList.Add(MainList[i]);
+            end;
+
+        end else
+        begin
+            for i := 0 to MainList.Count - 1 do
+            begin
+                if TAudioFile(MainList[i]).Favorite = aIndex then
+                    tmpList.Add(MainList[i]);
+            end;
+        end;
+
+        fDummyAudioFile.Titel := MainForm_NoFavorites;
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowFavorites, lParam(tmpList));
+    finally
+        tmpList.Free;
+    end;
 end;
 
 end.

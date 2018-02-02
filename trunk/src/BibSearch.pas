@@ -71,8 +71,6 @@ type
     LyricEdit: TMemo;
     LblConst_LyricSearchHint: TLabel;
     Btn_ExtendedSearch: TButton;
-    BtnRefineSearch: TButton;
-    BtnExtendSearch: TButton;
     CBFehlerToleranz: TCheckBox;
     BtnClear: TButton;
     BtnCancel: TButton;
@@ -220,9 +218,6 @@ begin
     BtnClear                   .Enabled := AllowSearch;
 
     Btn_ExtendedSearch         .Enabled := AllowSearch;
-    BtnRefineSearch            .Enabled := AllowSearch;
-    BtnExtendSearch            .Enabled := AllowSearch;
-
 end;
 
 procedure TFormBibSearch.cbIgnoreGenresClick(Sender: TObject);
@@ -298,7 +293,7 @@ var i:integer;
 begin
     if Medienbib.StatusBibUpdate >= 2 then exit;
 
-    Medienbib.BibSearcher.SearchOptions.SearchParam := (Sender as TButton).Tag;
+    // Medienbib.BibSearcher.SearchOptions.SearchParam := (Sender as TButton).Tag;
     Medienbib.BibSearcher.SearchOptions.AllowErrors := CBFehlerToleranz.Checked;
 
     KeyWords.General   := Trim(GeneralEdit.Text);
@@ -319,20 +314,20 @@ begin
     StringAdd(newComboBoxString, KeyWords.Kommentar);
     StringAdd(newComboBoxString, KeyWords.Lyric    );
 
-    case Medienbib.BibSearcher.SearchOptions.SearchParam of
-        0: ; // nothing. NewSearch
-        1: newComboBoxString := newComboBoxString + SearchForm_CBAddRefineSearch;  // Refined search
-        2: newComboBoxString := newComboBoxString + SearchForm_CBAddExtendSearch;  // Extended search
-    end;
+    ///case Medienbib.BibSearcher.SearchOptions.SearchParam of
+    ///    0: ; // nothing. NewSearch
+    ///    1: newComboBoxString := newComboBoxString + SearchForm_CBAddRefineSearch;  // Refined search
+    ///    2: newComboBoxString := newComboBoxString + SearchForm_CBAddExtendSearch;  // Extended search
+    ///end;
 
     if newComboBoxString = '' then
         newComboBoxString := (MainForm_NoSearchKeywords);
     KeyWords.ComboBoxString := newComboBoxString;
 
-    if Medienbib.BibSearcher.SearchOptions.SearchParam = 0 then
-        Medienbib.BibSearcher.InitNewSearch(KeyWords)
-    else
-        Medienbib.BibSearcher.InitBetterSearch(KeyWords);
+    ///if Medienbib.BibSearcher.SearchOptions.SearchParam = 0 then
+        Medienbib.BibSearcher.InitNewSearch(KeyWords);
+    ///else
+    ///    Medienbib.BibSearcher.InitBetterSearch(KeyWords);
 
     FillSuchComboBox;
 

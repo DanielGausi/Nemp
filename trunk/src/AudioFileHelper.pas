@@ -149,6 +149,7 @@ function AFCompareFileAge(a1,a2: tAudioFile): Integer;
 function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
 function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
 function AFCompareCD(a1,a2: tAudioFile): Integer;
+function AFCompareFavorite(a1,a2: tAudioFile): Integer;
 
 function MainSort(item1, item2: Pointer): Integer;
 
@@ -301,7 +302,10 @@ function AFCompareCD(a1,a2: tAudioFile): Integer;
 begin
     result := AnsiCompareText(a1.CD, a2.CD);
 end;
-
+function AFCompareFavorite(a1,a2: tAudioFile): Integer;
+begin
+    result := CompareValue(a1.Favorite, a2.Favorite);
+end;
 
 
 function Sortieren_ArtistTitel_asc(item1,item2:pointer):integer;

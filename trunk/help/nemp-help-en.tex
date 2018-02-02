@@ -1100,6 +1100,11 @@ See section \hyperref[sec_webserver]{Tools - The Nemp web server}.
 
 \item \textbf{Floating-Point channels.} So-called floating point channels provide better audio quality, but can sometimes cause problems. Nemp can automatically detect whether this feature is supported by the system. In case of problems: Switch off.
 
+\item \textbf{MIDI playback.} For playing MIDI files, so-called SoundFonts are required. Since Nemp does not focus on MIDI files, these (often very large) sound font files are not included. Some SoundFont files can be downloaded 
+\href{http://www.un4seen.com/download.php?x/ChoriumRevA}{here} or
+\href{http://www.un4seen.com/download.php?x/ChoriumRevA}{here}.
+If you copy the sf2 file contained in these archives to the bass-subfolder and restart Nemp, this SoundFont file will be used if you have not explicitly selected another one. 
+
 \item \textbf{Safe playback.} \emph{Default: Off.} An setting associated with variable bitrate files. For such files, it may be necessary to scan the entire file for accurate scrolling. This happens in the default setting after the title is started, which can cause problems (but usually does not). With \emph{safe playback} the file is completely scanned before the playback starts. However, this will delay the start of playback noticeably for larger files.
 \end{itemize}
 
@@ -1279,6 +1284,14 @@ If no matches were found for a search term, this may also be due to typing error
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+\subsection*{Version 4.7.2, December 2017}
+
+\textbf{New feature (or bug fix?)}
+\begin{itemize}
+\item Support for SoundFont files for MIDI playback.
+\end{itemize}
+
 
 \subsection*{Version 4.7.1, November 2017}
 

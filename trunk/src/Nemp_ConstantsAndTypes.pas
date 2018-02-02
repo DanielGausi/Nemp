@@ -374,11 +374,15 @@ const
     //MB_SearchAutoAbort = 12;
     // Show search results. lParam contains a Pointer to the result-list
     MB_ShowSearchResults = 13;
+
+    MB_ShowQuickSearchResults = 25;
+    MB_ShowFavorites = 26;
+
     // Show Quicksearch-results
     // Two Steps: Results from "QuickSearchList" and "Additional results"
-    MB_GetQuickSearchResults = 25;
-    MB_GetAdditionalQuickSearchResults = 26;
-    MB_ShowQuickSearchResults  = 27;
+    ///MB_GetQuickSearchResults = 25;
+    //// MB_GetAdditionalQuickSearchResults = 26;
+    ///MB_ShowQuickSearchResults  = 27;
 
 
     MB_DeadFilesWarning = 14;
@@ -466,7 +470,7 @@ const
     SEARCH_EXTENDED = 1;
     //SEARCH_LYRICs = 2;
 
-    Spaltenzahl = 23;
+    Spaltenzahl = 24;
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
     CON_ARTIST    = 0 ;
     CON_TITEL     = 1 ;
@@ -492,6 +496,7 @@ const
     CON_LASTFMTAGS = 19;
     CON_EXTENSION = 20;
     CON_FILEAGE = 21;
+    CON_FAVORITE = 23;
     //-----
     CON_EX_ARTISTALBUMTITEL = 117;
     CON_EX_ALBUMTITELARTIST = 118;
@@ -646,7 +651,7 @@ const
          'Techno'
          );
 
-      DefaultSpalten : array[0..22] of TSpalte =
+      DefaultSpalten : array[0..23] of TSpalte =
       (
         (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 122 ;sortAscending: True),
         (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
@@ -671,7 +676,8 @@ const
         (Bezeichnung: 'Tags' ;Inhalt: CON_LASTFMTAGS       ;visible: false  ;width: 44;sortAscending: True),
         (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
         (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
-        (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True)
+        (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
+        (Bezeichnung: 'Mark' ;Inhalt: CON_FAVORITE         ;visible: false  ;width: 44 ;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =
@@ -847,6 +853,7 @@ const
       VORBIS_PLAYCOUNT = 'PLAYCOUNT';
       VORBIS_CATEGORIES = 'CATEGORIES';
       VORBIS_DISCNUMBER = 'DISCNUMBER';
+      //VORBIS_FAVORITE = 'FAVORITE';
 
       APE_COMMENT = 'COMMENT';
       APE_LYRICS = 'UNSYNCEDLYRICS';
@@ -854,6 +861,7 @@ const
       APE_PLAYCOUNT = 'PLAYCOUNT';
       APE_CATEGORIES = 'CATEGORIES';
       APE_DISCNUMBER = 'DISCNUMBER';
+      //APE_FAVORITE = 'FAVORITE';
 
 
 procedure SaveWindowPositons(ini: TMemIniFile; var Options: TNempOptions; aMode: Integer);

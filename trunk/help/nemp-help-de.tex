@@ -1091,6 +1091,10 @@ Siehe Abschnitt \hyperref[sec_webserver]{Tools - Webserver}.
 \begin{itemize}
 \item \textbf{Buffergröße.} \emph{Standard: 500ms.} Ein größerer Buffer kann in einigen Fällen Ruckler vermeiden, wenn nicht immer schnell genug von der Quelle (Festplatte, USB-Stick, CD) gelesen werden kann. Dadurch werden aber auch Änderungen an den Equalizer-Einstellungen oder Effekten mit einer größeren Verzögerung wirksam.
 \item \textbf{Floating-Point Channels.} Sogenannte Floating-Point Channels liefern eine bessere Audio-Qualität, können aber unter Umständen zu Problemchen führen. Nemp kann automatisch erkennen, ob dieses Feature vom System unterstützt wird. Bei Problemen: Abschalten.
+\item \textbf{MIDI Wiedergabe.} Für die Wiedergabe von MIDI-Dateien werden sogenannte SoundFonts benötigt. Da der Schwerpunkt bei Nemp nicht auf MIDI-Dateien liegt, werden diese (oft sehr großen) Soundfont-Dateien nicht mitgeliefert. Einige SoundFont-Dateien können 
+\href{http://www.un4seen.com/download.php?x/ChoriumRevA}{hier} oder
+\href{http://www.un4seen.com/download.php?x/ChoriumRevA}{hier} heruntergeladen werden.
+Wenn Sie die in diesen Archiven enthaltene sf2-Datei in den bass-Unterordner kopieren und Nemp neu starten, dann wird diese SoundFont-Datei benutzt, sofern Sie noch keine andere explizit ausgewählt haben. 
 \item \textbf{Sichere Wiedergabe.} \emph{Standard: Aus.} Eine Option im Zusammenhang mit Dateien mit variabler Bitrate. Bei solchen Dateien ist es für ein akkurates Scrollen unter Umständen notwendig, die gesamte Datei zu scannen. Dies geschieht in der Standard-Einstellung nach dem Start des Titel, was unter Umständen zu Problemen führen kann (es in der Regel aber nicht tut). Beim \emph{sicheren Playback} wird die Datei erst vollständig gescannt, bevor die Wiedergabe gestartet wird. Das verzögert jedoch bei größeren Dateien den Start der Wiedergabe spürbar.
 \end{itemize}
 
@@ -1261,6 +1265,13 @@ Wenn für einen Suchbegriff kein Treffer gefunden wurde, kann das auch an Tippfeh
 \section{Versionsgeschichte}
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
+
+\subsection*{Version 4.7.2, Dezember 2017}
+
+\textbf{Neue Funktion (oder besser Bugfix?)}
+\begin{itemize}
+\item Unterstützung für SoundFont-Dateien, um MIDI-Dateien abzuspielen.
+\end{itemize}
 
 \subsection*{Version 4.7.1, November 2017}
 

@@ -247,7 +247,7 @@ type
         // ControlButtons: The Buttons on the MainForm
         ControlButtons : Array[TControlButtons] of TSkinButton;
 
-        TabButtons: Array [0..10] of SkinButtonRec;
+        TabButtons: Array [0..11] of SkinButtonRec;
         SlideButtons: Array [0..17] of SkinButtonRec;
 
         NempPartyMode: TNempPartyMode;
@@ -401,6 +401,7 @@ begin
   TabButtons[8].Button    :=  Nemp_MainForm.TabBtn_Preselection  ;
   TabButtons[9].Button    :=  Nemp_MainForm.TabBtn_Medialib      ;
   TabButtons[10].Button   :=  Nemp_MainForm.TabBtn_Headset       ;
+  TabButtons[11].Button   :=  Nemp_mainForm.TabBtn_Marker        ;
 
   TabButtons[0].GlyphFile := 'TabBtnCover'       ;
   TabButtons[1].GlyphFile := 'TabBtnLyrics'      ;
@@ -413,6 +414,7 @@ begin
   TabButtons[8].GlyphFile := 'TabBtnNemp'        ;
   TabButtons[9].GlyphFile := 'TabBtnNemp'        ;
   TabButtons[10].GlyphFile := 'TabBtnHeadset'    ;
+  TabButtons[11].GlyphFile := 'TabBtnMarker'     ;
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;
@@ -762,7 +764,7 @@ begin
       ButtonTmp.Width := 14;
       Buttontmp.Height := 14;
       Nemp_MainForm.PlayListSkinImageList.Clear;
-      for i := 0 to 11 do
+      for i := 0 to 15 do
       begin
         ButtonTmp.Canvas.CopyRect(
             rect(0,0,14,14), ListenCompletebmp.Canvas,
@@ -1427,8 +1429,8 @@ begin
                 AssignNemp3Glyph(SlideForwardHeadsetBTN,  Path + '\BtnSlideForwardHeadset', True);
                 SlideForwardHeadsetBTN.GlyphLine := SlideForwardHeadsetBTN.GlyphLine;
 
-                AssignNemp3Glyph(CB_MedienBibGlobalQuickSearch,  Path + '\BtnQuickSearch', True);
-                CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
+                //AssignNemp3Glyph(CB_MedienBibGlobalQuickSearch,  Path + '\BtnQuickSearch', True);
+                //CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
 
                 AssignSkinTabGlyphs;
             end;
@@ -2233,8 +2235,6 @@ begin
       else
       begin
           // No valid file found. Fall back to default graphics
-
-
           ScaleCorrectionNeeded := True;
           NewName := aFilename;
           ext := GetExistingExtension;
@@ -2441,7 +2441,8 @@ begin
 
         tmpBitmap := TBitmap.Create;
         try
-            for b := 0 to 10 do
+            //for b := 0 to 10 do
+            for b := Low(TabButtons) to High(TabButtons) do
             begin
                 TabButtons[b].Button.DrawMode := dm_Windows;
                 TabButtons[b].Button.NumGlyphsX := 1;
@@ -2465,7 +2466,8 @@ begin
     with Nemp_MainForm do
     begin
         BaseDir := path + '\';
-        for b := 0 to 10 do
+        //for b := 0 to 10 do
+        for b := Low(TabButtons) to High(TabButtons) do
         begin
             TabButtons[b].Button.DrawMode := dm_Skin;
             AssignNemp3Glyph(TabButtons[b].Button, BaseDir + TabButtons[b].GlyphFile, True);
@@ -2651,14 +2653,14 @@ begin
             SlideForwardHeadsetBTN.Refresh;
 
 
-            CB_MedienBibGlobalQuickSearch .drawMode := dm_Windows;
-            CB_MedienBibGlobalQuickSearch.NumGlyphsX := 1;
-            CB_MedienBibGlobalQuickSearch .NumGlyphs := 1;
-            CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnQuickSearch', True);
-            CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(tmpBitmap);
-            CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
-            CB_MedienBibGlobalQuickSearch.Refresh;
+            //CB_MedienBibGlobalQuickSearch .drawMode := dm_Windows;
+            //CB_MedienBibGlobalQuickSearch.NumGlyphsX := 1;
+            //CB_MedienBibGlobalQuickSearch .NumGlyphs := 1;
+            //CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(Nil);
+            //LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnQuickSearch', True);
+            //CB_MedienBibGlobalQuickSearch.NempGlyph.Assign(tmpBitmap);
+            //CB_MedienBibGlobalQuickSearch.GlyphLine := CB_MedienBibGlobalQuickSearch.GlyphLine;
+            //CB_MedienBibGlobalQuickSearch.Refresh;
 
 
 

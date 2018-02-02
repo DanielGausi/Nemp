@@ -61,7 +61,7 @@
 \contentsline {subsubsection}{Erweiterte Einstellungen}{48}{section*.71}
 \contentsline {subsection}{\numberline {5.4}Datei-Management}{49}{subsection.72}
 \contentsline {subsubsection}{Dateitypen-Registrierung}{50}{section*.73}
-\contentsline {subsubsection}{Metadaten}{50}{section*.74}
+\contentsline {subsubsection}{Metadaten}{51}{section*.74}
 \contentsline {subsubsection}{Cover}{53}{section*.75}
 \contentsline {subsubsection}{Suchoptionen}{54}{section*.76}
 \contentsline {section}{\numberline {6}Versionsgeschichte}{56}{section.77}

@@ -446,10 +446,13 @@ HeadSetForm_NoAudioFile = 'Select an audiofile in the main window first.';
 
 MainForm_NoSearchHistory = 'Previous searchs';
 MainForm_GlobalQuickSearch    = 'Quicksearch (library)';
-MainForm_LocalQuickSearch     = 'Quicksearch (current list)';
-MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
+// MainForm_LocalQuickSearch     = 'Quicksearch (current list)';
+/// MainForm_MoreSearchresults  = 'Additional results (not limited to current preselection)';
 MainForm_NoSearchresults    = 'Nothing found. Try another search.';
 MainForm_SearchQueryTooShort = 'Search query too short. Please enter at least 2 characters.';
+MainForm_NoFavorites = 'No files flagged with this marker.';
+// DummyFile for browsing Playlists/Webradio
+MainForm_NoTitleInformationAvailable = 'No title information available.';
 
 MainForm_GlobalQuickSearchHint = 'Search in the media library';
 
@@ -518,6 +521,11 @@ MainForm_PlaylistSearchHint = 'Search in the playlist'
                     + #13#10 + '- F3: step through'
                     + #13#10 + '- Enter: mark all'
                     + #13#10 + '- Shift+Enter: play';
+
+MainForm_MarkerBtnHint = 'Show only files flagged with one of the markers.';
+//MainForm_FavoriteBtnHint = 'Show all files marked as favorites'
+//                    + #13#10 + '- use F4 to add a file to favorites'
+//                    + #13#10 + '- use Ctrl+F4 to remove a file from favorites';
 
 MainForm_BtnEqualizerPresetsSelect = 'Select';
 MainForm_BtnEqualizerPresetsCustom = 'Custom';

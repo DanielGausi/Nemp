@@ -1944,7 +1944,6 @@ object FDetails: TFDetails
           PopupMenu = PM_EditExtendedTags
           TabOrder = 1
           OnDblClick = lb_TagsDblClick
-          OnKeyDown = lb_TagsKeyDown
         end
         object btn_AddTag: TButton
           Left = 304

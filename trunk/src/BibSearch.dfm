@@ -3,8 +3,8 @@ object FormBibSearch: TFormBibSearch
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Search in the library'
-  ClientHeight = 526
-  ClientWidth = 536
+  ClientHeight = 436
+  ClientWidth = 595
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,23 +15,20 @@ object FormBibSearch: TFormBibSearch
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
-  DesignSize = (
-    536
-    526)
   PixelsPerInch = 96
   TextHeight = 13
   object GRPBOXSuchauswahl: TGroupBox
     Tag = 2
     Left = 8
     Top = 8
-    Width = 520
+    Width = 574
     Height = 49
     Caption = 'Search history'
-    TabOrder = 6
+    TabOrder = 4
     object CB_SearchHistory: TComboBox
       Left = 3
       Top = 16
-      Width = 510
+      Width = 557
       Height = 21
       Style = csDropDownList
       TabOrder = 0
@@ -43,14 +40,14 @@ object FormBibSearch: TFormBibSearch
     Left = 8
     Top = 63
     Width = 353
-    Height = 290
+    Height = 326
     Caption = 'Keywords'
     ParentShowHint = False
     ShowHint = True
     TabOrder = 0
     DesignSize = (
       353
-      290)
+      326)
     object LblConst_SearchArtist: TLabel
       Left = 14
       Top = 76
@@ -152,7 +149,7 @@ object FormBibSearch: TFormBibSearch
       Left = 53
       Top = 217
       Width = 289
-      Height = 60
+      Height = 96
       Anchors = [akLeft, akTop, akRight]
       Lines.Strings = (
         '')
@@ -182,10 +179,10 @@ object FormBibSearch: TFormBibSearch
   end
   object GrpBox_ExtendedSearchDate: TGroupBox
     Tag = 2
-    Left = 229
-    Top = 359
-    Width = 132
-    Height = 160
+    Left = 367
+    Top = 280
+    Width = 215
+    Height = 109
     Caption = 'Date'
     TabOrder = 2
     object LblConst_SearchExtendedYear: TLabel
@@ -233,9 +230,9 @@ object FormBibSearch: TFormBibSearch
       OnClick = cbIgnoreYearClick
     end
     object cbIncludeNA: TCheckBox
-      Left = 54
-      Top = 102
-      Width = 67
+      Left = 134
+      Top = 44
+      Width = 51
       Height = 17
       Caption = 'N/A'
       Enabled = False
@@ -244,8 +241,8 @@ object FormBibSearch: TFormBibSearch
       TabOrder = 3
     end
     object cbInclude0: TCheckBox
-      Left = 54
-      Top = 125
+      Left = 134
+      Top = 76
       Width = 67
       Height = 17
       Caption = '0'
@@ -272,10 +269,10 @@ object FormBibSearch: TFormBibSearch
   end
   object GrpBox_ExtendedSearchGenres: TGroupBox
     Tag = 2
-    Left = 8
-    Top = 359
+    Left = 367
+    Top = 63
     Width = 215
-    Height = 160
+    Height = 211
     Align = alCustom
     Caption = 'Genres'
     TabOrder = 1
@@ -283,7 +280,7 @@ object FormBibSearch: TFormBibSearch
       Left = 8
       Top = 40
       Width = 195
-      Height = 88
+      Height = 136
       Columns = 2
       Enabled = False
       ItemHeight = 13
@@ -305,7 +302,7 @@ object FormBibSearch: TFormBibSearch
     end
     object cbIncludeUnkownGenres: TCheckBox
       Left = 8
-      Top = 136
+      Top = 182
       Width = 185
       Height = 17
       Caption = 'N/A, unknown'
@@ -316,44 +313,23 @@ object FormBibSearch: TFormBibSearch
     end
   end
   object Btn_ExtendedSearch: TButton
-    Left = 367
-    Top = 66
-    Width = 154
-    Height = 46
+    Left = 492
+    Top = 395
+    Width = 90
+    Height = 25
     Caption = 'Search'
+    Default = True
     TabOrder = 3
     OnClick = Btn_ExtendedSearchClick
   end
-  object BtnRefineSearch: TButton
-    Tag = 1
-    Left = 367
-    Top = 118
-    Width = 154
-    Height = 46
-    Caption = 'Refine search'
-    TabOrder = 4
-    OnClick = Btn_ExtendedSearchClick
-  end
-  object BtnExtendSearch: TButton
-    Tag = 2
-    Left = 367
-    Top = 170
-    Width = 154
-    Height = 46
-    Caption = 'Extend search'
-    TabOrder = 5
-    OnClick = Btn_ExtendedSearchClick
-  end
   object BtnCancel: TButton
-    Left = 367
-    Top = 472
-    Width = 154
-    Height = 46
-    Anchors = [akLeft, akBottom]
+    Left = 396
+    Top = 395
+    Width = 90
+    Height = 25
     Cancel = True
     Caption = 'Cancel'
-    TabOrder = 7
+    TabOrder = 5
     OnClick = BtnCancelClick
-    ExplicitTop = 473
   end
 end

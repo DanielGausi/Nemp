@@ -69,6 +69,9 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
 
 type
 
+    TDisplayContent = (DISPLAY_None, DISPLAY_BrowseFiles, DISPLAY_BrowsePlaylist, DISPLAY_Search, DISPLAY_Quicksearch, DISPLAY_Favorites);
+
+
     TMedienBibliothek = class
     private
         MainWindowHandle: DWord;  // Handle of Nemp Main Window, Destination for all the messages
@@ -321,11 +324,13 @@ type
         // wird generiert über Onchange der Vorauswahl, oder aber von der Such-History
         // Achtung: Auf diese NUR IM VCL-HAUPTTHREAD zugreifen !!
         AnzeigeListe: TObjectList; // Speichert die Liste, die gerade im Tree angezeigt wird.
-        AnzeigeListe2: TObjectList; // Speichert zusätzliche QuickSearch-Resultate.
+        // AnzeigeListe2: TObjectList; // Speichert zusätzliche QuickSearch-Resultate.
         // Flag, was für Dateien in der Playlist sind
         // Muss bei jeder Änderung der AnzeigeListe gesetzt werden
         // Zusätzlich dürfen Dateien aus der AnzeigeListe ggf. nicht in andere Listen gehängt werden.
         AnzeigeShowsPlaylistFiles: Boolean;
+
+        DisplayContent: TDisplayContent;
 
         // Liste für die Webradio-Stationen
         // Darauf greift auch die Stream-Verwaltung-Form zu
@@ -533,7 +538,7 @@ type
         // 2. Regenerate BrowseLists
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList(FromScratch: Boolean = True);       // -"- of CoverLists
-        procedure ReBuildCoverListFromList(aList, bList: TObjectList);  // used to refresh coverflow on QuickSearch
+        procedure ReBuildCoverListFromList(aList: TObjectList);  // used to refresh coverflow on QuickSearch
         procedure ReBuildTagCloud;        // -"- of the TagCloud
 
         procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
@@ -546,7 +551,7 @@ type
         Procedure GetTitelList(Target: TObjectlist; Artist: UnicodeString; Album: UnicodeString);
         // Ruft nur GetTitelList auf, mit Target = AnzeigeListe
         // NUR IM VCL_HAUPTTHREAD benutzen
-        Procedure GenerateAnzeigeListe(Artist: UnicodeString; Album: UnicodeString; UpdateQuickSearchList: Boolean = True);
+        Procedure GenerateAnzeigeListe(Artist: UnicodeString; Album: UnicodeString);// UpdateQuickSearchList: Boolean = True);
         // wie oben, nur wirdf hier nur auf eine der großen Listen zugegriffen
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
@@ -560,8 +565,8 @@ type
 
         // Methods for searching
         // See BibSearcherClass for Details.
-        Procedure ShowQuickSearchList;  // Displays the QuicksearchList
-        procedure FillQuickSearchList;  // Set the currently displayed List as QuickSearchList
+        ///Procedure ShowQuickSearchList;  // Displays the QuicksearchList
+        ///procedure FillQuickSearchList;  // Set the currently displayed List as QuickSearchList
         // Searching for keywords
         // a. Quicksearch
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
@@ -576,10 +581,12 @@ type
         procedure GetFilesInDir(aDirectory: UnicodeString);
         // d. Special case: Search for Empty Strings
         procedure EmptySearch(Mode: Integer);
+        // list favorites
+        procedure ShowMarker(aIndex: Byte);
 
         // Sorting the Lists
         procedure AddSorter(TreeHeaderColumnTag: Integer; FlipSame: Boolean = True);
-        procedure SortAList(aList: TObjectList);
+        // procedure SortAList(aList: TObjectList);
         procedure SortAnzeigeListe;
 
         // Generating RandomList (Random Playlist)
@@ -701,9 +708,10 @@ begin
 
   Alben        := TObjectlist.create(False);
   AnzeigeListe := TObjectlist.create(False);
-  AnzeigeListe2 := TObjectlist.create(False);
+  //AnzeigeListe2 := TObjectlist.create(False);
 
   AnzeigeShowsPlaylistFiles := False;
+  DisplayContent := DISPLAY_None;
 
   BibSearcher := TBibSearcher.Create(aWnd);
   BibSearcher.MainList := Mp3ListePfadSort;
@@ -805,7 +813,7 @@ begin
   AlleArtists.Free;
   Alben.Free;
   AnzeigeListe.Free;
-  AnzeigeListe2.Free;
+  // AnzeigeListe2.Free;
 
   UpdateList.Free;
   PlaylistUpdateList.Free;
@@ -873,8 +881,9 @@ begin
   AlleArtists.Clear;
   Alben.Clear;
   AnzeigeListe.Clear;
-  AnzeigeListe2.Clear;
+  // AnzeigeListe2.Clear;
   AnzeigeShowsPlaylistFiles := False;
+  DisplayContent := DISPLAY_None;
 
   BibSearcher.Clear;
   Coverlist.Clear;
@@ -1506,7 +1515,7 @@ begin
       ChangeAfterUpdate := True; // We need to save the changed library after the cleanup
 
       AnzeigeListe.Clear;
-      AnzeigeListe2.Clear;
+      ///AnzeigeListe2.Clear;
       AnzeigeListIsCurrentlySorted := False;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
       // Delete Duplicates
@@ -2013,7 +2022,7 @@ begin
     for i := 0 to DeadFiles.Count - 1 do
     begin
         AnzeigeListe.Extract(TAudioFile(DeadFiles[i]));
-        AnzeigeListe2.Extract(TAudioFile(DeadFiles[i]));
+        ///AnzeigeListe2.Extract(TAudioFile(DeadFiles[i]));
     end;
     // Delete DeadFiles from BibSearcher
     BibSearcher.RemoveAudioFilesFromLists(DeadFiles);
@@ -2883,7 +2892,7 @@ begin
       currentAudioFile := Nil;
 
   AnzeigeListe.Extract(aAudioFile);
-  AnzeigeListe2.Extract(aAudioFile);
+  /// AnzeigeListe2.Extract(aAudioFile);
   if AnzeigeShowsPlaylistFiles then
   begin
       PlaylistFiles.Extract(aAudioFile);
@@ -3864,7 +3873,7 @@ begin
   end;
 end;
 
-procedure TMedienBibliothek.ReBuildCoverListFromList(aList, bList: TObjectList);
+procedure TMedienBibliothek.ReBuildCoverListFromList(aList: TObjectList);
 var tmpList: TObjectList;
     i: integer;
     newCover: TNempCover;
@@ -3888,8 +3897,8 @@ begin
     try
         for i := 0 to aList.Count - 1 do
             tmpList.Add(aList[i]);
-        for i := 0 to bList.Count - 1 do
-            tmpList.Add(bList[i]);
+        ///for i := 0 to bList.Count - 1 do
+        ///    tmpList.Add(bList[i]);
 
         tmpList.Sort(Sortieren_CoverID);
 
@@ -4254,7 +4263,7 @@ function TMedienBibliothek.IsAutoSortWanted: Boolean;
 begin
     result := AlwaysSortAnzeigeList
           And
-          ( (AnzeigeListe.Count + AnzeigeListe2.Count < 5000) or (Not SkipSortOnLargeLists));
+          ( (AnzeigeListe.Count {+ AnzeigeListe2.Count} < 5000) or (Not SkipSortOnLargeLists));
 end;
 
 {
@@ -4264,16 +4273,17 @@ end;
     (has gone a little complicated since allowing webradio and playlists there...)
     --------------------------------------------------------
 }
-Procedure TMedienBibliothek.GenerateAnzeigeListe(Artist: UnicodeString; Album: UnicodeString; UpdateQuickSearchList: Boolean = True);
+Procedure TMedienBibliothek.GenerateAnzeigeListe(Artist: UnicodeString; Album: UnicodeString);//; UpdateQuickSearchList: Boolean = True);
 var i: Integer;
 begin
   AnzeigeListIsCurrentlySorted := False;
   if Artist = BROWSE_PLAYLISTS then
   begin
+      BibSearcher.DummyAudioFile.Titel := MainForm_NoTitleInformationAvailable;
       // Playlist Datei in PlaylistFiles laden.
       PlaylistFiles.Clear;
       AnzeigeListe.Clear;
-      AnzeigeListe2.Clear;
+      ///AnzeigeListe2.Clear;
       // bugfix Nemp 4.7.1
       // (Bug created in 4.7, in context of the label-click-search-stuff)
       CurrentAudioFile := Nil;
@@ -4283,6 +4293,8 @@ begin
           LoadPlaylistFromFile(Album, PlaylistFiles, AutoScanPlaylistFilesOnView);
 
           AnzeigeShowsPlaylistFiles := True;
+          DisplayContent := DISPLAY_BrowsePlaylist;
+
           for i := 0 to PlaylistFiles.Count - 1 do
               AnzeigeListe.Add(TAudioFile(PlaylistFiles[i]));
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0)
@@ -4292,17 +4304,20 @@ begin
   end else
   if Artist = BROWSE_RADIOSTATIONS then
   begin
+      BibSearcher.DummyAudioFile.Titel := MainForm_NoTitleInformationAvailable;
       AnzeigeListe.Clear;
-      AnzeigeListe2.Clear;
+      ///AnzeigeListe2.Clear;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
   end else
   begin
+      BibSearcher.DummyAudioFile.Titel := MainForm_NoSearchresults;
       AnzeigeShowsPlaylistFiles := False;
+      DisplayContent := DISPLAY_BrowseFiles;
       GetTitelList(AnzeigeListe, Artist, Album);
       if IsAutoSortWanted then
           SortAnzeigeliste;
-      if UpdateQuickSearchList then
-          FillQuickSearchList;
+      //if UpdateQuickSearchList then
+      ///FillQuickSearchList;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
   end;
 end;
@@ -4322,8 +4337,8 @@ begin
       // special case: Show all Files in Quicksearchlist
       for i := 0 to BibSearcher.QuickSearchResults.Count - 1 do
           Target.Add(BibSearcher.QuickSearchResults[i]);
-      for i := 0 to BibSearcher.QuickSearchAdditionalResults.Count - 1 do
-          Target.Add(BibSearcher.QuickSearchAdditionalResults[i]);
+      //// for i := 0 to BibSearcher.QuickSearchAdditionalResults.Count - 1 do
+      ////     Target.Add(BibSearcher.QuickSearchAdditionalResults[i]);
   end else
   begin
       Start := 0;
@@ -4349,14 +4364,15 @@ procedure TMedienBibliothek.GenerateAnzeigeListeFromCoverID(aCoverID: String);
 begin
   AnzeigeListIsCurrentlySorted := False;
 
-  AnzeigeListe2.Clear;
+  ///AnzeigeListe2.Clear;
   GetTitelListFromCoverID(AnzeigeListe, aCoverID);
 
   AnzeigeShowsPlaylistFiles := False;
+  DisplayContent := DISPLAY_BrowseFiles;
   AnzeigeListIsCurrentlySorted := False;
   if IsAutoSortWanted then
       SortAnzeigeliste;
-  FillQuickSearchList;
+  ///FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
 {
@@ -4376,7 +4392,7 @@ begin
   AnzeigeListIsCurrentlySorted := False;
 
   AnzeigeListe.Clear;
-  AnzeigeListe2.Clear;
+  ///AnzeigeListe2.Clear;
 
   if aTag = TagCloud.ClearTag then
       for i := 0 to Mp3ListeArtistSort.Count - 1 do
@@ -4392,10 +4408,12 @@ begin
 
 
   AnzeigeShowsPlaylistFiles := False;
+  DisplayContent := DISPLAY_BrowseFiles;
+
   AnzeigeListIsCurrentlySorted := False;
   if IsAutoSortWanted then
       SortAnzeigeliste;
-  FillQuickSearchList;
+  ///FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
 
@@ -4452,6 +4470,7 @@ end;
     - Set/Get the QuickSearchList
     --------------------------------------------------------
 }
+(*
 procedure TMedienBibliothek.FillQuickSearchList;
 begin
   if AnzeigeShowsPlaylistFiles then
@@ -4462,9 +4481,11 @@ end;
 Procedure TMedienBibliothek.ShowQuickSearchList;
 begin
     AnzeigeShowsPlaylistFiles := False;
+    DisplayContent := DISPLAY_QuickSearch;
     AnzeigeListIsCurrentlySorted := False;
     BibSearcher.ShowQuickSearchList;
 end;
+*)
 
 {
     --------------------------------------------------------
@@ -4517,6 +4538,13 @@ begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
     BibSearcher.EmptySearch(Mode);
+    LeaveCriticalSection(CSUpdate);
+end;
+procedure TMedienBibliothek.ShowMarker(aIndex: Byte);
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.SearchMarker(aIndex);
     LeaveCriticalSection(CSUpdate);
 end;
 
@@ -4577,6 +4605,7 @@ begin
         CON_PLAYCOUNTER         : NewSortMethod := AFComparePlayCounter;
         CON_LASTFMTAGS          : NewSortMethod := AFCompareLastFMTagsExists;
         CON_CD                  : NewSortMethod := AFCompareCD;
+        CON_FAVORITE            : NewSortMethod := AFCompareFavorite;
     else
         NewSortMethod := AFComparePath;
     end;
@@ -4611,7 +4640,7 @@ end;
     - Sort the files in the list
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.SortAList(aList: TObjectList);
+(*procedure TMedienBibliothek.SortAList(aList: TObjectList);
 begin
 
     aList.Sort(MainSort);
@@ -4640,11 +4669,12 @@ begin
     CON_RATING              : if SortAscending then aList.Sort(Sortieren_Rating_asc) else aList.Sort(Sortieren_Rating_Desc);
   end;
   }
-end;
+end;   *)
 procedure TMedienBibliothek.SortAnzeigeListe;
 begin
-  SortAList(AnzeigeListe);
-  SortAList(AnzeigeListe2);
+  AnzeigeListe.Sort(MainSort);
+  ///SortAList(AnzeigeListe);
+  ///SortAList(AnzeigeListe2);
   AnzeigeListIsCurrentlySorted := True;
 end;
 

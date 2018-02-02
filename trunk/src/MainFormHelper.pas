@@ -57,19 +57,11 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure HandleNewConnectedDrive;
 
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
-
-    // Fills the TreeView with 2 Lists (used for Quicksearch)
-    procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
-
-    procedure FillTreeViewQueryTooShort(Dummy: TAudioFile);
-
-    // Fills the TreeView with 2 Lists and re-select previous selected one
-    procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
+    procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
 
     function GetObjectAt(form: TForm; x,y: integer): TControl;
     function ObjectIsPlaylist(aName:string): Boolean;
     function ObjectIsHeadphone(aName:string): Boolean;
-
 
     // Blockiert GUI-Elemente, die ein Hinzufügen/Löschen von Elementen in der Medienbib verursachen
     procedure BlockeMedienListeUpdate(block: Boolean);
@@ -373,13 +365,14 @@ var i: integer;
   Data:PTreeData;
   tmpAudioFile: TAudioFile;
 
-  function SameFile(File1, File2: TAudioFile): Boolean;
-  begin
-      if assigned(File1) and assigned(File2) then
-          result := (File1.Dateiname = File2.Dateiname) AND (File1.Ordner = File2.Ordner)
-      else
-          result := False;
-  end;
+        function SameFile(File1, File2: TAudioFile): Boolean;
+        begin
+            if assigned(File1) and assigned(File2) then
+                result := (File1.Dateiname = File2.Dateiname) AND (File1.Ordner = File2.Ordner)
+            else
+                result := False;
+        end;
+
 begin
     with Nemp_MainForm do
     begin
@@ -395,165 +388,80 @@ begin
         else
             VST.Header.SortColumn := GetColumnIDfromContent(VST, MedienBib.Sortparams[0].Tag);
 
-        for i:=0 to MP3Liste.Count-1 do
-            AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
 
-        VST.EndUpdate;
-
-        // Knoten mit AudioFile suchen und focussieren
-        NewNode := VST.GetFirst;
-        if assigned(Newnode) then
+        if (MP3Liste.Count = 0) then
         begin
-            Data := VST.GetNodeData(NewNode);
-            tmpAudioFile := Data^.FAudioFile;
-            //if tmpAudioFile <> AudioFile then
-            if Not SameFile(tmpAudioFile, AudioFile) then
-            repeat
-                NewNode := VST.GetNext(NewNode);
-                if assigned(NewNode) then
-                begin
-                    Data := VST.GetNodeData(NewNode);
-                    tmpAudioFile := Data^.FAudioFile;
-                end;
-            until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
-
-            // Ok, we didn't found our AudioFile.
-            // get the first one in the list.
-            if not assigned(NewNode) then
-            begin
-                NewNode := VST.GetFirst;
-                // and get the corresponding AudioFile again
-                if assigned(NewNode) then
-                begin
-                    Data := VST.GetNodeData(NewNode);
-                    tmpAudioFile := Data^.FAudioFile;
-                end;
-            end;
-
-            if assigned(Newnode) then // Nur zur Sicherheit!
-            begin
-              VST.Selected[NewNode] := True;
-              VST.FocusedNode := NewNode;
-            //  AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-              ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
-            end
-            // else
-            //  AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-        end
-        else
-        begin
-            // no file in view
-        //    AktualisiereDetailForm(NIL, SD_MEDIENBIB);
+            // just add a Dummyfile showing "No results"
+            AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
             ShowVSTDetails(Nil);
-        end;
-    end;
-end;
-
-procedure FillTreeViewQuickSearch(List1, List2: TObjectList; Dummy: TAudioFile);
-var i: integer;
-    NewNode:PVirtualNode;
-    Data:PTreeData;
-    tmpAudioFile: TAudioFile;
-begin
-    with Nemp_MainForm do
-    begin
-        VST.BeginUpdate;
-        VST.Clear;
-        for i:=0 to List1.Count-1 do
-            AddVSTMp3(VST,Nil,TAudioFile(List1.Items[i]));
-
-        if ((List1.Count > 0) and (List2.Count > 0))
-            or ((List1.Count = 0) and (List2.Count = 0))
-        then
-            AddVSTMp3(VST, NIL, Dummy);
-
-        for i:=0 to List2.Count-1 do
-            AddVSTMp3(VST,Nil,TAudioFile(List2.Items[i]));
-
-        VST.EndUpdate;
-
-        NewNode := VST.GetFirst;
-        if assigned(Newnode) then
-        begin
-            Data := VST.GetNodeData(NewNode);
-            tmpAudioFile := data^.FAudioFile;
-            if tmpAudioFile <> Dummy then
-            begin
-                VST.Selected[NewNode] := True;
-                VST.FocusedNode := NewNode;
-                //AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-                ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
-            end else
-            begin
-                //AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-                ShowVSTDetails(Nil);
-            end;
         end else
         begin
-            //AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-            ShowVSTDetails(Nil);
+            for i := 0 to MP3Liste.Count-1 do
+                AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
+
+            // Knoten mit AudioFile suchen und focussieren
+            NewNode := VST.GetFirst;
+            if assigned(Newnode) then
+            begin
+                Data := VST.GetNodeData(NewNode);
+                tmpAudioFile := Data^.FAudioFile;
+
+                if Not SameFile(tmpAudioFile, AudioFile) then
+                repeat
+                    NewNode := VST.GetNext(NewNode);
+                    if assigned(NewNode) then
+                    begin
+                        Data := VST.GetNodeData(NewNode);
+                        tmpAudioFile := Data^.FAudioFile;
+                    end;
+                until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
+
+                // Ok, we didn't found our AudioFile.
+                // get the first one in the list.
+                if not assigned(NewNode) then
+                begin
+                    NewNode := VST.GetFirst;
+                    // and get the corresponding AudioFile again
+                    if assigned(NewNode) then
+                    begin
+                        Data := VST.GetNodeData(NewNode);
+                        tmpAudioFile := Data^.FAudioFile;
+                    end;
+                end;
+
+                if assigned(Newnode) then // Nur zur Sicherheit!
+                begin
+                    VST.Selected[NewNode] := True;
+                    VST.FocusedNode := NewNode;
+                    ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
+                end
+            end else
+            begin
+                // no file in view
+                ShowVSTDetails(Nil);
+            end;
         end;
+
+        VST.EndUpdate;
     end;
 end;
 
-procedure FillTreeViewQueryTooShort(Dummy: TAudioFile);
+
+procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
 begin
     with Nemp_MainForm do
     begin
+        MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
+
         VST.BeginUpdate;
         VST.Clear;
-
-        AddVSTMp3(VST, NIL, Dummy);
-
+        AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
         VST.EndUpdate;
         // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         ShowVSTDetails(Nil);
     end;
 end;
 
-procedure FillTreeViewQuickSearchReselect(List1, List2: TObjectList; Dummy: TAudioFile; oldFile: TAudioFile);
-var NewNode:PVirtualNode;
-  Data:PTreeData;
-  tmpAudioFile: TAudioFile;
-begin
-    FillTreeViewQuickSearch(List1, List2, Dummy);
-    with Nemp_MainForm do
-    begin
-        if oldFile = Nil then exit;
-
-        // Knoten mit AudioFile suchen und focussieren
-        NewNode := VST.GetFirst;
-        if assigned(Newnode) then
-        begin
-          Data := VST.GetNodeData(NewNode);
-          tmpAudioFile := Data^.FAudioFile;
-          if tmpAudioFile <> oldFile then
-          repeat
-            NewNode := VST.GetNext(NewNode);
-            Data := VST.GetNodeData(NewNode);
-            tmpAudioFile := Data^.FAudioFile;
-          until (tmpAudioFile = oldFile) OR (NewNode=NIL);
-
-          if assigned(Newnode) then // Nur zur Sicherheit!
-          begin
-            VST.Selected[NewNode] := True;
-            VST.FocusedNode := NewNode;
-            ShowVSTDetails(tmpAudioFile, SD_MEDIENBIB);
-            // AktualisiereDetailForm(tmpAudioFile, SD_MEDIENBIB);
-          end
-          else
-          begin
-              // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-              ShowVSTDetails(Nil);
-          end;
-        end
-        else
-        begin
-            // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
-            ShowVSTDetails(Nil);
-        end;
-    end;
-end;
 
 
 function GetObjectAt(form: TForm; x,y: integer): TControl;
@@ -1291,8 +1199,7 @@ function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String;
 // TagToReplace =  '' -> add new tag (commas allowed)
 // TagToReplace <> '' -> rename a existing tag (no cammas allowed)
 var ClickedOK, askNoMore: Boolean;
-    backup: String;
-    i, dlgresult: Integer;
+    dlgresult: Integer;
 begin
     result := False;
     if not assigned(aAudioFile) then
@@ -1300,8 +1207,6 @@ begin
 
     if aAudioFile.HasSupportedTagFormat then
     begin
-        backup := aAudioFile.RawTagLastFM;
-
         if TagToReplace = '' then
             ClickedOK := InputQuery(MainForm_AddTagQueryCaption, MainForm_AddTagQueryLabel, NewTag)
         else
