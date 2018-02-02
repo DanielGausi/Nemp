@@ -61,7 +61,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Top = 6
     Width = 454
     Height = 550
-    ActivePage = TabPlayer6
+    ActivePage = TabPlayer1
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -3677,15 +3677,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_PlayerExt_SafePlayback: TGroupBox
         Left = 8
-        Top = 184
+        Top = 271
         Width = 431
-        Height = 49
+        Height = 50
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Safe playback'
         TabOrder = 1
         DesignSize = (
           431
-          49)
+          50)
         object cb_SafePlayback: TCheckBox
           Left = 16
           Top = 20
@@ -3694,6 +3694,46 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Use safe playback'
           TabOrder = 0
+        end
+      end
+      object grpBoxMidi: TGroupBox
+        Left = 8
+        Top = 184
+        Width = 431
+        Height = 81
+        Anchors = [akLeft, akTop, akRight]
+        Caption = 'MIDI playback'
+        TabOrder = 2
+        DesignSize = (
+          431
+          81)
+        object LblSoundFont: TLabel
+          Left = 16
+          Top = 20
+          Width = 401
+          Height = 13
+          Anchors = [akLeft, akTop, akRight]
+          Caption = 'SoundFont file'
+        end
+        object editSoundFont: TEdit
+          Left = 16
+          Top = 39
+          Width = 368
+          Height = 21
+          Hint = 'The SoundFont file used for MIDI playback'
+          Anchors = [akLeft, akTop, akRight]
+          TabOrder = 0
+        end
+        object BtnSelectSoundFontFile: TButton
+          Left = 390
+          Top = 39
+          Width = 25
+          Height = 21
+          Hint = 'Select file'
+          Anchors = [akTop, akRight]
+          Caption = '...'
+          TabOrder = 1
+          OnClick = BtnSelectSoundFontFileClick
         end
       end
     end
@@ -5040,10 +5080,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       'Commonly used settings'
       'All settings')
   end
-  object ColorDialog1: TColorDialog
-    Left = 104
-    Top = 308
-  end
   object OpenDlg_CountdownSongs: TOpenDialog
     Left = 112
     Top = 232
@@ -5068,5 +5104,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
     HTTPOptions = [hoForceEncodeParams]
     Left = 48
     Top = 16
+  end
+  object OpenDlg_SoundFont: TOpenDialog
+    Filter = 'Soundfonts (sf2/sf2pack)|*.sf2;*.sf2pack|All files|*.*'
+    Left = 80
+    Top = 304
   end
 end

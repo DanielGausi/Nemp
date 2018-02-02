@@ -278,8 +278,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 115);
-    SetLength(fPartyControls, 115);
+    Setlength(fPositionArray, 116);
+    SetLength(fPartyControls, 116);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -412,6 +412,7 @@ begin
 
         SetOriginalPosition(TabBtn_Playlist     , i);
         SetOriginalPosition(TabBtn_Medialib     , i);
+        SetOriginalPosition(TabBtn_Marker       , i);
 
         Setlength(fPositionArray, i);
         SetLength(fPartyControls, i);
@@ -437,7 +438,7 @@ begin
         SetAdditionalOriginalPosition(MedienListeStatusLBL, i);
         SetAdditionalOriginalPosition(GRPBOXVST           , i);
         SetAdditionalOriginalPosition(EDITFastSearch               , i);
-        SetAdditionalOriginalPosition(CB_MedienBibGlobalQuickSearch, i);
+        //SetAdditionalOriginalPosition(CB_MedienBibGlobalQuickSearch, i);
         SetAdditionalOriginalPosition(Lbl_CoverFlow, i);
 
         SetAdditionalOriginalPosition(EditPlaylistSearch           , i);
@@ -558,16 +559,16 @@ begin
 
 
 
-        CB_MedienBibGlobalQuickSearch.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
-        CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
-        CB_MedienBibGlobalQuickSearch.Left := ChangeProc(fAdditionalPositionsArray[13].Left);
-        CB_MedienBibGlobalQuickSearch.Top := ChangeProc(fAdditionalPositionsArray[13].Top);
+        //CB_MedienBibGlobalQuickSearch.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
+        //CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
+        //CB_MedienBibGlobalQuickSearch.Left := ChangeProc(fAdditionalPositionsArray[13].Left);
+        //CB_MedienBibGlobalQuickSearch.Top := ChangeProc(fAdditionalPositionsArray[13].Top);
 
         Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[14].Height);
         Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
         Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
 
-        CB_MedienBibGlobalQuickSearch.Font.Size := EDITFastSearch.Font.Size;
+        //CB_MedienBibGlobalQuickSearch.Font.Size := EDITFastSearch.Font.Size;
 
 
         PlaylistVST.Font.Size := ChangeProc(NempOptions.DefaultFontSize);

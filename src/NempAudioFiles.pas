@@ -226,6 +226,9 @@ type
 
         fVoteCounter: Integer;
 
+        fFavorite: Byte; // Marker for the new favorite list (preselect files for the playlist)
+                         // Byte ist used instead of Bool, because there was still a DummyByte in the fileformat left, but no Bool
+
         fAudioType: TAudioType; // undef, File, Stream, CD-Audio
 
         // In the playlist, every AudioFile can have a list
@@ -329,7 +332,8 @@ type
         // Everytime some audiofiles are displayed in the main VST,
         // the displayed files get a new ViewCounter-ID to identify them
         // fast at "better Searches". See comments in BibSearcherClass.
-        ViewCounter: Integer;
+        // 4.7.3: Disabled this stuff
+        // ViewCounter: Integer;
 
         // WebServerID is used by Nemp WebServer
         // Each file will get ist own ID, which will be used for downloading
@@ -407,6 +411,7 @@ type
         property isCDDA: Boolean read fGetIsCDDA;
 
         property VoteCounter: Integer read fVoteCounter write fVoteCounter;
+        property Favorite: Byte read fFavorite write fFavorite;
 
         constructor Create;
         destructor Destroy; override;
@@ -571,7 +576,7 @@ const
       MP3DB_KOMMENTAR   = 21;
       MP3DB_YEAR        = 22;
       MP3DB_GENRE       = 23;
-        MP3DB_GENRE_STR   = 26;  //$1A
+      MP3DB_GENRE_STR   = 26;  //$1A
       MP3DB_LYRICS      = 24;
       MP3DB_ID3KOMMENTAR = 25;
       MP3DB_COVERID = 27;
@@ -584,7 +589,9 @@ const
       // some dummy IDs for future use.
       // Ints are Integer, Bytes are Bytes, Texts are strings
       // note: some of them are already in use
-      MP3DB_DUMMY_Byte2  = 29;
+      //MP3DB_DUMMY_Byte2  = 29;
+      MP3DB_FAVORITE  = 29;
+
       //MP3DB_DUMMY_Int1   = 30;
       // MP3DB_DUMMY_Int2   = 31;
       MP3DB_PLAYCOUNTER  = 31;
@@ -1082,7 +1089,7 @@ end;
 function TAudioFile.GetHint(naArtist, naTitle, naAlbum: Integer): UnicodeString;
 begin
     case fAudioType of
-        at_Undef: result := 'ERROR: UNDEFINED AUDIOTYPE';
+        at_Undef: result := ''; // 'ERROR: UNDEFINED AUDIOTYPE';
 
         at_File: begin
             result :=
@@ -2300,6 +2307,7 @@ begin
     if Rating > 0 then
          aOggFile.SetPropertyByFieldname(VORBIS_RATING, IntToStr(Rating))
     else aOggFile.SetPropertyByFieldname(VORBIS_RATING, '');
+
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     aOggFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(RawTagLastFM));
 end;
@@ -2350,7 +2358,6 @@ begin
     if Rating > 0 then
          aBaseApeFile.SetValueByKey(APE_RATING     , IntToStr(Rating))
     else aBaseApeFile.SetValueByKey(APE_RATING     , '');
-
     aBaseApeFile.SetValueByKey(APE_CATEGORIES , String(RawTagLastFM));
 end;
 
@@ -2591,7 +2598,6 @@ var GenreIDX:byte;
     Id: Byte;
     dummy: Integer;
     Wyear: word;
-    DummyByte: Byte;
     DummyInt: Integer;
     Dummystr: UnicodeString;
 begin
@@ -2649,7 +2655,7 @@ begin
             MP3DB_RATING : aStream.Read(fRating, sizeOf(fRating));
             MP3DB_CUEPRESENT  : aStream.Read(DummyInt, sizeOf(DummyInt));
 
-            MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
+            MP3DB_FAVORITE : aStream.Read(fFavorite, sizeOf(fFavorite));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
@@ -2682,7 +2688,6 @@ var GenreIDX:byte;
     Id: Byte;
     dummy: Integer;
     Wyear: word;
-    DummyByte: Byte;
     DummyInt: Integer;
     Dummystr: UnicodeString;
 
@@ -2739,7 +2744,8 @@ begin
                                     aStream.Read(cuePresent, sizeOf(cuePresent));
                                     GetCueList;
                                 end;
-            MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
+            //MP3DB_DUMMY_Byte2 : aStream.Read(DummyByte, sizeOf(DummyByte));
+            MP3DB_FAVORITE : aStream.Read(fFavorite, sizeOf(fFavorite));
             //MP3DB_DUMMY_Int1  : aStream.Read(DummyInt, sizeOf(DummyInt));
             MP3DB_PLAYCOUNTER  : aStream.Read(fPlayCounter, sizeOf(fPlayCounter));
             MP3DB_DUMMY_Int3  : aStream.Read(DummyInt, sizeOf(DummyInt));
@@ -2882,6 +2888,13 @@ begin
       ID := MP3DB_PLAYCOUNTER;
       aStream.Write(ID, SizeOf(Id));
       aStream.Write(fPlayCounter, SizeOf(fPlayCounter));
+    end;
+
+    if fFavorite <> 0 then
+    begin
+      ID := MP3DB_FAVORITE;
+      aStream.Write(ID, SizeOf(Id));
+      aStream.Write(fFavorite, SizeOf(fFavorite));
     end;
 
     if Year<>'' then

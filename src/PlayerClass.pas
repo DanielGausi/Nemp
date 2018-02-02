@@ -35,7 +35,7 @@ interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
       ShellApi, IniFiles, Dialogs, Graphics, cddaUtils,
-      bass, bass_fx, basscd, spectrum_vis, DateUtils,
+      bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
       Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection;
@@ -87,6 +87,8 @@ type
       fFileNearEndSyncHandleM: DWord; // for fading into the next track
       fFileNearEndSyncHandleS: DWord; // (x seconds before file end OR SilenceBegin)
 
+      fSoundfont  : HSOUNDFONT;
+      fSoundfontFilename : String;
 
       fCueSyncHandleM: DWord;
       fCueSyncHandleS: DWord;
@@ -371,11 +373,16 @@ type
 
         property Nemp_BassUserAgent: String read fNemp_BassUserAgent;
 
+        property SoundfontFilename : String read fSoundfontFilename write fSoundfontFilename;
+
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
 
         procedure InitBassEngine(HND: HWND; PathToDlls: String; var Filter: UnicodeString);
+
+        procedure SetSoundFont(aFilename: String);
+
         // Nötig z.B. bei meinem Notebook, wenn man aus dem Ruhezustand hochkommt
         procedure ReInitBassEngine;
         procedure UpdateFlags;
@@ -697,16 +704,54 @@ end;
     Initialization of the bass-engine
     --------------------------------------------------------
 }
+
+procedure TNempPlayer.SetSoundFont(aFilename: String);
+var NewSoundfont  : BASS_MIDI_FONT;
+begin
+    NewSoundfont.font := BASS_MIDI_FontInit(PChar(aFilename), BASS_UNICODE);  // open new soundfont
+    if (NewSoundfont.font <> 0) and (NewSoundfont.font <> fSoundfont) then
+    begin
+        NewSoundfont.preset := -1;                                  // use all presets
+        NewSoundfont.bank   := 0;                                   // use default bank(s)
+        BASS_MIDI_FontFree(fSoundfont);                             // free old soundfont
+        BASS_MIDI_StreamSetFonts(0, NewSoundfont, 1);               // set default soundfont
+        BASS_MIDI_StreamSetFonts(MainStream, NewSoundfont, 1);      // set for current stream too
+        BASS_MIDI_StreamSetFonts(SlideStream, NewSoundfont, 1);
+        fSoundfont := NewSoundfont.font;
+        fSoundfontFilename := aFilename;
+    end;
+end;
+
 procedure TNempPlayer.InitBassEngine(HND: HWND; PathToDlls: String; var Filter: UnicodeString);
 var count: LongWord;
     fh: THandle;
     fd: TWin32FindData;
     plug: DWORD;
-    Info: PBass_PluginInfo;
-    a,i: integer;
-    tmpext: TStringList;
+    i: integer;
     tmpfilter: String;
     BassInfo: BASS_DEVICEINFO;
+    sf  : BASS_MIDI_FONT;
+
+    procedure ProcessPLugin(aPlug: Dword);
+    var Info: PBass_PluginInfo;
+        a, j: Integer;
+        tmpext: TStringList;
+    begin
+        Info := BASS_PluginGetInfo(aPlug); // get plugin info to add to the file selector filter...
+        for a := 0 to Info.formatc - 1 do
+        begin
+            // Set The OpenDialog additional, to the supported PlugIn Formats
+            Filter := Filter
+              + '|' + String(Info.Formats[a].name) + ' ' + '(' +
+              String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
+
+            //ValidExtensions
+            tmpext := Explode(';', String(Info.Formats[a].exts));
+            for j := 0 to tmpext.Count - 1 do
+                ValidExtensions.Add(StringReplace(tmpext.Strings[j],'*', '',[]));
+            FreeAndNil(tmpext);// im Explode wirds erzeugt
+        end;
+    end;
 
 begin
     // diese Werte werden bei einem Re-Init gebraucht!
@@ -748,35 +793,47 @@ begin
     if Count < HeadsetDevice then
         HeadsetDevice := MainDevice;
 
+    // Init SoundFonts for MIDI
+    if (BASS_MIDI_StreamGetFonts(0, sf, 1) >= 1) then
+        fSoundfont  := sf.font
+    else
+    begin
+        if (fSoundfontFilename <> '') and FileExists(fSoundfontFilename) then
+            SetSoundFont(fSoundfontFilename)
+        else
+        begin
+            fh := FindFirstFile(PChar(PathToDlls + '*.sf2'), fd);
+            if (fh <> INVALID_HANDLE_VALUE) then
+                SetSoundFont(PathToDlls + fd.cFileName);
+        end;
+    end;
+
     BASS_SetConfigPtr(BASS_CONFIG_NET_AGENT or BASS_UNICODE, PChar(Nemp_BassUserAgent));
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
     UpdateFlags;
     Filter := '|Standard formats (*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.aif)' + '|'
                    + '*.mp3;*.mp2;*.mp1;*.ogg;*.wav*;*.aif';
 
-    // PLugins laden. Code aus dem PLugin-Beipsiel -Projekt
+
+    // load MIDI plugin first (which is stored in the main directory now)
+    if FileExists(PChar(ExtractFilePath(ParamStr(0)) + 'bassmidi.dll')) then
+    begin
+        plug := BASS_PluginLoad(PChar(ExtractFilePath(ParamStr(0)) + 'bassmidi.dll'), BASS_UNICODE);
+        if Plug <> 0 then
+            ProcessPLugin(Plug);
+    end;
+
+    // weitere Plugins laden. Code aus dem PLugin-Beipsiel -Projekt
     fh := FindFirstFile(PChar(PathToDlls + 'bass*.dll'), fd);
     if (fh <> INVALID_HANDLE_VALUE) then
     try
         repeat
-            plug := BASS_PluginLoad(PChar(PathToDlls + fd.cFileName), BASS_UNICODE);
-            if Plug <> 0 then
+            if fd.cFileName <> 'bassmidi.dll' then
             begin
-                Info := BASS_PluginGetInfo(Plug); // get plugin info to add to the file selector filter...
-                for a := 0 to Info.formatc - 1 do
-                begin
-                    // Set The OpenDialog additional, to the supported PlugIn Formats
-                    Filter := Filter
-                      + '|' + String(Info.Formats[a].name) + ' ' + '(' +
-                      String(Info.Formats[a].exts) + ')' { , ' + fd.cFileName} + '|' + String(Info.Formats[a].exts);
-
-                    //ValidExtensions
-                    tmpext := Explode(';', String(Info.Formats[a].exts));
-                    for i := 0 to tmpext.Count - 1 do
-                        ValidExtensions.Add(StringReplace(tmpext.Strings[i],'*', '',[]));
-                    FreeAndNil(tmpext);// im Explode wirds erzeugt
-                end;
-            end
+                plug := BASS_PluginLoad(PChar(PathToDlls + fd.cFileName), BASS_UNICODE);
+                if Plug <> 0 then
+                    ProcessPLugin(Plug);
+            end;
         until Not FindNextFile(fh, fd);
     finally
         Windows.FindClose(fh);
@@ -790,8 +847,7 @@ begin
 
     Filter := 'All supported files|' + tmpfilter
                                        + Filter
-                                       + '|CD-Audio|*.cda'
-                                       ;
+                                       + '|CD-Audio|*.cda' ;
 end;
 
 procedure TNempPlayer.ReInitBassEngine;
@@ -875,6 +931,8 @@ begin
   fMainVolume := fMainVolume / 100;
   fHeadsetVolume := ini.ReadInteger('Player','HeadsetVolume',80);
   fHeadsetVolume := fHeadsetVolume / 100;
+
+  fSoundfontFilename := ini.ReadString('Player', 'SoundfontFilename', '');
 
   fUseFloatingPointChannels := Ini.ReadInteger('Player', 'FloatingPointChannels', 0);// 0: Auto-Detect, 1: Aus, 2: An
   if fUseFloatingPointChannels > 2 then fUseFloatingPointChannels := 0;
@@ -982,6 +1040,8 @@ begin
   ini.WriteInteger('Player','MainDevice',MainDevice);
   ini.WriteInteger('Player','MainVolume',Round(fMainVolume * 100));
   ini.WriteInteger('Player','HeadsetVolume',Round(fHeadsetVolume * 100));
+
+  ini.WriteString('Player', 'SoundfontFilename', fSoundfontFilename);
 
   Ini.WriteInteger('Player', 'FloatingPointChannels', fUseFloatingPointChannels);
   Ini.WriteBool('Player', 'HardwareMixing', fUseHardwareMixing);

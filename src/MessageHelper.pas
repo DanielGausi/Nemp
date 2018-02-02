@@ -64,7 +64,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
-    DeleteSelect, GnuGetText;
+    DeleteSelect, GnuGetText, MedienbibliothekClass;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -565,58 +565,35 @@ begin
 
         MB_CheckAnzeigeList: begin
             MedienBib.CleanUpDeadFilesFromVCLLists;
-            //FillTreeView(VST, MedienBib.AnzeigeListe);
             FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
         end;
 
         MB_ReFillAnzeigeList: begin
-            //FillTreeView(VST, MedienBib.AnzeigeListe);
             FillTreeView(MedienBib.AnzeigeListe, Nil);
             ShowSummary;
             if aMsg.LParam <> 0 then
                 MedienListeStatusLBL.Caption := Warning_FileNotFound;
-            //else
-            //    MedienListeStatusLBL.Caption := '';
         end;
 
-        MB_ShowSearchResults: begin
+        MB_ShowSearchResults,
+        MB_ShowQuickSearchResults,
+        MB_ShowFavorites : begin
             srList := TObjectList(aMsg.LParam);
             MedienBib.AnzeigeListe.Clear;
-            MedienBib.AnzeigeListe2.Clear;
             MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
             for i := 0 to srList.Count - 1 do
-            begin
                 MedienBib.AnzeigeListe.Add(srList[i]);
+
+            case aMsg.WParam of
+                  MB_ShowSearchResults      : MedienBib.DisplayContent := DISPLAY_Search;
+                  MB_ShowQuickSearchResults : MedienBib.DisplayContent := DISPLAY_QuickSearch;
+                  MB_ShowFavorites          : MedienBib.DisplayContent := DISPLAY_Favorites;
             end;
-            MedienBib.AnzeigeListIsCurrentlySorted := False;
             MedienBib.AnzeigeShowsPlaylistFiles := False;
-            //FillTreeView(VST, MedienBib.AnzeigeListe);
+            MedienBib.AnzeigeListIsCurrentlySorted := False;
+
             FillTreeView(MedienBib.AnzeigeListe, Nil);
-            ShowSummary;
-        end;
-
-        MB_GetQuickSearchResults: begin
-            srList := TObjectList(aMsg.LParam);
-            MedienBib.AnzeigeListe.Clear;
-            MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
-            for i := 0 to srList.Count - 1 do
-                MedienBib.AnzeigeListe.Add(srList[i]);
-
-            MedienBib.AnzeigeListIsCurrentlySorted := False;
-            MedienBib.AnzeigeShowsPlaylistFiles := False;
-        end;
-        MB_GetAdditionalQuickSearchResults: begin
-            srList := TObjectList(aMsg.LParam);
-            MedienBib.AnzeigeListe2.Clear;
-            MedienBib.AnzeigeListe2.Capacity := srList.Count + 1;
-            for i := 0 to srList.Count - 1 do
-                MedienBib.AnzeigeListe2.Add(srList[i]);
-        end;
-
-        MB_ShowQuickSearchResults: begin
-            af := TAudioFile(aMsg.LParam); // Should be the Dummy-File from BibSearcher
-            FillTreeViewQuickSearch(MedienBib.AnzeigeListe, MedienBib.AnzeigeListe2, af);
             ShowSummary;
         end;
 

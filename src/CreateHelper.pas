@@ -445,12 +445,13 @@ begin
         MM_T_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
         PM_P_Scrobbler.Checked := NempPlayer.NempScrobbler.DoScrobble;
 
-        CB_MedienBibGlobalQuickSearch.OnClick := Nil;
-        CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;
+        //CB_MedienBibGlobalQuickSearch.OnClick := Nil;
+        //CB_MedienBibGlobalQuickSearch.OnClick := CB_MedienBibGlobalQuickSearchClick;
         EditFastSearch.Text := MainForm_GlobalQuickSearch;
         EditFastSearch.Hint := MainForm_GlobalQuickSearchHint;
 
         EditPlaylistSearch.Hint := MainForm_PlaylistSearchHint;
+        TabBtn_Marker.Hint := MainForm_MarkerBtnHint;
 
         // Optionen verarbeiten, Variablen entsprechend setzen
         PM_P_ViewStayOnTop.Checked := NempOptions.MiniNempStayOnTop;

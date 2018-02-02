@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  19 NOV 2017 16:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  27 NOV 2017 13:38
 entering extended mode
 **./nemp-help-de.tex
 (nemp-help-de.tex
@@ -920,159 +920,166 @@ Overfull \hbox (13.21672pt too wide) in paragraph at lines 1043--1045
 tei-en, die man von Webradio-
  []
 
-[46] [47] [48] [49]
-Overfull \hbox (2.19778pt too wide) in paragraph at lines 1117--1118
+[46] [47] [48]
+Overfull \hbox (8.46533pt too wide) in paragraph at lines 1094--1098
+\OT1/cmr/m/n/12 auf MIDI-Dateien liegt, wer-den die-se (oft sehr groen) Soundf
+ont-Dateien
+ []
+
+[49]
+Overfull \hbox (2.19778pt too wide) in paragraph at lines 1121--1122
 []\OT1/cmr/bx/n/12 Einf[]ugen als Standard-Aktion. \OT1/cmr/m/n/12 Sorgt daf[]u
 r, dass neue Da-tei-en (bzw.
  []
 
 [50]
-Overfull \hbox (5.63618pt too wide) in paragraph at lines 1139--1140
+Overfull \hbox (5.63618pt too wide) in paragraph at lines 1143--1144
 \OT1/cmr/m/n/12 Die []Ande-rung an der Be-wer-tung wird da-bei nicht so-fort in
  der Sternchen-
  []
 
-<encoding.png, id=660, 143.03438pt x 79.04532pt>
+[51] <encoding.png, id=666, 143.03438pt x 79.04532pt>
 File: encoding.png Graphic file (type png)
  <use encoding.png>
-Package pdftex.def Info: encoding.png used on input line 1143.
+Package pdftex.def Info: encoding.png used on input line 1147.
 (pdftex.def)             Requested size: 97.5pt x 53.88155pt.
- [51 <./encoding.png>] [52]
-Overfull \hbox (8.09032pt too wide) in paragraph at lines 1171--1172
+
+[52 <./encoding.png>]
+Overfull \hbox (8.09032pt too wide) in paragraph at lines 1175--1176
 []\OT1/cmr/m/n/12 Suche im []uber-ge-ord-ne-ten Ord-ner (falls dort nicht zu-vi
 e-le Da-tei-en/Ordner
  []
 
 
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1186--1186
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1190--1190
 []   \OT1/cmtt/m/n/10.95 Track1.mp3[] 
  []
 
 
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1186--1186
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1190--1190
 []   \OT1/cmtt/m/n/10.95 Track2.mp3[] 
  []
 
 
-Overfull \hbox (0.81383pt too wide) in paragraph at lines 1198--1198
+Overfull \hbox (0.81383pt too wide) in paragraph at lines 1202--1202
 []     \OT1/cmtt/m/n/10.95 front.jpg[] 
  []
 
 
-Overfull \hbox (34.27895pt too wide) in paragraph at lines 1177--1228
+Overfull \hbox (34.27895pt too wide) in paragraph at lines 1181--1232
 [][] 
  []
 
-
-Overfull \hbox (1.44002pt too wide) in paragraph at lines 1235--1236
+[53]
+Overfull \hbox (1.44002pt too wide) in paragraph at lines 1239--1240
 []\OT1/cmr/bx/n/12 Standard-Cover. \OT1/cmr/m/n/12 Aus-wahl ei-nes ei-ge-nen St
 andard-Covers f[]ur den Fall,
  []
 
-[53] [54] [55] [56]
-Overfull \hbox (7.77505pt too wide) in paragraph at lines 1319--1320
+[54] [55] [56]
+Overfull \hbox (7.77505pt too wide) in paragraph at lines 1329--1330
 []\OT1/cmr/m/n/12 Globale Ab-schaltm[]oglich-keit f[]ur das er-wei-ter-te Skins
 -sy-stem, mit Default-
  []
 
-
-Overfull \hbox (28.77066pt too wide) in paragraph at lines 1323--1326
+[57]
+Overfull \hbox (28.77066pt too wide) in paragraph at lines 1333--1336
 \OT1/cmr/m/n/12 da ist. Ver-wen-dung kann jetzt auch Im Nemp-Einstellungsdialog
  (de)aktiviert
  []
 
-[57]
-Overfull \hbox (6.11717pt too wide) in paragraph at lines 1352--1354
+
+Overfull \hbox (6.11717pt too wide) in paragraph at lines 1362--1364
 []\OT1/cmr/m/n/12 Option \OT1/cmr/m/it/12 Einf[]ugen ans En-de der Vor-mer-k-li
 -ste \OT1/cmr/m/n/12 wie-der ge[]andert zu \OT1/cmr/m/it/12 Einf[]ugen
  []
 
-[58]
-Overfull \hbox (16.13618pt too wide) in paragraph at lines 1392--1394
+[58] [59]
+Overfull \hbox (16.13618pt too wide) in paragraph at lines 1402--1404
 []\OT1/cmr/m/n/12 Browsen in der Shoutcast-Datenbank de-ak-ti-viert. Die API wu
 r-de ge[]andert,
  []
 
-<v4_0.jpg, id=706, 734.745pt x 478.78876pt>
+<v4_0.jpg, id=715, 734.745pt x 478.78876pt>
 File: v4_0.jpg Graphic file (type jpg)
  <use v4_0.jpg>
-Package pdftex.def Info: v4_0.jpg used on input line 1404.
+Package pdftex.def Info: v4_0.jpg used on input line 1414.
 (pdftex.def)             Requested size: 272.99881pt x 177.90155pt.
 
-Overfull \hbox (13.78128pt too wide) in paragraph at lines 1409--1409
+Overfull \hbox (13.78128pt too wide) in paragraph at lines 1419--1419
 [][]\OT1/cmr/bx/n/14.4 Version 4.0.0, Mai-Juli 2010: Nemp wird Open-Source 
  []
 
-[59] [60 <./v4_0.jpg>]
-Overfull \hbox (13.11945pt too wide) in paragraph at lines 1445--1446
+[60 <./v4_0.jpg>]
+Overfull \hbox (13.11945pt too wide) in paragraph at lines 1455--1456
 []\OT1/cmr/m/n/12 Intelligentere Gr[]oen-ver[]ande-rung der Kom-po-nen-ten bei
  Re-si-ze des Haupt-
  []
 
 [61]
-Overfull \hbox (6.57518pt too wide) in paragraph at lines 1487--1488
+Overfull \hbox (6.57518pt too wide) in paragraph at lines 1497--1498
 []\OT1/cmr/m/n/12 Diverse Feh-ler beim Star-ten von CD/DVD oder an-de-ren schre
 ib-gesch[]utz-
  []
 
-[62]
-Overfull \hbox (8.14726pt too wide) in paragraph at lines 1530--1531
+[62] [63]
+Overfull \hbox (8.14726pt too wide) in paragraph at lines 1540--1541
 []\OT1/cmr/m/n/12 Wenn kei-ne Me-dien-bi-blio-thek ge-la-den wur-de, funk-tio-n
 ier-te das Deskband
  []
 
-[63]
-Overfull \hbox (8.15144pt too wide) in paragraph at lines 1557--1558
+
+Overfull \hbox (8.15144pt too wide) in paragraph at lines 1567--1568
 []\OT1/cmr/m/n/12 Deutlich ver-bes-ser-tes her-un-ter-la-den von Ly-rics. D.h. 
 schnel-ler, zu-verl[]assi-
  []
 
-
-Overfull \hbox (14.47914pt too wide) in paragraph at lines 1560--1561
+[64]
+Overfull \hbox (14.47914pt too wide) in paragraph at lines 1570--1571
 []\OT1/cmr/m/n/12 Deutlich ver-bes-ser-te Un-terst[]utzung von We-bra-dio. Su-c
 he in der Shoutcast-
  []
 
-[64] [65] [66] <v3_0.jpg, id=755, 957.5775pt x 719.68875pt>
+[65] [66] <v3_0.jpg, id=758, 957.5775pt x 719.68875pt>
 File: v3_0.jpg Graphic file (type jpg)
  <use v3_0.jpg>
-Package pdftex.def Info: v3_0.jpg used on input line 1648.
+Package pdftex.def Info: v3_0.jpg used on input line 1658.
 (pdftex.def)             Requested size: 272.99881pt x 205.1793pt.
-
-[67] [68 <./v3_0.jpg>] [69] <v2_5.jpg, id=772, 827.09pt x 611.28375pt>
+ [67]
+[68 <./v3_0.jpg>] [69] <v2_5.jpg, id=775, 827.09pt x 611.28375pt>
 File: v2_5.jpg Graphic file (type jpg)
 
 <use v2_5.jpg>
-Package pdftex.def Info: v2_5.jpg used on input line 1738.
+Package pdftex.def Info: v2_5.jpg used on input line 1748.
 (pdftex.def)             Requested size: 272.99881pt x 201.77089pt.
  [70] [71 <./v2_5.jpg>] [72]
-Overfull \hbox (9.74446pt too wide) in paragraph at lines 1858--1860
+Overfull \hbox (9.74446pt too wide) in paragraph at lines 1868--1870
 []\OT1/cmr/m/n/12 Verbesserte Un-terst[]utzung f[]ur Multimedia-Tastaturen (hof
 -fent-lich) durch
  []
 
-<v2_1.png, id=794, 679.78969pt x 487.06969pt>
+<v2_1.png, id=797, 679.78969pt x 487.06969pt>
 File: v2_1.png Graphic file (type png)
  <use v2_1.png>
-Package pdftex.def Info: v2_1.png used on input line 1884.
+Package pdftex.def Info: v2_1.png used on input line 1894.
 (pdftex.def)             Requested size: 272.99881pt x 195.60478pt.
 
-Overfull \hbox (20.68962pt too wide) in paragraph at lines 1889--1889
+Overfull \hbox (20.68962pt too wide) in paragraph at lines 1899--1899
 [][]\OT1/cmr/bx/n/14.4 Version 2.1, Fe-bru-ar 2006: Nemp wird zum mp3-Player 
  []
 
-[73] [74 <./v2_1.png>] <v1_0.png, id=807, 475.7775pt x 356.0803pt>
+[73] [74 <./v2_1.png>] <v1_0.png, id=809, 475.7775pt x 356.0803pt>
 File: v1_0.png Graphic file (type png)
 
 <use v1_0.png>
-Package pdftex.def Info: v1_0.png used on input line 1948.
+Package pdftex.def Info: v1_0.png used on input line 1958.
 (pdftex.def)             Requested size: 312.00119pt x 233.51956pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1954.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1964.
  [75] [76 <./v1_0.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1954.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1964.
  (nemp-help-de.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1954.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1954.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1964.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1964.
 
 Package rerunfilecheck Info: File `nemp-help-de.out' has not changed.
 (rerunfilecheck)             Checksum: 9E9B396423231512FA86BCDB7C371EE0;4762.
@@ -1080,11 +1087,11 @@ Package rerunfilecheck Info: File `nemp-help-de.out' has not changed.
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1954.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1964.
  ) 
 Here is how much of TeX's memory you used:
- 7055 strings out of 493335
- 100963 string characters out of 3136677
+ 7056 strings out of 493335
+ 100975 string characters out of 3136677
  187347 words of memory out of 3000000
  10233 multiletter control sequences out of 15000+200000
  13602 words of font info for 53 fonts, out of 3000000 for 9000
@@ -1103,9 +1110,9 @@ x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x8
 /MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (x86)/M
 iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files (x86)/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on nemp-help-de.pdf (77 pages, 2079663 bytes).
+Output written on nemp-help-de.pdf (77 pages, 2082003 bytes).
 PDF statistics:
- 905 PDF objects out of 1000 (max. 8388607)
- 198 named destinations out of 1000 (max. 500000)
+ 909 PDF objects out of 1000 (max. 8388607)
+ 199 named destinations out of 1000 (max. 500000)
  797 words of extra memory for PDF output out of 10000 (max. 10000000)
 

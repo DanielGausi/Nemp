@@ -91,7 +91,7 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  NempApi in 'common\NempApi.pas',
+  NempApi in 'common\NempApi.pas' ,
   bass in '3rd Party Units\bass.pas',
   bass_fx in '3rd Party Units\bass_fx.pas',
   basscd in '3rd Party Units\basscd.pas',
@@ -106,7 +106,9 @@ uses
   Windows_Fragment in '3rd Party Units\Windows_Fragment.pas',
   gnugettext in '3rd Party Units\gnugettext.pas',
   languagecodes in '3rd Party Units\languagecodes.pas',
-  PlayWebstream in 'PlayWebstream.pas'
+  PlayWebstream in 'PlayWebstream.pas',
+  bassmidi in '3rd Party Units\bassmidi.pas'
+
   {$IFDEF USESTYLES}
    ,vcl.themes, vcl.styles
   {$ENDIF};

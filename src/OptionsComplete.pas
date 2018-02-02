@@ -68,7 +68,6 @@ type
     BTNok: TButton;
     BTNCancel: TButton;
     BTNApply: TButton;
-    ColorDialog1: TColorDialog;
     PageControl1: TPageControl;
     TabPlayer0: TTabSheet;
     TabSystem2: TTabSheet;
@@ -507,6 +506,11 @@ type
     cb_AutoResolveInconsistencies: TCheckBox;
     cb_AskForAutoResolveInconsistencies: TCheckBox;
     cb_ShowAutoResolveInconsistenciesHints: TCheckBox;
+    grpBoxMidi: TGroupBox;
+    LblSoundFont: TLabel;
+    editSoundFont: TEdit;
+    OpenDlg_SoundFont: TOpenDialog;
+    BtnSelectSoundFontFile: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -611,6 +615,7 @@ type
     procedure cb_UseWeightedRNGClick(Sender: TObject);
     procedure RandomWeight05Exit(Sender: TObject);
     procedure BtnCountRatingClick(Sender: TObject);
+    procedure BtnSelectSoundFontFileClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -1239,6 +1244,8 @@ begin
   Lbl_Framerate.Caption := inttostr(1000 DIV NempPlayer.VisualizationInterval) + ' fps';
 
   SEBufferSize.Value := BASS_GetConfig(BASS_CONFIG_BUFFER);
+
+  editSoundFont.Text := NempPlayer.SoundfontFilename;
 
   CB_AutoScanPlaylist.checked := NempPlaylist.AutoScan;
   CB_AutoPlayOnStart.Checked  := NempPlaylist.AutoPlayOnStart;
@@ -2085,6 +2092,13 @@ begin
     EditCountDownSong.Text := OpenDlg_CountdownSongs.FileName;
 end;
 
+procedure TOptionsCompleteForm.BtnSelectSoundFontFileClick(Sender: TObject);
+begin
+    if OpenDlg_SoundFont.Execute then
+        editSoundFont.Text := OpenDlg_SoundFont.FileName;
+end;
+
+
 procedure TOptionsCompleteForm.BtnCountRatingClick(Sender: TObject);
 var aList: TObjectList;
     i, rawRating: Integer;
@@ -2236,6 +2250,14 @@ begin
   Bass_SetDevice(MainDeviceCB.ItemIndex + 1);
   BASS_SetConfig(BASS_CONFIG_BUFFER,SEBufferSize.Value);
   NempPlayer.PlayBufferSize := SEBufferSize.Value;
+
+  if (editSoundFont.Text <> NempPlayer.SoundfontFilename)
+      and FileExists(editSoundFont.Text)
+  then
+  begin
+      NempPlayer.SoundfontFilename := editSoundFont.Text;
+      NempPlayer.SetSoundFont(editSoundFont.Text);
+  end;
 
 //  if (HeadPhonesDeviceCB.Items.Count > 0) AND (MainDeviceCB.ItemIndex = HeadPhonesDeviceCB.ItemIndex) then
 //  begin

@@ -325,8 +325,8 @@ type
     procedure btn_AddTagClick(Sender: TObject);
     procedure Btn_RenameTagClick(Sender: TObject);
     procedure Btn_RemoveTagClick(Sender: TObject);
-    procedure lb_TagsKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    //procedure lb_TagsKeyDown(Sender: TObject; var Key: Word;
+    //  Shift: TShiftState);
     procedure lb_TagsDblClick(Sender: TObject);
     procedure Btn_TagCloudEditorClick(Sender: TObject);
     //procedure pm_AddIgnoreRuleClick(Sender: TObject);
@@ -486,8 +486,7 @@ begin
 end;
 
 procedure TFDetails.LoadStarGraphics;
-var i:integer;
-    s,h,u: TBitmap;
+var s,h,u: TBitmap;
     baseDir: String;
 
 begin
@@ -800,6 +799,7 @@ begin
 end;
 }
 
+(*
 procedure TFDetails.lb_TagsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var newTagDummy, CurrentTagToChange: String;
@@ -833,6 +833,7 @@ begin
     end;
     }
 end;
+*)
 
 {
     --------------------------------------------------------

@@ -157,6 +157,7 @@ begin
     fHalfStar.Assign(half);
     fUnSetStar.Assign(none);
 end;
+
                                           // oder nur ein canvas?
 procedure TRatingHelper.DrawRatingInStars(aRating: Integer; aCanvas: TCanvas; ImageHeight: Integer; Left: Integer=0);
 var i, p: Integer;
@@ -195,6 +196,7 @@ begin
               ImageHeight Div 2 - (fUnSetStar.Height Div 2),
               fUnSetStar);
 end;
+
 
 procedure TRatingHelper.DrawRatingInStarsOnBitmap(aRating: Integer;
   aBitmap: TBitmap; ImageWidth: Integer; ImageHeight: Integer);

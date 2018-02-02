@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  19 NOV 2017 16:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  27 NOV 2017 13:39
 entering extended mode
 **./nemp-help-en.tex
 (nemp-help-en.tex
@@ -738,92 +738,91 @@ Overfull \hbox (5.59554pt too wide) in paragraph at lines 1078--1079
 e play-ers \OT1/cmr/m/n/12 from other brands).
  []
 
-[44] [45] [46] <encoding.png, id=646, 143.03438pt x 79.04532pt>
+[44] [45] [46] <encoding.png, id=648, 143.03438pt x 79.04532pt>
 File: encoding.png Graphic file (type png)
 
 <use encoding.png>
-Package pdftex.def Info: encoding.png used on input line 1158.
+Package pdftex.def Info: encoding.png used on input line 1163.
 (pdftex.def)             Requested size: 97.5pt x 53.88155pt.
- [47 <./encoding.png>]
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1203--1203
+ [47 <./encoding.png>] [48]
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1208--1208
 []   \OT1/cmtt/m/n/10.95 Track1.mp3[] 
  []
 
 
-Overfull \hbox (0.75562pt too wide) in paragraph at lines 1203--1203
+Overfull \hbox (0.75562pt too wide) in paragraph at lines 1208--1208
 []   \OT1/cmtt/m/n/10.95 Track2.mp3[] 
  []
 
 
-Overfull \hbox (0.81383pt too wide) in paragraph at lines 1215--1215
+Overfull \hbox (0.81383pt too wide) in paragraph at lines 1220--1220
 []     \OT1/cmtt/m/n/10.95 front.jpg[] 
  []
 
 
-Overfull \hbox (34.27895pt too wide) in paragraph at lines 1194--1245
+Overfull \hbox (34.27895pt too wide) in paragraph at lines 1199--1250
 [][] 
  []
 
-[48] [49]
-Overfull \hbox (5.50978pt too wide) in paragraph at lines 1265--1266
+[49]
+Overfull \hbox (5.50978pt too wide) in paragraph at lines 1270--1271
 []\OT1/cmr/m/n/12 Including the com-ments may lead to con-fus-ing search hits, 
 if the searched
  []
 
-[50] [51] [52] [53] <v4_0.jpg, id=689, 734.745pt x 478.78876pt>
+[50] [51] [52] [53] <v4_0.jpg, id=691, 734.745pt x 478.78876pt>
 File: v4_0.jpg Graphic file (type jpg)
  <use v4_0.jpg>
-Package pdftex.def Info: v4_0.jpg used on input line 1415.
+Package pdftex.def Info: v4_0.jpg used on input line 1428.
 (pdftex.def)             Requested size: 272.99881pt x 177.90155pt.
 
 [54] [55 <./v4_0.jpg>]
-Overfull \hbox (12.55011pt too wide) in paragraph at lines 1470--1471
+Overfull \hbox (12.55011pt too wide) in paragraph at lines 1483--1484
 []\OT1/cmr/m/n/12 Fixed var-i-ous er-rors when boot-ing from CD/DVD or other wr
 ite-protected
  []
 
-[56] [57] [58] [59] <v3_0.jpg, id=728, 957.5775pt x 719.68875pt>
+[56] [57] [58] [59] <v3_0.jpg, id=730, 957.5775pt x 719.68875pt>
 File: v3_0.jpg Graphic file (type jpg)
 
 <use v3_0.jpg>
-Package pdftex.def Info: v3_0.jpg used on input line 1604.
+Package pdftex.def Info: v3_0.jpg used on input line 1617.
 (pdftex.def)             Requested size: 272.99881pt x 205.1793pt.
  [60]
-Overfull \hbox (3.42508pt too wide) in paragraph at lines 1616--1617
+Overfull \hbox (3.42508pt too wide) in paragraph at lines 1629--1630
 \OT1/cmr/m/n/12 browse the for-eign me-dia li-brary, down-load in-di-vid-ual ti
 -tles from friends,
  []
 
-[61 <./v3_0.jpg>] [62] <v2_5.jpg, id=746, 827.09pt x 611.28375pt>
+[61 <./v3_0.jpg>] [62] <v2_5.jpg, id=749, 827.09pt x 611.28375pt>
 File: v2_5.jpg Graphic file (type jpg)
 
 <use v2_5.jpg>
-Package pdftex.def Info: v2_5.jpg used on input line 1681.
+Package pdftex.def Info: v2_5.jpg used on input line 1694.
 (pdftex.def)             Requested size: 272.99881pt x 201.77089pt.
  [63] [64 <./v2_5.jpg>] [65]
-<v2_1.png, id=768, 679.78969pt x 487.06969pt>
+<v2_1.png, id=770, 679.78969pt x 487.06969pt>
 File: v2_1.png Graphic file (type png)
  <use v2_1.png>
-Package pdftex.def Info: v2_1.png used on input line 1764.
+Package pdftex.def Info: v2_1.png used on input line 1777.
 (pdftex.def)             Requested size: 272.99881pt x 195.60478pt.
-
-Overfull \hbox (6.68893pt too wide) in paragraph at lines 1777--1778
+ [66 <./v2_1.png>]
+Overfull \hbox (6.68893pt too wide) in paragraph at lines 1790--1791
 []\OT1/cmr/m/n/12 Classification into pre-de-fined cat-e-gories such as al-bums
 , sam-plers, sound-
  []
 
-[66 <./v2_1.png>] [67] <v1_0.png, id=781, 475.7775pt x 356.0803pt>
+[67] <v1_0.png, id=784, 475.7775pt x 356.0803pt>
 File: v1_0.png Graphic file (type png)
-
-<use v1_0.png>
-Package pdftex.def Info: v1_0.png used on input line 1822.
+ <use v1_0.png>
+Package pdftex.def Info: v1_0.png used on input line 1835.
 (pdftex.def)             Requested size: 312.00119pt x 233.51956pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1828.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1841.
  [68 <./v1_0.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1828.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1841.
  (nemp-help-en.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1828.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1828.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1841.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1841.
 
 Package rerunfilecheck Info: File `nemp-help-en.out' has not changed.
 (rerunfilecheck)             Checksum: 4C302FBCDE3C84FB8E9AAE15FAC0942A;4613.
@@ -831,14 +830,11 @@ Package rerunfilecheck Info: File `nemp-help-en.out' has not changed.
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1828.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1841.
  ) 
 Here is how much of TeX's memory you used:
- 6900 strings out of 493335
- 99305 string characters out of 3136677
+ 6901 strings out of 493335
+ 99317 string characters out of 3136677
  183995 words of memory out of 3000000
  10087 multiletter control sequences out of 15000+200000
  16395 words of font info for 64 fonts, out of 3000000 for 9000
@@ -857,9 +853,9 @@ x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x8
 /MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (x86)/M
 iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files (x86)/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on nemp-help-en.pdf (69 pages, 2101626 bytes).
+Output written on nemp-help-en.pdf (69 pages, 2101311 bytes).
 PDF statistics:
- 874 PDF objects out of 1000 (max. 8388607)
- 193 named destinations out of 1000 (max. 500000)
+ 877 PDF objects out of 1000 (max. 8388607)
+ 194 named destinations out of 1000 (max. 500000)
  797 words of extra memory for PDF output out of 10000 (max. 10000000)
 
