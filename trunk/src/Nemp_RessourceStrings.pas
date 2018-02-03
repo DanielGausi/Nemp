@@ -72,6 +72,8 @@ TreeHeader_PlayCounter = 'Play counter';
 TreeHeader_Playlists = 'Playlists';
 TreeHeader_Playlist = 'Playlist';
 TreeHeader_Webradio = 'Webradio';
+TreeHeader_Marker = 'Marker';
+
 
 Time_HoursLong = 'hours';
 Time_DaysLong = 'days';

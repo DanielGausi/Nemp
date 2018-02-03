@@ -64,7 +64,7 @@ citecolor = black] {hyperref}
 	{\Large Documentation and user guide\par}	
 	\emph{This documentation was mainly translated with the help of \emph{deepl.com}. I hope it is reasonably understandable and does not contain too much gibberish.}	
 	\vfill	
-	\copyright Daniel Gauﬂmann, 2005-2017
+	\copyright Daniel Gauﬂmann, 2005-2018
 \end{titlepage}
 
 \tableofcontents
@@ -534,6 +534,19 @@ If you want to listen to a certain song, you can use the quick search function. 
 By default, \emph{during typing} only exact hits are listed. When you press the \textsc{Enter} key, Nemp performs an fuzzy search that also takes spelling mistakes into account. Then titles of \emph{P!nk} will also be found if you searched for \emph{Pink}. And if you are not sure how many \emph{r}, \emph{s} and \emph{t} occur in \emph{Alanis Morissette}, that's not bad either.
 \end{tipp}
 
+\subsection{Set markers and use them}
+
+With Nemp 4.7.2 the possibility to mark files with \emph{markers} was added. These markers can be used to highlight some of your music files. They can be set via the context menu, the key combination \textsc{Ctrl+Shift+1} (or \textsc{+2, +3}, to remove \textsc{+u}), or by clicking on the column \emph{mark}. By default, this column is not visible - use the settings dialog to display it or use the context menu of the column headers. Currently, three different markings are possible.
+
+\begin{center}
+\includegraphics{marker-en.png}
+\end{center}
+
+To view all marked files, click on the button next to the quicksearch. Then all files are displayed with the respective marker. Repeated clicking will switch the displayed marker accordingly.
+
+The coverflow, search, quicksearch and other ways to search and browse the library will ignore these markers.
+
+The markers are stored only in the Media Library and not in the ID3-Tag of the music files.
 
 \subsection{The detailed search}
 
@@ -543,7 +556,7 @@ By default, the fuzzy search is activated, which also lists search hits with sma
 
 So don't worry about the exact spelling or typos - especially when searching for lyrics. Also a search for \emph{in the taun wer i was born} leads to the desired title \emph{Yellow Submarine} with the line \emph{in the town, where i was born}.
 
-With \textbf{Search} a new search is started. With \textbf{Refine search} is searched only in current search hits, and with \textbf{Extend search} new ones are added to current search hits.
+%With \textbf{Search} a new search is started. With \textbf{Refine search} is searched only in current search hits, and with \textbf{Extend search} new ones are added to current search hits.
 
 Restriction to \textbf{genre} or \textbf{year} is still in it for nostalgic reasons, but in most cases probably more obstructive than useful.
 
@@ -1280,16 +1293,38 @@ If no matches were found for a search term, this may also be due to typing error
 
 \newpage
 
+\section{Nerd stuff}
+
+Nemp contains some more hidden and/or wacky features. Some of them have been requested  over time, others are historically determined, others are just for fun. I would like to draw your attention to a few things here.
+
+\begin{itemize}
+\item \textbf{The Nemp-API.} Originally, Nemp was just an Mp3-manager with a remote control for Winamp. The Winamp API was used for this purpose, which allows other programs to send commands to Winamp and read data from it. Nemp has basically copied this API and extended it a little bit. If you are interested, you can examine the file \texttt{src/common/NempAPI. pas} in the source code folder or use it in your own projects.
+
+The Nemp Deskband for Windows XP and the display app for the Logitech G15 included with Nemp work with this API.
+
+\item \textbf{command line parameter.} Nemp supports a few parameters for the command line. Some of them are used for the function \emph{Play in Nemp} respectively \emph{Enqueue in Nemp} in the Windows Explorer. Another hidden function is the parameter \texttt{/close}. A few years ago, a user requested a method to terminate a running instance of Nemp from the command line. First there was the small add-on program \textit{NempClose. exe}. In Nemp 4.7.2 this can be done by calling \texttt{./nemp.exe /close}. This terminates the current instance.
+
+\item \textbf{Easteregg for Entwickler-Ecke.de.} Originally Nemp was published in the Delphi forum on \href{https://entwickler-ecke.de}{entwickler-ecke.de}. There I also worked as a moderator for several years and took part in the traditional Advent Lottery. One of these puzzles revolved around an mp3 file whose audio data was actually the source code of a brainfuck program that outputs a Christmas carol during execution. Nemp recognizes this special file, extracts the Brainfuck program, executes it and plays the hidden song. By the way, it was this one: Allison Crowe - Silent Night (video on \href{https://www.youtube.com/watch?v=zERIiMe1tNE}{youtube}).
+
+\item In addition, there is a backdoor to quit the party mode, i.e. an admin password stored in the source code, with which you can always quit this mode.
+\end{itemize}
+
+\newpage
+
 
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
 
-\subsection*{Version 4.7.2, December 2017}
+\subsection*{Version 4.7.2, February 2018}
 
-\textbf{New feature (or bug fix?)}
+\textbf{New features and changes}
 \begin{itemize}
-\item Support for SoundFont files for MIDI playback.
+\item Possibility to mark files in the Media Library.
+\item Support for SoundFont files for MIDI playback. (This is more like a bug fix.)
+\item removed \gf{Extend Search} and \gf{Refine Search} from the detailed search window
+\item command line parameter \texttt{/close}.
+
 \end{itemize}
 
 

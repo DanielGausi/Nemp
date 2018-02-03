@@ -677,7 +677,7 @@ const
         (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
         (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
         (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Mark' ;Inhalt: CON_FAVORITE         ;visible: false  ;width: 44 ;sortAscending: True)
+        (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: false  ;width: 44 ;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =

@@ -902,9 +902,6 @@ begin
                             MedienBib.ChangeTags(CurrentTagToChange, newTag);
                     end; // if Data^.FTag.Key <> newTag then
 
-
-
-
                 end;  // for selected Tags
             end; // valid tag input
 

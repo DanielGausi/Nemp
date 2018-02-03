@@ -4248,19 +4248,12 @@ begin
   case VST.Header.Columns[column].Tag of
      CON_RATING: begin
         TargetCanvas.Brush.Style := bsClear;
-
         if Data^.FAudioFile.Rating = 0 then
             st := 127
         else
             st := Data^.FAudioFile.Rating;
-
         RatingGraphics.DrawRatingInStars(st, TargetCanvas, CellRect.Bottom - CellRect.Top, CellRect.Left);
      end;
-     //CON_Favorite: begin
-     //   TargetCanvas.Brush.Style := bsClear;
-     //
-     //   RatingGraphics.DrawFavStars(Data^.FAudioFile.Favorite, TargetCanvas, CellRect.Bottom - CellRect.Top, CellRect.Left);
-     //end;
   end;
 end;
 
@@ -9868,6 +9861,7 @@ var
 begin
   // Parameter für Alphablending zusammstellen
   if Not NempSkin.isActive then exit;
+
 
   if Sender = VST then
   begin
