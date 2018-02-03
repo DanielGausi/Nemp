@@ -225,6 +225,7 @@ end;
 }
 procedure TRatingControl.Paint;
 begin
+
   // Draw Background
   RatingGraphics.fComplete.Canvas.Draw(0, 0, RatingGraphics.fRatingControlBackGround);
   // Draw Stars

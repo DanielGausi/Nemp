@@ -21,47 +21,49 @@
 \contentsline {subsubsection}{Die Tagwolke}{20}{section*.28}
 \contentsline {subsubsection}{St\"obern \"uber die Anzeige}{21}{section*.29}
 \contentsline {subsection}{\numberline {3.3}Die Schnellsuche}{22}{subsection.30}
-\contentsline {subsection}{\numberline {3.4}Die ausf\"uhrliche Suche}{23}{subsection.31}
-\contentsline {subsection}{\numberline {3.5}Von der Medienbibliothek in die Playlist}{23}{subsection.32}
-\contentsline {subsection}{\numberline {3.6}Pflege der Medienbibliothek}{24}{subsection.33}
-\contentsline {subsubsection}{Einfache Bearbeitung der Metadaten}{25}{section*.34}
-\contentsline {subsubsection}{Das Detailfenster zur Bearbeitung der Metadaten}{25}{section*.35}
-\contentsline {subsubsection}{Aktualisieren der Daten}{27}{section*.36}
-\contentsline {subsubsection}{L\"oschen von Dateien und Aufr\"aumen der Medienbibliothek}{27}{section*.37}
-\contentsline {subsubsection}{Webradio}{28}{section*.38}
-\contentsline {subsubsection}{CSV-Export}{28}{section*.39}
-\contentsline {subsection}{\numberline {3.7}Der Tagwolken-Editor}{29}{subsection.40}
-\contentsline {section}{\numberline {4}Tools}{31}{section.41}
-\contentsline {subsection}{\numberline {4.1}Scrobbeln mit Nemp}{31}{subsection.42}
-\contentsline {subsubsection}{Scrobbler konfigurieren}{31}{section*.43}
-\contentsline {subsubsection}{Scrobbler aktivieren}{32}{section*.47}
-\contentsline {subsubsection}{Was wird gescrobbelt?}{32}{section*.48}
-\contentsline {subsubsection}{Fehler beheben}{33}{section*.49}
-\contentsline {subsection}{\numberline {4.2}Der Geburtstagsmodus}{33}{subsection.50}
-\contentsline {subsection}{\numberline {4.3}Der Nemp Webserver}{34}{subsection.51}
-\contentsline {subsubsection}{Konfiguration im Einstellungsdialog}{35}{section*.52}
-\contentsline {subsection}{\numberline {4.4}Tastatur-Display}{36}{subsection.53}
-\contentsline {subsection}{\numberline {4.5}Automatischer Shutdown, Einschlaf-Timer}{36}{subsection.54}
-\contentsline {section}{\numberline {5}Einstellungen}{37}{section.55}
-\contentsline {subsection}{\numberline {5.1}Allgemeine Einstellungen}{37}{subsection.56}
-\contentsline {subsubsection}{Steuerung}{38}{section*.57}
-\contentsline {subsubsection}{System}{39}{section*.58}
-\contentsline {subsection}{\numberline {5.2}Anzeige-Einstellungen}{40}{subsection.59}
-\contentsline {subsubsection}{Party-Modus}{41}{section*.60}
-\contentsline {subsubsection}{Schriften}{41}{section*.61}
-\contentsline {subsubsection}{Erweiterte Einstellungen}{42}{section*.62}
-\contentsline {subsection}{\numberline {5.3}Player-Einstellungen}{43}{subsection.63}
-\contentsline {subsubsection}{Playlist}{44}{section*.64}
-\contentsline {subsubsection}{Zufallswiedergabe}{45}{section*.65}
-\contentsline {subsubsection}{Webradio}{46}{section*.66}
-\contentsline {subsubsection}{Effekte}{47}{section*.67}
-\contentsline {subsubsection}{Geburtstagsmodus}{48}{section*.68}
-\contentsline {subsubsection}{LastFM}{48}{section*.69}
-\contentsline {subsubsection}{Webserver}{48}{section*.70}
-\contentsline {subsubsection}{Erweiterte Einstellungen}{48}{section*.71}
-\contentsline {subsection}{\numberline {5.4}Datei-Management}{49}{subsection.72}
-\contentsline {subsubsection}{Dateitypen-Registrierung}{50}{section*.73}
-\contentsline {subsubsection}{Metadaten}{51}{section*.74}
-\contentsline {subsubsection}{Cover}{53}{section*.75}
-\contentsline {subsubsection}{Suchoptionen}{54}{section*.76}
-\contentsline {section}{\numberline {6}Versionsgeschichte}{56}{section.77}
+\contentsline {subsection}{\numberline {3.4}Markierungen setzen und nutzen}{23}{subsection.31}
+\contentsline {subsection}{\numberline {3.5}Die ausf\"uhrliche Suche}{23}{subsection.32}
+\contentsline {subsection}{\numberline {3.6}Von der Medienbibliothek in die Playlist}{24}{subsection.33}
+\contentsline {subsection}{\numberline {3.7}Pflege der Medienbibliothek}{25}{subsection.34}
+\contentsline {subsubsection}{Einfache Bearbeitung der Metadaten}{25}{section*.35}
+\contentsline {subsubsection}{Das Detailfenster zur Bearbeitung der Metadaten}{26}{section*.36}
+\contentsline {subsubsection}{Aktualisieren der Daten}{28}{section*.37}
+\contentsline {subsubsection}{L\"oschen von Dateien und Aufr\"aumen der Medienbibliothek}{28}{section*.38}
+\contentsline {subsubsection}{Webradio}{28}{section*.39}
+\contentsline {subsubsection}{CSV-Export}{29}{section*.40}
+\contentsline {subsection}{\numberline {3.8}Der Tagwolken-Editor}{29}{subsection.41}
+\contentsline {section}{\numberline {4}Tools}{32}{section.42}
+\contentsline {subsection}{\numberline {4.1}Scrobbeln mit Nemp}{32}{subsection.43}
+\contentsline {subsubsection}{Scrobbler konfigurieren}{32}{section*.44}
+\contentsline {subsubsection}{Scrobbler aktivieren}{33}{section*.48}
+\contentsline {subsubsection}{Was wird gescrobbelt?}{33}{section*.49}
+\contentsline {subsubsection}{Fehler beheben}{33}{section*.50}
+\contentsline {subsection}{\numberline {4.2}Der Geburtstagsmodus}{34}{subsection.51}
+\contentsline {subsection}{\numberline {4.3}Der Nemp Webserver}{34}{subsection.52}
+\contentsline {subsubsection}{Konfiguration im Einstellungsdialog}{35}{section*.53}
+\contentsline {subsection}{\numberline {4.4}Tastatur-Display}{36}{subsection.54}
+\contentsline {subsection}{\numberline {4.5}Automatischer Shutdown, Einschlaf-Timer}{37}{subsection.55}
+\contentsline {section}{\numberline {5}Einstellungen}{37}{section.56}
+\contentsline {subsection}{\numberline {5.1}Allgemeine Einstellungen}{38}{subsection.57}
+\contentsline {subsubsection}{Steuerung}{39}{section*.58}
+\contentsline {subsubsection}{System}{40}{section*.59}
+\contentsline {subsection}{\numberline {5.2}Anzeige-Einstellungen}{41}{subsection.60}
+\contentsline {subsubsection}{Party-Modus}{41}{section*.61}
+\contentsline {subsubsection}{Schriften}{42}{section*.62}
+\contentsline {subsubsection}{Erweiterte Einstellungen}{42}{section*.63}
+\contentsline {subsection}{\numberline {5.3}Player-Einstellungen}{43}{subsection.64}
+\contentsline {subsubsection}{Playlist}{44}{section*.65}
+\contentsline {subsubsection}{Zufallswiedergabe}{45}{section*.66}
+\contentsline {subsubsection}{Webradio}{47}{section*.67}
+\contentsline {subsubsection}{Effekte}{48}{section*.68}
+\contentsline {subsubsection}{Geburtstagsmodus}{49}{section*.69}
+\contentsline {subsubsection}{LastFM}{49}{section*.70}
+\contentsline {subsubsection}{Webserver}{49}{section*.71}
+\contentsline {subsubsection}{Erweiterte Einstellungen}{49}{section*.72}
+\contentsline {subsection}{\numberline {5.4}Datei-Management}{50}{subsection.73}
+\contentsline {subsubsection}{Dateitypen-Registrierung}{51}{section*.74}
+\contentsline {subsubsection}{Metadaten}{51}{section*.75}
+\contentsline {subsubsection}{Cover}{53}{section*.76}
+\contentsline {subsubsection}{Suchoptionen}{55}{section*.77}
+\contentsline {section}{\numberline {6}Nerd-Zeug}{57}{section.78}
+\contentsline {section}{\numberline {7}Versionsgeschichte}{58}{section.79}

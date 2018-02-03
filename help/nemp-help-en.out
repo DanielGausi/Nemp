@@ -21,47 +21,49 @@
 \BOOKMARK [3][]{section*.29}{Tag cloud}{subsection.26}% 21
 \BOOKMARK [3][]{section*.30}{Browsing via the display}{subsection.26}% 22
 \BOOKMARK [2][]{subsection.31}{3.3 The quick search}{section.24}% 23
-\BOOKMARK [2][]{subsection.32}{3.4 The detailed search}{section.24}% 24
-\BOOKMARK [2][]{subsection.33}{3.5 From the Media Library to the Playlist}{section.24}% 25
-\BOOKMARK [2][]{subsection.34}{3.6 Maintenance of the Media Library}{section.24}% 26
-\BOOKMARK [3][]{section*.35}{Simple editing of metadata}{subsection.34}% 27
-\BOOKMARK [3][]{section*.36}{The detail window for editing metadata}{subsection.34}% 28
-\BOOKMARK [3][]{section*.37}{Updating the data}{subsection.34}% 29
-\BOOKMARK [3][]{section*.38}{Deleting files and cleaning up the library}{subsection.34}% 30
-\BOOKMARK [3][]{section*.39}{Webradio}{subsection.34}% 31
-\BOOKMARK [3][]{section*.40}{CSV export}{subsection.34}% 32
-\BOOKMARK [2][]{subsection.41}{3.7 The tag cloud editor}{section.24}% 33
-\BOOKMARK [1][]{section.43}{4 Tools}{}% 34
-\BOOKMARK [2][]{subsection.44}{4.1 Scrobble with Nemp}{section.43}% 35
-\BOOKMARK [3][]{section*.45}{Scrobbler configuration}{subsection.44}% 36
-\BOOKMARK [3][]{section*.49}{Scrobbler activation}{subsection.44}% 37
-\BOOKMARK [3][]{section*.50}{What is being scrobbled?}{subsection.44}% 38
-\BOOKMARK [3][]{section*.51}{Troubleshooting}{subsection.44}% 39
-\BOOKMARK [2][]{subsection.52}{4.2 The birthday mode}{section.43}% 40
-\BOOKMARK [2][]{subsection.54}{4.3 The Nemp web server}{section.43}% 41
-\BOOKMARK [3][]{section*.55}{Configuration}{subsection.54}% 42
-\BOOKMARK [2][]{subsection.56}{4.4 Keyboard display}{section.43}% 43
-\BOOKMARK [2][]{subsection.57}{4.5 Automatic shutdown, sleep timer}{section.43}% 44
-\BOOKMARK [1][]{section.58}{5 Preferences, settings dialog}{}% 45
-\BOOKMARK [2][]{subsection.59}{5.1 General settings}{section.58}% 46
-\BOOKMARK [3][]{section*.60}{Controls}{subsection.59}% 47
-\BOOKMARK [3][]{section*.61}{System}{subsection.59}% 48
-\BOOKMARK [2][]{subsection.62}{5.2 Viewing settings}{section.58}% 49
-\BOOKMARK [3][]{section*.63}{Party mode}{subsection.62}% 50
-\BOOKMARK [3][]{section*.64}{Fonts}{subsection.62}% 51
-\BOOKMARK [3][]{section*.65}{Extended viewing settings}{subsection.62}% 52
-\BOOKMARK [2][]{subsection.66}{5.3 Player settings}{section.58}% 53
-\BOOKMARK [3][]{section*.67}{Playlist}{subsection.66}% 54
-\BOOKMARK [3][]{section*.68}{Random playback}{subsection.66}% 55
-\BOOKMARK [3][]{section*.69}{Web radio}{subsection.66}% 56
-\BOOKMARK [3][]{section*.70}{Effects}{subsection.66}% 57
-\BOOKMARK [3][]{section*.71}{Birthday mode}{subsection.66}% 58
-\BOOKMARK [3][]{section*.72}{LastFM}{subsection.66}% 59
-\BOOKMARK [3][]{section*.73}{Web server}{subsection.66}% 60
-\BOOKMARK [3][]{section*.74}{Extended player settings}{subsection.66}% 61
-\BOOKMARK [2][]{subsection.75}{5.4 File management}{section.58}% 62
-\BOOKMARK [3][]{section*.76}{File types registration}{subsection.75}% 63
-\BOOKMARK [3][]{section*.77}{Metadata}{subsection.75}% 64
-\BOOKMARK [3][]{section*.78}{Cover}{subsection.75}% 65
-\BOOKMARK [3][]{section*.79}{Search settings}{subsection.75}% 66
-\BOOKMARK [1][]{section.80}{6 Version history}{}% 67
+\BOOKMARK [2][]{subsection.32}{3.4 Set markers and use them}{section.24}% 24
+\BOOKMARK [2][]{subsection.33}{3.5 The detailed search}{section.24}% 25
+\BOOKMARK [2][]{subsection.34}{3.6 From the Media Library to the Playlist}{section.24}% 26
+\BOOKMARK [2][]{subsection.35}{3.7 Maintenance of the Media Library}{section.24}% 27
+\BOOKMARK [3][]{section*.36}{Simple editing of metadata}{subsection.35}% 28
+\BOOKMARK [3][]{section*.37}{The detail window for editing metadata}{subsection.35}% 29
+\BOOKMARK [3][]{section*.38}{Updating the data}{subsection.35}% 30
+\BOOKMARK [3][]{section*.39}{Deleting files and cleaning up the library}{subsection.35}% 31
+\BOOKMARK [3][]{section*.40}{Webradio}{subsection.35}% 32
+\BOOKMARK [3][]{section*.41}{CSV export}{subsection.35}% 33
+\BOOKMARK [2][]{subsection.42}{3.8 The tag cloud editor}{section.24}% 34
+\BOOKMARK [1][]{section.44}{4 Tools}{}% 35
+\BOOKMARK [2][]{subsection.45}{4.1 Scrobble with Nemp}{section.44}% 36
+\BOOKMARK [3][]{section*.46}{Scrobbler configuration}{subsection.45}% 37
+\BOOKMARK [3][]{section*.50}{Scrobbler activation}{subsection.45}% 38
+\BOOKMARK [3][]{section*.51}{What is being scrobbled?}{subsection.45}% 39
+\BOOKMARK [3][]{section*.52}{Troubleshooting}{subsection.45}% 40
+\BOOKMARK [2][]{subsection.53}{4.2 The birthday mode}{section.44}% 41
+\BOOKMARK [2][]{subsection.55}{4.3 The Nemp web server}{section.44}% 42
+\BOOKMARK [3][]{section*.56}{Configuration}{subsection.55}% 43
+\BOOKMARK [2][]{subsection.57}{4.4 Keyboard display}{section.44}% 44
+\BOOKMARK [2][]{subsection.58}{4.5 Automatic shutdown, sleep timer}{section.44}% 45
+\BOOKMARK [1][]{section.59}{5 Preferences, settings dialog}{}% 46
+\BOOKMARK [2][]{subsection.60}{5.1 General settings}{section.59}% 47
+\BOOKMARK [3][]{section*.61}{Controls}{subsection.60}% 48
+\BOOKMARK [3][]{section*.62}{System}{subsection.60}% 49
+\BOOKMARK [2][]{subsection.63}{5.2 Viewing settings}{section.59}% 50
+\BOOKMARK [3][]{section*.64}{Party mode}{subsection.63}% 51
+\BOOKMARK [3][]{section*.65}{Fonts}{subsection.63}% 52
+\BOOKMARK [3][]{section*.66}{Extended viewing settings}{subsection.63}% 53
+\BOOKMARK [2][]{subsection.67}{5.3 Player settings}{section.59}% 54
+\BOOKMARK [3][]{section*.68}{Playlist}{subsection.67}% 55
+\BOOKMARK [3][]{section*.69}{Random playback}{subsection.67}% 56
+\BOOKMARK [3][]{section*.70}{Web radio}{subsection.67}% 57
+\BOOKMARK [3][]{section*.71}{Effects}{subsection.67}% 58
+\BOOKMARK [3][]{section*.72}{Birthday mode}{subsection.67}% 59
+\BOOKMARK [3][]{section*.73}{LastFM}{subsection.67}% 60
+\BOOKMARK [3][]{section*.74}{Web server}{subsection.67}% 61
+\BOOKMARK [3][]{section*.75}{Extended player settings}{subsection.67}% 62
+\BOOKMARK [2][]{subsection.76}{5.4 File management}{section.59}% 63
+\BOOKMARK [3][]{section*.77}{File types registration}{subsection.76}% 64
+\BOOKMARK [3][]{section*.78}{Metadata}{subsection.76}% 65
+\BOOKMARK [3][]{section*.79}{Cover}{subsection.76}% 66
+\BOOKMARK [3][]{section*.80}{Search settings}{subsection.76}% 67
+\BOOKMARK [1][]{section.81}{6 Nerd stuff}{}% 68
+\BOOKMARK [1][]{section.82}{7 Version history}{}% 69

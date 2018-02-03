@@ -63,7 +63,7 @@ citecolor = black] {hyperref}
 	\vspace{1cm}
 	{\Large Dokumentation und Bedienungsanleitung\par}		
 	\vfill	
-	\copyright Daniel Gaußmann, 2005-2017
+	\copyright Daniel Gaußmann, 2005-2018
 \end{titlepage}
 
 \tableofcontents
@@ -535,6 +535,20 @@ Wenn Sie einen bestimmten Titel hören wollen, dann können Sie dafür die Schnells
 In der Voreinstellung werden \emph{während des Tippens} nur exakte Treffer aufgelistet. Wenn Sie die Taste \textsc{Enter} betätigen, führt Nemp einen ungenauen Durchlauf durch, der auch Rechtschreibfehler berücksichtigt. Dann werden auch Titel von \emph{P!nk}  gefunden, wenn Sie nach \emph{Pink} gesucht haben. Und wenn Sie sich nicht sicher sind, wie viele \emph{r}, \emph{s} und \emph{t} in \emph{Alanis Morissette} vorkommen, ist das auch nicht schlimm.
 \end{tipp}
 
+\subsection{Markierungen setzen und nutzen}
+
+Mit Nemp 4.7.2 wurde die Möglichkeit hinzugefügt, Dateien mit \emph{Markierungen} zu versehen. Diese Markierungen können verwendet werden, um einige Stücke noch besonders hervorzuheben. Sie können gesetzt werden über das Kontextmenü, die Tastenkombination \textsc{Strg+Shift+1} (oder \textsc{+2, +3}, zum entfernen \textsc{+u}), oder über Klick auf die Spalte \emph{Markierung}. Standardweise ist diese nicht sichtbar - zum Anzeigen die Einstellungen verwenden oder das Kontextmenü der Spaltenüberschriften nutzen. Aktuell sind drei verschiedene Markierungen möglich.
+
+\begin{center}
+\includegraphics{marker.png}
+\end{center}
+
+Zum Anzeigen aller markierten Dateien auf den Button neben der Schnellsuche klicken. Dann werden alle Dateien mit der jeweiligen Markierung (überhaupt einer Markierung oder keiner Markierung) angezeigt. Mehrfaches Klicken schaltet die Anzeige entsprechend durch.
+
+Der Coverflow, Suche, Schnellsuche und andere Arten in der Medienbibliothek zu suchen und zu stöbern ignorieren diese Markierungen.
+
+Die Markierungen werden nur in der Medienbibliothek gespeichert, und nicht im ID3-Tag der einzelnen Musikdateien.
+
 \subsection{Die ausführliche Suche}
 
 In den meisten Fällen reicht die Schnellsuche vollkommen aus. Nur in wenigen Fällen, z.B. bei der Suche nach einem bestimmten Liedtext, muss die ausführliche Suche herangezogen werden. Das war eine der ersten Funktionen in dem Ur-Nemp, das eigentlich nur eine mp3-Verwaltung war. Sie erreichen die Suche über das Menü oder die Tastenkombination \textsc{Strg+Shift+F}. In dem Suchfenster dann die gesuchten Begriffe eintragen und suchen.
@@ -545,7 +559,7 @@ Standardweise ist die \emph{ungenaue Suche} aktiviert, die auch Suchtreffer mit 
 
 Keine Angst also vor der genauen Schreibweise oder Tippfehlern - besonders bei der Suche nach Liedtexten. Auch eine Suche nach \emph{in the taun wer i was born} führt zum gewünschten Titel \emph{Yellow Submarine} mit der Zeile \emph{in the town, where i was born}.
 
-Mit \textbf{Suchen} wird eine neue Suche gestartet. Über \textbf{Suche verfeinern} wird nur in den aktuellen Suchtreffern gesucht, und mit \textbf{Suche erweitern} werden den aktuellen Suchtreffern neue hinzugefügt.
+%Mit \textbf{Suchen} wird eine neue Suche gestartet. Über \textbf{Suche verfeinern} wird nur in den aktuellen Suchtreffern gesucht, und mit \textbf{Suche erweitern} werden den aktuellen Suchtreffern neue hinzugefügt.
 
 Die Einschränkung auf \textbf{Genre} oder \textbf{Jahr} ist aus nostalgischen Gründen noch drin, aber in den allermeisten Fällen vermutlich eher hinderlich als nützlich.
 
@@ -1261,16 +1275,38 @@ Wenn für einen Suchbegriff kein Treffer gefunden wurde, kann das auch an Tippfeh
 
 \newpage
 
+\section{Nerd-Zeug}
+
+Nemp enthält einige weitere versteckte und/oder bekloppte Features. Einige sind im Laufe der Zeit gewünscht worden, andere sind historisch bedingt, wieder andere einfach nur so aus Spaß dabei. Der Vollständigkeit möchte ich hier auf ein paar Dinge hinweisen.
+
+\begin{itemize}
+\item \textbf{Die Nemp-API.} Ursprünglich war Nemp nur eine Mp3-Verwaltung mit einer Fernsteuerung für Winamp. Dafür wurde die Winamp-API verwendet, über die andere Programme Kommandos an Winamp senden und Daten auslesen können. Nemp hat diese API im Wesentlichen kopiert und ein wenig erweitert. Bei Interesse kann im Quellcode-Order die Datei \texttt{src/common/NempAPI.pas} untersucht bzw. in eigenen Projekten verwendet werden.
+
+Das Nemp-Deskband für Windows XP und auch die Display-App für die Logitech G15, die Nemp beiliegt, funktionieren mit Hilfe dieser API
+
+\item \textbf{Kommandozeilen-Parameter.} Nemp unterstützt einige wenige Parameter für den Aufruf über die Kommandozeile. Einige davon werden für die Funktion \emph{Play in Nemp} bzw. \emph{Enqueue in Nemp} im Windows-Explorer verwendet. Eine weitere versteckte Funktion ist der Parameter \texttt{/close}. Vor einigen Jahren wollte ein Nutzer eine Methode haben, eine laufende Instanz von Nemp über die Kommandozeile zu beenden. Zunächst gab es dafür das kleine Zusatzprogramm \textit{NempClose.exe}. In Nemp 4.7.2 geht das über den Aufruf \texttt{./nemp.exe /close}. Damit wird die laufende Instanz beendet.
+
+\item \textbf{Easteregg für die Entwickler-Ecke.} Ursprünglich wurde Nemp im Delphi-Forum auf \href{https://entwickler-ecke.de}{entwickler-ecke.de} vorgestellt. Dort war ich auch einige Jahre als Moderator tätig und habe an den traditionellen Advents-Gewinnspielen mitgewirkt. Eines dieser Rätsel drehte sich um eine Mp3-Datei, deren Audiodaten in Wirklichkeit der Quellcode eines Brain\-fuck-Programms waren, das bei der Ausführung ein Weihnachtslied ausgibt. Nemp erkennt diese spezielle Datei, extrahiert das Brainfuck-Programm, führt es aus und spielt das versteckte Lied ab. War übrigens dieses hier: Allison Crowe - Silent Night (Video auf \href{https://www.youtube.com/watch?v=zERIiMe1tNE}{youtube}).
+
+\item Außerdem gibt es eine Backdoor zum Beenden des Party-Modus, also ein im Quellcode hinterlegtes Admin-Passwort, mit dem man diesen Modus immer beenden kann.
+\end{itemize}
+
+\newpage
+
 
 \section{Versionsgeschichte}
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
 
-\subsection*{Version 4.7.2, Dezember 2017}
 
-\textbf{Neue Funktion (oder besser Bugfix?)}
+\subsection*{Version 4.7.2, Februar 2018}
+
+\textbf{Neue Funktionen und Änderungen}
 \begin{itemize}
-\item Unterstützung für SoundFont-Dateien, um MIDI-Dateien abzuspielen.
+\item Möglichkeit, Dateien in der Medienbibliothek zu markieren.
+\item Unterstützung für SoundFont-Dateien, um MIDI-Dateien abzuspielen. (Eher ein Bugfix.)
+\item Optionen \gf{Erweiterte Suche} und \gf{Suche verfeinern} aus der ausführlichen Suche entfernt
+\item Kommandozeilenparameter \texttt{/close} zum Beenden der laufenden Instanz.
 \end{itemize}
 
 \subsection*{Version 4.7.1, November 2017}
