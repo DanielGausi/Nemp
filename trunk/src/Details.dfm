@@ -38,12 +38,16 @@ object FDetails: TFDetails
     Top = 8
     Width = 462
     Height = 465
-    ActivePage = Tab_MoreTags
+    ActivePage = Tab_ExtendedID3v2
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 1
     object Tab_General: TTabSheet
       Caption = 'General'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 8
         Top = 1
@@ -609,6 +613,10 @@ object FDetails: TFDetails
     object Tab_MpegInformation: TTabSheet
       Caption = 'ID3-Tags'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_ID3v1: TGroupBox
         Left = 8
         Top = 8
@@ -1133,6 +1141,10 @@ object FDetails: TFDetails
     object Tab_VorbisComments: TTabSheet
       Caption = 'Vorbis Comments'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_StandardVorbisComments: TGroupBox
         Left = 8
         Top = 0
@@ -1448,6 +1460,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 8
         Top = 0
@@ -1916,6 +1932,10 @@ object FDetails: TFDetails
     object Tab_MoreTags: TTabSheet
       Caption = 'Tags for tagcloud'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_TagCloud: TGroupBox
         Left = 8
         Top = 0

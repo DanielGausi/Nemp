@@ -116,6 +116,19 @@ function BinaerAlbumSuche_JustContains(Liste: TObjectlist; album: UnicodeString;
 // First: GetAudiodata.
 // Second: Get Rating from the library (important for non-mp3-files)
 procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
+// SynchronizeAudioFile XXXXx
+// replace with 2 new functions
+/// 1. SynchNewFileWithBib
+///    - search a file in the library
+///    - if found: Use the library data for the new File
+///    - if not: Get data from file
+procedure SynchNewFileWithBib(aNewFile: TAudioFile; WithCover: Boolean = True);
+/// 2. SynchAFileWithDisc
+///    - Get data from the file
+///    - update library data (if file is in the library)
+procedure SynchAFileWithDisc(aNewFile: TAudioFile; WithCover: Boolean = True);
+
+
 
 
 procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
@@ -928,6 +941,51 @@ begin
         // aNewFile.Rating := mbAf.Rating;
 end;
 
+
+{
+    --------------------------------------------------------
+    SynchNewFileWithBib
+      - search a file in the library
+      - if found: Use the library data for the new File
+      - if not: Get data from file
+    --------------------------------------------------------
+}
+procedure SynchNewFileWithBib(aNewFile: TAudioFile; WithCover: Boolean = True);
+var mbAf: TAudioFile;
+begin
+    mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
+    if assigned(mbAF) then
+    begin
+        aNewFile.Assign(mbAF);
+    end else
+    begin
+        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating);
+        if WithCover then
+            Medienbib.InitCover(aNewFile);
+    end;
+end;
+
+{
+    --------------------------------------------------------
+    SynchAFileWithDisc
+      - Get data from the file
+      - update library data (if file is in the library)
+    --------------------------------------------------------
+}
+procedure SynchAFileWithDisc(aNewFile: TAudioFile; WithCover: Boolean = True);
+var mbAf: TAudioFile;
+begin
+    if FileExists(aNewFile.Pfad) then
+    begin
+        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating);
+        if WithCover then
+            Medienbib.InitCover(aNewFile);
+        mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
+        if assigned(mbAF) then
+            mbAF.Assign(aNewFile);
+    end;
+end;
+
 {
     --------------------------------------------------------
     LoadPlaylistFromFileM3U8
@@ -999,7 +1057,8 @@ begin
                                   aAudioFile.FileIsPresent := True;
                                   if AutoScan then
                                   begin
-                                      SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                      //SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                      SynchNewFileWithBib(aAudioFile, False);
                                       aAudiofile.GetCueList;
                                   end else
                                   begin
@@ -1051,7 +1110,8 @@ begin
                             aAudioFile.FileIsPresent := True;
                             if AutoScan then
                             begin
-                                SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                //SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                SynchNewFileWithBib(aAudioFile, False);
                                 aAudiofile.GetCueList;
                             end else
                             begin
@@ -1120,7 +1180,8 @@ begin
                 aAudiofile.Titel  := copy(newTitel,pos(' - ',newTitel)+3,length(newTitel));
                 if AutoScan then
                 begin
-                    SynchronizeAudioFile(aAudioFile, newFilename, False);
+                    // SynchronizeAudioFile(aAudioFile, newFilename, False);
+                    SynchNewFileWithBib(aAudioFile, False);
                     aAudiofile.GetCueList;
                 end;
             end;
@@ -1239,7 +1300,8 @@ begin
                                 aAudioFile.FileIsPresent := True;
                                 if AutoScan then
                                 begin
-                                    SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                    //SynchronizeAudioFile(aAudioFile, aAudioFile.Pfad, False);
+                                    SynchNewFileWithBib(aAudioFile, False);
                                     aAudiofile.GetCueList;
                                 end else
                                 begin

@@ -1518,7 +1518,8 @@ begin
       // Jetzt das Audiofile ggf. ändern
       // zunächst mit eigenen Methoden rangehen
       if MainAudioFile.IsFile then
-          SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
+          SynchNewFileWithBib(MainAudioFile, False);
+          //SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
 
       if ScanMode <> ps_Later then
       begin

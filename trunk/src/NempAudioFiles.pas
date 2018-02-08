@@ -920,6 +920,7 @@ begin
     fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
     RawTagLastFM       := aAudioFile.RawTagLastFM        ;
+    Favorite           := aAudioFile.fFavorite           ;
 end;
 procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
 begin
@@ -947,6 +948,7 @@ begin
     PlayCounter        := aAudioFile.PlayCounter         ;
     fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
+    Favorite           := aAudioFile.fFavorite           ;
 end;
 
 {

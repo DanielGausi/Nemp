@@ -267,7 +267,7 @@ type
       procedure ActualizeCue;
       // Get Audiodata from the current selected Node and repaint it
       // used e.g. in OnChange of the TreeView
-      procedure ActualizeNode(aNode: pVirtualNode; SynchFile: Boolean);
+      procedure ActualizeNode(aNode: pVirtualNode; ReloadDataFromFile: Boolean);
       procedure UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
       function ShowPlayListSummary: Int64;
 
@@ -1259,7 +1259,7 @@ begin
     VST.Invalidate;
 end;
 
-procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode; SynchFile: Boolean);
+procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode; ReloadDataFromFile: Boolean);
 var Data: PTreeData;
     AudioFile: TPlaylistFile;
     OldLength: Int64;
@@ -1277,8 +1277,9 @@ begin
             if not AudioFile.FileIsPresent then
                 AudioFile.Duration := 0;
 
-            if SynchFile then
-                SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
+            if ReloadDataFromFile then
+                SynchAFileWithDisc(AudioFile, False);
+                //SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
 
             if not assigned(AudioFile.CueList) then
             begin
@@ -1295,7 +1296,7 @@ begin
 
         at_CDDA   : begin
             // todo
-            if SynchFile then
+            if ReloadDataFromFile then
             begin
                 if Nemp_MainForm.NempOptions.UseCDDB then
                     AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
@@ -1437,7 +1438,8 @@ begin
   NewFile.Pfad := aAudiofileName;
 
   case NewFile.AudioType of
-      at_File: SynchronizeAudioFile(NewFile, aAudioFileName);
+      at_File: //SynchronizeAudioFile(NewFile, aAudioFileName);
+                SynchNewFileWithBib(newFile);
       at_CDDA: begin
           NewFile.GetAudioData(aAudioFileName, 0);
       end;
@@ -1492,7 +1494,8 @@ begin
   NewFile.Pfad := aAudiofileName;
 
   case NewFile.AudioType of
-      at_File: SynchronizeAudioFile(NewFile, aAudioFileName);
+      at_File: // SynchronizeAudioFile(NewFile, aAudioFileName);
+                SynchNewFileWithBib(NewFile);
       at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
   end;
 
