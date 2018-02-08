@@ -4261,15 +4261,41 @@ end;
 procedure TNemp_MainForm.VSTColumnClick(Sender: TBaseVirtualTree;
   Column: TColumnIndex; Shift: TShiftState);
 var aFile: TAudioFile;
+    ListOfFiles: TObjectList;
+    iList: Integer;
+    newMark: Byte;
+    FileIsInLibrary: Boolean;
 begin
     case VST.Header.Columns[column].Tag of
       CON_FAVORITE: begin
           aFile := GetFocussedAudioFile;
           if assigned(aFile) then
           begin
-              aFile.Favorite := (aFile.Favorite + 1) Mod 4;
+              newMark := (aFile.Favorite + 1) Mod 4;
+              aFile.Favorite := newMark;
+              ListOfFiles := TObjectList.Create(False);
+              try
+                  // get List of this AudioFile
+                  FileIsInLibrary := GetListOfAudioFileCopies(aFile, ListOfFiles);
+                  // edit all these files
+                  for iList := 0 to ListOfFiles.Count - 1 do
+                      TAudioFile(ListOfFiles[iList]).Favorite := newMark;
+                  // correct GUI
+                  CorrectVCLAfterAudioFileEdit(aFile);
+              finally
+                  ListOfFiles.Free;
+              end;
+
+
               VST.InvalidateNode(VST.FocusedNode);
               MedienBib.Changed := True;
+
+              if (NOT FileIsInLibrary) and (MedienBib.AnzeigeShowsPlaylistFiles) then
+              begin
+                  // Show warning, that the marker could not be saved.
+                  AddErrorLog(MainForm_MarkerErrorPlaylistFiles);
+              end;
+
           end;
       end;
     end;
@@ -5235,6 +5261,12 @@ begin
                         if NempOptions.AllowQuickAccessToMetadata then
                             newLabel.PopupMenu := PopupEditExtendedTags;
                         newLabel.Hint := Format(MainForm_DoublClickToSearchTags, [tmpTagList[i]]);
+                        if NempSkin.isActive then
+                        begin
+                            newLabel.Color       := NempSkin.SkinColorScheme.LabelBackGroundCL;
+                            newLabel.Font.Color  := NempSkin.SkinColorScheme.LabelCL;
+                            newLabel.Transparent := NempSkin.DrawTransparentLabel;
+                        end;
 
                         newWidth := newLabel.Width;   //newLabel.Canvas.TextWidth(tmpTagList[i]);
                         newHeight:= newLabel.Height;  //newLabel.Canvas.TextHeight(tmpTagList[i]);
@@ -5269,6 +5301,12 @@ begin
                     newLabel.OnMouseLeave := DetailLabelMouseLeave;
                     newLabel.OnDblClick := DetailLabelDblClickNewTag;
                     newLabel.Hint := MainForm_DoublClickToAddTagHint;
+                    if NempSkin.isActive then
+                    begin
+                        newLabel.Color       := NempSkin.SkinColorScheme.LabelBackGroundCL;
+                        newLabel.Font.Color  := NempSkin.SkinColorScheme.LabelCL;
+                        newLabel.Transparent := NempSkin.DrawTransparentLabel;
+                    end;
 
                     newWidth := newLabel.Width;
                     newHeight:= newLabel.Height;
@@ -10907,11 +10945,11 @@ begin
         end;
         if (aErr <> AUDIOERR_None) then
         begin
-
             // Read old Data again, if we edited something else than RATING
             if VST.Header.Columns[column].Tag <> CON_RATING then
             begin
-                SynchronizeAudioFile(af, af.Pfad, True);
+                ///SynchronizeAudioFile(af, af.Pfad, True);
+                SynchAFileWithDisc(af, True);
                 TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
                 HandleError(afa_DirectEdit, af, aErr, True);
             end else

@@ -688,7 +688,8 @@ begin
                  (NOT NempPlayer.MainAudioFile.isCDDA)
               then
               begin
-                  SynchronizeAudioFile(NempPlayer.MainAudioFile, NempPlayer.MainAudioFile.Pfad, False);
+                  //SynchronizeAudioFile(NempPlayer.MainAudioFile, NempPlayer.MainAudioFile.Pfad, False);
+                  SynchNewFileWithBib(NempPlayer.MainAudioFile, False);
                   CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile, False);
               end;
         end;

@@ -525,6 +525,8 @@ MainForm_PlaylistSearchHint = 'Search in the playlist'
                     + #13#10 + '- Shift+Enter: play';
 
 MainForm_MarkerBtnHint = 'Show only files flagged with one of the markers.';
+MainForm_MarkerErrorPlaylistFiles = 'Hint: This audiofile is part of a playlist, but it is not part of the Media Library itself. - The marker will disappear as soon as the displayed list of audio files changes.';
+
 //MainForm_FavoriteBtnHint = 'Show all files marked as favorites'
 //                    + #13#10 + '- use F4 to add a file to favorites'
 //                    + #13#10 + '- use Ctrl+F4 to remove a file from favorites';

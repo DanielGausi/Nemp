@@ -10,7 +10,7 @@
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
       Januar 2005 - Februar 2018
 
-      Version: 4.7.2
+      Version: 4.8.0
 
 
 -----------------------------------------------------------
@@ -115,18 +115,18 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
 
-Version 4.7.2, Februar 2018
+Version 4.8.0, Februar 2018
 ----------------------------------------------------------- 
-Neue Funktion / Bugfix:
+Neue Funktionen/Änderungen/Bugfix:
 -----------------------
 - Unterstützung für SoundFont-Dateien, um MIDI-Dateien abzuspielen.
-- Markierung von Dateien möglich (1/2/3). Wird NUR in der Medienbibliothek gespeichert, nicht in den ID3-Tags
-- Parameter /close. Durch den Aufruf von "nemp.exe /close" wird die leufende Instanz beendet. CloseNemp.exe damit überflüssig.
+- Markierung von Dateien möglich (1/2/3). Wird NUR in der Medienbibliothek 
+  gespeichert, nicht in den ID3-Tags
+- Parameter /close. Durch den Aufruf von "nemp.exe /close" wird die leufende Instanz 
+  beendet. CloseNemp.exe damit überflüssig.
 - Suche verschlankt. 
   * keine Aufteilung mehr bei der Schnellsuche in zwei Listen
   * "Suche verfeinern" und "Suche erweitern" beid er ausführlichen Suche entfernt
-
-
 
 
 Version 4.7.1, November 2017

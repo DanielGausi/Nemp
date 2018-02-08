@@ -485,6 +485,198 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
     end
+    object PlaylistPanel: TNempPanel
+      Tag = 1
+      Left = 538
+      Top = 0
+      Width = 365
+      Height = 658
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 2
+      OnResize = PlaylistPanelResize
+      OnPaint = PanelPaint
+      OwnerDraw = False
+      object GRPBOXPlaylist: TNempPanel
+        Tag = 1
+        Left = 0
+        Top = 28
+        Width = 365
+        Height = 630
+        Align = alClient
+        BevelInner = bvRaised
+        BevelOuter = bvLowered
+        TabOrder = 1
+        OnPaint = NewPanelPaint
+        OwnerDraw = False
+        object PlaylistVST: TVirtualStringTree
+          Left = 2
+          Top = 2
+          Width = 361
+          Height = 626
+          Align = alClient
+          BevelEdges = []
+          BevelInner = bvSpace
+          BevelOuter = bvSpace
+          BorderStyle = bsNone
+          BorderWidth = 1
+          Ctl3D = True
+          DefaultPasteMode = amInsertAfter
+          DragImageKind = diMainColumnOnly
+          DragMode = dmAutomatic
+          DragWidth = 10
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          Header.AutoSizeIndex = -1
+          Header.Background = clWindow
+          Header.Font.Charset = DEFAULT_CHARSET
+          Header.Font.Color = clWindowText
+          Header.Font.Height = -11
+          Header.Font.Name = 'Tahoma'
+          Header.Font.Style = []
+          Header.Options = [hoDrag, hoVisible]
+          HintMode = hmHint
+          Images = PlayListImageList
+          Indent = 12
+          Margin = 0
+          ParentCtl3D = False
+          ParentFont = False
+          ParentShowHint = False
+          PopupMenu = PlayListPOPUP
+          ScrollBarOptions.ScrollBars = ssVertical
+          ShowHint = True
+          TabOrder = 0
+          TextMargin = 0
+          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
+          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
+          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
+          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
+          OnAfterItemErase = VSTAfterItemErase
+          OnAfterItemPaint = PlaylistVSTAfterItemPaint
+          OnBeforeItemErase = VSTBeforeItemErase
+          OnChange = PlaylistVSTChange
+          OnCollapsed = PlaylistVSTCollapsAndExpanded
+          OnColumnDblClick = PlaylistVSTColumnDblClick
+          OnDragOver = PlaylistVSTDragOver
+          OnDragDrop = PlaylistVSTDragDrop
+          OnEnter = PlaylistVSTEnter
+          OnExpanded = PlaylistVSTCollapsAndExpanded
+          OnGetText = PlaylistVSTGetText
+          OnPaintText = VSTPaintText
+          OnGetImageIndex = PlaylistVSTGetImageIndex
+          OnGetHint = PlaylistVSTGetHint
+          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
+          OnKeyDown = PlaylistVSTKeyDown
+          OnKeyUp = PlaylistVSTKeyUp
+          OnMouseDown = PlaylistVSTMouseDown
+          OnMouseUp = PlaylistVSTMouseUp
+          OnResize = PlaylistVSTResize
+          OnScroll = PlaylistVSTScroll
+          OnStartDrag = PlaylistVSTStartDrag
+          Columns = <
+            item
+              Margin = 0
+              Position = 0
+              Spacing = 0
+              Width = 250
+              WideText = 'Title'
+            end
+            item
+              Alignment = taRightJustify
+              Margin = 0
+              Position = 1
+              Spacing = 0
+              Width = 40
+              WideText = 'Time'
+            end>
+        end
+      end
+      object PlayerHeaderPanel: TNempPanel
+        Tag = 1
+        Left = 0
+        Top = 0
+        Width = 365
+        Height = 28
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        DesignSize = (
+          365
+          28)
+        object PlaylistFillPanel: TNempPanel
+          Tag = 1
+          Left = 103
+          Top = 2
+          Width = 262
+          Height = 24
+          Anchors = [akLeft, akTop, akRight]
+          BevelInner = bvRaised
+          BevelOuter = bvLowered
+          PopupMenu = PlayListPOPUP
+          TabOrder = 1
+          OnPaint = TABPanelPaint
+          OwnerDraw = False
+          DesignSize = (
+            262
+            24)
+          object PlayListStatusLBL: TLabel
+            Left = 8
+            Top = 5
+            Width = 245
+            Height = 13
+            Anchors = [akLeft, akTop, akRight]
+            AutoSize = False
+            ShowAccelChar = False
+            Transparent = True
+            ExplicitWidth = 302
+          end
+        end
+        object TabBtn_Playlist: TSkinButton
+          Left = 2
+          Top = 2
+          Width = 24
+          Height = 24
+          Hint = 'Show context menu'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 2
+          TabStop = False
+          OnClick = TabPanelPlaylistClick
+          DrawMode = dm_Skin
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object EditPlaylistSearch: TEdit
+          Left = 32
+          Top = 3
+          Width = 65
+          Height = 21
+          AutoSize = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          Text = 'Search'
+          OnEnter = EditPlaylistSearchEnter
+          OnExit = EditPlaylistSearchExit
+          OnKeyDown = EditPlaylistSearchKeyDown
+          OnKeyPress = EditPlaylistSearchKeyPress
+        end
+      end
+    end
     object PlayerPanel: TNempPanel
       Tag = 6
       Left = 304
@@ -1807,7 +1999,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 21
           Hint = 'Next preset'
           Caption = '>'
-          TabOrder = 11
+          TabOrder = 12
           OnClick = ButtonNextEQClick
         end
         object ButtonPrevEQ: TButton
@@ -1817,230 +2009,8 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 21
           Hint = 'Previous preset'
           Caption = '<'
-          TabOrder = 12
+          TabOrder = 11
           OnClick = ButtonNextEQClick
-        end
-      end
-      object GRPBOXHeadset: TNempPanel
-        Tag = 5
-        Left = 17
-        Top = 330
-        Width = 191
-        Height = 180
-        BevelOuter = bvNone
-        TabOrder = 6
-        OnClick = GRPBOXHeadsetClick
-        OnDragOver = GRPBOXControlDragOver
-        OnPaint = PanelPaint
-        OwnerDraw = False
-        OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
-        OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
-        object SlideBarShapeHeadset: TShape
-          Left = 14
-          Top = 131
-          Width = 139
-          Height = 6
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeWE
-          Shape = stRoundRect
-          OnDragOver = GRPBOXControlDragOver
-          OnMouseDown = SlideBarShapeHeadsetMouseDown
-        end
-        object VolShapeHeadset: TShape
-          Left = 166
-          Top = 130
-          Width = 6
-          Height = 33
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnDragOver = GRPBOXControlDragOver
-        end
-        object HeadsetCoverImage: TImage
-          Left = 33
-          Top = 32
-          Width = 91
-          Height = 91
-          Proportional = True
-          Stretch = True
-          OnClick = GRPBOXHeadsetClick
-          OnMouseDown = ImgDetailCoverMouseDown
-          OnMouseMove = ImgDetailCoverMouseMove
-        end
-        object LblHeadsetArtist: TLabel
-          Left = 8
-          Top = 8
-          Width = 60
-          Height = 13
-          Caption = 'Headphones'
-        end
-        object SlidebarButton_Headset: TSkinButton
-          Left = 41
-          Top = 129
-          Width = 25
-          Height = 10
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          TabOrder = 0
-          OnDragOver = GRPBOXControlDragOver
-          OnEndDrag = SlidebarButton_HeadsetEndDrag
-          OnKeyDown = SlidebarButton_HeadsetKeyDown
-          OnStartDrag = SlidebarButton_HeadsetStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = True
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object PlayPauseHeadSetBtn: TSkinButton
-          Left = 57
-          Top = 147
-          Width = 24
-          Height = 24
-          TabOrder = 1
-          OnClick = PLayPauseBtnHeadsetClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 2
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnLoadHeadset: TSkinButton
-          Left = 150
-          Top = 30
-          Width = 24
-          Height = 24
-          Hint = 'Load selected file into headset (Ctrl+H)'
-          TabOrder = 2
-          OnClick = BtnLoadHeadsetClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object StopHeadSetBtn: TSkinButton
-          Left = 87
-          Top = 147
-          Width = 24
-          Height = 24
-          TabOrder = 3
-          OnClick = StopHeadSetBtnClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object VolButtonHeadset: TSkinButton
-          Left = 163
-          Top = 148
-          Width = 12
-          Height = 12
-          Hint = 'Volume'
-          DragCursor = crSizeNS
-          DragMode = dmAutomatic
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 4
-          OnDragOver = GRPBOXControlDragOver
-          OnEndDrag = VolButtonEndDrag
-          OnKeyDown = VolButtonHeadsetKeyDown
-          OnStartDrag = SlidebarButton_HeadsetStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = True
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object SlideForwardHeadsetBTN: TSkinButton
-          Left = 118
-          Top = 148
-          Width = 22
-          Height = 22
-          TabOrder = 5
-          OnClick = SlideForwardHeadsetBTNClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object SlideBackHeadsetBTN: TSkinButton
-          Left = 29
-          Top = 148
-          Width = 22
-          Height = 22
-          TabOrder = 6
-          OnClick = SlideBackHeadsetBTNClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnHeadsetToPlaylist: TSkinButton
-          Left = 150
-          Top = 57
-          Width = 24
-          Height = 24
-          Hint = 'Add current file to playlist'
-          TabOrder = 7
-          OnClick = BtnHeadsetToPlaylistClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnHeadsetPlaynow: TSkinButton
-          Left = 150
-          Top = 85
-          Width = 24
-          Height = 24
-          Hint = 'Add file to playlist and begin playback from current position'
-          TabOrder = 8
-          OnClick = BtnHeadsetPlaynowClick
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
         end
       end
       object GRPBOXEffekte: TNempPanel
@@ -2328,170 +2298,108 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
       end
-    end
-    object PlaylistPanel: TNempPanel
-      Tag = 1
-      Left = 538
-      Top = 0
-      Width = 365
-      Height = 658
-      Align = alClient
-      BevelOuter = bvNone
-      TabOrder = 2
-      OnResize = PlaylistPanelResize
-      OnPaint = PanelPaint
-      OwnerDraw = False
-      object GRPBOXPlaylist: TNempPanel
-        Tag = 1
-        Left = 0
-        Top = 28
-        Width = 365
-        Height = 630
-        Align = alClient
-        BevelInner = bvRaised
-        BevelOuter = bvLowered
-        TabOrder = 1
-        OnPaint = NewPanelPaint
-        OwnerDraw = False
-        object PlaylistVST: TVirtualStringTree
-          Left = 2
-          Top = 2
-          Width = 361
-          Height = 626
-          Align = alClient
-          BevelEdges = []
-          BevelInner = bvSpace
-          BevelOuter = bvSpace
-          BorderStyle = bsNone
-          BorderWidth = 1
-          Ctl3D = True
-          DefaultPasteMode = amInsertAfter
-          DragImageKind = diMainColumnOnly
-          DragMode = dmAutomatic
-          DragWidth = 10
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          Header.AutoSizeIndex = -1
-          Header.Background = clWindow
-          Header.Font.Charset = DEFAULT_CHARSET
-          Header.Font.Color = clWindowText
-          Header.Font.Height = -11
-          Header.Font.Name = 'Tahoma'
-          Header.Font.Style = []
-          Header.Options = [hoDrag, hoVisible]
-          HintMode = hmHint
-          Images = PlayListImageList
-          Indent = 12
-          Margin = 0
-          ParentCtl3D = False
-          ParentFont = False
-          ParentShowHint = False
-          PopupMenu = PlayListPOPUP
-          ScrollBarOptions.ScrollBars = ssVertical
-          ShowHint = True
-          TabOrder = 0
-          TextMargin = 0
-          TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
-          TreeOptions.PaintOptions = [toShowBackground, toShowButtons, toShowRoot, toThemeAware, toUseBlendedImages, toUseBlendedSelection]
-          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect, toMultiSelect, toRightClickSelect]
-          OnAdvancedHeaderDraw = VSTAdvancedHeaderDraw
-          OnAfterItemErase = VSTAfterItemErase
-          OnAfterItemPaint = PlaylistVSTAfterItemPaint
-          OnBeforeItemErase = VSTBeforeItemErase
-          OnChange = PlaylistVSTChange
-          OnCollapsed = PlaylistVSTCollapsAndExpanded
-          OnColumnDblClick = PlaylistVSTColumnDblClick
-          OnDragOver = PlaylistVSTDragOver
-          OnDragDrop = PlaylistVSTDragDrop
-          OnEnter = PlaylistVSTEnter
-          OnExpanded = PlaylistVSTCollapsAndExpanded
-          OnGetText = PlaylistVSTGetText
-          OnPaintText = VSTPaintText
-          OnGetImageIndex = PlaylistVSTGetImageIndex
-          OnGetHint = PlaylistVSTGetHint
-          OnHeaderDrawQueryElements = VSTHeaderDrawQueryElements
-          OnKeyDown = PlaylistVSTKeyDown
-          OnKeyUp = PlaylistVSTKeyUp
-          OnMouseDown = PlaylistVSTMouseDown
-          OnMouseUp = PlaylistVSTMouseUp
-          OnResize = PlaylistVSTResize
-          OnScroll = PlaylistVSTScroll
-          OnStartDrag = PlaylistVSTStartDrag
-          Columns = <
-            item
-              Margin = 0
-              Position = 0
-              Spacing = 0
-              Width = 250
-              WideText = 'Title'
-            end
-            item
-              Alignment = taRightJustify
-              Margin = 0
-              Position = 1
-              Spacing = 0
-              Width = 40
-              WideText = 'Time'
-            end>
-        end
-      end
-      object PlayerHeaderPanel: TNempPanel
-        Tag = 1
-        Left = 0
-        Top = 0
-        Width = 365
-        Height = 28
-        Align = alTop
+      object GRPBOXHeadset: TNempPanel
+        Tag = 5
+        Left = 14
+        Top = 345
+        Width = 191
+        Height = 180
         BevelOuter = bvNone
-        TabOrder = 0
+        TabOrder = 6
+        OnClick = GRPBOXHeadsetClick
+        OnDragOver = GRPBOXControlDragOver
         OnPaint = PanelPaint
         OwnerDraw = False
-        DesignSize = (
-          365
-          28)
-        object PlaylistFillPanel: TNempPanel
-          Tag = 1
-          Left = 103
-          Top = 2
-          Width = 262
-          Height = 24
-          Anchors = [akLeft, akTop, akRight]
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          PopupMenu = PlayListPOPUP
-          TabOrder = 1
-          OnPaint = TABPanelPaint
-          OwnerDraw = False
-          DesignSize = (
-            262
-            24)
-          object PlayListStatusLBL: TLabel
-            Left = 8
-            Top = 5
-            Width = 245
-            Height = 13
-            Anchors = [akLeft, akTop, akRight]
-            AutoSize = False
-            ShowAccelChar = False
-            Transparent = True
-            ExplicitWidth = 302
-          end
+        OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
+        OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
+        object SlideBarShapeHeadset: TShape
+          Left = 14
+          Top = 131
+          Width = 139
+          Height = 6
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeWE
+          Shape = stRoundRect
+          OnDragOver = GRPBOXControlDragOver
+          OnMouseDown = SlideBarShapeHeadsetMouseDown
         end
-        object TabBtn_Playlist: TSkinButton
-          Left = 2
-          Top = 2
+        object VolShapeHeadset: TShape
+          Left = 166
+          Top = 130
+          Width = 6
+          Height = 33
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnDragOver = GRPBOXControlDragOver
+        end
+        object HeadsetCoverImage: TImage
+          Left = 33
+          Top = 32
+          Width = 91
+          Height = 91
+          Proportional = True
+          Stretch = True
+          OnClick = GRPBOXHeadsetClick
+          OnMouseDown = ImgDetailCoverMouseDown
+          OnMouseMove = ImgDetailCoverMouseMove
+        end
+        object LblHeadsetArtist: TLabel
+          Left = 8
+          Top = 8
+          Width = 60
+          Height = 13
+          Caption = 'Headphones'
+        end
+        object SlidebarButton_Headset: TSkinButton
+          Left = 41
+          Top = 129
+          Width = 25
+          Height = 10
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          TabOrder = 4
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = SlidebarButton_HeadsetEndDrag
+          OnKeyDown = SlidebarButton_HeadsetKeyDown
+          OnStartDrag = SlidebarButton_HeadsetStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = True
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object PlayPauseHeadSetBtn: TSkinButton
+          Left = 57
+          Top = 147
           Width = 24
           Height = 24
-          Hint = 'Show context menu'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 2
-          TabStop = False
-          OnClick = TabPanelPlaylistClick
-          DrawMode = dm_Skin
+          TabOrder = 0
+          OnClick = PLayPauseBtnHeadsetClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 2
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnLoadHeadset: TSkinButton
+          Left = 150
+          Top = 30
+          Width = 24
+          Height = 24
+          Hint = 'Load selected file into headset (Ctrl+H)'
+          TabOrder = 8
+          OnClick = BtnLoadHeadsetClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
           NumGlyphsX = 5
           NumGlyphsY = 1
           GlyphLine = 0
@@ -2500,24 +2408,116 @@ object Nemp_MainForm: TNemp_MainForm
           Color1 = clBlack
           Color2 = clBlack
         end
-        object EditPlaylistSearch: TEdit
-          Left = 32
-          Top = 3
-          Width = 65
-          Height = 21
-          AutoSize = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 0
-          Text = 'Search'
-          OnEnter = EditPlaylistSearchEnter
-          OnExit = EditPlaylistSearchExit
-          OnKeyDown = EditPlaylistSearchKeyDown
-          OnKeyPress = EditPlaylistSearchKeyPress
+        object StopHeadSetBtn: TSkinButton
+          Left = 87
+          Top = 147
+          Width = 24
+          Height = 24
+          TabOrder = 2
+          OnClick = StopHeadSetBtnClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object VolButtonHeadset: TSkinButton
+          Left = 163
+          Top = 148
+          Width = 12
+          Height = 12
+          Hint = 'Volume'
+          DragCursor = crSizeNS
+          DragMode = dmAutomatic
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = VolButtonEndDrag
+          OnKeyDown = VolButtonHeadsetKeyDown
+          OnStartDrag = SlidebarButton_HeadsetStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = True
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object SlideForwardHeadsetBTN: TSkinButton
+          Left = 118
+          Top = 148
+          Width = 22
+          Height = 22
+          TabOrder = 3
+          OnClick = SlideForwardHeadsetBTNClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object SlideBackHeadsetBTN: TSkinButton
+          Left = 29
+          Top = 148
+          Width = 22
+          Height = 22
+          TabOrder = 1
+          OnClick = SlideBackHeadsetBTNClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnHeadsetToPlaylist: TSkinButton
+          Left = 150
+          Top = 57
+          Width = 24
+          Height = 24
+          Hint = 'Add current file to playlist'
+          TabOrder = 7
+          OnClick = BtnHeadsetToPlaylistClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnHeadsetPlaynow: TSkinButton
+          Left = 150
+          Top = 85
+          Width = 24
+          Height = 24
+          Hint = 'Add file to playlist and begin playback from current position'
+          TabOrder = 6
+          OnClick = BtnHeadsetPlaynowClick
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
         end
       end
     end
@@ -3989,7 +3989,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000000ACC0B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000000AE80B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4555,7 +4555,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012600300B200D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012600300B3C0D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
@@ -7655,7 +7655,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07200910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C073C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
