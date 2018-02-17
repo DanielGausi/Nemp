@@ -576,6 +576,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
+          ExplicitLeft = 4
+          ExplicitTop = 4
           Columns = <
             item
               Margin = 0
@@ -692,6 +694,228 @@ object Nemp_MainForm: TNemp_MainForm
       OnMouseUp = PaintFrameMouseUp
       OnPaint = PanelPaint
       OwnerDraw = False
+      object GRPBOXHeadset: TNempPanel
+        Tag = 5
+        Left = 14
+        Top = 345
+        Width = 191
+        Height = 180
+        BevelOuter = bvNone
+        TabOrder = 6
+        OnClick = GRPBOXHeadsetClick
+        OnDragOver = GRPBOXControlDragOver
+        OnPaint = PanelPaint
+        OwnerDraw = False
+        OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
+        OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
+        object SlideBarShapeHeadset: TShape
+          Left = 14
+          Top = 131
+          Width = 139
+          Height = 6
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeWE
+          Shape = stRoundRect
+          OnDragOver = GRPBOXControlDragOver
+          OnMouseDown = SlideBarShapeHeadsetMouseDown
+        end
+        object VolShapeHeadset: TShape
+          Left = 166
+          Top = 130
+          Width = 6
+          Height = 33
+          Brush.Color = clGradientActiveCaption
+          DragCursor = crSizeNS
+          Shape = stRoundRect
+          OnDragOver = GRPBOXControlDragOver
+        end
+        object HeadsetCoverImage: TImage
+          Left = 33
+          Top = 32
+          Width = 91
+          Height = 91
+          Proportional = True
+          Stretch = True
+          OnClick = GRPBOXHeadsetClick
+          OnMouseDown = ImgDetailCoverMouseDown
+          OnMouseMove = ImgDetailCoverMouseMove
+        end
+        object LblHeadsetArtist: TLabel
+          Left = 8
+          Top = 8
+          Width = 60
+          Height = 13
+          Caption = 'Headphones'
+        end
+        object SlidebarButton_Headset: TSkinButton
+          Left = 41
+          Top = 129
+          Width = 25
+          Height = 10
+          DragCursor = crSizeWE
+          DragMode = dmAutomatic
+          TabOrder = 4
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = SlidebarButton_HeadsetEndDrag
+          OnKeyDown = SlidebarButton_HeadsetKeyDown
+          OnStartDrag = SlidebarButton_HeadsetStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = True
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object PlayPauseHeadSetBtn: TSkinButton
+          Left = 57
+          Top = 147
+          Width = 24
+          Height = 24
+          TabOrder = 0
+          OnClick = PLayPauseBtnHeadsetClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 2
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnLoadHeadset: TSkinButton
+          Left = 150
+          Top = 30
+          Width = 24
+          Height = 24
+          Hint = 'Load selected file into headset (Ctrl+H)'
+          TabOrder = 8
+          OnClick = BtnLoadHeadsetClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object StopHeadSetBtn: TSkinButton
+          Left = 87
+          Top = 147
+          Width = 24
+          Height = 24
+          TabOrder = 2
+          OnClick = StopHeadSetBtnClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object VolButtonHeadset: TSkinButton
+          Left = 163
+          Top = 148
+          Width = 12
+          Height = 12
+          Hint = 'Volume'
+          DragCursor = crSizeNS
+          DragMode = dmAutomatic
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 5
+          OnDragOver = GRPBOXControlDragOver
+          OnEndDrag = VolButtonEndDrag
+          OnKeyDown = VolButtonHeadsetKeyDown
+          OnStartDrag = SlidebarButton_HeadsetStartDrag
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = True
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+          AcceptArrowKeys = True
+        end
+        object SlideForwardHeadsetBTN: TSkinButton
+          Left = 118
+          Top = 148
+          Width = 22
+          Height = 22
+          TabOrder = 3
+          OnClick = SlideForwardHeadsetBTNClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object SlideBackHeadsetBTN: TSkinButton
+          Left = 29
+          Top = 148
+          Width = 22
+          Height = 22
+          TabOrder = 1
+          OnClick = SlideBackHeadsetBTNClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnHeadsetToPlaylist: TSkinButton
+          Left = 150
+          Top = 57
+          Width = 24
+          Height = 24
+          Hint = 'Add current file to playlist'
+          TabOrder = 7
+          OnClick = BtnHeadsetToPlaylistClick
+          OnDragOver = GRPBOXControlDragOver
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+        object BtnHeadsetPlaynow: TSkinButton
+          Left = 150
+          Top = 85
+          Width = 24
+          Height = 24
+          Hint = 'Add file to playlist and begin playback from current position'
+          TabOrder = 6
+          OnClick = BtnHeadsetPlaynowClick
+          DrawMode = dm_Windows
+          NumGlyphsX = 5
+          NumGlyphsY = 1
+          GlyphLine = 0
+          CustomRegion = False
+          FocusDrawMode = fdm_Windows
+          Color1 = clBlack
+          Color2 = clBlack
+        end
+      end
       object NewPlayerPanel: TNempPanel
         Left = 2
         Top = 2
@@ -1450,7 +1674,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 8
         Top = 150
         Width = 177
-        Height = 81
+        Height = 180
         BevelOuter = bvNone
         PopupMenu = Player_PopupMenu
         TabOrder = 0
@@ -1461,12 +1685,12 @@ object Nemp_MainForm: TNemp_MainForm
         OwnerDraw = False
         DesignSize = (
           177
-          81)
+          180)
         object LyricsMemo: TMemo
           Left = 5
           Top = 5
           Width = 167
-          Height = 74
+          Height = 175
           Anchors = [akLeft, akTop, akRight, akBottom]
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -1475,6 +1699,7 @@ object Nemp_MainForm: TNemp_MainForm
           ReadOnly = True
           TabOrder = 0
           OnKeyDown = LyricsMemoKeyDown
+          ExplicitHeight = 148
         end
       end
       object GRPBOXEqualizer: TNempPanel
@@ -2289,228 +2514,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 8
           OnClick = BtnABRepeatClick
           DrawMode = dm_Skin
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-      end
-      object GRPBOXHeadset: TNempPanel
-        Tag = 5
-        Left = 14
-        Top = 345
-        Width = 191
-        Height = 180
-        BevelOuter = bvNone
-        TabOrder = 6
-        OnClick = GRPBOXHeadsetClick
-        OnDragOver = GRPBOXControlDragOver
-        OnPaint = PanelPaint
-        OwnerDraw = False
-        OnMouseWheelUp = GRPBOXHeadsetMouseWheelUp
-        OnMouseWheelDown = GRPBOXHeadsetMouseWheelDown
-        object SlideBarShapeHeadset: TShape
-          Left = 14
-          Top = 131
-          Width = 139
-          Height = 6
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeWE
-          Shape = stRoundRect
-          OnDragOver = GRPBOXControlDragOver
-          OnMouseDown = SlideBarShapeHeadsetMouseDown
-        end
-        object VolShapeHeadset: TShape
-          Left = 166
-          Top = 130
-          Width = 6
-          Height = 33
-          Brush.Color = clGradientActiveCaption
-          DragCursor = crSizeNS
-          Shape = stRoundRect
-          OnDragOver = GRPBOXControlDragOver
-        end
-        object HeadsetCoverImage: TImage
-          Left = 33
-          Top = 32
-          Width = 91
-          Height = 91
-          Proportional = True
-          Stretch = True
-          OnClick = GRPBOXHeadsetClick
-          OnMouseDown = ImgDetailCoverMouseDown
-          OnMouseMove = ImgDetailCoverMouseMove
-        end
-        object LblHeadsetArtist: TLabel
-          Left = 8
-          Top = 8
-          Width = 60
-          Height = 13
-          Caption = 'Headphones'
-        end
-        object SlidebarButton_Headset: TSkinButton
-          Left = 41
-          Top = 129
-          Width = 25
-          Height = 10
-          DragCursor = crSizeWE
-          DragMode = dmAutomatic
-          TabOrder = 4
-          OnDragOver = GRPBOXControlDragOver
-          OnEndDrag = SlidebarButton_HeadsetEndDrag
-          OnKeyDown = SlidebarButton_HeadsetKeyDown
-          OnStartDrag = SlidebarButton_HeadsetStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = True
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object PlayPauseHeadSetBtn: TSkinButton
-          Left = 57
-          Top = 147
-          Width = 24
-          Height = 24
-          TabOrder = 0
-          OnClick = PLayPauseBtnHeadsetClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 2
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnLoadHeadset: TSkinButton
-          Left = 150
-          Top = 30
-          Width = 24
-          Height = 24
-          Hint = 'Load selected file into headset (Ctrl+H)'
-          TabOrder = 8
-          OnClick = BtnLoadHeadsetClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object StopHeadSetBtn: TSkinButton
-          Left = 87
-          Top = 147
-          Width = 24
-          Height = 24
-          TabOrder = 2
-          OnClick = StopHeadSetBtnClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object VolButtonHeadset: TSkinButton
-          Left = 163
-          Top = 148
-          Width = 12
-          Height = 12
-          Hint = 'Volume'
-          DragCursor = crSizeNS
-          DragMode = dmAutomatic
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 5
-          OnDragOver = GRPBOXControlDragOver
-          OnEndDrag = VolButtonEndDrag
-          OnKeyDown = VolButtonHeadsetKeyDown
-          OnStartDrag = SlidebarButton_HeadsetStartDrag
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = True
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-          AcceptArrowKeys = True
-        end
-        object SlideForwardHeadsetBTN: TSkinButton
-          Left = 118
-          Top = 148
-          Width = 22
-          Height = 22
-          TabOrder = 3
-          OnClick = SlideForwardHeadsetBTNClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object SlideBackHeadsetBTN: TSkinButton
-          Left = 29
-          Top = 148
-          Width = 22
-          Height = 22
-          TabOrder = 1
-          OnClick = SlideBackHeadsetBTNClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnHeadsetToPlaylist: TSkinButton
-          Left = 150
-          Top = 57
-          Width = 24
-          Height = 24
-          Hint = 'Add current file to playlist'
-          TabOrder = 7
-          OnClick = BtnHeadsetToPlaylistClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Windows
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnHeadsetPlaynow: TSkinButton
-          Left = 150
-          Top = 85
-          Width = 24
-          Height = 24
-          Hint = 'Add file to playlist and begin playback from current position'
-          TabOrder = 6
-          OnClick = BtnHeadsetPlaynowClick
-          DrawMode = dm_Windows
           NumGlyphsX = 5
           NumGlyphsY = 1
           GlyphLine = 0
