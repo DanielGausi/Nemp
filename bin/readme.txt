@@ -122,11 +122,11 @@ Neue Funktionen/Änderungen/Bugfix:
 - Unterstützung für SoundFont-Dateien, um MIDI-Dateien abzuspielen.
 - Markierung von Dateien möglich (1/2/3). Wird NUR in der Medienbibliothek 
   gespeichert, nicht in den ID3-Tags
-- Parameter /close. Durch den Aufruf von "nemp.exe /close" wird die leufende Instanz 
+- Parameter /close. Durch den Aufruf von "nemp.exe /close" wird die laufende Instanz 
   beendet. CloseNemp.exe damit überflüssig.
 - Suche verschlankt. 
   * keine Aufteilung mehr bei der Schnellsuche in zwei Listen
-  * "Suche verfeinern" und "Suche erweitern" beid er ausführlichen Suche entfernt
+  * "Suche verfeinern" und "Suche erweitern" bei der ausführlichen Suche entfernt
 
 
 Version 4.7.1, November 2017
