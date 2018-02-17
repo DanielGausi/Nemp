@@ -471,10 +471,11 @@ begin
  result := nil;
  for i := 0 to form.ComponentCount-1 do
   if form.Components[i] is TControl then        // is TControl
-   with TControl(form.Components[i]) do
     if PtInRect(
-        Rect(ClientToScreen(clientrect.TopLeft), ClientToScreen(clientrect.BottomRight)),
-        point(x,y)) then
+        Rect(TControl(form.Components[i]).ClientToScreen(TControl(form.Components[i]).clientrect.TopLeft),
+              TControl(form.Components[i]).ClientToScreen(TControl(form.Components[i]).clientrect.BottomRight)),
+              point(x,y))
+        then
               result := TControl(form.Components[i]);
 end;
 

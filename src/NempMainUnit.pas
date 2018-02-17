@@ -4717,6 +4717,7 @@ end;
 
 
 
+
 procedure TNemp_MainForm.VSTChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
 var c, i: Integer;
   dauer:int64;
