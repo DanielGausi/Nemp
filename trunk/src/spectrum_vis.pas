@@ -696,6 +696,8 @@ var textwidth: integer;
 begin
     if Not Scroll then fTextPosX := 4;
 
+    // use fixed scale here
+    TxtBuff.Canvas.Font.PixelsPerInch := 96;
     TxtBuff.Canvas.Font.Size := fTextFontSize;
     TxtBuff.Canvas.Pen.Color := TitelBkgColor;
     TxtBuff.Canvas.Brush.Style := bsSolid;
@@ -755,6 +757,8 @@ begin
   TxtBuff.Canvas.Pen.Color := TimeBkgColor;
   TxtBuff.Canvas.Brush.Style := bsSolid;
   TxtBuff.Canvas.Brush.Color := TimeBkgColor;
+  // use fixed scale here
+  TxtBuff.Canvas.Font.PixelsPerInch := 96;
   TxtBuff.Canvas.Font.Size := fTimeFontSize;
 
   if UseBkg then
