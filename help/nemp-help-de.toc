@@ -63,7 +63,7 @@
 \contentsline {subsection}{\numberline {5.4}Datei-Management}{50}{subsection.73}
 \contentsline {subsubsection}{Dateitypen-Registrierung}{51}{section*.74}
 \contentsline {subsubsection}{Metadaten}{51}{section*.75}
-\contentsline {subsubsection}{Cover}{53}{section*.76}
+\contentsline {subsubsection}{Cover}{54}{section*.76}
 \contentsline {subsubsection}{Suchoptionen}{55}{section*.77}
 \contentsline {section}{\numberline {6}Nerd-Zeug}{57}{section.78}
 \contentsline {section}{\numberline {7}Versionsgeschichte}{58}{section.79}
