@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  18 FEB 2018 09:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.24)  3 MAR 2018 15:44
 entering extended mode
 **./nemp-help-de.tex
 (nemp-help-de.tex
@@ -1098,10 +1098,6 @@ Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2002.
 
 Package rerunfilecheck Info: File `nemp-help-de.out' has not changed.
 (rerunfilecheck)             Checksum: 86F393237DFC5281D3D9932C40A238EA;4894.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2002.
  ) 
 Here is how much of TeX's memory you used:
@@ -1125,7 +1121,7 @@ x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x8
 /MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (x86)/M
 iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files (x86)/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on nemp-help-de.pdf (79 pages, 2093914 bytes).
+Output written on nemp-help-de.pdf (79 pages, 2094841 bytes).
 PDF statistics:
  932 PDF objects out of 1000 (max. 8388607)
  203 named destinations out of 1000 (max. 500000)
