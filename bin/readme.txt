@@ -115,6 +115,16 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
 
+Version 4.8.1, März 2018
+----------------------------------------------------------- 
+- Option: Beim Start fehlende Dateien löschen (= Medienbib aufräumen)
+          - wird neu ausgeführt beim Anschluss eines neuen Laufwerks
+- Einstellungsdialog: Button "Scan now" für neue/fehlende Dateien
+- Bugfix: "Fehlende Dateien entfernen" entfernte immer fehlende Playlists, 
+           auch von Laufwerken, die aktuell nicht angeschlossen sind
+- Bugfix: Wahrscheinlicher Deadlock bei "Clear Covercache" behoben
+
+
 Version 4.8.0, Februar 2018
 ----------------------------------------------------------- 
 Neue Funktionen/Änderungen/Bugfix:

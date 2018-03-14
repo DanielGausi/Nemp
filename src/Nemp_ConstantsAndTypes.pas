@@ -433,6 +433,12 @@ const
 
     MB_ID3TagUpdateComplete = 38;
 
+    MB_StartAutoDeleteFiles = 39;
+    // new startup-system
+    MB_CheckForStartJobs = 40;
+
+    MB_InfoDeadFiles = 41;
+
     MB_SetStatus = 100;
 
 
@@ -837,9 +843,11 @@ const
       // On Nemp Start, several thing may be done automatically in Threads,
       // i.e. AutoScanDirs for new files and AutoActivate WebServer
       // We need to know, which part of Startup is already done, this is stored in Bib.Initializing
-      init_nothing = 0;
-      init_AutoScanDir = 1;
-      init_Complete = 2;
+      //init_nothing = 0;
+      //init_AutoScanDir = 1;
+      //init_CleanUpDeadFiles = 2;
+      //init_ActivateWebServer = 3;
+      //init_Complete = 4;
 
 
 

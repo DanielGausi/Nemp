@@ -108,6 +108,11 @@ type
             fCacheFilename: String;
             fCacheList: TObjectList;   // Always use CriticalSection CSAccessCacheList to access this List!
                                        // The List is mainly used by the secondary thread, but can be deleted by the Settings-dialog.
+                                       // ... which will directly cause a f*cking Deadlock m(
+                                       // therefore: change it to ...
+            fUserWantToClearCacheList: LongBool;
+
+
 
             fMostImportantIndex: Integer;
             procedure SetMostImportantIndex(Value: Integer);    // VCL
@@ -130,6 +135,9 @@ type
             // CacheList
             procedure LoadCacheList;
             procedure SaveCacheList;
+
+            function GetUserWantToClearCacheList: LongBool;
+            procedure SetUserWantToClearCacheList(aValue: LongBool);
 
             function GetMatchingCacheItem: TCoverDownloadItem;
             function CacheItemCanBeRechecked(aCacheItem: TCoverDownloadItem): Boolean;
@@ -161,6 +169,7 @@ type
 
         public
             property MostImportantIndex: Integer read fMostImportantIndex write SetMostImportantIndex;
+            property UserWantToClearCacheList: LongBool read GetUserWantToClearCacheList write SetUserWantToClearCacheList;
 
             constructor Create;
             destructor Destroy; override;
@@ -172,9 +181,6 @@ type
     end;
 
     function SortDownloadPriority(item1,item2: Pointer): Integer;
-
-var
-    CSAccessCacheList: RTL_CRITICAL_SECTION;
 
 implementation
 
@@ -280,12 +286,14 @@ begin
     fEvent := TEvent.Create(Nil, True, False, '');
     FreeOnTerminate := False;
 
-    fIDHttp.ConnectTimeout:= 5000;
-    fIDHttp.ReadTimeout:= 5000;
-    fIDHttp.Request.UserAgent := 'Mozilla/3.0';
+    fIDHttp.ConnectTimeout:= 2000;
+    fIDHttp.ReadTimeout:= 2000;
+    fIDHttp.Request.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+    fIDHttp.Request.CharSet := 'utf-8';
+
     fIDHttp.HTTPOptions :=  [];
 
-
+    UserWantToClearCacheList := False;
     Resume;
 end;
 
@@ -322,13 +330,16 @@ begin
             begin
                 if not Terminated then
                 begin
+                    if UserWantToClearCacheList then
+                    begin
+                        fCacheList.Clear;
+                        UserWantToClearCacheList := False;
+                    end;
+
                     FWorkToDo := False;  // will be set to True again in SyncGetFirstJob
                     Synchronize(SyncGetFirstJob);
                     if FWorkToDo then
                     begin
-                        // Block CacheList
-                        EnterCriticalSection(CSAccessCacheList);
-
                         if fCurrentDownloadItem.QueryType = qtPlayer then
                         begin
                             if fCurrentDownloadItem.SubQueryType = sqtFile then
@@ -415,8 +426,6 @@ begin
                             if not terminated then
                                 Synchronize(SyncUpdateInvalidCover);
                         end;
-                        LeaveCriticalSection(CSAccessCacheList);
-
                     end;
                 end;
             end;
@@ -425,6 +434,15 @@ begin
     finally
         fCacheList.Free;
     end;
+end;
+
+function TCoverDownloadWorkerThread.GetUserWantToClearCacheList: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fUserWantToClearCacheList));
+end;
+procedure TCoverDownloadWorkerThread.SetUserWantToClearCacheList(aValue: LongBool);
+begin
+  InterLockedExchange(Integer(fUserWantToClearCacheList), Integer(aValue));
 end;
 
 {
@@ -441,7 +459,6 @@ var Header: AnsiString;
     i, Count: Integer;
     NewItem: TCoverDownloadItem;
 begin
-    EnterCriticalSection(CSAccessCacheList);
     aStream := TMemoryStream.Create;
     try
         if FileExists(fCacheFilename) then
@@ -471,7 +488,6 @@ begin
     finally
         aStream.Free;
     end;
-    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 procedure TCoverDownloadWorkerThread.SaveCacheList;
@@ -480,7 +496,6 @@ var Header: AnsiString;
     aStream: TMemoryStream;
     i, Count: Integer;
 begin
-    EnterCriticalSection(CSAccessCacheList);
     aStream := TMemoryStream.Create;
     try
         Header := 'NempCoverCache';
@@ -508,7 +523,6 @@ begin
     finally
         aStream.Free;
     end;
-    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 {
@@ -520,9 +534,8 @@ end;
 }
 procedure TCoverDownloadWorkerThread.ClearCacheList;
 begin
-    EnterCriticalSection(CSAccessCacheList);
-    fCacheList.Clear;
-    LeaveCriticalSection(CSAccessCacheList);
+    UserWantToClearCacheList := True;
+    fEvent.SetEvent;
 end;
 
 {
@@ -658,8 +671,6 @@ function TCoverDownloadWorkerThread.GetMatchingCacheItem: TCoverDownloadItem;
 var i: Integer;
     aItem: TCoverDownloadItem;
 begin
-    // Block CacheList
-    EnterCriticalSection(CSAccessCacheList);
     result := Nil;
 
     if (fCurrentDownloadItem.QueryType = qtPlayer)
@@ -690,7 +701,6 @@ begin
             end;
         end;
     end;
-    LeaveCriticalSection(CSAccessCacheList);
 end;
 
 {
@@ -723,7 +733,7 @@ end;
     --------------------------------------------------------
 }
 function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
-var url: String;
+var url: UTF8String;
 begin
     url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
         + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
@@ -743,7 +753,9 @@ begin
 
         on E: EIDHttpProtocolException do
         begin
-            fInternetConnectionLost := True;
+            // lastFM seems to send a "400-Bad Request" when an album is not found
+            // but a "no connection" logo on the cover would be wrong here
+            fInternetConnectionLost := False;
             fXMLData := '';
             result := False;
         end;
@@ -1318,12 +1330,5 @@ begin
         //Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
 end;
 
-initialization
-
-  InitializeCriticalSection(CSAccessCacheList);
-
-finalization
-
-  DeleteCriticalSection(CSAccessCacheList);
 
 end.

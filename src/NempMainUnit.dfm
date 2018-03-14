@@ -576,8 +576,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
-          ExplicitLeft = 4
-          ExplicitTop = 4
           Columns = <
             item
               Margin = 0
@@ -1699,7 +1697,6 @@ object Nemp_MainForm: TNemp_MainForm
           ReadOnly = True
           TabOrder = 0
           OnKeyDown = LyricsMemoKeyDown
-          ExplicitHeight = 148
         end
       end
       object GRPBOXEqualizer: TNempPanel
@@ -3245,6 +3242,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_ML_FlagSelectedFiles: TMenuItem
         Caption = 'Flag selected files with'
+        ImageIndex = 34
         object MM_ML_Mark1: TMenuItem
           Tag = 101
           Caption = 'Mark 1'
@@ -3461,6 +3459,7 @@ object Nemp_MainForm: TNemp_MainForm
       object MM_PL_MarkFiles: TMenuItem
         Tag = 150
         Caption = 'Flag selected files with'
+        ImageIndex = 34
         object MM_PL_Mark1: TMenuItem
           Tag = 1
           Caption = 'Mark 1'
@@ -3992,7 +3991,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000000AF40B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000000AF80B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4558,7 +4557,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012600300B480D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012600300B4C0D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
@@ -6245,6 +6244,7 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ML_MarkFile: TMenuItem
       Tag = 150
       Caption = 'Flag selected files with'
+      ImageIndex = 34
       object PM_ML_Mark1: TMenuItem
         Tag = 101
         Caption = 'Mark 1'
@@ -6545,6 +6545,7 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_PL_MarkFiles: TMenuItem
       Tag = 150
       Caption = 'Flag selected files with'
+      ImageIndex = 34
       object PM_PL_Mark1: TMenuItem
         Tag = 1
         Caption = 'Mark 1'
@@ -7658,7 +7659,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07480910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C074C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

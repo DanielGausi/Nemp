@@ -511,6 +511,9 @@ type
     editSoundFont: TEdit;
     OpenDlg_SoundFont: TOpenDialog;
     BtnSelectSoundFontFile: TButton;
+    cb_AutoDeleteFiles: TCheckBox;
+    cb_AutoDeleteFilesShowInfo: TCheckBox;
+    BtnAutoScanNow: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -616,6 +619,8 @@ type
     procedure RandomWeight05Exit(Sender: TObject);
     procedure BtnCountRatingClick(Sender: TObject);
     procedure BtnSelectSoundFontFileClick(Sender: TObject);
+    procedure cb_AutoDeleteFilesClick(Sender: TObject);
+    procedure BtnAutoScanNowClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -668,7 +673,7 @@ var
 implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
-  WebServerLog;
+  WebServerLog, MedienBibliothekClass;
 
 {$R *.dfm}
 
@@ -1415,6 +1420,11 @@ begin
 
   CBAskForAutoAddNewDirs.Checked := MedienBib.AskForAutoAddNewDirs;
   CBAutoAddNewDirs.Checked       := MedienBib.AutoAddNewDirs;
+
+  cb_AutoDeleteFiles        .checked := MedienBib.AutoDeleteFiles;
+  cb_AutoDeleteFilesShowInfo.checked := MedienBib.AutoDeleteFilesShowInfo;
+  cb_AutoDeleteFilesShowInfo.Enabled := cb_AutoDeleteFiles.Checked;
+
 
   cb_ShowSplashScreen.Checked := Nemp_MainForm.NempOptions.ShowSplashScreen;
   CB_AllowMultipleInstances.Checked := Not Nemp_MainForm.NempOptions.AllowOnlyOneInstance;
@@ -2475,71 +2485,65 @@ begin
   NeedTotalLyricStringUpdate := False;
   NeedCoverFlowSearchUpdate := False;
 
-  if MedienBib.StatusBibUpdate = 0 then
-  begin
-      if ((
-          (CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
-          OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2]))
-          )
-          AND
-          (MedienBib.BrowseMode = 0)
-          )
+  //if MedienBib.StatusBibUpdate = 0 then
+  //begin
+      // check for some critical updates for the medialibrary (done later in this procedure)
+      // --------------------------------------------------------
+      if      (((CBSortArray1.ItemIndex <> integer(MedienBib.NempSortArray[1]))
+                    OR (CBSortArray2.ItemIndex <> integer(MedienBib.NempSortArray[2])))
+              AND
+              (MedienBib.BrowseMode = 0))
           OR
-          (
-          ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
-          AND
-          (MedienBib.BrowseMode = 1)
-          )
+              ( ((cbCoverSortOrder.ItemIndex + 1) <> MedienBib.CoverSortOrder)
+              AND (MedienBib.BrowseMode = 1) )
           OR
-          (
-          ((cbMissingCoverMode.ItemIndex) <> MedienBib.MissingCoverMode)
-          AND
-          (MedienBib.BrowseMode = 1)
-          )
+              ( ((cbMissingCoverMode.ItemIndex) <> MedienBib.MissingCoverMode)
+              AND (MedienBib.BrowseMode = 1) )
       then
-      begin
-          // We have changed something with the current Browse-Values
-          // Update needed
           NeedUpdate := True;
-      end;
+
       if (MedienBib.BrowseMode = 1)  AND
-          (cb_ChangeCoverflowOnSearch.Checked <> MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow) 
+          (cb_ChangeCoverflowOnSearch.Checked <> MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow)
       then
-            NeedCoverFlowSearchUpdate := True;
-            
-      // However, we can synchronize VCL and Data here always. ;-)
-      MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
-      MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
-      MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
-      MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
+          NeedCoverFlowSearchUpdate := True;
 
-      Nemp_MainForm.NempOptions.ReplaceNAArtistBy := cbReplaceArtistBy.ItemIndex;
-      Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
-      Nemp_MainForm.NempOptions.ReplaceNAAlbumBy := cbReplaceAlbumBy .ItemIndex;
-
-      // MedienBib, Suchoptionen
       NeedTotalLyricStringUpdate := MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked;
-
       NeedTotalStringUpdate := (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch.Checked)
                              or (MedienBib.BibSearcher.AccelerateSearchIncludePath <> CB_AccelerateSearchIncludePath.Checked)
                              or (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked);
-      MedienBib.BibSearcher.AccelerateSearch               := CB_AccelerateSearch                 .Checked;
-      MedienBib.BibSearcher.AccelerateSearchIncludePath    := CB_AccelerateSearchIncludePath      .Checked;
-      MedienBib.BibSearcher.AccelerateSearchIncludeComment := CB_AccelerateSearchIncludeComment   .Checked;
-      MedienBib.BibSearcher.AccelerateLyricSearch          := CB_AccelerateLyricSearch            .Checked;
 
-      MedienBib.BibSearcher.QuickSearchOptions.WhileYouType       := CB_QuickSearchWhileYouType          .Checked;
-      MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow    := cb_ChangeCoverflowOnSearch          .Checked;
-      MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter := CB_QuickSearchAllowErrorsOnEnter    .Checked;
-      MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType  := CB_QuickSearchAllowErrorsWhileTyping.Checked;
-  end else
-  begin
-    MessageDLG((Warning_MedienBibIsBusy_Options), mtWarning, [MBOK], 0);
-    CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
-    CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
-    cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
-    cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
-  end;
+      if (MedienBib.StatusBibUpdate <> 0)
+          AND (NeedUpdate or NeedCoverFlowSearchUpdate or NeedTotalLyricStringUpdate or NeedTotalStringUpdate) then
+      begin
+          // warning, settings MUST NOT be adopted now.
+          MessageDLG((Warning_MedienBibIsBusy_Options), mtWarning, [MBOK], 0);
+          // CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
+          // CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
+          // cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
+          // cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
+      end else
+      begin
+          // everthings fine
+          MedienBib.NempSortArray[1] := TAudioFileStringIndex(CBSortArray1.ItemIndex);
+          MedienBib.NempSortArray[2] := TAudioFileStringIndex(CBSortArray2.ItemIndex);
+          MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
+          MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
+
+          Nemp_MainForm.NempOptions.ReplaceNAArtistBy := cbReplaceArtistBy.ItemIndex;
+          Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
+          Nemp_MainForm.NempOptions.ReplaceNAAlbumBy := cbReplaceAlbumBy .ItemIndex;
+
+          MedienBib.BibSearcher.AccelerateSearch               := CB_AccelerateSearch                 .Checked;
+          MedienBib.BibSearcher.AccelerateSearchIncludePath    := CB_AccelerateSearchIncludePath      .Checked;
+          MedienBib.BibSearcher.AccelerateSearchIncludeComment := CB_AccelerateSearchIncludeComment   .Checked;
+          MedienBib.BibSearcher.AccelerateLyricSearch          := CB_AccelerateLyricSearch            .Checked;
+
+          MedienBib.BibSearcher.QuickSearchOptions.WhileYouType       := CB_QuickSearchWhileYouType          .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow    := cb_ChangeCoverflowOnSearch          .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter := CB_QuickSearchAllowErrorsOnEnter    .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType  := CB_QuickSearchAllowErrorsWhileTyping.Checked;
+      end;
+
 
   MedienBib.AutoScanDirs := CBAutoScan.Checked;
   MedienBib.AutoScanDirList.Clear;
@@ -2548,15 +2552,13 @@ begin
   MedienBib.AskForAutoAddNewDirs := CBAskForAutoAddNewDirs.Checked;
   MedienBib.AutoAddNewDirs       := CBAutoAddNewDirs.Checked      ;
 
+  MedienBib.AutoDeleteFiles         := cb_AutoDeleteFiles        .checked ;
+  MedienBib.AutoDeleteFilesShowInfo := cb_AutoDeleteFilesShowInfo.checked ;
+
   if Nemp_MainForm.NempOptions.FullRowSelect then
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions + [toFullRowSelect]
   else
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions - [toFullRowSelect];
-
-  // if Nemp_MainForm.NempOptions.EditOnClick then
-  //    Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions + [toEditOnClick]
-  //else
-  //    Nemp_MainForm.VST.TreeOptions.MiscOptions := Nemp_MainForm.VST.TreeOptions.MiscOptions - [toEditOnClick];
 
   Nemp_MainForm.NempOptions.ShowSplashScreen := cb_ShowSplashScreen.Checked;
   Nemp_MainForm.NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
@@ -2614,8 +2616,6 @@ begin
 
   if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);
-
-  //FDetails.UpdateID3ReadOnlyStatus;//SetID3EditsWritable(False);
 
   // Fensterverhalten:
   if Nemp_MainForm.NempOptions.NempWindowView <> cb_TaskTray.ItemIndex then
@@ -2689,14 +2689,12 @@ begin
   Nemp_MainForm.ArtistsVST.Font.Size := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
   Nemp_MainForm.AlbenVST.Font.Size := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
 
-
   if NeedTotalLyricStringUpdate then Medienbib.BuildTotalLyricString;
   if NeedTotalStringUpdate then MedienBib.BuildTotalString;
 
   if NeedCoverFlowSearchUpdate then
       RestoreCoverFlowAfterSearch(True);
 
-      
   if NeedUpdate then
   begin
       // Browse-Listen neu aufbauen
@@ -2735,25 +2733,7 @@ begin
     end;
   end;
 
-  //Nemp_MainForm.NempOptions.MinFontColor    := ShapeMinColor.Brush.Color;
-  //Nemp_MainForm.NempOptions.MiddleFontColor := ShapeMittelColor.Brush.Color;
-  //Nemp_MainForm.NempOptions.MaxFontColor    := ShapeMaxColor.Brush.Color;
-  //Nemp_MainForm.NempOptions.MiddleToMinComputing := CBMiddleToMinComputing.ItemIndex;
-  //Nemp_MainForm.NempOptions.MiddleToMaxComputing := CBMiddleToMaxComputing.ItemIndex;
-
-  // Basis-Value für [3] nehmen
-  /// Nemp_MainForm.NempOptions.FontSize[3] :=  SEFontSize.Value;
-
-  /// Nemp_MainForm.NempOptions.FontSize[1] :=  max(4,
-  ///                 Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 2));
-
-  /// Nemp_MainForm.NempOptions.FontSize[2] :=  max(4,
-  ///                 Nemp_MainForm.NempOptions.FontSize[3] - (Nemp_MainForm.NempOptions.FontSize[3] Div 4));
-
-  /// Nemp_MainForm.NempOptions.FontSize[4] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 4);
-  /// Nemp_MainForm.NempOptions.FontSize[5] :=  Nemp_MainForm.NempOptions.FontSize[3] + (Nemp_MainForm.NempOptions.FontSize[3] Div 2);
   Nemp_MainForm.NempOptions.RowHeight := SERowHeight.Value;
-
   if Nemp_MainForm.NempOptions.ChangeFontSizeOnLength then
       maxFont := MaxFontSize(Nemp_MainForm.NempOptions.DefaultFontSize)
   else
@@ -2781,20 +2761,6 @@ begin
       AlbenVST.Invalidate;
   end;
 
-  // Zeichensätze
-  {
-  with MedienBib do
-  begin
-      NempCharCodeOptions.Arabic    := ArabicEncodings[CBArabic.Itemindex];
-      NempCharCodeOptions.Chinese   := ChineseEncodings[CBChinese.Itemindex];
-      NempCharCodeOptions.Cyrillic  := CyrillicEncodings[CBCyrillic.Itemindex];
-      NempCharCodeOptions.Greek     := GreekEncodings[CBGreek.Itemindex];
-      NempCharCodeOptions.Hebrew    := HebrewEncodings[CBHebrew.Itemindex];
-      NempCharCodeOptions.Japanese  := JapaneseEncodings[CBJapanese.Itemindex];
-      NempCharCodeOptions.Korean    := KoreanEncodings[CBKorean.Itemindex];
-      NempCharCodeOptions.Thai      := ThaiEncodings[CBThai.Itemindex];
-  end;
-  }
   MedienBib.NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
 
   if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
@@ -2912,7 +2878,6 @@ begin
   //========================================================
 
   Nemp_MainForm.NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
-  // Todo: Menu-Check-Einträge umsetzen
 
   with Nemp_MainForm do
   begin
@@ -2949,9 +2914,6 @@ begin
   NempPlayer.NempScrobbler.IgnoreErrors      := CB_SilentError        .Checked;
   NempPlayer.NempScrobbler.AlwaysScrobble    := CB_AlwaysScrobble     .Checked;
 
-  //Nemp_MainForm.MM_T_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
-  //Nemp_MainForm.PM_P_Scrobbler.Checked := CB_ScrobbleThisSession.Checked;
-
   if NempPlayer.NempScrobbler.DoScrobble <> CB_ScrobbleThisSession.Checked then
   begin
       NempPlayer.NempScrobbler.DoScrobble := CB_ScrobbleThisSession.Checked;
@@ -2985,13 +2947,10 @@ begin
   NempWebServer.PasswordA := EdtPasswordAdmin.Text;
   NempWebServer.Theme := cbWebServerRootDir.Text;
 
-  // NempWebServer.OnlyLAN  := cbOnlyLAN.Checked;
-
   if (NempWebServer.Port <> seWebServer_Port.Value) and (NempWebServer.Active) then
       MessageDLG((WebServer_PortChangeFailed), mtInformation, [MBOK], 0);
 
   NempWebServer.Port := seWebServer_Port.Value;
-
   NempWebServer.AllowLibraryAccess    := cbPermitLibraryAccess.Checked;
   NempWebServer.AllowFileDownload     := cbPermitPlaylistDownload.Checked;
   NempWebServer.AllowRemoteControl    := cbAllowRemoteControl.Checked;
@@ -3002,9 +2961,7 @@ begin
 
   oldfactor := Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor;
 
-  Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor :=
-  Nemp_MainForm.NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex);
-
+  Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor := Nemp_MainForm.NempSkin.NempPartyMode.IndexToFactor(CB_PartyMode_ResizeFactor.ItemIndex);
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTreeEdit           := cb_PartyMode_BlockTreeEdit          .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockCurrentTitleRating := cb_PartyMode_BlockCurrentTitleRating.Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.BlockTools              := cb_PartyMode_BlockTools             .Checked;
@@ -3148,11 +3105,33 @@ procedure TOptionsCompleteForm.BtnAutoScanDeleteClick(Sender: TObject);
 var i: Integer;
 begin
   LBAutoScan.DeleteSelected;
-// hier besser:
-// mit  LBAutoScan.itemIndex arbeiten, und nur das gelöscht aus der Liste entfernen
   MedienBib.AutoScanDirList.Clear;
   for i := 0 to LBAutoScan.Count - 1 do
     MedienBib.AutoScanDirList.Add(LBAutoScan.Items[i]);
+end;
+
+procedure TOptionsCompleteForm.BtnAutoScanNowClick(Sender: TObject);
+var i: Integer;
+begin
+    if (MedienBib.StatusBibUpdate = 0) then
+    begin
+        if CBAutoScan.Checked then
+        begin
+            // refill scandirectories
+            MedienBib.AutoScanToDoList.clear;
+            for i := 0 to MedienBib.AutoScanDirList.count - 1 do
+                MedienBib.AutoScanToDoList.Add(MedienBib.AutoScanDirList[i]);
+            // add the scanJob to the ToDo-List
+            Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
+        end;
+
+        if cb_AutoDeleteFiles.checked then
+            Medienbib.AddStartJob(JOB_AutoScanMissingFiles, '');
+        MedienBib.AddStartJob(JOB_Finish, '');
+        // start working
+        MedienBib.ProcessNextStartJob;
+    end else
+        MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
 end;
 
 procedure TOptionsCompleteForm.LBAutoscanKeyDown(Sender: TObject;
@@ -3393,6 +3372,11 @@ end;
 procedure TOptionsCompleteForm.CB_AutoCheckClick(Sender: TObject);
 begin
     CBBOX_UpdateInterval.Enabled := CB_AutoCheck.Checked;
+end;
+
+procedure TOptionsCompleteForm.cb_AutoDeleteFilesClick(Sender: TObject);
+begin
+    cb_AutoDeleteFilesShowInfo.Enabled := cb_AutoDeleteFiles.Checked;
 end;
 
 procedure TOptionsCompleteForm.Btn_CHeckNowForUpdatesClick(

@@ -43,7 +43,7 @@ implementation
 
 {$R *.dfm}
 
-uses Nemp_RessourceStrings, NempMainUnit;
+uses Nemp_RessourceStrings, NempMainUnit, BibHelper;
 
 procedure TDeleteSelection.FormShow(Sender: TObject);
 var i: Integer;
@@ -121,6 +121,10 @@ begin
         try
             for i := 0 to currentData.Files.Count - 1 do
                 sl.Add(TAudioFile(currentData.Files[i]).Pfad);
+
+            for i := 0 to currentData.PlaylistFiles.Count - 1 do
+                sl.Add(TJustaString(currentData.PlaylistFiles[i]).AnzeigeString);
+
             MemoFiles.Lines.Assign(sl);
         finally
             sl.Free;

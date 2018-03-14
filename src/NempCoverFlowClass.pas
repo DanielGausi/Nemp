@@ -301,6 +301,7 @@ end;
 
 procedure TNempCoverFlow.ClearCoverCache;
 begin
+    // this will set a flag to delete the list inside the context of the thread before downloading the next cover.
     fDownloadThread.ClearCacheList;
 end;
 

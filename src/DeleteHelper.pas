@@ -15,6 +15,7 @@ type
             DoDelete    : Boolean;   // User-Input
             Hint: TDeleteHint;                      // ... and why?
             Files: TObjectList;
+            PlaylistFiles: TObjectList;
 
             constructor Create;
             destructor Destroy; override;
@@ -28,11 +29,13 @@ implementation
 constructor TDeleteData.Create;
 begin
     Files := TObjectList.Create(False);
+    PlaylistFiles := TObjectList.Create(False);
 end;
 
 destructor TDeleteData.Destroy;
 begin
     Files.Free;
+    PlaylistFiles.Free;
     inherited;
 end;
 

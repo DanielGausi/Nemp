@@ -64,13 +64,33 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles,
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
-     DeleteHelper, TagHelper;
-
+     DeleteHelper, TagHelper, Generics.Collections;
 
 type
 
     TDisplayContent = (DISPLAY_None, DISPLAY_BrowseFiles, DISPLAY_BrowsePlaylist, DISPLAY_Search, DISPLAY_Quicksearch, DISPLAY_Favorites);
 
+    PDeadFilesInfo = ^TDeadFilesInfo;
+    TDeadFilesInfo = record
+        MissingDrives: Integer;
+        ExistingDrives: Integer;
+        MissingFilesOnMissingDrives: Integer;
+        MissingFilesOnExistingDrives: Integer;
+        MissingPlaylistsOnMissingDrives: Integer;
+        MissingPlaylistsOnExistingDrives: Integer;
+    end;
+
+    // types for the automatic stuff to do after create.
+    // note: When adding Jobs, ALWAYS add also a JOB_Finish job to finalize the process
+    TJobType = (JOB_LoadLibrary, JOB_AutoScanNewFiles, JOB_AutoScanMissingFiles, JOB_StartWebServer, JOB_Finish);
+    TStartJob = class
+        public
+            Typ: TJobType;
+            Param: String;
+            constructor Create(atype: TJobType; aParam: String);
+            procedure Assign(aJob: TStartjob);
+    end;
+    TJobList = class(TObjectList<TStartJob>);
 
     TMedienBibliothek = class
     private
@@ -161,7 +181,7 @@ type
         // Loading a Library will execute the same code as adding new files.
         // On Startup a little different behaviour is wanted (e.g. the library is not changed)
         fChangeAfterUpdate: LongBool;
-        fInitializing: Integer;
+        // fInitializing: Integer; // not needed any more
 
         // After the user changes some information in an audiofile,
         // key1/2 and the matching "real information" are not identical.
@@ -188,6 +208,8 @@ type
         fBrowseMode: Integer;
         fCoverSortOrder: Integer;
 
+        fJobList: TJobList;
+
         function IsAutoSortWanted: Boolean;
         // Getter and Setter for some properties.
         // Most of them Thread-Safe
@@ -200,8 +222,8 @@ type
         procedure SetChangeAfterUpdate(Value: LongBool);
         function GetChanged: LongBool;
         procedure SetChanged(Value: LongBool);
-        function GetInitializing: Integer;
-        procedure SetInitializing(Value: Integer);
+        //function GetInitializing: Integer;
+        //procedure SetInitializing(Value: Integer);
         function GetBrowseMode: Integer;
         procedure SetBrowseMode(Value: Integer);
         function GetCoverSortOrder: Integer;
@@ -364,10 +386,11 @@ type
         ShowHintsInMedialist: Boolean;
         NempCharCodeOptions: TConvertOptions;
         AutoScanDirs: Boolean;
-        AutoScanDirList: TStringList;
-        // Die Todo-List enthält die, die ggf. bei "Newdrive" gescannt werden müsssem.
-        // Also die, die ncoh nicht gescannt wurden.
-        AutoScanToDoList: TStringList;
+        AutoScanDirList: TStringList;  // complete list of all Directories to scan
+        AutoScanToDoList: TStringList; // the "working list"
+
+        AutoDeleteFiles: Boolean;       
+        AutoDeleteFilesShowInfo: Boolean;
 
         InitialDialogFolder: String;  // last used folder for "scan for audiofiles"
 
@@ -435,9 +458,9 @@ type
         AutoResolveInconsistenciesRules: Boolean;
         //ShowAutoResolveInconsistenciesHints: Boolean;
 
-
         // BibScrobbler: Link to Player.NempScrobbler
         BibScrobbler: TNempScrobbler;
+
 
         property StatusBibUpdate   : Integer read GetStatusBibUpdate    write SetStatusBibUpdate;
 
@@ -452,7 +475,7 @@ type
         property AlbumIndex: Cardinal read fAlbumIndex write fAlbumIndex;
         property Changed: LongBool read GetChanged write SetChanged;
         property ChangeAfterUpdate: LongBool read GetChangeAfterUpdate write SetChangeAfterUpdate;
-        property Initializing: Integer read GetInitializing write SetInitializing;
+        // property Initializing: Integer read GetInitializing write SetInitializing;
         property BrowseMode: Integer read GetBrowseMode write SetBrowseMode;
         property CoverSortOrder: Integer read GetCoverSortOrder write SetCoverSortOrder;
 
@@ -483,6 +506,8 @@ type
         // These methods will start a new thread and call several private methods
         procedure NewFilesUpdateBib(NewBib: Boolean = False);
         procedure DeleteFilesUpdateBib;
+        procedure DeleteFilesUpdateBibAutomatic;
+
         procedure CleanUpDeadFilesFromVCLLists;
         procedure RefreshFiles;
         procedure GetLyrics;
@@ -628,14 +653,23 @@ type
 
         procedure PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
         procedure ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
+        procedure GetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 
         function GetDriveFromUsedDrives(aChar: Char): TDrive;
+
+        // note: When adding Jobs, ALWAYS add also a JOB_Finish job to finalize the process
+        procedure AddStartJob(aJobtype: TJobType; aJobParam: String);
+        procedure ProcessNextStartJob;
 
   end;
 
   Procedure fLoadLibrary(MB: TMedienbibliothek);
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
-  Procedure fDeleteFilesUpdate(MB: TMedienbibliothek);
+
+  Procedure fDeleteFilesUpdateContainer(MB: TMedienbibliothek; askUser: Boolean);
+  Procedure fDeleteFilesUpdateUser(MB: TMedienbibliothek);
+  Procedure fDeleteFilesUpdateAutomatic(MB: TMedienbibliothek);
+
   procedure fRefreshFilesThread(MB: TMedienbibliothek);
   procedure fGetLyricsThread(MB: TMedienBibliothek);
   procedure fGetTagsThread(MB: TMedienBibliothek);
@@ -670,6 +704,20 @@ begin
     end;
 end;
 
+
+{ TAutomaticJob }
+
+constructor TStartJob.Create(atype: TJobType; aParam: String);
+begin
+    Typ := atype;
+    Param := aParam;
+end;
+
+procedure TStartJob.Assign(aJob: TStartjob);
+begin
+    self.Typ := aJob.Typ;
+    self.Param := aJob.Param;
+end;
 
 {
     --------------------------------------------------------
@@ -737,7 +785,7 @@ begin
   //SortParam := CON_ARTIST;
   //SortAscending := True;
   Changed := False;
-  Initializing := init_nothing;
+  //Initializing := init_nothing;
 
   CurrentArtist := BROWSE_ALL;
   CurrentAlbum := BROWSE_ALL;
@@ -755,10 +803,13 @@ begin
   TagCloud := TTagCloud.Create;
   TagPostProcessor := TTagPostProcessor.Create; // Data files are loaded automatically
 
+  fJobList := TJobList.Create;
+  fJobList.OwnsObjects := True;
 end;
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
+  fJobList.Free;
   //NewCoverFlow.Clear;
   NewCoverFlow.free;
   fIgnoreListCopy.Free;
@@ -828,6 +879,7 @@ begin
   inherited Destroy;
 end;
 
+
 {
     --------------------------------------------------------
     Clear
@@ -837,6 +889,7 @@ end;
 procedure TMedienBibliothek.Clear;
 var i: Integer;
 begin
+  fJobList.Clear;
   for i := 0 to Mp3ListePfadSort.Count - 1 do
     TAudioFile(Mp3ListePfadSort[i]).Free;
 
@@ -1037,14 +1090,14 @@ procedure TMedienBibliothek.SetChanged(Value: LongBool);
 begin
   InterLockedExchange(Integer(fChanged), Integer(Value));
 end;
-function TMedienBibliothek.GetInitializing: Integer;
+(*function TMedienBibliothek.GetInitializing: Integer;
 begin
   InterLockedExchange(Result, fInitializing);
 end;
 procedure TMedienBibliothek.SetInitializing(Value: Integer);
 begin
   InterLockedExchange(fInitializing, Value);
-end;
+end;*)
 function TMedienBibliothek.GetBrowseMode: Integer;
 begin
   InterLockedExchange(Result, fBrowseMode);
@@ -1183,6 +1236,8 @@ begin
         AutoScanDirs := Ini.ReadBool('MedienBib', 'AutoScanDirs', True);
         AskForAutoAddNewDirs  := Ini.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
         AutoAddNewDirs        := Ini.ReadBool('MedienBib', 'AutoAddNewDirs', True);
+        AutoDeleteFiles         := Ini.ReadBool('MedienBib', 'AutoDeleteFiles', False);
+        AutoDeleteFilesShowInfo := Ini.ReadBool('MedienBib', 'AutoDeleteFilesShowInfo', True);
 
         AutoResolveInconsistencies          := Ini.ReadBool('MedienBib', 'AutoResolveInconsistencies'      , True);
         AskForAutoResolveInconsistencies    := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistencies', True);
@@ -1197,7 +1252,10 @@ begin
         begin
             tmp := Ini.ReadString('MedienBib', 'ScanDir' + IntToStr(i), '');
             if trim(tmp) <> '' then
+            begin
                 AutoScanDirList.Add(IncludeTrailingPathDelimiter(tmp));
+                AutoScanToDoList.Add(IncludeTrailingPathDelimiter(tmp));
+            end;
         end;
 
         AutoActivateWebServer := Ini.ReadBool('MedienBib', 'AutoActivateWebServer', False);
@@ -1264,6 +1322,8 @@ begin
 
         Ini.WriteString('MedienBib', 'InitialDialogFolder', InitialDialogFolder);
         Ini.WriteBool('MedienBib', 'AutoScanDirs', AutoScanDirs);
+        Ini.WriteBool('MedienBib', 'AutoDeleteFiles', AutoDeleteFiles);
+        Ini.WriteBool('MedienBib', 'AutoDeleteFilesShowInfo', AutoDeleteFilesShowInfo);
         Ini.WriteInteger('MedienBib', 'dircount', AutoScanDirList.Count);
         Ini.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);
         Ini.WriteBool('MedienBib', 'AutoAddNewDirs', AutoAddNewDirs);
@@ -1353,8 +1413,35 @@ begin
   ///  ///  NO. NewFilesUpdate is called everytime on ST_Finish, whether there are 0 files or not.
   ///  the status remains BIB_Status_ReadAccessBlocked
   ///  This would be fatal.
+  ///
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//  DAS HIER NEU MACHEN.
+//  NEUE MESSAGE / PARAM ZUM ANLEIERN WEITERER INIT-PROZESSE.
+//  AUCH EINFÜGEN BEI DER DELETE-MISSING-FILES METHODE
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+  // current //job// is done, set status to 0
+  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+  // check for the next job
+  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
+
+  {case MB.Initializing of
+      init_nothing           : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_BibLoaded);
+      init_AutoScanDir       : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_NewFilesFound);
+      init_CleanUpDeadFiles,
+      init_ActivateWebServer,
+      init_Complete          : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+  end;
+  }
+
+  //if MB.Initializing < init_AutoScanDir then
+  //begin
+  //    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_BibLoaded);
+  //end;
 
 
+ (*
   case MB.Initializing of
       init_nothing: begin
           // the bib was loaded
@@ -1406,6 +1493,7 @@ begin
           SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
       end;
   end;
+  *)
 
   try
       CloseHandle(MB.fHND_UpdateThread);
@@ -1712,15 +1800,110 @@ begin
   begin
       UpdateFortsetzen := True;
       StatusBibUpdate := 1;
-      fHND_DeleteFilesThread := BeginThread(Nil, 0, @fDeleteFilesUpdate, Self, 0, Dummy);
+      fHND_DeleteFilesThread := BeginThread(Nil, 0, @fDeleteFilesUpdateUser, Self, 0, Dummy);
   end;
+end;
+
+Procedure TMedienBibliothek.DeleteFilesUpdateBibAutomatic;
+  var Dummy: Cardinal;
+begin
+  if StatusBibUpdate = 0 then
+  begin
+      UpdateFortsetzen := True;
+      StatusBibUpdate := 1;
+      fHND_DeleteFilesThread := BeginThread(Nil, 0, @fDeleteFilesUpdateAutomatic, Self, 0, Dummy);
+  end else
+      // consider it done.
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
 end;
 {
     --------------------------------------------------------
-    fDeleteFilesUpdate
+    fDeleteFilesUpdate_USER||Automatic
     - runs in secondary thread and calls several private methods
     --------------------------------------------------------
 }
+Procedure fDeleteFilesUpdateUser(MB: TMedienbibliothek);
+begin
+    fDeleteFilesUpdateContainer(MB, true);
+end;
+Procedure fDeleteFilesUpdateAutomatic(MB: TMedienbibliothek);
+begin
+    fDeleteFilesUpdateContainer(MB, false);
+end;
+
+Procedure fDeleteFilesUpdateContainer(MB: TMedienbibliothek; askUser: Boolean);
+var DeleteDataList: TObjectList;
+    SummaryDeadFiles: TDeadFilesInfo;
+begin
+    // Status is = 1 here (see above)     // status: Temporary comments, as I found a concept-bug here ;-)
+    MB.CollectDeadFiles;                  // status: ok, no change needed
+    // there ---^ check MB.fCurrentJob for a matching parameter
+
+
+
+    if MB.DeadFiles.Count > 0 then
+    begin
+        DeleteDataList := TObjectList.Create(False);
+        try
+            MB.PrepareUserInputDeadFiles(DeleteDataList);
+            if askUser then
+            begin
+                // let the user correct the list
+                SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
+                MB.ReFillDeadFilesByDataList(DeleteDataList);
+            end
+            else
+            begin
+                // user can't change anything, fill the list
+                MB.ReFillDeadFilesByDataList(DeleteDataList);
+
+                MB.GetDeadFilesSummary(DeleteDataList, SummaryDeadFiles);
+                SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_InfoDeadFiles, lParam(@SummaryDeadFiles));
+            end;
+        finally
+            DeleteDataList.Free;
+        end;
+    end;
+
+    if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
+    begin
+        MB.PrepareDeleteFilesUpdate;          // status: ok, change via SendMessage
+        // if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
+           MB.Changed := True;
+        MB.SwapLists;                         // status: ok, change via SendMessage
+        // Delete AudioFiles from "VCL-Lists"
+        // This includes AnzeigeListe and the BibSearcher-Lists
+        // MainForm will call CleanUpDeadFilesFromVCLLists
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
+        // Free deleted AudioFiles
+        MB.CleanUpDeadFiles;                  // status: ok, no change needed
+        // Clear temporary lists
+        MB.CleanUpTmpLists;                   // status: ok, no change allowed        
+    end else
+    begin
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+    end;
+
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
+    {
+    case MB.Initializing of
+        init_nothing,
+        init_AutoScanDir,
+        init_CleanUpDeadFiles  : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_MissingFilesCollected);
+        init_ActivateWebServer,
+        init_Complete          : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    end;
+    }
+
+    try
+        CloseHandle(MB.fHND_DeleteFilesThread);
+    except
+    end;
+end;
+
+(*
 Procedure fDeleteFilesUpdate(MB: TMedienbibliothek);
 var DeleteDataList: TObjectList;
 begin
@@ -1759,7 +1942,7 @@ begin
         CloseHandle(MB.fHND_DeleteFilesThread);
     except
     end;
-end;
+end;  *)
 {
     --------------------------------------------------------
     CollectDeadFiles
@@ -1808,7 +1991,7 @@ var i: Integer;
     currentDir: String;
     currentDrive: Char;
     currentPC: String;
-    newDeleteData: TDeleteData;
+    newDeleteData, currentDeleteData: TDeleteData;
 
     function IsLocalDir(aFilename: String): Boolean;
     begin
@@ -1841,13 +2024,57 @@ var i: Integer;
         result := c;
     end;
 
+    function GetMatchingDeleteDataObject(aDrive: String; isLocal: Boolean): TDeleteData;
+    var i: Integer;
+    begin
+        result := Nil;
+        for i := 0 to DeleteDataList.Count - 1 do
+        begin
+            if TDeleteData(DeleteDataList[i]).DriveString = aDrive then
+            begin
+                result := TDeleteData(DeleteDataList[i]);
+                break;
+            end;
+        end;
+
+        if not assigned(result) then
+        begin
+            // create a new DeleteDataObject
+            result := TDeleteData.Create;
+            result.DriveString := aDrive;
+            DeleteDataList.Add(result);
+            if isLocal then
+            begin
+                if GetDriveFromListByChar(Drives, aDrive[1]) = NIL then
+                begin
+                    // complete Drive is NOT there
+                    result.DoDelete       := False;
+                    //newDeleteData.Recommendation := dr_Keep;
+                    result.Hint           := dh_DriveMissing;
+                end else
+                begin
+                    // drive is there => just the file is not present
+                    result.DoDelete       := True;
+                    //newDeleteData.Recommendation := dr_Delete;
+                    result.Hint           := dh_DivePresent;
+                end;
+            end else
+            begin
+                // assume that its missing, further check after this loop
+                result.DoDelete       := False;
+                //newDeleteData.Recommendation := dr_Keep;
+                result.Hint           := dh_NetworkMissing;
+            end;
+        end;
+    end;
+
 begin
     // prepare data - check whether the drive of the issing files exists etc.
     Drives := TObjectList.Create;
     try
         GetLogicalDrives(Drives); // get connected logical drives
-        currentDrive := ' '; // invalid drive letter
-        currentPC    := 'XXX'; // invalid PC-Name
+        currentDrive  := ' ';    // invalid drive letter
+        currentPC     := 'XXX';  // invalid PC-Name
         newDeleteData := Nil;
         for i := 0 to DeadFiles.Count - 1 do
         begin
@@ -1900,6 +2127,39 @@ begin
                 newDeleteData.Files.Add(DeadFiles[i]);
         end;
 
+        // The same for playlists, but re-use the existing DeleteDataList-Objects
+        currentDeleteData := Nil;
+        currentDrive      := ' ';    // invalid drive letter
+        currentPC         := 'XXX';  // invalid PC-Name
+        for i := 0 to DeadPlaylists.Count - 1 do
+        begin
+            currentDir := TJustAString(DeadPlaylists[i]).DataString;
+            if length(currentDir) > 0 then
+            begin
+                if IsLocalDir(currentDir) then
+                begin
+                    if currentDrive <> currentDir[1] then
+                    begin
+                        // beginning of a ne drive - Get a matching DeleteDtaa-Object from the already existing list
+                        // (or create a new one)
+                        currentDrive := currentDir[1];
+                        currentDeleteData := GetMatchingDeleteDataObject(currentDrive + ':\', True);
+                    end;
+                end else
+                begin
+                    // File on another pc in the network
+                    if not AnsiStartsText(currentPC, currentDir)  then
+                    begin
+                        currentPC := ExtractPCNameFromPath(currentDir);
+                        currentDeleteData := GetMatchingDeleteDataObject(currentPC, False);
+                    end;
+                end;
+            end;
+            // Add file to the DeleteData-Objects Playlist-FileList
+            if assigned(currentDeleteData) then
+                currentDeleteData.PlaylistFiles.Add(DeadPlaylists[i]);
+        end;
+
         // Try to determine, whether network-ressources are online or not
         for i := 0 to DeleteDataList.Count - 1 do
         begin
@@ -1931,12 +2191,46 @@ var i, f: Integer;
     currentData: TDeleteData;
 begin
     DeadFiles.Clear;
+    DeadPlaylists.Clear;
+
     for i := 0 to DeleteDataList.Count - 1 do
     begin
         currentData := TDeleteData(DeleteDataList[i]);
         if currentData.DoDelete then
+        begin
             for f := 0 to currentData.Files.Count - 1 do
                 DeadFiles.Add(currentData.Files[f]);
+            for f := 0 to currentData.PlaylistFiles.Count - 1 do
+                Deadplaylists.Add(currentData.PlaylistFiles[f]);
+        end;
+    end;
+end;
+
+procedure TMedienBibliothek.GetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
+var i: Integer;
+    currentData: TDeleteData;
+begin
+    aSummary.MissingDrives := 0;
+    aSummary.ExistingDrives := 0;
+    aSummary.MissingFilesOnMissingDrives := 0;
+    aSummary.MissingFilesOnExistingDrives := 0;
+    aSummary.MissingPlaylistsOnMissingDrives := 0 ;
+    aSummary.MissingPlaylistsOnExistingDrives := 0;
+
+    for i := 0 to DeleteDataList.Count - 1 do
+    begin
+        currentData := TDeleteData(DeleteDataList[i]);
+        if currentData.DoDelete then
+        begin
+            aSummary.ExistingDrives := aSummary.ExistingDrives + 1;
+            aSummary.MissingFilesOnExistingDrives := aSummary.MissingFilesOnExistingDrives + currentData.Files.Count;
+            aSummary.MissingPlaylistsOnExistingDrives := aSummary.MissingPlaylistsOnExistingDrives + currentData.PlaylistFiles.Count;
+        end else
+        begin
+            aSummary.MissingDrives := aSummary.MissingDrives  + 1;
+            aSummary.MissingFilesOnMissingDrives := aSummary.MissingFilesOnMissingDrives + currentData.Files.Count;
+            aSummary.MissingPlaylistsOnMissingDrives := aSummary.MissingPlaylistsOnMissingDrives + currentData.PlaylistFiles.Count;
+        end;
     end;
 end;
 {
@@ -4633,6 +4927,37 @@ begin
     end;
 
 end;
+procedure TMedienBibliothek.AddStartJob(aJobtype: TJobType; aJobParam: String);
+var newJob: TStartJob;
+begin
+    newJob := TStartJob.Create(aJobType, aJobParam);
+    fJobList.Add(newJob);
+end;
+
+procedure TMedienBibliothek.ProcessNextStartJob;
+var nextJob: TStartJob;
+begin
+    if (fJobList.Count > 0) AND (not CloseAfterUpdate) then
+    begin
+        nextJob := fJoblist[0];
+        case nextJob.Typ of
+          JOB_LoadLibrary:        ; // nothing to do
+          JOB_AutoScanNewFiles    : PostMessage(MainWindowHandle, WM_MedienBib, MB_StartAutoScanDirs, 0) ;
+          JOB_AutoScanMissingFiles: PostMessage(MainWindowHandle, WM_MedienBib, MB_StartAutoDeleteFiles, 0) ;
+          JOB_StartWebServer      : PostMessage(MainWindowHandle, WM_MedienBib, MB_ActivateWebServer, 0) ;
+          JOB_Finish              : begin
+                // set the status to "free" (=0)
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+                // if there are more jobs to do (should not happen) process the next jobs as well
+                if fJobList.Count > 1 then
+                    PostMessage(MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
+                    // !!! do NOT use *SEND*message here
+          end;
+        end;
+        fJoblist.Delete(0);
+    end;
+end;
+
 {
     --------------------------------------------------------
     SortAList
@@ -5826,6 +6151,7 @@ function TMedienBibliothek.GetDriveFromUsedDrives(aChar: Char): TDrive;
 begin
     result := GetDriveFromListByChar(fUsedDrives, aChar);
 end;
+
 
 
 initialization

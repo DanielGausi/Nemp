@@ -376,8 +376,18 @@ begin
     begin
         if MedienBib.AutoLoadMediaList then
         begin
+            // create the jobs first - just in case "loading" (which runs in another thread) is veeeery fast
+            if Medienbib.AutoScanDirs then
+                Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
+            if Medienbib.AutoDeleteFiles then
+                Medienbib.AddStartJob(JOB_AutoScanMissingFiles, '');
+            if Medienbib.AutoActivateWebServer then
+                MedienBib.AddStartJob(JOB_StartWebServer, '');
+            //Finalization
+            MedienBib.AddStartJob(JOB_Finish, '');
+
             LblEmptyLibraryHint.Caption := MainForm_LibraryIsLoading;
-            MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp', True)
+            MedienBib.LoadFromFile(SavePath + NEMP_NAME + '.gmp', True);
         end
         else
         begin

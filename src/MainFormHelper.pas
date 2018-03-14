@@ -138,7 +138,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
-    CDOpenDialogs, LowBattery, PlayWebstream, Taghelper;
+    CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass;
 
 procedure CorrectVolButton;
 begin
@@ -335,7 +335,18 @@ begin
               Nemp_MainForm.SetFocus;
         end;
 
-        if MedienBib.AutoScanDirs then
+        if Medienbib.AutoScanDirs then
+            Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
+        if Medienbib.AutoDeleteFiles then
+            Medienbib.AddStartJob(JOB_AutoScanMissingFiles, '');
+        //Finalization
+        MedienBib.AddStartJob(JOB_Finish, '');
+
+        // Start the work
+        // status should be still = 0 here, so it's save to start the jobs now
+        MedienBib.ProcessNextStartJob;
+
+        {if MedienBib.AutoScanDirs then
         begin
               ST_Medienliste.Mask := GenerateMedienBibSTFilter;
               for i := MedienBib.AutoScanToDoList.Count - 1 downto 0 do
@@ -353,6 +364,7 @@ begin
                   ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
               end;
         end;
+        }
     end;
 end;
 

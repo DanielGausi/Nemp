@@ -915,6 +915,10 @@ DeleteHelper_Readme = 'Sometimes it is not appropriate to remove every missing f
     + 'Missing files from the checked drives will be removed from the library, the others will not be removed.'
     ;
 
+AutoDeleteInfo_DeletedFiles   = 'Nemp detected %d missing file(s) and %d missing playlist(s) and removed these entries from the media library.';
+AutoDeleteInfo_PreservedFiles = 'Nemp detected %d file(s) and %d playlist(s) on %d missing drive(s). These entries will remain in the media library until further notice.';
+AutoDeleteInfo_MessageHint = 'Note: You can turn off this message in the settings dialog -> File management.';
+
 Hint_BatteryLow = 'Low battery (%d%%). Click for more information.';
 
 

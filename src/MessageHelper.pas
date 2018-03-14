@@ -500,6 +500,8 @@ var i: Integer;
 
     tmpString: String;
     delData: TDeleteData;
+    deadFilesInfo: PDeadFilesInfo;
+
 begin
   result := True;
 
@@ -697,12 +699,20 @@ begin
         MB_StartAutoScanDirs: begin
             ST_Medienliste.Mask := GenerateMedienBibSTFilter;
 
-            for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
+            {for i := 0 to MedienBib.AutoScanDirList.Count - 1 do
             begin
                 if DirectoryExists(MedienBib.AutoScanDirList[i]) then
                     MedienBib.ST_Ordnerlist.Add(MedienBib.AutoScanDirList[i])
                 else
                     MedienBib.AutoScanToDoList.Add(MedienBib.AutoScanDirList[i]);
+            end;}
+            for i := MedienBib.AutoScanToDoList.Count - 1 downto 0 do
+            begin
+                if DirectoryExists(MedienBib.AutoScanToDoList[i]) then
+                begin
+                    MedienBib.ST_Ordnerlist.Add(MedienBib.AutoScanToDoList[i]);
+                    MedienBib.AutoScanToDoList.Delete(i);
+                end;
             end;
             if MedienBib.ST_Ordnerlist.Count > 0 then
             begin
@@ -712,21 +722,8 @@ begin
                 BlockeMedienListeUpdate(True);
                 ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
             end else
-            begin
-                // If ST_Ordnerlist is empty, the update-process will not start
-                // This is good, but in this case we dont run fNewFilesUpdate a
-                // second time, so Auto-Activation of the server will not be done
-                // So: Start it directly here
-                // Anyway, we have te set the status to zero here
-                MedienBib.StatusBibUpdate := 0;
-                if MedienBib.AutoActivateWebServer then
-                begin
-                    MedienBib.Initializing := Init_Complete;
-                    SendMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_ActivateWebServer, 0);
-                end;
-                // Anyway, we have te set the status to zero here
-                MedienBib.StatusBibUpdate := 0;
-            end;
+                // nothing more to do here, check for another job
+                PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_CheckForStartJobs, 0);
         end;
 
         MB_ActivateWebServer: begin
@@ -757,7 +754,10 @@ begin
                     // MessageDLG('Server activation failed:' + #13#10 + NempWebServer.LastErrorString, mtError, [mbOK], 0);
                     // Nothing here. This is the Auto-Activation
                 end;
-            end
+            end;
+            // no matter what we did - post the message for the starting process
+            //if MedienBib.Initializing < init_complete then
+            SendMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_CheckForStartJobs, 0);
         end;
         MB_UnifyPlaylistRating: begin
             // im Lparam steckt ein AudioFile drin
@@ -782,6 +782,10 @@ begin
         MB_ErrorLogHint: begin
             MessageDlg(MediaLibrary_SomeErrorsOccured, mtWarning, [MBOK], 0);
         end;
+
+        //MB_CoverError: begin
+        //    AddErrorLog(PWideChar(aMsg.LParam));
+        //end;
 
         MB_InvalidGMPFile: begin
             MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
@@ -829,6 +833,106 @@ begin
             ShowMessage(tmpString);
             }
         end;
+
+        MB_InfoDeadFiles: begin
+            // generate Message (if wanted)
+            if medienbib.AutoDeleteFilesShowInfo then
+            begin
+                deadFilesInfo := PDeadFilesInfo(aMsg.lParam);
+                if (deadFilesInfo^.MissingFilesOnExistingDrives + deadFilesInfo^.MissingPlaylistsOnExistingDrives) > 0 then
+                    AddErrorLog(Format(AutoDeleteInfo_DeletedFiles,
+                          [deadFilesInfo^.MissingFilesOnExistingDrives,
+                           deadFilesInfo^.MissingPlaylistsOnExistingDrives]));
+
+                if (deadFilesInfo^.MissingFilesOnMissingDrives + deadFilesInfo^.MissingPlaylistsOnMissingDrives) > 0 then
+                    AddErrorLog(Format(AutoDeleteInfo_PreservedFiles,
+                          [deadFilesInfo^.MissingFilesOnMissingDrives,
+                           deadFilesInfo^.MissingPlaylistsOnMissingDrives,
+                           deadFilesInfo^.MissingDrives]));
+
+                if   (deadFilesInfo^.MissingFilesOnExistingDrives
+                    + deadFilesInfo^.MissingPlaylistsOnExistingDrives
+                    + deadFilesInfo^.MissingFilesOnMissingDrives
+                    + deadFilesInfo^.MissingPlaylistsOnMissingDrives) > 0
+                then
+                    AddErrorLog(AutoDeleteInfo_MessageHint);
+            end;
+        end;
+
+        MB_StartAutoDeleteFiles: begin
+            MedienBib.DeleteFilesUpdateBibAutomatic;
+        end;
+
+        MB_CheckForStartJobs: MedienBib.ProcessNextStartJob;
+
+        (*
+        MB_StartingJobDone: begin
+            // todo: Check, which job to do now.
+            // order after loading the library file:
+            // 1.) Search new Files
+            // 2.) Search dead Files
+            // 3.) Start Webserver
+
+            if MedienBib.CloseAfterUpdate then
+            begin
+                // user wants to clse Nemp NOW
+                MedienBib.Initializing := Init_Complete;
+                SendMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+            end else
+            begin
+                // do more initializing-stuff
+                case aMSg.LParam of
+
+                    NempInit_BibLoaded: begin
+                        MedienBib.Initializing := init_AutoScanDir;
+                        if MedienBib.AutoScanDirs then
+                            // start scanning for new files
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_StartAutoScanDirs, 0)
+                        else
+                            // consider it done, this will call the next case-step here
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_StartingJobDone, NempInit_NewFilesFound);
+                    end;
+
+                    NempInit_NewFilesFound: begin
+                        MedienBib.Initializing := init_CleanUpDeadFiles;
+
+                        MedienBib.StatusBibUpdate := 0;
+                        if MedienBib.AutoDeleteFiles then
+                            // start scanning for dead files
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_StartAutoDeleteFiles, 0)
+                        else
+                            // consider it done, this will call the next case-step here
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_StartingJobDone, NempInit_MissingFilesCollected);
+                    end;
+
+                    NempInit_MissingFilesCollected: begin
+                        MedienBib.Initializing := init_ActivateWebServer;
+                        if MedienBib.AutoActivateWebServer then
+                            // activate the webserver
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_ActivateWebServer, 0)
+                            // or, just move the message-handler here? No, poribably more clearly arranged that way.
+                        else
+                            // consider it done, this will call the next case-step here
+                            PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_StartingJobDone, NempInit_WebServerOnline);
+                    end;
+
+                    NempInit_WebServerOnline: begin
+                          MedienBib.Initializing := init_Complete;
+                          // last step.
+                          SendMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+                    end;
+
+                end;
+            end;
+
+
+            // check: MB.CloseAfterUpdate: Wenn gesetzt: Abrechen, User will Nemp beenden
+
+            // am ende aber auf JEDEN FALL
+            // SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+            // auch bei MB.CloseAfterUpdate = True
+
+        end;   *)
   end;
 end;
 
