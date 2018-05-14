@@ -2599,13 +2599,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 194
+        Height = 193
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Directories'
         TabOrder = 0
         DesignSize = (
           431
-          194)
+          193)
         object CBAutoScan: TCheckBox
           Left = 16
           Top = 20
@@ -2639,7 +2639,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object CBAutoAddNewDirs: TCheckBox
           Left = 16
           Top = 103
-          Width = 409
+          Width = 313
           Height = 17
           Hint = 'Add new directories to this list'
           Caption = 'Automatically monitor new directories'
@@ -2648,7 +2648,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object CBAskForAutoAddNewDirs: TCheckBox
           Left = 16
           Top = 119
-          Width = 409
+          Width = 319
           Height = 17
           Hint = 
             'When selecting a new directory: Show query whether it should be ' +
@@ -2669,8 +2669,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cb_AutoDeleteFiles: TCheckBox
           Left = 16
           Top = 145
-          Width = 313
+          Width = 393
           Height = 17
+          Hint = 
+            'Check for missing files in your music directories when starting ' +
+            'Nemp and remove them from the media library.'
           Caption = 'Automatically delete missing files from the media library'
           TabOrder = 6
           OnClick = cb_AutoDeleteFilesClick
@@ -2678,14 +2681,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object cb_AutoDeleteFilesShowInfo: TCheckBox
           Left = 33
           Top = 161
-          Width = 296
+          Width = 384
           Height = 17
+          Hint = 'Create a log message about missing files'
           Caption = 'Log summary about deleted files'
           TabOrder = 7
         end
         object BtnAutoScanNow: TButton
           Left = 341
-          Top = 157
+          Top = 99
           Width = 75
           Height = 25
           Hint = 'Scan now for new or missing files, according to the settings'
@@ -2696,7 +2700,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_FilesMain_FileTypes: TGroupBox
         Left = 8
-        Top = 208
+        Top = 205
         Width = 431
         Height = 205
         Anchors = [akLeft, akTop, akRight]
@@ -2744,7 +2748,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_FilesMain_Playlists: TGroupBox
         Left = 8
-        Top = 415
+        Top = 412
         Width = 434
         Height = 50
         Caption = 'Playlists'

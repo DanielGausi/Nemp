@@ -696,13 +696,13 @@ begin
 
             at_File: begin
                 // Read file information from disk
-                if Fileexists(CurrentAudioFile.Pfad) then
-                begin
+                //if Fileexists(CurrentAudioFile.Pfad) then
+                //begin
                     //SynchronizeAudioFile(CurrentAudioFile, CurrentAudioFile.Pfad, True);
                     ///XXXXXX//// This will reset the bib-rating to the file-rating - Intended??
                     // FileExist wird hier grade doppelt gecheckt
-                    SynchAFileWithDisc(CurrentAudioFile, True);
-                end;
+                SynchAFileWithDisc(CurrentAudioFile, True);
+                //end;
 
                 // Generate a List of Files which should be updated now
                 ListOfFiles := TObjectList.Create(False);

@@ -624,7 +624,10 @@ begin
                 SetGlobalWarningID3TagUpdate;
         end;
 
-        MB_ProgressSearchDead: AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
+        MB_ProgressSearchDead: begin
+            AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
+            fspTaskbarManager.ProgressValue := aMsg.LParam;
+        end;
 
         //MB_SearchAutoAbort: MessageDLG((MediaLibrary_PreciseQuery), mtWarning, [MBOK], 0); // Wird aber nie ausgelöst ;-)
 

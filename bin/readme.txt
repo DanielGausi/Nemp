@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - März 2018
+      Januar 2005 - April 2018
 
-      Version: 4.8.0
+      Version: 4.8.1
 
 
 -----------------------------------------------------------
@@ -115,7 +115,7 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
 
-Version 4.8.1, März 2018
+Version 4.8.1, April 2018
 ----------------------------------------------------------- 
 - Option: Beim Start fehlende Dateien löschen (= Medienbib aufräumen)
           - wird neu ausgeführt beim Anschluss eines neuen Laufwerks

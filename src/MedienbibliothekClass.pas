@@ -1237,7 +1237,7 @@ begin
         AskForAutoAddNewDirs  := Ini.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
         AutoAddNewDirs        := Ini.ReadBool('MedienBib', 'AutoAddNewDirs', True);
         AutoDeleteFiles         := Ini.ReadBool('MedienBib', 'AutoDeleteFiles', False);
-        AutoDeleteFilesShowInfo := Ini.ReadBool('MedienBib', 'AutoDeleteFilesShowInfo', True);
+        AutoDeleteFilesShowInfo := Ini.ReadBool('MedienBib', 'AutoDeleteFilesShowInfo', False);
 
         AutoResolveInconsistencies          := Ini.ReadBool('MedienBib', 'AutoResolveInconsistencies'      , True);
         AskForAutoResolveInconsistencies    := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistencies', True);
@@ -1955,6 +1955,8 @@ var i, ges, freq: Integer;
 begin
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
 
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+
       ges := Mp3ListePfadSort.Count + AllPlaylistsPfadSort.Count  + 1;
       freq := Round(ges / 100) + 1;
       for i := 0 to Mp3ListePfadSort.Count-1 do
@@ -1977,6 +1979,8 @@ begin
           if not UpdateFortsetzen then break;
       end;
       result := True;
+
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 end;
 {
     --------------------------------------------------------

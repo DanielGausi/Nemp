@@ -1584,6 +1584,10 @@ object FDetails: TFDetails
     object Tab_ExtendedID3v2: TTabSheet
       Caption = ' Mp3- and ID3-Details'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Mpeg: TGroupBox
         Left = 8
         Top = 8

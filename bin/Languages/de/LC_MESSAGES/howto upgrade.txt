@@ -1,0 +1,4 @@
+1.) SRC -> Extract to Template
+2.) neue default.po in .pot Umbenennen
+3.) alte .po (bzw. .mo) öffnen
+4.) aus POT-Datei aktualisieren - neu erstellte pot dazu laden

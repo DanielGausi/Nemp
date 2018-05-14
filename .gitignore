@@ -4,7 +4,6 @@ bin/Data/Cover/
 bin/Data/CoverCache
 *.npl
 *.gmp
-*.ini
 bin/Data/tag_ignore
 bin/Data/tag_merge
 *.map
@@ -12,3 +11,7 @@ bin/Data/tag_merge
 *.local
 *.identcache
 *.drc
+bin/Data/Hotkeys.ini
+bin/Data/Nemp.ini
+bin/Data/Nemp_EQ.ini
+bin/Data/NempWebServer.ini

@@ -1425,6 +1425,7 @@ begin
   cb_AutoDeleteFilesShowInfo.checked := MedienBib.AutoDeleteFilesShowInfo;
   cb_AutoDeleteFilesShowInfo.Enabled := cb_AutoDeleteFiles.Checked;
 
+  BtnAutoScanNow.Enabled := cb_AutoDeleteFiles.Checked or CBAutoScan.Checked;
 
   cb_ShowSplashScreen.Checked := Nemp_MainForm.NempOptions.ShowSplashScreen;
   CB_AllowMultipleInstances.Checked := Not Nemp_MainForm.NempOptions.AllowOnlyOneInstance;
@@ -3057,6 +3058,8 @@ begin
   LBAutoScan.Enabled  := CBAutoScan.Checked;
   BtnAutoScanDelete.Enabled  := CBAutoScan.Checked;
   BtnAutoScanAdd.Enabled  := CBAutoScan.Checked;
+
+  BtnAutoScanNow.Enabled := cb_AutoDeleteFiles.Checked or CBAutoScan.Checked;
 end;
 
 procedure TOptionsCompleteForm.BtnAutoScanAddClick(Sender: TObject);
@@ -3115,6 +3118,7 @@ var i: Integer;
 begin
     if (MedienBib.StatusBibUpdate = 0) then
     begin
+
         if CBAutoScan.Checked then
         begin
             // refill scandirectories
@@ -3377,6 +3381,8 @@ end;
 procedure TOptionsCompleteForm.cb_AutoDeleteFilesClick(Sender: TObject);
 begin
     cb_AutoDeleteFilesShowInfo.Enabled := cb_AutoDeleteFiles.Checked;
+
+    BtnAutoScanNow.Enabled := cb_AutoDeleteFiles.Checked or CBAutoScan.Checked;
 end;
 
 procedure TOptionsCompleteForm.Btn_CHeckNowForUpdatesClick(
