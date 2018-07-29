@@ -48,7 +48,7 @@ uses
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
       fldbrows, MainFormHelper, MessageHelper, BibSearchClass,
   Nemp_ConstantsAndTypes, NempApi, SplitForm_Hilfsfunktionen, SearchTool, mmsystem,
-   Nemp_SkinSystem, NempPanel, SkinButtons, math,
+   Nemp_SkinSystem, NempPanel, SkinButtons, math, PlayerLog,
 
   PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, deleteHelper,
 
@@ -862,6 +862,8 @@ type
     PM_PL_Mark3: TMenuItem;
     PM_PL_Mark2: TMenuItem;
     PM_PL_Mark1: TMenuItem;
+    MM_T_PlaylistLog: TMenuItem;
+    PM_P_PlaylistLog: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1451,6 +1453,7 @@ type
       Shift: TShiftState);
     procedure TabBtn_MarkerKeyPress(Sender: TObject; var Key: Char);
     procedure CoverScrollbarEnter(Sender: TObject);
+    procedure MM_T_PlaylistLogClick(Sender: TObject);
     //procedure PM_RenameTagSelectedFilesClick(Sender: TObject);
     //procedure PM_RemoveTagSelectedFilesClick(Sender: TObject);
     //procedure PM_AddTagSelectedFilesClick(Sender: TObject);
@@ -1609,6 +1612,14 @@ type
    end;
 
 
+   {$IFDEF USESTYLES}
+    // see https://community.embarcadero.com/view-profile/10750-
+    TStyleEnginePrivateHelper = class helper for TStyleEngine
+        class procedure DoFreeControlHooks;
+    end;
+    {$ENDIF}
+
+
 var
 
   Nemp_MainForm: TNemp_MainForm;
@@ -1647,8 +1658,21 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
 
 {$R *.dfm}
 
-
 {$IFDEF USESTYLES}
+/// -----------------------
+/// Workaround for some exceptions on closing after changing to Windows-Style
+/// https://community.embarcadero.com/view-profile/10750-
+class procedure TStyleEnginePrivateHelper.DoFreeControlHooks;
+begin
+    TStyleEngine.FreeControlHooks;
+end;
+
+procedure FreeAllControlStyleHooks;
+begin
+TStyleEngine.DoFreeControlHooks;
+end;
+/// -----------------------
+
 { TFormStyleHookFix }
 
 procedure TFormStyleHookFix.CMDialogChar(var Message: TWMKey);
@@ -2099,6 +2123,7 @@ begin
 
         // PlayList abspeichern
         NempPlaylist.SaveToFile(SavePath + NEMP_NAME + '.npl', True);
+        NempPlayer.NempLogFile.UpdateLogfile(SavePath + NEMP_NAME + '-PlayerLog.log');
 
         // Do not Postprocess files any longer
         NempPlayer.LastUserWish := USER_WANT_STOP;
@@ -2117,12 +2142,16 @@ begin
         if NempOptions.HideDeskbandOnClose then
             NotifyDeskband(NempDeskbandDeActivateMessage);
 
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         if MedienBib.AutoSaveMediaList AND {(MedienBib.Count > 0) AND} (MedienBib.Changed) then
         begin
           AuswahlStatusLBL.Caption := (MainForm_ShuttingDownHint_MediaLib);
           AuswahlStatusLBL.Update;
           MedienBib.SaveToFile(SavePath + NEMP_NAME + '.gmp', True);
         end;
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
 
         PlaylistPanel.Parent := Nemp_MainForm;
         AuswahlPanel.Parent := Nemp_MainForm;
@@ -4061,7 +4090,7 @@ begin
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
-                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                   HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
 
                   MedienBib.InitCover(AudioFile);
@@ -4093,7 +4122,7 @@ begin
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
-                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                   HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
                   MedienBib.InitCover(AudioFile);
                   if  (oldArtist <> AudioFile.Strings[MedienBib.NempSortArray[1]])
@@ -5375,8 +5404,8 @@ begin
   begin
       Coverbmp := tBitmap.Create;
       try
-          Coverbmp.Width := 250;
-          Coverbmp.Height := 250;
+          Coverbmp.Width := ImgDetailCover.Width; //  250;
+          Coverbmp.Height := ImgDetailCover.Height; // 250;
 
           // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
           GetCover(aAudioFile, Coverbmp);
@@ -7173,6 +7202,13 @@ end;
 
 
 
+procedure TNemp_MainForm.MM_T_PlaylistLogClick(Sender: TObject);
+begin
+    if not assigned(PlayerLogForm) then
+        Application.CreateForm(TPlayerLogForm, PlayerLogForm);
+    PlayerLogForm.Show;
+end;
+
 procedure TNemp_MainForm.PM_PL_PropertiesClick(Sender: TObject);
 var AudioFile:TAudioFile;
     Node: PVirtualNode;
@@ -7207,6 +7243,7 @@ var aNode: PVirtualNode;
   SelectedMP3s: TNodeArray;
   cueSelected: Boolean;
 begin
+
 
   c := PlaylistVST.SelectedCount;
   SelectedMP3s := PlaylistVST.GetSortedSelection(False);
@@ -7614,7 +7651,7 @@ begin
         if AudioFile = Nil then
         begin
           AudioFile := TAudioFile.Create;
-          aErr := AudioFile.GetAudioData((NempPlaylist.Playlist[i] as TAudioFile).Pfad, GAD_Cover or GAD_Rating);
+          aErr := AudioFile.GetAudioData((NempPlaylist.Playlist[i] as TAudioFile).Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
           HandleError(afa_NewFile, AudioFile, aErr);
 
           MedienBib.InitCover(AudioFile);
@@ -7824,7 +7861,7 @@ begin
                       if Not MedienBib.AudioFileExists(buffer) then
                       begin
                         AudioFile:=TAudioFile.Create;
-                        aErr := AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating);
+                        aErr := AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                         HandleError(afa_PasteFromClipboard, AudioFile, aErr);
                         MedienBib.InitCover(AudioFile);
                         MedienBib.UpdateList.Add(AudioFile);
@@ -10061,8 +10098,13 @@ begin
     AuswahlStatusLBL.Width := AuswahlFillPanel.Width - 16;
 end;
 
+
 procedure TNemp_MainForm.TntFormDestroy(Sender: TObject);
+var i, j: Integer;
 begin
+    {$IFDEF USESTYLES}
+    FreeAllControlStyleHooks;
+    {$ENDIF}
     try
         TagLabelList.Free;
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;

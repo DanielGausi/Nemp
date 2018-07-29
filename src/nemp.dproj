@@ -94,11 +94,11 @@
         <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Release>1</VerInfo_Release>
-        <VerInfo_MinorVer>8</VerInfo_MinorVer>
+        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <VerInfo_MinorVer>9</VerInfo_MinorVer>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Build>582</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.8.1.582;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.8;Comments=</VerInfo_Keys>
+        <VerInfo_Build>588</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.0.588;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=4.9;Comments=</VerInfo_Keys>
         <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
     </PropertyGroup>
     <ItemGroup>
@@ -267,6 +267,10 @@ uses
         <DCCReference Include="3rd Party Units\languagecodes.pas"/>
         <DCCReference Include="PlayWebstream.pas"/>
         <DCCReference Include="3rd Party Units\bassmidi.pas"/>
+        <DCCReference Include="3rd Party Units\unFastFileStream.pas"/>
+        <DCCReference Include="PlayerLog.pas">
+            <Form>PlayerLogForm</Form>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

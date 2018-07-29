@@ -135,6 +135,10 @@ type
         fAccelerateSearchIncludePath: LongBool;
         fAccelerateSearchIncludeComment: LongBool;
 
+        fTotalStringLengthSetting   : Integer;  // The length of the total string, according to the curent settings
+        fTotalStringLengthMinimized : Integer;  //  The length of the total string, without filenames and without comments
+        fLyricStringLength          : Integer;  // The Length of the Lyric string
+
         // Variables for quicker search.
         // The TotalStrings contain all String-Information of all the
         // Audiofiles in one big string. This cann be searched much
@@ -154,10 +158,10 @@ type
         // the tmp-versions of these vars are used during the update-process
         // of the library. At the end of this process the vars will swapped
         // within the vcl mainthread.
-        TmpTotalString: UTF8String;
-        TmpTotalStringIndizes: TIntArray;
-        TmpTotalLyricString: UTF8String;
-        TmpTotalLyricStringIndizes: TIntArray;
+        //TmpTotalString: UTF8String;
+        //TmpTotalStringIndizes: TIntArray;
+        //TmpTotalLyricString: UTF8String;
+        //TmpTotalLyricStringIndizes: TIntArray;
 
         // Getter and Setter for threadsafe properties
         function GetAccelerateSearch: LongBool;
@@ -168,6 +172,9 @@ type
         function GetAccelerateSearchIncludeComment: LongBool;
         function GetAccelerateLyricSearch: LongBool;
         procedure SetAccelerateLyricSearch(Value: LongBool);
+
+        procedure CalculateTotalStringLengths(FileList: TObjectList);
+        procedure CalculateLyricStringLengths(FileList: TObjectList);
 
          //Some sub-methods for searching
         //procedure DeleteNotMatchingFiles(KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
@@ -235,17 +242,18 @@ type
         // generate the tmpTotal-Strings
         // Note: These run in a secondary thread, not the VCL-mainthread
         // Parameter is the temporary Mp3ListePfadSort from the library
-        procedure BuildTMPTotalString(tmpFileList: TObjectList);
-        procedure BuildTMPTotalLyricString(tmpFileList: TObjectList);
+        //procedure BuildTMPTotalString(tmpFileList: TObjectList);
+        //procedure BuildTMPTotalLyricString(tmpFileList: TObjectList);
 
         // generate the TotalStrings directly
         // Note: These run in the VCL-mainthread
         procedure BuildTotalString(FileList: TObjectList);
         procedure BuildTotalLyricString(FileList: TObjectList);
+        procedure ClearTotalLyricString;
 
         // Swap the TmpTotalString-Stuff (created in secondary thread)
         // to the TotalString-Stuff (runs in secondary thread)
-        procedure SwapTotalStrings;
+        procedure SwapTotalStrings(FileList: TObjectList);
 
         procedure InitNewSearch(Keywords: TSearchKeyWords);
         /// procedure InitBetterSearch(Keywords: TSearchKeyWords);
@@ -381,13 +389,13 @@ begin
     for i := 1 to 10 do
         SearchResultLists[i].Clear;
     TotalString := '';
-    TmpTotalString := '';
+    //TmpTotalString := '';
     SetLength(TotalStringIndizes, 0);
-    SetLength(TmpTotalStringIndizes, 0);
+    //SetLength(TmpTotalStringIndizes, 0);
     TotalLyricString := '';
-    TmpTotalLyricString := '';
+    //TmpTotalLyricString := '';
     SetLength(TotalLyricStringIndizes, 0);
-    SetLength(TmpTotalLyricStringIndizes, 0);
+    //SetLength(TmpTotalLyricStringIndizes, 0);
 end;
 
 procedure TBibSearcher.RemoveAudioFileFromLists(aAudioFile: TAudioFile);
@@ -478,7 +486,7 @@ begin
   InterLockedExchange(Integer(fAccelerateLyricSearch), Integer(Value));
 end;
 
-
+(*
 {
     --------------------------------------------------------
     BuildTMPTotalString
@@ -541,6 +549,7 @@ begin
         Setlength(TmpTotalLyricStringIndizes, 0);
     end;
 end;
+*)
 
 {
     --------------------------------------------------------
@@ -552,56 +561,207 @@ end;
     Note to self: This could be done more elegant...
     --------------------------------------------------------
 }
-procedure TBibSearcher.BuildTotalString(FileList: TObjectList);
+
+procedure TBibSearcher.CalculateTotalStringLengths(FileList: TObjectList);
+var aAudioFile: TAudioFile;
+    aLengthAdditional, aLengthMinimal: Integer;
+    i: Integer;
+begin
+    fTotalStringLengthSetting   := 0;
+    fTotalStringLengthMinimized := 0;
+
+    if AccelerateSearch then
+    begin
+        for i := 0 to Filelist.Count - 1 do
+        begin
+            aAudioFile := TAudioFile(FileList[i]);
+            aLengthMinimal := 4 + Length(Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) {+ #1}
+                                     + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) {+ #1}
+                                     + Utf8Encode(AnsiLowerCase(aAudioFile.Album)) {+ #13#10});
+
+            aLengthAdditional := 0;
+            if AccelerateSearchIncludePath then
+                aLengthAdditional := 1 + aLengthAdditional
+                                       + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Pfad)));
+            if AccelerateSearchIncludeComment then
+                aLengthAdditional := 1 + aLengthAdditional
+                                       + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Comment)));
+
+            fTotalStringLengthSetting   := fTotalStringLengthSetting + aLengthMinimal + aLengthAdditional;
+            fTotalStringLengthMinimized := fTotalStringLengthMinimized + aLengthMinimal;
+        end;
+    end;
+end;
+
+procedure TBibSearcher.CalculateLyricStringLengths(FileList: TObjectList);
 var aAudioFile: TAudioFile;
     i: Integer;
 begin
+    fLyricStringLength := 0;
+    if AccelerateLyricSearch then
+    begin
+        for i := 0 to Filelist.Count - 1 do
+        begin
+            aAudioFile := TAudioFile(FileList[i]);
+            fLyricStringLength := fLyricStringLength
+                         + 2 + Length( Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics)))) {+ #13#10};
+        end;
+    end;
+end;
+
+procedure TBibSearcher.BuildTotalString(FileList: TObjectList);
+var aAudioFile: TAudioFile;
+    i, currentPos, maxLength: Integer;
+    currentAudioString: UTF8String;
+    BuildSettings, BuildAtAll: Boolean;
+begin
     if AccelerateSearch then
     begin
+        // first: calculate the necessary length, two possible variations:
+        // fTotalStringLengthSetting
+        // fTotalStringLengthMinimized
+        // SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(PWideChar('Calculating ... ')));
+
+        CalculateTotalStringLengths(FileList);
+        // clear current string
         TotalString := '';
-        Setlength(TotalStringIndizes, FileList.Count);
-        for i := 0 to FileList.Count-1 do
+
+        //SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(PWideChar(' ... ' + IntToStr(fTotalStringLengthSetting))));
+
+        BuildSettings := True;
+        BuildAtAll := True;
+        try
+            SetLength(TotalString, fTotalStringLengthSetting + 1);
+        except
+            on EOutOfMemory do
+            begin
+                BuildSettings := False;
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(OutOfMemory_DataReduced));
+            end;
+        end;
+
+        if NOT BuildSettings then
+        // try again
+        try
+            SetLength(TotalString, fTotalStringLengthMinimized + 1);
+        except
+            on EOutOfMemory do
+            begin
+                TotalString := '';
+                BuildAtAll := False;
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(OutOfMemory_DataDisabled));
+            end;
+        end;
+
+        //SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(PWideChar('Length ' + IntToStr(Length(TotalString)))));
+
+        if BuildAtall then
         begin
-            TotalStringIndizes[i] := Length(TotalString);
-            aAudioFile := TAudioFile(FileList[i]);
-            TotalString := TotalString
-                         + Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) + #1
-                         + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) + #1
-                         + Utf8Encode(AnsiLowerCase(aAudioFile.Album));
-            if AccelerateSearchIncludePath then
-                TotalString := TotalString + #1
-                            + Utf8Encode(AnsiLowerCase(aAudioFile.Pfad));
-            if AccelerateSearchIncludeComment then
-                TotalString := TotalString + #1
-                            + Utf8Encode(AnsiLowerCase(aAudioFile.Comment));
-            TotalString := TotalString + #13#10;
+            Setlength(TotalStringIndizes, FileList.Count);
+            maxLength := Length(TotalString);
+            currentPos := 1;
+            for i := 0 to FileList.Count-1 do
+            begin
+                TotalStringIndizes[i] := currentPos - 1; //before: Length(TotalString);
+
+                aAudioFile := TAudioFile(FileList[i]);
+                currentAudioString :=
+                               Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) + #1
+                             + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) + #1
+                             + Utf8Encode(AnsiLowerCase(aAudioFile.Album));
+                if AccelerateSearchIncludePath and BuildSettings then
+                    currentAudioString := currentAudioString + #1
+                                + Utf8Encode(AnsiLowerCase(aAudioFile.Pfad));
+                if AccelerateSearchIncludeComment and BuildSettings then
+                    currentAudioString := currentAudioString + #1
+                                + Utf8Encode(AnsiLowerCase(aAudioFile.Comment));
+                currentAudioString := currentAudioString + #13#10;
+
+                if currentPos + length(currentAudioString) <= maxLength then
+                begin
+                    move(currentAudioString[1], TotalString[currentPos], length(currentAudioString) );
+                    inc(currentPos, length(currentAudioString));
+                end else
+                    // This Should NEVER happen!!
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory,
+                        LParam(OutOfMemory_ErrorBuildingDataString));
+            end;
+
+            //SendMessage(MainWindowHandle, WM_MedienBib, MB_MessageForDialog, LParam(PWideChar('Length (fertig) ' + ':' + IntToStr(Length(TotalString)))));
+        end else
+        begin
+            TotalString := '';
+            Setlength(TotalStringIndizes, 0);
         end;
     end else
     begin
         TotalString := '';
         Setlength(TotalStringIndizes, 0);
     end;
+
+
 end;
 procedure TBibSearcher.BuildTotalLyricString(FileList: TObjectList);
 var aAudioFile: TAudioFile;
-    i: Integer;
+    i, currentPos, maxLength: Integer;
+    currentAudioString: UTF8String;
+    BuildAtAll: Boolean;
 begin
     if AccelerateLyricSearch then
     begin
+        CalculateLyricStringLengths(FileList);
         TotalLyricString := '';
-        Setlength(TotalLyricStringIndizes, FileList.Count);
-        for i := 0 to FileList.Count-1 do
+        BuildAtAll := True;
+
+        try
+            SetLength(TotalLyricString, fLyricStringLength + 1);
+        except
+            on EOutOfMemory do
+            begin
+                TotalLyricString := '';
+                BuildAtAll := False;
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory, LParam(OutOfMemory_LyricsDisabled));
+            end;
+        end;
+
+        if BuildAtAll then
         begin
-            TotalLyricStringIndizes[i] := Length(TotalLyricString);
-            aAudioFile := TAudioFile(FileList[i]);
-            TotalLyricString := TotalLyricString
-                         + Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics))) + #13#10;
+            Setlength(TotalLyricStringIndizes, FileList.Count);
+            maxLength := Length(TotalLyricString);
+            currentPos := 1;
+
+            for i := 0 to FileList.Count-1 do
+            begin
+                TotalLyricStringIndizes[i] := currentPos - 1;
+                aAudioFile := TAudioFile(FileList[i]);
+                currentAudioString := Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics))) + #13#10;
+
+                if currentPos + length(currentAudioString) <= maxLength then
+                begin
+                    move(currentAudioString[1], TotalLyricString[currentPos], length(currentAudioString) );
+                    inc(currentPos, length(currentAudioString));
+                end else
+                    // This Should NEVER happen!!
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_OutOfMemory,
+                        LParam(OutOfMemory_ErrorBuildingLyricString));
+            end;
+        end else
+        begin
+            TotalLyricString := '';
+            Setlength(TotalLyricStringIndizes, 0);
         end;
     end else
     begin
         TotalLyricString := '';
         Setlength(TotalLyricStringIndizes, 0);
     end;
+end;
+
+procedure TBibSearcher.ClearTotalLyricString;
+begin
+    AccelerateLyricSearch := False;
+    TotalLyricString := '';
+    Setlength(TotalLyricStringIndizes, 0);
 end;
 
 {
@@ -612,9 +772,16 @@ end;
     runs in VCL-Mainthread
     --------------------------------------------------------
 }
-procedure TBibSearcher.SwapTotalStrings;
+procedure TBibSearcher.SwapTotalStrings(FileList: TObjectList);
 var i: Integer;
 begin
+
+    BuildTotalString(FileList);
+    BuildTotalLyricString(FileList);
+
+    {
+    exit;
+
   if AccelerateSearch then
   begin
       // copy the indizes
@@ -647,6 +814,8 @@ begin
       TotalLyricString := '';
       TmpTotalLyricString := '';
   end;
+  }
+
 end;
 
 
@@ -681,6 +850,7 @@ end;
     of the search
     --------------------------------------------------------
 }
+
 function TBibSearcher.CheckGenre(Genre: UnicodeString):boolean;
 var GenreIDX: Integer;
 begin

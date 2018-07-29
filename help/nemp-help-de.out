@@ -1,11 +1,11 @@
 \BOOKMARK [1][]{section.2}{1 Nemp Grundlagen}{}% 1
-\BOOKMARK [2][]{subsection.8}{1.1 Das Hauptfenster von Nemp}{section.2}% 2
-\BOOKMARK [2][]{subsection.9}{1.2 Allgemeine Steuerung}{section.2}% 3
-\BOOKMARK [2][]{subsection.10}{1.3 Skins, Einzelfenster und Party-Modus}{section.2}% 4
-\BOOKMARK [2][]{subsection.12}{1.4 Party-Modus}{section.2}% 5
-\BOOKMARK [2][]{subsection.13}{1.5 Sprachen}{section.2}% 6
-\BOOKMARK [2][]{subsection.14}{1.6 Mobile Festplatten und Backups, Portabilit\344t}{section.2}% 7
-\BOOKMARK [2][]{subsection.15}{1.7 Grundlegende Einstellungen: Der Nemp Wizard}{section.2}% 8
+\BOOKMARK [2][]{subsection.8}{1.1 Grundlegende Einstellungen: Der Nemp Wizard}{section.2}% 2
+\BOOKMARK [2][]{subsection.9}{1.2 Das Hauptfenster von Nemp}{section.2}% 3
+\BOOKMARK [2][]{subsection.10}{1.3 Allgemeine Steuerung}{section.2}% 4
+\BOOKMARK [2][]{subsection.11}{1.4 Skins, Einzelfenster und Party-Modus}{section.2}% 5
+\BOOKMARK [2][]{subsection.13}{1.5 Party-Modus}{section.2}% 6
+\BOOKMARK [2][]{subsection.14}{1.6 Sprachen}{section.2}% 7
+\BOOKMARK [2][]{subsection.15}{1.7 Mobile Festplatten und Backups, Portabilit\344t}{section.2}% 8
 \BOOKMARK [1][]{section.16}{2 Player und Playlist}{}% 9
 \BOOKMARK [2][]{subsection.17}{2.1 Anzeige und Steuerung im Player}{section.16}% 10
 \BOOKMARK [2][]{subsection.18}{2.2 Weitere Anzeigen und Steuerungselemente}{section.16}% 11
@@ -43,27 +43,28 @@
 \BOOKMARK [3][]{section*.53}{Konfiguration im Einstellungsdialog}{subsection.52}% 43
 \BOOKMARK [2][]{subsection.54}{4.4 Tastatur-Display}{section.42}% 44
 \BOOKMARK [2][]{subsection.55}{4.5 Automatischer Shutdown, Einschlaf-Timer}{section.42}% 45
-\BOOKMARK [1][]{section.56}{5 Einstellungen}{}% 46
-\BOOKMARK [2][]{subsection.57}{5.1 Allgemeine Einstellungen}{section.56}% 47
-\BOOKMARK [3][]{section*.58}{Steuerung}{subsection.57}% 48
-\BOOKMARK [3][]{section*.59}{System}{subsection.57}% 49
-\BOOKMARK [2][]{subsection.60}{5.2 Anzeige-Einstellungen}{section.56}% 50
-\BOOKMARK [3][]{section*.61}{Party-Modus}{subsection.60}% 51
-\BOOKMARK [3][]{section*.62}{Schriften}{subsection.60}% 52
-\BOOKMARK [3][]{section*.63}{Erweiterte Einstellungen}{subsection.60}% 53
-\BOOKMARK [2][]{subsection.64}{5.3 Player-Einstellungen}{section.56}% 54
-\BOOKMARK [3][]{section*.65}{Playlist}{subsection.64}% 55
-\BOOKMARK [3][]{section*.66}{Zufallswiedergabe}{subsection.64}% 56
-\BOOKMARK [3][]{section*.67}{Webradio}{subsection.64}% 57
-\BOOKMARK [3][]{section*.68}{Effekte}{subsection.64}% 58
-\BOOKMARK [3][]{section*.69}{Geburtstagsmodus}{subsection.64}% 59
-\BOOKMARK [3][]{section*.70}{LastFM}{subsection.64}% 60
-\BOOKMARK [3][]{section*.71}{Webserver}{subsection.64}% 61
-\BOOKMARK [3][]{section*.72}{Erweiterte Einstellungen}{subsection.64}% 62
-\BOOKMARK [2][]{subsection.73}{5.4 Datei-Management}{section.56}% 63
-\BOOKMARK [3][]{section*.74}{Dateitypen-Registrierung}{subsection.73}% 64
-\BOOKMARK [3][]{section*.75}{Metadaten}{subsection.73}% 65
-\BOOKMARK [3][]{section*.76}{Cover}{subsection.73}% 66
-\BOOKMARK [3][]{section*.77}{Suchoptionen}{subsection.73}% 67
-\BOOKMARK [1][]{section.78}{6 Nerd-Zeug}{}% 68
-\BOOKMARK [1][]{section.79}{7 Versionsgeschichte}{}% 69
+\BOOKMARK [2][]{subsection.56}{4.6 Playlist-Log}{section.42}% 46
+\BOOKMARK [1][]{section.57}{5 Einstellungen}{}% 47
+\BOOKMARK [2][]{subsection.58}{5.1 Allgemeine Einstellungen}{section.57}% 48
+\BOOKMARK [3][]{section*.59}{Steuerung}{subsection.58}% 49
+\BOOKMARK [3][]{section*.60}{System}{subsection.58}% 50
+\BOOKMARK [2][]{subsection.61}{5.2 Anzeige-Einstellungen}{section.57}% 51
+\BOOKMARK [3][]{section*.62}{Party-Modus}{subsection.61}% 52
+\BOOKMARK [3][]{section*.63}{Schriften}{subsection.61}% 53
+\BOOKMARK [3][]{section*.64}{Erweiterte Einstellungen}{subsection.61}% 54
+\BOOKMARK [2][]{subsection.65}{5.3 Player-Einstellungen}{section.57}% 55
+\BOOKMARK [3][]{section*.66}{Playlist}{subsection.65}% 56
+\BOOKMARK [3][]{section*.67}{Zufallswiedergabe}{subsection.65}% 57
+\BOOKMARK [3][]{section*.68}{Webradio}{subsection.65}% 58
+\BOOKMARK [3][]{section*.69}{Effekte}{subsection.65}% 59
+\BOOKMARK [3][]{section*.70}{Geburtstagsmodus}{subsection.65}% 60
+\BOOKMARK [3][]{section*.71}{LastFM}{subsection.65}% 61
+\BOOKMARK [3][]{section*.72}{Webserver}{subsection.65}% 62
+\BOOKMARK [3][]{section*.73}{Erweiterte Einstellungen}{subsection.65}% 63
+\BOOKMARK [2][]{subsection.74}{5.4 Datei-Management}{section.57}% 64
+\BOOKMARK [3][]{section*.75}{Dateitypen-Registrierung}{subsection.74}% 65
+\BOOKMARK [3][]{section*.76}{Metadaten}{subsection.74}% 66
+\BOOKMARK [3][]{section*.77}{Cover}{subsection.74}% 67
+\BOOKMARK [3][]{section*.78}{Suchoptionen}{subsection.74}% 68
+\BOOKMARK [1][]{section.79}{6 Nerd-Zeug}{}% 69
+\BOOKMARK [1][]{section.80}{7 Versionsgeschichte}{}% 70

@@ -40,7 +40,7 @@ interface
 uses Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
 iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons,
 
-Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
+Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
@@ -1693,7 +1693,7 @@ end;
 
 
 procedure TNempSkin.DeActivateSkin(SetFlowColor: Boolean = True);
-var i, idx: integer;
+var i, j, idx: integer;
   DestVST: TVirtualStringTree;
 
 begin
@@ -1912,6 +1912,15 @@ begin
         Menu := Nemp_MainMenu;
 
     {$IFDEF USESTYLES}
+    for I:= 0 to Screen.CustomFormCount - 1 do
+    begin
+      for j:=0 to Screen.Forms[i].ComponentCount - 1 do
+        if Screen.Forms[i].Components[j] is TCustomListControl  then
+          TStyleManager.Notification(snControlDestroyed,  Screen.Forms[i].Components[j]);
+      TStyleManager.Notification(snControlDestroyed,  Screen.Forms[i]);
+    end;
+
+
     TStyleManager.SetStyle('Windows');
     {$ENDIF}
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;

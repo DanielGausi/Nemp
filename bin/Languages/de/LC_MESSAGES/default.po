@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2018-04-17 20:00\n"
-"PO-Revision-Date: 2018-04-19 20:06+0200\n"
+"POT-Creation-Date: 2018-07-22 18:53\n"
+"PO-Revision-Date: 2018-07-22 19:03+0200\n"
 "Last-Translator: Somebody <your.email@address.com>\n"
 "Language-Team: Daniel Gaußmann <Mail@Gausi.de>\n"
 "Language: de_DE\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #. AboutForm..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_About..Caption
-#: About.dfm:5 NempMainUnit.dfm:7138
+#: About.dfm:5 NempMainUnit.dfm:7146
 msgid "About Nemp"
 msgstr "Über"
 
@@ -151,6 +151,8 @@ msgstr "Über"
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..LblEventWarning..Font.Name
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..LblWebserverAdminURL..Font.Name
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblWebserverUserURL..Font.Name
+#. PlayerLogForm..Font.Name
+#. PlayerLogForm..vstPlayerLog..Header.Font.Name
 #. PlaylistCopyForm..Font.Name
 #. PlaylistForm..Font.Name
 #. FPlayWebstream..Font.Name
@@ -168,7 +170,7 @@ msgstr "Über"
 #. WebServerLogForm..Font.Name
 #. NempDeskBand..Font.Name
 #. MainForm..Font.Name
-#: About.dfm:12 About.dfm:161 About.dfm:166 About.dfm:177 AuswahlUnit.dfm:14
+#: About.dfm:12 About.dfm:165 About.dfm:170 About.dfm:181 AuswahlUnit.dfm:14
 #: BasicSettingsWizard.dfm:12 BasicSettingsWizard.dfm:43
 #: BasicSettingsWizard.dfm:108 BasicSettingsWizard.dfm:122
 #: BasicSettingsWizard.dfm:143 BasicSettingsWizard.dfm:210
@@ -208,13 +210,14 @@ msgstr "Über"
 #: NempMainUnit.dfm:2718 NempMainUnit.dfm:2725 NempMainUnit.dfm:2871
 #: NewPicture.dfm:12 NewPicture.dfm:143 NewStation.dfm:12
 #: OptionsComplete.dfm:15 OptionsComplete.dfm:45 OptionsComplete.dfm:1153
-#: OptionsComplete.dfm:3991 OptionsComplete.dfm:4284 OptionsComplete.dfm:4367
-#: OptionsComplete.dfm:4828 OptionsComplete.dfm:4996 PlaylistToUSB.dfm:12
-#: PlaylistUnit.dfm:13 PlayWebstream.dfm:12 RandomPlaylist.dfm:13
-#: ShutDown.dfm:12 ShutDown.dfm:38 ShutDownEdit.dfm:13 Splash.dfm:13
-#: Splash.dfm:37 Splash.dfm:53 StreamVerwaltung.dfm:13 StreamVerwaltung.dfm:92
-#: StreamVerwaltung.dfm:230 StreamVerwaltung.dfm:247 WebServerLog.dfm:13
-#: Deskband/FormMainBand.dfm:13 G15App/MainUnit.dfm:12
+#: OptionsComplete.dfm:4045 OptionsComplete.dfm:4338 OptionsComplete.dfm:4421
+#: OptionsComplete.dfm:4882 OptionsComplete.dfm:5050 PlayerLog.dfm:13
+#: PlayerLog.dfm:57 PlaylistToUSB.dfm:12 PlaylistUnit.dfm:13
+#: PlayWebstream.dfm:12 RandomPlaylist.dfm:13 ShutDown.dfm:12 ShutDown.dfm:38
+#: ShutDownEdit.dfm:13 Splash.dfm:13 Splash.dfm:37 Splash.dfm:53
+#: StreamVerwaltung.dfm:13 StreamVerwaltung.dfm:92 StreamVerwaltung.dfm:230
+#: StreamVerwaltung.dfm:247 WebServerLog.dfm:13 Deskband/FormMainBand.dfm:13
+#: G15App/MainUnit.dfm:12
 msgid "Tahoma"
 msgstr "Tahoma"
 
@@ -302,7 +305,7 @@ msgstr "[Offset=\"100\"]Germany"
 #. AboutForm..NempCredits....Credits.Strings
 #. AboutForm..NempCredits....Credits.Strings
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:60 About.dfm:124 About.dfm:142 About.dfm:157
+#: About.dfm:60 About.dfm:128 About.dfm:146 About.dfm:161
 msgid "[row=\"200\"]"
 msgstr "[row=\"200\"]"
 
@@ -340,43 +343,52 @@ msgstr ""
 "[url=\"http://www.delphi-forum.de/viewtopic.php?t=48936\"]SearchTools[/url] "
 "by Heiko Thiel"
 
+#. AboutForm..NempCredits......Credits.Strings
+#: About.dfm:84
+msgid ""
+"[url=\"https://www.entwickler-ecke.de/viewtopic.php?"
+"t=100088\"]FastFileStream[/url] by Flamefire et al."
+msgstr ""
+"[url=\"https://www.entwickler-ecke.de/viewtopic.php?"
+"t=100088\"]FastFileStream[/url] by Flamefire et al."
+
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:82
+#: About.dfm:86
 msgid "[url=\"http://dybdahl.dk/dxgettext/\"]GNU gettext for Delphi[/url]"
 msgstr "[url=\"http://dybdahl.dk/dxgettext/\"]GNU gettext for Delphi[/url]"
 
 #. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:86
+#: About.dfm:90
 msgid ""
 "[url=\"http://www.delphipraxis.net/topic114228.html\"]TACredits[/url] (this "
 "scrolling thing)"
 msgstr ""
 "[url=\"http://www.delphipraxis.net/topic114228.html\"]TACredits[/url] (this "
 "scrolling thing)"
-
-#. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:91
-msgid ""
-"[url=\"http://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo"
-"+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] by "
-"MagicAndre1981"
-msgstr ""
-"[url=\"http://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo"
-"+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] by "
-"MagicAndre1981"
 
 #. AboutForm..NempCredits......Credits.Strings
 #: About.dfm:95
 msgid ""
-"[url=\"http://angusj.com/delphi/\"]Drag&Drop-Component[/url] (modified) by "
-"Angus Johnson"
+"[url=\"http://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo"
+"+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] by "
+"MagicAndre1981"
 msgstr ""
-"[url=\"http://angusj.com/delphi/\"]Drag&Drop-Component[/url] (modified) by "
-"Angus Johnson"
+"[url=\"http://www.delphipraxis.net/topic116695_kompo+twindowsversionsinfo"
+"+kompo+zur+windowserkennung.html\"]TWindowsVersionInfo[/url] by "
+"MagicAndre1981"
 
 #. AboutForm..NempCredits......Credits.Strings
 #: About.dfm:99
 msgid ""
+"[url=\"http://angusj.com/delphi/\"]Drag&Drop-Component[/url] (modified) by "
+"Angus Johnson"
+msgstr ""
+"[url=\"http://angusj.com/delphi/\"]Drag&Drop-Component[/url] (modified) by "
+"Angus Johnson"
+
+#. AboutForm..NempCredits......Credits.Strings
+#: About.dfm:103
+msgid ""
 "[url=\"http://delphi.fsprolabs.com/\"]FSPro Windows 7 Taskbar Components[/"
 "url]"
 msgstr ""
@@ -384,32 +396,32 @@ msgstr ""
 "url]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:101
+#: About.dfm:105
 msgid "[url=\"http://www.last.fm/api/intro\"]The LastFM API[/url]"
 msgstr "[url=\"http://www.last.fm/api/intro\"]The LastFM API[/url]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:103
+#: About.dfm:107
 msgid "[url=\"http://www.madshi.net/\"]MadExcept[/url] by Mathias Rauen"
 msgstr "[url=\"http://www.madshi.net/\"]MadExcept[/url] by Mathias Rauen"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:106
+#: About.dfm:110
 msgid "... and many short snips from \"the internet\""
 msgstr "...und viele Schnipsel aus dem \"Internet\""
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:109
+#: About.dfm:113
 msgid "[b]Icons and Graphics[/b]"
 msgstr "[b]Icons and Graphics[/b]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:111
+#: About.dfm:115
 msgid "[url=\"http://everaldo.com/crystal\"]Chrystal Project Icons[/url]"
 msgstr "[url=\"http://everaldo.com/crystal\"]Chrystal Project Icons[/url]"
 
 #. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:115
+#: About.dfm:119
 msgid ""
 "Silk Icon Set by [url=\"http://www.famfamfam.com/lab/icons/silk\"]famfamfam."
 "com[/url]"
@@ -418,7 +430,7 @@ msgstr ""
 "com[/url]"
 
 #. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:119
+#: About.dfm:123
 msgid ""
 "[url=\"http://tango.freedesktop.org/Tango_Icon_Library\"]Tango Icon Library[/"
 "url]"
@@ -427,59 +439,59 @@ msgstr ""
 "url]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:127
+#: About.dfm:131
 msgid "[b]Thanks to all who helped me ...[/b]"
 msgstr "[b]Thanks to all who helped me ...[/b]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:129
+#: About.dfm:133
 msgid "... by solving programming problems"
 msgstr "... by solving programming problems"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:131
+#: About.dfm:135
 msgid "... by testing and sending bugreports"
 msgstr "... by testing and sending bugreports"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:133
+#: About.dfm:137
 msgid "... by nagging about peanuts"
 msgstr "... by nagging about peanuts"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:135
+#: About.dfm:139
 msgid "... by sending test material"
 msgstr "... by sending test material"
 
 #. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:139
+#: About.dfm:143
 msgid "... just by saying \"thank you, this is a fine piece of software\" "
 msgstr "... just by saying \"thank you, this is a fine piece of software\" "
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:145
+#: About.dfm:149
 msgid "[b]Some music I listened to during coding[/b]"
 msgstr "[b]Some music I listened to during coding[/b]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:147
+#: About.dfm:151
 msgid "The Avatar Soundtrack"
 msgstr "The Avatar Soundtrack"
 
 #. AboutForm..NempCredits......Credits.Strings
-#: About.dfm:151
+#: About.dfm:155
 msgid ""
 "[url=\"http://www.jamendo.com/de/album/78275\"]Kendra Springer - Hope[/url]"
 msgstr ""
 "[url=\"http://www.jamendo.com/de/album/78275\"]Kendra Springer - Hope[/url]"
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:153
+#: About.dfm:157
 msgid "I think its ok to mention some amazing billion-dollar-stuff "
 msgstr "I think its ok to mention some amazing billion-dollar-stuff "
 
 #. AboutForm..NempCredits....Credits.Strings
-#: About.dfm:154
+#: About.dfm:158
 msgid "and a wonderful creative-commons-work in one sentence..."
 msgstr "and a wonderful creative-commons-work in one sentence..."
 
@@ -497,16 +509,16 @@ msgstr "and a wonderful creative-commons-work in one sentence..."
 #. FormStreamVerwaltung..Btn_Ok..Caption
 #. FormStreamVerwaltung..PC_Streams..Tab_Shoutcast..GrpBox_GeneralSearch..Btn_Search..Caption
 #. FormStreamVerwaltung..PC_Streams..Tab_Shoutcast..GrpBox_SearchGenre..Btn_SearchGenre..Caption
-#: About.dfm:190 BasicSettingsWizard.dfm:706 CDOpenDialogs.dfm:35
+#: About.dfm:194 BasicSettingsWizard.dfm:706 CDOpenDialogs.dfm:35
 #: ErrorForm.dfm:49 Lowbattery.dfm:62 NewPicture.dfm:165 NewStation.dfm:144
-#: OptionsComplete.dfm:5089 PlayWebstream.dfm:50 RandomPlaylist.dfm:253
+#: OptionsComplete.dfm:5143 PlayWebstream.dfm:50 RandomPlaylist.dfm:253
 #: ShutDownEdit.dfm:25 StreamVerwaltung.dfm:39 StreamVerwaltung.dfm:305
 #: StreamVerwaltung.dfm:358
 msgid "Ok"
 msgstr "Ok"
 
 #. AboutForm..BtnDonate..Caption
-#: About.dfm:200
+#: About.dfm:204
 msgid "Donate"
 msgstr "Spenden"
 
@@ -545,9 +557,9 @@ msgstr "Willkommen zum Nemp Wizard"
 #. ShutDownForm..LblHinweis..Caption
 #. FSplash..StatusLBL..Caption
 #: BasicSettingsWizard.dfm:59 DeleteSelect.dfm:54 DeleteSelect.dfm:69
-#: DeleteSelect.dfm:77 OptionsComplete.dfm:2518 OptionsComplete.dfm:3661
-#: OptionsComplete.dfm:3761 OptionsComplete.dfm:4013 OptionsComplete.dfm:4305
-#: OptionsComplete.dfm:4378 PlaylistToUSB.dfm:65 ShutDown.dfm:26
+#: DeleteSelect.dfm:77 OptionsComplete.dfm:2518 OptionsComplete.dfm:3674
+#: OptionsComplete.dfm:3774 OptionsComplete.dfm:4067 OptionsComplete.dfm:4359
+#: OptionsComplete.dfm:4432 PlaylistToUSB.dfm:65 ShutDown.dfm:26
 #: ShutDown.dfm:34 Splash.dfm:49
 msgid "..."
 msgstr "..."
@@ -595,9 +607,9 @@ msgstr "Weiter"
 #: BasicSettingsWizard.dfm:91 BasicSettingsWizard.dfm:697 BibSearch.dfm:331
 #: CDOpenDialogs.dfm:26 CDSelection.dfm:35 DeleteSelect.dfm:127 Details.dfm:32
 #: Lowbattery.dfm:87 NewPicture.dfm:175 NewStation.dfm:156
-#: OptionsComplete.dfm:5079 PartymodePassword.dfm:47 PlayWebstream.dfm:40
+#: OptionsComplete.dfm:5133 PartymodePassword.dfm:47 PlayWebstream.dfm:40
 #: RandomPlaylist.dfm:265 ShutDown.dfm:49 ShutDownEdit.dfm:36
-#: Nemp_RessourceStrings.pas:44 Nemp_RessourceStrings.pas:787
+#: Nemp_RessourceStrings.pas:44 Nemp_RessourceStrings.pas:794
 #: 3rd_Party_Units/MyDialogs.pas:60
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -612,7 +624,7 @@ msgstr "(Updates)"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_CheckForUpdates..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_CheckForUpdates..Caption
 #: BasicSettingsWizard.dfm:104 BasicSettingsWizard.dfm:609
-#: NempMainUnit.dfm:3971 NempMainUnit.dfm:7152
+#: NempMainUnit.dfm:3975 NempMainUnit.dfm:7160
 msgid "Check for updates"
 msgstr "Nach Updates suchen"
 
@@ -876,11 +888,12 @@ msgstr "Suchbegriffe"
 #. FDetails..MainPageControl..Tab_VorbisComments..GrpBox_StandardVorbisComments..Lbl_VorbisArtist..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByArtist..Caption
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceArtistBy..Caption
+#. PlayerLogForm..vstPlayerLog......WideText
 #. InfoForm..LblArtist..Caption
 #. Programmer's name for it: AudioFileProperty_Artist
 #: BibSearch.dfm:56 Details.dfm:294 Details.dfm:637 Details.dfm:851
-#: Details.dfm:1164 NempMainUnit.dfm:6402 OptionsComplete.dfm:2372
-#: Deskband/InfoUnit.dfm:314 Nemp_RessourceStrings.pas:750
+#: Details.dfm:1164 NempMainUnit.dfm:6406 OptionsComplete.dfm:2372
+#: PlayerLog.dfm:81 Deskband/InfoUnit.dfm:314 Nemp_RessourceStrings.pas:757
 msgid "Artist"
 msgstr "Interpret"
 
@@ -893,10 +906,11 @@ msgstr "Interpret"
 #. Nemp_MainForm..TopMainPanel..PlaylistPanel..GRPBOXPlaylist..PlaylistVST......WideText
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByTitle..Caption
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceTitletBy..Caption
+#. PlayerLogForm..vstPlayerLog......WideText
 #. Programmer's name for it: AudioFileProperty_Title
 #: BibSearch.dfm:63 Details.dfm:245 Details.dfm:310 Details.dfm:654
-#: Details.dfm:868 Details.dfm:1181 NempMainUnit.dfm:585 NempMainUnit.dfm:6407
-#: OptionsComplete.dfm:2380 Nemp_RessourceStrings.pas:751
+#: Details.dfm:868 Details.dfm:1181 NempMainUnit.dfm:585 NempMainUnit.dfm:6411
+#: OptionsComplete.dfm:2380 PlayerLog.dfm:76 Nemp_RessourceStrings.pas:758
 msgid "Title"
 msgstr "Titel"
 
@@ -908,7 +922,7 @@ msgstr "Titel"
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..LblReplaceAlbumBy..Caption
 #. Programmer's name for it: AudioFileProperty_Album
 #: BibSearch.dfm:70 Details.dfm:326 Details.dfm:671 Details.dfm:885
-#: Details.dfm:1198 OptionsComplete.dfm:2388 Nemp_RessourceStrings.pas:752
+#: Details.dfm:1198 OptionsComplete.dfm:2388 Nemp_RessourceStrings.pas:759
 msgid "Album"
 msgstr "Album"
 
@@ -919,7 +933,7 @@ msgstr "Album"
 #. FDetails..MainPageControl..Tab_VorbisComments..GrpBox_StandardVorbisComments..Lbl_VorbisComment..Caption
 #. Programmer's name for it: AudioFileProperty_Comment
 #: BibSearch.dfm:77 Details.dfm:398 Details.dfm:722 Details.dfm:936
-#: Details.dfm:1215 Nemp_RessourceStrings.pas:761
+#: Details.dfm:1215 Nemp_RessourceStrings.pas:768
 msgid "Comment"
 msgstr "Kommentar"
 
@@ -928,7 +942,7 @@ msgstr "Kommentar"
 #. Programmer's name for it: DetailForm_InfoLblPath
 #. Programmer's name for it: AudioFileProperty_Path
 #: BibSearch.dfm:84 Details.dfm:115 Nemp_RessourceStrings.pas:96
-#: Nemp_RessourceStrings.pas:762
+#: Nemp_RessourceStrings.pas:769
 msgid "Path"
 msgstr "Pfad"
 
@@ -940,7 +954,7 @@ msgstr "Einfache Suche"
 #. FormBibSearch..GRPErweiterteSucheEdit..LblConst_LyricSearchHint..Caption
 #. FDetails..MainPageControl..Tab_Lyrics..GrpBox_Lyrics..Caption
 #. Programmer's name for it: AudioFileProperty_Lyrics
-#: BibSearch.dfm:98 Details.dfm:1472 Nemp_RessourceStrings.pas:765
+#: BibSearch.dfm:98 Details.dfm:1472 Nemp_RessourceStrings.pas:772
 msgid "Lyrics"
 msgstr "Lyrics"
 
@@ -966,7 +980,7 @@ msgstr "Datum"
 #. FDetails..MainPageControl..Tab_VorbisComments..GrpBox_StandardVorbisComments..Lbl_VorbisYear..Caption
 #. Programmer's name for it: AudioFileProperty_Year
 #: BibSearch.dfm:195 Details.dfm:342 Details.dfm:688 Details.dfm:902
-#: Details.dfm:1249 Nemp_RessourceStrings.pas:763
+#: Details.dfm:1249 Nemp_RessourceStrings.pas:770
 msgid "Year"
 msgstr "Jahr"
 
@@ -1052,7 +1066,7 @@ msgstr "Schließen sie dieses Fenster, um mit der Playlist fortzufahren."
 
 #. CDOpenDialog..Caption
 #. Nemp_MainForm..PopupPlayPause..PM_PlayCDAudio..Caption
-#: CDOpenDialogs.dfm:5 NempMainUnit.dfm:7489
+#: CDOpenDialogs.dfm:5 NempMainUnit.dfm:7497
 msgid "Play CD-Audio"
 msgstr "Audio-CD abspielen"
 
@@ -1065,7 +1079,7 @@ msgstr "CD/DVD-Laufwerke"
 #. FDetails..MainPageControl..Tab_General..GrpBox_Title..Btn_Actualize..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..BtnRefreshDevices..Caption
 #. WebServerLogForm..BtnRefresh..Caption
-#: CDOpenDialogs.dfm:52 Details.dfm:443 OptionsComplete.dfm:3450
+#: CDOpenDialogs.dfm:52 Details.dfm:443 OptionsComplete.dfm:3463
 #: WebServerLog.dfm:56
 msgid "Refresh"
 msgstr "Aktualisieren"
@@ -1122,7 +1136,7 @@ msgstr "CD Auswahl"
 #. Programmer's name for it: Shoutcast_OK
 #. Programmer's name for it: XcmbOK
 #: CDSelection.dfm:23 PartymodePassword.dfm:36 Nemp_RessourceStrings.pas:43
-#: Nemp_RessourceStrings.pas:786 3rd_Party_Units/MyDialogs.pas:59
+#: Nemp_RessourceStrings.pas:793 3rd_Party_Units/MyDialogs.pas:59
 msgid "OK"
 msgstr "Ok"
 
@@ -1321,8 +1335,8 @@ msgstr "Datei"
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByFileSize..Caption
 #. Programmer's name for it: DetailForm_InfoLblFileSize
 #. Programmer's name for it: AudioFileProperty_Filesize
-#: Details.dfm:83 NempMainUnit.dfm:6031 Nemp_RessourceStrings.pas:98
-#: Nemp_RessourceStrings.pas:755
+#: Details.dfm:83 NempMainUnit.dfm:6035 Nemp_RessourceStrings.pas:98
+#: Nemp_RessourceStrings.pas:762
 msgid "Filesize"
 msgstr "Dateigröße"
 
@@ -1333,12 +1347,13 @@ msgstr "Dateigröße"
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceTitleBy..Text
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceTitleBy....Items.Strings
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceAlbumBy....Items.Strings
+#. PlayerLogForm..vstPlayerLog......WideText
 #. Programmer's name for it: DetailForm_InfoLblFilename
 #. Programmer's name for it: AudioFileProperty_Filename
-#: Details.dfm:99 NempMainUnit.dfm:5997 NempMainUnit.dfm:6397
+#: Details.dfm:99 NempMainUnit.dfm:6001 NempMainUnit.dfm:6401
 #: OptionsComplete.dfm:2402 OptionsComplete.dfm:2415 OptionsComplete.dfm:2419
-#: OptionsComplete.dfm:2436 Nemp_RessourceStrings.pas:97
-#: Nemp_RessourceStrings.pas:757
+#: OptionsComplete.dfm:2436 PlayerLog.dfm:86 Nemp_RessourceStrings.pas:97
+#: Nemp_RessourceStrings.pas:764
 msgid "Filename"
 msgstr "Dateiname"
 
@@ -1352,8 +1367,8 @@ msgstr "Explorer"
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Properties..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_Properties..Caption
 #. Nemp_MainForm..PopupEditExtendedTags..pm_TagDetails..Caption
-#: Details.dfm:149 NempMainUnit.dfm:3513 NempMainUnit.dfm:6364
-#: NempMainUnit.dfm:6623 NempMainUnit.dfm:8176
+#: Details.dfm:149 NempMainUnit.dfm:3513 NempMainUnit.dfm:6368
+#: NempMainUnit.dfm:6627 NempMainUnit.dfm:8184
 msgid "Properties"
 msgstr "Eigenschaften"
 
@@ -1368,9 +1383,9 @@ msgstr "Eigenschaften"
 #. FormStreamVerwaltung..PC_Streams..Tab_Shoutcast..VST_ShoutcastQuery......WideText
 #. Programmer's name for it: AudioFileProperty_Genre
 #: Details.dfm:358 Details.dfm:705 Details.dfm:919 Details.dfm:1232
-#: NempMainUnit.dfm:6015 NewStation.dfm:66 StreamVerwaltung.dfm:122
+#: NempMainUnit.dfm:6019 NewStation.dfm:66 StreamVerwaltung.dfm:122
 #: StreamVerwaltung.dfm:178 StreamVerwaltung.dfm:276
-#: Nemp_RessourceStrings.pas:764
+#: Nemp_RessourceStrings.pas:771
 msgid "Genre"
 msgstr "Genre"
 
@@ -1380,9 +1395,9 @@ msgstr "Genre"
 #. RandomPlaylistForm..GrpBox_Duration..Caption
 #. Programmer's name for it: Infostring_Duration
 #. Programmer's name for it: AudioFileProperty_Duration
-#: Details.dfm:382 Details.dfm:1758 NempMainUnit.dfm:6025
+#: Details.dfm:382 Details.dfm:1758 NempMainUnit.dfm:6029
 #: RandomPlaylist.dfm:323 Nemp_RessourceStrings.pas:307
-#: Nemp_RessourceStrings.pas:753
+#: Nemp_RessourceStrings.pas:760
 msgid "Duration"
 msgstr "Dauer"
 
@@ -1392,7 +1407,7 @@ msgstr "Dauer"
 #. FDetails..MainPageControl..Tab_VorbisComments..GrpBox_StandardVorbisComments..Lbl_VorbisTrack..Caption
 #. Programmer's name for it: AudioFileProperty_Track
 #: Details.dfm:421 Details.dfm:739 Details.dfm:953 Details.dfm:1266
-#: Nemp_RessourceStrings.pas:766
+#: Nemp_RessourceStrings.pas:773
 msgid "Track"
 msgstr "Track"
 
@@ -1406,7 +1421,7 @@ msgstr "Qualität"
 #. Programmer's name for it: Infostring_Samplerate
 #. Programmer's name for it: AudioFileProperty_Samplerate
 #: Details.dfm:485 Details.dfm:1622 Nemp_RessourceStrings.pas:308
-#: Nemp_RessourceStrings.pas:760
+#: Nemp_RessourceStrings.pas:767
 msgid "Samplerate"
 msgstr "Samplerate"
 
@@ -1416,7 +1431,7 @@ msgstr "Samplerate"
 #. Programmer's name for it: Infostring_Bitrate
 #. Programmer's name for it: AudioFileProperty_Bitrate
 #: Details.dfm:501 Details.dfm:1605 NewStation.dfm:59
-#: Nemp_RessourceStrings.pas:306 Nemp_RessourceStrings.pas:754
+#: Nemp_RessourceStrings.pas:306 Nemp_RessourceStrings.pas:761
 msgid "Bitrate"
 msgstr "Bitrate"
 
@@ -1518,7 +1533,7 @@ msgstr "Bewertung und Abspielzähler auf Null setzen"
 #. FDetails..MainPageControl..Tab_MpegInformation..GrpBox_ID3v2..BtnResetRating..Caption
 #. FDetails..MainPageControl..Tab_VorbisComments..GrpBox_StandardVorbisComments..Btn_ResetVorbisRating..Caption
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..btn_DefaultCoverReset..Caption
-#: Details.dfm:1100 Details.dfm:1375 OptionsComplete.dfm:3078
+#: Details.dfm:1100 Details.dfm:1375 OptionsComplete.dfm:3091
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -1602,7 +1617,7 @@ msgstr "Neu"
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..BtnAutoScanDelete..Caption
 #. FormStreamVerwaltung..PM_Favorites..PM_Fav_Delete..Caption
 #. FormStreamVerwaltung..MainMenu_StreamSelection..MM_Favorites..MM_Fav_Delete..Caption
-#: Details.dfm:1555 NempMainUnit.dfm:6144 OptionsComplete.dfm:2635
+#: Details.dfm:1555 NempMainUnit.dfm:6148 OptionsComplete.dfm:2635
 #: StreamVerwaltung.dfm:461 StreamVerwaltung.dfm:500
 msgid "Delete"
 msgstr "Entfernen"
@@ -1724,7 +1739,7 @@ msgstr "Tagwolken-Editor"
 
 #. FDetails..BtnApply..Caption
 #. OptionsCompleteForm..BTNApply..Caption
-#: Details.dfm:2016 OptionsComplete.dfm:5068
+#: Details.dfm:2016 OptionsComplete.dfm:5122
 msgid "Apply"
 msgstr "Übernehmen"
 
@@ -1736,20 +1751,20 @@ msgstr "Rückgängig"
 #. FDetails..IdHTTP1..Request.Accept
 #. OptionsCompleteForm..IDHttpWebServerGetIP..Request.Accept
 #. FormStreamVerwaltung..IdHTTP1..Request.Accept
-#: Details.dfm:2044 OptionsComplete.dfm:5126 StreamVerwaltung.dfm:405
+#: Details.dfm:2044 OptionsComplete.dfm:5180 StreamVerwaltung.dfm:405
 msgid "text/html, */*"
 msgstr "text/html, */*"
 
 #. FDetails..IdHTTP1..Request.UserAgent
 #. OptionsCompleteForm..IDHttpWebServerGetIP..Request.UserAgent
-#: Details.dfm:2046 OptionsComplete.dfm:5128
+#: Details.dfm:2046 OptionsComplete.dfm:5182
 msgid "Mozilla/3.0 (compatible; Indy Library)"
 msgstr "Mozilla/3.0 (compatible; Indy Library)"
 
 #. FDetails..IdHTTP1..Request.Ranges.Units
 #. OptionsCompleteForm..IDHttpWebServerGetIP..Request.Ranges.Units
 #. FormStreamVerwaltung..IdHTTP1..Request.Ranges.Units
-#: Details.dfm:2047 OptionsComplete.dfm:5129 StreamVerwaltung.dfm:408
+#: Details.dfm:2047 OptionsComplete.dfm:5183 StreamVerwaltung.dfm:408
 msgid "bytes"
 msgstr "bytes"
 
@@ -1787,7 +1802,9 @@ msgstr "ExtendedControlForm"
 #. ExtendedControlForm..ContainerPanelExtendedControlsForm..CloseImage..Hint
 #. Nemp_MainForm..TNAMenu..PM_TNA_Close..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Close..Caption
-#: ExtendedControlsUnit.dfm:44 NempMainUnit.dfm:6668 NempMainUnit.dfm:7164
+#. PlayerLogForm..BtnClose..Caption
+#: ExtendedControlsUnit.dfm:44 NempMainUnit.dfm:6672 NempMainUnit.dfm:7172
+#: PlayerLog.dfm:29
 msgid "Close"
 msgstr "Schließen"
 
@@ -1865,7 +1882,7 @@ msgstr "Zeige Menü"
 
 #. Nemp_MainForm..TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..TabBtn_Browse..Hint
 #. Programmer's name for it: TabBtnBrowse_Hint1
-#: NempMainUnit.dfm:396 Nemp_RessourceStrings.pas:794
+#: NempMainUnit.dfm:396 Nemp_RessourceStrings.pas:801
 msgid "Browse your medialibrary"
 msgstr "In der Medienbibliothek browsen"
 
@@ -1877,20 +1894,22 @@ msgstr "Coverflow"
 
 #. Nemp_MainForm..TopMainPanel..AuswahlPanel..AuswahlHeaderPanel..TabBtn_TagCloud..Hint
 #. Programmer's name for it: TabBtnTagCloud_Hint1
-#: NempMainUnit.dfm:471 Nemp_RessourceStrings.pas:797
+#: NempMainUnit.dfm:471 Nemp_RessourceStrings.pas:804
 msgid "Tag cloud"
 msgstr "Tagwolke"
 
 #. Nemp_MainForm..TopMainPanel..PlaylistPanel..GRPBOXPlaylist..PlaylistVST......WideText
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..Lbl_Const_EventTime..Caption
+#. PlayerLogForm..vstPlayerLog......WideText
 #. InfoForm..LblTime..Caption
-#: NempMainUnit.dfm:593 OptionsComplete.dfm:4348 Deskband/InfoUnit.dfm:242
+#: NempMainUnit.dfm:593 OptionsComplete.dfm:4402 PlayerLog.dfm:71
+#: Deskband/InfoUnit.dfm:242
 msgid "Time"
 msgstr "Zeit"
 
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..GRPBOXHeadset..LblHeadsetArtist..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..LblConst_Headphones..Caption
-#: NempMainUnit.dfm:746 OptionsComplete.dfm:3425
+#: NempMainUnit.dfm:746 OptionsComplete.dfm:3438
 msgid "Headphones"
 msgstr "Kopfhörer"
 
@@ -1919,7 +1938,7 @@ msgstr ""
 
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..NewPlayerPanel..WebserverImage..Hint
 #. Nemp_MainForm..WebServerPopup.._Webserver..Caption
-#: NempMainUnit.dfm:1037 NempMainUnit.dfm:7572
+#: NempMainUnit.dfm:1037 NempMainUnit.dfm:7580
 msgid "Nemp Webserver"
 msgstr "Nemp Webserver"
 
@@ -1953,7 +1972,7 @@ msgstr "Vorheriger Titel"
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..NewPlayerPanel..PlayPauseBTN..Hint
 #. Nemp_MainForm..fspTaskbarManager......Hint
 #. OptionsCompleteForm..PageControl1..TabSystem1..GrpBox_Hotkeys..CB_Activate_Play..Caption
-#: NempMainUnit.dfm:1312 NempMainUnit.dfm:7615 OptionsComplete.dfm:290
+#: NempMainUnit.dfm:1312 NempMainUnit.dfm:7623 OptionsComplete.dfm:290
 msgid "Play/Pause"
 msgstr "Play/Pause"
 
@@ -1962,7 +1981,7 @@ msgstr "Play/Pause"
 #. Nemp_MainForm..PopupStop..PM_StopNow..Caption
 #. OptionsCompleteForm..PageControl1..TabSystem1..GrpBox_Hotkeys..CB_Activate_Stop..Caption
 #. Programmer's name for it: MainForm_StopBtn_NormalHint
-#: NempMainUnit.dfm:1333 NempMainUnit.dfm:6641 NempMainUnit.dfm:7498
+#: NempMainUnit.dfm:1333 NempMainUnit.dfm:6645 NempMainUnit.dfm:7506
 #: OptionsComplete.dfm:301 Nemp_RessourceStrings.pas:553
 msgid "Stop"
 msgstr "Stop"
@@ -1986,7 +2005,7 @@ msgstr "Zeige Menü"
 
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..NewPlayerPanel..BtnMinimize..Hint
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Minimize..Caption
-#: NempMainUnit.dfm:1481 NempMainUnit.dfm:7160
+#: NempMainUnit.dfm:1481 NempMainUnit.dfm:7168
 msgid "Minimize"
 msgstr "Minimieren"
 
@@ -1995,8 +2014,8 @@ msgstr "Minimieren"
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownModeCloseNemp..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeCloseNemp..Caption
 #. Programmer's name for it: NempShutDown_ClosePopupBlank
-#: NempMainUnit.dfm:1502 NempMainUnit.dfm:3298 NempMainUnit.dfm:6858
-#: NempMainUnit.dfm:7233 Nemp_RessourceStrings.pas:412
+#: NempMainUnit.dfm:1502 NempMainUnit.dfm:3298 NempMainUnit.dfm:6862
+#: NempMainUnit.dfm:7241 Nemp_RessourceStrings.pas:412
 msgid "Close Nemp"
 msgstr "Nemp beenden"
 
@@ -2053,7 +2072,7 @@ msgstr "16K"
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..GRPBOXEqualizer..Btn_EqualizerPresets..Caption
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..btn_DefaultCover..Caption
 #. Programmer's name for it: MainForm_BtnEqualizerPresetsSelect
-#: NempMainUnit.dfm:2204 OptionsComplete.dfm:3068 Nemp_RessourceStrings.pas:534
+#: NempMainUnit.dfm:2204 OptionsComplete.dfm:3081 Nemp_RessourceStrings.pas:534
 msgid "Select"
 msgstr "Auswahl"
 
@@ -2106,20 +2125,20 @@ msgstr "Effekte aus"
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..GRPBOXEffekte..BtnABRepeatSetA..Hint
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeatSetA..Caption
 #. Nemp_MainForm..PopupRepeatAB..PM_SetA..Caption
-#: NempMainUnit.dfm:2470 NempMainUnit.dfm:7541 NempMainUnit.dfm:8094
+#: NempMainUnit.dfm:2470 NempMainUnit.dfm:7549 NempMainUnit.dfm:8102
 msgid "Set start point (A)"
 msgstr "Setze Startpunkt (A)"
 
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..GRPBOXEffekte..BtnABRepeatSetB..Hint
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeatSetB..Caption
 #. Nemp_MainForm..PopupRepeatAB..PM_SetB..Caption
-#: NempMainUnit.dfm:2489 NempMainUnit.dfm:7545 NempMainUnit.dfm:8098
+#: NempMainUnit.dfm:2489 NempMainUnit.dfm:7553 NempMainUnit.dfm:8106
 msgid "Set end point (B)"
 msgstr "Setze Endpunkt (B)"
 
 #. Nemp_MainForm..TopMainPanel..PlayerPanel..GRPBOXEffekte..BtnABRepeatUnset..Hint
 #. Nemp_MainForm..PopupRepeatAB..PM_StopABrepeat..Caption
-#: NempMainUnit.dfm:2508 NempMainUnit.dfm:8105
+#: NempMainUnit.dfm:2508 NempMainUnit.dfm:8113
 msgid "Disable A-B repeat"
 msgstr "A-B-Wiederholung aus"
 
@@ -2155,7 +2174,7 @@ msgstr "Computer nach Musikdateien untersuchen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_Webradio..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Webradio..Caption
-#: NempMainUnit.dfm:2970 NempMainUnit.dfm:6155
+#: NempMainUnit.dfm:2970 NempMainUnit.dfm:6159
 msgid "Manage webradio stations"
 msgstr "Webradio-Sender verwalten"
 
@@ -2264,26 +2283,26 @@ msgstr "Webradio-Sender verwalten"
 #: NempMainUnit.dfm:3578 NempMainUnit.dfm:3599 NempMainUnit.dfm:3625
 #: NempMainUnit.dfm:3665 NempMainUnit.dfm:3712 NempMainUnit.dfm:3765
 #: NempMainUnit.dfm:3818 NempMainUnit.dfm:3871 NempMainUnit.dfm:3893
-#: NempMainUnit.dfm:3908 NempMainUnit.dfm:3927 NempMainUnit.dfm:3963
-#: NempMainUnit.dfm:5947 NempMainUnit.dfm:5956 NempMainUnit.dfm:5992
-#: NempMainUnit.dfm:6020 NempMainUnit.dfm:6036 NempMainUnit.dfm:6105
-#: NempMainUnit.dfm:6115 NempMainUnit.dfm:6170 NempMainUnit.dfm:6234
-#: NempMainUnit.dfm:6270 NempMainUnit.dfm:6299 NempMainUnit.dfm:6326
-#: NempMainUnit.dfm:6344 NempMainUnit.dfm:6352 NempMainUnit.dfm:6416
-#: NempMainUnit.dfm:6432 NempMainUnit.dfm:6458 NempMainUnit.dfm:6535
-#: NempMainUnit.dfm:6568 NempMainUnit.dfm:6577 NempMainUnit.dfm:6586
-#: NempMainUnit.dfm:6611 NempMainUnit.dfm:6661 NempMainUnit.dfm:6681
-#: NempMainUnit.dfm:6693 NempMainUnit.dfm:6728 NempMainUnit.dfm:6764
-#: NempMainUnit.dfm:6784 NempMainUnit.dfm:6797 NempMainUnit.dfm:6809
-#: NempMainUnit.dfm:6849 NempMainUnit.dfm:6896 NempMainUnit.dfm:6949
-#: NempMainUnit.dfm:7002 NempMainUnit.dfm:7055 NempMainUnit.dfm:7077
-#: NempMainUnit.dfm:7092 NempMainUnit.dfm:7111 NempMainUnit.dfm:7135
-#: NempMainUnit.dfm:7157 NempMainUnit.dfm:7184 NempMainUnit.dfm:7224
-#: NempMainUnit.dfm:7271 NempMainUnit.dfm:7324 NempMainUnit.dfm:7377
-#: NempMainUnit.dfm:7430 NempMainUnit.dfm:7456 NempMainUnit.dfm:7468
-#: NempMainUnit.dfm:7534 NempMainUnit.dfm:7561 NempMainUnit.dfm:7580
-#: NempMainUnit.dfm:8070 NempMainUnit.dfm:8102 NempMainUnit.dfm:8157
-#: NempMainUnit.dfm:8173 OptionsComplete.dfm:457 OptionsComplete.dfm:532
+#: NempMainUnit.dfm:3908 NempMainUnit.dfm:3927 NempMainUnit.dfm:3967
+#: NempMainUnit.dfm:5951 NempMainUnit.dfm:5960 NempMainUnit.dfm:5996
+#: NempMainUnit.dfm:6024 NempMainUnit.dfm:6040 NempMainUnit.dfm:6109
+#: NempMainUnit.dfm:6119 NempMainUnit.dfm:6174 NempMainUnit.dfm:6238
+#: NempMainUnit.dfm:6274 NempMainUnit.dfm:6303 NempMainUnit.dfm:6330
+#: NempMainUnit.dfm:6348 NempMainUnit.dfm:6356 NempMainUnit.dfm:6420
+#: NempMainUnit.dfm:6436 NempMainUnit.dfm:6462 NempMainUnit.dfm:6539
+#: NempMainUnit.dfm:6572 NempMainUnit.dfm:6581 NempMainUnit.dfm:6590
+#: NempMainUnit.dfm:6615 NempMainUnit.dfm:6665 NempMainUnit.dfm:6685
+#: NempMainUnit.dfm:6697 NempMainUnit.dfm:6732 NempMainUnit.dfm:6768
+#: NempMainUnit.dfm:6788 NempMainUnit.dfm:6801 NempMainUnit.dfm:6813
+#: NempMainUnit.dfm:6853 NempMainUnit.dfm:6900 NempMainUnit.dfm:6953
+#: NempMainUnit.dfm:7006 NempMainUnit.dfm:7059 NempMainUnit.dfm:7081
+#: NempMainUnit.dfm:7096 NempMainUnit.dfm:7115 NempMainUnit.dfm:7143
+#: NempMainUnit.dfm:7165 NempMainUnit.dfm:7192 NempMainUnit.dfm:7232
+#: NempMainUnit.dfm:7279 NempMainUnit.dfm:7332 NempMainUnit.dfm:7385
+#: NempMainUnit.dfm:7438 NempMainUnit.dfm:7464 NempMainUnit.dfm:7476
+#: NempMainUnit.dfm:7542 NempMainUnit.dfm:7569 NempMainUnit.dfm:7588
+#: NempMainUnit.dfm:8078 NempMainUnit.dfm:8110 NempMainUnit.dfm:8165
+#: NempMainUnit.dfm:8181 OptionsComplete.dfm:457 OptionsComplete.dfm:532
 #: OptionsComplete.dfm:607 OptionsComplete.dfm:682 OptionsComplete.dfm:757
 #: OptionsComplete.dfm:832 OptionsComplete.dfm:907 OptionsComplete.dfm:982
 #: OptionsComplete.dfm:1057 StreamVerwaltung.dfm:466 StreamVerwaltung.dfm:504
@@ -2373,61 +2392,61 @@ msgstr "&Browsen nach"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByArtistAlbum..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByArtistAlbum..Caption
-#: NempMainUnit.dfm:3075 NempMainUnit.dfm:6056
+#: NempMainUnit.dfm:3075 NempMainUnit.dfm:6060
 msgid "Artists - Albums"
 msgstr "Interpret- Album"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByAlbumArtists..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByAlbumArtists..Caption
-#: NempMainUnit.dfm:3081 NempMainUnit.dfm:6086
+#: NempMainUnit.dfm:3081 NempMainUnit.dfm:6090
 msgid "Album - Artists"
 msgstr "Album - Interpreten"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByDirectoryArtist..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByDirArtist..Caption
-#: NempMainUnit.dfm:3086 NempMainUnit.dfm:6062
+#: NempMainUnit.dfm:3086 NempMainUnit.dfm:6066
 msgid "Directories - Artists"
 msgstr "Ordner - Interpret"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByDirectoryAlbum..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByDirAlbum..Caption
-#: NempMainUnit.dfm:3092 NempMainUnit.dfm:6068
+#: NempMainUnit.dfm:3092 NempMainUnit.dfm:6072
 msgid "Directories - Albums"
 msgstr "Ordner - Album"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByGenreArtist..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByGenreArtist..Caption
-#: NempMainUnit.dfm:3098 NempMainUnit.dfm:6074
+#: NempMainUnit.dfm:3098 NempMainUnit.dfm:6078
 msgid "Genres - Artists"
 msgstr "Genre - Interpret"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByGenreYear..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByGenreYear..Caption
-#: NempMainUnit.dfm:3104 NempMainUnit.dfm:6080
+#: NempMainUnit.dfm:3104 NempMainUnit.dfm:6084
 msgid "Genres - Years"
 msgstr "Genre - Jahr"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByYearArtist..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByYearArtist..Caption
-#: NempMainUnit.dfm:3110 NempMainUnit.dfm:6091
+#: NempMainUnit.dfm:3110 NempMainUnit.dfm:6095
 msgid "Year - Artist"
 msgstr "Jahr - Interpret"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByFileageAlbum..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByFileageAlbum..Caption
-#: NempMainUnit.dfm:3115 NempMainUnit.dfm:6096
+#: NempMainUnit.dfm:3115 NempMainUnit.dfm:6100
 msgid "Fileage - Album"
 msgstr "Dateialter - Album"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByFileageArtist..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByFileageArtist..Caption
-#: NempMainUnit.dfm:3120 NempMainUnit.dfm:6101
+#: NempMainUnit.dfm:3120 NempMainUnit.dfm:6105
 msgid "Fileage - Artist"
 msgstr "Dateialter - Interpret"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_BrowseBy..MM_ML_BrowseByMore..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..PM_ML_BrowseByMore..Caption
-#: NempMainUnit.dfm:3128 NempMainUnit.dfm:6109
+#: NempMainUnit.dfm:3128 NempMainUnit.dfm:6113
 msgid "More..."
 msgstr "Mehr..."
 
@@ -2464,7 +2483,7 @@ msgstr "&Exportieren als csv"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_DeleteSelectedFiles..Caption
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_DeleteSelected..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_DeleteSelected..Caption
-#: NempMainUnit.dfm:3174 NempMainUnit.dfm:3387 NempMainUnit.dfm:6165
+#: NempMainUnit.dfm:3174 NempMainUnit.dfm:3387 NempMainUnit.dfm:6169
 msgid "Remove selected files"
 msgstr "Entferne markierte Dateien"
 
@@ -2472,8 +2491,8 @@ msgstr "Entferne markierte Dateien"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..Caption
-#: NempMainUnit.dfm:3178 NempMainUnit.dfm:3395 NempMainUnit.dfm:6173
-#: NempMainUnit.dfm:6475
+#: NempMainUnit.dfm:3178 NempMainUnit.dfm:3395 NempMainUnit.dfm:6177
+#: NempMainUnit.dfm:6479
 msgid "Set rating of selected files to"
 msgstr "Bewertung der markierten Dateien setzen"
 
@@ -2481,8 +2500,8 @@ msgstr "Bewertung der markierten Dateien setzen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles1..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles1..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles1..Caption
-#: NempMainUnit.dfm:3182 NempMainUnit.dfm:3398 NempMainUnit.dfm:6177
-#: NempMainUnit.dfm:6478
+#: NempMainUnit.dfm:3182 NempMainUnit.dfm:3398 NempMainUnit.dfm:6181
+#: NempMainUnit.dfm:6482
 msgid "0.5 stars"
 msgstr "0.5 Sternchen"
 
@@ -2490,8 +2509,8 @@ msgstr "0.5 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles2..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles2..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles2..Caption
-#: NempMainUnit.dfm:3188 NempMainUnit.dfm:3404 NempMainUnit.dfm:6183
-#: NempMainUnit.dfm:6484
+#: NempMainUnit.dfm:3188 NempMainUnit.dfm:3404 NempMainUnit.dfm:6187
+#: NempMainUnit.dfm:6488
 msgid "1 star"
 msgstr "1 Sternchen"
 
@@ -2499,8 +2518,8 @@ msgstr "1 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles3..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles3..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles3..Caption
-#: NempMainUnit.dfm:3193 NempMainUnit.dfm:3409 NempMainUnit.dfm:6189
-#: NempMainUnit.dfm:6490
+#: NempMainUnit.dfm:3193 NempMainUnit.dfm:3409 NempMainUnit.dfm:6193
+#: NempMainUnit.dfm:6494
 msgid "1.5 stars"
 msgstr "1.5 Sternchen"
 
@@ -2508,8 +2527,8 @@ msgstr "1.5 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles4..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles4..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles4..Caption
-#: NempMainUnit.dfm:3198 NempMainUnit.dfm:3414 NempMainUnit.dfm:6194
-#: NempMainUnit.dfm:6495
+#: NempMainUnit.dfm:3198 NempMainUnit.dfm:3414 NempMainUnit.dfm:6198
+#: NempMainUnit.dfm:6499
 msgid "2 stars"
 msgstr "2 Sternchen"
 
@@ -2517,8 +2536,8 @@ msgstr "2 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles5..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles5..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles5..Caption
-#: NempMainUnit.dfm:3203 NempMainUnit.dfm:3419 NempMainUnit.dfm:6200
-#: NempMainUnit.dfm:6501
+#: NempMainUnit.dfm:3203 NempMainUnit.dfm:3419 NempMainUnit.dfm:6204
+#: NempMainUnit.dfm:6505
 msgid "2.5 stars"
 msgstr "2.5 Sternchen"
 
@@ -2526,8 +2545,8 @@ msgstr "2.5 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles6..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles6..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles6..Caption
-#: NempMainUnit.dfm:3209 NempMainUnit.dfm:3425 NempMainUnit.dfm:6206
-#: NempMainUnit.dfm:6507
+#: NempMainUnit.dfm:3209 NempMainUnit.dfm:3425 NempMainUnit.dfm:6210
+#: NempMainUnit.dfm:6511
 msgid "3 stars"
 msgstr "3 Sternchen"
 
@@ -2535,8 +2554,8 @@ msgstr "3 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles7..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles7..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles7..Caption
-#: NempMainUnit.dfm:3214 NempMainUnit.dfm:3430 NempMainUnit.dfm:6212
-#: NempMainUnit.dfm:6513
+#: NempMainUnit.dfm:3214 NempMainUnit.dfm:3430 NempMainUnit.dfm:6216
+#: NempMainUnit.dfm:6517
 msgid "3.5 stars"
 msgstr "3.5 Sternchen"
 
@@ -2544,8 +2563,8 @@ msgstr "3.5 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles8..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles8..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles8..Caption
-#: NempMainUnit.dfm:3219 NempMainUnit.dfm:3435 NempMainUnit.dfm:6217
-#: NempMainUnit.dfm:6518
+#: NempMainUnit.dfm:3219 NempMainUnit.dfm:3435 NempMainUnit.dfm:6221
+#: NempMainUnit.dfm:6522
 msgid "4 stars"
 msgstr "4 Sternchen"
 
@@ -2553,8 +2572,8 @@ msgstr "4 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles9..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles9..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles9..Caption
-#: NempMainUnit.dfm:3224 NempMainUnit.dfm:3440 NempMainUnit.dfm:6223
-#: NempMainUnit.dfm:6524
+#: NempMainUnit.dfm:3224 NempMainUnit.dfm:3440 NempMainUnit.dfm:6227
+#: NempMainUnit.dfm:6528
 msgid "4.5 stars"
 msgstr "4.5 Sternchen"
 
@@ -2562,15 +2581,15 @@ msgstr "4.5 Sternchen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_SetRatingofSelectedFilesTo..MM_PL_SetRatingsOfSelectedFiles10..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_SetRatingsOfSelectedFiles10..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_SetRatingsOfSelectedFiles10..Caption
-#: NempMainUnit.dfm:3229 NempMainUnit.dfm:3445 NempMainUnit.dfm:6228
-#: NempMainUnit.dfm:6529
+#: NempMainUnit.dfm:3229 NempMainUnit.dfm:3445 NempMainUnit.dfm:6232
+#: NempMainUnit.dfm:6533
 msgid "5 stars"
 msgstr "5 Sternchen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_SetRatingSelected..MM_ML_SetRatingsOfSelectedFilesReset..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SetRatingsOfSelectedFiles..PM_ML_ResetRating..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SetRatingofSelectedFilesTo..PM_PL_ResetRating..Caption
-#: NempMainUnit.dfm:3238 NempMainUnit.dfm:6238 NempMainUnit.dfm:6539
+#: NempMainUnit.dfm:3238 NempMainUnit.dfm:6242 NempMainUnit.dfm:6543
 msgid "Reset rating/playcounter"
 msgstr "Bewertung/Abspielzähler zurücksetzen"
 
@@ -2578,8 +2597,8 @@ msgstr "Bewertung/Abspielzähler zurücksetzen"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_MarkFiles..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MarkFile..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..Caption
-#: NempMainUnit.dfm:3244 NempMainUnit.dfm:3461 NempMainUnit.dfm:6246
-#: NempMainUnit.dfm:6547
+#: NempMainUnit.dfm:3244 NempMainUnit.dfm:3461 NempMainUnit.dfm:6250
+#: NempMainUnit.dfm:6551
 msgid "Flag selected files with"
 msgstr "Dateien markieren mit"
 
@@ -2587,8 +2606,8 @@ msgstr "Dateien markieren mit"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_MarkFiles..MM_PL_Mark1..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MarkFile..PM_ML_Mark1..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark1..Caption
-#: NempMainUnit.dfm:3248 NempMainUnit.dfm:3465 NempMainUnit.dfm:6250
-#: NempMainUnit.dfm:6551
+#: NempMainUnit.dfm:3248 NempMainUnit.dfm:3465 NempMainUnit.dfm:6254
+#: NempMainUnit.dfm:6555
 msgid "Mark 1"
 msgstr "Markierung 1"
 
@@ -2596,8 +2615,8 @@ msgstr "Markierung 1"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_MarkFiles..MM_PL_Mark2..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MarkFile..PM_ML_Mark2..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark2..Caption
-#: NempMainUnit.dfm:3255 NempMainUnit.dfm:3471 NempMainUnit.dfm:6257
-#: NempMainUnit.dfm:6557
+#: NempMainUnit.dfm:3255 NempMainUnit.dfm:3471 NempMainUnit.dfm:6261
+#: NempMainUnit.dfm:6561
 msgid "Mark 2"
 msgstr "Markierung 2"
 
@@ -2605,8 +2624,8 @@ msgstr "Markierung 2"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_MarkFiles..MM_PL_Mark3..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MarkFile..PM_ML_Mark3..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark3..Caption
-#: NempMainUnit.dfm:3262 NempMainUnit.dfm:3477 NempMainUnit.dfm:6264
-#: NempMainUnit.dfm:6563
+#: NempMainUnit.dfm:3262 NempMainUnit.dfm:3477 NempMainUnit.dfm:6268
+#: NempMainUnit.dfm:6567
 msgid "Mark 3"
 msgstr "Markierung 3"
 
@@ -2614,26 +2633,26 @@ msgstr "Markierung 3"
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_MarkFiles..MM_PL_Mark0..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MarkFile..PM_ML_Mark0..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MarkFiles..PM_PL_Mark0..Caption
-#: NempMainUnit.dfm:3272 NempMainUnit.dfm:3485 NempMainUnit.dfm:6274
-#: NempMainUnit.dfm:6571
+#: NempMainUnit.dfm:3272 NempMainUnit.dfm:3485 NempMainUnit.dfm:6278
+#: NempMainUnit.dfm:6575
 msgid "Unmarked"
 msgstr "Nicht markiert"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_GetLyrics..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_GetLyrics..Caption
-#: NempMainUnit.dfm:3279 NempMainUnit.dfm:6281
+#: NempMainUnit.dfm:3279 NempMainUnit.dfm:6285
 msgid "Get lyrics for selected files"
 msgstr "Hole Lyrics für markierte Dateien"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_ML_GetAdditionalTags..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_GetTags..Caption
-#: NempMainUnit.dfm:3284 NempMainUnit.dfm:6287
+#: NempMainUnit.dfm:3284 NempMainUnit.dfm:6291
 msgid "Get additional tags for selected files"
 msgstr "Hole weitere Tags für markierte Dateien"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Medialibrary..MM_T_CloudEditor..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_CloudEditor..Caption
-#: NempMainUnit.dfm:3289 NempMainUnit.dfm:6293
+#: NempMainUnit.dfm:3289 NempMainUnit.dfm:6297
 msgid "Tag cloud editor"
 msgstr "Tagwolken-Editor"
 
@@ -2714,14 +2733,14 @@ msgstr "&Speichern"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ClearPlaylist..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ClearPlaylist..Caption
-#: NempMainUnit.dfm:3383 NempMainUnit.dfm:6461
+#: NempMainUnit.dfm:3383 NempMainUnit.dfm:6465
 msgid "Clear"
 msgstr "Löschen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_DeleteMissingFiles..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryDeleteNotExisting..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_DeleteMissingFiles..Caption
-#: NempMainUnit.dfm:3391 NempMainUnit.dfm:6120 NempMainUnit.dfm:6471
+#: NempMainUnit.dfm:3391 NempMainUnit.dfm:6124 NempMainUnit.dfm:6475
 msgid "Cleanup (remove missing files)"
 msgstr "Aufräumen (fehlende Dateien entfernen)"
 
@@ -2732,7 +2751,7 @@ msgstr "Bewertungen zurücksetzen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ExtendedAddToMedialibrary..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedAddToMedialibrary..Caption
-#: NempMainUnit.dfm:3494 NempMainUnit.dfm:6589
+#: NempMainUnit.dfm:3494 NempMainUnit.dfm:6593
 msgid "Add all files to the media library"
 msgstr "Füge Dateien zur Medienbibliothek hinzu"
 
@@ -2740,21 +2759,21 @@ msgstr "Füge Dateien zur Medienbibliothek hinzu"
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_CopyPlaylistToUSB..Caption
 #. PlaylistCopyForm..BtnCopyFiles..Caption
 #. Programmer's name for it: CopyToUSB_Copy
-#: NempMainUnit.dfm:3498 NempMainUnit.dfm:6607 PlaylistToUSB.dfm:28
-#: Nemp_RessourceStrings.pas:855
+#: NempMainUnit.dfm:3498 NempMainUnit.dfm:6611 PlaylistToUSB.dfm:28
+#: Nemp_RessourceStrings.pas:862
 msgid "Copy files"
 msgstr "Playlist kopieren"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ExtendedScanFiles..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedScanFiles..Caption
-#: NempMainUnit.dfm:3505 NempMainUnit.dfm:6614
+#: NempMainUnit.dfm:3505 NempMainUnit.dfm:6618
 msgid "Refresh files"
 msgstr "Dateien aktualisieren"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Playlist..MM_PL_ShowInExplorer..Caption
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_ShowInExplorer..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ShowInExplorer..Caption
-#: NempMainUnit.dfm:3509 NempMainUnit.dfm:6360 NempMainUnit.dfm:6619
+#: NempMainUnit.dfm:3509 NempMainUnit.dfm:6364 NempMainUnit.dfm:6623
 msgid "Show in Windows Explorer"
 msgstr "Im Windows Explorer zeigen"
 
@@ -2770,7 +2789,7 @@ msgstr "&Optionen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Wizard..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Wizard..Caption
-#: NempMainUnit.dfm:3526 NempMainUnit.dfm:6712
+#: NempMainUnit.dfm:3526 NempMainUnit.dfm:6716
 msgid "Wizard"
 msgstr "Wizard"
 
@@ -2781,7 +2800,7 @@ msgstr "&Ansicht"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_ViewCompact..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewCompact..Caption
-#: NempMainUnit.dfm:3533 NempMainUnit.dfm:6719
+#: NempMainUnit.dfm:3533 NempMainUnit.dfm:6723
 msgid "[--- Compact view ---]"
 msgstr "[--- kompakte Ansicht ---]"
 
@@ -2792,7 +2811,7 @@ msgstr "&Komplett"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_ViewSeparateWindows..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows..Caption
-#: NempMainUnit.dfm:3546 NempMainUnit.dfm:6732
+#: NempMainUnit.dfm:3546 NempMainUnit.dfm:6736
 msgid "[--- Seperate windows ---]"
 msgstr "[--- Einzelfenster---]"
 
@@ -2823,7 +2842,7 @@ msgstr "Im &Vordergrund halten"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_View..MM_O_PartyMode..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_PartyMode..Caption
-#: NempMainUnit.dfm:3581 NempMainUnit.dfm:6767
+#: NempMainUnit.dfm:3581 NempMainUnit.dfm:6771
 msgid "Party mode"
 msgstr "Party-Modus"
 
@@ -2839,19 +2858,19 @@ msgstr "Windows-Standard"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Skins..MM_O_Skin_UseAdvanced..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skin_UseAdvancedSkin..Caption
-#: NempMainUnit.dfm:3594 NempMainUnit.dfm:6780
+#: NempMainUnit.dfm:3594 NempMainUnit.dfm:6784
 msgid "Use advanced skinning"
 msgstr "Aktiviere erweitertes Skinsystem"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Languages..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..Caption
-#: NempMainUnit.dfm:3604 NempMainUnit.dfm:6789
+#: NempMainUnit.dfm:3604 NempMainUnit.dfm:6793
 msgid "Languages"
 msgstr "Sprachen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Options..MM_O_Languages..MM_O_Defaultlanguage..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Languages..PM_P_Defaultlanguage..Caption
-#: NempMainUnit.dfm:3607 NempMainUnit.dfm:6792
+#: NempMainUnit.dfm:3607 NempMainUnit.dfm:6796
 msgid "English"
 msgstr "English"
 
@@ -2891,10 +2910,10 @@ msgstr "Nemp anhalten"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_5Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_5Minutes4..Caption
 #: NempMainUnit.dfm:3631 NempMainUnit.dfm:3678 NempMainUnit.dfm:3731
-#: NempMainUnit.dfm:3784 NempMainUnit.dfm:3837 NempMainUnit.dfm:6815
-#: NempMainUnit.dfm:6862 NempMainUnit.dfm:6915 NempMainUnit.dfm:6968
-#: NempMainUnit.dfm:7021 NempMainUnit.dfm:7190 NempMainUnit.dfm:7237
-#: NempMainUnit.dfm:7290 NempMainUnit.dfm:7343 NempMainUnit.dfm:7396
+#: NempMainUnit.dfm:3784 NempMainUnit.dfm:3837 NempMainUnit.dfm:6819
+#: NempMainUnit.dfm:6866 NempMainUnit.dfm:6919 NempMainUnit.dfm:6972
+#: NempMainUnit.dfm:7025 NempMainUnit.dfm:7198 NempMainUnit.dfm:7245
+#: NempMainUnit.dfm:7298 NempMainUnit.dfm:7351 NempMainUnit.dfm:7404
 msgid "5 minutes"
 msgstr "5 Minuten"
 
@@ -2914,10 +2933,10 @@ msgstr "5 Minuten"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_15Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_15Minutes4..Caption
 #: NempMainUnit.dfm:3636 NempMainUnit.dfm:3683 NempMainUnit.dfm:3736
-#: NempMainUnit.dfm:3789 NempMainUnit.dfm:3842 NempMainUnit.dfm:6820
-#: NempMainUnit.dfm:6867 NempMainUnit.dfm:6920 NempMainUnit.dfm:6973
-#: NempMainUnit.dfm:7026 NempMainUnit.dfm:7195 NempMainUnit.dfm:7242
-#: NempMainUnit.dfm:7295 NempMainUnit.dfm:7348 NempMainUnit.dfm:7401
+#: NempMainUnit.dfm:3789 NempMainUnit.dfm:3842 NempMainUnit.dfm:6824
+#: NempMainUnit.dfm:6871 NempMainUnit.dfm:6924 NempMainUnit.dfm:6977
+#: NempMainUnit.dfm:7030 NempMainUnit.dfm:7203 NempMainUnit.dfm:7250
+#: NempMainUnit.dfm:7303 NempMainUnit.dfm:7356 NempMainUnit.dfm:7409
 msgid "15 minutes"
 msgstr "15 Minuten"
 
@@ -2937,10 +2956,10 @@ msgstr "15 Minuten"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_30Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_30Minutes4..Caption
 #: NempMainUnit.dfm:3641 NempMainUnit.dfm:3688 NempMainUnit.dfm:3741
-#: NempMainUnit.dfm:3794 NempMainUnit.dfm:3847 NempMainUnit.dfm:6825
-#: NempMainUnit.dfm:6872 NempMainUnit.dfm:6925 NempMainUnit.dfm:6978
-#: NempMainUnit.dfm:7031 NempMainUnit.dfm:7200 NempMainUnit.dfm:7247
-#: NempMainUnit.dfm:7300 NempMainUnit.dfm:7353 NempMainUnit.dfm:7406
+#: NempMainUnit.dfm:3794 NempMainUnit.dfm:3847 NempMainUnit.dfm:6829
+#: NempMainUnit.dfm:6876 NempMainUnit.dfm:6929 NempMainUnit.dfm:6982
+#: NempMainUnit.dfm:7035 NempMainUnit.dfm:7208 NempMainUnit.dfm:7255
+#: NempMainUnit.dfm:7308 NempMainUnit.dfm:7361 NempMainUnit.dfm:7414
 msgid "30 minutes"
 msgstr "30 Minuten"
 
@@ -2960,10 +2979,10 @@ msgstr "30 Minuten"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_45Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_45Minutes4..Caption
 #: NempMainUnit.dfm:3646 NempMainUnit.dfm:3693 NempMainUnit.dfm:3746
-#: NempMainUnit.dfm:3799 NempMainUnit.dfm:3852 NempMainUnit.dfm:6830
-#: NempMainUnit.dfm:6877 NempMainUnit.dfm:6930 NempMainUnit.dfm:6983
-#: NempMainUnit.dfm:7036 NempMainUnit.dfm:7205 NempMainUnit.dfm:7252
-#: NempMainUnit.dfm:7305 NempMainUnit.dfm:7358 NempMainUnit.dfm:7411
+#: NempMainUnit.dfm:3799 NempMainUnit.dfm:3852 NempMainUnit.dfm:6834
+#: NempMainUnit.dfm:6881 NempMainUnit.dfm:6934 NempMainUnit.dfm:6987
+#: NempMainUnit.dfm:7040 NempMainUnit.dfm:7213 NempMainUnit.dfm:7260
+#: NempMainUnit.dfm:7313 NempMainUnit.dfm:7366 NempMainUnit.dfm:7419
 msgid "45 minutes"
 msgstr "45 Minuten"
 
@@ -2983,10 +3002,10 @@ msgstr "45 Minuten"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_60Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_60Minutes4..Caption
 #: NempMainUnit.dfm:3651 NempMainUnit.dfm:3698 NempMainUnit.dfm:3751
-#: NempMainUnit.dfm:3804 NempMainUnit.dfm:3857 NempMainUnit.dfm:6835
-#: NempMainUnit.dfm:6882 NempMainUnit.dfm:6935 NempMainUnit.dfm:6988
-#: NempMainUnit.dfm:7041 NempMainUnit.dfm:7210 NempMainUnit.dfm:7257
-#: NempMainUnit.dfm:7310 NempMainUnit.dfm:7363 NempMainUnit.dfm:7416
+#: NempMainUnit.dfm:3804 NempMainUnit.dfm:3857 NempMainUnit.dfm:6839
+#: NempMainUnit.dfm:6886 NempMainUnit.dfm:6939 NempMainUnit.dfm:6992
+#: NempMainUnit.dfm:7045 NempMainUnit.dfm:7218 NempMainUnit.dfm:7265
+#: NempMainUnit.dfm:7318 NempMainUnit.dfm:7371 NempMainUnit.dfm:7424
 msgid "1 hour"
 msgstr "1 Stunde"
 
@@ -3006,10 +3025,10 @@ msgstr "1 Stunde"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_90Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_90Minutes4..Caption
 #: NempMainUnit.dfm:3656 NempMainUnit.dfm:3703 NempMainUnit.dfm:3756
-#: NempMainUnit.dfm:3809 NempMainUnit.dfm:3862 NempMainUnit.dfm:6840
-#: NempMainUnit.dfm:6887 NempMainUnit.dfm:6940 NempMainUnit.dfm:6993
-#: NempMainUnit.dfm:7046 NempMainUnit.dfm:7215 NempMainUnit.dfm:7262
-#: NempMainUnit.dfm:7315 NempMainUnit.dfm:7368 NempMainUnit.dfm:7421
+#: NempMainUnit.dfm:3809 NempMainUnit.dfm:3862 NempMainUnit.dfm:6844
+#: NempMainUnit.dfm:6891 NempMainUnit.dfm:6944 NempMainUnit.dfm:6997
+#: NempMainUnit.dfm:7050 NempMainUnit.dfm:7223 NempMainUnit.dfm:7270
+#: NempMainUnit.dfm:7323 NempMainUnit.dfm:7376 NempMainUnit.dfm:7429
 msgid "1.5 hours"
 msgstr "1.5 Stunden"
 
@@ -3029,10 +3048,10 @@ msgstr "1.5 Stunden"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_120Minutes3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_120Minutes4..Caption
 #: NempMainUnit.dfm:3661 NempMainUnit.dfm:3708 NempMainUnit.dfm:3761
-#: NempMainUnit.dfm:3814 NempMainUnit.dfm:3867 NempMainUnit.dfm:6845
-#: NempMainUnit.dfm:6892 NempMainUnit.dfm:6945 NempMainUnit.dfm:6998
-#: NempMainUnit.dfm:7051 NempMainUnit.dfm:7220 NempMainUnit.dfm:7267
-#: NempMainUnit.dfm:7320 NempMainUnit.dfm:7373 NempMainUnit.dfm:7426
+#: NempMainUnit.dfm:3814 NempMainUnit.dfm:3867 NempMainUnit.dfm:6849
+#: NempMainUnit.dfm:6896 NempMainUnit.dfm:6949 NempMainUnit.dfm:7002
+#: NempMainUnit.dfm:7055 NempMainUnit.dfm:7228 NempMainUnit.dfm:7275
+#: NempMainUnit.dfm:7328 NempMainUnit.dfm:7381 NempMainUnit.dfm:7434
 msgid "2 hours"
 msgstr "2 Stunden"
 
@@ -3054,10 +3073,10 @@ msgstr "2 Stunden"
 #. FormStreamVerwaltung..PC_Streams..Tab_Favourites..cbSortMode....Items.Strings
 #. Programmer's name for it: MainForm_BtnEqualizerPresetsCustom
 #: NempMainUnit.dfm:3669 NempMainUnit.dfm:3716 NempMainUnit.dfm:3769
-#: NempMainUnit.dfm:3822 NempMainUnit.dfm:3875 NempMainUnit.dfm:6853
-#: NempMainUnit.dfm:6900 NempMainUnit.dfm:6953 NempMainUnit.dfm:7006
-#: NempMainUnit.dfm:7059 NempMainUnit.dfm:7228 NempMainUnit.dfm:7275
-#: NempMainUnit.dfm:7328 NempMainUnit.dfm:7381 NempMainUnit.dfm:7434
+#: NempMainUnit.dfm:3822 NempMainUnit.dfm:3875 NempMainUnit.dfm:6857
+#: NempMainUnit.dfm:6904 NempMainUnit.dfm:6957 NempMainUnit.dfm:7010
+#: NempMainUnit.dfm:7063 NempMainUnit.dfm:7236 NempMainUnit.dfm:7283
+#: NempMainUnit.dfm:7336 NempMainUnit.dfm:7389 NempMainUnit.dfm:7442
 #: StreamVerwaltung.dfm:180 Nemp_RessourceStrings.pas:535
 msgid "Custom"
 msgstr "Benutzerdefiniert"
@@ -3080,9 +3099,9 @@ msgstr "&Nemp beenden"
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..PM_S_ShutDown_EndofPlaylist3..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..PM_S_ShutDown_EndofPlaylist4..Caption
 #: NempMainUnit.dfm:3721 NempMainUnit.dfm:3774 NempMainUnit.dfm:3827
-#: NempMainUnit.dfm:3880 NempMainUnit.dfm:6905 NempMainUnit.dfm:6958
-#: NempMainUnit.dfm:7011 NempMainUnit.dfm:7064 NempMainUnit.dfm:7280
-#: NempMainUnit.dfm:7333 NempMainUnit.dfm:7386 NempMainUnit.dfm:7439
+#: NempMainUnit.dfm:3880 NempMainUnit.dfm:6909 NempMainUnit.dfm:6962
+#: NempMainUnit.dfm:7015 NempMainUnit.dfm:7068 NempMainUnit.dfm:7288
+#: NempMainUnit.dfm:7341 NempMainUnit.dfm:7394 NempMainUnit.dfm:7447
 msgid "After the last file"
 msgstr "Nach dem letzten Lied"
 
@@ -3117,9 +3136,9 @@ msgstr "&Geburtstags-Modus"
 #. Nemp_MainForm..WebServerPopup..PM_W_WebServerActivate..Caption
 #. Programmer's name for it: MenuItem_Activate
 #: NempMainUnit.dfm:3889 NempMainUnit.dfm:3904 NempMainUnit.dfm:3923
-#: NempMainUnit.dfm:7073 NempMainUnit.dfm:7088 NempMainUnit.dfm:7107
-#: NempMainUnit.dfm:7452 NempMainUnit.dfm:7557 NempMainUnit.dfm:7576
-#: Nemp_RessourceStrings.pas:840
+#: NempMainUnit.dfm:7077 NempMainUnit.dfm:7092 NempMainUnit.dfm:7111
+#: NempMainUnit.dfm:7460 NempMainUnit.dfm:7565 NempMainUnit.dfm:7584
+#: Nemp_RessourceStrings.pas:847
 msgid "Activate"
 msgstr "Aktivieren"
 
@@ -3132,25 +3151,26 @@ msgstr "Aktivieren"
 #. Nemp_MainForm..BirthdayPopup..PM_B_BirthdayOptions..Caption
 #. Nemp_MainForm..ScrobblerPopup..PM_S_ScrobblerOptions..Caption
 #. Nemp_MainForm..WebServerPopup..PM_W_WebServerOptions..Caption
+#. PlayerLogForm..BtnSettings..Caption
 #. PlaylistCopyForm..GrpboxSettings..Caption
 #. MainForm..GrpBoxSettings..Caption
 #: NempMainUnit.dfm:3896 NempMainUnit.dfm:3911 NempMainUnit.dfm:3930
-#: NempMainUnit.dfm:7080 NempMainUnit.dfm:7095 NempMainUnit.dfm:7114
-#: NempMainUnit.dfm:7459 NempMainUnit.dfm:7564 NempMainUnit.dfm:7583
-#: PlaylistToUSB.dfm:50 G15App/MainUnit.dfm:47
+#: NempMainUnit.dfm:7084 NempMainUnit.dfm:7099 NempMainUnit.dfm:7118
+#: NempMainUnit.dfm:7467 NempMainUnit.dfm:7572 NempMainUnit.dfm:7591
+#: PlayerLog.dfm:41 PlaylistToUSB.dfm:50 G15App/MainUnit.dfm:47
 msgid "Settings"
 msgstr "Einstellungen"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..Caption
-#: NempMainUnit.dfm:3901 NempMainUnit.dfm:7085
+#: NempMainUnit.dfm:3901 NempMainUnit.dfm:7089
 msgid "Nemp &Webserver"
 msgstr "Nemp &Webserver"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_RemoteNemp..MM_T_WebServerShowLog..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_RemoteNemp..PM_P_WebServerShowLog..Caption
 #. Nemp_MainForm..WebServerPopup..PM_W_WebServerShowLog..Caption
-#: NempMainUnit.dfm:3915 NempMainUnit.dfm:7099 NempMainUnit.dfm:7587
+#: NempMainUnit.dfm:3915 NempMainUnit.dfm:7103 NempMainUnit.dfm:7595
 msgid "Show log"
 msgstr "Zeige Log"
 
@@ -3161,7 +3181,7 @@ msgstr "Scro&bbler"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_KeyboardDisplay..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_KeyboardDisplay..Caption
-#: NempMainUnit.dfm:3935 NempMainUnit.dfm:7119
+#: NempMainUnit.dfm:3935 NempMainUnit.dfm:7123
 msgid "Keyboard display"
 msgstr "Tastatur-Display"
 
@@ -3180,43 +3200,49 @@ msgstr "&Aufnahmen (Webradio)"
 msgid "&Data (cover, preferences, ...)"
 msgstr "D&aten (Cover, Einstellungen, ...)"
 
+#. Nemp_MainForm..Nemp_MainMenu..MM_Tools..MM_T_PlaylistLog..Caption
+#. Nemp_MainForm..Player_PopupMenu..PM_P_PlaylistLog..Caption
+#: NempMainUnit.dfm:3951 NempMainUnit.dfm:7139
+msgid "Playlist log"
+msgstr "Playlist Log"
+
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..Caption
 #. Programmer's name for it: XcmbHelp
 #. Programmer's name for it: XcmbHelp
-#: NempMainUnit.dfm:3952 Nemp_RessourceStrings.pas:45
+#: NempMainUnit.dfm:3956 Nemp_RessourceStrings.pas:45
 #: 3rd_Party_Units/MyDialogs.pas:61
 msgid "&Help"
 msgstr "&Hilfe"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_About..Caption
-#: NempMainUnit.dfm:3954
+#: NempMainUnit.dfm:3958
 msgid "&About Nemp"
 msgstr "&Über Nemp"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_ShowReadme..Caption
-#: NempMainUnit.dfm:3959
+#: NempMainUnit.dfm:3963
 msgid "&Show readme"
 msgstr "Zeige &Readme"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Help..MM_H_Help..Caption
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Help..Caption
-#: NempMainUnit.dfm:3966 NempMainUnit.dfm:7147
+#: NempMainUnit.dfm:3970 NempMainUnit.dfm:7155
 msgid "Documentation and user guide"
 msgstr "Dokumentation und Bedienungsanleitung"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_H_ErrorLog..Caption
 #. Programmer's name for it: MainForm_MainMenu_NoMessages
-#: NempMainUnit.dfm:3977 Nemp_RessourceStrings.pas:623
+#: NempMainUnit.dfm:3981 Nemp_RessourceStrings.pas:623
 msgid "Messages"
 msgstr "Nachrichten"
 
 #. Nemp_MainForm..Nemp_MainMenu..MM_Warning_ID3Tags..Caption
-#: NempMainUnit.dfm:3982
+#: NempMainUnit.dfm:3986
 msgid "Warning"
 msgstr "Warnung"
 
 #. Nemp_MainForm..PlayListOpenDialog....Filter
-#: NempMainUnit.dfm:5891
+#: NempMainUnit.dfm:5895
 msgid ""
 "All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lists|*.m3u|"
 "m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nemp playlists|*.npl|"
@@ -3228,23 +3254,23 @@ msgstr ""
 
 #. Nemp_MainForm..OpenDialog1..DefaultExt
 #. Nemp_MainForm..SaveDialog1..DefaultExt
-#: NempMainUnit.dfm:5901 NempMainUnit.dfm:5919
+#: NempMainUnit.dfm:5905 NempMainUnit.dfm:5923
 msgid "gmp"
 msgstr "gmp"
 
 #. Nemp_MainForm..OpenDialog1..Filter
 #. Nemp_MainForm..SaveDialog1..Filter
-#: NempMainUnit.dfm:5902 NempMainUnit.dfm:5920
+#: NempMainUnit.dfm:5906 NempMainUnit.dfm:5924
 msgid "Nemp medialibrary (*.gmp)|*.gmp"
 msgstr "Nemp Medienbibliothek (*.gmp)|*.gmp"
 
 #. Nemp_MainForm..PlayListSaveDialog..DefaultExt
-#: NempMainUnit.dfm:5908
+#: NempMainUnit.dfm:5912
 msgid "m3u8"
 msgstr "m3u8"
 
 #. Nemp_MainForm..PlayListSaveDialog....Filter
-#: NempMainUnit.dfm:5911
+#: NempMainUnit.dfm:5915
 msgid ""
 "m3u-list|*.m3u|m3u8-list (unicode-capable)|*.m3u8|pls-list|*.pls|Nemp "
 "playlists|*.npl"
@@ -3256,7 +3282,7 @@ msgstr ""
 #. RandomPlaylistForm..CBInsertMode....Items.Strings
 #. Programmer's name for it: MainForm_MenuCaptionsEnqueue
 #. Programmer's name for it: MainForm_MenuCaptionsEnqueueAll
-#: NempMainUnit.dfm:5931 RandomPlaylist.dfm:281 Nemp_RessourceStrings.pas:575
+#: NempMainUnit.dfm:5935 RandomPlaylist.dfm:281 Nemp_RessourceStrings.pas:575
 #: Nemp_RessourceStrings.pas:606
 msgid "Enqueue (at the end of the playlist)"
 msgstr "Einfügen (ans Ende der Playlist)"
@@ -3268,7 +3294,7 @@ msgstr "Einfügen (ans Ende der Playlist)"
 #. RandomPlaylistForm..CBInsertMode....Items.Strings
 #. Programmer's name for it: MainForm_MenuCaptionsPlay
 #. Programmer's name for it: MainForm_MenuCaptionsPlayAll
-#: NempMainUnit.dfm:5935 OptionsComplete.dfm:3863 OptionsComplete.dfm:3879
+#: NempMainUnit.dfm:5939 OptionsComplete.dfm:3876 OptionsComplete.dfm:3892
 #: RandomPlaylist.dfm:279 RandomPlaylist.dfm:282 Nemp_RessourceStrings.pas:574
 #: Nemp_RessourceStrings.pas:605
 msgid "Play (and clear current playlist)"
@@ -3278,92 +3304,92 @@ msgstr "Abspielen (und alte Playlist löschen)"
 #. 'Enqueue (at the end of the prebook-list)';
 #. Programmer's name for it: MainForm_MenuCaptionsPlayNext
 #. Programmer's name for it: MainForm_MenuCaptionsPlayNextAll
-#: NempMainUnit.dfm:5939 Nemp_RessourceStrings.pas:576
+#: NempMainUnit.dfm:5943 Nemp_RessourceStrings.pas:576
 #: Nemp_RessourceStrings.pas:607
 msgid "Enqueue (after the current title)"
 msgstr "Hinter den aktuellen Titel einfügen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_PlayNow..Caption
-#: NempMainUnit.dfm:5943
+#: NempMainUnit.dfm:5947
 msgid "Just play focussed file (don't change the playlist)"
 msgstr "Datei einfach abspielen (ohne die Playlist zu verändern)"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_PlayHeadset..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_PlayInHeadset..Caption
-#: NempMainUnit.dfm:5950 NempMainUnit.dfm:6580
+#: NempMainUnit.dfm:5954 NempMainUnit.dfm:6584
 msgid "Play in headset"
 msgstr "Im Kopfhörer abspielen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..Caption
-#: NempMainUnit.dfm:5959 NempMainUnit.dfm:6393
+#: NempMainUnit.dfm:5963 NempMainUnit.dfm:6397
 msgid "Sort by"
 msgstr "Sortieren nach"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByArtistTitel..Caption
-#: NempMainUnit.dfm:5962
+#: NempMainUnit.dfm:5966
 msgid "Artist, Title"
 msgstr "Interpret, Titel"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByArtistAlbumTitle..Caption
-#: NempMainUnit.dfm:5967
+#: NempMainUnit.dfm:5971
 msgid "Artist, Album, Title"
 msgstr "Interpret, Album, Titel"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByTitleArtist..Caption
-#: NempMainUnit.dfm:5972
+#: NempMainUnit.dfm:5976
 msgid "Title, Artist"
 msgstr "Titel, Interpret"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByAlbumArtistTitle..Caption
-#: NempMainUnit.dfm:5977
+#: NempMainUnit.dfm:5981
 msgid "Album, Artist, Title"
 msgstr "Album, Interpret, Titel"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByAlbumTitleArtist..Caption
-#: NempMainUnit.dfm:5982
+#: NempMainUnit.dfm:5986
 msgid "Album, Title, Artist"
 msgstr "Album, Titel, Interpret"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByAlbumTrack..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByAlbumTrack..Caption
-#: NempMainUnit.dfm:5987 NempMainUnit.dfm:6412
+#: NempMainUnit.dfm:5991 NempMainUnit.dfm:6416
 msgid "Album, Tracknr."
 msgstr "Album, Tracknr."
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByPath..Caption
-#: NempMainUnit.dfm:6003
+#: NempMainUnit.dfm:6007
 msgid "Path && Filename"
 msgstr "Pfad && Dateiname"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortByLyrics..Caption
-#: NempMainUnit.dfm:6009
+#: NempMainUnit.dfm:6013
 msgid "Lyrics exists"
 msgstr "Lyrics vorhanden"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortDescending..Caption
-#: NempMainUnit.dfm:6040
+#: NempMainUnit.dfm:6044
 msgid "Descending"
 msgstr "Absteigend"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SortBy..PM_ML_SortAscending..Caption
-#: NempMainUnit.dfm:6046
+#: NempMainUnit.dfm:6050
 msgid "Ascending"
 msgstr "Aufsteigend"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_BrowseBy..Caption
-#: NempMainUnit.dfm:6054
+#: NempMainUnit.dfm:6058
 msgid "Browse by"
 msgstr "Browsen nach"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Medialibrary..Caption
 #. Programmer's name for it: OptionsTree_PlayerMedialibrary
-#: NempMainUnit.dfm:6118 Nemp_RessourceStrings.pas:230
+#: NempMainUnit.dfm:6122 Nemp_RessourceStrings.pas:230
 msgid "Media library"
 msgstr "Medienbibliothek"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryRefresh..Caption
-#: NempMainUnit.dfm:6124
+#: NempMainUnit.dfm:6128
 msgid "Refresh (rescan all files)"
 msgstr "Erneuern (alle Dateien neu einlesen)"
 
@@ -3371,174 +3397,174 @@ msgstr "Erneuern (alle Dateien neu einlesen)"
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SavePlaylist..Caption
 #. RandomPlaylistForm..GrpBox_Tags..Btn_Save..Caption
 #. WebServerLogForm..BtnSave..Caption
-#: NempMainUnit.dfm:6129 NempMainUnit.dfm:6452 RandomPlaylist.dfm:148
+#: NempMainUnit.dfm:6133 NempMainUnit.dfm:6456 RandomPlaylist.dfm:148
 #: WebServerLog.dfm:44
 msgid "Save"
 msgstr "Speichern"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryLoad..Caption
-#: NempMainUnit.dfm:6134
+#: NempMainUnit.dfm:6138
 msgid "Load"
 msgstr "Laden"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Medialibrary..PM_ML_MedialibraryExport..Caption
-#: NempMainUnit.dfm:6139
+#: NempMainUnit.dfm:6143
 msgid "Export as csv"
 msgstr "Exportieren als csv"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_SearchDirectory..Caption
-#: NempMainUnit.dfm:6149
+#: NempMainUnit.dfm:6153
 msgid "Search directory for new files"
 msgstr "Verzeichnis nach neuen Dateien durchsuchen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_HideSelected..Caption
-#: NempMainUnit.dfm:6160
+#: NempMainUnit.dfm:6164
 msgid "Hide selected files"
 msgstr "Markierte ausblenden"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_CopyToClipboard..Caption
-#: NempMainUnit.dfm:6302
+#: NempMainUnit.dfm:6306
 msgid "Copy to clipboard"
 msgstr "Kopieren"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_MagicCopyToClipboard..Caption
-#: NempMainUnit.dfm:6307
+#: NempMainUnit.dfm:6311
 msgid "... and include a proper playlist-file"
 msgstr "... und eine passende Playlist-Datei erstellen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_PasteFromClipboard..Caption
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedPasteFromClipboard..Caption
-#: NempMainUnit.dfm:6311 NempMainUnit.dfm:6602
+#: NempMainUnit.dfm:6315 NempMainUnit.dfm:6606
 msgid "Paste from clipboard"
 msgstr "Einfügen aus der Zwischenablage"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..Caption
-#: NempMainUnit.dfm:6316
+#: NempMainUnit.dfm:6320
 msgid "Extended"
 msgstr "Erweitert"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ExtendedShowAllFilesInDir..Caption
-#: NempMainUnit.dfm:6318
+#: NempMainUnit.dfm:6322
 msgid "Show all files within this directory"
 msgstr "Zeige alle Dateien in diesem Verzeichnis"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ExtendedAddAllFilesInDir..Caption
-#: NempMainUnit.dfm:6322
+#: NempMainUnit.dfm:6326
 msgid "Add all files within this directory"
 msgstr "Füge alle Dateien in diesem Verzeichnis hinzu"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchTitle..Caption
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForTitle
-#: NempMainUnit.dfm:6330 Nemp_RessourceStrings.pas:610
+#: NempMainUnit.dfm:6334 Nemp_RessourceStrings.pas:610
 msgid "Search for this title"
 msgstr "Nach diesem Titel suchen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchArtist..Caption
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForArtist
-#: NempMainUnit.dfm:6335 Nemp_RessourceStrings.pas:611
+#: NempMainUnit.dfm:6339 Nemp_RessourceStrings.pas:611
 msgid "Search for this artist"
 msgstr "Nach diesem Interpreten suchen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ExtendedSearchAlbum..Caption
 #. Programmer's name for it: MainForm_MenuCaptionsSearchForAlbum
-#: NempMainUnit.dfm:6340 Nemp_RessourceStrings.pas:612
+#: NempMainUnit.dfm:6344 Nemp_RessourceStrings.pas:612
 msgid "Search for this album"
 msgstr "Nach diesem Album suchen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_Extended..PM_ML_ShowAllIncompleteTaggedFiles..Caption
-#: NempMainUnit.dfm:6347
+#: NempMainUnit.dfm:6351
 msgid "Show all files where Artist/Title/Album is missing"
 msgstr "Alle Dateien ohne Interpret/Titel/Album zeigen"
 
 #. Nemp_MainForm..Medialist_PopupMenu..PM_ML_RefreshSelected..Caption
-#: NempMainUnit.dfm:6355
+#: NempMainUnit.dfm:6359
 msgid "Refresh selected"
 msgstr "Markierte aktualisieren"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddFiles..Caption
-#: NempMainUnit.dfm:6376
+#: NempMainUnit.dfm:6380
 msgid "Add files"
 msgstr "Dateien hinzufügen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddDirectories..Caption
-#: NempMainUnit.dfm:6380
+#: NempMainUnit.dfm:6384
 msgid "Add directory"
 msgstr "Verzeichnis hinzufügen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddCDAudio..Caption
-#: NempMainUnit.dfm:6384
+#: NempMainUnit.dfm:6388
 msgid "Add CD-Audio"
 msgstr "Audio-CD hinzufügen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddWebstream..Caption
-#: NempMainUnit.dfm:6388
+#: NempMainUnit.dfm:6392
 msgid "Add webradio"
 msgstr "Webradio-Sender hinzufügen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByInverse..Caption
-#: NempMainUnit.dfm:6419
+#: NempMainUnit.dfm:6423
 msgid "Inverse"
 msgstr "Sortierung umkehren"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_SortBy..PM_PL_SortByMix..Caption
-#: NempMainUnit.dfm:6423
+#: NempMainUnit.dfm:6427
 msgid "Mix"
 msgstr "Mischen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_StopAfterCurrentTitle..Caption
 #. Programmer's name for it: MainForm_PlaylistMenu_StopAfterTitle
-#: NempMainUnit.dfm:6428 Nemp_RessourceStrings.pas:557
+#: NempMainUnit.dfm:6432 Nemp_RessourceStrings.pas:557
 msgid "Stop after current title"
 msgstr "Nach aktuellem Titel stoppen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_GeneraterandomPlaylist..Caption
-#: NempMainUnit.dfm:6435
+#: NempMainUnit.dfm:6439
 msgid "Generate random playlist"
 msgstr "Zufalls-Playlist erstellen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_LoadPlaylist..Caption
-#: NempMainUnit.dfm:6439
+#: NempMainUnit.dfm:6443
 msgid "Load (and clear current list)"
 msgstr "Laden (und aktuelle Playlist löschen)"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_AddPlaylist..Caption
-#: NempMainUnit.dfm:6445
+#: NempMainUnit.dfm:6449
 msgid "Load (add files to current list)"
 msgstr "Laden (an aktuelle Playlist anhängen)"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_RecentPlaylists..Caption
-#: NempMainUnit.dfm:6449
+#: NempMainUnit.dfm:6453
 msgid "Recent playlists"
 msgstr "Zuletzt geladen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_DeleteSelected..Caption
-#: NempMainUnit.dfm:6466
+#: NempMainUnit.dfm:6470
 msgid "Remove selected"
 msgstr "Markierte entfernen"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_ExtendedCopyToClipboard..Caption
-#: NempMainUnit.dfm:6593
+#: NempMainUnit.dfm:6597
 msgid "Copy selected files to clipboard"
 msgstr "Markierte Dateien in die Zwischenablage kopieren"
 
 #. Nemp_MainForm..PlayListPOPUP..PM_PL_MagicCopyToClipboard..Caption
-#: NempMainUnit.dfm:6598
+#: NempMainUnit.dfm:6602
 msgid "... and include a proper playlist file"
 msgstr "... und eine passende Playlist-Datei erstellen"
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_PlayPause..Caption
 #. Programmer's name for it: PlayerBtn_Pause
-#: NempMainUnit.dfm:6636 Nemp_RessourceStrings.pas:852
+#: NempMainUnit.dfm:6640 Nemp_RessourceStrings.pas:859
 msgid "Pause"
 msgstr "Pause"
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_Next..Caption
-#: NempMainUnit.dfm:6646
+#: NempMainUnit.dfm:6650
 msgid "Next track"
 msgstr "Nächster Titel"
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_Previous..Caption
-#: NempMainUnit.dfm:6651
+#: NempMainUnit.dfm:6655
 msgid "Previous track"
 msgstr "Vorheriger Titel"
 
@@ -3549,7 +3575,7 @@ msgstr "Vorheriger Titel"
 #. Programmer's name for it: TreeHeader_Playlist
 #. Programmer's name for it: OptionsTree_PlayerPlaylist
 #. Programmer's name for it: OptionsTree_AudioPlaylist
-#: NempMainUnit.dfm:6657 Deskband/FormMainBand.dfm:187
+#: NempMainUnit.dfm:6661 Deskband/FormMainBand.dfm:187
 #: Deskband/PlaylistUnit.dfm:294 Nemp_RessourceStrings.pas:59
 #: Nemp_RessourceStrings.pas:73 Nemp_RessourceStrings.pas:228
 #: Nemp_RessourceStrings.pas:229
@@ -3557,137 +3583,137 @@ msgid "Playlist"
 msgstr "Playlist"
 
 #. Nemp_MainForm..TNAMenu..PM_TNA_Restore..Caption
-#: NempMainUnit.dfm:6664
+#: NempMainUnit.dfm:6668
 msgid "Restore"
 msgstr "Wiederherstellen"
 
 #. Nemp_MainForm..Equalizer_PopupMenu..PM_EQ_Disabled..Caption
-#: NempMainUnit.dfm:6677
+#: NempMainUnit.dfm:6681
 msgid "Disable equalizer"
 msgstr "Equalizer ausschalten"
 
 #. Nemp_MainForm..Equalizer_PopupMenu..PM_EQ_Load..Caption
-#: NempMainUnit.dfm:6684
+#: NempMainUnit.dfm:6688
 msgid "Load preset"
 msgstr "Voreinstellung laden"
 
 #. Nemp_MainForm..Equalizer_PopupMenu..PM_EQ_Save..Caption
-#: NempMainUnit.dfm:6687
+#: NempMainUnit.dfm:6691
 msgid "Save current setting as"
 msgstr "Aktuelle Einstellungen speichern als"
 
 #. Nemp_MainForm..Equalizer_PopupMenu..PM_EQ_Delete..Caption
-#: NempMainUnit.dfm:6690
+#: NempMainUnit.dfm:6694
 msgid "Delete preset"
 msgstr "Voreinstellung löschen"
 
 #. Nemp_MainForm..Equalizer_PopupMenu..PM_EQ_RestoreStandard..Caption
-#: NempMainUnit.dfm:6696
+#: NempMainUnit.dfm:6700
 msgid "Restore default settings"
 msgstr "Standard Einstellungen wiederherstellen"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Preferences..Caption
 #. OptionsCompleteForm..Caption
-#: NempMainUnit.dfm:6707 OptionsComplete.dfm:6
+#: NempMainUnit.dfm:6711 OptionsComplete.dfm:6
 msgid "Preferences"
 msgstr "Einstellungen"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..Caption
 #. OptionsCompleteForm..PageControl1..TabView1..GrpBox_ViewPartymode_Amplification..Caption
-#: NempMainUnit.dfm:6717 OptionsComplete.dfm:2029
+#: NempMainUnit.dfm:6721 OptionsComplete.dfm:2029
 msgid "View"
 msgstr "Ansicht"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewCompactComplete..Caption
-#: NempMainUnit.dfm:6723
+#: NempMainUnit.dfm:6727
 msgid "Complete"
 msgstr "Komplett"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows_Equalizer..Caption
-#: NempMainUnit.dfm:6736
+#: NempMainUnit.dfm:6740
 msgid "Show effects/equalizer/..."
 msgstr "Zeige Effekte, Equalizer, ..."
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows_Playlist..Caption
-#: NempMainUnit.dfm:6741
+#: NempMainUnit.dfm:6745
 msgid "Show playlist"
 msgstr "Zeige Playlist"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows_Medialist..Caption
-#: NempMainUnit.dfm:6747
+#: NempMainUnit.dfm:6751
 msgid "Show media library (title list)"
 msgstr "Zeige Medienbibliothek (Titelliste)"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewSeparateWindows_Browse..Caption
-#: NempMainUnit.dfm:6753
+#: NempMainUnit.dfm:6757
 msgid "Show media library (browse list)"
 msgstr "Zeige Medienbibliothek (Übersicht)"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_View..PM_P_ViewStayOnTop..Caption
-#: NempMainUnit.dfm:6759
+#: NempMainUnit.dfm:6763
 msgid "Stay on top"
 msgstr "Im Vordergrund halten"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..Caption
-#: NempMainUnit.dfm:6772
+#: NempMainUnit.dfm:6776
 msgid "Skins"
 msgstr "Skins"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Skins..PM_P_Skins_WindowsStandard..Caption
-#: NempMainUnit.dfm:6775
+#: NempMainUnit.dfm:6779
 msgid "Windows standard"
 msgstr "Windows standard"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..Caption
 #. Nemp_MainForm..SleepPopup.._Shutdown..Caption
-#: NempMainUnit.dfm:6800 NempMainUnit.dfm:7174
+#: NempMainUnit.dfm:6804 NempMainUnit.dfm:7182
 msgid "Shutdown"
 msgstr "Herunterfahren"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownOff..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownOff..Caption
-#: NempMainUnit.dfm:6803 NempMainUnit.dfm:7178
+#: NempMainUnit.dfm:6807 NempMainUnit.dfm:7186
 msgid "Disable"
 msgstr "Aus"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownModeStop..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeStop..Caption
 #. Programmer's name for it: NempShutDown_StopPopupBlank
-#: NempMainUnit.dfm:6812 NempMainUnit.dfm:7187 Nemp_RessourceStrings.pas:411
+#: NempMainUnit.dfm:6816 NempMainUnit.dfm:7195 Nemp_RessourceStrings.pas:411
 msgid "Stop Nemp"
 msgstr "Nemp anhalten"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownModeSuspend..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeSuspend..Caption
 #. Programmer's name for it: NempShutDown_SuspendPopupBlank
-#: NempMainUnit.dfm:6911 NempMainUnit.dfm:7286 Nemp_RessourceStrings.pas:413
+#: NempMainUnit.dfm:6915 NempMainUnit.dfm:7294 Nemp_RessourceStrings.pas:413
 msgid "Suspend Windows"
 msgstr "Windows in den Energiesparmodus versetzen"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownModeHibernate..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeHibernate..Caption
 #. Programmer's name for it: NempShutDown_HibernatePopupBlank
-#: NempMainUnit.dfm:6964 NempMainUnit.dfm:7339 Nemp_RessourceStrings.pas:414
+#: NempMainUnit.dfm:6968 NempMainUnit.dfm:7347 Nemp_RessourceStrings.pas:414
 msgid "Hibernate Windows"
 msgstr "Windows in den Ruhezustand versetzen"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShutDown..PM_P_ShutDownModeShutDownWindows..Caption
 #. Nemp_MainForm..SleepPopup..PM_S_ShutDownModeShutDownWindows..Caption
 #. Programmer's name for it: NempShutDown_ShutDownPopupBlank
-#: NempMainUnit.dfm:7017 NempMainUnit.dfm:7392 Nemp_RessourceStrings.pas:415
+#: NempMainUnit.dfm:7021 NempMainUnit.dfm:7400 Nemp_RessourceStrings.pas:415
 msgid "Shutdown Windows"
 msgstr "Windows herunterfahren"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Birthday..Caption
 #. Nemp_MainForm..BirthdayPopup.._Birthdaymode..Caption
 #. Programmer's name for it: OptionsTree_PlayerEvents
-#: NempMainUnit.dfm:7070 NempMainUnit.dfm:7448 Nemp_RessourceStrings.pas:234
+#: NempMainUnit.dfm:7074 NempMainUnit.dfm:7456 Nemp_RessourceStrings.pas:234
 msgid "Birthday mode"
 msgstr "Geburtstags-Modus"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Scrobbler..Caption
 #. Nemp_MainForm..ScrobblerPopup.._Scrobbler..Caption
-#: NempMainUnit.dfm:7104 NempMainUnit.dfm:7553
+#: NempMainUnit.dfm:7108 NempMainUnit.dfm:7561
 msgid "Scrobbler"
 msgstr "Scrobbler"
 
@@ -3696,143 +3722,143 @@ msgstr "Scrobbler"
 #. OptionsCompleteForm..PageControl1..TabView0..GrpBox_ViewMain_BrowseClassic..CBSortArray2....Items.Strings
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..Caption
 #. Programmer's name for it: TreeHeader_Directories
-#: NempMainUnit.dfm:7124 OptionsComplete.dfm:1893 OptionsComplete.dfm:1910
+#: NempMainUnit.dfm:7128 OptionsComplete.dfm:1893 OptionsComplete.dfm:1910
 #: OptionsComplete.dfm:2604 Nemp_RessourceStrings.pas:66
 msgid "Directories"
 msgstr "Verzeichnisse"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesRecordings..Caption
-#: NempMainUnit.dfm:7126
+#: NempMainUnit.dfm:7130
 msgid "Recordings (webradio)"
 msgstr "Aufnahmen (Webradio)"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_Directories..PM_P_DirectoriesData..Caption
-#: NempMainUnit.dfm:7130
+#: NempMainUnit.dfm:7134
 msgid "Data (cover, preferences, ...)"
 msgstr "Daten (Cover, Einstellungen, ...)"
 
 #. Nemp_MainForm..Player_PopupMenu..PM_P_ShowReadme..Caption
-#: NempMainUnit.dfm:7143
+#: NempMainUnit.dfm:7151
 msgid "Show readme"
 msgstr "Zeige Readme"
 
 #. Nemp_MainForm..VST_ColumnPopup..VST_ColumnPopupCover..Caption
 #. OptionsCompleteForm..PageControl1..TabView0..GrpBox_ViewMain_Columns..cb_ShowCoverAndDetails..Caption
-#: NempMainUnit.dfm:7473 OptionsComplete.dfm:1853
+#: NempMainUnit.dfm:7481 OptionsComplete.dfm:1853
 msgid "Cover and additional details"
 msgstr "Cover und zusätzliche Details"
 
 #. Nemp_MainForm..PopupPlayPause..PM_PlayFiles..Caption
-#: NempMainUnit.dfm:7481
+#: NempMainUnit.dfm:7489
 msgid "Play files"
 msgstr "Dateien abspielen"
 
 #. Nemp_MainForm..PopupPlayPause..PM_PlayWebstream..Caption
-#: NempMainUnit.dfm:7485
+#: NempMainUnit.dfm:7493
 msgid "Play webstream"
 msgstr "Webradio abspielen"
 
 #. Nemp_MainForm..PopupStop..PM_StopAfterTitle..Caption
-#: NempMainUnit.dfm:7502
+#: NempMainUnit.dfm:7510
 msgid "Stop after title (Shift+Click)"
 msgstr "Nach aktuellem Titel stoppen (Shift+Klick)"
 
 #. Nemp_MainForm..PopupRepeat..PM_RepeatAll..Caption
 #. Programmer's name for it: MainForm_RepeatBtnHint_RepeatAll
-#: NempMainUnit.dfm:7511 Nemp_RessourceStrings.pas:546
+#: NempMainUnit.dfm:7519 Nemp_RessourceStrings.pas:546
 msgid "Repeat all"
 msgstr "Alles wiederholen"
 
 #. Nemp_MainForm..PopupRepeat..PM_RepeatTitle..Caption
 #. Programmer's name for it: MainForm_RepeatBtnHint_RepeatTitle
-#: NempMainUnit.dfm:7517 Nemp_RessourceStrings.pas:547
+#: NempMainUnit.dfm:7525 Nemp_RessourceStrings.pas:547
 msgid "Repeat title"
 msgstr "Titel wiederholen"
 
 #. Nemp_MainForm..PopupRepeat..PM_RandomMode..Caption
 #. Programmer's name for it: MainForm_RepeatBtnHint_RandomMode
-#: NempMainUnit.dfm:7523 Nemp_RessourceStrings.pas:548
+#: NempMainUnit.dfm:7531 Nemp_RessourceStrings.pas:548
 msgid "Random mode"
 msgstr "Zufallswiedergabe"
 
 #. Nemp_MainForm..PopupRepeat..PM_RepeatOff..Caption
 #. Programmer's name for it: MainForm_RepeatBtnHint_NoRepeat
-#: NempMainUnit.dfm:7529 Nemp_RessourceStrings.pas:549
+#: NempMainUnit.dfm:7537 Nemp_RessourceStrings.pas:549
 msgid "Repeat off"
 msgstr "Kein Wiederholen"
 
 #. Nemp_MainForm..PopupRepeat..PM_ABRepeat..Caption
-#: NempMainUnit.dfm:7537
+#: NempMainUnit.dfm:7545
 msgid "A-B repeat"
 msgstr "A-B Wiederholung"
 
 #. Nemp_MainForm..NempTrayIcon..Hint
-#: NempMainUnit.dfm:7592
+#: NempMainUnit.dfm:7600
 msgid "Nemp - Noch ein mp3-Player"
 msgstr "Nemp - Noch ein mp3-Player"
 
 #. Nemp_MainForm..fspTaskbarManager......Hint
-#: NempMainUnit.dfm:7608
+#: NempMainUnit.dfm:7616
 msgid "Play previous"
 msgstr "Voriger Titel"
 
 #. Nemp_MainForm..fspTaskbarManager......Hint
-#: NempMainUnit.dfm:7622
+#: NempMainUnit.dfm:7630
 msgid "Play next"
 msgstr "Als nächstes abspielen"
 
 #. Nemp_MainForm..fspTaskbarManager......Hint
-#: NempMainUnit.dfm:7629
+#: NempMainUnit.dfm:7637
 msgid "Show playlist menu"
 msgstr "Zeige Playlist-Menü"
 
 #. Nemp_MainForm..fspTaskbarManager......Hint
-#: NempMainUnit.dfm:7636
+#: NempMainUnit.dfm:7644
 msgid "Volume down"
 msgstr "Lautstärke verringern"
 
 #. Nemp_MainForm..fspTaskbarManager......Hint
-#: NempMainUnit.dfm:7643
+#: NempMainUnit.dfm:7651
 msgid "Volume up"
 msgstr "Lautstärke erhöhen"
 
 #. Nemp_MainForm..Win7TaskBarPopup..test1..Caption
-#: NempMainUnit.dfm:8073
+#: NempMainUnit.dfm:8081
 msgid "Close this menu"
 msgstr "Dieses Menü schließen"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagAudiofile..Caption
-#: NempMainUnit.dfm:8140
+#: NempMainUnit.dfm:8148
 msgid "This audio file"
 msgstr "Diese Musikdatei"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_AddTagThisFile..Caption
-#: NempMainUnit.dfm:8145
+#: NempMainUnit.dfm:8153
 msgid "Add new tag to this file"
 msgstr "Neuen Tag zur Datei hizufügen"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RenameTagThisFile..Caption
-#: NempMainUnit.dfm:8149
+#: NempMainUnit.dfm:8157
 msgid "Rename tag in this file"
 msgstr "Tag in der Datei umbenennen"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_RemoveTagThisFile..Caption
-#: NempMainUnit.dfm:8153
+#: NempMainUnit.dfm:8161
 msgid "Remove tag from this file"
 msgstr "Tag aus der Datei entfernen"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagTagCloud..Caption
-#: NempMainUnit.dfm:8160
+#: NempMainUnit.dfm:8168
 msgid "Nemp Tagcloud (Ignore/Rename rules)"
 msgstr "Nemp Tagwolke (Ignorier/Änderungs-Regeln)"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagIgnoreList..Caption
-#: NempMainUnit.dfm:8165
+#: NempMainUnit.dfm:8173
 msgid "Add \"Ignore rule\" and remove this tag from all files"
 msgstr "Neue \"Ignorier-Regel\" und Tags in allen Dateien ändern"
 
 #. Nemp_MainForm..PopupEditExtendedTags..PM_TagMergeList..Caption
-#: NempMainUnit.dfm:8169
+#: NempMainUnit.dfm:8177
 msgid "Add \"Rename rule\" and rename this tag in all files"
 msgstr "Neue \"Änderungs-Regel\" und Tags in allen Dateien ändern"
 
@@ -3889,7 +3915,7 @@ msgstr "Name (z.B. \"The Hit Channel\")"
 #. NewStationForm..GrpBox_NewStation..LblConst_URL....Caption
 #. FPlayWebstream..lblURL....Caption
 #. Programmer's name for it: Shoutcast_InputStreamLabel
-#: NewStation.dfm:45 PlayWebstream.dfm:30 Nemp_RessourceStrings.pas:792
+#: NewStation.dfm:45 PlayWebstream.dfm:30 Nemp_RessourceStrings.pas:799
 msgid ""
 "URL (e.g. \"http://myhits.com/tune_in.pls\" or \"http://123.12.34.56:5000\")"
 msgstr ""
@@ -4863,7 +4889,7 @@ msgstr "Sys (Files)"
 
 #. OptionsCompleteForm..PageControl1..TabSystem2..Label3..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_WebradioNote..Caption
-#: OptionsComplete.dfm:1149 OptionsComplete.dfm:3987
+#: OptionsComplete.dfm:1149 OptionsComplete.dfm:4041
 msgid "Note:"
 msgstr "Hinweis:"
 
@@ -4904,7 +4930,7 @@ msgstr "Wiedergabelisten"
 
 #. OptionsCompleteForm..PageControl1..TabSystem2..GrpBox_FileFormats..CBFileTypes..Hint
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..cbIncludeFiles..Hint
-#: OptionsComplete.dfm:1205 OptionsComplete.dfm:2729
+#: OptionsComplete.dfm:1205 OptionsComplete.dfm:2733
 msgid "List of supported audio files."
 msgstr "Liste der unterstützten Audiodatei-Typen."
 
@@ -5480,7 +5506,7 @@ msgstr "Blockiere Tools"
 
 #. OptionsCompleteForm..PageControl1..TabView1..GrpBox_ViewPartymode_Password..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblConst_Password2..Caption
-#: OptionsComplete.dfm:2093 OptionsComplete.dfm:4984
+#: OptionsComplete.dfm:2093 OptionsComplete.dfm:5038
 msgid "Password"
 msgstr "Passwort"
 
@@ -5655,7 +5681,7 @@ msgstr "'N/A'"
 #. OptionsCompleteForm..PageControl1..TabView4..GrpBox_ViewExt_NoMetadata..cbReplaceAlbumBy....Items.Strings
 #. Programmer's name for it: AudioFileProperty_Directory
 #: OptionsComplete.dfm:2404 OptionsComplete.dfm:2421 OptionsComplete.dfm:2432
-#: OptionsComplete.dfm:2438 Nemp_RessourceStrings.pas:756
+#: OptionsComplete.dfm:2438 Nemp_RessourceStrings.pas:763
 msgid "Directory"
 msgstr "Verzeichnis"
 
@@ -5826,38 +5852,52 @@ msgstr ""
 msgid "Show query dialog when adding new directories"
 msgstr "Bei neuen Verzeichnissen nachfragen"
 
+#. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..cb_AutoDeleteFiles....Hint
+#: OptionsComplete.dfm:2676
+msgid ""
+"Check for missing files in your music directories when starting Nemp and "
+"remove them from the media library."
+msgstr ""
+"Beim Starten von Nemp nach fehlenden Dateien suchen und diese aus der "
+"Medienbibliothek entfernen."
+
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..cb_AutoDeleteFiles..Caption
-#: OptionsComplete.dfm:2674
+#: OptionsComplete.dfm:2677
 msgid "Automatically delete missing files from the media library"
 msgstr "Automatisch fehlende Dateien aus der Medienbibliothek löschen"
 
+#. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..cb_AutoDeleteFilesShowInfo..Hint
+#: OptionsComplete.dfm:2686
+msgid "Create a log message about missing files"
+msgstr "Eine Zusammenfassung über fehlende Dateien anzeigen"
+
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..cb_AutoDeleteFilesShowInfo..Caption
-#: OptionsComplete.dfm:2683
+#: OptionsComplete.dfm:2687
 msgid "Log summary about deleted files"
 msgstr "Erstelle Nachricht über gelöschte Dateien"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..BtnAutoScanNow..Hint
-#: OptionsComplete.dfm:2691
+#: OptionsComplete.dfm:2695
 msgid "Scan now for new or missing files, according to the settings"
 msgstr "Jetzt nach neuen und/oder fehlenden Dateien scannen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Directories..BtnAutoScanNow..Caption
-#: OptionsComplete.dfm:2692
+#: OptionsComplete.dfm:2696
 msgid "Scan now"
 msgstr "Jetzt scannen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..Caption
-#: OptionsComplete.dfm:2703
+#: OptionsComplete.dfm:2707
 msgid "File types for the media library"
 msgstr "Dateitypen für die Medienbibliothek"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..LblConst_OnlythefollowingTypes..Caption
-#: OptionsComplete.dfm:2710
+#: OptionsComplete.dfm:2714
 msgid "Only the following types:"
 msgstr "Nur die folgenden Typen aufnehmen:"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..cbIncludeAll....Hint
-#: OptionsComplete.dfm:2719
+#: OptionsComplete.dfm:2723
 msgid ""
 "When searching for files: Add every supported file or just some special "
 "types."
@@ -5866,28 +5906,28 @@ msgstr ""
 "nur bestimmte."
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..cbIncludeAll..Caption
-#: OptionsComplete.dfm:2720
+#: OptionsComplete.dfm:2724
 msgid "All types supported by the player"
 msgstr "Alle Typen, die vom Player unterstützt werden"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..BtnRecommendedFiletypes..Hint
-#: OptionsComplete.dfm:2739
+#: OptionsComplete.dfm:2743
 msgid "Select recommended filetypes only"
 msgstr "Wähle empfohlene Dateitypen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_FileTypes..BtnRecommendedFiletypes..Caption
-#: OptionsComplete.dfm:2740
+#: OptionsComplete.dfm:2744
 msgid "Recommended"
 msgstr "Empfohlen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Playlists..Caption
 #. Programmer's name for it: TreeHeader_Playlists
-#: OptionsComplete.dfm:2750 Nemp_RessourceStrings.pas:72
+#: OptionsComplete.dfm:2754 Nemp_RessourceStrings.pas:72
 msgid "Playlists"
 msgstr "Wiedergabelisten"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Playlists..CBAutoScanPlaylistFilesOnView....Hint
-#: OptionsComplete.dfm:2759
+#: OptionsComplete.dfm:2763
 msgid ""
 "When browsing in playlists: Get the meta-data from the included audiofiles"
 msgstr ""
@@ -5895,52 +5935,52 @@ msgstr ""
 "auslesen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles0..GrpBox_FilesMain_Playlists..CBAutoScanPlaylistFilesOnView..Caption
-#: OptionsComplete.dfm:2760
+#: OptionsComplete.dfm:2764
 msgid "Scan files in playlists"
 msgstr "Dateien in Wiedergabelisten untersuchen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..Caption
-#: OptionsComplete.dfm:2766
+#: OptionsComplete.dfm:2770
 msgid "Files (Metadata)"
 msgstr "Files (Metadata)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..Caption
-#: OptionsComplete.dfm:2777
+#: OptionsComplete.dfm:2781
 msgid "Automatic rating and play counter"
 msgstr "Automatische Bewertung/Abspielzähler"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingActive..Hint
-#: OptionsComplete.dfm:2784
+#: OptionsComplete.dfm:2788
 msgid "(De)activate automatic rating/playcounter"
 msgstr "(De)aktivieren der automatischen Bewertung"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingActive..Caption
-#: OptionsComplete.dfm:2785
+#: OptionsComplete.dfm:2789
 msgid "Change rating and play counter of played files"
 msgstr "Bewertung und Abspielzähler verändern"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingIgnoreShortFiles..Hint
-#: OptionsComplete.dfm:2794
+#: OptionsComplete.dfm:2798
 msgid "Do not change rating and playcounter on short tracks."
 msgstr "Bewertung und Abspielzähler bei kurzen Titeln nicht verändern."
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingIgnoreShortFiles..Caption
-#: OptionsComplete.dfm:2795
+#: OptionsComplete.dfm:2799
 msgid "Ignore short tracks (i.e. less than 30 seconds)"
 msgstr "Bei kurzen Stücken ignorieren (d.h. kürzer als 30 Sekunden)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingChangeCounter..Hint
-#: OptionsComplete.dfm:2803
+#: OptionsComplete.dfm:2807
 msgid "Increase the playcounter of a file after it was played"
 msgstr "Abspielzähler erhöhen, wenn die Datei abgespielt wurde"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingChangeCounter..Caption
-#: OptionsComplete.dfm:2804
+#: OptionsComplete.dfm:2808
 msgid "Increase play counter"
 msgstr "Abspielzähler erhöhen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingIncreaseRating....Hint
-#: OptionsComplete.dfm:2815
+#: OptionsComplete.dfm:2819
 msgid ""
 "Automatically increase rating on played tracks. The change will be smaller "
 "the higher the playcounter is."
@@ -5949,12 +5989,12 @@ msgstr ""
 "öfter die Datei abgespielt wurde."
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingIncreaseRating..Caption
-#: OptionsComplete.dfm:2816
+#: OptionsComplete.dfm:2820
 msgid "Increase rating on played tracks"
 msgstr "Erhöhe Bewertung von abgespielten Dateien"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingDecreaseRating....Hint
-#: OptionsComplete.dfm:2826
+#: OptionsComplete.dfm:2830
 msgid ""
 "Automatically decrease rating on aborted tracks. The change will be smaller "
 "the higher the playcounter is."
@@ -5963,38 +6003,43 @@ msgstr ""
 "je öfter die Datei abgespielt wurde."
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_AutoRating..cb_RatingDecreaseRating..Caption
-#: OptionsComplete.dfm:2827
+#: OptionsComplete.dfm:2831
 msgid "Decrease rating on aborted tracks"
 msgstr "Bewertung bei abgebrochenen Stücken herabsetzen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_Metadata..Caption
-#: OptionsComplete.dfm:2837
+#: OptionsComplete.dfm:2841
 msgid "Access to meta data (e.g. Id3-Tags)"
 msgstr "Zugriff auf Metadaten (z.B. ID3-Tags)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_Metadata..cb_AccessMetadata..Caption
-#: OptionsComplete.dfm:2844
+#: OptionsComplete.dfm:2848
 msgid "Allow quick access to metadata"
 msgstr "Schnellzugriff auf Metadaten erlauben"
 
+#. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_Metadata..cb_IgnoreLyrics..Caption
+#: OptionsComplete.dfm:2856
+msgid "Ignore Lyrics (recommended for very large  music collections)"
+msgstr "Lyrics ignorieren (empfohlen für sehr große Musiksammlungen)"
+
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_CDAudio..Caption
-#: OptionsComplete.dfm:2853
+#: OptionsComplete.dfm:2866
 msgid "CD-Audio"
 msgstr "Audio-CD"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_CDAudio..cb_UseCDDB..Caption
-#: OptionsComplete.dfm:2860
+#: OptionsComplete.dfm:2873
 msgid "Use CDDB/freeDB to get disc information"
 msgstr "Benutze cddb/freedb zum Ermitteln von CD-Daten"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_TabMedia5_ID3..Caption
 #. Programmer's name for it: OptionsTree_MediabibUnicode
-#: OptionsComplete.dfm:2870 Nemp_RessourceStrings.pas:247
+#: OptionsComplete.dfm:2883 Nemp_RessourceStrings.pas:247
 msgid "Unicode"
 msgstr "Unicode"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_TabMedia5_ID3..CBAutoDetectCharCode....Hint
-#: OptionsComplete.dfm:2879
+#: OptionsComplete.dfm:2892
 msgid ""
 "Use a uber-ingenious special method for better tag-reading in files with "
 "\"unicode-filenames\"."
@@ -6003,129 +6048,129 @@ msgstr ""
 "bei Dateien mit \"Unicode-Dateinamen\"."
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..GrpBox_TabMedia5_ID3..CBAutoDetectCharCode..Caption
-#: OptionsComplete.dfm:2880
+#: OptionsComplete.dfm:2893
 msgid "Auto-detect (probably) used charset"
 msgstr "Automatisch den (wahrscheinlich) verwendeten Zeichensatz bestimmen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..grpBox_AdditionalTags..Caption
-#: OptionsComplete.dfm:2889
+#: OptionsComplete.dfm:2902
 msgid "Extended tags (for tag cloud)"
 msgstr "Erweiterte Tags (für Tagwolke)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..grpBox_AdditionalTags..cb_AutoResolveInconsistencies..Caption
-#: OptionsComplete.dfm:2896
+#: OptionsComplete.dfm:2909
 msgid "Automatically resolve inconsistencies when entering new tags"
 msgstr "Bei Eingabe neuer Tags automatisch Inkonsistenzen auflösen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..grpBox_AdditionalTags..cb_AskForAutoResolveInconsistencies..Caption
-#: OptionsComplete.dfm:2904
+#: OptionsComplete.dfm:2917
 msgid "If not: Show query dialog when inconsistencies occur"
 msgstr "Falls nicht: nachfragen, wenn Inkonsistenzen auftreten"
 
 #. OptionsCompleteForm..PageControl1..TabFiles1..grpBox_AdditionalTags..cb_ShowAutoResolveInconsistenciesHints....Caption
-#: OptionsComplete.dfm:2914
+#: OptionsComplete.dfm:2927
 msgid "If not: Show information dialog when minor inconsistencies occur "
 msgstr "Falls nicht: Hinweis anzeigen, wenn kleinere Inkonsistenzen auftreten "
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..Caption
-#: OptionsComplete.dfm:2920
+#: OptionsComplete.dfm:2933
 msgid "Files (Cover)"
 msgstr "Files (Cover)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..Hint
-#: OptionsComplete.dfm:2930
+#: OptionsComplete.dfm:2943
 msgid "Specify, where Nemp should look for cover images."
 msgstr "Geben Sie an, wo Nemp nach Coverbildern suchen soll."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..Caption
-#: OptionsComplete.dfm:2932
+#: OptionsComplete.dfm:2945
 msgid "Search covers in ..."
 msgstr "Suche Cover in ..."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inDir..Hint
-#: OptionsComplete.dfm:2939
+#: OptionsComplete.dfm:2952
 msgid "Search for coverfiles within the directory of the audiofile"
 msgstr "In dem Verzeichnis suchen, in dem die Audiodatei liegt"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inDir..Caption
-#: OptionsComplete.dfm:2940
+#: OptionsComplete.dfm:2953
 msgid "Directory itself"
 msgstr "Verzeichnis selbst"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inSubDir..Hint
-#: OptionsComplete.dfm:2950
+#: OptionsComplete.dfm:2963
 msgid "Search for coverfiles in the specified subdirectory."
 msgstr "In dem angegebenen Unterverzeichnis suchen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inSubDir..Caption
-#: OptionsComplete.dfm:2951
+#: OptionsComplete.dfm:2964
 msgid "Subdirectory (name)"
 msgstr "Unterverzeichnis (Name)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inParentDir..Hint
-#: OptionsComplete.dfm:2962
+#: OptionsComplete.dfm:2975
 msgid "Search for coverfiles in the parent directory of the audiofile."
 msgstr "Im übergeordneten Verzeichnis suchen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inParentDir..Caption
-#: OptionsComplete.dfm:2963
+#: OptionsComplete.dfm:2976
 msgid "Parent directory"
 msgstr "Übergeordnetes Verzeichnis"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inSisterDir....Hint
-#: OptionsComplete.dfm:2975
+#: OptionsComplete.dfm:2988
 msgid ""
 "Search for coverfiles in the specified subdirectory of the parent directory."
 msgstr "In einem Nachbarverzeichnis suchen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..CB_CoverSearch_inSisterDir..Caption
-#: OptionsComplete.dfm:2976
+#: OptionsComplete.dfm:2989
 msgid "Sisterdirectory (name)"
 msgstr "Nachbarverzeichnis (Name)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..EDTCoverSubDirName..Text
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_TabMedia3_Cover..EDTCoverSisterDirName..Text
-#: OptionsComplete.dfm:2988 OptionsComplete.dfm:2996
+#: OptionsComplete.dfm:3001 OptionsComplete.dfm:3009
 msgid "cover"
 msgstr "cover"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_LastFM..Caption
-#: OptionsComplete.dfm:3005
+#: OptionsComplete.dfm:3018
 msgid "Online cover"
 msgstr "Online Cover"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_LastFM..CB_CoverSearch_LastFM..Hint
-#: OptionsComplete.dfm:3012
+#: OptionsComplete.dfm:3025
 msgid "Allow Nemp downloading missing cover files from the internet"
 msgstr "Herunterladen von fehlenden Covern aus dem Internet erlauben"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_LastFM..CB_CoverSearch_LastFM..Caption
-#: OptionsComplete.dfm:3013
+#: OptionsComplete.dfm:3026
 msgid "Try to get missing covers from LastFM"
 msgstr "Fehlende Cover von LastFM herunterladen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_LastFM..BtnClearCoverCache..Hint
-#: OptionsComplete.dfm:3023
+#: OptionsComplete.dfm:3036
 msgid "Clear the list of unsuccessfully checked covers"
 msgstr "Die Liste der erfolglos gesuchten Cover löschen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_LastFM..BtnClearCoverCache..Caption
-#: OptionsComplete.dfm:3024
+#: OptionsComplete.dfm:3037
 msgid "Clear cache"
 msgstr "Cache leeren"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..Caption
-#: OptionsComplete.dfm:3034
+#: OptionsComplete.dfm:3047
 msgid "Default cover"
 msgstr "Standard-Cover"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..lbl_DefaultCover..Caption
-#: OptionsComplete.dfm:3042
+#: OptionsComplete.dfm:3055
 msgid "Used when no proper cover art can be found."
 msgstr "Wird verwendet, wenn kein passendes Cover gefunden werden kann."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..lbl_DefaultCoverHint....Caption
-#: OptionsComplete.dfm:3059
+#: OptionsComplete.dfm:3072
 msgid ""
 "Note: Cover art already displayed in the player will not change until the "
 "cover art is loaded again."
@@ -6134,27 +6179,27 @@ msgstr ""
 "aktualisiert, wenn das Bild neu geladen werden muss."
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..btn_DefaultCover..Hint
-#: OptionsComplete.dfm:3067
+#: OptionsComplete.dfm:3080
 msgid "Select a file you want to use as cover art"
 msgstr "Datei auswählen, die als Standard-Cover verwendet werden soll"
 
 #. OptionsCompleteForm..PageControl1..TabFiles2..GrpBox_Files_Cover_Default..btn_DefaultCoverReset..Hint
-#: OptionsComplete.dfm:3077
+#: OptionsComplete.dfm:3090
 msgid "Reset the default cover to the Nemp default cover"
 msgstr "Setzt das Standard-Cover auf die Werkseinstellung zurück"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..Caption
-#: OptionsComplete.dfm:3085
+#: OptionsComplete.dfm:3098
 msgid "Files (Search)"
 msgstr "Files (Search)"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..Caption
-#: OptionsComplete.dfm:3096
+#: OptionsComplete.dfm:3109
 msgid "Global search options"
 msgstr "Suchoptionen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..LblConst_AccelerateSearchNote....Caption
-#: OptionsComplete.dfm:3110
+#: OptionsComplete.dfm:3123
 msgid ""
 "Note: This will decrease the required time, but will increase the reqired "
 "memory (approx. 1mb/4.000 files)."
@@ -6163,7 +6208,7 @@ msgstr ""
 "(ca. 1mb/4.000 Dateien)."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..LblConst_AccelerateSearchNote2....Caption
-#: OptionsComplete.dfm:3123
+#: OptionsComplete.dfm:3136
 msgid ""
 "Note: This will affect the search results of \"Quick search\" and \"General "
 "search\"."
@@ -6172,61 +6217,61 @@ msgstr ""
 "und \"Einfacher Suche\"."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearch..Hint
-#: OptionsComplete.dfm:3131
+#: OptionsComplete.dfm:3144
 msgid "Use some tricky algorithms to accelerate the search."
 msgstr ""
 "Ein paar trickreiche Algorithmen verwenden, um die Suche zu beschleunigen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearch..Caption
-#: OptionsComplete.dfm:3133
+#: OptionsComplete.dfm:3146
 msgid "Accelerate search"
 msgstr "Suche beschleunigen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearchIncludePath..Hint
-#: OptionsComplete.dfm:3142
+#: OptionsComplete.dfm:3155
 msgid "Include filenames to the accelerated search algorithms."
 msgstr "Schließe Dateinamen in die beschleunigten Suchalgorithmen mit ein."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearchIncludePath..Caption
-#: OptionsComplete.dfm:3144
+#: OptionsComplete.dfm:3157
 msgid "Including filenames"
 msgstr "Einschließlich Dateinamen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearchIncludeComment..Hint
-#: OptionsComplete.dfm:3152
+#: OptionsComplete.dfm:3165
 msgid "Include comments to the accelerated search algorithms."
 msgstr "Schließe Kommentare in die beschleunigten Suchalgorithmen mit ein."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateSearchIncludeComment..Caption
-#: OptionsComplete.dfm:3154
+#: OptionsComplete.dfm:3167
 msgid "Including comments"
 msgstr "Einschließlich Kommentare"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateLyricSearch..Hint
-#: OptionsComplete.dfm:3162
+#: OptionsComplete.dfm:3175
 msgid "Use some tricky algorithms to accelerate the search for lyrics."
 msgstr ""
 "Ein paar trickreiche Algorithmen verwenden, um die Suche nach Lyrics  zu "
 "beschleunigen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_GlobalSearchOptions..CB_AccelerateLyricSearch..Caption
-#: OptionsComplete.dfm:3164
+#: OptionsComplete.dfm:3177
 msgid "Accelerate lyrics search"
 msgstr "Suche nach Lyrics beschleunigen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..Caption
-#: OptionsComplete.dfm:3174
+#: OptionsComplete.dfm:3187
 msgid "Quicksearch options"
 msgstr "Optionen für die Schnellsuche"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..LblConst_QuickSearchNote..Hint
-#: OptionsComplete.dfm:3184
+#: OptionsComplete.dfm:3197
 msgid "Activate this settings only if your machine is fast enough."
 msgstr ""
 "Diese Einstellung nur setzen, wenn der Rechner schnell genug dafür ist."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..LblConst_QuickSearchNote....Caption
-#: OptionsComplete.dfm:3190
+#: OptionsComplete.dfm:3203
 msgid ""
 "Note: Accelerated search is strongly recommended if one of these options is "
 "activated. The last one is not recommended unless your medialibrary is not "
@@ -6237,7 +6282,7 @@ msgstr ""
 "Medienbibliothek nicht zu groß oder ihr Rechner wirklich schnell ist."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchWhileYouType....Hint
-#: OptionsComplete.dfm:3200
+#: OptionsComplete.dfm:3213
 msgid ""
 "Show search results in \"real time\" or just after pressing the \"enter\"-"
 "key."
@@ -6245,12 +6290,12 @@ msgstr ""
 "Zeige Suchergebnisse beim Tippen oder erst nach Drücken der Enter-Taste."
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchWhileYouType..Caption
-#: OptionsComplete.dfm:3202
+#: OptionsComplete.dfm:3215
 msgid "\"While you type\""
 msgstr "\"Während Sie tippen\""
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchAllowErrorsWhileTyping....Hint
-#: OptionsComplete.dfm:3212
+#: OptionsComplete.dfm:3225
 msgid ""
 "Always use a fuzzy search (e.g. show files from \"Amy MacDonald\" when you "
 "search for \"Amy McDonald\")"
@@ -6259,12 +6304,12 @@ msgstr ""
 "\" bei der Suche nach \"Amy McDonald\")"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchAllowErrorsWhileTyping..Caption
-#: OptionsComplete.dfm:3214
+#: OptionsComplete.dfm:3227
 msgid "Allow errors while typing"
 msgstr "Erlaube Fehler während des Tippens"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchAllowErrorsOnEnter....Hint
-#: OptionsComplete.dfm:3224
+#: OptionsComplete.dfm:3237
 msgid ""
 "Do a fuzzy search after pressing \"enter\" (e.g. show files from \"Amy "
 "MacDonald\" when you search for \"Amy McDonald\")"
@@ -6273,72 +6318,72 @@ msgstr ""
 "von \"Amy MacDonald\" bei der Suche nach \"Amy McDonald\")"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..CB_QuickSearchAllowErrorsOnEnter..Caption
-#: OptionsComplete.dfm:3226
+#: OptionsComplete.dfm:3239
 msgid "Allow errors on [Enter]"
 msgstr "Erlaube Fehler bei [Enter]"
 
 #. OptionsCompleteForm..PageControl1..TabFiles3..GrpBox_TabMedia4_QuickSearchOptions..cb_ChangeCoverflowOnSearch..Caption
-#: OptionsComplete.dfm:3234
+#: OptionsComplete.dfm:3247
 msgid "Change coverflow according to results"
 msgstr "Coverflow den Suchergebnissen anpassen"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..Caption
-#: OptionsComplete.dfm:3240
+#: OptionsComplete.dfm:3253
 msgid "XXX Unicode"
 msgstr "Unicode"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..Hint
-#: OptionsComplete.dfm:3250
+#: OptionsComplete.dfm:3263
 msgid "Adjust charset-detection."
 msgstr "Zeichensätze für die automatische Erkennung."
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..Caption
-#: OptionsComplete.dfm:3252
+#: OptionsComplete.dfm:3265
 msgid "Charsets for auto-detection"
 msgstr "Zeichensätze für die automatische Erkennung"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Arabic..Caption
-#: OptionsComplete.dfm:3259
+#: OptionsComplete.dfm:3272
 msgid "Arabic"
 msgstr "Arabisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_hebrew..Caption
-#: OptionsComplete.dfm:3266
+#: OptionsComplete.dfm:3279
 msgid "Hebrew"
 msgstr "Hebräisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_cyrillic..Caption
-#: OptionsComplete.dfm:3273
+#: OptionsComplete.dfm:3286
 msgid "Cyrillic"
 msgstr "Kyrillisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Thai..Caption
-#: OptionsComplete.dfm:3280
+#: OptionsComplete.dfm:3293
 msgid "Thai"
 msgstr "Thai"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Korean..Caption
-#: OptionsComplete.dfm:3287
+#: OptionsComplete.dfm:3300
 msgid "Korean"
 msgstr "Koreanisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Chinese..Caption
-#: OptionsComplete.dfm:3294
+#: OptionsComplete.dfm:3307
 msgid "Chinese"
 msgstr "Chinesisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Greek..Caption
-#: OptionsComplete.dfm:3301
+#: OptionsComplete.dfm:3314
 msgid "Greek"
 msgstr "Griechisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..GrpBox_TabMedia5_Charsets..LblConst_Japanese..Caption
-#: OptionsComplete.dfm:3308
+#: OptionsComplete.dfm:3321
 msgid "Japanese"
 msgstr "Japanisch"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..__XXX__CB_AutoSavePlaylist....Hint
-#: OptionsComplete.dfm:3382
+#: OptionsComplete.dfm:3395
 msgid ""
 "Backup the playlist every 5 minutes. When Nemp crashes, this backup will be "
 "loaded."
@@ -6347,150 +6392,150 @@ msgstr ""
 "wird dieses Backup geladen."
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..__XXX__CB_AutoSavePlaylist..Caption
-#: OptionsComplete.dfm:3383
+#: OptionsComplete.dfm:3396
 msgid "Automatically save playlist every 5 minutes"
 msgstr "Playlist automatisch alle 5 Minuten speichern"
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..cbOnlyLAN..Hint
-#: OptionsComplete.dfm:3391
+#: OptionsComplete.dfm:3404
 msgid "Deny access from \"the internet\"."
 msgstr "Zugriff auf die Medienbibliothek \"vom Internet\" verweigern."
 
 #. OptionsCompleteForm..PageControl1..TabFiles4..cbOnlyLAN..Caption
-#: OptionsComplete.dfm:3392
+#: OptionsComplete.dfm:3405
 msgid "Local network only"
 msgstr "Nur lokales Netzwerk"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..Caption
-#: OptionsComplete.dfm:3398
+#: OptionsComplete.dfm:3411
 msgid "Player (Main)"
 msgstr "Player (Main)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..Caption
-#: OptionsComplete.dfm:3409
+#: OptionsComplete.dfm:3422
 msgid "Output devices"
 msgstr "Ausgabegeräte"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..LblConst_MainDevice..Caption
-#: OptionsComplete.dfm:3417
+#: OptionsComplete.dfm:3430
 msgid "Main"
 msgstr "Hauptwiedergabe"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..HeadphonesDeviceCB..Hint
-#: OptionsComplete.dfm:3432
+#: OptionsComplete.dfm:3445
 msgid "The secondary device."
 msgstr "Das sekundäre Ausgabegerät für die Kopfhörer-Wiedergabe."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_Devices..MainDeviceCB..Hint
-#: OptionsComplete.dfm:3441
+#: OptionsComplete.dfm:3454
 msgid "The main device."
 msgstr "Das primäre Ausgabegerät für die Hauptwiedergabe."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..Caption
-#: OptionsComplete.dfm:3461
+#: OptionsComplete.dfm:3474
 msgid "Fading"
 msgstr "Fading"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_TitleChange..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_ms1..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..SE_Fade..Hint
-#: OptionsComplete.dfm:3468 OptionsComplete.dfm:3484 OptionsComplete.dfm:3522
+#: OptionsComplete.dfm:3481 OptionsComplete.dfm:3497 OptionsComplete.dfm:3535
 msgid "Fading length between two songs."
 msgstr "Länge des Fadings zwischen zwei Liedern."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_TitleChange..Caption
-#: OptionsComplete.dfm:3469
+#: OptionsComplete.dfm:3482
 msgid "On title change"
 msgstr "Bei Titelwechsel"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_Titlefade..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_ms2..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..SE_SeekFade..Hint
-#: OptionsComplete.dfm:3476 OptionsComplete.dfm:3492 OptionsComplete.dfm:3510
+#: OptionsComplete.dfm:3489 OptionsComplete.dfm:3505 OptionsComplete.dfm:3523
 msgid "Fading length when scrolling inside a song."
 msgstr "Länge des Fadings beim Spulen innerhalb eines Liedes."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_Titlefade..Caption
-#: OptionsComplete.dfm:3477
+#: OptionsComplete.dfm:3490
 msgid "On position change"
 msgstr "Bei Positionswechsel"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_ms1..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..LblConst_ms2..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_ms..Caption
-#: OptionsComplete.dfm:3485 OptionsComplete.dfm:3493 OptionsComplete.dfm:3635
+#: OptionsComplete.dfm:3498 OptionsComplete.dfm:3506 OptionsComplete.dfm:3648
 msgid "ms"
 msgstr "ms"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_Fading..Hint
-#: OptionsComplete.dfm:3500
+#: OptionsComplete.dfm:3513
 msgid "Use crossfading."
 msgstr "Verwende Crossfading."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_Fading..Caption
-#: OptionsComplete.dfm:3501
+#: OptionsComplete.dfm:3514
 msgid "Fade in/out"
 msgstr "Ein-/ausfaden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnShortTracks..Hint
-#: OptionsComplete.dfm:3534
+#: OptionsComplete.dfm:3547
 msgid "Ignore fading on short tracks."
 msgstr "Bei kurzen Stücken ignorieren."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnShortTracks..Caption
-#: OptionsComplete.dfm:3535
+#: OptionsComplete.dfm:3548
 msgid "Ignore on short tracks"
 msgstr "Bei kurzen Stücken ignorieren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnPause..Hint
-#: OptionsComplete.dfm:3543
+#: OptionsComplete.dfm:3556
 msgid "Ignore fading when clicking on \"Pause\"."
 msgstr "Kein Fading beim Klicken auf \"Pause\"."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnPause..Caption
-#: OptionsComplete.dfm:3544
+#: OptionsComplete.dfm:3557
 msgid "Ignore on pause"
 msgstr "Bei Pause ignorieren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnStop..Hint
-#: OptionsComplete.dfm:3552
+#: OptionsComplete.dfm:3565
 msgid "Ignore fading when stopping the player."
 msgstr "Kein Fading beim Stoppen des Players."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Fading..CB_IgnoreFadingOnStop..Caption
-#: OptionsComplete.dfm:3553
+#: OptionsComplete.dfm:3566
 msgid "Ignore on stop"
 msgstr "Bei Stop ignorieren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..Caption
-#: OptionsComplete.dfm:3563
+#: OptionsComplete.dfm:3576
 msgid "Silence detection"
 msgstr "Stille erkennen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..Lbl_SilenceThreshold..Caption
-#: OptionsComplete.dfm:3570
+#: OptionsComplete.dfm:3583
 msgid "Threshold"
 msgstr "Schwellwert"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..Lbl_SilenceDB..Caption
-#: OptionsComplete.dfm:3577
+#: OptionsComplete.dfm:3590
 msgid "dB"
 msgstr "dB"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..CB_SilenceDetection....Hint
-#: OptionsComplete.dfm:3586
+#: OptionsComplete.dfm:3599
 msgid ""
 "Automatically detect and skip the silent parts at the end of the tracks "
 msgstr ""
 "Automatisches Erkennen und Überspringen von Stille am Ende eines Titels "
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..CB_SilenceDetection..Caption
-#: OptionsComplete.dfm:3587
+#: OptionsComplete.dfm:3600
 msgid "Skip silence at the end of tracks"
 msgstr "Stille am Ende eines Titels überspringen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer0..GrpBox_TabAudio2_Silence..SE_SilenceThreshold....Hint
-#: OptionsComplete.dfm:3598
+#: OptionsComplete.dfm:3611
 msgid ""
 "Threshold for \"silence\". A threshold of -5dB to -10dB will skip a lot, "
 "-40dB and below will skip only really quiet parts."
@@ -6500,24 +6545,24 @@ msgstr ""
 "leisen Stellen ab."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..Caption
-#: OptionsComplete.dfm:3607
+#: OptionsComplete.dfm:3620
 msgid "Player (Ext)"
 msgstr "Player (Ext)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..Caption
-#: OptionsComplete.dfm:3618
+#: OptionsComplete.dfm:3631
 msgid "Extended audio settings"
 msgstr "Erweiterte Audio-Einstellungen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_Buffersize..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_ms..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..SEBufferSize..Hint
-#: OptionsComplete.dfm:3625 OptionsComplete.dfm:3634 OptionsComplete.dfm:3668
+#: OptionsComplete.dfm:3638 OptionsComplete.dfm:3647 OptionsComplete.dfm:3681
 msgid "Increase this value, if the playback stutters sometimes."
 msgstr "Erhöhen Sie diesen Wert, wenn die Wiedergabe ab und zu stottert."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_Buffersize..Caption
-#: OptionsComplete.dfm:3627
+#: OptionsComplete.dfm:3640
 msgid "Buffer size"
 msgstr "Buffergröße"
 
@@ -6526,92 +6571,92 @@ msgstr "Buffergröße"
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..Lbl_FloatingPoints_Status..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_FloatingPoint..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_Mixing..Hint
-#: OptionsComplete.dfm:3642 OptionsComplete.dfm:3651 OptionsComplete.dfm:3660
-#: OptionsComplete.dfm:3680 OptionsComplete.dfm:3695
+#: OptionsComplete.dfm:3655 OptionsComplete.dfm:3664 OptionsComplete.dfm:3673
+#: OptionsComplete.dfm:3693 OptionsComplete.dfm:3708
 msgid "Try to change this, if the playback is distorted."
 msgstr "Versuchen Sie andere Einstellungen, wenn die Wiedergabe verzerrt ist."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_UseFloatingPoint..Caption
-#: OptionsComplete.dfm:3644
+#: OptionsComplete.dfm:3657
 msgid "Floating-point channels"
 msgstr "Floating-point Channels"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..LblConst_Mixing..Caption
-#: OptionsComplete.dfm:3653
+#: OptionsComplete.dfm:3666
 msgid "Mixing"
 msgstr "Mixing"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_FloatingPoint..Text
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_FloatingPoint....Items.Strings
-#: OptionsComplete.dfm:3684 OptionsComplete.dfm:3686
+#: OptionsComplete.dfm:3697 OptionsComplete.dfm:3699
 msgid "Auto-detect"
 msgstr "Automatisch"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_FloatingPoint....Items.Strings
-#: OptionsComplete.dfm:3687
+#: OptionsComplete.dfm:3700
 msgid "Off"
 msgstr "Off"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_FloatingPoint....Items.Strings
-#: OptionsComplete.dfm:3688
+#: OptionsComplete.dfm:3701
 msgid "On"
 msgstr "On"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_Mixing..Text
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_Mixing....Items.Strings
-#: OptionsComplete.dfm:3699 OptionsComplete.dfm:3701
+#: OptionsComplete.dfm:3712 OptionsComplete.dfm:3714
 msgid "Hardware"
 msgstr "Hardware"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_ExtendedAudio..CB_Mixing....Items.Strings
-#: OptionsComplete.dfm:3702
+#: OptionsComplete.dfm:3715
 msgid "Software"
 msgstr "Software"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_PlayerExt_SafePlayback..Caption
-#: OptionsComplete.dfm:3711
+#: OptionsComplete.dfm:3724
 msgid "Safe playback"
 msgstr "Sichere Wiedergabe"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..GrpBox_PlayerExt_SafePlayback..cb_SafePlayback..Caption
-#: OptionsComplete.dfm:3722
+#: OptionsComplete.dfm:3735
 msgid "Use safe playback"
 msgstr "Sicheres Playback verwenden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..grpBoxMidi..Caption
-#: OptionsComplete.dfm:3732
+#: OptionsComplete.dfm:3745
 msgid "MIDI playback"
 msgstr "MIDI Wiedergabe"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..grpBoxMidi..LblSoundFont..Caption
-#: OptionsComplete.dfm:3743
+#: OptionsComplete.dfm:3756
 msgid "SoundFont file"
 msgstr "SoundFont Datei"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..grpBoxMidi..editSoundFont..Hint
-#: OptionsComplete.dfm:3750
+#: OptionsComplete.dfm:3763
 msgid "The SoundFont file used for MIDI playback"
 msgstr "Die SoundFont Datei, die für die MIDI-Wiedergabe verwendet wird"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer1..grpBoxMidi..BtnSelectSoundFontFile..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..BtnCountDownSong..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..BtnBirthdaySong..Hint
-#: OptionsComplete.dfm:3759 OptionsComplete.dfm:4303 OptionsComplete.dfm:4376
+#: OptionsComplete.dfm:3772 OptionsComplete.dfm:4357 OptionsComplete.dfm:4430
 msgid "Select file"
 msgstr "Datei auswählen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..Caption
-#: OptionsComplete.dfm:3768
+#: OptionsComplete.dfm:3781
 msgid "Player (Playlist)"
 msgstr "Player (Playlist)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..Caption
-#: OptionsComplete.dfm:3779
+#: OptionsComplete.dfm:3792
 msgid "Behaviour of the playlist"
 msgstr "Verhalten der Playlist"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_AutoScanPlaylist....Hint
-#: OptionsComplete.dfm:3791
+#: OptionsComplete.dfm:3804
 msgid ""
 "Read metadata from the audiofiles or just use the data stored in the "
 "playlistfile."
@@ -6620,36 +6665,36 @@ msgstr ""
 "gespeicherten Daten."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_AutoScanPlaylist..Caption
-#: OptionsComplete.dfm:3793
+#: OptionsComplete.dfm:3806
 msgid "Check files when loading a playlist"
 msgstr "Dateien in Wiedergabelisten untersuchen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_JumpToNextCue..Hint
-#: OptionsComplete.dfm:3801
+#: OptionsComplete.dfm:3814
 msgid "When clicking \"next\", jump to the next cuesheet (if available)"
 msgstr ""
 "Beim Klick auf \"Nächstes Lied\" nur zum nächsten Eintrag im Cuesheet "
 "springen (falls vorhanden)."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_JumpToNextCue..Caption
-#: OptionsComplete.dfm:3802
+#: OptionsComplete.dfm:3815
 msgid "Jump to next entry in cuesheet on \"next\""
 msgstr "Zum nächsten Eintrag im Cue-Sheet bei Klick auf \"Nächster Titel\""
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_RememberInterruptedPlayPosition..Hint
-#: OptionsComplete.dfm:3810
+#: OptionsComplete.dfm:3823
 msgid "Used in combination with \"Just play focussed file\""
 msgstr "Wird in Verbindung mit \"Datei einfach nur abspielen\" benutzt"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..CB_RememberInterruptedPlayPosition....Caption
-#: OptionsComplete.dfm:3813
+#: OptionsComplete.dfm:3826
 msgid "Remember track position when playing a song directly from the library"
 msgstr ""
 "Merke Position im aktuellen Track beim Abspielen direkt aus der "
 "Medienbibliothek"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..cb_ReplayCue....Hint
-#: OptionsComplete.dfm:3823
+#: OptionsComplete.dfm:3836
 msgid ""
 "Repeat only the current part of a file instead of the whole track when "
 "\"Repeat title\" is selected"
@@ -6658,22 +6703,22 @@ msgstr ""
 "die ganze Datei) wenn \"Wiederhole Titel\" gewählt ist. "
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlaylistBehaviour..cb_ReplayCue..Caption
-#: OptionsComplete.dfm:3824
+#: OptionsComplete.dfm:3837
 msgid "Repeat current entry in cuesheet on \"Repeat title\""
 msgstr "\"Wiederhole Titel\" auch in Cue-Sheets anwenden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..Caption
-#: OptionsComplete.dfm:3834
+#: OptionsComplete.dfm:3847
 msgid "Default actions"
 msgstr "Standardaktionen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..Label10..Caption
-#: OptionsComplete.dfm:3842
+#: OptionsComplete.dfm:3855
 msgid "Insert mode from media list into the playlist"
 msgstr "Einfügemodus für Dateien von der Medienbibliothek in die Playlist"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..LblHeadsetDefaultAction..Caption
-#: OptionsComplete.dfm:3850
+#: OptionsComplete.dfm:3863
 msgid "Insert mode from headset to playlist"
 msgstr "Einfügemodus für Dateien vom Kopfhörer in die Playlist"
 
@@ -6681,116 +6726,136 @@ msgstr "Einfügemodus für Dateien vom Kopfhörer in die Playlist"
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_DefaultAction....Items.Strings
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction..Text
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction....Items.Strings
-#: OptionsComplete.dfm:3860 OptionsComplete.dfm:3862 OptionsComplete.dfm:3876
-#: OptionsComplete.dfm:3878
+#: OptionsComplete.dfm:3873 OptionsComplete.dfm:3875 OptionsComplete.dfm:3889
+#: OptionsComplete.dfm:3891
 msgid "Enqueue at the end of the playlist"
 msgstr "Ans Ende der Playlist einfügen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_DefaultAction....Items.Strings
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction....Items.Strings
-#: OptionsComplete.dfm:3864 OptionsComplete.dfm:3880
+#: OptionsComplete.dfm:3877 OptionsComplete.dfm:3893
 msgid "Enqueue after current track"
 msgstr "Hinter den aktuellen Titel einfügen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_DefaultAction....Items.Strings
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction....Items.Strings
-#: OptionsComplete.dfm:3865 OptionsComplete.dfm:3881
+#: OptionsComplete.dfm:3878 OptionsComplete.dfm:3894
 msgid "Just play (don't change the playlist)"
 msgstr "Einfach nur abspielen (ohne die Playlist zu verändern)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..GrpBox_HeadsetDefaultAction..Hint
-#: OptionsComplete.dfm:3872
+#: OptionsComplete.dfm:3885
 msgid "Insert mode for files from the headset"
 msgstr "Einfüge-Modus für Dateien aus dem Kopfhörer"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_HeadsetBehaviour..cb_AutoStopHeadset..Caption
-#: OptionsComplete.dfm:3888
+#: OptionsComplete.dfm:3901
 msgid "Stop headset when switching to another tab"
 msgstr "Kopfhörer-Wiedergabe anhalten beim Wechseln in ein anderes Tab"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..Caption
-#: OptionsComplete.dfm:3898
+#: OptionsComplete.dfm:3911
 msgid "Deleting and mixing"
 msgstr "Löschen und Mischen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_AutoMixPlaylist..Hint
-#: OptionsComplete.dfm:3905
+#: OptionsComplete.dfm:3918
 msgid "Randomize playlist after the last track."
 msgstr "Nach dem letzten Stück Playlist neu mischen."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_AutoMixPlaylist..Caption
-#: OptionsComplete.dfm:3906
+#: OptionsComplete.dfm:3919
 msgid "Mix playlist after last track"
 msgstr "Nach dem letzten Stück Playlist neu mischen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_DisableAutoDeleteAtUserInput..Hint
-#: OptionsComplete.dfm:3914
+#: OptionsComplete.dfm:3927
 msgid "Exceptions for deleting a file from the playlist."
 msgstr "Ausnahmen für das automatische Entfernen von Dateien aus der Playlist."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_DisableAutoDeleteAtUserInput..Caption
-#: OptionsComplete.dfm:3915
+#: OptionsComplete.dfm:3928
 msgid "Do not delete after manual stop/pause/slide/next/previous"
 msgstr "Nicht löschen nach manuellem stopp/pause/spulen/vor/zurück"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_AutoDeleteFromPlaylist..Hint
-#: OptionsComplete.dfm:3923
+#: OptionsComplete.dfm:3936
 msgid "remove a track from the playlist after it is completely played."
 msgstr "Ein Lied aus der Playlist löschen, wenn es komplett abgespielt wurde."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBox_PlayerExt2_Playlist..CB_AutoDeleteFromPlaylist..Caption
-#: OptionsComplete.dfm:3924
+#: OptionsComplete.dfm:3937
 msgid "Delete completely played tracks from the playlist"
 msgstr "Vollständig abgespielte Titel aus der Playlist löschen"
 
+#. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBoX_LogPlaylist..Caption
+#: OptionsComplete.dfm:3947
+msgid "Playlist Log"
+msgstr "Playlist Log"
+
+#. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBoX_LogPlaylist..LblLogDuration..Caption
+#: OptionsComplete.dfm:3954
+msgid "Remove log entries older than"
+msgstr "Entferne Log-Einträge älter als"
+
+#. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBoX_LogPlaylist..LblLogDuration2..Caption
+#: OptionsComplete.dfm:3961
+msgid "days (0 for unlimited logging)."
+msgstr "Tage (0 für zeitlich unbegrenztes loggen)."
+
+#. OptionsCompleteForm..PageControl1..TabPlayer2..GrpBoX_LogPlaylist..cbSaveLogToFile..Caption
+#: OptionsComplete.dfm:3968
+msgid "Use logfile on hard disk to log previous sessions"
+msgstr "Logfile in eine Datei schreiben, um vorige Sitzungen zu speichern"
+
 #. OptionsCompleteForm..PageControl1..TabPlayer4..Caption
-#: OptionsComplete.dfm:3931
+#: OptionsComplete.dfm:3985
 msgid "Player (Streams)"
 msgstr "Player (Streams)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..Caption
-#: OptionsComplete.dfm:3942
+#: OptionsComplete.dfm:3996
 msgid "Recording settings"
 msgstr "Aufnahmeoptionen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_DownloadDir..Caption
-#: OptionsComplete.dfm:3952
+#: OptionsComplete.dfm:4006
 msgid "Download directory"
 msgstr "Download-Verzeichnis"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_FilenameFormat..Caption
-#: OptionsComplete.dfm:3959
+#: OptionsComplete.dfm:4013
 msgid "Pattern for filenames"
 msgstr "Schema für den Dateinamen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_FilenameExtension..Caption
-#: OptionsComplete.dfm:3966
+#: OptionsComplete.dfm:4020
 msgid "(A proper extension will be added automatically)"
 msgstr "(Eine passende Dateiendung wird automatisch hinzugefügt)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_MaxSize..Caption
-#: OptionsComplete.dfm:3973
+#: OptionsComplete.dfm:4027
 msgid "MB per file"
 msgstr "MB pro Datei"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_MaxTime..Caption
-#: OptionsComplete.dfm:3980
+#: OptionsComplete.dfm:4034
 msgid "Minutes per file"
 msgstr "Minuten pro Datei"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..LblConst_WebradioHint....Caption
-#: OptionsComplete.dfm:4003
+#: OptionsComplete.dfm:4057
 msgid "These values are approximate values. Resulting length/size may vary."
 msgstr ""
 "Diese Werte sind Schätzwerte und können von den realen leicht abweichen."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..BtnChooseDownloadDir..Hint
-#: OptionsComplete.dfm:4011
+#: OptionsComplete.dfm:4065
 msgid "Choose a download directory"
 msgstr "Download-Verzeichnis auswählen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitByTitle....Hint
-#: OptionsComplete.dfm:4024
+#: OptionsComplete.dfm:4078
 msgid ""
 "Try to split the stream when a new title begins. This will work only if the "
 "station submits proper title information."
@@ -6799,58 +6864,58 @@ msgstr ""
 "nur, wenn der Sender passende Informationen mitliefert."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitByTitle..Caption
-#: OptionsComplete.dfm:4025
+#: OptionsComplete.dfm:4079
 msgid "Begin new file for every title"
 msgstr "Neue Datei für jeden Titel beginnen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitByTime..Hint
-#: OptionsComplete.dfm:4035
+#: OptionsComplete.dfm:4089
 msgid "Split recordings by time."
 msgstr "Dateien nach Zeit aufteilen."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitByTime..Caption
-#: OptionsComplete.dfm:4036
+#: OptionsComplete.dfm:4090
 msgid "Split files by time"
 msgstr "Dateien nach Zeit aufteilen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitBySize..Hint
-#: OptionsComplete.dfm:4055
+#: OptionsComplete.dfm:4109
 msgid "Split recordings by size."
 msgstr "Dateien nach Größe aufteilen."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbAutoSplitBySize..Caption
-#: OptionsComplete.dfm:4056
+#: OptionsComplete.dfm:4110
 msgid "Split files by size"
 msgstr "Dateien nach Größe aufteilen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbFilenameFormat..Text
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbFilenameFormat....Items.Strings
-#: OptionsComplete.dfm:4084 OptionsComplete.dfm:4087
+#: OptionsComplete.dfm:4138 OptionsComplete.dfm:4141
 msgid "<date>, <time> - <title>"
 msgstr "<date>, <time> - <title>"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbFilenameFormat....Items.Strings
-#: OptionsComplete.dfm:4088
+#: OptionsComplete.dfm:4142
 msgid "<date>, <time> - <streamname> - <title>"
 msgstr "<date>, <time> - <streamname> - <title>"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbFilenameFormat....Items.Strings
-#: OptionsComplete.dfm:4089
+#: OptionsComplete.dfm:4143
 msgid "<title>"
 msgstr "<title>"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbFilenameFormat....Items.Strings
-#: OptionsComplete.dfm:4090
+#: OptionsComplete.dfm:4144
 msgid "<streamname> - <title>"
 msgstr "<streamname> - <title>"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..GrpBox_WebradioRecording..cbUseStreamnameAsDirectory..Caption
-#: OptionsComplete.dfm:4097
+#: OptionsComplete.dfm:4151
 msgid "Use streamname as directory"
 msgstr "Streamname als Verzeichnis verwenden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..RGroup_Playlist....Hint
-#: OptionsComplete.dfm:4109
+#: OptionsComplete.dfm:4163
 msgid ""
 "A webstream playlist can contain multiple streams (often just alternate "
 "URLs) - add all of them to the playlist or let Nemp decide which one to play?"
@@ -6860,172 +6925,172 @@ msgstr ""
 "abgespielt werden soll?"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..RGroup_Playlist..Caption
-#: OptionsComplete.dfm:4111
+#: OptionsComplete.dfm:4165
 msgid "Playlists (e.g. http://myradio.com/tunein.pls)"
 msgstr "Playlists (z.B. http://myradio.com/tunein.pls)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..RGroup_Playlist....Items.Strings
-#: OptionsComplete.dfm:4114
+#: OptionsComplete.dfm:4168
 msgid "Parse stream playlist and add all contained streams to playlist"
 msgstr "Stream-Playlist parsen und alle Sender in die Playlist einfügen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer4..RGroup_Playlist....Items.Strings
-#: OptionsComplete.dfm:4115
+#: OptionsComplete.dfm:4169
 msgid "Just add playlist URL to the playlist (recommended)"
 msgstr "Nur die Playlist-URL zur Playlist hinzufügen (empfohlen)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..Caption
-#: OptionsComplete.dfm:4120
+#: OptionsComplete.dfm:4174
 msgid "Player (Effects)"
 msgstr "Player (Effects)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_MickyMouse..Caption
-#: OptionsComplete.dfm:4131
+#: OptionsComplete.dfm:4185
 msgid "On changing speed (changes will take effect on next track)"
 msgstr "Änderung der Geschwindigkeit (erst beim nächsten Titel wirksam)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_MickyMouse....Items.Strings
-#: OptionsComplete.dfm:4134
+#: OptionsComplete.dfm:4188
 msgid "Keep pitch"
 msgstr "Tonhöhe beibehalten"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_MickyMouse....Items.Strings
-#: OptionsComplete.dfm:4135
+#: OptionsComplete.dfm:4189
 msgid "\"Micky Mouse effect\""
 msgstr "\"Micky Maus Effekt\""
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Effects..Caption
-#: OptionsComplete.dfm:4144
+#: OptionsComplete.dfm:4198
 msgid "Effects/Equalizer"
 msgstr "Effekte/Equalizer"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Effects..CB_UseDefaultEffects..Hint
-#: OptionsComplete.dfm:4151
+#: OptionsComplete.dfm:4205
 msgid "Disable effects when Nemp starts"
 msgstr "Beim Start von Nemp Effekte zurücksetzen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Effects..CB_UseDefaultEffects..Caption
-#: OptionsComplete.dfm:4152
+#: OptionsComplete.dfm:4206
 msgid "Reset effects on start"
 msgstr "Beim Start Effekte zurücksetzen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Effects..CB_UseDefaultEqualizer..Hint
-#: OptionsComplete.dfm:4162
+#: OptionsComplete.dfm:4216
 msgid "Disable equalizer when Nemp starts"
 msgstr "Beim Start von Nemp Equalizer zurücksetzen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Effects..CB_UseDefaultEqualizer..Caption
-#: OptionsComplete.dfm:4163
+#: OptionsComplete.dfm:4217
 msgid "Reset equalizer on start"
 msgstr "Beim Start Equalizer zurücksetzen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..Caption
-#: OptionsComplete.dfm:4173
+#: OptionsComplete.dfm:4227
 msgid "Jingles (playback via F9, Push-to-talk via F8 )"
 msgstr "Jingles (abspielen über F9, Push-To-Talk über F8)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..LblJingleReduce..Caption
-#: OptionsComplete.dfm:4180
+#: OptionsComplete.dfm:4234
 msgid "%"
 msgstr "%"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..LblConst_JingleVolume..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..LblConst_JingleVolumePercent..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..SEJingleVolume..Hint
-#: OptionsComplete.dfm:4187 OptionsComplete.dfm:4195 OptionsComplete.dfm:4224
+#: OptionsComplete.dfm:4241 OptionsComplete.dfm:4249 OptionsComplete.dfm:4278
 msgid "Volume of the jingle in relation to main volume."
 msgstr "Lautstärke der Jingles in Relation zur Hauptlautstärke."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..LblConst_JingleVolume..Caption
-#: OptionsComplete.dfm:4188
+#: OptionsComplete.dfm:4242
 msgid "Volume of jingles"
 msgstr "Lautstärke der Jingles"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..LblConst_JingleVolumePercent..Caption
-#: OptionsComplete.dfm:4196
+#: OptionsComplete.dfm:4250
 msgid "% of main volume"
 msgstr "% der Hauptlautstärke"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..CBJingleReduce..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..SEJingleReduce..Hint
-#: OptionsComplete.dfm:4203 OptionsComplete.dfm:4213
+#: OptionsComplete.dfm:4257 OptionsComplete.dfm:4267
 msgid "Reduce main volume before when playing a jingle"
 msgstr "Beim Abspielen eines Jingles die Hauptlautstärke reduzieren um"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GrpBox_Jingles..CBJingleReduce..Caption
-#: OptionsComplete.dfm:4204
+#: OptionsComplete.dfm:4258
 msgid "Reduce main volume to"
 msgstr "Lautstärke reduzieren auf"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GroupBox1..Caption
-#: OptionsComplete.dfm:4237
+#: OptionsComplete.dfm:4291
 msgid "\"Walkman\" mode"
 msgstr "\"Walkman\"-Modus"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GroupBox1..cb_UseWalkmanMode..Hint
-#: OptionsComplete.dfm:4244
+#: OptionsComplete.dfm:4298
 msgid "Just as those cassette players did before \"mp3\" was invented."
 msgstr ""
 "In etwa so wie die alten tragbaren Kassetten-Abspielgeräte, als es noch "
 "keine mp3-Player gab."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer5..GroupBox1..cb_UseWalkmanMode..Caption
-#: OptionsComplete.dfm:4245
+#: OptionsComplete.dfm:4299
 msgid "Flutter playback when battery is low"
 msgstr "Wiedergabe leiern bei schwachem Akku"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..Caption
-#: OptionsComplete.dfm:4251
+#: OptionsComplete.dfm:4305
 msgid "Player (Event)"
 msgstr "Player (Event)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..Caption
 #. ShutDownEditForm..Caption
-#: OptionsComplete.dfm:4262 ShutDownEdit.dfm:6
+#: OptionsComplete.dfm:4316 ShutDownEdit.dfm:6
 msgid "Countdown"
 msgstr "Countdown"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..lblCountDownTitel..Caption
-#: OptionsComplete.dfm:4272
+#: OptionsComplete.dfm:4326
 msgid "Countdown title"
 msgstr "Titel für Countdown"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..LBlCountDownWarning..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..LblEventWarning..Caption
 #. Programmer's name for it: Warning_FileNotFound
-#: OptionsComplete.dfm:4280 OptionsComplete.dfm:4363
+#: OptionsComplete.dfm:4334 OptionsComplete.dfm:4417
 #: Nemp_RessourceStrings.pas:110
 msgid "File not found"
 msgstr "Datei nicht gefunden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..CBStartCountDown..Hint
-#: OptionsComplete.dfm:4293
+#: OptionsComplete.dfm:4347
 msgid "Signalize birthday song with a countdown."
 msgstr "Spiele vor dem eigentlichen Geburtstagslied einen Countdown ab."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..CBStartCountDown..Caption
-#: OptionsComplete.dfm:4294
+#: OptionsComplete.dfm:4348
 msgid "Start a countdown before the actual time"
 msgstr "Vor dem Event einen Countdown starten"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..BtnGetCountDownTitel..Hint
-#: OptionsComplete.dfm:4314
+#: OptionsComplete.dfm:4368
 msgid "Use the current selected file in player as countdown."
 msgstr "Markiertes Stück im Hauptfenster für den Countdown verwenden."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Countdown..BtnGetCountDownTitel..Caption
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..BtnGetBirthdayTitel..Caption
-#: OptionsComplete.dfm:4315 OptionsComplete.dfm:4388
+#: OptionsComplete.dfm:4369 OptionsComplete.dfm:4442
 msgid "Use selected file in mainwindow"
 msgstr "Markiertes Stück im Hauptfenster verwenden"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..Caption
-#: OptionsComplete.dfm:4335
+#: OptionsComplete.dfm:4389
 msgid "Event"
 msgstr "Event"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..Lbl_Const_EventTime....Hint
-#: OptionsComplete.dfm:4347
+#: OptionsComplete.dfm:4401
 msgid ""
 "Time when the birthday song should be played. The optional countdown will "
 "end at this time."
@@ -7034,47 +7099,47 @@ msgstr ""
 "Countdown wird passend davor abgespielt."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..lblBirthdayTitel..Caption
-#: OptionsComplete.dfm:4355
+#: OptionsComplete.dfm:4409
 msgid "Birthday song"
 msgstr "Geburtstagslied"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..BtnGetBirthdayTitel..Hint
-#: OptionsComplete.dfm:4387
+#: OptionsComplete.dfm:4441
 msgid "Use the current selected file in player as birthday song."
 msgstr "Markiertes Stück im Hauptfenster als Geburtstagslied verwenden."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..CBContinueAfter..Hint
-#: OptionsComplete.dfm:4406
+#: OptionsComplete.dfm:4460
 msgid "Continue with the playlist after the birthday song."
 msgstr "Anschließend mit der Playlist fortfahren."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..CBContinueAfter..Caption
-#: OptionsComplete.dfm:4407
+#: OptionsComplete.dfm:4461
 msgid "Continue with the playlist after playing the birthday song"
 msgstr "Mit der Playlist nach dem Abspielen des Geburtstagsliedes fortfahren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..mskEdt_BirthdayTime..EditMask
-#: OptionsComplete.dfm:4415
+#: OptionsComplete.dfm:4469
 msgid "!90:00;1;_"
 msgstr "!90:00;1;_"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer6..GrpBox_TabAudio7_Event..mskEdt_BirthdayTime..Text
-#: OptionsComplete.dfm:4418
+#: OptionsComplete.dfm:4472
 msgid "  :  "
 msgstr " : "
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..Caption
-#: OptionsComplete.dfm:4424
+#: OptionsComplete.dfm:4478
 msgid "Player (Scrobble)"
 msgstr "Player (Scrobble)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_Scrobble..Caption
-#: OptionsComplete.dfm:4435
+#: OptionsComplete.dfm:4489
 msgid "LastFM-Scrobbler Setup"
 msgstr "LastFM Scrobbler Konfiguration"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_Scrobble..LblScrobble1....Caption
-#: OptionsComplete.dfm:4446
+#: OptionsComplete.dfm:4500
 msgid ""
 "Nemp can scrobble what you hear to your account on LastFM. To do this, Nemp "
 "needs your permission to access your account. Go online and click the button "
@@ -7085,47 +7150,47 @@ msgstr ""
 "Konfiguration durch Klick auf den Button."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_Scrobble..LblVisitLastFM..Caption
-#: OptionsComplete.dfm:4678
+#: OptionsComplete.dfm:4732
 msgid "For details visit"
 msgstr "Für Details besuchen Sie bitte"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_Scrobble..BtnScrobbleWizard..Caption
-#: OptionsComplete.dfm:4685
+#: OptionsComplete.dfm:4739
 msgid "Start"
 msgstr "Start"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleLog..Caption
-#: OptionsComplete.dfm:4696
+#: OptionsComplete.dfm:4750
 msgid "Scrobble Log (this session)"
 msgstr "Scrobbel-Log (diese Sitzung)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleLog..MemoScrobbleLog....Lines.Strings
-#: OptionsComplete.dfm:4708
+#: OptionsComplete.dfm:4762
 msgid "MemoScrobbleLog"
 msgstr "Scrobbler-Log"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..Caption
-#: OptionsComplete.dfm:4720
+#: OptionsComplete.dfm:4774
 msgid "Scrobble Settings"
 msgstr "Scrobbel Einstellungen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..Label5....Caption
-#: OptionsComplete.dfm:4729
+#: OptionsComplete.dfm:4783
 msgid "In case scrobbling was paused automatically and you fixed the reason: "
 msgstr "Falls das Scrobbeln mal gestoppt, aber der Fehler behoben wurde: "
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_AlwaysScrobble..Hint
-#: OptionsComplete.dfm:4736
+#: OptionsComplete.dfm:4790
 msgid "Always begin scrobbling when nemp starts."
 msgstr "Mit dem Scrobbeln beginnen, sobald Nemp startet."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_AlwaysScrobble..Caption
-#: OptionsComplete.dfm:4737
+#: OptionsComplete.dfm:4791
 msgid "Scrobble always"
 msgstr "Immer scrobbeln"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_SilentError....Hint
-#: OptionsComplete.dfm:4747
+#: OptionsComplete.dfm:4801
 msgid ""
 "Ignore hard failures like \"no internet connection\", \"invalid username/"
 "password\", ..."
@@ -7134,100 +7199,100 @@ msgstr ""
 "Nutzername/Passwort\", ..."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_SilentError....Caption
-#: OptionsComplete.dfm:4750
+#: OptionsComplete.dfm:4804
 msgid "Ignore hard failures - just stop scrobbling if something goes wrong"
 msgstr "Fehler ignorieren - einfach scrobbeln stoppen, wenn was schief läuft"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_ScrobbleThisSession..Hint
-#: OptionsComplete.dfm:4758
+#: OptionsComplete.dfm:4812
 msgid "Begin scrobbling now."
 msgstr "Jetzt mit dem Scrobbeln beginnen."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..CB_ScrobbleThisSession..Caption
-#: OptionsComplete.dfm:4759
+#: OptionsComplete.dfm:4813
 msgid "Scrobble this session"
 msgstr "Diese Sitzung scrobbeln"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..Btn_ScrobbleAgain..Hint
-#: OptionsComplete.dfm:4767
+#: OptionsComplete.dfm:4821
 msgid "Restart scrobbling."
 msgstr "Scrobbeln wieder starten."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer7..GrpBox_ScrobbleSettings..Btn_ScrobbleAgain..Caption
-#: OptionsComplete.dfm:4768
+#: OptionsComplete.dfm:4822
 msgid "Scrobble again!"
 msgstr "Wieder scrobbeln!"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..Caption
-#: OptionsComplete.dfm:4775
+#: OptionsComplete.dfm:4829
 msgid "Player (Webserver)"
 msgstr "Player (Webserver)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..Caption
-#: OptionsComplete.dfm:4786
+#: OptionsComplete.dfm:4840
 msgid "Configuration"
 msgstr "Konfiguration"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..LblWebServer_Port..Caption
-#: OptionsComplete.dfm:4793
+#: OptionsComplete.dfm:4847
 msgid "Port"
 msgstr "Port"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..LblWebServerTheme..Caption
-#: OptionsComplete.dfm:4800
+#: OptionsComplete.dfm:4854
 msgid "Theme"
 msgstr "Theme"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..Label7..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblConst_Username2..Hint
-#: OptionsComplete.dfm:4807 OptionsComplete.dfm:4975
+#: OptionsComplete.dfm:4861 OptionsComplete.dfm:5029
 msgid "Set username and password to access your library."
 msgstr "Username und Passwort für Zugriff auf die Medienbibliothek."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..Label7..Caption
-#: OptionsComplete.dfm:4808
+#: OptionsComplete.dfm:4862
 msgid "Username (Admin)"
 msgstr "Username (Admin)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..Label8..Hint
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblConst_Password2..Hint
-#: OptionsComplete.dfm:4815 OptionsComplete.dfm:4983
+#: OptionsComplete.dfm:4869 OptionsComplete.dfm:5037
 msgid "Set username and password to access your library"
 msgstr "Username und Passwort für Zugriff auf die Medienbibliothek"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..Label8..Caption
-#: OptionsComplete.dfm:4816
+#: OptionsComplete.dfm:4870
 msgid "Password (Admin)"
 msgstr "Passwort (Admin)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..LblWebserverAdminURL..Caption
-#: OptionsComplete.dfm:4824
+#: OptionsComplete.dfm:4878
 msgid "http://localhost/admin"
 msgstr "http://localhost/admin"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..BtnServerActivate..Caption
 #. Programmer's name for it: WebServer_ActivateServer
-#: OptionsComplete.dfm:4838 Nemp_RessourceStrings.pas:343
+#: OptionsComplete.dfm:4892 Nemp_RessourceStrings.pas:343
 msgid "Activate server"
 msgstr "Server aktivieren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..CBAutoStartWebServer..Hint
-#: OptionsComplete.dfm:4847
+#: OptionsComplete.dfm:4901
 msgid "Automatically activate the webserver when Nemp starts."
 msgstr "Den Nemp Webserver beim Start aktivieren."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..CBAutoStartWebServer..Caption
-#: OptionsComplete.dfm:4848
+#: OptionsComplete.dfm:4902
 msgid "Activate webserver on start"
 msgstr "Beim Start von Nemp den Webserver aktivieren"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxConfig..BtnShowWebserverLog..Caption
-#: OptionsComplete.dfm:4891
+#: OptionsComplete.dfm:4945
 msgid "Show Log"
 msgstr "Zeige Log"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP....Hint
-#: OptionsComplete.dfm:4903
+#: OptionsComplete.dfm:4957
 msgid ""
 "Your IP-configuration. Tell your friends these IPs to access your library."
 msgstr ""
@@ -7235,38 +7300,38 @@ msgstr ""
 "zugriff auf die Medienbibliothek."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..Caption
-#: OptionsComplete.dfm:4905
+#: OptionsComplete.dfm:4959
 msgid "Current IP-addresses"
 msgstr "Ihre IP-Adressen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..LblConst_IPWAN..Caption
-#: OptionsComplete.dfm:4913
+#: OptionsComplete.dfm:4967
 msgid "Your IP (Internet)"
 msgstr "Ihre IP (Internet)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..LabelLANIP..Caption
-#: OptionsComplete.dfm:4922
+#: OptionsComplete.dfm:4976
 msgid "Your IP (LAN)"
 msgstr "Ihre IP (LAN)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..BtnGetIPs....Hint
-#: OptionsComplete.dfm:4932
+#: OptionsComplete.dfm:4986
 msgid "Get your Internet-IP (done via a little php-script on www.gausi.de)."
 msgstr ""
 "Ihre Internet-IP ermitteln (über ein kleines PHP-Script auf www.gausi.de)."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..BtnGetIPs..Caption
-#: OptionsComplete.dfm:4933
+#: OptionsComplete.dfm:4987
 msgid "Get IP-address"
 msgstr "IP-Adresse ermitteln"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..cbLANIPs..Hint
-#: OptionsComplete.dfm:4942
+#: OptionsComplete.dfm:4996
 msgid "Your IP(s) inside the local area network (LAN)."
 msgstr "Ihre IP(s) innerhalb des lokalen Netzwerks (LAN)."
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..EdtGlobalIP....Hint
-#: OptionsComplete.dfm:4956
+#: OptionsComplete.dfm:5010
 msgid ""
 "Your IP \"in the internet\". You have to configure your router and/or "
 "firewall properly (e.g. forwarding Port80 to your machine) "
@@ -7276,38 +7341,38 @@ msgstr ""
 "weiterleiten). "
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxIP..EdtGlobalIP..Text
-#: OptionsComplete.dfm:4959
+#: OptionsComplete.dfm:5013
 msgid "?"
 msgstr "?"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..Caption
-#: OptionsComplete.dfm:4968
+#: OptionsComplete.dfm:5022
 msgid "User rights"
 msgstr "User Berechtigungen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblConst_Username2..Caption
-#: OptionsComplete.dfm:4976
+#: OptionsComplete.dfm:5030
 msgid "Username"
 msgstr "Username"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..LblWebserverUserURL..Caption
-#: OptionsComplete.dfm:4992
+#: OptionsComplete.dfm:5046
 msgid "http://localhost"
 msgstr "http://localhost"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbAllowRemoteControl..Hint
-#: OptionsComplete.dfm:5006
+#: OptionsComplete.dfm:5060
 msgid "Let the user control the player (play/stop/next/volume/...)"
 msgstr ""
 "Dem User die Steuerung des Players erlauben (Play/Pause/Stop/Vor/Zurück/...)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbAllowRemoteControl..Caption
-#: OptionsComplete.dfm:5007
+#: OptionsComplete.dfm:5061
 msgid "Permit remote control of the player"
 msgstr "Fernsteuerung des Players erlauben"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitVote....Hint
-#: OptionsComplete.dfm:5018
+#: OptionsComplete.dfm:5072
 msgid ""
 "Let the user vote for files - files with many votes will be played first"
 msgstr ""
@@ -7315,49 +7380,49 @@ msgstr ""
 "zuerst abgespielt"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitVote..Caption
-#: OptionsComplete.dfm:5019
+#: OptionsComplete.dfm:5073
 msgid "Permit voting for files"
 msgstr "Erlaube \"voten\" für Dateien"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitLibraryAccess..Hint
-#: OptionsComplete.dfm:5028
+#: OptionsComplete.dfm:5082
 msgid "Let the user search and browse in your library"
 msgstr "Den User in der Medienbibliothek stöbern und suchen lassen"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitLibraryAccess..Caption
-#: OptionsComplete.dfm:5029
+#: OptionsComplete.dfm:5083
 msgid "Permit access to the media library (read only)"
 msgstr "Zugriff auf die Medienbibliothek erlauben (nur lesend)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitPlaylistDownload..Hint
-#: OptionsComplete.dfm:5038
+#: OptionsComplete.dfm:5092
 msgid "Let the user download files from your playlist and/or library"
 msgstr "Herunterladen von Dateien aus der Playlist erlauben (oder eben nicht)"
 
 #. OptionsCompleteForm..PageControl1..TabPlayer8..GrpBoxWebserverUserRights..cbPermitPlaylistDownload..Caption
-#: OptionsComplete.dfm:5039
+#: OptionsComplete.dfm:5093
 msgid "Permit downloading files from the playlist"
 msgstr "Herunterladen von Dateien aus der Playlist erlauben"
 
 #. OptionsCompleteForm.._XXX_cb_SettingsMode..Text
 #. OptionsCompleteForm.._XXX_cb_SettingsMode....Items.Strings
-#: OptionsComplete.dfm:5103 OptionsComplete.dfm:5107
+#: OptionsComplete.dfm:5157 OptionsComplete.dfm:5161
 msgid "Commonly used settings"
 msgstr "Häufig genutzte Einstellungen"
 
 #. OptionsCompleteForm.._XXX_cb_SettingsMode....Items.Strings
-#: OptionsComplete.dfm:5108
+#: OptionsComplete.dfm:5162
 msgid "All settings"
 msgstr "Alle Einstellungen"
 
 #. OptionsCompleteForm..OpenDlg_SoundFont..Filter
-#: OptionsComplete.dfm:5136
+#: OptionsComplete.dfm:5190
 msgid "Soundfonts (sf2/sf2pack)|*.sf2;*.sf2pack|All files|*.*"
 msgstr "Soundfonts (sf2/sf2pack)|*.sf2;*.sf2pack|Alle Dateien|*.*"
 
 #. PasswordDlg..Caption
 #. Programmer's name for it: ParrtyMode_Password_Caption
-#: PartymodePassword.dfm:5 Nemp_RessourceStrings.pas:844
+#: PartymodePassword.dfm:5 Nemp_RessourceStrings.pas:851
 msgid "Nemp Party-Mode"
 msgstr "Nemp: Party-Modus"
 
@@ -7370,6 +7435,27 @@ msgstr "Passwort zum Beenden des Party-Modus"
 #: PartymodePassword.dfm:28
 msgid "*"
 msgstr "*"
+
+#. PlayerLogForm..Caption
+#: PlayerLog.dfm:4
+msgid "Nemp: Player logfile"
+msgstr "Nemp: Player Logfile"
+
+#. PlayerLogForm..vstPlayerLog......WideText
+#: PlayerLog.dfm:91
+msgid "Remark"
+msgstr "Bemerkung"
+
+#. PlayerLogForm..cbSessionSelect..Text
+#. PlayerLogForm..cbSessionSelect....Items.Strings
+#: PlayerLog.dfm:103 PlayerLog.dfm:106
+msgid "Current session"
+msgstr "Aktuelle Sitzung"
+
+#. PlayerLogForm..cbSessionSelect....Items.Strings
+#: PlayerLog.dfm:107
+msgid "Previous sessions (from logfile)"
+msgstr "Vorige Sitzungen (aus Logdatei)"
 
 #. PlaylistCopyForm..Caption
 #: PlaylistToUSB.dfm:5
@@ -7465,7 +7551,7 @@ msgstr "Status"
 
 #. PlaylistCopyForm..GrpboxStatus..LblProgressFile..Caption
 #. Programmer's name for it: CopyToUSB_Idle
-#: PlaylistToUSB.dfm:154 Nemp_RessourceStrings.pas:860
+#: PlaylistToUSB.dfm:154 Nemp_RessourceStrings.pas:867
 msgid "Idle"
 msgstr "Bereit"
 
@@ -7675,7 +7761,7 @@ msgstr "www.Icecast.org"
 #. FormStreamVerwaltung..PC_Streams..Tab_Shoutcast..VST_ShoutcastQuery......WideText
 #. Programmer's name for it: AudioFileProperty_Name
 #: StreamVerwaltung.dfm:112 StreamVerwaltung.dfm:176 StreamVerwaltung.dfm:261
-#: Nemp_RessourceStrings.pas:748
+#: Nemp_RessourceStrings.pas:755
 msgid "Name"
 msgstr "Name"
 
@@ -7684,7 +7770,7 @@ msgstr "Name"
 #. Programmer's name for it: DetailForm_InfoLblWebStream
 #. Programmer's name for it: AudioFileProperty_URL
 #: StreamVerwaltung.dfm:127 StreamVerwaltung.dfm:179
-#: Nemp_RessourceStrings.pas:89 Nemp_RessourceStrings.pas:749
+#: Nemp_RessourceStrings.pas:89 Nemp_RessourceStrings.pas:756
 msgid "URL"
 msgstr "URL"
 
@@ -8205,7 +8291,7 @@ msgstr "Einige Angaben könnten veraltet oder falsch sein."
 
 #. Programmer's name for it: DetailForm_PlayCounter
 #. Programmer's name for it: Audiofile_PlayCounterHint
-#: Nemp_RessourceStrings.pas:93 Nemp_RessourceStrings.pas:767
+#: Nemp_RessourceStrings.pas:93 Nemp_RessourceStrings.pas:774
 msgid "Played %d times"
 msgstr "%d mal abgespielt"
 
@@ -8483,7 +8569,7 @@ msgstr "Datei konnte nicht geöffnet werden"
 
 #. Programmer's name for it: BASS_ERRORSTR_FILEFORM
 #. Programmer's name for it: Shoutcast_UnknownFormat
-#: Nemp_RessourceStrings.pas:175 Nemp_RessourceStrings.pas:789
+#: Nemp_RessourceStrings.pas:175 Nemp_RessourceStrings.pas:796
 msgid "Unknown format"
 msgstr "Unbekanntes Format"
 
@@ -8978,7 +9064,7 @@ msgstr "(Benutzerdefiniert)"
 
 #. Programmer's name for it: Infostring_Webstream
 #. Programmer's name for it: AudioFileProperty_Webstream
-#: Nemp_RessourceStrings.pas:305 Nemp_RessourceStrings.pas:747
+#: Nemp_RessourceStrings.pas:305 Nemp_RessourceStrings.pas:754
 msgid "Webstream"
 msgstr "Webradio"
 
@@ -9041,7 +9127,7 @@ msgstr "Fehlgeschlagen."
 
 #. Programmer's name for it: WebServer_GettingIP
 #. Programmer's name for it: Shoutcast_Connecting_MainForm
-#: Nemp_RessourceStrings.pas:347 Nemp_RessourceStrings.pas:781
+#: Nemp_RessourceStrings.pas:347 Nemp_RessourceStrings.pas:788
 msgid "Connecting..."
 msgstr "Verbinde..."
 
@@ -9584,7 +9670,7 @@ msgstr "Warnung: Der Tag \"%s\" ist bereits auf der \"Ignorieren-Liste\"."
 
 #. Programmer's name for it: TagManagementDialog_Caption
 #. Programmer's name for it: AutoScanDirsDialog_Caption
-#: Nemp_RessourceStrings.pas:496 Nemp_RessourceStrings.pas:772
+#: Nemp_RessourceStrings.pas:496 Nemp_RessourceStrings.pas:779
 msgid "Confirmation"
 msgstr "Bestätigung"
 
@@ -9605,7 +9691,7 @@ msgstr ""
 
 #. Programmer's name for it: TagManagementDialog_ShowAgain
 #. Programmer's name for it: AutoScanDirsDialog_ShowAgain
-#: Nemp_RessourceStrings.pas:501 Nemp_RessourceStrings.pas:776
+#: Nemp_RessourceStrings.pas:501 Nemp_RessourceStrings.pas:783
 msgid "Save selection and do not show this dialog again."
 msgstr "Auswahl speichern und diesen Dialog nicht wieder anzeigen."
 
@@ -10455,18 +10541,58 @@ msgstr "Füge Playlist zur Medienbibliothek hinzu..."
 msgid "CSV files"
 msgstr "CSV-Dateien"
 
-#. Programmer's name for it: Playlist_QueryReallyDelete
+#. Programmer's name for it: MediaLibrary_OutOfMemoryAccelerateSearchReduced
+#: Nemp_RessourceStrings.pas:734
+msgid ""
+"Not enough memory. The settings for the accelerated search have been reduced "
+"to a minimum."
+msgstr ""
+"Nicht genug Arbeitsspeicher. Die Einstellungen für die beschleunigte Suche "
+"wurde auf ein Minimum reduziert."
+
+#. Programmer's name for it: MediaLibrary_OutOfMemoryAccelerateSearchDisabled
 #: Nemp_RessourceStrings.pas:735
+msgid "Not enough memory. Accelerated search has been disabled."
+msgstr ""
+"Nicht genug Arbeitsspeicher. Die beschleunigte Suche wurde deaktiviert."
+
+#. Programmer's name for it: MediaLibrary_OutOfMemoryAccelerateLyricSearchDisabled
+#: Nemp_RessourceStrings.pas:736
+msgid "Not enough memory. The accelerated search for lyrics has been disabled."
+msgstr ""
+"Nicht genug Arbeitsspeicher. Die beschleunigte Suche nach Lyrics wurde "
+"deaktiviert."
+
+#. Programmer's name for it: MediaLibrary_OutOfMemoryBuildingStringError
+#: Nemp_RessourceStrings.pas:737
+msgid ""
+"An error occurred while preparing the accelerated search. That was never "
+"supposed to happen."
+msgstr ""
+"Beim Vorbereiten der beschleunigten Suche ist ein Fehler aufgetreten. Das "
+"sollte eigentlich nicht passieren."
+
+#. Programmer's name for it: MediaLibrary_OutOfMemoryBuildingLyricStringError
+#: Nemp_RessourceStrings.pas:738
+msgid ""
+"An error occurred while preparing the accelerated search for lyrics. That "
+"was never supposed to happen."
+msgstr ""
+"Beim Vorbereiten der beschleunigten Suche für Liedtexte ist ein Fehler "
+"aufgetreten. Das sollte eigentlich nicht passieren."
+
+#. Programmer's name for it: Playlist_QueryReallyDelete
+#: Nemp_RessourceStrings.pas:742
 msgid "This will delete your current playlist. Continue?"
 msgstr "Das wird ihre aktuelle Playlist löschen. Fortfahren?"
 
 #. Programmer's name for it: Playlist_NotEverything
-#: Nemp_RessourceStrings.pas:736
+#: Nemp_RessourceStrings.pas:743
 msgid "No. Nemp will not add _everything_ to the playlist."
 msgstr "Nein. Nemp wird nicht _alles_ in die Playlist packen."
 
 #. Programmer's name for it: Playlist_FileNotFound
-#: Nemp_RessourceStrings.pas:737
+#: Nemp_RessourceStrings.pas:744
 msgid ""
 "The specified file can not be found. Do you want to delete it from the list?"
 msgstr ""
@@ -10474,12 +10600,12 @@ msgstr ""
 "der Liste entfernen?"
 
 #. Programmer's name for it: Playlist_NoRecentlists
-#: Nemp_RessourceStrings.pas:738
+#: Nemp_RessourceStrings.pas:745
 msgid "empty"
 msgstr "leer"
 
 #. Programmer's name for it: Player_FilenameWebradioTooLong
-#: Nemp_RessourceStrings.pas:742
+#: Nemp_RessourceStrings.pas:749
 msgid ""
 "The filename for this stream is to long and automatic abbreviation failed.\n"
 "Please change the directory for webradio downloads."
@@ -10489,7 +10615,7 @@ msgstr ""
 "Bitte ändern Sie das Verzeichnis für Webradio-Aufnahmen."
 
 #. Programmer's name for it: Player_NoReversePossible
-#: Nemp_RessourceStrings.pas:743
+#: Nemp_RessourceStrings.pas:750
 msgid ""
 "It seems that you deleted the playing file from the playlist. Therefore this "
 "function cannot be executed."
@@ -10498,23 +10624,23 @@ msgstr ""
 "diese Funktion jetzt nicht ausgeführt werden."
 
 #. Programmer's name for it: AudioFileProperty_CbrVbr
-#: Nemp_RessourceStrings.pas:758
+#: Nemp_RessourceStrings.pas:765
 msgid "cbr/vbr"
 msgstr "cbr/vbr"
 
 #. Programmer's name for it: AudioFileProperty_ChannelMode
-#: Nemp_RessourceStrings.pas:759
+#: Nemp_RessourceStrings.pas:766
 msgid "Channelmode"
 msgstr "Channelmode"
 
 #. Audiofile_RatingHintNoRating  = 'Rating: N/A';
 #. Programmer's name for it: Audiofile_RatingHint
-#: Nemp_RessourceStrings.pas:769
+#: Nemp_RessourceStrings.pas:776
 msgid "Rating: %s of 5 stars"
 msgstr "Bewertung: %s von 5 Sternchen"
 
 #. Programmer's name for it: AutoScanDirsDialog_Text
-#: Nemp_RessourceStrings.pas:774
+#: Nemp_RessourceStrings.pas:781
 msgid ""
 "Do you want Nemp to monitor this directoy?\n"
 "\n"
@@ -10528,13 +10654,13 @@ msgstr ""
 "bearbeiten."
 
 #. Programmer's name for it: Shoutcast_Error_ConnectionFailed
-#: Nemp_RessourceStrings.pas:778
+#: Nemp_RessourceStrings.pas:785
 msgid "Connection failed. Please check your internet configuration."
 msgstr ""
 "Verbindung fehlgeschlagen. Bitte überprüfen Sie ihre Internetverbindung."
 
 #. Programmer's name for it: Shoutcast_Error_DownloadFailed
-#: Nemp_RessourceStrings.pas:779
+#: Nemp_RessourceStrings.pas:786
 msgid ""
 "Download failed. If the stream is available in other players, disable the "
 "parsing of the playlist in the settings dialog and try again."
@@ -10544,71 +10670,71 @@ msgstr ""
 "versuchen Sie es erneut."
 
 #. Programmer's name for it: Shoutcast_Connecting
-#: Nemp_RessourceStrings.pas:780
+#: Nemp_RessourceStrings.pas:787
 msgid "Connecting to shoutcast.com ..."
 msgstr "Verbinde mit shoutcast.com ..."
 
 #. Programmer's name for it: Shoutcast_Downloading
-#: Nemp_RessourceStrings.pas:782
+#: Nemp_RessourceStrings.pas:789
 msgid "Downloading stationlist..."
 msgstr "Herunterladen der Stationsliste..."
 
 #. Programmer's name for it: Shoutcast_ParsingXMLData
-#: Nemp_RessourceStrings.pas:783
+#: Nemp_RessourceStrings.pas:790
 msgid "Download complete. Parsing XML-Data..."
 msgstr "Download beendet. Parse XML-Daten..."
 
 #. Programmer's name for it: Shoutcast_DownloadingPlaylist
-#: Nemp_RessourceStrings.pas:784
+#: Nemp_RessourceStrings.pas:791
 msgid "Downloading playlist..."
 msgstr "Herunterladen der Wiedergabeliste..."
 
 #. Programmer's name for it: Shoutcast_DownloadComplete
-#: Nemp_RessourceStrings.pas:785
+#: Nemp_RessourceStrings.pas:792
 msgid "Download complete."
 msgstr "Download komplett."
 
 #. Programmer's name for it: Shoutcast_MainForm_BibError
-#: Nemp_RessourceStrings.pas:788
+#: Nemp_RessourceStrings.pas:795
 msgid "Cannot find station data. This should not happen."
 msgstr "Kann Stationsdaten nicht finden. Das sollte nicht passieren."
 
 #. Programmer's name for it: Shoutcast_InputStreamCaption
-#: Nemp_RessourceStrings.pas:791
+#: Nemp_RessourceStrings.pas:798
 msgid "Nemp: Play Webstream"
 msgstr "Nemp: Webradio abspielen"
 
 #. Programmer's name for it: TabBtnBrowse_Hint2
-#: Nemp_RessourceStrings.pas:795
+#: Nemp_RessourceStrings.pas:802
 msgid "Click to resort"
 msgstr "Klicken zum neu sortieren"
 
 #. Programmer's name for it: TabBtnTagCloud_Hint2
-#: Nemp_RessourceStrings.pas:798
+#: Nemp_RessourceStrings.pas:805
 msgid "Click to rebuild"
 msgstr "Klicken zum Neuaufbau"
 
 #. Programmer's name for it: TagEditor_RenameTagQueryLabel
-#: Nemp_RessourceStrings.pas:803
+#: Nemp_RessourceStrings.pas:810
 msgid "Rename the selected tags to:"
 msgstr "Die markierten Tags ändern zu:"
 
 #. Programmer's name for it: TagEditor_SelectTagRenameHint
-#: Nemp_RessourceStrings.pas:804
+#: Nemp_RessourceStrings.pas:811
 msgid "Please select the tag you want to rename in the list."
 msgstr ""
 "Bitte wählen Sie einen Tag aus, den sie zur Liste der zu ändernden Tags "
 "hinzufügen wollen."
 
 #. Programmer's name for it: TagEditor_SelectTagRemoveHint
-#: Nemp_RessourceStrings.pas:805
+#: Nemp_RessourceStrings.pas:812
 msgid "Please select the tag you want to ignore in the list."
 msgstr ""
 "Bitte wählen Sie einen Tag aus, den sie zur Liste der zu ignorierenden Tags "
 "hinzufügen wollen."
 
 #. Programmer's name for it: TagEditor_LabelExplainTagList
-#: Nemp_RessourceStrings.pas:808
+#: Nemp_RessourceStrings.pas:815
 msgid ""
 "A list of all tags in the media library. Changes will affect each audio "
 "file, which is marked with the selected tags. \n"
@@ -10623,7 +10749,7 @@ msgstr ""
 "Dateien und verhindern, dass sie später wieder eingefügt werden. "
 
 #. Programmer's name for it: TagEditor_LabelExplainRenameList
-#: Nemp_RessourceStrings.pas:811
+#: Nemp_RessourceStrings.pas:818
 msgid ""
 "A list of all \"Rename rules\". \n"
 "\n"
@@ -10645,7 +10771,7 @@ msgstr ""
 "verwenden Sie bitte die erste Seite in diesem Dialog."
 
 #. Programmer's name for it: TagEditor_LabelExplainIgnoreList
-#: Nemp_RessourceStrings.pas:815
+#: Nemp_RessourceStrings.pas:822
 msgid ""
 "A list of all \"Ignore rules\". \n"
 "\n"
@@ -10666,7 +10792,7 @@ msgstr ""
 "verwenden Sie bitte die erste Seite in diesem Dialog."
 
 #. Programmer's name for it: TagEditor_Delete_Query
-#: Nemp_RessourceStrings.pas:822
+#: Nemp_RessourceStrings.pas:829
 msgid ""
 "This will remove the selected tags from all files in the media library.\n"
 "\n"
@@ -10678,7 +10804,7 @@ msgstr ""
 "Wollen Sie fortfahren?"
 
 #. Programmer's name for it: TagEditor_AddIgnoreRule_Query
-#: Nemp_RessourceStrings.pas:825
+#: Nemp_RessourceStrings.pas:832
 msgid ""
 "This will add an \"Ignore rule\" for the selected tags and remove them from "
 "all files in the media library.\n"
@@ -10691,28 +10817,28 @@ msgstr ""
 "Wollen Sie fortfahren?"
 
 #. Programmer's name for it: TagEditor_FilesNeedUpdate
-#: Nemp_RessourceStrings.pas:828
+#: Nemp_RessourceStrings.pas:835
 msgid "The ID3-Tags of %d files should be updated."
 msgstr "Die ID3-Tags von %d Dateien sollten aktualisiert werden."
 
 #. Programmer's name for it: TagEditor_FilesUpdateComplete
-#: Nemp_RessourceStrings.pas:830
+#: Nemp_RessourceStrings.pas:837
 msgid "The ID3-Tags have been updated."
 msgstr "Die ID3-Tags wurden aktualisiert."
 
 #. Programmer's name for it: Tags_AddTags
-#: Nemp_RessourceStrings.pas:832
+#: Nemp_RessourceStrings.pas:839
 msgid "No additional Tags set. Click here to add some."
 msgstr "Keine weiteren Tags gesetzt. Hier klicken, um welche hinzuzufügen."
 
 #. Programmer's name for it: Tags_NoTagsAccessDenied
-#: Nemp_RessourceStrings.pas:833
+#: Nemp_RessourceStrings.pas:840
 msgid "No additional Tags set."
 msgstr "Keine zusätzlichen Tags gesetzt."
 
 #. Tags_AddTagsNotPossible = 'No additional Tags set. (Only available for *.mp3, *.ogg and *.flac-files.)';
 #. Programmer's name for it: Tags_CommasFound
-#: Nemp_RessourceStrings.pas:835
+#: Nemp_RessourceStrings.pas:842
 msgid ""
 "It looks like you entered a comma-separated list of tags. However, tags "
 "should be entered line by line here. Do you want Nemp to treat your input as "
@@ -10723,22 +10849,22 @@ msgstr ""
 "Nemp Ihre Eingabe dahingehend korrigieren?"
 
 #. Programmer's name for it: MenuItem_Partymode
-#: Nemp_RessourceStrings.pas:837
+#: Nemp_RessourceStrings.pas:844
 msgid "Activate Party-Mode"
 msgstr "Aktiviere Party-Modus"
 
 #. Programmer's name for it: MenuItem_PartymodeExit
-#: Nemp_RessourceStrings.pas:838
+#: Nemp_RessourceStrings.pas:845
 msgid "Exit Party-Mode"
 msgstr "Party-Modus beenden"
 
 #. Programmer's name for it: MenuItem_Deactivate
-#: Nemp_RessourceStrings.pas:841
+#: Nemp_RessourceStrings.pas:848
 msgid "Deactivate"
 msgstr "Deaktivieren"
 
 #. Programmer's name for it: ParrtyMode_WrongPassword
-#: Nemp_RessourceStrings.pas:843
+#: Nemp_RessourceStrings.pas:850
 msgid ""
 "Invalid password. Try again if you should know it. Or go back to the party "
 "and have some fun."
@@ -10747,63 +10873,63 @@ msgstr ""
 "Oder gehen Sie einfach zurück auf die Party und haben etwas Spaß."
 
 #. Programmer's name for it: ParrtyMode_Password_Prompt
-#: Nemp_RessourceStrings.pas:845
+#: Nemp_RessourceStrings.pas:852
 msgid "Please enter the password to exit the Nemp Party-Mode"
 msgstr "Passwort zum Beenden des Party-Modus"
 
 #. Programmer's name for it: ParrtyMode_Password_PromptOnActivate
-#: Nemp_RessourceStrings.pas:846
+#: Nemp_RessourceStrings.pas:853
 msgid "Note: The password to exit the Nemp Party-Mode is \"%s\"."
 msgstr ""
 "Hinweis: Dass Passwort zum Beenden des Nemp Party-Modus lautet: \"%s\"."
 
 #. Programmer's name for it: HeadSetLabel_Default1
-#: Nemp_RessourceStrings.pas:849
+#: Nemp_RessourceStrings.pas:856
 msgid "Headphones (no title loaded)"
 msgstr "Kopfhörer (kein Titel geladen)"
 
 #. Programmer's name for it: HeadSetLabel_Default2
-#: Nemp_RessourceStrings.pas:850
+#: Nemp_RessourceStrings.pas:857
 msgid "(no title loaded)"
 msgstr "(kein Titel geladen)"
 
 #. Programmer's name for it: PlayerBtn_Play
-#: Nemp_RessourceStrings.pas:853
+#: Nemp_RessourceStrings.pas:860
 msgid "Play"
 msgstr "Play"
 
 #. Programmer's name for it: CopyToUSB_Abort
-#: Nemp_RessourceStrings.pas:856
+#: Nemp_RessourceStrings.pas:863
 msgid "Abort"
 msgstr "Abbrechen"
 
 #. Programmer's name for it: CopyToUSB_FileProgress
-#: Nemp_RessourceStrings.pas:857
+#: Nemp_RessourceStrings.pas:864
 msgid "Copying file %s"
 msgstr "Kopiere Datei %s"
 
 #. Programmer's name for it: CopyToUSB_Complete
-#: Nemp_RessourceStrings.pas:858
+#: Nemp_RessourceStrings.pas:865
 msgid "Completed"
 msgstr "Vorgang abgeschlossen"
 
 #. Programmer's name for it: CopyToUSB_Aborted
-#: Nemp_RessourceStrings.pas:859
+#: Nemp_RessourceStrings.pas:866
 msgid "Aborted by user"
 msgstr "Abbruch durch den Nutzer"
 
 #. Programmer's name for it: CopyToUSB_AbortQuery
-#: Nemp_RessourceStrings.pas:861
+#: Nemp_RessourceStrings.pas:868
 msgid "Copying in progress. Do you want to cancel the copy process?"
 msgstr "Kopiervorgang läuft. Wollen Sie den Vorgang abbrechen?"
 
 #. Programmer's name for it: CopyToUSB_SavingPlaylistFailed
-#: Nemp_RessourceStrings.pas:862
+#: Nemp_RessourceStrings.pas:869
 msgid "Could not save the playlist: %s"
 msgstr "Playlist-Datei konnte nicht gespeichert werden: %s"
 
 #. Programmer's name for it: CopyToUSB_ChooseDestination
-#: Nemp_RessourceStrings.pas:863
+#: Nemp_RessourceStrings.pas:870
 msgid ""
 "You have to choose a destination directory where the playlist should be "
 "copied to."
@@ -10812,12 +10938,12 @@ msgstr ""
 "werden soll."
 
 #. Programmer's name for it: CopyToUSB_DestinationDirDoesNotexist
-#: Nemp_RessourceStrings.pas:864
+#: Nemp_RessourceStrings.pas:871
 msgid "The destination directory does not exist. Do you want to create it?"
 msgstr "Das Zielverzeichnis existiert nicht. Wollen Sie es erstellen?"
 
 #. Programmer's name for it: CopyToUSB_DestinationDirCreateFailed
-#: Nemp_RessourceStrings.pas:865
+#: Nemp_RessourceStrings.pas:872
 msgid ""
 "The specified destination directory could not be created. Please verify that "
 "the directory name is valid."
@@ -10826,7 +10952,7 @@ msgstr ""
 "Verzeichnisname gültig ist."
 
 #. Programmer's name for it: CopyToUSB_ERROR_UNKOWN
-#: Nemp_RessourceStrings.pas:868
+#: Nemp_RessourceStrings.pas:875
 msgid ""
 "Copying file failed for an unknown reason (Errorcode: %d). Choose OK to "
 "continue with next file, or cancel the copying process."
@@ -10836,7 +10962,7 @@ msgstr ""
 "den Vorgang ab."
 
 #. Programmer's name for it: CopyToUSB_ERROR_FILE_NOT_FOUND
-#: Nemp_RessourceStrings.pas:870
+#: Nemp_RessourceStrings.pas:877
 msgid ""
 "The current file can not be found. Choose OK to continue with next file, or "
 "cancel the copying process."
@@ -10845,7 +10971,7 @@ msgstr ""
 "nächsten Datei fortzufahren, oder brechen Sie den Vorgang ab."
 
 #. Programmer's name for it: CopyToUSB_ERROR_PATH_NOT_FOUND
-#: Nemp_RessourceStrings.pas:871
+#: Nemp_RessourceStrings.pas:878
 msgid ""
 "The destination path can not be found. Choose OK to continue with next file, "
 "or cancel the copying process."
@@ -10854,7 +10980,7 @@ msgstr ""
 "nächsten Datei fortzufahren, oder brechen Sie den Vorgang ab."
 
 #. Programmer's name for it: CopyToUSB_ERROR_TOO_MANY_OPEN_FILES
-#: Nemp_RessourceStrings.pas:872
+#: Nemp_RessourceStrings.pas:879
 msgid ""
 "Too many open files. Choose OK to continue with next file, or cancel the "
 "copying process."
@@ -10863,7 +10989,7 @@ msgstr ""
 "fortzufahren, oder brechen Sie den Vorgang ab."
 
 #. Programmer's name for it: CopyToUSB_ERROR_ACCESS_DENIED
-#: Nemp_RessourceStrings.pas:873
+#: Nemp_RessourceStrings.pas:880
 msgid ""
 "Access denied. Choose OK to continue with next file, or cancel the copying "
 "process."
@@ -10872,7 +10998,7 @@ msgstr ""
 "oder brechen Sie den Vorgang ab."
 
 #. Programmer's name for it: CopyToUSB_ERROR_NOT_ENOUGH_MEMORY
-#: Nemp_RessourceStrings.pas:874
+#: Nemp_RessourceStrings.pas:881
 msgid ""
 "Not enough memory. Choose OK to continue with next file, or cancel the "
 "copying process."
@@ -10881,20 +11007,20 @@ msgstr ""
 "fortzufahren, oder brechen Sie den Vorgang ab."
 
 #. Programmer's name for it: WizardCancel
-#: Nemp_RessourceStrings.pas:876
+#: Nemp_RessourceStrings.pas:883
 msgid "You cancelled the Nemp Wizard. Some features may be disabled."
 msgstr ""
 "Sie haben den Nemp Wizard abgebrochen. Einige Features sind möglicherweise "
 "deaktiviert."
 
 #. Programmer's name for it: Wizard_NewSkin
-#: Nemp_RessourceStrings.pas:878
+#: Nemp_RessourceStrings.pas:885
 msgid "Nemp 4.6 comes with a new default skin. Do you want to use the new one?"
 msgstr ""
 "Nemp 4.6 verwendet einen neuen Standard-Skin. Wollen Sie den neuen verwenden?"
 
 #. Programmer's name for it: StartG15ToolQuestion
-#: Nemp_RessourceStrings.pas:886
+#: Nemp_RessourceStrings.pas:893
 msgid ""
 "If you have a Logitech G15 keyboard, Nemp can display the current title (and "
 "some other stuff) on it.\n"
@@ -10916,17 +11042,17 @@ msgstr ""
 "Also, wollen Sie jetzt die G15-App starten?"
 
 #. Programmer's name for it: StartG15AppNotFound
-#: Nemp_RessourceStrings.pas:887
+#: Nemp_RessourceStrings.pas:894
 msgid "The app for the keyboard display could not be found"
 msgstr "Die App für das Tastatur-Display konnte nicht gefunden werden"
 
 #. Programmer's name for it: CDDA_NoDrivesFound
-#: Nemp_RessourceStrings.pas:889
+#: Nemp_RessourceStrings.pas:896
 msgid "No CD drives found."
 msgstr "Keine CD-Laufwerke gefunden."
 
 #. Programmer's name for it: CDDA_NoHeadsetPossible
-#: Nemp_RessourceStrings.pas:890
+#: Nemp_RessourceStrings.pas:897
 msgid ""
 "Nemp is currently playing a track from this CD. Playing another one at the "
 "same time is not possible."
@@ -10935,43 +11061,43 @@ msgstr ""
 "abspielen ist nicht möglich."
 
 #. Programmer's name for it: DeleteHelper_DrivePresent
-#: Nemp_RessourceStrings.pas:897
+#: Nemp_RessourceStrings.pas:904
 msgid "The drive is available."
 msgstr "Das Laufwerk ist verfügbar."
 
 #. Programmer's name for it: DeleteHelper_DriveMissing
-#: Nemp_RessourceStrings.pas:898
+#: Nemp_RessourceStrings.pas:905
 msgid "The drive is NOT available."
 msgstr "Das Laufwerk ist NICHT verfügbar."
 
 #. Programmer's name for it: DeleteHelper_NetworkPresent
-#: Nemp_RessourceStrings.pas:899
+#: Nemp_RessourceStrings.pas:906
 msgid "The network ressource is available."
 msgstr "Diese Netzwerk-Ressource ist verfügbar."
 
 #. Programmer's name for it: DeleteHelper_NetworkMissing
-#: Nemp_RessourceStrings.pas:900
+#: Nemp_RessourceStrings.pas:907
 msgid "The network ressource seems to be offline."
 msgstr "Diese Netzwerk-Ressource scheint offline zu sein."
 
 #. Programmer's name for it: DeleteHelper_DrivePresentFileMissing
-#: Nemp_RessourceStrings.pas:902
+#: Nemp_RessourceStrings.pas:909
 msgid "Some files are definitely missing."
 msgstr "Einige Dateien fehlen definitiv."
 
 #. Programmer's name for it: DeleteHelper_DriveMissingFileMissing
-#: Nemp_RessourceStrings.pas:903
+#: Nemp_RessourceStrings.pas:910
 msgid "It is unknown whether the files still exist."
 msgstr "Es kann nicht festgestellt werden, ob die Dateien noch vorhanden sind."
 
 #. Programmer's name for it: DeleteHelper_DoWithDrivePresent
 #. Programmer's name for it: DeleteHelper_DoWithNetworkPresent
-#: Nemp_RessourceStrings.pas:906 Nemp_RessourceStrings.pas:908
+#: Nemp_RessourceStrings.pas:913 Nemp_RessourceStrings.pas:915
 msgid "You should remove the missing files from the library."
 msgstr "Sie sollten die fehlenden Dateien aus der Bibliothek entfernen."
 
 #. Programmer's name for it: DeleteHelper_DoWithDriveMissing
-#: Nemp_RessourceStrings.pas:907
+#: Nemp_RessourceStrings.pas:914
 msgid ""
 "You should keep files in the library, connect the drive to your computer and "
 "try again later."
@@ -10980,7 +11106,7 @@ msgstr ""
 "und es nochmal probieren."
 
 #. Programmer's name for it: DeleteHelper_DoWithNetworkMissing
-#: Nemp_RessourceStrings.pas:909
+#: Nemp_RessourceStrings.pas:916
 msgid ""
 "You should keep the files in the library, check your network settings and "
 "try again later."
@@ -10989,7 +11115,7 @@ msgstr ""
 "Einstellungen überprüfen und es nochmal probieren."
 
 #. Programmer's name for it: DeleteHelper_Readme
-#: Nemp_RessourceStrings.pas:916
+#: Nemp_RessourceStrings.pas:923
 msgid ""
 "Sometimes it is not appropriate to remove every missing file from the "
 "library. E.g.: If you store large parts of your music files on an external "
@@ -11010,7 +11136,7 @@ msgstr ""
 "bleiben erhalten."
 
 #. Programmer's name for it: AutoDeleteInfo_DeletedFiles
-#: Nemp_RessourceStrings.pas:918
+#: Nemp_RessourceStrings.pas:925
 msgid ""
 "Nemp detected %d missing file(s) and %d missing playlist(s) and removed "
 "these entries from the media library."
@@ -11019,7 +11145,7 @@ msgstr ""
 "aus der Medienbibliothek entfernt."
 
 #. Programmer's name for it: AutoDeleteInfo_PreservedFiles
-#: Nemp_RessourceStrings.pas:919
+#: Nemp_RessourceStrings.pas:926
 msgid ""
 "Nemp detected %d file(s) and %d playlist(s) on %d missing drive(s). These "
 "entries will remain in the media library until further notice."
@@ -11029,7 +11155,7 @@ msgstr ""
 "bleiben."
 
 #. Programmer's name for it: AutoDeleteInfo_MessageHint
-#: Nemp_RessourceStrings.pas:920
+#: Nemp_RessourceStrings.pas:927
 msgid ""
 "Note: You can turn off this message in the settings dialog -> File "
 "management."
@@ -11038,25 +11164,57 @@ msgstr ""
 "Dateimanagement"
 
 #. Programmer's name for it: Hint_BatteryLow
-#: Nemp_RessourceStrings.pas:922
+#: Nemp_RessourceStrings.pas:929
 msgid "Low battery (%d%%). Click for more information."
 msgstr "Niedriger Akku-Ladezustand (%d%%). Klicken für weitere Informationen."
 
-#: NempMainUnit.pas:5776
+#. Programmer's name for it: Playlist_LogAborted
+#: Nemp_RessourceStrings.pas:931
+msgid "aborted"
+msgstr "abgebrochen"
+
+#. Programmer's name for it: Warning_LyricsUsage
+#: Nemp_RessourceStrings.pas:938
+msgid ""
+"Ignoring lyrics will remove all collected lyrics from the media library, but "
+"they will remain\n"
+"in the ID3-Tags. Once the lyrics have been removed from the library, they "
+"can no longer be\n"
+"used by the search function unless you rescan the files in your library.\n"
+"\n"
+"Currently there are %d files with lyrics stored in the library (out of %d "
+"total files), using \n"
+"approximately %s of memory.\n"
+"\n"
+"Do you want to continue and reomve all lyrics from you media library?"
+msgstr ""
+"Lyrics zu ignorieren wird sämtliche Liedtexte aus der Medienbibliothek "
+"löschen. Sie bleiben im\n"
+"ID3-Tag der Dateien enthalten, aber sie stehen nicht länger für die "
+"Suchfunktion zur Verfügung.\n"
+"\n"
+"Aktuell sind %d Dateien mit Liedtexten in der Medienbibliothek enthalten "
+"(von %d insgesamt), die\n"
+"ungefähr %s Platz im Arbeitsspeicher benötigen.\n"
+"\n"
+"Wollen Sie fortfahren und sämtliche Liedtexte aus der Medienbibliothek "
+"löschen?"
+
+#: NempMainUnit.pas:5784
 msgid "<All Files>"
 msgstr "<Alle Dateien>"
 
-#: NempMainUnit.pas:5779
+#: NempMainUnit.pas:5787
 msgid "<Playlists>"
 msgstr "<Wiedergabelisten>"
 
-#: NempMainUnit.pas:5782
+#: NempMainUnit.pas:5790
 msgid "<Webradio>"
 msgstr "<Webradio>"
 
 #. Windows XP/2000/...
 #. uninstalling should be allowed. ;-)
-#: OptionsComplete.pas:3317 OptionsComplete.pas:3340
+#: OptionsComplete.pas:3434 OptionsComplete.pas:3457
 msgid "NempDeskband.dll not found."
 msgstr "NempDeskband.dll nicht gefunden."
 
@@ -11541,9 +11699,6 @@ msgstr "Nemp48.ico"
 
 #~ msgid "Cleanup library (delete &missing files)"
 #~ msgstr "Bibliothek aufräumen (fehlende Dateien entfernen)"
-
-#~ msgid "Cleanup playlist (delete missing files)"
-#~ msgstr "Playlist aufräumen (fehlende Dateien entfernen)"
 
 #~ msgid "Clear playlist"
 #~ msgstr "Playlist löschen"

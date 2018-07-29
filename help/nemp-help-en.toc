@@ -1,11 +1,11 @@
 \contentsline {section}{\numberline {1}Nemp Basics}{3}{section.3}
-\contentsline {subsection}{\numberline {1.1}The Nemp main window}{3}{subsection.9}
-\contentsline {subsection}{\numberline {1.2}Basic control}{5}{subsection.10}
-\contentsline {subsection}{\numberline {1.3}Skins, individual windows and party mode}{6}{subsection.11}
-\contentsline {subsection}{\numberline {1.4}Party mode}{7}{subsection.13}
-\contentsline {subsection}{\numberline {1.5}Languages}{8}{subsection.14}
-\contentsline {subsection}{\numberline {1.6}External drives and backups, portability}{8}{subsection.15}
-\contentsline {subsection}{\numberline {1.7}Basic Settings: The Nemp Wizard}{9}{subsection.16}
+\contentsline {subsection}{\numberline {1.1}Basic Settings: The Nemp Wizard}{3}{subsection.9}
+\contentsline {subsection}{\numberline {1.2}The Nemp main window}{4}{subsection.10}
+\contentsline {subsection}{\numberline {1.3}Basic control}{6}{subsection.11}
+\contentsline {subsection}{\numberline {1.4}Skins, individual windows and party mode}{7}{subsection.12}
+\contentsline {subsection}{\numberline {1.5}Party mode}{8}{subsection.14}
+\contentsline {subsection}{\numberline {1.6}Languages}{9}{subsection.15}
+\contentsline {subsection}{\numberline {1.7}External drives and backups, portability}{9}{subsection.16}
 \contentsline {section}{\numberline {2}Player and Playlist}{10}{section.17}
 \contentsline {subsection}{\numberline {2.1}Display and controls in the player}{10}{subsection.18}
 \contentsline {subsection}{\numberline {2.2}Other displays and controls}{12}{subsection.19}
@@ -43,27 +43,28 @@
 \contentsline {subsubsection}{Configuration}{32}{section*.56}
 \contentsline {subsection}{\numberline {4.4}Keyboard display}{33}{subsection.57}
 \contentsline {subsection}{\numberline {4.5}Automatic shutdown, sleep timer}{34}{subsection.58}
-\contentsline {section}{\numberline {5}Preferences, settings dialog}{35}{section.59}
-\contentsline {subsection}{\numberline {5.1}General settings}{35}{subsection.60}
-\contentsline {subsubsection}{Controls}{36}{section*.61}
-\contentsline {subsubsection}{System}{37}{section*.62}
-\contentsline {subsection}{\numberline {5.2}Viewing settings}{37}{subsection.63}
-\contentsline {subsubsection}{Party mode}{38}{section*.64}
-\contentsline {subsubsection}{Fonts}{38}{section*.65}
-\contentsline {subsubsection}{Extended viewing settings}{39}{section*.66}
-\contentsline {subsection}{\numberline {5.3}Player settings}{40}{subsection.67}
-\contentsline {subsubsection}{Playlist}{41}{section*.68}
-\contentsline {subsubsection}{Random playback}{42}{section*.69}
-\contentsline {subsubsection}{Web radio}{43}{section*.70}
-\contentsline {subsubsection}{Effects}{44}{section*.71}
-\contentsline {subsubsection}{Birthday mode}{45}{section*.72}
-\contentsline {subsubsection}{LastFM}{45}{section*.73}
-\contentsline {subsubsection}{Web server}{45}{section*.74}
-\contentsline {subsubsection}{Extended player settings}{45}{section*.75}
-\contentsline {subsection}{\numberline {5.4}File management}{46}{subsection.76}
-\contentsline {subsubsection}{File types registration}{46}{section*.77}
-\contentsline {subsubsection}{Metadata}{47}{section*.78}
-\contentsline {subsubsection}{Cover}{49}{section*.79}
-\contentsline {subsubsection}{Search settings}{50}{section*.80}
-\contentsline {section}{\numberline {6}Nerd stuff}{52}{section.81}
-\contentsline {section}{\numberline {7}Version history}{53}{section.82}
+\contentsline {subsection}{\numberline {4.6}Playlist log}{35}{subsection.59}
+\contentsline {section}{\numberline {5}Preferences, settings dialog}{35}{section.60}
+\contentsline {subsection}{\numberline {5.1}General settings}{35}{subsection.61}
+\contentsline {subsubsection}{Controls}{37}{section*.62}
+\contentsline {subsubsection}{System}{37}{section*.63}
+\contentsline {subsection}{\numberline {5.2}Viewing settings}{38}{subsection.64}
+\contentsline {subsubsection}{Party mode}{38}{section*.65}
+\contentsline {subsubsection}{Fonts}{39}{section*.66}
+\contentsline {subsubsection}{Extended viewing settings}{40}{section*.67}
+\contentsline {subsection}{\numberline {5.3}Player settings}{41}{subsection.68}
+\contentsline {subsubsection}{Playlist}{41}{section*.69}
+\contentsline {subsubsection}{Random playback}{42}{section*.70}
+\contentsline {subsubsection}{Web radio}{44}{section*.71}
+\contentsline {subsubsection}{Effects}{45}{section*.72}
+\contentsline {subsubsection}{Birthday mode}{45}{section*.73}
+\contentsline {subsubsection}{LastFM}{45}{section*.74}
+\contentsline {subsubsection}{Web server}{45}{section*.75}
+\contentsline {subsubsection}{Extended player settings}{46}{section*.76}
+\contentsline {subsection}{\numberline {5.4}File management}{46}{subsection.77}
+\contentsline {subsubsection}{File types registration}{47}{section*.78}
+\contentsline {subsubsection}{Metadata}{47}{section*.79}
+\contentsline {subsubsection}{Cover}{50}{section*.80}
+\contentsline {subsubsection}{Search settings}{51}{section*.81}
+\contentsline {section}{\numberline {6}Nerd stuff}{54}{section.82}
+\contentsline {section}{\numberline {7}Version history}{55}{section.83}

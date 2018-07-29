@@ -514,6 +514,12 @@ type
     cb_AutoDeleteFiles: TCheckBox;
     cb_AutoDeleteFilesShowInfo: TCheckBox;
     BtnAutoScanNow: TButton;
+    GrpBoX_LogPlaylist: TGroupBox;
+    cbSaveLogToFile: TCheckBox;
+    LblLogDuration: TLabel;
+    seLogDuration: TSpinEdit;
+    LblLogDuration2: TLabel;
+    cb_IgnoreLyrics: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -621,6 +627,8 @@ type
     procedure BtnSelectSoundFontFileClick(Sender: TObject);
     procedure cb_AutoDeleteFilesClick(Sender: TObject);
     procedure BtnAutoScanNowClick(Sender: TObject);
+    procedure cbSaveLogToFileClick(Sender: TObject);
+    procedure cb_IgnoreLyricsClick(Sender: TObject);
   private
     { Private-Deklarationen }
     OldFontSize: integer;
@@ -643,6 +651,7 @@ type
     { Public-Deklarationen }
 
     CBSpalten: Array of TCheckBox;
+    PlaylistNode: PVirtualNode;
     BirthdayNode: PVirtualNode;
     ScrobbleNode: PVirtualNode;
     WebServerNode: PVirtualNode;
@@ -1023,7 +1032,7 @@ begin
 
     // PLAYER
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArrayAudio[0]);
-          AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]); // Playlist
+          PlaylistNode := AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[1]); // Playlist
           AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[2]); // random
           AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[3]); // Webradio
           AddVSTOptions(OptionsVST, MainNode, OptionsArrayAudio[4]); // Effects
@@ -1279,6 +1288,12 @@ begin
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
   cb_ReplayCue.Checked              := NempPlaylist.RepeatCueOnRepeatTitle;
   CB_RememberInterruptedPlayPosition.Checked := NempPlaylist.RememberInterruptedPlayPosition;
+
+  cbSaveLogToFile.Checked      := NempPlayer.NempLogFile.DoLogToFile;
+  seLogDuration.Value          := NempPlayer.NempLogFile.KeepLogRangeInDays;
+  seLogDuration    .Enabled := NempPlayer.NempLogFile.DoLogToFile;
+  LblLogDuration   .Enabled := NempPlayer.NempLogFile.DoLogToFile;
+  LblLogDuration2  .Enabled := NempPlayer.NempLogFile.DoLogToFile;
 
   CB_ShowHintsInPlaylist.Checked    := NempPlaylist.ShowHintsInPlaylist;
 
@@ -1672,8 +1687,12 @@ begin
   Edt_PartyModePassword.Text := Nemp_MainForm.NempSkin.NempPartyMode.password;
 
 
-  // quick access to metadata
+ // quick access to metadata
   cb_AccessMetadata                     .checked := Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata;
+  // Ignore Lyrics (for HUGE collections, saves RAM)
+  cb_IgnoreLyrics                       .checked := MedienBib.IgnoreLyrics;
+
+
   cb_UseCDDB                            .checked := Nemp_MainForm.NempOptions.UseCDDB;
   cb_AutoResolveInconsistencies         .checked := MedienBib.AutoResolveInconsistencies          ;
   cb_AskForAutoResolveInconsistencies   .checked := MedienBib.AskForAutoResolveInconsistencies    ;
@@ -1858,6 +1877,43 @@ begin
     RandomWeight40.Enabled := cb_UseWeightedRNG.Checked;
     RandomWeight45.Enabled := cb_UseWeightedRNG.Checked;
     RandomWeight50.Enabled := cb_UseWeightedRNG.Checked;
+end;
+
+procedure TOptionsCompleteForm.cb_IgnoreLyricsClick(Sender: TObject);
+var currentLibraryLyricsUsage: TLibraryLyricsUsage;
+begin
+          if (cb_IgnoreLyrics.Checked) AND (NOT MedienBib.IgnoreLyrics) then
+          begin
+              // show a warning about this.
+              // get lyrics information (total size of lyrics in MB?)
+              // explain what this means (reloading all data necessary etc.)
+
+              currentLibraryLyricsUsage := MedienBib.GetLyricsUsage;
+
+              if  (currentLibraryLyricsUsage.FilesWithLyrics = 0) OR
+                  (MessageDlg ( Format(Warning_LyricsUsage,
+                                        [currentLibraryLyricsUsage.FilesWithLyrics,
+                                        currentLibraryLyricsUsage.TotalFiles,
+                                        SizeToString2(currentLibraryLyricsUsage.TotalLyricSize)]),
+                          mtWarning, [mbYes, MBNo, MBAbort], 0, mbAbort )
+                  = mrYes) then
+              begin
+                  // ok, accept settings later
+
+                  //MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
+                  //MedienBib.RemoveAllLyrics;
+                  //CB_AccelerateLyricSearch.Checked := False;
+                  //MedienBib.Changed := True;
+
+              end else
+              begin
+                  // cancel, reset checkbox
+                  cb_IgnoreLyrics.Checked := False; //MedienBib.IgnoreLyrics;
+              end;
+          end else
+          ;
+              // ok, setting IgnoreLyrics back to "false" (=using lyrics in the library) is fine.
+              //MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
 end;
 
 procedure TOptionsCompleteForm.cb_RatingActiveClick(Sender: TObject);
@@ -2211,6 +2267,13 @@ end;
 
 
 
+procedure TOptionsCompleteForm.cbSaveLogToFileClick(Sender: TObject);
+begin
+  seLogDuration   .Enabled := cbSaveLogToFile.Checked;
+  LblLogDuration  .Enabled := cbSaveLogToFile.Checked;
+  LblLogDuration2 .Enabled := cbSaveLogToFile.Checked;
+end;
+
 procedure TOptionsCompleteForm.cbSkinAuswahlChange(Sender: TObject);
 
 begin
@@ -2237,6 +2300,9 @@ var i,s,l, maxfont:integer;
     hMod: Cardinal;
     hKey: Byte;
   oldfactor: single;
+  currentLibraryLyricsUsage: TLibraryLyricsUsage;
+
+
 begin
   // Beta-Optionen
 //  MedienBib.BetaDontUseThreadedUpdate := cb_BetaDontUseThreadedUpdate.Checked;
@@ -2366,6 +2432,9 @@ begin
   NempPlaylist.RememberInterruptedPlayPosition := CB_RememberInterruptedPlayPosition.Checked;
   NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
   Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
+
+  NempPlayer.NempLogFile.DoLogToFile         := cbSaveLogToFile.Checked ;
+  NempPlayer.NempLogFile.KeepLogRangeInDays  := seLogDuration.Value     ;
 
   NempPlaylist.RandomRepeat := TBRandomRepeat.Position;
 
@@ -2508,7 +2577,8 @@ begin
       then
           NeedCoverFlowSearchUpdate := True;
 
-      NeedTotalLyricStringUpdate := MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked;
+      NeedTotalLyricStringUpdate := (MedienBib.BibSearcher.AccelerateLyricSearch <> CB_AccelerateLyricSearch.Checked)
+                  or ((cb_IgnoreLyrics.Checked) AND (NOT MedienBib.IgnoreLyrics)) ;
       NeedTotalStringUpdate := (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch.Checked)
                              or (MedienBib.BibSearcher.AccelerateSearchIncludePath <> CB_AccelerateSearchIncludePath.Checked)
                              or (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked);
@@ -2534,15 +2604,57 @@ begin
           Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
           Nemp_MainForm.NempOptions.ReplaceNAAlbumBy := cbReplaceAlbumBy .ItemIndex;
 
+          MedienBib.BibSearcher.QuickSearchOptions.WhileYouType       := CB_QuickSearchWhileYouType          .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow    := cb_ChangeCoverflowOnSearch          .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter := CB_QuickSearchAllowErrorsOnEnter    .Checked;
+          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType  := CB_QuickSearchAllowErrorsWhileTyping.Checked;
+
+          MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
+          if MedienBib.IgnoreLyrics then
+          begin
+              MedienBib.RemoveAllLyrics;
+              CB_AccelerateLyricSearch.Checked := False;
+              MedienBib.Changed := True;
+          end;
+
           MedienBib.BibSearcher.AccelerateSearch               := CB_AccelerateSearch                 .Checked;
           MedienBib.BibSearcher.AccelerateSearchIncludePath    := CB_AccelerateSearchIncludePath      .Checked;
           MedienBib.BibSearcher.AccelerateSearchIncludeComment := CB_AccelerateSearchIncludeComment   .Checked;
           MedienBib.BibSearcher.AccelerateLyricSearch          := CB_AccelerateLyricSearch            .Checked;
 
-          MedienBib.BibSearcher.QuickSearchOptions.WhileYouType       := CB_QuickSearchWhileYouType          .Checked;
-          MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow    := cb_ChangeCoverflowOnSearch          .Checked;
-          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter := CB_QuickSearchAllowErrorsOnEnter    .Checked;
-          MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType  := CB_QuickSearchAllowErrorsWhileTyping.Checked;
+          {
+          if (cb_IgnoreLyrics.Checked) AND (NOT MedienBib.IgnoreLyrics) then
+          begin
+              // show a warning about this.
+              // get lyrics information (total size of lyrics in MB?)
+              // explain what this means (reloading all data necessary etc.)
+
+              //MessageDlg((OptionsForm_InvalidTime), mtWarning, [MBOK], 0);
+
+              currentLibraryLyricsUsage := MedienBib.GetLyricsUsage;
+
+              if  (currentLibraryLyricsUsage.FilesWithLyrics = 0) OR
+                  (MessageDlg ( Format(Warning_LyricsUsage,
+                                        [currentLibraryLyricsUsage.FilesWithLyrics,
+                                        currentLibraryLyricsUsage.TotalFiles,
+                                        SizeToString2(currentLibraryLyricsUsage.TotalLyricSize)]),
+                          mtWarning, [mbYes, MBNo, MBAbort], 0, mbAbort )
+                  = mrYes) then
+              begin
+                  MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
+                  MedienBib.RemoveAllLyrics;
+                  CB_AccelerateLyricSearch.Checked := False;
+                  MedienBib.Changed := True;
+
+              end else
+              begin
+                  // cancel, reset checkbox
+                  cb_IgnoreLyrics.Checked := MedienBib.IgnoreLyrics;
+              end;
+          end else
+              // ok, setting IgnoreLyrics back to "false" (=using lyrics in the library) is fine.
+              MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
+              }
       end;
 
 
@@ -2971,6 +3083,7 @@ begin
 
   Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
   Nemp_MainForm.NempOptions.UseCDDB                     := cb_UseCDDB                            .checked;
+
 
   MedienBib.AutoResolveInconsistencies          := cb_AutoResolveInconsistencies         .checked ;
   MedienBib.AskForAutoResolveInconsistencies    := cb_AskForAutoResolveInconsistencies   .checked ;

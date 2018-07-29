@@ -463,12 +463,12 @@ end;
 
 procedure TFDetails.FormDestroy(Sender: TObject);
 begin
-  if assigned(PictureFrames) then
-      PictureFrames.Free;
-  if assigned(CurrentTagObject) then
-      FreeAndNil(CurrentTagObject);
-  Coverpfade.Free;
-  DetailRatingHelper.Free;
+    if assigned(PictureFrames) then
+        PictureFrames.Free;
+    if assigned(CurrentTagObject) then
+        FreeAndNil(CurrentTagObject);
+    Coverpfade.Free;
+    DetailRatingHelper.Free;
 end;
 
 
@@ -941,7 +941,7 @@ begin
           try
               aPic.LoadFromFile(Pfad);
               FitBitmapIn(aCoverbmp, aPic.Graphic);
-              aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aPic.Graphic);
+              //aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aPic.Graphic);
               CoverIMAGE.Picture.Bitmap.Assign(aCoverbmp);
           except
               on E: Exception do
@@ -2218,7 +2218,7 @@ var ci: Integer;
     mp3: TMp3File;
 begin
   // Hier auch die Abfrage zum Speichern rein
-  if (not fForceChange) and CurrentFileHasBeenChanged then
+  if (not fForceChange) and CurrentFileHasBeenChanged and (CurrentAudioFile <> AudioFile) then
   begin
       case TranslateMessageDLG((DetailForm_SaveChanges), mtConfirmation, [MBYes, MBNo, MBAbort], 0) of
         mrYes   : BtnApply.Click;   // save Changes
@@ -2226,7 +2226,6 @@ begin
         mrAbort : Exit;             // Abort showing Details
       end;
   end;
-
 
   if Source <> -1 then
     fFilefromMedienBib := Source = SD_MedienBib;
@@ -3026,8 +3025,10 @@ begin
         at_Mp3: begin
                     mp3 := CurrentTagObject.MP3File;
                     // aktuellesAudiofile is not NIL here.
-                    if (mp3.Id3v1Tag.Exists <> CBID3v1.Checked)
-                        or (mp3.Id3v2Tag.Exists <> CBID3v2.Checked)
+                    if ValidMP3File and
+                      (((mp3.Id3v1Tag.Exists <> CBID3v1.Checked) and Tab_MpegInformation.Visible)
+                        or
+                      ((mp3.Id3v2Tag.Exists <> CBID3v2.Checked) and Tab_MpegInformation.Visible))
                     then
                     begin
                         result := True;     // User changed existance of the ID3Tags

@@ -79,6 +79,10 @@ object AboutForm: TAboutForm
         '[url="http://www.delphi-forum.de/viewtopic.php?t=48936"]SearchTo' +
         'ols[/url] by Heiko Thiel'
       ''
+      
+        '[url="https://www.entwickler-ecke.de/viewtopic.php?t=100088"]Fas' +
+        'tFileStream[/url] by Flamefire et al.'
+      ''
       '[url="http://dybdahl.dk/dxgettext/"]GNU gettext for Delphi[/url]'
       ''
       

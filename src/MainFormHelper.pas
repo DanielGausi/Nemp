@@ -138,7 +138,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
-    CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass;
+    CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
+    PlayerLog;
 
 procedure CorrectVolButton;
 begin
@@ -1066,6 +1067,8 @@ begin
         if assigned(FormBibSearch        ) then ReTranslateComponent(FormBibSearch       );
         if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
         if assigned(Wizard               ) then ReTranslateComponent(Wizard              );
+        if assigned(PlayerLogForm        ) then ReTranslateComponent(PlayerLogForm       );
+
 
         //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
         if assigned(OptionsCompleteForm  ) then

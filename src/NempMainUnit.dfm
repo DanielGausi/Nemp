@@ -2575,7 +2575,7 @@ object Nemp_MainForm: TNemp_MainForm
         OwnerDraw = False
         object ImgDetailCover: TImage
           Left = 2
-          Top = 2
+          Top = 1
           Width = 150
           Height = 150
           Center = True
@@ -3947,6 +3947,10 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = PM_P_DirectoriesDataClick
         end
       end
+      object MM_T_PlaylistLog: TMenuItem
+        Caption = 'Playlist log'
+        OnClick = MM_T_PlaylistLogClick
+      end
     end
     object MM_Help: TMenuItem
       Caption = '&Help'
@@ -3991,7 +3995,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000000AF80B0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000000A200C0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4557,7 +4561,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012600300B4C0D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012600300B740D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
@@ -7131,6 +7135,10 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = PM_P_DirectoriesDataClick
       end
     end
+    object PM_P_PlaylistLog: TMenuItem
+      Caption = 'Playlist log'
+      OnClick = MM_T_PlaylistLogClick
+    end
     object N17: TMenuItem
       Caption = '-'
     end
@@ -7645,7 +7653,7 @@ object Nemp_MainForm: TNemp_MainForm
         Flags = []
       end>
     OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
-    Left = 624
+    Left = 640
     Top = 624
   end
   object fspTaskbarPreviews1: TfspTaskbarPreviews
@@ -7659,7 +7667,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C074C0910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07740910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

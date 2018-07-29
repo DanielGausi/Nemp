@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear Delphi 2009, XE2, XE3
-      Januar 2005 - April 2018
+      Januar 2005 - August 2018
 
-      Version: 4.8.1
+      Version: 4.9.0
 
 
 -----------------------------------------------------------
@@ -42,8 +42,7 @@ Aber für ein Ein-Mann-Projekt ein verdammt guter:
    teilen - auf der anderen Seite reicht ein einfacher Webbrowser
 
    Nemp hat ein intuitives GUI mit vielen kleinen nützlichen Dingen wie z.B.
-
-      - optional ins System integrierbares Deskband, wie man es vom WindowsMediaPlayer kennt
+      
       - anpassbares Design
       - Mehrsprachigkeit
       - paralleles Abspielen eines zweiten Liedes über eine zweite Soundkarte
@@ -51,6 +50,7 @@ Aber für ein Ein-Mann-Projekt ein verdammt guter:
       - integrierter LastFM-Scrobbler
       - Geburtstagsmodus, d.h. abspielen eines bestimmten Liedes zu einer bestimmten Zeit
       - Partymodus mit größeren Buttons, reduziertem Menü und eingeschränkter Funktionalität
+      - optional ins System integrierbares Deskband, wie man es vom WindowsMediaPlayer kennt
      
 
 Was Nemp NICHT kann:
@@ -115,13 +115,17 @@ Verwendete Units/Komponenten:
   http://www.swissdelphicenter.ch
 
 
-Version 4.8.1, April 2018
+Version 4.9.0, August 2018
 ----------------------------------------------------------- 
+- RAM-schonendes Laden und Speichern der Medienbibliothek
+- RAM-schonender Aufbau der beschleunigten Suche, inkl. Fallback/Deaktivierung 
+  bei OutOfMemory-Exceptions
+- Playlist-Log
 - Option: Beim Start fehlende Dateien löschen (= Medienbib aufräumen)
-          - wird neu ausgeführt beim Anschluss eines neuen Laufwerks
+          (wird ggf. neu ausgeführt beim Anschluss eines neuen Laufwerks)
 - Einstellungsdialog: Button "Scan now" für neue/fehlende Dateien
 - Bugfix: "Fehlende Dateien entfernen" entfernte immer fehlende Playlists, 
-           auch von Laufwerken, die aktuell nicht angeschlossen sind
+          auch von Laufwerken, die aktuell nicht angeschlossen sind
 - Bugfix: Wahrscheinlicher Deadlock bei "Clear Covercache" behoben
 
 

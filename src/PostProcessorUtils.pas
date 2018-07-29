@@ -44,10 +44,103 @@ uses Windows, Classes, SysUtils, Contnrs, DateUtils,
       MP3FileUtils, gnuGettext, Nemp_RessourceStrings,
       ScrobblerUtils, CustomizedScrobbler;
 
+// same as in Player.pas
+const USER_WANT_PLAY = 1;
+      USER_WANT_STOP = 2;
+
+      LOG_SEPARATOR = '|';
 
 type
 
     TPostProcessor = class; // forward declaration
+
+    TNempLogEntry = class
+        private
+            fStartTime   : TDateTime;
+            fTitle       : UnicodeString;
+            fArtist      : UnicodeString;
+            //fArtistTitle : UnicodeString;
+            fFilename    : UnicodeString;
+
+            fAborted: Boolean;
+            fInvalid: Boolean;
+
+        public
+            property StartTime   : TDateTime     read fStartTime    ;
+            property Title       : UnicodeString read fTitle        ;
+            property Artist      : UnicodeString read fArtist       ;
+            //property ArtistTitle : UnicodeString read fArtistTitle  ;
+            property Filename    : UnicodeString read fFilename     ;
+
+            property Aborted: Boolean read fAborted write fAborted;
+            property Invalid: Boolean read fInvalid;
+
+            constructor create(currentAudioFile: TAudioFile); overload;
+            constructor create(aLogString: UnicodeString); overload;
+
+            function LogLineDateTime(settings: TFormatSettings) : UnicodeString; overload;
+
+    end;
+
+    TNempLogFile = class
+        private
+            fLogList: TObjectList;
+            fPreviousSessionList: TObjectList;
+
+            fPreviousLogListAlreadyLoaded: Boolean;
+            fLocalFormatSettings: TFormatSettings;
+
+            fCurrentLogEntry: TNempLogEntry;
+            fMainWindowHandle: Hwnd;
+
+            // settings
+            fDoLogToFile         : Boolean;
+            fAutoDeleteOldEntries: Boolean;
+            fKeepLogRangeInDays  : Integer;
+            procedure fSetLogRange(aValue: Integer);
+
+            function fFirstIndexToKeepFromPreviousLogList(aFilename: UnicodeString): Integer;
+            procedure fMergeCurrentSessionIntoLogFile(aFilename: UnicodeString; FirstKeepIdxFromPreviousSession: Integer);
+
+        public
+            property DoLogToFile         : Boolean read fDoLogToFile          write fDoLogToFile          ;
+            property AutoDeleteOldEntries: Boolean read fAutoDeleteOldEntries ;
+            property KeepLogRangeInDays  : Integer read fKeepLogRangeInDays   write fSetLogRange   ;
+
+            property LogList: TObjectList read fLogList;
+            property PreviousSessionList: TObjectList read fPreviousSessionList;
+
+            constructor create(aHandle: HWND);
+            destructor Destroy; override;
+
+            procedure LoadFromIni(Ini: TMemIniFile);
+            procedure WriteToIni(Ini: TMemIniFile);
+
+            //procedure ShowCurrentLogList(aLines: TStrings);
+            // open the LogFile and create proper Logentries from the textfile.
+            // done only when needed (= user action in the player-log-form)
+            procedure PreparePreviousLogList(aFilename: UnicodeString);
+
+            procedure UpdateLogfile(aFilename: UnicodeString);
+            // add the current Loglist to the logfile (when nemp is closing)
+
+
+
+
+            //
+            procedure ChangeCurrentPlayingFile(aAudioFile: TAudioFile);
+            procedure FinalizeCurrentLogEntry(PlayedLongEnough: Boolean);
+            // Add the currentplayingfile to the loglist (if it makes sense)
+            // Do log entries like "aborted" ?
+            //procedure DoLog;
+    end;
+
+    // Types used in the VirtualStringTree of the Player Log Form
+    TLogTreeData = record
+      FLogEntry : TNempLogEntry;
+    end;
+
+    PLogTreeData = ^TLogTreeData;
 
     TPostProcessJob = class
         private
@@ -150,6 +243,8 @@ type
         public
             // The Scrobbler here is just a pointer to Player.NempScrobbler
             NempScrobbler: TNempScrobbler;
+            // Nemplogfile also. Just a Pointer to Plaer.NempLogFile
+            NempLogFile: TNempLogFile;
 
             // Vairable: NempIsClosing, die den ganzen Quatsch abbricht???
 
@@ -201,7 +296,220 @@ type
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Hilfsfunktionen;
+
+
+{ TNempLogEntry }
+
+constructor TNempLogEntry.create(currentAudioFile: TAudioFile);
+begin
+    if assigned(currentAudioFile) then
+    begin
+        fStartTime  := Now;
+        fTitle      := currentAudioFile.Titel;
+        fArtist     := currentAudioFile.Artist;
+        //fArtistTitle := currentAudioFile.PlaylistTitle;
+        fFilename   := currentAudioFile.Pfad;
+
+        fAborted := False;
+        fInvalid := False;
+    end else
+        fInvalid := True;
+end;
+
+
+constructor TNempLogEntry.create(aLogString: UnicodeString);
+var sl: TStringList;
+    aDateTime: TDateTime;
+begin
+    // explode the String, fill fields
+    sl := Explode(LOG_SEPARATOR , aLogString);
+    try
+        if sl.Count >= 4 then
+        begin
+            if TryStrToDateTime(sl[0], aDateTime) then
+            begin
+                fStartTime  := aDateTime;
+                fArtist     := sl[1];
+                fTitle      := sl[2];
+                fFilename   := sl[3];
+                fInvalid    := False;
+            end else
+                fInvalid := True;
+        end else
+            fInvalid := True;
+
+        if sl.Count >=5 then
+            self.fAborted := sl[4] = 'aborted'
+        else
+            fAborted := False;
+    finally
+        sl.Free;
+    end;
+end;
+
+
+function TNempLogEntry.LogLineDateTime(settings: TFormatSettings): UnicodeString;
+begin
+    result := DateTimeToStr(fStartTime, settings) + LOG_SEPARATOR
+          + StringReplace( fArtist, LOG_SEPARATOR, ',', [rfReplaceAll]) + LOG_SEPARATOR
+          + StringReplace( fTitle , LOG_SEPARATOR, ',', [rfReplaceAll]) + LOG_SEPARATOR
+          + fFilename;
+
+    if fAborted then
+        result := result + LOG_SEPARATOR + 'aborted';   // fixed string here, do not translate
+end;
+
+{ TNempLogFile }
+
+constructor TNempLogFile.create(aHandle: HWND);
+begin
+    fLogList := TObjectList.Create(True);
+    fPreviousSessionList := TObjectList.Create(True);
+    fPreviousLogListAlreadyLoaded := False;
+
+    fMainWindowHandle := aHandle;
+    fCurrentLogEntry := Nil;
+    GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
+end;
+
+destructor TNempLogFile.destroy;
+begin
+    fLogList.Free;
+    fPreviousSessionList.Free;
+    inherited;
+end;
+
+
+procedure TNempLogFile.LoadFromIni(Ini: TMemIniFile);
+begin
+    DoLogToFile          := Ini.ReadBool('NempLogFile', 'DoLogToFile'           , False);
+    KeepLogRangeInDays   := Ini.ReadInteger('NempLogFile', 'KeepLogRangeInDays' , 7);
+end;
+
+procedure TNempLogFile.WriteToIni(Ini: TMemIniFile);
+begin
+    Ini.WriteBool('NempLogFile', 'DoLogToFile'           , fDoLogToFile          );
+    Ini.WriteInteger('NempLogFile', 'KeepLogRangeInDays' , fKeepLogRangeInDays   );
+end;
+
+procedure TNempLogFile.ChangeCurrentPlayingFile(aAudioFile: TAudioFile);
+begin
+    // create new log entry and ad it to the loglist
+    fCurrentLogEntry := TNempLogEntry.create(aAudioFile);
+    fLogList.add(fCurrentLogEntry);
+    // Message to refresh "live" log in the window
+    SendMessage(fMainWindowHandle, WM_MedienBib, MB_AddNewLogEntry, LParam(fCurrentLogEntry));
+end;
+
+procedure TNempLogFile.FinalizeCurrentLogEntry(PlayedLongEnough: Boolean);
+begin
+    if assigned(fCurrentLogEntry) then
+    begin
+        fCurrentLogEntry.Aborted := Not PlayedLongEnough;
+        // Message to refresh "live" log in the window
+        SendMessage(fMainWindowHandle, WM_MedienBib, MB_EditLastLogEntry, LParam(fCurrentLogEntry));
+    end;
+end;
+
+ procedure TNempLogFile.fSetLogRange(aValue: Integer);
+begin
+    fKeepLogRangeInDays := aValue;
+    fAutoDeleteOldEntries := aValue > 0;
+end;
+
+procedure TNempLogFile.PreparePreviousLogList(aFilename: UnicodeString);
+var sl: TStringList;
+    i: Integer;
+    newLogEntry: TNempLogEntry;
+begin
+    if Not FileExists(aFilename) then
+        exit;
+
+    if fPreviousLogListAlreadyLoaded then
+        exit;
+
+    // do this only once per session
+    fPreviousLogListAlreadyLoaded := True;
+    sl := TStringList.Create;
+    try
+        sl.LoadFromFile(aFilename);
+        for i := 0 to sl.Count-1 do
+        begin
+            newLogEntry := TNempLogEntry.create(sl[i]);
+            if not newLogEntry.Invalid then
+                fPreviousSessionList.Add(newLogEntry)
+            else
+              FreeAndNil(newLogEntry);
+        end;
+    finally
+        sl.free;
+    end;
+end;
+
+
+function TNempLogFile.fFirstIndexToKeepFromPreviousLogList(aFilename: UnicodeString): Integer;
+var firstKeepIdx: Integer;
+    aLogEntry: TNempLogEntry;
+    currentDate: TDateTime;
+begin
+    // load old logs (if still necessary)
+    PreparePreviousLogList(aFilename);
+
+    if fPreviousSessionList.Count > 0 then
+    begin
+        aLogEntry := TNempLogEntry(fPreviousSessionList[0]);
+        firstKeepIdx := 0;
+        currentDate := DateOf(Now);
+        while (firstKeepIdx < fPreviousSessionList.Count - 1)
+              and (DaysBetween(DateOf(aLogEntry.StartTime), currentDate) > KeepLogRangeInDays)
+        do begin
+            inc(firstKeepIdx);
+            aLogEntry := TNempLogEntry(fPreviousSessionList[firstKeepIdx]);
+        end;
+        result := firstKeepIdx;
+    end else
+        result := -1;
+end;
+
+procedure TNempLogFile.fMergeCurrentSessionIntoLogFile(aFilename: UnicodeString; FirstKeepIdxFromPreviousSession: Integer);
+var newLog: TStringList;
+    i: Integer;
+begin
+    ///  PreparePreviousLogList or better FirstIndexToKeepFromPreviousLogList must be called earlier
+    ///  param FirstKeepIdxFromPreviousSession is the first log entry (in fPreviousSessionList) to keep
+    ///  Older entries will NOT be saved then.
+
+    newLog := TStringList.Create;
+    try
+        // write old logs, but discard too old entries
+        if fPreviousSessionList.Count > 0 then
+            for i := FirstKeepIdxFromPreviousSession to fPreviousSessionList.Count-1 do
+                newLog.Add(TNempLogEntry(fPreviousSessionList[i]).LogLineDateTime(fLocalFormatSettings));
+        // log from the current session
+        for i := 0 to fLogList.Count-1 do
+            newLog.Add(TNempLogEntry(fLogList[i]).LogLineDateTime(fLocalFormatSettings));
+
+        newLog.SaveToFile(aFilename);
+    finally
+        newLog.Free;
+    end;
+end;
+
+
+procedure TNempLogFile.UpdateLogfile(aFilename: UnicodeString);
+var aIdx: Integer;
+begin
+    if fDoLogToFile then
+    begin
+        if fKeepLogRangeInDays > 0 then
+            aIdx := fFirstIndexToKeepFromPreviousLogList(aFilename)
+        else
+            aIdx := 0;
+
+        fMergeCurrentSessionIntoLogFile(aFilename, aIdx);
+    end;
+end;
 
 
 { TPostProcessJob }
@@ -351,6 +659,7 @@ begin
     fPlayingFileName := aAudioFile.Pfad;
     fPlayingFileLength := aAudioFile.Duration;
     NempScrobbler.ChangeCurrentPlayingFile(aAudioFile);
+    NempLogFile.ChangeCurrentPlayingFile(aAudioFile);
     fCurrentFileAdded := False;
 
     fManualRating := False;     // 0: undefined
@@ -388,10 +697,16 @@ begin
     if not fCurrentFileAdded then
     begin
         fCurrentFileAdded := True;
+        if IsJustPlaying then
+            PlayAmount := PlayAmount + SecondsBetween(Now, StartTimeLocal);
 
         // first: Scrobble. This is done in a thread.
         // whether it is really scrobbled or cancelled will be decided there
         NempScrobbler.AddToScrobbleList(IsJustPlaying);
+        // Finalize LogEntry: Add a "Aborted" flag, if the file was not "played"
+        //                    (meaning: less than 50% and playtime less than 240 seconds)
+        NempLogFile.FinalizeCurrentLogEntry(
+                  (PlayAmount > 240) or (PlayAmount > (fPlayingFileLength Div 2)) );
 
         if fActive and (not self.NempIsClosing)       // user-settings
                    and (FileExists(fPlayingFileName)) // there could be non-existing files
@@ -404,8 +719,7 @@ begin
             else
             begin
                 // Ok, file is long enough or should NOT be ignored.
-                if IsJustPlaying then
-                    PlayAmount := PlayAmount + SecondsBetween(Now, StartTimeLocal);
+
                 NewJob := TPostProcessJob.Create(self);
                 // decide, whether the file was played or aborted
                 if ((PlayAmount > 240) or (PlayAmount > (fPlayingFileLength Div 2))) then
@@ -522,7 +836,6 @@ begin
 
     end;
 end;
-
 
 
 

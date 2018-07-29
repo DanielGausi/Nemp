@@ -115,7 +115,7 @@ function BinaerAlbumSuche_JustContains(Liste: TObjectlist; album: UnicodeString;
 // Gets the Data for a new created AudioFile
 // First: GetAudiodata.
 // Second: Get Rating from the library (important for non-mp3-files)
-procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
+//procedure SynchronizeAudioFile(aNewFile: TAudioFile; aFileName: UnicodeString; WithCover: Boolean = True);
 // SynchronizeAudioFile XXXXx
 // replace with 2 new functions
 /// 1. SynchNewFileWithBib
@@ -926,7 +926,7 @@ end;
     Getting the Data for a new created AudioFile
     --------------------------------------------------------
 }
-procedure SynchronizeAudioFile(aNewFile: TAudioFile;
+(*procedure SynchronizeAudioFile(aNewFile: TAudioFile;
   aFileName: UnicodeString; WithCover: Boolean = True);
 var mbAf: TAudioFile;
 begin
@@ -940,6 +940,7 @@ begin
     end;
         // aNewFile.Rating := mbAf.Rating;
 end;
+*)
 
 
 {
@@ -959,7 +960,7 @@ begin
         aNewFile.Assign(mbAF);
     end else
     begin
-        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating);
+        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
         if WithCover then
             Medienbib.InitCover(aNewFile);
     end;
@@ -977,7 +978,7 @@ var mbAf: TAudioFile;
 begin
     if FileExists(aNewFile.Pfad) then
     begin
-        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating);
+        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
         if WithCover then
             Medienbib.InitCover(aNewFile);
         mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);

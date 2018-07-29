@@ -325,6 +325,7 @@ type
         MainStation: TStation; // used for direct insert of a radiostation
 
         NempScrobbler: TNempScrobbler;   // the Scrobbler-thingy
+        NempLogFile  : TNempLogFile;     // the LogFile-thingy
         PostProcessor: TPostProcessor;   // the Postprocessor: change rating of the file and scrobble it
 
         CoverBitmap: TBitmap;    // The Cover of the current file
@@ -654,8 +655,12 @@ begin
 
     NempScrobbler := TNempScrobbler.Create(aHnd);
     NempScrobbler.InitScrobbler;
+
+    NempLogFile  := TNempLogFile.create(aHnd);;
+
     PostProcessor := TPostProcessor.Create(aHnd);
     PostProcessor.NempScrobbler := NempScrobbler;
+    PostProcessor.NempLogFile := NempLogFile;
 
     CoverBitmap := TBitmap.Create;
     CoverBitmap.Width := 180;
@@ -686,6 +691,7 @@ begin
     MainStation.Free;
     PostProcessor.Free;
     NempScrobbler.Free;
+    NempLogFile.Free;
 
     if assigned(HeadSetAudioFile) then
         HeadSetAudioFile.Free;
@@ -1031,6 +1037,7 @@ begin
   fNemp_BassUserAgent := ini.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
 
   NempScrobbler.LoadFromIni(Ini);
+  NempLogFile.LoadFromIni(Ini);
   PostProcessor.LoadFromIni(Ini);
 end;
 
@@ -1118,6 +1125,7 @@ begin
   end;
 
   NempScrobbler.SaveToIni(Ini);
+  NempLogFile.WriteToIni(Ini);
   PostProcessor.WriteToIni(Ini);
 end;
 

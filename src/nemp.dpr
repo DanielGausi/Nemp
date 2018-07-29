@@ -19,6 +19,8 @@ uses
   Windows,
   SysUtils,
   Graphics,
+  vcl.themes,
+  vcl.styles,
   NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
   Details in 'Details.pas' {FDetails},
   NempAudioFiles in 'NempAudioFiles.pas',
@@ -69,7 +71,7 @@ uses
   PartyModeClass in 'PartyModeClass.pas',
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas' {/,  classes;},
+  TagClouds in 'TagClouds.pas' ,
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
   CoverDownloads in 'CoverDownloads.pas',
@@ -91,7 +93,7 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  NempApi in 'common\NempApi.pas' ,
+  NempApi in 'common\NempApi.pas',
   bass in '3rd Party Units\bass.pas',
   bass_fx in '3rd Party Units\bass_fx.pas',
   basscd in '3rd Party Units\basscd.pas',
@@ -107,11 +109,9 @@ uses
   gnugettext in '3rd Party Units\gnugettext.pas',
   languagecodes in '3rd Party Units\languagecodes.pas',
   PlayWebstream in 'PlayWebstream.pas',
-  bassmidi in '3rd Party Units\bassmidi.pas'
-
-  {$IFDEF USESTYLES}
-   ,vcl.themes, vcl.styles
-  {$ENDIF};
+  bassmidi in '3rd Party Units\bassmidi.pas',
+  unFastFileStream in '3rd Party Units\unFastFileStream.pas',
+  PlayerLog in 'PlayerLog.pas' {PlayerLogForm};
 
 {$R *.res}
 
@@ -144,7 +144,7 @@ ShowWindow
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  //Application.CreateForm(TForm1, Form1);
+
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
@@ -163,6 +163,8 @@ ShowWindow
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
+
+    Application.CreateForm(TFDetails, FDetails);
 
 
     StuffToDoAfterCreate ;

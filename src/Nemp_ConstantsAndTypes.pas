@@ -270,8 +270,8 @@ const
     MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
     
     MP3DB_VERSION: Byte = 4;        // Dateiformat seit 3.1
-    MP3DB_SUBVERSION: Byte = 1;     // subversion changed to 1 in Nemp 4.0
-
+    MP3DB_SUBVERSION: Byte = 2;     // subversion changed to 1 in Nemp 4.0
+                                    // subversion changed to 2 in Nemp 4.9
     // "Extended Boolean", used for "unset" settings
     //BoolUnDef = 0;
     //BoolTrue = 1;
@@ -283,8 +283,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.8';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.8';
+    NEMP_VERSION_SPLASH = 'version 4.9';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.9';
 
     NEMP_TIPSIZE = 128;
 
@@ -389,7 +389,7 @@ const
     // Warnung: Duplikate in der Bib gefunden. Das sollte eigentlich nicht mehr vorkommen
     MB_DuplicateWarning = 15;
     // Recheck Current playingfile after the bib was initially loaded (rating!)
-    MB_ReCheckPlaylingFile = 35;
+    ///// MB_ReCheckPlaylingFile = 35;
     // AutScan der Ordner starten
     MB_StartAutoScanDirs = 16;
     // WebServer automatisch starten
@@ -438,6 +438,20 @@ const
     MB_CheckForStartJobs = 40;
 
     MB_InfoDeadFiles = 41;
+
+    MB_OutOfMemory = 43;
+          // for lParams
+          OutOfMemory_DataReduced = 1;
+          OutOfMemory_DataDisabled = 2;
+          OutOfMemory_LyricsDisabled = 3;
+          OutOfMemory_ErrorBuildingDataString = 4;
+          OutOfMemory_ErrorBuildingLyricString = 5;
+
+    MB_AddNewLogEntry = 44;
+    MB_EditLastLogEntry = 45;
+
+    MB_MessageForLog = 98;
+    MB_MessageForDialog = 99;
 
     MB_SetStatus = 100;
 

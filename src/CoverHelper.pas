@@ -630,6 +630,7 @@ end;
 
 procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
 var xfactor, yfactor:double;
+    tmpBmp: TBitmap;
 begin
   if Source = NIL then exit;
   if (Source.Width = 0) or (Source.Height=0) then exit;
@@ -643,6 +644,18 @@ begin
     begin
       Bounds.Width := round(Source.Width*xfactor);
       Bounds.Height := round(Source.Height*xfactor);
+    end;
+
+    tmpbmp := tBitmap.Create;
+    try
+        tmpBmp.Assign(Source);
+        SetStretchBltMode(Bounds.Canvas.Handle, HALFTONE);
+        StretchBlt(Bounds.Canvas.Handle,
+                  0,0, Bounds.Width, Bounds.Height,
+                  tmpbmp.Canvas.Handle,
+                  0, 0, tmpBmp.Width, tmpBmp.Height, SRCCopy);
+    finally
+        tmpbmp.Free
     end;
 end;
 
@@ -659,10 +672,8 @@ begin
       try
           aGraphic.LoadFromFile(aList[FrontCover]);
           if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-          begin
-              FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-              aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-          end else
+              FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+          else
               AssignBitmap(aCoverBmp, aGraphic);
           result := True;
       finally
@@ -718,10 +729,8 @@ begin
                         if ok then
                         begin
                             if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                            begin
-                                FitBitmapIn(aCoverbmp, tmpbmp);
-                                aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, tmpbmp);
-                            end else
+                                FitBitmapIn(aCoverbmp, tmpbmp)
+                            else
                                 aCoverBmp.Assign(tmpbmp);
                         end;
                     finally
@@ -750,6 +759,7 @@ function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
+    tmpbmp: tBitmap;
 begin
   result := false;
   try
@@ -765,10 +775,8 @@ begin
                   try
                       aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                      begin
-                          FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-                          aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-                      end else
+                          FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+                      else
                           AssignBitmap(aCoverBmp, aGraphic);
                       result := True;
                   finally
@@ -813,10 +821,8 @@ begin
                   try
                       aGraphic.LoadFromFile(completeName);
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                      begin
-                          FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-                          aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-                      end else
+                          FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+                      else
                           AssignBitmap(aCoverBmp, aGraphic);
                       result := True;
                   finally
@@ -896,10 +902,8 @@ begin
         try
             aGraphic.LoadFromFile(filename);
             if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-            begin
-                FitBitmapIn(aCoverbmp, aGraphic.Graphic);
-                aCoverbmp.Canvas.StretchDraw(aCoverbmp.Canvas.ClipRect, aGraphic.Graphic);
-            end else
+                FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+            else
                 AssignBitmap(aCoverBmp, aGraphic);
         finally
             aGraphic.Free;

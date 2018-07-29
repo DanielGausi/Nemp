@@ -79,6 +79,8 @@ function SekIntToMinStr(sek:integer; OnlyMinutes: Boolean = False):string;
 
   function SizeToString(Value: Int64): String;
 
+  function SizeToString2(Value: Int64): String;
+
 function SecondsUntil(aTime: TTime): Integer;
 
 function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
@@ -637,12 +639,26 @@ begin
       result := inttostr(Value) + ' Byte; '
   else
       if Value <= 1024*1024 then
-          result :=  FloatToStrF((Value / 1024), ffFixed, 4, 0) + 'kb; '
+          result :=  FloatToStrF((Value / 1024), ffFixed, 4, 0) + ' kB; '
       else
           if Value <= 1024*1024*1024 then
-              result := FloatToStrF((Value / 1024 / 1024), ffFixed, 8, 0) + 'mb; '
+              result := FloatToStrF((Value / 1024 / 1024), ffFixed, 8, 0) + ' MB; '
           else
-              result := FloatToStrF((Value / 1024 / 1024 / 1024), ffFixed, 4, 0) + 'gb; ';
+              result := FloatToStrF((Value / 1024 / 1024 / 1024), ffFixed, 4, 0) + ' GB; ';
+end;
+
+function SizeToString2(Value: Int64): String;
+begin
+  if Value <= 1024 then
+      result := inttostr(Value) + ' Byte'
+  else
+      if Value <= 1024*1024 then
+          result :=  FloatToStrF((Value / 1024), ffFixed, 4, 0) + ' kB'
+      else
+          if Value <= 1024*1024*1024 then
+              result := FloatToStrF((Value / 1024 / 1024), ffFixed, 8, 0) + ' MB'
+          else
+              result := FloatToStrF((Value / 1024 / 1024 / 1024), ffFixed, 4, 0) + ' GB';
 end;
 
 

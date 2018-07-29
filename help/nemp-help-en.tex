@@ -84,11 +84,44 @@ Nemp's basic concept looks like this:
 \item The played titles come from the \textbf{Playlist}, which Nemp plays in order.
 \item The playlist can be filled with titles from the \textbf{Media Library} in which all titles are managed. \footnote{of course, titles can also be played that are not contained in the media library. }
 \end{enumerate}
-And just to start now: Click the Play button, select a few files in the selection dialog and listen to some music while reading this documentation.
 
-\begin{center}
-\includegraphics{BtnPlay.png} 
-\end{center}
+At the first start the Nemp Wizard is started, which provides some basic configurations. You can also skip these settings and repeat them later.
+
+\subsection{Basic Settings: The Nemp Wizard}
+\label{sec_wizard}
+
+\begin{wrapfigure}{R}{0.21\textwidth}
+\centering
+\includegraphics[width=0.2\textwidth]{wizard.png}
+\end{wrapfigure}
+Nemp has a lot of interesting features. Some of them are very useful (at least I think so), but some of them change your music files, or look for additional information on the Internet.
+
+I think that such things should be \textsc{Opt-in}. I don't like players that write stuff into my ID3 tags without asking. I don't like programs that go online all by themselves to do something. Therefore, the Nemp Wizard was introduced, which asks some basic questions at the first start of Nemp. 
+
+For the following actions, the Nemp Wizard will ask for permission:
+
+\begin{itemize}
+\item Check for updates: Nemp will download a small text file from my website www.gausi.de to point out a newer version if one exists. This happens once a week in the standard setting, but can also happen more often. No personal data is sent, and apart from the usual server logs (IP-address etc.) I don't get anything else from it. I don't care, either.
+
+\item Change metadata: Nemp uses the metadata (ID3 tags) of the audio files to store various information. Changing this data is very easy - just click on it to change the rating - and could happen unintentionally. But this is a common feature, and many other players just do it. 
+
+\item Automatic rating: Nemp can automatically adjust the rating of your music files. If you listen to a song often, it is likely that you like it. If you break it off, it is probably not that great. The rating is also written to the metadata of the file. 
+
+\item Download missing covers: If no suitable cover for a music file can be found on the hard disk, Nemp can try to download a cover from the internet via the last.fm web service. This is then stored in the Nemp cover folder, and as \texttt{front (NempAutoCover).jpg} (or \texttt{.png}) in the directory where the music file itself is located. 
+
+\item Nemp as default player: Register Nemp as the default player for Windows. Under Windows 10 this doesn't  work 100\% - Windows will probably ask you again with which \emph{App} you want to open an mp3-file.
+\end{itemize}
+
+If you cancel the wizard at some point, all of these options will remain unchanged - i.e. deactivated in the default setting.
+
+You can change these settings later by restarting the wizard from the menu or using the full \hyperref[sec_einstellungen]{Settings dialog}. 
+
+
+%And just to start now: Click the Play button, select a few files in the selection dialog and listen to some music while reading this documentation.
+
+%\begin{center}
+%\includegraphics{BtnPlay.png} 
+%\end{center}
 
 \subsection{The Nemp main window}
 %\subsubsection{Der Player}
@@ -217,35 +250,7 @@ This also works while Nemp is running. For example, if you forgot to connect the
 This method works very well in most cases, but has one gap: If you have your complete collection on two different drives, i. e. an original and a backup, then Nemp will differentiate between these two drives, even if both always appear under the same drive letter in the system. Because of the automatic drive adaption it will not find the files then when you connect the other drive - even though the files are there. Nemp \emph{does not} corrects the paths in that case, but makes them \emph{kaputt}. The workaround is to always connect the same disk, or to make two copies of the media library and load the appropriate media library, depending on the hard disk.
 
 
-\subsection{Basic Settings: The Nemp Wizard}
-\label{sec_wizard}
 
-Nemp has a lot of interesting features. Some of them are very useful (at least I think so), but some of them change your music files, or look for additional information on the Internet.
-
-\begin{wrapfigure}{R}{0.21\textwidth}
-\centering
-\includegraphics[width=0.2\textwidth]{wizard.png}
-\end{wrapfigure}
-
-I think that such things should be \textsc{Opt-in}. I don't like players that write stuff into my ID3 tags without asking. I don't like programs that go online all by themselves to do something. Therefore, the Nemp Wizard was introduced, which asks some basic questions at the first start of Nemp. 
-
-For the following actions, the Nemp Wizard will ask for permission:
-
-\begin{itemize}
-\item Check for updates: Nemp will download a small text file from my website www.gausi.de to point out a newer version if one exists. This happens once a week in the standard setting, but can also happen more often. No personal data is sent, and apart from the usual server logs (IP-address etc.) I don't get anything else from it. I don't care, either.
-
-\item Change metadata: Nemp uses the metadata (ID3 tags) of the audio files to store various information. Changing this data is very easy - just click on it to change the rating - and could happen unintentionally. But this is a common feature, and many other players just do it. 
-
-\item Automatic rating: Nemp can automatically adjust the rating of your music files. If you listen to a song often, it is likely that you like it. If you break it off, it is probably not that great. The rating is also written to the metadata of the file. 
-
-\item Download missing covers: If no suitable cover for a music file can be found on the hard disk, Nemp can try to download a cover from the internet via the last.fm web service. This is then stored in the Nemp cover folder, and as \texttt{front (NempAutoCover).jpg} (or \texttt{.png}) in the directory where the music file itself is located. 
-
-\item Nemp as default player: Register Nemp as the default player for Windows. Under Windows 10 this doesn't  work 100\% - Windows will probably ask you again with which \emph{App} you want to open an mp3-file.
-\end{itemize}
-
-If you cancel the wizard at some point, all of these options will remain unchanged - i.e. deactivated in the default setting.
-
-You can change these settings later by restarting the wizard from the menu or using the full \hyperref[sec_einstellungen]{Settings dialog}. 
 
 \section{Player and Playlist}
 
@@ -841,6 +846,13 @@ In these 30 seconds, the volume is slowly reduced and no new song is started to 
 For this, the sound scheme of Windows must be appropriately configured. Nemp does not prevent the possibly quite loud \emph{jingling} of Windows when the computer is shut down.
 \end{hinweis}
 
+\subsection{Playlist log}
+
+A small feature request was a logfile for the player. Now here it is logged, when which track was played, if necessary with the remark \gf{aborted} if the title was not played back completely.
+
+The definition of \gf{fully played} is the same as for scrobbling, i.e. at least 4 minutes or half of the title must be played. If a 3-minute track runs for 2 minutes, or a 1 hour mix for 5 minutes, then both tracks are considered \gf{played} and not \gf{cancelled}.
+
+If you wish, this log file can also be saved automatically in order to to keep an overview of the titles that have been played in the past days. This is deactivated by default and must therefore be activated in the settings. There you can also set the amount of time you want to keep the logs (default: 7 days).
 
 
 \section{Preferences, settings dialog}
@@ -1130,6 +1142,8 @@ The original core feature of Nemp was the file management, which is still a cent
 \begin{itemize}
 \item \textbf{Directories.} Nemp can manage a list of directories that are scanned for new files every time Nemp is started. This is only useful if the media library is growing regularly and often new files are added. With more static music collections, it makes more sense to search for new files manually only when needed.
 
+Since Nemp 4.9 you can also search for missing files when starting, which are then automatically removed from the Media Library. If files are on a drive that is currently unavailable, the files remain in the library. If a new drive is connected while Nemp is running, the search for unavailable files for this drive is repeated.
+
 \item \textbf{File types for the media library.} Specify which file types (identified by the file extension) you want to include in the library. By default, everything that can be played is inserted. This unfortunately also includes \textsc{.mp4} files, but these are usually video files. Nemp also plays these files (mostly) but only audio, without video.
 If movies and music are stored in different directories, this is no problem. Otherwise exclude the file type \textsc{.mp4} from the media library if necessary.
 
@@ -1155,6 +1169,12 @@ Metadata are additional information in the music files, often referred to as \em
 \item \textbf{Allow quick access.} \emph{Default: Off.} This setting is queried via the \emph{Nemp-Wizard}, because I think it makes sense - but the files are changed very quickly. A click on the asterisk rating is sufficient to effect a change in the file, which may conflict with your backup strategy and cause unnecessary additional effort during the backup.
 
 If this option is enabled, some metadata such as interpet, title, or album can be changed directly from the media list display.
+
+
+\item \textbf{Ignore lyrics.} \emph{Default: Off.} With very, very large music collections, Nemp reaches certain technical limits. So far there exists Nemp
+only in a 32-bit version, and the usable memory is limited to 2GB. If 1 million songs contain lyrics with 1000 characters each, 1GB is already used to keep all lyrics in memory that are rarely or never used.
+
+Therefore (since Nemp 4.9) the collection of lyrics in the media library can be stopped for such cases. All previously saved lyrics are removed from the library and are therefore no longer available for searching. Of course, the texts in the ID3 tags are retained, and they are still displayed when you play a title or open the detail window.
 
 \item \textbf{Resolve inconsistencies when entering new tags.} \emph{Default: On.} Inconsistencies can occur when entering new extended tags for the tag cloud. These are minor inconsistencies such as duplicates of a tag, or more severe ones such as inconsistencies with the Ignore- and Rename-rules defined in the tag cloud editor. Nemp can automatically resolve these inconsistencies by deleting (or not creating) duplicate entries and applying the Ignore- and Rename-rules to the user input.
 
@@ -1276,7 +1296,9 @@ The button \textsc{Clear cache} deletes the information about unsuccessfully sea
 A huge media library is of little use if you can't find anything in it. Therefore, Nemp contains a quite strong search function.
 
 \begin{itemize}
-\item \textbf{Accelerate search.} \emph{Default: On.} As with many problems in computer science, different methods can be used for text searches. You can often save time by using more memory space. When the search is accelerated, Nemp uses more memory to speed up the search. In view of today's computer equipment with several gigabytes of RAM, the increased memory requirements are hardly worth mentioning, even with large music collections.
+\item \textbf{Accelerate search.} \emph{Default: On.} As with many problems in computer science, different methods can be used for text searches. You can often save time by using more memory space. When the search is accelerated, Nemp uses more memory to speed up the search. 
+
+With very, very large music collections (i.e. several hundred thousand titles) a problem can arise here, since Nemp is so far only available in a 32-bit version and therefore the usable memory is limited to 2GB. If this occurs, Nemp will automatically disable this option. However, this can still lead to undesired behavior or even a crash.
 
 \item \textbf{Including filenames/comments.} For accelerated search, a copy of all text information is created, which can be accessed more quickly. Depending on the structure of the music collection, it may be useful to include file names or comments in this copy. 
 
@@ -1284,11 +1306,15 @@ Since the filename also contains the complete path, this option can be useful if
 
 Including the comments may lead to confusing search hits, if the searched term does not appear in the artist or title, but only \gf{hidden} in the field \emph{comment} of the ID3 tag, which is often used for incidental information such as codec settings. However, if you use the comments for useful information, you should also include them in the quick search.
 
-\item \textbf{Accelerate lyrics search.} A little bit hidden is the function to search for lyrics. This is not possible via the quick search, but only via the extended search, accessible via the menu. The same procedure can be used to speed up the search. With large music collections, where most of the lyrics are available, the memory usage increases a bit more. If the function is hardly used, you can disable it, but you don't have to.
+\item \textbf{Accelerate lyrics search.} \emph{Default: Off.} A little bit hidden is the function to search for lyrics. This is not possible via the quick search, but only via the extended search, accessible via the menu. Here the same procedure can be used to speed up the search. For large music collections, where most of the lyrics are also available, the memory consumption increases significantly. 
+
+If the lyric search is often used, you can activate it, but usually this is not necessary.
+
+\textbf{Important: }If the \gf{Ignore lyrics} option has been activated in the metadata settings, the lyric search does not work at all. Nemp then ignores the texts stored in the ID3 tags and does not include them in the media library. The fact that the texts are still displayed during playback and in the detail window does not change this. Because the information displayed in this way is always also synchronized  with the information in the file stored data.
 
 \item \textbf{Quick search.} In my opinion, the quick search in the main Nemp window is really fast. The results are displayed (almost) instantly even in very large music collections. By default, even while typing - with each additional character the hit list is further restricted.
 
-If no matches were found for a search term, this may also be due to typing errors - in the search term or in the metadata of the files, or to inconsistencies such as \emph{P!nk} or \emph{Pink}. Nemp therefore also supports a fuzzy search, which is performed by default only when pressing the \textsc{Enter} key. On newer computers, however, the fuzzy search also works without any noticeable delay during typing.
+If no matches were found for a search term, this may also be due to typing errors - in the search term or in the metadata of the files, or to inconsistencies such as \emph{P!nk} or \emph{Pink}. Nemp therefore also supports a fuzzy search, which is performed by default only when pressing the \textsc{Enter} key. On newer computers, however, the fuzzy search also works without any noticeable delay during typing, if there are not too many files in the media library.
 
 \item \textbf{Change coverflow according to results.} In addition to presenting the search hits in the list, the coverflow can also be restricted to the search results. The search hits can then be further refined via the coverflow.
 \end{itemize}
@@ -1317,6 +1343,25 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+\subsection*{Version 4.9.0, August 2018}
+
+\textbf{New features}
+\begin{itemize}
+\item Loading and saving the media library is more RAM-saving now
+\item Preparation of the media library for accelerated searches is more RAM-saving now
+
+\item option \gf{Ignore lyrics} to reduce storage problems with very (very) large music collections.
+\item Logfile for the playlist: When was which track played
+\item Option \gf{Delete missing files at startup} to delete missing files from the media library. If necessary, it will be executed again when a new drive is connected
+\item Settings dialog: Button \gf{Scan now} for new or missing files
+\end{itemize}
+
+\textbf{Bugfixes}
+\begin{itemize}
+\item \gf{Cleanup / Remove missing files} removed always missing playlists, even from drives that are not currently connected
+\item Possible deadlock at \gf{Clear Covercache} fixed
+\end{itemize}
 
 \subsection*{Version 4.8.0, March 2018}
 

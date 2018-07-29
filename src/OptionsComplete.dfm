@@ -4,7 +4,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 521
+  ClientHeight = 615
   ClientWidth = 665
   Color = clBtnFace
   Constraints.MinHeight = 520
@@ -25,14 +25,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
   OnShow = FormShow
   DesignSize = (
     665
-    521)
+    615)
   PixelsPerInch = 96
   TextHeight = 13
   object OptionsVST: TVirtualStringTree
     Left = 8
     Top = 8
     Width = 191
-    Height = 475
+    Height = 569
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelInner = bvNone
     BevelOuter = bvNone
@@ -60,8 +60,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Left = 204
     Top = 6
     Width = 454
-    Height = 478
-    ActivePage = TabFiles0
+    Height = 572
+    ActivePage = TabFiles2
     Anchors = [akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 1
@@ -71,7 +71,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_NempUpdater: TGroupBox
         Left = 8
         Top = 134
@@ -273,7 +273,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 5
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_Hotkeys: TGroupBox
         Left = 8
         Top = 103
@@ -1140,7 +1140,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 6
       DesignSize = (
         446
-        378)
+        472)
       object Label3: TLabel
         Left = 16
         Top = 312
@@ -1289,7 +1289,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_Deskband: TGroupBox
         Left = 8
         Top = 103
@@ -1447,7 +1447,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 21
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_BetaOptions: TGroupBox
         Left = 3
         Top = 372
@@ -1835,7 +1835,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 1
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_ViewMain_Columns: TGroupBox
         Left = 8
         Top = 8
@@ -2019,7 +2019,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_ViewPartymode_Amplification: TGroupBox
         Left = 8
         Top = 8
@@ -2121,7 +2121,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 7
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_Fonts: TGroupBox
         Left = 8
         Top = 160
@@ -2352,7 +2352,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 21
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_ViewExt_NoMetadata: TGroupBox
         Left = 8
         Top = 287
@@ -2594,7 +2594,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 22
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_FilesMain_Directories: TGroupBox
         Left = 8
         Top = 8
@@ -2771,10 +2771,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 20
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_AutoRating: TGroupBox
         Left = 8
-        Top = 159
+        Top = 174
         Width = 431
         Height = 130
         Anchors = [akLeft, akTop, akRight]
@@ -2836,7 +2836,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Left = 8
         Top = 8
         Width = 431
-        Height = 49
+        Height = 65
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Access to meta data (e.g. Id3-Tags)'
         TabOrder = 0
@@ -2848,10 +2848,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Allow quick access to metadata'
           TabOrder = 0
         end
+        object cb_IgnoreLyrics: TCheckBox
+          Left = 16
+          Top = 40
+          Width = 401
+          Height = 17
+          Caption = 'Ignore Lyrics (recommended for very large  music collections)'
+          TabOrder = 1
+          OnClick = cb_IgnoreLyricsClick
+        end
       end
       object GrpBox_CDAudio: TGroupBox
         Left = 8
-        Top = 295
+        Top = 310
         Width = 431
         Height = 50
         Caption = 'CD-Audio'
@@ -2867,7 +2876,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object GrpBox_TabMedia5_ID3: TGroupBox
         Left = 8
-        Top = 351
+        Top = 366
         Width = 431
         Height = 50
         Anchors = [akLeft, akTop, akRight]
@@ -2887,7 +2896,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       end
       object grpBox_AdditionalTags: TGroupBox
         Left = 8
-        Top = 63
+        Top = 78
         Width = 431
         Height = 90
         Caption = 'Extended tags (for tag cloud)'
@@ -2925,7 +2934,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 24
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_TabMedia3_Cover: TGroupBox
         Left = 8
         Top = 8
@@ -3090,7 +3099,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 25
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
         Left = 8
         Top = 8
@@ -3245,7 +3254,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 23
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_TabMedia5_Charsets: TGroupBox
         Left = 8
         Top = 66
@@ -3403,7 +3412,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 2
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_Devices: TGroupBox
         Left = 8
         Top = 8
@@ -3612,7 +3621,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 22
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_ExtendedAudio: TGroupBox
         Left = 8
         Top = 8
@@ -3773,7 +3782,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_PlaylistBehaviour: TGroupBox
         Left = 8
         Top = 8
@@ -3894,7 +3903,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
       end
       object GrpBox_PlayerExt2_Playlist: TGroupBox
-        Left = 7
+        Left = 8
         Top = 264
         Width = 431
         Height = 81
@@ -3930,13 +3939,54 @@ object OptionsCompleteForm: TOptionsCompleteForm
           OnClick = CB_AutoDeleteFromPlaylistClick
         end
       end
+      object GrpBoX_LogPlaylist: TGroupBox
+        Left = 8
+        Top = 351
+        Width = 431
+        Height = 98
+        Caption = 'Playlist Log'
+        TabOrder = 3
+        object LblLogDuration: TLabel
+          Left = 28
+          Top = 43
+          Width = 144
+          Height = 13
+          Caption = 'Remove log entries older than'
+        end
+        object LblLogDuration2: TLabel
+          Left = 96
+          Top = 65
+          Width = 143
+          Height = 13
+          Caption = 'days (0 for unlimited logging).'
+        end
+        object cbSaveLogToFile: TCheckBox
+          Left = 8
+          Top = 20
+          Width = 409
+          Height = 17
+          Caption = 'Use logfile on hard disk to log previous sessions'
+          TabOrder = 0
+          OnClick = cbSaveLogToFileClick
+        end
+        object seLogDuration: TSpinEdit
+          Left = 29
+          Top = 62
+          Width = 61
+          Height = 22
+          MaxValue = 366
+          MinValue = 0
+          TabOrder = 1
+          Value = 7
+        end
+      end
     end
     object TabPlayer4: TTabSheet
       Caption = 'Player (Streams)'
       ImageIndex = 23
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_WebradioRecording: TGroupBox
         Left = 8
         Top = 88
@@ -4125,7 +4175,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 15
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_MickyMouse: TRadioGroup
         Left = 8
         Top = 8
@@ -4256,7 +4306,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 19
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_TabAudio7_Countdown: TGroupBox
         Left = 8
         Top = 174
@@ -4429,7 +4479,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 17
       DesignSize = (
         446
-        378)
+        472)
       object GrpBox_Scrobble: TGroupBox
         Left = 8
         Top = 8
@@ -4780,7 +4830,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       ImageIndex = 18
       DesignSize = (
         446
-        378)
+        472)
       object GrpBoxConfig: TGroupBox
         Left = 8
         Top = 8
@@ -5065,7 +5115,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNApply: TButton
     Left = 583
-    Top = 491
+    Top = 585
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -5075,7 +5125,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNCancel: TButton
     Left = 503
-    Top = 491
+    Top = 585
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -5086,7 +5136,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object BTNok: TButton
     Left = 423
-    Top = 491
+    Top = 585
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -5097,7 +5147,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   end
   object _XXX_cb_SettingsMode: TComboBox
     Left = 8
-    Top = 489
+    Top = 583
     Width = 191
     Height = 21
     Style = csDropDownList

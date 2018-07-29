@@ -64,7 +64,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
-    DeleteSelect, GnuGetText, MedienbibliothekClass;
+    DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog, PostProcessorUtils;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -648,7 +648,7 @@ begin
 
         MB_RefreshAudioFile: begin
             af := TAudioFile(aMsg.LParam);
-            aErr := af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating);
+            aErr := af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
             if aErr <> AUDIOERR_None then
                 HandleError(afa_RefreshingFileInformation, af, aErr);
 
@@ -684,7 +684,7 @@ begin
         MB_LyricUpdateComplete: begin
                               MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
                             end;
-
+        {
         MB_ReCheckPlaylingFile: begin
               // this is only called after loading the library.
               // And only to show a proper rating in the player
@@ -698,6 +698,7 @@ begin
                   CorrectVCLAfterAudioFileEdit(NempPlayer.MainAudioFile, False);
               end;
         end;
+        }
 
         MB_StartAutoScanDirs: begin
             ST_Medienliste.Mask := GenerateMedienBibSTFilter;
@@ -794,6 +795,34 @@ begin
             MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
         end;
 
+        MB_OutOfMemory: begin
+            case aMsg.LParam of
+                OutOfMemory_DataReduced: begin
+                      MedienBib.BibSearcher.AccelerateSearchIncludePath := False;
+                      MedienBib.BibSearcher.AccelerateSearchIncludeComment := False;
+                      AddErrorLog(MediaLibrary_OutOfMemoryAccelerateSearchReduced);
+                end;
+                OutOfMemory_DataDisabled: begin
+                      MedienBib.BibSearcher.AccelerateSearch := False;
+                      AddErrorLog(MediaLibrary_OutOfMemoryAccelerateSearchDisabled);
+                end;
+                OutOfMemory_LyricsDisabled: begin
+                      MedienBib.BibSearcher.AccelerateLyricSearch := False;
+                      AddErrorLog(MediaLibrary_OutOfMemoryAccelerateLyricSearchDisabled);
+                end;
+                OutOfMemory_ErrorBuildingDataString: begin
+                      AddErrorLog(MediaLibrary_OutOfMemoryBuildingStringError);
+                end;
+                OutOfMemory_ErrorBuildingLyricString: begin
+                      AddErrorLog(MediaLibrary_OutOfMemoryBuildingLyricStringError);
+                end;
+            end;
+            // MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
+        end;
+
+        MB_MessageForLog    : AddErrorLog(PWideChar(aMsg.LParam));
+        MB_MessageForDialog : MessageDlg(PWideChar(aMsg.LParam), mtWarning, [MBOK], 0);
+
         MB_ID3TagUpdateComplete: begin
             MessageDlg(TagEditor_FilesUpdateComplete, mtInformation, [MBOK], 0);
         end;
@@ -867,6 +896,16 @@ begin
         end;
 
         MB_CheckForStartJobs: MedienBib.ProcessNextStartJob;
+
+        MB_AddNewLogEntry: begin
+            if assigned(PlayerLogForm) then
+                PlayerLogForm.AddNewLogEntry(TNempLogEntry(aMsg.lParam));
+        end;
+
+        MB_EditLastLogEntry: begin
+            if assigned(PlayerLogForm) then
+                PlayerLogForm.vstPlayerLog.Invalidate;
+        end;
 
         (*
         MB_StartingJobDone: begin
@@ -1981,7 +2020,7 @@ Begin
                               if Not MedienBib.AudioFileExists(filename) then
                               begin
                                 AudioFile:=TAudioFile.Create;
-                                aErr := AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating);
+                                aErr := AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                                 HandleError(afa_DroppedFiles, AudioFile, aErr);
 
                                 MedienBib.InitCover(AudioFile);
@@ -2020,7 +2059,7 @@ Var
       begin
           AudioFile := TAudioFile.Create;
           try
-              aErr := AudioFile.GetAudioData(af, GAD_Cover or GAD_Rating);
+              aErr := AudioFile.GetAudioData(af, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
               HandleError(afa_DroppedFiles, AudioFile, aErr);
               // Play new song in headset
               NempPlayer.PlayInHeadset(AudioFile);
@@ -2136,7 +2175,7 @@ begin
                 if Not MedienBib.AudioFileExists(NewFile) then
                 begin
                     AudioFile:=TAudioFile.Create;
-                    aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating);
+                    aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                     HandleError(afa_NewFile, AudioFile, aErr);
 
                     MedienBib.InitCover(AudioFile);

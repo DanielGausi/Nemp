@@ -132,7 +132,7 @@ type
               'Invalid Ogg-Vorbis-File: First Ogg-Page corrupt',
               'Invalid Ogg-Vorbis-File: Second Vorbis-Header corrupt',
               'Invalid Ogg-Vorbis-File: Second Ogg-Page corrupt',
-              'Comment too large (sorry, Flogger limitation)',
+              'Ogg-Vorbis-Comment too large (not supported by Nemp, sorry)',
               'Backup failed',
               'Delete backup failed',
               // Flac
@@ -143,14 +143,14 @@ type
               'Invalid Apev2Tag' ,
               //
 
-              'Invalid Top-Level Atom',
+              'Invalid Top-Level Atom (probably a video file?)',
               'Invalid UDTA Atom',
               'Invalid META Version',
               'Invalid MDHD Atom',
               'Invalid STSD Atom',
               'Invalid STCO Atom',
               'Duplicate UDTA Atoms',
-              'Duplicate TRAK Atoms',
+              'Duplicate TRAK Atoms (probably a video file?)',
               //
               'Metadata is not supported in this file type',
               'Quick access to metadata denied',
@@ -288,6 +288,9 @@ type
 
         function fGetRoundedRating: Double;
 
+        // for saving the data into the MediaLibrary (gmp) file: a Raw estimation of the needed size
+        function fGetEstimatedSizeInFile: Integer;
+
         procedure GetMp3Info(aMp3File: TMp3File; filename: UnicodeString; Flags: Integer = 0);
         procedure GetFlacInfo(aFlacFile: TFlacFile; Flags: Integer = 0);
         procedure GetM4AInfo(aM4AFile: TM4aFile; Flags: Integer = 0);
@@ -310,7 +313,7 @@ type
         // Write a string in a stream. In previous versions several encodings were
         // written, now only UTF8 is used
         // the ID defines, whether the string contains the artist, title, album, ...
-        procedure WriteTextToStream(aStream: TStream; ID: Byte; wString: UnicodeString);
+        function WriteTextToStream(aStream: TStream; ID: Byte; wString: UnicodeString): LongInt;
         function ReadTextFromStream(aStream: TStream): UnicodeString;
     public
         // CueList: AudioFiles in the Playlist can have a Cuesheet.
@@ -413,6 +416,8 @@ type
         property VoteCounter: Integer read fVoteCounter write fVoteCounter;
         property Favorite: Byte read fFavorite write fFavorite;
 
+        property EstimatedSizeInFile: Integer read fGetEstimatedSizeInFile;
+
         constructor Create;
         destructor Destroy; override;
 
@@ -441,12 +446,14 @@ type
         function GenerateCSVString: UnicodeString;
 
         // Load the data from a .gmp-file (medialib-format)
+        function LoadSizeInfoFromStream(aStream: TStream): Integer;
+        procedure LoadDataFromStream(aStream: TStream);
         procedure LoadFromStream(aStream: TStream);
         // load the data from a .npl-file (Nemp-playlist-format)
         // the difference is about URLs as paths and relative filenames in playlists
         procedure LoadFromStreamForPlaylist(aStream: TStream);
         // save the data to the stream. gmp/npl-stuff is done via the second parameter
-        procedure SaveToStream(aStream: TStream; aPath: UnicodeString = '');
+        function SaveToStream(aStream: TStream; aPath: UnicodeString = ''): LongInt;
 
         // Set the samplerate. Called by the playerclass.
         // Samplerate came from the bass.dll, but not directly compatible to
@@ -546,6 +553,7 @@ const
       GAD_Cover  = 1;
       GAD_Rating = 2;  // !!!!  ignored by the subfunctions
       GAD_CDDB   = 4;
+      GAD_NOLYRICS = 8;
       // note for future extensions:
       // this is planned as bitmasks, so use 4,8,16,32,.. for additional flags
 
@@ -1586,6 +1594,11 @@ begin
                       fDuration := MainFile.Duration;
                       fBitrate := MainFile.Bitrate Div 1000;
                       SetSampleRate(MainFile.Samplerate);
+
+                      // Ignore Lyrics (far saving RAM on huge collections)
+                      if (Flags AND GAD_NOLYRICS) = GAD_NOLYRICS then
+                          Lyrics := '';
+
                   finally
                       MainFile.Free;
                   end;
@@ -2592,7 +2605,15 @@ end;
     Load AudioFile-structure from stream
     --------------------------------------------------------
 }
-procedure TAudioFile.LoadFromStream(aStream: Tstream);
+
+// split the reading method into two methods for loading the (huge) media library file
+// keep the old name (just LoadFromStream) for use with *.npl Playlist files
+function TAudioFile.LoadSizeInfoFromStream(aStream: TStream): Integer;
+begin
+    aStream.Read(result, SizeOf(result));
+end;
+
+procedure TAudioFile.LoadDataFromStream(aStream: TStream);
 var GenreIDX:byte;
     c: Integer;
     katold:byte;
@@ -2603,9 +2624,10 @@ var GenreIDX:byte;
     DummyInt: Integer;
     Dummystr: UnicodeString;
 begin
-    // Note: First Dummy was used for the size of the Audiofile data
-    // not used anymore.
-    aStream.Read(dummy, SizeOf(dummy));
+    // Note: Dummy was used for the size of the Audiofile data
+    // not used for some time,
+    // in 2018 relocated in seperate function, as the Medialibrary.Load method needs to check the size field for buffering reasons
+    //  aStream.Read(dummy, SizeOf(dummy));
     c := 0;
     repeat
         aStream.Read(id, sizeof(ID));
@@ -2650,7 +2672,7 @@ begin
                   genre := '';
             end;
             MP3DB_GENRE_STR: genre := ReadTextFromStream(aStream);
-            MP3DB_LYRICS: Lyrics := UTF8String(Trim(ReadTextFromStream(aStream)));
+            MP3DB_LYRICS: Lyrics := UTF8String(Trim(  ReadTextFromStream(aStream)));
             MP3DB_ID3KOMMENTAR: Comment := ReadTextFromStream(aStream);
             MP3DB_COVERID: CoverID := ReadTextFromStream(aStream);
 
@@ -2671,6 +2693,13 @@ begin
             end;
         end;
     until (ID = MP3DB_ENDOFINFO) OR (c >= MP3DB_ENDOFINFO);
+
+end;
+
+procedure TAudioFile.LoadFromStream(aStream: Tstream);
+begin
+    LoadSizeInfoFromStream(aStream);
+    LoadDataFromStream(aStream);
 end;
 
 
@@ -2769,142 +2798,165 @@ end;
     Methods for writing the stuff ...
     --------------------------------------------------------
 }
-procedure TAudioFile.WriteTextToStream(aStream: TStream; ID: Byte; wString: UnicodeString);
+function TAudioFile.fGetEstimatedSizeInFile: Integer;
+const STRING_DATA_HEADER = 7;
+      OTHER_DATA_HEADER = 1;
+begin
+    result :=
+       + 70   // dummy + 10 * STRING_DATA_HEADER
+       + length(Pfad)
+       + length(Artist)
+       + length(Titel)
+       + length(Album)
+       + length(RawTagLastFM)
+       + length(Genre)  // in most cases only the Index (int)
+       + length(lyrics)
+       + length(Comment)
+       + length(CoverID)
+       + length(CD)
+       + 70; // duration, bitrate, vbr, channelmode, sampleratre, filesize, date, track, rating, playcounter, favorite, year
+
+    result := 2 * result; // just to be sure, doesn't really matter
+end;
+
+function TAudioFile.WriteTextToStream(aStream: TStream; ID: Byte; wString: UnicodeString): LongInt;
 var TextEncoding: Byte;
     len: integer;
     tmpStr: UTF8String;
 begin
   TextEncoding := 2; // UTF-8
 
-  aStream.Write(ID,sizeof(ID));
-  aStream.Write(TextEncoding,sizeof(TExtEncoding));
+  result := aStream.Write(ID,sizeof(ID));
+  result := result + aStream.Write(TextEncoding,sizeof(TExtEncoding));
 
   tmpstr := UTF8Encode(wString);
   len := length(tmpstr);
-  aStream.Write(len,SizeOf(len));
-  aStream.Write(PAnsiChar(tmpstr)^,len);
+  result := result + aStream.Write(len,SizeOf(len));
+  result := result + aStream.Write(PAnsiChar(tmpstr)^,len);
 
 end;
 
-procedure TAudioFile.SaveToStream(aStream: Tstream; aPath: UnicodeString = '');
+function TAudioFile.SaveToStream(aStream: Tstream; aPath: UnicodeString = ''): LongInt;
 var
     GenreIDXint:integer;
     GenreIDX: byte;
     Id: Byte;
     CuePresent: Integer;
-    dummy: Integer;
-    Wyear: word; 
+    dummy, dataSize: Integer;
+    Wyear: word;
+    SizePos, EndPos: LongInt;
 begin
     dummy := 0;
-    aStream.Write(dummy,SizeOf(dummy));
+    SizePos := aStream.Position; // needed later to correct the size field (07/2018)
+    result := aStream.Write(dummy,SizeOf(dummy));
     if aPath = '' then
         // write filename incl. path
-        WriteTextToStream(aStream, MP3DB_PFAD, Pfad)
+        result := result + WriteTextToStream(aStream, MP3DB_PFAD, Pfad)
     else
     begin
         // write only the name in the parameter
         // used by npl-playlist for relative filenames
-        WriteTextToStream(aStream, MP3DB_PFAD, aPath);
+        result := result + WriteTextToStream(aStream, MP3DB_PFAD, aPath);
         // On Playlistfiles: write whether cuesheet is present or not
         if Assigned(CueList) and (CueList.Count > 0) then
         begin
             ID := MP3DB_CUEPRESENT;
             CuePresent := 1;
-            aStream.Write(ID,sizeof(ID));
-            aStream.Write(CuePresent, sizeOf(CuePresent));
+            result := result + aStream.Write(ID,sizeof(ID));
+            result := result + aStream.Write(CuePresent, sizeOf(CuePresent));
         end;
     end;
 
     if length(Artist)>0 then
-      WriteTextToStream(aStream, MP3DB_ARTIST, Artist);
+      result := result + WriteTextToStream(aStream, MP3DB_ARTIST, Artist);
 
     if length(titel)>0 then
-      WriteTextToStream(aStream, MP3DB_TITEL, Titel);
+      result := result + WriteTextToStream(aStream, MP3DB_TITEL, Titel);
 
     if length(Album)>0 then
-      WriteTextToStream(aStream, MP3DB_ALBUM, Album);
+      result := result + WriteTextToStream(aStream, MP3DB_ALBUM, Album);
 
     if RawTagLastFM <> '' then
-        WriteTextToStream(aStream, MP3DB_LASTFM_TAGS, String(RawTagLastFM));
+        result := result + WriteTextToStream(aStream, MP3DB_LASTFM_TAGS, String(RawTagLastFM));
 
     if Duration <> 0 then
     begin
       ID:=MP3DB_DAUER;
-      aStream.Write(ID,sizeof(ID));
-      aStream.Write(fDuration,sizeOf(fDuration));
+      result := result + aStream.Write(ID,sizeof(ID));
+      result := result + aStream.Write(fDuration,sizeOf(fDuration));
     end;
 
     if bitrate <> 192 then
     begin
       ID:=MP3DB_BITRATE;
-      aStream.Write(ID,sizeof(ID));
-      aStream.Write(fBitrate,sizeOf(fBitrate));
+      result := result + aStream.Write(ID,sizeof(ID));
+      result := result + aStream.Write(fBitrate,sizeOf(fBitrate));
     end;
 
     ID:=MP3DB_VBR;
-    aStream.Write(ID,sizeof(ID));
-    aStream.Write(fvbr,sizeOf(fvbr));
+    result := result + aStream.Write(ID,sizeof(ID));
+    result := result + aStream.Write(fvbr,sizeOf(fvbr));
 
     if fChannelModeIDX <> 1 then
     begin
       ID:=MP3DB_CHANNELMODE;
-      aStream.Write(ID,sizeof(ID));
-      aStream.Write(fChannelmodeIDX,SizeOf(fChannelmodeIDX));
+      result := result + aStream.Write(ID,sizeof(ID));
+      result := result + aStream.Write(fChannelmodeIDX,SizeOf(fChannelmodeIDX));
     end;
 
     if fSamplerateIDX <> 7 then
     begin
       ID:=MP3DB_SAMPLERATE;
-      aStream.Write(ID,sizeof(ID));
-      aStream.Write(fSamplerateIDX,SizeOf(fSamplerateIDX));
+      result := result + aStream.Write(ID,sizeof(ID));
+      result := result + aStream.Write(fSamplerateIDX,SizeOf(fSamplerateIDX));
     end;
 
     ID:=MP3DB_FILESIZE;
-    aStream.Write(ID,sizeof(ID));
-    aStream.Write(fFileSize,sizeOf(fFileSize));
+    result := result + aStream.Write(ID,sizeof(ID));
+    result := result + aStream.Write(fFileSize,sizeOf(fFileSize));
 
     // new again in Nemp 4.0: FileAge
     ID := MP3DB_DATUM;
-    aStream.Write(ID,sizeof(ID));
-    aStream.Write(fFileAge, SizeOf(fFileAge));
+    result := result + aStream.Write(ID,sizeof(ID));
+    result := result + aStream.Write(fFileAge, SizeOf(fFileAge));
 
     if Track <> 0 then
     begin
       ID := MP3DB_TRACK;
-      aStream.Write(ID, SizeOf(Id));
-      aStream.Write(Track, SizeOf(Track));
+      result := result + aStream.Write(ID, SizeOf(Id));
+      result := result + aStream.Write(Track, SizeOf(Track));
     end;
 
     if CD <> '' then
-        WriteTextToStream(aStream, MP3DB_CD, CD);
+        result := result + WriteTextToStream(aStream, MP3DB_CD, CD);
 
     if fRating <> 0 then
     begin
       ID := MP3DB_RATING;
-      aStream.Write(ID, SizeOf(Id));
-      aStream.Write(fRating, SizeOf(fRating));
+      result := result + aStream.Write(ID, SizeOf(Id));
+      result := result + aStream.Write(fRating, SizeOf(fRating));
     end;
 
     if fPlayCounter <> 0 then
     begin
       ID := MP3DB_PLAYCOUNTER;
-      aStream.Write(ID, SizeOf(Id));
-      aStream.Write(fPlayCounter, SizeOf(fPlayCounter));
+      result := result + aStream.Write(ID, SizeOf(Id));
+      result := result + aStream.Write(fPlayCounter, SizeOf(fPlayCounter));
     end;
 
     if fFavorite <> 0 then
     begin
       ID := MP3DB_FAVORITE;
-      aStream.Write(ID, SizeOf(Id));
-      aStream.Write(fFavorite, SizeOf(fFavorite));
+      result := result + aStream.Write(ID, SizeOf(Id));
+      result := result + aStream.Write(fFavorite, SizeOf(fFavorite));
     end;
 
     if Year<>'' then
     begin
       ID := MP3DB_YEAR;
       WYear := StrToIntDef(Year, 0);
-      aStream.Write(ID,sizeof(ID));
-      aStream.Write(WYear,SizeOf(WYear));
+      result := result + aStream.Write(ID,sizeof(ID));
+      result := result + aStream.Write(WYear,SizeOf(WYear));
     end;
 
 
@@ -2912,29 +2964,35 @@ begin
     if GenreIDXint = -1 then
     begin
           // No Standard-Genre - write String
-          WriteTextToStream(aStream, MP3DB_GENRE_STR, Genre);
+          result := result + WriteTextToStream(aStream, MP3DB_GENRE_STR, Genre);
     end else
     begin
           // Standard-Genre: just write the corresponding byte
           ID := MP3DB_GENRE;
-          aStream.Write(ID,sizeof(ID));
+          result := result + aStream.Write(ID,sizeof(ID));
           GenreIDX := Byte(GenreIDXint);
-          aStream.Write(GenreIDX,sizeof(GenreIDX));
+          result := result + aStream.Write(GenreIDX,sizeof(GenreIDX));
     end;
 
     if length(lyrics) > 0 then
-      WriteTextToStream(aStream, MP3DB_LYRICS, String(lyrics));
-
+      result := result + WriteTextToStream(aStream, MP3DB_LYRICS, String(lyrics));
 
     if length(Comment) > 0 then
-      WriteTextToStream(aStream, MP3DB_ID3KOMMENTAR, Comment);
+      result := result + WriteTextToStream(aStream, MP3DB_ID3KOMMENTAR, Comment);
 
     if CoverID <> '' then
-      WriteTextToStream(aStream, MP3DB_COVERID, CoverID);
+      result := result + WriteTextToStream(aStream, MP3DB_COVERID, CoverID);
                              
     // End of AudioFile
     ID := MP3DB_ENDOFINFO;
-    aStream.Write(ID,sizeof(ID));
+    result := result + aStream.Write(ID,sizeof(ID));
+
+    // fix the size-information
+    endPos := aStream.Position;
+    aStream.Position := SizePos;
+    dataSize := result - 4;  // -4: Exclude the size needed for writing the size-field
+    aStream.Write(dataSize, SizeOf(dataSize));
+    aStream.Position := endPos;
 end;
 
 

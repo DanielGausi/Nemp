@@ -731,6 +731,13 @@ Medialibrary_DialogFilter            = 'Nemp medialibrary';
 Medialibrary_AddingPlaylist          = 'Adding the playlist to the medialibrary...';
 MediaLibrary_CSVFilter               = 'CSV files';
 
+MediaLibrary_OutOfMemoryAccelerateSearchReduced       = 'Not enough memory. The settings for the accelerated search have been reduced to a minimum.';
+MediaLibrary_OutOfMemoryAccelerateSearchDisabled      = 'Not enough memory. Accelerated search has been disabled.';
+MediaLibrary_OutOfMemoryAccelerateLyricSearchDisabled = 'Not enough memory. The accelerated search for lyrics has been disabled.';
+MediaLibrary_OutOfMemoryBuildingStringError           = 'An error occurred while preparing the accelerated search. That was never supposed to happen.';
+MediaLibrary_OutOfMemoryBuildingLyricStringError      = 'An error occurred while preparing the accelerated search for lyrics. That was never supposed to happen.';
+
+
 
     Playlist_QueryReallyDelete    = 'This will delete your current playlist. Continue?';
     Playlist_NotEverything        = 'No. Nemp will not add _everything_ to the playlist.';
@@ -920,6 +927,17 @@ AutoDeleteInfo_PreservedFiles = 'Nemp detected %d file(s) and %d playlist(s) on 
 AutoDeleteInfo_MessageHint = 'Note: You can turn off this message in the settings dialog -> File management.';
 
 Hint_BatteryLow = 'Low battery (%d%%). Click for more information.';
+
+Playlist_LogAborted = 'aborted';
+
+Warning_LyricsUsage = 'Ignoring lyrics will remove all collected lyrics from the media library, but they will remain'
+            +#13#10 + 'in the ID3-Tags. Once the lyrics have been removed from the library, they can no longer be'
+            +#13#10 + 'used by the search function unless you rescan the files in your library.'
+         +#13#10+#13#10 + 'Currently there are %d files with lyrics stored in the library (out of %d total files), using '
+         +#13#10 + 'approximately %s of memory.'
+         +#13#10 + #13#10 + 'Do you want to continue and reomve all lyrics from you media library?';
+
+//MediaLibrarySize_Summary = 'Estimated library size: %s';
 
 
 implementation
