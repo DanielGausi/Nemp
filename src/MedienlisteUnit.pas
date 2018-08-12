@@ -52,11 +52,11 @@ uses
 type
   TMedienlisteForm = class(TNempForm)
     ContainerPanelMedienBibForm: TNempPanel;
-    CloseImage: TSkinButton;
+    CloseImageM: TSkinButton;
     procedure FormShow(Sender: TObject);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure CloseImageClick(Sender: TObject);
+    procedure CloseImageMClick(Sender: TObject);
 
     procedure FormResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -74,6 +74,7 @@ type
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelMedienBibFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormHide(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -137,10 +138,10 @@ begin
   Width  := BWidth  ;
 
   Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.VSTPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-  CloseImage.Left := Nemp_MainForm.VSTPanel.Width - CloseImage.Width;// - 10;
-  CloseImage.Top := 3;
-  CloseImage.Parent := Nemp_MainForm.VSTPanel;
-  CloseImage.BringToFront;
+  CloseImageM.Left := Nemp_MainForm.VSTPanel.Width - CloseImageM.Width;// - 10;
+  CloseImageM.Top := 3;
+  CloseImageM.Parent := Nemp_MainForm.VSTPanel;
+  CloseImageM.BringToFront;
 
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
 
@@ -189,10 +190,10 @@ end;
 procedure TMedienlisteForm.FormActivate(Sender: TObject);
 begin
   Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.VSTPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-  CloseImage.Left := Nemp_MainForm.VSTPanel.Width - CloseImage.Width;
-  CloseImage.Top := 3;
-  CloseImage.Parent := Nemp_MainForm.VSTPanel;
-  CloseImage.BringToFront;
+  CloseImageM.Left := Nemp_MainForm.VSTPanel.Width - CloseImageM.Width;
+  CloseImageM.Top := 3;
+  CloseImageM.Parent := Nemp_MainForm.VSTPanel;
+  CloseImageM.BringToFront;
 end;
 
 procedure TMedienlisteForm.FormClose(Sender: TObject;
@@ -202,9 +203,14 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImage.Parent := MedienlisteForm;
+  CloseImageM.Parent := MedienlisteForm;
 end;
 
+
+procedure TMedienlisteForm.FormHide(Sender: TObject);
+begin
+    CloseImageM.Parent := MedienlisteForm;
+end;
 
 procedure TMedienlisteForm.FormMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -215,7 +221,7 @@ begin
   Resizing := False;
 end;
 
-procedure TMedienlisteForm.CloseImageClick(Sender: TObject);
+procedure TMedienlisteForm.CloseImageMClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin

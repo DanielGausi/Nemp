@@ -1476,6 +1476,7 @@ Begin
   finally
   end;
   {$IFDEF USESTYLES}FormatSettings.{$ENDIF}DecimalSeparator := '.';
+  //FormatSettings.DecimalSeparator := '.';
   try
     Result := StrToFloat( StrPas( Ident) );
   except on E : EConvertError Do

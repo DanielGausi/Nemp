@@ -58,14 +58,15 @@ uses
   UpdateUtils, uDragFilesSrc, PlayWebstream,
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection
+  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection,
+  System.ImageList
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
 type
 
   {$IFDEF USESTYLES}
-  TFormStyleHookFix= class (TFormStyleHook)
+(*  TFormStyleHookFix= class (TFormStyleHook)
   procedure CMDialogChar(var Message: TWMKey); message CM_DIALOGCHAR;
   end;
 
@@ -73,6 +74,7 @@ type
   private
      function CheckHotKeyItem(ACharCode: Word): Boolean;
   end;
+  *)
   {$ENDIF}
 
   TNemp_MainForm = class(TNempForm)
@@ -652,8 +654,6 @@ type
     WebserverImage: TImage;
     BirthdayImage: TImage;
     ScrobblerImage: TImage;
-    BtnMenu: TSkinButton;
-    BtnMinimize: TSkinButton;
     BtnClose: TSkinButton;
     AudioPanel: TNempPanel;
     GRPBOXCover: TNempPanel;
@@ -867,7 +867,6 @@ type
 
     procedure FormCreate(Sender: TObject);
 
-
     procedure InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 
     procedure Skinan1Click(Sender: TObject);
@@ -964,7 +963,6 @@ type
     procedure PlaylistVSTMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
 
-    //Procedure StreamPause;
     procedure PlayNextBTNIMGClick(Sender: TObject);
     procedure PlayPrevBTNIMGClick(Sender: TObject);
     procedure StopBTNIMGClick(Sender: TObject);
@@ -1056,10 +1054,10 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure PlaylistVSTGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      var Ghosted: Boolean; var ImageIndex: Integer);
+      var Ghosted: Boolean; var ImageIndex: TImageIndex);
     procedure VSTGetImageIndex(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-      var Ghosted: Boolean; var ImageIndex: Integer);
+      var Ghosted: Boolean; var ImageIndex: TImageIndex);
     procedure PM_PL_ExtendedScanFilesClick(Sender: TObject);
 
     procedure LyricsMemoKeyDown(Sender: TObject; var Key: Word;
@@ -1107,7 +1105,6 @@ type
     procedure PlaylistVSTScroll(Sender: TBaseVirtualTree; DeltaX,
       DeltaY: Integer);
     procedure FormResize(Sender: TObject);
-    //procedure MM_PL_WebStreamClick(Sender: TObject);
     procedure PM_ML_DeleteSelectedClick(Sender: TObject);
     procedure EDITFastSearchEnter(Sender: TObject);
     procedure PM_P_ViewStayOnTopClick(Sender: TObject);
@@ -1132,7 +1129,7 @@ type
     procedure PaintFrameMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure BtnCloseClick(Sender: TObject);
-    procedure BtnMinimizeClick(Sender: TObject);
+    procedure __BtnMinimizeClick(Sender: TObject);
     procedure PM_P_ViewCompactClick(Sender: TObject);
     procedure PM_P_ViewSeparateWindows_PlaylistClick(Sender: TObject);
     procedure PM_P_ViewSeparateWindows_MedialistClick(Sender: TObject);
@@ -1163,10 +1160,8 @@ type
     procedure RepairZOrder;
     procedure ActualizeVDTCover;
 
-    //procedure PM_PL_AddToPrebookListEndClick(Sender: TObject);
     procedure PM_ML_PlayNowClick(Sender: TObject);
     procedure PanelPaint(Sender: TObject);
-    //procedure GroupboxPaint(Sender: TObject);
     Procedure RepaintPanels;
     Procedure RepaintPlayerPanel;
     Procedure RepaintOtherForms;
@@ -1218,7 +1213,7 @@ type
     procedure VSTAfterCellPaint(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
       CellRect: TRect);
-    //procedure MM_ML_ResetRatingsClick(Sender: TObject);
+
     procedure Player_PopupMenuPopup(Sender: TObject);
     procedure VST_ColumnPopupPopup(Sender: TObject);
     procedure Splitter4CanResize(Sender: TObject; var NewSize: Integer;
@@ -1226,7 +1221,6 @@ type
 
     procedure VST_ColumnPopupOnClick(Sender: TObject);
     procedure EDITFastSearchChange(Sender: TObject);
-    //procedure CB_MedienBibGlobalQuickSearchClick(Sender: TObject);
     procedure AlbenVSTClick(Sender: TObject);
     procedure ArtistsVSTClick(Sender: TObject);
     procedure PM_PlayFilesClick(Sender: TObject);
@@ -1417,9 +1411,6 @@ type
     procedure WalkmanModeTimerTimer(Sender: TObject);
     procedure WalkmanImageClick(Sender: TObject);
     procedure VSTEndDrag(Sender, Target: TObject; X, Y: Integer);
-    //procedure ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
-    //  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-    //  CellRect: TRect);
     procedure CorrectSkinRegionsTimerTimer(Sender: TObject);
     procedure MM_O_Skin_UseAdvancedClick(Sender: TObject);
     procedure PanelCoverBrowseMouseWheelDown(Sender: TObject;
@@ -1443,7 +1434,6 @@ type
     procedure MM_Warning_ID3TagsClick(Sender: TObject);
     procedure PM_RenameTagThisFileClick(Sender: TObject);
 
-    //moved to MainFormHelper function HandleSingleFileTagChange(aAudioFile: TAudioFile; TagToReplace: String; Out newTag: String; out IgnoreWarnings: Boolean): Boolean;
     procedure pm_TagDetailsClick(Sender: TObject);
     procedure PM_ML_SetmarkerClick(Sender: TObject);
 
@@ -1521,6 +1511,7 @@ type
     EqualizerButtons: Array[0..9] of TSkinButton;
 
     PlayListSkinImageList: TImageList;
+    MenuSkinImageList: TImageList;
 
     ActivationMessage: Cardinal;
 
@@ -1674,7 +1665,7 @@ end;
 /// -----------------------
 
 { TFormStyleHookFix }
-
+(*
 procedure TFormStyleHookFix.CMDialogChar(var Message: TWMKey);
 begin
    if ((Message.KeyData and $20000000) <> 0 ) and (CheckHotKeyItem(Message.CharCode)) then
@@ -1691,6 +1682,8 @@ begin
   if Self.FMainMenuBarHook<>nil then
    Result:=Self.FMainMenuBarHook.CheckHotKeyItem(ACharCode);
 end;
+
+*)
 {$ENDIF}
 
 
@@ -1887,7 +1880,8 @@ begin
     LangeAktionWeitermachen    := False;
     NempRegionsDistance.Docked := True;
     MinimizedIndicator         := False;
-    {$IFDEF USESTYLES}FormatSettings.{$ENDIF}Decimalseparator   := '.';
+    {$IFDEF USESTYLES}FormatSettings.{$ENDIF}DecimalSeparator := '.';
+    //FormatSettings.Decimalseparator   := '.';
 
     OldScrollbarWindowProc    := CoverScrollbar.WindowProc;
     CoverScrollbar.WindowProc := NewScrollBarWndProc;
@@ -1946,8 +1940,6 @@ begin
         SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
     end;
 
-
-
     // Create additional controls
     CloudViewer           := TCloudViewer.Create(self);
     CloudViewer.Parent    := PanelTagCloudBrowse;
@@ -1978,11 +1970,8 @@ begin
     NempPlaylist.MainWindowHandle := FOwnMessageHandler;
 
     BibRatingHelper := TRatingHelper.Create;
+
     // Create Medialibrary
-    //Application.CreateForm(TMsgForm, MsgForm);
-
-
-
     MedienBib := TMedienBibliothek.Create(FOwnMessageHandler, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
     MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
@@ -2007,6 +1996,45 @@ begin
     PlayListSkinImageList := TImageList.Create(Nemp_MainForm);
     PlayListSkinImageList.Height := 14;
     PlayListSkinImageList.Width := 14;
+
+    MenuSkinImageList := TImageList.Create(Nemp_MainForm);
+    MenuSkinImageList.Height := 16;
+    MenuSkinImageList.Width := 16;
+
+
+    // ------------------------------------
+    // tmp code to save the menu-imagelist into a file,
+    // as base for the MenuSkinImageList
+   { ButtonTmp := TBitmap.Create;
+    singleBtn := TBitmap.Create;
+    try
+      Buttontmp.PixelFormat := pf32bit;
+      ButtonTmp.Width := 608;
+      Buttontmp.Height := 16;
+      //Nemp_MainForm.PlayListSkinImageList.Clear;
+      for i := 0 to 37 do
+      begin
+          singleBtn.Canvas.Brush.Color := clWhite;
+          singleBtn.Canvas.FillRect(rect(0,0,16,16));
+
+          MenuImages.GetBitmap(i, singleBtn);
+
+        Buttontmp.Canvas.CopyRect(
+            rect(i*16,0,i*16+16, ButtonTmp.Height),
+            singleBtn.Canvas,
+            rect(0,0,16,16)
+            );
+        //Nemp_MainForm.PlayListSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
+      end;
+
+
+      buttontmp.SaveToFile('F:\Nemp Github\Nemp\bin\Skins\Nemp 4.6\MenuImages.bmp');
+    finally
+      ButtonTmp.Free;
+    end;
+    }
+
+    // ------------------------------------
 
     // Create Updater
     NempUpdater := TNempUpdater.Create(FOwnMessageHandler);
@@ -2150,8 +2178,6 @@ begin
           MedienBib.SaveToFile(SavePath + NEMP_NAME + '.gmp', True);
         end;
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-
 
         PlaylistPanel.Parent := Nemp_MainForm;
         AuswahlPanel.Parent := Nemp_MainForm;
@@ -2888,6 +2914,11 @@ begin
     if Not Nemp_MainForm.GlobalUseAdvancedSkin then
     begin
         TStyleManager.SetStyle('Windows');
+        if UseSkin then
+        begin
+            if NOT NempSkin.UseDefaultMenuImages then
+                NempSkin.SetDefaultMenuImages;
+        end;
         Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
     end else
     begin
@@ -2900,7 +2931,7 @@ begin
                 TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
         end;
     end;
-    UpdateFormDesignNeu;
+    //UpdateFormDesignNeu;     ??? 08.2018 warum war das hier???
 
     if assigned(FDetails) then
         FDetails.LoadStarGraphics;
@@ -3104,7 +3135,7 @@ begin
                     AlbumData := AlbenVST.GetNodeData(FocussedAlbumNode);
                     SelectedPlaylist := TJustAstring(AlbumData^.FString);
 
-                    AlbenVST.DeleteNode(FocussedAlbumNode, True);
+                    AlbenVST.DeleteNode(FocussedAlbumNode);
 
                     Medienbib.DeletePlaylist(SelectedPlaylist);
 
@@ -4504,14 +4535,24 @@ begin
         end;
 
         if  (NempSkin.isActive) AND
-            (vsSelected in Node.States) AND
-            ((Sender.Focused) OR ((Sender = PlaylistVST) and EditPlaylistSearch.Focused))
+            (vsSelected in Node.States) //AND
+            //((Sender.Focused) OR ((Sender = PlaylistVST) and EditPlaylistSearch.Focused))
             then
         begin
           if Sender = PlaylistVST then
-            font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[3]
+          begin
+              if Sender.Focused then
+                  font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[3]
+              else
+                  font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[3]
+          end
           else
-            if Sender = VST then font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[4]
+            if Sender = VST then begin
+                if Sender.Focused then
+                    font.color := NempSkin.SkinColorScheme.Tree_FontSelectedColor[4]
+                else
+                    font.color := NempSkin.SkinColorScheme.Tree_UnfocusedColor[4]
+            end;
         end;
 
         if NempOptions.ChangeFontStyleOnMode then
@@ -4932,8 +4973,8 @@ begin
     PM_TagIgnoreList    .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
     PM_TagMergeList     .Enabled := enableEditExtendeTag and NempOptions.AllowQuickAccessToMetadata;
 
-    if not assigned(MedienBib.CurrentAudioFile) then
-        exit;
+    //if not assigned(MedienBib.CurrentAudioFile) then
+    //    exit;
     //PM_TagAudiofile.Caption := MedienBib.CurrentAudioFile.PlaylistTitle;
 end;
 
@@ -5723,14 +5764,38 @@ procedure TNemp_MainForm.VSTBeforeItemErase(Sender: TBaseVirtualTree;
   var ItemColor: TColor; var EraseAction: TItemEraseAction);
 begin
   if not NempSkin.isActive then
-  with TargetCanvas do
+      with TargetCanvas do
+      begin
+          if Node.Index mod 2 = 0 then
+            ItemColor := $EEEEEE  //$49DDEF // $70A33F // $436BFF
+          else
+            ItemColor := VST.Color;
+          EraseAction := eaColor;
+      end
+(*  else
   begin
-      if Node.Index mod 2 = 0 then
-        ItemColor := $EEEEEE  //$49DDEF // $70A33F // $436BFF
-      else
-        ItemColor := VST.Color;
-      EraseAction := eaColor;
+      if (Node = NempPlaylist.LastHighlightedSearchResultNode) then
+      begin
+        if NempSkin.isActive then
+        begin
+            //ItemColor := NempSkin.SkinColorScheme.Tree_UnfocusedSelectionColor[3];
+            //EraseAction := eaColor;
+        end;
+        {else
+            Pen.Color := clGradientActiveCaption;
+        pen.Width := 1;//3;
+        pen.Style := psDot; // psDash;
+
+        Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Bottom-1),
+              Point(ItemRect.Right-1, ItemRect.Top+1),
+              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
+              );
+              }
+      end;
   end;
+  *)
 end;
 
 procedure TNemp_MainForm.PlaylistVSTAfterItemPaint(Sender: TBaseVirtualTree;
@@ -5762,7 +5827,7 @@ begin
         else
             Pen.Color := clGradientActiveCaption;
         pen.Width := 1;//3;
-        pen.Style := psDot;
+        pen.Style := psSolid; //psDot; // psDash;
 
         Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
               Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
@@ -8498,7 +8563,7 @@ end;
 
 procedure TNemp_MainForm.PlaylistVSTGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 var Data: PTreeData;
 begin
  case Kind of
@@ -8533,6 +8598,7 @@ begin
                                       at_Stream : ImageIndex := 9;
                                       at_CDDA   : ImageIndex := 10;
                                   end;
+                                  //ImageIndex := 16;
                               end;
                           end;
                       end;
@@ -8545,7 +8611,7 @@ end;
 
 procedure TNemp_MainForm.VSTGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
 var Data: PTreeData;
 
 begin
@@ -9801,20 +9867,6 @@ begin
     MedienBib.GlobalQuickSearch(aString, AllowErr);
 end;
 
-(*
-procedure TNemp_MainForm.CB_MedienBibGlobalQuickSearchClick(
-  Sender: TObject);
-begin
-    EditFastSearch.Font.Color := clGrayText;
-    EditFastSearch.Font.Style := [];
-    EditFastSearch.OnChange := Nil;
-    EditFastSearch.Text := MainForm_GlobalQuickSearch;
-    EditFastSearch.OnChange := EDITFastSearchChange;
-    RestoreCoverFlowAfterSearch;
-    MedienBib.ShowQuickSearchList;
-
-    EditFastSearch.SetFocus;
-end;    *)
 
 procedure TNemp_MainForm.EDITFastSearchKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -9912,6 +9964,8 @@ begin
                            NempOptions.ReplaceNAAlbumBy);
 end;
 
+
+
 procedure TNemp_MainForm.DragFilesSrc1Dropping(Sender: TObject);
 begin
   // Beim Droppen in Nemp wird die Quelle abgeprüft
@@ -9937,7 +9991,6 @@ var
 begin
   // Parameter für Alphablending zusammstellen
   if Not NempSkin.isActive then exit;
-
 
   if Sender = VST then
   begin
@@ -10173,7 +10226,7 @@ begin
 end;
 
 
-procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);
+procedure TNemp_MainForm.__BtnMinimizeClick(Sender: TObject);
 begin
   Application.minimize;
 end;
@@ -10232,17 +10285,20 @@ begin
                       then
                       begin
                           // deactivate advanced skin temporary
-                          TStyleManager.SetStyle('Windows');
-                          reactivate := True;
+                      //    TStyleManager.SetStyle('Windows');    //???
+                      //    reactivate := True;                   //???
+ /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
+
                       end;
                       {$ENDIF}
 
   AuswahlForm.Visible := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
 
+
                       {$IFDEF USESTYLES}
                       if reactivate then
                       begin
-                          TStylemanager.SetStyle(NempSkin.name);
+                          TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
                           CorrectSkinRegionsTimer.Enabled := True;
                       end;
                       {$ENDIF}
@@ -11118,22 +11174,6 @@ begin
 end;
 
 
-//procedure TNemp_MainForm.PM_PL_AddToPrebookListBeginningClick(Sender: TObject);
-//begin
-    // NempPlaylist.AddSelectedNodesToPreBookList(pb_Beginning) ;
-//end;
-
-{procedure TNemp_MainForm.PM_PL_AddToPrebookListEndClick(
-  Sender: TObject);
-begin
-    NempPlaylist.AddSelectedNodesToPreBookList(pb_End) ;
-end;}
-
-//procedure TNemp_MainForm.PM_PL_RemoveFromPrebookListClick(Sender: TObject);
-//begin
-//    NempPlaylist.RemoveSelectedNodesFromPreBookList;
-//end;
-
 procedure TNemp_MainForm.PM_PL_ClearPlaylistClick(Sender: TObject);
 begin
     NempPlaylist.ClearPlaylist(False);
@@ -11260,7 +11300,17 @@ procedure TNemp_MainForm.TABPanelPaint(Sender: TObject);
 var aPanel: TNempPanel;
 begin
   aPanel := (Sender as TNempPanel);
-  NempSkin.DrawAPanel(aPanel);
+
+
+      if aPanel.Tag <= 3 then
+        NempSkin.DrawAPanel(aPanel, NempSkin.UseBackgroundImages[aPanel.Tag])
+    else
+        NempSkin.DrawAPanel(aPanel, True);
+
+  //NempSkin.DrawAPanel(aPanel);
+
+
+
   aPanel.Canvas.Brush.Style := bsclear;
   aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
   begin
@@ -12045,36 +12095,6 @@ begin
     AlbenVSTFocusChanged(AlbenVST, AlbenVST.FocusedNode, 0);
 end;
 
-(*
-  // for skinning the [+] and [-] Buttons in teh Treeview
-procedure TNemp_MainForm.ArtistsVSTAfterCellPaint(Sender: TBaseVirtualTree;
-  TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
-  CellRect: TRect);
-var
-  r : TRect;
-  nd : PStringTreeData;
-  t: Integer;
-begin
-  nd := Sender.GetNodeData(Node);
-
-  // vsExpanded,          // Set if the node is expanded.
-  // vsHasChildren,
-
-
-  if (vsHasChildren in Node.States) then
-  begin
-      r := Sender.GetDisplayRect(Node, Column, true, false);
-
-      t := ((Cellrect.Bottom - Cellrect.Top) - (11)) Div 2;
-
-      if vsExpanded in Node.States then
-          TreeImages.Draw(TargetCanvas, r.Left-14, t{CellRect.Top}, 1)
-      else
-          TreeImages.Draw(TargetCanvas, r.Left-14, t{CellRect.Top}, 0)
-
-  end;
-
-end; *)
 
 procedure TNemp_MainForm.ArtistsVSTClick(Sender: TObject);
 begin

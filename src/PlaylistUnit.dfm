@@ -16,6 +16,7 @@ object PlaylistForm: TPlaylistForm
   OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
+  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
@@ -40,7 +41,7 @@ object PlaylistForm: TPlaylistForm
     DesignSize = (
       244
       303)
-    object CloseImage: TSkinButton
+    object CloseImageP: TSkinButton
       Left = 232
       Top = 0
       Width = 12
@@ -51,7 +52,7 @@ object PlaylistForm: TPlaylistForm
       ShowHint = True
       TabOrder = 0
       TabStop = False
-      OnClick = CloseImageClick
+      OnClick = CloseImagePClick
       DrawMode = dm_Skin
       NumGlyphsX = 5
       NumGlyphsY = 1

@@ -51,11 +51,11 @@ uses
 type
   TPlaylistForm = class(TNempForm)
     ContainerPanelPlaylistForm: TNempPanel;
-    CloseImage: TSkinButton;
+    CloseImageP: TSkinButton;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
-    procedure CloseImageClick(Sender: TObject);
+    procedure CloseImagePClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -72,6 +72,7 @@ type
     procedure ContainerPanelPlaylistFormPaint(Sender: TObject);
     procedure ContainerPanelPlaylistFormMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormHide(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -139,10 +140,10 @@ begin
 
   Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
 
-  CloseImage.Parent := Nemp_MainForm.PlaylistPanel;
-  CloseImage.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImage.Width;
-  CloseImage.Top := 3; //6              // PlaylistPanel
-  CloseImage.BringToFront;
+  CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
+  CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
+  CloseImageP.Top := 3; //6              // PlaylistPanel
+  CloseImageP.BringToFront;
 
   SetRegion(ContainerPanelPlaylistForm, self, NempRegionsDistance, handle);
 
@@ -193,10 +194,10 @@ procedure TPlaylistForm.FormActivate(Sender: TObject);
 begin
   Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 16;
 
-  CloseImage.Parent := Nemp_MainForm.PlaylistPanel;
-  CloseImage.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImage.Width;
-  CloseImage.Top := 3; //6              // PlaylistPanel
-  CloseImage.BringToFront;
+  CloseImageP.Parent := Nemp_MainForm.PlaylistPanel;
+  CloseImageP.Left := Nemp_MainForm.PlaylistPanel.Width - CloseImageP.Width;
+  CloseImageP.Top := 3; //6              // PlaylistPanel
+  CloseImageP.BringToFront;
 end;
 
 procedure TPlaylistForm.FormClose(Sender: TObject;
@@ -206,7 +207,12 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImage.Parent := PlaylistForm;
+  CloseImageP.Parent := PlaylistForm;
+end;
+
+procedure TPlaylistForm.FormHide(Sender: TObject);
+begin
+    CloseImageP.Parent := PlaylistForm;
 end;
 
 Procedure TPlaylistForm.WMDropFiles (Var aMsg: tMessage);
@@ -225,7 +231,7 @@ begin
   Resizing := False;
 end;
 
-procedure TPlaylistForm.CloseImageClick(Sender: TObject);
+procedure TPlaylistForm.CloseImagePClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin

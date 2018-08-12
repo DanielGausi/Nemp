@@ -52,13 +52,13 @@ uses
 type
   TAuswahlForm = class(TNempForm)
     ContainerPanelAuswahlform: TNempPanel;
-    CloseImage: TSkinButton;
+    CloseImageA: TSkinButton;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormShow(Sender: TObject);
 
     procedure FormResize(Sender: TObject);
-    procedure CloseImageClick(Sender: TObject);
+    procedure CloseImageAClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
@@ -74,6 +74,7 @@ type
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ContainerPanelAuswahlformMouseUp(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormHide(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -138,10 +139,10 @@ begin
   Width  := BWidth  ;
 
   Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  CloseImage.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImage.Width;// - 5;//10;
-  CloseImage.Top := 3;
-  CloseImage.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImage.BringToFront;
+  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width;// - 5;//10;
+  CloseImageA.Top := 3;
+  CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
+  CloseImageA.BringToFront;
 
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
 
@@ -193,10 +194,10 @@ procedure TAuswahlForm.FormActivate(Sender: TObject);
 begin
   Nemp_MainForm.AuswahlFillPanel.Width := Nemp_MainForm.AuswahlPanel.Width
                                         - Nemp_MainForm.AuswahlFillPanel.Left - 16;//26;
-  CloseImage.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImage.Width;// - 5;//10;
-  CloseImage.Top := 3;
-  CloseImage.Parent := Nemp_MainForm.AuswahlPanel;
-  CloseImage.BringToFront;
+  CloseImageA.Left := Nemp_MainForm.AuswahlPanel.Width - CloseImageA.Width;// - 5;//10;
+  CloseImageA.Top := 3;
+  CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
+  CloseImageA.BringToFront;
 end;
 
 procedure TAuswahlForm.FormClose(Sender: TObject;
@@ -206,11 +207,16 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImage.Parent := Auswahlform.ContainerPanelAuswahlform;
+  CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
   if MedienlisteForm.Visible then
   begin
     MedienBib.GenerateAnzeigeListe(BROWSE_ALL, BROWSE_ALL);
   end;
+end;
+
+procedure TAuswahlForm.FormHide(Sender: TObject);
+begin
+    CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
 end;
 
 procedure TAuswahlForm.FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -237,7 +243,7 @@ begin
   end;
 end;
 
-procedure TAuswahlForm.CloseImageClick(Sender: TObject);
+procedure TAuswahlForm.CloseImageAClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin

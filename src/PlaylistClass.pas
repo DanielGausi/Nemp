@@ -928,7 +928,7 @@ begin
               PrebookList.Remove(aData^.FAudioFile);
               RemoveFileFromHistory(aData^.FAudioFile);
               Playlist.Delete(Selectedmp3s[i].Index);
-              VST.DeleteNode(Selectedmp3s[i],True);
+              VST.DeleteNode(Selectedmp3s[i]);
           end else
             allNodesDeleted := False;
         end;
@@ -1008,7 +1008,7 @@ begin
       PrebookList.Remove(fPlayingFile);
       RemoveFileFromHistory(fPlayingFile);
       Playlist.Remove(fPlayingfile);
-      VST.DeleteNode(aNode,True);
+      VST.DeleteNode(aNode);
       ReIndexPrebookedFiles;
   end;
   fDauer := ShowPlayListSummary;
@@ -2481,7 +2481,7 @@ begin
     PrebookList.Remove(aData^.FAudioFile);
     RemoveFileFromHistory(aData^.FAudioFile);
     Playlist.Delete(aNode.Index);
-    VST.DeleteNode(aNode,True);
+    VST.DeleteNode(aNode);
 
     ReIndexPrebookedFiles;
 

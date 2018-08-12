@@ -127,6 +127,8 @@ Version 4.9.0, August 2018
 - Bugfix: "Fehlende Dateien entfernen" entfernte immer fehlende Playlists, 
           auch von Laufwerken, die aktuell nicht angeschlossen sind
 - Bugfix: Wahrscheinlicher Deadlock bei "Clear Covercache" behoben
+- neues Standard-Cover mit besserer Anzeige (weniger pixelig)
+- neuer Skin (Blue) zur Auswahl
 
 
 Version 4.8.0, Februar 2018

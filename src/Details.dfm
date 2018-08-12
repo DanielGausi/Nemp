@@ -3,7 +3,7 @@ object FDetails: TFDetails
   Top = 53
   BorderStyle = bsDialog
   Caption = 'File properties'
-  ClientHeight = 512
+  ClientHeight = 514
   ClientWidth = 475
   Color = clBtnFace
   DoubleBuffered = True
@@ -23,25 +23,20 @@ object FDetails: TFDetails
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Btn_Close: TButton
-    Left = 232
-    Top = 480
-    Width = 75
-    Height = 25
-    Cancel = True
-    Caption = 'Cancel'
-    TabOrder = 0
-    OnClick = Btn_CloseClick
-  end
   object MainPageControl: TPageControl
-    Left = 8
-    Top = 8
-    Width = 462
+    AlignWithMargins = True
+    Left = 3
+    Top = 3
+    Width = 469
     Height = 465
     ActivePage = Tab_ExtendedID3v2
+    Align = alTop
     DoubleBuffered = True
     ParentDoubleBuffered = False
-    TabOrder = 1
+    TabOrder = 0
+    ExplicitLeft = 8
+    ExplicitTop = 8
+    ExplicitWidth = 462
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
@@ -1568,6 +1563,7 @@ object FDetails: TFDetails
     object Tab_ExtendedID3v2: TTabSheet
       Caption = ' Mp3- and ID3-Details'
       ImageIndex = 3
+      ExplicitWidth = 454
       object GrpBox_Mpeg: TGroupBox
         Left = 8
         Top = 8
@@ -1984,30 +1980,51 @@ object FDetails: TFDetails
       end
     end
   end
-  object BtnApply: TButton
-    Left = 392
-    Top = 479
-    Width = 75
-    Height = 25
-    Caption = 'Apply'
-    TabOrder = 2
-    OnClick = BtnApplyClick
-  end
-  object BtnUndo: TButton
-    Left = 312
-    Top = 480
-    Width = 75
-    Height = 25
-    Caption = 'Undo'
-    TabOrder = 3
-    OnClick = BtnUndoClick
+  object Panel1: TPanel
+    AlignWithMargins = True
+    Left = 3
+    Top = 474
+    Width = 469
+    Height = 43
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+    ExplicitLeft = -2
+    object Btn_Close: TButton
+      Left = 216
+      Top = 0
+      Width = 75
+      Height = 25
+      Cancel = True
+      Caption = 'Cancel'
+      TabOrder = 0
+      OnClick = Btn_CloseClick
+    end
+    object BtnUndo: TButton
+      Left = 297
+      Top = 0
+      Width = 75
+      Height = 25
+      Caption = 'Undo'
+      TabOrder = 1
+      OnClick = BtnUndoClick
+    end
+    object BtnApply: TButton
+      Left = 378
+      Top = 0
+      Width = 75
+      Height = 25
+      Caption = 'Apply'
+      TabOrder = 2
+      OnClick = BtnApplyClick
+    end
   end
   object Timer1: TTimer
     Enabled = False
     Interval = 250
     OnTimer = Timer1Timer
-    Left = 16
-    Top = 464
+    Left = 8
+    Top = 424
   end
   object IdHTTP1: TIdHTTP
     AllowCookies = True
@@ -2024,7 +2041,7 @@ object FDetails: TFDetails
     Request.Ranges = <>
     HTTPOptions = [hoForceEncodeParams]
     Left = 116
-    Top = 456
+    Top = 424
   end
   object PM_URLCopy: TPopupMenu
     Left = 20
@@ -2038,15 +2055,15 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 60
-    Top = 456
+    Left = 68
+    Top = 416
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
     Left = 176
-    Top = 456
+    Top = 424
   end
   object PM_EditExtendedTags: TPopupMenu
     Left = 392

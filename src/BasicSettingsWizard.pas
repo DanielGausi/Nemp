@@ -195,7 +195,7 @@ begin
     if FileExists(filename) then
         ImageRating.Picture.LoadFromFile(filename);
 
-    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardLastFM.png';
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\WizardLastFM.jpg';
     if FileExists(filename) then
         ImageLastFM.Picture.LoadFromFile(filename);
 

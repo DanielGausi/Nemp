@@ -16,6 +16,7 @@ object MedienlisteForm: TMedienlisteForm
   OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
+  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
@@ -42,7 +43,7 @@ object MedienlisteForm: TMedienlisteForm
     DesignSize = (
       574
       180)
-    object CloseImage: TSkinButton
+    object CloseImageM: TSkinButton
       Left = 562
       Top = 0
       Width = 12
@@ -53,7 +54,7 @@ object MedienlisteForm: TMedienlisteForm
       ShowHint = True
       TabOrder = 0
       TabStop = False
-      OnClick = CloseImageClick
+      OnClick = CloseImageMClick
       DrawMode = dm_Skin
       NumGlyphsX = 5
       NumGlyphsY = 1

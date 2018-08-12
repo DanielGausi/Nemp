@@ -278,8 +278,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 116);
-    SetLength(fPartyControls, 116);
+    Setlength(fPositionArray, 114);
+    SetLength(fPartyControls, 114);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -297,9 +297,9 @@ begin
         SetOriginalPosition(RandomBtn           , i);
         SetOriginalPosition(RecordBtn           , i);
         // 3 System-Buttons
-        SetOriginalPosition(BtnMinimize         , i);
+        // SetOriginalPosition(BtnMinimize         , i);
         SetOriginalPosition(BtnClose            , i);
-        SetOriginalPosition(BtnMenu            , i);
+        //SetOriginalPosition(BtnMenu            , i);
 
         // Other Controls
         SetOriginalPosition(PlayerPanel         , i);

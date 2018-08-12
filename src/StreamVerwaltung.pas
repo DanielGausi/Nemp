@@ -850,7 +850,7 @@ begin
     begin
           MedienBib.RadioStationList.Delete(SelectedStations[i].Index);
           FavoriteList.Delete(SelectedStations[i].Index);
-          VST_Favorites.DeleteNode(SelectedStations[i],True);
+          VST_Favorites.DeleteNode(SelectedStations[i]);
     end;
 
     if MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS then

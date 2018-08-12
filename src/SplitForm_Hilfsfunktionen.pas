@@ -717,8 +717,9 @@ begin
                       then
                       begin
                           // deactivate advanced skin temporary
-                          TStyleManager.SetStyle('Windows');
-                          reactivate := True;
+                      //    TStyleManager.SetStyle('Windows');
+                      //    reactivate := True;
+ /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
                       end;
                       {$ENDIF}
 
@@ -748,7 +749,7 @@ begin
                       {$IFDEF USESTYLES}
                       if reactivate then
                       begin
-                          TStylemanager.SetStyle(NempSkin.name);
+                          TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
                           CorrectSkinRegionsTimer.Enabled := True;
                       end;
                       {$ENDIF}
@@ -829,6 +830,9 @@ begin
       GRPBOXHeadset.OnMouseDown := ExtendedControlForm.OnMouseDown;
       GRPBOXHeadset.OnMouseMove := ExtendedControlForm.OnMouseMove;
       GRPBOXHeadset.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+
+      EditPlaylistSearchExit(Nil);
+      EDITFastSearchExit(Nil);
   end;
 end;
 
@@ -840,17 +844,20 @@ begin
     ////GRPBOXVST.Height := GRPBOXVST.Height + (GRPBOXVST.Top - 28);
 
     AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
-    PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
+    //PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
 
     AuswahlPanel.Align := alleft;
     AuswahlPanel.Left := 0;
 
-    PlaylistPanel.Align := alClient;
+
     PlaylistPanel.Parent := TopMainPanel;
+    PlaylistPanel.Align := alClient;
+
     AuswahlPanel.Parent := TopMainPanel;
 
-    VSTPanel.Align := alClient;
+
     VSTPanel.Parent := Nemp_MainForm;
+    VSTPanel.Align := alClient;
 
     AudioPanel.Parent := PlayerPanel;
     AudioPanel.Left := 2;
@@ -864,6 +871,7 @@ begin
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := VSTPanel.Width - MedienlisteFillPanel.Left;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
+
 
     if NempSkin.NempPartyMode.Active then
         EditplaylistSearch.Width := Round(65 * NempSkin.NempPartyMode.ResizeFactor)
@@ -941,6 +949,8 @@ begin
     GRPBOXHeadset.OnMouseDown := Nil;
     GRPBOXHeadset.OnMouseMove := Nil;
     GRPBOXHeadset.OnMouseUp   := Nil;
+    EditPlaylistSearchExit(Nil);
+    EDITFastSearchExit(Nil);
   end;
 end;
 
@@ -1135,6 +1145,10 @@ begin
             VSTPanel.Visible := True; // 23.8
             Splitter1.Visible := True;
             PlaylistPanel.Visible := True;
+
+            PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
+            PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
+            PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
         end;
 
         1: begin

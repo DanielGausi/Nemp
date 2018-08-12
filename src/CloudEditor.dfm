@@ -42,7 +42,7 @@ object CloudEditorForm: TCloudEditorForm
     ExplicitTop = 279
   end
   object BtnUpdateID3Tags: TButton
-    Left = 436
+    Left = 428
     Top = 432
     Width = 107
     Height = 25
@@ -53,7 +53,7 @@ object CloudEditorForm: TCloudEditorForm
     OnClick = BtnUpdateID3TagsClick
   end
   object BtnBugFix: TButton
-    Left = 323
+    Left = 315
     Top = 432
     Width = 107
     Height = 25
@@ -73,10 +73,6 @@ object CloudEditorForm: TCloudEditorForm
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -117,11 +113,6 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         IncrementalSearch = isAll
         Indent = 4
@@ -193,10 +184,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Rename rules'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -218,11 +205,6 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4
         PopupMenu = PopupRenameRules
@@ -260,10 +242,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_DeleteTags: TTabSheet
       Caption = 'Ignore rules'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -285,11 +263,6 @@ object CloudEditorForm: TCloudEditorForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         BorderWidth = 1
         Header.AutoSizeIndex = 0
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
         Indent = 4
         PopupMenu = PopupIgnoreRules

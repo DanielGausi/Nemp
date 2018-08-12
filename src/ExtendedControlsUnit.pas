@@ -53,7 +53,7 @@ uses
 type
   TExtendedControlForm = class(TNempForm)
     ContainerPanelExtendedControlsForm: TNempPanel;
-    CloseImage: TSkinButton;
+    CloseImageE: TSkinButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -64,7 +64,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure ContainerPanelExtendedControlsFormPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
-    procedure CloseImageClick(Sender: TObject);
+    procedure CloseImageEClick(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -92,7 +92,7 @@ uses NempMainUnit, MedienlisteUnit, AuswahlUnit, PlaylistUnit;
 {$R *.dfm}
 
 
-procedure TExtendedControlForm.CloseImageClick(Sender: TObject);
+procedure TExtendedControlForm.CloseImageEClick(Sender: TObject);
 begin
     with Nemp_MainForm do
     begin
@@ -117,7 +117,7 @@ begin
   BTop    := Top   ;
   BHeight := Height;
   BWidth  := Width ;
-  CloseImage.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
+  CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 
   if Nemp_MainForm.AnzeigeMode = 1 then
       // still in seperate-window-mode
@@ -150,6 +150,7 @@ end;
 
 procedure TExtendedControlForm.FormHide(Sender: TObject);
 begin
+  CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
   if Nemp_MainForm.AnzeigeMode = 1 then
       // still in seperate-window-mode
       NempPlayer.StopHeadset;
@@ -253,10 +254,10 @@ begin
 
   //Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 26;
 
-  CloseImage.Parent := Nemp_MainForm.AudioPanel;
-  CloseImage.Left := Nemp_MainForm.AudioPanel.Width - CloseImage.Width - 5;
-  CloseImage.Top := 3; //6
-  CloseImage.BringToFront;
+  CloseImageE.Parent := Nemp_MainForm.AudioPanel;
+  CloseImageE.Left := Nemp_MainForm.AudioPanel.Width - CloseImageE.Width - 5;
+  CloseImageE.Top := 3; //6
+  CloseImageE.BringToFront;
 
   //
 

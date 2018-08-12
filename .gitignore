@@ -1,5 +1,6 @@
 
 src/__history/
+src/3rd Party Units/__history/
 bin/Data/Cover/
 bin/Data/CoverCache
 *.npl
@@ -15,15 +16,12 @@ bin/Data/Hotkeys.ini
 bin/Data/Nemp.ini
 bin/Data/Nemp_EQ.ini
 bin/Data/NempWebServer.ini
-bin/Images/[Originaldateien]/CDs.jpg
+bin/Images/[Originaldateien]/
 bin/__nemp.exe
 bin/bugreport.txt
 bin/Data/000-Playlist.m3u
 bin/Data/Nemp-PlayerLog.log
 bin/Data/RandomPlaylist.ini
-*.~1~
-*.~2~
-*.~3~
-*.~4~
-*.~5~
 bin/Languages/de/LC_MESSAGES/__default - Kopie.mo
+bin/Skins/CatWoman/
+bin/Skins/Earth At Night/

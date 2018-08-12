@@ -38,7 +38,7 @@ unit Nemp_SkinSystem;
 interface
 
 uses Windows, Graphics, ExtCtrls, Controls, Types, Forms, dialogs, SysUtils, VirtualTrees,  StdCtrls,
-iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons,
+iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage,
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
@@ -53,9 +53,9 @@ type
                      ctrlSlidebackwardBtn,
                      ctrlRandomBtn,
                      ctrlRecordBtn,
-                     ctrlMinimizeBtn,
-                     ctrlCloseBtn,
-                     ctrlMenuBtn
+                     // ctrlMinimizeBtn,
+                     ctrlCloseBtn
+                     //ctrlMenuBtn
                      );
                      // Der Reverse-Button fällt hier raus. Größe und Position sind fest!!
 
@@ -64,8 +64,8 @@ type
   // Typ Zur Farbverwaltung des Skins
   TNempColorScheme = record
       FormCL: TColor;
-      TabTextCL: TColor;
-      TabTextBackGroundCL: TColor;
+      //TabTextCL: TColor;
+      //TabTextBackGroundCL: TColor;
       SpecTitelCL: TColor;
       SpecTimeCL: TColor;
       SpecTitelBackGroundCL: TColor;
@@ -116,6 +116,7 @@ type
       Tree_TreeLineColor                 : Array[1..4] of TColor;
       Tree_UnfocusedSelectionBorderColor : Array[1..4] of TColor;
       Tree_UnfocusedSelectionColor       : Array[1..4] of TColor;
+      Tree_UnfocusedColor                : Array[1..4] of TColor;
   end;
 
 
@@ -129,9 +130,9 @@ type
         (Name: 'BtnSlideBackward'; Visible: True; Left:  13; Top: 98; Width: 24; Height: 24),   // 'SlidebackwardBtn'
         (Name: 'BtnRandom'       ; Visible: True; Left: 191; Top: 98; Width: 24; Height: 24),  // 'RandomBtn',
         (Name: 'BtnRecord'       ; Visible: True; Left: 109; Top: 98; Width: 24; Height: 24),  // 'RecordBtn',
-        (Name: 'BtnMinimize'     ; Visible: False; Left: 202; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
-        (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12),  // 'CloseBtn',
-        (Name: 'BtnMenu'         ; Visible: False; Left:   8; Top: 52; Width: 12; Height: 12)  // 'MenuBtn',
+        // (Name: 'BtnMinimize'     ; Visible: False; Left: 202; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
+        (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12)  // 'CloseBtn',
+        //(Name: 'BtnMenu'         ; Visible: False; Left:   8; Top: 52; Width: 12; Height: 12)  // 'MenuBtn',
       ) ;
 
   type
@@ -183,10 +184,10 @@ type
 
         boldFont: Boolean;
 
-        DrawGroupboxFrames: Boolean;
-        DrawGroupboxFramesMain: Boolean;
-        HideTabText: Boolean;
-        DrawTransparentTabText: Boolean;
+        //DrawGroupboxFrames: Boolean;
+        //DrawGroupboxFramesMain: Boolean;
+        //HideTabText: Boolean;
+        //DrawTransparentTabText: Boolean;
         DrawTransparentLabel  : Boolean;
         DrawTransparentTitel  : Boolean;
         DrawTransparentTime   : Boolean;
@@ -228,6 +229,8 @@ type
 
         // XE2:
         UseAdvancedSkin: Boolean;
+        AdvancedStyleFilename: String;
+        AdvancedStyleName: String;
 
         //OldUseDefaultButtons: Boolean;
         ButtonMode: Integer;  // 0: Windows, 1: Nemp klassisch, 2: Nemp3.0
@@ -235,6 +238,7 @@ type
 
         UseDefaultListImages: Boolean;
         UseDefaultTreeImages: Boolean;
+        UseDefaultMenuImages: Boolean;
 
         UseDefaultStarBitmaps: Boolean;
 
@@ -267,6 +271,8 @@ type
         procedure SetVSTOffsets;
         Procedure SetPlaylistOffsets;
 
+        procedure SetDefaultMenuImages;
+
         procedure DrawPreview(aPanel: TNempPanel);
 
         procedure DrawAPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
@@ -293,6 +299,8 @@ type
         function LoadGraphicFromBaseName(aBmp: TBitmap; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
 
       private
+
+        function LoadListGraphic(aTargetBmp: TBitmap; aBaseFilename: UnicodeString): Boolean;
 
         // Die alten Grafiken, bzw. die Default-Grafiken in das neue Glyph-Format bringen
         procedure AssignWindowsGlyphs(UseSkinGraphics: Boolean);
@@ -386,9 +394,9 @@ begin
   ControlButtons[ctrlSlidebackwardBtn] :=  Nemp_MainForm.SlidebackBtn    ;
   ControlButtons[ctrlRandomBtn       ] :=  Nemp_MainForm.RandomBtn       ;
   ControlButtons[ctrlRecordBtn       ] :=  Nemp_MainForm.RecordBtn       ;
-  ControlButtons[ctrlMinimizeBtn     ] :=  Nemp_MainForm.BtnMinimize     ;
+  //ControlButtons[ctrlMinimizeBtn     ] :=  Nemp_MainForm.BtnMinimize     ;
   ControlButtons[ctrlCloseBtn        ] :=  Nemp_MainForm.BtnClose        ;
-  ControlButtons[ctrlMenuBtn         ] :=  Nemp_MainForm.BtnMenu         ;
+  //ControlButtons[ctrlMenuBtn         ] :=  Nemp_MainForm.BtnMenu         ;
 
   TabButtons[0].Button    :=  Nemp_MainForm.TabBtn_Cover         ;
   TabButtons[1].Button    :=  Nemp_MainForm.TabBtn_Lyrics        ;
@@ -469,10 +477,11 @@ var i,idx: integer;
   ini: TMemIniFile;
   SectionStr, n {$IFDEF USESTYLES}, StyleFilename{$ENDIF}: String;
    Buttontmp, ListenCompletebmp: TBitmap;
-  tmpjpg: TJpegImage;
   aPoint: TPoint;
   j: TControlButtons;
-  aStream: TFileStream;
+
+  {$IFDEF USESTYLES}StyleInfo: TStyleInfo;{$ENDIF}
+
 begin
   name := ExtractFileName(DirName);
   path := DirName;
@@ -508,11 +517,7 @@ begin
         //
         //--------------------------
         //                                                          
-        DrawGroupboxFrames               := Ini.ReadBool('Options','DrawGroupboxFrames'              , True);
         boldFont                         := Ini.ReadBool('Options', 'boldFont'                       , False);
-        DrawGroupboxFramesMain           := Ini.ReadBool('Options','DrawGroupboxFramesMain'          , DrawGroupboxFrames);
-        HideTabText                      := Ini.ReadBool('Options','HideTabText'                     , False);
-        DrawTransparentTabText           := Ini.ReadBool('Options','DrawTransparentTabText'          , True);
         DrawTransparentLabel             := Ini.ReadBool('Options','DrawTransparentLabel'            , True);
         DrawTransparentTitel             := Ini.ReadBool('Options','DrawTransparentTitel'            , True);
         DrawTransparentTime              := Ini.ReadBool('Options','DrawTransparentTime'             , True);
@@ -542,18 +547,21 @@ begin
 
         {$IFDEF USESTYLES}
         UseAdvancedSkin  := Ini.ReadBool('Options','UseAdvancedSkin'  , False);
+        AdvancedStyleFilename := Ini.ReadString('Options','AdvancedStyleFilename'  , 'wuppdi');
         {$ELSE}
         UseAdvancedSkin := False;
+        AdvancedStyleFilename := '';
         {$ENDIF}
 
         {$IFDEF USESTYLES}
-        StyleFilename := path + '\' + name + '.vsf';
+        StyleFilename := path + '\' + AdvancedStyleFilename + '.vsf';
         if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
         begin
-            if TStyleManager.IsValidStyle(StyleFilename) then
+            if TStyleManager.IsValidStyle(StyleFilename, StyleInfo) then
             begin
                 try
                     TStyleManager.LoadFromFile(StyleFilename); //beware in this line you are only loading and registering a VCL Style and not setting as the current style.
+                    AdvancedStyleName := StyleInfo.Name;
                 except
                 end
             end
@@ -566,25 +574,14 @@ begin
 
 
         ButtonMode                       := Ini.ReadInteger('Options', 'ButtonMode', 0);
-        //if ButtonMode = -1 then
-        //begin
-        //  OldUseDefaultButtons                := Ini.ReadBool('Options','UseDefaultButtons', False);
-        //  if OldUseDefaultButtons then ButtonMode := 0 else ButtonMode := 1;
-        //end;
         if (ButtonMode < 0) or (ButtonMode > 2) then ButtonMode := 0;
 
         SlideButtonMode                  := Ini.ReadInteger('Options', 'SlideButtonMode', 0);
-        //if ButtonMode = -1 then
-        //begin
-        //  OldUseDefaultSlideButtons                := Ini.ReadBool('Options','UseDefaultSlideButtons', False);
-        //  if OldUseDefaultSlideButtons then SlideButtonMode := 0 else SlideButtonMode := 1;
-        //end;
         if (SlideButtonMode < 0) or (SlideButtonMode > 2) then SlideButtonMode := 0;
 
-
-        //UseDefaultSlideButtons           := Ini.ReadBool('Options','UseDefaultSlideButtons', False);
         UseDefaultListImages             := Ini.ReadBool('Options','UseDefaultListImages', False);
         UseDefaultTreeImages             := Ini.ReadBool('Options','UseDefaultTreeImages', False);
+        UseDefaultMenuImages             := Ini.ReadBool('Options','UseDefaultMenuImages', False);
         UseDefaultStarBitmaps  := Ini.ReadBool('Options','UseDefaultStarBitmaps', True);
         UseSeparatePlayerBitmap          := Ini.ReadBool('Options', 'UseSeparatePlayerBitmap', False);
         //----
@@ -601,10 +598,7 @@ begin
         BlendFaktorTagCloud2    := Ini.ReadInteger('Options','BlendFaktorTagCloud2'      , 100);
 
         SkinColorScheme.FormCL                := StringToColor(Ini.ReadString('Colors','FormCL'               , 'clWindow'   ));
-        SkinColorScheme.TabTextCL             := StringToColor(Ini.ReadString('Colors','TabTextCL'            , 'clWindowText'   ));
-        SkinColorScheme.TabTextBackGroundCL   := StringToColor(Ini.ReadString('Colors','TabTextBackGroundCL'  , 'clWindow'     ));
         SkinColorScheme.SpecTitelCL           := StringToColor(Ini.ReadString('Colors','SpecTitelCL'          , 'clWindowText'     ));
-
         SkinColorScheme.SpecTimeCL            := StringToColor(Ini.ReadString('Colors','SpecTimeCL'           , 'clWindowText'  ));
         SkinColorScheme.SpecTitelBackGroundCL := StringToColor(Ini.ReadString('Colors','SpecTitelBackGroundCL', 'clBtnFace'     ));
         SkinColorScheme.SpecTimeBackGroundCL  := StringToColor(Ini.ReadString('Colors','SpecTimeBackGroundCL' , 'clBtnFace'     ));
@@ -631,7 +625,6 @@ begin
         SkinColorScheme.Splitter2Color        := StringToColor(Ini.ReadString('Colors','Splitter2'            , 'clWindow'    ));
         SkinColorScheme.Splitter3Color        := StringToColor(Ini.ReadString('Colors','Splitter3'            , 'clWindow'    ));
         SkinColorScheme.PlaylistPlayingFileColor := StringToColor(Ini.ReadString('Colors','PlaylistPlayingFileColor'            , 'clGradientActiveCaption'    ));
-        //SkinColorScheme.ControlImagesColor    := StringToColor(Ini.ReadString('Colors','ControlImagesColor'            , ColorToString(SkinColorScheme.GroupboxFrameCL)    ));
 
         SkinColorScheme.MinFontColor    := StringToColor(Ini.ReadString('Colors','MinFontColor'     , 'clred'         ));
         SkinColorScheme.MiddleFontColor := StringToColor(Ini.ReadString('Colors','MiddleFontColor'  , 'clwindowtext'  ));
@@ -671,6 +664,9 @@ begin
             SkinColorScheme.Tree_TreeLineColor[idx]                := StringToColor(Ini.ReadString(SectionStr, 'Tree_TreeLineColor'                     , 'clBtnShadow'  ));
             SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx]:= StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedSelectionBorderColor'     , 'clBtnFace'    ));
             SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      := StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedSelectionColor'           , 'clBtnFace'    ));
+            SkinColorScheme.Tree_UnfocusedColor[idx]               := StringToColor(Ini.ReadString(SectionStr, 'Tree_UnfocusedColor'                    , 'clBtnFace'    ));
+
+
         end;
 
         // Button-Eigenschaften
@@ -720,66 +716,89 @@ begin
 
   end;
 
-
   if Not Complete then exit;
 
-  //LoadButtons;
-/////  LoadSlideButtons;
-
-  ListenCompletebmp := TBitmap.Create;
-  if FileExists(DirName + '\ListenBilder.bmp') then
+  if UseDefaultListImages then
   begin
-
-      try
-        aStream := TFileStream.Create(DirName + '\ListenBilder.bmp', fmOpenRead or fmShareDenyWrite);
-        ListenCompletebmp.LoadFromStream(aStream);
-        aStream.free;
-      except
-
-      end;
-  end
-  else
-    if FileExists(DirName + '\ListenBilder.jpg') then
-    begin
-      tmpjpg := TJpegImage.Create;
-      try
-        aStream := TFileStream.Create(DirName + '\ListenBilder.jpg', fmOpenRead or fmShareDenyWrite);
-        tmpjpg.LoadFromStream(aStream);
-        aStream.free;
-        ListenCompletebmp.Assign(tmpjpg);
-      except
-
-      end;
-      tmpjpg.Free;
-    end
-    else
-    begin
-      ListenCompletebmp.Assign(NIl);
-      UseDefaultListImages := True;
-    end;
-  if Not UseDefaultListImages then
-  begin
-      ButtonTmp := TBitmap.Create;
-      Buttontmp.PixelFormat := pf32bit;
-      ButtonTmp.Width := 14;
-      Buttontmp.Height := 14;
-      Nemp_MainForm.PlayListSkinImageList.Clear;
-      for i := 0 to 15 do
-      begin
-        ButtonTmp.Canvas.CopyRect(
-            rect(0,0,14,14), ListenCompletebmp.Canvas,
-            rect(i*14,0,i*14+14, ButtonTmp.Height));
-        Nemp_MainForm.PlayListSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
-      end;
-      ButtonTmp.Free;
-      Nemp_MainForm.PlaylistVST.Images := Nemp_MainForm.PlayListSkinImageList;
-      Nemp_MainForm.VST.Images := Nemp_MainForm.PlayListSkinImageList;
+      Nemp_MainForm.PlaylistVST.Images := Nemp_MainForm.PlayListImageList;
+      Nemp_MainForm.VST.Images         := Nemp_MainForm.PlayListImageList;
   end else
   begin
-    Nemp_MainForm.PlaylistVST.Images := Nemp_MainForm.PlayListImageList;
-    Nemp_MainForm.VST.Images := Nemp_MainForm.PlayListImageList;
+      ListenCompletebmp := TBitmap.Create;
+      try
+          if not LoadListGraphic(ListenCompletebmp, DirName + '\ListenBilder') then
+          begin
+              UseDefaultListImages := True;
+              Nemp_MainForm.PlaylistVST.Images := Nemp_MainForm.PlayListImageList;
+              Nemp_MainForm.VST.Images         := Nemp_MainForm.PlayListImageList;
+          end else
+          begin
+              UseDefaultListImages := False;
+              ButtonTmp := TBitmap.Create;
+              try
+                  Buttontmp.PixelFormat := pf32bit;
+                  ButtonTmp.Width := 14;
+                  Buttontmp.Height := 14;
+                  Nemp_MainForm.PlayListSkinImageList.Clear;
+                  for i := 0 to 15 do
+                  begin
+                      ButtonTmp.Canvas.CopyRect(
+                            rect(0,0,14,14), ListenCompletebmp.Canvas,
+                            rect(i*14,0,i*14+14, ButtonTmp.Height));
+                      Nemp_MainForm.PlayListSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
+                  end;
+                  Nemp_MainForm.PlaylistVST.Images := Nemp_MainForm.PlayListSkinImageList;
+                  Nemp_MainForm.VST.Images         := Nemp_MainForm.PlayListSkinImageList;
+              finally
+                  ButtonTmp.Free;
+              end;
+          end;
+      finally
+          ListenCompletebmp.Free;
+      end;
   end;
-  ListenCompletebmp.Free;
+
+  if UseDefaultMenuImages or (Not Nemp_MainForm.GlobalUseAdvancedSkin) then
+  begin
+      SetDefaultMenuImages;
+  end else
+  begin
+      ListenCompletebmp := TBitmap.Create;
+      try
+          if not LoadListGraphic(ListenCompletebmp, DirName + '\MenuImages') then
+          begin
+              UseDefaultMenuImages := True;
+              SetDefaultMenuImages;
+          end else
+          begin
+              UseDefaultMenuImages := False;
+              ButtonTmp := TBitmap.Create;
+              try
+                  Buttontmp.PixelFormat := pf32bit;
+                  ButtonTmp.Width := 16;
+                  Buttontmp.Height := 16;
+                  Nemp_MainForm.MenuSkinImageList.Clear;
+                  for i := 0 to 37 do
+                  begin
+                      ButtonTmp.Canvas.CopyRect(
+                            rect(0,0,16,16), ListenCompletebmp.Canvas,
+                            rect(i*16,0,i*16+16, ButtonTmp.Height));
+                      Nemp_MainForm.MenuSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
+                  end;
+                  Nemp_MainForm.Nemp_MainMenu      .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Medialist_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.PlayListPOPUP      .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Player_PopupMenu   .Images := Nemp_MainForm.MenuSkinImageList;
+              finally
+                  ButtonTmp.Free;
+              end;
+
+          end;
+      finally
+          ListenCompletebmp.Free;
+      end;
+  end;
+
 
   // Load Tree images [+] [-]
   if NOT UseDefaultTreeImages then
@@ -873,6 +892,14 @@ begin
 
 end;
 
+procedure TNempSkin.SetDefaultMenuImages;
+begin
+    Nemp_MainForm.Nemp_MainMenu      .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Medialist_PopupMenu.Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.PlayListPOPUP      .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Player_PopupMenu   .Images := Nemp_MainForm.MenuImages;
+end;
+
 procedure TNempSkin.SaveToDir(DirName: UnicodeString);
 var idx: integer;
   ini: TMemIniFile;
@@ -895,10 +922,6 @@ begin
         //--------------------------
         //
         Ini.WriteBool('Options', 'boldFont'                       , boldFont);
-        Ini.WriteBool('Options','DrawGroupboxFrames'              , DrawGroupboxFrames      );
-        Ini.WriteBool('Options','DrawGroupboxFramesMain'              , DrawGroupboxFramesMain);
-        Ini.WriteBool('Options','HideTabText'                     , HideTabText             );
-        Ini.WriteBool('Options','DrawTransparentTabText'          , DrawTransparentTabText  );
         Ini.WriteBool('Options','DrawTransparentLabel'            , DrawTransparentLabel    );
         Ini.WriteBool('Options','DrawTransparentTitel'            , DrawTransparentTitel    );
         Ini.WriteBool('Options','DrawTransparentTime'             , DrawTransparentTime     );
@@ -926,12 +949,9 @@ begin
         //----
         Ini.WriteBool('Options','HideMainMenu'  , HideMainMenu);
         Ini.WriteInteger('Options', 'ButtonMode', ButtonMode);
-        // Ini.WriteBool('Options','UseDefaultButtons', UseDefaultButtons);
         Ini.WriteInteger('Options', 'SlideButtonMode', SlideButtonMode);
-        //Ini.WriteBool('Options','UseDefaultSlideButtons', UseDefaultSlideButtons);
         Ini.WriteBool('Options','UseDefaultListImages', UseDefaultListImages);
         Ini.WriteBool('Options','UseDefaultStarBitmaps', UseDefaultStarBitmaps);
-
         Ini.WriteBool('Options', 'UseSeparatePlayerBitmap', UseSeparatePlayerBitmap);
         //----
         Ini.WriteInteger('Options','BlendFaktorArtists'       , BlendFaktorArtists    );
@@ -946,13 +966,7 @@ begin
         Ini.WriteInteger('Options','BlendFaktorMedienliste2'   , BlendFaktorMedienliste2);
         Ini.WriteInteger('Options','BlendFaktorTagCloud2'      , BlendFaktorTagCloud2   );
 
-        // Farbwert in einen String der Form $XXXXXXXX bringen:      '$'+InttoHex(Integer(  ),8)
-        // (damit die Vordefinierten Farben AUCH SO gespeichert werden, und nicht als Farbname wie "clblack")
-
-
         Ini.WriteString('Colors','FormCL'               , '$'+InttoHex(Integer( SkinColorScheme.FormCL                ),8)  );
-        Ini.WriteString('Colors','TabTextCL'            , '$'+InttoHex(Integer( SkinColorScheme.TabTextCL             ),8)  );
-        Ini.WriteString('Colors','TabTextBackGroundCL'  , '$'+InttoHex(Integer( SkinColorScheme.TabTextBackGroundCL   ),8)  );
         Ini.WriteString('Colors','SpecTitelCL'          , '$'+InttoHex(Integer( SkinColorScheme.SpecTitelCL           ),8)  );
 
         Ini.WriteString('Colors','SpecTimeCL'           , '$'+InttoHex(Integer( SkinColorScheme.SpecTimeCL            ),8)  );
@@ -976,7 +990,6 @@ begin
         Ini.WriteString('Colors','Splitter2'            , '$'+InttoHex(Integer( SkinColorScheme.Splitter2Color   ),8)  );
         Ini.WriteString('Colors','Splitter3'            , '$'+InttoHex(Integer( SkinColorScheme.Splitter3Color   ),8)  );
         Ini.WriteString('Colors','PlaylistPlayingFileColor', '$'+InttoHex(Integer( SkinColorScheme.PlaylistPlayingFileColor),8)  );
-        //Ini.WriteString('Colors','ControlImagesColor', '$'+InttoHex(Integer( SkinColorScheme.ControlImagesColor),8)  );
 
         Ini.WriteString('Colors','MinFontColor'   , '$'+InttoHex(Integer( SkinColorScheme.MinFontColor)   ,8)  );
         Ini.WriteString('Colors','MiddleFontColor', '$'+InttoHex(Integer( SkinColorScheme.MiddleFontColor),8)  );
@@ -1080,10 +1093,6 @@ begin
   //--------------------------
   //
   boldFont                       := aSkin.boldFont;
-  DrawGroupboxFrames             := aSkin.DrawGroupboxFrames              ;
-  DrawGroupboxFramesMain         := aSkin.DrawGroupboxFramesMain          ;
-  HideTabText                    := aSkin.HideTabText                     ;
-  DrawTransparentTabText         := aSkin.DrawTransparentTabText          ;
   DrawTransparentLabel           := aSkin.DrawTransparentLabel            ;
   DrawTransparentTitel           := aSkin.DrawTransparentTitel            ;
   DrawTransparentTime            := aSkin.DrawTransparentTime             ;
@@ -1129,8 +1138,6 @@ begin
   with SkinColorScheme do
   begin
       FormCL                := aSkin.SkinColorScheme.FormCL                 ;
-      TabTextCL             := aSkin.SkinColorScheme.TabTextCL              ;
-      TabTextBackGroundCL   := aSkin.SkinColorScheme.TabTextBackGroundCL    ;
       SpecTitelCL           := aSkin.SkinColorScheme.SpecTitelCL            ;
       SpecTimeCL            := aSkin.SkinColorScheme.SpecTimeCL             ;
       SpecTitelBackGroundCL := aSkin.SkinColorScheme.SpecTitelBackGroundCL  ;
@@ -1179,6 +1186,7 @@ begin
           Tree_TreeLineColor[idx]                 := askin.SkinColorScheme.Tree_TreeLineColor[idx]                 ;
           Tree_UnfocusedSelectionBorderColor[idx] := askin.SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx] ;
           Tree_UnfocusedSelectionColor[idx]       := askin.SkinColorScheme.Tree_UnfocusedSelectionColor[idx]       ;
+          Tree_UnfocusedColor[idx]                := askin.SkinColorScheme.Tree_UnfocusedColor[idx]       ;
       end;
   end;
 end;
@@ -1368,26 +1376,26 @@ begin
                 end;
 
                 AssignNemp3Glyph(
-                        AuswahlForm.CloseImage,
+                        AuswahlForm.CloseImageA,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    AuswahlForm.CloseImage.GlyphLine := AuswahlForm.CloseImage.GlyphLine;
+                    AuswahlForm.CloseImageA.GlyphLine := AuswahlForm.CloseImageA.GlyphLine;
                 AssignNemp3Glyph(
-                        MedienListeForm.CloseImage,
+                        MedienListeForm.CloseImageM,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    MedienListeForm.CloseImage.GlyphLine := MedienListeForm.CloseImage.GlyphLine;
+                    MedienListeForm.CloseImageM.GlyphLine := MedienListeForm.CloseImageM.GlyphLine;
                 AssignNemp3Glyph(
-                        PlaylistForm.CloseImage,
+                        PlaylistForm.CloseImageP,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    PlaylistForm.CloseImage.GlyphLine := PlaylistForm.CloseImage.GlyphLine;
+                    PlaylistForm.CloseImageP.GlyphLine := PlaylistForm.CloseImageP.GlyphLine;
 
                 AssignNemp3Glyph(
-                        ExtendedControlForm.CloseImage,
+                        ExtendedControlForm.CloseImageE,
                         Path + '\' + ControlButtonData[ctrlCloseBtn].Name,
                         True);
-                    ExtendedControlForm.CloseImage.GlyphLine := ExtendedControlForm.CloseImage.GlyphLine;
+                    ExtendedControlForm.CloseImageE.GlyphLine := ExtendedControlForm.CloseImageE.GlyphLine;
 
                 AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
                 DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
@@ -1555,6 +1563,8 @@ begin
         DestVST.Colors.TreeLineColor                   := SkinColorScheme.Tree_TreeLineColor[idx]                ;
         DestVST.Colors.UnfocusedSelectionBorderColor   := SkinColorScheme.Tree_UnfocusedSelectionBorderColor[idx];
         DestVST.Colors.UnfocusedSelectionColor         := SkinColorScheme.Tree_UnfocusedSelectionColor[idx]      ;
+        DestVST.Colors.UnfocusedColor                  := SkinColorScheme.Tree_UnfocusedColor[idx]      ;
+
       end;
   end;
 
@@ -1647,10 +1657,10 @@ begin
   {$IFDEF USESTYLES}
   if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
   begin
-      TStylemanager.SetStyle(self.name);
+      TStylemanager.TrySetStyle(self.AdvancedStyleName);
   end
   else
-      TStyleManager.SetStyle('Windows');
+      TStyleManager.TrySetStyle('Windows');
   {$ENDIF}
 
   Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
@@ -1687,6 +1697,32 @@ begin
               TabButtons[i].Button.Refresh;
         end;
 
+
+        DirectionPositionBTN.CustomRegion := True;
+        DirectionPositionBTN.Refresh;
+        BtnABRepeatSetA.CustomRegion := True;
+        BtnABRepeatSetA.Refresh;
+        BtnABRepeatSetB.CustomRegion := True;
+        BtnABRepeatSetB.Refresh;
+        BtnABRepeatUnset.CustomRegion := True;
+        BtnABRepeatUnset.Refresh;
+
+        BtnHeadsetPlaynow     .CustomRegion := True;
+        BtnHeadsetToPlaylist  .CustomRegion := True;
+        BtnLoadHeadset        .CustomRegion := True;
+        PlayPauseHeadSetBtn   .CustomRegion := True;
+        SlideBackHeadsetBTN   .CustomRegion := True;
+        SlideForwardHeadsetBTN.CustomRegion := True;
+        StopHeadSetBtn        .CustomRegion := True;
+
+        BtnHeadsetPlaynow      .Refresh;
+        BtnHeadsetToPlaylist   .Refresh;
+        BtnLoadHeadset         .Refresh;
+        PlayPauseHeadSetBtn    .Refresh;
+        SlideBackHeadsetBTN    .Refresh;
+        SlideForwardHeadsetBTN .Refresh;
+        StopHeadSetBtn         .Refresh;
+
     end;
 
 end;
@@ -1719,6 +1755,11 @@ begin
   begin
         PlaylistVST.Images := PlayListImageList;
         VST.Images := PlayListImageList;
+
+        Nemp_MainMenu      .Images := MenuImages;
+        Medialist_PopupMenu.Images := MenuImages;
+        PlayListPOPUP      .Images := MenuImages;
+        Player_PopupMenu   .Images := MenuImages;
 
         SetDefaultButtonSizes;
         AssignButtonSizes;
@@ -1912,16 +1953,7 @@ begin
         Menu := Nemp_MainMenu;
 
     {$IFDEF USESTYLES}
-    for I:= 0 to Screen.CustomFormCount - 1 do
-    begin
-      for j:=0 to Screen.Forms[i].ComponentCount - 1 do
-        if Screen.Forms[i].Components[j] is TCustomListControl  then
-          TStyleManager.Notification(snControlDestroyed,  Screen.Forms[i].Components[j]);
-      TStyleManager.Notification(snControlDestroyed,  Screen.Forms[i]);
-    end;
-
-
-    TStyleManager.SetStyle('Windows');
+    TStyleManager.TrySetStyle('Windows');
     {$ENDIF}
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
   end;
@@ -2201,6 +2233,39 @@ begin
   end;
 end;
 
+function TNempSkin.LoadListGraphic(aTargetBmp: TBitmap;
+  aBaseFilename: UnicodeString): Boolean;
+var tmpPNG : TPNGImage;
+    tmpJPG : TJpegImage;
+begin
+    result := True;
+    if FileExists(aBaseFilename + '.png') then
+    begin
+        tmpPNG := TPNGImage.Create;
+        try
+            tmpPNG.LoadFromFile(aBaseFilename + '.png');
+            aTargetBmp.Assign(tmpPNG);
+        finally
+            tmpPNG.free;
+        end;
+    end else
+        if FileExists(aBaseFilename + '.png') then
+        begin
+            tmpJPG := TJpegImage.Create;
+            try
+                tmpJPG.LoadFromFile(aBaseFilename + '.jpg');
+                aTargetBmp.Assign(tmpJPG);
+            finally
+                tmpJPG.free;
+            end;
+        end else
+            if FileExists(aBaseFilename + '.bmp') then
+                aTargetBmp.LoadFromFile(aBaseFilename + '.bmp')
+            else
+                result := False;
+end;
+
+
 function TNempSkin.LoadGraphicFromBaseName(aBmp: TBitmap; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
 var NewName, ext: String;
     ScaleCorrectionNeeded: Boolean;
@@ -2323,7 +2388,10 @@ begin
       end;
   end;
 end;
-              (*
+
+
+
+(*
 procedure TNempSkin.AssignDefaultSystemButtons;
 begin
     with Nemp_MainForm do
@@ -2371,9 +2439,9 @@ begin
     NempPartyMode.SetButtonPos(ControlButtonData[ctrlRandomBtn]    , i);
     NempPartyMode.SetButtonPos(ControlButtonData[ctrlRecordBtn]    , i);
     // 3 System-Buttons
-    NempPartyMode.SetButtonPos(ControlButtonData[ctrlMinimizeBtn]  , i);
+    // NempPartyMode.SetButtonPos(ControlButtonData[ctrlMinimizeBtn]  , i);
     NempPartyMode.SetButtonPos(ControlButtonData[ctrlCloseBtn]     , i);
-    NempPartyMode.SetButtonPos(ControlButtonData[ctrlMenuBtn]      , i);
+    //NempPartyMode.SetButtonPos(ControlButtonData[ctrlMenuBtn]      , i);
 
 
     r := NempPartyMode.ResizeProc;
@@ -2435,6 +2503,8 @@ begin
       ControlButtonData[j].Height      := DefaultButtonData[j].Height      ;
     end;
 end;
+
+
 
 procedure TNempSkin.AssignWindowsTabGlyphs(UseSkinGraphics: Boolean);
 var BaseDir: String;
@@ -2674,24 +2744,24 @@ begin
 
 
             LoadGraphicFromBaseName(tmpBitmap, BaseDir + DefaultButtonData[ctrlCloseBtn].Name, True);
-            AuswahlForm.CloseImage.NempGlyph.Assign(tmpBitmap);
+            AuswahlForm.CloseImageA.NempGlyph.Assign(tmpBitmap);
             //Buttons12ImageList.GetBitmap(1,AuswahlForm.CloseImage.NempGlyph);
-            AuswahlForm.CloseImage.NumGlyphsX := 1;
-            AuswahlForm.CloseImage.NumGlyphs := 1;
+            AuswahlForm.CloseImageA.NumGlyphsX := 1;
+            AuswahlForm.CloseImageA.NumGlyphs := 1;
 
             //Buttons12ImageList.GetBitmap(1,MedienlisteForm.CloseImage.NempGlyph);
-            MedienlisteForm.CloseImage.NempGlyph.Assign(tmpBitmap);
-            MedienlisteForm.CloseImage.NumGlyphsX := 1;
-            MedienlisteForm.CloseImage.NumGlyphs := 1;
+            MedienlisteForm.CloseImageM.NempGlyph.Assign(tmpBitmap);
+            MedienlisteForm.CloseImageM.NumGlyphsX := 1;
+            MedienlisteForm.CloseImageM.NumGlyphs := 1;
 
             //Buttons12ImageList.GetBitmap(1,PlaylistForm.CloseImage.NempGlyph);
-            PlaylistForm.CloseImage.NempGlyph.Assign(tmpBitmap);
-            PlaylistForm.CloseImage.NumGlyphsX := 1;
-            PlaylistForm.CloseImage.NumGlyphs := 1;
+            PlaylistForm.CloseImageP.NempGlyph.Assign(tmpBitmap);
+            PlaylistForm.CloseImageP.NumGlyphsX := 1;
+            PlaylistForm.CloseImageP.NumGlyphs := 1;
 
-            ExtendedControlForm.CloseImage.NempGlyph.Assign(tmpBitmap);
-            ExtendedControlForm.CloseImage.NumGlyphsX := 1;
-            ExtendedControlForm.CloseImage.NumGlyphs := 1;
+            ExtendedControlForm.CloseImageE.NempGlyph.Assign(tmpBitmap);
+            ExtendedControlForm.CloseImageE.NumGlyphsX := 1;
+            ExtendedControlForm.CloseImageE.NumGlyphs := 1;
 
         finally
             tmpBitmap.Free;

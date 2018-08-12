@@ -140,7 +140,7 @@ ShowWindow
  }
 
   {$IFDEF USESTYLES}
-    TStyleManager.Engine.RegisterStyleHook(TNemp_MainForm, TFormStyleHookFix);
+    //TStyleManager.Engine.RegisterStyleHook(TNemp_MainForm, TFormStyleHookFix);
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);

@@ -16,12 +16,16 @@ object AboutForm: TAboutForm
   OnCreate = FormCreate
   OnHide = FormHide
   OnShow = FormShow
+  DesignSize = (
+    371
+    394)
   PixelsPerInch = 96
   TextHeight = 13
   object NempCredits: TACredits
+    AlignWithMargins = True
     Left = 8
     Top = 8
-    Width = 353
+    Width = 347
     Height = 345
     Cursor = crDefault
     Images = ImageList1
@@ -175,6 +179,7 @@ object AboutForm: TAboutForm
     BackgroundImage.Data = {07544269746D617000000000}
     ForeGroundImage.Data = {07544269746D617000000000}
     ShowBorder = False
+    Anchors = [akLeft, akTop, akRight]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clSilver
     Font.Height = -11
@@ -184,10 +189,12 @@ object AboutForm: TAboutForm
     EnableDragging = True
     Smooth = [spTop, spBottom]
     TextOffset = 1
+    ExplicitWidth = 353
   end
   object BtnOK: TButton
-    Left = 288
-    Top = 360
+    AlignWithMargins = True
+    Left = 280
+    Top = 361
     Width = 75
     Height = 25
     Cancel = True
@@ -198,7 +205,7 @@ object AboutForm: TAboutForm
   end
   object BtnDonate: TButton
     Left = 8
-    Top = 360
+    Top = 359
     Width = 75
     Height = 25
     Caption = 'Donate'

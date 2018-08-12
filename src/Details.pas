@@ -52,7 +52,6 @@ uses
 
 type
   TFDetails = class(TForm)
-    Btn_Close: TButton;
     MainPageControl: TPageControl;
     Tab_General: TTabSheet;
     GrpBox_File: TGroupBox;
@@ -83,8 +82,6 @@ type
     GrpBox_TextFrames: TGroupBox;
     ID3Image: TImage;
     Bevel1: TBevel;
-    BtnApply: TButton;
-    BtnUndo: TButton;
     CBID3v1: TCheckBox;
     CBID3v2: TCheckBox;
     BtnCopyFromV2: TButton;
@@ -234,6 +231,10 @@ type
     pm_RenameTag: TMenuItem;
     pm_RemoveTag: TMenuItem;
     Btn_TagCloudEditor: TButton;
+    Panel1: TPanel;
+    Btn_Close: TButton;
+    BtnUndo: TButton;
+    BtnApply: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -878,7 +879,7 @@ procedure TFDetails.BtnResetRatingClick(Sender: TObject);
 begin
     if CurrentBibCounter > 20 then
     begin
-         if TranslateMessageDLG(Format(DetailForm_HighPlayCounter,[CurrentBibCounter]), mtConfirmation, [MBOk, MBCancel], 0, mrCancel)
+         if TranslateMessageDLG(Format(DetailForm_HighPlayCounter,[CurrentBibCounter]), mtConfirmation, [MBOk, MBCancel], 0, mbCancel)
             = mrCancel then EXIT;
     end;
 

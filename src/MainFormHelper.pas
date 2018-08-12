@@ -1972,7 +1972,7 @@ begin
             // User dont want Files to be changed. But this is necessary here.
             // so get a special permission (or cancel the process)
             if TranslateMessageDLG((MediaLibrary_PermissionToChangeTagsRequired)
-               , mtConfirmation, [MBYes, MBNo], 0, mrNo) = mrYes
+               , mtConfirmation, [MBYes, MBNo], 0, mbNo) = mrYes
             then
                 result := True
             else

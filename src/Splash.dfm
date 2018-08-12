@@ -54,5 +54,6 @@ object FSplash: TFSplash
     Font.Style = []
     ParentFont = False
     Transparent = True
+    StyleElements = [seClient, seBorder]
   end
 end

@@ -32,7 +32,7 @@ function MessageDlgWithNoMorebox(const aCaption : string;
   CBCaption: String): integer;
 
 function TranslateMessageDlg(const Msg : string; DlgType : TMsgDlgType;
-    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : integer = mrOK): integer;
+    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : TMsgDlgBtn = mbOK): integer;
 
 implementation
 
@@ -221,7 +221,7 @@ begin
 end; { InitMsgForm }
 
 
-procedure InitTranslateMessageDlg(aForm : TForm; helpCtx : longint; DefButton: Integer);
+procedure InitTranslateMessageDlg(aForm : TForm; helpCtx : longint; DefButton: TMsgDlgBtn);
 var
   i : integer;
   btn : TButton;
@@ -236,7 +236,7 @@ begin
             if Components[i] is TButton then
             begin
                 btn := TButton(Components[i]);
-                btn.Default := btn.ModalResult = DefButton;
+                btn.Default := btn.ModalResult = ModalResults[DefButton];
                 if btn.Default then
                     ActiveControl := Btn;
                 btn.Caption := MyButtonCaptions[ModalResultToBtn(btn.Modalresult)];
@@ -332,11 +332,11 @@ end; { MessageDlgWithNoMorebox }
 
 
 function TranslateMessageDlg(const Msg : string; DlgType : TMsgDlgType;
-    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : integer = mrOK): integer;
+    Buttons : TMsgDlgButtons; HelpCtx : longint; DefButton : TMsgDlgBtn = mbOK): integer;
 var
   aForm : TForm;
 begin { MessageDlgWithNoMorebox }
-    aForm := CreateMessageDialog(Msg, DlgType, Buttons);
+    aForm := CreateMessageDialog(Msg, DlgType, Buttons, DefButton);
     try
       InitTranslateMessageDlg(aForm, helpCtx, DefButton);
       Result := aForm.ShowModal;

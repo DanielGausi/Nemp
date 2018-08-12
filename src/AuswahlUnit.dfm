@@ -17,6 +17,7 @@ object AuswahlForm: TAuswahlForm
   OldCreateOrder = False
   OnActivate = FormActivate
   OnClose = FormClose
+  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
@@ -41,7 +42,7 @@ object AuswahlForm: TAuswahlForm
     DesignSize = (
       411
       422)
-    object CloseImage: TSkinButton
+    object CloseImageA: TSkinButton
       Left = 399
       Top = 0
       Width = 12
@@ -52,7 +53,7 @@ object AuswahlForm: TAuswahlForm
       ShowHint = True
       TabOrder = 0
       TabStop = False
-      OnClick = CloseImageClick
+      OnClick = CloseImageAClick
       DrawMode = dm_Skin
       NumGlyphsX = 5
       NumGlyphsY = 1

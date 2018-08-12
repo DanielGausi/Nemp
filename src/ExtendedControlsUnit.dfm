@@ -36,7 +36,7 @@ object ExtendedControlForm: TExtendedControlForm
     DesignSize = (
       234
       188)
-    object CloseImage: TSkinButton
+    object CloseImageE: TSkinButton
       Left = 222
       Top = 0
       Width = 12
@@ -47,7 +47,7 @@ object ExtendedControlForm: TExtendedControlForm
       ShowHint = True
       TabOrder = 0
       TabStop = False
-      OnClick = CloseImageClick
+      OnClick = CloseImageEClick
       DrawMode = dm_Skin
       NumGlyphsX = 5
       NumGlyphsY = 1

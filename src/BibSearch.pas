@@ -41,19 +41,31 @@ uses
 
 type
   TFormBibSearch = class(TForm)
-    GRPBOXSuchauswahl: TGroupBox;
-    CB_SearchHistory: TComboBox;
+    Btn_ExtendedSearch: TButton;
+    BtnCancel: TButton;
+    Panel1: TPanel;
     GRPErweiterteSucheEdit: TGroupBox;
     LblConst_SearchArtist: TLabel;
     LblConst_SearchTitle: TLabel;
     LblConst_SearchAlbum: TLabel;
     LblConst_SearchComment: TLabel;
     LblConst_SearchPath: TLabel;
+    LblConst_GeneralSearchHint: TLabel;
+    LblConst_LyricSearchHint: TLabel;
     ArtistEDIT: TEdit;
     TitelEDIT: TEdit;
     AlbumEDIT: TEdit;
     KommentarEDIT: TEdit;
     PathEDIT: TEdit;
+    GeneralEdit: TEdit;
+    LyricEdit: TMemo;
+    CBFehlerToleranz: TCheckBox;
+    BtnClear: TButton;
+    Panel2: TPanel;
+    GrpBox_ExtendedSearchGenres: TGroupBox;
+    cbGenres: TCheckListBox;
+    cbIgnoreGenres: TCheckBox;
+    cbIncludeUnkownGenres: TCheckBox;
     GrpBox_ExtendedSearchDate: TGroupBox;
     LblConst_SearchExtendedYear: TLabel;
     LblConst_SearchExtendedPeriod: TLabel;
@@ -62,18 +74,8 @@ type
     cbIncludeNA: TCheckBox;
     cbInclude0: TCheckBox;
     cb_ExtendedSearchPeriod: TComboBox;
-    GrpBox_ExtendedSearchGenres: TGroupBox;
-    cbGenres: TCheckListBox;
-    cbIgnoreGenres: TCheckBox;
-    cbIncludeUnkownGenres: TCheckBox;
-    GeneralEdit: TEdit;
-    LblConst_GeneralSearchHint: TLabel;
-    LyricEdit: TMemo;
-    LblConst_LyricSearchHint: TLabel;
-    Btn_ExtendedSearch: TButton;
-    CBFehlerToleranz: TCheckBox;
-    BtnClear: TButton;
-    BtnCancel: TButton;
+    Panel3: TPanel;
+    CB_SearchHistory: TComboBox;
     procedure Btn_ExtendedSearchClick(Sender: TObject);
     procedure cbIgnoreGenresClick(Sender: TObject);
     procedure cbIgnoreYearClick(Sender: TObject);
@@ -231,9 +233,10 @@ begin
     cb_ExtendedSearchPeriod.Enabled := NOT cbIgnoreYear.Checked;
     LblConst_SearchExtendedPeriod.Enabled := NOT cbIgnoreYear.Checked;
     LblConst_SearchExtendedYear.Enabled := NOT cbIgnoreYear.Checked;
+
     seJahr.Enabled := NOT cbIgnoreYear.Checked;
-    cbIncludeNA.Enabled := NOT cbIncludeNA.Enabled;
-    cbInclude0.Enabled := NOT cbInclude0.Enabled;
+    cbIncludeNA.Enabled := NOT cbIgnoreYear.Checked; //NOT cbIncludeNA.Enabled;
+    cbInclude0.Enabled := NOT cbIgnoreYear.Checked;  //NOT cbInclude0.Enabled;
 end;
 
 procedure TFormBibSearch.CB_SearchHistoryChange(Sender: TObject);

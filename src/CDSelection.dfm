@@ -16,7 +16,7 @@ object FormCDDBSelect: TFormCDDBSelect
   PixelsPerInch = 96
   TextHeight = 13
   object BtnOK: TButton
-    Left = 256
+    Left = 248
     Top = 111
     Width = 75
     Height = 25
@@ -27,7 +27,7 @@ object FormCDDBSelect: TFormCDDBSelect
     OnClick = BtnOKClick
   end
   object BtnCancel: TButton
-    Left = 344
+    Left = 342
     Top = 111
     Width = 75
     Height = 25

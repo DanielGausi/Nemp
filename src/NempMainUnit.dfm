@@ -243,11 +243,6 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
-            Header.Font.Charset = DEFAULT_CHARSET
-            Header.Font.Color = clWindowText
-            Header.Font.Height = -11
-            Header.Font.Name = 'Tahoma'
-            Header.Font.Style = []
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
             IncrementalSearch = isAll
             Indent = 14
@@ -299,11 +294,6 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
-            Header.Font.Charset = DEFAULT_CHARSET
-            Header.Font.Color = clWindowText
-            Header.Font.Height = -11
-            Header.Font.Name = 'Tahoma'
-            Header.Font.Style = []
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
             IncrementalSearch = isAll
             Indent = 14
@@ -430,7 +420,7 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
         end
         object AuswahlFillPanel: TNempPanel
-          Tag = 3
+          Tag = 2
           Left = 114
           Top = 2
           Width = 186
@@ -532,11 +522,6 @@ object Nemp_MainForm: TNemp_MainForm
           Font.Style = []
           Header.AutoSizeIndex = -1
           Header.Background = clWindow
-          Header.Font.Charset = DEFAULT_CHARSET
-          Header.Font.Color = clWindowText
-          Header.Font.Height = -11
-          Header.Font.Name = 'Tahoma'
-          Header.Font.Style = []
           Header.Options = [hoDrag, hoVisible]
           HintMode = hmHint
           Images = PlayListImageList
@@ -1451,49 +1436,6 @@ object Nemp_MainForm: TNemp_MainForm
           Color2 = clBlack
           AcceptArrowKeys = True
         end
-        object BtnMenu: TSkinButton
-          Left = 196
-          Top = 94
-          Width = 12
-          Height = 12
-          Hint = 'Show menu'
-          Anchors = [akTop, akRight]
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 10
-          TabStop = False
-          OnClick = BtnMenuClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Skin
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
-        object BtnMinimize: TSkinButton
-          Left = 200
-          Top = 7
-          Width = 12
-          Height = 12
-          Hint = 'Minimize'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 11
-          TabStop = False
-          OnClick = BtnMinimizeClick
-          OnDragOver = GRPBOXControlDragOver
-          DrawMode = dm_Skin
-          NumGlyphsX = 5
-          NumGlyphsY = 1
-          GlyphLine = 0
-          CustomRegion = False
-          FocusDrawMode = fdm_Windows
-          Color1 = clBlack
-          Color2 = clBlack
-        end
         object BtnClose: TSkinButton
           Left = 214
           Top = 7
@@ -1502,7 +1444,7 @@ object Nemp_MainForm: TNemp_MainForm
           Hint = 'Close Nemp'
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 12
+          TabOrder = 10
           TabStop = False
           Visible = False
           OnClick = BtnCloseClick
@@ -2719,11 +2661,6 @@ object Nemp_MainForm: TNemp_MainForm
         Font.Style = []
         Header.AutoSizeIndex = -1
         Header.Background = clWindow
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoRestrictDrag, hoShowSortGlyphs, hoVisible]
         Header.SortColumn = 0
         HintMode = hmHint
@@ -3132,6 +3069,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object MM_ML_Search: TMenuItem
         Caption = 'Search'
+        ImageIndex = 10
         ShortCut = 24646
         OnClick = MM_ML_SearchClick
       end
@@ -3995,7 +3933,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000000A200C0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000000A540C0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4561,7 +4499,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012600300B740D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012600300BA80D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
@@ -7667,7 +7605,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07740910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07A80910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

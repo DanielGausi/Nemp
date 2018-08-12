@@ -1,3 +1,8 @@
+{$IF CompilerVersion > 23} 
+    {$DEFINE USESTYLES}
+{$ENDIF}
+
+
 {$IFDEF VER230}
     {$DEFINE USESTYLES}
 {$ENDIF}

@@ -38,12 +38,17 @@ object CDOpenDialog: TCDOpenDialog
     OnClick = BtnOkClick
   end
   object GrpBoxDrives: TGroupBox
-    Left = 8
-    Top = 8
-    Width = 353
+    AlignWithMargins = True
+    Left = 3
+    Top = 3
+    Width = 367
     Height = 65
+    Align = alTop
     Caption = 'CD/DVD drives'
     TabOrder = 2
+    ExplicitLeft = 8
+    ExplicitTop = 8
+    ExplicitWidth = 353
     object BtnRefresh: TButton
       Left = 263
       Top = 24
@@ -59,18 +64,22 @@ object CDOpenDialog: TCDOpenDialog
       Width = 248
       Height = 21
       Style = csDropDownList
-      ItemHeight = 0
       TabOrder = 1
       OnChange = cb_DrivesChange
     end
   end
   object GrpBoxTracklist: TGroupBox
-    Left = 8
-    Top = 79
-    Width = 353
+    AlignWithMargins = True
+    Left = 3
+    Top = 74
+    Width = 367
     Height = 282
+    Align = alTop
     Caption = 'Tracklist'
     TabOrder = 3
+    ExplicitLeft = 8
+    ExplicitTop = 79
+    ExplicitWidth = 353
     object LblSelectionMode: TLabel
       Left = 9
       Top = 247
@@ -117,7 +126,6 @@ object CDOpenDialog: TCDOpenDialog
       Width = 185
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 0
       TabOrder = 3
       Text = 'All tracks on the CD'
