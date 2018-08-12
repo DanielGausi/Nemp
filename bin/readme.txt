@@ -121,14 +121,14 @@ Version 4.9.0, August 2018
 - RAM-schonender Aufbau der beschleunigten Suche, inkl. Fallback/Deaktivierung 
   bei OutOfMemory-Exceptions
 - Playlist-Log
+- neues Standard-Cover mit besserer Anzeige (weniger pixelig)
+- neuer Skin (Blue) zur Auswahl, vorhandene Skins umbenannt
 - Option: Beim Start fehlende Dateien löschen (= Medienbib aufräumen)
           (wird ggf. neu ausgeführt beim Anschluss eines neuen Laufwerks)
 - Einstellungsdialog: Button "Scan now" für neue/fehlende Dateien
 - Bugfix: "Fehlende Dateien entfernen" entfernte immer fehlende Playlists, 
           auch von Laufwerken, die aktuell nicht angeschlossen sind
 - Bugfix: Wahrscheinlicher Deadlock bei "Clear Covercache" behoben
-- neues Standard-Cover mit besserer Anzeige (weniger pixelig)
-- neuer Skin (Blue) zur Auswahl
 
 
 Version 4.8.0, Februar 2018
