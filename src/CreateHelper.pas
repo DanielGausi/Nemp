@@ -134,7 +134,7 @@ begin
 
 
             UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
-            SkinName            := ini.ReadString('Fenster','SkinName','<public> Nemp 4.6');
+            SkinName            := ini.ReadString('Fenster','SkinName','<public> Dark');
 
             {$IFDEF USESTYLES}
                 WinVersionInfo := TWindowsVersionInfo.Create;

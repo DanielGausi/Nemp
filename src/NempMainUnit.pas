@@ -864,6 +864,7 @@ type
     PM_PL_Mark1: TMenuItem;
     MM_T_PlaylistLog: TMenuItem;
     PM_P_PlaylistLog: TMenuItem;
+    RefreshVSTCoverTimer: TTimer;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1447,6 +1448,8 @@ type
     //procedure PM_RenameTagSelectedFilesClick(Sender: TObject);
     //procedure PM_RemoveTagSelectedFilesClick(Sender: TObject);
     //procedure PM_AddTagSelectedFilesClick(Sender: TObject);
+    procedure RefreshVSTCover(aAudioFile: TAudioFile);
+    procedure RefreshVSTCoverTimerTimer(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -5404,8 +5407,37 @@ begin
     end;
 end;
 
-procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
+procedure TNemp_MainForm.RefreshVSTCover(aAudioFile: TAudioFile);
 var Coverbmp: TBitmap;
+begin
+    if assigned(aAudioFile) then
+    begin
+        Coverbmp := tBitmap.Create;
+        try
+            Coverbmp.Width := ImgDetailCover.Width; //  250;
+            Coverbmp.Height := ImgDetailCover.Height; // 250;
+            // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
+            GetCover(aAudioFile, Coverbmp);
+            ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
+            ImgDetailCover.Refresh;
+        finally
+            Coverbmp.Free;
+        end;
+    end;
+end;
+
+procedure TNemp_MainForm.RefreshVSTCoverTimerTimer(Sender: TObject);
+begin
+    // refresh the VST-Cover after a resize of this part
+    // this will result in a better display of the cover than just using the
+    // image-stretch property.
+    RefreshVSTCoverTimer.Enabled := False;
+    if assigned(MedienBib) then
+        RefreshVSTCover(MedienBib.CurrentAudioFile);
+end;
+
+procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
+var
     tmp: String;
 begin
   MedienBib.CurrentAudioFile := aAudioFile;
@@ -5441,21 +5473,7 @@ begin
   CreateTagLabels(aAudioFile);
 
   // Get Cover
-  if assigned(aAudioFile) then
-  begin
-      Coverbmp := tBitmap.Create;
-      try
-          Coverbmp.Width := ImgDetailCover.Width; //  250;
-          Coverbmp.Height := ImgDetailCover.Height; // 250;
-
-          // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-          GetCover(aAudioFile, Coverbmp);
-          ImgDetailCover.Picture.Bitmap.Assign(Coverbmp);
-          ImgDetailCover.Refresh;
-      finally
-          Coverbmp.Free;
-      end;
-  end;
+  RefreshVSTCover(aAudiofile);
 
 
   if not assigned(aAudiofile) then
@@ -5563,6 +5581,9 @@ begin
 
     if VDTCover.Width > 0 then
         NempOptions.CoverWidth := VDTCover.Width;
+
+    if assigned(MedienBib) then
+        RefreshVSTCoverTimer.Enabled := True;
 end;
 
 procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;

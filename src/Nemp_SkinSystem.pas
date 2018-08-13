@@ -231,6 +231,7 @@ type
         UseAdvancedSkin: Boolean;
         AdvancedStyleFilename: String;
         AdvancedStyleName: String;
+        RegisteredStyles: TStringList;
 
         //OldUseDefaultButtons: Boolean;
         ButtonMode: Integer;  // 0: Windows, 1: Nemp klassisch, 2: Nemp3.0
@@ -449,10 +450,14 @@ begin
 
   SlideButtons[16].GlyphFile := 'SlideBtnVolume';
   SlideButtons[17].GlyphFile := 'SlideBtnLeftRight';
+
+  RegisteredStyles := TStringList.Create;
 end;
 
 destructor TNempSkin.Destroy;
 begin
+  RegisteredStyles.Free;
+
   CompleteBitmap.Free;
   PlayerBitmap.Free;
   ExtendedPlayerBitmap.Free;
@@ -546,31 +551,34 @@ begin
         HideMainMenu     := Ini.ReadBool('Options','HideMainMenu'  , False);
 
         {$IFDEF USESTYLES}
-        UseAdvancedSkin  := Ini.ReadBool('Options','UseAdvancedSkin'  , False);
-        AdvancedStyleFilename := Ini.ReadString('Options','AdvancedStyleFilename'  , 'wuppdi');
+            UseAdvancedSkin  := Ini.ReadBool('Options','UseAdvancedSkin'  , False);
+            AdvancedStyleFilename := Ini.ReadString('Options','AdvancedStyleFilename'  , name);
+            StyleFilename := path + '\' + AdvancedStyleFilename + '.vsf';
+            if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
+            begin
+                if TStyleManager.IsValidStyle(StyleFilename, StyleInfo) then
+                begin
+                    AdvancedStyleName := StyleInfo.Name;
+                    if RegisteredStyles.IndexOf(StyleInfo.Name) = -1 then
+                    begin
+                        try
+                            TStyleManager.LoadFromFile(StyleFilename); //beware in this line you are only loading and registering a VCL Style and not setting as the current style.
+                            RegisteredStyles.Add(StyleInfo.Name)
+                        except
+                            // possible exception: Style already loaded
+                            on E: Exception do Showmessage(E.Message);
+                        end;
+                    end;
+                end
+                else
+                    UseAdvancedSkin := False;
+            end;
         {$ELSE}
-        UseAdvancedSkin := False;
-        AdvancedStyleFilename := '';
+            UseAdvancedSkin := False;
+            AdvancedStyleFilename := '';
+            AdvancedStyleName := '';
         {$ENDIF}
 
-        {$IFDEF USESTYLES}
-        StyleFilename := path + '\' + AdvancedStyleFilename + '.vsf';
-        if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
-        begin
-            if TStyleManager.IsValidStyle(StyleFilename, StyleInfo) then
-            begin
-                try
-                    TStyleManager.LoadFromFile(StyleFilename); //beware in this line you are only loading and registering a VCL Style and not setting as the current style.
-                    AdvancedStyleName := StyleInfo.Name;
-                except
-                end
-            end
-            else
-            begin
-                UseAdvancedSkin := False;
-            end;
-        end;
-        {$ENDIF}
 
 
         ButtonMode                       := Ini.ReadInteger('Options', 'ButtonMode', 0);

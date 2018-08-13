@@ -142,13 +142,13 @@ begin
 
     if Nemp_MainForm.NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION then
     begin
-        if (Nemp_MainForm.SkinName <> '<public> Nemp 4.6') and  Nemp_MainForm.NempOptions.WriteAccessPossible then
+        if (Nemp_MainForm.SkinName <> '<public> Dark') and  Nemp_MainForm.NempOptions.WriteAccessPossible then
         begin
           if TranslateMessageDLG((Wizard_NewSkin), mtInformation, [MBYES, MBNO], 0) = mrYES then
           begin
               Nemp_MainForm.UseSkin := True;
-              Nemp_MainForm.SkinName := '<public> Nemp 4.6';
-              Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Nemp 4.6');
+              Nemp_MainForm.SkinName := '<public> Dark';
+              Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Dark');
               SetSkinRadioBox(Nemp_MainForm.SkinName);
           end;
         end;

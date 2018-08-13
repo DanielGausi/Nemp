@@ -33,6 +33,8 @@ object Wizard: TWizard
     ExplicitHeight = 288
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object Lbl_Welcome: TLabel
@@ -101,6 +103,7 @@ object Wizard: TWizard
       Caption = '(Updates)'
       ImageIndex = 1
       ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object Lbl_CheckUpdates: TLabel
@@ -197,6 +200,8 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object ImageMetaData: TImage
@@ -295,6 +300,8 @@ object Wizard: TWizard
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object ImageRating: TImage
@@ -391,6 +398,8 @@ object Wizard: TWizard
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object ImageLastFM: TImage
@@ -486,6 +495,8 @@ object Wizard: TWizard
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object ImageFiletypes: TImage
@@ -582,6 +593,8 @@ object Wizard: TWizard
       Caption = '(summary)'
       ImageIndex = 5
       OnShow = TabSheet7Show
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 504
       ExplicitHeight = 254
       object ImgSummary: TImage

@@ -7,7 +7,7 @@
       von Daniel 'Gausi' Gaußmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit CodeGear Delphi 2009, XE2, XE3
+      Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.2
       Januar 2005 - August 2018
 
       Version: 4.9.0
@@ -24,11 +24,13 @@ Merkmale
 -----------------------------------------------------------
 
 Zusammengefasst:
+
                
-                 Nemp ist einfach nur [n]och [e]in [m]p3 [P]layer.
+                 Nemp ist einfach nur [N]och [e]in [m]p3 [P]layer.
 
 
 Aber für ein Ein-Mann-Projekt ein verdammt guter:
+
 
    Nemp kann Musikdateien, Playlists und Webstreams abspielen, finden und verwalten. 
    Unter anderem mp3, ogg, wma, wav, flac, ape, aac, m4a, m3u, m3u8, pls, asx, wax. 
@@ -38,31 +40,20 @@ Aber für ein Ein-Mann-Projekt ein verdammt guter:
 
    Nemp kann Webstreams (nur mp3 und aac) aufnehmen und automatisch schneiden
 
-   Nemp hat einen integrierten Webserver um die eigene Musiksammlung mit Freunden zu
-   teilen - auf der anderen Seite reicht ein einfacher Webbrowser
+   Nemp hat einen integrierten Webserver zur Fernsteuerung des Players im lokalen Netz,
+   z.B. über ein Smartphone im gleichen WLAN.
 
-   Nemp hat ein intuitives GUI mit vielen kleinen nützlichen Dingen wie z.B.
-      
-      - anpassbares Design
-      - Mehrsprachigkeit
-      - paralleles Abspielen eines zweiten Liedes über eine zweite Soundkarte
-      - automatisches Herunterfahren des Systems nach einer gewissen Zeit
-      - integrierter LastFM-Scrobbler
-      - Geburtstagsmodus, d.h. abspielen eines bestimmten Liedes zu einer bestimmten Zeit
-      - Partymodus mit größeren Buttons, reduziertem Menü und eingeschränkter Funktionalität
-      - optional ins System integrierbares Deskband, wie man es vom WindowsMediaPlayer kennt
-     
+   Nemp kann scrobbeln, automatisch Coverart nachladen, nach Liedtexten suchen, parallel
+   ein zweites Stück abspielen (auch auf einer zweiten Soundkarte), nach einiger Zeit den 
+   Computer heruntefahren, um Mitternacht die Playlist automatisch für ein Geburtstagslied
+   unterbrechen und einiges mehr.
 
-Was Nemp NICHT kann:
 
-   Nemp kann keine CDs rippen
-   
-   Nemp kann keine CDs brennen
-   
-   Nemp kann keine Ordnung auf der Festplatte schaffen oder massenhaft Id3-Tags setzen
 
-   Nemp kann kein DRM - und wird das auch NIEMALS können
-
+   Wenn Sie eine Funktion vermissen, dann fragen Sie einfach nach: mail@gausi.de
+   Es sind schon einige Dinge nach Nutzerfeedback hinzugefügt worden - z.B. die Suche 
+   in der Playlist, Markierungen in der Medienbibliothek, Player-Logfile oder die
+   gewichtete Zufallswiedergabe.
 
 
 
@@ -71,48 +62,6 @@ Lizenzvereinbarungen:
 GPL 2.0 oder später
 (Details in der licence.txt und der gpl.txt)
 
-
-
-Verwendete Units/Komponenten:
------------------------------------------------------------
-- VirtualTreeView
-  http://www.soft-gems.net/       
-
-- MP3-Wiedergabe-Engine: bass.dll
-  Download unter http://www.un4seen.com/
-
-- Audio Werkzeuge Bibliothek
-  http://www.gausi.de/delphi
-
-- SearchTools von Heiko Thiel
-  http://www.delphi-forum.de/viewtopic.php?t=48936
-
-- GNU gettext for Delphi
-  http://dybdahl.dk/dxgettext/
-
-- TACredits
-  http://www.delphipraxis.net/topic114228.html
-
-- Eine Drag&Drop-Komponente von Angus Johnson (leicht verändert)
-  http://angusj.com/delphi/
-
-- FSPro Windows 7 Taskbar Components
-  http://delphi.fsprolabs.com/
-
-- Flying Cow
-  http://sourceforge.net/projects/flyingcow/
-
-- LastFM API
-  http://www.last.fm/api/intro
-
-- MadExcept by Mathias Rauen 
-  http://www.madshi.net/
-  
-- außerdem diverse Funktionen und Codeschnipsel aus dem Internet, u.a. von
-  http://www.delphi-forum.de
-  http://www.delphipraxis.net
-  http://www.dsdt.info
-  http://www.swissdelphicenter.ch
 
 
 Version 4.9.0, August 2018
@@ -1222,3 +1171,43 @@ Version 1.0, erste Veröffentlichung, Januar 2005
 -----------------------------------------------------------
 
 
+Verwendete Units/Komponenten:
+-----------------------------------------------------------
+- VirtualTreeView
+  http://www.soft-gems.net/       
+
+- MP3-Wiedergabe-Engine: bass.dll
+  Download unter http://www.un4seen.com/
+
+- Audio Werkzeuge Bibliothek
+  http://www.gausi.de/delphi
+
+- SearchTools von Heiko Thiel
+  http://www.delphi-forum.de/viewtopic.php?t=48936
+
+- GNU gettext for Delphi
+  http://dybdahl.dk/dxgettext/
+
+- TACredits
+  http://www.delphipraxis.net/topic114228.html
+
+- Eine Drag&Drop-Komponente von Angus Johnson (leicht verändert)
+  http://angusj.com/delphi/
+
+- FSPro Windows 7 Taskbar Components
+  http://delphi.fsprolabs.com/
+
+- Flying Cow
+  http://sourceforge.net/projects/flyingcow/
+
+- LastFM API
+  http://www.last.fm/api/intro
+
+- MadExcept by Mathias Rauen 
+  http://www.madshi.net/
+  
+- außerdem diverse Funktionen und Codeschnipsel aus dem Internet, u.a. von
+  http://www.delphi-forum.de
+  http://www.delphipraxis.net
+  http://www.dsdt.info
+  http://www.swissdelphicenter.ch
