@@ -1,5 +1,0 @@
-Hallo,
-
-das Prefex *.pspimage ist ein Paint Shop Pro X2 Format
-
-TDP
