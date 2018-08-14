@@ -5752,6 +5752,8 @@ var i, len: Integer;
     SizePosition, EndPosition: Int64;
     ERROROCCURRED, DoMessageShow: Boolean;
 
+// for testing larger libraries: increase this value temporary
+// this will create a larger library. Set to 1 after saving!
 const FAKE_FILES_MULTIPLIER = 1;
 
 begin

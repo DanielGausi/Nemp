@@ -946,24 +946,24 @@ begin
 
         NempFormAufteilung[0].FormTop            := ini.ReadInteger('Fenster', 'Top_0'                ,0  );
         NempFormAufteilung[0].FormLeft           := ini.ReadInteger('Fenster', 'Left_0'               ,0  );
-        NempFormAufteilung[0].FormWidth          := ini.ReadInteger('Fenster', 'Width_0'              ,800);
-        NempFormAufteilung[0].FormHeight         := ini.ReadInteger('Fenster', 'Height_0'             ,800);
+        NempFormAufteilung[0].FormWidth          := ini.ReadInteger('Fenster', 'Width_0'              ,1200);
+        NempFormAufteilung[0].FormHeight         := ini.ReadInteger('Fenster', 'Height_0'             ,750);
         NempFormAufteilung[0].TopMainPanelHeight := ini.ReadInteger('Fenster', 'Splitter1_0'          ,350);
-        NempFormAufteilung[0].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_0'  ,320);
-        NempFormAufteilung[0].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_0'   ,160);
+        NempFormAufteilung[0].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_0'  ,560);
+        NempFormAufteilung[0].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_0'   ,280);
         NempFormAufteilung[0].Maximized          := ini.ReadBool('Fenster', 'maximiert_0',False);
 
         NempFormAufteilung[1].FormTop            := ini.ReadInteger('Fenster', 'Top_1'                ,-10);
-        NempFormAufteilung[1].FormLeft           := ini.ReadInteger('Fenster', 'Left_1'               ,336);
+        NempFormAufteilung[1].FormLeft           := ini.ReadInteger('Fenster', 'Left_1'               ,616);
         NempFormAufteilung[1].FormWidth          := 234 + 2 * GetSystemMetrics(SM_CXFrame);
         NempFormAufteilung[1].FormHeight         := 560;
         NempFormAufteilung[1].TopMainPanelHeight := 430;//370;//ini.ReadInteger('Fenster', 'Splitter1_1'          ,350);//391;
-        NempFormAufteilung[1].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_1'  ,320);//303;
-        NempFormAufteilung[1].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_1'   ,160);//73;
+        NempFormAufteilung[1].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_1'  ,580);//303;
+        NempFormAufteilung[1].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_1'   ,290);//73;
         NempFormAufteilung[1].Maximized := False;
 
         NempFormRatios.VSTHeight      := Ini.ReadInteger('Fenster', 'VSTHeight'      , 50);
-        NempFormRatios.BrowseWidth    := Ini.ReadInteger('Fenster', 'BrowseWidth'    , 50);
+        NempFormRatios.BrowseWidth    := Ini.ReadInteger('Fenster', 'BrowseWidth'    , 60);
         NempFormRatios.VSTWidth       := Ini.ReadInteger('Fenster', 'VSTWidth'       , 30);
         NempFormRatios.VDTCoverWidth  := Ini.ReadInteger('Fenster', 'VDTCoverWidth'  , 50);
         NempFormRatios.VDTCoverHeight := Ini.ReadInteger('Fenster', 'VDTCoverHeight' , 20);
@@ -987,23 +987,23 @@ begin
         NempEinzelFormOptions.ExtendedControlsDocked := ini.ReadBool('EinzelFenster','ExtendedControlsDocked', False);
 
         NempEinzelFormOptions.ExtendedControlsTop  := Ini.ReadInteger('Einzelfenster', 'ExtendedControlsTop'   , 166);
-        NempEinzelFormOptions.ExtendedControlsLeft := Ini.ReadInteger('Einzelfenster', 'ExtendedControlsLeft'  , 346);
+        NempEinzelFormOptions.ExtendedControlsLeft := Ini.ReadInteger('Einzelfenster', 'ExtendedControlsLeft'  , 623);
 
 
         NempEinzelFormOptions.PlaylistTop    := Ini.ReadInteger('Einzelfenster', 'PlaylistTop'   , 23);
-        NempEinzelFormOptions.PlaylistLeft   := Ini.ReadInteger('Einzelfenster', 'PlaylistLeft'  , 597);
+        NempEinzelFormOptions.PlaylistLeft   := Ini.ReadInteger('Einzelfenster', 'PlaylistLeft'  , 868);
         NempEinzelFormOptions.PlaylistHeight := Ini.ReadInteger('Einzelfenster', 'PlaylistHeight', 391);
         NempEinzelFormOptions.PlaylistWidth  := Ini.ReadInteger('Einzelfenster', 'PlaylistWidth' , 254);
 
         NempEinzelFormOptions.MedienlisteTop    := Ini.ReadInteger('Einzelfenster', 'MedienlisteTop'   , 428);
         NempEinzelFormOptions.MedienlisteLeft   := Ini.ReadInteger('Einzelfenster', 'MedienlisteLeft'  , 16);
-        NempEinzelFormOptions.MedienlisteHeight := Ini.ReadInteger('Einzelfenster', 'MedienlisteHeight', 205);
-        NempEinzelFormOptions.MedienlisteWidth  := Ini.ReadInteger('Einzelfenster', 'MedienlisteWidth' , 836);
+        NempEinzelFormOptions.MedienlisteHeight := Ini.ReadInteger('Einzelfenster', 'MedienlisteHeight', 330);
+        NempEinzelFormOptions.MedienlisteWidth  := Ini.ReadInteger('Einzelfenster', 'MedienlisteWidth' , 1108);
 
         NempEinzelFormOptions.AuswahlSucheTop    := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheTop'   , 22);
         NempEinzelFormOptions.AuswahlSucheLeft   := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheLeft'  , 18);
         NempEinzelFormOptions.AuswahlSucheHeight := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheHeight', 391);
-        NempEinzelFormOptions.AuswahlSucheWidth  := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheWidth' , 303);
+        NempEinzelFormOptions.AuswahlSucheWidth  := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheWidth' , 594);
 
         NempFormAufteilung[0].FormMinHeight := 600;
         NempFormAufteilung[0].FormMaxHeight := 0;

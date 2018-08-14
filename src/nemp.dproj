@@ -129,10 +129,11 @@
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_MinorVer>9</VerInfo_MinorVer>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Build>588</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.0.588;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>589</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.3.589;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Nemp</VerInfo_Keys>
         <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_Release>3</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -362,8 +363,8 @@ uses
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Beispiele für gekapselte Komponenten für Automatisierungsserver</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Beispiele für gekapselte Komponenten für Automation Server</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
