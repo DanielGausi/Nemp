@@ -27,3 +27,6 @@ bin/Skins/CatWoman/
 bin/Skins/Earth At Night/
 /help/nemp-help-de.synctex.gz
 /help/nemp-help-en.synctex.gz
+/bin/Languages/de/LC_MESSAGES/default.po
+/bin/Languages/de/LC_MESSAGES/howto upgrade.txt
+/src/*.stat
