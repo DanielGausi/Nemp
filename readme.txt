@@ -20,11 +20,11 @@
 
    Nemp does not need to be installed. As a tool on an external disk it is    
    
-   immediately ready for use on any computer - including the media library
+   immediately ready for use on any computer - including the media library.
 
 
 
-   Nemp can record webstreams (mp3 and aac only) and cut them automatically
+   Nemp can record webstreams (mp3 and aac only) and cut them automatically.
 
 
 
