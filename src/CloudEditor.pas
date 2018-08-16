@@ -37,8 +37,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees, contnrs, StrUtils, gnugettext, MyDialogs,
 
-  NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls, Vcl.Menus
-  ;
+  NempAudioFiles, TagClouds, StdCtrls, Spin, TagHelper, ComCtrls, Vcl.Menus,
+  System.UITypes ;
 
 type
 

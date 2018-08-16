@@ -38,7 +38,7 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
   IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException, IdExceptionCore,
   CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
-  Nemp_ConstantsAndTypes, SyncObjs;
+  Nemp_ConstantsAndTypes, SyncObjs, System.Types;
 
 const
     ccArtist     = 0;

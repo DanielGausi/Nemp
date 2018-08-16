@@ -52,7 +52,7 @@ uses
   gnuGettext, languageCodes, 
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   SkinButtons, NempPanel, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdHTTP, MyDialogs, Vcl.Mask
+  IdTCPClient, IdHTTP, MyDialogs, Vcl.Mask, System.UITypes
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
@@ -712,8 +712,7 @@ begin
 end;
 
 procedure TOptionsCompleteForm.LoadStarGraphics;
-var i:integer;
-    s,h,u: TBitmap;
+var s,h,u: TBitmap;
     baseDir: String;
 
 begin
@@ -1158,7 +1157,6 @@ var i,s: integer;
     //aBmp: TBitmap;
     ftr: TFileTypeRegistration;
     tmpIPs, tmpThemes: TStrings;
-    Coverbmp: tBitmap;
 begin
   // Beta-Option
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;

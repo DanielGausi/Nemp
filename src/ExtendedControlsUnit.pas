@@ -48,7 +48,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, gnuGettext,
-  StdCtrls, Buttons, SkinButtons, ExtCtrls, NempPanel;
+  StdCtrls, Buttons, SkinButtons, ExtCtrls, NempPanel, System.Types;
 
 type
   TExtendedControlForm = class(TNempForm)

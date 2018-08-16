@@ -38,8 +38,7 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
     NempAudioFiles, AudioFileHelper, PlayerClass,
-    gnuGettext, Nemp_RessourceStrings,
-
+    gnuGettext, Nemp_RessourceStrings, System.UITypes, System.Types,
 
     MainFormHelper;
 
@@ -350,7 +349,6 @@ end;
     --------------------------------------------------------
 }
 constructor TNempPlaylist.Create;
-var i: Integer;
 begin
   inherited create;
   Playlist := TObjectList.Create;
@@ -2123,7 +2121,7 @@ begin
 end;
 
 procedure TNempPlaylist.RebuildWeighedArray;
-var i, j, curIdx, totalWeight, curWeight: Integer;
+var i, curIdx, totalWeight, curWeight: Integer;
     af: TAudiofile;
 begin
     SetLength(fWeightedRandomIndices, Playlist.Count, 2);

@@ -38,7 +38,7 @@ uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnr
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
-      Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection;
+      Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes;
 
 const USER_WANT_PLAY = 1;
       USER_WANT_STOP = 2;

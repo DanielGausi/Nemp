@@ -759,7 +759,6 @@ function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
-    tmpbmp: tBitmap;
 begin
   result := false;
   try

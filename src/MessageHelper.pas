@@ -34,7 +34,8 @@ unit MessageHelper;
 interface
 
 uses Windows, Classes, Forms, Messages, SysUtils, Controls, Graphics, Dialogs, myDialogs,
-    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper, SilenceDetection;
+    ContNrs, StrUtils, ShellApi, hilfsfunktionen, VirtualTrees, DeleteHelper, SilenceDetection,
+    System.UITypes;
 
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;

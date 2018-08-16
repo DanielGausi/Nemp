@@ -34,7 +34,7 @@ unit TagClouds;
 interface
 
 uses windows, classes, SysUtils, Controls, Contnrs, NempAudioFiles, Math, stdCtrls,
-    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils;
+    ComCtrls, Graphics, Messages, NempPanel, IniFiles, dialogs, StrUtils, System.Types;
 
 const
 

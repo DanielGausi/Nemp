@@ -73,6 +73,10 @@ object CloudEditorForm: TCloudEditorForm
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -184,6 +188,10 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Rename rules'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -242,6 +250,10 @@ object CloudEditorForm: TCloudEditorForm
     object TS_DeleteTags: TTabSheet
       Caption = 'Ignore rules'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         526
         390)

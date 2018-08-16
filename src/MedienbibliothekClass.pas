@@ -64,7 +64,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
 
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
-     DeleteHelper, TagHelper, Generics.Collections, unFastFileStream;
+     DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes;
 
 const
     BUFFER_SIZE = 10 * 1024 * 1024;
@@ -1553,8 +1553,8 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.PrepareNewFilesUpdate;
-var i,d: Integer;
-    aAudioFile: TAudioFile;
+var i: Integer;
+    //aAudioFile: TAudioFile;
 begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
 

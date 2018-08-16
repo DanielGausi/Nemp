@@ -79,7 +79,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, StrUtils,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack,
-  IdException, md5, StdCtrls, DateUtils, Contnrs;
+  IdException, md5, StdCtrls, DateUtils, Contnrs, System.Types;
 
 const
     UnixStartDate: TDateTime = 25569.0;

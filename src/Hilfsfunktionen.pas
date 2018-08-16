@@ -491,7 +491,7 @@ begin
 end;}
 
 function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
-var sek,min,std,tag:integer;
+var sek,min,std:integer;
   d:integer;
 begin
   result := '';

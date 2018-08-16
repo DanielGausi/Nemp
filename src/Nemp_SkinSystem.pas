@@ -1737,7 +1737,7 @@ end;
 
 
 procedure TNempSkin.DeActivateSkin(SetFlowColor: Boolean = True);
-var i, j, idx: integer;
+var i, idx: integer;
   DestVST: TVirtualStringTree;
 
 begin

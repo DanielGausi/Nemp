@@ -38,7 +38,7 @@ uses
   Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs, MyDialogs,
   Menus,   Hilfsfunktionen, NempAudioFiles,
   MP3FileUtils, Nemp_ConstantsAndTypes,
-  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls;
+  gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls, System.UITypes;
 
 type
   TTagSetting = class

@@ -1488,6 +1488,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlaylistRandom: TTabSheet
         Caption = 'Random'
         ImageIndex = 21
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -2177,6 +2179,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView2: TTabSheet
         Caption = 'XXX (Vis)'
         ImageIndex = 20
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
       end
@@ -2671,6 +2675,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles0: TTabSheet
         Caption = 'Files (Main)'
         ImageIndex = 22
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -2747,7 +2753,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ItemHeight = 13
             TabOrder = 1
             OnKeyDown = LBAutoscanKeyDown
-            ExplicitWidth = 295
           end
           object cb_AutoDeleteFiles: TCheckBox
             Left = 16
@@ -2853,6 +2858,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles1: TTabSheet
         Caption = 'Files (Metadata)'
         ImageIndex = 20
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -3021,6 +3028,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles2: TTabSheet
         Caption = 'Files (Cover)'
         ImageIndex = 24
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -3190,6 +3199,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles3: TTabSheet
         Caption = 'Files (Search)'
         ImageIndex = 25
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -3358,6 +3369,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles4: TTabSheet
         Caption = 'XXX Unicode'
         ImageIndex = 23
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -3519,6 +3532,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer0: TTabSheet
         Caption = 'Player (Main)'
         ImageIndex = 2
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -3872,11 +3887,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblSoundFont: TLabel
             Left = 16
             Top = 20
-            Width = 81
+            Width = 69
             Height = 13
             Anchors = [akLeft, akTop, akRight]
             Caption = 'SoundFont file'
-            ExplicitWidth = 69
           end
           object editSoundFont: TEdit
             Left = 16
@@ -4314,6 +4328,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer5: TTabSheet
         Caption = 'Player (Effects)'
         ImageIndex = 15
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -4451,6 +4467,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer6: TTabSheet
         Caption = 'Player (Event)'
         ImageIndex = 19
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 442
         ExplicitHeight = 754
         DesignSize = (
@@ -4924,7 +4942,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             ReadOnly = True
             ScrollBars = ssVertical
             TabOrder = 0
-            ExplicitWidth = 411
           end
         end
         object GrpBox_ScrobbleSettings: TGroupBox

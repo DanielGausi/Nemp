@@ -38,7 +38,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
   PNGImage, GifImg, gnuGettext,  CoverHelper, AudioFiles, M4aAtoms,
-  Nemp_RessourceStrings;
+  Nemp_RessourceStrings, System.UITypes;
 
 type
   TFNewPicture = class(TForm)

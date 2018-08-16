@@ -773,7 +773,6 @@ end;
     --------------------------------------------------------
 }
 procedure TBibSearcher.SwapTotalStrings(FileList: TObjectList);
-var i: Integer;
 begin
 
     BuildTotalString(FileList);

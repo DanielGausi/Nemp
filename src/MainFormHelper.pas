@@ -101,7 +101,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
     procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
     procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
-    procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: String);
+    procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 
     procedure CorrectVCLForABRepeat;
 
@@ -282,7 +282,6 @@ end;
 
 // TODO: Event bei "neues Drive angeschlossen"
 procedure HandleNewConnectedDrive;
-var i: Integer;
 begin
 
   with Nemp_MainForm do
@@ -1537,7 +1536,7 @@ begin
     end;
 end;
 
-procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: String);
+procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 var aErr: TNempAudioError;
     BibFile: TAudioFile;
 begin

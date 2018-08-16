@@ -40,7 +40,8 @@ unit spectrum_vis;
 }
 
 interface
-  uses Windows, Dialogs, Graphics, SysUtils,  Classes, Nemp_Skinsystem, ExtCtrls;
+  uses Windows, Dialogs, Graphics, SysUtils,  Classes, Nemp_Skinsystem,
+      ExtCtrls, System.Types;
 
   // Type TWaveData = array [ 0..2048] of DWORD;
     type TFFTData  = array [0..512] of Single;

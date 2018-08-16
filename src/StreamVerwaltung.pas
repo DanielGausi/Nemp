@@ -41,7 +41,7 @@ uses
   shellApi, Menus,  Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings,
   Nemp_ConstantsAndTypes, TreeHelper,
    ComCtrls, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdHTTP, ShoutcastUtils, ExtCtrls;
+  IdTCPClient, IdHTTP, ShoutcastUtils, ExtCtrls, System.UITypes;
 
 type
 
@@ -260,8 +260,7 @@ end;
 
 
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
-var i: Integer;
-    aList: TObjectList;
+var aList: TObjectList;
     FS: TFileStream;
      filename, sl: string;
      s: AnsiString;

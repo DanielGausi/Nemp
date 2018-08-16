@@ -33,7 +33,8 @@ unit Taghelper;
 
 interface
 
-uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs, NempAudioFiles;
+uses windows, classes, SysUtils, Contnrs, Messages, IniFiles, strUtils, dialogs,
+  NempAudioFiles, System.Types;
 
 // Flag constants for consistency-checking
 const

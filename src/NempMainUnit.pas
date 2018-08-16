@@ -59,7 +59,7 @@ uses
 
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection,
-  System.ImageList
+  System.ImageList, System.Types, System.UITypes
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -4997,7 +4997,8 @@ Tag Management: Handle a single File
 }
 
 procedure TNemp_MainForm.DetailLabelDblClickNewTag(Sender: TObject);
-var newTagDummy, backup: String;
+var newTagDummy: String;
+    backup: UTF8String;
     IgnoreWarningsDummy: Boolean;
 begin
     backup := MedienBib.CurrentAudioFile.RawTagLastFM;
@@ -5007,7 +5008,8 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_RenameTagThisFileClick(Sender: TObject);
-var newTagDummy, backup: String;
+var newTagDummy: String;
+    backup: UTF8String;
     IgnoreWarningsDummy: Boolean;
 begin
     backup := MedienBib.CurrentAudioFile.RawTagLastFM;
@@ -5017,7 +5019,7 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_RemoveTagThisFileClick(Sender: TObject);
-var backup: String;
+var backup: UTF8String;
 begin
     if not assigned(MedienBib.CurrentAudioFile) then
         exit;
@@ -5139,7 +5141,7 @@ Tag Management: Global Rules
 ----------------------------------------
 }
 procedure TNemp_MainForm.PM_TagIgnoreListClick(Sender: TObject);
-var backup: String;
+var backup: UTF8String;
 begin
     if not assigned(MedienBib.CurrentAudioFile) then
         exit;
@@ -5172,7 +5174,8 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_TagMergeListClick(Sender: TObject);
-var backup, newTag: String;
+var backup: UTF8String;
+    newTag: String;
 begin
     if not assigned(MedienBib.CurrentAudioFile) then
         exit;
@@ -10174,7 +10177,6 @@ end;
 
 
 procedure TNemp_MainForm.TntFormDestroy(Sender: TObject);
-var i, j: Integer;
 begin
     {$IFDEF USESTYLES}
     FreeAllControlStyleHooks;
