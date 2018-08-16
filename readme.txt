@@ -51,7 +51,6 @@
 
    Some features have already been added after user feedback - e.g. the search in the 
    playlist, marks in the library, the player log file, or the
- weighted random playback.
-
+ weighted random playback
 
 
