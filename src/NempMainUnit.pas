@@ -896,7 +896,7 @@ type
     procedure Medialist_PopupMenuPopup(Sender: TObject);
     procedure PM_ML_ShowInExplorerClick(Sender: TObject);
 
-    procedure ShowSummary;
+    procedure ShowSummary(aList: TObjectList = Nil);
     procedure ShowHelp;
 
     procedure ToolButton7Click(Sender: TObject);
@@ -1450,6 +1450,8 @@ type
     //procedure PM_AddTagSelectedFilesClick(Sender: TObject);
     procedure RefreshVSTCover(aAudioFile: TAudioFile);
     procedure RefreshVSTCoverTimerTimer(Sender: TObject);
+    procedure TabBtn_MarkerMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     CoverImgDownX: Integer;
@@ -3961,11 +3963,23 @@ begin
         TabBtn_Marker.Tag := (TabBtn_Marker.Tag + 1) mod 5;
         TabBtn_Marker.GlyphLine := TabBtn_Marker.Tag;
     end;
-        // else: just re-display the current marker
+    // else: just re-display the current marker, do not change it for now
 
     MedienBib.ShowMarker(TabBtn_Marker.Tag);
 end;
 
+
+procedure TNemp_MainForm.TabBtn_MarkerMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if Medienbib.StatusBibUpdate >= 2 then exit;
+    if Button = mbRight then
+    begin
+        TabBtn_Marker.Tag := 0;
+        TabBtn_Marker.GlyphLine := TabBtn_Marker.Tag;
+        MedienBib.ShowMarker(TabBtn_Marker.Tag);
+    end;
+end;
 
 
 procedure TNemp_MainForm.PM_ML_ShowInExplorerClick(Sender: TObject);
@@ -3986,7 +4000,7 @@ begin
                       , PChar('/e,/select,"'+Data^.FAudioFile.Pfad+'"'), '', sw_ShowNormal);
 end;
 
-procedure TNemp_MainForm.ShowSummary;
+procedure TNemp_MainForm.ShowSummary(aList: TObjectList = Nil);
 var i:integer;
   dauer:int64;
   groesse:int64;
@@ -3995,7 +4009,10 @@ begin
   dauer:=0;
   groesse:=0;
   // ???
-  Liste := MedienBib.Anzeigeliste;
+  if assigned(aList) then
+      Liste := aList
+  else
+      Liste := MedienBib.Anzeigeliste;
 
   if MedienBib.Count = 0 then
       AuswahlStatusLBL.Caption := ''

@@ -4899,7 +4899,7 @@ procedure TMedienBibliothek.ShowMarker(aIndex: Byte);
 begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
-    BibSearcher.SearchMarker(aIndex);
+    BibSearcher.SearchMarker(aIndex, AnzeigeListe);
     LeaveCriticalSection(CSUpdate);
 end;
 

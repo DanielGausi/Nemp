@@ -583,10 +583,15 @@ begin
         MB_ShowQuickSearchResults,
         MB_ShowFavorites : begin
             srList := TObjectList(aMsg.LParam);
-            MedienBib.AnzeigeListe.Clear;
-            MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
-            for i := 0 to srList.Count - 1 do
-                MedienBib.AnzeigeListe.Add(srList[i]);
+
+            if (aMsg.WParam = MB_ShowSearchResults) or (aMsg.WParam = MB_ShowQuickSearchResults) then
+            begin
+                // do not change AnzeigeListe for Favorites (= marked Files)
+                MedienBib.AnzeigeListe.Clear;
+                MedienBib.AnzeigeListe.Capacity := srList.Count + 1;
+                for i := 0 to srList.Count - 1 do
+                    MedienBib.AnzeigeListe.Add(srList[i]);
+            end;
 
             case aMsg.WParam of
                   MB_ShowSearchResults      : MedienBib.DisplayContent := DISPLAY_Search;
@@ -595,9 +600,9 @@ begin
             end;
             MedienBib.AnzeigeShowsPlaylistFiles := False;
             MedienBib.AnzeigeListIsCurrentlySorted := False;
-
-            FillTreeView(MedienBib.AnzeigeListe, Nil);
-            ShowSummary;
+            //FillTreeView(MedienBib.AnzeigeListe, Nil);
+            FillTreeView(srList, Nil);
+            ShowSummary(srList);
         end;
 
         MB_SetWin7TaskbarProgress: begin

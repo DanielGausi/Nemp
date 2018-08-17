@@ -267,7 +267,7 @@ type
         procedure IPCQuickSearch(Keyword: UnicodeString);
 
         procedure EmptySearch(Mode: Integer);
-        procedure SearchMarker(aIndex: Byte);
+        procedure SearchMarker(aIndex: Byte; SearchList: TObjectList);
 
     end;
 
@@ -1614,27 +1614,35 @@ begin
     end;
 end;
 
-procedure TBibSearcher.SearchMarker(aIndex: Byte);
+procedure TBibSearcher.SearchMarker(aIndex: Byte; SearchList: TObjectList);
 var tmpList: TObjectList;
     i: Integer;
 begin
     tmpList := TObjectList.Create(False);
     try
-        if aIndex = 4 then
-        begin
-            // list all marked files
-            for i := 0 to MainList.Count - 1 do
-            begin
-                if TAudioFile(MainList[i]).Favorite <> 0 then
-                    tmpList.Add(MainList[i]);
+        case aIndex  of
+            0: begin
+                // list all files
+                for i := 0 to SearchList.Count - 1 do
+                    tmpList.Add(SearchList[i]);
             end;
 
-        end else
-        begin
-            for i := 0 to MainList.Count - 1 do
+            4: begin
+                // list all marked files
+                for i := 0 to SearchList.Count - 1 do
+                begin
+                    if TAudioFile(SearchList[i]).Favorite <> 0 then
+                        tmpList.Add(SearchList[i]);
+                end;
+            end;
+        else
             begin
-                if TAudioFile(MainList[i]).Favorite = aIndex then
-                    tmpList.Add(MainList[i]);
+                // list only files with marker = aIndex
+                for i := 0 to SearchList.Count - 1 do
+                begin
+                    if TAudioFile(SearchList[i]).Favorite = aIndex then
+                        tmpList.Add(SearchList[i]);
+                end;
             end;
         end;
 

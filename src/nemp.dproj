@@ -129,8 +129,8 @@
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_MinorVer>9</VerInfo_MinorVer>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Build>599</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.3.599;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=;ProductName=Nemp</VerInfo_Keys>
+        <VerInfo_Build>601</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.3.601;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=;ProductName=Nemp</VerInfo_Keys>
         <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Release>3</VerInfo_Release>
