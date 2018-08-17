@@ -32,7 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 unit NempApi;
 
-{$I \..\xe.inc}
+{$I ..\xe.inc}
 
 interface
 
