@@ -50,9 +50,9 @@ type TNempG15Applet = class(TObject)
         constructor Create;
         destructor Destroy; Override;
 
-        procedure PaintIntro;
-        procedure PaintCurrentTrackInfo;
-        procedure PaintPlaylistPart;
+        procedure PaintIntro(PaintAlsoOnForm: Boolean);
+        procedure PaintCurrentTrackInfo(PaintAlsoOnForm: Boolean);
+        procedure PaintPlaylistPart(PaintAlsoOnForm: Boolean);
 
 
         procedure myCallbackSoftButtons(dwButtons:integer);
@@ -186,6 +186,8 @@ begin
     MainBitmap.Canvas.Font.Name := 'Tahoma';
     MainBitmap.Canvas.Font.Size := 10;
 
+    MainBitmap.PixelFormat := pf8bit;
+
     CurrentFileName := '';
     CurrentFileScrolling := False;
     CurrentFileScrollPos := 0;
@@ -210,6 +212,7 @@ begin
         g15Display.OnSoftButtons := myCallbackSoftButtons;
 
         g15Display.LcdCanvas := MainBitmap.Canvas;
+        g15Display.SourceBitmap := MainBitmap;
         g15Display.SendToDisplay(fStartPriority);
     except
         g15Display := Nil;
@@ -389,7 +392,7 @@ begin
     end;
 end;
 
-procedure TNempG15Applet.PaintIntro;
+procedure TNempG15Applet.PaintIntro(PaintAlsoOnForm: Boolean);
 begin
     MainBitmap.Canvas.Brush.Color := clWhite;
     MainBitmap.Canvas.FillRect(Rect(0, 0, LGLCD_BMP_WIDTH, LGLCD_BMP_HEIGHT));
@@ -411,21 +414,19 @@ begin
     if Assigned(g15Display) then
         g15Display.SendToDisplay(fDisplayPriority);
 
-    ControlImage.Picture.Assign(MainBitmap);
+    if PaintAlsoOnForm then
+        ControlImage.Picture.Assign(MainBitmap);
 end;
 
 
-procedure TNempG15Applet.PaintCurrentTrackInfo;
+procedure TNempG15Applet.PaintCurrentTrackInfo(PaintAlsoOnForm: Boolean);
 var NeuerFilename: UnicodeString;
     NeuerTitel: UnicodeString;
     neuerstatus:integer;
-    //NeuerRandomMode: integer;
     CurrentPos : Integer;
 begin
     Neuerstatus     := GetNempState;  // 1: Playing, 3: Paused, 0: Not Playing
     neuerFilename   := GetNempCurrentTitleW(IPC_CF_FILENAME);
-    //GetNempPlaylistFileNameW(-1);
-    //NeuerRandomMode := GetNempRandomMode;
 
     if CurrentFileName <> neuerFilename then
     begin
@@ -464,7 +465,6 @@ begin
         CurrentPos := GetNemp_TrackPosition;
     end;
 
-
     // Clear Display
     MainBitmap.Canvas.Brush.Color := clWhite;
     MainBitmap.Canvas.FillRect(Rect(0, 0, LGLCD_BMP_WIDTH, LGLCD_BMP_HEIGHT));
@@ -478,7 +478,7 @@ begin
 
     if CurrentFileScrolling then
     begin
-        MainBitmap.Canvas.TextOut(CurrentFileScrollPos, 0, CurrentTitle + ' ... ' + CurrentTitle);
+         MainBitmap.Canvas.TextOut(CurrentFileScrollPos, 0, CurrentTitle + ' ... ' + CurrentTitle);
         dec(CurrentFileScrollPos,1);
         if CurrentFileScrollPos < - MainBitmap.Canvas.TextWidth(CurrentTitle + ' ... ') then
             CurrentFileScrollPos := 0;
@@ -556,13 +556,15 @@ begin
     MainBitmap.Canvas.Pixels[152,37] := clBlack;
     MainBitmap.Canvas.Pixels[152,39] := clBlack;
 
+
     if Assigned(g15Display) then
         g15Display.SendToDisplay(fDisplayPriority);
 
-    ControlImage.Picture.Assign(MainBitmap);
+    if PaintAlsoOnForm then
+        ControlImage.Picture.Assign(MainBitmap);
 end;
 
-procedure TNempG15Applet.PaintPlaylistPart;
+procedure TNempG15Applet.PaintPlaylistPart(PaintAlsoOnForm: Boolean);
 var i: Integer;
     y: Integer;
 begin
@@ -630,7 +632,8 @@ begin
     if Assigned(g15Display) then
         g15Display.SendToDisplay(fDisplayPriority);
 
-    ControlImage.Picture.Assign(MainBitmap);
+    if PaintAlsoOnForm then
+        ControlImage.Picture.Assign(MainBitmap);
 end;
 
 

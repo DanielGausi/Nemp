@@ -1,6 +1,6 @@
 {$IF CompilerVersion > 23} 
     {$DEFINE USESTYLES}
-{$ENDIF}
+{$IFEND}
 
 
 {$IFDEF VER230}

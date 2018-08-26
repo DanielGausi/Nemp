@@ -9,7 +9,10 @@ $Id: lcdg15.pas,v 0.3 2007/05/01 smurfy.de $
 
 Changes:
 
-v.0.42:
+v0.5: Changed pixels[] to scanline in SendToDisplay
+      => much better performance
+
+v0.42:
   Update for Delphi 2009 - Daniel Gaussmann
 
 v0.4.1:
@@ -187,6 +190,7 @@ type TOnConfigureCB = procedure() of Object;
 type TLcdG15 = class(TComponent)
   private
    LCanvas : TCanvas;
+   fSourceBitmap: TBitmap;
    LOpenContext : lgLcdOpenContext;
    LOnSoftButtonsCB : TOnSoftButtonsCB;
    LOnConfigureCB : TOnConfigureCB;
@@ -195,6 +199,8 @@ type TLcdG15 = class(TComponent)
    property OnSoftButtons : TOnSoftButtonsCB read LOnSoftButtonsCB write LOnSoftButtonsCB;
    property OnConfigure : TOnConfigureCB read LOnConfigureCB write LOnConfigureCB;
    property LcdCanvas : TCanvas read LCanvas write LCanvas;
+   // note: SourceBitmap MUST have PixelFormat pf8bit !!!!
+   property SourceBitmap: TBitmap read fSourceBitmap write fSourceBitmap;
    constructor Create(ApplicationName:AnsiString;isPersistent:Bool;isAutostartable:Bool;SupportConfigure:boolean = false); reintroduce;
    destructor Destroy(); override;
    procedure SendToDisplay(priority:integer);
@@ -322,17 +328,31 @@ end;
 
 procedure TLcdG15.SendToDisplay(priority:integer);
 var i,it,x2:integer;
-    tmp : tcolor;
     bmp : lgLcdBitmap160x43x1;
-    //i2:int64;
+    P: PByteArray;
 begin
   if (LOpenContext.device = -1) then exit;
+
+  x2 := 0;
+  for it := 0 to 43 -1 do
+  begin
+      P := SourceBitmap.ScanLine[it];
+      for i := 0 to 160 -1 do
+      begin
+          if P[i] <> $ff then
+              bmp.pixels[x2] := 128
+          else
+              bmp.pixels[x2] := 0;
+          inc(x2);
+      end;
+  end;
+    {
   x2:=0;
   for it:= 0 to 43 -1 do
   begin
     for i:= 0 to 160 -1 do
     begin
-      tmp :=  LCanvas.Pixels[i,it];
+      tmp :=  SourceBitmap.Canvas.Pixels[i,it];
       if tmp <> $ffffff then
         bmp.pixels[x2] := 128
       else
@@ -340,6 +360,7 @@ begin
       inc(x2);
     end;
   end;
+  }
  bmp.hdr.Format := LGLCD_BMP_FORMAT_160x43x1;
  lgLcdUpdateBitmap(LOpenContext.device,@bmp.hdr,LGLCD_SYNC_UPDATE or priority);
 end;

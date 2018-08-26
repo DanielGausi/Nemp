@@ -115,6 +115,7 @@ procedure TMainForm.MainTimerTimer(Sender: TObject);
 var hwndNemp:THandle;
 begin
   hwndNemp := FindWindow(PChar(WINDOW_NAME),nil);
+
   if (hwndNemp = 0) And (ParamCount = 1) then
       close
   else
@@ -124,13 +125,13 @@ begin
 
       if (MainTimer.Tag < 10) or (hwndNemp = 0) or (Not assigned(NempG15Applet.g15Display)) then
       begin
-          NempG15Applet.PaintIntro;
+          NempG15Applet.PaintIntro(visible);
       end else
       begin
           if NempG15Applet.AppState = 0 then
-              NempG15Applet.PaintCurrentTrackInfo
+              NempG15Applet.PaintCurrentTrackInfo(visible)
           else
-              NempG15Applet.PaintPlaylistPart;
+              NempG15Applet.PaintPlaylistPart(visible);
       end;
   end;
 end;
