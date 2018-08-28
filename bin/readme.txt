@@ -10,7 +10,7 @@
       Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.2
       Januar 2005 - August 2018
 
-      Version: 4.9.0
+      Version: 4.9.1
 
 
 -----------------------------------------------------------
@@ -62,6 +62,12 @@ Lizenzvereinbarungen:
 GPL 2.0 oder später
 (Details in der licence.txt und der gpl.txt)
 
+
+
+Version 4.9.1, August 2018
+----------------------------------------------------------- 
+- Performance der Display-App für die G15 deutlich verbessert und
+  die CPU-Last drastisch reduziert
 
 
 Version 4.9.0, August 2018
