@@ -522,6 +522,7 @@ type
     BTNok: TButton;
     BTNCancel: TButton;
     BTNApply: TButton;
+    cb_limitMarkerToCurrentFiles: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1380,8 +1381,8 @@ begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
- end;
- cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
+  end;
+  cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
 
 
 
@@ -1410,6 +1411,7 @@ begin
 
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
+  cb_limitMarkerToCurrentFiles.Checked := MedienBib.limitMarkerToCurrentFiles;
   CBSkipSortOnLargeLists.Enabled := CBAlwaysSortAnzeigeList.Checked;
   CBSkipSortOnLargeLists.Checked := MedienBib.SkipSortOnLargeLists;
 
@@ -2545,6 +2547,7 @@ begin
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   // Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
+  MedienBib.limitMarkerToCurrentFiles := cb_limitMarkerToCurrentFiles.Checked;
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
   MedienBib.ShowHintsInMedialist := CBShowHintsInMedialist.Checked;

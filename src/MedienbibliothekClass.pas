@@ -362,7 +362,25 @@ type
         // Liste, die unten in der Liste angezeigt wird.
         // wird generiert über Onchange der Vorauswahl, oder aber von der Such-History
         // Achtung: Auf diese NUR IM VCL-HAUPTTHREAD zugreifen !!
-        AnzeigeListe: TObjectList; // Speichert die Liste, die gerade im Tree angezeigt wird.
+
+        ///  *************************
+        ///  Rework 2018:
+        ///  - Three "Real" Lists, which actually stores AudioFileObjects
+        ///    a. LastBrowseResult (for Browsing, Coverflow, TagCloud and "big" search)
+        ///    b. LastQuickSearchResult (for Quicksearch)
+        ///    c. LastMarkFilter (for switching between files with different marks)
+        ///  - Two "Virtual" Lists, which are only links to one of the two above
+        ///    * AnzeigeListe (pointer to a. or b. or c.), which is displayed in the VST
+        ///    * BaseMarkerList (pointer to a. or b. or "all files" (user setting))
+        ///
+        ///  maybe later: replace "AnzeigeShowsPlaylistFiles" by another "PlaylistFilesList" ??
+        ///  ************************
+        LastBrowseResultList      : TObjectList;
+        LastQuickSearchResultList : TObjectList;
+        LastMarkFilterList        : TObjectList;
+        // virtual Lists, do NOT create/free. These are just links to one of three above (or "allFiles")
+        AnzeigeListe          : TObjectList;
+        BaseMarkerList        : TObjectList;
         // AnzeigeListe2: TObjectList; // Speichert zusätzliche QuickSearch-Resultate.
         // Flag, was für Dateien in der Playlist sind
         // Muss bei jeder Änderung der AnzeigeListe gesetzt werden
@@ -397,6 +415,7 @@ type
         AutoLoadMediaList: Boolean;
         AutoSaveMediaList: Boolean;
         alwaysSortAnzeigeList: Boolean;
+        limitMarkerToCurrentFiles: Boolean;
         SkipSortOnLargeLists: Boolean;
         AnzeigeListIsCurrentlySorted: Boolean;
         AutoScanPlaylistFilesOnView: Boolean;
@@ -582,6 +601,9 @@ type
         // Reset internal variables fLastPath, fLastCoverID, ...
         procedure ReInitCoverSearch;
 
+        // 2018: new helper method to set the BaseMarkerList properly
+        procedure SetBaseMarkerList(aList: TObjectList);
+
         // Methods for Browsing in the Library
         // 1. Generate BrowseLists
         //    see private methods, called during update-process
@@ -609,9 +631,10 @@ type
         procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
         procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
 
+        procedure RestoreAnzeigeListeAfterQuicksearch;
+
         // Search the next matching cover
         function GetCoverWithPrefix(aPrefix: UnicodeString; Startidx: Integer): Integer;
-
 
         // Methods for searching
         // See BibSearcherClass for Details.
@@ -623,12 +646,14 @@ type
         procedure IPCSearch(Keyword: UnicodeString);
         // special case: Searching for a Tag
         procedure GlobalQuickTagSearch(KeyTag: UnicodeString);
+        // search for '*' => show all files in the library
+        procedure QuickSearchShowAllFiles;
 
         // b. detailed search
         procedure CompleteSearch(Keywords: TSearchKeyWords);
         procedure CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
         // c. get all files from the library in the same directory
-        procedure GetFilesInDir(aDirectory: UnicodeString);
+        procedure GetFilesInDir(aDirectory: UnicodeString; ClearExistingView: Boolean);
         // d. Special case: Search for Empty Strings
         procedure EmptySearch(Mode: Integer);
         // list favorites
@@ -783,7 +808,15 @@ begin
 
 
   Alben        := TObjectlist.create(False);
-  AnzeigeListe := TObjectlist.create(False);
+
+
+  LastBrowseResultList      := TObjectList.create(False);
+  LastQuickSearchResultList := TObjectList.create(False);
+  LastMarkFilterList        := TObjectList.create(False);
+  // virtual Lists, do NOT create/free
+  AnzeigeListe              := LastBrowseResultList;
+  BaseMarkerList            := LastBrowseResultList;
+  ////////AnzeigeListe := TObjectlist.create(False);
   //AnzeigeListe2 := TObjectlist.create(False);
 
   AnzeigeShowsPlaylistFiles := False;
@@ -891,7 +924,14 @@ begin
   tmpAlleArtists.Free;
   AlleArtists.Free;
   Alben.Free;
-  AnzeigeListe.Free;
+
+  LastBrowseResultList      .Free;
+  LastQuickSearchResultList .Free;
+  LastMarkFilterList        .Free;
+  // virtual Lists, do NOT create/free
+  AnzeigeListe          := Nil;
+  BaseMarkerList        := Nil;
+  ///////AnzeigeListe.Free;
   // AnzeigeListe2.Free;
 
   UpdateList.Free;
@@ -901,8 +941,6 @@ begin
   Coverlist.Free;
   fBackupCoverlist.Free;
   BibSearcher.Free;
-
-
 
   inherited Destroy;
 end;
@@ -961,7 +999,11 @@ begin
   tmpAlleArtists.Clear;
   AlleArtists.Clear;
   Alben.Clear;
-  AnzeigeListe.Clear;
+  // AnzeigeListe.Clear; // (no need to clear the virtaul lists)
+  LastBrowseResultList      .Clear;
+  LastQuickSearchResultList .Clear;
+  LastMarkFilterList        .Clear;
+
   // AnzeigeListe2.Clear;
   AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_None;
@@ -1185,6 +1227,7 @@ begin
         end;
 
         AlwaysSortAnzeigeList := ini.ReadBool('MedienBib', 'AlwaysSortAnzeigeList', False);
+        limitMarkerToCurrentFiles := ini.ReadBool('MedienBib', 'limitMarkerToCurrentFiles', True);
         SkipSortOnLargeLists  := ini.ReadBool('MedienBib', 'SkipSortOnLargeLists', True);
         AutoScanPlaylistFilesOnView := ini.ReadBool('MedienBib', 'AutoScanPlaylistFilesOnView', True);
         ShowHintsInMedialist := ini.ReadBool('Medienbib', 'ShowHintsInMedialist', True);
@@ -1321,6 +1364,8 @@ begin
         Ini.WriteInteger('MedienBib', 'Vorauswahl1', integer(NempSortArray[1]));
         Ini.WriteInteger('MedienBib', 'Vorauswahl2', integer(NempSortArray[2]));
         ini.WriteBool('MedienBib', 'AlwaysSortAnzeigeList', AlwaysSortAnzeigeList);
+        ini.WriteBool('MedienBib', 'limitMarkerToCurrentFiles', limitMarkerToCurrentFiles);
+
         ini.WriteBool('MedienBib', 'SkipSortOnLargeLists', SkipSortOnLargeLists);
 
         ini.WriteBool('MedienBib', 'AutoScanPlaylistFilesOnView', AutoScanPlaylistFilesOnView);
@@ -2371,11 +2416,12 @@ end;
 procedure TMedienBibliothek.CleanUpDeadFilesFromVCLLists;
 var i: Integer;
 begin
-    // Delete DeadFiles from AnzeigeListe
+    // Delete DeadFiles from AnzeigeListe (meaning: from the possible "real" lists behind this list)
     for i := 0 to DeadFiles.Count - 1 do
     begin
-        AnzeigeListe.Extract(TAudioFile(DeadFiles[i]));
-        ///AnzeigeListe2.Extract(TAudioFile(DeadFiles[i]));
+        LastBrowseResultList      .Extract(TAudioFile(DeadFiles[i]));
+        LastQuickSearchResultList .Extract(TAudioFile(DeadFiles[i]));
+        LastMarkFilterList        .Extract(TAudioFile(DeadFiles[i]));
     end;
     // Delete DeadFiles from BibSearcher
     BibSearcher.RemoveAudioFilesFromLists(DeadFiles);
@@ -3246,7 +3292,10 @@ begin
   if aAudioFile = CurrentAudioFile then
       currentAudioFile := Nil;
 
-  AnzeigeListe.Extract(aAudioFile);
+  LastBrowseResultList      .Extract(aAudioFile);
+  LastQuickSearchResultList .Extract(aAudioFile);
+  LastMarkFilterList        .Extract(aAudioFile);
+
   /// AnzeigeListe2.Extract(aAudioFile);
   if AnzeigeShowsPlaylistFiles then
   begin
@@ -4173,6 +4222,15 @@ begin
 
 end;
 
+
+procedure TMedienBibliothek.SetBaseMarkerList(aList: TObjectList);
+begin
+    if limitMarkerToCurrentFiles then
+        BaseMarkerList := aList
+    else
+        BaseMarkerList := Mp3ListePfadSort;
+end;
+
 {
     --------------------------------------------------------
     ReBuildBrowseLists
@@ -4635,10 +4693,14 @@ begin
   if Artist = BROWSE_PLAYLISTS then
   begin
       BibSearcher.DummyAudioFile.Titel := MainForm_NoTitleInformationAvailable;
+
       // Playlist Datei in PlaylistFiles laden.
       PlaylistFiles.Clear;
-      AnzeigeListe.Clear;
-      ///AnzeigeListe2.Clear;
+
+      LastBrowseResultList.Clear;
+      AnzeigeListe := LastBrowseResultList;
+      SetBaseMarkerList(LastBrowseResultList);
+
       // bugfix Nemp 4.7.1
       // (Bug created in 4.7, in context of the label-click-search-stuff)
       CurrentAudioFile := Nil;
@@ -4651,7 +4713,8 @@ begin
           DisplayContent := DISPLAY_BrowsePlaylist;
 
           for i := 0 to PlaylistFiles.Count - 1 do
-              AnzeigeListe.Add(TAudioFile(PlaylistFiles[i]));
+              LastBrowseResultList.Add(TAudioFile(PlaylistFiles[i]));
+
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0)
       end else
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  100);
@@ -4660,15 +4723,23 @@ begin
   if Artist = BROWSE_RADIOSTATIONS then
   begin
       BibSearcher.DummyAudioFile.Titel := MainForm_NoTitleInformationAvailable;
-      AnzeigeListe.Clear;
-      ///AnzeigeListe2.Clear;
+
+      LastBrowseResultList.Clear;
+      AnzeigeListe := LastBrowseResultList;
+      SetBaseMarkerList(LastBrowseResultList);
+
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
   end else
   begin
       BibSearcher.DummyAudioFile.Titel := MainForm_NoSearchresults;
       AnzeigeShowsPlaylistFiles := False;
       DisplayContent := DISPLAY_BrowseFiles;
-      GetTitelList(AnzeigeListe, Artist, Album);
+
+      //LastBrowseResultList.Clear; // done in GetTitelList
+      AnzeigeListe := LastBrowseResultList;
+      SetBaseMarkerList(LastBrowseResultList);
+
+      GetTitelList(LastBrowseResultList, Artist, Album);
       if IsAutoSortWanted then
           SortAnzeigeliste;
       //if UpdateQuickSearchList then
@@ -4719,8 +4790,10 @@ procedure TMedienBibliothek.GenerateAnzeigeListeFromCoverID(aCoverID: String);
 begin
   AnzeigeListIsCurrentlySorted := False;
 
-  ///AnzeigeListe2.Clear;
-  GetTitelListFromCoverID(AnzeigeListe, aCoverID);
+  //LastBrowseResultList.Clear; // done in GetTitelListFromCoverID
+  AnzeigeListe := LastBrowseResultList;
+  SetBaseMarkerList(LastBrowseResultList);
+  GetTitelListFromCoverID(LastBrowseResultList, aCoverID);
 
   AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_BrowseFiles;
@@ -4730,6 +4803,14 @@ begin
   ///FillQuickSearchList;
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
+
+procedure TMedienBibliothek.RestoreAnzeigeListeAfterQuicksearch;
+begin
+    AnzeigeListe := LastBrowseResultList;
+    SetBaseMarkerList(LastBrowseResultList);
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
+end;
+
 {
     --------------------------------------------------------
     GenerateAnzeigeListeFromTagCloud
@@ -4743,19 +4824,19 @@ var i: Integer;
 begin
   if not assigned(aTag) then exit;
 
-
   AnzeigeListIsCurrentlySorted := False;
 
-  AnzeigeListe.Clear;
-  ///AnzeigeListe2.Clear;
+  LastBrowseResultList.Clear;
+  AnzeigeListe := LastBrowseResultList;
+  SetBaseMarkerList(LastBrowseResultList);
 
   if aTag = TagCloud.ClearTag then
       for i := 0 to Mp3ListeArtistSort.Count - 1 do
-          AnzeigeListe.Add(Mp3ListeArtistSort[i])
+          LastBrowseResultList.Add(Mp3ListeArtistSort[i])
   else
       // we need no binary search or stuff here. The Tag saves all its AudioFiles.
       for i := 0 to aTag.AudioFiles.Count - 1 do
-          AnzeigeListe.Add(aTag.AudioFiles[i]);
+          LastBrowseResultList.Add(aTag.AudioFiles[i]);
 
   if BuildNewCloud then
       TagCloud.BuildCloud(Mp3ListeArtistSort, aTag, False);
@@ -4888,6 +4969,14 @@ begin
     LeaveCriticalSection(CSUpdate);
 end;
 
+procedure TMedienBibliothek.QuickSearchShowAllFiles;
+begin
+    if StatusBibUpdate >= 2 then exit;
+    EnterCriticalSection(CSUpdate);
+    BibSearcher.ShowAllFiles;
+    LeaveCriticalSection(CSUpdate);
+end;
+
 procedure TMedienBibliothek.EmptySearch(Mode: Integer);
 begin
     if StatusBibUpdate >= 2 then exit;
@@ -4899,7 +4988,7 @@ procedure TMedienBibliothek.ShowMarker(aIndex: Byte);
 begin
     if StatusBibUpdate >= 2 then exit;
     EnterCriticalSection(CSUpdate);
-    BibSearcher.SearchMarker(aIndex, AnzeigeListe);
+    BibSearcher.SearchMarker(aIndex, BaseMarkerList);
     LeaveCriticalSection(CSUpdate);
 end;
 
@@ -4909,19 +4998,35 @@ end;
     - Get all files in the library within the given directory
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetFilesInDir(aDirectory: UnicodeString);
+procedure TMedienBibliothek.GetFilesInDir(aDirectory: UnicodeString; ClearExistingView: Boolean);
 var i: Integer;
+    tmpList: TObjectList;
 begin
   if StatusBibUpdate >= 2 then exit;
   EnterCriticalSection(CSUpdate);
 
-  if Not AnzeigeShowsPlaylistFiles then
+  if AnzeigeShowsPlaylistFiles then
+      MessageDLG((Medialibrary_GUIError1), mtError, [MBOK], 0)
+  else
   begin
-      for i := 0 to MP3ListeArtistSort.Count-1 do
-        if (Mp3ListeArtistSort[i] as tAudiofile).Ordner = aDirectory then
-          AnzeigeListe.Add(Mp3ListeArtistSort[i]);
-  end else
-      MessageDLG((Medialibrary_GUIError1), mtError, [MBOK], 0);
+      tmpList := TObjectList.Create(False);
+      try
+          if not ClearExistingView then
+          begin
+              // add currently listed files to the tmpList
+              for i := 0 to AnzeigeListe.Count - 1 do
+                  tmpList.Add(AnzeigeListe[i]);
+          end;
+
+          for i := 0 to MP3ListeArtistSort.Count-1 do
+              if (Mp3ListeArtistSort[i] as tAudiofile).Ordner = aDirectory then
+                  tmpList.Add(Mp3ListeArtistSort[i]);
+
+          SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(tmpList));
+      finally
+          tmpList.Free;
+      end;
+  end;
 
   LeaveCriticalSection(CSUpdate);
 end;
@@ -5059,8 +5164,6 @@ end;   *)
 procedure TMedienBibliothek.SortAnzeigeListe;
 begin
   AnzeigeListe.Sort(MainSort);
-  ///SortAList(AnzeigeListe);
-  ///SortAList(AnzeigeListe2);
   AnzeigeListIsCurrentlySorted := True;
 end;
 

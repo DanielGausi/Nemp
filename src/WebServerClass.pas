@@ -999,15 +999,17 @@ var lastpoint: integer;
     CommonPart: string;
 begin
   //if Not OnlyLAN then
-  //    result := True
+      result := True
   //else
   //begin
+  {
       lastpoint := length(aIP);
       repeat
         dec(lastpoint);
       until (lastpoint < 1) or (aIP[lastpoint] = '.');
       CommonPart := copy(aIP, 1, lastpoint);
       result := AnsiStartsStr(CommonPart, bIP);
+  }
   //end;
 end;
 

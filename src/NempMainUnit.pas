@@ -7542,15 +7542,15 @@ begin
 
   Data := VST.GetNodeData(aNode);
   aPfad := (Data^.FaudioFile).Ordner;
-  if Sender=PM_ML_ExtendedShowAllFilesInDir then
-  begin
-    MedienBib.AnzeigeListe.Clear;
+  ///if Sender=PM_ML_ExtendedShowAllFilesInDir then
+  ///begin
+  ///  MedienBib.AnzeigeListe.Clear;
     ///MedienBib.AnzeigeListe2.Clear;
-  end;
+  ///end;
 
-  MedienBib.GetFilesInDir(aPfad);
-  FillTreeView(MedienBib.AnzeigeListe, Nil);
-  ShowSummary;
+  MedienBib.GetFilesInDir(aPfad, Sender=PM_ML_ExtendedShowAllFilesInDir);
+  // FillTreeView(MedienBib.AnzeigeListe, Nil); // done via SendMessage in GetFilesInDir
+  // ShowSummary;                               // ---"--
 end;
 
 procedure TNemp_MainForm.NachDiesemDingSuchen1Click(Sender: TObject);
@@ -7738,12 +7738,14 @@ begin
     exit;
   end;
 
+  {
+  Change 2018: Do not show the files directly in the list.
   MedienBib.Anzeigeliste.Clear;
-  ///MedienBib.AnzeigeListe2.Clear;
-  ///  DisplayContent := DISPLAY_
   Medienbib.AnzeigeShowsPlaylistFiles := False;
   MedienBib.DisplayContent := DISPLAY_BrowseFiles;
   VST.Clear;
+  }
+
   MedienBib.ReInitCoverSearch;
 
   MedienListeStatusLBL.Caption := (Medialibrary_AddingPlaylist);
@@ -7763,8 +7765,10 @@ begin
           MedienBib.InitCover(AudioFile);
           MedienBib.UpdateList.Add(AudioFile);
         end;
+        {
         MedienBib.Anzeigeliste.Add(AudioFile);
         VST.AddChild(Nil, AudioFile);
+        }
     end;
   end;
   MedienBib.NewFilesUpdateBib;
@@ -9918,12 +9922,16 @@ begin
             if Trim(EDITFastSearch.Text)= '' then
             begin
                 //MedienBib.ShowQuickSearchList;
+                MedienBib.RestoreAnzeigeListeAfterQuicksearch;
                 RestoreCoverFlowAfterSearch;
             end
             else
             begin
                 RefreshCoverFlowTimer.Enabled := False;
-                DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
+                if Trim(EDITFastSearch.Text) = '*' then
+                    MedienBib.QuickSearchShowAllFiles
+                else
+                    DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter);
                 // Restart Timer
                 if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
                     AND (MedienBib.BrowseMode = 1)
@@ -9936,6 +9944,7 @@ begin
               key := #0;
               EDITFastSearch.Text := '';
               //MedienBib.ShowQuickSearchList;
+              MedienBib.RestoreAnzeigeListeAfterQuicksearch;
               RestoreCoverFlowAfterSearch;
           end
   end;
@@ -9960,6 +9969,7 @@ begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
           //MedienBib.ShowQuickSearchList;
+          MedienBib.RestoreAnzeigeListeAfterQuicksearch;
           RestoreCoverFlowAfterSearch;
       end
       else
@@ -9977,7 +9987,10 @@ begin
               end;
           end
           else
-              FillTreeViewQueryTooShort;
+              if Trim(EDITFastSearch.Text) = '*' then
+                  MedienBib.QuickSearchShowAllFiles
+              else
+                  FillTreeViewQueryTooShort;
   end;
 end;
 

@@ -140,7 +140,9 @@ begin
                     if aMsg.LParam = IPC_GETPLAYLISTTRACKLENGTH then
                       aList := NempPlaylist.Playlist
                     else
-                      aList := MedienBib.AnzeigeListe;
+                      //aList := MedienBib.AnzeigeListe; // fix 11.2018
+                      aList := MedienBib.BibSearcher.IPCSearchResults;
+
                     if assigned(aList) AND (aList.Count > aMsg.WParam) then
                       aMsg.Result := TAudioFile(aList[aMsg.WParam]).Duration
                     else
@@ -494,7 +496,7 @@ end;
 
 function Handle_MedienBibMessage(Var aMsg: TMessage): Boolean;
 var i: Integer;
-    srList: TObjectList;
+    TargetList, srList: TObjectList;
     af: TAudiofile;
     aErr: TNempAudioError;
     ErrorLog : TErrorLog;
@@ -579,9 +581,81 @@ begin
                 MedienListeStatusLBL.Caption := Warning_FileNotFound;
         end;
 
-        MB_ShowSearchResults,
         MB_ShowQuickSearchResults,
+        MB_ShowSearchResults,
+        MB_ShowFavorites :  begin
+            case aMsg.WParam of
+
+                  MB_ShowSearchResults      : begin
+                      TargetList := MedienBib.LastBrowseResultList;
+                      MedienBib.DisplayContent := DISPLAY_Search;
+                  end;
+
+                  MB_ShowQuickSearchResults : begin
+                      TargetList := MedienBib.LastQuickSearchResultList;
+                      MedienBib.DisplayContent := DISPLAY_QuickSearch;
+                  end;
+
+                  MB_ShowFavorites          : begin
+                      TargetList := MedienBib.LastMarkFilterList;
+                      MedienBib.DisplayContent := DISPLAY_Favorites;
+                  end;
+
+            end;
+
+            if aMsg.WParam <> MB_ShowFavorites then
+                MedienBib.SetBaseMarkerList(TargetList);
+
+            // fill the List with the srList in LParam
+            TargetList.Clear;
+            srList := TObjectList(aMsg.LParam);
+            TargetList.Capacity := srList.Count + 1;
+            for i := 0 to srList.Count - 1 do
+                TargetList.Add(srList[i]);
+
+            MedienBib.AnzeigeListe := TargetList;
+            MedienBib.AnzeigeListIsCurrentlySorted := False;
+
+            FillTreeView(TargetList, Nil);
+            ShowSummary(TargetList);
+        end;
+        {
+        MB_ShowSearchResults: begin
+            MedienBib.LastBrowseResultList.Clear;
+            MedienBib.SetBaseMarkerList(MedienBib.LastBrowseResultList);
+            MedienBib.DisplayContent := DISPLAY_Search;
+
+            // fill the List with the srList in LParam
+            srList := TObjectList(aMsg.LParam);
+            MedienBib.LastBrowseResultList.Capacity := srList.Count + 1;
+            for i := 0 to srList.Count - 1 do
+                MedienBib.LastBrowseResultList.Add(srList[i]);
+
+            MedienBib.AnzeigeListe := MedienBib.LastBrowseResultList;
+            MedienBib.AnzeigeListIsCurrentlySorted := False;
+
+            FillTreeView(MedienBib.LastBrowseResultList, Nil);
+            ShowSummary(MedienBib.LastBrowseResultList);
+
+        end;
         MB_ShowFavorites : begin
+            MedienBib.LastMarkFilterList.Clear;
+            ///MedienBib.SetBaseMarkerList(MedienBib.LastBrowseResultList);
+            MedienBib.DisplayContent := DISPLAY_Favorites;
+
+            // fill the List with the srList in LParam
+            srList := TObjectList(aMsg.LParam);
+            MedienBib.LastMarkFilterList.Capacity := srList.Count + 1;
+            for i := 0 to srList.Count - 1 do
+                MedienBib.LastMarkFilterList.Add(srList[i]);
+
+            MedienBib.AnzeigeListe := MedienBib.LastMarkFilterList;
+            MedienBib.AnzeigeListIsCurrentlySorted := False;
+
+            FillTreeView(MedienBib.LastMarkFilterList, Nil);
+            ShowSummary(MedienBib.LastMarkFilterList);
+
+             //--------------------
             srList := TObjectList(aMsg.LParam);
 
             if (aMsg.WParam = MB_ShowSearchResults) or (aMsg.WParam = MB_ShowQuickSearchResults) then
@@ -603,7 +677,8 @@ begin
             //FillTreeView(MedienBib.AnzeigeListe, Nil);
             FillTreeView(srList, Nil);
             ShowSummary(srList);
-        end;
+
+        end;  }
 
         MB_SetWin7TaskbarProgress: begin
             fspTaskbarManager.ProgressState := TfspTaskProgressState(aMsg.LParam);

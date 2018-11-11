@@ -260,6 +260,8 @@ type
 
         procedure GlobalQuickSearch(Keyword: UnicodeString; AllowErr: Boolean);
         procedure GlobalQuickTagSearch(KeyTag: UnicodeString);
+        procedure ShowAllFiles;
+
 
         procedure CompleteSearch(Keywords: TSearchKeyWords);
         procedure CompleteSearchNoSubStrings(Keywords: TSearchKeyWords);
@@ -1075,6 +1077,9 @@ var i, lmax: integer;
     : TObjectlist;
 begin
 
+  // Escape "\*", as we use "*" for a search for all files now (11.2018)
+  keyword := StringReplace(keyword, '\*', '*', [rfreplaceAll]);
+
   Keywords := GenerateKeywordList(keyword);
   OnlyOneWord := Keywords.Count = 1;
   searchL := 0;
@@ -1215,6 +1220,17 @@ begin
     // show search results
     fDummyAudioFile.Titel := MainForm_NoSearchresults;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(QuickSearchResults));
+end;
+
+procedure TBibSearcher.ShowAllFiles;
+var i: Integer;
+begin
+    QuickSearchResults.Clear;
+    for i := 0 to MainList.Count - 1 do
+        QuickSearchResults.Add(Mainlist[i]);
+
+    fDummyAudioFile.Titel := MainForm_NoSearchresults;
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowQuickSearchResults, lParam(QuickSearchResults));
 end;
 
 
