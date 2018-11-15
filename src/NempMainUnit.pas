@@ -865,6 +865,19 @@ type
     MM_T_PlaylistLog: TMenuItem;
     PM_P_PlaylistLog: TMenuItem;
     RefreshVSTCoverTimer: TTimer;
+    QuickSearchHistory_PopupMenu: TPopupMenu;
+    pmRecentSearches: TMenuItem;
+    pmQuickSeachHistory0: TMenuItem;
+    N80: TMenuItem;
+    pmQuickSeachHistory1: TMenuItem;
+    pmQuickSeachHistory2: TMenuItem;
+    pmQuickSeachHistory3: TMenuItem;
+    pmQuickSeachHistory4: TMenuItem;
+    pmQuickSeachHistory5: TMenuItem;
+    pmQuickSeachHistory6: TMenuItem;
+    pmQuickSeachHistory7: TMenuItem;
+    pmQuickSeachHistory8: TMenuItem;
+    pmQuickSeachHistory9: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1452,6 +1465,8 @@ type
     procedure RefreshVSTCoverTimerTimer(Sender: TObject);
     procedure TabBtn_MarkerMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure QuickSearchHistory_PopupMenuPopup(Sender: TObject);
+    procedure pmQuickSeachHistoryClick(Sender: TObject);
 
   private
     CoverImgDownX: Integer;
@@ -6842,6 +6857,8 @@ end;
 
 
 
+
+
 procedure TNemp_MainForm.StopBTNIMGClick(Sender: TObject);
 begin
   if ((GetAsyncKeyState(vk_shift) < 0) and (GetAsyncKeyState(vk_Control) >= 0)) then
@@ -9763,6 +9780,56 @@ begin
   FormStreamVerwaltung.show;
 end;
 
+procedure TNemp_MainForm.QuickSearchHistory_PopupMenuPopup(Sender: TObject);
+
+    procedure FillString(aItem: TMenuItem; aIndex: Integer);
+    begin
+        if MedienBib.BibSearcher.QuickSearchHistory.Count > aIndex then
+        begin
+            aItem.Caption := MedienBib.BibSearcher.QuickSearchHistory[aIndex];
+            aItem.Visible := True;
+        end else
+            aItem.Visible := False;
+    end;
+
+begin
+    if MedienBib.BibSearcher.QuickSearchHistory.Count = 0 then
+        pmRecentSearches.Caption := _(MainForm_NoRecentQuickSearchresults)
+    else
+        pmRecentSearches.Caption := _(MainForm_RecentQuickSearchresults);
+    FillString(pmQuickSeachHistory0, 0);
+    FillString(pmQuickSeachHistory1, 1);
+    FillString(pmQuickSeachHistory2, 2);
+    FillString(pmQuickSeachHistory3, 3);
+    FillString(pmQuickSeachHistory4, 4);
+    FillString(pmQuickSeachHistory5, 5);
+    FillString(pmQuickSeachHistory6, 6);
+    FillString(pmQuickSeachHistory7, 7);
+    FillString(pmQuickSeachHistory8, 8);
+    FillString(pmQuickSeachHistory9, 9);
+end;
+
+procedure TNemp_MainForm.pmQuickSeachHistoryClick(Sender: TObject);
+begin
+    MedienBib.BibSearcher.MoveQuickSearchQueryToHistory((Sender as TMenuItem).Tag);
+
+    EditFastSearch.OnChange := Nil;
+    EditFastSearch.Text := MedienBib.BibSearcher.MostrecentQuickSearch;
+    EditFastSearch.OnChange := EDITFastSearchChange;
+
+    RefreshCoverFlowTimer.Enabled := False;
+    DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
+    if (MedienBib.AnzeigeListe.Count) {+ (MedienBib.AnzeigeListe2.Count)} > 1 then
+    begin
+        // Restart Timer
+        if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
+            AND (MedienBib.BrowseMode = 1)
+        then
+            RefreshCoverFlowTimer.Enabled := True;
+    end;
+
+end;
+
 procedure TNemp_MainForm.EDITFastSearchEnter(Sender: TObject);
 begin
   if EditFastSearch.Tag = 0 then
@@ -9803,6 +9870,10 @@ begin
     EditFastSearch.OnChange := Nil;
     EditFastSearch.Text := MainForm_GlobalQuickSearch;
     EditFastSearch.OnChange := EDITFastSearchChange;
+  end else
+  begin
+      if EditFastSearch.Tag <> 0 then
+          MedienBib.BibSearcher.AddQuickSearchQueryToHistory(EditFastSearch.Text);
   end;
 end;
 
@@ -9927,6 +9998,7 @@ begin
             end
             else
             begin
+                MedienBib.BibSearcher.AddQuickSearchQueryToHistory(EditFastSearch.Text);
                 RefreshCoverFlowTimer.Enabled := False;
                 if Trim(EDITFastSearch.Text) = '*' then
                     MedienBib.QuickSearchShowAllFiles
@@ -9942,6 +10014,7 @@ begin
       VK_ESCAPE:
           begin
               key := #0;
+              MedienBib.BibSearcher.AddQuickSearchQueryToHistory(EditFastSearch.Text);
               EDITFastSearch.Text := '';
               //MedienBib.ShowQuickSearchList;
               MedienBib.RestoreAnzeigeListeAfterQuicksearch;
@@ -11644,6 +11717,7 @@ begin
     end;
   end; // if JobListContainsNewDirs
 end;
+
 
 
 procedure TNemp_MainForm.VSTPanelResize(Sender: TObject);

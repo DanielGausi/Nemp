@@ -43,7 +43,7 @@ unit BibSearchClass;
 interface
 
 uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, IniFiles,
-     NempAudioFiles,
+     NempAudioFiles, System.Types,
      Hilfsfunktionen, StringSearchHelper, StrUtils, Nemp_ConstantsAndTypes,
      Nemp_RessourceStrings;
 
@@ -193,6 +193,8 @@ type
 
         function GenerateKeywordList(aKeyword: UnicodeString): TStringList;
 
+        function fGetMostrecentQuickSearch: String;
+
 
       public
         // Main list. This is just a pointer to TMedienBibliothek.Mp3ListePfadSort
@@ -201,6 +203,8 @@ type
         // Contains the results of a quicksearch
         QuickSearchResults: TObjectList;
         //QuickSearchAdditionalResults: TObjectList;
+        // History of recent quicksearch queries
+        QuickSearchHistory: TStringList;
 
         // The IPC-Search results for the Deskband. VCL only!!
         IPCSearchResults: TObjectList;
@@ -223,6 +227,8 @@ type
 
         property IPCSearchIsRunning: Boolean read fIPCSearchIsRunning;
 
+        property MostRecentQuickSearch: String read fGetMostrecentQuickSearch;
+
         constructor Create(aWnd: DWord);
         destructor Destroy; override;
 
@@ -235,6 +241,9 @@ type
         // Read/write some settings from IniFile
         procedure LoadFromIni(Ini: TMemIniFile);
         procedure SaveToIni(Ini: TMemIniFile);
+
+        procedure AddQuickSearchQueryToHistory(aString: String);
+        procedure MoveQuickSearchQueryToHistory(aIndex: Integer);
 
         // Displays a Searchresult-List
         procedure ShowSearchResults(aIndex: Integer);
@@ -367,6 +376,7 @@ begin
     MainWindowHandle := aWnd;
     QuickSearchResults := TObjectList.Create(False);
     IPCSearchResults := TObjectList.Create(False);
+    QuickSearchHistory := TStringList.Create;
     for i := 1 to 10 do
         SearchResultLists[i] := TObjectlist.Create(False);
 
@@ -378,6 +388,7 @@ var i: Integer;
 begin
     IPCSearchResults.Free;
     QuickSearchResults.Free;
+    QuickSearchHistory.Free;
     fDummyAudioFile.Free;
     for i := 1 to 10 do
         SearchResultLists[i].Free;
@@ -388,6 +399,7 @@ procedure TBibSearcher.Clear;
 var i: Integer;
 begin
     QuickSearchResults.Clear;
+    QuickSearchHistory.Clear;
     for i := 1 to 10 do
         SearchResultLists[i].Clear;
     TotalString := '';
@@ -956,6 +968,41 @@ begin
             or (SearchDP(UTF8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics))),
                 Keywords.General,  length(Keywords.General) Div 4) > 0)
           );
+end;
+
+
+procedure TBibSearcher.AddQuickSearchQueryToHistory(aString: String);
+begin
+
+    if QuickSearchHistory.Count = 0 then
+        QuickSearchHistory.Insert(0, aString)
+    else
+        // check for duplicate on 1. entry
+        if QuickSearchHistory[0] <> aString then
+            QuickSearchHistory.Insert(0, aString);
+
+    // limit the length of the list to 10 items
+    if QuickSearchHistory.Count > 10 then
+        QuickSearchHistory.Delete(10);
+end;
+
+procedure TBibSearcher.MoveQuickSearchQueryToHistory(aIndex: Integer);
+var tmp: String;
+begin
+    if QuickSearchHistory.Count > aIndex then
+    begin
+        tmp := QuickSearchHistory[aIndex];
+        QuickSearchHistory.Delete(aIndex);
+        QuickSearchHistory.Insert(0, tmp);
+    end;
+end;
+
+function TBibSearcher.fGetMostrecentQuickSearch: String;
+begin
+    if QuickSearchHistory.Count > 0 then
+        result := QuickSearchHistory[0]
+    else
+        result := '';
 end;
 
 
@@ -1629,6 +1676,8 @@ begin
         tmpList.Free;
     end;
 end;
+
+
 
 procedure TBibSearcher.SearchMarker(aIndex: Byte; SearchList: TObjectList);
 var tmpList: TObjectList;

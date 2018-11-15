@@ -114,7 +114,7 @@ type
 
   // Save a Graphic in a resized file. Used for all the little md5-named jpgs
   // in <NempDir>\Cover
-  function SafeResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+  function SaveResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
 
   // Converts data from a (id3tag)-picture-stream to a Bitmap.
   function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
@@ -491,7 +491,7 @@ begin
   Findclose(sr);
 end;
 
-function SafeResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+function SaveResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
 var BigBmp, SmallBmp: TBitmap;
     xfactor, yfactor:double;
     aJpg: tJpegImage;

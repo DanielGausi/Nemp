@@ -3795,7 +3795,7 @@ begin
           try
               aGraphic.LoadFromFile(aFilename);
 
-              if SafeResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
+              if SaveResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
                   result := newID;
           except
               // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg

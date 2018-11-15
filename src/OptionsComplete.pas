@@ -3515,7 +3515,7 @@ begin
         aGraphic := TPicture.Create;
         try
             aGraphic.LoadFromFile(OpenDlg_DefaultCover.FileName);
-            if SafeResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
+            if SaveResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
@@ -3536,7 +3536,7 @@ begin
     aGraphic := TPicture.Create;
     try
         aGraphic.LoadFromFile(FileName);
-        if SafeResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
+        if SaveResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
             LoadDefaultCover
         else
             MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);

@@ -2811,6 +2811,7 @@ object Nemp_MainForm: TNemp_MainForm
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
+        PopupMenu = QuickSearchHistory_PopupMenu
         TabOrder = 0
         OnEnter = EDITFastSearchEnter
         OnExit = EDITFastSearchExit
@@ -3937,7 +3938,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 744
     Top = 208
     Bitmap = {
-      494C01011000000A600C0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01011000000A740C0E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4503,7 +4504,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 112
     Top = 376
     Bitmap = {
-      494C01012600300BB40D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012600300BC80D10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
       0000000000000000000000000000000000000000000000000000000000000000
       0000FDFDFE00FAFAFB00F6F6F800F4F4F600F5F5F700F9F9FA00FCFCFD000000
@@ -7609,7 +7610,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 552
     Top = 624
     Bitmap = {
-      494C010108006C07B40910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108006C07C80910001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8132,5 +8133,76 @@ object Nemp_MainForm: TNemp_MainForm
     OnTimer = RefreshVSTCoverTimerTimer
     Left = 256
     Top = 612
+  end
+  object QuickSearchHistory_PopupMenu: TPopupMenu
+    OnPopup = QuickSearchHistory_PopupMenuPopup
+    Left = 40
+    Top = 548
+    object pmRecentSearches: TMenuItem
+      Caption = 'Recent searches'
+      Enabled = False
+    end
+    object N80: TMenuItem
+      Caption = '-'
+    end
+    object pmQuickSeachHistory0: TMenuItem
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory1: TMenuItem
+      Tag = 1
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory2: TMenuItem
+      Tag = 2
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory3: TMenuItem
+      Tag = 3
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory4: TMenuItem
+      Tag = 4
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory5: TMenuItem
+      Tag = 5
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory6: TMenuItem
+      Tag = 6
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory7: TMenuItem
+      Tag = 7
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory8: TMenuItem
+      Tag = 8
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
+    object pmQuickSeachHistory9: TMenuItem
+      Tag = 9
+      AutoHotkeys = maManual
+      Caption = '.'
+      OnClick = pmQuickSeachHistoryClick
+    end
   end
 end

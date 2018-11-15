@@ -38,7 +38,7 @@ interface
 uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   AudioFileBasics, Mp3FileUtils, ID3v2Frames, ID3GenreList,
   Mp3Files, FlacFiles, OggVorbisFiles, M4AFiles, M4aAtoms,
-  VorbisComments, cddaUtils,
+  VorbisComments, cddaUtils, System.Types,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
   Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
@@ -1736,7 +1736,7 @@ begin
                     begin
                         CoverStream.Seek(0, soFromBeginning);
                         newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
                             CoverID := newID;
                     end;
                 finally
@@ -1796,7 +1796,7 @@ begin
                     begin
                         CoverStream.Seek(0, soFromBeginning);
                         newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
                             CoverID := newID;
                     end;
                 finally
@@ -1894,7 +1894,7 @@ begin
                     begin
                         CoverStream.Seek(0, soFromBeginning);
                         newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
                             CoverID := newID;
                     end;
                 finally
@@ -1974,7 +1974,7 @@ begin
                         begin
                             CoverStream.Seek(0, soFromBeginning);
                             newID := MD5DigestToStr(MD5Stream(CoverStream));
-                            if SafeResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
+                            if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
                                 CoverID := newID;
                         end;
                     finally

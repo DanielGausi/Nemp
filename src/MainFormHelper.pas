@@ -34,7 +34,8 @@ unit MainFormHelper;
 interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
-    NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs, MyDialogs;
+    NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs,
+    MyDialogs, System.UITypes;
 
 
 // passt die VCL an die Player-Werte an

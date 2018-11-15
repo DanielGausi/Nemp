@@ -524,6 +524,9 @@ MainForm_PlaylistSearchHint = 'Search in the playlist'
                     + #13#10 + '- Enter: mark all'
                     + #13#10 + '- Shift+Enter: play';
 
+MainForm_RecentQuickSearchresults = 'Recent searches';
+MainForm_NoRecentQuickSearchresults = 'No recent searches';
+
 MainForm_MarkerBtnHint = 'Show only files flagged with one of the markers.';
 MainForm_MarkerErrorPlaylistFiles = 'Hint: This audiofile is part of a playlist, but it is not part of the Media Library itself. - The marker will disappear as soon as the displayed list of audio files changes.';
 
