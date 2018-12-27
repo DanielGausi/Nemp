@@ -63,7 +63,7 @@ citecolor = black] {hyperref}
 	\vspace{1cm}
 	{\Large Dokumentation und Bedienungsanleitung\par}		
 	\vfill	
-	\copyright Daniel Gaußmann, 2005-2018
+	\copyright Daniel Gaußmann, 2005-2019
 \end{titlepage}
 
 \tableofcontents
@@ -533,6 +533,10 @@ Ein Doppelklick auf den Interpreten listet dann sämtliche Titel dieses Interpret
 
 Wenn Sie einen bestimmten Titel hören wollen, dann können Sie dafür die Schnellsuche benutzen. Fokussieren Sie das Suchfeld (geht auch mit der Tastenkombination \textsc{Strg+F}, solange Sie nicht in der Playlist sind - denn dann gelangen Sie damit in die Playlist-Suche) und fangen Sie einfach an zu tippen, und Nemp zeigt Ihnen während des Tippens alle Titel an, die zum aktuellen Suchbegriff passen. 
 
+Mit \emph{*} können Sie alle Titel in der Medienbibliothek anzeigen lassen. Wenn Sie tatsächlich alle Titel mit \emph{*} angezeigt haben wollen, müssen Sie das Sternchen escapen mit \emph{\textbackslash*}.
+
+Seit Nemp 4.9.2 werden die letzten 10 Suchbegriffe gespeichert und sind über das Kontextmenü des Schnellsuche-Eingabefeldes abrufbar.
+
 \begin{tipp}
 In der Voreinstellung werden \emph{während des Tippens} nur exakte Treffer aufgelistet. Wenn Sie die Taste \textsc{Enter} betätigen, führt Nemp einen ungenauen Durchlauf durch, der auch Rechtschreibfehler berücksichtigt. Dann werden auch Titel von \emph{P!nk}  gefunden, wenn Sie nach \emph{Pink} gesucht haben. Und wenn Sie sich nicht sicher sind, wie viele \emph{r}, \emph{s} und \emph{t} in \emph{Alanis Morissette} vorkommen, ist das auch nicht schlimm.
 \end{tipp}
@@ -546,6 +550,8 @@ Mit Nemp 4.8 wurde die Möglichkeit hinzugefügt, Dateien mit \emph{Markierungen} 
 \end{center}
 
 Zum Anzeigen aller markierten Dateien auf den Button neben der Schnellsuche klicken. Dann werden alle Dateien mit der jeweiligen Markierung (überhaupt einer Markierung oder keiner Markierung) angezeigt. Mehrfaches Klicken schaltet die Anzeige entsprechend durch.
+
+In den Anzeige-Optionen kann eingestellt werden, ob dabei entsprechend markierte Dateien aus der gesamten Medienbibliothek oder nur die aus der aktuellen Vorauswahl angezeigt werden.
 
 Der Coverflow, Suche, Schnellsuche und andere Arten in der Medienbibliothek zu suchen und zu stöbern ignorieren diese Markierungen.
 
@@ -819,9 +825,9 @@ Je nach gewähltem Theme steht ein unterschiedlich großer Funktionsumfang zur Ver
 
 %Zusätzlich müssen Sie ggf. in der Konfiguration Ihres Routers den eingestellten Port auf Ihre lokale IP-Adresse weiterleiten. Dadurch ist sichergestellt, dass die HTTP-Anfragen aus dem Internet bei Nemp auch ankommen und nicht am Router hängenbleiben.
 
-\begin{hinweis}
-Im Gegensatz zu früheren Versionen ist nun nur noch der Zugriff von innerhalb des lokalen Netzes möglich. Ein Zugriff von außerhalb wird verweigert. Das lokale Netz wird vereinfacht dadurch erkannt, dass die ersten drei Teile der IP-Adresse übereinstimmen müssen.
-\end{hinweis}
+%\begin{hinweis}
+%Im Gegensatz zu früheren Versionen ist nun nur noch der Zugriff von innerhalb des lokalen Netzes möglich. Ein Zugriff von außerhalb wird verweigert. Das lokale Netz wird vereinfacht dadurch erkannt, dass die ersten drei Teile der IP-Adresse übereinstimmen müssen.
+%\end{hinweis}
 
 \subsubsection{Konfiguration im Einstellungsdialog}
 \label{sec_webserver}
@@ -896,7 +902,7 @@ Beim Starten von Nemp
 Nemp Auto-Updater
 \begin{itemize}
 \item \textbf{Automatisch nach Updates suchen.} \emph{Standard: Aus.} Nemp kann im angegebenen Intervall überprüfen, ob eine neue Version vorliegt und dann eine entsprechende Nachricht anzeigen. Herunterladen und \gf{Installation} muss manuell erfolgen.
-\item \textbf{Bei-Beta-Versionen benachrichtigen.} \emph{Standard: Aus.} Auch benachrichtigen, wenn noch keine neue stabile Version vorliegt, sondern nur eine Vorabversion, in der noch mehr Fehler auftreten können als es in der Endfassung der Fall sein sollte.
+\item \textbf{Bei Beta-Versionen benachrichtigen.} \emph{Standard: Aus.} Auch benachrichtigen, wenn noch keine neue stabile Version vorliegt, sondern nur eine Vorabversion, in der noch mehr Fehler auftreten können als es in der Endfassung der Fall sein sollte.
 \end{itemize}
 
 Erweitertes Skinsystem
@@ -956,6 +962,8 @@ Nemp kann darauf reagieren, wenn der PC in den Ruhezustand versetzt wird.
 \item \textbf{Sortierreihenfolge} für die klassische Übersichtsansicht und den Coverflow. In der Klassischen Ansicht werden zwei Sortierkriterien angegeben, die beliebig kombiniert werden können. Im Coverflow gibt es einige Vorauswahlen. Für den Coverflow sind außerdem Sonderbehandlungen für solche Alben einstellbar, für die kein Cover gefunden wurde, oder Titelzusammenstellungen ohne ordentliche Metadaten.
 \item \textbf{Sortieren der Anzeige.} \emph{Standard: Aus.} Über einen Klick auf einen Spalten-Header in der Medienliste kann die angezeigte Liste nach dem entsprechenden Kriterium sortiert werden. Über diese Einstellung hier wird diese Einstellung dann auch übernommen, wenn über die Übersichtslisten (klassische Ansicht, Coverflow, Tagwolke) eine neue Liste erstellt und angezeigt wird. Das führt aber zu einer kleinen Verzögerung in der Anzeige. \emph{Daher ...}
 \item \textbf{Bei langen Listen nicht sortieren.} \emph{Standard: Ein.} ... kann bei Aktivierung dieser Option das Sortieren sehr großer Listen deaktiviert werden, um zu große Verzögerungen zu vermeiden.
+
+\item \textbf{Zeige markierte Dateien nur aus der aktuellen Liste.} \emph{Standard: Ein.} Wenn aktiviert, werden bei Klick auf den Markierungs-Button neben dem Schnellsuche-Feld nur die markierten Titel angezeigt, die in der aktuellen Vorauswahl zu finden sin. Andernfalls werden alle markierten Titel aus der kompletten Medienbibliothek angezeigt.
 %\item \textbf{Zeige Cover und Details zum markierten Titel.} Auswahl ob und wo neben der Liste mit Titeln aus der Medienbibliothek im unteren Teil des Hauptfensters auch das Cover und ein paar weitere Angaben zum aktuell markierten Titel angezeigt werden.
 \end{itemize}
 
@@ -1320,6 +1328,14 @@ Das Nemp-Deskband für Windows XP und auch die Display-App für die Logitech G15, 
 \section{Versionsgeschichte}
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
+
+\subsection*{Version 4.9.2, Januar 2019}
+\begin{itemize}
+\item Einige Ungereimtheiten bei den angezeigten Titeln in der Medienliste (unten) behoben
+\item Option, wie die Anzeige von \gf{markierten Titeln} arbeitet
+\item Speichern der letzten 10 Suchbegriffe in der Schnellsuche
+\item Anzeige der aktuellen IP-Adresse(n) in den Einstellungen des Webservers
+\end{itemize}
 
 \subsection*{Version 4.9.1, August 2018}
 \begin{itemize}

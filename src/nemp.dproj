@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{B9B2D972-A999-4FCC-A09E-1AA479CF129B}</ProjectGuid>
         <MainSource>nemp.dpr</MainSource>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <ProjectVersion>18.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
@@ -84,14 +84,12 @@
         <SanitizedProjectName>nemp</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <VerInfo_Release>3</VerInfo_Release>
-        <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
-        <VerInfo_Build>555</VerInfo_Build>
-        <Manifest_File>None</Manifest_File>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.3.555;InternalName=;LegalCopyright=2005-2012, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.6;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Release>2</VerInfo_Release>
+        <VerInfo_Build>650</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.2.650;InternalName=;LegalCopyright=2005-2019, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <VerInfo_MinorVer>9</VerInfo_MinorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -114,11 +112,16 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Release>3</VerInfo_Release>
+        <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.6.3.555;InternalName=;LegalCopyright=2005-2016, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.6;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_Build>555</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.2.620;InternalName=;LegalCopyright=2005-2019, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>620</VerInfo_Build>
+        <VerInfo_MinorVer>9</VerInfo_MinorVer>
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_DebugInformation>2</DCC_DebugInformation>
+        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
+        <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -135,10 +138,10 @@
         <VerInfo_MinorVer>9</VerInfo_MinorVer>
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
         <VerInfo_Build>605</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.1.605;InternalName=;LegalCopyright=2005-2018, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=;ProductName=Nemp</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.9.2.605;InternalName=;LegalCopyright=2005-2019, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.9;Comments=;ProgramID=;ProductName=Nemp</VerInfo_Keys>
         <Icon_MainIcon>nemp_Icon1.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Release>2</VerInfo_Release>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>

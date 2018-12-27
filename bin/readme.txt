@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.2
-      Januar 2005 - August 2018
+      Januar 2005 - Januar 2019
 
-      Version: 4.9.1
+      Version: 4.9.2
 
 
 -----------------------------------------------------------
@@ -43,7 +43,7 @@ Aber für ein Ein-Mann-Projekt ein verdammt guter:
    Nemp hat einen integrierten Webserver zur Fernsteuerung des Players im lokalen Netz,
    z.B. über ein Smartphone im gleichen WLAN.
 
-   Nemp kann scrobbeln, automatisch Coverart nachladen, nach Liedtexten suchen, parallel
+   Nemp kann scrobbeln, automatisch Cover nachladen, nach Liedtexten suchen, parallel
    ein zweites Stück abspielen (auch auf einer zweiten Soundkarte), nach einiger Zeit den 
    Computer heruntefahren, um Mitternacht die Playlist automatisch für ein Geburtstagslied
    unterbrechen und einiges mehr.
@@ -62,6 +62,12 @@ Lizenzvereinbarungen:
 GPL 2.0 oder später
 (Details in der licence.txt und der gpl.txt)
 
+
+Version 4.9.2, Januar 2019
+----------------------------------------------------------- 
+- Einige Probleme mit der Liste der angezeigten Titel behoben
+- Option, wie sich die Anzeige von "markierten Dateien" verhält
+- Schnellsuche speichert nun die letzten 10 Suchbegriffe
 
 
 Version 4.9.1, August 2018

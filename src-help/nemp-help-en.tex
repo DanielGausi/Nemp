@@ -64,7 +64,7 @@ citecolor = black] {hyperref}
 	{\Large Documentation and user guide\par}	
 	\emph{This documentation was mainly translated with the help of \emph{deepl.com}. I hope it is reasonably understandable and does not contain too much gibberish.}	
 	\vfill	
-	\copyright Daniel Gauﬂmann, 2005-2018
+	\copyright Daniel Gauﬂmann, 2005-2019
 \end{titlepage}
 
 \tableofcontents
@@ -535,6 +535,10 @@ A double-click on the artist will list all songs of this artist, a double-click 
 
 If you want to listen to a certain song, you can use the quick search function. Focus the search box (you can also use the key combination \textsc{Ctrl+F} as long as you are not in the playlist (this will take you to the playlist search) and just start typing. Nemp will show you all the titles that match the current search term while typing. 
 
+With \emph{*} you can search for all titles in the media library. If you really want to see all titles containing a \emph{*}, you must escape the asterisk with \emph{\textbackslash*}.
+
+Since Nemp 4.9.2 the last 10 search terms are logged and can be retrieved via the context menu of the quick search input field.
+
 \begin{tipp}
 By default, \emph{during typing} only exact hits are listed. When you press the \textsc{Enter} key, Nemp performs an fuzzy search that also takes spelling mistakes into account. Then titles of \emph{P!nk} will also be found if you searched for \emph{Pink}. And if you are not sure how many \emph{r}, \emph{s} and \emph{t} occur in \emph{Alanis Morissette}, that's not bad either.
 \end{tipp}
@@ -548,6 +552,8 @@ With Nemp 4.8 the possibility to mark files with \emph{markers} was added. These
 \end{center}
 
 To view all marked files, click on the button next to the quicksearch. Then all files are displayed with the respective marker. Repeated clicking will switch the displayed marker accordingly.
+
+In the display settings you can set whether files marked accordingly from the entire media library or only those from the current preselection are displayed.
 
 The coverflow, search, quicksearch and other ways to search and browse the library will ignore these markers.
 
@@ -792,9 +798,9 @@ Just try it out! Use your smartphone to access your WiFi and enter the IP addres
 
 Depending on the chosen theme, a different range of functions is available. 
 
-\begin{hinweis}
-In contrast to previous versions, now only access from within the local network is possible. Access from outside is denied. The local network is recognized simply by the fact that the first three parts of the IP address must match.
-\end{hinweis}
+%\begin{hinweis}
+%In contrast to previous versions, now only access from within the local network is possible. Access from outside is denied. The local network is recognized simply by the fact that the first three parts of the IP address must match.
+%\end{hinweis}
 
 \subsubsection{Configuration}
 \label{sec_webserver}
@@ -878,7 +884,7 @@ Nemp auto updater
 \begin{itemize}
 \item \textbf{Automatically check for new versions of Nemp.} \emph{Default: Off.} Nemp can check at the specified interval whether a new version is available and then display an appropriate message. Download and \gf{installation} must be done manually.
 
-\item \textbf{Notify on Neta releases.} \emph{Default: Off.} Also notify if there is no new stable version yet, but only a pre-release version in which more errors can occur than it should be in the final version.
+\item \textbf{Notify on Beta releases.} \emph{Default: Off.} Also notify if there is no new stable version yet, but only a pre-release version in which more errors can occur than it should be in the final version.
 \end{itemize}
 
 Advanced skinning
@@ -953,6 +959,8 @@ Nemp can react to it, if the PC is put into hibernation mode.
 By clicking on a column header in the media list, you can sort the displayed list according to the corresponding criteria. This setting also applies if a new list is created and displayed using the overview lists (classic view, coverflow, tag cloud). This causes a small delay in the display. \emph{Therefore, ... }
 
 \item \textbf{Skip sort on large lists.} \emph{Default: On.} ... when this option is activated, sorting very large lists can be deactivated to avoid excessive delays.
+
+\item \textbf{Show marked files only from the current list.} \emph{Default: On.} When activated, clicking on the marker button next to the quicksearch field will show only marked files from the current selection. Otherwise, all marked files from the complete media library are shown.
 \end{itemize}
 
 
@@ -1343,6 +1351,14 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+\subsection*{Version 4.9.2, January 2019}
+\begin{itemize}
+\item Fixed some issues with the displayed titles in the media list
+\item setting how the display of \gf{marked files} works
+\item Quicksearch saves now the 10 most recent search terms
+\item Display of the current IP adresses in the settings dialog of the web server.
+\end{itemize}
 
 \subsection*{Version 4.9.1, August 2018}
 \begin{itemize}
