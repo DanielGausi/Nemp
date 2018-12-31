@@ -28,7 +28,7 @@ Nemp has a lot (and I mean a lot!) of settings. Some are very useful, others may
 * You can define usage of media keys, additionally install some global hotkeys, use the tabulator key for almost all controls, ...
 * You can choose which properties are displayed in the main list, sort your music collection by whatever you want
 * Activate fading between tracks and skip silence at the end of tracks
-* Choose a default action when the user double-click a file in teh Windows Explorer, like "play" and "enqueue"
+* Choose a default action when the user double-click a file in the Windows Explorer, like "play" or "enqueue"
 * Automatically scan your music folder for new files when Nemp starts
 * Use a fuzzy search (do you know ho many R, S and T are in "Alanis Morissette"?)
 * and many, many more!
