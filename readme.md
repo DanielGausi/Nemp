@@ -56,7 +56,9 @@ Nemp does not change anything in your Music files without your permission. It wi
 
 ## Nemp API
 
-For developers: Nemp comes with an API, so taht other programs can communicate with Nemp. For example, you can write an app for your keyoard display which shows the current title and provides basic controls for the player. Such an app for the "Logitech G15" is included in the download archive.
+For developers: Nemp comes with an API, so that other programs can communicate with Nemp. For example, you can write an app for your keyoard display which shows the current title and provides basic controls for the player. Such an app for the "Logitech G15" is included in the download archive.
+
+if you already did something like that for Winamp: The Nemp API is very similar to use.
 
 ## Contribute
 If you miss a function and want it to be implemented, or if you want to add some lines of code, just contact me: 
