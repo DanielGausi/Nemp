@@ -75,7 +75,6 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Height = 21
       Hint = 'Choose how the files should be renamed'
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 3
       ParentShowHint = False
       ShowHint = True

@@ -37,8 +37,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, ShellApi, DateUtils,
   IniFiles, Contnrs, ScrobblerUtils, md5, NempAudioFiles, StrUtils,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
-  IdStack, IdException, HTMLHelper;
+  HTMLHelper, System.Net.URLClient, System.Net.HttpClient;
 
 type
 
@@ -308,7 +307,8 @@ end;
 
 function TNempScrobbler.GetTags(aAudioFile: tAudioFile): UnicodeString;
 var url: String;
-    aIDHttp: TIdHttp;
+    //aIDHttp: TIdHttp;
+    aHttpClient: THttpClient;
     raw: String;
     n: Dword;
 begin
@@ -326,26 +326,33 @@ begin
         sleep(250);
 
     fLastCall := GetTickCount;
-    url := 'http://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
+    url := 'https://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
     + '&artist=' + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Artist)))
     + '&track='  + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Titel)))
     + '&api_key=' + String(ApiKey);
 
-    aIDHttp := TIdHttp.Create;
+    // aIDHttp := TIdHttp.Create;
+    aHttpClient := THttpClient.Create;
     try
-        aIDHttp.ConnectTimeout:= 20000;
-        aIDHttp.ReadTimeout:= 20000;
-        aIDHttp.Request.UserAgent := 'Mozilla/3.0';
-        aIDHttp.HTTPOptions :=  [];
+        //aIDHttp.ConnectTimeout:= 20000;
+        //aIDHttp.ReadTimeout:= 20000;
+        //aIDHttp.Request.UserAgent := 'Mozilla/3.0';
+        //aIDHttp.HTTPOptions :=  [];
+        aHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+        aHttpClient.ConnectionTimeout := 5000;
+        aHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
+
         try
-            raw := aIDHttp.Get(url);
+            //raw := aIDHttp.Get(url);
+            raw := aHttpClient.Get(url).ContentAsString();
         except
             raw := '';
         end;
         result := ParseRawTag(raw, Nil);
 
     finally
-        aIDhttp.Free;
+        //aIDhttp.Free;
+        aHttpClient.Free;
     end;
 end;
 

@@ -101,23 +101,23 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Columns = <
           item
             Position = 0
+            Text = 'Name'
             Width = 240
-            WideText = 'Name'
           end
           item
             Position = 1
+            Text = 'Format'
             Width = 100
-            WideText = 'Format'
           end
           item
             Position = 2
+            Text = 'Genre'
             Width = 100
-            WideText = 'Genre'
           end
           item
             Position = 3
+            Text = 'URL'
             Width = 240
-            WideText = 'URL'
           end>
       end
       object BtnExport: TButton
@@ -244,28 +244,28 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Columns = <
           item
             Position = 0
+            Text = 'Name'
             Width = 200
-            WideText = 'Name'
           end
           item
             Position = 1
+            Text = 'Current title'
             Width = 200
-            WideText = 'Current title'
           end
           item
             Position = 2
+            Text = 'Format'
             Width = 100
-            WideText = 'Format'
           end
           item
             Position = 3
+            Text = 'Genre'
             Width = 100
-            WideText = 'Genre'
           end
           item
             Position = 4
+            Text = 'Listener'
             Width = 60
-            WideText = 'Listener'
           end>
       end
       object GrpBox_GeneralSearch: TGroupBox
@@ -377,28 +377,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     Caption = 'Parse Stream-Playlist and add all contained streams to playlist'
     TabOrder = 5
     Visible = False
-  end
-  object IdHTTP1: TIdHTTP
-    AllowCookies = True
-    ProxyParams.BasicAuthentication = False
-    ProxyParams.ProxyPort = 0
-    Request.ContentLength = -1
-    Request.ContentRangeEnd = -1
-    Request.ContentRangeStart = -1
-    Request.ContentRangeInstanceLength = -1
-    Request.Accept = 'text/html, */*'
-    Request.BasicAuthentication = False
-    Request.UserAgent = 'Mozilla/3.0'
-    Request.Ranges.Units = 'bytes'
-    Request.Ranges = <>
-    HTTPOptions = [hoForceEncodeParams]
-    Left = 676
-  end
-  object HideTimer: TTimer
-    Enabled = False
-    Interval = 1500
-    OnTimer = HideTimerTimer
-    Left = 556
   end
   object OpenDialog1: TOpenDialog
     Filter = 'Webstream lists|*.nwl;*.pls'

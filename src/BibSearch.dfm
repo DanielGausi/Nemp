@@ -214,8 +214,6 @@ object FormBibSearch: TFormBibSearch
         Align = alClient
         Caption = 'Genres'
         TabOrder = 0
-        ExplicitWidth = 230
-        ExplicitHeight = 216
         object cbGenres: TCheckListBox
           Left = 8
           Top = 40
@@ -359,9 +357,6 @@ object FormBibSearch: TFormBibSearch
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitLeft = 171
-    ExplicitTop = 11
-    ExplicitWidth = 185
     DesignSize = (
       595
       41)

@@ -35,8 +35,9 @@ unit UpdateUtils;
 
 interface
 
-uses Windows, Classes, SysUtils, StrUtils, Messages, ExtCtrls, DateUtils, Inifiles, Controls,
-     IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack, IdException, Nemp_RessourceStrings;
+uses Windows, Classes, SysUtils, StrUtils, Messages, ExtCtrls, DateUtils,
+     Inifiles, Controls, System.Net.URLClient, System.Net.HttpClient,
+     HtmlHelper, Nemp_RessourceStrings;
 
 type
 
@@ -149,7 +150,6 @@ const
     UPDATE_NEWERTEST_VERSION = 8;
     UPDATE_PRIVATE_VERSION = 9;
 
-
     UPDATE_URL = 'http://www.gausi.de/nemp/current_version.txt';
 
 
@@ -227,7 +227,6 @@ procedure TNempUpdater.DoOnTimer(Sender: TObject);
 begin
     fTimer.Enabled := False;
 
-
     if AutoCheck and ((CheckInterval = 0) or (DaysBetween(Now, LastCheck) >= CheckInterval)) then
     begin
         ///  New in Nemp 3.3.3: First MessageDlg canceled.
@@ -297,7 +296,8 @@ begin
 end;
 
 procedure TNempUpdater.fCheckForUpdates;
-var IDHttp: TIDHttp;
+var //IDHttp: TIDHttp;
+    // HttpClient: THttpClient;
     MessageText: String;
     sl: TStrings;
     ini: TMemIniFile;
@@ -306,15 +306,18 @@ var IDHttp: TIDHttp;
 
 begin
     // Indy erstellen, Datei runterladen, Version checken, ggf. Message absenden (falls Cancel=false)
-    IDHttp :=  TidHttp.Create;
+    //IDHttp :=  TidHttp.Create;
+    //HttpClient := THttpClient.Create;
     try
-        IDHttp.ConnectTimeout:= 5000;
-        IDHttp.ReadTimeout:= 5000;
-        IDHttp.Request.UserAgent := 'Mozilla/3.0';
+        //IDHttp.ConnectTimeout:= 5000;
+        //IDHttp.ReadTimeout:= 5000;
+        //IDHttp.Request.UserAgent := 'Mozilla/3.0';
+        //HttpClient.UserAgent := 'Mozilla/3.0';
 
         // VersionsDatei herunterladen
         fDownloadString := '';
-        fDownloadString := IDHttp.Get(UPDATE_URL);
+        //fDownloadString := IDHttp.Get(UPDATE_URL);
+        fDownloadString := GetURLAsString(UPDATE_URL);
 
 
         if not Cancel then
@@ -401,6 +404,16 @@ begin
         end; // else nichts machen
 
     except
+        on E: Exception do
+        begin
+            MessageText := NempUpdate_Error + #13#10#13#10 + E.Message ;
+            SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
+
+            //SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
+            //(z.B. 404) -> 404 ist mit httpClient aber keine exception mehr!!!
+        end;
+
+        {
         on E: EIdHTTPProtocolException do
         begin
             MessageText := NempUpdate_Error + #13#10#13#10 + E.Message;
@@ -419,14 +432,17 @@ begin
             MessageText := NempUpdate_UnkownError + '(' + E.ClassName + ')' + #13#10#13#10 + E.Message;
             SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
         end;
+        }
+
     end;
+
 
     // Am Ende:
     Checking := False;
     CloseHandle(fThread);
     fThread := 0;
 
-    IDHttp.Free;
+    // IDHttp.Free;
 end;
 
 function TNempUpdater.fGetUpdateType(aString: String): TUpdateType;

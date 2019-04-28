@@ -87,8 +87,6 @@ type
   private
     { Private-Deklarationen }
     procedure FillSuchComboBox;
-    procedure BackupComboboxes;
-    procedure RestoreComboboxes;
   public
     { Public-Deklarationen }
     procedure EnableControls(AllowSearch: Boolean);
@@ -103,7 +101,7 @@ implementation
 
 {$R *.dfm}
 
-uses NempMainUnit;
+uses NempMainUnit, Hilfsfunktionen;
 
 
 (*
@@ -154,27 +152,12 @@ begin
         OldString := '';
 end;
 
-procedure TFormBibSearch.BackupComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-procedure TFormBibSearch.RestoreComboboxes;
-var i: Integer;
-begin
-  for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-end;
-
 
 procedure TFormBibSearch.FormCreate(Sender: TObject);
 begin
-    BackUpComboBoxes;
+    BackUpComboBoxes(self);
     TranslateComponent (self);
-    RestoreComboboxes;
+    RestoreComboboxes(self);
 
     cbGenres.Items.Clear;
     // Genres: StringList defined in MP3FileUtils

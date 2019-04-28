@@ -22,9 +22,6 @@ type
     LblSelectionMode: TLabel;
     procedure FormShow(Sender: TObject);
 
-    procedure BackupComboboxes;
-    procedure RestoreComboboxes;
-
     procedure cb_DrivesChange(Sender: TObject);
     procedure BtnRefreshClick(Sender: TObject);
     procedure cb_AutoCddbClick(Sender: TObject);
@@ -53,16 +50,16 @@ const MAXDRIVES = 10; // maximum number of drives
 
 implementation
 
-uses Nemp_RessourceStrings, NempMainUnit;
+uses Nemp_RessourceStrings, NempMainUnit, Hilfsfunktionen;
 
 {$R *.dfm}
 
 
 procedure TCDOpenDialog.FormCreate(Sender: TObject);
 begin
-    BackupComboboxes;
+    BackupComboboxes(self);
     TranslateComponent (self);
-    RestoreComboboxes;
+    RestoreComboboxes(self);
     localAudioFiles := TObjectList.Create(True);
     Files := TStringList.Create;
 end;
@@ -90,23 +87,6 @@ begin
     end;
     UpdateDriveListView;
 end;
-
-
-procedure TCDOpenDialog.BackupComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-        if (Components[i] is TComboBox) then
-            Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-procedure TCDOpenDialog.RestoreComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-        if (Components[i] is TComboBox) then
-            (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-end;
-
 
 
 procedure TCDOpenDialog.lbTracksKeyDown(Sender: TObject; var Key: Word;

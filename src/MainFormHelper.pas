@@ -88,8 +88,6 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 
     procedure RestoreCoverFlowAfterSearch(ForceUpdate: Boolean = False);
 
-//    procedure BackupComboboxes;    // We dont have any comboboxes on the mainform
-//    procedure RestoreComboboxes;   // except the genre-box
     procedure ReTranslateNemp(LanguageCode: String);
 
     procedure ClearShortCuts;
@@ -140,7 +138,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
-    PlayerLog;
+    PlayerLog, Hilfsfunktionen;
 
 procedure CorrectVolButton;
 begin
@@ -989,32 +987,6 @@ begin
 
 end;
 
-(*
-procedure BackupComboboxes;
-var i: Integer;
-begin
-    with Nemp_MainForm do
-        EdtBibGenre.Tag := EdtBibGenre.ItemIndex
-    for i := 0 to ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-
-procedure RestoreComboboxes;
-var i: Integer;
-begin
-  with Nemp_MainForm do
-  begin
-    for i := 0 to ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-
-    // We need this tag for Editing purposes!
-    EdtBibGenre.Tag := 5;
-  end;
-end;
-*)
-
 procedure ReTranslateNemp(LanguageCode: String);
 var i, c: Integer;
 begin
@@ -1060,7 +1032,6 @@ begin
         ReTranslateComponent (AuswahlForm     );
         ReTranslateComponent (MedienlisteForm );
 
-        if assigned(FDetails             ) then ReTranslateComponent(FDetails            );
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
         if assigned(PasswordDlg          ) then ReTranslateComponent(PasswordDlg         );
@@ -1069,35 +1040,33 @@ begin
         if assigned(Wizard               ) then ReTranslateComponent(Wizard              );
         if assigned(PlayerLogForm        ) then ReTranslateComponent(PlayerLogForm       );
 
-
-        //if assigned(AboutForm            ) then ReTranslateComponent(AboutForm           );
+        if assigned(FDetails) then
+        begin
+            BackUpComboBoxes(FDetails);
+            ReTranslateComponent(FDetails);
+            RestoreComboboxes(FDetails);
+        end;
         if assigned(OptionsCompleteForm  ) then
         begin
-           OptionsCompleteForm.BackUpComboBoxes;
+           BackUpComboBoxes(OptionsCompleteForm);
            ReTranslateComponent(OptionsCompleteForm );
            OptionsCompleteForm.OptionsVST.Invalidate;
-           OptionsCompleteForm.RestoreComboboxes;
+           RestoreComboboxes(OptionsCompleteForm);
         end;
         if assigned(FormStreamVerwaltung ) then
         begin
-            FormStreamVerwaltung.BackUpComboBoxes;
+            BackUpComboBoxes(FormStreamVerwaltung);
             ReTranslateComponent(FormStreamVerwaltung);
-            FormStreamVerwaltung.RestoreComboboxes;
+            RestoreComboboxes(FormStreamVerwaltung);
         end;
         if assigned(ShutDownForm         ) then ReTranslateComponent(ShutDownForm        );
         //if assigned(HeadsetControlForm   ) then ReTranslateComponent(HeadsetControlForm  );
-        {if assigned(SkinEditorForm       ) then
-        begin
-          SkinEditorForm.BackupComboboxes;
-          ReTranslateComponent(SkinEditorForm      );
-          SkinEditorForm.RestoreComboboxes;
-        end; }
         if assigned(BirthdayForm         ) then ReTranslateComponent(BirthdayForm        );
         if assigned(RandomPlaylistForm   ) then
         begin
-          RandomPlaylistForm.BackupComboboxes;
+          BackupComboboxes(RandomPlaylistForm);
           ReTranslateComponent(RandomPlaylistForm  );
-          RandomPlaylistForm.RestoreComboboxes;
+          RestoreComboboxes(RandomPlaylistForm);
         end;
 
         if assigned(ShutDownEditForm     ) then ReTranslateComponent(ShutDownEditForm    );
@@ -1105,26 +1074,26 @@ begin
 
         if assigned(PlaylistCopyForm     ) then
         begin
-            PlaylistCopyForm.BackUpComboBoxes;
+            BackUpComboBoxes(PlaylistCopyForm);
             ReTranslateComponent(PlaylistCopyForm     );
-            PlaylistCopyForm.RestoreComboBoxes;
+            RestoreComboBoxes(PlaylistCopyForm);
         end;
 
         if assigned(FormCDDBSelect)  then ReTranslateComponent(FormCDDBSelect  );
         if assigned(CDOpenDialog)    then
         begin
-            CDOpenDialog.BackupComboboxes;
+            BackupComboboxes(CDOpenDialog);
             ReTranslateComponent(CDOpenDialog    );
-            CDOpenDialog.RestoreComboboxes;
+            RestoreComboboxes(CDOpenDialog);
         end;
 
         if assigned(DeleteSelection) then ReTranslateComponent(DeleteSelection );
 
         if assigned(FormLowBattery) then
         begin
-            FormLowBattery.BackUpComboBoxes;
+            BackUpComboBoxes(FormLowBattery);
             ReTranslateComponent(FormLowBattery);
-            FormLowBattery.RestoreComboboxes;
+            RestoreComboboxes(FormLowBattery);
         end;
 
         if assigned(FPlayWebstream) then ReTranslateComponent(FPlayWebstream);

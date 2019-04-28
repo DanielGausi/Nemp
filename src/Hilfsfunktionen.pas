@@ -45,51 +45,46 @@ uses
 
 
 
-type TMyhelp = array[0..0] of TRGBQuad;
-   TRGBArray = array[0..0] of TRGBTriple;
-   pRGBArray = ^TRGBArray;
+//type TMyhelp = array[0..0] of TRGBQuad;
+//   TRGBArray = array[0..0] of TRGBTriple;
+//   pRGBArray = ^TRGBArray;
 
+procedure BackupComboboxes(aForm: TForm);
+procedure RestoreComboboxes(aForm: TForm);
 
 
 function BitrateToColor(bitrate:integer; MinColor, CenterColor, MaxColor: TColor; MiddleToMinComputing, MiddleToMaxComputing: Byte ):Tcolor;
-
 //procedure BitmapDrehen_90Grad(const Bitmap: TBitmap);
 //procedure HorizontalSpiegeln(const Bitmap: TBitmap);
+//function PathSeemsToBeURL(apath: string): boolean;
+
 
 Function BassErrorString(ErrorCode: Integer):string;
-
 function GetStreamType(aStream: DWord): String;
 function GetStreamExtension(aStream: DWord): String;
 
 function ReplaceForbiddenFilenameChars(aString: UnicodeString): UnicodeString;
-
-function PathSeemsToBeURL(apath: string): boolean;
 
 function Explode(const Separator, S: String): TStringList;
 function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;
 
 procedure Delay(dwMillSec: DWord);
 
+
+// function SekToPlaylistZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
+//function InttoStrZero(i:integer):string;
+
 function SekIntToMinStr(sek:integer; OnlyMinutes: Boolean = False):string;
-  //function InttoStrZero(i:integer):string;
-  function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
-  // function SekToPlaylistZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
-
-  Function SecToStr(Value: Double):String;
-
-  function SizeToString(Value: Int64): String;
-
-  function SizeToString2(Value: Int64): String;
-
+function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
+function SecToStr(Value: Double):String;
+function SizeToString(Value: Int64): String;
+function SizeToString2(Value: Int64): String;
 function SecondsUntil(aTime: TTime): Integer;
 
 function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
 
-//Baut eine string in Uppercase-Wort um mit "_" als Trenner - für die LyricWiki-Abfrage
 function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
-
 function StringToURLString(aUTF8String: UTF8String): AnsiString;
-
 
 
 
@@ -150,6 +145,24 @@ begin
   end;
 end;
        *)
+
+
+procedure BackupComboboxes(aForm: TForm);
+var i: Integer;
+begin
+    for i := 0 to aForm.ComponentCount - 1 do
+      if (aForm.Components[i] is TComboBox) then
+        aForm.Components[i].Tag := (aForm.Components[i] as TComboBox).ItemIndex;
+end;
+procedure RestoreComboboxes(aForm: TForm);
+var i: Integer;
+begin
+  for i := 0 to aForm.ComponentCount - 1 do
+      if (aForm.Components[i] is TComboBox) then
+        (aForm.Components[i] as TComboBox).ItemIndex := aForm.Components[i].Tag;
+end;
+
+
 Function BassErrorString(ErrorCode: Integer):string;
 begin
   Case ErrorCode of
@@ -172,14 +185,14 @@ begin
 end;
 
 
-function PathSeemsToBeURL(apath: string): boolean;
-begin
-  result := (pos('://', apath) > 0);
+//function PathSeemsToBeURL(apath: string): boolean;
+//begin
+//  result := (pos('://', apath) > 0);
 {       AnsiStartsText('http://', Trim(aPath))
     OR (pos('http://', apath) > 0)
     OR AnsiStartsText('ftp://', Trim(aPath))
     OR (pos('ftp://', apath) > 0)}
-end;
+//end;
 
 function GetStreamType(aStream: Dword): String;
 var Channelinfo: Bass_ChannelInfo;

@@ -34,19 +34,44 @@ unit HtmlHelper;
 interface
 
 uses Windows, Messages, SysUtils, Variants, Classes,
-   StrUtils;
+   StrUtils, System.Net.URLClient, System.Net.HttpClient;
 
 
-function WordUppercase(s: String): String;
+function GetURLAsString(const AURL: string): string;
+function GetURLAsHttpResponse(const AURL: string): IHttpResponse;
+
+
+function WordUppercase(s: String; newDelimiter: Char ='_'): String;
 function ReplaceGeneralEntities(s: String): String;
 function EscapeHTMLChars(s: String): String;
 function StringToURLStringAnd(aUTF8String: UTF8String): String;
-
+function URLEncode_LyricWiki(const ASrc: String): String;
+function URLEncode_ChartLyricsManual(const ASrc: String): String;
 
 implementation
 
+function GetURLAsString(const AURL: string): string;
+begin
+    result := GetURLAsHttpResponse(aURL).ContentAsString();
+end;
 
-function WordUppercase(s: String): String;
+function GetURLAsHttpResponse(const AURL: string): IHttpResponse;
+var
+  HttpClient: THttpClient;
+begin
+    HttpClient := THTTPClient.Create;
+    try
+        HttpClient.UserAgent := 'Mozilla/3.0';
+        HttpClient.ConnectionTimeout := 5000;
+        HttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
+
+        Result := HttpClient.Get(AURL);
+    finally
+        HttpClient.Free;
+    end;
+end;
+
+function WordUppercase(s: String; newDelimiter: Char ='_'): String;
 var
     i: Integer;
     tmp: String;
@@ -64,7 +89,7 @@ begin
                 tmp[1] := Upcase(tmp[1]);
                 Strings[i] := tmp;
             end;
-        Delimiter := '_';//#32;
+        Delimiter := newDelimiter; //'_';//#32;
         result := DelimitedText;
 
     finally
@@ -200,6 +225,35 @@ begin
     for i := 1 to length(aUTF8String) do
         result := result + '%'  + IntToHex(Ord(aUTF8String[i]),2);
 end;
+
+function URLEncode_LyricWiki(const ASrc: String): String;
+  var
+    i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(ASrc) do
+    case ASrc[i] of
+      ' ': Result := Result + '_';
+      'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
+      else
+      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+    end;
+end;
+
+function URLEncode_ChartLyricsManual(const ASrc: String): String;
+  var
+    i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(ASrc) do
+    case ASrc[i] of
+      ' ': Result := Result + '+';
+      'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
+      else
+      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+    end;
+end;
+
 
 
 end.

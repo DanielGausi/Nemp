@@ -9,9 +9,9 @@
 {
   -------------------------------------------------------
 
-  Copyright (C) 2009, Daniel Gaussmann
-                      www.gausi.de
-                      mail@gausi.de
+  Copyright (C) 2009-2019,  Daniel Gaussmann
+                            www.gausi.de
+                            mail@gausi.de
   All rights reserved.
 
   *******************************************************
@@ -51,6 +51,11 @@
   Version History:
   -------------------------------------------------------
 
+  v0.3, April 2019
+  -------------------
+   * replaced Indy Components with native THttpClient
+   * switched BaseURL to https://
+
   v0.2a, November 2011
   -------------------
     * deleted some "uses"
@@ -78,13 +83,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, StrUtils,
-  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, IdStack,
-  IdException, md5, StdCtrls, DateUtils, Contnrs, System.Types;
+  md5, StdCtrls, DateUtils, Contnrs, System.Types,
+  System.Net.URLClient, System.Net.HttpClient;
 
 const
     UnixStartDate: TDateTime = 25569.0;
 
-    BaseApiURL = 'http://ws.audioscrobbler.com/2.0/';
+    BaseApiURL = 'https://ws.audioscrobbler.com/2.0/';
     /// BaseScrobbleURL = 'http://post.audioscrobbler.com/';
 
     Scrobble_GetSessionError = 'Invalid response to GetSession. ';
@@ -125,6 +130,7 @@ const
     SC_JobIsDone = 25;               // Job is done, EndWork MUST be called by VCL
     SC_GetAuthException = 26;        // Error during authentification process
     SC_InvalidToken = 27;            // The Token was invalid (during getSession)
+    SC_ProtocolError= 29;
 
     SC_ScrobblingSkippedAgain = 28;  // repeated SC_ScrobblingSkipped message
 
@@ -201,7 +207,9 @@ type
       private
           fWindowHandle: HWND; // Messages will be sent to this Handle
           fThread: Integer;
-          fIDHttp: TIdHttp;
+          //fIDHttp: TIdHttp;
+          fHttpClient: THttpClient;
+
           fParent: TApplicationScrobbler;
 
           fToken: AnsiString;   // needed for GetSession
@@ -240,8 +248,9 @@ type
           function ParseNowPlayingResult(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
 
           // the main scrobbling methods
-          procedure fScrobbleNowPlaying;
-          procedure fScrobbleSubmit;
+          procedure fScrobbleStuff(aScrobbleMode: TScrobbleMode);
+          // procedure fScrobbleNowPlaying;
+          // procedure fScrobbleSubmit;
 
           // begins the new thread with the proper method
           procedure ScrobbleNowPlaying;
@@ -347,7 +356,9 @@ type
 implementation
 
 
+{
 // copied from the den Indys, added '&'
+/// not used with the ne THTTpClient
 function ParamsEncode(const ASrc: UTF8String): UnicodeString;
 var i: Integer;
 begin
@@ -366,6 +377,7 @@ begin
     end;
   end;
 end;
+}
 
 function ParseHTMLChars(s: UnicodeString): UnicodeString;
 begin
@@ -680,7 +692,8 @@ begin
             SetLength(Params, ParamCount); // cut Array
 
             for i := 0 to length(params) - 1 do
-                aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+                //aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+                aScrobbler.ParamList.Add(params[i].name+'=' + (UTF8Encode(params[i].value)));
 
             sig := GenerateSignature(SortParams(params));
             aScrobbler.ParamList.Add('api_sig=' + sig);
@@ -764,7 +777,8 @@ begin
           SetLength(Params, idx+1); // cut Array
 
           for i := 0 to length(params) - 1 do
-                aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+                //aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
+                aScrobbler.ParamList.Add(params[i].name+'=' + UTF8Encode(params[i].value));
 
           sig := GenerateSignature(SortParams(Params));
           aScrobbler.ParamList.Add('api_sig=' + sig);
@@ -857,20 +871,27 @@ begin
     fWindowHandle := aHandle;
     fThread := 0;
 
-    fIDHttp := TIdHttp.Create;
-    fIDHttp.ConnectTimeout:= 20000;
-    fIDHttp.ReadTimeout:= 20000;
+    //fIDHttp := TIdHttp.Create;
+    //fIDHttp.ConnectTimeout:= 20000;
+    //fIDHttp.ReadTimeout:= 20000;
 
-    fIDHttp.Request.UserAgent := 'Mozilla/3.0';
-    fIDHttp.HTTPOptions :=  [];  // Hinweis: hoForceEncodeParams maskiert keine '&',
+    //fIDHttp.Request.UserAgent := 'Mozilla/3.0';
+    //fIDHttp.HTTPOptions :=  [];  // Hinweis: hoForceEncodeParams maskiert keine '&',
                                  // was zu Problemen bei der einen oder anderen Band führt. ;-)
 
+    fHttpClient := THttpClient.Create;
+    fHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+    fHttpClient.ConnectionTimeout := 5000;
+    fHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
+
     ParamList := TStringList.Create;
+    //ParamList.Encoding := TEncoding.UTF8;
 end;
 
 destructor TScrobbler.Destroy;
 begin
-    fIDHttp.Free;
+    //fIDHttp.Free;
+    fHttpClient.Free;
     ParamList.Free;
     inherited destroy;
 end;
@@ -980,61 +1001,90 @@ begin
 end;
 procedure TScrobbler.fGetToken;
 var Sig: UnicodeString;
-    Response, MessageText: UnicodeString;
+    ResponseString, MessageText: UnicodeString;
+    aResponse: IHttpResponse;
     tmpStat: TScrobbleStatus;
     ParsedResponse: AnsiString;
 begin
-  try
-      Sig := Parent.GenerateSignature('api_key' + String(Parent.ApiKey)
-              + 'method' + 'auth.gettoken');
-      try
-          Response := fIDHTTP.Get( BaseApiURL + '?method=auth.gettoken'
-                            + '&' + 'api_key=' + String(Parent.ApiKey)
-                            + '&' + 'api_sig=' + Sig);
-          ParsedResponse := ParseGetTokenResult(Response);
+    try
+        Sig := Parent.GenerateSignature('api_key' + String(Parent.ApiKey)
+                + 'method' + 'auth.gettoken');
+        try
+            //ResponseString := fIDHTTP.Get( BaseApiURL + '?method=auth.gettoken'
+            //                  + '&' + 'api_key=' + String(Parent.ApiKey)
+            //                  + '&' + 'api_sig=' + Sig);
 
-          if (ParsedResponse <> '')  then
-          begin
-              SendMessage(fWindowHandle, WM_Scrobbler, SC_GetToken, lParam(PAnsiChar(ParsedResponse)));
-              SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
-          end
-          else
-          begin
-              MessageText := Scrobble_GetTokenError + #13#10 + Response;
-              SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
-              SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
-          end;
+            aResponse := fHttpClient.Get( BaseApiURL + '?method=auth.gettoken'
+                              + '&' + 'api_key=' + String(Parent.ApiKey)
+                              + '&' + 'api_sig=' + Sig);
 
-      except
-            on E: EIdHTTPProtocolException do
+            if aResponse.StatusCode >= 300 then
             begin
-                tmpStat := ParseLfmError(E.ErrorMessage, sm_Auth);
+                tmpStat := ParseLfmError(aResponse.StatusText, sm_Auth);
                 if tmpStat = hs_UnknownFailure then
                 begin
-                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
                     SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
                     SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
                 end;
-                //(z.B. 404)
+            end else
+            begin
+                // success !!!
+                ResponseString := aResponse.ContentAsString();
+                ParsedResponse := ParseGetTokenResult(ResponseString);
+
+                if (ParsedResponse <> '')  then
+                begin
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetToken, lParam(PAnsiChar(ParsedResponse)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end else
+                begin
+                    MessageText := Scrobble_GetTokenError + ': ' + ResponseString;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
             end;
 
-            on E: EIdSocketError do
+
+        except
+            on E: Exception do
             begin
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
+                MessageText := Scrobble_ConnectError + ': ' + E.Message;
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
 
-            on E: EIdexception do
-            begin
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
-            end;
+            {
+              on E: EIdHTTPProtocolException do
+              begin
+                  tmpStat := ParseLfmError(E.ErrorMessage, sm_Auth);
+                  if tmpStat = hs_UnknownFailure then
+                  begin
+                      MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                      SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
+                      SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                  end;
+                  //(z.B. 404)
+              end;
+
+              on E: EIdSocketError do
+              begin
+                  MessageText := Scrobble_ConnectError + #13#10 + E.Message;
+                  SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                  SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+              end;
+
+              on E: EIdexception do
+              begin
+                  MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
+                  SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                  SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+              end;
+            }
         end;
-     finally
+    finally
         self.free;
-     end;
+    end;
 end;
 
 {  GetSession-Repsonse:
@@ -1074,7 +1124,8 @@ begin
 end;
 procedure TScrobbler.fGetSession;
 var Sig: UnicodeString;
-    Response, MessageText: UnicodeString;
+    aResponse: IHttpResponse;
+    ResponseString, MessageText: UnicodeString;
     ParsedResponse: TSessionResponse;
     tmpStat: TScrobbleStatus;
 begin
@@ -1083,24 +1134,60 @@ begin
               + 'method' + 'auth.getsession'
               + 'token' + String(Token));
         try
-            Response := fIDHTTP.Get( BaseApiURL + '?method=auth.getsession'
+            //ResponseString := fIDHTTP.Get( BaseApiURL + '?method=auth.getsession'
+            //                + '&' + 'api_key=' + String(Parent.ApiKey)
+            //                + '&' + 'token=' + String(Token)
+            //                + '&' + 'api_sig=' + Sig);
+
+            aResponse := fHttpClient.Get( BaseApiURL + '?method=auth.getsession'
                             + '&' + 'api_key=' + String(Parent.ApiKey)
                             + '&' + 'token=' + String(Token)
                             + '&' + 'api_sig=' + Sig);
 
-            ParsedResponse := ParseGetSessionResult(Response);
-            if (ParsedResponse.Username <> '') and (ParsedResponse.SessionKey <> '') then
+
+            if aResponse.StatusCode >= 300 then
             begin
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSession, lParam(@ParsedResponse));
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
-            end
-            else
+                tmpStat := ParseLfmError(aResponse.StatusText, sm_Auth);
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    //MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
+                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
+                {tmpStat := ParseLfmError(aResponse.StatusText, sm_Auth);
+                if tmpStat = hs_UnknownFailure then
+                begin
+                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, LParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;  }
+            end else
             begin
-                MessageText := Scrobble_GetSessionError + #13#10 + Response;
+                // success !!!
+                ResponseString := aResponse.ContentAsString();
+                ParsedResponse := ParseGetSessionResult(ResponseString);
+                if (ParsedResponse.Username <> '') and (ParsedResponse.SessionKey <> '') then
+                begin
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetSession, lParam(@ParsedResponse));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end
+                else
+                begin
+                    MessageText := Scrobble_GetSessionError + ': ' + ResponseString;
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
+                    SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
+                end;
+            end;
+
+        except
+            on E: Exception do
+            begin
+                MessageText := Scrobble_ConnectError + ': ' + E.Message;
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
-        except
+            {
             on E: EIdHTTPProtocolException do
             begin
                 tmpStat := ParseLfmError(E.ErrorMessage, sm_Auth);
@@ -1126,6 +1213,7 @@ begin
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_GetAuthException, lParam(PWideChar(MessageText)));
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_JobIsDone, 0);
             end;
+            }
         end;
     finally
         self.free;
@@ -1173,6 +1261,7 @@ begin
         end;
 end;
 
+
 function TScrobbler.ParseNowPlayingResult(aResponse: UnicodeString; Mode: TScrobbleMode): TScrobbleStatus;
 var p,p2: Integer;
     partOfResponse: UnicodeString;
@@ -1213,20 +1302,11 @@ begin
         result := ParseLfmError(aResponse, Mode)
 end;
 
-
-procedure TScrobbler.ScrobbleNowPlaying;
-var Dummy: Cardinal;
-begin
-    fThread := BeginThread(Nil, 0, @StartScrobbleNowPlaying, Self, 0, Dummy)
-end;
-procedure StartScrobbleNowPlaying(Scrobbler: TScrobbler);
-begin
-    Scrobbler.fScrobbleNowPlaying;
-end;
-procedure TScrobbler.fScrobbleNowPlaying;
+procedure TScrobbler.fScrobbleStuff(aScrobbleMode: TScrobbleMode);
 var tmpStat: TScrobbleStatus;
-    Response: UnicodeString;
+    ResponseString: UnicodeString;
     MessageText: UnicodeString;
+    aResponse: IHttpResponse;
 begin
     try
         try
@@ -1235,54 +1315,62 @@ begin
             // if something is wrong here (Errorcount, nextAllowedScrobbelTime, etc.)
             if Parent.fScrobblingAllowed then
             begin
-                Response := fIDHTTP.Post(BaseApiURL, ParamList);
-                // Parse the Response and react properly
-                tmpStat := ParseNowPlayingResult(Response, sm_NowPlaying);
-                if tmpStat = hs_UnknownFailure then
+                //Response := fIDHTTP.Post(BaseApiURL, ParamList);
+                aResponse := fHttpClient.Post(BaseApiURL, ParamList);
+
+                if aResponse.StatusCode >= 300 then
                 begin
-                    MessageText := Scrobble_UnkownError + #13#10 + 'Server message:'#13#10 + Response;
-                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
+                    // some error occurred (404 or something)
+                    Parent.CountError;
+                    tmpStat := ParseNowPlayingResult(aResponse.StatusText, aScrobbleMode);
+                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
+                    // if the Status is hs_UnknownFailure
+                    if tmpStat = hs_UnknownFailure then
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)))
+                    else
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_ProtocolError, LParam(PWideChar(MessageText)));
+                end else
+                begin
+                    // success !!!
+                    ResponseString := aResponse.ContentAsString;
+
+                    // Parse the Response and react properly
+                    tmpStat := ParseNowPlayingResult(ResponseString, aScrobbleMode);
+                    if tmpStat = hs_UnknownFailure then
+                    begin
+                        MessageText := Scrobble_UnkownError + '. Server message: ' + ResponseString;
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
+                    end;    // else: nothing to do, everything is fine
                 end;
             end;
             // else: the main window was notified by the fScrobblingAllowed-method,
             // that the scobbling was skipped and Endwork will be called via "JobDone"
 
         except
-            on E: EIdHTTPProtocolException do
-            begin
-                //(z.B. 404)
-                // Parse the ErrorMessage and react properly
-                // here we get the lfm-errorcodes as InvalidSessionKey etc.
-                tmpStat := ParseNowPlayingResult(E.ErrorMessage, sm_NowPlaying);
-
-                // if the Status is hs_UnknownFailure
-                if tmpStat = hs_UnknownFailure then
-                begin
-                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
-                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
-                end;
-            end;
-
-            on E: EIdSocketError do
+            on E: Exception do
             begin
                 Parent.CountError;
                 MessageText := Scrobble_ConnectError + #13#10 + E.Message;
                 SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
             end;
-
-            on E: EIdexception do
-            begin
-                Parent.CountError;
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
-            end;
-
         end;
     finally
         self.free;
     end;
 end;
 
+
+
+procedure TScrobbler.ScrobbleNowPlaying;
+var Dummy: Cardinal;
+begin
+    fThread := BeginThread(Nil, 0, @StartScrobbleNowPlaying, Self, 0, Dummy)
+end;
+procedure StartScrobbleNowPlaying(Scrobbler: TScrobbler);
+begin
+    //Scrobbler.fScrobbleNowPlaying;
+    Scrobbler.fScrobbleStuff(sm_NowPlaying);
+end;
 
 procedure TScrobbler.ScrobbleSubmit;
 var Dummy: Cardinal;
@@ -1291,8 +1379,71 @@ begin
 end;
 procedure StartScrobbleSubmit(Scrobbler: TScrobbler);
 begin
-    Scrobbler.fScrobbleSubmit;
+    //Scrobbler.fScrobbleSubmit;
+    Scrobbler.fScrobbleStuff(sm_Scrobble);
 end;
+
+
+{procedure TScrobbler.fScrobbleNowPlaying;
+var tmpStat: TScrobbleStatus;
+    ResponseString: UnicodeString;
+    MessageText: UnicodeString;
+    aResponse: IHttpResponse;
+begin
+    try
+        try
+            // 1st: Check, whether it is ok to scrobble
+            // should be done in this thread, as we eventually change the corresponding values
+            // if something is wrong here (Errorcount, nextAllowedScrobbelTime, etc.)
+            if Parent.fScrobblingAllowed then
+            begin
+                //Response := fIDHTTP.Post(BaseApiURL, ParamList);
+                aResponse := fHttpClient.Post(BaseApiURL, ParamList);
+
+                if aResponse.StatusCode >= 300 then
+                begin
+                    // some error occurred (404 or something)
+                    Parent.CountError;
+                    tmpStat := ParseNowPlayingResult(aResponse.StatusText, sm_NowPlaying);
+                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
+                    // if the Status is hs_UnknownFailure
+                    if tmpStat = hs_UnknownFailure then
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)))
+                    else
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_ProtocolError, LParam(PWideChar(MessageText)));
+                end else
+                begin
+                    // success !!!
+                    ResponseString := aResponse.ContentAsString;
+
+                    // Parse the Response and react properly
+                    tmpStat := ParseNowPlayingResult(ResponseString, sm_NowPlaying);
+                    if tmpStat = hs_UnknownFailure then
+                    begin
+                        MessageText := Scrobble_UnkownError + '. Server message: ' + ResponseString;
+                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
+                    end;    // else: nothing to do, everything is fine
+                end;
+            end;
+            // else: the main window was notified by the fScrobblingAllowed-method,
+            // that the scobbling was skipped and Endwork will be called via "JobDone"
+
+        except
+            on E: Exception do
+            begin
+                Parent.CountError;
+                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
+                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
+            end;
+        end;
+    finally
+        self.free;
+    end;
+end;   }
+
+
+
+{
 procedure TScrobbler.fScrobbleSubmit;
 var tmpStat: TScrobbleStatus;
     Response, MessageText: UnicodeString;
@@ -1339,7 +1490,7 @@ begin
     finally
         self.free;
     end;
-end;
+end;   }
 
 
 end.

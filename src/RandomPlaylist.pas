@@ -132,8 +132,6 @@ type
 
   public
     { Public-Deklarationen }
-    procedure BackupComboboxes;
-    procedure RestoreComboboxes;
     //procedure ShowRating(Value: Integer);
   end;
 
@@ -195,9 +193,9 @@ var ini: TMemIniFile;
     ltmp, c: Integer;
 begin
   
-  BackupComboboxes;
+  BackupComboboxes(self);
   TranslateComponent (self);
-  RestoreComboboxes;
+  RestoreComboboxes(self);
   cbGenres.Items.Clear;
   // cbGenres.Items := Genres;
 
@@ -713,23 +711,6 @@ begin
 
     cbTagMatchType.ItemIndex := TagSettings[idx].MatchType;
     RecheckLastCheckedTags;
-end;
-
-procedure TRandomPlaylistForm.BackupComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-
-
-procedure TRandomPlaylistForm.RestoreComboboxes;
-var i: Integer;
-begin
-  for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
 end;
 
 (*

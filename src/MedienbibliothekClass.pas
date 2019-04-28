@@ -60,9 +60,6 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
-     //Indys:
-     IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
-
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
      DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes;
 
@@ -207,6 +204,13 @@ type
         // MUST be 0 (use Lyrics) or GAD_NOLYRICS (=8, ignore Lyrics)
         fIgnoreLyrics: Boolean;
         fIgnoreLyricsFlag: Integer;
+
+        // (LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS)
+        // these temporary variables are set just before a Lyric-Search begins
+        // they are computed from the priorities stored in the LyricPriorities-Array
+        // !!! Access to these variables only within a CriticalSection !!!
+        fLyricFirstPriority  : TLyricFunctionsEnum;
+        fLyricSecondPriority : TLyricFunctionsEnum;
 
 
         // used for faster cover-initialisation.
@@ -469,6 +473,8 @@ type
             SortParams im Create initialisieren
             SortParams in Ini Speichern/Laden }
 
+        LyricPriorities: Array[TLyricFunctionsEnum] of Integer;
+
         // this is used to synchronize access to single mediafiles
         // Some threads are running and modifying the files: GetLyrics and the Player.PostProcessor
         // This is fine, but the VCL MUST NOT try to write the same files.
@@ -554,6 +560,7 @@ type
 
         procedure CleanUpDeadFilesFromVCLLists;
         procedure RefreshFiles;
+        procedure GetLyricPriorities(out Prio1, Prio2: TLyricFunctionsEnum);
         procedure GetLyrics;
         procedure GetTags;
         procedure UpdateId3tags;
@@ -737,6 +744,7 @@ type
       CSUpdate: RTL_CRITICAL_SECTION;
       CSAccessDriveList: RTL_CRITICAL_SECTION;
       CSAccessBackupCoverList: RTL_CRITICAL_SECTION;
+      CSLyricPriorities: RTL_CRITICAL_SECTION;
 
 implementation
 
@@ -1353,6 +1361,11 @@ begin
         NewCoverFlow.CurrentCoverID := Ini.ReadString('MedienBib','SelectedCoverID', 'all');
         NewCoverFlow.CurrentItem    := ini.ReadInteger('MedienBib', 'SelectedCoverIDX', 0);
 
+        // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
+        LyricPriorities[LYR_NONE]        := 100;
+        LyricPriorities[LYR_LYRICWIKI]   := Ini.ReadInteger('MedienBib', 'PriorityLyricWiki'  , 1);
+        LyricPriorities[LYR_CHARTLYRICS] := Ini.ReadInteger('MedienBib', 'PriorityChartLyrics', 2);
+
         BibSearcher.LoadFromIni(ini);
         TagCloud.LoadFromIni(ini);
 end;
@@ -1434,6 +1447,10 @@ begin
         Ini.WriteInteger('MedienBib', 'SelectedCoverIDX', NewCoverFlow.CurrentItem);
 
         Ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
+
+        // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
+        Ini.WriteInteger('MedienBib', 'PriorityLyricWiki'  , LyricPriorities[LYR_LYRICWIKI]   );
+        Ini.WriteInteger('MedienBib', 'PriorityChartLyrics', LyricPriorities[LYR_CHARTLYRICS] );
 
         BibSearcher.SaveToIni(Ini);
         TagCloud.SaveToIni(Ini);
@@ -2626,14 +2643,37 @@ end;
     - Creates a secondary thread and load lyrics from LyricWiki.org
     --------------------------------------------------------
 }
+procedure TMedienBibliothek.GetLyricPriorities(out Prio1, Prio2: TLyricFunctionsEnum);
+var i: TLyricFunctionsEnum;
+begin
+    Prio1 := LYR_NONE;
+    Prio2 := LYR_NONE;
+    for i := Low(TLyricFunctionsEnum) to High(TLyricFunctionsEnum) do
+    begin
+        if LyricPriorities[i] = 1 then
+            Prio1 := i;
+        if LyricPriorities[i] = 2 then
+            Prio2 := i;
+    end;
+end;
+
 procedure TMedienBibliothek.GetLyrics;
   var Dummy: Cardinal;
+      Prio1, Prio2: TLyricFunctionsEnum;
 begin
     // Status MUST be set outside
     // (the updatelist is filled in VCL-Thread)
     // But, to be sure:
     StatusBibUpdate := 1;
     UpdateFortsetzen := True;
+
+    // Get the Priorities for the Lyric-Search-Methods
+    GetLyricPriorities(Prio1, Prio2);
+    EnterCriticalSection(CSLyricPriorities);
+        fLyricFirstPriority  := Prio1;
+        fLyricSecondPriority := Prio2;
+    LeaveCriticalSection(CSLyricPriorities);
+
     fHND_GetLyricsThread := BeginThread(Nil, 0, @fGetLyricsThread, Self, 0, Dummy);
 end;
 
@@ -2671,6 +2711,9 @@ var i: Integer;
     aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
+
+    tmpLyricFirstPriority,tmpLyricSecondPriority  : TLyricFunctionsEnum;
+
 begin
     //ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
@@ -2683,6 +2726,14 @@ begin
 
     Lyrics :=  TLyrics.create;
     try
+            //Critical Section: Set Priorities
+            EnterCriticalSection(CSLyricPriorities);
+                tmpLyricFirstPriority := self.fLyricFirstPriority;
+                tmpLyricSecondPriority := self.fLyricSecondPriority;
+            LeaveCriticalSection(CSLyricPriorities);
+
+            Lyrics.SetLyricSearchPriorities(tmpLyricFirstPriority, tmpLyricSecondPriority);
+
             // Lyrics suchen
             for i := 0 to UpdateList.Count - 1 do
             begin
@@ -6494,11 +6545,13 @@ initialization
   InitializeCriticalSection(CSUpdate);
   InitializeCriticalSection(CSAccessDriveList);
   InitializeCriticalSection(CSAccessBackupCoverList);
+  InitializeCriticalSection(CSLyricPriorities);
 
 finalization
 
   DeleteCriticalSection(CSUpdate);
   DeleteCriticalSection(CSAccessDriveList);
   DeleteCriticalSection(CSAccessBackupCoverList);
+  DeleteCriticalSection(CSLyricPriorities);
 end.
 

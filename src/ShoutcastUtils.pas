@@ -49,9 +49,8 @@ unit ShoutcastUtils;
 
 interface
 
-uses Windows, SysUtils, Messages, Classes, StrUtils, ContNrs, Math,
-    IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP,
-    dialogs, Nemp_RessourceStrings;
+uses Windows, SysUtils, Messages, Classes, StrUtils, ContNrs, Math, dialogs,
+     Nemp_RessourceStrings, System.Net.URLClient, System.Net.HttpClient;
 
 const
     // Messages für ShoutcastQuery:
@@ -64,15 +63,14 @@ const
     SCQ_ParsedList = 6;
 
     ST_PlaylistDownloadConnecting = 20;
-    ST_PlaylistDownloadBegins = 21;
+    // ST_PlaylistDownloadBegins = 21;
     ST_PlaylistDownloadComplete = 22;
     ST_PlaylistDownloadFailed = 23;
-
     ST_PlaylistStreamLink = 24;
 
 
 Type
-    TSCQueryMode = (QM_Genre, QM_Search);
+    // TSCQueryMode = (QM_Genre, QM_Search);
 
     TStation = class
         private
@@ -93,10 +91,10 @@ Type
             function fGetFormat: String;
             // Rückgabewert: erfolgreich Infos gefunden (True),
             // oder sinnfreier String, d.h. keine Station drinne (False)
-            function GetInfoFromString(s: String): Boolean;
+            //function GetInfoFromString(s: String): Boolean;
             procedure fDownloadPlaylist;
 
-            procedure fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
+            // procedure fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
 
         public
             property Name: String           read fName         write fName;
@@ -125,6 +123,7 @@ Type
             procedure SaveToStream(aStream: TStream);
     end;
 
+    (*
     TShoutcastQuery = class
         private
             fWindowHandle: Hwnd;
@@ -167,8 +166,9 @@ Type
             procedure DownloadStationList(aQuery: String; aMode: TSCQueryMode);
 
     end;
+    *)
 
-    procedure StartPrivateDownloadProcedure(SQ: TShoutcastQuery);
+    /// procedure StartPrivateDownloadProcedure(SQ: TShoutcastQuery);
     procedure StartDownloadPlaylist(St: TStation);
 
     // Überprüft, ob die URL einer Station ein PLaylist-Datei ist
@@ -197,17 +197,17 @@ Type
 
 var
     CSQueryString: RTL_CRITICAL_SECTION;
-    CSGetStationList: RTL_CRITICAL_SECTION;
+    // CSGetStationList: RTL_CRITICAL_SECTION;
 
-const
-    SC_GenreSearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?genre=';
-    SC_SearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?search=';
-
-    SC_PlaylistTemplate = 'http://yp.shoutcast.com/sbin/tunein-station.pls?id=';
+//const
+//    SC_GenreSearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?genre=';
+//    SC_SearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?search=';
+//    SC_PlaylistTemplate = 'http://yp.shoutcast.com/sbin/tunein-station.pls?id=';
 
 implementation
 
 
+{
 function DecodeShoutcastString(s: String): String;
 var beginPos, endPos: Integer;
     nStr: String;
@@ -225,6 +225,7 @@ begin
     s := StringReplace(s, '&amp;', '&', [rfReplaceAll]);
     result := s;
 end;
+}
 
 function UrlIsPlaylist(aURL: String): Boolean;
 var //slash, doubleslash, dp: Integer;
@@ -392,6 +393,7 @@ begin
     fCount        := aStation.Count        ;
 end;
 
+{
 // Diese Methode bekommt eine Zeile aus dem DownloadString
 function TStation.GetInfoFromString(s: String): Boolean;
 var beginPos, endPos: Integer;
@@ -484,6 +486,7 @@ begin
                or (fCount <> 0);
     end;
 end;
+}
 
 function TStation.fGetURL: String;
 begin
@@ -534,33 +537,48 @@ begin
 end;
 
 procedure TStation.fDownloadPlaylist;
-var IDHttp: TIDHttp;
+var //IDHttp: TIDHttp;
     s: AnsiString;
-    //tmp: AnsiString;
+    aHttpClient: THttpClient;
+    aResponse: IHttpResponse;
 begin
-    //tmp := URL;
-    //if UrlIsPlaylist(tmp) then
     if UrlIsPlaylist(URL) then
     begin
         // download ausführen
-        IDHttp :=  TidHttp.Create;
+        //IDHttp :=  TidHttp.Create;
+        aHttpClient := THttpClient.Create;
         try
-            IDHttp.ConnectTimeout:= 5000;
-            IDHttp.ReadTimeout:= 5000;
-            // Hinweis: Der originale Indy-Useragent scheint Probleme zu machen!
-            IDHttp.Request.UserAgent := 'Mozilla/3.0';
-            IDHttp.HTTPOptions :=  [hoForceEncodeParams];
-            IDHttp.OnWorkBegin := fStationDownloadWorkBegin;
+            try
+                //IDHttp.ConnectTimeout:= 5000;
+                //IDHttp.ReadTimeout:= 5000;
+                // Hinweis: Der originale Indy-Useragent scheint Probleme zu machen!
+                //IDHttp.Request.UserAgent := 'Mozilla/3.0';
+                //IDHttp.HTTPOptions :=  [hoForceEncodeParams];
+                //IDHttp.OnWorkBegin := fStationDownloadWorkBegin;
 
-            SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadConnecting, 0);
-            s := AnsiString(IDHttp.Get(URL));
-            SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadComplete, lParam(PAnsiChar(s)));
-        except
-            SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadFailed,  0);
+                aHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+                aHttpClient.ConnectionTimeout := 5000;
+                aHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
+
+                SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadConnecting, 0);
+                aResponse := aHttpClient.Get(URL);
+                if aResponse.StatusCode >= 300 then
+                    // fail
+                    SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadFailed, 0)
+                else
+                begin
+                    // success
+                    s := AnsiString(aResponse.ContentStream);
+                    SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadComplete, lParam(PAnsiChar(s)));
+                end;
+            except
+                SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadFailed, 0);
+            end;
+        finally
+            //IDHttp.Free;
+            aHttpClient.Free;
         end;
-        IDHttp.Free;
     end else
-
     begin
         // URL ist eine direkte Stream-Adresse
         SendMessage(fWindowHandle, WM_Shoutcast,
@@ -571,10 +589,10 @@ begin
     fThread := 0;
 end;
 
-procedure TStation.fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
-begin
-    SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadBegins, 0);
-end;
+//procedure TStation.fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
+//begin
+//    SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadBegins, 0);
+//end;
 
 function TStation.GetInfoString: String;
 begin
@@ -672,7 +690,7 @@ end;
 
 
 
-
+(*
 constructor TShoutcastQuery.Create(aHandle: HWnd);
 begin
     inherited Create;
@@ -833,16 +851,17 @@ begin
         lbPos := PosEx(#10, fDownloadString, lbPos + 1);
     end;
 end;
+*)
 
 
 initialization
 
   InitializeCriticalSection(CSQueryString);
-  InitializeCriticalSection(CSGetStationList);
+  // InitializeCriticalSection(CSGetStationList);
 
 finalization
 
   DeleteCriticalSection(CSQueryString);
-  DeleteCriticalSection(CSGetStationList);
+  // DeleteCriticalSection(CSGetStationList);
 
 end.

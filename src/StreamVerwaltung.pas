@@ -37,11 +37,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
-  Dialogs, VirtualTrees, StdCtrls, Contnrs,  INiFiles,
+  Dialogs, VirtualTrees, StdCtrls, Contnrs,  IniFiles,
   shellApi, Menus,  Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings,
-  Nemp_ConstantsAndTypes, TreeHelper,
-   ComCtrls, IdBaseComponent, IdComponent, IdTCPConnection,
-  IdTCPClient, IdHTTP, ShoutcastUtils, ExtCtrls, System.UITypes;
+  Nemp_ConstantsAndTypes, TreeHelper, ComCtrls, ShoutcastUtils, ExtCtrls,
+  System.UITypes;
 
 type
 
@@ -61,8 +60,6 @@ type
     VST_ShoutcastQuery: TVirtualStringTree;
     VST_Favorites: TVirtualStringTree;
     LblConst_Limit: TLabel;
-    IdHTTP1: TIdHTTP;
-    HideTimer: TTimer;
     GrpBox_GeneralSearch: TGroupBox;
     GrpBox_SearchGenre: TGroupBox;
     CB_SearchGenre: TComboBox;
@@ -117,7 +114,7 @@ type
       Column: TColumnIndex; Shift: TShiftState);
     //procedure VST_ShoutcastQueryHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
     //        Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure HideTimerTimer(Sender: TObject);
+    //procedure HideTimerTimer(Sender: TObject);
     //procedure Btn_AddSelectedClick(Sender: TObject);
     //procedure Btn_SearchGenreClick(Sender: TObject);
     procedure Btn_NewClick(Sender: TObject);
@@ -158,10 +155,7 @@ type
       Procedure ShoutcastQueryMessage(Var aMsg: TMessage); message WM_Shoutcast;
   public
     { Public-Deklarationen }
-    ShoutcastQuery: TShoutcastQuery;
-    procedure BackUpComboBoxes;
-    procedure RestoreComboboxes;
-
+    /// ShoutcastQuery: TShoutcastQuery;
   end;
 
 //  function min(a,b:integer):integer;
@@ -211,7 +205,7 @@ function AddVSTStation(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aSta
 var Data: PStationTreeData;
 begin
   Result:= AVST.AddChild(aNode); // meistens wohl Nil
-  AVST.ValidateNode(Result,false); // ?? was macht das??
+  AVST.ValidateNode(Result,false);
   Data:=AVST.GetNodeData(Result);
   Data^.fStation := aStation;
 end;
@@ -221,9 +215,9 @@ procedure TFormStreamVerwaltung.FormCreate(Sender: TObject);
 var i: integer;
   newStation: TStation;
 begin
-  BackupComboboxes;
+  BackupComboboxes(self);
   TranslateComponent (self);
-  RestoreComboboxes;
+  RestoreComboboxes(self);
   //CB_SearchGenre.ItemIndex := 0;
 
   StationList := TObjectlist.Create;
@@ -234,10 +228,7 @@ begin
   VST_ShoutcastQuery.NodeDataSize := SizeOf(PStationTreeData);
   VST_Favorites.NodeDataSize := SizeOf(PStationTreeData);
 
-  idHTTP1.ConnectTimeout:= 5000;
-  idHTTP1.ReadTimeout:= 5000;
-
-  ShoutcastQuery := TShoutcastQuery.Create(Handle);
+  ///ShoutcastQuery := TShoutcastQuery.Create(Handle);
   //Progressbar1.Parent := Statusbar1;
   //Progressbar1.Left := 210;
   //Progressbar1.Top := 2;
@@ -260,10 +251,9 @@ end;
 
 
 Procedure TFormStreamVerwaltung.ShoutcastQueryMessage(Var aMsg: TMessage);
-var aList: TObjectList;
-    FS: TFileStream;
-     filename, sl: string;
-     s: AnsiString;
+var FS: TFileStream;
+    filename, sl: string;
+    s: AnsiString;
 begin
     Case aMsg.WParam of
         SCQ_BeginDownload    : begin
@@ -315,12 +305,12 @@ begin
                                   //ProgressBar1.Position := 0;
                                   //StatusBar1.Panels[0].Text := Shoutcast_Connecting;
                                end;
-        ST_PlaylistDownloadBegins: begin
+        //ST_PlaylistDownloadBegins: begin
                                   ////Lbl_Status.Visible := True;
                                   //ProgressBar1.Visible := True;
                                   //ProgressBar1.Position := Progressbar1.Max Div 2;
                                   //StatusBar1.Panels[0].Text := Shoutcast_DownloadingPlaylist;
-                               end;
+        //                       end;
         ST_PlaylistDownloadComplete : begin
                                   s := PAnsiChar(aMsg.LParam);
                                   if s <> '' then
@@ -421,6 +411,7 @@ begin
     end;
 end;
 
+{
 procedure TFormStreamVerwaltung.HideTimerTimer(Sender: TObject);
 begin
     //Lbl_Status.Visible := False;
@@ -428,12 +419,13 @@ begin
     //ProgressBar1 .Visible := False;
     //HideTimer.Enabled := False;
 end;
+}
 
 procedure TFormStreamVerwaltung.FormDestroy(Sender: TObject);
 begin
     StationList.Free;
     FavoriteList.Free;
-    ShoutcastQuery.Free;
+    ///ShoutcastQuery.Free;
 end;
 
 procedure TFormStreamVerwaltung.Btn_OkClick(Sender: TObject);
@@ -622,10 +614,6 @@ end;
 
 procedure TFormStreamVerwaltung.VST_FavoritesHeaderClick(Sender: TVTHeader;
   HitInfo: TVTHeaderHitInfo);
-
-
-//procedure TFormStreamVerwaltung.__VST_FavoritesHeaderClick(Sender: TVTHeader; Column: TColumnIndex;
-//            Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var i: Integer;
 begin
     if HitInfo.Button = mbLeft then
@@ -689,22 +677,6 @@ begin
   end;
 end;
 
-
-
-procedure TFormStreamVerwaltung.BackUpComboBoxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-procedure TFormStreamVerwaltung.RestoreComboboxes;
-var i: Integer;
-begin
-  for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-end;
 
 procedure TFormStreamVerwaltung.BtnSetCustomSortClick(Sender: TObject);
 var i: Integer;

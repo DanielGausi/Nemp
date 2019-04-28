@@ -36,9 +36,10 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
-  IdBaseComponent, IdComponent,  IdHTTP, IdStack, IdException, IdExceptionCore,
   CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
-  Nemp_ConstantsAndTypes, SyncObjs, System.Types;
+  Nemp_ConstantsAndTypes, SyncObjs, System.Types,
+  // new method for downloading stuff
+  System.Net.URLClient, System.Net.HttpClient;
 
 const
     ccArtist     = 0;
@@ -82,7 +83,8 @@ type
     TCoverDownloadWorkerThread = class(TThread)
         private
             { Private-Deklarationen }
-            fIDHttp: TIdHttp;
+            /// fIDHttp: TIdHttp;
+            fHttpClient: THttpClient;
 
             //fSemaphore: THandle;
             fEvent: TEvent;
@@ -165,6 +167,7 @@ type
 
 
         protected
+
             procedure Execute; override;
 
         public
@@ -277,7 +280,7 @@ end;
 constructor TCoverDownloadWorkerThread.Create;
 begin
     inherited create(True);
-    fIDHttp := TIdHttp.Create;
+    /// fIDHttp := TIdHttp.Create;
     fJobList := TObjectList.Create;
     fDataStream := TMemoryStream.Create;
     fCurrentDownloadItem := TCoverDownloadItem.Create;
@@ -286,12 +289,16 @@ begin
     fEvent := TEvent.Create(Nil, True, False, '');
     FreeOnTerminate := False;
 
-    fIDHttp.ConnectTimeout:= 2000;
-    fIDHttp.ReadTimeout:= 2000;
-    fIDHttp.Request.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
-    fIDHttp.Request.CharSet := 'utf-8';
+    //fIDHttp.ConnectTimeout:= 2000;
+    //fIDHttp.ReadTimeout:= 2000;
+    //fIDHttp.Request.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+    //fIDHttp.Request.CharSet := 'utf-8';
+    //fIDHttp.HTTPOptions :=  [];
 
-    fIDHttp.HTTPOptions :=  [];
+    fHttpClient := THttpClient.Create;
+    fHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
+    fHttpClient.ConnectionTimeout := 5000;
+    fHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
 
     UserWantToClearCacheList := False;
     Resume;
@@ -299,7 +306,8 @@ end;
 
 destructor TCoverDownloadWorkerThread.Destroy;
 begin
-    fIDHttp.Free;
+    //fIDHttp.Free;
+    fHttpClient.Free;
     fDataStream.Free;
     fJobList.Free;
     fCurrentDownloadItem.Free;
@@ -734,6 +742,73 @@ end;
 }
 function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
 var url: UTF8String;
+    aResponse: IHttpResponse;
+begin
+    url := 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo'
+        + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
+        + '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
+        + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
+
+    try
+        //fXMLData := fIDHttp.Get(url);
+        aResponse := fHttpClient.Get(url);
+
+        if (aResponse.StatusCode = 400) then
+        begin
+            // lastFM seems to send a "400-Bad Request" when an album is not found
+            // but a "no connection" logo on the cover would be wrong here
+            fInternetConnectionLost := False;
+            fXMLData := '';
+            result := False;
+        end else
+        begin
+            // success!!!
+            fXMLData := aResponse.ContentAsString();
+            fInternetConnectionLost := False;
+            result := True;
+        end;
+
+    except
+        /// note: that may be too general.
+        /// ??? todo ??? handle some exceptions and status codes seperately?
+        on E: Exception do
+        begin
+            fInternetConnectionLost := True;
+            fXMLData := '';
+            result := False;
+        end;
+        {
+        on E: EidIOHandlerPropInvalid  do
+        begin
+            fInternetConnectionLost := True;
+            fXMLData := '';
+            result := False;
+        end;
+
+        on E: EIDHttpProtocolException do
+        begin
+            // lastFM seems to send a "400-Bad Request" when an album is not found
+            // but a "no connection" logo on the cover would be wrong here
+            fInternetConnectionLost := False;
+            fXMLData := '';
+            result := False;
+        end;
+        on E: EIdSocketError do
+        begin
+            fInternetConnectionLost := True;
+            fXMLData := '';
+            result := False;
+        end;
+        else
+        begin
+            fXMLData := '';
+            result := False;
+        end; }
+    end;
+end;
+{
+function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
+var url: UTF8String;
 begin
     url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
         + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
@@ -741,7 +816,9 @@ begin
         + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
 
     try
-        fXMLData := fIDHttp.Get(url);
+        //fXMLData := fIDHttp.Get(url);
+        fXMLData := (fHttpClient.Get(url)).
+
         result := True;
     except
         on E: EidIOHandlerPropInvalid  do
@@ -772,6 +849,7 @@ begin
         end;
     end;
 end;
+}
 
 {
     --------------------------------------------------------
@@ -804,8 +882,8 @@ begin
         fBestCoverURL := '';
     end;
 
-    // Note: Try to download through https:// in a later version ....
-    fBestCoverURL := Stringreplace(fBestCoverURL, 'https://', 'http://', [rfReplaceAll]);
+    // Note: Try to download through https:// in a later version .... done :D
+    /////  fBestCoverURL := Stringreplace(fBestCoverURL, 'https://', 'http://', [rfReplaceAll]);
 end;
 
 
@@ -817,15 +895,29 @@ end;
     --------------------------------------------------------
 }
 function TCoverDownloadWorkerThread.DownloadBestCoverToStream: Boolean;
+var aResponse: IHttpResponse;
 begin
     result := True;
     if fBestCoverURL <> '' then
     begin
         fDataStream.Clear;
         try
-            fIDHttp.Get(fBestCoverURL, fDataStream);
-        except
+            // fIDHttp.Get(fBestCoverURL, fDataStream);
+            aResponse := fHttpClient.Get(fBestCoverURL);
+            fDataStream.CopyFrom(aResponse.ContentStream, 0);
 
+            // ??? todo ??? proper error-handling?
+        except
+            on E: Exception do
+            begin
+                fInternetConnectionLost := True;
+                fXMLData := '';
+                fDataType := ptNone;
+                fDataStream.Clear;
+                result := False;
+            end;
+
+            {
             on E: EidIOHandlerPropInvalid  do
             begin
                 fInternetConnectionLost := True;
@@ -851,7 +943,7 @@ begin
                 result := False;
                 fDataType := ptNone;
             end;
-
+            }
         end;
 
         if AnsiEndsText('.jpg', fBestCoverURL) then

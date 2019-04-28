@@ -46,9 +46,8 @@ uses
   M4AFiles, M4AAtoms,
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
-  Nemp_ConstantsAndTypes, gnuGettext, Lyrics,
-  Nemp_RessourceStrings,  IdBaseComponent, IdComponent, TagClouds,
-  IdTCPConnection, IdTCPClient, IdHTTP, Menus, RatingCtrls, Spin;
+  Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds,
+  Nemp_RessourceStrings, Menus, RatingCtrls, Spin;
 
 type
   TFDetails = class(TForm)
@@ -95,7 +94,6 @@ type
     Lblv2_Size: TLabel;
     Lblv2_Version: TLabel;
     RatingImageBib: TImage;
-    IdHTTP1: TIdHTTP;
     BtnLyricWikiManual: TButton;
     PM_URLCopy: TPopupMenu;
     PM_CopyURLToClipboard: TMenuItem;
@@ -235,6 +233,7 @@ type
     Btn_Close: TButton;
     BtnUndo: TButton;
     BtnApply: TButton;
+    cbLyricOptions: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -402,6 +401,7 @@ type
     ValidApeFile: Boolean;
 
     procedure LoadStarGraphics;
+    procedure BuildGetLyricButtonHint;
   end;
 
 
@@ -436,7 +436,11 @@ var i:integer;
 begin
   PictureFrames := Nil;
   fForceChange := False;
+
+  BackUpComboBoxes(self);
   TranslateComponent (self);
+  RestoreComboboxes(self);
+
   CurrentTagObject := Nil;
   Coverpfade := TStringList.Create;
 
@@ -477,6 +481,7 @@ procedure TFDetails.FormShow(Sender: TObject);
 begin
     MainPageControl.ActivePageIndex := 0;
     MainPageControl.ActivePage := Tab_General;
+    BuildGetLyricButtonHint;
     refresh;
 end;
 
@@ -2961,17 +2966,27 @@ end;
       ManualSearch opens URL in Webbrowser
     --------------------------------------------------------
 }
+procedure TFDetails.BuildGetLyricButtonHint;
+var Prio1, Prio2: TLyricFunctionsEnum;
+begin
+    MedienBib.GetLyricPriorities(Prio1, Prio2);
+    BtnLyricWiki.Hint := Format(Hint_LyricPriorities, [GetGenericPriorityString(Prio1, Prio2)]);
+end;
+
 procedure TFDetails.BtnLyricWikiClick(Sender: TObject);
 var Lyrics: TLyrics;
     LyricString: String;
+    Prio1, Prio2: TLyricFunctionsEnum;
 begin
-        //if Fileexists(AktuellesAudioFile.Pfad)
-        //   AND (AnsiLowerCase(ExtractFileExt(AktuellesAudioFile.Pfad))='.mp3')
         if ValidMp3File or ValidOggFile or ValidFlacFile or ValidApeFile or ValidM4AFile then
         begin
             CurrentAudioFile.FileIsPresent:=True;
             Lyrics := TLyrics.Create;
             try
+                MedienBib.GetLyricPriorities(Prio1, Prio2);
+                Lyrics.SetLyricSearchPriorities(Prio1, Prio2);
+
+                // ShowMessage(Lyrics.PriorityString);
                 LyricString := Lyrics.GetLyrics(CurrentAudioFile.Artist, CurrentAudioFile.Titel);
 
                 if LyricString = '' then
@@ -3008,7 +3023,15 @@ end;
 procedure TFDetails.BtnLyricWikiManualClick(Sender: TObject);
 var LyricQuery: AnsiString;
 begin
-    LyricQuery := 'http://lyrics.wikia.com';
+    //LyricQuery := 'http://lyrics.wikia.com';
+
+    case cbLyricOptions.ItemIndex of
+        0: LyricQuery := AnsiString(BuildURL_LyricWiki(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
+        1: LyricQuery := AnsiString(BuildURL_ChartLyricsManual(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
+    else
+        LyricQuery := AnsiString(BuildURL_LyricWiki(CurrentAudioFile.Artist, CurrentAudioFile.Titel));
+    end;
+
     ShellExecuteA(Handle, 'open', PAnsiChar(LyricQuery), nil, nil, SW_SHOW);
 end;
 

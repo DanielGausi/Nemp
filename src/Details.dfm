@@ -29,14 +29,11 @@ object FDetails: TFDetails
     Top = 3
     Width = 469
     Height = 465
-    ActivePage = Tab_ExtendedID3v2
+    ActivePage = Tab_Lyrics
     Align = alTop
     DoubleBuffered = True
     ParentDoubleBuffered = False
     TabOrder = 0
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 462
     object Tab_General: TTabSheet
       Caption = 'General'
       object GrpBox_File: TGroupBox
@@ -590,7 +587,7 @@ object FDetails: TFDetails
           OnClick = Btn_OpenImageClick
         end
         object CoverBox: TComboBox
-          Left = 3
+          Left = 8
           Top = 283
           Width = 209
           Height = 21
@@ -1465,13 +1462,15 @@ object FDetails: TFDetails
           Top = 41
           Width = 89
           Height = 21
-          Caption = 'lyrics.wikia.com'
+          Caption = 'Get Lyrics'
+          ParentShowHint = False
+          ShowHint = True
           TabOrder = 1
           OnClick = BtnLyricWikiClick
         end
         object BtnLyricWikiManual: TButton
           Left = 335
-          Top = 68
+          Top = 138
           Width = 89
           Height = 21
           Caption = 'Manual search'
@@ -1489,6 +1488,19 @@ object FDetails: TFDetails
           TabOrder = 2
           OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
+        end
+        object cbLyricOptions: TComboBox
+          Left = 335
+          Top = 111
+          Width = 89
+          Height = 21
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 4
+          Text = 'LyricWiki'
+          Items.Strings = (
+            'LyricWiki'
+            'ChartLyrics')
         end
       end
       object GrpBox_Pictures: TGroupBox
@@ -1563,7 +1575,6 @@ object FDetails: TFDetails
     object Tab_ExtendedID3v2: TTabSheet
       Caption = ' Mp3- and ID3-Details'
       ImageIndex = 3
-      ExplicitWidth = 454
       object GrpBox_Mpeg: TGroupBox
         Left = 8
         Top = 8
@@ -1989,7 +2000,6 @@ object FDetails: TFDetails
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
-    ExplicitLeft = -2
     object Btn_Close: TButton
       Left = 216
       Top = 0
@@ -2024,23 +2034,6 @@ object FDetails: TFDetails
     Interval = 250
     OnTimer = Timer1Timer
     Left = 8
-    Top = 424
-  end
-  object IdHTTP1: TIdHTTP
-    AllowCookies = True
-    ProxyParams.BasicAuthentication = False
-    ProxyParams.ProxyPort = 0
-    Request.ContentLength = -1
-    Request.ContentRangeEnd = -1
-    Request.ContentRangeStart = -1
-    Request.ContentRangeInstanceLength = -1
-    Request.Accept = 'text/html, */*'
-    Request.BasicAuthentication = False
-    Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
-    Request.Ranges.Units = 'bytes'
-    Request.Ranges = <>
-    HTTPOptions = [hoForceEncodeParams]
-    Left = 116
     Top = 424
   end
   object PM_URLCopy: TPopupMenu

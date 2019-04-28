@@ -4,7 +4,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Preferences'
-  ClientHeight = 618
+  ClientHeight = 676
   ClientWidth = 665
   Color = clBtnFace
   Constraints.MinHeight = 520
@@ -30,7 +30,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
     Left = 3
     Top = 3
     Width = 659
-    Height = 580
+    Height = 638
     Align = alClient
     BevelEdges = []
     BevelOuter = bvNone
@@ -41,7 +41,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Left = 3
       Top = 3
       Width = 185
-      Height = 574
+      Height = 632
       Align = alLeft
       BevelInner = bvNone
       BevelOuter = bvNone
@@ -65,8 +65,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Left = 194
       Top = 3
       Width = 462
-      Height = 574
-      ActivePage = TabView0
+      Height = 632
+      ActivePage = TabFiles2
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -76,7 +76,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 6
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_NempUpdater: TGroupBox
           Left = 8
           Top = 134
@@ -278,7 +278,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 5
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_Hotkeys: TGroupBox
           Left = 8
           Top = 103
@@ -1145,7 +1145,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 6
         DesignSize = (
           454
-          474)
+          532)
         object Label3: TLabel
           Left = 16
           Top = 312
@@ -1294,7 +1294,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 20
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_Deskband: TGroupBox
           Left = 8
           Top = 103
@@ -1452,7 +1452,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 21
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_BetaOptions: TGroupBox
           Left = 3
           Top = 372
@@ -1840,7 +1840,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 1
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_ViewMain_Columns: TGroupBox
           Left = 8
           Top = 8
@@ -2032,7 +2032,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 19
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_ViewPartymode_Amplification: TGroupBox
           Left = 8
           Top = 8
@@ -2134,7 +2134,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 7
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_Fonts: TGroupBox
           Left = 8
           Top = 160
@@ -2365,7 +2365,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 21
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_ViewExt_NoMetadata: TGroupBox
           Left = 8
           Top = 287
@@ -2607,7 +2607,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 22
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_FilesMain_Directories: TGroupBox
           Left = 8
           Top = 8
@@ -2784,7 +2784,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 20
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_AutoRating: TGroupBox
           Left = 8
           Top = 174
@@ -2947,12 +2947,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 24
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_TabMedia3_Cover: TGroupBox
           Left = 8
           Top = 8
           Width = 439
-          Height = 149
+          Height = 113
           Hint = 'Specify, where Nemp should look for cover images.'
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Search covers in ...'
@@ -2970,7 +2970,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_CoverSearch_inSubDir: TCheckBox
             Left = 16
-            Top = 52
+            Top = 64
             Width = 201
             Height = 17
             Hint = 'Search for coverfiles in the specified subdirectory.'
@@ -2982,7 +2982,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_CoverSearch_inParentDir: TCheckBox
             Left = 16
-            Top = 36
+            Top = 42
             Width = 201
             Height = 17
             Hint = 'Search for coverfiles in the parent directory of the audiofile.'
@@ -2993,8 +2993,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_CoverSearch_inSisterDir: TCheckBox
             Left = 16
-            Top = 98
-            Width = 185
+            Top = 86
+            Width = 201
             Height = 17
             Hint = 
               'Search for coverfiles in the specified subdirectory of the paren' +
@@ -3006,16 +3006,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnClick = CB_CoverSearch_inSisterDirClick
           end
           object EDTCoverSubDirName: TEdit
-            Left = 36
-            Top = 72
+            Left = 223
+            Top = 62
             Width = 105
             Height = 21
             TabOrder = 3
             Text = 'cover'
           end
           object EDTCoverSisterDirName: TEdit
-            Left = 34
-            Top = 118
+            Left = 223
+            Top = 84
             Width = 105
             Height = 21
             TabOrder = 5
@@ -3024,16 +3024,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_Files_Cover_LastFM: TGroupBox
           Left = 8
-          Top = 162
+          Top = 120
           Width = 439
-          Height = 87
+          Height = 55
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Online cover'
           TabOrder = 1
           object CB_CoverSearch_LastFM: TCheckBox
             Left = 16
             Top = 20
-            Width = 404
+            Width = 305
             Height = 17
             Hint = 'Allow Nemp downloading missing cover files from the internet'
             Caption = 'Try to get missing covers from LastFM'
@@ -3042,8 +3042,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 0
           end
           object BtnClearCoverCache: TButton
-            Left = 38
-            Top = 43
+            Left = 327
+            Top = 16
             Width = 99
             Height = 25
             Hint = 'Clear the list of unsuccessfully checked covers'
@@ -3053,10 +3053,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
         object GrpBox_Files_Cover_Default: TGroupBox
-          Left = 8
-          Top = 253
-          Width = 431
-          Height = 203
+          Left = 12
+          Top = 175
+          Width = 439
+          Height = 194
           Caption = 'Default cover'
           TabOrder = 2
           object lbl_DefaultCover: TLabel
@@ -3106,13 +3106,63 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnClick = btn_DefaultCoverResetClick
           end
         end
+        object GrpBoxLyrcSettings: TGroupBox
+          Left = 8
+          Top = 375
+          Width = 439
+          Height = 138
+          Caption = 'Online search for Lyrics'
+          TabOrder = 3
+          object LblLyricPriorities: TLabel
+            Left = 16
+            Top = 79
+            Width = 409
+            Height = 42
+            AutoSize = False
+            Caption = 
+              'Select the websites you want to download lyrics from. Use the ar' +
+              'row buttons to change priority. Double-Click an entry to visit t' +
+              'he website for more information.'
+            WordWrap = True
+          end
+          object VSTLyricSettings: TVirtualStringTree
+            Left = 16
+            Top = 20
+            Width = 241
+            Height = 53
+            Header.AutoSizeIndex = 0
+            Header.Options = [hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
+            TabOrder = 0
+            TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
+            TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+            OnChecked = VSTLyricSettingsChecked
+            OnGetText = VSTLyricSettingsGetText
+            OnInitNode = VSTLyricSettingsInitNode
+            OnNodeDblClick = VSTLyricSettingsNodeDblClick
+            Columns = <
+              item
+                Position = 0
+                Text = 'SearchMethod'
+                Width = 200
+              end>
+          end
+          object BtnLyricPriorities: TUpDown
+            Left = 263
+            Top = 20
+            Width = 26
+            Height = 41
+            Position = 50
+            TabOrder = 1
+            OnClick = BtnLyricPrioritiesClick
+          end
+        end
       end
       object TabFiles3: TTabSheet
         Caption = 'Files (Search)'
         ImageIndex = 25
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_TabMedia4_GlobalSearchOptions: TGroupBox
           Left = 8
           Top = 8
@@ -3269,7 +3319,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 23
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_TabMedia5_Charsets: TGroupBox
           Left = 8
           Top = 66
@@ -3427,7 +3477,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 2
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_Devices: TGroupBox
           Left = 8
           Top = 8
@@ -3636,7 +3686,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 22
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_ExtendedAudio: TGroupBox
           Left = 8
           Top = 8
@@ -3797,7 +3847,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 19
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_PlaylistBehaviour: TGroupBox
           Left = 8
           Top = 8
@@ -4001,7 +4051,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 23
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_WebradioRecording: TGroupBox
           Left = 8
           Top = 88
@@ -4190,7 +4240,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 15
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_MickyMouse: TRadioGroup
           Left = 8
           Top = 8
@@ -4321,7 +4371,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 19
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_TabAudio7_Countdown: TGroupBox
           Left = 8
           Top = 174
@@ -4494,7 +4544,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 17
         DesignSize = (
           454
-          474)
+          532)
         object GrpBox_Scrobble: TGroupBox
           Left = 8
           Top = 8
@@ -4845,7 +4895,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         ImageIndex = 18
         DesignSize = (
           454
-          474)
+          532)
         object GrpBoxConfig: TGroupBox
           Left = 8
           Top = 8
@@ -5131,7 +5181,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
   object Panel2: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 589
+    Top = 647
     Width = 659
     Height = 26
     Align = alBottom
@@ -5195,23 +5245,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
   object OpenDlg_DefaultCover: TOpenPictureDialog
     Left = 112
     Top = 376
-  end
-  object IDHttpWebServerGetIP: TIdHTTP
-    AllowCookies = True
-    ProxyParams.BasicAuthentication = False
-    ProxyParams.ProxyPort = 0
-    Request.ContentLength = -1
-    Request.ContentRangeEnd = -1
-    Request.ContentRangeStart = -1
-    Request.ContentRangeInstanceLength = -1
-    Request.Accept = 'text/html, */*'
-    Request.BasicAuthentication = False
-    Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
-    Request.Ranges.Units = 'bytes'
-    Request.Ranges = <>
-    HTTPOptions = [hoForceEncodeParams]
-    Left = 48
-    Top = 16
   end
   object OpenDlg_SoundFont: TOpenDialog
     Filter = 'Soundfonts (sf2/sf2pack)|*.sf2;*.sf2pack|All files|*.*'

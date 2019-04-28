@@ -239,7 +239,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerRandom      = 'Random playback';
 
     OptionsTree_FilesMain         = 'File management';
-    OptionsTree_FilesCover        = 'Cover';
+    OptionsTree_FilesCover        = 'Cover & Lyrics';
 
 
     OptionsTree_ExtendedMain      = 'Extended settings';
@@ -942,6 +942,9 @@ Warning_LyricsUsage = 'Ignoring lyrics will remove all collected lyrics from the
 
 //MediaLibrarySize_Summary = 'Estimated library size: %s';
 
+Options_LyricPriority_LYRICWIKI   = 'LyricWiki (recommended)';
+Options_LyricPriority_CHARTLYRICS = 'ChartLyrics (beta)';
+Hint_LyricPriorities              = 'Search online for lyrics. Current settings: '+ #13#10 + '%s';
 
 implementation
 

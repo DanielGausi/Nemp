@@ -78,8 +78,6 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    procedure BackupComboboxes;
-    procedure RestoreComboboxes;
 
     procedure WndProc(var Msg: TMessage); override;
   end;
@@ -407,9 +405,9 @@ procedure TPlaylistCopyForm.FormCreate(Sender: TObject);
 var Ini: TMeminiFile;
     tmpPattern: Integer;
 begin
-    BackupComboboxes;
+    BackupComboboxes(self);
     TranslateComponent (self);
-    RestoreComboboxes;
+    RestoreComboboxes(self);
 
     EditDirectory.Text := GetUSBDrive;
 
@@ -445,20 +443,6 @@ begin
     BtnCopyFiles.Tag := 0;
 end;
 
-procedure TPlaylistCopyForm.BackupComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-        if (Components[i] is TComboBox) then
-            Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-procedure TPlaylistCopyForm.RestoreComboboxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-        if (Components[i] is TComboBox) then
-            (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-end;
 
 procedure TPlaylistCopyForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);

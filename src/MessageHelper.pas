@@ -1073,9 +1073,9 @@ begin
         ST_PlaylistDownloadConnecting: begin
                                   PlayListStatusLBL.Caption := Shoutcast_Connecting_MainForm;
                                end;
-        ST_PlaylistDownloadBegins: begin
-                                  PlayListStatusLBL.Caption := Shoutcast_DownloadingPlaylist;
-                               end;
+        //ST_PlaylistDownloadBegins: begin
+        //                          PlayListStatusLBL.Caption := Shoutcast_DownloadingPlaylist;
+        //                       end;
         ST_PlaylistDownloadComplete : begin
                                   s := PAnsiChar(aMsg.LParam);
                                   //FS := Nil;
@@ -1612,20 +1612,20 @@ begin
         end;
         SC_ScrobblingSkipped: begin
             NempPlayer.NempScrobbler.LogList.Add(Format(ScrobblingSkipped, [Integer(aMsg.LParam)]));
-            AddErrorLog('Scrobbler:'#13#10 + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
+            AddErrorLog('Scrobbler: ' + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
             if not NempPlayer.NempScrobbler.IgnoreErrors then
                 MessageDlg(Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]), mtWarning, [mbOK], 0);
         end;
         SC_ScrobblingSkippedAgain : begin
             // no Messagebox here
             NempPlayer.NempScrobbler.LogList.Add(Format(ScrobblingSkipped, [Integer(aMsg.LParam)]));
-            AddErrorLog('Scrobbler:'#13#10 + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
+            AddErrorLog('Scrobbler: ' + Format(ScrobbleFailureWait, [Integer(aMsg.LParam)]));
         end;
 
         SC_InvalidSessionKey: begin
             NempPlayer.NempScrobbler.DoScrobble := False;
             ReArrangeToolImages;
-            AddErrorLog('Scrobbler:'#13#10 + 'LastFM Session Key is missing or invalid');
+            AddErrorLog('Scrobbler: ' + 'LastFM Session Key is missing or invalid');
 
             if not NempPlayer.NempScrobbler.IgnoreErrors then
             begin
@@ -1645,12 +1645,18 @@ begin
 
         SC_UnknownScrobbleError: begin
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            AddErrorLog('Scrobbler:'#13#10 + Scrobble_UnkownError);
+            AddErrorLog('Scrobbler: ' + Scrobble_UnkownError);
             NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
         end;
         SC_IndyException: begin
             NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
-            AddErrorLog('Scrobbler:'#13#10 + Scrobble_ConnectError);
+            AddErrorLog('Scrobbler: ' + Scrobble_ConnectError);
+            NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
+        end;
+
+        SC_ProtocolError: begin
+            NempPlayer.NempScrobbler.LogList.Add(PChar(aMsg.LParam));
+            AddErrorLog('Scrobbler: ' + Scrobble_ProtocolError);
             NempPlayer.NempScrobbler.ScrobbleAgain(NempPlayer.Status = PLAYER_ISPLAYING);
         end;
 
@@ -1660,7 +1666,7 @@ begin
             NempPlayer.NempScrobbler.DoScrobble := False;
             ReArrangeToolImages;
 
-            AddErrorLog('Scrobbler:'#13#10 + ScrobbleException);
+            AddErrorLog('Scrobbler: ' + ScrobbleException);
             if not NempPlayer.NempScrobbler.IgnoreErrors then
                 MessageDlg(ScrobbleException, mtWarning, [mbOK], 0);
         end;
