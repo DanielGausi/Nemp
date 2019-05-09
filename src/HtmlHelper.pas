@@ -44,7 +44,9 @@ function GetURLAsHttpResponse(const AURL: string): IHttpResponse;
 function WordUppercase(s: String; newDelimiter: Char ='_'): String;
 function ReplaceGeneralEntities(s: String): String;
 function EscapeHTMLChars(s: String): String;
-function StringToURLStringAnd(aUTF8String: UTF8String): String;
+// function StringToURLStringAnd(aUTF8String: UTF8String): String;
+function URLEncode_LastFM(const ASrc: String): String;
+
 function URLEncode_LyricWiki(const ASrc: String): String;
 function URLEncode_ChartLyricsManual(const ASrc: String): String;
 
@@ -72,9 +74,7 @@ begin
 end;
 
 function WordUppercase(s: String; newDelimiter: Char ='_'): String;
-var
-    i: Integer;
-    tmp: String;
+var i: Integer;
 begin
     s := AnsiLowerCase(s);
     result := s;
@@ -85,9 +85,10 @@ begin
         for i := 0 to Count-1 do
             if (Strings[i] <> '') then
             begin
-                tmp := Strings[i];
-                tmp[1] := Upcase(tmp[1]);
-                Strings[i] := tmp;
+                CharUpperBuff(PChar(Strings[i]), 1);
+                //tmp := Strings[i];
+                //tmp := Upcase(tmp);
+                //Strings[i] := tmp;
             end;
         Delimiter := newDelimiter; //'_';//#32;
         result := DelimitedText;
@@ -218,17 +219,37 @@ begin
 end;
 
 
-function StringToURLStringAnd(aUTF8String: UTF8String): String;
+{function StringToURLStringAnd(aUTF8String: UTF8String): String;
 var i: integer;
 begin
     result := '';
     for i := 1 to length(aUTF8String) do
         result := result + '%'  + IntToHex(Ord(aUTF8String[i]),2);
+end;}
+
+function URLEncode_LastFM(const ASrc: String): String;
+var i, j: Integer;
+    s: UTF8String;
+begin
+    Result := '';
+  for i := 1 to Length(ASrc) do
+    case ASrc[i] of
+      // ' ': Result := Result + '_';
+      'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
+      else
+      begin
+          s := UTF8String(ASrc[i]);
+          for j := 1 to Length(s) do
+              Result := Result + '%' + IntToHex(Ord(s[j]), 2);
+      end;
+      // Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+    end;
 end;
 
 function URLEncode_LyricWiki(const ASrc: String): String;
   var
-    i: Integer;
+    i,j: Integer;
+    s: UTF8String;
 begin
   Result := '';
   for i := 1 to Length(ASrc) do
@@ -236,13 +257,19 @@ begin
       ' ': Result := Result + '_';
       'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
       else
-      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+      begin
+          //Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+          // URL-encoded UTF8-encoding of this char
+          s := UTF8String(ASrc[i]);
+          for j := 1 to Length(s) do
+              Result := Result + '%' + IntToHex(Ord(s[j]), 2);
+      end;
     end;
 end;
 
 function URLEncode_ChartLyricsManual(const ASrc: String): String;
-  var
-    i: Integer;
+var i,j: Integer;
+    s: UTF8String;
 begin
   Result := '';
   for i := 1 to Length(ASrc) do
@@ -250,7 +277,14 @@ begin
       ' ': Result := Result + '+';
       'A'..'Z', 'a'..'z', '0'..'9': Result := Result + ASrc[i];
       else
-      Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+      begin
+          //Result := Result + '%' + IntToHex(Ord(ASrc[i]), 2);
+          // URL-encoded UTF8-encoding of this char
+          s := UTF8String(ASrc[i]);
+          for j := 1 to Length(s) do
+              Result := Result + '%' + IntToHex(Ord(s[j]), 2);
+      end;
+
     end;
 end;
 

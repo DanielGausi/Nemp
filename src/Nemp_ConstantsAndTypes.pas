@@ -411,6 +411,12 @@ const
     // Liste abgearbeitet
     MB_LyricUpdateComplete = 20;
 
+    MB_CurrentProcessFailCount = 46;
+    MB_CurrentProcessSuccessCount = 47;
+
+    MB_StartLongerProcess = 48;
+    MB_ProgressShowHint = 49;  // LParam: String to display
+
     // Search the playlist for a filename and set the ratings
     MB_UnifyPlaylistRating = 22;
 

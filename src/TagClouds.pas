@@ -1614,9 +1614,6 @@ begin
             // nor Tags any more
             af.RawTagLastFM := '';
         }
-
-
-        //ShowMessage((af.RawTagLastFM));
     end;
     aTag.AudioFiles.Clear;
 end;

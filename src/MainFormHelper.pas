@@ -60,7 +60,7 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
     procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
 
-    function GetObjectAt(form: TForm; x,y: integer): TControl;
+    // function GetObjectAt(form: TForm; x,y: integer): TControl;
     function ObjectIsPlaylist(aName:string): Boolean;
     function ObjectIsHeadphone(aName:string): Boolean;
 
@@ -138,7 +138,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
-    PlayerLog, Hilfsfunktionen;
+    PlayerLog, progressUnit, Hilfsfunktionen;
 
 procedure CorrectVolButton;
 begin
@@ -474,13 +474,13 @@ begin
 end;
 
 
-
+{
 function GetObjectAt(form: TForm; x,y: integer): TControl;
 var
  i: integer;
 begin
  result := nil;
- for i := 0 to form.ComponentCount-1 do
+for i := 0 to form.ComponentCount-1 do
   if form.Components[i] is TControl then        // is TControl
     if PtInRect(
         Rect(TControl(form.Components[i]).ClientToScreen(TControl(form.Components[i]).clientrect.TopLeft),
@@ -488,7 +488,9 @@ begin
               point(x,y))
         then
               result := TControl(form.Components[i]);
+
 end;
+}
 
 function ObjectIsPlaylist(aName:string): Boolean;
 begin
@@ -1031,6 +1033,7 @@ begin
         ReTranslateComponent (PlaylistForm    );
         ReTranslateComponent (AuswahlForm     );
         ReTranslateComponent (MedienlisteForm );
+        ReTranslateComponent (ProgressForm    );
 
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );

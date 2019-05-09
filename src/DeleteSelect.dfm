@@ -1,12 +1,12 @@
 object DeleteSelection: TDeleteSelection
   Left = 0
   Top = 0
-  Caption = 'Select the files to be removed'
-  ClientHeight = 262
-  ClientWidth = 604
+  Caption = 'Nemp: Cleanup media library'
+  ClientHeight = 428
+  ClientWidth = 684
   Color = clBtnFace
-  Constraints.MinHeight = 300
-  Constraints.MinWidth = 620
+  Constraints.MinHeight = 400
+  Constraints.MinWidth = 700
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -19,106 +19,53 @@ object DeleteSelection: TDeleteSelection
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    604
-    262)
+    684
+    428)
   PixelsPerInch = 96
   TextHeight = 13
-  object LblDrives: TLabel
-    Left = 8
-    Top = 8
-    Width = 112
-    Height = 13
-    Caption = 'Drives with missing files'
-  end
   object LblFiles: TLabel
     Left = 8
-    Top = 96
+    Top = 213
     Width = 433
     Height = 13
     Caption = 
       'Missing files on the selected drive (will be removed from the li' +
       'brary, if the drive is checked)'
   end
-  object DriveImage: TImage
-    Left = 532
-    Top = 27
-    Width = 64
-    Height = 64
-    Anchors = [akTop, akRight]
-  end
-  object LblExplaination: TLabel
-    Left = 167
-    Top = 24
-    Width = 9
-    Height = 13
-    Caption = '...'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object LblWhatToDo: TLabel
-    Left = 167
-    Top = 57
-    Width = 359
-    Height = 27
-    Anchors = [akLeft, akTop, akRight]
+  object lblMainExplanation: TLabel
+    Left = 96
+    Top = 8
+    Width = 576
+    Height = 65
     AutoSize = False
     Caption = '...'
     WordWrap = True
   end
-  object LblExplaination2: TLabel
-    Left = 167
-    Top = 40
-    Width = 9
-    Height = 13
-    Caption = '...'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'Tahoma'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object MemoFiles: TMemo
-    Left = 9
-    Top = 115
-    Width = 587
-    Height = 108
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    ReadOnly = True
-    ScrollBars = ssVertical
-    TabOrder = 0
-    WordWrap = False
-  end
-  object cbDrives: TCheckListBox
-    Left = 8
-    Top = 24
-    Width = 153
-    Height = 66
-    ItemHeight = 13
-    TabOrder = 1
-    OnClick = cbDrivesClick
+  object HintImage: TImage
+    Left = 17
+    Top = 8
+    Width = 64
+    Height = 64
+    ParentShowHint = False
+    ShowHint = True
   end
   object BtnOk: TButton
-    Left = 410
-    Top = 229
-    Width = 104
-    Height = 25
+    Left = 490
+    Top = 373
+    Width = 186
+    Height = 47
     Hint = 'Remove missing files from checked drives'
     Anchors = [akRight, akBottom]
-    Caption = 'Remove files'
+    Caption = 'Cleanup library'
     Default = True
     ModalResult = 1
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 2
+    TabOrder = 0
   end
   object Btncancel: TButton
-    Left = 521
-    Top = 229
+    Left = 409
+    Top = 395
     Width = 75
     Height = 25
     Hint = 'Cancel - do not remove any files from the library'
@@ -128,25 +75,164 @@ object DeleteSelection: TDeleteSelection
     ModalResult = 2
     ParentShowHint = False
     ShowHint = True
-    TabOrder = 3
+    TabOrder = 1
   end
   object BtnHelp: TButton
     Left = 8
-    Top = 229
+    Top = 395
     Width = 75
     Height = 25
     Anchors = [akLeft, akBottom]
     Caption = 'Help'
-    TabOrder = 4
+    TabOrder = 2
     OnClick = BtnHelpClick
+  end
+  object Panel1: TPanel
+    Left = 8
+    Top = 232
+    Width = 668
+    Height = 135
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    BevelOuter = bvNone
+    TabOrder = 3
+    object Splitter1: TSplitter
+      Left = 429
+      Top = 0
+      Height = 135
+      Align = alRight
+      ExplicitLeft = 383
+      ExplicitHeight = 179
+    end
+    object VSTPlaylistFiles: TVirtualStringTree
+      Left = 432
+      Top = 0
+      Width = 236
+      Height = 135
+      Align = alRight
+      Header.AutoSizeIndex = 0
+      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+      Indent = 0
+      TabOrder = 0
+      TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+      OnGetText = VSTPlaylistFilesGetText
+      Columns = <
+        item
+          Position = 0
+          Text = 'Playlists on the selected drive'
+          Width = 232
+        end>
+    end
+    object VSTFiles: TVirtualStringTree
+      Left = 0
+      Top = 0
+      Width = 429
+      Height = 135
+      Align = alClient
+      Header.AutoSizeIndex = 0
+      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+      Indent = 0
+      TabOrder = 1
+      TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+      OnGetText = VSTFilesGetText
+      Columns = <
+        item
+          Position = 0
+          Text = 'Audio files on the selected drive'
+          Width = 425
+        end>
+    end
+  end
+  object grpBoxDrives: TGroupBox
+    Left = 8
+    Top = 88
+    Width = 662
+    Height = 113
+    Caption = 'Affected drives'
+    TabOrder = 4
+    DesignSize = (
+      662
+      113)
+    object DriveImage: TImage
+      Left = 583
+      Top = 24
+      Width = 64
+      Height = 64
+      Anchors = [akTop, akRight]
+    end
+    object LblExplaination: TLabel
+      Left = 175
+      Top = 24
+      Width = 9
+      Height = 13
+      Caption = '...'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object LblWhatToDo: TLabel
+      Left = 175
+      Top = 59
+      Width = 402
+      Height = 27
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = '...'
+      WordWrap = True
+    end
+    object LblExplaination2: TLabel
+      Left = 175
+      Top = 40
+      Width = 9
+      Height = 13
+      Caption = '...'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object cbDrives: TCheckListBox
+      Left = 368
+      Top = 24
+      Width = 209
+      Height = 74
+      ItemHeight = 13
+      TabOrder = 0
+    end
+    object VSTDrives: TVirtualStringTree
+      Left = 3
+      Top = 24
+      Width = 184
+      Height = 76
+      DefaultNodeHeight = 32
+      Header.AutoSizeIndex = 0
+      Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
+      Indent = 0
+      TabOrder = 1
+      TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
+      TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
+      OnChange = VSTDrivesChange
+      OnChecked = VSTDrivesChecked
+      OnGetText = VSTDrivesGetText
+      Columns = <
+        item
+          Position = 0
+          Text = 'Files'
+          Width = 180
+        end>
+    end
   end
   object ImageList1: TImageList
     Height = 64
     Width = 64
-    Left = 288
-    Top = 168
+    Left = 496
+    Top = 80
     Bitmap = {
-      494C010108002800680040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010108002800040040004000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000000010000C000000001002000000000000000
       0300000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

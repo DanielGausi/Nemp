@@ -41,7 +41,7 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
-  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math,
+  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
   MP3FileUtils, ID3v2Frames, NempAudioFiles, Nemp_ConstantsAndTypes,
   cddaUtils, basscd;
 
@@ -152,6 +152,10 @@ type
   procedure ClearRandomCover;
   // Paint a custumized cover "Your Library", using Cover in RandomCoverList
   procedure PaintPersonalMainCover(aCoverBmp: TBitmap);
+
+
+  // returns true, iff a preview-graphic for this ID should be already stored in the Cover-Save-Directory
+  function PreviewGraphicShouldExist(aCoverID: String): Boolean;
 
 
 implementation
@@ -1087,6 +1091,13 @@ begin
     end;
 
     LeaveCriticalSection(CSAccessRandomCoverlist);
+end;
+
+function PreviewGraphicShouldExist(aCoverID: String): Boolean;
+begin
+    // we use a "_" at the beginning of a cover ID to indicate a "missing cover",
+    // i.e. no cover art have been found so far
+    result := (Length(aCoverID) > 1) and (aCoverID[1] <> '_');
 end;
 
 initialization

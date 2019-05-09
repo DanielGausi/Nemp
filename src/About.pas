@@ -38,7 +38,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, 
   Dialogs, jpeg, ExtCtrls, StdCtrls, ShellApi, Nemp_ConstantsAndTypes, gnuGettext,
-  Nemp_RessourceStrings, Credits, ImgList, System.ImageList;
+  Nemp_RessourceStrings, Credits, ImgList, System.ImageList,System.UITypes;
 
 type
   TAboutForm = class(TForm)

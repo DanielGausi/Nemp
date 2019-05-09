@@ -88,7 +88,7 @@ uses
   CWString,
 {$endif}
 {$endif}
-  Classes, StrUtils, SysUtils, TypInfo;
+  Classes, StrUtils, SysUtils, TypInfo, AnsiStrings;
 
 (*****************************************************************************)
 (*                                                                           *)
@@ -529,7 +529,7 @@ begin
   Assert (sLinebreak=ansistring(#13#10));
   i:=1;
   while i<=length(s) do begin
-    if (s[i]=#10) and (MidStr(s,i-1,1)<>#13) then begin
+    if (s[i]=#10) and (AnsiStrings.MidStr(s,i-1,1)<>#13) then begin
       insert (#13,s,i);
       inc (i,2);
     end else
@@ -1623,10 +1623,10 @@ begin
             tkString, tkLString :
               old := GetStrProp(AnObject, PropName);
             tkWString :
-              old := GetWideStrProp(AnObject, PropName);
+              old := GetStrProp(AnObject, PropName);
             {$IFDEF UNICODE}
             tkUString :
-              old := GetUnicodeStrProp(AnObject, PropName);
+              old := GetStrProp(AnObject, PropName);   // Get{Unicode}StrPop
             {$ENDIF}
           else
             raise Exception.Create ('Internal error: Illegal property type. This problem needs to be solved by a programmer, try to find a workaround.');
@@ -2397,7 +2397,7 @@ begin
   for i:=0 to 43 do
     s[i+1]:=arrch[i];
 
-  s:=MidStr(s,length(s)-7,8);
+  s:=AnsiStrings.MidStr(s,length(s)-7,8);
   offset:=0;
   for i:=8 downto 1 do
     offset:=offset shl 8+ord(s[i]);  
@@ -2408,7 +2408,7 @@ begin
     fs:=TFileStream.Create(ExecutableFilename,fmOpenRead or fmShareDenyNone);
     try
       while true do begin
-        fs.Seek(offset,soFromBeginning);
+        fs.Seek(offset,soBeginning);
         offset:=ReadInt64(fs);
         if offset=0 then
           exit;

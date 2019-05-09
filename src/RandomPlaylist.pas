@@ -636,7 +636,7 @@ begin
               if cbGenres.Checked[i] then
                   tmpTagList.Add(cbGenres.Items.Objects[i]);
           if tmpTagList.Count > 0 then
-              Medienbib.PlaylistFillOptions.WantedTags := tmpTagList
+              Medienbib.PlaylistFillOptions.WantedTags := tmpTagList    // !!!!!
           else
               Medienbib.PlaylistFillOptions.Wantedtags := Nil;
 

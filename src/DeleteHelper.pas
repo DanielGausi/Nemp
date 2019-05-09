@@ -13,6 +13,7 @@ type
         public
             DriveString : String;    // i.e. "c:\" or "\\MyOtherPC\"
             DoDelete    : Boolean;   // User-Input
+            DriveType   : String ;   // 'Removable drive', 'Harddisk', 'Shared directory', ...
             Hint: TDeleteHint;                      // ... and why?
             Files: TObjectList;
             PlaylistFiles: TObjectList;

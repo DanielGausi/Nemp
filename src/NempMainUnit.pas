@@ -56,7 +56,7 @@ uses
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
   //dwTaskbarComponents, dwTaskbarThumbnails,
   UpdateUtils, uDragFilesSrc, PlayWebstream,
-
+  ClassicCoverFlowClass,
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection,
   System.ImageList, System.Types, System.UITypes
@@ -900,9 +900,8 @@ type
     procedure DatenbankUpdateTBClick(Sender: TObject);
 
     procedure HandleFiles(aList: TObjectList; how: integer);
-    procedure GenerateListForHandleFiles(aList: TObjectList; what: integer);
-    procedure DoFreeFilesInHandleFilesList(aList: TObjectList);
-                  
+    procedure GenerateListForHandleFiles(aList: TObjectList; what: integer; OnlyTemporaryFiles: Boolean);
+
     procedure EnqueueTBClick(Sender: TObject);
     procedure PM_ML_PlayClick(Sender: TObject);
     function GetFocussedAudioFile:TAudioFile;
@@ -1482,8 +1481,6 @@ type
     OldScrollbarWindowProc: TWndMethod;
     OldLyricMemoWindowProc: TWndMethod;
 
-    FreeFilesInHandleFilesList: Boolean;
-
     // Speichert den Slidebutton, der gerade gedraggt wird
     DraggingSlideButton: TSkinButton;
 
@@ -1756,32 +1753,33 @@ begin
       if (abs(X - TagCloudDownX) > 5) or  (abs(Y - TagCloudDownY) > 5) then
       begin
           Dateiliste := TObjectlist.Create(False);
-          GenerateListForHandleFiles(DateiListe, 4);
-          DragSource := DS_VST;
-          with DragFilesSrc1 do
-          begin
-              // Add files selected to DragFilesSrc1 list
-              ClearFiles;
-              DragDropList.Clear;
-
-              maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
-
-              //if DateiListe.Count > MAX_DRAGFILECOUNT then
-              //begin
-              //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
-              //  FreeAndNil(Dateiliste);
-              //  exit;
-              //end;
-              for i:=0 to maxC do
+          try
+              GenerateListForHandleFiles(DateiListe, 4, True);
+              DragSource := DS_VST;
+              with DragFilesSrc1 do
               begin
-                  AddFile((Dateiliste[i] as TAudiofile).Pfad);
-                  DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+                  // Add files selected to DragFilesSrc1 list
+                  ClearFiles;
+                  DragDropList.Clear;
+                  maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
+
+                  //if DateiListe.Count > MAX_DRAGFILECOUNT then
+                  //begin
+                  //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
+                  //  FreeAndNil(Dateiliste);
+                  //  exit;
+                  //end;
+                  for i:=0 to maxC do
+                  begin
+                      AddFile((Dateiliste[i] as TAudiofile).Pfad);
+                      DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+                  end;
+                  // This is the START of the drag (FROM) operation.
+                  Execute;
               end;
-              // This is the START of the drag (FROM) operation.
-              Execute;
+          finally
+              FreeAndNil(Dateiliste);
           end;
-          if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-          FreeAndNil(Dateiliste);
       end;
     end
     else
@@ -2275,7 +2273,7 @@ procedure TNemp_MainForm.NewSelected (Var Msg: TMessage);
 var aCover: tNempCover;
 begin
     CoverScrollBar.OnChange := Nil;
-    if CoverScrollbar.Position <> Msg.WParam then
+    if CoverScrollbar.Position <> Integer(Msg.WParam) then
     begin
         CoverScrollbar.Position := Msg.WParam;
         if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
@@ -2295,11 +2293,13 @@ begin
     CoverScrollbar.OnChange := CoverScrollbarChange;
 end;
 
+
 procedure TNemp_MainForm.NeedPreview (var msg : TWMFCNeedPreview);
 var
     aCover: tNempCover;
     bmp: TBitmap;
     success: Boolean;
+    dummyAudioFile: TAudioFile;
 begin
   if NempIsClosing then exit;
 
@@ -2313,12 +2313,37 @@ begin
       begin
           aCover := TNempCover(MedienBib.CoverList[msg.Index]);
 
-          success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
+          case MedienBib.NewCoverFlow.Mode of
+              cm_Classic: success := False; // we already failed during the painting process
+              cm_OpenGL : success := GetCoverBitmapFromID(aCover.ID, bmp, MedienBib.CoverSavePath);
+          else
+              success := True; // we are not in CoverflowMode at all, should not happen
+          end;
+
+          if (not success) and PreviewGraphicShouldExist(aCover.ID) then
+          begin
+              // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
+              // try to recreate it from the image files already existing on the disc/id3Tag
+              dummyAudioFile := TAudioFile.Create;
+              try
+                  dummyAudioFile.Pfad := IncludeTrailingPathDelimiter(aCover.Directory) + 'foo.bar';
+                  MedienBib.InitCover(dummyAudioFile, True);
+                  // try again getting the coverbitmap
+                  success := GetCoverBitmapFromID(dummyAudioFile.CoverID, bmp, MedienBib.CoverSavePath);
+                  // if we found an image, but the ID has changed: Change it on the other files with that ID as well
+                  if (dummyAudioFile.CoverID <> aCover.ID) then
+                  begin
+                      MedienBib.ChangeCoverID(aCover.ID, dummyAudioFile.CoverID);
+                      if  MedienBib.NewCoverFlow.CurrentCoverID = aCover.ID then
+                          MedienBib.NewCoverFlow.CurrentCoverID := dummyAudioFile.CoverID;
+                      aCover.ID := dummyAudioFile.CoverID;
+                  end;
+              finally
+                  dummyAudioFile.Free;
+              end;
+          end;
+
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
-
-          //if (not success) then
-          //    CheckAndDoCoverDownloaderQuery;
-
           if (not success) and (MedienBib.CoverSearchLastFM) then
               Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
       end;
@@ -2837,14 +2862,16 @@ end;
 
 Procedure TNemp_MainForm.WMDropFiles (Var aMsg: tMessage);
 Var
-  p: TPoint;
-  o: TControl;
+  o: TWinControl;
+
 Begin
     Inherited;
-    p := (mouse.CursorPos);
-    o := GetObjectAt(self, p.x,p.y);
+    o := FindVCLWindow(Mouse.CursorPos);
+
     if not assigned(o) then
       exit;
+
+    Caption := O.Name;
 
     if ObjectIsPlaylist(o.Name) then
         Handle_DropFilesForPlaylist(aMsg)
@@ -3310,6 +3337,15 @@ begin
     MedienBib.DeleteFilesUpdateBib;
 end;
 
+{
+  -------------------
+  HandleFiles
+  -------------------
+    Add some files to the Playlist.
+    The file in aList a *Copies* of Files in the medialibrary (or otherwise not connected to the library)
+    Adding these one by one (with Application.ProcessMessages) should be ok, even if
+    the library is currently updating (collecting new files, deleting files, ...)
+}
 procedure TNemp_MainForm.HandleFiles(aList: TObjectList; how: integer);
 var i:integer;
     Abspielen: Boolean;
@@ -3357,45 +3393,58 @@ begin
     ContinueWithPlaylistAdding := True;
 
     // weitere Dateien einfügen
-    for i:=1 to iMax do
+    for i := 1 to iMax do
     begin
-      ///// (aList[i] as TAudiofile).ReCheckExistence;
-      ///  it should be enough, when this is done when the user actually select the file in the playlist.
+          if ContinueWithPlaylistAdding then
+              tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]))
+          else
+              // free the remaining Audiofiles. They are not needed any more
+              TAudiofile(aList[i]).Free;
 
-      tmp := NempPlaylist.InsertFileToPlayList(TAudiofile(aList[i]));
-      if i Mod 100 = 0 then
-      begin
-          PlayListVST.ScrollIntoView( tmp, False, True);
-          Application.ProcessMessages;
-      end;
-      if Not ContinueWithPlaylistAdding then break;
+          if (i Mod 100 = 0) and ContinueWithPlaylistAdding then
+          begin
+              PlayListVST.ScrollIntoView( tmp, False, True);
+              Application.ProcessMessages;
+          end;
+          // if Not ContinueWithPlaylistAdding then break; // No, we have to free the rest of the list now (2019)
     end;
-
     ContinueWithPlaylistAdding := False;
 end;
 
-procedure TNemp_MainForm.GenerateListForHandleFiles(aList: tObjectList; what: integer);
+{
+    --------------------------
+    GenerateListForHandleFiles
+    --------------------------
+    OnlyTemporaryFiles: FileList is only temporaty used to create a proper FileNameList
+    for a Drag&Drop- or Copy&Paste-Operation, and not actually used for a later call
+    of "HandleFiles(aList)".
+    so:  OnlyTemporaryFiles = True:  Store only references of existing audiofiles in aList
+         OnlyTemporaryFiles = False: Store new created copies of audiofiles in aList
+}
+procedure TNemp_MainForm.GenerateListForHandleFiles(aList: tObjectList; what: integer; OnlyTemporaryFiles: Boolean);
 var i: integer;
   DataS: PStringTreeData;
   DataA: PTreeData;
   aNode: PVirtualNode;
   artist, album: UnicodeString;
   SelectedMp3s: TNodeArray;
+  tmpFileList: TObjectList;
 begin
   SelectedMP3s := Nil;
   case what of
       0: begin // Quelle ist der VST
-          FreeFilesInHandleFilesList := False;
           SelectedMP3s := VST.GetSortedSelection(False);
           for i:=0 to length(SelectedMP3s)-1 do
           begin
               DataA := VST.GetNodeData(SelectedMP3s[i]);
-              aList.Add(DataA^.FAudioFile)
+              if OnlyTemporaryFiles then
+                  aList.Add(DataA^.FAudioFile)
+              else
+                  DataA^.FAudioFile.AddCopyToList(aList);
           end;
           // Nicht sortieren
       end;
       1: begin  // Artists
-          FreeFilesInHandleFilesList := False;
           aNode := ArtistsVST.FocusedNode;
           if assigned(aNode) then
           begin
@@ -3404,10 +3453,21 @@ begin
                AND (TJustAstring(DataS^.FString).DataString <> BROWSE_RADIOSTATIONS)
             then
             begin
-                MedienBib.GetTitelList(aList, TJustAstring(DataS^.FString).DataString, BROWSE_ALL);
-                // Sortieren
-                if aList.Count <= 5000 then
-                    aList.Sort(Sortieren_AlbumTrack_asc);
+                tmpFileList := TObjectList.Create(False);
+                try
+                    MedienBib.GetTitelList(tmpFileList, TJustAstring(DataS^.FString).DataString, BROWSE_ALL);
+                    // Sortieren
+                    if tmpFileList.Count <= 5000 then
+                        tmpFileList.Sort(Sortieren_AlbumTrack_asc);
+                    // add items to the actual HandleList
+                    for i := 0 to tmpFileList.Count - 1 do
+                        if OnlyTemporaryFiles then
+                            aList.Add(tmpFileList[i])
+                        else
+                            TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+                finally
+                    tmpFileList.Free;
+                end;
             end;
           end;
       end;
@@ -3429,20 +3489,16 @@ begin
             Album := BROWSE_ALL;
 
           if (Artist = BROWSE_PLAYLISTS) and (Album <> BROWSE_ALL) then //(letzteres sollte immer so sein ;-))
-          begin
-              FreeFilesInHandleFilesList := True;
-              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan);
-          end else
+              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan)
+          else
           if (Artist = BROWSE_RADIOSTATIONS) and (Album <> BROWSE_ALL) then //(letzteres sollte immer so sein ;-))
           begin
               if Integer(aNode.Index) < MedienBib.RadioStationList.Count then
                   TStation(MedienBib.RadioStationList[aNode.Index]).TuneIn(NempPlaylist.BassHandlePlaylist)
               else
                   TranslateMessageDLG(Shoutcast_MainForm_BibError, mtError, [mbOK], 0);
-              FreeFilesInHandleFilesList := True;
           end else
           begin
-              FreeFilesInHandleFilesList := False;
               // Wenn ein spezielles Album ausgewählt wurde, dann
               //   dann alle Titel dieses Albums nehmen -> Artist=alle
               // ansonsten:
@@ -3451,27 +3507,59 @@ begin
               //if Album <> BROWSE_ALL then Artist := BROWSE_ALL;
               //  MedienBib.GetTitelList(aList, Artist, Album);
               // DAS MACHT BEI VIELEN VORSORTIERUNGEN KEINEN SINN!!! Daher einfach nur:
-
-              MedienBib.GetTitelList(aList, Artist, Album);
-              //Sortieren
-              if aList.Count <= 5000 then
-                  aList.Sort(Sortieren_AlbumTrack_asc);
+              tmpFileList := TObjectList.Create(False);
+              try
+                  MedienBib.GetTitelList(tmpFileList, Artist, Album);
+                  //Sortieren
+                  if tmpFileList.Count <= 5000 then
+                      tmpFileList.Sort(Sortieren_AlbumTrack_asc);
+                  // add files to the actual list
+                  for i := 0 to tmpFileList.Count-1 do
+                      if OnlyTemporaryFiles then
+                          aList.Add(tmpFileList[i])
+                      else
+                          TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+              finally
+                  tmpFileList.Free;
+              end;
           end;
       end;
       3: begin
         // Quelle ist das Cover-Flow-Image
-        //MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).ID);
-        if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
-            MedienBib.GetTitelListFromCoverID(aList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
-        // Sortieren
-        if aList.Count <= 5000 then
-            aList.Sort(Sortieren_AlbumTrack_asc);
+        tmpFileList := TObjectList.Create(False);
+        try
+            if CoverScrollbar.Position <= MedienBib.Coverlist.Count -1 then
+                MedienBib.GetTitelListFromCoverID(tmpFileList, TNempCover(MedienBib.Coverlist[CoverScrollbar.Position]).key);
+            // Sortieren
+            if tmpFileList.Count <= 5000 then
+                tmpFileList.Sort(Sortieren_AlbumTrack_asc);
+            // add files to the actual list
+            for i := 0 to tmpFileList.Count-1 do
+                if OnlyTemporaryFiles then
+                    aList.Add(tmpFileList[i])
+                else
+                    TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+        finally
+            tmpFileList.Free;
+        end;
+
       end;
       4: begin
-        MedienBib.GenerateDragDropListFromTagCloud(MedienBib.TagCloud.FocussedTag, aList);
-          // Sortieren
-        if aList.Count <= 5000 then
-            aList.Sort(Sortieren_AlbumTrack_asc);
+        tmpFileList := TObjectList.Create(False);
+        try
+            MedienBib.GenerateDragDropListFromTagCloud(MedienBib.TagCloud.FocussedTag, tmpFileList);
+              // Sortieren
+            if tmpFileList.Count <= 5000 then
+                tmpFileList.Sort(Sortieren_AlbumTrack_asc);
+            // add files to the actual list
+            for i := 0 to tmpFileList.Count-1 do
+                if OnlyTemporaryFiles then
+                    aList.Add(tmpFileList[i])
+                else
+                    TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+        finally
+            tmpFileList.Free;
+        end;
       end;
   else
     TranslateMessageDLG('Uh-Oh. Something strange happens (GenerateListForHandleFiles). Please report this error.'
@@ -3479,25 +3567,18 @@ begin
   end;
 end;
 
-procedure TNemp_MainForm.DoFreeFilesInHandleFilesList(aList: TObjectList);
-var i: Integer;
-begin
-    for i := 0 to aList.Count - 1 do
-        TAudioFile(aList[i]).Free;
-end;
 
 procedure TNemp_MainForm.EnqueueTBClick(Sender: TObject);
 var DateiListe: TObjectList;
 begin
   DateiListe := TObjectList.Create(False);
   WebRadioInsertMode := PLAYER_ENQUEUE_FILES;
-  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag);
+  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag, False);
   if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
            AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
           ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
   begin
       HandleFiles(Dateiliste, PLAYER_ENQUEUE_FILES);
-      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
   end;
   FreeAndNil(DateiListe);
 end;
@@ -3506,23 +3587,24 @@ procedure TNemp_MainForm.PM_ML_PlayClick(Sender: TObject);
 var DateiListe: TObjectList;
 begin
   DateiListe := TObjectList.Create(False);
-  WebRadioInsertMode := PLAYER_PLAY_FILES;
-  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag);
-  if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
-           AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
-          ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
-  begin
-      if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
+  try
+      WebRadioInsertMode := PLAYER_PLAY_FILES;
+      GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag, False);
+      if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
+               AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
+              ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
       begin
-        if TranslateMessageDLG((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
-              HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
-      end
-      else
-        HandleFiles(Dateiliste, PLAYER_PLAY_FILES);
-
-      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+          if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
+          begin
+            if TranslateMessageDLG((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
+                  HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
+          end
+          else
+              HandleFiles(Dateiliste, PLAYER_PLAY_FILES);
+      end; // else: No deletion of files in DateiListe needed, as there are none
+  finally
+      FreeAndNil(Dateiliste);
   end;
-  FreeAndNil(Dateiliste);
 end;
 
 
@@ -3530,17 +3612,19 @@ procedure TNemp_MainForm.PM_ML_PlayNextClick(Sender: TObject);
 var DateiListe: TObjectList;
 begin
   DateiListe := TObjectList.Create(False);
-  WebRadioInsertMode := PLAYER_PLAY_NEXT;
-  // Dateiliste füllen, abhängig davon, wo wir gerade sind.
-  GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag);
-  if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
-           AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
-          ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
-  begin
-      HandleFiles(Dateiliste, PLAYER_PLAY_NEXT);
-      if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
+  try
+      WebRadioInsertMode := PLAYER_PLAY_NEXT;
+      // Dateiliste füllen, abhängig davon, wo wir gerade sind.
+      GenerateListForHandleFiles(Dateiliste, Medialist_PopupMenu.Tag, False);
+      if NOT (     (MedienBib.CurrentArtist = BROWSE_RADIOSTATIONS) // Webradio markiert
+               AND (Medialist_PopupMenu.Tag = 2)                    // Popup auf Alben geöffnet
+              ) then                                                // bei Webradio wird ein Thread gestartet, der das dann erledigt.
+      begin
+          HandleFiles(Dateiliste, PLAYER_PLAY_NEXT);
+      end;
+  finally
+      FreeAndNil(DateiListe);
   end;
-  FreeAndNil(DateiListe);
 end;
 
 procedure TNemp_MainForm.PM_ML_PlayNowClick(Sender: TObject);
@@ -9648,35 +9732,33 @@ begin
   aNode := ArtistsVST.FocusedNode;
   if not assigned(aNode) then exit;
   Dateiliste := TObjectlist.Create(False);
-
-  GenerateListForHandleFiles(DateiListe, 1);
-
-  DragSource := DS_VST;
-  with DragFilesSrc1 do
-  begin
-      // Add files selected to DragFilesSrc1 list
-      ClearFiles;
-      DragDropList.Clear;
-
-      if DateiListe.Count > MAX_DRAGFILECOUNT then
+  try
+      GenerateListForHandleFiles(DateiListe, 1, True);
+      DragSource := DS_VST;
+      with DragFilesSrc1 do
       begin
-        TranslateMessageDLG((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-        if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-        FreeAndNil(Dateiliste);
-        exit;
+          // Add files selected to DragFilesSrc1 list
+          ClearFiles;
+          DragDropList.Clear;
+          if DateiListe.Count > MAX_DRAGFILECOUNT then
+          begin
+              TranslateMessageDLG((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+          end else
+          begin
+              for i:=0 to DateiListe.Count - 1 do
+              begin
+                  AddFile((Dateiliste[i] as TAudiofile).Pfad);
+                  DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+              end;
+
+              // This is the START of the drag (FROM) operation.
+              Execute;
+          end;
       end;
 
-      for i:=0 to DateiListe.Count - 1 do
-      begin
-          AddFile((Dateiliste[i] as TAudiofile).Pfad);
-          DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
-      end;
-
-      // This is the START of the drag (FROM) operation.
-      Execute;
+  finally
+      FreeAndNil(Dateiliste);
   end;
-  if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-  FreeAndNil(Dateiliste);
 end;
 
 procedure TNemp_MainForm.AlbenVSTStartDrag(Sender: TObject;
@@ -9703,34 +9785,36 @@ begin
     if Artist <> BROWSE_RADIOSTATIONS then
     begin
         Dateiliste := TObjectlist.Create(False);
-        GenerateListForHandleFiles(Dateiliste, 2);
-        DragSource := DS_VST;
-        with DragFilesSrc1 do
-        begin
-            // Add files selected to DragFilesSrc1 list
-            ClearFiles;
-            DragDropList.Clear;
-
-            maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
-
-            //if DateiListe.Count > MAX_DRAGFILECOUNT then
-            //begin
-            //  MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-            //  FreeAndNil(Dateiliste);
-            //  exit;
-            //end;
-
-            for i:=0 to maxC do
+        try
+            GenerateListForHandleFiles(Dateiliste, 2, true);
+            DragSource := DS_VST;
+            with DragFilesSrc1 do
             begin
-                AddFile((Dateiliste[i] as TAudiofile).Pfad);
-                DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad)
-            end;
-            // This is the START of the drag (FROM) operation.
-            Execute;
-        end;
+                // Add files selected to DragFilesSrc1 list
+                ClearFiles;
+                DragDropList.Clear;
 
-        if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-        FreeAndNil(Dateiliste);
+                maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
+
+                //if DateiListe.Count > MAX_DRAGFILECOUNT then
+                //begin
+                //  MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
+                //  FreeAndNil(Dateiliste);
+                //  exit;
+                //end;
+
+                for i:=0 to maxC do
+                begin
+                    AddFile((Dateiliste[i] as TAudiofile).Pfad);
+                    DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad)
+                end;
+                // This is the START of the drag (FROM) operation.
+                Execute;
+            end;
+
+        finally
+            FreeAndNil(Dateiliste);
+        end;
     end;
 end;
 procedure TNemp_MainForm.PlaylistVSTScroll(Sender: TBaseVirtualTree; DeltaX,
@@ -10315,6 +10399,7 @@ end;
 
 procedure TNemp_MainForm.BtnHeadsetToPlaylistClick(Sender: TObject);
 //var tmp: PvirtualNode;
+var newPlaylistFile: TAudioFile;
 begin
     if assigned(NempPlayer.HeadSetAudioFile) then
     begin
@@ -10322,18 +10407,24 @@ begin
             0: begin
                 // enqueue (at the end)
                 NempPlaylist.InsertNode := NIL;
-                NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+                newPlaylistFile := TAudioFile.Create;
+                newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+                NempPlaylist.InsertFileToPlayList(newPlaylistFile);
             end;
             1: begin
                 // play(and clear current list)
                 NempPlayList.ClearPlaylist;
                 NempPlaylist.InsertNode := NIL;
-                NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+                newPlaylistFile := TAudioFile.Create;
+                newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+                NempPlaylist.InsertFileToPlayList(newPlaylistFile);
             end;
             2: begin
                 // enqueue (in th prebook-list)
                 NempPlaylist.GetInsertNodeFromPlayPosition;
-                {tmp := }NempPlaylist.InsertFileToPlayList(NempPlayer.HeadSetAudioFile);
+                newPlaylistFile := TAudioFile.Create;
+                newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
+                {tmp := }NempPlaylist.InsertFileToPlayList(newPlaylistFile);
                 // DONT - Most users dont get it ;-)  NempPlaylist.AddNodeToPrebookList(tmp);
             end;
             3: begin
@@ -11983,32 +12074,35 @@ begin
     begin
     //showmessage( inttostr(abs(X - CoverImgDownX)) + '----' + inttostr(abs(Y - CoverImgDownY)) );
         Dateiliste := TObjectlist.Create(False);
-        GenerateListForHandleFiles(DateiListe, 3);
-        DragSource := DS_VST;
-        with DragFilesSrc1 do
-        begin
-            // Add files selected to DragFilesSrc1 list
-            ClearFiles;
-            DragDropList.Clear;
-
-            maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
-
-            //if DateiListe.Count > MAX_DRAGFILECOUNT then
-            //begin
-            //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
-            //  FreeAndNil(Dateiliste);
-            //  exit;
-            //end;
-            for i := 0 to maxC do
+        try
+            GenerateListForHandleFiles(DateiListe, 3, true);
+            DragSource := DS_VST;
+            with DragFilesSrc1 do
             begin
-                AddFile((Dateiliste[i] as TAudiofile).Pfad);
-                DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+                // Add files selected to DragFilesSrc1 list
+                ClearFiles;
+                DragDropList.Clear;
+
+                maxC := min(MAX_DRAGFILECOUNT, DateiListe.Count - 1);
+
+                //if DateiListe.Count > MAX_DRAGFILECOUNT then
+                //begin
+                //  //MessageDlg(MESSAGE_TOO_MANY_FILES, mtInformation, [MBOK], 0);
+                //  FreeAndNil(Dateiliste);
+                //  exit;
+                //end;
+                for i := 0 to maxC do
+                begin
+                    AddFile((Dateiliste[i] as TAudiofile).Pfad);
+                    DragDropList.Add((Dateiliste[i] as TAudiofile).Pfad);
+                end;
+                // This is the START of the drag (FROM) operation.
+                Execute;
             end;
-            // This is the START of the drag (FROM) operation.
-            Execute;
+
+        finally
+            FreeAndNil(Dateiliste);
         end;
-        if FreeFilesInHandleFilesList then DoFreeFilesInHandleFilesList(DateiListe);
-        FreeAndNil(Dateiliste);
     end;
   end
   else

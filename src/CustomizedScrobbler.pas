@@ -327,8 +327,10 @@ begin
 
     fLastCall := GetTickCount;
     url := 'https://ws.audioscrobbler.com/2.0/?method=track.gettoptags'
-    + '&artist=' + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Artist)))
-    + '&track='  + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Titel)))
+    //+ '&artist=' + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Artist)))
+    //+ '&track='  + StringToURLStringAnd(Utf8String(AnsiLowerCase(aAudioFile.Titel)))
+    + '&artist=' + URLEncode_LastFM(AnsiLowerCase(aAudioFile.Artist))
+    + '&track='  + URLEncode_LastFM(AnsiLowerCase(aAudioFile.Titel))
     + '&api_key=' + String(ApiKey);
 
     // aIDHttp := TIdHttp.Create;

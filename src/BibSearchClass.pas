@@ -262,7 +262,7 @@ type
 
         // Swap the TmpTotalString-Stuff (created in secondary thread)
         // to the TotalString-Stuff (runs in secondary thread)
-        procedure SwapTotalStrings(FileList: TObjectList);
+        procedure BuildTotalSearchStrings(FileList: TObjectList);
 
         procedure InitNewSearch(Keywords: TSearchKeyWords);
         /// procedure InitBetterSearch(Keywords: TSearchKeyWords);
@@ -786,7 +786,7 @@ end;
     runs in VCL-Mainthread
     --------------------------------------------------------
 }
-procedure TBibSearcher.SwapTotalStrings(FileList: TObjectList);
+procedure TBibSearcher.BuildTotalSearchStrings(FileList: TObjectList);
 begin
 
     BuildTotalString(FileList);
@@ -1252,7 +1252,7 @@ begin
         for i := 0 to MainList.Count - 1 do
         begin
             aAudioFile := TAudioFile(MainList[i]);
-            if AnsiContainsText(aAudioFile.RawTagLastFM      , KeyTag) then
+            if AnsiContainsText(String(aAudioFile.RawTagLastFM)      , KeyTag) then
             begin
                 // audiofile is possibly tagged with the KeyTag
                 tmpTagList.Text := String(aAudioFile.RawTagLastFM);

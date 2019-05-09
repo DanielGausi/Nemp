@@ -7,10 +7,10 @@
       von Daniel 'Gausi' Gaußmann, 
       eMail: mail@gausi.de
 
-      Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.2
-      Januar 2005 - Januar 2019
+      Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.3
+      Januar 2005 - Mai 2019
 
-      Version: 4.9.2
+      Version: 4.9.3
 
 
 -----------------------------------------------------------
@@ -61,6 +61,13 @@ Lizenzvereinbarungen:
 -----------------------------------------------------------
 GPL 2.0 oder später
 (Details in der licence.txt und der gpl.txt)
+
+
+Version 4.9.3, Mai 2019
+----------------------------------------------------------- 
+- Lyricsuche gefixed
+- Umstieg von http auf https (wo es möglich ist)
+- Wechsel auf Delphi 10.3 (Community Edition)
 
 
 Version 4.9.2, Januar 2019

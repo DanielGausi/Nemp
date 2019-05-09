@@ -648,8 +648,9 @@ Der zweite Tab enthält die grundlegenden Eigenschaften der \emph{ID3-Tags}. Bei 
 
 %\subsubsection{Lyrics}
 %\label{sec_lyrics}
-Im dritten Tab können \textbf{Lyrics und Bilder} bearbeitet werden. Wenn Sie Liedtexte für mehrere Musikstücke bearbeiten wollen, dann dürfte es in der Regel schneller sein, die mehrfache Suche nach Lyrics zu benutzen. Dazu markieren Sie mehrere Dateien im Hauptfenster, und wählen Sie die Funktion \textsc{Hole Lyrics} (Tastenkombination \textsc{Strg+L}). Hierzu wird die Seite \emph{lyrics.wikia.com} benutzt. Das dauert auch ein wenig, und es werden nicht zu allen Titeln (die richtigen) Texte gefunden, aber die Trefferquote ist doch sehr ordentlich.
+Im dritten Tab können \textbf{Lyrics und Bilder} bearbeitet werden. Wenn Sie Liedtexte für mehrere Musikstücke bearbeiten wollen, dann dürfte es in der Regel schneller sein, die mehrfache Suche nach Lyrics zu benutzen. Dazu markieren Sie mehrere Dateien im Hauptfenster, und wählen Sie die Funktion \textsc{Hole Lyrics} (Tastenkombination \textsc{Strg+L}). Das dauert auch ein wenig, und es werden nicht zu allen Titeln (die richtigen) Texte gefunden, aber die Trefferquote ist doch sehr ordentlich. 
 
+Seit Version 4.9.3 wird nicht nur die Seite \emph{lyrics.wikia.com} benutzt, sondern optional auch \emph{chartlyrics.com}. Welche Quelle mit welcher Priorität verwendet wird, kann in den Optionen eingestellt werden. Die neue Seite Chartlyrics sollte aber nur als Fallback verwendet werden. Bei der Suche dort werden einige Suchbegriffe automatisiert ausgefiltert. Zum Beispiel \emph{are, take, that, the, who, are, you} und viele andere. Was das für Auswirkungen auf Titel von \emph{Take That} oder \emph{The Who} hat (insbesondere der Titel \emph{Who are you?}) kann man sich dann selber ausmalen.
 
 %\subsubsection{Erweiterte Tags}
 Im vierten Tab können Sie die erweiterten Tags für die \hyperref[sec_tagwolke]{Tagwolke} bearbeiten. Für die Tagwolke sind weitere Tags sehr nützlich, denn die wenigen Standard-Tags reichen für eine sinnvolle Kategorisierung nicht aus. 
@@ -1202,10 +1203,12 @@ Das funktioniert natürlich nicht immer einwandfrei. Aber es ist eine deutliche V
 \end{itemize}
 
 
-\subsubsection{Cover}
+\subsubsection{Cover und Lyrics}
 \label{sec_coversettings}
 
-In diesem Teil kann die Suche nach Covern für die Medienbibliothek konfiguriert werden. Voreingestellt ist dieses Suchverhalten, das sich in recht umfangreichen Tests als sehr zuverlässig herausgestellt hat.
+In diesem Teil kann die Suche nach Covern und Lyrics für die Medienbibliothek konfiguriert werden. 
+
+Für Cover voreingestellt ist das folgende Suchverhalten, das sich in recht umfangreichen Tests als sehr zuverlässig herausgestellt hat.
 
 \begin{itemize}
 \item Suche im Ordner der Audiodatei 
@@ -1276,7 +1279,9 @@ Zusätzlich kann Nemp fehlende Cover im Internet bei last.fm suchen. Um nicht bei
 
 \item \textbf{Standard-Cover.} Auswahl eines eigenen Standard-Covers für den Fall, dass Nemp zu einem Album bzw. Titel kein Cover finden kann. Bereits im Player angezeigte Cover werden erst dann aktualisiert, wenn das Cover erneut geladen wird, also beim Start eines neuen Titels oder beim durchscrollen des Coverflow.
 
+\item \textbf{Online-Suche nach Lyrics.} Hier kann konfiguriert werden, welche online-Quellen mit welcher Priorität für die Suche nach Liedtexten verwendet werden sollen. Standard ist LyricWiki, optional kann zusätzlich ChartLyrics als Fallback verwendet werden. In der Regel werden aber mit LyricWiki die besseren Ergebnisse erzielt.
 \end{itemize}
+
 
 \subsubsection{Suchoptionen}
 Eine riesige Medienbibliothek nützt kaum etwas, wenn man nichts mehr darin findet. Daher enthält Nemp eine recht starke Suchfunktion.
@@ -1328,6 +1333,14 @@ Das Nemp-Deskband für Windows XP und auch die Display-App für die Logitech G15, 
 \section{Versionsgeschichte}
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
+
+\subsection*{Version 4.9.3, Mai 2019}
+\begin{itemize}
+\item Suche nach Lyrics gefixed: Anpassung an das neue Template, Umstellung auf https
+\item zusätzliche Quelle für Liedtexte hinzugefügt (dort nur http möglich)
+\item Umstellung von http auf https, wo es möglich ist (Scrobbeln, Cover-Suche, teilweise Lyrics)
+\item Umstieg auf Delphi 10.3 Rio (Community Edition)
+\end{itemize}
 
 \subsection*{Version 4.9.2, Januar 2019}
 \begin{itemize}

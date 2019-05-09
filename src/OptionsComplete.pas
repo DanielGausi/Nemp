@@ -41,7 +41,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
-  DateUtils,  IniFiles, jpeg, PNGImage, GifImg, math, Contnrs,
+  DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
   bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, U_Charcode, Nemp_SkinSystem, UpdateUtils, HtmlHelper, Lyrics,
@@ -2607,8 +2607,8 @@ begin
   Nemp_MainForm.VST.ShowHint := MedienBib.ShowHintsInMedialist;
 
   NeedUpdate := False;
-  NeedTotalStringUpdate := False;
-  NeedTotalLyricStringUpdate := False;
+  //NeedTotalStringUpdate := False;
+  //NeedTotalLyricStringUpdate := False;
   NeedCoverFlowSearchUpdate := False;
 
   //if MedienBib.StatusBibUpdate = 0 then
@@ -4045,8 +4045,7 @@ begin
     currentNode := VSTLyricSettings.FocusedNode;
 
     BtnLyricPriorities.Position := 50;
-    if assigned(currentNode) then
-        caption := INttostr(random(10000)) + ' __ ' + Inttostr(BtnLyricPriorities.Position);
+
 
     case Button of
       btNext: begin

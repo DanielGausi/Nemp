@@ -692,8 +692,8 @@ begin
             SetLength(Params, ParamCount); // cut Array
 
             for i := 0 to length(params) - 1 do
-                //aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
-                aScrobbler.ParamList.Add(params[i].name+'=' + (UTF8Encode(params[i].value)));
+                //aScrobbler.ParamList.Add(params[i].name+'=' + (UTF8Encode(params[i].value)));
+                aScrobbler.ParamList.Add(params[i].name+'=' + ((params[i].value)));
 
             sig := GenerateSignature(SortParams(params));
             aScrobbler.ParamList.Add('api_sig=' + sig);
@@ -777,8 +777,7 @@ begin
           SetLength(Params, idx+1); // cut Array
 
           for i := 0 to length(params) - 1 do
-                //aScrobbler.ParamList.Add(params[i].name+'=' + ParamsEncode(UTF8Encode(params[i].value)));
-                aScrobbler.ParamList.Add(params[i].name+'=' + UTF8Encode(params[i].value));
+                aScrobbler.ParamList.Add(params[i].name+'=' + params[i].value);
 
           sig := GenerateSignature(SortParams(Params));
           aScrobbler.ParamList.Add('api_sig=' + sig);

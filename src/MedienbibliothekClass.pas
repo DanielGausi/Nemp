@@ -54,7 +54,7 @@ unit MedienbibliothekClass;
 interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
-     dialogs, Messages, JPEG, PNGImage, GifImg, MD5, Graphics, Math, Lyrics,
+     dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
      AudioFileBasics,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
@@ -266,18 +266,22 @@ type
         // Update-Process for Non-Existing Files.
         // Runs in seperate Thread, sends proper messages to mainform for sync
         // 1. Search Library for dead files
-        Function CollectDeadFiles: Boolean;
+        Function fCollectDeadFiles: Boolean;
         // 1b. Let the user select files which should be deleted or not
 //        procedure UserInputDeadFiles(DeleteDataList: TObjectList);
         // 2. Prepare Update
         //    - Fill tmplists with files, which are NOT dead
 
-        procedure PrepareDeleteFilesUpdate;
+        procedure fPrepareDeleteFilesUpdate;
         // 3. Send Message and do
         //    CleanUpDeadFilesFromVCLLists
         //    in VCL-Thread
         // 4. Delete DeadFiles
-        procedure CleanUpDeadFiles;
+        procedure fCleanUpDeadFiles;
+
+        procedure fPrepareUserInputDeadFiles(DeleteDataList: TObjectList);
+        procedure fReFillDeadFilesByDataList(DeleteDataList: TObjectList);
+        procedure fGetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 
         // Refreshing Library
         procedure fRefreshFiles;      // 1a. Refresh files OR
@@ -576,6 +580,7 @@ type
         // Check, whether Key1 and Key2 matches strings[sortarray[1/2]]
         function ValidKeys(aAudioFile: TAudioFile): Boolean;
         // set fBrowseListsNeedUpdate to true
+        procedure ChangeCoverID(oldID, newID: String);
         procedure HandleChangedCoverID;
 
         // even more stuff for file managing: Additional Tags
@@ -601,7 +606,7 @@ type
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
         function InitCoverFromFilename(aFileName: UnicodeString): String;
-        procedure InitCover(aAudioFile: tAudioFile);
+        procedure InitCover(aAudioFile: tAudioFile; ForceReScan: Boolean = False);
         // 2. If AudioFile is in a new directory:
         //    Get a List with candidates for the cover for the audiofile
         procedure GetCoverListe(aAudioFile: tAudioFile; aCoverListe: TStringList);
@@ -707,10 +712,6 @@ type
         procedure PutAllFilesToUpdateList;    // Put these files into the updatelist
         function ChangeTags(oldTag, newTag: String): Integer;
         function CountFilesWithTag(aTag: String): Integer;
-
-        procedure PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
-        procedure ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
-        procedure GetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 
         function GetDriveFromUsedDrives(aChar: Char): TDrive;
 
@@ -1861,7 +1862,7 @@ begin
   tmpAllPlaylistsPfadSort := swapList;
   InitPlayListsList;
 
-  BibSearcher.SwapTotalStrings(Mp3ListePfadSort);
+  BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
 
   LeaveCriticalSection(CSUpdate);
 
@@ -1952,28 +1953,29 @@ var DeleteDataList: TObjectList;
     SummaryDeadFiles: TDeadFilesInfo;
 begin
     // Status is = 1 here (see above)     // status: Temporary comments, as I found a concept-bug here ;-)
-    MB.CollectDeadFiles;                  // status: ok, no change needed
+    MB.fCollectDeadFiles;                  // status: ok, no change needed
     // there ---^ check MB.fCurrentJob for a matching parameter
-
 
 
     if MB.DeadFiles.Count > 0 then
     begin
         DeleteDataList := TObjectList.Create(False);
         try
-            MB.PrepareUserInputDeadFiles(DeleteDataList);
+            MB.fPrepareUserInputDeadFiles(DeleteDataList);
             if askUser then
             begin
                 // let the user correct the list
+                SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput)));
+
                 SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
-                MB.ReFillDeadFilesByDataList(DeleteDataList);
+                MB.fReFillDeadFilesByDataList(DeleteDataList);
             end
             else
             begin
                 // user can't change anything, fill the list
-                MB.ReFillDeadFilesByDataList(DeleteDataList);
+                MB.fReFillDeadFilesByDataList(DeleteDataList);
 
-                MB.GetDeadFilesSummary(DeleteDataList, SummaryDeadFiles);
+                MB.fGetDeadFilesSummary(DeleteDataList, SummaryDeadFiles);
                 SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_InfoDeadFiles, lParam(@SummaryDeadFiles));
             end;
         finally
@@ -1983,7 +1985,7 @@ begin
 
     if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
     begin
-        MB.PrepareDeleteFilesUpdate;          // status: ok, change via SendMessage
+        MB.fPrepareDeleteFilesUpdate;          // status: ok, change via SendMessage
         // if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
            MB.Changed := True;
         MB.SwapLists;                         // status: ok, change via SendMessage
@@ -1992,9 +1994,9 @@ begin
         // MainForm will call CleanUpDeadFilesFromVCLLists
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
         // Free deleted AudioFiles
-        MB.CleanUpDeadFiles;                  // status: ok, no change needed
+        MB.fCleanUpDeadFiles;                  // status: ok, no change needed
         // Clear temporary lists
-        MB.CleanUpTmpLists;                   // status: ok, no change allowed        
+        MB.CleanUpTmpLists;                   // status: ok, no change allowed
     end else
     begin
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
@@ -2066,12 +2068,12 @@ end;  *)
       i.e. VCL MUST NOT start a searching for new files
     --------------------------------------------------------
 }
-Function TMedienBibliothek.CollectDeadFiles: Boolean;
+Function TMedienBibliothek.fCollectDeadFiles: Boolean;
 var i, ges, freq: Integer;
 begin
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
-
       SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
 
       ges := Mp3ListePfadSort.Count + AllPlaylistsPfadSort.Count  + 1;
       freq := Round(ges / 100) + 1;
@@ -2080,7 +2082,16 @@ begin
           if Not FileExists((Mp3ListePfadSort[i] as TAudioFile).Pfad) then
             DeadFiles.Add(Mp3ListePfadSort[i] as TAudioFile);
           if i mod freq = 0 then
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round(i/ges * 100));
+          begin
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead,
+                      Integer(PChar( (Mp3ListePfadSort[i] as TAudioFile).Ordner)) );
+
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
+                // SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round(i/ges * 100));
+
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, (i+1) - DeadFiles.Count);
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, DeadFiles.Count);
+          end;
 
           if not UpdateFortsetzen then break;
       end;
@@ -2090,12 +2101,23 @@ begin
           if Not FileExists(TJustaString(AllPlaylistsPfadSort[i]).DataString) then
             DeadPlaylists.Add(AllPlaylistsPfadSort[i] as TJustaString);
           if i mod freq = 0 then
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round((i + Mp3ListePfadSort.Count)/ges * 100));
+          begin
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Integer(PChar(MediaLibrary_SearchingMissingPlaylist)));
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round((Mp3ListePfadSort.Count+i)/ges * 100));
+              //SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round((i + Mp3ListePfadSort.Count)/ges * 100));
+
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount,
+                                Mp3ListePfadSort.Count + i - DeadFiles.Count - DeadPlaylists.Count);
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount,
+                                DeadFiles.Count + DeadPlaylists.Count);
+          end;
 
           if not UpdateFortsetzen then break;
       end;
       result := True;
 
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_AnalysingData)));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
       SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 end;
 {
@@ -2105,11 +2127,12 @@ end;
     - change DeadFiles acording to user input
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.PrepareUserInputDeadFiles(DeleteDataList: TObjectList);
+procedure TMedienBibliothek.fPrepareUserInputDeadFiles(DeleteDataList: TObjectList);
 var i: Integer;
-    Drives: TObjectList;
+    LogicalDrives: TObjectList;
     currentDir: String;
-    currentDrive: Char;
+    currentLogicalDrive, currentLibraryDrive: TDrive;
+    currentDriveChar: Char;
     currentPC: String;
     newDeleteData, currentDeleteData: TDeleteData;
 
@@ -2146,6 +2169,7 @@ var i: Integer;
 
     function GetMatchingDeleteDataObject(aDrive: String; isLocal: Boolean): TDeleteData;
     var i: Integer;
+        fcurrentLogicalDrive, fcurrentLibraryDrive: TDrive;
     begin
         result := Nil;
         for i := 0 to DeleteDataList.Count - 1 do
@@ -2165,37 +2189,52 @@ var i: Integer;
             DeleteDataList.Add(result);
             if isLocal then
             begin
-                if GetDriveFromListByChar(Drives, aDrive[1]) = NIL then
+                fcurrentLogicalDrive := GetDriveFromListByChar(LogicalDrives, aDrive[1]);
+                fcurrentLibraryDrive := GetDriveFromListByChar(fUsedDrives, aDrive[1]);
+                if fcurrentLogicalDrive = NIL then
                 begin
                     // complete Drive is NOT there
                     result.DoDelete       := False;
                     //newDeleteData.Recommendation := dr_Keep;
                     result.Hint           := dh_DriveMissing;
+
+                    if assigned(fcurrentLibraryDrive) then
+                        result.DriveType := fcurrentLibraryDrive.typ
+                    else
+                        result.DriveType := DriveTypeTexts[DRIVE_REMOTE];
                 end else
                 begin
                     // drive is there => just the file is not present
-                    result.DoDelete       := True;
+                    result.DoDelete    := True;
                     //newDeleteData.Recommendation := dr_Delete;
-                    result.Hint           := dh_DivePresent;
+                    result.Hint        := dh_DivePresent;
+                    result.DriveType   := fcurrentLibraryDrive.typ
                 end;
             end else
             begin
                 // assume that its missing, further check after this loop
-                result.DoDelete       := False;
+                result.DoDelete    := False;
                 //newDeleteData.Recommendation := dr_Keep;
-                result.Hint           := dh_NetworkMissing;
+                result.Hint        := dh_NetworkMissing;
+                result.DriveType   := DriveTypeTexts[DRIVE_REMOTE];
             end;
         end;
     end;
 
 begin
     // prepare data - check whether the drive of the issing files exists etc.
-    Drives := TObjectList.Create;
+    LogicalDrives := TObjectList.Create;
     try
-        GetLogicalDrives(Drives); // get connected logical drives
-        currentDrive  := ' ';    // invalid drive letter
-        currentPC     := 'XXX';  // invalid PC-Name
-        newDeleteData := Nil;
+        GetLogicalDrives(LogicalDrives); // get connected logical drives
+
+        currentDriveChar  := ' ';    // invalid drive letter
+        currentPC         := 'XXX';  // invalid PC-Name
+        //currentLogicalDrive := Nil;
+        //currentLibraryDrive := Nil;
+        newDeleteData     := Nil;
+
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar('Sorting Dead Files ...')));
+
         for i := 0 to DeadFiles.Count - 1 do
         begin
             currentDir := TAudioFile(DeadFiles[i]).Ordner;
@@ -2203,25 +2242,36 @@ begin
             begin
                 if IsLocalDir(currentDir) then
                 begin
-                    if currentDrive <> currentDir[1] then
+                    // C:\, F:\, whatever - a LOCAL drive
+                    if currentDriveChar <> currentDir[1] then
                     begin
                         // beginning of a ne drive - check for this drive
-                        currentDrive := currentDir[1];
+                        currentDriveChar := currentDir[1];
+                        currentLogicalDrive := GetDriveFromListByChar(LogicalDrives, currentDriveChar);
+                        currentLibraryDrive := GetDriveFromListByChar(fUsedDrives, currentDriveChar);
 
                         newDeleteData := TDeleteData.Create;
-                        newDeleteData.DriveString := currentDrive + ':\';
-                        if GetDriveFromListByChar(Drives, currentDrive) = NIL then
+                        newDeleteData.DriveString := currentDriveChar; // at first only the letter + ':\';
+                        if currentLogicalDrive = NIL then
                         begin
-                            // complete Drive is NOT there
+                            // complete logical Drive is NOT there
                             newDeleteData.DoDelete       := False;
                             //newDeleteData.Recommendation := dr_Keep;
                             newDeleteData.Hint           := dh_DriveMissing;
+
+                            // use the drivetype from the library
+                            if assigned(currentLibraryDrive) then
+                                newDeleteData.DriveType := currentLibraryDrive.typ
+                            else
+                                // fallback to "remote" (but this should not happen)
+                                newDeleteData.DriveType := DriveTypeTexts[DRIVE_REMOTE];
                         end else
                         begin
                             // drive is there => just the file is not present
                             newDeleteData.DoDelete       := True;
                             //newDeleteData.Recommendation := dr_Delete;
                             newDeleteData.Hint           := dh_DivePresent;
+                            newDeleteData.DriveType      := currentLogicalDrive.Typ;
                         end;
                         DeleteDataList.Add(newDeleteData);
                     end;
@@ -2237,7 +2287,7 @@ begin
                         newDeleteData.DoDelete       := False;
                         //newDeleteData.Recommendation := dr_Keep;
                         newDeleteData.Hint           := dh_NetworkMissing;
-
+                        newDeleteData.DriveType  := DriveTypeTexts[DRIVE_REMOTE];
                         DeleteDataList.Add(newDeleteData);
                     end;
                 end;
@@ -2249,8 +2299,9 @@ begin
 
         // The same for playlists, but re-use the existing DeleteDataList-Objects
         currentDeleteData := Nil;
-        currentDrive      := ' ';    // invalid drive letter
+        currentDriveChar  := ' ';    // invalid drive letter
         currentPC         := 'XXX';  // invalid PC-Name
+
         for i := 0 to DeadPlaylists.Count - 1 do
         begin
             currentDir := TJustAString(DeadPlaylists[i]).DataString;
@@ -2258,12 +2309,12 @@ begin
             begin
                 if IsLocalDir(currentDir) then
                 begin
-                    if currentDrive <> currentDir[1] then
+                    if currentDriveChar <> currentDir[1] then
                     begin
-                        // beginning of a ne drive - Get a matching DeleteDtaa-Object from the already existing list
+                        // beginning of a new drive - Get a matching DeleteData-Object from the already existing list
                         // (or create a new one)
-                        currentDrive := currentDir[1];
-                        currentDeleteData := GetMatchingDeleteDataObject(currentDrive + ':\', True);
+                        currentDriveChar := currentDir[1];
+                        currentDeleteData := GetMatchingDeleteDataObject(currentDriveChar{ + ':\'}, True);
                     end;
                 end else
                 begin
@@ -2279,6 +2330,23 @@ begin
             if assigned(currentDeleteData) then
                 currentDeleteData.PlaylistFiles.Add(DeadPlaylists[i]);
         end;
+
+        // make the drivestrings a little bit nicer, add the name (from the library-drive)
+        for i := 0 to DeleteDataList.Count-1 do
+        begin
+            currentDeleteData := TDeleteData(DeleteDataList[i]);
+            if Length(currentDeleteData.DriveString) > 0 then
+            begin
+                currentLibraryDrive := GetDriveFromListByChar(fUsedDrives, currentDeleteData.DriveString[1]);
+
+                if assigned(currentLibraryDrive) then
+                    currentDeleteData.DriveString := currentDeleteData.DriveString
+                      + ':\ (' + currentLibraryDrive.Name + ')';
+            end;
+        end;
+
+
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar('Checking Drives ...')));
 
         // Try to determine, whether network-ressources are online or not
         for i := 0 to DeleteDataList.Count - 1 do
@@ -2296,8 +2364,9 @@ begin
             end;
         end;
     finally
-        Drives.Free;
+        LogicalDrives.Free;
     end;
+
 end;
 {
     --------------------------------------------------------
@@ -2306,7 +2375,7 @@ end;
       the user wants to be deleted
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.ReFillDeadFilesByDataList(DeleteDataList: TObjectList);
+procedure TMedienBibliothek.fReFillDeadFilesByDataList(DeleteDataList: TObjectList);
 var i, f: Integer;
     currentData: TDeleteData;
 begin
@@ -2326,7 +2395,7 @@ begin
     end;
 end;
 
-procedure TMedienBibliothek.GetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
+procedure TMedienBibliothek.fGetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 var i: Integer;
     currentData: TDeleteData;
 begin
@@ -2360,7 +2429,7 @@ end;
     - "AntiMerge" DeadFiles and Mainlist to tmp-List
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.PrepareDeleteFilesUpdate;
+procedure TMedienBibliothek.fPrepareDeleteFilesUpdate;
 var i: Integer;
 begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
@@ -2448,7 +2517,7 @@ end;
     CleanUpDeadFiles
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.CleanUpDeadFiles;
+procedure TMedienBibliothek.fCleanUpDeadFiles;
 var i: Integer;
     aAudioFile: TAudioFile;
     jas: TJustaString;
@@ -2607,19 +2676,19 @@ begin
       SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, LParam(DeadFiles.Count));
       DeleteDataList := TObjectList.Create(False);
       try
-          PrepareUserInputDeadFiles(DeleteDataList);
+          fPrepareUserInputDeadFiles(DeleteDataList);
           SendMessage(MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
           // user can change DeleteDataList (set the DoDelete-property of the objects)
           // so: Change the DeadFiles-list and fill it with the files that should be deleted.
-          ReFillDeadFilesByDataList(DeleteDataList);
+          fReFillDeadFilesByDataList(DeleteDataList);
       finally
           DeleteDataList.Free;
       end;
 
-      PrepareDeleteFilesUpdate;
+      fPrepareDeleteFilesUpdate;
       SwapLists;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
-      CleanUpDeadFiles;
+      fCleanUpDeadFiles;
       CleanUpTmpLists;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
   end;
@@ -2709,7 +2778,7 @@ var i: Integer;
     done, failed: Integer;
     Lyrics: TLyrics;
     aErr: TNempAudioError;
-    ErrorOcurred: Boolean;
+    ErrorOcurred, CurrentSuccess: Boolean;
     ErrorLog: TErrorLog;
 
     tmpLyricFirstPriority,tmpLyricSecondPriority  : TLyricFunctionsEnum;
@@ -2721,6 +2790,7 @@ begin
     done := 0;
     failed := 0;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
 
     ErrorOcurred := False;
 
@@ -2753,7 +2823,9 @@ begin
                     // call the vcl, that we will edit this file now
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                             Integer(PWideChar(aAudioFile.Pfad)));
+
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateStatus,
+                            //2nd param unused right now
                             Integer(PWideChar(Format(_(MediaLibrary_SearchLyricsStats), [done, done + failed]))));
 
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
@@ -2771,12 +2843,14 @@ begin
                         if aErr = AUDIOERR_None then
                         begin
                             inc(done);
+                            CurrentSuccess := True;
                             Changed := True;
                         end else
                         begin
                             // discard new lyrics
                             aAudioFile.Lyrics := Utf8String(backup);
                             inc(failed);
+                            CurrentSuccess := False;
                             ErrorOcurred := True;
                             // FehlerMessage senden
                             ErrorLog := TErrorLog.create(afa_LyricSearch, aAudioFile, aErr, false);
@@ -2788,22 +2862,31 @@ begin
                         end;
                     end
                     else
+                    begin
                         inc(failed);
+                        CurrentSuccess := False;
+                    end;
                 end
                 else begin
                     if Not FileExists(aAudioFile.Pfad) then
                         aAudioFile.FileIsPresent:=False;
                     inc(failed);
+                    CurrentSuccess := False;
                 end;
+                if CurrentSuccess then
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, done)
+                else
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, failed);
+
             end;
     finally
             Lyrics.Free;
     end;
 
     // clear thread-used filename
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                    Integer(PWideChar('')));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
     // Build TotalStrings
@@ -2813,7 +2896,7 @@ begin
     //BibSearcher.BuildTMPTotalLyricString(Mp3ListePfadSort);
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
-    BibSearcher.SwapTotalStrings(Mp3ListePfadSort);
+    BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
 
     if done + failed = 1 then
     begin
@@ -2822,6 +2905,9 @@ begin
         if (done = 0) then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                 Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SingleNotFound))))
+        else
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
@@ -2921,7 +3007,7 @@ var i: Integer;
     s, backup: String;
     //TagPostProcessor: TTagPostProcessor;
     aErr: TNempAudioError;
-    ErrorOcurred: Boolean;
+    ErrorOcurred, currentSuccess: Boolean;
     ErrorLog: TErrorLog;
 begin
     done := 0;
@@ -2930,21 +3016,16 @@ begin
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
+    // if UpdateList.Count > 1 then
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
+
     for i := 0 to UpdateList.Count - 1 do
     begin
         if not UpdateFortsetzen then break;
 
         af := TAudioFile(UpdateList[i]);
 
-        if FileExists(af.Pfad)
-                AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
-                (
-                    af.HasSupportedTagFormat
-                //   (AnsiLowercase(af.Extension) = 'mp3')
-                //or (AnsiLowercase(af.Extension) = 'ogg')
-                //or (AnsiLowercase(af.Extension) = 'flac')
-                )
-        then
+        if FileExists(af.Pfad) AND af.HasSupportedTagFormat then
         begin
             // call the vcl, that we will edit this file now
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
@@ -2966,6 +3047,7 @@ begin
             if trim(s) = '' then
             begin
                 inc(failed);
+                currentSuccess := False;
             end else
             begin
                 backup := String(af.RawTagLastFM);
@@ -2984,10 +3066,12 @@ begin
                 begin
                     Changed := True;
                     inc(done);
+                    currentSuccess := True;
                 end
                 else
                 begin
                     inc(failed);
+                    currentSuccess := False;
                     ErrorOcurred := True;
                     // FehlerMessage senden
                     ErrorLog := TErrorLog.create(afa_TagSearch, af, aErr, false);
@@ -3003,17 +3087,23 @@ begin
             if Not FileExists(af.Pfad) then
                 af.FileIsPresent:=False;
             inc(failed);
+            currentSuccess := False;
         end;
+
+        if CurrentSuccess then
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, done)
+        else
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, failed);
     end;
 
     if done > 0 then
         SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsSetTabWarning, 0);
 
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
 
     // clear thread-used filename
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                    Integer(PWideChar('')));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
     if done + failed = 1 then
     begin
@@ -3022,6 +3112,9 @@ begin
         if (done = 0) then
             SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
                 Integer(PChar(_(MediaLibrary_SearchTagsComplete_SingleNotFound))))
+        else
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
@@ -3447,6 +3540,25 @@ begin
     fBrowseListsNeedUpdate := True;
 end;
 
+procedure TMedienBibliothek.ChangeCoverID(oldID, newID: String);
+var afList: TObjectList;
+    i: Integer;
+begin
+    afList := TObjectList.Create(False);
+    try
+        GetTitelListFromCoverID(afList, oldID);
+        for i := 0 to afList.Count - 1 do
+            // set the new ID
+            TAudioFile(afList[i]).CoverID := NewID;
+    finally
+        afList.Free;
+    end;
+
+    // handle the Changes
+    HandleChangedCoverID;
+    Changed := True;
+end;
+
 
 {
     --------------------------------------------------------
@@ -3520,6 +3632,7 @@ var currentTagList, newTagList: TStringlist;
     localIgnoreList: TStringList;
     localMergeList: TObjectList;
 begin
+    result := TAGERR_NONE;
     currentTagList := TStringlist.Create;
     try
         currentTagList.Text := String(aAudioFile.RawTagLastFM);
@@ -3584,7 +3697,13 @@ begin
                   if aAudioFile.RawTagLastFM = '' then
                       aAudioFile.RawTagLastFM := UTF8String(newTag)
                   else
-                      aAudioFile.RawTagLastFM := trim(aAudioFile.RawTagLastFM) + #13#10 + UTF8String(newTag);
+                  begin
+                      // fixed some compiler warnings regarding implicit string casts
+                      //cleanup current RawTag (to be sure)
+                      aAudioFile.RawTagLastFM := UTF8String(trim(String(aAudioFile.RawTagLastFM)));
+                      // add new Tag
+                      aAudioFile.RawTagLastFM := aAudioFile.RawTagLastFM + #13#10 + UTF8String(newTag);
+                  end;
               end;
         finally
             newTagList.Free;
@@ -3713,7 +3832,7 @@ end;
     one of the last one.
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile);
+procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile; ForceReScan: Boolean = False);
 var CoverListe: TStringList;
     NewCoverName: String;
 begin
@@ -3730,7 +3849,7 @@ begin
             // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
             // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
             //if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
-            if (fLastPath <> aAudioFile.Ordner) then
+            if (fLastPath <> aAudioFile.Ordner) or (ForceReScan) then
             begin
                 //fLastPath := ExtractFilePath(aAudioFile.Pfad);
                 fLastPath := aAudioFile.Ordner;
@@ -3740,7 +3859,7 @@ begin
                 if Coverliste.Count > 0 then
                 begin
                     NewCoverName := coverliste[GetFrontCover(CoverListe)];
-                    if  (NewCovername <> fLastCoverName) then
+                    if  (NewCovername <> fLastCoverName) or (ForceReScan) then
                     begin
                         aAudioFile.CoverID := InitCoverFromFilename(NewCovername);
                         if aAudioFile.CoverID = '' then
@@ -5299,34 +5418,44 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.FillRandomList(aList: TObjectlist);
-var sourceList: TObjectlist;
+var sourceList, tmpFileList: TObjectlist;
     i: Integer;
     aAudioFile: TAudioFile;
 begin
-  EnterCriticalSection(CSUpdate);
+    EnterCriticalSection(CSUpdate);
 
-  if PlaylistFillOptions.WholeBib then
-    SourceList := Mp3ListePfadSort
-  else
-    SourceList := AnzeigeListe;
-  // passende Stücke zusammensuchen
-  for i := 0 to SourceList.Count - 1 do
-  begin
-    aAudioFile := SourceList[i] as TAudioFile;
-    if CheckYearRange(aAudioFile.Year)
-        //and CheckGenrePL(aAudioFile.Genre)
-        and CheckRating(aAudioFile.Rating)
-        and CheckLength(aAudioFile.Duration)
-        and CheckTags(aAudioFile.Taglist)
-        then
-      aList.Add(aAudioFile);
-  end;
-  // Liste mischen
-  for i := 0 to aList.Count-1 do
-    aList.Exchange(i,i + random(aList.Count-i));
-  // Überflüssiges löschen
-  For i := aList.Count - 1 downto PlaylistFillOptions.MaxCount do
-    aList.Delete(i);
+    if PlaylistFillOptions.WholeBib then
+        SourceList := Mp3ListePfadSort
+    else
+        SourceList := AnzeigeListe;
+
+    // passende Stücke zusammensuchen
+    tmpFileList := TObjectlist.Create(False);
+    try
+        for i := 0 to SourceList.Count - 1 do
+        begin
+            aAudioFile := SourceList[i] as TAudioFile;
+            if CheckYearRange(aAudioFile.Year)
+                //and CheckGenrePL(aAudioFile.Genre)
+                and CheckRating(aAudioFile.Rating)
+                and CheckLength(aAudioFile.Duration)
+                and CheckTags(aAudioFile.Taglist)
+                then
+              tmpFileList.Add(aAudioFile);
+        end;
+        // Liste mischen
+        for i := 0 to tmpFileList.Count-1 do
+            tmpFileList.Exchange(i,i + random(tmpFileList.Count-i));
+        // Überflüssiges löschen
+        For i := tmpFileList.Count - 1 downto PlaylistFillOptions.MaxCount do
+            tmpFileList.Delete(i);
+
+        // eigentliche Zielliste mit Kopien füllen
+        for i := 0 to tmpFileList.Count-1 do
+            TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+    finally
+        tmpFileList.Free;
+    end;
 
   LeaveCriticalSection(CSUpdate);
 end;
@@ -5827,7 +5956,7 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream; MaxSize: Integer): Boolean;
-var FilesCount, i, DriveID, audioSize: Integer;
+var FilesCount, i, DriveID: Integer;
     newAudioFile: TAudioFile;
     ID: Byte;
     CurrentDriveChar: WideChar;
@@ -5843,7 +5972,7 @@ begin
         case ID of
             0: begin
                 newAudioFile := TAudioFile.Create;
-                audioSize := newAudioFile.LoadSizeInfoFromStream(aStream);
+                {audioSize := }newAudioFile.LoadSizeInfoFromStream(aStream);
                 newAudioFile.LoadDataFromStream(aStream);
                 newAudioFile.SetNewDriveChar(CurrentDriveChar);
                 UpdateList.Add(newAudioFile);
@@ -5870,7 +5999,7 @@ begin
                         CurrentDriveChar := WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
                     newAudioFile := TAudioFile.Create;
 
-                    audioSize := newAudioFile.LoadSizeInfoFromStream(aStream);
+                    {audioSize := }newAudioFile.LoadSizeInfoFromStream(aStream);
                     newAudioFile.LoadDataFromStream(aStream);
                     newAudioFile.SetNewDriveChar(CurrentDriveChar);
                     UpdateList.Add(newAudioFile);
@@ -6418,7 +6547,7 @@ begin
             on E: Exception do begin
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
                         Integer(PWideChar((ErrorLoadingMediaLib) + #13#10 + E.Message )));
-                success := False;
+                // success := False;
             end;
         end;
     end else

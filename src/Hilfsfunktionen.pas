@@ -39,7 +39,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, bass,  ShlObj, ActiveX, ClipBrd, ShellApi, StrUtils, WinSock,
-  Inifiles, ExtCtrls, Jpeg, PNGImage, GifImg,
+  Inifiles, ExtCtrls, Jpeg, PNGImage,
   math, contNrs, consts, OneInst, DateUtils,
   gnugettext, Nemp_RessourceStrings;
 

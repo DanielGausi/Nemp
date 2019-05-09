@@ -370,7 +370,8 @@ begin
 
     fMainWindowHandle := aHandle;
     fCurrentLogEntry := Nil;
-    GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
+    //GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
+    fLocalFormatSettings := TFormatSettings.Create;
 end;
 
 destructor TNempLogFile.destroy;

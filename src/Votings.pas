@@ -3,7 +3,7 @@ unit Votings;
 interface
 
 uses Windows, Classes, Messages, ContNrs, SysUtils, IniFiles,  StrUtils,
-  DateUtils, VirtualTrees,
+  DateUtils, VirtualTrees, System.Types,
   MP3FileUtils, NempAudioFiles, Hilfsfunktionen,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
   MedienbibliothekClass;
@@ -218,7 +218,7 @@ end;
 
 // this is called from the Messagehandler for "WS_VoteID"
 function TVoteMachine.VCLDoVote(aFileID: Integer; aPlaylist: TNempPlaylist): Integer;
-var i: integer;
+var i: Integer;
     af: TAudioFile;
 begin
     result := 0;  // fail

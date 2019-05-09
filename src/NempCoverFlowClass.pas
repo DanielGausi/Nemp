@@ -154,7 +154,7 @@ begin
             fMode := aValue;
             if Not Assigned(fClassicFlow) then
             begin
-                fClassicFlow := TClassicCoverFlow.Create;
+                fClassicFlow := TClassicCoverFlow.Create(events_Window);
             end;
                 fClassicFlow.MainImage := MainImage;
                 fClassicFlow.ScrollImage := ScrollImage;

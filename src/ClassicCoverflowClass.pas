@@ -35,12 +35,17 @@ unit ClassicCoverflowClass;
 interface
 
 uses Windows, Messages, SysUtils, Graphics, ExtCtrls, ContNrs, Classes,
-    Jpeg, PNGImage, GifImg, dialogs;
+    Jpeg, PNGImage, dialogs;
+
+const
+    // the same as in FlyingCow
+    WM_FLYINGCOW = WM_USER + $1000;
+    WM_FC_NEEDPREVIEW = WM_FLYINGCOW + 0;
 
 type
     TClassicCoverFlow = class
         private
-
+            fEventsWindow : HWND;
             fCurrentItem: Integer;  // Index of the current selected cover
             fCurrentCoverID: String;     // currently selected coverID
             // Note: I'm not using a NempCover-object here to remember the idx
@@ -61,6 +66,8 @@ type
 
             property CurrentItem: Integer read fGetCurrentItem write fSetCurrentItem;
            // property Caption: String read fcaption;
+
+           constructor Create(events_window : HWND);
 
             // ScrollToCurrentItem:
             // Searches the cover with fCurrentCoverID and shows it
@@ -134,45 +141,25 @@ begin
     MainImage.Picture.Bitmap.Height := MainImage.Height;
     MainImage.Picture.Bitmap.Width := MainImage.Width;
 
-    GetCoverBitmapFromID(aCover.ID, MainImage.Picture.Bitmap, CoverSavePath);
+    if not GetCoverBitmapFromID(aCover.ID, MainImage.Picture.Bitmap, CoverSavePath) then
+        // cover is missing - try again to get it ?
+        SendMessage(fEventsWindow, WM_FC_NEEDPREVIEW, fCurrentItem, 0);
 
-  {  if aCover.ID = 'all' then
-    begin
-        GetDefaultCover(dcAllFiles, MainImage.Picture.Bitmap, cmUseBibDefaults or cmNoStretch);
-        fCaption := _(aCover.Artist) + #13#10 + _(aCover.Album);
-    end else
-    begin
-        if aCover.ID = '' then
-        begin
-            GetDefaultCover(dcNoCover, MainImage.Picture.Bitmap, cmUseBibDefaults or cmNoStretch);
-            fCaption := _(aCover.Artist) + #13#10 + _(aCover.Album); //+ ' --- ' + aCover.ID;
-        end else
-        begin
-            fCaption := (aCover.Artist) + #13#10 + (aCover.Album) ;// + ' --- ' + aCover.ID;
-            if FileExists(CoverSavePath + aCover.ID + '.jpg') then
-            begin
-                try
-                  aStream := TFileStream.Create(CoverSavePath  + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
-                  aJpg := TJpegIMage.Create;
-                  aJpg.LoadFromStream(aStream);
-                  MainImage.Picture.Assign(aJpg);
-                  aStream.free;
-                  aJpg.Free;
-                except
-                end;
-            end else
-            begin
-                GetDefaultCover(dcError, MainImage.Picture.Bitmap, cmUseBibDefaults or cmNoStretch);
-            end;
-        end;
-    end;
-  }
+    // after that: try again
+    // yes, we called this in the MessageHandler for WM_FC_NEEDPREVIEW as well
+    // not the best solution, but I hope the classic flow is not used that often^^
+    GetCoverBitmapFromID(aCover.ID, MainImage.Picture.Bitmap, CoverSavePath);
 
     DrawScrollCover(fCurrentItem, ScrollImage.Width, ScrollImage.Height);
 end;
 
 
 
+
+constructor TClassicCoverFlow.Create(events_window: HWND);
+begin
+    fEventsWindow := events_window;
+end;
 
 procedure TClassicCoverFlow.DrawScrollCover(aIdx: Integer; aWidth, aHeight: Integer);
 var mitte, minidx, maxidx, i: Integer;
@@ -181,11 +168,8 @@ var mitte, minidx, maxidx, i: Integer;
     xfactor, yfactor:double;
     NewHeight, NewWidth: Integer;
     bigbmp: TBitmap;
-    //aStream: TFileStream;
     aCover: TNempCover;
 begin
-
-
   mitte := aWidth Div 2;
 
   minidx := aIdx - ((Mitte Div 75) + 1);
@@ -208,36 +192,6 @@ begin
 
           GetCoverBitmapFromID(aCover.ID, aBmp, CoverSavePath);
 
-        {  if aCover.ID = 'all' then
-          begin
-              GetDefaultCover(dcAllFiles, aBmp, cmUseBibDefaults);
-          end else
-          begin
-              if aCover.ID = '' then
-              begin
-                  GetDefaultCover(dcNoCover, aBmp, cmUseBibDefaults);
-              end else
-
-                  if FileExists(CoverSavePath + aCover.ID + '.jpg') then
-                  begin
-                      //try
-                        //aStream := TFileStream.Create(CoverSavePath + aCover.ID + '.jpg', fmOpenRead or fmShareDenyWrite);
-                        //aJpg.LoadFromStream(aStream);
-                        aJpg.LoadFromFile(CoverSavePath + aCover.ID + '.jpg');
-
-                        abmp.Assign(aJpg);
-                        //aStream.free;
-                      //except
-                      //end;
-                  end
-                 else
-                  begin
-                      GetDefaultCover(dcError, aBmp, cmUseBibDefaults);
-                  end;
-          end; }
-
-
-          ;
           if (abmp.Width > 0) AND (abmp.Height > 0) then
           begin
               xfactor:= (75) / abmp.Width;

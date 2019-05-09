@@ -98,7 +98,7 @@ end;
 
 procedure TSilenceDetector.fGetSilenceLength;
 var IntThreshold: Integer;
-    a, b: Integer;
+    a, b: DWORD;
 
     pos, count: DWORD;
     buf: array[0..100000] of Smallint;

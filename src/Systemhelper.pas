@@ -43,7 +43,7 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes, Forms, Dialogs, ShlObj, ActiveX,
-  ClipBrd, ShellApi,  WinSock;
+  ClipBrd, ShellApi,  WinSock, AnsiStrings;
 
 
 // Is XP-Theme active or Classic-mode?
@@ -358,7 +358,7 @@ begin
           Addr := Pointer(HostInfo^.h_addr_list);
           if (Addr<>nil) AND (Addr^<>nil) then
              Repeat
-                    Result.Add(String(StrPas(inet_ntoa(Addr^^))));
+                    Result.Add(String(AnsiStrings.StrPas(inet_ntoa(Addr^^))));
                     inc(Addr);
              Until Addr^=nil;
        end;

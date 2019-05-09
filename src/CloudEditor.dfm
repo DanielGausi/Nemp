@@ -134,13 +134,13 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
+            Text = 'Tag'
             Width = 217
-            WideText = 'Tag'
           end
           item
             Position = 1
+            Text = 'Count'
             Width = 100
-            WideText = 'Count'
           end>
       end
       object BtnMerge: TButton
@@ -224,13 +224,13 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
+            Text = 'Original key'
             Width = 150
-            WideText = 'Original key'
           end
           item
             Position = 1
+            Text = 'Replace with'
             Width = 150
-            WideText = 'Replace with'
           end>
       end
       object BtnDeleteMergeTag: TButton
@@ -285,8 +285,8 @@ object CloudEditorForm: TCloudEditorForm
         Columns = <
           item
             Position = 0
+            Text = 'Key'
             Width = 200
-            WideText = 'Key'
           end>
       end
       object BtnDeleteIgnoreTag: TButton

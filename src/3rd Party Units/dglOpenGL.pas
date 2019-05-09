@@ -11854,11 +11854,11 @@ begin
   // Changed by bero
   raise Exception.Create('RaiseLastOSError!'); // To-Do: find a better solution
 {$ELSE}
-{$IFDEF VER140} // If Delphi 6 or later
+//{$IFDEF VER140} // If Delphi 6 or later
   SysUtils.RaiseLastOSError;
-{$ELSE}
-  SysUtils.RaiseLastWin32Error;
-{$ENDIF}
+//{$ELSE}
+//  SysUtils.RaiseLastWin32Error;
+//{$ENDIF}
 {$ENDIF}
 end;
 

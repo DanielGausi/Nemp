@@ -36,7 +36,7 @@ unit NempApi;
 
 interface
 
-uses Windows, Messages, SysUtils;
+uses Windows, Messages, SysUtils, AnsiStrings;
 
 // Ober-Prozedur fürs Setzen eines Wertes in Nemp/Winamp per WM_USER Nachricht
 procedure SetNemp_User(value, kind: Integer);
@@ -1022,7 +1022,7 @@ begin
     with MyCopyDataStruct do
     begin
       dwData := IPC_SEND_SEARCHSTRING;
-      cbData := StrLen(PAnsiChar(aString)) + 1;  //Need to transfer terminating #0 as well
+      cbData := AnsiStrings.StrLen(PAnsiChar(aString)) + 1;  //Need to transfer terminating #0 as well
       lpData := PAnsiChar(aString);
     end;
     SendMessage(hwndNemp, WM_COPYDATA, Source, Longint(@MyCopyDataStruct))
@@ -1040,7 +1040,7 @@ begin
     begin
       dwData := IPC_SEND_FILEFORPLAYLIST + Mode;
       cbData :=
-            StrLen(PAnsiChar(aFilename)) + 1; //Need to transfer terminating #0 as well
+            AnsiStrings.StrLen(PAnsiChar(aFilename)) + 1; //Need to transfer terminating #0 as well
       lpData := PAnsiChar(aFilename);
     end;
     SendMessage(hwndNemp, WM_COPYDATA, Source, Longint(@MyCopyDataStruct))

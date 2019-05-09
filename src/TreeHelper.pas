@@ -40,7 +40,7 @@ unit TreeHelper;
 interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
-  Contnrs, Classes, Jpeg, PNGImage, GifImg,
+  Contnrs, Classes, Jpeg, PNGImage,
   Mp3FileUtils, Id3v2Frames, dialogs, Hilfsfunktionen,
   Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
   gnuGettext, Nemp_RessourceStrings;

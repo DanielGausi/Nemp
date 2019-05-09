@@ -71,7 +71,7 @@ uses
   PartyModeClass in 'PartyModeClass.pas',
   PostProcessorUtils in 'PostProcessorUtils.pas',
   RatingCtrls in 'RatingCtrls.pas',
-  TagClouds in 'TagClouds.pas' ,
+  TagClouds in 'TagClouds.pas' {/,  classes;},
   CloudEditor in 'CloudEditor.pas' {CloudEditorForm},
   Taghelper in 'Taghelper.pas',
   CoverDownloads in 'CoverDownloads.pas',
@@ -93,7 +93,24 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  NempApi in 'common\NempApi.pas',
+  NempApi in 'common\NempApi.pas' {,
+  bass in '3rd Party Units\bass.pas',
+  bass_fx in '3rd Party Units\bass_fx.pas',
+  basscd in '3rd Party Units\basscd.pas';
+
+uses
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
+  OneInst in '3rd Party Units\OneInst.pas',
+  gnuGettext,
+  Forms,
+  Windows,
+  SysUtils,
+  Graphics,
+  NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
   bass in '3rd Party Units\bass.pas',
   bass_fx in '3rd Party Units\bass_fx.pas',
   basscd in '3rd Party Units\basscd.pas',
@@ -111,7 +128,8 @@ uses
   PlayWebstream in 'PlayWebstream.pas',
   bassmidi in '3rd Party Units\bassmidi.pas',
   unFastFileStream in '3rd Party Units\unFastFileStream.pas',
-  PlayerLog in 'PlayerLog.pas' {PlayerLogForm};
+  PlayerLog in 'PlayerLog.pas' {PlayerLogForm},
+  ProgressUnit in 'ProgressUnit.pas' {ProgressForm};
 
 {$R *.res}
 
@@ -144,7 +162,7 @@ ShowWindow
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-
+  Application.CreateForm(TProgressForm, ProgressForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

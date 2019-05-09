@@ -848,6 +848,7 @@ begin
                 begin
                     Data := TagVST.GetNodeData(SelectedTags[i]);
                     CurrentTagToChange := Data^.FTag.Key;
+                    UpdateDone := False; // should never happen
                     if CurrentTagToChange <> newTag then
                     begin
                         // Actually try to update the merge rules
@@ -884,7 +885,6 @@ begin
                                                 MedienBib.AskForAutoResolveInconsistenciesRules := not asknomore;
                                             end;
                                             mrCancel: begin
-                                                updateDone := False;
                                                 break;
                                             end;
                                         end;
@@ -950,7 +950,7 @@ begin
             begin
                 Data := TagVST.GetNodeData(SelectedTags[i]);
                 CurrentTagToChange := Data^.FTag.Key;
-
+                UpdateDone := False; // should never happen
                 case MedienBib.TagPostProcessor.AddIgnoreRuleConsistencyCheck(CurrentTagToChange) of
 
                     CONSISTENCY_OK: begin

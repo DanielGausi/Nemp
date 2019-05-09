@@ -6119,6 +6119,7 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ML_SetRatingsOfSelectedFiles: TMenuItem
       Caption = 'Set rating of selected files to'
       ImageIndex = 20
+      OnClick = PM_ML_SetRatingsOfSelectedFilesClick
       object PM_ML_SetRatingsOfSelectedFiles1: TMenuItem
         Tag = 100
         Caption = '0.5 stars'

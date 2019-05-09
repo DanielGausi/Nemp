@@ -159,7 +159,7 @@ type
 
           fTheme : String;
 
-          fOnlyLAN               : Longbool;
+          // fOnlyLAN               : Longbool;
           fAllowPlaylistDownload : Longbool;
           fAllowLibraryAccess    : Longbool;
           fAllowRemoteControl    : Longbool;
@@ -681,7 +681,8 @@ begin
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
 
-    GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
+    fLocalFormatSettings := TFormatSettings.Create;
+    //GetLocaleFormatSettings(LOCALE_USER_DEFAULT, fLocalFormatSettings);
     UsernameU := '';
     PasswordU := '';
 
@@ -995,8 +996,8 @@ begin
 end;
 
 function TNempWebServer.ValidIP(aIP, bIP: string): Boolean;
-var lastpoint: integer;
-    CommonPart: string;
+//var lastpoint: integer;
+    // CommonPart: string;
 begin
   //if Not OnlyLAN then
       result := True

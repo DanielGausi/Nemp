@@ -78,7 +78,7 @@ var
   Msg: TMsg;
   Wnd: HWND;
   Dat: TCopyDataStruct;
-  AResult: DWORD;
+  AResult: PDWORD_PTR; //DWORD;
 begin
   // MessageBox(0, 'läuft schon', nil, MB_ICONINFORMATION);
   {----------------------------------------------------------------------------}
@@ -89,6 +89,7 @@ begin
   { (Broadcast sollten _NUR_ mit registrierten Nachrichten-Ids erfolgen!)      }
   {----------------------------------------------------------------------------}
 
+  AResult := NIL;
   SendMessageTimeOut(HWND_BROADCAST, SecondInstMsgId, GetCurrentThreadId, 0, SMTO_ABORTIFHUNG, 500, AResult );
 
   { Wir warten auf die Antwort der ersten Instanz                        }

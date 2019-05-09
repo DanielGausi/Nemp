@@ -639,7 +639,9 @@ In the first tab \textbf{General} you get an overview of the metadata for the se
 
 The second tab contains the basic properties of the \emph{ID3 tags}. For some file types there is no ID3 tag in the true sense of the word. With .ogg or .flac files, these information is then called \emph{Vorbis comments}. With .mp3 files you can edit the two tag versions \texttt{id3v1} and \texttt{id3v2} separately. However, you should keep them in sync.
 
-In the third tab you can edit \textbf{lyrics and pictures}. If you want to edit lyrics for several titles, it might be faster to use the multiple search for lyrics. To do this, select several files in the main window and select the \textsc{Get  Lyrics} function (key combination \textsc{Ctrl+L}). This is done using the page \emph{lyrics.wikia.com}. This will take a little time, and not all titles will be found with the correct lyrics, but the hit rate is quite good.
+In the third tab you can edit \textbf{lyrics and pictures}. If you want to edit lyrics for several titles, it might be faster to use the multiple search for lyrics. To do this, select several files in the main window and select the \textsc{Get  Lyrics} function (key combination \textsc{Ctrl+L}). This will take a little time, and not all titles will be found with the correct lyrics, but the hit rate is quite good.
+
+Since version 4.9.3 not only the page \emph{lyrics.wikia.com} is used, but optionally also \emph{chartlyrics.com}. Which source is used with which priority can be set in the options. The new page Chartlyrics should only be used as fallback. When searching on this page, some search terms will be filtered out automatically. For example \emph{are, take, that, the, who, are, you} and many others. What effects this will have on the titles from Bands like \emph{Take That} or \emph{The Who} (especially the title \emph{Who are you?}) you can then imagine yourself.
 
 In the fourth tab you can edit the extended tags for the \hyperref[sec_tagwolke]{tag cloud}. For this tag cloud, further tags are very useful, because the few standard tags are not sufficient for a meaningful categorization. 
 
@@ -1225,10 +1227,10 @@ Of course, this does not always work properly. But it's a significant improvemen
 \end{itemize}
 
 
-\subsubsection{Cover}
+\subsubsection{Cover and Lyrics}
 \label{sec_coversettings}
 
-In this section, you can configure the search for covers for the library. The default setting is this search behavior, which turned out to be very reliable in extensive tests.
+In this section, you can configure the search for covers and lyrics for the library. The default setting for the cover search is the following search behavior, which turned out to be very reliable in extensive tests.
 
 \begin{itemize}
 \item Search in the directory itself
@@ -1298,6 +1300,8 @@ In addition, Nemp can search for missing covers on the internet at last.fm. In o
 The button \textsc{Clear cache} deletes the information about unsuccessfully searched covers and Nemp will start searching for them again.
 
 \item \textbf{Default cover.} Selection of a custom default cover in case Nemp cannot find a cover for an album or title. Covers already displayed in the player are not updated until the cover is reloaded, i. e. when a new song is started or when the coverflow is scrolled through.
+
+\item \textbf{Online search for lyrics.} Here you can configure which online sources with which priority should be used for the search for lyrics. Standard is LyricWiki, optionally ChartLyrics can be used as fallback. In most cases, however, LyricWiki will achieve better results.
 \end{itemize}
 
 \subsubsection{Search settings}
@@ -1351,6 +1355,14 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+\subsection*{Version 4.9.3, May 2019}
+\begin{itemize}
+\item fixed the search for lyrics: new template, change to https
+\item additional source for lyrics 
+\item Switched from http to https where possible (scrobbling, search for cover, partially lyrics)
+\item Upgrade to Delphi 10.3 Rio (Community Edition)
+\end{itemize}
 
 \subsection*{Version 4.9.2, January 2019}
 \begin{itemize}

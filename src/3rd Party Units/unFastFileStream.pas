@@ -95,7 +95,8 @@ implementation
 
 function OffsetPointer(const Addr: Pointer; const Offset: PtrInt): Pointer; inline;
 begin
-  Result:= {%H-}Pointer({%H-}PtrUInt(Addr) + Offset);
+  //Result:= {%H-}Pointer({%H-}PtrUInt(Addr) + Offset);
+  Result:= {%H-}Pointer({%H-}PtrUInt(Addr) + PtrUInt(Offset));
 end;
 
 function SubtractPointer(const Addr1, Addr2: Pointer): PtrInt; inline;
@@ -281,7 +282,7 @@ begin
     if(FVirtualSize>FRealSize) or (newSizeWanted-FBufferSize*2>FRealSize) then
       SetFileSize(newSizeWanted);
   end;
-  if(setPosition) then Seek(NewSize,soFromBeginning);
+  if(setPosition) then Seek(NewSize,soBeginning);
 end;
 
 function TFastFileStream.Read(var Buffer; Count: Integer): Longint;
@@ -300,12 +301,12 @@ begin
         Inc(pTarget,iRemain);
         Dec(Count,iRemain);
       end;
-      Seek(iRemain,soFromCurrent);
+      Seek(iRemain,soCurrent);
     end else begin
       //pSrc:=Ptr(Cardinal(FPointer)+FPosInBuffer);
       pSrc:=OffsetPointer(FPointer, FPosInBuffer);
       Move(pSrc^,pTarget^,Count);
-      Seek(Count,soFromCurrent);
+      Seek(Count,soCurrent);
       Inc(pTarget,Count);
       Count:=0;
     end;
@@ -340,12 +341,12 @@ begin
         Inc(pSrc,iRemain);
         Dec(Count,iRemain);
       end;
-      Seek(iRemain,soFromCurrent);
+      Seek(iRemain,soCurrent);
     end else begin
       //pTarget:=Ptr(Cardinal(FPointer)+FPosInBuffer);
       pTarget:=OffsetPointer(FPointer, FPosInBuffer);
       Move(pSrc^,pTarget^,Count);
-      Seek(Count,soFromCurrent);
+      Seek(Count,soCurrent);
       Inc(pSrc,Count);
       Count:=0;
     end;

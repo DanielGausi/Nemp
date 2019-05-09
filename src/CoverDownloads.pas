@@ -35,7 +35,7 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
-  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, GifImg, math, DateUtils,
+  Dialogs, StrUtils, ContNrs, Jpeg, PNGImage,  math, DateUtils,
   CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs, System.Types,
   // new method for downloading stuff
@@ -279,7 +279,7 @@ end;
 
 constructor TCoverDownloadWorkerThread.Create;
 begin
-    inherited create(True);
+    inherited create(False);
     /// fIDHttp := TIdHttp.Create;
     fJobList := TObjectList.Create;
     fDataStream := TMemoryStream.Create;
@@ -301,7 +301,7 @@ begin
     fHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
 
     UserWantToClearCacheList := False;
-    Resume;
+    //Resume;
 end;
 
 destructor TCoverDownloadWorkerThread.Destroy;
@@ -741,13 +741,16 @@ end;
     --------------------------------------------------------
 }
 function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
-var url: UTF8String;
+var //url: UTF8String;
+    url: String;
     aResponse: IHttpResponse;
 begin
     url := 'https://ws.audioscrobbler.com/2.0/?method=album.getinfo'
         + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
-        + '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
-        + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
+        //+ '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
+        //+ '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
+        + '&artist=' + URLEncode_LastFM(AnsiLowerCase(fCurrentDownloadItem.Artist))
+        + '&album='  + URLEncode_LastFM(AnsiLowerCase(fCurrentDownloadItem.Album));
 
     try
         //fXMLData := fIDHttp.Get(url);
@@ -1386,8 +1389,6 @@ end;
 }
 procedure TCoverDownloadWorkerThread.SyncUpdateMedialib;
 var OldID, NewID: String;
-    i: Integer;
-    afList: TObjectList;
 begin
     if  (MedienBib.BrowseMode = 1)         // we are still in CoverFlow
         and (fCurrentDownloadItem.QueryType = qtCoverFlow)
@@ -1399,25 +1400,14 @@ begin
         // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
         OldID := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID;
 
-        // Get List of all Files with the old ID
-        afList := TObjectList.Create(False);
-        try
-            MedienBib.GetTitelListFromCoverID(afList, OldID);
-            for i := 0 to afList.Count - 1 do
-                // set the new ID
-                TAudioFile(afList[i]).CoverID := NewID;
+        MedienBib.ChangeCoverID(OldID, NewID);
 
-            // set the new ID on the NempCover-Object
-            TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID := NewID;
+        // set the new ID on the NempCover-Object
+        TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID := NewID;
 
-            if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
-                MedienBib.NewCoverFlow.CurrentCoverID := NewID;
+        if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
+            MedienBib.NewCoverFlow.CurrentCoverID := NewID;
 
-            MedienBib.HandleChangedCoverID;
-            MedienBib.Changed := True;
-        finally
-            afList.Free;
-        end;
     end;// else
         //Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
 end;

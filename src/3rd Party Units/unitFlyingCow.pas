@@ -46,11 +46,8 @@ var
 
 const
   WM_FLYINGCOW = WM_USER + $1000;
-
   WM_FC_NEEDPREVIEW = WM_FLYINGCOW + 0;
   WM_FC_SELECT = WM_FLYINGCOW + 1;
-
-
  // WM_FC_NEEDMORE = WM_FLYINGCOW + 2;
   WM_FLYINGCOWTEST = WM_FLYINGCOW + 3;
 
@@ -195,6 +192,7 @@ begin
   fThread := TRenderThread.Create (self, window, events_window);
   fEventsWindow := events_window;
   fBeginUpdate := False;
+  //fThread.Start;
 end;
 
 
@@ -423,7 +421,7 @@ end;
 
 constructor TRenderThread.Create(instance: TFlyingCow; window, events_window : HWND);
 begin
-  inherited Create (True);
+  inherited Create (False);
   fSemaphore := CreateSemaphore(Nil, 0, maxInt, Nil);
   FreeOnTerminate := False;
   fInstance := instance;
@@ -444,7 +442,8 @@ begin
   fr := 0.0;
   fg := 0.0;
   fb := 0.0;
-  resume;
+  // resume;
+  // start;
 end;
 
 procedure TRenderThread.DeleteTexture (index : LongInt);

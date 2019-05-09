@@ -506,6 +506,9 @@ type
         //function RemoveTag(aTag: String): Boolean;
         //function RenameTag(oldTag, newTag: String): Boolean;
 
+        // creates a copy of the Audiofile and adds the copy to the list
+        procedure AddCopyToList(aList: TObjectList);
+
 
     end;
 
@@ -843,7 +846,7 @@ begin
             Stream.Seek(0, sobeginning);
             tmp := id3v2tag.ReadFromStream(Stream);
             if id3v2Tag.exists then
-                Stream.Seek(id3v2tag.size, soFromBeginning)
+                Stream.Seek(id3v2tag.size, soBeginning)
             else
                 Stream.Seek(0, sobeginning);
             if (tmp <> MP3ERR_None) and ((result = ID3ERR_NoTag) or (result = MP3ERR_None)) then
@@ -900,6 +903,14 @@ begin
       fTagList.Free;
 
   inherited destroy;
+end;
+
+procedure TAudioFile.AddCopyToList(aList: TObjectList);
+var newFile: TAudioFile;
+begin
+    newFile := TAudioFile.Create;
+    newFile.Assign(self);
+    aList.Add(newFile);
 end;
 
 procedure TAudioFile.Assign(aAudioFile: TAudioFile);
@@ -1542,7 +1553,7 @@ function TAudioFile.GetAudioData(filename: UnicodeString; Flags: Integer = 0): T
 var MainFile: TGeneralAudioFile;
     fs: TFileStream;
 begin
-  result := AUDIOERR_Unkown; // default value
+  // result := AUDIOERR_Unkown; // default value
 
   Pfad := filename; // Set Path and determine Audiotype (file, stream, CD-Audio)
 
@@ -2619,7 +2630,7 @@ var GenreIDX:byte;
     katold:byte;
     tmp: UnicodeString;
     Id: Byte;
-    dummy: Integer;
+    // dummy: Integer;
     Wyear: word;
     DummyInt: Integer;
     Dummystr: UnicodeString;

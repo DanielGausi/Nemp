@@ -65,7 +65,8 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
-    DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog, PostProcessorUtils;
+    DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
+    PostProcessorUtils, ProgressUnit;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -108,7 +109,7 @@ begin
         IPC_SETPLAYLISTPOS: if AcceptApiCommands then
 
                         begin
-                          if NempPlaylist.Count > aMsg.WParam then
+                          if NempPlaylist.Count > Integer(aMsg.WParam) then
                           begin
                               NempPlayer.LastUserWish := USER_WANT_PLAY;
                               NempPlaylist.Play(aMsg.WParam, NempPlayer.FadingInterval, True);
@@ -143,7 +144,7 @@ begin
                       //aList := MedienBib.AnzeigeListe; // fix 11.2018
                       aList := MedienBib.BibSearcher.IPCSearchResults;
 
-                    if assigned(aList) AND (aList.Count > aMsg.WParam) then
+                    if assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
                       aMsg.Result := TAudioFile(aList[aMsg.WParam]).Duration
                     else
                       aMsg.Result := -1;
@@ -311,7 +312,7 @@ begin
                               aList := MedienBib.BibSearcher.IPCSearchResults;
                             end;
 
-                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam >= 0)then
+                            If assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
                             begin
                               aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of
@@ -387,7 +388,7 @@ begin
                               aList := MedienBib.BibSearcher.IPCSearchResults
                             end;
 
-                            If assigned(aList) AND (aList.Count > aMsg.WParam) AND (aMsg.WParam >= 0) then
+                            If assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
                             begin
                               aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of
@@ -600,7 +601,8 @@ begin
                       TargetList := MedienBib.LastMarkFilterList;
                       MedienBib.DisplayContent := DISPLAY_Favorites;
                   end;
-
+            else
+                TargetList := Nil; // should never happen
             end;
 
             if aMsg.WParam <> MB_ShowFavorites then
@@ -687,10 +689,12 @@ begin
         MB_ProgressRefresh: begin
             AuswahlStatusLbl.Caption := Format((MediaLibrary_RefreshingFiles), [aMsg.LParam]);
             fspTaskbarManager.ProgressValue := aMsg.LParam;
+            Progressform.MainProgressBar.Position := aMsg.LParam;
         end;
 
         MB_ProgressRefreshJustProgressbar: begin
             fspTaskbarManager.ProgressValue := aMsg.LParam;
+            Progressform.MainProgressBar.Position := aMsg.LParam;
         end;
 
         MB_RefreshTagCloudFile: begin
@@ -706,8 +710,14 @@ begin
         end;
 
         MB_ProgressSearchDead: begin
-            AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFiles), [aMsg.LParam]);
-            fspTaskbarManager.ProgressValue := aMsg.LParam;
+            // AuswahlStatusLbl.Caption := Format((MediaLibrary_SearchingMissingFilesDir), [aMsg.LParam]);
+            ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingMissingFilesDir), [pChar(aMsg.LParam)]);
+            // fspTaskbarManager.ProgressValue := aMsg.LParam;
+            //Progressform.MainProgressBar.Position := aMsg.LParam;
+        end;
+
+        MB_ProgressShowHint: begin
+              ProgressForm.lblCurrentItem.Caption := pChar(aMsg.LParam);
         end;
 
         //MB_SearchAutoAbort: MessageDLG((MediaLibrary_PreciseQuery), mtWarning, [MBOK], 0); // Wird aber nie ausgelöst ;-)
@@ -738,20 +748,24 @@ begin
 
         MB_LyricUpdateStatus: begin
             // WParam: a string like "(found 5/8)"
-            MedienListeStatusLBL.Caption :=
-                Format((MediaLibrary_SearchingLyrics),
-                      [ ExtractFilename(MedienBib.CurrentThreadFilename),
-                        PWideChar(aMsg.LParam)]);
-            // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
+            //MedienListeStatusLBL.Caption :=
+                // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
+            //    Format((MediaLibrary_SearchingLyrics),
+            //          [ ExtractFilename(MedienBib.CurrentThreadFilename), PWideChar(aMsg.LParam)]);
+            ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingLyrics_JustFile),
+                      [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
         end;
 
         MB_TagsUpdateStatus: begin
-        // WParam: a string like "(found 5/8)"
-            MedienListeStatusLBL.Caption :=
-                Format((MediaLibrary_SearchingTags),
-                      [ ExtractFilename(MedienBib.CurrentThreadFilename),
-                        PWideChar(aMsg.LParam)]);
+            // WParam: a string like "(found 5/8)"
+            //MedienListeStatusLBL.Caption :=
+            //    Format((MediaLibrary_SearchingTags),
+            //          [ ExtractFilename(MedienBib.CurrentThreadFilename),
+            //            PWideChar(aMsg.LParam)]);
             // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
+
+            ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingTags_JustFile),
+                      [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
         end;
 
         MB_TagsSetTabWarning: begin
@@ -763,8 +777,25 @@ begin
                             end;
 
         MB_LyricUpdateComplete: begin
-                              MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
+
+                              // MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
+
+                              ProgressForm.LblMain.Caption := PWideChar(aMsg.LParam);
+                              ProgressForm.lblCurrentItem.Caption := '';
+                              ProgressForm.FinishProcess;
                             end;
+
+        MB_CurrentProcessSuccessCount: begin
+                              ProgressForm.lblSuccessCount.Caption := IntToStr(aMsg.LParam);
+        end;
+        MB_CurrentProcessFailCount: begin
+                              ProgressForm.lblFailCount.Caption := IntToStr(aMsg.LParam);
+        end;
+
+        MB_StartLongerProcess: begin
+                              ProgressForm.InitiateProcess(Boolean(aMsg.LParam));
+        end;
+
         {
         MB_ReCheckPlaylingFile: begin
               // this is only called after loading the library.
@@ -1090,7 +1121,7 @@ begin
                                               if assigned(FS) then
                                               begin
                                                   FS.Free;
-                                                  tmpPlaylist := TObjectList.Create(True);
+                                                  tmpPlaylist := TObjectList.Create(False); // False: Do NOT free the audiofiles therein!
                                                   try
                                                       LoadPlaylistFromFile(filename, tmpPlaylist, False);
                                                       HandleFiles(tmpPlaylist, WebRadioInsertMode);
@@ -1110,7 +1141,7 @@ begin
                                   ShowSummary;
                                end;
         ST_PlaylistStreamLink: begin
-                                  tmpPlaylist  := TObjectList.Create(True);
+                                  tmpPlaylist  := TObjectList.Create(False); // False: Do NOT free the audiofiles therein!
                                   try
                                       tmpAudioFile := TAudioFile.Create;
                                       tmpAudioFile.Pfad := String(PChar(aMsg.LParam));
@@ -1133,7 +1164,7 @@ end;
 
 function Handle_WebServerMessage(Var aMsg: TMessage): Boolean;
 var idx: Integer;
-    af: TAudioFile;
+    af, newAudioFile: TAudioFile;
     newNode: PVirtualNode;
     NodeData: pTreeData;
 begin
@@ -1209,16 +1240,20 @@ begin
                               begin
                                   af := TAudioFile(aMsg.LParam);
                                   NempPlaylist.GetInsertNodeFromPlayPosition;
-                                  newNode := NempPlaylist.InsertFileToPlayList(af);
+
+                                  newAudioFile := TAudioFile.Create;
+                                  newAudioFile.Assign(af);
+
+                                  newNode := NempPlaylist.InsertFileToPlayList(newAudioFile);
                                   // NempPlaylist.AddNodeToPrebookList(newNode);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
 
                                   NodeData := PlaylistVST.GetNodeData(newNode);
-                                  af := NodeData^.FAudioFile;
-                                  NempWebserver.EnsureFileHasID(af);
+                                  newAudioFile := NodeData^.FAudioFile;
+                                  NempWebserver.EnsureFileHasID(newAudioFile);
 
-                                  aMsg.Result := af.WebServerID;
+                                  aMsg.Result := newAudioFile.WebServerID;
                                   //result: the ID of the new AudioFile-Object
                               end;
                         end;
@@ -1226,14 +1261,17 @@ begin
                               if AcceptApiCommands then
                               begin
                                   af := TAudioFile(aMsg.LParam);
-                                  newNode := NempPlaylist.AddFileToPlaylist(af);
+                                  newAudioFile := TAudioFile.Create;
+                                  newAudioFile.Assign(af);
+
+                                  newNode := NempPlaylist.AddFileToPlaylist(newAudioFile);
                                   if (NempPlayer.Mainstream = 0) then
                                       InitPlayingFile(NempPlaylist.AutoplayOnStart);
 
                                   NodeData := PlaylistVST.GetNodeData(newNode);
-                                  af := NodeData^.FAudioFile;
-                                  NempWebserver.EnsureFileHasID(af);
-                                  aMsg.Result := af.WebServerID;
+                                  newAudioFile := NodeData^.FAudioFile;
+                                  NempWebserver.EnsureFileHasID(newAudioFile);
+                                  aMsg.Result := newAudioFile.WebServerID;
                               end;
                            end;
         WS_PlaylistMoveUpCheck : begin  // returns a copy of the previous file in the playlist

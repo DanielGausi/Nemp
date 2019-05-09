@@ -38,9 +38,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
-  Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage, GifImg,
+  Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage,
   ShellApi, ComCtrls, U_CharCode, myDialogs,
-
   AudioFileBasics, Mp3FileUtils, ID3v2Frames, ID3GenreList, Mp3Files, FlacFiles, OggVorbisFiles,
   VorbisComments, AudioFiles, Apev2Tags, ApeTagItem, MusePackFiles, cddaUtils,
   M4AFiles, M4AAtoms,

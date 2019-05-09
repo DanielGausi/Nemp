@@ -323,7 +323,7 @@ type
       function SwapFiles(a, b: Integer): Boolean;   // a and b must be siblings!!
       procedure DeleteAFile(aIdx: Integer); // delete a file (for WebServer)
 
-      procedure ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
+      procedure ResortVotedFile(aFile: TAudioFile; aIndex: Cardinal);
 
       procedure ClearSearch(complete: Boolean = False);
       procedure SearchAll(aString: String); 
@@ -1385,23 +1385,23 @@ end;
 }
 function TNempPlaylist.AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode;
 var NewNode: PVirtualNode;
-    newAudiofile: TAudioFile;
+    //newAudiofile: TAudioFile;
 begin
-  newAudiofile := TAudioFile.Create;
-  newAudiofile.Assign(AudioFile);
+  //newAudiofile := TAudioFile.Create;
+  //newAudiofile.Assign(AudioFile);
 
-  Playlist.Add(newAudiofile);
-  NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
-  if (newAudiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(newAudiofile.CueList)) then
+  Playlist.Add(Audiofile);
+  NewNode := VST.AddChild(Nil, Audiofile); // Am Ende einfügen
+  if (Audiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(Audiofile.CueList)) then
   begin
     // nach einer Liste suchen und erstellen
-    newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-    AddCueListNodes(newAudiofile, NewNode);
+    Audiofile.GetCueList(aCueName, Audiofile.Pfad);
+    AddCueListNodes(Audiofile, NewNode);
   end;
 
   VST.Invalidate;
   Result := NewNode;
-  fDauer := fDauer + newAudiofile.Duration;
+  fDauer := fDauer + Audiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
   fPlaylistHasChanged := True;
 end;
@@ -1432,54 +1432,54 @@ end;
 function TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
 var NewFile: TPlaylistfile;
 begin
-  NewFile := TPlaylistfile.Create;
-  NewFile.Pfad := aAudiofileName;
+    NewFile := TPlaylistfile.Create;
+    NewFile.Pfad := aAudiofileName;
 
-  case NewFile.AudioType of
-      at_File: //SynchronizeAudioFile(NewFile, aAudioFileName);
-                SynchNewFileWithBib(newFile);
-      at_CDDA: begin
-          NewFile.GetAudioData(aAudioFileName, 0);
-      end;
+    case NewFile.AudioType of
+        at_File: //SynchronizeAudioFile(NewFile, aAudioFileName);
+                  SynchNewFileWithBib(newFile);
+        at_CDDA: begin
+            NewFile.GetAudioData(aAudioFileName, 0);
+        end;
 
-  end;
+    end;
 
-  result := AddFileToPlaylist(NewFile, aCueName);
-  NewFile.Free;
+    result := AddFileToPlaylist(NewFile, aCueName);
+  // NewFile.Free;
 end;
 
 function TNempPlaylist.InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode;
 var NewNode: PVirtualNode;
-    newAudiofile: TAudioFile;
+    // newAudiofile: TAudioFile;
 begin
-  newAudiofile := TAudioFile.Create;
-  newAudiofile.Assign(AudioFile);
+  //newAudiofile := TAudioFile.Create;  // no, just insert the file in the parameter.
+  //newAudiofile.Assign(AudioFile);
 
   if InsertNode <> NIL then
   begin
     fInsertIndex := InsertNode.Index;
-    Playlist.Insert(fInsertIndex, newAudiofile);
+    Playlist.Insert(fInsertIndex, Audiofile);
     Inc(fInsertIndex);
-    NewNode := VST.InsertNode(fInsertNode, amInsertBefore, newAudiofile);
+    NewNode := VST.InsertNode(fInsertNode, amInsertBefore, Audiofile);
 
     if AudioFile.Duration > MIN_CUESHEET_DURATION then
     begin
-        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-        AddCueListNodes(newAudiofile, NewNode);
+        Audiofile.GetCueList(aCueName, Audiofile.Pfad);
+        AddCueListNodes(Audiofile, NewNode);
     end;
   end else
   begin
-    Playlist.Add(newAudiofile);
+    Playlist.Add(Audiofile);
     // indexnode ist NIL, also am Ende einfügen
-    NewNode := VST.AddChild(Nil, newAudiofile);
+    NewNode := VST.AddChild(Nil, Audiofile);
     if AudioFile.Duration > MIN_CUESHEET_DURATION then
     begin
-        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-        AddCueListNodes(newAudiofile, NewNode);
+        Audiofile.GetCueList(aCueName, Audiofile.Pfad);
+        AddCueListNodes(Audiofile, NewNode);
     end;
   end;
   Result := NewNode;
-  fDauer := fDauer + newAudiofile.Duration;
+  fDauer := fDauer + Audiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
   fPlaylistHasChanged := True;
   VST.Invalidate;
@@ -1498,7 +1498,7 @@ begin
   end;
 
   result := InsertFileToPlayList(NewFile, aCueName);
-  NewFile.Free;
+  // NewFile.Free; // no, do not free any longer (2019)
 end;
 
 
@@ -2526,7 +2526,7 @@ begin
     fPlaylistHasChanged := True;
 end;
 
-procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
+procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Cardinal);
 var i, newIdx: Integer;
     currentNode, iNode: PVirtualNode;
     iData: PTreeData;

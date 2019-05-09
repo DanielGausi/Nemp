@@ -44,7 +44,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs,
+  Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs, System.Contnrs,
 
   Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
   SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen
@@ -487,7 +487,7 @@ begin
   case Msg.Msg of
     CEXM_MAXBYTES:
       begin
-        PBCurrentFile.Max := (Msg.LParam shl 32) + Msg.WParam;
+        PBCurrentFile.Max := (Msg.LParam shl 32) + Integer(Msg.WParam);
       end;
     CEXM_CONTINUE:
       begin
