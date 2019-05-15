@@ -41,6 +41,8 @@ type
 
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
+    TProgressActions = (pa_Default, pa_SearchFiles, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData);
+
     TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
     TNempSortArray = Array[1..2] of TAudioFileStringIndex;
@@ -149,6 +151,7 @@ type
         UseDisplayApp: Boolean;
         DisplayApp: String;
 
+        AutoCloseProgressWindow: Boolean;
         ShowSplashScreen: Boolean;
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
@@ -369,7 +372,7 @@ const
     //MB_ProgressSearch = 9;
     //MB_ProgressSearchFuzzy = 10;
 
-    MB_ProgressRefresh = 11;
+    //MB_ProgressRefresh = 11;
     MB_ProgressRefreshJustProgressbar = 30;
     //MB_SearchAutoAbort = 12;
     // Show search results. lParam contains a Pointer to the result-list
@@ -385,7 +388,7 @@ const
     ///MB_ShowQuickSearchResults  = 27;
 
 
-    MB_DeadFilesWarning = 14;
+    //MB_DeadFilesWarning = 14;
     // Warnung: Duplikate in der Bib gefunden. Das sollte eigentlich nicht mehr vorkommen
     MB_DuplicateWarning = 15;
     // Recheck Current playingfile after the bib was initially loaded (rating!)
@@ -397,9 +400,9 @@ const
     // Suche nach toten Dateien
     MB_ProgressSearchDead = 17;
     // Lyrics, send Status complete/failed
-    MB_LyricUpdateStatus = 18;
+    MB_ProgressCurrentFileOrDirUpdate = 18;
     // same for Tags
-    MB_TagsUpdateStatus = 28;
+    // MB_TagsUpdateStatus = 28;
     // Lyrics/PostProcessor: Send the filename which is currently edited by a thread
     MB_ThreadFileUpdate = 23;
     // Refresh AudioFile: GetAudiodata in VCL-Thread, as Cover-stuff will create some
@@ -407,9 +410,9 @@ const
     MB_RefreshAudioFile = 24;
 
     // Exception im Thread - wahrscheinlich keine Internetverbindung.
-    MB_LyricUpdateFailed = 19;
+    //MB_LyricUpdateFailed = 19;
     // Liste abgearbeitet
-    MB_LyricUpdateComplete = 20;
+    MB_UpdateProcessComplete = 20;
 
     MB_CurrentProcessFailCount = 46;
     MB_CurrentProcessSuccessCount = 47;
@@ -926,6 +929,8 @@ begin
   begin
         //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
         LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
+
+        AutoCloseProgressWindow := ini.ReadBool('Allgmein', 'AutoCloseProgressWindow', False);
         StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
         RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', False);
@@ -1137,6 +1142,7 @@ begin
         //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
 
+        ini.WriteBool('Allgmein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
         ini.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
         ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);

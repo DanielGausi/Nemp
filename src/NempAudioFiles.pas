@@ -285,6 +285,7 @@ type
         function fGetIsFile: Boolean;
         function fGetIsStream: Boolean;
         function fGetIsCDDA: Boolean;
+        function fGetIsLocalFile: Boolean;
 
         function fGetRoundedRating: Double;
 
@@ -412,6 +413,7 @@ type
         property IsFile: Boolean read fGetIsFile;
         property isStream: Boolean read fGetIsStream;
         property isCDDA: Boolean read fGetIsCDDA;
+        property isLocalFile: Boolean read fGetIsLocalFile;
 
         property VoteCounter: Integer read fVoteCounter write fVoteCounter;
         property Favorite: Byte read fFavorite write fFavorite;
@@ -1070,6 +1072,11 @@ end;
 function TAudioFile.fGetIsFile: Boolean;
 begin
     result := fAudioType = at_File;
+end;
+
+function TAudioFile.fGetIsLocalFile: Boolean;
+begin
+    result := NOT AnsiStartsText('\', self.FStrings[siOrdner])
 end;
 
 function TAudioFile.fGetIsStream: Boolean;

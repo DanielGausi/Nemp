@@ -62,7 +62,7 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
               fInterpret: String;  // the current artist we are searching for
               fTitle: String;      // the current title we are searching for
               fCurrentLyrics: String;
-              fExceptionOccured: Boolean;
+              // fExceptionOccured: Boolean;
 
               fLyricGetFunctions: TLyricGetFunctions;
 
@@ -75,7 +75,7 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
           public
               constructor Create;
               destructor Destroy; override;
-              property ExceptionOccured: Boolean read fExceptionOccured;
+              // property ExceptionOccured: Boolean read fExceptionOccured;
 
               // main method of the class
               // everything else is done in the subroutines
@@ -251,7 +251,7 @@ function TLyrics.GetLyrics(aInterpret, aTitle: String): String;
 var Success: Boolean;
     i: Integer;
 begin
-    fExceptionOccured := False;
+    // fExceptionOccured := False;
     fInterpret := aInterpret;
     fTitle := aTitle;
     fCurrentLyrics := '';

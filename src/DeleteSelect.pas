@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, CheckLst, ContNrs, NempAudioFiles, DeleteHelper,
   DriveRepairTools, ExtCtrls, ImgList, GnuGetText, System.UITypes,
-  System.ImageList, Generics.Collections, VirtualTrees;
+  System.ImageList, Generics.Collections, VirtualTrees, PNGImage,CommCtrl ;
 
 
 // type
@@ -40,10 +40,10 @@ type
     LblExplaination: TLabel;
     LblWhatToDo: TLabel;
     LblExplaination2: TLabel;
-    cbDrives: TCheckListBox;
     ImageList1: TImageList;
     HintImage: TImage;
     VSTDrives: TVirtualStringTree;
+    checkImages: TImageList;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     //procedure cbDrivesClick(Sender: TObject);
@@ -65,9 +65,13 @@ type
     //DisplayDataList: TDisplayDataList;
     procedure FillTreeViews(currentData: TDeleteData);
 
+    procedure AddPngToImageList(aFilename: String; aImageList: TImageList);
+
   public
     { Public-Deklarationen }
     DataFromMedienBib: TObjectList;
+
+    procedure ReloadScheckBoxImages(aBaseDir: String; TryDefaultAgain: Boolean=False);
 
   end;
 
@@ -78,7 +82,7 @@ implementation
 
 {$R *.dfm}
 
-uses Nemp_RessourceStrings, NempMainUnit, BibHelper, TreeHelper;
+uses Nemp_RessourceStrings, NempMainUnit, BibHelper, TreeHelper, Nemp_SkinSystem;
 
 
 procedure TDeleteSelection.FormCreate(Sender: TObject);
@@ -96,6 +100,12 @@ begin
     filename := ExtractFilePath(ParamStr(0)) + 'Images\alert.png';
     if FileExists(filename) then
         HintImage.Picture.LoadFromFile(filename);
+
+    // Load CheckBoxImages for the DriveVST
+    if Nemp_MainForm.NempSkin.IsACtive then
+        self.ReloadScheckBoxImages(Nemp_MainForm.NempSkin.Path, True)
+    else
+        self.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\');
 end;
 
 procedure TDeleteSelection.FormDestroy(Sender: TObject);
@@ -126,10 +136,9 @@ procedure TDeleteSelection.FormShow(Sender: TObject);
 var i: Integer;
     currentData: TDeleteData;
 begin
-    cbDrives.Clear;
     lblMainExplanation.Caption := DeleteHelper_Explanation;
 
-    if assigned(DataFromMedienBib) then
+    {if assigned(DataFromMedienBib) then
     begin
         for i := 0 to DataFromMedienBib.Count - 1 do
         begin
@@ -143,10 +152,8 @@ begin
             cbDrives.ItemIndex := 0;
             cbDrives.Selected[0] := True;
             //cbDrivesClick(Nil);
-
         end;
-    end;
-
+    end;}
 
     VSTDrives.Clear;
     VSTDrives.BeginUpdate;
@@ -159,14 +166,60 @@ begin
     end;
     VSTDrives.EndUpdate;
 
-    // VSTDrives.FocusedNode := VSTDrives.GetFirst;
-
-
-    auf Nil checken? wie auch select?
-    // !!
     VSTDrivesChange(VSTDrives, VSTDrives.GetFirst);
 end;
 
+
+procedure TDeleteSelection.ReloadScheckBoxImages(aBaseDir: String; TryDefaultAgain: Boolean=False);
+var filename: String;
+    i: Integer;
+    FileIsMissing: Boolean;
+begin
+    aBaseDir := IncludeTrailingPathDelimiter(aBaseDir);
+    FileIsMissing := False;
+    checkImages.Clear;
+
+    // index 0..7: Unused
+    // 8: normal
+    // 9: hot
+    //10: pressed
+    //11: disabled
+    filename := aBaseDir + 'cbClean-UnCheckNormal.png';
+    if FileExists(filename) then
+    begin
+        for i := 0 to 11 do
+          AddPngToImageList(filename, checkImages);
+    end else
+        FileIsMissing := True;
+
+    // index 16..23: Unused
+    filename := aBaseDir + 'cbClean-CheckNormal.png';
+    if FileExists(filename) then
+    begin
+        for i := 12 to 23 do
+          AddPngToImageList(filename, checkImages);
+    end else
+        FileIsMissing := True;
+
+    if FileIsMissing and TryDefaultAgain then
+    begin
+        // if Skin doesn't support Checkimages: load default ones
+        ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\', False);
+        exit;
+    end;
+
+    // if still something is missing: Use System default CheckBoxes
+    if FileIsMissing then
+    begin
+        VSTDrives.CustomCheckImages := Nil;
+        VSTDrives.CheckImageKind := ckSystemDefault;
+    end else
+    begin
+        // success, use custom Images
+        VSTDrives.CustomCheckImages := checkImages;
+        VSTDrives.CheckImageKind := ckCustom;
+    end;
+end;
 
 procedure TDeleteSelection.VSTDrivesChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
@@ -187,56 +240,47 @@ begin
     currentData := currentDataP^.fDeleteData;
     FillTreeViews(currentData);
 
+    if Node.CheckState = csCheckedNormal then
+        LblFiles.Caption := DeleteSelect_FilesWillBeDeleted
+    else
+        LblFiles.Caption := DeleteSelect_FilesWillRemain;
 
-        if Node.CheckState = csCheckedNormal then
-            LblFiles.Caption := DeleteSelect_FilesWillBeDeleted
-        else
-            LblFiles.Caption := DeleteSelect_FilesWillRemain;
+    imgidx := 0;
+    aType := TDeleteData(DataFromMedienBib[Node.Index]).DriveType;
+    if aType = DriveTypeTexts[DRIVE_REMOVABLE] then
+        imgidx := 2;
+    if aType = DriveTypeTexts[DRIVE_REMOTE] then
+        imgidx := 4;
+    if aType = DriveTypeTexts[DRIVE_CDROM] then
+        imgidx := 6;
 
-        imgidx := 0;
-
-        aType := TDeleteData(DataFromMedienBib[Node.Index]).DriveType;
-
-        if aType = DriveTypeTexts[DRIVE_REMOVABLE] then
-            imgidx := 2;
-        if aType = DriveTypeTexts[DRIVE_REMOTE] then
-            imgidx := 4;
-        if aType = DriveTypeTexts[DRIVE_CDROM] then
-            imgidx := 6;
-
-        case currentData.Hint of
-          dh_DivePresent: ;
-          dh_DriveMissing: inc(imgIdx);
-          dh_NetworkPresent: ;
-          dh_NetworkMissing: inc(imgIdx);
+    case currentData.Hint of
+        dh_DivePresent    : begin
+                      LblExplaination.Caption  := DeleteHelper_DrivePresent  ;
+                      LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
+                      LblWhatToDo.Caption      := DeleteHelper_DoWithDrivePresent;
         end;
-
-        ImageList1.GetBitmap(imgIdx, DriveImage.Picture.Bitmap);
-        DriveImage.Refresh;
-
-        case currentData.Hint of
-            dh_DivePresent    : begin
-                          LblExplaination.Caption  := DeleteHelper_DrivePresent  ;
-                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithDrivePresent;
-            end;
-            dh_DriveMissing   : begin
-                          LblExplaination.Caption  := DeleteHelper_DriveMissing    ;
-                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithDriveMissing;
-            end;
-            dh_NetworkPresent : begin
-                          LblExplaination.Caption  := DeleteHelper_NetworkPresent  ;
-                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkPresent;
-            end;
-            dh_NetworkMissing : begin
-                          LblExplaination.Caption  := DeleteHelper_NetworkMissing  ;
-                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkMissing;
-            end;
+        dh_DriveMissing   : begin
+                      inc(imgIdx);
+                      LblExplaination.Caption  := DeleteHelper_DriveMissing    ;
+                      LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
+                      LblWhatToDo.Caption      := DeleteHelper_DoWithDriveMissing;
         end;
+        dh_NetworkPresent : begin
+                      LblExplaination.Caption  := DeleteHelper_NetworkPresent  ;
+                      LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
+                      LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkPresent;
+        end;
+        dh_NetworkMissing : begin
+                      inc(imgIdx);
+                      LblExplaination.Caption  := DeleteHelper_NetworkMissing  ;
+                      LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
+                      LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkMissing;
+        end;
+    end;
 
+    ImageList1.GetBitmap(imgIdx, DriveImage.Picture.Bitmap);
+    DriveImage.Refresh;
 end;
 
 procedure TDeleteSelection.VSTDrivesChecked(Sender: TBaseVirtualTree;
@@ -291,6 +335,27 @@ begin
     CellText := TJustAstring(Data^.FString).AnzeigeString;
 end;
 
+procedure TDeleteSelection.AddPngToImageList(aFilename: String;
+  aImageList: TImageList);
+var pngbmp: TPngImage;
+    bmp: TBitmap;
+begin
+  pngbmp := TPNGImage.Create;
+  try
+      pngbmp.LoadFromFile(aFilename);
+      bmp := TBitmap.Create;
+      try
+          pngbmp.AssignTo(bmp);
+          bmp.AlphaFormat:=afIgnored;
+          aImageList.Add(bmp, Nil);
+      finally
+          bmp.Free;
+      end;
+  finally
+      pngbmp.Free;
+  end;
+end;
+
 procedure TDeleteSelection.BtnHelpClick(Sender: TObject);
 begin
     MessageDlg(DeleteHelper_Readme, mtInformation, [mbOK], 0);
@@ -321,80 +386,9 @@ begin
 end;
 
 
-(*
-procedure TDeleteSelection.cbDrivesClick(Sender: TObject);
-var currentData: TDeleteData;
-    imgidx: Integer;
-    aType: String;
-
-begin
-    if cbDrives.ItemIndex >= 0 then
-    begin
-        currentData := TDeleteData(DataFromMedienBib[cbDrives.ItemIndex]);
-        FillTreeViews(currentData);
-
-        if cbDrives.Checked[cbDrives.ItemIndex] then
-            LblFiles.Caption := DeleteSelect_FilesWillBeDeleted
-        else
-            LblFiles.Caption := DeleteSelect_FilesWillRemain;
-
-        imgidx := 0;
-
-        aType := TDeleteData(DataFromMedienBib[cbDrives.ItemIndex]).DriveType;
-
-        if aType = DriveTypeTexts[DRIVE_REMOVABLE] then
-            imgidx := 2;
-        if aType = DriveTypeTexts[DRIVE_REMOTE] then
-            imgidx := 4;
-        if aType = DriveTypeTexts[DRIVE_CDROM] then
-            imgidx := 6;
-
-        case currentData.Hint of
-          dh_DivePresent: ;
-          dh_DriveMissing: inc(imgIdx);
-          dh_NetworkPresent: ;
-          dh_NetworkMissing: inc(imgIdx);
-        end;
-
-        ImageList1.GetBitmap(imgIdx, DriveImage.Picture.Bitmap);
-        DriveImage.Refresh;
-
-        case currentData.Hint of
-            dh_DivePresent    : begin
-                          LblExplaination.Caption  := DeleteHelper_DrivePresent  ;
-                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithDrivePresent;
-            end;
-            dh_DriveMissing   : begin
-                          LblExplaination.Caption  := DeleteHelper_DriveMissing    ;
-                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithDriveMissing;
-            end;
-            dh_NetworkPresent : begin
-                          LblExplaination.Caption  := DeleteHelper_NetworkPresent  ;
-                          LblExplaination2.Caption := DeleteHelper_DrivePresentFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkPresent;
-            end;
-            dh_NetworkMissing : begin
-                          LblExplaination.Caption  := DeleteHelper_NetworkMissing  ;
-                          LblExplaination2.Caption := '';//DeleteHelper_DriveMissingFileMissing;
-                          LblWhatToDo.Caption      := DeleteHelper_DoWithNetworkMissing;
-            end;
-        end;
-    end else
-    begin
-        // MemoFiles.Clear;
-        LblExplaination.Caption := '' ;
-        LblWhatToDo.Caption := '';
-        FillTreeViews(Nil);
-    end;
-end;
-*)
 
 
 procedure TDeleteSelection.FormClose(Sender: TObject; var Action: TCloseAction);
-var i: Integer;
-    currentData: TDeleteData;
 begin
    { if assigned(DataFromMedienBib) then
     begin

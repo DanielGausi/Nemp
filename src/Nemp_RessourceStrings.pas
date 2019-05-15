@@ -126,14 +126,14 @@ Warning_DataDirNotFound       = 'The data directory could not be found.';
 Bitrate_Constant = 'Constant bitrate';
 Bitrate_Variable = 'Variable bitrate';
 
-Warning_MedienBibIsBusy = 'The operation could not be processed, because the medialibrary is busy. Please try again later or cancel the running operation by pressing ESC.';
+Warning_MedienBibIsBusy = 'The operation could not be processed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC.';
 Warning_MedienBibIsBusyOnClose = 'Nemp is searching for new files or updating the library. Do you really want to quit now?';
 Warning_MedienBibIsBusyCritical = 'The library is in a critical update-process right now. Editing files is not possible. Please try again in a few seconds.';
 Warning_MedienBibIsBusy_Options
-           = 'Some settings could not be changed, because the medialibrary is busy. Please try again later or cancel the running operation by pressing ESC.';
+           = 'Some settings could not be changed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC.';
 
-Warning_MedienBibIsBusyRating = 'The medialibrary is busy at the moment, so your rating could not be set there. (If the current file is not in your library at all, you can ignore this message.)';
-Warning_MedienBibIsBusyEdit = 'The medialibrary is busy at the moment, so your input could not be saved. Please try again in a few seconds.';
+Warning_MedienBibIsBusyRating = 'The media library is busy at the moment, so your rating could not be set there. (If the current file is not in your library at all, you can ignore this message.)';
+Warning_MedienBibIsBusyEdit = 'The media library is busy at the moment, so your input could not be saved. Please try again in a few seconds.';
 Warning_MedienBibBusyThread = 'The library blocked this very file by an automated background-process right now. Please try again in a few seconds.'  + #13#10
                  + 'Note: The probability for this message is almost zero (unless Gausi made some bad mistakes). You should play Lotto this week!';
 
@@ -156,7 +156,7 @@ LyricsSearch_NotFoundMessage = 'No lyrics found. Do you want to search them manu
 
 //ErrorSavingPlaylist = 'An error occured while saving the playlist. This should not happen.';
 //ErrorSavingMediaLib = 'An error occured while saving the medialibrary. This should not happen.';
-ErrorLoadingMediaLib = 'An error occured while loading the medialibrary. This should not happen.';
+ErrorLoadingMediaLib = 'An error occured while loading the media library. This should not happen.';
 
 Error_HelpFileNotFound = 'The helpfile could not be found.';
 Error_ReadmeFileNotFound = 'The readme.txt could not be found.';
@@ -289,7 +289,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     +#13#10+'If this message occurs continuously, please report this to mail@gausi.de. Thank you.';
 
 
-SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the medialibrary.';
+SelectDirectoryDialog_BibCaption = 'Please select the root directory of the audiofiles you want to add to the media library.';
 SelectDirectoryDialog_PlaylistCaption = 'Please select the root directory of the audiofiles you want to add to the playlist.';
 SelectDirectoryDialog_Webradio_Caption = 'Select download directory for webstreams';
 SelectDirectoryDialog_RemoteNemp = 'Select download directory';
@@ -568,7 +568,7 @@ MainForm_ABRepeatBtnHint_Show = 'Show controls for A-B-Repeat';
 MainForm_ABRepeatBtnHint_Hide = 'Disable A-B-Repeat';
 
 MainForm_ShuttingDownHint          = 'Shutting down...';
-MainForm_ShuttingDownHint_MediaLib = 'Saving medialibrary...';
+MainForm_ShuttingDownHint_MediaLib = 'Saving media library...';
 
 MainForm_NoSearchKeywords  = 'No search phrase';
 SearchForm_CBAddRefineSearch = '(refined search)';
@@ -620,9 +620,8 @@ MainForm_MenuCaptionsSearchForEmptyAlbum  = 'Show all files where "Album" is mis
 
 MainForm_LibraryIsEmpty = 'You music library is empty. Drop some files here to start.';
 MainForm_LibraryIsLoading = 'Loading library. Please wait...';
-MediaLibrary_SearchingNewFilesBigLabel = 'Searching for audio files ... %d found';
 
-MainForm_MainMenu_Messages = 'Messages (%d)';
+// MainForm_MainMenu_Messages = 'Messages (%d)';
 MainForm_MainMenu_NoMessages = 'Messages';
 ErrorForm_NoMessages = 'No new messages, everything is fine. :)';
 
@@ -650,7 +649,7 @@ MainForm_Lyrics_NoLyrics = 'No lyrics available';
     SplashScreen_Loadingplaylist    = 'Loading playlist';
     SplashScreen_SearchSkins        = 'Searching for skins';
     SplashScreen_InitPlayer         = 'Initializing player';
-    SplashScreen_LoadingMediaLib    = 'Loading medialibrary';
+    SplashScreen_LoadingMediaLib    = 'Loading media library';
     SplashScreen_GenerateWindows    = 'Generating windows';
     SplashScreen_PleaseWaitaMoment  = 'Preparing media library';
     SplashScreen_NewDriveConnected  = 'New drive connected: Collecting data.';
@@ -659,33 +658,44 @@ MainForm_Lyrics_NoLyrics = 'No lyrics available';
 // Warning_NempDidntShutDownRegular = 'Nemp didn''t shutdown tidily last time.';
 // Warning_NempDidntShutDownRegular_NoBackup = 'Nemp didn''t shutdown tidily. A backup of the playlist couldn''t be found.';
 
-MediaLibrary_Preparing  = 'Preparing medialibrary...';
+MediaLibrary_Preparing  = 'Preparing media library...';
 Medialibrary_Sorting    = 'Sorting data...';
 MediaLibrary_AlmostDone = 'Almost done...';
-MediaLibrary_SearchingExactMatchings = 'Searching exact matchings (%d%%)';
-MediaLibrary_SearchingFuzzyMatchings = 'Searching fuzzy matchings (%d%%)';
+// MediaLibrary_SearchingExactMatchings = 'Searching exact matchings (%d%%)';
+// MediaLibrary_SearchingFuzzyMatchings = 'Searching fuzzy matchings (%d%%)';
 MediaLibrary_RefreshingFiles         = 'Refreshing file information (%d%%)';
-MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
+MediaLibrary_RefreshingFilesInDir    = 'Refreshing file information ... %s';
+MediaLibrary_RefreshingFilesPreparingLibrary = 'Refreshing files complete. Preparing media library ...';
+MediaLibrary_RefreshingFilesCompleteFinished = 'Refreshing files complete.';
+//MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
 MediaLibrary_SearchingMissingFilesDir= 'Searching missing files ... %s'; // %s: current Directory
 MediaLibrary_SearchingMissingPlaylist= '(Playlists)'; // this will replace the %s just above, when serching for dead playlists
 MediaLibrary_SearchingNewFiles       = '(%d) Searching %s';
-MediaLibrary_StartSearchingNewFiles  = 'Start searching...';
+MediaLibrary_SearchingNewFilesDir    = 'Searching for new files ... %s';
+MediaLibrary_SearchingNewFilesBigLabel = 'Searching for audio files ... %d found';
+MediaLibrary_StartSearchingNewFiles  = 'Searching for new files ...';
+MediaLibrary_SearchingNewFilesComplete = 'Searching for new files completed. The new files have been added to your media library.';
+MediaLibrary_SearchingNewFiles_NothingFound = 'Searching for new files completed. No new files have been found. ';
+
 // MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
 MediaLibrary_SearchingMissingFilesComplete_AnalysingData = 'Search complete, preparing data ...';
-MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput = 'Preparing query window ...';
+MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput = 'Waiting for user input ...';
 
 DeleteSelect_FilesWillBeDeleted = 'The following files will be removed from the library when you click on "Cleanup library"';
 DeleteSelect_FilesWillRemain = 'The following files will remain in the library when you click on "Cleanup library"';
+DeleteSelect_DeletingFiles = 'Removing files from the media library...';
+DeleteSelect_DeletingFilesComplete = 'The selected files have been removed from the media library.';
+DeleteSelect_DeletingFilesAborted = 'No files have been removed from the library.';
 
-MediaLibrary_FilesNotFound           = 'There are %d missing files. Please select the files you want to keep or delete from the library.';
-MediaLibrary_FilesNotFoundJustHint   = 'Some of the selected files are missing. You may cleanup your library now to remove the missing files.';
-//MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
-//MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
+// MediaLibrary_FilesNotFound           = 'There are %d missing files. Please select the files you want to keep or delete from the library.';
+// MediaLibrary_FilesNotFoundJustHint   = 'Some of the selected files are missing. You may cleanup your library now to remove the missing files.';
+// MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
+// MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
 
-MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your medialibrary. This is not supposed to happen. If this message appears frequently feel free to contact me via e-mail. Thank you!';
-MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
+MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your media library. This is not supposed to happen. If this message appears frequently feel free to contact me via e-mail. Thank you!';
+// MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
 MediaLibrary_SearchingLyrics_JustFile= 'Searching lyrics for %s';
-MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
+// MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
 MediaLibrary_SearchingTags_JustFile  = 'Searching tags for %s';
 MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. Please check your internet configuration.';
 MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
@@ -710,28 +720,34 @@ MediaLibrary_SearchTagsComplete_ManyFound = 'Tag search complete. Found Tags for
 MediaLibrary_SearchTagsComplete_FewFound = 'Tag search complete. Found Tags for only %d of %d files.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
 MediaLibrary_SearchTagsComplete_NoneFound = 'Tag search complete. Sorry, no additional Tags could be found.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
 
-MediaLibrary_OperationComplete_CloseWindowNow = 'You can close this Window now.';
+MediaLibrary_OperationComplete_CloseWindowNow = 'You can close this window now.';
+MediaLibrary_OperationComplete_CBClose_NoTimer = 'Close window after completion';
+MediaLibrary_OperationComplete_CBClose_TimerActive = 'Close window after completion (%d)';
 
 MediaLibrary_SomeErrorsOccured = 'Some unexpected errors appeared during the process. Please view the Error-Log for details.';
 
-MediaLibrary_CloudUpdateStatus = 'Working (%d%%) %s';
+MediaLibrary_CloudUpdateStatus = 'Updating ID3-Tags ... %s';
 MediaLibrary_InconsistentFilesWarning = 'You have changed some tags in the library, but the mp3-files have not been updated yet.'
           +#13#10 + 'If you close Nemp now, these files remain inconsistent to the data in the library.'
           +#13#10+#13#10 + 'Do you really want to close Nemp now?';
 MediaLibrary_InconsistentFilesCaption = 'Warning: %d file(s) need an update. Click here to start.';
+MediaLibrary_InconsistentFiles_Completed_Success = 'All ID3-Tags have been successfully updated.';
+MediaLibrary_InconsistentFiles_Completed_SomeFailed = 'Some ID3-Tags could not been updated. There are still %d files that are inconsistent to the data in the library.';
+MediaLibrary_InconsistentFiles_Abort = 'Some ID3-Tags have not been updated due to user abort. There are still %d files that are inconsistent to the data in the library.';
 //MediaLibrary_InconsistentFilesHintCount = 'You have changed some tags in the library, but the mp3-files have not been updated yet. Do you want to update the %d changed files now?';
 
-MediaLibrary_Deleting                = 'Deleting from medialibrary (%d%%)';
-Medialibrary_QueryReallyDelete       = 'This will delete your complete medialibrary. Continue?';
-Medialibrary_LoadingFile             = 'Loading medialibrary (%s)';
-Medialibrary_InvalidLibFile          = 'Invalid medialibrary-file.';
-Medialibrary_LibFileTooYoung         = 'The medialibrary was probably created by a newer version of Nemp. This version of Nemp doesn''t know how to read this file.';
-Medialibrary_LibFileTooOld           = 'Medialibrary of Nemp 2.4 or earlier detected. This is not supported any more.';
-Medialibrary_OldFileHint        = 'You are loading a medialibrary of an earlier version of Nemp. Please connect all relevant drives to your computer before you proceed. '
+
+MediaLibrary_Deleting                = 'Deleting from media library (%d%%)';
+Medialibrary_QueryReallyDelete       = 'This will delete your complete media library. Continue?';
+Medialibrary_LoadingFile             = 'Loading media library (%s)';
+Medialibrary_InvalidLibFile          = 'Invalid media library-file.';
+Medialibrary_LibFileTooYoung         = 'The media library was probably created by a newer version of Nemp. This version of Nemp doesn''t know how to read this file.';
+Medialibrary_LibFileTooOld           = 'Media library of Nemp 2.4 or earlier detected. This is not supported any more.';
+Medialibrary_OldFileHint        = 'You are loading a media library of an earlier version of Nemp. Please connect all relevant drives to your computer before you proceed. '
                                  + 'Otherwise some files will be deleted from the library.';
 Medialibrary_OldFileHint2       = 'Some problems occured while converting the old library and some audiofiles were ignored. You should rebuild it by searching your harddrives for new files.';
 
-Medialibrary_SaveException1 = 'An error occured while saving the medialibrary. Please report this error.';
+Medialibrary_SaveException1 = 'An error occured while saving the media library. Please report this error.';
 //Medialibrary_SaveException = 'Saving failed. Probably the directory is write protected or there is not enough available free space.';
 Medialibrary_QuickSearchError1 = 'Tried to fill the Quicksearchlist while displaying playlists. This should never occur - please report this error. ';
 Medialibrary_GUIError1 = 'This function (1) shouldn''t be accessible now. Please report this error.';
@@ -741,8 +757,8 @@ Medialibrary_GUIError4 = 'This function (4) shouldn''t be accessible now. Please
 Medialibrary_GUIError5 = 'The current view shows files from a playlist-file. Getting lyrics or additional tags is not possible.';
 Medialibrary_DriveRepairError = 'An Error occured while updating drivelist. Please report this error.';
 
-Medialibrary_DialogFilter            = 'Nemp medialibrary';
-Medialibrary_AddingPlaylist          = 'Adding the playlist to the medialibrary...';
+Medialibrary_DialogFilter            = 'Nemp media library';
+Medialibrary_AddingPlaylist          = 'Adding the playlist to the media library...';
 MediaLibrary_CSVFilter               = 'CSV files';
 
 MediaLibrary_OutOfMemoryAccelerateSearchReduced       = 'Not enough memory. The settings for the accelerated search have been reduced to a minimum.';
@@ -812,7 +828,7 @@ Shoutcast_UnknownFormat = 'Unknown format';
 Shoutcast_InputStreamCaption = 'Nemp: Play Webstream';
 Shoutcast_InputStreamLabel   = 'URL (e.g. "http://myhits.com/tune_in.pls" or "http://123.12.34.56:5000")';
 
-TabBtnBrowse_Hint1 = 'Browse your medialibrary';
+TabBtnBrowse_Hint1 = 'Browse your media library';
 TabBtnBrowse_Hint2 = 'Click to resort';
 
 TabBtnTagCloud_Hint1 = 'Tag cloud';
@@ -848,7 +864,7 @@ TagEditor_AddIgnoreRule_Query = 'This will add an "Ignore rule" for the selected
 
 TagEditor_FilesNeedUpdate = 'The ID3-Tags of %d files should be updated.';
 
-TagEditor_FilesUpdateComplete = 'The ID3-Tags have been updated.';
+TagEditor_FilesUpdateComplete = 'All ID3-Tags have been updated.';
 
 Tags_AddTags = 'No additional Tags set. Click here to add some.';
 Tags_NoTagsAccessDenied = 'No additional Tags set.';
@@ -921,7 +937,7 @@ DeleteHelper_NetworkPresent = 'The network ressource is available.';
 DeleteHelper_NetworkMissing = 'The network ressource seems to be offline.';
 
 DeleteHelper_DrivePresentFileMissing  = 'Some files are definitely missing.';
-DeleteHelper_DriveMissingFileMissing  = 'It is unknown whether the files still exist.';
+//DeleteHelper_DriveMissingFileMissing  = 'It is unknown whether the files still exist.';
 
 
 DeleteHelper_DoWithDrivePresent   = 'You should remove the missing files from the library.';
@@ -953,7 +969,7 @@ Warning_LyricsUsage = 'Ignoring lyrics will remove all collected lyrics from the
             +#13#10 + 'used by the search function unless you rescan the files in your library.'
          +#13#10+#13#10 + 'Currently there are %d files with lyrics stored in the library (out of %d total files), using '
          +#13#10 + 'approximately %s of memory.'
-         +#13#10 + #13#10 + 'Do you want to continue and reomve all lyrics from you media library?';
+         +#13#10 + #13#10 + 'Do you want to continue and remove all lyrics from you media library?';
 
 //MediaLibrarySize_Summary = 'Estimated library size: %s';
 
@@ -961,7 +977,15 @@ Options_LyricPriority_LYRICWIKI   = 'LyricWiki (recommended)';
 Options_LyricPriority_CHARTLYRICS = 'ChartLyrics (beta)';
 Hint_LyricPriorities              = 'Search online for lyrics. Current settings: '+ #13#10 + '%s';
 
-ProgressForm_Default = 'Nemp is updating your Media Library right now.'#13#10#13#10'Some functions are disabled during this process. You can cancel the current operation at any time.';
+ProgressForm_DefaultHint = 'Some functions are disabled during this process. You can cancel the current operation at any time.';
+ProgressForm_DefaultAction  = 'Nemp is updating your media library right now.';
+ProgressForm_SearchFiles    = 'Nemp is searching your computer for new music files.';
+ProgressForm_RefreshFiles   = 'Nemp is refreshing your media library.';
+ProgressForm_CleanUp        = 'Nemp is searching for missing files in your media library. ';
+ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files.';
+ProgressForm_SearchTags     = 'Nemp is searching for some additional tags for your music files.';
+ProgressForm_UpdateMetaData = 'Nemp is updating the meta data (ID3tags) of your music files.';
+
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
 

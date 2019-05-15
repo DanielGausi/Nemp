@@ -339,7 +339,7 @@ implementation
 
 uses NempMainUnit, Details, OptionsComplete, Hilfsfunktionen, spectrum_vis,
     SplitForm_Hilfsfunktionen, PlaylistUnit, AuswahlUnit, MedienlisteUnit, ExtendedControlsUnit,
-    VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper;
+    VSTEditControls, MedienBibliothekClass, TagClouds, Systemhelper, DeleteSelect;
 
 function GetSkinDirFromSkinName(aName: String): String;
 begin
@@ -806,6 +806,7 @@ begin
           ListenCompletebmp.Free;
       end;
   end;
+
 
 
   // Load Tree images [+] [-]
@@ -1323,6 +1324,9 @@ begin
             VST.Images := PlayListImageList;
         end;
 
+        if assigned(DeleteSelection) then
+            DeleteSelection.ReloadScheckBoxImages(path, true);
+
         case SlideButtonMode of
            0,1: begin
                   for i := 0 to 17 do
@@ -1753,6 +1757,10 @@ begin
         TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := False;
     end;
   end;
+
+  if assigned(DeleteSelection) then
+      DeleteSelection.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\', false);
+
   AuswahlForm.ContainerPanelAuswahlform.OwnerDraw := False;
   MedienListeForm.ContainerPanelMedienBibForm.OwnerDraw := False;
   PlaylistForm.ContainerPanelPlaylistForm.OwnerDraw := False;

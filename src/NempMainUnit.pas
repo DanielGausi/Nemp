@@ -1922,6 +1922,7 @@ begin
 
     // Create FileSearcher
     ST_Playlist := TSearchTool.Create;
+
     ST_Medienliste := TSearchTool.Create;
     with ST_Medienliste do
     begin
@@ -3207,6 +3208,14 @@ begin
                     TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
                     exit;
                 end;
+                {
+                    TODO 2019:
+                    ---------------------------
+                    fill List DeadFiles with the selected Files
+                    use fPrepareDeleteFilesUpdate
+
+                }
+
                 VST.BeginUpdate;
                 MedienBib.StatusBibUpdate := BIB_Status_ReadAccessBlocked;
                 SelectedMP3s := VST.GetSortedSelection(False);
@@ -3295,8 +3304,6 @@ begin
   try
       if fb.Execute then
       begin
-          fspTaskbarManager.ProgressValue := 0;
-          fspTaskbarManager.ProgressState := fstpsIndeterminate;
           newdir := fb.SelectedItem;
           MedienBib.InitialDialogFolder := fb.SelectedItem;
           MedienBib.ST_Ordnerlist.Add(newdir);
@@ -3306,7 +3313,7 @@ begin
             PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
             MedienBib.StatusBibUpdate := 1;
             BlockeMedienListeUpdate(True);
-            ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
+            StartMediaLibraryFileSearch;
           end;
       end;
   finally
@@ -4189,7 +4196,7 @@ begin
     TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
     exit;
   end;
-  MedienBib.RefreshFiles;
+  MedienBib.RefreshFiles_All;
 end;
 
 procedure TNemp_MainForm.PM_ML_RefreshSelectedClick(Sender: TObject);
@@ -4213,15 +4220,8 @@ begin
     exit;
   end;
 
-  MedienBib.StatusBibUpdate := 3;
-  BlockeMedienListeReadAccess(True);
-  LangeAktionWeitermachen := true;
-  MedienBib.ReInitCoverSearch;
+
   SelectedMP3s := VST.GetSortedSelection(False);
-
-  fspTaskbarManager.ProgressState := fstpsNormal;
-  fspTaskbarManager.ProgressValue := 0;
-
   SelectedFiles := TObjectList.Create(False);
   try
       // Collect Data
@@ -4229,35 +4229,69 @@ begin
 
       if MedienBib.AnzeigeShowsPlaylistFiles then
       begin
+            MedienBib.StatusBibUpdate := 3;
+            BlockeMedienListeReadAccess(True);
+            LangeAktionWeitermachen := true;
+            MedienBib.ReInitCoverSearch;
+            fspTaskbarManager.ProgressState := fstpsNormal;
+            fspTaskbarManager.ProgressValue := 0;
 
-          //MessageDLG((Medialibrary_GUIError4), mtError, [MBOK], 0);
-          for i:=0 to SelectedFiles.Count-1 do
-          begin
-              application.processmessages;
-              if not LangeAktionWeitermachen then break;
-              //Data := VST.GetNodeData(SelectedMP3s[i]);
-              AudioFile := TAudioFile(SelectedFiles[i]);//Data^.FAudioFile;
-              if FileExists(AudioFile.Pfad) then
-              begin
-                  AudioFile.FileIsPresent:=True;
-                  aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
-                  HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
+            //MessageDLG((Medialibrary_GUIError4), mtError, [MBOK], 0);
+            for i:=0 to SelectedFiles.Count-1 do
+            begin
+                application.processmessages;
+                if not LangeAktionWeitermachen then break;
+                //Data := VST.GetNodeData(SelectedMP3s[i]);
+                AudioFile := TAudioFile(SelectedFiles[i]);//Data^.FAudioFile;
+                if FileExists(AudioFile.Pfad) then
+                begin
+                    AudioFile.FileIsPresent:=True;
+                    aErr := AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                    HandleError(afa_RefreshingFileInformation, AudioFile, aErr);
 
-                  MedienBib.InitCover(AudioFile);
-                  VST.Invalidate;
-              end
-              else begin
-                  AudioFile.FileIsPresent:=False;
-                  VST.Invalidate;
-              end;
-              if i mod 64 = 0 then
-              begin
-                  MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/SelectedFiles.Count * 100)]);
-                  fspTaskbarManager.ProgressValue := Round(i/SelectedFiles.Count * 100);
-              end;
-          end;
+                    MedienBib.InitCover(AudioFile);
+                    VST.Invalidate;
+                end
+                else begin
+                    AudioFile.FileIsPresent:=False;
+                    VST.Invalidate;
+                end;
+                if i mod 64 = 0 then
+                begin
+                    MedienListeStatusLBL.Caption := Format((MediaLibrary_RefreshingFiles), [Round(i/SelectedFiles.Count * 100)]);
+                    fspTaskbarManager.ProgressValue := Round(i/SelectedFiles.Count * 100);
+                end;
+            end;
+
+            BlockeMedienListeReadAccess(False);
+            BlockeMedienListeWriteAcces(False);
+            BlockeMedienListeUpdate(False);
+
+            LangeAktionWeitermachen := False;
+            MedienBib.StatusBibUpdate := 0;
+            MedienListeStatusLBL.Caption := '';
+            ShowSummary;
+            fspTaskbarManager.ProgressState := fstpsNoProgress;
+
+            Node := VST.FocusedNode;
+            if Assigned(Node) then
+            begin
+                Data := VST.GetNodeData(Node);
+                AktualisiereDetailForm(Data^.FAudioFile, SD_MEDIENBIB);
+            end else
+                AktualisiereDetailForm(NIL, SD_MEDIENBIB);
       end else
       begin
+          // do it in a thread now
+          MedienBib.UpdateList.Clear;
+          for i := 0 to SelectedFiles.Count - 1 do
+          begin
+              MedienBib.UpdateList.Add(SelectedFiles[i]);
+          end;
+
+          MedienBib.RefreshFiles_Selected;
+
+          {
           einUpdate := False;
           tot := 0;
           for i:=0 to SelectedFiles.Count-1 do
@@ -4297,6 +4331,8 @@ begin
           if tot > 0 then
               TranslateMessageDLG(MediaLibrary_FilesNotFoundJustHint, mtWarning, [MBOK], 0);
 
+
+
           if einUpdate then
           begin
               MedienBib.RepairBrowseListsAfterChange;
@@ -4305,28 +4341,13 @@ begin
               ReFillBrowseTrees(True);
           end;
           MedienBib.Changed := True;
+          }
       end;
   finally
       SelectedFiles.Free;
   end;
 
-  BlockeMedienListeReadAccess(False);
-  BlockeMedienListeWriteAcces(False);
-  BlockeMedienListeUpdate(False);
 
-  LangeAktionWeitermachen := False;
-  MedienBib.StatusBibUpdate := 0;
-  MedienListeStatusLBL.Caption := '';
-  ShowSummary;
-  fspTaskbarManager.ProgressState := fstpsNoProgress;
-
-  Node := VST.FocusedNode;
-  if Assigned(Node) then
-  begin
-      Data := VST.GetNodeData(Node);
-      AktualisiereDetailForm(Data^.FAudioFile, SD_MEDIENBIB);
-  end else
-      AktualisiereDetailForm(NIL, SD_MEDIENBIB);
 end;
 
 
@@ -4954,7 +4975,11 @@ begin
   begin
       Data := VST.GetNodeData(aNode);
       AudioFile := Data^.FAudioFile;
-      AudioFile.ReCheckExistence;
+
+      if AudioFile.IsLocalFile then
+      //PROBLEM BEI NETZLAUFWERKEN
+          AudioFile.ReCheckExistence;
+
       ShowVSTDetails(AudioFile, SD_MEDIENBIB);
       AktualisiereDetailForm(AudioFile, SD_MEDIENBIB);
   end
@@ -5592,8 +5617,8 @@ begin
   CreateTagLabels(aAudioFile);
 
   // Get Cover
-  RefreshVSTCover(aAudiofile);
-
+  //RefreshVSTCover(aAudiofile);
+  //PROBLEM BEI NETZLAUFWERKEN
 
   if not assigned(aAudiofile) then
        exit;
@@ -8100,7 +8125,7 @@ begin
     begin
       PutDirListInAutoScanList(JobList);
       BlockeMedienListeUpdate(True);
-      ST_Medienliste.SearchFiles(JobList[0]);
+      StartMediaLibraryFileSearch;
     end
     else
       // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
@@ -11002,7 +11027,6 @@ procedure TNemp_MainForm.STStart(var Msg: TMessage);
 begin
     Handle_STStart(Msg);
 end;
-
 
 procedure TNemp_MainForm.STNewFile(var Msg: TMessage);
 begin

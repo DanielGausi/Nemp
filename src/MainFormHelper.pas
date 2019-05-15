@@ -71,7 +71,6 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     //blockiert auch Lese-Zugriff auf die Medienliste
     procedure BlockeMedienListeReadAccess(block: Boolean);
 
-
     procedure StarteLangeAktion(max:integer;text:String; EnableStopButton: Boolean);
     procedure BeendeLangeAktion;
 
@@ -1861,6 +1860,7 @@ end;
 procedure AddErrorLog(aString: String);
 begin
     ErrorLog.Add(aString);
+
     if assigned(FError) and Ferror.Visible then
     begin
         if ErrorLogCount = 0 then
@@ -1869,8 +1869,9 @@ begin
     end;
 
     inc(ErrorLogCount);
-    Nemp_MainForm.MM_H_ErrorLog.Caption := Format(MainForm_MainMenu_Messages, [ErrorLogCount]);
-    Nemp_MainForm.MM_H_ErrorLog.Visible := True;
+    //Nemp_MainForm.MM_H_ErrorLog.Caption := Format(MainForm_MainMenu_Messages, [ErrorLogCount]);
+    if not Nemp_MainForm.MM_H_ErrorLog.Visible then
+        Nemp_MainForm.MM_H_ErrorLog.Visible := True;
 end;
 
 procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);  overload;
@@ -1881,21 +1882,21 @@ begin
 
         case aAction of
           afa_None:           s := '';
-          afa_SaveRating:     s := 'Note: Rating Not saved into file'  ;
-          afa_RefreshingFileInformation: s := 'Error while refreshing file information:'  ;
-          afa_AddingFileToLibrary: s := 'Error while adding file to library:'  ;
-          afa_PasteFromClipboard:  s := 'Error while Copy&Paste from clipboard:'  ;
-          afa_DroppedFiles:        s := 'Error while Drag&Drop files:'  ;
-          afa_NewFile:             s := 'Error with new found file:'  ;
-          afa_DirectEdit:          s := 'Error while editing file properties directly:'  ;
-          afa_EditingDetails:      s := 'Error while editing file properties'  ;
-          afa_LyricSearch:         s := 'Error while searching lyrics:' ;
-          afa_TagSearch:           s := 'Error while searching additional Tags:';
-          afa_TagCloud:            s := 'Error while updating the Tagcloud:'
+          afa_SaveRating:     s := 'Note: Rating Not saved into file: '  ;
+          afa_RefreshingFileInformation: s := 'Error while refreshing file information: '  ;
+          afa_AddingFileToLibrary: s := 'Error while adding file to library: '  ;
+          afa_PasteFromClipboard:  s := 'Error while Copy&Paste from clipboard: '  ;
+          afa_DroppedFiles:        s := 'Error while Drag&Drop files: '  ;
+          afa_NewFile:             s := 'Error with new found file: '  ;
+          afa_DirectEdit:          s := 'Error while editing file properties directly: '  ;
+          afa_EditingDetails:      s := 'Error while editing file properties '  ;
+          afa_LyricSearch:         s := 'Error while searching lyrics: ' ;
+          afa_TagSearch:           s := 'Error while searching additional Tags: ';
+          afa_TagCloud:            s := 'Error while updating the Tagcloud: '
         end;
-        s := s + #13#10;
         if assigned(aFile) then
-            s := s + aFile.Pfad + #13#10;
+            s := s + aFile.Pfad;
+        s := s + #13#10;
         s := s + 'Errormessage: ' + AudioErrorString[aErr] + #13#10
            + '------';
 

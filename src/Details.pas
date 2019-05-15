@@ -2990,10 +2990,10 @@ begin
 
                 if LyricString = '' then
                 begin
-                    if Lyrics.ExceptionOccured then
+                    {if Lyrics.ExceptionOccured then
                         // no connection
                         TranslateMessageDLG(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0)
-                    else
+                    else}
                     begin
                         // no lyrics found
                         if (TranslateMessageDLG(LyricsSearch_NotFoundMessage, mtConfirmation, [mbYes, mbNo], 0) = mrYes) then

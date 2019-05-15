@@ -50,6 +50,7 @@ function Handle_DropFilesForPlaylist(Var aMsg: TMessage): Boolean;
 function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean;
 function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
 
+procedure StartMediaLibraryFileSearch(AutoCloseProgressForm: Boolean = False);
 procedure Handle_STStart(var Msg: TMessage);
 procedure Handle_STNewFile(var Msg: TMessage);
 procedure Handle_STFinish(var Msg: TMessage);
@@ -525,12 +526,12 @@ begin
 
         MB_BlockWriteAccess: begin
             if aMsg.LParam = 0 then BlockeMedienListeWriteAcces(True);
-            AuswahlStatusLBL.Caption := (MediaLibrary_Preparing);
+            // AuswahlStatusLBL.Caption := (MediaLibrary_Preparing);
         end;
 
         MB_BlockReadAccess: begin
           if aMsg.LParam = 0 then BlockeMedienListeReadAccess(True);
-          AuswahlStatusLBL.Caption :=  (MediaLibrary_AlmostDone);
+          // AuswahlStatusLBL.Caption :=  (MediaLibrary_AlmostDone);
         end;
 
         MB_RefillTrees: begin
@@ -549,8 +550,8 @@ begin
         end;
 
         MB_Unblock: begin
-            AuswahlStatusLbl.Caption := '';
-            MedienListeStatusLBL.Caption := '';
+            //AuswahlStatusLbl.Caption := '';
+            //MedienListeStatusLBL.Caption := '';
 
             BlockeMedienListeUpdate(False);
             BlockeMedienListeWriteAcces(False);
@@ -686,11 +687,11 @@ begin
             fspTaskbarManager.ProgressState := TfspTaskProgressState(aMsg.LParam);
         end;
 
-        MB_ProgressRefresh: begin
+        {MB_ProgressRefresh: begin
             AuswahlStatusLbl.Caption := Format((MediaLibrary_RefreshingFiles), [aMsg.LParam]);
             fspTaskbarManager.ProgressValue := aMsg.LParam;
             Progressform.MainProgressBar.Position := aMsg.LParam;
-        end;
+        end;}
 
         MB_ProgressRefreshJustProgressbar: begin
             fspTaskbarManager.ProgressValue := aMsg.LParam;
@@ -698,7 +699,8 @@ begin
         end;
 
         MB_RefreshTagCloudFile: begin
-            Nemp_MainForm.MM_Warning_ID3Tags.Caption := PChar(aMsg.LParam);
+            // NO. Nemp_MainForm.MM_Warning_ID3Tags.Caption := PChar(aMsg.LParam);
+            ProgressForm.lblCurrentItem.Caption := PChar(aMsg.LParam);
 
             if assigned(CloudEditorForm) then
                 CloudEditorForm.LblUpdateWarning.Caption := PChar(aMsg.LParam);
@@ -722,12 +724,14 @@ begin
 
         //MB_SearchAutoAbort: MessageDLG((MediaLibrary_PreciseQuery), mtWarning, [MBOK], 0); // Wird aber nie ausgelöst ;-)
 
+        {
         MB_DeadFilesWarning: begin
             //if (aMsg.LParam < 2000) AND (aMsg.LParam < MedienBib.Count DIV 10) then // weniger als 10% fehlen
                 MessageDlg(Format((MediaLibrary_FilesNotFound), [aMsg.LParam]), mtWarning, [MBOK], 0)
             //else // mehr als 10% fehlen => Laufwerk fehlt?
             //    MessageDlg(Format((MediaLibrary_FilesNotFoundExternalDrive), [aMsg.LParam]), mtWarning, [MBOK], 0);
         end;
+        }
 
         MB_DuplicateWarning: MessageDlg((MediaLibrary_DuplicatesWarning)
             + #13#10 +
@@ -746,17 +750,18 @@ begin
             MedienBib.InitCover(af);
         end;
 
-        MB_LyricUpdateStatus: begin
+        MB_ProgressCurrentFileOrDirUpdate: begin
             // WParam: a string like "(found 5/8)"
             //MedienListeStatusLBL.Caption :=
                 // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
             //    Format((MediaLibrary_SearchingLyrics),
             //          [ ExtractFilename(MedienBib.CurrentThreadFilename), PWideChar(aMsg.LParam)]);
-            ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingLyrics_JustFile),
-                      [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
+            ProgressForm.lblCurrentItem.Caption := PWideChar(aMsg.LParam);
+                //Format((MediaLibrary_SearchingLyrics_JustFile),
+                //      [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
         end;
 
-        MB_TagsUpdateStatus: begin
+        //MB_TagsUpdateStatus: begin
             // WParam: a string like "(found 5/8)"
             //MedienListeStatusLBL.Caption :=
             //    Format((MediaLibrary_SearchingTags),
@@ -764,22 +769,21 @@ begin
             //            PWideChar(aMsg.LParam)]);
             // This will result a string like "Get lyrics for mysong.mp3 (found 5/8)"
 
-            ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingTags_JustFile),
-                      [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
-        end;
+        //    ProgressForm.lblCurrentItem.Caption := Format((MediaLibrary_SearchingTags_JustFile),
+        //              [ ExtractFilename(MedienBib.CurrentThreadFilename)]);
+        //end;
 
         MB_TagsSetTabWarning: begin
             SetBrowseTabCloudWarning(True);
         end;
 
-        MB_LyricUpdateFailed: begin
+        {MB_LyricUpdateFailed: begin
                               MessageDlg(MediaLibrary_LyricsFailed, mtWarning, [MBOK], 0);
                             end;
+        }
 
-        MB_LyricUpdateComplete: begin
-
+        MB_UpdateProcessComplete: begin
                               // MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
-
                               ProgressForm.LblMain.Caption := PWideChar(aMsg.LParam);
                               ProgressForm.lblCurrentItem.Caption := '';
                               ProgressForm.FinishProcess;
@@ -793,7 +797,7 @@ begin
         end;
 
         MB_StartLongerProcess: begin
-                              ProgressForm.InitiateProcess(Boolean(aMsg.LParam));
+                              ProgressForm.InitiateProcess(True, TProgressActions(aMsg.LParam));
         end;
 
         {
@@ -832,11 +836,9 @@ begin
             end;
             if MedienBib.ST_Ordnerlist.Count > 0 then
             begin
-                fspTaskbarManager.ProgressValue := 0;
-                fspTaskbarManager.ProgressState := fstpsIndeterminate;
                 MedienBib.StatusBibUpdate := 1;
                 BlockeMedienListeUpdate(True);
-                ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
+                StartMediaLibraryFileSearch(True); // True: autoclose progress window
             end else
                 // nothing more to do here, check for another job
                 PostMessage(Nemp_MainForm.Handle, WM_MedienBib, MB_CheckForStartJobs, 0);
@@ -2163,7 +2165,7 @@ Begin
               begin
                 PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
                 BlockeMedienListeUpdate(True);
-                ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0])
+                StartMediaLibraryFileSearch;
               end
               else
                 // Die Dateien einpflegen, die evtl. einzeln in die Updatelist geaten sind
@@ -2250,25 +2252,36 @@ begin
     end;
 end;
 
+procedure StartMediaLibraryFileSearch(AutoCloseProgressForm: Boolean = False);
+begin
+    if MedienBib.ST_Ordnerlist.Count > 0 then
+    begin
+        ProgressForm.AutoClose := AutoCloseProgressForm;
+        ProgressForm.InitiateProcess(True, pa_SearchFiles);
+
+        Nemp_MainForm.fspTaskbarManager.ProgressValue := 0;
+        Nemp_MainForm.fspTaskbarManager.ProgressState := fstpsIndeterminate;
+
+        ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
+    end;
+end;
+
 procedure CurDir(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
 begin
-  Nemp_MainForm.AuswahlStatusLbl.Caption :=
-      Format(_(MediaLibrary_SearchingNewFiles),  [MedienBib.UpdateList.Count, ST_Medienliste.CurrentDir]);
-
-  Nemp_MainForm.LblEmptyLibraryHint.Caption :=
-      Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
-
-
-  Nemp_MainForm.AuswahlStatusLbl.Update;
+    ProgressForm.lblSuccessCount.Caption := IntToStr(MedienBib.UpdateList.Count);
+    ProgressForm.lblCurrentItem.Caption := Format(MediaLibrary_SearchingNewFilesDir, [ST_Medienliste.CurrentDir]);
+    Nemp_MainForm.LblEmptyLibraryHint.Caption :=
+          Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
 end;
 
 procedure Handle_STStart(var Msg: TMessage);
 begin
     if Msg.WParam = ST_ID_Medialist then
     begin
-      Nemp_MainForm.AuswahlStatusLbl.Caption := (MediaLibrary_StartSearchingNewFiles);
-      Nemp_MainForm.AuswahlStatusLbl.Update;
-      tid := timeSetEvent(500, 1, @CurDir, 0, TIME_PERIODIC);
+      ProgressForm.lblCurrentItem.Caption := (MediaLibrary_StartSearchingNewFiles);
+      // Nemp_MainForm.AuswahlStatusLbl.Caption := (MediaLibrary_StartSearchingNewFiles);
+      // Nemp_MainForm.AuswahlStatusLbl.Update;
+      tid := timeSetEvent(250, 1, @CurDir, 0, TIME_PERIODIC);
     end;
 end;
 
@@ -2302,7 +2315,6 @@ begin
                     AudioFile:=TAudioFile.Create;
                     aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
                     HandleError(afa_NewFile, AudioFile, aErr);
-
                     MedienBib.InitCover(AudioFile);
                     MedienBib.UpdateList.Add(AudioFile);
                 end;
@@ -2353,7 +2365,7 @@ begin
                   PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
                   MedienBib.StatusBibUpdate := 1;
                   BlockeMedienListeUpdate(True);
-                  ST_Medienliste.SearchFiles(Medienbib.ST_Ordnerlist[0])
+                  ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
                 end
                 else
                 begin

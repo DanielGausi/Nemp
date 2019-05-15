@@ -144,7 +144,7 @@ object DeleteSelection: TDeleteSelection
   end
   object grpBoxDrives: TGroupBox
     Left = 8
-    Top = 88
+    Top = 94
     Width = 662
     Height = 113
     Caption = 'Affected drives'
@@ -160,7 +160,7 @@ object DeleteSelection: TDeleteSelection
       Anchors = [akTop, akRight]
     end
     object LblExplaination: TLabel
-      Left = 175
+      Left = 215
       Top = 24
       Width = 9
       Height = 13
@@ -173,9 +173,9 @@ object DeleteSelection: TDeleteSelection
       ParentFont = False
     end
     object LblWhatToDo: TLabel
-      Left = 175
+      Left = 215
       Top = 59
-      Width = 402
+      Width = 354
       Height = 27
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
@@ -183,7 +183,7 @@ object DeleteSelection: TDeleteSelection
       WordWrap = True
     end
     object LblExplaination2: TLabel
-      Left = 175
+      Left = 215
       Top = 40
       Width = 9
       Height = 13
@@ -195,24 +195,16 @@ object DeleteSelection: TDeleteSelection
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object cbDrives: TCheckListBox
-      Left = 368
-      Top = 24
-      Width = 209
-      Height = 74
-      ItemHeight = 13
-      TabOrder = 0
-    end
     object VSTDrives: TVirtualStringTree
-      Left = 3
+      Left = 8
       Top = 24
-      Width = 184
+      Width = 193
       Height = 76
-      DefaultNodeHeight = 32
+      DefaultNodeHeight = 22
       Header.AutoSizeIndex = 0
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs]
       Indent = 0
-      TabOrder = 1
+      TabOrder = 0
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toCheckSupport, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
       TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
       OnChange = VSTDrivesChange
@@ -222,7 +214,7 @@ object DeleteSelection: TDeleteSelection
         item
           Position = 0
           Text = 'Files'
-          Width = 180
+          Width = 189
         end>
     end
   end
@@ -6574,5 +6566,12 @@ object DeleteSelection: TDeleteSelection
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object checkImages: TImageList
+    ColorDepth = cd32Bit
+    Height = 22
+    Width = 22
+    Left = 88
+    Top = 64
   end
 end

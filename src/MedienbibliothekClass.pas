@@ -284,7 +284,7 @@ type
         procedure fGetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 
         // Refreshing Library
-        procedure fRefreshFiles;      // 1a. Refresh files OR
+        procedure fRefreshFiles(aRefreshList: TObjectList);      // 1a. Refresh files OR
         procedure fGetLyrics;         // 1b. get Lyrics
         procedure fPrepareGetTags;    // 1c. get tags, but at first make a copy of the Ignore/rename-Rules in VCL-Thread
         procedure fGetTags;           //     get Tags (from LastFM)
@@ -511,7 +511,6 @@ type
         // BibScrobbler: Link to Player.NempScrobbler
         BibScrobbler: TNempScrobbler;
 
-
         property StatusBibUpdate   : Integer read GetStatusBibUpdate    write SetStatusBibUpdate;
 
         property Count: Integer read GetCount;
@@ -563,7 +562,8 @@ type
         procedure DeleteFilesUpdateBibAutomatic;
 
         procedure CleanUpDeadFilesFromVCLLists;
-        procedure RefreshFiles;
+        procedure RefreshFiles_All;
+        procedure RefreshFiles_Selected;
         procedure GetLyricPriorities(out Prio1, Prio2: TLyricFunctionsEnum);
         procedure GetLyrics;
         procedure GetTags;
@@ -731,7 +731,9 @@ type
   Procedure fDeleteFilesUpdateUser(MB: TMedienbibliothek);
   Procedure fDeleteFilesUpdateAutomatic(MB: TMedienbibliothek);
 
-  procedure fRefreshFilesThread(MB: TMedienbibliothek);
+  procedure fRefreshFilesThread_All(MB: TMedienbibliothek);
+  procedure fRefreshFilesThread_Selected(MB: TMedienbibliothek);
+
   procedure fGetLyricsThread(MB: TMedienBibliothek);
   procedure fGetTagsThread(MB: TMedienBibliothek);
 
@@ -876,6 +878,7 @@ begin
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
 end;
+
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
@@ -1504,10 +1507,17 @@ begin
     MB.PrepareNewFilesUpdate;  // status: ok (no StatusChange needed)
     MB.SwapLists;              // status: ok (StatusChange via SendMessage)
     MB.CleanUpTmpLists;        // status: ok (No StatusChange allowed)
+
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                        Integer(PChar( MediaLibrary_SearchingNewFilesComplete ) ));
+
     if MB.ChangeAfterUpdate then
         MB.Changed := True;
   end else
   begin
+      SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                        Integer(PChar( MediaLibrary_SearchingNewFiles_NothingFound ) ));
+
       SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
   end;
 
@@ -1616,10 +1626,12 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.PrepareNewFilesUpdate;
-var i: Integer;
-    //aAudioFile: TAudioFile;
+var i, d: Integer;
+    aAudioFile: TAudioFile;
 begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
+
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_Preparing)));
 
   UpdateList.Sort(Sortieren_Pfad_asc);
   Merge(UpdateList, Mp3ListePfadSort, tmpMp3ListePfadSort, SO_Pfad, NempSortArray);
@@ -1701,7 +1713,7 @@ begin
   ///  temporary disabled
   ///////////////////////////////////////////////////////////////
   ///
-  (*
+
   // Check for Duplicates
   // Note: This test should be always negative. If not, something in the system went wrong. :(
   //       Probably the Sort and Binary-Search methods do not match then.
@@ -1738,7 +1750,7 @@ begin
   ///////////////////////////////////////////////////////////////
   ///  temporary disabled
   ///////////////////////////////////////////////////////////////
-  *)
+
 
   // Prepare BrowseLists
   case BrowseMode of
@@ -1957,7 +1969,7 @@ begin
     // there ---^ check MB.fCurrentJob for a matching parameter
 
 
-    if MB.DeadFiles.Count > 0 then
+    if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
     begin
         DeleteDataList := TObjectList.Create(False);
         try
@@ -1974,7 +1986,7 @@ begin
             begin
                 // user can't change anything, fill the list
                 MB.fReFillDeadFilesByDataList(DeleteDataList);
-
+                // create a message containing a summary of the files to be deleted now (for logging, if wanted)
                 MB.fGetDeadFilesSummary(DeleteDataList, SummaryDeadFiles);
                 SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_InfoDeadFiles, lParam(@SummaryDeadFiles));
             end;
@@ -1997,11 +2009,18 @@ begin
         MB.fCleanUpDeadFiles;                  // status: ok, no change needed
         // Clear temporary lists
         MB.CleanUpTmpLists;                   // status: ok, no change allowed
+
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                        Integer(PChar( DeleteSelect_DeletingFilesComplete ) ));
     end else
     begin
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                        Integer(PChar( DeleteSelect_DeletingFilesAborted ) ));
     end;
+
 
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
@@ -2070,19 +2089,24 @@ end;  *)
 }
 Function TMedienBibliothek.fCollectDeadFiles: Boolean;
 var i, ges, freq: Integer;
+    nt, ct: Cardinal;
 begin
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
       SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_CleanUp));
 
       ges := Mp3ListePfadSort.Count + AllPlaylistsPfadSort.Count  + 1;
       freq := Round(ges / 100) + 1;
+      ct := GetTickCount;
       for i := 0 to Mp3ListePfadSort.Count-1 do
       begin
           if Not FileExists((Mp3ListePfadSort[i] as TAudioFile).Pfad) then
             DeadFiles.Add(Mp3ListePfadSort[i] as TAudioFile);
-          if i mod freq = 0 then
+
+          nt := GetTickCount;
+          if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
           begin
+                ct := nt;
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead,
                       Integer(PChar( (Mp3ListePfadSort[i] as TAudioFile).Ordner)) );
 
@@ -2100,8 +2124,11 @@ begin
       begin
           if Not FileExists(TJustaString(AllPlaylistsPfadSort[i]).DataString) then
             DeadPlaylists.Add(AllPlaylistsPfadSort[i] as TJustaString);
-          if i mod freq = 0 then
+
+          nt := GetTickCount;
+          if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
           begin
+              ct := nt;
               SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Integer(PChar(MediaLibrary_SearchingMissingPlaylist)));
               SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round((Mp3ListePfadSort.Count+i)/ges * 100));
               //SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round((i + Mp3ListePfadSort.Count)/ges * 100));
@@ -2229,11 +2256,7 @@ begin
 
         currentDriveChar  := ' ';    // invalid drive letter
         currentPC         := 'XXX';  // invalid PC-Name
-        //currentLogicalDrive := Nil;
-        //currentLibraryDrive := Nil;
         newDeleteData     := Nil;
-
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar('Sorting Dead Files ...')));
 
         for i := 0 to DeadFiles.Count - 1 do
         begin
@@ -2345,9 +2368,6 @@ begin
             end;
         end;
 
-
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar('Checking Drives ...')));
-
         // Try to determine, whether network-ressources are online or not
         for i := 0 to DeleteDataList.Count - 1 do
         begin
@@ -2434,6 +2454,8 @@ var i: Integer;
 begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
   SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_WriteAccessBlocked);
+
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(DeleteSelect_DeletingFiles)));
 
   DeadFiles.Sort(Sortieren_Pfad_asc);
   AntiMerge(Mp3ListePfadSort, DeadFiles, tmpMp3ListePfadSort);
@@ -2549,25 +2571,46 @@ end;
       AudioFiles, which will require much more RAM
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.RefreshFiles;
+procedure TMedienBibliothek.RefreshFiles_All;
 var Dummy: Cardinal;
 begin
   if StatusBibUpdate = 0 then
   begin
       UpdateFortsetzen := True;
       StatusBibUpdate := BIB_Status_ReadAccessBlocked;
-      fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread, Self, 0, Dummy));
+      fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_All, Self, 0, Dummy));
   end;
 end;
+procedure TMedienBibliothek.RefreshFiles_Selected;
+var Dummy: Cardinal;
+begin
+  if StatusBibUpdate = 0 then
+  begin
+      UpdateFortsetzen := True;
+      StatusBibUpdate := BIB_Status_ReadAccessBlocked;
+      fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_Selected, Self, 0, Dummy));
+  end;
+end;
+
 {
     --------------------------------------------------------
     fRefreshFilesThread
     - the secondary thread will call the proper private method
     --------------------------------------------------------
 }
-procedure fRefreshFilesThread(MB: TMedienbibliothek);
+procedure fRefreshFilesThread_All(MB: TMedienbibliothek);
 begin
-    MB.fRefreshFiles;
+    MB.fRefreshFiles(MB.Mp3ListePfadSort);
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    try
+        CloseHandle(MB.fHND_RefreshFilesThread);
+    except
+    end;
+end;
+procedure fRefreshFilesThread_Selected(MB: TMedienbibliothek);
+begin
+    MB.fRefreshFiles(MB.UpdateList);
+    MB.UpdateList.Clear;
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
     try
         CloseHandle(MB.fHND_RefreshFilesThread);
@@ -2580,62 +2623,80 @@ end;
     - Block read access for the VCL
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.fRefreshFiles;
-var i, freq: Integer; // toteFilesCount
+procedure TMedienBibliothek.fRefreshFiles(aRefreshList: TObjectList);
+var i, freq, ges: Integer;
     AudioFile: TAudioFile;
     oldArtist, oldAlbum: UnicodeString;
     oldID: string;
     einUpdate: boolean;
     DeleteDataList: TObjectList;
+    ct, nt: Cardinal;
 begin
   // AudioFiles will be changed. Block everything.
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0); //
-
   SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_RefreshFiles));
 
-  // toteFilesCount := 0;
   einUpdate := False;
 
   EnterCriticalSection(CSUpdate);
-  freq := Round(Mp3ListeArtistSort.Count / 100) + 1;
-  for i := 0 to MP3ListePfadSort.Count - 1 do
+  ges := aRefreshList.Count;
+  freq := Round(aRefreshList.Count / 100) + 1;
+  ct := GetTickCount;
+  for i := 0 to aRefreshList.Count - 1 do
   begin
-    AudioFile := TAudioFile(MP3ListePfadSort[i]);
-    if FileExists(AudioFile.Pfad) then
-    begin
-        AudioFile.FileIsPresent:=True;
-        oldArtist := AudioFile.Strings[NempSortArray[1]];
-        oldAlbum := AudioFile.Strings[NempSortArray[2]];
-        oldID := AudioFile.CoverID;
+        AudioFile := TAudioFile(aRefreshList[i]);
+        if FileExists(AudioFile.Pfad) then
+        begin
+            AudioFile.FileIsPresent:=True;
+            oldArtist := AudioFile.Strings[NempSortArray[1]];
+            oldAlbum := AudioFile.Strings[NempSortArray[2]];
+            oldID := AudioFile.CoverID;
 
-        // GetAudioData within the secondary is a very bad idea.
-        // The cover-stuff will cause some exceptions like OutOfRessources
-        // The Mainthread will do the following at this message:
-        // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-        // InitCover(AudioFile);
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
+            // GetAudioData within the secondary is a very bad idea.
+            // The cover-stuff will cause some exceptions like OutOfRessources
+            // The Mainthread will do the following at this message:
+            // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+            // InitCover(AudioFile);
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
 
-        if  (oldArtist <> AudioFile.Strings[NempSortArray[1]])
-            OR (oldAlbum <> AudioFile.Strings[NempSortArray[2]])
-            or (oldID <> AudioFile.CoverID)
-        then
-            einUpdate := true;
-    end
-    else
-    begin
-        AudioFile.FileIsPresent:=False;
-        //inc(toteFilesCount);
-        DeadFiles.Add(AudioFile);
-    end;
-    if i mod freq = 0 then
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefresh, Round(i/MP3ListePfadSort.Count * 100));
+            if  (oldArtist <> AudioFile.Strings[NempSortArray[1]])
+                OR (oldAlbum <> AudioFile.Strings[NempSortArray[2]])
+                or (oldID <> AudioFile.CoverID)
+            then
+                einUpdate := true;
+        end
+        else
+        begin
+            AudioFile.FileIsPresent:=False;
+            DeadFiles.Add(AudioFile);
+        end;
 
-    if Not UpdateFortsetzen then break;
+        nt := GetTickCount;
+        if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
+        begin
+            ct := nt;
+            //SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefresh, Round(i/ges * 100));
+
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressCurrentFileOrDirUpdate,
+                            Integer(PWideChar(Format(_(MediaLibrary_RefreshingFilesInDir),
+                                                  [ AudioFile.Ordner ]))));
+
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, (i+1) - DeadFiles.Count);
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, DeadFiles.Count);
+        end;
+
+        if Not UpdateFortsetzen then break;
   end;
+
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
+
 
   // first: adjust Browse&Search stuff for the new data
   if einUpdate then
   begin
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_RefreshingFilesPreparingLibrary)));
       // Listen sortieren
       // With lParam = 1 only the caption of the StatusLabel is changed
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 1);
@@ -2673,10 +2734,11 @@ begin
   // After this: Handle missing files
   if DeadFiles.Count > 0 then
   begin
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, LParam(DeadFiles.Count));
+      // SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, LParam(DeadFiles.Count));
       DeleteDataList := TObjectList.Create(False);
       try
           fPrepareUserInputDeadFiles(DeleteDataList);
+          SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput)));
           SendMessage(MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
           // user can change DeleteDataList (set the DoDelete-property of the objects)
           // so: Change the DeadFiles-list and fill it with the files that should be deleted.
@@ -2685,15 +2747,23 @@ begin
           DeleteDataList.Free;
       end;
 
-      fPrepareDeleteFilesUpdate;
-      SwapLists;
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
-      fCleanUpDeadFiles;
-      CleanUpTmpLists;
+      if (DeadFiles.Count{ + DeadPlaylists.Count}) > 0 then
+      // (we haven't checked for playlist during "refreshing files"
+      begin
+          fPrepareDeleteFilesUpdate;
+          SwapLists;
+          SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
+          fCleanUpDeadFiles;
+          CleanUpTmpLists;
+      end;
+
       SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
   end;
 
   LeaveCriticalSection(CSUpdate);
+
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                        Integer(PChar( MediaLibrary_RefreshingFilesCompleteFinished ) ));
 
   // Status zurücksetzen, Unblock library
   SendMessage(MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
@@ -2790,7 +2860,7 @@ begin
     done := 0;
     failed := 0;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_Searchlyrics));
 
     ErrorOcurred := False;
 
@@ -2824,9 +2894,9 @@ begin
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                             Integer(PWideChar(aAudioFile.Pfad)));
 
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateStatus,
-                            //2nd param unused right now
-                            Integer(PWideChar(Format(_(MediaLibrary_SearchLyricsStats), [done, done + failed]))));
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressCurrentFileOrDirUpdate,
+                            Integer(PWideChar(Format(_(MediaLibrary_SearchingLyrics_JustFile),
+                                                  [ aAudioFile.Dateiname ]))));
 
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
 
@@ -2903,29 +2973,29 @@ begin
         // ein einzelnes File wurde angefordert
         // Bei Mißerfolg einen Hinweis geben.
         if (done = 0) then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SingleNotFound))))
         else
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
         if failed = 0 then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
         else
             if done > 0.5 * (failed + done) then
                 // ganz gutes Ergebnis - mehr als die Hälfte gefunden
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                     Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_ManyFound), [done, done + failed]))))
             else
                 if done > 0 then
                     // Nicht so tolles Ergebnis
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                         Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_FewFound), [done, done + failed]))))
                 else
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                         Integer(PChar(_(MediaLibrary_SearchLyricsComplete_NoneFound))))
     end;
 
@@ -3017,7 +3087,7 @@ begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
 
     // if UpdateList.Count > 1 then
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(True));
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_SearchTags));
 
     for i := 0 to UpdateList.Count - 1 do
     begin
@@ -3031,8 +3101,12 @@ begin
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                         Integer(PWideChar(af.Pfad)));
 
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
-                        Integer(PWideChar(Format(_(MediaLibrary_SearchTagsStats), [done, done + failed]))));
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressCurrentFileOrDirUpdate,
+                            Integer(PWideChar(Format(_(MediaLibrary_SearchingTags_JustFile),
+                                                      [af.Dateiname]))));
+
+            //SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsUpdateStatus,
+            //            Integer(PWideChar(Format(_(MediaLibrary_SearchTagsStats), [done, done + failed]))));
 
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
             af.FileIsPresent:=True;
@@ -3110,29 +3184,29 @@ begin
         // ein einzelnes File wurde angefordert
         // Bei Mißerfolg einen Hinweis geben.
         if (done = 0) then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchTagsComplete_SingleNotFound))))
         else
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
     end else
     begin
         // mehrere Dateien wurden gesucht.
         if failed = 0 then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                 Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
         else
             if done > 0.5 * (failed + done) then
                 // ganz gutes Ergebnis - mehr als die Hälfte gefunden
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                     Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_ManyFound), [done, done + failed]))))
             else
                 if done > 0 then
                     // Nicht so tolles Ergebnis
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                         Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_FewFound), [done, done + failed]))))
                 else
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_LyricUpdateComplete,
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
                         Integer(PChar(_(MediaLibrary_SearchTagsComplete_NoneFound))))
     end;
 
@@ -3180,15 +3254,24 @@ begin
 end;
 
 procedure TMedienBibliothek.fUpdateId3tags;
-var i: Integer;
+var i, freq, ges: Integer;
     af: TAudioFile;
     aErr: TNempAudioError;
     ErrorOcurred: Boolean;
     ErrorLog: TErrorLog;
+    ct, nt: Cardinal;
+    errCount, inconCount: Integer;
 begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_UpdateMetadata));
 
     ErrorOcurred := False;
+
+    ges := UpdateList.Count;
+    freq := Round(UpdateList.Count / 100) + 1;
+    ct := GetTickCount;
+    errCount := 0;
+
     for i := 0 to UpdateList.Count - 1 do
     begin
         if not UpdateFortsetzen then break;
@@ -3201,12 +3284,18 @@ begin
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
                         Integer(PWideChar(af.Pfad)));
 
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/UpdateList.Count * 100));
-
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile,
-                        Integer(PWideChar(
-                            Format(MediaLibrary_CloudUpdateStatus,
-                            [Round(i/UpdateList.Count * 100), af.Dateiname]))));
+            nt := GetTickCount;
+            if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
+            begin
+                ct := nt;
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
+                // display current item in progress-label
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile,
+                        Integer(PWideChar(Format(MediaLibrary_CloudUpdateStatus, [af.Dateiname]))));
+                // display success/fail
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, i - errCount);
+                SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, errCount);
+            end;
 
             af.FileIsPresent := True;
 
@@ -3219,6 +3308,7 @@ begin
                 Changed := True;
             end else
             begin
+                inc(errCount);
                 ErrorOcurred := True;
                 ErrorLog := TErrorLog.create(afa_TagCloud, af, aErr, false);
                 try
@@ -3227,24 +3317,57 @@ begin
                     ErrorLog.Free;
                 end;
             end;
+        end else
+        begin
+            // not an unexpected error, but the file could not be updated, as it's currently not available
+            inc(errCount);
         end;
     end;
 
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+
+    // this will reset the status of the MenuItem indicating the warning for inconsistent files
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
 
+
+    // present a summary of this operation in the progress window
     if Updatefortsetzen then
-        // complete, show message
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ID3TagUpdateComplete, 0);
+    begin
+        // user *did not* aborted the operation.
+        if errCount = 0 then
+            // everything is fine
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete, Integer(PChar(MediaLibrary_InconsistentFiles_Completed_Success)))
+        else
+        begin
+            // some files are still inconsitent
+            inconCount := CountInconsistentFiles;
+            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                    Integer(PChar( Format(MediaLibrary_InconsistentFiles_Completed_SomeFailed,[inconCount]) )));
+        end;
+    end else
+    begin
+        // user *did* click on "Abort"
+        // some ID3Tags are still inconsistent with the files in the library
+        inconCount := CountInconsistentFiles;
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                Integer(PChar( Format(MediaLibrary_InconsistentFiles_Abort,[inconCount]) )));
+    end;
 
     // clear thread-used filename
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate,
-                    Integer(PWideChar('')));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-    if ErrorOcurred then
-    begin
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
-    end;
+            //if Updatefortsetzen then
+                // complete, show message
+            //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ID3TagUpdateComplete, 0);
+
+                //SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+            //      Integer(PChar( MediaLibrary_RefreshingFilesCompleteFinished ) ));
+
+            //if ErrorOcurred then
+            //begin
+            //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+            //end;
 end;
 
 
@@ -3320,7 +3443,7 @@ begin
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile,
                         Integer(PWideChar(
                             Format(MediaLibrary_CloudUpdateStatus,
-                            [Round(i/UpdateList.Count * 100), af.Dateiname]))));
+                            [{Round(i/UpdateList.Count * 100),} af.Dateiname]))));
 
 
                 af.FileIsPresent := True;

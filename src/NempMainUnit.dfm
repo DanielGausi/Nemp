@@ -245,6 +245,7 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
+            Header.Height = 20
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
             IncrementalSearch = isAll
             Indent = 14
@@ -3922,6 +3923,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object MM_H_ErrorLog: TMenuItem
       Caption = 'Messages'
+      ImageIndex = 33
       Visible = False
       OnClick = MM_H_ErrorLogClick
     end
