@@ -41,7 +41,7 @@ type
 
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
-    TProgressActions = (pa_Default, pa_SearchFiles, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData);
+    TProgressActions = (pa_Default, pa_SearchFiles, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles);
 
     TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
@@ -167,6 +167,7 @@ type
 
         //Sprache
         Language: String;
+        maxDragFileCount: Integer;
 
         ShutDownMode: Integer;
         ShutDownTime: TDateTime;
@@ -302,7 +303,7 @@ const
     // Minimale Höhe des oberen teils:
     TOP_MIN_HEIGHT = 323;//311///426;
 
-    MAX_DRAGFILECOUNT = 2500;
+    //MAX_DRAGFILECOUNT = 2500; Now: NempOptions.maxDragFileCount
     MIN_CUESHEET_DURATION = 600; // no automatic scanning for cue sheets for short tracks
 
     // Messages des Players
@@ -930,7 +931,7 @@ begin
         //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
         LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
 
-        AutoCloseProgressWindow := ini.ReadBool('Allgmein', 'AutoCloseProgressWindow', False);
+        AutoCloseProgressWindow := ini.ReadBool('Allgemein', 'AutoCloseProgressWindow', False);
         StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
         AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
         RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', False);
@@ -954,6 +955,7 @@ begin
         // ShutDownAtEndOfPlaylist initialisieren
         ShutDownAtEndOfPlaylist := False;
         Language := Ini.ReadString('Allgemein', 'Language', '');
+        maxDragFileCount := Ini.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
 
         NempFormAufteilung[0].FormTop            := ini.ReadInteger('Fenster', 'Top_0'                ,0  );
         NempFormAufteilung[0].FormLeft           := ini.ReadInteger('Fenster', 'Left_0'               ,0  );
@@ -1142,7 +1144,7 @@ begin
         //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
         ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
 
-        ini.WriteBool('Allgmein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
+        ini.WriteBool('Allgemein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
         ini.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
         ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
         ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
@@ -1164,6 +1166,7 @@ begin
 
         //ini.WriteInteger('Allgemein', 'ShutDownMode', ShutDownMode);
         Ini.WriteString('Allgemein', 'Language', Language);
+        Ini.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
 
         SaveWindowPositons(ini, options, aMode);
 

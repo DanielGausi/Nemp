@@ -40,6 +40,9 @@ end;
 
 procedure TFError.BtnOKClick(Sender: TObject);
 begin
+    if ErrorLogCount = 0 then
+        Nemp_MainForm.MM_H_ErrorLog.Visible := False;
+
     Close;
 end;
 

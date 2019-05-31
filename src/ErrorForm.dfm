@@ -37,8 +37,6 @@ object FError: TFError
     Caption = 'Clear Messages'
     TabOrder = 1
     OnClick = BtnClearClick
-    ExplicitLeft = 205
-    ExplicitTop = 353
   end
   object BtnOK: TButton
     Left = 302
@@ -49,7 +47,5 @@ object FError: TFError
     Caption = 'Ok'
     TabOrder = 2
     OnClick = BtnOKClick
-    ExplicitLeft = 363
-    ExplicitTop = 353
   end
 end

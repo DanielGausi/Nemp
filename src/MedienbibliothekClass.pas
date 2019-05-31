@@ -2906,6 +2906,9 @@ begin
                     if LyricWikiResponse <> '' then
                     begin
                         backup := String(aAudioFile.Lyrics);
+                        // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+                        aAudioFile.GetAudioData(aAudioFile.Pfad);
+                        // Set new Lyrics
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
                         aErr := aAudioFile.SetAudioData(True);
                             // SetAudioData(True) : Check before entering this thread, whether this operation
@@ -3127,9 +3130,13 @@ begin
                 backup := String(af.RawTagLastFM);
                 // process new Tags. Rename, delete ignored and duplicates.
 
+                // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+                af.GetAudioData(af.Pfad);
+
+                // Set new Tags
                 // change to medienbib.addnewtag (THREADED)
                 // param false: do not ignore warnings but resolve inconsistencies
-                // param true: use therad-safe copies of rule-lists
+                // param true: use thread-safe copies of rule-lists
                 AddNewTag(af, s, False, True);
                 //af.RawTagLastFM := Utf8String(ControlRawTag(af, s, fIgnoreListCopy, fMergeListCopy));
 
@@ -3582,13 +3589,30 @@ begin
   FreeAndNil(aAudioFile);
 end;
 function TMedienBibliothek.DeletePlaylist(aPlaylist: TJustAString): boolean;
+    procedure lDeletePlaylistFromList(aList: TObjectList);
+    var i: Integer;
+        currentJString: TJustaString;
+    begin
+        for i := 0 to aList.Count - 1 do
+        begin
+            currentJString := TJustaString(aList[i]);
+            if (currentJString.DataString = aPlaylist.DataString)
+               AND (currentJString.AnzeigeString = aPlaylist.AnzeigeString)
+            then
+            begin
+                aList.Delete(i);
+                break;
+            end;
+        end;
+    end;
 begin
     result := StatusBibUpdate = 0;
     if StatusBibUpdate <> 0 then exit;
-    tmpAllPlaylistsPfadSort.Extract(aPlaylist);
-    AllPlaylistsPfadSort.Extract(aPlaylist);
-    AllPlaylistsNameSort.Extract(aPlaylist);
-    Alben.Extract(aPlaylist);
+
+    lDeletePlaylistFromList(tmpAllPlaylistsPfadSort);
+    lDeletePlaylistFromList(AllPlaylistsPfadSort);
+    lDeletePlaylistFromList(AllPlaylistsNameSort);
+    lDeletePlaylistFromList(Alben);
     Changed := True;
     FreeAndNil(aPlaylist);
 end;

@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 801
+  ClientHeight = 881
   ClientWidth = 903
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -116,7 +116,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 175
           Anchors = []
           BevelOuter = bvNone
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           TabOrder = 1
           Visible = False
           OnMouseDown = PanelCoverBrowseMouseDown
@@ -132,7 +132,7 @@ object Nemp_MainForm: TNemp_MainForm
             300
             175)
           object IMGMedienBibCover: TImage
-            Left = 0
+            Left = 1
             Top = 6
             Width = 297
             Height = 24
@@ -143,8 +143,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnMouseDown = IMGMedienBibCoverMouseDown
             OnMouseMove = IMGMedienBibCoverMouseMove
             OnMouseUp = IMGMedienBibCoverMouseUp
-            ExplicitWidth = 353
-            ExplicitHeight = 59
           end
           object ImgScrollCover: TImage
             Left = 1
@@ -215,7 +213,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 59
           Anchors = []
           BevelOuter = bvNone
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           TabOrder = 0
           object Splitter3: TSplitter
             Left = 73
@@ -245,13 +243,13 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             Header.AutoSizeIndex = 0
             Header.Background = clWindow
-            Header.Height = 20
+            Header.Height = 21
             Header.Options = [hoAutoResize, hoDrag, hoVisible]
             IncrementalSearch = isAll
             Indent = 14
             Margin = 0
             ParentFont = False
-            PopupMenu = Medialist_PopupMenu
+            PopupMenu = Medialist_Browse_PopupMenu
             ScrollBarOptions.ScrollBars = ssVertical
             TabOrder = 0
             TextMargin = 2
@@ -302,7 +300,7 @@ object Nemp_MainForm: TNemp_MainForm
             Indent = 14
             Margin = 0
             ParentFont = False
-            PopupMenu = Medialist_PopupMenu
+            PopupMenu = Medialist_Browse_PopupMenu
             ScrollBarOptions.ScrollBars = ssVertical
             TabOrder = 1
             TextMargin = 2
@@ -367,7 +365,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 24
           Hint = 'Show context menu'
           ParentShowHint = False
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           ShowHint = True
           TabOrder = 0
           TabStop = False
@@ -388,7 +386,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 24
           Hint = 'Browse your medialibrary'
           ParentShowHint = False
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           ShowHint = True
           TabOrder = 1
           OnClick = TABPanelAuswahlClick
@@ -409,7 +407,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 24
           Hint = 'Coverflow'
           ParentShowHint = False
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           ShowHint = True
           TabOrder = 2
           OnClick = TABPanelAuswahlClick
@@ -431,7 +429,7 @@ object Nemp_MainForm: TNemp_MainForm
           Anchors = [akLeft, akTop, akRight]
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           TabOrder = 3
           OnPaint = TABPanelPaint
           OwnerDraw = False
@@ -463,7 +461,7 @@ object Nemp_MainForm: TNemp_MainForm
           Height = 24
           Hint = 'Tag cloud'
           ParentShowHint = False
-          PopupMenu = Medialist_PopupMenu
+          PopupMenu = Medialist_Browse_PopupMenu
           ShowHint = True
           TabOrder = 4
           OnClick = TABPanelAuswahlClick
@@ -2472,7 +2470,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 662
     Width = 903
-    Height = 139
+    Height = 219
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
@@ -2484,7 +2482,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 28
       Width = 903
-      Height = 111
+      Height = 191
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -2497,7 +2495,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 497
         Top = 2
         Width = 4
-        Height = 107
+        Height = 187
         Align = alRight
         ResizeStyle = rsUpdate
         OnCanResize = Splitter4CanResize
@@ -2511,7 +2509,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 501
         Top = 2
         Width = 400
-        Height = 107
+        Height = 187
         Align = alRight
         BevelOuter = bvNone
         PopupMenu = PopupEditExtendedTags
@@ -2647,7 +2645,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 2
         Top = 2
         Width = 495
-        Height = 107
+        Height = 187
         Align = alClient
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -2673,7 +2671,7 @@ object Nemp_MainForm: TNemp_MainForm
         Margin = 0
         ParentFont = False
         ParentShowHint = False
-        PopupMenu = Medialist_PopupMenu
+        PopupMenu = Medialist_View_PopupMenu
         ShowHint = True
         TabOrder = 1
         TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -2827,7 +2825,7 @@ object Nemp_MainForm: TNemp_MainForm
         Anchors = [akLeft, akTop, akRight]
         BevelInner = bvRaised
         BevelOuter = bvLowered
-        PopupMenu = Medialist_PopupMenu
+        PopupMenu = Medialist_View_PopupMenu
         TabOrder = 1
         OnPaint = TABPanelPaint
         OwnerDraw = False
@@ -2847,7 +2845,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object TabBtn_Medialib: TSkinButton
-        Left = 2
+        Left = -2
         Top = 2
         Width = 24
         Height = 24
@@ -2899,10 +2897,11 @@ object Nemp_MainForm: TNemp_MainForm
   object Nemp_MainMenu: TMainMenu
     AutoHotkeys = maManual
     Images = MenuImages
-    Left = 32
-    Top = 376
+    Left = 40
+    Top = 112
     object MM_Medialibrary: TMenuItem
       Caption = '&Media library'
+      OnClick = MM_MedialibraryClick
       object MM_ML_SearchDirectory: TMenuItem
         Caption = '&Scan hard disk for audio files'
         ImageIndex = 3
@@ -2916,101 +2915,6 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object N22: TMenuItem
         Caption = '-'
-      end
-      object MM_ML_SortBy: TMenuItem
-        Caption = 'So&rt by'
-        ImageIndex = 11
-        object MM_ML_SortByArtistTitle: TMenuItem
-          Caption = '&Artist, Title'
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByArtistAlbumTitle: TMenuItem
-          Tag = 117
-          Caption = 'A&rtist, Album, Title'
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByTitleArtist: TMenuItem
-          Tag = 1
-          Caption = '&Title, Artist'
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByAlbumArtistTitle: TMenuItem
-          Tag = 2
-          Caption = 'A&lbum, Artist, Title'
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByAlumTitleArtist: TMenuItem
-          Tag = 118
-          Caption = 'Al&bum, Title, Artist'
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByAlbumTrack: TMenuItem
-          Tag = 119
-          Caption = 'Alb&um, Tracknr.'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object N10: TMenuItem
-          Caption = '-'
-          GroupIndex = 1
-        end
-        object MM_ML_SortByFilename: TMenuItem
-          Tag = 12
-          Caption = '&Filename'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByPath: TMenuItem
-          Tag = 10
-          Caption = '&Path && filename'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByLyrics: TMenuItem
-          Tag = 15
-          Caption = 'L&yrics exists'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByGenre: TMenuItem
-          Tag = 14
-          Caption = '&Genre'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object N11: TMenuItem
-          Caption = '-'
-          GroupIndex = 1
-        end
-        object MM_ML_SortByDuration: TMenuItem
-          Tag = 3
-          Caption = 'Du&ration'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object MM_ML_SortByFilesize: TMenuItem
-          Tag = 9
-          Caption = 'File&size'
-          GroupIndex = 1
-          OnClick = AnzeigeSortMENUClick
-        end
-        object N4: TMenuItem
-          Caption = '-'
-          GroupIndex = 1
-        end
-        object MM_ML_SortAscending: TMenuItem
-          Caption = '&Ascending'
-          Checked = True
-          GroupIndex = 1
-          RadioItem = True
-          OnClick = MM_ML_SortAscendingClick
-        end
-        object MM_ML_SortDescending: TMenuItem
-          Caption = 'D&escending'
-          GroupIndex = 1
-          RadioItem = True
-          OnClick = MM_ML_SortDescendingClick
-        end
       end
       object MM_ML_BrowseBy: TMenuItem
         Caption = '&Browse by'
@@ -3082,11 +2986,6 @@ object Nemp_MainForm: TNemp_MainForm
       object N23: TMenuItem
         Caption = '-'
       end
-      object MM_ML_Delete: TMenuItem
-        Caption = '&Delete'
-        ImageIndex = 12
-        OnClick = MM_ML_DeleteClick
-      end
       object MM_ML_Load: TMenuItem
         Caption = '&Load'
         ImageIndex = 0
@@ -3097,137 +2996,27 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 1
         OnClick = MM_ML_SaveClick
       end
-      object MM_ML_DeleteMissingFiles: TMenuItem
-        Caption = 'Cleanup (remove &missing files)'
-        OnClick = DatenbankUpdateTBClick
+      object MM_ML_ExportAsCSV: TMenuItem
+        Caption = '&Export as csv'
+        ShortCut = 16453
+        OnClick = PM_ML_MedialibraryExportClick
+      end
+      object MM_ML_Delete: TMenuItem
+        Caption = '&Delete'
+        ImageIndex = 12
+        OnClick = MM_ML_DeleteClick
+      end
+      object N71: TMenuItem
+        Caption = '-'
       end
       object MM_ML_RefreshAll: TMenuItem
         Caption = '&Refresh (rescan all files)'
         ShortCut = 16500
         OnClick = MM_ML_RefreshAllClick
       end
-      object MM_ML_ExportAsCSV: TMenuItem
-        Caption = '&Export as csv'
-        ShortCut = 16453
-        OnClick = PM_ML_MedialibraryExportClick
-      end
-      object N21: TMenuItem
-        Caption = '-'
-      end
-      object MM_ML_DeleteSelectedFiles: TMenuItem
-        Caption = 'Remove selected files'
-        OnClick = PM_ML_DeleteSelectedClick
-      end
-      object MM_ML_SetRatingSelected: TMenuItem
-        Caption = 'Set rating of selected files to'
-        ImageIndex = 20
-        object MM_ML_SetRatingsOfSelectedFiles1: TMenuItem
-          Tag = 100
-          Caption = '0.5 stars'
-          ImageIndex = 23
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles2: TMenuItem
-          Tag = 101
-          Caption = '1 star'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles3: TMenuItem
-          Tag = 102
-          Caption = '1.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles4: TMenuItem
-          Tag = 103
-          Caption = '2 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles5: TMenuItem
-          Tag = 104
-          Caption = '2.5 stars'
-          ImageIndex = 24
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles6: TMenuItem
-          Tag = 105
-          Caption = '3 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles7: TMenuItem
-          Tag = 106
-          Caption = '3.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles8: TMenuItem
-          Tag = 107
-          Caption = '4 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles9: TMenuItem
-          Tag = 108
-          Caption = '4.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_ML_SetRatingsOfSelectedFiles10: TMenuItem
-          Tag = 109
-          Caption = '5 stars'
-          ImageIndex = 20
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object N74: TMenuItem
-          Caption = '-'
-        end
-        object MM_ML_SetRatingsOfSelectedFilesReset: TMenuItem
-          Tag = 110
-          Caption = 'Reset rating/playcounter'
-          ImageIndex = 24
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-      end
-      object MM_ML_FlagSelectedFiles: TMenuItem
-        Caption = 'Flag selected files with'
-        ImageIndex = 34
-        object MM_ML_Mark1: TMenuItem
-          Tag = 101
-          Caption = 'Mark 1'
-          ImageIndex = 35
-          ShortCut = 24625
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object MM_ML_Mark2: TMenuItem
-          Tag = 102
-          Caption = 'Mark 2'
-          ImageIndex = 36
-          ShortCut = 24626
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object MM_ML_Mark3: TMenuItem
-          Tag = 103
-          Caption = 'Mark 3'
-          ImageIndex = 37
-          ShortCut = 24627
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object N84: TMenuItem
-          Caption = '-'
-        end
-        object MM_ML_Mark0: TMenuItem
-          Tag = 100
-          Caption = 'Unmarked'
-          ImageIndex = 34
-          ShortCut = 24624
-          OnClick = PM_ML_SetmarkerClick
-        end
-      end
-      object MM_ML_GetLyrics: TMenuItem
-        Caption = 'Get lyrics for selected files'
-        ImageIndex = 25
-        OnClick = PM_ML_GetLyricsClick
-      end
-      object MM_ML_GetAdditionalTags: TMenuItem
-        Caption = 'Get additional tags for selected files'
-        ImageIndex = 18
-        OnClick = PM_ML_GetTagsClick
+      object MM_ML_DeleteMissingFiles: TMenuItem
+        Caption = 'Cleanup (remove &missing files)'
+        OnClick = DatenbankUpdateTBClick
       end
       object MM_T_CloudEditor: TMenuItem
         Caption = 'Tag cloud editor'
@@ -3235,7 +3024,7 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 24660
         OnClick = PM_ML_CloudEditorClick
       end
-      object N71: TMenuItem
+      object N21: TMenuItem
         Caption = '-'
       end
       object MM_ML_CloseNemp: TMenuItem
@@ -3246,6 +3035,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object MM_Playlist: TMenuItem
       Caption = '&Playlist'
+      OnClick = MM_PlaylistClick
       object MM_PL_Files: TMenuItem
         Caption = 'Add &files'
         OnClick = MM_PL_FilesClick
@@ -3323,113 +3113,17 @@ object Nemp_MainForm: TNemp_MainForm
       object N18: TMenuItem
         Caption = '-'
       end
-      object MM_PL_ClearPlaylist: TMenuItem
-        Caption = 'Clear'
-        OnClick = PM_PL_ClearPlaylistClick
-      end
-      object MM_PL_DeleteSelected: TMenuItem
-        Caption = 'Remove selected files'
-        OnClick = PM_PL_DeleteSelectedClick
+      object MM_PL_ExtendedScanFiles: TMenuItem
+        Caption = 'Refresh files'
+        OnClick = PM_PL_ExtendedScanFilesClick
       end
       object MM_PL_DeleteMissingFiles: TMenuItem
         Caption = 'Cleanup (remove missing files)'
         OnClick = Nichtvorhandenelschen1Click
       end
-      object MM_PL_SetRatingofSelectedFilesTo: TMenuItem
-        Caption = 'Set rating of selected files to'
-        ImageIndex = 20
-        object MM_PL_SetRatingsOfSelectedFiles1: TMenuItem
-          Caption = '0.5 stars'
-          ImageIndex = 23
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles2: TMenuItem
-          Tag = 1
-          Caption = '1 star'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles3: TMenuItem
-          Tag = 2
-          Caption = '1.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles4: TMenuItem
-          Tag = 3
-          Caption = '2 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles5: TMenuItem
-          Tag = 4
-          Caption = '2.5 stars'
-          ImageIndex = 24
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles6: TMenuItem
-          Tag = 5
-          Caption = '3 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles7: TMenuItem
-          Tag = 6
-          Caption = '3.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles8: TMenuItem
-          Tag = 7
-          Caption = '4 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles9: TMenuItem
-          Tag = 8
-          Caption = '4.5 stars'
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object MM_PL_SetRatingsOfSelectedFiles10: TMenuItem
-          Tag = 9
-          Caption = '5 stars'
-          ImageIndex = 20
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-        object N77: TMenuItem
-          Caption = '-'
-        end
-        object MM_PL_ResetRating: TMenuItem
-          Tag = 10
-          Caption = 'Reset rating'
-          ImageIndex = 24
-          OnClick = PM_ML_SetRatingsOfSelectedFilesClick
-        end
-      end
-      object MM_PL_MarkFiles: TMenuItem
-        Tag = 150
-        Caption = 'Flag selected files with'
-        ImageIndex = 34
-        object MM_PL_Mark1: TMenuItem
-          Tag = 1
-          Caption = 'Mark 1'
-          ImageIndex = 35
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object MM_PL_Mark2: TMenuItem
-          Tag = 2
-          Caption = 'Mark 2'
-          ImageIndex = 36
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object MM_PL_Mark3: TMenuItem
-          Tag = 3
-          Caption = 'Mark 3'
-          ImageIndex = 37
-          OnClick = PM_ML_SetmarkerClick
-        end
-        object N85: TMenuItem
-          Caption = '-'
-        end
-        object MM_PL_Mark0: TMenuItem
-          Caption = 'Unmarked'
-          ImageIndex = 34
-          OnClick = PM_ML_SetmarkerClick
-        end
+      object MM_PL_ClearPlaylist: TMenuItem
+        Caption = 'Clear'
+        OnClick = PM_PL_ClearPlaylistClick
       end
       object N26: TMenuItem
         Caption = '-'
@@ -3442,25 +3136,10 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Copy files'
         OnClick = PM_PL_CopyPlaylistToUSBClick
       end
-      object N33: TMenuItem
-        Caption = '-'
-      end
-      object MM_PL_ExtendedScanFiles: TMenuItem
-        Caption = 'Refresh files'
-        OnClick = PM_PL_ExtendedScanFilesClick
-      end
-      object MM_PL_ShowInExplorer: TMenuItem
-        Caption = 'Show in Windows Explorer'
-        OnClick = PM_PL_ShowInExplorerClick
-      end
-      object MM_PL_Properties: TMenuItem
-        Caption = 'Properties'
-        ShortCut = 16452
-        OnClick = PM_PL_PropertiesClick
-      end
     end
     object MM_Options: TMenuItem
       Caption = '&Settings'
+      OnClick = MM_OptionsClick
       object MM_O_Preferences: TMenuItem
         Caption = '&Preferences'
         ImageIndex = 5
@@ -3518,13 +3197,6 @@ object Nemp_MainForm: TNemp_MainForm
           ShortCut = 16468
           OnClick = PM_P_ViewStayOnTopClick
         end
-        object N32: TMenuItem
-          Caption = '-'
-        end
-        object MM_O_PartyMode: TMenuItem
-          Caption = 'Party mode'
-          OnClick = PM_P_PartyModeClick
-        end
       end
       object MM_O_Skins: TMenuItem
         Caption = '&Skins'
@@ -3551,6 +3223,13 @@ object Nemp_MainForm: TNemp_MainForm
           Caption = 'English'
           OnClick = ChangeLanguage
         end
+      end
+      object N32: TMenuItem
+        Caption = '-'
+      end
+      object MM_O_PartyMode: TMenuItem
+        Caption = 'Party mode'
+        OnClick = PM_P_PartyModeClick
       end
     end
     object MM_Tools: TMenuItem
@@ -4470,8 +4149,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object DragDropTimer: TTimer
     OnTimer = DragDropTimerTimer
-    Left = 192
-    Top = 512
+    Left = 40
+    Top = 496
   end
   object SleepTimer: TTimer
     Enabled = False
@@ -4503,8 +4182,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object MenuImages: TImageList
     ShareImages = True
-    Left = 112
-    Top = 376
+    Left = 32
+    Top = 248
     Bitmap = {
       494C01012600300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000A0000000010020000000000000A0
@@ -5871,11 +5550,11 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 56
     Top = 432
   end
-  object Medialist_PopupMenu: TPopupMenu
+  object Medialist_View_PopupMenu: TPopupMenu
     Images = MenuImages
-    OnPopup = Medialist_PopupMenuPopup
-    Left = 168
-    Top = 576
+    OnPopup = Medialist_View_PopupMenuPopup
+    Left = 192
+    Top = 128
     object PM_ML_Enqueue: TMenuItem
       Caption = 'Enqueue (at the end of the playlist)'
       OnClick = EnqueueTBClick
@@ -5907,61 +5586,33 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ML_SortBy: TMenuItem
       Caption = 'Sort by'
       ImageIndex = 11
-      object PM_ML_SortByArtistTitel: TMenuItem
+      object PM_ML_SortArtistTitle: TMenuItem
         Caption = 'Artist, Title'
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByArtistAlbumTitle: TMenuItem
+      object PM_ML_SortArtistAlbumTitle: TMenuItem
         Tag = 117
         Caption = 'Artist, Album, Title'
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByTitleArtist: TMenuItem
+      object PM_ML_SortTitleArtist: TMenuItem
         Tag = 1
         Caption = 'Title, Artist'
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByAlbumArtistTitle: TMenuItem
+      object PM_ML_SortAlbumArtistTitle: TMenuItem
         Tag = 2
         Caption = 'Album, Artist, Title'
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByAlbumTitleArtist: TMenuItem
+      object PM_ML_SortAlbumTitleArtist: TMenuItem
         Tag = 118
         Caption = 'Album, Title, Artist'
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByAlbumTrack: TMenuItem
+      object PM_ML_SortAlbumTracknr: TMenuItem
         Tag = 119
         Caption = 'Album, Tracknr.'
-        GroupIndex = 1
-        OnClick = AnzeigeSortMENUClick
-      end
-      object N7: TMenuItem
-        Caption = '-'
-        GroupIndex = 1
-      end
-      object PM_ML_SortByFilename: TMenuItem
-        Tag = 12
-        Caption = 'Filename'
-        GroupIndex = 1
-        OnClick = AnzeigeSortMENUClick
-      end
-      object PM_ML_SortByPath: TMenuItem
-        Tag = 10
-        Caption = 'Path && Filename'
-        GroupIndex = 1
-        OnClick = AnzeigeSortMENUClick
-      end
-      object PM_ML_SortByLyrics: TMenuItem
-        Tag = 15
-        Caption = 'Lyrics exists'
-        GroupIndex = 1
-        OnClick = AnzeigeSortMENUClick
-      end
-      object PM_ML_SortByGenre: TMenuItem
-        Tag = 14
-        Caption = 'Genre'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
@@ -5969,19 +5620,47 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '-'
         GroupIndex = 1
       end
-      object PM_ML_SortByDuration: TMenuItem
+      object PM_ML_SortFilename: TMenuItem
+        Tag = 12
+        Caption = 'Filename'
+        GroupIndex = 1
+        OnClick = AnzeigeSortMENUClick
+      end
+      object PM_ML_SortPathFilename: TMenuItem
+        Tag = 10
+        Caption = 'Path && Filename'
+        GroupIndex = 1
+        OnClick = AnzeigeSortMENUClick
+      end
+      object PM_ML_SortLyricsexists: TMenuItem
+        Tag = 15
+        Caption = 'Lyrics exists'
+        GroupIndex = 1
+        OnClick = AnzeigeSortMENUClick
+      end
+      object PM_ML_SortGenre: TMenuItem
+        Tag = 14
+        Caption = 'Genre'
+        GroupIndex = 1
+        OnClick = AnzeigeSortMENUClick
+      end
+      object N7: TMenuItem
+        Caption = '-'
+        GroupIndex = 1
+      end
+      object PM_ML_SortDuration: TMenuItem
         Tag = 3
         Caption = 'Duration'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
-      object PM_ML_SortByFileSize: TMenuItem
+      object PM_ML_SortFilesize: TMenuItem
         Tag = 9
         Caption = 'Filesize'
         GroupIndex = 1
         OnClick = AnzeigeSortMENUClick
       end
-      object N90: TMenuItem
+      object N4: TMenuItem
         Caption = '-'
         GroupIndex = 1
       end
@@ -5999,111 +5678,8 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_ML_SortAscendingClick
       end
     end
-    object PM_ML_BrowseBy: TMenuItem
-      Caption = 'Browse by'
-      object PM_ML_BrowseByArtistAlbum: TMenuItem
-        Caption = 'Artists - Albums'
-        RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByDirArtist: TMenuItem
-        Tag = 1
-        Caption = 'Directories - Artists'
-        RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByDirAlbum: TMenuItem
-        Tag = 2
-        Caption = 'Directories - Albums'
-        RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByGenreArtist: TMenuItem
-        Tag = 3
-        Caption = 'Genres - Artists'
-        RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByGenreYear: TMenuItem
-        Tag = 4
-        Caption = 'Genres - Years'
-        RadioItem = True
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByAlbumArtists: TMenuItem
-        Tag = 6
-        Caption = 'Album - Artists'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByYearArtist: TMenuItem
-        Tag = 7
-        Caption = 'Year - Artist'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByFileageAlbum: TMenuItem
-        Tag = 8
-        Caption = 'Fileage - Album'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object PM_ML_BrowseByFileageArtist: TMenuItem
-        Tag = 9
-        Caption = 'Fileage - Artist'
-        OnClick = SortierAuswahl1POPUPClick
-      end
-      object N16: TMenuItem
-        Caption = '-'
-      end
-      object PM_ML_BrowseByMore: TMenuItem
-        Tag = 100
-        Caption = 'More...'
-        RadioItem = True
-        OnClick = PM_ML_BrowseByMoreClick
-      end
-    end
     object N5: TMenuItem
       Caption = '-'
-    end
-    object PM_ML_Medialibrary: TMenuItem
-      Caption = 'Media library'
-      object PM_ML_MedialibraryDeleteNotExisting: TMenuItem
-        Caption = 'Cleanup (remove missing files)'
-        OnClick = DatenbankUpdateTBClick
-      end
-      object PM_ML_MedialibraryRefresh: TMenuItem
-        Caption = 'Refresh (rescan all files)'
-        ShortCut = 16500
-        OnClick = MM_ML_RefreshAllClick
-      end
-      object PM_ML_MedialibrarySave: TMenuItem
-        Caption = 'Save'
-        ImageIndex = 1
-        OnClick = MM_ML_SaveClick
-      end
-      object PM_ML_MedialibraryLoad: TMenuItem
-        Caption = 'Load'
-        ImageIndex = 0
-        OnClick = MM_ML_LoadClick
-      end
-      object PM_ML_MedialibraryExport: TMenuItem
-        Caption = 'Export as csv'
-        ShortCut = 16453
-        OnClick = PM_ML_MedialibraryExportClick
-      end
-      object PM_ML_MedialibraryDelete: TMenuItem
-        Caption = 'Delete'
-        OnClick = MM_ML_DeleteClick
-      end
-    end
-    object PM_ML_SearchDirectory: TMenuItem
-      Caption = 'Search directory for new files'
-      ImageIndex = 3
-      ShortCut = 16462
-      OnClick = MM_ML_SearchDirectoryClick
-    end
-    object PM_ML_Webradio: TMenuItem
-      Caption = 'Manage webradio stations'
-      ShortCut = 16471
-      OnClick = MM_ML_WebradioClick
     end
     object PM_ML_HideSelected: TMenuItem
       Caption = 'Hide selected files'
@@ -6118,10 +5694,9 @@ object Nemp_MainForm: TNemp_MainForm
     object N72: TMenuItem
       Caption = '-'
     end
-    object PM_ML_SetRatingsOfSelectedFiles: TMenuItem
+    object PM_ML_SetRatingsOfSelectedFilesCHOOSE: TMenuItem
       Caption = 'Set rating of selected files to'
       ImageIndex = 20
-      OnClick = PM_ML_SetRatingsOfSelectedFilesClick
       object PM_ML_SetRatingsOfSelectedFiles1: TMenuItem
         Tag = 100
         Caption = '0.5 stars'
@@ -6239,11 +5814,10 @@ object Nemp_MainForm: TNemp_MainForm
       ShortCut = 16468
       OnClick = PM_ML_GetTagsClick
     end
-    object PM_ML_CloudEditor: TMenuItem
-      Caption = 'Tag cloud editor'
-      ImageIndex = 19
-      ShortCut = 24660
-      OnClick = PM_ML_CloudEditorClick
+    object PM_ML_RefreshSelected: TMenuItem
+      Caption = 'Refresh selected'
+      ShortCut = 116
+      OnClick = PM_ML_RefreshSelectedClick
     end
     object N3: TMenuItem
       Caption = '-'
@@ -6300,11 +5874,6 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object N55: TMenuItem
       Caption = '-'
-    end
-    object PM_ML_RefreshSelected: TMenuItem
-      Caption = 'Refresh selected'
-      ShortCut = 116
-      OnClick = PM_ML_RefreshSelectedClick
     end
     object PM_ML_ShowInExplorer: TMenuItem
       Caption = 'Show in Windows Explorer'
@@ -6710,13 +6279,6 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 16468
         OnClick = PM_P_ViewStayOnTopClick
       end
-      object N35: TMenuItem
-        Caption = '-'
-      end
-      object PM_P_PartyMode: TMenuItem
-        Caption = 'Party mode'
-        OnClick = PM_P_PartyModeClick
-      end
     end
     object PM_P_Skins: TMenuItem
       Caption = 'Skins'
@@ -6742,6 +6304,13 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'English'
         OnClick = ChangeLanguage
       end
+    end
+    object N35: TMenuItem
+      Caption = '-'
+    end
+    object PM_P_PartyMode: TMenuItem
+      Caption = 'Party mode'
+      OnClick = PM_P_PartyModeClick
     end
     object N36: TMenuItem
       Caption = '-'
@@ -7429,7 +6998,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object PopupPlayPause: TPopupMenu
-    Left = 645
+    Left = 653
     Top = 304
     object PM_PlayFiles: TMenuItem
       Caption = 'Play files'
@@ -8038,8 +7607,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 300
     OnTimer = RefreshCoverFlowTimerTimer
-    Left = 48
-    Top = 608
+    Left = 224
+    Top = 480
   end
   object PopupRepeatAB: TPopupMenu
     Left = 552
@@ -8070,21 +7639,15 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 200
     OnTimer = CorrectSkinRegionsTimerTimer
-    Left = 200
-    Top = 392
-  end
-  object TreeImages: TImageList
-    Height = 11
-    Width = 11
-    Left = 168
-    Top = 328
+    Left = 224
+    Top = 384
   end
   object CoverFlowRefreshViewTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = CoverFlowRefreshViewTimerTimer
-    Left = 208
-    Top = 464
+    Left = 224
+    Top = 432
   end
   object PopupEditExtendedTags: TPopupMenu
     OnPopup = PopupEditExtendedTagsPopup
@@ -8134,13 +7697,13 @@ object Nemp_MainForm: TNemp_MainForm
   object RefreshVSTCoverTimer: TTimer
     Enabled = False
     OnTimer = RefreshVSTCoverTimerTimer
-    Left = 256
-    Top = 612
+    Left = 224
+    Top = 532
   end
   object QuickSearchHistory_PopupMenu: TPopupMenu
     OnPopup = QuickSearchHistory_PopupMenuPopup
     Left = 40
-    Top = 548
+    Top = 572
     object pmRecentSearches: TMenuItem
       Caption = 'Recent searches'
       Enabled = False
@@ -8206,6 +7769,148 @@ object Nemp_MainForm: TNemp_MainForm
       AutoHotkeys = maManual
       Caption = '.'
       OnClick = pmQuickSeachHistoryClick
+    end
+  end
+  object Medialist_Browse_PopupMenu: TPopupMenu
+    Images = MenuImages
+    OnPopup = Medialist_Browse_PopupMenuPopup
+    Left = 192
+    Top = 78
+    object PM_ML_EnqueueBrowse: TMenuItem
+      Caption = 'Enqueue (at the end of the playlist)'
+      OnClick = EnqueueTBClick
+    end
+    object PM_ML_PlayBrowse: TMenuItem
+      Caption = 'Play (and clear current playlist)'
+      OnClick = PM_ML_PlayClick
+    end
+    object PM_ML_PlayNextBrowse: TMenuItem
+      Caption = 'Enqueue (after the current title)'
+      OnClick = PM_ML_PlayNextClick
+    end
+    object N10: TMenuItem
+      Caption = '-'
+    end
+    object PM_ML_BrowseBy: TMenuItem
+      Caption = 'Browse by'
+      object PM_ML_BrowseByArtistsAlbums: TMenuItem
+        Caption = 'Artists - Albums'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByDirectoriesArtists: TMenuItem
+        Tag = 1
+        Caption = 'Directories - Artists'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByDirectoriesAlbums: TMenuItem
+        Tag = 2
+        Caption = 'Directories - Albums'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByGenresArtists: TMenuItem
+        Tag = 3
+        Caption = 'Genres - Artists'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByGenresYears: TMenuItem
+        Tag = 4
+        Caption = 'Genres - Years'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByAlbumArtists: TMenuItem
+        Tag = 6
+        Caption = 'Album - Artists'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByYearArtist: TMenuItem
+        Tag = 7
+        Caption = 'Year - Artist'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByFileageAlbum: TMenuItem
+        Tag = 8
+        Caption = 'Fileage - Album'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object PM_ML_BrowseByFileageArtist: TMenuItem
+        Tag = 9
+        Caption = 'Fileage - Artist'
+        OnClick = SortierAuswahl1POPUPClick
+      end
+      object N11: TMenuItem
+        Caption = '-'
+      end
+      object PM_ML_BrowseByMore: TMenuItem
+        Tag = 100
+        Caption = 'More...'
+        RadioItem = True
+        OnClick = SortierAuswahl1POPUPClick
+      end
+    end
+    object N16: TMenuItem
+      Caption = '-'
+    end
+    object PM_ML_SearchDirectory: TMenuItem
+      Caption = 'Search directory for new files'
+      ImageIndex = 3
+      ShortCut = 16462
+      OnClick = MM_ML_SearchDirectoryClick
+    end
+    object PM_ML_Medialibrary: TMenuItem
+      Caption = 'Media library'
+      object PM_ML_MedialibraryLoad: TMenuItem
+        Caption = 'Load'
+        ImageIndex = 0
+        OnClick = MM_ML_LoadClick
+      end
+      object PM_ML_MedialibrarySave: TMenuItem
+        Caption = 'Save'
+        ImageIndex = 1
+        OnClick = MM_ML_SaveClick
+      end
+      object PM_ML_MedialibraryExport: TMenuItem
+        Caption = 'Export as csv'
+        ShortCut = 16453
+        OnClick = PM_ML_MedialibraryExportClick
+      end
+      object PM_ML_MedialibraryDelete: TMenuItem
+        Caption = '&Delete'
+        ImageIndex = 12
+        OnClick = MM_ML_DeleteClick
+      end
+      object N82: TMenuItem
+        Caption = '-'
+      end
+      object PM_ML_MedialibraryRefresh: TMenuItem
+        Caption = 'Refresh (rescan all files)'
+        ShortCut = 16500
+        OnClick = MM_ML_RefreshAllClick
+      end
+      object PM_ML_MedialibraryDeleteNotExisting: TMenuItem
+        Caption = 'Cleanup (remove missing files)'
+        OnClick = DatenbankUpdateTBClick
+      end
+      object PM_ML_CloudEditor: TMenuItem
+        Caption = 'Tag cloud editor'
+        ImageIndex = 19
+        ShortCut = 24660
+        OnClick = PM_ML_CloudEditorClick
+      end
+    end
+    object PM_ML_Webradio: TMenuItem
+      Caption = 'Manage webradio stations'
+      ShortCut = 16471
+      OnClick = MM_ML_WebradioClick
+    end
+    object PM_ML_RemoveSelectedPlaylists: TMenuItem
+      Caption = 'Remove selected playlist'
+      ShortCut = 16430
+      OnClick = PM_ML_RemoveSelectedPlaylistsClick
     end
   end
 end

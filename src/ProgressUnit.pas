@@ -153,6 +153,11 @@ begin
           SetLabelWithHint(ProgressForm_UpdateMetaData);
       end;
 
+      pa_DeleteFiles: begin
+          LoadImage('CleanUp.png');
+          SetLabelWithHint(ProgressForm_DeleteFiles);
+      end;
+
     end;
 
     Visible := True;

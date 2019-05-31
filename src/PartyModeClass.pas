@@ -665,8 +665,111 @@ end;
 
 
 procedure TNempPartyMode.CorrectMenuStff;
-var vis: Boolean;
+var ShowGeneralMenuItems, ShowToolItems: Boolean;
 begin
+    ShowGeneralMenuItems := not fActive;
+    ShowToolItems        := not DoBlockTools;
+    with Nemp_MainForm do
+    begin
+        /// Enable/Disable is done in the OnPopup-Methods
+        /// However: Disabled Items should be set to Invisible here (and vice versea)
+
+        //// Popup-Menus
+        ///  -----------
+        // Medialist: Browse
+        PM_ML_PlayBrowse                      .visible := ShowGeneralMenuItems;
+        N16                                   .visible := ShowGeneralMenuItems;
+        PM_ML_SearchDirectory                 .visible := ShowGeneralMenuItems;
+        PM_ML_Medialibrary                    .visible := ShowGeneralMenuItems;
+        PM_ML_Webradio                        .visible := ShowGeneralMenuItems;
+        PM_ML_RemoveSelectedPlaylists         .visible := ShowGeneralMenuItems;
+        // Medialist: View
+        PM_ML_DeleteSelected                  .visible := ShowGeneralMenuItems;
+        PM_ML_SetRatingsOfSelectedFilesCHOOSE .visible := ShowGeneralMenuItems;
+        PM_ML_GetLyrics                       .visible := ShowGeneralMenuItems;
+        PM_ML_GetTags                         .visible := ShowGeneralMenuItems;
+        PM_ML_RefreshSelected                 .visible := ShowGeneralMenuItems;
+        PM_ML_PasteFromClipboard              .visible := ShowGeneralMenuItems;
+        PM_ML_Properties                      .visible := ShowGeneralMenuItems;
+        // Playlist
+        PM_PL_AddDirectories                  .visible := ShowGeneralMenuItems;
+        PM_PL_AddWebstream                    .visible := ShowGeneralMenuItems;
+        PM_PL_SortBy                          .visible := ShowGeneralMenuItems;
+        PM_PL_GeneraterandomPlaylist          .visible := ShowGeneralMenuItems;
+        PM_PL_LoadPlaylist                    .visible := ShowGeneralMenuItems;
+        PM_PL_RecentPlaylists                 .visible := ShowGeneralMenuItems;
+        PM_PL_DeleteMissingFiles              .visible := ShowGeneralMenuItems;
+        PM_PL_SetRatingofSelectedFilesTo      .visible := ShowGeneralMenuItems;
+        PM_PL_ExtendedAddToMedialibrary       .visible := ShowGeneralMenuItems;
+        // player
+        PM_P_Preferences                      .visible := ShowGeneralMenuItems;
+        PM_P_Wizard                           .visible := ShowGeneralMenuItems;
+        PM_P_View                             .visible := ShowGeneralMenuItems;
+        PM_P_KeyboardDisplay                  .visible := ShowGeneralMenuItems;
+        PM_P_Directories                      .visible := ShowGeneralMenuItems;
+        // Player - Tools
+        PM_P_ShutDown   .visible := ShowToolItems;
+        PM_P_Birthday   .visible := ShowToolItems;
+        PM_P_RemoteNemp .visible := ShowToolItems;
+        PM_P_Scrobbler  .visible := ShowToolItems;
+
+        //// Mainmenu
+        /// --------------------
+        // MediaLibrary
+        MM_ML_SearchDirectory          .visible := ShowGeneralMenuItems;
+        MM_ML_Webradio                 .visible := ShowGeneralMenuItems;
+        N22                            .visible := ShowGeneralMenuItems;
+        MM_ML_Load                     .visible := ShowGeneralMenuItems;
+        MM_ML_Save                     .visible := ShowGeneralMenuItems;
+        MM_ML_ExportAsCSV              .visible := ShowGeneralMenuItems;
+        MM_ML_Delete                   .visible := ShowGeneralMenuItems;
+        N71                            .visible := ShowGeneralMenuItems;
+        MM_ML_RefreshAll               .visible := ShowGeneralMenuItems;
+        MM_ML_DeleteMissingFiles       .visible := ShowGeneralMenuItems;
+        MM_T_CloudEditor               .visible := ShowGeneralMenuItems;
+        // Playlist
+        MM_PL_Directory                .visible := ShowGeneralMenuItems;
+        MM_PL_WebStream                .visible := ShowGeneralMenuItems;
+        MM_PL_SortBy                   .visible := ShowGeneralMenuItems;
+        MM_PL_GenerateRandomPlaylist   .visible := ShowGeneralMenuItems;
+        MM_PL_Load                     .visible := ShowGeneralMenuItems;
+        MM_PL_RecentPlaylists          .visible := ShowGeneralMenuItems;
+        MM_PL_DeleteMissingFiles       .visible := ShowGeneralMenuItems;
+        MM_PL_ClearPlaylist            .visible := ShowGeneralMenuItems;
+        MM_PL_ExtendedAddToMedialibrary.visible := ShowGeneralMenuItems;
+        // Settings
+        MM_O_Preferences               .visible := ShowGeneralMenuItems;
+        MM_O_Wizard                    .visible := ShowGeneralMenuItems;
+        MM_O_View                      .visible := ShowGeneralMenuItems;
+        // Tools
+        MM_T_KeyboardDisplay           .visible := ShowGeneralMenuItems;
+        MM_T_Directories               .visible := ShowGeneralMenuItems;
+        MM_T_ShutDown   .visible := ShowToolItems;
+        MM_T_Birthday   .visible := ShowToolItems;
+        MM_T_RemoteNemp .visible := ShowToolItems;
+        MM_T_Scrobbler  .visible := ShowToolItems;
+
+        if ShowGeneralMenuItems then
+        begin
+            MM_O_PartyMode.Caption := MenuItem_Partymode;
+            PM_P_PartyMode.Caption := MenuItem_Partymode;
+        end
+        else
+        begin
+            MM_O_PartyMode.Caption := MenuItem_PartymodeExit;
+            PM_P_PartyMode.Caption := MenuItem_PartymodeExit;
+        end;
+
+        // Images
+        ScrobblerImage    .Enabled := not DoBlockTools;
+        BirthdayImage     .Enabled := not DoBlockTools;
+        SleepImage        .Enabled := not DoBlockTools;
+        WebserverImage    .Enabled := not DoBlockTools;
+    end;
+
+    (*
+    exit;
+
     vis := not fActive;
     with Nemp_MainForm do
     begin
@@ -681,8 +784,8 @@ begin
         PM_ML_DeleteSelected.Visible := vis; // enabled is done at OnPopup
         //-----
         N72                            .Visible := vis;   // - before "set rating of selected files"
-        PM_ML_SetRatingsOfSelectedFiles.Visible := vis;
-        PM_ML_SetRatingsOfSelectedFiles.Enabled := vis;
+        PM_ML_SetRatingsOfSelectedFilesCHOOSE.Visible := vis;
+        PM_ML_SetRatingsOfSelectedFilesCHOOSE.Enabled := vis;
         PM_ML_GetLyrics   .Visible := vis; // enabled is done at OnPopup
         PM_ML_GetTags     .Visible := vis; // enabled is done at OnPopup
         PM_ML_CloudEditor .Visible := vis;
@@ -751,7 +854,7 @@ begin
         MM_ML_ExportAsCSV         .Enabled := vis;
         N21                       .Visible := vis;
         //---
-        MM_ML_DeleteSelectedFiles .Visible := vis;
+        {MM_ML_DeleteSelectedFiles .Visible := vis;
         MM_ML_DeleteSelectedFiles .Enabled := vis;
         MM_ML_SetRatingSelected   .Visible := vis;
         MM_ML_SetRatingSelected   .Enabled := vis;
@@ -759,6 +862,7 @@ begin
         MM_ML_GetLyrics           .Enabled := vis;
         MM_ML_GetAdditionalTags   .Visible := vis;
         MM_ML_GetAdditionalTags   .Enabled := vis;
+        }
         //N70                       .Visible := vis;
         //--
         MM_ML_RefreshAll          .Visible := vis;
@@ -766,12 +870,12 @@ begin
         //MM_ML_ResetRatings        .Visible := vis;
         //MM_ML_ResetRatings        .Enabled := vis;
         // Playlist
-        MM_PL_SetRatingofSelectedFilesTo .Visible := vis;
-        MM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
+        //MM_PL_SetRatingofSelectedFilesTo .Visible := vis;
+        //MM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
         MM_PL_ExtendedAddToMedialibrary  .Visible := vis;
         MM_PL_ExtendedAddToMedialibrary  .Enabled := vis;
-        MM_PL_Properties                 .Visible := vis;
-        MM_PL_Properties                 .Enabled := vis;
+        //MM_PL_Properties                 .Visible := vis;
+        //MM_PL_Properties                 .Enabled := vis;
         // Settings
         MM_O_Preferences                    .Visible := vis;
         MM_O_Wizard                         .Visible := vis;
@@ -799,11 +903,15 @@ begin
         SleepImage        .Enabled := not DoBlockTools;
         WebserverImage    .Enabled := not DoBlockTools;
     end;
+    *)
 end;
 
 procedure TNempPartyMode.SetActive(value: Boolean);
 begin
     if value = fActive then exit;
+
+    if value then BackupOriginalPositions;
+
     fActive := value;
     CorrectMainForm;
 end;

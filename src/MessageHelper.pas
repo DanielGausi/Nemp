@@ -521,16 +521,18 @@ begin
 
         MB_BlockUpdateStart: begin
               // Alles deaktivieren, was ein hinzuf¸gen/lˆschen von Dateien in die Medienbib erwirkt.
-              BlockeMedienListeUpdate(True);
+              BlockGUI(1);
         end;
 
         MB_BlockWriteAccess: begin
-            if aMsg.LParam = 0 then BlockeMedienListeWriteAcces(True);
+            if aMsg.LParam = 0 then BlockGUI(2);
+            // BlockeMedienListeWriteAcces(True);
             // AuswahlStatusLBL.Caption := (MediaLibrary_Preparing);
         end;
 
         MB_BlockReadAccess: begin
-          if aMsg.LParam = 0 then BlockeMedienListeReadAccess(True);
+          if aMsg.LParam = 0 then BlockGUI(3);
+          //BlockeMedienListeReadAccess(True);
           // AuswahlStatusLBL.Caption :=  (MediaLibrary_AlmostDone);
         end;
 
@@ -552,10 +554,7 @@ begin
         MB_Unblock: begin
             //AuswahlStatusLbl.Caption := '';
             //MedienListeStatusLBL.Caption := '';
-
-            BlockeMedienListeUpdate(False);
-            BlockeMedienListeWriteAcces(False);
-            BlockeMedienListeReadAccess(False);
+            UnBlockGUI;
 
             if MedienBib.Count = 0 then
                 LblEmptyLibraryHint.Caption := MainForm_LibraryIsEmpty
@@ -564,7 +563,7 @@ begin
 
             //UnBlockMedienListe;
             LangeAktionWeitermachen := False;
-            BeendelangeAktion;
+            fspTaskbarManager.ProgressState := fstpsNoProgress;
 
             if NewDrivesNotificationCount > 0 then
                 HandleNewConnectedDrive;
@@ -733,9 +732,10 @@ begin
         end;
         }
 
-        MB_DuplicateWarning: MessageDlg((MediaLibrary_DuplicatesWarning)
-            + #13#10 +
-            pWideChar(Integer(aMsg.LParam)) , mtWarning, [MBOK], 0);
+        MB_DuplicateWarning: AddErrorLog(MediaLibrary_DuplicatesWarning);
+
+        //MessageDlg((MediaLibrary_DuplicatesWarning) //+ #13#10#13#10 + '(' + pWideChar(Integer(aMsg.LParam)) + ')'
+        //    , mtWarning, [MBOK], 0);
 
         MB_ThreadFileUpdate: begin
                         MedienBib.CurrentThreadFilename := PWideChar(aMsg.LParam);
@@ -837,7 +837,7 @@ begin
             if MedienBib.ST_Ordnerlist.Count > 0 then
             begin
                 MedienBib.StatusBibUpdate := 1;
-                BlockeMedienListeUpdate(True);
+                BlockGUI(1);
                 StartMediaLibraryFileSearch(True); // True: autoclose progress window
             end else
                 // nothing more to do here, check for another job
@@ -2112,15 +2112,15 @@ Begin
     begin
           if (DragSource <> DS_VST) then    // Files kommen von Auﬂerhalb
           begin
-              LangeAktionWeitermachen := True;
-
               if MedienBib.StatusBibUpdate <> 0 then
               begin
-                MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-                DragFinish (aMsg.WParam);
-                DragSource := DS_EXTERN;
-                exit;
+                  MessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+                  DragFinish (aMsg.WParam);
+                  DragSource := DS_EXTERN;
+                  exit;
               end;
+
+              LangeAktionWeitermachen := True;
               ST_Medienliste.Mask := GenerateMedienBibSTFilter;
               MedienBib.StatusBibUpdate := 1;
 
@@ -2164,7 +2164,7 @@ Begin
               if MedienBib.ST_Ordnerlist.Count > 0 then
               begin
                 PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
-                BlockeMedienListeUpdate(True);
+                BlockGUI(1);
                 StartMediaLibraryFileSearch;
               end
               else
@@ -2364,7 +2364,7 @@ begin
                 begin
                   PutDirListInAutoScanList(MedienBib.ST_Ordnerlist);
                   MedienBib.StatusBibUpdate := 1;
-                  BlockeMedienListeUpdate(True);
+                  BlockGUI(1);
                   ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
                 end
                 else

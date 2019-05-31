@@ -35,7 +35,7 @@ interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs,
-    MyDialogs, System.UITypes;
+    MyDialogs, System.UITypes, math;
 
 
 // passt die VCL an die Player-Werte an
@@ -65,14 +65,17 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     function ObjectIsHeadphone(aName:string): Boolean;
 
     // Blockiert GUI-Elemente, die ein Hinzufügen/Löschen von Elementen in der Medienbib verursachen
-    procedure BlockeMedienListeUpdate(block: Boolean);
+    //procedure BlockeMedienListeUpdate(block: Boolean);
     // Blockiert Schreibzugriffe auf die Medienliste
-    procedure BlockeMedienListeWriteAcces(block: Boolean);
+    //procedure BlockeMedienListeWriteAcces(block: Boolean);
     //blockiert auch Lese-Zugriff auf die Medienliste
-    procedure BlockeMedienListeReadAccess(block: Boolean);
+    //procedure BlockeMedienListeReadAccess(block: Boolean);
+    // Blocke Update/Write/Read done in these two new methods now:
+    procedure BlockGUI(aBlockLevel: Integer);
+    procedure UnBlockGUI;
 
-    procedure StarteLangeAktion(max:integer;text:String; EnableStopButton: Boolean);
-    procedure BeendeLangeAktion;
+    // procedure StarteLangeAktion(max:integer;text:String; EnableStopButton: Boolean);
+    //procedure BeendeLangeAktion;
 
     procedure SetTabStopsPlayer;
     procedure SetTabStopsTabs;
@@ -295,8 +298,9 @@ begin
               // uhoh...es gab eine Änderung. Also:
               // Mehr Arbeit nötig - alle Dateien ändern
               // die nötigen Infos stecken in der UsedDrive-Liste der Bib drin
-              StarteLangeAktion(-1,'', True);
+
               Nemp_MainForm.Enabled := False;
+
               If Not assigned(FSplash) then
                   Application.CreateForm(TFSplash, FSplash);
               FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected);
@@ -304,31 +308,29 @@ begin
               SetWindowPos(FSplash.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
               FSplash.Update;
 
-              // Dateien reparieren
-              MedienBib.RepairDriveCharsAtAudioFiles;
-              MedienBib.RepairDriveCharsAtPlaylistFiles;
+                  // Dateien reparieren
+                  MedienBib.RepairDriveCharsAtAudioFiles;
+                  MedienBib.RepairDriveCharsAtPlaylistFiles;
 
-              FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
-              FSplash.Update;
+                  FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
+                  FSplash.Update;
 
-              // Anzeige aktualisieren
-              case MedienBib.BrowseMode of
-                  0 : MedienBib.ReBuildBrowseLists;
+                  // Anzeige aktualisieren
+                  case MedienBib.BrowseMode of
+                      0 : MedienBib.ReBuildBrowseLists;
 
-                  1: begin
-                      MedienBib.ReBuildCoverList;
-                      If MedienBib.Coverlist.Count > 3 then
-                        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                      else
-                        CoverScrollbar.Max := 3;
-                      CoverScrollbarChange(Nil);
+                      1: begin
+                          MedienBib.ReBuildCoverList;
+                          If MedienBib.Coverlist.Count > 3 then
+                            CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+                          else
+                            CoverScrollbar.Max := 3;
+                          CoverScrollbarChange(Nil);
+                      end;
+
                   end;
 
-              end;
-              BeendeLangeAktion;
               FSplash.Close;
-              //FreeAndNil(FSplash);
-
               Nemp_MainForm.Enabled := True;
               Nemp_MainForm.SetFocus;
         end;
@@ -501,9 +503,10 @@ begin
   result := (aName = 'GRPBOXHeadset');
 end;
 
-
+{
 procedure BlockeMedienListeUpdate(block: Boolean);
 begin
+    // nothing todo - MenuItems are done o the OnPopup-Event (Toplevel-onClick for MainMenu)
     with Nemp_MainForm do
     begin
         block := not block;
@@ -513,7 +516,7 @@ begin
         MM_ML_Load.Enabled   := block;
         MM_ML_Save.Enabled := block;
         MM_ML_DeleteMissingFiles.Enabled := block;
-        MM_ML_DeleteSelectedFiles.Enabled := block;
+        // MM_ML_DeleteSelectedFiles.Enabled := block;
         MM_ML_RefreshAll.Enabled := block;
         //MM_ML_ResetRatings.Enabled := block;
         // Einträge im Popup-Menü der Medienliste
@@ -524,14 +527,18 @@ begin
         PM_ML_MedialibraryLoad.Enabled := block;
         PM_ML_MedialibraryDelete.Enabled := block;
         PM_ML_SearchDirectory.Enabled := block;
+        PM_ML_Medialibrary.Enabled := block;
+        PM_ML_Webradio.Enabled := block;
         PM_ML_RefreshSelected.Enabled := block;
         PM_ML_DeleteSelected.Enabled := block;
         PM_ML_PasteFromClipboard.Enabled := block;
     end;
+
 end;
 
 procedure BlockeMedienListeWriteAcces(block: Boolean);
 begin
+    // nothing todo - MenuItems are done o the OnPopup-Event (Toplevel-onClick for MainMenu)
     with Nemp_MainForm do
     begin
         if block then
@@ -547,8 +554,8 @@ procedure BlockeMedienListeReadAccess(block: Boolean);
 begin
     with Nemp_MainForm do
     begin
-        if block then
-          BlockeMedienListeWriteAcces(block);
+        //if block then
+        //  BlockeMedienListeWriteAcces(block);
         block := not block;
         //Browse-Listen disablen;
         ArtistsVST.Enabled := block;
@@ -564,114 +571,77 @@ begin
           if assigned(FormBibSearch) then
               FormBibSearch.EnableControls(False);
     end;
-end;
+end;       }
 
-procedure StarteLangeAktion(max:integer;text:String; EnableStopButton: Boolean);
+procedure BlockGUI(aBlockLevel: Integer);
 begin
-    with Nemp_MainForm do
+    // todo: API access ???
+
+    if aBlockLEvel >= 1 then
     begin
-        ReadyForGetFileApiCommands := False;
+        // Block "Update" access
+    end;
 
-        MedienListeStatusLBL.Caption := Text;
-        MedienListeStatusLBL.Update;
-        LangeAktionWeitermachen := True;
+    if aBlockLEvel >= 2 then
+    begin
+        // Block "Write" access
+        // Classic Browsing
+        Nemp_MainForm.ArtistsVST         .Enabled := False;
+        Nemp_MainForm.AlbenVST           .Enabled := False;
+        // Coverflow
+        Nemp_MainForm.PanelCoverBrowse   .Enabled := False;
+        // TagCloud
+        Nemp_MainForm.PanelTagCloudBrowse.Enabled := False;
+        // Switch-Buttons
+        Nemp_MainForm.TabBtn_CoverFlow.Enabled := False;
+        Nemp_MainForm.TabBtn_Browse   .Enabled := False;
+        Nemp_MainForm.TabBtn_TagCloud .Enabled := False;
+        // VST Panel (Complete)
+        Nemp_MainForm.VSTPanel.Enabled := False;
 
-        // Panel Suche//Auswahl disablen
-        TabBtn_CoverFlow.Enabled := False;
-        TabBtn_Browse.Enabled := False;
-        TabBtn_TagCloud.Enabled := False;
-
-        //Gefährliche MainMenüeinträge disablen
-        MM_Medialibrary.Enabled := False;
-        MM_PL_ExtendedAddToMedialibrary.Enabled := False;
-        MM_PL_Directory.Enabled := False;
-        MM_ML_Delete.Enabled:=False;
-        MM_ML_Load.Enabled:=False;
-        MM_ML_Save.Enabled:=False;
-        MM_ML_SortBy.Enabled:=False;
-        //SuchenMAINMENU.Enabled:=False;
-
-        // Gefährliche PopupMenüeinträge disablen
-        PM_ML_SortBy.Enabled:=False;
-        PM_ML_RefreshSelected.Enabled:=False;
-        PM_ML_HideSelected.Enabled:=False;
-        PM_ML_DeleteSelected.Enabled:=False;
-        PM_ML_Extended.Enabled := False;
-        //Dateienhinzufgen2.Enabled := False;
-        PM_PL_AddDirectories.Enabled := False;
-        PM_PL_ExtendedAddToMedialibrary.Enabled := False;
-        //PM_PL_ExtendedCopyFromWinamp.Enabled := False;
-        //Dateienhinzufgen3.Enabled := False;
-
-
-        PM_ML_Medialibrary.Enabled := False;
-        PM_ML_SearchDirectory.Enabled := False;
-
-        // SuchDinger disablen
         if assigned(FormBibSearch) then
-            FormBibSearch.EnableControls(False);
-        // Browse-Listen Disablen
-        ArtistsVST.Enabled := False;
-        AlbenVST.Enabled := False;
+           FormBibSearch.EnableControls(False);
+        if assigned(FDetails) then
+            FDetails.Enabled := False;
+        if assigned(CloudEditorForm) then
+            CloudEditorForm.Enabled := False;
+    end;
 
-        VST.OnHeaderClick:=NIL;
+    if aBlockLEvel >= 3 then
+    begin
+        Nemp_MainForm.VST.OnHeaderClick:=NIL;
+        Nemp_MainForm.ReadyForGetFileApiCommands := False;
+        // Block "Read" access = Block (almost) everything
     end;
 end;
 
-procedure BeendeLangeAktion;
+procedure UnBlockGUI;
 begin
-    with Nemp_MainForm do
-    begin
-        ShowSummary;
-        MM_ML_SortBy.Enabled:=True;
-        PM_ML_SortBy.Enabled:=True;
-        LangeAktionWeitermachen := False; // Suche fertig
+    // Classic Browsing
+    Nemp_MainForm.ArtistsVST         .Enabled := True;
+    Nemp_MainForm.AlbenVST           .Enabled := True;
+    // Coverflow
+    Nemp_MainForm.PanelCoverBrowse   .Enabled := True;
+    // TagCloud
+    Nemp_MainForm.PanelTagCloudBrowse.Enabled := True;
+    // Switch-Buttons
+    Nemp_MainForm.TabBtn_CoverFlow.Enabled := True;
+    Nemp_MainForm.TabBtn_Browse   .Enabled := True;
+    Nemp_MainForm.TabBtn_TagCloud .Enabled := True;
+    // VST Panel (Complete)
+    Nemp_MainForm.VSTPanel.Enabled := True;
 
-        // Panel Suche//Auswahl enablen
-        TabBtn_CoverFlow.Enabled := True;
-        TabBtn_Browse.Enabled := True;
-        TabBtn_TagCloud.Enabled := True;
+    // Other Forms
+    if assigned(FormBibSearch) then
+       FormBibSearch.EnableControls(True);
+    if assigned(FDetails) then
+        FDetails.Enabled := True;
+    if assigned(CloudEditorForm) then
+        CloudEditorForm.Enabled := True;
 
-        //Gefährliche MainMenüeinträge enablen
-        MM_Medialibrary.Enabled := True;
-        MM_PL_ExtendedAddToMedialibrary.Enabled := True;
-        MM_PL_Directory.Enabled := True;
-
-        //OptionenMAINMENU.Enabled := True;
-        //AboutMAINMENU.Enabled := True;
-        MM_ML_Delete.Enabled:=True;
-        MM_ML_Load.Enabled:=True;
-        MM_ML_Save.Enabled:=True;
-        MM_ML_SortBy.Enabled:=True;
-        //SuchenMAINMENU.Enabled:=True;
-
-        // Gefährliche PopupMenüeinträge enablen
-        PM_ML_SortBy.Enabled:=True;
-        PM_ML_RefreshSelected.Enabled:=True;
-        PM_ML_HideSelected.Enabled:=True;
-        PM_ML_DeleteSelected.Enabled:=True;
-        PM_ML_Extended.Enabled := True;
-        //Dateienhinzufgen2.Enabled := True;
-        PM_PL_AddDirectories.Enabled := True;
-        PM_PL_ExtendedAddToMedialibrary.Enabled := True;
-        //PM_PL_ExtendedCopyFromWinamp.Enabled := True;
-        PM_ML_Medialibrary.Enabled := True;
-        PM_ML_SearchDirectory.Enabled := True;
-        //Dateienhinzufgen3.Enabled := True;
-
-        // SuchDinger enablen
-        if assigned(FormBibSearch) then
-            FormBibSearch.EnableControls(True);
-
-        // Browse-Listen Enablen
-        ArtistsVST.Enabled := True;
-        AlbenVST.Enabled := True;
-
-        VST.OnHeaderClick:=VSTHeaderClick;
-        ReadyForGetFileApiCommands := True;
-
-        fspTaskbarManager.ProgressState := fstpsNoProgress;
-    end;
+    // some additional Stuff from BlockLevel 3
+    Nemp_MainForm.ReadyForGetFileApiCommands := True;
+    Nemp_MainForm.VST.OnHeaderClick := Nemp_MainForm.VSTHeaderClick;
 end;
 
 
@@ -827,7 +797,6 @@ begin
     with Nemp_MainForm do
     begin
         // Bib umschalten.
-        StarteLangeAktion(-1,'', True);
         Nemp_MainForm.Enabled := False;
         If Not assigned(FSplash) then
             Application.CreateForm(TFSplash, FSplash);
@@ -836,39 +805,38 @@ begin
         SetWindowPos(FSplash.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
         FSplash.Update;
 
-        MedienBib.BrowseMode := NewMode;
-        case NewMode of
-            0: begin
-                MedienBib.ReBuildBrowseLists;
+            MedienBib.BrowseMode := NewMode;
+            case NewMode of
+                0: begin
+                    MedienBib.ReBuildBrowseLists;
+                end;
+                1: begin
+                    MedienBib.CurrentArtist := BROWSE_ALL;
+                    MedienBib.CurrentAlbum := BROWSE_ALL;
+                    MedienBib.ReBuildCoverList;
+
+                    MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+
+                    If MedienBib.Coverlist.Count > 3 then
+                        CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+                    else
+                        CoverScrollbar.Max := 3;
+                    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
+                end;
+                2: begin
+                    // 1. Backup Breadcrumbs (current navigation)
+                    MedienBib.TagCloud.BackUpNavigation;
+                    // 2. Rebuild TagCloud
+                    MedienBib.ReBuildTagCloud;
+                    // 3. Restore BreadCrumbs
+                    MedienBib.RestoreTagCloudNavigation;
+                    // 4. Show Files for the current Tag
+                    MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
+                end;
             end;
-            1: begin
-                MedienBib.CurrentArtist := BROWSE_ALL;
-                MedienBib.CurrentAlbum := BROWSE_ALL;
-                MedienBib.ReBuildCoverList;
 
-                MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
+            ResetBrowsePanels;
 
-                If MedienBib.Coverlist.Count > 3 then
-                    CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                else
-                    CoverScrollbar.Max := 3;
-                CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
-            end;
-            2: begin
-                // 1. Backup Breadcrumbs (current navigation)
-                MedienBib.TagCloud.BackUpNavigation;
-                // 2. Rebuild TagCloud
-                MedienBib.ReBuildTagCloud;
-                // 3. Restore BreadCrumbs
-                MedienBib.RestoreTagCloudNavigation;
-                // 4. Show Files for the current Tag
-                MedienBib.GenerateAnzeigeListeFromTagCloud(MedienBib.TagCloud.FocussedTag, False);
-            end;
-        end;
-
-        ResetBrowsePanels;
-
-        BeendeLangeAktion;
         FSplash.Close;
         Nemp_MainForm.Enabled := True;
         Nemp_MainForm.SetFocus;
@@ -1511,7 +1479,13 @@ end;
 procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 var aErr: TNempAudioError;
     BibFile: TAudioFile;
+    newTags: UTF8String;
 begin
+    newTags := aAudioFile.RawTagLastFM;
+    // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+    aAudioFile.GetAudioData(aAudioFile.Pfad);
+    aAudioFile.RawTagLastFM := newTags;
+
     aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
     if aErr = AUDIOERR_None then
     begin
@@ -1766,29 +1740,27 @@ end;
 
 function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
 var
-  idx: integer;
+  idx, maxC: integer;
   SelectedMP3s: TNodeArray;
   Data: PTreeData;
 begin
+    result := '';
+    SelectedMP3s := aTree.GetSortedSelection(False);
 
-  result := '';
-  SelectedMP3s := aTree.GetSortedSelection(False);
-  if length(SelectedMp3s) > MAX_DRAGFILECOUNT then
-  begin
-      MessageDlg((Warning_TooManyFiles), mtInformation, [MBOK], 0);
-      exit;
-  end;
+    maxC := min(Nemp_MainForm.NempOptions.maxDragFileCount, length(SelectedMp3s));
+    if length(SelectedMp3s) > Nemp_MainForm.NempOptions.maxDragFileCount then
+        AddErrorLog(Format(Warning_TooManyFiles, [Nemp_MainForm.NempOptions.maxDragFileCount]));
 
-  for idx := 0 to length(SelectedMP3s)-1 do
-  begin
-      Data := aTree.GetNodeData(SelectedMP3s[idx]);
-      if FileExists(Data^.FAudioFile.Pfad) then
-          result := result + Data^.FAudioFile.Pfad + #0;
-      if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  MIN_CUESHEET_DURATION)  )
-         AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
-      then
-          result := result + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
-  end;
+    for idx := 0 to maxC - 1 do
+    begin
+        Data := aTree.GetNodeData(SelectedMP3s[idx]);
+        if FileExists(Data^.FAudioFile.Pfad) then
+            result := result + Data^.FAudioFile.Pfad + #0;
+        if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  MIN_CUESHEET_DURATION)  )
+           AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
+        then
+            result := result + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
+    end;
 end;
 
 // this is called after a succesful call of GetFileListForClipBoardFromTree

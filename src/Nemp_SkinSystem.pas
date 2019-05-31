@@ -238,7 +238,7 @@ type
         SlideButtonMode: Integer;
 
         UseDefaultListImages: Boolean;
-        UseDefaultTreeImages: Boolean;
+        //UseDefaultTreeImages: Boolean;
         UseDefaultMenuImages: Boolean;
 
         UseDefaultStarBitmaps: Boolean;
@@ -588,7 +588,7 @@ begin
         if (SlideButtonMode < 0) or (SlideButtonMode > 2) then SlideButtonMode := 0;
 
         UseDefaultListImages             := Ini.ReadBool('Options','UseDefaultListImages', False);
-        UseDefaultTreeImages             := Ini.ReadBool('Options','UseDefaultTreeImages', False);
+        //UseDefaultTreeImages             := Ini.ReadBool('Options','UseDefaultTreeImages', False);
         UseDefaultMenuImages             := Ini.ReadBool('Options','UseDefaultMenuImages', False);
         UseDefaultStarBitmaps  := Ini.ReadBool('Options','UseDefaultStarBitmaps', True);
         UseSeparatePlayerBitmap          := Ini.ReadBool('Options', 'UseSeparatePlayerBitmap', False);
@@ -793,10 +793,11 @@ begin
                             rect(i*16,0,i*16+16, ButtonTmp.Height));
                       Nemp_MainForm.MenuSkinImageList.AddMasked(ButtonTmp,Buttontmp.Canvas.Pixels[0,0]);
                   end;
-                  Nemp_MainForm.Nemp_MainMenu      .Images := Nemp_MainForm.MenuSkinImageList;
-                  Nemp_MainForm.Medialist_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
-                  Nemp_MainForm.PlayListPOPUP      .Images := Nemp_MainForm.MenuSkinImageList;
-                  Nemp_MainForm.Player_PopupMenu   .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Nemp_MainMenu             .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Medialist_Browse_PopupMenu.Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuSkinImageList;
               finally
                   ButtonTmp.Free;
               end;
@@ -808,7 +809,7 @@ begin
   end;
 
 
-
+  {
   // Load Tree images [+] [-]
   if NOT UseDefaultTreeImages then
   begin
@@ -840,6 +841,7 @@ begin
           ListenCompletebmp.Free;
       end;
   end;
+  }
 
   {if UseSkinGraphics then
             BaseDir := Path + '\'
@@ -903,10 +905,11 @@ end;
 
 procedure TNempSkin.SetDefaultMenuImages;
 begin
-    Nemp_MainForm.Nemp_MainMenu      .Images := Nemp_MainForm.MenuImages;
-    Nemp_MainForm.Medialist_PopupMenu.Images := Nemp_MainForm.MenuImages;
-    Nemp_MainForm.PlayListPOPUP      .Images := Nemp_MainForm.MenuImages;
-    Nemp_MainForm.Player_PopupMenu   .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Nemp_MainMenu             .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Medialist_Browse_PopupMenu.Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuImages;
 end;
 
 procedure TNempSkin.SaveToDir(DirName: UnicodeString);
@@ -1772,8 +1775,10 @@ begin
         PlaylistVST.Images := PlayListImageList;
         VST.Images := PlayListImageList;
 
-        Nemp_MainMenu      .Images := MenuImages;
-        Medialist_PopupMenu.Images := MenuImages;
+        Nemp_MainMenu             .Images := MenuImages;
+        Medialist_View_PopupMenu  .Images := MenuImages;
+        Medialist_Browse_PopupMenu.Images := MenuImages;
+
         PlayListPOPUP      .Images := MenuImages;
         Player_PopupMenu   .Images := MenuImages;
 

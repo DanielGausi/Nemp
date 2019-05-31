@@ -1063,7 +1063,7 @@ begin
         if not GetSpecialPermissionToChangeMetaData then exit;
 
         MedienBib.StatusBibUpdate := 1;
-        BlockeMedienListeUpdate(True);
+        BlockGUI(1);
         LblUpdateWarning.Visible := True;
         // Fill UpdateList
         MedienBib.PutInconsistentFilesToUpdateList;
@@ -1095,7 +1095,7 @@ begin
           , mtInformation, [MBOK, MBCancel], 0) = mrok then
         begin
             MedienBib.StatusBibUpdate := 1;
-            BlockeMedienListeUpdate(True);
+            BlockGUI(1);
             LblUpdateWarning.Visible := True;
 
             MedienBib.PutAllFilesToUpdateList;

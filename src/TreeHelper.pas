@@ -234,7 +234,7 @@ begin
   else
     aTree.Header.Columns[0].Text := HeaderStr;
 
-  aTree.FullExpand;
+  //aTree.FullExpand;  --> this requires a lot of time ???
   aTree.EndUpdate;
 end;
 

@@ -68,15 +68,11 @@ object CloudEditorForm: TCloudEditorForm
     Top = 8
     Width = 534
     Height = 418
-    ActivePage = TS_MergedTags
+    ActivePage = TS_ExistingTags
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TS_ExistingTags: TTabSheet
       Caption = 'Existing tags'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)

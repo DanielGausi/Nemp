@@ -127,6 +127,7 @@ Bitrate_Constant = 'Constant bitrate';
 Bitrate_Variable = 'Variable bitrate';
 
 Warning_MedienBibIsBusy = 'The operation could not be processed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC.';
+Warning_MedienBibIsBusyOnPartyMode = 'The Nemp Partymode can''t be activated, if the media library is busy. Please stop the current operation and try again.';
 Warning_MedienBibIsBusyOnClose = 'Nemp is searching for new files or updating the library. Do you really want to quit now?';
 Warning_MedienBibIsBusyCritical = 'The library is in a critical update-process right now. Editing files is not possible. Please try again in a few seconds.';
 Warning_MedienBibIsBusy_Options
@@ -139,11 +140,9 @@ Warning_MedienBibBusyThread = 'The library blocked this very file by an automate
 
 // // MedienBib_ConfirmResetRatings = 'This will reset the rating of all files in the library. Ratings within the ID3-tags will not be changed. Continue?';
 
-Warning_TooManyFiles = 'Operation cancelled: Too many files for drag&&drop and copy&&paste respectively.'
-                      + #13#10
-                      + 'You can use the pop-up menu to put all these files into the playlist or just select fewer files.';
+Warning_TooManyFiles = 'Warning: Too many files for Drag&Drop and Copy&Paste respectively. Only %d files were included.';
 
-Warning_MagicCopyFailed = 'Extended Copy&&Paste failed. This method doesn''t work from write-protected drives (e.g. CD/DVD).';
+Warning_MagicCopyFailed = 'Extended Copy&Paste failed. This method doesn''t work from write-protected drives (e.g. CD/DVD).';
 
 Error_ID3OnlyInMp3Files = 'ID3-tags can only be written to mp3-files.';
 //Error_EvilLyricsNotFound1 = 'This function needs another program called "EvilLyrics". Start this program and try again.';
@@ -675,7 +674,7 @@ MediaLibrary_SearchingNewFilesDir    = 'Searching for new files ... %s';
 MediaLibrary_SearchingNewFilesBigLabel = 'Searching for audio files ... %d found';
 MediaLibrary_StartSearchingNewFiles  = 'Searching for new files ...';
 MediaLibrary_SearchingNewFilesComplete = 'Searching for new files completed. The new files have been added to your media library.';
-MediaLibrary_SearchingNewFiles_NothingFound = 'Searching for new files completed. No new files have been found. ';
+MediaLibrary_SearchingNewFiles_NothingFound = 'Operation complete. No new files have been added to the media library.';
 
 // MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
 MediaLibrary_SearchingMissingFilesComplete_AnalysingData = 'Search complete, preparing data ...';
@@ -684,15 +683,15 @@ MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput = 'Waiting for user 
 DeleteSelect_FilesWillBeDeleted = 'The following files will be removed from the library when you click on "Cleanup library"';
 DeleteSelect_FilesWillRemain = 'The following files will remain in the library when you click on "Cleanup library"';
 DeleteSelect_DeletingFiles = 'Removing files from the media library...';
-DeleteSelect_DeletingFilesComplete = 'The selected files have been removed from the media library.';
 DeleteSelect_DeletingFilesAborted = 'No files have been removed from the library.';
+DeleteSelect_DeletingFilesComplete = 'The selected files have been removed from the media library.';
 
 // MediaLibrary_FilesNotFound           = 'There are %d missing files. Please select the files you want to keep or delete from the library.';
 // MediaLibrary_FilesNotFoundJustHint   = 'Some of the selected files are missing. You may cleanup your library now to remove the missing files.';
 // MediaLibrary_FilesNotFound           = 'There are %d missing files. You should execute the function "delete missing files" now to cleanup your library.';
 // MediaLibrary_FilesNotFoundExternalDrive = 'There are %d missing files. Probably there is an external drive not connected to your computer.';
 
-MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your media library. This is not supposed to happen. If this message appears frequently feel free to contact me via e-mail. Thank you!';
+MediaLibrary_DuplicatesWarning       = 'Nemp found some duplicate entries in your media library. This is not supposed to happen, unless you just added the current playlist to the media library. - If this message appears frequently, please contact me via e-mail. Thank you!';
 // MediaLibrary_SearchingLyrics         = 'Searching lyrics for %s %s';
 MediaLibrary_SearchingLyrics_JustFile= 'Searching lyrics for %s';
 // MediaLibrary_SearchingTags           = 'Searching tags for %s %s';
@@ -701,6 +700,8 @@ MediaLibrary_LyricsFailed            = 'Connection to lyrics.wikia.com failed. P
 MediaLibrary_GetTagsFailed           = 'No additional Tags found.';
 MediaLibrary_SearchLyricsStats       = ' (found %d/%d)';
 MediaLibrary_SearchTagsStats         = ' (found %d/%d)';
+
+MediaLibrary_RatingComplete = 'All ratings have been successfully updated.';
 
 MediaLibrary_PermissionToChangeTagsRequired = 'You denied quick access to metadata (e.g. ID3-Tags), to protect your files from unintented changes.'
                     +#13#10+'However, this function only works properly, if changing metadata is allowed.'
@@ -751,10 +752,11 @@ Medialibrary_SaveException1 = 'An error occured while saving the media library. 
 //Medialibrary_SaveException = 'Saving failed. Probably the directory is write protected or there is not enough available free space.';
 Medialibrary_QuickSearchError1 = 'Tried to fill the Quicksearchlist while displaying playlists. This should never occur - please report this error. ';
 Medialibrary_GUIError1 = 'This function (1) shouldn''t be accessible now. Please report this error.';
-Medialibrary_GUIError2 = 'Tried to fill searchhistory with playlist files. This should never occur - please report this error.';
+Medialibrary_GUIError2 = 'Tried to fill search history with playlist files. This should never occur - please report this error.';
 Medialibrary_GUIError3 = 'The current view shows files from a playlist-file. You can not delete these files frome the library.';
 Medialibrary_GUIError4 = 'This function (4) shouldn''t be accessible now. Please report this error.';
 Medialibrary_GUIError5 = 'The current view shows files from a playlist-file. Getting lyrics or additional tags is not possible.';
+Medialibrary_GUIError6 = 'The current view shows files from a playlist-file. Operation cancelled.';
 Medialibrary_DriveRepairError = 'An Error occured while updating drivelist. Please report this error.';
 
 Medialibrary_DialogFilter            = 'Nemp media library';
@@ -985,6 +987,7 @@ ProgressForm_CleanUp        = 'Nemp is searching for missing files in your media
 ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files.';
 ProgressForm_SearchTags     = 'Nemp is searching for some additional tags for your music files.';
 ProgressForm_UpdateMetaData = 'Nemp is updating the meta data (ID3tags) of your music files.';
+ProgressForm_DeleteFiles    = 'Nemp is removing the selected files from your media library.';
 
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
