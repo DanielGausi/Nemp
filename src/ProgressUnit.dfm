@@ -98,7 +98,6 @@ object ProgressForm: TProgressForm
     Step = 1
     TabOrder = 0
     TabStop = True
-    ExplicitTop = 296
   end
   object BtnCancel: TButton
     Left = 415
@@ -110,7 +109,6 @@ object ProgressForm: TProgressForm
     Caption = 'Cancel'
     TabOrder = 1
     OnClick = BtnCancelClick
-    ExplicitTop = 265
   end
   object cbAutoClose: TCheckBox
     Left = 8
@@ -121,7 +119,6 @@ object ProgressForm: TProgressForm
     Caption = 'Close window after completion'
     TabOrder = 2
     OnClick = cbAutoCloseClick
-    ExplicitTop = 273
   end
   object CloseTimer: TTimer
     Enabled = False

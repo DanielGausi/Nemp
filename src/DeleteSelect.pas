@@ -134,7 +134,7 @@ end;
 
 procedure TDeleteSelection.FormShow(Sender: TObject);
 var i: Integer;
-    currentData: TDeleteData;
+    // currentData: TDeleteData;
 begin
     lblMainExplanation.Caption := DeleteHelper_Explanation;
 

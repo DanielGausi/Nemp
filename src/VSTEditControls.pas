@@ -112,20 +112,23 @@ type
     FTree: TVirtualStringTree;
     FNode: PVirtualNode;
     FColumn: Integer;
+    fLastPaint: Cardinal;
+    fOriginalRating: Byte;
     procedure RatingMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure RatingMouseLeave(Sender: TObject);
     procedure RatingClick(Sender: TObject);
+    procedure RatingKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     //procedure EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   public
     destructor Destroy; override;
-    function BeginEdit: Boolean; stdcall;
-    function CancelEdit: Boolean; stdcall;
-    function EndEdit: Boolean; stdcall;
-    function GetBounds: TRect; stdcall;
+    function BeginEdit: Boolean; virtual; stdcall;
+    function CancelEdit: Boolean; virtual; stdcall;
+    function EndEdit: Boolean; virtual; stdcall;
+    function GetBounds: TRect; virtual; stdcall;
     function PrepareEdit(Tree: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex): Boolean; stdcall;
-    procedure ProcessMessage(var Message: TMessage); stdcall;
+    procedure ProcessMessage(var Message: TMessage); virtual; stdcall;
     procedure SetBounds(R: TRect); stdcall;
   end;
 
@@ -167,7 +170,7 @@ var RatingGraphics: TRatingGraphics ;
 
 implementation
 
-uses NempAudioFiles;//, NempMainUnit, mmSystem;
+uses NempAudioFiles, NempMainUnit;//, NempMainUnit, mmSystem;
 
 {
     --------------------------------------------------------
@@ -264,15 +267,27 @@ end;
 
 procedure TRatingEditLink.ProcessMessage(var Message: TMessage);
 begin
-    FEdit.WindowProc(Message);
+    if Assigned(FEdit) then
+       FEdit.WindowProc(Message);
 end;
 
 function TRatingEditLink.PrepareEdit(Tree: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex): Boolean;
+var Data: PTreeData;
+    af: tAudioFile;
 begin
   Result := True;
   FTree := Tree as TVirtualStringTree;
   FNode := Node;
   FColumn := Column;
+  fLastPaint := 0;
+
+  Data := FTree.GetNodeData(FNode);
+  if assigned(Data) then
+  begin
+      af := Data^.FAudioFile;
+      fOriginalRating := af.Rating;
+  end else
+      fOriginalRating := 0;
 
   FEdit.Free;
   FEdit := nil;
@@ -283,8 +298,10 @@ begin
       OnMouseMove := RatingMouseMove;      // Change Rating
       OnMouseLeave := RatingMouseLeave;    // Cancel Edit
       OnClick := RatingClick;              // Set new value
+      OnKeyDown := RatingKeyDown;          // cancel on ESC
       Visible := False;
       Parent := FTree;
+      Tag := fOriginalRating;
   end;
 end;
 
@@ -299,6 +316,11 @@ function TRatingEditLink.CancelEdit: Boolean;
 begin
   Result := True;
   //FEdit.Hide;
+
+  try
+      FTree.SetFocus;
+  except
+  end;
 end;
 
 function TRatingEditLink.EndEdit: Boolean;
@@ -329,10 +351,17 @@ end;
 
 procedure TRatingEditLink.RatingMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
-begin
+var c: Cardinal;
+  begin
     FEdit.Tag := RatingGraphics.MousePosToRating(X, 70);
-    // Repaint the Control
-    (FEdit as TRatingControl).Repaint;
+
+    c := GetTickCount;
+    if c - self.fLastPaint > 50 then
+    begin
+        // Repaint the Control
+        (FEdit as TRatingControl).Repaint;
+        fLastPaint := GetTickCount;
+    end;
 end;
 
 procedure TRatingEditLink.RatingClick(Sender: TObject);
@@ -341,11 +370,70 @@ begin
     FTree.EndEditNode;
 end;
 
+procedure TRatingEditLink.RatingKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var tmp: Integer;
+begin
+    case key of
+        vk_Escape: begin
+            CancelEdit;
+            FTree.CancelEditNode;
+        end;
+
+        49,97: begin  // 1
+            FEdit.Tag := 1*50;
+            (FEdit as TRatingControl).Repaint;
+        end;
+
+        50,98: begin  // 2
+            FEdit.Tag := 2*50;
+            (FEdit as TRatingControl).Repaint;
+        end;
+        51,99: begin  // 3
+            FEdit.Tag := 3*50;
+            (FEdit as TRatingControl).Repaint;
+        end;
+        52,100: begin  // 4
+            FEdit.Tag := 4*50;
+            (FEdit as TRatingControl).Repaint;
+        end;
+        53,101: begin // 5
+            FEdit.Tag := 5*50;
+            (FEdit as TRatingControl).Repaint;
+        end;
+
+        187, 107: begin  // +
+            tmp := FEdit.Tag + 25;
+            if tmp > 255 then
+                tmp := 255;
+            FEdit.Tag := tmp;
+            (FEdit as TRatingControl).Repaint;
+        end;
+
+        189,109: begin // -
+            tmp := FEdit.Tag - 25;
+            if tmp < 1 then
+                tmp := 1;
+            FEdit.Tag := tmp;
+            (FEdit as TRatingControl).Repaint;
+        end;
+
+        vk_Return: begin
+            EndEdit;
+            FTree.EndEditNode;
+        end;
+    else
+      ;
+    end;
+end;
+
+
 procedure TRatingEditLink.RatingMouseLeave(Sender: TObject);
 begin
-   // FTree.setfocus;
-    CancelEdit;
-    FTree.CancelEditNode;
+    // Set Original Rating
+    FEdit.Tag := fOriginalRating;
+    (FEdit as TRatingControl).Repaint;
+    //    CancelEdit;
+    //    FTree.CancelEditNode;
 end;
 
 

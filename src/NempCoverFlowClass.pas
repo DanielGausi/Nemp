@@ -233,7 +233,7 @@ begin
             newItem := 0
         else
         begin
-            newItem := fCurrentItem - 1;
+            newItem := fCurrentItem; // - 1;  2019: change: Just show the "currentitem" again.
             if (newItem >= fCoverlist.Count) or (newItem < 0) then
                 newItem := 0;
         end;

@@ -131,9 +131,9 @@ type
   function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 
   // GetCover calls GetCoverFromID3,
-  // then MedienBib.GetCoverList and GetCoverFromList if no success
+  // then MedienBib.GetCoverList and GetCoverFromList if no success (iff CompleteCoverSearch = True)
   // finally GetDefaultCover if still no success
-  function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
+  function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap; CompleteCoverSearch: Boolean): boolean;
 
   // GetCoverBitmapFromID:
   // Get the Bitmap for a specified Cover-ID
@@ -759,7 +759,7 @@ begin
   end;
 end;
 
-function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
+function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap; CompleteCoverSearch: Boolean): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
@@ -787,25 +787,32 @@ begin
                   end;
               end else
               begin
-                  // erstmal im ID3-Tag nach nem Bild suchen
-                  if GetCoverFromID3(aAudioFile, aCoverbmp) then
-                      result := True
-                  else
-                  begin // in Dateien rund um das Audiofile nach nem Bild suchen
-                      coverliste := TStringList.Create;
-                      Medienbib.GetCoverListe(aAudioFile,coverliste);
-                      try
-                          if Not GetCoverFromList(CoverListe, aCoverbmp) then
-                          begin
+                  if CompleteCoverSearch then
+                  begin
+                      // erstmal im ID3-Tag nach nem Bild suchen
+                      if GetCoverFromID3(aAudioFile, aCoverbmp) then
+                          result := True
+                      else
+                      begin // in Dateien rund um das Audiofile nach nem Bild suchen
+                          coverliste := TStringList.Create;
+                          Medienbib.GetCoverListe(aAudioFile,coverliste);
+                          try
+                              if Not GetCoverFromList(CoverListe, aCoverbmp) then
+                              begin
+                                  GetDefaultCover(dcFile, aCoverbmp, 0);
+                                  result := False;
+                              end else
+                                  result := True;
+                          except
                               GetDefaultCover(dcFile, aCoverbmp, 0);
-                              result := False;
-                          end else
-                              result := True;
-                      except
-                          GetDefaultCover(dcFile, aCoverbmp, 0);
-                          result := false;
+                              result := false;
+                          end;
+                          coverliste.free;
                       end;
-                      coverliste.free;
+                  end else
+                  begin
+                      GetDefaultCover(dcFile, aCoverbmp, 0);
+                      result := False;
                   end;
               end;
           end;

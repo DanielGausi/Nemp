@@ -303,8 +303,7 @@ var //IDHttp: TIDHttp;
     ini: TMemIniFile;
     // StableVersion, LastRelease, ReleaseStatus, ReleaseNote: String;
     NempUpdateInfo: TNempUpdateInfo;
-
-begin
+begin
     // Indy erstellen, Datei runterladen, Version checken, ggf. Message absenden (falls Cancel=false)
     //IDHttp :=  TidHttp.Create;
     //HttpClient := THttpClient.Create;
@@ -319,98 +318,99 @@ begin
         //fDownloadString := IDHttp.Get(UPDATE_URL);
         fDownloadString := GetURLAsString(UPDATE_URL);
 
-
-        if not Cancel then
-        begin
-            sl := TStringList.Create;
-            try
-                sl.Text := fDownloadString;
-                ini := TMemIniFile.Create('');
+            if not Cancel then
+            begin
+                sl := TStringList.Create;
                 try
-                    ini.SetStrings(sl);
-                    NempUpdateInfo := TNempUpdateInfo.Create;
+                    sl.Text := fDownloadString;
+                    ini := TMemIniFile.Create('');
                     try
-                        NempUpdateInfo.StableRelease := ini.ReadString('UpdateInfo', 'StableRelease', 'x.x.x.x');
-                        NempUpdateInfo.LastRelease   := ini.ReadString('UpdateInfo', 'LastRelease', NempUpdateInfo.StableRelease);
-                        NempUpdateInfo.ReleaseStatus := ini.ReadString('UpdateInfo', 'ReleaseStatus', 'Beta');
-                        NempUpdateInfo.ReleaseNote   := ini.ReadString('UpdateInfo', 'ReleaseNote', 'Use with caution!');
+                        ini.SetStrings(sl);
+                        NempUpdateInfo := TNempUpdateInfo.Create;
+                        try
+                            NempUpdateInfo.StableRelease := ini.ReadString('UpdateInfo', 'StableRelease', 'x.x.x.x');
+                            NempUpdateInfo.LastRelease   := ini.ReadString('UpdateInfo', 'LastRelease', NempUpdateInfo.StableRelease);
+                            NempUpdateInfo.ReleaseStatus := ini.ReadString('UpdateInfo', 'ReleaseStatus', 'Beta');
+                            NempUpdateInfo.ReleaseNote   := ini.ReadString('UpdateInfo', 'ReleaseNote', 'Use with caution!');
 
 
-                        case fGetUpdateType(NempUpdateInfo.StableRelease) of
-                            utError : SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
-                            utMajor,
-                            utMinor,
-                            utPatch,  // Es gibt eine neue Stabile Version => Update empfehlen
-                            utBuild : SendMessage(fWindowHandle, WM_Update, UPDATE_NEWER_VERSION, lParam(NempUpdateInfo));  //Param: Stable-version aus Ini
+                            case fGetUpdateType(NempUpdateInfo.StableRelease) of
+                                utError : SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
+                                utMajor,
+                                utMinor,
+                                utPatch,  // Es gibt eine neue Stabile Version => Update empfehlen
+                                utBuild : SendMessage(fWindowHandle, WM_Update, UPDATE_NEWER_VERSION, lParam(NempUpdateInfo));  //Param: Stable-version aus Ini
 
-                            utNone  : begin
-                                // stabile Version ist aktuell - ggf. auf alpha/beta/release candidate testen
+                                utNone  : begin
+                                    // stabile Version ist aktuell - ggf. auf alpha/beta/release candidate testen
 
-                                if NempUpdateInfo.LastRelease = NempUpdateInfo.StableRelease then
-                                    // lokale Version ist die aktuelle, weitere Testversionen gibt es nicht
-                                    SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENT_VERSION, 0)       // Kein Parameter notwendig
-                                else
-                                begin
-                                    // Lastrelease weicht zumindest auf den ersten Blick von der lokalen Version ab
+                                    if NempUpdateInfo.LastRelease = NempUpdateInfo.StableRelease then
+                                        // lokale Version ist die aktuelle, weitere Testversionen gibt es nicht
+                                        SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENT_VERSION, 0)       // Kein Parameter notwendig
+                                    else
+                                    begin
+                                        // Lastrelease weicht zumindest auf den ersten Blick von der lokalen Version ab
+                                        case fGetUpdateType(NempUpdateInfo.LastRelease) of
+                                            utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
+                                            utMajor,
+                                            utMinor,
+                                            utPatch,
+                                            utBuild : // lokale Version aktuell, aber eine Testversion ist verfügbar
+                                                SendMessage(fWindowHandle, WM_Update, UPDATE_TEST_VERSION, lParam(NempUpdateInfo));
+
+                                            utNone: // lokale Version aktuell, neue Testversion auch (der Fall kann eigentlich hier nicht eintreten)
+                                                SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
+
+                                            utDownGrade: // lokale Version aktuell, und _neuer_ als das letzte Release!
+                                                         // kann eigentlich auch nicht auftreten, da LastRelease >= StableVersion gilt
+                                                SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
+                                        end;
+                                    end;
+                                end; // StableVersion = lokale Version
+
+                                utDownGrade : begin
+                                    // Lokale Version ist bereits eine Testversion
+                                    // hier: auf eine neue Testversion checken ...
+
                                     case fGetUpdateType(NempUpdateInfo.LastRelease) of
                                         utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
                                         utMajor,
                                         utMinor,
                                         utPatch,
-                                        utBuild : // lokale Version aktuell, aber eine Testversion ist verfügbar
-                                            SendMessage(fWindowHandle, WM_Update, UPDATE_TEST_VERSION, lParam(NempUpdateInfo));
+                                        utBuild : // Neuere TestVersion ist verfügbar
+                                            SendMessage(fWindowHandle, WM_Update, UPDATE_NEWERTEST_VERSION, lParam(NempUpdateInfo));
 
-                                        utNone: // lokale Version aktuell, neue Testversion auch (der Fall kann eigentlich hier nicht eintreten)
+                                        utNone: // lokale Version ist die aktuellste Testversion
                                             SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
 
-                                        utDownGrade: // lokale Version aktuell, und _neuer_ als das letzte Release!
-                                                     // kann eigentlich auch nicht auftreten, da LastRelease >= StableVersion gilt
+                                        utDownGrade: // lokale Version ist noch nicht auf dem Server bekannt
                                             SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
-                                    end;
+                                    end
                                 end;
-                            end; // StableVersion = lokale Version
-
-                            utDownGrade : begin
-                                // Lokale Version ist bereits eine Testversion
-                                // hier: auf eine neue Testversion checken ...
-
-                                case fGetUpdateType(NempUpdateInfo.LastRelease) of
-                                    utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
-                                    utMajor,
-                                    utMinor,
-                                    utPatch,
-                                    utBuild : // Neuere TestVersion ist verfügbar
-                                        SendMessage(fWindowHandle, WM_Update, UPDATE_NEWERTEST_VERSION, lParam(NempUpdateInfo));
-
-                                    utNone: // lokale Version ist die aktuellste Testversion
-                                        SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
-
-                                    utDownGrade: // lokale Version ist noch nicht auf dem Server bekannt
-                                        SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
-                                end
                             end;
+                        finally
+                            NempUpdateInfo.Free;
                         end;
                     finally
-                        NempUpdateInfo.Free;
+                        ini.Free;
                     end;
-                finally
-                    ini.Free;
-                end;
-                LastCheck := Now;
+                    LastCheck := Now;
 
-            finally
-                sl.Free;
-            end;
-        end; // else nichts machen
+                finally
+                    sl.Free;
+                end;
+            end; // else nichts machen
 
     except
+        on E: ENetHTTPClientException do begin
+            MessageText := Format(HTTP_Connection_Error, [GetDomainFromURL(UPDATE_URL), E.Message]);
+            SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
+        end;
+
         on E: Exception do
         begin
             MessageText := NempUpdate_Error + #13#10#13#10 + E.Message ;
             SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
-
-            //SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
-            //(z.B. 404) -> 404 ist mit httpClient aber keine exception mehr!!!
         end;
 
         {

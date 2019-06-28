@@ -565,6 +565,10 @@ begin
   oldTitel := '';
   meta := String(BASS_ChannelGetTags(channel, BASS_TAG_META));
 
+
+  // DetectUTF8Encoding ?? somehow ?
+
+
   if (meta <> '') AND (TNempPlayer(User).MainAudioFile <> NIL) then
   begin
         oldTitel := TNempPlayer(User).PlayingTitel;
@@ -816,6 +820,12 @@ begin
 
     BASS_SetConfigPtr(BASS_CONFIG_NET_AGENT or BASS_UNICODE, PChar(Nemp_BassUserAgent));
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
+
+    // more stable Webradio? (2019) ---
+    BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 10000);          setting ???
+    BASS_SetConfig(BASS_CONFIG_NET_READTIMEOUT, 2000);      setting ???
+    // ---
+
     UpdateFlags;
     Filter := '|Standard formats (*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.aif)' + '|'
                    + '*.mp3;*.mp2;*.mp1;*.ogg;*.wav*;*.aif';
@@ -2930,7 +2940,7 @@ begin
 
     if assigned(MainAudioFile) then
     begin
-        result := GetCover(MainAudioFile, CoverBitmap)
+        result := GetCover(MainAudioFile, CoverBitmap, True)
     end else
         GetDefaultCover(dcFile, CoverBitmap, 0);
         //result := True; // no audiofile, no downloading. ;-)

@@ -786,7 +786,7 @@ begin
                   ButtonTmp.Width := 16;
                   Buttontmp.Height := 16;
                   Nemp_MainForm.MenuSkinImageList.Clear;
-                  for i := 0 to 37 do
+                  for i := 0 to 39 do
                   begin
                       ButtonTmp.Canvas.CopyRect(
                             rect(0,0,16,16), ListenCompletebmp.Canvas,

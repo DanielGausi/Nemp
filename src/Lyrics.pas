@@ -39,7 +39,7 @@ unit Lyrics;
 
 interface
 
-uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils ;
+uses Windows, Contnrs, Sysutils,  Classes, dialogs, Messages, StrUtils, System.Net.HttpClient ;
 
 const COUNT_LYRIC_SEARCH_METHODS = 2;
 
@@ -62,7 +62,9 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
               fInterpret: String;  // the current artist we are searching for
               fTitle: String;      // the current title we are searching for
               fCurrentLyrics: String;
-              // fExceptionOccured: Boolean;
+
+              fExceptionOccured: Boolean;
+              fExceptionMessage: String;
 
               fLyricGetFunctions: TLyricGetFunctions;
 
@@ -75,7 +77,8 @@ const COUNT_LYRIC_SEARCH_METHODS = 2;
           public
               constructor Create;
               destructor Destroy; override;
-              // property ExceptionOccured: Boolean read fExceptionOccured;
+              property ExceptionOccured: Boolean read fExceptionOccured;
+              property ExceptionMessage: String read fExceptionMessage;
 
               // main method of the class
               // everything else is done in the subroutines
@@ -257,9 +260,14 @@ begin
     fCurrentLyrics := '';
     success := False;
 
+    fExceptionOccured := False;
+    fExceptionMessage := '';
+
     for i := 1 to COUNT_LYRIC_SEARCH_METHODS do
+    begin
         if (not success) then
             success := fLyricGetFunctions[i](aInterpret, aTitle);
+    end;
 
     if Success then
         result := fCurrentLyrics
@@ -292,33 +300,42 @@ const LyricStart = '<Lyric>';
       LyricsEnd = '</Lyric>';
 begin
     aURL := BuildURL_ChartLyrics(aInterpret, aTitle);
-    code := GetURLAsString(aURL);
-    if code = '' then
-        result := false
-    else
-    begin
-        // parse code and get lyrics
-        lStart := Pos(LyricStart, code);
-        if lStart > 0 then
-            // inc Start, so at Start is the first interesting letter
-            lStart := lStart + length(LyricStart);
-
-        // search for the "end marker"
-        if lStart > 0 then
-            lEnd := PosEx(LyricsEnd, code, lStart)
+    try
+        code := GetURLAsString(aURL);
+        if code = '' then
+            result := false
         else
-            lEnd := 0;
-
-        if (lStart > 0) and (lEnd > 0) then
         begin
-            // copy the matching part into a string
-            rawLyrics := Copy(code, lStart, lEnd - lStart);
-            fCurrentLyrics := ReplaceGeneralEntities(rawLyrics);
-            result := True;
-        end
-        else
-            // no Lyric-Tags found :(
-            result := False;
+            // parse code and get lyrics
+            lStart := Pos(LyricStart, code);
+            if lStart > 0 then
+                // inc Start, so at Start is the first interesting letter
+                lStart := lStart + length(LyricStart);
+
+            // search for the "end marker"
+            if lStart > 0 then
+                lEnd := PosEx(LyricsEnd, code, lStart)
+            else
+                lEnd := 0;
+
+            if (lStart > 0) and (lEnd > 0) then
+            begin
+                // copy the matching part into a string
+                rawLyrics := Copy(code, lStart, lEnd - lStart);
+                fCurrentLyrics := ReplaceGeneralEntities(rawLyrics);
+                result := True;
+            end
+            else
+                // no Lyric-Tags found :(
+                result := False;
+        end;
+    except
+        on E: ENetHTTPClientException do
+        begin
+            result := false;
+            fExceptionOccured := True;
+            fExceptionMessage := Format(HTTP_Connection_Error, [GetDomainFromURL(aURL), E.Message]);
+        end;
     end;
 end;
 
@@ -339,71 +356,80 @@ const LyricBox = '<div class=''lyricbox''>';
       //ScriptEnd = '</script>';
 begin
     aURL := BuildURL_LyricWiki(aInterpret, aTitle);
-    code := GetURLAsString(aURL);
-    if code = '' then
-        result := false
-    else
-    begin
-        ///  April 2019
-        ///  <div class='lyricbox'>
-        ///  LYRICS
-        ///  <div class='lyricsbreak'>
-
-        // search for <div class=''lyricbox''>
-        lStart := Pos(LyricBox, code);
-
-        if lStart > 0 then
-            // inc Start, so at Start is the first interesting letter
-            lStart := lStart + length(LyricBox);
-
-        // search for the "end marker"
-        if lStart > 0 then
-            lEnd := PosEx(LyricBoxEnd, code, lStart)
+    try
+        code := GetURLAsString(aURL);
+        if code = '' then
+            result := false
         else
-            lEnd := 0;
-
-
-        if (lStart > 0) and (lEnd > 0) then
         begin
-            // copy the matching part into a string
-            rawLyrics := Copy(code, lStart, lEnd - lStart);
-            // Replace HTML Linebreaks with normal ones
-            rawLyrics := StringReplace(rawLyrics, '<br />', #13#10, [rfReplaceAll]);
+            ///  April 2019
+            ///  <div class='lyricbox'>
+            ///  LYRICS
+            ///  <div class='lyricsbreak'>
 
-            sl := TStringList.Create;
-            try
-                // put the text into a StringList, line by line
-                sl.Text := rawLyrics;
-                for i := 0 to sl.count - 1 do
-                begin
-                    c := 1;
-                    newline := '';
-                    // for each line translate the &#111;-stuff into normal chars
-                    while c < length(sl[i]) do
+            // search for <div class=''lyricbox''>
+            lStart := Pos(LyricBox, code);
+
+            if lStart > 0 then
+                // inc Start, so at Start is the first interesting letter
+                lStart := lStart + length(LyricBox);
+
+            // search for the "end marker"
+            if lStart > 0 then
+                lEnd := PosEx(LyricBoxEnd, code, lStart)
+            else
+                lEnd := 0;
+
+
+            if (lStart > 0) and (lEnd > 0) then
+            begin
+                // copy the matching part into a string
+                rawLyrics := Copy(code, lStart, lEnd - lStart);
+                // Replace HTML Linebreaks with normal ones
+                rawLyrics := StringReplace(rawLyrics, '<br />', #13#10, [rfReplaceAll]);
+
+                sl := TStringList.Create;
+                try
+                    // put the text into a StringList, line by line
+                    sl.Text := rawLyrics;
+                    for i := 0 to sl.count - 1 do
                     begin
-                        a := PosEx('&#', sl[i], c) + 2;
-                        b := PosEx(';',  sl[i], a+2) ;
-                        if (a > 2) and (b > 3) then
+                        c := 1;
+                        newline := '';
+                        // for each line translate the &#111;-stuff into normal chars
+                        while c < length(sl[i]) do
                         begin
-                            charcode := copy(sl[i], a, b - a);
-                            newline := newline + chr(StrToIntDef(charcode, Ord('?')));
-                            c := b;
-                        end else
-                            c := length(sl[i]) + 1;
+                            a := PosEx('&#', sl[i], c) + 2;
+                            b := PosEx(';',  sl[i], a+2) ;
+                            if (a > 2) and (b > 3) then
+                            begin
+                                charcode := copy(sl[i], a, b - a);
+                                newline := newline + chr(StrToIntDef(charcode, Ord('?')));
+                                c := b;
+                            end else
+                                c := length(sl[i]) + 1;
+                        end;
+                        sl[i] := newLine;
                     end;
-                    sl[i] := newLine;
+                    // Set Self.fCurrentLyrics to our parsed text
+                    fCurrentLyrics := sl.Text;
+                    // Success :D
+                    result := True;
+                finally
+                  sl.Free;
                 end;
-                // Set Self.fCurrentLyrics to our parsed text
-                fCurrentLyrics := sl.Text;
-                // Success :D
-                result := True;
-            finally
-              sl.Free;
-            end;
-        end
-        else
-            // no lyric-Box found :(
-            result := False;
+            end
+            else
+                // no lyric-Box found :(
+                result := False;
+        end;
+    except
+        on E: ENetHTTPClientException do
+        begin
+            result := false;
+            fExceptionOccured := True;
+            fExceptionMessage := Format(HTTP_Connection_Error, [GetDomainFromURL(aURL), E.Message]);
+        end;
     end;
 end;
 

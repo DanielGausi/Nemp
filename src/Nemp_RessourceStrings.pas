@@ -714,12 +714,15 @@ MediaLibrary_SearchLyricsComplete_AllFound = 'Lyric search complete. All lyrics 
 MediaLibrary_SearchLyricsComplete_ManyFound = 'Lyric search complete. %d of %d lyrics could be found.'#13#10#13#10'You can try to find some of the missing lyrics by a manual search on lyrics.wikia.com or other lyrics sites on the net.';
 MediaLibrary_SearchLyricsComplete_FewFound = 'Lyric search complete. Only %d of %d lyrics could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
 MediaLibrary_SearchLyricsComplete_NoneFound = 'Lyric search complete. Sorry, but nothing could be found.'#13#10#13#10'Either the files are not properly tagged, they are instrumental only, or you have a special taste in music.'#13#10#13#10'Please note, that lyrics are not supported for some audio formats.';
+MediaLibrary_SearchLyricsComplete_SomeErrors = 'Lyric search complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
 
 MediaLibrary_SearchTagsComplete_SingleNotFound = 'Sorry, for this file are no additional Tags available.';
 MediaLibrary_SearchTagsComplete_AllFound = 'Tag search complete. Added some Tags for every file.';
 MediaLibrary_SearchTagsComplete_ManyFound = 'Tag search complete. Found Tags for %d of %d files.';
 MediaLibrary_SearchTagsComplete_FewFound = 'Tag search complete. Found Tags for only %d of %d files.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
 MediaLibrary_SearchTagsComplete_NoneFound = 'Tag search complete. Sorry, no additional Tags could be found.'#13#10#13#10'Either the files are not properly tagged, or you have a special taste in music.'#13#10#13#10'Please note, that additional Tags are not supported for some audio formats.';
+MediaLibrary_SearchTagsComplete_SomeErrors = 'Tag search complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
+
 
 MediaLibrary_OperationComplete_CloseWindowNow = 'You can close this window now.';
 MediaLibrary_OperationComplete_CBClose_NoTimer = 'Close window after completion';
@@ -735,6 +738,7 @@ MediaLibrary_InconsistentFilesCaption = 'Warning: %d file(s) need an update. Cli
 MediaLibrary_InconsistentFiles_Completed_Success = 'All ID3-Tags have been successfully updated.';
 MediaLibrary_InconsistentFiles_Completed_SomeFailed = 'Some ID3-Tags could not been updated. There are still %d files that are inconsistent to the data in the library.';
 MediaLibrary_InconsistentFiles_Abort = 'Some ID3-Tags have not been updated due to user abort. There are still %d files that are inconsistent to the data in the library.';
+MediaLibrary_InconsistentFiles_SomeErrors = 'ID3-Tag update complete. Some unexpected errors appeared during the process.'#13#10#13#10'Please view the Error-Log for details.';
 //MediaLibrary_InconsistentFilesHintCount = 'You have changed some tags in the library, but the mp3-files have not been updated yet. Do you want to update the %d changed files now?';
 
 
@@ -883,7 +887,11 @@ ParrtyMode_WrongPassword = 'Invalid password. Try again if you should know it. O
 ParrtyMode_Password_Caption = 'Nemp Party-Mode';
 ParrtyMode_Password_Prompt = 'Please enter the password to exit the Nemp Party-Mode';
 ParrtyMode_Password_PromptOnActivate = 'Note: The password to exit the Nemp Party-Mode is "%s".';
-
+ParrtyMode_ActivationHint =
+'This will activate the Nemp Party-Mode. In this mode, some features are disabled to prevent'+#13#10+
+'unwanted changes to the playlist and media library.'  + #13#10 +
+'However, if you don''t trust your party guests, you might want to lock the computer completely'+#13#10+
+'and use the Nemp web server for remote control.';
 
 HeadSetLabel_Default1 = 'Headphones (no title loaded)';
 HeadSetLabel_Default2 = '(no title loaded)';
@@ -982,6 +990,7 @@ Hint_LyricPriorities              = 'Search online for lyrics. Current settings:
 ProgressForm_DefaultHint = 'Some functions are disabled during this process. You can cancel the current operation at any time.';
 ProgressForm_DefaultAction  = 'Nemp is updating your media library right now.';
 ProgressForm_SearchFiles    = 'Nemp is searching your computer for new music files.';
+ProgressForm_SearchFilesPlaylist = 'Nemp is searching your computer for new files to add to your playlist.';
 ProgressForm_RefreshFiles   = 'Nemp is refreshing your media library.';
 ProgressForm_CleanUp        = 'Nemp is searching for missing files in your media library. ';
 ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files.';
@@ -991,6 +1000,12 @@ ProgressForm_DeleteFiles    = 'Nemp is removing the selected files from your med
 
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
+
+Playlist_StartSearchingFiles  = 'Searching for music files ...';
+Playlist_SearchingNewFilesDir    = 'Searching for music files ... %s';
+Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The new files have been added to your playlist.';
+
+HTTP_Connection_Error = 'Error connecting %s: %s';
 
 implementation
 

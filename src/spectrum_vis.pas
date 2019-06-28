@@ -233,20 +233,22 @@ var Spectrum : TSpectrum;
 
 implementation
 
-uses NempMainUnit, VSTEditControls;
+uses NempMainUnit, VSTEditControls, system.UITypes;
 
 procedure DrawGradient(const Canvas: TCanvas; Color1, Color2: TColor;
                        ARect: TRect; GradientOrientation: TGradientOrientation; aHeight: Integer);
 var 
-  c1, c2, c: TPixelRec;  //for easy access to RGB values as well as TColor value 
+  c1, c2, c: TPixelRec;  //for easy access to RGB values as well as TColor value
   x, y: Integer;         //current pixel position to be set 
   OldPenWidth: Integer;  //Save old settings to restore them properly 
-  OldPenStyle: TPenStyle;//see above 
+  OldPenStyle: TPenStyle;//see above
+  OldPenColor: TColor;
 begin 
   c1.Color := ColorToRGB(Color1);  //convert system colors to RGB values
   c2.Color := ColorToRGB(Color2);  //if neccessary 
   OldPenWidth := Canvas.Pen.Width; //get old settings 
-  OldPenStyle := Canvas.Pen.Style; 
+  OldPenStyle := Canvas.Pen.Style;
+  OldPenColor := Canvas.Pen.Color;
   Canvas.Pen.Width:=1;             //ensure correct pen settings 
   Canvas.Pen.Style:=psInsideFrame;
 
@@ -258,10 +260,11 @@ begin
         c.r := Round(c1.r + (c2.r - c1.r) * (y) / aHeight);//(ARect.Bottom - ARect.Top));
         c.g := Round(c1.g + (c2.g - c1.g) * (y) / aHeight);//(ARect.Bottom - ARect.Top));
         c.b := Round(c1.b + (c2.b - c1.b) * (y) / aHeight);//(ARect.Bottom - ARect.Top));
-        Canvas.Brush.Color := c.Color; 
-        Canvas.FillRect(Classes.Rect(ARect.Left, (ARect.Bottom {- Arect.Top}) - y,
-                                     ARect.Right,(ARect.Bottom {- Arect.Top}) - y - 1));
-      end; 
+        Canvas.Pen.Color := 256*256 * c.b + 256*c.g + c.r;
+        // c.color doesnt work ... some issues with transparency ??
+        Canvas.MoveTo(ARect.Left, ARect.Bottom-y);
+        Canvas.LineTo(ARect.Right, ARect.Bottom-y);
+      end;
     end; 
     goHorizontal: 
     begin 
@@ -277,7 +280,8 @@ begin
     end; 
   end; 
   Canvas.Pen.Width := OldPenWidth; //restore old settings 
-  Canvas.Pen.Style := OldPenStyle; 
+  Canvas.Pen.Style := OldPenStyle;
+  Canvas.Pen.Color := OldPenColor;
 end;
 
 
@@ -515,9 +519,6 @@ begin
               goVertical,
               GradientBMPPreView.Height
              ) ;
-
-  //GradientBMPPreView.SaveToFile('C:\Users\Daniel\Delphi\Nemp SVN\Nemp\trunk\bin\grad.bmp');
-
 end;
 
 procedure TSpectrum.SetScale(aStretchFactor: Single);

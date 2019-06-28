@@ -2578,6 +2578,10 @@ begin
   begin
       UpdateFortsetzen := True;
       StatusBibUpdate := BIB_Status_ReadAccessBlocked;
+      // reset Coversearch
+      fLastPath := '';
+      fLastCoverName := '';
+      // start refreshing files
       fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_All, Self, 0, Dummy));
   end;
 end;
@@ -2588,6 +2592,10 @@ begin
   begin
       UpdateFortsetzen := True;
       StatusBibUpdate := BIB_Status_ReadAccessBlocked;
+      // reset Coversearch
+      fLastPath := '';
+      fLastCoverName := '';
+      // start refreshing files
       fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_Selected, Self, 0, Dummy));
   end;
 end;
@@ -2902,6 +2910,7 @@ begin
 
                     aAudioFile.FileIsPresent:=True;
 
+                    // possible ENetHTTPClientException is handled in Lyrics.GetLyris
                     LyricWikiResponse := Lyrics.GetLyrics(aAudiofile.Artist, aAudiofile.Titel);
                     if LyricWikiResponse <> '' then
                     begin
@@ -2938,6 +2947,14 @@ begin
                     begin
                         inc(failed);
                         CurrentSuccess := False;
+                        // as set by Lyrics.getLyrics, in case of an Exception
+                        if Lyrics.ExceptionOccured then
+                        begin
+                            ErrorOcurred := True;  // Count Exceptions?
+                            // Display Exception Message
+                            SendMessage(MainWindowHandle, WM_MedienBib, MB_MessageForLog, LParam(Lyrics.ExceptionMessage));
+                        end;
+
                     end;
                 end
                 else begin
@@ -2964,49 +2981,53 @@ begin
 
     // Build TotalStrings
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
-    // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    //BibSearcher.BuildTMPTotalString(Mp3ListePfadSort);
-    //BibSearcher.BuildTMPTotalLyricString(Mp3ListePfadSort);
-
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0);
     BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
 
-    if done + failed = 1 then
-    begin
-        // ein einzelnes File wurde angefordert
-        // Bei Mißerfolg einen Hinweis geben.
-        if (done = 0) then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SingleNotFound))))
-        else
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
-    end else
-    begin
-        // mehrere Dateien wurden gesucht.
-        if failed = 0 then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
-        else
-            if done > 0.5 * (failed + done) then
-                // ganz gutes Ergebnis - mehr als die Hälfte gefunden
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                    Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_ManyFound), [done, done + failed]))))
-            else
-                if done > 0 then
-                    // Nicht so tolles Ergebnis
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_FewFound), [done, done + failed]))))
-                else
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar(_(MediaLibrary_SearchLyricsComplete_NoneFound))))
-    end;
-
     if ErrorOcurred then
     begin
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SomeErrors))));
+        // display the Warning-Image
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessCompleteSomeErrors, 0);
+    end else
+    begin
+          if done + failed = 1 then
+          begin
+              // ein einzelnes File wurde angefordert
+              // Bei Misserfolg einen Hinweis geben.
+              if (done = 0) then
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchLyricsComplete_SingleNotFound))))
+              else
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
+          end else
+          begin
+              // mehrere Dateien wurden gesucht.
+              if failed = 0 then
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchLyricsComplete_AllFound))))
+              else
+                  if done > 0.5 * (failed + done) then
+                      // ganz gutes Ergebnis - mehr als die Hälfte gefunden
+                      SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                          Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_ManyFound), [done, done + failed]))))
+                  else
+                      if done > 0 then
+                          // Nicht so tolles Ergebnis
+                          SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                              Integer(PChar(Format(_(MediaLibrary_SearchLyricsComplete_FewFound), [done, done + failed]))))
+                      else
+                          SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                              Integer(PChar(_(MediaLibrary_SearchLyricsComplete_NoneFound))))
+          end;
     end;
-    //id3v2Tag.free;
+
+    //if ErrorOcurred then
+    //begin
+    //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+    //end;
     // UnblockMEssage is sent via CleanUpTMPLists
 end;
 
@@ -3120,11 +3141,18 @@ begin
 
             // bei einer exception ganz abbrechen??
             // nein, manchmal kommen ja auch BadRequests...???
-
             if trim(s) = '' then
             begin
                 inc(failed);
                 currentSuccess := False;
+
+                if BibScrobbler.ExceptionOccured then
+                begin
+                    ErrorOcurred := True;  // Count Exceptions?
+                    // Display Exception Message
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_MessageForLog, LParam(BibScrobbler.ExceptionMessage));
+                end;
+
             end else
             begin
                 backup := String(af.RawTagLastFM);
@@ -3186,41 +3214,51 @@ begin
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-    if done + failed = 1 then
-    begin
-        // ein einzelnes File wurde angefordert
-        // Bei Mißerfolg einen Hinweis geben.
-        if (done = 0) then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchTagsComplete_SingleNotFound))))
-        else
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
-    end else
-    begin
-        // mehrere Dateien wurden gesucht.
-        if failed = 0 then
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
-        else
-            if done > 0.5 * (failed + done) then
-                // ganz gutes Ergebnis - mehr als die Hälfte gefunden
-                SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                    Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_ManyFound), [done, done + failed]))))
-            else
-                if done > 0 then
-                    // Nicht so tolles Ergebnis
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_FewFound), [done, done + failed]))))
-                else
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar(_(MediaLibrary_SearchTagsComplete_NoneFound))))
-    end;
 
     if ErrorOcurred then
     begin
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                Integer(PChar(_(MediaLibrary_SearchTagsComplete_SomeErrors))));
+        // display the Warning-Image
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessCompleteSomeErrors, 0);
+    end else
+    begin
+          if done + failed = 1 then
+          begin
+              // ein einzelnes File wurde angefordert
+              // Bei Mißerfolg einen Hinweis geben.
+              if (done = 0) then
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchTagsComplete_SingleNotFound))))
+              else
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
+          end else
+          begin
+              // mehrere Dateien wurden gesucht.
+              if failed = 0 then
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar(_(MediaLibrary_SearchTagsComplete_AllFound))))
+              else
+                  if done > 0.5 * (failed + done) then
+                      // ganz gutes Ergebnis - mehr als die Hälfte gefunden
+                      SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                          Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_ManyFound), [done, done + failed]))))
+                  else
+                      if done > 0 then
+                          // Nicht so tolles Ergebnis
+                          SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                              Integer(PChar(Format(_(MediaLibrary_SearchTagsComplete_FewFound), [done, done + failed]))))
+                      else
+                          SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                              Integer(PChar(_(MediaLibrary_SearchTagsComplete_NoneFound))))
+          end;
     end;
+
+    //if ErrorOcurred then
+    //begin
+    //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
+    //end;
 end;
 
 
@@ -3339,27 +3377,38 @@ begin
 
 
     // present a summary of this operation in the progress window
-    if Updatefortsetzen then
+    if ErrorOcurred then
     begin
-        // user *did not* aborted the operation.
-        if errCount = 0 then
-            // everything is fine
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete, Integer(PChar(MediaLibrary_InconsistentFiles_Completed_Success)))
-        else
-        begin
-            // some files are still inconsitent
-            inconCount := CountInconsistentFiles;
-            SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                    Integer(PChar( Format(MediaLibrary_InconsistentFiles_Completed_SomeFailed,[inconCount]) )));
-        end;
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                Integer(PChar(_(MediaLibrary_InconsistentFiles_SomeErrors))));
+        // display the Warning-Image
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessCompleteSomeErrors, 0);
     end else
     begin
-        // user *did* click on "Abort"
-        // some ID3Tags are still inconsistent with the files in the library
-        inconCount := CountInconsistentFiles;
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                Integer(PChar( Format(MediaLibrary_InconsistentFiles_Abort,[inconCount]) )));
+          if Updatefortsetzen then
+          begin
+              // user *did not* aborted the operation.
+              if errCount = 0 then
+                  // everything is fine
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete, Integer(PChar(MediaLibrary_InconsistentFiles_Completed_Success)))
+              else
+              begin
+                  // some files are still inconsitent
+                  inconCount := CountInconsistentFiles;
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                          Integer(PChar( Format(MediaLibrary_InconsistentFiles_Completed_SomeFailed,[inconCount]) )));
+              end;
+          end else
+          begin
+              // user *did* click on "Abort"
+              // some ID3Tags are still inconsistent with the files in the library
+              inconCount := CountInconsistentFiles;
+              SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                      Integer(PChar( Format(MediaLibrary_InconsistentFiles_Abort,[inconCount]) )));
+          end;
     end;
+
+
 
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));

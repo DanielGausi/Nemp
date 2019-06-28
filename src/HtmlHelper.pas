@@ -38,6 +38,7 @@ uses Windows, Messages, SysUtils, Variants, Classes,
 
 
 function GetURLAsString(const AURL: string): string;
+
 function GetURLAsHttpResponse(const AURL: string): IHttpResponse;
 
 
@@ -50,11 +51,36 @@ function URLEncode_LastFM(const ASrc: String): String;
 function URLEncode_LyricWiki(const ASrc: String): String;
 function URLEncode_ChartLyricsManual(const ASrc: String): String;
 
+function GetDomainFromURL(aURL: String): String;
+
 implementation
 
-function GetURLAsString(const AURL: string): string;
+uses MainFormHelper, Nemp_RessourceStrings;
+
+function GetDomainFromURL(aURL: String): String;
+var pos1, pos2: Integer;
 begin
-    result := GetURLAsHttpResponse(aURL).ContentAsString();
+    pos1 := pos('://', aUrl);
+    if pos1 > 0 then
+    begin
+        pos2 := pos('/', aUrl, pos1+3);
+        if pos2 > 0 then
+            result := copy(aUrl, pos1+3, pos2-pos1-3)
+        else
+            result := copy(aUrl, pos1+3, length(aUrl));
+    end;
+end;
+
+
+
+function GetURLAsString(const AURL: string): string;
+var aResponse: IHttpResponse;
+begin
+    aResponse := GetURLAsHttpResponse(aURL);
+    if assigned(aResponse) then
+        result := aResponse.ContentAsString()
+    else
+        result := '';
 end;
 
 function GetURLAsHttpResponse(const AURL: string): IHttpResponse;

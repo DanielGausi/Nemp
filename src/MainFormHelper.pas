@@ -74,9 +74,6 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure BlockGUI(aBlockLevel: Integer);
     procedure UnBlockGUI;
 
-    // procedure StarteLangeAktion(max:integer;text:String; EnableStopButton: Boolean);
-    //procedure BeendeLangeAktion;
-
     procedure SetTabStopsPlayer;
     procedure SetTabStopsTabs;
 
@@ -580,6 +577,7 @@ begin
     if aBlockLEvel >= 1 then
     begin
         // Block "Update" access
+        // all done by Menu.OnPopup ;-)
     end;
 
     if aBlockLEvel >= 2 then
@@ -609,7 +607,7 @@ begin
 
     if aBlockLEvel >= 3 then
     begin
-        Nemp_MainForm.VST.OnHeaderClick:=NIL;
+        Nemp_MainForm.VST.OnHeaderClick := NIL;
         Nemp_MainForm.ReadyForGetFileApiCommands := False;
         // Block "Read" access = Block (almost) everything
     end;

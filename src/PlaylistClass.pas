@@ -84,6 +84,8 @@ type
       fLastEditedAudioFile: TAudioFile;   // the last edited AudioFile when manually sorting the PrebookList by keypress
       fLastKeypressTick: Int64;           // TickCount when the last keypress occured
 
+      fFileSearchCounter: Integer;        // used during a search for new files to display the progress
+
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
       PrebookList: TObjectList;
@@ -223,6 +225,7 @@ type
       property InsertNode: PVirtualNode read fInsertNode write SetInsertNode;
       property InsertIndex: Integer read fInsertIndex;
       property PrebookCount: Integer read fGetPreBookCount;
+      property FileSearchCounter: Integer read fFileSearchCounter write fFileSearchCounter;
 
       property LastHighlightedSearchResultNode: PVirtualNode read fLastHighlightedSearchResultNode;
       property UseWeightedRNG: Boolean read fUseWeightedRNG write SetUseWeightedRNG;
@@ -1186,7 +1189,6 @@ begin
 end;
 
 
-
 //Set fInsertNode/fInsertIndex from current position in the list
 procedure TNempPlaylist.GetInsertNodeFromPlayPosition;
 var i, PrebookIdx: Integer;
@@ -1197,7 +1199,7 @@ begin
         lastPrebookFile := TAudioFile(PrebookList[PrebookList.Count - 1]);
         PrebookIdx := Playlist.IndexOf(lastPrebookFile);
         InsertNode := VST.GetFirst;
-        for i := 0 to PrebookIdx do
+        for i := 0 to PrebookIdx-1 do
         begin
             if assigned(InsertNode) then
                 InsertNode := {f}InsertNode.NextSibling;
@@ -1208,11 +1210,15 @@ begin
         // d.h. PlayingNode ist noch in der Liste;
         if fPlayingNode <> NIL then
         begin
-          InsertNode := fPlayingNode.NextSibling;
+          InsertNode := fPlayingNode;
         end else
         begin
           // Playingfile gelöscht - Dateien an der Position einfügen, die
           // GetNextAudioFile ermitteln wird.
+          // note 2019: with the change to insert AFTER the current title,
+          //            this is not 100% exact - there will be nother title played
+          //            before the new ones. This could be done by "-2", but then it would
+          //            be inconsistent, if fPlayingIndex = 0.
           InsertNode := VST.GetFirst;
           for i := 0 to fPlayingIndex-1 do
           begin
@@ -1457,28 +1463,32 @@ begin
 
   if InsertNode <> NIL then
   begin
-    fInsertIndex := InsertNode.Index;
-    Playlist.Insert(fInsertIndex, Audiofile);
-    Inc(fInsertIndex);
-    NewNode := VST.InsertNode(fInsertNode, amInsertBefore, Audiofile);
+      fInsertIndex := InsertNode.Index;
+      Inc(fInsertIndex);
 
-    if AudioFile.Duration > MIN_CUESHEET_DURATION then
-    begin
-        Audiofile.GetCueList(aCueName, Audiofile.Pfad);
-        AddCueListNodes(Audiofile, NewNode);
-    end;
+      Playlist.Insert(fInsertIndex, Audiofile);
+
+      //NewNode := VST.InsertNode(fInsertNode, amInsertBefore, Audiofile);
+      NewNode := VST.InsertNode(fInsertNode, amInsertAfter, Audiofile);
+
+      if AudioFile.Duration > MIN_CUESHEET_DURATION then
+      begin
+          Audiofile.GetCueList(aCueName, Audiofile.Pfad);
+          AddCueListNodes(Audiofile, NewNode);
+      end;
   end else
   begin
-    Playlist.Add(Audiofile);
-    // indexnode ist NIL, also am Ende einfügen
-    NewNode := VST.AddChild(Nil, Audiofile);
-    if AudioFile.Duration > MIN_CUESHEET_DURATION then
-    begin
-        Audiofile.GetCueList(aCueName, Audiofile.Pfad);
-        AddCueListNodes(Audiofile, NewNode);
-    end;
+      Playlist.Add(Audiofile);
+      // indexnode ist NIL, also am Ende einfügen
+      NewNode := VST.AddChild(Nil, Audiofile);
+      if AudioFile.Duration > MIN_CUESHEET_DURATION then
+      begin
+          Audiofile.GetCueList(aCueName, Audiofile.Pfad);
+          AddCueListNodes(Audiofile, NewNode);
+      end;
   end;
   Result := NewNode;
+  InsertNode := NewNode;
   fDauer := fDauer + Audiofile.Duration;
   UpdatePlayListHeader(VST, Playlist.Count, fDauer);
   fPlaylistHasChanged := True;

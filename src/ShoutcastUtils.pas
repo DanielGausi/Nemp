@@ -568,7 +568,7 @@ begin
                 else
                 begin
                     // success
-                    s := AnsiString(aResponse.ContentStream);
+                    s := AnsiString(aResponse.ContentAsString);
                     SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadComplete, lParam(PAnsiChar(s)));
                 end;
             except

@@ -510,11 +510,6 @@ begin
         AuswahlStatusLBL.Font.Size := ChangeProc(fAdditionalPositionsArray[2].FontSize);
         GRPBOXArtistsAlben.Top := ChangeProc(fAdditionalPositionsArray[3].Top);
 
-
-
-
-
-
         PlayerHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[4].Height);
 
         PlaylistFillPanel.Left := ChangeProc(fAdditionalPositionsArray[5].Left);
@@ -536,7 +531,6 @@ begin
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[15].FontSize);
 
 
-
         MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
 
         MedienlisteFillPanel.Left := ChangeProc(fAdditionalPositionsArray[9].Left);
@@ -556,17 +550,21 @@ begin
         EDITFastSearch.Top := ChangeProc(fAdditionalPositionsArray[12].Top);
         EDITFastSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[12].FontSize);
 
-
-
-
         //CB_MedienBibGlobalQuickSearch.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
         //CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
         //CB_MedienBibGlobalQuickSearch.Left := ChangeProc(fAdditionalPositionsArray[13].Left);
         //CB_MedienBibGlobalQuickSearch.Top := ChangeProc(fAdditionalPositionsArray[13].Top);
 
-        Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[14].Height);
-        Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
+        Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
+        Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[13].FontSize);
         Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
+
+
+        EditPlaylistSearch.Height := ChangeProc(fAdditionalPositionsArray[14].Height);
+        EditPlaylistSearch.Width := ChangeProc(fAdditionalPositionsArray[14].Width);
+        EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[14].Left);
+        EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[14].Top);
+        EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
 
         //CB_MedienBibGlobalQuickSearch.Font.Size := EDITFastSearch.Font.Size;
 

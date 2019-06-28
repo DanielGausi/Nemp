@@ -45,6 +45,9 @@ type
         private
             fLastCall: TDateTime;
 
+            fExceptionOccured: Boolean;
+            fExceptionMessage: String;
+
             //function EncodeSessionKey(PlainKey: String): String;
             //function DecodeSessionKey(CryptedKey: String): String;
 
@@ -56,6 +59,9 @@ type
             function GenerateSignature(SortedParams: UnicodeString): UnicodeString; override;
         public
             IgnoreErrors: Boolean;
+
+            property ExceptionOccured: Boolean read fExceptionOccured;
+            property ExceptionMessage: String read fExceptionMessage;
 
             procedure LoadFromIni(Ini: TMemIniFile);
             procedure SaveToIni(Ini: TMemIniFile);
@@ -70,7 +76,7 @@ type
 
 implementation
 
-uses Systemhelper;
+uses Systemhelper, Nemp_RessourceStrings;
 
 function MD5UTF8String(const S: UTF8String): TMD5Digest;
 begin
@@ -308,10 +314,13 @@ end;
 function TNempScrobbler.GetTags(aAudioFile: tAudioFile): UnicodeString;
 var url: String;
     //aIDHttp: TIdHttp;
-    aHttpClient: THttpClient;
+    //aHttpClient: THttpClient;
     raw: String;
     n: Dword;
 begin
+    fExceptionOccured := False;
+    fExceptionMessage := '';
+
     if not assigned(aAudioFile) then
     begin
         result := '';
@@ -333,28 +342,17 @@ begin
     + '&track='  + URLEncode_LastFM(AnsiLowerCase(aAudioFile.Titel))
     + '&api_key=' + String(ApiKey);
 
-    // aIDHttp := TIdHttp.Create;
-    aHttpClient := THttpClient.Create;
+    result := '';
     try
-        //aIDHttp.ConnectTimeout:= 20000;
-        //aIDHttp.ReadTimeout:= 20000;
-        //aIDHttp.Request.UserAgent := 'Mozilla/3.0';
-        //aIDHttp.HTTPOptions :=  [];
-        aHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
-        aHttpClient.ConnectionTimeout := 5000;
-        aHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
-
-        try
-            //raw := aIDHttp.Get(url);
-            raw := aHttpClient.Get(url).ContentAsString();
-        except
-            raw := '';
-        end;
+        raw := GetURLAsString(url);
         result := ParseRawTag(raw, Nil);
+    except
+        on E: ENetHTTPClientException do
+        begin
+            fExceptionOccured := True;
+            fExceptionMessage := Format(HTTP_Connection_Error, [GetDomainFromURL(url), E.Message]);
+        end;
 
-    finally
-        //aIDhttp.Free;
-        aHttpClient.Free;
     end;
 end;
 

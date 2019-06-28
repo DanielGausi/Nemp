@@ -37,6 +37,8 @@ type
 
     procedure FinishProcess;
     procedure InitiateProcess(ShowImages: Boolean; aAction: TProgressActions=pa_Default);
+
+    procedure ShowWarning;
   end;
 
 var
@@ -132,6 +134,10 @@ begin
           LoadImage('SearchMusic.png');
           SetLabelWithHint(ProgressForm_SearchFiles);
       end;
+      pa_SearchFilesForPlaylist: begin
+          LoadImage('NempLogo.png');
+          SetLabelWithHint(ProgressForm_SearchFilesPlaylist);
+      end;
       pa_RefreshFiles  : begin
           LoadImage('Refresh.png');
           SetLabelWithHint(ProgressForm_RefreshFiles);
@@ -172,6 +178,14 @@ begin
         MainImage.Picture.LoadFromFile(aPath)
     else
         MainImage.Picture.Assign(Nil);
+end;
+
+procedure TProgressForm.ShowWarning;
+var filename: String;
+begin
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\alert.png';
+    if FileExists(filename) then
+        MainImage.Picture.LoadFromFile(filename);
 end;
 
 procedure TProgressForm.cbAutoCloseClick(Sender: TObject);
