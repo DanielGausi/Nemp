@@ -57,7 +57,7 @@ citecolor = black] {hyperref}
 \begin{titlepage}
 	\centering
 	{\scshape\LARGE Nemp - Noch ein mp3-Player \par}
-	Version 4.9 \par
+	Version 4.10 \par
 	\vspace{1cm}
 	\includegraphics[width=0.5\textwidth]{nemp.jpg}\par
 	\vspace{1cm}
@@ -232,7 +232,7 @@ Daher, für den Fall, dass regelmäßig \gf{merkwürdige} Fehler auftreten:
 
 Der Party-Modus war im Grunde eine buchstäbliche Schnapsidee. Wenn Nemp auf einer Party läuft und die Beschallung übernimmt, dann werden nach ein paar (oder ein paar mehr) Bierchen die Buttons ziemlich klein und sind nur noch schwer zu treffen. Im Party-Modus werden sie größer.
 
-Außerdem können hier einige Funktionen des Players deaktiviert werden, um unbeabsichtigte Änderungen an der Medienbibliothek oder einzelner Dateien zu verhindern.
+Außerdem sind hier einige Funktionen des Players deaktiviert, um unbeabsichtigte Änderungen an der Medienbibliothek oder einzelner Dateien zu verhindern. Ebenso ist das Löschen aller Titel aus der Playlist nicht möglich - das geht im Partymodus nur einzeln.
 
 Der Party-Modus kann über ein Passwort gesichert werden, das aber nur eine Alibi-Funktion hat. Es verhindert nicht, dass Nemp beendet werden kann, um dann im normalen Modus wieder neu gestartet zu werden.
 
@@ -650,7 +650,7 @@ Der zweite Tab enthält die grundlegenden Eigenschaften der \emph{ID3-Tags}. Bei 
 %\label{sec_lyrics}
 Im dritten Tab können \textbf{Lyrics und Bilder} bearbeitet werden. Wenn Sie Liedtexte für mehrere Musikstücke bearbeiten wollen, dann dürfte es in der Regel schneller sein, die mehrfache Suche nach Lyrics zu benutzen. Dazu markieren Sie mehrere Dateien im Hauptfenster, und wählen Sie die Funktion \textsc{Hole Lyrics} (Tastenkombination \textsc{Strg+L}). Das dauert auch ein wenig, und es werden nicht zu allen Titeln (die richtigen) Texte gefunden, aber die Trefferquote ist doch sehr ordentlich. 
 
-Seit Version 4.9.3 wird nicht nur die Seite \emph{lyrics.wikia.com} benutzt, sondern optional auch \emph{chartlyrics.com}. Welche Quelle mit welcher Priorität verwendet wird, kann in den Optionen eingestellt werden. Die neue Seite Chartlyrics sollte aber nur als Fallback verwendet werden. Bei der Suche dort werden einige Suchbegriffe automatisiert ausgefiltert. Zum Beispiel \emph{are, take, that, the, who, are, you} und viele andere. Was das für Auswirkungen auf Titel von \emph{Take That} oder \emph{The Who} hat (insbesondere der Titel \emph{Who are you?}) kann man sich dann selber ausmalen.
+Seit Version 4.10 wird nicht nur die Seite \emph{lyrics.wikia.com} benutzt, sondern optional auch \emph{chartlyrics.com}. Welche Quelle mit welcher Priorität verwendet wird, kann in den Optionen eingestellt werden. Die neue Seite Chartlyrics sollte aber nur als Fallback verwendet werden. Bei der Suche dort werden einige Suchbegriffe automatisiert ausgefiltert. Zum Beispiel \emph{are, take, that, the, who, are, you} und viele andere. Was das für Auswirkungen auf Titel von \emph{Take That} oder \emph{The Who} hat (insbesondere der Titel \emph{Who are you?}) kann man sich dann selber ausmalen.
 
 %\subsubsection{Erweiterte Tags}
 Im vierten Tab können Sie die erweiterten Tags für die \hyperref[sec_tagwolke]{Tagwolke} bearbeiten. Für die Tagwolke sind weitere Tags sehr nützlich, denn die wenigen Standard-Tags reichen für eine sinnvolle Kategorisierung nicht aus. 
@@ -1071,8 +1071,6 @@ Diese beiden Optionen beißen sich etwas, und es kann unter Umständen zu unerwart
 Die Webradio-Funktionen in Nemp sind relativ rudimentär. Nemp unterstützt zwar Webradio, aber der Schwerpunkt liegt nicht darauf.
 \begin{itemize}
 \item \textbf{Stream-Playlist parsen.} In den kleinen Dateien, die man von Webradio-Seiten im Internet runterlädt, können mehrere Adressen aufgelistet sein, die in der Regel alle das gleiche senden, aber ggf. in unterschiedlichen Qualitäten. Nemp kann entweder diese Datei parsen und alle Sender zum abspielen anbieten, oder nur einen Eintrag, aus dem dann die Wiedergabe-Engine einen passenden Sender selbstständig auswählt.
-\begin{hinweis} Nemp selbst kann (noch) keine sicheren https-Verbindungen nutzen. Wenn die Playlist-URL vom Sender automatisch auf die sichere URL (beginnend mit \textsc{https://}) umleitet, dann kann Nemp die Playlist-Datei nicht herunterladen und entsprechend auch nicht parsen. Die empfohlene Einstellung ist es daher, nur die Playlist-URL in die Playlist aufzunehmen. Die verwendete Wiedergabe-Engine regelt dann den Rest.
-\end{hinweis}
 \item \textbf{Aufnahmeoptionen.} Nemp kann auch Webstreams im Mp3-Format aufnehmen. Hier kann eingestellt werden, wo die Aufnahmen gespeichert werden sollen, wie die Dateien benannt werden sollen, ob für jeden Sender ein eigener Unterordner verwendet werden soll, und ob und wie die Dateien geschnitten werden sollen.
 
 Das Beginnen einer neuen Datei bei Titelwechsel ist davon abhängig, wie genau der Sender die Meta-Informationen mitsendet. Bei einigen Sendern klappt das sehr gut, bei einigen schlecht, bei wieder anderen praktisch gar nicht.
@@ -1334,12 +1332,15 @@ Das Nemp-Deskband für Windows XP und auch die Display-App für die Logitech G15, 
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
 
-\subsection*{Version 4.9.3, Mai 2019}
+\subsection*{Version 4.10.0, Juli 2019}
 \begin{itemize}
 \item Suche nach Lyrics gefixed: Anpassung an das neue Template, Umstellung auf https
 \item zusätzliche Quelle für Liedtexte hinzugefügt (dort nur http möglich)
 \item Umstellung von http auf https, wo es möglich ist (Scrobbeln, Cover-Suche, teilweise Lyrics)
 \item Umstieg auf Delphi 10.3 Rio (Community Edition)
+\item Diverse Korrekturen bzw. kleinere Verbesserungen am GUI, vor allem bei der Fortschrittsanzeiger länger andauernder Funktionen
+\item Möglicher Datenverlust bei ID3-Tags bei Verwendung von automatischer Beschaffung von Lyrics und erweiterten Tags behoben
+\item maximale Anzahl der Dateien in einer Drag\&Drop-Operation konfigurierbar (nur direkt in der Nemp.ini, Wert \textsc{[Allgemein]}-\textsc{maxDragFileCount})  
 \end{itemize}
 
 \subsection*{Version 4.9.2, Januar 2019}

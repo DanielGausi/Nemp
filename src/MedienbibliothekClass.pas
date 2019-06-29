@@ -1509,14 +1509,14 @@ begin
     MB.CleanUpTmpLists;        // status: ok (No StatusChange allowed)
 
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar( MediaLibrary_SearchingNewFilesComplete ) ));
+                        Integer(PChar(_(MediaLibrary_SearchingNewFilesComplete ) )));
 
     if MB.ChangeAfterUpdate then
         MB.Changed := True;
   end else
   begin
       SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar( MediaLibrary_SearchingNewFiles_NothingFound ) ));
+                        Integer(PChar(_(MediaLibrary_SearchingNewFiles_NothingFound )) ));
 
       SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
   end;
@@ -1977,7 +1977,7 @@ begin
             if askUser then
             begin
                 // let the user correct the list
-                SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput)));
+                SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(_(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput))));
 
                 SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
                 MB.fReFillDeadFilesByDataList(DeleteDataList);
@@ -2011,14 +2011,14 @@ begin
         MB.CleanUpTmpLists;                   // status: ok, no change allowed
 
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar( DeleteSelect_DeletingFilesComplete ) ));
+                        Integer(PChar(_(DeleteSelect_DeletingFilesComplete )) ));
     end else
     begin
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
 
         SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar( DeleteSelect_DeletingFilesAborted ) ));
+                        Integer(PChar(_(DeleteSelect_DeletingFilesAborted )) ));
     end;
 
 
@@ -2746,7 +2746,7 @@ begin
       DeleteDataList := TObjectList.Create(False);
       try
           fPrepareUserInputDeadFiles(DeleteDataList);
-          SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput)));
+          SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(_(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput))));
           SendMessage(MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
           // user can change DeleteDataList (set the DoDelete-property of the objects)
           // so: Change the DeadFiles-list and fill it with the files that should be deleted.
@@ -2771,7 +2771,7 @@ begin
   LeaveCriticalSection(CSUpdate);
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                        Integer(PChar( MediaLibrary_RefreshingFilesCompleteFinished ) ));
+                        Integer(PChar(_(MediaLibrary_RefreshingFilesCompleteFinished ) )));
 
   // Status zurücksetzen, Unblock library
   SendMessage(MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
@@ -3396,7 +3396,7 @@ begin
                   // some files are still inconsitent
                   inconCount := CountInconsistentFiles;
                   SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                          Integer(PChar( Format(MediaLibrary_InconsistentFiles_Completed_SomeFailed,[inconCount]) )));
+                          Integer(PChar( Format(_(MediaLibrary_InconsistentFiles_Completed_SomeFailed),[inconCount]) )));
               end;
           end else
           begin
@@ -3404,7 +3404,7 @@ begin
               // some ID3Tags are still inconsistent with the files in the library
               inconCount := CountInconsistentFiles;
               SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-                      Integer(PChar( Format(MediaLibrary_InconsistentFiles_Abort,[inconCount]) )));
+                      Integer(PChar( Format(_(MediaLibrary_InconsistentFiles_Abort),[inconCount]) )));
           end;
     end;
 

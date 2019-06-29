@@ -8,9 +8,9 @@
       eMail: mail@gausi.de
 
       Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.3
-      Januar 2005 - Mai 2019
+      Januar 2005 - Juli 2019
 
-      Version: 4.9.3
+      Version: 4.10.0
 
 
 -----------------------------------------------------------
@@ -63,11 +63,29 @@ GPL 2.0 oder später
 (Details in der licence.txt und der gpl.txt)
 
 
-Version 4.9.3, Mai 2019
+Version 4.10.0, Juli 2019
 ----------------------------------------------------------- 
-- Lyricsuche gefixed
+- Lyricsuche gefixed und erweitert
 - Umstieg von http auf https (wo es möglich ist)
 - Wechsel auf Delphi 10.3 (Community Edition)
+- Diverse Korrekturen bzw. kleinere Verbesserungen am GUI
+  * einige verrutschte Kontrollelemente im Partymodus
+  * Funktionsumfang im Partymodus stärker eingeschränkt
+    (z.B. Löschen von Titeln aus der Playlist nur noch einzeln möglich)
+  * bessere und einheitlichere Anzeige des Fortschritts bei länger 
+    andauernden Operationen
+  * Probleme mit Transparenzen bei einigen Buttons im Dark-Skin behoben
+  * Unter Umständen führten bestimmte Bedienabfolgen zu einem 
+    Absturz des Players
+  * Bearbeitung der Bewertung direkt in der Liste erst nach Klick,
+    dafür aber auch per Tastatur steuerbar: 1-5, +, -
+- Möglicher Datenverlust bei ID3-Tags bei Verwendung von automatischer
+  Beschaffung von Lyrics und erw. Tags behoben
+- Entfernen von Playlist-Dateien aus der Medienbibliothek funktionierte nicht
+- Nach Löschung des Cover-Archivs wird nun nicht mehr unbedingt eine
+  "Nemp-Autocover.jpg" im Musikverzeichnis erzeugt
+- max. Anzahl der Dateien in einer Drag&Drop-Operation konfigurierbar 
+  (nur direkt in der Nemp.ini, Wert [Allgemein]-maxDragFileCount)
 
 
 Version 4.9.2, Januar 2019

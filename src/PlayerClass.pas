@@ -822,8 +822,8 @@ begin
     BASS_SetConfig(BASS_CONFIG_BUFFER, PlayBufferSize);
 
     // more stable Webradio? (2019) ---
-    BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 10000);          setting ???
-    BASS_SetConfig(BASS_CONFIG_NET_READTIMEOUT, 2000);      setting ???
+    BASS_SetConfig(BASS_CONFIG_NET_BUFFER, 10000);
+    BASS_SetConfig(BASS_CONFIG_NET_READTIMEOUT, 2000);
     // ---
 
     UpdateFlags;

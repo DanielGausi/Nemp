@@ -57,7 +57,7 @@ citecolor = black] {hyperref}
 	\centering
 	{\scshape\LARGE Nemp - Noch ein mp3-Player\footnote{\emph{Noch ein mp3-Player} translates to \emph{Yet another mp3-player}} \par}
 	
-	Version 4.8 \par
+	Version 4.10 \par
 	\vspace{1cm}
 	\includegraphics[width=0.5\textwidth]{nemp.jpg}\par
 	\vspace{1cm}
@@ -226,7 +226,7 @@ Therefore, in case of regular \gf{odd} errors occur:
 
 The party mode was basically a literal crazy idea. If Nemp runs on a party and takes over the sound system, then after a few (or a few more) beers the buttons become quite small and are hard to hit. In Party mode, they get bigger.
 
-You can also disable some of the player's features to prevent accidental changes to the library or individual files.
+Some of the player's features are disabled in party mode to prevent accidental changes to the library or individual files. Also it is not possible to delete the complete playlist at once - you have to remove the titles one by one in party mode.
 
 Party mode can be secured by a password, which has only an alibi function. It does not prevent that Nemp can be terminated and then restarted in normal mode.
 
@@ -641,7 +641,7 @@ The second tab contains the basic properties of the \emph{ID3 tags}. For some fi
 
 In the third tab you can edit \textbf{lyrics and pictures}. If you want to edit lyrics for several titles, it might be faster to use the multiple search for lyrics. To do this, select several files in the main window and select the \textsc{Get  Lyrics} function (key combination \textsc{Ctrl+L}). This will take a little time, and not all titles will be found with the correct lyrics, but the hit rate is quite good.
 
-Since version 4.9.3 not only the page \emph{lyrics.wikia.com} is used, but optionally also \emph{chartlyrics.com}. Which source is used with which priority can be set in the options. The new page Chartlyrics should only be used as fallback. When searching on this page, some search terms will be filtered out automatically. For example \emph{are, take, that, the, who, are, you} and many others. What effects this will have on the titles from Bands like \emph{Take That} or \emph{The Who} (especially the title \emph{Who are you?}) you can then imagine yourself.
+Since version 4.10 not only the page \emph{lyrics.wikia.com} is used, but optionally also \emph{chartlyrics.com}. Which source is used with which priority can be set in the options. The new page Chartlyrics should only be used as fallback. When searching on this page, some search terms will be filtered out automatically. For example \emph{are, take, that, the, who, are, you} and many others. What effects this will have on the titles from Bands like \emph{Take That} or \emph{The Who} (especially the title \emph{Who are you?}) you can then imagine yourself.
 
 In the fourth tab you can edit the extended tags for the \hyperref[sec_tagwolke]{tag cloud}. For this tag cloud, further tags are very useful, because the few standard tags are not sufficient for a meaningful categorization. 
 
@@ -1089,9 +1089,6 @@ The web radio functions in Nemp are quite rudimentary. Nemp supports web radio, 
 \begin{itemize}
 \item \textbf{Parse stream playlist.} In the small files downloaded from web radio sites on the Internet, several URLs can be listed, which usually all send the same but in different qualities. Nemp can either parse this file and offer all stations to play, or only one entry from which the playback engine selects a suitable station on its own.
 
-\begin{hinweis} Nemp itself cannot (yet) use secure https connections. If the playlist URL is automatically redirected by the sender to the secure URL (starting with \textsc{https://}), then Nemp cannot download and parse the playlist file. The recommended setting is therefore to include only the playlist URL in the playlist. The playback engine used will then control the rest.
-\end{hinweis}
-
 \item \textbf{Recording settings.} Nemp can also record webstreams in mp3 format. Here you can set where the recordings should be saved, how the files should be named, whether a separate subfolder should be used for each station, and whether and how the files should be cut.
 
 Beginning a new file when changing the title depends on how exactly the sender sends the meta information. This works very well for some stations, badly for some, and practically not at all for others.
@@ -1356,12 +1353,16 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
 
-\subsection*{Version 4.9.3, May 2019}
+\subsection*{Version 4.10.0, July 2019}
 \begin{itemize}
 \item fixed the search for lyrics: new template, change to https
 \item additional source for lyrics 
 \item Switched from http to https where possible (scrobbling, search for cover, partially lyrics)
 \item Upgrade to Delphi 10.3 Rio (Community Edition)
+\item Various fixes and minor improvements on the GUI, especially for the progress indicator of longer lasting functions
+\item Possible data loss in ID3 tags fixed when using automatic lyrics retrieval and getting extended tags
+\item configurable maximum number of files for a Drag\&Drop operation (only manually in the Nemp.ini, value \textsc{[Allgemein]}-\textsc{maxDragFileCount})  
+
 \end{itemize}
 
 \subsection*{Version 4.9.2, January 2019}
