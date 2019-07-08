@@ -898,13 +898,28 @@ begin
     // Flags auswerten
     Stretch := (Flags and cmNoStretch) = 0;
 
-    filename := MedienBib.CoverSavePath + '_default_cover.jpg';
-    if not FileExists(filename) then
-        filename := MedienBib.CoverSavePath + '_default_cover.png';
-    if not FileExists(filename) then
-        filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
-    if not FileExists(filename)  then
-        filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
+    {filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+    if aType = dcWebRadio  then
+    begin
+        filename := MedienBib.CoverSavePath + '_default_cover_webradio.jpg';
+        if not FileExists(filename) then
+            filename := MedienBib.CoverSavePath + '_default_cover_webradio.png';
+        if not FileExists(filename) then
+            filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_webradio.png';
+        if not FileExists(filename)  then
+            filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_webradio.jpg';
+    end; //else
+    if not FileExists(filename) then}
+    begin
+        filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+        if not FileExists(filename) then
+            filename := MedienBib.CoverSavePath + '_default_cover.png';
+        if not FileExists(filename) then
+            filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+        if not FileExists(filename)  then
+            filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
+    end;
+
 
     if FileExists(filename) then
     begin

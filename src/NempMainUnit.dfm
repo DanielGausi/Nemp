@@ -562,6 +562,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
+          ExplicitLeft = 0
           Columns = <
             item
               Margin = 0

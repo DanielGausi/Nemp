@@ -4786,6 +4786,7 @@ begin
 
   case key of
     VK_Return: begin
+        MediaListPopupTag := 3; // Set the value to "VST"
         case NempPlaylist.DefaultAction of
             PLAYER_ENQUEUE_FILES: PM_ML_Enqueue.Click  ;
             PLAYER_PLAY_FILES   : PM_ML_Play.Click     ;
@@ -10202,7 +10203,6 @@ begin
   begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
-          //MedienBib.ShowQuickSearchList;
           MedienBib.RestoreAnzeigeListeAfterQuicksearch;
           RestoreCoverFlowAfterSearch;
       end
@@ -10211,7 +10211,7 @@ begin
           begin
               RefreshCoverFlowTimer.Enabled := False;
               DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
-              if (MedienBib.AnzeigeListe.Count) {+ (MedienBib.AnzeigeListe2.Count)} > 1 then
+              if (MedienBib.AnzeigeListe.Count) > 1 then
               begin
                   // Restart Timer
                   if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow

@@ -34,7 +34,7 @@ object AboutForm: TAboutForm
       ''
       '[b]Nemp - Noch ein Mp3-Player[/b]'
       ''
-      'Copyright '#169' 2005-2018 Daniel '#39'Gausi'#39' Gaussmann'
+      'Copyright '#169' 2005-2019 Daniel '#39'Gausi'#39' Gaussmann'
       ' '
       'Website: [url="http://www.gausi.de"]http://www.gausi.de[/url]'
       'e-Mail: [url="mailto:mail@gausi.de"]mail@gausi.de[/url]'
@@ -64,7 +64,7 @@ object AboutForm: TAboutForm
       '[row="200"]'
       ''
       ''
-      'Programmed with CodeGear Delphi 2009 / XE2 / XE3'
+      'Programmed with CodeGear Delphi 2009 / XE2 / XE3 / 10.x'
       ''
       ''
       '[b]Used components/units[/b]'
@@ -145,21 +145,6 @@ object AboutForm: TAboutForm
       
         '... just by saying "thank you, this is a fine piece of software"' +
         ' '
-      ''
-      ''
-      '[row="200"]'
-      ''
-      ''
-      '[b]Some music I listened to during coding[/b]'
-      ''
-      'The Avatar Soundtrack'
-      ''
-      
-        '[url="http://www.jamendo.com/de/album/78275"]Kendra Springer - H' +
-        'ope[/url]'
-      ''
-      'I think its ok to mention some amazing billion-dollar-stuff '
-      'and a wonderful creative-commons-work in one sentence...'
       ''
       ''
       '[row="200"]')
