@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -550,11 +550,6 @@ begin
         EDITFastSearch.Top := ChangeProc(fAdditionalPositionsArray[12].Top);
         EDITFastSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[12].FontSize);
 
-        //CB_MedienBibGlobalQuickSearch.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
-        //CB_MedienBibGlobalQuickSearch.Width := ChangeProc(fAdditionalPositionsArray[13].Width);
-        //CB_MedienBibGlobalQuickSearch.Left := ChangeProc(fAdditionalPositionsArray[13].Left);
-        //CB_MedienBibGlobalQuickSearch.Top := ChangeProc(fAdditionalPositionsArray[13].Top);
-
         Lbl_CoverFlow.Height := ChangeProc(fAdditionalPositionsArray[13].Height);
         Lbl_CoverFlow.Font.Size := ChangeProc(fAdditionalPositionsArray[13].FontSize);
         Lbl_CoverFlow.Top := (Pnl_CoverFlowLabel.Height Div 2) - (Lbl_CoverFlow.Height Div 2);
@@ -565,9 +560,6 @@ begin
         EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[14].Left);
         EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[14].Top);
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
-
-        //CB_MedienBibGlobalQuickSearch.Font.Size := EDITFastSearch.Font.Size;
-
 
         PlaylistVST.Font.Size := ChangeProc(NempOptions.DefaultFontSize);
         ArtistsVST.Font.Size  := ChangeProc(NempOptions.ArtistAlbenFontSize);
@@ -765,143 +757,6 @@ begin
         WebserverImage    .Enabled := not DoBlockTools;
     end;
 
-    (*
-    exit;
-
-    vis := not fActive;
-    with Nemp_MainForm do
-    begin
-        // Popup-Menu Library
-        PM_ML_BrowseByMore    .Enabled := vis;
-        PM_ML_Medialibrary    .Visible := vis;
-        PM_ML_Medialibrary    .Enabled := vis;
-        PM_ML_SearchDirectory .Visible := vis;
-        PM_ML_SearchDirectory .Enabled := vis;
-        PM_ML_Webradio        .Visible := vis;
-        PM_ML_Webradio        .Enabled := vis;
-        PM_ML_DeleteSelected.Visible := vis; // enabled is done at OnPopup
-        //-----
-        N72                            .Visible := vis;   // - before "set rating of selected files"
-        PM_ML_SetRatingsOfSelectedFilesCHOOSE.Visible := vis;
-        PM_ML_SetRatingsOfSelectedFilesCHOOSE.Enabled := vis;
-        PM_ML_GetLyrics   .Visible := vis; // enabled is done at OnPopup
-        PM_ML_GetTags     .Visible := vis; // enabled is done at OnPopup
-        PM_ML_CloudEditor .Visible := vis;
-        PM_ML_CloudEditor .Enabled := vis;
-        // --
-        PM_ML_PasteFromClipboard.Visible := vis; // enabled is done at OnPopup
-        //--
-        PM_ML_RefreshSelected.Visible := vis; // enabled is done at OnPopup
-        PM_ML_Properties     .Visible := vis; // enabled is done at OnPopup
-
-        // Popup Player
-        PM_P_Preferences.Visible := vis;
-        //--
-        N36             .visible := not DoBlockTools; // '-' before shutdown
-        PM_P_ShutDown   .visible := not DoBlockTools;
-        PM_P_Birthday   .visible := not DoBlockTools;
-        PM_P_RemoteNemp .visible := not DoBlockTools;
-        PM_P_Scrobbler  .visible := not DoBlockTools;
-        PM_P_Directories.visible := not DoBlockTools;
-        PM_P_CheckForUpdates.visible := not DoBlockTools;
-        PM_P_KeyboardDisplay.Visible := vis;
-        // --
-        PM_P_Wizard                         .Visible := vis;
-        PM_P_ViewCompact                    .Visible := vis;
-        PM_P_ViewCompactComplete            .Visible := vis;
-        N31                                 .Visible := vis;
-        PM_P_ViewSeparateWindows            .Visible := vis;
-        PM_P_ViewSeparateWindows_Equalizer  .Visible := vis;
-        PM_P_ViewSeparateWindows_Playlist   .Visible := vis;
-        PM_P_ViewSeparateWindows_Medialist  .Visible := vis;
-        PM_P_ViewSeparateWindows_Browse     .Visible := vis;
-        PM_P_ViewStayOnTop                  .Visible := vis;
-        N35                                 .Visible := vis;
-        if vis then
-            PM_P_PartyMode.Caption := MenuItem_Partymode
-        else
-            PM_P_PartyMode.Caption := MenuItem_PartymodeExit;
-
-
-
-        // Popup Playlist
-        PM_PL_SetRatingofSelectedFilesTo .Visible := vis;
-        PM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
-        PM_PL_ExtendedAddToMedialibrary  .Visible := vis;
-        PM_PL_ExtendedAddToMedialibrary  .Enabled := vis;
-        PM_PL_Properties                 .Visible := vis;
-        PM_PL_Properties                 .Enabled := vis;
-
-        // Mainmenu
-        // Medialibrary
-        MM_ML_SearchDirectory     .Visible := vis;
-        MM_ML_SearchDirectory     .Enabled := vis;
-        MM_ML_Webradio            .Visible := vis;
-        MM_ML_Webradio            .Enabled := vis;
-        MM_ML_BrowseByMore        .Enabled := vis;
-        //--
-        MM_ML_Delete              .Visible := vis;
-        MM_ML_Delete              .Enabled := vis;
-        MM_ML_Load                .Visible := vis;
-        MM_ML_Load                .Enabled := vis;
-        MM_ML_Save                .Visible := vis;
-        MM_ML_Save                .Enabled := vis;
-        MM_ML_DeleteMissingFiles  .Visible := vis;
-        MM_ML_DeleteMissingFiles  .Enabled := vis;
-        MM_ML_ExportAsCSV         .Visible := vis;
-        MM_ML_ExportAsCSV         .Enabled := vis;
-        N21                       .Visible := vis;
-        //---
-        {MM_ML_DeleteSelectedFiles .Visible := vis;
-        MM_ML_DeleteSelectedFiles .Enabled := vis;
-        MM_ML_SetRatingSelected   .Visible := vis;
-        MM_ML_SetRatingSelected   .Enabled := vis;
-        MM_ML_GetLyrics           .Visible := vis;
-        MM_ML_GetLyrics           .Enabled := vis;
-        MM_ML_GetAdditionalTags   .Visible := vis;
-        MM_ML_GetAdditionalTags   .Enabled := vis;
-        }
-        //N70                       .Visible := vis;
-        //--
-        MM_ML_RefreshAll          .Visible := vis;
-        MM_ML_RefreshAll          .Enabled := vis;
-        //MM_ML_ResetRatings        .Visible := vis;
-        //MM_ML_ResetRatings        .Enabled := vis;
-        // Playlist
-        //MM_PL_SetRatingofSelectedFilesTo .Visible := vis;
-        //MM_PL_SetRatingofSelectedFilesTo .Enabled := vis;
-        MM_PL_ExtendedAddToMedialibrary  .Visible := vis;
-        MM_PL_ExtendedAddToMedialibrary  .Enabled := vis;
-        //MM_PL_Properties                 .Visible := vis;
-        //MM_PL_Properties                 .Enabled := vis;
-        // Settings
-        MM_O_Preferences                    .Visible := vis;
-        MM_O_Wizard                         .Visible := vis;
-        MM_O_ViewCompact                    .Visible := vis;
-        MM_O_ViewCompactComplete            .Visible := vis;
-        N34                                 .Visible := vis;
-        MM_O_ViewSeparateWindows            .Visible := vis;
-        MM_O_ViewSeparateWindows_Equalizer  .Visible := vis;
-        MM_O_ViewSeparateWindows_Playlist   .Visible := vis;
-        MM_O_ViewSeparateWindows_Medialist  .Visible := vis;
-        MM_O_ViewSeparateWindows_Browse     .Visible := vis;
-        MM_O_ViewStayOnTop                  .Visible := vis;
-        N32                                 .Visible := vis;
-        if vis then
-            MM_O_PartyMode.Caption := MenuItem_Partymode
-        else
-            MM_O_PartyMode.Caption := MenuItem_PartymodeExit;
-
-        // Tools
-        MM_Tools        .Visible := not DoBlockTools;
-
-        // Images
-        ScrobblerImage    .Enabled := not DoBlockTools;
-        BirthdayImage     .Enabled := not DoBlockTools;
-        SleepImage        .Enabled := not DoBlockTools;
-        WebserverImage    .Enabled := not DoBlockTools;
-    end;
-    *)
 end;
 
 procedure TNempPartyMode.SetActive(value: Boolean);

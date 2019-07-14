@@ -22,7 +22,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -70,7 +70,6 @@ const
 
 
 Type
-    // TSCQueryMode = (QM_Genre, QM_Search);
 
     TStation = class
         private
@@ -93,8 +92,6 @@ Type
             // oder sinnfreier String, d.h. keine Station drinne (False)
             //function GetInfoFromString(s: String): Boolean;
             procedure fDownloadPlaylist;
-
-            // procedure fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
 
         public
             property Name: String           read fName         write fName;
@@ -122,51 +119,6 @@ Type
             procedure LoadFromStream(aStream: TStream);
             procedure SaveToStream(aStream: TStream);
     end;
-
-    (*
-    TShoutcastQuery = class
-        private
-            fWindowHandle: Hwnd;
-            fThread: Integer;
-            fDownloadString: String;
-
-            // Threadsafe arbeiten!
-            fStatus: Integer;
-            fCancelDownload: LongBool;
-            fQueryString: String;
-            fStationList: TObjectList;
-
-            procedure SetStatus(Value: Integer);
-            function GetStatus: Integer;
-
-            procedure SetCancelDownload(Value: LongBool);
-            function GetCancelDownload: LongBool;
-
-            procedure SetQueryString(Value: String);
-            function GetQueryString: String;
-
-            // Methoden, die im Nebenthread ablaufen:
-            procedure fDownloadStationList;
-            procedure fParseStationList;
-
-            procedure fDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
-            procedure fDownloadWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
-
-            // private Properties
-            property QueryString: String read GetQueryString write SetQueryString;
-
-
-        public
-            property Status: Integer read GetStatus write SetStatus;
-            property CancelDownload: LongBool read GetCancelDownload write SetCancelDownload;
-
-            constructor Create(aHandle: HWnd);
-            destructor Destroy; override;
-
-            procedure DownloadStationList(aQuery: String; aMode: TSCQueryMode);
-
-    end;
-    *)
 
     /// procedure StartPrivateDownloadProcedure(SQ: TShoutcastQuery);
     procedure StartDownloadPlaylist(St: TStation);
@@ -197,35 +149,8 @@ Type
 
 var
     CSQueryString: RTL_CRITICAL_SECTION;
-    // CSGetStationList: RTL_CRITICAL_SECTION;
-
-//const
-//    SC_GenreSearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?genre=';
-//    SC_SearchTemplate = 'http://yp.shoutcast.com/sbin/newxml.phtml?search=';
-//    SC_PlaylistTemplate = 'http://yp.shoutcast.com/sbin/tunein-station.pls?id=';
 
 implementation
-
-
-{
-function DecodeShoutcastString(s: String): String;
-var beginPos, endPos: Integer;
-    nStr: String;
-    n: Integer;
-begin
-    beginPos := pos('&#', s);
-    while beginPos <> 0 do
-    begin
-        endPos := PosEx(';', s, beginPos);
-        nStr := Copy(s, beginPos + 2, endPos - beginPos - 2);
-        n := StrToIntDef(nStr, 32);
-        s := StringReplace(s, '&#' + nstr + ';', chr(n), [rfReplaceAll]);
-        beginPos := pos('&#', s);
-    end;
-    s := StringReplace(s, '&amp;', '&', [rfReplaceAll]);
-    result := s;
-end;
-}
 
 function UrlIsPlaylist(aURL: String): Boolean;
 var //slash, doubleslash, dp: Integer;
@@ -393,100 +318,6 @@ begin
     fCount        := aStation.Count        ;
 end;
 
-{
-// Diese Methode bekommt eine Zeile aus dem DownloadString
-function TStation.GetInfoFromString(s: String): Boolean;
-var beginPos, endPos: Integer;
-    IDtmp: String;
-begin
-    // Aufbau des Strings:
-    //<station name="fName" mt="fMediaType" id="fID" br="fBitrate" genre="fGenre" ct="fCurrentTitle" lc="fCount"></station>
-
-    if (pos('<station', s) = 0) or (pos('</station>', s) = 0) then
-        result := false
-    else
-    begin
-        beginPos := pos('name="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('name="');
-            endPos   := posEx('"', s, beginPos);
-            fName    := DecodeShoutcastString(Copy(s, beginPos, EndPos - beginPos));
-        end else
-            fName := '';
-
-        beginPos := pos('mt="', s);
-        if beginPos > 0 then
-        begin
-            beginPos   := beginPos + length('mt="');
-            endPos     := posEx('"', s, beginPos);
-            fMediaType := DecodeShoutcastString(Copy(s, beginPos, EndPos - beginPos));
-            if fMediaType = 'audio/mpeg' then
-                fMediaType := 'mp3'
-            else
-                if fMediaType = 'audio/aacp' then
-                  fMediaType := 'aac';
-        end else
-            fMediaType := '';
-
-        beginPos := pos('id="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('id="');
-            endPos   := posEx('"', s, beginPos);
-            IDtmp    := DecodeShoutcastString(Copy(s, beginPos, EndPos - beginPos));
-            fURL  := SC_PlaylistTemplate + IDtmp;
-        end else
-        begin
-            IDtmp := '';
-            fURL := '';
-        end;
-
-        beginPos := pos('br="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('br="');
-            endPos   := posEx('"', s, beginPos);
-            fBitrate := StrToIntDef(Copy(s, beginPos, EndPos - beginPos), 0);
-        end else
-            fBitrate := 0;
-
-        beginPos := pos('genre="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('genre="');
-            endPos   := posEx('"', s, beginPos);
-            fGenre   := DecodeShoutcastString(Copy(s, beginPos, EndPos - beginPos));
-        end else
-            fGenre := '';
-
-        beginPos := pos('ct="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('ct="');
-            endPos   := posEx('"', s, beginPos);
-            fCurrentTitle   := DecodeShoutcastString(Copy(s, beginPos, EndPos - beginPos));
-        end else
-            fCurrentTitle := '';
-
-        beginPos := pos('lc="', s);
-        if beginPos > 0 then
-        begin
-            beginPos := beginPos + length('lc="');
-            endPos   := posEx('"', s, beginPos);
-            fCount   := StrToIntDef(Copy(s, beginPos, EndPos - beginPos),0);
-        end else
-            fCount := 0;
-
-        result := (fMediaType <> '')
-               or (fURL <> '')
-               or (fBitrate <> 0)
-               or (fGenre <> '')
-               or (fCurrentTitle <> '')
-               or (fCount <> 0);
-    end;
-end;
-}
 
 function TStation.fGetURL: String;
 begin
@@ -537,25 +368,16 @@ begin
 end;
 
 procedure TStation.fDownloadPlaylist;
-var //IDHttp: TIDHttp;
-    s: AnsiString;
+var s: AnsiString;
     aHttpClient: THttpClient;
     aResponse: IHttpResponse;
 begin
     if UrlIsPlaylist(URL) then
     begin
         // download ausführen
-        //IDHttp :=  TidHttp.Create;
         aHttpClient := THttpClient.Create;
         try
             try
-                //IDHttp.ConnectTimeout:= 5000;
-                //IDHttp.ReadTimeout:= 5000;
-                // Hinweis: Der originale Indy-Useragent scheint Probleme zu machen!
-                //IDHttp.Request.UserAgent := 'Mozilla/3.0';
-                //IDHttp.HTTPOptions :=  [hoForceEncodeParams];
-                //IDHttp.OnWorkBegin := fStationDownloadWorkBegin;
-
                 aHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
                 aHttpClient.ConnectionTimeout := 5000;
                 aHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
@@ -589,10 +411,6 @@ begin
     fThread := 0;
 end;
 
-//procedure TStation.fStationDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
-//begin
-//    SendMessage(fWindowHandle, WM_Shoutcast, ST_PlaylistDownloadBegins, 0);
-//end;
 
 function TStation.GetInfoString: String;
 begin
@@ -689,179 +507,12 @@ begin
 end;
 
 
-
-(*
-constructor TShoutcastQuery.Create(aHandle: HWnd);
-begin
-    inherited Create;
-    fWindowHandle := aHandle;
-    fThread := 0;
-    fStationList := TObjectList.Create(False);
-end;
-
-destructor TShoutcastQuery.Destroy;
-begin
-    CancelDownload := True;
-    if fThread <> 0 then
-        WaitForSingleObject(fThread, 5000);
-    fStationList.Free;
-    inherited Destroy;
-end;
-
-procedure TShoutcastQuery.SetStatus(Value: Integer);
-begin
-    InterLockedExchange(fStatus, Value);
-end;
-
-function TShoutcastQuery.GetStatus: Integer;
-begin
-    InterLockedExchange(Result, fStatus);
-end;
-
-procedure TShoutcastQuery.SetCancelDownload(Value: LongBool);
-begin
-    InterLockedExchange(Integer(fCancelDownload), Integer(Value));
-end;
-
-function TShoutcastQuery.GetCancelDownload: LongBool;
-begin
-    InterLockedExchange(Integer(Result), Integer(fCancelDownload));
-end;
-
-procedure TShoutcastQuery.SetQueryString(Value: String);
-begin
-    EnterCriticalSection(CSQueryString);
-    fQueryString := Value;
-    LeaveCriticalSection(CSQueryString);
-end;
-
-function TShoutcastQuery.GetQueryString: String;
-begin
-    EnterCriticalSection(CSQueryString);
-    Result := fQueryString;
-    LeaveCriticalSection(CSQueryString);
-end;
-
-
-procedure TShoutcastQuery.DownloadStationList(aQuery: String; aMode: TSCQueryMode);
-var Dummy: Cardinal;
-    s: String;
-begin
-    if Status = 0 then
-    begin
-        Status := 1;
-        s := StringReplace(aQuery, ' ', '+', [rfReplaceAll]);
-        case aMode of
-          QM_Genre : QueryString := SC_GenreSearchTemplate + s;
-        else
-          QueryString := SC_SearchTemplate + s;
-        end;
-        fThread := BeginThread(Nil, 0, @StartPrivateDownloadProcedure, Self, 0, Dummy);
-    end // else
-    // Exception? MessageDlg?
-end;
-
-procedure StartPrivateDownloadProcedure(SQ: TShoutcastQuery);
-begin
-    // wieder zurück zur Klasse, aber jetzt im Kontext eines anderen Threads.
-    sQ.fDownloadStationList;
-end;
-
-// Diese Methode wird NICHT im VCL-Thread ausgeführt!
-procedure TShoutcastQuery.fDownloadStationList;
-var IDHttp: TIDHttp;
-begin
-  // hier in eine weitere CS eintreten, damit immer nur ein Thread runterlädt und analysiert
-  EnterCriticalSection(CSGetStationList);
-
-  CancelDownload := False;
-  IDHttp :=  TidHttp.Create;
-  try
-      IDHttp.ConnectTimeout:= 5000;
-      IDHttp.ReadTimeout:= 5000;
-      IDHttp.Request.UserAgent := 'Mozilla/3.0';
-      IDHttp.OnWork      := fDownloadWork;
-      IDHttp.OnWorkBegin := fDownloadWorkBegin;
-      IDHttp.HTTPOptions :=  [hoForceEncodeParams];
-      // Daten herunterladen
-      fDownloadString := '';
-      fDownloadString := IDHttp.Get(QueryString);
-
-      if not CancelDownload then
-      begin
-          SendMessage(fWindowHandle, WM_Shoutcast, SCQ_FinishedDownload, lParam(PChar(fDownloadString)));
-          // Daten analysieren
-          fParseStationList;
-          SendMessage(fWindowHandle, WM_Shoutcast, SCQ_ParsedList, lParam(fStationList));
-      end; // else nichts machen
-  except
-     if Status <> 0 then
-        SendMessage(fWindowHandle, WM_Shoutcast, SCQ_ConnectionFailed, 0);
-  end;
-  IDHttp.Free;
-  Status := 0;
-  CloseHandle(fThread);
-  fThread := 0;
-
-  //CS wieder verlassen
-  LeaveCriticalSection(CSGetStationList);
-end;
-
-procedure TShoutcastQuery.fDownloadWorkBegin(ASender: TObject; AWorkMode: TWorkMode; AWorkCountMax: Int64);
-begin
-    SendMessage(fWindowHandle, WM_Shoutcast, SCQ_BeginDownload, lParam(AWorkCountMax));
-end;
-
-procedure TShoutcastQuery.fDownloadWork(ASender: TObject; AWorkMode: TWorkMode; AWorkCount: Int64);
-begin
-  if not CancelDownload then
-      SendMessage(fWindowHandle, WM_Shoutcast, SCQ_ProgressDownload, lParam(AWorkCount))
-  else
-  begin
-      // Cancel Download
-      SendMessage(fWindowHandle, WM_Shoutcast, SCQ_AbortedDownload, 0);
-      Status := 0;
-      (ASender as TidHTTP).Disconnect;
-  end;
-end;
-
-procedure TShoutcastQuery.fParseStationList;
-var lbPos, beginPos: Integer;
-    s: String;
-    newStation: TStation;
-begin
-    // Alte Liste leeren
-    fStationList.Clear;
-
-    lbPos := Pos(#10, fDownloadString);
-    beginPos := 1;
-    while lbPos > 0 do
-    begin
-        s := Trim(Copy(fDownloadString, beginPos, lbPos - beginPos)); // nicht +1, das #10 lass ich direkt weg. ;-)
-
-        newStation := TStation.Create(fWindowHandle);
-        if newStation.GetInfoFromString(s) then
-            // Station einfügen
-            fStationList.Add(NewStation)
-        else
-            // War wohl nix. ;-)
-            newStation.Free;
-
-        beginPos := lbPos + 1;
-        lbPos := PosEx(#10, fDownloadString, lbPos + 1);
-    end;
-end;
-*)
-
-
 initialization
 
   InitializeCriticalSection(CSQueryString);
-  // InitializeCriticalSection(CSGetStationList);
 
 finalization
 
   DeleteCriticalSection(CSQueryString);
-  // DeleteCriticalSection(CSGetStationList);
 
 end.

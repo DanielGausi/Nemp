@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -124,33 +124,23 @@ type
     { Private-Deklarationen }
     LocalTagList: TObjectList;
 
-    //TagPostProcessor: TTagPostProcessor;
-
     OldSelectionPrefix : String;
 
     procedure FillTagTree(reselect: Boolean = False);
     procedure SortTags;                          // Resort the Tags
     procedure ReselectNode(aKey: String);    // Reselect a node with the given key
 
-
     procedure ReselectIgnoreNode(aKey: String);
     procedure ReselectMergeNode(aOriginalKey, aReplaceKey: String);
 
     procedure ClearIgnoreTree;
-
-
     procedure SortMergetags;
-
-
 
   public
     { Public-Deklarationen }
     procedure ActualizeTreeView;      // get the tags from the cloud with current settings and show them in the tree
     procedure FillIgnoreTree(reselect: Boolean = False);
     procedure FillMergeTree(reselect: Boolean = False);
-
-
-    //procedure RefreshWarningLabel;       // Count "ID3TagNeedsUpdate"-AudioFiles and display are warning
   end;
 
 
@@ -465,18 +455,6 @@ end;
 
 
 {
-procedure TCloudEditorForm.RefreshWarningLabel;
-var c: Integer;
-begin
-    c := MedienBib.CountInconsistentFiles;
-    LblUpdateWarning.Caption := Format(TagEditor_FilesNeedUpdate, [c]);
-    LblUpdateWarning.Visible := c > 0;
-    BtnUpdateID3Tags.Enabled := c > 0;
-end;
-}
-
-
-{
     --------------------------------------------------------
     cbHideAutoTagsClick
     seMinTagCountChange
@@ -508,8 +486,6 @@ begin
     begin
         Data := TagVST.GetNodeData(aNode);
         MedienBib.GlobalQuickTagSearch(Data.FTag.Key);
-        //if assigned(Data) then
-        //    MedienBib.GenerateAnzeigeListeFromTagCloud(Data^.FTag, False);
     end;
 end;
 

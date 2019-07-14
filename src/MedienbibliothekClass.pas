@@ -6,7 +6,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -673,7 +673,6 @@ type
 
         // Sorting the Lists
         procedure AddSorter(TreeHeaderColumnTag: Integer; FlipSame: Boolean = True);
-        // procedure SortAList(aList: TObjectList);
         procedure SortAnzeigeListe;
 
         // Generating RandomList (Random Playlist)
@@ -827,8 +826,6 @@ begin
   // virtual Lists, do NOT create/free
   AnzeigeListe              := LastBrowseResultList;
   BaseMarkerList            := LastBrowseResultList;
-  ////////AnzeigeListe := TObjectlist.create(False);
-  //AnzeigeListe2 := TObjectlist.create(False);
 
   AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_None;
@@ -883,7 +880,6 @@ destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
   fJobList.Free;
-  //NewCoverFlow.Clear;
   NewCoverFlow.free;
   fIgnoreListCopy.Free;
   fMergeListCopy.Free;
@@ -943,8 +939,6 @@ begin
   // virtual Lists, do NOT create/free
   AnzeigeListe          := Nil;
   BaseMarkerList        := Nil;
-  ///////AnzeigeListe.Free;
-  // AnzeigeListe2.Free;
 
   UpdateList.Free;
   PlaylistUpdateList.Free;
@@ -1011,12 +1005,11 @@ begin
   tmpAlleArtists.Clear;
   AlleArtists.Clear;
   Alben.Clear;
-  // AnzeigeListe.Clear; // (no need to clear the virtaul lists)
+
   LastBrowseResultList      .Clear;
   LastQuickSearchResultList .Clear;
   LastMarkFilterList        .Clear;
 
-  // AnzeigeListe2.Clear;
   AnzeigeShowsPlaylistFiles := False;
   DisplayContent := DISPLAY_None;
 
@@ -1172,14 +1165,6 @@ procedure TMedienBibliothek.SetChanged(Value: LongBool);
 begin
   InterLockedExchange(Integer(fChanged), Integer(Value));
 end;
-(*function TMedienBibliothek.GetInitializing: Integer;
-begin
-  InterLockedExchange(Result, fInitializing);
-end;
-procedure TMedienBibliothek.SetInitializing(Value: Integer);
-begin
-  InterLockedExchange(fInitializing, Value);
-end;*)
 function TMedienBibliothek.GetBrowseMode: Integer;
 begin
   InterLockedExchange(Result, fBrowseMode);
@@ -1255,9 +1240,6 @@ begin
                 SortParams[i].Direction := sd_Descending;
         end;
 
-
-        //SortParam := Ini.ReadInteger('MedienBib', 'Sortorder', CON_ARTIST);
-
         CoverSearchInDir         := ini.ReadBool('MedienBib','CoverSearchInDir', True);
         CoverSearchInParentDir   := ini.ReadBool('MedienBib','CoverSearchInParentDir', True);
         CoverSearchInSubDir      := ini.ReadBool('MedienBib','CoverSearchInSubDir', True);
@@ -1265,7 +1247,6 @@ begin
         CoverSearchSubDirName    := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
         CoverSearchSisterDirName := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
         CoverSearchLastFM        := ini.ReadBool('MedienBib', 'CoverSearchLastFM', False);
-        //CoverSearchLastFMInit    := True;
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
         MissingCoverMode := ini.ReadInteger('MedienBib', 'MissingCoverMode', 1);
@@ -1273,12 +1254,6 @@ begin
             MissingCoverMode := 1;
 
         IgnoreLyrics := ini.ReadBool('MedienBib', 'IgnoreLyrics', False);
-
-
-        //UseNempDefaultCover      := Ini.ReadBool('MedienBib', 'UseNempDefaultCover', True);
-        //PersonalizeMainCover     := Ini.ReadBool('MedienBib', 'PersonalizeMainCover', True);
-        //WriteRatingToTag := Ini.ReadBool('MedienBib','WriteRatingToTag', False);
-
 
         BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 1);
         if (BrowseMode < 0) OR (BrowseMode > 2) then
@@ -1403,9 +1378,6 @@ begin
         ini.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
-        //Ini.WriteBool('MedienBib', 'UseNempDefaultCover', UseNempDefaultCover);
-        //Ini.WriteBool('MedienBib', 'PersonalizeMainCover', PersonalizeMainCover);
-        //Ini.Writebool('MedienBib','WriteRatingToTag', WriteRatingToTag);
 
         ini.WriteBool('MedienBib', 'IgnoreLyrics', IgnoreLyrics);
 
@@ -1521,94 +1493,10 @@ begin
       SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
   end;
 
-  //MB.StatusBibUpdate := 0;         // note: This is dangerous
-  {.$Message Hint 'STATUS MUST NOT be set to zero here, unless it is sure that this ends here '}
-  /// status-Comment: The only problem is AutoScanDirs files.
-  ///  If AutoScanDirs do not call NewFilesUpdate (because there are no new files)
-  ///  ///  NO. NewFilesUpdate is called everytime on ST_Finish, whether there are 0 files or not.
-  ///  the status remains BIB_Status_ReadAccessBlocked
-  ///  This would be fatal.
-  ///
-
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-//  DAS HIER NEU MACHEN.
-//  NEUE MESSAGE / PARAM ZUM ANLEIERN WEITERER INIT-PROZESSE.
-//  AUCH EINFÜGEN BEI DER DELETE-MISSING-FILES METHODE
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
   // current //job// is done, set status to 0
   SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
   // check for the next job
   SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
-
-  {case MB.Initializing of
-      init_nothing           : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_BibLoaded);
-      init_AutoScanDir       : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_NewFilesFound);
-      init_CleanUpDeadFiles,
-      init_ActivateWebServer,
-      init_Complete          : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-  end;
-  }
-
-  //if MB.Initializing < init_AutoScanDir then
-  //begin
-  //    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_BibLoaded);
-  //end;
-
-
- (*
-  case MB.Initializing of
-      init_nothing: begin
-          // the bib was loaded
-          // todo: Check the playingfile (as the rating could be different!)
-          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ReCheckPlaylingFile, 0);
-          if MB.AutoScanDirs then
-          begin
-              MB.Initializing := init_AutoScanDir;
-
-              if not MB.CloseAfterUpdate then
-                  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartAutoScanDirs, 0)
-              else
-                  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-
-              // Scanning is done in a separate thread.
-              // Problem: Another Thread (VCL, in preparation for Player.PostProcess)
-              //          could have gotten the Status=0 from above and start working
-              //          before the Message (StartAutoScan) was processed
-              //          So two Threads will work on the Library!!
-          end else
-          begin
-              // Not really "Complete", but after this we have nothing more special to do here
-              MB.Initializing := Init_Complete;
-              SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-
-              // No Autoscan wanted, but maybe we want to activate the WebServer now.
-              if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
-              begin
-                  SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ActivateWebServer, 0);
-                  // Activation is done in VCL-Thread.
-                  // So the WebServer IS activated when SendMessage returns
-              end;
-          end;
-      end;
-      init_AutoScanDir: begin
-          // AutoScandir has been completed, so WebServer-Activation is the next thing to do.
-          MB.Initializing := Init_Complete;
-          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-          if (not MB.CloseAfterUpdate) and MB.AutoActivateWebServer then
-          begin
-              MB.Initializing := Init_Complete;
-              SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_ActivateWebServer, 0);
-              // Activation is done in VCL-Thread.
-              // So the WebServer IS activated when SendMessage returns
-          end;
-      end;
-      init_complete: begin
-          // nothing more to do.
-          SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-      end;
-  end;
-  *)
 
   try
       CloseHandle(MB.fHND_UpdateThread);
@@ -1709,11 +1597,6 @@ begin
   end;
 
 
-  ///////////////////////////////////////////////////////////////
-  ///  temporary disabled
-  ///////////////////////////////////////////////////////////////
-  ///
-
   // Check for Duplicates
   // Note: This test should be always negative. If not, something in the system went wrong. :(
   //       Probably the Sort and Binary-Search methods do not match then.
@@ -1726,7 +1609,6 @@ begin
       ChangeAfterUpdate := True; // We need to save the changed library after the cleanup
 
       AnzeigeListe.Clear;
-      ///AnzeigeListe2.Clear;
       AnzeigeListIsCurrentlySorted := False;
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList, 0);
       // Delete Duplicates
@@ -1747,9 +1629,7 @@ begin
       break;
     end;
   end;
-  ///////////////////////////////////////////////////////////////
-  ///  temporary disabled
-  ///////////////////////////////////////////////////////////////
+
 
 
   // Prepare BrowseLists
@@ -1766,12 +1646,6 @@ begin
       end;
   end;
 
-
-  // Build String for accelerated search
-  // No. To save RAM on larger collections, we will no longer build a temporary string here
-  // Building the "real string" must be done after blocking read-access to the library, => method SwapLists
-  // BibSearcher.BuildTMPTotalString(tmpMp3ListePfadSort);
-  // BibSearcher.BuildTMPTotalLyricString(tmpMp3ListePfadSort);
 end;
 
 
@@ -2021,18 +1895,8 @@ begin
                         Integer(PChar(_(DeleteSelect_DeletingFilesAborted )) ));
     end;
 
-
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
     SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
-    {
-    case MB.Initializing of
-        init_nothing,
-        init_AutoScanDir,
-        init_CleanUpDeadFiles  : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_StartingJobDone, NempInit_MissingFilesCollected);
-        init_ActivateWebServer,
-        init_Complete          : SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
-    end;
-    }
 
     try
         CloseHandle(MB.fHND_DeleteFilesThread);
@@ -2040,46 +1904,6 @@ begin
     end;
 end;
 
-(*
-Procedure fDeleteFilesUpdate(MB: TMedienbibliothek);
-var DeleteDataList: TObjectList;
-begin
-    // Status is = 1 here (see above)     // status: Temporary comments, as I found a concept-bug here ;-)
-    MB.CollectDeadFiles;                  // status: ok, no change needed
-
-    if MB.DeadFiles.Count > 0 then
-    begin
-        DeleteDataList := TObjectList.Create(False);
-        try
-            MB.PrepareUserInputDeadFiles(DeleteDataList);
-            SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UserInputDeadFiles, lParam(DeleteDataList));
-            // user can change DeleteDataList (set the DoDelete-property of the objects)
-            // so: Change the DeadFiles-list and fill it with the files that should be deleted.
-            MB.ReFillDeadFilesByDataList(DeleteDataList);
-        finally
-            DeleteDataList.Free;
-        end;
-    end;
-
-    MB.PrepareDeleteFilesUpdate;          // status: ok, change via SendMessage
-    if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
-       MB.Changed := True;
-    MB.SwapLists;                         // status: ok, change via SendMessage
-    // Delete AudioFiles from "VCL-Lists"
-    // This includes AnzeigeListe and the BibSearcher-Lists
-    // MainForm will call CleanUpDeadFilesFromVCLLists
-    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckAnzeigeList, 0);
-    // Free deleted AudioFiles
-    MB.CleanUpDeadFiles;                  // status: ok, no change needed
-    // Clear temporary lists
-    MB.CleanUpTmpLists;                   // status: ok, no change allowed
-
-    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free); // status: ok, thread finished
-    try
-        CloseHandle(MB.fHND_DeleteFilesThread);
-    except
-    end;
-end;  *)
 {
     --------------------------------------------------------
     CollectDeadFiles
@@ -2131,7 +1955,6 @@ begin
               ct := nt;
               SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Integer(PChar(MediaLibrary_SearchingMissingPlaylist)));
               SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round((Mp3ListePfadSort.Count+i)/ges * 100));
-              //SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round((i + Mp3ListePfadSort.Count)/ges * 100));
 
               SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount,
                                 Mp3ListePfadSort.Count + i - DeadFiles.Count - DeadPlaylists.Count);
@@ -2222,7 +2045,6 @@ var i: Integer;
                 begin
                     // complete Drive is NOT there
                     result.DoDelete       := False;
-                    //newDeleteData.Recommendation := dr_Keep;
                     result.Hint           := dh_DriveMissing;
 
                     if assigned(fcurrentLibraryDrive) then
@@ -2233,7 +2055,6 @@ var i: Integer;
                 begin
                     // drive is there => just the file is not present
                     result.DoDelete    := True;
-                    //newDeleteData.Recommendation := dr_Delete;
                     result.Hint        := dh_DivePresent;
                     result.DriveType   := fcurrentLibraryDrive.typ
                 end;
@@ -2241,7 +2062,6 @@ var i: Integer;
             begin
                 // assume that its missing, further check after this loop
                 result.DoDelete    := False;
-                //newDeleteData.Recommendation := dr_Keep;
                 result.Hint        := dh_NetworkMissing;
                 result.DriveType   := DriveTypeTexts[DRIVE_REMOTE];
             end;
@@ -2279,7 +2099,6 @@ begin
                         begin
                             // complete logical Drive is NOT there
                             newDeleteData.DoDelete       := False;
-                            //newDeleteData.Recommendation := dr_Keep;
                             newDeleteData.Hint           := dh_DriveMissing;
 
                             // use the drivetype from the library
@@ -2292,7 +2111,6 @@ begin
                         begin
                             // drive is there => just the file is not present
                             newDeleteData.DoDelete       := True;
-                            //newDeleteData.Recommendation := dr_Delete;
                             newDeleteData.Hint           := dh_DivePresent;
                             newDeleteData.DriveType      := currentLogicalDrive.Typ;
                         end;
@@ -2308,7 +2126,6 @@ begin
                         newDeleteData.DriveString := currentPC ;
                         // assume that its missing, further check after this loop
                         newDeleteData.DoDelete       := False;
-                        //newDeleteData.Recommendation := dr_Keep;
                         newDeleteData.Hint           := dh_NetworkMissing;
                         newDeleteData.DriveType  := DriveTypeTexts[DRIVE_REMOTE];
                         DeleteDataList.Add(newDeleteData);
@@ -2378,7 +2195,6 @@ begin
                 begin
                     // some files on this ressource can be found
                     TDeleteData(DeleteDatalist[i]).DoDelete       := True;
-                    //TDeleteData(DeleteDatalist[i]).Recommendation := dr_Delete;
                     TDeleteData(DeleteDatalist[i]).Hint           := dh_NetworkPresent;
                 end;
             end;
@@ -2510,9 +2326,6 @@ begin
       end;
   end;
 
-  // no temporary totalstrings any more.
-  //BibSearcher.BuildTMPTotalString(tmpMp3ListePfadSort);
-  //BibSearcher.BuildTMPTotalLyricString(tmpMp3ListePfadSort);
 end;
 {
     --------------------------------------------------------
@@ -2889,13 +2702,7 @@ begin
 
                 aAudioFile := tAudioFile(UpdateList[i]);
                 if FileExists(aAudioFile.Pfad)
-                    AND //(AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
-                    (
-                    aAudioFile.HasSupportedTagFormat
-                    //   (AnsiLowercase(aAudioFile.Extension) = 'mp3')
-                    //or (AnsiLowercase(aAudioFile.Extension) = 'ogg')
-                    //or (AnsiLowercase(aAudioFile.Extension) = 'flac')
-                    )
+                    AND aAudioFile.HasSupportedTagFormat
                 then
                 begin
                     // call the vcl, that we will edit this file now
@@ -3023,12 +2830,6 @@ begin
                               Integer(PChar(_(MediaLibrary_SearchLyricsComplete_NoneFound))))
           end;
     end;
-
-    //if ErrorOcurred then
-    //begin
-    //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
-    //end;
-    // UnblockMEssage is sent via CleanUpTMPLists
 end;
 
 
@@ -3254,11 +3055,6 @@ begin
                               Integer(PChar(_(MediaLibrary_SearchTagsComplete_NoneFound))))
           end;
     end;
-
-    //if ErrorOcurred then
-    //begin
-    //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
-    //end;
 end;
 
 
@@ -3408,22 +3204,9 @@ begin
           end;
     end;
 
-
-
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-            //if Updatefortsetzen then
-                // complete, show message
-            //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ID3TagUpdateComplete, 0);
-
-                //SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
-            //      Integer(PChar( MediaLibrary_RefreshingFilesCompleteFinished ) ));
-
-            //if ErrorOcurred then
-            //begin
-            //    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLogHint, 0);
-            //end;
 end;
 
 
@@ -3931,68 +3714,6 @@ begin
     end;
 end;       }
 
-{
-    --------------------------------------------------------
-    RestoreSortOrderAfterItemChanged
-    - Extract a (changed) AudioFile from the lists, add it to the UpdateList
-      and re-merge it
-    Run ONLY IN VCL-Thread !
-    - Not needed any longer: Browsing is done by audiofile.key1/key2, and the User should click
-                             the TabBrowseBtn to refresh the Browse-Lists
-    --------------------------------------------------------
-}
-(*
-function TMedienBibliothek.RestoreSortOrderAfterItemChanged(aAudioFile: tAudioFile): Boolean;
-var swaplist: TObjectlist;
-    swapstlist: TStringList;
-begin
-  result := StatusBibUpdate = 0;
-  if StatusBibUpdate <> 0 then exit;  // WICHTIG!!!
-
-  StatusBibUpdate := BIB_Status_ReadAccessBlocked;
-  // Datei aus den Listen entfernen
-  Mp3ListeArtistSort.Extract(aAudioFile);
-  Mp3ListeAlbenSort.Extract(aAudioFile);
-  //Datei wieder einpflegen
-  UpdateList.Add(aAudioFile);
-  if BrowseMode = 0 then
-  begin
-      Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
-      Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_AlbumArtist, NempSortArray);
-      // BrowseListen vorbereiten.
-      InitAlbenlist(tmpMp3ListeAlbenSort, tmpAlleAlben);
-      Generateartistlist(tmpMp3ListeArtistSort, tmpAlleArtists);
-  end else
-  begin
-      Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_Cover, NempSortArray);
-      Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_Cover, NempSortArray);
-      GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverlist);
-  end;
-  // SwapLists, nur ohne Messages.
-  // DIESE PROZEDUR DARF ALSO NUR IM VCL_THREAD AUSGEFÜHRT WERDEN !!!!
-  EnterCriticalSection(CSUpdate);
-      swaplist := Mp3ListeArtistSort;
-      Mp3ListeArtistSort := tmpMp3ListeArtistSort;
-      tmpMp3ListeArtistSort := swaplist;
-      swaplist := Mp3ListeAlbenSort;
-      Mp3ListeAlbenSort := tmpMp3ListeAlbenSort;
-      tmpMp3ListeAlbenSort := swaplist;
-
-      swaplist := Coverlist;
-      Coverlist := tmpCoverlist;
-      tmpCoverlist := swaplist;
-      swaplist := AlleArtists;
-      AlleArtists := tmpAlleArtists;
-      tmpAlleArtists := swaplist;
-      swapstlist := AlleAlben;
-      AlleAlben := tmpAlleAlben;
-      tmpAlleAlben := swapstlist;
-  LeaveCriticalSection(CSUpdate);
-  CleanUpTmpLists;
-  StatusBibUpdate := 0;
-  Changed := True;
-end;
-*)
 
 {
     --------------------------------------------------------
@@ -4496,20 +4217,6 @@ begin
 
   GetRandomCover(Target);
 
-///// das im Hauptthread mit der neuen Liste machen  NewCoverFlow.SetNewList(Target);
-
-{  NewCoverFlow.BeginUpdate;
-  NewCoverFlow.Clear;
-  for i := 0 to Target.Count - 1 do
-  begin
-      item := TFlyingCowItem.Create( TNempCover(Target[i]).ID, TNempCover(Target[i]).Artist, TNempCover(Target[i]).Album );
-      NewCoverFlow.Add(item);
-  end;
-  NewCoverFlow.EndUpdate;
-
-  //if Target.Count > 0 then
-  //    NewCoverFlow.CurrentItem := 0;
-  }
 end;
 
 procedure TMedienBibliothek.GenerateCoverListFromSearchResult(Source,
@@ -4960,28 +4667,7 @@ begin
             end;
       end;
   end;
-  {
-  if (NempSortArray[2] <> siOrdner)
-    AND (Artist <> BROWSE_RADIOSTATIONS)
-    AND (Artist <> BROWSE_PLAYLISTS)
-  then
-  begin
-    i := 1;      // <All> auslassen
-    while (i < Alben.Count) and (AnsiCompareText(TJustastring(Alben[i]).AnzeigeString, AUDIOFILE_UNKOWN) < 0  ) do
-      inc(i);
 
-    start := i;
-    if (start < Alben.Count) and (  AnsiCompareText(TJustastring(Alben[i]).AnzeigeString, AUDIOFILE_UNKOWN) = 0  ) then
-    begin
-        for i := start downto 2 do
-        begin
-            tmpJaS := TJustastring(Alben[i]);
-            Alben[i] := Alben[i-1];
-            Alben[i-1] := tmpJaS;
-        end;
-    end;
-  end;
-  }
 end;
 
 
@@ -5101,15 +4787,13 @@ begin
       AnzeigeShowsPlaylistFiles := False;
       DisplayContent := DISPLAY_BrowseFiles;
 
-      //LastBrowseResultList.Clear; // done in GetTitelList
       AnzeigeListe := LastBrowseResultList;
       SetBaseMarkerList(LastBrowseResultList);
 
       GetTitelList(LastBrowseResultList, Artist, Album);
       if IsAutoSortWanted then
           SortAnzeigeliste;
-      //if UpdateQuickSearchList then
-      ///FillQuickSearchList;
+
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
   end;
 end;
@@ -5166,7 +4850,7 @@ begin
   AnzeigeListIsCurrentlySorted := False;
   if IsAutoSortWanted then
       SortAnzeigeliste;
-  ///FillQuickSearchList;
+
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
 
@@ -5264,30 +4948,6 @@ begin
 end;
 
 
-
-{
-    --------------------------------------------------------
-    FillQuickSearchList
-    ShowQuickSearchList
-    - Set/Get the QuickSearchList
-    --------------------------------------------------------
-}
-(*
-procedure TMedienBibliothek.FillQuickSearchList;
-begin
-  if AnzeigeShowsPlaylistFiles then
-      MessageDLG((Medialibrary_QuickSearchError1), mtError, [MBOK], 0)
-  else
-      BibSearcher.SetQuickSearchList(AnzeigeListe);
-end;
-Procedure TMedienBibliothek.ShowQuickSearchList;
-begin
-    AnzeigeShowsPlaylistFiles := False;
-    DisplayContent := DISPLAY_QuickSearch;
-    AnzeigeListIsCurrentlySorted := False;
-    BibSearcher.ShowQuickSearchList;
-end;
-*)
 
 {
     --------------------------------------------------------
@@ -5490,43 +5150,6 @@ begin
     end;
 end;
 
-{
-    --------------------------------------------------------
-    SortAList
-    SortAnzeigeListe
-    - Sort the files in the list
-    --------------------------------------------------------
-}
-(*procedure TMedienBibliothek.SortAList(aList: TObjectList);
-begin
-
-    aList.Sort(MainSort);
- {
-  case SortParam of                                 // +++_asc   else    +++_desc
-    CON_ARTIST              : if SortAscending then aList.Sort(Sortieren_ArtistTitel_asc) else aList.Sort(Sortieren_ArtistTitel_desc);
-    CON_TITEL               : if SortAscending then aList.Sort(Sortieren_TitelArtist_asc) else aList.Sort(Sortieren_TitelArtist_desc);
-    CON_ALBUM               : if SortAscending then aList.Sort(Sortieren_AlbumArtistTitel_asc) else aList.Sort(Sortieren_AlbumArtistTitel_desc);
-    CON_DAUER               : if SortAscending then aList.Sort(Sortieren_Dauer_asc) else aList.Sort(Sortieren_Dauer_desc);
-    CON_BITRATE             : if SortAscending then aList.Sort(Sortieren_Bitrate_asc) else aList.Sort(Sortieren_Bitrate_desc);
-    CON_CBR                 : if SortAscending then aList.Sort(Sortieren_CBR_asc) else aList.Sort(Sortieren_CBR_desc);
-    CON_MODE                : if SortAscending then aList.Sort(Sortieren_Mode_asc) else aList.Sort(Sortieren_Mode_desc);
-    CON_SAMPLERATE          : if SortAscending then aList.Sort(Sortieren_Samplerate_asc) else aList.Sort(Sortieren_Samplerate_desc);
-    CON_STANDARDCOMMENT     : if SortAscending then aList.Sort(Sortieren_Comment_asc) else aList.Sort(Sortieren_Comment_desc);
-    CON_FILESIZE            : if SortAscending then aList.Sort(Sortieren_DateiGroesse_asc) else aList.Sort(Sortieren_DateiGroesse_desc);
-    CON_PFAD                : if SortAscending then aList.Sort(Sortieren_Pfad_asc) else aList.Sort(Sortieren_Pfad_desc);
-    CON_ORDNER              : if SortAscending then aList.Sort(Sortieren_Pfad_asc) else aList.Sort(Sortieren_Pfad_desc);
-    CON_DATEINAME           : if SortAscending then aList.Sort(Sortieren_Dateiname_asc) else aList.Sort(Sortieren_Dateiname_desc);
-    CON_YEAR                : if SortAscending then aList.Sort(Sortieren_Jahr_asc) else aList.Sort(Sortieren_Jahr_desc);
-    CON_GENRE               : if SortAscending then aList.Sort(Sortieren_Genre_asc) else aList.Sort(Sortieren_Genre_desc);
-    CON_LYRICSEXISTING      : if SortAscending then aList.Sort(Sortieren_Lyrics_asc) else aList.Sort(Sortieren_Lyrics_desc);
-    CON_TRACKNR             : if SortAscending then aList.Sort(Sortieren_Track_asc) else aList.Sort(Sortieren_Track_desc);
-    CON_EX_ARTISTALBUMTITEL : if SortAscending then aList.Sort(Sortieren_ArtistAlbumTitel_asc) else aList.Sort(Sortieren_ArtistAlbumTitel_desc);
-    CON_EX_ALBUMTITELARTIST : if SortAscending then aList.Sort(Sortieren_AlbumTitelArtist_asc) else aList.Sort(Sortieren_AlbumTitelArtist_desc);
-    CON_EX_ALBUMTRACK       : if SortAscending then aList.Sort(Sortieren_AlbumTrack_asc) else aList.Sort(Sortieren_AlbumTrack_Desc);
-    CON_RATING              : if SortAscending then aList.Sort(Sortieren_Rating_asc) else aList.Sort(Sortieren_Rating_Desc);
-  end;
-  }
-end;   *)
 procedure TMedienBibliothek.SortAnzeigeListe;
 begin
   AnzeigeListe.Sort(MainSort);
@@ -6759,13 +6382,6 @@ begin
         // as this ensures AutoScan and/or webserver-activation
         NewFilesUpdateBib(True);
 
-        {case BrowseMode of
-            0: ReBuildBrowseLists;
-            1: ReBuildCoverList;
-            2: ; // Nothing to do
-        end;
-        SendMessage(MainWindowHandle, WM_MedienBib, MB_RefillTrees, 0);
-        }
     end;
 end;
 

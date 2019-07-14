@@ -46,9 +46,6 @@ object FormBibSearch: TFormBibSearch
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 0
-    ExplicitTop = 55
-    ExplicitWidth = 595
     object GRPErweiterteSucheEdit: TGroupBox
       Tag = 2
       Left = 0
@@ -60,9 +57,6 @@ object FormBibSearch: TFormBibSearch
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      ExplicitLeft = 3
-      ExplicitTop = 43
-      ExplicitHeight = 328
       DesignSize = (
         353
         334)
@@ -203,8 +197,6 @@ object FormBibSearch: TFormBibSearch
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitLeft = 362
-      ExplicitWidth = 230
       object GrpBox_ExtendedSearchGenres: TGroupBox
         Tag = 2
         Left = 0
@@ -260,9 +252,6 @@ object FormBibSearch: TFormBibSearch
         Align = alBottom
         Caption = 'Date'
         TabOrder = 1
-        ExplicitLeft = 3
-        ExplicitTop = 221
-        ExplicitWidth = 230
         object LblConst_SearchExtendedYear: TLabel
           Left = 8
           Top = 77

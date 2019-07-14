@@ -9,7 +9,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -54,9 +54,6 @@ procedure RestoreComboboxes(aForm: TForm);
 
 
 function BitrateToColor(bitrate:integer; MinColor, CenterColor, MaxColor: TColor; MiddleToMinComputing, MiddleToMaxComputing: Byte ):Tcolor;
-//procedure BitmapDrehen_90Grad(const Bitmap: TBitmap);
-//procedure HorizontalSpiegeln(const Bitmap: TBitmap);
-//function PathSeemsToBeURL(apath: string): boolean;
 
 
 Function BassErrorString(ErrorCode: Integer):string;
@@ -70,9 +67,6 @@ function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;
 
 procedure Delay(dwMillSec: DWord);
 
-
-// function SekToPlaylistZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
-//function InttoStrZero(i:integer):string;
 
 function SekIntToMinStr(sek:integer; OnlyMinutes: Boolean = False):string;
 function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
@@ -91,60 +85,6 @@ function StringToURLString(aUTF8String: UTF8String): AnsiString;
 procedure Wuppdi(i: Integer = 0);
 
 implementation
-
-
-  (*
-procedure BitmapDrehen_90Grad(const Bitmap: TBitmap);
-var P: PRGBQuad; //^THelpRGB;
-    x,y,b,h : Integer;
-    RowOut: ^TMyHelp;
-    help: TBitmap;
-begin
-  Bitmap.PixelFormat := pf32bit;
-  help := TBitmap.Create;
-  try
-    help.PixelFormat := pf32bit;
-    b := bitmap.Height;
-    h := bitmap.Width;
-    help.Width := b;
-    help.height := h;
-    for y := 0 to (h-1) do
-    begin
-      rowOut := help.ScanLine[y];
-      P  := Bitmap.scanline[bitmap.height-1];
-      inc(p,y);
-      for x := 0 to (b-1) do
-      begin
-        rowout[x] := p^;
-        inc(p,h);
-      end;
-    end;
-  finally
-    bitmap.Assign(help);
-    help.Free;
-  end;
-end;
-
-procedure HorizontalSpiegeln(const Bitmap: TBitmap);
-var i,j,w: Integer;
-    rowin,rowout: pRGBArray;
-begin
-  w := bitmap.width*sizeof(TRGBTriple);
-  Getmem(rowIn,w);
-  try
-    for j:= 0 to Bitmap.Height-1 do
-    begin
-      move(Bitmap.Scanline[j]^,rowin^,w);
-      rowout := Bitmap.Scanline[j];
-      for i := 0 to Bitmap.Width-1 do
-        rowout[i] := rowin[Bitmap.Width-1-i];
-    end;
-    bitmap.Assign(bitmap);
-  finally
-    Freemem(rowin);
-  end;
-end;
-       *)
 
 
 procedure BackupComboboxes(aForm: TForm);
@@ -496,12 +436,6 @@ begin
     end;
 end;
 
-{function InttoStrZero(i:integer):string;
-begin
-  if i= 0 then result := '00'
-    else if i<10 then result := '0'+inttostr(i)
-      else result := inttostr(i);
-end;}
 
 function SekToZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
 var sek,min,std:integer;
@@ -558,56 +492,6 @@ begin
   end;}
 end;
 
-(*function SekToPlaylistZeitString(dauer:int64; OnlyMinutes: Boolean = False):string;
-var sek,min,std{,tag}:integer;
-  d:integer;
-begin
-  result := '';
-  d := 0;
-  // sekunden rausrechnen
-  sek := dauer mod 60;
-  dauer := dauer div 60;
-  if dauer > 0 then inc(d); // nur sekunden
-
-  // minuten rausrechnen
-  min := dauer mod 60;
-  dauer := dauer DIV 60;
-  if dauer > 0 then inc(d); //  min:sek
-
-  // 2017: shorter version
-  std := dauer;
-
-  // Stunden ausrechnen
-  /// std := dauer mod 24;
-  /// dauer := dauer DIV 24;
-  /// if dauer > 0 then inc(d); // std:min
-  /// tag := dauer;
-
-  case d of
-
-    0: result := Format('0:%.2d%s', [sek, (Time_MinuteShort)]);
-    1: result := Format('%d:%.2d%s', [min, sek, (Time_MinuteShort)]);
-    2: begin
-        if std < 72 then
-            result := Format('%d:%.2d%s', [std, min,(Time_HourShort)])
-        else
-            result :=  Format('%d %s', [std div 24, (Time_DaysLong)]);
-    end;
-
-    /// 0: {nur Sekunden} result := Format('%d%s', [sek, (Time_SecShort)]);
-    /// 1: if OnlyMinutes then
-    ///      result := Format('%d%s', [min, (Time_MinuteShort)])
-    ///    else
-    ///      result := Format('%d%s%d%s', [min, (Time_MinuteShort), sek, (Time_SecShort)]);
-    /// 2: result := Format('%d%s%d%s', [std, (Time_HourShort), min, (Time_MinuteShort)]);
-    ///    // Inttostr(std) + 'h' + InttoStrZero(min) + 'm';
-    /// 3:  if tag <= 3 then
-    ///       result := Format('%d %s', [24 * tag + std, (Time_HourShort)])
-    ///     else
-    ///       result :=  Format('%d %s', [tag, (Time_DaysLong)]);
-  end;
-end;
-*)
 
 // Diese Funktion wandelt eine Zeitangabe in Sekunden
 // in einen String im Format 'HH:MM:SS' um.

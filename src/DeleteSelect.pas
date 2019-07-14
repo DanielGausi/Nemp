@@ -1,3 +1,35 @@
+{
+
+    Unit DeleteSelect
+    Form DeleteSelection
+
+    A Form for selecting which files should be removed from the
+    Media Library (and which not)
+
+    ---------------------------------------------------------------
+    Nemp - Noch ein Mp3-Player
+    Copyright (C) 2005-2019, Daniel Gaussmann
+    http://www.gausi.de
+    mail@gausi.de
+    ---------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+
+    See license.txt for more information
+
+    ---------------------------------------------------------------
+}
 unit DeleteSelect;
 
 interface
@@ -8,15 +40,6 @@ uses
   DriveRepairTools, ExtCtrls, ImgList, GnuGetText, System.UITypes,
   System.ImageList, Generics.Collections, VirtualTrees, PNGImage,CommCtrl ;
 
-
-// type
-    {TDisplayData = class
-        DriveIndex: Integer;   // refers to the Index of the DriveData-List // the index in the CheckListBox
-        DeleteDrive: Boolean;  // will be set for all these DataObjects in the ONClick-Event of the CheckListBox
-        DisplayString: String; // the String to be displayed;
-    end;  }
-
-    // TDisplayDataList = TObjectList<TDisplayData>;
 
 type
     TDeleteTreeData = record
@@ -46,10 +69,8 @@ type
     checkImages: TImageList;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
-    //procedure cbDrivesClick(Sender: TObject);
     procedure BtnHelpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure VSTFilesGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure VSTPlaylistFilesGetText(Sender: TBaseVirtualTree;
@@ -62,9 +83,7 @@ type
   private
     { Private-Deklarationen }
 
-    //DisplayDataList: TDisplayDataList;
     procedure FillTreeViews(currentData: TDeleteData);
-
     procedure AddPngToImageList(aFilename: String; aImageList: TImageList);
 
   public
@@ -90,9 +109,6 @@ var filename: String;
 begin
     TranslateComponent (self);
 
-    //    DisplayDataList := TObjectList<TDisplayData>.create;
-    //    VSTFiles.NodeDataSize := SizeOf(TDisplayData);
-
     VSTPlaylistFiles.NodeDataSize  := SizeOf(TStringTreeData);
     VSTFiles.NodeDataSize  := SizeOf(TTreeData);
     VSTDrives.NodeDataSize := SizeOf(TDeleteTreeData);
@@ -106,12 +122,6 @@ begin
         self.ReloadScheckBoxImages(Nemp_MainForm.NempSkin.Path, True)
     else
         self.ReloadScheckBoxImages(ExtractFilePath(ParamStr(0)) + 'Images\');
-end;
-
-procedure TDeleteSelection.FormDestroy(Sender: TObject);
-begin
-
-//    DisplayDataList.Free;
 end;
 
 function AddVSTDrive(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aDeleteData: TDeleteData): PVirtualNode;
@@ -134,26 +144,8 @@ end;
 
 procedure TDeleteSelection.FormShow(Sender: TObject);
 var i: Integer;
-    // currentData: TDeleteData;
 begin
     lblMainExplanation.Caption := DeleteHelper_Explanation;
-
-    {if assigned(DataFromMedienBib) then
-    begin
-        for i := 0 to DataFromMedienBib.Count - 1 do
-        begin
-            currentData := TDeleteData(DataFromMedienBib[i]);
-            cbDrives.Items.Add(currentData.DriveString);
-            cbDrives.Checked[i] := currentData.DoDelete;
-        end;
-
-        if cbDrives.Count > 0 then
-        begin
-            cbDrives.ItemIndex := 0;
-            cbDrives.Selected[0] := True;
-            //cbDrivesClick(Nil);
-        end;
-    end;}
 
     VSTDrives.Clear;
     VSTDrives.BeginUpdate;
@@ -385,20 +377,8 @@ begin
     end;
 end;
 
-
-
-
 procedure TDeleteSelection.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-   { if assigned(DataFromMedienBib) then
-    begin
-        for i := 0 to DataFromMedienBib.Count - 1 do
-        begin
-            currentData := TDeleteData(DataFromMedienBib[i]);
-            currentData.DoDelete := cbDrives.Checked[i];
-        end;
-    end;
-    }
     // delete Reference - it will be invalid after closing the form
     DataFromMedienBib := Nil;
 end;

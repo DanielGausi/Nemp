@@ -4,13 +4,6 @@
 
     - Some String-functions
 
-    Note: Probably every function/procedure was copied from "the internet", mostly
-             www.entwickler-ecke.de
-             www.delphipraxis.net
-             www.delphi-treff.de
-          It is assumed that these functions are kinda "public domain".
-          If you want your credits here, give me a notice.
-
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
     Copyright (C) 2005-2010, Daniel Gaussmann

@@ -6,7 +6,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -47,9 +47,6 @@ type
 
             fExceptionOccured: Boolean;
             fExceptionMessage: String;
-
-            //function EncodeSessionKey(PlainKey: String): String;
-            //function DecodeSessionKey(CryptedKey: String): String;
 
             // a poor replacement for the previous encodings, but it should be sufficient
             function Rot13(aString: String): String;
@@ -135,62 +132,6 @@ begin
     result := Lowercase(MD5DigestToStr(MD5UTF8String(RawSig)));
 end;
 
-
-(*
-Session Keys are no longer md5-formatted strings. This method does not work anymore.
-function TNempScrobbler.EncodeSessionKey(PlainKey: String): String;
-var plainDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
-    i: Integer;
-const CSIDL_APPDATA = $001a;
-begin
-    if length(PlainKey) = 32 then
-    begin
-        //  PlainKey in Ziffern übersetzen
-        plainDigest := MD5StringToDigest(PlainKey);
-        //die anderen HashSummen ermitteln
-        VolumeSrnNrDigest := MD5String(AnsiString(GetVolumeSerialNr('C')));
-        FolderDigest      := MD5String(AnsiString(GetShellFolder(CSIDL_APPDATA)));
-
-        // addieren
-        for i := 0 to 15 do
-            resultDigest.v[i] := (plainDigest.v[i] + VolumeSrnNrDigest.v[i] + FolderDigest.v[i]) Mod 256;
-
-        result := Lowercase(MD5DigestToStr(resultDigest));
-    end
-    else
-    begin
-        result := PlainKey;
-    end;
-end;
-
-function TNempScrobbler.DecodeSessionKey(CryptedKey: String): String;
-var cryptedDigest, VolumeSrnNrDigest, FolderDigest, resultDigest: TMD5Digest;
-    i, tmp: Integer;
-const CSIDL_APPDATA = $001a;
-begin
-    if length(CryptedKey) = 32 then
-    begin
-        //  PlainKey in Ziffern übersetzen
-        cryptedDigest := MD5StringToDigest(CryptedKey);
-        //die anderen HashSummen ermitteln
-        VolumeSrnNrDigest := MD5String(AnsiString(GetVolumeSerialNr('C')));
-        FolderDigest      := MD5String(AnsiString(GetShellFolder(CSIDL_APPDATA)));
-
-        // addieren
-        for i := 0 to 15 do
-        begin
-            tmp := (cryptedDigest.v[i] + 256 + 256 - VolumeSrnNrDigest.v[i] - FolderDigest.v[i]);
-            resultDigest.v[i] := tmp mod 256;
-            //(cryptedDigest.v[i] {+ 256 + 256 }- VolumeSrnNrDigest.v[i] - FolderDigest.v[i]) Mod 256;
-        end;
-        result := Lowercase(MD5DigestToStr(resultDigest));
-    end
-    else
-    begin
-        result := CryptedKey;
-    end;
-end;
-*)
 
 
 procedure TNempScrobbler.LoadFromIni(Ini: TMemIniFile);

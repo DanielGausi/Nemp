@@ -27,10 +27,6 @@ object Wizard: TWizard
     Align = alClient
     MultiLine = True
     TabOrder = 0
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 512
-    ExplicitHeight = 288
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
       ExplicitLeft = 0
@@ -200,10 +196,6 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object ImageMetaData: TImage
         Left = 8
         Top = 32

@@ -14,7 +14,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -155,13 +155,6 @@ type
         TotalLyricString: UTF8String;
         TotalLyricStringIndizes: TIntArray;
 
-        // the tmp-versions of these vars are used during the update-process
-        // of the library. At the end of this process the vars will swapped
-        // within the vcl mainthread.
-        //TmpTotalString: UTF8String;
-        //TmpTotalStringIndizes: TIntArray;
-        //TmpTotalLyricString: UTF8String;
-        //TmpTotalLyricStringIndizes: TIntArray;
 
         // Getter and Setter for threadsafe properties
         function GetAccelerateSearch: LongBool;
@@ -251,8 +244,6 @@ type
         // generate the tmpTotal-Strings
         // Note: These run in a secondary thread, not the VCL-mainthread
         // Parameter is the temporary Mp3ListePfadSort from the library
-        //procedure BuildTMPTotalString(tmpFileList: TObjectList);
-        //procedure BuildTMPTotalLyricString(tmpFileList: TObjectList);
 
         // generate the TotalStrings directly
         // Note: These run in the VCL-mainthread
@@ -260,8 +251,6 @@ type
         procedure BuildTotalLyricString(FileList: TObjectList);
         procedure ClearTotalLyricString;
 
-        // Swap the TmpTotalString-Stuff (created in secondary thread)
-        // to the TotalString-Stuff (runs in secondary thread)
         procedure BuildTotalSearchStrings(FileList: TObjectList);
 
         procedure InitNewSearch(Keywords: TSearchKeyWords);
@@ -403,13 +392,9 @@ begin
     for i := 1 to 10 do
         SearchResultLists[i].Clear;
     TotalString := '';
-    //TmpTotalString := '';
     SetLength(TotalStringIndizes, 0);
-    //SetLength(TmpTotalStringIndizes, 0);
     TotalLyricString := '';
-    //TmpTotalLyricString := '';
     SetLength(TotalLyricStringIndizes, 0);
-    //SetLength(TmpTotalLyricStringIndizes, 0);
 end;
 
 procedure TBibSearcher.RemoveAudioFileFromLists(aAudioFile: TAudioFile);
@@ -465,6 +450,7 @@ end;
     Setter/Getter for properties
     InterlockedExchange necessary as these properties are used
     in BuildTmpTotalString, which runs in a secondary thread
+     -- well, not anymore, but it doesn't hurt ...
     --------------------------------------------------------
 }
 function TBibSearcher.GetAccelerateSearch: LongBool;
@@ -500,79 +486,12 @@ begin
   InterLockedExchange(Integer(fAccelerateLyricSearch), Integer(Value));
 end;
 
-(*
-{
-    --------------------------------------------------------
-    BuildTMPTotalString
-    BuildTMPTotalLyricString
-    Generate the temporary versions of the totalstrings.
-    Note: run in secondary thread!
-    --------------------------------------------------------
-}
-procedure TBibSearcher.BuildTMPTotalString(tmpFileList: TObjectList);
-var aAudioFile: TAudioFile;
-    i: Integer;
-begin
-    if AccelerateSearch then
-    begin
-        // Create TotalString and Indizes
-        // Looks complicated, but check quicksearch
-        // with/without acceleration on large libraries (~50.000 files)
-        TmpTotalString := '';
-        Setlength(TmpTotalStringIndizes, tmpFileList.Count);
-        for i := 0 to tmpFileList.Count-1 do
-        begin
-            TmpTotalStringIndizes[i] := Length(TmpTotalString);
-            aAudioFile := TAudioFile(tmpFileList[i]);
-            TmpTotalString := TmpTotalString
-                           + Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) + #1
-                           + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) + #1
-                           + Utf8Encode(AnsiLowerCase(aAudioFile.Album));
-            if AccelerateSearchIncludePath then
-                  TmpTotalString := TmpTotalString + #1
-                              + Utf8Encode(AnsiLowerCase(aAudioFile.Pfad));
-            if AccelerateSearchIncludeComment then
-                  TmpTotalString := TmpTotalString + #1
-                              + Utf8Encode(AnsiLowerCase(aAudioFile.Comment));
-            TmpTotalString := TmpTotalString + #13#10;
-        end;
-    end else
-    begin
-        TmpTotalString := '';
-        Setlength(TmpTotalStringIndizes, 0);
-    end;
-end;
-procedure TBibSearcher.BuildTMPTotalLyricString(tmpFileList: TObjectList);
-var aAudioFile: TAudioFile;
-    i: Integer;
-begin
-    if AccelerateLyricSearch then
-    begin
-        TmpTotalLyricString := '';
-        Setlength(TmpTotalLyricStringIndizes, tmpFileList.Count);
-        for i := 0 to tmpFileList.Count-1 do
-        begin
-            TmpTotalLyricStringIndizes[i] := Length(TmpTotalLyricString);
-            aAudioFile := TAudioFile(tmpFileList[i]);
-            TmpTotalLyricString := TmpTotalLyricString
-                           + Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics))) + #13#10;
-        end;
-    end else
-    begin
-        TmpTotalLyricString := '';
-        Setlength(TmpTotalLyricStringIndizes, 0);
-    end;
-end;
-*)
-
 {
     --------------------------------------------------------
     BuildTotalString
     BuildTotalLyricString
     Generate the  totalstrings.
     Note: run in VCL-Mainthread
-    just the same method as the tmp-versions.
-    Note to self: This could be done more elegant...
     --------------------------------------------------------
 }
 
@@ -780,55 +699,14 @@ end;
 
 {
     --------------------------------------------------------
-    SwapTotalStrings
-    Swap the total strings
-    Executed in the final part of an update-process
+    BuildTotalSearchStrings
     runs in VCL-Mainthread
     --------------------------------------------------------
 }
 procedure TBibSearcher.BuildTotalSearchStrings(FileList: TObjectList);
 begin
-
     BuildTotalString(FileList);
     BuildTotalLyricString(FileList);
-
-    {
-    exit;
-
-  if AccelerateSearch then
-  begin
-      // copy the indizes
-      setlength(TotalStringIndizes, length(TmpTotalStringIndizes));
-      for i := 0 to Length(TotalStringIndizes) - 1 do
-          TotalStringIndizes[i] := TmpTotalStringIndizes[i];
-      setlength(TmpTotalStringIndizes, 0);
-      // swapString. Old TotalString should be cleared automatically
-      // by compiler-magic and stuff
-      TotalString := TmpTotalString;
-  end else
-  begin
-      setlength(TotalStringIndizes, 0);
-      setlength(TmpTotalStringIndizes, 0);
-      TotalString := '';
-      TmpTotalString := '';
-  end;
-  // the same for the lyrics
-  if AccelerateLyricSearch then
-  begin
-      setlength(TotalLyricStringIndizes, length(TmpTotalLyricStringIndizes));
-      for i := 0 to Length(TotalLyricStringIndizes) - 1 do
-        TotalLyricStringIndizes[i] := TmpTotalLyricStringIndizes[i];
-      setlength(TmpTotalLyricStringIndizes, 0);
-      TotalLyricString := TmpTotalLyricString;
-  end else
-  begin
-      setlength(TotalLyricStringIndizes, 0);
-      setlength(TmpTotalLyricStringIndizes, 0);
-      TotalLyricString := '';
-      TmpTotalLyricString := '';
-  end;
-  }
-
 end;
 
 

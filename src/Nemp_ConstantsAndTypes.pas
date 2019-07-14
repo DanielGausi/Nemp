@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -41,6 +41,7 @@ type
 
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
+    // pa_default is used only for putting files from the playlist into the media library
     TProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles);
 
     TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
@@ -1066,21 +1067,10 @@ begin
         ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',False);
         ChangeFontSizeOnLength := ini.ReadBool('Font','ChangeFontSizeOnLength',False);
 
-        //MinFontColor   := StringToColor(Ini.ReadString('Font','MinColor'   , 'clred'   ));
-        //MiddleFontColor:= StringToColor(Ini.ReadString('Font','MiddleColor', 'clblack'   ));
-        //MaxFontColor   := StringToColor(Ini.ReadString('Font','MaxColor'   , 'clgreen'   ));
-        //MiddleToMinComputing := Ini.ReadInteger('Font', 'MiddleToMinComputing', 2);
-        //MiddleToMaxComputing := Ini.ReadInteger('Font', 'MiddleToMaxComputing', 2);
-
         MaxDauer[1] := Ini.ReadInteger('Font', 'Maxdauer1',  60);
         MaxDauer[2] := Ini.ReadInteger('Font', 'Maxdauer2', 150);
         MaxDauer[3] := Ini.ReadInteger('Font', 'Maxdauer3', 360);
         MaxDauer[4] := Ini.ReadInteger('Font', 'Maxdauer4', 900);
-        ///FontSize[1] := Ini.ReadInteger('Font', 'FontSize1', 6  );
-        ///FontSize[2] := Ini.ReadInteger('Font', 'FontSize2', 6  );
-        ///FontSize[3] := Ini.ReadInteger('Font', 'FontSize3', 8  );
-        ///FontSize[4] := Ini.ReadInteger('Font', 'FontSize4', 10 );
-        ///FontSize[5] := Ini.ReadInteger('Font', 'FontSize5', 12 );
 
         ChangeFontStyleOnMode := ini.ReadBool('Font','ChangeFontStyleOnMode',False);
         ChangeFontOnCbrVbr := ini.ReadBool('Font','ChangeFontOnCbrVbr',False);
@@ -1165,16 +1155,11 @@ begin
         ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
         ini.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
 
-        //ini.WriteInteger('Allgemein', 'ShutDownMode', ShutDownMode);
         Ini.WriteString('Allgemein', 'Language', Language);
         Ini.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
 
         SaveWindowPositons(ini, options, aMode);
 
-        //ini.WriteInteger('Fenster', 'Top_0'                , NempFormAufteilung[0].FormTop           );
-        //ini.WriteInteger('Fenster', 'Left_0'               , NempFormAufteilung[0].FormLeft          );
-        //ini.WriteInteger('Fenster', 'Width_0'              , NempFormAufteilung[0].FormWidth         );
-        //ini.WriteInteger('Fenster', 'Height_0'             , NempFormAufteilung[0].FormHeight        );
         ini.WriteInteger('Fenster', 'Splitter1_0'          , NempFormAufteilung[0].TopMainPanelHeight);
         ini.WriteInteger('Fenster', 'BrowseListenWeite_0'  , NempFormAufteilung[0].AuswahlPanelWidth );
         ini.WriteInteger('Fenster', 'ArtisListenWeite_0'   , NempFormAufteilung[0].ArtistWidth       );
@@ -1194,47 +1179,14 @@ begin
         Ini.WriteInteger('Fenster', 'VDTCoverHeight' , NempFormRatios.VDTCoverHeight);
         Ini.WriteInteger('Fenster', 'ArtistWidth'    , NempFormRatios.ArtistWidth  );
 
-        {ini.WriteBool('EinzelFenster','PlaylistVisible'   , NempEinzelFormOptions.PlaylistVisible           );
-        ini.WriteBool('EinzelFenster','MedienlisteVisible', NempEinzelFormOptions.MedienlisteVisible        );
-        ini.WriteBool('EinzelFenster','AuswahlVisible'    , NempEinzelFormOptions.AuswahlSucheVisible       );
-        ini.WriteBool('EinzelFenster','ControlsVisible'   , NempEinzelFormOptions.ErweiterteControlsVisible );
-
-        ini.WriteBool('EinzelFenster','PlaylistDocked'    , PlaylistForm.NempRegionsDistance.docked   );
-        ini.WriteBool('EinzelFenster','MedienlisteDocked' , MedienlisteForm.NempRegionsDistance.docked);
-        ini.WriteBool('EinzelFenster','AuswahlListeDocked', AuswahlForm.NempRegionsDistance.docked    );
-        ini.WriteBool('EinzelFenster','ExtendedControlsDocked', NempEinzelFormOptions.ExtendedControlsDocked);
-
-        Ini.WriteInteger('Einzelfenster', 'ExtendedControlsTop'   , ExtendedControlForm.Top);
-        Ini.WriteInteger('Einzelfenster', 'ExtendedControlsLeft'  , ExtendedControlForm.Left);
-
-
-        Ini.WriteInteger('Einzelfenster', 'PlaylistTop'   , PlaylistForm.Top   );
-        Ini.WriteInteger('Einzelfenster', 'PlaylistLeft'  , PlaylistForm.Left  );
-        Ini.WriteInteger('Einzelfenster', 'PlaylistHeight', PlaylistForm.Height);
-        Ini.WriteInteger('Einzelfenster', 'PlaylistWidth' , PlaylistForm.Width );
-
-        Ini.WriteInteger('Einzelfenster', 'MedienlisteTop'   , MedienlisteForm.Top   );
-        Ini.WriteInteger('Einzelfenster', 'MedienlisteLeft'  , MedienlisteForm.Left  );
-        Ini.WriteInteger('Einzelfenster', 'MedienlisteHeight', MedienlisteForm.Height);
-        Ini.WriteInteger('Einzelfenster', 'MedienlisteWidth' , MedienlisteForm.Width );
-
-        Ini.WriteInteger('Einzelfenster', 'AuswahlSucheTop'   , AuswahlForm.Top   );
-        Ini.WriteInteger('Einzelfenster', 'AuswahlSucheLeft'  , AuswahlForm.Left  );
-        Ini.WriteInteger('Einzelfenster', 'AuswahlSucheHeight', AuswahlForm.Height);
-        Ini.WriteInteger('Einzelfenster', 'AuswahlSucheWidth' , AuswahlForm.Width );
-        }
-
         Ini.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
         ini.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
         ini.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
         ini.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
         ini.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
-        // ini.WriteBool('Fenster', 'EditOnClick', EditOnClick);
         ini.WriteBool('Fenster', 'ShowCoverAndDetails', ShowCoverAndDetails);
-        //ini.WriteInteger('Fenster', 'CoverMode', CoverMode);
         ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
-        //ini.WriteInteger('Fenster', 'DetailMode', DetailMode);
 
         ini.WriteInteger('Fenster', 'ReplaceNAArtistBy', ReplaceNAArtistBy);
         ini.WriteInteger('Fenster', 'ReplaceNATitleBy' , ReplaceNATitleBy );
@@ -1253,17 +1205,6 @@ begin
         Ini.WriteInteger('Font', 'Maxdauer2', MaxDauer[2]);
         Ini.WriteInteger('Font', 'Maxdauer3', MaxDauer[3]);
         Ini.WriteInteger('Font', 'Maxdauer4', MaxDauer[4]);
-        /// Ini.WriteInteger('Font', 'FontSize1', FontSize[1]);
-        /// Ini.WriteInteger('Font', 'FontSize2', FontSize[2]);
-        /// Ini.WriteInteger('Font', 'FontSize3', FontSize[3]);
-        /// Ini.WriteInteger('Font', 'FontSize4', FontSize[4]);
-        /// Ini.WriteInteger('Font', 'FontSize5', FontSize[5]);
-
-        //Ini.WriteString('Font','MinColor'   , '$'+InttoHex(Integer( MinFontColor ),8)  );
-        //Ini.WriteString('Font','MiddleColor', '$'+InttoHex(Integer( MiddleFontColor ),8)  );
-        //Ini.WriteString('Font','MaxColor'   , '$'+InttoHex(Integer( MaxFontColor ),8)  );
-        //Ini.WriteInteger('Font', 'MiddleToMinComputing', MiddleToMinComputing);
-        //Ini.WriteInteger('Font', 'MiddleToMaxComputing', MiddleToMaxComputing);
 
         ini.Writebool('Font','ChangeFontStyleOnMode',ChangeFontStyleOnMode);
         ini.Writebool('Font','ChangeFontOnCbrVbr',ChangeFontOnCbrVbr);

@@ -562,7 +562,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = PlaylistVSTResize
           OnScroll = PlaylistVSTScroll
           OnStartDrag = PlaylistVSTStartDrag
-          ExplicitLeft = 0
           Columns = <
             item
               Margin = 0
@@ -2705,7 +2704,6 @@ object Nemp_MainForm: TNemp_MainForm
         OnInitNode = VSTInitNode
         OnKeyDown = VSTKeyDown
         OnKeyUp = PlaylistVSTKeyUp
-        OnMouseMove = VSTMouseMove
         OnNewText = VSTNewText
         OnStartDrag = VSTStartDrag
         Columns = <

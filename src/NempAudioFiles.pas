@@ -1094,24 +1094,6 @@ function TAudioFile.fGetRoundedRating: Double;
 begin
     // unit RatingCtrls
     result := GetRoundedRating(fRating);
-{    if fRating = 0 then
-        base := 127
-    else
-        base := fRating;
-
-    // note: That is the same method as used in RatingCtrls
-    result := base div 51;
-
-    if (base div 51) <= 4 then
-    begin
-        if ((base mod 51) > 25) then
-            // add a full star
-            result := result + 1
-        else
-            // add only a half star
-            result := result + 0.5;
-    end;
-}
 end;
 
 function TAudioFile.GetHint(naArtist, naTitle, naAlbum: Integer): UnicodeString;
@@ -1144,24 +1126,6 @@ begin
             if (PlayCounter > 0) then
                 result := result + ', '
                             + Format(Audiofile_PlayCounterHint, [PlayCounter]);
-
-
-            {if (fRating <> 0) or (PlayCounter > 0) then
-            begin
-                if fRating = 0 then
-                    result := result + #13#10
-                            + ' ' + Audiofile_RatingHintNoRating
-                            + ' ' + Format(Audiofile_PlayCounterHint, [PlayCounter])
-                else
-                    result := result + #13#10
-                            + ' ' + Format(Audiofile_RatingHint, [FloatToStrF(RoundedRating,ffFixed,4,1)])
-                            + ', '
-                            + Format(Audiofile_PlayCounterHint, [PlayCounter]);
-            end else
-                result := result + #13#10
-                            + ' ' + Audiofile_RatingHintNoRating;
-            }
-
         end;
 
         at_Stream: begin
@@ -1441,10 +1405,6 @@ begin
     else
     begin
         if HasSupportedTagFormat then
-        //if (AnsiLowercase(Extension) = 'mp3')
-        //or (AnsiLowercase(Extension) = 'ogg')
-        //or (AnsiLowercase(Extension) = 'flac')
-        //then
         begin
             if allowEdit then
                 result := Tags_AddTags

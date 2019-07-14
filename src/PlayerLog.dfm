@@ -29,8 +29,6 @@ object PlayerLogForm: TPlayerLogForm
     Caption = 'Close'
     TabOrder = 0
     OnClick = BtnCloseClick
-    ExplicitLeft = 554
-    ExplicitTop = 328
   end
   object BtnSettings: TButton
     Left = 366
@@ -41,8 +39,6 @@ object PlayerLogForm: TPlayerLogForm
     Caption = 'Settings'
     TabOrder = 1
     OnClick = BtnSettingsClick
-    ExplicitLeft = 442
-    ExplicitTop = 328
   end
   object vstPlayerLog: TVirtualStringTree
     Left = 8
@@ -51,44 +47,37 @@ object PlayerLogForm: TPlayerLogForm
     Height = 216
     Anchors = [akLeft, akTop, akRight, akBottom]
     Header.AutoSizeIndex = 0
-    Header.Font.Charset = DEFAULT_CHARSET
-    Header.Font.Color = clWindowText
-    Header.Font.Height = -11
-    Header.Font.Name = 'Tahoma'
-    Header.Font.Style = []
     Header.Options = [hoColumnResize, hoDblClickResize, hoDrag, hoShowSortGlyphs, hoVisible]
     Indent = 0
     TabOrder = 2
     TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
     TreeOptions.SelectionOptions = [toFullRowSelect]
     OnGetText = vstPlayerLogGetText
-    ExplicitWidth = 644
-    ExplicitHeight = 314
     Columns = <
       item
         Position = 0
+        Text = 'Time'
         Width = 85
-        WideText = 'Time'
       end
       item
         Position = 1
+        Text = 'Title'
         Width = 120
-        WideText = 'Title'
       end
       item
         Position = 2
+        Text = 'Artist'
         Width = 96
-        WideText = 'Artist'
       end
       item
         Position = 3
+        Text = 'Filename'
         Width = 148
-        WideText = 'Filename'
       end
       item
         Position = 4
+        Text = 'Remark'
         Width = 69
-        WideText = 'Remark'
       end>
   end
   object cbSessionSelect: TComboBox
@@ -105,6 +94,5 @@ object PlayerLogForm: TPlayerLogForm
     Items.Strings = (
       'Current session'
       'Previous sessions (from logfile)')
-    ExplicitTop = 112
   end
 end

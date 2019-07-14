@@ -6,7 +6,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -166,10 +166,6 @@ type
       AutoScan: Boolean;            // Scan files with Mp3fileUtils
       AutoDelete: Boolean;                  // Delete File after playback
           DisableAutoDeleteAtUserInput: Boolean;
-        //DisableAutoDeleteAtSlide: Boolean;  // ... but not after slide
-        //DisableAutoDeleteAtPause: Boolean;  // ... after the user paused the title once
-        //DisAbleAutoDeleteAtStop: Boolean;   // ... when the user clicks "stop"
-        //DisableAutoDeleteAtTitleChange: Boolean;  // ...when the user clicks "next"
       BassHandlePlaylist: Boolean;      // let the bass.dll handle webstream-playlists
       RandomRepeat: Integer;   // 0..100% - which part of the Playlist should be played before a song is selected "randomly" again?
 
@@ -418,10 +414,6 @@ begin
   // AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
   AutoDelete            := ini.ReadBool('Playlist','AutoDelete', False);
   DisableAutoDeleteAtUserInput    := ini.ReadBool('Playlist','DisableAutoDeleteAtUserInput', True);
-  //DisableAutoDeleteAtSlide        := ini.ReadBool('Playlist','DisableAutoDeleteAtSlide', True);
-  //DisableAutoDeleteAtPause        := ini.ReadBool('Playlist','DisableAutoDeleteAtPause', True);
-  //DisAbleAutoDeleteAtStop         := ini.ReadBool('Playlist','DisAbleAutoDeleteAtStop', True);
-  //DisableAutoDeleteAtTitleChange  := ini.ReadBool('Playlist','DisableAutoDeleteAtTitleChange', True);
   fAutoMix                        := ini.ReadBool('Playlist','AutoMix', False);
   fJumpToNextCueOnNextClick       := Ini.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
   fRepeatCueOnRepeatTitle         := Ini.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
@@ -457,10 +449,7 @@ begin
   ini.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadset);
   ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
   ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
-  //if PlayingFile <> NIL then
-  //    idx := PlayList.IndexOf(fPlayingFile)
-  //else
-      idx := fPlayingIndex;
+  idx := fPlayingIndex;
   ini.WriteInteger('Playlist','IndexinList',idx);
   ini.WriteBool('Playlist', 'SavePositionInTrack', SavePositionInTrack);
 
@@ -474,14 +463,9 @@ begin
   ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
   ini.WriteBool('Playlist','AutoPlayNewTitle', AutoPlayNewTitle);
   ini.WriteBool('Playlist','AutoPlayEnqueuedTitle', AutoPlayEnqueuedTitle);
-  // Ini.WriteBool('Playlist','AutoSave', AutoSave);
 
   Ini.WriteBool('Playlist','AutoDelete', AutoDelete);
   ini.WriteBool('Playlist','DisableAutoDeleteAtUserInput', DisableAutoDeleteAtUserInput);
-  //ini.WriteBool('Playlist','DisableAutoDeleteAtSlide', DisableAutoDeleteAtSlide);
-  //ini.WriteBool('Playlist','DisableAutoDeleteAtPause', DisableAutoDeleteAtPause);
-  //ini.WriteBool('Playlist','DisAbleAutoDeleteAtStop', DisAbleAutoDeleteAtStop);
-  //ini.WriteBool('Playlist','DisableAutoDeleteAtTitleChange', DisableAutoDeleteAtTitleChange);
 
   Ini.WriteBool('Playlist','AutoMix', fAutoMix);
   Ini.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
@@ -1542,79 +1526,6 @@ begin
 
     end;
 end;
-{
-procedure TNempPlaylist.RemoveSelectedNodesFromPreBookList;
-var i:integer;
-  Selectedmp3s: TNodeArray;
-  aData: PTreeData;
-begin
-    Selectedmp3s := VST.GetSortedSelection(False);
-    if length(SelectedMp3s) = 0 then exit;
-
-    VST.BeginUpdate;
-
-    for i := 0 to length(Selectedmp3s)-1 do
-    begin
-      // We dont need to handle Cue-Nodes here
-      if VST.GetNodeLevel(Selectedmp3s[i])=0 then
-      begin
-          aData := VST.GetNodeData(Selectedmp3s[i]);
-          aData^.FAudioFile.PrebookIndex := 0;
-          PrebookList.Remove(aData^.FAudioFile);
-      end
-    end;
-
-    ReIndexPrebookedFiles;
-
-    VST.EndUpdate;
-    VST.Invalidate;
-end;
-
-
-procedure TNempPlaylist.AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
-var i:integer;
-  Selectedmp3s: TNodeArray;
-  aData: PTreeData;
-  af: TAudioFile;
-begin
-
-    Selectedmp3s := VST.GetSortedSelection(False);
-    if length(SelectedMp3s) = 0 then exit;
-
-    for i := 0 to length(Selectedmp3s)-1 do
-    begin
-      // We dont need to handle Cue-Nodes here
-      if VST.GetNodeLevel(Selectedmp3s[i])=0 then
-      begin
-          aData := VST.GetNodeData(Selectedmp3s[i]);
-          af := aData^.FAudioFile;
-
-          case Mode of
-              pb_Beginning: begin
-                    if PrebookList.IndexOf(af) > -1 then
-                        PrebookList.Move(PrebookList.IndexOf(af), i)
-                    else
-                        if PrebookList.Count < 99 then
-                            PrebookList.Insert(i, af);
-              end;
-
-              pb_End: begin
-                    if PrebookList.IndexOf(af) > -1 then
-                        PrebookList.Move(PrebookList.IndexOf(af), PrebookList.Count-1)
-                    else
-                        if PrebookList.Count < 99 then
-                            PrebookList.Add(af);
-              end;
-          end;
-
-      end
-    end;
-
-    ReIndexPrebookedFiles;
-    VST.Invalidate;
-end;
-}
-
 
 procedure TNempPlaylist.ReIndexPrebookedFiles;
 var i:Integer;

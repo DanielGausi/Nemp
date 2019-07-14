@@ -162,7 +162,9 @@ ShowWindow
   {$ENDIF}
 
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
-  Application.CreateForm(TProgressForm, ProgressForm);
+  Application.CreateForm(TProgressForm, ProgressFormPlaylist);
+  Application.CreateForm(TProgressForm, ProgressFormLibrary);
+
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

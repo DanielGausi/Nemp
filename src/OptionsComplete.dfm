@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabFiles2
+      ActivePage = TabPlayer8
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2820,7 +2820,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Hint = 'Increase the playcounter of a file after it was played'
             Caption = 'Increase play counter'
             TabOrder = 2
-            OnClick = cb_RatingChangeCounterClick
           end
           object cb_RatingIncreaseRating: TCheckBox
             Left = 33
@@ -3469,7 +3468,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Hint = 'Deny access from "the internet".'
           Caption = 'Local network only'
           TabOrder = 2
-          OnClick = cbOnlyLANClick
         end
       end
       object TabPlayer0: TTabSheet
@@ -5124,7 +5122,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Hint = 'Let the user control the player (play/stop/next/volume/...)'
             Caption = 'Permit remote control of the player'
             TabOrder = 5
-            OnClick = cbAllowRemoteControlClick
           end
           object cbPermitVote: TCheckBox
             Left = 16
@@ -5136,7 +5133,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'ed first'
             Caption = 'Permit voting for files'
             TabOrder = 2
-            OnClick = cbAllowRemoteControlClick
           end
           object cbPermitLibraryAccess: TCheckBox
             Left = 16
@@ -5146,7 +5142,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Hint = 'Let the user search and browse in your library'
             Caption = 'Permit access to the media library (read only)'
             TabOrder = 3
-            OnClick = cbPermitLibraryAccessClick
           end
           object cbPermitPlaylistDownload: TCheckBox
             Left = 16
@@ -5156,7 +5151,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Hint = 'Let the user download files from your playlist and/or library'
             Caption = 'Permit downloading files from the playlist'
             TabOrder = 4
-            OnClick = cbPermitPlaylistDownloadClick
           end
           object EdtUsername: TEdit
             Left = 17
@@ -5200,7 +5194,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       TabOrder = 0
       Text = 'Commonly used settings'
       Visible = False
-      OnChange = _XXX_cb_SettingsModeChange
       Items.Strings = (
         'Commonly used settings'
         'All settings')

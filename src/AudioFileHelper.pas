@@ -11,7 +11,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -55,53 +55,6 @@ function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
 function Sortieren_String2String1Titel_asc(item1,item2:pointer):integer;
 function Sortieren_CoverID(item1,item2:pointer):integer;
 
-
-// Note: The following CompareFunctions are not needed any longer
-//       due to the new Sort-System in Nemp 4.0
-//function Sortieren_ArtistAlbumTitel_asc(item1,item2:pointer):integer;
-
-//function Sortieren_AlbumArtistTitel_asc(item1,item2:pointer):integer;
-//function Sortieren_AlbumTitelArtist_asc(item1,item2:pointer):integer;
-
-//function Sortieren_Dateiname_asc(item1,item2:pointer):integer;
-
-//function Sortieren_Dauer_asc(item1,item2:pointer):integer;
-//function Sortieren_DateiGroesse_asc(item1,item2:pointer):integer;
-//function Sortieren_Bitrate_asc(item1,item2:pointer):integer;
-
-//function Sortieren_CBR_asc(item1,item2:pointer):integer;
-//function Sortieren_Mode_asc(item1,item2:pointer):integer;
-//function Sortieren_Samplerate_asc(item1,item2:pointer):integer;
-//function Sortieren_Comment_asc(item1,item2:pointer):integer;
-
-//function Sortieren_Lyrics_asc(item1,item2:pointer):integer;
-//function Sortieren_Track_asc(item1,item2:pointer):integer;
-//function Sortieren_Genre_asc(item1,item2:pointer):integer;
-
-//function Sortieren_Rating_asc(item1,item2:pointer):integer;
-
-//function Sortieren_ArtistTitel_desc(item1,item2:pointer):integer;
-//function Sortieren_ArtistAlbumTitel_desc(item1,item2:pointer):integer;
-//function Sortieren_TitelArtist_desc(item1,item2:pointer):integer;
-//function Sortieren_AlbumArtistTitel_desc(item1,item2:pointer):integer;
-//function Sortieren_AlbumTitelArtist_desc(item1,item2:pointer):integer;
-//function Sortieren_Pfad_desc(item1,item2:pointer):integer;
-//function Sortieren_Dateiname_desc(item1,item2:pointer):integer;
-//function Sortieren_Dauer_desc(item1,item2:pointer):integer;
-//function Sortieren_DateiGroesse_desc(item1,item2:pointer):integer;
-//function Sortieren_Bitrate_desc(item1,item2:pointer):integer;
-
-//function Sortieren_CBR_desc(item1,item2:pointer):integer;
-//function Sortieren_Mode_desc(item1,item2:pointer):integer;
-//function Sortieren_Samplerate_desc(item1,item2:pointer):integer;
-//function Sortieren_Comment_desc(item1,item2:pointer):integer;
-//function Sortieren_Track_desc(item1,item2:pointer):integer;
-//function Sortieren_Jahr_desc(item1,item2:pointer):integer;
-//function Sortieren_Lyrics_desc(item1,item2:pointer):integer;
-
-//function Sortieren_Genre_desc(item1,item2:pointer):integer;
-//function Sortieren_AlbumTrack_desc(item1,item2:pointer):integer;
-//function Sortieren_Rating_Desc(item1,item2:pointer):integer;
 
 function binaersuche(Liste: TObjectlist; FilePath, FileName: UnicodeString; l,r:integer):integer;
 function BinaerAlbumSuche(Liste: TObjectlist; album: UnicodeString; l,r:integer):integer;
@@ -384,307 +337,6 @@ begin
     result := AnsiCompareText(TAudioFile(item1).Genre, TAudioFile(item2).Genre)
 end;
 
-(*
-function Sortieren_ArtistAlbumTitel_asc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:=AnsiCompareText(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item1).Album, TAudioFile(item2).Album);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_AlbumArtistTitel_asc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:= AnsiCompareText(TAudioFile(item1).Album, TAudioFile(item2).Album);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_AlbumTitelArtist_asc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:= AnsiCompareText(TAudioFile(item1).Album, TAudioFile(item2).Album);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item1).Titel, TAudioFile(item2).Titel);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item1).Artist, TAudioFile(item2).Artist);
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_Dateiname_asc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText(TAudioFile(item1).Dateiname, TAudioFile(item2).Dateiname)
-end;
-function Sortieren_Dauer_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).Duration,TAudioFile(item2).Duration);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_DateiGroesse_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).Size,TAudioFile(item2).Size);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Bitrate_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).Bitrate,TAudioFile(item2).Bitrate);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-
-function Sortieren_CBR_asc(item1,item2:pointer):integer;
-begin
-    if (TAudioFile(item1).vbr) = (TAudioFile(item2).vbr)
-    then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2)
-    else
-      if (TAudioFile(item1).vbr) then
-        result := -1
-      else
-        result := 1;
-end;
-function Sortieren_Mode_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).ChannelModeInt, TAudioFile(item2).ChannelModeInt);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Samplerate_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).SamplerateInt, TAudioFile(item2).SamplerateInt);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Comment_asc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText(TAudioFile(item1).Comment, TAudioFile(item2).Comment);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-
-function Sortieren_Lyrics_asc(item1,item2:pointer):integer;
-begin
-    if (TAudioFile(item1).LyricsExisting) = (TAudioFile(item2).LyricsExisting)
-    then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2)
-    else
-      if (TAudioFile(item1).LyricsExisting) then
-        result := -1
-      else
-        result := 1;
-end;
-
-function Sortieren_Track_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).Track, TAudioFile(item2).Track);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-function Sortieren_Genre_asc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText(TAudioFile(item1).Genre,TAudioFile(item2).Genre);
-  if result = 0 then
-    result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-function Sortieren_Rating_asc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item1).Rating, TAudioFile(item2).Rating);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-//----------------
-// Descending sort
-function Sortieren_ArtistTitel_desc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText(TAudioFile(item2).Artist, TAudioFile(item1).Artist);
-    if result=0 then
-        result := AnsiCompareText(TAudioFile(item2).Titel, TAudioFile(item1).Titel);
-end;
-
-function Sortieren_ArtistAlbumTitel_desc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:=AnsiCompareText(TAudioFile(item2).Artist, TAudioFile(item1).Artist);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item2).Album, TAudioFile(item1).Album);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item2).Titel, TAudioFile(item1).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_TitelArtist_desc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText(TAudioFile(item2).Titel, TAudioFile(item1).Titel);
-    if result = 0 then
-        result := AnsiCompareText(TAudioFile(item2).Artist, TAudioFile(item1).Artist);
-end;
-
-function Sortieren_AlbumArtistTitel_desc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:= AnsiCompareText(TAudioFile(item2).Album, TAudioFile(item1).Album);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item2).Artist, TAudioFile(item1).Artist);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item2).Titel, TAudioFile(item1).Titel)
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_AlbumTitelArtist_desc(item1,item2:pointer):integer;
-var tmp1,tmp2:integer;
-begin
-    tmp1:= AnsiCompareText(TAudioFile(item2).Album, TAudioFile(item1).Album);
-    if tmp1=0 then
-    begin
-        tmp2 := AnsiCompareText(TAudioFile(item2).Titel, TAudioFile(item1).Titel);
-        if tmp2 = 0 then
-        begin
-            result:= AnsiCompareText(TAudioFile(item2).Artist, TAudioFile(item1).Artist);
-        end else result:=tmp2;
-    end
-    else result:= tmp1;
-end;
-
-function Sortieren_Pfad_desc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText(TAudioFile(item2).Pfad, TAudioFile(item1).Pfad);
-end;
-
-function Sortieren_Dateiname_desc(item1,item2:pointer):integer;
-begin
-    result:=AnsiCompareText(TAudioFile(item2).Dateiname, TAudioFile(item1).Dateiname)
-end;
-function Sortieren_Dauer_desc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item2).Duration,TAudioFile(item1).Duration);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_DateiGroesse_desc(item1,item2:pointer):integer;
-begin
-    result:=compareValue(TAudioFile(item2).Size,TAudioFile(item1).Size);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Bitrate_desc(item1,item2:pointer):integer;
-begin
-    result:=compareValue(TAudioFile(item2).Bitrate,TAudioFile(item1).Bitrate);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-function Sortieren_CBR_desc(item1,item2:pointer):integer;
-begin
-    if (TAudioFile(item1).vbr) = (TAudioFile(item2).vbr)
-    then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2)
-    else
-      if (TAudioFile(item1).vbr) then
-        result := 1
-      else
-        result := -1;
-end;
-function Sortieren_Mode_desc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item2).ChannelModeInt, TAudioFile(item1).ChannelModeInt);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Samplerate_desc(item1,item2:pointer):integer;
-begin
-    result := compareValue(TAudioFile(item2).SamplerateInt, TAudioFile(item1).SamplerateInt);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Comment_desc(item1,item2:pointer):integer;
-begin
-    result := AnsiCompareText(TAudioFile(item2).Comment, TAudioFile(item1).Comment);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-
-function Sortieren_Jahr_desc(item1,item2:pointer):integer;
-begin
-    result:=AnsiCompareText(TAudioFile(item2).Year,TAudioFile(item1).Year);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2);
-end;
-function Sortieren_Lyrics_desc(item1,item2:pointer):integer;
-begin
-    if (TAudioFile(item1).LyricsExisting) = (TAudioFile(item2).LyricsExisting)
-    then
-      result := Sortieren_ArtistAlbumTitel_asc(item1,item2)
-    else
-      if (TAudioFile(item1).LyricsExisting) then
-        result := 1
-      else
-        result := -1;
-end;
-function Sortieren_Track_desc(item1,item2:pointer):integer;
-begin
-  result := compareValue(TAudioFile(item2).Track, TAudioFile(item1).Track);;
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_desc(item1,item2);
-end;
-function Sortieren_Genre_desc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText(TAudioFile(item2).Genre,TAudioFile(item1).Genre);
-  if result = 0 then
-    result := Sortieren_ArtistAlbumTitel_desc(item1,item2);
-end;
-
-function Sortieren_AlbumTrack_desc(item1,item2:pointer):integer;
-begin
-  result := AnsiCompareText(TAudioFile(item2).Album,TAudioFile(item1).Album);
-  if result = 0 then
-      result := AnsiCompareText(TAudioFile(item2).Ordner,TAudioFile(item1).Ordner);
-  if result = 0 then
-      result := CompareValue(TAudioFile(item2).Track,TAudioFile(item1).Track);
-  if result = 0 then
-      result := AnsiCompareText(TAudioFile(item2).Dateiname,TAudioFile(item1).Dateiname);
-end;
-
-function Sortieren_Rating_Desc(item1,item2:pointer):integer;
-begin
-  result := compareValue(TAudioFile(item2).Rating, TAudioFile(item1).Rating);
-    if result = 0 then
-      result := Sortieren_ArtistAlbumTitel_desc(item1,item2);
-end;
-*)
 
 function Sortieren_String1String2Titel_asc(item1,item2:pointer):integer;
 var tmp1,tmp2: Integer;
@@ -736,7 +388,6 @@ end;
 
 function binaersuche(Liste: TObjectlist; FilePath, FileName: UnicodeString; l,r:integer):integer;
 var m:integer;
-    //strm: UnicodeString;
     c:integer;
 begin
     if (r < l) or (r = -1) then
@@ -750,10 +401,6 @@ begin
           c := AnsiCompareText(FilePath, TAudioFile(Liste[m]).Ordner);
           if c = 0 then
               c := AnsiCompareText(FileName, TAudioFile(Liste[m]).Dateiname);
-
-          //        strm:=(Liste[m] as TAudioFile).Pfad;
-          //c := AnsiCompareText(filename,strm);
-
 
         if l=r then
         begin
@@ -783,7 +430,6 @@ begin
     end else
     begin
         m:=(l+r) DIV 2;
-        // strm:=(Liste[m] as TAudioFile).Strings[SortArray[2]]; //Album;
 
         strm:=(Liste[m] as TAudioFile).Key2;
         c := AnsiCompareText(album,strm);
@@ -814,7 +460,6 @@ begin
     end else
     begin
         m:=(l+r) DIV 2;
-        //strm:=(Liste[m] as TAudioFile).Strings[SortArray[1]]; //artist;
         strm:=(Liste[m] as TAudioFile).Key1;
         c := AnsiCompareText(artist,strm);
         if l=r then
@@ -873,7 +518,6 @@ begin
     end else
     begin
         m:=(l+r) DIV 2;
-        //strm:=(Liste[m] as TAudioFile).Strings[SortArray[1]]; //artist;
         strm:=(Liste[m] as TAudioFile).Key1;
         c := AnsiCompareText(artist,strm);
         if l=r then
@@ -902,7 +546,6 @@ begin
     end else
     begin
         m:=(l+r) DIV 2;
-        //strm:=(Liste[m] as TAudioFile).Strings[SortArray[2]]; //Album;
         strm:=(Liste[m] as TAudioFile).Key2;
         c := AnsiCompareText(album,strm);
         if l=r then
@@ -920,27 +563,6 @@ begin
         end;
     end;
 end;
-
-{
-    --------------------------------------------------------
-    Getting the Data for a new created AudioFile
-    --------------------------------------------------------
-}
-(*procedure SynchronizeAudioFile(aNewFile: TAudioFile;
-  aFileName: UnicodeString; WithCover: Boolean = True);
-var mbAf: TAudioFile;
-begin
-    aNewFile.GetAudioData(aFileName, GAD_Cover OR GAD_Rating);
-    if WithCover then
-        Medienbib.InitCover(aNewFile);
-    mbAf := MedienBib.GetAudioFileWithFilename(aFileName);
-    if assigned(mbAF) then
-    begin
-        aNewFile.Assign(mbAF);
-    end;
-        // aNewFile.Rating := mbAf.Rating;
-end;
-*)
 
 
 {

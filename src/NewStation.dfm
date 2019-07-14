@@ -87,7 +87,6 @@ object NewStationForm: TNewStationForm
       Width = 73
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
       ItemIndex = 0
       TabOrder = 2
       Text = 'mp3'
@@ -105,7 +104,6 @@ object NewStationForm: TNewStationForm
       Height = 21
       Style = csDropDownList
       DropDownCount = 10
-      ItemHeight = 13
       ItemIndex = 11
       TabOrder = 3
       Text = '128'

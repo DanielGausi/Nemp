@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -38,7 +38,7 @@ uses Windows, Forms, Classes, SysUtils, hilfsfunktionen;
 
 
   procedure StatusProc(buffer: Pointer; length: DWORD; user: Pointer); stdcall;
- // procedure DoMeta(meta: PAnsiChar);
+
 
 implementation
 
@@ -51,7 +51,6 @@ begin
   begin
       if (length = 0) then
           Spectrum.DrawText(String(PAnsiChar(buffer)))
-          //AddErrorLog(String(PAnsiChar(buffer)));
       else
       begin
           if NempPlayer.StreamRecording and assigned(NempPlayer.RecordStream) then
@@ -68,49 +67,6 @@ begin
       if assigned(NempPlayer.RecordStream) then
           FreeandNil(NempPlayer.RecordStream);
 end;
-   (*
-procedure DoMeta(meta: PAnsiChar);
-var
-  p: Integer;
-  oldTitel: UnicodeString;
-begin
-  oldTitel := '';
 
-  if (meta <> nil) AND (NempPlaylist.PlayingFile <> NIL) then
-  begin
-        wuppdi;
-        oldTitel := NempPlayer.PlayingTitel;
-        p := Pos('StreamTitle=', meta);
-        if (p > 0) then
-        begin
-            p := p + 13;
-            NempPlaylist.PlayingFile.Titel := Copy(meta, p, Pos(';', meta) - p - 1);
-        end else
-        begin
-            // nach Ogg-Daten suchen
-            if (meta <> nil) then
-                try
-                    while (meta^ <> #0) do
-                    begin
-                      if (AnsiUppercase(Copy(meta, 1, 7)) = 'ARTIST=') then
-                          NempPlaylist.PlayingFile.Artist := Copy(meta, 8, Length(meta) - 7)
-                      else
-                          if (AnsiUppercase(Copy(meta,1,6)) = 'TITLE=') then
-                              NempPlaylist.PlayingFile.Titel := trim(Copy(meta, 7, Length(meta) - 6 ));
-                      meta := meta + Length(meta) + 1;
-                    end;
-                except
-                  // Wenn was schief gelaufen ist: Dann gibts halt keine Tags...
-                end;
-        end;
-        NempPlayer.RefreshPlayingTitel;// := Nemp_MainForm.GeneratePlayingTitel(Nemp_MainForm.PlayingFile, Nemp_MainForm.NempOptions.PlayingTitelMode);
-        Application.Title := NempPlayer.GenerateTaskbarTitel;
-
-        if NempPlayer.StreamRecording AND (oldTitel<> NempPlayer.PlayingTitel) AND NempPlayer.AutoSplitByTitle then
-            NempPlayer.StartRecording;
-
-        Nemp_MainForm.NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
-  end;
-end;   *)
 
 end.

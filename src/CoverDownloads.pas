@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -83,7 +83,6 @@ type
     TCoverDownloadWorkerThread = class(TThread)
         private
             { Private-Deklarationen }
-            /// fIDHttp: TIdHttp;
             fHttpClient: THttpClient;
 
             //fSemaphore: THandle;
@@ -114,8 +113,6 @@ type
                                        // therefore: change it to ...
             fUserWantToClearCacheList: LongBool;
 
-
-
             fMostImportantIndex: Integer;
             procedure SetMostImportantIndex(Value: Integer);    // VCL
 
@@ -125,8 +122,6 @@ type
             function IsProperAlbum(aAudioFileList: TObjectList): Boolean;
             function CollectAlbumInformation: Boolean;
             function CollectCDInformation: Boolean;
-
-
 
             // Thread-methods. Downloading, parsing, ...
             function QueryLastFMCoverXML: Boolean;
@@ -143,7 +138,6 @@ type
 
             function GetMatchingCacheItem: TCoverDownloadItem;
             function CacheItemCanBeRechecked(aCacheItem: TCoverDownloadItem): Boolean;
-
 
             // VCL-methods
             function StreamToBitmap(TargetBMP: TBitmap): Boolean;
@@ -164,7 +158,6 @@ type
             procedure AddLogoToBitmap(aLogo: String; Target: TBitmap);
             // Update CoverFlow-Data in Medialibrary
             procedure SyncUpdateMedialib;
-
 
         protected
 
@@ -289,24 +282,16 @@ begin
     fEvent := TEvent.Create(Nil, True, False, '');
     FreeOnTerminate := False;
 
-    //fIDHttp.ConnectTimeout:= 2000;
-    //fIDHttp.ReadTimeout:= 2000;
-    //fIDHttp.Request.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
-    //fIDHttp.Request.CharSet := 'utf-8';
-    //fIDHttp.HTTPOptions :=  [];
-
     fHttpClient := THttpClient.Create;
     fHttpClient.UserAgent := 'Mozilla/3.0 (compatible; Nemp)' ;
     fHttpClient.ConnectionTimeout := 5000;
     fHttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12, THTTPSecureProtocol.TLS11];
 
     UserWantToClearCacheList := False;
-    //Resume;
 end;
 
 destructor TCoverDownloadWorkerThread.Destroy;
 begin
-    //fIDHttp.Free;
     fHttpClient.Free;
     fDataStream.Free;
     fJobList.Free;
@@ -668,7 +653,6 @@ end;
 
 
 
-
 {
     --------------------------------------------------------
     GetMatchingCacheItem:
@@ -809,50 +793,6 @@ begin
         end; }
     end;
 end;
-{
-function TCoverDownloadWorkerThread.QueryLastFMCoverXML: Boolean;
-var url: UTF8String;
-begin
-    url := 'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
-        + '&api_key=' + String(NempPlayer.NempScrobbler.ApiKey)
-        + '&artist=' + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Artist)))
-        + '&album='  + StringToURLStringAnd(UTF8String(AnsiLowerCase(fCurrentDownloadItem.Album)));
-
-    try
-        //fXMLData := fIDHttp.Get(url);
-        fXMLData := (fHttpClient.Get(url)).
-
-        result := True;
-    except
-        on E: EidIOHandlerPropInvalid  do
-        begin
-            fInternetConnectionLost := True;
-            fXMLData := '';
-            result := False;
-        end;
-
-        on E: EIDHttpProtocolException do
-        begin
-            // lastFM seems to send a "400-Bad Request" when an album is not found
-            // but a "no connection" logo on the cover would be wrong here
-            fInternetConnectionLost := False;
-            fXMLData := '';
-            result := False;
-        end;
-        on E: EIdSocketError do
-        begin
-            fInternetConnectionLost := True;
-            fXMLData := '';
-            result := False;
-        end;
-        else
-        begin
-            fXMLData := '';
-            result := False;
-        end;
-    end;
-end;
-}
 
 {
     --------------------------------------------------------
@@ -885,8 +825,6 @@ begin
         fBestCoverURL := '';
     end;
 
-    // Note: Try to download through https:// in a later version .... done :D
-    /////  fBestCoverURL := Stringreplace(fBestCoverURL, 'https://', 'http://', [rfReplaceAll]);
 end;
 
 
@@ -1408,8 +1346,7 @@ begin
         if  MedienBib.NewCoverFlow.CurrentCoverID = OldID then
             MedienBib.NewCoverFlow.CurrentCoverID := NewID;
 
-    end;// else
-        //Nemp_MainForm.Caption := 'Upsa, Coverflow changed? ' + OldID;
+    end;
 end;
 
 

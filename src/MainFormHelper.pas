@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -60,17 +60,10 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
     procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
 
-    // function GetObjectAt(form: TForm; x,y: integer): TControl;
     function ObjectIsPlaylist(aName:string): Boolean;
     function ObjectIsHeadphone(aName:string): Boolean;
 
     // Blockiert GUI-Elemente, die ein Hinzufügen/Löschen von Elementen in der Medienbib verursachen
-    //procedure BlockeMedienListeUpdate(block: Boolean);
-    // Blockiert Schreibzugriffe auf die Medienliste
-    //procedure BlockeMedienListeWriteAcces(block: Boolean);
-    //blockiert auch Lese-Zugriff auf die Medienliste
-    //procedure BlockeMedienListeReadAccess(block: Boolean);
-    // Blocke Update/Write/Read done in these two new methods now:
     procedure BlockGUI(aBlockLevel: Integer);
     procedure UnBlockGUI;
 
@@ -342,26 +335,6 @@ begin
         // Start the work
         // status should be still = 0 here, so it's save to start the jobs now
         MedienBib.ProcessNextStartJob;
-
-        {if MedienBib.AutoScanDirs then
-        begin
-              ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-              for i := MedienBib.AutoScanToDoList.Count - 1 downto 0 do
-              begin
-                  if DirectoryExists(MedienBib.AutoScanToDoList[i]) then
-                  begin
-                      MedienBib.ST_Ordnerlist.Add(MedienBib.AutoScanToDoList[i]);
-                      MedienBib.AutoScanToDoList.Delete(i);
-                  end;
-              end;
-              if MedienBib.ST_Ordnerlist.Count > 0 then
-              begin
-                  MedienBib.StatusBibUpdate := 1;
-                  BlockeMedienListeUpdate(True);
-                  ST_Medienliste.SearchFiles(MedienBib.ST_Ordnerlist[0]);
-              end;
-        end;
-        }
     end;
 end;
 
@@ -472,24 +445,6 @@ begin
 end;
 
 
-{
-function GetObjectAt(form: TForm; x,y: integer): TControl;
-var
- i: integer;
-begin
- result := nil;
-for i := 0 to form.ComponentCount-1 do
-  if form.Components[i] is TControl then        // is TControl
-    if PtInRect(
-        Rect(TControl(form.Components[i]).ClientToScreen(TControl(form.Components[i]).clientrect.TopLeft),
-              TControl(form.Components[i]).ClientToScreen(TControl(form.Components[i]).clientrect.BottomRight)),
-              point(x,y))
-        then
-              result := TControl(form.Components[i]);
-
-end;
-}
-
 function ObjectIsPlaylist(aName:string): Boolean;
 begin
   result := (aName = 'PlaylistVST') or (aName = 'PlaylistVST_IMG');
@@ -500,75 +455,6 @@ begin
   result := (aName = 'GRPBOXHeadset');
 end;
 
-{
-procedure BlockeMedienListeUpdate(block: Boolean);
-begin
-    // nothing todo - MenuItems are done o the OnPopup-Event (Toplevel-onClick for MainMenu)
-    with Nemp_MainForm do
-    begin
-        block := not block;
-        // Einträge im Hauptmenü
-        MM_ML_SearchDirectory.Enabled   := block;
-        MM_ML_Delete.Enabled         := block;
-        MM_ML_Load.Enabled   := block;
-        MM_ML_Save.Enabled := block;
-        MM_ML_DeleteMissingFiles.Enabled := block;
-        // MM_ML_DeleteSelectedFiles.Enabled := block;
-        MM_ML_RefreshAll.Enabled := block;
-        //MM_ML_ResetRatings.Enabled := block;
-        // Einträge im Popup-Menü der Medienliste
-        PM_ML_MedialibraryDeleteNotExisting.Enabled := block;
-        PM_ML_MedialibraryRefresh.Enabled := block;
-        //PM_ML_ResetRatings.Enabled := block;
-        PM_ML_MedialibrarySave.Enabled := block;
-        PM_ML_MedialibraryLoad.Enabled := block;
-        PM_ML_MedialibraryDelete.Enabled := block;
-        PM_ML_SearchDirectory.Enabled := block;
-        PM_ML_Medialibrary.Enabled := block;
-        PM_ML_Webradio.Enabled := block;
-        PM_ML_RefreshSelected.Enabled := block;
-        PM_ML_DeleteSelected.Enabled := block;
-        PM_ML_PasteFromClipboard.Enabled := block;
-    end;
-
-end;
-
-procedure BlockeMedienListeWriteAcces(block: Boolean);
-begin
-    // nothing todo - MenuItems are done o the OnPopup-Event (Toplevel-onClick for MainMenu)
-    with Nemp_MainForm do
-    begin
-        if block then
-          BlockeMedienListeUpdate(block);
-        block := not block;
-        //Sortierauswahl-Menüeinträge
-        MM_ML_BrowseBy.Enabled := block;
-        PM_ML_BrowseBy.Enabled := block;
-    end;
-end;
-
-procedure BlockeMedienListeReadAccess(block: Boolean);
-begin
-    with Nemp_MainForm do
-    begin
-        //if block then
-        //  BlockeMedienListeWriteAcces(block);
-        block := not block;
-        //Browse-Listen disablen;
-        ArtistsVST.Enabled := block;
-        AlbenVST.Enabled   := block;
-
-        PanelCoverBrowse.Enabled := Block;
-
-        // Panel Suche//Auswahl disablen
-          TabBtn_CoverFlow.Enabled := block;
-          TabBtn_Browse.Enabled := block;
-          TabBtn_TagCloud.Enabled := block;
-
-          if assigned(FormBibSearch) then
-              FormBibSearch.EnableControls(False);
-    end;
-end;       }
 
 procedure BlockGUI(aBlockLevel: Integer);
 begin
@@ -998,7 +884,8 @@ begin
         ReTranslateComponent (PlaylistForm    );
         ReTranslateComponent (AuswahlForm     );
         ReTranslateComponent (MedienlisteForm );
-        ReTranslateComponent (ProgressForm    );
+        ReTranslateComponent (ProgressFormLibrary    );
+        ReTranslateComponent (ProgressFormPlaylist   );
 
         if assigned(FNewPicture          ) then ReTranslateComponent(FNewPicture         );
         if assigned(FSplash              ) then ReTranslateComponent(FSplash             );
@@ -1671,22 +1558,7 @@ begin
     end;
 
 end;
-         {
-procedure CheckAndDoCoverDownloaderQuery;
-begin
-          if (MedienBib.CoverSearchLastFM = BoolUnDef)
-              and MedienBib.CoverSearchLastFMInit
-          then
-          begin
-              MedienBib.CoverSearchLastFMInit := False;
-              if Nemp_MainForm.NempOptions.WriteAccessPossible
-                  and (MessageDlg(CoverFlowLastFM_Confirmation, mtConfirmation, [mbYes,MBNo], 0) = mrYes)
-              then
-                  MedienBib.CoverSearchLastFM := BoolTrue
-              else
-                  MedienBib.CoverSearchLastFM := BoolFalse;
-          end;
-end;       }
+
 
 procedure HandleStopAfterTitleClick;
 begin

@@ -249,8 +249,6 @@ type
 
           // the main scrobbling methods
           procedure fScrobbleStuff(aScrobbleMode: TScrobbleMode);
-          // procedure fScrobbleNowPlaying;
-          // procedure fScrobbleSubmit;
 
           // begins the new thread with the proper method
           procedure ScrobbleNowPlaying;
@@ -1367,7 +1365,6 @@ begin
 end;
 procedure StartScrobbleNowPlaying(Scrobbler: TScrobbler);
 begin
-    //Scrobbler.fScrobbleNowPlaying;
     Scrobbler.fScrobbleStuff(sm_NowPlaying);
 end;
 
@@ -1378,118 +1375,9 @@ begin
 end;
 procedure StartScrobbleSubmit(Scrobbler: TScrobbler);
 begin
-    //Scrobbler.fScrobbleSubmit;
     Scrobbler.fScrobbleStuff(sm_Scrobble);
 end;
 
-
-{procedure TScrobbler.fScrobbleNowPlaying;
-var tmpStat: TScrobbleStatus;
-    ResponseString: UnicodeString;
-    MessageText: UnicodeString;
-    aResponse: IHttpResponse;
-begin
-    try
-        try
-            // 1st: Check, whether it is ok to scrobble
-            // should be done in this thread, as we eventually change the corresponding values
-            // if something is wrong here (Errorcount, nextAllowedScrobbelTime, etc.)
-            if Parent.fScrobblingAllowed then
-            begin
-                //Response := fIDHTTP.Post(BaseApiURL, ParamList);
-                aResponse := fHttpClient.Post(BaseApiURL, ParamList);
-
-                if aResponse.StatusCode >= 300 then
-                begin
-                    // some error occurred (404 or something)
-                    Parent.CountError;
-                    tmpStat := ParseNowPlayingResult(aResponse.StatusText, sm_NowPlaying);
-                    MessageText := Scrobble_ProtocolError + '. Server message: ' + aResponse.StatusText;
-                    // if the Status is hs_UnknownFailure
-                    if tmpStat = hs_UnknownFailure then
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)))
-                    else
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_ProtocolError, LParam(PWideChar(MessageText)));
-                end else
-                begin
-                    // success !!!
-                    ResponseString := aResponse.ContentAsString;
-
-                    // Parse the Response and react properly
-                    tmpStat := ParseNowPlayingResult(ResponseString, sm_NowPlaying);
-                    if tmpStat = hs_UnknownFailure then
-                    begin
-                        MessageText := Scrobble_UnkownError + '. Server message: ' + ResponseString;
-                        SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
-                    end;    // else: nothing to do, everything is fine
-                end;
-            end;
-            // else: the main window was notified by the fScrobblingAllowed-method,
-            // that the scobbling was skipped and Endwork will be called via "JobDone"
-
-        except
-            on E: Exception do
-            begin
-                Parent.CountError;
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
-            end;
-        end;
-    finally
-        self.free;
-    end;
-end;   }
-
-
-
-{
-procedure TScrobbler.fScrobbleSubmit;
-var tmpStat: TScrobbleStatus;
-    Response, MessageText: UnicodeString;
-begin
-    try
-        try
-            if Parent.fScrobblingAllowed then
-            begin
-                Response := fIDHTTP.Post(BaseApiURL, ParamList);
-                // Parse the Response and react properly
-                tmpStat := ParseNowPlayingResult(Response, sm_Scrobble);
-                if tmpStat = hs_UnknownFailure then
-                begin
-                    MessageText := Scrobble_UnkownError + #13#10 + 'Server message:'#13#10 + Response;
-                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
-                end;
-            end;
-        except
-            on E: EIdHTTPProtocolException do
-            begin
-                tmpStat := ParseNowPlayingResult(E.ErrorMessage, sm_Scrobble);
-
-                // if the Status is hs_UnknownFailure
-                if tmpStat = hs_UnknownFailure then
-                begin
-                    MessageText := Scrobble_ProtocolError + #13#10 + 'Server message:'#13#10 + E.Message + #13#10 + E.ErrorMessage;
-                    SendMessage(fWindowHandle, WM_Scrobbler, SC_UnknownScrobbleError, LParam(PWideChar(MessageText)));
-                end;
-            end;
-
-            on E: EIdSocketError do
-            begin
-                MessageText := Scrobble_ConnectError + #13#10 + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
-            end;
-
-            on E: EIdexception do
-            begin
-                MessageText := Scrobble_UnkownError + '(' + E.ClassName + ') ' + E.Message;
-                SendMessage(fWindowHandle, WM_Scrobbler, SC_IndyException, lParam(PWideChar(MessageText)));
-            end;
-        end;
-
-    finally
-        self.free;
-    end;
-end;   }
 
 
 end.

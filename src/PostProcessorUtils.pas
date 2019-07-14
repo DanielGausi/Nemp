@@ -10,7 +10,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -624,11 +624,7 @@ procedure TPostProcessor.LoadFromIni(Ini: TMemIniFile);
 begin
     fActive        := Ini.ReadBool('PostProcessor', 'Active', False);
     fIgnoreShortFiles := Ini.ReadBool('PostProcessor', 'IgnoreShortFiles', True);
-    //fWriteToFiles  := Ini.ReadBool('PostProcessor', 'WriteToFiles', True);
-
     fChangeCounter := Ini.ReadBool('PostProcessor', 'ChangeCounter', True);
-    // fIgnoreCounterOnAbortedTracks := Ini.ReadBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', False);
-
     fIncPlayedFiles  := Ini.ReadBool('PostProcessor', 'IncPlayedFiles', True);
     fDecAbortedFiles := Ini.ReadBool('PostProcessor', 'DecAbortedFiles', True);
 end;
@@ -636,11 +632,7 @@ procedure TPostProcessor.WriteToIni(Ini: TMemIniFile);
 begin
     Ini.WriteBool('PostProcessor', 'Active', fActive);
     Ini.WriteBool('PostProcessor', 'IgnoreShortFiles', fIgnoreShortFiles);
-    // Ini.WriteBool('PostProcessor', 'WriteToFiles', fWriteToFiles);
-
     Ini.WriteBool('PostProcessor', 'ChangeCounter', fChangeCounter);
-    // Ini.WriteBool('PostProcessor', 'IgnoreCounterOnAbortedTracks', fIgnoreCounterOnAbortedTracks);
-
     Ini.WriteBool('PostProcessor', 'IncPlayedFiles', fIncPlayedFiles);
     Ini.WriteBool('PostProcessor', 'DecAbortedFiles', fDecAbortedFiles);
 end;

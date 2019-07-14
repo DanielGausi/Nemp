@@ -7,7 +7,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2010, Daniel Gaussmann
+    Copyright (C) 2005-2019, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -103,41 +103,6 @@ implementation
 
 uses NempMainUnit, Hilfsfunktionen;
 
-
-(*
-
-
-procedure TNemp_MainForm.SucheEDITKeyPress(Sender: TObject; var Key: Char);
-begin
-    case Word(key) of
-        VK_RETURN: begin
-            key:=#0;
-            GenerelleSucheBTNClick(Sender)
-        end;
-    end;
-end;
-
-procedure TNemp_MainForm.ArtistEDITKeyPress(Sender: TObject; var Key: Char);
-begin
-    case Word(key) of
-        VK_RETURN: begin
-            key:=#0;
-            GenaueSucheBTNClick(Sender)
-        end;
-    end;
-end;
-
-procedure TNemp_MainForm.LyricEditKeyPress(Sender: TObject; var Key: Char);
-begin
-  case Word(key) of
-    VK_RETURN: begin
-        key:=#0;
-        LyricSucheBITBTNClick(Sender)
-    end;
-  end;
-end;
-
-*)
 
 // Helper for building the Strings in the history-ComboBox
 procedure StringAdd(var OldString: String; AddString: String);
