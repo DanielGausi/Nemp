@@ -201,7 +201,6 @@ type
     cbCountRatingOnlyPlaylist: TCheckBox;
     TabView0: TTabSheet;
     GrpBox_ViewMain_Columns: TGroupBox;
-    cb_ShowCoverAndDetails: TCheckBox;
     GrpBox_ViewMain_BrowseClassic: TGroupBox;
     Label44: TLabel;
     Label9: TLabel;
@@ -1361,7 +1360,6 @@ begin
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
   end;
-  cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
 
   cbHideNACover.Checked := MedienBib.HideNACover;
   cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
@@ -2097,7 +2095,6 @@ begin
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
  end;
- cb_ShowCoverAndDetails.Checked := Nemp_MainForm.NempOptions.ShowCoverAndDetails;
 end;
 
 // GeburtstagsOptionen
@@ -2327,15 +2324,18 @@ begin
   if Not NempPlayer.UseWalkmanMode then
       StopFluttering;
 
+  {
   if Not NempPlayer.ScrollAnzeigeTitel then
   begin
     Spectrum.TextPosX := 0;
     Spectrum.DrawText;
   end;
+  }
 
   if not NempPlayer.ScrollTaskbarTitel then
       Application.Title := NempPlayer.GenerateTaskbarTitel;
   Nemp_MainForm.BassTimer.Interval := NempPlayer.VisualizationInterval;
+  Nemp_MainForm.HeadsetTimer.Interval := NempPlayer.VisualizationInterval;
 
   NempPlaylist.AutoScan         := CB_AutoScanPlaylist.checked;
   NempPlaylist.AutoPlayOnStart  := CB_AutoPlayOnStart.Checked;
@@ -2414,10 +2414,6 @@ begin
     else
       Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
   end;
-
-  Nemp_MainForm.NempOptions.ShowCoverAndDetails := cb_ShowCoverAndDetails.Checked;
-
-  Nemp_MainForm.ActualizeVDTCover;
 
   Nemp_MainForm.NempOptions.FontNameCBR := CBFontNameCBR.Items[CBFontNameCBR.itemindex];
   Nemp_MainForm.NempOptions.FontNameVBR := CBFontNameVBR.Items[CBFontNameVBR.itemindex];
@@ -2854,14 +2850,14 @@ begin
 
   with Nemp_MainForm do
   begin
-    PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelformOptions.ErweiterteControlsVisible;
-    MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelformOptions.ErweiterteControlsVisible;
+    PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+    MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
 
-    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+    PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+    MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
 
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
+    PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+    MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
   end;
 
   Nemp_MainForm.RepairZOrder;
@@ -3401,11 +3397,12 @@ var Coverbmp: TBitmap;
 begin
   Coverbmp := tBitmap.Create;
   try
-      Coverbmp.Width := img_DefaultCover.Width;
-      Coverbmp.Height := img_DefaultCover.Height;
-      GetDefaultCover(dcFile, Coverbmp, 0);
+      //Coverbmp.Width := img_DefaultCover.Width;
+      //Coverbmp.Height := img_DefaultCover.Height;
 
-      img_DefaultCover.Picture.Bitmap.Assign(Coverbmp);
+      GetDefaultCover(dcFile, img_DefaultCover.Picture, 0);
+
+      //img_DefaultCover.Picture.Bitmap.Assign(Coverbmp);
       img_DefaultCover.Refresh;
   finally
       Coverbmp.Free;

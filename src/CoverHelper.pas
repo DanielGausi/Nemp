@@ -43,7 +43,11 @@ uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
   MP3FileUtils, ID3v2Frames, NempAudioFiles, Nemp_ConstantsAndTypes,
-  cddaUtils, basscd;
+  cddaUtils, basscd,
+  //System.Win.ComObj,
+  Winapi.Wincodec
+  //Winapi.ActiveX
+  ;
 
 
 type
@@ -120,30 +124,32 @@ type
   function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
 
   // Draw a Picture on a Bitmap
-  procedure AssignBitmap(var Bitmap: TBitmap; const Picture: TPicture);
+  procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 
   // Draw a Graphic on a bounded Bitmap (stretch, proportional)
   procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
+  procedure FitPictureIn(Bounds: TPicture; Source: TGraphic);
+  procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
 
   // GetCoverFromList calls GetFrontCover and load it into the Bitmap
-  function GetCoverFromList(aList: TStringList; aCoverbmp: tBitmap): boolean;
+  function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): boolean;
   // Get the Frontcover from an id3Tag
   function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 
   // GetCover calls GetCoverFromID3,
   // then MedienBib.GetCoverList and GetCoverFromList if no success (iff CompleteCoverSearch = True)
   // finally GetDefaultCover if still no success
-  function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap; CompleteCoverSearch: Boolean): boolean;
+  function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
 
   // GetCoverBitmapFromID:
   // Get the Bitmap for a specified Cover-ID
-  function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: tBitmap; aDir: String): Boolean;
+  function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture; aDir: String): Boolean;
 
 
   // Get the Default-Cover
   // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
   //      OR the customized cover file from the Medialibrary-settings.
-  procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: tBitmap; Flags: Integer);
+  procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
 
   // Select randomly some covers from the list and store it in the
   // global variable RandomCoverList
@@ -151,7 +157,7 @@ type
   // Clear random cover
   procedure ClearRandomCover;
   // Paint a custumized cover "Your Library", using Cover in RandomCoverList
-  procedure PaintPersonalMainCover(aCoverBmp: TBitmap);
+  procedure PaintPersonalMainCover(aCoverBmp: TPicture);
 
 
   // returns true, iff a preview-graphic for this ID should be already stored in the Cover-Save-Directory
@@ -620,9 +626,12 @@ begin
                 end;
 end;
 
-procedure AssignBitmap(var Bitmap: TBitmap; const Picture: TPicture);
+procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 begin
     Bitmap.PixelFormat := pf24bit;
+    Bitmap.Height := 0;
+    Bitmap.Width := 0;
+    Bitmap.Canvas.Brush.Style := bsClear;
     Bitmap.Height := Picture.Height;
     Bitmap.Width := Picture.Width;
     //Bitmap.Canvas.FillRect(Rect(0, 0, Bitmap.Width, Bitmap.Height));
@@ -632,8 +641,23 @@ end;
 
 
 
+procedure FitPictureIn(Bounds: TPicture; Source: TGraphic);
+var BoundBitmap: TBitmap;
+begin
+    BoundBitmap := TBitmap.Create;
+    try
+        BoundBitmap.Width  := Bounds.Width;
+        BoundBitmap.Height := Bounds.Height;
+        FitBitmapIn(BoundBitmap, Source);
+        Bounds.Assign(BoundBitmap);
+    finally
+        BoundBitmap.Free;
+    end;
+end;
+
+
 procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
-var xfactor, yfactor:double;
+var xfactor, yfactor, factor:double;
     tmpBmp: TBitmap;
 begin
   if Source = NIL then exit;
@@ -644,10 +668,12 @@ begin
     begin
       Bounds.Width := round(Source.Width*yfactor);
       Bounds.Height := round(Source.Height*yfactor);
+      factor := yFactor;
     end else
     begin
       Bounds.Width := round(Source.Width*xfactor);
       Bounds.Height := round(Source.Height*xfactor);
+      factor := xFactor;
     end;
 
     tmpbmp := tBitmap.Create;
@@ -664,7 +690,38 @@ begin
 end;
 
 
-function GetCoverFromList(aList: TStringList; aCoverbmp: tBitmap): Boolean;
+// WIC-principle from https://www.delphipraxis.net/1291613-post31.html
+procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
+var scale: IWICBitmapScaler;
+    wicBitmap: IWICBitmap;
+    newHeight, newWidth:Integer;
+    xfactor, yfactor:double;
+begin
+    if Assigned(aWICImage) then
+    begin
+        xfactor:= (aWidth) / aWICImage.Width;
+        yfactor:= (aHeight) / aWICImage.Height;
+        if xfactor > yfactor then
+        begin
+            newWidth := round(aWICImage.Width*yfactor);
+            newHeight := round(aWICImage.Height*yfactor);
+        end else
+        begin
+            newWidth := round(aWICImage.Width*xfactor);
+            newHeight := round(aWICImage.Height*xfactor);
+        end;
+
+        aWICImage.ImagingFactory.CreateBitmapScaler(scale);
+        scale.Initialize(aWICImage.Handle, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
+        aWICImage.ImagingFactory.CreateBitmapFromSourceRect(scale, 0, 0, NewWidth, NewHeight, wicBitmap);
+        if Assigned(wicBitmap) then
+            aWICImage.Handle := wicBitmap;
+    end;
+end;
+
+
+
+function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): Boolean;
 var FrontCover:integer;
     aGraphic: TPicture;
 begin
@@ -676,9 +733,10 @@ begin
       try
           aGraphic.LoadFromFile(aList[FrontCover]);
           if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-              FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+              FitPictureIn(aCoverbmp, aGraphic.Graphic)
           else
-              AssignBitmap(aCoverBmp, aGraphic);
+              //AssignBitmap(aCoverBmp, aGraphic);
+              aCoverbmp.Assign(aGraphic);
           result := True;
       finally
           aGraphic.Free;
@@ -728,6 +786,7 @@ begin
                 begin
                     tmpbmp := TBitmap.Create;
                     try
+                        tmpbmp.PixelFormat := pf32Bit;
                         ok := PicStreamToImage(PicData, Mime, tmpbmp);
 
                         if ok then
@@ -759,7 +818,7 @@ begin
   end;
 end;
 
-function GetCover(aAudioFile: TAudioFile; aCoverbmp: tBitmap; CompleteCoverSearch: Boolean): boolean;
+function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
@@ -777,10 +836,12 @@ begin
                   aGraphic := TPicture.Create;
                   try
                       aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
+
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                          FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
                       else
-                          AssignBitmap(aCoverBmp, aGraphic);
+                          //AssignBitmap(aCoverBmp, aGraphic);
+                          aCoverbmp.Assign(aGraphic);
                       result := True;
                   finally
                       aGraphic.Free;
@@ -790,7 +851,7 @@ begin
                   if CompleteCoverSearch then
                   begin
                       // erstmal im ID3-Tag nach nem Bild suchen
-                      if GetCoverFromID3(aAudioFile, aCoverbmp) then
+                      if GetCoverFromID3(aAudioFile, aCoverbmp.Bitmap) then
                           result := True
                       else
                       begin // in Dateien rund um das Audiofile nach nem Bild suchen
@@ -831,9 +892,10 @@ begin
                   try
                       aGraphic.LoadFromFile(completeName);
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                          FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
                       else
-                          AssignBitmap(aCoverBmp, aGraphic);
+                          //AssignBitmap(aCoverBmp, aGraphic);
+                          aCoverBmp.Assign(aGraphic);
                       result := True;
                   finally
                       aGraphic.Free;
@@ -851,7 +913,7 @@ begin
   end;
 end;
 
-function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: tBitmap; aDir: String): Boolean;
+function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture; aDir: String): Boolean;
 var aJpg: TJpegImage;
 begin
     result := true;
@@ -890,15 +952,20 @@ begin
     end;
 end;
 
-procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: tBitmap; Flags: Integer);
+
+
+
+procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
 var filename: UnicodeString;
-    aGraphic: TPicture;
+    //aGraphic: TPicture;
+    WPic: TWICImage;
     Stretch: Boolean;
+
 begin
     // Flags auswerten
     Stretch := (Flags and cmNoStretch) = 0;
 
-    {filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+    filename := MedienBib.CoverSavePath + '_default_cover.jpg';
     if aType = dcWebRadio  then
     begin
         filename := MedienBib.CoverSavePath + '_default_cover_webradio.jpg';
@@ -909,7 +976,7 @@ begin
         if not FileExists(filename)  then
             filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_webradio.jpg';
     end; //else
-    if not FileExists(filename) then}
+    if not FileExists(filename) then
     begin
         filename := MedienBib.CoverSavePath + '_default_cover.jpg';
         if not FileExists(filename) then
@@ -920,19 +987,40 @@ begin
             filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
     end;
 
-
     if FileExists(filename) then
     begin
-        aGraphic := TPicture.Create;
+        //aCoverbmp.LoadFromFile(filename);
+
+        //aGraphic := TPicture.Create;
+        WPic := TWICImage.Create;
         try
-            aGraphic.LoadFromFile(filename);
+            //aGraphic.LoadFromFile(filename);
+            WPic.LoadFromFile(filename);
+
+
+
+           // FitBitmapIn(aCoverbmp.Bitmap, aGraphic.Graphic);
+
+
+
+            //stretch := False;
+
+            //w := aCoverbmp.width; //aCoverbmp.Width;
             if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                FitBitmapIn(aCoverbmp, aGraphic.Graphic)
+            begin
+                //FitBitmapIn(aCoverbmp.Bitmap, aGraphic.Graphic)
+                FitWICImageIn(WPic, aCoverbmp.Width, aCoverbmp.Height);
+                aCoverBmp.Bitmap.Assign(WPic);
+            end
             else
-                AssignBitmap(aCoverBmp, aGraphic);
+                //AssignBitmap(aCoverBmp.Bitmap, aGraphic);
+                aCoverBmp.Bitmap.Assign(WPic);
+
         finally
-            aGraphic.Free;
+            //aGraphic.Free;
+            WPic.Free
         end;
+
     end;
     // otherwise: just a blank image, do nothing.
 end;
@@ -1011,7 +1099,7 @@ begin
     RandomCoverList.Clear;
 end;
 
-procedure PaintPersonalMainCover(aCoverBmp: TBitmap);
+procedure PaintPersonalMainCover(aCoverBmp: TPicture);
 var i: Integer;
     smallbmp: TBitmap;
     aGraphic: TPicture;
@@ -1032,32 +1120,32 @@ begin
             // and Tile-Bitmap
             case RandomCoverList.Count of
                 1: begin
-                    aCoverBmp.Width  := 4 * TileSize;
-                    aCoverBmp.Height := 4 * TileSize;
+                    aCoverBmp.Bitmap.Width  := 4 * TileSize;
+                    aCoverBmp.Bitmap.Height := 4 * TileSize;
                     smallbmp.Width   := 4 * TileSize;
                     smallbmp.Height  := 4 * TileSize;
                 end;
                 2: begin
-                    aCoverBmp.Width  := 4 * TileSize;
-                    aCoverBmp.Height := 2 * TileSize;
+                    aCoverBmp.Bitmap.Width  := 4 * TileSize;
+                    aCoverBmp.Bitmap.Height := 2 * TileSize;
                     smallbmp.Width   := 2 * TileSize;
                     smallbmp.Height  := 2 * TileSize;
                 end;
                 4: begin
-                    aCoverBmp.Width  := 4 * TileSize;
-                    aCoverBmp.Height := 4 * TileSize;
+                    aCoverBmp.Bitmap.Width  := 4 * TileSize;
+                    aCoverBmp.Bitmap.Height := 4 * TileSize;
                     smallbmp.Width   := 2 * TileSize;
                     smallbmp.Height  := 2 * TileSize;
                 end;
                 8: begin
-                    aCoverBmp.Width  := 4 * TileSize;
-                    aCoverBmp.Height := 2 * TileSize;
+                    aCoverBmp.Bitmap.Width  := 4 * TileSize;
+                    aCoverBmp.Bitmap.Height := 2 * TileSize;
                     smallbmp.Width   := 1 * TileSize;
                     smallbmp.Height  := 1 * TileSize;
                 end;
                 16: begin
-                    aCoverBmp.Width  := 4 * TileSize;
-                    aCoverBmp.Height := 4 * TileSize;
+                    aCoverBmp.Bitmap.Width  := 4 * TileSize;
+                    aCoverBmp.Bitmap.Height := 4 * TileSize;
                     smallbmp.Width   := 1 * TileSize;
                     smallbmp.Height  := 1 * TileSize;
                 end;
@@ -1076,12 +1164,22 @@ begin
                         aGraphic.Free;
                     end;
                 end else
-                    GetDefaultCover(dcError, smallbmp,  cmNoStretch);
+                begin
+                    aGraphic := TPicture.Create;
+                    try
+                        GetDefaultCover(dcError, aGraphic,  cmNoStretch);
+                        AssignBitmap(smallbmp, aGraphic);
+                        //smallbmp.Assign(aGraphic.Bitmap);
+                    finally
+                        aGraphic.Free;
+                    end;
+
+                end;
 
                 // smallbmp auf aCoverBmp kopieren.
-                SetStretchBltMode(aCoverBmp.Canvas.Handle, HALFTONE);
+                SetStretchBltMode(aCoverBmp.Bitmap.Canvas.Handle, HALFTONE);
                 case RandomCoverList.Count of
-                      1: StretchBlt(aCoverBmp.Canvas.Handle,     // handle to destination device context
+                      1: StretchBlt(aCoverBmp.Bitmap.Canvas.Handle,     // handle to destination device context
                                 0, //23 + 40,
                                 0, //78 + 0,
                                 4 * TileSize, 4 * TileSize,   // width, height of destination rectangle
@@ -1089,7 +1187,7 @@ begin
                                 0, 0,                   // x/y-coordinate of source rectangle's upper-left corner
                                 smallbmp.Width, smallBmp.Height,
                                 SRCCopy);
-                      2,4: StretchBlt(aCoverBmp.Canvas.Handle,     // handle to destination device context
+                      2,4: StretchBlt(aCoverBmp.Bitmap.Canvas.Handle,     // handle to destination device context
                                 ((i mod 2) * 2*TileSize),
                                 ((i Div 2) * 2*TileSize),
                                 2*TileSize, 2*TileSize,   // width, height of destination rectangle
@@ -1097,7 +1195,7 @@ begin
                                 0, 0,                   // x/y-coordinate of source rectangle's upper-left corner
                                 smallbmp.Width, smallBmp.Height,
                                 SRCCopy);
-                      8,16: StretchBlt(aCoverBmp.Canvas.Handle,     // handle to destination device context
+                      8,16: StretchBlt(aCoverBmp.Bitmap.Canvas.Handle,     // handle to destination device context
                                 ((i mod 4) * TileSize),
                                 ((i Div 4) * TileSize),
                                 TileSize, TileSize,   // width, height of destination rectangle

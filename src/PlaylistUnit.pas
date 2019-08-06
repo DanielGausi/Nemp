@@ -109,19 +109,19 @@ procedure TPlaylistForm.InitForm;
 begin
   TranslateComponent (self);
   DragAcceptFiles (Handle, True);
-  Top    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistTop;
-  Left   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistLeft;
-  Height := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistHeight;
-  Width  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistWidth;
+  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistTop;
+  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistLeft;
+  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistHeight;
+  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistWidth;
 
-  BTop    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistTop;
-  BLeft   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistLeft;
-  BHeight := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistHeight;
-  BWidth  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistWidth;
+  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistTop;
+  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistLeft;
+  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistHeight;
+  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistWidth;
 
-  NempRegionsDistance.docked := Nemp_MainForm.NempOptions.NempEinzelFormOptions.PlaylistDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.PlaylistDocked;
+  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
 
   Caption := NEMP_CAPTION;
 end;
@@ -186,7 +186,7 @@ end;
 
 procedure TPlaylistForm.ContainerPanelPlaylistFormPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawAPanel((Sender as TNempPanel),
+    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
     Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
 end;
 
@@ -218,7 +218,7 @@ end;
 Procedure TPlaylistForm.WMDropFiles (Var aMsg: tMessage);
 Begin
     Inherited;
-    Handle_DropFilesForPlaylist(aMsg);
+    Handle_DropFilesForPlaylist(aMsg, False);
 end;
 
 
@@ -235,9 +235,9 @@ procedure TPlaylistForm.CloseImagePClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin
-    NempOptions.NempEinzelFormOptions.PlaylistVisible := False;
-    PM_P_ViewSeparateWindows_Playlist.Checked := NempOptions.NempEinzelFormOptions.PlaylistVisible;
-    MM_O_ViewSeparateWindows_Playlist.Checked := NempOptions.NempEinzelFormOptions.PlaylistVisible;
+    NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible := False;
+    PM_P_ViewSeparateWindows_Playlist.Checked := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
+    MM_O_ViewSeparateWindows_Playlist.Checked := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
   end;
   close;
 end;

@@ -2479,7 +2479,14 @@ begin
             // The Mainthread will do the following at this message:
             // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
             // InitCover(AudioFile);
+
+
             SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
+            ////////////////////////////////
+            ////AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or IgnoreLyricsFlag);
+            ////InitCover(AudioFile);
+            ///////////////////////////////////
+
 
             if  (oldArtist <> AudioFile.Strings[NempSortArray[1]])
                 OR (oldAlbum <> AudioFile.Strings[NempSortArray[2]])

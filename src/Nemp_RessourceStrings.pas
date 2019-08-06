@@ -785,7 +785,9 @@ Player_FilenameWebradioTooLong = 'The filename for this stream is to long and au
                                   + 'Please change the directory for webradio downloads.';
 Player_NoReversePossible = 'It seems that you deleted the playing file from the playlist. Therefore this function cannot be executed.';
 
-
+Player_UnkownArtist = '(Unknwon Artist)';
+Player_NoTitleLoaded = 'Nothing to play ... drop a music file here to start';
+//Player_NoTitleLoadedDropHereToStart = 'Drop an audiofile here to start playback';
 
 AudioFileProperty_Webstream   = 'Webstream';
 AudioFileProperty_Name        = 'Name';

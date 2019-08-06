@@ -1452,6 +1452,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics && Pictures '
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 8
         Top = 0

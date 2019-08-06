@@ -141,14 +141,14 @@ begin
     MainImage.Picture.Bitmap.Height := MainImage.Height;
     MainImage.Picture.Bitmap.Width := MainImage.Width;
 
-    if not GetCoverBitmapFromID(aCover.ID, MainImage.Picture.Bitmap, CoverSavePath) then
+    if not GetCoverBitmapFromID(aCover.ID, MainImage.Picture, CoverSavePath) then
         // cover is missing - try again to get it ?
         SendMessage(fEventsWindow, WM_FC_NEEDPREVIEW, fCurrentItem, 0);
 
     // after that: try again
     // yes, we called this in the MessageHandler for WM_FC_NEEDPREVIEW as well
     // not the best solution, but I hope the classic flow is not used that often^^
-    GetCoverBitmapFromID(aCover.ID, MainImage.Picture.Bitmap, CoverSavePath);
+    GetCoverBitmapFromID(aCover.ID, MainImage.Picture, CoverSavePath);
 
     DrawScrollCover(fCurrentItem, ScrollImage.Width, ScrollImage.Height);
 end;
@@ -186,6 +186,7 @@ begin
   Bigbmp.Canvas.Brush.Color := clLime;
   bigbmp.Canvas.FillRect(Rect(0,0,bigbmp.Width, bigbmp.Height));
 
+  (* TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
   for i := minidx to maxidx do
   begin
           aCover := TNempCover(Coverlist[i]);
@@ -216,6 +217,7 @@ begin
 
           end;
   end;
+  *)
   ScrollImage.Picture.Assign(bigbmp);
   ScrollImage.Refresh;
   bigbmp.Free;

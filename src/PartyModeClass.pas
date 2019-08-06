@@ -302,13 +302,13 @@ begin
         //SetOriginalPosition(BtnMenu            , i);
 
         // Other Controls
-        SetOriginalPosition(PlayerPanel         , i);
-        SetOriginalPosition(GRPBOXCover         , i);
+        //SetOriginalPosition(PlayerPanel         , i);
+        //SetOriginalPosition(GRPBOXCover         , i);
 //        SetOriginalPosition(CoverImage          , i);
         SetOriginalPosition(NewPlayerPanel      , i);
         SetOriginalPosition(PaintFrame          , i);
-        SetOriginalPosition(TextAnzeigeIMAGE    , i);
-        SetOriginalPosition(TimePaintBox        , i);
+        //SetOriginalPosition(TextAnzeigeIMAGE    , i);
+        //SetOriginalPosition(TimePaintBox        , i);
         SetOriginalPosition(SlideBarShape       , i);
         SetOriginalPosition(VolShape            , i);
         //SetOriginalPosition(SleepImage          , i);
@@ -323,12 +323,14 @@ begin
         SetOriginalPosition(ab1                 , i);
         SetOriginalPosition(ab2                 , i);
         SetOriginalPosition(VolButton           , i);
-        SetOriginalPosition(AudioPanel          , i);
+        //SetOriginalPosition(AudioPanel          , i);
         SetOriginalPosition(TabBtn_Cover        , i);
         SetOriginalPosition(TabBtn_Lyrics       , i);
         SetOriginalPosition(TabBtn_Equalizer    , i);
-        SetOriginalPosition(TabBtn_Effects      , i);
+        SetOriginalPosition(TabBtn_MainPlayerControl      , i);
         SetOriginalPosition(TabBtn_Headset      , i);
+
+        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         SetOriginalPosition(GRPBOXEffekte       , i);
         SetOriginalPosition(HallShape           , i);
         SetOriginalPosition(HallLBL             , i);
@@ -386,20 +388,21 @@ begin
         SetOriginalPosition(Btn_EqualizerPresets, i);
         SetOriginalPosition(ButtonPrevEQ, i);
         SetOriginalPosition(ButtonNextEQ, i);
-        SetOriginalPosition(GRPBOXLyrics        , i);
+        *)
+        //SetOriginalPosition(GRPBOXLyrics        , i);
         SetOriginalPosition(LyricsMemo          , i);
 
-        SetOriginalPosition(GRPBOXHeadset          , i);
+        //SetOriginalPosition(GRPBOXHeadset          , i);
         SetOriginalPosition(BtnHeadsetToPlaylist   , i);
         SetOriginalPosition(BtnHeadsetPlaynow      , i);
         SetOriginalPosition(BtnLoadHeadset         , i);
-        SetOriginalPosition(HeadsetCoverImage      , i);
-        SetOriginalPosition(LblHeadsetArtist       , i);
+        //SetOriginalPosition(HeadsetCoverImage      , i);
+        //SetOriginalPosition(LblHeadsetArtist       , i);
         SetOriginalPosition(PlayPauseHeadSetBtn    , i);
-        SetOriginalPosition(SlideBackHeadsetBTN    , i);
-        SetOriginalPosition(SlidebarButton_Headset , i);
-        SetOriginalPosition(SlideBarShapeHeadset   , i);
-        SetOriginalPosition(SlideForwardHeadsetBTN , i);
+        //SetOriginalPosition(SlideBackHeadsetBTN    , i);
+        //SetOriginalPosition(SlidebarButton_Headset , i);
+        //SetOriginalPosition(SlideBarShapeHeadset   , i);
+        //SetOriginalPosition(SlideForwardHeadsetBTN , i);
         SetOriginalPosition(StopHeadSetBtn         , i);
         SetOriginalPosition(VolButtonHeadset       , i);
         SetOriginalPosition(VolShapeHeadset        , i);
@@ -459,7 +462,7 @@ begin
     begin
         ChangeProc := Bigger;
         fResizeProc := Bigger;
-        fLastTopHeight := Nemp_MainForm.TopMainPanel.Height;
+        fLastTopHeight := Nemp_MainForm._TopMainPanel.Height;
         fLastHeight    := Nemp_MainForm.Height;
         fLastWidth     := Nemp_MainForm.Width;
     end
@@ -588,10 +591,13 @@ begin
         NempPlaylist.ReInitPlaylist;
 
 
+        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         for i := 0 to 9 do CorrectEQButton(i);
         CorrectHallButton;
         CorrectEchoButtons;
         CorrectSpeedButton;
+        *)
+
         CorrectVolButton;
 
 
@@ -617,8 +623,6 @@ begin
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
 
-        SlidebarButton_Headset  .Height := SlidebarButton_Headset  .Height;
-        SlidebarButton_Headset.Left := SlidebarButton_Headset.Left;
     end;
 
     if assigned(FDetails) and FDetails.visible then
@@ -631,17 +635,19 @@ begin
         OptionsCompleteForm.Close;
 
 
-    Nemp_MainForm.TopMainPanel.Constraints.MinHeight := ChangeProc(TOP_MIN_HEIGHT);
+    Nemp_MainForm._TopMainPanel.Constraints.MinHeight := ChangeProc(MAIN_PANEL_MIN_HEIGHT);
+    Nemp_MainForm._TopMainPanel.Constraints.MinWidth := ChangeProc(MAIN_PANEL_MIN_WIDTH);
+
     Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
     Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
 
-    Nemp_MainForm.LyricsMemo.Top          := 5;
-    Nemp_MainForm.LyricsMemo.Height       := Nemp_MainForm.GRPBoxLyrics.Height - 10;
+    //Nemp_MainForm.LyricsMemo.Top          := 5;
+    //Nemp_MainForm.LyricsMemo.Height       := Nemp_MainForm.GRPBoxLyrics.Height - 10;
 
 
     if Not fActive then
     begin
-        Nemp_MainForm.TopMainPanel.Height := fLastTopHeight;
+        Nemp_MainForm._TopMainPanel.Height := fLastTopHeight;
         Nemp_MainForm.Height := fLastHeight ;
         Nemp_MainForm.Width  := fLastWidth  ;
         if Nemp_MainForm.Left < 0 then

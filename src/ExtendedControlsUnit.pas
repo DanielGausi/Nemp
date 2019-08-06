@@ -65,6 +65,14 @@ type
     procedure ContainerPanelExtendedControlsFormPaint(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure CloseImageEClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure ContainerPanelExtendedControlsFormMouseUp(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure ContainerPanelExtendedControlsFormMouseMove(Sender: TObject;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ContainerPanelExtendedControlsFormMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure FormResize(Sender: TObject);
   private
     { Private-Deklarationen }
     DownX: Integer;
@@ -73,10 +81,13 @@ type
     BTop: Integer;
     BWidth: Integer;
     BHeight: Integer;
+    ResizeFlag: Cardinal;
+
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
 
   public
     { Public-Deklarationen }
+    Resizing: Boolean;
     procedure SetPartySize(w,h: Integer);
     procedure InitForm;
     procedure RepaintForm;
@@ -96,18 +107,53 @@ procedure TExtendedControlForm.CloseImageEClick(Sender: TObject);
 begin
     with Nemp_MainForm do
     begin
-      NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible := NOT NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-      PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-      MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
+      NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+      PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+      MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
     end;
     close;
+end;
+
+procedure TExtendedControlForm.ContainerPanelExtendedControlsFormMouseDown(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if button = mbLeft then
+    begin
+      Resizing := True;
+      ReleaseCapture;
+      PerForm(WM_SysCommand, ResizeFlag , 0);
+    end;
+end;
+
+procedure TExtendedControlForm.ContainerPanelExtendedControlsFormMouseMove(
+  Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+    ResizeFlag := GetResizeDirection(Sender, Shift, X, Y);
+end;
+
+procedure TExtendedControlForm.ContainerPanelExtendedControlsFormMouseUp(
+  Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    Resizing := False;
 end;
 
 procedure TExtendedControlForm.ContainerPanelExtendedControlsFormPaint(
   Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawAPanel((Sender as TNempPanel),
+    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
     Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
+end;
+
+procedure TExtendedControlForm.FormActivate(Sender: TObject);
+begin
+  {
+  Copied from MedíenListeForm, do something equivalent here
+  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
+  CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;
+  CloseImageM.Top := 3;
+  CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
+  CloseImageM.BringToFront;
+  }
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -118,31 +164,27 @@ begin
   BHeight := Height;
   BWidth  := Width ;
   CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
-
-  if Nemp_MainForm.AnzeigeMode = 1 then
-      // still in seperate-window-mode
-      NempPlayer.StopHeadset;
 end;
 
 procedure TExtendedControlForm.InitForm;
 begin
   TranslateComponent (self);
-  Top    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsTop;
-  Left   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsLeft;
-//  Height := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsHeight;
-//  Width  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsWidth;
+  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsTop;
+  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsLeft;
+  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsHeight;
+  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsWidth;
 
-  BTop    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsTop;
-  BLeft   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsLeft;
-//  BHeight := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsHeight;
-//  BWidth  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsWidth;
+  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsTop;
+  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsLeft;
+  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsHeight;
+  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsWidth;
 
-BHeight := Height;
-BWidth := Width;
+  // BHeight := Height;
+  // BWidth := Width;
 
-  NempRegionsDistance.docked := Nemp_MainForm.NempOptions.NempEinzelFormOptions.ExtendedControlsDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsDocked;
+  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
 
   Caption := NEMP_CAPTION;
 end;
@@ -150,10 +192,7 @@ end;
 
 procedure TExtendedControlForm.FormHide(Sender: TObject);
 begin
-  CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
-  if Nemp_MainForm.AnzeigeMode = 1 then
-      // still in seperate-window-mode
-      NempPlayer.StopHeadset;
+    CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 end;
 
 procedure TExtendedControlForm.SetPartySize(w, h: Integer);
@@ -172,37 +211,31 @@ end;
 
 procedure TExtendedControlForm.FormMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var newp: TPoint;
 begin
-
-
-
-  newp := self.ScreenToClient((Sender as TControl).ClientToScreen(Point(x,y)));
   DownX := X;
   DownY := Y;
   NempRegionsDistance.docked := False;
+  Resizing := False;
 end;
 
 procedure TExtendedControlForm.FormMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
-var newp: TPoint;
 begin
 
-  if (ssLeft in Shift) then
-  begin
-    newp := self.ScreenToClient((Sender as TControl).ClientToScreen(Point(x,y)));
-    Left := Left + X - DownX;
-    Top := Top +  Y - DownY;
-    NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
-    NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
+    if (ssLeft in Shift) then
+    begin
+        Left := Left + X - DownX;
+        Top := Top +  Y - DownY;
+        NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
+        NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
 
- //   If Nemp_MainForm.NempSkin.isActive then
- //   begin
- //     Nemp_MainForm.NempSkin.SetPlaylistOffsets;
- //     Repaint;
- //   end;
+        if (Nemp_MainForm.NempSkin.isActive) and (NOT Nemp_MainForm.NempSkin.FixedBackGround) then
+        begin
+            Nemp_MainForm.NempSkin.RepairSkinOffset;
+            RepaintForm;
+        end;
 
-  end;
+    end;
 end;
 
 procedure TExtendedControlForm.FormMouseUp(Sender: TObject;
@@ -231,15 +264,27 @@ begin
     end;
 end;
 
+procedure TExtendedControlForm.FormResize(Sender: TObject);
+begin
+
+    SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
+    If Nemp_MainForm.NempSkin.isActive then
+    begin
+        Nemp_MainForm.NempSkin.SetVSTOffsets;
+        //Repaint;
+    end;
+end;
+
 procedure TExtendedControlForm.RepaintForm;
 begin
     Repaint;
-    Nemp_MainForm.AudioPanel.Repaint;
-    Nemp_MainForm.GRPBOXEffekte.Repaint;
-    Nemp_MainForm.GRPBOXEqualizer.Repaint;
-    Nemp_MainForm.GRPBOXHeadset.Repaint;
-    Nemp_MainForm.GRPBOXLyrics.Repaint;
-    Nemp_MainForm.GRPBOXCover.Repaint
+
+    // todo: Repaint subpanels of FileOverview ??
+
+    //Nemp_MainForm.AudioPanel.Repaint;
+    //Nemp_MainForm.GRPBOXHeadset.Repaint;
+    //Nemp_MainForm.GRPBOXLyrics.Repaint;
+    //Nemp_MainForm.GRPBOXCover.Repaint
 end;
 
 procedure TExtendedControlForm.FormShow(Sender: TObject);
@@ -252,32 +297,18 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  //Nemp_MainForm.PlaylistFillPanel.Width := Nemp_MainForm.PlaylistPanel.Width - Nemp_MainForm.PlaylistFillPanel.Left - 26;
+  // rework needed .... somethin like in the other forms as well
+  // the different code for "regions" is due to the "header" in the other forms
 
-  CloseImageE.Parent := Nemp_MainForm.AudioPanel;
-  CloseImageE.Left := Nemp_MainForm.AudioPanel.Width - CloseImageE.Width - 5;
-  CloseImageE.Top := 3; //6
+
+  Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width -  Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
+
+  CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;// - 10;
+  CloseImageE.Top := 3;
+  CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
   CloseImageE.BringToFront;
 
-  //
-
-  //SetRegion(Nemp_MainForm.AudioPanel, self, NempRegionsDistance, handle);
-
-  xpleft   := 0; //GetSystemMetrics(SM_CXFrame) + NewPlayerPanel.Left - 1;
-  xptop    := 0; // GetSystemMetrics(SM_CYCAPTION)  + GetSystemMetrics(SM_CYFrame) + NewPlayerPanel.Top - 1;
-  xpright  :=  Width - 1;
-  xpbottom := Height - 1;
-  formRegion := CreateRectRgn
-                  (xpleft, xptop, xpright, xpbottom);
-  SetWindowRgn(handle, formregion, true );
-
-
-NempRegionsDistance.Left := 0;
-NempRegionsDistance.Top := 0;
-NempRegionsDistance.Bottom := Height-1;
-NempRegionsDistance.Right := Width-1;
-
-
+  SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!
   if (Top + NempRegionsDistance.Top >= Nemp_MainForm.Top + Nemp_MainForm.NempRegionsDistance.Top)
@@ -321,6 +352,13 @@ begin
        AND Auswahlform.Visible
        then
         SnapForm(Message, ExtendedControlForm, AuswahlForm);
+
+  if Resizing then
+  begin
+      NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.Left;
+      NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.Top;
+  end;
+
 
   Message.Result := 0;
 end;

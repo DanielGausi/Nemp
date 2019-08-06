@@ -111,20 +111,20 @@ procedure TAuswahlForm.InitForm;
 begin
   TranslateComponent (self);
   DragAcceptFiles (Handle, True);
-  Top    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheTop;
-  Left   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheLeft;
-  Height := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheHeight;
-  Width  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheWidth;
+  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheTop;
+  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheLeft;
+  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheHeight;
+  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheWidth;
 
-  BTop    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheTop;
-  BLeft   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheLeft;
-  BHeight := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheHeight;
-  BWidth  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlSucheWidth;
+  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheTop;
+  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheLeft;
+  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheHeight;
+  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheWidth;
 
 
-  NempRegionsDistance.docked := Nemp_MainForm.NempOptions.NempEinzelFormOptions.AuswahlListeDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlListeDocked;
+  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
   Caption := NEMP_CAPTION;
 end;
 
@@ -186,7 +186,7 @@ end;
 
 procedure TAuswahlForm.ContainerPanelAuswahlformPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawAPanel((Sender as TNempPanel),
+    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
     Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
 end;
 
@@ -247,9 +247,9 @@ procedure TAuswahlForm.CloseImageAClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin
-    NempOptions.NempEinzelFormOptions.AuswahlSucheVisible := NOT NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+    NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+    PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+    MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
   end;
   close;
 end;

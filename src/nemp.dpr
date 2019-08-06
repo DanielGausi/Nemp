@@ -129,7 +129,9 @@ uses
   bassmidi in '3rd Party Units\bassmidi.pas',
   unFastFileStream in '3rd Party Units\unFastFileStream.pas',
   PlayerLog in 'PlayerLog.pas' {PlayerLogForm},
-  ProgressUnit in 'ProgressUnit.pas' {ProgressForm};
+  ProgressUnit in 'ProgressUnit.pas' {ProgressForm},
+  EffectsAndEqualizer in 'EffectsAndEqualizer.pas' {FormEffectsAndEqualizer},
+  MainFormBuilderForm in 'MainFormBuilderForm.pas' {MainFormBuilder};
 
 {$R *.res}
 
@@ -164,7 +166,7 @@ ShowWindow
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
-
+  Application.CreateForm(TFormEffectsAndEqualizer, FormEffectsAndEqualizer);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;
@@ -196,7 +198,8 @@ ShowWindow
     Nemp_MainForm.Top := EVILHACKY;
     Nemp_MainForm.Left := EVILHACKX;
 
-    //UpdateFormDesignNeu;
+    // for some reasons, there are some controls "unpainted" on startup on some skins
+    Nemp_MainForm.RepaintAll;
 
     if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
     begin

@@ -58,7 +58,7 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure ReAcceptDragFiles;
 
   procedure UpdateSmallMainForm;
-  procedure UpdateFormDesignNeu;
+  procedure UpdateFormDesignNeu(newMode: Integer);
 
 var
 
@@ -469,6 +469,7 @@ begin
 end;
 
 procedure FormPosAndSizeCorrect(aForm: TNempForm);
+var XMax, YMax: Integer;
 begin
 
   //Größen korrekturen
@@ -478,67 +479,65 @@ begin
   if aForm.NempRegionsDistance.Right > Screen.WorkAreaWidth then
     aForm.Width := Screen.WorkAreaWidth;
 
+  XMax := Screen.DesktopLeft + Screen.DesktopWidth;
+  YMax := Screen.DesktopTop + Screen.DesktopHeight;
   // Positionskorrekturen
   // Zu weit unten?
-  if aForm.Top + aForm.NempRegionsDistance.Top
-          > Screen.DesktopHeight - 50 then
+  if aForm.Top + aForm.NempRegionsDistance.Top > YMax - 50 then
   begin
-    aForm.Top := Screen.DesktopHeight - aForm.NempRegionsDistance.Bottom;
+    aForm.Top := YMax - aForm.NempRegionsDistance.Bottom;
     aForm.NempRegionsDistance.docked := False;
   end;
 
   // Zu weit rechts?
-  if aForm.Left + aForm.NempRegionsDistance.Left
-          > Screen.DesktopWidth - 20 then
+  if aForm.Left + aForm.NempRegionsDistance.Left > XMax - 20 then
   begin
-    aForm.Left := Screen.DesktopWidth - aForm.NempRegionsDistance.Right;
+    aForm.Left := XMax - aForm.NempRegionsDistance.Right;
     aForm.NempRegionsDistance.docked := False;
   end;
 
   // Zu weit links?
-  if aForm.Left + aForm.NempRegionsDistance.Right
-          < Screen.DesktopLeft + 20 then
+  if aForm.Left + aForm.NempRegionsDistance.Right < Screen.DesktopLeft + 20 then
   begin
     aForm.Left := Screen.DesktopLeft - aForm.NempRegionsDistance.Left;
     aForm.NempRegionsDistance.docked := False;
   end;
 
   // Zu weit oben?
-  if aForm.Top + aForm.NempRegionsDistance.Top
-          < Screen.DesktopTop + 10 then
+  if aForm.Top + aForm.NempRegionsDistance.Top  < Screen.DesktopTop + 10 then
   begin
     aForm.Top := Screen.DesktopTop - aForm.NempRegionsDistance.Top;
     aForm.NempRegionsDistance.docked := False;
   end;
 
-  aForm.NempRegionsDistance.RelativPositionX := aForm.Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  aForm.NempRegionsDistance.RelativPositionY := aForm.Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  aForm.NempRegionsDistance.RelativPositionX := aForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+  aForm.NempRegionsDistance.RelativPositionY := aForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
 end;
 
 Procedure ReInitRelativePositions;
 begin
   if PlaylistForm.Visible then
   begin
-    PlaylistForm.NempRegionsDistance.RelativPositionX := PlaylistForm.Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-    PlaylistForm.NempRegionsDistance.RelativPositionY := PlaylistForm.Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+    PlaylistForm.NempRegionsDistance.RelativPositionX := PlaylistForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+    PlaylistForm.NempRegionsDistance.RelativPositionY := PlaylistForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
   end;
 
   if MedienlisteForm.Visible then
   begin
-    MedienlisteForm.NempRegionsDistance.RelativPositionX := MedienlisteForm.Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-    MedienlisteForm.NempRegionsDistance.RelativPositionY := MedienlisteForm.Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+    MedienlisteForm.NempRegionsDistance.RelativPositionX := MedienlisteForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+    MedienlisteForm.NempRegionsDistance.RelativPositionY := MedienlisteForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
   end;
 
   if AuswahlForm.Visible then
   begin
-    AuswahlForm.NempRegionsDistance.RelativPositionX := AuswahlForm.Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-    AuswahlForm.NempRegionsDistance.RelativPositionY := AuswahlForm.Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+    AuswahlForm.NempRegionsDistance.RelativPositionX := AuswahlForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+    AuswahlForm.NempRegionsDistance.RelativPositionY := AuswahlForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
   end;
 
   if ExtendedControlForm.Visible then
   begin
-    ExtendedControlForm.NempRegionsDistance.RelativPositionX := ExtendedControlForm.Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-    ExtendedControlForm.NempRegionsDistance.RelativPositionY := ExtendedControlForm.Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+    ExtendedControlForm.NempRegionsDistance.RelativPositionX := ExtendedControlForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+    ExtendedControlForm.NempRegionsDistance.RelativPositionY := ExtendedControlForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
   end;
 
 end;
@@ -719,7 +718,7 @@ begin
                           // deactivate advanced skin temporary
                       //    TStyleManager.SetStyle('Windows');
                       //    reactivate := True;
- /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
+                      /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
                       end;
                       {$ENDIF}
 
@@ -727,7 +726,7 @@ begin
                       ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
                       try
                           ini.Encoding := TEncoding.UTF8;
-                          SaveWindowPositons(ini, NempOptions, AnzeigeMode);
+                          SaveWindowPositons(ini, NempFormBuildOptions, AnzeigeMode);
                           Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
                           try
                               Ini.UpdateFile;
@@ -738,19 +737,19 @@ begin
                           ini.Free
                       end;
 
-                      Anzeigemode := newMode mod 2;
+                      newMode := newMode mod 2;
 
-                      if Anzeigemode = 1 then
+                      if newMode = 1 then
                           // Party-mode in Separate-Window-Mode is not allowed.
                           NempSkin.NempPartyMode.Active := False;
 
-                      UpdateFormDesignNeu;
+                      UpdateFormDesignNeu(newMode);
 
                       {$IFDEF USESTYLES}
                       if reactivate then
                       begin
                           TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
-                          CorrectSkinRegionsTimer.Enabled := True;
+                          //CorrectSkinRegionsTimer.Enabled := True;   Now in UpdateFormDesignNeu
                       end;
                       {$ENDIF}
     end;
@@ -763,73 +762,133 @@ procedure SplitMainForm;
 begin
   with Nemp_MainForm do
   begin
-      PlaylistPanel.OnMouseDown :=     PlaylistForm.OnMouseDown;
-      GRPBOXPlaylist.OnMouseDown :=    PlaylistForm.OnMouseDown;
+      Width := 800; // _ControlPanel.Width + 4 + 2*GetSystemMetrics(SM_CXFrame);
+      Height := {NewPlayerPanel.Top +} _ControlPanel.Height + 40 + 2*GetSystemMetrics(SM_CYFrame);
+      Top  := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop ;
+      Left := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+
+
+      Nemp_MainForm.OnResize := NIL;
+      _VSTPanel.OnResize := Nil;
+      _TopMainPanel.OnResize := Nil;
+
+      _VSTPanel    .Align := alNone;
+      _TopMainPanel.Align := alNone;
+
+      _ControlPanel.Parent := __MainContainerPanel;
+      _ControlPanel.Align := alTop;
+      _ControlPanel.Left := 0;
+      _ControlPanel.Top  := 0;
+
+
+      if NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible then
+          PlaylistForm.Show
+      else
+          PlaylistForm.Hide;
+      PlaylistPanel.Parent  := PlaylistForm.ContainerPanelPlaylistForm;
+      PlaylistPanel.Align   := alNone;
+      PlaylistPanel.Left    := 7;
+      PlaylistPanel.Width   := PlaylistForm.ContainerPanelPlaylistForm.Width - 14;
+      PlaylistPanel.Top     := 2;
+      PlaylistPanel.Height  := PlaylistForm.ContainerPanelPlaylistForm.Height - 9;
+      PlaylistPanel.Anchors := [akleft, aktop, akright, akBottom];
+      PlaylistForm.FormResize(Nil);
+      PlaylistForm.FormShow(Nil);
+
+
+      if NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible then
+          AuswahlForm.Show
+      else
+          AuswahlForm.Hide;
+      AuswahlPanel.Parent := AuswahlForm.ContainerPanelAuswahlform;
+      AuswahlPanel.Align   := alNone;
+      AuswahlPanel.Left    := 7;
+      AuswahlPanel.Width   := AuswahlForm.ContainerPanelAuswahlform.Width - 14;
+      AuswahlPanel.Top     := 2;
+      AuswahlPanel.Height  := AuswahlForm.ContainerPanelAuswahlform.Height - 9;
+      AuswahlPanel.Anchors := [akleft, aktop, akright, akBottom];
+      AuswahlForm.FormResize(Nil);
+      AuswahlForm.FormShow(Nil);
+
+
+      if NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible then
+          MedienlisteForm.Show
+      else
+          MedienlisteForm.Hide;
+      MedialistPanel.Parent  := MedienlisteForm;
+      MedialistPanel.Align   := alNone;
+      MedialistPanel.Left    := 7;
+      MedialistPanel.Width   := MedienListeForm.ContainerPanelMedienBibForm.Width - 14;
+      MedialistPanel.Top     := 2;
+      MedialistPanel.Height  := MedienListeForm.ContainerPanelMedienBibForm.Height - 9;
+      MedialistPanel.Anchors := [akleft, aktop, akright, akBottom];
+      MedienlisteForm.FormResize(Nil);
+      MedienlisteForm.FormShow(Nil);
+
+      if NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible then
+          ExtendedControlForm.Show
+      else
+          ExtendedControlForm.Hide;
+      MedienBibDetailPanel.Parent  := ExtendedControlForm;
+      MedienBibDetailPanel.Align   := alNone;
+      MedienBibDetailPanel.Left    := 7;
+      MedienBibDetailPanel.Width   := ExtendedControlForm.ContainerPanelExtendedControlsForm.Width - 14;
+      MedienBibDetailPanel.Top     := 2;
+      MedienBibDetailPanel.Height  := ExtendedControlForm.ContainerPanelExtendedControlsForm.Height - 9;
+      MedienBibDetailPanel.Anchors := [akleft, aktop, akright, akBottom];
+      ExtendedControlForm.FormResize(Nil);
+      ExtendedControlForm.FormShow(ExtendedControlForm);
+
+
+
+      // Set OnMouseEvents for Dragging the forms
       PlaylistFillPanel.OnMouseDown := PlaylistForm.OnMouseDown;
-      PlaylistPanel.OnMouseMove := PlaylistForm.OnMouseMove;
-      GRPBOXPlaylist.OnMouseMove := PlaylistForm.OnMouseMove;
-      PlaylistFillPanel.OnMouseMove := PlaylistForm.OnMouseMove;
-      PlaylistPanel.OnMouseUP := PlaylistForm.OnMouseUP;
-      GRPBOXPlaylist.OnMouseUP := PlaylistForm.OnMouseUP;
-      PlaylistFillPanel.OnMouseUP := PlaylistForm.OnMouseUP;
-      AuswahlPanel.OnMouseDown := AuswahlForm.OnMouseDown;
-      GRPBOXArtistsAlben.OnMouseDown := AuswahlForm.OnMouseDown;
-      AuswahlPanel.OnMouseMove := AuswahlForm.OnMouseMove;
-      GRPBOXArtistsAlben.OnMouseMove := AuswahlForm.OnMouseMove;
-      AuswahlPanel.OnMouseUP := AuswahlForm.OnMouseUP;
-      GRPBOXArtistsAlben.OnMouseUP := AuswahlForm.OnMouseUP;
-      AuswahlFillPanel.OnMouseUp := AuswahlForm.OnMouseUp;
-      AuswahlFillPanel.OnMouseMove := AuswahlForm.OnMouseMove;
-      AuswahlFillPanel.OnMouseDown := AuswahlForm.OnMouseDown;
-      AuswahlStatusLBL.OnMouseUp := AuswahlForm.OnMouseUp;
-      AuswahlStatusLBL.OnMouseMove := AuswahlForm.OnMouseMove;
-      AuswahlStatusLBL.OnMouseDown := AuswahlForm.OnMouseDown;
-
-      VSTPanel.OnMouseDown := MedienlisteForm.OnMouseDown;
-      GRPBOXVST.OnMouseDown := MedienlisteForm.OnMouseDown;
-      MedienListeFillPanel.OnMouseDown := MedienlisteForm.OnMouseDown;
-      VSTPanel.OnMouseMove := MedienlisteForm.OnMouseMove;
-      GRPBOXVST.OnMouseMove := MedienlisteForm.OnMouseMove;
-      MedienListeFillPanel.OnMouseMove := MedienlisteForm.OnMouseMove;
-      VSTPanel.OnMouseUP := MedienlisteForm.OnMouseUP;
-      GRPBOXVST.OnMouseUP := MedienlisteForm.OnMouseUP;
-      MedienListeFillPanel.OnMouseUP := MedienlisteForm.OnMouseUP;
-
-      MedienListeStatusLBL.OnMouseDown := MedienlisteForm.OnMouseDown;
-      MedienListeStatusLBL.OnMouseMove := MedienlisteForm.OnMouseMove;
-      MedienListeStatusLBL.OnMouseUP := MedienlisteForm.OnMouseUP;
-
       PlayListStatusLBL.OnMouseDown := PlaylistForm.OnMouseDown;
+      PlaylistFillPanel.OnMouseMove := PlaylistForm.OnMouseMove;
       PlayListStatusLBL.OnMouseMove := PlaylistForm.OnMouseMove;
+      PlaylistFillPanel.OnMouseUP := PlaylistForm.OnMouseUP;
       PlayListStatusLBL.OnMouseUP   := PlaylistForm.OnMouseUP;
 
-      AudioPanel.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      AudioPanel.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      AudioPanel.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+      AuswahlFillPanel  .OnMouseDown := AuswahlForm.OnMouseDown;
+      AuswahlStatusLBL  .OnMouseDown := AuswahlForm.OnMouseDown;
+      AuswahlFillPanel  .OnMouseMove := AuswahlForm.OnMouseMove;
+      AuswahlStatusLBL  .OnMouseMove := AuswahlForm.OnMouseMove;
+      AuswahlFillPanel  .OnMouseUp := AuswahlForm.OnMouseUp;
+      AuswahlStatusLBL  .OnMouseUp := AuswahlForm.OnMouseUp;
+
+      MedienListeFillPanel.OnMouseDown := MedienlisteForm.OnMouseDown;
+      MedienListeStatusLBL.OnMouseDown := MedienlisteForm.OnMouseDown;
+      MedienListeFillPanel.OnMouseMove := MedienlisteForm.OnMouseMove;
+      MedienListeStatusLBL.OnMouseMove := MedienlisteForm.OnMouseMove;
+      MedienListeFillPanel.OnMouseUP := MedienlisteForm.OnMouseUP;
+      MedienListeStatusLBL.OnMouseUP := MedienlisteForm.OnMouseUP;
+
+      MedienBibDetailFillPanel      .OnMouseDown := ExtendedControlForm.OnMouseDown;
+      MedienBibDetailStatusLbl      .OnMouseDown := ExtendedControlForm.OnMouseDown;
+      MedienBibDetailFillPanel      .OnMouseMove := ExtendedControlForm.OnMouseMove;
+      MedienBibDetailStatusLbl      .OnMouseMove := ExtendedControlForm.OnMouseMove;
+      MedienBibDetailFillPanel      .OnMouseUP := ExtendedControlForm.OnMouseUP;
+      MedienBibDetailStatusLbl      .OnMouseUP := ExtendedControlForm.OnMouseUP;
+
+      //AudioPanel.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      //AudioPanel.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      //AudioPanel.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
       //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseDown := ExtendedControlForm.OnMouseDown;
       //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseMove := ExtendedControlForm.OnMouseMove;
       //ExtendedControlForm.ContainerPanelExtendedControlsForm.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
-      CoverImage.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      CoverImage.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      CoverImage.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+      //CoverImage.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      //CoverImage.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      //CoverImage.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
-      GRPBOXEqualizer.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      GRPBOXEqualizer.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      GRPBOXEqualizer.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+      //GRPBOXCover.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      //GRPBOXCover.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      //GRPBOXCover.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
-      GRPBOXCover.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      GRPBOXCover.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      GRPBOXCover.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
-
-      GRPBOXEffekte.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      GRPBOXEffekte.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      GRPBOXEffekte.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
-
-      GRPBOXHeadset.OnMouseDown := ExtendedControlForm.OnMouseDown;
-      GRPBOXHeadset.OnMouseMove := ExtendedControlForm.OnMouseMove;
-      GRPBOXHeadset.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
+      //GRPBOXHeadset.OnMouseDown := ExtendedControlForm.OnMouseDown;
+      //GRPBOXHeadset.OnMouseMove := ExtendedControlForm.OnMouseMove;
+      //GRPBOXHeadset.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
       EditPlaylistSearchExit(Nil);
       EDITFastSearchExit(Nil);
@@ -846,22 +905,25 @@ begin
     AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left;
     //PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
 
-    AuswahlPanel.Align := alleft;
+
+    AuswahlPanel.Align := alNone;
     AuswahlPanel.Left := 0;
+    AuswahlPanel.Parent := _TopMainPanel;
+
+    PlaylistPanel.Align := alNone;
+    PlaylistPanel.Parent := _TopMainPanel;
+
+    MedialistPanel.Align := alNone;
+    MedialistPanel.Parent := _VSTPanel;
+
+    MedienBibDetailPanel.Align := alNone;
+    MedienBibDetailPanel.Parent := _VSTPanel;
 
 
-    PlaylistPanel.Parent := TopMainPanel;
-    PlaylistPanel.Align := alClient;
-
-    AuswahlPanel.Parent := TopMainPanel;
-
-
-    VSTPanel.Parent := Nemp_MainForm;
-    VSTPanel.Align := alClient;
-
-    AudioPanel.Parent := PlayerPanel;
-    AudioPanel.Left := 2;
-    AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
+    // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //AudioPanel.Parent := PlayerPanel;
+    //AudioPanel.Left := 2;
+    //AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
 
 
     if NempSkin.NempPartyMode.Active then
@@ -869,7 +931,7 @@ begin
     else
         EditFastSearch.Width := 194;
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
-    MedienlisteFillPanel.Width := VSTPanel.Width - MedienlisteFillPanel.Left;// - 8;
+    MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
 
@@ -877,78 +939,53 @@ begin
         EditplaylistSearch.Width := Round(65 * NempSkin.NempPartyMode.ResizeFactor)
     else
         EditplaylistSearch.Width := 65;
-    PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
-    PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
-    PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
+    //PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
+    //PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
+    //PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
-    AuswahlPanel.OnResize := AuswahlPanelResize;
+    // set Resize-Handler again
     Nemp_MainForm.OnResize := FormResize;
+    _VSTPanel.OnResize     := _TopMainPanelResize;
+    _TopMainPanel.OnResize := _TopMainPanelResize;
+
+    //AuswahlPanel.OnResize  := AuswahlPanelResize;
+    //PlaylistPanel.OnResize := PlaylistPanelResize;
+
 
     if Medienlisteform.visible then Medienlisteform.Close;
     if Playlistform.visible then Playlistform.Close;
     if Auswahlform.Visible then Auswahlform.Close;
     if ExtendedControlForm.visible then ExtendedControlForm.Close;
 
-    PlaylistPanel.OnMouseDown := NIL;
-    PlaylistPanel.OnMouseMove := NIL;
-    GRPBOXPlaylist.OnMouseDown := NIL;
-    GRPBOXPlaylist.OnMouseMove := NIL;
     PlaylistFillPanel.OnMouseDown := NIL;
-    PlaylistFillPanel.OnMouseMove := NIL;
-
-    AuswahlPanel.OnMouseDown := NIL;
-    AuswahlPanel.OnMouseMove := NIL;
-    GRPBOXArtistsAlben.OnMouseDown := NIL;
-    GRPBOXArtistsAlben.OnMouseMove := NIL;
-
-    VSTPanel.OnMouseDown := NIL;
-    VSTPanel.OnMouseMove := NIL;
-    GRPBOXVST.OnMouseDown := NIL;
-    GRPBOXVST.OnMouseMove := NIL;
-    MedienListeFillPanel.OnMouseDown := NIL;
-    MedienListeFillPanel.OnMouseMove := NIL;
-    AuswahlFillPanel.OnMouseDown := Nil;
-    AuswahlFillPanel.OnMouseMove := Nil;
-    AuswahlStatusLBL.OnMouseMove := Nil;
-    AuswahlStatusLBL.OnMouseDown := Nil;
-
-    MedienListeStatusLBL.OnMouseDown := Nil;
-    MedienListeStatusLBL.OnMouseMove := Nil;
-    MedienListeStatusLBL.OnMouseUP   := Nil;
-
     PlayListStatusLBL.OnMouseDown := Nil;
+    PlaylistFillPanel.OnMouseMove := NIL;
     PlayListStatusLBL.OnMouseMove := Nil;
+    PlaylistFillPanel.OnMouseUP   := Nil;
     PlayListStatusLBL.OnMouseUP   := Nil;
 
-    AuswahlStatusLBL.OnMouseDown := Nil;
-    AuswahlStatusLBL.OnMouseMove := Nil;
-    AuswahlStatusLBL.OnMouseUP   := Nil;
+    AuswahlFillPanel  .OnMouseDown := Nil;
+    AuswahlStatusLBL  .OnMouseDown := Nil;
+    AuswahlFillPanel  .OnMouseMove := Nil;
+    AuswahlStatusLBL  .OnMouseMove := Nil;
+    AuswahlFillPanel  .OnMouseUP   := Nil;
+    AuswahlStatusLBL  .OnMouseUP   := Nil;
 
-    CoverImage.OnMouseDown := Nil;
-    CoverImage.OnMouseMove := Nil;
-    CoverImage.OnMouseUp   := Nil;
+    MedienListeFillPanel.OnMouseDown := NIL;
+    MedienListeStatusLBL.OnMouseDown := Nil;
+    MedienListeFillPanel.OnMouseMove := NIL;
+    MedienListeStatusLBL.OnMouseMove := Nil;
+    MedienListeFillPanel.OnMouseUP   := Nil;
+    MedienListeStatusLBL.OnMouseUP   := Nil;
 
-    GRPBOXCover.OnMouseDown := Nil;
-    GRPBOXCover.OnMouseMove := Nil;
-    GRPBOXCover.OnMouseUp   := Nil;
+    MedienBibDetailFillPanel      .OnMouseDown := NIL;
+    MedienBibDetailStatusLbl      .OnMouseDown := Nil;
+    MedienBibDetailFillPanel      .OnMouseMove := NIL;
+    MedienBibDetailStatusLbl      .OnMouseMove := Nil;
+    MedienBibDetailFillPanel      .OnMouseUP   := Nil;
+    MedienBibDetailStatusLbl      .OnMouseUP   := Nil;
 
-    // Andere Controls im Equalizer-Teil
-    AudioPanel.OnMouseDown := Nil;
-    AudioPanel.OnMouseMove := Nil;
-    AudioPanel.OnMouseUp   := Nil;
-
-    GRPBOXEqualizer.OnMouseDown := Nil;
-    GRPBOXEqualizer.OnMouseMove := Nil;
-    GRPBOXEqualizer.OnMouseUp   := Nil;
-
-    GRPBOXEffekte.OnMouseDown :=  Nil;
-    GRPBOXEffekte.OnMouseMove :=  Nil;
-    GRPBOXEffekte.OnMouseUp   :=  Nil;
-
-    GRPBOXHeadset.OnMouseDown := Nil;
-    GRPBOXHeadset.OnMouseMove := Nil;
-    GRPBOXHeadset.OnMouseUp   := Nil;
     EditPlaylistSearchExit(Nil);
     EDITFastSearchExit(Nil);
   end;
@@ -958,98 +995,39 @@ end;
 procedure UpdateSmallMainForm;
 var formregion,
   xpbottom, xptop, xpleft, xpright: integer;
+  aPoint: TPoint;
 begin
     with Nemp_MainForm do
     begin
-//      if _IsThemeActive or NempSkin.isActive then
-//      begin
-              xpleft   := GetSystemMetrics(SM_CXFrame) + - 2 + NewPlayerPanel.Left ;
-              xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + NewPlayerPanel.Top ;
-              xpright  := xpleft + NewPlayerPanel.Width - 1 + 4;// - 1 + 4;
-              xpbottom := xptop + NewPlayerPanel.Height - 1 + 4;// - 1 + 3;
-              formRegion := CreateRectRgn
-                  (xpleft, xptop, xpright, xpbottom );
+        aPoint := _ControlPanel.ClientToParent(Point(0,0), Nemp_MainForm );
+        xpleft   := GetSystemMetrics(SM_CXFrame) {+ - 2} + aPoint.X ;
+        xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + aPoint.Y ;
+        //xpleft   := GetSystemMetrics(SM_CXFrame) {+ - 2} + _ControlPanel.Left ;
+        //xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + _ControlPanel.Top ;
+        xpright  := xpleft + _ControlPanel.Width - 1 {+ 4};// - 1 + 4;
+        xpbottom := xptop + _ControlPanel.Height - 1 {+ 4};// - 1 + 3;
 
-              NempRegionsDistance.Top := xptop;
-              NempRegionsDistance.Left := xpleft;
-              NempRegionsDistance.Right := xpright ;
-              NempRegionsDistance.Bottom := xpbottom ;
+        formRegion := CreateRectRgn
+            (xpleft, xptop, xpright, xpbottom );
 
-             // xptop    := xpBottom - 1;
-             // xpbottom := xptop + GRPBOXSpectrum.Height-1 + 2;
-             // formRegion1 := CreateRoundRectRgn
-             //     (xpleft, xptop, xpright, xpbottom , 4, 4);
-             // CombineRgn( formregion, formregion, formregion1, RGN_OR );
+        NempRegionsDistance.Top := xptop;
+        NempRegionsDistance.Left := xpleft;
+        NempRegionsDistance.Right := xpright ;
+        NempRegionsDistance.Bottom := xpbottom ;
 
-             // xptop    := xpBottom - 1;
-             // xpbottom := xptop + GRPBOXControl.Height - 1 + 3;
-
-{              if NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible then
-                xpbottom := xpbottom + 4; // Hier muss man was weiter runter gehen
-
-              formRegion1 := CreateRoundRectRgn
-                  (xpleft, xptop, xpright, xpbottom , 4, 4);
-              CombineRgn( formregion, formregion, formregion1, RGN_OR );
-
-              NempRegionsDistance.Bottom := xpbottom - 1;
-
-              // ggf oben und unten was dranhängen
-              if NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible then
-              begin
-                xptop    := GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFrame) ;
-                xpBottom := xpTop + NewPlayerPanel.Top;
-                formRegion1 := CreateRoundRectRgn
-                  (xpleft, xptop, xpright, xpbottom , 4, 4);
-                CombineRgn( formregion, formregion, formregion1, RGN_OR );
-
-                NempRegionsDistance.Top := xptop;
-
-                xptop := GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFrame) + GRPBOXEqualizer.Top - 4;
-                xpBottom := xpTop + EXTENDED_HEIGHT + 6;//GRPBOXEqualizer.Height + 6;
-
-                formRegion1 := CreateRoundRectRgn
-                  (xpleft, xptop, xpright, xpbottom , 4, 4);
-                CombineRgn( formregion, formregion, formregion1, RGN_OR );
-
-                NempRegionsDistance.Bottom := xpbottom - 1;
-              end;
-
-      end else
-      begin // Theme nicht aktiv UND kein Skin aktiv
-              xpleft   := 10;
-              xpright  := xpleft + NewPlayerPanel.Width  + 4 ;
-
-              if NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible then
-              begin
-                xptop    := GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFrame) ;
-                xpBottom := xpTop + GRPBOXEqualizer.Top + GRPBOXEqualizer.Height + 2;
-              end else
-              begin
-                xptop    := GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFrame) + NewPlayerPanel.Top + 3;  //+ 15 + 18;
-                xpbottom := xpTop + NewPlayerPanel.Height -1 ;
-              end;
-              formRegion := CreateRoundRectRgn
-                  (xpleft, xptop, xpright, xpbottom , 4, 4);
-
-              NempRegionsDistance.Top := xptop;
-              NempRegionsDistance.Left := xpleft;
-              NempRegionsDistance.Right := xpright - 1;
-              NempRegionsDistance.Bottom := xpbottom - 1;
-      end;
-}
-      // Regions setzen
-      SetWindowRgn( handle, formregion, true );
-      stopBtn.BringToFront;
+        // Regions setzen
+        SetWindowRgn( handle, formregion, true );
+        stopBtn.BringToFront;
     end;
 end;
 
-procedure UpdateFormDesignNeu;
+procedure UpdateFormDesignNeu(newMode: Integer);
 var i: Integer;
+    bckup: TWndMethod;
 begin
   with Nemp_MainForm do
   begin
-
-      //LockWindowUpdate (CoverScrollbar.Handle);
+      LockWindowUpdate (CoverScrollbar.Handle);
 
       // one attempt to get rid of several AV with this scrollbar
       //CoverScrollbar.Visible := False;
@@ -1059,203 +1037,89 @@ begin
       //02.2017 // Bug mit MAXIMIZED-Over Taskleiste????
       if Tag in [0,1] then
       begin
-        NempOptions.NempFormAufteilung[Tag].Maximized := WindowState=wsMaximized;
-        WindowState := wsNormal;
-        // aktuelle Aufteilung speichern
-        NempOptions.NempFormAufteilung[Tag].FormTop   := Top ;
-        NempOptions.NempFormAufteilung[Tag].FormLeft  := Left;
-        NempOptions.NempFormAufteilung[Tag].FormHeight:= Height;
-        NempOptions.NempFormAufteilung[Tag].FormWidth := Width;
-        NempOptions.NempFormAufteilung[Tag].TopMainPanelHeight := TopMainPanel.Height;
-        NempOptions.NempFormAufteilung[Tag].AuswahlPanelWidth  := AuswahlPanel.Width;
-        NempOptions.NempFormAufteilung[Tag].ArtistWidth   := ArtistsVST.Width;
+          NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized := WindowState=wsMaximized;
+          WindowState := wsNormal;
+          // aktuelle Aufteilung speichern
+          if Tag = 0 then
+          begin
+              NempFormBuildOptions.WindowSizeAndPositions.MainFormTop   := Top ;
+              NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft  := Left;
+              NempFormBuildOptions.WindowSizeAndPositions.MainFormHeight:= Height;
+              NempFormBuildOptions.WindowSizeAndPositions.MainFormWidth := Width;
+          end else
+          begin
+              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop   := Top ;
+              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft  := Left;
+              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormHeight:= Height;
+              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormWidth := Width;
+          end;
       end;
-
 
       // Zuerst: HauptMenü anzeigen // ausblenden
       // Das macht das Setzen Der Regions im Einzelfenster-Modus einfacher.
-      if AnzeigeMode = 1 then
-        Nemp_MainForm.Menu := NIL
+      if newMode = 1 then
+          Nemp_MainForm.Menu := NIL
       else
       begin
-        if NOT ({Nempskin.isActive And } NempSkin.HideMainMenu) then
-            Nemp_MainForm.Menu := Nemp_MainMenu;
+          if NOT NempSkin.HideMainMenu then
+              Nemp_MainForm.Menu := Nemp_MainMenu;
       end;
 
       // Menu-Einträge Dis-/Enablen
-          PM_P_ViewSeparateWindows_Equalizer.Enabled := AnzeigeMode = 1;
-          PM_P_ViewSeparateWindows_Playlist.Enabled := AnzeigeMode = 1;
-          PM_P_ViewSeparateWindows_Medialist.Enabled := AnzeigeMode = 1;
-          PM_P_ViewSeparateWindows_Browse.Enabled := AnzeigeMode = 1;
-          PM_P_ViewStayOnTop.Enabled := AnzeigeMode = 1;
+      PM_P_ViewSeparateWindows_Equalizer.Enabled := newMode = 1;
+      PM_P_ViewSeparateWindows_Playlist.Enabled := newMode = 1;
+      PM_P_ViewSeparateWindows_Medialist.Enabled := newMode = 1;
+      PM_P_ViewSeparateWindows_Browse.Enabled := newMode = 1;
+      PM_P_ViewStayOnTop.Enabled := newMode = 1;
 
-          MM_O_ViewSeparateWindows_Equalizer.Enabled := AnzeigeMode = 1;
-          MM_O_ViewSeparateWindows_Playlist.Enabled := AnzeigeMode = 1;
-          MM_O_ViewSeparateWindows_Medialist.Enabled := AnzeigeMode = 1;
-          MM_O_ViewSeparateWindows_Browse.Enabled := AnzeigeMode = 1;
-          MM_O_ViewStayOnTop.Enabled := AnzeigeMode = 1;
+      MM_O_ViewSeparateWindows_Equalizer.Enabled := newMode = 1;
+      MM_O_ViewSeparateWindows_Playlist.Enabled := newMode = 1;
+      MM_O_ViewSeparateWindows_Medialist.Enabled := newMode = 1;
+      MM_O_ViewSeparateWindows_Browse.Enabled := newMode = 1;
+      MM_O_ViewStayOnTop.Enabled := newMode = 1;
 
-          PM_P_ViewCompactComplete.Enabled := AnzeigeMode = 0;
-          MM_O_ViewCompactComplete.Enabled := AnzeigeMode = 0;
+      PM_P_ViewCompactComplete.Enabled := newMode = 0;
+      MM_O_ViewCompactComplete.Enabled := newMode = 0;
 
-      if AnzeigeMode = 0 then
-          JoinMainForm;
-
-      Constraints.MinHeight := 0;
-      Constraints.MaxHeight := 0;
-      Constraints.MinWidth := 0;
-      Constraints.MaxWidth := 0;
-      TopMainPanel.Constraints.MaxHeight := 0;
-
+      BtnClose.Visible := newMode = 1;
+      // temporary for this procedure
       PanelCoverBrowse.OnResize := Nil;
-      // 1. Form: Größen setzen
 
 
-      if Tag in [0,1] then
-      begin
-          Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
-          Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
-      end;
+      Anzeigemode := NewMode;  // here ok?? (2019 rework, tmp comment
 
-      // 2. Sachenanzeigen und Aligns ggf. wieder umsetzen
-      // 3. Positionen korrigieren
       case AnzeigeMode of
         0: begin
-            // Kompakte Ansicht
+            // Compact view, all in one window
+            if (Tag in [0,1]) then
+                // not necessary on start, Mainform is designed in a "joined state"
+                // basically: Put all the Panels back o the Mainform
+                JoinMainForm;
 
-            Height := NempOptions.NempFormAufteilung[AnzeigeMode].FormHeight;
-            Width := NempOptions.NempFormAufteilung[AnzeigeMode].FormWidth;
+            // after joining the MainForm: Apply the FormBuilder-Layout
+            NempFormBuildOptions.BeginUpdate;
+            NempFormBuildOptions.RefreshBothRowsOrColumns(False);
+            NempFormBuildOptions.SwapMainLayout;
+            NempFormBuildOptions.ApplyRatios;
+            NempFormBuildOptions.EndUpdate;
 
-            MM_O_ViewCompactComplete.Checked := True;
-            PM_P_ViewCompactComplete.Checked := True;
-
-            AuswahlPanel.Align := alNone;
-            AuswahlPanel.Width := NempOptions.NempFormAufteilung[AnzeigeMode].AuswahlPanelWidth;
-            AuswahlPanel.Visible := True;
-            AuswahlPanel.Left := 0;
-
-            Splitter2.Align := alnone;
-            Splitter2.Visible := True;
-            Splitter2.Left := AuswahlPanel.Width;
-            PlayerPanel.Left := AuswahlPanel.Width + Splitter2.Width;
-            Auswahlpanel.Align := alLeft;
-            Splitter2.Align := alleft;
-            PlayerPanel.Align := alleft;
-
-            VSTPanel.Visible := True; // 23.8
-            Splitter1.Visible := True;
-            PlaylistPanel.Visible := True;
-
-            PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
-            PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left;// - 8;
-            PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
+            Top    := NempFormBuildOptions.WindowSizeAndPositions.MainFormTop ;
+            Left   := NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft;
+            Height := NempFormBuildOptions.WindowSizeAndPositions.MainFormHeight;
+            Width  := NempFormBuildOptions.WindowSizeAndPositions.MainFormWidth;
         end;
 
         1: begin
             // Einzelfenster-Ansicht
-            // In Partymode the size is different here. Use the current values
-            // of the components
-            // Note: Currently Separate Windows are not allowed in PartyMode
-            //       Maybe later. ;-)
-            Width := NewPlayerPanel.Width + 4 + 2*GetSystemMetrics(SM_CXFrame);
-            Height := NewPlayerPanel.Top + NewPlayerPanel.Height + 40 + 2*GetSystemMetrics(SM_CYFrame);
-
-            Nemp_MainForm.OnResize := NIL;
-            TopMainPanel.Height := AudioPanel.Top + AudioPanel.Height + 40; //430; //391;
-
-            // Forms anzeigen
-            if NempOptions.NempEinzelFormOptions.PlaylistVisible then
-            begin
-                PlaylistForm.Show;
-                PlaylistPanel.OnResize := NIL;
-                if PlaylistForm.Width < Playlistform.Constraints.MinWidth then
-                    PlaylistForm.Width := Playlistform.Constraints.MinWidth;
-            end else
-            begin
-                PlaylistForm.Hide;
-            end;
-            PlaylistPanel.Parent := PlaylistForm.ContainerPanelPlaylistForm;
-            PlaylistPanel.Align := alNone;
-            PlaylistPanel.Left := 7;
-            PlaylistPanel.Width := PlaylistForm.ContainerPanelPlaylistForm.Width - 14;
-            PlaylistPanel.Top := 2;
-            PlaylistPanel.Height := PlaylistForm.ContainerPanelPlaylistForm.Height - 9;
-            PlaylistPanel.Anchors := [akleft, aktop, akright, akBottom];
-            PlaylistForm.FormResize(Nil);
-            PlaylistForm.FormShow(Nil);
-
-            if NempOptions.NempEinzelFormOptions.AuswahlSucheVisible then
-            begin
-                AuswahlForm.Show;
-                AuswahlPanel.OnResize := NIL;
-            end else
-            begin
-                AuswahlForm.Hide;
-            end;
-            AuswahlPanel.Parent := AuswahlForm.ContainerPanelAuswahlform;
-            AuswahlPanel.Constraints.MaxWidth := 0;
-
-            AuswahlPanel.Align := alNone;
-            AuswahlPanel.Left := 7;
-            AuswahlPanel.Width := AuswahlForm.ContainerPanelAuswahlform.Width - 14;
-            AuswahlPanel.Top := 2;
-            AuswahlPanel.Height := AuswahlForm.ContainerPanelAuswahlform.Height - 9;
-            AuswahlPanel.Anchors := [akleft, aktop, akright, akBottom];
-
-            AuswahlForm.FormResize(Nil);
-            AuswahlForm.FormShow(Nil);
-
-            if NempOptions.NempEinzelFormOptions.MedienlisteVisible then
-            begin
-                MedienlisteForm.Show;
-            end else
-            begin
-                MedienlisteForm.Hide;
-            end;
-            VSTPanel.Parent := MedienlisteForm;
-            VSTPanel.Align := alNone;
-            VSTPanel.Left := 7;
-            VSTPanel.Width := MedienListeForm.ContainerPanelMedienBibForm.Width - 14;
-            VSTPanel.Top := 2;
-            VSTPanel.Height := MedienListeForm.ContainerPanelMedienBibForm.Height - 9;
-            VSTPanel.Anchors := [akleft, aktop, akright, akBottom];
-            MedienlisteForm.FormResize(Nil);
-            MedienlisteForm.FormShow(Nil);
-
-
-           // ExtendedControlForm.Height := AudioPanel.Height + 4;
-           // ExtendedControlForm.Width := AudioPanel.Width + 4;
-
-            ExtendedControlForm.SetPartySize(AudioPanel.Width + 4, AudioPanel.Height + 4);
-            if NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible then
-            begin
-                ExtendedControlForm.Show;
-                ExtendedControlForm.FormShow(ExtendedControlForm);
-            end else
-            begin
-                ExtendedControlForm.Hide;
-            end;
-            AudioPanel.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
-            AudioPanel.Left := 2;
-            AudioPanel.Top := 2;
-
-
-            TopMainPanel.Constraints.MaxHeight := 0;
-            TopMainPanel.Constraints.MinHeight := 0;
-
-            // MouseMove etc. setzen
             SplitMainForm;
-            Splitter2.Visible := False;
-            Splitter1.Visible := False;
         end;
       end;
+
+      // reactivate it again
       PanelCoverBrowse.OnResize := PanelCoverBrowseResize;
-      //4.  Größen setzen der Controls setzen
-      if AnzeigeMode = 0 then
-      begin
-        TopMainPanel.Height := NempOptions.NempFormAufteilung[AnzeigeMode].TopMainPanelHeight;
-      end;
-      ArtistsVST.Width := NempOptions.NempFormAufteilung[AnzeigeMode].ArtistWidth;
+      //CoverScrollbar.WindowProc := bckup;
+      //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);
+
 
       //Korrektur. Das ist manchmal nötig
       GRPBOXPlaylist.Left   := 4;
@@ -1269,19 +1133,20 @@ begin
       PlaylistForm.FormResize(Nil);
 
       // 5. Constraints setzen
+      {
       Constraints.MinHeight := NempOptions.NempFormAufteilung[AnzeigeMode].FormMinHeight;
       Constraints.MaxHeight := NempOptions.NempFormAufteilung[AnzeigeMode].FormMaxHeight;
       Constraints.MinWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMinWidth;
       Constraints.MaxWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMaxWidth;
-
+      }
       if AnzeigeMode = 0 then
       begin
-          TopMainPanel.Constraints.MaxHeight := Height - 160;
+          //2019 _TopMainPanel.Constraints.MaxHeight := Height - 160;
           NempRegionsDistance.Top := 0;
           NempRegionsDistance.Bottom := height;
           NempRegionsDistance.Right := width;
           NempRegionsDistance.Left := 0;
-          TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
+          _TopMainPanel.Constraints.MinHeight := MAIN_PANEL_MIN_HEIGHT;
       end
       else
       begin
@@ -1290,34 +1155,20 @@ begin
 
       if Tag in [0,1] then
       begin
-
           FormPosAndSizeCorrect(Nemp_MainForm);
-
           FormPosAndSizeCorrect(AuswahlForm);
-
           FormPosAndSizeCorrect(PlaylistForm);
           FormPosAndSizeCorrect(MedienlisteForm);
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
       end;
-      // This seems useless.
-      // But the setter will call SetCustomregion, which seems to be
-      // necessary, as the ParentForm of these buttons has changed.
-      HallButton         .Height := HallButton         .Height;
-      EchoWetDryMixButton.Height := EchoWetDryMixButton.Height;
-      EchoTimeButton     .Height := EchoTimeButton     .Height;
-      SampleRateButton   .Height := SampleRateButton   .Height;
-      for i := 0 to 9 do
-          EqualizerButtons[i].Height := EqualizerButtons[i].Height;
-      VolButtonHeadset        .Height := VolButtonHeadset        .Height;
-      SlidebarButton_Headset  .Height := SlidebarButton_Headset  .Height;
 
 
-
-      // Größenkorrekturen
+      {// Größenkorrekturen
       if (ArtistsVST.Width > AuswahlPanel.width - 40)
           OR (ArtistsVST.Width < 40) then
               ArtistsVST.Width := AuswahlPanel.width DIV 2;
+      }
 
       SnapActive := True;
 
@@ -1325,8 +1176,15 @@ begin
       begin
           // Note:  WindowState := wsMaximized; MUST be set AFTER this!
 
-          Top := NempOptions.NempFormAufteilung[AnzeigeMode].FormTop;
-          Left := NempOptions.NempFormAufteilung[AnzeigeMode].FormLeft;
+          if AnzeigeMode = 0 then
+          begin
+              Top := NempFormBuildOptions.WindowSizeAndPositions.MainFormTop;
+              Left := NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft;
+          end else
+          begin
+              Top := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+              Left := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+          end;
 
           FormPosAndSizeCorrect(Nemp_MainForm);
           FormPosAndSizeCorrect(AuswahlForm);
@@ -1335,19 +1193,18 @@ begin
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
 
-
           if NempOptions.FixCoverFlowOnStart then
           begin
               // this is somehow needed on XP (or only in my virtual machine??)
-              if TopMainPanel.Height Mod 2 = 0 then
-                  TopMainPanel.Height := TopMainPanel.Height + 1
+              if _TopMainPanel.Height Mod 2 = 0 then
+                  _TopMainPanel.Height := _TopMainPanel.Height + 1
               else
-                  TopMainPanel.Height := TopMainPanel.Height - 1  ;
+                  _TopMainPanel.Height := _TopMainPanel.Height - 1  ;
           end;
       end;
 
       //02.2017 // MAXIMIZED-OVer TAskleiste????
-      if NempOptions.NempFormAufteilung[Anzeigemode].Maximized then
+      if (AnzeigeMode = 0) AND NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized then
           WindowState := wsMaximized;
 
       if NempSkin.isActive then
@@ -1364,23 +1221,24 @@ begin
       end;
 
 
-      MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
+      MM_O_ViewCompactComplete.Checked := AnzeigeMode = 0;
+      PM_P_ViewCompactComplete.Checked := AnzeigeMode = 0;
 
+      CorrectSkinRegionsTimer.Enabled := True;
+      MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
       // necessary on advanced skins
       ReAcceptDragFiles;
 
       Tag := AnzeigeMode;
 
+
       //CoverScrollbar.WindowProc := NewScrollBarWndProc;
       //SendMessage( CoverScrollbar.Handle, WM_SETREDRAW, 1, 0);
-
       //CoverScrollbar.StyleElements := [seFont,seClient,seBorder]
-
       // one attempt to get rid of several AV with this scrollbar
       //CoverScrollbar.Visible := True;
 
-
-
+      LockWindowUpdate(0);
   end;
 end;
 

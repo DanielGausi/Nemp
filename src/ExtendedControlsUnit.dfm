@@ -13,13 +13,14 @@ object ExtendedControlForm: TExtendedControlForm
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  OnActivate = FormActivate
   OnClose = FormClose
   OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnMouseDown = FormMouseDown
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
-  OnShow = FormShow
+  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
   object ContainerPanelExtendedControlsForm: TNempPanel
@@ -30,7 +31,12 @@ object ExtendedControlForm: TExtendedControlForm
     Height = 188
     Align = alClient
     BevelOuter = bvNone
+    Constraints.MinHeight = 100
+    Constraints.MinWidth = 50
     TabOrder = 0
+    OnMouseDown = ContainerPanelExtendedControlsFormMouseDown
+    OnMouseMove = ContainerPanelExtendedControlsFormMouseMove
+    OnMouseUp = ContainerPanelExtendedControlsFormMouseUp
     OnPaint = ContainerPanelExtendedControlsFormPaint
     OwnerDraw = False
     DesignSize = (

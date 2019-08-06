@@ -603,7 +603,7 @@ begin
                                     oldest_index := i;
                         end;
                     end;
-                    If texture_count > 50 Then
+                    If texture_count > 100 Then
                     begin
                         glDeleteTextures (1, @fItem[oldest_index].texture.handle);
                         fItem[oldest_index].texture.handle := 0;
@@ -644,8 +644,16 @@ begin
                             91..103: NewSelectedItem := 5;
                             104..116:NewSelectedItem := 6;
                             117..128:NewSelectedItem := 7;
+                            // ---------- added 2019
+                            129..140:NewSelectedItem := 8;
+                            141..152:NewSelectedItem := 9;
+                            153..164:NewSelectedItem := 10;
+                            165..176:NewSelectedItem := 11;
+                            177..188:NewSelectedItem := 12;
+                            189..200:NewSelectedItem := 13;
+                            201..211:NewSelectedItem := 14;
                         else
-                            NewSelectedItem := 8;
+                            NewSelectedItem :=15;
                         end;
 
                         if vec0 > 0 then
@@ -972,16 +980,18 @@ begin
 
 
         // reflexion
-        glColor3f (0.85-Abs(fItem[i].x)/7.0*1.5,
+       { glColor3f (0.85-Abs(fItem[i].x)/7.0*1.5,
                    0.85-Abs(fItem[i].x)/7.0*1.5,
-                   0.85-Abs(fItem[i].x)/7.0*1.5);
+                   0.85-Abs(fItem[i].x)/7.0*1.5);   }
+
+
   //      glColor3f (Abs(fItem[i].x)/7.0*0.5,
   //                 Abs(fItem[i].x)/7.0*0.5,
    //                Abs(fItem[i].x)/7.0*0.5);
 
-        glColor3f ((0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fr)+fr,
-                   (0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fg)+fg,
-                   (0.85-Abs(fItem[i].x)/7.0*1.5)*(1-fb)+fb);
+        glColor3f ((0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fr)+fr,
+                   (0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fg)+fg,
+                   (0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fb)+fb);
 
           //           glColor3f(0.9,0.9,1.0);
         glBegin (GL_QUADS);
@@ -997,13 +1007,13 @@ begin
 
 
         // item itsself
-        glColor3f (1.0-Abs(fItem[i].x)/7.0,
+       { glColor3f (1.0-Abs(fItem[i].x)/7.0,
                    1.0-Abs(fItem[i].x)/7.0,
-                   1.0-Abs(fItem[i].x)/7.0);
+                   1.0-Abs(fItem[i].x)/7.0);    }
 
-        glColor3f ((1.0-Abs(fItem[i].x)/7.0)*(1-fr)+fr,
-                   (1.0-Abs(fItem[i].x)/7.0)*(1-fg)+fg,
-                   (1.0-Abs(fItem[i].x)/7.0)*(1-fb)+fb);
+        glColor3f ((1.0-Abs(fItem[i].x)/10.0)*(1-fr)+fr,
+                   (1.0-Abs(fItem[i].x)/10.0)*(1-fg)+fg,
+                   (1.0-Abs(fItem[i].x)/10.0)*(1-fb)+fb);
 
         //glColor3f(1.9,1.9,0.0);
 

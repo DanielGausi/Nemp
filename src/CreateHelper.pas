@@ -101,7 +101,7 @@ begin
             end;
 
 
-            ReadNempOptions(ini, NempOptions);
+            ReadNempOptions(ini, NempOptions, NempFormBuildOptions);
             if NempOptions.Language = '' then
                 // overwrite the default setting with the curent system language
                 NempOptions.Language := GetCurrentLanguage;
@@ -132,6 +132,7 @@ begin
             MedienBib.LoadFromIni(Ini);
             // MedienBib.AllowQuickAccessToMetadata := NempOptions.AllowQuickAccessToMetadata;
 
+            NempFormBuildOptions.LoadFromIni(Ini);
 
             UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
             SkinName            := ini.ReadString('Fenster','SkinName','<public> Dark');
@@ -214,6 +215,7 @@ begin
         end;
         }
 
+        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
         try
             InitEqualizerMenuFormIni(ini);
@@ -221,6 +223,7 @@ begin
         finally
             ini.Free
         end;
+        *)
 
         SetRecentPlaylistsMenuItems;
 
@@ -429,6 +432,7 @@ begin
     with Nemp_MainForm do
     begin
         // EQ-Buttons-Array befüllen
+        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         EqualizerButtons[0] := EqualizerButton1;
         EqualizerButtons[1] := EqualizerButton2;
         EqualizerButtons[2] := EqualizerButton3;
@@ -439,12 +443,13 @@ begin
         EqualizerButtons[7] := EqualizerButton8;
         EqualizerButtons[8] := EqualizerButton9;
         EqualizerButtons[9] := EqualizerButton10;
+        *)
 
         CorrectVolButton;
-        CorrectHallButton;
-        CorrectEchoButtons;
-        CorrectSpeedButton;
-        for i := 0 to 9 do CorrectEQButton(i);
+        //CorrectHallButton;
+        //CorrectEchoButtons;
+        //CorrectSpeedButton;
+        //for i := 0 to 9 do CorrectEQButton(i);
         // TabStops setzen
         SetTabStopsPlayer;
         SetTabStopsTabs;
@@ -470,15 +475,15 @@ begin
         AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
         // Menüeinträge checken//unchecken
-        PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-        PM_P_ViewSeparateWindows_Playlist.Checked  := NempOptions.NempEinzelFormOptions.PlaylistVisible;
-        PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-        PM_P_ViewSeparateWindows_Browse.Checked    := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+        PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+        PM_P_ViewSeparateWindows_Playlist.Checked  := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
+        PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+        PM_P_ViewSeparateWindows_Browse.Checked    := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
 
-        MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.NempEinzelFormOptions.ErweiterteControlsVisible;
-        MM_O_ViewSeparateWindows_Playlist.Checked  := NempOptions.NempEinzelFormOptions.PlaylistVisible;
-        MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-        MM_O_ViewSeparateWindows_Browse.Checked    := NempOptions.NempEinzelFormOptions.AuswahlSucheVisible;
+        MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+        MM_O_ViewSeparateWindows_Playlist.Checked  := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
+        MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+        MM_O_ViewSeparateWindows_Browse.Checked    := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
 
         if NempOptions.FullRowSelect then
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
@@ -522,6 +527,7 @@ begin
                 RandomBtn.Hint := (MainForm_RepeatBtnHint_NoRepeat);
         end;
         BassTimer.Interval := NempPlayer.VisualizationInterval;
+        HeadsetTimer.Interval := NempPlayer.VisualizationInterval;
         AutoSavePlaylistTimer.Enabled := True; // NempPlaylist.AutoSave;
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
@@ -536,11 +542,6 @@ begin
         Spectrum.Pen := clActiveCaption;
         Spectrum.Peak := clBackground;
         Spectrum.BackColor := clBtnFace;
-        Spectrum.TimebackColor := Spectrum.BackColor;
-        Spectrum.TitelbackColor := Spectrum.BackColor;
-        Spectrum.TextColor := clWindowText;
-        Spectrum.TextPosY := 0;
-        Spectrum.TextPosX := 0;
         Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
         Spectrum.DrawClear;
 
@@ -593,6 +594,7 @@ begin
 
         // Anzeige oben links initialisieren
         SwitchBrowsePanel(MedienBib.BrowseMode);
+
 
         NempOptions.StartMinimizedByParameter := False;
         if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') or (trim(paramstr(1)) = '/safemode') then
@@ -667,67 +669,58 @@ begin
 
         //s := gettickcount;
         UpdateSplashScreen(SplashScreen_GenerateWindows);
-        // Place some controls correctly
-        GRPBoxCover      .Parent := AudioPanel;
-        GRPBoxEffekte    .Parent := AudioPanel;
-        GRPBoxEqualizer  .Parent := AudioPanel;
-        GRPBoxLyrics     .Parent := AudioPanel;
-        GRPBOXHeadset    .Parent := AudioPanel;
-        GRPBoxCover      .Top := 0;
-        GRPBoxEffekte    .Top := 0;
-        GRPBoxEqualizer  .Top := 0;
-        GRPBoxLyrics     .Top := 0;
-        GRPBOXHeadset    .Top := 0;
-        GRPBoxCover      .Left := 0;
-        GRPBoxEffekte    .Left := 0;
-        GRPBoxEqualizer  .Left := 0;
-        GRPBoxLyrics     .Left := 0;
-        GRPBOXHeadset    .Left := 0;
-        //GRPBoxCover      .Align := alLeft;
-        //GRPBoxEffekte    .Align := alLeft;
-        //GRPBoxEqualizer  .Align := alLeft;
-        //GRPBoxLyrics     .Align := alLeft;
-        //GRPBOXHeadset    .Align := alLeft;
-        GRPBoxCover      .Width := 191;
-        GRPBoxEffekte    .Width := 191;
-        GRPBoxEqualizer  .Width := 191;
-        GRPBoxLyrics     .Width := 191;
-        GRPBOXHeadset    .Width := 191;
-        GRPBoxLyrics     .Visible := False;
-        GRPBoxEffekte    .Visible := False;
-        GRPBoxEqualizer  .Visible := False;
-        GRPBOXHeadset    .Visible := False;
-        TopMainPanel.Constraints.MinHeight := TOP_MIN_HEIGHT;
+
+        _TopMainPanel.Constraints.MinHeight := MAIN_PANEL_MIN_HEIGHT;
+        _TopMainPanel.Constraints.MinWidth := MAIN_PANEL_MIN_WIDTH;
+
         GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
-
 
         ArtistsVST.BorderWidth := 0;
         AlbenVST.BorderWidth := 0;
         PlaylistVST.BorderWidth := 0;
         VST.BorderWidth := 0;
 
-        UpdateFormDesignNeu;
-        //e := gettickcount;
-        //ShowMessage('Form Design: ' + IntToStr(e - s));
+        //------------
 
+            // ??
+
+            // ??NempFormBuildOptions.RefreshBothRowsOrColumns(False);
+            // ??NempFormBuildOptions.SwapMainLayout;
+            // ??NempFormBuildOptions.ApplyRatios;
+
+            UpdateFormDesignNeu(AnzeigeMode);
+            //??
+
+        //NempFormBuildOptions.EndUpdate;
+        //------------
+        NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
+
+        {newWidth := Round(NempFormBuildOptions.BrowseArtistRatio / 100 * (AuswahlPanel.Width));
+        if newWidth < 50 then
+            newWidth := 50;
+        ArtistsVST.Width := newWidth;}
+
+
+        //------------
 
         if NempSkin.isActive then
             MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)
         else
             MedienBib.NewCoverFlow.SetColor(clWhite);
 
-        ActualizeVDTCover;
+        // ActualizeVDTCover; will be done by FormBuilder now
 
         ReTranslateNemp(GetCurrentLanguage);
 
-
         if NempPlayer.MainStream = 0 then
-            ReInitPlayerVCL; // otherwise it has been done in player.play
+            ReInitPlayerVCL(False); // otherwise it has been done in player.play
         ReArrangeToolImages;
 
         if NempSkin.isActive then
+        begin
             NempSkin.SetVSTOffsets;
+        end;
 
         ReadyForgetFileApiCommands := True;
         AcceptApiCommands := True;
@@ -754,7 +747,6 @@ begin
 
     //e1 := gettickcount;
     //ShowMessage('Complete: ' + IntToStr(e1 - s1));
-
 
 end;
 

@@ -46,7 +46,7 @@ function Handle_UpdaterMessage(Var aMsg: TMessage): Boolean;
 function Handle_ScrobblerMessage(Var aMsg: TMessage): Boolean;
 function Handle_WndProc(var Message: TMessage): Boolean;
 
-function Handle_DropFilesForPlaylist(Var aMsg: TMessage): Boolean;
+function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean;
 function Handle_DropFilesForLibrary(Var aMsg: TMessage): Boolean;
 function Handle_DropFilesForHeadPhone(Var aMsg: TMessage): Boolean;
 
@@ -67,7 +67,7 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
-    PostProcessorUtils, ProgressUnit;
+    PostProcessorUtils, ProgressUnit, EffectsAndEqualizer;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -82,7 +82,8 @@ var aAudioFile: tAudioFile;
   eq_idx, eq_value: integer;
   aList: TObjectList;
   aStream: TMemoryStream;
-  Coverbmp: TBitmap;
+  //Coverbmp: TBitmap;
+  CoverPicture: TPicture;
   MyCopyDataStruct: TCopyDataStruct;
 begin
     result := True;
@@ -194,8 +195,9 @@ begin
                     eq_value := (aMsg.WParam) AND $FFFF;
                     if (eq_idx in [0..9]) and (eq_Value in [0..60]) then
                     begin
-                      NempPlayer.SetEqualizer(eq_idx, APIEQToPlayer(eq_value));
-                      CorrectEQButton(eq_idx);
+                        NempPlayer.SetEqualizer(eq_idx, APIEQToPlayer(eq_value));
+                        if assigned(FormEffectsAndEqualizer) then
+                            FormEffectsAndEqualizer.CorrectEQButton(eq_idx);
                     end;
                 end;
                 aMsg.Result := 0;
@@ -213,7 +215,8 @@ begin
         IPC_GETREVERB :   if AcceptApiCommands then aMsg.Result := Round(NempPlayer.ReverbMix);
         IPC_SETREVERB :   if AcceptApiCommands then begin
                               NempPlayer.ReverbMix :=  aMsg.WParam;
-                              CorrectHallButton;
+                              if assigned(FormEffectsAndEqualizer) then
+                                  FormEffectsAndEqualizer.CorrectHallButton;
                           end;
 
         // Echo-Daten liefern/setzen
@@ -221,19 +224,22 @@ begin
         IPC_GETECHOTIME : if AcceptApiCommands then aMsg.Result := Round(NempPlayer.EchoTime);
         IPC_SETECHOTIME : if AcceptApiCommands then begin
                               NempPlayer.EchoTime := aMsg.WParam;
-                              CorrectEchoButtons;
+                              if assigned(FormEffectsAndEqualizer) then
+                                  FormEffectsAndEqualizer.CorrectEchoButtons;
                           end;
         IPC_GETECHOMIX :  if AcceptApiCommands then aMsg.Result := Round(NempPlayer.EchoWetDryMix);
         IPC_SETECHOMIX :  if AcceptApiCommands then begin
                               NempPlayer.EchoWetDryMix := aMsg.WParam;
-                              CorrectEchoButtons;
+                              if assigned(FormEffectsAndEqualizer) then
+                                  FormEffectsAndEqualizer.CorrectEchoButtons;
                           end;
         // Geschwindigkeit setzen/zurückliefern
         IPC_GETSPEED :    if AcceptApiCommands then aMsg.Result := Round(NempPlayer.Speed * 100);
         IPC_SETSPEED :    if AcceptApiCommands then
                           begin
                                 NempPlayer.Speed := aMsg.WParam/100;
-                                CorrectSpeedButton;
+                                if assigned(FormEffectsAndEqualizer) then
+                                  FormEffectsAndEqualizer.CorrectSpeedButton;
                           end;
 
 
@@ -442,16 +448,17 @@ begin
         IPC_QUERYCOVER: begin  // Cover liefern
                           if assigned(NempPlayer.MainAudioFile) then
                           begin
-                               Coverbmp := tBitmap.Create;
+                               //Coverbmp := tBitmap.Create;
+                               CoverPicture := TPicture.Create;
                                try
                                    //Coverbmp.Width := 240;
                                    //Coverbmp.Height := 240;
-                                   if GetCover(NempPlayer.MainAudioFile, Coverbmp, true) then
+                                   if GetCover(NempPlayer.MainAudioFile, CoverPicture, true) then
                                    begin
                                       aMsg.Result := 1;
                                       aStream := TMemoryStream.Create;
                                       try
-                                          Coverbmp.SaveToStream(aStream);
+                                          CoverPicture.Bitmap.SaveToStream(aStream);
                                           with MyCopyDataStruct do
                                           begin
                                             dwData := IPC_SENDCOVER;
@@ -465,7 +472,8 @@ begin
                                    end else
                                       aMsg.result := -1;
                                finally
-                                   CoverBmp.Free;
+                                   //CoverBmp.Free;
+                                   CoverPicture.Free;
                                end
                           end else
                               aMsg.result := -1;
@@ -1641,13 +1649,13 @@ begin
                    if NempPlayer.Status <> PLAYER_ISPLAYING then
                    begin
                      spectrum.DrawClear;
-                     Spectrum.DrawText(NempPlayer.PlayingTitel,False);
+                     //Spectrum.DrawText(NempPlayer.PlayingTitel,False);
                      if NempPlayer.Status = PLAYER_ISSTOPPED_MANUALLY then
-                       Spectrum.DrawTime('  00:00');
+                        PlayerTimeLbl.Caption := '00:00';
                    end;
                  end;
 
-    WM_ResetPlayerVCL: ReInitPlayerVCL;
+    WM_ResetPlayerVCL: ReInitPlayerVCL(Boolean(Message.wParam));
 
     WM_ActualizePlayPauseBtn: begin
                             case Message.LParam of
@@ -1659,6 +1667,8 @@ begin
                                                 PM_TNA_PlayPause.Caption := PlayerBtn_Play;
                                                 PM_TNA_PlayPause.ImageIndex := 1;
                                           end;
+
+
                                           NEMP_API_PLAYING : begin
                                             PlayPauseBTN.GlyphLine := 1;
                                             fspTaskbarManager.ThumbButtons.Items[1].ImageIndex := 2;
@@ -1673,7 +1683,8 @@ begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 0;
                                                 //PlayPauseHeadSetBtn.Caption := 'Play';
                                                 HeadSetTimer.Enabled := False;
-                                                SlidebarButton_Headset.Left := SlideBarShapeHeadset.Left;
+                                                if NOT MainPlayerControlsActive then
+                                                    SetProgressButtonPosition(0);
                                           end;
                                           NEMP_API_PAUSED: begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 0;
@@ -1702,19 +1713,26 @@ begin
                                                          NempPlayer.Status = PLAYER_ISPLAYING;
                                     if assigned(NempPlayer.MainAudioFile) then
                                     begin
-                                        RecordBtn.Enabled := NempPlayer.MainAudioFile.isStream
+                                        RecordBtn.Enabled
+                                        //RecordBtn.Visible
+                                         := NempPlayer.MainAudioFile.isStream
                                                            and (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING)
                                                            and (NempPlayer.StreamType <> 'Ogg')
                                     end;
                                     if  Message.Msg = WM_PlayerStop then
                                     begin
                                       // Set the SlideBtn to its initial position
-                                      SlideBarButton.Left := SlideBarShape.Left;
+                                      if  MainPlayerControlsActive then
+                                      begin
+                                          SetProgressButtonPosition(0);
+                                          SlidebarShape.Progress := 0;
+                                      end;
                                     end;
 
                                   end;
     WM_PlayerHeadSetEnd : begin
-          SlidebarButton_Headset.Left := SlidebarShapeHeadset.Left;
+          if NOT MainPlayerControlsActive then
+              SetProgressButtonPosition(0);
           PlayPauseHeadsetBtn.GlyphLine := 0;
     end;
     WM_PlayerStopRecord : begin
@@ -1737,18 +1755,11 @@ begin
                 begin
                     // Swapping streams was succesful
                     // otherwise the prescanlist was not empty, and another precan is needed
-                    tmp := (not NempPlayer.URLStream);
-                    SlideBackBTN.Enabled := tmp;
-                    SlideForwardBtn.Enabled := tmp;
-                    SlideBarShape.Enabled := tmp;
-                    SlidebarButton.Enabled := tmp;
-                    // Geschwindigkeit disablen, das macht bei Streams keinen Sinn
-                    EffekteLBL3.Enabled := tmp;
-                    SampleRateLBL.Enabled := tmp;
-                    SamplerateShape.Enabled := tmp;
-                    SampleRateButton.Enabled := tmp;
-                    // Rückwärtsspielen disablen
-                    DirectionPositionBTN.Enabled := tmp;
+
+                    ReCheckAndSetProgressChangeGUIStatus;
+
+                    if assigned(FormEffectsAndEqualizer) then
+                        FormEffectsAndEqualizer.ResetEffectButtons;
 
                     if NempPlayer.DoSilenceDetection then
                         NempPlayer.StartSilenceDetection;
@@ -1774,7 +1785,7 @@ begin
 end;
 
 
-function Handle_DropFilesForPlaylist(Var aMsg: TMessage): Boolean;
+function Handle_DropFilesForPlaylist(Var aMsg: TMessage; UseDefaultInsertMode: Boolean): Boolean;
 Var
   Idx,
   Size,
@@ -1792,8 +1803,19 @@ Begin
 
     // KeepOnWithPlaylistProcess := True;
 
-    p := PlayListVST.ScreenToClient(Mouse.CursorPos);
-    NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
+    if UseDefaultInsertMode then
+    begin
+        if NempPlaylist.DefaultAction = 2 then
+            NempPlaylist.GetInsertNodeFromPlayPosition
+        else
+            NempPlaylist.InsertNode := NIL;
+    end else
+    begin
+        p := PlayListVST.ScreenToClient(Mouse.CursorPos);
+        NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
+    end;
+
+
     //if assigned(NempPlaylist.InsertNode) then
     //    NempPlaylist.InsertNode := PlayListVST.GetNextSibling(NempPlaylist.InsertNode);
 
@@ -1844,6 +1866,7 @@ Begin
             ProgressFormPlaylist.InitiateProcess(True, pa_SearchFilesForPlaylist);
 
             ST_Playlist.SearchFiles(NempPlaylist.ST_Ordnerlist[0]);
+            // note: autoplay will be done in message-handler for "new file", if the player is not already playing
         end;
     end
     else
@@ -1855,12 +1878,13 @@ Begin
         IMGMedienBibCover.EndDrag(true);
         DragFinish (aMsg.WParam);
         DragSource := DS_EXTERN;
-        // Hier ggf. Abspielen
-        if abspielen AND (NempPlaylist.Count > 0) then
-        begin
-            NempPlayer.LastUserWish := USER_WANT_PLAY;
-            NempPlaylist.Play(0, 0, True);
-        end;
+    end;
+
+    // play (change 2019: always, also when dropping from extern)
+    if abspielen AND (NempPlaylist.Count > 0) then
+    begin
+        NempPlayer.LastUserWish := USER_WANT_PLAY;
+        NempPlaylist.Play(0, 0, True);
     end;
   end;
 End;
@@ -1960,8 +1984,12 @@ Var
               HandleError(afa_DroppedFiles, AudioFile, aErr);
               // Play new song in headset
               NempPlayer.PlayInHeadset(AudioFile);
-              // Show Details
-              Nemp_MainForm.ShowHeadsetDetails(AudioFile);
+
+              // Show Headset Controls and File Details
+              Nemp_MainForm.TabBtn_Headset.GlyphLine := 1; // (TabBtn_Headset.GlyphLine + 1) mod 2;
+              Nemp_MainForm.TabBtn_MainPlayerControl.GlyphLine := 0;
+              Nemp_MainForm.MainPlayerControlsActive := False;
+              Nemp_MainForm.ShowMatchingControls;//(0);
           finally
               AudioFile.Free
           end;

@@ -951,8 +951,9 @@ begin
           except
               on E: Exception do
               begin
-                  GetDefaultCover(dcFile, aCoverBmp, 0);
-                  CoverIMAGE.Picture.Bitmap.Assign(aCoverbmp);
+                  GetDefaultCover(dcFile, aPic, 0);
+
+                  CoverIMAGE.Picture.Assign(aPic);//   Bitmap.Assign(aCoverbmp);
                   TranslateMessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
               end;
           end;

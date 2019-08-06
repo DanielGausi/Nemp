@@ -63,7 +63,7 @@ interface
     const NempOriginalSpectrumSpecs: TSpectrumSpecs =
     (
         Width       : 125;
-        Height      : 35;
+        Height      : 35;//88;
         TextWidth   : 216;
         TextHeight  : 18;
         TimeWidth   : 53;
@@ -71,33 +71,30 @@ interface
         StarHeight  : 14;
         StarWidth   : 70;
         ColumnWidth : 4;
-        PreviewColumn: 2;
-        GradientHeight : 35;
+        //PreviewColumn: 2;
+        GradientHeight : 88;
         TimeFontSize: 10;
         TextFontSize: 10;
         FFTDataMultiplikator: 500;
     );
 
-    const PREVIEW_COLUMN_WIDTH = 3;
-          PREVIEW_COLUMN_HEIGHT = 38;
+    //const PREVIEW_COLUMN_WIDTH = 3;
+    //      PREVIEW_COLUMN_HEIGHT = 38;
 
     type TSpectrum = Class(TObject)
     private
         VisBuff : TBitmap;
-        TxtBuff : TBitmap;
+        //TxtBuff : TBitmap;
         BackBmp : TBitmap;
-        BackTimeBmp : TBitmap;
-        BackTextBMP : TBitmap;
+        //BackTimeBmp : TBitmap;
+        //BackTextBMP : TBitmap;
         BackStarBMP : TBitmap;
-        BackPreViewBuf: TBitmap;
 
         GradientBMP: TBitmap;
-        GradientBMPPreView: TBitmap;
-
 
         BkgColor : TColor;
-        TitelBkgCOlor: TColor;
-        TimeBkgColor: TColor;
+        //TitelBkgCOlor: TColor;
+        //TimeBkgColor: TColor;
         SpecHeight : Integer;
         SpecHeightPreview: Integer;
         PenColor : TColor;
@@ -112,28 +109,32 @@ interface
         ColWidth : Integer;
         ShowPeak : Boolean;
 
-        FTextStyle: TFontStyles;
-        FTextColor: TColor;
+        //FTextStyle: TFontStyles;
+        //FTextColor: TColor;
 
-        FTimeStyle: TFontStyles;
-        FTimeColor: TColor;
+        //FTimeStyle: TFontStyles;
+        //FTimeColor: TColor;
 
         FPreviewArtistColor: TColor;
         FPreviewTitleColor: TColor;
         FPreviewTimeColor: TColor;
 
+        fPreviewShapePenColor          : TColor;
+        fPreviewShapeBrushColor        : TColor;
+        fPreviewShapeProgressPenColor  : TColor;
+        fPreviewShapeProgressBrushColor: TColor;
 
-        fTimeFontSize: Integer;
-        fTextFontSize: Integer;
+        //fTimeFontSize: Integer;
+        //fTextFontSize: Integer;
 
         fFFTDataMultiplikator: Integer;
         fFFTDataMultiplikatorPreView: Integer;
 
-        FTimeTextBackground: TBrushStyle;
-        FTitelTextBackground: TBrushStyle;
+        //FTimeTextBackground: TBrushStyle;
+        //FTitelTextBackground: TBrushStyle;
 
-        FTimeString: String;
-        FTextString: UnicodeString;
+        //FTimeString: String;
+        //FTextString: UnicodeString;
 
         FFTPeacks  : array [0..30] of Integer;
         FFTFallOff : array [0..30] of Integer;
@@ -141,8 +142,8 @@ interface
         FFTPeacksPreView  : array [0..30] of Integer;
         FFTFallOffPreView : array [0..30] of Integer;
 
-        fTextPosX: Integer;
-        fTextPosY: Integer;
+        //fTextPosX: Integer;
+        //fTextPosY: Integer;
 
         fScrollDelay: Integer;
         fDelayCounter: Integer;
@@ -150,28 +151,25 @@ interface
 
     public
         MainImage: TImage;
-        TextImage: TImage;
-        TimeImage: TImage;
+        //TextImage: TImage;
+        //TimeImage: TImage;
         StarImage: TImage;
-
-        PreViewBuf: TBitmap; // Buffer for Win7-Preview
-
 
         Constructor Create (Width, Height : Integer);
         Destructor Destroy; override;
 
 
         procedure Draw(FFTData : TFFTData);
-        procedure DrawText(aString: UnicodeString = ''; Scroll: Boolean = True);
+        //procedure DrawText(aString: UnicodeString = ''; Scroll: Boolean = True);
 
-        procedure DrawTime(aString: String);
+        //procedure DrawTime(aString: String);
 
         procedure DrawRating(aRating: Integer);
 
         procedure DrawClear;
         procedure SetBackGround (Active : Boolean);
-        procedure SetTimeBackGround (Active : Boolean);
-        procedure SetTextBackGround (Active : Boolean);
+        //procedure SetTimeBackGround (Active : Boolean);
+        //procedure SetTextBackGround (Active : Boolean);
 
         procedure SetStarBackGround (Active: Boolean);
         procedure SetGradientBitmap;
@@ -179,8 +177,8 @@ interface
         procedure SetScale(aStretchFactor: Single);
 
         property BackColor : TColor read BkgColor write BkgColor;
-        property TimebackColor : tColor read TimeBkgColor write TimeBkgColor;
-        property TitelbackColor : tColor read TitelBkgColor write TitelBkgColor;
+        //property TimebackColor : tColor read TimeBkgColor write TimeBkgColor;
+        //property TitelbackColor : tColor read TitelBkgColor write TitelBkgColor;
 
         property Height : Integer read SpecHeight write SpecHeight;
         property Width  : Integer read ColWidth write ColWidth;
@@ -194,27 +192,34 @@ interface
         property PeakFallOff: Integer read PeakFall write PeakFall;
         property LineFallOff: Integer read LineFall write LineFall;
         property DrawPeak   : Boolean read ShowPeak write ShowPeak;
-        property TextStyle  : TFontStyles read FTextStyle write FTextStyle;
-        property TextColor  : TColor read FTextColor write FTextColor;
-        property TimeTextBackground : TBrushStyle read FTimeTextBackground write FTimeTextBackground;
-        property TitelTextBackground: TBrushStyle read FTitelTextBackground write FTitelTextBackground;
+        //property TextStyle  : TFontStyles read FTextStyle write FTextStyle;
+        //property TextColor  : TColor read FTextColor write FTextColor;
+        //property TimeTextBackground : TBrushStyle read FTimeTextBackground write FTimeTextBackground;
+        //property TitelTextBackground: TBrushStyle read FTitelTextBackground write FTitelTextBackground;
 
-        property TimeStyle  : TFontStyles read FTimeStyle write FTimeStyle;
-        property TimeColor  : TColor read FTimeColor write FTimeColor;
+        //property TimeStyle  : TFontStyles read FTimeStyle write FTimeStyle;
+        //property TimeColor  : TColor read FTimeColor write FTimeColor;
         property UseBackGround: Boolean read Usebkg write UseBkg;
 
         property PreviewArtistColor: TColor read FPreviewArtistColor write FPreviewArtistColor;
         property PreviewTitleColor: TColor read FPreviewTitleColor write FPreviewTitleColor;
         property PreviewTimeColor: tColor read FPreviewTimeColor write FPreviewTimeColor;
 
+        property PreviewShapePenColor          : TColor read fPreviewShapePenColor           write fPreviewShapePenColor           ;
+        property PreviewShapeBrushColor        : TColor read fPreviewShapeBrushColor         write fPreviewShapeBrushColor         ;
+        property PreviewShapeProgressPenColor  : TColor read fPreviewShapeProgressPenColor   write fPreviewShapeProgressPenColor   ;
+        property PreviewShapeProgressBrushColor: TColor read fPreviewShapeProgressBrushColor write fPreviewShapeProgressBrushColor ;
+
+
+
 
         // Dieser wird bei DrawTime gesetzt, so dass man nach einem Pause-Klick beim verschieben der Form
         // Die Zeit neu malen kann
-        property TimeString: String Read fTimeString;
-        property TextString: UnicodeString read FTextString;
+        //property TimeString: String Read fTimeString;
+        //property TextString: UnicodeString read FTextString;
 
-        property TextPosX: Integer read fTextPosX write fTextPosX;
-        property TextPosY: Integer read fTextPosY write fTextPosY;
+        //property TextPosX: Integer read fTextPosX write fTextPosX;
+        //property TextPosY: Integer read fTextPosY write fTextPosY;
 
         property ScrollDelay: Integer read fScrollDelay write fScrollDelay;
         //Property OffSetY    : Integer read SpecOffSetY write SpecOffSetY;
@@ -273,7 +278,7 @@ begin
         c.r := Round(c1.r + (c2.r - c1.r) * x / (ARect.Right - ARect.Left)); 
         c.g := Round(c1.g + (c2.g - c1.g) * x / (ARect.Right - ARect.Left)); 
         c.b := Round(c1.b + (c2.b - c1.b) * x / (ARect.Right - ARect.Left));
-        Canvas.Brush.Color := c.Color; 
+        Canvas.Brush.Color := c.Color;
         Canvas.FillRect(Rect(ARect.Left + x, ARect.Top, 
                              ARect.Left + x + 1, ARect.Bottom)); 
       end; 
@@ -291,21 +296,15 @@ Constructor TSpectrum.Create(Width, Height : Integer);
 begin
     VisBuff := TBitmap.Create;
     BackBmp := TBitmap.Create;
-    PreViewBuf  := TBitmap.Create;
-    BackPreViewBuf := TBitmap.Create;
-    BackTimeBmp := TBitmap.Create;
-    BackTextBMP := TBitmap.Create;
+
+    //BackTimeBmp := TBitmap.Create;
+    //BackTextBMP := TBitmap.Create;
     BackStarBMP := TBitmap.Create;
 
-    PreViewBuf.Height := 38; // something like that should be ok
-    PreViewBuf.Width  := 92; //  --""--
-    BackPreViewBuf.Height := 38;
-    BackPreViewBuf.Width := 92;
     SpecHeightPreview := 38;
 
-    TxtBuff := tBitmap.Create;
+    //TxtBuff := tBitmap.Create;
     GradientBMP := TBitmap.Create;
-    GradientBMPPreView := TBitmap.Create;
 //    GradientBmp.Height := 65;
 //    GradientBMP.Width := 4;
 
@@ -346,20 +345,17 @@ end;
 Destructor TSpectrum.Destroy;
 begin
     VisBuff.Free;
-    PreViewBuf.Free;
-    BackPreViewBuf.Free;
     BackBmp.Free;
-    BackTimeBmp.Free;
-    BackTextBMP.Free;
+    //BackTimeBmp.Free;
+    //BackTextBMP.Free;
     BackStarBMP.Free;
-    TxtBuff.Free;
+    //TxtBuff.Free;
     GradientBMP.Free;
-    GradientBMPPreView.Free;
     inherited destroy;
 end;
 
 procedure TSpectrum.SetBackGround (Active : Boolean);
-var grpPoint, OffsetPoint: TPoint;
+var // grpPoint, OffsetPoint: TPoint;
  sourceBmp: TBitmap;
  localOffsetX, localOffsetY: Integer;
  stretch: Boolean;
@@ -369,12 +365,13 @@ UseBkg := Active;
 if active then
   with Nemp_MainForm do
   begin
-      grpPoint := PaintFrame.ClientToScreen(Point(0,0));
+      //grpPoint := PaintFrame.ClientToScreen(Point(0,0));
       if NempSkin.UseSeparatePlayerBitmap then
       begin
-          localOffsetX := 0;
-          localOffsetY := 0;
-          OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
+          localOffsetX := PaintFrame.Left;
+          localOffsetY := PaintFrame.Top;
+          //OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
+
           sourceBmp := NempSkin.PlayerBitmap;
           //stretch := NempSkin.NempPartyMode.Active;
           stretch := False;
@@ -382,24 +379,21 @@ if active then
       begin
           localOffsetX := NempSkin.PlayerPageOffsetX;
           localOffsetY := NempSkin.PlayerPageOffsetY;
-          OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
+          // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
           sourceBmp := NempSkin.CompleteBitmap;
           stretch := False;
       end;
 
-      NempSkin.TileGraphic(sourceBmp, BackBmp.Canvas,
-          localOffsetX + (grpPoint.X - OffsetPoint.X) ,
-          localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
-
-      // Same vor the Win7Preview
-      localOffsetX := 102;  // Must be the same as in NempPlayer.DrawPreview
-      localOffsetY := 57;
-      NempSkin.TileGraphic(NempPlayer.PreviewBackGround, BackPreViewBuf.Canvas,
-              localOffsetX, localOffsetY, false);
+      NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackBmp.Canvas,
+          localOffsetX , //+ (grpPoint.X - OffsetPoint.X) ,
+          localOffsetY //+ (grpPoint.Y - OffsetPoint.Y)
+          , stretch);
   end;
 
 end;
 
+(*
 procedure TSpectrum.SetTextBackGround (Active : Boolean);
 var grpPoint, OffsetPoint: TPoint;
   sourceBmp: TBitmap;
@@ -423,15 +417,17 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
-        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
+        // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
-    NempSkin.TileGraphic(sourceBmp, BackTextBMP.Canvas,
-        localOffsetX + (grpPoint.X - OffsetPoint.X) ,
-        localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
+    //NempSkin.TileGraphic(sourceBmp, BackTextBMP.Canvas,
+    //    localOffsetX + (grpPoint.X - OffsetPoint.X) ,
+    //    localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
   end;
 end;
+
 
 procedure TSpectrum.SetTimeBackGround (Active : Boolean);
 var grpPoint, OffsetPoint: TPoint;
@@ -456,7 +452,8 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
-        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
+        // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
@@ -465,6 +462,7 @@ if active then
         localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
   end;
 end;
+*)
 
 procedure TSpectrum.SetStarBackGround(Active: Boolean);
 var grpPoint, OffsetPoint: TPoint;
@@ -489,11 +487,12 @@ if active then
     begin
         localOffsetX := NempSkin.PlayerPageOffsetX;
         localOffsetY := NempSkin.PlayerPageOffsetY;
-        OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
+        // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
     end;
-    NempSkin.TileGraphic(sourceBmp, BackStarBMP.Canvas,
+    NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackStarBMP.Canvas,
         localOffsetX + (grpPoint.X - OffsetPoint.X) ,
         localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
   end;
@@ -511,14 +510,6 @@ begin
               GradientBMP.Height
              ) ;
 
-  GradientBMPPreView.Height := PREVIEW_COLUMN_HEIGHT;
-  GradientBMPPreView.Width := PREVIEW_COLUMN_WIDTH;
-  DrawGradient(GradientBMPPreView.Canvas,
-                  PenColor, PenColor2,
-                  Rect( 0, 0, GradientBMPPreView.Width, GradientBMPPreView.Height),
-              goVertical,
-              GradientBMPPreView.Height
-             ) ;
 end;
 
 procedure TSpectrum.SetScale(aStretchFactor: Single);
@@ -531,6 +522,7 @@ begin
 
     SetBackGround(UseBkg);
 
+    {
     BackTextBMP.Width := Round(NempOriginalSpectrumSpecs.TextWidth * aStretchFactor);
     BackTextBMP.Height := Round(NempOriginalSpectrumSpecs.TextHeight * aStretchFactor);
     TxtBuff.Width  := BackTextBMP.Width ;
@@ -540,6 +532,7 @@ begin
     BackTimeBmp.Width := Round(NempOriginalSpectrumSpecs.TimeWidth * aStretchFactor);
     BackTimeBmp.Height := Round(NempOriginalSpectrumSpecs.TimeHeight * aStretchFactor);
     SetTimeBackGround(UseBkg);
+    }
 
     BackStarBMP.Width := Round(NempOriginalSpectrumSpecs.StarWidth * aStretchFactor);
     BackStarBMP.Height := Round(NempOriginalSpectrumSpecs.StarHeight * aStretchFactor);
@@ -550,8 +543,8 @@ begin
     GradientBMP.Height := Round(NempOriginalSpectrumSpecs.GradientHeight * aStretchFactor);
     SetGradientBitmap;
 
-    fTimeFontSize := Round(NempOriginalSpectrumSpecs.TimeFontSize * aStretchFactor);
-    fTextFontSize := Round(NempOriginalSpectrumSpecs.TextFontSize * aStretchFactor);
+    //fTimeFontSize := Round(NempOriginalSpectrumSpecs.TimeFontSize * aStretchFactor);
+    //fTextFontSize := Round(NempOriginalSpectrumSpecs.TextFontSize * aStretchFactor);
 
     fFFTDataMultiplikator := Round(NempOriginalSpectrumSpecs.FFTDataMultiplikator * aStretchFactor);
     fFFTDataMultiplikatorPreView := NempOriginalSpectrumSpecs.FFTDataMultiplikator;
@@ -562,7 +555,93 @@ end;
 
 procedure TSpectrum.Draw(FFTData : TFFTData);
 var i, YPos, YPosPreview : LongInt; YVal : Single;
+    aPB: TPaintbox;
 begin
+  {
+    aPB := Nemp_MainForm.Paintbox1;
+     aPB.Invalidate;
+
+
+    aPB.Canvas.Pen.Color := PenColor;
+    //for i := 0 to 30 do
+    for i := 0 to 30 do
+    begin
+      YVal := Abs(FFTData[(i * DrawRes) + 5]);
+      YPos := Trunc((YVal) * fFFTDataMultiplikator);
+      if YPos > Height then YPos := SpecHeight;
+
+      if YPos >= FFTPeacks[i] then FFTPeacks[i] := YPos
+        else FFTPeacks[i] := FFTPeacks[i] - PeakFall;
+
+      if YPos >= FFTFallOff[i] then
+        FFTFallOff[i] := YPos - 1
+      else
+        FFTFallOff[i] := FFTFallOff[i] - LineFall;
+
+
+      YPosPreview := Trunc((YVal) * fFFTDataMultiplikatorPreView);
+      if YPosPreview > SpecHeightPreview then YPosPreview := SpecHeightPreview;
+
+      if YPosPreview >= FFTPeacksPreview[i] then FFTPeacksPreview[i] := YPosPreview
+        else FFTPeacksPreview[i] := FFTPeacksPreview[i] - PeakFall;
+
+      if YPosPreview >= FFTFallOffPreview[i] then
+        FFTFallOffPreview[i] := YPosPreview - 1
+      else
+        FFTFallOffPreview[i] := FFTFallOffPreview[i] - LineFall;
+
+
+      // ----------------------------------------
+      if FFTPeacks[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
+        FFTPeacks[i] := 1;
+
+      if FFTPeacks[i] > VisBuff.Height then // damit die Peaks nicht nach oben hin verschwinden
+        FFTPeacks[i] := VisBuff.Height;
+      //----------------------
+      // ----------------------------------------
+      if FFTPeacksPreview[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
+        FFTPeacksPreview[i] := 1;
+
+      if FFTPeacksPreview[i] > SpecHeightPreview then // damit die Peaks nicht nach oben hin verschwinden
+        FFTPeacksPreview[i] := SpecHeightPreview;
+      //----------------------
+
+     // if (VisBuff.Height - FFTPeacks[i]) > VisBuff.Height then FFTPeacks[i] := 0;
+     // if (VisBuff.Height - FFTFallOff[i]) > VisBuff.Height then FFTFallOff[i] := 0;
+
+     // if (SpecHeightPreview - FFTPeacksPreview[i]) > SpecHeightPreview then FFTPeacksPreview[i] := 0;
+     // if (SpecHeightPreview - FFTFallOffPreview[i]) > SpecHeightPreview then FFTFallOffPreview[i] := 0;
+
+      case DrawType of
+          0 : begin
+                 aPB.Canvas.MoveTo(i, aPB.Height);
+                 aPB.Canvas.LineTo(i, aPB.Height - FFTFallOff[i]);
+                 if ShowPeak then aPB.Canvas.Pixels[i, aPB.Height - FFTPeacks[i]] := Pen;
+          end;
+
+          1 : begin
+               aPB.Canvas.Pen.Color := PenColor;
+               aPB.Canvas.Brush.Color := PenColor;
+               aPB.Canvas.CopyRect(Rect((i * (ColWidth + 1))+1,            aPB.Height - FFTFallOff[i],
+                                           (i * (ColWidth + 1))+1 + ColWidth, aPB.Height),
+                                       GradientBMP.Canvas,
+                                       Rect(0, aPB.Height - FFTFallOff[i], ColWidth, aPB.Height)
+               );
+
+               if ShowPeak then
+               begin
+                  aPB.Canvas.Pen.Color := PeakColor;
+                  aPB.Canvas.MoveTo((i * (ColWidth + 1))+1, aPB.Height - FFTPeacks[i]);
+                  aPB.Canvas.LineTo((i * (ColWidth + 1))+1 + ColWidth, aPB.Height - FFTPeacks[i]);
+               end;
+
+          end;
+      end;
+    end;
+
+      }
+
+
 
     if FrmClear then
     begin
@@ -571,28 +650,19 @@ begin
       VisBuff.Canvas.Brush.Color := BkgColor;
       VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
 
-      PreViewBuf.Canvas.Pen.Color := BkgColor;
-      PreViewBuf.Canvas.Brush.Style := bsSolid;
-      PreViewBuf.Canvas.Brush.Color := BkgColor;
-      PreViewBuf.Canvas.Rectangle(0, 0, PreViewBuf.Width, PreViewBuf.Height);
-
       if UseBkg then
       begin
           VisBuff.Canvas.CopyRect(
               Rect(0, 0, BackBmp.Width, BackBmp.Height),
               BackBmp.Canvas,
               Rect(0, 0, BackBmp.Width, BackBmp.Height));
-
-          PreViewBuf.Canvas.CopyRect(
-              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height),
-              BackPreViewBuf.Canvas,
-              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height));
       end;
     end;
 
 
 
     VisBuff.Canvas.Pen.Color := PenColor;
+    //for i := 0 to 30 do
     for i := 0 to 30 do
     begin
       YVal := Abs(FFTData[(i * DrawRes) + 5]);
@@ -651,8 +721,8 @@ begin
           1 : begin
                VisBuff.Canvas.Pen.Color := PenColor;
                VisBuff.Canvas.Brush.Color := PenColor;
-               VisBuff.Canvas.CopyRect(Rect(i * (ColWidth + 1),            VisBuff.Height - FFTFallOff[i],
-                                            i * (ColWidth + 1) + ColWidth, VisBuff.Height),
+               VisBuff.Canvas.CopyRect(Rect((i * (ColWidth + 1))+1,            VisBuff.Height - FFTFallOff[i],
+                                           (i * (ColWidth + 1))+1 + ColWidth, VisBuff.Height),
                                        GradientBMP.Canvas,
                                        Rect(0, VisBuff.Height - FFTFallOff[i], ColWidth, VisBuff.Height)
                );
@@ -660,42 +730,25 @@ begin
                if ShowPeak then
                begin
                   VisBuff.Canvas.Pen.Color := PeakColor;
-                  VisBuff.Canvas.MoveTo(i * (ColWidth + 1), VisBuff.Height - FFTPeacks[i]);
-                  VisBuff.Canvas.LineTo(i * (ColWidth + 1) + ColWidth, VisBuff.Height - FFTPeacks[i]);
+                  VisBuff.Canvas.MoveTo((i * (ColWidth + 1))+1, VisBuff.Height - FFTPeacks[i]);
+                  VisBuff.Canvas.LineTo((i * (ColWidth + 1))+1 + ColWidth, VisBuff.Height - FFTPeacks[i]);
                end;
-
-
-               PreViewBuf.Canvas.Pen.Color := PenColor;
-               PreViewBuf.Canvas.Brush.Color := PenColor;
-               PreViewBuf.Canvas.CopyRect(Rect(i * (PREVIEW_COLUMN_WIDTH + 1),                     PreViewBuf.Height - FFTFallOffPreview[i],
-                                            i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height),
-                                       GradientBMPPreview.Canvas,
-                                       Rect(0, PreViewBuf.Height - FFTFallOffPreview[i], PREVIEW_COLUMN_WIDTH, PreViewBuf.Height)
-               );
-
-               if ShowPeak then
-               begin
-                  PreViewBuf.Canvas.Pen.Color := PeakColor;
-                  PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - FFTPeacksPreview[i]);
-                  PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - FFTPeacksPreview[i]);
-               end;
-
-
-
           end;
       end;
     end;
 
-    MainImage.Picture.
-    Assign(VisBuff);
+    MainImage.Picture.Assign(VisBuff);
 
    // BitBlt(MainImage.Canvas.Handle, 0,   0, VisBuff.Width, VisBuff.Height, VisBuff.Canvas.Handle, 0,  0, srccopy);
-    MainImage.Refresh;
+    // MainImage.Refresh;      ??? commented out 2019
 end;
 
+(*
 procedure TSpectrum.DrawText(aString: UnicodeString = ''; Scroll: Boolean = True);
 var textwidth: integer;
 begin
+
+
     if Not Scroll then fTextPosX := 4;
 
     // use fixed scale here
@@ -756,6 +809,13 @@ end;
 
 procedure TSpectrum.DrawTime(aString: String);
 begin
+
+
+
+  // Nemp_MainForm.PlayerTimeLbl.Caption := aString;
+
+  exit;
+
   TxtBuff.Canvas.Pen.Color := TimeBkgColor;
   TxtBuff.Canvas.Brush.Style := bsSolid;
   TxtBuff.Canvas.Brush.Color := TimeBkgColor;
@@ -783,11 +843,12 @@ begin
   TimeImage.Refresh;
   fTimeString := aString;
 end;
-
+*)
 
 procedure TSpectrum.DrawClear;
 var i: integer;
 begin
+
     VisBuff.Canvas.Pen.Color := BkgColor;
     VisBuff.Canvas.Brush.Color := BkgColor;
     VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
@@ -796,15 +857,6 @@ begin
               BackBmp.Canvas,
               Rect(0, 0, BackBmp.Width, BackBmp.Height));
 
-
-    PreViewBuf.Canvas.Pen.Color := BkgColor;
-    PreViewBuf.Canvas.Brush.Color := BkgColor;
-    PreViewBuf.Canvas.Rectangle(0, 0, PreViewBuf.Width, PreViewBuf.Height);
-    if UseBkg then
-        PreViewBuf.Canvas.CopyRect(
-              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height),
-              BackPreViewBuf.Canvas,
-              Rect(0, 0, BackPreViewBuf.Width, BackPreViewBuf.Height));
 
     for i := 0 to 30 do
     begin
@@ -815,15 +867,11 @@ begin
             VisBuff.Canvas.Pen.Color := PeakColor;
             VisBuff.Canvas.MoveTo(0 + i * (ColWidth + 1), 0 + VisBuff.Height - 1);
             VisBuff.Canvas.LineTo(0 + i * (ColWidth + 1) + ColWidth, 0 + VisBuff.Height - 1);
-
-
-             PreViewBuf.Canvas.Pen.Color := PeakColor;
-             PreViewBuf.Canvas.MoveTo(i * (PREVIEW_COLUMN_WIDTH + 1), PreViewBuf.Height - 1);
-             PreViewBuf.Canvas.LineTo(i * (PREVIEW_COLUMN_WIDTH + 1) + PREVIEW_COLUMN_WIDTH, PreViewBuf.Height - 1);
         end;
     end;
 
-    BitBlt(MainImage.Canvas.Handle, 0, 0, VisBuff.Width, VisBuff.Height, VisBuff.Canvas.Handle, 0, 0, srccopy);
+    //BitBlt(MainImage.Canvas.Handle, 0, 0, VisBuff.Width, VisBuff.Height, VisBuff.Canvas.Handle, 0, 0, srccopy);
+    MainImage.Picture.Assign(VisBuff);
     MainImage.Refresh;
 end;
 
@@ -838,7 +886,7 @@ begin
         //aBmp.Height := RatingImage.Height;
 
 
-
+        {
         TxtBuff.Canvas.Font.Size := fTextFontSize;
     TxtBuff.Canvas.Pen.Color := TitelBkgColor;
     TxtBuff.Canvas.Brush.Style := bsSolid;
@@ -849,7 +897,7 @@ begin
         Rect(0, 0, BackTextBmp.Width, BackTextBmp.Height))
     else
         TxtBuff.Canvas.Rectangle(0, 0, TxtBuff.Width, TxtBuff.Height);
-
+          }
 
         if UseBkg then
             aBmp.Assign(BackStarBMP)

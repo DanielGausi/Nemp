@@ -111,19 +111,22 @@ procedure TMedienlisteForm.InitForm;
 begin
   TranslateComponent (self);
   DragAcceptFiles (Handle, True);
-  Top    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteTop;
-  Left   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteLeft;
-  Height := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteHeight;
-  Width  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteWidth;
+  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteTop;
+  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteLeft;
+  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteHeight;
+  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteWidth;
 
-  BTop    := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteTop;
-  BLeft   := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteLeft;
-  BHeight := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteHeight;
-  BWidth  := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteWidth;
+  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteTop;
+  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteLeft;
+  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteHeight;
+  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteWidth;
 
-  NempRegionsDistance.docked := Nemp_MainForm.NempOptions.NempEinzelFormOptions.MedienlisteDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteDocked;
+  //NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
+  //NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
+  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+
   Caption := NEMP_CAPTION;
 end;
 
@@ -137,10 +140,12 @@ begin
   Height := BHeight ;
   Width  := BWidth  ;
 
-  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.VSTPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-  CloseImageM.Left := Nemp_MainForm.VSTPanel.Width - CloseImageM.Width;// - 10;
+  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width -  Nemp_MainForm.MedienlisteFillPanel.Left - 16;
+
+
+  CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;// - 10;
   CloseImageM.Top := 3;
-  CloseImageM.Parent := Nemp_MainForm.VSTPanel;
+  CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
   CloseImageM.BringToFront;
 
   SetRegion(ContainerPanelMedienBibForm, self, NempRegionsDistance, handle);
@@ -183,16 +188,16 @@ end;
 
 procedure TMedienlisteForm.ContainerPanelMedienBibFormPaint(Sender: TObject);
 begin
-    Nemp_MainForm.NempSkin.DrawAPanel((Sender as TNempPanel),
+    Nemp_MainForm.NempSkin.DrawARegularPanel((Sender as TNempPanel),
     Nemp_MainForm.NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
 end;
 
 procedure TMedienlisteForm.FormActivate(Sender: TObject);
 begin
-  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.VSTPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-  CloseImageM.Left := Nemp_MainForm.VSTPanel.Width - CloseImageM.Width;
+  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
+  CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;
   CloseImageM.Top := 3;
-  CloseImageM.Parent := Nemp_MainForm.VSTPanel;
+  CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
   CloseImageM.BringToFront;
 end;
 
@@ -225,9 +230,9 @@ procedure TMedienlisteForm.CloseImageMClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin
-    NempOptions.NempEinzelFormOptions.MedienlisteVisible := False;
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.NempEinzelFormOptions.MedienlisteVisible;
+    NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible := False;
+    PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+    MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
   end;
   close;
 end;
@@ -293,8 +298,8 @@ end;
 procedure TMedienlisteForm.RepaintForm;
 begin
     Repaint;
-    Nemp_MainForm.VSTPanel.Repaint;
-    Nemp_MainForm.VDTCover.Repaint;
+    Nemp_MainForm.MedialistPanel.Repaint;
+    Nemp_MainForm.DetailID3TagPanel.Repaint;
 
     //Nemp_MainForm.TabPanelMedienliste.Repaint;
     Nemp_MainForm.MedienBibHeaderPanel.Repaint;

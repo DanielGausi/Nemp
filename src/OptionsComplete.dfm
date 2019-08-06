@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer8
+      ActivePage = TabView0
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -74,6 +74,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem0: TTabSheet
         Caption = 'Sys (Main)'
         ImageIndex = 6
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -276,6 +280,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem1: TTabSheet
         Caption = 'Sys (Control)'
         ImageIndex = 5
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1143,6 +1151,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem2: TTabSheet
         Caption = 'Sys (Files)'
         ImageIndex = 6
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1292,6 +1304,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem3: TTabSheet
         Caption = 'Sys (System)'
         ImageIndex = 20
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1838,6 +1854,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView0: TTabSheet
         Caption = 'View (Main)'
         ImageIndex = 1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1850,14 +1870,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Show the following columns in the medialist'
           TabOrder = 0
-          object cb_ShowCoverAndDetails: TCheckBox
-            Left = 16
-            Top = 128
-            Width = 225
-            Height = 17
-            Caption = 'Cover and additional details'
-            TabOrder = 0
-          end
         end
         object GrpBox_ViewMain_BrowseClassic: TGroupBox
           Left = 8
@@ -2030,6 +2042,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView1: TTabSheet
         Caption = 'View (Party)'
         ImageIndex = 19
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2128,10 +2144,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView2: TTabSheet
         Caption = 'XXX (Vis)'
         ImageIndex = 20
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2363,6 +2387,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView4: TTabSheet
         Caption = 'View (Ext)'
         ImageIndex = 21
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3682,6 +3710,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer1: TTabSheet
         Caption = 'Player (Ext)'
         ImageIndex = 22
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3843,6 +3875,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer2: TTabSheet
         Caption = 'Player (Playlist)'
         ImageIndex = 19
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4047,6 +4083,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer4: TTabSheet
         Caption = 'Player (Streams)'
         ImageIndex = 23
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4540,6 +4580,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer7: TTabSheet
         Caption = 'Player (Scrobble)'
         ImageIndex = 17
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4891,6 +4935,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer8: TTabSheet
         Caption = 'Player (Webserver)'
         ImageIndex = 18
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         DesignSize = (
           454
           532)

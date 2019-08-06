@@ -152,6 +152,7 @@ type
             // Get next job, i.e. information about the next queried cover
             procedure SyncGetFirstJob; // VCL
             // Update the Cover in Coverflow (or: in Player?)
+            procedure GetDefaultPic(aDCType: TDefaultCoverType; aBitmap: TBitmap);
             procedure SyncUpdateCover; // VCL
             procedure SyncUpdateCoverCacheBlocked; // VCL
             procedure SyncUpdateInvalidCover; // VCL
@@ -1121,7 +1122,8 @@ begin
     if (fCurrentDownloadItem.SubQueryType = sqtFile) then
         result := assigned(NempPlayer.MainAudioFile)
             and
-            (NempPlayer.MainAudioFile.Ordner = fCurrentDownloadItem.Directory)
+            (IncludeTrailingPathDelimiter(NempPlayer.MainAudioFile.Ordner)
+             = IncludeTrailingPathDelimiter(fCurrentDownloadItem.Directory))
     else
         result := assigned(NempPlayer.MainAudioFile)
             and (CddbIDFromCDDA(NempPlayer.MainAudioFile.Pfad) = fCurrentDownloadItem.FileType)
@@ -1158,8 +1160,8 @@ procedure TCoverDownloadWorkerThread.SetProperBitmapSize(aBmp: TBitmap; aQueryTy
 begin
     if aQueryType = qtPlayer then
     begin
-        aBmp.Height := 180;
-        aBmp.Width := 180;
+        aBmp.Height := NEMP_PLAYER_COVERSIZE;
+        aBmp.Width := NEMP_PLAYER_COVERSIZE;
     end else
     begin
         aBmp.Height := 240;
@@ -1174,11 +1176,24 @@ end;
       and call SetPreview (paint it on the CoverFlow)
     --------------------------------------------------------
 }
+
+procedure TCoverDownloadWorkerThread.GetDefaultPic(aDCType: TDefaultCoverType; aBitmap: TBitmap);
+var pic: TPicture;
+begin
+    pic := TPicture.Create;
+    try
+        GetDefaultCover(aDCType, pic, 0);
+        FitBitmapIn(aBitmap, pic.Graphic)
+    finally
+        pic.Free;
+    end;
+end;
+
 procedure TCoverDownloadWorkerThread.SyncUpdateCover;
 var bmp: TBitmap;
     HintString: String;
-begin
 
+begin
     bmp := TBitmap.Create;
     try
         HintString := '';
@@ -1187,7 +1202,8 @@ begin
 
         if fInternetConnectionLost then
         begin
-            GetDefaultCover(dcFile, bmp, 0);
+            //GetDefaultCover(dcFile, pic, 0);
+            GetDefaultPic(dcFile, bmp);
             AddLogoToBitmap('lastfmConnectError', bmp);
             fCurrentDownloadComplete := False;
             HintString := CoverFlowLastFM_HintConnectError;
@@ -1197,7 +1213,8 @@ begin
 
             if Not fCurrentDownloadComplete then
             begin
-                GetDefaultCover(dcFile, bmp, 0);
+                //GetDefaultCover(dcFile, pic, 0);
+                GetDefaultPic(dcFile, bmp);
                 AddLogoToBitmap('lastfmFail', bmp);
                 HintString := CoverFlowLastFM_HintFail;
             end else
@@ -1211,8 +1228,8 @@ begin
         begin
             if DownloadItemStillMatchesPlayer then
             begin
-                NempPlayer.CoverBitmap.Assign(bmp);
-                Nemp_MainForm.CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);
+                NempPlayer.MainPlayerPicture.Assign(bmp);
+                Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
                 Nemp_MainForm.CoverImage.Hint := HintString;
             end;
         end
@@ -1251,13 +1268,15 @@ end;
 
 procedure TCoverDownloadWorkerThread.SyncUpdateCoverCacheBlocked;
 var bmp: TBitmap;
+    //pic: TPicture;
 begin
     bmp := TBitmap.Create;
     try
         bmp.PixelFormat := pf24bit;
         SetProperBitmapSize(bmp, fCurrentDownloadItem.QueryType);
 
-        GetDefaultCover(dcFile, bmp, 0);
+        GetDefaultPic(dcFile, bmp);
+
         AddLogoToBitmap('lastfmCache', bmp);
 
         //bmp.Canvas.Brush.Style := bsClear;
@@ -1268,8 +1287,8 @@ begin
         begin
             if DownloadItemStillMatchesPlayer then
             begin
-                NempPlayer.CoverBitmap.Assign(bmp);
-                Nemp_MainForm.CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);
+                NempPlayer.MainPlayerPicture.Assign(bmp);
+                Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
                 Nemp_MainForm.CoverImage.Hint := CoverFlowLastFM_HintCache;
             end;
         end
@@ -1299,11 +1318,12 @@ begin
             and DownloadItemStillMatchesPlayer
         then
         begin
-            GetDefaultCover(dcFile, bmp, 0);
+            //GetDefaultCover(dcFile, pic, 0);
+            GetDefaultPic(dcFile, bmp);
             AddLogoToBitmap('lastfmInvalid', bmp);
 
-            NempPlayer.CoverBitmap.Assign(bmp);
-            Nemp_MainForm.CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);
+            NempPlayer.MainPlayerPicture.Assign(bmp);
+            Nemp_MainForm.CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
             Nemp_MainForm.CoverImage.Hint := CoverFlowLastFM_HintInvalid;
         end;
     finally
