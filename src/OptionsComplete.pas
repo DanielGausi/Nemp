@@ -272,9 +272,7 @@ type
     CB_visual: TCheckBox;
     TB_Refresh: TTrackBar;
     CB_ScrollTitelTaskBar: TCheckBox;
-    CB_ScrollTitleInMainWindow: TCheckBox;
     CB_TaskBarDelay: TComboBox;
-    CB_AnzeigeDelay: TComboBox;
     TabFiles0: TTabSheet;
     GrpBox_FilesMain_Directories: TGroupBox;
     CBAutoScan: TCheckBox;
@@ -585,7 +583,6 @@ type
     procedure cbAutoSplitBySizeClick(Sender: TObject);
     procedure cbAutoSplitByTimeClick(Sender: TObject);
     procedure CB_ScrollTitelTaskBarClick(Sender: TObject);
-    procedure CB_ScrollTitleInMainWindowClick(Sender: TObject);
     procedure ResetScrobbleButton;
     Procedure SetScrobbleButtonOnError;
     procedure InitScrobblerWizard;
@@ -1163,8 +1160,8 @@ begin
   Lbl_Framerate.Enabled := CB_visual.Checked;
 
   CB_ScrollTitelTaskBar.Checked := NempPlayer.ScrollTaskbarTitel;
-  CB_ScrollTitleInMainWindow.Checked := NempPlayer.ScrollAnzeigeTitel;
-  CB_AnzeigeDelay.Enabled := CB_ScrollTitleInMainWindow.Checked;
+  // CB_ScrollTitleInMainWindow.Checked := NempPlayer.ScrollAnzeigeTitel;
+  //CB_AnzeigeDelay.Enabled := CB_ScrollTitleInMainWindow.Checked;
   CB_TaskBarDelay.Enabled := CB_ScrollTitelTaskBar.Checked;
 
   cbReInitAfterSuspend.Checked := NempPlayer.ReInitAfterSuspend;
@@ -1233,6 +1230,7 @@ begin
       CB_TaskbarDelay.ItemIndex := 0
   end;
 
+  {
   case NempPlayer.ScrollAnzeigeDelay of
       0..1   : CB_AnzeigeDelay.ItemIndex := 4;
       2..3   : CB_AnzeigeDelay.ItemIndex := 3;
@@ -1241,6 +1239,7 @@ begin
   else
       CB_AnzeigeDelay.ItemIndex := 0
   end;
+  }
 
   Lbl_Framerate.Caption := inttostr(1000 DIV NempPlayer.VisualizationInterval) + ' fps';
 
@@ -1901,13 +1900,6 @@ begin
     CB_TaskbarDelay.Enabled := CB_ScrollTitelTaskBar.Checked;
 end;
 
-procedure TOptionsCompleteForm.CB_ScrollTitleInMainWindowClick(
-  Sender: TObject);
-begin
-    CB_AnzeigeDelay.Enabled := CB_ScrollTitleInMainWindow.Checked;
-end;
-
-
 procedure TOptionsCompleteForm.CB_AutoPlayOnStartClick(Sender: TObject);
 begin
   cb_SavePositionInTrack.Enabled := CB_AutoPlayOnStart.Checked;
@@ -2299,11 +2291,11 @@ begin
 
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;
-  NempPlayer.ScrollAnzeigeTitel := CB_ScrollTitleInMainWindow.Checked;
+  // NempPlayer.ScrollAnzeigeTitel := CB_ScrollTitleInMainWindow.Checked;
 
   NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5;
-  NempPlayer.ScrollAnzeigeDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
-  Spectrum.ScrollDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
+  // NempPlayer.ScrollAnzeigeDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
+  // Spectrum.ScrollDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
 
 
   NempPlayer.ReInitAfterSuspend := cbReInitAfterSuspend.Checked;

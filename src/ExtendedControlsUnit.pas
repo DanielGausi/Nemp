@@ -146,14 +146,15 @@ end;
 
 procedure TExtendedControlForm.FormActivate(Sender: TObject);
 begin
-  {
-  Copied from MedíenListeForm, do something equivalent here
-  Nemp_MainForm.MedienlisteFillPanel.Width := Nemp_MainForm.MedialistPanel.Width - Nemp_MainForm.MedienlisteFillPanel.Left - 16;
-  CloseImageM.Left := Nemp_MainForm.MedialistPanel.Width - CloseImageM.Width;
-  CloseImageM.Top := 3;
-  CloseImageM.Parent := Nemp_MainForm.MedialistPanel;
-  CloseImageM.BringToFront;
-  }
+
+  //Copied from MedíenListeForm, do something equivalent here
+
+  Nemp_MainForm.MedienBibDetailFillPanel.Width := Nemp_MainForm.MedienBibDetailPanel.Width - Nemp_MainForm.MedienBibDetailFillPanel.Left - 16;
+  CloseImageE.Left := Nemp_MainForm.MedienBibDetailPanel.Width - CloseImageE.Width;
+  CloseImageE.Top := 3;
+  CloseImageE.Parent := Nemp_MainForm.MedienBibDetailPanel;
+  CloseImageE.BringToFront;
+
 end;
 
 procedure TExtendedControlForm.FormClose(Sender: TObject;
@@ -268,6 +269,7 @@ procedure TExtendedControlForm.FormResize(Sender: TObject);
 begin
 
     SetRegion(ContainerPanelExtendedControlsForm, self, NempRegionsDistance, handle);
+
     If Nemp_MainForm.NempSkin.isActive then
     begin
         Nemp_MainForm.NempSkin.SetVSTOffsets;

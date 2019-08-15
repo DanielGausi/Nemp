@@ -1889,7 +1889,12 @@ begin
         TagCustomizer.TileGraphic(Canvas,
               TagCustomizer.OffSetX, TagCustomizer.OffSetY);
 
-        TagCustomizer.AlphaBlendCloud(Canvas, Width, Height, 0, 0, bm_Cloud);
+        y := BREADCRUMB_GAP;
+        for i := 0 to TagLines.Count - 1 do
+            y := y + TTagLine(Taglines[i]).Height;
+
+
+        TagCustomizer.AlphaBlendCloud(Canvas, Width, y, 0, 0, bm_Cloud);
     end else
     begin
         Canvas.Brush.Color := TagCustomizer.BackgroundColor;
@@ -2184,7 +2189,7 @@ begin
     if y + currentLine.Height > Height - 8 then
         Fail := True;
 
-    if Fail then
+    if Fail and (Tags.Count > 0) then
     begin
         // we have to much in our TagList. So: Delete some tags
         Tags.Sort(Sort_Count);

@@ -55,6 +55,8 @@ type
 
   TPrescanMode = (ps_None, ps_Now, ps_Later);
 
+  TPlayerMessageEvent = procedure(Sender: TObject; aMessage: String) of object;
+
   TNempPlayer = class
     private
 
@@ -150,6 +152,11 @@ type
       ThreadedMainStream: DWord;
       ThreadedSlideStream: DWord;
 
+      // (new 4.11) ok, we'll get a mixture of SendMessages and Events by that, but
+      // it's working, wo why not. maybe change the code to events anyway later ...
+      fOnPlayerStopped: TNotifyEvent;
+      fOnMessage: TPlayerMessageEvent;
+
 
       // Basic method for creating a stream from a given file   //filename
       function NEMP_CreateStream(aFile: TAudioFile; //UnicodeString;
@@ -215,7 +222,11 @@ type
 
       procedure StartPrescanThread;
       function GetTimeString: String;
-    function GetTimeStringHeadset: String;
+      function GetTimeStringHeadset: String;
+
+      function fGetPlayerLine1: UnicodeString;
+      function fGetPlayerLine2: UnicodeString;
+
 
     public
         MainAudioFile: TPlaylistFile;
@@ -272,9 +283,8 @@ type
 
         TimeMode: Byte;
         ScrollTaskbarTitel: Boolean;
-        ScrollAnzeigeTitel: Boolean;
         ScrollTaskbarDelay: Integer;
-        ScrollAnzeigeDelay: Integer;
+        //ScrollAnzeigeDelay: Integer;
 
         ReInitAfterSuspend: Boolean;
         PauseOnSuspend    : Boolean;
@@ -356,6 +366,9 @@ type
         property ReverbMix: single      read fReverbMix     write SetReverbMix  ;
 
         property PlayingTitel: UnicodeString read fPlayingTitel;
+        property PlayerLine1: UnicodeString read fGetPlayerLine1;
+        property PlayerLine2: UnicodeString read fGetPlayerLine2;
+
         property PlayingTitelMode: Word read fPlayingTitelMode write SetPlayingTitelMode;
 
         property URLStream: Boolean read fIsUrlStream;
@@ -389,6 +402,8 @@ type
 
         property SoundfontFilename : String read fSoundfontFilename write fSoundfontFilename;
 
+        property OnPlayerStopped: TNotifyEvent read fOnPlayerStopped write fOnPlayerStopped;
+        property OnMessage: TPlayerMessageEvent read fOnMessage write fOnMessage;
 
         constructor Create(AHnd: HWND);
         destructor Destroy; override;
@@ -425,6 +440,7 @@ type
         procedure StopAndFree(StartPlayAfterStop: Boolean = False);
         // Kehrt die Richtung der Wiedergabe um
         procedure ReversePlayback(FromBeginning: Boolean);
+        procedure ForceForwardPlayback;
 
         procedure Mute;
         procedure UnMute;
@@ -992,13 +1008,11 @@ begin
   UseVisualization      := ini.ReadBool('Player','UseVisual',True);
   VisualizationInterval := ini.ReadInteger('Player','Visualinterval',40);
   TimeMode              := Ini.ReadInteger('Player', 'ShowTime', 0);
-  ScrollTaskbarTitel    := ini.ReadBool('Player','ScrollTaskbarTitel',True);
-  ScrollAnzeigeTitel    := ini.ReadBool('Player','ScrollAnzeigeTitel',True);
+  ScrollTaskbarTitel    := ini.ReadBool('Player','ScrollTaskbarTitel',False);
   ScrollTaskbarDelay    := ini.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
   if ScrollTaskbarDelay < 5 then ScrollTaskbarDelay := 5;
-  ScrollAnzeigeDelay    := ini.ReadInteger('Player', 'ScrollAnzeigeDelay', 0);
-  if ScrollAnzeigeDelay < 0 then ScrollAnzeigeDelay := 0;
-
+  // ScrollAnzeigeDelay    := ini.ReadInteger('Player', 'ScrollAnzeigeDelay', 0);
+  // if ScrollAnzeigeDelay < 0 then ScrollAnzeigeDelay := 0;
 
   ReInitAfterSuspend    := ini.ReadBool('Player','ReInitAfterSuspend',False);
   PauseOnSuspend        := ini.ReadBool('Player','PauseOnSuspend',True);
@@ -1100,9 +1114,8 @@ begin
   ini.WriteInteger('Player','Visualinterval', VisualizationInterval);
   Ini.WriteInteger('Player', 'ShowTime', TimeMode);
   ini.WriteBool('Player','ScrollTaskbarTitel', ScrollTaskbarTitel);
-  ini.WriteBool('Player','ScrollAnzeigeTitel', ScrollAnzeigeTitel);
   ini.WriteInteger('Player', 'ScrollTaskbarDelay', ScrollTaskbarDelay);
-  ini.WriteInteger('Player', 'ScrollAnzeigeDelay', ScrollAnzeigeDelay);
+  // ini.WriteInteger('Player', 'ScrollAnzeigeDelay', ScrollAnzeigeDelay);
 
 
   ini.WriteBool('Player','ReInitAfterSuspend',ReInitAfterSuspend);
@@ -1304,9 +1317,10 @@ begin
     BASS_ChannelStop(SlideStream);
     BASS_StreamFree(SlideStream);
 
-    spectrum.DrawClear;
-    //Spectrum.DrawText('', False);
-    //Spectrum.DrawTime('  00:00');
+
+    if assigned(fOnPlayerStopped) then
+        fOnPlayerStopped(self);
+
     MainStream := 0;
     SlideStream := 0;
 
@@ -1359,19 +1373,14 @@ begin
       MainAudioFile.VoteCounter := 0; // We play this file now, so all votes are deleted
       extension := AnsiLowerCase(ExtractFileExt(MainAudioFile.Pfad));
 
-      {
-      case MainAudioFile.AudioType of
-          at_File: begin
-              Spectrum.DrawText('Starting ' +  MainAudioFile.Dateiname, False);
-          end;
-          at_Stream: begin
-              Spectrum.DrawText('Connecting to ' +  MainAudioFile.Pfad, False)
-          end;
-          at_CDDA: begin
-              Spectrum.DrawText('Starting ' +  MainAudioFile.Pfad, False);
+      if assigned(fOnMessage) then
+      begin
+          case MainAudioFile.AudioType of
+              at_File   : fOnMessage(self, 'Starting ' +  MainAudioFile.Dateiname);
+              at_Stream : fOnMessage(self, 'Connecting to ' +  MainAudioFile.Pfad );
+              at_CDDA   : fOnMessage(self, 'Starting ' +  MainAudioFile.Pfad);
           end;
       end;
-      }
 
       if MainAudioFile.isCDDA then
       begin
@@ -1410,8 +1419,8 @@ begin
       // Fehlerbehandlung
       if (MainStream = 0) {or (not CDChangeSuccess)} then
       begin
-      //!!    if BassErrorString(Bass_ErrorGetCode) <> '' then
-      //!!        Spectrum.DrawText(BassErrorString(Bass_ErrorGetCode), False);
+          if (BassErrorString(Bass_ErrorGetCode) <> '') and assigned(fOnMessage) then
+              fOnMessage(Self, BassErrorString(Bass_ErrorGetCode));
           // something is wrong
           MainAudioFileIsPresentAndPlaying := False;
       end;
@@ -1561,6 +1570,9 @@ begin
       // zunächst mit eigenen Methoden rangehen
       if MainAudioFile.IsFile then
           SynchNewFileWithBib(MainAudioFile, False);
+
+
+
           //SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
 
       if ScanMode <> ps_Later then
@@ -1728,6 +1740,14 @@ end;
     Reverse Playback of current stream
     --------------------------------------------------------
 }
+procedure TNempPlayer.ForceForwardPlayback;
+begin
+    if fIsURLStream then exit;
+
+    if MainStreamIsReverseStream then
+        ReversePlayback(False);
+    // else: nothing todo
+end;
 procedure TNempPlayer.ReversePlayback(FromBeginning: Boolean);
 var
   tmpMain: DWord;
@@ -2052,6 +2072,78 @@ begin
     Case TimeMode of
         0: result := SecToStr(HeadsetTime);
         1: result := '-' + SecToStr(HeadsetDauer - HeadsetTime );
+    end;
+end;
+
+
+function TNempPlayer.fGetPlayerLine1: UnicodeString;
+begin
+    if not assigned(MainAudioFile) then
+        result := ''
+    else
+    begin
+        // get a proper display string for the player
+        // 1st line (in most cases: "Artist")
+        case MainAudioFile.AudioType of
+            at_Undef: result := '';
+            at_File,
+            at_CDDA: begin
+                    if assigned(MainAudioFile.CueList) and (MainAudioFile.CueList.Count > 0) then
+                    begin
+                        // when playing a file with a cuesheet:
+                        // MainTitle + CueSheet-Title
+                        result := MainAudioFile.PlaylistTitle;
+                    end else
+                    begin
+                        // usual case: just the "Artist"
+                        if MainAudioFile.Artist <> '' then
+                            result := MainAudioFile.Artist
+                        else
+                            result := Player_UnkownArtist;
+                    end;
+            end;
+
+            at_Stream: begin
+                    if (MainAudioFile.artist <> '') and (MainAudioFile.titel <> '') then  // could be the case on remote ogg-files (through "DoOggMeta")
+                        result := MainAudioFile.Artist
+                    else
+                        result := MainAudioFile.Description;
+            end;
+        else
+            // at_CUE should not happen here
+            result := '';
+        end;
+    end;
+end;
+
+function TNempPlayer.fGetPlayerLine2: UnicodeString;
+begin
+    if not assigned(MainAudioFile) then
+        result := ''
+    else
+    begin
+        // get a proper display string for the player
+        // 2nd line (in most cases: "Title")
+        case MainAudioFile.AudioType of
+            at_Undef  : result := '';
+            at_File,
+            at_CDDA   : begin
+                    if assigned(MainAudioFile.CueList) and (MainAudioFile.CueList.Count > 0) then
+                        // when playing a file with a cuesheet:
+                        // "MainTitle + CueSheet-Title"
+                        // note: there should be no issue with the cuesheet-index here, as GetIndex runs through the CueList
+                        result := TAudioFile(MainAudioFile.CueList[GetActiveCue]).PlaylistTitle
+                    else
+                        // usual case: just the "Title"
+                        result := MainAudioFile.NonEmptyTitle;
+            end;
+            at_Stream : begin
+                        result := MainAudioFile.Titel
+            end
+        else
+            //at_CUE should not happen here
+            result := '';
+        end;
     end;
 end;
 
@@ -2984,23 +3076,15 @@ end;
 procedure TNempPlayer.DrawMainPlayerVisualisation; //(IncludingTime: Boolean = True);
 var FFTFata : TFFTData;
 begin
-  if UseVisualization then
-  begin
-      if BassStatus = BASS_ACTIVE_PLAYING then
-      begin
-          BASS_ChannelGetData(MainStream, @FFTFata, BASS_DATA_FFT1024);
-          Spectrum.Draw (FFTFata);
-      end else
-          Spectrum.DrawClear;
-  end;
-  // Spectrum.DrawText(PlayingTitel, ScrollAnzeigeTitel);
-  {
-  if IncludingTime then
-      Case TimeMode of
-          0: Spectrum.DrawTime(SecToStr(Time));
-          1: Spectrum.DrawTime('-' + SecToStr(Dauer - Time ));
-      end;
-  }
+    if UseVisualization then
+    begin
+        if BassStatus = BASS_ACTIVE_PLAYING then
+        begin
+            BASS_ChannelGetData(MainStream, @FFTFata, BASS_DATA_FFT1024);
+            Spectrum.Draw (FFTFata);
+        end else
+            Spectrum.DrawClear;
+    end;
 end;
 
 (*
@@ -3183,14 +3267,17 @@ begin
             // Draw progress
             if MainAudioFile.isStream then
             begin
+                {
                 b.canvas.Pen.color := Spectrum.PreviewShapePenColor;
                 b.Canvas.Pen.Width := 1;
                 b.Canvas.Brush.Color := Spectrum.PreviewShapeBrushColor;
                 b.Canvas.Brush.Style := bsSolid;
                 pw := 88;
                 b.Canvas.Rectangle(102, 80, 102+pw, 86 );
+                }
             end else
             begin
+
                 b.canvas.Pen.color := Spectrum.PreviewShapePenColor;
                 b.Canvas.Pen.Width := 1;
                 b.Canvas.Brush.Color := Spectrum.PreviewShapeBrushColor;
@@ -3200,6 +3287,7 @@ begin
                 b.canvas.Pen.color :=   Spectrum.PreviewShapeProgressPenColor;
                 b.Canvas.Brush.Color := Spectrum.PreviewShapeProgressBrushColor;
                 b.Canvas.Rectangle(102, 87, 102 + round(Progress*pw), 93 );
+
             end;
 
         end else

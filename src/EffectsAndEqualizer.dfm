@@ -1,9 +1,11 @@
 object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
+  AlignWithMargins = True
   Left = 0
   Top = 0
-  Caption = 'FormEffectsAndEqualizer'
-  ClientHeight = 341
-  ClientWidth = 635
+  BorderStyle = bsSingle
+  Caption = 'Nemp: Equalizer and effects'
+  ClientHeight = 301
+  ClientWidth = 891
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,515 +14,29 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
   Font.Style = []
   KeyPreview = True
   OldCreateOrder = False
+  ShowHint = True
   OnCreate = FormCreate
+  OnMouseDown = TrackBarMouseDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object GRPBOXEffekte: TGroupBox
-    Tag = 5
-    Left = 37
-    Top = 19
-    Width = 191
-    Height = 314
-    Caption = 'Effects'
-    TabOrder = 0
-    OnDragOver = GRPBOXEffekteDragOver
-    object HallShape: TShape
-      Left = 13
-      Top = 37
-      Width = 125
-      Height = 6
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-      OnMouseDown = HallShapeMouseDown
-    end
-    object HallLBL: TLabel
-      Left = 149
-      Top = 32
-      Width = 12
-      Height = 13
-      Caption = '...'
-      Transparent = True
-    end
-    object EchoWetDryMixShape: TShape
-      Left = 13
-      Top = 79
-      Width = 125
-      Height = 6
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-      OnMouseDown = EchoWetDryMixShapeMouseDown
-    end
-    object EchoTimeShape: TShape
-      Left = 13
-      Top = 98
-      Width = 125
-      Height = 6
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-      OnMouseDown = EchoTimeShapeMouseDown
-    end
-    object EchoTimeLBL: TLabel
-      Left = 149
-      Top = 93
-      Width = 12
-      Height = 13
-      Caption = '...'
-      Transparent = True
-    end
-    object EchoMixLBL: TLabel
-      Left = 149
-      Top = 74
-      Width = 12
-      Height = 13
-      Caption = '...'
-      Transparent = True
-    end
-    object EffekteLBL2: TLabel
-      Left = 13
-      Top = 61
-      Width = 23
-      Height = 13
-      Caption = 'Echo'
-      Transparent = True
-    end
-    object EffekteLBL1: TLabel
-      Left = 13
-      Top = 19
-      Width = 17
-      Height = 13
-      Caption = 'Hall'
-      Transparent = True
-    end
-    object SampleRateShape: TShape
-      Left = 13
-      Top = 142
-      Width = 125
-      Height = 6
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-      OnMouseDown = SampleRateShapeMouseDown
-    end
-    object SampleRateLBL: TLabel
-      Left = 149
-      Top = 137
-      Width = 12
-      Height = 13
-      Caption = '...'
-      Transparent = True
-    end
-    object EffekteLBL3: TLabel
-      Left = 13
-      Top = 126
-      Width = 30
-      Height = 13
-      Caption = 'Speed'
-      Transparent = True
-    end
-    object DirectionPositionBTN: TSkinButton
-      Left = 15
-      Top = 166
-      Width = 24
-      Height = 24
-      Hint = 'Play backwards'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 4
-      OnClick = DirectionPositionBTNClick
-      DrawMode = dm_Skin
-      NumGlyphsX = 5
-      NumGlyphsY = 2
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-    end
-    object Btn_EffectsOff: TBitBtn
-      Left = 13
-      Top = 226
-      Width = 99
-      Height = 25
-      Caption = 'Disable effects'
-      TabOrder = 5
-      OnClick = Btn_EffectsOffClick
-    end
-    object EchoWetDryMixButton: TSkinButton
-      Tag = 1
-      Left = 13
-      Top = 75
-      Width = 30
-      Height = 14
-      DragCursor = crSizeWE
-      DragMode = dmAutomatic
-      TabOrder = 1
-      OnDragOver = GRPBOXEffekteDragOver
-      OnEndDrag = EffectsButtonEndDrag
-      OnKeyDown = EchoWetDryMixButtonKeyDown
-      OnMouseDown = EchoWetDryMixButtonMouseDown
-      OnStartDrag = EchoWetDryMixButtonStartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
-    end
-    object HallButton: TSkinButton
-      Tag = 1
-      Left = 13
-      Top = 33
-      Width = 30
-      Height = 14
-      DragCursor = crSizeWE
-      DragMode = dmAutomatic
-      TabOrder = 0
-      OnDragOver = GRPBOXEffekteDragOver
-      OnEndDrag = EffectsButtonEndDrag
-      OnKeyDown = HallButtonKeyDown
-      OnMouseDown = HallButtonMouseDown
-      OnStartDrag = HallButtonStartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
-    end
-    object EchoTimeButton: TSkinButton
-      Tag = 1
-      Left = 13
-      Top = 94
-      Width = 30
-      Height = 14
-      DragCursor = crSizeWE
-      DragMode = dmAutomatic
-      TabOrder = 2
-      OnDragOver = GRPBOXEffekteDragOver
-      OnEndDrag = EffectsButtonEndDrag
-      OnKeyDown = EchoTimeButtonKeyDown
-      OnMouseDown = EchoTimeButtonMouseDown
-      OnStartDrag = EchoWetDryMixButtonStartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
-    end
-    object SampleRateButton: TSkinButton
-      Tag = 1
-      Left = 63
-      Top = 138
-      Width = 30
-      Height = 14
-      DragCursor = crSizeWE
-      DragMode = dmAutomatic
-      TabOrder = 3
-      OnDragOver = GRPBOXEffekteDragOver
-      OnEndDrag = EffectsButtonEndDrag
-      OnKeyDown = SampleRateButtonKeyDown
-      OnMouseDown = SampleRateButtonMouseDown
-      OnStartDrag = SampleRateButtonStartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
-    end
-    object BtnABRepeatSetA: TSkinButton
-      Left = 15
-      Top = 196
-      Width = 24
-      Height = 24
-      Hint = 'Set start point (A)'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 6
-      OnClick = BtnABRepeatSetAClick
-      DrawMode = dm_Skin
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-    end
-    object BtnABRepeatSetB: TSkinButton
-      Left = 39
-      Top = 196
-      Width = 24
-      Height = 24
-      Hint = 'Set end point (B)'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 7
-      OnClick = BtnABRepeatSetBClick
-      DrawMode = dm_Skin
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-    end
-    object BtnABRepeatUnset: TSkinButton
-      Left = 63
-      Top = 196
-      Width = 24
-      Height = 24
-      Hint = 'Disable A-B repeat'
-      ParentShowHint = False
-      ShowHint = True
-      TabOrder = 8
-      OnClick = BtnABRepeatUnsetClick
-      DrawMode = dm_Skin
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-    end
-  end
   object GRPBOXEqualizer: TGroupBox
-    Tag = 5
-    Left = 261
-    Top = 19
-    Width = 191
-    Height = 164
-    TabOrder = 1
-    OnDragOver = GRPBOXEqualizerDragOver
-    object EqualizerShape5: TShape
-      Left = 88
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape2: TShape
-      Left = 40
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape3: TShape
-      Left = 56
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape4: TShape
-      Left = 72
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape6: TShape
-      Left = 104
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape7: TShape
-      Left = 120
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape8: TShape
-      Left = 136
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape9: TShape
-      Left = 152
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerShape10: TShape
-      Left = 168
-      Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
+    AlignWithMargins = True
+    Left = 8
+    Top = 8
+    Width = 426
+    Height = 250
+    Caption = 'Equalizer'
+    TabOrder = 0
     object EQLBL1: TLabel
-      Left = 20
-      Top = 116
-      Width = 8
-      Height = 10
+      Left = 21
+      Top = 173
+      Width = 12
+      Height = 13
       Caption = '30'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL2: TLabel
-      Left = 37
-      Top = 116
-      Width = 8
-      Height = 10
-      Caption = '60'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL3: TLabel
-      Left = 50
-      Top = 116
-      Width = 12
-      Height = 10
-      Caption = '120'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL4: TLabel
-      Left = 67
-      Top = 116
-      Width = 12
-      Height = 10
-      Caption = '250'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL5: TLabel
-      Left = 84
-      Top = 116
-      Width = 12
-      Height = 10
-      Caption = '500'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL6: TLabel
-      Left = 102
-      Top = 116
-      Width = 9
-      Height = 10
-      Caption = '1K'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL7: TLabel
-      Left = 118
-      Top = 116
-      Width = 9
-      Height = 10
-      Caption = '2K'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL8: TLabel
-      Left = 132
-      Top = 116
-      Width = 9
-      Height = 10
-      Caption = '4K'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
-      Font.Name = 'Tahoma'
-      Font.Pitch = fpVariable
-      Font.Style = []
-      ParentFont = False
-      Transparent = True
-    end
-    object EQLBL9: TLabel
-      Left = 148
-      Top = 116
-      Width = 13
-      Height = 10
-      Caption = '12K'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -8
+      Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Pitch = fpVariable
       Font.Style = []
@@ -528,348 +44,520 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Transparent = True
     end
     object EQLBL10: TLabel
-      Left = 164
-      Top = 116
-      Width = 13
-      Height = 10
+      Left = 378
+      Top = 173
+      Width = 18
+      Height = 13
       Caption = '16K'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -8
+      Font.Height = -11
       Font.Name = 'Tahoma'
       Font.Pitch = fpVariable
       Font.Style = []
       ParentFont = False
       Transparent = True
     end
-    object EqualizerShape1: TShape
-      Left = 24
+    object EQLBL2: TLabel
+      Left = 61
+      Top = 173
+      Width = 12
+      Height = 13
+      Caption = '60'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL3: TLabel
+      Left = 99
+      Top = 173
+      Width = 18
+      Height = 13
+      Caption = '120'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL4: TLabel
+      Left = 138
+      Top = 173
+      Width = 18
+      Height = 13
+      Caption = '250'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL5: TLabel
+      Left = 178
+      Top = 173
+      Width = 18
+      Height = 13
+      Caption = '500'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL6: TLabel
+      Left = 221
+      Top = 173
+      Width = 12
+      Height = 13
+      Caption = '1K'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL7: TLabel
+      Left = 261
+      Top = 173
+      Width = 12
+      Height = 13
+      Caption = '2K'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL8: TLabel
+      Left = 301
+      Top = 173
+      Width = 12
+      Height = 13
+      Caption = '4K'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object EQLBL9: TLabel
+      Left = 338
+      Top = 173
+      Width = 18
+      Height = 13
+      Caption = '12K'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Pitch = fpVariable
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+    end
+    object tbEQ0: TNempTrackBar
+      Left = 8
       Top = 24
-      Width = 4
-      Height = 85
-      Brush.Color = clGradientActiveCaption
-      DragCursor = crSizeNS
-      Shape = stRoundRect
-    end
-    object EqualizerDefaultShape: TShape
-      Left = 16
-      Top = 66
-      Width = 163
-      Height = 1
-      Pen.Color = clGradientActiveCaption
-    end
-    object EqualizerButton1: TSkinButton
-      Left = 21
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 0
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton2: TSkinButton
+    object tbEQ1: TNempTrackBar
       Tag = 1
-      Left = 37
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 48
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 1
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton3: TSkinButton
+    object tbEQ2: TNempTrackBar
       Tag = 2
-      Left = 53
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 88
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 2
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton5: TSkinButton
-      Tag = 4
-      Left = 85
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
-      TabOrder = 4
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
-    end
-    object EqualizerButton4: TSkinButton
+    object tbEQ3: TNempTrackBar
       Tag = 3
-      Left = 69
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 128
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 3
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton6: TSkinButton
+    object tbEQ4: TNempTrackBar
+      Tag = 4
+      Left = 168
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
+      TabOrder = 4
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
+    end
+    object tbEQ5: TNempTrackBar
       Tag = 5
-      Left = 101
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 208
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 5
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton7: TSkinButton
+    object tbEQ6: TNempTrackBar
       Tag = 6
-      Left = 117
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 248
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 6
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton8: TSkinButton
+    object tbEQ7: TNempTrackBar
       Tag = 7
-      Left = 133
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 288
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 7
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton9: TSkinButton
+    object tbEQ8: TNempTrackBar
       Tag = 8
-      Left = 149
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 328
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 8
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object EqualizerButton10: TSkinButton
+    object tbEQ9: TNempTrackBar
       Tag = 9
-      Left = 165
-      Top = 54
-      Width = 10
-      Height = 25
-      DragCursor = crSizeNS
-      DragMode = dmAutomatic
+      Left = 368
+      Top = 24
+      Width = 40
+      Height = 150
+      Max = 100
+      Min = -100
+      Orientation = trVertical
       TabOrder = 9
-      OnDragOver = EqualizerButton1DragOver
-      OnEndDrag = EqualizerButton1EndDrag
-      OnKeyDown = EqualizerButton1KeyDown
-      OnMouseDown = EqualizerButton1MouseDown
-      OnStartDrag = EqualizerButton1StartDrag
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-      AcceptArrowKeys = True
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEQ0Change
+      OnMouseDown = TrackBarMouseDown
     end
-    object Btn_EqualizerPresets: TSkinButton
-      Left = 16
-      Top = 132
+    object Btn_EqualizerPresets: TButton
+      Left = 237
+      Top = 210
       Width = 126
-      Height = 21
+      Height = 25
       Caption = 'Select'
+      PopupMenu = Equalizer_PopupMenu
       TabOrder = 10
       OnClick = Btn_EqualizerPresetsClick
-      DrawMode = dm_Windows
-      NumGlyphsX = 5
-      NumGlyphsY = 1
-      GlyphLine = 0
-      CustomRegion = False
-      FocusDrawMode = fdm_Windows
-      Color1 = clBlack
-      Color2 = clBlack
-    end
-    object ButtonNextEQ: TButton
-      Tag = 1
-      Left = 162
-      Top = 132
-      Width = 21
-      Height = 21
-      Hint = 'Next preset'
-      Caption = '>'
-      TabOrder = 12
-      OnClick = ButtonPrevEQClick
     end
     object ButtonPrevEQ: TButton
-      Left = 142
-      Top = 132
-      Width = 21
-      Height = 21
+      Left = 363
+      Top = 210
+      Width = 25
+      Height = 25
       Hint = 'Previous preset'
       Caption = '<'
       TabOrder = 11
       OnClick = ButtonPrevEQClick
     end
+    object ButtonNextEQ: TButton
+      Tag = 1
+      Left = 388
+      Top = 210
+      Width = 25
+      Height = 25
+      Hint = 'Next preset'
+      Caption = '>'
+      TabOrder = 12
+      OnClick = ButtonPrevEQClick
+    end
+    object BtnDisableEqualizer: TButton
+      Left = 16
+      Top = 210
+      Width = 129
+      Height = 25
+      Hint = 'Disable equalizer'
+      Caption = 'Disable equalizer'
+      TabOrder = 13
+      OnClick = PM_EQ_DisabledClick
+    end
   end
-  object Button1: TButton
-    Left = 528
-    Top = 250
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
+  object GrpBoxHall: TGroupBox
+    AlignWithMargins = True
+    Left = 440
+    Top = 8
+    Width = 217
+    Height = 250
+    Caption = 'Reverb and echo'
+    TabOrder = 1
+    object HallLBL: TLabel
+      Left = 171
+      Top = 37
+      Width = 12
+      Height = 13
+      Caption = '...'
+      Transparent = True
+    end
+    object EchoTimeLBL: TLabel
+      Left = 171
+      Top = 138
+      Width = 12
+      Height = 13
+      Caption = '...'
+      Transparent = True
+    end
+    object EchoMixLBL: TLabel
+      Left = 171
+      Top = 98
+      Width = 12
+      Height = 13
+      Caption = '...'
+      Transparent = True
+    end
+    object tbReverb: TNempTrackBar
+      Left = 16
+      Top = 24
+      Width = 150
+      Height = 40
+      Hint = 'Reverb'
+      Max = 0
+      Min = -96
+      Position = -2
+      TabOrder = 0
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbReverbChange
+      OnMouseDown = tbReverbMouseDown
+    end
+    object tbEchoTime: TNempTrackBar
+      Left = 16
+      Top = 126
+      Width = 150
+      Height = 40
+      Hint = 'Echo delay'
+      Max = 2000
+      Min = 100
+      Position = 100
+      TabOrder = 2
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbEchoTimeChange
+      OnMouseDown = tbEchoTimeMouseDown
+    end
+    object tbWetDryMix: TNempTrackBar
+      Left = 16
+      Top = 86
+      Width = 150
+      Height = 40
+      Hint = 'Echo mix'
+      Max = 50
+      TabOrder = 1
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbWetDryMixChange
+      OnMouseDown = tbWetDryMixMouseDown
+    end
+    object Btn_EffectsOff: TBitBtn
+      Left = 16
+      Top = 210
+      Width = 129
+      Height = 25
+      Hint = 'Disable effects'
+      Caption = 'Disable effects'
+      TabOrder = 3
+      OnClick = Btn_EffectsOffClick
+    end
+  end
+  object grpBoxPlayback: TGroupBox
+    AlignWithMargins = True
+    Left = 663
+    Top = 8
+    Width = 210
+    Height = 178
+    Caption = 'Playback'
     TabOrder = 2
+    object SampleRateLBL: TLabel
+      Left = 171
+      Top = 85
+      Width = 12
+      Height = 13
+      Caption = '...'
+      Transparent = True
+    end
+    object DirectionPositionBTN: TButton
+      Left = 16
+      Top = 25
+      Width = 150
+      Height = 25
+      Hint = 'Play backwards'
+      Caption = 'Play backwards'
+      TabOrder = 0
+      OnClick = __DirectionPositionBTNClick
+    end
+    object tbSpeed: TNempTrackBar
+      Left = 15
+      Top = 72
+      Width = 150
+      Height = 40
+      Hint = 'Playback speed'
+      Max = 100
+      Min = -100
+      TabOrder = 1
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbSpeedChange
+      OnMouseDown = tbSpeedMouseDown
+    end
+    object BitBtn1: TBitBtn
+      Left = 16
+      Top = 137
+      Width = 129
+      Height = 25
+      Hint = 'Disable effects'
+      Caption = 'Disable effects'
+      TabOrder = 2
+      OnClick = BitBtn1Click
+    end
   end
-  object TrackBar1: TTrackBar
-    Left = 298
-    Top = 230
-    Width = 150
-    Height = 45
+  object grpBoxABRepeat: TGroupBox
+    AlignWithMargins = True
+    Left = 663
+    Top = 192
+    Width = 210
+    Height = 66
+    Caption = 'A-B repeat'
     TabOrder = 3
+    object BtnABRepeatSetA: TButton
+      Left = 16
+      Top = 24
+      Width = 49
+      Height = 25
+      Hint = 'Set start point for A-B repeat'
+      Caption = '[ A ]'
+      TabOrder = 0
+      OnClick = BtnABRepeatSetAClick
+    end
+    object BtnABRepeatSetB: TButton
+      Left = 71
+      Top = 24
+      Width = 49
+      Height = 25
+      Hint = 'Set end point for A-B repeat'
+      Caption = '[ B ]'
+      TabOrder = 1
+      OnClick = BtnABRepeatSetBClick
+    end
+    object BtnABRepeatUnset: TButton
+      Left = 151
+      Top = 24
+      Width = 49
+      Height = 25
+      Hint = 'Disable A-B repeat'
+      Caption = 'Off'
+      TabOrder = 2
+      OnClick = BtnABRepeatUnsetClick
+    end
   end
-  object ProgressBar1: TProgressBar
-    Left = 302
-    Top = 296
-    Width = 150
-    Height = 17
-    Position = 20
+  object BtnClose: TButton
+    Left = 752
+    Top = 267
+    Width = 121
+    Height = 25
+    Caption = 'Close'
     TabOrder = 4
+    OnClick = BtnCloseClick
   end
   object Equalizer_PopupMenu: TPopupMenu
     AutoHotkeys = maManual
-    Left = 495
-    Top = 39
-    object PM_EQ_Disabled: TMenuItem
-      Caption = 'Disable equalizer'
-      OnClick = PM_EQ_DisabledClick
-    end
-    object N27: TMenuItem
-      Caption = '-'
-    end
+    Left = 183
+    Top = 207
     object PM_EQ_Load: TMenuItem
       Caption = 'Load preset'
     end

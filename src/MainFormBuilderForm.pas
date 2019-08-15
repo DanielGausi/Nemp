@@ -60,9 +60,10 @@ type
     GroupBox2: TGroupBox;
     cbControlPanelRows: TCheckBox;
     cbControlPanelShowCover: TCheckBox;
-    cbControlPanelShowVisualisation: TCheckBox;
     GroupBox3: TGroupBox;
     cbHideFileOverview: TCheckBox;
+    BtnUndo: TButton;
+    BtnResetToDefault: TButton;
     procedure cbMainLayoutChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BlockBrowseResize(Sender: TObject);
@@ -82,6 +83,12 @@ type
     procedure cbControlPanelShowCoverClick(Sender: TObject);
     procedure cbControlPanelShowVisualisationClick(Sender: TObject);
     procedure cbHideFileOverviewClick(Sender: TObject);
+    procedure SplitterTopMoved(Sender: TObject);
+    procedure MainSplitterMoved(Sender: TObject);
+    procedure BtnUndoClick(Sender: TObject);
+    procedure BtnResetToDefaultClick(Sender: TObject);
+    procedure SplitterTopCanResize(Sender: TObject; var NewSize: Integer;
+      var Accept: Boolean);
   private
     { Private declarations }
     LocalBuildOptions: TNempFormBuildOptions;
@@ -174,23 +181,39 @@ end;
 
 procedure TMainFormBuilder.FixSettingsGUI;
 begin
-        if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockBrowse       then RGrpControlSubPanel.ItemIndex := 0;
-        if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockPlaylist     then RGrpControlSubPanel.ItemIndex := 1;
-        if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockMediaList    then RGrpControlSubPanel.ItemIndex := 2;
-        if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockFileOverview then RGrpControlSubPanel.ItemIndex := 3;
 
+    RGrpControlSubPanel.OnClick := Nil;
+    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockBrowse       then RGrpControlSubPanel.ItemIndex := 0;
+    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockPlaylist     then RGrpControlSubPanel.ItemIndex := 1;
+    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockMediaList    then RGrpControlSubPanel.ItemIndex := 2;
+    if LocalBuildOptions.ControlPanelSubParent = LocalBuildOptions.BlockFileOverview then RGrpControlSubPanel.ItemIndex := 3;
+    RGrpControlSubPanel.OnClick := RGrpControlSubPanelClick;
 
+    cbControlPosition.OnChange := Nil;
     cbControlPosition.ItemIndex := Integer(LocalBuildOptions.ControlPanelPosition);
+    cbControlPosition.OnChange := cbControlPositionChange;
 
+    cbMainLayout.OnChange := Nil;
     cbMainLayout.ItemIndex := Integer(LocalBuildOptions.MainLayout);
+    cbMainLayout.OnChange := cbMainLayoutChange;
 
+    cbControlPositionSubPanel.OnChange := Nil;
     if LocalBuildOptions.ControlPanelSubPosition = cp_SubTop then cbControlPositionSubPanel.ItemIndex := 0;
     if LocalBuildOptions.ControlPanelSubPosition = cp_SubBottom then cbControlPositionSubPanel.ItemIndex := 1;
+    cbControlPositionSubPanel.OnChange := cbControlPositionSubPanelChange;
 
     cbControlPanelRows.Checked              := LocalBuildOptions.ControlPanelTwoRows           ;
     cbControlPanelShowCover.Checked         := LocalBuildOptions.ControlPanelShowCover         ;
-    cbControlPanelShowVisualisation.Checked := LocalBuildOptions.ControlPanelShowVisualisation ;
+    // cbControlPanelShowVisualisation.Checked := LocalBuildOptions.ControlPanelShowVisualisation ;
 
+    cbHideFileOverview.OnClick := Nil;
+    cbHideFileOverview.Checked := LocalBuildOptions.HideFileOverviewPanel;
+    cbHideFileOverview.OnClick := cbHideFileOverviewClick;
+
+    // enable/disable Postion-sub-settings for ControlPanel
+    RGrpControlSubPanel.Enabled       := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
+    LblSubPanelPosition.Enabled       := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
+    cbControlPositionSubPanel.Enabled := LocalBuildOptions.ControlPanelPosition = cp_subPanel;
 end;
 
 procedure TMainFormBuilder.FormCreate(Sender: TObject);
@@ -206,10 +229,13 @@ begin
     LocalBuildOptions.MainContainerB := _BottomMainPanel;
     LocalBuildOptions.MainSplitter := MainSplitter;
 
-    LocalBuildOptions.ChildPanelMinHeight := BlockBrowse.Constraints.MinHeight;
-    LocalBuildOptions.ChildPanelMinWidth  := BlockBrowse.Constraints.MinWidth;
+    LocalBuildOptions.ChildPanelMinHeight := 100;
+    LocalBuildOptions.ChildPanelMinWidth  := 100;
 
-    LocalBuildOptions.ControlPanel.SetValues(_ControlPanel, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, 'Player Control');
+    LocalBuildOptions.MainPanelMinHeight := 100;
+    LocalBuildOptions.MainPanelMinWidth := 100;
+
+    LocalBuildOptions.ControlPanel.SetControlValues(_ControlPanel, Nil, Nil, Nil, Nil, Nil, Nil, Nil,{ Nil,} 'Player Control');
 
     // fill it with the default layout
     LocalBuildOptions.BlockBrowse.SetValues(BlockBrowse, HeaderBrowse, ContentBrowse, 'Coverflow');
@@ -225,9 +251,6 @@ begin
 
     LocalBuildOptions.SubSplitter1 := SplitterTop;
     LocalBuildOptions.SubSplitter2 := SplitterBottom;
-
-    //LocalBuildOptions.PanelASplitters.Add(SplitterTop);
-    //LocalBuildOptions.PanelBSplitters.Add(SplitterBottom);
 
     fn := ExtractFilePath(ParamStr(0)) + 'Images\FormBuilderUp.png';
     if FileExists(fn) then
@@ -267,7 +290,6 @@ begin
 
     ApplySettings;
     LocalBuildOptions.SwapMainLayout;
-//    LocalBuildOptions.RefreshBothRowsOrColumns;
     FixAllButtons;
 end;
 
@@ -275,8 +297,27 @@ procedure TMainFormBuilder.FormShow(Sender: TObject);
 begin
     LocalBuildOptions.Assign(Nemp_MainForm.NempFormBuildOptions);
     FixAllButtons;
-    self.FixSettingsGUI;
+    FixSettingsGUI;
 end;
+
+
+
+
+procedure TMainFormBuilder.BtnUndoClick(Sender: TObject);
+begin
+    LocalBuildOptions.Assign(Nemp_MainForm.NempFormBuildOptions);
+    FixAllButtons;
+    FixSettingsGUI;
+end;
+
+// reset all input and restore Default Laoyut
+procedure TMainFormBuilder.BtnResetToDefaultClick(Sender: TObject);
+begin
+    LocalBuildOptions.ResetToDefault;
+    FixAllButtons;
+    FixSettingsGUI;
+end;
+
 
 procedure TMainFormBuilder.ApplyClick(Sender: TObject);
 begin
@@ -290,9 +331,6 @@ begin
     LockWindowUpdate(0);
 
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-    //MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
-
-//    MedienBib.NewCoverFlow.Window := Nemp_MainForm.PanelCoverBrowse.Handle ;
 end;
 
 
@@ -383,7 +421,11 @@ begin
 end;
 
 procedure TMainFormBuilder.cbHideFileOverviewClick(Sender: TObject);
+var VisA, VisB: Boolean;
 begin
+    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
+    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
+
     if cbHideFileOverview.Checked then
     begin
         // set one of the splitters to "available"
@@ -411,6 +453,11 @@ begin
     LocalBuildOptions.HideFileOverviewPanel := cbHideFileOverview.Checked;
     LocalBuildOptions.RefreshBothRowsOrColumns(False);
     FixAllButtons;
+
+    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
+        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
+    then
+        LocalBuildOptions.SwapMainLayout;
 end;
 
 procedure TMainFormBuilder.cbControlPanelRowsClick(Sender: TObject);
@@ -426,7 +473,7 @@ end;
 procedure TMainFormBuilder.cbControlPanelShowVisualisationClick(
   Sender: TObject);
 begin
-    LocalBuildOptions.ControlPanelShowVisualisation := cbControlPanelShowVisualisation.Checked;
+    //LocalBuildOptions.ControlPanelShowVisualisation := cbControlPanelShowVisualisation.Checked;
 end;
 
 procedure TMainFormBuilder.cbControlPositionChange(Sender: TObject);
@@ -452,12 +499,37 @@ begin
 end;
 
 
+procedure TMainFormBuilder.SplitterTopCanResize(Sender: TObject;
+  var NewSize: Integer; var Accept: Boolean);
+var s: TSplitter;
+begin
+    s := Sender as TSplitter;
+    if s.Align in [alLeft, alRight] then
+        accept := (s.MinSize < NewSize) and ( (s.Parent.Width - newSize) > s.MinSize)
+    else
+        accept := (s.MinSize < NewSize) and ( (s.Parent.Height - newSize) > s.MinSize)
+end;
+
+procedure TMainFormBuilder.SplitterTopMoved(Sender: TObject);
+begin
+    LocalBuildOptions.OnSplitterMoved(Sender);
+end;
+
+procedure TMainFormBuilder.MainSplitterMoved(Sender: TObject);
+begin
+    LocalBuildOptions.OnMainSplitterMoved(Sender);
+end;
+
 procedure TMainFormBuilder.ImgUpClick(Sender: TObject);
 var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
     aSplitter: TSplitter;
+    VisA, VisB: Boolean;
 begin
+    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
+    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
+
     // UP-Click
     ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
     ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
@@ -490,19 +562,20 @@ begin
             else
                 LocalBuildOptions.PanelAChilds.Add(ParentBlock); // order will be done by RefreshBothRowsOrColumns
 
-            // todo: Setze einen Splitter-Tag von 1 auf -1, so dass er durch RefreshBothRows neu gesetzt werden kann
             LocalBuildOptions.MakeOneSplitterAvailable(1);
-            {if LocalBuildOptions.PanelBSplitters.Count > 0 then
-            begin
-                aSplitter := LocalBuildOptions.PanelBSplitters.ExtractAt(LocalBuildOptions.PanelBSplitters.Count-1);
-                LocalBuildOptions.PanelASplitters.Add(aSplitter);
-            end;}
         end;
 
         LocalBuildOptions.RefreshBothRowsOrColumns(True);
+        LocalBuildOptions.ApplyRatios;
         FixAllButtons;
     end;
+
+    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
+        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
+    then
+        LocalBuildOptions.SwapMainLayout;
 end;
+
 
 
 
@@ -511,7 +584,11 @@ var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
     aSplitter: TSplitter;
+    VisA, VisB: Boolean;
 begin
+    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
+    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
+
     // DOWN-Click
     ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
     ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
@@ -545,16 +622,17 @@ begin
                 LocalBuildOptions.PanelBChilds.Add(ParentBlock);
 
             LocalBuildOptions.MakeOneSplitterAvailable(0);
-            {if LocalBuildOptions.PanelASplitters.Count > 0 then
-            begin
-                aSplitter := LocalBuildOptions.PanelASplitters.ExtractAt(LocalBuildOptions.PanelASplitters.Count-1);
-                LocalBuildOptions.PanelBSplitters.Add(aSplitter);
-            end;}
         end;
 
         LocalBuildOptions.RefreshBothRowsOrColumns(True);
+        LocalBuildOptions.ApplyRatios;
         FixAllButtons;
     end;
+
+    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
+        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
+    then
+        LocalBuildOptions.SwapMainLayout;
 end;
 
 procedure TMainFormBuilder.ImgLeftClick(Sender: TObject);
@@ -562,7 +640,11 @@ var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
     aSplitter: TSplitter;
+    VisA, VisB: Boolean;
 begin
+    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
+    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
+
     // LeftClick
     ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
     ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
@@ -596,16 +678,17 @@ begin
                 LocalBuildOptions.PanelAChilds.Add(ParentBlock);
 
             LocalBuildOptions.MakeOneSplitterAvailable(1);
-            {if LocalBuildOptions.PanelBSplitters.Count > 0 then
-            begin
-                aSplitter := LocalBuildOptions.PanelBSplitters.ExtractAt(LocalBuildOptions.PanelBSplitters.Count-1);
-                LocalBuildOptions.PanelASplitters.Add(aSplitter);
-            end;}
         end;
 
         LocalBuildOptions.RefreshBothRowsOrColumns(True);
+        LocalBuildOptions.ApplyRatios;
         FixAllButtons;
     end;
+
+    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
+        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
+    then
+        LocalBuildOptions.SwapMainLayout;
 end;
 
 procedure TMainFormBuilder.ImgRightClick(Sender: TObject);
@@ -613,7 +696,11 @@ var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
     aSplitter: TSplitter;
+    VisA, VisB: Boolean;
 begin
+    VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
+    VisB := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds);
+
     // RightClick
     ParentPanel := ((Sender as TImage).Parent.Parent) as TPanel;
     ParentBlock := LocalBuildOptions.GetBlockByPanel(ParentPanel);
@@ -647,200 +734,19 @@ begin
                 LocalBuildOptions.PanelBChilds.Add(ParentBlock);
 
             LocalBuildOptions.MakeOneSplitterAvailable(0);
-            {
-            if LocalBuildOptions.PanelASplitters.Count > 0 then
-            begin
-                aSplitter := LocalBuildOptions.PanelASplitters.ExtractAt(LocalBuildOptions.PanelASplitters.Count-1);
-                LocalBuildOptions.PanelBSplitters.Add(aSplitter);
-            end;
-            }
         end;
 
         LocalBuildOptions.RefreshBothRowsOrColumns(True);
+        LocalBuildOptions.ApplyRatios;
         FixAllButtons;
     end;
 
-
+    if (VisA <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds))
+        or  (VisB <> LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelBChilds))
+    then
+        LocalBuildOptions.SwapMainLayout;
 end;
 
 
-(*
-procedure TMainFormBuilder.BuildTestForm(aBuildOptions: TNempFormBuildOptions);
-var i, currentLeft, currentTop: Integer;
-
-begin
-
-            for i := 0 to aBuildOptions.PanelAChilds.Count - 1 do
-                aBuildOptions.PanelAChilds[i].Align := alNone;
-
-            for i := 0 to aBuildOptions.PanelBChilds.Count - 1 do
-                aBuildOptions.PanelBChilds[i].Align := alNone;
-
-            for i := 0 to aBuildOptions.PanelBSplitters.Count - 1 do
-            begin
-                aBuildOptions.PanelBSplitters[i].Align := alNone;
-                aBuildOptions.PanelBSplitters[i].Parent := Nil;
-            end;
-
-            for i := 0 to aBuildOptions.PanelASplitters.Count - 1 do
-            begin
-                aBuildOptions.PanelASplitters[i].Align := alNone;
-                aBuildOptions.PanelASplitters[i].Parent := Nil;
-            end;
-
-
-    case aBuildOptions.MainLayout of
-        Layout_TwoRows : begin
-            _TopMainPanel.Align := alTop;
-            _TopMainPanel.Height := __MainContainer.Height Div 2;
-            MainSplitter.Align := alTop;
-            MainSplitter.Top := _TopMainPanel.Height;
-
-            // turn child panels accordingly
-            // here: next to each other in one row
-                                            currentLeft := 0;
-                                            for i := 0 to aBuildOptions.PanelAChilds.Count - 2 do
-                                            begin
-                                                aBuildOptions.PanelAChilds[i].Parent := _TopMainPanel;
-                                                aBuildOptions.PanelAChilds[i].Left := currentleft;
-                                                aBuildOptions.PanelAChilds[i].Width := _TopMainPanel.Width Div aBuildOptions.PanelAChilds.Count;
-
-                                                currentLeft := currentLeft + aBuildOptions.PanelAChilds[i].Width;
-
-                                                aBuildOptions.PanelASplitters[i].Parent := _TopMainPanel;
-                                                aBuildOptions.PanelASplitters[i].Width := 4;
-                                                aBuildOptions.PanelASplitters[i].Left := currentLeft + 10;
-
-                                                aBuildOptions.PanelAChilds[i].Align := alLeft;
-                                                aBuildOptions.PanelASplitters[i].Align := alLeft;
-
-                                                currentLeft := currentLeft + aBuildOptions.PanelASplitters[i].Width;
-
-                                                FixRowLayoutButtons(0, i, 1, aBuildOptions.PanelAChilds.Count-1, aBuildOptions.PanelAChilds[i]);
-                                            end;
-                                            if aBuildOptions.PanelAChilds.Count > 0 then
-                                            begin
-                                                i := aBuildOptions.PanelAChilds.Count - 1;
-                                                aBuildOptions.PanelAChilds[i].Parent := _TopMainPanel;
-                                                aBuildOptions.PanelAChilds[i].Left := currentleft;
-                                                aBuildOptions.PanelAChilds[i].Align := alClient;
-
-                                                FixRowLayoutButtons(0, i, 1, aBuildOptions.PanelAChilds.Count-1, aBuildOptions.PanelAChilds[i]);
-                                            end;
-
-
-            // the same for the other panel PANEL B
-            currentLeft := 0;
-            for i := 0 to aBuildOptions.PanelBChilds.Count - 2 do
-            begin
-                aBuildOptions.PanelBChilds[i].Parent := _BottomMainPanel;
-
-                aBuildOptions.PanelBChilds[i].Left := currentleft;
-                aBuildOptions.PanelBChilds[i].Width := _BottomMainPanel.Width Div aBuildOptions.PanelBChilds.Count;
-
-                currentLeft := currentLeft + aBuildOptions.PanelBChilds[i].Width;
-
-                aBuildOptions.PanelBSplitters[i].Parent := _BottomMainPanel;
-                aBuildOptions.PanelBSplitters[i].Width := 4;
-                aBuildOptions.PanelBSplitters[i].Left := currentLeft + 10;
-
-
-                aBuildOptions.PanelBChilds[i].Align := alLeft;
-                aBuildOptions.PanelBSplitters[i].Align := alLeft;
-
-
-                currentLeft := currentLeft + aBuildOptions.PanelBSplitters[i].Width;
-
-                FixRowLayoutButtons(1, i, 1, aBuildOptions.PanelBChilds.Count-1, aBuildOptions.PanelBChilds[i]);
-            end;
-            if aBuildOptions.PanelBChilds.Count > 0 then
-            begin
-                i := aBuildOptions.PanelBChilds.Count - 1;
-
-                aBuildOptions.PanelBChilds[i].Parent := self._BottomMainPanel;
-                aBuildOptions.PanelBChilds[i].Align := alClient;
-                aBuildOptions.PanelBChilds[i].Left := currentleft;
-
-                FixRowLayoutButtons(1, i, 1, aBuildOptions.PanelBChilds.Count-1, aBuildOptions.PanelBChilds[i]);
-            end;
-        end;
-
-        Layout_TwoColumns: begin
-            _TopMainPanel.Align := alLeft;
-            _TopMainPanel.Width := __MainContainer.Width Div 2;
-            MainSplitter.Align := alLeft;
-            MainSplitter.Left := _TopMainPanel.Width;
-
-            // turn child panels accordingly
-            // here: all in one column, one above the other
-                                                      currentTop := 0;
-                                                      for i := 0 to aBuildOptions.PanelAChilds.Count - 2 do
-                                                      begin
-                                                          aBuildOptions.PanelAChilds[i].Parent := _TopMainPanel;
-
-                                                          FixRowLayoutButtons(i, 0, aBuildOptions.PanelAChilds.Count-1, 1, aBuildOptions.PanelAChilds[i]);
-
-                                                          aBuildOptions.PanelAChilds[i].Top := currentTop;
-                                                          aBuildOptions.PanelAChilds[i].Height := _TopMainPanel.Height Div aBuildOptions.PanelAChilds.Count;
-                                                          currentTop := currentTop + aBuildOptions.PanelAChilds[i].Height;
-
-                                                          aBuildOptions.PanelASplitters[i].Parent := _TopMainPanel;
-                                                          aBuildOptions.PanelASplitters[i].Height := 4;
-                                                          aBuildOptions.PanelASplitters[i].Top := currentTop + 10;
-
-                                                          aBuildOptions.PanelAChilds[i].Align := alTop;
-                                                          aBuildOptions.PanelASplitters[i].Align := alTop;
-
-                                                          currentTop := currentTop + aBuildOptions.PanelASplitters[i].Height;
-                                                      end;
-                                                      if aBuildOptions.PanelAChilds.Count > 0 then
-                                                      begin
-                                                          i := aBuildOptions.PanelAChilds.Count - 1;
-
-                                                          aBuildOptions.PanelAChilds[i].Parent := _TopMainPanel;
-                                                          aBuildOptions.PanelAChilds[i].Align := alClient;
-                                                          aBuildOptions.PanelAChilds[i].Top := currentTop;
-
-                                                          FixRowLayoutButtons(i, 0, aBuildOptions.PanelAChilds.Count-1, 1, aBuildOptions.PanelAChilds[i]);
-                                                      end;
-
-            // the same for the other panel
-            currentTop := 0;
-            for i := 0 to aBuildOptions.PanelBChilds.Count - 2 do
-            begin
-                aBuildOptions.PanelBChilds[i].Parent := _BottomMainPanel;
-
-                aBuildOptions.PanelBChilds[i].Top := currentTop;
-                aBuildOptions.PanelBChilds[i].Height := _BottomMainPanel.Height Div aBuildOptions.PanelBChilds.Count;
-
-                currentTop := currentTop + aBuildOptions.PanelBChilds[i].Height;
-
-                aBuildOptions.PanelBSplitters[i].Parent := _BottomMainPanel;
-                aBuildOptions.PanelBSplitters[i].Height := 4;
-                aBuildOptions.PanelBSplitters[i].Top := currentTop + 10;
-
-                aBuildOptions.PanelBChilds[i].Align := alTop;
-                aBuildOptions.PanelBSplitters[i].Align := alTop;
-
-                currentTop := currentTop + aBuildOptions.PanelBSplitters[i].Height;
-
-                FixRowLayoutButtons(i, 1, aBuildOptions.PanelBChilds.Count-1, 1, aBuildOptions.PanelBChilds[i]);
-            end;
-            if aBuildOptions.PanelBChilds.Count > 0 then
-            begin
-                i := aBuildOptions.PanelBChilds.Count - 1;
-                aBuildOptions.PanelBChilds[i].Parent := self._BottomMainPanel;
-                aBuildOptions.PanelBChilds[i].Align := alClient;
-                aBuildOptions.PanelBChilds[i].Top := currentTop;
-
-
-                FixRowLayoutButtons(i, 1, aBuildOptions.PanelBChilds.Count-1, 1, aBuildOptions.PanelBChilds[i]);
-            end;
-
-        end;
-    end;
-
-end;
-*)
 
 end.

@@ -2,11 +2,11 @@ object MedienlisteForm: TMedienlisteForm
   Left = 689
   Top = 113
   BorderStyle = bsNone
-  ClientHeight = 180
+  ClientHeight = 250
   ClientWidth = 574
   Color = clBtnFace
-  Constraints.MinHeight = 180
-  Constraints.MinWidth = 230
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -29,7 +29,7 @@ object MedienlisteForm: TMedienlisteForm
     Left = 0
     Top = 0
     Width = 574
-    Height = 180
+    Height = 250
     Align = alClient
     BevelOuter = bvNone
     DoubleBuffered = False
@@ -40,9 +40,10 @@ object MedienlisteForm: TMedienlisteForm
     OnMouseUp = ContainerPanelMedienBibFormMouseUp
     OnPaint = ContainerPanelMedienBibFormPaint
     OwnerDraw = False
+    ExplicitHeight = 180
     DesignSize = (
       574
-      180)
+      250)
     object CloseImageM: TSkinButton
       Left = 562
       Top = 0

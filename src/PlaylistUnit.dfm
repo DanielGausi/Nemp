@@ -3,10 +3,10 @@ object PlaylistForm: TPlaylistForm
   Top = 190
   BorderStyle = bsNone
   ClientHeight = 303
-  ClientWidth = 244
+  ClientWidth = 420
   Color = clBtnFace
-  Constraints.MinHeight = 150
-  Constraints.MinWidth = 230
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -28,7 +28,7 @@ object PlaylistForm: TPlaylistForm
     Tag = 1
     Left = 0
     Top = 0
-    Width = 244
+    Width = 420
     Height = 303
     Align = alClient
     BevelOuter = bvNone
@@ -38,11 +38,12 @@ object PlaylistForm: TPlaylistForm
     OnMouseUp = ContainerPanelPlaylistFormMouseUp
     OnPaint = ContainerPanelPlaylistFormPaint
     OwnerDraw = False
+    ExplicitWidth = 244
     DesignSize = (
-      244
+      420
       303)
     object CloseImageP: TSkinButton
-      Left = 232
+      Left = 408
       Top = 0
       Width = 12
       Height = 12
@@ -61,6 +62,7 @@ object PlaylistForm: TPlaylistForm
       FocusDrawMode = fdm_Windows
       Color1 = clBlack
       Color2 = clBlack
+      ExplicitLeft = 232
     end
   end
 end

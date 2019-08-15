@@ -678,6 +678,8 @@ begin
                 end;
             end;
 
+            if NempSkin.isActive then
+                NempSkin.SetArtistAlbumOffsets;
             ResetBrowsePanels;
 
         FSplash.Close;
@@ -698,6 +700,8 @@ begin
         end
 
         else }
+
+
 
         case Newmode of
             0: begin
@@ -732,7 +736,6 @@ begin
                 PanelCoverBrowse.Height := GRPBOXArtistsAlben.Height - 4;
                 PanelCoverBrowse.Anchors := [akleft, aktop, akright, akBottom];
 
-
                 // TabButtons-Glyphs neu setzen
                 TabBtn_Browse.GlyphLine := 0;
                 TabBtn_CoverFlow.GlyphLine := 1;
@@ -742,8 +745,7 @@ begin
                 TabBtn_CoverFlow.Refresh;
             end;
             2: begin
-                // Hier Code für Tagwolke einfügen
-                // Zeige CoverFlow
+
                 PanelStandardBrowse.Visible := False;
                 PanelTagCloudBrowse.Visible := MedienBib.Count > 0;
                 PanelCoverBrowse.Visible := False;
@@ -764,6 +766,7 @@ begin
 
             end;
         end;
+
         //MedienBib.NewCoverFlow.SetNewHandle(PanelCoverBrowse.Handle);
     end;
 end;
@@ -974,9 +977,9 @@ begin
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label
 
+
         if Medienbib.BrowseMode = 2 then
             MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
-
 
     end;
 end;
@@ -1427,11 +1430,11 @@ var EnableControls: Boolean;
 begin
     with Nemp_MainForm do
     begin
-        ab1.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width)) + SlideBarShape.Left;
-        ab2.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width)) + SlideBarShape.Left - ab2.Width;
+        ABRepeatStartImg.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width)) + SlideBarShape.Left;
+        ABRepeatEndImg.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width)) + SlideBarShape.Left - ab2.Width;
 
-        ab1.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
-        ab2.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
+        ABRepeatStartImg.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
+        ABRepeatEndImg.Visible := NempPlayer.ABRepeatActive and Nemp_MainForm.MainPlayerControlsActive;
         PM_ABRepeat.Checked := NempPlayer.ABRepeatActive;
     end;
 
@@ -1444,6 +1447,7 @@ begin
     begin
         // Hints anders setzen, wenn Headset-Anzeige? Buttons disabledn?
         //(* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
+        FormEffectsAndEqualizer.grpBoxABRepeat   .Enabled := EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatUnSet .Enabled := NempPlayer.ABRepeatActive and EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatSetA  .Enabled := EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatSetB  .Enabled := EnableControls;
@@ -1603,6 +1607,7 @@ begin
         begin
           Spectrum.DrawClear;
           //Spectrum.DrawText(NempPlayer.PlayingTitel,False);
+          PlaylistCueChanged(NempPlaylist);
           PlayerTimeLbl.Caption := '00:00'; //Spectrum.DrawTime('00:00');
           fspTaskbarPreviews1.InvalidatePreview;
         end;

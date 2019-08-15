@@ -36,7 +36,9 @@ unit PartyModeClass;
 interface
 
 uses Windows, Forms, Controls, StdCtrls, Classes, SysUtils, SkinButtons,
-    Nemp_ConstantsAndTypes, IniFiles, math, Details, Nemp_RessourceStrings;
+    Nemp_ConstantsAndTypes, IniFiles, math, Details, Nemp_RessourceStrings
+    ,SplitForm_Hilfsfunktionen
+    ;
 
 type
     TChangeProc = function(value: Integer): Integer of Object;
@@ -278,8 +280,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 114);
-    SetLength(fPartyControls, 114);
+    Setlength(fPositionArray, 44);  // 114
+    SetLength(fPartyControls, 44);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -296,117 +298,52 @@ begin
         SetOriginalPosition(SlideBackBTN        , i);
         SetOriginalPosition(RandomBtn           , i);
         SetOriginalPosition(RecordBtn           , i);
-        // 3 System-Buttons
-        // SetOriginalPosition(BtnMinimize         , i);
+        SetOriginalPosition(PlayPauseHeadSetBtn    , i);
+        SetOriginalPosition(StopHeadSetBtn         , i);
+        SetOriginalPosition(BtnHeadsetPlaynow      , i);
+        SetOriginalPosition(BtnHeadsetToPlaylist   , i);
         SetOriginalPosition(BtnClose            , i);
-        //SetOriginalPosition(BtnMenu            , i);
+
+        // ==============================
+        SetOriginalPosition(VolButton           , i);
+        SetOriginalPosition(VolumeImage         , i);
+
+        // controls in Slide-part
+        SetOriginalPosition(PlayerArtistLabel   , i);
+        SetOriginalPosition(PlayerTitleLabel    , i);
+        SetOriginalPosition(RatingImage         , i);
 
         // Other Controls
         //SetOriginalPosition(PlayerPanel         , i);
         //SetOriginalPosition(GRPBOXCover         , i);
 //        SetOriginalPosition(CoverImage          , i);
-        SetOriginalPosition(NewPlayerPanel      , i);
-        SetOriginalPosition(PaintFrame          , i);
-        //SetOriginalPosition(TextAnzeigeIMAGE    , i);
-        //SetOriginalPosition(TimePaintBox        , i);
-        SetOriginalPosition(SlideBarShape       , i);
-        SetOriginalPosition(VolShape            , i);
-        //SetOriginalPosition(SleepImage          , i);
-        //SetOriginalPosition(WebserverImage      , i);
-        //SetOriginalPosition(BirthdayImage       , i);
-        //SetOriginalPosition(ScrobblerImage      , i);
-        SetOriginalPosition(RatingImage         , i);
-        //SetOriginalPosition(LblPlayerTitle      , i);
-        //SetOriginalPosition(LblPlayerArtist     , i);
-        //SetOriginalPosition(LblPlayerAlbum      , i);
-        SetOriginalPosition(SlideBarButton      , i);
-        SetOriginalPosition(ab1                 , i);
-        SetOriginalPosition(ab2                 , i);
-        SetOriginalPosition(VolButton           , i);
-        //SetOriginalPosition(AudioPanel          , i);
-        SetOriginalPosition(TabBtn_Cover        , i);
-        SetOriginalPosition(TabBtn_Lyrics       , i);
-        SetOriginalPosition(TabBtn_Equalizer    , i);
-        SetOriginalPosition(TabBtn_MainPlayerControl      , i);
-        SetOriginalPosition(TabBtn_Headset      , i);
+        //SetOriginalPosition(NewPlayerPanel      , i);               // Problem with new GUI
+        //SetOriginalPosition(PaintFrame          , i);               // Problem with new GUI
+        //SetOriginalPosition(SlideBarShape       , i);               // Problem with new GUI
+        //SetOriginalPosition(SlideBarButton      , i);        // Problem with new GUI
+        SetOriginalPosition(ab1                 , i);        // Problem with new GUI
+        SetOriginalPosition(ab2                 , i);        // Problem with new GUI
 
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        SetOriginalPosition(GRPBOXEffekte       , i);
-        SetOriginalPosition(HallShape           , i);
-        SetOriginalPosition(HallLBL             , i);
-        SetOriginalPosition(EchoWetDryMixShape  , i);
-        SetOriginalPosition(EchoTimeShape       , i);
-        SetOriginalPosition(EchoTimeLBL         , i);
-        SetOriginalPosition(EchoMixLBL          , i);
-        SetOriginalPosition(EffekteLBL2         , i);
-        SetOriginalPosition(EffekteLBL1         , i);
-        SetOriginalPosition(SampleRateShape     , i);
-        SetOriginalPosition(SampleRateLBL       , i);
-        SetOriginalPosition(EffekteLBL3         , i);
-        SetOriginalPosition(DirectionPositionBTN, i);
-        SetOriginalPosition(BtnABRepeatSetA     , i);
-        SetOriginalPosition(BtnABRepeatSetB     , i);
-        SetOriginalPosition(BtnABRepeatUnset    , i);
-
-        SetOriginalPosition(Btn_EffectsOff      , i);
-        SetOriginalPosition(EchoWetDryMixButton , i);
-        SetOriginalPosition(HallButton          , i);
-        SetOriginalPosition(EchoTimeButton      , i);
-        SetOriginalPosition(SampleRateButton    , i);
-        SetOriginalPosition(GRPBOXEqualizer     , i);
-        SetOriginalPosition(EqualizerShape5     , i);
-        SetOriginalPosition(EqualizerShape2     , i);
-        SetOriginalPosition(EqualizerShape3     , i);
-        SetOriginalPosition(EqualizerShape4     , i);
-        SetOriginalPosition(EqualizerShape6     , i);
-        SetOriginalPosition(EqualizerShape7     , i);
-        SetOriginalPosition(EqualizerShape8     , i);
-        SetOriginalPosition(EqualizerShape9     , i);
-        SetOriginalPosition(EqualizerShape10    , i);
-        SetOriginalPosition(EQLBL1              , i);
-        SetOriginalPosition(EQLBL2              , i);
-        SetOriginalPosition(EQLBL3              , i);
-        SetOriginalPosition(EQLBL4              , i);
-        SetOriginalPosition(EQLBL5              , i);
-        SetOriginalPosition(EQLBL6              , i);
-        SetOriginalPosition(EQLBL7              , i);
-        SetOriginalPosition(EQLBL8              , i);
-        SetOriginalPosition(EQLBL9              , i);
-        SetOriginalPosition(EQLBL10             , i);
-        SetOriginalPosition(EqualizerShape1     , i);
-        SetOriginalPosition(EqualizerDefaultShape, i);
-        SetOriginalPosition(EqualizerButton1    , i);
-        SetOriginalPosition(EqualizerButton2    , i);
-        SetOriginalPosition(EqualizerButton3    , i);
-        SetOriginalPosition(EqualizerButton5    , i);
-        SetOriginalPosition(EqualizerButton4    , i);
-        SetOriginalPosition(EqualizerButton6    , i);
-        SetOriginalPosition(EqualizerButton7    , i);
-        SetOriginalPosition(EqualizerButton8    , i);
-        SetOriginalPosition(EqualizerButton9    , i);
-        SetOriginalPosition(EqualizerButton10   , i);
-        SetOriginalPosition(Btn_EqualizerPresets, i);
-        SetOriginalPosition(ButtonPrevEQ, i);
-        SetOriginalPosition(ButtonNextEQ, i);
-        *)
-        //SetOriginalPosition(GRPBOXLyrics        , i);
         SetOriginalPosition(LyricsMemo          , i);
 
-        //SetOriginalPosition(GRPBOXHeadset          , i);
-        SetOriginalPosition(BtnHeadsetToPlaylist   , i);
-        SetOriginalPosition(BtnHeadsetPlaynow      , i);
-        SetOriginalPosition(BtnLoadHeadset         , i);
-        //SetOriginalPosition(HeadsetCoverImage      , i);
-        //SetOriginalPosition(LblHeadsetArtist       , i);
-        SetOriginalPosition(PlayPauseHeadSetBtn    , i);
-        //SetOriginalPosition(SlideBackHeadsetBTN    , i);
-        //SetOriginalPosition(SlidebarButton_Headset , i);
-        //SetOriginalPosition(SlideBarShapeHeadset   , i);
-        //SetOriginalPosition(SlideForwardHeadsetBTN , i);
-        SetOriginalPosition(StopHeadSetBtn         , i);
+        // HeadsetControls
+        SetOriginalPosition(lblHeadphoneControl    , i);
+
+        SetOriginalPosition(BtnLoadHeadset         , i); // disabled right now
+
         SetOriginalPosition(VolButtonHeadset       , i);
         SetOriginalPosition(VolShapeHeadset        , i);
 
+        SetOriginalPosition(VolShape            , i);
+
+        SetOriginalPosition(VolumeImageHeadset  , i);
+
+        // "Tab"-Buttons
+        SetOriginalPosition(TabBtn_Cover        , i);
+        SetOriginalPosition(TabBtn_Lyrics       , i);
+        SetOriginalPosition(TabBtn_Equalizer    , i);
+        SetOriginalPosition(TabBtn_MainPlayerControl , i);
+        SetOriginalPosition(TabBtn_Headset      , i);
 
         SetOriginalPosition(TabBtn_Preselection , i);
         SetOriginalPosition(TabBtn_Browse       , i);
@@ -421,10 +358,12 @@ begin
         SetLength(fPartyControls, i);
 
 
+        //showmessage(inttostr(i));
+
         // Additional Controls
         i := 0;
-        Setlength(fAdditionalControls, 16);
-        SetLength(fAdditionalPositionsArray, 16);
+        Setlength(fAdditionalControls, 31);
+        SetLength(fAdditionalPositionsArray, 31);
 
         SetAdditionalOriginalPosition(AuswahlHeaderPanel, i);
         SetAdditionalOriginalPosition(AuswahlFillPanel, i);
@@ -440,11 +379,35 @@ begin
         SetAdditionalOriginalPosition(MedienlisteFillPanel, i);
         SetAdditionalOriginalPosition(MedienListeStatusLBL, i);
         SetAdditionalOriginalPosition(GRPBOXVST           , i);
-        SetAdditionalOriginalPosition(EDITFastSearch               , i);
-        //SetAdditionalOriginalPosition(CB_MedienBibGlobalQuickSearch, i);
-        SetAdditionalOriginalPosition(Lbl_CoverFlow, i);
 
-        SetAdditionalOriginalPosition(EditPlaylistSearch           , i);
+        SetAdditionalOriginalPosition(EDITFastSearch     , i);
+        SetAdditionalOriginalPosition(Lbl_CoverFlow      , i);
+        SetAdditionalOriginalPosition(EditPlaylistSearch , i);
+
+        SetAdditionalOriginalPosition(MedienBibDetailHeaderPanel, i);
+        SetAdditionalOriginalPosition(MedienBibDetailFillPanel, i);
+        SetAdditionalOriginalPosition(MedienBibDetailStatusLbl, i);
+        SetAdditionalOriginalPosition(ContainerPanelMedienBibDetails, i);
+
+
+        SetAdditionalOriginalPosition(_ControlPanel              , i);
+
+        SetAdditionalOriginalPosition(ControlContainer1          , i);
+        SetAdditionalOriginalPosition(  OutputControlPanel       , i);
+        SetAdditionalOriginalPosition(  PlayerControlCoverPanel  , i);
+        SetAdditionalOriginalPosition(  PlayerControlPanel       , i);
+        SetAdditionalOriginalPosition(  HeadsetControlPanel      , i);
+
+        SetAdditionalOriginalPosition(ControlContainer2          , i);
+        SetAdditionalOriginalPosition(  NewPlayerPanel           , i);
+
+
+        SetAdditionalOriginalPosition(SlideBarShape   , i);
+        SetAdditionalOriginalPosition(SlideBarButton  , i);
+        // SetAdditionalOriginalPosition(ab1             , i);
+        // SetAdditionalOriginalPosition(ab2             , i);
+        SetAdditionalOriginalPosition(PlayerTimeLbl   , i);
+        SetAdditionalOriginalPosition(PaintFrame      , i);
 
 
         //SetAdditionalOriginalPosition(, i);
@@ -455,7 +418,7 @@ end;
 
 procedure TNempPartyMode.CorrectMainForm;
 var ChangeProc: TChangeProc;
-    i: Integer;
+    i, currentLeft, SlideBarDiff: Integer;
     c: tControl;
 begin
     if fActive then
@@ -533,9 +496,7 @@ begin
         EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[15].Top);
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[15].FontSize);
 
-
         MedienBibHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[8].Height);
-
         MedienlisteFillPanel.Left := ChangeProc(fAdditionalPositionsArray[9].Left);
         MedienlisteFillPanel.Height := ChangeProc(fAdditionalPositionsArray[9].Height);
         MedienlisteFillPanel.Top := ChangeProc(fAdditionalPositionsArray[9].Top);
@@ -563,6 +524,111 @@ begin
         EditPlaylistSearch.Left := ChangeProc(fAdditionalPositionsArray[14].Left);
         EditPlaylistSearch.Top := ChangeProc(fAdditionalPositionsArray[14].Top);
         EditPlaylistSearch.Font.Size := ChangeProc(fAdditionalPositionsArray[14].FontSize);
+
+        MedienBibDetailHeaderPanel.Height := ChangeProc(fAdditionalPositionsArray[15].Height);
+
+        MedienBibDetailFillPanel.Left   := ChangeProc(fAdditionalPositionsArray[16].Left);
+        MedienBibDetailFillPanel.Height := ChangeProc(fAdditionalPositionsArray[16].Height);
+        MedienBibDetailFillPanel.Top    := ChangeProc(fAdditionalPositionsArray[16].Top);
+
+        MedienBibDetailStatusLbl.Top       := ChangeProc(fAdditionalPositionsArray[17].Top);
+        MedienBibDetailStatusLbl.Height    := ChangeProc(fAdditionalPositionsArray[17].Height);
+        MedienBibDetailStatusLbl.Font.Size := ChangeProc(fAdditionalPositionsArray[17].FontSize);
+
+        ContainerPanelMedienBibDetails.Top := ChangeProc(fAdditionalPositionsArray[18].Top);
+
+        // PlayerControls (more difficult now)
+
+        _ControlPanel           .Height := ChangeProc(fAdditionalPositionsArray[19].Height);
+        ControlContainer1       .Height := ChangeProc(fAdditionalPositionsArray[20].Height);
+        ControlContainer2       .Height := ChangeProc(fAdditionalPositionsArray[25].Height);
+        OutputControlPanel      .Height := ChangeProc(fAdditionalPositionsArray[21].Height);
+        PlayerControlCoverPanel .Height := ChangeProc(fAdditionalPositionsArray[22].Height);
+        PlayerControlPanel      .Height := ChangeProc(fAdditionalPositionsArray[23].Height);
+        HeadsetControlPanel     .Height := ChangeProc(fAdditionalPositionsArray[24].Height);
+        NewPlayerPanel          .Height := ChangeProc(fAdditionalPositionsArray[26].Height);
+
+        //ControlContainer1.Width := ChangeProc(fAdditionalPositionsArray[20].Width);
+        OutputControlPanel      .Width  := ChangeProc(fAdditionalPositionsArray[21].Width);
+        PlayerControlPanel      .Width  := ChangeProc(fAdditionalPositionsArray[23].Width);
+        HeadsetControlPanel     .Width  := ChangeProc(fAdditionalPositionsArray[24].Width);
+
+        if PlayerControlCoverPanel.Visible then
+            currentLeft := OutputControlPanel.Left + OutputControlPanel.Width + PlayerControlCoverPanel.Width
+        else
+            currentLeft := OutputControlPanel.Left + OutputControlPanel.Width;
+        PlayerControlPanel .Left := currentLeft;
+        HeadsetControlPanel.Left := currentLeft;
+        currentLeft := currentLeft + PlayerControlPanel.Width;
+        ControlContainer1.Width := currentLeft;
+        ControlContainer2.Left := ControlContainer1.Width;
+
+        // some Controls in the Player-Slide-Panel
+        currentLeft := SlideBarShape.Left;
+        SlideBarShape.Left := ChangeProc(fAdditionalPositionsArray[27].Left);
+        // shorten the slidebar a little bit
+        SlideBarDiff := (SlideBarShape.Left - currentLeft);
+
+        // Set it later, after TimLbl is also set
+        // SlideBarShape.Width := SlideBarShape.Width - (SlideBarShape.Left - currentLeft);
+
+        SlideBarButton.Width := ChangeProc(fAdditionalPositionsArray[28].Width);
+
+        // top
+        SlideBarShape  .Top := ChangeProc(fAdditionalPositionsArray[27].Top);
+        SlideBarButton .Top := ChangeProc(fAdditionalPositionsArray[28].Top);
+        //ab1            .Top := ChangeProc(fAdditionalPositionsArray[29].Top);
+        //ab2            .Top := ChangeProc(fAdditionalPositionsArray[30].Top);
+        PlayerTimeLbl  .Top := ChangeProc(fAdditionalPositionsArray[29].Top);
+        PaintFrame     .Top := ChangeProc(fAdditionalPositionsArray[30].Top);
+        // Height
+        SlideBarShape  .Height := ChangeProc(fAdditionalPositionsArray[27].Height);
+        SlideBarButton .Height := ChangeProc(fAdditionalPositionsArray[28].Height);
+        //ab1            .Height := ChangeProc(fAdditionalPositionsArray[29].Height);
+        //ab2            .Height := ChangeProc(fAdditionalPositionsArray[30].Height);
+        PlayerTimeLbl  .Height := ChangeProc(fAdditionalPositionsArray[29].Height);
+        PaintFrame     .Height := ChangeProc(fAdditionalPositionsArray[30].Height);
+
+        currentLeft := PaintFrame.Width;
+        PaintFrame.Width := ChangeProc(fAdditionalPositionsArray[30].Width);
+        PaintFrame.Left := PaintFrame.Left - (PaintFrame.Width - currentLeft);
+
+        currentLeft := PlayerTimeLbl.Width;
+        PlayerTimeLbl.Width := ChangeProc(fAdditionalPositionsArray[29].Width);
+        PlayerTimeLbl.Font.Size  := ChangeProc(fAdditionalPositionsArray[29].FontSize);
+        PlayerTimeLbl.Left := PlayerTimeLbl.Left - (PlayerTimeLbl.Width - currentLeft);
+
+        SlideBarDiff := SlideBarDiff + (PlayerTimeLbl.Width - currentLeft);
+        SlideBarShape.Width := SlideBarShape.Width - SlideBarDiff;
+
+        // PlayerTimeLbl.Width := ChangeProc(fAdditionalPositionsArray[31].Width);
+
+        // todo:
+        // set ab-Positions, set SlidBtn.left
+
+        {
+        SlideBarShape    27
+        SlideBarButton   28
+        ab1              29
+        ab2              30
+        PlayerTimeLbl    31
+        }
+
+
+        //NewPlayerPanel.Left := currentLeft;
+
+         {
+        _ControlPanel             19
+        ControlContainer1         20
+          OutputControlPanel      21
+          PlayerControlCoverPanel 22
+          PlayerControlPanel      23
+          HeadsetControlPanel     24
+        ControlContainer2         25
+          NewPlayerPanel          26
+         }
+
+        // =================================
 
         PlaylistVST.Font.Size := ChangeProc(NempOptions.DefaultFontSize);
         ArtistsVST.Font.Size  := ChangeProc(NempOptions.ArtistAlbenFontSize);
@@ -600,6 +666,8 @@ begin
 
         CorrectVolButton;
 
+        CorrectVCLForABRepeat;
+
 
         // correct Splitter
         Splitter2.Left := AuswahlPanel.Width;
@@ -614,12 +682,14 @@ begin
             // Star-Graphics must be reloaded!
             Nemp_MainForm.NempSkin.DeActivateSkin;
 
+
         if fActive then
             Spectrum.SetScale(fResizeFactor)
         else
             Spectrum.SetScale(1);
 
-        // xxxxxx   Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
+
+        ///Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
 
@@ -635,8 +705,8 @@ begin
         OptionsCompleteForm.Close;
 
 
-    Nemp_MainForm._TopMainPanel.Constraints.MinHeight := ChangeProc(MAIN_PANEL_MIN_HEIGHT);
-    Nemp_MainForm._TopMainPanel.Constraints.MinWidth := ChangeProc(MAIN_PANEL_MIN_WIDTH);
+    //Nemp_MainForm._TopMainPanel.Constraints.MinHeight := ChangeProc(NempFormBuildOptions.MainPanelMinHeight);
+    //Nemp_MainForm._TopMainPanel.Constraints.MinWidth := ChangeProc(MAIN_PANEL_MIN_WIDTH);
 
     Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
     Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
@@ -647,13 +717,10 @@ begin
 
     if Not fActive then
     begin
-        Nemp_MainForm._TopMainPanel.Height := fLastTopHeight;
+        // Nemp_MainForm._TopMainPanel.Height := fLastTopHeight;
         Nemp_MainForm.Height := fLastHeight ;
         Nemp_MainForm.Width  := fLastWidth  ;
-        if Nemp_MainForm.Left < 0 then
-            Nemp_MainForm.Left := 0;
-        if Nemp_MainForm.Top < 0 then
-            Nemp_MainForm.Top := 0;
+        FormPosAndSizeCorrect(Nemp_MainForm);
     end;
 
     CorrectMenuStff;
@@ -703,6 +770,7 @@ begin
         PM_P_View                             .visible := ShowGeneralMenuItems;
         PM_P_KeyboardDisplay                  .visible := ShowGeneralMenuItems;
         PM_P_Directories                      .visible := ShowGeneralMenuItems;
+        PM_P_FormBuilder                      .visible := ShowGeneralMenuItems;
         // Player - Tools
         PM_P_ShutDown   .visible := ShowToolItems;
         PM_P_Birthday   .visible := ShowToolItems;
@@ -737,6 +805,7 @@ begin
         MM_O_Preferences               .visible := ShowGeneralMenuItems;
         MM_O_Wizard                    .visible := ShowGeneralMenuItems;
         MM_O_View                      .visible := ShowGeneralMenuItems;
+        MM_O_FormBuilder               .visible := ShowGeneralMenuItems;
         // Tools
         MM_T_KeyboardDisplay           .visible := ShowGeneralMenuItems;
         MM_T_Directories               .visible := ShowGeneralMenuItems;

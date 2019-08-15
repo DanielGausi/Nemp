@@ -2,8 +2,8 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 755
-  ClientWidth = 1091
+  ClientHeight = 758
+  ClientWidth = 1090
   Color = clBtnFace
   Constraints.MinHeight = 600
   Constraints.MinWidth = 800
@@ -35,8 +35,8 @@ object Nemp_MainForm: TNemp_MainForm
     Tag = 2
     Left = 0
     Top = 0
-    Width = 1091
-    Height = 755
+    Width = 1090
+    Height = 758
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -44,8 +44,8 @@ object Nemp_MainForm: TNemp_MainForm
     OwnerDraw = False
     object Splitter1: TSplitter
       Left = 0
-      Top = 344
-      Width = 1091
+      Top = 240
+      Width = 1090
       Height = 4
       Cursor = crVSplit
       Align = alTop
@@ -55,25 +55,24 @@ object Nemp_MainForm: TNemp_MainForm
       ResizeStyle = rsUpdate
       OnCanResize = Splitter5CanResize
       OnMoved = Splitter1Moved
-      ExplicitTop = 240
       ExplicitWidth = 1047
     end
     object _TopMainPanel: TPanel
       Tag = 200
       Left = 0
       Top = 0
-      Width = 1091
-      Height = 344
+      Width = 1090
+      Height = 240
       Align = alTop
       BevelOuter = bvNone
       Constraints.MinHeight = 240
       TabOrder = 0
       OnResize = _TopMainPanelResize
       object Splitter2: TSplitter
-        Left = 300
+        Left = 540
         Top = 0
         Width = 4
-        Height = 344
+        Height = 240
         MinSize = 100
         ResizeStyle = rsUpdate
         OnCanResize = Splitter5CanResize
@@ -85,8 +84,8 @@ object Nemp_MainForm: TNemp_MainForm
         Tag = 2
         Left = 0
         Top = 0
-        Width = 300
-        Height = 344
+        Width = 540
+        Height = 240
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -96,18 +95,18 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 2
           Left = 0
           Top = 28
-          Width = 300
-          Height = 316
+          Width = 540
+          Height = 212
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
           TabOrder = 0
           OnResize = GRPBOXArtistsAlbenResize
-          OnPaint = NewPanelPaint
+          OnPaint = GRPBOXArtistsAlbenPaint
           OwnerDraw = False
           DesignSize = (
-            300
-            316)
+            540
+            212)
           object LblEmptyLibraryHint: TLabel
             Left = 60
             Top = 4
@@ -122,12 +121,13 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             ParentFont = False
             WordWrap = True
+            StyleElements = [seClient, seBorder]
           end
           object PanelCoverBrowse: TNempPanel
             Tag = 2
-            Left = 0
-            Top = 17
-            Width = 300
+            Left = 2
+            Top = -9
+            Width = 167
             Height = 175
             Anchors = []
             BevelOuter = bvNone
@@ -144,12 +144,12 @@ object Nemp_MainForm: TNemp_MainForm
             OnMouseWheelUp = PanelCoverBrowseMouseWheelUp
             OnMouseWheelDown = PanelCoverBrowseMouseWheelDown
             DesignSize = (
-              300
+              167
               175)
             object IMGMedienBibCover: TImage
               Left = 1
               Top = 6
-              Width = 297
+              Width = 164
               Height = 24
               Anchors = [akLeft, akTop, akRight, akBottom]
               Center = True
@@ -158,20 +158,22 @@ object Nemp_MainForm: TNemp_MainForm
               OnMouseDown = IMGMedienBibCoverMouseDown
               OnMouseMove = IMGMedienBibCoverMouseMove
               OnMouseUp = IMGMedienBibCoverMouseUp
+              ExplicitWidth = 297
             end
             object ImgScrollCover: TImage
               Left = 1
               Top = 36
-              Width = 297
+              Width = 164
               Height = 75
               Anchors = [akLeft, akRight, akBottom]
               Transparent = True
               OnMouseDown = ImgScrollCoverMouseDown
+              ExplicitWidth = 297
             end
             object CoverScrollbar: TScrollBar
               Left = 6
               Top = 156
-              Width = 292
+              Width = 159
               Height = 17
               Anchors = [akLeft, akRight, akBottom]
               LargeChange = 3
@@ -186,7 +188,7 @@ object Nemp_MainForm: TNemp_MainForm
               Tag = 2
               Left = 30
               Top = 117
-              Width = 233
+              Width = 100
               Height = 33
               Anchors = [akLeft, akRight, akBottom]
               BevelOuter = bvNone
@@ -203,12 +205,12 @@ object Nemp_MainForm: TNemp_MainForm
               OnPaint = Pnl_CoverFlowLabelPaint
               OwnerDraw = False
               DesignSize = (
-                233
+                100
                 33)
               object Lbl_CoverFlow: TLabel
                 Left = 0
                 Top = 8
-                Width = 233
+                Width = 100
                 Height = 13
                 Alignment = taCenter
                 Anchors = [akLeft, akTop, akRight]
@@ -217,16 +219,16 @@ object Nemp_MainForm: TNemp_MainForm
                 Transparent = True
                 StyleElements = [seClient, seBorder]
                 OnMouseDown = Lbl_CoverFlowMouseDown
-                ExplicitWidth = 289
+                ExplicitWidth = 233
               end
             end
           end
           object PanelStandardBrowse: TPanel
             Tag = 2
-            Left = 4
-            Top = -7
-            Width = 290
-            Height = 59
+            Left = 318
+            Top = -10
+            Width = 216
+            Height = 140
             Anchors = []
             BevelOuter = bvNone
             PopupMenu = Medialist_Browse_PopupMenu
@@ -235,20 +237,20 @@ object Nemp_MainForm: TNemp_MainForm
               Left = 73
               Top = 0
               Width = 4
-              Height = 59
+              Height = 140
               OnMoved = Splitter3Moved
+              ExplicitHeight = 59
             end
             object ArtistsVST: TVirtualStringTree
               Tag = 1
               Left = 0
               Top = 0
               Width = 73
-              Height = 59
+              Height = 140
               Align = alLeft
               BevelInner = bvNone
               BevelOuter = bvNone
               BorderStyle = bsNone
-              BorderWidth = 1
               Constraints.MinWidth = 20
               DefaultNodeHeight = 14
               DragMode = dmAutomatic
@@ -284,24 +286,24 @@ object Nemp_MainForm: TNemp_MainForm
               OnKeyDown = StringVSTKeyDown
               OnResize = ArtistsVSTResize
               OnStartDrag = ArtistsVSTStartDrag
+              ExplicitLeft = -2
               Columns = <
                 item
                   MinWidth = 0
                   Position = 0
-                  Width = 71
+                  Width = 73
                 end>
             end
             object AlbenVST: TVirtualStringTree
               Tag = 2
               Left = 77
               Top = 0
-              Width = 213
-              Height = 59
+              Width = 139
+              Height = 140
               Align = alClient
               BevelInner = bvNone
               BevelOuter = bvNone
               BorderStyle = bsNone
-              BorderWidth = 1
               Constraints.MinWidth = 20
               DefaultNodeHeight = 14
               DragMode = dmAutomatic
@@ -312,6 +314,7 @@ object Nemp_MainForm: TNemp_MainForm
               Font.Style = []
               Header.AutoSizeIndex = 0
               Header.Background = clWindow
+              Header.Height = 21
               Header.Options = [hoAutoResize, hoDrag, hoVisible]
               IncrementalSearch = isAll
               Indent = 14
@@ -341,16 +344,16 @@ object Nemp_MainForm: TNemp_MainForm
                 item
                   MinWidth = 0
                   Position = 0
-                  Width = 211
+                  Width = 139
                 end>
             end
           end
           object PanelTagCloudBrowse: TNempPanel
             Tag = 2
-            Left = 6
-            Top = 286
-            Width = 275
-            Height = 114
+            Left = 175
+            Top = 20
+            Width = 119
+            Height = 160
             BevelOuter = bvNone
             TabOrder = 2
             Visible = False
@@ -364,7 +367,7 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 2
           Left = 0
           Top = 0
-          Width = 300
+          Width = 540
           Height = 28
           Align = alTop
           BevelOuter = bvNone
@@ -373,7 +376,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnPaint = PanelPaint
           OwnerDraw = False
           DesignSize = (
-            300
+            540
             28)
           object TabBtn_Preselection: TSkinButton
             Tag = 1
@@ -442,7 +445,7 @@ object Nemp_MainForm: TNemp_MainForm
             Tag = 2
             Left = 114
             Top = 2
-            Width = 186
+            Width = 426
             Height = 24
             Anchors = [akLeft, akTop, akRight]
             BevelInner = bvRaised
@@ -452,12 +455,12 @@ object Nemp_MainForm: TNemp_MainForm
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              186
+              426
               24)
             object AuswahlStatusLBL: TLabel
               Left = 10
               Top = 5
-              Width = 170
+              Width = 410
               Height = 13
               Anchors = [akLeft, akTop, akRight, akBottom]
               AutoSize = False
@@ -470,6 +473,7 @@ object Nemp_MainForm: TNemp_MainForm
               ShowAccelChar = False
               Transparent = True
               StyleElements = [seClient, seBorder]
+              ExplicitWidth = 170
             end
           end
           object TabBtn_TagCloud: TSkinButton
@@ -497,10 +501,10 @@ object Nemp_MainForm: TNemp_MainForm
       end
       object PlaylistPanel: TNempPanel
         Tag = 1
-        Left = 304
+        Left = 544
         Top = 0
-        Width = 787
-        Height = 344
+        Width = 546
+        Height = 240
         Align = alClient
         BevelOuter = bvNone
         PopupMenu = PlayListPOPUP
@@ -511,8 +515,8 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 1
           Left = 0
           Top = 28
-          Width = 787
-          Height = 316
+          Width = 546
+          Height = 212
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -522,14 +526,13 @@ object Nemp_MainForm: TNemp_MainForm
           object PlaylistVST: TVirtualStringTree
             Left = 2
             Top = 2
-            Width = 783
-            Height = 312
+            Width = 542
+            Height = 208
             Align = alClient
             BevelEdges = []
             BevelInner = bvSpace
             BevelOuter = bvSpace
             BorderStyle = bsNone
-            BorderWidth = 1
             Ctl3D = True
             DefaultPasteMode = amInsertAfter
             DragImageKind = diMainColumnOnly
@@ -545,7 +548,7 @@ object Nemp_MainForm: TNemp_MainForm
             Header.Options = [hoDrag, hoVisible]
             HintMode = hmHint
             Images = PlayListImageList
-            Indent = 12
+            Indent = 20
             Margin = 0
             ParentCtl3D = False
             ParentFont = False
@@ -604,7 +607,7 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 1
           Left = 0
           Top = 0
-          Width = 787
+          Width = 546
           Height = 28
           Align = alTop
           BevelOuter = bvNone
@@ -612,13 +615,13 @@ object Nemp_MainForm: TNemp_MainForm
           OnPaint = PanelPaint
           OwnerDraw = False
           DesignSize = (
-            787
+            546
             28)
           object PlaylistFillPanel: TNempPanel
             Tag = 1
             Left = 103
             Top = 2
-            Width = 684
+            Width = 443
             Height = 24
             Anchors = [akLeft, akTop, akRight]
             BevelInner = bvRaised
@@ -628,19 +631,18 @@ object Nemp_MainForm: TNemp_MainForm
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              684
+              443
               24)
             object PlayListStatusLBL: TLabel
-              Left = 8
+              Left = 10
               Top = 5
-              Width = 667
+              Width = 426
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               ShowAccelChar = False
               Transparent = True
               StyleElements = [seClient, seBorder]
-              ExplicitWidth = 302
             end
           end
           object TabBtn_Playlist: TSkinButton
@@ -688,19 +690,19 @@ object Nemp_MainForm: TNemp_MainForm
     object _VSTPanel: TNempPanel
       Tag = 3
       Left = 0
-      Top = 348
-      Width = 1091
-      Height = 307
+      Top = 244
+      Width = 1090
+      Height = 414
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
       OnResize = _TopMainPanelResize
       OwnerDraw = False
       object Splitter4: TSplitter
-        Left = 608
+        Left = 607
         Top = 0
         Width = 4
-        Height = 307
+        Height = 414
         Align = alRight
         MinSize = 50
         ResizeStyle = rsUpdate
@@ -712,8 +714,8 @@ object Nemp_MainForm: TNemp_MainForm
       object MedialistPanel: TNempPanel
         Left = 0
         Top = 0
-        Width = 608
-        Height = 307
+        Width = 607
+        Height = 414
         Align = alClient
         BevelOuter = bvNone
         PopupMenu = Medialist_View_PopupMenu
@@ -724,7 +726,7 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 3
           Left = 0
           Top = 0
-          Width = 608
+          Width = 607
           Height = 28
           Align = alTop
           BevelOuter = bvNone
@@ -734,7 +736,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnPaint = PanelPaint
           OwnerDraw = False
           DesignSize = (
-            608
+            607
             28)
           object EDITFastSearch: TEdit
             Left = 58
@@ -758,7 +760,7 @@ object Nemp_MainForm: TNemp_MainForm
             Tag = 3
             Left = 262
             Top = 2
-            Width = 340
+            Width = 339
             Height = 23
             Anchors = [akLeft, akTop, akRight]
             BevelInner = bvRaised
@@ -768,18 +770,19 @@ object Nemp_MainForm: TNemp_MainForm
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              340
+              339
               23)
             object MedienListeStatusLBL: TLabel
               Left = 14
               Top = 5
-              Width = 326
+              Width = 325
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               ShowAccelChar = False
               Transparent = True
               StyleElements = [seClient, seBorder]
+              ExplicitWidth = 326
             end
           end
           object TabBtn_Medialib: TSkinButton
@@ -828,8 +831,8 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 3
           Left = 0
           Top = 28
-          Width = 608
-          Height = 279
+          Width = 607
+          Height = 386
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -841,13 +844,12 @@ object Nemp_MainForm: TNemp_MainForm
           object VST: TVirtualStringTree
             Left = 2
             Top = 2
-            Width = 604
-            Height = 275
+            Width = 603
+            Height = 382
             Align = alClient
             BevelInner = bvNone
             BevelOuter = bvNone
             BorderStyle = bsNone
-            BorderWidth = 1
             Colors.SelectionTextColor = clWindowText
             Constraints.MinHeight = 26
             DragImageKind = diMainColumnOnly
@@ -982,10 +984,10 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MedienBibDetailPanel: TNempPanel
-        Left = 612
+        Left = 611
         Top = 0
         Width = 479
-        Height = 307
+        Height = 414
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 1
@@ -995,7 +997,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 28
           Width = 479
-          Height = 279
+          Height = 386
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -1004,19 +1006,20 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 248
             Top = 0
             Width = 4
-            Height = 279
+            Height = 386
             ResizeStyle = rsUpdate
             OnCanResize = Splitter5CanResize
             OnMoved = Splitter5Moved
             ExplicitLeft = 250
             ExplicitTop = 4
+            ExplicitHeight = 279
           end
           object DetailCoverLyricsPanel: TNempPanel
             Tag = 3
             Left = 0
             Top = 0
             Width = 248
-            Height = 279
+            Height = 386
             Align = alLeft
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1027,12 +1030,12 @@ object Nemp_MainForm: TNemp_MainForm
             OwnerDraw = False
             DesignSize = (
               248
-              279)
+              386)
             object ImgDetailCover: TImage
               Left = 8
               Top = 8
               Width = 234
-              Height = 261
+              Height = 368
               Anchors = [akLeft, akTop, akRight, akBottom]
               Proportional = True
               Stretch = True
@@ -1043,9 +1046,9 @@ object Nemp_MainForm: TNemp_MainForm
             end
             object LyricsMemo: TMemo
               Left = 8
-              Top = 8
+              Top = 6
               Width = 234
-              Height = 261
+              Height = 368
               Anchors = [akLeft, akTop, akRight, akBottom]
               BevelInner = bvNone
               BevelOuter = bvNone
@@ -1063,7 +1066,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 252
             Top = 0
             Width = 227
-            Height = 279
+            Height = 386
             Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1074,7 +1077,7 @@ object Nemp_MainForm: TNemp_MainForm
             OwnerDraw = False
             DesignSize = (
               227
-              279)
+              386)
             object ImgBibRating: TImage
               Left = 8
               Top = 129
@@ -1229,9 +1232,9 @@ object Nemp_MainForm: TNemp_MainForm
             object MedienBibDetailStatusLbl: TLabel
               Left = 14
               Top = 4
-              Width = 63
+              Width = 73
               Height = 13
-              Caption = 'File overview'
+              Caption = 'File information'
               StyleElements = [seClient, seBorder]
             end
           end
@@ -1284,27 +1287,29 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 655
-      Width = 1091
+      Top = 658
+      Width = 1090
       Height = 100
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 2
+      OnMouseMove = _ControlPanelMouseMove
+      OnResize = _ControlPanelResize
       OwnerDraw = False
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
-        Width = 610
+        Width = 609
         Height = 100
         Align = alClient
         BevelOuter = bvNone
-        TabOrder = 0
+        TabOrder = 1
         OwnerDraw = False
         object NewPlayerPanel: TNempPanel
           Tag = 4
           Left = 0
           Top = 0
-          Width = 470
+          Width = 609
           Height = 100
           Align = alClient
           BevelInner = bvRaised
@@ -1315,15 +1320,16 @@ object Nemp_MainForm: TNemp_MainForm
           OnMouseDown = PaintFrameMouseDown
           OnMouseMove = PaintFrameMouseMove
           OnMouseUp = PaintFrameMouseUp
+          OnResize = NewPlayerPanelResize
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           DesignSize = (
-            470
+            609
             100)
           object SlideBarShape: TProgressShape
             Left = 96
             Top = 78
-            Width = 317
+            Width = 456
             Height = 6
             Anchors = [akLeft, akTop, akRight]
             Brush.Color = clGradientActiveCaption
@@ -1364,32 +1370,8 @@ object Nemp_MainForm: TNemp_MainForm
             OnEndDrag = ab1EndDrag
             OnStartDrag = ab1StartDrag
           end
-          object PlayerArtistLabel: TLabel
-            Left = 11
-            Top = 6
-            Width = 307
-            Height = 13
-            Caption = 'Die Toten Hosen und das wunderbare Orchester von D'#252'sseldorf'
-            ShowAccelChar = False
-            StyleElements = [seClient, seBorder]
-          end
-          object PlayerTitleLabel: TLabel
-            Left = 11
-            Top = 26
-            Width = 313
-            Height = 13
-            Caption = 'Das Altbierlied und noch ein paar Tolle andere Titelinfos'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Tahoma'
-            Font.Style = [fsBold]
-            ParentFont = False
-            ShowAccelChar = False
-            StyleElements = [seClient, seBorder]
-          end
           object PlayerTimeLbl: TLabel
-            Left = 427
+            Left = 566
             Top = 74
             Width = 34
             Height = 13
@@ -1417,6 +1399,44 @@ object Nemp_MainForm: TNemp_MainForm
             OnEndDrag = ab1EndDrag
             OnStartDrag = ab1StartDrag
           end
+          object PaintFrame: TImage
+            Left = 525
+            Top = 34
+            Width = 75
+            Height = 25
+            Anchors = [akRight]
+            OnClick = NewPlayerPanelClick
+            OnDblClick = PaintFrameDblClick
+            OnDragOver = GRPBOXControlDragOver
+            OnMouseDown = PaintFrameMouseDown
+            OnMouseMove = PaintFrameMouseMove
+            OnMouseUp = PaintFrameMouseUp
+            ExplicitLeft = 386
+          end
+          object PlayerTitleLabel: TLabel
+            Left = 11
+            Top = 26
+            Width = 313
+            Height = 13
+            Caption = 'Das Altbierlied und noch ein paar Tolle andere Titelinfos'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
+          object PlayerArtistLabel: TLabel
+            Left = 11
+            Top = 6
+            Width = 307
+            Height = 13
+            Caption = 'Die Toten Hosen und das wunderbare Orchester von D'#252'sseldorf'
+            ShowAccelChar = False
+            StyleElements = [seClient, seBorder]
+          end
           object SlideBarButton: TSkinButton
             Left = 303
             Top = 76
@@ -1424,7 +1444,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 10
             DragCursor = crSizeWE
             DragMode = dmAutomatic
-            TabOrder = 0
+            TabOrder = 3
             OnDragOver = GRPBOXControlDragOver
             OnEndDrag = SlideBarButtonEndDrag
             OnKeyDown = SlideBarButtonKeyDown
@@ -1448,7 +1468,7 @@ object Nemp_MainForm: TNemp_MainForm
             Hint = 'Slide forward'
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 1
+            TabOrder = 2
             OnClick = SlideForwardBTNIMGClick
             OnDragOver = GRPBOXControlDragOver
             DrawMode = dm_Windows
@@ -1469,7 +1489,7 @@ object Nemp_MainForm: TNemp_MainForm
             Hint = 'Slide backward'
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 2
+            TabOrder = 1
             OnClick = SlideBackBTNIMGClick
             OnDragOver = GRPBOXControlDragOver
             DrawMode = dm_Windows
@@ -1488,7 +1508,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 20
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 3
+            TabOrder = 0
             Visible = False
             OnClick = RecordBtnIMGClick
             OnDragOver = GRPBOXControlDragOver
@@ -1502,8 +1522,8 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
           object BtnClose: TSkinButton
-            Left = 452
-            Top = 2
+            Left = 591
+            Top = 4
             Width = 12
             Height = 12
             Hint = 'Close Nemp'
@@ -1525,46 +1545,6 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
         end
-        object SpectrumPanel: TNempPanel
-          Tag = 5
-          Left = 470
-          Top = 0
-          Width = 140
-          Height = 100
-          Align = alRight
-          BevelInner = bvRaised
-          BevelOuter = bvLowered
-          TabOrder = 1
-          OnResize = SpectrumPanelResize
-          OnPaint = ControlPanelPaint
-          OwnerDraw = False
-          DesignSize = (
-            140
-            100)
-          object PaintFrame: TImage
-            Left = 6
-            Top = 27
-            Width = 125
-            Height = 35
-            Anchors = []
-            OnClick = NewPlayerPanelClick
-            OnDblClick = PaintFrameDblClick
-            OnDragOver = GRPBOXControlDragOver
-            OnMouseDown = PaintFrameMouseDown
-            OnMouseMove = PaintFrameMouseMove
-            OnMouseUp = PaintFrameMouseUp
-          end
-          object lblPlayingFileInfo: TLabel
-            Left = 8
-            Top = 70
-            Width = 121
-            Height = 26
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'lblPlayingFileInfo'
-            StyleElements = [seClient, seBorder]
-          end
-        end
       end
       object ControlContainer1: TNempPanel
         Left = 0
@@ -1573,20 +1553,18 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 100
         Align = alLeft
         BevelOuter = bvNone
-        TabOrder = 1
+        TabOrder = 0
         OwnerDraw = False
-        ExplicitLeft = 5
-        ExplicitTop = 4
         object HeadsetControlPanel: TNempPanel
           Tag = 3
-          Left = 309
+          Left = 305
           Top = 0
           Width = 165
           Height = 100
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 0
+          TabOrder = 3
           OnClick = HeadsetControlPanelClick
           OnDragOver = GRPBOXControlDragOver
           OnPaint = ControlPanelPaint
@@ -1612,7 +1590,7 @@ object Nemp_MainForm: TNemp_MainForm
           object lblHeadphoneControl: TLabel
             Left = 8
             Top = 6
-            Width = 147
+            Width = 98
             Height = 13
             Caption = 'Headphone Controls'
             StyleElements = [seClient, seBorder]
@@ -1733,14 +1711,14 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object PlayerControlCoverPanel: TNempPanel
           Tag = 2
-          Left = 44
+          Left = 40
           Top = 0
           Width = 100
           Height = 100
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 1
+          TabOrder = 0
           OnResize = PlayerControlCoverPanelResize
           OnPaint = ControlPanelPaint
           OwnerDraw = False
@@ -1762,7 +1740,7 @@ object Nemp_MainForm: TNemp_MainForm
           Tag = 1
           Left = 0
           Top = 0
-          Width = 44
+          Width = 40
           Height = 100
           Align = alLeft
           BevelInner = bvRaised
@@ -1773,7 +1751,7 @@ object Nemp_MainForm: TNemp_MainForm
           object TabBtn_MainPlayerControl: TSkinButton
             Tag = 4
             Left = 8
-            Top = 4
+            Top = 8
             Width = 24
             Height = 24
             Hint = 'Show main player controls'
@@ -1795,19 +1773,19 @@ object Nemp_MainForm: TNemp_MainForm
           object TabBtn_Equalizer: TSkinButton
             Tag = 3
             Left = 8
-            Top = 64
+            Top = 68
             Width = 24
             Height = 24
             Hint = 'Show equalizer and effect controls'
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
-            TabOrder = 1
+            TabOrder = 2
             OnClick = TabBtn_EqualizerClick
             OnMouseMove = TabBtn_CoverMouseMove
             DrawMode = dm_Windows
             NumGlyphsX = 5
-            NumGlyphsY = 1
+            NumGlyphsY = 2
             GlyphLine = 0
             CustomRegion = False
             FocusDrawMode = fdm_Windows
@@ -1817,14 +1795,14 @@ object Nemp_MainForm: TNemp_MainForm
           object TabBtn_Headset: TSkinButton
             Tag = 5
             Left = 8
-            Top = 34
+            Top = 38
             Width = 24
             Height = 24
             Hint = 'Show headset controls'
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
-            TabOrder = 2
+            TabOrder = 1
             TabStop = False
             OnClick = TabBtn_HeadsetClick
             OnMouseMove = TabBtn_CoverMouseMove
@@ -1840,21 +1818,20 @@ object Nemp_MainForm: TNemp_MainForm
         end
         object PlayerControlPanel: TNempPanel
           Tag = 3
-          Left = 144
+          Left = 140
           Top = 0
           Width = 165
           Height = 100
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 3
+          TabOrder = 1
           OnClick = PlayerControlPanelClick
           OnDragOver = GRPBOXControlDragOver
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           OnMouseWheelUp = PlayerControlPanelMouseWheelUp
           OnMouseWheelDown = PlayerControlPanelMouseWheelDown
-          ExplicitTop = 4
           object VolShape: TShape
             Left = 37
             Top = 78
@@ -1947,7 +1924,7 @@ object Nemp_MainForm: TNemp_MainForm
               FFFFFFFFFFFFFFFFFFC27C37FFFFFF0000000000000000000000000000000000
               0000000000000000000000000000000000000000000000000000000000000000
               0000}
-            PopupMenu = WebServerPopup
+            PopupMenu = PMWebserver
             Proportional = True
             ShowHint = True
             Stretch = True
@@ -1988,7 +1965,7 @@ object Nemp_MainForm: TNemp_MainForm
               EAB69EBF8575D7BFBFFFFFFFFFFFFF0000000000000000000000000000000000
               0000000000000000000000000000000000000000000000000000000000000000
               0000}
-            PopupMenu = SleepPopup
+            PopupMenu = PMSleep
             Proportional = True
             ShowHint = True
             Stretch = True
@@ -2028,7 +2005,7 @@ object Nemp_MainForm: TNemp_MainForm
               FFFFFF08D4DB30F1F383DDE3FFFFFF00000000000000000000000000000038D3
               DC00000000000000000000000000000000000000000038D3DC00000000000000
               0000}
-            PopupMenu = BirthdayPopup
+            PopupMenu = PMBirthday
             Proportional = True
             ShowHint = True
             Stretch = True
@@ -2070,7 +2047,7 @@ object Nemp_MainForm: TNemp_MainForm
               6577F96577F96577F96375F93E51F65263ED9C9C9C5466F1263EF9263EF9263E
               F9263EF9263EF9263EF9263EF9263EF9263EF9263EF9263EF9263EF95466F19C
               9C9C}
-            PopupMenu = ScrobblerPopup
+            PopupMenu = PMScrobbler
             Proportional = True
             ShowHint = True
             Stretch = True
@@ -2207,8 +2184,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 20
     OnTimer = BassTimerTimer
-    Left = 560
-    Top = 56
+    Left = 464
+    Top = 232
   end
   object Nemp_MainMenu: TMainMenu
     AutoHotkeys = maManual
@@ -2517,13 +2494,10 @@ object Nemp_MainForm: TNemp_MainForm
           ShortCut = 16468
           OnClick = PM_P_ViewStayOnTopClick
         end
-        object N27: TMenuItem
-          Caption = '-'
-        end
-        object MM_O_FormBuilder: TMenuItem
-          Caption = 'Form builder'
-          OnClick = MM_O_FormBuilderClick
-        end
+      end
+      object MM_O_FormBuilder: TMenuItem
+        Caption = 'Form customizer'
+        OnClick = MM_O_FormBuilderClick
       end
       object MM_O_Skins: TMenuItem
         Caption = '&Skins'
@@ -3483,22 +3457,22 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 10000
     OnTimer = SleepTimerTimer
-    Left = 560
-    Top = 104
+    Left = 40
+    Top = 536
   end
   object BirthdayTimer: TTimer
     Enabled = False
     Interval = 60000
     OnTimer = BirthdayTimerTimer
-    Left = 560
-    Top = 152
+    Left = 216
+    Top = 544
   end
   object VolTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = VolTimerTimer
     Left = 560
-    Top = 200
+    Top = 232
   end
   object ReallyClearPlaylistTimer: TTimer
     Enabled = False
@@ -4976,13 +4950,12 @@ object Nemp_MainForm: TNemp_MainForm
       'All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lis' +
       'ts|*.m3u|m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nem' +
       'p playlists|*.npl|WindowsMedia|*.asx;*.wax'
-    Left = 697
-    Top = 17
+    Left = 913
+    Top = 1
   end
   object PlaylistDateienOpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-    Left = 736
-    Top = 16
+    Left = 832
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'gmp'
@@ -4999,8 +4972,8 @@ object Nemp_MainForm: TNemp_MainForm
     FilterIndex = 2
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     OnTypeChange = PlayListSaveDialogTypeChange
-    Left = 769
-    Top = 17
+    Left = 873
+    Top = 1
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = 'gmp'
@@ -5350,8 +5323,8 @@ object Nemp_MainForm: TNemp_MainForm
   object PlayListPOPUP: TPopupMenu
     Images = MenuImages
     OnPopup = PlayListPOPUPPopup
-    Left = 656
-    Top = 208
+    Left = 456
+    Top = 88
     object PM_PL_AddFiles: TMenuItem
       Caption = 'Add files'
       OnClick = MM_PL_FilesClick
@@ -5655,8 +5628,8 @@ object Nemp_MainForm: TNemp_MainForm
     AutoHotkeys = maManual
     Images = MenuImages
     OnPopup = Player_PopupMenuPopup
-    Left = 552
-    Top = 306
+    Left = 352
+    Top = 82
     object PM_P_Preferences: TMenuItem
       Caption = 'Preferences'
       ImageIndex = 5
@@ -5714,13 +5687,10 @@ object Nemp_MainForm: TNemp_MainForm
         ShortCut = 16468
         OnClick = PM_P_ViewStayOnTopClick
       end
-      object N33: TMenuItem
-        Caption = '-'
-      end
-      object PM_P_FormBuilder: TMenuItem
-        Caption = 'Form builder'
-        OnClick = MM_O_FormBuilderClick
-      end
+    end
+    object PM_P_FormBuilder: TMenuItem
+      Caption = 'Form customizer'
+      OnClick = MM_O_FormBuilderClick
     end
     object PM_P_Skins: TMenuItem
       Caption = 'Skins'
@@ -6131,10 +6101,10 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_P_CloseClick
     end
   end
-  object SleepPopup: TPopupMenu
+  object PMSleep: TPopupMenu
     OnPopup = Player_PopupMenuPopup
-    Left = 845
-    Top = 453
+    Left = 37
+    Top = 589
     object _Shutdown: TMenuItem
       Caption = 'Shutdown'
       Enabled = False
@@ -6406,9 +6376,9 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
   end
-  object BirthdayPopup: TPopupMenu
-    Left = 829
-    Top = 396
+  object PMBirthday: TPopupMenu
+    Left = 213
+    Top = 588
     object _Birthdaymode: TMenuItem
       Caption = 'Birthday mode'
       Enabled = False
@@ -6427,12 +6397,12 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object VST_ColumnPopup: TPopupMenu
     OnPopup = VST_ColumnPopupPopup
-    Left = 420
-    Top = 449
+    Left = 476
+    Top = 393
   end
   object PopupPlayPause: TPopupMenu
-    Left = 653
-    Top = 304
+    Left = 333
+    Top = 592
     object PM_PlayFiles: TMenuItem
       Caption = 'Play files'
       OnClick = PM_PlayFilesClick
@@ -6448,8 +6418,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupStop: TPopupMenu
     OnPopup = PopupStopPopup
-    Left = 677
-    Top = 370
+    Left = 405
+    Top = 586
     object PM_StopNow: TMenuItem
       Caption = 'Stop'
       OnClick = PM_StopNowClick
@@ -6461,8 +6431,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 653
-    Top = 410
+    Left = 461
+    Top = 594
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
       RadioItem = True
@@ -6502,9 +6472,9 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_ABRepeatSetBClick
     end
   end
-  object ScrobblerPopup: TPopupMenu
-    Left = 845
-    Top = 292
+  object PMScrobbler: TPopupMenu
+    Left = 157
+    Top = 588
     object _Scrobbler: TMenuItem
       Caption = 'Scrobbler'
       Enabled = False
@@ -6521,9 +6491,9 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = PM_P_ScrobblerOptionsClick
     end
   end
-  object WebServerPopup: TPopupMenu
-    Left = 829
-    Top = 356
+  object PMWebserver: TPopupMenu
+    Left = 93
+    Top = 589
     object _Webserver: TMenuItem
       Caption = 'Nemp Webserver'
       Enabled = False
@@ -7033,8 +7003,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 250
     OnTimer = HeadSetTimerTimer
-    Left = 552
-    Top = 352
+    Left = 464
+    Top = 280
   end
   object RefreshCoverFlowTimer: TTimer
     Enabled = False
@@ -7044,8 +7014,8 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 336
   end
   object PopupRepeatAB: TPopupMenu
-    Left = 552
-    Top = 408
+    Left = 528
+    Top = 592
     object PM_SetA: TMenuItem
       Caption = 'Set start point (A)'
       OnClick = PM_ABRepeatSetAClick
@@ -7065,8 +7035,8 @@ object Nemp_MainForm: TNemp_MainForm
   object WalkmanModeTimer: TTimer
     Interval = 60000
     OnTimer = WalkmanModeTimerTimer
-    Left = 560
-    Top = 248
+    Left = 272
+    Top = 544
   end
   object CorrectSkinRegionsTimer: TTimer
     Enabled = False
@@ -7084,8 +7054,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupEditExtendedTags: TPopupMenu
     OnPopup = PopupEditExtendedTagsPopup
-    Left = 744
-    Top = 464
+    Left = 816
+    Top = 592
     object PM_TagAudiofile: TMenuItem
       Caption = 'This audio file'
       Enabled = False

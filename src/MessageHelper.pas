@@ -1648,10 +1648,10 @@ begin
                    BassTimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
                    if NempPlayer.Status <> PLAYER_ISPLAYING then
                    begin
-                     spectrum.DrawClear;
-                     //Spectrum.DrawText(NempPlayer.PlayingTitel,False);
-                     if NempPlayer.Status = PLAYER_ISSTOPPED_MANUALLY then
-                        PlayerTimeLbl.Caption := '00:00';
+                       spectrum.DrawClear;
+                       PlaylistCueChanged(NempPlaylist);
+                       if NempPlayer.Status = PLAYER_ISSTOPPED_MANUALLY then
+                            PlayerTimeLbl.Caption := '00:00';
                    end;
                  end;
 
@@ -1706,6 +1706,7 @@ begin
                         //    NempPlayer.StartRecording;
                         NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
                         PlaylistVST.Invalidate;
+                        PlaylistCueChanged(NempPlayer);
                     end;
 
     WM_PlayerStop, WM_PlayerPlay: begin

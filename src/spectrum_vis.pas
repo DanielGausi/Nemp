@@ -60,17 +60,18 @@ interface
         FFTDataMultiplikator: Integer;
     end;
 
+    // change this as well, if PaintFrame.Hieght7Width is changed in the MainForm
     const NempOriginalSpectrumSpecs: TSpectrumSpecs =
     (
-        Width       : 125;
-        Height      : 35;//88;
+        Width       : 75;
+        Height      : 25;//88;
         TextWidth   : 216;
         TextHeight  : 18;
         TimeWidth   : 53;
         TimeHeight  : 14;
         StarHeight  : 14;
         StarWidth   : 70;
-        ColumnWidth : 4;
+        ColumnWidth : 2;
         //PreviewColumn: 2;
         GradientHeight : 88;
         TimeFontSize: 10;
@@ -221,7 +222,7 @@ interface
         //property TextPosX: Integer read fTextPosX write fTextPosX;
         //property TextPosY: Integer read fTextPosY write fTextPosY;
 
-        property ScrollDelay: Integer read fScrollDelay write fScrollDelay;
+        // property ScrollDelay: Integer read fScrollDelay write fScrollDelay;
         //Property OffSetY    : Integer read SpecOffSetY write SpecOffSetY;
     end;
 
@@ -356,8 +357,8 @@ end;
 
 procedure TSpectrum.SetBackGround (Active : Boolean);
 var // grpPoint, OffsetPoint: TPoint;
+  pnlPoint: TPoint;
  sourceBmp: TBitmap;
- localOffsetX, localOffsetY: Integer;
  stretch: Boolean;
 begin
 UseBkg := Active;
@@ -365,32 +366,37 @@ UseBkg := Active;
 if active then
   with Nemp_MainForm do
   begin
-      //grpPoint := PaintFrame.ClientToScreen(Point(0,0));
       if NempSkin.UseSeparatePlayerBitmap then
       begin
-          localOffsetX := PaintFrame.Left;
-          localOffsetY := PaintFrame.Top;
-          //OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
+          sourceBmp := NempSkin.PaintedProgressBitmap;
 
-          sourceBmp := NempSkin.PlayerBitmap;
-          //stretch := NempSkin.NempPartyMode.Active;
           stretch := False;
+
+          NempSkin.TileGraphic(sourceBmp, False, BackBmp.Canvas,
+                PaintFrame.Left,
+                PaintFrame.Top,
+                stretch);
+
+          {sourceBmp := NempSkin.ControlProgressBmp;
+          stretch := NempSkin.NempPartyMode.Active;
+
+          NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackBmp.Canvas,
+              PaintFrame.Left,
+              PaintFrame.Top,
+              stretch); }
       end else
       begin
-          localOffsetX := NempSkin.PlayerPageOffsetX;
-          localOffsetY := NempSkin.PlayerPageOffsetY;
-          // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
           sourceBmp := NempSkin.CompleteBitmap;
-          stretch := False;
+          stretch := NempSkin.NempPartyMode.Active;
+
+          pnlPoint := PaintFrame.ClientToScreen(Point(0,0));
+
+          NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackBmp.Canvas,
+              pnlPoint.X - NempSkin.PlayerPageOffsetX,
+              pnlPoint.Y - NempSkin.PlayerPageOffsetY,
+              False)
       end;
-
-      NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackBmp.Canvas,
-          localOffsetX , //+ (grpPoint.X - OffsetPoint.X) ,
-          localOffsetY //+ (grpPoint.Y - OffsetPoint.Y)
-          , stretch);
   end;
-
 end;
 
 (*
@@ -465,36 +471,54 @@ end;
 *)
 
 procedure TSpectrum.SetStarBackGround(Active: Boolean);
-var grpPoint, OffsetPoint: TPoint;
+var pnlPoint, SourceOffsetPoint: TPoint;
   sourceBmp: TBitmap;
-  localOffsetX, localOffsetY: Integer;
   stretch: Boolean;
 begin
 UseBkg := Active;
 if active then
   with Nemp_MainForm do
   begin
-    grpPoint := RatingImage.ClientToScreen(Point(0,0));
+    // grpPoint := RatingImage.ClientToScreen(Point(0,0));
     if NempSkin.UseSeparatePlayerBitmap then
     begin
-        localOffsetX := 0;
-        localOffsetY := 0;
-        OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
-        sourceBmp := NempSkin.PlayerBitmap;
-        //stretch := NempSkin.NempPartyMode.Active;
+        // similar than in NempSkin.DrawAControlPanel
+
+
+        //localOffsetX := 0;
+        //localOffsetY := 0;
+        //OffsetPoint := NewPlayerPanel.ClientToScreen(Point(0,0));
+        sourceBmp := NempSkin.PaintedProgressBitmap;
+
         stretch := False;
+
+        NempSkin.TileGraphic(sourceBmp, False, BackStarBMP.Canvas,
+              RatingImage.Left,
+              RatingImage.Top,
+              stretch)
+
     end else
     begin
-        localOffsetX := NempSkin.PlayerPageOffsetX;
-        localOffsetY := NempSkin.PlayerPageOffsetY;
+        //localOffsetX := NempSkin.PlayerPageOffsetX;
+        //localOffsetY := NempSkin.PlayerPageOffsetY;
         // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //OffsetPoint := PlayerPanel.ClientToScreen(Point(0,0));
         sourceBmp := NempSkin.CompleteBitmap;
         stretch := False;
+
+        pnlPoint := RatingImage.ClientToScreen(Point(0,0));
+
+        NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackStarBMP.Canvas,
+              pnlPoint.X - NempSkin.PlayerPageOffsetX,
+              pnlPoint.Y - NempSkin.PlayerPageOffsetY,
+              False)
+
+        //NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackStarBMP.Canvas,
+        //localOffsetX + (grpPoint.X - OffsetPoint.X) ,
+        //localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
+
     end;
-    NempSkin.TileGraphic(sourceBmp, NempSkin.TileControlBackground, BackStarBMP.Canvas,
-        localOffsetX + (grpPoint.X - OffsetPoint.X) ,
-        localOffsetY + (grpPoint.Y - OffsetPoint.Y), stretch);
+
   end;
 
 end;
@@ -557,91 +581,6 @@ procedure TSpectrum.Draw(FFTData : TFFTData);
 var i, YPos, YPosPreview : LongInt; YVal : Single;
     aPB: TPaintbox;
 begin
-  {
-    aPB := Nemp_MainForm.Paintbox1;
-     aPB.Invalidate;
-
-
-    aPB.Canvas.Pen.Color := PenColor;
-    //for i := 0 to 30 do
-    for i := 0 to 30 do
-    begin
-      YVal := Abs(FFTData[(i * DrawRes) + 5]);
-      YPos := Trunc((YVal) * fFFTDataMultiplikator);
-      if YPos > Height then YPos := SpecHeight;
-
-      if YPos >= FFTPeacks[i] then FFTPeacks[i] := YPos
-        else FFTPeacks[i] := FFTPeacks[i] - PeakFall;
-
-      if YPos >= FFTFallOff[i] then
-        FFTFallOff[i] := YPos - 1
-      else
-        FFTFallOff[i] := FFTFallOff[i] - LineFall;
-
-
-      YPosPreview := Trunc((YVal) * fFFTDataMultiplikatorPreView);
-      if YPosPreview > SpecHeightPreview then YPosPreview := SpecHeightPreview;
-
-      if YPosPreview >= FFTPeacksPreview[i] then FFTPeacksPreview[i] := YPosPreview
-        else FFTPeacksPreview[i] := FFTPeacksPreview[i] - PeakFall;
-
-      if YPosPreview >= FFTFallOffPreview[i] then
-        FFTFallOffPreview[i] := YPosPreview - 1
-      else
-        FFTFallOffPreview[i] := FFTFallOffPreview[i] - LineFall;
-
-
-      // ----------------------------------------
-      if FFTPeacks[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
-        FFTPeacks[i] := 1;
-
-      if FFTPeacks[i] > VisBuff.Height then // damit die Peaks nicht nach oben hin verschwinden
-        FFTPeacks[i] := VisBuff.Height;
-      //----------------------
-      // ----------------------------------------
-      if FFTPeacksPreview[i] < 1 then   // damit die Peaks nicht verschwinden, sondern untern liegen bleiben
-        FFTPeacksPreview[i] := 1;
-
-      if FFTPeacksPreview[i] > SpecHeightPreview then // damit die Peaks nicht nach oben hin verschwinden
-        FFTPeacksPreview[i] := SpecHeightPreview;
-      //----------------------
-
-     // if (VisBuff.Height - FFTPeacks[i]) > VisBuff.Height then FFTPeacks[i] := 0;
-     // if (VisBuff.Height - FFTFallOff[i]) > VisBuff.Height then FFTFallOff[i] := 0;
-
-     // if (SpecHeightPreview - FFTPeacksPreview[i]) > SpecHeightPreview then FFTPeacksPreview[i] := 0;
-     // if (SpecHeightPreview - FFTFallOffPreview[i]) > SpecHeightPreview then FFTFallOffPreview[i] := 0;
-
-      case DrawType of
-          0 : begin
-                 aPB.Canvas.MoveTo(i, aPB.Height);
-                 aPB.Canvas.LineTo(i, aPB.Height - FFTFallOff[i]);
-                 if ShowPeak then aPB.Canvas.Pixels[i, aPB.Height - FFTPeacks[i]] := Pen;
-          end;
-
-          1 : begin
-               aPB.Canvas.Pen.Color := PenColor;
-               aPB.Canvas.Brush.Color := PenColor;
-               aPB.Canvas.CopyRect(Rect((i * (ColWidth + 1))+1,            aPB.Height - FFTFallOff[i],
-                                           (i * (ColWidth + 1))+1 + ColWidth, aPB.Height),
-                                       GradientBMP.Canvas,
-                                       Rect(0, aPB.Height - FFTFallOff[i], ColWidth, aPB.Height)
-               );
-
-               if ShowPeak then
-               begin
-                  aPB.Canvas.Pen.Color := PeakColor;
-                  aPB.Canvas.MoveTo((i * (ColWidth + 1))+1, aPB.Height - FFTPeacks[i]);
-                  aPB.Canvas.LineTo((i * (ColWidth + 1))+1 + ColWidth, aPB.Height - FFTPeacks[i]);
-               end;
-
-          end;
-      end;
-    end;
-
-      }
-
-
 
     if FrmClear then
     begin
@@ -663,7 +602,7 @@ begin
 
     VisBuff.Canvas.Pen.Color := PenColor;
     //for i := 0 to 30 do
-    for i := 0 to 30 do
+    for i := 0 to 24 do
     begin
       YVal := Abs(FFTData[(i * DrawRes) + 5]);
       YPos := Trunc((YVal) * fFFTDataMultiplikator);
@@ -905,6 +844,7 @@ begin
         begin
             aBmp.Width := StarImage.Width;
             aBmp.Height := StarImage.Height;
+            aBmp.Canvas.Pen.Color := BkgColor;
             aBmp.Canvas.Brush.Style := bsSolid;
             aBmp.Canvas.Brush.Color := BkgColor;
             aBmp.Canvas.Rectangle(0, 0, aBmp.Width, aBmp.Height);

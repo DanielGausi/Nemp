@@ -49,9 +49,10 @@ procedure StatusProc(buffer: Pointer; length: DWORD; user: Pointer); stdcall;
 begin
   if (buffer <> nil) then
   begin
-      //if (length = 0) then
-      //    Spectrum.DrawText(String(PAnsiChar(buffer)))
-      //else
+      if (length = 0) and assigned(NempPlayer.OnMessage) then
+          //Spectrum.DrawText(String(PAnsiChar(buffer)))
+          NempPlayer.OnMessage(NempPlayer, String(PAnsiChar(buffer)) )
+      else
       begin
           if NempPlayer.StreamRecording and assigned(NempPlayer.RecordStream) then
           begin

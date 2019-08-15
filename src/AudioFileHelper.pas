@@ -582,9 +582,14 @@ begin
         aNewFile.Assign(mbAF);
     end else
     begin
-        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
+
         if WithCover then
+        begin
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
             Medienbib.InitCover(aNewFile);
+        end else
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
+
     end;
 end;
 
@@ -600,9 +605,13 @@ var mbAf: TAudioFile;
 begin
     if FileExists(aNewFile.Pfad) then
     begin
-        aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
         if WithCover then
+        begin
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
             Medienbib.InitCover(aNewFile);
+        end else
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
+
         mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
         if assigned(mbAF) then
             mbAF.Assign(aNewFile);

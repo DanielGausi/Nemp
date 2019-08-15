@@ -279,6 +279,7 @@ type
         procedure SetPath(const Value: UnicodeString);
 
         function fGetPlaylistTitleString: UnicodeString;
+
         function fGetNonEmptyTitle: UnicodeString;
         function fGetProperFilename: UnicodeString;
 
@@ -488,7 +489,7 @@ type
         function GetReplacedTitle (ReplaceValue: Integer): String;
         function GetReplacedAlbum (ReplaceValue: Integer): String;
 
-        function GetTagDisplayString(allowEdit: Boolean): String;
+        // function GetTagDisplayString(allowEdit: Boolean): String;
 
         // for the Double-Click Action in the VTS-Details.
         // check for values that "make sense"
@@ -1299,6 +1300,8 @@ begin
     result := FormatDateTime('yyyymm', fFileAge);
 end;
 
+
+
 function TAudioFile.fGetPlaylistTitleString: UnicodeString;
 begin
     case fAudioType of
@@ -1398,6 +1401,7 @@ begin
     result := fTagList;
 end;
 
+(*
 function TAudioFile.GetTagDisplayString(allowEdit: Boolean): String;
 begin
     if trim(String(RawTagLastFM)) <> '' then
@@ -1415,6 +1419,7 @@ begin
             result := ''; //Tags_AddTagsNotPossible;
     end;
 end;
+*)
 
 {
     --------------------------------------------------------
@@ -2409,6 +2414,17 @@ var tmplist, CueTimelist, CueParselist: TStringList;
     i: Integer;
     FileFound: boolean;
     aCue: TAudioFile;
+
+    function TrimGF(s: String): String;
+    var l: Integer;
+    begin
+        l := length(s);
+        if (l > 0) and (s[1] = '"') and (s[l] = '"') then
+            result := s.Substring(1, l-2)
+        else
+            result := s;
+    end;
+
 begin
   // Defaultvalue for aAudioFilename: Filename of "self"
   if (aAudioFilename = '') then aAudioFilename := Dateiname else
@@ -2462,11 +2478,11 @@ begin
                       end;
         CUE_ID_TITLE: begin
                         if assigned(aCue) then
-                          aCue.Titel := copy(trim(tmplist[i]), 7, length(tmplist[i]));
+                          aCue.Titel := TrimGF(copy(trim(tmplist[i]), 7, length(tmplist[i])));
                       end;
         CUE_ID_PERFORMER: begin
                         if assigned(aCue) then
-                          aCue.Artist := copy(trim(tmplist[i]), 11, length(tmplist[i]));
+                          aCue.Artist := TrimGF(copy(trim(tmplist[i]), 11, length(tmplist[i])));
                       end;
         CUE_ID_INDEX: begin
                         if assigned(aCue) then

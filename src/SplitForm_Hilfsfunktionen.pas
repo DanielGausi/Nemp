@@ -80,8 +80,8 @@ begin
     xpRight  := xpleft + GrpBox.Width;// - 2 + 5;  //aForm.width - 10;
     xpbottom := 27; //GrpBox.Top - 2 + 2;
 
-    formRegion := CreateRoundRectRgn
-            (xpleft, xptop, xpright, xpbottom, 4, 4);
+    ///formRegion := CreateRoundRectRgn
+    ///        (xpleft, xptop, xpright, xpbottom, 4, 4);
 
     NempRegionsDistance.Top := xptop;
 
@@ -89,11 +89,11 @@ begin
     xpleft   := 0;//GrpBox.Left + 1 - 2;
     xpbottom := GrpBox.Height; //xptop + GrpBox.Height - 1 + 4;
 
-    formRegion1 := CreateRoundRectRgn
-        (xpleft, xptop, xpright, xpbottom , 4, 4);
+    ///formRegion1 := CreateRoundRectRgn
+    ///    (xpleft, xptop, xpright, xpbottom , 4, 4);
 
-    CombineRgn( formregion, formregion, formregion1, RGN_OR );
-    SetWindowRgn( ahandle, formregion, true );
+    ///CombineRgn( formregion, formregion, formregion1, RGN_OR );
+    ///SetWindowRgn( ahandle, formregion, true );
 
     NempRegionsDistance.Left := xpleft;
     NempRegionsDistance.Right := xpright - 1;
@@ -762,8 +762,17 @@ procedure SplitMainForm;
 begin
   with Nemp_MainForm do
   begin
-      Width := 800; // _ControlPanel.Width + 4 + 2*GetSystemMetrics(SM_CXFrame);
-      Height := {NewPlayerPanel.Top +} _ControlPanel.Height + 40 + 2*GetSystemMetrics(SM_CYFrame);
+
+      NempFormBuildOptions.NilConstraints;
+
+      Constraints.MinWidth := 0; // CONTROL_PANEL_MinWidth_1;
+      Constraints.MinHeight := 10; // _ControlPanel.Height;
+
+      Width := 798;
+
+       // _ControlPanel.Width + 4 + 2*GetSystemMetrics(SM_CXFrame);
+      //Height := {NewPlayerPanel.Top +} _ControlPanel.Height + 40 + 2*GetSystemMetrics(SM_CYFrame);
+
       Top  := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop ;
       Left := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
 
@@ -779,6 +788,18 @@ begin
       _ControlPanel.Align := alTop;
       _ControlPanel.Left := 0;
       _ControlPanel.Top  := 0;
+
+      // das bei Join wieder umsetzen
+      //__MainContainerPanel.Constraints.MinHeight := 0;
+
+      Height := _ControlPanel.Height + 2;
+      Constraints.MaxHeight := Height;
+
+
+      //Nemp_MainForm.OnResize := FormResize;
+      Nemp_MainForm.Borderstyle := bsNone;
+
+      //__MainContainerPanel.OnPaint := PanelPaint;
 
 
       if NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible then
@@ -837,9 +858,7 @@ begin
       MedienBibDetailPanel.Height  := ExtendedControlForm.ContainerPanelExtendedControlsForm.Height - 9;
       MedienBibDetailPanel.Anchors := [akleft, aktop, akright, akBottom];
       ExtendedControlForm.FormResize(Nil);
-      ExtendedControlForm.FormShow(ExtendedControlForm);
-
-
+      ExtendedControlForm.FormShow(Nil);
 
       // Set OnMouseEvents for Dragging the forms
       PlaylistFillPanel.OnMouseDown := PlaylistForm.OnMouseDown;
@@ -870,6 +889,10 @@ begin
       MedienBibDetailFillPanel      .OnMouseUP := ExtendedControlForm.OnMouseUP;
       MedienBibDetailStatusLbl      .OnMouseUP := ExtendedControlForm.OnMouseUP;
 
+      EditPlaylistSearchExit(Nil);
+      EDITFastSearchExit(Nil);
+
+
       //AudioPanel.OnMouseDown := ExtendedControlForm.OnMouseDown;
       //AudioPanel.OnMouseMove := ExtendedControlForm.OnMouseMove;
       //AudioPanel.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
@@ -890,8 +913,6 @@ begin
       //GRPBOXHeadset.OnMouseMove := ExtendedControlForm.OnMouseMove;
       //GRPBOXHeadset.OnMouseUp   := ExtendedControlForm.OnMouseUp  ;
 
-      EditPlaylistSearchExit(Nil);
-      EDITFastSearchExit(Nil);
   end;
 end;
 
@@ -949,14 +970,26 @@ begin
     _VSTPanel.OnResize     := _TopMainPanelResize;
     _TopMainPanel.OnResize := _TopMainPanelResize;
 
-    //AuswahlPanel.OnResize  := AuswahlPanelResize;
-    //PlaylistPanel.OnResize := PlaylistPanelResize;
+      //__MainContainerPanel.Constraints.MinHeight := 0;
+      Height := _ControlPanel.Height + 2;
+      Constraints.MaxHeight := 0;
+      Constraints.MinWidth := 800;
+      Constraints.MinHeight := 600;
+
+      //Nemp_MainForm.OnResize := FormResize;
+      Nemp_MainForm.Borderstyle := bsSizeable;
 
 
     if Medienlisteform.visible then Medienlisteform.Close;
     if Playlistform.visible then Playlistform.Close;
     if Auswahlform.Visible then Auswahlform.Close;
     if ExtendedControlForm.visible then ExtendedControlForm.Close;
+
+    // to be sure: set the Parent here as well
+    Auswahlform.CloseImageA.Parent := Auswahlform.ContainerPanelAuswahlform;
+    Medienlisteform.CloseImageM.Parent := Medienlisteform.ContainerPanelMedienBibForm;
+    Playlistform.CloseImageP.Parent := Playlistform.ContainerPanelPlaylistForm;
+    ExtendedControlForm.CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
 
     PlaylistFillPanel.OnMouseDown := NIL;
     PlayListStatusLBL.OnMouseDown := Nil;
@@ -997,18 +1030,31 @@ var formregion,
   xpbottom, xptop, xpleft, xpright: integer;
   aPoint: TPoint;
 begin
+
+
+
+// exit;
+
     with Nemp_MainForm do
     begin
         aPoint := _ControlPanel.ClientToParent(Point(0,0), Nemp_MainForm );
-        xpleft   := GetSystemMetrics(SM_CXFrame) {+ - 2} + aPoint.X ;
-        xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + aPoint.Y ;
+
+        xpleft   := {GetSystemMetrics(SM_CXFrame) + + - 2} + aPoint.X ;
+        xptop    := aPoint.Y;
+                             {
+        GetSystemMetrics(SM_CYCAPTION)
+              + GetSystemMetrics(SM_CYBORDER) - 2
+              + GetSystemMetrics(SM_CYFrame) - 1
+              + aPoint.Y ;
+              }
+
         //xpleft   := GetSystemMetrics(SM_CXFrame) {+ - 2} + _ControlPanel.Left ;
         //xptop    := GetSystemMetrics(SM_CYCAPTION)  - 2 + GetSystemMetrics(SM_CYFrame) + _ControlPanel.Top ;
-        xpright  := xpleft + _ControlPanel.Width - 1 {+ 4};// - 1 + 4;
-        xpbottom := xptop + _ControlPanel.Height - 1 {+ 4};// - 1 + 3;
+        xpright  := xpleft + width; //_ControlPanel.Width {+ 1} {+ 4};// - 1 + 4;
+        xpbottom := xptop + height; //_ControlPanel.Height  {+ 4};// - 1 + 3;
 
-        formRegion := CreateRectRgn
-            (xpleft, xptop, xpright, xpbottom );
+        //formRegion := CreateRectRgn
+        //    (xpleft, xptop, xpright, xpbottom );
 
         NempRegionsDistance.Top := xptop;
         NempRegionsDistance.Left := xpleft;
@@ -1016,7 +1062,7 @@ begin
         NempRegionsDistance.Bottom := xpbottom ;
 
         // Regions setzen
-        SetWindowRgn( handle, formregion, true );
+        // SetWindowRgn( handle, formregion, true );
         stopBtn.BringToFront;
     end;
 end;
@@ -1093,7 +1139,7 @@ begin
             // Compact view, all in one window
             if (Tag in [0,1]) then
                 // not necessary on start, Mainform is designed in a "joined state"
-                // basically: Put all the Panels back o the Mainform
+                // basically: Put all the Panels back on the Mainform
                 JoinMainForm;
 
             // after joining the MainForm: Apply the FormBuilder-Layout
@@ -1146,7 +1192,8 @@ begin
           NempRegionsDistance.Bottom := height;
           NempRegionsDistance.Right := width;
           NempRegionsDistance.Left := 0;
-          _TopMainPanel.Constraints.MinHeight := MAIN_PANEL_MIN_HEIGHT;
+          _TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
+          _TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
       end
       else
       begin

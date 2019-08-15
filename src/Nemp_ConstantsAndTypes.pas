@@ -46,6 +46,17 @@ const MAXCHILDS = 10;
       CONTROL_PANEL_CoverWidth = 100;
       CONTROL_PANEL_VisualisationWidth = 140;
 
+      CONTROL_PANEL_MinWidth_1 = 550;
+      CONTROL_PANEL_MinWidth_2 = 309;  // check later, maybe
+
+
+      MAIN_PANEL_MinHeight = 250;
+      MAIN_PANEL_MinWidth = 250;
+      // these values are for childs in a "2-rows-layout", without ControlPanel
+      // Formbuilder should adjust Constraints accoding to the Layout, especially the Height
+      CHILD_PANEL_MinWidth = 250;
+      CHILD_PANEL_MinHeight = 180;
+
 type
 
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
@@ -154,6 +165,10 @@ type
 
             fRatio  : Integer;
 
+            // some temporary variables for loading from the inifile
+            fSortIndex: Integer;
+            fParentIndex: Integer;
+
             function fGetHeight : Integer     ;
             function fGetWidth  : Integer     ;
             function fGetLeft   : Integer     ;
@@ -188,9 +203,9 @@ type
 
     TPanelList = class(TObjectList<TNempBlockPanel>);
 
-    TControlPanel = class
+    TControlPanel = class(TNempBlockPanel)
         private
-            function fGetParent : TWinControl ;
+            {function fGetParent : TWinControl ;
             function fGetAlign  : TAlign      ;
             function fGetHeight : Integer     ;
             function fGetWidth  : Integer     ;
@@ -203,34 +218,36 @@ type
             procedure fSetWidth (Value: Integer      );
             procedure fSetLeft  (Value: Integer      );
             procedure fSetTop   (Value: Integer      );
+            }
 
             function fIsReal: Boolean;
 
         public
-            Block,
+            //Block,
             Container1,
             Container2,
             Select,
             Cover,
             Player,
             Headset,
-            Progress,
-            Visualisation: TPanel;
+            Progress : TPanel;
+            //Visualisation
             Name: String;
 
-            property Height  : Integer      read fGetHeight  write fSetHeight ;
+            {property Height  : Integer      read fGetHeight  write fSetHeight ;
             property Width   : Integer      read fGetWidth   write fSetWidth  ;
             property Left    : Integer      read fGetLeft    write fSetLeft   ;
             property Top     : Integer      read fGetTop     write fSetTop    ;
             property Parent  : TWinControl  read fGetParent  write fSetParent ;
             property Align   : TAlign       read fGetAlign   write fSetAlign  ;
+            }
             // real: The "real" ControlPanel with all the subPanels,
             // and not the pure ControlPanel on the Test-Form
             property IsReal: Boolean read fIsReal;
 
             constructor create;
-            procedure SetValues( aBlock, aContainer1, aContainer2,
-                                 aSelect, aCover, aPlayer, aHeadset, aProgress, aVisualisation: TPanel;
+            procedure SetControlValues( aBlock, aContainer1, aContainer2,
+                                 aSelect, aCover, aPlayer, aHeadset, aProgress{, aVisualisation}: TPanel;
                                  aName: String);
     end;
 
@@ -246,8 +263,21 @@ type
             procedure fSetBlockSizes(aMainContainer: TPanel; aChildList: TPanelList);
             procedure fSetMainContainerSizes;
 
+            procedure fTopToSortIndex;
+            procedure fLeftToSortIndex;
+            // sort the Childs by Top or Left.
+            // called by RefreshBothRowsOrColumns;
+            procedure fSortaChildList(aPanelList: TPanelList);
+            procedure fSortChilds;
+            //procedure SortaRow(aPanelList: TPanelList);
+            //procedure SortaColumn(aPanelList: TPanelList);
+
+            function fGetIsReal: Boolean;
 
             procedure fApplyRatio(aMainContainer: TPanel; aChildList: TPanelList);
+
+            procedure SetProperConstraints;
+
         public
 
             // settings for the ControlPanel
@@ -256,7 +286,7 @@ type
             ControlPanelSubParent   : TNempBlockPanel;          // parentPanel if ControlPanelPosition=SubPanel
             ControlPanelTwoRows          : Boolean;
             ControlPanelShowCover        : Boolean;
-            ControlPanelShowVisualisation: Boolean;
+            //ControlPanelShowVisualisation: Boolean;
             // Show/Hide the "File Overview"-Panel
             HideFileOverviewPanel: Boolean;
 
@@ -293,16 +323,24 @@ type
             // new ratios (2019, Formbuilder)
             // (still Integer-Values: 0..100%)
 
+            // some fixed values, by design
+            // not the same for MainForm and TestForm
+            MainPanelMinHeight,
+            MainPanelMinWidth: Integer;
+
 
             //FormRatios: TNempMainFormRatios;
 
             property MainLayout: TMainLayout read fMainLayout;
             property RebuildingRightNow: Boolean read fRebuildingRightNow;
 
+            property Isreal: Boolean read fGetIsReal;
+
             constructor Create;
             destructor Destroy; override;
 
             procedure LoadFromIni(aIni: TMemIniFile);
+            procedure SaveToIni(aIni: TMemIniFile);
 
             procedure BeginUpdate;
             procedure EndUpdate;
@@ -310,6 +348,11 @@ type
             procedure SwapMainLayout;
             procedure RefreshControlPanel;
             procedure Assign(aNempFormBuildOptions: TNempFormBuildOptions);
+            procedure ResetToDefault;
+
+            procedure NilConstraints;
+
+            function EmptyPanel(aChildList: TPanelList): Boolean;
 
             // MakeOneSplitterAvailable: Used by the Testform when we move one Block to another ContainerPanel
             // The "available" Splitter will then be used on the new ContainerPanel by RefreshBothRowsOrColumns
@@ -321,11 +364,6 @@ type
             // refresh both rows or columns
             // called after a ChildPanel has been moved from one to another
             procedure RefreshBothRowsOrColumns(DoSort: Boolean);
-
-            // sort the Childs by Top or Left.
-            // called by RefreshBothRowsOrColumns;
-            procedure SortaRow(aPanelList: TPanelList);
-            procedure SortaColumn(aPanelList: TPanelList);
 
             // get a scaling factor after a Child has beed added from the other MainPanel
             // Called by RefreshBothRowsOrColumns
@@ -563,10 +601,10 @@ const
     //EXTENDED_HEIGHT = 218;
     // Minimale Höhe des oberen teils:
     //TOP_MIN_HEIGHT = 323;//311///426;
-    MAIN_PANEL_MIN_HEIGHT = 250;
-    MAIN_PANEL_MIN_WIDTH  = 250;
-    SUB_PANEL_MIN_WIDTH = 50;
-    SUB_PANEL_MIN_HEIGHT = 50;
+    // MAIN_PANEL_MIN_HEIGHT = 250;
+    // MAIN_PANEL_MIN_WIDTH  = 250;
+    //SUB_PANEL_MIN_WIDTH = 50;
+    //SUB_PANEL_MIN_HEIGHT = 50;
 
 
 
@@ -1049,6 +1087,15 @@ implementation
 uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSettingsWizard, Treehelper;
 
 
+procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
+begin
+    if x < minValue then
+        x := minValue;
+    if x > maxValue then
+        x := maxValue;
+end;
+
+
 { TNempBlockPanel }
 
 constructor TNempBlockPanel.create;
@@ -1146,11 +1193,11 @@ begin
               assigned(Cover) AND
               assigned(Player) AND
               assigned(Headset) AND
-              assigned(Progress) AND
-              assigned(Visualisation);
+              assigned(Progress);// AND assigned(Visualisation);
 end;
 
 {$region 'Getter/Setter for TControlPanel'}
+(*
 function TControlPanel.fGetAlign: TAlign;
 begin
     result := Block.Align;
@@ -1201,12 +1248,13 @@ procedure TControlPanel.fSetWidth(Value: Integer);
 begin
     Block.Width := Value;
 end;
+*)
 {$endregion}
 
-procedure TControlPanel.SetValues(aBlock, aContainer1, aContainer2, aSelect,
-  aCover, aPlayer, aHeadset, aProgress, aVisualisation: TPanel; aName: String);
+procedure TControlPanel.SetControlValues(aBlock, aContainer1, aContainer2, aSelect,
+  aCover, aPlayer, aHeadset, aProgress{, aVisualisation}: TPanel; aName: String);
 begin
-    Block         := aBlock         ;
+    fBlock        := aBlock         ;
     Container1    := aContainer1    ;
     Container2    := aContainer2    ;
     Select        := aSelect        ;
@@ -1214,7 +1262,7 @@ begin
     Player        := aPlayer        ;
     Headset       := aHeadset       ;
     Progress      := aProgress      ;
-    Visualisation := aVisualisation ;
+    //Visualisation := aVisualisation ;
     Name          := aName          ;
 end;
 
@@ -1241,7 +1289,7 @@ begin
 
     ControlPanelTwoRows           := False;
     ControlPanelShowCover         := True;
-    ControlPanelShowVisualisation := True;
+    // ControlPanelShowVisualisation := True;
 
     fMainLayout := Layout_TwoRows;
     ControlPanelPosition := cp_FormBottom;
@@ -1280,6 +1328,14 @@ begin
         result := SubSplitter2
 end;
 
+function TNempFormBuildOptions.fGetIsReal: Boolean;
+begin
+    if Assigned(ControlPanel) then
+        result := ControlPanel.IsReal
+    else
+        result := False;
+end;
+
 procedure TNempFormBuildOptions.fMakeSplittersAvailable(aTag: Integer);
 begin
     // make Both Splitters available
@@ -1311,6 +1367,8 @@ begin
 end;
 
 
+
+
 procedure TNempFormBuildOptions.fSetMainContainerSizes;
 var newSize: Integer;
 begin
@@ -1319,19 +1377,19 @@ begin
     begin
         // two rows, adjust Height of the MainContainer
         newSize := Round(SuperContainer.Height * TopPanelRatio / 100);
-        if newSize < MAIN_PANEL_MIN_HEIGHT then
-            newSize := MAIN_PANEL_MIN_HEIGHT;
-        if newSize > SuperContainer.Height - MAIN_PANEL_MIN_HEIGHT then
-            newSize :=  SuperContainer.Height - MAIN_PANEL_MIN_HEIGHT;
+        if newSize < MainPanelMinHeight then
+            newSize := MainPanelMinHeight;
+        if newSize > SuperContainer.Height - MainPanelMinHeight then
+            newSize :=  SuperContainer.Height - MainPanelMinHeight;
 
         MainContainerA.Height := newSize;
     end else
     begin
         newSize := Round(SuperContainer.Width * TopPanelRatio / 100);
-        if newSize < MAIN_PANEL_MIN_WIDTH then
-            newSize := MAIN_PANEL_MIN_WIDTH;
-        if newSize > SuperContainer.Width - MAIN_PANEL_MIN_WIDTH then
-            newSize :=  SuperContainer.Width - MAIN_PANEL_MIN_WIDTH;
+        if newSize < MainPanelMinWidth then
+            newSize := MainPanelMinWidth;
+        if newSize > SuperContainer.Width - MainPanelMinWidth then
+            newSize :=  SuperContainer.Width - MainPanelMinWidth;
 
         MainContainerA.Width := newSize;
     end;
@@ -1349,20 +1407,20 @@ begin
         for i := 0 to aChildList.Count - 2 do
         begin
             newSize := Round(aMainContainer.Width * aChildList[i].Ratio / 100);
-            if newSize > SUB_PANEL_MIN_WIDTH then
+            if newSize > ChildPanelMinWidth then
                 aChildList[i].Width := newSize
             else
-                aChildList[i].Width := SUB_PANEL_MIN_WIDTH;
+                aChildList[i].Width := ChildPanelMinWidth;
         end
     else
         // two columns
         for i := 0 to aChildList.Count - 2 do
         begin
             newSize := Round(aMainContainer.Height * aChildList[i].Ratio / 100);
-            if newSize > SUB_PANEL_MIN_HEIGHT then
+            if newSize > ChildPanelMinHeight then
                 aChildList[i].Height := newSize
             else
-                aChildList[i].Height := SUB_PANEL_MIN_HEIGHT;
+                aChildList[i].Height := ChildPanelMinHeight;
         end
 end;
 
@@ -1530,56 +1588,265 @@ begin
     if aNempFormBuildOptions.ControlPanelSubParent = aNempFormBuildOptions.BlockFileOverview then
         ControlPanelSubParent := BlockFileOverview;
 
+
+
     HideFileOverviewPanel := aNempFormBuildOptions.HideFileOverviewPanel;
     BlockFileOverview.fBlock.Visible := NOT HideFileOverviewPanel;
 
     ControlPanelTwoRows           := aNempFormBuildOptions.ControlPanelTwoRows           ;
     ControlPanelShowCover         := aNempFormBuildOptions.ControlPanelShowCover         ;
-    ControlPanelShowVisualisation := aNempFormBuildOptions.ControlPanelShowVisualisation ;
+    // ControlPanelShowVisualisation := aNempFormBuildOptions.ControlPanelShowVisualisation ;
+
+    // toDo: SetRatios?
+    TopPanelRatio := aNempFormBuildOptions.TopPanelRatio;
+    BlockBrowse      .fRatio := aNempFormBuildOptions.BlockBrowse      .fRatio;
+    BlockPlaylist    .fRatio := aNempFormBuildOptions.BlockPlaylist    .fRatio;
+    BlockMediaList   .fRatio := aNempFormBuildOptions.BlockMediaList   .fRatio;
+    BlockFileOverview.fRatio := aNempFormBuildOptions.BlockFileOverview.fRatio;
 
     RefreshBothRowsOrColumns(False);
     SwapMainLayout;
+    ApplyRatios;
 end;
 
 
 procedure TNempFormBuildOptions.LoadFromIni(aIni: TMemIniFile);
+var ControlPanelSubParentIdx: Integer;
 begin
-    //
-    {
 
-    MainLayout: TMainLayout;
-            ControlPanelPosition: TControlPanelPosition;
+    NewLayout                 := TMainLayout(aIni.ReadInteger('FormBuilder', 'MainLayout', 1) mod 2);
+    HideFileOverviewPanel     := aIni.ReadBool('FormBuilder', 'HideFileOverviewPanel', False  );
 
-            ControlPanelSubPosition: TControlPanelSubPosition;
-            ControlPanelSubParent: TNempBlockPanel;
+    // settings for ControlPanel
+    ControlPanelPosition      := TControlPanelPosition(aIni.ReadInteger('FormBuilder', 'ControlPanelPosition', 3) mod 4);
+    ControlPanelSubPosition   := TControlPanelSubPosition(aIni.ReadInteger('FormBuilder', 'ControlPanelSubPosition', 1) mod 2);
+    ControlPanelSubParentIdx  := aIni.ReadInteger('FormBuilder', 'ControlPanelSubParentIdx', 2) mod 4 ;
+    case ControlPanelSubParentIdx of
+        0: ControlPanelSubParent := BlockBrowse;
+        1: ControlPanelSubParent := BlockPlaylist;
+        2: ControlPanelSubParent := BlockMediaList;
+        3: ControlPanelSubParent := BlockFileOverview;
+    end;
+    ControlPanelTwoRows           := aIni.ReadBool('FormBuilder', 'ControlPanelTwoRows'          , False );
+    ControlPanelShowCover         := aIni.ReadBool('FormBuilder', 'ControlPanelShowCover'        , True  );
+    // ControlPanelShowVisualisation := aIni.ReadBool('FormBuilder', 'ControlPanelShowVisualisation', True  );
 
-            MegaContainer: TWinControl; // another Panel in the Testform, in real Nemp the Form directly
-            SuperContainer: TPanel; // contains Container A+B (and maybe the ControlPanel)
-            MainContainerA: TPanel; // top
-            MainContainerB: TPanel; // bottom
+    // position and sizes of the 4 blocks
+    BlockBrowse.fParentIndex      := aIni.ReadInteger('FormBuilder', 'BlockBrowseParent'      , 0);
+    BlockBrowse.fSortIndex        := aIni.ReadInteger('FormBuilder', 'BlockBrowseSort'        , 0);
+    BlockBrowse.fRatio            := aIni.ReadInteger('FormBuilder', 'BlockBrowseRatio'       , 50);
 
-            BlockBrowse: TNempBlockPanel;  // im create erzeugen
-            BlockPlaylist: TNempBlockPanel;
-            BlockMediaList: TNempBlockPanel;
-            BlockFileOverview: TNempBlockPanel;
+    BlockPlaylist.fParentIndex    := aIni.ReadInteger('FormBuilder', 'BlockPlaylistParent'    , 1);
+    BlockPlaylist.fSortIndex      := aIni.ReadInteger('FormBuilder', 'BlockPlaylistSort'      , 0);
+    BlockPlaylist.fRatio          := aIni.ReadInteger('FormBuilder', 'BlockPlaylistRatio'     , 50);
 
-            ControlPanel: TControlPanel;
+    BlockMediaList.fParentIndex   := aIni.ReadInteger('FormBuilder', 'BlockMediaListParent'   , 0);
+    BlockMediaList.fSortIndex     := aIni.ReadInteger('FormBuilder', 'BlockMediaListSort'     , 1);
+    BlockMediaList.fRatio         := aIni.ReadInteger('FormBuilder', 'BlockMediaListRatio'    , 70);
 
-            // ControlPanelFixedHeight: Integer
+    BlockFileOverview.fParentIndex:= aIni.ReadInteger('FormBuilder', 'BlockFileOverviewParent', 1);
+    BlockFileOverview.fSortIndex  := aIni.ReadInteger('FormBuilder', 'BlockFileOverviewSort'  , 1);
+    BlockFileOverview.fRatio      := aIni.ReadInteger('FormBuilder', 'BlockFileOverviewRatio' , 30);
 
-            // The Splitter betwenn the 2 main panels
-            MainSplitter: TSplitter;
-            // 2 Lists with Sub-Panels on the two main panels
-            PanelAChilds: TPanelList;
-            PanelBChilds: TPanelList;
-            // 2 Lists with Splitters on the two main panels
-            PanelASplitters: TSplitterList;
-            PanelBSplitters: TSplitterList;
+    // main Ratio and some special ratios
+    TopPanelRatio          := aIni.ReadInteger('FormBuilder', 'RatioTopPanel'         , 50);
+    BrowseArtistRatio      := aIni.ReadInteger('FormBuilder', 'RatioBrowseArtist'     , 50);
+    FileOverviewCoverRatio := aIni.ReadInteger('FormBuilder', 'RatioFileOverviewCover', 50);
 
-            ChildPanelMinWidth: Integer;
-            ChildPanelMinHeight: Integer;
-    }
+    CheckValue(BlockBrowse.fRatio       , 10, 90);
+    CheckValue(BlockPlaylist.fRatio     , 10, 90);
+    CheckValue(BlockMediaList.fRatio    , 10, 90);
+    CheckValue(BlockFileOverview.fRatio , 10, 90);
 
+    CheckValue(TopPanelRatio          , 10, 90);
+    CheckValue(BrowseArtistRatio      , 10, 90);
+    CheckValue(FileOverviewCoverRatio , 10, 90);
+
+
+    // apply some settings directly ?
+    BlockFileOverview.fBlock.Visible := NOT HideFileOverviewPanel;
+
+    // fill the PanelLists
+    PanelAChilds.Clear;
+    PanelBChilds.Clear;
+    if BlockBrowse      .fParentIndex = 0 then PanelAChilds.Add(BlockBrowse)       else PanelBChilds.Add(BlockBrowse);
+    if BlockPlaylist    .fParentIndex = 0 then PanelAChilds.Add(BlockPlaylist)     else PanelBChilds.Add(BlockPlaylist);
+    if BlockMediaList   .fParentIndex = 0 then PanelAChilds.Add(BlockMediaList)    else PanelBChilds.Add(BlockMediaList);
+    if BlockFileOverview.fParentIndex = 0 then PanelAChilds.Add(BlockFileOverview) else PanelBChilds.Add(BlockFileOverview);
+    // sort the PanelLists
+    fSortChilds;
+
+end;
+
+procedure TNempFormBuildOptions.SaveToIni(aIni: TMemIniFile);
+var i, ControlPanelSubParentIdx: Integer;
+begin
+
+    if newLayout <> MainLayout then   // needed when we start in seprate mode and do not enter compact mode at all
+        aIni.WriteInteger('FormBuilder', 'MainLayout', Integer(newLayout))
+    else
+        aIni.WriteInteger('FormBuilder', 'MainLayout', Integer(MainLayout));
+
+
+    aIni.WriteBool('FormBuilder', 'HideFileOverviewPanel', HideFileOverviewPanel);
+
+    // settings for ControlPanel
+    aIni.WriteInteger('FormBuilder', 'ControlPanelPosition', Integer(ControlPanelPosition));
+    aIni.WriteInteger('FormBuilder', 'ControlPanelSubPosition', Integer(ControlPanelSubPosition));
+    ControlPanelSubParentIdx := 0;
+    if ControlPanelSubParent = BlockBrowse then
+        ControlPanelSubParentIdx := 0
+    else
+        if ControlPanelSubParent = BlockPlaylist then
+            ControlPanelSubParentIdx := 1
+        else
+            if ControlPanelSubParent = BlockMediaList then
+                ControlPanelSubParentIdx := 2
+            else
+                if ControlPanelSubParent = BlockFileOverview then
+                    ControlPanelSubParentIdx := 3;
+    aIni.WriteInteger('FormBuilder', 'ControlPanelSubParentIdx', ControlPanelSubParentIdx);
+
+    aIni.WriteBool('FormBuilder', 'ControlPanelTwoRows'          , ControlPanelTwoRows           );
+    aIni.WriteBool('FormBuilder', 'ControlPanelShowCover'        , ControlPanelShowCover         );
+    // aIni.WriteBool('FormBuilder', 'ControlPanelShowVisualisation', ControlPanelShowVisualisation );
+
+    // make sure the temporary index variables are set correctly
+    for i := 0 to PanelAChilds.Count - 1 do PanelAChilds[i].fParentIndex := 0;
+    for i := 0 to PanelAChilds.Count - 1 do PanelAChilds[i].fSortIndex := i;
+    for i := 0 to PanelBChilds.Count - 1 do PanelBChilds[i].fParentIndex := 1;
+    for i := 0 to PanelBChilds.Count - 1 do PanelBChilds[i].fSortIndex := i;
+
+    aIni.WriteInteger('FormBuilder', 'BlockBrowseParent'      , BlockBrowse.fParentIndex);
+    aIni.WriteInteger('FormBuilder', 'BlockBrowseSort'        , BlockBrowse.fSortIndex  );
+    aIni.WriteInteger('FormBuilder', 'BlockBrowseRatio'       , BlockBrowse.fRatio      );
+
+    aIni.WriteInteger('FormBuilder', 'BlockPlaylistParent'    , BlockPlaylist.fParentIndex );
+    aIni.WriteInteger('FormBuilder', 'BlockPlaylistSort'      , BlockPlaylist.fSortIndex   );
+    aIni.WriteInteger('FormBuilder', 'BlockPlaylistRatio'     , BlockPlaylist.fRatio       );
+
+    aIni.WriteInteger('FormBuilder', 'BlockMediaListParent'   , BlockMediaList.fParentIndex);
+    aIni.WriteInteger('FormBuilder', 'BlockMediaListSort'     , BlockMediaList.fSortIndex  );
+    aIni.WriteInteger('FormBuilder', 'BlockMediaListRatio'    , BlockMediaList.fRatio      );
+
+    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewParent', BlockFileOverview.fParentIndex);
+    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewSort'  , BlockFileOverview.fSortIndex  );
+    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewRatio' , BlockFileOverview.fRatio      );
+
+    // main Ratio and some special ratios
+     aIni.WriteInteger('FormBuilder', 'RatioBrowseArtist'     , BrowseArtistRatio     );
+     aIni.WriteInteger('FormBuilder', 'RatioFileOverviewCover', FileOverviewCoverRatio);
+     aIni.WriteInteger('FormBuilder', 'RatioTopPanel'         , TopPanelRatio         );
+
+{
+with FormBuildOptions do
+    begin
+        ini.WriteInteger('Windows', 'RatioBrowse'      , BlockBrowse.fRatio       );
+        ini.WriteInteger('Windows', 'RatioPlaylist'    , BlockPlaylist.fRatio     );
+        ini.WriteInteger('Windows', 'RatioMedialist'   , BlockMediaList.fRatio    );
+        ini.WriteInteger('Windows', 'RatioFileOverview', BlockFileOverview.fRatio );
+        // main Ratio and some special ratios
+        ini.WriteInteger('Windows', 'RatioBrowseArtist'     , BrowseArtistRatio     );
+        ini.WriteInteger('Windows', 'RatioFileOverviewCover', FileOverviewCoverRatio);
+        ini.WriteInteger('Windows', 'RatioTopPanel'         , TopPanelRatio         );
+    end;
+
+}
+
+end;
+
+procedure TNempFormBuildOptions.NilConstraints;
+begin
+
+    MainSplitter.MinSize := 1; // 0 is not possible
+    SubSplitter1.MinSize := 1;
+    SubSplitter2.MinSize := 1;
+
+    MainContainerA   .Constraints.MinHeight := 0;
+    MainContainerA   .Constraints.MinWidth  := 0;
+    MainContainerB   .Constraints.MinHeight := 0;
+    MainContainerB   .Constraints.MinWidth  := 0;
+    BlockBrowse      .Block.Constraints.MinHeight := 0;
+    BlockBrowse      .Block.Constraints.MinWidth  := 0;
+    BlockPlaylist    .Block.Constraints.MinHeight := 0;
+    BlockPlaylist    .Block.Constraints.MinWidth  := 0;
+    BlockMediaList   .Block.Constraints.MinHeight := 0;
+    BlockMediaList   .Block.Constraints.MinWidth  := 0;
+    BlockFileOverview.Block.Constraints.MinHeight := 0;
+    BlockFileOverview.Block.Constraints.MinWidth  := 0;
+end;
+
+procedure TNempFormBuildOptions.SetProperConstraints;
+begin
+{
+      MAIN_PANEL_MinHeight = 250;
+      MAIN_PANEL_MinWidth = 250;
+
+      CHILD_PANEL_MinWidth = 150;
+      CHILD_PANEL_MinHeight = 100;
+}
+
+    case MainLayout of
+        Layout_TwoRows: begin
+            MainSplitter.MinSize := MAIN_PANEL_MinHeight;
+            SubSplitter1.MinSize := CHILD_PANEL_MinWidth;
+            SubSplitter2.MinSize := CHILD_PANEL_MinWidth;
+
+            MainContainerA   .Constraints.MinHeight := MAIN_PANEL_MinHeight;
+            MainContainerA   .Constraints.MinWidth  := MAIN_PANEL_MinWidth;  // FormConstraints will be a higher
+            MainContainerB   .Constraints.MinHeight := MAIN_PANEL_MinHeight;
+            MainContainerB   .Constraints.MinWidth  := MAIN_PANEL_MinWidth;
+
+            BlockBrowse      .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockPlaylist    .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockMediaList   .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockFileOverview.Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+
+            //ControlPanel.Parent.Constraints.MinWidth := CONTROL_PANEL_MinWidth_1;
+
+            BlockBrowse      .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockPlaylist    .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockMediaList   .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockFileOverview.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+
+            //ControlPanel.Parent.Constraints.MinHeight := CHILD_PANEL_MinHeight + CONTROL_PANEL_HEIGHT_1;
+        end;
+        Layout_TwoColumns: begin
+
+            MainSplitter.MinSize := MAIN_PANEL_MinWidth;
+            SubSplitter1.MinSize :=  CHILD_PANEL_MinHeight;
+            SubSplitter2.MinSize := CHILD_PANEL_MinHeight;
+
+            MainContainerA   .Constraints.MinHeight := MAIN_PANEL_MinHeight; // FormConstraints will be a higher
+            MainContainerA   .Constraints.MinWidth  := MAIN_PANEL_MinWidth;
+            MainContainerB   .Constraints.MinHeight := MAIN_PANEL_MinHeight; // FormConstraints will be a higher
+            MainContainerB   .Constraints.MinWidth  := MAIN_PANEL_MinWidth;
+
+            BlockBrowse      .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockPlaylist    .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockMediaList   .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+            BlockFileOverview.Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
+
+            //ControlPanel.Parent.Constraints.MinWidth := CONTROL_PANEL_MinWidth_1;
+
+            BlockBrowse      .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockPlaylist    .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockMediaList   .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+            BlockFileOverview.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
+
+            //ControlPanel.Parent.Constraints.MinHeight := CHILD_PANEL_MinHeight + CONTROL_PANEL_HEIGHT_1;
+
+        end;
+
+        Layout_Undef: ; // nothing to do
+    end;
+end;
+
+function TNempFormBuildOptions.EmptyPanel(aChildList: TPanelList): Boolean;
+begin
+    result := (aChildList.Count = 0) // should not happen
+              or
+              ( (aChildList.Count = 1) AND (aChildList[0] = BlockFileOverview) AND (HideFileOverviewPanel))
 end;
 
 
@@ -1657,9 +1924,9 @@ begin
               currentTop := 0;
 
               if ControlPanelPosition in [cp_FormTop, cp_FormCenter, cp_FormBottom] then
-                  RemainingSize := SuperContainer.Height - ControlPanel.Height
+                  RemainingSize := SuperContainer.Height - ControlPanel.Height - 4
               else
-                  RemainingSize := SuperContainer.Height;
+                  RemainingSize := SuperContainer.Height - 4;
 
               // place the ControlPanel here, if "TOP"
               if ControlPanelPosition = cp_FormTop then
@@ -1699,14 +1966,28 @@ begin
               end;
 
               // Place the splitter and the remaining MainPanel
-              MainSplitter.Height := 4;
-              MainSplitter.Top := currentTop; //MainContainerA.Height;
-              MainContainerA.Align := alTop;
-              MainSplitter.Align := alTop;
-              MainContainerB.Align := alClient;
+              MainContainerA.Visible := NOT EmptyPanel(PanelAChilds);
+              MainContainerB.Visible := NOT EmptyPanel(PanelBChilds);
+
+              if NOT (EmptyPanel(PanelAChilds) or EmptyPanel(PanelBChilds)) then
+              begin
+                  MainSplitter.Visible := True;
+                  MainSplitter.Height := 4;
+                  MainSplitter.Top := currentTop; //MainContainerA.Height;
+                  MainContainerA.Align := alTop;
+                  MainSplitter.Align := alTop;
+                  MainContainerB.Align := alClient;
+              end else
+              begin
+                  MainSplitter.Visible := False;
+                  if EmptyPanel(PanelAChilds) then MainContainerB.Align := alClient;
+                  if EmptyPanel(PanelBChilds) then MainContainerA.Align := alClient;
+              end;
 
           end;
           Layout_TwoColumns: begin
+
+              RemainingSize := SuperContainer.Width - 4;
 
               if ControlPanelPosition in [cp_FormTop, cp_FormCenter, cp_FormBottom] then
               begin
@@ -1724,15 +2005,31 @@ begin
                   ControlPanel.Align := alBottom;
               end;
 
+              MainContainerA.Visible := NOT EmptyPanel(PanelAChilds);
+              MainContainerB.Visible := NOT EmptyPanel(PanelBChilds);
+              if NOT (EmptyPanel(PanelAChilds) or EmptyPanel(PanelBChilds)) then
+              begin
+                  MainSplitter.Visible := True;
+                  MainContainerA.Left := 0;
+                  MainContainerA.Width := Round(SuperContainer.Width * firstPanelRelativeSize);
 
-              MainContainerA.Left := 0;
-              MainContainerA.Width := Round(SuperContainer.Width * firstPanelRelativeSize);
-              MainSplitter.Width := 4;
-              MainSplitter.Left := MainContainerA.Width;
+                  if MainContainerA.Width < ChildPanelMinWidth then
+                      MainContainerA.Width := ChildPanelMinWidth;
 
-              MainContainerA.Align := alLeft;
-              MainSplitter.Align := alLeft;
-              MainContainerB.Align := alClient;
+                  if MainContainerA.Width > RemainingSize - ChildPanelMinWidth then
+                      MainContainerA.Width := RemainingSize - ChildPanelMinWidth;
+
+                  MainSplitter.Width := 4;
+                  MainSplitter.Left := MainContainerA.Width;
+                  MainContainerA.Align := alLeft;
+                  MainSplitter.Align := alLeft;
+                  MainContainerB.Align := alClient;
+              end  else
+              begin
+                  MainSplitter.Visible := False;
+                  if EmptyPanel(PanelAChilds) then MainContainerB.Align := alClient;
+                  if EmptyPanel(PanelBChilds) then MainContainerA.Align := alClient;
+              end;
           end;
     end;
 
@@ -1909,6 +2206,9 @@ begin
     fMainLayout := NewLayout;
 
     RefreshControlPanel;
+
+    if IsReal then
+        SetProperConstraints;
 end;
 
 procedure TNempFormBuildOptions.RefreshBothRowsOrColumns(DoSort: Boolean);
@@ -1938,8 +2238,8 @@ begin
 
           if DoSort  then
           begin
-              SortaRow(PanelAChilds);
-              SortaRow(PanelBChilds);
+              fLeftToSortIndex;
+              fSortChilds;
           end;
 
           RefreshARow(MainContainerA, rescaleFactorA);
@@ -1952,13 +2252,12 @@ begin
 
           if DoSort  then
           begin
-              SortaColumn(PanelAChilds);
-              SortaColumn(PanelBChilds);
+              fTopToSortIndex;
+              fSortChilds;
           end;
 
           RefreshAColumn(MainContainerA, rescaleFactorA);
           RefreshAColumn(MainContainerB, rescaleFactorB);
-
 
       end;
       Layout_Undef: ; // nothing to do;
@@ -1984,6 +2283,8 @@ procedure TNempFormBuildOptions.RefreshControlPanel;
 begin
     if ControlPanel.IsReal then
     begin
+        /// note: without the extr visualisation panel
+        ///  this can be done much more simple. But I kkep it that way for now ...
         {
         Block,
             Container1, Container2,
@@ -2001,12 +2302,13 @@ begin
         // CONTROL_PANEL_VisualisationWidth = 140;
 
 
+        {
         ControlPanel.Visualisation.Visible := ControlPanelShowVisualisation;
         if ControlPanelShowVisualisation then
             ControlPanel.Visualisation.Width := CONTROL_PANEL_VisualisationWidth
         else
             ControlPanel.Visualisation.Width := 0;
-
+        }
 
         if self.ControlPanelTwoRows then
         begin
@@ -2016,16 +2318,16 @@ begin
             ControlPanel.Container2.Align := alNone;
 
             ControlPanel.Progress.Align := alNone;
-            ControlPanel.Visualisation.Align := alNone;
+            // ControlPanel.Visualisation.Align := alNone;
 
             ControlPanel.Select.Left := 0;
             ControlPanel.Cover.Left := ControlPanel.Select.Width;
             ControlPanel.Player.Left := ControlPanel.Cover.Left + ControlPanel.Cover.Width;
             ControlPanel.Headset.Left := ControlPanel.Player.Left + ControlPanel.Player.Width;
             // vis swaps the parent
-            ControlPanel.Visualisation.Parent := ControlPanel.Container1;
-            ControlPanel.Visualisation.Left := ControlPanel.Headset.Left + ControlPanel.Headset.Width;
-            ControlPanel.Visualisation.Align := alLeft;
+            // ControlPanel.Visualisation.Parent := ControlPanel.Container1;
+            // ControlPanel.Visualisation.Left := ControlPanel.Headset.Left + ControlPanel.Headset.Width;
+            // ControlPanel.Visualisation.Align := alLeft;
             // progress-panel to alClient
             ControlPanel.Progress.Left := 0;
             ControlPanel.Progress.Align := alClient;
@@ -2058,7 +2360,7 @@ begin
 
             // one row
             ControlPanel.Progress.Align := alNone;
-            ControlPanel.Visualisation.Align := alNone;
+            // ControlPanel.Visualisation.Align := alNone;
 
             ControlPanel.Select.Left := 0;
             ControlPanel.Cover.Left := ControlPanel.Select.Width;
@@ -2067,11 +2369,11 @@ begin
 
             ControlPanel.Progress.Left := 0;
 
-            ControlPanel.Visualisation.Parent := ControlPanel.Container2;
-            ControlPanel.Visualisation.Width := CONTROL_PANEL_VisualisationWidth;
-            ControlPanel.Visualisation.Left := ControlPanel.Container2.Width - ControlPanel.Visualisation.Width;
+            // ControlPanel.Visualisation.Parent := ControlPanel.Container2;
+            // ControlPanel.Visualisation.Width := CONTROL_PANEL_VisualisationWidth;
+            // ControlPanel.Visualisation.Left := ControlPanel.Container2.Width - ControlPanel.Visualisation.Width;
+            // ControlPanel.Visualisation.Align := alRight;
 
-            ControlPanel.Visualisation.Align := alRight;
             ControlPanel.Progress.Align := alClient;
 
             ControlPanel.Container1.Left := 0;
@@ -2095,6 +2397,46 @@ begin
 
     end;
     // else: nothing to do, just the testform.
+end;
+
+procedure TNempFormBuildOptions.ResetToDefault;
+begin
+    NewLayout  := Layout_TwoRows;
+    HideFileOverviewPanel := False;
+
+    // settings for ControlPanel
+    ControlPanelPosition      := cp_FormBottom;
+    ControlPanelSubPosition   := cp_SubBottom;   // but that doesn't matter here
+    ControlPanelSubParent     := BlockMediaList; // but that doesn't matter here
+
+    ControlPanelTwoRows           := False;
+    ControlPanelShowCover         := True;
+    // ControlPanelShowVisualisation := True;
+
+    // position and sizes of the 4 blocks
+    PanelAChilds.Clear;
+    PanelBChilds.Clear;
+    PanelAChilds.Add(BlockBrowse);
+    PanelAChilds.Add(BlockPlaylist);
+    PanelBChilds.Add(BlockMediaList);
+    PanelBChilds.Add(BlockFileOverview);
+    BlockBrowse.fRatio := 50;
+    BlockPlaylist.fRatio := 50;
+    BlockMediaList.fRatio := 70;
+    BlockFileOverview.fRatio := 30;
+
+
+    // main Ratio and some special ratios
+    TopPanelRatio          := 50;
+    BrowseArtistRatio      := 50;
+    FileOverviewCoverRatio := 50;
+
+    // apply some settings directly ?
+    BlockFileOverview.Block.Visible := NOT HideFileOverviewPanel;
+
+    RefreshBothRowsOrColumns(False);
+    SwapMainLayout;
+    ApplyRatios;
 end;
 
 procedure TNempFormBuildOptions.ResizeSubPanel(ABlockPanel: TPanel; aSubPanel: TWinControl; aRatio: Integer);
@@ -2175,7 +2517,53 @@ begin
 end;
 
 
+
+procedure TNempFormBuildOptions.fTopToSortIndex;
+var i: Integer;
+begin
+    for i := 0 to PanelAChilds.Count - 1 do
+        PanelAChilds[i].fSortIndex := PanelAChilds[i].Top;
+    for i := 0 to PanelBChilds.Count - 1 do
+        PanelBChilds[i].fSortIndex := PanelBChilds[i].Top;
+end;
+
+procedure TNempFormBuildOptions.fLeftToSortIndex;
+var i: Integer;
+begin
+    for i := 0 to PanelAChilds.Count - 1 do
+        PanelAChilds[i].fSortIndex := PanelAChilds[i].Left;
+    for i := 0 to PanelBChilds.Count - 1 do
+        PanelBChilds[i].fSortIndex := PanelBChilds[i].Left;
+end;
+
 // sorting: just do a quick Bubblesort
+
+procedure TNempFormBuildOptions.fSortaChildList(aPanelList: TPanelList);
+var i: Integer;
+    swapped: Boolean;
+begin
+    swapped := True;
+    while swapped do
+    begin
+        swapped := False;
+        for i := 0 to aPanelList.Count - 2 do
+        begin
+            if aPanelList[i].fSortIndex > aPanelList[i+1].fSortIndex then
+            begin
+                aPanelList.Exchange(i, i+1);
+                swapped := True;
+            end;
+        end;
+    end;
+end;
+
+procedure TNempFormBuildOptions.fSortChilds;
+begin
+    fSortaChildList(PanelAChilds);
+    fSortaChildList(PanelBChilds);
+end;
+
+(*
 procedure TNempFormBuildOptions.SortaColumn(aPanelList: TPanelList);
 var i: Integer;
     swapped: Boolean;
@@ -2212,6 +2600,7 @@ begin
         end;
     end;
 end;
+*)
 
 
 procedure TNempFormBuildOptions.RefreshARow(aMainPanel: TPanel; scaleFactor: Double = 1);
@@ -2242,17 +2631,13 @@ begin
     // unalign ChildPanels and Splitters
     for i := 0 to aChildList.Count - 1 do
         aChildList[i].Align := alNone;
-    //for i := 0 to aSplitterList.Count - 1 do
-    //    aSplitterList[i].Align := alNone;
+    
     fMakeSplittersAvailable(DesiredSplitterTag);
 
 
     // Set Parents (needed, if we swapped some Childs before)
     for i := 0 to aChildList.Count - 1 do
         aChildList[i].Parent := aMainPanel;
-
-    //for i := 0 to aSplitterList.Count - 1 do
-    //    aSplitterList[i].Parent := aMainPanel;
 
 
     currentLeft := 0;
@@ -2348,36 +2733,7 @@ end;
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions);
 var i: integer;
 
-      procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
-      begin
-          if x < minValue then
-              x := minValue;
-          if x > maxValue then
-              x := maxValue;
-      end;
-
 begin
-    with FormBuildOptions do
-    begin
-        BlockBrowse.fRatio       := ini.ReadInteger('Windows', 'RatioBrowse', 40);
-        BlockPlaylist.fRatio     := ini.ReadInteger('Windows', 'RatioPlaylist', 60);
-        BlockMediaList.fRatio    := ini.ReadInteger('Windows', 'RatioMedialist', 70);
-        BlockFileOverview.fRatio := ini.ReadInteger('Windows', 'RatioFileOverview', 30);
-        // main Ratio and some special ratios
-        BrowseArtistRatio      := ini.ReadInteger('Windows', 'RatioBrowseArtist', 50);
-        FileOverviewCoverRatio := ini.ReadInteger('Windows', 'RatioFileOverviewCover', 50);
-        TopPanelRatio          := ini.ReadInteger('Windows', 'RatioTopPanel', 50);
-
-        CheckValue(BlockBrowse.fRatio     , 10, 90);
-        CheckValue(BlockPlaylist.fRatio   , 10, 90);
-        CheckValue(BlockMediaList.fRatio      , 10, 90);
-        CheckValue(BlockFileOverview.fRatio , 10, 90);
-
-        CheckValue(TopPanelRatio, 10, 90);
-        CheckValue(BrowseArtistRatio, 10, 90);
-        CheckValue(FileOverviewCoverRatio   , 10, 90);
-
-    end;
 
     with FormBuildOptions.WindowSizeAndPositions do
     begin
@@ -2576,18 +2932,6 @@ end;
 procedure SaveWindowPositons(ini: TMemIniFile; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
 begin
 
-    with FormBuildOptions do
-    begin
-        ini.WriteInteger('Windows', 'RatioBrowse'      , BlockBrowse.fRatio       );
-        ini.WriteInteger('Windows', 'RatioPlaylist'    , BlockPlaylist.fRatio     );
-        ini.WriteInteger('Windows', 'RatioMedialist'   , BlockMediaList.fRatio    );
-        ini.WriteInteger('Windows', 'RatioFileOverview', BlockFileOverview.fRatio );
-        // main Ratio and some special ratios
-        ini.WriteInteger('Windows', 'RatioBrowseArtist'     , BrowseArtistRatio     );
-        ini.WriteInteger('Windows', 'RatioFileOverviewCover', FileOverviewCoverRatio);
-        ini.WriteInteger('Windows', 'RatioTopPanel'         , TopPanelRatio         );
-    end;
-
 
     with FormBuildOptions.WindowSizeAndPositions do
     begin
@@ -2641,6 +2985,8 @@ procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; var Form
 var i: integer;
 begin
     SaveWindowPositons(ini, FormBuildOptions, aMode);
+    FormBuildOptions.SaveToIni(ini);
+
 
   With Options do
   begin

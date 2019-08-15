@@ -1,11 +1,14 @@
 object ExtendedControlForm: TExtendedControlForm
   Left = 0
   Top = 0
+  Anchors = [akTop, akRight]
   BorderStyle = bsNone
   Caption = 'ExtendedControlForm'
-  ClientHeight = 188
-  ClientWidth = 234
+  ClientHeight = 200
+  ClientWidth = 400
   Color = clBtnFace
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 400
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -27,12 +30,10 @@ object ExtendedControlForm: TExtendedControlForm
     Tag = 6
     Left = 0
     Top = 0
-    Width = 234
-    Height = 188
+    Width = 400
+    Height = 200
     Align = alClient
     BevelOuter = bvNone
-    Constraints.MinHeight = 100
-    Constraints.MinWidth = 50
     TabOrder = 0
     OnMouseDown = ContainerPanelExtendedControlsFormMouseDown
     OnMouseMove = ContainerPanelExtendedControlsFormMouseMove
@@ -40,10 +41,10 @@ object ExtendedControlForm: TExtendedControlForm
     OnPaint = ContainerPanelExtendedControlsFormPaint
     OwnerDraw = False
     DesignSize = (
-      234
-      188)
+      400
+      200)
     object CloseImageE: TSkinButton
-      Left = 222
+      Left = 388
       Top = 0
       Width = 12
       Height = 12

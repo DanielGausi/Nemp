@@ -541,7 +541,7 @@ MainForm_BtnEqualizerSaveNewPrompt = 'Please insert a name for the new preset.';
 
 MainForm_BtnEqualizerDeleteQuery = 'This will delete the preset "%s". Continue?';
 MainForm_BtnEqualizerOverwriteQuery = 'This will overwrite the preset "%s" with the current settings. Continue?';
-Player_RestoreDefaultEqualizer = 'This will delete your personal settings for the default presets (e.g. "Full Bass" or "Reggae"). Other presets ("New preset") are not affected.';
+Player_RestoreDefaultEqualizer = 'This will delete your personal settings for the default presets (e.g. "Full Bass" or "Reggae").'+#13#10#13#10+' Other presets ("New preset") are not affected.';
 MainForm_EqualizerInvalidInput = 'Invalid input. Only chars (a..z), numbers (0..9) and space ( ) are allowed. Please choose another name.';
 
 

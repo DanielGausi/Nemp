@@ -117,6 +117,10 @@ type
       // Flag whether the playlist has been changed and a re-init of fWeightedRandomIndices is necessary
       fPlaylistHasChanged: Boolean;
 
+      // (new 4.11) ok, we'll get a mixture of SendMessages and Events by that, but
+      // it's working, wo why not. maybe change the code to events anyway later ...
+      fOnCueChanged: TNotifyEvent;
+
       function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
@@ -217,6 +221,7 @@ type
 
       property PlayCounter: Integer read fPlayCounter;
       property VST: TVirtualStringTree read fVST write fVST;
+      property OnCueChanged: TNotifyEvent read fOnCueChanged write fOnCueChanged;
 
       property InsertNode: PVirtualNode read fInsertNode write SetInsertNode;
       property InsertIndex: Integer read fInsertIndex;
@@ -421,7 +426,7 @@ begin
   fShowHintsInPlaylist  := Ini.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
   RandomRepeat          := Ini.ReadInteger('Playlist', 'RandomRepeat', 25);
   TNA_PlaylistCount     := ini.ReadInteger('Playlist','TNA_PlaylistCount',30);
-  fPlayingIndex         := ini.ReadInteger('Playlist','IndexinList',-1);
+  fPlayingIndex         := ini.ReadInteger('Playlist','IndexinList',0);
   SavePositionInTrack   := ini.ReadBool('Playlist', 'SavePositionInTrack', True);
   PositionInTrack       := ini.ReadInteger('Playlist', 'PositionInTrack', 0);
   BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', True);
@@ -828,6 +833,8 @@ begin
           Player.Time := CueTime;
           fActiveCueNode := NewCueNode;
           VST.Invalidate;
+          if assigned(fOnCueChanged) then
+              fOnCueChanged(Self);
       end else
       begin
           if assigned(Data) then
@@ -1245,6 +1252,8 @@ begin
     NewCueIndex := Player.GetActiveCue;
     fActiveCueNode := GetActiveCueNode(NewCueIndex);
     VST.Invalidate;
+    if assigned(fOnCueChanged) then
+        fOnCueChanged(Self);
 end;
 
 procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode; ReloadDataFromFile: Boolean);
@@ -1266,7 +1275,7 @@ begin
                 AudioFile.Duration := 0;
 
             if ReloadDataFromFile then
-                SynchAFileWithDisc(AudioFile, False);
+                SynchAFileWithDisc(AudioFile, True);
                 //SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
 
             if not assigned(AudioFile.CueList) then

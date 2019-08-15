@@ -144,6 +144,7 @@ begin
   CloseImageA.Parent := Nemp_MainForm.AuswahlPanel;
   CloseImageA.BringToFront;
 
+
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
 
   // Das ist nötig, um z.B. zu korrigieren, dass die Form komplett unter Form1 versteckt ist!!

@@ -2,8 +2,8 @@ object MainFormBuilder: TMainFormBuilder
   Left = 0
   Top = 0
   Caption = 'Nemp: Customize main window'
-  ClientHeight = 658
-  ClientWidth = 850
+  ClientHeight = 619
+  ClientWidth = 870
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,15 +15,15 @@ object MainFormBuilder: TMainFormBuilder
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    850
-    658)
+    870
+    619)
   PixelsPerInch = 96
   TextHeight = 13
   object ___FormSimulatorPanel: TPanel
     Left = 8
     Top = 8
-    Width = 620
-    Height = 640
+    Width = 640
+    Height = 554
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelInner = bvLowered
     BevelKind = bkFlat
@@ -34,8 +34,8 @@ object MainFormBuilder: TMainFormBuilder
     object __MainContainer: TPanel
       Left = 6
       Top = 6
-      Width = 604
-      Height = 576
+      Width = 624
+      Height = 490
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -43,12 +43,14 @@ object MainFormBuilder: TMainFormBuilder
       object MainSplitter: TSplitter
         Left = 0
         Top = 248
-        Width = 604
+        Width = 624
         Height = 3
         Cursor = crVSplit
         Align = alTop
         MinSize = 100
         ResizeStyle = rsUpdate
+        OnCanResize = SplitterTopCanResize
+        OnMoved = MainSplitterMoved
         ExplicitLeft = 1
         ExplicitTop = 209
         ExplicitWidth = 95
@@ -56,17 +58,19 @@ object MainFormBuilder: TMainFormBuilder
       object _BottomMainPanel: TPanel
         Left = 0
         Top = 251
-        Width = 604
-        Height = 325
+        Width = 624
+        Height = 239
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         object SplitterBottom: TSplitter
           Left = 232
           Top = 0
-          Height = 325
+          Height = 239
           MinSize = 100
           ResizeStyle = rsUpdate
+          OnCanResize = SplitterTopCanResize
+          OnMoved = SplitterTopMoved
           ExplicitLeft = 264
           ExplicitTop = 72
           ExplicitHeight = 100
@@ -75,12 +79,10 @@ object MainFormBuilder: TMainFormBuilder
           Left = 0
           Top = 0
           Width = 232
-          Height = 325
+          Height = 239
           Align = alLeft
           BevelKind = bkFlat
           BevelOuter = bvNone
-          Constraints.MinHeight = 80
-          Constraints.MinWidth = 40
           TabOrder = 0
           StyleElements = []
           OnResize = BlockMedialistResize
@@ -96,7 +98,7 @@ object MainFormBuilder: TMainFormBuilder
             Left = 0
             Top = 17
             Width = 228
-            Height = 304
+            Height = 218
             Align = alClient
             Caption = 'Medialist'
             TabOrder = 1
@@ -104,10 +106,10 @@ object MainFormBuilder: TMainFormBuilder
             OnResize = BlockMedialistResize
             DesignSize = (
               228
-              304)
+              218)
             object ImgMediaListDown: TImage
               Left = 96
-              Top = 276
+              Top = 190
               Width = 24
               Height = 24
               Anchors = [akLeft, akBottom]
@@ -142,20 +144,18 @@ object MainFormBuilder: TMainFormBuilder
         object BlockFileOverview: TPanel
           Left = 235
           Top = 0
-          Width = 369
-          Height = 325
+          Width = 389
+          Height = 239
           Align = alClient
           BevelKind = bkFlat
           BevelOuter = bvNone
-          Constraints.MinHeight = 80
-          Constraints.MinWidth = 40
           TabOrder = 1
           StyleElements = []
           OnResize = BlockFileOverviewResize
           object HeaderFileOverview: TPanel
             Left = 0
             Top = 0
-            Width = 365
+            Width = 385
             Height = 17
             Align = alTop
             TabOrder = 0
@@ -163,19 +163,19 @@ object MainFormBuilder: TMainFormBuilder
           object ContentFileOverview: TPanel
             Left = 0
             Top = 17
-            Width = 365
-            Height = 304
+            Width = 385
+            Height = 218
             Align = alClient
             Caption = 'File overview'
             TabOrder = 1
             StyleElements = []
             OnResize = BlockFileOverviewResize
             DesignSize = (
-              365
-              304)
+              385
+              218)
             object ImgFileOverviewDown: TImage
               Left = 184
-              Top = 276
+              Top = 190
               Width = 24
               Height = 24
               Anchors = [akLeft, akBottom]
@@ -190,7 +190,7 @@ object MainFormBuilder: TMainFormBuilder
               OnClick = ImgLeftClick
             end
             object ImgFileOverviewRight: TImage
-              Left = 336
+              Left = 356
               Top = 112
               Width = 24
               Height = 24
@@ -211,7 +211,7 @@ object MainFormBuilder: TMainFormBuilder
       object _TopMainPanel: TPanel
         Left = 0
         Top = 0
-        Width = 604
+        Width = 624
         Height = 248
         Align = alTop
         BevelOuter = bvNone
@@ -222,6 +222,8 @@ object MainFormBuilder: TMainFormBuilder
           Height = 248
           MinSize = 100
           ResizeStyle = rsUpdate
+          OnCanResize = SplitterTopCanResize
+          OnMoved = SplitterTopMoved
           ExplicitLeft = 321
           ExplicitTop = 17
           ExplicitHeight = 246
@@ -234,8 +236,6 @@ object MainFormBuilder: TMainFormBuilder
           Align = alLeft
           BevelKind = bkFlat
           BevelOuter = bvNone
-          Constraints.MinHeight = 80
-          Constraints.MinWidth = 40
           TabOrder = 0
           StyleElements = []
           OnResize = BlockBrowseResize
@@ -297,20 +297,18 @@ object MainFormBuilder: TMainFormBuilder
         object BlockPlaylist: TPanel
           Left = 283
           Top = 0
-          Width = 321
+          Width = 341
           Height = 248
           Align = alClient
           BevelKind = bkFlat
           BevelOuter = bvNone
-          Constraints.MinHeight = 80
-          Constraints.MinWidth = 40
           TabOrder = 1
           StyleElements = []
           OnResize = BlockPlaylistResize
           object HeaderPlaylist: TPanel
             Left = 0
             Top = 0
-            Width = 317
+            Width = 337
             Height = 17
             Align = alTop
             TabOrder = 0
@@ -318,7 +316,7 @@ object MainFormBuilder: TMainFormBuilder
           object ContentPlaylist: TPanel
             Left = 0
             Top = 17
-            Width = 317
+            Width = 337
             Height = 227
             Align = alClient
             Caption = 'Playlist'
@@ -326,7 +324,7 @@ object MainFormBuilder: TMainFormBuilder
             StyleElements = []
             OnResize = BlockPlaylistResize
             DesignSize = (
-              317
+              337
               227)
             object ImgPlaylistDown: TImage
               Left = 152
@@ -345,7 +343,7 @@ object MainFormBuilder: TMainFormBuilder
               OnClick = ImgLeftClick
             end
             object ImgPlaylistRight: TImage
-              Left = 288
+              Left = 308
               Top = 120
               Width = 24
               Height = 24
@@ -366,8 +364,8 @@ object MainFormBuilder: TMainFormBuilder
     end
     object _ControlPanel: TPanel
       Left = 6
-      Top = 582
-      Width = 604
+      Top = 496
+      Width = 624
       Height = 48
       Align = alBottom
       BevelKind = bkFlat
@@ -378,7 +376,7 @@ object MainFormBuilder: TMainFormBuilder
     end
   end
   object GrpBoxSettings: TGroupBox
-    Left = 643
+    Left = 663
     Top = 8
     Width = 185
     Height = 65
@@ -401,17 +399,18 @@ object MainFormBuilder: TMainFormBuilder
     end
   end
   object Apply: TButton
-    Left = 732
-    Top = 625
-    Width = 110
+    Left = 727
+    Top = 586
+    Width = 121
     Height = 25
+    Hint = 'Assign the current layout to the Nemp window'
     Anchors = [akRight, akBottom]
     Caption = 'Apply'
     TabOrder = 2
     OnClick = ApplyClick
   end
   object GroupBox1: TGroupBox
-    Left = 643
+    Left = 663
     Top = 79
     Width = 185
     Height = 217
@@ -472,10 +471,11 @@ object MainFormBuilder: TMainFormBuilder
     end
   end
   object GroupBox2: TGroupBox
-    Left = 643
+    Left = 663
     Top = 302
     Width = 185
     Height = 99
+    Anchors = [akTop, akRight]
     Caption = 'Player Control Configuration'
     TabOrder = 4
     object cbControlPanelRows: TCheckBox
@@ -496,21 +496,13 @@ object MainFormBuilder: TMainFormBuilder
       TabOrder = 1
       OnClick = cbControlPanelShowCoverClick
     end
-    object cbControlPanelShowVisualisation: TCheckBox
-      Left = 16
-      Top = 70
-      Width = 153
-      Height = 17
-      Caption = 'Show Visualisation'
-      TabOrder = 2
-      OnClick = cbControlPanelShowVisualisationClick
-    end
   end
   object GroupBox3: TGroupBox
-    Left = 643
+    Left = 663
     Top = 407
     Width = 185
     Height = 122
+    Anchors = [akTop, akRight]
     Caption = 'Other Options'
     TabOrder = 5
     object cbHideFileOverview: TCheckBox
@@ -522,5 +514,27 @@ object MainFormBuilder: TMainFormBuilder
       TabOrder = 0
       OnClick = cbHideFileOverviewClick
     end
+  end
+  object BtnUndo: TButton
+    Left = 589
+    Top = 586
+    Width = 121
+    Height = 25
+    Hint = 'Revert to current layout in the Nemp window'
+    Anchors = [akRight, akBottom]
+    Caption = 'Undo'
+    TabOrder = 6
+    OnClick = BtnUndoClick
+  end
+  object BtnResetToDefault: TButton
+    Left = 453
+    Top = 586
+    Width = 121
+    Height = 25
+    Hint = 'Restore the default settings'
+    Anchors = [akRight, akBottom]
+    Caption = 'Reset to Default'
+    TabOrder = 7
+    OnClick = BtnResetToDefaultClick
   end
 end

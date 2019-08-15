@@ -542,7 +542,7 @@ begin
         Spectrum.Pen := clActiveCaption;
         Spectrum.Peak := clBackground;
         Spectrum.BackColor := clBtnFace;
-        Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
+        // Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
         Spectrum.DrawClear;
 
         AuswahlForm.InitForm;
@@ -670,16 +670,17 @@ begin
         //s := gettickcount;
         UpdateSplashScreen(SplashScreen_GenerateWindows);
 
-        _TopMainPanel.Constraints.MinHeight := MAIN_PANEL_MIN_HEIGHT;
-        _TopMainPanel.Constraints.MinWidth := MAIN_PANEL_MIN_WIDTH;
+        _TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
+        _TopMainPanel.Constraints.MinWidth := NempFormBuildOptions.MainPanelMinWidth;
 
         GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
 
-        ArtistsVST.BorderWidth := 0;
+       { ArtistsVST.BorderWidth := 0;
         AlbenVST.BorderWidth := 0;
         PlaylistVST.BorderWidth := 0;
         VST.BorderWidth := 0;
+        }
 
         //------------
 
