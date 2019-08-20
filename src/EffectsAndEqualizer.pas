@@ -314,19 +314,6 @@ begin
 end;
 
 
-{
-========================================
-Event-Handler for Speed
-========================================
-}
-
-{
-========================================
-Event-Handler for Equalizer
-========================================
-}
-
-
 function TFormEffectsAndEqualizer.GetDefaultEQName(aIdx: Integer): String;
 begin
   if (aIdx >= 0) and (aIdx <= 17) then

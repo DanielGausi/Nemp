@@ -410,7 +410,7 @@ type
     LblHeadsetDefaultAction: TLabel;
     GrpBox_DefaultAction: TComboBox;
     GrpBox_HeadsetDefaultAction: TComboBox;
-    cb_AutoStopHeadset: TCheckBox;
+    cb_AutoStopHeadsetSwitchTab: TCheckBox;
     GrpBox_PlayerExt2_Playlist: TGroupBox;
     CB_AutoMixPlaylist: TCheckBox;
     CB_DisableAutoDeleteAtUserInput: TCheckBox;
@@ -524,6 +524,7 @@ type
     VSTLyricSettings: TVirtualStringTree;
     BtnLyricPriorities: TUpDown;
     LblLyricPriorities: TLabel;
+    cb_AutoStopHeadsetAddToPlayist: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1152,7 +1153,9 @@ begin
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
   GrpBox_HeadsetDefaultAction.ItemIndex := NempPlaylist.HeadSetAction;
 
-  cb_AutoStopHeadset.Checked := NempPlaylist.AutoStopHeadset;
+  cb_AutoStopHeadsetSwitchTab.Checked := NempPlaylist.AutoStopHeadsetSwitchTab;
+  cb_AutoStopHeadsetAddToPlayist.Checked := NempPlaylist.AutoStopHeadsetAddToPlayist;
+
 
   CB_Fading.Checked := NempPlayer.UseFading;
   CB_visual.Checked := NempPlayer.UseVisualization;
@@ -2179,16 +2182,10 @@ begin
 end;
 
 function TOptionsCompleteForm.GetFocussedAudioFileName: UnicodeString;
-var aNode: PVirtualNode;
-  Data: PTreeData;
 begin
   result := '';
-  if Nemp_MainForm.AktiverTree = NIL then exit;
-  aNode := Nemp_MainForm.AktiverTree.FocusedNode;
-  if not assigned(aNode) then exit;
-
-  Data := Nemp_MainForm.AktiverTree.GetNodeData(aNode);
-  result := Data^.FAudioFile.Pfad;
+  if assigned(MedienBib.CurrentAudioFile) then
+      result := MedienBib.CurrentAudioFile.Pfad;
 end;
 
 procedure TOptionsCompleteForm.BtnGetCountDownTitelClick(Sender: TObject);
@@ -2274,7 +2271,8 @@ begin
 
   NempPlaylist.DefaultAction := GrpBox_DefaultAction.ItemIndex;
   NempPlaylist.HeadSetAction := GrpBox_HeadsetDefaultAction.ItemIndex;
-  NempPlaylist.AutoStopHeadset := cb_AutoStopHeadset.Checked;
+  NempPlaylist.AutoStopHeadsetSwitchTab := cb_AutoStopHeadsetSwitchTab.Checked;
+  NempPlaylist.AutoStopHeadsetAddToPlayist := cb_AutoStopHeadsetAddToPlayist.Checked;
 
   NempPlayer.UseFading := CB_Fading.Checked;
   NempPlayer.UseVisualization := CB_Visual.Checked;
@@ -2968,7 +2966,8 @@ begin
       if Not Nemp_MainForm.GlobalUseAdvancedSkin then
       begin
           TStyleManager.SetStyle('Windows');
-          Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+           Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+          // Nemp_MainForm.CorrectSkinRegions;
       end else
       begin
           // refresh skin, if a skin is used, and it supports advanced skinning

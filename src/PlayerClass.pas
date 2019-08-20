@@ -2642,7 +2642,7 @@ begin
 end;
 
 procedure TNempPlayer.SetABSyncs(p1, p2: Double);
-var tmp, t1: Double;
+var tmp: Double;
     syncpos: LongWord;
     ByteLength: LongWord;
 
@@ -2654,12 +2654,16 @@ begin
         if p2 = -1 then
         begin
             // get automatic p2: p1 + 10 seconds
-            t1 := BASS_ChannelBytes2seconds(MainStream,
-                  Round(ByteLength * p1)) + 10;
-            SyncPos := BASS_ChannelSeconds2bytes(MainStream, t1);
-            if SyncPos > ByteLength then
-                SyncPos := ByteLength;
-            fABRepeatEndPosition := SyncPos / ByteLength;
+            //t1 := BASS_ChannelBytes2seconds(MainStream,
+            //      Round(ByteLength * p1)) + 10;
+            //SyncPos := BASS_ChannelSeconds2bytes(MainStream, t1);
+            //if SyncPos > ByteLength then
+            //    SyncPos := ByteLength;
+            //fABRepeatEndPosition := SyncPos / ByteLength;
+            //
+            // change 2019: set it just to the end of the file  as default
+            fABRepeatEndPosition := 0.999;
+            SyncPos := (Round(ByteLength * p2));
         end else
         begin
             if p1 > p2 then
@@ -3160,7 +3164,10 @@ begin
     HeadsetPicture.Bitmap.Height := NEMP_PLAYER_COVERSIZE;
 
     LoadHeadSetGraphic;
+
     exit;
+
+    { // note, do not show proper Cover in HeadsetControls? or do it?
     if assigned(HeadSetAudioFile) then
     begin
         result := GetCover(HeadSetAudioFile, HeadsetPicture, True);
@@ -3171,6 +3178,7 @@ begin
         LoadHeadSetGraphic;
         result := False;
     end;
+    }
 end;
 
 

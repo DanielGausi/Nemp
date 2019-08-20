@@ -177,8 +177,8 @@ type
         fControlSelectionLoaded,
         fControCoverLoaded,
         fControlPlayerLoaded,
-        fControlProgressLoaded,
-        fControlVisLoaded        : Boolean;
+        fControlProgressLoaded : Boolean;
+        //fControlVisLoaded
 
         fBrowseBitmapLoaded,
         fMedialistBitmapLoaded,
@@ -256,7 +256,7 @@ type
         ControlSelectionBmp,
         ControlCoverBmp,
         ControlProgressBmp,
-        ControlVisBmp,
+        // ControlVisBmp,
         ControlGenericBmp: TBitmap;
 
         // a copy of the Bitmap painted on the Progress-Panel
@@ -473,7 +473,7 @@ begin
   ControlSelectionBmp := TBitmap.Create;
   ControlCoverBmp     := TBitmap.Create;
   ControlProgressBmp  := TBitmap.Create;
-  ControlVisBmp       := TBitmap.Create;
+  // ControlVisBmp       := TBitmap.Create;
   ControlGenericBmp   := TBitmap.Create;
   PaintedProgressBitmap := TBitmap.Create;
 
@@ -607,7 +607,7 @@ begin
   ControlSelectionBmp  .Free;
   ControlCoverBmp      .Free;
   ControlProgressBmp   .Free;
-  ControlVisBmp        .Free;
+  // ControlVisBmp        .Free;
   ControlGenericBmp    .Free;
   PaintedProgressBitmap.Free;
   // ExtendedPlayerBitmap.Free;
@@ -903,16 +903,16 @@ begin
       fControlSelectionLoaded  := LoadGraphicFromBaseName(ControlSelectionBmp , DirName + '\ControlSelection', True);
       fControCoverLoaded       := LoadGraphicFromBaseName(ControlCoverBmp     , DirName + '\ControlCover'    , True);
       fControlProgressLoaded   := LoadGraphicFromBaseName(ControlProgressBmp  , DirName + '\ControlProgress' , True);
-      fControlVisLoaded        := LoadGraphicFromBaseName(ControlVisBmp       , DirName + '\ControlVis'      , True);
+      // fControlVisLoaded        := LoadGraphicFromBaseName(ControlVisBmp       , DirName + '\ControlVis'      , True);
 
       if not fControlPlayerLoaded    then PaintFallbackImage(PlayerBitmap);
       if not fControlSelectionLoaded then PaintFallbackImage(ControlSelectionBmp);
       if not fControCoverLoaded      then PaintFallbackImage(ControlCoverBmp);
       if not fControlProgressLoaded  then PaintFallbackImage(ControlProgressBmp);
-      if not fControlVisLoaded       then PaintFallbackImage(ControlVisBmp);
+      // if not fControlVisLoaded       then PaintFallbackImage(ControlVisBmp);
 
       // this one will be always used in some way
-      if not LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGenericBmp', True) then
+      if not LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGeneric', True) then
           PaintFallbackImage(ControlGenericBmp);
 
       {
@@ -1002,6 +1002,7 @@ begin
                   Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuSkinImageList;
                   Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuSkinImageList;
                   Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuSkinImageList;
+                  Nemp_MainForm.PopupTools                .Images := Nemp_MainForm.MenuSkinImageList;
               finally
                   ButtonTmp.Free;
               end;
@@ -1021,6 +1022,7 @@ begin
     Nemp_MainForm.Medialist_View_PopupMenu  .Images := Nemp_MainForm.MenuImages;
     Nemp_MainForm.PlayListPOPUP             .Images := Nemp_MainForm.MenuImages;
     Nemp_MainForm.Player_PopupMenu          .Images := Nemp_MainForm.MenuImages;
+    Nemp_MainForm.PopupTools                .Images := Nemp_MainForm.MenuImages;
 end;
 
 
@@ -1692,6 +1694,7 @@ begin
   {$ENDIF}
 
   Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+  //Nemp_MainForm.CorrectSkinRegions;
 
 end;
 
@@ -1794,9 +1797,9 @@ begin
         Nemp_MainMenu             .Images := MenuImages;
         Medialist_View_PopupMenu  .Images := MenuImages;
         Medialist_Browse_PopupMenu.Images := MenuImages;
-
-        PlayListPOPUP      .Images := MenuImages;
-        Player_PopupMenu   .Images := MenuImages;
+        PlayListPOPUP             .Images := MenuImages;
+        Player_PopupMenu          .Images := MenuImages;
+        PopupTools                .Images := MenuImages;
 
         SetDefaultButtonSizes;
         AssignButtonSizes;
@@ -2019,6 +2022,7 @@ begin
     TStyleManager.TrySetStyle('Windows');
     {$ENDIF}
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+    //Nemp_MainForm.CorrectSkinRegions;
   end;
 end;
 
@@ -2156,6 +2160,7 @@ begin
                     end;
                 end;
 
+                {
                 5: begin
                     // Spectrum
                     if fControlVisLoaded then
@@ -2165,6 +2170,7 @@ begin
                         SourceOffsetPoint := Point(0,0);
                     end;
                 end;
+                }
             end;
 
             with Nemp_MainForm do

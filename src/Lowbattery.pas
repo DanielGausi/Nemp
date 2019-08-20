@@ -20,8 +20,6 @@ type
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
-    procedure BackUpComboBoxes;
-    procedure RestoreComboboxes;
   end;
 
 var
@@ -42,19 +40,5 @@ begin
         Image1.Picture.LoadFromFile(filename);
 end;
 
-procedure TFormLowBattery.BackUpComboBoxes;
-var i: Integer;
-begin
-    for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        Components[i].Tag := (Components[i] as TComboBox).ItemIndex;
-end;
-procedure TFormLowBattery.RestoreComboboxes;
-var i: Integer;
-begin
-  for i := 0 to self.ComponentCount - 1 do
-      if (Components[i] is TComboBox) then
-        (Components[i] as TComboBox).ItemIndex := Components[i].Tag;
-end;
 
 end.

@@ -56,7 +56,6 @@ procedure Handle_STNewFile(var Msg: TMessage);
 procedure Handle_STFinish(var Msg: TMessage);
 
 
-
 implementation
 
 
@@ -71,8 +70,6 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
-    tid, tidPlaylist    : Cardinal;
-
 
 function Handle_NempAPI_UserCommands(Var aMSG: tMessage): Boolean;
 var aAudioFile: tAudioFile;
@@ -448,11 +445,8 @@ begin
         IPC_QUERYCOVER: begin  // Cover liefern
                           if assigned(NempPlayer.MainAudioFile) then
                           begin
-                               //Coverbmp := tBitmap.Create;
                                CoverPicture := TPicture.Create;
                                try
-                                   //Coverbmp.Width := 240;
-                                   //Coverbmp.Height := 240;
                                    if GetCover(NempPlayer.MainAudioFile, CoverPicture, true) then
                                    begin
                                       aMsg.Result := 1;
@@ -472,7 +466,6 @@ begin
                                    end else
                                       aMsg.result := -1;
                                finally
-                                   //CoverBmp.Free;
                                    CoverPicture.Free;
                                end
                           end else
@@ -648,19 +641,17 @@ begin
 
         MB_ProgressSearchDead: begin
             ProgressFormLibrary.lblCurrentItem.Caption := Format((MediaLibrary_SearchingMissingFilesDir), [pChar(aMsg.LParam)]);
-            //ProgressFormLibrary.SetCurrent_Library(Format((MediaLibrary_SearchingMissingFilesDir), [pChar(aMsg.LParam)]) );
         end;
 
         MB_ProgressShowHint: begin
-              // Note: ONLY for Processes from the MediaLibrary!
-              ProgressFormLibrary.lblCurrentItem.Caption := pChar(aMsg.LParam);
-              //ProgressFormLibrary.SetCurrent_Library(PChar(aMsg.LParam));
+            // Note: ONLY for Processes from the MediaLibrary!
+            ProgressFormLibrary.lblCurrentItem.Caption := pChar(aMsg.LParam);
         end;
 
         MB_DuplicateWarning: AddErrorLog(MediaLibrary_DuplicatesWarning);
 
         MB_ThreadFileUpdate: begin
-                        MedienBib.CurrentThreadFilename := PWideChar(aMsg.LParam);
+            MedienBib.CurrentThreadFilename := PWideChar(aMsg.LParam);
         end;
 
         MB_RefreshAudioFile: begin
@@ -674,7 +665,6 @@ begin
 
         MB_ProgressCurrentFileOrDirUpdate: begin
             ProgressFormLibrary.lblCurrentItem.Caption := PWideChar(aMsg.LParam);
-            //ProgressFormLibrary.SetCurrent_Library(PWideChar(aMsg.LParam));
         end;
 
         MB_TagsSetTabWarning: begin
@@ -682,11 +672,8 @@ begin
         end;
 
         MB_UpdateProcessComplete: begin
-                              // MessageDlg(PWideChar(aMsg.LParam), mtInformation, [mbOK], 0);
                               ProgressFormLibrary.LblMain.Caption := PWideChar(aMsg.LParam);
                               ProgressFormLibrary.lblCurrentItem.Caption := '';
-                              //ProgressFormLibrary.SetMainLabel_Library(PWideChar(aMsg.LParam));
-                              //ProgressFormLibrary.SetCurrent_Library('');
                               ProgressFormLibrary.FinishProcess(jt_WorkingLibrary);
                             end;
         MB_UpdateProcessCompleteSomeErrors: begin
@@ -694,11 +681,9 @@ begin
         end;
 
         MB_CurrentProcessSuccessCount: begin
-                              //ProgressFormLibrary.SetSuccess_Library(aMsg.LParam);
                               ProgressFormLibrary.lblSuccessCount.Caption := IntToStr(aMsg.LParam);
         end;
         MB_CurrentProcessFailCount: begin
-                              //ProgressFormLibrary.SetFail_Library(aMsg.LParam);
                               ProgressFormLibrary.lblFailCount.Caption := IntToStr(aMsg.LParam);
         end;
 
@@ -2065,20 +2050,6 @@ begin
     end;
 end;
 
-procedure CurDir(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
-begin
-    ProgressFormLibrary.lblSuccessCount.Caption := IntToStr(MedienBib.UpdateList.Count);
-    ProgressFormLibrary.lblCurrentItem.Caption := Format(MediaLibrary_SearchingNewFilesDir, [ST_Medienliste.CurrentDir]);
-
-    Nemp_MainForm.LblEmptyLibraryHint.Caption :=
-          Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
-end;
-
-procedure CurDirPlayist(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
-begin
-    ProgressFormPlaylist.lblSuccessCount.Caption := IntToStr(NempPlaylist.FileSearchCounter);
-    ProgressFormPlaylist.lblCurrentItem.Caption := Format(Playlist_SearchingNewFilesDir, [ST_Playlist.CurrentDir]);
-end;
 
 procedure Handle_STStart(var Msg: TMessage);
 begin
@@ -2086,12 +2057,14 @@ begin
     begin
         // Media library
         ProgressFormLibrary.lblCurrentItem.Caption := (MediaLibrary_StartSearchingNewFiles);
-        tid := timeSetEvent(250, 1, @CurDir, 0, TIME_PERIODIC);
+        MedienBib.CurrentSearchDir := '';
+        Nemp_MainForm.CurrentSearchDirMediaLibraryTimer.Enabled := True;
     end else
     begin
         // Playlist
         ProgressFormPlaylist.lblCurrentItem.Caption := (Playlist_StartSearchingFiles);
-        tidPlaylist := timeSetEvent(250, 1, @CurDirPlayist, 0, TIME_PERIODIC);
+        NempPlaylist.CurrentSearchDir := '';
+        Nemp_MainForm.CurrentSearchDirPlayistTimer.Enabled := True;
     end;
 end;
 
@@ -2110,6 +2083,7 @@ begin
         // Datei in die MedienListe aufnehmen
         begin
             ext := AnsiLowerCase(ExtractFileExt(NewFile));
+            MedienBib.CurrentSearchDir := ExtractFileDir(NewFile);
             // Unterscheiden, ob Playlist-Datei oder normal:
             if (ext = '.m3u') or (ext = '.m3u8') or (ext = '.pls') or (ext = '.npl')
                               or (ext = '.asx') or (ext = '.wax')
@@ -2132,6 +2106,7 @@ begin
         begin
             // Datei nur in die Playlist übernehmen
             NempPlaylist.InsertFileToPlayList(NewFile);
+            NempPlaylist.CurrentSearchDir := ExtractFileDir(NewFile);
             NempPlaylist.FileSearchCounter := NempPlaylist.FileSearchCounter + 1;
 
             if (NempPlayer.Mainstream = 0) then
@@ -2150,7 +2125,8 @@ begin
         case Msg.WParam of
           ST_ID_Playlist: begin
                 // stop the timer
-                timeKillEvent(tidPlaylist);
+                //timeKillEvent(tidPlaylist);
+                Nemp_MainForm.CurrentSearchDirPlayistTimer.Enabled := False;
 
                 if NempPlaylist.ST_Ordnerlist.Count > 0 then
                   NempPlaylist.ST_Ordnerlist.Delete(0);
@@ -2171,7 +2147,8 @@ begin
           end;
           ST_ID_Medialist: begin
                 //Timer stoppen
-                timeKillEvent(tid);
+                //timeKillEvent(tid);
+                Nemp_MainForm.CurrentSearchDirMediaLibraryTimer.Enabled := False;
 
                 if Medienbib.ST_Ordnerlist.Count > 0 then
                   Medienbib.ST_Ordnerlist.Delete(0);

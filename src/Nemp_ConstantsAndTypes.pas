@@ -76,26 +76,6 @@ type
       sortAscending: boolean;
     end;
 
-    {
-    TNempMainFormRatios = record
-      //VSTHeight: Integer;
-      //BrowseWidth: Integer;
-      //VSTWidth: Integer;
-
-      // ArtistWidth: Integer;  // reuse later
-      // VDTCoverWidth: Integer; // reuse later
-
-      // new ratios (2019, Formbuilder)
-      // (still Integer-Values: 0..100%)
-
-      //ContainerRatio: Integer;
-      //BrowseRatio,  // property of the TNempBlock!
-      //PlaylistRatio,
-      //MedialistRatio,
-      //FileOverviewRatio: Integer;
-
-    end;
-    }
 
     TNempWindowSizeAndPositions = record
         // MiniForms visible
@@ -205,23 +185,7 @@ type
 
     TControlPanel = class(TNempBlockPanel)
         private
-            {function fGetParent : TWinControl ;
-            function fGetAlign  : TAlign      ;
-            function fGetHeight : Integer     ;
-            function fGetWidth  : Integer     ;
-            function fGetLeft   : Integer     ;
-            function fGetTop    : Integer     ;
-
-            procedure fSetParent(Value: TWinControl  );
-            procedure fSetAlign (Value: TAlign       );
-            procedure fSetHeight(Value: Integer      );
-            procedure fSetWidth (Value: Integer      );
-            procedure fSetLeft  (Value: Integer      );
-            procedure fSetTop   (Value: Integer      );
-            }
-
             function fIsReal: Boolean;
-
         public
             //Block,
             Container1,
@@ -231,16 +195,9 @@ type
             Player,
             Headset,
             Progress : TPanel;
-            //Visualisation
+
             Name: String;
 
-            {property Height  : Integer      read fGetHeight  write fSetHeight ;
-            property Width   : Integer      read fGetWidth   write fSetWidth  ;
-            property Left    : Integer      read fGetLeft    write fSetLeft   ;
-            property Top     : Integer      read fGetTop     write fSetTop    ;
-            property Parent  : TWinControl  read fGetParent  write fSetParent ;
-            property Align   : TAlign       read fGetAlign   write fSetAlign  ;
-            }
             // real: The "real" ControlPanel with all the subPanels,
             // and not the pure ControlPanel on the Test-Form
             property IsReal: Boolean read fIsReal;
@@ -269,8 +226,6 @@ type
             // called by RefreshBothRowsOrColumns;
             procedure fSortaChildList(aPanelList: TPanelList);
             procedure fSortChilds;
-            //procedure SortaRow(aPanelList: TPanelList);
-            //procedure SortaColumn(aPanelList: TPanelList);
 
             function fGetIsReal: Boolean;
 
@@ -386,30 +341,10 @@ type
 
             procedure ResizeSubPanel(ABlockPanel: TPanel; aSubPanel: TWinControl; aRatio: Integer);
 
-
             // on initializing the form, (?or after setting a new layuot?)
             procedure ApplyRatios;
     end;
 
-    {
-    // Das speichert die Aufteilung der Form
-    // Im Programm findet man dann ein Array dieses Typs,
-    // für jeden Anzeigemodus eins.
-    TNempFormAufteilung = record
-      FormTop: integer;
-      FormLeft: integer;
-      FormHeight: integer;
-      FormWidth: integer;
-      TopMainPanelHeight: integer;
-      AuswahlPanelWidth: integer;
-      ArtistWidth: integer;
-      FormMinHeight: integer;
-      FormMaxHeight: integer;
-      FormMinWidth: integer;
-      FormMaxWidth: integer;
-      Maximized: boolean;
-    end;
-    }
     TNempRegionsDistance = record
       Left: integer;
       Right: integer;
@@ -453,10 +388,6 @@ type
         // EditOnClick: Boolean;
         TippSpeed: Integer;
 
-        //NempFormAufteilung: Array [0..1] of TNempFormAufteilung;
-
-        //NempFormRatios: TNempMainFormRatios;
-        // NempEinzelFormOptions: TNempWindowSizeAndPositions; // Optionen für die Einzelformen -> moved to FormBuilder
         NempWindowView: Word;
         StartMinimized: Boolean;
         StartMinimizedByParameter: Boolean;
@@ -466,9 +397,17 @@ type
         Language: String;
         maxDragFileCount: Integer;
 
+        // shutdown variables
+        // used during runtime
         ShutDownMode: Integer;
         ShutDownTime: TDateTime;
         ShutDownAtEndOfPlaylist: Boolean;
+        // used for the initialising the settings form
+        ShutDownModeIniIdx,
+        ShutDownTimeIniIdx,
+        ShutDownTimeIniHours,
+        ShutDownTimeIniMinutes : Integer;
+
 
         // Optionen für die Darstellung der Playliste/Medienliste
         // MinFontColor: TColor;          // not editable in Nemp 4.0 any longer
@@ -502,7 +441,6 @@ type
         ReplaceNAArtistBy  : Integer;
         ReplaceNATitleBy   : Integer;
         ReplaceNAAlbumBy   : Integer;
-
 
         WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
@@ -1529,17 +1467,8 @@ procedure TNempFormBuildOptions.ApplyRatios;
 begin
     // set size of the two MainPanels
     fSetMainContainerSizes;
-
     fApplyRatio(MainContainerA, PanelAChilds);
     fApplyRatio(MainContainerB, PanelBChilds);
-
-
-    {
-        subratios setzen
-            BrowseArtistRatio
-            FileOverviewCoverRatio
-    }
-
 end;
 
 procedure TNempFormBuildOptions.Assign(
@@ -1589,15 +1518,12 @@ begin
         ControlPanelSubParent := BlockFileOverview;
 
 
-
     HideFileOverviewPanel := aNempFormBuildOptions.HideFileOverviewPanel;
     BlockFileOverview.fBlock.Visible := NOT HideFileOverviewPanel;
 
     ControlPanelTwoRows           := aNempFormBuildOptions.ControlPanelTwoRows           ;
     ControlPanelShowCover         := aNempFormBuildOptions.ControlPanelShowCover         ;
-    // ControlPanelShowVisualisation := aNempFormBuildOptions.ControlPanelShowVisualisation ;
 
-    // toDo: SetRatios?
     TopPanelRatio := aNempFormBuildOptions.TopPanelRatio;
     BlockBrowse      .fRatio := aNempFormBuildOptions.BlockBrowse      .fRatio;
     BlockPlaylist    .fRatio := aNempFormBuildOptions.BlockPlaylist    .fRatio;
@@ -1738,21 +1664,6 @@ begin
      aIni.WriteInteger('FormBuilder', 'RatioFileOverviewCover', FileOverviewCoverRatio);
      aIni.WriteInteger('FormBuilder', 'RatioTopPanel'         , TopPanelRatio         );
 
-{
-with FormBuildOptions do
-    begin
-        ini.WriteInteger('Windows', 'RatioBrowse'      , BlockBrowse.fRatio       );
-        ini.WriteInteger('Windows', 'RatioPlaylist'    , BlockPlaylist.fRatio     );
-        ini.WriteInteger('Windows', 'RatioMedialist'   , BlockMediaList.fRatio    );
-        ini.WriteInteger('Windows', 'RatioFileOverview', BlockFileOverview.fRatio );
-        // main Ratio and some special ratios
-        ini.WriteInteger('Windows', 'RatioBrowseArtist'     , BrowseArtistRatio     );
-        ini.WriteInteger('Windows', 'RatioFileOverviewCover', FileOverviewCoverRatio);
-        ini.WriteInteger('Windows', 'RatioTopPanel'         , TopPanelRatio         );
-    end;
-
-}
-
 end;
 
 procedure TNempFormBuildOptions.NilConstraints;
@@ -1802,15 +1713,12 @@ begin
             BlockMediaList   .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
             BlockFileOverview.Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
 
-            //ControlPanel.Parent.Constraints.MinWidth := CONTROL_PANEL_MinWidth_1;
-
             BlockBrowse      .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockPlaylist    .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockMediaList   .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockFileOverview.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
-
-            //ControlPanel.Parent.Constraints.MinHeight := CHILD_PANEL_MinHeight + CONTROL_PANEL_HEIGHT_1;
         end;
+
         Layout_TwoColumns: begin
 
             MainSplitter.MinSize := MAIN_PANEL_MinWidth;
@@ -1827,14 +1735,10 @@ begin
             BlockMediaList   .Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
             BlockFileOverview.Block.Constraints.MinWidth  := CHILD_PANEL_MinWidth;
 
-            //ControlPanel.Parent.Constraints.MinWidth := CONTROL_PANEL_MinWidth_1;
-
             BlockBrowse      .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockPlaylist    .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockMediaList   .Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
             BlockFileOverview.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight;
-
-            //ControlPanel.Parent.Constraints.MinHeight := CHILD_PANEL_MinHeight + CONTROL_PANEL_HEIGHT_1;
 
         end;
 
@@ -1905,9 +1809,6 @@ begin
     SubSplitter2.Align := alNone;
     SubSplitter1.Tag := -1;  // -1 <=> "not used"
     SubSplitter2.Tag := -1;  // -1 <=> "not used"
-
-    //for i := 0 to PanelASplitters.Count - 1 do PanelASplitters[i].Align := alNone;
-    //for i := 0 to PanelBSplitters.Count - 1 do PanelBSplitters[i].Align := alNone;
 
     if ControlPanelPosition in [cp_FormTop, cp_FormCenter, cp_FormBottom] then
     begin
@@ -2087,7 +1988,6 @@ begin
             begin
                 PanelAChilds[i].Left := currentleft;
                 PanelAChilds[i].Width := Round(completeSizeA * RatioArrayA[i]);
-                //PanelAChilds[i].Height := MainContainerA.Height;
                 currentLeft := currentLeft + PanelAChilds[i].Width;
 
                 newSplitter := fGetAnUnusedSplitter;
@@ -2103,7 +2003,6 @@ begin
             if PanelAChilds.Count > 0 then
             begin
                 i := PanelAChilds.Count - 1;
-                //PanelAChilds[i].Height := MainContainerA.Height;
                 PanelAChilds[i].Left := currentleft;
                 PanelAChilds[i].Align := alClient;
             end;
@@ -2130,7 +2029,6 @@ begin
             begin
                 i := PanelBChilds.Count - 1;
                 PanelBChilds[i].Left := currentleft;
-                //PanelBChilds[i].Height := MainContainerB.Height;
                 PanelBChilds[i].Align := alClient;
             end;
 
@@ -2192,8 +2090,6 @@ begin
     begin
         ControlPanel.Parent := ControlPanelSubParent.fBlock;
 
-        //if not assigned(ControlPanel.Parent) then
-
         if self.ControlPanelSubPosition = cp_SubTop then
         begin
             ControlPanel.Align := alTop;
@@ -2215,18 +2111,6 @@ procedure TNempFormBuildOptions.RefreshBothRowsOrColumns(DoSort: Boolean);
 var rescaleFactorA, rescaleFactorB: Double;
     i: Integer;
 begin
-     {
-    for i := 0 to PanelAChilds.Count - 1 do
-    begin
-        PanelAChilds[i].Constraints.MinHeight := 0;
-        PanelAChilds[i].Constraints.MinWidth := 0;
-    end;
-    for i := 0 to PanelBChilds.Count - 1 do
-    begin
-        PanelBChilds[i].Constraints.MinHeight := 0;
-        PanelBChilds[i].Constraints.MinWidth := 0;
-    end;
-      }
 
     // Nope. RefreshMainLayout; // if needed: turn mainpanels by 90 degrees
    // Problem beim resizeFaktor: Wenn der letzt (alClient) kleiner wird als Constraints = > fehler, SuperContainer wächst
@@ -2263,18 +2147,6 @@ begin
       Layout_Undef: ; // nothing to do;
     end;
 
-    {
-    for i := 0 to PanelAChilds.Count - 1 do
-    begin
-        PanelAChilds[i].Constraints.MinHeight := ChildPanelMinHeight;
-        PanelAChilds[i].Constraints.MinWidth := ChildPanelMinWidth;
-    end;
-    for i := 0 to PanelBChilds.Count - 1 do
-    begin
-        PanelBChilds[i].Constraints.MinHeight := ChildPanelMinHeight;
-        PanelBChilds[i].Constraints.MinWidth := ChildPanelMinWidth;
-    end;
-    }
 end;
 
 
@@ -2301,33 +2173,19 @@ begin
         // CONTROL_PANEL_CoverWidth = 100;
         // CONTROL_PANEL_VisualisationWidth = 140;
 
-
-        {
-        ControlPanel.Visualisation.Visible := ControlPanelShowVisualisation;
-        if ControlPanelShowVisualisation then
-            ControlPanel.Visualisation.Width := CONTROL_PANEL_VisualisationWidth
-        else
-            ControlPanel.Visualisation.Width := 0;
-        }
-
-        if self.ControlPanelTwoRows then
+         if self.ControlPanelTwoRows then
         begin
             // two rows
 
             ControlPanel.Container1.Align := alNone;
             ControlPanel.Container2.Align := alNone;
-
             ControlPanel.Progress.Align := alNone;
-            // ControlPanel.Visualisation.Align := alNone;
 
             ControlPanel.Select.Left := 0;
             ControlPanel.Cover.Left := ControlPanel.Select.Width;
             ControlPanel.Player.Left := ControlPanel.Cover.Left + ControlPanel.Cover.Width;
             ControlPanel.Headset.Left := ControlPanel.Player.Left + ControlPanel.Player.Width;
-            // vis swaps the parent
-            // ControlPanel.Visualisation.Parent := ControlPanel.Container1;
-            // ControlPanel.Visualisation.Left := ControlPanel.Headset.Left + ControlPanel.Headset.Width;
-            // ControlPanel.Visualisation.Align := alLeft;
+
             // progress-panel to alClient
             ControlPanel.Progress.Left := 0;
             ControlPanel.Progress.Align := alClient;
@@ -2368,12 +2226,6 @@ begin
             ControlPanel.Headset.Left := ControlPanel.Player.Left + ControlPanel.Player.Width;
 
             ControlPanel.Progress.Left := 0;
-
-            // ControlPanel.Visualisation.Parent := ControlPanel.Container2;
-            // ControlPanel.Visualisation.Width := CONTROL_PANEL_VisualisationWidth;
-            // ControlPanel.Visualisation.Left := ControlPanel.Container2.Width - ControlPanel.Visualisation.Width;
-            // ControlPanel.Visualisation.Align := alRight;
-
             ControlPanel.Progress.Align := alClient;
 
             ControlPanel.Container1.Left := 0;
@@ -2563,45 +2415,6 @@ begin
     fSortaChildList(PanelBChilds);
 end;
 
-(*
-procedure TNempFormBuildOptions.SortaColumn(aPanelList: TPanelList);
-var i: Integer;
-    swapped: Boolean;
-begin
-    swapped := True;
-    while swapped do
-    begin
-        swapped := False;
-        for i := 0 to aPanelList.Count - 2 do
-        begin
-            if aPanelList[i].Top > aPanelList[i+1].Top then
-            begin
-                aPanelList.Exchange(i, i+1);
-                swapped := True;
-            end;
-        end;
-    end;
-end;
-procedure TNempFormBuildOptions.SortaRow(aPanelList: TPanelList);
-var i: Integer;
-    swapped: Boolean;
-begin
-    swapped := True;
-    while swapped do
-    begin
-        swapped := False;
-        for i := 0 to aPanelList.Count - 2 do
-        begin
-            if aPanelList[i].Left > aPanelList[i+1].Left then
-            begin
-                aPanelList.Exchange(i, i+1);
-                swapped := True;
-            end;
-        end;
-    end;
-end;
-*)
-
 
 procedure TNempFormBuildOptions.RefreshARow(aMainPanel: TPanel; scaleFactor: Double = 1);
 var aChildList: TPanelList;
@@ -2678,12 +2491,10 @@ begin
     if aMainPanel = MainContainerA then
     begin
         aChildList := PanelAChilds;
-        //aSplitterList := PanelASplitters;
         DesiredSplitterTag := 0;
     end else
     begin
         aChildList := PanelBChilds;
-        //aSplitterList := PanelBSplitters;
         DesiredSplitterTag := 1;
     end;
 
@@ -2694,15 +2505,11 @@ begin
     // unalign ChildPanels and Splitters
     for i := 0 to aChildList.Count - 1 do
         aChildList[i].Align := alNone;
-    //for i := 0 to aSplitterList.Count - 1 do
-    //    aSplitterList[i].Align := alNone;
     fMakeSplittersAvailable(DesiredSplitterTag);
 
     // Set Parents (needed, if we swapped some Childs before)
     for i := 0 to aChildList.Count - 1 do
         aChildList[i].Parent := aMainPanel;
-    //for i := 0 to aSplitterList.Count - 1 do
-    //    aSplitterList[i].Parent := aMainPanel;
 
     currentTop := 0;
     for i := 0 to aChildList.Count - 2 do
@@ -2743,19 +2550,11 @@ begin
         MainFormHeight         := ini.ReadInteger('Windows', 'MainHeight'  ,750 );
         MainFormMaximized         := ini.ReadBool('Windows', 'maximiert_0' ,False);
 
-        //TopMainPanelHeight := ini.ReadInteger('Fenster', 'Splitter1_0'          ,350);
-        //AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_0'  ,560);
-        //ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_0'   ,280);
-
-        MiniMainFormTop            := ini.ReadInteger('Windows', 'MiniTop'  ,0 );
-        MiniMainFormLeft           := ini.ReadInteger('Windows', 'MiniLeft' ,616 );
-        MiniMainFormWidth          := 234 + 2 * GetSystemMetrics(SM_CXFrame);
+        MiniMainFormTop            := ini.ReadInteger('Windows', 'MiniTop'   , 0 );
+        MiniMainFormLeft           := ini.ReadInteger('Windows', 'MiniLeft'  , 616 );
+        MiniMainFormWidth          := ini.ReadInteger('Windows', 'MiniWidth' , 800 );
+        //MiniMainFormWidth          := 234 + 2 * GetSystemMetrics(SM_CXFrame);
         MiniMainFormHeight         := 560;
-
-        //NempFormAufteilung[1].TopMainPanelHeight := 430;//370;//ini.ReadInteger('Fenster', 'Splitter1_1'          ,350);//391;
-        //NempFormAufteilung[1].AuswahlPanelWidth  := ini.ReadInteger('Fenster', 'BrowseListenWeite_1'  ,580);//303;
-        //NempFormAufteilung[1].ArtistWidth        := ini.ReadInteger('Fenster', 'ArtisListenWeite_1'   ,290);//73;
-        //NempFormAufteilung[1].Maximized := False;
 
         PlaylistVisible           := ini.ReadBool('Windows','PlaylistVisible'   , True);
         MedienlisteVisible        := ini.ReadBool('Windows','MedienlisteVisible', True);
@@ -2791,7 +2590,6 @@ begin
 
     With Options do
     begin
-        //DenyID3Edit     := ini.ReadBool('Allgemein','DenyID3Edit',False);
         LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
 
         AutoCloseProgressWindow := ini.ReadBool('Allgemein', 'AutoCloseProgressWindow', False);
@@ -2814,7 +2612,18 @@ begin
         MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
         FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
 
-                  //ShutdownMode := Ini.ReadInteger('Allgemein', 'ShutDownMode', SHUTDOWNMODE_Shutdown);
+        //ShutdownMode := Ini.ReadInteger('Allgemein', 'ShutDownMode', SHUTDOWNMODE_Shutdown);
+        ShutDownModeIniIdx     := Ini.ReadInteger('Allgemein',  'ShutDownModeIniIdx'    , 4);
+        ShutDownTimeIniIdx     := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniIdx'    , 3);
+        ShutDownTimeIniHours   := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniHours'  , 2);
+        ShutDownTimeIniMinutes := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniMinutes', 0);
+
+        CheckValue(ShutDownModeIniIdx      , 0, 4);  // 5 different ShutDown-Modes
+        CheckValue(ShutDownTimeIniIdx      , 0, 8);  // 9 different preselections for countdown-length
+        CheckValue(ShutDownTimeIniHours    , 0, 24);
+        CheckValue(ShutDownTimeIniMinutes  , 0, 59);
+
+
         // ShutDownAtEndOfPlaylist initialisieren
         ShutDownAtEndOfPlaylist := False;
         Language := Ini.ReadString('Allgemein', 'Language', '');
@@ -2940,6 +2749,7 @@ begin
 
             ini.WriteInteger('Windows', 'MiniTop'  , MiniMainFormTop   );
             ini.WriteInteger('Windows', 'MiniLeft' , MiniMainFormLeft  );
+            ini.WriteInteger('Windows', 'MiniWidth' , MiniMainFormWidth );
 
             ini.WriteBool('Windows','PlaylistVisible'   , PlaylistVisible           );
             ini.WriteBool('Windows','MedienlisteVisible', MedienlisteVisible        );
@@ -3011,6 +2821,11 @@ begin
 
         ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
         ini.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
+
+        Ini.WriteInteger('Allgemein',  'ShutDownModeIniIdx'    , ShutDownModeIniIdx    );
+        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniIdx'    , ShutDownTimeIniIdx    );
+        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniHours'  , ShutDownTimeIniHours  );
+        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniMinutes', ShutDownTimeIniMinutes);
 
         Ini.WriteString('Allgemein', 'Language', Language);
         Ini.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);

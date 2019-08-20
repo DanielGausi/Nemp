@@ -177,7 +177,9 @@ type
       DefaultAction: Integer;
       // default-action when the user clicks "Add current Headphone-title to playlist"
       HeadSetAction: Integer;
-      AutoStopHeadset: Boolean;
+      AutoStopHeadsetSwitchTab: Boolean;
+      AutoStopHeadsetAddToPlayist: Boolean;
+
 
 
       TNA_PlaylistCount: Integer; // number of files displayed in the TNA-menu
@@ -190,6 +192,8 @@ type
 
       ST_Ordnerlist: TStringList; // Joblist for SearchTools
       InitialDialogFolder: String;
+
+      CurrentSearchDir: String;
 
       Status: Integer;
 
@@ -410,7 +414,9 @@ procedure TNempPlaylist.LoadFromIni(Ini: TMemIniFile);
 begin
   DefaultAction         := ini.ReadInteger('Playlist','DefaultAction',0);
   HeadSetAction         := ini.ReadInteger('Playlist','HeadSetAction',0);
-  AutoStopHeadset       := ini.ReadBool('Playlist','AutoStopHeadset',True);
+  AutoStopHeadsetSwitchTab       := ini.ReadBool('Playlist','AutoStopHeadset',True);
+  AutoStopHeadsetAddToPlayist    := ini.ReadBool('Playlist','AutoStopHeadsetAddToPlayist',False);
+
   WiedergabeMode        := ini.ReadInteger('Playlist','WiedergabeModus',0);
   AutoScan              := ini.ReadBool('Playlist','AutoScan', True);
   AutoPlayOnStart       := ini.ReadBool('Playlist','AutoPlayOnStart', True);
@@ -451,7 +457,9 @@ var idx: Integer;
 begin
   ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
   ini.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
-  ini.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadset);
+  ini.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadsetSwitchTab);
+  ini.WriteBool('Playlist','AutoStopHeadsetAddToPlayist',AutoStopHeadsetAddToPlayist);
+
   ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
   ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
   idx := fPlayingIndex;
@@ -625,7 +633,7 @@ begin
     // Grml. Die Multimediakeys machen da wieder Ärger.
     // Scheinbar gehts wirklich nur, wenn man AcceptInput erst nach einer gewissen Zeit
     // wieder freigibt...
-    tid := timeSetEvent(300, 10, @APM, MainWindowHandle, TIME_ONESHOT);
+    tid := timeSetEvent(300, 50, @APM, MainWindowHandle, TIME_ONESHOT);
   end;
 end;
 
@@ -680,7 +688,7 @@ begin
       // Grml. Die Multimediakeys machen da wieder Ärger.
       // Scheinbar gehts wirklich nur, wenn man AcceptInput erst nach einer gewissen Zeit
       // wieder freigibt...
-      tid := timeSetEvent(300, 10, @APM, MainWindowHandle, TIME_ONESHOT);
+      tid := timeSetEvent(300, 50, @APM, MainWindowHandle, TIME_ONESHOT);
   end;
 
 end;

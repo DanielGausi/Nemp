@@ -6,7 +6,7 @@ object MedienlisteForm: TMedienlisteForm
   ClientWidth = 574
   Color = clBtnFace
   Constraints.MinHeight = 200
-  Constraints.MinWidth = 400
+  Constraints.MinWidth = 300
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -40,7 +40,6 @@ object MedienlisteForm: TMedienlisteForm
     OnMouseUp = ContainerPanelMedienBibFormMouseUp
     OnPaint = ContainerPanelMedienBibFormPaint
     OwnerDraw = False
-    ExplicitHeight = 180
     DesignSize = (
       574
       250)

@@ -6,7 +6,7 @@ object PlaylistForm: TPlaylistForm
   ClientWidth = 420
   Color = clBtnFace
   Constraints.MinHeight = 200
-  Constraints.MinWidth = 400
+  Constraints.MinWidth = 300
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -38,7 +38,6 @@ object PlaylistForm: TPlaylistForm
     OnMouseUp = ContainerPanelPlaylistFormMouseUp
     OnPaint = ContainerPanelPlaylistFormPaint
     OwnerDraw = False
-    ExplicitWidth = 244
     DesignSize = (
       420
       303)
@@ -62,7 +61,6 @@ object PlaylistForm: TPlaylistForm
       FocusDrawMode = fdm_Windows
       Color1 = clBlack
       Color2 = clBlack
-      ExplicitLeft = 232
     end
   end
 end

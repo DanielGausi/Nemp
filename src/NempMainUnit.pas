@@ -91,14 +91,11 @@ type
     AuswahlPanel: TPanel;
     AutoSavePlaylistTimer: TTimer;
     DragFilesSrc1: TDragFilesSrc;
-    DragDropTimer: TTimer;
     _VSTPanel: TNempPanel;
     PlaylistFillPanel: TNempPanel;
     GRPBOXPlaylist: TNempPanel;
     SleepTimer: TTimer;
     BirthdayTimer: TTimer;
-    VolTimer: TTimer;
-    ReallyClearPlaylistTimer: TTimer;
     PanelCoverBrowse: TNempPanel;
     CoverScrollbar: TScrollBar;
     MenuImages: TImageList;
@@ -113,14 +110,10 @@ type
     PlayListPOPUP: TPopupMenu;
     TNAMenu: TPopupMenu;
     Player_PopupMenu: TPopupMenu;
-    PMSleep: TPopupMenu;
-    PMBirthday: TPopupMenu;
     VST_ColumnPopup: TPopupMenu;
     PopupPlayPause: TPopupMenu;
     PopupStop: TPopupMenu;
     PopupRepeat: TPopupMenu;
-    PMScrobbler: TPopupMenu;
-    PMWebserver: TPopupMenu;
     MM_Medialibrary: TMenuItem;
     MM_ML_SearchDirectory: TMenuItem;
     MM_ML_Webradio: TMenuItem;
@@ -184,72 +177,14 @@ type
     MM_Tools: TMenuItem;
     MM_T_Shutdown: TMenuItem;
     MM_T_ShutdownOff: TMenuItem;
-    N56: TMenuItem;
-    MM_T_ShutDownModeStop: TMenuItem;
-    MM_T_Shutdown_5Minutes0: TMenuItem;
-    MM_T_Shutdown_15Minutes0: TMenuItem;
-    MM_T_Shutdown_30Minutes0: TMenuItem;
-    MM_T_Shutdown_45minutes0: TMenuItem;
-    MM_T_Shutdown_60Minutes0: TMenuItem;
-    MM_T_Shutdown_90Minutes0: TMenuItem;
-    MM_T_Shutdown_120Minutes0: TMenuItem;
-    N44: TMenuItem;
-    MM_T_ShutDown_Custom0: TMenuItem;
-    MM_T_ShutdownModeCloseNemp: TMenuItem;
-    MM_T_Shutdown_5Minutes1: TMenuItem;
-    MM_T_Shutdown_15Minutes1: TMenuItem;
-    MM_T_Shutdown_30Minutes1: TMenuItem;
-    MM_T_Shutdown_45minutes1: TMenuItem;
-    MM_T_Shutdown_60Minutes1: TMenuItem;
-    MM_T_Shutdown_90Minutes1: TMenuItem;
-    MM_T_Shutdown_120Minutes1: TMenuItem;
-    N60: TMenuItem;
-    MM_T_ShutDown_Custom1: TMenuItem;
-    MM_T_ShutDown_EndofPlaylist1: TMenuItem;
-    MM_T_ShutdownModeSuspend: TMenuItem;
-    MM_T_Shutdown_5Minutes2: TMenuItem;
-    MM_T_Shutdown_15Minutes2: TMenuItem;
-    MM_T_Shutdown_30Minutes2: TMenuItem;
-    MM_T_Shutdown_45minutes2: TMenuItem;
-    MM_T_Shutdown_60Minutes2: TMenuItem;
-    MM_T_Shutdown_90Minutes2: TMenuItem;
-    MM_T_Shutdown_120Minutes2: TMenuItem;
-    N46: TMenuItem;
-    MM_T_ShutDown_Custom2: TMenuItem;
-    MM_T_ShutDown_EndofPlaylist2: TMenuItem;
-    MM_T_ShutdownModeHibernate: TMenuItem;
-    MM_T_Shutdown_5Minutes3: TMenuItem;
-    MM_T_Shutdown_15Minutes3: TMenuItem;
-    MM_T_Shutdown_30Minutes3: TMenuItem;
-    MM_T_Shutdown_45minutes3: TMenuItem;
-    MM_T_Shutdown_60Minutes3: TMenuItem;
-    MM_T_Shutdown_90Minutes3: TMenuItem;
-    MM_T_Shutdown_120Minutes3: TMenuItem;
-    N47: TMenuItem;
-    MM_T_ShutDown_Custom3: TMenuItem;
-    MM_T_ShutDown_EndofPlaylist3: TMenuItem;
-    MM_T_ShutdownModeShutDownWindows: TMenuItem;
-    MM_T_Shutdown_5Minutes4: TMenuItem;
-    MM_T_Shutdown_15Minutes4: TMenuItem;
-    MM_T_Shutdown_30Minutes4: TMenuItem;
-    MM_T_Shutdown_45minutes4: TMenuItem;
-    MM_T_Shutdown_60Minutes4: TMenuItem;
-    MM_T_Shutdown_90Minutes4: TMenuItem;
-    MM_T_Shutdown_120Minutes4: TMenuItem;
-    N49: TMenuItem;
-    MM_T_ShutDown_Custom4: TMenuItem;
-    MM_T_ShutDown_EndofPlaylist4: TMenuItem;
     MM_T_Birthday: TMenuItem;
     MM_T_BirthdayActivate: TMenuItem;
-    N24: TMenuItem;
     MM_T_BirthdayOptions: TMenuItem;
     MM_T_RemoteNemp: TMenuItem;
     MM_T_WebServerActivate: TMenuItem;
-    N64: TMenuItem;
     MM_T_WebServerOptions: TMenuItem;
     MM_T_Scrobbler: TMenuItem;
     MM_T_ScrobblerActivate: TMenuItem;
-    N62: TMenuItem;
     MM_T_ScrobblerOptions: TMenuItem;
     MM_T_Directories: TMenuItem;
     MM_T_DirectoriesRecordings: TMenuItem;
@@ -350,145 +285,22 @@ type
     N36: TMenuItem;
     PM_P_ShutDown: TMenuItem;
     PM_P_ShutDownOff: TMenuItem;
-    N57: TMenuItem;
-    PM_P_ShutDownModeStop: TMenuItem;
-    PM_P_ShutDown_5Minutes0: TMenuItem;
-    PM_P_ShutDown_15Minutes0: TMenuItem;
-    PM_P_ShutDown_30Minutes0: TMenuItem;
-    PM_P_ShutDown_45Minutes0: TMenuItem;
-    PM_P_ShutDown_60Minutes0: TMenuItem;
-    PM_P_ShutDown_90Minutes0: TMenuItem;
-    PM_P_ShutDown_120Minutes0: TMenuItem;
-    N39: TMenuItem;
-    PM_P_ShutDown_Custom0: TMenuItem;
-    PM_P_ShutDownModeCloseNemp: TMenuItem;
-    PM_P_ShutDown_5Minutes1: TMenuItem;
-    PM_P_ShutDown_15Minutes1: TMenuItem;
-    PM_P_ShutDown_30Minutes1: TMenuItem;
-    PM_P_ShutDown_45Minutes1: TMenuItem;
-    PM_P_ShutDown_60Minutes1: TMenuItem;
-    PM_P_ShutDown_90Minutes1: TMenuItem;
-    PM_P_ShutDown_120Minutes1: TMenuItem;
-    N40: TMenuItem;
-    PM_P_ShutDown_Custom1: TMenuItem;
-    PM_P_ShutDown_EndofPlaylist1: TMenuItem;
-    PM_P_ShutDownModeSuspend: TMenuItem;
-    PM_P_ShutDown_5Minutes2: TMenuItem;
-    PM_P_ShutDown_15Minutes2: TMenuItem;
-    PM_P_ShutDown_30Minutes2: TMenuItem;
-    PM_P_ShutDown_45Minutes2: TMenuItem;
-    PM_P_ShutDown_60Minutes2: TMenuItem;
-    PM_P_ShutDown_90Minutes2: TMenuItem;
-    PM_P_ShutDown_120Minutes2: TMenuItem;
-    N59: TMenuItem;
-    PM_P_ShutDown_Custom2: TMenuItem;
-    PM_P_ShutDown_EndofPlaylist2: TMenuItem;
-    PM_P_ShutDownModeHibernate: TMenuItem;
-    PM_P_ShutDown_5Minutes3: TMenuItem;
-    PM_P_ShutDown_15Minutes3: TMenuItem;
-    PM_P_ShutDown_30Minutes3: TMenuItem;
-    PM_P_ShutDown_45Minutes3: TMenuItem;
-    PM_P_ShutDown_60Minutes3: TMenuItem;
-    PM_P_ShutDown_90Minutes3: TMenuItem;
-    PM_P_ShutDown_120Minutes3: TMenuItem;
-    N42: TMenuItem;
-    PM_P_ShutDown_Custom3: TMenuItem;
-    PM_P_ShutDown_EndofPlaylist3: TMenuItem;
-    PM_P_ShutDownModeShutDownWindows: TMenuItem;
-    PM_P_ShutDown_5Minutes4: TMenuItem;
-    PM_P_ShutDown_15Minutes4: TMenuItem;
-    PM_P_ShutDown_30Minutes4: TMenuItem;
-    PM_P_ShutDown_45Minutes4: TMenuItem;
-    PM_P_ShutDown_60Minutes4: TMenuItem;
-    PM_P_ShutDown_90Minutes4: TMenuItem;
-    PM_P_ShutDown_120Minutes4: TMenuItem;
-    N43: TMenuItem;
-    PM_P_ShutDown_Custom4: TMenuItem;
-    PM_P_ShutDown_EndofPlaylist4: TMenuItem;
     PM_P_Birthday: TMenuItem;
     PM_P_BirthdayActivate: TMenuItem;
-    N41: TMenuItem;
     PM_P_BirthdayOptions: TMenuItem;
     PM_P_RemoteNemp: TMenuItem;
     PM_P_WebServerActivate: TMenuItem;
-    N65: TMenuItem;
     PM_P_WebServerOptions: TMenuItem;
     PM_P_Scrobbler: TMenuItem;
     PM_P_ScrobblerActivate: TMenuItem;
-    N61: TMenuItem;
     PM_P_ScrobblerOptions: TMenuItem;
     PM_P_Directories: TMenuItem;
     PM_P_DirectoriesRecordings: TMenuItem;
     PM_P_DirectoriesData: TMenuItem;
     N17: TMenuItem;
     PM_P_About: TMenuItem;
-    PM_P_ShowReadme: TMenuItem;
     PM_P_Help: TMenuItem;
     PM_P_CheckForUpdates: TMenuItem;
-    N28: TMenuItem;
-    PM_P_Minimize: TMenuItem;
-    PM_P_Close: TMenuItem;
-    _Shutdown: TMenuItem;
-    PM_S_ShutDownOff: TMenuItem;
-    N37: TMenuItem;
-    PM_S_ShutDownModeStop: TMenuItem;
-    PM_S_ShutDown_5Minutes0: TMenuItem;
-    PM_S_ShutDown_15Minutes0: TMenuItem;
-    PM_S_ShutDown_30Minutes0: TMenuItem;
-    PM_S_ShutDown_45Minutes0: TMenuItem;
-    PM_S_ShutDown_60Minutes0: TMenuItem;
-    PM_S_ShutDown_90Minutes0: TMenuItem;
-    PM_S_ShutDown_120Minutes0: TMenuItem;
-    N50: TMenuItem;
-    PM_S_ShutDown_Custom0: TMenuItem;
-    PM_S_ShutDownModeCloseNemp: TMenuItem;
-    PM_S_ShutDown_5Minutes1: TMenuItem;
-    PM_S_ShutDown_15Minutes1: TMenuItem;
-    PM_S_ShutDown_30Minutes1: TMenuItem;
-    PM_S_ShutDown_45Minutes1: TMenuItem;
-    PM_S_ShutDown_60Minutes1: TMenuItem;
-    PM_S_ShutDown_90Minutes1: TMenuItem;
-    PM_S_ShutDown_120Minutes1: TMenuItem;
-    N51: TMenuItem;
-    PM_S_ShutDown_Custom1: TMenuItem;
-    PM_S_ShutDown_EndofPlaylist1: TMenuItem;
-    PM_S_ShutDownModeSuspend: TMenuItem;
-    PM_S_ShutDown_5Minutes2: TMenuItem;
-    PM_S_ShutDown_15Minutes2: TMenuItem;
-    PM_S_ShutDown_30Minutes2: TMenuItem;
-    PM_S_ShutDown_45Minutes2: TMenuItem;
-    PM_S_ShutDown_60Minutes2: TMenuItem;
-    PM_S_ShutDown_90Minutes2: TMenuItem;
-    PM_S_ShutDown_120Minutes2: TMenuItem;
-    N52: TMenuItem;
-    PM_S_ShutDown_Custom2: TMenuItem;
-    PM_S_ShutDown_EndofPlaylist2: TMenuItem;
-    PM_S_ShutDownModeHibernate: TMenuItem;
-    PM_S_ShutDown_5Minutes3: TMenuItem;
-    PM_S_ShutDown_15Minutes3: TMenuItem;
-    PM_S_ShutDown_30Minutes3: TMenuItem;
-    PM_S_ShutDown_45Minutes3: TMenuItem;
-    PM_S_ShutDown_60Minutes3: TMenuItem;
-    PM_S_ShutDown_90Minutes3: TMenuItem;
-    PM_S_ShutDown_120Minutes3: TMenuItem;
-    N53: TMenuItem;
-    PM_S_ShutDown_Custom3: TMenuItem;
-    PM_S_ShutDown_EndofPlaylist3: TMenuItem;
-    PM_S_ShutDownModeShutDownWindows: TMenuItem;
-    PM_S_ShutDown_5Minutes4: TMenuItem;
-    PM_S_ShutDown_15Minutes4: TMenuItem;
-    PM_S_ShutDown_30Minutes4: TMenuItem;
-    PM_S_ShutDown_45Minutes4: TMenuItem;
-    PM_S_ShutDown_60Minutes4: TMenuItem;
-    PM_S_ShutDown_90Minutes4: TMenuItem;
-    PM_S_ShutDown_120Minutes4: TMenuItem;
-    N54: TMenuItem;
-    PM_S_ShutDown_Custom4: TMenuItem;
-    PM_S_ShutDown_EndofPlaylist4: TMenuItem;
-    _Birthdaymode: TMenuItem;
-    PM_B_BirthdayActivate: TMenuItem;
-    N461: TMenuItem;
-    PM_B_BirthdayOptions: TMenuItem;
     PM_PlayFiles: TMenuItem;
     PM_PlayWebstream: TMenuItem;
     PM_StopNow: TMenuItem;
@@ -497,14 +309,6 @@ type
     PM_RepeatTitle: TMenuItem;
     PM_RandomMode: TMenuItem;
     PM_RepeatOff: TMenuItem;
-    _Scrobbler: TMenuItem;
-    PM_S_ScrobblerActivate: TMenuItem;
-    N63: TMenuItem;
-    PM_S_ScrobblerOptions: TMenuItem;
-    _Webserver: TMenuItem;
-    PM_W_WebServerActivate: TMenuItem;
-    N66: TMenuItem;
-    PM_W_WebServerOptions: TMenuItem;
     NempTrayIcon: TTrayIcon;
     AuswahlHeaderPanel: TNempPanel;
     TabBtn_Preselection: TSkinButton;
@@ -585,7 +389,6 @@ type
     PM_P_Wizard: TMenuItem;
     PM_PlayCDAudio: TMenuItem;
     PM_PL_AddCDAudio: TMenuItem;
-    PM_W_WebServerShowLog: TMenuItem;
     MM_T_WebServerShowLog: TMenuItem;
     PM_P_WebServerShowLog: TMenuItem;
     N70: TMenuItem;
@@ -599,7 +402,6 @@ type
     N78: TMenuItem;
     LblEmptyLibraryHint: TLabel;
     WalkmanModeTimer: TTimer;
-    CorrectSkinRegionsTimer: TTimer;
     PlaylistVST: TVirtualStringTree;
     MM_O_Skin_UseAdvanced: TMenuItem;
     PM_P_Skin_UseAdvancedSkin: TMenuItem;
@@ -631,7 +433,6 @@ type
     PM_PL_Mark1: TMenuItem;
     MM_T_PlaylistLog: TMenuItem;
     PM_P_PlaylistLog: TMenuItem;
-    RefreshVSTCoverTimer: TTimer;
     QuickSearchHistory_PopupMenu: TPopupMenu;
     pmRecentSearches: TMenuItem;
     pmQuickSeachHistory0: TMenuItem;
@@ -766,6 +567,31 @@ type
     LblBibYear: TLabel;
     Bevel1: TBevel;
     PaintFrame: TImage;
+    PopupTools: TPopupMenu;
+    PM_T_ShutDown: TMenuItem;
+    PM_T_ShutDownActivate: TMenuItem;
+    PM_T_Birthday: TMenuItem;
+    PM_T_BirthdayActivate: TMenuItem;
+    PM_T_BirthdayOptions: TMenuItem;
+    PM_T_WebServer: TMenuItem;
+    PM_T_WebServerActivate: TMenuItem;
+    PM_T_WebServerOptions: TMenuItem;
+    PM_T_WebServerShowLog: TMenuItem;
+    PM_T_Scrobbler: TMenuItem;
+    PM_T_ScrobblerActivate: TMenuItem;
+    PM_T_ScrobblerOptions: TMenuItem;
+    PM_T_ShutDownSettings: TMenuItem;
+    PM_T_ShutdownInfo: TMenuItem;
+    PM_P_ShutdownInfo: TMenuItem;
+    MM_T_ShutdownInfo: TMenuItem;
+    PM_P_ShutDownSettings: TMenuItem;
+    MM_T_ShutdownSettings: TMenuItem;
+    Help1: TMenuItem;
+    PopupHeadset: TPopupMenu;
+    PM_H_EnqueueEndOfPlaylist: TMenuItem;
+    PM_H_PlayAndClearPlaylist: TMenuItem;
+    PM_H_EnqueueAfterCurrentTitle: TMenuItem;
+    PM_H_JustPlay: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -983,6 +809,8 @@ type
       var HintText: String);
     procedure DragFilesSrc1Dropping(Sender: TObject);
     procedure DragDropTimerTimer(Sender: TObject);
+    procedure VolTimerTimer(Sender: TObject);
+    procedure IncrementalCoverSearchTimerTimer(Sender: TObject);
     procedure VSTAfterItemErase(Sender: TBaseVirtualTree;
       TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
     procedure SortierAuswahl1POPUPClick(Sender: TObject);
@@ -1005,9 +833,10 @@ type
     procedure Nichtvorhandenelschen1Click(Sender: TObject);
     procedure TabPanelMedienlisteClick(Sender: TObject);
     Function GenerateSleepHint: String;
-    procedure ResetShutDownCaptions;
-    procedure StundenClick(Sender: TObject);
+    //procedure ResetShutDownCaptions;
+    //procedure StundenClick(Sender: TObject);
     procedure InitShutDown;
+    procedure ActivateShutDownMode(Sender: TObject);
     procedure SleepTimerTimer(Sender: TObject);
     procedure Schlafmodusdeaktivieren1Click(Sender: TObject);
 
@@ -1018,8 +847,6 @@ type
 
     Function GeneratePlaylistSTFilter: string;
     function GenerateMedienBibSTFilter: String;
-    procedure PlaylistVSTEnter(Sender: TObject);
-    procedure VSTEnter(Sender: TObject);
 
     procedure RepairZOrder;
     // procedure ActualizeVDTCover;
@@ -1050,13 +877,11 @@ type
     procedure DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
     procedure DisplayHeadsetTitleInformation(GetCoverWasSuccessful: Boolean);
 
-    procedure VolTimerTimer(Sender: TObject);
     procedure PutDirListInAutoScanList(aDirList: TStringList);
     procedure EDITFastSearchExit(Sender: TObject);
-    procedure VSTPanelResize(Sender: TObject);
     procedure MitzuflligenEintrgenausderMedienbibliothekfllen1Click(
       Sender: TObject);
-    procedure ReallyClearPlaylistTimerTimer(Sender: TObject);
+    //procedure ReallyClearPlaylistTimerTimer(Sender: TObject);
     procedure RecordBtnIMGClick(Sender: TObject);
     procedure CoverScrollbarChange(Sender: TObject);
     procedure PanelCoverBrowseResize(Sender: TObject);
@@ -1098,7 +923,7 @@ type
     procedure PopupStopPopup(Sender: TObject);
     procedure PM_RepeatMenuClick(Sender: TObject);
     procedure PopupRepeatPopup(Sender: TObject);
-    procedure ShutDown_EndofPlaylistClick(Sender: TObject);
+    //procedure ShutDown_EndofPlaylistClick(Sender: TObject);
     procedure MM_H_CheckForUpdatesClick(Sender: TObject);
     procedure VolButtonKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -1120,12 +945,9 @@ type
       Y: Integer);
     procedure PM_P_ScrobblerActivateClick(Sender: TObject);
     procedure PM_P_ScrobblerOptionsClick(Sender: TObject);
-    procedure ScrobblerImageClick(Sender: TObject);
-    procedure SleepImageClick(Sender: TObject);
-    procedure BirthdayImageClick(Sender: TObject);
+    procedure ToolImageClick(Sender: TObject);
     procedure MM_T_WebServerActivateClick(Sender: TObject);
     procedure MM_T_WebServerOptionsClick(Sender: TObject);
-    procedure WebserverImageClick(Sender: TObject);
 
     procedure NempTrayIconClick(Sender: TObject);
     procedure ArtistsVSTIncrementalSearch(Sender: TBaseVirtualTree;
@@ -1204,10 +1026,6 @@ type
     procedure PM_ML_CloudEditorClick(Sender: TObject);
 
     procedure NewPlayerPanelClick(Sender: TObject);
-    //procedure NewPlayerPanelMouseWheelDown(Sender: TObject; Shift: TShiftState;
-    //  MousePos: TPoint; var Handled: Boolean);
-    //procedure NewPlayerPanelMouseWheelUp(Sender: TObject; Shift: TShiftState;
-    //  MousePos: TPoint; var Handled: Boolean);
     procedure Win7TaskBarPopupPopup(Sender: TObject);
     procedure PM_PL_ShowInExplorerClick(Sender: TObject);
     procedure PM_ML_SetRatingsOfSelectedFilesClick(Sender: TObject);
@@ -1241,7 +1059,7 @@ type
     procedure MM_O_WizardClick(Sender: TObject);
     procedure PM_PlayCDAudioClick(Sender: TObject);
     procedure PM_PL_AddCDAudioClick(Sender: TObject);
-    procedure PM_W_WebServerShowLogClick(Sender: TObject);
+    procedure __PM_W_WebServerShowLogClick(Sender: TObject);
     procedure BtnHeadsetPlaynowClick(Sender: TObject);
     procedure ab1StartDrag(Sender: TObject; var DragObject: TDragObject);
     procedure ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
@@ -1312,8 +1130,6 @@ type
       Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure TabBtn_HeadsetClick(Sender: TObject);
     procedure MM_O_FormBuilderClick(Sender: TObject);
-    procedure PlayerControlCoverPanelResize(Sender: TObject);
-    procedure SpectrumPanelResize(Sender: TObject);
     procedure MedialistPanelResize(Sender: TObject);
     procedure MedienBibDetailPanelResize(Sender: TObject);
     procedure Splitter5Moved(Sender: TObject);
@@ -1328,12 +1144,19 @@ type
       Y: Integer);
     procedure _ControlPanelResize(Sender: TObject);
     procedure NewPlayerPanelResize(Sender: TObject);
-    //procedure sbFileOverviewMouseWheel(Sender: TObject; Shift: TShiftState;
-    //  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 
     procedure PlaylistCueChanged(Sender: TObject);
     procedure OnPlayerStopped(Sender: TObject);
     procedure OnPlayerMessage(Sender: TObject; aMessage: String);
+    procedure ReallyDeletePlaylistTimerTimer(Sender: TObject);
+    procedure ImgDetailCoverDblClick(Sender: TObject);
+    procedure InsertHeadsetToPlaylistClick(Sender: TObject);
+    procedure __MainContainerPanelMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure __MainContainerPanelMouseMove(Sender: TObject; Shift: TShiftState;
+      X, Y: Integer);
+    procedure __MainContainerPanelMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     { Private declarations }
@@ -1351,9 +1174,6 @@ type
 
     OldScrollbarWindowProc: TWndMethod;
     OldLyricMemoWindowProc: TWndMethod;
-
-    // Speichert den Slidebutton, der gerade gedraggt wird
-    DraggingSlideButton: TSkinButton;
 
     // a replacement for the PopupMenu.Tag, as we have two medialist popups now
     MediaListPopupTag: Integer;
@@ -1378,11 +1198,11 @@ type
     function ArtistDragContainsFiles: Boolean;
     function ArtistAlbumDragContainsFiles: Boolean;
 
-
     procedure HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
 
     procedure CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
 
+    procedure HandleInsertHeadsetToPlaylist(aAction: Integer);
 
   public
     { Public declarations }
@@ -1396,7 +1216,6 @@ type
     NewDrivesNotificationCount: Integer;
 
     WebRadioInsertMode: Integer;
-
 
     PlayListSkinImageList: TImageList;
     MenuSkinImageList: TImageList;
@@ -1412,10 +1231,8 @@ type
     NempOptions: TNempOptions; // Viele viele Optionen, die in der ini stehen
     NempFormBuildOptions: TNempFormBuildOptions;
 
-
     NempDockedForms: Array [1..3] of Boolean;
     NempSkin: TNempSkin;
-
 
     // Laufzeit-tmp-Variablen
     AutoShowDetailsTMP: Boolean;
@@ -1434,7 +1251,15 @@ type
 
     SelectionPrefix: UnicodeString;
     OldSelectionPrefix: UnicodeString;
-    IncrementalTimerID: Cardinal;
+
+    CorrectSkinRegionsTimer,
+    ReallyDeletePlaylistTimer,
+    VolTimer,
+    DragDropTimer,
+    RefreshVSTCoverTimer,
+    CurrentSearchDirPlayistTimer,
+    CurrentSearchDirMediaLibraryTimer,
+    IncrementalCoverSearchTimer : TTimer;
 
     Nemp_VersionString: String;
 
@@ -1451,7 +1276,6 @@ type
 
     MainPlayerControlsActive: Boolean;
 
-    AktiverTree: TVirtualStringTree;
     AlphaBlendBMP: TBitmap;
 
     BibRatingHelper: TRatingHelper;
@@ -1461,6 +1285,8 @@ type
     // reference to AB1 and AB2, needed for assigning the correct graphics
     ABRepeatStartImg, ABRepeatEndImg: TImage;
 
+    Resizing: Boolean;
+
     //procedure EmptyScrollBarWndProc(var Message: TMessage);
 
     procedure MinimizeNemp(Sender: TObject);
@@ -1469,6 +1295,14 @@ type
     procedure NotifyDeskband(aMsg: Integer);
     procedure ProcessCommandline(lpData: Pointer; StartPlay: Boolean) ; overload;
     procedure ProcessCommandline(filename: UnicodeString; StartPlay: Boolean; Enqueue: Boolean); overload;
+
+    function GetShutDownInfoCaption: String;
+
+    procedure RefreshCurrentSearchDirPlayist(Sender: TObject);
+    procedure RefreshCurrentSearchDirMediaLibrary(Sender: TObject);
+
+    //procedure CorrectSkinRegions;
+    //procedure ResetVolSteps;
   protected
     Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
     procedure MediaKey (Var aMSG: tMessage); message WM_APPCOMMAND;
@@ -1499,6 +1333,8 @@ type
     procedure STStart    (var Msg: TMessage); message ST_Start    ;
     procedure STNewFile  (var Msg: TMessage); message ST_NewFile  ;
     procedure STFinish   (var Msg: TMessage); message ST_Finish   ;
+    // procedure STNewDir   (var Msg: TMessage); message ST_CurrentDir   ;   This is "too fast" to display
+
    end;
 
 
@@ -1587,7 +1423,65 @@ end;
 {$ENDIF}
 
 
+// some Timers, not on the Form, but created in OnCreate
+procedure TNemp_MainForm.IncrementalCoverSearchTimerTimer(Sender: TObject);
+begin
+    // Prefix zurücksetzen
+    SelectionPrefix := '';
+end;
 
+procedure TNemp_MainForm.DragDropTimerTimer(Sender: TObject);
+begin
+    DragDropTimer.Enabled := False;
+    Nemp_MainForm.DragSource := DS_EXTERN;
+end;
+
+procedure TNemp_MainForm.VolTimerTimer(Sender: TObject);
+begin
+    VolTimer.Enabled := False;
+    NempPlayer.VolStep := 0;
+end;
+
+procedure TNemp_MainForm.CorrectSkinRegionsTimerTimer(Sender: TObject);
+begin
+    CorrectSkinRegionsTimer.Enabled := False;
+    NempSkin.SetRegionsAgain;
+    MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
+    ReAcceptDragFiles;
+
+    // NempSkin.AssignOtherGraphics;
+    //UpdateFormDesignNeu;      // really necessary??? (july 2019)
+end;
+
+// Refresh the CurrentDir information on the ProgreessForms
+procedure TNemp_MainForm.RefreshCurrentSearchDirPlayist(Sender: TObject);
+begin
+    ProgressFormPlaylist.lblSuccessCount.Caption := IntToStr(NempPlaylist.FileSearchCounter);
+    ProgressFormPlaylist.lblCurrentItem.Caption := Format(Playlist_SearchingNewFilesDir, [NempPlaylist.CurrentSearchDir]);
+end;
+procedure TNemp_MainForm.RefreshCurrentSearchDirMediaLibrary(Sender: TObject);
+begin
+    ProgressFormLibrary.lblSuccessCount.Caption := IntToStr(MedienBib.UpdateList.Count);
+    ProgressFormLibrary.lblCurrentItem.Caption := Format(MediaLibrary_SearchingNewFilesDir, [MedienBib.CurrentSearchDir]);
+
+    Nemp_MainForm.LblEmptyLibraryHint.Caption :=
+          Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
+end;
+
+
+
+// Sinn dieses Timers:
+// Wenn im Explorer mehrere Dateien markiert werden, und die Funktion "In Nemp abspielen"
+// gewählt wird, wird die Playlist für jede Datei neu gelöscht. das ist erstens nicht unbedingt
+// sinnvoll, und zweitens kommt da irgendwas mit irgendwem durcheinander (die Anzahl der Dateien, die
+// am Ende in der Playlist sind, ist irgendwie nicht vorhersehbar...???).
+// So wird das Löschen der Playlist für einen gewissen Zeitraum verhindert, und alle markierten Dateien
+// werden in die Playlist eingefügt.
+procedure TNemp_MainForm.ReallyDeletePlaylistTimerTimer(Sender: TObject);
+begin
+    NempPlaylist.ProcessBufferStringlist;
+    ReallyDeletePlaylistTimer.Enabled := False;
+end;
 
 procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 begin
@@ -1766,9 +1660,47 @@ begin
     ABRepeatStartImg := ab1;
     ABRepeatEndImg   := ab2;
 
-    //c := CBHeadSetControlInsertMode.ItemIndex;
+    CorrectSkinRegionsTimer := TTimer.Create(self);
+    CorrectSkinRegionsTimer.Enabled := False;
+    CorrectSkinRegionsTimer.Interval := 500;
+    CorrectSkinRegionsTimer.OnTimer := CorrectSkinRegionsTimerTimer;
+
+    ReallyDeletePlaylistTimer := TTimer.Create(self);
+    ReallyDeletePlaylistTimer.Enabled := False;
+    ReallyDeletePlaylistTimer.Interval := 500;
+    ReallyDeletePlaylistTimer.OnTimer := ReallyDeletePlaylistTimerTimer;
+
+    DragDropTimer := TTimer.Create(self);
+    DragDropTimer.Enabled := False;
+    DragDropTimer.Interval := 1000;
+    DragDropTimer.OnTimer := DragDropTimerTimer;
+
+    VolTimer := TTimer.Create(self);
+    VolTimer.Enabled := False;
+    VolTimer.Interval := 100;
+    VolTimer.OnTimer := VolTimerTimer;
+
+    RefreshVSTCoverTimer := TTimer.Create(self);
+    RefreshVSTCoverTimer.Enabled := False;
+    RefreshVSTCoverTimer.Interval := 1000;
+    RefreshVSTCoverTimer.OnTimer := RefreshVSTCoverTimerTimer;
+
+    CurrentSearchDirPlayistTimer := TTimer.Create(self);
+    CurrentSearchDirPlayistTimer.Enabled := False;
+    CurrentSearchDirPlayistTimer.Interval := 250;
+    CurrentSearchDirPlayistTimer.OnTimer := RefreshCurrentSearchDirPlayist;
+
+    CurrentSearchDirMediaLibraryTimer := TTimer.Create(self);
+    CurrentSearchDirMediaLibraryTimer.Enabled := False;
+    CurrentSearchDirMediaLibraryTimer.Interval := 250;
+    CurrentSearchDirMediaLibraryTimer.OnTimer := RefreshCurrentSearchDirMediaLibrary;
+
+    IncrementalCoverSearchTimer := TTimer.Create(self);
+    IncrementalCoverSearchTimer.Enabled := False;
+    IncrementalCoverSearchTimer.Interval := 1000;
+    IncrementalCoverSearchTimer.OnTimer := IncrementalCoverSearchTimerTimer;
+
     TranslateComponent (self);
-    //CBHeadSetControlInsertMode.ItemIndex := c;
 
     Randomize;
     // Diverse Exceptions abschalten
@@ -1813,6 +1745,7 @@ begin
     ST_Playlist := TSearchTool.Create;
 
     ST_Medienliste := TSearchTool.Create;
+
     with ST_Medienliste do
     begin
         ID      := ST_ID_Medialist;
@@ -1906,9 +1839,6 @@ begin
     // Place the Splitters
     NempFormBuildOptions.SubSplitter1 := Splitter2;
     NempFormBuildOptions.SubSplitter2 := Splitter4;
-
-    //NempFormBuildOptions.PanelASplitters.Add(Splitter2);
-    //NempFormBuildOptions.PanelBSplitters.Add(Splitter4);
 
     ///////////////////////////////////////
 
@@ -2004,8 +1934,6 @@ begin
     // create Spectrum
     Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
     Spectrum.MainImage := PaintFrame;
-    //Spectrum.TextImage := TextAnzeigeImage;
-    //Spectrum.TimeImage := TimePaintbox;
     Spectrum.StarImage := RatingImage;
 
     // Set some ShortCuts
@@ -2163,12 +2091,8 @@ begin
 
         PlaylistPanel.Parent := Nemp_MainForm;
         AuswahlPanel.Parent := Nemp_MainForm;
-        _VSTPanel.Parent := Nemp_MainForm;
-
-        // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //AudioPanel.Parent := PlayerPanel;
-        //AudioPanel.Left := 2;
-        //AudioPanel.Top := NewPlayerPanel.Top + NewPlayerPanel.Height + 3;
+        MedialistPanel.Parent := Nemp_MainForm;
+        MedienBibDetailPanel.Parent := Nemp_MainForm;
 
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;
         LyricsMemo.WindowProc := OldLyricMemoWindowProc;
@@ -2376,10 +2300,13 @@ begin
             MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
     end;
   else
+
       try
         OldScrollbarWindowProc(Message);
       except
-          wuppdi;
+          // silent exception - This "wuppdi" actually seems to work (I got the message sometimes)
+          // and by that we'll get rid of some Exceptions druing WindowMode-Changing!
+          // wuppdi;
       end;
   end;
 end;
@@ -2460,28 +2387,6 @@ begin
   end;
 end;
 
-(*
-procedure TNemp_MainForm.sbFileOverviewMouseWheel(Sender: TObject;
-  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
-  var Handled: Boolean);
-begin
-    with (Sender as TScrollBox).VertScrollBar do begin
-        if WheelDelta > 0 then
-        begin
-            if (Position - WheelDelta) >= 0 then
-              Position := Position - WheelDelta
-            else
-              Position := 0;
-        end else
-        begin
-            if (Position - WheelDelta) <= Range then
-              Position := Position - WheelDelta
-            else
-              Position := Range;
-        end;
-    end;
-end;
-*)
 
 procedure TNemp_MainForm.ProcessCommandline(lpData: Pointer; StartPlay: Boolean);
 var filename: String;
@@ -2539,7 +2444,8 @@ begin
   // Zumindest bisher (2.5d, für die nächste Version ist auch nichts anderes geplant)
   if (ST_Playlist.IsSearching)  then exit;
 
-  ReallyClearPlaylistTimer.Enabled := False;
+  ReallyDeletePlaylistTimer.Enabled := False;
+
   //Weiter unten wieder starten...
 
   // Verzeichnisse rekursiv durchsuchen lassen.
@@ -2594,7 +2500,7 @@ begin
                 end;
   end;
   // Timer wieder starten
-  ReallyClearPlaylistTimer.Enabled := True;
+  ReallyDeletePlaylistTimer.Enabled := True;
 end;
 
 procedure TNemp_MainForm.HandleRemoteFilename(filename: UnicodeString; Mode: Integer);
@@ -2857,14 +2763,11 @@ begin
 end;
 
 Procedure TNemp_MainForm.WMDropFiles (Var aMsg: tMessage);
-Var
-  o: TWinControl;
-
+var o: TWinControl;
 Begin
     Inherited;
+
     o := FindVCLWindow(Mouse.CursorPos);
-
-
     case GetDropWindowSection(o) of
           ws_none    : Handle_DropFilesForLibrary(aMsg); // default: add files also into the library
           ws_Library : Handle_DropFilesForLibrary(aMsg);
@@ -2876,25 +2779,6 @@ Begin
                               Handle_DropFilesForHeadPhone(aMsg)
                         end;
     end;
-    {
-    exit;
-
-    if not assigned(o) then
-      exit;
-
-    if ObjectIsPlaylist(o.Name) then
-        Handle_DropFilesForPlaylist(aMsg)
-    else
-    begin
-        if NOT (o is TNempPanel) then
-            // get parent, should be the HeadPhone-Groupbox
-            o := o.Parent;
-        if assigned(o) and ObjectIsHeadphone(o.Name) then
-            Handle_DropFilesForHeadPhone(aMsg)
-        else
-            Handle_DropFilesForLibrary(aMsg);
-    end;
-    }
 end;
 
 
@@ -2976,7 +2860,8 @@ begin
             if NOT NempSkin.UseDefaultMenuImages then
                 NempSkin.SetDefaultMenuImages;
         end;
-        Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+         CorrectSkinRegionsTimer.Enabled := True;
+        //CorrectSkinRegions;
     end else
     begin
         // refresh skin, if a skin is used, and it supports advanced skinning
@@ -3009,8 +2894,7 @@ begin
         NempSkin.NempPartyMode.Active := true;
     end;
 
-
-    RePaintPanels;
+    // RePaintPanels;
     RepaintOtherForms;
     RepaintAll;
 end;
@@ -3020,7 +2904,7 @@ begin
   NempSkin.DeActivateSkin;
   SetSkinRadioBox('');
   UseSkin := False;
-  RePaintPanels;
+  // RePaintPanels;
   RepaintOtherForms;
   RepaintAll;
 end;
@@ -3664,8 +3548,10 @@ begin
       begin
           if (NempPlaylist.Count > 20) AND (DateiListe.Count < 5) then
           begin
-            if TranslateMessageDLG((Playlist_QueryReallyDelete), mtWarning, [mbYes, mbNo], 0) = mrYes then
-                  HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
+            if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, DateiListe.Count]), mtWarning, [mbYes, mbNo], 0) = mrYes then
+                HandleFiles(Dateiliste, PLAYER_PLAY_FILES)
+            else
+                HandleFiles(Dateiliste, PLAYER_ENQUEUE_FILES);
           end
           else
               HandleFiles(Dateiliste, PLAYER_PLAY_FILES);
@@ -4720,6 +4606,7 @@ begin
     if not assigned(MainFormBuilder) then
         Application.CreateForm(TMainFormBuilder, MainFormBuilder);
     MainFormBuilder.Show;
+    MainFormBuilder.BringToFront;
 end;
 
 procedure TNemp_MainForm.MM_O_PreferencesClick(Sender: TObject);
@@ -4727,6 +4614,7 @@ begin
   if Not Assigned(OptionsCompleteForm) then
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
   OptionsCompleteForm.Show;
+  OptionsCompleteForm.BringToFront;
 end;
 
 
@@ -5559,6 +5447,15 @@ begin
   end;
 end;
 
+procedure TNemp_MainForm.ImgDetailCoverDblClick(Sender: TObject);
+begin
+    if assigned(MedienBib.CurrentAudioFile) then
+    begin
+        AutoShowDetailsTMP := True;
+        AktualisiereDetailForm(MedienBib.CurrentAudioFile, SD_PLAYLIST, True);
+    end;
+end;
+
 procedure TNemp_MainForm.ImgDetailCoverMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
@@ -5893,8 +5790,6 @@ begin
               );
       end;
 
-
-
       Data := PlaylistVST.GetNodeData(Node);
       if assigned(Data) then
       begin
@@ -6051,7 +5946,7 @@ begin
     if Not MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow then
         exit;
 
-    MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe);// , MedienBib.AnzeigeListe2);
+    MedienBib.ReBuildCoverListFromList(MedienBib.AnzeigeListe);
 
     CoverScrollbar.OnChange := Nil;
     If MedienBib.Coverlist.Count > 3 then
@@ -6373,19 +6268,12 @@ end;
 // vertical splitter between player and Browse
 procedure TNemp_MainForm.Splitter2Moved(Sender: TObject);
 begin
-  // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //NempOptions.NempFormRatios.BrowseWidth := Round(AuswahlPanel.Width / (Width {- PlayerPanel.Width}) * 100);
-
   NempFormBuildOptions.OnSplitterMoved(Sender);
 
   if NempSkin.isActive then
   begin
-    NempSkin.RepairSkinOffset;
-    NempSkin.SetArtistAlbumOffsets;
-    NempSkin.SetVSTOffsets;
-    NempSkin.SetPlaylistOffsets;
-    NempSkin.FitSkinToNewWindow;
-    RepaintPanels;
+      NempSkin.FitSkinToNewWindow;
+      RepaintPanels;
   end;
 end;
 
@@ -6448,29 +6336,11 @@ begin
     end;
 end;
 
-procedure TNemp_MainForm.PlayerControlCoverPanelResize(Sender: TObject);
-begin
-    {
-    CoverImage.Left := 6;
-    CoverImage.Top := 6;
-    CoverImage.Width := 88;
-    CoverImage.Height := 88;
-    }
-end;
-
-procedure TNemp_MainForm.SpectrumPanelResize(Sender: TObject);
-begin
-    //PaintFrame.Top := 4;
-    //PaintFrame.Left := 4;
-    //PaintFrame.Width := NempOriginalSpectrumSpecs.Width;
-    //PaintFrame.Height := NempOriginalSpectrumSpecs.Height;
-end;
 
 procedure TNemp_MainForm.PlayerControlPanelClick(Sender: TObject);
 begin
     FocusControl(VolButton);
 end;
-
 
 
 procedure TNemp_MainForm.HeadsetControlPanelClick(Sender: TObject);
@@ -6666,9 +6536,9 @@ end;
 
 procedure TNemp_MainForm.VSTEndDrag(Sender, Target: TObject; X, Y: Integer);
 begin
-  ClipCursor(Nil);
-  NempPlaylist.ReInitPlaylist;
-  DragDropTimer.Enabled := True;
+    ClipCursor(Nil);
+    NempPlaylist.ReInitPlaylist;
+    DragDropTimer.Enabled := True;
 end;
 
 procedure TNemp_MainForm.PlaylistVSTMouseUp(Sender: TObject; Button: TMouseButton;
@@ -6728,13 +6598,11 @@ procedure TNemp_MainForm.SlideBarButtonStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var AREct: tRect;
 begin
-  with (Sender as TControl) do Begindrag(false);
-  //ARect.TopLeft :=  ((NewPlayerPanel.Parent).ClientToScreen(Point(NewPlayerPanel.Left, NewPlayerPanel.Top)));
-  //ARect.BottomRight :=  ((NewPlayerPanel.Parent).ClientToScreen(Point(NewPlayerPanel.Left + NewPlayerPanel.Width, NewPlayerPanel.Top + NewPlayerPanel.Height)));
-  ARect.TopLeft :=  NewPlayerPanel.ClientToScreen(Point(0,0));
-  ARect.BottomRight :=  NewPlayerPanel.ClientToScreen(Point(NewPlayerPanel.Width, NewPlayerPanel.Height));
-  SlideBarButton.Tag := 1;
-  ClipCursor(@Arect);
+    with (Sender as TControl) do Begindrag(false);
+    ARect.TopLeft :=  NewPlayerPanel.ClientToScreen(Point(0,0));
+    ARect.BottomRight :=  NewPlayerPanel.ClientToScreen(Point(NewPlayerPanel.Width, NewPlayerPanel.Height));
+    SlideBarButton.Tag := 1;
+    ClipCursor(@Arect);
 end;
 
 
@@ -6742,21 +6610,10 @@ procedure TNemp_MainForm.VolButton_HeadsetStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var AREct: tRect;
 begin
- { with (Sender as TControl) do
-  begin
-    Begindrag(false);
-    ARect.TopLeft :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left, GRPBOXHeadset.Top)));
-    ARect.BottomRight :=  (AudioPanel.ClientToScreen(Point(GRPBOXHeadset.Left + GRPBOXHeadset.Width, GRPBOXHeadset.Top + GRPBOXHeadset.Height)));
-    Tag := 1;
+    with VolButtonHeadset do Begindrag(false);
+    ARect.TopLeft :=  HeadsetControlPanel.ClientToScreen(Point(0,0));
+    ARect.BottomRight :=  HeadsetControlPanel.ClientToScreen(Point(HeadsetControlPanel.Width, HeadsetControlPanel.Height));
     ClipCursor(@Arect);
-  end;}
-
-  with VolButtonHeadset do Begindrag(false);
-  //ARect.TopLeft :=  (_ControlPanel.ClientToScreen(Point(HeadsetControlPanel.Left, HeadsetControlPanel.Top)));
-  //ARect.BottomRight :=  (_ControlPanel.ClientToScreen(Point(HeadsetControlPanel.Left + HeadsetControlPanel.Width, HeadsetControlPanel.Top + HeadsetControlPanel.Height)));
-  ARect.TopLeft :=  HeadsetControlPanel.ClientToScreen(Point(0,0));
-  ARect.BottomRight :=  HeadsetControlPanel.ClientToScreen(Point(HeadsetControlPanel.Width, HeadsetControlPanel.Height));
-  ClipCursor(@Arect);
 end;
 
 
@@ -6783,16 +6640,6 @@ var swapImg: TImage;
 begin
     ClipCursor(NIL);
     SlideBarButton.Tag := 0;
-    //NempPlayer.SetABSyncs(
-    //    (ab1.Left + (ab1.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width),
-    //    (ab2.Left + (ab2.Width Div 2) - SlideBarShape.Left - (SlideBarButton.Width Div 2)) / (SlideBarShape.Width - SlideBarButton.Width)
-    //    );
-
-    // ABRepeatStartImg, ABRepeatEndImg
-
-    //if ABRepeatStartImg.Left > ABRepeatEndImg.Left then
-    //    SwapABImages;
-    // SwapABImages
 
     NempPlayer.SetABSyncs(
         (ABRepeatStartImg.Left - SlideBarShape.Left) / (SlideBarShape.Width),
@@ -6825,12 +6672,8 @@ begin
 
         if MainPlayerControlsActive then
             PlayerTimeLbl.Caption := NempPlayer.GetTimeStringFromProgress(ProgressButtonPositionToProgress)
-            //NempPlayer.DrawTimeFromProgress(ProgressButtonPositionToProgress)
         else
             PlayerTimeLbl.Caption := NempPlayer.GetHeadsetTimeStringFromProgress(ProgressButtonPositionToProgress);
-            //NempPlayer.DrawHeadsetTimeFromProgress(ProgressButtonPositionToProgress)
-
-
     end else
     if Source = VolButton then
     begin
@@ -6890,22 +6733,6 @@ begin
         NempPlayer.HeadSetVolume := Round(
         (VolButtonHeadset.Left - VolShapeHeadset.Left)  * (100/(VolShapeHeadset.Width - VolButtonHeadset.Width))
         );
-
-
-        {if (Sender is TNempPanel) then
-            NewPos := y - (VolButtonHeadset.Height Div 2)
-        else
-            NewPos := (Sender as TControl).Top + y - (VolButtonHeadset.Height Div 2);
-
-        if NewPos <= VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2) then
-          NewPos := VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2)
-        else
-          if NewPos >= VolShapeHeadset.Top + VolShapeHeadset.Height - (VolButtonHeadset.Height Div 2) then
-            NewPos := VolShapeHeadset.Top + VolShapeHeadset.Height - (VolButtonHeadset.Height Div 2);
-        VolButtonHeadset.Top := NewPos;
-        NempPlayer.HeadSetVolume :=
-            Round(100-((VolButtonHeadset.Top - VolShapeHeadset.Top + (VolButtonHeadset.Height Div 2))* (100/VolShapeHeadset.Height)));
-        }
     end;
 end;
 
@@ -6933,13 +6760,10 @@ procedure TNemp_MainForm.VolButtonStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 var Arect: TRect;
 begin
-  with VolButton do Begindrag(false);
-  //ARect.TopLeft :=  (_ControlPanel.ClientToScreen(Point(PlayerControlPanel.Left, PlayerControlPanel.Top)));
-  //ARect.BottomRight :=  (_ControlPanel.ClientToScreen(Point(PlayerControlPanel.Left + PlayerControlPanel.Width, PlayerControlPanel.Top + PlayerControlPanel.Height)));
-  ARect.TopLeft :=  PlayerControlPanel.ClientToScreen(Point(0,0));
-  ARect.BottomRight :=  PlayerControlPanel.ClientToScreen(Point(PlayerControlPanel.Width, PlayerControlPanel.Height));
-
-  ClipCursor(@Arect);
+    with VolButton do Begindrag(false);
+    ARect.TopLeft :=  PlayerControlPanel.ClientToScreen(Point(0,0));
+    ARect.BottomRight :=  PlayerControlPanel.ClientToScreen(Point(PlayerControlPanel.Width, PlayerControlPanel.Height));
+    ClipCursor(@Arect);
 end;
 
 procedure TNemp_MainForm.VolButtonEndDrag(Sender, Target: TObject; X,
@@ -7534,115 +7358,67 @@ begin
   aNode := PlaylistVST.FocusedNode;
   if not Assigned(aNode) then Exit;
 
-  if PlaylistVST.GetNodeLevel(aNode)>0 then exit;
+  if PlaylistVST.GetNodeLevel(aNode) > 0 then
+  begin
+      aNode := anode.Parent;
+      Data := PlaylistVST.GetNodeData(aNode);
+      AudioFile := Data^.FAudioFile;
+      ShowVSTDetails(AudioFile, SD_PLAYLIST);
+  end else
+  begin
+      NempPlaylist.ActualizeNode(aNode, false);
 
-  NempPlaylist.ActualizeNode(aNode, false);
-
-  Data := PlaylistVST.GetNodeData(aNode);
-  AudioFile := Data^.FAudioFile;
-  ShowVSTDetails(AudioFile, SD_PLAYLIST);
-  AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
+      Data := PlaylistVST.GetNodeData(aNode);
+      AudioFile := Data^.FAudioFile;
+      ShowVSTDetails(AudioFile, SD_PLAYLIST);
+      AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
+  end;
 end;
 
 
-(*
-procedure TNemp_MainForm.ShowPlayerDetails(aAudioFile: TAudioFile);
-// called from: - CorrectVCLAfterAudioFileEdit
-//              - ReInitPlayerVCL
-//var success: Boolean;
-begin
-  if aAudioFile = NIL then exit;
-
-  //if aAudioFile.CoverID = '' then
-  //    MedienBib.InitCover(aAudioFile);
-  /// success := NempPlayer.RefreshCoverBitmap;     // remove this from here - will be done in player.play!!!
-
-  CoverImage.Visible := True;
-  CoverImage.Hint := '';
-  CoverImage.Picture.Bitmap.Assign(NempPlayer.CoverBitmap);      // das bleibt aber ;-9!!
-
-  //if not success then
-  //begin
-  //    //CheckAndDoCoverDownloaderQuery;
-  //    if MedienBib.CoverSearchLastFM then
-  //        Medienbib.NewCoverFlow.DownloadPlayerCover(aAudioFile);
-  //end;
-
-  if aAudioFile.Lyrics <> '' then
-    LyricsMemo.Text := UTF8ToString(aAudioFile.Lyrics)
-  else
-    LyricsMemo.Text := (MainForm_Lyrics_NoLyrics);
-
-  NempTrayIcon.Hint := StringReplace(aAudioFile.PlaylistTitle, '&', '&&&', [rfReplaceAll]);
-end;
-*)
-
-
-{
-MainOrHeadset: The same as TabBtn_MainPlayerControl.GlyphLine
-}
+/// Switch between MainPlayer-Controls and Headset-Controls
 procedure TNemp_MainForm.TabBtn_MainPlayerControlClick(Sender: TObject);
 begin
-    TabBtn_MainPlayerControl.GlyphLine := 1; //(TabBtn_MainPlayerControl.GlyphLine + 1) mod 2;
+    TabBtn_MainPlayerControl.GlyphLine := 1;
     TabBtn_Headset.GlyphLine := 0;
+    MainPlayerControlsActive := True;
+    ShowMatchingControls;
 
-    MainPlayerControlsActive := True; // TabBtn_MainPlayerControl.GlyphLine = 1;
-    ShowMatchingControls;//(TabBtn_MainPlayerControl.GlyphLine);
+    if NempPlaylist.AutoStopHeadsetSwitchTab then
+        NempPlayer.PauseHeadset;
 end;
-
-
 procedure TNemp_MainForm.TabBtn_HeadsetClick(Sender: TObject);
 begin
-
-    TabBtn_Headset.GlyphLine := 1; // (TabBtn_Headset.GlyphLine + 1) mod 2;
+    TabBtn_Headset.GlyphLine := 1;
     TabBtn_MainPlayerControl.GlyphLine := 0;
-    MainPlayerControlsActive := False; // TabBtn_MainPlayerControl.GlyphLine = 1;
-
-    ShowMatchingControls;//(TabBtn_MainPlayerControl.GlyphLine);
+    MainPlayerControlsActive := False;
+    ShowMatchingControls;
 end;
 
-procedure TNemp_MainForm.ShowMatchingControls;//(MainOrHeadset: Integer);
-
+procedure TNemp_MainForm.ShowMatchingControls;
 begin
-    PlayerControlPanel.Visible  := MainPlayerControlsActive;      //MainOrHeadset = 1;
-    HeadsetControlPanel.Visible := NOT MainPlayerControlsActive; //MainOrHeadset = 0;
-
+    PlayerControlPanel.Visible  := MainPlayerControlsActive;
+    HeadsetControlPanel.Visible := NOT MainPlayerControlsActive;
 
     if PlayerControlCoverPanel.Visible then
-            ControlContainer1.Width := OutputControlPanel.Width
-                               + PlayerControlCoverPanel.Width
+            ControlContainer1.Width := OutputControlPanel.Width + PlayerControlCoverPanel.Width
                                + PlayerControlPanel.Width
         else
-            ControlContainer1.Width := OutputControlPanel.Width
-                               + PlayerControlPanel.Width;
+            ControlContainer1.Width := OutputControlPanel.Width + PlayerControlPanel.Width;
 
     CorrectVCLForABRepeat;
 
-
     if MainPlayerControlsActive then
-    begin
-        // Show Information about MainAudioFile
-        DisplayPlayerMainTitleInformation(True);
-
-//        PlayerControlPanel.Invalidate;
-  //      VolumeImage.Invalidate;
-
-    end else
-    begin
-        // Show Information about Headset-AudioFile
-        DisplayHeadsetTitleInformation(True);
-    end;
-
-    // sometimes needed because of transparenceis of the volume button
-    //NempSkin.AssignOtherGraphics;
-
+        DisplayPlayerMainTitleInformation(True) // Show Information about MainAudioFile
+    else
+        DisplayHeadsetTitleInformation(True);   // Show Information about Headset-AudioFile
 end;
 
 
 
-procedure TNemp_MainForm.ShowProgress(aProgress: Double; aSeconds: Integer; MainPlayer: Boolean);// aTimeString: String);
+procedure TNemp_MainForm.ShowProgress(aProgress: Double; aSeconds: Integer; MainPlayer: Boolean);
 begin
-    SlidebarShape.Progress := aProgress; //NempPlayer.Progress;
+    SlidebarShape.Progress := aProgress;
 
     if (SlideBarButton.Tag = 0) then // d.h. der Button wird grade nicht gedraggt
     begin
@@ -7653,12 +7429,9 @@ begin
             else
                 playerTimeLbl.Caption := NempPlayer.TimeStringHeadset;
             LastPaintedTime := aSeconds;
-
             // Refresh Win7 preview
             fspTaskbarPreviews1.InvalidatePreview;
-
         end;
-
         if (SlideBarButton.Visible) then
             SetProgressButtonPosition(aProgress);
     end;
@@ -7716,26 +7489,6 @@ begin
             af := NempPlayer.MainAudioFile;
             PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
             PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
-
-            {
-            // basic title information
-            if assigned(af.CueList) and (af.CueList.Count > 0) then
-            begin
-                // when playing a file with a cuesheet:
-                // MainTitle + CueSheet-Title
-                PlayerArtistLabel.Caption := af.PlaylistTitle;
-                // note: there should be no issue with the cuesheet-index here, as GetIndex runs through the CueList
-                PlayerTitleLabel.Caption := TAudioFile(af.CueList[NempPlayer.GetActiveCue]).PlaylistTitle;
-            end else
-            begin
-                // artist + Title
-                if NempPlayer.MainAudioFile.Artist <> '' then
-                    PlayerArtistLabel.Caption := NempPlayer.MainAudioFile.Artist
-                else
-                    PlayerArtistLabel.Caption := Player_UnkownArtist;
-                PlayerTitleLabel.Caption := NempPlayer.MainAudioFile.NonEmptyTitle;
-            end;
-            }
         end;
     end;
 end;
@@ -7744,7 +7497,7 @@ end;
 // new procedure ... fit it in somehow ...
 procedure TNemp_MainForm.DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
 var SlidebarEnabled: Boolean;
-    fn, tmp: String;
+    fn, tmp, aHint: String;
     af: TAudioFile;
 begin
     if MainPlayerControlsActive then
@@ -7754,42 +7507,25 @@ begin
           if assigned(NempPlayer.MainAudioFile) then
           begin
               af := NempPlayer.MainAudioFile;
-
               PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
               PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
-              {
-              // basic title information
-              if assigned(af.CueList) and (af.CueList.Count > 0) then
-              begin
-                  // when playing a file with a cuesheet:
-                  // MainTitle + CueSheet-Title
-                  PlayerArtistLabel.Caption := af.PlaylistTitle;
-                  // note: there should be no issue with the cuesheet-index here, as GetIndex runs through the CueList
-                  PlayerTitleLabel.Caption := TAudioFile(af.CueList[NempPlayer.GetActiveCue]).PlaylistTitle;
-              end else
-              begin
-                  // artist + Title
-                  if NempPlayer.MainAudioFile.Artist <> '' then
-                      PlayerArtistLabel.Caption := NempPlayer.MainAudioFile.Artist
-                  else
-                      PlayerArtistLabel.Caption := Player_UnkownArtist;
-                  PlayerTitleLabel.Caption := NempPlayer.MainAudioFile.NonEmptyTitle;
-              end;
-              }
+
+              aHint := af.GetHint(NempOptions.ReplaceNAArtistBy,
+                                   NempOptions.ReplaceNATitleBy,
+                                   NempOptions.ReplaceNAAlbumBy);
 
               // Rating
-              Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
+              Spectrum.DrawRating(af.Rating);
 
               // Cover
               CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
-              CoverImage.Hint := NempPlayer.MainAudioFile.GetHint(NempOptions.ReplaceNAArtistBy,
-                                   NempOptions.ReplaceNATitleBy,
-                                   NempOptions.ReplaceNAAlbumBy);
+              CoverImage.Hint := aHint;
+
               // initiate Cover Download, if necessary (and allowed by User)
               if NOT GetCoverWasSuccessful then
               begin
                   if MedienBib.CoverSearchLastFM then
-                      Medienbib.NewCoverFlow.DownloadPlayerCover(NempPlayer.MainAudioFile);
+                      Medienbib.NewCoverFlow.DownloadPlayerCover(af);
               end;
 
               // Progress
@@ -7798,36 +7534,20 @@ begin
 
               // vis
               NempPlayer.DrawMainPlayerVisualisation;
-
-              {
-              if NempPlayer.MainAudioFile.AudioType = at_File then
-              begin
-                  if NempPlayer.MainAudioFile.vbr then
-                      tmp := inttostr(NempPlayer.MainAudioFile.Bitrate) + ' kbit/s (vbr), '
-                  else
-                      tmp := inttostr(NempPlayer.MainAudioFile.Bitrate) + ' kbit/s, ';
-                  lblPlayingFileInfo.Caption := tmp + NempPlayer.MainAudioFile.SampleRate + #13#10 + NempPlayer.MainAudioFile.ChannelMode;
-              end else
-                  lblPlayingFileInfo.Caption := '';
-               }
+              PaintFrame.Hint := aHint;
 
           end else
           begin
               PlayerArtistLabel.Caption := Player_NoTitleLoaded;
               PlayerTitleLabel.Caption := '';  //Player_NoTitleLoadedDropHereToStart;
 
-              // todo , display "nothng loaded, click here ..."
-              (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!! *)
-
               // rating
               Spectrum.DrawRating(0);
 
               // cover
-              // todo: CoverImage.Picture ...
               fn := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_MainPlayer.png';
               if FileExists(fn) then
                   CoverImage.Picture.LoadFromFile(fn);
-
               CoverImage.Hint := '';
 
               // zero progress
@@ -7838,6 +7558,7 @@ begin
 
               // clear vis
               NempPlayer.DrawMainPlayerVisualisation;
+              PaintFrame.Hint := '';
           end;
     end;
 
@@ -7845,7 +7566,8 @@ end;
 
 procedure TNemp_MainForm.DisplayHeadsetTitleInformation(GetCoverWasSuccessful: Boolean);
 var SlidebarEnabled: Boolean;
-    fn: String;
+    fn, aHint: String;
+    af: TAudioFile;
 begin
     if not MainPlayerControlsActive then
     begin
@@ -7853,40 +7575,42 @@ begin
         if assigned(NempPlayer.HeadSetAudioFile) then
         begin
             // display information about the Headset Title
+            af := NempPlayer.HeadSetAudioFile;
+
+            aHint := af.GetHint(NempOptions.ReplaceNAArtistBy,
+                                   NempOptions.ReplaceNATitleBy,
+                                   NempOptions.ReplaceNAAlbumBy);
 
             // artist + title
             if NempPlayer.HeadSetAudioFile.Artist <> '' then
-                PlayerArtistLabel.Caption := NempPlayer.HeadSetAudioFile.Artist
+                PlayerArtistLabel.Caption := af.Artist
             else
                 PlayerArtistLabel.Caption := Player_UnkownArtist;
-            PlayerTitleLabel.Caption := NempPlayer.HeadSetAudioFile.NonEmptyTitle;
+            PlayerTitleLabel.Caption := af.NonEmptyTitle;
 
             // Rating
-            Spectrum.DrawRating(NempPlayer.HeadSetAudioFile.Rating);
+            Spectrum.DrawRating(af.Rating);
 
             // Cover //no cover download for headset
             CoverImage.Picture.Assign(NempPlayer.HeadsetPicture);
-            CoverImage.Hint := NempPlayer.HeadSetAudioFile.GetHint(NempOptions.ReplaceNAArtistBy,
-                     NempOptions.ReplaceNATitleBy,
-                     NempOptions.ReplaceNAAlbumBy);
+            CoverImage.Hint := aHint;
 
             // Progress
             ShowProgress(NempPlayer.HeadsetProgress, NempPlayer.TimeInSec, False);
 
+            // visualisation
             NempPlayer.DrawHeadsetVisualisation;
+            Paintframe.Hint := aHint;
 
             // enable/disable slidebar
             ReCheckAndSetProgressChangeGUIStatus;
 
             HeadSetTimer.Enabled := NempPlayer.BassHeadSetStatus = BASS_ACTIVE_PLAYING;
-
         end else
         begin
             // default information
             PlayerArtistLabel.Caption := Player_NoTitleLoaded;
             PlayerTitleLabel.Caption := '';
-            // todo , display "nothng loaded, click here ..."
-            (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!! *)
 
             // rating
             Spectrum.DrawRating(0);
@@ -7905,7 +7629,7 @@ begin
 
             // clear vis
             NempPlayer.DrawHeadsetVisualisation;
-
+            PaintFrame.Hint := '';
         end;
 
     end;
@@ -7944,26 +7668,21 @@ begin
 end;
 
 
-
-procedure TNemp_MainForm.CorrectSkinRegionsTimerTimer(Sender: TObject);
-begin
-    CorrectSkinRegionsTimer.Enabled := False;
-    NempSkin.SetRegionsAgain;
-    MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
-
-
-    // NempSkin.AssignOtherGraphics;
-    ReAcceptDragFiles;
-
-    //UpdateFormDesignNeu;      // really necessary??? (july 2019)
-end;
-
-
 procedure TNemp_MainForm.CoverImageDblClick(Sender: TObject);
+var af: TAudioFile;
 begin
-  if NempPlaylist.PlayingFile = Nil then Exit;
-  AutoShowDetailsTMP := True;
-  AktualisiereDetailForm(NempPlaylist.PlayingFile, SD_PLAYLIST, True);
+    if  MainPlayerControlsActive then
+        af := NempPlaylist.PlayingFile    // MainControls -> show Details of current PlayingFile
+    else
+       af := NempPlayer.HeadSetAudioFile; // HeadsetControls -> show Details of current HeadsetFile
+
+    if assigned(af) then
+    begin
+        AutoShowDetailsTMP := True;
+        AktualisiereDetailForm(af, SD_PLAYLIST, True);
+        // note: there may be an issue with "SD_PLAYLIST vs, SD_MEDIENBIB" here
+        //      ( or not?)
+    end;
 end;
 
 procedure TNemp_MainForm.PlaylistVSTKeyDown(Sender: TObject; var Key: Word;
@@ -8551,7 +8270,7 @@ begin
   RestoreNemp;
 end;
 
-procedure TNemp_MainForm.PM_W_WebServerShowLogClick(Sender: TObject);
+procedure TNemp_MainForm.__PM_W_WebServerShowLogClick(Sender: TObject);
 begin
     if not assigned(WebServerLogForm) then
         Application.CreateForm(TWebServerLogForm, WebServerLogForm);
@@ -9304,11 +9023,16 @@ begin
     if AnzeigeMode = 1 then
     begin
         // UpdateSmallMainForm;
-        CorrectSkinRegionsTimer.Enabled := True;
+        // CorrectSkinRegionsTimer.Enabled := True;
+
+        SetRegion(__MainContainerPanel , self, NempRegionsDistance, handle);
+
+        //CorrectSkinRegions;
     end;
 
 
-exit;
+    exit;
+
            (*
   if AnzeigeMode = 0 then
   begin
@@ -9672,11 +9396,7 @@ begin
   // Da es kein Event OnDropped gibt, löse ich das Dirty über einen Timer.
   DragDropTimer.Enabled := True;
 end;
-procedure TNemp_MainForm.DragDropTimerTimer(Sender: TObject);
-begin
-  DragSource := DS_EXTERN;
-  DragDropTimer.Enabled := False;
-end;
+
 
 procedure TNemp_MainForm.VSTAfterItemErase(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
@@ -9889,13 +9609,12 @@ begin
   close;
 end;
 
-procedure TNemp_MainForm.BtnHeadsetToPlaylistClick(Sender: TObject);
-//var tmp: PvirtualNode;
+procedure TNemp_MainForm.HandleInsertHeadsetToPlaylist(aAction: Integer);
 var newPlaylistFile: TAudioFile;
 begin
     if assigned(NempPlayer.HeadSetAudioFile) then
     begin
-        case NempPlaylist.HeadSetAction of
+        case aAction of
             0: begin
                 // enqueue (at the end)
                 NempPlaylist.InsertNode := NIL;
@@ -9904,20 +9623,28 @@ begin
                 NempPlaylist.InsertFileToPlayList(newPlaylistFile);
             end;
             1: begin
-                // play(and clear current list)
-                NempPlayList.ClearPlaylist;
+                // play (and clear current list)
+                if (NempPlaylist.Count > 20) then
+                begin
+                    if TranslateMessageDLG(Format((Playlist_QueryReallyDelete), [NempPlaylist.Count, 1]), mtWarning, [mbYes, mbNo], 0) = mrYes then
+                        // yes, user really wants tor delete the Playlist
+                        NempPlayList.ClearPlaylist;
+                end else
+                    // just clear it without asking
+                    NempPlayList.ClearPlaylist;
+
+                // add the Headset-Track into the playlist
                 NempPlaylist.InsertNode := NIL;
                 newPlaylistFile := TAudioFile.Create;
                 newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
                 NempPlaylist.InsertFileToPlayList(newPlaylistFile);
             end;
             2: begin
-                // enqueue (in th prebook-list)
+                // enqueue after the current track
                 NempPlaylist.GetInsertNodeFromPlayPosition;
                 newPlaylistFile := TAudioFile.Create;
                 newPlaylistFile.Assign(NempPlayer.HeadSetAudioFile);
-                {tmp := }NempPlaylist.InsertFileToPlayList(newPlaylistFile);
-                // DONT - Most users dont get it ;-)  NempPlaylist.AddNodeToPrebookList(tmp);
+                NempPlaylist.InsertFileToPlayList(newPlaylistFile);
             end;
             3: begin
                   // just play
@@ -9926,6 +9653,20 @@ begin
             end;
         end;
     end;
+
+    if NempPlaylist.AutoStopHeadsetAddToPlayist then
+        NempPlayer.PauseHeadset;
+end;
+
+procedure TNemp_MainForm.InsertHeadsetToPlaylistClick(
+  Sender: TObject);
+begin
+    HandleInsertHeadsetToPlaylist((Sender as TMenuItem).Tag);
+end;
+
+procedure TNemp_MainForm.BtnHeadsetToPlaylistClick(Sender: TObject);
+begin
+    HandleInsertHeadsetToPlaylist(NempPlaylist.HeadSetAction);
 end;
 
 procedure TNemp_MainForm.BtnHeadsetPlaynowClick(Sender: TObject);
@@ -10016,6 +9757,7 @@ begin
                       begin
                           TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
                           CorrectSkinRegionsTimer.Enabled := True;
+                          //CorrectSkinRegions;
                       end;
                       {$ENDIF}
 
@@ -10111,7 +9853,7 @@ begin
   begin
       result := #13#10#13#10 + NempShutDown_AtEndOfPlaylist_Hint;
       Case NempOptions.ShutDownMode of
-            //SHUTDOWNMODE_StopNemp  : result := Format((NempShutDown_StopHint     ),  [SekToZeitString(c, true)] );
+            SHUTDOWNMODE_StopNemp  : result := Format((NempShutDown_StopHint     ),  [SekToZeitString(c, true)] );
             SHUTDOWNMODE_ExitNemp  : result := NempShutDown_CloseHint_AtEndOfPlaylist    + result;
             SHUTDOWNMODE_Suspend   : result := NempShutDown_SuspendHint_AtEndOfPlaylist  + result;
             SHUTDOWNMODE_Hibernate : result := NempShutDown_HibernateHint_AtEndOfPlaylist+ result;
@@ -10132,31 +9874,40 @@ begin
   end;
 end;
 
-
-procedure TNemp_MainForm.ResetShutDownCaptions;
+function TNemp_MainForm.GetShutDownInfoCaption: String;
+var c: Integer;
 begin
-    PM_P_ShutDownModeStop            .Caption :=  NempShutDown_StopPopupBlank      ;
-    PM_P_ShutDownModeCloseNemp       .Caption :=  NempShutDown_ClosePopupBlank     ;
-    PM_P_ShutDownModeSuspend         .Caption :=  NempShutDown_SuspendPopupBlank   ;
-    PM_P_ShutDownModeHibernate       .Caption :=  NempShutDown_HibernatePopupBlank ;
-    PM_P_ShutDownModeShutDownWindows .Caption :=  NempShutDown_ShutDownPopupBlank  ;
+    // default: not active
+    result := NempShutDown_PopupNotActive;
 
-    MM_T_ShutDownModeStop            .Caption :=  NempShutDown_StopPopupBlank      ;
-    MM_T_ShutdownModeCloseNemp       .Caption :=  NempShutDown_ClosePopupBlank     ;
-    MM_T_ShutDownModeSuspend         .Caption :=  NempShutDown_SuspendPopupBlank   ;
-    MM_T_ShutDownModeHibernate       .Caption :=  NempShutDown_HibernatePopupBlank ;
-    MM_T_ShutDownModeShutDownWindows .Caption :=  NempShutDown_ShutDownPopupBlank  ;
-
-    PM_S_ShutDownModeStop            .Caption :=  NempShutDown_StopPopupBlank      ;
-    PM_S_ShutdownModeCloseNemp       .Caption :=  NempShutDown_ClosePopupBlank     ;
-    PM_S_ShutDownModeSuspend         .Caption :=  NempShutDown_SuspendPopupBlank   ;
-    PM_S_ShutDownModeHibernate       .Caption :=  NempShutDown_HibernatePopupBlank ;
-    PM_S_ShutDownModeShutDownWindows .Caption :=  NempShutDown_ShutDownPopupBlank  ;
+    if SleepTimer.Enabled then
+    begin
+        c := SecondsBetween(Now, NempOptions.ShutDownTime);
+        case NempOptions.ShutDownMode of
+          SHUTDOWNMODE_StopNemp  : result := Format((NempShutDown_StopPopupTime),  [SekToZeitString(c, True)] );
+          SHUTDOWNMODE_ExitNemp  : result := Format((NempShutDown_ClosePopupTime),  [SekToZeitString(c, True)] );
+          SHUTDOWNMODE_Suspend   : result := Format((NempShutDown_SuspendPopupTime),  [SekToZeitString(c, True)] );
+          SHUTDOWNMODE_Hibernate : result := Format((NempShutDown_HibernatePopupTime),  [SekToZeitString(c, True)] );
+          SHUTDOWNMODE_Shutdown  : result := Format((NempShutDown_ShutDownPopupTime),  [SekToZeitString(c, True)] );
+        end;
+    end else
+    begin
+        if NempOptions.ShutDownAtEndOfPlaylist then
+        begin
+            case NempOptions.ShutDownMode of
+                SHUTDOWNMODE_ExitNemp  : result := NempShutDown_ClosePopupTime_AtEndOfPlaylist;
+                SHUTDOWNMODE_Suspend   : result := NempShutDown_SuspendPopupTime_AtEndOfPlaylist;
+                SHUTDOWNMODE_Hibernate : result := NempShutDown_HibernatePopupTime_AtEndOfPlaylist;
+                SHUTDOWNMODE_Shutdown  : result := NempShutDown_ShutDownPopupTime_AtEndOfPlaylist;
+            end;
+        end;
+    end;
 end;
 
 procedure TNemp_MainForm.Player_PopupMenuPopup(Sender: TObject);
 var c: Integer;
     PartyModeNotActive, ToolsNotBlockedBypartymode: Boolean;
+    CaptionString: String;
 begin
     // enable/disable several items regarding PartyMode
     PartyModeNotActive         := NOT NempSkin.NempPartyMode.Active;
@@ -10187,206 +9938,49 @@ begin
     MM_T_KeyboardDisplay .Enabled := ToolsNotBlockedBypartymode;
     MM_T_Directories     .Enabled := ToolsNotBlockedBypartymode;
 
-  ResetShutDownCaptions;
-  if SleepTimer.Enabled then
-  begin
-      c := SecondsBetween(Now, NempOptions.ShutDownTime);
-      case NempOptions.ShutDownMode of
-        SHUTDOWNMODE_StopNemp : begin
-                                    MM_T_ShutDownModeStop.Caption := Format((NempShutDown_StopPopupTime),  [SekToZeitString(c, True)] );
-                                    PM_P_ShutDownModeStop.Caption := Format((NempShutDown_StopPopupTime),  [SekToZeitString(c, True)] );
-                                    PM_S_ShutDownModeStop.Caption := Format((NempShutDown_StopPopupTime),  [SekToZeitString(c, True)] );
-                                end;
-        SHUTDOWNMODE_ExitNemp  : begin
-                                    MM_T_ShutdownModeCloseNemp.Caption := Format((NempShutDown_ClosePopupTime),  [SekToZeitString(c, True)] );
-                                    PM_P_ShutDownModeCloseNemp.Caption := Format((NempShutDown_ClosePopupTime),  [SekToZeitString(c, True)] );
-                                    PM_S_ShutDownModeCloseNemp.Caption := Format((NempShutDown_ClosePopupTime),  [SekToZeitString(c, True)] );
-                                 end;
-        SHUTDOWNMODE_Suspend   : begin
-                                   MM_T_ShutdownModeSuspend.Caption := Format((NempShutDown_SuspendPopupTime),  [SekToZeitString(c, True)] );
-                                   PM_P_ShutDownModeSuspend.Caption := Format((NempShutDown_SuspendPopupTime),  [SekToZeitString(c, True)] );
-                                   PM_S_ShutDownModeSuspend.Caption := Format((NempShutDown_SuspendPopupTime),  [SekToZeitString(c, True)] );
-                                 end;
-        SHUTDOWNMODE_Hibernate : begin
-                                    MM_T_ShutdownModeHibernate.Caption := Format((NempShutDown_HibernatePopupTime),  [SekToZeitString(c, True)] );
-                                    PM_P_ShutDownModeHibernate.Caption := Format((NempShutDown_HibernatePopupTime),  [SekToZeitString(c, True)] );
-                                    PM_S_ShutDownModeHibernate.Caption := Format((NempShutDown_HibernatePopupTime),  [SekToZeitString(c, True)] );
-                                 end;
-        SHUTDOWNMODE_Shutdown  : begin
-                                    MM_T_ShutdownModeShutDownWindows.Caption := Format((NempShutDown_ShutDownPopupTime),  [SekToZeitString(c, True)] );
-                                    PM_P_ShutDownModeShutDownWindows.Caption := Format((NempShutDown_ShutDownPopupTime),  [SekToZeitString(c, True)] );
-                                    PM_S_ShutDownModeShutDownWindows.Caption := Format((NempShutDown_ShutDownPopupTime),  [SekToZeitString(c, True)] );
-                                 end;
-      end;
-  end else
-  begin
-      if NempOptions.ShutDownAtEndOfPlaylist then
-      begin
-          case NempOptions.ShutDownMode of
-              SHUTDOWNMODE_ExitNemp  : begin
-                                        MM_T_ShutdownModeCloseNemp.Caption := NempShutDown_ClosePopupTime_AtEndOfPlaylist;
-                                        PM_P_ShutDownModeCloseNemp.Caption := NempShutDown_ClosePopupTime_AtEndOfPlaylist;
-                                        PM_S_ShutDownModeCloseNemp.Caption := NempShutDown_ClosePopupTime_AtEndOfPlaylist;
-                                     end;
-              SHUTDOWNMODE_Suspend   : begin
-                                       MM_T_ShutdownModeSuspend.Caption := NempShutDown_SuspendPopupTime_AtEndOfPlaylist;
-                                       PM_P_ShutDownModeSuspend.Caption := NempShutDown_SuspendPopupTime_AtEndOfPlaylist;
-                                       PM_S_ShutDownModeSuspend.Caption := NempShutDown_SuspendPopupTime_AtEndOfPlaylist;
-                                     end;
-              SHUTDOWNMODE_Hibernate : begin
-                                        MM_T_ShutdownModeHibernate.Caption := NempShutDown_HibernatePopupTime_AtEndOfPlaylist;
-                                        PM_P_ShutDownModeHibernate.Caption := NempShutDown_HibernatePopupTime_AtEndOfPlaylist;
-                                        PM_S_ShutDownModeHibernate.Caption := NempShutDown_HibernatePopupTime_AtEndOfPlaylist;
-                                     end;
-              SHUTDOWNMODE_Shutdown  : begin
-                                        MM_T_ShutdownModeShutDownWindows.Caption := NempShutDown_ShutDownPopupTime_AtEndOfPlaylist;
-                                        PM_P_ShutDownModeShutDownWindows.Caption := NempShutDown_ShutDownPopupTime_AtEndOfPlaylist;
-                                        PM_S_ShutDownModeShutDownWindows.Caption := NempShutDown_ShutDownPopupTime_AtEndOfPlaylist;
-                                     end;
-          end;
-      end;
-  end;
+    CaptionString := GetShutDownInfoCaption;
+    PM_T_ShutdownInfo.Caption := CaptionString;
+    MM_T_ShutdownInfo.Caption := CaptionString;
+    PM_P_ShutdownInfo.Caption := CaptionString;
 end;
 
 
-procedure TNemp_MainForm.StundenClick(Sender: TObject);
+procedure TNemp_MainForm.ActivateShutDownMode(Sender: TObject);
 var c: Integer;
 begin
-//neue Methode: Tag Mod 100 => Zeit
-//                          => Shutdown-Time := Now + zeit
-//              Tag DIV 100 => Modus (Stop, Clos, Hibernate,...)
+    // activate ShutDown after Settings-Dialog
+    if not assigned(ShutDownEditForm) then
+        Application.CreateForm(TShutDownEditForm, ShutDownEditForm);
 
-  case ((Sender as TMenuItem).Tag) Mod 100 of
-      0: NempOptions.ShutDownTime := IncMinute(Now, 5);
-      1: NempOptions.ShutDownTime := IncMinute(Now, 15);
-      2: NempOptions.ShutDownTime := IncMinute(Now, 30);
-      3: NempOptions.ShutDownTime := IncMinute(Now, 45);
-      4: NempOptions.ShutDownTime := IncMinute(Now, 60);
-      5: NempOptions.ShutDownTime := IncMinute(Now, 90);
-      6: NempOptions.ShutDownTime := IncMinute(Now, 120);
-      else begin
-          //...
-          // Form zeigen, Zeit eingeben
-          if not assigned(ShutDownEditForm) then
-              Application.CreateForm(TShutDownEditForm, ShutDownEditForm);
-
-          if ShutDownEditForm.ShowModal = mrOk then
-              NempOptions.ShutDownTime := IncMinute(Now, 60 * ShutDownEditForm.SE_Hours.Value + ShutDownEditForm.SE_Minutes.Value)
-          else
-              exit;
-      end;
-  end;
-
-  NempOptions.ShutDownMode := ((Sender as TMenuItem).Tag) Div 100;
-  NempOptions.ShutDownAtEndOfPlaylist := False;
-  
-  case ((Sender as TMenuItem).Tag) Div 100 of
-      SHUTDOWNMODE_StopNemp : begin
-                                  MM_T_ShutDownModeStop.Checked := True;
-                                  PM_P_ShutDownModeStop.Checked := True;
-                                  PM_S_ShutDownModeStop.Checked := True;
-                              end;
-      SHUTDOWNMODE_ExitNemp  : begin
-                                  MM_T_ShutdownModeCloseNemp.Checked := True;
-                                  PM_P_ShutDownModeCloseNemp.Checked := True;
-                                  PM_S_ShutDownModeCloseNemp.Checked := True;
-                               end;
-      SHUTDOWNMODE_Suspend   : begin
-                                 MM_T_ShutdownModeSuspend.Checked := True;
-                                 PM_P_ShutDownModeSuspend.Checked := True;
-                                 PM_S_ShutDownModeSuspend.Checked := True;
-                               end;
-      SHUTDOWNMODE_Hibernate : begin
-                                  MM_T_ShutdownModeHibernate.Checked := True;
-                                  PM_P_ShutDownModeHibernate.Checked := True;
-                                  PM_S_ShutDownModeHibernate.Checked := True;
-                               end;
-      SHUTDOWNMODE_Shutdown  : begin
-                                  MM_T_ShutdownModeShutDownWindows.Checked := True;
-                                  PM_P_ShutDownModeShutDownWindows.Checked := True;
-                                  PM_S_ShutDownModeShutDownWindows.Checked := True;
-                               end;
-  end;
-
-  ResetShutDownCaptions;
-
-  c := SecondsBetween(Now, NempOptions.ShutDownTime);
-  if c <= 120 then
-    SleepTimer.Interval := 250    // 0.25sek
-  else
-    SleepTimer.Interval := 10000; // 10sek
-
-  SleepTimer.Enabled := True;
-  SleepImage.Hint := GenerateSleepHint;
-
-  ReArrangeToolImages;
-end;
-
-
-procedure TNemp_MainForm.ShutDown_EndofPlaylistClick(Sender: TObject);
-var DlgResult: Integer;
-begin
-    if NempPlaylist.WiedergabeMode <> NEMP_API_NOREPEAT then
+    if ShutDownEditForm.ShowModal = mrOk then
     begin
-        DlgResult := TranslateMessageDLG(NempShutDown_AtEndOfPlaylist_Dlg,
-            mtWarning, [MBYes, MBNO, MBAbort], 0);
-    end else
-        DlgResult := mrNone;
+        if NempOptions.ShutDownAtEndOfPlaylist then
+        begin
+            SleepTimer.Enabled := False;
+            // !
+            NempPlaylist.WiedergabeMode := NEMP_API_NOREPEAT; //(NempPlaylist.WiedergabeMode + 1) Mod 4;
+            SetRepeatBtnGraphics;
+        end else
+        begin
+            c := SecondsBetween(Now, NempOptions.ShutDownTime);
+            if c <= 120 then
+                SleepTimer.Interval := 250    // 0.25sek
+            else
+                SleepTimer.Interval := 10000; // 10sek
 
-    // Exit when user choosed "Cancel"
-    if DlgResult = MrAbort then exit;
+            SleepTimer.Enabled := True;
+        end;
 
-    // switch mode
-    if DlgResult = MrYes then
-    begin
-        NempPlaylist.WiedergabeMode := NEMP_API_NOREPEAT; //(NempPlaylist.WiedergabeMode + 1) Mod 4;
-        SetRepeatBtnGraphics;
+        SleepImage.Hint := GenerateSleepHint;
+        ReArrangeToolImages;
     end;
-
-    NempOptions.ShutDownMode := ((Sender as TMenuItem).Tag) DIV 100;
-
-    NempOptions.ShutDownAtEndOfPlaylist := True;
-
-    case ((Sender as TMenuItem).Tag) Div 100 of
-        SHUTDOWNMODE_StopNemp : begin
-                                    MM_T_ShutDownModeStop.Checked := True;
-                                    PM_P_ShutDownModeStop.Checked := True;
-                                    PM_S_ShutDownModeStop.Checked := True;
-                                end;
-        SHUTDOWNMODE_ExitNemp  : begin
-                                    MM_T_ShutdownModeCloseNemp.Checked := True;
-                                    PM_P_ShutDownModeCloseNemp.Checked := True;
-                                    PM_S_ShutDownModeCloseNemp.Checked := True;
-                                 end;
-        SHUTDOWNMODE_Suspend   : begin
-                                   MM_T_ShutdownModeSuspend.Checked := True;
-                                   PM_P_ShutDownModeSuspend.Checked := True;
-                                   PM_S_ShutDownModeSuspend.Checked := True;
-                                 end;
-        SHUTDOWNMODE_Hibernate : begin
-                                    MM_T_ShutdownModeHibernate.Checked := True;
-                                    PM_P_ShutDownModeHibernate.Checked := True;
-                                    PM_S_ShutDownModeHibernate.Checked := True;
-                                 end;
-        SHUTDOWNMODE_Shutdown  : begin
-                                    MM_T_ShutdownModeShutDownWindows.Checked := True;
-                                    PM_P_ShutDownModeShutDownWindows.Checked := True;
-                                    PM_S_ShutDownModeShutDownWindows.Checked := True;
-                                 end;
-    end;
-
-    SleepTimer.Enabled := False;
-    ResetShutDownCaptions;
-    ReArrangeToolImages;
-    SleepImage.Hint := GenerateSleepHint;
 end;
 
 procedure TNemp_MainForm.InitShutDown;
 begin
-    ResetShutDownCaptions;
+    // ResetShutDownCaptions;
     NempOptions.ShutDownAtEndOfPlaylist := False;
     SleepTimer.Enabled := False;
-
     ReArrangeToolImages;
 
     // Laufende Aktionen Beenden
@@ -10409,6 +10003,8 @@ begin
 end;
 
 
+
+
 procedure TNemp_MainForm.SleepTimerTimer(Sender: TObject);
 var c: Integer;
 begin
@@ -10423,15 +10019,20 @@ begin
 end;
 
 procedure TNemp_MainForm.Schlafmodusdeaktivieren1Click(Sender: TObject);
+var c: Integer;
 begin
-  SleepTimer.Enabled := False;
-  NempOptions.ShutDownAtEndOfPlaylist := False;
+    if SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist then
+    begin
+        // Disable ShutDown
+        SleepTimer.Enabled := False;
+        NempOptions.ShutDownAtEndOfPlaylist := False;
 
-  MM_T_ShutdownOff.Checked := True;
-  PM_P_ShutdownOff.Checked := True;
-  PM_S_ShutdownOff.Checked := True;
+        ReArrangeToolImages;
+    end else
+    begin
+        ActivateShutDownMode(Sender);
+    end;
 
-  ReArrangeToolImages;
 end;
 
 procedure TNemp_MainForm.LoadARecentPlaylist(Sender: TObject);
@@ -10564,6 +10165,14 @@ begin
     Handle_STNewFile(Msg);
 end;
 
+(*
+procedure TNemp_MainForm.STNewDir   (var Msg: TMessage);
+begin
+    Handle_STNewDir(Msg);
+end;
+*)
+
+
 procedure TNemp_MainForm.STFinish   (var Msg: TMessage);
 begin
     Handle_STFinish(Msg);
@@ -10594,12 +10203,6 @@ begin
     // Ja, das ist so richtig. In die Medienbib kommen Playlist-Dateien rein.
     // In die Playlist nicht.
     result := result + ';*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax';
-end;
-
-
-procedure TNemp_MainForm.PlaylistVSTEnter(Sender: TObject);
-begin
-  AktiverTree := PlaylistVST;
 end;
 
 
@@ -10804,13 +10407,6 @@ end;
 
 
 
-procedure TNemp_MainForm.VSTEnter(Sender: TObject);
-begin
-  AktiverTree := VST;
-end;
-
-
-
 procedure TNemp_MainForm.RepairZOrder;
 begin
   ///02.2017
@@ -10909,7 +10505,6 @@ begin
         // (invalid winwdow handle when switching VCL styles)
         RepaintPlayerPanel;
 
-        // AudioPanel.Repaint;
         PlaylistPanel.Repaint;
         AuswahlPanel.Repaint;
 
@@ -11086,21 +10681,6 @@ begin
     aPanel.Canvas.RoundRect(0,0, aPanel.Width-0, aPanel.Height-0, 6, 6);
 end;
 
-(*
-procedure TNemp_MainForm.NewPlayerPanelMouseWheelDown(Sender: TObject;
-  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-begin
-    NempPlayer.Volume := NempPlayer.Volume - 1;
-    CorrectVolButton;
-end;
-
-procedure TNemp_MainForm.NewPlayerPanelMouseWheelUp(Sender: TObject;
-  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
-begin
-    NempPlayer.Volume := NempPlayer.Volume + 1;
-    CorrectVolButton;
-end;
-*)
 
 procedure TNemp_MainForm.PlayerControlPanelMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
@@ -11260,11 +10840,7 @@ begin
     BirthdayImage.Hint := Format((BirthdayCountDown_Hint),  [SekToZeitString(timeleft, true)] );
 end;
 
-procedure TNemp_MainForm.VolTimerTimer(Sender: TObject);
-begin
-  NempPlayer.VolStep := 0;
-  VolTimer.Enabled := False;
-end;
+
 
 procedure TNemp_MainForm.PutDirListInAutoScanList(aDirList: TStringList);
 var asknomore: Boolean;
@@ -11325,82 +10901,15 @@ begin
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
     MedienBibDetailStatusLbl.Width := MedienBibDetailFillPanel.Width - 16;
 
-    // handle ratio VST - Cover
-    //if NempOptions.ShowCoverAndDetails then
     if NOT NempFormBuildOptions.HideFileOverviewPanel then
-    begin
-        //fix DetailCoverLyricsPanel vs. VDTCover
-        // to do for later: fix sizes vertically
-        {
-         dim := Round(NempOptions.NempFormRatios.VDTCoverWidth / 100 * MedienBibDetailPanel.Width);
-         if dim < 30 then
-            dim := 30;
-         if MedienBibDetailPanel.Width - dim < 30 then
-            dim := MedienBibDetailPanel.Width - 30;
-        }
-
          NempFormBuildOptions.ResizeSubPanel(MedienBibDetailPanel, DetailCoverLyricsPanel, NempFormBuildOptions.FileOverviewCoverRatio);
-
-         //DetailCoverLyricsPanel.Width := dim;
-
-
-        //if assigned(MedienBib) then
-        //    CreateTagLabels(MedienBib.CurrentAudioFile);
-
-        //if DetailID3TagPanel.Width > 0 then
-        //    NempOptions.CoverWidth := DetailID3TagPanel.Width;
-
-        //if assigned(MedienBib) then
-        //    RefreshVSTCoverTimer.Enabled := True;
-    end;
 end;
 
 
 procedure TNemp_MainForm.DetailID3TagPanelResize(Sender: TObject);
-var dim: Integer;
 begin
-        if assigned(MedienBib) then
-            RefreshVSTCoverTimer.Enabled := True;
-        //if assigned(MedienBib) then
-        //    CreateTagLabels(MedienBib.CurrentAudioFile);
-
-exit;
-//!!!!!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!
-(*
-    dim := Round(NempOptions.NempFormRatios.VDTCoverWidth / 100 * VDTCover.Width);
-    if dim > 300 then
-        dim := 300;
-    if dim > VDTCover.Height then
-        dim := VDTCover.Height;
-
-  {  ImgDetailCover.Width  := dim;
-    ImgDetailCover.Height := dim;
-
-    LyricsMemo.Width := dim;
-    LyricsMemo.Height := VDTCover.Height - 8;
-    }
-    {
-    LblBibArtist     .Left := dim + 6;
-    LblBibTitle      .Left := dim + 6;
-    LblBibAlbum      .Left := dim + 6;
-    LblBibTrack      .Left := dim + 6;
-    LblBibYear       .Left := dim + 6;
-    LblBibGenre      .Left := dim + 6;
-    LblBibDuration   .Left := dim + 6;
-    LblBibQuality    .Left := dim + 6;
-    ImgBibRating     .Left := dim + 6;
-    LblBibPlayCounter.Left := dim + 6;
-     }
-
-    if assigned(MedienBib) then
-        CreateTagLabels(MedienBib.CurrentAudioFile);
-
-    if VDTCover.Width > 0 then
-        NempOptions.CoverWidth := VDTCover.Width;
-
     if assigned(MedienBib) then
         RefreshVSTCoverTimer.Enabled := True;
-    *)
 end;
 
 
@@ -11408,22 +10917,18 @@ procedure TNemp_MainForm.Splitter5CanResize(Sender: TObject;
   var NewSize: Integer; var Accept: Boolean);
 var s: TSplitter;
 begin
-
     s := Sender as TSplitter;
     if s.Align in [alLeft, alRight] then
         accept := (s.MinSize < NewSize) and ( (s.Parent.Width - newSize) > s.MinSize)
     else
         accept := (s.MinSize < NewSize) and ( (s.Parent.Height - newSize) > s.MinSize)
-
 end;
 
 procedure TNemp_MainForm.Splitter5Moved(Sender: TObject);
 begin
     if MedienBibDetailPanel.Width > 0 then
-        // NempOptions.NempFormRatios.VDTCoverWidth := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)
         NempFormBuildOptions.FileOverviewCoverRatio := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)
     else
-        //NempOptions.NempFormRatios.VDTCoverWidth := 50;
         NempFormBuildOptions.FileOverviewCoverRatio := 50;
 
     // ??
@@ -11452,65 +10957,16 @@ begin
         PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - 16;
     end else
     begin
-        
     end;
     }
 
     PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
-
     PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
     NempSkin.SetPlaylistOffsets;
 end;
 
-
-
-
-procedure TNemp_MainForm.VSTPanelResize(Sender: TObject);
-var newWidth: Integer;
-begin
-
-Exit;
-// split this into two methods for Medialist and FileOverview !!!
-// !!!!!!!!!!!!!!!!!!!!!  GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Dickes "IF" am Anfang kann weg. Grund war: VST-FORM sollte man auf Player-Breite verkleinern können
-
-
-    // handle QuickSearch-Edit-stuff
-    if _VSTPanel.Parent <> Nemp_MainForm.__MainContainerPanel then
-    begin
-        if _VSTPanel.Width <= 320 then
-        begin
-            EDITFastSearch.Width := 194 - (320 - _VSTPanel.Width);
-            //CB_MedienBibGlobalQuickSearch.Left := EditFastSearch.Left + EditFastSearch.Width - 17;
-        end else
-        begin
-            EditFastSearch.Width := 194;
-            //CB_MedienBibGlobalQuickSearch.Left := 209;
-        end;
-
-
-        MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
-        MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - 16;
-    end else
-    begin
-        MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
-        MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left;// - 8;
-    end;
-    MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
-  (*
-    // handle ratio VST - Cover
-    if NempOptions.ShowCoverAndDetails then
-    begin
-        // Cover is visible here
-        newWidth := Round(NempOptions.NempFormRatios.VSTWidth / 100 * _VSTPanel.Width);
-        if newWidth < 100 then
-            newWidth := 100;
-        DetailID3TagPanel.Width := newWidth;
-    end;
-    *)
-end;
 
 
 procedure TNemp_MainForm.MitzuflligenEintrgenausderMedienbibliothekfllen1Click(
@@ -11523,20 +10979,6 @@ begin
   RandomPlaylistForm.Show;
 end;
 
-// Sinn dieses Timers:
-// Wenn im Explorer mehrere Dateien markiert werden, und die Funktion "In Nemp abspielen"
-// gewählt wird, wird die Playlist für jede Datei neu gelöscht. das ist erstens nicht unbedingt
-// sinnvoll, und zweitens kommt da irgendwas mit irgendwem durcheinander (die Anzahl der Dateien, die
-// am Ende in der Playlist sind, ist irgendwie nicht vorhersehbar...???).
-// So wird das Löschen der Playlist für einen gewissen Zeitraum verhindert, und alle markierten Dateien
-// werden in die Playlist eingefügt.
-
-procedure TNemp_MainForm.ReallyClearPlaylistTimerTimer(Sender: TObject);
-begin
-  NempPlaylist.ProcessBufferStringlist;
-
-  ReallyClearPlaylistTimer.Enabled := False;
-end;
 
 procedure TNemp_MainForm.RecordBtnIMGClick(Sender: TObject);
 begin
@@ -11641,11 +11083,6 @@ begin
       MedienBib.NewCoverFlow.Paint;
 end;
 
-procedure IncrementalTimerFire(TimerID, Msg: Uint; dwUser, dw1, dw2: DWORD); pascal;
-begin
-    // Prefix zurücksetzen
-    Nemp_MainForm.SelectionPrefix := '';
-end;
 
 procedure TNemp_MainForm.CoverScrollbarKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -11660,30 +11097,29 @@ begin
     $41..$5A, $30..$39,32,
     $BA..$C0, $DB..$DE, $E2:
     begin
-      //if not Assigned(aTree.FocusedNode) then Exit;
-      // SuchPrefix erweitern
-      GetKeyboardState(keystate);
-      if ToAscii(Key, MapVirtualKey(key, 0), keyState, @tempC[1], 0) > 0 then
-          SelectionPrefix := SelectionPrefix + Char(tempC[1]);
+        // SuchPrefix erweitern
+        GetKeyboardState(keystate);
+        if ToAscii(Key, MapVirtualKey(key, 0), keyState, @tempC[1], 0) > 0 then
+            SelectionPrefix := SelectionPrefix + Char(tempC[1]);
 
-      // Das OldSelectionPrefix wird zur Suche mit F3 benutzt.
-      // das SelectionPrefix wird bei OnTimer sinnigerweise auf '' gesetzt
-      OldSelectionPrefix := SelectionPrefix;
+        // Das OldSelectionPrefix wird zur Suche mit F3 benutzt.
+        // das SelectionPrefix wird bei OnTimer sinnigerweise auf '' gesetzt
+        OldSelectionPrefix := SelectionPrefix;
 
-      ActualIndex := CoverScrollbar.Position;
-      Newindex := MedienBib.GetCoverWithPrefix(SelectionPrefix, ActualIndex);
-      CoverScrollbar.Position := NewIndex;
+        ActualIndex := CoverScrollbar.Position;
+        Newindex := MedienBib.GetCoverWithPrefix(SelectionPrefix, ActualIndex);
+        CoverScrollbar.Position := NewIndex;
 
-      // Timer neustarten
-      TimeKillEvent(IncrementalTimerID);
-      IncrementalTimerID := TimeSetEvent(1000, 50, @IncrementalTimerFire, 0, TIME_ONESHOT);
+        // Timer neustarten
+        IncrementalCoverSearchTimer.Enabled := False;
+        IncrementalCoverSearchTimer.Enabled := True;
     end;
     VK_F3:
     begin
-      if OldSelectionPrefix = '' then Exit;
-      ActualIndex := CoverScrollbar.Position;
-      Newindex := MedienBib.GetCoverWithPrefix(OldSelectionPrefix, (ActualIndex + 1) Mod MedienBib.Coverlist.Count);
-      CoverScrollbar.Position := NewIndex;
+        if OldSelectionPrefix = '' then Exit;
+        ActualIndex := CoverScrollbar.Position;
+        Newindex := MedienBib.GetCoverWithPrefix(OldSelectionPrefix, (ActualIndex + 1) Mod MedienBib.Coverlist.Count);
+        CoverScrollbar.Position := NewIndex;
     end;
     VK_ESCAPE: begin
         ////key := #0;
@@ -12130,18 +11566,12 @@ begin
   OptionsCompleteForm.Show;
 end;
 
-procedure TNemp_MainForm.ScrobblerImageClick(Sender: TObject);
-var point: TPoint;
-begin
-  GetCursorPos(Point);
-  PMScrobbler.Popup(Point.X, Point.Y+10);
-end;
 
-procedure TNemp_MainForm.SleepImageClick(Sender: TObject);
+procedure TNemp_MainForm.ToolImageClick(Sender: TObject);
 var point: TPoint;
 begin
   GetCursorPos(Point);
-  PMSleep.Popup(Point.X, Point.Y+10);
+  PopupTools.Popup(Point.X, Point.Y+10);
 end;
 
 procedure TNemp_MainForm.WalkmanImageClick(Sender: TObject);
@@ -12209,19 +11639,6 @@ begin
     end;
 end;
 
-procedure TNemp_MainForm.WebserverImageClick(Sender: TObject);
-var point: TPoint;
-begin
-  GetCursorPos(Point);
-  PMWebserver.Popup(Point.X, Point.Y+10);
-end;
-
-procedure TNemp_MainForm.BirthdayImageClick(Sender: TObject);
-var point: TPoint;
-begin
-  GetCursorPos(Point);
-  PMBirthday.Popup(Point.X, Point.Y+10);
-end;
 
 procedure TNemp_MainForm.MM_T_WebServerActivateClick(Sender: TObject);
 begin
@@ -12282,8 +11699,30 @@ begin
 end;
 
 
+procedure TNemp_MainForm.__MainContainerPanelMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if button = mbLeft then
+  begin
+    Resizing := True;
+    ReleaseCapture;
+    PerForm(WM_SysCommand, ResizeFlag , 0);
+  end;
+end;
 
 
+
+procedure TNemp_MainForm.__MainContainerPanelMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+begin
+    ResizeFlag := GetResizeDirection(Sender, Shift, X, Y);
+end;
+
+procedure TNemp_MainForm.__MainContainerPanelMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+   Resizing := False;
+end;
 
 initialization
 
@@ -12291,7 +11730,6 @@ initialization
 finalization
 
     DeallocateHWnd(FOwnMessageHandler);
-
 
 end.
 

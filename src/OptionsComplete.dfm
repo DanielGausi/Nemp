@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabView4
+      ActivePage = TabPlayer6
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -3872,7 +3872,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 120
           Width = 439
-          Height = 138
+          Height = 161
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Default actions'
           TabOrder = 1
@@ -3923,7 +3923,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'Enqueue after current track'
               'Just play (don'#39't change the playlist)')
           end
-          object cb_AutoStopHeadset: TCheckBox
+          object cb_AutoStopHeadsetSwitchTab: TCheckBox
             Left = 12
             Top = 111
             Width = 389
@@ -3931,10 +3931,18 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Stop headset when switching to another tab'
             TabOrder = 2
           end
+          object cb_AutoStopHeadsetAddToPlayist: TCheckBox
+            Left = 12
+            Top = 128
+            Width = 405
+            Height = 17
+            Caption = 'Stop headset when adding headset file to playlist'
+            TabOrder = 3
+          end
         end
         object GrpBox_PlayerExt2_Playlist: TGroupBox
           Left = 8
-          Top = 264
+          Top = 301
           Width = 439
           Height = 81
           Anchors = [akLeft, akTop, akRight]
@@ -3971,8 +3979,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBoX_LogPlaylist: TGroupBox
           Left = 8
-          Top = 351
-          Width = 431
+          Top = 388
+          Width = 439
           Height = 98
           Caption = 'Playlist Log'
           TabOrder = 3

@@ -395,7 +395,7 @@ NempUpdate_InfoNote = 'Note: %s';
   NempShutDown_HibernateHint_AtEndOfPlaylist = 'Windows will hibernate at the end of the playlist.';
   NempShutDown_ShutDownHint_AtEndOfPlaylist  = 'Windows will shutdown at the end of the playlist.';
   NempShutDown_AtEndOfPlaylist_Hint = 'Note that this only makes sense with mode "Repeat off" and no webstreams in the playlist.';
-  NempShutDown_AtEndOfPlaylist_Dlg = 'Shutting down at the end of the playlist only works with "Repeat off". Do you want to change the playback mode now?';
+  NempShutDown_AtEndOfPlaylist_Dlg = 'Shutting down at the end of the playlist only works with "Repeat off". Therefore Nemp will change the playback mode if you continue.';
 
 
   NempShutDown_StopHint     = 'Nemp will stop in %s.';
@@ -407,23 +407,26 @@ NempUpdate_InfoNote = 'Note: %s';
   NempShutDown_CountDownLblMainForm = 'Shutdown in %s.';
   NempShutDown_AtEndOfPlaylist = 'Shutdown after the last file.';
 
+
   NempShutDown_StopPopupBlank      = 'Stop Nemp';
   NempShutDown_ClosePopupBlank     = 'Close Nemp';
   NempShutDown_SuspendPopupBlank   = 'Suspend Windows';
   NempShutDown_HibernatePopupBlank = 'Hibernate Windows';
   NempShutDown_ShutDownPopupBlank  = 'Shutdown Windows';
 
-  NempShutDown_StopPopupTime       = 'Stop Nemp (~%s)';
-  NempShutDown_ClosePopupTime      = 'Close Nemp (~%s)';
-  NempShutDown_SuspendPopupTime    = 'Suspend Windows (~%s)';
-  NempShutDown_HibernatePopupTime  = 'Hibernate Windows (~%s)';
-  NempShutDown_ShutDownPopupTime   = 'Shutdown Windows (~%s)';
 
-  //NempShutDown_StopPopupTime_AtEndOfPlaylist       = 'Stop Nemp (after the last file)'; // Not needed!
-  NempShutDown_ClosePopupTime_AtEndOfPlaylist      = 'Close Nemp (after the last file)';
-  NempShutDown_SuspendPopupTime_AtEndOfPlaylist    = 'Suspend Windows (after the last file)';
-  NempShutDown_HibernatePopupTime_AtEndOfPlaylist  = 'Hibernate Windows (after the last file)';
-  NempShutDown_ShutDownPopupTime_AtEndOfPlaylist   = 'Shutdown Windows (after the last file)';
+  NempShutDown_PopupNotActive      = 'Current status: not active';
+  NempShutDown_StopPopupTime       = 'Current status: Stop Nemp in ~%s';
+  NempShutDown_ClosePopupTime      = 'Current status: Close Nemp in ~%s';
+  NempShutDown_SuspendPopupTime    = 'Current status: Suspend Windows in ~%s';
+  NempShutDown_HibernatePopupTime  = 'Current status: Hibernate Windows in ~%s';
+  NempShutDown_ShutDownPopupTime   = 'Current status: Shutdown Windows in ~%s';
+
+  NempShutDown_StopPopupTime_AtEndOfPlaylist       = 'Current status: Stop Nemp after the last file'; // Not needed!
+  NempShutDown_ClosePopupTime_AtEndOfPlaylist      = 'Current status: Close Nemp after the last file';
+  NempShutDown_SuspendPopupTime_AtEndOfPlaylist    = 'Current status: Suspend Windows after the last file';
+  NempShutDown_HibernatePopupTime_AtEndOfPlaylist  = 'Current status: Hibernate Windows after the last file';
+  NempShutDown_ShutDownPopupTime_AtEndOfPlaylist   = 'Current status: Shutdown Windows after the last file';
 
 
   BirthdayCountDown_Caption = 'Birthday in %s';
@@ -775,8 +778,9 @@ MediaLibrary_OutOfMemoryBuildingLyricStringError      = 'An error occurred while
 
 
 
-    Playlist_QueryReallyDelete    = 'This will delete your current playlist. Continue?';
-    Playlist_NotEverything        = 'No. Nemp will not add _everything_ to the playlist.';
+    Playlist_QueryReallyDelete    = 'This will clear your current playlist with %d tracks and replace it with only %d new tracks. Do you really want to clear the playlist?'
+                                    + #13#10#13#10 + 'Note: You can change the default action for adding files into the playlist within the settings dialog';
+    Playlist_NotEverything        = 'No. Nemp will not add *everything* to the playlist.';
     Playlist_FileNotFound         = 'The specified file can not be found. Do you want to delete it from the list?';
     Playlist_NoRecentlists        = 'empty';
 

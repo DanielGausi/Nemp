@@ -433,6 +433,8 @@ type
         AutoScanDirList: TStringList;  // complete list of all Directories to scan
         AutoScanToDoList: TStringList; // the "working list"
 
+        CurrentSearchDir: String;
+
         AutoDeleteFiles: Boolean;       
         AutoDeleteFilesShowInfo: Boolean;
 

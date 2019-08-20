@@ -565,7 +565,7 @@ begin
         // Set Scrobble-Menu
         MM_T_ScrobblerActivate.Caption := MenuString;
         PM_P_ScrobblerActivate.Caption := MenuString;
-        PM_S_ScrobblerActivate.Caption := MenuString;
+        PM_T_ScrobblerActivate.Caption := MenuString;
 
 
         If assigned(NempWebserver) and NempWebserver.Active then
@@ -583,7 +583,7 @@ begin
         // Set the Webserver-Menu
         MM_T_WebServerActivate.Caption := MenuString;
         PM_P_WebServerActivate.Caption := MenuString;
-        PM_W_WebServerActivate.Caption := MenuString;
+        PM_T_WebServerActivate.Caption := MenuString;
 
         if BirthdayTimer.Enabled then
         begin
@@ -600,7 +600,7 @@ begin
         // Set the Birthday-Menu
         MM_T_BirthdayActivate.Caption := MenuString;
         PM_P_BirthdayActivate.Caption := MenuString;
-        PM_B_BirthdayActivate.Caption := MenuString;
+        PM_T_BirthdayActivate.Caption := MenuString;
 
         if (SleepTimer.Enabled) or (NempOptions.ShutDownAtEndOfPlaylist) then
         begin
@@ -608,8 +608,16 @@ begin
             SleepImage.Left := currentLeft;
             SleepImage.Visible := True;
             inc(currentLeft, decvalue);
+            MenuString := MenuItem_Deactivate;
         end else
+        begin
             SleepImage.Visible := False;
+            MenuString := MenuItem_Activate;
+        end;
+
+        MM_T_ShutDownOff.Caption := MenuString;
+        PM_P_ShutDownOff.Caption := MenuString;
+        PM_T_ShutDownActivate.Caption := MenuString;
 
         if WalkmanModeTimer.Tag = 1 then
         begin
@@ -810,7 +818,7 @@ begin
         Uselanguage(LanguageCode);
 
         //c := Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex;
-        //ReTranslateComponent (Nemp_MainForm);
+        ReTranslateComponent (Nemp_MainForm);
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
 
         NempPlayer.RefreshPlayingTitel;

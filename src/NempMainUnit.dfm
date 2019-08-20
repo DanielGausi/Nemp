@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 758
+  ClientHeight = 729
   ClientWidth = 1090
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -36,10 +36,13 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 0
     Width = 1090
-    Height = 758
+    Height = 729
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    OnMouseDown = __MainContainerPanelMouseDown
+    OnMouseMove = __MainContainerPanelMouseMove
+    OnMouseUp = __MainContainerPanelMouseUp
     OnResize = __MainContainerPanelResize
     OwnerDraw = False
     object Splitter1: TSplitter
@@ -286,7 +289,6 @@ object Nemp_MainForm: TNemp_MainForm
               OnKeyDown = StringVSTKeyDown
               OnResize = ArtistsVSTResize
               OnStartDrag = ArtistsVSTStartDrag
-              ExplicitLeft = -2
               Columns = <
                 item
                   MinWidth = 0
@@ -571,7 +573,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnColumnDblClick = PlaylistVSTColumnDblClick
             OnDragOver = PlaylistVSTDragOver
             OnDragDrop = PlaylistVSTDragDrop
-            OnEnter = PlaylistVSTEnter
             OnExpanded = PlaylistVSTCollapsAndExpanded
             OnGetText = PlaylistVSTGetText
             OnPaintText = VSTPaintText
@@ -692,7 +693,7 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 244
       Width = 1090
-      Height = 414
+      Height = 385
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -702,7 +703,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 607
         Top = 0
         Width = 4
-        Height = 414
+        Height = 385
         Align = alRight
         MinSize = 50
         ResizeStyle = rsUpdate
@@ -715,7 +716,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 0
         Top = 0
         Width = 607
-        Height = 414
+        Height = 385
         Align = alClient
         BevelOuter = bvNone
         PopupMenu = Medialist_View_PopupMenu
@@ -832,7 +833,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 28
           Width = 607
-          Height = 386
+          Height = 357
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -845,7 +846,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 2
             Top = 2
             Width = 603
-            Height = 382
+            Height = 353
             Align = alClient
             BevelInner = bvNone
             BevelOuter = bvNone
@@ -892,7 +893,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnEdited = VSTEdited
             OnEditing = VSTEditing
             OnEndDrag = VSTEndDrag
-            OnEnter = VSTEnter
             OnFocusChanging = VSTFocusChanging
             OnGetText = VSTGetText
             OnPaintText = VSTPaintText
@@ -987,7 +987,7 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 611
         Top = 0
         Width = 479
-        Height = 414
+        Height = 385
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 1
@@ -997,7 +997,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 28
           Width = 479
-          Height = 386
+          Height = 357
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -1006,7 +1006,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 248
             Top = 0
             Width = 4
-            Height = 386
+            Height = 357
             ResizeStyle = rsUpdate
             OnCanResize = Splitter5CanResize
             OnMoved = Splitter5Moved
@@ -1019,7 +1019,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 0
             Top = 0
             Width = 248
-            Height = 386
+            Height = 357
             Align = alLeft
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1030,25 +1030,26 @@ object Nemp_MainForm: TNemp_MainForm
             OwnerDraw = False
             DesignSize = (
               248
-              386)
+              357)
             object ImgDetailCover: TImage
               Left = 8
               Top = 8
               Width = 234
-              Height = 368
+              Height = 339
               Anchors = [akLeft, akTop, akRight, akBottom]
               Proportional = True
               Stretch = True
+              OnDblClick = ImgDetailCoverDblClick
               OnMouseDown = ImgDetailCoverMouseDown
               OnMouseMove = ImgDetailCoverMouseMove
               ExplicitWidth = 203
               ExplicitHeight = 150
             end
             object LyricsMemo: TMemo
-              Left = 8
+              Left = 12
               Top = 6
               Width = 234
-              Height = 368
+              Height = 339
               Anchors = [akLeft, akTop, akRight, akBottom]
               BevelInner = bvNone
               BevelOuter = bvNone
@@ -1066,7 +1067,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 252
             Top = 0
             Width = 227
-            Height = 386
+            Height = 357
             Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1077,7 +1078,7 @@ object Nemp_MainForm: TNemp_MainForm
             OwnerDraw = False
             DesignSize = (
               227
-              386)
+              357)
             object ImgBibRating: TImage
               Left = 8
               Top = 129
@@ -1287,11 +1288,12 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 658
+      Top = 629
       Width = 1090
       Height = 100
       Align = alBottom
       BevelOuter = bvNone
+      PopupMenu = Player_PopupMenu
       TabOrder = 2
       OnMouseMove = _ControlPanelMouseMove
       OnResize = _ControlPanelResize
@@ -1381,6 +1383,7 @@ object Nemp_MainForm: TNemp_MainForm
             Caption = '00:00'
             StyleElements = [seClient, seBorder]
             OnClick = BassTimeLBLClick
+            OnDragOver = GRPBOXControlDragOver
             ExplicitLeft = 767
           end
           object ab1: TImage
@@ -1416,9 +1419,9 @@ object Nemp_MainForm: TNemp_MainForm
           object PlayerTitleLabel: TLabel
             Left = 11
             Top = 26
-            Width = 313
+            Width = 9
             Height = 13
-            Caption = 'Das Altbierlied und noch ein paar Tolle andere Titelinfos'
+            Caption = '...'
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -11
@@ -1427,15 +1430,17 @@ object Nemp_MainForm: TNemp_MainForm
             ParentFont = False
             ShowAccelChar = False
             StyleElements = [seClient, seBorder]
+            OnDragOver = GRPBOXControlDragOver
           end
           object PlayerArtistLabel: TLabel
             Left = 11
             Top = 6
-            Width = 307
+            Width = 12
             Height = 13
-            Caption = 'Die Toten Hosen und das wunderbare Orchester von D'#252'sseldorf'
+            Caption = '...'
             ShowAccelChar = False
             StyleElements = [seClient, seBorder]
+            OnDragOver = GRPBOXControlDragOver
           end
           object SlideBarButton: TSkinButton
             Left = 303
@@ -1553,6 +1558,7 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 100
         Align = alLeft
         BevelOuter = bvNone
+        PopupMenu = Player_PopupMenu
         TabOrder = 0
         OwnerDraw = False
         object HeadsetControlPanel: TNempPanel
@@ -1586,6 +1592,7 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 73
             Width = 20
             Height = 18
+            OnDragOver = GRPBOXControlDragOver
           end
           object lblHeadphoneControl: TLabel
             Left = 8
@@ -1594,6 +1601,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 13
             Caption = 'Headphone Controls'
             StyleElements = [seClient, seBorder]
+            OnDragOver = GRPBOXControlDragOver
           end
           object VolButtonHeadset: TSkinButton
             Left = 47
@@ -1678,7 +1686,8 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 29
             Width = 24
             Height = 24
-            Hint = 'Add current file to playlist'
+            Hint = 'Add current file to playlist (Right click for options)'
+            PopupMenu = PopupHeadset
             TabOrder = 4
             OnClick = BtnHeadsetToPlaylistClick
             OnDragOver = GRPBOXControlDragOver
@@ -1699,6 +1708,7 @@ object Nemp_MainForm: TNemp_MainForm
             Hint = 'Add file to playlist and begin playback from current position'
             TabOrder = 5
             OnClick = BtnHeadsetPlaynowClick
+            OnDragOver = GRPBOXControlDragOver
             DrawMode = dm_Windows
             NumGlyphsX = 5
             NumGlyphsY = 1
@@ -1719,7 +1729,6 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvRaised
           BevelOuter = bvLowered
           TabOrder = 0
-          OnResize = PlayerControlCoverPanelResize
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           object CoverImage: TImage
@@ -1745,6 +1754,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
+          PopupMenu = PlayListPOPUP
           TabOrder = 2
           OnPaint = ControlPanelPaint
           OwnerDraw = False
@@ -1803,7 +1813,6 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 1
-            TabStop = False
             OnClick = TabBtn_HeadsetClick
             OnMouseMove = TabBtn_CoverMouseMove
             DrawMode = dm_Skin
@@ -1847,6 +1856,7 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 73
             Width = 20
             Height = 18
+            OnDragOver = GRPBOXControlDragOver
           end
           object WalkmanImage: TImage
             Left = 88
@@ -1888,10 +1898,11 @@ object Nemp_MainForm: TNemp_MainForm
             Stretch = True
             Visible = False
             OnClick = WalkmanImageClick
+            OnDragOver = GRPBOXControlDragOver
           end
           object WebserverImage: TImage
             Left = 66
-            Top = 3
+            Top = 4
             Width = 16
             Height = 16
             Hint = 'Nemp Webserver'
@@ -1924,16 +1935,16 @@ object Nemp_MainForm: TNemp_MainForm
               FFFFFFFFFFFFFFFFFFC27C37FFFFFF0000000000000000000000000000000000
               0000000000000000000000000000000000000000000000000000000000000000
               0000}
-            PopupMenu = PMWebserver
             Proportional = True
             ShowHint = True
             Stretch = True
-            OnClick = WebserverImageClick
+            OnClick = ToolImageClick
             OnDblClick = MM_T_WebServerOptionsClick
+            OnDragOver = GRPBOXControlDragOver
           end
           object SleepImage: TImage
             Left = 44
-            Top = 3
+            Top = 4
             Width = 16
             Height = 16
             ParentShowHint = False
@@ -1965,11 +1976,11 @@ object Nemp_MainForm: TNemp_MainForm
               EAB69EBF8575D7BFBFFFFFFFFFFFFF0000000000000000000000000000000000
               0000000000000000000000000000000000000000000000000000000000000000
               0000}
-            PopupMenu = PMSleep
             Proportional = True
             ShowHint = True
             Stretch = True
-            OnClick = SleepImageClick
+            OnClick = ToolImageClick
+            OnDragOver = GRPBOXControlDragOver
           end
           object BirthdayImage: TImage
             Left = 22
@@ -2005,12 +2016,12 @@ object Nemp_MainForm: TNemp_MainForm
               FFFFFF08D4DB30F1F383DDE3FFFFFF00000000000000000000000000000038D3
               DC00000000000000000000000000000000000000000038D3DC00000000000000
               0000}
-            PopupMenu = PMBirthday
             Proportional = True
             ShowHint = True
             Stretch = True
-            OnClick = BirthdayImageClick
+            OnClick = ToolImageClick
             OnDblClick = PM_P_BirthdayOptionsClick
+            OnDragOver = GRPBOXControlDragOver
           end
           object ScrobblerImage: TImage
             Left = 9
@@ -2047,12 +2058,12 @@ object Nemp_MainForm: TNemp_MainForm
               6577F96577F96577F96375F93E51F65263ED9C9C9C5466F1263EF9263EF9263E
               F9263EF9263EF9263EF9263EF9263EF9263EF9263EF9263EF9263EF95466F19C
               9C9C}
-            PopupMenu = PMScrobbler
             Proportional = True
             ShowHint = True
             Stretch = True
-            OnClick = ScrobblerImageClick
+            OnClick = ToolImageClick
             OnDblClick = PM_P_ScrobblerOptionsClick
+            OnDragOver = GRPBOXControlDragOver
           end
           object PlayPauseBTN: TSkinButton
             Left = 5
@@ -2184,14 +2195,14 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 20
     OnTimer = BassTimerTimer
-    Left = 464
-    Top = 232
+    Left = 512
+    Top = 280
   end
   object Nemp_MainMenu: TMainMenu
     AutoHotkeys = maManual
     Images = MenuImages
     Left = 40
-    Top = 112
+    Top = 80
     object MM_Medialibrary: TMenuItem
       Caption = '&Media library'
       OnClick = MM_MedialibraryClick
@@ -2467,7 +2478,7 @@ object Nemp_MainForm: TNemp_MainForm
           OnClick = MM_O_ViewCompactCompleteClick
         end
         object MM_O_ViewSeparateWindows_Equalizer: TMenuItem
-          Caption = 'Show &effects/equalizer/...'
+          Caption = 'Show file information'
           ShortCut = 8304
           OnClick = PM_P_ViewSeparateWindows_EqualizerClick
         end
@@ -2541,269 +2552,15 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 16
         object MM_T_ShutdownOff: TMenuItem
           Caption = '&Disable'
-          Checked = True
-          RadioItem = True
           OnClick = Schlafmodusdeaktivieren1Click
         end
-        object N56: TMenuItem
-          Caption = '-'
+        object MM_T_ShutdownSettings: TMenuItem
+          Caption = 'Settings'
+          OnClick = ActivateShutDownMode
         end
-        object MM_T_ShutDownModeStop: TMenuItem
-          Caption = 'Sto&p Nemp'
-          RadioItem = True
-          object MM_T_Shutdown_5Minutes0: TMenuItem
-            Caption = '5 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_15Minutes0: TMenuItem
-            Tag = 1
-            Caption = '15 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_30Minutes0: TMenuItem
-            Tag = 2
-            Caption = '30 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_45minutes0: TMenuItem
-            Tag = 3
-            Caption = '45 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_60Minutes0: TMenuItem
-            Tag = 4
-            Caption = '1 hour'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_90Minutes0: TMenuItem
-            Tag = 5
-            Caption = '1.5 hours'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_120Minutes0: TMenuItem
-            Tag = 6
-            Caption = '2 hours'
-            OnClick = StundenClick
-          end
-          object N44: TMenuItem
-            Caption = '-'
-          end
-          object MM_T_ShutDown_Custom0: TMenuItem
-            Tag = 7
-            Caption = 'Custom'
-            OnClick = StundenClick
-          end
-        end
-        object MM_T_ShutdownModeCloseNemp: TMenuItem
-          Caption = '&Close Nemp'
-          RadioItem = True
-          object MM_T_Shutdown_5Minutes1: TMenuItem
-            Tag = 100
-            Caption = '5 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_15Minutes1: TMenuItem
-            Tag = 101
-            Caption = '15 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_30Minutes1: TMenuItem
-            Tag = 102
-            Caption = '30 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_45minutes1: TMenuItem
-            Tag = 103
-            Caption = '45 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_60Minutes1: TMenuItem
-            Tag = 104
-            Caption = '1 hour'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_90Minutes1: TMenuItem
-            Tag = 105
-            Caption = '1.5 hours'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_120Minutes1: TMenuItem
-            Tag = 106
-            Caption = '2 hours'
-            OnClick = StundenClick
-          end
-          object N60: TMenuItem
-            Caption = '-'
-          end
-          object MM_T_ShutDown_Custom1: TMenuItem
-            Tag = 107
-            Caption = 'Custom'
-            OnClick = StundenClick
-          end
-          object MM_T_ShutDown_EndofPlaylist1: TMenuItem
-            Tag = 100
-            Caption = 'After the last file'
-            OnClick = ShutDown_EndofPlaylistClick
-          end
-        end
-        object MM_T_ShutdownModeSuspend: TMenuItem
-          Tag = 1
-          Caption = '&Suspend Windows'
-          RadioItem = True
-          object MM_T_Shutdown_5Minutes2: TMenuItem
-            Tag = 200
-            Caption = '5 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_15Minutes2: TMenuItem
-            Tag = 201
-            Caption = '15 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_30Minutes2: TMenuItem
-            Tag = 202
-            Caption = '30 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_45minutes2: TMenuItem
-            Tag = 203
-            Caption = '45 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_60Minutes2: TMenuItem
-            Tag = 204
-            Caption = '1 hour'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_90Minutes2: TMenuItem
-            Tag = 205
-            Caption = '1.5 hours'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_120Minutes2: TMenuItem
-            Tag = 206
-            Caption = '2 hours'
-            OnClick = StundenClick
-          end
-          object N46: TMenuItem
-            Caption = '-'
-          end
-          object MM_T_ShutDown_Custom2: TMenuItem
-            Tag = 207
-            Caption = 'Custom'
-            OnClick = StundenClick
-          end
-          object MM_T_ShutDown_EndofPlaylist2: TMenuItem
-            Tag = 200
-            Caption = 'After the last file'
-            OnClick = ShutDown_EndofPlaylistClick
-          end
-        end
-        object MM_T_ShutdownModeHibernate: TMenuItem
-          Tag = 2
-          Caption = '&Hibernate Windows'
-          RadioItem = True
-          object MM_T_Shutdown_5Minutes3: TMenuItem
-            Tag = 300
-            Caption = '5 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_15Minutes3: TMenuItem
-            Tag = 301
-            Caption = '15 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_30Minutes3: TMenuItem
-            Tag = 302
-            Caption = '30 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_45minutes3: TMenuItem
-            Tag = 303
-            Caption = '45 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_60Minutes3: TMenuItem
-            Tag = 304
-            Caption = '1 hour'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_90Minutes3: TMenuItem
-            Tag = 305
-            Caption = '1.5 hours'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_120Minutes3: TMenuItem
-            Tag = 306
-            Caption = '2 hours'
-            OnClick = StundenClick
-          end
-          object N47: TMenuItem
-            Caption = '-'
-          end
-          object MM_T_ShutDown_Custom3: TMenuItem
-            Tag = 307
-            Caption = 'Custom'
-            OnClick = StundenClick
-          end
-          object MM_T_ShutDown_EndofPlaylist3: TMenuItem
-            Tag = 300
-            Caption = 'After the last file'
-            OnClick = ShutDown_EndofPlaylistClick
-          end
-        end
-        object MM_T_ShutdownModeShutDownWindows: TMenuItem
-          Tag = 3
-          Caption = '&Shutdown Windows'
-          RadioItem = True
-          object MM_T_Shutdown_5Minutes4: TMenuItem
-            Tag = 400
-            Caption = '5 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_15Minutes4: TMenuItem
-            Tag = 401
-            Caption = '15 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_30Minutes4: TMenuItem
-            Tag = 402
-            Caption = '30 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_45minutes4: TMenuItem
-            Tag = 403
-            Caption = '45 minutes'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_60Minutes4: TMenuItem
-            Tag = 404
-            Caption = '1 hour'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_90Minutes4: TMenuItem
-            Tag = 405
-            Caption = '1.5 hours'
-            OnClick = StundenClick
-          end
-          object MM_T_Shutdown_120Minutes4: TMenuItem
-            Tag = 406
-            Caption = '2 hours'
-            OnClick = StundenClick
-          end
-          object N49: TMenuItem
-            Caption = '-'
-          end
-          object MM_T_ShutDown_Custom4: TMenuItem
-            Tag = 407
-            Caption = 'Custom'
-            OnClick = StundenClick
-          end
-          object MM_T_ShutDown_EndofPlaylist4: TMenuItem
-            Tag = 400
-            Caption = 'After the last file'
-            OnClick = ShutDown_EndofPlaylistClick
-          end
+        object MM_T_ShutdownInfo: TMenuItem
+          Caption = '(not active)'
+          Enabled = False
         end
       end
       object MM_T_Birthday: TMenuItem
@@ -2812,9 +2569,6 @@ object Nemp_MainForm: TNemp_MainForm
         object MM_T_BirthdayActivate: TMenuItem
           Caption = 'Activate'
           OnClick = MenuBirthdayStartClick
-        end
-        object N24: TMenuItem
-          Caption = '-'
         end
         object MM_T_BirthdayOptions: TMenuItem
           Caption = 'Settings'
@@ -2828,16 +2582,13 @@ object Nemp_MainForm: TNemp_MainForm
           Caption = 'Activate'
           OnClick = MM_T_WebServerActivateClick
         end
-        object N64: TMenuItem
-          Caption = '-'
-        end
         object MM_T_WebServerOptions: TMenuItem
           Caption = 'Settings'
           OnClick = MM_T_WebServerOptionsClick
         end
         object MM_T_WebServerShowLog: TMenuItem
           Caption = 'Show log'
-          OnClick = PM_W_WebServerShowLogClick
+          OnClick = __PM_W_WebServerShowLogClick
         end
       end
       object MM_T_Scrobbler: TMenuItem
@@ -2846,9 +2597,6 @@ object Nemp_MainForm: TNemp_MainForm
         object MM_T_ScrobblerActivate: TMenuItem
           Caption = 'Activate'
           OnClick = PM_P_ScrobblerActivateClick
-        end
-        object N62: TMenuItem
-          Caption = '-'
         end
         object MM_T_ScrobblerOptions: TMenuItem
           Caption = 'Settings'
@@ -2917,8 +2665,8 @@ object Nemp_MainForm: TNemp_MainForm
   object PlayListImageList: TImageList
     Height = 14
     Width = 14
-    Left = 744
-    Top = 208
+    Left = 1008
+    Top = 64
     Bitmap = {
       494C01011000000A04000E000E00FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000038000000460000000100200000000000403D
@@ -3448,38 +3196,19 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 120
     Top = 312
   end
-  object DragDropTimer: TTimer
-    OnTimer = DragDropTimerTimer
-    Left = 48
-    Top = 376
-  end
   object SleepTimer: TTimer
     Enabled = False
     Interval = 10000
     OnTimer = SleepTimerTimer
-    Left = 40
-    Top = 536
+    Left = 32
+    Top = 488
   end
   object BirthdayTimer: TTimer
     Enabled = False
     Interval = 60000
     OnTimer = BirthdayTimerTimer
-    Left = 216
-    Top = 544
-  end
-  object VolTimer: TTimer
-    Enabled = False
-    Interval = 50
-    OnTimer = VolTimerTimer
-    Left = 560
-    Top = 232
-  end
-  object ReallyClearPlaylistTimer: TTimer
-    Enabled = False
-    Interval = 500
-    OnTimer = ReallyClearPlaylistTimerTimer
-    Left = 760
-    Top = 104
+    Left = 88
+    Top = 488
   end
   object MenuImages: TImageList
     ShareImages = True
@@ -5323,8 +5052,8 @@ object Nemp_MainForm: TNemp_MainForm
   object PlayListPOPUP: TPopupMenu
     Images = MenuImages
     OnPopup = PlayListPOPUPPopup
-    Left = 456
-    Top = 88
+    Left = 624
+    Top = 56
     object PM_PL_AddFiles: TMenuItem
       Caption = 'Add files'
       OnClick = MM_PL_FilesClick
@@ -5628,8 +5357,8 @@ object Nemp_MainForm: TNemp_MainForm
     AutoHotkeys = maManual
     Images = MenuImages
     OnPopup = Player_PopupMenuPopup
-    Left = 352
-    Top = 82
+    Left = 624
+    Top = 114
     object PM_P_Preferences: TMenuItem
       Caption = 'Preferences'
       ImageIndex = 5
@@ -5660,7 +5389,7 @@ object Nemp_MainForm: TNemp_MainForm
         OnClick = MM_O_ViewCompactCompleteClick
       end
       object PM_P_ViewSeparateWindows_Equalizer: TMenuItem
-        Caption = 'Show effects/equalizer/...'
+        Caption = 'Show file information'
         ShortCut = 8304
         OnClick = PM_P_ViewSeparateWindows_EqualizerClick
       end
@@ -5731,270 +5460,16 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Shutdown'
       ImageIndex = 16
       object PM_P_ShutDownOff: TMenuItem
-        Caption = 'Disable'
-        Checked = True
-        RadioItem = True
+        Caption = 'Activate'
         OnClick = Schlafmodusdeaktivieren1Click
       end
-      object N57: TMenuItem
-        Caption = '-'
+      object PM_P_ShutDownSettings: TMenuItem
+        Caption = 'Settings'
+        OnClick = ActivateShutDownMode
       end
-      object PM_P_ShutDownModeStop: TMenuItem
-        Caption = 'Stop Nemp'
-        RadioItem = True
-        object PM_P_ShutDown_5Minutes0: TMenuItem
-          Caption = '5 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_15Minutes0: TMenuItem
-          Tag = 1
-          Caption = '15 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_30Minutes0: TMenuItem
-          Tag = 2
-          Caption = '30 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_45Minutes0: TMenuItem
-          Tag = 3
-          Caption = '45 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_60Minutes0: TMenuItem
-          Tag = 4
-          Caption = '1 hour'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_90Minutes0: TMenuItem
-          Tag = 5
-          Caption = '1.5 hours'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_120Minutes0: TMenuItem
-          Tag = 6
-          Caption = '2 hours'
-          OnClick = StundenClick
-        end
-        object N39: TMenuItem
-          Caption = '-'
-        end
-        object PM_P_ShutDown_Custom0: TMenuItem
-          Tag = 7
-          Caption = 'Custom'
-          OnClick = StundenClick
-        end
-      end
-      object PM_P_ShutDownModeCloseNemp: TMenuItem
-        Caption = 'Close Nemp'
-        RadioItem = True
-        object PM_P_ShutDown_5Minutes1: TMenuItem
-          Tag = 100
-          Caption = '5 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_15Minutes1: TMenuItem
-          Tag = 101
-          Caption = '15 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_30Minutes1: TMenuItem
-          Tag = 102
-          Caption = '30 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_45Minutes1: TMenuItem
-          Tag = 103
-          Caption = '45 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_60Minutes1: TMenuItem
-          Tag = 104
-          Caption = '1 hour'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_90Minutes1: TMenuItem
-          Tag = 105
-          Caption = '1.5 hours'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_120Minutes1: TMenuItem
-          Tag = 106
-          Caption = '2 hours'
-          OnClick = StundenClick
-        end
-        object N40: TMenuItem
-          Caption = '-'
-        end
-        object PM_P_ShutDown_Custom1: TMenuItem
-          Tag = 107
-          Caption = 'Custom'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_EndofPlaylist1: TMenuItem
-          Tag = 100
-          Caption = 'After the last file'
-          OnClick = ShutDown_EndofPlaylistClick
-        end
-      end
-      object PM_P_ShutDownModeSuspend: TMenuItem
-        Tag = 1
-        Caption = 'Suspend Windows'
-        RadioItem = True
-        object PM_P_ShutDown_5Minutes2: TMenuItem
-          Tag = 200
-          Caption = '5 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_15Minutes2: TMenuItem
-          Tag = 201
-          Caption = '15 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_30Minutes2: TMenuItem
-          Tag = 202
-          Caption = '30 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_45Minutes2: TMenuItem
-          Tag = 203
-          Caption = '45 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_60Minutes2: TMenuItem
-          Tag = 204
-          Caption = '1 hour'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_90Minutes2: TMenuItem
-          Tag = 205
-          Caption = '1.5 hours'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_120Minutes2: TMenuItem
-          Tag = 206
-          Caption = '2 hours'
-          OnClick = StundenClick
-        end
-        object N59: TMenuItem
-          Caption = '-'
-        end
-        object PM_P_ShutDown_Custom2: TMenuItem
-          Tag = 207
-          Caption = 'Custom'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_EndofPlaylist2: TMenuItem
-          Tag = 200
-          Caption = 'After the last file'
-          OnClick = ShutDown_EndofPlaylistClick
-        end
-      end
-      object PM_P_ShutDownModeHibernate: TMenuItem
-        Tag = 2
-        Caption = 'Hibernate Windows'
-        RadioItem = True
-        object PM_P_ShutDown_5Minutes3: TMenuItem
-          Tag = 300
-          Caption = '5 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_15Minutes3: TMenuItem
-          Tag = 301
-          Caption = '15 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_30Minutes3: TMenuItem
-          Tag = 302
-          Caption = '30 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_45Minutes3: TMenuItem
-          Tag = 303
-          Caption = '45 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_60Minutes3: TMenuItem
-          Tag = 304
-          Caption = '1 hour'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_90Minutes3: TMenuItem
-          Tag = 305
-          Caption = '1.5 hours'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_120Minutes3: TMenuItem
-          Tag = 306
-          Caption = '2 hours'
-          OnClick = StundenClick
-        end
-        object N42: TMenuItem
-          Caption = '-'
-        end
-        object PM_P_ShutDown_Custom3: TMenuItem
-          Tag = 307
-          Caption = 'Custom'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_EndofPlaylist3: TMenuItem
-          Tag = 300
-          Caption = 'After the last file'
-          OnClick = ShutDown_EndofPlaylistClick
-        end
-      end
-      object PM_P_ShutDownModeShutDownWindows: TMenuItem
-        Tag = 3
-        Caption = 'Shutdown Windows'
-        RadioItem = True
-        object PM_P_ShutDown_5Minutes4: TMenuItem
-          Tag = 400
-          Caption = '5 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_15Minutes4: TMenuItem
-          Tag = 401
-          Caption = '15 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_30Minutes4: TMenuItem
-          Tag = 402
-          Caption = '30 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_45Minutes4: TMenuItem
-          Tag = 403
-          Caption = '45 minutes'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_60Minutes4: TMenuItem
-          Tag = 404
-          Caption = '1 hour'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_90Minutes4: TMenuItem
-          Tag = 405
-          Caption = '1.5 hours'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_120Minutes4: TMenuItem
-          Tag = 406
-          Caption = '2 hours'
-          OnClick = StundenClick
-        end
-        object N43: TMenuItem
-          Caption = '-'
-        end
-        object PM_P_ShutDown_Custom4: TMenuItem
-          Tag = 407
-          Caption = 'Custom'
-          OnClick = StundenClick
-        end
-        object PM_P_ShutDown_EndofPlaylist4: TMenuItem
-          Tag = 400
-          Caption = 'After the last file'
-          OnClick = ShutDown_EndofPlaylistClick
-        end
+      object PM_P_ShutdownInfo: TMenuItem
+        Caption = '(not active)'
+        Enabled = False
       end
     end
     object PM_P_Birthday: TMenuItem
@@ -6003,9 +5478,6 @@ object Nemp_MainForm: TNemp_MainForm
       object PM_P_BirthdayActivate: TMenuItem
         Caption = 'Activate'
         OnClick = MenuBirthdayStartClick
-      end
-      object N41: TMenuItem
-        Caption = '-'
       end
       object PM_P_BirthdayOptions: TMenuItem
         Caption = 'Settings'
@@ -6019,16 +5491,13 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Activate'
         OnClick = MM_T_WebServerActivateClick
       end
-      object N65: TMenuItem
-        Caption = '-'
-      end
       object PM_P_WebServerOptions: TMenuItem
         Caption = 'Settings'
         OnClick = MM_T_WebServerOptionsClick
       end
       object PM_P_WebServerShowLog: TMenuItem
         Caption = 'Show log'
-        OnClick = PM_W_WebServerShowLogClick
+        OnClick = __PM_W_WebServerShowLogClick
       end
     end
     object PM_P_Scrobbler: TMenuItem
@@ -6037,9 +5506,6 @@ object Nemp_MainForm: TNemp_MainForm
       object PM_P_ScrobblerActivate: TMenuItem
         Caption = 'Activate'
         OnClick = PM_P_ScrobblerActivateClick
-      end
-      object N61: TMenuItem
-        Caption = '-'
       end
       object PM_P_ScrobblerOptions: TMenuItem
         Caption = 'Settings'
@@ -6069,340 +5535,34 @@ object Nemp_MainForm: TNemp_MainForm
     object N17: TMenuItem
       Caption = '-'
     end
-    object PM_P_About: TMenuItem
-      Caption = 'About Nemp'
-      ImageIndex = 17
-      OnClick = MM_H_AboutClick
-    end
-    object PM_P_ShowReadme: TMenuItem
-      Caption = 'Show readme'
-      OnClick = MM_H_ShowReadmeClick
-    end
-    object PM_P_Help: TMenuItem
-      Caption = 'Documentation and user guide'
+    object Help1: TMenuItem
+      Caption = 'Help'
       ImageIndex = 4
-      OnClick = ToolButton7Click
-    end
-    object PM_P_CheckForUpdates: TMenuItem
-      Caption = 'Check for updates'
-      ImageIndex = 22
-      OnClick = MM_H_CheckForUpdatesClick
-    end
-    object N28: TMenuItem
-      Caption = '-'
-    end
-    object PM_P_Minimize: TMenuItem
-      Caption = 'Minimize'
-      OnClick = PM_P_MinimizeClick
-    end
-    object PM_P_Close: TMenuItem
-      Caption = 'Close'
-      ImageIndex = 21
-      OnClick = PM_P_CloseClick
-    end
-  end
-  object PMSleep: TPopupMenu
-    OnPopup = Player_PopupMenuPopup
-    Left = 37
-    Top = 589
-    object _Shutdown: TMenuItem
-      Caption = 'Shutdown'
-      Enabled = False
-    end
-    object PM_S_ShutDownOff: TMenuItem
-      Caption = 'Disable'
-      Checked = True
-      RadioItem = True
-      OnClick = Schlafmodusdeaktivieren1Click
-    end
-    object N37: TMenuItem
-      Caption = '-'
-    end
-    object PM_S_ShutDownModeStop: TMenuItem
-      Caption = 'Stop Nemp'
-      RadioItem = True
-      object PM_S_ShutDown_5Minutes0: TMenuItem
-        Caption = '5 minutes'
-        OnClick = StundenClick
+      object PM_P_About: TMenuItem
+        Caption = 'About Nemp'
+        ImageIndex = 17
+        OnClick = MM_H_AboutClick
       end
-      object PM_S_ShutDown_15Minutes0: TMenuItem
-        Tag = 1
-        Caption = '15 minutes'
-        OnClick = StundenClick
+      object PM_P_CheckForUpdates: TMenuItem
+        Caption = 'Check for updates'
+        ImageIndex = 22
+        OnClick = MM_H_CheckForUpdatesClick
       end
-      object PM_S_ShutDown_30Minutes0: TMenuItem
-        Tag = 2
-        Caption = '30 minutes'
-        OnClick = StundenClick
+      object PM_P_Help: TMenuItem
+        Caption = 'Documentation and user guide'
+        ImageIndex = 4
+        OnClick = ToolButton7Click
       end
-      object PM_S_ShutDown_45Minutes0: TMenuItem
-        Tag = 3
-        Caption = '45 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_60Minutes0: TMenuItem
-        Tag = 4
-        Caption = '1 hour'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_90Minutes0: TMenuItem
-        Tag = 5
-        Caption = '1.5 hours'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_120Minutes0: TMenuItem
-        Tag = 6
-        Caption = '2 hours'
-        OnClick = StundenClick
-      end
-      object N50: TMenuItem
-        Caption = '-'
-      end
-      object PM_S_ShutDown_Custom0: TMenuItem
-        Tag = 7
-        Caption = 'Custom'
-        OnClick = StundenClick
-      end
-    end
-    object PM_S_ShutDownModeCloseNemp: TMenuItem
-      Caption = 'Close Nemp'
-      RadioItem = True
-      object PM_S_ShutDown_5Minutes1: TMenuItem
-        Tag = 100
-        Caption = '5 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_15Minutes1: TMenuItem
-        Tag = 101
-        Caption = '15 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_30Minutes1: TMenuItem
-        Tag = 102
-        Caption = '30 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_45Minutes1: TMenuItem
-        Tag = 103
-        Caption = '45 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_60Minutes1: TMenuItem
-        Tag = 104
-        Caption = '1 hour'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_90Minutes1: TMenuItem
-        Tag = 105
-        Caption = '1.5 hours'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_120Minutes1: TMenuItem
-        Tag = 106
-        Caption = '2 hours'
-        OnClick = StundenClick
-      end
-      object N51: TMenuItem
-        Caption = '-'
-      end
-      object PM_S_ShutDown_Custom1: TMenuItem
-        Tag = 107
-        Caption = 'Custom'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_EndofPlaylist1: TMenuItem
-        Tag = 100
-        Caption = 'After the last file'
-        OnClick = ShutDown_EndofPlaylistClick
-      end
-    end
-    object PM_S_ShutDownModeSuspend: TMenuItem
-      Tag = 1
-      Caption = 'Suspend Windows'
-      RadioItem = True
-      object PM_S_ShutDown_5Minutes2: TMenuItem
-        Tag = 200
-        Caption = '5 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_15Minutes2: TMenuItem
-        Tag = 201
-        Caption = '15 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_30Minutes2: TMenuItem
-        Tag = 202
-        Caption = '30 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_45Minutes2: TMenuItem
-        Tag = 203
-        Caption = '45 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_60Minutes2: TMenuItem
-        Tag = 204
-        Caption = '1 hour'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_90Minutes2: TMenuItem
-        Tag = 205
-        Caption = '1.5 hours'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_120Minutes2: TMenuItem
-        Tag = 206
-        Caption = '2 hours'
-        OnClick = StundenClick
-      end
-      object N52: TMenuItem
-        Caption = '-'
-      end
-      object PM_S_ShutDown_Custom2: TMenuItem
-        Tag = 207
-        Caption = 'Custom'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_EndofPlaylist2: TMenuItem
-        Tag = 200
-        Caption = 'After the last file'
-        OnClick = ShutDown_EndofPlaylistClick
-      end
-    end
-    object PM_S_ShutDownModeHibernate: TMenuItem
-      Tag = 2
-      Caption = 'Hibernate Windows'
-      RadioItem = True
-      object PM_S_ShutDown_5Minutes3: TMenuItem
-        Tag = 300
-        Caption = '5 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_15Minutes3: TMenuItem
-        Tag = 301
-        Caption = '15 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_30Minutes3: TMenuItem
-        Tag = 302
-        Caption = '30 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_45Minutes3: TMenuItem
-        Tag = 303
-        Caption = '45 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_60Minutes3: TMenuItem
-        Tag = 304
-        Caption = '1 hour'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_90Minutes3: TMenuItem
-        Tag = 305
-        Caption = '1.5 hours'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_120Minutes3: TMenuItem
-        Tag = 306
-        Caption = '2 hours'
-        OnClick = StundenClick
-      end
-      object N53: TMenuItem
-        Caption = '-'
-      end
-      object PM_S_ShutDown_Custom3: TMenuItem
-        Tag = 307
-        Caption = 'Custom'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_EndofPlaylist3: TMenuItem
-        Tag = 300
-        Caption = 'After the last file'
-        OnClick = ShutDown_EndofPlaylistClick
-      end
-    end
-    object PM_S_ShutDownModeShutDownWindows: TMenuItem
-      Tag = 3
-      Caption = 'Shutdown Windows'
-      RadioItem = True
-      object PM_S_ShutDown_5Minutes4: TMenuItem
-        Tag = 400
-        Caption = '5 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_15Minutes4: TMenuItem
-        Tag = 401
-        Caption = '15 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_30Minutes4: TMenuItem
-        Tag = 402
-        Caption = '30 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_45Minutes4: TMenuItem
-        Tag = 403
-        Caption = '45 minutes'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_60Minutes4: TMenuItem
-        Tag = 404
-        Caption = '1 hour'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_90Minutes4: TMenuItem
-        Tag = 405
-        Caption = '1.5 hours'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_120Minutes4: TMenuItem
-        Tag = 406
-        Caption = '2 hours'
-        OnClick = StundenClick
-      end
-      object N54: TMenuItem
-        Caption = '-'
-      end
-      object PM_S_ShutDown_Custom4: TMenuItem
-        Tag = 407
-        Caption = 'Custom'
-        OnClick = StundenClick
-      end
-      object PM_S_ShutDown_EndofPlaylist4: TMenuItem
-        Tag = 400
-        Caption = 'After the last file'
-        OnClick = ShutDown_EndofPlaylistClick
-      end
-    end
-  end
-  object PMBirthday: TPopupMenu
-    Left = 213
-    Top = 588
-    object _Birthdaymode: TMenuItem
-      Caption = 'Birthday mode'
-      Enabled = False
-    end
-    object PM_B_BirthdayActivate: TMenuItem
-      Caption = 'Activate'
-      OnClick = MenuBirthdayStartClick
-    end
-    object N461: TMenuItem
-      Caption = '-'
-    end
-    object PM_B_BirthdayOptions: TMenuItem
-      Caption = 'Settings'
-      OnClick = PM_P_BirthdayOptionsClick
     end
   end
   object VST_ColumnPopup: TPopupMenu
     OnPopup = VST_ColumnPopupPopup
-    Left = 476
-    Top = 393
+    Left = 388
+    Top = 313
   end
   object PopupPlayPause: TPopupMenu
-    Left = 333
-    Top = 592
+    Left = 253
+    Top = 560
     object PM_PlayFiles: TMenuItem
       Caption = 'Play files'
       OnClick = PM_PlayFilesClick
@@ -6418,8 +5578,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupStop: TPopupMenu
     OnPopup = PopupStopPopup
-    Left = 405
-    Top = 586
+    Left = 325
+    Top = 570
     object PM_StopNow: TMenuItem
       Caption = 'Stop'
       OnClick = PM_StopNowClick
@@ -6431,8 +5591,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupRepeat: TPopupMenu
     OnPopup = PopupRepeatPopup
-    Left = 461
-    Top = 594
+    Left = 389
+    Top = 570
     object PM_RepeatAll: TMenuItem
       Caption = 'Repeat all'
       RadioItem = True
@@ -6470,48 +5630,6 @@ object Nemp_MainForm: TNemp_MainForm
     object PM_ABRepeatSetB: TMenuItem
       Caption = 'Set end point (B)'
       OnClick = PM_ABRepeatSetBClick
-    end
-  end
-  object PMScrobbler: TPopupMenu
-    Left = 157
-    Top = 588
-    object _Scrobbler: TMenuItem
-      Caption = 'Scrobbler'
-      Enabled = False
-    end
-    object PM_S_ScrobblerActivate: TMenuItem
-      Caption = 'Activate'
-      OnClick = PM_P_ScrobblerActivateClick
-    end
-    object N63: TMenuItem
-      Caption = '-'
-    end
-    object PM_S_ScrobblerOptions: TMenuItem
-      Caption = 'Settings'
-      OnClick = PM_P_ScrobblerOptionsClick
-    end
-  end
-  object PMWebserver: TPopupMenu
-    Left = 93
-    Top = 589
-    object _Webserver: TMenuItem
-      Caption = 'Nemp Webserver'
-      Enabled = False
-    end
-    object PM_W_WebServerActivate: TMenuItem
-      Caption = 'Activate'
-      OnClick = MM_T_WebServerActivateClick
-    end
-    object N66: TMenuItem
-      Caption = '-'
-    end
-    object PM_W_WebServerOptions: TMenuItem
-      Caption = 'Settings'
-      OnClick = MM_T_WebServerOptionsClick
-    end
-    object PM_W_WebServerShowLog: TMenuItem
-      Caption = 'Show log'
-      OnClick = PM_W_WebServerShowLogClick
     end
   end
   object NempTrayIcon: TTrayIcon
@@ -7003,8 +6121,8 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 250
     OnTimer = HeadSetTimerTimer
-    Left = 464
-    Top = 280
+    Left = 512
+    Top = 344
   end
   object RefreshCoverFlowTimer: TTimer
     Enabled = False
@@ -7014,8 +6132,8 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 336
   end
   object PopupRepeatAB: TPopupMenu
-    Left = 528
-    Top = 592
+    Left = 448
+    Top = 568
     object PM_SetA: TMenuItem
       Caption = 'Set start point (A)'
       OnClick = PM_ABRepeatSetAClick
@@ -7035,15 +6153,8 @@ object Nemp_MainForm: TNemp_MainForm
   object WalkmanModeTimer: TTimer
     Interval = 60000
     OnTimer = WalkmanModeTimerTimer
-    Left = 272
-    Top = 544
-  end
-  object CorrectSkinRegionsTimer: TTimer
-    Enabled = False
-    Interval = 200
-    OnTimer = CorrectSkinRegionsTimerTimer
-    Left = 232
-    Top = 240
+    Left = 160
+    Top = 488
   end
   object CoverFlowRefreshViewTimer: TTimer
     Enabled = False
@@ -7054,8 +6165,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object PopupEditExtendedTags: TPopupMenu
     OnPopup = PopupEditExtendedTagsPopup
-    Left = 816
-    Top = 592
+    Left = 760
+    Top = 528
     object PM_TagAudiofile: TMenuItem
       Caption = 'This audio file'
       Enabled = False
@@ -7097,16 +6208,10 @@ object Nemp_MainForm: TNemp_MainForm
       OnClick = pm_TagDetailsClick
     end
   end
-  object RefreshVSTCoverTimer: TTimer
-    Enabled = False
-    OnTimer = RefreshVSTCoverTimerTimer
-    Left = 232
-    Top = 388
-  end
   object QuickSearchHistory_PopupMenu: TPopupMenu
     OnPopup = QuickSearchHistory_PopupMenuPopup
-    Left = 80
-    Top = 444
+    Left = 96
+    Top = 388
     object pmRecentSearches: TMenuItem
       Caption = 'Recent searches'
       Enabled = False
@@ -7316,6 +6421,92 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Remove selected playlist'
       ShortCut = 16430
       OnClick = PM_ML_RemoveSelectedPlaylistsClick
+    end
+  end
+  object PopupTools: TPopupMenu
+    AutoHotkeys = maManual
+    Images = MenuImages
+    OnPopup = Player_PopupMenuPopup
+    Left = 32
+    Top = 546
+    object PM_T_ShutDown: TMenuItem
+      Caption = 'Shutdown'
+      ImageIndex = 16
+      object PM_T_ShutDownActivate: TMenuItem
+        Caption = 'Activate'
+        OnClick = Schlafmodusdeaktivieren1Click
+      end
+      object PM_T_ShutDownSettings: TMenuItem
+        Caption = 'Settings'
+        OnClick = ActivateShutDownMode
+      end
+      object PM_T_ShutdownInfo: TMenuItem
+        Caption = '(not active)'
+        Enabled = False
+      end
+    end
+    object PM_T_Birthday: TMenuItem
+      Caption = 'Birthday mode'
+      ImageIndex = 2
+      object PM_T_BirthdayActivate: TMenuItem
+        Caption = 'Activate'
+        OnClick = MenuBirthdayStartClick
+      end
+      object PM_T_BirthdayOptions: TMenuItem
+        Caption = 'Settings'
+        OnClick = PM_P_BirthdayOptionsClick
+      end
+    end
+    object PM_T_WebServer: TMenuItem
+      Caption = 'Nemp &Webserver'
+      ImageIndex = 9
+      object PM_T_WebServerActivate: TMenuItem
+        Caption = 'Activate'
+        OnClick = MM_T_WebServerActivateClick
+      end
+      object PM_T_WebServerOptions: TMenuItem
+        Caption = 'Settings'
+        OnClick = MM_T_WebServerOptionsClick
+      end
+      object PM_T_WebServerShowLog: TMenuItem
+        Caption = 'Show log'
+        OnClick = __PM_W_WebServerShowLogClick
+      end
+    end
+    object PM_T_Scrobbler: TMenuItem
+      Caption = 'Scrobbler'
+      ImageIndex = 18
+      object PM_T_ScrobblerActivate: TMenuItem
+        Caption = 'Activate'
+        OnClick = PM_P_ScrobblerActivateClick
+      end
+      object PM_T_ScrobblerOptions: TMenuItem
+        Caption = 'Settings'
+        OnClick = PM_P_ScrobblerOptionsClick
+      end
+    end
+  end
+  object PopupHeadset: TPopupMenu
+    Left = 176
+    Top = 560
+    object PM_H_EnqueueEndOfPlaylist: TMenuItem
+      Caption = 'Enqueue (at the end of the playlist)'
+      OnClick = InsertHeadsetToPlaylistClick
+    end
+    object PM_H_PlayAndClearPlaylist: TMenuItem
+      Tag = 1
+      Caption = 'Play (and clear current playlist)'
+      OnClick = InsertHeadsetToPlaylistClick
+    end
+    object PM_H_EnqueueAfterCurrentTitle: TMenuItem
+      Tag = 2
+      Caption = 'Enqueue (after the current title)'
+      OnClick = InsertHeadsetToPlaylistClick
+    end
+    object PM_H_JustPlay: TMenuItem
+      Tag = 3
+      Caption = 'Just play the track (don'#39't change the playlist)'
+      OnClick = InsertHeadsetToPlaylistClick
     end
   end
 end

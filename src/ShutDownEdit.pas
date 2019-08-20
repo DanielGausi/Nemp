@@ -35,20 +35,32 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Spin, gnuGettext;
+  Dialogs, StdCtrls, Spin, gnuGettext, System.DateUtils, Vcl.ExtCtrls;
 
 type
   TShutDownEditForm = class(TForm)
     BtnOk: TButton;
     BtnCancel: TButton;
-    GrpBox_CounbtdownLength: TGroupBox;
-    LblConst_Hour: TLabel;
-    LblConst_Minute: TLabel;
+    grpBoxSettings: TGroupBox;
+    cbIntendedAction: TComboBox;
+    lblIntendedAction: TLabel;
+    lblCountDownLength: TLabel;
+    cbCountdownLength: TComboBox;
     SE_Hours: TSpinEdit;
     SE_Minutes: TSpinEdit;
+    LblConst_Minute: TLabel;
+    LblConst_Hour: TLabel;
+    ImgShutDown: TImage;
+    lblShutDownMode: TLabel;
+    lblCurrentStatus: TLabel;
     procedure FormCreate(Sender: TObject);
+    procedure cbCountdownLengthChange(Sender: TObject);
+    procedure BtnOkClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure cbIntendedActionChange(Sender: TObject);
   private
     { Private-Deklarationen }
+    procedure ShowProperImage(aMode: Integer);
   public
     { Public-Deklarationen }
   end;
@@ -58,11 +70,150 @@ var
 
 implementation
 
+uses Hilfsfunktionen, NempMainUnit, Nemp_RessourceStrings, Nemp_ConstantsAndTypes,
+    NempApi, MyDialogs;
+
 {$R *.dfm}
 
-procedure TShutDownEditForm.FormCreate(Sender: TObject);
+procedure TShutDownEditForm.BtnOkClick(Sender: TObject);
+var DlgResult: Integer;
 begin
-  TranslateComponent (self);
+
+    if (cbCountdownLength.ItemIndex = 8) AND (NempPlaylist.WiedergabeMode <> NEMP_API_NOREPEAT) then
+    begin
+        if TranslateMessageDLG(NempShutDown_AtEndOfPlaylist_Dlg, mtWarning, [MBOk, MBAbort], 0) = MrOk then
+            ModalResult := mrOK
+        else
+            ModalResult := mrNone
+    end else
+        ModalResult := mrOK;
+
+
+    // set current settings as the new settings for NempOptions // IniFile
+    Nemp_MainForm.NempOptions.ShutDownModeIniIdx     := cbIntendedAction  .ItemIndex  ;
+    Nemp_MainForm.NempOptions.ShutDownTimeIniIdx     := cbCountdownLength .ItemIndex  ;
+    Nemp_MainForm.NempOptions.ShutDownTimeIniHours   := SE_Hours.Value  ;
+    Nemp_MainForm.NempOptions.ShutDownTimeIniMinutes := SE_Minutes.Value;
+
+    // Start the actual Countdown timer
+
+    // SHUTDOWNMODE_StopNemp, SHUTDOWNMODE_ExitNemp, SHUTDOWNMODE_Suspend, SHUTDOWNMODE_Hibernat, SHUTDOWNMODE_Shutdown
+    Nemp_MainForm.NempOptions.ShutDownMode := cbIntendedAction.ItemIndex;
+
+    case cbCountdownLength.ItemIndex of
+        0: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 5);
+        1: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 15);
+        2: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 30);
+        3: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 45);
+        4: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 60);
+        5: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 90);
+        6: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 120);
+        7: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 60 * SE_Hours.Value + SE_Minutes.Value);
+        8: ; // special case, shut down after end of playlist
+    end;
+
+    Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := (cbCountdownLength.ItemIndex = 8);
+
+
+    {
+    ToDo:
+
+    NempOptions.ShutDownMode := ((Sender as TMenuItem).Tag) DIV 100;
+
+    NempOptions.ShutDownAtEndOfPlaylist := True // False
+
+    NempOptions.ShutDownTime := IncMinute(Now, 45);
+
+
+    if c <= 120 then
+    SleepTimer.Interval := 250    // 0.25sek
+  else
+    SleepTimer.Interval := 10000; // 10sek
+
+  SleepTimer.Enabled := True;
+  SleepImage.Hint := GenerateSleepHint;
+
+  ReArrangeToolImages;
+
+    }
+
+
+end;
+
+procedure TShutDownEditForm.cbCountdownLengthChange(Sender: TObject);
+begin
+    LblConst_Hour           .Enabled := cbCountdownLength.ItemIndex = 7;
+    LblConst_Minute         .Enabled := cbCountdownLength.ItemIndex = 7;
+    SE_Hours                .Enabled := cbCountdownLength.ItemIndex = 7;
+    SE_Minutes              .Enabled := cbCountdownLength.ItemIndex = 7;
+
+    //LblEndOfPlaylistWarning.Visible := (cbCountdownLength.ItemIndex = 8);
+    //if cbCountdownLength.ItemIndex = 8 then
+    //    LblEndOfPlaylistWarning.Caption := _(NempShutDown_AtEndOfPlaylist_Hint);
+end;
+
+procedure TShutDownEditForm.cbIntendedActionChange(Sender: TObject);
+begin
+    ShowProperImage(cbIntendedAction.ItemIndex);
+end;
+
+procedure TShutDownEditForm.FormCreate(Sender: TObject);
+var filename: String;
+begin
+    cbIntendedAction.OnChange := Nil;
+    cbCountdownLength.OnChange:= Nil;
+    BackUpComboBoxes(self);
+    TranslateComponent (self);
+    RestoreComboboxes(self);
+    cbIntendedAction.OnChange := cbIntendedActionChange;
+    cbCountdownLength.OnChange := cbCountdownLengthChange;
+
+    //filename := ExtractFilePath(ParamStr(0)) + 'Images\shutdown.png';
+    //if FileExists(filename) then
+    //    ImgShutDown.Picture.LoadFromFile(filename);
+
+    // set settings from the NempOptions // IniFile
+    cbIntendedAction  .ItemIndex := Nemp_MainForm.NempOptions.ShutDownModeIniIdx ;
+    cbCountdownLength .ItemIndex := Nemp_MainForm.NempOptions.ShutDownTimeIniIdx ;
+
+    SE_Hours.Value   := Nemp_MainForm.NempOptions.ShutDownTimeIniHours   ;
+    SE_Minutes.Value := Nemp_MainForm.NempOptions.ShutDownTimeIniMinutes ;
+
+    ShowProperImage(Nemp_MainForm.NempOptions.ShutDownModeIniIdx) ;
+end;
+
+procedure TShutDownEditForm.FormShow(Sender: TObject);
+begin
+    cbCountdownLengthChange(Nil);
+    lblCurrentStatus.Caption := Nemp_MainForm.GetShutDownInfoCaption;
+
+end;
+
+procedure TShutDownEditForm.ShowProperImage(aMode: Integer);
+var filename: String;
+begin
+    case aMode of
+        SHUTDOWNMODE_StopNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepStopNemp.png';
+        SHUTDOWNMODE_ExitNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepCloseNemp.png';
+        SHUTDOWNMODE_Suspend   : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepSuspend.png';
+        SHUTDOWNMODE_Hibernate : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepHibernate.png';
+        SHUTDOWNMODE_Shutdown  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepShutdown.png';
+    end;
+    if FileExists(filename) then
+        ImgShutDown.Picture.LoadFromFile(filename);
+
+    case aMode of
+        SHUTDOWNMODE_StopNemp  : lblShutDownMode.Caption := NempShutDown_StopPopupBlank      ;
+        SHUTDOWNMODE_ExitNemp  : lblShutDownMode.Caption := NempShutDown_ClosePopupBlank     ;
+        SHUTDOWNMODE_Suspend   : lblShutDownMode.Caption := NempShutDown_SuspendPopupBlank   ;
+        SHUTDOWNMODE_Hibernate : lblShutDownMode.Caption := NempShutDown_HibernatePopupBlank ;
+        SHUTDOWNMODE_Shutdown  : lblShutDownMode.Caption := NempShutDown_ShutDownPopupBlank  ;
+    end;
+
 end;
 
 end.
+
+
+
+

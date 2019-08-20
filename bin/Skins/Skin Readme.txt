@@ -29,7 +29,7 @@ Every button file needs 5 columns for the following variants
 	5. disabled
 
 Some buttons have several modes. For each mode, a new line is needed.
-
+--------------------------------------------------------------------
 BtnPlayPause: 	1. Play
 		2. Pause
 BtnStop: 	1. regular
@@ -40,8 +40,6 @@ BtnRandom: 	1. repeat all
 		2. repeat title
 		3. random 
 		4. no repeat
-BtnReverse: 	1. backwards 
-		2. forward
 TabBtn<..>:	1. regular
 		2. active tab
 		3. active tab with warning indicator:
@@ -53,15 +51,66 @@ TabBtnMarker:	1: no marker
 		4: marker green
 		2: marker red/blue/green
 
+New TabBtn in 4.11:
+TabBtnMainPlayerControl
+
+The following Button files are removed in Nemp 4.11 due to the redesign of the GUI
+----------------------------------------------------------------------------------
+	BtnReverse
+	BtnABRepeatSetA
+	BtnABRepeatSetB
+	BtnABRepeatUnset
+	BtnSlideBackwardHeadset
+	BtnSlideForwardHeadset
+	SlideBtnVolume
+	SlideBtnUpDown
+
+
+[Buttons]
+--------------------------------------
+Btn<...>Visible:	Visibilty of the Button
+Btn<...>Left,		
+Btn<...>Top:		Position of the Button
+Btn<...>Width,
+Btn<...>Height:		Size of the Button
+
+Button names:
+-------------
+	BtnPlayPause	
+	BtnPlayPauseHeadset
+	BtnStop
+	BtnStopHeadSet
+	BtnNext
+	BtnPrev
+	BtnSlideForward
+	BtnSlidebackward
+	BtnRandom
+	BtnRecord
+	BtnHeadsetPlaynow (new in 4.11)
+	BtnHeadsetToPlaylist (new in 4.11)
+	BtnClose
+
+Note: The total size of the PlayerControl has changed in 4.11. Therefore, some 
+Button positions may be invalid.
+Because of this, all Button positions (but not the sizes) are set to some default 
+values, unless you add the following lines to the skin.ini
+
+------------------
+[Skin]
+Version=4
+------------------
+
 
 Addtional image files:
 ----------------------
 
-main:		Bckground for the major part of the main form
-player:		Background of the player part
-extendedplayer:	Background for lyrics, equalizer, effects, ... (if
+main:		Background for the major part of the main form
+player:		Background for the player part with PLay/Stop/Next controls
+ControlProgress: Background for the player part with title information, progress and visualisation
+ControlSelection: Background for the player part with the 3 Tab buttons for Main/Headset/Equalizer
+ControlCover	: background for the player part with the cover
 Win7PreviewBackground: Background image for the Taskbar preview (Windows 7 or later)
-
+extendedplayer: (removed in Nemp 4.11)	Background for lyrics, equalizer, effects, ...
 
 ListenBilder:	16x16 icons for use in the playlist and media list
 		0: playlist, default icon
@@ -128,6 +177,7 @@ unused images:
 BtnQuickSearch
 BtnMinimize
 BtnMenu
+tree
 
 =================================================================
 Sections in the skin.ini file
@@ -145,25 +195,59 @@ Note: Color values are G-B-R, *not* R-G-B as in most image editing software, htm
 -----------------------------------------------------------------
 HideBackgroundImageVorauswahl,
 HideBackgroundImagePlaylist,
-HideBackgroundImageMedienliste	: Don't use the background image in these parts
+HideBackgroundImageMedienliste,
+HideBackgroundTagCloud	: Don't use the background image in these parts
 PlayerPageOffsetX,
 PlayerPageOffsetY:	Offset where the background image starts
-TileBackground:		Tile the background image (repeat-x-y)
+TileBackground,		
+TileControlBackground,
+TileBackgroundBrowse,
+TileBackgroundMedialist,
+TileBackgroundPlaylist: Tile the background image (repeat-x-y) in these parts
+
 FixedBackGround:	1: offset is relative to the main window
 			0: offset is relative to the desktop
+
+AlignBackgroundBrowse,
+AlignBackgroundMedialist,
+AlignBackgroundPlaylist: align-values for background bitmaps 
+	0: left-center
+	1: right-center
+	2: align to MainControls (use PlayerPageOffset<X/Y>Orig in that case)
+	   or: center-center
+	3: left-top
+	4: right-top
+	5: left-bottom
+	6: right-bottom
+
 not used anymore:
 -----------------
 HideBackgroundImageArtists
 HideBackgroundImageAlben
 
 
+[PlayerControl]
+-----------------------------
+AlignControlProgressDisplay
+AlignControlGenericBackground
+AlignCompleteBackground
+AlignControlGenericOffset
+
+align-values for player control bitmaps
+	0: left
+	1: right
+	2: align to MainControls
+possible Background Images (*.jpg, *.png, *.bmp)
+	ControlSelection (small left part with the 3 buttons)
+	ControlCover (the Cover)
+	ControlPlayer (main controls)
+	ControlProgress (part with variable size)
+	ControlGeneric (used for all parts without a special image)
+
 
 [Options]
 -----------------------------------------------------------------
 DrawTransparentLabel: 	Draw transparent labels
-DrawTransparentTitel,
-DrawTransparentTime:	Draw transparent information in the main part
-boldFont:		use bold font for title and time in the main part
 DisableBitrateColorsPlaylist,
 DisableBitrateColorsMedienliste:	disable the color coding for bitrates in the lists
 DisableArtistScrollbar,
@@ -185,6 +269,17 @@ UseDefaultListImages,
 UseDefaultStarBitmaps,
 UseDefaultMenuImages,
 UseDefaultTreeImages: 	use the default images, not the ones in the skin directory
+;-----------------------
+; Blendfaktor*= 0..255
+;         Used for selected Items. 
+;         0: completely transparent
+;         255: no transparency 
+;         used color: Tree_(un)FocussedSelectionColor
+; Blendfaktor*2
+;         used for non-selected items, 
+;         but only if matching UseBlended*=1
+;         used color: Tree_Color 
+;-----------------------
 BlendFaktorArtists,
 BlendFaktorAlben,
 BlendFaktorPlaylist,
@@ -212,7 +307,9 @@ HideTabText
 DrawTransparentTabText
 UseDefaultButtons
 UseDefaultSlideButtons
-
+boldFont
+DrawTransparentTitel,
+DrawTransparentTime:	Draw transparent information in the main part
 
 
 [Colors]
@@ -220,8 +317,6 @@ UseDefaultSlideButtons
 FormCL			Background color of the main form
 SpecTitelCL,
 SpecTimeCL: 		Font colors for time and title in main part
-SpecTitelBackGroundCL,
-SpecTimeBackGroundCL:	Background colors for time and title (if not transparent)
 SpecPenCL,
 SpecPen2CL:		Color of the jumping bars (linear gradient between these two)
 SpecPeakCL:		Peak color for these bars
@@ -232,9 +327,9 @@ MemoBackGroundCL:	Background of the lyrics part
 MemoTextCL:		Font color of the lyrics part
 ShapeBrushCL,
 ShapePenCL:		Colors for the slide shapes for time, volume, effects, equalizer
-Splitter1,
-Splitter2,
-Splitter3:		Colors for the splitters to resize several parts of the main window
+ShapePenProgressCL,
+ShapeBrushProgresCL:    Colors for the "progress part" in the slide shapes for progress
+Splitter1:		Colors for the splitters to resize several parts of the main window
 PlaylistPlayingFileColor: Font color of the file currently playing in the playlist
 MinFontColor,
 MiddleFontColor,
@@ -247,13 +342,20 @@ MiddleToMaxComputing:	paramater for the gradient of the bitrate coding
 PreviewTimeColor,
 PreviewTitelColor,
 PreviewArtistColor: Font colors for the Windows7 preview in the taskbar
+PreviewShapePenColor,
+PreviewShapeBrushColor,
+PreviewShapeProgressPenColor,
+PreviewShapeProgressBrushColor: Colors for the Progress bar in Windows7 Taskbar preview
 
 not used anymore
 -----------------
 TabTextCL
 TabTextBackGroundCL
 ControlImagesColor
-
+SpecTitelBackGroundCL,
+SpecTimeBackGroundCL:	Background colors for time and title (if not transparent)
+Splitter2
+Splitter3
 
 
 [DialogColors]
@@ -262,12 +364,12 @@ Not used anymore
 (was used for the skin editor, which is not part of Nemp anymore)
 
 
-
 [Buttons]
 -----------------------------------------------------------------
 Note: Only the buttons in the player part are customizable in that way
       Buttons for equalizer and headphones, as well as the "tab buttons"
       for selections are fixed in size and position.
+
 <..>Visible:	Button is visible
 <..>Left,
 <..>Top: 	Position of the button
@@ -284,11 +386,12 @@ BtnMenu<..>
 
 [ArtistColors],[AlbenColors],[PlaylistColors],[MedienlisteColors]
 -----------------------------------------------------------------
-Tree_Color: 			Background of the list (*)
-Tree_FontColor: 		Font color in the list. (*)
+Tree_Color: 			Background of the list
+Tree_FontColor: 		Font color in the list.
 Tree_FontColorSelected: 	Font color of a selected item. 
+Tree_UnfocusedColor:            Font color of a selected item without focus. 
 Tree_HeaderBackgroundColor: 	Background of the header. 
-Tree_HeaderFontColor: 		Font of the header. (*)
+Tree_HeaderFontColor: 		Font of the header. 
 Tree_BorderColor: 		little gap between header columns. 
 Tree_DropTargetBorderColor, 
 Tree_DropTargetColor: 		Color for the Drag&Drop target
@@ -299,8 +402,6 @@ Tree_SelectionRectangleBorderColor: Colors for a selection (mouse Click&Drag, pr
 Tree_UnfocusedSelectionBorderColor,
 Tree_UnfocusedSelectionColor: 	Background color of the selection without focus
 
-(*): These color ar not used whith the "advanced skin system" and will be repleaced with the colors  
-     defined in the *.vsf file
 
 currently unused:
 -----------------

@@ -48,6 +48,7 @@ type
     ShutDownLBL: TLabel;
     Timer1: TTimer;
     LblHinweis: TLabel;
+    ImgShutDown: TImage;
     procedure Timer1Timer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Btn_ShutDownNowClick(Sender: TObject);
@@ -70,16 +71,28 @@ uses Systemhelper, NempMainUnit, MainFormHelper;
 {$R *.dfm}
 
 procedure TShutDownForm.FormShow(Sender: TObject);
+var Filename: String;
 begin
+
+
   ShutDownLBL.Caption := Format((NempShutDown_CountDownLbl),  [30] );
   Timer1.Tag := 30;
   Timer1.Enabled := True;
-
-
   // Idee: Langes FadeOut. Vorher: Player-Flag setzen, damit KEIN TITELWECHSEL mehr durchgeführt wird.
 
   NempPlayer.FadeOut(30);
   // Bei Abbruch: Wieder Fade-In und Syncs wieder setzen
+
+    case Nemp_MainForm.NempOptions.ShutDownMode of
+        SHUTDOWNMODE_StopNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepStopNemp.png';
+        SHUTDOWNMODE_ExitNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepCloseNemp.png';
+        SHUTDOWNMODE_Suspend   : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepSuspend.png';
+        SHUTDOWNMODE_Hibernate : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepHibernate.png';
+        SHUTDOWNMODE_Shutdown  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepShutdown.png';
+    end;
+    if FileExists(filename) then
+        ImgShutDown.Picture.LoadFromFile(filename);
+
 
   case Nemp_MainForm.NempOptions.ShutDownMode of
         SHUTDOWNMODE_StopNemp  : LblHinweis.Caption := (NempShutDown_StopNemp  );
@@ -107,9 +120,9 @@ begin
 
     // Set Shutdownmode back to "disabled"
     Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := False;
-    Nemp_MainForm.MM_T_ShutdownOff.Checked := True;
-    Nemp_MainForm.PM_P_ShutdownOff.Checked := True;
-    Nemp_MainForm.PM_S_ShutdownOff.Checked := True;
+    //Nemp_MainForm.MM_T_ShutdownOff.Checked := True;
+    //Nemp_MainForm.PM_P_ShutdownOff.Checked := True;
+    //Nemp_MainForm.PM_S_ShutdownOff.Checked := True;
     ReArrangeToolImages;
 
     case Nemp_MainForm.NempOptions.ShutDownMode of

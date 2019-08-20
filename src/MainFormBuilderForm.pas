@@ -331,6 +331,7 @@ begin
     LockWindowUpdate(0);
 
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+    // Nemp_MainForm.CorrectSkinRegions;
 end;
 
 

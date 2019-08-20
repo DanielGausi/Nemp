@@ -1,36 +1,46 @@
-
-src/__history/
-src/3rd Party Units/__history/
-bin/Data/Cover/
-bin/Data/CoverCache
 *.npl
 *.gmp
-bin/Data/tag_ignore
-bin/Data/tag_merge
 *.map
 *.dcu
 *.local
 *.identcache
 *.drc
-bin/Data/Hotkeys.ini
-bin/Data/Nemp.ini
-bin/Data/Nemp_EQ.ini
-bin/Data/NempWebServer.ini
-bin/Images/[Originaldateien]/
-bin/__nemp.exe
-bin/bugreport.txt
+/bin/Data/tag_ignore
+/bin/Data/tag_merge
+/bin/Data/Hotkeys.ini
+/bin/Data/Nemp.ini
+/bin/Data/Nemp_EQ.ini
+/bin/Data/NempWebServer.ini
 bin/Data/000-Playlist.m3u
 bin/Data/Nemp-PlayerLog.log
 bin/Data/RandomPlaylist.ini
-bin/Languages/de/LC_MESSAGES/__default - Kopie.mo
-bin/Skins/CatWoman/
-bin/Skins/Earth At Night/
-/help/nemp-help-de.synctex.gz
-/help/nemp-help-en.synctex.gz
+bin/Data/Cover/
+bin/Data/CoverCache
 /bin/Languages/de/LC_MESSAGES/default.po
 /bin/Languages/de/LC_MESSAGES/howto upgrade.txt
+/bin/Images/[Originaldateien]/
+/bin/Images/_unsued
+/bin/__nemp.exe
+/bin/bugreport.txt
+/bin/Languages/de/LC_MESSAGES/__default - Kopie.mo
+/bin/Skins/CatWoman/
+/bin/Skins/Earth At Night/
+/bin/Skins/Nemp 4.6
+/bin/Skins/NewYork
+/bin/Skins/Blue/__unused
+/bin/Skins/Dark/_Unused
+/help/nemp-help-de.synctex.gz
+/help/nemp-help-en.synctex.gz
 /src/*.stat
-/src-help/nemp-help-de.out
+/src/__history/
+/src/__recovery/
+/src/common/__history
+/src/G15App/__history
+/src/3rd Party Units/__history/
+/src/3rd Party Units/_unused
+/src/__Some unsed Code.pas
+/src/____default.pot
+/src/_default.pot/src-help/nemp-help-de.out
 /src-help/nemp-help-de.synctex.gz
 /src-help/nemp-help-de.toc
 /src-help/nemp-help-en.aux
@@ -40,24 +50,5 @@ bin/Skins/Earth At Night/
 /src-help/nemp-help-en.toc
 /src-help/nemp-help-de.aux
 /src-help/nemp-help-de.log
-/src/common/__history
 /bin64
-/bin/Skins/Nemp 4.6
-/src/G15App/__history
-/bin/Images/_unsued
-/bin/Skins/Blue/__unused
-/bin/Skins/Dark/_Unused
-/src/3rd Party Units/___x32_dglOpenGL.pas
-/src/3rd Party Units/__dglOpenGL.pas
-/src/3rd Party Units/__unitFlyingCow.pas
-/src/3rd Party Units/_aus DP_gnugettext.pas
-/src/3rd Party Units/_gnugettext.pas
-/src/3rd Party Units/_x64_dglOpenGL - Kopie.pas
-/src/3rd Party Units/_x64_gnugettext.pas
-/src/__Some unsed Code.pas
-/src/____default.pot
-/src/__recovery/NempMainUnit.dfm
-/src/__recovery/NempMainUnit.pas
-/src/__recovery/__recovery.ini
-/src/_default.pot
-/bin/Skins/NewYork
+/bin/Skins/Classic/_unused

@@ -3,8 +3,8 @@ object ShutDownForm: TShutDownForm
   Top = 125
   BorderIcons = []
   BorderStyle = bsToolWindow
-  ClientHeight = 143
-  ClientWidth = 319
+  ClientHeight = 134
+  ClientWidth = 381
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,15 +19,15 @@ object ShutDownForm: TShutDownForm
   PixelsPerInch = 96
   TextHeight = 13
   object ShutDownLBL: TLabel
-    Left = 16
-    Top = 72
+    Left = 88
+    Top = 64
     Width = 12
     Height = 13
     Caption = '...'
   end
   object LblHinweis: TLabel
-    Left = 16
-    Top = 16
+    Left = 88
+    Top = 8
     Width = 281
     Height = 49
     AutoSize = False
@@ -36,13 +36,19 @@ object ShutDownForm: TShutDownForm
     Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'Tahoma'
-    Font.Style = [fsBold]
+    Font.Style = []
     ParentFont = False
     WordWrap = True
   end
+  object ImgShutDown: TImage
+    Left = 8
+    Top = 8
+    Width = 64
+    Height = 64
+  end
   object Btn_Cancel: TButton
-    Left = 160
-    Top = 104
+    Left = 192
+    Top = 96
     Width = 121
     Height = 25
     Cancel = True
@@ -52,8 +58,8 @@ object ShutDownForm: TShutDownForm
     OnClick = Btn_CancelClick
   end
   object Btn_ShutDownNow: TButton
-    Left = 24
-    Top = 104
+    Left = 56
+    Top = 96
     Width = 121
     Height = 25
     Caption = 'Shutdown now'
@@ -64,5 +70,7 @@ object ShutDownForm: TShutDownForm
     Tag = 30
     Enabled = False
     OnTimer = Timer1Timer
+    Left = 16
+    Top = 40
   end
 end

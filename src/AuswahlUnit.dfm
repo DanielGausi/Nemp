@@ -7,7 +7,7 @@ object AuswahlForm: TAuswahlForm
   ClientWidth = 411
   Color = clBtnFace
   Constraints.MinHeight = 200
-  Constraints.MinWidth = 400
+  Constraints.MinWidth = 300
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
