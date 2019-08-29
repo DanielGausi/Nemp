@@ -55,6 +55,8 @@ uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_Const
   procedure SplitMainForm;
   procedure JoinMainForm;
 
+  procedure FixScrollbar;
+
   procedure ReAcceptDragFiles;
 
   procedure UpdateSmallMainForm;
@@ -67,7 +69,7 @@ var
 implementation
 
 uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsUnit,
-     SystemHelper, Inifiles;
+     SystemHelper, Inifiles, MainFormBuilderForm;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
 var formregion,
@@ -709,8 +711,23 @@ begin
                       end;
                       {$ENDIF}
     end;
+
+    if (newMode = 1) and assigned(MainFormBuilder) then
+        MainFormBuilder.Close;
 end;
 
+
+procedure FixScrollbar;
+begin
+    with Nemp_MainForm do
+    begin
+        SlidebarShape.Left := 95;
+        SlidebarShape.Width := NewPlayerPanel.Width - 95 - 58;
+        BtnClose.Left      := NewPlayerPanel.Width - 18;
+        PaintFrame.Left    := NewPlayerPanel.Width - 84;
+        PlayerTimeLbl.Left := NewPlayerPanel.Width - 43;
+    end;
+end;
 
 
 procedure SplitMainForm;
@@ -750,7 +767,12 @@ begin
         // Constraints
         Constraints.MaxHeight := Height;
         Constraints.MinHeight := Height;
-        Constraints.MinWidth := 400;
+        if Nemp_MainForm.NempFormBuildOptions.ControlPanelTwoRows then
+            Constraints.MinWidth := 214
+        else
+            Constraints.MinWidth := 400;
+
+        FixScrollbar;
 
 
         // show other forms
@@ -900,6 +922,8 @@ begin
 
       //Nemp_MainForm.OnResize := FormResize;
       Nemp_MainForm.Borderstyle := bsSizeable;
+
+    FixScrollbar;
 
 
     if Medienlisteform.visible then Medienlisteform.Close;
@@ -1071,6 +1095,9 @@ begin
 
         1: begin
             // Einzelfenster-Ansicht
+            // at first start: Build two rows here for ControlPanel, if necessary
+            if (Tag = -1) and NempFormBuildOptions.ControlPanelTwoRows then
+                NempFormBuildOptions.RefreshControlPanel;
             SplitMainForm;
         end;
       end;

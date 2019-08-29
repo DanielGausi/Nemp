@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, MyDialogs,
 
   Nemp_ConstantsAndTypes, Vcl.ComCtrls;
 
@@ -51,7 +51,7 @@ type
     ContentPlaylist: TPanel;
     ContentMedialist: TPanel;
     ContentFileOverview: TPanel;
-    Apply: TButton;
+    BtnApply: TButton;
     GroupBox1: TGroupBox;
     cbControlPosition: TComboBox;
     RGrpControlSubPanel: TRadioGroup;
@@ -64,6 +64,7 @@ type
     cbHideFileOverview: TCheckBox;
     BtnUndo: TButton;
     BtnResetToDefault: TButton;
+    BtnOK: TButton;
     procedure cbMainLayoutChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BlockBrowseResize(Sender: TObject);
@@ -77,7 +78,7 @@ type
     procedure cbControlPositionChange(Sender: TObject);
     procedure RGrpControlSubPanelClick(Sender: TObject);
     procedure cbControlPositionSubPanelChange(Sender: TObject);
-    procedure ApplyClick(Sender: TObject);
+    procedure BtnApplyClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure cbControlPanelRowsClick(Sender: TObject);
     procedure cbControlPanelShowCoverClick(Sender: TObject);
@@ -89,6 +90,7 @@ type
     procedure BtnResetToDefaultClick(Sender: TObject);
     procedure SplitterTopCanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
+    procedure BtnOKClick(Sender: TObject);
   private
     { Private declarations }
     LocalBuildOptions: TNempFormBuildOptions;
@@ -108,7 +110,7 @@ var
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Nemp_RessourceStrings;
 
 {$R *.dfm}
 
@@ -319,21 +321,32 @@ begin
 end;
 
 
-procedure TMainFormBuilder.ApplyClick(Sender: TObject);
+procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
 begin
+    if Nemp_MainForm.AnzeigeMode = 1 then
+    begin
+        TranslateMessageDLG(FormBuilder_SeparateWindowWarning, mtWarning, [MBOK], 0);
+    end else
+    begin
+        LockWindowUpdate(Nemp_MainForm.Handle);
 
-    LockWindowUpdate(Nemp_MainForm.Handle);
+        Nemp_MainForm.NempFormBuildOptions.BeginUpdate;
+        Nemp_MainForm.NempFormBuildOptions.assign (LocalBuildOptions);
+        Nemp_MainForm.NempFormBuildOptions.EndUpdate;
 
-    Nemp_MainForm.NempFormBuildOptions.BeginUpdate;
-    Nemp_MainForm.NempFormBuildOptions.assign (LocalBuildOptions);
-    Nemp_MainForm.NempFormBuildOptions.EndUpdate;
+        LockWindowUpdate(0);
 
-    LockWindowUpdate(0);
-
-    Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-    // Nemp_MainForm.CorrectSkinRegions;
+        Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
+        // Nemp_MainForm.CorrectSkinRegions;
+    end;
 end;
 
+
+procedure TMainFormBuilder.BtnOKClick(Sender: TObject);
+begin
+    BtnApplyClick(Sender);
+    close;
+end;
 
 procedure TMainFormBuilder.BlockBrowseResize(Sender: TObject);
 begin

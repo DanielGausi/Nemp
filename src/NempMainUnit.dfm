@@ -719,7 +719,6 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 385
         Align = alClient
         BevelOuter = bvNone
-        PopupMenu = Medialist_View_PopupMenu
         TabOrder = 0
         OnResize = MedialistPanelResize
         OwnerDraw = False
@@ -839,6 +838,7 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvLowered
           DoubleBuffered = False
           ParentDoubleBuffered = False
+          PopupMenu = Medialist_View_PopupMenu
           TabOrder = 1
           OnPaint = NewPanelPaint
           OwnerDraw = False
@@ -1329,7 +1329,7 @@ object Nemp_MainForm: TNemp_MainForm
             609
             100)
           object SlideBarShape: TProgressShape
-            Left = 96
+            Left = 95
             Top = 78
             Width = 456
             Height = 6
@@ -1344,7 +1344,6 @@ object Nemp_MainForm: TNemp_MainForm
             ProgressPen.Color = 12678971
             ProgressBrush.Color = clMaroon
             Progress = 0.500000000000000000
-            ExplicitWidth = 353
           end
           object RatingImage: TImage
             Left = 11
@@ -1560,6 +1559,9 @@ object Nemp_MainForm: TNemp_MainForm
         BevelOuter = bvNone
         PopupMenu = Player_PopupMenu
         TabOrder = 0
+        OnMouseDown = PaintFrameMouseDown
+        OnMouseMove = PaintFrameMouseMove
+        OnMouseUp = PaintFrameMouseUp
         OwnerDraw = False
         object HeadsetControlPanel: TNempPanel
           Tag = 3

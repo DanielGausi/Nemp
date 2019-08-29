@@ -1744,6 +1744,16 @@ begin
 
         Layout_Undef: ; // nothing to do
     end;
+
+    if (ControlPanelPosition = cp_subPanel) and ControlPanelTwoRows then
+    begin
+        if ControlPanelSubParent = BlockBrowse then BlockBrowse.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight + 100;
+        if ControlPanelSubParent = BlockPlaylist then BlockPlaylist.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight + 100;
+        if ControlPanelSubParent = BlockMediaList then BlockMediaList.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight + 100;
+        if ControlPanelSubParent = BlockFileOverview then BlockFileOverview.Block.Constraints.MinHeight := CHILD_PANEL_MinHeight + 100;
+    end;
+
+
 end;
 
 function TNempFormBuildOptions.EmptyPanel(aChildList: TPanelList): Boolean;

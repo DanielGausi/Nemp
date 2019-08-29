@@ -97,7 +97,7 @@ type
       ShapeBrushCL: TColor;
       ShapePenCL: TColor;
       ShapePenProgressCL: TColor;
-      ShapeBrushProgresCL: TColor;
+      ShapeBrushProgressCL: TColor;
       SplitterColor: TColor;
       // Splitter2Color: TColor;
       // Splitter3Color: TColor;
@@ -737,10 +737,10 @@ begin
         {$ENDIF}
 
 
-        AlignControlProgressDisplay   := Ini.ReadInteger('PlayerControl','AlignControlProgressDisplay'         , 1);
-        AlignControlGenericBackground := Ini.ReadInteger('PlayerControl','AlignControlGenericBackground'       , 2);
-        AlignCompleteBackground       := Ini.ReadInteger('PlayerControl','AlignCompleteBackground'             , 2);
-        AlignControlGenericOffset     := Ini.ReadInteger('PlayerControl','AlignControlGenericOffset'           , 0);
+        AlignControlProgressDisplay   := Ini.ReadInteger('BackGround','AlignControlProgressDisplay'         , 1);
+        AlignControlGenericBackground := Ini.ReadInteger('BackGround','AlignControlGenericBackground'       , 2);
+        AlignCompleteBackground       := Ini.ReadInteger('BackGround','AlignCompleteBackground'             , 2);
+        AlignControlGenericOffset     := Ini.ReadInteger('BackGround','AlignControlGenericOffset'           , 0);
 
         AlignBackgroundBrowse         := Ini.ReadInteger('BackGround','AlignBackgroundBrowse'      , 5);
         AlignBackgroundMedialist      := Ini.ReadInteger('BackGround','AlignBackgroundMedialist'   , 5);
@@ -814,7 +814,7 @@ begin
         SkinColorScheme.ShapePenCL            := StringToColor(Ini.ReadString('Colors','ShapePenCL'           , 'clGradientActiveCaption'    ));
 
         SkinColorScheme.ShapePenProgressCL    := StringToColor(Ini.ReadString('Colors','ShapePenProgressCL'   , 'clHighLight'    ));
-        SkinColorScheme.ShapeBrushProgresCL   := StringToColor(Ini.ReadString('Colors','ShapeBrushProgresCL'  , 'clHotLight'    ));
+        SkinColorScheme.ShapeBrushProgressCL   := StringToColor(Ini.ReadString('Colors','ShapeBrushProgressCL'  , 'clHotLight'    ));
 
         SkinColorScheme.SplitterColor        := StringToColor(Ini.ReadString('Colors','Splitter1'            , 'clWindow'    ));
         //SkinColorScheme.Splitter2Color        := StringToColor(Ini.ReadString('Colors','Splitter2'            , 'clWindow'    ));
@@ -1610,7 +1610,7 @@ begin
       TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
           if Nemp_MainForm.Components[i] is TProgressShape then
           begin
-              TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := SkinColorScheme.ShapeBrushProgresCL;
+              TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := SkinColorScheme.ShapeBrushProgressCL;
               TProgressShape(Nemp_MainForm.Components[i]).ProgressPen.Color := SkinColorScheme.ShapePenProgressCL;
           end;
     end

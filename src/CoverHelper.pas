@@ -996,15 +996,8 @@ begin
         try
             //aGraphic.LoadFromFile(filename);
             WPic.LoadFromFile(filename);
-
-
-
            // FitBitmapIn(aCoverbmp.Bitmap, aGraphic.Graphic);
-
-
-
             //stretch := False;
-
             //w := aCoverbmp.width; //aCoverbmp.Width;
             if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
             begin

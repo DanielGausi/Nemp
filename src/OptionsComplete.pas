@@ -1457,6 +1457,9 @@ begin
   CBHideDeskbandOnRestore.Checked  := Nemp_MainForm.NempOptions.HideDeskbandOnRestore;
   CBHideDeskbandOnClose.Checked    := Nemp_MainForm.NempOptions.HideDeskbandOnClose;
 
+  // hide this option in most cases now (for new users)
+  GrpBox_Deskband.Visible := FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll');
+
 
   // Artist/alben-Größen
   SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
@@ -3384,20 +3387,12 @@ begin
 end;
 
 procedure TOptionsCompleteForm.LoadDefaultCover;
-var Coverbmp: TBitmap;
 begin
-  Coverbmp := tBitmap.Create;
-  try
-      //Coverbmp.Width := img_DefaultCover.Width;
-      //Coverbmp.Height := img_DefaultCover.Height;
+    img_DefaultCover.Picture.Bitmap.Width := img_DefaultCover.Width;
+    img_DefaultCover.Picture.Bitmap.Height := img_DefaultCover.Height;
 
-      GetDefaultCover(dcFile, img_DefaultCover.Picture, 0);
-
-      //img_DefaultCover.Picture.Bitmap.Assign(Coverbmp);
-      img_DefaultCover.Refresh;
-  finally
-      Coverbmp.Free;
-  end;
+    GetDefaultCover(dcFile, img_DefaultCover.Picture, 0);
+    img_DefaultCover.Refresh;
 end;
 
 procedure TOptionsCompleteForm.cbAutoSplitBySizeClick(Sender: TObject);

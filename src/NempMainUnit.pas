@@ -3662,6 +3662,8 @@ begin
     MM_O_Preferences .Enabled := PartyModeNotActive;
     MM_O_Wizard      .Enabled := PartyModeNotActive;
     MM_O_View        .Enabled := PartyModeNotActive;
+
+    MM_O_FormBuilder.Enabled := Nemp_MainForm.AnzeigeMode = 0;
 end;
 
 
@@ -9224,12 +9226,6 @@ begin
                     NempPlaylist.SearchAll(EditPlaylistSearch.Text)
             end;
           end;
-      VK_ESCAPE:
-          begin
-              key := 0;
-              EditPlaylistSearch.Text := '';
-              NempPlaylist.ClearSearch(True);
-          end;
       VK_F3: begin
           if Length(Trim(EditPlaylistSearch.Text)) >= 2 then
               NempPlaylist.Search(EditPlaylistSearch.Text, True);
@@ -9242,6 +9238,12 @@ procedure TNemp_MainForm.EditPlaylistSearchKeyPress(Sender: TObject;
 begin
     case ord(key) of
         VK_RETURN: key := #0;
+
+        VK_ESCAPE: begin
+              key := #0;
+              EditPlaylistSearch.Text := '';
+              NempPlaylist.ClearSearch(True);
+        end
     end;
 end;
 
@@ -9803,10 +9805,16 @@ begin
 end;
 
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);
+var WidthLimit: Integer;
 begin
-    if not NempFormBuildOptions.ControlPanelTwoRows then
+    if NempFormBuildOptions.ControlPanelTwoRows then
+        WidthLimit := 305
+    else
+        WidthLimit := 400;
+
+    //if not NempFormBuildOptions.ControlPanelTwoRows then
     begin
-        PlayerControlCoverPanel.Visible := (_ControlPanel.Width > 400) and NempFormBuildOptions.ControlPanelShowCover;
+        PlayerControlCoverPanel.Visible := (_ControlPanel.Width > WidthLimit) and NempFormBuildOptions.ControlPanelShowCover;
         if PlayerControlCoverPanel.Visible then
             ControlContainer1.Width := OutputControlPanel.Width
                                + PlayerControlCoverPanel.Width
@@ -9942,6 +9950,8 @@ begin
     PM_T_ShutdownInfo.Caption := CaptionString;
     MM_T_ShutdownInfo.Caption := CaptionString;
     PM_P_ShutdownInfo.Caption := CaptionString;
+
+    PM_P_FormBuilder.Enabled := Nemp_MainForm.AnzeigeMode = 0;
 end;
 
 

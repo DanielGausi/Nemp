@@ -4,8 +4,8 @@ object ShutDownEditForm: TShutDownEditForm
   BorderIcons = []
   BorderStyle = bsSingle
   Caption = 'Nemp: Countdown'
-  ClientHeight = 186
-  ClientWidth = 425
+  ClientHeight = 182
+  ClientWidth = 473
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,38 +17,44 @@ object ShutDownEditForm: TShutDownEditForm
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
-    425
-    186)
+    473
+    182)
   PixelsPerInch = 96
   TextHeight = 13
   object ImgShutDown: TImage
-    Left = 8
-    Top = 33
+    AlignWithMargins = True
+    Left = 33
+    Top = 15
     Width = 64
     Height = 64
   end
   object lblShutDownMode: TLabel
+    AlignWithMargins = True
     Left = 8
-    Top = 103
-    Width = 64
-    Height = 36
+    Top = 85
+    Width = 114
+    Height = 53
     Alignment = taCenter
     AutoSize = False
     Caption = '...'
     WordWrap = True
   end
   object lblCurrentStatus: TLabel
+    AlignWithMargins = True
     Left = 8
-    Top = 153
-    Width = 233
+    Top = 149
+    Width = 265
     Height = 25
+    Anchors = [akLeft, akBottom]
     AutoSize = False
     Caption = '...'
     WordWrap = True
+    ExplicitTop = 167
   end
   object BtnOk: TButton
-    Left = 261
-    Top = 153
+    AlignWithMargins = True
+    Left = 296
+    Top = 149
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -57,11 +63,12 @@ object ShutDownEditForm: TShutDownEditForm
     ModalResult = 1
     TabOrder = 1
     OnClick = BtnOkClick
-    ExplicitTop = 145
+    ExplicitTop = 179
   end
   object BtnCancel: TButton
-    Left = 342
-    Top = 153
+    AlignWithMargins = True
+    Left = 377
+    Top = 149
     Width = 75
     Height = 25
     Anchors = [akRight, akBottom]
@@ -69,16 +76,18 @@ object ShutDownEditForm: TShutDownEditForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
-    ExplicitTop = 145
+    ExplicitTop = 179
   end
   object grpBoxSettings: TGroupBox
-    Left = 78
+    AlignWithMargins = True
+    Left = 128
     Top = 8
-    Width = 339
-    Height = 131
+    Width = 331
+    Height = 130
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Settings'
     TabOrder = 0
+    ExplicitHeight = 160
     object lblIntendedAction: TLabel
       Left = 16
       Top = 76
@@ -112,7 +121,7 @@ object ShutDownEditForm: TShutDownEditForm
     object cbIntendedAction: TComboBox
       Left = 16
       Top = 95
-      Width = 177
+      Width = 297
       Height = 21
       Style = csDropDownList
       ItemIndex = 3

@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer6
+      ActivePage = TabFiles2
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -1297,8 +1297,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           532)
         object GrpBox_Deskband: TGroupBox
           Left = 8
-          Top = 103
-          Width = 439
+          Top = 222
+          Width = 431
           Height = 163
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Notification of a deskband'
@@ -1358,8 +1358,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_Hibernate: TGroupBox
           Left = 8
-          Top = 272
-          Width = 439
+          Top = 103
+          Width = 431
           Height = 113
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Hibernate/standby'

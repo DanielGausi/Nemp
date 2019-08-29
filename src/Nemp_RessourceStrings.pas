@@ -1013,6 +1013,8 @@ Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The n
 
 HTTP_Connection_Error = 'Error connecting %s: %s';
 
+FormBuilder_SeparateWindowWarning = 'The form layout cannot be applied in separate window mode.';
+
 implementation
 
 end.
