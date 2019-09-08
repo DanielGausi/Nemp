@@ -1,7 +1,7 @@
 object MainFormBuilder: TMainFormBuilder
   Left = 0
   Top = 0
-  Caption = 'Nemp: Customize main window'
+  Caption = 'Nemp: Form designer'
   ClientHeight = 544
   ClientWidth = 825
   Color = clBtnFace
@@ -33,7 +33,6 @@ object MainFormBuilder: TMainFormBuilder
     BevelWidth = 3
     TabOrder = 0
     StyleElements = []
-    ExplicitWidth = 593
     object __MainContainer: TPanel
       Left = 6
       Top = 6
@@ -43,8 +42,6 @@ object MainFormBuilder: TMainFormBuilder
       BevelOuter = bvNone
       TabOrder = 0
       StyleElements = []
-      ExplicitWidth = 617
-      ExplicitHeight = 468
       object MainSplitter: TSplitter
         Left = 0
         Top = 248
@@ -68,8 +65,6 @@ object MainFormBuilder: TMainFormBuilder
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 617
-        ExplicitHeight = 217
         object SplitterBottom: TSplitter
           Left = 232
           Top = 0
@@ -93,7 +88,6 @@ object MainFormBuilder: TMainFormBuilder
           TabOrder = 0
           StyleElements = []
           OnResize = BlockMedialistResize
-          ExplicitHeight = 217
           object HeaderMedialist: TPanel
             Left = 0
             Top = 0
@@ -112,7 +106,6 @@ object MainFormBuilder: TMainFormBuilder
             TabOrder = 1
             StyleElements = []
             OnResize = BlockMedialistResize
-            ExplicitHeight = 196
             DesignSize = (
               228
               156)
@@ -160,8 +153,6 @@ object MainFormBuilder: TMainFormBuilder
           TabOrder = 1
           StyleElements = []
           OnResize = BlockFileOverviewResize
-          ExplicitWidth = 382
-          ExplicitHeight = 217
           object HeaderFileOverview: TPanel
             Left = 0
             Top = 0
@@ -169,7 +160,6 @@ object MainFormBuilder: TMainFormBuilder
             Height = 17
             Align = alTop
             TabOrder = 0
-            ExplicitWidth = 378
           end
           object ContentFileOverview: TPanel
             Left = 0
@@ -181,8 +171,6 @@ object MainFormBuilder: TMainFormBuilder
             TabOrder = 1
             StyleElements = []
             OnResize = BlockFileOverviewResize
-            ExplicitWidth = 378
-            ExplicitHeight = 196
             DesignSize = (
               356
               156)
@@ -229,7 +217,6 @@ object MainFormBuilder: TMainFormBuilder
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitWidth = 617
         object SplitterTop: TSplitter
           Left = 280
           Top = 0
@@ -319,7 +306,6 @@ object MainFormBuilder: TMainFormBuilder
           TabOrder = 1
           StyleElements = []
           OnResize = BlockPlaylistResize
-          ExplicitWidth = 334
           object HeaderPlaylist: TPanel
             Left = 0
             Top = 0
@@ -327,7 +313,6 @@ object MainFormBuilder: TMainFormBuilder
             Height = 17
             Align = alTop
             TabOrder = 0
-            ExplicitWidth = 330
           end
           object ContentPlaylist: TPanel
             Left = 0
@@ -339,7 +324,6 @@ object MainFormBuilder: TMainFormBuilder
             TabOrder = 1
             StyleElements = []
             OnResize = BlockPlaylistResize
-            ExplicitWidth = 330
             DesignSize = (
               308
               227)
@@ -387,11 +371,9 @@ object MainFormBuilder: TMainFormBuilder
       Align = alBottom
       BevelKind = bkFlat
       BevelOuter = bvNone
-      Caption = 'Player Controls'
+      Caption = 'Control panel'
       TabOrder = 1
       StyleElements = []
-      ExplicitTop = 474
-      ExplicitWidth = 617
     end
   end
   object GrpBoxSettings: TGroupBox
@@ -402,7 +384,6 @@ object MainFormBuilder: TMainFormBuilder
     Anchors = [akTop, akRight]
     Caption = 'Main layout'
     TabOrder = 1
-    ExplicitLeft = 614
     object cbMainLayout: TComboBox
       Left = 16
       Top = 22
@@ -411,11 +392,11 @@ object MainFormBuilder: TMainFormBuilder
       Style = csDropDownList
       ItemIndex = 0
       TabOrder = 0
-      Text = '2 Rows'
+      Text = 'Two Rows'
       OnChange = cbMainLayoutChange
       Items.Strings = (
-        '2 Rows'
-        '2 Columns')
+        'Two Rows'
+        'Two Columns')
     end
   end
   object BtnApply: TButton
@@ -428,7 +409,6 @@ object MainFormBuilder: TMainFormBuilder
     Caption = 'Apply'
     TabOrder = 2
     OnClick = BtnApplyClick
-    ExplicitLeft = 703
   end
   object GroupBox1: TGroupBox
     Left = 632
@@ -438,13 +418,12 @@ object MainFormBuilder: TMainFormBuilder
     Anchors = [akTop, akRight]
     Caption = 'Position of control panel'
     TabOrder = 3
-    ExplicitLeft = 614
     object LblSubPanelPosition: TLabel
       Left = 16
       Top = 159
-      Width = 95
+      Width = 94
       Height = 13
-      Caption = 'Position in SubPanel'
+      Caption = 'Position in subpanel'
     end
     object cbControlPosition: TComboBox
       Left = 16
@@ -452,22 +431,22 @@ object MainFormBuilder: TMainFormBuilder
       Width = 153
       Height = 21
       Style = csDropDownList
-      ItemIndex = 0
+      ItemIndex = 2
       TabOrder = 0
-      Text = 'Top'
+      Text = 'Bottom'
       OnChange = cbControlPositionChange
       Items.Strings = (
         'Top'
         'Center (if reasonable)'
         'Bottom'
-        'Sub-Panel')
+        'Subpanel')
     end
     object RGrpControlSubPanel: TRadioGroup
       Left = 16
       Top = 48
       Width = 153
       Height = 105
-      Caption = 'SubPanel for Controls'
+      Caption = 'Subpanel for control panel'
       ItemIndex = 1
       Items.Strings = (
         'Cowerflow'
@@ -500,13 +479,12 @@ object MainFormBuilder: TMainFormBuilder
     Anchors = [akTop, akRight]
     Caption = 'Control panel configuration'
     TabOrder = 4
-    ExplicitLeft = 614
     object cbControlPanelRows: TCheckBox
       Left = 16
       Top = 24
       Width = 153
       Height = 17
-      Caption = '2 rows instead of 1'
+      Caption = 'Two rows instead of one'
       TabOrder = 0
       OnClick = cbControlPanelRowsClick
     end
@@ -528,7 +506,6 @@ object MainFormBuilder: TMainFormBuilder
     Anchors = [akTop, akRight]
     Caption = 'Other settings'
     TabOrder = 5
-    ExplicitLeft = 614
     object cbHideFileOverview: TCheckBox
       Left = 16
       Top = 24
@@ -549,7 +526,6 @@ object MainFormBuilder: TMainFormBuilder
     Caption = 'Undo'
     TabOrder = 6
     OnClick = BtnUndoClick
-    ExplicitLeft = 599
   end
   object BtnResetToDefault: TButton
     Left = 8
@@ -561,7 +537,6 @@ object MainFormBuilder: TMainFormBuilder
     Caption = 'Reset to default'
     TabOrder = 7
     OnClick = BtnResetToDefaultClick
-    ExplicitTop = 486
   end
   object BtnOK: TButton
     Left = 507
@@ -572,6 +547,5 @@ object MainFormBuilder: TMainFormBuilder
     Caption = 'OK'
     TabOrder = 8
     OnClick = BtnOKClick
-    ExplicitLeft = 489
   end
 end

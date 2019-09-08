@@ -1233,9 +1233,9 @@ object Nemp_MainForm: TNemp_MainForm
             object MedienBibDetailStatusLbl: TLabel
               Left = 14
               Top = 4
-              Width = 73
+              Width = 63
               Height = 13
-              Caption = 'File information'
+              Caption = 'File overview'
               StyleElements = [seClient, seBorder]
             end
           end
@@ -1449,6 +1449,7 @@ object Nemp_MainForm: TNemp_MainForm
             DragCursor = crSizeWE
             DragMode = dmAutomatic
             TabOrder = 3
+            Visible = False
             OnDragOver = GRPBOXControlDragOver
             OnEndDrag = SlideBarButtonEndDrag
             OnKeyDown = SlideBarButtonKeyDown
@@ -2509,7 +2510,7 @@ object Nemp_MainForm: TNemp_MainForm
         end
       end
       object MM_O_FormBuilder: TMenuItem
-        Caption = 'Form customizer'
+        Caption = 'Form designer'
         OnClick = MM_O_FormBuilderClick
       end
       object MM_O_Skins: TMenuItem
@@ -5420,7 +5421,7 @@ object Nemp_MainForm: TNemp_MainForm
       end
     end
     object PM_P_FormBuilder: TMenuItem
-      Caption = 'Form customizer'
+      Caption = 'Form designer'
       OnClick = MM_O_FormBuilderClick
     end
     object PM_P_Skins: TMenuItem

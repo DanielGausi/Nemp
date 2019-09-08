@@ -200,10 +200,10 @@ For setting the appropriate configuration there is the \textbf{Form-Designer}, a
 \end{figure}
 
 \begin{itemize}
-	\item The \emph{Main Layout} controls whether the primary division of the window should be horizontally or vertically.
-	\item Via \emph{Position of Control Panel} you can specify the area with the controls. This can be set to either the top or bottom, or centered in a layout with two rows. In addition, this part can be arranged with \gf{half width} at one of the other four areas - at the top or bottom.
-	\item Under \emph{Control Panel Configuration}, the Control Panel can be configured a little bit. 
-	\item With \emph{Other settings} the part with the file information can be hidden, as it's not used by all users. If this part is hidden, a single-line or single-column view is also possible. If all four areas are visible, this does not make sense. 
+	\item The \emph{Main layout} controls whether the primary division of the window should be horizontally or vertically.
+	\item Via \emph{Position of control panel} you can specify the area with the controls. This can be set to either the top or bottom, or centered in a layout with two rows. In addition, this part can be arranged with \gf{half width} at one of the other four areas - at the top or bottom.
+	\item Under \emph{Control panel configuration}, the control panel can be configured a little bit. 
+	\item With \emph{Other settings} the part with the file overview can be hidden, as it's not used by all users. If this part is hidden, a single-line or single-column view is also possible. If all four areas are visible, this does not make sense. 
 \end{itemize}
 
 The proportions are adjustable as usual at the dividing lines. Click on \emph{Apply} to transfer the layout to the main window, click on \emph{Undo} to return to the current layout of the main window in the Form Designer. If you have completely messed up the settings, you can restore the original layout by clicking on \emph{Reset to default}.
@@ -1476,6 +1476,36 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+
+\subsection*{Version 4.11.0, September 2019}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\textwidth]{v4_11.jpg}
+\caption{New layout in Nemp 4.11}
+\end{figure}
+
+\begin{itemize}
+\item The layout of the main window can now be modified using the \textbf{Form Designer}. The control panel of the player has been redesigned a bit:
+	\begin{itemize}
+		\item player and headphone controls share the same place
+		\item display of the cover of the current title is smaller, but always visible
+		\item display of the lyrics for the current title is dropped, but a display of the lyrics for the selected title in the playlist and media list 
+		\item controls for effects and equalizer moved to separate window.
+		\item removed the possibility to switch the scrolling title display between different informations
+	\end{itemize}
+
+\item Some changes and extensions to the skin system. Due to the new proportions of the window old skins may be incompatible and have to be adapted.
+	\begin{itemize}
+		\item Background graphics can be defined for individual areas, various options for alignment
+		\item Bouncing bars in the taskbar preview removed. Instead more space for the title and a small progress bar.
+		\item Use of some more skin colors also when the advanced skin system is used
+	\end{itemize}
+\item The sleep mode is no longer selected via a nested menu, but via a new dialog window.
+\item Minor changes to the display in the playlist: The default note symbol is no longer displayed. For titles with cue sheets, the individual entries are displayed without quotes.
+\item Deskband removed. It is still supported in principle, but since Nemp does not support Windows XP any more, and some other functions are not supported under XP, it is no longer included.
+\end{itemize}
 
 \subsection*{Version 4.10.0, July 2019}
 \begin{itemize}

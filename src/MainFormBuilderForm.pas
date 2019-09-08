@@ -110,7 +110,7 @@ var
 
 implementation
 
-uses NempMainUnit, Nemp_RessourceStrings;
+uses NempMainUnit, Nemp_RessourceStrings, Hilfsfunktionen, gnugettext;
 
 {$R *.dfm}
 
@@ -222,6 +222,10 @@ procedure TMainFormBuilder.FormCreate(Sender: TObject);
 var a: tListItem;
     fn: String;
 begin
+    BackupComboboxes(self);
+    TranslateComponent (self);
+    RestoreComboboxes(self);
+
     LocalBuildOptions := TNempFormBuildOptions.Create;
     LocalBuildOptions.NewLayout := Layout_TwoRows;
 

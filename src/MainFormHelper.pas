@@ -138,7 +138,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
-    PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer;
+    PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm;
 
 procedure CorrectVolButton;
 begin
@@ -874,6 +874,12 @@ begin
         if assigned(PlayerLogForm        ) then ReTranslateComponent(PlayerLogForm       );
         if assigned(FormEffectsAndEqualizer) then ReTranslateComponent(FormEffectsAndEqualizer);
 
+        if assigned(MainFormBuilder) then
+        begin
+            BackupComboboxes(MainFormBuilder);
+            ReTranslateComponent(MainFormBuilder);
+            RestoreComboboxes(MainFormBuilder);
+        end;
         if assigned(FDetails) then
         begin
             BackUpComboBoxes(FDetails);

@@ -779,7 +779,7 @@ MediaLibrary_OutOfMemoryBuildingLyricStringError      = 'An error occurred while
 
 
     Playlist_QueryReallyDelete    = 'This will clear your current playlist with %d tracks and replace it with only %d new tracks. Do you really want to clear the playlist?'
-                                    + #13#10#13#10 + 'Note: You can change the default action for adding files into the playlist within the settings dialog';
+                                    + #13#10#13#10 + 'Note: You can change the default action for adding files into the playlist within the settings dialog.';
     Playlist_NotEverything        = 'No. Nemp will not add *everything* to the playlist.';
     Playlist_FileNotFound         = 'The specified file can not be found. Do you want to delete it from the list?';
     Playlist_NoRecentlists        = 'empty';
@@ -789,7 +789,7 @@ Player_FilenameWebradioTooLong = 'The filename for this stream is to long and au
                                   + 'Please change the directory for webradio downloads.';
 Player_NoReversePossible = 'It seems that you deleted the playing file from the playlist. Therefore this function cannot be executed.';
 
-Player_UnkownArtist = '(Unknwon Artist)';
+Player_UnkownArtist = '(Unknown Artist)';
 Player_NoTitleLoaded = 'Nothing to play ... drop a music file here to start';
 //Player_NoTitleLoadedDropHereToStart = 'Drop an audiofile here to start playback';
 
