@@ -44,7 +44,7 @@ object Nemp_MainForm: TNemp_MainForm
     OnMouseUp = __MainContainerPanelMouseUp
     OnResize = __MainContainerPanelResize
     OwnerDraw = False
-    object Splitter1: TSplitter
+    object MainSplitter: TSplitter
       Left = 0
       Top = 240
       Width = 1090
@@ -55,8 +55,8 @@ object Nemp_MainForm: TNemp_MainForm
       MinSize = 150
       ParentColor = False
       ResizeStyle = rsUpdate
-      OnCanResize = Splitter5CanResize
-      OnMoved = Splitter1Moved
+      OnCanResize = SplitterFileOverviewCanResize
+      OnMoved = MainSplitterMoved
       ExplicitWidth = 1047
     end
     object _TopMainPanel: TPanel
@@ -70,15 +70,15 @@ object Nemp_MainForm: TNemp_MainForm
       Constraints.MinHeight = 240
       TabOrder = 0
       OnResize = _TopMainPanelResize
-      object Splitter2: TSplitter
+      object SubSplitter1: TSplitter
         Left = 540
         Top = 0
         Width = 4
         Height = 240
         MinSize = 100
         ResizeStyle = rsUpdate
-        OnCanResize = Splitter5CanResize
-        OnMoved = Splitter2Moved
+        OnCanResize = SplitterFileOverviewCanResize
+        OnMoved = SubSplitter1Moved
         ExplicitLeft = 385
         ExplicitHeight = 425
       end
@@ -235,12 +235,12 @@ object Nemp_MainForm: TNemp_MainForm
             BevelOuter = bvNone
             PopupMenu = Medialist_Browse_PopupMenu
             TabOrder = 0
-            object Splitter3: TSplitter
+            object SplitterBrowse: TSplitter
               Left = 73
               Top = 0
               Width = 4
               Height = 140
-              OnMoved = Splitter3Moved
+              OnMoved = SplitterBrowseMoved
               ExplicitHeight = 59
             end
             object ArtistsVST: TVirtualStringTree
@@ -698,7 +698,7 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnResize = _TopMainPanelResize
       OwnerDraw = False
-      object Splitter4: TSplitter
+      object SubSplitter2: TSplitter
         Left = 607
         Top = 0
         Width = 4
@@ -706,8 +706,8 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alRight
         MinSize = 50
         ResizeStyle = rsUpdate
-        OnCanResize = Splitter5CanResize
-        OnMoved = Splitter4Moved
+        OnCanResize = SplitterFileOverviewCanResize
+        OnMoved = SubSplitter2Moved
         ExplicitLeft = 720
         ExplicitHeight = 196
       end
@@ -1001,14 +1001,14 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 0
           OwnerDraw = False
-          object Splitter5: TSplitter
+          object SplitterFileOverview: TSplitter
             Left = 248
             Top = 0
             Width = 4
             Height = 357
             ResizeStyle = rsUpdate
-            OnCanResize = Splitter5CanResize
-            OnMoved = Splitter5Moved
+            OnCanResize = SplitterFileOverviewCanResize
+            OnMoved = SplitterFileOverviewMoved
             ExplicitLeft = 250
             ExplicitTop = 4
             ExplicitHeight = 279

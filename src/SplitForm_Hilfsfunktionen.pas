@@ -724,7 +724,7 @@ begin
 
         _VSTPanel.Visible := False;
         _TopMainPanel.Visible := False;
-        Splitter1.Visible := False;
+        MainSplitter.Visible := False;
 
         // Set Size/position of the Mini-MainForm
         Nemp_MainForm.Borderstyle := bsNone;
@@ -887,7 +887,7 @@ begin
     _VSTPanel.OnResize     := _TopMainPanelResize;
     _TopMainPanel.OnResize := _TopMainPanelResize;
 
-    Splitter1.Visible := True;
+    MainSplitter.Visible := True;
     _VSTPanel.Visible := False;
     _TopMainPanel.Visible := False;
 

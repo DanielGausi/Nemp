@@ -1551,11 +1551,11 @@ begin
         MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
     Color := SkinColorScheme.FormCL;
-    Splitter1.Color := SkinColorScheme.SplitterColor;
-    Splitter2.Color := SkinColorScheme.SplitterColor;
-    Splitter3.Color := SkinColorScheme.SplitterColor;
-    Splitter4.Color := SkinColorScheme.SplitterColor;
-    Splitter5.Color := SkinColorScheme.SplitterColor;
+    MainSplitter.Color := SkinColorScheme.SplitterColor;
+    SubSplitter1.Color := SkinColorScheme.SplitterColor;
+    SubSplitter2.Color := SkinColorScheme.SplitterColor;
+    SplitterBrowse.Color := SkinColorScheme.SplitterColor;
+    SplitterFileOverview.Color := SkinColorScheme.SplitterColor;
 
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
@@ -1851,11 +1851,11 @@ begin
   with Nemp_MainForm do
   begin
     Color := clBtnFace;
-    Splitter1.Color := clBtnFace;
-    Splitter2.Color := clBtnFace;
-    Splitter3.Color := clBtnFace;
-    Splitter4.Color := clBtnFace;
-    Splitter5.Color := clBtnFace;
+    MainSplitter.Color := clBtnFace;
+    SubSplitter1.Color := clBtnFace;
+    SubSplitter2.Color := clBtnFace;
+    SplitterBrowse.Color := clBtnFace;
+    SplitterFileOverview.Color := clBtnFace;
 
     LyricsMemo.Color := clWindow;
     LyricsMemo.Font.Color := clWindowText;

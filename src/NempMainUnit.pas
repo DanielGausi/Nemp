@@ -79,13 +79,13 @@ type
   TNemp_MainForm = class(TNempForm)
     _TopMainPanel: TPanel;
     BassTimer: TTimer;
-    Splitter2: TSplitter;
+    SubSplitter1: TSplitter;
     Nemp_MainMenu: TMainMenu;
     PlayListImageList: TImageList;
     PlaylistPanel: TNempPanel;
     GRPBOXArtistsAlben: TNempPanel;
     PanelStandardBrowse: TPanel;
-    Splitter3: TSplitter;
+    SplitterBrowse: TSplitter;
     ArtistsVST: TVirtualStringTree;
     AlbenVST: TVirtualStringTree;
     AuswahlPanel: TPanel;
@@ -507,21 +507,21 @@ type
     TabBtn_Marker: TSkinButton;
     GRPBOXVST: TNempPanel;
     VST: TVirtualStringTree;
-    Splitter4: TSplitter;
+    SubSplitter2: TSplitter;
     MedienBibDetailPanel: TNempPanel;
     DetailID3TagPanel: TNempPanel;
     MedienBibDetailHeaderPanel: TNempPanel;
     MedienBibDetailFillPanel: TNempPanel;
     TabBtn_Cover: TSkinButton;
     TabBtn_Lyrics: TSkinButton;
-    Splitter5: TSplitter;
+    SplitterFileOverview: TSplitter;
     DetailCoverLyricsPanel: TNempPanel;
     LyricsMemo: TMemo;
     ImgDetailCover: TImage;
     MedienBibDetailStatusLbl: TLabel;
     ContainerPanelMedienBibDetails: TNempPanel;
     __MainContainerPanel: TNempPanel;
-    Splitter1: TSplitter;
+    MainSplitter: TSplitter;
     ControlContainer2: TNempPanel;
     ControlContainer1: TNempPanel;
     HeadsetControlPanel: TNempPanel;
@@ -743,7 +743,7 @@ type
     procedure PlaylistVSTMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
 
-    procedure Splitter2Moved(Sender: TObject);
+    procedure SubSplitter1Moved(Sender: TObject);
     procedure PlayListSaveDialogTypeChange(Sender: TObject);
     procedure PM_TNA_CloseClick(Sender: TObject);
     procedure PM_TNA_RestoreClick(Sender: TObject);
@@ -858,7 +858,7 @@ type
     procedure RepaintAll;
     Procedure RepaintVisOnPause;
     procedure TABPanelPaint(Sender: TObject);
-    procedure Splitter1Moved(Sender: TObject);
+    procedure MainSplitterMoved(Sender: TObject);
 
     procedure PlaylistVSTCollapsAndExpanded(Sender: TBaseVirtualTree;
       Node: PVirtualNode);
@@ -1027,8 +1027,8 @@ type
     procedure PM_ML_SetRatingsOfSelectedFilesClick(Sender: TObject);
     procedure GRPBOXArtistsAlbenResize(Sender: TObject);
     procedure AuswahlPanelResize(Sender: TObject);
-    procedure Splitter3Moved(Sender: TObject);
-    procedure Splitter4Moved(Sender: TObject);
+    procedure SplitterBrowseMoved(Sender: TObject);
+    procedure SubSplitter2Moved(Sender: TObject);
 
     procedure VolButton_HeadsetStartDrag(Sender: TObject;
       var DragObject: TDragObject);
@@ -1128,8 +1128,8 @@ type
     procedure MM_O_FormBuilderClick(Sender: TObject);
     procedure MedialistPanelResize(Sender: TObject);
     procedure MedienBibDetailPanelResize(Sender: TObject);
-    procedure Splitter5Moved(Sender: TObject);
-    procedure Splitter5CanResize(Sender: TObject; var NewSize: Integer;
+    procedure SplitterFileOverviewMoved(Sender: TObject);
+    procedure SplitterFileOverviewCanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
     procedure _TopMainPanelResize(Sender: TObject);
     procedure __MainContainerPanelResize(Sender: TObject);
@@ -1811,7 +1811,7 @@ begin
     NempFormBuildOptions.ControlPanel.SetControlValues(_ControlPanel, ControlContainer1, ControlContainer2,
                                                 OutputControlPanel, PlayerControlCoverPanel, PlayerControlPanel, HeadsetControlPanel, NewPlayerPanel, {SpectrumPanel,}
                                                 'Player Control');
-    NempFormBuildOptions.MainSplitter := Splitter1;
+    NempFormBuildOptions.MainSplitter := MainSplitter;
 
     NempFormBuildOptions.ChildPanelMinHeight := CHILD_PANEL_MinHeight;
     NempFormBuildOptions.ChildPanelMinWidth  := CHILD_PANEL_MinWidth;
@@ -1833,8 +1833,8 @@ begin
     NempFormBuildOptions.PanelBChilds.Add(NempFormBuildOptions.BlockMediaList);
     NempFormBuildOptions.PanelBChilds.Add(NempFormBuildOptions.BlockFileOverView);
     // Place the Splitters
-    NempFormBuildOptions.SubSplitter1 := Splitter2;
-    NempFormBuildOptions.SubSplitter2 := Splitter4;
+    NempFormBuildOptions.SubSplitter1 := SubSplitter1;
+    NempFormBuildOptions.SubSplitter2 := SubSplitter2;
 
     ///////////////////////////////////////
 
@@ -6246,7 +6246,7 @@ begin
 end;
 
 // horizontal splitter between Top and VST
-procedure TNemp_MainForm.Splitter1Moved(Sender: TObject);
+procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
 begin
 
     //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);
@@ -6261,7 +6261,7 @@ begin
 end;
 
 // vertical splitter between player and Browse
-procedure TNemp_MainForm.Splitter2Moved(Sender: TObject);
+procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
 begin
   NempFormBuildOptions.OnSplitterMoved(Sender);
 
@@ -6273,7 +6273,7 @@ begin
 end;
 
 //vertical splitter between Artist and Album
-procedure TNemp_MainForm.Splitter3Moved(Sender: TObject);
+procedure TNemp_MainForm.SplitterBrowseMoved(Sender: TObject);
 begin
     NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
@@ -6285,7 +6285,7 @@ begin
 end;
 
 // vertical splitter between VST and Cover
-procedure TNemp_MainForm.Splitter4Moved(Sender: TObject);
+procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
 begin
     NempFormBuildOptions.OnSplitterMoved(Sender);
 
@@ -10771,7 +10771,7 @@ begin
 end;
 
 
-procedure TNemp_MainForm.Splitter5CanResize(Sender: TObject;
+procedure TNemp_MainForm.SplitterFileOverviewCanResize(Sender: TObject;
   var NewSize: Integer; var Accept: Boolean);
 var s: TSplitter;
 begin
@@ -10782,7 +10782,7 @@ begin
         accept := (s.MinSize < NewSize) and ( (s.Parent.Height - newSize) > s.MinSize)
 end;
 
-procedure TNemp_MainForm.Splitter5Moved(Sender: TObject);
+procedure TNemp_MainForm.SplitterFileOverviewMoved(Sender: TObject);
 begin
     if MedienBibDetailPanel.Width > 0 then
         NempFormBuildOptions.FileOverviewCoverRatio := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)

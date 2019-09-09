@@ -615,7 +615,7 @@ begin
         CorrectVCLForABRepeat;
 
         // correct Splitter
-        Splitter2.Left := AuswahlPanel.Width;
+        SubSplitter1.Left := AuswahlPanel.Width;
 
         // Load correctly scaled graphics
         if Nemp_MainForm.NempSkin.isActive then
