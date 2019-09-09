@@ -657,7 +657,7 @@ end;
 
 
 procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
-var xfactor, yfactor, factor:double;
+var xfactor, yfactor:double;
     tmpBmp: TBitmap;
 begin
   if Source = NIL then exit;
@@ -665,16 +665,14 @@ begin
   xfactor:= (Bounds.Width) / Source.Width;
   yfactor:= (Bounds.Height) / Source.Height;
   if xfactor > yfactor then
-    begin
+  begin
       Bounds.Width := round(Source.Width*yfactor);
       Bounds.Height := round(Source.Height*yfactor);
-      factor := yFactor;
-    end else
-    begin
+  end else
+  begin
       Bounds.Width := round(Source.Width*xfactor);
       Bounds.Height := round(Source.Height*xfactor);
-      factor := xFactor;
-    end;
+  end;
 
     tmpbmp := tBitmap.Create;
     try

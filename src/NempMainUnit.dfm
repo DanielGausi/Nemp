@@ -26,7 +26,6 @@ object Nemp_MainForm: TNemp_MainForm
   OnDestroy = TntFormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = PlaylistVSTKeyUp
-  OnPaint = FormPaint
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96

@@ -40,20 +40,9 @@ uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTree
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
 
-// passt die VCL an die Player-Werte an
-    //procedure CorrectEQButton(band: Integer; ResetCaption: Boolean = True);
-    //procedure CorrectHallButton;
-    //procedure CorrectEchoButtons;
-    //procedure CorrectSpeedButton;
     procedure CorrectVolButton;
-    // Berechnet aus den VCL-Werten die Player-Werte
-    //function VCLEQToPlayer(idx: Integer): Single;
     function APIEQToPlayer(Value: Integer): Single;
-    //function VCLHallToPlayer: Single;
-    //function VCLSpeedToPlayer: Single;
     function VCLVolToPlayer: Integer;
-    //function VCLEchoMixToPlayer: Single;
-    //function VCLEchoTimeToPlayer: Single;
 
     procedure SetProgressButtonPosition(aProgress: Double);
     function ProgressButtonPositionToProgress: Double;
@@ -64,9 +53,6 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
     procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
     procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
-
-    //function ObjectIsPlaylist(aName:string): Boolean;
-    //function ObjectIsHeadphone(aName:string): Boolean;
 
     function GetDropWindowSection(aControl: TWinControl): TWindowSection;
 
@@ -102,6 +88,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
 
     procedure CorrectVCLForABRepeat;
+    procedure RepositionABRepeatButtons;
     procedure SwapABImagesIfNecessary(FixedImage: TImage);
 
     procedure SetBrowseTabWarning(ShowWarning: Boolean);
@@ -143,21 +130,15 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
 procedure CorrectVolButton;
 begin
     with Nemp_MainForm do
-      //VolButton.Top := Round((100-NempPlayer.Volume)/ (100/VolShape.Height) {3.125}) + (VolShape.Top - (VolButton.Height Div 2));
-      //VolButton.Left := Round(({100-}NempPlayer.Volume)/ (100/VolShape.Width) {3.125}) + (VolShape.Left - (VolButton.Width Div 2));
+    begin
+        VolButton.Left := Round(NempPlayer.Volume/ (100/(VolShape.Width - VolButton.Width) )) + VolShape.Left;
+        VolButtonHeadset.Left := Round(NempPlayer.HeadsetVolume/ (100/(VolShapeHeadset.Width - VolButtonHeadset.Width) )) + VolShapeHeadset.Left;
+    end
 
-      VolButton.Left := Round(NempPlayer.Volume/ (100/(VolShape.Width - VolButton.Width) )) + VolShape.Left;
-
-    with Nemp_MainForm do
-      VolButtonHeadset.Left := Round(NempPlayer.HeadsetVolume/ (100/(VolShapeHeadset.Width - VolButtonHeadset.Width) )) + VolShapeHeadset.Left;
-      //:= Round((100-NempPlayer.HeadsetVolume)/ (100/VolShapeHeadset.Height) {3.125}) + (VolShapeHeadset.Top - (VolButtonHeadset.Height Div 2));
 end;
 function VCLVolToPlayer: Integer;
 begin
     with Nemp_MainForm do
-        //result := Round(100-((VolButton.Top - VolShape.Top + (VolButton.Height Div 2))* (100/VolShape.Height){3.125}));
-        //result := Round({100-}((VolButton.Left - VolShape.Left + (VolButton.Width Div 2))* (100/VolShape.Width){3.125}));
-
         result := Round(
         (VolButton.Left - VolShape.Left)  * (100/(VolShape.Width - VolButton.Width))
         );
@@ -400,18 +381,6 @@ begin
     end;
 end;
 
-{
-function ObjectIsPlaylist(aName:string): Boolean;
-begin
-  result := (aName = 'PlaylistVST') or (aName = 'PlaylistVST_IMG');
-end;
-
-function ObjectIsHeadphone(aName:string): Boolean;
-begin
-  result := (aName = 'GRPBOXHeadset');
-end;
-}
-
 
 procedure BlockGUI(aBlockLevel: Integer);
 begin
@@ -500,25 +469,6 @@ begin
         PlayNextBTN         .TabStop := NempOptions.TabStopAtPlayerControls;
         SlideForwardBTN     .TabStop := NempOptions.TabStopAtPlayerControls;
         RandomBtn           .TabStop := NempOptions.TabStopAtPlayerControls;
-        //
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        HallButton          .TabStop := NempOptions.TabStopAtPlayerControls;
-        EchoWetDryMixButton .TabStop := NempOptions.TabStopAtPlayerControls;
-        EchoTimeButton      .TabStop := NempOptions.TabStopAtPlayerControls;
-        SampleRateButton    .TabStop := NempOptions.TabStopAtPlayerControls;
-        DirectionPositionBTN.TabStop := NempOptions.TabStopAtPlayerControls;
-        //PosRewindCB         .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton1    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton2    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton3    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton4    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton5    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton6    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton7    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton8    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton9    .TabStop := NempOptions.TabStopAtPlayerControls;
-        EqualizerButton10   .TabStop := NempOptions.TabStopAtPlayerControls;
-        *)
     end;
 end;
 
@@ -844,15 +794,6 @@ begin
         else
             RecordBtn.Hint := (MainForm_RecordBtnHint_Start);
 
-            (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        if NempPlayer.MainStreamIsReverseStream then
-            DirectionPositionBTN.Hint := (MainForm_ReverseBtnHint_PlayNormal)
-        else
-            DirectionPositionBTN.Hint := (MainForm_ReverseBtnHint_PlayReverse);
-
-        Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
-            *)
-
         if SleepTimer.Enabled then SleepTimerTimer(Nil);
         if BirthdayTimer.Enabled then BirthdayTimerTimer(Nil);
 
@@ -872,7 +813,11 @@ begin
         if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
         if assigned(Wizard               ) then ReTranslateComponent(Wizard              );
         if assigned(PlayerLogForm        ) then ReTranslateComponent(PlayerLogForm       );
-        if assigned(FormEffectsAndEqualizer) then ReTranslateComponent(FormEffectsAndEqualizer);
+        if assigned(FormEffectsAndEqualizer) then
+        begin
+            ReTranslateComponent(FormEffectsAndEqualizer);
+            FormEffectsAndEqualizer.ResetEffectButtons;
+        end;
 
         if assigned(MainFormBuilder) then
         begin
@@ -1439,6 +1384,15 @@ begin
     end;
 end;
 
+procedure RepositionABRepeatButtons;
+begin
+    with Nemp_MainForm do
+    begin
+        ABRepeatStartImg.Left := Round(NempPlayer.ABRepeatA * (SlideBarShape.Width)) + SlideBarShape.Left;
+        ABRepeatEndImg.Left := Round(NempPlayer.ABRepeatB * (SlideBarShape.Width)) + SlideBarShape.Left - ab2.Width;
+    end;
+end;
+
 procedure CorrectVCLForABRepeat;
 var EnableControls: Boolean;
 begin
@@ -1459,7 +1413,7 @@ begin
 
     if assigned(FormEffectsAndEqualizer) then
     begin
-        // Hints anders setzen, wenn Headset-Anzeige? Buttons disabledn?
+        // maybe to do, for later: Disbale Effect-Controls when Headset-Controls are enabled
         //(* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
         FormEffectsAndEqualizer.grpBoxABRepeat   .Enabled := EnableControls;
         FormEffectsAndEqualizer.BtnABRepeatUnSet .Enabled := NempPlayer.ABRepeatActive and EnableControls;

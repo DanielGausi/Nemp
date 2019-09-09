@@ -63,7 +63,6 @@ object ShutDownEditForm: TShutDownEditForm
     ModalResult = 1
     TabOrder = 1
     OnClick = BtnOkClick
-    ExplicitTop = 179
   end
   object BtnCancel: TButton
     AlignWithMargins = True
@@ -76,7 +75,6 @@ object ShutDownEditForm: TShutDownEditForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 2
-    ExplicitTop = 179
   end
   object grpBoxSettings: TGroupBox
     AlignWithMargins = True
@@ -87,7 +85,6 @@ object ShutDownEditForm: TShutDownEditForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Settings'
     TabOrder = 0
-    ExplicitHeight = 160
     object lblIntendedAction: TLabel
       Left = 16
       Top = 76

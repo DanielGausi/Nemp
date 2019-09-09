@@ -389,7 +389,7 @@ NempUpdate_InfoNote = 'Note: %s';
   NempShutDown_ShutDown  = 'Windows will shutdown now. Unsaved data could be lost.';
   NempShutDown_CountDownLbl = 'ShutDown in %d seconds';
 
-  // NempShutDown_StopHint_AtEndOfPlaylist      = 'Nemp will stop in %s.'; // Not needed!
+  NempShutDown_StopHint_AtEndOfPlaylist      = 'Nemp will stop at the end of the playlist.';
   NempShutDown_CloseHint_AtEndOfPlaylist     = 'Nemp will close at the end of the playlist.';
   NempShutDown_SuspendHint_AtEndOfPlaylist   = 'Windows will suspend at the end of the playlist.';
   NempShutDown_HibernateHint_AtEndOfPlaylist = 'Windows will hibernate at the end of the playlist.';

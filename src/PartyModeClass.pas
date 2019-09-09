@@ -314,28 +314,18 @@ begin
         SetOriginalPosition(RatingImage         , i);
 
         // Other Controls
-        //SetOriginalPosition(PlayerPanel         , i);
-        //SetOriginalPosition(GRPBOXCover         , i);
-//        SetOriginalPosition(CoverImage          , i);
-        //SetOriginalPosition(NewPlayerPanel      , i);               // Problem with new GUI
-        //SetOriginalPosition(PaintFrame          , i);               // Problem with new GUI
-        //SetOriginalPosition(SlideBarShape       , i);               // Problem with new GUI
-        //SetOriginalPosition(SlideBarButton      , i);        // Problem with new GUI
-        SetOriginalPosition(ab1                 , i);        // Problem with new GUI
-        SetOriginalPosition(ab2                 , i);        // Problem with new GUI
+        SetOriginalPosition(ab1                 , i);
+        SetOriginalPosition(ab2                 , i);
 
         SetOriginalPosition(LyricsMemo          , i);
 
         // HeadsetControls
         SetOriginalPosition(lblHeadphoneControl    , i);
-
         SetOriginalPosition(BtnLoadHeadset         , i); // disabled right now
-
         SetOriginalPosition(VolButtonHeadset       , i);
         SetOriginalPosition(VolShapeHeadset        , i);
 
         SetOriginalPosition(VolShape            , i);
-
         SetOriginalPosition(VolumeImageHeadset  , i);
 
         // "Tab"-Buttons
@@ -356,9 +346,6 @@ begin
 
         Setlength(fPositionArray, i);
         SetLength(fPartyControls, i);
-
-
-        //showmessage(inttostr(i));
 
         // Additional Controls
         i := 0;
@@ -397,15 +384,10 @@ begin
         SetAdditionalOriginalPosition(  PlayerControlCoverPanel  , i);
         SetAdditionalOriginalPosition(  PlayerControlPanel       , i);
         SetAdditionalOriginalPosition(  HeadsetControlPanel      , i);
-
         SetAdditionalOriginalPosition(ControlContainer2          , i);
-        SetAdditionalOriginalPosition(  NewPlayerPanel           , i);
-
-
+        SetAdditionalOriginalPosition(NewPlayerPanel             , i);
         SetAdditionalOriginalPosition(SlideBarShape   , i);
         SetAdditionalOriginalPosition(SlideBarButton  , i);
-        // SetAdditionalOriginalPosition(ab1             , i);
-        // SetAdditionalOriginalPosition(ab2             , i);
         SetAdditionalOriginalPosition(PlayerTimeLbl   , i);
         SetAdditionalOriginalPosition(PaintFrame      , i);
 
@@ -601,33 +583,6 @@ begin
         SlideBarDiff := SlideBarDiff + (PlayerTimeLbl.Width - currentLeft);
         SlideBarShape.Width := SlideBarShape.Width - SlideBarDiff;
 
-        // PlayerTimeLbl.Width := ChangeProc(fAdditionalPositionsArray[31].Width);
-
-        // todo:
-        // set ab-Positions, set SlidBtn.left
-
-        {
-        SlideBarShape    27
-        SlideBarButton   28
-        ab1              29
-        ab2              30
-        PlayerTimeLbl    31
-        }
-
-
-        //NewPlayerPanel.Left := currentLeft;
-
-         {
-        _ControlPanel             19
-        ControlContainer1         20
-          OutputControlPanel      21
-          PlayerControlCoverPanel 22
-          PlayerControlPanel      23
-          HeadsetControlPanel     24
-        ControlContainer2         25
-          NewPlayerPanel          26
-         }
-
         // =================================
 
         PlaylistVST.Font.Size := ChangeProc(NempOptions.DefaultFontSize);
@@ -656,18 +611,8 @@ begin
         NempPlaylist.FillPlaylistView;
         NempPlaylist.ReInitPlaylist;
 
-
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        for i := 0 to 9 do CorrectEQButton(i);
-        CorrectHallButton;
-        CorrectEchoButtons;
-        CorrectSpeedButton;
-        *)
-
         CorrectVolButton;
-
         CorrectVCLForABRepeat;
-
 
         // correct Splitter
         Splitter2.Left := AuswahlPanel.Width;
@@ -688,11 +633,8 @@ begin
         else
             Spectrum.SetScale(1);
 
-
-        ///Nemp_MainForm.NempSkin.UpdateSpectrumGraphics;
         Spectrum.DrawRating(Nemp_MainForm.RatingImage.Tag);
         ReArrangeToolImages;
-
     end;
 
     if assigned(FDetails) and FDetails.visible then
@@ -704,16 +646,8 @@ begin
     if assigned(OptionsCompleteForm) and OptionsCompleteForm.visible then
         OptionsCompleteForm.Close;
 
-
-    //Nemp_MainForm._TopMainPanel.Constraints.MinHeight := ChangeProc(NempFormBuildOptions.MainPanelMinHeight);
-    //Nemp_MainForm._TopMainPanel.Constraints.MinWidth := ChangeProc(MAIN_PANEL_MIN_WIDTH);
-
     Nemp_MainForm.Constraints.MinWidth  := min(Screen.Width, ChangeProc(800));
     Nemp_MainForm.Constraints.MinHeight := min(Screen.Height-50, ChangeProc(600));
-
-    //Nemp_MainForm.LyricsMemo.Top          := 5;
-    //Nemp_MainForm.LyricsMemo.Height       := Nemp_MainForm.GRPBoxLyrics.Height - 10;
-
 
     if Not fActive then
     begin

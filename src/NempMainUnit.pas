@@ -802,7 +802,6 @@ type
     procedure DoFastSearch(aString: UnicodeString; AllowErr: Boolean = False);
     procedure DoFastIPCSearch(aString: UnicodeString);
 
-    procedure FormPaint(Sender: TObject);
     procedure PlaylistVSTGetHint(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex;
       var LineBreakStyle: TVTTooltipLineBreakStyle;
@@ -933,11 +932,8 @@ type
     procedure SlideBarButtonEndDrag(Sender, Target: TObject; X,
       Y: Integer);
 
-      // !!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
     procedure GrpBoxControlDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
-
 
     procedure VolButtonEndDrag(Sender, Target: TObject; X, Y: Integer);
     procedure TabBtn_PreselectionClick(Sender: TObject);
@@ -2939,11 +2935,8 @@ end;
 
 
 procedure TNemp_MainForm.GRPBOXArtistsAlbenResize(Sender: TObject);
-var newWidth: Integer;
 begin
-
     NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
-
 
     LblEmptyLibraryHint.Width := (GRPBOXArtistsAlben.Width - 50);
     LblEmptyLibraryHint.Left := 25;
@@ -4913,10 +4906,12 @@ begin
                 if aAudioFile.Track <> 0 then
                     tmp := tmp + Format(', Track %d', [aAudioFile.Track]);
                 LblBibAlbum .Caption := tmp;
-                // LblBibTrack .Caption := '';
-                // LblBibTrack .Caption := 'Track ' + SetString(IntToStr(aAudioFile.Track));
 
-                LblBibYear  .Caption := SetString(aAudioFile.Year, AudioFileProperty_Year);
+                tmp := SetString(aAudioFile.Year, AudioFileProperty_Year);
+                if tmp <> '0' then
+                    LblBibYear  .Caption := tmp
+                else
+                    LblBibYear  .Caption := AudioFileProperty_Year + ' N/A';
                 LblBibGenre .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
 
                 if aAudioFile.IsValidArtist then
@@ -5411,8 +5406,8 @@ begin
   // Get Cover
   RefreshVSTCover(aAudiofile);
 
-  if assigned(aAudioFile) and (trim(aAudioFile.Lyrics) <> '') then   // put this into RefreshVSTCover-Method???
-      LyricsMemo.Text := aAudioFile.Lyrics
+  if assigned(aAudioFile) and (trim(String(aAudioFile.Lyrics)) <> '') then   // put this into RefreshVSTCover-Method???
+      LyricsMemo.Text := String(aAudioFile.Lyrics)
   else
       LyricsMemo.Text := MainForm_Lyrics_NoLyrics;
 
@@ -5473,8 +5468,6 @@ begin
     begin
       if (abs(X - CoverImgDownX) > 5) or  (abs(Y - CoverImgDownY) > 5) then
       begin
-          //if Sender = HeadSetCoverImage then
-          //    af := NempPlayer.HeadSetAudioFile
           if (Sender = CoverImage) then
           begin
               if self.MainPlayerControlsActive then
@@ -6282,7 +6275,6 @@ end;
 //vertical splitter between Artist and Album
 procedure TNemp_MainForm.Splitter3Moved(Sender: TObject);
 begin
-    // NempOptions.NempFormRatios.ArtistWidth := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
     NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
 
@@ -6297,7 +6289,6 @@ procedure TNemp_MainForm.Splitter4Moved(Sender: TObject);
 begin
     NempFormBuildOptions.OnSplitterMoved(Sender);
 
-    // NempOptions.NempFormRatios.VSTWidth := Round(DetailID3TagPanel.Width / _VSTPanel.Width * 100);
     if NempSkin.isActive then
     begin
         NempSkin.RepairSkinOffset;
@@ -6309,7 +6300,6 @@ end;
 
 
 procedure TNemp_MainForm.BassTimerTimer(Sender: TObject);
-var newLeft: Integer;
 begin
     if NempPlayer.BassStatus = BASS_ACTIVE_PLAYING then
     begin
@@ -6320,10 +6310,6 @@ begin
               // ... progress (Time, SlideButton)
               ShowProgress(NempPlayer.Progress, NempPlayer.TimeInSec, True);
           end;
-
-          // the rest: do it always
-          // Win7/10 preview
-
 
           //... scroll taskbar title
           if NempPlayer.ScrollTaskbarTitel then
@@ -6401,8 +6387,6 @@ procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject;
 var aRect: TRect;
 begin
   DragSource := DS_PLAYLIST;
-  //ARect.TopLeft :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left, PlaylistVST.Top)));
-  //ARect.BottomRight :=  (GRPBOXPlaylist.ClientToScreen(Point(PlaylistVST.Left + PlaylistVST.Width, PlaylistVST.Top + PlaylistVST.Height)));
   ARect.TopLeft :=  PlaylistVST.ClientToScreen(Point(0,0));
   ARect.BottomRight :=  PlaylistVST.ClientToScreen(Point(PlaylistVST.Width, PlaylistVST.Height));
   ClipCursor(@Arect);
@@ -6638,7 +6622,6 @@ end;
 
 
 procedure TNemp_MainForm.ab1EndDrag(Sender, Target: TObject; X, Y: Integer);
-var swapImg: TImage;
 begin
     ClipCursor(NIL);
     SlideBarButton.Tag := 0;
@@ -6653,6 +6636,14 @@ end;
 procedure TNemp_MainForm.GrpBoxControlDragOver(Sender, Source: TObject; X,
   Y: Integer; State: TDragState; var Accept: Boolean);
 var NewPos: Integer;
+
+    procedure CheckBounds(aMin, aMax: Integer);
+    begin
+        if NewPos <= aMin then NewPos := aMin
+        else
+            if NewPos >= aMax then NewPos := aMax;
+    end;
+
 begin
     if Source = SlideBarButton then
     begin
@@ -6661,12 +6652,7 @@ begin
         else
             NewPos := (Sender as TControl).Left + x - (SlideBarButton.Width Div 2);
 
-        if NewPos <= SlideBarShape.Left - (SlideBarButton.Width Div 2) then
-            NewPos := SlideBarShape.Left - (SlideBarButton.Width Div 2)
-        else
-            if NewPos >= SlideBarShape.Width  + SlideBarShape.Left - (SlideBarButton.Width Div 2) then
-                NewPos := SlideBarShape.Width + SlideBarShape.Left - (SlideBarButton.Width Div 2);
-
+        CheckBounds(SlideBarShape.Left - (SlideBarButton.Width Div 2), SlideBarShape.Width + SlideBarShape.Left - (SlideBarButton.Width Div 2));
         SlideBarButton.Left := NewPos;
 
         if (SlidebarButton.Tag = 1) and not SlidebarButton.Visible then
@@ -6677,65 +6663,46 @@ begin
         else
             PlayerTimeLbl.Caption := NempPlayer.GetHeadsetTimeStringFromProgress(ProgressButtonPositionToProgress);
     end else
-    if Source = VolButton then
-    begin
-        if (Sender is TNempPanel) then
-            NewPos := x - (VolButton.Width Div 2)
-        else
-            NewPos := (Sender as TControl).Left + x - (VolButton.Width Div 2);
+        if Source = VolButton then
+        begin
+            if (Sender is TNempPanel) then
+                NewPos := x - (VolButton.Width Div 2)
+            else
+                NewPos := (Sender as TControl).Left + x - (VolButton.Width Div 2);
 
-        if NewPos <= VolShape.Left then // - (VolButton.Width Div 2) then
-            NewPos := VolShape.Left  // - (VolButton.Width Div 2)
-        else
-            if NewPos >= VolShape.Left + VolShape.Width - VolButton.Width then // - (VolButton.Width Div 2) then
-                NewPos := VolShape.Left + VolShape.Width - VolButton.Width; // - (VolButton.Width Div 2);
+            CheckBounds(VolShape.Left, VolShape.Left + VolShape.Width - VolButton.Width);
+            VolButton.Left := NewPos;
 
-        VolButton.Left := NewPos;
+            NempPlayer.Volume := VCLVolToPlayer;
+        end else
+            if (source = ab1) or (source = ab2) then
+            begin
+                if (Sender is TNempPanel) then
+                    NewPos := x - ((source as TControl).Width Div 2)
+                else
+                    NewPos := (Sender as TControl).Left + x - ((source as TControl).Width Div 2);
 
-        NempPlayer.Volume := VCLVolToPlayer;
-    end else
-    if (source = ab1) or (source = ab2) then
-    begin
-        if (Sender is TNempPanel) then
-            NewPos := x - ((source as TControl).Width Div 2)
-        else
-            NewPos := (Sender as TControl).Left + x - ((source as TControl).Width Div 2);
+                CheckBounds(SlideBarShape.Left, SlideBarShape.Width  + SlideBarShape.Left - (source as TControl).Width);
+                (source as TControl).Left := NewPos;
+                SwapABImagesIfNecessary(Source as TImage);
 
-        if NewPos <= SlideBarShape.Left then // - ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2) then
-            NewPos := SlideBarShape.Left //- ((source as TControl).Width Div 2) + (SlideBarButton.Width Div 2)
-        else
-            if NewPos >= SlideBarShape.Width  + SlideBarShape.Left - (source as TControl).Width  then
-                NewPos := SlideBarShape.Width + SlideBarShape.Left - (source as TControl).Width ;
-        (source as TControl).Left := NewPos;
+                if (Source as TImage) = ABRepeatStartImg then
+                    PlayerTimeLbl.Caption := NempPlayer.GetTimeStringFromProgress((ABRepeatStartImg.Left - SlideBarShape.Left ) / SlideBarShape.Width)
+                else
+                    PlayerTimeLbl.Caption := NempPlayer.GetTimeStringFromProgress((ABRepeatEndImg.Left + ABRepeatEndImg.Width - SlideBarShape.Left) / SlideBarShape.Width);
+            end else
+                if Source = VolButtonHeadset then
+                begin
+                    if (Sender is TNempPanel) then
+                        NewPos := x - (VolButtonHeadset.Width Div 2)
+                    else
+                        NewPos := (Sender as TControl).Left + x - (VolButtonHeadset.Width Div 2);
 
-        SwapABImagesIfNecessary(Source as TImage);
+                    CheckBounds(VolShapeHeadset.Left, VolShapeHeadset.Left + VolShapeHeadset.Width - VolButtonHeadset.Width);
+                    VolButtonHeadset.Left := NewPos;
 
-        if (Source as TImage) = ABRepeatStartImg then
-            PlayerTimeLbl.Caption := NempPlayer.GetTimeStringFromProgress((ABRepeatStartImg.Left - SlideBarShape.Left ) / SlideBarShape.Width)
-            //NempPlayer.DrawTimeFromProgress((ABRepeatStartImg.Left - SlideBarShape.Left ) / SlideBarShape.Width)
-        else
-            PlayerTimeLbl.Caption := NempPlayer.GetTimeStringFromProgress((ABRepeatEndImg.Left + ABRepeatEndImg.Width - SlideBarShape.Left) / SlideBarShape.Width);
-            //NempPlayer.DrawTimeFromProgress((ABRepeatEndImg.Left + ABRepeatEndImg.Width - SlideBarShape.Left) / SlideBarShape.Width);
-    end else
-    if Source = VolButtonHeadset then
-    begin
-        if (Sender is TNempPanel) then
-            NewPos := x - (VolButtonHeadset.Width Div 2)
-        else
-            NewPos := (Sender as TControl).Left + x - (VolButtonHeadset.Width Div 2);
-
-        if NewPos <= VolShapeHeadset.Left then // - (VolButton.Width Div 2) then
-          NewPos := VolShapeHeadset.Left  // - (VolButton.Width Div 2)
-        else
-          if NewPos >= VolShapeHeadset.Left + VolShapeHeadset.Width - VolButtonHeadset.Width then // - (VolButton.Width Div 2) then
-            NewPos := VolShapeHeadset.Left + VolShapeHeadset.Width - VolButtonHeadset.Width; // - (VolButton.Width Div 2);
-
-        VolButtonHeadset.Left := NewPos;
-
-        NempPlayer.HeadSetVolume := Round(
-        (VolButtonHeadset.Left - VolShapeHeadset.Left)  * (100/(VolShapeHeadset.Width - VolButtonHeadset.Width))
-        );
-    end;
+                    NempPlayer.HeadSetVolume := Round((VolButtonHeadset.Left - VolShapeHeadset.Left)  * (100/(VolShapeHeadset.Width - VolButtonHeadset.Width)));
+                end;
 end;
 
 procedure TNemp_MainForm.SlideBarButtonEndDrag(Sender, Target: TObject; X,
@@ -6815,9 +6782,6 @@ begin
       NempPlaylist.PlayPrevious(True);
   Basstimer.Enabled := NempPlayer.Status = PLAYER_ISPLAYING;
 end;
-
-
-
 
 
 procedure TNemp_MainForm.StopBTNIMGClick(Sender: TObject);
@@ -6931,16 +6895,12 @@ begin
     end;
 end;
 
-
-
-
 procedure TNemp_MainForm.BtnLoadHeadsetClick(Sender: TObject);
 begin
     // Play new song in headset
     NempPlayer.PlayInHeadset(MedienBib.CurrentAudioFile);
     // Show Details
     DisplayHeadsetTitleInformation(False);
-    //ShowHeadsetDetails(MedienBib.CurrentAudioFile);
 end;
 
 procedure TNemp_MainForm.StopHeadSetBtnClick(Sender: TObject);
@@ -6966,8 +6926,6 @@ begin
             NempPlaylist.Play(CurrentIdx, 0, True);
         end;
     end;
-
-
 end;
 
 procedure TNemp_MainForm.PM_PlayFilesClick(Sender: TObject);
@@ -7482,13 +7440,11 @@ begin
 end;
 
 procedure TNemp_MainForm.PlaylistCueChanged(Sender: TObject);
-var af: TAudioFile;
 begin
     if MainPlayerControlsActive then
     begin
         if assigned(NempPlayer.MainAudioFile) then
         begin
-            af := NempPlayer.MainAudioFile;
             PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
             PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
         end;
@@ -7498,8 +7454,7 @@ end;
 
 // new procedure ... fit it in somehow ...
 procedure TNemp_MainForm.DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
-var SlidebarEnabled: Boolean;
-    fn, tmp, aHint: String;
+var fn, aHint: String;
     af: TAudioFile;
 begin
     if MainPlayerControlsActive then
@@ -7567,8 +7522,7 @@ begin
 end;
 
 procedure TNemp_MainForm.DisplayHeadsetTitleInformation(GetCoverWasSuccessful: Boolean);
-var SlidebarEnabled: Boolean;
-    fn, aHint: String;
+var fn, aHint: String;
     af: TAudioFile;
 begin
     if not MainPlayerControlsActive then
@@ -7638,7 +7592,6 @@ begin
 end;
 
 procedure TNemp_MainForm.ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
-var tmp: Boolean;
 begin
     // called from: CreateHelper - StuffToDoAfterCreate (if not playing) to init the display
     //              Player.Play
@@ -8778,7 +8731,6 @@ end;
 
 
 procedure TNemp_MainForm.PlayerTabsClick(Sender: TObject);
-var dim: Integer;
 begin
     Case (Sender as TControl).Tag of
         1: begin
@@ -9017,52 +8969,9 @@ end;
 
 
 procedure TNemp_MainForm.FormResize(Sender: TObject);
-var newHeight, newWidth: Integer;
 begin
-//  TopMainPanel.Constraints.MaxHeight := Height - 160;
-
-
     if AnzeigeMode = 1 then
-    begin
-        // UpdateSmallMainForm;
-        // CorrectSkinRegionsTimer.Enabled := True;
-
         SetRegion(__MainContainerPanel , self, NempRegionsDistance, handle);
-
-        //CorrectSkinRegions;
-    end;
-
-
-    exit;
-
-           (*
-  if AnzeigeMode = 0 then
-  begin
-      _TopMainPanel.Constraints.MaxHeight := Height - 172;
-
-      newHeight := Round(NempOptions.NempFormRatios.VSTHeight / 100 * Height);
-
-      if NewHeight < _TopMainPanel.Constraints.MinHeight then
-          NewHeight := _TopMainPanel.Constraints.MinHeight;
-
-      if Height - NewHeight < 172 then
-          NewHeight := Height - 172;
-
-      _TopMainPanel.Height := NewHeight;
-
-
-      newWidth := Round(NempOptions.NempFormRatios.BrowseWidth / 100 * (Width{ - PlayerPanel.Width}));
-
-      if newWidth < 150 then //minimum BrowseList-width
-          newWidth := 150;
-      AuswahlPanel.Width := newWidth;
-
-
-      AuswahlPanel.Constraints.MaxWidth := Width - 234 - 150;
-      //if Width - 234 - AuswahlPanel.Width < 150 then
-      //    AuswahlPanel.Width := Width - 234 - 150;
-
-  end;  *)
 end;
 
 
@@ -9115,7 +9024,7 @@ begin
 
     RefreshCoverFlowTimer.Enabled := False;
     DoFastSearch(Trim(EDITFastSearch.Text), MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType);
-    if (MedienBib.AnzeigeListe.Count) {+ (MedienBib.AnzeigeListe2.Count)} > 1 then
+    if (MedienBib.AnzeigeListe.Count) > 1 then
     begin
         // Restart Timer
         if MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow
@@ -9360,17 +9269,6 @@ begin
               else
                   FillTreeViewQueryTooShort;
   end;
-end;
-
-
-
-procedure TNemp_MainForm.FormPaint(Sender: TObject);
-begin
-  (*if ((Not BassTimer.Enabled) OR (NOT NempPlayer.UseVisualization))
-      And (not NempIsClosing)
-  then
-      Spectrum.DrawClear;
-      *)
 end;
 
 
@@ -9706,7 +9604,6 @@ begin
   begin
       FormPosAndSizeCorrect(PlaylistForm);
       PlaylistForm.FormResize(Nil);
-      //ReInitRelativePositions;
   end;
   ReInitDocks;
 end;
@@ -9723,7 +9620,6 @@ begin
   begin
       FormPosAndSizeCorrect(MedienListeForm);
       MedienListeForm.FormResize(Nil);
-      //ReInitRelativePositions;
   end;
   ReInitDocks;
 end;
@@ -9767,7 +9663,6 @@ begin
   begin
       FormPosAndSizeCorrect(AuswahlForm);
       AuswahlForm.FormResize(Nil);
-      //ReInitRelativePositions;
   end;
   ReInitDocks;
 end;
@@ -9784,7 +9679,7 @@ begin
   if ExtendedControlForm.Visible then
   begin
       FormPosAndSizeCorrect(ExtendedControlForm);
-      //MedienListeForm.FormResize(Nil);
+      ExtendedControlForm.FormResize(Nil);
   end;
   ReInitDocks;
 end;
@@ -9828,6 +9723,9 @@ end;
 procedure TNemp_MainForm.NewPlayerPanelResize(Sender: TObject);
 begin
     PaintFrame.Visible := NewPlayerPanel.Width > 170;
+
+    if NempPlayer.ABRepeatActive then
+        RepositionABRepeatButtons;
 end;
 
 
@@ -9861,7 +9759,7 @@ begin
   begin
       result := #13#10#13#10 + NempShutDown_AtEndOfPlaylist_Hint;
       Case NempOptions.ShutDownMode of
-            SHUTDOWNMODE_StopNemp  : result := Format((NempShutDown_StopHint     ),  [SekToZeitString(c, true)] );
+            SHUTDOWNMODE_StopNemp  : result := NempShutDown_StopHint_AtEndOfPlaylist     + result;
             SHUTDOWNMODE_ExitNemp  : result := NempShutDown_CloseHint_AtEndOfPlaylist    + result;
             SHUTDOWNMODE_Suspend   : result := NempShutDown_SuspendHint_AtEndOfPlaylist  + result;
             SHUTDOWNMODE_Hibernate : result := NempShutDown_HibernateHint_AtEndOfPlaylist+ result;
@@ -9913,8 +9811,7 @@ begin
 end;
 
 procedure TNemp_MainForm.Player_PopupMenuPopup(Sender: TObject);
-var c: Integer;
-    PartyModeNotActive, ToolsNotBlockedBypartymode: Boolean;
+var PartyModeNotActive, ToolsNotBlockedBypartymode: Boolean;
     CaptionString: String;
 begin
     // enable/disable several items regarding PartyMode
@@ -10029,7 +9926,6 @@ begin
 end;
 
 procedure TNemp_MainForm.Schlafmodusdeaktivieren1Click(Sender: TObject);
-var c: Integer;
 begin
     if SleepTimer.Enabled or NempOptions.ShutDownAtEndOfPlaylist then
     begin
@@ -10175,15 +10071,7 @@ begin
     Handle_STNewFile(Msg);
 end;
 
-(*
-procedure TNemp_MainForm.STNewDir   (var Msg: TMessage);
-begin
-    Handle_STNewDir(Msg);
-end;
-*)
-
-
-procedure TNemp_MainForm.STFinish   (var Msg: TMessage);
+procedure TNemp_MainForm.STFinish(var Msg: TMessage);
 begin
     Handle_STFinish(Msg);
 end;
@@ -10449,32 +10337,6 @@ begin
   SetForeGroundWindow(Handle);
 end;
 
-(*
-procedure TNemp_MainForm.ActualizeVDTCover;
-begin
-    // wird von Options - OK aufgerufen nach Änderung der Cover-Zeugs
-
-    if NempOptions.ShowCoverAndDetails then
-    begin
-        DetailID3TagPanel.Width := NempOptions.CoverWidth;
-        //Splitter4.Align := alRight;
-        //VDTCover.Align := alRight;
-
-        Splitter4.Visible := True;
-        //VDTCover.Visible := True;
-        //Splitter4.Left := VST.Width;
-        //VDTCover.Left := VST.Width + Splitter4.Width;
-
-    end else
-    begin
-        DetailID3TagPanel.Width := 0;
-        Splitter4.Visible := False;
-        //VDTCover.Visible := False;
-    end;
-
-     MedienBibDetailPanelResize(DetailID3TagPanel);
-end;
-*)
 
 
 procedure TNemp_MainForm.PM_PL_ClearPlaylistClick(Sender: TObject);
@@ -10545,15 +10407,7 @@ end;
 Procedure TNemp_MainForm.RepaintPlayerPanel;
 begin
   if NempSkin.isActive and NOT Nempskin.FixedBackGround then
-  begin
-    // PlayerPanel.Repaint;
-    //if NOT _IsThemeActive then // some issues with windows 10 - always paint everything
-    //begin
       NewPlayerPanel.Repaint;
-      //GRPBOXLyrics.Repaint;
-      //GRPBOXCover.Repaint;
-    //end;
-  end;
 end;
 
 Procedure TNemp_MainForm.RepaintOtherForms;
@@ -10583,11 +10437,7 @@ begin
   OR (NOT NempPlayer.UseVisualization)
   OR (NempPlayer.BassStatus <> BASS_ACTIVE_PLAYING)
   then
-  begin
         Spectrum.DrawClear;
-        //Spectrum.DrawText(Spectrum.TextString,False);
-        //Spectrum.DrawTime(Spectrum.TimeString);
-  end;
 end;
 
 
@@ -10626,7 +10476,6 @@ begin
 
     // Special case Artist/Album: Paint Browse-Bitmap (if set)
     NempSkin.DrawArtistAlbumPanel((Sender as TNempPanel), MedienBib.Count, NempSkin.UseBackgroundImages[(Sender as TNempPanel).Tag]);
-
 
     aPanel.Canvas.Brush.Style := bsclear;
     aPanel.Canvas.Pen.Color := Nempskin.SkinColorScheme.GroupboxFrameCL;  //TabTextCL;
@@ -10775,7 +10624,6 @@ begin
     end;
   end;
 end;
-
 
 
 
@@ -10940,14 +10788,6 @@ begin
         NempFormBuildOptions.FileOverviewCoverRatio := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)
     else
         NempFormBuildOptions.FileOverviewCoverRatio := 50;
-
-    // ??
-    if NempSkin.isActive then
-    begin
-        //NempSkin.RepairSkinOffset;
-        //NempSkin.SetVSTOffsets;
-        //RepaintPanels;
-    end;
 end;
 
 
@@ -10955,21 +10795,6 @@ procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
     ExtraSpace := 16 * AnzeigeMode;
-
-   { // handle Search-Edit-stuff
-    if PlaylistPanel.Parent <> _TopMainPanel then
-    begin
-        if PlaylistPanel.Width <= 120 then
-            EditplaylistSearch.Width := 65 - (120 - PlaylistPanel.Width)
-        else
-            EditplaylistSearch.Width := 65;
-        PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
-        PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - 16;
-    end else
-    begin
-    end;
-    }
-
     PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
     PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;

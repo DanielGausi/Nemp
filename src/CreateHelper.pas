@@ -214,17 +214,6 @@ begin
             ini.Free;
         end;
         }
-
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        ini := TMeminiFile.Create(SavePath + 'Nemp_EQ.ini');
-        try
-            InitEqualizerMenuFormIni(ini);
-            Btn_EqualizerPresets.Caption := NempPlayer.EQSettingName;
-        finally
-            ini.Free
-        end;
-        *)
-
         SetRecentPlaylistsMenuItems;
 
     end;
@@ -425,31 +414,13 @@ end;
 
 
 procedure ApplySettings;
-var i: integer;
-    maxFont: integer;
+var maxFont: integer;
 begin
     UpdateSplashScreen(SplashScreen_InitPlayer);
     with Nemp_MainForm do
     begin
-        // EQ-Buttons-Array befüllen
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        EqualizerButtons[0] := EqualizerButton1;
-        EqualizerButtons[1] := EqualizerButton2;
-        EqualizerButtons[2] := EqualizerButton3;
-        EqualizerButtons[3] := EqualizerButton4;
-        EqualizerButtons[4] := EqualizerButton5;
-        EqualizerButtons[5] := EqualizerButton6;
-        EqualizerButtons[6] := EqualizerButton7;
-        EqualizerButtons[7] := EqualizerButton8;
-        EqualizerButtons[8] := EqualizerButton9;
-        EqualizerButtons[9] := EqualizerButton10;
-        *)
-
         CorrectVolButton;
-        //CorrectHallButton;
-        //CorrectEchoButtons;
-        //CorrectSpeedButton;
-        //for i := 0 to 9 do CorrectEQButton(i);
+
         // TabStops setzen
         SetTabStopsPlayer;
         SetTabStopsTabs;

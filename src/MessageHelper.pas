@@ -1503,7 +1503,6 @@ end;
 function Handle_WndProc(var Message: TMessage): Boolean;
 var devType: Integer;
   Datos: PDevBroadcastHdr;
-  tmp: Boolean;
 //  VolInfo: PDevBroadcastVolume;
 //  UnitMask: DWord;
 begin
@@ -1666,7 +1665,6 @@ begin
                                       case Message.WParam of
                                           NEMP_API_STOPPED: begin
                                                 PlayPauseHeadSetBtn.GlyphLine := 0;
-                                                //PlayPauseHeadSetBtn.Caption := 'Play';
                                                 HeadSetTimer.Enabled := False;
                                                 if NOT MainPlayerControlsActive then
                                                     SetProgressButtonPosition(0);

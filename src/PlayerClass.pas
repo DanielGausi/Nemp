@@ -1865,7 +1865,6 @@ begin
 end;
 
 procedure TNempPlayer.PlayInHeadset(aAudioFile: TAudioFile); // kein PlaylistFile, weil auch aus der Medienliste ein Jingle gespielt werden kann
-var CoverIsLoaded: Boolean;
 begin
   if not Bass_SetDevice(HeadsetDevice) then
       exit;
@@ -1912,7 +1911,7 @@ begin
   end;
 
   // get the cover for the current Headset-File
-  CoverIsLoaded := RefreshHeadsetCoverBitmap;
+  RefreshHeadsetCoverBitmap;
 end;
 
 

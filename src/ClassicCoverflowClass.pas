@@ -163,11 +163,10 @@ end;
 
 procedure TClassicCoverFlow.DrawScrollCover(aIdx: Integer; aWidth, aHeight: Integer);
 var mitte, minidx, maxidx, i: Integer;
-    abmp: TBitmap;
-    ajpg: TJpegImage;
+    aPicture: TPicture;
     xfactor, yfactor:double;
     NewHeight, NewWidth: Integer;
-    bigbmp: TBitmap;
+    bigbmp, tmpBmp: TBitmap;
     aCover: TNempCover;
 begin
   mitte := aWidth Div 2;
@@ -177,52 +176,58 @@ begin
   if minidx < 0 then minidx := 0;
   if maxidx >= Coverlist.Count-1 then maxidx := Coverlist.Count - 1;
 
-  ajpg := TJpegImage.Create;
-  abmp := TBitmap.Create;
+  aPicture := TPicture.Create;
   bigbmp := TBitmap.Create;
-  bigbmp.Width := aWidth;
-  Bigbmp.Height := aHeight;
-  bigbmp.TransparentColor := cllime;
-  Bigbmp.Canvas.Brush.Color := clLime;
-  bigbmp.Canvas.FillRect(Rect(0,0,bigbmp.Width, bigbmp.Height));
+  try
+      aPicture.Bitmap.Width := 75;
+      aPicture.Bitmap.Height := 75;
 
-  (* TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-  for i := minidx to maxidx do
-  begin
-          aCover := TNempCover(Coverlist[i]);
+      bigbmp.Width := aWidth;
+      Bigbmp.Height := aHeight;
+      bigbmp.TransparentColor := cllime;
+      Bigbmp.Canvas.Brush.Color := clLime;
+      bigbmp.Canvas.FillRect(Rect(0,0,bigbmp.Width, bigbmp.Height));
 
-          GetCoverBitmapFromID(aCover.ID, aBmp, CoverSavePath);
-
-          if (abmp.Width > 0) AND (abmp.Height > 0) then
+      tmpBmp := TBitmap.Create;
+      try
+          for i := minidx to maxidx do
           begin
-              xfactor:= (75) / abmp.Width;
-              yfactor:= (75) / abmp.Height;
-              if xfactor > yfactor then
-                begin
-                  NewWidth := round(abmp.Width * yfactor);
-                  NewHeight := round(abmp.Height * yfactor);
-                end else
-                begin
-                  NewWidth := round(abmp.Width * xfactor);
-                  NewHeight := round(abmp.Height * xfactor);
-                end;
+              aCover := TNempCover(Coverlist[i]);
+              GetCoverBitmapFromID(aCover.ID, aPicture, CoverSavePath);
+              AssignBitmap(tmpBmp, aPicture);
 
-              SetStretchBltMode(bigbmp.Canvas.Handle, HALFTONE);
-              StretchBlt(bigbmp.Canvas.Handle,
-                          (mitte - 37)  - (aIdx - i) * 85 + ( (75-NewWidth) Div 2)
-                          ,
-                         (75 - Newheight) Div 2, NewWidth, NewHeight,
+              if (tmpBmp.Width > 0) AND (tmpBmp.Height > 0) then
+              begin
+                  xfactor:= (75) / tmpBmp.Width;
+                  yfactor:= (75) / tmpBmp.Height;
+                  if xfactor > yfactor then
+                  begin
+                      NewWidth := round(tmpBmp.Width * yfactor);
+                      NewHeight := round(tmpBmp.Height * yfactor);
+                  end else
+                  begin
+                      NewWidth := round(tmpBmp.Width * xfactor);
+                      NewHeight := round(tmpBmp.Height * xfactor);
+                  end;
 
-                          abmp.Canvas.Handle, 0, 0, abmp.Width, abmp.Height, SRCCopy);
-
+                  SetStretchBltMode(bigbmp.Canvas.Handle, HALFTONE);
+                  StretchBlt(bigbmp.Canvas.Handle,
+                              (mitte - 37)  - (aIdx - i) * 85 + ( (75-NewWidth) Div 2)
+                              ,
+                             (75 - Newheight) Div 2, NewWidth, NewHeight,
+                              tmpBmp.Canvas.Handle, 0, 0, tmpBmp.Width, tmpBmp.Height, SRCCopy);
+              end;
           end;
+      finally
+          tmpBmp.Free;
+      end;
+
+      ScrollImage.Picture.Assign(bigbmp);
+      ScrollImage.Refresh;
+  finally
+      bigbmp.Free;
+      aPicture.Free;
   end;
-  *)
-  ScrollImage.Picture.Assign(bigbmp);
-  ScrollImage.Refresh;
-  bigbmp.Free;
-  ajpg.Free;
-  abmp.Free;
 end;
 
 end.

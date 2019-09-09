@@ -290,8 +290,6 @@ begin
 end;
 
 procedure TExtendedControlForm.FormShow(Sender: TObject);
-var formregion: HRGN;
-    xpbottom, xptop, xpleft, xpright: integer;
 begin
 
   Left   := BLeft   ;

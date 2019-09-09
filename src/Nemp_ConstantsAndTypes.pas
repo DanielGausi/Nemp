@@ -1365,7 +1365,6 @@ end;
 
 procedure TNempFormBuildOptions.OnMainContainerResize(Sender: TObject);
 var aChildList: TPanelList;
-    i, newSize: Integer;
 begin
     if fRebuildingRightNow then
         exit;
@@ -1575,7 +1574,7 @@ begin
     BlockFileOverview.fRatio      := aIni.ReadInteger('FormBuilder', 'BlockFileOverviewRatio' , 30);
 
     // main Ratio and some special ratios
-    TopPanelRatio          := aIni.ReadInteger('FormBuilder', 'RatioTopPanel'         , 50);
+    TopPanelRatio          := aIni.ReadInteger('FormBuilder', 'RatioTopPanel'         , 60);
     BrowseArtistRatio      := aIni.ReadInteger('FormBuilder', 'RatioBrowseArtist'     , 50);
     FileOverviewCoverRatio := aIni.ReadInteger('FormBuilder', 'RatioFileOverviewCover', 50);
 
@@ -1982,6 +1981,13 @@ begin
             if Not SizeFits then
                 for i := 0 to PanelBChilds.Count - 1 do RatioArrayB[i] := 1/PanelBChilds.Count;
         end;
+        else begin
+            // just some dummy values. Should never occur
+            completeSizeA := 500;
+            completeSizeB := 500;
+        end;
+
+
     end;
 
     // Set Parents again
@@ -2119,7 +2125,6 @@ end;
 
 procedure TNempFormBuildOptions.RefreshBothRowsOrColumns(DoSort: Boolean);
 var rescaleFactorA, rescaleFactorB: Double;
-    i: Integer;
 begin
 
     // Nope. RefreshMainLayout; // if needed: turn mainpanels by 90 degrees
@@ -2203,11 +2208,6 @@ begin
 
             ControlPanel.Container1.Top := 0;
             ControlPanel.Container1.Width := ControlPanel.Width;
-                                           { ControlPanel.Select.Width +
-                                             ControlPanel.Cover.width +
-                                             ControlPanel.Visualisation.Width +
-                                             ControlPanel.Player.Width;      /// !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                             }
             ControlPanel.Container1.Height := CONTROL_PANEL_HEIGHT_1;
 
             ControlPanel.Container2.Top := CONTROL_PANEL_HEIGHT_1;
@@ -2241,12 +2241,8 @@ begin
             ControlPanel.Container1.Left := 0;
             ControlPanel.Container1.Width := ControlPanel.Select.Width +
                                              ControlPanel.Cover.width +
-                                             ControlPanel.Player.Width;   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                             ControlPanel.Player.Width;
 
-                                             //one of Heaset7player is always invsible
-                                             //ControlPanel.Headset.Width;
-
-                                             //ControlPanel.Visualisation.Width +
             ControlPanel.Container1.Height := CONTROL_PANEL_HEIGHT_1;
             ControlPanel.Container2.Height := CONTROL_PANEL_HEIGHT_1;
             ControlPanel.Height := CONTROL_PANEL_HEIGHT_1;

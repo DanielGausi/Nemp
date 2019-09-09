@@ -166,7 +166,6 @@ ShowWindow
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
-  Application.CreateForm(TFormEffectsAndEqualizer, FormEffectsAndEqualizer);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

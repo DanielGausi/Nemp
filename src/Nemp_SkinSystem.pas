@@ -99,8 +99,6 @@ type
       ShapePenProgressCL: TColor;
       ShapeBrushProgressCL: TColor;
       SplitterColor: TColor;
-      // Splitter2Color: TColor;
-      // Splitter3Color: TColor;
       PlaylistPlayingFileColor: TColor;
 
       // Farben (und Optionen) für die Bitraten-Darstellung in der Playlist/Medienliste
@@ -151,17 +149,8 @@ type
         (Name: 'BtnHeadsetPlaynow'     ; Visible: True; Left: 100; Top: 30; Width: 24; Height: 24),  // '',
         (Name: 'BtnHeadsetToPlaylist'  ; Visible: True; Left: 124; Top: 30; Width: 24; Height: 24),  // '',
 
-        {(Name: 'BtnPlayPause'    ; Visible: True; Left:  61; Top: 98; Width: 24; Height: 24),  // 'PlayBtn',
-        (Name: 'BtnStop'         ; Visible: True; Left:  85; Top: 98; Width: 24; Height: 24),  // 'StopBtn',
-        (Name: 'BtnNext'         ; Visible: True; Left: 133; Top: 98; Width: 24; Height: 24),  // 'NextBtn',
-        (Name: 'BtnPrev'         ; Visible: True; Left:  37; Top: 98; Width: 24; Height: 24),  // 'PrevBtn',
-        (Name: 'BtnSlideForward' ; Visible: True; Left: 157; Top: 98; Width: 24; Height: 24),  // 'SlideForwardBtn',
-        (Name: 'BtnSlideBackward'; Visible: True; Left:  13; Top: 98; Width: 24; Height: 24),   // 'SlidebackwardBtn'
-        (Name: 'BtnRandom'       ; Visible: True; Left: 191; Top: 98; Width: 24; Height: 24),  // 'RandomBtn',
-        (Name: 'BtnRecord'       ; Visible: True; Left: 109; Top: 98; Width: 24; Height: 24),  // 'RecordBtn',}
-        // (Name: 'BtnMinimize'     ; Visible: False; Left: 202; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
         (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12)  // 'CloseBtn',
-        //(Name: 'BtnMenu'         ; Visible: False; Left:   8; Top: 52; Width: 12; Height: 12)  // 'MenuBtn',
+
       ) ;
 
   type
@@ -389,8 +378,6 @@ type
         procedure SetVSTOffsets;
         Procedure SetPlaylistOffsets;
 
-        procedure SetControlOffsets;
-
         procedure SetDefaultMenuImages;
 
         //procedure DrawPreview(aPanel: TNempPanel);
@@ -459,7 +446,6 @@ begin
 end;
 
 constructor TNempSkin.create;
-var i: Integer;
 begin
   inherited create;
   CompleteBitmap := TBitmap.Create;
@@ -476,8 +462,6 @@ begin
   // ControlVisBmp       := TBitmap.Create;
   ControlGenericBmp   := TBitmap.Create;
   PaintedProgressBitmap := TBitmap.Create;
-
-  //ExtendedPlayerBitmap := TBitmap.Create;
 
   NempPartyMode := TNempPartyMode.Create;
   NempPartymode.BackupOriginalPositions;
@@ -561,31 +545,9 @@ begin
 
   SlideButtons[0].Button  := Nemp_MainForm.VolButton           ;
   SlideButtons[1].Button  := Nemp_MainForm.SlideBarButton      ;
-
-  // tmp!!!
-  //for i := 2 to 15 do SlideButtons[i].Button := Nemp_MainForm.SlideBarButton      ;
-  (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-  SlideButtons[2].Button  := Nemp_MainForm.HallButton          ;
-  SlideButtons[3].Button  := Nemp_MainForm.EchoWetDryMixButton ;
-  SlideButtons[4].Button  := Nemp_MainForm.EchoTimeButton      ;
-  SlideButtons[5].Button  := Nemp_MainForm.SampleRateButton    ;
-  SlideButtons[6].Button  := Nemp_MainForm.EqualizerButton1    ;
-  SlideButtons[7].Button  := Nemp_MainForm.EqualizerButton2    ;
-  SlideButtons[8].Button  := Nemp_MainForm.EqualizerButton3    ;
-  SlideButtons[9].Button  := Nemp_MainForm.EqualizerButton4    ;
-  SlideButtons[10].Button := Nemp_MainForm.EqualizerButton5    ;
-  SlideButtons[11].Button := Nemp_MainForm.EqualizerButton6    ;
-  SlideButtons[12].Button := Nemp_MainForm.EqualizerButton7    ;
-  SlideButtons[13].Button := Nemp_MainForm.EqualizerButton8    ;
-  SlideButtons[14].Button := Nemp_MainForm.EqualizerButton9    ;
-  SlideButtons[15].Button := Nemp_MainForm.EqualizerButton10   ;
-  *)
   SlideButtons[2].Button := Nemp_MainForm.VolButtonHeadset    ;
+
   SlideButtons[0].GlyphFile := 'SlideBtnLeftRight'; //'SlideBtnVolume';
-
-  //for i := 1 to 5 do SlideButtons[i].GlyphFile := 'SlideBtnLeftRight';
-  //for i := 6 to 15 do SlideButtons[i].GlyphFile := 'SlideBtnUpDown';
-
   SlideButtons[1].GlyphFile := 'SlideBtnLeftRight';
   SlideButtons[2].GlyphFile := 'SlideBtnLeftRight';//'SlideBtnVolume';
 
@@ -607,10 +569,8 @@ begin
   ControlSelectionBmp  .Free;
   ControlCoverBmp      .Free;
   ControlProgressBmp   .Free;
-  // ControlVisBmp        .Free;
   ControlGenericBmp    .Free;
   PaintedProgressBitmap.Free;
-  // ExtendedPlayerBitmap.Free;
 
   SetStarBitmap.Free;
   HalfStarBitmap.Free;
@@ -666,15 +626,13 @@ begin
         PlayerPageOffsetYOrig := Ini.ReadInteger('BackGround','PlayerPageOffsetY', 0);
         if FixedBackGround then
         begin
-          PlayerPageOffsetX := PlayerPageOffsetXOrig;
-          PlayerPageOffsetY := PlayerPageOffsetYOrig;
+            PlayerPageOffsetX := PlayerPageOffsetXOrig;
+            PlayerPageOffsetY := PlayerPageOffsetYOrig;
         end else
         begin
-           // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          aPoint := Nemp_MainForm.PlayerControlPanel.ClientToScreen(Point(0,0));
-
-          PlayerPageOffsetX := aPoint.X + PlayerPageOffsetXOrig; //Nemp_MainForm.Left + Nemp_MainForm.PlayerPanel.Left + PlayerPageOffsetXOrig;
-          PlayerPageOffsetY := aPoint.Y + PlayerPageOffsetYOrig; //Nemp_MainForm.Top + Nemp_MainForm.PlayerPanel.Top + PlayerPageOffsetYOrig;
+            aPoint := Nemp_MainForm.PlayerControlPanel.ClientToScreen(Point(0,0));
+            PlayerPageOffsetX := aPoint.X + PlayerPageOffsetXOrig; //Nemp_MainForm.Left + Nemp_MainForm.PlayerPanel.Left + PlayerPageOffsetXOrig;
+            PlayerPageOffsetY := aPoint.Y + PlayerPageOffsetYOrig; //Nemp_MainForm.Top + Nemp_MainForm.PlayerPanel.Top + PlayerPageOffsetYOrig;
         end;
         //
         //--------------------------
@@ -915,17 +873,6 @@ begin
       if not LoadGraphicFromBaseName(ControlGenericBmp, DirName + '\ControlGeneric', True) then
           PaintFallbackImage(ControlGenericBmp);
 
-      {
-      if not LoadGraphicFromBaseName(ExtendedPlayerBitmap, DirName + '\extendedplayer', true) then
-      begin
-          ExtendedPlayerBitmap.Width := 10;
-          ExtendedPlayerBitmap.Height := 10;
-          ExtendedPlayerBitmap.Canvas.Brush.Color := SkinColorScheme.FormCL;
-          ExtendedPlayerBitmap.Canvas.Pen.Color := SkinColorScheme.LabelCL;
-          ExtendedPlayerBitmap.Canvas.FillRect(ExtendedPlayerBitmap.Canvas.ClipRect);
-      end;
-      }
-
   end;
 
   if Not Complete then exit;
@@ -1101,7 +1048,6 @@ begin
 
     end else
     begin
-        // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // 2019: This should be the same as in all the "OffsetPoints" in later methods. Or not?
         aPoint := Nemp_MainForm.PlayerControlPanel.ClientToScreen(Point(0,0));
         PlayerPageOffsetX := aPoint.X + PlayerPageOffsetXOrig;
@@ -1109,12 +1055,6 @@ begin
     end;
 end;
 
-procedure TNempSkin.SetControlOffsets;
-begin
-    if FormBuilder.RebuildingRightNow then
-        exit;
-    // TODO ????
-end;
 
 procedure TNempSkin.fSetTreeLocalOffsetPoint(aTree: TVirtualStringTree; aAlignment: Integer; DoTile: Boolean; aBitmap: TBitmap; aParent: TWinControl = Nil);
 var aPoint: TPoint;
@@ -1389,20 +1329,6 @@ begin
                         True);
                     ExtendedControlForm.CloseImageE.GlyphLine := ExtendedControlForm.CloseImageE.GlyphLine;
 
-                (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-                AssignNemp3Glyph(DirectionPositionBTN,  Path + '\BtnReverse', True);
-                DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
-
-                AssignNemp3Glyph(BtnABRepeatSetA,  Path + '\BtnABRepeatSetA', True);
-                BtnABRepeatSetA.GlyphLine := BtnABRepeatSetA.GlyphLine;
-
-                AssignNemp3Glyph(BtnABRepeatSetB,  Path + '\BtnABRepeatSetB', True);
-                BtnABRepeatSetB.GlyphLine := BtnABRepeatSetB.GlyphLine;
-
-                AssignNemp3Glyph(BtnABRepeatUnset,  Path + '\BtnABRepeatUnset', True);
-                BtnABRepeatUnset.GlyphLine := BtnABRepeatUnset.GlyphLine;
-                *)
-
                 AssignNemp3Glyph(BtnLoadHeadset,  Path + '\BtnLoadHeadset', True);
                 BtnLoadHeadset.GlyphLine := BtnLoadHeadset.GlyphLine;
 
@@ -1592,30 +1518,28 @@ begin
   // Hier jetzt auch in einer Schleife. Sollte leichter zu lesen sein.
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
-    if Nemp_MainForm.Components[i] is TLabel then
-    begin
-      TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
-      TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
-      TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
-    end else
-    {if Nemp_MainForm.Components[i] is TLabel then
-    begin
-      TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
-      TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
-      TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
-    end else   }
-    if Nemp_MainForm.Components[i] is TShape then
-    begin
-      TShape(Nemp_MainForm.Components[i]).Brush.Color := SkinColorScheme.ShapeBrushCL;
-      TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
+      if Nemp_MainForm.Components[i] is TLabel then
+      begin
+          TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
+          TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
+          TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
+      end else
+      {if Nemp_MainForm.Components[i] is TLabel then
+      begin
+        TLabel(Nemp_MainForm.Components[i]).Color := SkinColorScheme.LabelBackGroundCL;
+        TLabel(Nemp_MainForm.Components[i]).Font.Color := SkinColorScheme.LabelCL;
+        TLabel(Nemp_MainForm.Components[i]).Transparent := DrawTransparentLabel;
+      end else   }
+      if Nemp_MainForm.Components[i] is TShape then
+      begin
+          TShape(Nemp_MainForm.Components[i]).Brush.Color := SkinColorScheme.ShapeBrushCL;
+          TShape(Nemp_MainForm.Components[i]).Pen.Color := SkinColorScheme.ShapePenCL;
           if Nemp_MainForm.Components[i] is TProgressShape then
           begin
               TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := SkinColorScheme.ShapeBrushProgressCL;
               TProgressShape(Nemp_MainForm.Components[i]).ProgressPen.Color := SkinColorScheme.ShapePenProgressCL;
           end;
-    end
-        //SkinColorScheme.ShapePenProgressCL    := StringToColor(Ini.ReadString('Colors','ShapePenProgressCL'   , 'clHighLight'    ));
-        //SkinColorScheme.ShapeBrushProgresCL   := StringToColor(Ini.ReadString('Colors','ShapeBrushProgresCL'  , 'clHotLight'    ));
+      end
   end;
 
   // Weitere Eigenschaften der Form setzen
@@ -1635,13 +1559,11 @@ begin
 
     LyricsMemo.Color := SkinColorScheme.MemoBackGroundCL;
     LyricsMemo.Font.Color := SkinColorScheme.MemoTextCL;
-    //Spectrum.TextColor := SkinColorScheme.SpecTitelCL;
 
     Spectrum.PreviewArtistColor := SkinColorScheme.PreviewArtistColor ;
     Spectrum.PreviewTitleColor  := SkinColorScheme.PreviewTitleColor  ;
     Spectrum.PreviewTimeColor   := SkinColorScheme.PreviewTimeColor   ;
 
-    // lblPlayingFileInfo.Font.Color  := SkinColorScheme.FontColorControlQuality;
     PlayerTimeLbl.Font.Color       := SkinColorScheme.SpecTimeCL;;
     PlayerArtistLabel.Font.Color   := SkinColorScheme.SpecArtistCL;
     PlayerTitleLabel.Font.Color    := SkinColorScheme.SpecTitelCL;
@@ -1651,17 +1573,9 @@ begin
     Spectrum.PreviewShapeProgressPenColor   := SkinColorScheme.PreviewShapeProgressPenColor   ;
     Spectrum.PreviewShapeProgressBrushColor := SkinColorScheme.PreviewShapeProgressBrushColor ;
 
-    //Spectrum.TimeColor := SkinColorScheme.SpecTimeCL;
-    //Spectrum.TitelBackColor := SkinColorScheme.SpecTitelBackGroundCL;
-    //Spectrum.TimebackColor := SkinColorScheme.SpecTimeBackGroundCL;
     Spectrum.Pen := SkinColorScheme.SpecPenCL;
     Spectrum.Pen2 := SkinColorScheme.SpecPen2CL;
     Spectrum.Peak := SkinColorScheme.SpecPeakCL;
-
-    //if DrawTransparentTime then Spectrum.TimeTextBackground := bsclear
-    //  else Spectrum.TimeTextBackground := bssolid;
-    //if DrawTransparentTitel then Spectrum.TitelTextBackground := bsclear
-    //  else Spectrum.TitelTextBackground := bssolid;
 
     if (HideMainMenu) or (Nemp_MainForm.AnzeigeMode = 1) then
       Menu := NIL
@@ -1694,8 +1608,6 @@ begin
   {$ENDIF}
 
   Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-  //Nemp_MainForm.CorrectSkinRegions;
-
 end;
 
 procedure TNempSkin.SetRegionsAgain;
@@ -1730,31 +1642,17 @@ begin
               TabButtons[i].Button.Refresh;
         end;
 
-        (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-        DirectionPositionBTN.CustomRegion := True;
-        DirectionPositionBTN.Refresh;
-        BtnABRepeatSetA.CustomRegion := True;
-        BtnABRepeatSetA.Refresh;
-        BtnABRepeatSetB.CustomRegion := True;
-        BtnABRepeatSetB.Refresh;
-        BtnABRepeatUnset.CustomRegion := True;
-        BtnABRepeatUnset.Refresh;
-        *)
 
         BtnHeadsetPlaynow     .CustomRegion := True;
         BtnHeadsetToPlaylist  .CustomRegion := True;
         BtnLoadHeadset        .CustomRegion := True;
         PlayPauseHeadSetBtn   .CustomRegion := True;
-        //SlideBackHeadsetBTN   .CustomRegion := True;
-        //SlideForwardHeadsetBTN.CustomRegion := True;
         StopHeadSetBtn        .CustomRegion := True;
 
         BtnHeadsetPlaynow      .Refresh;
         BtnHeadsetToPlaylist   .Refresh;
         BtnLoadHeadset         .Refresh;
         PlayPauseHeadSetBtn    .Refresh;
-        //SlideBackHeadsetBTN    .Refresh;
-        //SlideForwardHeadsetBTN .Refresh;
         StopHeadSetBtn         .Refresh;
 
     end;
@@ -1771,13 +1669,11 @@ begin
   //zunächst: Ownerdraw der Boxen/Panels setzen
   with Nemp_MainForm do
   begin
-    for i := 0 to Nemp_MainForm.ComponentCount - 1 do
-    begin
-      //if Components[i] is TNempGroupbox then
-      //  TNempGroupbox(Nemp_MainForm.Components[i]).OwnerDraw := False;
-      if Nemp_MainForm.Components[i] is TNempPanel then
-        TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := False;
-    end;
+      for i := 0 to Nemp_MainForm.ComponentCount - 1 do
+      begin
+          if Nemp_MainForm.Components[i] is TNempPanel then
+            TNempPanel(Nemp_MainForm.Components[i]).OwnerDraw := False;
+      end;
   end;
 
   if assigned(DeleteSelection) then
@@ -1805,8 +1701,6 @@ begin
         AssignButtonSizes;
 
         AssignWindowsGlyphs(False);
-        //System-Grafiken
-//        AssignDefaultSystemButtons;
         AssignWindowsTabGlyphs(False);
 
         AssignStarGraphics;
@@ -1820,15 +1714,6 @@ begin
             SlideButtons[i].Button.Glyph.Assign(Nil);
             SlideButtons[i].Button.Refresh;
         end;
-
-        // Note to Self: Is this OK? Overwrite Star-Graphics with Windows-Default??
-        //SetStarBitmap.Assign(Nil);
-        //HalfStarBitmap.Assign(Nil);
-        //UnSetStarBitmap.Assign(Nil);
-        //PlayListImageList.GetBitmap(11, SetStarBitmap);
-        //PlayListImageList.GetBitmap(12, HalfStarBitmap);
-        //PlayListImageList.GetBitmap(13, UnSetStarBitmap);
-        //RatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
 
   end;
 
@@ -1934,20 +1819,20 @@ begin
   // Hier jetzt auch in einer Schleife. Sollte leichter zu lesen sein.
   for i := 0 to Nemp_MainForm.ComponentCount - 1 do
   begin
-    if Nemp_MainForm.Components[i] is TLabel then
-    begin
-      TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
-      TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
-      TLabel(Nemp_MainForm.Components[i]).Transparent := True;
-    end else
-    if Nemp_MainForm.Components[i] is TLabel then
-    begin
-      TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
-      TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
-      TLabel(Nemp_MainForm.Components[i]).Transparent := True;
-    end else
-    if Nemp_MainForm.Components[i] is TShape then
-    begin
+      if Nemp_MainForm.Components[i] is TLabel then
+      begin
+          TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
+          TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
+          TLabel(Nemp_MainForm.Components[i]).Transparent := True;
+      end else
+      if Nemp_MainForm.Components[i] is TLabel then
+      begin
+          TLabel(Nemp_MainForm.Components[i]).Color := clBtnFace;
+          TLabel(Nemp_MainForm.Components[i]).Font.Color := clWindowText;
+          TLabel(Nemp_MainForm.Components[i]).Transparent := True;
+      end else
+      if Nemp_MainForm.Components[i] is TShape then
+      begin
           TShape(Nemp_MainForm.Components[i]).Brush.Color := clGradientActiveCaption;
           TShape(Nemp_MainForm.Components[i]).Pen.Color := clBlack;
           if Nemp_MainForm.Components[i] is TProgressShape then
@@ -1955,15 +1840,7 @@ begin
               TProgressShape(Nemp_MainForm.Components[i]).ProgressBrush.Color := clHighlight;
               TProgressShape(Nemp_MainForm.Components[i]).ProgressPen.Color := clHotlight;
           end;
-    end
-{    else
-    if Nemp_MainForm.Components[i] is TLabeledEdit then
-    begin
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Color := clBtnFace;
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Font.Color := clWindowText;
-      TLabeledEdit(Nemp_MainForm.Components[i]).EditLabel.Transparent := True;
-    end
-}
+      end
   end;
 
   if SetFlowColor then
@@ -1982,17 +1859,11 @@ begin
 
     LyricsMemo.Color := clWindow;
     LyricsMemo.Font.Color := clWindowText;
-    //Spectrum.TextColor := clWindowText;
-    //Spectrum.TimeColor := clWindowText;
-    //Spectrum.TitelBackColor := clBtnFace;
-    //Spectrum.TimebackColor := clBtnFace;
 
     Spectrum.PreviewArtistColor := clGrayText;
     Spectrum.PreviewTitleColor  := clWindowText;
     Spectrum.PreviewTimeColor   := clWindowText;
 
-    // lblPlayingFileInfo.Font.Color := clWindowText;
-    // lblPlayingFileInfo.Font.Color  := clWindowText;
     PlayerTimeLbl.Font.Color       := clWindowText;
     PlayerArtistLabel.Font.Color   := clWindowText;
     PlayerTitleLabel.Font.Color    := clWindowText;
@@ -2002,15 +1873,10 @@ begin
     Spectrum.PreviewShapeProgressPenColor   := clHighLight  ;
     Spectrum.PreviewShapeProgressBrushColor := clHotLight   ;
 
-
-    //Spectrum.TextStyle := [];
-    //Spectrum.TimeStyle := [];
     Spectrum.Pen := clBackground;
     Spectrum.Pen2 := clActiveCaption;
     Spectrum.Peak := clBackground;
     Spectrum.UseBackGround := False;
-    //Spectrum.TitelTextBackground := bsclear;
-    //Spectrum.TimeTextBackground := bsclear;
     Spectrum.SetGradientBitmap;
     Spectrum.DrawRating(RatingImage.Tag);
     RepaintVisOnPause;
@@ -2022,7 +1888,6 @@ begin
     TStyleManager.TrySetStyle('Windows');
     {$ENDIF}
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-    //Nemp_MainForm.CorrectSkinRegions;
   end;
 end;
 
@@ -2298,82 +2163,7 @@ begin
     end;
 end;
 
-(*
 
-procedure TNempSkin.DrawAPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
-var pnlPoint, OffsetPoint: TPoint;
-    tmp: TBitmap;
-    sourceBmp: TBitmap;
-    localOffsetX, localOffsetY: Integer;
-    stretch: Boolean;
-begin
-
-    if FormBuilder.RebuildingRightNow then
-        exit;
-
-  tmp := TBitmap.Create;
-  tmp.Width := aPanel.Width;
-  tmp.Height := aPanel.Height;
-
-  OffsetPoint := Nemp_MainForm.PlayerControlPanel.ClientToScreen(Point(0,0));
-  pnlPoint := aPanel.ClientToScreen(Point(0,0));
-  // !!!!!!!!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-  stretch := False;
-  if (aPanel.Tag = 0) and UseSeparatePlayerBitmap then
-  begin
-      // Player-Teil gesondert behandelr
-      localOffsetX := 0;
-      localOffsetY := 0;
-      sourceBmp := PlayerBitmap;
-      //stretch := NempPartyMode.Active;
-      OffsetPoint := pnlPoint;
-  end
-  else
-      if (aPanel.Tag = 5) and UseSeparatePlayerBitmap then
-      begin
-          // Player-Teil gesondert behandelr
-          localOffsetX := 0;//{-pnlPoint.X + }OffsetPoint.X;
-          localOffsetY := 0;//{-pnlPoint.Y +} OffsetPoint.Y;
-          // ??? pnlPoint := aPanel.ClientToScreen(Point(0,0));
-          // ??? OffsetPoint := Nemp_MainForm.AudioPanel.ClientToScreen(Point(0,0));
-          //sourceBmp := ExtendedPlayerBitmap;
-          //--- was already comment in last version
-          //---OffsetPoint.X := OffsetPoint.X - Nemp_MainForm.AudioPanel.Left;  // AudioPanel.Top/Left is 2 on the ContainerPanel
-          //---OffsetPoint.Y := OffsetPoint.Y - Nemp_MainForm.AudioPanel.Top;
-          //---stretch := NempPartyMode.Active;
-          stretch := False;
-
-          sourceBmp := CompleteBitmap;  // tmp, must be rewritten anyway
-      end
-      else
-      begin
-          localOffsetX := PlayerPageOffsetX;
-          localOffsetY := PlayerPageOffsetY;
-          sourceBmp := CompleteBitmap;
-      end;
-
-  with Nemp_MainForm do
-  begin
-    if UseBackground then
-          TileGraphic(sourceBmp, TileControlBackground, tmp.Canvas,
-                localOffsetX + (pnlPoint.X - OffsetPoint.X) ,
-                localOffsetY + (pnlPoint.Y - OffsetPoint.Y),
-                Stretch)
-    else
-    begin
-          tmp.Canvas.Brush.Style := bsSolid;
-          tmp.Canvas.Pen.Color :=  SkinColorScheme.FormCL;
-          tmp.Canvas.Brush.Color := SkinColorScheme.FormCL;
-          tmp.Canvas.FillRect(tmp.Canvas.ClipRect);
-    end;
-  end;
-
-  BitBlt(aPanel.Canvas.Handle, 0,   0, tmp.Width, tmp.Height, tmp.Canvas.Handle, 0,  0, srccopy);
-  tmp.Free;
-end;
-*)
 
 Procedure TNempSkin.UpdateSpectrumGraphics;
 begin
@@ -2556,37 +2346,6 @@ end;
 
 
 
-(*
-procedure TNempSkin.AssignDefaultSystemButtons;
-begin
-    with Nemp_MainForm do
-    begin
-        Buttons12ImageList.GetBitmap(0,BtnMinimize.NempGlyph);
-        Buttons12ImageList.GetBitmap(1,BtnClose.NempGlyph);
-        Buttons12ImageList.GetBitmap(2,BtnMenu.NempGlyph);
-        BtnMinimize.NumGlyphsX := 1;
-        BtnMinimize.NumGlyphs := 1;
-        BtnClose.NumGlyphsX := 1;
-        BtnClose.NumGlyphs := 1;
-        BtnMenu.NumGlyphsX := 1;
-        BtnMenu.NumGlyphs := 1;
-
-        // und die anderen Close-Images
-
-            Buttons12ImageList.GetBitmap(1,AuswahlForm.CloseImage.NempGlyph);
-            AuswahlForm.CloseImage.NumGlyphsX := 1;
-            AuswahlForm.CloseImage.NumGlyphs := 1;
-
-            Buttons12ImageList.GetBitmap(1,MedienlisteForm.CloseImage.NempGlyph);
-            MedienlisteForm.CloseImage.NumGlyphsX := 1;
-            MedienlisteForm.CloseImage.NumGlyphs := 1;
-
-            Buttons12ImageList.GetBitmap(1,PlaylistForm.CloseImage.NempGlyph);
-            PlaylistForm.CloseImage.NumGlyphsX := 1;
-            PlaylistForm.CloseImage.NumGlyphs := 1;
-    end;
-end;
-      *)
 procedure TNempSkin.AssignButtonSizes;
 var BtnArray: Array[0..7] of TSkinButton;
 
@@ -2719,24 +2478,8 @@ begin
 
         tmpBitmap := TBitmap.Create;
         try
-            //for b := 0 to 10 do
             for b := Low(TabButtons) to High(TabButtons) do
-            begin
                 AssignWindowsTabGlyph(TabButtons[b].Button, BaseDir + TabButtons[b].GlyphFile, True);
-               {
-                TabButtons[b].Button.DrawMode := dm_Windows;
-                TabButtons[b].Button.NumGlyphsX := 1;
-                TabButtons[b].Button.NumGlyphs  := 1;
-                TabButtons[b].Button.Glyph.Assign(Nil);
-                if not LoadGraphicFromBaseName(tmpBitmap, BaseDir + TabButtons[b].GlyphFile, True) then
-                    // because of the recent (4.11) changes in the GUI: fallback to default images
-                    LoadGraphicFromBaseName(tmpBitmap, ExtractFilePath(ParamStr(0)) + 'Images\' + TabButtons[b].GlyphFile, True);
-
-                TabButtons[b].Button.NempGlyph.Assign(tmpBitmap);
-                TabButtons[b].Button.CustomRegion := False;
-                TabButtons[b].Button.GlyphLine := TabButtons[b].Button.GlyphLine;
-                }
-            end;
         finally
             tmpBitmap.Free;
         end;
@@ -2751,7 +2494,6 @@ begin
     with Nemp_MainForm do
     begin
         BaseDir := path + '\';
-        //for b := 0 to 10 do
         for b := Low(TabButtons) to High(TabButtons) do
         begin
             TabButtons[b].Button.DrawMode := dm_Skin;
@@ -2766,7 +2508,6 @@ end;
 
 procedure TNempSkin.AssignABGraphics;
 var BaseDir: String;
-    l, r: TImage;
 begin
     if isActive and (not UseDefaultStarBitmaps) then
         BaseDir := path + '\'
@@ -2779,27 +2520,14 @@ begin
     then
         BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
 
-    //ABRepeatBitmapA.Assign(Nil);
-    //ABRepeatBitmapB.Assign(Nil);
-
     // no scaling here, as Stre
     LoadGraphicFromBaseName(ABRepeatBitmapA, BaseDir + 'ab-repeat-start', False);
     LoadGraphicFromBaseName(ABRepeatBitmapB, BaseDir + 'ab-repeat-end', False);
 
     with Nemp_MainForm do
     begin
-        //if ab1.left < ab2.Left then
-        //begin
-            //ab1.Picture.Assign(Nil);
-            //ab2.Picture.Assign(Nil);
-
-            ab1.Picture.Assign(ABRepeatBitmapA);
-            ab2.Picture.Assign(ABRepeatBitmapB);
-        //end else
-        //begin
-        //    ab2.Picture.Bitmap.Assign(ABRepeatBitmapA);
-        //    ab1.Picture.Bitmap.Assign(ABRepeatBitmapB);
-        //end;
+        ab1.Picture.Assign(ABRepeatBitmapA);
+        ab2.Picture.Assign(ABRepeatBitmapB);
     end;
 end;
 
@@ -2896,40 +2624,6 @@ begin
                 ControlButtons[b].RePaint;
             end;
 
-            (* !!!!!!!!!!!!!! GUI !!!!!!!!!!!!!!!!!
-            DirectionPositionBTN .drawMode := dm_Windows;
-            DirectionPositionBTN .NumGlyphs := 1;
-            DirectionPositionBTN.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnReverse', True);
-            DirectionPositionBTN.NempGlyph.Assign(tmpBitmap);
-            DirectionPositionBTN.GlyphLine := DirectionPositionBTN.GlyphLine;
-            DirectionPositionBTN.Refresh;
-
-            BtnABRepeatSetA .drawMode := dm_Windows;
-            BtnABRepeatSetA .NumGlyphs := 1;
-            BtnABRepeatSetA.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatSetA', True);
-            BtnABRepeatSetA.NempGlyph.Assign(tmpBitmap);
-            BtnABRepeatSetA.GlyphLine := BtnABRepeatSetA.GlyphLine;
-            BtnABRepeatSetA.Refresh;
-
-            BtnABRepeatSetB .drawMode := dm_Windows;
-            BtnABRepeatSetB .NumGlyphs := 1;
-            BtnABRepeatSetB.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatSetB', True);
-            BtnABRepeatSetB.NempGlyph.Assign(tmpBitmap);
-            BtnABRepeatSetB.GlyphLine := BtnABRepeatSetB.GlyphLine;
-            BtnABRepeatSetB.Refresh;
-
-            BtnABRepeatUnset .drawMode := dm_Windows;
-            BtnABRepeatUnset .NumGlyphs := 1;
-            BtnABRepeatUnset.NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnABRepeatUnset', True);
-            BtnABRepeatUnset.NempGlyph.Assign(tmpBitmap);
-            BtnABRepeatUnset.GlyphLine := BtnABRepeatUnset.GlyphLine;
-            BtnABRepeatUnset.Refresh;
-            *)
-
             BtnLoadHeadset .drawMode := dm_Windows;
             BtnLoadHeadset .NumGlyphs := 1;
             BtnLoadHeadset .NempGlyph.Assign(Nil);
@@ -2969,25 +2663,6 @@ begin
             StopHeadSetBtn.NempGlyph.Assign(tmpBitmap);
             StopHeadSetBtn.GlyphLine := StopHeadSetBtn.GlyphLine;
             StopHeadSetBtn.Refresh;
-
-            {
-            SlideBackHeadsetBTN .drawMode := dm_Windows;
-            SlideBackHeadsetBTN .NumGlyphs := 1;
-            SlideBackHeadsetBTN .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnSlideBackWardHeadset', True);
-            SlideBackHeadsetBTN.NempGlyph.Assign(tmpBitmap);
-            SlideBackHeadsetBTN.GlyphLine := SlideBackHeadsetBTN.GlyphLine;
-            SlideBackHeadsetBTN.Refresh;
-
-            SlideForwardHeadsetBTN .drawMode := dm_Windows;
-            SlideForwardHeadsetBTN .NumGlyphs := 1;
-            SlideForwardHeadsetBTN .NempGlyph.Assign(Nil);
-            LoadGraphicFromBaseName(tmpBitmap, BaseDir + 'BtnSlideForwardHeadset', True);
-            SlideForwardHeadsetBTN.NempGlyph.Assign(tmpBitmap);
-            SlideForwardHeadsetBTN.GlyphLine := SlideForwardHeadsetBTN.GlyphLine;
-            SlideForwardHeadsetBTN.Refresh;
-            }
-
 
 
             LoadGraphicFromBaseName(tmpBitmap, BaseDir + DefaultButtonData[ctrlCloseBtn].Name, True);
@@ -3038,6 +2713,7 @@ end;
 function TNempSkin.AssignWindowsTabGlyph(aButton: TSkinButton; aFilename: UnicodeString; Scaled: Boolean=False): Boolean;
 var tmpBitmap: TBitmap;
 begin
+    result := True;
     tmpBitmap := TBitmap.Create;
     try
         aButton.DrawMode := dm_Windows;

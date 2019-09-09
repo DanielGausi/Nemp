@@ -219,8 +219,7 @@ begin
 end;
 
 procedure TMainFormBuilder.FormCreate(Sender: TObject);
-var a: tListItem;
-    fn: String;
+var fn: String;
 begin
     BackupComboboxes(self);
     TranslateComponent (self);
@@ -542,7 +541,6 @@ procedure TMainFormBuilder.ImgUpClick(Sender: TObject);
 var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
-    aSplitter: TSplitter;
     VisA, VisB: Boolean;
 begin
     VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
@@ -601,7 +599,6 @@ procedure TMainFormBuilder.ImgDownClick(Sender: TObject);
 var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
-    aSplitter: TSplitter;
     VisA, VisB: Boolean;
 begin
     VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
@@ -657,7 +654,6 @@ procedure TMainFormBuilder.ImgLeftClick(Sender: TObject);
 var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
-    aSplitter: TSplitter;
     VisA, VisB: Boolean;
 begin
     VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);
@@ -713,7 +709,6 @@ procedure TMainFormBuilder.ImgRightClick(Sender: TObject);
 var idx: Integer;
     ParentPanel: TPanel;
     ParentBlock: TNempBlockPanel;
-    aSplitter: TSplitter;
     VisA, VisB: Boolean;
 begin
     VisA := LocalBuildOptions.EmptyPanel(LocalBuildOptions.PanelAChilds);

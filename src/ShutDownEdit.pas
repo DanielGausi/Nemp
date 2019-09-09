@@ -76,7 +76,6 @@ uses Hilfsfunktionen, NempMainUnit, Nemp_RessourceStrings, Nemp_ConstantsAndType
 {$R *.dfm}
 
 procedure TShutDownEditForm.BtnOkClick(Sender: TObject);
-var DlgResult: Integer;
 begin
 
     if (cbCountdownLength.ItemIndex = 8) AND (NempPlaylist.WiedergabeMode <> NEMP_API_NOREPEAT) then
@@ -114,30 +113,6 @@ begin
 
     Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := (cbCountdownLength.ItemIndex = 8);
 
-
-    {
-    ToDo:
-
-    NempOptions.ShutDownMode := ((Sender as TMenuItem).Tag) DIV 100;
-
-    NempOptions.ShutDownAtEndOfPlaylist := True // False
-
-    NempOptions.ShutDownTime := IncMinute(Now, 45);
-
-
-    if c <= 120 then
-    SleepTimer.Interval := 250    // 0.25sek
-  else
-    SleepTimer.Interval := 10000; // 10sek
-
-  SleepTimer.Enabled := True;
-  SleepImage.Hint := GenerateSleepHint;
-
-  ReArrangeToolImages;
-
-    }
-
-
 end;
 
 procedure TShutDownEditForm.cbCountdownLengthChange(Sender: TObject);
@@ -146,10 +121,6 @@ begin
     LblConst_Minute         .Enabled := cbCountdownLength.ItemIndex = 7;
     SE_Hours                .Enabled := cbCountdownLength.ItemIndex = 7;
     SE_Minutes              .Enabled := cbCountdownLength.ItemIndex = 7;
-
-    //LblEndOfPlaylistWarning.Visible := (cbCountdownLength.ItemIndex = 8);
-    //if cbCountdownLength.ItemIndex = 8 then
-    //    LblEndOfPlaylistWarning.Caption := _(NempShutDown_AtEndOfPlaylist_Hint);
 end;
 
 procedure TShutDownEditForm.cbIntendedActionChange(Sender: TObject);
@@ -158,7 +129,6 @@ begin
 end;
 
 procedure TShutDownEditForm.FormCreate(Sender: TObject);
-var filename: String;
 begin
     cbIntendedAction.OnChange := Nil;
     cbCountdownLength.OnChange:= Nil;
@@ -167,10 +137,6 @@ begin
     RestoreComboboxes(self);
     cbIntendedAction.OnChange := cbIntendedActionChange;
     cbCountdownLength.OnChange := cbCountdownLengthChange;
-
-    //filename := ExtractFilePath(ParamStr(0)) + 'Images\shutdown.png';
-    //if FileExists(filename) then
-    //    ImgShutDown.Picture.LoadFromFile(filename);
 
     // set settings from the NempOptions // IniFile
     cbIntendedAction  .ItemIndex := Nemp_MainForm.NempOptions.ShutDownModeIniIdx ;
@@ -186,7 +152,6 @@ procedure TShutDownEditForm.FormShow(Sender: TObject);
 begin
     cbCountdownLengthChange(Nil);
     lblCurrentStatus.Caption := Nemp_MainForm.GetShutDownInfoCaption;
-
 end;
 
 procedure TShutDownEditForm.ShowProperImage(aMode: Integer);

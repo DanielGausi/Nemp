@@ -256,7 +256,6 @@ begin
 end;
 
 procedure TFormEffectsAndEqualizer.Btn_EffectsOffClick(Sender: TObject);
-var i: Integer;
 begin
     tbReverb.Position := -96;
     tbEchoTime.Position := 100;
@@ -680,7 +679,6 @@ end;
 
 
 procedure TFormEffectsAndEqualizer.tbSpeedChange(Sender: TObject);
-var tPos: Integer;
 begin
     // position < 0  =>  play Slower ( -33 % ... 0%)
     // position > 0  =>  play faster (0% .. 300%)
@@ -705,7 +703,6 @@ begin
 end;
 
 procedure TFormEffectsAndEqualizer.CorrectSpeedButton;
-var middle, whole: Integer;
 begin
     if SameValue(NempPlayer.Speed, 1) then
         tbSpeed.Position := 0

@@ -35,7 +35,7 @@ unit SplitForm_Hilfsfunktionen;
 interface
 
 uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -72,34 +72,11 @@ uses NempMainUnit, PlaylistUnit, MedienlisteUnit, AuswahlUnit, ExtendedControlsU
      SystemHelper, Inifiles, MainFormBuilderForm;
 
 procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance; aHandle: hWnd);
-var formregion,
-  formregion1: HRGN;
-  xpbottom, xptop, xpleft, xpright: integer;
 begin
-
-    xptop    := 0;
-    xpleft   := 0; //GrpBox.Left + 1 - 2;
-    xpRight  := xpleft + GrpBox.Width;// - 2 + 5;  //aForm.width - 10;
-    xpbottom := 27; //GrpBox.Top - 2 + 2;
-
-    ///formRegion := CreateRoundRectRgn
-    ///        (xpleft, xptop, xpright, xpbottom, 4, 4);
-
-    NempRegionsDistance.Top := xptop;
-
-    xptop    := 26;//GrpBox.Top + 1 - 2;
-    xpleft   := 0;//GrpBox.Left + 1 - 2;
-    xpbottom := GrpBox.Height; //xptop + GrpBox.Height - 1 + 4;
-
-    ///formRegion1 := CreateRoundRectRgn
-    ///    (xpleft, xptop, xpright, xpbottom , 4, 4);
-
-    ///CombineRgn( formregion, formregion, formregion1, RGN_OR );
-    ///SetWindowRgn( ahandle, formregion, true );
-
-    NempRegionsDistance.Left := xpleft;
-    NempRegionsDistance.Right := xpright - 1;
-    NempRegionsDistance.Bottom := xpbottom - 1;
+    NempRegionsDistance.Top    := 0;
+    NempRegionsDistance.Left   := 0;
+    NempRegionsDistance.Right  := GrpBox.Width;
+    NempRegionsDistance.Bottom := GrpBox.Height;
 end;
 
 function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
