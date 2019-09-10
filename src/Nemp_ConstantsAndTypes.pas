@@ -522,8 +522,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.10';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.10';
+    NEMP_VERSION_SPLASH = 'version 4.11';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.11';
 
     NEMP_TIPSIZE = 128;
 
