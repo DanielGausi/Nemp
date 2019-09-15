@@ -3,7 +3,7 @@
 
 Nemp is an MP3 player with a powerful media library to manage all the music files in your collection. It has a lot of standard features, but also some other things you won't find elsewhere.
 
-![Nemp Player](/Screenshots/MainPlayer.jpg)
+![Nemp Player](/Screenshots/MainPlayer-4-11.jpg)
 
 ## Basic Features
 
@@ -13,7 +13,7 @@ To avoid duplicate Tags with a similar meaning (like "90s" and "90ies"), you can
 
 A key feature is the search function for the media library. It is pretty fast, and works while you type with no delay even on larger collections with tens of thousands titles. If you wish, a fuzzy search is performed as well. With that, you may find titles from "P!nk" when searching for "Pink".
 
-![Nemp Tag Cloud](/Screenshots/MainPlayerTagCloud.jpg)
+![Nemp Tag Cloud](/Screenshots/MainPlayerTagCloud-4-11.jpg)
 
 ## Integrated web server
 
