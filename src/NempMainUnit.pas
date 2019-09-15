@@ -1653,6 +1653,8 @@ begin
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
     TagLabelList := TObjectList.Create(True);
 
+    NempFormBuildOptions := Nil;
+
     ABRepeatStartImg := ab1;
     ABRepeatEndImg   := ab2;
 
@@ -2936,7 +2938,8 @@ end;
 
 procedure TNemp_MainForm.GRPBOXArtistsAlbenResize(Sender: TObject);
 begin
-    NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
+    if assigned(NempFormBuildOptions) then
+        NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
 
     LblEmptyLibraryHint.Width := (GRPBOXArtistsAlben.Width - 50);
     LblEmptyLibraryHint.Left := 25;
@@ -6248,8 +6251,10 @@ end;
 // horizontal splitter between Top and VST
 procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
 begin
+    if not assigned(NempFormBuildOptions) then
+        exit;
 
-    //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);
+    //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);    
     NempFormBuildOptions.OnMainSplitterMoved(Sender);
 
     if NempSkin.isActive then
@@ -6263,19 +6268,21 @@ end;
 // vertical splitter between player and Browse
 procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
 begin
-  NempFormBuildOptions.OnSplitterMoved(Sender);
+    if assigned(NempFormBuildOptions) then
+        NempFormBuildOptions.OnSplitterMoved(Sender);
 
-  if NempSkin.isActive then
-  begin
-      NempSkin.FitSkinToNewWindow;
-      RepaintPanels;
-  end;
+    if NempSkin.isActive then
+    begin
+        NempSkin.FitSkinToNewWindow;
+        RepaintPanels;
+    end;
 end;
 
 //vertical splitter between Artist and Album
 procedure TNemp_MainForm.SplitterBrowseMoved(Sender: TObject);
 begin
-    NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
+    if assigned(NempFormBuildOptions) then
+        NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
 
 procedure TNemp_MainForm.Splitter4CanResize(Sender: TObject;
@@ -6287,7 +6294,10 @@ end;
 // vertical splitter between VST and Cover
 procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
 begin
-    NempFormBuildOptions.OnSplitterMoved(Sender);
+    if not assigned(NempFormBuildOptions) then
+        exit;
+            
+    NempFormBuildOptions.OnSplitterMoved(Sender);     
 
     if NempSkin.isActive then
     begin
@@ -8473,6 +8483,9 @@ end;
 
 procedure TNemp_MainForm.AlbenVSTResize(Sender: TObject);
 begin
+    if not assigned(NempFormBuildOptions) then
+        exit;
+    
   AlbenVST.Header.Columns[0].Width := AlbenVST.Width;
   if NempSkin.isActive and (AnzeigeMode = 0) then
   begin
@@ -9702,6 +9715,9 @@ end;
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);
 var WidthLimit: Integer;
 begin
+    if not assigned(NempFormBuildOptions) then
+        exit;
+
     if NempFormBuildOptions.ControlPanelTwoRows then
         WidthLimit := 305
     else
@@ -9731,12 +9747,14 @@ end;
 
 procedure TNemp_MainForm._TopMainPanelResize(Sender: TObject);
 begin
-    NempFormBuildOptions.OnMainContainerResize(Sender);
+    if assigned(NempFormBuildOptions) then
+        NempFormBuildOptions.OnMainContainerResize(Sender);
 end;
 
 procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
 begin
-    NempFormBuildOptions.OnSuperContainerResize(Sender);
+    if assigned(NempFormBuildOptions) then
+        NempFormBuildOptions.OnSuperContainerResize(Sender);
 end;
 
 
@@ -10748,7 +10766,8 @@ begin
     MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - ExtraSpace;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
-    NempSkin.SetVSTOffsets;
+    if assigned(NempFormBuildOptions) then
+        NempSkin.SetVSTOffsets;
 end;
 
 procedure TNemp_MainForm.MedienBibDetailPanelResize(Sender: TObject);
@@ -10759,7 +10778,7 @@ begin
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
     MedienBibDetailStatusLbl.Width := MedienBibDetailFillPanel.Width - 16;
 
-    if NOT NempFormBuildOptions.HideFileOverviewPanel then
+    if assigned(NempFormBuildOptions) and ( NOT NempFormBuildOptions.HideFileOverviewPanel) then
          NempFormBuildOptions.ResizeSubPanel(MedienBibDetailPanel, DetailCoverLyricsPanel, NempFormBuildOptions.FileOverviewCoverRatio);
 end;
 
@@ -10784,6 +10803,9 @@ end;
 
 procedure TNemp_MainForm.SplitterFileOverviewMoved(Sender: TObject);
 begin
+    if not assigned(NempFormBuildOptions) then
+        exit;
+
     if MedienBibDetailPanel.Width > 0 then
         NempFormBuildOptions.FileOverviewCoverRatio := Round(DetailCoverLyricsPanel.Width * 100 / MedienBibDetailPanel.Width)
     else
@@ -10799,7 +10821,8 @@ begin
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
     PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
-    NempSkin.SetPlaylistOffsets;
+    if assigned(NempFormBuildOptions) then
+        NempSkin.SetPlaylistOffsets;
 end;
 
 
