@@ -669,6 +669,11 @@ MediaLibrary_RefreshingFiles         = 'Refreshing file information (%d%%)';
 MediaLibrary_RefreshingFilesInDir    = 'Refreshing file information ... %s';
 MediaLibrary_RefreshingFilesPreparingLibrary = 'Refreshing files complete. Preparing media library ...';
 MediaLibrary_RefreshingFilesCompleteFinished = 'Refreshing files complete.';
+
+MediaLibrary_ScanningFilesInDir    = 'Reading file information ... %s';
+MediaLibrary_ScanningFilesCount    = 'Scanning music files for metadata ... %d/%d';
+//ProgressForm_ScanNewFiles    = 'Nemp is Scanning the new music files for meta data. This may take a while.';
+
 //MediaLibrary_SearchingMissingFiles   = 'Searching missing files (%d%%)';
 MediaLibrary_SearchingMissingFilesDir= 'Searching missing files ... %s'; // %s: current Directory
 MediaLibrary_SearchingMissingPlaylist= '(Playlists)'; // this will replace the %s just above, when serching for dead playlists
@@ -678,6 +683,7 @@ MediaLibrary_SearchingNewFilesBigLabel = 'Searching for audio files ... %d found
 MediaLibrary_StartSearchingNewFiles  = 'Searching for new files ...';
 MediaLibrary_SearchingNewFilesComplete = 'Searching for new files completed. The new files have been added to your media library.';
 MediaLibrary_SearchingNewFiles_NothingFound = 'Operation complete. No new files have been added to the media library.';
+MediaLibrary_SearchingNewFiles_Aborted = 'Searching for new files aborted. No new files have been added to the media library.';
 
 // MediaLibrary_PreciseQuery            = 'Please precise your query. Too many matchings found.';
 MediaLibrary_SearchingMissingFilesComplete_AnalysingData = 'Search complete, preparing data ...';
@@ -1003,6 +1009,7 @@ ProgressForm_Searchlyrics   = 'Nemp is searching for lyrics for your music files
 ProgressForm_SearchTags     = 'Nemp is searching for some additional tags for your music files.';
 ProgressForm_UpdateMetaData = 'Nemp is updating the meta data (ID3tags) of your music files.';
 ProgressForm_DeleteFiles    = 'Nemp is removing the selected files from your media library.';
+ProgressForm_ScanNewFiles    = 'Nemp is scanning the new music files for metadata. This may take a while.';
 
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';

@@ -69,6 +69,7 @@ object ProgressForm: TProgressForm
     Anchors = [akLeft, akRight, akBottom]
     AutoSize = False
     Caption = 'Current item ... reading ....'
+    ShowAccelChar = False
     WordWrap = True
     ExplicitTop = 209
     ExplicitWidth = 402

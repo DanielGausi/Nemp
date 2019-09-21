@@ -55,7 +55,7 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFileBasics,
+     AudioFileBasics, GR32,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
@@ -105,6 +105,7 @@ type
         // Thread-Handles
         fHND_LoadThread: DWord;
         fHND_UpdateThread: DWord;
+        fHND_ScanFilesAndUpdateThread: DWord;
         fHND_DeleteFilesThread: DWord;
         fHND_RefreshFilesThread: DWord;
         fHND_GetLyricsThread: DWord;
@@ -173,6 +174,8 @@ type
 
         // Thread-safe variable. DO NOT access it directly, always use the property
         fUpdateFortsetzen: LongBool;
+        // another one, for scanning hard disk for new files (new in version 4.12.)
+        fFileSearchAborted: LongBool;
 
         fArtist: UnicodeString;    // currently selected artist/album
         fAlbum: UnicodeString;     // Note: OnChange-Events of the trees MUST set these!
@@ -237,6 +240,8 @@ type
         function GetStatusBibUpdate   : Integer;
         procedure SetUpdateFortsetzen(Value: LongBool);
         function GetUpdateFortsetzen: LongBool;
+        procedure SetFileSearchAborted(Value: LongBool);
+        function GetFileSearchAborted: LongBool;
         function GetChangeAfterUpdate: LongBool;
         procedure SetChangeAfterUpdate(Value: LongBool);
         function GetChanged: LongBool;
@@ -285,6 +290,7 @@ type
 
         // Refreshing Library
         procedure fRefreshFiles(aRefreshList: TObjectList);      // 1a. Refresh files OR
+        procedure fScanNewFiles;
         procedure fGetLyrics;         // 1b. get Lyrics
         procedure fPrepareGetTags;    // 1c. get tags, but at first make a copy of the Ignore/rename-Rules in VCL-Thread
         procedure fGetTags;           //     get Tags (from LastFM)
@@ -435,6 +441,9 @@ type
 
         CurrentSearchDir: String;
 
+        // for the scan process for new files: New method in 4.12
+        UseNewFileScanMethod: Boolean;
+
         AutoDeleteFiles: Boolean;       
         AutoDeleteFilesShowInfo: Boolean;
 
@@ -531,6 +540,7 @@ type
         property CoverSortOrder: Integer read GetCoverSortOrder write SetCoverSortOrder;
 
         property UpdateFortsetzen: LongBool read GetUpdateFortsetzen Write SetUpdateFortsetzen;
+        property FileSearchAborted: LongBool read GetFileSearchAborted write SetFileSearchAborted;
 
         property SavePath: UnicodeString read fSavePath write fSavePath;
         property CoverSavePath: UnicodeString read fCoverSavePath write fCoverSavePath;
@@ -562,6 +572,9 @@ type
         procedure NewFilesUpdateBib(NewBib: Boolean = False);
         procedure DeleteFilesUpdateBib;
         procedure DeleteFilesUpdateBibAutomatic;
+
+        // for Nemp 4.12: Scan Files in UpdateList for the first time and merge them into the MediaLibrary
+        procedure ScanNewFilesAndUpdateBib;
 
         procedure CleanUpDeadFilesFromVCLLists;
         procedure RefreshFiles_All;
@@ -727,6 +740,7 @@ type
 
   Procedure fLoadLibrary(MB: TMedienbibliothek);
   Procedure fNewFilesUpdate(MB: TMedienbibliothek);
+  procedure fScanNewFilesAndUpdateBib(MB: TMedienbibliothek);
 
   Procedure fDeleteFilesUpdateContainer(MB: TMedienbibliothek; askUser: Boolean);
   Procedure fDeleteFilesUpdateUser(MB: TMedienbibliothek);
@@ -1191,6 +1205,14 @@ function TMedienBibliothek.GetUpdateFortsetzen: LongBool;
 begin
   InterLockedExchange(Integer(Result), Integer(fUpdateFortsetzen));
 end;
+procedure TMedienBibliothek.SetFileSearchAborted(Value: LongBool);
+begin
+    InterLockedExchange(Integer(fFileSearchAborted), Integer(Value));
+end;
+function TMedienBibliothek.GetFileSearchAborted: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fFileSearchAborted));
+end;
 
 procedure TMedienBibliothek.fSetIgnoreLyrics(aValue: Boolean);
 begin
@@ -1214,6 +1236,9 @@ var tmpcharcode, dircount, i: integer;
     so, sd: Integer;
 begin
         //BetaDontUseThreadedUpdate := Ini.ReadBool('Beta', 'DontUseThreadedUpdate', False);
+
+        // temporary, maybe add an option later (or remove it completely, so use it always)
+        UseNewFileScanMethod := ini.ReadBool('MedienBib', 'UseNewFileScanMethod', True);
 
         NempSortArray[1] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl1', integer(siArtist)));
         NempSortArray[2] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl2', integer(siAlbum)));
@@ -1432,6 +1457,173 @@ begin
 
         BibSearcher.SaveToIni(Ini);
         TagCloud.SaveToIni(Ini);
+
+        Ini.WriteBool('MedienBib', 'UseNewFileScanMethod', UseNewFileScanMethod);
+end;
+
+
+procedure TMedienBibliothek.ScanNewFilesAndUpdateBib;
+var Dummy: Cardinal;
+    i: Integer;
+begin
+    if Not FileSearchAborted then
+    begin
+        StatusBibUpdate := 1;
+        // actually start scanning the files and merge them into the library afterwards
+        fHND_ScanFilesAndUpdateThread  := BeginThread(Nil, 0, @fScanNewFilesAndUpdateBib, Self, 0, Dummy);
+    end else
+    begin
+        // the search for new files has beem cancelled by the user.
+        // Discard files in the UpdateList and cleanUP Progress-GUI
+        for i := 0 to UpdateList.Count - 1 do
+            TAudioFile(UpdateList[i]).Free;          
+        UpdateList.Clear;
+         
+        // we are in the main VCL Thread here.
+        // however, use the same methods to finish the jobs as in the threaded methods
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                              Integer(PChar(_(  MediaLibrary_SearchingNewFiles_Aborted  )) ));
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+
+        // current //job// is done, set status to 0
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+        // check for the next job
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);       
+    end;
+end;
+
+procedure fScanNewFilesAndUpdateBib(MB: TMedienbibliothek);
+begin
+    if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) then
+    begin
+        // !!!!!!!!!!!!!!!!!!!!!
+        // new part here: Scan the files first
+        MB.UpdateFortsetzen := True;
+        MB.fScanNewFiles;
+
+        // !!!!!!!!!!!!!!!!!
+        // Merge Files into the Library
+        // Status is set properly in PrepareNewFilesUpdate
+        MB.PrepareNewFilesUpdate;
+        MB.SwapLists;
+        MB.CleanUpTmpLists;
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                            Integer(PChar(_(MediaLibrary_SearchingNewFilesComplete ) )));
+        //if MB.ChangeAfterUpdate then
+        MB.Changed := True;
+    end else
+    begin
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UpdateProcessComplete,
+                          Integer(PChar(_(MediaLibrary_SearchingNewFiles_NothingFound )) ));
+        SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
+    end;
+
+    // current //job// is done, set status to 0
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_SetStatus, BIB_Status_Free);
+    // check for the next job
+    SendMessage(MB.MainWindowHandle, WM_MedienBib, MB_CheckForStartJobs, 0);
+    try
+        CloseHandle(MB.fHND_ScanFilesAndUpdateThread);
+    except
+    end;
+end;
+
+procedure TMedienBibliothek.fScanNewFiles;
+var i, freq, ges: Integer;
+    AudioFile: TAudioFile;
+    ct, nt: Cardinal;
+    ScanList: TObjectList;
+begin
+
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0); // Or better MB_BlockWriteAccess? - No, it should be ok so.
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+  
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_ScanNewFiles));
+
+  ges := UpdateList.Count;
+  freq := Round(UpdateList.Count / 100) + 1;
+  ct := GetTickCount;
+
+  ScanList := TObjectList.Create(False);
+  try
+      // Transfer the items from the UpdateList into a temporary new List
+      ScanList.Capacity := UpdateList.Count;
+      for i := 0 to UpdateList.Count - 1 do
+          ScanList.Add(TAudioFile(UpdateList[i]));
+      // Clear the original UpdateList
+      UpdateList.Clear;
+      
+      ChangeAfterUpdate := True;
+      for i := 0 to ScanList.Count - 1 do
+      begin
+          if Not UpdateFortsetzen then
+          begin
+              // Free the remaining AudioFiles in the ScanList, and
+              // don't add them to the UpdateList, which is processed after this method
+              TAudioFile(ScanList[i]).Free;
+          end else
+          begin
+              AudioFile := TAudioFile(ScanList[i]);
+              if FileExists(AudioFile.Pfad) then
+              begin
+                  AudioFile.FileIsPresent:=True;
+
+                  // GetAudioData within the secondary is a very bad idea.
+                  // The cover-stuff will cause some exceptions like OutOfRessources
+                  // The Mainthread will do the following at this message:
+                  // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
+                  // InitCover(AudioFile);
+
+                  //SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
+                  ////////////////////////////////
+                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or IgnoreLyricsFlag);
+                  InitCover(AudioFile);
+                  ///////////////////////////////////
+
+              end
+              else
+              begin
+                  // should npt happen here ...
+                  AudioFile.FileIsPresent:=False;
+              end;
+              // Add the File to the UpdateList, which is merged into the MediaLibrary later.
+              UpdateList.Add(AudioFile);
+
+              nt := GetTickCount;
+              if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
+              begin
+                  ct := nt;
+
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressCurrentFileOrDirUpdate,
+                                  Integer(PWideChar(Format(_(MediaLibrary_ScanningFilesInDir),
+                                                        [ AudioFile.Ordner ]))));
+
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressScanningNewFiles,
+                                  Integer(PWideChar(Format(_(MediaLibrary_ScanningFilesCount),
+                                                        [ i, ges ]))));
+
+                   {
+                  MediaLibrary_ScanningFilesCount
+
+
+                  ssd
+                      Nemp_MainForm.LblEmptyLibraryHint.Caption :=
+          Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
+                         }
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
+                  SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, i+1);
+                  // No counting of non-existing files here
+                  // SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, DeadFiles.Count);
+              end;
+          end;
+      end;
+
+      // progress complete
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
+
+  finally
+      ScanList.Free;
+  end;
 end;
 
 {
@@ -2506,8 +2698,6 @@ begin
         if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
         begin
             ct := nt;
-            //SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefresh, Round(i/ges * 100));
-
             SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressCurrentFileOrDirUpdate,
                             Integer(PWideChar(Format(_(MediaLibrary_RefreshingFilesInDir),
                                                   [ AudioFile.Ordner ]))));
@@ -3111,6 +3301,7 @@ var i, freq, ges: Integer;
     ErrorLog: TErrorLog;
     ct, nt: Cardinal;
     errCount, inconCount: Integer;
+    newTags: UTF8String;
 begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
     SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_UpdateMetadata));
@@ -3148,6 +3339,11 @@ begin
             end;
 
             af.FileIsPresent := True;
+
+            newTags := af.RawTagLastFM;
+            // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+            af.GetAudioData(af.Pfad);
+            af.RawTagLastFM := newTags;
 
             aErr := af.SetAudioData(True);
                     // SetAudioData(True) : Check before entering this thread, whether this operation
@@ -3472,9 +3668,12 @@ begin
   if not UpdateFortsetzen then
       StatusBibUpdate := 0;
 
+  FileSearchAborted := True;
   // this is the main-code in this method
   if StatusBibUpdate > 0 then
+  begin
       UpdateFortsetzen := False;
+  end;
 end;
 {
     --------------------------------------------------------
@@ -3859,7 +4058,7 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.InitCoverFromFilename(aFileName: UnicodeString): String;
-var aGraphic: TPicture;
+var aGraphic: TBitmap32; //TPicture;
     newID: String;
 begin
     try
@@ -3886,12 +4085,12 @@ begin
 
   if newID <> '' then
   begin
-      aGraphic := TPicture.Create;
+      aGraphic := TBitmap32.Create;
       try
           try
               aGraphic.LoadFromFile(aFilename);
 
-              if SaveResizedGraphic(aGraphic.Graphic, CoverSavePath + newID + '.jpg', 240, 240) then
+              if SaveResizedGraphic(aGraphic, CoverSavePath + newID + '.jpg', 240, 240) then
                   result := newID;
           except
               // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
@@ -5033,6 +5232,8 @@ end;
     - Get all files in the library within the given directory
     --------------------------------------------------------
 }
+
+
 procedure TMedienBibliothek.GetFilesInDir(aDirectory: UnicodeString; ClearExistingView: Boolean);
 var i: Integer;
     tmpList: TObjectList;

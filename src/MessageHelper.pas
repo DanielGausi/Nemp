@@ -667,6 +667,10 @@ begin
             ProgressFormLibrary.lblCurrentItem.Caption := PWideChar(aMsg.LParam);
         end;
 
+        MB_ProgressScanningNewFiles: begin
+            Nemp_MainForm.LblEmptyLibraryHint.Caption := PWideChar(aMsg.LParam);
+        end;
+
         MB_TagsSetTabWarning: begin
             SetBrowseTabCloudWarning(True);
         end;
@@ -2038,6 +2042,7 @@ procedure StartMediaLibraryFileSearch(AutoCloseProgressForm: Boolean = False);
 begin
     if MedienBib.ST_Ordnerlist.Count > 0 then
     begin
+        MedienBib.FileSearchAborted := False;
         ProgressFormLibrary.AutoClose := AutoCloseProgressForm;
         ProgressFormLibrary.InitiateProcess(True, pa_SearchFiles);
 
@@ -2095,9 +2100,14 @@ begin
                 if Not MedienBib.AudioFileExists(NewFile) then
                 begin
                     AudioFile:=TAudioFile.Create;
-                    aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
-                    HandleError(afa_NewFile, AudioFile, aErr);
-                    MedienBib.InitCover(AudioFile);
+                    if MedienBib.UseNewFileScanMethod then
+                        AudioFile.Pfad := NewFile
+                    else begin
+                        aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                        HandleError(afa_NewFile, AudioFile, aErr);
+                        MedienBib.InitCover(AudioFile);
+                    end;
+                    // add it to the UpdateListe anyway
                     MedienBib.UpdateList.Add(AudioFile);
                 end;
         end else
@@ -2161,8 +2171,16 @@ begin
                 else
                 begin
                     // Dateisuche fertig. Starte Updatekram
-                    MedienBib.NewFilesUpdateBib;
-                    fspTaskbarManager.ProgressState := fstpsNoProgress;
+                    if MedienBib.UseNewFileScanMethod then
+                    begin
+                        // new files has to be scanned first
+                        MedienBib.ScanNewFilesAndUpdateBib;
+                    end else
+                    begin
+                        // old method. Files are already scanned and ready to be merged into the Media Library
+                        MedienBib.NewFilesUpdateBib;
+                        fspTaskbarManager.ProgressState := fstpsNoProgress;
+                    end;
                 end;
           end;
         end;

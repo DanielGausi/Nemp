@@ -2188,6 +2188,7 @@ var
     pic: TPicture;
     success: Boolean;
     dummyAudioFile: TAudioFile;
+    afList: TObjectList;
 begin
   if NempIsClosing then exit;
 
@@ -2214,9 +2215,23 @@ begin
           begin
               // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
               // try to recreate it from the image files already existing on the disc/id3Tag
+
               dummyAudioFile := TAudioFile.Create;
               try
-                  dummyAudioFile.Pfad := IncludeTrailingPathDelimiter(aCover.Directory) + 'foo.bar';
+                  // We do not have an "Audiofile" with this coverID right now, so get one first.
+                  // this is needed, as otherwise we won't find the (now deleted) cover, if there's only cover art in
+                  // the ID3Tag, ond no jpg-files at all around the mp3-files
+                  afList := TObjectList.Create(False);
+                  try
+                      MedienBib.GetTitelListFromCoverID(afList, aCover.ID);
+                      if afList.Count = 0 then
+                          dummyAudioFile.Pfad := IncludeTrailingPathDelimiter(aCover.Directory) + 'foo.bar'
+                      else
+                          dummyAudioFile.GetAudioData(TAudioFile(afList[0]).Pfad, GAD_COVER)
+                  finally
+                      afList.Free;
+                  end;
+
                   MedienBib.InitCover(dummyAudioFile, True);
                   // try again getting the coverbitmap
                   success := GetCoverBitmapFromID(dummyAudioFile.CoverID, pic, MedienBib.CoverSavePath);
@@ -2234,10 +2249,11 @@ begin
           end;
 
           FitBitmapIn(bmp, pic.Graphic);
-
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+
           if (not success) and (MedienBib.CoverSearchLastFM) then
               Medienbib.NewCoverFlow.DownloadCover(aCover, msg.index);
+
       end;
   finally
       pic.free;
@@ -10216,6 +10232,7 @@ var
   listFile: TAudioFile;
   i: Integer;
   aErr: TNempAudioError;
+  newRating: Byte;
 begin
     if (NempSkin.NempPartyMode.DoBlockTreeEdit)
         // or (not NempOptions.AllowQuickAccessToMetadata)
@@ -10237,6 +10254,15 @@ begin
         and (MedienBib.CurrentThreadFilename <> af.Pfad)
     then
     begin
+        if (VST.Header.Columns[column].Tag = CON_RATING) then
+        begin
+            // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+            // for string-properties "GetAudioData" was called in VSTNewText to sync the library with the file
+            newRating := af.Rating;
+            af.GetAudioData(af.Pfad);
+            af.Rating := newRating;
+        end;
+
         aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
         if (aErr = AUDIOERR_None) or (VST.Header.Columns[column].Tag = CON_RATING) then
         begin
@@ -10293,6 +10319,9 @@ begin
             if af.Pfad <> MedienBib.CurrentThreadFilename then
             begin
                 MedienBib.Changed := True;
+                // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
+                af.GetAudioData(af.Pfad);
+
                 case VST.Header.Columns[column].Tag of
                     CON_ARTIST : af.Artist := NewText;
                     CON_TITEL  : af.Titel := NewText;

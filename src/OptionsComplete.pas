@@ -41,7 +41,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
-  DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
+  DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs, GR32,
   bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, U_Charcode, Nemp_SkinSystem, UpdateUtils, HtmlHelper, Lyrics,
@@ -3349,14 +3349,14 @@ begin
 end;
 
 procedure TOptionsCompleteForm.btn_DefaultCoverClick(Sender: TObject);
-var aGraphic: TPicture;
+var aGraphic: TBitmap32;
 begin
     if OpenDlg_DefaultCover.Execute then
     begin
-        aGraphic := TPicture.Create;
+        aGraphic := TBitmap32.Create;
         try
             aGraphic.LoadFromFile(OpenDlg_DefaultCover.FileName);
-            if SaveResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
+            if SaveResizedGraphic(aGraphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
@@ -3367,17 +3367,17 @@ begin
 end;
 
 procedure TOptionsCompleteForm.btn_DefaultCoverResetClick(Sender: TObject);
-var aGraphic: TPicture;
+var aGraphic: TBitmap32;
     FileName: UnicodeString;
 begin
     FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
     if not FileExists(FileName) then
         FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
 
-    aGraphic := TPicture.Create;
+    aGraphic := TBitmap32.Create;
     try
         aGraphic.LoadFromFile(FileName);
-        if SaveResizedGraphic(aGraphic.Graphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
+        if SaveResizedGraphic(aGraphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
             LoadDefaultCover
         else
             MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);

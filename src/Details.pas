@@ -46,7 +46,7 @@ uses
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds,
-  Nemp_RessourceStrings, Menus, RatingCtrls, Spin;
+  Nemp_RessourceStrings, Menus, RatingCtrls, Spin, GR32, GR32_Image, GR32_ImageEx;
 
 type
   TFDetails = class(TForm)
@@ -78,7 +78,6 @@ type
     Btn_SavePictureToFile: TButton;
     GrpBox_Mpeg: TGroupBox;
     GrpBox_TextFrames: TGroupBox;
-    ID3Image: TImage;
     Bevel1: TBevel;
     CBID3v1: TCheckBox;
     CBID3v2: TCheckBox;
@@ -233,6 +232,7 @@ type
     BtnUndo: TButton;
     BtnApply: TButton;
     cbLyricOptions: TComboBox;
+    ID3Image32: TImage32Ex;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -1139,7 +1139,7 @@ begin
     picsEnabled  := (ValidMp3File and ID3v2Activated) or ValidFlacFile or ValidApeFile or ValidM4AFile;
 
     cbPictures.Enabled := picsEnabled;
-    ID3Image.Visible := picsEnabled;
+    ID3Image32.Visible := picsEnabled;
     Btn_NewPicture.Enabled := picsEnabled;
     Btn_DeletePicture.Enabled := picsEnabled;
     Btn_SavePictureToFile.Enabled := picsEnabled;
@@ -1800,12 +1800,21 @@ begin
             if CurrentTagObject.BaseApeFile.GetPicture(aKey, picStream, picDescription) then
             begin
                 //if not StreamToBitmap(picStream, ID3Image.Picture.Bitmap) then
-                if not PicStreamToImage(picStream, 'image/jpeg', ID3Image.Picture.Bitmap) then
+                {if not PicStreamToImage(picStream, 'image/jpeg', ID3Image.Picture.Bitmap) then
                     if not PicStreamToImage(picStream, 'image/png', ID3Image.Picture.Bitmap) then
                         if not PicStreamToImage(picStream, 'image/bmp', ID3Image.Picture.Bitmap) then
                             ID3Image.Picture.Assign(NIL);
+                }
+
+
+                if not PicStreamToBitmap32(picStream, 'image/jpeg', ID3Image32.Bitmap) then
+                    if not PicStreamToBitmap32(picStream, 'image/png', ID3Image32.Bitmap) then
+                        if not PicStreamToBitmap32(picStream, 'image/bmp', ID3Image32.Bitmap) then
+                            ID3Image32.Bitmap.Assign(NIL);
             end else
-                ID3Image.Picture.Assign(NIL);
+            begin
+                ID3Image32.Bitmap.Assign(NIL);
+            end;
         finally
             picStream.Free;
         end;
@@ -1848,14 +1857,15 @@ begin
                         if cbPictures.Items.Count > 0 then
                         begin
                             cbPictures.ItemIndex := 0;
-                            ID3Image.Visible := True;
+                            ID3Image32.Visible := True;
                             stream.Seek(0, soFromBeginning);
-                            PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+                            // PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+                            PicStreamToBitmap32(stream, Mime, ID3IMAGE32.Bitmap);
                         end else
                         begin
                             cbPictures.ItemIndex := -1;
-                            ID3Image.Picture.Assign(NIL);
-                            ID3Image.Visible := False;
+                            ID3Image32.Bitmap.Assign(NIL);
+                            ID3Image32.Visible := False;
                         end;
                     finally
                         stream.Free;
@@ -1879,7 +1889,7 @@ begin
 
                       Btn_DeletePicture.Enabled := cbPictures.Items.Count > 0;
                       Btn_SavePictureToFile.Enabled := cbPictures.Items.Count > 0;
-                      ID3Image.Visible := cbPictures.Items.Count > 0;
+                      ID3Image32.Visible := cbPictures.Items.Count > 0;
                       Btn_NewPicture.Enabled := True;
 
                       if cbPictures.Items.Count > 0 then
@@ -1889,14 +1899,15 @@ begin
                           stream := TMemoryStream.Create;
                           try
                               TFlacPictureBlock(PictureFrames[0]).CopyPicData(stream);
-                              PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[0]).Mime, ID3IMAGE.Picture.Bitmap);
+                              //PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[0]).Mime, ID3IMAGE.Picture.Bitmap);
+                              PicStreamToBitmap32(stream, TFlacPictureBlock(PictureFrames[0]).Mime, ID3IMAGE32.Bitmap);
                           finally
                               stream.Free;
                           end;
                       end else
                       begin
                           cbPictures.ItemIndex := -1;
-                          ID3Image.Picture.Assign(NIL);
+                          ID3Image32.Bitmap.Assign(NIL);
                       end;
                   end;
         at_M4A: begin
@@ -1912,11 +1923,12 @@ begin
                               end;
                               cbPictures.Items.Add(DetailForm_OnlyOneM4ACover);
                               cbPictures.ItemIndex := 0;
-                              PicStreamToImage(stream, mime, ID3IMAGE.Picture.Bitmap);
+                              //PicStreamToImage(stream, mime, ID3IMAGE.Picture.Bitmap);
+                              PicStreamToBitmap32(stream, mime, ID3IMAGE32.Bitmap);
                           end else
                           begin
                               cbPictures.ItemIndex := -1;
-                              ID3Image.Picture.Assign(NIL);
+                              ID3Image32.Bitmap.Assign(NIL);
                           end;
                       finally
                           stream.Free;
@@ -1935,7 +1947,9 @@ begin
                           LoadApeImage(AnsiString(cBPictures.Text));
                       end
                       else
-                          Id3Image.Picture.Assign(NIL);
+                      begin
+                          ID3Image32.Bitmap.Assign(NIL);
+                      end;
                   end;
         at_Wma: ;
         at_Wav: ;
@@ -2727,15 +2741,17 @@ begin
     try
         if ValidMP3File then
         begin
-            ID3Image.Visible := True;
+            ID3Image32.Visible := True;
             (PictureFrames[cbPictures.ItemIndex] as TID3v2Frame).GetPicture(Mime, PicType, Description, stream);
-            PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+            // PicStreamToImage(stream, Mime, ID3IMAGE.Picture.Bitmap);
+            PicStreamToBitmap32(stream, Mime, ID3IMAGE32.Bitmap);
         end;
         if ValidFlacFile then
         begin
             idx := cbPictures.ItemIndex;
             TFlacPictureBlock(PictureFrames[idx]).CopyPicData(stream);
-            PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[idx]).Mime, ID3IMAGE.Picture.Bitmap);
+            // PicStreamToImage(stream, TFlacPictureBlock(PictureFrames[idx]).Mime, ID3IMAGE.Picture.Bitmap);
+            PicStreamToBitmap32(stream, TFlacPictureBlock(PictureFrames[idx]).Mime, ID3IMAGE32.Bitmap);
         end;
         if ValidApeFile then
         begin
@@ -2793,7 +2809,7 @@ var Stream: TMemoryStream;
     m4aPictype: TM4APicTypes;
     Description: UnicodeString;
     idx: Integer;
-    tmpBmp: TBitmap;
+    tmpBmp: TBitmap32;
 begin
     Stream := TMemoryStream.Create;
     try
@@ -2828,12 +2844,12 @@ begin
             if CurrentTagObject.BaseApeFile.GetPicture(AnsiString(cbPictures.Text), Stream, Description) then
             begin
                 // try to get the MimeType
-                tmpBmp := TBitmap.Create;
+                tmpBmp := TBitmap32.Create;
                 try
-                    if PicStreamToImage(Stream, 'image/jpeg', tmpBmp) then
+                    if PicStreamToBitmap32(Stream, 'image/jpeg', tmpBmp) then
                         mime := 'image/jpeg'
                     else
-                        if PicStreamToImage(Stream, 'image/png', tmpBmp) then
+                        if PicStreamToBitmap32(Stream, 'image/png', tmpBmp) then
                             mime := 'image/png'
                 finally
                       tmpBmp.Free;

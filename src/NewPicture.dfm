@@ -18,16 +18,6 @@ object FNewPicture: TFNewPicture
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Image1: TImage
-    Left = 8
-    Top = 8
-    Width = 129
-    Height = 129
-    Center = True
-    Proportional = True
-    Stretch = True
-    Visible = False
-  end
   object LblConst_PictureType: TLabel
     Left = 152
     Top = 8
@@ -41,6 +31,19 @@ object FNewPicture: TFNewPicture
     Width = 153
     Height = 13
     Caption = 'Short description for the picture'
+  end
+  object Image1: TImage32Ex
+    Left = 8
+    Top = 8
+    Width = 129
+    Height = 129
+    Bitmap.ResamplerClassName = 'TDraftResampler'
+    BitmapAlign = baCenter
+    Scale = 1.000000000000000000
+    ScaleMode = smResize
+    TabOrder = 6
+    Visible = False
+    Transparent = True
   end
   object cbPictureType: TComboBox
     Left = 152

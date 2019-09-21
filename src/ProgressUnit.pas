@@ -229,6 +229,14 @@ begin
           SetLabelWithHint(ProgressForm_DeleteFiles);
       end;
 
+      pa_ScanNewFiles: begin
+          LoadImage('scanFiles.png');
+          SetLabelWithHint(ProgressForm_ScanNewFiles);
+      end;
+
+
+      // ProgressForm_ScanNewFiles
+
     end;
 
     Visible := True;

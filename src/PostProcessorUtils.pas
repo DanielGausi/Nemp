@@ -590,9 +590,28 @@ begin
 end;
 
 function TPostProcessJob.UpdateFile: TNempAudioError;
+var currentRating: Byte;
+    currentPlayCounter: Integer;
 begin
     if fWriteToFiles then
-        result := fAudioFile.SetAudioData(fWriteToFiles)
+    begin
+        // fix 2019, Nemp 4.12
+        // if the file was uncompletely loaded in the media library (for whatever reasons),
+        // or the file was updated by another software in the meantime (since adding it to the library),
+        // the previous code removed potentially huge parts of the ID3-Tag.
+        // therefore: Reload the meta data from the file, and set only the changed values here again
+        // 1. backup the new values
+        currentRating      := fAudioFile.Rating      ;
+        currentPlayCounter := fAudioFile.PlayCounter ;
+        // 2. read all fileinfo from the file (and store it into the "NempAudioFile"-Structure
+        fAudioFile.GetAudioData(fAudioFile.Pfad);
+        // 3. set the recently calculated values again
+        fAudioFile.Rating      := currentRating      ;
+        fAudioFile.PlayCounter := currentPlayCounter ;
+        // 4. actually update the file
+        // (yes, this involves another "readfromfile" ...)
+        result := fAudioFile.SetAudioData(fWriteToFiles);
+    end
     else
         result := AUDIOERR_EditingDenied;
 end;

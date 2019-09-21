@@ -122,6 +122,7 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
+            ShowAccelChar = False
             WordWrap = True
             StyleElements = [seClient, seBorder]
           end
@@ -149,7 +150,7 @@ object Nemp_MainForm: TNemp_MainForm
               167
               175)
             object IMGMedienBibCover: TImage
-              Left = 1
+              Left = 3
               Top = 6
               Width = 164
               Height = 24
@@ -160,7 +161,6 @@ object Nemp_MainForm: TNemp_MainForm
               OnMouseDown = IMGMedienBibCoverMouseDown
               OnMouseMove = IMGMedienBibCoverMouseMove
               OnMouseUp = IMGMedienBibCoverMouseUp
-              ExplicitWidth = 297
             end
             object ImgScrollCover: TImage
               Left = 1

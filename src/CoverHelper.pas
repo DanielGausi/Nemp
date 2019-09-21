@@ -42,13 +42,10 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
-  MP3FileUtils, ID3v2Frames, NempAudioFiles, Nemp_ConstantsAndTypes,
-  cddaUtils, basscd,
-  //System.Win.ComObj,
-  Winapi.Wincodec
-  //Winapi.ActiveX
-  ;
-
+  //MP3FileUtils, ID3v2Frames, // not used anymore here
+  NempAudioFiles, Nemp_ConstantsAndTypes,
+  cddaUtils, basscd, GR32, GR32_Backends, GR32_Resamplers,
+  Winapi.Wincodec;
 
 type
 
@@ -118,25 +115,29 @@ type
 
   // Save a Graphic in a resized file. Used for all the little md5-named jpgs
   // in <NempDir>\Cover
-  function SaveResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+  function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
 
   // Converts data from a (id3tag)-picture-stream to a Bitmap.
-  function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
+  //function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
+  function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
+
 
   // Draw a Picture on a Bitmap
   procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 
   // Draw a Graphic on a bounded Bitmap (stretch, proportional)
   procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
+  procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
   procedure FitPictureIn(Bounds: TPicture; Source: TGraphic);
   procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
 
   // GetCoverFromList calls GetFrontCover and load it into the Bitmap
   function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): boolean;
-  // Get the Frontcover from an id3Tag
-  function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
+  //// Get the Frontcover from an id3Tag
+  //// moved to TAudioFile.GetCoverFromMetaData
+  //// function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 
-  // GetCover calls GetCoverFromID3,
+  // GetCover calls GetCoverFromMetaData,
   // then MedienBib.GetCoverList and GetCoverFromList if no success (iff CompleteCoverSearch = True)
   // finally GetDefaultCover if still no success
   function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
@@ -144,7 +145,6 @@ type
   // GetCoverBitmapFromID:
   // Get the Bitmap for a specified Cover-ID
   function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture; aDir: String): Boolean;
-
 
   // Get the Default-Cover
   // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
@@ -501,48 +501,64 @@ begin
   Findclose(sr);
 end;
 
-function SaveResizedGraphic(aGraphic: TGraphic; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
-var BigBmp, SmallBmp: TBitmap;
+function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+var SmallBmp: TBitmap32;
+    tmpBmp: TBitmap;
     xfactor, yfactor:double;
     aJpg: tJpegImage;
     aStream: TFileStream;
+
+    //wic: TWICImage;
+    //R: TDraftResampler; // TLinearResampler;
 begin
 
   result := True;
 
   if Not Overwrite and FileExists(dest) then exit;
 
-  BigBmp := TBitmap.Create;
-  SmallBmp := TBitmap.Create;
+  // BigBmp := TBitmap32.Create;
+  SmallBmp := TBitmap32.Create;
+
   try
       try
           SmallBmp.Width := W;
           SmallBmp.Height := H;
 
-          if (aGraphic <> NIL) And ((aGraphic.Width > 0) And (aGraphic.Height > 0)) then
+          if (SourceBmp <> NIL) And ((SourceBmp.Width > 0) And (SourceBmp.Height > 0)) then
           begin
 
-              BigBmp.Assign(aGraphic);
+              // BigBmp.Assign(aGraphic);
 
-
-              xfactor:= (W) / aGraphic.Width;
-              yfactor:= (H) / aGraphic.Height;
+              xfactor:= (W) / SourceBmp.Width;
+              yfactor:= (H) / SourceBmp.Height;
               if xfactor > yfactor then
                 begin
-                  SmallBmp.Width := round(aGraphic.Width * yfactor);
-                  SmallBmp.Height := round(aGraphic.Height * yfactor);
+                  SmallBmp.Width := round(SourceBmp.Width * yfactor);
+                  SmallBmp.Height := round(SourceBmp.Height * yfactor);
                 end else
                 begin
-                  SmallBmp.Width := round(aGraphic.Width * xfactor);
-                  SmallBmp.Height := round(aGraphic.Height * xfactor);
+                  SmallBmp.Width := round(SourceBmp.Width * xfactor);
+                  SmallBmp.Height := round(SourceBmp.Height * xfactor);
                 end;
 
-              SetStretchBltMode(SmallBmp.Canvas.Handle, HALFTONE);
-              StretchBlt(SmallBmp.Canvas.Handle, 0 ,0, SmallBmp.Width, SmallBmp.Height, BigBmp.Canvas.Handle, 0, 0, BigBmp.Width, BigBmp.Height, SRCCopy);
+              TDraftResampler.Create(SourceBmp); // will be freed be Destructor of Smallbmp
+              SmallBmp.Draw(SmallBmp.BoundsRect, SourceBmp.BoundsRect, SourceBmp);
+
+              // SetStretchBltMode(SmallBmp.Canvas.Handle, HALFTONE);
+              // StretchBlt(SmallBmp.Canvas.Handle, 0 ,0, SmallBmp.Width, SmallBmp.Height, BigBmp.Canvas.Handle, 0, 0, BigBmp.Width, BigBmp.Height, SRCCopy);
+
+              tmpBmp := TBitmap.Create;
               aJpg := TJpegImage.Create;
+
+              //wic := TWICImage.Create;
               try
+                  tmpBmp.Assign(SmallBmp);
                   aJpg.CompressionQuality := 90;
-                  aJpg.Assign(Smallbmp);
+                  aJpg.Assign(tmpBmp);
+
+                  //wic.Assign(SmallBmp);
+                  //wic.SaveToFile(dest + '___.jpg');
+
                   try
                       aStream := TFileStream.Create(dest, fmCreate or fmOpenWrite);
                       try
@@ -556,7 +572,9 @@ begin
                           result := False;
                   end;
               finally
+                  tmpBmp.Free;
                   aJpg.Free;
+                  //wic.Free;
               end;
           end;
       except
@@ -565,10 +583,68 @@ begin
       end;
   finally
       SmallBmp.Free;
-      BigBmp.Free;
+      // BigBmp.Free;
   end;
 end;
 
+function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
+var jp: TJPEGImage;
+    png: TPNGImage;
+begin
+    result := True;
+    if (mime = 'image/jpeg') or (mime = 'image/jpg') or (AnsiUpperCase(String(Mime)) = 'JPG') then
+    try
+        aStream.Seek(0, soFromBeginning);
+        jp := TJPEGImage.Create;
+        try
+          try
+            jp.LoadFromStream(aStream);
+            //jp.DIBNeeded;
+            aBmp.Assign(jp);
+          except
+            result := False;
+            aBmp.Assign(NIL);
+          end;
+        finally
+          jp.Free;
+        end;
+    except
+        result := False;
+        aBmp.Assign(NIL);
+    end else
+        if (mime = 'image/png') or (Uppercase(String(Mime)) = 'PNG') then
+        try
+            aStream.Seek(0, soFromBeginning);
+            png := TPNGImage.Create;
+            try
+              try
+                png.LoadFromStream(aStream);
+                aBmp.Assign(png);
+              except
+                result := False;
+                aBmp.Assign(NIL);
+              end;
+            finally
+              png.Free;
+            end;
+        except
+            result := False;
+            aBmp.Assign(NIL);
+        end else
+        if (mime = 'image/bmp') or (Uppercase(String(Mime)) = 'BMP') then
+            try
+                aStream.Seek(0, soFromBeginning);
+                aBmp.LoadFromStream(aStream);
+            except
+                result := False;
+                aBmp.Assign(Nil);
+            end else
+                begin
+                    aBmp.Assign(NIL);
+                end;
+end;
+
+(*
 function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
 var jp: TJPEGImage;
     png: TPNGImage;
@@ -625,6 +701,7 @@ begin
                     aBmp.Assign(NIL);
                 end;
 end;
+*)
 
 procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 begin
@@ -687,6 +764,47 @@ begin
     end;
 end;
 
+procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
+var xfactor, yfactor:double;
+    tmpBmp: TBitmap32;
+begin
+  if Source = NIL then exit;
+  if (Source.Width = 0) or (Source.Height=0) then exit;
+  xfactor:= (Bounds.Width) / Source.Width;
+  yfactor:= (Bounds.Height) / Source.Height;
+  if xfactor > yfactor then
+  begin
+      Bounds.Width := round(Source.Width*yfactor);
+      Bounds.Height := round(Source.Height*yfactor);
+  end else
+  begin
+      Bounds.Width := round(Source.Width*xfactor);
+      Bounds.Height := round(Source.Height*xfactor);
+  end;
+
+    tmpbmp := TBitmap32.Create;
+    try
+        tmpBmp.Width := Bounds.Width;
+        tmpBmp.Height := Bounds.Height;
+
+        //tmpBmp.Assign(Source);
+
+        TDraftResampler.Create(Source); // will be freed be Destructor of Smallbmp
+        tmpBmp.Draw(tmpBmp.BoundsRect, Source.BoundsRect, Source);
+
+        Bounds.Assign(tmpBmp);
+        {
+        SetStretchBltMode(Bounds.Canvas.Handle, HALFTONE);
+        StretchBlt(Bounds.Canvas.Handle,
+                  0,0, Bounds.Width, Bounds.Height,
+                  tmpbmp.Canvas.Handle,
+                  0, 0, tmpBmp.Width, tmpBmp.Height, SRCCopy);
+        }
+    finally
+        tmpbmp.Free
+    end;
+end;
+
 
 // WIC-principle from https://www.delphipraxis.net/1291613-post31.html
 procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
@@ -741,6 +859,7 @@ begin
       end;
 end;
 
+(*
 function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
 var MpegInfo: TMpegInfo;
   Id3v1Tag: TID3v1Tag;
@@ -752,7 +871,7 @@ var MpegInfo: TMpegInfo;
   PicData: TMemoryStream;
   ok: Boolean;
   i: integer;
-  tmpbmp: TBitmap;
+  tmpbmp: TBitmap32;
 begin
   result := False;
 
@@ -782,15 +901,15 @@ begin
 
                 if ((PicType = 3) or (i = 0)) and (PicData.Size > 50) then
                 begin
-                    tmpbmp := TBitmap.Create;
+                    tmpbmp := TBitmap32.Create;
                     try
-                        tmpbmp.PixelFormat := pf32Bit;
-                        ok := PicStreamToImage(PicData, Mime, tmpbmp);
-
+                        //tmpbmp.PixelFormat := pf32Bit;
+                        //ok := PicStreamToImage(PicData, Mime, tmpbmp);
+                        ok := PicStreamToBitmap32(PicData, Mime, tmpbmp);
                         if ok then
                         begin
                             if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                                FitBitmapIn(aCoverbmp, tmpbmp)
+                                FitBitmap32In(aCoverbmp, tmpbmp)
                             else
                                 aCoverBmp.Assign(tmpbmp);
                         end;
@@ -815,11 +934,13 @@ begin
     Id3v2Tag.Free;
   end;
 end;
+*)
 
 function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
+    aBmp32: TBitmap32;
 begin
   result := false;
   try
@@ -848,25 +969,36 @@ begin
               begin
                   if CompleteCoverSearch then
                   begin
-                      // erstmal im ID3-Tag nach nem Bild suchen
-                      if GetCoverFromID3(aAudioFile, aCoverbmp.Bitmap) then
-                          result := True
-                      else
-                      begin // in Dateien rund um das Audiofile nach nem Bild suchen
-                          coverliste := TStringList.Create;
-                          Medienbib.GetCoverListe(aAudioFile,coverliste);
-                          try
-                              if Not GetCoverFromList(CoverListe, aCoverbmp) then
-                              begin
+                      // first: Check Metadata
+                      // Bugfix 4.12: Also consider Non-MP3-Files (like Flac)
+                      aBmp32 := TBitmap32.Create;
+                      try
+                          // if GetCoverFromID3(aAudioFile, aCoverbmp.Bitmap) then
+                          //    result := True
+                          if aAudioFile.GetCoverFromMetaData(aBmp32) then
+                          begin
+                              result := True;
+                              aCoverbmp.Assign(aBmp32);
+                          end
+                          else
+                          begin // in Dateien rund um das Audiofile nach nem Bild suchen
+                              coverliste := TStringList.Create;
+                              Medienbib.GetCoverListe(aAudioFile,coverliste);
+                              try
+                                  if Not GetCoverFromList(CoverListe, aCoverbmp) then
+                                  begin
+                                      GetDefaultCover(dcFile, aCoverbmp, 0);
+                                      result := False;
+                                  end else
+                                      result := True;
+                              except
                                   GetDefaultCover(dcFile, aCoverbmp, 0);
-                                  result := False;
-                              end else
-                                  result := True;
-                          except
-                              GetDefaultCover(dcFile, aCoverbmp, 0);
-                              result := false;
+                                  result := false;
+                              end;
+                              coverliste.free;
                           end;
-                          coverliste.free;
+                      finally
+                          aBmp32.Free;
                       end;
                   end else
                   begin

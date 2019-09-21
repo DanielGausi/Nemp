@@ -62,7 +62,7 @@ type
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
     // pa_default is used only for putting files from the playlist into the media library
-    TProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles);
+    TProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
 
     TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
@@ -522,8 +522,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.11';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.11';
+    NEMP_VERSION_SPLASH = 'version 4.12';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.12';
 
     NEMP_TIPSIZE = 128;
 
@@ -645,6 +645,7 @@ const
     MB_ProgressSearchDead = 17;
     // Lyrics, send Status complete/failed
     MB_ProgressCurrentFileOrDirUpdate = 18;
+    MB_ProgressScanningNewFiles = 27;
     // same for Tags
     // MB_TagsUpdateStatus = 28;
     // Lyrics/PostProcessor: Send the filename which is currently edited by a thread

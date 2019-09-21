@@ -406,8 +406,10 @@ begin
         Nemp_MainForm.TabBtn_CoverFlow.Enabled := False;
         Nemp_MainForm.TabBtn_Browse   .Enabled := False;
         Nemp_MainForm.TabBtn_TagCloud .Enabled := False;
-        // VST Panel (Complete)
-        Nemp_MainForm._VSTPanel.Enabled := False;
+        // VST Panel (Complete) - no. Reason: Variable GUI
+        //Nemp_MainForm._VSTPanel.Enabled := False;
+        Nemp_MainForm.MedialistPanel.Enabled := False;
+        Nemp_MainForm.MedienBibDetailPanel.Enabled := False;
 
         if assigned(FormBibSearch) then
            FormBibSearch.EnableControls(False);
@@ -439,7 +441,10 @@ begin
     Nemp_MainForm.TabBtn_Browse   .Enabled := True;
     Nemp_MainForm.TabBtn_TagCloud .Enabled := True;
     // VST Panel (Complete)
-    Nemp_MainForm._VSTPanel.Enabled := True;
+    //Nemp_MainForm._VSTPanel.Enabled := True;
+    Nemp_MainForm.MedialistPanel.Enabled := True;
+    Nemp_MainForm.MedienBibDetailPanel.Enabled := True;
+
 
     // Other Forms
     if assigned(FormBibSearch) then

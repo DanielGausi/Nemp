@@ -38,11 +38,11 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
   PNGImage, gnuGettext,  CoverHelper, AudioFiles, M4aAtoms,
-  Nemp_RessourceStrings, System.UITypes;
+  Nemp_RessourceStrings, System.UITypes, GR32_Image, GR32_ImageEx;
 
 type
   TFNewPicture = class(TForm)
-    Image1: TImage;
+    Image1: TImage32Ex;
     cbPictureType: TComboBox;
     LblConst_PictureType: TLabel;
     LblConst_PictureDescription: TLabel;
@@ -115,7 +115,7 @@ procedure TFNewPicture.FormShow(Sender: TObject);
 begin
     cbPictureType.ItemIndex := 0;
     EdtPictureDescription.Text := '';
-    Image1.Picture.Assign(NIL);
+    Image1.Bitmap.Assign(NIL);
     Image1.Visible := False;
     Btn_OK.Enabled := False;
     UpdateWarning;
@@ -168,9 +168,9 @@ begin
           aStream := TFileStream.Create(OpenPictureDialog1.FileName, fmOpenRead or fmShareDenyWrite);
           try
               if (AnsiLowerCase(ExtractFileExt(OpenPictureDialog1.FileName))='.png') then
-                  PicStreamToImage(aStream, 'image/png', Image1.Picture.Bitmap)
+                  PicStreamToBitmap32(aStream, 'image/png', Image1.Bitmap)
               else
-                  PicStreamToImage(aStream, 'image/jpeg', Image1.Picture.Bitmap);
+                  PicStreamToBitmap32(aStream, 'image/jpeg', Image1.Bitmap);
           finally
               aStream.Free;
           end;
@@ -179,7 +179,7 @@ begin
           UpdateWarning;
 
       except
-          Image1.Picture.Assign(NIL);
+          Image1.Bitmap.Assign(NIL);
           Image1.Visible := False;
           Btn_OK.Enabled := False;
       end;
