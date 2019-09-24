@@ -4,8 +4,8 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Equalizer and effects'
-  ClientHeight = 301
-  ClientWidth = 891
+  ClientHeight = 348
+  ClientWidth = 815
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -369,42 +369,78 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       OnClick = PM_EQ_DisabledClick
     end
   end
-  object GrpBoxHall: TGroupBox
+  object GrpBoxEffects: TGroupBox
     AlignWithMargins = True
     Left = 440
     Top = 8
-    Width = 217
+    Width = 361
     Height = 250
-    Caption = 'Reverb and echo'
+    Caption = 'Effects'
     TabOrder = 1
     object HallLBL: TLabel
-      Left = 171
-      Top = 37
+      Left = 145
+      Top = 54
       Width = 12
       Height = 13
       Caption = '...'
       Transparent = True
     end
     object EchoTimeLBL: TLabel
-      Left = 171
-      Top = 138
+      Left = 145
+      Top = 155
       Width = 12
       Height = 13
       Caption = '...'
       Transparent = True
     end
     object EchoMixLBL: TLabel
-      Left = 171
-      Top = 98
+      Left = 145
+      Top = 115
       Width = 12
       Height = 13
       Caption = '...'
       Transparent = True
     end
-    object tbReverb: TNempTrackBar
+    object SampleRateLBL: TLabel
+      Left = 326
+      Top = 50
+      Width = 12
+      Height = 13
+      Caption = '...'
+      Transparent = True
+    end
+    object lblWobble: TLabel
+      Left = 200
+      Top = 88
+      Width = 81
+      Height = 13
+      Caption = 'Wobble playback'
+    end
+    object lblSpeed: TLabel
+      Left = 200
+      Top = 24
+      Width = 74
+      Height = 13
+      Caption = 'Playback speed'
+    end
+    object lblReverb: TLabel
       Left = 16
       Top = 24
-      Width = 150
+      Width = 35
+      Height = 13
+      Caption = 'Reverb'
+    end
+    object lblEcho: TLabel
+      Left = 16
+      Top = 85
+      Width = 23
+      Height = 13
+      Caption = 'Echo'
+    end
+    object tbReverb: TNempTrackBar
+      Left = 16
+      Top = 39
+      Width = 123
       Height = 40
       Hint = 'Reverb'
       Max = 0
@@ -418,8 +454,8 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
     object tbEchoTime: TNempTrackBar
       Left = 16
-      Top = 126
-      Width = 150
+      Top = 143
+      Width = 123
       Height = 40
       Hint = 'Echo delay'
       Max = 2000
@@ -433,8 +469,8 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
     object tbWetDryMix: TNempTrackBar
       Left = 16
-      Top = 86
-      Width = 150
+      Top = 103
+      Width = 123
       Height = 40
       Hint = 'Echo mix'
       Max = 50
@@ -445,84 +481,59 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       OnMouseDown = tbWetDryMixMouseDown
     end
     object Btn_EffectsOff: TBitBtn
-      Left = 16
+      Left = 200
       Top = 210
-      Width = 129
+      Width = 123
       Height = 25
       Hint = 'Disable effects'
       Caption = 'Disable effects'
       TabOrder = 3
       OnClick = Btn_EffectsOffClick
     end
-  end
-  object grpBoxPlayback: TGroupBox
-    AlignWithMargins = True
-    Left = 663
-    Top = 8
-    Width = 210
-    Height = 178
-    Caption = 'Playback'
-    TabOrder = 2
-    object SampleRateLBL: TLabel
-      Left = 171
-      Top = 78
-      Width = 12
-      Height = 13
-      Caption = '...'
-      Transparent = True
-    end
-    object DirectionPositionBTN: TButton
-      Left = 16
-      Top = 25
-      Width = 150
-      Height = 25
-      Hint = 'Play backwards'
-      Caption = 'Play backwards'
-      TabOrder = 0
-      OnClick = __DirectionPositionBTNClick
+    object tbWobble: TNempTrackBar
+      Left = 200
+      Top = 103
+      Width = 125
+      Height = 40
+      Max = 40
+      TabOrder = 4
+      TickMarks = tmBoth
+      TickStyle = tsManual
+      OnChange = tbWobbleChange
+      OnMouseDown = tbWobbleMouseDown
     end
     object tbSpeed: TNempTrackBar
-      Left = 15
-      Top = 65
-      Width = 150
+      Left = 200
+      Top = 39
+      Width = 125
       Height = 40
       Hint = 'Playback speed'
       Max = 100
       Min = -100
-      TabOrder = 1
+      TabOrder = 5
       TickMarks = tmBoth
       TickStyle = tsManual
       OnChange = tbSpeedChange
       OnMouseDown = tbSpeedMouseDown
     end
-    object BitBtn1: TBitBtn
-      Left = 16
-      Top = 137
-      Width = 129
-      Height = 25
-      Hint = 'Disable effects'
-      Caption = 'Disable effects'
-      TabOrder = 2
-      OnClick = BitBtn1Click
-    end
     object cbMickyMouseEffect: TCheckBox
-      Left = 16
-      Top = 114
-      Width = 183
+      Left = 200
+      Top = 149
+      Width = 137
       Height = 17
-      Caption = 'Micky-Mouse-Effect'
-      TabOrder = 3
+      Caption = 'Mickey-Mouse-Effect'
+      TabOrder = 6
       OnClick = cbMickyMouseEffectClick
     end
   end
   object grpBoxABRepeat: TGroupBox
     AlignWithMargins = True
-    Left = 663
-    Top = 192
-    Width = 210
+    Left = 394
+    Top = 264
+    Width = 208
     Height = 66
     Caption = 'A-B repeat'
-    TabOrder = 3
+    TabOrder = 2
     object BtnABRepeatSetA: TButton
       Left = 16
       Top = 24
@@ -544,7 +555,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       OnClick = BtnABRepeatSetBClick
     end
     object BtnABRepeatUnset: TButton
-      Left = 151
+      Left = 142
       Top = 24
       Width = 49
       Height = 25
@@ -555,13 +566,31 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
   end
   object BtnClose: TButton
-    Left = 752
-    Top = 267
+    Left = 8
+    Top = 309
     Width = 121
     Height = 25
     Caption = 'Close'
-    TabOrder = 4
+    TabOrder = 3
     OnClick = BtnCloseClick
+  end
+  object grpBoxDirection: TGroupBox
+    Left = 608
+    Top = 264
+    Width = 193
+    Height = 66
+    Caption = 'Playback direction'
+    TabOrder = 4
+    object DirectionPositionBTN: TButton
+      Left = 17
+      Top = 25
+      Width = 150
+      Height = 25
+      Hint = 'Play backwards'
+      Caption = 'Play backwards'
+      TabOrder = 0
+      OnClick = __DirectionPositionBTNClick
+    end
   end
   object Equalizer_PopupMenu: TPopupMenu
     AutoHotkeys = maManual
@@ -583,5 +612,9 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Caption = 'Restore default settings'
       OnClick = PM_EQ_RestoreStandardClick
     end
+  end
+  object WobbleTimer: TTimer
+    OnTimer = WobbleTimerTimer
+    Left = 320
   end
 end

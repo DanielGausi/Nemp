@@ -43,26 +43,31 @@ type
     Btn_EqualizerPresets: TButton;
     ButtonPrevEQ: TButton;
     ButtonNextEQ: TButton;
-    GrpBoxHall: TGroupBox;
+    GrpBoxEffects: TGroupBox;
     tbReverb: TNempTrackBar;
     HallLBL: TLabel;
-    grpBoxPlayback: TGroupBox;
-    DirectionPositionBTN: TButton;
     grpBoxABRepeat: TGroupBox;
     BtnABRepeatSetA: TButton;
     BtnABRepeatSetB: TButton;
     BtnABRepeatUnset: TButton;
     BtnClose: TButton;
     BtnDisableEqualizer: TButton;
-    tbSpeed: TNempTrackBar;
-    SampleRateLBL: TLabel;
     tbEchoTime: TNempTrackBar;
     EchoTimeLBL: TLabel;
     EchoMixLBL: TLabel;
     tbWetDryMix: TNempTrackBar;
     Btn_EffectsOff: TBitBtn;
-    BitBtn1: TBitBtn;
+    WobbleTimer: TTimer;
+    tbWobble: TNempTrackBar;
+    tbSpeed: TNempTrackBar;
+    SampleRateLBL: TLabel;
+    lblWobble: TLabel;
+    lblSpeed: TLabel;
     cbMickyMouseEffect: TCheckBox;
+    lblReverb: TLabel;
+    lblEcho: TLabel;
+    grpBoxDirection: TGroupBox;
+    DirectionPositionBTN: TButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -93,8 +98,11 @@ type
     procedure tbSpeedMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure BtnCloseClick(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
     procedure cbMickyMouseEffectClick(Sender: TObject);
+    procedure tbWobbleMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure tbWobbleChange(Sender: TObject);
+    procedure WobbleTimerTimer(Sender: TObject);
    
   private
     { Private declarations }
@@ -127,6 +135,8 @@ implementation
 {$R *.dfm}
 
 uses NempMainUnit, Nemp_ConstantsAndTypes, gnugettext, MainFormHelper;
+
+
 
 
 procedure TFormEffectsAndEqualizer.FormCreate(Sender: TObject);
@@ -263,11 +273,9 @@ begin
     tbReverb.Position := -96;
     tbEchoTime.Position := 100;
     tbWetDryMix.Position := 0;
-end;
 
-procedure TFormEffectsAndEqualizer.BitBtn1Click(Sender: TObject);
-begin
     tbSpeed.Position := 0;
+    tbWobble.Position := 0;
     NempPlayer.ForceForwardPlayback;
 end;
 
@@ -677,6 +685,8 @@ begin
         tbWetDryMix.Position := 0;
 end;
 
+
+
 procedure TFormEffectsAndEqualizer.CorrectEchoButtons;
 begin
     tbWetDryMix.Position := Round(NempPlayer.EchoWetDryMix);
@@ -720,6 +730,38 @@ begin
         tbSpeed.Position := Round( sqrt( (NempPlayer.Speed  -1) * 10000 / 2)  );
 
     SampleRateLBL.Caption := inttostr(Round(NempPlayer.Speed * 100)) + '%';
+end;
+
+procedure TFormEffectsAndEqualizer.tbWobbleChange(Sender: TObject);
+begin
+    if tbWobble.Position = 0 then
+    begin
+        WobbleTimer.enabled := False;
+        NempPlayer.Flutter(1, 1000);
+        NempPlayer.Speed := 1;
+    end else
+    begin
+        WobbleTimer.Enabled := True;
+    end;
+end;
+
+procedure TFormEffectsAndEqualizer.tbWobbleMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if Button = mbRight then
+        tbWobble.Position := 0;
+end;
+
+procedure TFormEffectsAndEqualizer.WobbleTimerTimer(Sender: TObject);
+var factor: Integer;
+begin
+    factor := tbWobble.Position;  //currently:  1 ... 40
+
+    // start fluttering
+    if Random >= 0.6 then
+        NempPlayer.Flutter(Random(factor) / 100 + 1, 1000)  // faster
+    else
+        NempPlayer.Flutter(  1/( (Random(factor) / 100)+1)   , 1000); // slower
 end;
 
 
@@ -802,9 +844,18 @@ begin
 
     // Changing speed doesn't make sense with Streams, and also not during the Prescan process
     SpeedEffectsAllowed := (not NempPlayer.URLStream) and (not NempPlayer.PrescanInProgress);
-    self.grpBoxPlayback.Enabled := SpeedEffectsAllowed;
+
+    lblSpeed           .Enabled := SpeedEffectsAllowed;
+    tbSpeed            .Enabled := SpeedEffectsAllowed;
+    SampleRateLBL      .Enabled := SpeedEffectsAllowed;
+    lblWobble          .Enabled := SpeedEffectsAllowed;
+    tbWobble           .Enabled := SpeedEffectsAllowed;
+    cbMickyMouseEffect .Enabled := SpeedEffectsAllowed;
+    grpBoxDirection    .Enabled := SpeedEffectsAllowed;
+    grpBoxABRepeat     .Enabled := SpeedEffectsAllowed;
+
     DirectionPositionBTN.Enabled := SpeedEffectsAllowed;
-    SampleRateLBL    .Enabled := SpeedEffectsAllowed;
+
 end;
 
 end.

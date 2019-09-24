@@ -299,13 +299,13 @@ With the \textbf{Equalizer} you can adjust the playback. But that's not much mor
 \includegraphics[width=0.6\textwidth]{eq.jpg} 
 \end{center}
 
-The same applies to the \textbf{effects}. A little bit of reverb and echo can be added and the playback speed can be increased or decreased. Whether a Mickey Mouse effect occurs or not can be configured in the settings. To change the behavior, it is necessary to restart playback.
+The same applies to the \textbf{effects}. A little bit of reverb and echo can be added and the playback speed can be increased or decreased. Since Nemp 4.12 the \emph{Micky-Mouse-Effect} can be switched on and off directly. Also, since version 4.12 there's the \gf{Wobble playback} effect, which was previously only implemented as a hidden feature as a warning for low battery.
 
 \begin{tipp}
 Right-clicking on a controller brings it back to the 0-position.
 \end{tipp}
 
-Another gimmick is the \textbf{reverse playing} of the current title, and the \textbf{A-B-repeat}, which repeats a certain section of the current title in a loop. Clicking on A sets the start point, clicking on B sets the end point, and pressing X deletes both so that the playback continues normally.
+Another gimmick is the \textbf{reverse playback} of the current title, and the \textbf{A-B-repeat}, which repeats a certain section of the current title in a loop. Clicking on A sets the start point, clicking on B sets the end point, and pressing X deletes both so that the playback continues normally.
 
 \begin{tipp}
 If you have set the start point A and end point B, you can also move the knobs in the control panel of the main window.
@@ -1058,13 +1058,11 @@ Streams that are not encoded in Mp3 format cannot be recorded.
 
 \subsubsection{Effects}
 \begin{itemize}
-\item \textbf{On changing speed.} When changing the speed, the simple method automatically changes the pitch. That leads to the fast, beeping voices I call \gf{Micky-Mouse effect}. This effect can be prevented if desired. A change only takes effect with the next played title.
-
 \item \textbf{Reset equalizer/effects.} Depending on the setting selected at this point, the effects and equalizer settings will be forgotten when Nemp is restarted and reset to the default setting or not. The default setting retains the equalizer setting, but resets the effects back to \emph{off}.
 
 \item \textbf{Jingles.} Pressing the \texttt{F9} key (and holding it down) will play an additional title. This playback is stopped immediately when the button is released. The volume of the actual playback can be reduced.
 
-\item \textbf{Walkman mode.} A silly little gimmick. Some \gf{older} people might still know the Walkmans (or \emph{portable cassette players} from other brands). They started to flutter when the battery was low, as the tape no longer ran at constant speed. 
+\item \textbf{Walkman mode.} A silly little gimmick. Some \gf{older} people might still know the Walkmans (or \emph{portable cassette players} from other brands). They started to wobble when the battery was low, as the tape no longer ran at constant speed. 
 
 Nemp can simulate this behavior. If Nemp is running on a laptop that is not connected to the power supply, playback will no longer run at constant speed. The effect becomes stronger and stronger as the state of charge decreases. This is actually counterproductive, since it will cost more computing power. But at least it is more noticeable when the battery is weakening and needs to be charged.
 \end{itemize}
@@ -1481,6 +1479,7 @@ The following is a summary of the new features in the individual versions - from
 
 \begin{itemize}
 \item Smoother scanning of metadata: the player remains responsive while searching for new files.
+\item added \emph{wobbling} to effects
 \end{itemize}
 Bugfixes:
 \begin{itemize}

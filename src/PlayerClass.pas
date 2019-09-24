@@ -2523,8 +2523,8 @@ begin
 
     if MainStreamIsTempoStream then
     begin
-        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100, t);
-        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100, t);
+        BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_TEMPO, aValue * 100 - 100, t);
+        BASS_ChannelSlideAttribute(SlideStream, BASS_ATTRIB_TEMPO, aValue * 100 - 100, t);
     end else
     begin
         BASS_ChannelSlideAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * aValue, t);

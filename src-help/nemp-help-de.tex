@@ -291,7 +291,7 @@ Mit dem \textbf{Equalizer} können Sie die Wiedergabe etwas anpassen. Viel mehr a
 \includegraphics[width=0.6\textwidth]{eq.jpg} 
 \end{center}
 
-Das gleiche gilt für die \textbf{Effekte}. Ein bisschen Hall und Echo kann man hinzufügen und die Abspielgeschwindigkeit erhöhen oder verringern. Ob dabei ein Micky-Maus-Effekt eintritt oder nicht, kann in den Einstellungen ausgewählt werden. Für eine Änderung des Verhaltens ist ein Neustart der Wiedergabe notwendig.
+Das gleiche gilt für die \textbf{Effekte}. Ein bisschen Hall und Echo kann man hinzufügen und die Abspielgeschwindigkeit erhöhen oder verringern. Seit Nemp 4.12 lässt sich der \emph{Micky-Maus-Effekt} direkt an- und abschalten. Außerdem gibt es seit Version 4.12 den Effekt \gf{Wiedergabe leiern}, der bisher nur als verstecktes Feature bei schwachem Akku implementiert war.
 
 \begin{tipp}
 Bei Rechtsklick auf einen Regler springt dieser zurück in die 0-Stellung.
@@ -1014,7 +1014,6 @@ Streams, die nicht im Mp3-Format codiert sind, können nicht aufgenommen werden.
 
 \subsubsection{Effekte}
 \begin{itemize}
-\item \textbf{Änderung der Geschwindigkeit.} Bei der Änderung der Geschwindigkeit ändert sich mit der einfachen Methode automatisch auch die Tonhöhe. Das führt dann zu den schnellen, piepsigen Stimmen, die ich mit \gf{Micky-Maus-Effekt} bezeichne. Dieser Effekt kann unterbunden werden, wenn das gewollt ist. Eine Änderung wird erst mit dem nächsten abgespielten Titel wirksam.
 \item \textbf{Effekte oder Equalizer zurücksetzen.} Je nach gewählter Einstellung an dieser Stelle werden die eingestellten Effekte und Equalizer-Settings bei einem Neustart von Nemp vergessen und auf die Standard-Einstellung zurückgesetzt oder nicht. Die Standardeinstellung behält die Equalizer-Einstellung bei, setzt die Effekte aber zurück auf \emph{aus}.
 \item \textbf{Jingles.} Mit Druck auf die Taste \texttt{F9} (und gedrückt halten) kann ein zusätzlicher Titel abgespielt werden. Diese Wiedergabe wird sofort wieder abgebrochen, wenn die Taste losgelassen wird. Dabei kann die Lautstärke der eigentlichen Wiedergabe reduziert werden.
 \item \textbf{Walkman-Modus.} Eine kleine alberne Spielerei. Etwas ältere Semester kennen vielleicht noch die Walkmans (oder \emph{tragbare Kassetten-Abspielgeräte} von anderen Marken). Diese fingen bei schwacher Batterie an zu leiern, da das Band nicht mehr in konstanter Geschwindigkeit durchlief. 
@@ -1434,6 +1433,7 @@ Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - vo
 
 \begin{itemize}
 \item Geschmeidigeres Scannen der Metadaten: der Player bleibt während der Suche nach neuen Dateien flüssig bedienbar.
+\item \emph{Wiedergabe leiern} zu den Effekten hinzugefügt
 \end{itemize}
 Bugfixes:
 \begin{itemize}
