@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabFiles2
+      ActivePage = TabPlayer5
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -74,10 +74,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem0: TTabSheet
         Caption = 'Sys (Main)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -280,10 +276,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem1: TTabSheet
         Caption = 'Sys (Control)'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1151,10 +1143,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem2: TTabSheet
         Caption = 'Sys (Files)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1304,10 +1292,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem3: TTabSheet
         Caption = 'Sys (System)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1854,10 +1838,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView0: TTabSheet
         Caption = 'View (Main)'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2042,10 +2022,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView1: TTabSheet
         Caption = 'View (Party)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2144,18 +2120,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView2: TTabSheet
         Caption = 'XXX (Vis)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2387,10 +2355,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView4: TTabSheet
         Caption = 'View (Ext)'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3685,10 +3649,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer1: TTabSheet
         Caption = 'Player (Ext)'
         ImageIndex = 22
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3850,10 +3810,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer2: TTabSheet
         Caption = 'Player (Playlist)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4066,10 +4022,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer4: TTabSheet
         Caption = 'Player (Streams)'
         ImageIndex = 23
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4259,30 +4211,19 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer5: TTabSheet
         Caption = 'Player (Effects)'
         ImageIndex = 15
+        ExplicitLeft = 0
+        ExplicitTop = 88
         DesignSize = (
           454
           532)
-        object GrpBox_MickyMouse: TRadioGroup
-          Left = 8
-          Top = 8
-          Width = 439
-          Height = 74
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'On changing speed (changes will take effect on next track)'
-          ItemIndex = 1
-          Items.Strings = (
-            'Keep pitch'
-            '"Micky Mouse effect"')
-          TabOrder = 0
-        end
         object GrpBox_Effects: TGroupBox
           Left = 8
-          Top = 88
+          Top = 8
           Width = 439
           Height = 69
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Effects/Equalizer'
-          TabOrder = 1
+          TabOrder = 0
           object CB_UseDefaultEffects: TCheckBox
             Left = 16
             Top = 43
@@ -4306,12 +4247,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_Jingles: TGroupBox
           Left = 8
-          Top = 165
+          Top = 85
           Width = 439
           Height = 129
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Jingles (playback via F9, Push-to-talk via F8 )'
-          TabOrder = 2
+          TabOrder = 1
           object LblJingleReduce: TLabel
             Left = 91
             Top = 47
@@ -4370,12 +4311,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GroupBox1: TGroupBox
           Left = 8
-          Top = 300
+          Top = 220
           Width = 439
           Height = 57
           Anchors = [akLeft, akTop, akRight]
           Caption = '"Walkman" mode'
-          TabOrder = 3
+          TabOrder = 2
           object cb_UseWalkmanMode: TCheckBox
             Left = 16
             Top = 20
@@ -4563,10 +4504,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer7: TTabSheet
         Caption = 'Player (Scrobble)'
         ImageIndex = 17
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4918,10 +4855,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer8: TTabSheet
         Caption = 'Player (Webserver)'
         ImageIndex = 18
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)

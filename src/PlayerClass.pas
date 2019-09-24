@@ -439,8 +439,12 @@ type
         // setzt mainstream und slidestream auf 0
         procedure StopAndFree(StartPlayAfterStop: Boolean = False);
         // Kehrt die Richtung der Wiedergabe um
+        procedure PlayReverse(fromPos: QWord);
         procedure ReversePlayback(FromBeginning: Boolean);
         procedure ForceForwardPlayback;
+
+        // change the property AvoidMickyMouseEffect and apllies it to the current playback
+        procedure ChangeMickyMouseEffect(aValue: Boolean);
 
         procedure Mute;
         procedure UnMute;
@@ -1740,6 +1744,38 @@ end;
     Reverse Playback of current stream
     --------------------------------------------------------
 }
+procedure TNempPlayer.PlayReverse(fromPos: QWord);
+var tmpMain: DWord;
+begin
+    tmpMain := NEMP_CreateStream(MainAudiofile,
+                         //False, // kein Tempostream
+                         AvoidMickyMausEffect,
+                         True,  // ReverseStream
+                         ps_Now );
+    MainStreamIsTempoStream := AvoidMickyMausEffect;
+
+    MainStream := tmpMain;
+
+    //if Not FromBeginning then
+    BASS_ChannelSetPosition(Mainstream, fromPos, BASS_POS_BYTE);
+
+    InitStreamEqualizer(MainStream);
+    BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
+
+    if MainStreamIsTempoStream then
+        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
+    else
+        BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+
+    SetNoEndSyncs(MainStream);
+    BASS_ChannelPlay(MainStream , False);
+    MainStreamIsReverseStream := True;
+    ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
+
+    // No fading for ReverseStreams
+    fReallyUseFading := False;
+end;
+
 procedure TNempPlayer.ForceForwardPlayback;
 begin
     if fIsURLStream then exit;
@@ -1749,9 +1785,7 @@ begin
     // else: nothing todo
 end;
 procedure TNempPlayer.ReversePlayback(FromBeginning: Boolean);
-var
-  tmpMain: DWord;
-  OldPosition: QWord;
+var OldPosition: QWord;
 begin
   if fIsURLStream then exit;
 
@@ -1781,34 +1815,57 @@ begin
           OldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
           StopAndFree;
 
-          tmpMain := NEMP_CreateStream(MainAudiofile,
-                               //False, // kein Tempostream
-                               AvoidMickyMausEffect,
-                               True,  // ReverseStream
-                               ps_Now );
-          MainStreamIsTempoStream := AvoidMickyMausEffect;
-
-
-          MainStream := tmpMain;
-
-          if Not FromBeginning then
-            BASS_ChannelSetPosition(Mainstream, OldPosition, BASS_POS_BYTE);
-
-          InitStreamEqualizer(MainStream);
-          BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, fMainVolume);
-
-          if MainStreamIsTempoStream then
-              BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
+          if FromBeginning then
+              PlayReverse(0)
           else
-              BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_FREQ, OrignalSamplerate * fSampleRateFaktor);
+              PlayReverse(OldPosition)
 
-          SetNoEndSyncs(MainStream);
-          BASS_ChannelPlay(MainStream , False);
-          MainStreamIsReverseStream := True;
-          ActualizePlayPauseBtn(NEMP_API_PLAYING, 0);
       end;
-      ResetPlayerVCL(False); // same song, cover remains the same
+      ResetPlayerVCL(True); // same song, cover remains the same
   end;
+end;
+
+procedure TNempPlayer.ChangeMickyMouseEffect(aValue: Boolean);
+var OldPosition: QWord;
+begin
+    if aValue = self.AvoidMickyMausEffect then
+        exit;
+
+    if fIsURLStream then
+        exit;
+
+    if Not assigned(MainAudiofile) then
+        exit;
+
+    // set the new value
+    AvoidMickyMausEffect := aValue;
+
+    // even if fSamplerateFaktor = 1 here (= normal speed), we still need to recreate the playback!
+
+    if NOT MainStreamIsReverseStream then
+    begin
+        // regular playback
+        // remember current position
+        OldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
+        fReallyUseFading := False;
+        // stop playback
+        StopAndFree;
+        // play again (with new settings, speed is applied there as well)
+        Play(MainAudiofile, 0, True);
+        // set the position to preovious position
+        BASS_ChannelSetPosition(Mainstream, OldPosition, BASS_POS_BYTE);
+        fReallyUseFading := True;
+        MainStreamIsReverseStream := False;
+    end else
+    begin
+        // reverse playback
+        OldPosition := BASS_ChannelGetPosition(MainStream, BASS_POS_BYTE);
+        fReallyUseFading := False;
+        // stop playback
+        StopAndFree;
+        // play again
+        PlayReverse(OldPosition);
+    end;
 end;
 
 {
@@ -3345,6 +3402,7 @@ end;
 procedure TNempPlayer.ResetPlayerVCL(GetCoverWasSuccessful: boolean);
 begin
   SendMessage(MainWindowHandle, WM_ResetPlayerVCL, wParam(GetCoverWasSuccessful), 0);
+  // this leads to a call of ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
 end;
 
 procedure TNempPlayer.ActualizePlayPauseBtn(wParam, lParam: Integer);

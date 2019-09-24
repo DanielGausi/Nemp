@@ -465,7 +465,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     TabOrder = 2
     object SampleRateLBL: TLabel
       Left = 171
-      Top = 85
+      Top = 78
       Width = 12
       Height = 13
       Caption = '...'
@@ -483,7 +483,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
     object tbSpeed: TNempTrackBar
       Left = 15
-      Top = 72
+      Top = 65
       Width = 150
       Height = 40
       Hint = 'Playback speed'
@@ -504,6 +504,15 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Caption = 'Disable effects'
       TabOrder = 2
       OnClick = BitBtn1Click
+    end
+    object cbMickyMouseEffect: TCheckBox
+      Left = 16
+      Top = 114
+      Width = 183
+      Height = 17
+      Caption = 'Micky-Mouse-Effect'
+      TabOrder = 3
+      OnClick = cbMickyMouseEffectClick
     end
   end
   object grpBoxABRepeat: TGroupBox

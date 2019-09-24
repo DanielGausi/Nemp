@@ -62,6 +62,7 @@ type
     tbWetDryMix: TNempTrackBar;
     Btn_EffectsOff: TBitBtn;
     BitBtn1: TBitBtn;
+    cbMickyMouseEffect: TCheckBox;
 
     procedure FormCreate(Sender: TObject);
 
@@ -93,6 +94,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure BtnCloseClick(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
+    procedure cbMickyMouseEffectClick(Sender: TObject);
    
   private
     { Private declarations }
@@ -189,6 +191,7 @@ begin
     CorrectEchoButtons;
     CorrectSpeedButton;
     for i := 0 to 9 do CorrectEQButton(i);
+    cbMickyMouseEffect.Checked := NOT NempPlayer.AvoidMickyMausEffect;
 end;
 
 
@@ -312,6 +315,11 @@ begin
 
 end;
 
+
+procedure TFormEffectsAndEqualizer.cbMickyMouseEffectClick(Sender: TObject);
+begin
+    NempPlayer.ChangeMickyMouseEffect(NOT cbMickyMouseEffect.Checked);
+end;
 
 function TFormEffectsAndEqualizer.GetDefaultEQName(aIdx: Integer): String;
 begin

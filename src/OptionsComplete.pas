@@ -440,7 +440,6 @@ type
     cbUseStreamnameAsDirectory: TCheckBox;
     RGroup_Playlist: TRadioGroup;
     TabPlayer5: TTabSheet;
-    GrpBox_MickyMouse: TRadioGroup;
     GrpBox_Effects: TGroupBox;
     CB_UseDefaultEffects: TCheckBox;
     CB_UseDefaultEqualizer: TCheckBox;
@@ -1302,12 +1301,6 @@ begin
   SEJingleVolume.Value := NempPlayer.JingleVolume;
 
   cb_UseWalkmanMode.Checked := NempPlayer.UseWalkmanMode;
-
-
-  if NempPlayer.AvoidMickyMausEffect then
-    GrpBox_MickyMouse.ItemIndex := 0
-  else
-    GrpBox_MickyMouse.ItemIndex := 1;
 
   CB_UseDefaultEffects.Checked := NempPlayer.UseDefaultEffects;
   CB_UseDefaultEqualizer.Checked := NempPlayer.UseDefaultEqualizer;
@@ -2301,8 +2294,6 @@ begin
 
   NempPlayer.ReInitAfterSuspend := cbReInitAfterSuspend.Checked;
   NempPlayer.PauseOnSuspend := cbPauseOnSuspend.Checked;
-
-  NempPlayer.AvoidMickyMausEffect := GrpBox_MickyMouse.ItemIndex = 0;
 
   NempPlayer.UseDefaultEffects := CB_UseDefaultEffects.Checked;
   NempPlayer.UseDefaultEqualizer := CB_UseDefaultEqualizer.Checked;
