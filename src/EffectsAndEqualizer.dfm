@@ -5,7 +5,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
   BorderStyle = bsSingle
   Caption = 'Nemp: Equalizer and effects'
   ClientHeight = 348
-  ClientWidth = 815
+  ClientWidth = 819
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -373,7 +373,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     AlignWithMargins = True
     Left = 440
     Top = 8
-    Width = 361
+    Width = 369
     Height = 250
     Caption = 'Effects'
     TabOrder = 1
@@ -487,7 +487,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Height = 25
       Hint = 'Disable effects'
       Caption = 'Disable effects'
-      TabOrder = 3
+      TabOrder = 6
       OnClick = Btn_EffectsOffClick
     end
     object tbWobble: TNempTrackBar
@@ -510,7 +510,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Hint = 'Playback speed'
       Max = 100
       Min = -100
-      TabOrder = 5
+      TabOrder = 3
       TickMarks = tmBoth
       TickStyle = tsManual
       OnChange = tbSpeedChange
@@ -522,13 +522,13 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
       Width = 137
       Height = 17
       Caption = 'Mickey-Mouse-Effect'
-      TabOrder = 6
+      TabOrder = 5
       OnClick = cbMickyMouseEffectClick
     end
   end
   object grpBoxABRepeat: TGroupBox
     AlignWithMargins = True
-    Left = 394
+    Left = 9
     Top = 264
     Width = 208
     Height = 66
@@ -566,24 +566,24 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
   end
   object BtnClose: TButton
-    Left = 8
-    Top = 309
+    Left = 680
+    Top = 305
     Width = 121
     Height = 25
     Caption = 'Close'
-    TabOrder = 3
+    TabOrder = 4
     OnClick = BtnCloseClick
   end
   object grpBoxDirection: TGroupBox
-    Left = 608
+    Left = 223
     Top = 264
     Width = 193
     Height = 66
     Caption = 'Playback direction'
-    TabOrder = 4
+    TabOrder = 3
     object DirectionPositionBTN: TButton
-      Left = 17
-      Top = 25
+      Left = 16
+      Top = 24
       Width = 150
       Height = 25
       Hint = 'Play backwards'

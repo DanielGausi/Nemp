@@ -701,6 +701,7 @@ begin
         SlidebarShape.Left := 95;
         SlidebarShape.Width := NewPlayerPanel.Width - 95 - 58;
         BtnClose.Left      := NewPlayerPanel.Width - 18;
+        BtnMinimize.Left   := BtnClose.Left - 18;
         PaintFrame.Left    := NewPlayerPanel.Width - 84;
         PlayerTimeLbl.Left := NewPlayerPanel.Width - 43;
     end;
@@ -1044,6 +1045,7 @@ begin
       MM_O_ViewCompactComplete.Enabled := newMode = 0;
 
       BtnClose.Visible := newMode = 1;
+      BtnMinimize.Visible := newMode = 1;
       // temporary for this procedure
       PanelCoverBrowse.OnResize := Nil;
 

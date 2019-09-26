@@ -592,6 +592,9 @@ type
     PM_H_PlayAndClearPlaylist: TMenuItem;
     PM_H_EnqueueAfterCurrentTitle: TMenuItem;
     PM_H_JustPlay: TMenuItem;
+    MM_T_EqualizerEffects: TMenuItem;
+    PM_P_EqualizerEffects: TMenuItem;
+    BtnMinimize: TSkinButton;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1153,6 +1156,7 @@ type
       X, Y: Integer);
     procedure __MainContainerPanelMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure BtnMinimizeClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -9718,6 +9722,11 @@ var point: TPoint;
 begin
   GetCursorPos(Point);
   Player_PopupMenu.Popup(Point.X, Point.Y+10);
+end;
+
+procedure TNemp_MainForm.BtnMinimizeClick(Sender: TObject);
+begin
+    Application.Minimize;
 end;
 
 procedure TNemp_MainForm._ControlPanelMouseMove(Sender: TObject;

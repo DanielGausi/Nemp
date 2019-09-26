@@ -2,7 +2,7 @@ object Nemp_MainForm: TNemp_MainForm
   Left = 0
   Top = 0
   Caption = 'Nemp - Noch ein MP3-Player'
-  ClientHeight = 729
+  ClientHeight = 749
   ClientWidth = 1090
   Color = clBtnFace
   Constraints.MinHeight = 600
@@ -35,7 +35,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 0
     Top = 0
     Width = 1090
-    Height = 729
+    Height = 749
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
@@ -44,6 +44,7 @@ object Nemp_MainForm: TNemp_MainForm
     OnMouseUp = __MainContainerPanelMouseUp
     OnResize = __MainContainerPanelResize
     OwnerDraw = False
+    ExplicitHeight = 729
     object MainSplitter: TSplitter
       Left = 0
       Top = 240
@@ -692,17 +693,18 @@ object Nemp_MainForm: TNemp_MainForm
       Left = 0
       Top = 244
       Width = 1090
-      Height = 385
+      Height = 405
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
       OnResize = _TopMainPanelResize
       OwnerDraw = False
+      ExplicitHeight = 385
       object SubSplitter2: TSplitter
         Left = 607
         Top = 0
         Width = 4
-        Height = 385
+        Height = 405
         Align = alRight
         MinSize = 50
         ResizeStyle = rsUpdate
@@ -715,12 +717,13 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 0
         Top = 0
         Width = 607
-        Height = 385
+        Height = 405
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
         OnResize = MedialistPanelResize
         OwnerDraw = False
+        ExplicitHeight = 385
         object MedienBibHeaderPanel: TNempPanel
           Tag = 3
           Left = 0
@@ -831,7 +834,7 @@ object Nemp_MainForm: TNemp_MainForm
           Left = 0
           Top = 28
           Width = 607
-          Height = 357
+          Height = 377
           Align = alClient
           BevelInner = bvRaised
           BevelOuter = bvLowered
@@ -841,11 +844,12 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 1
           OnPaint = NewPanelPaint
           OwnerDraw = False
+          ExplicitHeight = 357
           object VST: TVirtualStringTree
             Left = 2
             Top = 2
             Width = 603
-            Height = 353
+            Height = 373
             Align = alClient
             BevelInner = bvNone
             BevelOuter = bvNone
@@ -906,9 +910,11 @@ object Nemp_MainForm: TNemp_MainForm
             OnKeyUp = PlaylistVSTKeyUp
             OnNewText = VSTNewText
             OnStartDrag = VSTStartDrag
+            ExplicitHeight = 353
             Columns = <
               item
                 Position = 0
+                Width = 10
               end
               item
                 Position = 1
@@ -986,26 +992,28 @@ object Nemp_MainForm: TNemp_MainForm
         Left = 611
         Top = 0
         Width = 479
-        Height = 385
+        Height = 405
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 1
         OnResize = MedienBibDetailPanelResize
         OwnerDraw = False
+        ExplicitHeight = 385
         object ContainerPanelMedienBibDetails: TNempPanel
           Left = 0
           Top = 28
           Width = 479
-          Height = 357
+          Height = 377
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
           OwnerDraw = False
+          ExplicitHeight = 357
           object SplitterFileOverview: TSplitter
             Left = 248
             Top = 0
             Width = 4
-            Height = 357
+            Height = 377
             ResizeStyle = rsUpdate
             OnCanResize = SplitterFileOverviewCanResize
             OnMoved = SplitterFileOverviewMoved
@@ -1018,7 +1026,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 0
             Top = 0
             Width = 248
-            Height = 357
+            Height = 377
             Align = alLeft
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1027,14 +1035,15 @@ object Nemp_MainForm: TNemp_MainForm
             OnResize = DetailID3TagPanelResize
             OnPaint = NewPanelPaint
             OwnerDraw = False
+            ExplicitHeight = 357
             DesignSize = (
               248
-              357)
+              377)
             object ImgDetailCover: TImage
               Left = 8
               Top = 8
               Width = 234
-              Height = 339
+              Height = 359
               Anchors = [akLeft, akTop, akRight, akBottom]
               Proportional = True
               Stretch = True
@@ -1048,7 +1057,7 @@ object Nemp_MainForm: TNemp_MainForm
               Left = 12
               Top = 6
               Width = 234
-              Height = 339
+              Height = 359
               Anchors = [akLeft, akTop, akRight, akBottom]
               BevelInner = bvNone
               BevelOuter = bvNone
@@ -1059,6 +1068,7 @@ object Nemp_MainForm: TNemp_MainForm
               Visible = False
               StyleElements = [seBorder]
               OnKeyDown = LyricsMemoKeyDown
+              ExplicitHeight = 339
             end
           end
           object DetailID3TagPanel: TNempPanel
@@ -1066,7 +1076,7 @@ object Nemp_MainForm: TNemp_MainForm
             Left = 252
             Top = 0
             Width = 227
-            Height = 357
+            Height = 377
             Align = alClient
             BevelInner = bvRaised
             BevelOuter = bvLowered
@@ -1075,9 +1085,10 @@ object Nemp_MainForm: TNemp_MainForm
             OnResize = DetailID3TagPanelResize
             OnPaint = NewPanelPaint
             OwnerDraw = False
+            ExplicitHeight = 357
             DesignSize = (
               227
-              357)
+              377)
             object ImgBibRating: TImage
               Left = 8
               Top = 129
@@ -1287,7 +1298,7 @@ object Nemp_MainForm: TNemp_MainForm
     end
     object _ControlPanel: TNempPanel
       Left = 0
-      Top = 629
+      Top = 649
       Width = 1090
       Height = 100
       Align = alBottom
@@ -1297,6 +1308,7 @@ object Nemp_MainForm: TNemp_MainForm
       OnMouseMove = _ControlPanelMouseMove
       OnResize = _ControlPanelResize
       OwnerDraw = False
+      ExplicitTop = 629
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
@@ -1324,6 +1336,8 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = NewPlayerPanelResize
           OnPaint = ControlPanelPaint
           OwnerDraw = False
+          ExplicitLeft = -5
+          ExplicitTop = 4
           DesignSize = (
             609
             100)
@@ -1538,6 +1552,29 @@ object Nemp_MainForm: TNemp_MainForm
             TabStop = False
             Visible = False
             OnClick = BtnCloseClick
+            OnDragOver = GRPBOXControlDragOver
+            DrawMode = dm_Skin
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
+          end
+          object BtnMinimize: TSkinButton
+            Left = 576
+            Top = 4
+            Width = 12
+            Height = 12
+            Hint = 'Minimize Nemp'
+            Anchors = [akTop, akRight]
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 5
+            TabStop = False
+            Visible = False
+            OnClick = BtnMinimizeClick
             OnDragOver = GRPBOXControlDragOver
             DrawMode = dm_Skin
             NumGlyphsX = 5
@@ -2610,6 +2647,11 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 31
         OnClick = PM_P_KeyboardDisplayClick
       end
+      object MM_T_EqualizerEffects: TMenuItem
+        Caption = 'Equalizer && Effects'
+        ImageIndex = 40
+        OnClick = TabBtn_EqualizerClick
+      end
       object MM_T_Directories: TMenuItem
         Caption = '&Directories'
         object MM_T_DirectoriesRecordings: TMenuItem
@@ -3217,7 +3259,7 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 32
     Top = 248
     Bitmap = {
-      494C01012800300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01012900300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000B0000000010020000000000000B0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3260,6 +3302,7 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000E8A20000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3283,6 +3326,7 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000E8A20000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3297,6 +3341,7 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000000000000000000E8A2
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3306,10 +3351,7 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      0000E8A200000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4629,11 +4671,11 @@ object Nemp_MainForm: TNemp_MainForm
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000424D3E000000000000003E000000
       2800000040000000B00000000100010000000000800500000000000000000000
-      000000000000000000000000FFFFFF0000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000F01FFFFFF003E007C007FFFFC0008001
+      000000000000000000000000FFFFFF00FFFF000000000000FFFF000000000000
+      EDB7000000000000EDB7000000000000E8B7000000000000E8B7000000000000
+      E8B7000000000000ED17000000000000ED17000000000000C517000000000000
+      C5A3000000000000C5A3000000000000EDA3000000000000EDB7000000000000
+      FFFF000000000000FFFF000000000000F01FFFFFF003E007C007FFFFC0008001
       8003FC7F800000008003F00F800080000001C007C00080010001C007F0018001
       00018003F00380E100018003E00F80E100018003E01F800100018003C03F8001
       00018003C07F83818001C003C0FF80018003C00780FF8001C007E00F83FFC001
@@ -5513,6 +5555,11 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = 'Settings'
         OnClick = PM_P_ScrobblerOptionsClick
       end
+    end
+    object PM_P_EqualizerEffects: TMenuItem
+      Caption = 'Equalizer && Effects'
+      ImageIndex = 40
+      OnClick = TabBtn_EqualizerClick
     end
     object PM_P_KeyboardDisplay: TMenuItem
       Caption = 'Keyboard display'

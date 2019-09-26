@@ -42,6 +42,8 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
+const MAX_MENUIMAGE_INDEX = 40;
+
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
 
@@ -57,7 +59,7 @@ type
                      ctrlHeadsetStopBtn,
                      ctrlHeadsetPlayNowBtn,
                      ctrlHeadsetInsertToPlaylistBtn,
-                     // ctrlMinimizeBtn,
+                     ctrlMinimizeBtn,
                      ctrlCloseBtn
                      //ctrlMenuBtn
                      );
@@ -149,6 +151,7 @@ type
         (Name: 'BtnHeadsetPlaynow'     ; Visible: True; Left: 100; Top: 30; Width: 24; Height: 24),  // '',
         (Name: 'BtnHeadsetToPlaylist'  ; Visible: True; Left: 124; Top: 30; Width: 24; Height: 24),  // '',
 
+        (Name: 'BtnMinimize'     ; Visible: False; Left: 196; Top: 1; Width: 12; Height: 12),  // 'MinimizeBtn',
         (Name: 'BtnClose'        ; Visible: False; Left: 214; Top: 1; Width: 12; Height: 12)  // 'CloseBtn',
 
       ) ;
@@ -512,7 +515,7 @@ begin
   ControlButtons[ctrlHeadsetPlayNowBtn         ] := Nemp_MainForm.BtnHeadsetPlaynow    ;
   ControlButtons[ctrlHeadsetInsertToPlaylistBtn] := Nemp_MainForm.BtnHeadsetToPlaylist ;
 
-  //ControlButtons[ctrlMinimizeBtn     ] :=  Nemp_MainForm.BtnMinimize     ;
+  ControlButtons[ctrlMinimizeBtn     ] :=  Nemp_MainForm.BtnMinimize     ;
   ControlButtons[ctrlCloseBtn        ] :=  Nemp_MainForm.BtnClose        ;
   //ControlButtons[ctrlMenuBtn         ] :=  Nemp_MainForm.BtnMenu         ;
 
@@ -937,7 +940,7 @@ begin
                   ButtonTmp.Width := 16;
                   Buttontmp.Height := 16;
                   Nemp_MainForm.MenuSkinImageList.Clear;
-                  for i := 0 to 39 do
+                  for i := 0 to MAX_MENUIMAGE_INDEX do
                   begin
                       ButtonTmp.Canvas.CopyRect(
                             rect(0,0,16,16), ListenCompletebmp.Canvas,
@@ -2375,6 +2378,7 @@ begin
     NempPartyMode.SetButtonPos(ControlButtonData[ctrlRecordBtn]    , i);
     // System-Button
     NempPartyMode.SetButtonPos(ControlButtonData[ctrlCloseBtn]     , i);
+    NempPartyMode.SetButtonPos(ControlButtonData[ctrlMinimizeBtn]  , i);
 
     r := NempPartyMode.ResizeProc;
     with Nemp_MainForm do

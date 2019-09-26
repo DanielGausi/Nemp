@@ -1831,14 +1831,15 @@ begin
     if aValue = self.AvoidMickyMausEffect then
         exit;
 
+    // set the new value
+    AvoidMickyMausEffect := aValue;
+
+    // cancel if there is no "valid" audiofile for changing playback speed
     if fIsURLStream then
         exit;
 
     if Not assigned(MainAudiofile) then
         exit;
-
-    // set the new value
-    AvoidMickyMausEffect := aValue;
 
     // even if fSamplerateFaktor = 1 here (= normal speed), we still need to recreate the playback!
 
