@@ -1517,6 +1517,14 @@ object FDetails: TFDetails
           Height = 210
           Shape = bsFrame
         end
+        object ID3Image: TImage
+          Left = 16
+          Top = 47
+          Width = 305
+          Height = 194
+          Proportional = True
+          Stretch = True
+        end
         object Btn_NewPicture: TButton
           Left = 335
           Top = 13
@@ -1560,18 +1568,6 @@ object FDetails: TFDetails
           Style = csDropDownList
           TabOrder = 0
           OnChange = cbPicturesChange
-        end
-        object ID3Image32: TImage32Ex
-          Left = 16
-          Top = 47
-          Width = 303
-          Height = 195
-          Bitmap.ResamplerClassName = 'TDraftResampler'
-          BitmapAlign = baTopLeft
-          Scale = 1.000000000000000000
-          ScaleMode = smResize
-          TabOrder = 4
-          Transparent = True
         end
       end
     end

@@ -41,7 +41,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Variants, Classes, Graphics, Controls, Forms,
   Dialogs, VirtualTrees,  ComCtrls, StdCtrls, Spin, CheckLst, ExtCtrls, shellapi,
-  DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs, GR32,
+  DateUtils,  IniFiles, jpeg, PNGImage,  math, Contnrs,
   bass, fldbrows, StringHelper, MainFormHelper, RatingCtrls,
   NempAudioFiles, Spectrum_vis, Hilfsfunktionen, Systemhelper, TreeHelper,
   CoverHelper, U_Charcode, Nemp_SkinSystem, UpdateUtils, HtmlHelper, Lyrics,
@@ -3340,40 +3340,41 @@ begin
 end;
 
 procedure TOptionsCompleteForm.btn_DefaultCoverClick(Sender: TObject);
-var aGraphic: TBitmap32;
+var fs: TFileStream;
 begin
     if OpenDlg_DefaultCover.Execute then
     begin
-        aGraphic := TBitmap32.Create;
+        fs := TFileStream.Create(OpenDlg_DefaultCover.FileName, fmOpenRead);
         try
-            aGraphic.LoadFromFile(OpenDlg_DefaultCover.FileName);
-            if SaveResizedGraphic(aGraphic, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, True) then
+            if ScalePicStreamToFile(fs, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, Nil, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
+
         finally
-            aGraphic.Free;
+            fs.Free;
         end;
     end;
 end;
 
 procedure TOptionsCompleteForm.btn_DefaultCoverResetClick(Sender: TObject);
-var aGraphic: TBitmap32;
-    FileName: UnicodeString;
+var FileName: UnicodeString;
+    fs: TFileStream;
 begin
     FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
     if not FileExists(FileName) then
         FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
 
-    aGraphic := TBitmap32.Create;
+
+    fs := TFileStream.Create(FileName, fmOpenRead);
     try
-        aGraphic.LoadFromFile(FileName);
-        if SaveResizedGraphic(aGraphic, Medienbib.CoverSavePath + '_default_cover.jpg', aGraphic.Width, aGraphic.Height, True) then
+        if ScalePicStreamToFile(fs, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, Nil, True) then
             LoadDefaultCover
         else
             MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
+
     finally
-        aGraphic.Free;
+        fs.Free;
     end;
 end;
 

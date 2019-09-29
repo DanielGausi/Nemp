@@ -1354,7 +1354,7 @@ begin
         and DownloadItemStillMatchesCoverFlow
     then
     begin
-        NewID := Medienbib.InitCoverFromFilename(fNewCoverFilename);
+        NewID := Medienbib.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
         // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
         OldID := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID;
 

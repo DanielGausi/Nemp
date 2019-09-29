@@ -2231,12 +2231,12 @@ begin
                       if afList.Count = 0 then
                           dummyAudioFile.Pfad := IncludeTrailingPathDelimiter(aCover.Directory) + 'foo.bar'
                       else
-                          dummyAudioFile.GetAudioData(TAudioFile(afList[0]).Pfad, GAD_COVER)
+                          dummyAudioFile.GetAudioData(TAudioFile(afList[0]).Pfad)//, GAD_COVER)
                   finally
                       afList.Free;
                   end;
 
-                  MedienBib.InitCover(dummyAudioFile, True);
+                  MedienBib.InitCover(dummyAudioFile, tm_VCL, True);
                   // try again getting the coverbitmap
                   success := GetCoverBitmapFromID(dummyAudioFile.CoverID, pic, MedienBib.CoverSavePath);
                   // if we found an image, but the ID has changed: Change it on the other files with that ID as well
@@ -7976,9 +7976,9 @@ begin
                 if (AudioFile = Nil) then
                 begin
                     AudioFile := TAudioFile.Create;
-                    aErr := AudioFile.GetAudioData(newFilenames[i], GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                    aErr := AudioFile.GetAudioData(newFilenames[i], {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                     HandleError(afa_NewFile, AudioFile, aErr);
-                    MedienBib.InitCover(AudioFile);
+                    MedienBib.InitCover(AudioFile, tm_VCL);
                     MedienBib.UpdateList.Add(AudioFile);
                     inc(newCount);
                 end;
@@ -8206,9 +8206,9 @@ begin
                         if Not MedienBib.AudioFileExists(buffer) then
                         begin
                             AudioFile:=TAudioFile.Create;
-                            aErr := AudioFile.GetAudioData(buffer, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                            aErr := AudioFile.GetAudioData(buffer, {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                             HandleError(afa_PasteFromClipboard, AudioFile, aErr);
-                            MedienBib.InitCover(AudioFile);
+                            MedienBib.InitCover(AudioFile, tm_VCL);
                             MedienBib.UpdateList.Add(AudioFile);
                         end;
                     end;

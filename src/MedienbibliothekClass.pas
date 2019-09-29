@@ -55,13 +55,14 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFileBasics, GR32,
+     AudioFileBasics,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
-     DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes;
+     DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes,
+     Winapi.Wincodec, Winapi.ActiveX;
 
 const
     BUFFER_SIZE = 10 * 1024 * 1024;
@@ -215,6 +216,17 @@ type
         fLyricFirstPriority  : TLyricFunctionsEnum;
         fLyricSecondPriority : TLyricFunctionsEnum;
 
+        /// Threadsafe resizing of coverart:
+        ///  Since Nemp 4.12 the Windows Imaging Component WIC is used
+        ///  This uses a IWICImagingFactory, and we need one for eaach thread
+        ///  Creating a new IWICImagingFactory everytime a scaling is needed, would be too much overhead
+        ///  Therefore:
+        ///       WICImagingFactory_VCL is created, when it is needed, and released at the Library-destructor
+        ///       WICImagingFactory_ScanThread is created and released in the context of the ScanThread
+        WICImagingFactory_VCL: IWICImagingFactory;
+        WICImagingFactory_ScanThread: IWICImagingFactory;
+
+
 
         // used for faster cover-initialisation.
         // i.e. do not search coverfiles for every audiofile.
@@ -356,6 +368,8 @@ type
         procedure LoadFromFile4(aStream: TStream; SubVersion: Integer);
 
         procedure fLoadFromFile(aFilename: UnicodeString);
+
+        function GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
 
     public
         CloseAfterUpdate: Boolean; // flag used in OnCloseQuery
@@ -620,8 +634,9 @@ type
 
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
-        function InitCoverFromFilename(aFileName: UnicodeString): String;
-        procedure InitCover(aAudioFile: tAudioFile; ForceReScan: Boolean = False);
+        function InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode): String;
+        function InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
+        procedure InitCover(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; ForceReScan: Boolean = False);
         // 2. If AudioFile is in a new directory:
         //    Get a List with candidates for the cover for the audiofile
         procedure GetCoverListe(aAudioFile: tAudioFile; aCoverListe: TStringList);
@@ -890,11 +905,17 @@ begin
 
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
+
+  WICImagingFactory_ScanThread := Nil;
+  WICImagingFactory_VCL        := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
+    if WICImagingFactory_VCL <> Nil then
+        WICImagingFactory_VCL._Release;
+
   fJobList.Free;
   NewCoverFlow.free;
   fIgnoreListCopy.Free;
@@ -1540,6 +1561,13 @@ begin
   
   SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_ScanNewFiles));
 
+  // release the Factory (but this should not happen here, as the Factory should have been NILed by the previous thread)
+  if WICImagingFactory_ScanThread <> Nil then
+  begin
+      WICImagingFactory_ScanThread._Release;
+      WICImagingFactory_ScanThread := Nil;
+  end;
+
   ges := UpdateList.Count;
   freq := Round(UpdateList.Count / 100) + 1;
   ct := GetTickCount;
@@ -1552,7 +1580,7 @@ begin
           ScanList.Add(TAudioFile(UpdateList[i]));
       // Clear the original UpdateList
       UpdateList.Clear;
-      
+
       ChangeAfterUpdate := True;
       for i := 0 to ScanList.Count - 1 do
       begin
@@ -1576,8 +1604,8 @@ begin
 
                   //SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
                   ////////////////////////////////
-                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or IgnoreLyricsFlag);
-                  InitCover(AudioFile);
+                  AudioFile.GetAudioData(AudioFile.Pfad, {GAD_Cover or} GAD_Rating or IgnoreLyricsFlag);
+                  InitCover(AudioFile, tm_Thread);
                   ///////////////////////////////////
 
               end
@@ -1616,6 +1644,13 @@ begin
                   // SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessFailCount, DeadFiles.Count);
               end;
           end;
+      end;
+
+      // release the Factory now, scanning is complete and the the thread will terminate soon
+      if WICImagingFactory_ScanThread <> Nil then
+      begin
+          WICImagingFactory_ScanThread._Release;
+          WICImagingFactory_ScanThread := Nil;
       end;
 
       // progress complete
@@ -3957,17 +3992,41 @@ end;
     one of the last one.
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile; ForceReScan: Boolean = False);
+
+function TMedienBibliothek.GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
+begin
+    case ScanMode of
+        tm_VCL: begin
+            if WICImagingFactory_VCL = Nil then
+                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_VCL);
+            result := WICImagingFactory_VCL;
+        end;
+        tm_Thread: begin
+            if WICImagingFactory_ScanThread = Nil then
+                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_ScanThread);
+            result := WICImagingFactory_ScanThread;
+
+        end;
+    end;
+
+end;
+procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile;  ScanMode: CoverScanThreadMode; ForceReScan: Boolean = False);
 var CoverListe: TStringList;
     NewCoverName: String;
 begin
   try
-      if aAudioFile.CoverID <> '' then
-      // das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
+      /////if aAudioFile.CoverID <> '' then
+      ///////// das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
+      ///
+      aAudioFile.CoverID := ''; // new WIC : RESET the ID
+      if InitCoverFromMetaData(aAudioFile, ScanMode) <> '' then
       begin
-        flastID := aAudioFile.CoverID;
-        fLastPath := '';
-        fLastCoverName := '';
+          // Cover in Metadata found and successfully saved to <ID>.jpg
+          flastID := aAudioFile.CoverID;
+          fLastPath := '';
+          fLastCoverName := '';
       end else // AudioFile.GetAudioData hat kein Cover im ID3Tag gefunden. Also: In Dateien drumherum suchen
       begin
             //Wenn Da kein Erfolg: Cover-Datei suchen.
@@ -3986,7 +4045,7 @@ begin
                     NewCoverName := coverliste[GetFrontCover(CoverListe)];
                     if  (NewCovername <> fLastCoverName) or (ForceReScan) then
                     begin
-                        aAudioFile.CoverID := InitCoverFromFilename(NewCovername);
+                        aAudioFile.CoverID := InitCoverFromFilename(NewCovername, ScanMode);
                         if aAudioFile.CoverID = '' then
                         begin
                             // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
@@ -4023,6 +4082,39 @@ begin
      fLastCoverName := '';
   end;
 end;
+
+function TMedienBibliothek.InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode): String;
+var CoverStream: TMemoryStream;
+    newID: String;
+begin
+    result := '';
+    aAudioFile.CoverID := '';
+    CoverStream := TMemoryStream.Create;
+    try
+
+        if aAudioFile.GetCoverStreamFromMetaData(CoverStream) then
+        begin
+            // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
+            CoverStream.Seek(0, soFromBeginning);
+            // compute a new ID from the stream data
+            newID := MD5DigestToStr(MD5Stream(CoverStream));
+            // try to save a resized JPG from the content of the stream
+            // if this fails, there was something wrong with the image data :(
+            if ScalePicStreamToFile(CoverStream,
+                                    CoverSavePath + newID + '.jpg',
+                                    240, 240,
+                                    GetProperImagingFactory(ScanMode))
+            then
+            begin
+                aAudioFile.CoverID := newID;
+                result := newID;
+            end;
+        end;
+
+    finally
+        CoverStream.Free;
+    end;
+end;
 {
     --------------------------------------------------------
     GetCoverListe
@@ -4057,9 +4149,9 @@ end;
     Return value: The New Cover-ID (i.e. the filename for the resized cover)
     --------------------------------------------------------
 }
-function TMedienBibliothek.InitCoverFromFilename(aFileName: UnicodeString): String;
-var aGraphic: TBitmap32; //TPicture;
-    newID: String;
+function TMedienBibliothek.InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
+var newID: String;
+    fs: TFileStream;
 begin
     try
         newID := MD5DigestToStr(MD5File(aFileName));
@@ -4085,21 +4177,18 @@ begin
 
   if newID <> '' then
   begin
-      aGraphic := TBitmap32.Create;
+      fs := TFileStream.Create(aFileName, fmOpenRead);
       try
-          try
-              aGraphic.LoadFromFile(aFilename);
-
-              if SaveResizedGraphic(aGraphic, CoverSavePath + newID + '.jpg', 240, 240) then
-                  result := newID;
-          except
-              // something was wrong with the coverfile - e.g. filename=cover.gif, but its a jpeg
-              // => silent exception, as this is done during the search for new files.
-              // wuppdi;
-          end;
-
+          if ScalePicStreamToFile(fs,
+                                    CoverSavePath + newID + '.jpg',
+                                    240, 240,
+                                    GetProperImagingFactory(ScanMode))
+            then
+            begin
+                result := newID;
+            end;
       finally
-          aGraphic.Free;
+          fs.Free;
       end;
   end;
 end;

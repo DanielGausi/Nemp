@@ -32,18 +32,15 @@ object FNewPicture: TFNewPicture
     Height = 13
     Caption = 'Short description for the picture'
   end
-  object Image1: TImage32Ex
+  object Image1: TImage
     Left = 8
     Top = 8
     Width = 129
     Height = 129
-    Bitmap.ResamplerClassName = 'TDraftResampler'
-    BitmapAlign = baCenter
-    Scale = 1.000000000000000000
-    ScaleMode = smResize
-    TabOrder = 6
-    Visible = False
+    Proportional = True
+    Stretch = True
     Transparent = True
+    Visible = False
   end
   object cbPictureType: TComboBox
     Left = 152

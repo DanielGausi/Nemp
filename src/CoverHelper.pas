@@ -44,10 +44,12 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
   //MP3FileUtils, ID3v2Frames, // not used anymore here
   NempAudioFiles, Nemp_ConstantsAndTypes,
-  cddaUtils, basscd, GR32, GR32_Backends, GR32_Resamplers,
-  Winapi.Wincodec;
+  cddaUtils, basscd,
+  Winapi.Wincodec, Winapi.ActiveX;
 
 type
+
+    CoverScanThreadMode = (tm_VCL, tm_Thread);
 
     TNempCover = class
     private
@@ -115,11 +117,12 @@ type
 
   // Save a Graphic in a resized file. Used for all the little md5-named jpgs
   // in <NempDir>\Cover
-  function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+  //function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
+  function ScalePicStreamToFile(aStream: TStream; aFilename: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
 
   // Converts data from a (id3tag)-picture-stream to a Bitmap.
-  //function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
-  function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
+  function PicStreamToBitmap(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
+  //function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
 
 
   // Draw a Picture on a Bitmap
@@ -127,7 +130,7 @@ type
 
   // Draw a Graphic on a bounded Bitmap (stretch, proportional)
   procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
-  procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
+  //procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
   procedure FitPictureIn(Bounds: TPicture; Source: TGraphic);
   procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
 
@@ -501,6 +504,105 @@ begin
   Findclose(sr);
 end;
 
+
+function ScalePicStreamToFile(aStream: TStream; aFilename: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
+var
+    hr: HRESULT;
+    isLocalFactory: Boolean;
+    // for proper scaling
+    xfactor, yfactor:double;
+    origWidth, origHeight: Cardinal;
+    newWidth, newHeight: Cardinal;
+    // reading the source image
+    SourceAdapter: IStream;
+    BitmapDecoder: IWICBitmapDecoder;
+    DecodeFrame: IWICBitmapFrameDecode;
+    SourceBitmap: IWICBitmap;
+    SourceScaler: IWICBitmapScaler;
+    // writing the resized image
+    DestStream: TMemoryStream;
+    DestAdapter: IStream;
+    DestWICStream: IWICStream;
+    BitmapEncoder: IWICBitmapEncoder;
+    EncodeFrame: IWICBitmapFrameEncode;
+    Props: IPropertyBag2;
+begin
+    result := False;
+    if Not Overwrite and FileExists(aFilename) then
+    begin
+        result := True;
+        exit;
+    end;
+
+    isLocalFactory := (aWICImagingFactory = nil);
+    if isLocalFactory then
+        CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+          CLSCTX_LOCAL_SERVER, IUnknown, aWICImagingFactory);
+
+    // read the image data from stream
+    SourceAdapter := TStreamAdapter.Create(aStream);
+    hr := aWICImagingFactory.CreateDecoderFromStream(SourceAdapter, guid_null, WICDecodeMetadataCacheOnDemand, BitmapDecoder);
+    if Succeeded(hr) then hr := BitmapDecoder.GetFrame(0, DecodeFrame);
+    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapFromSource(DecodeFrame, WICBitmapCacheOnLoad, SourceBitmap);
+    if Succeeded(hr) then hr := SourceBitmap.GetSize(origWidth, origHeight);
+
+    // calculate proper scaling
+    xfactor:= (destWidth) / origWidth;
+    yfactor:= (destHeight) / origHeight;
+    if xfactor > yfactor then
+    begin
+        newWidth := round(origWidth * yfactor);
+        newHeight := round(origHeight * yfactor);
+    end else
+    begin
+        newWidth := round(origWidth * xfactor);
+        newHeight := round(origHeight * xfactor);
+    end;
+
+    // scale the original image
+    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapScaler(SourceScaler);
+    if Succeeded(hr) then hr := SourceScaler.Initialize(SourceBitmap, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
+
+    if Succeeded(hr) then
+    begin
+        // Reading and scaling the original image was successful.
+        // Now try to save the scaled image
+        DestStream := TMemoryStream.create;
+        try
+            // create new WICStream
+            DestAdapter := TStreamAdapter.Create(DestStream);
+            if Succeeded(hr) then hr := aWICImagingFactory.CreateStream(DestWICStream);
+            if Succeeded(hr) then hr := DestWICStream.InitializeFromIStream(DestAdapter);
+            // create and prepare JPEG-Encoder
+            if Succeeded(hr) then hr := aWICImagingFactory.CreateEncoder(GUID_ContainerFormatJpeg, guid_null, BitmapEncoder);
+            if Succeeded(hr) then hr := BitmapEncoder.Initialize(DestWICStream, WICBitmapEncoderNoCache);
+            if Succeeded(hr) then hr := BitmapEncoder.CreateNewFrame(EncodeFrame, Props);
+            if Succeeded(hr) then hr := EncodeFrame.Initialize(Props);
+            if Succeeded(hr) then hr := EncodeFrame.SetSize(newWidth, newHeight);
+            // write image data
+            if Succeeded(hr) then hr := EncodeFrame.WriteSource(SourceScaler, nil);
+            if Succeeded(hr) then hr := EncodeFrame.Commit;
+            if Succeeded(hr) then hr := BitmapEncoder.Commit;
+            // finally save the stream to the destination file
+            if Succeeded(hr) then
+                try
+                    DestStream.SaveToFile(aFilename);
+                    result := True;
+                except
+                    // silent exception here, but (try to) delete the destination file, if it exists
+                    if FileExists(aFilename) then DeleteFile(aFilename);
+                        result := False;
+                end;
+        finally
+            DestStream.Free;
+        end;
+    end;
+
+    if isLocalFactory then
+        aWICImagingFactory._Release;
+end;
+
+(*
 function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
 var SmallBmp: TBitmap32;
     tmpBmp: TBitmap;
@@ -587,6 +689,7 @@ begin
   end;
 end;
 
+
 function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
 var jp: TJPEGImage;
     png: TPNGImage;
@@ -643,9 +746,9 @@ begin
                     aBmp.Assign(NIL);
                 end;
 end;
+*)
 
-(*
-function PicStreamToImage(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
+function PicStreamToBitmap(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
 var jp: TJPEGImage;
     png: TPNGImage;
 begin
@@ -701,7 +804,7 @@ begin
                     aBmp.Assign(NIL);
                 end;
 end;
-*)
+
 
 procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 begin
@@ -764,6 +867,7 @@ begin
     end;
 end;
 
+(*
 procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
 var xfactor, yfactor:double;
     tmpBmp: TBitmap32;
@@ -804,6 +908,7 @@ begin
         tmpbmp.Free
     end;
 end;
+*)
 
 
 // WIC-principle from https://www.delphipraxis.net/1291613-post31.html
@@ -940,7 +1045,6 @@ function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSear
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
-    aBmp32: TBitmap32;
 begin
   result := false;
   try
@@ -971,14 +1075,14 @@ begin
                   begin
                       // first: Check Metadata
                       // Bugfix 4.12: Also consider Non-MP3-Files (like Flac)
-                      aBmp32 := TBitmap32.Create;
-                      try
+                      //aBmp32 := TBitmap32.Create;
+                      //try
                           // if GetCoverFromID3(aAudioFile, aCoverbmp.Bitmap) then
                           //    result := True
-                          if aAudioFile.GetCoverFromMetaData(aBmp32) then
+                          if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
                           begin
                               result := True;
-                              aCoverbmp.Assign(aBmp32);
+                              //aCoverbmp.Assign(aBmp32);
                           end
                           else
                           begin // in Dateien rund um das Audiofile nach nem Bild suchen
@@ -997,9 +1101,9 @@ begin
                               end;
                               coverliste.free;
                           end;
-                      finally
-                          aBmp32.Free;
-                      end;
+                      //finally
+                      //    aBmp32.Free;
+                      //end;
                   end else
                   begin
                       GetDefaultCover(dcFile, aCoverbmp, 0);

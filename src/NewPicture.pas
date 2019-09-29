@@ -38,11 +38,11 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
   PNGImage, gnuGettext,  CoverHelper, AudioFiles, M4aAtoms,
-  Nemp_RessourceStrings, System.UITypes, GR32_Image, GR32_ImageEx;
+  Nemp_RessourceStrings, System.UITypes;
 
 type
   TFNewPicture = class(TForm)
-    Image1: TImage32Ex;
+    Image1: TImage;
     cbPictureType: TComboBox;
     LblConst_PictureType: TLabel;
     LblConst_PictureDescription: TLabel;
@@ -115,7 +115,7 @@ procedure TFNewPicture.FormShow(Sender: TObject);
 begin
     cbPictureType.ItemIndex := 0;
     EdtPictureDescription.Text := '';
-    Image1.Bitmap.Assign(NIL);
+    Image1.Picture.Bitmap.Assign(NIL);
     Image1.Visible := False;
     Btn_OK.Enabled := False;
     UpdateWarning;
@@ -159,27 +159,15 @@ end;
 
 
 procedure TFNewPicture.Btn_ChoosePictureClick(Sender: TObject);
-var
-    aStream: TFileStream;
 begin
   if OpenPictureDialog1.Execute then
   begin
       try
-          aStream := TFileStream.Create(OpenPictureDialog1.FileName, fmOpenRead or fmShareDenyWrite);
-          try
-              if (AnsiLowerCase(ExtractFileExt(OpenPictureDialog1.FileName))='.png') then
-                  PicStreamToBitmap32(aStream, 'image/png', Image1.Bitmap)
-              else
-                  PicStreamToBitmap32(aStream, 'image/jpeg', Image1.Bitmap);
-          finally
-              aStream.Free;
-          end;
+          Image1.Picture.LoadFromFile(OpenPictureDialog1.FileName);
           Image1.Visible := True;
-
           UpdateWarning;
-
-      except
-          Image1.Bitmap.Assign(NIL);
+       except
+          Image1.Picture.Bitmap.Assign(NIL);
           Image1.Visible := False;
           Btn_OK.Enabled := False;
       end;

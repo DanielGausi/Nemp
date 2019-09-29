@@ -76,11 +76,6 @@ object AboutForm: TAboutForm
       '[url="http://www.soft-gems.net/"]Virtual Treeview[/url]'
       ''
       
-        '[url="https://github.com/graphics32"]Graphics32[/url] with [url=' +
-        '"https://stackoverflow.com/questions/11190472/transparent-image-' +
-        'control-with-resampling-in-delphi"]TImage32Ex[/url]'
-      ''
-      
         '[url="http://sourceforge.net/projects/flyingcow/"]Flying Cow[/ur' +
         'l] by Mat'#237'as Andr'#233's Moreno'
       ''

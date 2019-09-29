@@ -131,7 +131,8 @@ uses
   PlayerLog in 'PlayerLog.pas' {PlayerLogForm},
   ProgressUnit in 'ProgressUnit.pas' {ProgressForm},
   EffectsAndEqualizer in 'EffectsAndEqualizer.pas' {FormEffectsAndEqualizer},
-  MainFormBuilderForm in 'MainFormBuilderForm.pas' {MainFormBuilder};
+  MainFormBuilderForm in 'MainFormBuilderForm.pas' {MainFormBuilder},
+  _TestForm in '_TestForm.pas' {WICTestForm};
 
 {$R *.res}
 
@@ -166,6 +167,7 @@ ShowWindow
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
+  Application.CreateForm(TWICTestForm, WICTestForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

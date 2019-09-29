@@ -42,7 +42,7 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
   Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
-  DateUtils, RatingCtrls, GR32;
+  DateUtils, RatingCtrls;
 
 type
     TAudioFileAction = (afa_None,
@@ -303,10 +303,20 @@ type
 
         function GetCDDAInfo(Filename: UnicodeString; Flags: Integer = 0): TCDDAError;
 
-        function GetCoverFromMp3 (aMp3File: TMp3File   ; aCoverBmp: TBitmap32): Boolean;
-        function GetCoverFromFlac(aFlacFile: TFlacFile ; aCoverBmp: TBitmap32): Boolean;
-        function GetCoverFromM4A (aM4AFile: TM4aFile   ; aCoverBmp: TBitmap32): Boolean;
-        function GetCoverFromAPE (aBaseApeFile: TBaseApeFile; aCoverBmp: TBitmap32): Boolean;
+        // GetCoverFrom*: Used by the VCL-Thread only to display a proper Cover
+        // only used, when there is no <CoverID>.jpg in the Cover-Archive
+        function GetCoverFromMp3 (aMp3File: TMp3File   ; aCoverBmp: TBitmap): Boolean;
+        function GetCoverFromFlac(aFlacFile: TFlacFile ; aCoverBmp: TBitmap): Boolean;
+        function GetCoverFromM4A (aM4AFile: TM4aFile   ; aCoverBmp: TBitmap): Boolean;
+        function GetCoverFromAPE (aBaseApeFile: TBaseApeFile; aCoverBmp: TBitmap): Boolean;
+
+        // GetCoverStreamFrom*:
+        // Used by VCl and secondary Threads while initialising a new <CoverID>.jpg
+        // The stream is then processed by an IWICImagingFactory to save the resized <CoverID>.jpg in the coverArchive
+        function GetCoverStreamFromMp3 (aMp3File: TMp3File   ; var aPicStream: TMemoryStream): Boolean;
+        function GetCoverStreamFromFlac(aFlacFile: TFlacFile ; var aPicStream: TMemoryStream): Boolean;
+        function GetCoverStreamFromM4A (aM4AFile: TM4aFile   ; var aPicStream: TMemoryStream): Boolean;
+        function GetCoverStreamFromAPE (aBaseApeFile: TBaseApeFile; var aPicStream: TMemoryStream): Boolean;
 
 
 
@@ -453,7 +463,8 @@ type
         function SetAudioData(allowChange: Boolean): TNempAudioError;
 
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
-        function GetCoverFromMetaData(aCoverBmp: TBitmap32): boolean;
+        function GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
+        function GetCoverStreamFromMetaData(aCoverStream: TMemoryStream): boolean;
 
         // save the data here in a ";"-separated string for csv-export
         function GenerateCSVString: UnicodeString;
@@ -566,7 +577,10 @@ type
 
 const
       // GAD_xxx: Flags for GetAudioData-Methods
-      GAD_Cover  = 1;
+      // GAD_Cover  = 1;
+      // 4.12: GAD_Cover is not used anymore. When we want to scan a file for coverart,
+      // it is done within the method Medienbib.InitCover -> there is also done the "SaveToID"-stuff
+      // (which was kinda misplacec in AudioFile.GetAudioData anyway ...)
       GAD_Rating = 2;  // !!!!  ignored by the subfunctions
       GAD_CDDB   = 4;
       GAD_NOLYRICS = 8;
@@ -1649,14 +1663,7 @@ end;
     --------------------------------------------------------
 }
 procedure TAudioFile.GetMp3Info(aMp3File: TMp3File; filename: UnicodeString; Flags: Integer = 0);
-var CoverStream, TagStream: TMemoryStream;
-    PicList: TObjectlist;
-    PicType: Byte;
-    PicDesc: UnicodeString;
-    PicMime: AnsiString;
-    i: Integer;
-    aBMP: TBitmap32;
-    newID: String;
+var  TagStream: TMemoryStream;
 begin
     if MedienBib.NempCharCodeOptions.AutoDetectCodePage then
     begin
@@ -1703,48 +1710,6 @@ begin
         TagStream.Free;
     end;
 
-    // Determine cover if wanted
-    if (Flags and GAD_Cover) = GAD_Cover then
-    begin
-        // clear ID, so MediaLibrary.GetCover can do its job if no cover
-        // in the tag is found.
-        CoverID := '';
-        CoverStream := TMemoryStream.Create;
-        PicList := aMp3File.id3v2Tag.GetAllPictureFrames;
-        try
-            if PicList.Count > 0 then
-            begin
-                // Check Pic-Liste.
-                // Take the cover flagged as "frontcover" or the first one
-                // in the list.
-                for i := PicList.Count - 1 downto 0 do
-                begin
-                    CoverStream.Clear;
-                    TID3v2Frame(PicList[i]).GetPicture(PicMime, PicType, PicDesc, CoverStream);
-                    if PicType = 3 then //Front-Cover
-                        break;
-                end;
-                aBMP := TBitmap32.Create;
-                try
-                    // PicStreamToImage(CoverStream, PicMime, aBMP);
-                    PicStreamToBitmap32(CoverStream, PicMime, aBMP);
-
-                    if not aBMP.Empty then
-                    begin
-                        CoverStream.Seek(0, soFromBeginning);
-                        newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
-                            CoverID := newID;
-                    end;
-                finally
-                    aBMP.Free;
-                end;
-            end;
-        finally
-            PicList.Free;
-            CoverStream.Free;
-        end;
-    end // if Flags = GAD_Cover
 end;
 
 {
@@ -1753,12 +1718,6 @@ end;
     --------------------------------------------------------
 }
 procedure TAudioFile.GetFlacInfo(aFlacFile: TFlacFile; Flags: Integer = 0);
-var CoverStream: TMemoryStream;
-    PicType: Cardinal;
-    Mime: AnsiString;
-    Description: UnicodeString;
-    aBMP: TBitmap32;
-    newID: String;
 begin
     CD      := aFlacFile.GetPropertyByFieldname(VORBIS_DISCNUMBER);
     Comment := aFlacFile.GetPropertyByFieldname(VORBIS_COMMENT);
@@ -1776,36 +1735,6 @@ begin
     else
         fChannelModeIDX := 4; // unknown
     end;
-
-    if (Flags and GAD_Cover) = GAD_Cover then
-    begin
-        // clear ID, so MediaLibrary.GetCover can do its job
-        CoverID := '';
-        CoverStream := TMemoryStream.Create;
-        try
-            if aFlacFile.GetPictureStream(CoverStream, PicType, Mime, Description) then
-            begin
-                // Cover in FlacFile Found
-                aBMP := TBitmap32.Create;
-                try
-                    //PicStreamToImage(CoverStream, Mime, aBMP);
-                    PicStreamToBitmap32(CoverStream, Mime, aBMP);
-                    if not aBMP.Empty then
-                    begin
-                        CoverStream.Seek(0, soFromBeginning);
-                        newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
-                            CoverID := newID;
-                    end;
-                finally
-                    aBMP.Free;
-                end;
-
-            end;
-        finally
-            CoverStream.Free;
-        end;
-    end;
 end;
 
 {
@@ -1816,9 +1745,11 @@ end;
 }
 procedure TAudioFile.GetOggInfo(aOggFile: TOggVorbisFile; Flags: Integer = 0);
 begin
+    {
     if (Flags and GAD_Cover) = GAD_Cover then
         // clear ID, so MediaLibrary.GetCover can do its job
         CoverID := '';
+    }
     fVBR := False;
     case aOggFile.Channels of
         1: fChannelModeIDX := 3; // Mono
@@ -1844,11 +1775,6 @@ end;
     --------------------------------------------------------
 }
 procedure TAudioFile.GetM4AInfo(aM4AFile: TM4aFile; Flags: Integer);
-var CoverStream: TMemoryStream;
-    picType: TM4APicTypes;
-    aBMP: TBitmap32;
-    newID: String;
-    aMime: AnsiString;
 begin
 
     CD      := aM4AFile.Disc;
@@ -1870,43 +1796,6 @@ begin
 
     PlayCounter := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
     Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
-
-    if (Flags and GAD_Cover) = GAD_Cover then
-    begin
-        // clear ID, so MediaLibrary.GetCover can do its job
-        CoverID := '';
-        CoverStream := TMemoryStream.Create;
-        try
-            if aM4AFile.GetPictureStream(CoverStream, picType) then
-            begin
-                case picType of
-                  M4A_JPG: aMime := 'image/jpeg';
-                  M4A_PNG: aMime := 'image/png';
-                  M4A_Invalid: aMime := '-'; // invalid
-                end;
-                // Cover in M4AFile Found
-                aBMP := TBitmap32.Create;
-                try
-                    //PicStreamToImage(CoverStream, aMime, aBMP);
-                    PicStreamToBitmap32(CoverStream, aMime, aBMP);
-                    if not aBMP.Empty then
-                    begin
-                        CoverStream.Seek(0, soFromBeginning);
-                        newID := MD5DigestToStr(MD5Stream(CoverStream));
-                        if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
-                            CoverID := newID;
-                    end;
-                finally
-                    aBMP.Free;
-                end;
-
-            end;
-        finally
-            CoverStream.Free;
-        end;
-    end;
-
-
 end;
 
 {
@@ -1928,12 +1817,6 @@ end;
     --------------------------------------------------------
 }
 procedure TAudioFile.GetExoticInfo(aBaseApeFile: TBaseApeFile; aType: TAudioFileType; Flags: Integer);
-var picList: TStringList;
-    i: Integer;
-    description: UnicodeString;
-    CoverStream: TMemoryStream;
-    aBMP: TBitmap32;
-    newID: String;
 begin
     fVBR := False;
     // Get additonal Info from Apev2tags
@@ -1943,51 +1826,6 @@ begin
     PlayCounter  := StrToIntDef(aBaseApeFile.GetValueByKey(APE_PLAYCOUNT), 0);
     Rating       := StrToIntDef(aBaseApeFile.GetValueByKey(APE_RATING), 0);
     RawTagLastFM := UTF8String(aBaseApeFile.GetValueByKey(APE_CATEGORIES));
-
-    // Get Cover from Tags
-    if (Flags and GAD_Cover) = GAD_Cover then
-    begin
-        // clear ID, so MediaLibrary.GetCover can do its job
-        CoverID := '';
-        picList := TStringList.Create;
-        try
-            aBaseApeFile.GetAllPictureFrames(picList);
-            if picList.Count > 0 then
-            begin
-                CoverStream := TMemoryStream.Create;
-                try
-
-                    for i := PicList.Count - 1 downto 0 do
-                    begin
-                        CoverStream.Clear;
-                        aBaseApeFile.GetPicture(AnsiString(PicList[i]), CoverStream, description);
-                        if PicList[i] = String(TPictureTypeStrings[apt_Front]) then
-                            break;
-                    end;
-                    aBMP := TBitmap32.Create;
-                    try
-                        if not PicStreamToBitmap32(CoverStream, 'image/jpeg', aBMP) then
-                            if not PicStreamToBitmap32(CoverStream, 'image/png', aBMP) then
-                                PicStreamToBitmap32(CoverStream, 'image/bmp', aBMP);
-                        if not aBMP.Empty then
-                        begin
-                            CoverStream.Seek(0, soFromBeginning);
-                            newID := MD5DigestToStr(MD5Stream(CoverStream));
-                            if SaveResizedGraphic(aBMP, MedienBib.CoverSavePath + newID + '.jpg', 240, 240) then
-                                CoverID := newID;
-                        end;
-                    finally
-                        aBMP.Free;
-                    end;
-                finally
-                    CoverStream.Free;
-                end;
-            end;
-        finally
-            picList.Free;
-        end;
-    end;
-
 
     // Get ChannelMode
     case aType of
@@ -2082,7 +1920,57 @@ end;
     result: Success yes/no
     --------------------------------------------------------
 }
-function TAudioFile.GetCoverFromMetaData(aCoverBmp: TBitmap32): boolean;
+
+function TAudioFile.GetCoverStreamFromMetaData(aCoverStream: TMemoryStream): boolean;
+var MainFile: TGeneralAudioFile;
+begin
+    if not FileExists(Pfad) then
+    begin
+        result := False;
+        exit;
+    end;
+
+    case fAudioType of
+        at_File: begin
+            try
+                MainFile := TGeneralAudioFile.Create(Pfad);
+                try
+                    // get cover information (format-specific)
+                    case MainFile.FileType of
+                        at_Mp3    : result := GetCoverStreamFromMp3(MainFile.MP3File, aCoverStream) ;
+                        at_Flac   : result := GetCoverStreamFromFlac(MainFile.FlacFile, aCoverStream) ;
+                        at_M4A    : result := GetCoverStreamFromM4A(MainFile.M4aFile, aCoverStream) ;
+
+                        at_Monkey,
+                        at_WavPack,
+                        at_MusePack,
+                        at_OptimFrog,
+                        at_TrueAudio: result := GetCoverStreamFromApe(MainFile.BaseApeFile, aCoverStream) ;
+
+                        at_Invalid,
+                        at_Ogg,
+                        at_Wma,
+                        at_wav: result := False;
+                    else
+                        result := False;
+                    end;
+
+                finally
+                    MainFile.Free;
+                end;
+            except
+                result := False;
+            end;
+
+        end; // at_File
+    else
+        // not a File, but Stream, CDDA, ...
+        result := False
+    end;
+end;
+
+
+function TAudioFile.GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
 var MainFile: TGeneralAudioFile;
 begin
     if not FileExists(Pfad) then
@@ -2130,8 +2018,37 @@ begin
     end;
 end;
 
+function TAudioFile.GetCoverStreamFromMp3 (aMp3File: TMp3File   ; var aPicStream: TMemoryStream): Boolean;
+var PicList: TObjectlist;
+    PicType: Byte;
+    PicDesc: UnicodeString;
+    PicMime: AnsiString;
+    i: Integer;
+begin
+    result := False;
+    PicList := aMp3File.id3v2Tag.GetAllPictureFrames;
+    try
+        if PicList.Count > 0 then
+        begin
+            // Check Pic-List.
+            // Take the cover flagged as "frontcover" or the first one in the list.
+            for i := PicList.Count - 1 downto 0 do
+            begin
+                aPicStream.Clear;
+                TID3v2Frame(PicList[i]).GetPicture(PicMime, PicType, PicDesc, aPicStream);
+                if PicType = 3 then //Front-Cover
+                    break;
+            end;
+            result := True; // not aCoverBmp.Empty;
+            // we found a cover, but it is not sure that there is valid picture data in it.
+        end;
+    finally
+        PicList.Free;
+    end;
+end;
 
-function TAudioFile.GetCoverFromMp3(aMp3File: TMp3File   ; aCoverBmp: TBitmap32): Boolean;
+
+function TAudioFile.GetCoverFromMp3(aMp3File: TMp3File   ; aCoverBmp: TBitmap): Boolean;
 var CoverStream: TMemoryStream;
     PicList: TObjectlist;
     PicType: Byte;
@@ -2154,7 +2071,7 @@ begin
                 if PicType = 3 then //Front-Cover
                     break;
             end;
-            PicStreamToBitmap32(CoverStream, PicMime, aCoverBmp);
+            PicStreamToBitmap(CoverStream, PicMime, aCoverBmp);
             result := not aCoverBmp.Empty;
         end;
     finally
@@ -2163,7 +2080,16 @@ begin
     end;
 end;
 
-function TAudioFile.GetCoverFromFlac(aFlacFile: TFlacFile ; aCoverBmp: TBitmap32): Boolean;
+function TAudioFile.GetCoverStreamFromFlac(aFlacFile: TFlacFile ; var aPicStream: TMemoryStream): Boolean;
+var PicType: Cardinal;
+    Mime: AnsiString;
+    Description: UnicodeString;
+begin
+    aPicStream.Clear;
+    result := aFlacFile.GetPictureStream(aPicStream, PicType, Mime, Description);
+end;
+
+function TAudioFile.GetCoverFromFlac(aFlacFile: TFlacFile ; aCoverBmp: TBitmap): Boolean;
 var CoverStream : TMemoryStream;
     PicType: Cardinal;
     Mime: AnsiString;
@@ -2175,7 +2101,7 @@ begin
         if aFlacFile.GetPictureStream(CoverStream, PicType, Mime, Description) then
         begin
             // Cover in FlacFile Found
-            PicStreamToBitmap32(CoverStream, Mime, aCoverBmp);
+            PicStreamToBitmap(CoverStream, Mime, aCoverBmp);
             result := not aCoverBmp.Empty;
         end;
     finally
@@ -2183,7 +2109,16 @@ begin
     end;
 end;
 
-function TAudioFile.GetCoverFromM4A(aM4AFile: TM4aFile   ; aCoverBmp: TBitmap32): Boolean;
+
+
+function TAudioFile.GetCoverStreamFromM4A (aM4AFile: TM4aFile   ; var aPicStream: TMemoryStream): Boolean;
+var picType: TM4APicTypes;
+begin
+    aPicStream.Clear;
+    result := aM4AFile.GetPictureStream(aPicStream, picType)
+end;
+
+function TAudioFile.GetCoverFromM4A(aM4AFile: TM4aFile   ; aCoverBmp: TBitmap): Boolean;
 var CoverStream: TMemoryStream;
     picType: TM4APicTypes;
     aMime: AnsiString;
@@ -2199,7 +2134,7 @@ begin
               M4A_Invalid: aMime := '-'; // invalid
             end;
             // Cover in M4AFile Found
-            PicStreamToBitmap32(CoverStream, aMime, aCoverBmp);
+            PicStreamToBitmap(CoverStream, aMime, aCoverBmp);
             result := not aCoverBmp.Empty;
         end;
     finally
@@ -2207,7 +2142,35 @@ begin
     end;
 end;
 
-function TAudioFile.GetCoverFromAPE(aBaseApeFile: TBaseApeFile; aCoverBmp: TBitmap32): Boolean;
+
+function TAudioFile.GetCoverStreamFromAPE (aBaseApeFile: TBaseApeFile; var aPicStream: TMemoryStream): Boolean;
+var picList: TStringList;
+    i: Integer;
+    description: UnicodeString;
+begin
+    result := false;
+    picList := TStringList.Create;
+    try
+        aBaseApeFile.GetAllPictureFrames(picList);
+        if picList.Count > 0 then
+        begin
+            // get Front-Cover, or use first one in the List
+            for i := PicList.Count - 1 downto 0 do
+            begin
+                aPicStream.Clear;
+                aBaseApeFile.GetPicture(AnsiString(PicList[i]), aPicStream, description);
+                if PicList[i] = String(TPictureTypeStrings[apt_Front]) then
+                    break;
+            end;
+            result := True;
+        end;
+    finally
+        picList.Free;
+    end;
+end;
+
+
+function TAudioFile.GetCoverFromAPE(aBaseApeFile: TBaseApeFile; aCoverBmp: TBitmap): Boolean;
 var picList: TStringList;
     i: Integer;
     description: UnicodeString;
@@ -2230,9 +2193,9 @@ begin
                         break;
                 end;
 
-                if not PicStreamToBitmap32(CoverStream, 'image/jpeg', aCoverBmp) then
-                    if not PicStreamToBitmap32(CoverStream, 'image/png', aCoverBmp) then
-                        PicStreamToBitmap32(CoverStream, 'image/bmp', aCoverBmp);
+                if not PicStreamToBitmap(CoverStream, 'image/jpeg', aCoverBmp) then
+                    if not PicStreamToBitmap(CoverStream, 'image/png', aCoverBmp) then
+                        PicStreamToBitmap(CoverStream, 'image/bmp', aCoverBmp);
                 result := not aCoverBmp.Empty;
 
             finally

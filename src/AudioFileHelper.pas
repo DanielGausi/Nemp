@@ -122,7 +122,7 @@ function MainSort(item1, item2: Pointer): Integer;
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, CoverHelper;
 // MainUnit is needed because
 //    - Sortieren_String1String2Titel_asc and
 //    - Sortieren_String1String2Titel_desc
@@ -585,8 +585,8 @@ begin
 
         if WithCover then
         begin
-            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
-            Medienbib.InitCover(aNewFile);
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
+            Medienbib.InitCover(aNewFile, tm_VCL);
         end else
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
 
@@ -607,8 +607,8 @@ begin
     begin
         if WithCover then
         begin
-            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Cover OR GAD_Rating or MedienBib.IgnoreLyricsFlag);
-            Medienbib.InitCover(aNewFile);
+            aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
+            Medienbib.InitCover(aNewFile, tm_VCL);
         end else
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
 

@@ -656,11 +656,11 @@ begin
 
         MB_RefreshAudioFile: begin
             af := TAudioFile(aMsg.LParam);
-            aErr := af.GetAudioData(af.Pfad, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+            aErr := af.GetAudioData(af.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
             if aErr <> AUDIOERR_None then
                 HandleError(afa_RefreshingFileInformation, af, aErr);
 
-            MedienBib.InitCover(af);
+            MedienBib.InitCover(af, tm_VCL);
         end;
 
         MB_ProgressCurrentFileOrDirUpdate: begin
@@ -1930,10 +1930,10 @@ Begin
                           if Not MedienBib.AudioFileExists(filename) then
                           begin
                               AudioFile:=TAudioFile.Create;
-                              aErr := AudioFile.GetAudioData(filename, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                              aErr := AudioFile.GetAudioData(filename, GAD_Rating or MedienBib.IgnoreLyricsFlag);
                               HandleError(afa_DroppedFiles, AudioFile, aErr);
 
-                              MedienBib.InitCover(AudioFile);
+                              MedienBib.InitCover(AudioFile, tm_VCL);
                               MedienBib.UpdateList.Add(AudioFile);
                           end;
                       end;
@@ -1968,7 +1968,7 @@ Var
       begin
           AudioFile := TAudioFile.Create;
           try
-              aErr := AudioFile.GetAudioData(af, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+              aErr := AudioFile.GetAudioData(af, GAD_Rating or MedienBib.IgnoreLyricsFlag);  // GAD_COVER ???
               HandleError(afa_DroppedFiles, AudioFile, aErr);
               // Play new song in headset
               NempPlayer.PlayInHeadset(AudioFile);
@@ -2103,9 +2103,9 @@ begin
                     if MedienBib.UseNewFileScanMethod then
                         AudioFile.Pfad := NewFile
                     else begin
-                        aErr := AudioFile.GetAudioData(NewFile, GAD_Cover or GAD_Rating or MedienBib.IgnoreLyricsFlag);
+                        aErr := AudioFile.GetAudioData(NewFile, GAD_Rating or MedienBib.IgnoreLyricsFlag);
                         HandleError(afa_NewFile, AudioFile, aErr);
-                        MedienBib.InitCover(AudioFile);
+                        MedienBib.InitCover(AudioFile, tm_VCL);
                     end;
                     // add it to the UpdateListe anyway
                     MedienBib.UpdateList.Add(AudioFile);

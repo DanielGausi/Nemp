@@ -44,7 +44,6 @@ object Nemp_MainForm: TNemp_MainForm
     OnMouseUp = __MainContainerPanelMouseUp
     OnResize = __MainContainerPanelResize
     OwnerDraw = False
-    ExplicitHeight = 729
     object MainSplitter: TSplitter
       Left = 0
       Top = 240
@@ -699,7 +698,6 @@ object Nemp_MainForm: TNemp_MainForm
       TabOrder = 1
       OnResize = _TopMainPanelResize
       OwnerDraw = False
-      ExplicitHeight = 385
       object SubSplitter2: TSplitter
         Left = 607
         Top = 0
@@ -723,7 +721,6 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 0
         OnResize = MedialistPanelResize
         OwnerDraw = False
-        ExplicitHeight = 385
         object MedienBibHeaderPanel: TNempPanel
           Tag = 3
           Left = 0
@@ -844,7 +841,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 1
           OnPaint = NewPanelPaint
           OwnerDraw = False
-          ExplicitHeight = 357
           object VST: TVirtualStringTree
             Left = 2
             Top = 2
@@ -910,7 +906,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnKeyUp = PlaylistVSTKeyUp
             OnNewText = VSTNewText
             OnStartDrag = VSTStartDrag
-            ExplicitHeight = 353
             Columns = <
               item
                 Position = 0
@@ -998,7 +993,6 @@ object Nemp_MainForm: TNemp_MainForm
         TabOrder = 1
         OnResize = MedienBibDetailPanelResize
         OwnerDraw = False
-        ExplicitHeight = 385
         object ContainerPanelMedienBibDetails: TNempPanel
           Left = 0
           Top = 28
@@ -1008,7 +1002,6 @@ object Nemp_MainForm: TNemp_MainForm
           BevelOuter = bvNone
           TabOrder = 0
           OwnerDraw = False
-          ExplicitHeight = 357
           object SplitterFileOverview: TSplitter
             Left = 248
             Top = 0
@@ -1035,7 +1028,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnResize = DetailID3TagPanelResize
             OnPaint = NewPanelPaint
             OwnerDraw = False
-            ExplicitHeight = 357
             DesignSize = (
               248
               377)
@@ -1068,7 +1060,6 @@ object Nemp_MainForm: TNemp_MainForm
               Visible = False
               StyleElements = [seBorder]
               OnKeyDown = LyricsMemoKeyDown
-              ExplicitHeight = 339
             end
           end
           object DetailID3TagPanel: TNempPanel
@@ -1085,7 +1076,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnResize = DetailID3TagPanelResize
             OnPaint = NewPanelPaint
             OwnerDraw = False
-            ExplicitHeight = 357
             DesignSize = (
               227
               377)
@@ -1308,7 +1298,6 @@ object Nemp_MainForm: TNemp_MainForm
       OnMouseMove = _ControlPanelMouseMove
       OnResize = _ControlPanelResize
       OwnerDraw = False
-      ExplicitTop = 629
       object ControlContainer2: TNempPanel
         Left = 481
         Top = 0
@@ -1336,8 +1325,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = NewPlayerPanelResize
           OnPaint = ControlPanelPaint
           OwnerDraw = False
-          ExplicitLeft = -5
-          ExplicitTop = 4
           DesignSize = (
             609
             100)
