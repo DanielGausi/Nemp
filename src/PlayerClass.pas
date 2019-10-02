@@ -984,9 +984,9 @@ var i: Integer;
 begin
   MainDevice := ini.ReadInteger('Player','MainDevice',1);
   HeadsetDevice := ini.ReadInteger('Player','HeadsetDevice',2);
-  fMainVolume := ini.ReadInteger('Player','MainVolume',100);
+  fMainVolume := ini.ReadInteger('Player','MainVolume',50);
   fMainVolume := fMainVolume / 100;
-  fHeadsetVolume := ini.ReadInteger('Player','HeadsetVolume',80);
+  fHeadsetVolume := ini.ReadInteger('Player','HeadsetVolume',50);
   fHeadsetVolume := fHeadsetVolume / 100;
 
   fSoundfontFilename := ini.ReadString('Player', 'SoundfontFilename', '');

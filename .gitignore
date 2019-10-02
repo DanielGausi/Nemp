@@ -18,9 +18,7 @@ bin/Data/Cover/
 bin/Data/CoverCache
 /bin/Languages/de/LC_MESSAGES/default.po
 /bin/Languages/de/LC_MESSAGES/howto upgrade.txt
-/bin/Images/[Originaldateien]/
 /bin/Images/_unsued
-/bin/__nemp.exe
 /bin/bugreport.txt
 /bin/Languages/de/LC_MESSAGES/__default - Kopie.mo
 /bin/Skins/CatWoman/
@@ -37,10 +35,7 @@ bin/Data/CoverCache
 /src/common/__history
 /src/G15App/__history
 /src/3rd Party Units/__history/
-/src/3rd Party Units/_unused
-/src/__Some unsed Code.pas
-/src/____default.pot
-/src/_default.pot/src-help/nemp-help-de.out
+/src-help/nemp-help-de.out
 /src-help/nemp-help-de.synctex.gz
 /src-help/nemp-help-de.toc
 /src-help/nemp-help-en.aux
@@ -54,3 +49,4 @@ bin/Data/CoverCache
 /bin/Skins/Classic/_unused
 /src-help/_unused
 /bin/_unused
+/_unused

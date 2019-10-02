@@ -121,6 +121,7 @@ Warning_InvalidMp3file_Hint = 'The specified file with the extension ".mp3" is n
 
 Warning_DownloadDirNotFound   = 'The download directory could not be found.';
 Warning_RecordingDirNotFound  = 'The recording directory for webstreams could not be found.';
+Warning_RecordingDirNotFoundCreationFailed  = 'The current recording directory for webstreams could not be found, and could also not be created.';
 Warning_DataDirNotFound       = 'The data directory could not be found.';
 
 Bitrate_Constant = 'Constant bitrate';

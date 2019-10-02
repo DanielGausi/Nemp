@@ -3235,6 +3235,19 @@ var adir: UnicodeString;
     FB: TFolderBrowser;
 begin
   aDir := NempPlayer.DownloadDir;
+
+  // try to create the directory, if it not exist already
+  // --- this behaviour should be OK.
+  //     The default directory is savePath + \webradio, so it's in the same directory as "Cover\",
+  //     which is created automatically anyway.
+  if NOT DirectoryExists(ExtractFilePath(aDir)) then
+  try
+      ForceDirectories(aDir);
+  except
+      TranslateMessageDLG((Warning_RecordingDirNotFoundCreationFailed), mtWarning, [mbOk], 0);
+  end;
+
+
   FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_Webradio_Caption, NempPlayer.DownloadDir);
   try
       if fb.Execute then

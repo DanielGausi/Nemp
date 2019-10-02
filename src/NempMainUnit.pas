@@ -2462,7 +2462,11 @@ begin
   // Zumindest bisher (2.5d, für die nächste Version ist auch nichts anderes geplant)
   if (ST_Playlist.IsSearching)  then exit;
 
+  // an empty string is recognized as faDirectory, so the ProgressWindow will be opened if we don't exit in this case
+  if filename = '' then exit;
+
   ReallyDeletePlaylistTimer.Enabled := False;
+
 
   //Weiter unten wieder starten...
 
@@ -11159,6 +11163,19 @@ end;
 
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
 begin
+
+  // try to create the directory, if it not exist already
+  // --- this behaviour should be OK.
+  //     The default directory is savePath + \webradio, so it's in the same directory as "Cover\",
+  //     which is created automatically anyway.
+  if NOT DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
+  try
+      ForceDirectories(NempPlayer.DownloadDir);
+  except
+      // silent exception here
+      // TranslateMessageDLG((Warning_RecordingDirNotFoundCreationFailed), mtWarning, [mbOk], 0);
+  end;
+
   if DirectoryExists(ExtractFilePath(NempPlayer.DownloadDir)) then
         ShellExecute(Handle, 'open' ,'explorer.exe', PChar('"'+NempPlayer.DownloadDir+'"'), '', sw_ShowNormal)
   else
