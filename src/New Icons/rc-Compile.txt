@@ -1,0 +1,5 @@
+For Icons with large images (256x256):
+
+Use cgrc.exe, NOT brcc32.exe
+
+(help with cgrc -h)

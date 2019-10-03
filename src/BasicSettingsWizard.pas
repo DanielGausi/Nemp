@@ -384,9 +384,9 @@ begin
                 // include more often a video file, afaik
                 if NempPlayer.ValidExtensions[i] <> '.mp4' then
                 begin
-                    ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
+                    // ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
                     ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
-                    ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
+                    // ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
                 end;
             end;
             // register actions
@@ -397,13 +397,13 @@ begin
 
             // set playlistfile extensions
             ftr.RegisterType('.m3u', 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-            ftr.DeleteSpecialSetting('.m3u');
+            // ftr.DeleteSpecialSetting('.m3u');
             ftr.RegisterType('.m3u8', 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-            ftr.DeleteSpecialSetting('.m3u8');
+            // ftr.DeleteSpecialSetting('.m3u8');
             ftr.RegisterType('.pls', 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-            ftr.DeleteSpecialSetting('.pls');
+            // ftr.DeleteSpecialSetting('.pls');
             ftr.RegisterType('.npl', 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-            ftr.DeleteSpecialSetting('.npl');
+            // ftr.DeleteSpecialSetting('.npl');
             // register actions
             ftr.AddHandler('open','"' +  Paramstr(0) + '" "%1"');
             ftr.AddHandler('enqueue','"' +  Paramstr(0) + '" /enqueue "%1"', (FiletypeRegistration_PlaylistEnqueue));
