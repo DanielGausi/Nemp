@@ -1983,9 +1983,9 @@ begin
   for i := 0 to NempPlayer.ValidExtensions.Count - 1 do
       if CBFileTypes.Checked[i] then
       begin
-          ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
+          // ftr.DeleteUserChoice(NempPlayer.ValidExtensions[i]);
           ftr.RegisterType(NempPlayer.ValidExtensions[i], 'Nemp.AudioFile', 'Nemp Audiofile', Paramstr(0), 0);
-          ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
+          // ftr.DeleteSpecialSetting(NempPlayer.ValidExtensions[i]);
       end;
 
   // Operationen für Nemp.AudioFile hinzufügen
@@ -2002,7 +2002,7 @@ begin
     if CBPlaylistTypes.Checked[i] then
     begin
         ftr.RegisterType(CBPlaylistTypes.Items[i], 'Nemp.Playlist', 'Nemp Playlist', Paramstr(0), 1);
-        ftr.DeleteSpecialSetting(CBPlaylistTypes.Items[i]);
+        // ftr.DeleteSpecialSetting(CBPlaylistTypes.Items[i]);
     end;
 
   ftr.AddHandler('open','"' +  Paramstr(0) + '" "%1"');

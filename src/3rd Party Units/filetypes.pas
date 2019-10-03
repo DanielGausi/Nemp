@@ -62,8 +62,9 @@ type
     function DeleteHandler(const HandlerVerb: string): boolean;
     function DeleteDirectoryHandler(const HandlerVerb: string): boolean;
 
-    function DeleteUserChoice(const Extension: String): Boolean;
-    function DeleteSpecialSetting(const Extension: string): Boolean;
+    // removed 2019
+    // function DeleteUserChoice(const Extension: String): Boolean;
+    // function DeleteSpecialSetting(const Extension: string): Boolean;
 
     function ExtensionOpensWithApplication(const Extension, InternalName, AppName: string): boolean;
 
@@ -505,6 +506,7 @@ begin
 end;
 *)
 
+(* removed 2019
 function TFileTypeRegistration.DeleteUserChoice(
   const Extension: String): Boolean;
 var ucKey: string;
@@ -521,6 +523,7 @@ begin
         FRegConnector.KeyExists(ucKey) and
         FRegConnector.DeleteKey(ucKey);
 end;
+*)
 
 
 function TFileTypeRegistration.DeleteHandler(const HandlerVerb: string):
@@ -552,6 +555,7 @@ begin
     (FRegConnector.DeleteKey(fKey + Format(ShellKey,['directory',HandlerVerb])));
 end;
 
+(* removed 2019
 // Gesonderter Wert (falls mal "öffnen mit ... [x]immer damit öffnen" gewählt wurde) steht in
 // HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp3
 //   -- Application
@@ -569,7 +573,7 @@ begin
   end;
 
 end;
-
+*)
 
 
 function TFileTypeRegistration.SetDefaultHandler: boolean;
@@ -644,21 +648,6 @@ begin
   end;
 end;
 
-
-
-{
-
-
-Gesonderter Wert (falls mal "öffnen mit ... [x]immer damit öffnen" gewählt wurde)
-steht in
-
-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mp3
-   -- Application
-
-
-
-HKEY_CURRENT_USER\Software\Classes\.mp3
-}
 
 end.
 

@@ -2,6 +2,8 @@ program nemp;
 
 {.$R 'Nemp_Graphics.res' 'Nemp_Graphics.rc'}
 
+{$R 'Nemp_Playlist_Icons.RES'}
+
 // dontTouchUses  <- this tells madExcept to not touch the uses clause
 // note to self: publish nemp.mes (this contains the MadExcept setting)
 
