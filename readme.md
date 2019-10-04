@@ -36,7 +36,7 @@ Nemp has a lot (and I mean a lot!) of settings. Some are very useful, others may
 ![Nemp Settings](/Screenshots/Settings.jpg)
 
 ## The Nemp Wizard
-Nemp does not change anything in your Music files without your permission. It will not write any fancy meta data to your files - unless you allow it. As some really nice features require it to write additional data into the music files (or your music folders), Nemp comes with a Settings-Wizard which will ask for your permission for these actions.
+Nemp does not change anything in your music files without your permission. It will not write any fancy meta data to your files - unless you allow it. As some really nice features require it to write additional data into the music files (or your music folders), Nemp comes with a settings wizard which will ask for your permission for these actions.
 
 ![Nemp Wizard](/Screenshots/Wizard.jpg)
 
@@ -48,7 +48,7 @@ Nemp does not change anything in your Music files without your permission. It wi
 * Nemp can search online for missing cover art
 * Nemp can search for lyrics
 * Nemp can playback a second track on a second sound card (without disturbing the main playback)
-* Nemp can shut down the computer after some time. This includes lowering the output volume during the last 30 seconds, so you won't wake up again due o a sudden change in the volume
+* Nemp can shut down the computer after some time. This includes lowering the output volume during the last 30 seconds, so you won't wake up again due to a sudden change in the volume
 * Nemp can play a birthday song at midnight automatically 
 * You can customize the look of Nemp by the integrated skin system
 * You can create random playlist based on genres and other tags

@@ -60,4 +60,4 @@ Aber für ein Ein-Mann-Projekt ein verdammt guter:
 Lizenzvereinbarungen:
 -----------------------------------------------------------
 GPL 2.0 oder später
-(Details in der licence.txt und der gpl.txt)
+(Details in der licence.txt)
