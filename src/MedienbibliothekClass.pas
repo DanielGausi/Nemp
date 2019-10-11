@@ -226,8 +226,6 @@ type
         WICImagingFactory_VCL: IWICImagingFactory;
         WICImagingFactory_ScanThread: IWICImagingFactory;
 
-
-
         // used for faster cover-initialisation.
         // i.e. do not search coverfiles for every audiofile.
         // use the same cover again, if the next audiofile is in the same directory
@@ -906,8 +904,8 @@ begin
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
 
-  WICImagingFactory_ScanThread := Nil;
-  WICImagingFactory_VCL        := Nil;
+  Pointer(WICImagingFactory_ScanThread) := Nil;
+  Pointer(WICImagingFactory_VCL)        := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
@@ -1564,8 +1562,8 @@ begin
   // release the Factory (but this should not happen here, as the Factory should have been NILed by the previous thread)
   if WICImagingFactory_ScanThread <> Nil then
   begin
-      WICImagingFactory_ScanThread._Release;
-      WICImagingFactory_ScanThread := Nil;
+      if WICImagingFactory_ScanThread._Release = 0 then
+          Pointer(WICImagingFactory_ScanThread) := Nil;
   end;
 
   ges := UpdateList.Count;
@@ -1649,8 +1647,8 @@ begin
       // release the Factory now, scanning is complete and the the thread will terminate soon
       if WICImagingFactory_ScanThread <> Nil then
       begin
-          WICImagingFactory_ScanThread._Release;
-          WICImagingFactory_ScanThread := Nil;
+          if WICImagingFactory_ScanThread._Release = 0 then
+              Pointer(WICImagingFactory_ScanThread) := Nil;
       end;
 
       // progress complete
@@ -4007,7 +4005,6 @@ begin
                 CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
                     CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_ScanThread);
             result := WICImagingFactory_ScanThread;
-
         end;
     end;
 
@@ -4017,9 +4014,6 @@ var CoverListe: TStringList;
     NewCoverName: String;
 begin
   try
-      /////if aAudioFile.CoverID <> '' then
-      ///////// das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
-      ///
       aAudioFile.CoverID := ''; // new WIC : RESET the ID
       if InitCoverFromMetaData(aAudioFile, ScanMode) <> '' then
       begin
@@ -4032,7 +4026,6 @@ begin
             //Wenn Da kein Erfolg: Cover-Datei suchen.
             // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
             // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
-            //if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
             if (fLastPath <> aAudioFile.Ordner) or (ForceReScan) then
             begin
                 //fLastPath := ExtractFilePath(aAudioFile.Pfad);
