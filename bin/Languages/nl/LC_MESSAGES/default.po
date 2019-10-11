@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NEMP Player\n"
 "POT-Creation-Date: 2019-07-14 14:57+0200\n"
-"PO-Revision-Date: 2019-07-15 14:52+0200\n"
+"PO-Revision-Date: 2019-10-09 12:02+0200\n"
 "Last-Translator: Somebody <your.email@address.com>\n"
 "Language-Team: Gerrit Lammertink <xxxx@xxxx.xx>\n"
 "Language: nl\n"
@@ -10991,7 +10991,7 @@ msgstr "Wachtwoord om party-mode te beeindigen"
 #. Programmer's name for it: ParrtyMode_Password_PromptOnActivate
 #: Nemp_RessourceStrings.pas:889
 msgid "Note: The password to exit the Nemp Party-Mode is \"%s\"."
-msgstr "Notitie: Het wachtwoord om de Nemp Party-modus te verlaten is \"% s\""
+msgstr "Notitie: Het wachtwoord om de Nemp Party-modus te verlaten is \"%s\""
 
 #. Programmer's name for it: ParrtyMode_Password_PromptOnActivate
 #: Nemp_RessourceStrings.pas:894
