@@ -1827,16 +1827,18 @@ begin
           // VersionsInfo schreiben
           tmp := 'NempPlaylist';
           tmpStream.Write(tmp[1], length(tmp));
-          tmp := '3.1';
+          tmp := '5.0';
           tmpStream.Write(tmp[1], length(tmp));
+          // FileCount
           c := Playlist.Count;
           tmpStream.Write(c, SizeOf(Integer));
+          // actual Files
           for i := 0 to Playlist.Count - 1 do
           begin
               aAudioFile := TAudioFile(Playlist[i]);
               case aAudioFile.AudioType of
                   at_File: begin
-                      aAudioFile.SaveToStream(tmpStream, ExtractRelativePathNew(aFilename, TAudioFile(Playlist[i]).Pfad ) );
+                      aAudioFile.SaveToStream(tmpStream, ExtractRelativePathNew(aFilename, aAudioFile.Pfad ) );
                   end;
                   at_Stream: begin
                       aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)

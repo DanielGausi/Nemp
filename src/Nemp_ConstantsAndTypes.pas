@@ -505,12 +505,12 @@ const
 
     // Diese Daten kommen  nur in den GMPs zum Einsatz!!
     MP3DB_HEADER = 'GMP';
-    MP3DB_VERSION_OLD: Byte = 3;    // Dateiformat 2.5 - 3.0
-    MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
+    // MP3DB_VERSION_OLD: Byte = 3;    // Dateiformat 2.5 - 3.0
+    // MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
 
-    MP3DB_VERSION: Byte = 4;        // Dateiformat seit 3.1
-    MP3DB_SUBVERSION: Byte = 2;     // subversion changed to 1 in Nemp 4.0
-                                    // subversion changed to 2 in Nemp 4.9
+    MP3DB_VERSION: Byte = 5; // 4;        // Dateiformat seit 4.13
+    MP3DB_SUBVERSION: Byte = 0; //2;     //
+
     // "Extended Boolean", used for "unset" settings
     //BoolUnDef = 0;
     //BoolTrue = 1;

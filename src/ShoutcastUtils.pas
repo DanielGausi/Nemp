@@ -69,6 +69,13 @@ const
     ST_PlaylistStreamLink = 24;
 
 
+    MP3DB_SC_URL       = 1;
+    MP3DB_SC_Name      = 2;
+    MP3DB_SC_MediaType = 3;
+    MP3DB_SC_Bitrate   = 4;
+    MP3DB_SC_Genre     = 5;
+    MP3DB_SC_SortIndex = 6;
+
 Type
 
     TStation = class
@@ -81,8 +88,8 @@ Type
             fURL          : String;  // da gehts rein, wenn man manuell was eingibt.
             fBitrate      : Integer;
             fGenre        : String;
-            fCurrentTitle : String;
-            fCount        : Integer; // Anzahl der Hörer
+            // fCurrentTitle : String;  // deprecated
+            // fListenerCount: Integer; // deprecated // Anzahl der Hörer
             fSortIndex    : Integer; // used for a custom sorting of the favorite stations in nemp
 
             function fGetURL: String;
@@ -100,8 +107,8 @@ Type
             property Bitrate: Integer       read fBitrate      write fBitrate;
             property Format: String         read fGetFormat    ;
             property Genre: String          read fGenre        write fGenre;
-            property CurrentTitle: String   read fCurrentTitle ;
-            property Count: Integer         read fCount        ;
+            // property CurrentTitle: String   read fCurrentTitle ;
+            // property Count: Integer         read fCount        ;
             property SortIndex: Integer     read fSortIndex    write fSortIndex;
             property URL: String       read fGetURL   write fSetURL;
 
@@ -116,6 +123,7 @@ Type
             procedure TuneIn(LetBassDoEverything: Boolean);
             function GetInfoString: String;
 
+            procedure LoadFromStream_DEPRECATED(aStream: TStream);
             procedure LoadFromStream(aStream: TStream);
             procedure SaveToStream(aStream: TStream);
     end;
@@ -135,10 +143,10 @@ Type
     function Sort_MediaType_Desc(Item1, Item2: Pointer): Integer;
     function Sort_Genre_Asc(Item1, Item2: Pointer): Integer;
     function Sort_Genre_Desc(Item1, Item2: Pointer): Integer;
-    function Sort_CurrentTitle_Asc(Item1, Item2: Pointer): Integer;
-    function Sort_CurrentTitle_Desc(Item1, Item2: Pointer): Integer;
-    function Sort_Count_Asc(Item1, Item2: Pointer): Integer;
-    function Sort_Count_Desc(Item1, Item2: Pointer): Integer;
+    //function Sort_CurrentTitle_Asc(Item1, Item2: Pointer): Integer;
+    //function Sort_CurrentTitle_Desc(Item1, Item2: Pointer): Integer;
+    //function Sort_Count_Asc(Item1, Item2: Pointer): Integer;
+    //function Sort_Count_Desc(Item1, Item2: Pointer): Integer;
     function Sort_URL_Asc(Item1, Item2: Pointer): Integer;
     function Sort_URL_Desc(Item1, Item2: Pointer): Integer;
 
@@ -151,6 +159,8 @@ var
     CSQueryString: RTL_CRITICAL_SECTION;
 
 implementation
+
+uses NempFileUtils;
 
 function UrlIsPlaylist(aURL: String): Boolean;
 var //slash, doubleslash, dp: Integer;
@@ -251,6 +261,7 @@ function Sort_Genre_Desc(Item1, Item2: Pointer): Integer;
 begin
     result := AnsiCompareText(TStation(Item2).Genre, TStation(Item1).Genre);
 end;
+(*
 function Sort_CurrentTitle_Asc(Item1, Item2: Pointer): Integer;
 begin
     result := AnsiCompareText(TStation(Item1).CurrentTitle, TStation(Item2).CurrentTitle);
@@ -259,6 +270,7 @@ function Sort_CurrentTitle_Desc(Item1, Item2: Pointer): Integer;
 begin
     result := AnsiCompareText(TStation(Item2).CurrentTitle, TStation(Item1).CurrentTitle);
 end;
+
 function Sort_Count_Asc(Item1, Item2: Pointer): Integer;
 var tmp: Integer;
 begin
@@ -275,6 +287,7 @@ begin
         tmp := AnsiCompareText(TStation(Item1).Name, TStation(Item2).Name);
     result := tmp;
 end;
+*)
 
 function Sort_URL_Asc(Item1, Item2: Pointer): Integer;
 begin
@@ -314,8 +327,8 @@ begin
     fURL          := aStation.fURL         ;
     fBitrate      := aStation.Bitrate      ;
     fGenre        := aStation.Genre        ;
-    fCurrentTitle := aStation.CurrentTitle ;
-    fCount        := aStation.Count        ;
+    // fCurrentTitle := aStation.fCurrentTitle ;
+    // fListenerCount        := aStation.fListenerCount        ;
 end;
 
 
@@ -420,11 +433,42 @@ begin
 end;
 
 procedure TStation.LoadFromStream(aStream: TStream);
-var len: Integer;
+var c: Integer;
+    dataID: Byte;
+begin
+    c := 0;
+    repeat
+        aStream.Read(dataID, sizeof(dataID));
+        inc(c);
+        case dataID of
+              MP3DB_SC_URL       : fURL       := ReadTextFromStream(aStream);
+              MP3DB_SC_Name      : fName      := ReadTextFromStream(aStream);
+              MP3DB_SC_MediaType : fMediaType := ReadTextFromStream(aStream);
+              MP3DB_SC_Bitrate   : fBitrate   := ReadIntegerFromStream(aStream);
+              MP3DB_SC_Genre     : fGenre     := ReadTextFromStream(aStream);
+              MP3DB_SC_SortIndex : fSortIndex := ReadIntegerFromStream(aStream);
+
+              DATA_END_ID: ; // Explicitly do Nothing -  because of the ELSE path ;-)
+        else
+            begin
+                // unknown DataID, use generic reading function
+                // if this fails, then the file is invalid, stop reading
+                if not ReadUnkownDataFromStream(aStream) then
+                    c := DATA_END_ID;
+            end;
+        end;
+    until (dataID = DATA_END_ID) OR (c >= DATA_END_ID);
+    // DATA_END_ID = 255
+end;
+
+
+procedure TStation.LoadFromStream_DEPRECATED(aStream: TStream);
+var len, dummy: Integer;
     tmp: UTF8String;
 begin
     aStream.Read(fBitrate, SizeOf(Integer));
-    aStream.Read(fCount, SizeOf(Integer));
+    // aStream.Read(fListenerCount, SizeOf(Integer)); // ListenerCount not used for quite some time
+    aStream.Read(dummy, SizeOf(Integer));
 
     aStream.Read(len, SizeOf(len));
     // new in Nemp 4.0
@@ -456,54 +500,23 @@ begin
     aStream.Read(tmp[1], len);
     fGenre := String(tmp);
 
+    // Currenttitle. Not used for quite some time, removed property in 4.13
     aStream.Read(len, SizeOf(len));
     SetLength(tmp, len);
     aStream.Read(tmp[1], len);
-    fCurrentTitle := String(tmp);
+    // just discard the tmp value
+    // fCurrentTitle := String(tmp);
 end;
 procedure TStation.SaveToStream(aStream: TStream);
-var len: Integer;
-    tmps: UTF8String;
-    tmpi: Integer;
 begin
-    tmpi := Bitrate;
-    aStream.Write(tmpi, SizeOf(Integer));
-    tmpi := Count;
-    aStream.Write(tmpi, SizeOf(Integer));
-
-    // New in Nemp 4.0
-    // !!! Use Fileversion 4.1 (was 4.0 before)
-    // determine old/new version by a leading High(Integer)
-    tmpi := High(Integer);
-    aStream.Write(tmpi, SizeOf(Integer));
-    tmpi := SortIndex;
-    aStream.Write(tmpi, SizeOf(Integer));
-    // end of new in Nemp 4.0
-
-    if Name = '' then tmps := ' ' else tmps := UTF8Encode(Name);
-    len := length(tmps);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(tmps[1], len);
-
-    if MediaType = '' then tmps := ' ' else tmps := UTF8Encode(MediaType);
-    len := length(tmps);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(tmps[1], len);
-
-    if URL = '' then tmps := ' ' else tmps := UTF8Encode(URL);
-    len := length(tmps);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(tmps[1], len);
-
-    if Genre = '' then tmps := ' ' else tmps := UTF8Encode(Genre);
-    len := length(tmps);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(tmps[1], len);
-
-    if CurrentTitle = '' then tmps := ' ' else tmps := UTF8Encode(CurrentTitle);
-    len := length(tmps);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(tmps[1], len);
+    // rework for 4.13
+    WriteTextToStream(aStream, MP3DB_SC_URL      , fURL      );
+    WriteTextToStream(aStream, MP3DB_SC_Name     , fName     );
+    WriteTextToStream(aStream, MP3DB_SC_MediaType, fMediaType);
+    WriteTextToStream(aStream, MP3DB_SC_Genre    , fGenre    );
+    WriteIntegerToStream(aStream, MP3DB_SC_Bitrate  , fBitrate  );
+    WriteIntegerToStream(aStream, MP3DB_SC_SortIndex, fSortIndex);
+    WriteDataEnd(aStream);
 end;
 
 

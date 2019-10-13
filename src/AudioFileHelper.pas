@@ -852,27 +852,44 @@ end;
 
 procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 var aStream: TFileStream;
-    v1, v2: AnsiString;
-    c, i: Integer;
+    NPLHeader: AnsiString;
+    FileCount, i: Integer;
     NewAudioFile: TAudioFile;
+    NPLVersion: AnsiString;
+    FileIsCurrentVersion, SupportedFormat: Boolean;
 const
   Check1: AnsiString = 'NempPlaylist';
-  Check2: AnsiString = '3.1';
+  Deprecatd_Version: AnsiString = '3.1';
+  Current_Version  : AnsiString = '5.0';  // like in the GMP, new in Nemp 4.13
+
 begin
       try
           aStream := TFileStream.Create(aFileName, fmOpenRead or fmShareDenyWrite);
           try
-              setlength(v1, length(Check1));
-              setlength(v2, length(Check2));
-              aStream.Read(v1[1], length(v1));
-              aStream.Read(v2[1], length(v2));
-              if (v1 = Check1) and (v2 = Check2) then
+              setlength(NPLHeader, length(Check1));
+              setlength(NPLVersion, length(Current_Version));
+              aStream.Read(NPLHeader[1], length(NPLHeader));
+              aStream.Read(NPLVersion[1], length(NPLVersion));
+
+              if (NPLVersion = Deprecatd_Version) then
+                  FileIsCurrentVersion := False;
+
+              if (NPLVersion = Current_Version) then
+                  FileIsCurrentVersion := True;
+
+              SupportedFormat := (NPLVersion = Deprecatd_Version) OR (NPLVersion = Current_Version);
+
+              if (NPLHeader = Check1) AND SupportedFormat then // file starts with "NempPlaylist"
               begin
-                  aStream.Read(c, SizeOf(Integer));
-                  for i := 1 to c do
+
+                  aStream.Read(FileCount, SizeOf(Integer));
+                  for i := 1 to FileCount do
                   begin
                       NewAudioFile := TAudioFile.Create;
-                      NewAudioFile.LoadFromStreamForPlaylist(aStream);
+                      if FileIsCurrentVersion then
+                          NewAudioFile.LoadDataFromStream(aStream, True)
+                      else
+                          NewAudioFile.LoadFromStreamForPlaylist_DEPRECATED(aStream);
 
                       if NewAudioFile.isCDDA then
                           SetCDDADefaultInformation(NewAudioFile);
@@ -888,7 +905,7 @@ begin
                       TargetList.Add(NewAudioFile);
                   end;
               end else
-                MessageDlg('Invalid playlist', mtError, [mbOK], 0);
+                  MessageDlg('Invalid playlist', mtError, [mbOK], 0);
           finally
               if Assigned(aStream) then
                 aStream.Free;

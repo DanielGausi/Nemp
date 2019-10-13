@@ -55,7 +55,7 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFileBasics,
+     AudioFileBasics, NempFileUtils,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
@@ -226,6 +226,8 @@ type
         WICImagingFactory_VCL: IWICImagingFactory;
         WICImagingFactory_ScanThread: IWICImagingFactory;
 
+
+
         // used for faster cover-initialisation.
         // i.e. do not search coverfiles for every audiofile.
         // use the same cover again, if the next audiofile is in the same directory
@@ -351,19 +353,26 @@ type
         function DrivesHaveChanged: Boolean;
 
         // Saving/loading the *.gmp-File
+        function LoadDrivesFromStream_DEPRECATED(aStream: TStream): Boolean;
         function LoadDrivesFromStream(aStream: TStream): Boolean;
         procedure SaveDrivesToStream(aStream: TStream);
 
-        function LoadAudioFilesFromStream(aStream: TStream; MaxSize: Integer): Boolean;
+        function LoadAudioFilesFromStream_DEPRECATED(aStream: TStream; MaxSize: Integer): Boolean;
+        function LoadAudioFilesFromStream(aStream: TStream): Boolean;
         procedure SaveAudioFilesToStream(aStream: TStream);
 
+        function LoadPlaylistsFromStream_DEPRECATED(aStream: TStream): Boolean;
         function LoadPlaylistsFromStream(aStream: TStream): Boolean;
         procedure SavePlaylistsToStream(aStream: TStream);
 
+        function LoadRadioStationsFromStream_DEPRECATED(aStream: TStream): Boolean;
         function LoadRadioStationsFromStream(aStream: TStream): Boolean;
         procedure SaveRadioStationsToStream(aStream: TStream);
 
         procedure LoadFromFile4(aStream: TStream; SubVersion: Integer);
+
+        // new format since Nemp 4.13 (end of 2019)
+        procedure LoadFromFile5(aStream: TStream; SubVersion: Integer);
 
         procedure fLoadFromFile(aFilename: UnicodeString);
 
@@ -4005,6 +4014,7 @@ begin
                 CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
                     CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_ScanThread);
             result := WICImagingFactory_ScanThread;
+
         end;
     end;
 
@@ -4014,6 +4024,9 @@ var CoverListe: TStringList;
     NewCoverName: String;
 begin
   try
+      /////if aAudioFile.CoverID <> '' then
+      ///////// das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
+      ///
       aAudioFile.CoverID := ''; // new WIC : RESET the ID
       if InitCoverFromMetaData(aAudioFile, ScanMode) <> '' then
       begin
@@ -4026,6 +4039,7 @@ begin
             //Wenn Da kein Erfolg: Cover-Datei suchen.
             // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
             // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
+            //if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
             if (fLastPath <> aAudioFile.Ordner) or (ForceReScan) then
             begin
                 //fLastPath := ExtractFilePath(aAudioFile.Pfad);
@@ -5932,7 +5946,7 @@ begin
         try
             fs.LoadFromFile(aFilename);
             fs.Position := 0;
-            LoadRadioStationsFromStream(fs);
+            LoadRadioStationsFromStream_DEPRECATED(fs);
             Changed := True;
         finally
             fs.Free;
@@ -6013,7 +6027,7 @@ end;
     - Read/Write a List of TDrives
     --------------------------------------------------------
 }
-function TMedienBibliothek.LoadDrivesFromStream(aStream: TStream): Boolean;
+function TMedienBibliothek.LoadDrivesFromStream_DEPRECATED(aStream: TStream): Boolean;
 var SavedDriveList: TObjectList;
     DriveCount, i: Integer;
     newDrive: TDrive;
@@ -6025,6 +6039,25 @@ begin
     for i := 0 to DriveCount - 1 do
     begin
         newDrive := TDrive.Create;
+        newDrive.LoadFromStream_DEPRECATED(aStream);
+        SavedDriveList.Add(newDrive);
+    end;
+  // Daten synchronisieren
+  SynchronizeDrives(SavedDriveList);
+  SavedDriveList.Free;
+end;
+
+function TMedienBibliothek.LoadDrivesFromStream(aStream: TStream): Boolean;
+var SavedDriveList: TObjectList;
+    DriveCount, i: Integer;
+    newDrive: TDrive;
+begin
+    result := True;
+    SavedDriveList := TObjectList.Create;
+    aStream.Read(DriveCount, SizeOf(Integer));
+    for i := 0 to DriveCount - 1 do
+    begin
+        newDrive := TDrive.Create;
         newDrive.LoadFromStream(aStream);
         SavedDriveList.Add(newDrive);
     end;
@@ -6032,6 +6065,8 @@ begin
   SynchronizeDrives(SavedDriveList);
   SavedDriveList.Free;
 end;
+
+
 procedure TMedienBibliothek.SaveDrivesToStream(aStream: TStream);
 var i, len: Integer;
     MainID: Byte;
@@ -6066,7 +6101,56 @@ end;
     - Read/Write a List of TAudioFiles
     --------------------------------------------------------
 }
-function TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream; MaxSize: Integer): Boolean;
+function TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream): Boolean;
+var FilesCount, i: Integer;
+    newAudioFile: TAudioFile;
+    //ID: Byte;
+    currentDriveID: Integer;
+    CurrentDriveChar: Char;
+begin
+    result := True;
+    CurrentDriveChar := ' ';
+    currentDriveID := -2;
+    aStream.Read(FilesCount, SizeOf(FilesCount));
+
+    for i := 1 to FilesCount do
+    begin
+        // create a new Audiofile object and read the data from the stream
+        newAudioFile := TAudioFile.Create;
+        newAudioFile.LoadDataFromStream(aStream, False);
+
+        // now assign a proper drive letter, according to the DriveID of the audiofile
+        if currentDriveID <> newAudioFile.DriveID then
+        begin
+            // currentDriveChar does not match, we need to find the correct one
+            if newAudioFile.DriveID <= -1 then
+                CurrentDriveChar := '\'
+            else
+            begin
+                if newAudioFile.DriveID < fUsedDrives.Count then
+                    CurrentDriveChar := TDrive(fUsedDrives[newAudioFile.DriveID]).Drive[1]
+                else // something is wrong with the file here
+                begin
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid audiofile data, DriveID not found' )));
+                    result := False;
+                    exit;
+                end;
+
+            end;
+            // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+            currentDriveID := newAudioFile.DriveID;
+        end;
+        // now *actually* assign the proper drive letter ;-)
+        newAudioFile.SetNewDriveChar(CurrentDriveChar);
+
+        // add the file to the update list
+        UpdateList.Add(newAudioFile);
+    end;
+end;
+
+function TMedienBibliothek.LoadAudioFilesFromStream_DEPRECATED(aStream: TStream; MaxSize: Integer): Boolean;
 var FilesCount, i, DriveID: Integer;
     newAudioFile: TAudioFile;
     ID: Byte;
@@ -6083,8 +6167,8 @@ begin
         case ID of
             0: begin
                 newAudioFile := TAudioFile.Create;
-                {audioSize := }newAudioFile.LoadSizeInfoFromStream(aStream);
-                newAudioFile.LoadDataFromStream(aStream);
+                {audioSize := }newAudioFile.LoadSizeInfoFromStream_DEPRECATED(aStream);
+                newAudioFile.LoadDataFromStream_DEPRECATED(aStream);
                 newAudioFile.SetNewDriveChar(CurrentDriveChar);
                 UpdateList.Add(newAudioFile);
             end;
@@ -6110,8 +6194,8 @@ begin
                         CurrentDriveChar := WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
                     newAudioFile := TAudioFile.Create;
 
-                    {audioSize := }newAudioFile.LoadSizeInfoFromStream(aStream);
-                    newAudioFile.LoadDataFromStream(aStream);
+                    {audioSize := }newAudioFile.LoadSizeInfoFromStream_DEPRECATED(aStream);
+                    newAudioFile.LoadDataFromStream_DEPRECATED(aStream);
                     newAudioFile.SetNewDriveChar(CurrentDriveChar);
                     UpdateList.Add(newAudioFile);
                 end else
@@ -6134,21 +6218,19 @@ begin
         end;
     end;
 end;
+
+
 procedure TMedienBibliothek.SaveAudioFilesToStream(aStream: TStream);
 var i, len: Integer;
     CurrentDriveChar: WideChar;
     aAudioFile: TAudioFile;
     aDrive: tDrive;
-    MainID, ID: Byte;
-    c: Integer;
-    tmpid: Integer;
+    MainID: Byte;
+    FileCount, currentDriveID: Integer;
     BytesWritten: LongInt;
     SizePosition, EndPosition: Int64;
     ERROROCCURRED, DoMessageShow: Boolean;
 
-// for testing larger libraries: increase this value temporary
-// this will create a larger library. Set to 1 after saving!
-const FAKE_FILES_MULTIPLIER = 1;
 
 begin
     // write size info before writing actual data
@@ -6158,10 +6240,11 @@ begin
     SizePosition := aStream.Position;
     aStream.Write(len, SizeOf(len));
 
-    c := Mp3ListePfadSort.Count * FAKE_FILES_MULTIPLIER;
+    FileCount := Mp3ListePfadSort.Count; // * FAKE_FILES_MULTIPLIER;
 
-    BytesWritten := aStream.Write(c, sizeOf(c));
+    BytesWritten := aStream.Write(FileCount, sizeOf(FileCount));
     CurrentDriveChar := '-';
+    currentDriveID := -2;
     DoMessageShow := True;
 
     for i := 0 to Mp3ListePfadSort.Count - 1 do
@@ -6169,6 +6252,7 @@ begin
         ERROROCCURRED := False;
         aAudioFile := TAudioFile(MP3ListePfadSort[i]);
 
+        // get a Proper DriveID, if the Drive char is different from the previouos file
         if aAudioFile.Ordner[1] <> CurrentDriveChar then
         begin
             if aAudioFile.Ordner[1] <> '\' then
@@ -6177,36 +6261,26 @@ begin
                 aDrive := GetDriveFromListByChar(fUsedDrives, Char(aAudioFile.Ordner[1]));
                 if assigned(aDrive) then
                 begin
-                    ID := 1;
-                    BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-                    BytesWritten := BytesWritten + aStream.Write(aDrive.ID, SizeOf(aDrive.ID));
+                    currentDriveID := aDrive.ID;
                     CurrentDriveChar := aAudioFile.Ordner[1];
                 end else
                 begin
                     if DoMessageShow then
                         MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                    //    exit;
                     DoMessageShow := False;
                     ERROROCCURRED := True;
                 end;
             end else
             begin
-                    ID := 1;
-                    BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-                    tmpid := -1;
-                    BytesWritten := BytesWritten + aStream.Write(tmpid, SizeOf(tmpid));
-                    CurrentDriveChar := aAudioFile.Ordner[1];
+                currentDriveID := -1;
+                CurrentDriveChar := aAudioFile.Ordner[1];
             end;
         end;
+        // set the DriveID properly
+        aAudioFile.DriveID := currentDriveID;
+        // write the audiofile data into the stream
         if not ERROROCCURRED then
-        begin
-            for c := 1 to FAKE_FILES_MULTIPLIER do
-            begin
-                ID := 0;
-                BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-                BytesWritten := BytesWritten + aAudioFile.SaveToStream(aStream, '');
-            end;
-        end;
+            BytesWritten := BytesWritten + aAudioFile.SaveToStream(aStream, '');
     end;
 
     // correct the size information for this block
@@ -6310,6 +6384,58 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.LoadPlaylistsFromStream(aStream: TStream): Boolean;
+var FileCount, i, currentDriveID: Integer;
+    CurrentDriveChar: WideChar;
+    jas: TJustaString;
+    NewLibraryPlaylist: TLibraryPlaylist;
+begin
+    result := True;
+    CurrentDriveChar := ' ';
+    currentDriveID := -2;
+    aStream.Read(FileCount, SizeOf(FileCount));
+
+    /// NewLibraryPlaylist:
+    ///  This system may look strange here, but this way it is more consistent with
+    ///  loading AudioFiles from the *.gmp Medialibrary file
+    NewLibraryPlaylist := TLibraryPlaylist.Create;
+    try
+        for i := 1 to FileCount do
+        begin
+            NewLibraryPlaylist.LoadFromStream(aStream);
+
+            if currentDriveID <> NewLibraryPlaylist.DriveID then
+            begin
+                // currentDriveChar does not match, we need to find the correct one
+                if NewLibraryPlaylist.DriveID <= -1 then
+                    CurrentDriveChar := '\'
+                else
+                begin
+                    if NewLibraryPlaylist.DriveID < fUsedDrives.Count then
+                        CurrentDriveChar := TDrive(fUsedDrives[NewLibraryPlaylist.DriveID]).Drive[1]
+                    else // something is wrong with the file here
+                    begin
+                        SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
+                                        #13#10 + 'invalid playlist data, DriveID not found' )));
+                        result := False;
+                        exit;
+                    end;
+                end;
+                // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                currentDriveID := NewLibraryPlaylist.DriveID;
+            end;
+            // set the proper drive char
+            NewLibraryPlaylist.SetNewDriveChar(CurrentDriveChar);
+            // add a new item the the list of Playlists
+            jas := TJustaString.create(NewLibraryPlaylist.Path, ExtractFileName(NewLibraryPlaylist.Path));
+            PlaylistUpdateList.Add(jas);
+        end;
+    finally
+        NewLibraryPlaylist.Free;
+    end;
+end;
+
+function TMedienBibliothek.LoadPlaylistsFromStream_DEPRECATED(aStream: TStream): Boolean;
 var FilesCount, i, DriveID: Integer;
     jas: TJustaString;
     ID: Byte;
@@ -6388,67 +6514,58 @@ begin
 
 end;
 procedure TMedienBibliothek.SavePlaylistsToStream(aStream: TStream);
-var i, len: Integer;
-    CurrentDriveChar: WideChar;
+var i, len, FileCount: Integer;
     jas: TJustaString;
-    aDrive: tDrive;
-    MainID, ID: Byte;
-    c: Integer;
-    tmpstr: UTF8String;
-    tmpid: Integer;
+    aDrive: TDrive;
+    MainID: Byte;
     BytesWritten: LongInt;
     SizePosition, EndPosition: Int64;
+    NewLibraryPlaylist: TLibraryPlaylist;
 begin
+    // write block header, with dummy size (write the correct value at the end of this procedure)
     MainID := 3;
     aStream.Write(MainID, SizeOf(MainID));
     len := 42; // dummy size;
     SizePosition := aStream.Position;
     aStream.Write(len, SizeOf(len));
 
-    c := AllPlaylistsPfadSort.Count;
-    BytesWritten := aStream.Write(c, sizeOf(c));
-    CurrentDriveChar := '-';
+    // write FileCount
+    FileCount := AllPlaylistsPfadSort.Count;
+    BytesWritten := aStream.Write(FileCount, sizeOf(FileCount));
 
-    for i := 0 to AllPlaylistsPfadSort.Count - 1 do
-    begin
-        jas := TJustaString(AllPlaylistsPfadSort[i]);
-
-        if jas.DataString[1] <> CurrentDriveChar then
+    //----------------------------
+    // write the actual data
+    NewLibraryPlaylist := TLibraryPlaylist.Create;
+    try
+        for i := 0 to AllPlaylistsPfadSort.Count - 1 do
         begin
-            // Neues Laufwerk - Infos dazwischenschieben
-            if jas.DataString[1] <> '\' then
+            jas := TJustaString(AllPlaylistsPfadSort[i]);
+
+            // we have only a "few" playlist files here (at least much less than audiofiles)
+            // so we do that without "currentDrive" here
+              NewLibraryPlaylist.Path := jas.DataString;
+
+            if jas.DataString[1] = '\' then
+                NewLibraryPlaylist.DriveID := -1
+            else
             begin
-                    aDrive := GetDriveFromListByChar(fUsedDrives, Char(jas.DataString[1]));
-                    if assigned(aDrive) then
-                    begin
-                        ID := 1;
-                        BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-                        BytesWritten := BytesWritten + aStream.Write(aDrive.ID, SizeOf(aDrive.ID));
-                        CurrentDriveChar := jas.DataString[1];
-                    end else
-                    begin
-                        MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                        exit;
-                    end;
-            end else
-            begin
-                    ID := 1;
-                    BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-                    tmpid := -1;
-                    BytesWritten := BytesWritten + aStream.Write(tmpid, SizeOf(tmpid));
-                    CurrentDriveChar := jas.DataString[1];
+                aDrive := GetDriveFromListByChar(fUsedDrives, Char(jas.DataString[1]));
+                if assigned(aDrive) then
+                    NewLibraryPlaylist.DriveID := aDrive.ID
+                else
+                begin
+                    MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
+                    exit;
+                end;
             end;
+
+            BytesWritten := BytesWritten + NewLibraryPlaylist.SaveToStream(aStream);
         end;
-        ID := 0;
-        BytesWritten := BytesWritten + aStream.Write(ID, SizeOf(ID));
-
-        // String schreiben
-        tmpstr := UTF8Encode(jas.DataString);
-        len := length(tmpstr);
-        BytesWritten := BytesWritten + aStream.Write(len, SizeOf(len));
-        BytesWritten := BytesWritten + aStream.Write(PAnsiChar(tmpstr)^,len);
+    finally
+        NewLibraryPlaylist.Free;
     end;
-
+    // --------------------------
+    // write correct block size
     EndPosition := aStream.Position;
     aStream.Position := SizePosition;
     aStream.Write(BytesWritten, SizeOf(BytesWritten));
@@ -6463,6 +6580,23 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.LoadRadioStationsFromStream(aStream: TStream): Boolean;
+var i, StationCount: Integer;
+    NewStation: TStation;
+begin
+    // todo: Some error handling?
+    Result := True;
+
+    aStream.Read(StationCount, SizeOf(StationCount));
+    // Stationen laden
+    for i := 1 to StationCount do
+    begin
+        NewStation := TStation.Create(MainWindowHandle);
+        NewStation.LoadFromStream(aStream);
+        RadioStationList.Add(NewStation);
+    end;
+end;
+
+function TMedienBibliothek.LoadRadioStationsFromStream_DEPRECATED(aStream: TStream): Boolean;
 var i, c: Integer;
     NewStation: TStation;
 begin
@@ -6474,7 +6608,7 @@ begin
     for i := 1 to c do
     begin
         NewStation := TStation.Create(MainWindowHandle);
-        NewStation.LoadFromStream(aStream);
+        NewStation.LoadFromStream_DEPRECATED(aStream);
         RadioStationList.Add(NewStation);
     end;
 end;
@@ -6536,10 +6670,40 @@ begin
 
         case MainID of
             // note: Drives are located BEFORE the Audiofiles in the *.gmp-File!
-            1: GoOn := LoadAudioFilesFromStream(aStream, BlockSize); // Audiodaten lesen
-            2: GoOn := LoadDrivesFromStream(aStream); // Drive-Info lesen
-            3: GoOn := LoadPlaylistsFromStream(aStream);
-            4: GoOn := LoadRadioStationsFromStream(aStream);
+            1: GoOn := LoadAudioFilesFromStream_DEPRECATED(aStream, BlockSize); // Audiodaten lesen
+            2: GoOn := LoadDrivesFromStream_DEPRECATED(aStream); // Drive-Info lesen
+            3: GoOn := LoadPlaylistsFromStream_DEPRECATED(aStream);
+            4: GoOn := LoadRadioStationsFromStream_DEPRECATED(aStream);
+        else
+          aStream.Seek(BlockSize, soFromCurrent);
+        end;
+    end;
+end;
+
+
+procedure TMedienBibliothek.LoadFromFile5(aStream: TStream; SubVersion: Integer);
+var MainID: Byte;
+    BlockSize: Integer;
+    GoOn: Boolean;
+begin
+    // Changes in Version 5:
+    // - the structure of the different blocks has been unified
+    // - the content of the blocks (e.g. audiofiles) is kinda update-proof.
+    //   It is easier to add new data fields without changing the file format
+    // - also some simplifications (but at the cost of a minor increase of size)
+    GoOn := True;
+
+    While (aStream.Position < aStream.Size) and GoOn do
+    begin
+        aStream.Read(MainID, SizeOf(Byte));
+        aStream.Read(BlockSize, SizeOf(Integer));
+
+        case MainID of
+            // note: Drives are located BEFORE the Audiofiles in the *.gmp-File!
+            1: GoOn := LoadAudioFilesFromStream(aStream);   // 4.13: Done
+            2: GoOn := LoadDrivesFromStream(aStream);       // 4.13: Done
+            3: GoOn := LoadPlaylistsFromStream(aStream);    // 4.13: Done
+            4: GoOn := LoadRadioStationsFromStream(aStream); // 4.13: done
         else
           aStream.Seek(BlockSize, soFromCurrent);
         end;
@@ -6609,11 +6773,24 @@ begin
                         4: begin
                             if Subversion <= 2 then // new in Nemp 4.0: Subversion changed to 1
                                                     // (additional value in RadioStations)
-                                                    // new in Nemp 4.9: Subversion changed to 2
-                                                    // (size information used again in audiofiles for buffering)
                             begin
                                 EnterCriticalSection(CSAccessDriveList);
                                 LoadFromFile4(aStream, Subversion);
+                                LeaveCriticalSection(CSAccessDriveList);
+                                NewFilesUpdateBib(True);
+                            end else
+                            begin
+                                SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
+                                    Integer(PWideChar(_(Medialibrary_LibFileTooYoung) )));
+                                success := False;
+                            end;
+                        end;
+                        5: begin
+                            // new format since Nemp 4.13, end of 2019
+                            if subversion <= 0 then
+                            begin
+                                EnterCriticalSection(CSAccessDriveList);
+                                LoadFromFile5(aStream, Subversion);
                                 LeaveCriticalSection(CSAccessDriveList);
                                 NewFilesUpdateBib(True);
                             end else
@@ -6705,7 +6882,7 @@ begin
         str.Write(MP3DB_VERSION,sizeOf(MP3DB_VERSION));
         str.Write(MP3DB_SUBVERSION, sizeof(MP3DB_SUBVERSION));
 
-        SaveDrivesToStream(str);
+        SaveDrivesToStream(str); // 4.13: Done
 
         SaveAudioFilesToStream(str);
         SavePlaylistsToStream(str);

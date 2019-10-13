@@ -74,6 +74,7 @@ type
           // Copy a Drive
           procedure Assign(aDrive: TDrive);
           // Load/Save Data to a stream (= *.gmp-file)
+          procedure LoadFromStream_DEPRECATED(aStream: TStream);
           procedure LoadFromStream(aStream: TStream);
           procedure SaveToStream(aStream: TStream);
   end;
@@ -107,6 +108,13 @@ type
       DBT_DEVTYP_DEVICEINTERFACE = $00000005;      // device interface class
       DBT_DEVTYP_VOLUME          = $00000002;
 
+      MP3DB_DriveString   = 1; // string
+      MP3DB_DriveName     = 2; // String
+      MP3DB_DriveTyp      = 3; // String
+      MP3DB_DriveSerialNr = 4; // DWord
+      MP3DB_DriveID       = 5; // Integer, basically the index of the drive in the List
+
+
 
   // some helpers
   // Get all Drives in the system and store them in the ObjectList
@@ -119,6 +127,8 @@ type
 
   
 implementation
+
+uses NempFileUtils;
 
 
 procedure TDrive.GetInfo(s: String);
@@ -171,6 +181,33 @@ begin
 end;
 
 procedure TDrive.LoadFromStream(aStream: TStream);
+var c: Integer;
+    dataID: Byte;
+begin
+    c := 0;
+    repeat
+        aStream.Read(dataID, sizeof(dataID));
+        inc(c);
+        case dataID of
+            MP3DB_DriveString   : Drive    := ReadTextFromStream(aStream);
+            MP3DB_DriveName     : Name     := ReadTextFromStream(aStream);
+            MP3DB_DriveTyp      : Typ      := ReadTextFromStream(aStream);
+            MP3DB_DriveSerialNr : SerialNr := ReadDWordFromStream(aStream);
+            MP3DB_DriveID       : ID       := ReadIntegerFromStream(aStream);
+            DATA_END_ID: ; // Explicitly do Nothing -  because of the ELSE path ;-)
+        else
+            begin
+                // unknown DataID, use generic reading function
+                // if this fails, then the file is invalid, stop reading
+                if not ReadUnkownDataFromStream(aStream) then
+                    c := DATA_END_ID;
+            end;
+        end;
+    until (dataID = DATA_END_ID) OR (c >= DATA_END_ID);
+    // DATA_END_ID = 255
+end;
+
+procedure TDrive.LoadFromStream_DEPRECATED(aStream: TStream);
 var len: Integer;
 begin
     aStream.Read(ID, SizeOf(Integer));
@@ -190,23 +227,16 @@ begin
 end;
 
 procedure TDrive.SaveToStream(aStream: TStream);
-var len: Integer;
 begin
-    aStream.Write(ID, SizeOf(Integer));
-    aStream.Write(SerialNr, SizeOf(DWord));
+    WriteIntegerToStream(aStream, MP3DB_DriveID      , ID       );
+    WriteDWordToStream  (aStream, MP3DB_DriveSerialNr, SerialNr );
+    WriteTextToStream   (aStream, MP3DB_DriveString  , Drive    );
+    WriteTextToStream   (aStream, MP3DB_DriveName    , Name     );
+    WriteTextToStream   (aStream, MP3DB_DriveTyp     , Typ      );
 
-    len := length(Drive) * SizeOf(Char);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(Drive[1], len);
-
-    len := length(Typ) * SizeOf(Char);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(Typ[1], len);
-
-    len := length(Name) * SizeOf(Char);
-    aStream.Write(len, SizeOf(len));
-    aStream.Write(Name[1], len);
+    WriteDataEnd(aStream);
 end;
+
 
 
 
