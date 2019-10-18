@@ -63,7 +63,6 @@ type
         Pfad: UnicodeString;
         Kommentar: UnicodeString;
         Lyric: UnicodeString;
-        Mode: Integer;
         ComboBoxString: UnicodeString;
     end;
     // UTF8-Keywords are used for Quicksearch
@@ -943,7 +942,6 @@ begin
         SearchKeyWords[i+1].Titel    := SearchKeyWords[i].Titel;
         SearchKeyWords[i+1].Album    := SearchKeyWords[i].Album;
         SearchKeyWords[i+1].Kommentar:= SearchKeyWords[i].Kommentar;
-        SearchKeyWords[i+1].Mode     := SearchKeyWords[i].Mode;
         SearchKeyWords[i+1].Lyric    := SearchKeyWords[i].Lyric;
         SearchKeyWords[i+1].ComboBoxString := SearchKeyWords[i].ComboBoxString;
     end;

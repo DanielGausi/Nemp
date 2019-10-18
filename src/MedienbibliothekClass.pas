@@ -777,7 +777,6 @@ type
   procedure fUpdateID3TagsThread(MB: TMedienBibliothek);
   procedure fBugFixID3TagsThread(MB: TMedienBibliothek);
 
-
   function GetProperMenuString(aIdx: Integer): UnicodeString;
 
   var //CSStatusChange: RTL_CRITICAL_SECTION;
@@ -5398,6 +5397,8 @@ begin
         CON_LASTFMTAGS          : NewSortMethod := AFCompareLastFMTagsExists;
         CON_CD                  : NewSortMethod := AFCompareCD;
         CON_FAVORITE            : NewSortMethod := AFCompareFavorite;
+        CON_TRACKGAIN           : NewSortMethod := AFCompareTrackGain;
+        CON_ALBUMGAIN           : NewSortMethod := AFCompareAlbumGain;
     else
         NewSortMethod := AFComparePath;
     end;

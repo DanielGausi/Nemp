@@ -254,7 +254,6 @@ begin
     KeyWords.Pfad      := Trim(PathEDIT.Text);
     KeyWords.Kommentar := Trim(KommentarEDIT.Text);
     KeyWords.Lyric     := Trim(LyricEdit.Text);
-    KeyWords.Mode      := SEARCH_EXTENDED;
 
     newComboBoxString := '';
     StringAdd(newComboBoxString, KeyWords.General  );

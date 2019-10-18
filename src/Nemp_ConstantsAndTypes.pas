@@ -508,8 +508,8 @@ const
     // MP3DB_VERSION_OLD: Byte = 3;    // Dateiformat 2.5 - 3.0
     // MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
 
-    MP3DB_VERSION: Byte = 5; // 4;        // Dateiformat seit 4.13
-    MP3DB_SUBVERSION: Byte = 0; //2;     //
+    MP3DB_VERSION   : Byte = 5;    //4;  // Dateiformat seit 4.13: "5.0"
+    MP3DB_SUBVERSION: Byte = 0;    //2;
 
     // "Extended Boolean", used for "unset" settings
     //BoolUnDef = 0;
@@ -522,8 +522,8 @@ const
     NEMP_CAPTION = 'Nemp - Noch ein MP3-Player';
     NEMP_NAME_TASK_LONG = '[ N e m p ]';
     NEMP_NAME_TASK = '[Nemp]';
-    NEMP_VERSION_SPLASH = 'version 4.12';// 'v3.3';
-    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.12';
+    NEMP_VERSION_SPLASH = 'version 4.13';// 'v3.3';
+    NEMP_BASS_DEFAULT_USERAGENT = 'Nemp/4.13';
 
     NEMP_TIPSIZE = 128;
 
@@ -741,11 +741,7 @@ const
 
     // WM_TRAYMSG = WM_USER + 10; // not needed any more (tTrayIcon)
 
-    //SEARCH_SIMPLE = 0;
-    SEARCH_EXTENDED = 1;
-    //SEARCH_LYRICs = 2;
-
-    Spaltenzahl = 24;
+    Spaltenzahl = 26;
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
     CON_ARTIST    = 0 ;
     CON_TITEL     = 1 ;
@@ -772,6 +768,8 @@ const
     CON_EXTENSION = 20;
     CON_FILEAGE = 21;
     CON_FAVORITE = 23;
+    CON_TRACKGAIN = 24;
+    CON_ALBUMGAIN = 25;
     //-----
     CON_EX_ARTISTALBUMTITEL = 117;
     CON_EX_ALBUMTITELARTIST = 118;
@@ -926,7 +924,7 @@ const
          'Techno'
          );
 
-      DefaultSpalten : array[0..23] of TSpalte =
+      DefaultSpalten : array[0..25] of TSpalte =
       (
         (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 122 ;sortAscending: True),
         (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
@@ -952,7 +950,10 @@ const
         (Bezeichnung: 'Type' ;Inhalt: CON_EXTENSION        ;visible: false  ;width: 50;sortAscending: True),
         (Bezeichnung: 'Fileage' ;Inhalt: CON_FILEAGE       ;visible: false  ;width: 80;sortAscending: True),
         (Bezeichnung: 'CD' ;Inhalt: CON_CD                 ;visible: false  ;width: 50 ;sortAscending: True),
-        (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True)
+        (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True),
+        // new in Nemp 4.13
+        (Bezeichnung: 'Track gain' ;Inhalt: CON_TRACKGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
+        (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =

@@ -134,7 +134,11 @@ uses
   ProgressUnit in 'ProgressUnit.pas' {ProgressForm},
   EffectsAndEqualizer in 'EffectsAndEqualizer.pas' {FormEffectsAndEqualizer},
   MainFormBuilderForm in 'MainFormBuilderForm.pas' {MainFormBuilder},
-  NempFileUtils in 'NempFileUtils.pas';
+  NempFileUtils in 'NempFileUtils.pas',
+  _TestUnit in '_TestUnit.pas' {TestForm},
+  ReplayGain in '3rd Party Units\ReplayGain.pas',
+  ReplayGainAnalysis in 'ReplayGainAnalysis.pas',
+  NempReplayGainCalculation in 'NempReplayGainCalculation.pas';
 
 {$R *.res}
 
@@ -169,6 +173,7 @@ ShowWindow
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
+  Application.CreateForm(TTestForm, TestForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

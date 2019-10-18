@@ -979,6 +979,12 @@ object Nemp_MainForm: TNemp_MainForm
               end
               item
                 Position = 23
+              end
+              item
+                Position = 24
+              end
+              item
+                Position = 25
               end>
           end
         end

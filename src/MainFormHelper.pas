@@ -1728,7 +1728,8 @@ begin
           afa_EditingDetails:      s := 'Error while editing file properties '  ;
           afa_LyricSearch:         s := 'Error while searching lyrics: ' ;
           afa_TagSearch:           s := 'Error while searching additional Tags: ';
-          afa_TagCloud:            s := 'Error while updating the Tagcloud: '
+          afa_TagCloud:            s := 'Error while updating the Tagcloud: ';
+          afa_ReplayGain:          s := 'Error while calculating ReplayGain values: ';
         end;
         if assigned(aFile) then
             s := s + aFile.Pfad;

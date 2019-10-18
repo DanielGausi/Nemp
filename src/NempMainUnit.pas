@@ -3015,6 +3015,8 @@ begin
       CON_DAUER: MedienBib.AddSorter(CON_DAUER, False);
       CON_FILESIZE: MedienBib.AddSorter(CON_FILESIZE, False);
       CON_LASTFMTAGS: MedienBib.AddSorter(CON_LASTFMTAGS, False);
+      CON_TRACKGAIN: MedienBib.AddSorter(CON_TRACKGAIN, False);
+      CON_ALBUMGAIN: MedienBib.AddSorter(CON_ALBUMGAIN, False);
   end;
 
   MedienBib.SortAnzeigeListe;
@@ -4329,6 +4331,13 @@ begin
                           else CellText := ' '; // noFav
 
           CON_LASTFMTAGS : CellText := ' ';// Data^.FAudioFile.RawTagLastFM;
+
+          //CON_TRACKGAIN : Celltext := Data^.FAudioFile.TrackGainStr; //  'Track gain (todo)';
+          //CON_ALBUMGAIN : Celltext := Data^.FAudioFile.AlbumGainStr; //  'Album gain (todo)';
+
+          CON_TRACKGAIN : Celltext := GainValueToString(Data^.FAudioFile.TrackGain); //  'Track gain (todo)';
+          CON_ALBUMGAIN : Celltext := GainValueToString(Data^.FAudioFile.AlbumGain); //  'Album gain (todo)';
+
         else
           CellText := ' ';
         end;
@@ -5199,7 +5208,6 @@ begin
     KeyWords.Pfad      := '';
     KeyWords.Kommentar := '';
     KeyWords.Lyric     := '';
-    KeyWords.Mode      := SEARCH_EXTENDED;
 
     Medienbib.BibSearcher.SearchOptions.SkipGenreCheck  := True;
     Medienbib.BibSearcher.SearchOptions.SkipYearCheck  := True;
@@ -7771,7 +7779,6 @@ begin
     KeyWords.Pfad      := '';
     KeyWords.Kommentar := '';
     KeyWords.Lyric     := '';
-    KeyWords.Mode      := SEARCH_EXTENDED;
 
     aNode := VST.FocusedNode;
     if not assigned(aNode) then exit;
@@ -9769,7 +9776,7 @@ procedure TNemp_MainForm.NewPlayerPanelResize(Sender: TObject);
 begin
     PaintFrame.Visible := NewPlayerPanel.Width > 170;
 
-    if NempPlayer.ABRepeatActive then
+    if assigned(NempPlayer) and NempPlayer.ABRepeatActive then
         RepositionABRepeatButtons;
 end;
 
@@ -10172,6 +10179,8 @@ begin
         if assigned(af) and (FileExists(af.Pfad)) then
         begin
             if MedienBib.StatusBibUpdate > 1 then
+                // Changed for Nemp 4.13 to "> 0": Block whenever the library is working! or not ???
+                //
                 // if the library is in the "hot phase" of an update: Do not allow edit
                 // Note: We have to check this again in EndUpdate and NewText!
                 allowed := false

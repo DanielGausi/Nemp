@@ -116,6 +116,8 @@ function AFCompareLyricsExists(a1,a2: tAudioFile): Integer;
 function AFCompareLastFMTagsExists(a1,a2: tAudioFile): Integer;
 function AFCompareCD(a1,a2: tAudioFile): Integer;
 function AFCompareFavorite(a1,a2: tAudioFile): Integer;
+function AFCompareAlbumGain(a1,a2: tAudioFile): Integer;
+function AFCompareTrackGain(a1,a2: tAudioFile): Integer;
 
 function MainSort(item1, item2: Pointer): Integer;
 
@@ -271,6 +273,25 @@ end;
 function AFCompareFavorite(a1,a2: tAudioFile): Integer;
 begin
     result := CompareValue(a1.Favorite, a2.Favorite);
+end;
+
+function AFCompareAlbumGain(a1,a2: tAudioFile): Integer;
+begin
+    result := CompareValue(a1.AlbumGain, a2.AlbumGain);
+end;
+function AFCompareTrackGain(a1,a2: tAudioFile): Integer;
+begin
+    if isZero(a1.TrackGain) and isZero(a2.TrackGain) then
+        result := 0
+    else
+        if (isZero(a1.TrackGain)) and (NOT isZero(a2.TrackGain)) then
+            result := 1
+        else
+            if (NOT isZero(a1.TrackGain)) and (isZero(a2.TrackGain)) then
+                result := -1
+            else
+
+    result := CompareValue(a1.TrackGain, a2.TrackGain);
 end;
 
 
@@ -871,6 +892,7 @@ begin
               aStream.Read(NPLHeader[1], length(NPLHeader));
               aStream.Read(NPLVersion[1], length(NPLVersion));
 
+              FileIsCurrentVersion := True;
               if (NPLVersion = Deprecatd_Version) then
                   FileIsCurrentVersion := False;
 

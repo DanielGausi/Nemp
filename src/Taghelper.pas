@@ -116,14 +116,6 @@ type
             function AddIgnoreRule(newIgnoreTag: String; IgnoreWarnings: Boolean): Boolean;
             function AddMergeRule(newOriginalTag: string; var newReplaceTag: String; IgnoreWarnings: Boolean): Boolean;
 
-            // -----------Deprecated, remove later
-            // Add new Tag to Ignore/Merge
-            // result: False if Tag already existed
-            function AddIgnoreTag(aKey: String): Boolean;
-            function AddMergeTag(aOriginalKey, aReplaceKey: String): Boolean;
-            // -----------Deprecated, remove later
-
-
             // delete a Tag from the List
             procedure DeleteIgnoreTag(aKey: String);
             procedure DeleteMergeTag(aOriginalKey, aReplaceKey: String);
@@ -713,29 +705,6 @@ begin
     else
         result := False;
 
-end;
-
-
-function TTagPostProcessor.AddIgnoreTag(aKey: String): Boolean;
-begin
-    if not fIgnoreTagExists(aKey) then
-    begin
-        fIgnoreList.Add(aKey);
-        result := True;
-    end
-    else
-        result := False;
-end;
-function TTagPostProcessor.AddMergeTag(aOriginalKey,
-  aReplaceKey: String): Boolean;
-begin
-    if not fMergeTagExists(aOriginalKey, aReplaceKey) then
-    begin
-        fMergeList.Add(TTagMergeItem.Create(aOriginalKey, aReplaceKey));
-        result := True;
-    end
-    else
-        result := False;
 end;
 
 {

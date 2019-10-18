@@ -118,7 +118,7 @@ uses WinApi.Windows, System.Classes;
     // used, if a DataID is unknown (because it is written by a following version of nemp)
     // !!! The DT_*** constant following the DataID in the stream *MUST* be known
     //     If Nemp uses more different Data types, the file format version *MUST* be changed
-    //      currently: (Nemp 4.13) "5.0"
+    //      currently: (Nemp 4.13) "5.0", see e.g. MP3DB_VERSION
     function ReadUnkownDataFromStream(aStream: TStream): Boolean;
 
     function ReadByteFromStream(aStream: TStream): Byte;

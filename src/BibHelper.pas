@@ -43,6 +43,8 @@ Const SO_Pfad = 0;
       SO_AlbumArtist = 2;
       SO_Cover = 3;
 
+      MP3DB_PL_Path = 1;
+
  type
     TJustaString = class
     public

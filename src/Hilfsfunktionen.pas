@@ -80,6 +80,9 @@ function EscapeAmpersAnd(aWs: UnicodeString): UnicodeString;
 function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
 function StringToURLString(aUTF8String: UTF8String): AnsiString;
 
+function GainStringToSingle(aGainString: String): Single;
+
+function GainValueToString(aGainValue: Single): String;
 
 
 procedure Wuppdi(i: Integer = 0);
@@ -642,6 +645,38 @@ begin
       Result := DestName;
 end;
 
+///  Convert a ReplayGainString (from the Metatags of an Audiofile) into a Single value
+function GainStringToSingle(aGainString: String): Single;
+var formatSettings: TFormatSettings;
+begin
+    // expected format:
+    // "+/-xx.xxxxxx dB"  ->  always use "." as DecimalSeparator!
+    if Length(aGainString) < 3 then
+        result := 0
+    else
+    begin
+        GetLocaleFormatSettings(GetUserDefaultLCID, formatSettings);
+        formatSettings.DecimalSeparator := '.';
+        if not TryStrToFloat(Copy(aGainString, 1, Length(aGainString) - 3 ), result, formatSettings)
+            then result := 0;
+    end;
+end;
+
+function GainValueToString(aGainValue: Single): String;
+var formatSettings: TFormatSettings;
+begin
+    if isZero(aGainValue) then
+        result := ''
+    else
+    begin
+        GetLocaleFormatSettings(GetUserDefaultLCID, formatSettings);
+        formatSettings.DecimalSeparator := '.';
+        if aGainValue > 0 then
+            result := Format('+%.2f dB', [aGainValue], formatSettings)
+        else
+            result := Format('%.2f dB', [aGainValue], formatSettings);
+    end;
+end;
 
 
 procedure Wuppdi(i: Integer = 0);

@@ -88,8 +88,6 @@ Type
             fURL          : String;  // da gehts rein, wenn man manuell was eingibt.
             fBitrate      : Integer;
             fGenre        : String;
-            // fCurrentTitle : String;  // deprecated
-            // fListenerCount: Integer; // deprecated // Anzahl der Hörer
             fSortIndex    : Integer; // used for a custom sorting of the favorite stations in nemp
 
             function fGetURL: String;
@@ -107,8 +105,6 @@ Type
             property Bitrate: Integer       read fBitrate      write fBitrate;
             property Format: String         read fGetFormat    ;
             property Genre: String          read fGenre        write fGenre;
-            // property CurrentTitle: String   read fCurrentTitle ;
-            // property Count: Integer         read fCount        ;
             property SortIndex: Integer     read fSortIndex    write fSortIndex;
             property URL: String       read fGetURL   write fSetURL;
 

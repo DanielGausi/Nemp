@@ -56,7 +56,8 @@ type
                         afa_EditingDetails,
                         afa_LyricSearch,
                         afa_TagSearch,
-                        afa_TagCloud
+                        afa_TagCloud,
+                        afa_ReplayGain
 
                         );
 
@@ -223,6 +224,12 @@ type
         fFileAge: TDateTime;
         // CoverID: a md5-hash-like string
         fCoverID: String;
+
+        fTrackGainStr: String;
+        fAlbumGainStr: String;
+
+        fTrackGain: Single;
+        fAlbumGain: Single;
 
         // fDriveID: New in 4.13, used for loading/saving media library files into a stream.
         //           it is the index of the drive in the DriveList, to assign a proper Drive letter
@@ -440,6 +447,12 @@ type
 
         property DriveID: Integer read fDriveID write fDriveID;
 
+        property TrackGainStr: String read fTrackGainStr write fTrackGainStr;
+        property AlbumGainStr: String read fAlbumGainStr write fAlbumGainStr;
+
+        property TrackGain: Single read fTrackGain write fTrackGain;
+        property AlbumGain: Single read fAlbumGain write fAlbumGain;
+
         constructor Create;
         destructor Destroy; override;
 
@@ -644,8 +657,13 @@ const
       MP3DB_LASTFM_TAGS  = 33;
       //MP3DB_DUMMY_Text2  = 34;
       MP3DB_CD = 34;    // new in 4.5 (Part of aSet)
-      MP3DB_DUMMY_Text3  = 35;
-      // 42 marks the end of an AudioFile
+
+      //MP3DB_DUMMY_Text3  = 35;
+      MP3DB_ALBUMGAIN = 35;
+      MP3DB_TRACKGAIN = 36;
+
+
+      // 42 marked the end of an AudioFile (until Nemp 4.12)
       MP3DB_ENDOFINFO = 42;
 
       // Some Constant-Arrays
@@ -1716,6 +1734,12 @@ begin
         TagStream.Free;
     end;
 
+    // Get ReplayGain Information
+    fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_album_gain');
+    fTrackGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_track_gain');
+
+    AlbumGain := GainStringToSingle(fAlbumGainStr);
+    TrackGain := GainStringToSingle(fTrackGainStr);
 end;
 
 {
@@ -2446,6 +2470,28 @@ begin
     end else
         // delete Tags-Frame
         aMp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+
+
+    if isZero(TrackGain) then
+        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', '')
+    else
+        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', GainValueToString(TrackGain));
+
+
+    if isZero(AlbumGain) then
+        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', '')
+    else
+        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', GainValueToString(AlbumGain));
+
+
+    {fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_album_gain');
+    fTrackGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_track_gain');
+
+    AlbumGain := GainStringToSingle(fAlbumGainStr);
+    TrackGain := GainStringToSingle(fTrackGainStr);
+
+    }
+
 end;
 
 procedure TAudioFile.SetOggVorbisData(aOggFile: TOggVorbisFile);
@@ -2837,7 +2883,13 @@ begin
             MP3DB_DRIVE_ID  :    fDriveID     := ReadIntegerFromStream(aStream);
 
             MP3DB_LASTFM_TAGS :  RawTagLastFM := UTF8String(ReadTextFromStream(aStream));
-            MP3DB_DUMMY_Text3 :  DummyStr     := ReadTextFromStream(aStream);
+            //MP3DB_DUMMY_Text3 :  DummyStr     := ReadTextFromStream(aStream);
+
+            //MP3DB_ALBUMGAIN : fAlbumGainStr := ReadTextFromStream(aStream);
+            //MP3DB_TRACKGAIN : fTrackGainStr := ReadTextFromStream(aStream);
+
+            MP3DB_ALBUMGAIN : fAlbumGain := ReadSingleFromStream(aStream);
+            MP3DB_TRACKGAIN : fTrackGain := ReadSingleFromStream(aStream);
 
             // Deprecated (from a long, long time ago ...)
             MP3DB_KATEGORIE:     ReadByteFromStream(aStream);
@@ -2934,7 +2986,7 @@ begin
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream_DEPRECATED(aStream));
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
             //MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
-            MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
+            MP3DB_ALBUMGAIN : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
 
             else begin
               // Something is wrong. Stop reading.
@@ -3032,7 +3084,7 @@ begin
             //MP3DB_DUMMY_Text1 : DummyStr := ReadTextFromStream(aStream);
             MP3DB_LASTFM_TAGS : RawTagLastFM := UTF8String(ReadTextFromStream_DEPRECATED(aStream));
             // MP3DB_DUMMY_Text2 : DummyStr := ReadTextFromStream(aStream);
-            MP3DB_DUMMY_Text3 : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
+            MP3DB_ALBUMGAIN : DummyStr := ReadTextFromStream_DEPRECATED(aStream);
 
             else begin
               c := MP3DB_ENDOFINFO;
@@ -3107,6 +3159,12 @@ begin
     if length(lyrics) > 0  then result := result + WriteTextToStream(aStream, MP3DB_LYRICS, String(lyrics));
     if length(Comment) > 0 then result := result + WriteTextToStream(aStream, MP3DB_ID3KOMMENTAR, Comment);
     if CoverID <> ''       then result := result + WriteTextToStream(aStream, MP3DB_COVERID, CoverID);
+
+    //if fAlbumGainStr <> '' then result := result + WriteTextToStream(aStream, MP3DB_ALBUMGAIN, fAlbumGainStr);
+    //if fTrackGainStr <> '' then result := result + WriteTextToStream(aStream, MP3DB_TRACKGAIN, fTrackGainStr);
+
+    if not isZero(fAlbumGain) then result := result + WriteSingleToStream(aStream, MP3DB_ALBUMGAIN, fAlbumGain);
+    if not isZero(fTrackGain) then result := result + WriteSingleToStream(aStream, MP3DB_TRACKGAIN, fTrackGain);
 
     // end of AudioFile
     result := result + WriteDataEnd(aStream);
