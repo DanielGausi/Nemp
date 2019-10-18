@@ -1186,6 +1186,8 @@ type
     //LastPaintedTimeString: String;
     LastPaintedTime: Integer;
 
+    FormReadyAndActivated: Boolean;
+
 
     procedure OwnMessageProc(var msg: TMessage);
     procedure NewScrollBarWndProc(var Message: TMessage);
@@ -1579,6 +1581,9 @@ end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     MedienBib.TagCloud.CloudPainter.Height := CloudViewer.Height;
     MedienBib.TagCloud.CloudPainter.Width := CloudViewer.Width;
     MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
@@ -1653,6 +1658,7 @@ end;
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 //var c: Integer;
 begin
+    FormReadyAndActivated := False;
 
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
     TagLabelList := TObjectList.Create(True);
@@ -2962,6 +2968,9 @@ end;
 
 procedure TNemp_MainForm.GRPBOXArtistsAlbenResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
 
@@ -6275,6 +6284,9 @@ end;
 // horizontal splitter between Top and VST
 procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -6292,6 +6304,9 @@ end;
 // vertical splitter between player and Browse
 procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnSplitterMoved(Sender);
 
@@ -6305,6 +6320,9 @@ end;
 //vertical splitter between Artist and Album
 procedure TNemp_MainForm.SplitterBrowseMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
@@ -6318,10 +6336,13 @@ end;
 // vertical splitter between VST and Cover
 procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
             
-    NempFormBuildOptions.OnSplitterMoved(Sender);     
+    NempFormBuildOptions.OnSplitterMoved(Sender);
 
     if NempSkin.isActive then
     begin
@@ -8484,6 +8505,9 @@ end;
 
 procedure TNemp_MainForm.PlaylistVSTResize(Sender: TObject);
 begin
+  if not FormReadyAndActivated then
+        exit;
+
   if (NempSkin.isActive and Nempskin.DisablePlaylistScrollbar)
        OR // Oder Scrollbar unsichtbar
      (PlaylistVST.Height > Integer(playlistVST.RootNode.TotalHeight))
@@ -8501,12 +8525,17 @@ end;
 
 procedure TNemp_MainForm.ArtistsVSTResize(Sender: TObject);
 begin
-  ArtistsVST.Header.Columns[0].Width := ArtistsVST.Width;
+    if not FormReadyAndActivated then
+        exit;
+    ArtistsVST.Header.Columns[0].Width := ArtistsVST.Width;
 end;
 
 
 procedure TNemp_MainForm.AlbenVSTResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
     
@@ -8823,6 +8852,7 @@ end;
 procedure TNemp_MainForm.FormActivate(Sender: TObject);
 begin
     fspTaskbarManager.Active := True;
+    FormReadyAndActivated := True;
 end;
 
 procedure TNemp_MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -9744,6 +9774,9 @@ end;
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);
 var WidthLimit: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -9767,21 +9800,30 @@ end;
 
 procedure TNemp_MainForm.NewPlayerPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     PaintFrame.Visible := NewPlayerPanel.Width > 170;
 
-    if NempPlayer.ABRepeatActive then
+    if assigned(NempPlayer) and NempPlayer.ABRepeatActive then
         RepositionABRepeatButtons;
 end;
 
 
 procedure TNemp_MainForm._TopMainPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnMainContainerResize(Sender);
 end;
 
 procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnSuperContainerResize(Sender);
 end;
@@ -10803,6 +10845,9 @@ end;
 procedure TNemp_MainForm.MedialistPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - ExtraSpace;// - 8;
@@ -10815,6 +10860,9 @@ end;
 procedure TNemp_MainForm.MedienBibDetailPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     MedienBibDetailFillPanel.Left := TabBtn_Lyrics.Left + TabBtn_Lyrics.Width + 6;
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
@@ -10827,6 +10875,9 @@ end;
 
 procedure TNemp_MainForm.DetailID3TagPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(MedienBib) then
         RefreshVSTCoverTimer.Enabled := True;
 end;
@@ -10845,6 +10896,9 @@ end;
 
 procedure TNemp_MainForm.SplitterFileOverviewMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -10858,6 +10912,9 @@ end;
 procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
@@ -10979,8 +11036,10 @@ end;
 
 procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
 begin
-  if PanelCoverBrowse.Visible then
-      MedienBib.NewCoverFlow.Paint;
+    if not FormReadyAndActivated then
+        exit;
+    if PanelCoverBrowse.Visible then
+        MedienBib.NewCoverFlow.Paint;
 end;
 
 
