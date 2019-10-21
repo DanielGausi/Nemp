@@ -294,7 +294,6 @@ uses
         <DCCReference Include="NempFileUtils.pas"/>
         <DCCReference Include="_TestUnit.pas">
             <Form>TestForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="3rd Party Units\ReplayGain.pas"/>
         <DCCReference Include="ReplayGainAnalysis.pas"/>

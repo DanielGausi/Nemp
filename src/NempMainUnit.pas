@@ -1169,6 +1169,8 @@ type
 
     CurrentTagToChange: String;
 
+    NewStringFromVSTEdit: String;
+
     PaintFrameDownX: Integer;
     PaintFrameDownY: Integer;
 
@@ -1185,6 +1187,8 @@ type
 
     //LastPaintedTimeString: String;
     LastPaintedTime: Integer;
+
+    FormReadyAndActivated : Boolean;
 
 
     procedure OwnMessageProc(var msg: TMessage);
@@ -1579,6 +1583,9 @@ end;
 
 procedure TNemp_MainForm.PanelTagCloudBrowseResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     MedienBib.TagCloud.CloudPainter.Height := CloudViewer.Height;
     MedienBib.TagCloud.CloudPainter.Width := CloudViewer.Width;
     MedienBib.TagCloud.CloudPainter.Paint(MedienBib.TagCloud.CurrentTagList);
@@ -1653,6 +1660,7 @@ end;
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
 //var c: Integer;
 begin
+    FormReadyAndActivated := false;
 
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
     TagLabelList := TObjectList.Create(True);
@@ -2962,6 +2970,9 @@ end;
 
 procedure TNemp_MainForm.GRPBOXArtistsAlbenResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
 
@@ -3958,7 +3969,11 @@ begin
                               listFile.PlayCounter := 0;
                       end;
                       // write the rating into the file on disk
-                      aErr := CurrentAF.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                      //aErr := CurrentAF.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                      aErr := CurrentAF.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
+                      if resetCounter then
+                          aErr := CurrentAF.WritePlayCounterToMetaData(0, NempOptions.AllowQuickAccessToMetadata);
+
                       HandleError(afa_SaveRating, CurrentAF, aErr);
                       // correct GUI
                       CorrectVCLAfterAudioFileEdit(CurrentAF);
@@ -5542,7 +5557,7 @@ procedure TNemp_MainForm.ImgBibRatingMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
-    i: Integer;
+    i, newRating: Integer;
     aErr: TNempAudioError;
 begin
     if      (not NempSkin.NempPartyMode.DoBlockTreeEdit)
@@ -5560,14 +5575,16 @@ begin
               try
                   // get List of this AudioFile
                   GetListOfAudioFileCopies(MedienBib.CurrentAudioFile, ListOfFiles);
+                  newRating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
                   // edit all these files
                   for i := 0 to ListOfFiles.Count - 1 do
                   begin
                       listFile := TAudioFile(ListOfFiles[i]);
-                      listFile.Rating := BibRatingHelper.MousePosToRating(x, ImgBibRating.Width);
+                      listFile.Rating := newRating;
                   end;
                   // write the rating into the file on disk
-                  aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                  // aErr := MedienBib.CurrentAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                  aErr := MedienBib.CurrentAudioFile.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
                   HandleError(afa_SaveRating, MedienBib.CurrentAudioFile, aErr);
                   
                   MedienBib.Changed := True;
@@ -6283,6 +6300,9 @@ end;
 // horizontal splitter between Top and VST
 procedure TNemp_MainForm.MainSplitterMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -6300,6 +6320,9 @@ end;
 // vertical splitter between player and Browse
 procedure TNemp_MainForm.SubSplitter1Moved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnSplitterMoved(Sender);
 
@@ -6313,6 +6336,12 @@ end;
 //vertical splitter between Artist and Album
 procedure TNemp_MainForm.SplitterBrowseMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
@@ -6326,6 +6355,9 @@ end;
 // vertical splitter between VST and Cover
 procedure TNemp_MainForm.SubSplitter2Moved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
             
@@ -7052,7 +7084,7 @@ procedure TNemp_MainForm.RatingImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var ListOfFiles: TObjectList;
     listFile: TAudioFile;
-    i: Integer;
+    i, newRating: Integer;
     aErr: TNempAudioError;
 begin
     if (not NempSkin.NempPartyMode.DoBlockCurrentTitleRating)
@@ -7071,14 +7103,16 @@ begin
                   try
                       // get List of this AudioFile
                       GetListOfAudioFileCopies(NempPlayer.MainAudioFile, ListOfFiles);
+                      newRating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
                       // edit all these files
                       for i := 0 to ListOfFiles.Count - 1 do
                       begin
                           listFile := TAudioFile(ListOfFiles[i]);
-                          listFile.Rating := PlayerRatingGraphics.MousePosToRating(x, RatingImage.Width);
+                          listFile.Rating := newRating
                       end;
                       // write the rating into the file on disk
-                      aErr := NempPlayer.MainAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                      // aErr := NempPlayer.MainAudioFile.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+                      aErr := NempPlayer.MainAudioFile.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
                       HandleError(afa_SaveRating, NempPlayer.MainAudioFile, aErr);
                       MedienBib.Changed := True;
                   finally
@@ -8491,6 +8525,9 @@ end;
 
 procedure TNemp_MainForm.PlaylistVSTResize(Sender: TObject);
 begin
+  if not FormReadyAndActivated then
+        exit;
+
   if (NempSkin.isActive and Nempskin.DisablePlaylistScrollbar)
        OR // Oder Scrollbar unsichtbar
      (PlaylistVST.Height > Integer(playlistVST.RootNode.TotalHeight))
@@ -8508,12 +8545,17 @@ end;
 
 procedure TNemp_MainForm.ArtistsVSTResize(Sender: TObject);
 begin
-  ArtistsVST.Header.Columns[0].Width := ArtistsVST.Width;
+    if not FormReadyAndActivated then
+        exit;
+    ArtistsVST.Header.Columns[0].Width := ArtistsVST.Width;
 end;
 
 
 procedure TNemp_MainForm.AlbenVSTResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
     
@@ -8830,6 +8872,7 @@ end;
 procedure TNemp_MainForm.FormActivate(Sender: TObject);
 begin
     fspTaskbarManager.Active := True;
+    FormReadyAndActivated := True;
 end;
 
 procedure TNemp_MainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -9751,6 +9794,9 @@ end;
 procedure TNemp_MainForm._ControlPanelResize(Sender: TObject);
 var WidthLimit: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -9774,6 +9820,9 @@ end;
 
 procedure TNemp_MainForm.NewPlayerPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     PaintFrame.Visible := NewPlayerPanel.Width > 170;
 
     if assigned(NempPlayer) and NempPlayer.ABRepeatActive then
@@ -9783,12 +9832,18 @@ end;
 
 procedure TNemp_MainForm._TopMainPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnMainContainerResize(Sender);
 end;
 
 procedure TNemp_MainForm.__MainContainerPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(NempFormBuildOptions) then
         NempFormBuildOptions.OnSuperContainerResize(Sender);
 end;
@@ -10283,9 +10338,15 @@ begin
             newRating := af.Rating;
             af.GetAudioData(af.Pfad);
             af.Rating := newRating;
-        end;
 
-        aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+            aErr := af.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
+        end else
+        begin
+            aErr := af.WriteStringToMetaData(NewStringFromVSTEdit, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata )
+
+        end;
+        // aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
+
         if (aErr = AUDIOERR_None) or (VST.Header.Columns[column].Tag = CON_RATING) then
         begin
             // Generate a List of Files which should be updated now
@@ -10342,7 +10403,9 @@ begin
             begin
                 MedienBib.Changed := True;
                 // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
-                af.GetAudioData(af.Pfad);
+                af.GetAudioData(af.Pfad); // not needed any more .... ?
+
+                NewStringFromVSTEdit := NewText;
 
                 case VST.Header.Columns[column].Tag of
                     CON_ARTIST : af.Artist := NewText;
@@ -10812,6 +10875,9 @@ end;
 procedure TNemp_MainForm.MedialistPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - ExtraSpace;// - 8;
@@ -10824,6 +10890,9 @@ end;
 procedure TNemp_MainForm.MedienBibDetailPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     MedienBibDetailFillPanel.Left := TabBtn_Lyrics.Left + TabBtn_Lyrics.Width + 6;
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
@@ -10836,6 +10905,9 @@ end;
 
 procedure TNemp_MainForm.DetailID3TagPanelResize(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if assigned(MedienBib) then
         RefreshVSTCoverTimer.Enabled := True;
 end;
@@ -10854,6 +10926,9 @@ end;
 
 procedure TNemp_MainForm.SplitterFileOverviewMoved(Sender: TObject);
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     if not assigned(NempFormBuildOptions) then
         exit;
 
@@ -10867,6 +10942,9 @@ end;
 procedure TNemp_MainForm.PlaylistPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
+    if not FormReadyAndActivated then
+        exit;
+
     ExtraSpace := 16 * AnzeigeMode;
     PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
@@ -10988,8 +11066,10 @@ end;
 
 procedure TNemp_MainForm.PanelCoverBrowseResize(Sender: TObject);
 begin
-  if PanelCoverBrowse.Visible then
-      MedienBib.NewCoverFlow.Paint;
+    if not FormReadyAndActivated then
+        exit;
+    if PanelCoverBrowse.Visible then
+        MedienBib.NewCoverFlow.Paint;
 end;
 
 

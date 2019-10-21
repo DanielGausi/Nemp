@@ -610,7 +610,9 @@ begin
         fAudioFile.PlayCounter := currentPlayCounter ;
         // 4. actually update the file
         // (yes, this involves another "readfromfile" ...)
-        result := fAudioFile.SetAudioData(fWriteToFiles);
+        {result := }fAudioFile.WriteRatingsToMetaData(currentRating, True);
+        result := fAudioFile.WritePlayCounterToMetaData(currentPlayCounter, True);
+        ////result := fAudioFile.SetAudioData(fWriteToFiles);
     end
     else
         result := AUDIOERR_EditingDenied;

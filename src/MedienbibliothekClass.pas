@@ -2966,7 +2966,8 @@ begin
                         aAudioFile.GetAudioData(aAudioFile.Pfad);
                         // Set new Lyrics
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
-                        aErr := aAudioFile.SetAudioData(True);
+                        aErr := aAudioFile.WriteLyricsToMetaData(aAudioFile.Lyrics, True);
+                        // aErr := aAudioFile.SetAudioData(True);
                             // SetAudioData(True) : Check before entering this thread, whether this operation
                             //                      is allowed. If NOT: Do not enter this thread at all!
                         if aErr = AUDIOERR_None then
@@ -3208,8 +3209,8 @@ begin
                 // param true: use thread-safe copies of rule-lists
                 AddNewTag(af, s, False, True);
                 //af.RawTagLastFM := Utf8String(ControlRawTag(af, s, fIgnoreListCopy, fMergeListCopy));
-
-                aErr := af.SetAudioData(True);
+                aErr := af.WriteRawTagsToMetaData(af.RawTagLastFM, True);
+                // aErr := af.SetAudioData(True);
                         // SetAudioData(True) : Check before entering this thread, whether this operation
                         //                      is allowed. If NOT: Do not enter this thread at all!
                 if aErr = AUDIOERR_None then
@@ -3386,7 +3387,8 @@ begin
             af.GetAudioData(af.Pfad);
             af.RawTagLastFM := newTags;
 
-            aErr := af.SetAudioData(True);
+            //aErr := af.SetAudioData(True);
+            aErr := af.WriteRawTagsToMetaData(af.RawTagLastFM, True);
                     // SetAudioData(True) : Check before entering this thread, whether this operation
                     //                      is allowed. If NOT: Do not enter this thread at all!
             if aErr = AUDIOERR_None then

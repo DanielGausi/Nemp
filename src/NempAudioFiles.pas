@@ -58,7 +58,6 @@ type
                         afa_TagSearch,
                         afa_TagCloud,
                         afa_ReplayGain
-
                         );
 
     TNempAudioError = (
@@ -331,11 +330,13 @@ type
         // no tags found - set default values
         procedure SetUnknown;
 
+        (*
         procedure SetMp3Data(aMp3File: TMp3File);
         procedure SetOggVorbisData(aOggFile: TOggVorbisFile);
         procedure SetFlacData(aFlacFile: TFlacFile);
         procedure SetM4AData(aM4AFile: TM4AFile);
         procedure SetExoticInfo(aBaseApeFile: TBaseApeFile);
+        *)
 
         // reading text information from a stream. This method is only used for reading files created
         // by Nemp 4.12 or earlier.
@@ -475,7 +476,21 @@ type
 
         // Write the Meta-Data back to the file
         // This method will call a proper sub-methode like SetMp3Info
-        function SetAudioData(allowChange: Boolean): TNempAudioError;
+        // function SetAudioData(allowChange: Boolean): TNempAudioError;
+
+        function PreparingWriteChecks(allowChange: Boolean): TNempAudioError;
+        function WriteStringToMetaData(aValue: String; ColumnIndex: Integer; allowChange: Boolean): TNempAudioError;
+        function WriteLyricsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
+        function WriteRawTagsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
+        function WriteRatingsToMetaData(aRating: Integer; allowChange: Boolean): TNempAudioError;
+        function WritePlayCounterToMetaData(aPlayCounter: Integer; allowChange: Boolean): TNempAudioError;
+
+        function WriteReplayGainToMetaData(aTrackGain, aAlbumGain: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
+
+
+
+
+
 
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
         function GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
@@ -603,6 +618,14 @@ const
       GAD_NOLYRICS = 8;
       // note for future extensions:
       // this is planned as bitmasks, so use 4,8,16,32,.. for additional flags
+
+      // Flags for setting ReplayGainValues
+      RG_SetTrack = 1;
+      RG_SetAlbum = 2;
+      RG_SetBoth  = 3; // = RG_SetTrack OR RG_SetAlbum
+      RG_ClearTrack = 4;
+      RG_ClearAlbum = 8;
+      RG_ClearBoth = 12; // = RG_ClearTrack OR RG_ClearAlbum
 
       // SAD_xxx Flags for SetAudioData-Methods
       //SAD_None     = 0;   // Do not Update Informatin in the file
@@ -2396,6 +2419,292 @@ end;
     Used, in MainVST.
     --------------------------------------------------------
 }
+function TAudioFile.PreparingWriteChecks(allowChange: Boolean): TNempAudioError;
+begin
+    if Not AllowChange then
+        result := AUDIOERR_EditingDenied
+    else
+        if Not IsFile then
+            result := AUDIOERR_UnsupportedMediaFile
+        else
+            result := AUDIOERR_None;
+end;
+function TAudioFile.WriteStringToMetaData(aValue: String; ColumnIndex: Integer; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                case ColumnIndex of
+
+                    CON_ARTIST : MainFile.Artist := aValue;
+                    CON_TITEL  : MainFile.Title  := aValue ;
+                    CON_ALBUM  : MainFile.Album  := aValue ;
+                    CON_YEAR   : MainFile.Year := aValue;
+                    CON_GENRE  : MainFile.Genre := aValue;
+                    CON_TRACKNR: begin
+
+                          MainFile.Track := aValue;  //StrToIntDef(aValue, 0);
+                    end;
+                    CON_STANDARDCOMMENT: begin
+                        case MainFile.FileType of
+                            at_Mp3: MainFile.Mp3File.Comment := aValue;
+                            at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_COMMENT, aValue);
+                            at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, aValue);
+                            at_M4A: MainFile.M4aFile.Comment := aValue;
+                            at_Monkey,
+                            at_WavPack,
+                            at_MusePack,
+                            at_OptimFrog,
+                            at_TrueAudio: MainFile.BaseApeFile.SetValueByKey(APE_COMMENT, aValue);
+                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
+                        end;
+                    end;
+
+                    CON_CD: begin
+                        case MainFile.FileType of
+                            at_Mp3: MainFile.Mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, aValue);
+                            at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, aValue);
+                            at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, aValue);
+                            at_M4A: MainFile.M4aFile.Disc := aValue;
+                            at_Monkey,
+                            at_WavPack,
+                            at_MusePack,
+                            at_OptimFrog,
+                            at_TrueAudio: MainFile.BaseApeFile.SetValueByKey(APE_DISCNUMBER, aValue);
+                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
+                        end;
+                    end;
+                end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+function TAudioFile.WriteLyricsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                // bei mp3-Dateien war hier noch ne Abfrage "if Lyrics <> '' " dabei .... warum? Checken?
+                        case MainFile.FileType of
+                            at_Mp3: MainFile.Mp3File.ID3v2Tag.Lyrics := String(aValue);
+                            at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_LYRICS, String(aValue));
+                            at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(aValue));
+                            at_M4A: MainFile.M4aFile.Lyrics := String(aValue);
+                            at_Monkey,
+                            at_WavPack,
+                            at_MusePack,
+                            at_OptimFrog,
+                            at_TrueAudio: MainFile.BaseApeFile.SetValueByKey(APE_LYRICS, String(aValue));
+                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
+                        end;
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+function TAudioFile.WriteRawTagsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+    ms: TMemoryStream;
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                        case MainFile.FileType of
+                            at_Mp3: begin
+                                  if length(aValue) > 0 then
+                                  begin
+                                      ms := TMemoryStream.Create;
+                                      try
+                                          ms.Write(aValue[1], length(aValue));
+                                          MainFile.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+                                      finally
+                                          ms.Free;
+                                      end;
+                                  end else
+                                      // delete Tags-Frame
+                                      MainFile.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+                            end;
+                            at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(aValue));
+                            at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, String(aValue));
+                            at_M4A: MainFile.M4aFile.Keywords := String(aValue);
+                            at_Monkey,
+                            at_WavPack,
+                            at_MusePack,
+                            at_OptimFrog,
+                            at_TrueAudio: MainFile.BaseApeFile.SetValueByKey(APE_CATEGORIES , String(aValue));
+                            //  at_Invalid: ; at_Wma: ; at_Wav: ;
+                        end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+function TAudioFile.WriteRatingsToMetaData(aRating: Integer; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+    StrRating: String;
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                if aRating > 0 then
+                    StrRating  := IntToStr(aRating)
+                else
+                    StrRating := '';
+
+                case MainFile.FileType of
+                  at_Mp3:  MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', aRating, -1);
+                  at_Ogg:  MainFile.OggFile.SetPropertyByFieldname(VORBIS_RATING  , StrRating );
+                  at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_RATING , StrRating );
+                  at_M4A:  MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4ARating, StrRating );
+                  at_Monkey,
+                  at_WavPack,
+                  at_MusePack,
+                  at_OptimFrog,
+                  at_TrueAudio: MainFile.BaseApeFile.SetValueByKey(APE_RATING, StrRating );
+                  //at_Wma: ; at_Invalid: ; at_Wav: ;
+                end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+
+function TAudioFile.WritePlayCounterToMetaData(aPlayCounter: Integer; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+    StrCounter: String;
+
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                      if aPlayCounter > 0 then StrCounter := IntToStr(aPlayCounter) else StrCounter := '';
+
+                      case MainFile.FileType of
+                        at_Mp3 : MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', -1, aPlayCounter);
+                        at_Ogg : MainFile.OggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
+                        at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
+                        at_M4A : MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, StrCounter);
+                        at_Monkey,
+                        at_WavPack,
+                        at_MusePack,
+                        at_OptimFrog,
+                        at_TrueAudio:  MainFile.BaseApeFile.SetValueByKey(APE_PLAYCOUNT  , StrCounter);
+                        //at_Wma: ; at_Invalid: ; at_Wav: ;
+                      end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+
+
+function TAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+    strAlbum, strTrack: String;
+    doUpdateTrack, doUpdateAlbum: Boolean;
+const INVALID_STR = '----';
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                  {
+                      RG_SetTrack = 1;
+                      RG_SetAlbum = 2;
+                      RG_SetBoth  = 3; // = RG_SetTrack OR RG_SetAlbum
+                      RG_ClearTrack = 4;
+                      RG_ClearAlbum = 8;
+                      RG_ClearBoth = 12; // = RG_ClearTrack OR RG_ClearAlbum
+                  }
+                      // Init Strings with invalid Data
+                      strTrack := INVALID_STR;
+                      strAlbum := INVALID_STR;
+                      // 1.) Convert Values into Strings, according to the Flags
+                      if (Flags AND RG_ClearTrack) = RG_ClearTrack then strTrack := '';
+                      if (Flags AND RG_SetTrack)   = RG_SetTrack   then strTrack := GainValueToString(aTrackGain);
+                      if (Flags AND RG_ClearAlbum) = RG_ClearAlbum then strAlbum := '';
+                      if (Flags AND RG_SetAlbum)   = RG_SetAlbum   then strAlbum := GainValueToString(aAlbumGain);
+                      // if we want to set or clear a value: actually do update the metadata
+                      doUpdateTrack := strTrack <> INVALID_STR;
+                      doUpdateAlbum := strAlbum <> INVALID_STR;
+                      case MainFile.FileType of
+                          at_Mp3: begin
+                                if doUpdateTrack then MainFile.Mp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', strTrack);
+                                if doUpdateAlbum then MainFile.Mp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', strAlbum);
+                          end;
+                          at_Ogg: ;
+                          at_Flac: ;
+                          at_M4A: ;
+                          at_Monkey,
+                          at_WavPack,
+                          at_MusePack,
+                          at_OptimFrog,
+                          at_TrueAudio: ;
+                          // at_Invalid: ;at_Wma: ; at_Wav: ;
+                      end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+
+
+(*
 function TAudioFile.SetAudioData(allowChange: Boolean): TNempAudioError;
 var MainFile: TGeneralAudioFile;
 begin
@@ -2471,7 +2780,7 @@ begin
         // delete Tags-Frame
         aMp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
-
+    {
     if isZero(TrackGain) then
         aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', '')
     else
@@ -2483,7 +2792,7 @@ begin
     else
         aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', GainValueToString(AlbumGain));
 
-
+     }
     {fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_album_gain');
     fTrackGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_track_gain');
 
@@ -2560,6 +2869,7 @@ begin
     else aBaseApeFile.SetValueByKey(APE_RATING     , '');
     aBaseApeFile.SetValueByKey(APE_CATEGORIES , String(RawTagLastFM));
 end;
+*)
 
 
 {

@@ -1305,8 +1305,8 @@ begin
     // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
     aAudioFile.GetAudioData(aAudioFile.Pfad);
     aAudioFile.RawTagLastFM := newTags;
-
-    aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
+    aErr := aAudioFile.WriteRawTagsToMetaData(aAudioFile.RawTagLastFM, Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
+    //aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
     if aErr = AUDIOERR_None then
     begin
         aAudioFile.ID3TagNeedsUpdate := False;

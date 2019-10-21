@@ -37,7 +37,7 @@ unit Hilfsfunktionen;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Windows, Messages, System.SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, bass,  ShlObj, ActiveX, ClipBrd, ShellApi, StrUtils, WinSock,
   Inifiles, ExtCtrls, Jpeg, PNGImage,
   math, contNrs, consts, OneInst, DateUtils,
@@ -655,7 +655,7 @@ begin
         result := 0
     else
     begin
-        GetLocaleFormatSettings(GetUserDefaultLCID, formatSettings);
+        formatSettings := TFormatSettings.Create(GetThreadLocale);
         formatSettings.DecimalSeparator := '.';
         if not TryStrToFloat(Copy(aGainString, 1, Length(aGainString) - 3 ), result, formatSettings)
             then result := 0;
@@ -669,7 +669,7 @@ begin
         result := ''
     else
     begin
-        GetLocaleFormatSettings(GetUserDefaultLCID, formatSettings);
+        formatSettings := TFormatSettings.Create(GetThreadLocale);
         formatSettings.DecimalSeparator := '.';
         if aGainValue > 0 then
             result := Format('+%.2f dB', [aGainValue], formatSettings)

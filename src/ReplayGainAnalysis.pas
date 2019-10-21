@@ -37,14 +37,16 @@ const
     SampleBufferSize = 4096;
 
     // some error Values
-    RG_ERR_None                 = 0; // everything is ok :)
+    RG_ERR_None                  = 0; // everything is ok :)
     // I do not start with 1, so theses codes differ from the BASS ErrorCodes
-    RG_ERR_TooManyChannels      = 101;  // The audiostream contains more than 2 channels
-    RG_ERR_No16Bit              = 102;  // the audiostream does not contain 16bit samples
-    RG_ERR_FreqNotSupported     = 103;  // the samplerate of the audiostream is not supported
-    RG_ERR_AlbumGainFreqChanged = 104;  // the list of audiofiles contains different samplerates
-                                        // in that case, calculation of AlbumGain is not possible and will be skipped
-                                        // at the end of the method CalculateAlbumGain
+    RG_ERR_TooManyChannels       = 101;  // The audiostream contains more than 2 channels
+    RG_ERR_No16Bit               = 102;  // the audiostream does not contain 16bit samples
+    RG_ERR_InitGainAnalysisError = 103;  // error from the original ReplayGain-Unit,
+                                         // probably the samplerate of the audiostream is not supported
+    RG_ERR_AlbumGainFreqChanged  = 104;  // the list of audiofiles contains different samplerates
+                                         // in that case, calculation of AlbumGain is not possible and will be skipped
+                                         // at the end of the method CalculateAlbumGain
+
 
 type
 
@@ -76,8 +78,15 @@ type
         fAlbumGainCalculationFailed: Boolean;
         fSomeCalculationsDone: Boolean;
 
+        fFileCount: Integer;
+
         fPeakTrack: SmallInt;
         fPeakAlbum: SmallInt;
+        fTrackGain: TFloat;
+        fAlbumGain: TFloat;
+        fCurrentIndex: Integer;
+        fLastErrorCode: Integer;
+
         fLeftSamples:  array[0..SampleBufferSize-1] of TFloat;
         fRightSamples: array[0..SampleBufferSize-1] of TFloat;
 
@@ -125,15 +134,27 @@ type
         function RGAnalyse(nSamples: Integer): LongInt;
 
         /// calculate TrackGain for the current track
-        function fCalculateTrack(aIndex: Integer; SingleTrack: Boolean): TFloat;
+        function fCalculateTrack(aIndex: Integer; AlbumGainWanted, SingleTrack: Boolean): TFloat;
 
     public
         property PeakTrack: SmallInt read fPeakTrack;
         property PeakAlbum : SmallInt read fPeakAlbum ;
+        property TrackGain: TFloat read fTrackGain;
+        property AlbumGain: TFloat read fAlbumGain;
+
+        property AlbumGainCalculationFailed: Boolean read fAlbumGainCalculationFailed;
+        property SomeCalculationsDone: Boolean read fSomeCalculationsDone;
+
+        property LastErrorCode: Integer read fLastErrorCode;
+        property CurrentIndex: Integer read fCurrentIndex;
+
         property ChannelLength : Cardinal read fChannelLength ;
         property ChannelCount  : Cardinal read fChannelCount  ;
         property ChannelFreq   : Cardinal read fChannelFreq   ;
         property CurrentFilename : UnicodeString read fCurrentFilename;
+
+        // the number of files in the AlbumList for CalculateAlbumGain
+        property FileCount : Integer read fFileCount;
 
 
         ///  some Events triggered during the GainCalculation
@@ -164,7 +185,8 @@ type
         destructor Destroy; Override;
 
         ///  Calculate TrackGain for a single Title
-        function CalculateTrackGain(aAudioFile: UnicodeString): TFloat;
+        function CalculateTrackGain(aAudioFile: UnicodeString): TFloat;    overload;
+        function CalculateTrackGain(aAudioFile: UnicodeString; aIndex: Integer): TFloat; overload;
 
         ///  Calculate TrackGain and AlbumGain for a List of Titles
         ///  Use the Events from above to get the result values for the different Tracks
@@ -193,10 +215,31 @@ end;
 
 
 function TReplayGainCalculator.fInitGainCalculation(aFreq: Longint): Longint;
+var localRGerr: Integer;
 begin
-    result := InitGainAnalysis(aFreq);
-    fLastGainInitFreq := aFreq;
-    fSomeCalculationsDone := False;
+    // the orginal return values from the replaygain.dll does not fit into the system here
+    // we use (OK <=> ErrorCode=0)
+    // but replaygaion.dll uses
+    //  INIT_GAIN_ANALYSIS_ERROR = 0;
+    //  INIT_GAIN_ANALYSIS_OK    = 1;
+     localRGerr := InitGainAnalysis(aFreq);
+
+    if localRGerr = INIT_GAIN_ANALYSIS_OK then
+    begin
+        fLastGainInitFreq := aFreq;
+        fSomeCalculationsDone := False;
+        fLastErrorCode := RG_ERR_None;
+    end else
+    begin
+        fLastGainInitFreq := 0;
+        fSomeCalculationsDone := False;
+        fLastErrorCode := RG_ERR_InitGainAnalysisError;
+
+        if assigned(fOnError) then
+            fOnError(self, RG_ERR_InitGainAnalysisError);
+    end;
+
+    result := fLastErrorCode;
 end;
 
 {
@@ -215,10 +258,18 @@ begin
         BASS_StreamFree(fStream);
     fStream := BASS_StreamCreateFile(false, PChar(aFilename), 0, 0, BASS_UNICODE OR BASS_STREAM_DECODE);
     if (fStream = 0) then
-        result := Bass_ErrorGetCode
+    begin
+        fLastErrorCode   := Bass_ErrorGetCode;
+        fCurrentFilename := aFilename;
+        fPeakTrack       := 0;
+        fChannelLength   := 0;
+        fChannelCount    := 0;
+        fChannelFreq     := 0;
+        fChannelIs16Bit  := False;
+    end
     else
     begin
-        result := 0;
+        fLastErrorCode := 0;
         fPeakTrack := 0;
         fCurrentFilename := aFilename;
         fChannelLength := BASS_ChannelGetLength(fStream, BASS_POS_BYTE);
@@ -230,8 +281,11 @@ begin
                 ((ChannelInfo.flags AND BASS_SAMPLE_FLOAT) = BASS_SAMPLE_FLOAT)     );
     end;
 
+    result := fLastErrorCode;
+
+    // trigger event to display Information about the current stream .... fChannelCount, fChannelFreq, ...
     if assigned(fOnStreamInit) then
-        fOnStreamInit(self, result);
+        fOnStreamInit(self, fLastErrorCode);
 end;
 
 procedure TReplayGainCalculator.FreeStream;
@@ -252,18 +306,21 @@ end;
 }
 function TReplayGainCalculator.CheckNewStreamProperties(AlbumGainWanted: Boolean): Integer;
 begin
-    result := RG_ERR_None;
+    fLastErrorCode := RG_ERR_None;
+    result := fLastErrorCode;
 
     if fchannelCount > 2 then
     begin
-        result := RG_ERR_TooManyChannels;
+        fLastErrorCode := RG_ERR_TooManyChannels;
+        result := fLastErrorCode;
         if assigned(fOnError) then
             fOnError(self, RG_ERR_TooManyChannels);
     end
     else
         if Not fChannelIs16Bit then
         begin
-            result := RG_ERR_No16Bit;
+            fLastErrorCode := RG_ERR_No16Bit;
+            result := fLastErrorCode;
             if assigned(fOnError) then
                 fOnError(self, RG_ERR_No16Bit);
         end
@@ -271,12 +328,19 @@ begin
             if self.fChannelFreq <> fLastGainInitFreq then
             begin
                 // ReInit GainAnalysis
-                if fInitGainCalculation(fChannelFreq) <> INIT_GAIN_ANALYSIS_OK then
-                    result := RG_ERR_FreqNotSupported; // probably that's the cause here
+                if fInitGainCalculation(fChannelFreq) <> RG_ERR_None then
+                begin
+                    // fLastErrorCode was set in fInitGainCalculation
+                    result := fLastErrorCode;
+                end;
 
                 if AlbumGainWanted then
                 begin
                     fAlbumGainCalculationFailed := True;
+                    fLastErrorCode := RG_ERR_AlbumGainFreqChanged;
+                    // DO NOT set result := fLastErrorCode; in this case
+                    // we will continue calculating TrackGain-Values, but we skip AlbumGain
+                    // however: do trigger an event to notify the main application // user
                     if assigned(fOnError) then
                         fOnError(self, RG_ERR_AlbumGainFreqChanged);
                 end;
@@ -303,8 +367,11 @@ begin
 
     if bytesread = -1 then
     begin
+        flastErrorCode := BASS_ErrorGetCode;
+        // No data was read. One possible cause: BASS_ERROR_ENDED
+        // This will result in an error-event, but it should not be treated as one in the EventHandler.
         if assigned(fOnError) then
-            fOnError(self, BASS_ErrorGetCode);
+            fOnError(self, flastErrorCode);
     end else
     begin
         case fChannelCount  of
@@ -349,14 +416,17 @@ begin
 end;
 
 
-function TReplayGainCalculator.fCalculateTrack(aIndex: Integer; SingleTrack: Boolean): TFloat;
+function TReplayGainCalculator.fCalculateTrack(aIndex: Integer; AlbumGainWanted, SingleTrack: Boolean): TFloat;
 var LastProgressReport, currentProgress: Cardinal;
 begin
     ///  First, check the properties of the stream.
     ///  Within CheckNewStreamProperties, the OnError-Event is triggered if something goes wrong.
     ///  The Parameter ErrorCode contains one of the RG_ERR_** constants defined in this Unit.
-    if CheckNewStreamProperties(Not SingleTrack) <> RG_ERR_None then
-        result := 0
+    if CheckNewStreamProperties(AlbumGainWanted) <> RG_ERR_None then
+    begin
+        result := 0;
+        // Error-Event was triggered in CheckNewStreamProperties, if an error occured
+    end
     else
     begin
         // Channel properties are supported, continue
@@ -380,18 +450,20 @@ begin
             end;
         end;
 
-        result := GetTitleGain;
+        fTrackGain := GetTitleGain;
+        result := fTrackGain;
+
         fSomeCalculationsDone := True;
 
         /// trigger the proper "OnComplete" event
         if SingleTrack then
         begin
             if assigned(fOnSingleTrackComplete) then
-                fOnSingleTrackComplete(self, 0, result, fPeakTrack)
+                fOnSingleTrackComplete(self, 0, fTrackGain, fPeakTrack)
         end else
         begin
             if assigned(self.fOnTrackComplete) then
-                fOnTrackComplete(self, aIndex, result, fPeakTrack)
+                fOnTrackComplete(self, aIndex, fTrackGain, fPeakTrack)
         end;
     end;
 end;
@@ -399,12 +471,25 @@ end;
 function TReplayGainCalculator.CalculateTrackGain(aAudioFile: UnicodeString): TFloat;
 begin
     result := 0;
+    fFileCount := 1;
     ///  For Error handling during calculation use the event OnStreamInit,
     ///  which is triggered by InitStreamFromFilename
     ///  The Parameter ErrorCode contains the result from BASS_ErrorGetCode
     if InitStreamFromFilename(aAudioFile) = 0 then
-        result := fCalculateTrack(0, True);
+        result := fCalculateTrack(0, False, True);
 
+    FreeStream;
+end;
+
+function TReplayGainCalculator.CalculateTrackGain(aAudioFile: UnicodeString; aIndex: Integer): TFloat;
+begin
+    result := 0;
+    fFileCount := 1;
+    ///  For Error handling during calculation use the event OnStreamInit,
+    ///  which is triggered by InitStreamFromFilename
+    ///  The Parameter ErrorCode contains the result from BASS_ErrorGetCode
+    if InitStreamFromFilename(aAudioFile) = 0 then
+        result := fCalculateTrack(aIndex, False, False);
     FreeStream;
 end;
 
@@ -412,18 +497,29 @@ function TReplayGainCalculator.CalculateAlbumGain(
   AudioFiles: TStringList): TFloat;
 var i: Integer;
 begin
-    result := 0;
-    if AudioFiles.Count = 0 then
+    result     := 0;
+    fTrackGain := 0;
+    fAlbumGain := 0;
+    fPeakAlbum := 0;
+    fFileCount := 0;
+
+    fLastGainInitFreq := 0;
+    fAlbumGainCalculationFailed := False;
+    fSomeCalculationsDone       := False;
+
+    if (not assigned(AudioFiles)) or (AudioFiles.Count = 0) then
         exit;
 
-    fPeakAlbum := 0;
-    fAlbumGainCalculationFailed := False;
+    fFileCount := AudioFiles.Count;
 
     // initiate AlbumGain calculation with the first AudioFile in the list.
     if InitStreamFromFilename(AudioFiles[0]) = 0 then
     begin
-        if fInitGainCalculation(fChannelFreq) = INIT_GAIN_ANALYSIS_OK then
-            fCalculateTrack(0, False);
+        // difference to the for-loop:
+        // we call fInitGainCalculation directly, not only indirectly through
+        // fCalculateTrack->CheckNewStreamProperties->"if freq changed"
+        if fInitGainCalculation(fChannelFreq) = RG_ERR_None then
+            fCalculateTrack(0, True, False);
 
         fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
     end;
@@ -431,12 +527,13 @@ begin
 
     // for the rest of the titles do *not* call fInitGainCalculation again
     //  ... unless it is needed due to a samplerate change.
-    //      But in that case AlbumGain is kinda pointless, therefore it  is skipped later
+    //  ... which is the case, if the first title failed (by InitStreamFromFilename OR fInitGainCalculation)
+    //      But in that case AlbumGain is kinda pointless, therefore it is skipped later
     for i := 1 to AudioFiles.Count - 1 do
     begin
         if InitStreamFromFilename(AudioFiles[i]) = 0 then
         begin
-            fCalculateTrack(i, False);
+            fCalculateTrack(i, True, False);
             fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
         end;
         FreeStream;
@@ -446,13 +543,16 @@ begin
     if Not fAlbumGainCalculationFailed then
     begin
         if fSomeCalculationsDone then
-            result := GetAlbumGain
+            fAlbumGain := GetAlbumGain
         else
-            result := 0;
+            fAlbumGain := 0;
+
+        result := fAlbumGain;
         if assigned(fOnAlbumComplete) then
-            fOnAlbumComplete(self, AudioFiles.Count, result, fPeakAlbum);
+            fOnAlbumComplete(self, AudioFiles.Count, fAlbumGain, fPeakAlbum);
     end else
     begin
+        fAlbumGain := 0;
         if assigned(fOnAlbumComplete) then
             fOnAlbumComplete(self, -1, 0, 0);
     end;
