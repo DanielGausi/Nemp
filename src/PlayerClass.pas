@@ -34,7 +34,7 @@ unit PlayerClass;
 interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
-      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils,
+      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math,
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
@@ -111,6 +111,10 @@ type
       fDoSilenceDetection: Boolean;
       fSilenceThreshold: Integer;
 
+      fApplyReplayGain: Boolean;
+      fPreferAlbumGain: Boolean;
+      fDefaultGain    : Single;
+
       fStatus: Integer;       // Playing, paused, stopped
       fStopStatus: Integer;   // "normal Stop" or "Stop after title"
 
@@ -167,6 +171,8 @@ type
 
       function EqualizerIsNeeded: boolean;
       procedure InitStreamEqualizer(aStream: DWord);
+      procedure ApplyReplayGainToStream(aStream: DWord; aAudioFile: TAudioFile);
+
 
       // Setter/getter for some properties
       procedure SetVolume(Value: Single);         // Volume
@@ -312,6 +318,10 @@ type
         EqMainHnd : DWord;
         EqSlideHnd : DWord;
 
+        // ReplayGain
+        RGVolumeMain,
+        RGVolumeSlide : BASS_BFX_VOLUME;
+
         //Compressor
         BassCompress: BASS_BFX_COMPRESSOR;
         BassFXEcho : BASS_DX8_ECHO;
@@ -395,6 +405,10 @@ type
 
         property DoSilenceDetection: Boolean read fDoSilenceDetection write fDoSilenceDetection;
         property SilenceThreshold: Integer read fSilenceThreshold write fSilenceThreshold;
+
+        property ApplyReplayGain: Boolean read fApplyReplayGain write fApplyReplayGain  ;
+        property PreferAlbumGain: Boolean read fPreferAlbumGain write fPreferAlbumGain ;
+        property DefaultGain: Single read fDefaultGain write fDefaultGain;
 
         property PrescanInProgress: Boolean read fPrescanInProgress;
 
@@ -1008,6 +1022,11 @@ begin
   DoSilenceDetection    := ini.ReadBool('Player', 'DoSilenceDetection', True);
   SilenceThreshold      := Ini.ReadInteger('Player', 'SilenceThreshold', -40);
 
+  ApplyReplayGain       := ini.ReadBool('Player', 'ApplyReplayGain', True);
+  PreferAlbumGain       := ini.ReadBool('Player', 'PreferAlbumGain', True);
+  DefaultGain           := ini.ReadFloat('Player', 'DefaultGain', 0);
+
+
   fPlayingTitelMode     := ini.ReadInteger('Player','AnzeigeModus',0);
   UseVisualization      := ini.ReadBool('Player','UseVisual',True);
   VisualizationInterval := ini.ReadInteger('Player','Visualinterval',40);
@@ -1112,6 +1131,10 @@ begin
 
   ini.WriteBool('Player', 'DoSilenceDetection', DoSilenceDetection);
   ini.WriteInteger('Player', 'SilenceThreshold', SilenceThreshold);
+
+  ini.WriteBool('Player', 'ApplyReplayGain', ApplyReplayGain);
+  ini.WriteBool('Player', 'PreferAlbumGain', PreferAlbumGain);
+  ini.WriteFloat('Player', 'DefaultGain', DefaultGain);
 
   ini.WriteInteger('Player','AnzeigeModus', fPlayingTitelMode);
   ini.WriteBool('Player','UseVisual', UseVisualization);
@@ -1436,6 +1459,7 @@ begin
       BASS_ChannelGetAttribute(Mainstream, BASS_ATTRIB_FREQ, OrignalSamplerate{!!});
       InitStreamEqualizer(MainStream);
 
+      ApplyReplayGainToStream(Mainstream, MainAudioFile);
 
       // URL oder Dateiname??
       // BEI URLS ist einiges etwas anders - z.B. kein Tempo
@@ -1492,6 +1516,8 @@ begin
                 SlideStream := NEMP_CreateStream(MainAudioFile, AvoidMickyMausEffect, False, ScanMode);
                 SetEndSyncs(SlideStream);
                 InitStreamEqualizer(SlideStream);
+                ApplyReplayGainToStream(SlideStream, MainAudioFile);
+
                 if MainStreamIsTempoStream then
                     BASS_ChannelSetAttribute(SlideStream, BASS_ATTRIB_TEMPO, fSampleRateFaktor * 100 - 100)
                 else
@@ -2514,6 +2540,34 @@ begin
       BassFXEcho.fLeftDelay := fEchoTime;
       BassFXEcho.fRightDelay := fEchoTime;
       BASS_FXSetParameters(EchoSlideHnd, @BassFXEcho);
+end;
+
+procedure TNempPlayer.ApplyReplayGainToStream(aStream: DWord; aAudioFile: TAudioFile);
+var localRGVolume: BASS_BFX_VOLUME;
+    rgHandle: HFX;
+    aGain: Double;
+begin
+    if not ApplyReplayGain then
+        // do nothing
+        exit;
+
+    aGain := 0;
+    if PreferAlbumGain then
+        aGain := aAudioFile.AlbumGain;
+
+    if IsZero(aGain) then
+        aGain := aAudioFile.TrackGain;
+
+    if isZero(aGain) then
+        aGain := fDefaultGain;
+
+    if not isZero(aGain) then
+    begin
+        rgHandle := BASS_ChannelSetFX(astream, BASS_FX_BFX_VOLUME, 1);
+        localRGVolume.lChannel := 0;
+        localRGVolume.fVolume := power(10, aGain/20);
+        BASS_FXSetParameters(rgHandle, @localRGVolume);
+    end;
 end;
 
 procedure TNempPlayer.Flutter(aValue: single; t: Integer);
@@ -3901,6 +3955,9 @@ begin
 
         InitStreamEqualizer(ThreadedMainStream);
         InitStreamEqualizer(ThreadedSlideStream);
+
+        ApplyReplayGainToStream(ThreadedMainStream, MainAudioFile);
+        ApplyReplayGainToStream(ThreadedSlideStream, MainAudioFile);
 
         // Set Volume
         //if UseFading AND fReallyUseFading

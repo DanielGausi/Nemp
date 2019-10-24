@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabSystem2
+      ActivePage = TabPlayer0
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2117,10 +2117,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
       end
-      object TabView2: TTabSheet
-        Caption = 'XXX (Vis)'
-        ImageIndex = 20
-      end
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
@@ -3599,12 +3595,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_TabAudio2_Silence: TGroupBox
           Left = 8
-          Top = 288
+          Top = 449
           Width = 439
           Height = 93
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Silence detection'
-          TabOrder = 2
+          TabOrder = 3
           object Lbl_SilenceThreshold: TLabel
             Left = 32
             Top = 43
@@ -3643,6 +3639,76 @@ object OptionsCompleteForm: TOptionsCompleteForm
             MinValue = -100
             TabOrder = 1
             Value = -40
+          end
+        end
+        object GrpBox_TabAudio2_ReplayGain: TGroupBox
+          Left = 12
+          Top = 291
+          Width = 439
+          Height = 158
+          Caption = 'ReplayGain'
+          TabOrder = 2
+          object Label1: TLabel
+            Left = 16
+            Top = 111
+            Width = 409
+            Height = 34
+            AutoSize = False
+            Caption = 
+              'Please have a look into the documentation how ReplayGain works i' +
+              'n Nemp.'
+            WordWrap = True
+          end
+          object lblDefaultGainValue: TLabel
+            Left = 376
+            Top = 85
+            Width = 37
+            Height = 13
+            Caption = '0.00 dB'
+          end
+          object lblReplayGainDefault: TLabel
+            Left = 16
+            Top = 65
+            Width = 59
+            Height = 13
+            Caption = 'Default Gain'
+          end
+          object cb_ApplyReplayGain: TCheckBox
+            Left = 16
+            Top = 17
+            Width = 409
+            Height = 17
+            Hint = 
+              'Use ReplayGain values to achieve a more consistent loudness duri' +
+              'ng playback.'
+            Caption = 'Use ReplayGain for a more consistent loudness during playback'
+            TabOrder = 0
+            OnClick = cb_ApplyReplayGainClick
+          end
+          object cb_PreferAlbumGain: TCheckBox
+            Left = 16
+            Top = 35
+            Width = 404
+            Height = 17
+            Hint = 
+              'Use AlbumGain values to maintain intentional loudness changes wi' +
+              'thin albums'
+            Caption = 'Prefer AlbumGain'
+            TabOrder = 1
+          end
+          object tp_DefaultGain: TNempTrackBar
+            Left = 16
+            Top = 81
+            Width = 354
+            Height = 24
+            Max = 200
+            Min = -200
+            PageSize = 10
+            TabOrder = 2
+            TickMarks = tmBoth
+            TickStyle = tsNone
+            OnChange = tp_DefaultGainChange
+            OnMouseDown = tp_DefaultGainMouseDown
           end
         end
       end

@@ -1015,6 +1015,12 @@ ProgressForm_ScanNewFiles    = 'Nemp is scanning the new music files for metadat
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
 
+Progressform_ReplayGain = 'Nemp is calculating ReplayGain values right now. This may take a while.';
+Progressform_ReplayGain_Complete = 'Calculation of ReplayGain complete. The values have been written to the metadata of the files.';
+Progressform_ReplayGain_Cancelled = 'Calculation of ReplayGain aborted. Some values may have been already written to the metadata of the files.';
+
+Progressform_ReplayGain_AlreadyRunning = 'ReplayGain calculation is already running. Please wait until the current calculation is finished.';
+
 Playlist_StartSearchingFiles  = 'Searching for music files ...';
 Playlist_SearchingNewFilesDir    = 'Searching for music files ... %s';
 Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The new files have been added to your playlist.';

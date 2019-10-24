@@ -135,7 +135,7 @@ uses
   EffectsAndEqualizer in 'EffectsAndEqualizer.pas' {FormEffectsAndEqualizer},
   MainFormBuilderForm in 'MainFormBuilderForm.pas' {MainFormBuilder},
   NempFileUtils in 'NempFileUtils.pas',
-  _TestUnit in '_TestUnit.pas' {TestForm},
+  ReplayGainProgress in 'ReplayGainProgress.pas' {ReplayGainProgressForm},
   ReplayGain in '3rd Party Units\ReplayGain.pas',
   ReplayGainAnalysis in 'ReplayGainAnalysis.pas',
   NempReplayGainCalculation in 'NempReplayGainCalculation.pas';
@@ -148,7 +148,7 @@ var EVILHACKX, EVILHACKY: INTEGER;
 
 begin
 
-    ReportMemoryLeaksOnShutdown := False;
+    ReportMemoryLeaksOnShutdown := True;
 
     Application.Initialize;
 
@@ -173,7 +173,7 @@ ShowWindow
   Application.CreateForm(TNemp_MainForm, Nemp_MainForm);
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
-  Application.CreateForm(TTestForm, TestForm);
+  Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

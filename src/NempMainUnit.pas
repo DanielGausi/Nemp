@@ -336,7 +336,6 @@ type
     Win7TaskBarPopup: TPopupMenu;
     test1: TMenuItem;
     N67: TMenuItem;
-    N68: TMenuItem;
     PM_PL_ShowInExplorer: TMenuItem;
     N69: TMenuItem;
     MM_T_CloudEditor: TMenuItem;
@@ -451,7 +450,6 @@ type
     PM_ML_EnqueueBrowse: TMenuItem;
     PM_ML_PlayBrowse: TMenuItem;
     PM_ML_PlayNextBrowse: TMenuItem;
-    N10: TMenuItem;
     PM_ML_SortBy: TMenuItem;
     PM_ML_SortAscending: TMenuItem;
     PM_ML_SortDescending: TMenuItem;
@@ -595,6 +593,18 @@ type
     MM_T_EqualizerEffects: TMenuItem;
     PM_P_EqualizerEffects: TMenuItem;
     BtnMinimize: TSkinButton;
+    N24: TMenuItem;
+    PM_PL_ReplayGain: TMenuItem;
+    PM_PL_ReplayGain_SingleTracks: TMenuItem;
+    PM_PL_ReplayGain_OneAlbum: TMenuItem;
+    PM_PL_ReplayGain_MultiAlbums: TMenuItem;
+    PM_PL_ReplayGain_Clear: TMenuItem;
+    PM_ML_ReplayGain: TMenuItem;
+    PM_ML_ReplayGain_SingleTracks: TMenuItem;
+    PM_ML_ReplayGain_OneAlbum: TMenuItem;
+    PM_ML_ReplayGain_MultiAlbum: TMenuItem;
+    PM_ML_ReplayGain_Clear: TMenuItem;
+    N27: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1157,6 +1167,7 @@ type
     procedure __MainContainerPanelMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure BtnMinimizeClick(Sender: TObject);
+    procedure PM_PL_ReplayGain_Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -1189,6 +1200,8 @@ type
     LastPaintedTime: Integer;
 
     FormReadyAndActivated : Boolean;
+
+    DeleteAudioFilesAfterHandled: Boolean;
 
 
     procedure OwnMessageProc(var msg: TMessage);
@@ -1384,7 +1397,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   ExtendedControlsUnit, fspControlsExt, CloudEditor,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
-  MainFormBuilderForm;
+  MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation;
 
 
 {$R *.dfm}
@@ -3347,6 +3360,7 @@ var i:integer;
     imax: integer;
     tmp: PvirtualNode;
 begin
+
     if aList.Count = 0 then exit;
 
     (aList[0] as TAudiofile).ReCheckExistence;
@@ -3443,6 +3457,7 @@ begin
   ///  4:   tagcloud     (unused)
 
   result := True;
+  DeleteAudioFilesAfterHandled := False;
   case what of
       0, 100: begin // BrwoseMode=0 ... Artist / Album
           aNode := ArtistsVST.FocusedNode;
@@ -3468,10 +3483,19 @@ begin
               Album := BROWSE_ALL;
 
           if (Artist = BROWSE_PLAYLISTS) and (Album <> BROWSE_ALL) then //(letzteres sollte immer so sein ;-))
-              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan)
+          begin
+              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan);
+              if OnlyTemporaryFiles then
+                  DeleteAudioFilesAfterHandled := True;
+                  // the AudioFiles loaded into aList are only used temporarily (e.g. to fill a DragDropList with proper Filenames)
+                  // but these files from LoadPlaylistFromFile are only referenced in this list now
+                  // => MemoryLeak
+                  // => delete the AudioFile-Objects after their temporary usage is done.
+          end
           else
               if (Artist = BROWSE_RADIOSTATIONS) and (Album <> BROWSE_ALL) then //(letzteres sollte immer so sein ;-))
               begin
+
                   if Integer(aNode.Index) < MedienBib.RadioStationList.Count then
                   begin
                       result := False;
@@ -7321,6 +7345,76 @@ begin
     AktualisiereDetailForm(AudioFile, SD_Playlist, True);
 end;
 
+procedure TNemp_MainForm.PM_PL_ReplayGain_Click(Sender: TObject);
+var aVST: TVirtualStringtree;
+    Data: PTreeData;
+    SelectedMp3s: TNodeArray;
+    i: Integer;
+    FileList: TObjectList;
+    RGMode: TRGCalculationMode;
+    CopyFiles: Boolean;
+begin
+
+    if assigned(NempReplayGainCalculator) then
+    begin
+        TranslateMessageDLG((Progressform_ReplayGain_AlreadyRunning), mtInformation, [MBOK], 0);
+        exit;
+    end;
+
+    if MedienBib.StatusBibUpdate <> 0 then
+    begin
+        TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+        exit;
+    end;
+
+    // determine Source and ReplayGain calculation setting
+    if (Sender as TMenuItem).Tag >= 100 then
+        aVST := self.PlaylistVST
+    else
+        aVST := self.VST;
+
+    case (Sender as TMenuItem).Tag Mod 100 of
+        0: RGMode := RG_Calculate_SingleTracks  ;
+        1: RGMode := RG_Calculate_SingleAlbum   ;
+        2: RGMode := RG_Calculate_MultiAlbums   ;
+        3: RGMode := RG_Delete_ReplayGainValues ;
+    else
+        RGMode := RG_Calculate_SingleTracks  ;
+    end;
+
+    // collect files to scan from the TreeView
+    FileList := TObjectList.Create(False);
+    try
+        SelectedMp3s := aVST.GetSortedSelection(False);
+        for i := 0 to length(SelectedMp3s) - 1 do
+        begin
+            if aVST.GetNodeLevel(Selectedmp3s[i]) = 0 then
+            begin
+                Data := aVST.GetNodeData(SelectedMP3s[i]);
+                // only add actual files (no webradio, CDDA, ..)
+                if Data^.FAudioFile.IsFile then
+                    FileList.Add(Data^.FAudioFile);
+            end;
+        end;
+
+        // sort the list by Album for AlbumGain calculation
+        FileList.Sort(Sortieren_AlbumTrack_asc);
+
+        // if the source is the Playlist-VST, or the Library-VST is showing PlaylistFiles, then we
+        // have to copy the files for the ReplayGain Calculator.
+        CopyFiles :=   (aVst = PlaylistVST)
+                    OR ((aVst = VST) and MedienBib.AnzeigeShowsPlaylistFiles);
+
+        // start the calculation in a secondary thread
+        ReplayGainProgressForm.Show;
+        ReplayGainProgressForm.InitiateReplayGainCalculation(FileList, RGMode, CopyFiles);
+
+    finally
+        FileList.Free;
+    end;
+end;
+
+// replayGain-Calculation from the "Browse-Lists, Coverflow, TagCloud"
 procedure TNemp_MainForm.PlaylistVSTChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
 var aNode: PVirtualNode;
@@ -8096,6 +8190,9 @@ begin
     ClipCursor(Nil);
     PM_PL_ExtendedPasteFromClipboard.Enabled := Clipboard.HasFormat(CF_HDROP);
     PM_PL_ExtendedAddToMedialibrary.Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
+
+    PM_PL_ReplayGain.Enabled := SomeFilesSelected AND LibraryNotBlockedByPartymode and LibraryIsIdle
+                                    AND (Not assigned(NempReplayGainCalculator));
 end;
 
 
@@ -8353,7 +8450,17 @@ begin
                               end;
                           end;
                       end;
-                end; // case Column
+                  end; // case Column 0
+                  1: begin
+                        if (Data.FAudioFile.AudioType = at_File)
+                        AND NOT (
+                              IsZero(Data.FAudioFile.TrackGain)
+                              AND
+                              IsZero(Data.FAudioFile.AlbumGain)
+                            )
+                        then ImageIndex := 16;
+
+                  end;
             end;
         end;
       end;
@@ -9023,7 +9130,7 @@ begin
 
     Dateiliste := TObjectlist.Create(False);
     try
-        GenerateListForHandleFiles(Dateiliste, 0, true);  // was: 2
+        GenerateListForHandleFiles(Dateiliste, 100, true);  // was: 2
         DragSource := DS_VST;
         with DragFilesSrc1 do
         begin
@@ -9043,6 +9150,16 @@ begin
             // This is the START of the drag (FROM) operation.
             Execute;
         end;
+
+        // DeleteAudioFilesAfterHandled was set to TRUE in GenerateListForHandleFiles,
+        // if a Playlist has been dragged. IN that case, new Audiofiles have been created,
+        // which schould be freed again.
+        if DeleteAudioFilesAfterHandled then
+        begin
+            for i := 0 to DateiListe.Count - 1 do
+                (Dateiliste[i] as TAudioFile).Free;
+        end;
+
 
     finally
         FreeAndNil(Dateiliste);
@@ -9531,6 +9648,8 @@ begin
       //5 : SwitchMediaLibrary(1);     // CoverFlow
   end;
 end;
+
+
 
 
 procedure TNemp_MainForm.PM_ML_BrowseByMoreClick(Sender: TObject);

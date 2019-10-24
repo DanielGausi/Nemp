@@ -48,7 +48,7 @@ uses
   Nemp_ConstantsAndTypes, filetypes, Buttons, gnuGettext, languageCodes,
   Nemp_RessourceStrings,  ScrobblerUtils, ExtDlgs, NempCoverFlowClass,
   SkinButtons, NempPanel, MyDialogs, Vcl.Mask, System.UITypes, Generics.Collections,
-  System.Generics.Defaults
+  System.Generics.Defaults, NempTrackBar
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF};
 
 type
@@ -227,7 +227,6 @@ type
     GrpBox_ViewPartymode_Password: TGroupBox;
     Edt_PartyModePassword: TLabeledEdit;
     cb_PartyMode_ShowPasswordOnActivate: TCheckBox;
-    TabView2: TTabSheet;
     TabView3: TTabSheet;
     GrpBox_Fonts: TGroupBox;
     LblConst_FontVBR: TLabel;
@@ -524,6 +523,13 @@ type
     BtnLyricPriorities: TUpDown;
     LblLyricPriorities: TLabel;
     cb_AutoStopHeadsetAddToPlayist: TCheckBox;
+    GrpBox_TabAudio2_ReplayGain: TGroupBox;
+    cb_ApplyReplayGain: TCheckBox;
+    cb_PreferAlbumGain: TCheckBox;
+    Label1: TLabel;
+    tp_DefaultGain: TNempTrackBar;
+    lblDefaultGainValue: TLabel;
+    lblReplayGainDefault: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -628,6 +634,10 @@ type
     procedure BtnLyricPrioritiesClick(Sender: TObject; Button: TUDBtnType);
     procedure VSTLyricSettingsNodeDblClick(Sender: TBaseVirtualTree;
       const HitInfo: THitInfo);
+    procedure cb_ApplyReplayGainClick(Sender: TObject);
+    procedure tp_DefaultGainMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure tp_DefaultGainChange(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -880,7 +890,6 @@ begin
 
   TabView0.TabVisible := False;
   TabView1.TabVisible := False;
-  TabView2.TabVisible := False;
   TabView3.TabVisible := False;
   TabView4.TabVisible := False;
 
@@ -1210,6 +1219,14 @@ begin
   Lbl_SilenceThreshold.Enabled := NempPlayer.DoSilenceDetection;
   SE_SilenceThreshold.Enabled  := NempPlayer.DoSilenceDetection;
   Lbl_SilenceDB.Enabled        := NempPlayer.DoSilenceDetection;
+
+  cb_ApplyReplayGain.Checked   := NempPlayer.ApplyReplayGain;
+      cb_PreferAlbumGain.Enabled   := NempPlayer.ApplyReplayGain;
+      lblReplayGainDefault .Enabled   := cb_ApplyReplayGain.Checked;
+      tp_DefaultGain       .Enabled   := cb_ApplyReplayGain.Checked;
+      lblDefaultGainValue  .Enabled   := cb_ApplyReplayGain.Checked;
+  cb_PreferAlbumGain.Checked   := NempPlayer.PreferAlbumGain;
+  tp_DefaultGain.Position := Round(NempPlayer.DefaultGain * 10);
 
   if NempPlayer.MainDevice > 0 then
       MainDeviceCB.ItemIndex := NempPlayer.MainDevice - 1
@@ -1709,6 +1726,22 @@ begin
     end;
 end;
 
+procedure TOptionsCompleteForm.tp_DefaultGainChange(Sender: TObject);
+begin
+    if tp_DefaultGain.Position = 0 then
+        lblDefaultgainValue.Caption := '0.00 dB'
+    else
+        lblDefaultgainValue.Caption := GainValueToString(tp_DefaultGain.Position / 10);
+    //Format('%6.2f dB', [tp_DefaultGain.Position / 10]);
+end;
+
+procedure TOptionsCompleteForm.tp_DefaultGainMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if Button = mbRight then
+        tp_DefaultGain.Position := 0;
+end;
+
 Function TOptionsCompleteForm.ModToIndex(aMod: Cardinal): Integer;
 begin
   case aMod of
@@ -1819,6 +1852,14 @@ begin
   Lbl_SilenceThreshold.Enabled := CB_SilenceDetection.Checked;
   SE_SilenceThreshold.Enabled  := CB_SilenceDetection.Checked;
   Lbl_SilenceDB.Enabled        := CB_SilenceDetection.Checked;
+end;
+
+procedure TOptionsCompleteForm.cb_ApplyReplayGainClick(Sender: TObject);
+begin
+    cb_PreferAlbumGain   .Enabled   := cb_ApplyReplayGain.Checked;
+    lblReplayGainDefault .Enabled   := cb_ApplyReplayGain.Checked;
+    tp_DefaultGain       .Enabled   := cb_ApplyReplayGain.Checked;
+    lblDefaultGainValue  .Enabled   := cb_ApplyReplayGain.Checked;
 end;
 
 procedure TOptionsCompleteForm.RandomWeight05Exit(Sender: TObject);
@@ -2283,6 +2324,10 @@ begin
   NempPlayer.DoSilenceDetection := CB_SilenceDetection.Checked ;
   NempPlayer.SilenceThreshold   := SE_SilenceThreshold.Value   ;
 
+  NempPlayer.ApplyReplayGain  := cb_ApplyReplayGain.Checked;
+  NempPlayer.PreferAlbumGain  := cb_PreferAlbumGain.Checked;
+  NempPlayer.DefaultGain      := tp_DefaultGain.Position / 10;
+
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;
   // NempPlayer.ScrollAnzeigeTitel := CB_ScrollTitleInMainWindow.Checked;
@@ -2290,7 +2335,6 @@ begin
   NempPlayer.ScrollTaskbarDelay :=  (4 - CB_TaskbarDelay.ItemIndex + 1)* 5;
   // NempPlayer.ScrollAnzeigeDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
   // Spectrum.ScrollDelay := (4 - CB_AnzeigeDelay.ItemIndex) * 2;
-
 
   NempPlayer.ReInitAfterSuspend := cbReInitAfterSuspend.Checked;
   NempPlayer.PauseOnSuspend := cbPauseOnSuspend.Checked;
@@ -3156,6 +3200,8 @@ begin
   CB_MOD_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
   CB_Key_Stop.Enabled := (Sender as TCheckBox).Checked AND (Sender as TCheckBox).Enabled;
 end;
+
+
 
 procedure TOptionsCompleteForm.CB_Activate_NextClick(Sender: TObject);
 begin

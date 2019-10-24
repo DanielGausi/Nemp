@@ -4,25 +4,46 @@ interface
 
 uses
   Winapi.Windows, System.Classes, System.Contnrs, System.SysUtils, math, Generics.Collections, Generics.Defaults,
-  NempAudioFiles, ReplayGainAnalysis, Nemp_ConstantsAndTypes;
+  NempAudioFiles, Nemp_ConstantsAndTypes, ReplayGain, bass;
+
+const
+
+    SampleBufferSize = 16384; //4096;
+
+    // some error Values
+    RG_ERR_None                  = 0; // everything is ok :)
+
+    // I do not start with 1, so theses codes differ from the BASS ErrorCodes
+    RG_ERR_TooManyChannels       = 101;  // The audiostream contains more than 2 channels
+    RG_ERR_No16Bit               = 102;  // the audiostream does not contain 16bit samples
+    RG_ERR_InitGainAnalysisError = 103;  // error from the original ReplayGain-Unit,
+                                         // probably the samplerate of the audiostream is not supported
+    RG_ERR_AlbumGainFreqChanged  = 104;  // the list of audiofiles contains different samplerates
+                                         // in that case, calculation of AlbumGain is not possible and will be skipped
+                                         // at the end of the method CalculateAlbumGain
 
 type
 
-  TAudioFileList = class(TObjectList<TAudioFile>);
-  TNempReplayGainCalculator = class;
+    TNempReplayGainCalculator = class;
 
-  TRGStatus = ( RGStatus_StartCalculationSingleTracks,
-                RGStatus_StartCalculationSingleAlbum,
-                RGStatus_StartCalculationMultiAlbum,
-                RGStatus_StartSync,
-                RGStatus_StartDeleteValues,
-                RGStatus_Finished );
+    TAudioFileList = class(TObjectList<TAudioFile>);
 
-  TRGCalculationMode = (RG_Calculate_SingleTracks, RG_Calculate_SingleAlbum, RG_Calculate_MultiAlbums, RG_Delete_ReplayGainValues);
+    TRGCalculationMode = (RG_Calculate_SingleTracks, RG_Calculate_SingleAlbum, RG_Calculate_MultiAlbums, RG_Delete_ReplayGainValues);
 
-  TRGMainProgressEvent = Procedure(RGThread: TNempReplayGainCalculator; AlbumName: String; FileCount: Integer; Progress: TRGStatus) of Object;
+    TRGStatus = ( RGStatus_StartCalculationSingleTracks,
+                  RGStatus_StartCalculationSingleAlbum,
+                  RGStatus_StartCalculationMultiAlbum,
+                  RGStatus_StartSync,
+                  RGStatus_StartDeleteValues,
+                  RGStatus_Finished );
 
-  TRGAudioFileSynchEvent = Procedure(aFile: TAudioFile; aTrackGain, aAlbumGain: Double) of Object;
+
+    TRGNotifyEvent       = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer) of Object;
+    TRGProgressEvent     = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; aProgress: Single) of Object;
+    TRGCompleteEvent     = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt) of Object;
+    TRGMainProgressEvent = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; AlbumName: String; FileCount: Integer; Progress: TRGStatus) of Object;
+
+    TRGAudioFileSynchEvent = Procedure(aFile: TAudioFile; aTrackGain, aAlbumGain: Double) of Object;
 
   // internal Data for preparing the TRGOverallProgressEvent
   TMainProgressData = record
@@ -31,20 +52,13 @@ type
       Progress: TRGStatus;
   end;
 
-  ///  General concept of this Thread
-  ///  1.) The fOn*** methods are the Eventhandler for the TReplayGainCalculator
-  ///      these run in the context of the Thread
-  ///  2.) The properties SynchOn*** and the corresponding fSynchOn*** fields
-  ///      are VCL-methods from the calling form/class/whatever
-  ///  3.) As methods with parameters cannot be called by "Synchronize" directly,
-  ///      we have the DoSynchOn*** methods, which will call the matching fSynchOn**
-  ///      EventHandler with proper parameters
-  ///  In addition to the TReplayGainCalculator-Events, we have
-  ///     DoSynchAudioFile and DOSynchRGOverallProgress
-  ///  These Methods are used for additional Events
-  ///     - Metadata has been written to an file (and should be set in teh AudioFile Object now)
-  ///     - Progress of a Multi-Album-Calculation is starting / start synching / finished
-  ///
+  TMonoSample = SmallInt;
+
+  TStereoSample = record
+      Left:  SmallInt;
+      Right: SmallInt;
+  end;
+
 
   TNempReplayGainCalculator = class(TThread)
   private
@@ -52,59 +66,125 @@ type
       fAudioFiles: TAudioFileList;
       fPaths     : TStringList;
       fAlbums    : TStringList;
-
-      ReplayGainCalculator: TReplayGainCalculator;
+      // For automatic Multi-Album-Calculation
       fCurrentAlbumList: TStringList;
 
-      ///  Forward Eventhandlers for the (threaded) ReplayGainCalculator for the VCL ...
+      //
+      fUseAudioFileCopies : Boolean;
+
+      fLeftSamples:  array[0..SampleBufferSize-1] of TFloat;
+      fRightSamples: array[0..SampleBufferSize-1] of TFloat;
+
+      fStereoBuffer: array[0..SampleBufferSize-1] of TStereoSample;
+      fMonoBuffer  : array[0..SampleBufferSize-1] of TMonoSample;
+
+      fStream: HSTREAM;
+
+      ///  some properties about the current track//stream
+      ///  can be accessed in the fOnStreamInit-Event to display some more info about the track
+      fChannelLength    : Int64;
+      fChannelCount     : Cardinal;
+      fChannelFreq      : Cardinal;
+      fCurrentFilename  : UnicodeString;
+
+      //
+      fChannelIs16Bit   : Boolean;
+      fLastGainInitFreq : Cardinal;
+
+
+      fAlbumGainCalculationFailed: Boolean;
+      fSomeCalculationsDone: Boolean;
+
+      ///  internal variables for ReplayGain Calculation
+      ///  access through parameters in the OnComplete-Events
+      fPeakTrack: SmallInt;
+      fPeakAlbum: SmallInt;
+      fTrackGain: TFloat;
+      fAlbumGain: TFloat;
+
+      ///  the last ErrorCode
+      ///  access through prarmeter in the OnError-Event
+      fLastErrorCode: Integer;
+
+      ///  For AlbumGain it makes sense to calculate all TrackGains of an Album
+      ///  before Updating the MetaData and the AudioFile-Objects
+      ///  In this array all TrackGAin-Values for the current Album are stored
+      ///  access indirectly throught the parameter of the OnSynchAudioFile-Event
+      fCurrentTrackGains: Array of Double;
+
+      ///  a little record with some data for the OnMainProgress-Event
+      fMainProgressData : TMainProgressData;
+
+      ///  Eventhandlers
       ///  See comments below in the property-section
-      fSynchOnStreamInit          : TRGEvent;
-      fSynchOnError               : TRGEvent;
-      fSynchOnStreamProgress      : TRGProgressEvent;
-      fSynchOnSingleTrackComplete : TRGCompleteEvent;
-      fSynchOnTrackComplete       : TRGCompleteEvent;
-      fSynchOnAlbumComplete       : TRGCompleteEvent;
+      fOnStreamInit          : TRGNotifyEvent;
+      fOnError               : TRGNotifyEvent;
+      fOnTrackProgress       : TRGProgressEvent;
+      fOnTrackComplete       : TRGCompleteEvent;
+      fOnAlbumComplete       : TRGCompleteEvent;
       ///  ... and some additional Eventhandlers
-      fSynchOnWriteMetaDataProgress: TRGProgressEvent;
-      fMainProgressData            : TMainProgressData;
-      fSynchRGMainProgress         : TRGMainProgressEvent;
+      fOnWriteMetaDataProgress: TRGProgressEvent;
+      fOnMainProgress         : TRGMainProgressEvent;
+      fOnSynchAudioFile       : TRGAudioFileSynchEvent;
 
+      /// 2 variables for TrackProgress-Events
+      fCurrentTrackProgress  : Single;
+      fLastProgressReport    : Int64;
 
+      fCurrentIndex    : Integer ;
       fFileSynchOffset : Integer;
-      fAlbumGain       : Double ;
-      fOnSynchAudioFile: TRGAudioFileSynchEvent;
 
-      fCurrentProgress  : Single  ;
       fCurrentWriteMetaDataProgress: Single;
-      fCurrentIndex     : Integer ;
-      fCurrentErrorCode : Integer ;
 
       fCalculationMode: TRGCalculationMode;
 
+
+      ///  Init the ReplayGain calculation
+      ///  Basically just a call of "ReplayGain.InitGainAnalysis" from the dll-functions,
+      ///  and some initialisation of private member variables
+      function fInitGainCalculation(aFreq: Longint): Longint;
+
+      ///  InitStreamFromFilename
+      ///  Create a Stream using BASS from the filename and
+      ///  get Information from the Channel (Channels, 16Bit, Freq)
+      ///  returnValue:  BASS_ErrorGetCode if Stream could not be created
+      function InitStreamFromFilename(aFilename: UnicodeString): Integer;
+      ///  Free the stream again
+      procedure FreeStream;
+
+      ///  CheckNewStreamProperties
+      ///  Check, whether Channel values are supported
+      ///    - 16 Bit Channels
+      ///    - 1 or 2 Channels
+      ///    - supported Freq
+      ///    - if AlbumGainWanted: freq is still the same (as from the last initialisation)
+      function CheckNewStreamProperties(AlbumGainWanted: Boolean): Integer;
+
+      ///  Read some AudioSamples from the AudioStream into the Buffer
+      function fReadMonoSamplesFromStream: Integer;
+      function fReadStereoSamplesFromStream: Integer;
+      function ReadAudioSamplesFromStream: Integer;
+
+      ///  Analyse the samples in the buffer
+      procedure fPrepareRGAnalyseMono(nSamples: Integer);
+      procedure fPrepareRGAnalyseStereo(nSamples: Integer);
+      function RGAnalyse(nSamples: Integer): LongInt;
+
+      /// calculate TrackGain for the current track
+      function fCalculateTrack(aIndex: Integer; AlbumGainWanted: Boolean): TFloat;
+
       procedure HandleMainProgress(AlbumName: String; FileCount: Integer; Progress: TRGStatus);
 
+      ///  Synchronize the EventHandlers
       procedure DoSynchOnStreamInit          ;
       procedure DoSynchOnError               ;
       procedure DoSynchOnStreamProgress      ;
-      procedure DoSynchOnSingleTrackComplete ;
       procedure DoSynchOnTrackComplete       ;
       procedure DoSynchOnAlbumComplete       ;
       /// -----------
       procedure DoSynchOnWriteMetaDataProgress;
-      procedure DoSynchAudioFile ;
-      procedure DOSynchRGOverallProgress;
-
-      ///  internal EventHandlers for ReplayGainCalculator
-      ///  These methods basically set some internal variables, so that the parameters from the
-      ///  ReplayGainCalculator can be passed through the VCL by the DoSynch*** methods
-      ///  (using Synchronize(DoSynch***)
-      Procedure fOnStreamInit(aReplayGainCalculator: TReplayGainCalculator; ErrorCode: Integer);
-      procedure fOnTrackProgress(Sender: TReplayGainCalculator; aProgress: Single);
-      procedure fOnSingleTrackComplete(aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
-      procedure fOnTrackComplete(aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
-      procedure fOnAlbumComplete(aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
-      procedure fOnCalculationError(aReplayGainCalculator: TReplayGainCalculator; ErrorCode: Integer);
-
+      procedure DoSynchAudioFile              ;
+      procedure DOSynchRGOverallProgress      ;
 
       function fPrepareNextAlbum(StartIndex: Integer): Integer;
       procedure fUpdateMetaData(aFile: String; aTrackGain, aAlbumGain: Double; Flags: Integer);
@@ -117,48 +197,73 @@ type
       procedure ExecuteMultiAlbums;
       procedure ExecuteDeleteReplayGAinValues;
 
+      ///  Calculate TrackGain only
+      function CalculateTrackGain(aAudioFile: UnicodeString; aIndex: Integer): TFloat;
+
+      ///  Calculate TrackGain and AlbumGain for a List of Titles
+      ///  Use the Events from above to get the result values for the different Tracks
+      function CalculateAlbumGain(AudioFiles: TStringList): TFloat;
+
   public
 
       MainWindowHandle: DWord;
-      CurrentAlbumTrackGains: Array of Single;
+
+      property ChannelLength : Int64    read fChannelLength ;
+      property ChannelCount  : Cardinal read fChannelCount  ;
+      property ChannelFreq   : Cardinal read fChannelFreq   ;
+      property CurrentFilename : UnicodeString read fCurrentFilename;
+
 
       property CalculationMode: TRGCalculationMode read fCalculationMode write fCalculationMode;
 
-      ///  Forward Eventhandlers of the TReplayGainCalculator
+      // The MediaLibrary can be blocked, so we can work with the actual files from there
+      // The Playlist has no blocking ability, so we have to work wth copies of the playlist-files here
+      // (to avoid AccessViolations and stuff when the user deletes files from the playlist...)
+      // NOTE: This MUST be set before adding any audiofiles to the List!
+      property UseAudioFileCopies: boolean read fUseAudioFileCopies write fUseAudioFileCopies;
+
+      ///  Eventhandlers
       ///  --------------------------------------------------
-      ///  OnSynchStreamInit   : Display a "Starting (filename) (streamproperties)" Message (e.g. on a TLabel)
-      ///                        or: log the error message (depending on ErrorCode)
-      ///  OnSynchError        : Log an error message ("invalid file, frequenzy, no 16Bit, ...")
-      ///  OnSynchStreamProgress : Display progress of the Calculation of a Track (e.g. on a Progressbar)
-      ///  OnSynchSingleTrackComplete : Calculation of a single track is completed
-      ///  OnSynchTrackComplete : a Track during a multi-track-calculation has been completed
-      ///                         display TrackGain-Values
-      ///                         (and, with knowledge of the VCL-Lists and previous Events: Show "overall progress"
-      ///  OnSynchAlbumComplete : One Album during a Multi-Album-Calculation has been completed
-      ///                         Display AlbumGain values
+      ///  OnStreamInit : Triggered after creation of a Stream by the BASS.dll
+      ///                 ErrorCode: - 0 if everything is fine,
+      ///                            - one of the constants used by BASS_ErrorGetCode
+      ///                 => Display a "Starting (filename) (streamproperties)" Message (e.g. on a TLabel)
+      ///                    or: log the error message (depending on ErrorCode)
+      ///  OnError:      (a) The Stream does not match the requirements to be analyses
+      ///                    Errorcode contains one of the RG_ERR_** constants defined in this Unit
+      ///                (b) Reading sampledata from the stream fails
+      ///                    ErrorCode: BASS_ErrorGetCode
+      ///                    (Note: BASS_ERROR_ENDED is possible, but that should not be considered as an actual error)
+      ///                 => Log an error message ("invalid file, frequenzy, no 16Bit, ...")
+      ///  OnTrackProgress:   Progress of the calculation of the current Title, ranged from 0 to 1
+      ///                     => Display progress of the Calculation of a Track (e.g. on a Progressbar)
+      ///  OnTrackComplete:   a Track during a multi-track-calculation has been completed
+      ///                     => display TrackGain-Values
+      ///                        (and, with knowledge of the VCL-Lists and previous Events: Show "overall progress"
+      ///  OnAlbumComplete:   One Album during a Multi-Album-Calculation has been completed
+      ///                      => display AlbumGain values
       ///
-      property OnSynchStreamInit          : TRGEvent read fSynchOnStreamInit write fSynchOnStreamInit;
-      property OnSynchError               : TRGEvent read fSynchOnError write fSynchOnError;
-      property OnSynchStreamProgress      : TRGProgressEvent read fSynchOnStreamProgress write fSynchOnStreamProgress;
-      property OnSynchSingleTrackComplete : TRGCompleteEvent read fSynchOnSingleTrackComplete write fSynchOnSingleTrackComplete;
-      property OnSynchTrackComplete       : TRGCompleteEvent read fSynchOnTrackComplete write fSynchOnTrackComplete;
-      property OnSynchAlbumComplete       : TRGCompleteEvent read fSynchOnAlbumComplete write fSynchOnAlbumComplete;
+      property OnStreamInit          : TRGNotifyEvent read fOnStreamInit write fOnStreamInit;
+      property OnError               : TRGNotifyEvent read fOnError write fOnError;
+      property OnTrackProgress       : TRGProgressEvent read fOnTrackProgress write fOnTrackProgress;
+      property OnTrackComplete       : TRGCompleteEvent read fOnTrackComplete write fOnTrackComplete;
+      property OnAlbumComplete       : TRGCompleteEvent read fOnAlbumComplete write fOnAlbumComplete;
 
       ///  Additional Eventhandlers
       ///  ------------------------
-      ///  OnSynchMainProgress          : Overall Progress has reached a new state
-      ///                                 e.g. Display a message like "Begin calculating ReplayGain for %d files ..."
-      ///  OnSynchAudioFile             : after saving ReplayGain-MetaData to the file (within this thread!)
-      ///                                 Properties of the actual AudioFile-Object should be set in VCL-Context
-      ///  OnSynchWriteMetaDataProgress : For some operations, it makes sense to update MetaData in multiples files after
-      ///                                 the calculations are done. This is in most cases pretty fast, but when there is no
-      ///                                 ID3v2Tag or not enough padding, the complete file must be rewritten. This may take a
-      ///                                 while when calculating many files. Therefore this event.
-      ///                                 e.g. refesh a ProgressBar
+      ///  OnMainProgress          : Overall Progress has reached a new state
+      ///                            => e.g. Display a message like "Begin calculating ReplayGain for %d files ..."
+      ///  OnSynchAudioFile        : triggered after saving ReplayGain to the MetaData of the file (within this thread!)
+      ///                            => Properties of the Nemp AudioFile-Object should be set in VCL-Context
+      ///  OnWriteMetaDataProgress : For some operations, it makes sense to update MetaData in multiples files after
+      ///                            the calculations are done. This is in most cases pretty fast. But when there is no
+      ///                            ID3v2Tag or not enough padding, the complete file must be rewritten. This may take a
+      ///                            while when calculating many files. Therefore this event.
+      ///                            => e.g. refesh a ProgressBar
       ///
-      property OnSynchMainProgress          : TRGMainProgressEvent read fSynchRGMainProgress write fSynchRGMainProgress;
-      property OnSynchAudioFile             : TRGAudioFileSynchEvent read fOnSynchAudioFile write fOnSynchAudioFile;
-      property OnSynchWriteMetaDataProgress : TRGProgressEvent read fSynchOnWriteMetaDataProgress write fSynchOnWriteMetaDataProgress;
+      property OnMainProgress          : TRGMainProgressEvent read fOnMainProgress write fOnMainProgress;
+      property OnSynchAudioFile        : TRGAudioFileSynchEvent read fOnSynchAudioFile write fOnSynchAudioFile;
+      property OnWriteMetaDataProgress : TRGProgressEvent read fOnWriteMetaDataProgress write fOnWriteMetaDataProgress;
 
 
       constructor Create;
@@ -179,35 +284,42 @@ begin
     FreeOnTerminate := True;
 
     fAudioFiles := TAudioFileList.Create(False);  // do NOT own the objects!
-    fPaths := TStringList.Create;
-    fAlbums := TStringList.Create;
-
+    fPaths   := TStringList.Create;
+    fAlbums  := TStringList.Create;
     fCurrentAlbumList := TStringList.Create;
-
-    ReplayGainCalculator := TReplayGainCalculator.create;
-    ReplayGainCalculator.OnStreamProgress     := fOnTrackProgress;
-    ReplayGainCalculator.OnStreamInit         := fOnStreamInit;
-    ReplayGainCalculator.OnSingleTrackComplete:= fOnSingleTrackComplete;
-    ReplayGainCalculator.OnTrackComplete      := fOnTrackComplete;
-    ReplayGainCalculator.OnAlbumComplete      := fOnAlbumComplete;
-    ReplayGainCalculator.OnError              := fOnCalculationError;
 end;
 
 destructor TNempReplayGainCalculator.Destroy;
+var i: Integer;
 begin
+    if fUseAudioFileCopies then
+    begin
+        for i := 0 to fAudioFiles.Count - 1 do
+            fAudioFiles[i].Free;
+    end;
     fPaths.Free;
     fAlbums.Free;
     fCurrentAlbumList.Free;
-    ReplayGainCalculator.Free;
     fAudioFiles.Free;
+
+    if fStream <> 0 then
+        BASS_StreamFree(fStream);
+
     inherited;
 end;
 
 
-
 procedure TNempReplayGainCalculator.AddAudioFile(aAudioFile: TAudioFile);
+var newFile: TAudioFile;
 begin
-    fAudioFiles.Add(aAudioFile);
+    if fUseAudioFileCopies then
+    begin
+        newFile := TAudioFile.Create;
+        newFile.Assign(aAudioFile);
+        fAudioFiles.Add(newFile);
+    end else
+        fAudioFiles.Add(aAudioFile);
+
     fPaths.Add(aAudioFile.Pfad);
     fAlbums.Add(aAudioFile.Album);
 end;
@@ -234,9 +346,9 @@ begin
     end;
 
     // prepare the TrackGain-Value array
-    SetLength(CurrentAlbumTrackGains, fCurrentAlbumList.Count);
-    for i := 0 to Length(CurrentAlbumTrackGains)-1 do
-        CurrentAlbumTrackGains[i] := 0;
+    SetLength(fCurrentTrackGains, fCurrentAlbumList.Count);
+    for i := 0 to Length(fCurrentTrackGains)-1 do
+        fCurrentTrackGains[i] := 0;
 
     result := fCurrentAlbumList.Count;
 end;
@@ -255,6 +367,7 @@ begin
         try
             // read data
             localAudioFile.GetAudioData(aFile, 0);
+
             // set Gain values in AudioFile-Object
             if (Flags AND RG_SetTrack)   = RG_SetTrack   then localAudioFile.TrackGain := aTrackGain;
             if (Flags AND RG_ClearTrack) = RG_ClearTrack then localAudioFile.TrackGain := 0;
@@ -263,7 +376,6 @@ begin
 
             // Write Data into the metatags of the file
             aErr := localAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain, Flags, True);
-            //aErr:= localAudioFile.SetAudioData(True);
 
             if aErr <> AUDIOERR_None then
             begin
@@ -287,44 +399,39 @@ end;
 
 
 ///  -------------------------------------------------
-///  Call the external Event Handlers
+///  Call the EventHandlers
 ///  These methods MUST be called with Synchronize
 ///  -------------------------------------------------
 procedure TNempReplayGainCalculator.DoSynchOnStreamInit;
 begin
-    fSynchOnStreamInit(ReplayGainCalculator, fCurrentErrorCode);
+    fOnStreamInit(self, fLastErrorCode);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnError;
 begin
-    fSynchOnError(ReplayGainCalculator, fCurrentErrorCode);
+    fOnError(self, fLastErrorCode);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnStreamProgress;
 begin
-    fSynchOnStreamProgress(ReplayGainCalculator, fCurrentProgress);
-end;
-procedure TNempReplayGainCalculator.DoSynchOnSingleTrackComplete;
-begin
-    fSynchOnSingleTrackComplete(ReplayGainCalculator, fCurrentIndex, ReplayGainCalculator.TrackGain, ReplayGainCalculator.PeakTrack);
+    self.fOnTrackProgress(self, fCurrentTrackProgress);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnTrackComplete;
 begin
-    fSynchOnTrackComplete(ReplayGainCalculator, fCurrentIndex, ReplayGainCalculator.TrackGain, ReplayGainCalculator.PeakTrack);
+    fOnTrackComplete(self, fCurrentIndex, fTrackGain, fPeakTrack);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnAlbumComplete;
 begin
-    fSynchOnAlbumComplete(ReplayGainCalculator, fCurrentIndex, ReplayGainCalculator.AlbumGain, ReplayGainCalculator.PeakAlbum);
+    fOnAlbumComplete(self, fCurrentIndex, fAlbumGain, fPeakAlbum);
 end;
-
 procedure TNempReplayGainCalculator.DoSynchOnWriteMetaDataProgress;
 begin
-    self.fSynchOnWriteMetaDataProgress(ReplayGainCalculator, fCurrentWriteMetaDataProgress);
+    fOnWriteMetaDataProgress(self, fCurrentWriteMetaDataProgress);
 end;
 
 procedure TNempReplayGainCalculator.DoSynchAudioFile;
 begin
     fOnSynchAudioFile(
         fAudioFiles[ fFileSynchOffset + fCurrentIndex ],
-        CurrentAlbumTrackGains[fCurrentIndex],
+        fCurrentTrackGains[fCurrentIndex],
         fAlbumGain
     );
 end;
@@ -337,7 +444,7 @@ end;
 }
 procedure TNempReplayGainCalculator.HandleMainProgress(AlbumName: String; FileCount: Integer; Progress: TRGStatus);
 begin
-    if assigned(fSynchRGMainProgress) then
+    if assigned(fOnMainProgress) then
     begin
         fMainProgressData.AlbumName := AlbumName;
         fMainProgressData.FileCount := FileCount;
@@ -347,80 +454,385 @@ begin
 end;
 procedure TNempReplayGainCalculator.DoSynchRGOverallProgress;
 begin
-    fSynchRGMainProgress(self, fMainProgressData.AlbumName, fMainProgressData.FileCount, fMainProgressData.Progress);
+    fOnMainProgress(self, fMainProgressData.AlbumName, fMainProgressData.FileCount, fMainProgressData.Progress);
 end;
 
 
-///  -------------------------------------------------
-///  Internal Event Handlers
-///  Do some internal stuff, and call external EventHandlers, if they're assigned
-///  -------------------------------------------------
-procedure TNempReplayGainCalculator.fOnStreamInit(
-  aReplayGainCalculator: TReplayGainCalculator; ErrorCode: Integer);
+{
+  * ---------------------------------
+  * Calculating ReplayGain Values
+  * ---------------------------------
+}
+
+function TNempReplayGainCalculator.fInitGainCalculation(aFreq: Longint): Longint;
+var localRGerr: Integer;
 begin
-    // prepare external event Handler (progress display ...)
-    fCurrentErrorCode := ErrorCode;
-    //
-    if assigned(fSynchOnStreamInit) then
+    // the orginal return values from the replaygain.dll does not fit into the system here
+    // we use (OK <=> ErrorCode=0)
+    // but replaygaion.dll uses
+    //  INIT_GAIN_ANALYSIS_ERROR = 0;
+    //  INIT_GAIN_ANALYSIS_OK    = 1;
+     localRGerr := InitGainAnalysis(aFreq);
+
+    if localRGerr = INIT_GAIN_ANALYSIS_OK then
+    begin
+        fLastGainInitFreq := aFreq;
+        fSomeCalculationsDone := False;
+        fLastErrorCode := RG_ERR_None;
+    end else
+    begin
+        fLastGainInitFreq := 0;
+        fSomeCalculationsDone := False;
+        fLastErrorCode := RG_ERR_InitGainAnalysisError;
+        // Handle Error-Event
+        if assigned(fOnError) then
+            Synchronize(DoSynchOnError);
+    end;
+
+    result := fLastErrorCode;
+end;
+
+{
+    InitStreamFromFilename
+    ---------------------------------------------------------------
+    Create a Stream using BASS from the filename and
+    get Information from the Channel (Channels, 16Bit, Freq)
+    - return value:
+        0                 if stream was successfully created
+        BASS_ErrorGetCode otherwise
+}
+function TNempReplayGainCalculator.InitStreamFromFilename(aFilename: UnicodeString): Integer;
+var Channelinfo: Bass_ChannelInfo;
+begin
+    if fStream <> 0 then
+        BASS_StreamFree(fStream);
+    fStream := BASS_StreamCreateFile(false, PChar(aFilename), 0, 0, BASS_UNICODE OR BASS_STREAM_DECODE);
+    if (fStream = 0) then
+    begin
+        fLastErrorCode   := Bass_ErrorGetCode;
+        fCurrentFilename := aFilename;
+        fPeakTrack       := 0;
+        fChannelLength   := 0;
+        fChannelCount    := 0;
+        fChannelFreq     := 0;
+        fChannelIs16Bit  := False;
+    end
+    else
+    begin
+        fLastErrorCode := 0;
+        fPeakTrack := 0;
+        fCurrentFilename := aFilename;
+        fChannelLength := BASS_ChannelGetLength(fStream, BASS_POS_BYTE);
+        BASS_ChannelGetInfo(fStream, Channelinfo);
+        fChannelCount   := ChannelInfo.chans;
+        fChannelFreq    := ChannelInfo.freq;
+        fChannelIs16Bit := NOT (
+                ((ChannelInfo.flags AND BASS_SAMPLE_8BITS) = BASS_SAMPLE_8BITS) or
+                ((ChannelInfo.flags AND BASS_SAMPLE_FLOAT) = BASS_SAMPLE_FLOAT)     );
+    end;
+
+    result := fLastErrorCode;
+
+    // trigger event to display Information about the current stream .... fChannelCount, fChannelFreq, ...
+    if assigned(fOnStreamInit) then
         Synchronize(DoSynchOnStreamInit);
 end;
 
-procedure TNempReplayGainCalculator.fOnCalculationError(
-  aReplayGainCalculator: TReplayGainCalculator; ErrorCode: Integer);
+procedure TNempReplayGainCalculator.FreeStream;
 begin
-    // prepare external event Handler (progress display ...)
-    fCurrentErrorCode := ErrorCode;
-    if assigned(fSynchOnError) then
-        Synchronize(DoSynchOnError);
+    if fStream <> 0 then
+        BASS_StreamFree(fStream);
 end;
 
-procedure TNempReplayGainCalculator.fOnTrackProgress(
-  Sender: TReplayGainCalculator; aProgress: Single);
+{
+    CheckNewStreamProperties
+    -----------------------------------------------------------------
+    Check, whether Channel values are supported
+      - 16 Bit Channels
+      - 1 or 2 Channels
+      - supported Freq
+      - if AlbumGainWanted: freq is still the same (as from the last initialisation)
+}
+function TNempReplayGainCalculator.CheckNewStreamProperties(AlbumGainWanted: Boolean): Integer;
 begin
-    // prepare external event Handler (progress display ...)
-    fCurrentProgress := aProgress;
-    if assigned(fSynchOnStreamProgress) then
-        Synchronize(DoSynchOnStreamProgress);
+    fLastErrorCode := RG_ERR_None;
+    result := fLastErrorCode;
+
+    if fchannelCount > 2 then
+    begin
+        fLastErrorCode := RG_ERR_TooManyChannels;
+        result := fLastErrorCode;
+        // trigger OnError-Event
+        if assigned(fOnError) then
+            Synchronize(DoSynchOnError);
+    end
+    else
+        if Not fChannelIs16Bit then
+        begin
+            fLastErrorCode := RG_ERR_No16Bit;
+            result := fLastErrorCode;
+            // trigger OnError-Event
+            if assigned(fOnError) then
+                Synchronize(DoSynchOnError);
+        end
+        else
+            if self.fChannelFreq <> fLastGainInitFreq then
+            begin
+                // ReInit GainAnalysis
+                if fInitGainCalculation(fChannelFreq) <> RG_ERR_None then
+                begin
+                    // fLastErrorCode was set in fInitGainCalculation
+                    result := fLastErrorCode;
+                end;
+
+                if AlbumGainWanted then
+                begin
+                    fAlbumGainCalculationFailed := True;
+                    fLastErrorCode := RG_ERR_AlbumGainFreqChanged;
+                    // DO NOT set result := fLastErrorCode; in this case
+                    // we will continue calculating TrackGain-Values, but we skip AlbumGain
+                    // however: do trigger an event to notify the main application // user about it
+                    if assigned(fOnError) then
+                        Synchronize(DoSynchOnError);
+                end;
+            end;
 end;
 
-procedure TNempReplayGainCalculator.fOnSingleTrackComplete(
-  aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double;
-  aPeak: SmallInt);
+
+function TNempReplayGainCalculator.fReadMonoSamplesFromStream: Integer;
 begin
-    // prepare external event Handler (progress display ...)
-    fCurrentIndex := aIndex; // is always 0 on "SingleTrackComplete"
-    if assigned(fSynchOnSingleTrackComplete) then
-        Synchronize(DoSynchOnSingleTrackComplete);
+    result := BASS_ChannelGetData(fStream, @fMonoBuffer, sizeof(fMonoBuffer)); // div sizeof(TMonoSample);
+end;
+function TNempReplayGainCalculator.fReadStereoSamplesFromStream: Integer;
+begin
+    result := BASS_ChannelGetData(fStream, @fStereoBuffer, sizeof(fStereoBuffer)); // div sizeof(TStereoSample);
+end;
+function TNempReplayGainCalculator.ReadAudioSamplesFromStream: Integer;
+var bytesread: Integer;
+begin
+    bytesread := 0;
+    result := 0;
+    case fChannelCount  of
+        1: bytesread := fReadMonoSamplesFromStream;
+        2: bytesread := fReadStereoSamplesFromStream;
+    end;
+
+    if bytesread = -1 then
+    begin
+        flastErrorCode := BASS_ErrorGetCode;
+        // No data was read. One possible cause: BASS_ERROR_ENDED
+        // This will result in an error-event, but it should not be treated as one in the EventHandler.
+        if assigned(fOnError) then
+            Synchronize(DoSynchOnError);
+    end else
+    begin
+        case fChannelCount  of
+            1: result := bytesread div sizeof(TMonoSample);
+            2: result := bytesread div sizeof(TStereoSample);
+        end;
+    end;
 end;
 
-procedure TNempReplayGainCalculator.fOnTrackComplete(
-  aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double;
-  aPeak: SmallInt);
+procedure TNempReplayGainCalculator.fPrepareRGAnalyseMono(nSamples: Integer);
+var k: Integer;
 begin
-    // handle this internally, we have more work to do
-    CurrentAlbumTrackGains[aIndex] := aGain;
-    // prepare external event Handler (progress display ...)
-    fCurrentIndex := aIndex;    /// INDEX des TReplayGainCalculator-Objectes.
-                                /// NICHT der INdex des Audiofiles in der (globalen) ThreadListe !!!
-
-    //
-    if assigned(fSynchOnTrackComplete) then
-        Synchronize(DoSynchOnTrackComplete);
+    for k := 0 to pred(nSamples) do
+    begin
+        fLeftSamples[k]  := fMonoBuffer[k];
+        fPeakTrack := Max(fPeakTrack, Abs(fMonoBuffer[k]));
+        fRightSamples[k] := 0;
+    end;
+end;
+procedure TNempReplayGainCalculator.fPrepareRGAnalyseStereo(nSamples: Integer);
+var k: Integer;
+begin
+    for k := 0 to pred(nSamples) do
+    begin
+        fLeftSamples[k]  := fStereoBuffer[k].Left  ;
+        fPeakTrack := Max(fPeakTrack, Abs(fStereoBuffer[k].Left));
+        fRightSamples[k] := fStereoBuffer[k].Right ;
+        fPeakTrack := Max(fPeakTrack, Abs(fStereoBuffer[k].Right));
+    end;
+end;
+function TNempReplayGainCalculator.RGAnalyse(nSamples: Integer): LongInt;
+begin
+    result := GAIN_ANALYSIS_OK;
+    if (nSamples > 0) then
+    begin
+        case fChannelCount of
+            1: fPrepareRGAnalyseMono(nSamples);
+            2: fPrepareRGAnalyseStereo(nSamples);
+        end;
+        result := AnalyzeSamples(@fLeftSamples, @fRightSamples, nSamples, fChannelCount);
+    end;
 end;
 
-procedure TNempReplayGainCalculator.fOnAlbumComplete(
-  aReplayGainCalculator: TReplayGainCalculator; aIndex: Integer; aGain: Double;
-  aPeak: SmallInt);
-begin
-    // now set all fCurrentAlbumTrackGains
-    // todo ...
 
-    // prepare external event Handler (progress display ...)
-    fCurrentIndex := aIndex;
-    //
-    if assigned(fSynchOnAlbumComplete) then
-        Synchronize(DoSynchOnAlbumComplete);
+
+function TNempReplayGainCalculator.fCalculateTrack(aIndex: Integer; AlbumGainWanted: Boolean): TFloat;
+var currentBassPos: Int64;
+begin
+    ///  First, check the properties of the stream.
+    ///  Within CheckNewStreamProperties, the OnError-Event is triggered if something goes wrong.
+    ///  The Parameter ErrorCode contains one of the RG_ERR_** constants defined in this Unit.
+    if CheckNewStreamProperties(AlbumGainWanted) <> RG_ERR_None then
+    begin
+        result := 0;
+        // Error-Event was triggered in CheckNewStreamProperties, if an error occured
+    end
+    else
+    begin
+        // Channel properties are supported, continue
+        fPeakTrack := 0;
+        fLastProgressReport := 0;
+
+        while (BASS_ChannelIsActive(fStream) > 0) do
+        begin
+            if terminated then
+                break;
+
+            // read some samples and analyse them
+            RGAnalyse(ReadAudioSamplesFromStream);
+
+            // Trigger/Sync the OnTrackProgress event.
+            // Note: This is not triggered everry time, but only if a significant amount of data has been read.
+
+            if assigned(fOnTrackComplete) then
+            begin
+                currentBassPos := BASS_ChannelGetPosition(fStream, BASS_POS_BYTE);
+                if (currentBassPos - fLastProgressReport) > (fChannelLength Div 100)  then
+                begin
+                    fLastProgressReport := currentBassPos;
+                    fCurrentTrackProgress := currentBassPos / fChannelLength;
+                    Synchronize(DoSynchOnStreamProgress);
+                end;
+            end;
+
+        end;
+
+        if terminated then
+            result := 0
+        else
+        begin
+            fSomeCalculationsDone := True;
+
+            fCurrentIndex := aIndex;
+            fTrackGain := GetTitleGain;
+            fCurrentTrackGains[aIndex] := fTrackGain;
+
+            // trigger Event: OnTrackComplete
+            if assigned(fOnTrackComplete) then
+                Synchronize(DoSynchOnTrackComplete);
+
+            result := fTrackGain;
+        end;
+    end;
 end;
+
+
+
+function TNempReplayGainCalculator.CalculateTrackGain(aAudioFile: UnicodeString; aIndex: Integer): TFloat;
+begin
+    result := 0;
+    ///  For Error handling during calculation use the event OnStreamInit,
+    ///  which is triggered by InitStreamFromFilename
+    ///  The Parameter ErrorCode contains the result from BASS_ErrorGetCode
+    if InitStreamFromFilename(aAudioFile) = 0 then
+        result := fCalculateTrack(aIndex, False);
+    FreeStream;
+end;
+
+function TNempReplayGainCalculator.CalculateAlbumGain(
+  AudioFiles: TStringList): TFloat;
+var i: Integer;
+begin
+    result     := 0;
+    fTrackGain := 0;
+    fAlbumGain := 0;
+    fPeakAlbum := 0;
+
+    fLastGainInitFreq := 0;
+    fAlbumGainCalculationFailed := False;
+    fSomeCalculationsDone       := False;
+
+    if (not assigned(AudioFiles)) or (AudioFiles.Count = 0) then
+        exit;
+
+    // initiate AlbumGain calculation with the first AudioFile in the list.
+    if InitStreamFromFilename(AudioFiles[0]) = 0 then
+    begin
+        // difference to the for-loop:
+        // we call fInitGainCalculation directly, not only indirectly through
+        // fCalculateTrack->CheckNewStreamProperties->"if freq changed"
+        if fInitGainCalculation(fChannelFreq) = RG_ERR_None then
+            fCalculateTrack(0, True);
+
+        fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
+    end;
+    FreeStream;
+
+    if terminated then
+    begin
+        result := 0;
+        exit;
+    end;
+
+    // for the rest of the titles do *not* call fInitGainCalculation again
+    //  ... unless it is needed due to a samplerate change.
+    //  ... which is the case, if the first title failed (by InitStreamFromFilename OR fInitGainCalculation)
+    //      But in that case AlbumGain is kinda pointless, therefore it is skipped later
+    for i := 1 to AudioFiles.Count - 1 do
+    begin
+        if terminated then
+            break;
+
+        if InitStreamFromFilename(AudioFiles[i]) = 0 then
+        begin
+            fCalculateTrack(i, True);
+            fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
+        end;
+        FreeStream;
+    end;
+
+    if terminated then
+        result := 0
+    else
+    begin
+        // Fill private member variables needed for the OnComplete-Handler
+        if Not fAlbumGainCalculationFailed then
+        begin
+            if fSomeCalculationsDone then
+                fAlbumGain := GetAlbumGain
+            else
+                fAlbumGain := 0;
+            fCurrentIndex := AudioFiles.Count;
+        end else
+        begin
+            fAlbumGain := 0;
+            fPeakAlbum := 0;
+            fCurrentIndex := -1;
+        end;
+
+        result := fAlbumGain;
+
+        // trigger the event OnAlbumComplete
+        if assigned(fOnAlbumComplete) then
+            Synchronize(DoSynchOnAlbumComplete);
+    end;
+end;
+
+
+// TNempReplayGainCalculator
+{
+======================================
+======================================
+======================================
+" Thread-Level-Stuff" starts here
+======================================
+======================================
+======================================
+
+}
 
 procedure TNempReplayGainCalculator.ExecuteSingleTracks;
 var i: Integer;
@@ -429,34 +841,34 @@ begin
     if fAudioFiles.Count > 0 then
     begin
         // prepare the TrackGain-Value array
-        SetLength(CurrentAlbumTrackGains, fAudioFiles.Count);
-        for i := 0 to Length(CurrentAlbumTrackGains)-1 do
-            CurrentAlbumTrackGains[i] := 0;
-
-        //SetLength(CurrentAlbumTrackGains, 1);
-        //CurrentAlbumTrackGains[0] := 0;
+        SetLength(fCurrentTrackGains, fAudioFiles.Count);
+        for i := 0 to Length(fCurrentTrackGains)-1 do
+            fCurrentTrackGains[i] := 0;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartCalculationSingleTracks);
 
         for i := 0 to fPaths.Count - 1 do
         begin
+            if Terminated then
+                break;
+
             // calculate TrackGain
-            CurrentAlbumTrackGains[i] := ReplayGainCalculator.CalculateTrackGain(fPaths[i], i);
-
-            // Calculation complete, notify MainThread, // NO, not here.
-            // HandleMainProgress('', 1, RGStatus_StartSync);
-
             fCurrentIndex := i;
+            fCurrentTrackGains[i] := CalculateTrackGain(fPaths[i], i);
+
             // Update MetaData
-            if not isZero(CurrentAlbumTrackGains[i]) then
-                fUpdateMetaData(fPaths[i], CurrentAlbumTrackGains[i], 0, RG_SetTrack);
+            // we can do it her directly after the calculation of the TrackGain,
+            // as we do not need AlbumGain information
+            if not isZero(fCurrentTrackGains[i]) then
+                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i], 0, RG_SetTrack);
         end;
         // clear thread-used filename
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-        // File Synch complete, notify MainThread
-        HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
+        if not Terminated then
+            // File Synch complete, notify MainThread
+            HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
     end;
 
 end;
@@ -468,32 +880,40 @@ begin
     if fAudioFiles.Count > 0 then
     begin
         // prepare the TrackGain-Value array
-        SetLength(CurrentAlbumTrackGains, fAudioFiles.Count);
-        for i := 0 to Length(CurrentAlbumTrackGains)-1 do
-            CurrentAlbumTrackGains[i] := 0;
+        SetLength(fCurrentTrackGains, fAudioFiles.Count);
+        for i := 0 to Length(fCurrentTrackGains)-1 do
+            fCurrentTrackGains[i] := 0;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartCalculationSingleAlbum);
 
         // calculate TrackGain + AlbumGain
-        fAlbumGain := ReplayGainCalculator.CalculateAlbumGain(fPaths);
+        // (longer procedure, can be aborted through "Terminated")
+        fAlbumGain := CalculateAlbumGain(fPaths);
+
+        // check for termination. If yes, do NOT start updating Metadata
+        if terminated then
+            exit;
 
         // Calculation complete, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartSync);
 
         Flags := RG_SetTrack;
-        if NOT ReplayGainCalculator.AlbumGainCalculationFailed then
+        if NOT fAlbumGainCalculationFailed then
             Flags := RG_SetBoth;
 
         // Write the Data into the MetaTags of the Files
         for i := 0 to fPaths.Count - 1 do
         begin
+            if Terminated then
+                break;
+
             fCurrentIndex := i;
             // Update MetaData
-            if not isZero(CurrentAlbumTrackGains[i]) then
-                fUpdateMetaData(fPaths[i], CurrentAlbumTrackGains[i], fAlbumGain, Flags);
+            if not isZero(fCurrentTrackGains[i]) then
+                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i], fAlbumGain, Flags);
 
-            if assigned(fSynchOnWriteMetaDataProgress)  then
+            if assigned(fOnWriteMetaDataProgress)  then
             begin
                 fCurrentWriteMetaDataProgress := (i+1) / fPaths.Count;
                 DoSynchOnWriteMetaDataProgress;
@@ -502,8 +922,9 @@ begin
         // clear thread-used filename
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-        // File Synch complete, notify MainThread
-        HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
+        if not Terminated then
+            // File Synch complete, notify MainThread
+            HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
     end;
 end;
 
@@ -514,7 +935,7 @@ var FilesDone: Integer;
 begin
     FilesDone := 0;
     fFileSynchOffset := 0;
-    while FilesDone < fAudioFiles.Count do
+    while (FilesDone < fAudioFiles.Count) and (Not Terminated) do
     begin
         // collect file for the next album
         NewAlbumCount := fPrepareNextAlbum(FilesDone);
@@ -527,13 +948,18 @@ begin
         HandleMainProgress(fCurrentAlbum, NewAlbumCount, RGStatus_StartCalculationMultiAlbum);
 
         // calculate TrackGain + AlbumGain for this Album
-        fAlbumGain := ReplayGainCalculator.CalculateAlbumGain(self.fCurrentAlbumList);
+        // (longer procedure, can be aborted through "Terminated")
+        fAlbumGain := CalculateAlbumGain(self.fCurrentAlbumList);
+
+        // check for termination. If yes, do NOT start updating Metadata
+        if terminated then
+            exit;
 
         // Calculation complete, notify MainThread
         HandleMainProgress(fCurrentAlbum, NewAlbumCount, RGStatus_StartSync);
 
         Flags := RG_SetTrack;
-        if NOT ReplayGainCalculator.AlbumGainCalculationFailed then
+        if NOT fAlbumGainCalculationFailed then
             Flags := RG_SetBoth;
 
         // Write the Data into the MetaTags of the Files (threaded, using Message-concept with CurrentThreadFilename) and
@@ -541,12 +967,15 @@ begin
         fFileSynchOffset := FilesDone;
         for i := 0 to fCurrentAlbumList.Count - 1 do
         begin
+            if Terminated then
+                break;
+
             fCurrentIndex := i;
             // Update MetaData, similar to UpdateTags in Medialibrary for the TagCloud-stuff
-            if not isZero(CurrentAlbumTrackGains[i])  then
-                fUpdateMetaData(fCurrentAlbumList[i], CurrentAlbumTrackGains[i], fAlbumGain, Flags);
+            if not isZero(fCurrentTrackGains[i])  then
+                fUpdateMetaData(fCurrentAlbumList[i], fCurrentTrackGains[i], fAlbumGain, Flags);
 
-            if assigned(fSynchOnWriteMetaDataProgress)  then
+            if assigned(fOnWriteMetaDataProgress)  then
             begin
                 fCurrentWriteMetaDataProgress := (i+1) / fCurrentAlbumList.Count;
                 DoSynchOnWriteMetaDataProgress;
@@ -557,7 +986,8 @@ begin
 
         // File Synch complete, notify MainThread
         FilesDone := FilesDone + NewAlbumCount;
-        HandleMainProgress(fCurrentAlbum, NewAlbumCount, RGStatus_Finished);
+        if not Terminated then
+            HandleMainProgress(fCurrentAlbum, NewAlbumCount, RGStatus_Finished);
     end;
 
 end;
@@ -569,21 +999,24 @@ begin
     if fAudioFiles.Count > 0 then
     begin
         // prepare the TrackGain-Value array
-        // this array is needed in DoSynchAudioFile
-        SetLength(CurrentAlbumTrackGains, fAudioFiles.Count);
-        for i := 0 to Length(CurrentAlbumTrackGains)-1 do
-            CurrentAlbumTrackGains[i] := 0;
+        // this array is needed in DoSynchAudioFile (called from fUpdateMetaData)
+        SetLength(fCurrentTrackGains, fAudioFiles.Count);
+        for i := 0 to Length(fCurrentTrackGains)-1 do
+            fCurrentTrackGains[i] := 0;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartDeleteValues);
 
         for i := 0 to fPaths.Count - 1 do
         begin
+            if Terminated then
+                break;
+
             fCurrentIndex := i;
             // Update MetaData
             fUpdateMetaData(fPaths[i], 0, 0, RG_ClearBoth);
 
-            if assigned(fSynchOnWriteMetaDataProgress)  then
+            if assigned(fOnWriteMetaDataProgress)  then
             begin
                 fCurrentWriteMetaDataProgress := (i+1) / fPaths.Count;
                 DoSynchOnWriteMetaDataProgress;
@@ -593,15 +1026,15 @@ begin
         // clear thread-used filename
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
-        // Fily Synch complete, notify MainThread
-        HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
+        // File Synch complete, notify MainThread
+        if not Terminated then
+            HandleMainProgress('', fAudioFiles.Count, RGStatus_Finished);
     end;
 end;
 
 
 
 procedure TNempReplayGainCalculator.Execute;
-
 begin
     case self.fCalculationMode of
       RG_Calculate_SingleTracks  : ExecuteSingleTracks;
@@ -609,31 +1042,7 @@ begin
       RG_Calculate_MultiAlbums   : ExecuteMultiAlbums;
       RG_Delete_ReplayGainValues : ExecuteDeleteReplayGAinValues;
     end;
-
-
-
 end;
-
-
-
-
-(*
-procedure TNempReplayGainCalculator.fSortAudioFiles;
-begin
-    // !!!!! Checken, ob das überhaupt sinnvoll ist .....
-    // !!!!!!!!!!!!!!!!
-    // in den VCL Thread verlagern? Sonst muss man Bib (fast) komplett sperren ....
-    //!!!!!!!!!!!!!!!
-
-    fAudioFiles.Sort(TComparer<TAudioFile>.Construct(
-        function(const a1, a2: TAudioFile): integer
-        begin
-            Result := AnsiCompareText(a1.Album, a2.Album)
-        end
-    ));
-end;
-*)
-
 
 
 end.

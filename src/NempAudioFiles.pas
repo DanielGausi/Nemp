@@ -1014,6 +1014,9 @@ begin
     Pfad               := aAudioFile.Pfad                ;
     RawTagLastFM       := aAudioFile.RawTagLastFM        ;
     Favorite           := aAudioFile.fFavorite           ;
+    TrackGain          := aAudioFile.TrackGain           ;
+    AlbumGain          := aAudioFile.AlbumGain           ;
+
 end;
 procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
 begin
@@ -1042,6 +1045,8 @@ begin
     fAudioType         := aAudioFile.fAudioType          ;
     Pfad               := aAudioFile.Pfad                ;
     Favorite           := aAudioFile.fFavorite           ;
+    TrackGain          := aAudioFile.TrackGain           ;
+    AlbumGain          := aAudioFile.AlbumGain           ;
 end;
 
 {
