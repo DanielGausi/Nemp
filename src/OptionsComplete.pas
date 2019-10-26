@@ -526,10 +526,14 @@ type
     GrpBox_TabAudio2_ReplayGain: TGroupBox;
     cb_ApplyReplayGain: TCheckBox;
     cb_PreferAlbumGain: TCheckBox;
-    Label1: TLabel;
     tp_DefaultGain: TNempTrackBar;
     lblDefaultGainValue: TLabel;
     lblReplayGainDefault: TLabel;
+    tp_DefaultGain2: TNempTrackBar;
+    lblDefaultGainValue2: TLabel;
+    cb_ReplayGainPreventClipping: TCheckBox;
+    lblRG_Preamp1: TLabel;
+    lblRG_Preamp2: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -638,6 +642,9 @@ type
     procedure tp_DefaultGainMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure tp_DefaultGainChange(Sender: TObject);
+    procedure tp_DefaultGain2Change(Sender: TObject);
+    procedure tp_DefaultGain2MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     { Private-Deklarationen }
@@ -1224,9 +1231,17 @@ begin
       cb_PreferAlbumGain.Enabled   := NempPlayer.ApplyReplayGain;
       lblReplayGainDefault .Enabled   := cb_ApplyReplayGain.Checked;
       tp_DefaultGain       .Enabled   := cb_ApplyReplayGain.Checked;
+      tp_DefaultGain2      .Enabled   := cb_ApplyReplayGain.Checked;
       lblDefaultGainValue  .Enabled   := cb_ApplyReplayGain.Checked;
-  cb_PreferAlbumGain.Checked   := NempPlayer.PreferAlbumGain;
-  tp_DefaultGain.Position := Round(NempPlayer.DefaultGain * 10);
+      lblDefaultGainValue2 .Enabled   := cb_ApplyReplayGain.Checked;
+      cb_ReplayGainPreventClipping.Enabled := cb_ApplyReplayGain.Checked;
+      lblRG_Preamp1.Enabled                := cb_ApplyReplayGain.Checked;
+      lblRG_Preamp2.Enabled                := cb_ApplyReplayGain.Checked;
+
+  cb_PreferAlbumGain.Checked           := NempPlayer.PreferAlbumGain;
+  cb_ReplayGainPreventClipping.Checked := NempPlayer.PreventClipping;
+  tp_DefaultGain.Position  := Round(NempPlayer.DefaultGainWithoutRG * 10);
+  tp_DefaultGain2.Position := Round(NempPlayer.DefaultGainWithRG * 10);
 
   if NempPlayer.MainDevice > 0 then
       MainDeviceCB.ItemIndex := NempPlayer.MainDevice - 1
@@ -1726,6 +1741,21 @@ begin
     end;
 end;
 
+procedure TOptionsCompleteForm.tp_DefaultGain2Change(Sender: TObject);
+begin
+    if tp_DefaultGain2.Position = 0 then
+        lblDefaultgainValue2.Caption := '0.00 dB'
+    else
+        lblDefaultgainValue2.Caption := GainValueToString(tp_DefaultGain2.Position / 10);
+end;
+
+procedure TOptionsCompleteForm.tp_DefaultGain2MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+    if Button = mbRight then
+        tp_DefaultGain2.Position := 0;
+end;
+
 procedure TOptionsCompleteForm.tp_DefaultGainChange(Sender: TObject);
 begin
     if tp_DefaultGain.Position = 0 then
@@ -1859,7 +1889,13 @@ begin
     cb_PreferAlbumGain   .Enabled   := cb_ApplyReplayGain.Checked;
     lblReplayGainDefault .Enabled   := cb_ApplyReplayGain.Checked;
     tp_DefaultGain       .Enabled   := cb_ApplyReplayGain.Checked;
+    tp_DefaultGain2      .Enabled   := cb_ApplyReplayGain.Checked;
     lblDefaultGainValue  .Enabled   := cb_ApplyReplayGain.Checked;
+    lblDefaultGainValue2 .Enabled   := cb_ApplyReplayGain.Checked;
+    cb_ReplayGainPreventClipping.Enabled := cb_ApplyReplayGain.Checked;
+    lblRG_Preamp1.Enabled                := cb_ApplyReplayGain.Checked;
+    lblRG_Preamp2.Enabled                := cb_ApplyReplayGain.Checked;
+
 end;
 
 procedure TOptionsCompleteForm.RandomWeight05Exit(Sender: TObject);
@@ -2326,7 +2362,10 @@ begin
 
   NempPlayer.ApplyReplayGain  := cb_ApplyReplayGain.Checked;
   NempPlayer.PreferAlbumGain  := cb_PreferAlbumGain.Checked;
-  NempPlayer.DefaultGain      := tp_DefaultGain.Position / 10;
+  NempPlayer.DefaultGainWithoutRG := tp_DefaultGain.Position / 10;
+  NempPlayer.DefaultGainWithRG    := tp_DefaultGain2.Position / 10;
+  NempPlayer.PreventClipping      := cb_ReplayGainPreventClipping.Checked;
+
 
   NempPlayer.VisualizationInterval := 100 - TB_Refresh.Position;
   NempPlayer.ScrollTaskbarTitel := CB_ScrollTitelTaskBar.Checked;

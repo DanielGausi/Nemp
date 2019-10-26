@@ -38,12 +38,12 @@ type
 
     Procedure OnStreamInit(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer);
     procedure OnTrackProgress(Sender: TNempReplayGainCalculator; aProgress: Single);
-    procedure OnTrackComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
-    procedure OnAlbumComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
+    procedure OnTrackComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
+    procedure OnAlbumComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
 
     procedure OnWriteMetaDataProgress(Sender: TNempReplayGainCalculator; aProgress: Single);
     procedure OnCalculationError(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer);
-    procedure OnAudioFileSynch(aFile: TAudioFile; aTrackGain, aAlbumGain: Double);
+    procedure OnAudioFileSynch(aFile: TAudioFile; aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Double);
     Procedure OnMainProgress (RGThread: TNempReplayGainCalculator; AlbumName: String; FileCount: Integer; Progress: TRGStatus);
 
   public
@@ -255,10 +255,10 @@ begin
 end;
 
 
-procedure TReplayGainProgressForm.OnTrackComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
+procedure TReplayGainProgressForm.OnTrackComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
 begin
-    LogMemo.Lines.Add(Format('Track %d: %6.2f dB,  (%s)',
-                                [aIndex + 1, aGain, ExtractFilename(aReplayGainCalculator.CurrentFilename)]));
+    LogMemo.Lines.Add(Format('Track %d: %6.2f dB, Peak %6.6f (%s)',
+                                [aIndex + 1, aGain, aPeak,  ExtractFilename(aReplayGainCalculator.CurrentFilename)]));
     pbTrack.Position := 100;
 
     ///  Total-File-Index = Offset + aIndex
@@ -271,9 +271,9 @@ begin
 end;
 
 
-procedure TReplayGainProgressForm.OnAlbumComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt);
+procedure TReplayGainProgressForm.OnAlbumComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
 begin
-    LogMemo.Lines.Add(Format('AlbumGain: %6.2f dB', [aGain]));
+    LogMemo.Lines.Add(Format('AlbumGain: %6.2f dB, Peak %6.6f', [aGain, aPeak]));
 
     LblStatus.Caption := 'Calculation AlbumGain complete.';
     pbTrack.Position := 100;
@@ -285,13 +285,15 @@ begin
 end;
 
 procedure TReplayGainProgressForm.OnAudioFileSynch(aFile: TAudioFile; aTrackGain,
-  aAlbumGain: Double);
+  aAlbumGain, aTrackPeak, aAlbumPeak: Double);
 var ListOfFiles : TObjectList;
     i: Integer;
     listFile: TAudioFile;
 begin
     aFile.TrackGain := aTrackGain;
     aFile.AlbumGain := aAlbumGain;
+    aFile.TrackPeak := aTrackPeak;
+    aFile.AlbumPeak := aAlbumPeak;
 
     ListOfFiles := TObjectList.Create(False);
     try
@@ -303,6 +305,8 @@ begin
             listFile := TAudioFile(ListOfFiles[i]);
             listFile.TrackGain := aTrackGain;
             listFile.AlbumGain := aAlbumGain;
+            listFile.TrackPeak := aTrackPeak;
+            listFile.AlbumPeak := aAlbumPeak;
         end;
     finally
         ListOfFiles.Free;

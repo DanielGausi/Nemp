@@ -111,9 +111,12 @@ type
       fDoSilenceDetection: Boolean;
       fSilenceThreshold: Integer;
 
-      fApplyReplayGain: Boolean;
-      fPreferAlbumGain: Boolean;
-      fDefaultGain    : Single;
+      fApplyReplayGain      : Boolean;
+      fPreferAlbumGain      : Boolean;
+      fDefaultGainWithoutRG : Single;
+      fDefaultGainWithRG    : Single;
+      fPreventClipping      : Boolean;
+
 
       fStatus: Integer;       // Playing, paused, stopped
       fStopStatus: Integer;   // "normal Stop" or "Stop after title"
@@ -406,9 +409,11 @@ type
         property DoSilenceDetection: Boolean read fDoSilenceDetection write fDoSilenceDetection;
         property SilenceThreshold: Integer read fSilenceThreshold write fSilenceThreshold;
 
-        property ApplyReplayGain: Boolean read fApplyReplayGain write fApplyReplayGain  ;
-        property PreferAlbumGain: Boolean read fPreferAlbumGain write fPreferAlbumGain ;
-        property DefaultGain: Single read fDefaultGain write fDefaultGain;
+        property ApplyReplayGain     : Boolean read fApplyReplayGain      write fApplyReplayGain     ;
+        property PreferAlbumGain     : Boolean read fPreferAlbumGain      write fPreferAlbumGain     ;
+        property DefaultGainWithoutRG: Single  read fDefaultGainWithoutRG write fDefaultGainWithoutRG;
+        property DefaultGainWithRG   : Single  read fDefaultGainWithRG    write fDefaultGainWithRG   ;
+        property PreventClipping     : Boolean read fPreventClipping      write fPreventClipping     ;
 
         property PrescanInProgress: Boolean read fPrescanInProgress;
 
@@ -1024,7 +1029,9 @@ begin
 
   ApplyReplayGain       := ini.ReadBool('Player', 'ApplyReplayGain', True);
   PreferAlbumGain       := ini.ReadBool('Player', 'PreferAlbumGain', True);
-  DefaultGain           := ini.ReadFloat('Player', 'DefaultGain', 0);
+  PreventClipping       := ini.ReadBool('Player', 'PreventClipping', True);
+  DefaultGainWithoutRG  := ini.ReadFloat('Player', 'DefaultGain', 0);
+  DefaultGainWithRG     := ini.ReadFloat('Player', 'DefaultGainWithRG', 0);
 
 
   fPlayingTitelMode     := ini.ReadInteger('Player','AnzeigeModus',0);
@@ -1134,7 +1141,9 @@ begin
 
   ini.WriteBool('Player', 'ApplyReplayGain', ApplyReplayGain);
   ini.WriteBool('Player', 'PreferAlbumGain', PreferAlbumGain);
-  ini.WriteFloat('Player', 'DefaultGain', DefaultGain);
+  ini.WriteBool('Player', 'PreventClipping', PreventClipping);
+  ini.WriteFloat('Player', 'DefaultGainWithRG', DefaultGainWithRG);
+  ini.WriteFloat('Player', 'DefaultGain', DefaultGainWithoutRG);
 
   ini.WriteInteger('Player','AnzeigeModus', fPlayingTitelMode);
   ini.WriteBool('Player','UseVisual', UseVisualization);
@@ -2545,27 +2554,49 @@ end;
 procedure TNempPlayer.ApplyReplayGainToStream(aStream: DWord; aAudioFile: TAudioFile);
 var localRGVolume: BASS_BFX_VOLUME;
     rgHandle: HFX;
-    aGain: Double;
+    localPeak, aGain: Double;
+
 begin
     if not ApplyReplayGain then
         // do nothing
         exit;
 
     aGain := 0;
+    localPeak := 1;
+
     if PreferAlbumGain then
+    begin
         aGain := aAudioFile.AlbumGain;
+        localPeak := aAudioFile.AlbumPeak;
+    end;
 
     if IsZero(aGain) then
+    begin
         aGain := aAudioFile.TrackGain;
+        localPeak := aAudioFile.TrackPeak;
+    end;
+
+    // this should not happen, as the default peak should be set to 1, not zero.
+    // however, to be sure:
+    if isZero(localPeak) then
+        localPeak := 1;
 
     if isZero(aGain) then
-        aGain := fDefaultGain;
+        // No replayGain-Value available, use only pre-amp
+        aGain := fDefaultGainWithoutRG
+    else
+        // replayGain value available,
+        // add pre-amp
+        aGain := aGain + fDefaultGainWithRG;
 
     if not isZero(aGain) then
     begin
         rgHandle := BASS_ChannelSetFX(astream, BASS_FX_BFX_VOLUME, 1);
         localRGVolume.lChannel := 0;
-        localRGVolume.fVolume := power(10, aGain/20);
+        if fPreventClipping then
+            localRGVolume.fVolume := min(power(10, aGain/20),  1/localPeak)
+        else
+            localRGVolume.fVolume := power(10, aGain/20);
         BASS_FXSetParameters(rgHandle, @localRGVolume);
     end;
 end;

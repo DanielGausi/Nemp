@@ -13,7 +13,6 @@ object ReplayGainProgressForm: TReplayGainProgressForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Visible = True
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow

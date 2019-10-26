@@ -5401,6 +5401,8 @@ begin
         CON_FAVORITE            : NewSortMethod := AFCompareFavorite;
         CON_TRACKGAIN           : NewSortMethod := AFCompareTrackGain;
         CON_ALBUMGAIN           : NewSortMethod := AFCompareAlbumGain;
+        CON_TRACKPEAK           : NewSortMethod := AFCompareTrackPeak;
+        CON_ALBUMPEAK           : NewSortMethod := AFCompareAlbumPeak;
     else
         NewSortMethod := AFComparePath;
     end;

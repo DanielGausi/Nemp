@@ -40,10 +40,10 @@ type
 
     TRGNotifyEvent       = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer) of Object;
     TRGProgressEvent     = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; aProgress: Single) of Object;
-    TRGCompleteEvent     = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: SmallInt) of Object;
+    TRGCompleteEvent     = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double) of Object;
     TRGMainProgressEvent = Procedure(aReplayGainCalculator: TNempReplayGainCalculator; AlbumName: String; FileCount: Integer; Progress: TRGStatus) of Object;
 
-    TRGAudioFileSynchEvent = Procedure(aFile: TAudioFile; aTrackGain, aAlbumGain: Double) of Object;
+    TRGAudioFileSynchEvent = Procedure(aFile: TAudioFile; aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Double) of Object;
 
   // internal Data for preparing the TRGOverallProgressEvent
   TMainProgressData = record
@@ -52,11 +52,16 @@ type
       Progress: TRGStatus;
   end;
 
-  TMonoSample = SmallInt;
+  TGainData = record
+      Gain: Double;
+      Peak: Double;
+  end;
+
+  TMonoSample = Single; // 32Bit values
 
   TStereoSample = record
-      Left:  SmallInt;
-      Right: SmallInt;
+      Left:  single; // 32Bit values
+      Right: single; // 32Bit values
   end;
 
 
@@ -97,8 +102,8 @@ type
 
       ///  internal variables for ReplayGain Calculation
       ///  access through parameters in the OnComplete-Events
-      fPeakTrack: SmallInt;
-      fPeakAlbum: SmallInt;
+      fTrackPeak: TFloat; //SmallInt;
+      fAlbumPeak: TFloat; //SmallInt;
       fTrackGain: TFloat;
       fAlbumGain: TFloat;
 
@@ -110,7 +115,7 @@ type
       ///  before Updating the MetaData and the AudioFile-Objects
       ///  In this array all TrackGAin-Values for the current Album are stored
       ///  access indirectly throught the parameter of the OnSynchAudioFile-Event
-      fCurrentTrackGains: Array of Double;
+      fCurrentTrackGains: Array of TGainData;
 
       ///  a little record with some data for the OnMainProgress-Event
       fMainProgressData : TMainProgressData;
@@ -187,7 +192,7 @@ type
       procedure DOSynchRGOverallProgress      ;
 
       function fPrepareNextAlbum(StartIndex: Integer): Integer;
-      procedure fUpdateMetaData(aFile: String; aTrackGain, aAlbumGain: Double; Flags: Integer);
+      procedure fUpdateMetaData(aFile: String; aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Double; Flags: Integer);
 
   protected
       procedure Execute; override;
@@ -348,12 +353,15 @@ begin
     // prepare the TrackGain-Value array
     SetLength(fCurrentTrackGains, fCurrentAlbumList.Count);
     for i := 0 to Length(fCurrentTrackGains)-1 do
-        fCurrentTrackGains[i] := 0;
+    begin
+        fCurrentTrackGains[i].Gain := 0;
+        fCurrentTrackGains[i].Peak := 1;
+    end;
 
     result := fCurrentAlbumList.Count;
 end;
 
-procedure TNempReplayGainCalculator.fUpdateMetaData(aFile: String; aTrackGain, aAlbumGain: Double; Flags: Integer);
+procedure TNempReplayGainCalculator.fUpdateMetaData(aFile: String; aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Double; Flags: Integer);
 var localAudioFile: TAudioFile;
     aErr: TNempAudioError;
     ErrorLog: TErrorLog;
@@ -370,12 +378,16 @@ begin
 
             // set Gain values in AudioFile-Object
             if (Flags AND RG_SetTrack)   = RG_SetTrack   then localAudioFile.TrackGain := aTrackGain;
+            if (Flags AND RG_SetTrack)   = RG_SetTrack   then localAudioFile.TrackPeak := aTrackPeak;
             if (Flags AND RG_ClearTrack) = RG_ClearTrack then localAudioFile.TrackGain := 0;
+            if (Flags AND RG_ClearTrack) = RG_ClearTrack then localAudioFile.TrackPeak := 1;
             if (Flags AND RG_SetAlbum)   = RG_SetAlbum   then localAudioFile.AlbumGain := aAlbumGain;
+            if (Flags AND RG_SetAlbum)   = RG_SetAlbum   then localAudioFile.AlbumPeak := aAlbumPeak;
             if (Flags AND RG_ClearAlbum) = RG_ClearAlbum then localAudioFile.AlbumGain := 0;
+            if (Flags AND RG_ClearAlbum) = RG_ClearAlbum then localAudioFile.AlbumPeak := 1;
 
             // Write Data into the metatags of the file
-            aErr := localAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain, Flags, True);
+            aErr := localAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak, Flags, True);
 
             if aErr <> AUDIOERR_None then
             begin
@@ -416,11 +428,11 @@ begin
 end;
 procedure TNempReplayGainCalculator.DoSynchOnTrackComplete;
 begin
-    fOnTrackComplete(self, fCurrentIndex, fTrackGain, fPeakTrack);
+    fOnTrackComplete(self, fCurrentIndex, fTrackGain, fTrackPeak);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnAlbumComplete;
 begin
-    fOnAlbumComplete(self, fCurrentIndex, fAlbumGain, fPeakAlbum);
+    fOnAlbumComplete(self, fCurrentIndex, fAlbumGain, fAlbumPeak);
 end;
 procedure TNempReplayGainCalculator.DoSynchOnWriteMetaDataProgress;
 begin
@@ -431,8 +443,10 @@ procedure TNempReplayGainCalculator.DoSynchAudioFile;
 begin
     fOnSynchAudioFile(
         fAudioFiles[ fFileSynchOffset + fCurrentIndex ],
-        fCurrentTrackGains[fCurrentIndex],
-        fAlbumGain
+        fCurrentTrackGains[fCurrentIndex].Gain,
+        fAlbumGain,
+        fCurrentTrackGains[fCurrentIndex].Peak,
+        fAlbumPeak
     );
 end;
 
@@ -506,12 +520,12 @@ var Channelinfo: Bass_ChannelInfo;
 begin
     if fStream <> 0 then
         BASS_StreamFree(fStream);
-    fStream := BASS_StreamCreateFile(false, PChar(aFilename), 0, 0, BASS_UNICODE OR BASS_STREAM_DECODE);
+    fStream := BASS_StreamCreateFile(false, PChar(aFilename), 0, 0, BASS_UNICODE OR BASS_STREAM_DECODE OR BASS_SAMPLE_FLOAT);
     if (fStream = 0) then
     begin
         fLastErrorCode   := Bass_ErrorGetCode;
         fCurrentFilename := aFilename;
-        fPeakTrack       := 0;
+        fTrackPeak       := 0;
         fChannelLength   := 0;
         fChannelCount    := 0;
         fChannelFreq     := 0;
@@ -520,15 +534,18 @@ begin
     else
     begin
         fLastErrorCode := 0;
-        fPeakTrack := 0;
+        fTrackPeak := 0;
         fCurrentFilename := aFilename;
         fChannelLength := BASS_ChannelGetLength(fStream, BASS_POS_BYTE);
         BASS_ChannelGetInfo(fStream, Channelinfo);
         fChannelCount   := ChannelInfo.chans;
         fChannelFreq    := ChannelInfo.freq;
-        fChannelIs16Bit := NOT (
+
+        fChannelIs16Bit := True; // actually a lie with the latest changes ... ;-)
+        {fChannelIs16Bit := NOT (
                 ((ChannelInfo.flags AND BASS_SAMPLE_8BITS) = BASS_SAMPLE_8BITS) or
                 ((ChannelInfo.flags AND BASS_SAMPLE_FLOAT) = BASS_SAMPLE_FLOAT)     );
+        }
     end;
 
     result := fLastErrorCode;
@@ -605,7 +622,7 @@ begin
 end;
 function TNempReplayGainCalculator.fReadStereoSamplesFromStream: Integer;
 begin
-    result := BASS_ChannelGetData(fStream, @fStereoBuffer, sizeof(fStereoBuffer)); // div sizeof(TStereoSample);
+    result := BASS_ChannelGetData(fStream, @fStereoBuffer, sizeof(fStereoBuffer) ); // div sizeof(TStereoSample);
 end;
 function TNempReplayGainCalculator.ReadAudioSamplesFromStream: Integer;
 var bytesread: Integer;
@@ -638,8 +655,8 @@ var k: Integer;
 begin
     for k := 0 to pred(nSamples) do
     begin
-        fLeftSamples[k]  := fMonoBuffer[k];
-        fPeakTrack := Max(fPeakTrack, Abs(fMonoBuffer[k]));
+        fLeftSamples[k]  := fMonoBuffer[k] * 32767;
+        fTrackPeak := Max(fTrackPeak, Abs(fMonoBuffer[k]));
         fRightSamples[k] := 0;
     end;
 end;
@@ -648,10 +665,10 @@ var k: Integer;
 begin
     for k := 0 to pred(nSamples) do
     begin
-        fLeftSamples[k]  := fStereoBuffer[k].Left  ;
-        fPeakTrack := Max(fPeakTrack, Abs(fStereoBuffer[k].Left));
-        fRightSamples[k] := fStereoBuffer[k].Right ;
-        fPeakTrack := Max(fPeakTrack, Abs(fStereoBuffer[k].Right));
+        fLeftSamples[k]  := fStereoBuffer[k].Left  * 32767 ;
+        fTrackPeak := Max(fTrackPeak, Abs(fStereoBuffer[k].Left));
+        fRightSamples[k] := fStereoBuffer[k].Right * 32767 ;
+        fTrackPeak := Max(fTrackPeak, Abs(fStereoBuffer[k].Right));
     end;
 end;
 function TNempReplayGainCalculator.RGAnalyse(nSamples: Integer): LongInt;
@@ -678,12 +695,14 @@ begin
     if CheckNewStreamProperties(AlbumGainWanted) <> RG_ERR_None then
     begin
         result := 0;
+        fCurrentTrackGains[aIndex].Gain := 0;
+        fCurrentTrackGains[aIndex].Peak := 1;
         // Error-Event was triggered in CheckNewStreamProperties, if an error occured
     end
     else
     begin
         // Channel properties are supported, continue
-        fPeakTrack := 0;
+        fTrackPeak := 0;
         fLastProgressReport := 0;
 
         while (BASS_ChannelIsActive(fStream) > 0) do
@@ -718,7 +737,8 @@ begin
 
             fCurrentIndex := aIndex;
             fTrackGain := GetTitleGain;
-            fCurrentTrackGains[aIndex] := fTrackGain;
+            fCurrentTrackGains[aIndex].Gain := fTrackGain;
+            fCurrentTrackGains[aIndex].Peak := fTrackPeak;
 
             // trigger Event: OnTrackComplete
             if assigned(fOnTrackComplete) then
@@ -749,7 +769,7 @@ begin
     result     := 0;
     fTrackGain := 0;
     fAlbumGain := 0;
-    fPeakAlbum := 0;
+    fAlbumPeak := 0;
 
     fLastGainInitFreq := 0;
     fAlbumGainCalculationFailed := False;
@@ -767,7 +787,7 @@ begin
         if fInitGainCalculation(fChannelFreq) = RG_ERR_None then
             fCalculateTrack(0, True);
 
-        fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
+        fAlbumPeak := Max(fAlbumPeak, fTrackPeak);
     end;
     FreeStream;
 
@@ -789,7 +809,7 @@ begin
         if InitStreamFromFilename(AudioFiles[i]) = 0 then
         begin
             fCalculateTrack(i, True);
-            fPeakAlbum := Max(fPeakAlbum, fPeakTrack);
+            fAlbumPeak := Max(fAlbumPeak, fTrackPeak);
         end;
         FreeStream;
     end;
@@ -809,7 +829,7 @@ begin
         end else
         begin
             fAlbumGain := 0;
-            fPeakAlbum := 0;
+            fAlbumPeak := 0;
             fCurrentIndex := -1;
         end;
 
@@ -841,9 +861,15 @@ begin
     if fAudioFiles.Count > 0 then
     begin
         // prepare the TrackGain-Value array
+        fAlbumPeak := 0;
+        fAlbumGain := 0;
         SetLength(fCurrentTrackGains, fAudioFiles.Count);
         for i := 0 to Length(fCurrentTrackGains)-1 do
-            fCurrentTrackGains[i] := 0;
+        begin
+            fCurrentTrackGains[i].Gain := 0;
+            fCurrentTrackGains[i].Peak := 1;
+
+        end;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartCalculationSingleTracks);
@@ -855,13 +881,14 @@ begin
 
             // calculate TrackGain
             fCurrentIndex := i;
-            fCurrentTrackGains[i] := CalculateTrackGain(fPaths[i], i);
+            CalculateTrackGain(fPaths[i], i);
+            // Note: fCurrentTrackGains-values are set within CalculateTrackGain
 
             // Update MetaData
             // we can do it her directly after the calculation of the TrackGain,
             // as we do not need AlbumGain information
-            if not isZero(fCurrentTrackGains[i]) then
-                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i], 0, RG_SetTrack);
+            if not isZero(fCurrentTrackGains[i].Gain) then
+                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i].Gain, 0, fCurrentTrackGains[i].Peak, 1,  RG_SetTrack);
         end;
         // clear thread-used filename
         SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
@@ -882,7 +909,10 @@ begin
         // prepare the TrackGain-Value array
         SetLength(fCurrentTrackGains, fAudioFiles.Count);
         for i := 0 to Length(fCurrentTrackGains)-1 do
-            fCurrentTrackGains[i] := 0;
+        begin
+            fCurrentTrackGains[i].Gain := 0;
+            fCurrentTrackGains[i].Peak := 1;
+        end;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartCalculationSingleAlbum);
@@ -910,8 +940,8 @@ begin
 
             fCurrentIndex := i;
             // Update MetaData
-            if not isZero(fCurrentTrackGains[i]) then
-                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i], fAlbumGain, Flags);
+            if not isZero(fCurrentTrackGains[i].Gain) then
+                fUpdateMetaData(fPaths[i], fCurrentTrackGains[i].Gain, fAlbumGain, fCurrentTrackGains[i].Peak, fAlbumPeak, Flags);
 
             if assigned(fOnWriteMetaDataProgress)  then
             begin
@@ -972,8 +1002,8 @@ begin
 
             fCurrentIndex := i;
             // Update MetaData, similar to UpdateTags in Medialibrary for the TagCloud-stuff
-            if not isZero(fCurrentTrackGains[i])  then
-                fUpdateMetaData(fCurrentAlbumList[i], fCurrentTrackGains[i], fAlbumGain, Flags);
+            if not isZero(fCurrentTrackGains[i].Gain)  then
+                fUpdateMetaData(fCurrentAlbumList[i], fCurrentTrackGains[i].Gain, fAlbumGain, fCurrentTrackGains[i].Peak, fAlbumPeak, Flags);
 
             if assigned(fOnWriteMetaDataProgress)  then
             begin
@@ -1000,9 +1030,14 @@ begin
     begin
         // prepare the TrackGain-Value array
         // this array is needed in DoSynchAudioFile (called from fUpdateMetaData)
+        fAlbumPeak := 1;
+        fAlbumGain := 0;
         SetLength(fCurrentTrackGains, fAudioFiles.Count);
         for i := 0 to Length(fCurrentTrackGains)-1 do
-            fCurrentTrackGains[i] := 0;
+        begin
+            fCurrentTrackGains[i].Gain := 0;
+            fCurrentTrackGains[i].Peak := 1;
+        end;
 
         // Starting calculation, notify MainThread
         HandleMainProgress('', fAudioFiles.Count, RGStatus_StartDeleteValues);
@@ -1014,7 +1049,7 @@ begin
 
             fCurrentIndex := i;
             // Update MetaData
-            fUpdateMetaData(fPaths[i], 0, 0, RG_ClearBoth);
+            fUpdateMetaData(fPaths[i], 0, 0, 1, 1, RG_ClearBoth);
 
             if assigned(fOnWriteMetaDataProgress)  then
             begin

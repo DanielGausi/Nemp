@@ -4377,6 +4377,9 @@ begin
           CON_TRACKGAIN : Celltext := GainValueToString(Data^.FAudioFile.TrackGain); //  'Track gain (todo)';
           CON_ALBUMGAIN : Celltext := GainValueToString(Data^.FAudioFile.AlbumGain); //  'Album gain (todo)';
 
+          CON_TRACKPEAK : Celltext := PeakValueToString(Data^.FAudioFile.TrackPeak);
+          CON_ALBUMPEAK : Celltext := PeakValueToString(Data^.FAudioFile.AlbumPeak);
+
         else
           CellText := ' ';
         end;
@@ -7367,6 +7370,8 @@ begin
         exit;
     end;
 
+    if not GetSpecialPermissionToChangeMetaData then exit;
+
     // determine Source and ReplayGain calculation setting
     if (Sender as TMenuItem).Tag >= 100 then
         aVST := self.PlaylistVST
@@ -8458,7 +8463,12 @@ begin
                               AND
                               IsZero(Data.FAudioFile.AlbumGain)
                             )
-                        then ImageIndex := 16;
+                        then begin
+                            if NempPlayer.ApplyReplayGain then
+                                ImageIndex := 16
+                            else
+                                ImageIndex := 17;
+                        end;
 
                   end;
             end;

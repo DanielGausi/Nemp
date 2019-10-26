@@ -741,7 +741,7 @@ const
 
     // WM_TRAYMSG = WM_USER + 10; // not needed any more (tTrayIcon)
 
-    Spaltenzahl = 26;
+    Spaltenzahl = 28;
     // Nicht Ändern! Das sind auch die Tags in den Menu-Einträgen zum Sortieren!!
     CON_ARTIST    = 0 ;
     CON_TITEL     = 1 ;
@@ -770,6 +770,9 @@ const
     CON_FAVORITE = 23;
     CON_TRACKGAIN = 24;
     CON_ALBUMGAIN = 25;
+    CON_TRACKPEAK = 26;
+    CON_ALBUMPEAK = 27;
+
     //-----
     CON_EX_ARTISTALBUMTITEL = 117;
     CON_EX_ALBUMTITELARTIST = 118;
@@ -924,7 +927,7 @@ const
          'Techno'
          );
 
-      DefaultSpalten : array[0..25] of TSpalte =
+      DefaultSpalten : array[0..27] of TSpalte =
       (
         (Bezeichnung: 'Artist' ;Inhalt: CON_ARTIST        ;visible: True  ;width: 122 ;sortAscending: True),
         (Bezeichnung: 'Title' ;Inhalt: CON_TITEL          ;visible: True  ;width: 190 ;sortAscending: True),
@@ -953,7 +956,9 @@ const
         (Bezeichnung: 'Marker' ;Inhalt: CON_FAVORITE       ;visible: true   ;width: 44 ;sortAscending: True),
         // new in Nemp 4.13
         (Bezeichnung: 'Track gain' ;Inhalt: CON_TRACKGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
-        (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True)
+        (Bezeichnung: 'Album gain' ;Inhalt: CON_ALBUMGAIN       ;visible: false   ;width: 70 ;sortAscending: True),
+        (Bezeichnung: 'Track peak' ;Inhalt: CON_TRACKPEAK       ;visible: false   ;width: 70 ;sortAscending: True),
+        (Bezeichnung: 'Album peak' ;Inhalt: CON_ALBUMPEAK       ;visible: false   ;width: 70 ;sortAscending: True)
       );
 
       AUDIOFILE_STRINGS : Array[0..4] of string =
@@ -1006,6 +1011,12 @@ const
       APE_CATEGORIES = 'CATEGORIES';
       APE_DISCNUMBER = 'DISCNUMBER';
       //APE_FAVORITE = 'FAVORITE';
+
+      REPLAYGAIN_TRACK_GAIN = 'REPLAYGAIN_TRACK_GAIN';
+      REPLAYGAIN_ALBUM_GAIN = 'REPLAYGAIN_ALBUM_GAIN';
+
+      REPLAYGAIN_TRACK_PEAK = 'REPLAYGAIN_TRACK_PEAK';
+      REPLAYGAIN_ALBUM_PEAK = 'REPLAYGAIN_ALBUM_PEAK';
 
 
 procedure SaveWindowPositons(ini: TMemIniFile; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);

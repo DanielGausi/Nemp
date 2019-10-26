@@ -3648,30 +3648,40 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Height = 158
           Caption = 'ReplayGain'
           TabOrder = 2
-          object Label1: TLabel
-            Left = 16
-            Top = 111
-            Width = 409
-            Height = 34
-            AutoSize = False
-            Caption = 
-              'Please have a look into the documentation how ReplayGain works i' +
-              'n Nemp.'
-            WordWrap = True
-          end
           object lblDefaultGainValue: TLabel
             Left = 376
-            Top = 85
+            Top = 124
             Width = 37
             Height = 13
             Caption = '0.00 dB'
           end
           object lblReplayGainDefault: TLabel
             Left = 16
-            Top = 65
-            Width = 59
+            Top = 80
+            Width = 79
             Height = 13
-            Caption = 'Default Gain'
+            Caption = 'Pre-amplification'
+          end
+          object lblDefaultGainValue2: TLabel
+            Left = 376
+            Top = 100
+            Width = 37
+            Height = 13
+            Caption = '0.00 dB'
+          end
+          object lblRG_Preamp1: TLabel
+            Left = 16
+            Top = 100
+            Width = 39
+            Height = 13
+            Caption = 'With RG'
+          end
+          object lblRG_Preamp2: TLabel
+            Left = 16
+            Top = 124
+            Width = 55
+            Height = 13
+            Caption = 'Without RG'
           end
           object cb_ApplyReplayGain: TCheckBox
             Left = 16
@@ -3697,18 +3707,43 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 1
           end
           object tp_DefaultGain: TNempTrackBar
-            Left = 16
-            Top = 81
-            Width = 354
+            Left = 104
+            Top = 119
+            Width = 266
             Height = 24
+            Hint = 'Pre-amplification for tracks without ReplayGain information'
             Max = 200
             Min = -200
             PageSize = 10
-            TabOrder = 2
+            TabOrder = 3
             TickMarks = tmBoth
             TickStyle = tsNone
             OnChange = tp_DefaultGainChange
             OnMouseDown = tp_DefaultGainMouseDown
+          end
+          object tp_DefaultGain2: TNempTrackBar
+            Left = 104
+            Top = 96
+            Width = 266
+            Height = 24
+            Hint = 'Pre-amplification for tracks with ReplayGain information'
+            Max = 200
+            Min = -200
+            PageSize = 10
+            TabOrder = 4
+            TickMarks = tmBoth
+            TickStyle = tsNone
+            OnChange = tp_DefaultGain2Change
+            OnMouseDown = tp_DefaultGain2MouseDown
+          end
+          object cb_ReplayGainPreventClipping: TCheckBox
+            Left = 16
+            Top = 53
+            Width = 97
+            Height = 17
+            Hint = 'Limit amplification to prevent playback from clipping, if needed'
+            Caption = 'Prevent clipping'
+            TabOrder = 2
           end
         end
       end

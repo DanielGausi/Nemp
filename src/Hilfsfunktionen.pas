@@ -81,8 +81,10 @@ function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): Unicod
 function StringToURLString(aUTF8String: UTF8String): AnsiString;
 
 function GainStringToSingle(aGainString: String): Single;
+function PeakStringToSingle(aPeakString: String): Single;
 
 function GainValueToString(aGainValue: Single): String;
+function PeakValueToString(aPeakValue: Single): String;
 
 
 procedure Wuppdi(i: Integer = 0);
@@ -661,6 +663,14 @@ begin
             then result := 0;
     end;
 end;
+function PeakStringToSingle(aPeakString: String): Single;
+var formatSettings: TFormatSettings;
+begin
+    formatSettings := TFormatSettings.Create(GetThreadLocale);
+    formatSettings.DecimalSeparator := '.';
+    if not TryStrToFloat(aPeakString, result, formatSettings)
+        then result := 0;
+end;
 
 function GainValueToString(aGainValue: Single): String;
 var formatSettings: TFormatSettings;
@@ -678,6 +688,18 @@ begin
     end;
 end;
 
+function PeakValueToString(aPeakValue: Single): String;
+var formatSettings: TFormatSettings;
+begin
+    if SameValue(aPeakValue, 1) then
+        result := ''
+    else
+    begin
+        formatSettings := TFormatSettings.Create(GetThreadLocale);
+        formatSettings.DecimalSeparator := '.';
+        result := Format('%.6f', [aPeakValue], formatSettings)
+    end;
+end;
 
 procedure Wuppdi(i: Integer = 0);
 begin

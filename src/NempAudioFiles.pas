@@ -165,6 +165,7 @@ type
     M4APlayCounter: AnsiString = 'NEMP PLAYCOUNTER';
 
 
+
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
 
@@ -224,11 +225,13 @@ type
         // CoverID: a md5-hash-like string
         fCoverID: String;
 
-        fTrackGainStr: String;
-        fAlbumGainStr: String;
+        //fTrackGainStr: String;
+        //fAlbumGainStr: String;
 
         fTrackGain: Single;
         fAlbumGain: Single;
+        fTrackPeak: Single;
+        fAlbumPeak: Single;
 
         // fDriveID: New in 4.13, used for loading/saving media library files into a stream.
         //           it is the index of the drive in the DriveList, to assign a proper Drive letter
@@ -448,11 +451,14 @@ type
 
         property DriveID: Integer read fDriveID write fDriveID;
 
-        property TrackGainStr: String read fTrackGainStr write fTrackGainStr;
-        property AlbumGainStr: String read fAlbumGainStr write fAlbumGainStr;
+        //property TrackGainStr: String read fTrackGainStr write fTrackGainStr;
+        //property AlbumGainStr: String read fAlbumGainStr write fAlbumGainStr;
 
         property TrackGain: Single read fTrackGain write fTrackGain;
         property AlbumGain: Single read fAlbumGain write fAlbumGain;
+
+        property TrackPeak: Single read fTrackPeak write fTrackPeak;
+        property AlbumPeak: Single read fAlbumPeak write fAlbumPeak;
 
         constructor Create;
         destructor Destroy; override;
@@ -485,11 +491,7 @@ type
         function WriteRatingsToMetaData(aRating: Integer; allowChange: Boolean): TNempAudioError;
         function WritePlayCounterToMetaData(aPlayCounter: Integer; allowChange: Boolean): TNempAudioError;
 
-        function WriteReplayGainToMetaData(aTrackGain, aAlbumGain: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
-
-
-
-
+        function WriteReplayGainToMetaData(aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
 
 
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
@@ -684,6 +686,9 @@ const
       //MP3DB_DUMMY_Text3  = 35;
       MP3DB_ALBUMGAIN = 35;
       MP3DB_TRACKGAIN = 36;
+
+      MP3DB_ALBUMPEAK = 37;
+      MP3DB_TRACKPEAK = 38;
 
 
       // 42 marked the end of an AudioFile (until Nemp 4.12)
@@ -964,6 +969,8 @@ begin
     fRating := 0;
     fFileAge := 40300;    // this is May 2nd, 2010, so all files from Nemp3 will appear as may 2010
     ID3TagNeedsUpdate := False;
+    TrackPeak := 1;
+    AlbumPeak := 1;
 end;
 destructor TAudioFile.Destroy;
 begin
@@ -1016,6 +1023,8 @@ begin
     Favorite           := aAudioFile.fFavorite           ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
+    TrackPeak          := aAudioFile.TrackPeak           ;
+    AlbumPeak          := aAudioFile.AlbumPeak           ;
 
 end;
 procedure TAudioFile.AssignLight(aAudioFile: TAudioFile);
@@ -1047,6 +1056,8 @@ begin
     Favorite           := aAudioFile.fFavorite           ;
     TrackGain          := aAudioFile.TrackGain           ;
     AlbumGain          := aAudioFile.AlbumGain           ;
+    TrackPeak          := aAudioFile.TrackPeak           ;
+    AlbumPeak          := aAudioFile.AlbumPeak           ;
 end;
 
 {
@@ -1763,11 +1774,14 @@ begin
     end;
 
     // Get ReplayGain Information
-    fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_album_gain');
-    fTrackGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_track_gain');
+    //fTrackGainStr :=  aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_GAIN);
+    //fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_GAIN);
 
-    AlbumGain := GainStringToSingle(fAlbumGainStr);
-    TrackGain := GainStringToSingle(fTrackGainStr);
+    TrackGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_GAIN));
+    AlbumGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_GAIN));
+
+    TrackPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_PEAK));
+    AlbumPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_PEAK));
 end;
 
 {
@@ -1783,6 +1797,10 @@ begin
     // Playcounter/Rating: Maybe incompatible with other Taggers
     PlayCounter := StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT), 0);
     Rating :=  StrToIntDef(aFlacFile.GetPropertyByFieldname(VORBIS_RATING), 0);
+
+    TrackGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
+    AlbumGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
+
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     RawTagLastFM := UTF8String(aFlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
     fVBR := False;
@@ -1825,6 +1843,9 @@ begin
     Rating :=  StrToIntDef(aOggFile.GetPropertyByFieldname(VORBIS_RATING), 0);
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     RawTagLastFM := UTF8String(aOggFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
+
+    TrackGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
+    AlbumGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
 end;
 
 {
@@ -1854,6 +1875,9 @@ begin
 
     PlayCounter := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
     Rating      := StrToIntDef(aM4AFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
+
+    TrackGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_GAIN));
+    AlbumGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_GAIN));
 end;
 
 {
@@ -1884,6 +1908,8 @@ begin
     PlayCounter  := StrToIntDef(aBaseApeFile.GetValueByKey(APE_PLAYCOUNT), 0);
     Rating       := StrToIntDef(aBaseApeFile.GetValueByKey(APE_RATING), 0);
     RawTagLastFM := UTF8String(aBaseApeFile.GetValueByKey(APE_CATEGORIES));
+    TrackGain := GainStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_TRACK_GAIN));
+    AlbumGain := GainStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_ALBUM_GAIN));
 
     // Get ChannelMode
     case aType of
@@ -2650,9 +2676,9 @@ begin
 end;
 
 
-function TAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
+function TAudioFile.WriteReplayGainToMetaData(aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
 var MainFile: TGeneralAudioFile;
-    strAlbum, strTrack: String;
+    strAlbum, strTrack, strTrackPeak, strAlbumPeak: String;
     doUpdateTrack, doUpdateAlbum: Boolean;
 const INVALID_STR = '----';
 begin
@@ -2676,28 +2702,93 @@ begin
                       // Init Strings with invalid Data
                       strTrack := INVALID_STR;
                       strAlbum := INVALID_STR;
+                      strTrackPeak := INVALID_STR;
+                      strAlbumPeak := INVALID_STR;
                       // 1.) Convert Values into Strings, according to the Flags
                       if (Flags AND RG_ClearTrack) = RG_ClearTrack then strTrack := '';
+                      if (Flags AND RG_ClearTrack) = RG_ClearTrack then strTrackPeak := '';
                       if (Flags AND RG_SetTrack)   = RG_SetTrack   then strTrack := GainValueToString(aTrackGain);
+                      if (Flags AND RG_SetTrack)   = RG_SetTrack   then strTrackPeak := PeakValueToString(aTrackPeak);
+
                       if (Flags AND RG_ClearAlbum) = RG_ClearAlbum then strAlbum := '';
+                      if (Flags AND RG_ClearAlbum) = RG_ClearAlbum then strAlbumPeak := '';
                       if (Flags AND RG_SetAlbum)   = RG_SetAlbum   then strAlbum := GainValueToString(aAlbumGain);
+                      if (Flags AND RG_SetAlbum)   = RG_SetAlbum   then strAlbumPeak := PeakValueToString(aAlbumPeak);
+
                       // if we want to set or clear a value: actually do update the metadata
                       doUpdateTrack := strTrack <> INVALID_STR;
                       doUpdateAlbum := strAlbum <> INVALID_STR;
                       case MainFile.FileType of
                           at_Mp3: begin
-                                if doUpdateTrack then MainFile.Mp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', strTrack);
-                                if doUpdateAlbum then MainFile.Mp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', strAlbum);
+                                if doUpdateTrack then
+                                begin
+                                    MainFile.Mp3File.ID3v2Tag.SetUserText(REPLAYGAIN_TRACK_GAIN, strTrack);
+                                    MainFile.Mp3File.ID3v2Tag.SetUserText(REPLAYGAIN_TRACK_PEAK, strTrackPeak);
+                                end;
+                                if doUpdateAlbum then
+                                begin
+                                    MainFile.Mp3File.ID3v2Tag.SetUserText(REPLAYGAIN_ALBUM_GAIN, strAlbum);
+                                    MainFile.Mp3File.ID3v2Tag.SetUserText(REPLAYGAIN_ALBUM_PEAK, strAlbumPeak);
+                                end;
                           end;
-                          at_Ogg: ;
-                          at_Flac: ;
-                          at_M4A: ;
+                          at_Ogg: begin
+                                if doUpdateTrack then begin
+                                    MainFile.OggFile.SetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN, strTrack  );
+                                    MainFile.OggFile.SetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK, strTrackPeak  );
+                                end;
+                                if doUpdateAlbum then
+                                begin
+                                    MainFile.OggFile.SetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN, strAlbum  );
+                                    MainFile.OggFile.SetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK, strAlbumPeak  );
+                                end;
+                          end;
+
+                          at_Flac: begin
+                                if doUpdateTrack then begin
+                                    MainFile.FlacFile.SetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN, strTrack  );
+                                    MainFile.FlacFile.SetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK, strTrackPeak  );
+                                end;
+                                if doUpdateAlbum then begin
+                                    MainFile.FlacFile.SetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN, strAlbum  );
+                                    MainFile.FlacFile.SetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK, strAlbumPeak  );
+                                end;
+                          end;
+                          at_M4A: begin
+                                if doUpdateTrack then begin
+                                    MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_GAIN, strTrack );
+                                    MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_PEAK, strTrackPeak );
+                                end;
+                                if doUpdateAlbum then begin
+                                    MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_GAIN, strAlbum );
+                                    MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_PEAK, strAlbumPeak );
+                                end;
+                          end;
                           at_Monkey,
                           at_WavPack,
                           at_MusePack,
                           at_OptimFrog,
-                          at_TrueAudio: ;
+                          at_TrueAudio: begin
+                                if doUpdateTrack then begin
+                                    MainFile.BaseApeFile.SetValueByKey(REPLAYGAIN_TRACK_GAIN, strTrack);
+                                    MainFile.BaseApeFile.SetValueByKey(REPLAYGAIN_TRACK_PEAK, strTrackPeak);
+                                end;
+                                if doUpdateAlbum then begin
+                                    MainFile.BaseApeFile.SetValueByKey(REPLAYGAIN_ALBUM_GAIN, strAlbum);
+                                    MainFile.BaseApeFile.SetValueByKey(REPLAYGAIN_ALBUM_PEAK, strAlbumPeak);
+                                end;
+                          end;
                           // at_Invalid: ;at_Wma: ; at_Wav: ;
+
+                          {
+                          at_Ogg : MainFile.OggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
+                        at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
+                        at_M4A : MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, StrCounter);
+                        ...
+                        ...
+                        MainFile.BaseApeFile.SetValueByKey(APE_PLAYCOUNT  , StrCounter);
+
+                          }
+
                       end;
 
                 result := AudioToNempAudioError(MainFile.UpdateFile);
@@ -2785,26 +2876,7 @@ begin
         // delete Tags-Frame
         aMp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
 
-    {
-    if isZero(TrackGain) then
-        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', '')
-    else
-        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_TRACK_GAIN', GainValueToString(TrackGain));
 
-
-    if isZero(AlbumGain) then
-        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', '')
-    else
-        aMp3File.ID3v2Tag.SetUserText('REPLAYGAIN_ALBUM_GAIN', GainValueToString(AlbumGain));
-
-     }
-    {fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_album_gain');
-    fTrackGainStr :=  aMp3File.id3v2tag.GetUserText('replaygain_track_gain');
-
-    AlbumGain := GainStringToSingle(fAlbumGainStr);
-    TrackGain := GainStringToSingle(fTrackGainStr);
-
-    }
 
 end;
 
@@ -3206,8 +3278,8 @@ begin
             MP3DB_ALBUMGAIN : fAlbumGain := ReadSingleFromStream(aStream);
             MP3DB_TRACKGAIN : fTrackGain := ReadSingleFromStream(aStream);
 
-            // Deprecated (from a long, long time ago ...)
-            MP3DB_KATEGORIE:     ReadByteFromStream(aStream);
+            MP3DB_ALBUMPEAK : fAlbumPeak := ReadSingleFromStream(aStream);
+            MP3DB_TRACKPEAK : fTrackPeak := ReadSingleFromStream(aStream);
 
             DATA_END_ID: ; // Explicitly do Nothing -  because of the ELSE path ;-)
         else
@@ -3480,6 +3552,11 @@ begin
 
     if not isZero(fAlbumGain) then result := result + WriteSingleToStream(aStream, MP3DB_ALBUMGAIN, fAlbumGain);
     if not isZero(fTrackGain) then result := result + WriteSingleToStream(aStream, MP3DB_TRACKGAIN, fTrackGain);
+
+
+    if not isZero(fAlbumPeak) then result := result + WriteSingleToStream(aStream, MP3DB_ALBUMPEAK, fAlbumPeak);
+    if not isZero(fTrackPeak) then result := result + WriteSingleToStream(aStream, MP3DB_TRACKPEAK, fTrackPeak);
+
 
     // end of AudioFile
     result := result + WriteDataEnd(aStream);

@@ -118,6 +118,8 @@ function AFCompareCD(a1,a2: tAudioFile): Integer;
 function AFCompareFavorite(a1,a2: tAudioFile): Integer;
 function AFCompareAlbumGain(a1,a2: tAudioFile): Integer;
 function AFCompareTrackGain(a1,a2: tAudioFile): Integer;
+function AFCompareAlbumPeak(a1,a2: tAudioFile): Integer;
+function AFCompareTrackPeak(a1,a2: tAudioFile): Integer;
 
 function MainSort(item1, item2: Pointer): Integer;
 
@@ -277,6 +279,16 @@ end;
 
 function AFCompareAlbumGain(a1,a2: tAudioFile): Integer;
 begin
+    if isZero(a1.AlbumGain) and isZero(a2.AlbumGain) then
+        result := 0
+    else
+        if (isZero(a1.AlbumGain)) and (NOT isZero(a2.AlbumGain)) then
+            result := 1
+        else
+            if (NOT isZero(a1.AlbumGain)) and (isZero(a2.AlbumGain)) then
+                result := -1
+            else
+
     result := CompareValue(a1.AlbumGain, a2.AlbumGain);
 end;
 function AFCompareTrackGain(a1,a2: tAudioFile): Integer;
@@ -292,6 +304,15 @@ begin
             else
 
     result := CompareValue(a1.TrackGain, a2.TrackGain);
+end;
+
+function AFCompareAlbumPeak(a1,a2: tAudioFile): Integer;
+begin
+    result := CompareValue(a1.AlbumPeak, a2.AlbumPeak);
+end;
+function AFCompareTrackPeak(a1,a2: tAudioFile): Integer;
+begin
+    result := CompareValue(a1.TrackPeak, a2.TrackPeak);
 end;
 
 
