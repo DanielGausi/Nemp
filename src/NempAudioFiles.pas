@@ -107,6 +107,11 @@ type
                 AUDIOERR_EditingDenied,
                 AUDIOERR_DriveNotReady,
                 AUDIOERR_NoAudioTrack,
+
+                AUDIOERR_ReplayGain_TooManyChannels,
+                AUDIOERR_ReplayGain_InitGainAnalysisError,
+                AUDIOERR_ReplayGain_AlbumGainFreqChanged,
+
                 AUDIOERR_Unkown   );
 
  const
@@ -157,6 +162,12 @@ type
               // CDDA
               'Drive not ready',
               'No Audio track',
+
+              // ReplayGain
+              'Too many channels',                               // AUDIOERR_ReplayGain_TooManyChannels,
+              'Error initialising ReplayGain calculation',       //  AUDIOERR_ReplayGain_InitGainAnalysisError,
+              'Inconsistent track frequency on this album', //  AUDIOERR_ReplayGain_AlbumGainFreqChanged,
+
               // unknown
               'Unknown Error'
     );
@@ -1214,6 +1225,12 @@ begin
             if (PlayCounter > 0) then
                 result := result + ', '
                             + Format(Audiofile_PlayCounterHint, [PlayCounter]);
+
+            if (Not IsZero(TrackGain)) and (Not isZero(AlbumGain)) then
+                result := result + #13#10 + Format(Audiofile_ReplayGain_Album, [TrackGain, AlbumGain])
+            else
+                if (Not IsZero(TrackGain)) then
+                    result := result + #13#10 + Format(Audiofile_ReplayGain_Track, [TrackGain])
         end;
 
         at_Stream: begin
@@ -1801,6 +1818,9 @@ begin
     TrackGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
 
+    TrackPeak := PeakStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
+    AlbumPeak := PeakStringToSingle(aFlacFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK));
+
     // LastFM-Tags/CATEGORIES: Probably Nemp-Only
     RawTagLastFM := UTF8String(aFlacFile.GetPropertyByFieldname(VORBIS_CATEGORIES));
     fVBR := False;
@@ -1846,6 +1866,9 @@ begin
 
     TrackGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_GAIN));
+
+    TrackPeak := PeakStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_TRACK_PEAK));
+    AlbumPeak := PeakStringToSingle(aOggFile.GetPropertyByFieldname(REPLAYGAIN_ALBUM_PEAK));
 end;
 
 {
@@ -1878,6 +1901,9 @@ begin
 
     TrackGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_GAIN));
+
+    TrackPeak := PeakStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_TRACK_PEAK));
+    AlbumPeak := PeakStringToSingle(aM4AFile.GetSpecialData(DEFAULT_MEAN, REPLAYGAIN_ALBUM_PEAK));
 end;
 
 {
@@ -1910,7 +1936,8 @@ begin
     RawTagLastFM := UTF8String(aBaseApeFile.GetValueByKey(APE_CATEGORIES));
     TrackGain := GainStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_ALBUM_GAIN));
-
+    TrackPeak := PeakStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_TRACK_PEAK));
+    AlbumPeak := PeakStringToSingle(aBaseApeFile.GetValueByKey(REPLAYGAIN_ALBUM_PEAK));
     // Get ChannelMode
     case aType of
         // MPP_MODE: array [0..2] of string = ('Unknown', 'Stereo', 'Joint Stereo');

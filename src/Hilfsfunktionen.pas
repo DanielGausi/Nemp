@@ -669,7 +669,7 @@ begin
     formatSettings := TFormatSettings.Create(GetThreadLocale);
     formatSettings.DecimalSeparator := '.';
     if not TryStrToFloat(aPeakString, result, formatSettings)
-        then result := 0;
+        then result := 1;
 end;
 
 function GainValueToString(aGainValue: Single): String;

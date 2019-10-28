@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   System.Contnrs, myDialogs,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, ReplayGainAnalysis, NempReplayGainCalculation,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, NempReplayGainCalculation,
   Vcl.ComCtrls, VirtualTrees, bass, nempAudiofiles, Vcl.ExtCtrls;
 
 type
@@ -56,6 +56,8 @@ type
 
   end;
 
+  function ReplayGainToAudioError(aErrorCode: Integer): TNempAudioError;
+
 var
   ReplayGainProgressForm: TReplayGainProgressForm;
 
@@ -67,6 +69,21 @@ implementation
 uses NempMainUnit, MainFormHelper, AudioFiles, ReplayGain, Nemp_RessourceStrings;
 
 {$R *.dfm}
+
+function ReplayGainToAudioError(aErrorCode: Integer): TNempAudioError;
+begin
+    case aErrorCode of
+        RG_ERR_None                 : result := AUDIOERR_None;
+        RG_ERR_TooManyChannels      : result := AUDIOERR_ReplayGain_TooManyChannels       ;
+        RG_ERR_AlbumGainFreqChanged : result := AUDIOERR_ReplayGain_AlbumGainFreqChanged  ;
+        RG_ERR_InitGainAnalysisError: result := AUDIOERR_ReplayGain_InitGainAnalysisError ;
+
+        // can happen sometimes, but it's not actually an error ...
+        BASS_ERROR_ENDED            : result := AUDIOERR_None;
+    else
+        result := AUDIOERR_Unkown;
+    end;
+end;
 
 
 
@@ -248,6 +265,41 @@ begin
     end;
 end;
 
+procedure TReplayGainProgressForm.OnCalculationError(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer);
+var AudioErr: TNempAudioError;
+begin
+
+    AudioErr := ReplayGainToAudioError(ErrorCode);
+    if AudioErr <> AUDIOERR_None then
+    begin
+        HandleError(afa_ReplayGain,
+            aReplayGainCalculator.CurrentFilename,
+            AudioErr);
+    end;
+
+
+    case ErrorCode of
+        RG_ERR_None: ;
+        RG_ERR_TooManyChannels: LogMemo.Lines.Add(Format('Error: Too many channels (%s)', [aReplayGainCalculator.CurrentFilename]));
+        RG_ERR_AlbumGainFreqChanged: LogMemo.Lines.Add(Format('Warning: AlbumGain calculation cancelled (%s)', [aReplayGainCalculator.CurrentFilename]));
+        RG_ERR_InitGainAnalysisError: LogMemo.Lines.Add(Format('Error: Failed initialisiing replay gain calculation (%s)', [aReplayGainCalculator.CurrentFilename]));
+
+        BASS_ERROR_ENDED: ; // can happen sometimes, but it's not actually an error ...
+        {
+        if aErr <> AUDIOERR_None then
+            begin
+                ErrorLog := TErrorLog.create(afa_ReplayGain, localAudioFile, aErr, false);
+                try
+                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
+                finally
+                    ErrorLog.Free;
+                end;
+            end;
+        }
+    end;
+end;
+
+
 procedure TReplayGainProgressForm.OnTrackProgress(Sender: TNempReplayGainCalculator;
   aProgress: Single);
 begin
@@ -313,31 +365,7 @@ begin
     end;
 end;
 
-procedure TReplayGainProgressForm.OnCalculationError(aReplayGainCalculator: TNempReplayGainCalculator; ErrorCode: Integer);
-begin
-    case ErrorCode of
-        RG_ERR_None: ;
-        RG_ERR_TooManyChannels: LogMemo.Lines.Add(Format('Error: Too many channels (%s)', [aReplayGainCalculator.CurrentFilename]));
-        RG_ERR_No16Bit: LogMemo.Lines.Add(Format('Error: Not a 16Bit channel (%s)', [aReplayGainCalculator.CurrentFilename]));
-        RG_ERR_AlbumGainFreqChanged: LogMemo.Lines.Add(Format('Warning: AlbumGain calculation cancelled (%s)', [aReplayGainCalculator.CurrentFilename]));
-        RG_ERR_InitGainAnalysisError: LogMemo.Lines.Add(Format('Error: Failed initialisiing replay gain calculation (%s)', [aReplayGainCalculator.CurrentFilename]));
 
-        BASS_ERROR_ENDED: ; // can happen sometimes, but it's not actually an error ...
-
-
-        {
-        if aErr <> AUDIOERR_None then
-            begin
-                ErrorLog := TErrorLog.create(afa_ReplayGain, localAudioFile, aErr, false);
-                try
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
-                finally
-                    ErrorLog.Free;
-                end;
-            end;
-        }
-    end;
-end;
 
 
 

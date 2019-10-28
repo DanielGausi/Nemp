@@ -296,7 +296,6 @@ uses
             <Form>ReplayGainProgressForm</Form>
         </DCCReference>
         <DCCReference Include="3rd Party Units\ReplayGain.pas"/>
-        <DCCReference Include="ReplayGainAnalysis.pas"/>
         <DCCReference Include="NempReplayGainCalculation.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

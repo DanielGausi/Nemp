@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer0
+      ActivePage = TabView3
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2189,7 +2189,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CBChangeFontColoronBitrate: TCheckBox
             Left = 16
             Top = 58
-            Width = 393
+            Width = 409
             Height = 17
             Hint = 'Use different colors for different bitrates.'
             Caption = 'Change font color according to bitrate (if skin allows this)'
@@ -2201,7 +2201,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CBChangeFontSizeOnLength: TCheckBox
             Left = 16
             Top = 39
-            Width = 249
+            Width = 420
             Height = 17
             Hint = 
               'User bigger fonts for long tracks and smaller ones for short tra' +
@@ -3450,7 +3450,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_MainDevice: TLabel
             Left = 16
             Top = 20
-            Width = 121
+            Width = 385
             Height = 13
             AutoSize = False
             Caption = 'Main'
@@ -3458,7 +3458,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_Headphones: TLabel
             Left = 16
             Top = 66
-            Width = 121
+            Width = 305
             Height = 13
             AutoSize = False
             Caption = 'Headphones'
@@ -3764,7 +3764,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_Buffersize: TLabel
             Left = 16
             Top = 20
-            Width = 121
+            Width = 401
             Height = 13
             Hint = 'Increase this value, if the playback stutters sometimes.'
             AutoSize = False
@@ -3781,7 +3781,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_UseFloatingPoint: TLabel
             Left = 16
             Top = 68
-            Width = 121
+            Width = 401
             Height = 13
             Hint = 'Try to change this, if the playback is distorted.'
             AutoSize = False
@@ -3790,7 +3790,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_Mixing: TLabel
             Left = 16
             Top = 116
-            Width = 121
+            Width = 409
             Height = 13
             Hint = 'Try to change this, if the playback is distorted.'
             AutoSize = False

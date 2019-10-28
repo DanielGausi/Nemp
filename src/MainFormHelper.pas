@@ -109,7 +109,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 
     procedure AddErrorLog(aString: String);
-    procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);
+    procedure HandleError(aAction: TAudioFileAction; aFile: String; aErr: TNempAudioError; Important: Boolean = false); overload;
+    procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false); overload;
 
 
     function GetSpecialPermissionToChangeMetaData:Boolean;
@@ -1710,7 +1711,7 @@ begin
         Nemp_MainForm.MM_H_ErrorLog.Visible := True;
 end;
 
-procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);  overload;
+procedure HandleError(aAction: TAudioFileAction; aFile: String; aErr: TNempAudioError; Important: Boolean = false); overload;
 var s: String;
 begin
     if aErr <> AUDIOERR_None then
@@ -1731,8 +1732,9 @@ begin
           afa_TagCloud:            s := 'Error while updating the Tagcloud: ';
           afa_ReplayGain:          s := 'Error while calculating ReplayGain values: ';
         end;
-        if assigned(aFile) then
-            s := s + aFile.Pfad;
+
+        s := s + aFile;
+
         s := s + #13#10;
         s := s + 'Errormessage: ' + AudioErrorString[aErr] + #13#10
            + '------';
@@ -1762,6 +1764,9 @@ begin
           AUDIO_FlacErr_MetaDataTooLarge,
           AUDIOERR_DriveNotReady,
           AUDIOERR_NoAudioTrack,
+          AUDIOERR_ReplayGain_TooManyChannels,
+          AUDIOERR_ReplayGain_InitGainAnalysisError,
+          AUDIOERR_ReplayGain_AlbumGainFreqChanged,
           AUDIOERR_Unkown:            AddErrorLog(s);   // Post always, this is something strange
 
 
@@ -1771,6 +1776,14 @@ begin
               AddErrorLog(s);
         end;
     end;
+end;
+
+procedure HandleError(aAction: TAudioFileAction; aFile: TAudioFile; aErr: TNempAudioError; Important: Boolean = false);  overload;
+begin
+    if assigned(aFile) then
+        HandleError(aAction, aFile.Pfad, aErr, Important)
+    else
+        HandleError(aAction, '', aErr, Important);
 end;
 
 function GetSpecialPermissionToChangeMetaData:Boolean;

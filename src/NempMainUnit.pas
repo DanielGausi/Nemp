@@ -605,6 +605,7 @@ type
     PM_ML_ReplayGain_MultiAlbum: TMenuItem;
     PM_ML_ReplayGain_Clear: TMenuItem;
     N27: TMenuItem;
+    LblBibReplayGain: TLabel;
 
     procedure FormCreate(Sender: TObject);
 
@@ -5303,7 +5304,7 @@ var newLabel: TLabel;
 begin
 
     TagLabelList.Clear;
-    currentTop := LblBibPlayCounter.Top + LblBibPlayCounter.Height + 12;
+    currentTop := LblBibReplayGain.Top + LblBibReplayGain.Height + 12;
 
     baseLeft := 8;
     currentLeft := baseleft;
@@ -5463,6 +5464,7 @@ begin
   LblBibDuration    .Visible :=  assigned(aAudioFile);
   LblBibPlayCounter .Visible :=  assigned(aAudioFile);
   LblBibQuality     .Visible :=  assigned(aAudioFile);
+  LblBibReplayGain  .Visible :=  assigned(aAudioFile);
 
   ImgBibRating  .Visible :=  assigned(aAudioFile);
 
@@ -5503,6 +5505,14 @@ begin
           ImgBibRating.Visible := True;
           BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
           LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
+
+          if (Not IsZero(aAudioFile.TrackGain)) and (Not isZero(aAudioFile.AlbumGain)) then
+              LblBibReplayGain.Caption := Format(Audiofile_ReplayGain_Album_Short, [aAudioFile.TrackGain, aAudioFile.AlbumGain])
+          else
+              if (Not IsZero(aAudioFile.TrackGain)) then
+                  LblBibReplayGain.Caption := Format(Audiofile_ReplayGain_Track_Short, [aAudioFile.TrackGain])
+              else
+                  LblBibReplayGain.Caption := '';
       end;
 
       at_Stream: begin
@@ -5510,6 +5520,7 @@ begin
           LblBibDuration  .Caption := '';
           LblBibPlayCounter.Caption := '';
           LblBibQuality.Caption := '';
+          LblBibReplayGain.Caption := '';
       end;
 
       at_CDDA: begin
@@ -5517,6 +5528,7 @@ begin
           LblBibQuality.Caption := 'CD-Audio';
           ImgBibRating.Visible := False;
           LblBibPlayCounter.Caption := '';
+          LblBibReplayGain.Caption := '';
       end;
   end;
 end;

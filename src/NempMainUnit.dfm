@@ -906,7 +906,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnKeyUp = PlaylistVSTKeyUp
             OnNewText = VSTNewText
             OnStartDrag = VSTStartDrag
-            ExplicitLeft = -2
             Columns = <
               item
                 Position = 0
@@ -1157,8 +1156,8 @@ object Nemp_MainForm: TNemp_MainForm
               OnMouseLeave = DetailLabelMouseLeave
             end
             object LblBibPlayCounter: TLabel
-              Left = 8
-              Top = 149
+              Left = 84
+              Top = 129
               Width = 54
               Height = 13
               Caption = '                  '
@@ -1210,6 +1209,15 @@ object Nemp_MainForm: TNemp_MainForm
               Height = 5
               Anchors = [akLeft, akTop, akRight]
               Shape = bsBottomLine
+            end
+            object LblBibReplayGain: TLabel
+              Left = 9
+              Top = 149
+              Width = 54
+              Height = 13
+              Hint = 'ReplayGain values'
+              Caption = '                  '
+              StyleElements = [seClient, seBorder]
             end
           end
         end

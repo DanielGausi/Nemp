@@ -137,7 +137,6 @@ uses
   NempFileUtils in 'NempFileUtils.pas',
   ReplayGainProgress in 'ReplayGainProgress.pas' {ReplayGainProgressForm},
   ReplayGain in '3rd Party Units\ReplayGain.pas',
-  ReplayGainAnalysis in 'ReplayGainAnalysis.pas',
   NempReplayGainCalculation in 'NempReplayGainCalculation.pas';
 
 {$R *.res}

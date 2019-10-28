@@ -823,6 +823,11 @@ AudioFileProperty_Track       = 'Track';
 Audiofile_PlayCounterHint     = 'Played %d times';
 //Audiofile_RatingHintNoRating  = 'Rating: N/A';
 Audiofile_RatingHint          = 'Rating: %s of 5 stars';
+Audiofile_ReplayGain_Track    = 'ReplayGain: %6.2f dB';
+Audiofile_ReplayGain_Album    = 'ReplayGain: %6.2f dB (Album %6.2f dB)';
+
+Audiofile_ReplayGain_Track_Short    = '%6.2f dB';
+Audiofile_ReplayGain_Album_Short    = '%6.2f dB (Album %6.2f dB)';
 
 
     AutoScanDirsDialog_Caption = 'Confirmation';

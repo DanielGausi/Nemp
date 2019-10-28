@@ -15,10 +15,9 @@ const
 
     // I do not start with 1, so theses codes differ from the BASS ErrorCodes
     RG_ERR_TooManyChannels       = 101;  // The audiostream contains more than 2 channels
-    RG_ERR_No16Bit               = 102;  // the audiostream does not contain 16bit samples
-    RG_ERR_InitGainAnalysisError = 103;  // error from the original ReplayGain-Unit,
+    RG_ERR_InitGainAnalysisError = 102;  // error from the original ReplayGain-Unit,
                                          // probably the samplerate of the audiostream is not supported
-    RG_ERR_AlbumGainFreqChanged  = 104;  // the list of audiofiles contains different samplerates
+    RG_ERR_AlbumGainFreqChanged  = 103;  // the list of audiofiles contains different samplerates
                                          // in that case, calculation of AlbumGain is not possible and will be skipped
                                          // at the end of the method CalculateAlbumGain
 
@@ -93,7 +92,6 @@ type
       fCurrentFilename  : UnicodeString;
 
       //
-      fChannelIs16Bit   : Boolean;
       fLastGainInitFreq : Cardinal;
 
 
@@ -391,7 +389,8 @@ begin
 
             if aErr <> AUDIOERR_None then
             begin
-                ErrorLog := TErrorLog.create(afa_ReplayGain, localAudioFile, aErr, false);
+                ErrorLog := TErrorLog.create(afa_ReplayGain, localAudioFile, aErr, False);
+                // false: Do not report errors like "MetaData not supported" - that's ok here. ;-)
                 try
                     SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
                 finally
@@ -529,7 +528,6 @@ begin
         fChannelLength   := 0;
         fChannelCount    := 0;
         fChannelFreq     := 0;
-        fChannelIs16Bit  := False;
     end
     else
     begin
@@ -540,12 +538,6 @@ begin
         BASS_ChannelGetInfo(fStream, Channelinfo);
         fChannelCount   := ChannelInfo.chans;
         fChannelFreq    := ChannelInfo.freq;
-
-        fChannelIs16Bit := True; // actually a lie with the latest changes ... ;-)
-        {fChannelIs16Bit := NOT (
-                ((ChannelInfo.flags AND BASS_SAMPLE_8BITS) = BASS_SAMPLE_8BITS) or
-                ((ChannelInfo.flags AND BASS_SAMPLE_FLOAT) = BASS_SAMPLE_FLOAT)     );
-        }
     end;
 
     result := fLastErrorCode;
@@ -584,35 +576,26 @@ begin
             Synchronize(DoSynchOnError);
     end
     else
-        if Not fChannelIs16Bit then
+        if self.fChannelFreq <> fLastGainInitFreq then
         begin
-            fLastErrorCode := RG_ERR_No16Bit;
-            result := fLastErrorCode;
-            // trigger OnError-Event
-            if assigned(fOnError) then
-                Synchronize(DoSynchOnError);
-        end
-        else
-            if self.fChannelFreq <> fLastGainInitFreq then
+            // ReInit GainAnalysis
+            if fInitGainCalculation(fChannelFreq) <> RG_ERR_None then
             begin
-                // ReInit GainAnalysis
-                if fInitGainCalculation(fChannelFreq) <> RG_ERR_None then
-                begin
-                    // fLastErrorCode was set in fInitGainCalculation
-                    result := fLastErrorCode;
-                end;
-
-                if AlbumGainWanted then
-                begin
-                    fAlbumGainCalculationFailed := True;
-                    fLastErrorCode := RG_ERR_AlbumGainFreqChanged;
-                    // DO NOT set result := fLastErrorCode; in this case
-                    // we will continue calculating TrackGain-Values, but we skip AlbumGain
-                    // however: do trigger an event to notify the main application // user about it
-                    if assigned(fOnError) then
-                        Synchronize(DoSynchOnError);
-                end;
+                // fLastErrorCode was set in fInitGainCalculation
+                result := fLastErrorCode;
             end;
+
+            if AlbumGainWanted then
+            begin
+                fAlbumGainCalculationFailed := True;
+                fLastErrorCode := RG_ERR_AlbumGainFreqChanged;
+                // DO NOT set result := fLastErrorCode; in this case
+                // we will continue calculating TrackGain-Values, but we skip AlbumGain
+                // however: do trigger an event to notify the main application // user about it
+                if assigned(fOnError) then
+                    Synchronize(DoSynchOnError);
+            end;
+        end;
 end;
 
 
