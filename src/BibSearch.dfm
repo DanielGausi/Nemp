@@ -158,9 +158,9 @@ object FormBibSearch: TFormBibSearch
         TabOrder = 0
       end
       object LyricEdit: TMemo
-        Left = 53
+        Left = 82
         Top = 217
-        Width = 289
+        Width = 260
         Height = 96
         Anchors = [akLeft, akTop, akRight]
         Lines.Strings = (

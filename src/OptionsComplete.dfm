@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabSystem2
+      ActivePage = TabPlayer7
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -164,7 +164,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_SavePositionInTrack: TCheckBox
             Left = 16
             Top = 36
-            Width = 385
+            Width = 409
             Height = 17
             Hint = 'Begin playback at the last known position within the track'
             Caption = 'Remember last track position'
@@ -290,7 +290,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_Play: TCheckBox
             Left = 34
             Top = 40
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Play/Pause'
             Checked = True
@@ -301,7 +301,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_Stop: TCheckBox
             Left = 34
             Top = 60
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Stop'
             Checked = True
@@ -312,7 +312,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_JumpBack: TCheckBox
             Left = 34
             Top = 140
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Slide backwards'
             Checked = True
@@ -323,7 +323,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_Prev: TCheckBox
             Left = 34
             Top = 100
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Previous title'
             Checked = True
@@ -334,7 +334,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_Next: TCheckBox
             Left = 34
             Top = 80
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Next title'
             Checked = True
@@ -345,7 +345,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_JumpForward: TCheckBox
             Left = 34
             Top = 120
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'Slide forward'
             Checked = True
@@ -356,7 +356,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_IncVol: TCheckBox
             Left = 34
             Top = 160
-            Width = 121
+            Width = 140
             Height = 17
             Caption = 'Increase volume'
             Checked = True
@@ -367,7 +367,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_DecVol: TCheckBox
             Left = 34
             Top = 180
-            Width = 121
+            Width = 140
             Height = 17
             Caption = 'Decrease volume'
             Checked = True
@@ -378,7 +378,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Activate_Mute: TCheckBox
             Left = 34
             Top = 200
-            Width = 97
+            Width = 140
             Height = 17
             Caption = 'mute/unmute'
             Checked = True
@@ -389,7 +389,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CBRegisterHotKeys: TCheckBox
             Left = 16
             Top = 20
-            Width = 377
+            Width = 409
             Height = 17
             Hint = 
               'Install global hotkeys. You should use some values that are not ' +
@@ -2022,6 +2022,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView1: TTabSheet
         Caption = 'View (Party)'
         ImageIndex = 19
+        ExplicitLeft = 0
         DesignSize = (
           454
           532)
@@ -2067,7 +2068,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockTreeEdit: TCheckBox
             Left = 16
             Top = 20
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block editing file information in the media list'
             TabOrder = 0
@@ -2075,7 +2076,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
             Left = 16
             Top = 36
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block rating of current title'
             TabOrder = 1
@@ -2083,7 +2084,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockTools: TCheckBox
             Left = 16
             Top = 52
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block tools'
             TabOrder = 2
@@ -2124,6 +2125,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
+        ExplicitLeft = 0
+        ExplicitTop = 103
         DesignSize = (
           454
           532)
@@ -2131,20 +2134,20 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 160
           Width = 439
-          Height = 153
+          Height = 161
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Font variations according to audio data'
           TabOrder = 2
           object LblConst_FontVBR: TLabel
             Left = 35
-            Top = 98
+            Top = 108
             Width = 115
             Height = 13
             Caption = 'Font for variable bitrate'
           end
           object LblConst_FontCBR: TLabel
             Left = 227
-            Top = 98
+            Top = 111
             Width = 119
             Height = 13
             Caption = 'Font for constant bitrate'
@@ -2163,8 +2166,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBChangeFontOnCbrVbr: TCheckBox
             Left = 16
-            Top = 77
-            Width = 401
+            Top = 80
+            Width = 420
             Height = 17
             Hint = 'Use different fonts for files with fixed or variable bitrate.'
             Caption = 'Change font according to constant/variable bitrate'
@@ -2176,7 +2179,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBFontNameVBR: TComboBox
             Left = 35
-            Top = 114
+            Top = 127
             Width = 161
             Height = 21
             Style = csDropDownList
@@ -2184,7 +2187,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBFontNameCBR: TComboBox
             Left = 227
-            Top = 114
+            Top = 127
             Width = 161
             Height = 21
             Style = csDropDownList
@@ -2192,8 +2195,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBChangeFontColoronBitrate: TCheckBox
             Left = 16
-            Top = 58
-            Width = 393
+            Top = 60
+            Width = 420
             Height = 17
             Hint = 'Use different colors for different bitrates.'
             Caption = 'Change font color according to bitrate (if skin allows this)'
@@ -2204,8 +2207,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBChangeFontSizeOnLength: TCheckBox
             Left = 16
-            Top = 39
-            Width = 249
+            Top = 40
+            Width = 409
             Height = 17
             Hint = 
               'User bigger fonts for long tracks and smaller ones for short tra' +
@@ -2525,7 +2528,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_visual: TCheckBox
             Left = 16
             Top = 20
-            Width = 321
+            Width = 409
             Height = 17
             Caption = 'Visualization'
             TabOrder = 0
@@ -3454,7 +3457,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_MainDevice: TLabel
             Left = 16
             Top = 20
-            Width = 121
+            Width = 305
             Height = 13
             AutoSize = False
             Caption = 'Main'
@@ -3462,7 +3465,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblConst_Headphones: TLabel
             Left = 16
             Top = 66
-            Width = 121
+            Width = 305
             Height = 13
             AutoSize = False
             Caption = 'Headphones'
@@ -3538,7 +3541,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Fading: TCheckBox
             Left = 16
             Top = 20
-            Width = 161
+            Width = 409
             Height = 17
             Hint = 'Use crossfading.'
             Caption = 'Fade in/out'
@@ -3886,7 +3889,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object LblHeadsetDefaultAction: TLabel
             Left = 12
-            Top = 67
+            Top = 65
             Width = 405
             Height = 13
             AutoSize = False
@@ -3926,7 +3929,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_AutoStopHeadsetSwitchTab: TCheckBox
             Left = 12
             Top = 111
-            Width = 389
+            Width = 413
             Height = 17
             Caption = 'Stop headset when switching to another tab'
             TabOrder = 2
@@ -3951,7 +3954,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_AutoMixPlaylist: TCheckBox
             Left = 8
             Top = 56
-            Width = 409
+            Width = 428
             Height = 17
             Hint = 'Randomize playlist after the last track.'
             Caption = 'Mix playlist after last track'
@@ -3960,7 +3963,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_DisableAutoDeleteAtUserInput: TCheckBox
             Left = 28
             Top = 36
-            Width = 381
+            Width = 408
             Height = 17
             Hint = 'Exceptions for deleting a file from the playlist.'
             Caption = 'Do not delete after manual stop/pause/slide/next/previous'
@@ -3969,7 +3972,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_AutoDeleteFromPlaylist: TCheckBox
             Left = 8
             Top = 20
-            Width = 401
+            Width = 417
             Height = 17
             Hint = 'remove a track from the playlist after it is completely played.'
             Caption = 'Delete completely played tracks from the playlist'
@@ -3999,9 +4002,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'days (0 for unlimited logging).'
           end
           object cbSaveLogToFile: TCheckBox
-            Left = 8
+            Left = 3
             Top = 20
-            Width = 409
+            Width = 422
             Height = 17
             Caption = 'Use logfile on hard disk to log previous sessions'
             TabOrder = 0

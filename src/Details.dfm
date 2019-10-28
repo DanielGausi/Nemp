@@ -29,7 +29,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 469
     Height = 465
-    ActivePage = Tab_Lyrics
+    ActivePage = Tab_General
     Align = alTop
     DoubleBuffered = True
     ParentDoubleBuffered = False
