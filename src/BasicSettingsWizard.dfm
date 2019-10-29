@@ -3,8 +3,8 @@ object Wizard: TWizard
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Nemp Configuration Wizard'
-  ClientHeight = 304
-  ClientWidth = 528
+  ClientHeight = 321
+  ClientWidth = 544
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,18 +21,14 @@ object Wizard: TWizard
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 522
-    Height = 298
-    ActivePage = TabSheet3
+    Width = 538
+    Height = 315
+    ActivePage = TabSheet2
     Align = alClient
     MultiLine = True
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = '(welcome)'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object Lbl_Welcome: TLabel
         Left = 152
         Top = 16
@@ -63,8 +59,8 @@ object Wizard: TWizard
       object st_Introduction: TLabel
         Left = 152
         Top = 64
-        Width = 331
-        Height = 126
+        Width = 350
+        Height = 161
         AutoSize = False
         Caption = 
           'Nemp has a lot of cool features. Some of these features create n' +
@@ -75,8 +71,8 @@ object Wizard: TWizard
         WordWrap = True
       end
       object BtnContinue: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Continue'
@@ -85,8 +81,8 @@ object Wizard: TWizard
         OnClick = BtnContinueClick
       end
       object BtnCancel: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Cancel = True
@@ -98,10 +94,6 @@ object Wizard: TWizard
     object TabSheet2: TTabSheet
       Caption = '(Updates)'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object Lbl_CheckUpdates: TLabel
         Left = 152
         Top = 16
@@ -118,8 +110,8 @@ object Wizard: TWizard
       object Lbl_QeryUpdate: TLabel
         Left = 152
         Top = 172
-        Width = 321
-        Height = 46
+        Width = 350
+        Height = 70
         AutoSize = False
         Caption = 'Allow Nemp to check for updates periodically?'
         Font.Charset = DEFAULT_CHARSET
@@ -139,7 +131,7 @@ object Wizard: TWizard
       end
       object Label1: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '1/6'
@@ -153,8 +145,8 @@ object Wizard: TWizard
       object st_Updates: TLabel
         Left = 152
         Top = 45
-        Width = 349
-        Height = 105
+        Width = 350
+        Height = 125
         AutoSize = False
         Caption = 
           'Nemp can check for updates and notify you if a newer version of ' +
@@ -165,8 +157,8 @@ object Wizard: TWizard
         WordWrap = True
       end
       object BtnUpdateYes: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Yes'
@@ -175,8 +167,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateYesClick
       end
       object BtnUpdateNo: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'No'
@@ -185,7 +177,7 @@ object Wizard: TWizard
       end
       object BtnUpdateBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -196,10 +188,6 @@ object Wizard: TWizard
     object TabSheet3: TTabSheet
       Caption = '(QuickAccess)'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ImageMetaData: TImage
         Left = 8
         Top = 32
@@ -210,8 +198,8 @@ object Wizard: TWizard
       object Lbl_QueryMetadata: TLabel
         Left = 152
         Top = 172
-        Width = 321
-        Height = 46
+        Width = 350
+        Height = 70
         AutoSize = False
         Caption = 'Allow Nemp to change meta data in audio files?'
         Font.Charset = DEFAULT_CHARSET
@@ -237,7 +225,7 @@ object Wizard: TWizard
       end
       object Label2: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '2/6'
@@ -251,8 +239,8 @@ object Wizard: TWizard
       object st_Metadata: TLabel
         Left = 152
         Top = 45
-        Width = 337
-        Height = 105
+        Width = 350
+        Height = 125
         AutoSize = False
         Caption = 
           'If you change the artist, album, rating, ... of a title, or sear' +
@@ -266,7 +254,7 @@ object Wizard: TWizard
       end
       object Btn_MetaBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -274,8 +262,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateBackClick
       end
       object Btn_MetaYes: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Yes'
@@ -284,8 +272,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateYesClick
       end
       object Btn_MetaNo: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'No'
@@ -296,10 +284,6 @@ object Wizard: TWizard
     object TabSheet4: TTabSheet
       Caption = '(Rating)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object ImageRating: TImage
         Left = 8
         Top = 32
@@ -322,8 +306,8 @@ object Wizard: TWizard
       object Lbl_QueryRating: TLabel
         Left = 152
         Top = 172
-        Width = 326
-        Height = 46
+        Width = 350
+        Height = 70
         AutoSize = False
         Caption = 'Automatically adjust the rating of your files?'
         Font.Charset = DEFAULT_CHARSET
@@ -336,7 +320,7 @@ object Wizard: TWizard
       end
       object Label3: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '3/6'
@@ -350,8 +334,8 @@ object Wizard: TWizard
       object st_Rating: TLabel
         Left = 152
         Top = 45
-        Width = 337
-        Height = 105
+        Width = 350
+        Height = 125
         AutoSize = False
         Caption = 
           'Nemp can adjust the rating of your music files automatically. If' +
@@ -364,7 +348,7 @@ object Wizard: TWizard
       end
       object Btn_AutoBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -372,8 +356,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateBackClick
       end
       object Btn_AutoNo: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'No'
@@ -381,8 +365,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateNoClick
       end
       object Btn_AutoYes: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Yes'
@@ -394,10 +378,6 @@ object Wizard: TWizard
     object TabSheet5: TTabSheet
       Caption = '(LastFM)'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object ImageLastFM: TImage
         Left = 8
         Top = 32
@@ -420,8 +400,8 @@ object Wizard: TWizard
       object Lbl_QueryLastFM: TLabel
         Left = 152
         Top = 172
-        Width = 331
-        Height = 50
+        Width = 350
+        Height = 70
         AutoSize = False
         Caption = 'Automatically download missing cover art from last.fm?'
         Font.Charset = DEFAULT_CHARSET
@@ -434,7 +414,7 @@ object Wizard: TWizard
       end
       object Label4: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '4/6'
@@ -448,8 +428,8 @@ object Wizard: TWizard
       object st_LastFM: TLabel
         Left = 152
         Top = 45
-        Width = 337
-        Height = 105
+        Width = 350
+        Height = 125
         AutoSize = False
         Caption = 
           'Nemp tries to find a proper cover art for your audio files withi' +
@@ -461,7 +441,7 @@ object Wizard: TWizard
       end
       object Btn_LastFMBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -469,8 +449,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateBackClick
       end
       object Btn_LastFMNo: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'No'
@@ -478,8 +458,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateNoClick
       end
       object Btn_LastFMYes: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Yes'
@@ -491,10 +471,6 @@ object Wizard: TWizard
     object TabSheet6: TTabSheet
       Caption = '(filetypes)'
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object ImageFiletypes: TImage
         Left = 8
         Top = 32
@@ -517,8 +493,8 @@ object Wizard: TWizard
       object Lbl_QueryFiletypes: TLabel
         Left = 152
         Top = 172
-        Width = 331
-        Height = 50
+        Width = 350
+        Height = 70
         AutoSize = False
         Caption = 'Use Nemp as the default player for audio files?'
         Font.Charset = DEFAULT_CHARSET
@@ -531,7 +507,7 @@ object Wizard: TWizard
       end
       object Label5: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '5/6'
@@ -545,8 +521,8 @@ object Wizard: TWizard
       object st_filetypes: TLabel
         Left = 152
         Top = 45
-        Width = 331
-        Height = 105
+        Width = 350
+        Height = 125
         AutoSize = False
         Caption = 
           'Nemp can be installed as the default audio player. If you double' +
@@ -558,7 +534,7 @@ object Wizard: TWizard
       end
       object Btn_FiletypesBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -566,8 +542,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateBackClick
       end
       object Btn_FiletypesNo: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'No'
@@ -575,8 +551,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateNoClick
       end
       object Btn_FiletypesYes: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Yes'
@@ -589,10 +565,6 @@ object Wizard: TWizard
       Caption = '(summary)'
       ImageIndex = 5
       OnShow = TabSheet7Show
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 504
-      ExplicitHeight = 254
       object ImgSummary: TImage
         Left = 8
         Top = 32
@@ -616,7 +588,7 @@ object Wizard: TWizard
         Left = 152
         Top = 172
         Width = 331
-        Height = 46
+        Height = 70
         AutoSize = False
         Caption = 'Save settings and close wizard?'
         Font.Charset = DEFAULT_CHARSET
@@ -694,7 +666,7 @@ object Wizard: TWizard
       end
       object Label6: TLabel
         Left = 8
-        Top = 240
+        Top = 257
         Width = 27
         Height = 23
         Caption = '6/6'
@@ -707,7 +679,7 @@ object Wizard: TWizard
       end
       object Btn_CompleteBack: TButton
         Left = 152
-        Top = 240
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Back'
@@ -715,8 +687,8 @@ object Wizard: TWizard
         OnClick = BtnUpdateBackClick
       end
       object Btn_CompleteCancel: TButton
-        Left = 328
-        Top = 240
+        Left = 344
+        Top = 257
         Width = 75
         Height = 25
         Cancel = True
@@ -725,8 +697,8 @@ object Wizard: TWizard
         OnClick = BtnCancelClick
       end
       object Btn_CompleteOK: TButton
-        Left = 408
-        Top = 240
+        Left = 424
+        Top = 257
         Width = 75
         Height = 25
         Caption = 'Ok'

@@ -172,7 +172,7 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
         Top = 3
         Width = 207
         Height = 25
-        Caption = 'Use current sorting as custom sort'
+        Caption = 'Use current sorting'
         TabOrder = 5
         OnClick = BtnSetCustomSortClick
       end
@@ -190,10 +190,6 @@ object FormStreamVerwaltung: TFormStreamVerwaltung
     object Tab_Shoutcast: TTabSheet
       Caption = 'Shoutcast.com'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         684
         377)

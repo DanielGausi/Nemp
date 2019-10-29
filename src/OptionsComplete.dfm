@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabView3
+      ActivePage = TabPlayer1
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -87,7 +87,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 1
           object CB_AutoCheck: TCheckBox
             Left = 16
-            Top = 20
+            Top = 17
             Width = 401
             Height = 17
             Hint = 
@@ -268,7 +268,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Top = 20
             Width = 393
             Height = 17
-            Caption = 'Use advanced skinning sytem (not recommended for Windows XP)'
+            Caption = 'Use advanced skinning sytem'
             TabOrder = 0
           end
         end
@@ -1894,7 +1894,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBSortArray2: TComboBox
             Left = 176
-            Top = 34
+            Top = 37
             Width = 145
             Height = 21
             Style = csDropDownList
@@ -2067,7 +2067,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockTreeEdit: TCheckBox
             Left = 16
             Top = 20
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block editing file information in the media list'
             TabOrder = 0
@@ -2075,7 +2075,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockCurrentTitleRating: TCheckBox
             Left = 16
             Top = 36
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block rating of current title'
             TabOrder = 1
@@ -2083,7 +2083,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_BlockTools: TCheckBox
             Left = 16
             Top = 52
-            Width = 350
+            Width = 409
             Height = 17
             Caption = 'Block tools'
             TabOrder = 2
@@ -2110,7 +2110,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_PartyMode_ShowPasswordOnActivate: TCheckBox
             Left = 16
             Top = 63
-            Width = 393
+            Width = 409
             Height = 17
             Caption = 'Show password when activating the Nemp Party Mode'
             TabOrder = 1
@@ -2133,7 +2133,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           TabOrder = 2
           object LblConst_FontVBR: TLabel
             Left = 35
-            Top = 98
+            Top = 100
             Width = 115
             Height = 13
             Caption = 'Font for variable bitrate'
@@ -2192,7 +2192,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Width = 409
             Height = 17
             Hint = 'Use different colors for different bitrates.'
-            Caption = 'Change font color according to bitrate (if skin allows this)'
+            Caption = 'Change font color according to bitrate'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 2
@@ -2521,7 +2521,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_visual: TCheckBox
             Left = 16
             Top = 20
-            Width = 321
+            Width = 409
             Height = 17
             Caption = 'Visualization'
             TabOrder = 0
@@ -2575,13 +2575,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 8
           Width = 439
-          Height = 193
+          Height = 206
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Directories'
           TabOrder = 0
           DesignSize = (
             439
-            193)
+            206)
           object CBAutoScan: TCheckBox
             Left = 16
             Top = 20
@@ -2596,9 +2596,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object BtnAutoScanAdd: TButton
             Left = 341
-            Top = 36
+            Top = 43
             Width = 75
-            Height = 25
+            Height = 21
             Caption = 'Add'
             TabOrder = 2
             OnClick = BtnAutoScanAddClick
@@ -2607,15 +2607,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Left = 341
             Top = 68
             Width = 75
-            Height = 25
+            Height = 21
             Caption = 'Delete'
             TabOrder = 3
             OnClick = BtnAutoScanDeleteClick
           end
           object CBAutoAddNewDirs: TCheckBox
             Left = 16
-            Top = 103
-            Width = 313
+            Top = 119
+            Width = 409
             Height = 17
             Hint = 'Add new directories to this list'
             Caption = 'Automatically monitor new directories'
@@ -2623,8 +2623,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CBAskForAutoAddNewDirs: TCheckBox
             Left = 16
-            Top = 119
-            Width = 319
+            Top = 137
+            Width = 409
             Height = 17
             Hint = 
               'When selecting a new directory: Show query whether it should be ' +
@@ -2633,10 +2633,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 5
           end
           object LBAutoscan: TListBox
-            Left = 33
-            Top = 37
+            Left = 28
+            Top = 43
             Width = 307
-            Height = 60
+            Height = 70
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 13
             TabOrder = 1
@@ -2644,7 +2644,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cb_AutoDeleteFiles: TCheckBox
             Left = 16
-            Top = 145
+            Top = 155
             Width = 393
             Height = 17
             Hint = 
@@ -2656,7 +2656,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cb_AutoDeleteFilesShowInfo: TCheckBox
             Left = 33
-            Top = 161
+            Top = 173
             Width = 384
             Height = 17
             Hint = 'Create a log message about missing files'
@@ -2665,9 +2665,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object BtnAutoScanNow: TButton
             Left = 341
-            Top = 99
+            Top = 92
             Width = 75
-            Height = 25
+            Height = 21
             Hint = 'Scan now for new or missing files, according to the settings'
             Caption = 'Scan now'
             TabOrder = 8
@@ -2676,7 +2676,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_FilesMain_FileTypes: TGroupBox
           Left = 8
-          Top = 205
+          Top = 220
           Width = 439
           Height = 205
           Anchors = [akLeft, akTop, akRight]
@@ -2724,7 +2724,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_FilesMain_Playlists: TGroupBox
           Left = 8
-          Top = 412
+          Top = 427
           Width = 434
           Height = 50
           Caption = 'Playlists'
@@ -2787,7 +2787,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_RatingIncreaseRating: TCheckBox
             Left = 33
             Top = 85
-            Width = 376
+            Width = 392
             Height = 17
             Hint = 
               'Automatically increase rating on played tracks. The change will ' +
@@ -2798,7 +2798,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_RatingDecreaseRating: TCheckBox
             Left = 33
             Top = 105
-            Width = 376
+            Width = 384
             Height = 17
             Hint = 
               'Automatically decrease rating on aborted tracks. The change will' +
@@ -2836,14 +2836,14 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object GrpBox_CDAudio: TGroupBox
           Left = 8
           Top = 310
-          Width = 431
+          Width = 439
           Height = 50
           Caption = 'CD-Audio'
           TabOrder = 2
           object cb_UseCDDB: TCheckBox
             Left = 16
             Top = 20
-            Width = 393
+            Width = 420
             Height = 17
             Caption = 'Use CDDB/freeDB to get disc information'
             TabOrder = 0
@@ -2872,7 +2872,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         object grpBox_AdditionalTags: TGroupBox
           Left = 8
           Top = 78
-          Width = 431
+          Width = 439
           Height = 90
           Caption = 'Extended tags (for tag cloud)'
           TabOrder = 4
@@ -2922,7 +2922,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_CoverSearch_inDir: TCheckBox
             Left = 16
             Top = 20
-            Width = 209
+            Width = 385
             Height = 17
             Hint = 'Search for coverfiles within the directory of the audiofile'
             Caption = 'Directory itself'
@@ -2945,7 +2945,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_CoverSearch_inParentDir: TCheckBox
             Left = 16
             Top = 42
-            Width = 201
+            Width = 393
             Height = 17
             Hint = 'Search for coverfiles in the parent directory of the audiofile.'
             Caption = 'Parent directory'
@@ -3534,7 +3534,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object CB_Fading: TCheckBox
             Left = 16
             Top = 20
-            Width = 161
+            Width = 401
             Height = 17
             Hint = 'Use crossfading.'
             Caption = 'Fade in/out'
@@ -3739,7 +3739,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_ReplayGainPreventClipping: TCheckBox
             Left = 16
             Top = 53
-            Width = 97
+            Width = 401
             Height = 17
             Hint = 'Limit amplification to prevent playback from clipping, if needed'
             Caption = 'Prevent clipping'
@@ -4027,7 +4027,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cb_AutoStopHeadsetSwitchTab: TCheckBox
             Left = 12
             Top = 111
-            Width = 389
+            Width = 413
             Height = 17
             Caption = 'Stop headset when switching to another tab'
             TabOrder = 2
@@ -4102,7 +4102,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cbSaveLogToFile: TCheckBox
             Left = 8
             Top = 20
-            Width = 409
+            Width = 417
             Height = 17
             Caption = 'Use logfile on hard disk to log previous sessions'
             TabOrder = 0
@@ -4437,23 +4437,23 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 174
           Width = 439
-          Height = 125
+          Height = 123
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Countdown'
           TabOrder = 1
           DesignSize = (
             439
-            125)
+            123)
           object lblCountDownTitel: TLabel
-            Left = 36
-            Top = 39
-            Width = 76
+            Left = 16
+            Top = 42
+            Width = 96
             Height = 13
             Caption = 'Countdown title'
           end
           object LBlCountDownWarning: TLabel
             Left = 309
-            Top = 41
+            Top = 44
             Width = 76
             Height = 13
             Alignment = taRightJustify
@@ -4477,7 +4477,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object BtnCountDownSong: TButton
             Left = 404
-            Top = 55
+            Top = 58
             Width = 25
             Height = 21
             Hint = 'Select file'
@@ -4487,8 +4487,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnClick = BtnCountDownSongClick
           end
           object BtnGetCountDownTitel: TButton
-            Left = 36
-            Top = 82
+            Left = 16
+            Top = 85
             Width = 241
             Height = 25
             Hint = 'Use the current selected file in player as countdown.'
@@ -4497,9 +4497,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnClick = BtnGetCountDownTitelClick
           end
           object EditCountdownSong: TEdit
-            Left = 36
-            Top = 55
-            Width = 362
+            Left = 16
+            Top = 58
+            Width = 382
             Height = 21
             Anchors = [akLeft, akTop, akRight]
             TabOrder = 1
@@ -4919,7 +4919,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_SilentError: TCheckBox
             Left = 16
-            Top = 52
+            Top = 53
             Width = 410
             Height = 17
             Hint = 

@@ -530,7 +530,7 @@ object MainFormBuilder: TMainFormBuilder
   object BtnResetToDefault: TButton
     Left = 8
     Top = 511
-    Width = 125
+    Width = 177
     Height = 25
     Hint = 'Restore the default settings'
     Anchors = [akLeft, akBottom]
