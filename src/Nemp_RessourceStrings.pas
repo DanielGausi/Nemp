@@ -98,14 +98,24 @@ DetailForm_InfoLblFilename = 'Filename';
 DetailForm_InfoLblFileSize = 'Filesize';
 DetailForm_ID3v2Info = '%d Bytes (%d used)';
 
-DetailForm_VorbisCaption = 'Vorbis Comments';
-DetailForm_ApeCaption    = 'Apev2 Tags';
-DetailForm_iTunesCaption = 'iTunes Tags';
+//DetailForm_VorbisCaption = 'Vorbis Comments';
+//DetailForm_ApeCaption    = 'Apev2 Tags';
+//DetailForm_iTunesCaption = 'iTunes Tags';
 
 DetailForm_OnlyOneM4ACover = '(only one cover supported)';
 
 DetailForm_SaveChanges = 'Do you want to save the changes in the current file?';
 DetailForm_HighPlayCounter = 'This file was played %d times. This information will be irretrievably deleted if you reset the rating.';
+
+DetailForm_LibraryTagChanged = 'You have changed some properties of the audiofile, but these changes have not been saved yet.'
+          + 'If you make changes on this page as well, this may result in inconsistencies or unexpected behavior upon saving.'
+          + #13#10 + #13#10
+          + 'Would you like to save your changes now before you continue?';
+
+DetailForm_NoNewFramesPossible = 'All supported meta frames are already set. There''s nothing Nemp could add to the file here.';
+DetailForm_CurrentLibraryCover = 'Current cover art';
+DetailForm_CoverflowNotActive = 'The Coverflow will update automatically when you activate it';
+DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
 
 Warning_FileNotFound = 'File not found';
 Warning_FileNotFound_Hint = 'The specified file can not be found. Maybe it is on an external drive which is not connected.';
@@ -117,6 +127,9 @@ Warning_ReadError_Hint = 'The file could not be opened to get information. The f
 
 Warning_InvalidMp3file = 'Invalid mp3-file';
 Warning_InvalidMp3file_Hint = 'The specified file with the extension ".mp3" is not a valid mp3-file.';
+
+Warning_InvalidBaseApefile = 'Invalid audiofile';
+Warning_InvalidBaseApefile_Hint = 'The specified file is not a valid audiofile.';
 
 
 Warning_DownloadDirNotFound   = 'The download directory could not be found.';
@@ -828,6 +841,9 @@ Audiofile_ReplayGain_Album    = 'ReplayGain: %6.2f dB (Album %6.2f dB)';
 
 Audiofile_ReplayGain_Track_Short    = '%6.2f dB';
 Audiofile_ReplayGain_Album_Short    = '%6.2f dB (Album %6.2f dB)';
+
+Audiofile_ReplayGain_Track_WithPeak    = 'Title: %.2f dB, Peak: %.6f';
+Audiofile_ReplayGain_Album_WithPeak    = 'Album: %.2f dB, Peak: %.6f';
 
 
     AutoScanDirsDialog_Caption = 'Confirmation';

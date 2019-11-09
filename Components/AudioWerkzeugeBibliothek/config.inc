@@ -1,5 +1,12 @@
 
 {
+  Compatibilty to older Delphi Versions:
+  Undef USE_SYSTEM_TYPES to not use System.Types
+}
+
+{$DEFINE USE_SYSTEM_TYPES}
+
+{
   Compiler-Switch-TNT:
   For reading files with "unicode filenames", some methods/types from the
   "TNT Unicode Controls" can be used:

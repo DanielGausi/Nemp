@@ -342,7 +342,7 @@ var Buffer: Array of Byte;
 begin
   // Calculate CRC
   SetLength(Buffer, Source.Size);
-  Source.Seek(0, soFromBeginning);
+  Source.Seek(0, soBeginning);
   Source.Read(Buffer[0], Length(Buffer));
   for i := 0 to Length(Buffer) - 1 do
       CRC := (CRC shl 8) xor CRC_TABLE[((CRC shr 24) and $FF) xor Buffer[i]];
@@ -391,7 +391,7 @@ var id3: Integer;
 begin
     // check for ID3v2-Tag and skip it
     id3 := GetID3Size(Source);
-    Source.Seek(id3, soFromBeginning);
+    Source.Seek(id3, soBeginning);
 
     ReadHeader(Source);
 
@@ -709,7 +709,7 @@ begin
     for Index := 1 to 50 do
     begin
       DataIndex := aStream.Size - (SizeOf(Data) - 16) * Index - 16;
-      aStream.Seek(DataIndex, soFromBeginning);
+      aStream.Seek(DataIndex, soBeginning);
       aStream.Read(Data, SizeOf(Data));
       // Get number of PCM samples from last Ogg packet header
       // Search for an OggPage-ID from the end of the File
@@ -720,7 +720,7 @@ begin
              Data[Iterator + 3] = OGG_PAGE_ID then
           begin
               // found it! Read header and return the AbsolutePosition (=MaxSample in OggVorbis)
-              aStream.Seek(DataIndex + Iterator, soFromBeginning);
+              aStream.Seek(DataIndex + Iterator, soBeginning);
               aStream.Read(Header, SizeOf(Header));
               Result := Header.AbsolutePosition;
               exit;
@@ -932,11 +932,11 @@ begin
                                 CalculateCRC(newCRC, tmpStream);
                                 // write the new crc into the tmpstream
                                 SecondOggVorbisPage.fHeader.Checksum := newCRC;
-                                tmpStream.Seek(0, soFromBeginning);
+                                tmpStream.Seek(0, soBeginning);
                                 SecondOggVorbisPage.WriteHeader(tmpStream);
                                 // copy the tmpStream to fs
                                 //fs.Seek(SecondOggVorbisPage.fPositionInStream, soFromBeginning);
-                                fs.Seek(localSecondOggVorbisPage.fPositionInStream, soFromBeginning);
+                                fs.Seek(localSecondOggVorbisPage.fPositionInStream, soBeginning);
                                 fs.CopyFrom(tmpStream, 0)
                             finally
                                 tmpStream.Free;
@@ -993,13 +993,13 @@ begin
                                         CalculateCRC(newCRC, tmpStream);
                                         // write the new crc into the tmpstream
                                         SecondOggVorbisPage.fHeader.Checksum := newCRC;
-                                        tmpStream.Seek(0, soFromBeginning);
+                                        tmpStream.Seek(0, soBeginning);
                                         SecondOggVorbisPage.WriteHeader(tmpStream);
 
                                         // rewrite the file
                                         // copy the tmpStream to fs
                                         ///  fs.Seek(SecondOggVorbisPage.fPositionInStream, soFromBeginning);
-                                        fs.Seek(localSecondOggVorbisPage.fPositionInStream, soFromBeginning);
+                                        fs.Seek(localSecondOggVorbisPage.fPositionInStream, soBeginning);
 
                                         fs.CopyFrom(tmpStream, 0);
                                         // append the backup to the file

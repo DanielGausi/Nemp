@@ -137,7 +137,9 @@ uses
   NempFileUtils in 'NempFileUtils.pas',
   ReplayGainProgress in 'ReplayGainProgress.pas' {ReplayGainProgressForm},
   ReplayGain in '3rd Party Units\ReplayGain.pas',
-  NempReplayGainCalculation in 'NempReplayGainCalculation.pas';
+  NempReplayGainCalculation in 'NempReplayGainCalculation.pas',
+  NewMetaFrame in 'NewMetaFrame.pas' {NewMetaFrameForm},
+  MetaTagSorting in 'MetaTagSorting.pas';
 
 {$R *.res}
 

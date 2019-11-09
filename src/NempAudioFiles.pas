@@ -45,6 +45,9 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   DateUtils, RatingCtrls;
 
 type
+
+    TTagType = ( TT_ID3v2, TT_OggVorbis, TT_Flac, TT_Ape, TT_M4A);
+
     TAudioFileAction = (afa_None,
                         afa_SaveRating,
                         afa_RefreshingFileInformation,
@@ -174,7 +177,7 @@ type
 
     M4ARating: AnsiString = 'NEMP RATING';
     M4APlayCounter: AnsiString = 'NEMP PLAYCOUNTER';
-
+    M4AUserCoverID: AnsiString = 'NEMP COVER ID';
 
 
  type
@@ -496,6 +499,7 @@ type
         // function SetAudioData(allowChange: Boolean): TNempAudioError;
 
         function PreparingWriteChecks(allowChange: Boolean): TNempAudioError;
+        procedure EnsureID3v2Exists(aMp3File: TMp3File);
         function WriteStringToMetaData(aValue: String; ColumnIndex: Integer; allowChange: Boolean): TNempAudioError;
         function WriteLyricsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
         function WriteRawTagsToMetaData(aValue: UTF8String; allowChange: Boolean): TNempAudioError;
@@ -503,11 +507,12 @@ type
         function WritePlayCounterToMetaData(aPlayCounter: Integer; allowChange: Boolean): TNempAudioError;
 
         function WriteReplayGainToMetaData(aTrackGain, aAlbumGain, aTrackPeak, aAlbumPeak: Single; Flags: Integer; allowChange: Boolean): TNempAudioError;
-
+        function WriteUserCoverIDToMetaData(aValue: AnsiString; allowChange: Boolean): TNempAudioError;
+        function GetUserCoverIDFromMetaData(TagFile: TGeneralAudioFile): String;
 
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
         function GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
-        function GetCoverStreamFromMetaData(aCoverStream: TMemoryStream): boolean;
+        function GetCoverStreamFromMetaData(aCoverStream: TMemoryStream; TagFile: TGeneralAudioFile): boolean;
 
         // save the data here in a ";"-separated string for csv-export
         function GenerateCSVString: UnicodeString;
@@ -2032,8 +2037,8 @@ end;
     --------------------------------------------------------
 }
 
-function TAudioFile.GetCoverStreamFromMetaData(aCoverStream: TMemoryStream): boolean;
-var MainFile: TGeneralAudioFile;
+function TAudioFile.GetCoverStreamFromMetaData(aCoverStream: TMemoryStream; TagFile: TGeneralAudioFile): boolean;
+// var MainFile: TGeneralAudioFile;
 begin
     if not FileExists(Pfad) then
     begin
@@ -2044,19 +2049,19 @@ begin
     case fAudioType of
         at_File: begin
             try
-                MainFile := TGeneralAudioFile.Create(Pfad);
-                try
+                //MainFile := TGeneralAudioFile.Create(Pfad);
+                //try
                     // get cover information (format-specific)
-                    case MainFile.FileType of
-                        at_Mp3    : result := GetCoverStreamFromMp3(MainFile.MP3File, aCoverStream) ;
-                        at_Flac   : result := GetCoverStreamFromFlac(MainFile.FlacFile, aCoverStream) ;
-                        at_M4A    : result := GetCoverStreamFromM4A(MainFile.M4aFile, aCoverStream) ;
+                    case TagFile.FileType of
+                        at_Mp3    : result := GetCoverStreamFromMp3(TagFile.MP3File, aCoverStream) ;
+                        at_Flac   : result := GetCoverStreamFromFlac(TagFile.FlacFile, aCoverStream) ;
+                        at_M4A    : result := GetCoverStreamFromM4A(TagFile.M4aFile, aCoverStream) ;
 
                         at_Monkey,
                         at_WavPack,
                         at_MusePack,
                         at_OptimFrog,
-                        at_TrueAudio: result := GetCoverStreamFromApe(MainFile.BaseApeFile, aCoverStream) ;
+                        at_TrueAudio: result := GetCoverStreamFromApe(TagFile.BaseApeFile, aCoverStream) ;
 
                         at_Invalid,
                         at_Ogg,
@@ -2066,9 +2071,9 @@ begin
                         result := False;
                     end;
 
-                finally
-                    MainFile.Free;
-                end;
+                //finally
+                //    MainFile.Free;
+                //end;
             except
                 result := False;
             end;
@@ -2487,6 +2492,26 @@ begin
         else
             result := AUDIOERR_None;
 end;
+procedure TAudioFile.EnsureID3v2Exists(aMp3File: TMp3File);
+begin
+    if not aMp3File.ID3v2Tag.Exists then
+    begin
+        // we DO need the ID3v2-Tag now, so write *both*
+        // (we have to assume that there is already some metadata, so ID3v1 should exist anyway ...)
+        aMp3File.TagWriteMode := id3_Both;
+        // aMp3File.ID3v2Tag.Exists := True; // so that it is written into the file later
+        // copy basic information to ID3v2Tag
+        aMp3File.ID3v2Tag.Artist  := self.Artist  ;
+        aMp3File.ID3v2Tag.Title   := self.Titel   ;
+        aMp3File.ID3v2Tag.Album   := self.Album   ;
+        aMp3File.ID3v2Tag.Genre   := self.Genre   ;
+        aMp3File.ID3v2Tag.Comment := self.Comment ;
+        if (self.Year <> '') and (self.Year <> '0') then
+            aMp3File.ID3v2Tag.Year := self.Year;
+        if self.Track <> 0 then
+            aMp3File.ID3v2Tag.Track := IntToStr(self.Track);
+    end;
+end;
 function TAudioFile.WriteStringToMetaData(aValue: String; ColumnIndex: Integer; allowChange: Boolean): TNempAudioError;
 var MainFile: TGeneralAudioFile;
 begin
@@ -2505,9 +2530,17 @@ begin
                     CON_TITEL  : MainFile.Title  := aValue ;
                     CON_ALBUM  : MainFile.Album  := aValue ;
                     CON_YEAR   : MainFile.Year := aValue;
-                    CON_GENRE  : MainFile.Genre := aValue;
-                    CON_TRACKNR: begin
+                    CON_GENRE  : begin
+                        // for non-standard genres, we need the ID3v2Tag
+                        if MainFile.FileType = at_Mp3 then
+                        begin
+                              if NOT (ID3Genres.IndexOf(aValue) in [0..125]) then
+                                  EnsureID3v2Exists(MainFile.Mp3File);
+                        end;
+                        MainFile.Genre := aValue;
+                    end;
 
+                    CON_TRACKNR: begin
                           MainFile.Track := aValue;  //StrToIntDef(aValue, 0);
                     end;
                     CON_STANDARDCOMMENT: begin
@@ -2527,7 +2560,10 @@ begin
 
                     CON_CD: begin
                         case MainFile.FileType of
-                            at_Mp3: MainFile.Mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, aValue);
+                            at_Mp3: begin
+                                EnsureID3v2Exists(MainFile.Mp3File);
+                                MainFile.Mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, aValue);
+                            end;
                             at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, aValue);
                             at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, aValue);
                             at_M4A: MainFile.M4aFile.Disc := aValue;
@@ -2562,7 +2598,10 @@ begin
             begin
                 // bei mp3-Dateien war hier noch ne Abfrage "if Lyrics <> '' " dabei .... warum? Checken?
                         case MainFile.FileType of
-                            at_Mp3: MainFile.Mp3File.ID3v2Tag.Lyrics := String(aValue);
+                            at_Mp3: begin
+                                EnsureID3v2Exists(MainFile.Mp3File);
+                                MainFile.Mp3File.ID3v2Tag.Lyrics := String(aValue);
+                            end;
                             at_Ogg: MainFile.OggFile.SetPropertyByFieldname(VORBIS_LYRICS, String(aValue));
                             at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, String(aValue));
                             at_M4A: MainFile.M4aFile.Lyrics := String(aValue);
@@ -2597,6 +2636,7 @@ begin
                             at_Mp3: begin
                                   if length(aValue) > 0 then
                                   begin
+                                      EnsureID3v2Exists(MainFile.Mp3File);
                                       ms := TMemoryStream.Create;
                                       try
                                           ms.Write(aValue[1], length(aValue));
@@ -2645,7 +2685,10 @@ begin
                     StrRating := '';
 
                 case MainFile.FileType of
-                  at_Mp3:  MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', aRating, -1);
+                  at_Mp3:  begin
+                      EnsureID3v2Exists(MainFile.Mp3File);
+                      MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', aRating, -1);
+                  end;
                   at_Ogg:  MainFile.OggFile.SetPropertyByFieldname(VORBIS_RATING  , StrRating );
                   at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_RATING , StrRating );
                   at_M4A:  MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4ARating, StrRating );
@@ -2682,7 +2725,10 @@ begin
                       if aPlayCounter > 0 then StrCounter := IntToStr(aPlayCounter) else StrCounter := '';
 
                       case MainFile.FileType of
-                        at_Mp3 : MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', -1, aPlayCounter);
+                        at_Mp3 : begin
+                            EnsureID3v2Exists(MainFile.Mp3File);
+                            MainFile.Mp3File.ID3v2Tag.SetRatingAndCounter('*', -1, aPlayCounter);
+                        end;
                         at_Ogg : MainFile.OggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
                         at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
                         at_M4A : MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, StrCounter);
@@ -2747,6 +2793,7 @@ begin
                       doUpdateAlbum := strAlbum <> INVALID_STR;
                       case MainFile.FileType of
                           at_Mp3: begin
+                                EnsureID3v2Exists(MainFile.Mp3File);
                                 if doUpdateTrack then
                                 begin
                                     MainFile.Mp3File.ID3v2Tag.SetUserText(REPLAYGAIN_TRACK_GAIN, strTrack);
@@ -2823,6 +2870,94 @@ begin
         finally
             MainFile.Free;
         end;
+    end;
+end;
+
+function TAudioFile.WriteUserCoverIDToMetaData(aValue: AnsiString; allowChange: Boolean): TNempAudioError;
+var MainFile: TGeneralAudioFile;
+    ms: TMemoryStream;
+
+begin
+    result := PreparingWriteChecks(allowChange);
+    if result = AUDIOERR_None then
+    begin
+        MainFile := TGeneralAudioFile.Create(pfad);
+        try
+            if MainFile.LastError = FileErr_NotSupportedFileType then
+                result := AUDIOERR_UnsupportedMediaFile
+            else
+            begin
+                case MainFile.FileType of
+                    at_Mp3: begin
+                          if length(aValue) > 0 then
+                          begin
+                              EnsureID3v2Exists(MainFile.Mp3File);
+                              ms := TMemoryStream.Create;
+                              try
+                                  ms.Write(aValue[1], length(aValue));
+                                  MainFile.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', ms);
+                              finally
+                                  ms.Free;
+                              end;
+                          end else
+                              // delete UserCoverID-Frame
+                              MainFile.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', NIL);
+                    end;
+
+                    at_Ogg : MainFile.OggFile.SetPropertyByFieldname(VORBIS_USERCOVERID, aValue);
+                    at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_USERCOVERID, aValue);
+                    at_M4A : MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4AUserCoverID, aValue);
+                    at_Monkey,
+                    at_WavPack,
+                    at_MusePack,
+                    at_OptimFrog,
+                    at_TrueAudio:  MainFile.BaseApeFile.SetValueByKey(APE_USERCOVERID  , aValue);
+                    //at_Wma: ; at_Invalid: ; at_Wav: ;
+                end;
+
+                result := AudioToNempAudioError(MainFile.UpdateFile);
+            end;
+        finally
+            MainFile.Free;
+        end;
+    end;
+end;
+
+function TAudioFile.GetUserCoverIDFromMetaData(TagFile: TGeneralAudioFile): String;
+var ms: TMemoryStream;
+    AnsiID: AnsiString;
+begin
+    if fAudioType <> at_File then
+        result := ''
+    else
+    begin
+          case TagFile.FileType of
+              at_Mp3:  begin
+                          ms := TMemoryStream.Create;
+                          try
+                              TagFile.Mp3File.ID3v2Tag.GetPrivateFrame('NEMP/UserCoverID', ms);
+                              ms.Position := 0;
+                              SetLength(AnsiID, ms.Size);
+                              ms.Read(AnsiID[1], ms.Size);
+                              result := String(AnsiID);
+                          finally
+                              ms.Free;
+                          end;
+              end;
+              at_Ogg : result := TagFile.OggFile.GetPropertyByFieldname(VORBIS_USERCOVERID);
+              at_Flac: result := TagFile.FlacFile.GetPropertyByFieldname(VORBIS_USERCOVERID);
+              at_M4A : result := TagFile.M4AFile.GetSpecialData(DEFAULT_MEAN, M4AUserCoverID);
+
+              at_Monkey,
+              at_WavPack,
+              at_MusePack,
+              at_OptimFrog,
+              at_TrueAudio:  result := TagFile.BaseApeFile.GetValueByKey(APE_USERCOVERID);
+
+              at_Invalid,
+              at_Wma,
+              at_Wav: result := '';
+          end;
     end;
 end;
 

@@ -310,6 +310,7 @@ const  ID3v2KnownFrames : Array[TFrameIDs] of TID3v2FrameDescriptionData =
            ( IDs: ('TOF', 'TOFN', 'TOFN') ; Description : 'Original filename'),
            ( IDs: ('TOL', 'TOLY', 'TOLY') ; Description : 'Original Lyricist(s)/text writer(s)'),
            ( IDs: ('TOR', 'TORY', 'TDOR') ; Description : 'Original release year'),
+
            ( IDs: ('TOT', 'TOAL', 'TOAL') ; Description : 'Original album/Movie/Show title'),
            // ----//til here textframes existed in mp3fileutils 0.3
            ( IDs: ('TBP', 'TBPM', 'TBPM') ; Description : 'BPM (Beats Per Minute)'),

@@ -55,7 +55,7 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFileBasics, NempFileUtils,
+     AudioFileBasics, NempFileUtils, AudioFiles,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
      HtmlHelper, Mp3FileUtils, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
@@ -66,6 +66,11 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
 
 const
     BUFFER_SIZE = 10 * 1024 * 1024;
+
+    // some Flags for initialising CoverArt
+    INIT_COVER_DEFAULT       = 0;
+    INIT_COVER_FORCE_RESCAN  = 1;
+    INIT_COVER_IGNORE_USERID = 2;
 
 type
 
@@ -641,9 +646,9 @@ type
 
         // Copy a CoverFile to Cover\<md5-Hash(File)>
         // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
-        function InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode): String;
+        function InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
         function InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
-        procedure InitCover(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; ForceReScan: Boolean = False);
+        procedure InitCover(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer);
         // 2. If AudioFile is in a new directory:
         //    Get a List with candidates for the cover for the audiofile
         procedure GetCoverListe(aAudioFile: tAudioFile; aCoverListe: TStringList);
@@ -676,6 +681,7 @@ type
         // wie oben, nur wirdf hier nur auf eine der großen Listen zugegriffen
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
+        procedure GetTitelListFromCoverIDUnsorted(Target: TObjectlist; aCoverID: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
         procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
         procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
@@ -1611,7 +1617,7 @@ begin
                   //SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
                   ////////////////////////////////
                   AudioFile.GetAudioData(AudioFile.Pfad, {GAD_Cover or} GAD_Rating or IgnoreLyricsFlag);
-                  InitCover(AudioFile, tm_Thread);
+                  InitCover(AudioFile, tm_Thread, INIT_COVER_DEFAULT);
                   ///////////////////////////////////
 
               end
@@ -2080,7 +2086,7 @@ begin
 
     if (MB.DeadFiles.Count + MB.DeadPlaylists.Count) > 0 then
     begin
-        DeleteDataList := TObjectList.Create(False);
+        DeleteDataList := TObjectList.Create(True);
         try
             MB.fPrepareUserInputDeadFiles(DeleteDataList);
             if askUser then
@@ -2796,7 +2802,7 @@ begin
   if DeadFiles.Count > 0 then
   begin
       // SendMessage(MainWindowHandle, WM_MedienBib, MB_DeadFilesWarning, LParam(DeadFiles.Count));
-      DeleteDataList := TObjectList.Create(False);
+      DeleteDataList := TObjectList.Create(True);
       try
           fPrepareUserInputDeadFiles(DeleteDataList);
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(_(MediaLibrary_SearchingMissingFilesComplete_PrepareUserInput))));
@@ -4020,16 +4026,20 @@ begin
     end;
 
 end;
-procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile;  ScanMode: CoverScanThreadMode; ForceReScan: Boolean = False);
+procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile;  ScanMode: CoverScanThreadMode; Flags: Integer);
 var CoverListe: TStringList;
     NewCoverName: String;
+    ForceReScan: Boolean;
 begin
   try
+      ForceReScan       := (Flags and INIT_COVER_FORCE_RESCAN) = INIT_COVER_FORCE_RESCAN   ;
+      // IgnoreUserCoverID := (Flags and INIT_COVER_IGNORE_USERID) = INIT_COVER_IGNORE_USERID ;
+
       /////if aAudioFile.CoverID <> '' then
       ///////// das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
       ///
       aAudioFile.CoverID := ''; // new WIC : RESET the ID
-      if InitCoverFromMetaData(aAudioFile, ScanMode) <> '' then
+      if InitCoverFromMetaData(aAudioFile, ScanMode, Flags) <> '' then
       begin
           // Cover in Metadata found and successfully saved to <ID>.jpg
           flastID := aAudioFile.CoverID;
@@ -4091,32 +4101,53 @@ begin
   end;
 end;
 
-function TMedienBibliothek.InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode): String;
+function TMedienBibliothek.InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
 var CoverStream: TMemoryStream;
     newID: String;
+    MainFile: TGeneralAudioFile;
+
 begin
     result := '';
     aAudioFile.CoverID := '';
     CoverStream := TMemoryStream.Create;
     try
+        MainFile := TGeneralAudioFile.Create(aAudioFile.Pfad);
+        try
+            // first: Check for a User-CoverID
+            // this can happen, if the user refreshes the medialibrar and has set a specials CoverID through the Detail-Window
+            // (possible since Nemp 4.13)
+            if ( Flags and INIT_COVER_IGNORE_USERID) = 0 then
+                newID := aAudioFile.GetUserCoverIDFromMetaData(MainFile);
 
-        if aAudioFile.GetCoverStreamFromMetaData(CoverStream) then
-        begin
-            // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
-            CoverStream.Seek(0, soFromBeginning);
-            // compute a new ID from the stream data
-            newID := MD5DigestToStr(MD5Stream(CoverStream));
-            // try to save a resized JPG from the content of the stream
-            // if this fails, there was something wrong with the image data :(
-            if ScalePicStreamToFile(CoverStream,
-                                    CoverSavePath + newID + '.jpg',
-                                    240, 240,
-                                    GetProperImagingFactory(ScanMode))
-            then
+            if  (newID <> '') and FileExists(CoverSavePath + newID + '.jpg') then
             begin
                 aAudioFile.CoverID := newID;
                 result := newID;
+            end else
+            begin
+                ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
+                ///  we need to check for regular CoverArt information in the MetaData
+                if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
+                begin
+                    // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
+                    CoverStream.Seek(0, soFromBeginning);
+                    // compute a new ID from the stream data
+                    newID := MD5DigestToStr(MD5Stream(CoverStream));
+                    // try to save a resized JPG from the content of the stream
+                    // if this fails, there was something wrong with the image data :(
+                    if ScalePicStreamToFile(CoverStream,
+                                            CoverSavePath + newID + '.jpg',
+                                            240, 240,
+                                            GetProperImagingFactory(ScanMode))
+                    then
+                    begin
+                        aAudioFile.CoverID := newID;
+                        result := newID;
+                    end;
+                end;
             end;
+        finally
+            MainFile.Free;
         end;
 
     finally
@@ -5135,6 +5166,22 @@ begin
           Target.Add(Mp3ListeArtistSort[i]);
   end;
 end;
+{
+    --------------------------------------------------------
+    GetTitelListFromCoverIDUnsorted
+    - Same result as above, but can be used when NOT in Coverflow mode by the DetailForm when changing Library-Cover
+    --------------------------------------------------------
+}
+procedure TMedienBibliothek.GetTitelListFromCoverIDUnsorted(Target: TObjectlist; aCoverID: String);
+var i: Integer;
+begin
+    for i := 0 to Mp3ListeArtistSort.Count - 1 do
+    begin
+        if TAudioFile(Mp3ListeArtistSort[i]).CoverID = aCoverID then
+            Target.Add(Mp3ListeArtistSort[i]);
+    end;
+end;
+
 {
     --------------------------------------------------------
     GenerateAnzeigeListeFromCoverID

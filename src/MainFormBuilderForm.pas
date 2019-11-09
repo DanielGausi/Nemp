@@ -91,6 +91,7 @@ type
     procedure SplitterTopCanResize(Sender: TObject; var NewSize: Integer;
       var Accept: Boolean);
     procedure BtnOKClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     LocalBuildOptions: TNempFormBuildOptions;
@@ -297,6 +298,13 @@ begin
     LocalBuildOptions.SwapMainLayout;
     FixAllButtons;
 end;
+
+procedure TMainFormBuilder.FormDestroy(Sender: TObject);
+begin
+    LocalBuildOptions.Free;
+end;
+
+
 
 procedure TMainFormBuilder.FormShow(Sender: TObject);
 begin

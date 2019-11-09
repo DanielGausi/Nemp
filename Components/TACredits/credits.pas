@@ -38,7 +38,7 @@ Special Thanks
 Slightly modified by Daniel Gauﬂmann for Nemp:
  - added property position: Integer read TPos write TPos; in class TACredits
  - enabled {$DEFINE NOPNGSUPPORT}
-}
+
 
 { #Todo(Normal): Check the "Known Issues"-Zone }
 
@@ -62,7 +62,7 @@ unit Credits;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, System.UITypes, System.Types,
   ExtCtrls, StrUtils, ShellAPI {$IFNDEF NO_UNICODE}, WideStrings{$ENDIF} {$IFNDEF NOPNGSUPPORT}, PNGImage{$ENDIF};
 
 type

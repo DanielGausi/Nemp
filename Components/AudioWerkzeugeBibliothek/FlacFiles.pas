@@ -47,11 +47,14 @@
 
 unit FlacFiles;
 
+{$I config.inc}
+
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, ContNrs, Classes,
-  AudioFileBasics, VorbisComments, Id3Basics , winsock;
+  Windows, Messages, SysUtils, Variants, ContNrs, Classes
+  {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF}
+  , AudioFileBasics, VorbisComments, Id3Basics , winsock;
 
 const
     FLAC_MARKER = 'fLaC';
@@ -1317,14 +1320,18 @@ begin
         pad := pad mod 4096;
 
         PadBlock := TFlacMetaBlock.Create;
-        PadBlock.BlockType := 1;
-        PadBlock.fSetDataSize(pad);
-        PadBlock.fSetLastBlock(True);
+        try
+            PadBlock.BlockType := 1;
+            PadBlock.fSetDataSize(pad);
+            PadBlock.fSetLastBlock(True);
 
-        Setlength(PadBlock.fData, pad);
-        FillChar(PadBlock.fData[0], pad, 0);
+            Setlength(PadBlock.fData, pad);
+            FillChar(PadBlock.fData[0], pad, 0);
 
-        PadBlock.WriteToStream(BufferStream);
+            PadBlock.WriteToStream(BufferStream);
+        finally
+            PadBlock.Free;
+        end;
     end;
 
 end;

@@ -812,7 +812,7 @@ begin
         end else
         begin
             fAlbumGain := 0;
-            fAlbumPeak := 0;
+            fAlbumPeak := 1;
             fCurrentIndex := -1;
         end;
 
@@ -844,7 +844,7 @@ begin
     if fAudioFiles.Count > 0 then
     begin
         // prepare the TrackGain-Value array
-        fAlbumPeak := 0;
+        fAlbumPeak := 1;
         fAlbumGain := 0;
         SetLength(fCurrentTrackGains, fAudioFiles.Count);
         for i := 0 to Length(fCurrentTrackGains)-1 do

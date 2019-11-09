@@ -660,7 +660,7 @@ begin
             if aErr <> AUDIOERR_None then
                 HandleError(afa_RefreshingFileInformation, af, aErr);
 
-            MedienBib.InitCover(af, tm_VCL);
+            MedienBib.InitCover(af, tm_VCL, INIT_COVER_DEFAULT);
         end;
 
         MB_ProgressCurrentFileOrDirUpdate: begin
@@ -1933,7 +1933,7 @@ Begin
                               aErr := AudioFile.GetAudioData(filename, GAD_Rating or MedienBib.IgnoreLyricsFlag);
                               HandleError(afa_DroppedFiles, AudioFile, aErr);
 
-                              MedienBib.InitCover(AudioFile, tm_VCL);
+                              MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                               MedienBib.UpdateList.Add(AudioFile);
                           end;
                       end;
@@ -2105,7 +2105,7 @@ begin
                     else begin
                         aErr := AudioFile.GetAudioData(NewFile, GAD_Rating or MedienBib.IgnoreLyricsFlag);
                         HandleError(afa_NewFile, AudioFile, aErr);
-                        MedienBib.InitCover(AudioFile, tm_VCL);
+                        MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                     end;
                     // add it to the UpdateListe anyway
                     MedienBib.UpdateList.Add(AudioFile);

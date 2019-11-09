@@ -346,6 +346,7 @@ begin
     aFile.AlbumGain := aAlbumGain;
     aFile.TrackPeak := aTrackPeak;
     aFile.AlbumPeak := aAlbumPeak;
+    MedienBib.Changed := True;
 
     ListOfFiles := TObjectList.Create(False);
     try

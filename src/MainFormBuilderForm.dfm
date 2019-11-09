@@ -15,6 +15,7 @@ object MainFormBuilder: TMainFormBuilder
   OldCreateOrder = False
   Visible = True
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
     825

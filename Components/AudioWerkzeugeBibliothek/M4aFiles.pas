@@ -166,6 +166,12 @@ type
             procedure SetSpecialData(mean, name: AnsiString; aValue: UnicodeString);
 
             procedure GetAllTextAtomDescriptions(dest: TStrings);
+            procedure GetAllTextAtoms(dest: TObjectList);
+
+            procedure GetAllAtoms(dest: TObjectList);
+            procedure RemoveMetaAtom(aAtom: TMetaAtom);
+
+
     end;
 
 implementation
@@ -373,13 +379,28 @@ begin
     MOOV.UdtaAtom.GetAllTextAtomDescriptions(dest);
 end;
 
+procedure TM4AFile.GetAllTextAtoms(dest: TObjectList);
+begin
+    MOOV.UdtaAtom.GetAllTextAtoms(dest);
+end;
+
+procedure TM4AFile.GetAllAtoms(dest: TObjectList);
+begin
+    MOOV.UdtaAtom.GetAllAtoms(dest);
+end;
+
+procedure TM4AFile.RemoveMetaAtom(aAtom: TMetaAtom);
+begin
+    MOOV.UdtaAtom.RemoveAtom(aAtom);
+end;
+
 function TM4AFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
 var fs: TAudioFileStream;
     AtomSize: DWord;
     AtomName: TAtomName;
 begin
     Clear;
-    result := FileErr_None;
+    // result := FileErr_None;
 
     if AudioFileExists(aFilename) then
     begin
@@ -481,14 +502,14 @@ procedure TM4AFile.fFixAudioOffsets(st: TStream; diff: Integer);
 var i: Integer;
     c, v: Dword;
 begin
-    st.Seek( fTmpStcoOffset + 12, soFromBeginning);
+    st.Seek( fTmpStcoOffset + 12, soBeginning);
     st.Read(c, 4);
     c := ChangeEndian32(c);
     for i := 1 to c do
     begin
         st.Read(v, 4);
         v := ChangeEndian32(v);
-        st.Seek(-4, soFromCurrent);
+        st.Seek(-4, soCurrent);
 
         inc(v, diff);
 
@@ -543,7 +564,7 @@ var ExistingTag: TM4AFile;
                   try
                       fs := TAudioFileStream.Create(aFilename, fmOpenReadWrite or fmShareDenyWrite);
                       try
-                          fs.Seek(0, soFromBeginning);
+                          fs.Seek(0, soBeginning);
                           // copy the new tmpMetaStream into the file
                           fs.CopyFrom(tmpMetaStream, 0);
                       finally
@@ -557,7 +578,7 @@ var ExistingTag: TM4AFile;
           end;
 
 begin
-    result := FileErr_None;
+    // result := FileErr_None;
 
     ExistingTag := TM4AFile.Create;
     try
@@ -568,7 +589,7 @@ begin
             tmpMetaStream := TMemoryStream.Create;
             try
                 // copy first Atoms of ExistingTag, but replace moov.udta with self.moov.udta
-                result := fPrepareSaving(ExistingTag, tmpMetaStream);
+                {result := }fPrepareSaving(ExistingTag, tmpMetaStream);
 
                 if (tmpMetaStream.Size = ExistingTag.fBytesBeforeMDTA) and UsePadding then
                     // nothing special todo
@@ -580,9 +601,15 @@ begin
                     if (tmpMetaStream.Size + 8 < ExistingTag.fBytesBeforeMDTA) and UsePadding then
                     begin
                         FreeAtom := TFreeAtom.CreateFree('free', ExistingTag.fBytesBeforeMDTA - tmpMetaStream.Size);
-                        FreeAtom.SaveToStream(tmpMetaStream);
-                        // (and we are done)
-                        result := WriteData;
+                        try
+                            FreeAtom.SaveToStream(tmpMetaStream);
+                            // (and we are done)
+                            result := WriteData;
+                        finally
+                            FreeAtom.Free;
+                        end
+
+
                     end else
                     begin
                         // we do not have enough space for writing our data,
@@ -591,18 +618,23 @@ begin
                         if UsePadding then
                         begin
                             FreeAtom := TFreeAtom.CreateFree('free', 2048);
-                            FreeAtom.SaveToStream(tmpMetaStream);
+                            try
+                                FreeAtom.SaveToStream(tmpMetaStream);
+                            finally
+                                FreeAtom.Free;
+                            end;
+
                         end;
 
                         fFixAudioOffsets(tmpMetaStream, tmpMetaStream.Size - ExistingTag.fBytesBeforeMDTA);
                         try
                             fs := TAudioFileStream.Create(aFilename, fmOpenReadWrite or fmShareDenyWrite);
                             try
-                                fs.Seek(ExistingTag.fBytesBeforeMDTA, soFromBeginning);
+                                fs.Seek(ExistingTag.fBytesBeforeMDTA, soBeginning);
                                 result := BackupAudioData(fs, aFilename+'~');
                                 if result = FileErr_None then
                                 begin
-                                    fs.Seek(0, soFromBeginning);
+                                    fs.Seek(0, soBeginning);
                                     // copy the new tmpMetaStream into the file
                                     fs.CopyFrom(tmpMetaStream, 0);
                                     // write AudioData back to the File

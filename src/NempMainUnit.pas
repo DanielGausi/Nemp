@@ -2258,7 +2258,7 @@ begin
                       afList.Free;
                   end;
 
-                  MedienBib.InitCover(dummyAudioFile, tm_VCL, True);
+                  MedienBib.InitCover(dummyAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
                   // try again getting the coverbitmap
                   success := GetCoverBitmapFromID(dummyAudioFile.CoverID, pic, MedienBib.CoverSavePath);
                   // if we found an image, but the ID has changed: Change it on the other files with that ID as well
@@ -8134,7 +8134,7 @@ begin
                     AudioFile := TAudioFile.Create;
                     aErr := AudioFile.GetAudioData(newFilenames[i], {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                     HandleError(afa_NewFile, AudioFile, aErr);
-                    MedienBib.InitCover(AudioFile, tm_VCL);
+                    MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                     MedienBib.UpdateList.Add(AudioFile);
                     inc(newCount);
                 end;
@@ -8367,7 +8367,7 @@ begin
                             AudioFile:=TAudioFile.Create;
                             aErr := AudioFile.GetAudioData(buffer, {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                             HandleError(afa_PasteFromClipboard, AudioFile, aErr);
-                            MedienBib.InitCover(AudioFile, tm_VCL);
+                            MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                             MedienBib.UpdateList.Add(AudioFile);
                         end;
                     end;

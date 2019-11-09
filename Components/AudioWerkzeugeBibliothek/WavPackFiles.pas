@@ -178,7 +178,7 @@ begin
     //read first bytes
     FillChar(marker, SizeOf(marker), 0);
     aStream.Read(marker, SizeOf(marker));
-    aStream.Seek(0, soFromBeginning);
+    aStream.Seek(0, soBeginning);
 
     if marker = 'RIFF' then
        result := _ReadV3(aStream)
@@ -291,7 +291,7 @@ begin
             else  // not a wv file
                 break;
 
-         f.seek( fpos + chunk.size, soFromBeginning );
+         f.seek( fpos + chunk.size, soBeginning );
     end; // while
 end;
 

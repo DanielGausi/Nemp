@@ -47,10 +47,13 @@
 }
 unit M4aAtoms;
 
+{$I config.inc}
+
 interface
 
 uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
-     AudioFileBasics;
+     AudioFileBasics {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF};
+
 
 type
     TBuffer = Array of byte;
@@ -225,7 +228,10 @@ type
             procedure SetSpecialData(aMean, aName: AnsiString; aValue: UnicodeString);
 
             procedure GetAllTextAtomDescriptions(dest: TStrings);
+            procedure GetAllTextAtoms(dest: TObjectList);
 
+            procedure GetAllAtoms(dest: TObjectList);
+            procedure RemoveAtom(aAtom: TMetaAtom);
 
             function PrepareDataForSaving: TAudioError;
     end;
@@ -392,7 +398,7 @@ begin
         if newName = 'mdia' then
             result := Parse1_MDIA(newSize)
         else
-            fData.Seek(newSize-8, soFromCurrent);
+            fData.Seek(newSize-8, soCurrent);
 
         inc(bytesProcessed, newSize);
     end;
@@ -419,7 +425,7 @@ begin
             if newName = 'minf' then
                 tmp := Parse3_MINF(newSize)
             else
-                fData.Seek(newSize-8, soFromCurrent);
+                fData.Seek(newSize-8, soCurrent);
 
         if tmp <> FileErr_None then
             result := tmp;
@@ -439,11 +445,11 @@ begin
     if Version > 1 then    // 0: 32bit fields, 1: 64bit
     begin
         result := M4aErr_Invalid_MDHD;
-        fData.Seek(aSize-9, soFromCurrent); // skip rest of the MDHD-Atom
+        fData.Seek(aSize-9, soCurrent); // skip rest of the MDHD-Atom
     end else
     begin
-        fData.Seek(3, soFromCurrent); // 3 Byte Flags, ignore
-        fData.Seek(2* (Version + 1) * 4, soFromCurrent); // 2x Timestamps, each 32 Bit at Version 0, 64Bit at Version 1
+        fData.Seek(3, soCurrent); // 3 Byte Flags, ignore
+        fData.Seek(2* (Version + 1) * 4, soCurrent); // 2x Timestamps, each 32 Bit at Version 0, 64Bit at Version 1
 
         fData.Read(TimeScale, 4);
         TimeScale := ChangeEndian32(TimeScale);
@@ -455,11 +461,11 @@ begin
             fDuration := trunc(TrackLength / TimeScale);
         end else
         begin
-            fData.Seek(8, soFromCurrent);
+            fData.Seek(8, soCurrent);
             // Point of Failure: Incorrect Duration, but that should never happen...
             fDuration := High(Integer);
         end;
-        fData.Seek(4, soFromCurrent); // skip rest of the MDHD-Atom
+        fData.Seek(4, soCurrent); // skip rest of the MDHD-Atom
     end;
 end;
 
@@ -478,7 +484,7 @@ begin
         if newName = 'stbl' then
             result := Parse4_STBL(newSize)
         else
-            fData.Seek(newSize-8, soFromCurrent);
+            fData.Seek(newSize-8, soCurrent);
         inc(bytesProcessed, newSize);
     end;
 end;
@@ -503,12 +509,19 @@ begin
             if newName = 'stco' then
                 tmp := Parse6_STCO(newSize)
             else
-                fData.Seek(newSize-8, soFromCurrent);
+                fData.Seek(newSize-8, soCurrent);
 
         if tmp <> FileErr_None then
             result := tmp;
 
-        inc(bytesProcessed, newSize);
+        if newSize > 0 then
+            inc(bytesProcessed, newSize)
+        else
+        begin
+            bytesProcessed := aSize;
+            result := M4aErr_Invalid_STCO; // eigentlich was anderes ...  TODO !!!
+        end;
+
     end;
 end;
 
@@ -526,27 +539,27 @@ begin
     if Version <> 0 then    // 0: 32bit fields, 1: 64bit
     begin
         result := M4aErr_Invalid_STSD;
-        fData.Seek(aSize-9, soFromCurrent); // skip rest of the MDHD-Atom           // (complete)
+        fData.Seek(aSize-9, soCurrent); // skip rest of the MDHD-Atom           // (complete)
     end else
     begin
         fData.Seek(   3  // {Version,} Flags
                     + 4  // Number of Descriptions
                     + 8 // Header af mp4a-Atom
                     + 16 // some stuff I dont need here                             // 40
-            , soFromCurrent);
+            , soCurrent);
         fData.Read(Channels, 2);                                                    // 42
         Channels := ChangeEndian16(Channels);
         fChannels := Channels;
 
         fData.Read(Bits, 2);                                                        // 44
         Bits := ChangeEndian16(Bits);
-        fData.Seek(4, soFromCurrent);                                               // 48
+        fData.Seek(4, soCurrent);                                               // 48
         fData.Read(AudioSamplerate, 2);
-        fData.Seek(2, soFromCurrent); // seek another 2 bytes                       // 52
+        fData.Seek(2, soCurrent); // seek another 2 bytes                       // 52
         AudioSamplerate := ChangeEndian16(AudioSamplerate);
         fSamplerate := AudioSamplerate;
 
-        fData.Seek(aSize - 52, soFromCurrent);
+        fData.Seek(aSize - 52, soCurrent);
     end;
 end;
 
@@ -560,7 +573,7 @@ begin
     if Version <> 0 then    // 0: 32bit fields, 1: 64bit
     begin
         result := M4aErr_Invalid_STCO;
-        fData.Seek(aSize-9, soFromCurrent); // skip rest of the MDHD-Atom
+        fData.Seek(aSize-9, soCurrent); // skip rest of the MDHD-Atom
     end else
     begin
         fOffsetPosition := fData.Position - 1 ;
@@ -569,7 +582,7 @@ begin
         ///  4 Bytes Offset Count : X
         ///  X times 4 Bytes Offset Values
 
-        fData.Seek(3, soFromCurrent); // skip Flags
+        fData.Seek(3, soCurrent); // skip Flags
         fData.Read(fOffsetCount, 4);
         fOffsetCount := ChangeEndian32(fOffsetCount);
 
@@ -578,9 +591,9 @@ begin
             fData.Read(fAudioOffset, 4);
             fAudioOffset := ChangeEndian32(fAudioOffset);
 
-            fData.Seek(aSize-20, soFromCurrent);
+            fData.Seek(aSize-20, soCurrent);
         end else
-            fData.Seek(aSize-16, soFromCurrent);
+            fData.Seek(aSize-16, soCurrent);
     end;
 end;
 
@@ -765,7 +778,7 @@ begin
     c := ChangeEndian32(c);
     dest.Write(c, 4);
 
-    dest.Seek(0, soFromEnd);
+    dest.Seek(0, soEnd);
 end;
 
 { TUdtaAtom }
@@ -1077,6 +1090,29 @@ begin
             dest.Add(TMetaAtom(fMetaAtoms[i]).GetListDescription);
 end;
 
+procedure TUdtaAtom.GetAllTextAtoms(dest: TObjectList);
+var i: Integer;
+begin
+    dest.Clear;
+    for i := 0 to self.fMetaAtoms.Count - 1 do
+        if TMetaAtom(fMetaAtoms[i]).ContainsTextData then
+            dest.Add(TMetaAtom(fMetaAtoms[i]));
+end;
+
+procedure TUdtaAtom.GetAllAtoms(dest: TObjectList);
+var i: Integer;
+begin
+    dest.Clear;
+    for i := 0 to self.fMetaAtoms.Count - 1 do
+        dest.Add(TMetaAtom(fMetaAtoms[i]));
+end;
+
+procedure TUdtaAtom.RemoveAtom(aAtom: TMetaAtom);
+begin
+    fMetaAtoms.Remove(aAtom);
+end;
+
+
 
 function TUdtaAtom.ParseData: TAudioError;
 var bytesProcessed, IlstProcessed, MetaProcessed: DWord;
@@ -1105,7 +1141,7 @@ begin
                 result := M4aErr_Invalid_METAVersion;
                 exit;
             end;
-            fData.Seek(3, soFromCurrent); // skip Flags
+            fData.Seek(3, soCurrent); // skip Flags
             inc(bytesProcessed, 4);
 
             // meta ok, parse it
@@ -1136,7 +1172,7 @@ begin
                 begin
                     // some other atom, skip it
                     // probably "hdlr" or "free"
-                    fData.Seek(newSize-8, soFromCurrent);  // skip this atom
+                    fData.Seek(newSize-8, soCurrent);  // skip this atom
                     inc(bytesProcessed, newSize-8);
                     inc(MetaProcessed, newSize-8);
                 end;
@@ -1146,7 +1182,7 @@ begin
         begin
             // other udta.[..]-atom
             // probably FREE-Atom
-            fData.Seek(newSize-8, soFromCurrent);
+            fData.Seek(newSize-8, soCurrent);
             inc(bytesProcessed, newSize-8);
         end;
     end;
@@ -1202,7 +1238,7 @@ begin
             begin
                 // just skip, we write only ONE free-Atom into the file
                 // (on Top Level)
-                fData.Seek(newSize-8, soFromCurrent);
+                fData.Seek(newSize-8, soCurrent);
                 inc(bytesProcessed, newSize-8);
             end else
                 if newName = 'meta' then
@@ -1243,14 +1279,14 @@ begin
                                 ILSTwritten := True;
 
                                 // skip the old ILST in fData
-                                fData.Seek(newSize-8, soFromCurrent);
+                                fData.Seek(newSize-8, soCurrent);
                                 inc(bytesProcessed, newSize-8);
                                 inc(MetaProcessed, newSize-8);
                             end else
                             begin
                                 if newname = 'free' then
                                     // do not write old FREE-atoms into the newStream
-                                    fData.Seek(newSize-8, soFromCurrent)
+                                    fData.Seek(newSize-8, soCurrent)
                                 else
                                 begin
                                     // copy the old atom int the newStream
@@ -1291,10 +1327,10 @@ begin
 
 
         // Correct Sizes in Stream
-        newStream.Seek(IlstSizeOffset, soFromBeginning);
+        newStream.Seek(IlstSizeOffset, soBeginning);
         newStream.Write(newIlstSize, 4);
 
-        newStream.Seek(MetaSizeOffset, soFromBeginning);
+        newStream.Seek(MetaSizeOffset, soBeginning);
         newStream.Write(newMetaSize, 4);
 
         // Delete Old Data
@@ -1324,12 +1360,12 @@ begin
 
         if MetaType = 1 then
         begin
-            fData.Seek(4, soFromCurrent);  // reserved Bytes
+            fData.Seek(4, soCurrent);  // reserved Bytes
             SetLength(dataString, fData.Size - fData.Position);
             fData.Read(dataString[1], length(dataString));
             result := ConvertUTF8ToString(dataString);
         end else
-            result := ''
+            result := '';
     end else
         result := '';
 end;
@@ -1377,7 +1413,7 @@ begin
 
         if MetaType = 0 then  // binary data here
         begin
-            fData.Seek(4, soFromCurrent);  // reserved Bytes
+            fData.Seek(4, soCurrent);  // reserved Bytes
             fData.Read(gnre, 2);
             gnre := ChangeEndian16(gnre) - 1; // this number will be  the same as in ID3-Tags
 
@@ -1406,7 +1442,7 @@ begin
 
     WriteHeader(18);
     v := ChangeEndian16(Word(idx + 1));
-    fData.Seek(16, soFromBeginning);
+    fData.Seek(16, soBeginning);
     fData.Write(v, 2);
 end;
 
@@ -1446,7 +1482,7 @@ begin
 
     trk := ChangeEndian16(trk);
     total := ChangeEndian16(total);
-    fData.Seek(18, soFromBeginning);
+    fData.Seek(18, soBeginning);
     fData.Write(trk, 2);
     fData.Write(total, 2);
 end;
@@ -1461,7 +1497,7 @@ begin
     GetNextAtomInfo(fData, newName, newSize);
     if newName = 'data' then
     begin
-        fData.Seek(10, soFromCurrent);
+        fData.Seek(10, soCurrent);
         fData.Read(trk, 2);
         trk := ChangeEndian16(trk);
         fData.Read(total, 2);
@@ -1510,7 +1546,7 @@ begin
             else
                 typ := M4A_Invalid;
             end;
-            fData.Seek(4, soFromCurrent);
+            fData.Seek(4, soCurrent);
             Dest.CopyFrom(fData, fData.Size - 16);
             result := True;
         end else
@@ -1548,7 +1584,7 @@ begin
     GetNextAtomInfo(fData, newName, newSize);
     if newName = 'mean' then
     begin
-        fData.Seek(4, soFromCurrent);
+        fData.Seek(4, soCurrent);
         Setlength(aMean, newSize - 12);
         fData.Read(aMean[1], newSize - 12);
     end else
@@ -1560,7 +1596,7 @@ begin
     GetNextAtomInfo(fData, newName, newSize);
     if newName = 'name' then
     begin
-        fData.Seek(4, soFromCurrent);
+        fData.Seek(4, soCurrent);
         Setlength(aName, newSize - 12);
         fData.Read(aName[1], newSize - 12);
     end else
@@ -1576,7 +1612,7 @@ begin
         MetaType := ChangeEndian32(MetaType);
         if MetaType = 1 then
         begin
-            fData.Seek(4, soFromCurrent);
+            fData.Seek(4, soCurrent);
             setlength(dataString, newSize-16);
             fData.Read(dataString[1], newSize - 8);
             result := ConvertUTF8ToString(dataString);
@@ -1639,14 +1675,26 @@ begin
         GetSpecialData(aMean, aName);
         result := UnicodeString(aName + '::' + aMean);  // Dont change this!! (Used in TM4AFile.GetTextDataByDescription)
     end else
-    begin
-        for i := 0 to length(KnownMetaAtoms) - 1 do
-            if KnownMetaAtoms[i].AtomName = self.Name then
-            begin
-                result := KnownMetaAtoms[i].Description;
-                break;
-            end;
-    end;
+        if self.Name = 'trkn' then
+            result := 'Track number'
+        else
+            if self.Name = 'disk' then
+                result := 'Disk number'
+            else
+                if self.Name = 'gnre' then
+                    result := 'Genre (index)'
+                else
+                    if self.Name = 'covr' then
+                        result := 'Cover art'
+                    else
+                    begin
+                        for i := 0 to length(KnownMetaAtoms) - 1 do
+                            if KnownMetaAtoms[i].AtomName = self.Name then
+                            begin
+                                result := KnownMetaAtoms[i].Description;
+                                break;
+                            end;
+                    end;
 end;
 
 

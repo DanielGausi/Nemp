@@ -850,7 +850,7 @@ begin
     fOffset := fID3v1TagSize;
 
     // Check for Footer
-    aStream.Seek(- 32 - fID3v1TagSize, soFromEnd);
+    aStream.Seek(- 32 - Integer(fID3v1TagSize), soEnd);
     c := aStream.Read(fApev2TagFooter, 32);
     if c = 32 then
     begin
@@ -860,7 +860,7 @@ begin
             if ContainsHeader then  // i.e. the flag in the footer is set
             begin
                 fOffset := fApev2TagFooter.Size + 32 + fID3v1TagSize;
-                aStream.Seek(- fOffset, soFromEnd);
+                aStream.Seek(- fOffset, soEnd);
                 aStream.Read(fApev2TagHeader, 32);
                 if Not fIsValidHeader(fApev2TagHeader) then
                 begin
@@ -873,7 +873,7 @@ begin
             else
             begin
                 fOffset := fApev2TagFooter.Size + fID3v1TagSize;
-                aStream.Seek(-fOffset, soFromEnd);
+                aStream.Seek(-fOffset, soEnd);
             end;
 
             // ReadItems
@@ -904,8 +904,6 @@ end;
 function TBaseApeFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
 var fs: TAudioFileStream;
 begin
-    result := FileErr_None;
-
     Clear;
     if AudioFileExists(aFilename) then
     begin
@@ -921,7 +919,7 @@ begin
                 // Read the Audio Data (duration, bitrate, ) from the file.
                 // This should be done in derivate classes
                 // TagSizes (all 3) may be needed there
-                fs.Seek(fID3v2TagSize, soFromBeginning);
+                fs.Seek(fID3v2TagSize, soBeginning);
                 ReadAudioDataFromStream(fs);
             finally
                 fs.Free;
@@ -972,7 +970,7 @@ begin
                     oldTag := TBaseApeFile.Create;
                     try
                         oldTag.ReadTagFromStream(fs, False); // items there are not needed
-                        fs.Seek(- oldTag.fOffset, soFromEnd);
+                        fs.Seek(- oldTag.fOffset, soEnd);
                         // Write new Data into the Stream
                         if ContainsHeader then
                             fs.Write(fApev2TagHeader, 32);
@@ -1016,7 +1014,7 @@ begin
                     oldTag.ReadTagFromStream(fs, False); // items there are not needed
                     if oldTag.fOffset > 0 then
                     begin
-                        fs.Seek(- oldTag.fOffset, soFromEnd);
+                        fs.Seek(- oldTag.fOffset, soEnd);
 
                         // copy old ID3Tag back to the file
                         if oldTag.fID3v1Present then

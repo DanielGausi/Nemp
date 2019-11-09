@@ -103,13 +103,14 @@ type
             fBits                : integer;
 
             procedure fResetData;
+            function fGetVersionStr: String;
 
         protected
             function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
 
         public
             property Version           : Integer  read fVersion;
-            property VersionStr        : String   read fVersionStr;
+            property VersionStr        : String   read fGetVersionStr;
             property PeakLevel 	       : LongWord	read fPeakLevel;
             property PeakLevelRatio    : Double 	read fPeakLevelRatio;
             property TotalSamples 	   : Int64	  read fTotalSamples;
@@ -171,6 +172,8 @@ type
 
 { TMonkeyFile }
 
+
+
 procedure TMonkeyFile.fResetData;
 begin
   { Reset data }
@@ -190,6 +193,15 @@ begin
   fWavNotStored       := False;
 end;
 
+function TMonkeyFile.fGetVersionStr: String;
+var fsub: Integer;
+begin
+    fSub := fVersion Mod 1000;
+    if (fSub mod 10) = 0 then
+        fSub := fSub Div 10;
+    result := Format('%d.%d', [fVersion Div 1000, fSub]);
+end;
+
 function TMonkeyFile.ReadAudioDataFromStream(aStream: TStream): Boolean;
 var
    APE            : APE_HEADER;     // common header
@@ -206,8 +218,6 @@ begin
     if (aStream.Read(APE, sizeof(APE)) = sizeof(APE)) and ( APE.cID = 'MAC ') then
     begin
         fVersion := APE.nVersion;
-        Str(fVersion / 1000 : 4 : 2, fVersionStr);
-
         // Load New Monkey's Audio Header for version >= 3.98
         if APE.nVersion >= 3980 then
         begin
@@ -216,7 +226,7 @@ begin
            begin
               // seek past description header
               if APE_DESC.nDescriptorBytes <> 52 then
-                  aStream.Seek(APE_DESC.nDescriptorBytes - 52, soFromCurrent);
+                  aStream.Seek(APE_DESC.nDescriptorBytes - 52, soCurrent);
               // load new ape_header
               if APE_DESC.nHeaderBytes > sizeof(APE_NEW) then
                   APE_DESC.nHeaderBytes := sizeof(APE_NEW);
