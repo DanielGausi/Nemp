@@ -88,8 +88,8 @@ begin
                   cbFrameType.Items.Add(
                       ID3v2KnownFrames[ TFrameIDs(TextList[i])].Description
                       + ' ('
-                      + ID3v2KnownFrames[ TFrameIDs(TextList[i])].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)]+ ') ');
+                      + String(ID3v2KnownFrames[ TFrameIDs(TextList[i])].IDs[
+                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
               end;
 
               // add Comment-Frame (if it doesn't exist already)
@@ -100,8 +100,8 @@ begin
                   cbFrameType.Items.Add(
                       ID3v2KnownFrames[IDv2_COMMENT].Description
                       + ' ('
-                      + ID3v2KnownFrames[IDv2_COMMENT].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)]+ ') ');
+                      + String(ID3v2KnownFrames[IDv2_COMMENT].IDs[
+                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
               end;
 
               // add possible URLFrames
@@ -112,8 +112,8 @@ begin
                   cbFrameType.Items.Add(
                       ID3v2KnownFrames[ TFrameIDs(URLList[i])].Description
                       + ' ('
-                      + ID3v2KnownFrames[ TFrameIDs(URLList[i])].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)]+ ') ');
+                      + String(ID3v2KnownFrames[ TFrameIDs(URLList[i])].IDs[
+                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
               end;
 
               TextList.Free;
@@ -204,7 +204,7 @@ begin
                           AtomExists := False;
                           for idx := 0 to FrameList.Count - 1 do
                           begin
-                              if SameText (TMetaAtom(FrameList[idx]).Name, 'trkn') then
+                              if SameText (String(TMetaAtom(FrameList[idx]).Name), 'trkn') then
                               begin
                                   AtomExists := True;
                                   break;
@@ -219,7 +219,7 @@ begin
                           AtomExists := False;
                           for idx := 0 to FrameList.Count - 1 do
                           begin
-                              if SameText (TMetaAtom(FrameList[idx]).Name, 'disk') then
+                              if SameText (String(TMetaAtom(FrameList[idx]).Name), 'disk') then
                               begin
                                   AtomExists := True;
                                   break;
@@ -245,7 +245,7 @@ begin
                       AtomExists := False;
                       for idx := 0 to FrameList.Count - 1 do
                       begin
-                          if SameText (TMetaAtom(FrameList[idx]).Name, KnownMetaAtoms[i].AtomName) then
+                          if SameText (String(TMetaAtom(FrameList[idx]).Name), String(KnownMetaAtoms[i].AtomName)) then
                           begin
                               AtomExists := True;
                               break;
@@ -256,7 +256,7 @@ begin
                           fFrameTypList.Add(Pointer(i));
 
                           cbFrameType.Items.Add(
-                              KnownMetaAtoms[i].Description + ' (' + KnownMetaAtoms[i].AtomName + ')' );
+                              KnownMetaAtoms[i].Description + ' (' + String(KnownMetaAtoms[i].AtomName) + ')' );
                       end;
                   end;
               finally
@@ -295,7 +295,7 @@ begin
             case newFrame.FrameType of
                 FT_TextFrame: NewFrame.SetText(edt_FrameValue.Text);
                 FT_CommentFrame: NewFrame.SetCommentsLyrics('eng', '', edt_FrameValue.Text);
-                FT_URLFrame: NewFrame.SetURL(edt_FrameValue.Text);
+                FT_URLFrame: NewFrame.SetURL(AnsiString(edt_FrameValue.Text));
 
                 FT_INVALID,
                 FT_UNKNOWN,
@@ -320,7 +320,7 @@ begin
         end;
 
         TT_Ape: begin
-            CurrentTagObject.BaseApeFile.SetValueByKey(cbFrameType.Text, edt_FrameValue.Text);
+            CurrentTagObject.BaseApeFile.SetValueByKey(AnsiString(cbFrameType.Text), edt_FrameValue.Text);
             ModalResult := MROK;
         end;
 

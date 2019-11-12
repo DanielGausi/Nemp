@@ -38,6 +38,10 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
@@ -57,7 +61,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '........'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -67,7 +71,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '........'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -125,7 +129,7 @@ object FDetails: TFDetails
           Width = 339
           Height = 13
           AutoSize = False
-          Caption = '........'
+          Caption = '...'
           ParentShowHint = False
           ShowAccelChar = False
           ShowHint = True
@@ -138,7 +142,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '.............'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -180,7 +184,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '.............'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -206,7 +210,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '..............'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -232,7 +236,7 @@ object FDetails: TFDetails
           Width = 340
           Height = 13
           AutoSize = False
-          Caption = '........'
+          Caption = '...'
           ShowAccelChar = False
           Transparent = True
         end
@@ -244,6 +248,7 @@ object FDetails: TFDetails
           Height = 150
           Anchors = [akTop, akRight]
           Center = True
+          OnDblClick = CoverIMAGEDblClick
         end
         object Btn_Explore: TButton
           Left = 16
@@ -524,11 +529,11 @@ object FDetails: TFDetails
             Caption = 'CD'
           end
           object LblPlayCounter: TLabel
-            Left = 172
+            Left = 179
             Top = 171
-            Width = 56
+            Width = 12
             Height = 13
-            Caption = '..............'
+            Caption = '...'
           end
           object lblConst_ReplayGain: TLabel
             Left = 12
@@ -549,9 +554,9 @@ object FDetails: TFDetails
           object LblReplayGainTitle: TLabel
             Left = 96
             Top = 218
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ParentShowHint = False
             ShowAccelChar = False
             ShowHint = True
@@ -561,9 +566,9 @@ object FDetails: TFDetails
           object LblReplayGainAlbum: TLabel
             Left = 96
             Top = 237
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ParentShowHint = False
             ShowAccelChar = False
             ShowHint = True
@@ -576,7 +581,6 @@ object FDetails: TFDetails
             Width = 300
             Height = 21
             TabOrder = 0
-            Text = '123456789-123456789-123456789-'
             OnChange = EditLibraryChange
           end
           object Edit_LibraryTitle: TEdit
@@ -647,8 +651,8 @@ object FDetails: TFDetails
             Width = 142
             Height = 21
             Hint = 
-              'Synchronize rating/playcounter in the ID3-Tag with the rating/pl' +
-              'aycounter in the library'
+              'Synchronize rating/playcounter in the Metadata of the file with ' +
+              'the rating/playcounter in the library'
             Caption = 'Synchronize rating'
             ParentShowHint = False
             ShowHint = True
@@ -763,6 +767,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -838,8 +846,12 @@ object FDetails: TFDetails
       end
     end
     object Tab_Pictures: TTabSheet
-      Caption = 'Pictures (Cover-Art)'
+      Caption = 'Pictures (cover art)'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -899,7 +911,6 @@ object FDetails: TFDetails
               Hint = 'Open the image with the default image viewer'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Open'
-              Images = Nemp_MainForm.MenuImages
               ParentShowHint = False
               ShowHint = True
               TabOrder = 1
@@ -991,6 +1002,9 @@ object FDetails: TFDetails
         Align = alRight
         Caption = 'Cover art (Media library)'
         TabOrder = 1
+        DesignSize = (
+          262
+          466)
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 8
@@ -1000,32 +1014,33 @@ object FDetails: TFDetails
           Hint = 'The current cover art used in the media library'
           Center = True
           ParentShowHint = False
-          PopupMenu = popupCoverArt
           ShowHint = True
         end
         object BtnChangeCoverArtInLibrary: TButton
           AlignWithMargins = True
           Left = 8
           Top = 312
-          Width = 176
+          Width = 241
           Height = 25
           Hint = 'Use the currently selected image as cover art'
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Use current selection'
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
           WordWrap = True
-          OnClick = BtnChangeCoverArtInLibraryClick
+          OnClick = BtnUseCurrentSelectionInLibraryClick
         end
         object BtnRemoveUserCover: TButton
           AlignWithMargins = True
           Left = 8
           Top = 343
-          Width = 176
+          Width = 241
           Height = 25
           Hint = 
             'Remove a manually set cover art and let Nemp choose it automatic' +
             'ally'
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Reset'
           ParentShowHint = False
           ShowHint = True
@@ -1050,9 +1065,10 @@ object FDetails: TFDetails
           AlignWithMargins = True
           Left = 8
           Top = 281
-          Width = 177
+          Width = 241
           Height = 25
           Hint = 'Load an image file for cover art'
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Load cover art'
           ParentShowHint = False
           ShowHint = True
@@ -1064,6 +1080,10 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
@@ -1089,7 +1109,7 @@ object FDetails: TFDetails
           TabOrder = 0
           TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toWheelPanning, toEditOnClick, toEditOnDblClick]
           TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
-          TreeOptions.SelectionOptions = [toExtendedFocus, toFullRowSelect]
+          TreeOptions.SelectionOptions = [toFullRowSelect]
           OnCompareNodes = VST_MetaDataCompareNodes
           OnEditing = VST_MetaDataEditing
           OnFreeNode = VST_MetaDataFreeNode
@@ -1099,11 +1119,13 @@ object FDetails: TFDetails
           OnNodeDblClick = VST_MetaDataNodeDblClick
           Columns = <
             item
+              Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 0
               Text = 'Key'
               Width = 47
             end
             item
+              Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 1
               Text = 'Description'
               Width = 146
@@ -1527,90 +1549,90 @@ object FDetails: TFDetails
           object LblDETBitrate: TLabel
             Left = 88
             Top = 48
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETSamplerate: TLabel
             Left = 88
             Top = 64
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETDauer: TLabel
             Left = 88
             Top = 80
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETVersion: TLabel
             Left = 88
             Top = 16
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETHeaderAt: TLabel
             Left = 88
             Top = 32
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETProtection: TLabel
             Left = 88
             Top = 99
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETExtension: TLabel
             Left = 88
             Top = 115
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETCopyright: TLabel
             Left = 88
             Top = 131
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETOriginal: TLabel
             Left = 88
             Top = 147
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
           object LblDETEmphasis: TLabel
             Left = 88
             Top = 163
-            Width = 32
+            Width = 12
             Height = 13
-            Caption = '........'
+            Caption = '...'
             ShowAccelChar = False
             Transparent = True
           end
@@ -1631,7 +1653,7 @@ object FDetails: TFDetails
       615
       30)
     object Btn_Close: TButton
-      Left = 361
+      Left = 370
       Top = 0
       Width = 75
       Height = 25
@@ -1642,7 +1664,7 @@ object FDetails: TFDetails
       OnClick = Btn_CloseClick
     end
     object BtnUndo: TButton
-      Left = 442
+      Left = 451
       Top = 0
       Width = 75
       Height = 25
@@ -1652,7 +1674,7 @@ object FDetails: TFDetails
       OnClick = BtnUndoClick
     end
     object BtnApply: TButton
-      Left = 523
+      Left = 532
       Top = 0
       Width = 75
       Height = 25
@@ -1672,13 +1694,6 @@ object FDetails: TFDetails
       OnClick = BtnRefreshCoverflowClick
     end
   end
-  object Timer1: TTimer
-    Enabled = False
-    Interval = 250
-    OnTimer = Timer1Timer
-    Left = 56
-    Top = 448
-  end
   object PM_URLCopy: TPopupMenu
     Left = 404
     Top = 64
@@ -1691,15 +1706,15 @@ object FDetails: TFDetails
     DefaultExt = 'jpg'
     Filter = 'Supported files (*.jpg;*.jpeg;*.png)|*.jpg;*.jpeg;*.png;'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    Left = 116
+    Left = 20
     Top = 456
   end
   object ReloadTimer: TTimer
     Enabled = False
     Interval = 50
     OnTimer = ReloadTimerTimer
-    Left = 160
-    Top = 464
+    Left = 184
+    Top = 480
   end
   object PM_EditExtendedTags: TPopupMenu
     Left = 248
@@ -1717,14 +1732,6 @@ object FDetails: TFDetails
       Caption = 'Remove tag'
       ShortCut = 46
       OnClick = Btn_RemoveTagClick
-    end
-  end
-  object popupCoverArt: TPopupMenu
-    Left = 399
-    Top = 195
-    object pm_LoadAnotherImageAsCoverArt: TMenuItem
-      Caption = 'Load another image as cover art'
-      OnClick = BtnLoadAnotherImageClick
     end
   end
   object OpenDlgCoverArt: TOpenPictureDialog

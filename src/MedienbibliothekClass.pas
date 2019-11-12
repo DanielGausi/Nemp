@@ -29,14 +29,6 @@
     ---------------------------------------------------------------
 }
 
-(*29.05.2009: 5050 LOC, 12.06: 4060 LOC
-
-Evtl-. ToDo
-- Medienbib nach einem Update direkt speichern
-- Funktion: Showsummary irgendwie mit einbauen  --- hab ich. Evtl. noch bei MedienBib-Suche-Ende einfügen.
-*)
-
-
 (*
 Hinweise für eventuelle Erweiterungen:
 --------------------------------------
@@ -66,11 +58,6 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
 
 const
     BUFFER_SIZE = 10 * 1024 * 1024;
-
-    // some Flags for initialising CoverArt
-    INIT_COVER_DEFAULT       = 0;
-    INIT_COVER_FORCE_RESCAN  = 1;
-    INIT_COVER_IGNORE_USERID = 2;
 
 type
 
@@ -188,9 +175,6 @@ type
         fArtistIndex: Cardinal;
         fAlbumIndex: Cardinal;
 
-      //  fCurrentCoverID: String;     // currently selected cover
-      //  fCurrentCoverIDX: Integer;   // Note:  OnChange-Events of the scrollbar MUST set these!
-
         fChanged: LongBool;          // has bib changed? Is saving necessary?
         // Two helpers for Changed.
         // Loading a Library will execute the same code as adding new files.
@@ -207,7 +191,7 @@ type
         // Pfad zum Speicherverzeichnis - wird z.B. fürs Kopieren der Cover benötigt.
         // Savepath:
         fSavePath: UnicodeString;        // ProgramDir or UserDir. used for Settings, Skins, ...
-        fCoverSavePath: UnicodeString;   // Path for Cover, := SavePath + 'Cover\'
+        // fCoverSavePath: UnicodeString;   // Path for Cover, := SavePath + 'Cover\'
 
         // The Flag for ignoring Lyrics in GetAudioData.
         // MUST be 0 (use Lyrics) or GAD_NOLYRICS (=8, ignore Lyrics)
@@ -221,24 +205,12 @@ type
         fLyricFirstPriority  : TLyricFunctionsEnum;
         fLyricSecondPriority : TLyricFunctionsEnum;
 
-        /// Threadsafe resizing of coverart:
-        ///  Since Nemp 4.12 the Windows Imaging Component WIC is used
-        ///  This uses a IWICImagingFactory, and we need one for eaach thread
-        ///  Creating a new IWICImagingFactory everytime a scaling is needed, would be too much overhead
-        ///  Therefore:
-        ///       WICImagingFactory_VCL is created, when it is needed, and released at the Library-destructor
-        ///       WICImagingFactory_ScanThread is created and released in the context of the ScanThread
-        WICImagingFactory_VCL: IWICImagingFactory;
-        WICImagingFactory_ScanThread: IWICImagingFactory;
-
-
-
         // used for faster cover-initialisation.
         // i.e. do not search coverfiles for every audiofile.
         // use the same cover again, if the next audiofile is in the same directory
-        fLastCoverName: UnicodeString;
-        fLastPath: UnicodeString;
-        fLastID: String;
+        // fLastCoverName: UnicodeString;
+        // fLastPath: UnicodeString;
+        // fLastID: String;    CoverArtSearcher
 
         // Browsemode
         // 0: Classic
@@ -263,8 +235,6 @@ type
         procedure SetChangeAfterUpdate(Value: LongBool);
         function GetChanged: LongBool;
         procedure SetChanged(Value: LongBool);
-        //function GetInitializing: Integer;
-        //procedure SetInitializing(Value: Integer);
         function GetBrowseMode: Integer;
         procedure SetBrowseMode(Value: Integer);
         function GetCoverSortOrder: Integer;
@@ -381,8 +351,6 @@ type
 
         procedure fLoadFromFile(aFilename: UnicodeString);
 
-        function GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
-
     public
         CloseAfterUpdate: Boolean; // flag used in OnCloseQuery
         // Some Beta-Options
@@ -460,7 +428,6 @@ type
         AnzeigeListIsCurrentlySorted: Boolean;
         AutoScanPlaylistFilesOnView: Boolean;
         ShowHintsInMedialist: Boolean;
-        NempCharCodeOptions: TConvertOptions;
         AutoScanDirs: Boolean;
         AutoScanDirList: TStringList;  // complete list of all Directories to scan
         AutoScanToDoList: TStringList; // the "working list"
@@ -482,28 +449,14 @@ type
 
         AutoActivateWebServer: Boolean;
 
-         // Optionen für die Coversuche
-        CoverSearchInDir: Boolean;
-        CoverSearchInParentDir: Boolean;
-        CoverSearchInSubDir: Boolean;
-        CoverSearchInSisterDir: Boolean;
-        CoverSearchSubDirName: UnicodeString;
-        CoverSearchSisterDirName: UnicodeString;
         CoverSearchLastFM: Boolean;
-        //CoverSearchLastFMInit: Boolean;  // used for the first "do you want this"-message on first start
         HideNACover: Boolean;
         MissingCoverMode: Integer;
-        // for saving RAM:
-
-
 
         // Einstellungen für Standard-Cover
         // Eines für alle. Ist eins nicht da: Fallback auf Default
         //UseNempDefaultCover: Boolean;
         //PersonalizeMainCover: Boolean;
-
-        // Fürs Detail-Fenster:
-        //WriteRatingToTag: Boolean; // not used any longer
 
         // zur Laufzeit - weitere Sortiereigenschaften
         //Sortparam: Integer; // Eine der CON_ // CON_EX_- Konstanten
@@ -548,20 +501,21 @@ type
         // BibScrobbler: Link to Player.NempScrobbler
         BibScrobbler: TNempScrobbler;
 
+
+        CoverArtSearcher: TCoverArtSearcher;
+
+
         property StatusBibUpdate   : Integer read GetStatusBibUpdate    write SetStatusBibUpdate;
 
         property Count: Integer read GetCount;
 
         property CurrentArtist: UnicodeString read fArtist write fArtist;
         property CurrentAlbum: UnicodeString read fAlbum write fAlbum;
-//        property CurrentCoverID: String read fCurrentCoverID write fCurrentCoverID;
-//        property CurrentCoverIDX: Integer read fCurrentCoverIDX write fCurrentCoverIDX;
 
         property ArtistIndex: Cardinal read fArtistIndex write fArtistIndex;
         property AlbumIndex: Cardinal read fAlbumIndex write fAlbumIndex;
         property Changed: LongBool read GetChanged write SetChanged;
         property ChangeAfterUpdate: LongBool read GetChangeAfterUpdate write SetChangeAfterUpdate;
-        // property Initializing: Integer read GetInitializing write SetInitializing;
         property BrowseMode: Integer read GetBrowseMode write SetBrowseMode;
         property CoverSortOrder: Integer read GetCoverSortOrder write SetCoverSortOrder;
 
@@ -569,7 +523,6 @@ type
         property FileSearchAborted: LongBool read GetFileSearchAborted write SetFileSearchAborted;
 
         property SavePath: UnicodeString read fSavePath write fSavePath;
-        property CoverSavePath: UnicodeString read fCoverSavePath write fCoverSavePath;
 
         property IgnoreLyrics     : Boolean read fIgnoreLyrics     write fSetIgnoreLyrics  ;
         property IgnoreLyricsFlag : Integer read fIgnoreLyricsFlag                         ;
@@ -636,24 +589,6 @@ type
         function AudioFileExists(aFilename: UnicodeString): Boolean;
         function GetAudioFileWithFilename(aFilename: UnicodeString): TAudioFile;
         function PlaylistFileExists(aFilename: UnicodeString): Boolean;
-
-        // Initializing Cover-Information
-        // This is not done by the AudioFile-Class for reason of performance.
-        // 1. Search a Cover for the AudioFile
-        //    if the new file is in the same directory as the last one,
-        //    the method will use the last cover for this one, too
-        //    (except there is one in the id3-tag of the file)
-
-        // Copy a CoverFile to Cover\<md5-Hash(File)>
-        // returnvalue: the MD5-Hash (i.e. filename of the resized cover)
-        function InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
-        function InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
-        procedure InitCover(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer);
-        // 2. If AudioFile is in a new directory:
-        //    Get a List with candidates for the cover for the audiofile
-        procedure GetCoverListe(aAudioFile: tAudioFile; aCoverListe: TStringList);
-        // Reset internal variables fLastPath, fLastCoverID, ...
-        procedure ReInitCoverSearch;
 
         // 2018: new helper method to set the BaseMarkerList properly
         procedure SetBaseMarkerList(aList: TObjectList);
@@ -811,8 +746,6 @@ begin
 end;
 
 
-{ TAutomaticJob }
-
 constructor TStartJob.Create(atype: TJobType; aParam: String);
 begin
     Typ := atype;
@@ -901,8 +834,6 @@ begin
 
   CurrentArtist := BROWSE_ALL;
   CurrentAlbum := BROWSE_ALL;
-  //CurrentCoverID  := 'all';
-  //CurrentCoverIDX := 0;
   for i := 0 to SORT_MAX  do
         begin
             SortParams[i].Comparefunction := AFComparePath;
@@ -912,21 +843,18 @@ begin
 
   NewCoverFlow := TNempCoverFlow.Create;// (CFHandle, aWnd);
 
+  CoverArtSearcher := TCoverArtSearcher.Create;
+
   TagCloud := TTagCloud.Create;
   TagPostProcessor := TTagPostProcessor.Create; // Data files are loaded automatically
 
   fJobList := TJobList.Create;
   fJobList.OwnsObjects := True;
-
-  Pointer(WICImagingFactory_ScanThread) := Nil;
-  Pointer(WICImagingFactory_VCL)        := Nil;
 end;
 
 destructor TMedienBibliothek.Destroy;
 var i: Integer;
 begin
-    if WICImagingFactory_VCL <> Nil then
-        WICImagingFactory_VCL._Release;
 
   fJobList.Free;
   NewCoverFlow.free;
@@ -935,6 +863,8 @@ begin
 
   TagPostProcessor.Free;
   TagCloud.Free;
+
+  CoverArtSearcher.Free;
 
   for i := 0 to Mp3ListePfadSort.Count - 1 do
     TAudioFile(Mp3ListePfadSort[i]).Free;
@@ -1068,7 +998,7 @@ begin
 
   NewCoverFlow.clear;
 
-  ClearRandomCover;
+  CoverArtSearcher.Clear;
   RadioStationList.Clear;
   RepairBrowseListsAfterDelete;
   AnzeigeListIsCurrentlySorted := False;
@@ -1300,12 +1230,12 @@ begin
                 SortParams[i].Direction := sd_Descending;
         end;
 
-        CoverSearchInDir         := ini.ReadBool('MedienBib','CoverSearchInDir', True);
-        CoverSearchInParentDir   := ini.ReadBool('MedienBib','CoverSearchInParentDir', True);
-        CoverSearchInSubDir      := ini.ReadBool('MedienBib','CoverSearchInSubDir', True);
-        CoverSearchInSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
-        CoverSearchSubDirName    := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
-        CoverSearchSisterDirName := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
+        TCoverArtSearcher.UseDir         := ini.ReadBool('MedienBib','CoverSearchInDir', True);
+        TCoverArtSearcher.UseParentDir   := ini.ReadBool('MedienBib','CoverSearchInParentDir', True);
+        TCoverArtSearcher.UseSubDir      := ini.ReadBool('MedienBib','CoverSearchInSubDir', True);
+        TCoverArtSearcher.UseSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
+        TCoverArtSearcher.SubDirName     := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
+        TCoverArtSearcher.SisterDirName  := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
         CoverSearchLastFM        := ini.ReadBool('MedienBib', 'CoverSearchLastFM', False);
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
@@ -1429,12 +1359,12 @@ begin
             Ini.WriteInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(SortParams[i].Direction));
         end;
 
-        ini.Writebool('MedienBib','CoverSearchInDir', CoverSearchInDir);
-        ini.Writebool('MedienBib','CoverSearchInParentDir', CoverSearchInParentDir);
-        ini.Writebool('MedienBib','CoverSearchInSubDir', CoverSearchInSubDir);
-        ini.Writebool('MedienBib', 'CoverSearchInSisterDir', CoverSearchInSisterDir);
-        ini.WriteString('MedienBib', 'CoverSearchSubDirName', (CoverSearchSubDirName));
-        ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (CoverSearchSisterDirName));
+        ini.Writebool('MedienBib','CoverSearchInDir', TCoverArtSearcher.UseDir);
+        ini.Writebool('MedienBib','CoverSearchInParentDir', TCoverArtSearcher.UseParentDir);
+        ini.Writebool('MedienBib','CoverSearchInSubDir', TCoverArtSearcher.UseSubDir);
+        ini.Writebool('MedienBib', 'CoverSearchInSisterDir', TCoverArtSearcher.UseSisterDir);
+        ini.WriteString('MedienBib', 'CoverSearchSubDirName', (TCoverArtSearcher.SubDirName));
+        ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (TCoverArtSearcher.SisterDirName));
         ini.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
@@ -1529,12 +1459,10 @@ procedure fScanNewFilesAndUpdateBib(MB: TMedienbibliothek);
 begin
     if (MB.UpdateList.Count > 0) or (MB.PlaylistUpdateList.Count > 0) then
     begin
-        // !!!!!!!!!!!!!!!!!!!!!
         // new part here: Scan the files first
         MB.UpdateFortsetzen := True;
         MB.fScanNewFiles;
 
-        // !!!!!!!!!!!!!!!!!
         // Merge Files into the Library
         // Status is set properly in PrepareNewFilesUpdate
         MB.PrepareNewFilesUpdate;
@@ -1607,19 +1535,8 @@ begin
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
-
-                  // GetAudioData within the secondary is a very bad idea.
-                  // The cover-stuff will cause some exceptions like OutOfRessources
-                  // The Mainthread will do the following at this message:
-                  // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-                  // InitCover(AudioFile);
-
-                  //SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
-                  ////////////////////////////////
-                  AudioFile.GetAudioData(AudioFile.Pfad, {GAD_Cover or} GAD_Rating or IgnoreLyricsFlag);
-                  InitCover(AudioFile, tm_Thread, INIT_COVER_DEFAULT);
-                  ///////////////////////////////////
-
+                  AudioFile.GetAudioData(AudioFile.Pfad, GAD_Rating or IgnoreLyricsFlag);
+                  CoverArtSearcher.InitCover(AudioFile, tm_Thread, INIT_COVER_DEFAULT);
               end
               else
               begin
@@ -1642,14 +1559,6 @@ begin
                                   Integer(PWideChar(Format(_(MediaLibrary_ScanningFilesCount),
                                                         [ i, ges ]))));
 
-                   {
-                  MediaLibrary_ScanningFilesCount
-
-
-                  ssd
-                      Nemp_MainForm.LblEmptyLibraryHint.Caption :=
-          Format(_(MediaLibrary_SearchingNewFilesBigLabel),  [MedienBib.UpdateList.Count]);
-                         }
                   SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
                   SendMessage(MainWindowHandle, WM_MedienBib, MB_CurrentProcessSuccessCount, i+1);
                   // No counting of non-existing files here
@@ -1870,7 +1779,6 @@ begin
       break;
     end;
   end;
-
 
 
   // Prepare BrowseLists
@@ -2633,8 +2541,7 @@ begin
       UpdateFortsetzen := True;
       StatusBibUpdate := BIB_Status_ReadAccessBlocked;
       // reset Coversearch
-      fLastPath := '';
-      fLastCoverName := '';
+      CoverArtSearcher.StartNewSearch;
       // start refreshing files
       fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_All, Self, 0, Dummy));
   end;
@@ -2647,8 +2554,7 @@ begin
       UpdateFortsetzen := True;
       StatusBibUpdate := BIB_Status_ReadAccessBlocked;
       // reset Coversearch
-      fLastPath := '';
-      fLastCoverName := '';
+      CoverArtSearcher.StartNewSearch;
       // start refreshing files
       fHND_RefreshFilesThread := (BeginThread(Nil, 0, @fRefreshFilesThread_Selected, Self, 0, Dummy));
   end;
@@ -2715,18 +2621,7 @@ begin
             oldAlbum := AudioFile.Strings[NempSortArray[2]];
             oldID := AudioFile.CoverID;
 
-            // GetAudioData within the secondary is a very bad idea.
-            // The cover-stuff will cause some exceptions like OutOfRessources
-            // The Mainthread will do the following at this message:
-            // AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating);
-            // InitCover(AudioFile);
-
-
             SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshAudioFile, lParam(AudioFile));
-            ////////////////////////////////
-            ////AudioFile.GetAudioData(AudioFile.Pfad, GAD_Cover or GAD_Rating or IgnoreLyricsFlag);
-            ////InitCover(AudioFile);
-            ///////////////////////////////////
 
 
             if  (oldArtist <> AudioFile.Strings[NempSortArray[1]])
@@ -2910,7 +2805,6 @@ end;
 procedure TMedienBibliothek.fGetLyrics;
 var i: Integer;
     aAudioFile: TAudioFile;
-    //ID3v2tag: TID3v2Tag;
     LyricWikiResponse, backup: String;
     done, failed: Integer;
     Lyrics: TLyrics;
@@ -2921,7 +2815,6 @@ var i: Integer;
     tmpLyricFirstPriority,tmpLyricSecondPriority  : TLyricFunctionsEnum;
 
 begin
-    //ID3v2tag := TID3v2tag.Create;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
 
     done := 0;
@@ -2973,9 +2866,6 @@ begin
                         // Set new Lyrics
                         aAudioFile.Lyrics := UTF8Encode(LyricWikiResponse);
                         aErr := aAudioFile.WriteLyricsToMetaData(aAudioFile.Lyrics, True);
-                        // aErr := aAudioFile.SetAudioData(True);
-                            // SetAudioData(True) : Check before entering this thread, whether this operation
-                            //                      is allowed. If NOT: Do not enter this thread at all!
                         if aErr = AUDIOERR_None then
                         begin
                             inc(done);
@@ -3147,7 +3037,6 @@ var i: Integer;
     done, failed: Integer;
     af: TAudioFile;
     s, backup: String;
-    //TagPostProcessor: TTagPostProcessor;
     aErr: TNempAudioError;
     ErrorOcurred, currentSuccess: Boolean;
     ErrorLog: TErrorLog;
@@ -3214,11 +3103,8 @@ begin
                 // param false: do not ignore warnings but resolve inconsistencies
                 // param true: use thread-safe copies of rule-lists
                 AddNewTag(af, s, False, True);
-                //af.RawTagLastFM := Utf8String(ControlRawTag(af, s, fIgnoreListCopy, fMergeListCopy));
                 aErr := af.WriteRawTagsToMetaData(af.RawTagLastFM, True);
-                // aErr := af.SetAudioData(True);
-                        // SetAudioData(True) : Check before entering this thread, whether this operation
-                        //                      is allowed. If NOT: Do not enter this thread at all!
+
                 if aErr = AUDIOERR_None then
                 begin
                     Changed := True;
@@ -3393,10 +3279,7 @@ begin
             af.GetAudioData(af.Pfad);
             af.RawTagLastFM := newTags;
 
-            //aErr := af.SetAudioData(True);
             aErr := af.WriteRawTagsToMetaData(af.RawTagLastFM, True);
-                    // SetAudioData(True) : Check before entering this thread, whether this operation
-                    //                      is allowed. If NOT: Do not enter this thread at all!
             if aErr = AUDIOERR_None then
             begin
                 af.ID3TagNeedsUpdate := False;
@@ -3892,15 +3775,6 @@ begin
               // fill the Stringlist with the new Tags (probably only one)
               newTagList.Text := Trim(NewTag);
 
-              // delete duplicate entries in the new taglist first
-              //for i := newTagList.Count-1 downto 0 do
-              //    if newTagList.IndexOf(newTagList[i]) < i then
-              //        newTagList.Delete(i);
-              // delete the entries the file is already tagged with
-              //for i := newTagList.Count-1 downto 0 do
-              //    if currentTagList.IndexOf(newTagList[i]) > -1 then
-              //        newTagList.Delete(i);
-
               // process the tags
               for i := newTagList.Count-1 downto 0 do
               begin
@@ -3998,252 +3872,6 @@ begin
     result := TAudioFile(Mp3ListePfadSort[idx]);
 end;
 
-{
-    --------------------------------------------------------
-    InitCover
-    Get a CoverID for the Audiofile, using the last ID,
-    in case the directory of the new file is the same as th
-    one of the last one.
-    --------------------------------------------------------
-}
-
-function TMedienBibliothek.GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
-begin
-    case ScanMode of
-        tm_VCL: begin
-            if WICImagingFactory_VCL = Nil then
-                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
-                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_VCL);
-            result := WICImagingFactory_VCL;
-        end;
-        tm_Thread: begin
-            if WICImagingFactory_ScanThread = Nil then
-                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
-                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_ScanThread);
-            result := WICImagingFactory_ScanThread;
-
-        end;
-    end;
-
-end;
-procedure TMedienBibliothek.InitCover(aAudioFile: tAudioFile;  ScanMode: CoverScanThreadMode; Flags: Integer);
-var CoverListe: TStringList;
-    NewCoverName: String;
-    ForceReScan: Boolean;
-begin
-  try
-      ForceReScan       := (Flags and INIT_COVER_FORCE_RESCAN) = INIT_COVER_FORCE_RESCAN   ;
-      // IgnoreUserCoverID := (Flags and INIT_COVER_IGNORE_USERID) = INIT_COVER_IGNORE_USERID ;
-
-      /////if aAudioFile.CoverID <> '' then
-      ///////// das bedeutet, dass GetAudioData zuvor ein Cover gefunden hat!
-      ///
-      aAudioFile.CoverID := ''; // new WIC : RESET the ID
-      if InitCoverFromMetaData(aAudioFile, ScanMode, Flags) <> '' then
-      begin
-          // Cover in Metadata found and successfully saved to <ID>.jpg
-          flastID := aAudioFile.CoverID;
-          fLastPath := '';
-          fLastCoverName := '';
-      end else // AudioFile.GetAudioData hat kein Cover im ID3Tag gefunden. Also: In Dateien drumherum suchen
-      begin
-            //Wenn Da kein Erfolg: Cover-Datei suchen.
-            // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
-            // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
-            //if (fLastPath <> ExtractFilePath(aAudioFile.Pfad)) then
-            if (fLastPath <> aAudioFile.Ordner) or (ForceReScan) then
-            begin
-                //fLastPath := ExtractFilePath(aAudioFile.Pfad);
-                fLastPath := aAudioFile.Ordner;
-
-                Coverliste := TStringList.Create;
-                GetCoverListe(aAudioFile, coverliste);
-                if Coverliste.Count > 0 then
-                begin
-                    NewCoverName := coverliste[GetFrontCover(CoverListe)];
-                    if  (NewCovername <> fLastCoverName) or (ForceReScan) then
-                    begin
-                        aAudioFile.CoverID := InitCoverFromFilename(NewCovername, ScanMode);
-                        if aAudioFile.CoverID = '' then
-                        begin
-                            // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
-                            // possible solution: Try the next coverfile.
-                            // Easier: Just use "Default-Cover" and md5(AudioFile.Ordner) as Cover-ID
-                            NewCoverName := '';
-                            aAudioFile.CoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
-                        end;
-                        flastID := aAudioFile.CoverID;
-                        fLastCoverName := NewCovername;
-                    end
-                    else
-                        aAudioFile.CoverID := flastID;
-                end else
-                begin
-                    // Kein Cover gefunden
-                    fLastCoverName := '';
-
-                    flastID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
-                    //flastID := '__'+ (StringReplace(aAudioFile.Ordner, '\', '-', [rfreplaceall]));
-                    aAudioFile.CoverID := flastID;
-                end;
-                coverliste.free;
-            end else
-            begin
-                // Datei ist im selben Ordner wie die letzte Datei, also auch dasselbe Cover.
-                aAudioFile.CoverID := fLastId;
-            end;
-      end;
-  except
-    if assigned(aAudioFile) then aAudioFile.CoverID := '';
-     flastID := '';
-     fLastPath := '';
-     fLastCoverName := '';
-  end;
-end;
-
-function TMedienBibliothek.InitCoverFromMetaData(aAudioFile: tAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
-var CoverStream: TMemoryStream;
-    newID: String;
-    MainFile: TGeneralAudioFile;
-
-begin
-    result := '';
-    aAudioFile.CoverID := '';
-    CoverStream := TMemoryStream.Create;
-    try
-        MainFile := TGeneralAudioFile.Create(aAudioFile.Pfad);
-        try
-            // first: Check for a User-CoverID
-            // this can happen, if the user refreshes the medialibrar and has set a specials CoverID through the Detail-Window
-            // (possible since Nemp 4.13)
-            if ( Flags and INIT_COVER_IGNORE_USERID) = 0 then
-                newID := aAudioFile.GetUserCoverIDFromMetaData(MainFile);
-
-            if  (newID <> '') and FileExists(CoverSavePath + newID + '.jpg') then
-            begin
-                aAudioFile.CoverID := newID;
-                result := newID;
-            end else
-            begin
-                ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
-                ///  we need to check for regular CoverArt information in the MetaData
-                if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
-                begin
-                    // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
-                    CoverStream.Seek(0, soFromBeginning);
-                    // compute a new ID from the stream data
-                    newID := MD5DigestToStr(MD5Stream(CoverStream));
-                    // try to save a resized JPG from the content of the stream
-                    // if this fails, there was something wrong with the image data :(
-                    if ScalePicStreamToFile(CoverStream,
-                                            CoverSavePath + newID + '.jpg',
-                                            240, 240,
-                                            GetProperImagingFactory(ScanMode))
-                    then
-                    begin
-                        aAudioFile.CoverID := newID;
-                        result := newID;
-                    end;
-                end;
-            end;
-        finally
-            MainFile.Free;
-        end;
-
-    finally
-        CoverStream.Free;
-    end;
-end;
-{
-    --------------------------------------------------------
-    GetCoverListe
-    - Get a list of candidates for the cover
-      Used e.g. by InitCover, when the directory changed
-    --------------------------------------------------------
-}
-procedure TMedienBibliothek.GetCoverListe(aAudioFile: tAudioFile; aCoverListe: TStringList);
-var Ordner: UnicodeString;
-begin
-  Ordner := aAudioFile.Ordner;
-  if DirectoryExists(Ordner) then // Nach Ordnern suchen
-
-    if CoverSearchInDir then
-      SucheCover(Ordner, aCoverListe);
-    if (aCoverListe.Count <= 0) and CoverSearchInParentDir then
-      if CountFilesInParentDir(Ordner) <= 5 then
-        SucheCoverInParentDir(Ordner, aCoverListe);
-
-    if (aCoverListe.Count <= 0) and CoverSearchInSubDir then
-      if CountSubDirs(Ordner) <= 5 then
-        SucheCoverInSubDir(Ordner, aCoverListe, CoverSearchSubDirName);
-
-    if (aCoverListe.Count <= 0) and CoverSearchInSisterDir then
-      if CountSisterDirs(Ordner) <= 5 then
-        SucheCoverInSisterDir(Ordner, aCoverListe, CoverSearchSisterDirName);
-end;
-{
-    --------------------------------------------------------
-    InitCoverFromFilename
-    - Copy a Coverfile into the Cover-Directory of the library
-    Return value: The New Cover-ID (i.e. the filename for the resized cover)
-    --------------------------------------------------------
-}
-function TMedienBibliothek.InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
-var newID: String;
-    fs: TFileStream;
-begin
-    try
-        newID := MD5DigestToStr(MD5File(aFileName));
-    except
-        newID := ''
-    end;
-
-    if newID = '' then
-    begin
-        // somethin was wrong with opening the file ...
-        // I've got sometimes Exceptions "cannot access file..." with fresh downloaded files from LastFM
-        // maybe conflicts with an antivirus-scanner??
-        // so, try again.
-        sleep(100);
-        try
-            newID := MD5DigestToStr(MD5File(aFileName));
-        except
-            newID := ''
-        end;
-    end;
-
-  result := '';
-
-  if newID <> '' then
-  begin
-      fs := TFileStream.Create(aFileName, fmOpenRead);
-      try
-          if ScalePicStreamToFile(fs,
-                                    CoverSavePath + newID + '.jpg',
-                                    240, 240,
-                                    GetProperImagingFactory(ScanMode))
-            then
-            begin
-                result := newID;
-            end;
-      finally
-          fs.Free;
-      end;
-  end;
-end;
-{
-    --------------------------------------------------------
-    ReInitCoverSearch
-    - Reset the internally used variables for faster coversearch
-    --------------------------------------------------------
-}
-procedure TMedienBibliothek.ReInitCoverSearch;
-begin
-  fSavePath      := '';
-  fLastCoverName := '';
-  fLastPath      := '';
-  fLastID        := '';
-end;
 
 {
     --------------------------------------------------------
@@ -4488,7 +4116,7 @@ begin
 
   if Source.Count < 1 then
   begin
-    GetRandomCover(Target);
+    CoverArtSearcher.PrepareMainCover(Target);
     exit;
   end;
 
@@ -4551,7 +4179,7 @@ begin
   // Coverliste sortieren
   SortCoverList(Target);
 
-  GetRandomCover(Target);
+  CoverArtSearcher.PrepareMainCover(Target);
 
 end;
 
@@ -4577,7 +4205,7 @@ begin
 
     if Source.Count < 1 then
     begin
-        GetRandomCover(Target);
+        CoverArtSearcher.PrepareMainCover(Target);
         exit;
     end;
 
@@ -4623,7 +4251,7 @@ begin
 
         // Coverliste sortieren
         SortCoverList(Target);
-        GetRandomCover(Target);
+        CoverArtSearcher.PrepareMainCover(Target);
 
     finally
         AudioFilesWithSameCover.Free;
@@ -5149,8 +4777,6 @@ begin
       // special case: Show all Files in Quicksearchlist
       for i := 0 to BibSearcher.QuickSearchResults.Count - 1 do
           Target.Add(BibSearcher.QuickSearchResults[i]);
-      //// for i := 0 to BibSearcher.QuickSearchAdditionalResults.Count - 1 do
-      ////     Target.Add(BibSearcher.QuickSearchAdditionalResults[i]);
   end else
   begin
       Start := 0;
@@ -6342,91 +5968,6 @@ begin
     // seek to the end position again
     aStream.Position := EndPosition;
 end;
-(*
-BACKUP
-procedure TMedienBibliothek.SaveAudioFilesToStream(aStream: TStream);
-var tmpStream: TMemoryStream;
-    i, len: Integer;
-    CurrentDriveChar: WideChar;
-    aAudioFile: TAudioFile;
-    aDrive: tDrive;
-    MainID, ID: Byte;
-    c: Integer;
-    tmpid: Integer;
-    ERROROCCURRED, DoMessageShow: Boolean;
-
-const FAKE_FILES_MULTIPLIER = 1;
-begin
-    tmpStream := TMemoryStream.Create;
-    tmpStream.Size := 2000 * Mp3ListePfadSort.Count * FAKE_FILES_MULTIPLIER;
-    c := Mp3ListePfadSort.Count * FAKE_FILES_MULTIPLIER;
-    tmpStream.Write(c, sizeOf(c));
-    CurrentDriveChar := '-';
-    DoMessageShow := True;
-
-    {
-    comments for new saving method
-    from tmpmemorystream to filestream: aStream.CopyFrom(tmp, size)
-
-    check, ob noch genug platz im tmp-stream: audiofile.EstimatedSizeInFile
-
-    }
-
-    for i := 0 to Mp3ListePfadSort.Count - 1 do
-    begin
-        ERROROCCURRED := False;
-        aAudioFile := TAudioFile(MP3ListePfadSort[i]);
-        if aAudioFile.Ordner[1] <> CurrentDriveChar then
-        begin
-            if aAudioFile.Ordner[1] <> '\' then
-            begin
-                // Neues Laufwerk - Infos dazwischenschieben
-                aDrive := GetDriveFromListByChar(fUsedDrives, Char(aAudioFile.Ordner[1]));
-                if assigned(aDrive) then
-                begin
-                    ID := 1;
-                    tmpStream.Write(ID, SizeOf(ID));
-                    tmpStream.Write(aDrive.ID, SizeOf(aDrive.ID));
-                    CurrentDriveChar := aAudioFile.Ordner[1];
-                end else
-                begin
-                    if DoMessageShow then
-                        MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                    //    exit;
-                    DoMessageShow := False;
-                    ERROROCCURRED := True;
-                end;
-            end else
-            begin
-                    ID := 1;
-                    tmpStream.Write(ID, SizeOf(ID));
-                    tmpid := -1;
-                    tmpStream.Write(tmpid, SizeOf(tmpid));
-                    CurrentDriveChar := aAudioFile.Ordner[1];
-            end;
-        end;
-        if not ERROROCCURRED then
-        begin
-            for c := 1 to FAKE_FILES_MULTIPLIER do
-            begin
-                ID := 0;
-                tmpStream.Write(ID, SizeOf(ID));
-                aAudioFile.SaveToStream(tmpStream, '');
-            end;
-        end;
-    end;
-    tmpStream.size := tmpStream.Position;
-
-
-    MainID := 1;
-    aStream.Write(MainID, SizeOf(MainID));
-    len := tmpStream.Size;
-    aStream.Write(len, SizeOf(len));
-    tmpStream.SaveToStream(aStream);
-    tmpStream.Free;
-end;
-
-*)
 
 {
     --------------------------------------------------------

@@ -82,8 +82,6 @@ procedure SynchNewFileWithBib(aNewFile: TAudioFile; WithCover: Boolean = True);
 procedure SynchAFileWithDisc(aNewFile: TAudioFile; WithCover: Boolean = True);
 
 
-
-
 procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 procedure LoadPlaylistFromFileM3U8(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 procedure LoadPlaylistFromFilePLS(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
@@ -618,20 +616,22 @@ end;
 procedure SynchNewFileWithBib(aNewFile: TAudioFile; WithCover: Boolean = True);
 var mbAf: TAudioFile;
 begin
-    mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
+    if MedienBib.StatusBibUpdate <= 1 then
+        mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad)
+    else
+        mbAf := Nil;
+
     if assigned(mbAF) then
     begin
         aNewFile.Assign(mbAF);
     end else
     begin
-
         if WithCover then
         begin
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
-            Medienbib.InitCover(aNewFile, tm_VCL, INIT_COVER_DEFAULT);
+            NempPlayer.CoverArtSearcher.InitCover(aNewFile, tm_VCL, INIT_COVER_DEFAULT);
         end else
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
-
     end;
 end;
 
@@ -650,13 +650,16 @@ begin
         if WithCover then
         begin
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
-            Medienbib.InitCover(aNewFile, tm_VCL, INIT_COVER_DEFAULT);
+            NempPlayer.CoverArtSearcher.InitCover(aNewFile, tm_VCL, INIT_COVER_DEFAULT);
         end else
             aNewFile.GetAudioData(aNewFile.Pfad, GAD_Rating or MedienBib.IgnoreLyricsFlag);
 
-        mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
-        if assigned(mbAF) then
-            mbAF.Assign(aNewFile);
+        if MedienBib.StatusBibUpdate <= 1 then
+        begin
+            mbAf := MedienBib.GetAudioFileWithFilename(aNewFile.Pfad);
+            if assigned(mbAF) then
+                mbAF.Assign(aNewFile);
+        end;
     end;
 end;
 

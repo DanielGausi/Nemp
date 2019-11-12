@@ -44,8 +44,14 @@ uses
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
   //MP3FileUtils, ID3v2Frames, // not used anymore here
   NempAudioFiles, Nemp_ConstantsAndTypes,
-  cddaUtils, basscd,
+  cddaUtils, basscd, oneinst, md5, Audiofiles,
   Winapi.Wincodec, Winapi.ActiveX;
+
+const
+    // some Flags for initialising CoverArt
+    INIT_COVER_DEFAULT       = 0;
+    INIT_COVER_FORCE_RESCAN  = 1;
+    INIT_COVER_IGNORE_USERID = 2;
 
 type
 
@@ -89,79 +95,139 @@ type
       procedure GetCoverInfos(AudioFileList: TObjectlist);
     end;
 
+    TCoverArtSearcher = class
+    private
+        class var fUseDir       : LongBool      ;
+        class var fUseParentDir : LongBool      ;
+        class var fUseSubDir    : LongBool      ;
+        class var fUseSisterDir : LongBool      ;
+        class var fSubDirName   : UnicodeString ;
+        class var fSisterDirName: UnicodeString ;
+        class var fSavePath     : UnicodeString ;
 
-  // Get the front cover from a list of names of found imagefiles
-  function GetFrontCover(CoverList: TStrings): integer;
 
-  // Search imagefiles in pfad and add them to CoverList
-  procedure SucheCover(Pfad: UnicodeString; CoverList: TStringList);
-  // Search additional files "around the audiofile"
-  // These functions will call SucheCover with a new Pfad built from Pfad
-  // SubStr is a string that must be contained in the name of the sub/sister-directory
-  // (which is one setting for the medialibrary, default is "cover")
-  procedure SucheCoverInSubDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
-  procedure SucheCoverInSisterDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
-  procedure SucheCoverInParentDir(Pfad: UnicodeString; CoverList:TStringList);
+        var fCurrentPath,                      // the last Path a CoverList was created for
+            fCurrentCoverName,                 // the last Filename for the Coverart used as "FrontCover"
+            fCurrentCoverID:  UnicodeString;   // the last calculated CoverID
+        var RandomCoverList: TStringlist;      // Randomly selected cover. Used for customized painting
 
-  // imagefiles in other directories are not determined, if there are to much directories
-  // Idea: A few dirs may be "CD1, CD2, Cover" or something like that,
-  //       but many directories are probably something else and images in these directories
-  //       may have nothing to do with our file here.
-  function CountSubDirs(Pfad: UnicodeString):integer;
-  function CountSisterDirs(Pfad: UnicodeString):integer;
-  function CountFilesInParentDir(Pfad: UnicodeString):integer;
+        class function fGetUseDir       : LongBool      ; static;
+        class function fGetUseParentDir : LongBool      ; static;
+        class function fGetUseSubDir    : LongBool      ; static;
+        class function fGetUseSisterDir : LongBool      ; static;
+        class function fGetSubDirName   : UnicodeString ; static;
+        class function fGetSisterDirName: UnicodeString ; static;
+        class function fGetSavePath     : UnicodeString ; static;
 
-  // Determine whether there exists a directory which matches the setting
-  function GetValidSubDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
-  function GetValidSisterDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
+        class procedure fSetUseDir       (Value :  LongBool      ); static;
+        class procedure fSetUseParentDir (Value :  LongBool      ); static;
+        class procedure fSetUseSubDir    (Value :  LongBool      ); static;
+        class procedure fSetUseSisterDir (Value :  LongBool      ); static;
+        class procedure fSetSubDirName   (Value :  UnicodeString ); static;
+        class procedure fSetSisterDirName(Value :  UnicodeString ); static;
+        class procedure fSetSavepath     (Value :  UnicodeString ); static;
 
-  // Save a Graphic in a resized file. Used for all the little md5-named jpgs
-  // in <NempDir>\Cover
-  //function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
-  function ScalePicStreamToFile(aStream: TStream; aFilename: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
+        // Get the front cover from a list of names of found imagefiles
+        function GetFrontCoverIndex(CoverList: TStrings): integer;
+        // GetCoverFromList calls GetFrontCoverIndex and load it into the Bitmap
+        function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): boolean;
+
+        // Search image files in pfad and add them to CoverList
+        procedure SucheCover(Pfad: UnicodeString; CoverList: TStringList);
+        // Search additional files "around the audiofile"
+        // These functions will call SucheCover with a new Pfad built from Pfad
+        // SubStr is a string that must be contained in the name of the sub/sister-directory
+        // (which is one setting for the medialibrary, default is "cover")
+        procedure SucheCoverInSubDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
+        procedure SucheCoverInSisterDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
+        procedure SucheCoverInParentDir(Pfad: UnicodeString; CoverList:TStringList);
+
+        // imagefiles in other directories are not determined, if there are to much directories
+        // Idea: A few dirs may be "CD1, CD2, Cover" or something like that,
+        //       but many directories are probably something else and images in these directories
+        //       may have nothing to do with our file here.
+        function CountSubDirs(Pfad: UnicodeString):integer;
+        function CountSisterDirs(Pfad: UnicodeString):integer;
+        function CountFilesInParentDir(Pfad: UnicodeString):integer;
+
+        // Determine whether there exists a directory which matches the setting
+        function GetValidSubDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
+        function GetValidSisterDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
+
+        // Paint a custumized cover "Your Library", using Cover in RandomCoverList
+        procedure PaintMainCover(aCoverBmp: TPicture);
+
+        /// Threadsafe resizing of coverart:
+        ///  Since Nemp 4.12 the Windows Imaging Component WIC is used
+        ///  This uses a IWICImagingFactory, and we need one for eaach thread
+        ///  Creating a new IWICImagingFactory everytime a scaling is needed, would be too much overhead
+        ///  Therefore:
+        ///       WICImagingFactory_VCL is created, when it is needed, and released at the Library-destructor
+        ///       WICImagingFactory_ScanThread is created and released in the context of the ScanThread
+        function GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
+
+    public
+        class property  UseDir       : LongBool       read fGetUseDir        write fSetUseDir        ;
+        class property  UseParentDir : LongBool       read fGetUseParentDir  write fSetUseParentDir  ;
+        class property  UseSubDir    : LongBool       read fGetUseSubDir     write fSetUseSubDir     ;
+        class property  UseSisterDir : LongBool       read fGetUseSisterDir  write fSetUseSisterDir  ;
+        class property  SubDirName   : UnicodeString  read fGetSubDirName    write fSetSubDirName    ;
+        class property  SisterDirName: UnicodeString  read fGetSisterDirName write fSetSisterDirName ;
+        class property  Savepath     : UnicodeString  read fGetSavepath      write fSetSavepath      ;
+
+        constructor create;
+        destructor Destroy; override;
+        procedure Clear;
+
+        procedure GetCandidateFilelist(aAudioFile: TAudioFile; aCoverListe: TStringList); // "GetCoverListe"
+
+        procedure StartNewSearch;  // "ReInitCoverSearch"
+
+        ///  The InitCover-methods will create a new image file in \Cover\<md5-Hash>.jpg
+        ///  This is later used by the Coverlfow and other displays for the cover art
+        ///  Return value: the MD5-Hash (i.e. filename of the resized cover)
+        function InitCoverFromFilename(aFileName: UnicodeString; ScanMode: CoverScanThreadMode): String;
+        function InitCoverFromMetaData(aAudioFile: TAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer): String;
+        procedure InitCover(aAudioFile: TAudioFile; ScanMode: CoverScanThreadMode; Flags: Integer);
+
+        class function GetCover_Fast(aAudioFile: TAudioFile; aCoverbmp: TPicture): boolean;
+        function GetCover_Complete(aAudioFile: TAudioFile; aCoverbmp: TPicture): boolean;
+
+        // Get the Default-Cover
+        // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
+        //      OR the customized cover file from the Medialibrary-settings.
+        class procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
+
+        // GetCoverBitmapFromID:
+        // Get the Bitmap for a specified Cover-ID
+        function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture): Boolean;
+
+        // Randomly select some covers from the list and store it in the RandomCoverList
+        procedure PrepareMainCover(SourceCoverlist: TObjectlist);
+
+        // Save a Graphic in a resized file. Used for all the little md5-named jpgs
+        // in <NempDir>\Cover
+        class function ScalePicStreamToFile(aStream: TStream; aID: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
+
+    end;
+
+
+
+    var
+        WICImagingFactory_VCL: IWICImagingFactory;
+        WICImagingFactory_ScanThread: IWICImagingFactory;
+
 
   // Converts data from a (id3tag)-picture-stream to a Bitmap.
   function PicStreamToBitmap(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
-  //function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
-
 
   // Draw a Picture on a Bitmap
   procedure AssignBitmap(Bitmap: TBitmap; const Picture: TPicture);
 
   // Draw a Graphic on a bounded Bitmap (stretch, proportional)
   procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
-  //procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
   procedure FitPictureIn(Bounds: TPicture; Source: TGraphic);
   procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
-
-  // GetCoverFromList calls GetFrontCover and load it into the Bitmap
-  function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): boolean;
-  //// Get the Frontcover from an id3Tag
-  //// moved to TAudioFile.GetCoverFromMetaData
-  //// function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
-
-  // GetCover calls GetCoverFromMetaData,
-  // then MedienBib.GetCoverList and GetCoverFromList if no success (iff CompleteCoverSearch = True)
-  // finally GetDefaultCover if still no success
-  function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
-
-  // GetCoverBitmapFromID:
-  // Get the Bitmap for a specified Cover-ID
-  function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture; aDir: String): Boolean;
-
-  // Get the Default-Cover
-  // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
-  //      OR the customized cover file from the Medialibrary-settings.
-  procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
-
-  // Select randomly some covers from the list and store it in the
-  // global variable RandomCoverList
-  procedure GetRandomCover(SourceCoverlist: TObjectlist);
-  // Clear random cover
-  procedure ClearRandomCover;
-  // Paint a custumized cover "Your Library", using Cover in RandomCoverList
-  procedure PaintPersonalMainCover(aCoverBmp: TPicture);
-
 
   // returns true, iff a preview-graphic for this ID should be already stored in the Cover-Save-Directory
   function PreviewGraphicShouldExist(aCoverID: String): Boolean;
@@ -174,8 +240,7 @@ uses NempMainUnit, StringHelper, AudioFileHelper, GnuGetText, Nemp_RessourceStri
 
 var
     CSAccessRandomCoverlist: RTL_CRITICAL_SECTION;
-    RandomCoverList: TStringlist;       // Randomly selected cover. Used for customized painting
-
+    CSAccessCoverSearcherProperties: RTL_CRITICAL_SECTION;
 
 // another function used just here.
 function IsImageExt(aExt: String): boolean;
@@ -344,409 +409,7 @@ begin
 end;
 
 
-function GetFrontCover(CoverList:TStrings):integer;
-var i:integer;
-begin
-  result := -1;
 
-  for i:=0 to CoverList.Count-1 do
-    if AnsiContainsText(CoverList[i],'front') then
-    begin
-      result := i;
-      break;
-    end;
-
-  if result = -1 then
-    for i:=0 to CoverList.Count-1 do
-      if AnsiContainsText(CoverList[i],'_a') then
-      begin
-        result := i;
-        break;
-      end;
-
-  if result = -1 then
-  begin
-    result := 0;
-    for i:=0 to CoverList.Count-1 do
-      if AnsiContainsText(CoverList[i],'folder') then
-      begin
-        result := i;
-        break;
-      end;
-  end;
-end;
-
-Procedure SucheCover(pfad: UnicodeString; CoverList:TStringList);
-var sr : TSearchrec;
-    dateityp:string;
-begin
-    pfad := IncludeTrailingPathDelimiter(pfad);
-
-    if Findfirst(pfad+'*',FaAnyfile,sr) = 0 then
-    repeat
-      if (sr.name<>'.') AND (sr.name<>'..') then
-      begin
-          dateityp := ExtractFileExt(sr.Name);
-          if IsImageExt(dateityp) then
-              CoverList.Add(pfad + sr.Name);
-      end;
-    until Findnext(sr)<>0;
-    Findclose(sr);
-end;
-
-procedure SucheCoverInSubDir(Pfad: UnicodeString; CoverList:TStringList; Substr: UnicodeString);
-var sdir: UnicodeString;
-begin
-    sdir := GetValidSubDir(Pfad, Substr);
-    if sdir <> Pfad then
-      SucheCover(sdir, CoverList);
-end;
-
-procedure SucheCoverInSisterDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
-var sdir: UnicodeString;
-begin
-    sdir := GetValidSisterDir(Pfad,Substr);
-    if sdir <> Pfad then
-      SucheCover(sdir, CoverList);
-end;
-
-procedure SucheCoverInParentDir(Pfad: UnicodeString; CoverList: TStringList);
-begin
-  pfad := ExcludeTrailingPathDelimiter(pfad);
-  pfad := Copy(pfad,1,LastDelimiter('\',Pfad));
-  SucheCover(pfad, CoverList);
-end;
-
-function CountSubDirs(Pfad: UnicodeString):integer;
-var sr: TsearchRec;
-begin
-  result := 0;
-  if AnsiEndsStr('\', pfad) then
-      pfad:=Copy(Pfad,1,length(pfad)-1);
-  if (findfirst(pfad+'\*',FaDirectory,sr)=0) then
-      repeat
-        if (sr.name<>'.') AND (sr.name<>'..')
-            AND ((sr.Attr AND faDirectory)=faDirectory) then
-          result := result + 1;
-      until (Findnext(sr)<>0) OR (result > 6) ;
-    findclose(sr);
-end;
-
-function CountSisterDirs(Pfad: UnicodeString):integer;
-begin
-  pfad := ExcludeTrailingPathDelimiter(pfad);
- // ...und den Parentordner bestimmen
-  Pfad := Copy(Pfad,1, LastDelimiter('\',Pfad));
-  result := CountSubDirs(Pfad);
-end;
-
-function CountFilesInParentDir(Pfad: UnicodeString):integer;
-var sr: TsearchRec;
-begin
-  result := 0;
-  pfad := ExcludeTrailingPathDelimiter(pfad);
-  pfad := Copy(pfad,1, LastDelimiter('\',Pfad));
-
-  if (Findfirst(pfad+'\*',FaAnyfile,sr)=0) then
-      repeat
-        if (sr.name<>'.') AND (sr.name<>'..')
-            And (Not IsImageExt(ExtractFileExt(sr.Name)))
-        then
-          result := result + 1;
-      until (Findnext(sr)<>0) OR (result > 6) ;
-    Findclose(sr);
-end;
-
-function GetValidSubDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
-var sr: TsearchRec;
-  abbruch:boolean;
-begin
-  result := pfad;
-  pfad := IncludeTrailingPathDelimiter(pfad);
-  abbruch := false;
-  if (findfirst(pfad+'*',FaDirectory,sr)=0) then
-  repeat
-    if (sr.name<>'.') AND (sr.name<>'..')
-      AND ((sr.Attr AND faDirectory)=faDirectory)
-      AND (AnsiContainsText(sr.name, Substr))
-      then
-      begin
-        result := pfad + sr.Name;
-        abbruch := True;
-      end;
-  until (abbruch) or (Findnext(sr)<>0) ;
-  findclose(sr);
-end;
-
-function GetValidSisterDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
-var sr: TsearchRec;
-  abbruch:boolean;
-  pfadOrig: UnicodeString;
-begin
-  pfad := ExcludeTrailingPathDelimiter(pfad);
-  pfadOrig := pfad;
-  pfad := Copy(pfad,1,LastDelimiter('\',Pfad));
-  result := PfadOrig;
-  abbruch := false;
-
-  if (Findfirst(pfad+'\*',FaDirectory,sr)=0) then
-  repeat
-    if (sr.name<>'.') AND (sr.name<>'..')
-      AND ((sr.Attr AND faDirectory)=faDirectory)
-      AND ((pfad + '\' + sr.Name) <> pfadOrig)
-      AND (AnsiContainsText(sr.name, Substr))
-      then
-      begin
-        result := pfad + '\' + sr.Name;
-        abbruch := True;
-      end;
-  until (abbruch) or (Findnext(sr)<>0) ;
-  Findclose(sr);
-end;
-
-
-function ScalePicStreamToFile(aStream: TStream; aFilename: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
-var
-    hr: HRESULT;
-    isLocalFactory: Boolean;
-    // for proper scaling
-    xfactor, yfactor:double;
-    origWidth, origHeight: Cardinal;
-    newWidth, newHeight: Cardinal;
-    // reading the source image
-    SourceAdapter: IStream;
-    BitmapDecoder: IWICBitmapDecoder;
-    DecodeFrame: IWICBitmapFrameDecode;
-    SourceBitmap: IWICBitmap;
-    SourceScaler: IWICBitmapScaler;
-    // writing the resized image
-    DestStream: TMemoryStream;
-    DestAdapter: IStream;
-    DestWICStream: IWICStream;
-    BitmapEncoder: IWICBitmapEncoder;
-    EncodeFrame: IWICBitmapFrameEncode;
-    Props: IPropertyBag2;
-begin
-    result := False;
-    if Not Overwrite and FileExists(aFilename) then
-    begin
-        result := True;
-        exit;
-    end;
-
-    isLocalFactory := (aWICImagingFactory = nil);
-    if isLocalFactory then
-        CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
-          CLSCTX_LOCAL_SERVER, IUnknown, aWICImagingFactory);
-
-    // read the image data from stream
-    SourceAdapter := TStreamAdapter.Create(aStream);
-    hr := aWICImagingFactory.CreateDecoderFromStream(SourceAdapter, guid_null, WICDecodeMetadataCacheOnDemand, BitmapDecoder);
-    if Succeeded(hr) then hr := BitmapDecoder.GetFrame(0, DecodeFrame);
-    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapFromSource(DecodeFrame, WICBitmapCacheOnLoad, SourceBitmap);
-    if Succeeded(hr) then hr := SourceBitmap.GetSize(origWidth, origHeight);
-
-    // calculate proper scaling
-    xfactor:= (destWidth) / origWidth;
-    yfactor:= (destHeight) / origHeight;
-    if xfactor > yfactor then
-    begin
-        newWidth := round(origWidth * yfactor);
-        newHeight := round(origHeight * yfactor);
-    end else
-    begin
-        newWidth := round(origWidth * xfactor);
-        newHeight := round(origHeight * xfactor);
-    end;
-
-    // scale the original image
-    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapScaler(SourceScaler);
-    if Succeeded(hr) then hr := SourceScaler.Initialize(SourceBitmap, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
-
-    if Succeeded(hr) then
-    begin
-        // Reading and scaling the original image was successful.
-        // Now try to save the scaled image
-        DestStream := TMemoryStream.create;
-        try
-            // create new WICStream
-            DestAdapter := TStreamAdapter.Create(DestStream);
-            if Succeeded(hr) then hr := aWICImagingFactory.CreateStream(DestWICStream);
-            if Succeeded(hr) then hr := DestWICStream.InitializeFromIStream(DestAdapter);
-            // create and prepare JPEG-Encoder
-            if Succeeded(hr) then hr := aWICImagingFactory.CreateEncoder(GUID_ContainerFormatJpeg, guid_null, BitmapEncoder);
-            if Succeeded(hr) then hr := BitmapEncoder.Initialize(DestWICStream, WICBitmapEncoderNoCache);
-            if Succeeded(hr) then hr := BitmapEncoder.CreateNewFrame(EncodeFrame, Props);
-            if Succeeded(hr) then hr := EncodeFrame.Initialize(Props);
-            if Succeeded(hr) then hr := EncodeFrame.SetSize(newWidth, newHeight);
-            // write image data
-            if Succeeded(hr) then hr := EncodeFrame.WriteSource(SourceScaler, nil);
-            if Succeeded(hr) then hr := EncodeFrame.Commit;
-            if Succeeded(hr) then hr := BitmapEncoder.Commit;
-            // finally save the stream to the destination file
-            if Succeeded(hr) then
-                try
-                    DestStream.SaveToFile(aFilename);
-                    result := True;
-                except
-                    // silent exception here, but (try to) delete the destination file, if it exists
-                    if FileExists(aFilename) then DeleteFile(aFilename);
-                        result := False;
-                end;
-        finally
-            DestStream.Free;
-        end;
-    end;
-
-    if isLocalFactory then
-        aWICImagingFactory._Release;
-end;
-
-(*
-function SaveResizedGraphic(SourceBmp: TBitmap32; dest: UnicodeString; W,h: Integer; OverWrite: Boolean = False): boolean;
-var SmallBmp: TBitmap32;
-    tmpBmp: TBitmap;
-    xfactor, yfactor:double;
-    aJpg: tJpegImage;
-    aStream: TFileStream;
-
-    //wic: TWICImage;
-    //R: TDraftResampler; // TLinearResampler;
-begin
-
-  result := True;
-
-  if Not Overwrite and FileExists(dest) then exit;
-
-  // BigBmp := TBitmap32.Create;
-  SmallBmp := TBitmap32.Create;
-
-  try
-      try
-          SmallBmp.Width := W;
-          SmallBmp.Height := H;
-
-          if (SourceBmp <> NIL) And ((SourceBmp.Width > 0) And (SourceBmp.Height > 0)) then
-          begin
-
-              // BigBmp.Assign(aGraphic);
-
-              xfactor:= (W) / SourceBmp.Width;
-              yfactor:= (H) / SourceBmp.Height;
-              if xfactor > yfactor then
-                begin
-                  SmallBmp.Width := round(SourceBmp.Width * yfactor);
-                  SmallBmp.Height := round(SourceBmp.Height * yfactor);
-                end else
-                begin
-                  SmallBmp.Width := round(SourceBmp.Width * xfactor);
-                  SmallBmp.Height := round(SourceBmp.Height * xfactor);
-                end;
-
-              TDraftResampler.Create(SourceBmp); // will be freed be Destructor of Smallbmp
-              SmallBmp.Draw(SmallBmp.BoundsRect, SourceBmp.BoundsRect, SourceBmp);
-
-              // SetStretchBltMode(SmallBmp.Canvas.Handle, HALFTONE);
-              // StretchBlt(SmallBmp.Canvas.Handle, 0 ,0, SmallBmp.Width, SmallBmp.Height, BigBmp.Canvas.Handle, 0, 0, BigBmp.Width, BigBmp.Height, SRCCopy);
-
-              tmpBmp := TBitmap.Create;
-              aJpg := TJpegImage.Create;
-
-              //wic := TWICImage.Create;
-              try
-                  tmpBmp.Assign(SmallBmp);
-                  aJpg.CompressionQuality := 90;
-                  aJpg.Assign(tmpBmp);
-
-                  //wic.Assign(SmallBmp);
-                  //wic.SaveToFile(dest + '___.jpg');
-
-                  try
-                      aStream := TFileStream.Create(dest, fmCreate or fmOpenWrite);
-                      try
-                        aJpg.SaveToStream(aStream);
-                      finally
-                        aStream.free;
-                      end;
-                  except
-                      // silent Exception. Cover-Saving failed.
-                      if FileExists(dest) then DeleteFile(dest);
-                          result := False;
-                  end;
-              finally
-                  tmpBmp.Free;
-                  aJpg.Free;
-                  //wic.Free;
-              end;
-          end;
-      except
-        if FileExists(dest) then DeleteFile(dest);
-            result := False;
-      end;
-  finally
-      SmallBmp.Free;
-      // BigBmp.Free;
-  end;
-end;
-
-
-function PicStreamToBitmap32(aStream: TStream; Mime: AnsiString; aBmp: TBitmap32): Boolean;
-var jp: TJPEGImage;
-    png: TPNGImage;
-begin
-    result := True;
-    if (mime = 'image/jpeg') or (mime = 'image/jpg') or (AnsiUpperCase(String(Mime)) = 'JPG') then
-    try
-        aStream.Seek(0, soFromBeginning);
-        jp := TJPEGImage.Create;
-        try
-          try
-            jp.LoadFromStream(aStream);
-            //jp.DIBNeeded;
-            aBmp.Assign(jp);
-          except
-            result := False;
-            aBmp.Assign(NIL);
-          end;
-        finally
-          jp.Free;
-        end;
-    except
-        result := False;
-        aBmp.Assign(NIL);
-    end else
-        if (mime = 'image/png') or (Uppercase(String(Mime)) = 'PNG') then
-        try
-            aStream.Seek(0, soFromBeginning);
-            png := TPNGImage.Create;
-            try
-              try
-                png.LoadFromStream(aStream);
-                aBmp.Assign(png);
-              except
-                result := False;
-                aBmp.Assign(NIL);
-              end;
-            finally
-              png.Free;
-            end;
-        except
-            result := False;
-            aBmp.Assign(NIL);
-        end else
-        if (mime = 'image/bmp') or (Uppercase(String(Mime)) = 'BMP') then
-            try
-                aStream.Seek(0, soFromBeginning);
-                aBmp.LoadFromStream(aStream);
-            except
-                result := False;
-                aBmp.Assign(Nil);
-            end else
-                begin
-                    aBmp.Assign(NIL);
-                end;
-end;
-*)
 
 function PicStreamToBitmap(aStream: TStream; Mime: AnsiString; aBmp: TBitmap): Boolean;
 var jp: TJPEGImage;
@@ -867,49 +530,6 @@ begin
     end;
 end;
 
-(*
-procedure FitBitmap32In(Bounds: TBitmap; Source: TBitmap32);
-var xfactor, yfactor:double;
-    tmpBmp: TBitmap32;
-begin
-  if Source = NIL then exit;
-  if (Source.Width = 0) or (Source.Height=0) then exit;
-  xfactor:= (Bounds.Width) / Source.Width;
-  yfactor:= (Bounds.Height) / Source.Height;
-  if xfactor > yfactor then
-  begin
-      Bounds.Width := round(Source.Width*yfactor);
-      Bounds.Height := round(Source.Height*yfactor);
-  end else
-  begin
-      Bounds.Width := round(Source.Width*xfactor);
-      Bounds.Height := round(Source.Height*xfactor);
-  end;
-
-    tmpbmp := TBitmap32.Create;
-    try
-        tmpBmp.Width := Bounds.Width;
-        tmpBmp.Height := Bounds.Height;
-
-        //tmpBmp.Assign(Source);
-
-        TDraftResampler.Create(Source); // will be freed be Destructor of Smallbmp
-        tmpBmp.Draw(tmpBmp.BoundsRect, Source.BoundsRect, Source);
-
-        Bounds.Assign(tmpBmp);
-        {
-        SetStretchBltMode(Bounds.Canvas.Handle, HALFTONE);
-        StretchBlt(Bounds.Canvas.Handle,
-                  0,0, Bounds.Width, Bounds.Height,
-                  tmpbmp.Canvas.Handle,
-                  0, 0, tmpBmp.Width, tmpBmp.Height, SRCCopy);
-        }
-    finally
-        tmpbmp.Free
-    end;
-end;
-*)
-
 
 // WIC-principle from https://www.delphipraxis.net/1291613-post31.html
 procedure FitWICImageIn(aWICImage: TWICImage; aWidth, aHeight:Integer);
@@ -942,123 +562,28 @@ end;
 
 
 
-function GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): Boolean;
-var FrontCover:integer;
-    aGraphic: TPicture;
-begin
-      result := False;
-      if aList.Count = 0 then
-          Exit;
-      FrontCover := GetFrontCover(aList);
-      aGraphic := TPicture.Create;
-      try
-          aGraphic.LoadFromFile(aList[FrontCover]);
-          if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-              FitPictureIn(aCoverbmp, aGraphic.Graphic)
-          else
-              //AssignBitmap(aCoverBmp, aGraphic);
-              aCoverbmp.Assign(aGraphic);
-          result := True;
-      finally
-          aGraphic.Free;
-      end;
-end;
 
 (*
-function GetCoverFromID3(aAudioFile: TAudioFile; aCoverbmp: tBitmap): boolean;
-var MpegInfo: TMpegInfo;
-  Id3v1Tag: TID3v1Tag;
-  Id3v2Tag: TID3v2Tag;
-  PictureFrames: TObjectList;
-  Mime: AnsiString;
-  PicType: Byte;
-  Description: UnicodeString;
-  PicData: TMemoryStream;
-  ok: Boolean;
-  i: integer;
-  tmpbmp: TBitmap32;
-begin
-  result := False;
-
-  if (AnsiLowerCase(ExtractFileExt(aAudioFile.Pfad))='.mp3')
-    AND FileExists(aAudioFile.Pfad) then
-  begin
-    mpeginfo := TMpegInfo.Create;
-    Id3v1Tag := TId3v1Tag.Create;
-    Id3v2Tag := TId3v2Tag.Create;
-
-    try
-      GetMp3Details(aAudioFile.Pfad,mpegInfo,ID3v2Tag,ID3v1tag);
-    except
-    end;
-
-    if ID3v2Tag.exists then
-    begin
-        PictureFrames := ID3v2Tag.GetAllPictureFrames;
-        PicData := TMemoryStream.Create;
-        try
-            for i := PictureFrames.Count - 1 downto 0 do
-            begin
-                // hinten anfangen, Front-Cover suchen.
-                // gibt es kein Front-Cover: Das erste nehmen
-                PicData.Clear;
-                (PictureFrames[i] as TID3v2Frame).GetPicture(Mime, PicType, Description, PicData);
-
-                if ((PicType = 3) or (i = 0)) and (PicData.Size > 50) then
-                begin
-                    tmpbmp := TBitmap32.Create;
-                    try
-                        //tmpbmp.PixelFormat := pf32Bit;
-                        //ok := PicStreamToImage(PicData, Mime, tmpbmp);
-                        ok := PicStreamToBitmap32(PicData, Mime, tmpbmp);
-                        if ok then
-                        begin
-                            if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                                FitBitmap32In(aCoverbmp, tmpbmp)
-                            else
-                                aCoverBmp.Assign(tmpbmp);
-                        end;
-                    finally
-                        tmpbmp.Free;
-                    end;
-                    if ok then
-                    begin
-                        result := True;
-                        break;
-                    end;
-                end;
-            end;
-        finally
-            PictureFrames.Free;
-            PicData.Free;
-        end;
-
-    end;
-    mpeginfo.Free;
-    Id3v1Tag.Free;
-    Id3v2Tag.Free;
-  end;
-end;
-*)
-
 function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
 var coverliste: TStringList;
     aGraphic: TPicture;
     baseName, completeName: String;
+    CoverArtSearcher: TCoverArtSearcher;
+
 begin
   result := false;
   try
       case aAudioFile.AudioType of
           at_Stream: begin
-              GetDefaultCover(dcWebRadio, aCoverbmp, 0);
+              TCoverArtSearcher.GetDefaultCover(dcWebRadio, aCoverbmp, 0);
               result := True;
           end;
           at_File: begin
-              if (aAudioFile.CoverID <> '') And FileExists(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg') then
+              if (aAudioFile.CoverID <> '') And FileExists(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg') then
               begin
                   aGraphic := TPicture.Create;
                   try
-                      aGraphic.LoadFromFile(Medienbib.CoverSavePath + aAudioFile.CoverID + '.jpg');
+                      aGraphic.LoadFromFile(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg');
 
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
                           FitPictureIn(aCoverbmp, aGraphic.Graphic)
@@ -1075,38 +600,43 @@ begin
                   begin
                       // first: Check Metadata
                       // Bugfix 4.12: Also consider Non-MP3-Files (like Flac)
-                      //aBmp32 := TBitmap32.Create;
-                      //try
-                          // if GetCoverFromID3(aAudioFile, aCoverbmp.Bitmap) then
-                          //    result := True
-                          if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
-                          begin
-                              result := True;
-                              //aCoverbmp.Assign(aBmp32);
-                          end
-                          else
-                          begin // in Dateien rund um das Audiofile nach nem Bild suchen
+
+                      if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
+                      begin
+                          result := True;
+                      end
+                      else
+                      begin // in Dateien rund um das Audiofile nach nem Bild suchen
+
+                          // ------------------------
+
+                          CoverArtSearcher := TCoverArtSearcher.create;
+                          try
                               coverliste := TStringList.Create;
-                              Medienbib.GetCoverListe(aAudioFile,coverliste);
+                              CoverArtSearcher.GetCandidateFilelist(aAudioFile,coverliste);
                               try
-                                  if Not GetCoverFromList(CoverListe, aCoverbmp) then
+                                  if Not CoverArtSearcher.GetCoverFromList(CoverListe, aCoverbmp) then
                                   begin
-                                      GetDefaultCover(dcFile, aCoverbmp, 0);
+                                      CoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
                                       result := False;
                                   end else
                                       result := True;
                               except
-                                  GetDefaultCover(dcFile, aCoverbmp, 0);
+                                  CoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
                                   result := false;
                               end;
                               coverliste.free;
+                          finally
+                              CoverArtSearcher.free;
                           end;
-                      //finally
-                      //    aBmp32.Free;
-                      //end;
+
+                          // ------------------------
+
+                      end;
+
                   end else
                   begin
-                      GetDefaultCover(dcFile, aCoverbmp, 0);
+                      TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
                       result := False;
                   end;
               end;
@@ -1115,10 +645,10 @@ begin
               // get a Covername from cddb-id
               baseName := CoverFilenameFromCDDA(aAudioFile.Pfad);
               completeName := '';
-              if FileExists(Medienbib.CoverSavePath + baseName + '.jpg') then
-                  completeName := Medienbib.CoverSavePath + baseName + '.jpg'
-              else if FileExists(Medienbib.CoverSavePath + baseName + '.png') then
-                  completeName := Medienbib.CoverSavePath + baseName + '.png';
+              if FileExists(TCoverArtSearcher.Savepath + baseName + '.jpg') then
+                  completeName := TCoverArtSearcher.Savepath + baseName + '.jpg'
+              else if FileExists(TCoverArtSearcher.Savepath + baseName + '.png') then
+                  completeName := TCoverArtSearcher.Savepath + baseName + '.png';
 
               if completeName <> '' then
               begin
@@ -1128,7 +658,6 @@ begin
                       if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
                           FitPictureIn(aCoverbmp, aGraphic.Graphic)
                       else
-                          //AssignBitmap(aCoverBmp, aGraphic);
                           aCoverBmp.Assign(aGraphic);
                       result := True;
                   finally
@@ -1136,25 +665,622 @@ begin
                   end;
               end else
               begin
-                  GetDefaultCover(dcCDDA, aCoverbmp, 0);
+                  TCoverArtSearcher.GetDefaultCover(dcCDDA, aCoverbmp, 0);
                   result := false;
               end;
           end;
       end;
   except
-      GetDefaultCover(dcFile, aCoverbmp, 0);
+      TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
+      result := false;
+  end;
+end;
+*)
+
+
+
+function PreviewGraphicShouldExist(aCoverID: String): Boolean;
+begin
+    // we use a "_" at the beginning of a cover ID to indicate a "missing cover",
+    // i.e. no cover art have been found so far
+    result := (Length(aCoverID) > 1) and (aCoverID[1] <> '_');
+end;
+
+
+{ TCoverArtSearcher }
+
+constructor TCoverArtSearcher.create;
+begin
+    RandomCoverList := TStringlist.Create;
+end;
+
+destructor TCoverArtSearcher.Destroy;
+begin
+  RandomCoverList.Free;
+  inherited;
+end;
+
+
+class function TCoverArtSearcher.fGetSavePath: UnicodeString;
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    result := fSavePath;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class function TCoverArtSearcher.fGetSisterDirName: UnicodeString;
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    result := fSisterDirName;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class function TCoverArtSearcher.fGetSubDirName: UnicodeString;
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    result := fSubDirName;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class function TCoverArtSearcher.fGetUseDir: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fUseDir));
+end;
+
+class function TCoverArtSearcher.fGetUseParentDir: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fUseParentDir));
+end;
+
+class function TCoverArtSearcher.fGetUseSisterDir: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fUseSisterDir));
+end;
+
+class function TCoverArtSearcher.fGetUseSubDir: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fUseSubDir));
+end;
+
+class procedure TCoverArtSearcher.fSetSavepath(Value: UnicodeString);
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    fSavePath := Value;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class procedure TCoverArtSearcher.fSetSisterDirName(Value: UnicodeString);
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    fSisterDirName := Value;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class procedure TCoverArtSearcher.fSetSubDirName(Value: UnicodeString);
+begin
+    EnterCriticalSection(CSAccessCoverSearcherProperties);
+    fSubDirName := Value;
+    LeaveCriticalSection(CSAccessCoverSearcherProperties);
+end;
+
+class procedure TCoverArtSearcher.fSetUseDir(Value: LongBool);
+begin
+    InterLockedExchange(Integer(fUseDir), Integer(Value));
+end;
+
+class procedure TCoverArtSearcher.fSetUseParentDir(Value: LongBool);
+begin
+    InterLockedExchange(Integer(fUseParentDir), Integer(Value));
+end;
+
+class procedure TCoverArtSearcher.fSetUseSisterDir(Value: LongBool);
+begin
+    InterLockedExchange(Integer(fUseSisterDir), Integer(Value));
+end;
+
+class procedure TCoverArtSearcher.fSetUseSubDir(Value: LongBool);
+begin
+    InterLockedExchange(Integer(fUseSubDir), Integer(Value));
+end;
+
+procedure TCoverArtSearcher.GetCandidateFilelist(aAudioFile: TAudioFile;
+  aCoverListe: TStringList);
+begin
+    aCoverListe.Clear;
+    if DirectoryExists(aAudioFile.Ordner) then
+    begin
+        if UseDir then
+            SucheCover(aAudioFile.Ordner, aCoverListe);
+
+        if (aCoverListe.Count = 0) and UseParentDir and (CountFilesInParentDir(aAudioFile.Ordner) <= 5) then
+            SucheCoverInParentDir(aAudioFile.Ordner, aCoverListe);
+
+        if (aCoverListe.Count = 0) and UseSubDir and (CountSubDirs(aAudioFile.Ordner) <= 5) then
+            SucheCoverInSubDir(aAudioFile.Ordner, aCoverListe, SubDirName);
+
+        if (aCoverListe.Count = 0) and UseSisterDir and (CountSisterDirs(aAudioFile.Ordner) <= 5) then
+            SucheCoverInSisterDir(aAudioFile.Ordner, aCoverListe, SisterDirName);
+    end;
+end;
+
+procedure TCoverArtSearcher.StartNewSearch;
+begin
+    fCurrentPath      := '';
+    fCurrentCoverName := '';
+    fCurrentCoverID   := '';
+end;
+
+procedure TCoverArtSearcher.InitCover(aAudioFile: TAudioFile;
+  ScanMode: CoverScanThreadMode; Flags: Integer);
+var CoverListe: TStringList;
+    NewCoverName: String;
+    ForceReScan: Boolean;
+begin
+  try
+      ForceReScan       := (Flags and INIT_COVER_FORCE_RESCAN) = INIT_COVER_FORCE_RESCAN   ;
+      // IgnoreUserCoverID := (Flags and INIT_COVER_IGNORE_USERID) = INIT_COVER_IGNORE_USERID ;
+
+      aAudioFile.CoverID := ''; // new WIC : RESET the ID
+      if InitCoverFromMetaData(aAudioFile, ScanMode, Flags) <> '' then
+      begin
+          // Cover in Metadata found and successfully saved to <ID>.jpg
+          fCurrentCoverID := aAudioFile.CoverID;
+          fCurrentPath := '';
+          fCurrentCoverName := '';
+      end else // AudioFile.GetAudioData hat kein Cover im ID3Tag gefunden. Also: In Dateien drumherum suchen
+      begin
+            // Wenn Da kein Erfolg: Cover-Datei suchen.
+            // Aber nur, wenn man jetzt in einem Anderen Ordner ist.
+            // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
+            if (fCurrentPath <> aAudioFile.Ordner) or (ForceReScan) then
+            begin
+                //fLastPath := ExtractFilePath(aAudioFile.Pfad);
+                fCurrentPath := aAudioFile.Ordner;
+
+                Coverliste := TStringList.Create;
+                GetCandidateFilelist(aAudioFile, coverliste);
+                if Coverliste.Count > 0 then
+                begin
+                    NewCoverName := coverliste[GetFrontCoverIndex(CoverListe)];
+                    if  (NewCovername <> fCurrentCoverName) or (ForceReScan) then
+                    begin
+                        aAudioFile.CoverID := InitCoverFromFilename(NewCovername, ScanMode);
+                        if aAudioFile.CoverID = '' then
+                        begin
+                            // Something was wrong with the Coverfile (see comments in InitCoverFromFilename)
+                            // possible solution: Try the next coverfile.
+                            // Easier: Just use "Default-Cover" and md5(AudioFile.Ordner) as Cover-ID
+                            NewCoverName := '';
+                            aAudioFile.CoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
+                        end;
+                        fCurrentCoverID := aAudioFile.CoverID;
+                        fCurrentCoverName := NewCovername;
+                    end
+                    else
+                        aAudioFile.CoverID := fCurrentCoverID;
+                end else
+                begin
+                    // Kein Cover gefunden
+                    fCurrentCoverName := '';
+                    fCurrentCoverID := '__'+ MD5DigestToStr(MD5UnicodeString(aAudioFile.Ordner));
+                    aAudioFile.CoverID := fCurrentCoverID;
+                end;
+                coverliste.free;
+            end else
+            begin
+                // Datei ist im selben Ordner wie die letzte Datei, also auch dasselbe Cover.
+                aAudioFile.CoverID := fCurrentCoverID;
+            end;
+      end;
+  except
+    if assigned(aAudioFile) then aAudioFile.CoverID := '';
+     fCurrentCoverID := '';
+     fCurrentPath := '';
+     fCurrentCoverName := '';
+  end;
+end;
+
+
+function TCoverArtSearcher.InitCoverFromMetaData(aAudioFile: tAudioFile;
+  ScanMode: CoverScanThreadMode; Flags: Integer): String;
+var CoverStream: TMemoryStream;
+    newID: String;
+    MainFile: TGeneralAudioFile;
+
+begin
+    result := '';
+    aAudioFile.CoverID := '';
+    CoverStream := TMemoryStream.Create;
+    try
+        MainFile := TGeneralAudioFile.Create(aAudioFile.Pfad);
+        try
+            // first: Check for a User-CoverID
+            // this can happen, if the user refreshes the medialibrar and has set a specials CoverID through the Detail-Window
+            // (possible since Nemp 4.13)
+            if ( Flags and INIT_COVER_IGNORE_USERID) = 0 then
+                newID := aAudioFile.GetUserCoverIDFromMetaData(MainFile);
+
+            if  (newID <> '') and FileExists(SavePath + newID + '.jpg') then
+            begin
+                aAudioFile.CoverID := newID;
+                result := newID;
+            end else
+            begin
+                ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
+                ///  we need to check for regular CoverArt information in the MetaData
+                if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
+                begin
+                    // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
+                    CoverStream.Seek(0, soFromBeginning);
+                    // compute a new ID from the stream data
+                    newID := MD5DigestToStr(MD5Stream(CoverStream));
+                    // try to save a resized JPG from the content of the stream
+                    // if this fails, there was something wrong with the image data :(
+                    if ScalePicStreamToFile(CoverStream, newID,
+                                            // SavePath + newID + '.jpg',
+                                            240, 240,
+                                            GetProperImagingFactory(ScanMode))
+                    then
+                    begin
+                        aAudioFile.CoverID := newID;
+                        result := newID;
+                    end;
+                end;
+            end;
+        finally
+            MainFile.Free;
+        end;
+
+    finally
+        CoverStream.Free;
+    end;
+end;
+
+function TCoverArtSearcher.InitCoverFromFilename(aFileName: UnicodeString;
+  ScanMode: CoverScanThreadMode): String;
+var newID: String;
+    fs: TFileStream;
+begin
+    try
+        newID := MD5DigestToStr(MD5File(aFileName));
+    except
+        newID := ''
+    end;
+
+    if newID = '' then
+    begin
+        // somethin was wrong with opening the file ...
+        // I've got sometimes Exceptions "cannot access file..." with fresh downloaded files from LastFM
+        // maybe conflicts with an antivirus-scanner??
+        // so, try again.
+        sleep(100);
+        try
+            newID := MD5DigestToStr(MD5File(aFileName));
+        except
+            newID := ''
+        end;
+    end;
+
+  result := '';
+
+  if newID <> '' then
+  begin
+      fs := TFileStream.Create(aFileName, fmOpenRead);
+      try
+          if ScalePicStreamToFile(fs, newID,
+                                    // SavePath + newID + '.jpg',
+                                    240, 240,
+                                    GetProperImagingFactory(ScanMode))
+            then
+            begin
+                result := newID;
+            end;
+      finally
+          fs.Free;
+      end;
+  end;
+end;
+
+function TCoverArtSearcher.GetFrontCoverIndex(CoverList:TStrings):integer;
+var i:integer;
+begin
+  result := -1;
+
+  for i:=0 to CoverList.Count-1 do
+    if AnsiContainsText(CoverList[i],'front') then
+    begin
+      result := i;
+      break;
+    end;
+
+  if result = -1 then
+    for i:=0 to CoverList.Count-1 do
+      if AnsiContainsText(CoverList[i],'_a') then
+      begin
+        result := i;
+        break;
+      end;
+
+  if result = -1 then
+  begin
+    result := 0;
+    for i:=0 to CoverList.Count-1 do
+      if AnsiContainsText(CoverList[i],'folder') then
+      begin
+        result := i;
+        break;
+      end;
+  end;
+end;
+
+function TCoverArtSearcher.GetCoverFromList(aList: TStringList; aCoverbmp: TPicture): Boolean;
+var FrontCover:integer;
+    aGraphic: TPicture;
+begin
+      result := False;
+      if aList.Count = 0 then
+          Exit;
+      FrontCover := GetFrontCoverIndex(aList);
+      aGraphic := TPicture.Create;
+      try
+          aGraphic.LoadFromFile(aList[FrontCover]);
+          if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+              FitPictureIn(aCoverbmp, aGraphic.Graphic)
+          else
+              //AssignBitmap(aCoverBmp, aGraphic);
+              aCoverbmp.Assign(aGraphic);
+          result := True;
+      finally
+          aGraphic.Free;
+      end;
+end;
+
+
+Procedure TCoverArtSearcher.SucheCover(pfad: UnicodeString; CoverList:TStringList);
+var sr : TSearchrec;
+    dateityp:string;
+begin
+    pfad := IncludeTrailingPathDelimiter(pfad);
+
+    if Findfirst(pfad+'*',FaAnyfile,sr) = 0 then
+    repeat
+      if (sr.name<>'.') AND (sr.name<>'..') then
+      begin
+          dateityp := ExtractFileExt(sr.Name);
+          if IsImageExt(dateityp) then
+              CoverList.Add(pfad + sr.Name);
+      end;
+    until Findnext(sr)<>0;
+    Findclose(sr);
+end;
+
+procedure TCoverArtSearcher.SucheCoverInSubDir(Pfad: UnicodeString; CoverList:TStringList; Substr: UnicodeString);
+var sdir: UnicodeString;
+begin
+    sdir := GetValidSubDir(Pfad, Substr);
+    if sdir <> Pfad then
+      SucheCover(sdir, CoverList);
+end;
+
+procedure TCoverArtSearcher.SucheCoverInSisterDir(Pfad: UnicodeString; CoverList: TStringList; Substr: UnicodeString);
+var sdir: UnicodeString;
+begin
+    sdir := GetValidSisterDir(Pfad,Substr);
+    if sdir <> Pfad then
+      SucheCover(sdir, CoverList);
+end;
+
+procedure TCoverArtSearcher.SucheCoverInParentDir(Pfad: UnicodeString; CoverList: TStringList);
+begin
+  pfad := ExcludeTrailingPathDelimiter(pfad);
+  pfad := Copy(pfad,1,LastDelimiter('\',Pfad));
+  SucheCover(pfad, CoverList);
+end;
+
+function TCoverArtSearcher.CountSubDirs(Pfad: UnicodeString):integer;
+var sr: TsearchRec;
+begin
+  result := 0;
+  if AnsiEndsStr('\', pfad) then
+      pfad:=Copy(Pfad,1,length(pfad)-1);
+  if (findfirst(pfad+'\*',FaDirectory,sr)=0) then
+      repeat
+        if (sr.name<>'.') AND (sr.name<>'..')
+            AND ((sr.Attr AND faDirectory)=faDirectory) then
+          result := result + 1;
+      until (Findnext(sr)<>0) OR (result > 6) ;
+    findclose(sr);
+end;
+
+
+function TCoverArtSearcher.CountSisterDirs(Pfad: UnicodeString):integer;
+begin
+  pfad := ExcludeTrailingPathDelimiter(pfad);
+ // ...und den Parentordner bestimmen
+  Pfad := Copy(Pfad,1, LastDelimiter('\',Pfad));
+  result := CountSubDirs(Pfad);
+end;
+
+function TCoverArtSearcher.CountFilesInParentDir(Pfad: UnicodeString):integer;
+var sr: TsearchRec;
+begin
+  result := 0;
+  pfad := ExcludeTrailingPathDelimiter(pfad);
+  pfad := Copy(pfad,1, LastDelimiter('\',Pfad));
+
+  if (Findfirst(pfad+'\*',FaAnyfile,sr)=0) then
+      repeat
+        if (sr.name<>'.') AND (sr.name<>'..')
+            And (Not IsImageExt(ExtractFileExt(sr.Name)))
+        then
+          result := result + 1;
+      until (Findnext(sr)<>0) OR (result > 6) ;
+    Findclose(sr);
+end;
+
+function TCoverArtSearcher.GetValidSubDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
+var sr: TsearchRec;
+  abbruch:boolean;
+begin
+  result := pfad;
+  pfad := IncludeTrailingPathDelimiter(pfad);
+  abbruch := false;
+  if (findfirst(pfad+'*',FaDirectory,sr)=0) then
+  repeat
+    if (sr.name<>'.') AND (sr.name<>'..')
+      AND ((sr.Attr AND faDirectory)=faDirectory)
+      AND (AnsiContainsText(sr.name, Substr))
+      then
+      begin
+        result := pfad + sr.Name;
+        abbruch := True;
+      end;
+  until (abbruch) or (Findnext(sr)<>0) ;
+  findclose(sr);
+end;
+
+function TCoverArtSearcher.GetValidSisterDir(Pfad: UnicodeString; Substr: UnicodeString): UnicodeString;
+var sr: TsearchRec;
+  abbruch:boolean;
+  pfadOrig: UnicodeString;
+begin
+  pfad := ExcludeTrailingPathDelimiter(pfad);
+  pfadOrig := pfad;
+  pfad := Copy(pfad,1,LastDelimiter('\',Pfad));
+  result := PfadOrig;
+  abbruch := false;
+
+  if (Findfirst(pfad+'\*',FaDirectory,sr)=0) then
+  repeat
+    if (sr.name<>'.') AND (sr.name<>'..')
+      AND ((sr.Attr AND faDirectory)=faDirectory)
+      AND ((pfad + '\' + sr.Name) <> pfadOrig)
+      AND (AnsiContainsText(sr.name, Substr))
+      then
+      begin
+        result := pfad + '\' + sr.Name;
+        abbruch := True;
+      end;
+  until (abbruch) or (Findnext(sr)<>0) ;
+  Findclose(sr);
+end;
+
+function TCoverArtSearcher.GetCover_Complete(aAudioFile: TAudioFile;
+  aCoverbmp: TPicture): boolean;
+var coverliste: TStringList;
+begin
+    if (aAudioFile.AudioType <> at_File)
+    OR
+       ( (aAudioFile.AudioType <> at_File)
+         AND (aAudioFile.CoverID <> '')
+         And FileExists(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg')
+        )
+    then
+        result := GetCover_Fast(aAudioFile, aCoverbmp)
+    else
+    begin
+        if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
+        begin
+            result := True;
+        end
+        else
+        begin
+            coverliste := TStringList.Create;
+            GetCandidateFilelist(aAudioFile,coverliste);
+            try
+                if Not GetCoverFromList(CoverListe, aCoverbmp) then
+                begin
+                    GetDefaultCover(dcFile, aCoverbmp, 0);
+                    result := False;
+                end else
+                    result := True;
+            except
+                GetDefaultCover(dcFile, aCoverbmp, 0);
+                result := false;
+            end;
+            coverliste.free;
+        end;
+
+    end;
+end;
+
+class function TCoverArtSearcher.GetCover_Fast(aAudioFile: TAudioFile;
+  aCoverbmp: TPicture): boolean;
+var aGraphic: TPicture;
+    baseName, completeName: String;
+begin
+  result := false;
+  try
+      case aAudioFile.AudioType of
+          at_Stream: begin
+              TCoverArtSearcher.GetDefaultCover(dcWebRadio, aCoverbmp, 0);
+              result := True;
+          end;
+          at_File: begin
+              if (aAudioFile.CoverID <> '') And FileExists(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg') then
+              begin
+                  aGraphic := TPicture.Create;
+                  try
+                      aGraphic.LoadFromFile(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg');
+
+                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
+                      else
+                          //AssignBitmap(aCoverBmp, aGraphic);
+                          aCoverbmp.Assign(aGraphic);
+                      result := True;
+                  finally
+                      aGraphic.Free;
+                  end;
+              end else
+              begin
+                  TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
+                  result := False;
+              end;
+          end;
+          at_CDDA: begin
+              // get a Covername from cddb-id
+              baseName := CoverFilenameFromCDDA(aAudioFile.Pfad);
+              completeName := '';
+              if FileExists(TCoverArtSearcher.Savepath + baseName + '.jpg') then
+                  completeName := TCoverArtSearcher.Savepath + baseName + '.jpg'
+              else if FileExists(TCoverArtSearcher.Savepath + baseName + '.png') then
+                  completeName := TCoverArtSearcher.Savepath + baseName + '.png';
+
+              if completeName <> '' then
+              begin
+                  aGraphic := TPicture.Create;
+                  try
+                      aGraphic.LoadFromFile(completeName);
+                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
+                      else
+                          aCoverBmp.Assign(aGraphic);
+                      result := True;
+                  finally
+                      aGraphic.Free;
+                  end;
+              end else
+              begin
+                  TCoverArtSearcher.GetDefaultCover(dcCDDA, aCoverbmp, 0);
+                  result := false;
+              end;
+          end;
+      end;
+  except
+      TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
       result := false;
   end;
 end;
 
-function GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture; aDir: String): Boolean;
+function TCoverArtSearcher.GetCoverBitmapFromID(aCoverID: String; aCoverBmp: TPicture): Boolean;
 var aJpg: TJpegImage;
 begin
     result := true;
     if (aCoverID = 'all') or (aCoverID = 'searchresult') then
     begin
         // PaintPersonalCover
-        PaintPersonalMainCover(aCoverBmp);
+        PaintMainCover(aCoverBmp);
     end else
     begin
         if aCoverID = '' then
@@ -1163,12 +1289,12 @@ begin
             result := False;
         end else
         begin
-            if FileExists(aDir + aCoverID + '.jpg') then
+            if FileExists(SavePath + aCoverID + '.jpg') then
             begin
                 aJpg := TJpegImage.Create;
                 try
                     try
-                        aJpg.LoadFromFile(aDir  + aCoverID + '.jpg');
+                        aJpg.LoadFromFile(SavePath  + aCoverID + '.jpg');
                         aCoverBmp.Assign(aJpg);
                     except
                         GetDefaultCover(dcError, aCoverBmp,  cmNoStretch);
@@ -1179,7 +1305,7 @@ begin
                 end;
             end else
             begin
-                GetDefaultCover(dcError, aCoverBmp, cmNoStretch);
+                TCoverArtSearcher.GetDefaultCover(dcError, aCoverBmp, cmNoStretch);
                 result := False;
             end;
         end;
@@ -1187,11 +1313,8 @@ begin
 end;
 
 
-
-
-procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
+class procedure TCoverArtSearcher.GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
 var filename: UnicodeString;
-    //aGraphic: TPicture;
     WPic: TWICImage;
     Stretch: Boolean;
 
@@ -1199,12 +1322,12 @@ begin
     // Flags auswerten
     Stretch := (Flags and cmNoStretch) = 0;
 
-    filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+    filename := SavePath + '_default_cover.jpg';
     if aType = dcWebRadio  then
     begin
-        filename := MedienBib.CoverSavePath + '_default_cover_webradio.jpg';
+        filename := SavePath + '_default_cover_webradio.jpg';
         if not FileExists(filename) then
-            filename := MedienBib.CoverSavePath + '_default_cover_webradio.png';
+            filename := SavePath + '_default_cover_webradio.png';
         if not FileExists(filename) then
             filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_webradio.png';
         if not FileExists(filename)  then
@@ -1212,9 +1335,9 @@ begin
     end; //else
     if not FileExists(filename) then
     begin
-        filename := MedienBib.CoverSavePath + '_default_cover.jpg';
+        filename := SavePath + '_default_cover.jpg';
         if not FileExists(filename) then
-            filename := MedienBib.CoverSavePath + '_default_cover.png';
+            filename := SavePath + '_default_cover.png';
         if not FileExists(filename) then
             filename := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
         if not FileExists(filename)  then
@@ -1223,37 +1346,25 @@ begin
 
     if FileExists(filename) then
     begin
-        //aCoverbmp.LoadFromFile(filename);
 
-        //aGraphic := TPicture.Create;
         WPic := TWICImage.Create;
         try
-            //aGraphic.LoadFromFile(filename);
             WPic.LoadFromFile(filename);
-           // FitBitmapIn(aCoverbmp.Bitmap, aGraphic.Graphic);
-            //stretch := False;
-            //w := aCoverbmp.width; //aCoverbmp.Width;
             if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
             begin
-                //FitBitmapIn(aCoverbmp.Bitmap, aGraphic.Graphic)
                 FitWICImageIn(WPic, aCoverbmp.Width, aCoverbmp.Height);
                 aCoverBmp.Bitmap.Assign(WPic);
             end
             else
-                //AssignBitmap(aCoverBmp.Bitmap, aGraphic);
                 aCoverBmp.Bitmap.Assign(WPic);
-
         finally
-            //aGraphic.Free;
             WPic.Free
         end;
-
     end;
     // otherwise: just a blank image, do nothing.
 end;
 
-
-procedure GetRandomCover(SourceCoverlist: TObjectlist);
+procedure TCoverArtSearcher.PrepareMainCover(SourceCoverlist: TObjectlist);
 var i: Integer;
     CoverArray: Array of Integer;
     GoodCoverList: TObjectList;
@@ -1321,12 +1432,15 @@ begin
   LeaveCriticalSection(CSAccessRandomCoverlist);
 end;
 
-procedure ClearRandomCover;
+procedure TCoverArtSearcher.Clear;
 begin
     RandomCoverList.Clear;
+    fCurrentPath      := '';
+    fCurrentCoverName := '';
+    fCurrentCoverID   := '';
 end;
 
-procedure PaintPersonalMainCover(aCoverBmp: TPicture);
+procedure TCoverArtSearcher.PaintMainCover(aCoverBmp: TPicture);
 var i: Integer;
     smallbmp: TBitmap;
     aGraphic: TPicture;
@@ -1380,11 +1494,11 @@ begin
 
             for i := 0 to min(15, RandomCoverList.Count - 1) do
             begin
-                if (FileExists(Medienbib.CoverSavePath + RandomCoverList[i] + '.jpg')) then
+                if (FileExists(Savepath + RandomCoverList[i] + '.jpg')) then
                 begin
                     aGraphic := TPicture.Create;
                     try
-                        aGraphic.LoadFromFile(Medienbib.CoverSavePath + RandomCoverList[i] + '.jpg');
+                        aGraphic.LoadFromFile(Savepath + RandomCoverList[i] + '.jpg');
                         AssignBitmap(smallbmp, aGraphic);
                         //smallbmp.Assign(aGraphic.Bitmap);
                     finally
@@ -1440,21 +1554,142 @@ begin
     LeaveCriticalSection(CSAccessRandomCoverlist);
 end;
 
-function PreviewGraphicShouldExist(aCoverID: String): Boolean;
+function TCoverArtSearcher.GetProperImagingFactory(ScanMode: CoverScanThreadMode): IWICImagingFactory;
 begin
-    // we use a "_" at the beginning of a cover ID to indicate a "missing cover",
-    // i.e. no cover art have been found so far
-    result := (Length(aCoverID) > 1) and (aCoverID[1] <> '_');
+    case ScanMode of
+        tm_VCL: begin
+            if WICImagingFactory_VCL = Nil then
+                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_VCL);
+            result := WICImagingFactory_VCL;
+        end;
+        tm_Thread: begin
+            if WICImagingFactory_ScanThread = Nil then
+                CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+                    CLSCTX_LOCAL_SERVER, IUnknown, WICImagingFactory_ScanThread);
+            result := WICImagingFactory_ScanThread;
+        end;
+    end;
 end;
+
+
+class function TCoverArtSearcher.ScalePicStreamToFile(aStream: TStream; aID: UnicodeString; destWidth, destHeight: Integer; aWICImagingFactory: IWICImagingFactory; OverWrite: Boolean = False): boolean;
+var NewIDFilename: String;
+    hr: HRESULT;
+    isLocalFactory: Boolean;
+    // for proper scaling
+    xfactor, yfactor:double;
+    origWidth, origHeight: Cardinal;
+    newWidth, newHeight: Cardinal;
+    // reading the source image
+    SourceAdapter: IStream;
+    BitmapDecoder: IWICBitmapDecoder;
+    DecodeFrame: IWICBitmapFrameDecode;
+    SourceBitmap: IWICBitmap;
+    SourceScaler: IWICBitmapScaler;
+    // writing the resized image
+    DestStream: TMemoryStream;
+    DestAdapter: IStream;
+    DestWICStream: IWICStream;
+    BitmapEncoder: IWICBitmapEncoder;
+    EncodeFrame: IWICBitmapFrameEncode;
+    Props: IPropertyBag2;
+begin
+    result := False;
+    NewIDFilename := SavePath + aID + '.jpg';
+    if Not Overwrite and FileExists(NewIDFilename) then
+    begin
+        result := True;
+        exit;
+    end;
+
+    isLocalFactory := (aWICImagingFactory = nil);
+    if isLocalFactory then
+        CoCreateInstance(CLSID_WICImagingFactory, nil, CLSCTX_INPROC_SERVER or
+          CLSCTX_LOCAL_SERVER, IUnknown, aWICImagingFactory);
+
+    // read the image data from stream
+    SourceAdapter := TStreamAdapter.Create(aStream);
+    hr := aWICImagingFactory.CreateDecoderFromStream(SourceAdapter, guid_null, WICDecodeMetadataCacheOnDemand, BitmapDecoder);
+    if Succeeded(hr) then hr := BitmapDecoder.GetFrame(0, DecodeFrame);
+    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapFromSource(DecodeFrame, WICBitmapCacheOnLoad, SourceBitmap);
+    if Succeeded(hr) then hr := SourceBitmap.GetSize(origWidth, origHeight);
+
+    // calculate proper scaling
+    xfactor:= (destWidth) / origWidth;
+    yfactor:= (destHeight) / origHeight;
+    if xfactor > yfactor then
+    begin
+        newWidth := round(origWidth * yfactor);
+        newHeight := round(origHeight * yfactor);
+    end else
+    begin
+        newWidth := round(origWidth * xfactor);
+        newHeight := round(origHeight * xfactor);
+    end;
+
+    // scale the original image
+    if Succeeded(hr) then hr := aWICImagingFactory.CreateBitmapScaler(SourceScaler);
+    if Succeeded(hr) then hr := SourceScaler.Initialize(SourceBitmap, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
+
+    if Succeeded(hr) then
+    begin
+        // Reading and scaling the original image was successful.
+        // Now try to save the scaled image
+        DestStream := TMemoryStream.create;
+        try
+            // create new WICStream
+            DestAdapter := TStreamAdapter.Create(DestStream);
+            if Succeeded(hr) then hr := aWICImagingFactory.CreateStream(DestWICStream);
+            if Succeeded(hr) then hr := DestWICStream.InitializeFromIStream(DestAdapter);
+            // create and prepare JPEG-Encoder
+            if Succeeded(hr) then hr := aWICImagingFactory.CreateEncoder(GUID_ContainerFormatJpeg, guid_null, BitmapEncoder);
+            if Succeeded(hr) then hr := BitmapEncoder.Initialize(DestWICStream, WICBitmapEncoderNoCache);
+            if Succeeded(hr) then hr := BitmapEncoder.CreateNewFrame(EncodeFrame, Props);
+            if Succeeded(hr) then hr := EncodeFrame.Initialize(Props);
+            if Succeeded(hr) then hr := EncodeFrame.SetSize(newWidth, newHeight);
+            // write image data
+            if Succeeded(hr) then hr := EncodeFrame.WriteSource(SourceScaler, nil);
+            if Succeeded(hr) then hr := EncodeFrame.Commit;
+            if Succeeded(hr) then hr := BitmapEncoder.Commit;
+            // finally save the stream to the destination file
+            if Succeeded(hr) then
+                try
+                    DestStream.SaveToFile(NewIDFilename);
+                    result := True;
+                except
+                    // silent exception here, but (try to) delete the destination file, if it exists
+                    if FileExists(NewIDFilename) then DeleteFile(NewIDFilename);
+                        result := False;
+                end;
+        finally
+            DestStream.Free;
+        end;
+    end;
+
+    if isLocalFactory then
+        aWICImagingFactory._Release;
+end;
+
+
+
 
 initialization
 
   InitializeCriticalSection(CSAccessRandomCoverlist);
-  RandomCoverList := TStringlist.Create;
+  InitializeCriticalSection(CSAccessCoverSearcherProperties);
+
+
+  Pointer(WICImagingFactory_ScanThread) := Nil;
+  Pointer(WICImagingFactory_VCL)        := Nil;
 
 finalization
 
   DeleteCriticalSection(CSAccessRandomCoverlist);
-  RandomCoverList.Free;
+  DeleteCriticalSection(CSAccessCoverSearcherProperties);
+
+
+  if WICImagingFactory_VCL <> Nil then
+      WICImagingFactory_VCL._Release;
 
 end.

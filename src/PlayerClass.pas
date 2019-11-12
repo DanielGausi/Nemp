@@ -34,7 +34,7 @@ unit PlayerClass;
 interface
 
 uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnrs,
-      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math,
+      ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
       Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
@@ -363,6 +363,8 @@ type
         HeadsetPicture: TPicture;    // The Cover of the current file in Headset
         PreviewBackGround: TBitmap; // The BackGroundImage for the Win7-Preview
 
+        CoverArtSearcher: TCoverArtSearcher;
+
         property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
         property Time: Double read GetTime write SetTime;              // time in seconds
@@ -564,7 +566,7 @@ Const
 
 implementation
 
-Uses NempMainUnit, AudioFileHelper, CoverHelper;
+Uses NempMainUnit, AudioFileHelper;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -735,6 +737,8 @@ begin
 
     fPrescanFiles := TObjectList.Create(True);
     fPrescanInProgress := False;
+
+    CoverArtSearcher := TCoverArtSearcher.create;
 end;
 
 destructor TNempPlayer.Destroy;
@@ -765,6 +769,8 @@ begin
     fPrescanFiles.Free;
     fPrescanFiles := Nil;
     LeaveCriticalSection(CSPrescanList);
+
+    CoverArtSearcher.Free;
 
     inherited Destroy;
 end;
@@ -1609,10 +1615,6 @@ begin
       // zunächst mit eigenen Methoden rangehen
       if MainAudioFile.IsFile then
           SynchNewFileWithBib(MainAudioFile, False);
-
-
-
-          //SynchronizeAudioFile(MainAudioFile, MainAudioFile.Pfad, False);
 
       if ScanMode <> ps_Later then
       begin
@@ -3285,9 +3287,10 @@ begin
 
     if assigned(MainAudioFile) then
     begin
-        result := GetCover(MainAudioFile, MainPlayerPicture, True)
+        result := CoverArtSearcher.GetCover_Complete(MainAudioFile, MainPlayerPicture)
+        // GetCover(MainAudioFile, MainPlayerPicture, True)
     end else
-        GetDefaultCover(dcFile, MainPlayerPicture, 0);
+        CoverArtSearcher.GetDefaultCover(dcFile, MainPlayerPicture, 0);
         //result := True; // no audiofile, no downloading. ;-)
 end;
 

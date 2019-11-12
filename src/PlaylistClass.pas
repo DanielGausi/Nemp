@@ -40,7 +40,7 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     NempAudioFiles, AudioFileHelper, PlayerClass,
     gnuGettext, Nemp_RessourceStrings, System.UITypes, System.Types,
 
-    MainFormHelper;
+    MainFormHelper, CoverHelper;
 
 type
   DWORD = cardinal;
@@ -372,7 +372,6 @@ begin
   ProcessingBufferlist := False;
   fFirstAction := True;
   fLastHighlightedSearchResultNode := Nil;
-
 
   //for i := 0 to 10 do
   //    RNGWeights[i] := 1;

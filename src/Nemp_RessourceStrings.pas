@@ -117,6 +117,7 @@ DetailForm_CurrentLibraryCover = 'Current cover art';
 DetailForm_CoverflowNotActive = 'The Coverflow will update automatically when you activate it';
 DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
 
+
 Warning_FileNotFound = 'File not found';
 Warning_FileNotFound_Hint = 'The specified file can not be found. Maybe it is on an external drive which is not connected.';
 Warning_Coverbox_NoCover = 'No coverfile found';
@@ -140,7 +141,7 @@ Warning_DataDirNotFound       = 'The data directory could not be found.';
 Bitrate_Constant = 'Constant bitrate';
 Bitrate_Variable = 'Variable bitrate';
 
-Warning_MedienBibIsBusy = 'The operation could not be processed, because the media library is busy. Please try again later or cancel the running operation by pressing ESC.';
+Warning_MedienBibIsBusy = 'The operation could not be processed, because the media library is busy. Please try again later or cancel the running operation.';
 Warning_MedienBibIsBusyOnPartyMode = 'The Nemp Partymode can''t be activated, if the media library is busy. Please stop the current operation and try again.';
 Warning_MedienBibIsBusyOnClose = 'Nemp is searching for new files or updating the library. Do you really want to quit now?';
 Warning_MedienBibIsBusyCritical = 'The library is in a critical update-process right now. Editing files is not possible. Please try again in a few seconds.';

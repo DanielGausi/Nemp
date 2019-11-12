@@ -1805,6 +1805,15 @@ begin
         SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
     end;
 
+    TCoverArtSearcher.SavePath := SavePath + 'Cover\';
+    try
+        ForceDirectories(TCoverArtSearcher.SavePath);
+    except
+        if not DirectoryExists(TCoverArtSearcher.SavePath) then
+            TCoverArtSearcher.SavePath := SavePath;
+    end;
+
+
     // Create additional controls
     CloudViewer           := TCloudViewer.Create(self);
     CloudViewer.Parent    := PanelTagCloudBrowse;
@@ -1881,25 +1890,19 @@ begin
 
     BibRatingHelper := TRatingHelper.Create;
 
+
     // Create Medialibrary
     MedienBib := TMedienBibliothek.Create(FOwnMessageHandler, PanelCoverBrowse.Handle);
     MedienBib.BibScrobbler := NempPlayer.NempScrobbler;
     MedienBib.TagCloud.CloudPainter.Canvas := CloudViewer.Canvas;
     MedienBib.SavePath := SavePath;
-    MedienBib.CoverSavePath := SavePath + 'Cover\';
-    MedienBib.NewCoverFlow.CoverSavePath := MedienBib.CoverSavePath;
+
     // needed for ClassicFlow
     MedienBib.NewCoverFlow.MainImage := IMGMedienBibCover;
     MedienBib.NewCoverFlow.ScrollImage := ImgScrollCover;
     // Needed for FlyingCow
     MedienBib.NewCoverFlow.Window := PanelCoverBrowse.Handle ;
     MedienBib.NewCoverFlow.events_window := FOwnMessageHandler;
-    try
-        ForceDirectories(MedienBib.CoverSavePath);
-    except
-        if not DirectoryExists(MedienBib.CoverSavePath) then
-            MedienBib.CoverSavePath := MedienBib.SavePath;
-    end;
 
     // Create Skin-System
     NempSkin := TNempSkin.create;
@@ -1953,7 +1956,7 @@ begin
     // create WebServer
     NempWebServer := TNempWebServer.Create(FOwnMessageHandler);
     NempWebServer.SavePath := SavePath;
-    NempWebServer.CoverSavePath := MedienBib.CoverSavePath;
+    NempWebServer.CoverSavePath := TCoverArtSearcher.SavePath;
 
     // create Spectrum
     Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
@@ -2231,7 +2234,7 @@ begin
 
           case MedienBib.NewCoverFlow.Mode of
               cm_Classic: success := False; // we already failed during the painting process
-              cm_OpenGL : success := GetCoverBitmapFromID(aCover.ID, pic, MedienBib.CoverSavePath);
+              cm_OpenGL : success := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, pic);
           else
               success := True; // we are not in CoverflowMode at all, should not happen
           end;
@@ -2258,9 +2261,9 @@ begin
                       afList.Free;
                   end;
 
-                  MedienBib.InitCover(dummyAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
+                  MedienBib.CoverArtSearcher.InitCover(dummyAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
                   // try again getting the coverbitmap
-                  success := GetCoverBitmapFromID(dummyAudioFile.CoverID, pic, MedienBib.CoverSavePath);
+                  success := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(dummyAudioFile.CoverID, pic);
                   // if we found an image, but the ID has changed: Change it on the other files with that ID as well
                   if (dummyAudioFile.CoverID <> aCover.ID) then
                   begin
@@ -5424,9 +5427,9 @@ begin
             ImgDetailCover.Picture.Bitmap.Width := ImgDetailCover.Width;
             ImgDetailCover.Picture.Bitmap.Height := ImgDetailCover.Height;
 
-            // Bild holen - (das ist ne recht umfangreiche Prozedur!!)
-            GetCover(aAudioFile, ImgDetailCover.Picture, False); // False: Only get the cover from the ID, nothing else
-                                                   // or maybe more, if aAudioFile is in the Playlist??
+            TCoverArtSearcher.GetCover_Fast(aAudioFile, ImgDetailCover.Picture);
+            // GetCover(aAudioFile, ImgDetailCover.Picture, False); // False: Only get the cover from the ID, nothing else
+            //                                       // or maybe more, if aAudioFile is in the Playlist??
 
             ImgDetailCover.Picture.Assign(ImgDetailCover.Picture);
             ImgDetailCover.Refresh;
@@ -8104,7 +8107,7 @@ begin
     ProgressFormLibrary.AutoClose := True;
     ProgressFormLibrary.InitiateProcess(True, pa_Default);
 
-    MedienBib.ReInitCoverSearch;
+    MedienBib.coverArtSearcher.StartNewSearch; //ReInitCoverSearch;
     newCount := 0;
     MedienBib.StatusBibUpdate := 3;
     BlockGUI(3);
@@ -8134,7 +8137,7 @@ begin
                     AudioFile := TAudioFile.Create;
                     aErr := AudioFile.GetAudioData(newFilenames[i], {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                     HandleError(afa_NewFile, AudioFile, aErr);
-                    MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
+                    MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                     MedienBib.UpdateList.Add(AudioFile);
                     inc(newCount);
                 end;
@@ -8316,8 +8319,6 @@ begin
   if not Clipboard.HasFormat(CF_HDROP) then
     Exit;
 
-  MedienBib.ReInitCoverSearch;
-
   if Sender = PM_PL_ExtendedPasteFromClipboard then
   begin
         JobList := NempPlaylist.ST_Ordnerlist;
@@ -8325,16 +8326,19 @@ begin
         NempPlaylist.InsertNode := PlaylistVST.FocusedNode;
   end else
   begin
-        if MedienBib.StatusBibUpdate = 0 then
+        ///  even if we add files only to the playlist, we need to stop if the
+        ///  status of the MediaLibrary is >0.
+        ///  Reason: CoverSearch now works in th secondary Thread, and that will conflict with InitCover
+        ///          called here (as new files for the playlist are synced with the library ...)
+        if MedienBib.StatusBibUpdate <> 0 then
         begin
-            MedienBib.StatusBibUpdate := 1;
-            ST_Medienliste.Mask := GenerateMedienBibSTFilter;
-            JobList := MedienBib.ST_Ordnerlist;
-        end else
-        begin
-            TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
-            exit;
+          TranslateMessageDLG((Warning_MedienBibIsBusy), mtWarning, [MBOK], 0);
+          exit;
         end;
+        MedienBib.CoverArtSearcher.StartNewSearch;
+        MedienBib.StatusBibUpdate := 1;
+        ST_Medienliste.Mask := GenerateMedienBibSTFilter;
+        JobList := MedienBib.ST_Ordnerlist;
   end;
 
   Clipboard.Open;
@@ -8367,7 +8371,7 @@ begin
                             AudioFile:=TAudioFile.Create;
                             aErr := AudioFile.GetAudioData(buffer, {GAD_Cover or} GAD_Rating or MedienBib.IgnoreLyricsFlag);
                             HandleError(afa_PasteFromClipboard, AudioFile, aErr);
-                            MedienBib.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
+                            MedienBib.CoverArtSearcher.InitCover(AudioFile, tm_VCL, INIT_COVER_DEFAULT);
                             MedienBib.UpdateList.Add(AudioFile);
                         end;
                     end;
@@ -8531,6 +8535,8 @@ begin
   ///  However, This method is probably very rarely used, and in most cases the
   ///  playlist contains <1000 files or so, which should be scanned quite fast.
   ClearCDDBCache;
+
+  NempPlayer.CoverArtSearcher.StartNewSearch;
   Node := PlaylistVST.GetFirst;
   while assigned(Node) {and LangeAktionWeitermachen} do
   begin

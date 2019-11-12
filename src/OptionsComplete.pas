@@ -1391,16 +1391,16 @@ begin
   cbHideNACover.Checked := MedienBib.HideNACover;
   cbMissingCoverMode.ItemIndex := MedienBib.MissingCoverMode;
 
-  CB_CoverSearch_inDir.Checked       := MedienBib.CoverSearchInDir;
-  CB_CoverSearch_inParentDir.Checked := MedienBib.CoverSearchInParentDir;
-  CB_CoverSearch_inSubDir.Checked    := MedienBib.CoverSearchInSubDir;
+  CB_CoverSearch_inDir.Checked       := TCoverArtSearcher.UseDir;
+  CB_CoverSearch_inParentDir.Checked := TCoverArtSearcher.UseParentDir;
+  CB_CoverSearch_inSubDir.Checked    := TCoverArtSearcher.UseSubDir;
   EDTCoverSubDirName.Enabled := CB_CoverSearch_inSubDir.Checked;
 
-  CB_CoverSearch_inSisterDir.Checked := MedienBib.CoverSearchInSisterDir;
+  CB_CoverSearch_inSisterDir.Checked := TCoverArtSearcher.UseSisterDir;
   EDTCoverSisterDirName.Enabled := CB_CoverSearch_inSisterDir.Checked;
 
-  EDTCoverSubDirName.Text    := MedienBib.CoverSearchSubDirName;
-  EDTCoverSisterDirName.Text := MedienBib.CoverSearchSisterDirName;
+  EDTCoverSubDirName.Text    := TCoverArtSearcher.SubDirName;
+  EDTCoverSisterDirName.Text := TCoverArtSearcher.SisterDirName;
 
   CB_CoverSearch_LastFM.Checked := MedienBib.CoverSearchLastFM;
 
@@ -1505,7 +1505,7 @@ begin
   end;
   }
 
-  CBAutoDetectCharCode.Checked := MedienBib.NempCharCodeOptions.AutoDetectCodePage;
+  CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
   // Geburtstags-Optionen
   //DTPBirthdayTime.Date := TDate(Now);
 
@@ -2485,10 +2485,10 @@ begin
   Nemp_MainForm.NempOptions.FontNameCBR := CBFontNameCBR.Items[CBFontNameCBR.itemindex];
   Nemp_MainForm.NempOptions.FontNameVBR := CBFontNameVBR.Items[CBFontNameVBR.itemindex];
 
-  MedienBib.CoverSearchInDir       := CB_CoverSearch_inDir.Checked;
-  MedienBib.CoverSearchInParentDir := CB_CoverSearch_inParentDir.Checked;
-  MedienBib.CoverSearchInSubDir    := CB_CoverSearch_inSubDir.Checked;
-  MedienBib.CoverSearchInSisterDir := CB_CoverSearch_inSisterDir.Checked;
+  TCoverArtSearcher.UseDir       := CB_CoverSearch_inDir.Checked;
+  TCoverArtSearcher.UseParentDir := CB_CoverSearch_inParentDir.Checked;
+  TCoverArtSearcher.UseSubDir    := CB_CoverSearch_inSubDir.Checked;
+  TCoverArtSearcher.UseSisterDir := CB_CoverSearch_inSisterDir.Checked;
 
   // clear coverflow, if setting is changed
   if MedienBib.CoverSearchLastFM <> CB_CoverSearch_LastFM.Checked then
@@ -2497,8 +2497,8 @@ begin
       MedienBib.NewCoverFlow.ClearTextures;
   end;
 
-  MedienBib.CoverSearchSubDirName := EDTCoverSubDirName.Text ;
-  MedienBib.CoverSearchSisterDirName := EDTCoverSisterDirName.Text;
+  TCoverArtSearcher.SubDirName := EDTCoverSubDirName.Text ;
+  TCoverArtSearcher.SisterDirName := EDTCoverSisterDirName.Text;
   MedienBib.HideNACover := cbHideNACover.Checked;
 
 
@@ -2797,7 +2797,7 @@ begin
       AlbenVST.Invalidate;
   end;
 
-  MedienBib.NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
+  NempCharCodeOptions.AutoDetectCodePage := CBAutoDetectCharCode.Checked;
 
   if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
   if ReDrawPlaylistTree then
@@ -3444,7 +3444,8 @@ begin
     begin
         fs := TFileStream.Create(OpenDlg_DefaultCover.FileName, fmOpenRead);
         try
-            if ScalePicStreamToFile(fs, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, Nil, True) then
+            //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
+            if TCoverArtSearcher.ScalePicStreamToFile(fs, '_default_cover', 240, 240, Nil, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
@@ -3466,7 +3467,8 @@ begin
 
     fs := TFileStream.Create(FileName, fmOpenRead);
     try
-        if ScalePicStreamToFile(fs, Medienbib.CoverSavePath + '_default_cover.jpg', 240, 240, Nil, True) then
+        //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
+        if TCoverArtSearcher.ScalePicStreamToFile(fs, '_default_cover', 240, 240, Nil, True) then
             LoadDefaultCover
         else
             MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
@@ -3481,7 +3483,7 @@ begin
     img_DefaultCover.Picture.Bitmap.Width := img_DefaultCover.Width;
     img_DefaultCover.Picture.Bitmap.Height := img_DefaultCover.Height;
 
-    GetDefaultCover(dcFile, img_DefaultCover.Picture, 0);
+    TCoverArtSearcher.GetDefaultCover(dcFile, img_DefaultCover.Picture, 0);
     img_DefaultCover.Refresh;
 end;
 

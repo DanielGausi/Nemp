@@ -71,8 +71,6 @@ type
 
 
         public
-            CoverSavePath: String;
-
             // needed for ClassicFlow
             MainImage: TImage;
             ScrollImage: TImage;
@@ -159,7 +157,6 @@ begin
                 fClassicFlow.MainImage := MainImage;
                 fClassicFlow.ScrollImage := ScrollImage;
                 fClassicFlow.CoverList := fCoverList;
-                fClassicFlow.CoverSavePath := CoverSavePath;
 
             fClassicFlow.CurrentItem := fCurrentItem;
             Nemp_MainForm.IMGMedienBibCover.Visible := True;

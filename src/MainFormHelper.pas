@@ -747,7 +747,7 @@ begin
             RefreshCoverFlowTimer.Enabled := False;
             MedienBib.ReBuildCoverList(False);
             MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-            GetRandomCover(MedienBib.Coverlist);
+            MedienBib.CoverArtSearcher.PrepareMainCover(MedienBib.Coverlist);
 
             If MedienBib.Coverlist.Count > 3 then
                 CoverScrollbar.Max := MedienBib.Coverlist.Count - 1

@@ -62,7 +62,6 @@ type
             MainImage: TImage;
             ScrollImage: TImage;
             CoverList: TObjectList;
-            CoverSavePath: String;
 
             property CurrentItem: Integer read fGetCurrentItem write fSetCurrentItem;
            // property Caption: String read fcaption;
@@ -80,7 +79,7 @@ type
 
 implementation
 
-uses CoverHelper, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
+uses NempMainUnit, CoverHelper, Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings;
 
 { TClassicCoverFlow }
 
@@ -141,14 +140,14 @@ begin
     MainImage.Picture.Bitmap.Height := MainImage.Height;
     MainImage.Picture.Bitmap.Width := MainImage.Width;
 
-    if not GetCoverBitmapFromID(aCover.ID, MainImage.Picture, CoverSavePath) then
+    if not MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, MainImage.Picture) then
         // cover is missing - try again to get it ?
         SendMessage(fEventsWindow, WM_FC_NEEDPREVIEW, fCurrentItem, 0);
 
     // after that: try again
     // yes, we called this in the MessageHandler for WM_FC_NEEDPREVIEW as well
     // not the best solution, but I hope the classic flow is not used that often^^
-    GetCoverBitmapFromID(aCover.ID, MainImage.Picture, CoverSavePath);
+    MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, MainImage.Picture);
 
     DrawScrollCover(fCurrentItem, ScrollImage.Width, ScrollImage.Height);
 end;
@@ -193,7 +192,7 @@ begin
           for i := minidx to maxidx do
           begin
               aCover := TNempCover(Coverlist[i]);
-              GetCoverBitmapFromID(aCover.ID, aPicture, CoverSavePath);
+              MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, aPicture);
               AssignBitmap(tmpBmp, aPicture);
 
               if (tmpBmp.Width > 0) AND (tmpBmp.Height > 0) then

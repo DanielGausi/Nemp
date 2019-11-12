@@ -989,8 +989,8 @@ begin
        (fCurrentDownloadItem.SubQueryType = sqtCDDA)
     then begin
         case fDataType of
-            ptJPG:  fNewCoverFilename := Medienbib.CoverSavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.jpg';
-            ptPNG:  fNewCoverFilename := Medienbib.CoverSavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.png';
+            ptJPG:  fNewCoverFilename := TCoverArtSearcher.SavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.jpg';
+            ptPNG:  fNewCoverFilename := TCoverArtSearcher.SavePath + CoverFilenameFromCDDA(fCurrentDownloadItem.Directory) + '.png';
         else
             fNewCoverFilename := '';
         end;
@@ -1182,7 +1182,7 @@ var pic: TPicture;
 begin
     pic := TPicture.Create;
     try
-        GetDefaultCover(aDCType, pic, 0);
+        TCoverArtSearcher.GetDefaultCover(aDCType, pic, 0);
         FitBitmapIn(aBitmap, pic.Graphic)
     finally
         pic.Free;
@@ -1354,7 +1354,7 @@ begin
         and DownloadItemStillMatchesCoverFlow
     then
     begin
-        NewID := Medienbib.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
+        NewID := Medienbib.CoverArtSearcher.InitCoverFromFilename(fNewCoverFilename, tm_VCL);
         // as DownloadItemStillMatchesCoverFlow, the access to this index is ok
         OldID := TNempCover(MedienBib.CoverList[fCurrentDownloadItem.Index]).ID;
 

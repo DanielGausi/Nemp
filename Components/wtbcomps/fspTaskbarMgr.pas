@@ -16,7 +16,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Dialogs,
-  imglist, Forms, ShlObj, fspTaskbarApi;
+  imglist, Forms, ShlObj, fspTaskbarApi, System.UITypes;
 
 type
  TfspTaskProgressState = (fstpsNoProgress, fstpsIndeterminate, fstpsNormal,
