@@ -853,6 +853,61 @@ begin
     end;
 end;
 
+{
+    --------------------------------------------------------
+    UpdateID3v1InFile
+    - Save information to id3v1-tag
+    --------------------------------------------------------
+}
+function TFDetails.UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
+
+    function v1TagEditsAreEmpty: Boolean;
+    begin
+        result := (Trim(Lblv1Titel.Text  ) = '') AND
+       (Trim(Lblv1Artist.Text ) = '') AND
+       (Trim(Lblv1Album.Text  ) = '') AND
+       (Trim(Lblv1Comment.Text) = '') AND
+       (Trim(cbIDv1Genres.Text) = '') AND
+       ((Trim(Lblv1Track.Text  ) = '')  or (Lblv1Track.Text = '0')) AND
+       ((Trim(Lblv1Year.Text   ) = '')  or (Lblv1Year.Text = '0'))
+    end;
+
+begin
+    result := MP3ERR_None;
+    if not CurrentTagObject.Valid then
+        exit;
+
+    if mp3.ID3v1Tag.Exists and v1TagEditsAreEmpty then
+        result := mp3.id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad);
+
+    if not v1TagEditsAreEmpty then
+        result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
+
+
+    {
+    if (Trim(Lblv1Titel.Text  ) = '') AND
+       (Trim(Lblv1Artist.Text ) = '') AND
+       (Trim(Lblv1Album.Text  ) = '') AND
+       (Trim(Lblv1Comment.Text) = '') AND
+       (Trim(cbIDv1Genres.Text) = '') AND
+       (Trim(Lblv1Track.Text  ) = '') AND
+       (Trim(Lblv1Year.Text   ) = '')
+    then
+        result := mp3.id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad)
+    else
+    // if ID3v1Activated and ValidMp3File then
+    begin
+        mp3.Id3v1Tag.Title   := Lblv1Titel.Text   ;
+        mp3.Id3v1Tag.Artist  := Lblv1Artist.Text  ;
+        mp3.Id3v1Tag.Album   := Lblv1Album.Text   ;
+        mp3.Id3v1Tag.Comment := Lblv1Comment.Text ;
+        mp3.Id3v1Tag.Genre   := cbIDv1Genres.Text ;
+        mp3.Id3v1Tag.Track   := Lblv1Track.Text   ;
+        mp3.Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
+        result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
+    end;}
+end;
+
 
 procedure TFDetails.BtnApplyClick(Sender: TObject);
 var aErr: TNempAudioError;
@@ -905,8 +960,9 @@ begin
         // Update TagObject
         // Note: This may overwrite some changes made in the Tab_MetaData-Page
         //       (But the user has been warned, so it's ok ;-) )
-        if LibraryPropertyChanged or CurrentTagRatingChanged then  // (or LyricsHasChanged ??)
+        if LibraryPropertyChanged or CurrentTagRatingChanged then
             ApplyEditsToTagObject;
+
 
         aErr := AUDIOERR_None;
         if currenttagObject.FileType <> at_Mp3 then
@@ -2527,6 +2583,15 @@ procedure TFDetails.BtnCopyFromV2Click(Sender: TObject);
 begin
     if (not CurrentTagObject.Valid) or (CurrentTagObject.FileType <> at_mp3) then
         exit;
+    // Apply values to the TagObject
+    CurrentTagObject.MP3File.Id3v1Tag.Title   :=  CurrenttagObject.MP3File.ID3v2Tag.Title   ;
+    CurrentTagObject.MP3File.Id3v1Tag.Artist  :=  CurrenttagObject.MP3File.ID3v2Tag.Artist  ;
+    CurrentTagObject.MP3File.Id3v1Tag.Album   :=  CurrenttagObject.MP3File.ID3v2Tag.Album   ;
+    CurrentTagObject.MP3File.Id3v1Tag.Comment :=  CurrenttagObject.MP3File.ID3v2Tag.Comment ;
+    CurrentTagObject.MP3File.Id3v1Tag.Genre   :=  CurrenttagObject.MP3File.ID3v2Tag.Genre   ;
+    CurrentTagObject.MP3File.Id3v1Tag.Track   :=  CurrenttagObject.MP3File.ID3v2Tag.Track   ;
+    CurrentTagObject.MP3File.Id3v1Tag.Year    :=  AnsiString(CurrenttagObject.MP3File.ID3v2Tag.Year) ;
+    // Change the Edits
     Lblv1Titel.Text   :=  CurrenttagObject.MP3File.ID3v2Tag.Title   ;
     Lblv1Artist.Text  :=  CurrenttagObject.MP3File.ID3v2Tag.Artist  ;
     Lblv1Album.Text   :=  CurrenttagObject.MP3File.ID3v2Tag.Album   ;
@@ -2546,6 +2611,23 @@ end;
 procedure TFDetails.Lblv1Change(Sender: TObject);
 begin
     ID3v1HasChanged := True;
+
+    if not CurrentTagObject.Valid then
+        exit;
+
+    if CurrentTagObject.FileType <> at_mp3 then
+        exit;
+
+    // Apply the values
+    case (Sender as TWinControl).Tag of
+        1: CurrentTagObject.MP3File.Id3v1Tag.Artist  := Lblv1Artist.Text  ;
+        2: CurrentTagObject.MP3File.Id3v1Tag.Title   := Lblv1Titel.Text   ;
+        3: CurrentTagObject.MP3File.Id3v1Tag.Album   := Lblv1Album.Text   ;
+        4: CurrentTagObject.MP3File.Id3v1Tag.Comment := Lblv1Comment.Text ;
+        5: CurrentTagObject.MP3File.Id3v1Tag.Track   := Lblv1Track.Text   ;
+        6: CurrentTagObject.MP3File.Id3v1Tag.Genre   := cbIDv1Genres.Text ;
+        7: CurrentTagObject.MP3File.Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
+    end;
 end;
 
 procedure TFDetails.Lblv1TrackChange(Sender: TObject);
@@ -2558,6 +2640,9 @@ begin
         Lblv1Track.Font.Color := clWindowText
       else
         Lblv1Track.Font.Color := clred;
+
+      if CurrentTagObject.FileType = at_mp3 then
+          CurrentTagObject.MP3File.Id3v1Tag.Track   := Lblv1Track.Text   ;
     end;
     ID3v1HasChanged := True;
   end;
@@ -2573,6 +2658,8 @@ begin
         Lblv1Year.Font.Color := clWindowText
       else
         Lblv1Year.Font.Color := clRed;
+      if CurrentTagObject.FileType = at_mp3 then
+          CurrentTagObject.MP3File.Id3v1Tag.Year   := AnsiString(Lblv1Track.Text)   ;
     end;
     ID3v1HasChanged := True;
   end;
@@ -3301,40 +3388,7 @@ begin
     fForceChange := False;
 end;
 
-{
-    --------------------------------------------------------
-    UpdateID3v1InFile
-    - Save information to id3v1-tag
-    --------------------------------------------------------
-}
-function TFDetails.UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
-begin
-    result := MP3ERR_None;
-    if not CurrentTagObject.Valid then
-        exit;
 
-    if (Trim(Lblv1Titel.Text  ) = '') AND
-       (Trim(Lblv1Artist.Text ) = '') AND
-       (Trim(Lblv1Album.Text  ) = '') AND
-       (Trim(Lblv1Comment.Text) = '') AND
-       (Trim(cbIDv1Genres.Text) = '') AND
-       (Trim(Lblv1Track.Text  ) = '') AND
-       (Trim(Lblv1Year.Text   ) = '')
-    then
-        result := mp3.id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad)
-    else
-    // if ID3v1Activated and ValidMp3File then
-    begin
-        mp3.Id3v1Tag.Title   := Lblv1Titel.Text   ;
-        mp3.Id3v1Tag.Artist  := Lblv1Artist.Text  ;
-        mp3.Id3v1Tag.Album   := Lblv1Album.Text   ;
-        mp3.Id3v1Tag.Comment := Lblv1Comment.Text ;
-        mp3.Id3v1Tag.Genre   := cbIDv1Genres.Text ;
-        mp3.Id3v1Tag.Track   := Lblv1Track.Text   ;
-        mp3.Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
-        result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
-    end;
-end;
 
 
 function TFDetails.CurrentFileHasBeenChanged: Boolean;

@@ -38,10 +38,6 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
@@ -604,6 +600,7 @@ object FDetails: TFDetails
             Top = 120
             Width = 51
             Height = 21
+            NumbersOnly = True
             TabOrder = 5
             OnChange = Edit_LibraryYearChange
           end
@@ -767,10 +764,6 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -848,10 +841,6 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -1080,10 +1069,6 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
@@ -1309,6 +1294,7 @@ object FDetails: TFDetails
             OnClick = BtnCopyFromV2Click
           end
           object Lblv1Album: TEdit
+            Tag = 3
             Left = 96
             Top = 60
             Width = 250
@@ -1317,6 +1303,7 @@ object FDetails: TFDetails
             OnChange = Lblv1Change
           end
           object Lblv1Artist: TEdit
+            Tag = 1
             Left = 96
             Top = 14
             Width = 250
@@ -1325,6 +1312,7 @@ object FDetails: TFDetails
             OnChange = Lblv1Change
           end
           object Lblv1Titel: TEdit
+            Tag = 2
             Left = 96
             Top = 38
             Width = 250
@@ -1333,14 +1321,17 @@ object FDetails: TFDetails
             OnChange = Lblv1Change
           end
           object Lblv1Year: TEdit
+            Tag = 7
             Left = 305
             Top = 104
             Width = 41
             Height = 21
+            NumbersOnly = True
             TabOrder = 6
             OnChange = Lblv1YearChange
           end
           object Lblv1Comment: TEdit
+            Tag = 4
             Left = 96
             Top = 82
             Width = 154
@@ -1349,14 +1340,17 @@ object FDetails: TFDetails
             OnChange = Lblv1Change
           end
           object Lblv1Track: TEdit
+            Tag = 5
             Left = 305
             Top = 82
             Width = 41
             Height = 21
+            NumbersOnly = True
             TabOrder = 4
             OnChange = Lblv1TrackChange
           end
           object cbIDv1Genres: TComboBox
+            Tag = 6
             Left = 96
             Top = 104
             Width = 154

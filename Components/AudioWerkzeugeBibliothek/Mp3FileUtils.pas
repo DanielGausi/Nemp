@@ -729,7 +729,7 @@ type
 
   // Get a TrackNr. from a ID3v2-Tag-trackstring
   // e.g.: 3/15 => 3
-  function GetTrackFromV2TrackString(value: string): Byte;
+  function GetTrackFromV2TrackString(value: string): Integer;
 
 const
 
@@ -933,7 +933,7 @@ end;
 //--------------------------------------------------------------------
 // Get Track-Nr. from track-string
 //--------------------------------------------------------------------
-function GetTrackFromV2TrackString(value: string): Byte;
+function GetTrackFromV2TrackString(value: string): Integer;
 var
   del: Integer;
   Track: String;
