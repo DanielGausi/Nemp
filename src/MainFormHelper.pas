@@ -126,7 +126,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
-    PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm;
+    PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
+    ReplayGainProgress, NewMetaFrame;
 
 procedure CorrectVolButton;
 begin
@@ -819,6 +820,15 @@ begin
         if assigned(CloudEditorForm      ) then ReTranslateComponent(CloudEditorForm     );
         if assigned(Wizard               ) then ReTranslateComponent(Wizard              );
         if assigned(PlayerLogForm        ) then ReTranslateComponent(PlayerLogForm       );
+
+        if assigned(ReplayGainProgressForm ) then ReTranslateComponent(ReplayGainProgressForm );
+        if assigned(NewMetaFrameForm) then
+        begin
+            BackupComboboxes(NewMetaFrameForm);
+            ReTranslateComponent(NewMetaFrameForm);
+            RestoreComboboxes(NewMetaFrameForm);
+        end;
+
         if assigned(FormEffectsAndEqualizer) then
         begin
             ReTranslateComponent(FormEffectsAndEqualizer);

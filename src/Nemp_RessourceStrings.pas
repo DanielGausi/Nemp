@@ -846,6 +846,28 @@ Audiofile_ReplayGain_Album_Short    = '%6.2f dB (Album %6.2f dB)';
 Audiofile_ReplayGain_Track_WithPeak    = 'Title: %.2f dB, Peak: %.6f';
 Audiofile_ReplayGain_Album_WithPeak    = 'Album: %.2f dB, Peak: %.6f';
 
+ReplayGain_CalculateSingleTracks = 'Calculating ReplayGain values (TrackGain only) for %d files ...';
+ReplayGain_CalculateSingleAlbum  = 'Calculating ReplayGain values (with AlbumGain) for %d files ...';
+ReplayGain_UnknownAlbum = '<Unknown Album>';
+ReplayGain_CalculateMultipleAlbums = 'Calculating ReplayGain values for album "%s" with %d files ...';
+ReplayGain_StartSynchronizing = 'Calculating complete, synchronizing %d files ...';
+ReplayGain_RemoveFromFiles = 'Removing ReplayGain values from %d files ...';
+ReplayGain_Complete = 'ReplayGain calculation complete' ;
+ReplayGain_AlbumComplete = 'Calculation AlbumGain complete.';
+ReplayGain_ScanningFile = 'Scanning file "%s"' ;
+ReplayGain_UnexpectedError = 'Some unexpected Error occured (Errorcode: %d)';
+ReplayGain_ErrorTooManyChannels        = 'Error: Too many channels (%s)' ;
+ReplayGain_ErrorAlbumGainFreqChanged   = 'Warning: AlbumGain calculation cancelled (%s)';
+ReplayGain_ErrorInitGainAnalysisError  = 'Error: Failed initializing ReplayGain calculation (%s)';
+ReplayGain_TrackSummary = 'Track %d: %6.2f dB, Peak %6.6f (%s)';
+ReplayGain_AlbumSummary = 'AlbumGain: %6.2f dB, Peak %6.6f';
+
+Progressform_ReplayGain = 'Nemp is calculating ReplayGain values right now. This may take a while.';
+Progressform_ReplayGain_Complete = 'Calculation of ReplayGain complete. The values have been written to the metadata of the files.';
+Progressform_ReplayGain_Cancelled = 'Calculation of ReplayGain aborted. Some values may have been already written to the metadata of the files.';
+
+Progressform_ReplayGain_AlreadyRunning = 'ReplayGain calculation is already running. Please wait until the current calculation is finished.';
+
 
     AutoScanDirsDialog_Caption = 'Confirmation';
     AutoScanDirsDialog_Text    = 'Do you want Nemp to monitor this directoy?' +#13#10 + #13#10
@@ -1037,11 +1059,6 @@ ProgressForm_ScanNewFiles    = 'Nemp is scanning the new music files for metadat
 ProgressForm_WorkingCaption = 'Nemp: Work in progress ...';
 ProgressForm_CompleteCaption = 'Nemp: Process completed.';
 
-Progressform_ReplayGain = 'Nemp is calculating ReplayGain values right now. This may take a while.';
-Progressform_ReplayGain_Complete = 'Calculation of ReplayGain complete. The values have been written to the metadata of the files.';
-Progressform_ReplayGain_Cancelled = 'Calculation of ReplayGain aborted. Some values may have been already written to the metadata of the files.';
-
-Progressform_ReplayGain_AlreadyRunning = 'ReplayGain calculation is already running. Please wait until the current calculation is finished.';
 
 Playlist_StartSearchingFiles  = 'Searching for music files ...';
 Playlist_SearchingNewFilesDir    = 'Searching for music files ... %s';

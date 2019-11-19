@@ -776,9 +776,9 @@ object FDetails: TFDetails
           607
           472)
         object Btn_DeleteLyricFrame: TButton
-          Left = 465
+          Left = 451
           Top = 168
-          Width = 130
+          Width = 144
           Height = 25
           Anchors = [akTop, akRight]
           Caption = 'Delete lyrics'
@@ -787,9 +787,9 @@ object FDetails: TFDetails
           OnClick = Btn_DeleteLyricFrameClick
         end
         object BtnLyricWiki: TButton
-          Left = 465
-          Top = 24
-          Width = 130
+          Left = 451
+          Top = 22
+          Width = 144
           Height = 25
           Anchors = [akTop, akRight]
           Caption = 'Get Lyrics'
@@ -799,9 +799,9 @@ object FDetails: TFDetails
           OnClick = BtnLyricWikiClick
         end
         object BtnLyricWikiManual: TButton
-          Left = 465
+          Left = 451
           Top = 108
-          Width = 130
+          Width = 144
           Height = 25
           Anchors = [akTop, akRight]
           Caption = 'Manual search'
@@ -823,9 +823,9 @@ object FDetails: TFDetails
           OnKeyDown = Memo_LyricsKeyDown
         end
         object cbLyricOptions: TComboBox
-          Left = 465
+          Left = 451
           Top = 81
-          Width = 130
+          Width = 144
           Height = 21
           Style = csDropDownList
           Anchors = [akTop, akRight]
@@ -1373,7 +1373,7 @@ object FDetails: TFDetails
           object LblConst_MpegBitrate: TLabel
             Left = 8
             Top = 48
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1390,7 +1390,7 @@ object FDetails: TFDetails
           object LblConst_MpegSamplerate: TLabel
             Left = 8
             Top = 64
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1407,7 +1407,7 @@ object FDetails: TFDetails
           object LblConst_MpegOriginal: TLabel
             Left = 8
             Top = 147
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1424,7 +1424,7 @@ object FDetails: TFDetails
           object LblConst_MpegEmphasis: TLabel
             Left = 8
             Top = 163
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1441,7 +1441,7 @@ object FDetails: TFDetails
           object LblConst_MpegVersion: TLabel
             Left = 8
             Top = 16
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1458,7 +1458,7 @@ object FDetails: TFDetails
           object LblConst_MpegCopyright: TLabel
             Left = 8
             Top = 131
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1475,7 +1475,7 @@ object FDetails: TFDetails
           object LblConst_MpegProtection: TLabel
             Left = 8
             Top = 99
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1492,7 +1492,7 @@ object FDetails: TFDetails
           object LblConst_MpegHeader: TLabel
             Left = 8
             Top = 32
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1509,7 +1509,7 @@ object FDetails: TFDetails
           object LblConst_MpegExtension: TLabel
             Left = 8
             Top = 115
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1526,7 +1526,7 @@ object FDetails: TFDetails
           object LblConst_MpegDuration: TLabel
             Left = 8
             Top = 80
-            Width = 70
+            Width = 82
             Height = 13
             Alignment = taRightJustify
             AutoSize = False
@@ -1541,7 +1541,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETBitrate: TLabel
-            Left = 88
+            Left = 100
             Top = 48
             Width = 12
             Height = 13
@@ -1550,7 +1550,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETSamplerate: TLabel
-            Left = 88
+            Left = 100
             Top = 64
             Width = 12
             Height = 13
@@ -1559,7 +1559,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETDauer: TLabel
-            Left = 88
+            Left = 100
             Top = 80
             Width = 12
             Height = 13
@@ -1568,7 +1568,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETVersion: TLabel
-            Left = 88
+            Left = 100
             Top = 16
             Width = 12
             Height = 13
@@ -1577,7 +1577,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETHeaderAt: TLabel
-            Left = 88
+            Left = 100
             Top = 32
             Width = 12
             Height = 13
@@ -1586,7 +1586,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETProtection: TLabel
-            Left = 88
+            Left = 100
             Top = 99
             Width = 12
             Height = 13
@@ -1595,7 +1595,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETExtension: TLabel
-            Left = 88
+            Left = 100
             Top = 115
             Width = 12
             Height = 13
@@ -1604,7 +1604,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETCopyright: TLabel
-            Left = 88
+            Left = 100
             Top = 131
             Width = 12
             Height = 13
@@ -1613,7 +1613,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETOriginal: TLabel
-            Left = 88
+            Left = 100
             Top = 147
             Width = 12
             Height = 13
@@ -1622,7 +1622,7 @@ object FDetails: TFDetails
             Transparent = True
           end
           object LblDETEmphasis: TLabel
-            Left = 88
+            Left = 100
             Top = 163
             Width = 12
             Height = 13

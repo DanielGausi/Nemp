@@ -19,7 +19,6 @@ type
     LogMemo: TMemo;
     cbAutoClose: TCheckBox;
     CloseTimer: TTimer;
-    procedure BtnAlbumRGClick(Sender: TObject);
     procedure BtnCancelClick(Sender: TObject);
 
     procedure OnThreadTerminate(Sender: TObject);
@@ -48,11 +47,8 @@ type
 
   public
     { Public declarations }
-    // ReplayGainCalculator: TReplayGainCalculator;
     AutoClose: Boolean;
-
     procedure InitiateReplayGainCalculation(aFileList: TObjectList; aCalculationMode: TRGCalculationMode; CreateCopies: Boolean);
-
 
   end;
 
@@ -66,7 +62,7 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, AudioFiles, ReplayGain, Nemp_RessourceStrings;
+uses NempMainUnit, MainFormHelper, AudioFiles, ReplayGain, gnugettext, Nemp_RessourceStrings;
 
 {$R *.dfm}
 
@@ -118,6 +114,8 @@ end;
 procedure TReplayGainProgressForm.FormCreate(Sender: TObject);
 var aPath: String;
 begin
+    TranslateComponent (self);
+
     aPath := ExtractFilePath(ParamStr(0)) + 'Images\ReplayGain.png';
     if FileExists(aPath) then
         MainImage.Picture.LoadFromFile(aPath)
@@ -193,49 +191,42 @@ end;
 Procedure TReplayGainProgressForm.OnMainProgress (RGThread: TNempReplayGainCalculator; AlbumName: String; FileCount: Integer; Progress: TRGStatus);
 var displayAlbum: String;
 begin
-    // pbComplete.Position := Trunc(100 * OverallProgress);
 
     case Progress of
       RGStatus_StartCalculationSingleTracks: begin
-          LogMemo.Lines.Add(Format('Calculating ReplayGain (TrackGain only) values for %d files ...', [FileCount]));
+          LogMemo.Lines.Add(Format(ReplayGain_CalculateSingleTracks, [FileCount]));
       end;
 
       RGStatus_StartCalculationSingleAlbum: begin
-          LogMemo.Lines.Add(Format('Calculating ReplayGain (with AlbumGain) values for %d files ...', [FileCount]));
+          LogMemo.Lines.Add(Format(ReplayGain_CalculateSingleAlbum, [FileCount]));
       end;
 
       RGStatus_StartCalculationMultiAlbum: begin
           if AlbumName = '' then
-              displayAlbum := '<Unknown Album>'
+              displayAlbum := ReplayGain_UnknownAlbum
           else
               displayAlbum := AlbumName;
 
-          LogMemo.Lines.Add(Format('Calculating ReplayGain values for album "%s" with %d files ...', [displayAlbum, FileCount]));
+          LogMemo.Lines.Add(Format(ReplayGain_CalculateMultipleAlbums, [displayAlbum, FileCount]));
       end;
 
       RGStatus_StartSync: begin
-          LblStatus.Caption := Format('Calculating complete, synchronizing %d files ...', [FileCount]);
+          LblStatus.Caption := Format(ReplayGain_StartSynchronizing, [FileCount]);
       end;
 
       RGStatus_StartDeleteValues: begin
-          LogMemo.Lines.Add(Format('Removing ReplayGain values from %d files ...', [FileCount]));
-          LblStatus.Caption := Format('Removing ReplayGain values from %d files ...', [FileCount]);
+          LogMemo.Lines.Add(Format(ReplayGain_RemoveFromFiles, [FileCount]));
+          LblStatus.Caption := Format(ReplayGain_RemoveFromFiles, [FileCount]);
       end;
 
 
       RGStatus_Finished: begin
-
               ///  FileCount gives the completed files from this album
               ///  => increase "Offset" by FileCount
               fFileCountOffset := fFileCountOffset + FileCount;
 
               // not necessarily *completely* finished, but at least one album is finished
-              // pbAlbum.Position := 100;
-              ///// Memo1.Lines.Add('... done');
-              // Memo1.Lines.Add('ReplayGain Album completed..');
-              // LogMemo.Lines.Add('');
-
-              LblStatus.Caption := 'Done.';
+              LblStatus.Caption := ReplayGain_Complete;
       end;
     end;
 end;
@@ -245,23 +236,11 @@ procedure TReplayGainProgressForm.OnStreamInit(aReplayGainCalculator: TNempRepla
 begin
     case ErrorCode of
         RG_ERR_None: begin
-            LblStatus.Caption := Format ( 'Scanning file %s',
+            LblStatus.Caption := Format (ReplayGain_ScanningFile ,
                 [  ExtractFilename(aReplayGainCalculator.CurrentFilename) ]);
-
-             {
-            Format ( 'Scanning %s (%d kB, %d channel(s), %d Hz)',
-                [  ExtractFilename(aReplayGainCalculator.CurrentFilename),
-                   aReplayGainCalculator.ChannelLength Div 1024,
-                   aReplayGainCalculator.ChannelCount,
-                   aReplayGainCalculator.ChannelFreq    ]);
-              }
-            // Application.ProcessMessages;
         end;
     else
-        LogMemo.Lines.Add(Format('Some unexpected Error occured (Errorcode: %d)', [ErrorCode]));
-        //RG_ERR_TooManyChannels  : LblStatus.Caption := 'Too many Channels. Only mono and stereo are supported.';
-        //RG_ERR_No16Bit          : LblStatus.Caption := 'Channel is not a 16Bit channel. ReplayGain calculation is not supported.' ;
-        //RG_ERR_FreqNotSupported : LblStatus.Caption := 'Channel frequency is not supported';
+        LogMemo.Lines.Add(Format(ReplayGain_UnexpectedError, [ErrorCode]));
     end;
 end;
 
@@ -280,22 +259,11 @@ begin
 
     case ErrorCode of
         RG_ERR_None: ;
-        RG_ERR_TooManyChannels: LogMemo.Lines.Add(Format('Error: Too many channels (%s)', [aReplayGainCalculator.CurrentFilename]));
-        RG_ERR_AlbumGainFreqChanged: LogMemo.Lines.Add(Format('Warning: AlbumGain calculation cancelled (%s)', [aReplayGainCalculator.CurrentFilename]));
-        RG_ERR_InitGainAnalysisError: LogMemo.Lines.Add(Format('Error: Failed initialisiing replay gain calculation (%s)', [aReplayGainCalculator.CurrentFilename]));
+        RG_ERR_TooManyChannels: LogMemo.Lines.Add(Format(ReplayGain_ErrorTooManyChannels, [aReplayGainCalculator.CurrentFilename]));
+        RG_ERR_AlbumGainFreqChanged: LogMemo.Lines.Add(Format(ReplayGain_ErrorAlbumGainFreqChanged, [aReplayGainCalculator.CurrentFilename]));
+        RG_ERR_InitGainAnalysisError: LogMemo.Lines.Add(Format(ReplayGain_ErrorInitGainAnalysisError, [aReplayGainCalculator.CurrentFilename]));
 
         BASS_ERROR_ENDED: ; // can happen sometimes, but it's not actually an error ...
-        {
-        if aErr <> AUDIOERR_None then
-            begin
-                ErrorLog := TErrorLog.create(afa_ReplayGain, localAudioFile, aErr, false);
-                try
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_ErrorLog, LParam(ErrorLog));
-                finally
-                    ErrorLog.Free;
-                end;
-            end;
-        }
     end;
 end;
 
@@ -309,7 +277,7 @@ end;
 
 procedure TReplayGainProgressForm.OnTrackComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
 begin
-    LogMemo.Lines.Add(Format('Track %d: %6.2f dB, Peak %6.6f (%s)',
+    LogMemo.Lines.Add(Format(ReplayGain_TrackSummary,
                                 [aIndex + 1, aGain, aPeak,  ExtractFilename(aReplayGainCalculator.CurrentFilename)]));
     pbTrack.Position := 100;
 
@@ -325,9 +293,9 @@ end;
 
 procedure TReplayGainProgressForm.OnAlbumComplete(aReplayGainCalculator: TNempReplayGainCalculator; aIndex: Integer; aGain: Double; aPeak: Double);
 begin
-    LogMemo.Lines.Add(Format('AlbumGain: %6.2f dB, Peak %6.6f', [aGain, aPeak]));
+    LogMemo.Lines.Add(Format(ReplayGain_AlbumSummary, [aGain, aPeak]));
 
-    LblStatus.Caption := 'Calculation AlbumGain complete.';
+    LblStatus.Caption := ReplayGain_AlbumComplete;
     pbTrack.Position := 100;
 end;
 
@@ -366,68 +334,6 @@ begin
     end;
 end;
 
-
-
-
-
-procedure TReplayGainProgressForm.BtnAlbumRGClick(Sender: TObject);
-var i:integer;
-    Data: PTreeData;
-    SelectedMp3s: TNodeArray;
-
-begin
-    if assigned(NempReplayGainCalculator) then
-        ShowMessage('Sorry, already running')
-    else
-    begin
-          LblMain.Caption := Progressform_ReplayGain;
-
-          BtnCancel.Caption := XcmbCancel;
-          fOperationCancelled := False;
-
-          LogMemo.Lines.Clear;
-
-
-          SelectedMP3s := Nemp_MainForm.PlaylistVST.GetSortedSelection(False);
-          if length(SelectedMP3s) = 0 then exit;
-
-          pbComplete.Position := 0;
-
-          fTotalFileCount  := length(SelectedMP3s);
-          fFileCountOffset := 0;
-
-          // create Calculation thread
-          NempReplayGainCalculator := TNempReplayGainCalculator.Create;
-          NempReplayGainCalculator.MainWindowHandle := FOwnMessageHandler;
-
-          case (Sender as TButton).Tag of
-              0: NempReplayGainCalculator.CalculationMode := RG_Calculate_SingleTracks;
-              1: NempReplayGainCalculator.CalculationMode := RG_Calculate_SingleAlbum ;
-              2: NempReplayGainCalculator.CalculationMode := RG_Calculate_MultiAlbums ;
-              3: NempReplayGainCalculator.CalculationMode := RG_Delete_ReplayGainValues ;
-          end;
-
-          NempReplayGainCalculator.OnStreamInit           := OnStreamInit;
-          NempReplayGainCalculator.OnError                := OnCalculationError;
-          NempReplayGainCalculator.OnTrackProgress        := OnTrackProgress;
-          NempReplayGainCalculator.OnTrackComplete        := OnTrackComplete;
-          NempReplayGainCalculator.OnAlbumComplete        := OnAlbumComplete;
-          NempReplayGainCalculator.OnWriteMetaDataProgress := OnWriteMetaDataProgress;
-          NempReplayGainCalculator.OnSynchAudioFile := OnAudioFileSynch;
-          NempReplayGainCalculator.OnMainProgress   := OnMainProgress ;
-
-          NempReplayGainCalculator.OnTerminate := OnThreadTerminate;
-
-          for i:=0 to length(SelectedMP3s)-1 do
-          begin
-              Data := Nemp_MainForm.VST.GetNodeData(SelectedMP3s[i]);
-              NempReplayGainCalculator.AddAudioFile(Data^.FAudioFile);
-          end;
-
-          NempReplayGainCalculator.Start;
-
-    end;
-end;
 
 procedure TReplayGainProgressForm.OnThreadTerminate(Sender: TObject);
 begin

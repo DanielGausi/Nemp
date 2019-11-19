@@ -349,9 +349,88 @@ You can also play many of the usual \textbf{web radio stations} with Nemp. If th
 
 The order in which the playlist is played back can be changed by pressing the button for the playback mode. You can also sort the playlist using the menu or drag and drop individual titles.
 
+\begin{center}
+\includegraphics[width=0.4\textwidth]{playlist.jpg} 
+\end{center}
+
 New in Nemp 4.7 is the \textbf{search in the playlist}. This works similar to the quick search in the media library - just focus the search box (also works with the key combination \texttt{Ctrl+F}, if the playlist has the focus) and start typing. The first hit is selected in the playlist. Pressing the \texttt{F3} key will highlight the next hit. With \texttt{Enter} all search hits are marked, and can be copied to the clipboard via Copy\texttt{Strg+C} or \texttt{Strg+Shift+C}. With \texttt{Shift+Enter} the currently selected title is played.
 
+Since version 4.13, Nemp ReplayGain supports ReplayGain for automatic adjustment of the Loudness. Titles with ReplayGain information are indicated in the playlist by a sound level symbol. When the automatic loudness adjustment is disabled in the settings, this icon is displayed in grayscale. More
+about this in the next section.
+
 A hidden feature is the prebook-list. You can use the \texttt{0...9} numeric keys to set a temporary individual sequence. Simply highlight the song you want to hear next and press the \texttt{1} button. Mark another one with \texttt{2} and so on. If you want to change the order, this works as well. If you want to remove a marker, press \texttt{0}.
+
+\subsection{ReplayGain - automatic loudness adjustment}
+\label{sec_ReplayGain}
+
+Since version 4.13 Nemp supports ReplayGain. This adjusts the volume of tracks from different sources so that all tracks are played at the same volume. At least that's the goal.
+
+Nemp evaluates the ReplayGain information in the metadata. The most common tags are in the format \texttt{REPLAYGAIN\_TRACK\_GAIN}. There are a few other formats for them, but to my knowledge they are only used sporadically and are therefore not supported by Nemp (so far). 
+
+These tags are supported by MP3, Ogg-Vorbis, Flac, M4A and the more exotic formats that use the APEv2 tag for metadata. These values must be calculated in advance, which takes some time. 
+
+\subsubsection{The concept behind ReplayGain}
+
+\textbf{TrackGain.} ReplayGain tries to make all titles sound equally loud. The volume of a title is compared with a reference value. The deviation from this reference value indicates to what extent the volume of the title must be increased or decreased during playback so that this reference value is reached. This value is called \emph{TrackGain}.
+
+\textbf{AlbumGain.} Some albums, however, have titles that are intentionally louder or quieter than other titles on the album. These intentional differences in volume would then be lost. Therefore, not only the volume of the individual tracks is analyzed, but also the average volume of the entire album is considered and the difference to the reference value is determined. This is the \emph{AlbumGain} value.
+
+Depending on the playlist, either TrackGain or AlbumGain should be used. This can be set in the settings dialog under \emph{Player Settings}.
+
+\textbf{Pre-amplification.} Depending on the music collection, it makes sense to define a default value for the volume adjustment. Many current albums are mixed very loudly (keyword \emph{Loudness-War}). Thus the ReplayGain values for these tracks are negative (e.g. -6dB). If a title is played without ReplayGain information, it may appear disturbingly loud. A default value of e.g. -5dB significantly reduces this difference. 
+
+On the other hand, after using ReplayGain in this example, all titles appear (significantly) quieter than before, which is also not always desired. Therefore an additional default value for title \emph{with} ReplayGain data can be specified.
+
+These default values disable ReplayGain a bit. Which values make sense depends on your own preferences and on the composition of the music collection.
+
+\textbf{Clipping and Peaks.} If a positive value is set for the preamplification, then it can happen that some samples are amplified beyond the actual maximum. This results in disturbing effects during playback, called \emph{clipping}. To avoid this, the volume increase can be adjusted so that the peak value of a title is never amplified beyond the maximum. Therefore, when calculating the ReplayGain values, the peak values are also calculated and written into the metadata (as \texttt{REPLAYGAIN\_TRACK\_PEAK}, correspondingly also for the album value.
+
+These options can also be changed in the \emph{Player Settings}.
+
+\textbf{Clipping and Floating-Point-Channels.} By default, Nemp uses floating point channels for playback. These channels also allow internal processing of samples beyond the \gf{actual maximum}. A possible \emph{clipping} only occurs at the speakers - if at all. Therefore, the \emph{Prevent Clipping} option does not improve the sound in many cases, but only reduces the volume. However, if you disable the use of floating point channels in the \emph{Advanced Player Settings}, and then set high values for preamplification, you'll hear the effect of \gf{Prevent Clipping} very clearly.
+
+\subsubsection{Calculation of the ReplayGain values}
+
+With Nemp these values can also be calculated, if they are not already available. First select some titles in the playlist or media list and then select the item ReplayGain or the desired variant via the context menu (right click).
+\begin{itemize}
+\item \textbf{individual titles.} Only TrackGain values are calculated. 
+\item \textbf{as one album.} In addition to calculating the TrackGain values, the selected tracks are taken as one album. The AlbumGain values are based on the average volume of all selected tracks. 
+
+In order to minimize the number of write accesses to the metadata, the TrackGain values are only written to the metadata when the AlbumGain values are available - i.e. after the last title has been calculated. If the process is aborted before the end, all calculated values will be lost.
+
+\item \textbf{multiple albums (by tags).} The selected files are interpreted as multiple albums. The automatic compilation of the albums is based on the metadata. If the value for \gf{Album} in the metatags differs (e.g. because the appendix \gf{CD 1/2} is contained), this option should not be selected. 
+
+The ReplayGain values for an album will be written to the metadata when the calculation of all tracks for that album is complete.
+\item \textbf{ReplayGain values delete.} The values will be deleted from the metadata again.
+\end{itemize}
+
+A few hints about that:
+\begin{itemize}
+
+\item The audio data itself is not changed. Only up to four data points (track/album gain/peak) are inserted into the metadata of the files. Players that do not support ReplayGain are not affected. Players that support ReplayGain in this form, of course are. 
+
+There is also the variant (at least with mp3 files, see \emph{MP3Gain}) that the audio data itself is changed (reversibly), so that even with players without ReplayGain support there is an even volume. This method is \emph{not} used by Nemp.
+
+\item It is absolutely not recommended to calculate the ReplayGain values for the entire media library at once. This is especially true for the \emph{multiple albums} option, because even with well-maintained collections, the album subdivision is not always 100\% correct.
+And of course this applies even more to the \emph{as one album} option - applying it to the entire media library (or to large parts of it) is absolutely pointless. Because this way (when using the AlbumGain values) the differences in volume are preserved, which ReplayGain is supposed to prevent.
+
+\item To calculate the AlbumGain value, all titles of the album must have the same sample rate. For example, if one title does not have the usual 44.1kHz, but 48kHz, then the calculation of the AlbumGain value is aborted.
+
+\item During my tests it turned out that Nemp (or the used program library) delivers slightly different values for some files than e.g. foobar2000 or Mp3Gain. The deviations become particularly clear with titles that have both very loud and very quiet passages. However, the tendency is correct, and for titles with strongly fluctuating volume (as a classic I refer to the \textit{Bolero}) an \gf{average} Volume anyway is a term difficult to define, resp. is such a value there only of very limited expressiveness.
+
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
 
 
 \subsection{Special features}
@@ -578,36 +657,6 @@ This does not apply to the rating of titles. This is always possible. However, i
 \end{hinweis}
 
 
-\subsubsection{The detail window for editing metadata}
-\label{sec_details}
-
-For more detailed editing of the meta information, Nemp has a \textbf{detail window} that can be opened with the key combination \texttt{Ctrl+D} when a title is highlighted in the media library or playlist. In addition to specific changes to the ID3 tags, other information can be retrieved here that is not necessarily of great interest, but some may find it useful.
-
-\begin{hinweis} If you make changes in this window and click \emph{Apply}, the inputs are always saved in the metadata of the file, even if quick access to the metadata is not allowed in the settings.
-\end{hinweis}
-
-\begin{figure}[bth]
-\centering
-\includegraphics[width=0.8\textwidth]{details_en.jpg}
-\label{fig_detailfenster}
-\end{figure}
-
-In the first tab \textbf{General} you get an overview of the metadata for the selected title. The button \emph{Explorer} opens the Windows Explorer with the directory of the file, via \emph{Properties} you receive the Windows properties dialog.
-
-The second tab contains the basic properties of the \emph{ID3 tags}. For some file types there is no ID3 tag in the true sense of the word. With .ogg or .flac files, these information is then called \emph{Vorbis comments}. With .mp3 files you can edit the two tag versions \texttt{id3v1} and \texttt{id3v2} separately. However, you should keep them in sync.
-
-In the third tab you can edit \textbf{lyrics and pictures}. If you want to edit lyrics for several titles, it might be faster to use the multiple search for lyrics. To do this, select several files in the main window and select the \emph{Get  Lyrics} function (key combination \texttt{Ctrl+L}). This will take a little time, and not all titles will be found with the correct lyrics, but the hit rate is quite good.
-
-Since version 4.10 not only the page \emph{lyrics.wikia.com} is used, but optionally also \emph{chartlyrics.com}. Which source is used with which priority can be set in the options. The new page Chartlyrics should only be used as fallback. When searching on this page, some search terms will be filtered out automatically. For example \emph{are, take, that, the, who, are, you} and many others. What effects this will have on the titles from Bands like \emph{Take That} or \emph{The Who} (especially the title \emph{Who are you?}) you can then imagine yourself.
-
-In the fourth tab you can edit the extended tags for the \hyperref[sec_tagwolke]{tag cloud}. For this tag cloud, further tags are very useful, because the few standard tags are not sufficient for a meaningful categorization. 
-
-Adding extended tags is the same as adding lyrics. You can enter a few tags manually, or search for tags for many files simultaneously. To do this, select the desired files and use the \emph{Get extended tags} function (key combination \texttt{Ctrl+T}). See also the section about the \hyperref[sec_tagwolkeneditor]{tag cloud editor}.
-
-\begin{hinweis} For mass setting of \emph{Lyrics} and \emph{advanced} tags also quick access to metadata is necessary. If this access is not allowed, Nemp will prompt you to allow or disallow metadata changes for the selected files.
-\end{hinweis}
-
-
 \subsubsection{Updating the data}
 If you have changed individual files with other programs, you can reload these files. To do this, select \emph{Refresh selected files} or \emph{Media Library - Refresh} from the context menu. For a few files this is still quite fast, but the complete re-reading of a media library with some 10,000 titles takes a few minutes.
 
@@ -631,6 +680,72 @@ You can also sort the favorites list according to your wishes.
 \subsubsection{CSV export}
 
 A special feature is the possibility to export the complete media library as a csv-file, including most of the data. Excluded are lyrics (it is only exported if there are any) and extended tags. This csv file can then be imported by many other programs (e.g. Excel).
+
+\subsection{The detail window for editing metadata}
+\label{sec_details}
+
+For a more detailed editing of meta information, Nemp has a \textbf{detail window} that can be opened with the key combination \texttt{Ctrl+D} when a title is highlighted in the media library or playlist. In addition to specific changes to the ID3 tags, other information can also be retrieved here which is not necessarily of great interest, but which some might find useful.
+
+This window has been completely redesigned for version 4.13.
+
+\begin{hinweis} If you make changes in this window and click \emph{Apply}, the entries are always saved in the file's metadata. Even if the quick access to the metadata is not allowed in the settings.
+\end{hinweis}
+
+Some inputs on the different sides of this window may contradict each other. For example, if you change the title on the first page (\emph{summary}) and also change the frame for \gf{title} on the \emph{metadata} page, inconsistencies or unexpected behavior may occur when saving to the file. Therefore, Nemp will warn you when you change the page if any changes have been made that have not yet been saved.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.9\textwidth]{details_a.jpg}
+\label{fig_detailfenster}
+\end{figure}
+
+\subsubsection{Summary}
+
+The first tab \textbf{Summary} gives you an overview of the meta data for the selected title. The button \emph{Explorer} opens the Windows Explorer with the folder of the file, via \emph{Properties} you get the Windows properties dialog.
+
+Since Nemp 4.13 it is possible to edit the basic values like title and artist. Rating and playback counter are not editable directly, but can be set back to 0 by a button click (\gf{0} for the rating are 3.5 stars). The ReplayGain values are also only displayed there. The extended tags for the tag cloud can be edited.
+
+\subsubsection{Lyrics}
+
+The second tab is intended for displaying and editing lyrics. The lyrics can be edited freely, or can be obtained automatically from currently two sources on the net.
+
+If you want to edit lyrics for multiple titles, it might be faster to use the multiple search for lyrics. To do this, select several files in the main window and select the \emph{Get  Lyrics} function (key combination \texttt{Ctrl+L}). This will take a little time, and not all titles will be found with the correct lyrics, but the hit rate is quite good.
+
+Since version 4.10 not only the page \emph{lyrics.wikia.com} is used, but optionally also \emph{chartlyrics.com}. Which source is used with which priority can be set in the options. The new page Chartlyrics should only be used as fallback. When searching on this page, some search terms will be filtered out automatically. For example \emph{are, take, that, the, who, are, you} and many others. What effects this will have on the titles from Bands like \emph{Take That} or \emph{The Who} (especially the title \emph{Who are you?}) you can then imagine yourself.
+
+
+\subsubsection{Pictures (cover art)}
+
+The third page is reserved for Cover-Art, and with 4.13 there is an extension of the functionality, which I wanted to add for a long time.
+
+Here are listed all pictures Nemp found for the title. Both in the metadata (several pictures can be stored there) and as a file on the hard disk. Both (often hidden) system files like \emph{folder.jpg} and explicit cover art files like \emph{(my-album)-front.jpg} are found. The available images can be displayed via the selection boxes.
+
+A new role is assigned to the display of the image that Nemp currently uses for the main window and coverflow. New is that this image can be \emph{changed} without tricks. This is useful, for example, if Nemp's heuristic for searching the \gf{Front-Cover} returns an unwanted result, or if Nemp tears an album apart because of individual image data in the ID3 tags in the coverflow \gf{...}. 
+\begin{itemize}
+\item The button \emph{Load cover art} can be used to select any image file as a cover for the media library. 
+\item Click on \gf{Use current selection} to use the image currently selected from the list of automatically found images (metadata and files). 
+\item \emph{Reset} deletes a previously manually set cover, and Nemp selects one on itself again.
+\end{itemize}
+
+Click on \emph{Apply} (at the bottom) to save the newly selected cover. If the \emph{Update all files with this cover} checkbox is checked, the new cover will be set for all files that previously used the old cover art.
+
+After that the coverflow may have to be updated. This does not happen automatically, but only after clicking on the button, which is then displayed at the bottom.
+
+
+\begin{hinweis} This selection of the album cover remains even if the media library is updated and the metadata is re-read. Nemp writes an ID calculated from the selected image into the metadata of the audio files. If this ID is present in the metadata, this cover will be used for display if the corresponding file is present in the cover folder.
+\end{hinweis}
+
+\subsubsection{Metadata}
+
+On this page you can find further information from the metadata. For MP3 files, the older and more restricted ID3v1 tag is also displayed here. Otherwise \gf{only} the listing of (almost) all existing metadata in the file. Some of these can be edited, others not (grey font). Some of the values not editable on this page can be edited in other ways, e.g. lyrics or covers.
+
+Data fields that do not only contain plain text are displayed as far as possible up to a certain length (non-printable characters as dots). Larger amounts of data are only displayed as \emph{Binary Data}, followed by the size of the data.
+
+To edit, double-click an entry or press the \texttt{F2} key. With the button \emph{New Frame} further text information can be inserted. Which information is possible depends on the format of the audio file. Even if some formats like Ogg or Flac allow any tags in principle, Nemp offers only a selection here.
+
+\begin{hinweis}
+The access to the metadata is done here on a quite elementary level. If you are not sure what e.g. \gf{new frame} means in this context, or what the possible frames mean, then leave that alone. However, nothing should break the files, and other players should not have any problems with any of the data entered here - in the worst case they will simply be ignored.
+\end{hinweis}
 
 
 \subsection{The tag cloud editor}
@@ -982,6 +1097,9 @@ In this section, you can set things that affect file playback.
 \item \textbf{Output devices.} Selection of sound cards detected in the system. Even if only one sound card is installed, there are occasionally several options available, but they are of little relevance. This selection is really only interesting if a second sound card is actually installed (or connected via USB) in order to select which card is used for the main output and what the headphones are used for listening. See section \hyperref[sec_headphones]{headphones}  for more information.
 
 \item \textbf{Fading.} \emph{Default: On.} Allows a smoother transition between title changes. Can be disabled for some cases or actions.
+
+\item \textbf{ReplayGain.} Settings for automatic loudness adjustment during playback.
+Explanations about ReplayGain, the possible options and how it is implemented in Nemp can be found in the section \hyperref[sec_ReplayGain]{ReplayGain}. With this, the settings should be self-explanatory.
 
 \item \textbf{Silence detection.} \emph{Default: On.} Nemp can detect silence at the end of a track and then, if necessary, initiates playback of the next track earlier in order to play the playlist without pauses. 
 

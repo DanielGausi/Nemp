@@ -5879,6 +5879,7 @@ begin
               );
       end;
 
+      {
       Data := PlaylistVST.GetNodeData(Node);
       if assigned(Data) then
       begin
@@ -5895,6 +5896,7 @@ begin
                       IntTostr(TAudioFile(Data^.FAudioFile).PrebookIndex));
           end;
       end;
+      }
   end;
 end;
 
@@ -6478,7 +6480,12 @@ begin
   if not assigned(Data) then exit;
 
   case Column of
-    0: cellText := Data^.FAudioFile.PlaylistTitle;
+    0: begin
+          if Data^.FAudioFile.PrebookIndex = 0 then
+               cellText := Data^.FAudioFile.PlaylistTitle
+          else
+              cellText := Format('[ %d ]  %s' , [Data^.FAudioFile.PrebookIndex, Data^.FAudioFile.PlaylistTitle]);
+    end;
     1:  begin
           if PlaylistVST.GetNodeLevel(Node) = 0 then
               CellText := Data^.FAudioFile.GetDurationForVST
@@ -8437,7 +8444,7 @@ begin
       begin
         Data := Sender.GetNodeData(Node);
         if (Column = 0) and (Data.FAudioFile.PrebookIndex > 0) then
-             ImageIndex := 16 // empty image// nothing ImageIndex := -1
+             ImageIndex := 18 // timer image
         else
         begin
             case Column of

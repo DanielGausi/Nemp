@@ -48,6 +48,8 @@ var
 
 implementation
 
+uses gnugettext;
+
 {$R *.dfm}
 
 function TNewMetaFrameForm.PrepareFrameSelection: Integer;
@@ -345,6 +347,10 @@ end;
 procedure TNewMetaFrameForm.FormCreate(Sender: TObject);
 begin
     fFrameTypList := TList.Create;
+
+    //BackupComboboxes(self);
+    TranslateComponent (self);
+    //RestoreComboboxes(self);
 end;
 
 procedure TNewMetaFrameForm.FormDestroy(Sender: TObject);

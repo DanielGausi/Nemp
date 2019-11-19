@@ -226,7 +226,7 @@ type
         fComment: UnicodeString;
         fLyrics: UTF8String;
         //fDescription: UnicodeString;
-        fTrack: Word;
+        fTrack: Integer;
         fCD: UnicodeString;
         fRating: Byte;
         fPlayCounter: Cardinal;
@@ -426,7 +426,7 @@ type
 
         property CoverID: String read fCoverID write fCoverID;
         //property Track: Byte read fTrack write fTrack;
-        property Track: Word read fTrack write fTrack;
+        property Track: Integer read fTrack write fTrack;
         property CD: UnicodeString read fCD write fCD;
         property Duration: Integer read fDuration write fDuration;
         property Rating: Byte read fRating write fRating;
@@ -670,7 +670,7 @@ const
       MP3DB_FILESIZE    = 10;
       MP3DB_DATUM       = 11;
       MP3DB_TRACK       = 12;  // Byte
-      MP3DB_TRACK_W     = 13;  // Word, Nemp 4.13
+      MP3DB_TRACK_INT   = 13;  // Integer, Nemp 4.13
       //---
       MP3DB_KATEGORIE   = 20;  // this was used in "Gausis mp3 Verwaltung"
                                // (something like Nemp 0.1)
@@ -3251,11 +3251,11 @@ begin
                                   if fSamplerateIDX > 9 then
                                       fSamplerateIDX := 7;
                                end;
-            MP3DB_FILESIZE: fFileSize := ReadIntegerFromStream(aStream);
-            MP3DB_DATUM   : fFileAge  := ReadDateTimeFromStream(aStream);
-            MP3DB_TRACK   : fTrack    := ReadByteFromStream(aStream);  // Byte
-            MP3DB_TRACK_W : fTrack    := ReadWordFromStream(aStream);  // Word (since 4.13)
-            MP3DB_CD      : CD        := ReadTextFromStream(aStream);
+            MP3DB_FILESIZE  : fFileSize := ReadIntegerFromStream(aStream);
+            MP3DB_DATUM     : fFileAge  := ReadDateTimeFromStream(aStream);
+            MP3DB_TRACK     : fTrack    := ReadByteFromStream(aStream);    // Byte
+            MP3DB_TRACK_INT : fTrack    := ReadIntegerFromStream(aStream); // Word (since 4.13)
+            MP3DB_CD        : CD        := ReadTextFromStream(aStream);
 
             MP3DB_YEAR: begin
                              wYear :=  ReadWordFromStream(aStream);
@@ -3541,14 +3541,13 @@ begin
     result := result + WriteDateTimeToStream(aStream, MP3DB_DATUM, fFileAge);
 
     // New in  4.13: Support for Track-Values beyond the Byte-Limit
-    if Track <> 0 then
+    if Track >= 0 then
     begin
         if Track < 255 then
             result := result + WriteByteToStream(aStream, MP3DB_TRACK, Track)
         else
-            result := result + WriteWordToStream(aStream, MP3DB_TRACK_W, Track)
+            result := result + WriteIntegerToStream(aStream, MP3DB_TRACK_INT, Track)
     end;
-
 
     if CD <> ''          then result := result + WriteTextToStream(aStream, MP3DB_CD, CD);
     if fRating <> 0      then result := result + WriteByteToStream(aStream, MP3DB_RATING, fRating);
