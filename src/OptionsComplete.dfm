@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer1
+      ActivePage = TabPlayer8
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -74,10 +74,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem0: TTabSheet
         Caption = 'Sys (Main)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -280,10 +276,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem1: TTabSheet
         Caption = 'Sys (Control)'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1151,10 +1143,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem2: TTabSheet
         Caption = 'Sys (Files)'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1304,10 +1292,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabSystem3: TTabSheet
         Caption = 'Sys (System)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1466,10 +1450,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlaylistRandom: TTabSheet
         Caption = 'Random'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -1858,10 +1838,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView0: TTabSheet
         Caption = 'View (Main)'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2046,10 +2022,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView1: TTabSheet
         Caption = 'View (Party)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2148,10 +2120,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView3: TTabSheet
         Caption = 'View (Fonts)'
         ImageIndex = 7
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2383,10 +2351,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabView4: TTabSheet
         Caption = 'View (Ext)'
         ImageIndex = 21
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2604,10 +2568,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles0: TTabSheet
         Caption = 'Files (Main)'
         ImageIndex = 22
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2785,10 +2745,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles1: TTabSheet
         Caption = 'Files (Metadata)'
         ImageIndex = 20
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -2951,10 +2907,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles2: TTabSheet
         Caption = 'Files (Cover)'
         ImageIndex = 24
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3170,10 +3122,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles3: TTabSheet
         Caption = 'Files (Search)'
         ImageIndex = 25
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3331,10 +3279,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabFiles4: TTabSheet
         Caption = 'XXX Unicode'
         ImageIndex = 23
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3492,10 +3436,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer0: TTabSheet
         Caption = 'Player (Main)'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3810,10 +3750,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer1: TTabSheet
         Caption = 'Player (Ext)'
         ImageIndex = 22
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -3975,10 +3911,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer2: TTabSheet
         Caption = 'Player (Playlist)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4191,10 +4123,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer4: TTabSheet
         Caption = 'Player (Streams)'
         ImageIndex = 23
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4384,10 +4312,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer5: TTabSheet
         Caption = 'Player (Effects)'
         ImageIndex = 15
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4506,10 +4430,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer6: TTabSheet
         Caption = 'Player (Event)'
         ImageIndex = 19
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -4683,10 +4603,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer7: TTabSheet
         Caption = 'Player (Scrobble)'
         ImageIndex = 17
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -5038,10 +4954,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
       object TabPlayer8: TTabSheet
         Caption = 'Player (Webserver)'
         ImageIndex = 18
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         DesignSize = (
           454
           532)
@@ -5049,7 +4961,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 8
           Width = 439
-          Height = 177
+          Height = 185
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Configuration'
           TabOrder = 0
@@ -5069,24 +4981,24 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object Label7: TLabel
             Left = 16
-            Top = 95
+            Top = 89
             Width = 88
             Height = 13
             Hint = 'Set username and password to access your library.'
             Caption = 'Username (Admin)'
           end
           object Label8: TLabel
-            Left = 116
-            Top = 96
+            Left = 224
+            Top = 89
             Width = 86
             Height = 13
             Hint = 'Set username and password to access your library'
             Caption = 'Password (Admin)'
           end
           object LblWebserverAdminURL: TLabel
-            Left = 224
-            Top = 114
-            Width = 106
+            Left = 16
+            Top = 131
+            Width = 401
             Height = 13
             Cursor = crHandPoint
             Caption = 'http://localhost/admin'
@@ -5099,8 +5011,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnClick = LblWebserverAdminURLClick
           end
           object BtnServerActivate: TButton
-            Left = 296
-            Top = 139
+            Left = 298
+            Top = 150
             Width = 125
             Height = 25
             Caption = 'Activate server'
@@ -5137,23 +5049,23 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object EdtUsernameAdmin: TEdit
             Left = 16
-            Top = 111
-            Width = 95
+            Top = 104
+            Width = 200
             Height = 21
             TabOrder = 4
             OnKeyPress = EdtUsernameAdminKeyPress
           end
           object EdtPasswordAdmin: TEdit
-            Left = 115
-            Top = 111
-            Width = 97
+            Left = 223
+            Top = 104
+            Width = 200
             Height = 21
             TabOrder = 5
             OnKeyPress = EdtPasswordKeyPress
           end
           object BtnShowWebserverLog: TButton
-            Left = 159
-            Top = 139
+            Left = 165
+            Top = 149
             Width = 125
             Height = 25
             Caption = 'Show Log'
@@ -5163,9 +5075,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBoxIP: TGroupBox
           Left = 8
-          Top = 328
+          Top = 365
           Width = 439
-          Height = 73
+          Height = 104
           Hint = 
             'Your IP-configuration. Tell your friends these IPs to access you' +
             'r library.'
@@ -5173,7 +5085,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Caption = 'Current IP-addresses'
           TabOrder = 2
           object LblConst_IPWAN: TLabel
-            Left = 153
+            Left = 223
             Top = 20
             Width = 86
             Height = 13
@@ -5190,8 +5102,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Transparent = True
           end
           object BtnGetIPs: TButton
-            Left = 295
-            Top = 32
+            Left = 302
+            Top = 67
             Width = 121
             Height = 25
             Hint = 
@@ -5204,7 +5116,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object cbLANIPs: TComboBox
             Left = 16
             Top = 36
-            Width = 113
+            Width = 200
             Height = 21
             Hint = 'Your IP(s) inside the local area network (LAN).'
             Style = csDropDownList
@@ -5214,9 +5126,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
               '')
           end
           object EdtGlobalIP: TEdit
-            Left = 153
+            Left = 223
             Top = 36
-            Width = 121
+            Width = 200
             Height = 21
             Hint = 
               'Your IP "in the internet". You have to configure your router and' +
@@ -5228,9 +5140,9 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBoxWebserverUserRights: TGroupBox
           Left = 8
-          Top = 186
+          Top = 197
           Width = 439
-          Height = 140
+          Height = 164
           Anchors = [akLeft, akTop, akRight]
           Caption = 'User rights'
           TabOrder = 1
@@ -5243,7 +5155,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Username'
           end
           object LblConst_Password2: TLabel
-            Left = 116
+            Left = 224
             Top = 20
             Width = 46
             Height = 13
@@ -5251,8 +5163,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Password'
           end
           object LblWebserverUserURL: TLabel
-            Left = 224
-            Top = 40
+            Left = 17
+            Top = 63
             Width = 74
             Height = 13
             Cursor = crHandPoint
@@ -5267,7 +5179,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cbAllowRemoteControl: TCheckBox
             Left = 16
-            Top = 113
+            Top = 134
             Width = 393
             Height = 15
             Hint = 'Let the user control the player (play/stop/next/volume/...)'
@@ -5276,7 +5188,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cbPermitVote: TCheckBox
             Left = 16
-            Top = 64
+            Top = 84
             Width = 392
             Height = 15
             Hint = 
@@ -5287,7 +5199,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cbPermitLibraryAccess: TCheckBox
             Left = 16
-            Top = 81
+            Top = 102
             Width = 393
             Height = 15
             Hint = 'Let the user search and browse in your library'
@@ -5296,7 +5208,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object cbPermitPlaylistDownload: TCheckBox
             Left = 16
-            Top = 97
+            Top = 118
             Width = 393
             Height = 15
             Hint = 'Let the user download files from your playlist and/or library'
@@ -5306,15 +5218,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object EdtUsername: TEdit
             Left = 17
             Top = 36
-            Width = 95
+            Width = 200
             Height = 21
             TabOrder = 0
             OnKeyPress = EdtUsernameKeyPress
           end
           object EdtPassword: TEdit
-            Left = 115
+            Left = 223
             Top = 36
-            Width = 97
+            Width = 200
             Height = 21
             TabOrder = 1
             OnKeyPress = EdtPasswordKeyPress
