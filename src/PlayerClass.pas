@@ -62,6 +62,7 @@ type
 
       fMainVolume: Single;          // the main volume of the player
       fHeadsetVolume: Single;       // the volume of the secondary player (headset)
+      fBirthdayVolume: Single;
       fSampleRateFaktor: Single;    // Factor to multiply the samplerate with (0.5 to 2)
 
       // values for Echo and Hall
@@ -70,7 +71,6 @@ type
       fReverbMix: single; // 0..96
 
       fPlayingTitel: UnicodeString; // the title of the current file, i.e. "interpret - title"
-      fPlayingTitelMode: Word;      // mode of this string, i.e. title, bitrate, lyrics
 
       fIsURLStream: Boolean;
       fHeadsetIsURLStream: Boolean;
@@ -194,6 +194,8 @@ type
       function GetAvoidMickyMausEffect: LongBool;
       procedure SetAvoidMickyMausEffect(aValue: LongBool);
 
+      function GetBirthdayVolume: Single;
+      procedure SetBirthdayVolume(Value: Single);
 
       procedure SetHeadsetVolume(Value: Single);    // the same stuff for the
       function GetHeadsetVolume: Single;
@@ -213,7 +215,7 @@ type
       Procedure SetEchoTime(Value: Single);
       Procedure SetEcho(mix, time: Single);
       Procedure SetReverbMix(Value: Single);          // Hall
-      procedure SetPlayingTitelMode(Value: Word);     // Playing-title-mode
+      /// procedure SetPlayingTitelMode(Value: Word);     // Playing-title-mode
       procedure SetAutoSplitMaxSize(Value: Integer);  // Split size for webstream recording
       function GetFloatable: Boolean;
 
@@ -367,6 +369,7 @@ type
 
         property Volume: Single read GetVolume write SetVolume;
         property HeadSetVolume: Single read GetHeadsetVolume write SetHeadsetVolume;
+        property BirthdayVolume: Single read GetBirthdayVolume write SetBirthdayVolume;
         property Time: Double read GetTime write SetTime;              // time in seconds
         property TimeInSec: Integer read fGetSeconds;
         property TimeInSecHeadset: Integer read fGetSecondsHeadset;
@@ -383,8 +386,6 @@ type
         property PlayingTitel: UnicodeString read fPlayingTitel;
         property PlayerLine1: UnicodeString read fGetPlayerLine1;
         property PlayerLine2: UnicodeString read fGetPlayerLine2;
-
-        property PlayingTitelMode: Word read fPlayingTitelMode write SetPlayingTitelMode;
 
         property URLStream: Boolean read fIsUrlStream;
 
@@ -484,7 +485,6 @@ type
         property HeadsetProgress: Double read GetHeadsetProgress write SetHeadsetProgress;
         property HeadsetDauer: Double read GetHeadsetLength;
 
-        function GenerateTitelString(aAudioFile: TAudioFile; aMode: integer): UnicodeString;
         // Aktualisiert den String, der in der Anzeige durchläuft
         procedure RefreshPlayingTitel;
         function GenerateTaskbarTitel: UnicodeString;
@@ -527,8 +527,8 @@ type
 
         Procedure SetEqualizer(band: Integer; gain: Single);
 
-        procedure ReadBirthdayOptions(aIniFilename: UnicodeString);
-        procedure WriteBirthdayOptions(aIniFilename: UnicodeString);
+        //procedure ReadBirthdayOptions(aIniFilename: UnicodeString);
+        //procedure WriteBirthdayOptions(aIniFilename: UnicodeString);
         function GetCountDownLength(aFilename: UnicodeString): Integer;
         procedure PauseForBirthday; // the same as nomale pause, but force fading
         Procedure PlayCountDown; // Countdown abspielen mit setzen der Syncs
@@ -1040,20 +1040,15 @@ begin
   DefaultGainWithRG     := ini.ReadFloat('Player', 'DefaultGainWithRG', 0);
 
 
-  fPlayingTitelMode     := ini.ReadInteger('Player','AnzeigeModus',0);
   UseVisualization      := ini.ReadBool('Player','UseVisual',True);
   VisualizationInterval := ini.ReadInteger('Player','Visualinterval',40);
   TimeMode              := Ini.ReadInteger('Player', 'ShowTime', 0);
   ScrollTaskbarTitel    := ini.ReadBool('Player','ScrollTaskbarTitel',False);
   ScrollTaskbarDelay    := ini.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
   if ScrollTaskbarDelay < 5 then ScrollTaskbarDelay := 5;
-  // ScrollAnzeigeDelay    := ini.ReadInteger('Player', 'ScrollAnzeigeDelay', 0);
-  // if ScrollAnzeigeDelay < 0 then ScrollAnzeigeDelay := 0;
 
   ReInitAfterSuspend    := ini.ReadBool('Player','ReInitAfterSuspend',False);
   PauseOnSuspend        := ini.ReadBool('Player','PauseOnSuspend',True);
-
-  //ShowCoverOnPlay       := ini.ReadBool('Player','ShowCoverOnPlay',True);
 
   PlayBufferSize        := ini.ReadInteger('Player','PlayBufferSize',500);
 
@@ -1117,6 +1112,13 @@ begin
   // hidden feature: user agent
   fNemp_BassUserAgent := ini.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
 
+  NempBirthdayTimer.UseCountDown := Ini.ReadBool('Event', 'UseCountDown', True);
+  NempBirthdayTimer.StartTime := Ini.ReadTime('Event', 'StartTime', 0 );
+  // NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
+  NempBirthdayTimer.BirthdaySongFilename := (Ini.ReadString('Event', 'BirthdaySongFilename', ''));
+  NempBirthdayTimer.CountDownFileName := (Ini.ReadString('Event', 'CountDownFileName', ''));
+  NempBirthdayTimer.ContinueAfter :=Ini.ReadBool('Event', 'ContinueAfter', True);
+
   NempScrobbler.LoadFromIni(Ini);
   NempLogFile.LoadFromIni(Ini);
   PostProcessor.LoadFromIni(Ini);
@@ -1151,19 +1153,15 @@ begin
   ini.WriteFloat('Player', 'DefaultGainWithRG', DefaultGainWithRG);
   ini.WriteFloat('Player', 'DefaultGain', DefaultGainWithoutRG);
 
-  ini.WriteInteger('Player','AnzeigeModus', fPlayingTitelMode);
   ini.WriteBool('Player','UseVisual', UseVisualization);
   ini.WriteInteger('Player','Visualinterval', VisualizationInterval);
   Ini.WriteInteger('Player', 'ShowTime', TimeMode);
   ini.WriteBool('Player','ScrollTaskbarTitel', ScrollTaskbarTitel);
   ini.WriteInteger('Player', 'ScrollTaskbarDelay', ScrollTaskbarDelay);
-  // ini.WriteInteger('Player', 'ScrollAnzeigeDelay', ScrollAnzeigeDelay);
 
 
   ini.WriteBool('Player','ReInitAfterSuspend',ReInitAfterSuspend);
   ini.WriteBool('Player','PauseOnSuspend',PauseOnSuspend);
-
-  //ini.WriteBool('Player','ShowCoverOnPlay', ShowCoverOnPlay);
 
   ini.WriteInteger('Player','PlayBufferSize',PlayBufferSize);
 
@@ -1209,6 +1207,14 @@ begin
       ini.WriteInteger('Player','EQ10',Round(fxGain[9] * EQ_NEW_FACTOR));
       ini.WriteString('Player', 'EQ-Settings', EQSettingName);
   end;
+
+  Ini.WriteBool('Event', 'UseCountDown', NempBirthdayTimer.UseCountDown);
+  Ini.WriteTime('Event', 'StartTime'            , NempBirthdayTimer.StartTime);
+  // StartCountDownTime will be calculated when the event is activated
+  // Ini.WriteTime('Event', 'StartCountDownTime'   , NempBirthdayTimer.StartCountDownTime);
+  Ini.WriteString('Event', 'BirthdaySongFilename' , (NempBirthdayTimer.BirthdaySongFilename));
+  Ini.WriteString('Event', 'CountDownFileName'    , (NempBirthdayTimer.CountDownFileName));
+  Ini.WriteBool('Event', 'ContinueAfter'        , NempBirthdayTimer.ContinueAfter);
 
   NempScrobbler.SaveToIni(Ini);
   NempLogFile.WriteToIni(Ini);
@@ -2071,6 +2077,21 @@ begin
   BASS_ChannelSetAttribute(HeadsetStream, BASS_ATTRIB_VOL, fHeadsetVolume);
 end;
 
+function TNempPlayer.GetBirthdayVolume: Single;
+begin
+    result := fBirthdayVolume * 100;
+end;
+
+procedure TNempPlayer.SetBirthdayVolume(Value: Single);
+begin
+    Value := Value / 100;
+    if Value < 0 then Value := 0;
+    if Value > 1 then Value := 1;
+    fBirthdayVolume := Value;
+    BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, fBirthdayVolume);
+    BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, fBirthdayVolume);
+end;
+
 procedure TNempPlayer.Mute;
 begin
   BASS_ChannelSetAttribute(MainStream, BASS_ATTRIB_VOL, 0);
@@ -2321,6 +2342,7 @@ function TNempPlayer.GetBassStatus: DWord;
 begin
   result := BASS_ChannelIsActive(MainStream);
 end;
+
 
 function TNempPlayer.GetBassHeadSetStatus: DWord;
 begin
@@ -2881,6 +2903,7 @@ begin
     end;
 end;
 
+
 procedure TNempPlayer.SetBSync(p1: Double);
 var ByteLength: Integer;
     SyncPos: LongWord;
@@ -3061,88 +3084,17 @@ end;
     Stuff for the GUI. Set Playingtitle, Mode, Taskbartitle, Play/Pause-Buttons, ...
     --------------------------------------------------------
 }
-procedure TNempPlayer.SetPlayingTitelMode(Value: Word);
-begin
-  fPlayingTitelMode := Value;
-  RefreshPlayingTitel;
-end;
-
-function TNempPlayer.GenerateTitelString(aAudioFile: TAudioFile; aMode: Integer): UnicodeString;
-begin
-  if aAudioFile = Nil then
-    result := ''
-  else
-  begin
-    case aMode of
-      MODE_ARTIST_TITEL: //if isURLtmp then
-                         //    result := aAudioFile.Titel   // !! Achtung - bei Ogg-Streams kommen hier nähere Infos!!!
-                         //else
-                         begin
-                            if UnKownInformation(aAudioFile.Artist) then
-                                result := aAudioFile.NonEmptyTitle
-                            else
-                                result := aAudioFile.Artist + ' - ' + aAudioFile.NonEmptyTitle;// + aaudiofile.Pfad;
-                         end;
-      MODE_PATH        : result := aAudioFile.Pfad;
-      MODE_INFO        : case aAudioFile.AudioType of
-                            at_File : begin
-                                result := Format('%s: %s, ',
-                                      [(Infostring_Duration), SekToZeitString(aAudioFile.Duration)]);
-
-                                if aAudioFile.Bitrate > 0 then
-                                begin
-                                  result := result + Format('%s: %dkbit/s', [(Infostring_Bitrate), aAudioFile.Bitrate]);
-                                  if aAudioFile.vbr then
-                                    result := result + ' (vbr), '
-                                  else
-                                    result := result + ', ';
-                                end;
-                                result := result + Format('%s: %s, %s, ',
-                                          [(Infostring_Samplerate),
-                                          aAudioFile.Samplerate,
-                                          aAudioFile.Channelmode]);
-                                result := result + ' (' + self.StreamType + ')';
-                            end;
-
-                            at_Stream: begin
-                                result := Format('%s, %s: %dkbit/s (%s)'
-                                  , [(Infostring_Webstream), (Infostring_Bitrate), aAudioFile.Bitrate, self.StreamType]);
-                            end;
-
-                            at_CDDA: begin
-                                result := Format('%s: %s, CD-Audio',
-                                      [(Infostring_Duration), SekToZeitString(aAudioFile.Duration)]);
-                            end;
-                         end;
-
-      MODE_LYRICS      : case aAudioFile.AudioType of
-                            at_File,
-                            at_CDDA: begin
-                                if aAudioFile.LyricsExisting then
-                                  result := (StringReplace(UTF8ToString(aAudioFile.Lyrics), #13#10, ' ', [rfReplaceAll]))
-                                else
-                                  result := (Infostring_NoLyrics);
-                            end;
-
-                            at_Stream: begin
-                                // im Namen steht die Beschreibung des Sender drin, das dürfte
-                                // dem am nächsten kommen
-                                result := aAudioFile.Description;
-                            end;
-                         end;
-      else
-          result := '-';
-    end;
-  end;
-
-  if result = '' then result := '...';
-end;
-
-
-
 procedure TNempPlayer.RefreshPlayingTitel;
 begin
-    fPlayingTitel := GenerateTitelString(MainAudioFile, fPlayingTitelMode);
+    if not assigned(MainAudioFile) then
+        fPlayingTitel := '...'
+    else
+    begin
+        if UnKownInformation(MainAudioFile.Artist) then
+            fPlayingTitel := MainAudioFile.NonEmptyTitle
+        else
+            fPlayingTitel := MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle;
+    end;
 end;
 
 function TNempPlayer.GenerateTaskbarTitel: UnicodeString;
@@ -3499,7 +3451,7 @@ begin
   SendMessage(MainWindowHandle, WM_ActualizePlayPauseBtn, wParam, lParam);
 end;
 
-
+ (*
 {
     --------------------------------------------------------
     Birthday-settings
@@ -3508,6 +3460,7 @@ end;
 procedure TNempPlayer.WriteBirthdayOptions(aIniFilename: UnicodeString);
 var ini: TMemIniFile;
 begin
+    EXIT ;
     ini := TMeminiFile.Create(aIniFilename, TEncoding.UTF8);
     try
         ini.Encoding := TEncoding.UTF8;
@@ -3531,6 +3484,7 @@ end;
 procedure TNempPlayer.ReadBirthdayOptions(aIniFilename: UnicodeString);
 var ini: TMemIniFile;
 begin
+  EXIT;
     ini := TMeminiFile.Create(aIniFilename, TEncoding.UTF8);
     try
         ini.Encoding := TEncoding.UTF8;
@@ -3540,10 +3494,13 @@ begin
         NempBirthdayTimer.BirthdaySongFilename := (Ini.ReadString('Event', 'BirthdaySongFilename', ''));
         NempBirthdayTimer.CountDownFileName := (Ini.ReadString('Event', 'CountDownFileName', ''));
         NempBirthdayTimer.ContinueAfter :=Ini.ReadBool('Event', 'ContinueAfter', True);
+
+        showmessage(NempBirthdayTimer.BirthdaySongFilename);
     finally
       ini.Free
     end;
 end;
+*)
 
 function TNempPlayer.GetCountDownLength(aFilename: UnicodeString): Integer;
 var tmpstream: DWord;
@@ -3598,6 +3555,8 @@ begin
     af := TAudioFile.Create;
     try
         af.Pfad := NempBirthdayTimer.CountDownFileName; // set path, determine AudioType
+        // read file information (needed for ReplayGain)
+        af.GetAudioData(NempBirthdayTimer.CountDownFileName);
 
         CountDownStream := NEMP_CreateStream(af,
                                  False, // kein Tempostream
@@ -3610,11 +3569,14 @@ begin
         // no. fading is better
         BASS_ChannelSetAttribute(CountDownStream, BASS_ATTRIB_VOL, 0);
 
+        // apply ReplayGain, if wanted
+        ApplyReplayGainToStream(CountDownStream, af);
+
         BirthdayCountDownSyncHandle :=
           Bass_ChannelSetSync(CountDownStream, BASS_SYNC_END, 0, @EndCountdownProc, self);
 
         BASS_ChannelPlay(CountDownStream, true);
-        BASS_ChannelSlideAttribute(CountDownStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+        BASS_ChannelSlideAttribute(CountDownStream, BASS_ATTRIB_VOL, fBirthdayVolume, FadingInterval);
 
     finally
         af.Free;
@@ -3626,6 +3588,9 @@ begin
     af := TAudioFile.Create;
     try
         af.Pfad := NempBirthdayTimer.BirthdaySongFilename; // set path, determine AudioType
+        // read file information (needed for ReplayGain)
+        af.GetAudioData(NempBirthdayTimer.BirthdaySongFilename);
+
         BirthdayStream := NEMP_CreateStream(af,
                                  False, // kein Tempostream
                                  False,  // ReverseStream
@@ -3638,8 +3603,11 @@ begin
 
         // Attribute setzen
         BASS_ChannelSetAttribute(BirthdayStream, BASS_ATTRIB_VOL, 0);
+        // apply ReplayGain, if wanted
+        ApplyReplayGainToStream(BirthdayStream, af);
+
         BASS_ChannelPlay(BirthdayStream, true);
-        BASS_ChannelSlideAttribute(BirthdayStream, BASS_ATTRIB_VOL, fMainVolume, FadingInterval);
+        BASS_ChannelSlideAttribute(BirthdayStream, BASS_ATTRIB_VOL, fBirthdayVolume, FadingInterval);
     finally
         af.Free;
     end;

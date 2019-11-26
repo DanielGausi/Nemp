@@ -106,6 +106,13 @@ type
                 AUDIO_M4aErr_Invalid_MDHD,
                 AUDIO_M4aErr_Invalid_STSD,
                 AUDIO_M4aErr_Invalid_STCO,
+                //-
+                AUDIO_M4aErr_Invalid_STBL,
+                AUDIO_M4aErr_Invalid_TRAK,
+                AUDIO_M4aErr_Invalid_MDIA,
+                AUDIO_M4aErr_Invalid_MINF,
+                AUDIO_M4aErr_Invalid_MOOV,
+                //-
                 AUDIO_M4aErr_Invalid_DuplicateUDTA,
                 AUDIO_M4aErr_Invalid_DuplicateTRAK,
 
@@ -160,6 +167,13 @@ type
               'Invalid MDHD Atom',
               'Invalid STSD Atom',
               'Invalid STCO Atom',
+               //
+              'Invalid STBL Atom',
+              'Invalid TRAK Atom',
+              'Invalid MDIA Atom',
+              'Invalid MINF Atom',
+              'Invalid MOOV Atom',
+              //
               'Duplicate UDTA Atoms',
               'Duplicate TRAK Atoms (probably a video file?)',
               //
@@ -813,6 +827,13 @@ begin
         M4aErr_Invalid_MDHD         : result := AUDIO_M4aErr_Invalid_MDHD         ;
         M4aErr_Invalid_STSD         : result := AUDIO_M4aErr_Invalid_STSD         ;
         M4aErr_Invalid_STCO         : result := AUDIO_M4aErr_Invalid_STCO         ;
+        // --------------
+        M4aErr_Invalid_STBL         : result := AUDIO_M4aErr_Invalid_STBL  ;
+        M4aErr_Invalid_TRAK         : result := AUDIO_M4aErr_Invalid_TRAK  ;
+        M4aErr_Invalid_MDIA         : result := AUDIO_M4aErr_Invalid_MDIA  ;
+        M4aErr_Invalid_MINF         : result := AUDIO_M4aErr_Invalid_MINF  ;
+        M4aErr_Invalid_MOOV         : result := AUDIO_M4aErr_Invalid_MOOV  ;
+        // -------------------
         M4aErr_Invalid_DuplicateUDTA: result := AUDIO_M4aErr_Invalid_DuplicateUDTA;
         M4aErr_Invalid_DuplicateTRAK: result := AUDIO_M4aErr_Invalid_DuplicateTRAK;
 

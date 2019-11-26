@@ -10939,7 +10939,7 @@ procedure TNemp_MainForm.MenuBirthdayStartClick(Sender: TObject);
 var timeleft: Integer;
 begin
     // Einstellungen lesen
-    NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
+    // NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
 
     if Not NempPlayer.CheckBirthdaySettings then
     begin

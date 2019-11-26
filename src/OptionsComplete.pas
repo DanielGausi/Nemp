@@ -1510,7 +1510,7 @@ begin
   //DTPBirthdayTime.Date := TDate(Now);
 
   // Daten aus Ini lesen
-  NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
+  // NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
   //Controls setzen
   with NempPlayer.NempBirthdayTimer do
   begin
@@ -2831,7 +2831,7 @@ begin
           end;
 
           ContinueAfter := CBContinueAfter.Checked;
-          NempPlayer.WriteBirthdayOptions(SavePath + NEMP_NAME + '.ini');
+          // NempPlayer.WriteBirthdayOptions(SavePath + NEMP_NAME + '.ini');
       end;
   end; //else
        // just ignore it

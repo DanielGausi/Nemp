@@ -187,7 +187,6 @@ type
         private
             function fIsReal: Boolean;
         public
-            //Block,
             Container1,
             Container2,
             Select,
@@ -241,7 +240,6 @@ type
             ControlPanelSubParent   : TNempBlockPanel;          // parentPanel if ControlPanelPosition=SubPanel
             ControlPanelTwoRows          : Boolean;
             ControlPanelShowCover        : Boolean;
-            //ControlPanelShowVisualisation: Boolean;
             // Show/Hide the "File Overview"-Panel
             HideFileOverviewPanel: Boolean;
 
@@ -282,9 +280,6 @@ type
             // not the same for MainForm and TestForm
             MainPanelMinHeight,
             MainPanelMinWidth: Integer;
-
-
-            //FormRatios: TNempMainFormRatios;
 
             property MainLayout: TMainLayout read fMainLayout;
             property RebuildingRightNow: Boolean read fRebuildingRightNow;
@@ -433,11 +428,6 @@ type
         DefaultFontStyles: TFontStyles;
         ArtistAlbenFontStyles: TFontStyles;
 
-        //CoverMode: Integer;
-        //DetailMode: Integer;
-        // ShowCoverAndDetails: Boolean;
-        // CoverWidth: Integer;
-
         ReplaceNAArtistBy  : Integer;
         ReplaceNATitleBy   : Integer;
         ReplaceNAAlbumBy   : Integer;
@@ -511,11 +501,6 @@ const
     MP3DB_VERSION   : Byte = 5;    //4;  // Dateiformat seit 4.13: "5.0"
     MP3DB_SUBVERSION: Byte = 0;    //2;
 
-    // "Extended Boolean", used for "unset" settings
-    //BoolUnDef = 0;
-    //BoolTrue = 1;
-    //BoolFalse = 2;
-
     //-------------
     // Zeug für die Anzeige:
     NEMP_NAME = 'Nemp'; // Bezeichnung der ini-Datei
@@ -532,18 +517,6 @@ const
     BROWSE_PLAYLISTS =     '!!{A8F4183D-C8FE-4585-A6C6-36FCC402143D}';
     BROWSE_RADIOSTATIONS = '!!{B3723948-3015-4E60-8727-4AC7663CE7A5}';
     BROWSE_ALL =           '!!{F7B03349-5B91-4025-B439-EAF46875717B}';
-
-    //ALL_ALBUMS = '{6388E9C0-F52B-4D3D-B958-8A87EFDD84B8}';
-
-    // Höhe der Cover/EQ/Lyrics/Effekte-Box
-    //EXTENDED_HEIGHT = 218;
-    // Minimale Höhe des oberen teils:
-    //TOP_MIN_HEIGHT = 323;//311///426;
-    // MAIN_PANEL_MIN_HEIGHT = 250;
-    // MAIN_PANEL_MIN_WIDTH  = 250;
-    //SUB_PANEL_MIN_WIDTH = 50;
-    //SUB_PANEL_MIN_HEIGHT = 50;
-
 
 
     //MAX_DRAGFILECOUNT = 2500; Now: NempOptions.maxDragFileCount
@@ -795,39 +768,6 @@ const
     MODE_INFO         = 2;
     MODE_LYRICS       = 3;
     MODE_MAX          = 4;
-
-    // Konstanten für die Indizes in der Buttons16ImageList. Da ändert sich ja ab und zu etwas,
-    // und die Bilder müssen zur Laufzeit gesetzt werden. Mit den Konstanten wird das hoffentlich leichter wartbar sein.
-    BTNIDX_SlideBack = 0;
-    BTNIDX_Previous = 1;
-    BTNIDX_Play = 2;
-    BTNIDX_Pause = 3;
-    BTNIDX_Stop = 4; // <--------
-    BTNIDX_StopDown = 5;
-
-    BTNIDX_Next = 6;
-    BTNIDX_SlideForward = 7;
-
-    BTNIDX_RepeatAll = 8;
-//    BTNIDX_RepeatTitle = 9;
-//    BTNIDX_Random = 10;  // <-----------
-//    BTNIDX_NoRepeat = 11;
-
-    BTNIDX_Reverse = 12;
-    BTNIDX_Forward = 13;
-
-    BTNIDX_RecordInActive = 14;
-    BTNIDX_RecordActive = 15;
-
-    BTNIDX_Minimize = 15;  // = BTNIDX_RecordActive !!
-    BTNIDX_Close = 16;
-    BTNIDX_Menu = 17;
-
-    BTNIDX_Max = 14; // = BTNIDX_RecordInActive !!
-
-    sepchar: char=';';
-
-
 
       SEARCH_ARTIST = 0;
       SEARCH_ALBUM  = 1;

@@ -36,16 +36,21 @@ interface
 
 uses
   Windows, Messages, SysUtils,  Classes,  Forms,
-  StdCtrls, Controls, gnuGettext;
+  StdCtrls, Controls, gnuGettext, Vcl.ExtCtrls, Vcl.ComCtrls, NempTrackBar;
 
 type
   TBirthdayForm = class(TForm)
-    Lbl_Congratulations: TLabel;
     Label1: TLabel;
     Label2: TLabel;
+    imgParty: TImage;
+    BtnClose: TButton;
+    tbVolume: TNempTrackBar;
+    VolumeImage: TImage;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure BtnCloseClick(Sender: TObject);
+    procedure tbVolumeChange(Sender: TObject);
   private
     { Private-Deklarationen }
 
@@ -64,17 +69,51 @@ uses NempMainUnit, MainFormHelper;
 
 
 procedure TBirthdayForm.FormCreate(Sender: TObject);
+var fn: String;
 begin
-  TranslateComponent (self);
+    TranslateComponent (self);
+
+    fn := ExtractFilePath(ParamStr(0)) + 'Images\congratulations.jpg';
+    if FileExists(fn) then
+        imgParty.Picture.LoadFromFile(fn);
 end;
 
 procedure TBirthdayForm.FormShow(Sender: TObject);
+var fn: String;
 begin
    SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
+
+   // default volume here: MainVolume
+   tbVolume.Position := Round(NempPlayer.Volume);
+   NempPlayer.BirthdayVolume := NempPlayer.Volume;
+
    if NempPlayer.NempBirthdayTimer.UseCountDown then
      NempPlayer.PlayCountDown
    else
      NempPlayer.PlayBirthday;
+
+   if Nemp_MainForm.NempSkin.isActive then
+   begin
+      fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'VolumeBirthday.png';
+      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'VolumeBirthday.jpg';
+      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'Volume.png';
+      if not FileExists(fn) then fn := IncludeTrailingPathDelimiter(Nemp_MainForm.NempSkin.Path) + 'Volume.jpg';
+      if not FileExists(fn) then fn := ExtractFilePath(ParamStr(0)) + 'Images\Volume.png';
+   end else
+      fn := ExtractFilePath(ParamStr(0)) + 'Images\Volume.png';
+
+    if FileExists(fn) then
+        VolumeImage.Picture.LoadFromFile(fn);
+end;
+
+procedure TBirthdayForm.tbVolumeChange(Sender: TObject);
+begin
+    NempPlayer.BirthdayVolume := tbVolume.Position;
+end;
+
+procedure TBirthdayForm.BtnCloseClick(Sender: TObject);
+begin
+    Close;
 end;
 
 procedure TBirthdayForm.FormClose(Sender: TObject;

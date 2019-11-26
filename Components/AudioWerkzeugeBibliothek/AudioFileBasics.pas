@@ -120,6 +120,11 @@ type
           M4aErr_Invalid_MDHD,
           M4aErr_Invalid_STSD,
           M4aErr_Invalid_STCO,
+          M4aErr_Invalid_STBL,
+          M4aErr_Invalid_TRAK,
+          M4aErr_Invalid_MDIA,
+          M4aErr_Invalid_MINF,
+          M4aErr_Invalid_MOOV,
           M4aErr_Invalid_DuplicateUDTA,
           M4aErr_Invalid_DuplicateTRAK,
 

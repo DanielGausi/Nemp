@@ -400,7 +400,14 @@ begin
         else
             fData.Seek(newSize-8, soCurrent);
 
-        inc(bytesProcessed, newSize);
+        // inc(bytesProcessed, newSize);
+        if newSize > 0 then
+            inc(bytesProcessed, newSize)
+        else
+        begin
+            bytesProcessed := fData.Size;
+            result := M4aErr_Invalid_TRAK;
+        end;
     end;
 end;
 
@@ -430,7 +437,14 @@ begin
         if tmp <> FileErr_None then
             result := tmp;
 
-        inc(bytesProcessed, newSize);
+        // inc(bytesProcessed, newSize);
+        if newSize > 0 then
+            inc(bytesProcessed, newSize)
+        else
+        begin
+            bytesProcessed := fData.Size;
+            result := M4aErr_Invalid_MDIA;
+        end;
     end;
 end;
 
@@ -485,7 +499,15 @@ begin
             result := Parse4_STBL(newSize)
         else
             fData.Seek(newSize-8, soCurrent);
-        inc(bytesProcessed, newSize);
+
+        //inc(bytesProcessed, newSize);
+        if newSize > 0 then
+            inc(bytesProcessed, newSize)
+        else
+        begin
+            bytesProcessed := fData.Size;
+            result := M4aErr_Invalid_MINF;
+        end;
     end;
 end;
 
@@ -519,7 +541,7 @@ begin
         else
         begin
             bytesProcessed := aSize;
-            result := M4aErr_Invalid_STCO; // eigentlich was anderes ...  TODO !!!
+            result := M4aErr_Invalid_STBL;
         end;
 
     end;
@@ -577,7 +599,7 @@ begin
     end else
     begin
         fOffsetPosition := fData.Position - 1 ;
-        /// NOTE: At this poition:
+        /// NOTE: At this position:
         ///  4 Bytes Version/Flags
         ///  4 Bytes Offset Count : X
         ///  X times 4 Bytes Offset Values
@@ -728,7 +750,16 @@ begin
                AtomList.Add(newAtom);
             end;
 
-        inc(bytesProcessed, newSize);
+        //inc(bytesProcessed, newSize);
+        if newSize > 0 then
+            inc(bytesProcessed, newSize)
+        else
+        begin
+            bytesProcessed := fData.Size;
+            result := M4aErr_Invalid_MOOV;
+        end;
+
+
     end;
 
     if not assigned(UdtaAtom) then
@@ -1164,17 +1195,40 @@ begin
                         newAtom := TMetaAtom.Create(newName);
                         newAtom.ReadFromStream(fData, newSize);
                         fMetaAtoms.Add(newAtom);
-                        inc(IlstProcessed, newSize);
+
+                        if newSize > 0 then
+                            inc(IlstProcessed, newSize)
+                        else
+                        begin
+                            IlstProcessed := IlstSize;
+                            result := M4aErr_Invalid_UDTA;
+                        end;
                     end;
-                    inc(bytesProcessed, IlstProcessed);
-                    inc(MetaProcessed, IlstProcessed);
+                    if IlstProcessed > 0 then
+                    begin
+                        inc(bytesProcessed, IlstProcessed);
+                        inc(MetaProcessed, IlstProcessed);
+                    end else
+                    begin
+                        bytesProcessed := fData.Size;
+                        MetaProcessed := MetaSize;
+                        result := M4aErr_Invalid_UDTA;
+                    end;
                 end else
                 begin
                     // some other atom, skip it
                     // probably "hdlr" or "free"
-                    fData.Seek(newSize-8, soCurrent);  // skip this atom
-                    inc(bytesProcessed, newSize-8);
-                    inc(MetaProcessed, newSize-8);
+                    if newSize > 8 then
+                    begin
+                        fData.Seek(newSize-8, soCurrent);  // skip this atom
+                        inc(bytesProcessed, newSize-8);
+                        inc(MetaProcessed, newSize-8);
+                    end else
+                    begin
+                        bytesProcessed := fData.Size;
+                        MetaProcessed := MetaSize;
+                        result := M4aErr_Invalid_UDTA;
+                    end;
                 end;
             end; // parsing ILST
         end // parse META
@@ -1182,8 +1236,15 @@ begin
         begin
             // other udta.[..]-atom
             // probably FREE-Atom
-            fData.Seek(newSize-8, soCurrent);
-            inc(bytesProcessed, newSize-8);
+            if newSize > 8 then
+            begin
+                fData.Seek(newSize-8, soCurrent);
+                inc(bytesProcessed, newSize-8);
+            end else
+            begin
+                bytesProcessed := fData.Size;
+                result := M4aErr_Invalid_UDTA;
+            end;
         end;
     end;
 
