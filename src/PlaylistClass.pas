@@ -45,6 +45,8 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
 type
   DWORD = cardinal;
 
+  TAudioFileEvent = procedure(Sender: TAudioFile) of object;
+
   TPreBookInsertMode = (pb_Beginning, pb_End);
 
   TIndexArray = Array of Array of Integer;
@@ -120,6 +122,7 @@ type
       // (new 4.11) ok, we'll get a mixture of SendMessages and Events by that, but
       // it's working, wo why not. maybe change the code to events anyway later ...
       fOnCueChanged: TNotifyEvent;
+      fOnDeleteAudiofile: TAudioFileEvent;
 
       function fGetPreBookCount: Integer;
 
@@ -226,6 +229,7 @@ type
       property PlayCounter: Integer read fPlayCounter;
       property VST: TVirtualStringTree read fVST write fVST;
       property OnCueChanged: TNotifyEvent read fOnCueChanged write fOnCueChanged;
+      property OnDeleteAudiofile: TAudioFileEvent read fOnDeleteAudiofile write fOnDeleteAudiofile;
 
       property InsertNode: PVirtualNode read fInsertNode write SetInsertNode;
       property InsertIndex: Integer read fInsertIndex;
@@ -924,6 +928,9 @@ begin
                 fPlayingFile := fBackUpFile;
                 Player.MainAudioFile := fBackUpFile;
               end;
+              if assigned(fOnDeleteAudiofile) then
+                  fOnDeleteAudiofile(aData^.FAudioFile);
+
               PrebookList.Remove(aData^.FAudioFile);
               RemoveFileFromHistory(aData^.FAudioFile);
               Playlist.Delete(Selectedmp3s[i].Index);
@@ -948,6 +955,7 @@ end;
 
 
 procedure TNempPlaylist.ClearPlaylist(StopPlayer: Boolean = True);
+var i: Integer;
 begin
     if StopPlayer then
     begin
@@ -959,6 +967,14 @@ begin
         fBackUpFile.Assign(fPlayingFile);
         fPlayingFile := fBackUpFile;
         Player.MainAudioFile := fBackUpFile;
+    end;
+
+    // call teh event-handler for removing audiofiles for every fils
+    // => set MedienBib-CurrentAudiofile := Nil, if necessary
+    if assigned(self.fOnDeleteAudiofile) then
+    begin
+        for i := 0 to Playlist.Count - 1 do
+            fOnDeleteAudiofile(TAudioFile(Playlist[i]))
     end;
 
     HistoryList.Clear;
@@ -985,6 +1001,9 @@ begin
   begin
       if not TPlaylistFile(Playlist.Items[i]).ReCheckExistence then
       begin
+          if assigned(fOnDeleteAudiofile) then
+              fOnDeleteAudiofile(TPlaylistFile(Playlist.Items[i]));
+
           PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
           HistoryList.Remove(TPlaylistFile(Playlist.Items[i]));
           RemoveFileFromHistory(TPlaylistFile(Playlist.Items[i]));
@@ -1004,6 +1023,10 @@ begin
   if assigned(aNode) then
   begin
       if aNode = fLastHighlightedSearchResultNode then fLastHighlightedSearchResultNode := Nil;
+
+      if assigned(fOnDeleteAudiofile) then
+          fOnDeleteAudiofile(fPlayingFile);
+
       PrebookList.Remove(fPlayingFile);
       RemoveFileFromHistory(fPlayingFile);
       Playlist.Remove(fPlayingfile);
@@ -2415,6 +2438,10 @@ begin
         fPlayingFile := fBackUpFile;
         Player.MainAudioFile := fBackUpFile;
     end;
+
+    if assigned(fOnDeleteAudiofile) then
+        fOnDeleteAudiofile(aData^.FAudioFile);
+
     PrebookList.Remove(aData^.FAudioFile);
     RemoveFileFromHistory(aData^.FAudioFile);
     Playlist.Delete(aNode.Index);

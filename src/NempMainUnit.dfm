@@ -106,7 +106,6 @@ object Nemp_MainForm: TNemp_MainForm
           OnResize = GRPBOXArtistsAlbenResize
           OnPaint = GRPBOXArtistsAlbenPaint
           OwnerDraw = False
-          ExplicitTop = 29
           DesignSize = (
             540
             212)

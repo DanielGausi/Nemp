@@ -1156,6 +1156,8 @@ type
     procedure NewPlayerPanelResize(Sender: TObject);
 
     procedure PlaylistCueChanged(Sender: TObject);
+    procedure PlaylistDeleteFile(aFile: TAudioFile);
+
     procedure OnPlayerStopped(Sender: TObject);
     procedure OnPlayerMessage(Sender: TObject; aMessage: String);
     procedure ReallyDeletePlaylistTimerTimer(Sender: TObject);
@@ -1887,6 +1889,7 @@ begin
     NempPlaylist.Player := NempPlayer;
     NempPlaylist.MainWindowHandle := FOwnMessageHandler;
     NempPlaylist.OnCueChanged := PlaylistCueChanged;
+    NempPlaylist.OnDeleteAudiofile := PlaylistDeleteFile;
 
     BibRatingHelper := TRatingHelper.Create;
 
@@ -7636,6 +7639,9 @@ begin
     spectrum.DrawClear;
 end;
 
+
+// Event-Handler for the Playlist:
+// Refresh some captions when a new entry in the CueSheet is played
 procedure TNemp_MainForm.PlaylistCueChanged(Sender: TObject);
 begin
     if MainPlayerControlsActive then
@@ -7648,8 +7654,15 @@ begin
     end;
 end;
 
+// Event-Handler for the Playlist:
+// Set MedienBib.CurrentAudioFile to Nil, if it's the file we want to remove from the playlist
+procedure TNemp_MainForm.PlaylistDeleteFile(aFile: TAudioFile);
+begin
+    if MedienBib.CurrentAudioFile = aFile then
+        MedienBib.CurrentAudioFile := Nil;
+end;
 
-// new procedure ... fit it in somehow ...
+
 procedure TNemp_MainForm.DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
 var fn, aHint: String;
     af: TAudioFile;

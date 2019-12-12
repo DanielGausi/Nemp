@@ -379,18 +379,20 @@ NempUpdate_Error = 'Could not get update information from server.';
 NempUpdate_UnkownError = 'An error occured while getting update information from server.';
 NempUpdate_CurrentVersion = 'You are using the newest version of Nemp.';
 NempUpdate_VersionError = 'Unable to extract version information from server.';
-NempUpdate_NewerVersion = 'A newer Version of Nemp is available. Do you want to download it now?';
+/// NempUpdate_NewerVersion = 'A newer Version of Nemp is available. Do you want to download it now?';
 
-NempUpdate_TestVersionAvailable = 'You are using the newest stable version of Nemp, but there is a new unstable version available.' + #13#10 + 'Do you want to download and test it now?';
-NempUpdate_NewerTestVersionAvailable = 'Thank you for beta-testing Nemp. There is a newer test-version of Nemp available.' + #13#10 + 'Do you want to download and test it now?';
+/// NempUpdate_TestVersionAvailable = 'You are using the newest stable version of Nemp, but there is a new unstable version available.' + #13#10 + 'Do you want to download and test it now?';
+/// NempUpdate_NewerTestVersionAvailable = 'Thank you for beta-testing Nemp. There is a newer test-version of Nemp available.' + #13#10 + 'Do you want to download and test it now?';
 NempUpdate_CurrentTestVersion = 'Thank you for beta-testing Nemp. You are using the newest version.';
 NempUpdate_PrivateVersion = 'It seems that you are using an experimental version of Nemp. Thank you for testing it.';
 
-NempUpdate_InfoYourVersion = 'Your version: %s';
-NempUpdate_InfoNewestVersion = 'Newest version: %s';
-NempUpdate_InfoLastRelease = 'Latest release: %s (%s)';
+NempUpdate_InfoNewVersionAvailable = 'New version available: %s';
+NempUpdate_InfoNewBetaVersionAvailable = 'New beta version available: %s';
+NempUpdate_InfoYourVersion = 'Your current version: %s';
+// NempUpdate_InfoNewestVersion = 'Newest version: %s';
+NempUpdate_InfoLastBetaRelease = 'Latest release: %s (%s)';
 NempUpdate_InfoLastStableRelease = 'Latest stable release: %s';
-NempUpdate_InfoNote = 'Note: %s';
+// NempUpdate_InfoNote = 'Note: %s';
 //NempUpdate_InfoFirstStart = 'It seems that you are using Nemp (or this version) for the first time. Nemp will now search for a newer version (even if it is probably up-to-date)' +#13#10
 //                            + 'to show you this function. After this Nemp will search once a week for an update without showing this message.'
 //                            + #13#10#13#10

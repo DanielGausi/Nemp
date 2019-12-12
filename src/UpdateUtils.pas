@@ -36,7 +36,9 @@ unit UpdateUtils;
 interface
 
 uses Windows, Classes, SysUtils, StrUtils, Messages, ExtCtrls, DateUtils,
-     Inifiles, Controls, System.Net.URLClient, System.Net.HttpClient,
+      Variants,  Graphics,  Forms, WinApi.ShellApi, Richedit, Vcl.StdCtrls,
+  Vcl.Controls, Vcl.ComCtrls,
+     Inifiles, System.Net.URLClient, System.Net.HttpClient, SystemHelper,
      HtmlHelper, Nemp_RessourceStrings;
 
 type
@@ -55,13 +57,17 @@ type
             constructor Create;
     end;
 
-    TUpdateType = (utNone, utError, utMajor, utMinor, utPatch, utBuild, utDownGrade);
+    TUpdateType = (utNone, utError, utDownGrade, utUpgrade);
 
     TNempUpdateInfo = class
        StableRelease: String;
-       LastRelease: String;
-       ReleaseStatus: String;
-       ReleaseNote: String;	
+       BetaRelease: String;
+       ReleaseNotes: TMemoryStream;
+       ReleaseNotes_DE: TMemoryStream;
+
+       ReleaseIsStable: Boolean;
+       constructor Create;
+       destructor Destroy; override;
     end;
 
     TNempUpdater = class
@@ -70,7 +76,6 @@ type
             fCancel: LongBool;
 
             fTimer: TTimer;
-
             fWindowHandle: HWnd;
 
             fLastCheck: TDateTime;
@@ -78,7 +83,6 @@ type
             fAutoCheck: Boolean;
 
             fThread: Integer;
-            fDownloadString: String;
 
             fManualCheck: Boolean;
             fNotifyOnBetas: Boolean;
@@ -94,10 +98,8 @@ type
             procedure SetCancel(Value: LongBool);
             function GetChecking: LongBool;
             procedure SetChecking(Value: LongBool);
-
             function GetLastCheck: TDateTime;
             procedure SetLastCheck(Value: TDateTime);
-
 
         public
             property LastCheck: TDateTime read GetLastCheck write SetLastCheck;
@@ -110,9 +112,6 @@ type
             // Threadsicher arbeiten
             property Cancel: LongBool read GetCancel write SetCancel;
 
-            // URL zur Versionsdatei im Netz (im Create setzen, nie ändern)
-            // property VersionInfoPath: String read fVersionInfoPath write fVersionInfoPath;
-
             // Update-Intervall in Tagen
             // 0: Bei jedem Start
             property CheckInterval: Integer read fCheckInterval write fCheckInterval;
@@ -121,7 +120,7 @@ type
 
             property ManualCheck: Boolean read fManualCheck;
 
-            // Is writeaccess to the inifile possible? If not: Dont show Diaalog, Dont search for Updates
+            // Is writeaccess to the inifile possible? If not: Dont show Dialog, Dont search for Updates
             property WriteAccessPossible: Boolean read fWriteAccessPossible write fWriteAccessPossible;
 
             constructor Create(aHandle: HWnd);
@@ -134,6 +133,25 @@ type
             procedure WriteToIni(ini: TMemIniFile);
     end;
 
+    TUpdateForm = class(TForm)
+        RichEdit1: TRichEdit;
+        Panel1: TPanel;
+        ImgLogo: TImage;
+        LblNewVersion: TLabel;
+        BtnDownload: TButton;
+        BtnClose: TButton;
+    lblCurrentVersion: TLabel;
+        procedure BtnCloseClick(Sender: TObject);
+        procedure BtnDownloadClick(Sender: TObject);
+        procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    private
+        { Private-Deklarationen }
+    public
+        { Public-Deklarationen }
+        UpdateInfo: TNempUpdateInfo;
+    end;
+
     procedure StartCheckForUpdates(Updater: TNempUpdater);
 
 
@@ -143,27 +161,33 @@ const
     UPDATE_VERSION_ERROR = 2;
     UPDATE_NEWER_VERSION = 3;
     UPDATE_CURRENT_VERSION = 4;
-//    UPDATE_OLDER_VERSION = 5;
 
     UPDATE_TEST_VERSION = 6;
     UPDATE_CURRENTTEST_VERSION = 7;
     UPDATE_NEWERTEST_VERSION = 8;
     UPDATE_PRIVATE_VERSION = 9;
 
-    UPDATE_URL = 'http://www.gausi.de/nemp/current_version.txt';
+    UPDATE_URL = 'http://www.gausi.de/nemp/update_summary.txt'; // new URL since 4.13
 
+    // some RTF files with ReleaseNotes (new in 4.13)
+    RELEASENOTES_URL = 'http://www.gausi.de/nemp/updates.rtf';
+    RELEASENOTES_BETA_URL = 'http://www.gausi.de/nemp/updates_beta.rtf';
+
+    RELEASENOTES_URL_DE = 'http://www.gausi.de/nemp/updates_de.rtf';
+    RELEASENOTES_BETA_URL_DE = 'http://www.gausi.de/nemp/updates_beta_de.rtf';
 
 Var
     NempUpdater: TNempUpdater;
+    UpdateForm: TUpdateForm;
 
     CSNempUpdateAccessLastCheck: RTL_CRITICAL_SECTION;
-
-
 
 implementation
 
 uses
-  Dialogs;
+  Dialogs, NempMainUnit;
+
+  {$R *.dfm}
 
 constructor TNempVersion.Create;
 var
@@ -209,18 +233,18 @@ begin
     fTimer.Interval := 60000; // = 1 minute
     fTimer.OnTimer := DoOnTimer;
     fTimer.Enabled := True;
-    
+
     fWindowHandle := aHandle;
     fThread := 0;
 end;
 
 destructor TNempUpdater.Destroy;
 begin
-  Cancel := True;
-  if fThread <> 0 then
-      WaitForSingleObject(fThread, 5000);
-  fTimer.Free;
-  inherited destroy;
+    Cancel := True;
+    if fThread <> 0 then
+        WaitForSingleObject(fThread, 5000);
+    fTimer.Free;
+    inherited destroy;
 end;
 
 procedure TNempUpdater.DoOnTimer(Sender: TObject);
@@ -296,110 +320,141 @@ begin
 end;
 
 procedure TNempUpdater.fCheckForUpdates;
-var //IDHttp: TIDHttp;
-    // HttpClient: THttpClient;
-    MessageText: String;
+var MessageText, fDownloadString: String;
     sl: TStrings;
     ini: TMemIniFile;
-    // StableVersion, LastRelease, ReleaseStatus, ReleaseNote: String;
     NempUpdateInfo: TNempUpdateInfo;
-begin
-    // Indy erstellen, Datei runterladen, Version checken, ggf. Message absenden (falls Cancel=false)
-    //IDHttp :=  TidHttp.Create;
-    //HttpClient := THttpClient.Create;
-    try
-        //IDHttp.ConnectTimeout:= 5000;
-        //IDHttp.ReadTimeout:= 5000;
-        //IDHttp.Request.UserAgent := 'Mozilla/3.0';
-        //HttpClient.UserAgent := 'Mozilla/3.0';
+    aResponse: IHttpResponse;
 
-        // VersionsDatei herunterladen
+    StableUpdate, BetaUpdate: TUpdateType;
+
+begin
+    try
+        // Get Update Summary
         fDownloadString := '';
-        //fDownloadString := IDHttp.Get(UPDATE_URL);
         fDownloadString := GetURLAsString(UPDATE_URL);
 
-            if not Cancel then
-            begin
-                sl := TStringList.Create;
+        if fDownloadString = '' then
+            exit;
+
+        if Cancel then
+            exit;
+
+        sl := TStringList.Create;
+        try
+            sl.Text := fDownloadString;
+            ini := TMemIniFile.Create('');
+            try
+                ini.SetStrings(sl);
+                NempUpdateInfo := TNempUpdateInfo.Create;
                 try
-                    sl.Text := fDownloadString;
-                    ini := TMemIniFile.Create('');
-                    try
-                        ini.SetStrings(sl);
-                        NempUpdateInfo := TNempUpdateInfo.Create;
-                        try
-                            NempUpdateInfo.StableRelease := ini.ReadString('UpdateInfo', 'StableRelease', 'x.x.x.x');
-                            NempUpdateInfo.LastRelease   := ini.ReadString('UpdateInfo', 'LastRelease', NempUpdateInfo.StableRelease);
-                            NempUpdateInfo.ReleaseStatus := ini.ReadString('UpdateInfo', 'ReleaseStatus', 'Beta');
-                            NempUpdateInfo.ReleaseNote   := ini.ReadString('UpdateInfo', 'ReleaseNote', 'Use with caution!');
+                    // Get version information from the downloaded Update Summary
+                    NempUpdateInfo.StableRelease := ini.ReadString('UpdateInfo', 'StableRelease', 'x.x.x.x');
+                    NempUpdateInfo.BetaRelease   := ini.ReadString('UpdateInfo', 'BetaRelease', NempUpdateInfo.StableRelease);
+
+                    StableUpdate := fGetUpdateType(NempUpdateInfo.StableRelease);
+                    BetaUpdate   := fGetUpdateType(NempUpdateInfo.BetaRelease)  ;
+
+                    // Download Release Notes
+                    // (we just download both german and english release notes)
+                    if (StableUpdate = utUpgrade) then
+                    begin
+                        // Download Release Information (Stable)
+                        aResponse := GetURLAsHttpResponse(RELEASENOTES_URL);
+                        if aResponse.StatusCode = 200 then
+                            NempUpdateInfo.ReleaseNotes.CopyFrom(aResponse.ContentStream, 0);
+                        if Cancel then exit;
+
+                        // Download Release Information (German, Stable)
+                        aResponse := GetURLAsHttpResponse(RELEASENOTES_URL_DE);
+                        if aResponse.StatusCode = 200 then
+                            NempUpdateInfo.ReleaseNotes_DE.CopyFrom(aResponse.ContentStream, 0);
+                        if Cancel then exit;
+
+                        NempUpdateInfo.ReleaseIsStable := True;
+                    end
+                    else
+                        if (BetaUpdate = utUpgrade) then
+                        begin
+                            // Download Release Information (Beta)
+                            aResponse := GetURLAsHttpResponse(RELEASENOTES_BETA_URL);
+                            if aResponse.StatusCode = 200 then
+                                NempUpdateInfo.ReleaseNotes.CopyFrom(aResponse.ContentStream, 0);
+                            if Cancel then exit;
+
+                            // Download Release Information (German, Beta)
+                            aResponse := GetURLAsHttpResponse(RELEASENOTES_BETA_URL_DE);
+                            if aResponse.StatusCode = 200 then
+                                NempUpdateInfo.ReleaseNotes_DE.CopyFrom(aResponse.ContentStream, 0);
+                            if Cancel then exit;
+
+                            NempUpdateInfo.ReleaseIsStable := False;
+                        end;
 
 
-                            case fGetUpdateType(NempUpdateInfo.StableRelease) of
-                                utError : SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
-                                utMajor,
-                                utMinor,
-                                utPatch,  // Es gibt eine neue Stabile Version => Update empfehlen
-                                utBuild : SendMessage(fWindowHandle, WM_Update, UPDATE_NEWER_VERSION, lParam(NempUpdateInfo));  //Param: Stable-version aus Ini
+                    case StableUpdate of
+                        // something is wrong with the Uodate-File
+                        utError   : SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
 
-                                utNone  : begin
-                                    // stabile Version ist aktuell - ggf. auf alpha/beta/release candidate testen
+                        // There is an Update available
+                        utUpgrade : SendMessage(fWindowHandle, WM_Update, UPDATE_NEWER_VERSION, lParam(NempUpdateInfo));  //Param: Stable-version aus Ini
 
-                                    if NempUpdateInfo.LastRelease = NempUpdateInfo.StableRelease then
-                                        // lokale Version ist die aktuelle, weitere Testversionen gibt es nicht
-                                        SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENT_VERSION, 0)       // Kein Parameter notwendig
-                                    else
-                                    begin
-                                        // Lastrelease weicht zumindest auf den ersten Blick von der lokalen Version ab
-                                        case fGetUpdateType(NempUpdateInfo.LastRelease) of
-                                            utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
-                                            utMajor,
-                                            utMinor,
-                                            utPatch,
-                                            utBuild : // lokale Version aktuell, aber eine Testversion ist verfügbar
-                                                SendMessage(fWindowHandle, WM_Update, UPDATE_TEST_VERSION, lParam(NempUpdateInfo));
+                        // current user version matches the most recent stable version
+                        utNone  : begin
+                            // check for "beta" versions
+                            if NempUpdateInfo.BetaRelease = NempUpdateInfo.StableRelease then
+                                // both version informations are the same - no further action needed
+                                SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENT_VERSION, 0)
+                            else
+                            begin
+                                // Beta version may be newer than the last stable release
+                                case BetaUpdate of
+                                    utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
 
-                                            utNone: // lokale Version aktuell, neue Testversion auch (der Fall kann eigentlich hier nicht eintreten)
-                                                SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
+                                    // new beta version available
+                                    utUpgrade: SendMessage(fWindowHandle, WM_Update, UPDATE_TEST_VERSION, lParam(NempUpdateInfo));
 
-                                            utDownGrade: // lokale Version aktuell, und _neuer_ als das letzte Release!
-                                                         // kann eigentlich auch nicht auftreten, da LastRelease >= StableVersion gilt
-                                                SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
-                                        end;
-                                    end;
-                                end; // StableVersion = lokale Version
+                                    // same version (should not happen here ...)
+                                    utNone: SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
 
-                                utDownGrade : begin
-                                    // Lokale Version ist bereits eine Testversion
-                                    // hier: auf eine neue Testversion checken ...
-
-                                    case fGetUpdateType(NempUpdateInfo.LastRelease) of
-                                        utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
-                                        utMajor,
-                                        utMinor,
-                                        utPatch,
-                                        utBuild : // Neuere TestVersion ist verfügbar
-                                            SendMessage(fWindowHandle, WM_Update, UPDATE_NEWERTEST_VERSION, lParam(NempUpdateInfo));
-
-                                        utNone: // lokale Version ist die aktuellste Testversion
-                                            SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
-
-                                        utDownGrade: // lokale Version ist noch nicht auf dem Server bekannt
-                                            SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
-                                    end
+                                    // another case that should be impossible, unless the release information ist bugged
+                                    // (beta versions should have a *higher* number than stable releases)
+                                    utDownGrade: SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
                                 end;
                             end;
-                        finally
-                            NempUpdateInfo.Free;
+                        end; // StableVersion = curent user version
+
+                        // current user version is already a beta version
+                        utDownGrade : begin
+                            // check, whether there is a more recent beta version
+                            case BetaUpdate of
+                                utError: SendMessage(fWindowHandle, WM_Update, UPDATE_VERSION_ERROR, 0);
+
+                                // new beta version available
+                                utUpgrade : SendMessage(fWindowHandle, WM_Update, UPDATE_NEWERTEST_VERSION, lParam(NempUpdateInfo));
+
+                                // no update available
+                                utNone: SendMessage(fWindowHandle, WM_Update, UPDATE_CURRENTTEST_VERSION, 0);
+
+                                // developer version, should only happen for me and noone else ;-)
+                                utDownGrade:  SendMessage(fWindowHandle, WM_Update, UPDATE_PRIVATE_VERSION, lParam(NempUpdateInfo));
+                            end;
+
                         end;
-                    finally
-                        ini.Free;
+
                     end;
-                    LastCheck := Now;
 
                 finally
-                    sl.Free;
+                    NempUpdateInfo.Free;
                 end;
-            end; // else nichts machen
+            finally
+                ini.Free;
+            end;
+            LastCheck := Now;
+
+        finally
+            sl.Free;
+        end;
 
     except
         on E: ENetHTTPClientException do begin
@@ -412,28 +467,6 @@ var //IDHttp: TIDHttp;
             MessageText := NempUpdate_Error + #13#10#13#10 + E.Message ;
             SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
         end;
-
-        {
-        on E: EIdHTTPProtocolException do
-        begin
-            MessageText := NempUpdate_Error + #13#10#13#10 + E.Message;
-            SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
-            //(z.B. 404)
-        end;
-
-        on E: EIdSocketError do
-        begin
-            MessageText := NempUpdate_ConnectError + #13#10#13#10 + E.Message;
-            SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
-        end;
-
-        on E: EIdexception do
-        begin
-            MessageText := NempUpdate_UnkownError + '(' + E.ClassName + ')' + #13#10#13#10 + E.Message;
-            SendMessage(fWindowHandle, WM_Update, UPDATE_CONNECT_ERROR, lParam(PChar(MessageText)));
-        end;
-        }
-
     end;
 
 
@@ -441,9 +474,8 @@ var //IDHttp: TIDHttp;
     Checking := False;
     CloseHandle(fThread);
     fThread := 0;
-
-    // IDHttp.Free;
 end;
+
 
 function TNempUpdater.fGetUpdateType(aString: String): TUpdateType;
 var idx1, idx2: Integer;
@@ -451,9 +483,6 @@ var idx1, idx2: Integer;
     major, minor, patch, build: Cardinal;
     NempVersion: TNempVersion;
 begin
-  //(utNone, utError, utMajor, utMinor, utPatch, utBuild);
-//  result := utNone;
-
   idx1 := 1;
   idx2 := pos('.', aString);
   intStr := Copy(aString, idx1, idx2-idx1);
@@ -470,7 +499,6 @@ begin
   patch := StrToIntDef(intStr, 99999);
 
   idx1 := idx2+1;
-  //idx2 := posEx('.', fDownloadString, idx1);
   intStr := Copy(aString, idx1, 10);
   build := StrToIntDef(intStr, 99999);
 
@@ -483,25 +511,26 @@ begin
       try
           try
               if major > NempVersion.Major then
-                  result := utMajor;
+                  result := utUpgrade;
 
               if major < NempVersion.Major then
                   result := utDownGrade;
 
               if (result = utNone) and (minor > NempVersion.Minor) then
-                  result := utMinor;
+                  result := utUpgrade;
               if (result = utNone) and (minor < NempVersion.Minor) then
                   result := utDownGrade;
 
               if (result = utNone)  and (patch > NempVersion.Patch) then
-                  result := utPatch;
+                  result := utUpgrade;
               if (result = utNone)  and (patch < NempVersion.Patch) then
                   result := utDownGrade;
 
               if (result = utNone)  and (build > NempVersion.Build) then
-                  result := utBuild;
+                  result := utUpgrade;
               if (result = utNone)  and (build < NempVersion.Build) then
                   result := utDownGrade;
+
           except
               result := utError;
           end;
@@ -510,6 +539,8 @@ begin
       end;
   end;
 end;
+
+
 
 procedure TNempUpdater.LoadFromIni(ini: TMemIniFile);
 begin
@@ -521,10 +552,72 @@ end;
 
 procedure TNempUpdater.WriteToIni(ini: TMemIniFile);
 begin
-     Ini.WriteDateTime('Updater', 'LastCheck', LastCheck);
-     Ini.WriteInteger('Updater', 'Interval', fCheckInterval);
-     Ini.WriteBool('Updater', 'AutoCheck', fAutoCheck);
-     Ini.WriteBool('Updater', 'NotifyOnBetas', fNotifyOnBetas);
+    Ini.WriteDateTime('Updater', 'LastCheck', LastCheck);
+    Ini.WriteInteger('Updater', 'Interval', fCheckInterval);
+    Ini.WriteBool('Updater', 'AutoCheck', fAutoCheck);
+    Ini.WriteBool('Updater', 'NotifyOnBetas', fNotifyOnBetas);
+end;
+
+procedure TUpdateForm.BtnCloseClick(Sender: TObject);
+begin
+    Close;
+end;
+
+procedure TUpdateForm.BtnDownloadClick(Sender: TObject);
+begin
+    if (LeftStr(Nemp_MainForm.NempOptions.Language,2) = 'de') then
+        ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp.html', nil, nil, SW_SHOW)
+    else
+        ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp-en.html', nil, nil, SW_SHOW);
+end;
+
+procedure TUpdateForm.FormCreate(Sender: TObject);
+var filename: String;
+begin
+    filename := ExtractFilePath(ParamStr(0)) + 'Images\NempLogo.png';
+    if FileExists(filename) then
+        ImgLogo.Picture.LoadFromFile(filename);
+end;
+
+procedure TUpdateForm.FormShow(Sender: TObject);
+begin
+    UpdateInfo.ReleaseNotes.Position := 0;
+
+    if UpdateInfo.ReleaseIsStable then
+        lblNewVersion.Caption     := Format(NempUpdate_InfoNewVersionAvailable, [UpdateInfo.StableRelease] )
+    else
+        lblNewVersion.Caption     := Format(NempUpdate_InfoNewBetaVersionAvailable, [UpdateInfo.BetaRelease] );
+
+    lblCurrentVersion.Caption := Format(NempUpdate_InfoYourVersion        , [GetFileVersionString('')] );
+
+    UpdateInfo.ReleaseNotes_DE.Position := 0;
+    UpdateInfo.ReleaseNotes.Position := 0;
+
+    if (LeftStr(Nemp_MainForm.NempOptions.Language,2) = 'de') then
+    begin
+        if UpdateInfo.ReleaseNotes_DE.Size = 0 then
+            // If the german release notes are empty: Show the regular ones
+            // (this may happen on beta releases ...)
+            UpdateForm.RichEdit1.Lines.LoadFromStream(UpdateInfo.ReleaseNotes)
+        else
+            UpdateForm.RichEdit1.Lines.LoadFromStream(UpdateInfo.ReleaseNotes_DE);
+    end else
+        UpdateForm.RichEdit1.Lines.LoadFromStream(UpdateInfo.ReleaseNotes);
+end;
+
+{ TNempUpdateInfo }
+
+constructor TNempUpdateInfo.Create;
+begin
+    ReleaseNotes    := TMemoryStream.Create;
+    ReleaseNotes_DE := TMemoryStream.Create;
+end;
+
+destructor TNempUpdateInfo.Destroy;
+begin
+  ReleaseNotes.Free;
+  ReleaseNotes_DE.Free;
+  inherited;
 end;
 
 initialization

@@ -1299,93 +1299,63 @@ end;
 
 
 function Handle_UpdaterMessage(Var aMsg: TMessage): Boolean;
+var UpdateInfo: TNempUpdateInfo;
+
+    procedure ShowUpdateForm;
+    begin
+        UpdateInfo := TNempUpdateInfo(aMsg.LParam);
+        if not assigned(UpdateForm) then
+            Application.CreateForm(TUpdateForm, UpdateForm);
+        UpdateForm.UpdateInfo := TNempUpdateInfo(aMsg.LParam);
+        UpdateForm.Show;
+    end;
 begin
     result := True;
-    with Nemp_MainForm do
+
     Case aMsg.WParam of
-      // Aktuelle Version oder Fehler: Bei Auto-Check keine Message zeigen.
-      UPDATE_CURRENT_VERSION: if NempUpdater.ManualCheck then
-                              begin
-                                  MessageDlg(NempUpdate_CurrentVersion, mtInformation, [mbOK], 0);
-                              end;
-      UPDATE_VERSION_ERROR  : if NempUpdater.ManualCheck then
-                              begin
-                                  MessageDlg(NempUpdate_VersionError, mtError, [mbOK], 0);
-                              end;
-      UPDATE_CONNECT_ERROR  : if NempUpdater.ManualCheck then
-                              begin
-                                  MessageDlg(PChar(aMsg.LParam), mtError, [mbOK], 0);
-                              end;
+        // No Update available or some error occured: Only show a Message when the Update check was triggered manually
+        UPDATE_CURRENT_VERSION: if NempUpdater.ManualCheck then
+                                    MessageDlg(NempUpdate_CurrentVersion, mtInformation, [mbOK], 0);
+        UPDATE_VERSION_ERROR  : if NempUpdater.ManualCheck then
+                                    MessageDlg(NempUpdate_VersionError, mtError, [mbOK], 0);
+        UPDATE_CONNECT_ERROR  : if NempUpdater.ManualCheck then
+                                    MessageDlg(PChar(aMsg.LParam), mtError, [mbOK], 0);
 
-      UPDATE_NEWER_VERSION  : begin
-                                  // Neue Version: immer anzeigen
-                                  if TranslateMessageDLG(
-                                      NempUpdate_NewerVersion + #13#10#13#10 +
-                                      Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
-                                      Format(NempUpdate_InfoNewestVersion, [TNempUpdateInfo(aMsg.LParam).StableRelease ])
-                                      , mtInformation, [mbYes, mbNo], 0) = mrYes then
+        // New version available: Notify the user (always, also on automatic check)
+        UPDATE_NEWER_VERSION  : ShowUpdateForm;
 
-                                      ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp/download.php', nil, nil, SW_SHOW);
-                              end;
-
-      UPDATE_TEST_VERSION   : begin
-                                  if NempUpdater.NotifyOnBetas then
-                                  begin
-                                      if TranslateMessageDLG(
-                                          NempUpdate_TestVersionAvailable + #13#10#13#10 +
-                                          Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
-                                          Format(NempUpdate_InfoLastRelease, [TNempUpdateInfo(aMsg.LParam).LastRelease, TNempUpdateInfo(aMsg.LParam).ReleaseStatus ]) + #13#10 +
-                                          Format(NempUpdate_InfoNote, [TNempUpdateInfo(aMsg.LParam).ReleaseNote])
-                                          , mtInformation, [mbYes, mbNo], 0) = mrYes then
-                                              ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp/download.php', nil, nil, SW_SHOW);
-                                  end else
-                                      // nur bei Manual zeigen - und dann "Current version"
-                                      if NempUpdater.ManualCheck then
-                                          MessageDlg(NempUpdate_CurrentVersion, mtInformation, [mbOK], 0);
-                              end;
-
-      UPDATE_CURRENTTEST_VERSION: begin
-                                    if NempUpdater.ManualCheck then
-                                    begin
-                                        if NempUpdater.NotifyOnBetas then
-                                            MessageDlg(NempUpdate_CurrentTestVersion, mtInformation, [mbOK], 0)
-                                        else
-                                            MessageDlg(NempUpdate_CurrentTestVersion, mtInformation, [mbOK], 0);
-                                    end;
-                              end;
-
-      UPDATE_NEWERTEST_VERSION: begin
-                                  //if NempUpdater.NotifyOnBetas then
-                                  //begin
-                                  // No. Wenn man schon eine Beta nutzt, werden auch neue gezeigt!
-                                      if TranslateMessageDLG(
-                                          NempUpdate_NewerTestVersionAvailable + #13#10#13#10 +
-                                          Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
-                                          Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
-                                          Format(NempUpdate_InfoLastRelease, [TNempUpdateInfo(aMsg.LParam).LastRelease, TNempUpdateInfo(aMsg.LParam).ReleaseStatus ]) + #13#10 +
-                                          Format(NempUpdate_InfoNote, [TNempUpdateInfo(aMsg.LParam).ReleaseNote])
-                                          , mtInformation, [mbYes, mbNo], 0) = mrYes then
-                                          ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp/download.php', nil, nil, SW_SHOW)
-                                  //end else
-                                  //begin
-                                  //    if NempUpdater.ManualCheck then
-                                  //        MessageDlg(NempUpdate_CurrentTestVersion, mtInformation, [mbOK], 0);
-                                  //end;
-
-                              end;
-
-      UPDATE_PRIVATE_VERSION: begin
-                                if NempUpdater.ManualCheck then
-                                begin
-                                     TranslateMessageDLG(
-                                        NempUpdate_PrivateVersion + #13#10#13#10 +
-                                        Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
-                                        Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')]) + #13#10 +
-                                        Format(NempUpdate_InfoLastRelease, [TNempUpdateInfo(aMsg.LParam).LastRelease, TNempUpdateInfo(aMsg.LParam).ReleaseStatus ])
-                                        , mtInformation, [mbOk], 0)
+        // New beta version available: Notify the user, if he wants to test beta releases
+        UPDATE_TEST_VERSION   : begin
+                                    if NempUpdater.NotifyOnBetas then
+                                       ShowUpdateForm
+                                    else
+                                        // There is an beta-update, but the user wants no notification for that
+                                        // => show "everything's fine", but only on manual check
+                                        if NempUpdater.ManualCheck then
+                                            MessageDlg(NempUpdate_CurrentVersion, mtInformation, [mbOK], 0);
                                 end;
 
-                              end;
+        // the User is already using a beta version, and there is no further update available
+        // => tell him that , but only on manual check
+        UPDATE_CURRENTTEST_VERSION: begin
+                                      if NempUpdater.ManualCheck then
+                                          MessageDlg(NempUpdate_CurrentTestVersion, mtInformation, [mbOK], 0);
+                                end;
+
+        // the User is already using a beta version, and there is a newer beta available
+        // In that case, ignore setting "NotifyOnBetas", as it should be assumed, that the
+        // user *is* interested in this new version
+        UPDATE_NEWERTEST_VERSION:  ShowUpdateForm;
+
+        // developer version, not published yet
+        UPDATE_PRIVATE_VERSION: begin
+                                    if NempUpdater.ManualCheck then
+                                         TranslateMessageDLG(
+                                            NempUpdate_PrivateVersion + #13#10#13#10 +
+                                            Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
+                                            Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')])
+                                            , mtInformation, [mbOk], 0)
+                                end;
     end;
 end;
 
@@ -1533,26 +1503,6 @@ begin
                           Datos := PDevBroadcastHdr(Message.lParam);
                           devType := Datos^.dbch_devicetype;
 
-                          {if (devType = DBT_DEVTYP_DEVICEINTERFACE)
-                          then showmessage('DBT_DEVTYP_DEVICEINTERFACE');
-
-                          if (devType = DBT_DEVTYP_VOLUME)
-                          then showmessage('DBT_DEVTYP_VOLUME');  }
-
-                        {
-                          if (devType = DBT_DEVTYP_VOLUME) and (Message.wParam = DBT_DEVICEARRIVAL) then
-                          begin
-                              //repair playlist
-                              // treat lParam now as PDevBroadcastVolume
-                              VolInfo := PDevBroadcastVolume(Message.lParam);
-
-                              UnitMask := VolInfo^.dbcv_unitmask;
-                              Showmessage(Inttostr(unitmask));
-
-                          end;
-
-                         }
-
                           if (devType = DBT_DEVTYP_DEVICEINTERFACE) or (devType = DBT_DEVTYP_VOLUME) then
                           begin // USB Device
                             if Message.wParam = DBT_DEVICEARRIVAL then
@@ -1561,12 +1511,7 @@ begin
                               HandleNewConnectedDrive;
                             end
                             else
-                                begin
-                                    Message.Result := 1;
-                                   // if Assigned(FOnUSBRemove) then
-                                   //   FOnUSBRemove(Self);
-                                end;
-
+                                Message.Result := 1;
                           end;
                       end;
 
@@ -1732,7 +1677,6 @@ begin
 
     WM_PlayerSilenceDetected: begin
         NempPlayer.ProcessSilenceDetection(TSilenceDetector(Message.wParam));
-        //caption := 'Silence detected';
     end;
 
     WM_PlayerPrescanComplete: begin
