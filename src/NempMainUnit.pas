@@ -10951,10 +10951,7 @@ end;
 procedure TNemp_MainForm.MenuBirthdayStartClick(Sender: TObject);
 var timeleft: Integer;
 begin
-    // Einstellungen lesen
-    // NempPlayer.ReadBirthdayOptions(SavePath + NEMP_NAME + '.ini');
-
-    if Not NempPlayer.CheckBirthdaySettings then
+    if (not BirthdayTimer.Enabled) AND (Not NempPlayer.CheckBirthdaySettings) then
     begin
           if TranslateMessageDLG((BirthdaySettings_Incomplete), mtWarning, [mbYes, mbNo], 0) = mrYes then
           begin

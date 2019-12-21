@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer8
+      ActivePage = TabPlayer6
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -4599,6 +4599,16 @@ object OptionsCompleteForm: TOptionsCompleteForm
             OnExit = mskEdt_BirthdayTimeExit
           end
         end
+        object BtnActivateBirthdayMode: TButton
+          Left = 312
+          Top = 303
+          Width = 131
+          Height = 25
+          Anchors = [akTop, akRight]
+          Caption = 'Activate'
+          TabOrder = 2
+          OnClick = BtnActivateBirthdayModeClick
+        end
       end
       object TabPlayer7: TTabSheet
         Caption = 'Player (Scrobble)'
@@ -4998,7 +5008,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           object LblWebserverAdminURL: TLabel
             Left = 16
             Top = 131
-            Width = 401
+            Width = 106
             Height = 13
             Cursor = crHandPoint
             Caption = 'http://localhost/admin'

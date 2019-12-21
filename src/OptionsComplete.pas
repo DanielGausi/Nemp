@@ -534,6 +534,7 @@ type
     cb_ReplayGainPreventClipping: TCheckBox;
     lblRG_Preamp1: TLabel;
     lblRG_Preamp2: TLabel;
+    BtnActivateBirthdayMode: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -645,6 +646,7 @@ type
     procedure tp_DefaultGain2Change(Sender: TObject);
     procedure tp_DefaultGain2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure BtnActivateBirthdayModeClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -1531,6 +1533,12 @@ begin
     LblEventWarning.Visible := NOT FileExists(BirthdaySongFilename);
   end;
 
+  if Nemp_MainForm.BirthdayTimer.Enabled then
+      BtnActivateBirthdayMode.Caption := MenuItem_Deactivate
+  else
+      BtnActivateBirthdayMode.Caption := MenuItem_Activate;
+
+
   // Hotkeys setzen
   ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
   try
@@ -2273,6 +2281,45 @@ begin
 end;
 
 
+procedure TOptionsCompleteForm.BtnActivateBirthdayModeClick(Sender: TObject);
+begin
+    // Apply Birthday-Mode settings
+    if ValidTime(mskEdt_BirthdayTime.Text) then
+    begin
+        with NempPlayer.NempBirthdayTimer do
+        begin
+            if (CountDownFileName <> EditCountdownSong.Text)
+              or (BirthdaySongFilename <> EditBirthdaySong.Text)
+              or (UseCountDown <> CBStartCountDown.Checked)
+              or (StartTime <> StrToTime(mskEdt_BirthdayTime.Text))
+            then
+            begin
+                CountDownFileName := EditCountdownSong.Text;
+                BirthdaySongFilename := EditBirthdaySong.Text;
+                StartTime := StrToTime(mskEdt_BirthdayTime.Text);
+                UseCountDown := CBStartCountDown.Checked AND (Trim(EditCountdownSong.Text)<> '');
+
+                if UseCountDown then
+                    StartCountDownTime := IncSecond(StartTime, - NempPlayer.GetCountDownLength(CountDownFileName))
+                else
+                    StartCountDownTime := StartTime;
+            end;
+            ContinueAfter := CBContinueAfter.Checked;
+        end;
+    end;
+
+    // Check settings
+    if (NOT Nemp_MainForm.BirthdayTimer.Enabled) AND (Not NempPlayer.CheckBirthdaySettings) then
+        // abort activating
+        TranslateMessageDLG((BirthdaySettings_IncompleteSettingsDialog), mtWarning, [mbOk], 0)
+    else
+    begin
+        // Activate Birthday-Mode (or cancel it)
+         Nemp_MainForm.MM_T_BirthdayActivate.click;
+    end;
+end;
+
+
 
 procedure TOptionsCompleteForm.cbSaveLogToFileClick(Sender: TObject);
 begin
@@ -2280,6 +2327,7 @@ begin
   LblLogDuration  .Enabled := cbSaveLogToFile.Checked;
   LblLogDuration2 .Enabled := cbSaveLogToFile.Checked;
 end;
+
 
 
 

@@ -449,6 +449,7 @@ NempUpdate_InfoLastStableRelease = 'Latest stable release: %s';
   BirthdayCountDown_Caption = 'Birthday in %s';
   BirthdayCountDown_Hint    = 'In %s the current playlist will be interrupted for a little birthday song.';
   BirthdaySettings_Incomplete = 'Settings for birthday mode are incomplete. Edit them now?';
+  BirthdaySettings_IncompleteSettingsDialog = 'Settings for birthday mode are incomplete. Please correct them first.';
 
 (*
 SkinEditor_QueryDeleteMainBMP   = 'Preferred image file "main.bmp" already exists and must be deleted first. Continue?';

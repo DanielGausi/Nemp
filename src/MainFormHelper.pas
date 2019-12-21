@@ -559,6 +559,9 @@ begin
         PM_P_BirthdayActivate.Caption := MenuString;
         PM_T_BirthdayActivate.Caption := MenuString;
 
+        if assigned(OptionsCompleteForm) then
+            OptionsCompleteForm.BtnActivateBirthdayMode.Caption := MenuString;
+
         if (SleepTimer.Enabled) or (NempOptions.ShutDownAtEndOfPlaylist) then
         begin
             SleepImage.Top := newTop;

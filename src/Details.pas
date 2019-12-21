@@ -327,9 +327,6 @@ type
     PictureFrames: TObjectList;
     fFileFromMedienBib: Boolean;
 
-    // Speichert die "temporäre Existenz" der ID3Tags, d.h. ob der User sie aktiviert hat oder nicht
-    // ID3v1Activated: Boolean;
-    // ID3v2Activated: Boolean;
     CurrentTagRatingChanged: Boolean;
     CurrentTagRating: Byte;
     CurrentTagCounter: Cardinal;
@@ -882,30 +879,6 @@ begin
 
     if not v1TagEditsAreEmpty then
         result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
-
-
-    {
-    if (Trim(Lblv1Titel.Text  ) = '') AND
-       (Trim(Lblv1Artist.Text ) = '') AND
-       (Trim(Lblv1Album.Text  ) = '') AND
-       (Trim(Lblv1Comment.Text) = '') AND
-       (Trim(cbIDv1Genres.Text) = '') AND
-       (Trim(Lblv1Track.Text  ) = '') AND
-       (Trim(Lblv1Year.Text   ) = '')
-    then
-        result := mp3.id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad)
-    else
-    // if ID3v1Activated and ValidMp3File then
-    begin
-        mp3.Id3v1Tag.Title   := Lblv1Titel.Text   ;
-        mp3.Id3v1Tag.Artist  := Lblv1Artist.Text  ;
-        mp3.Id3v1Tag.Album   := Lblv1Album.Text   ;
-        mp3.Id3v1Tag.Comment := Lblv1Comment.Text ;
-        mp3.Id3v1Tag.Genre   := cbIDv1Genres.Text ;
-        mp3.Id3v1Tag.Track   := Lblv1Track.Text   ;
-        mp3.Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
-        result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
-    end;}
 end;
 
 
@@ -3310,9 +3283,8 @@ begin
       if FileExists(TCoverArtSearcher.SavePath + newID + '.jpg')
          OR
          TCoverArtSearcher.ScalePicStreamToFile(CurrentCoverStream, newID,
-                                    //TCoverArtSearcher.SavePath + newID + '.jpg',
                                     240, 240,
-                                    Nil) // oder besser in die Bib auslagern, und "GetProperImagingFactory" nutzen??
+                                    Nil)
       then
           HandleCoverIDSetting(newID)
 end;
@@ -3336,9 +3308,8 @@ begin
             if FileExists(TCoverArtSearcher.Savepath + newID + '.jpg')
                OR
                TCoverArtSearcher.ScalePicStreamToFile(fs, newID,
-                        //TCoverArtSearcher.Savepath + newID + '.jpg',
                         240, 240,
-                        Nil) // oder besser in die Bib auslagern, und "GetProperImagingFactory" nutzen??
+                        Nil)
             then
                 HandleCoverIDSetting(newID);
         finally
