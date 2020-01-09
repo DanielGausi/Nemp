@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlayer6
+      ActivePage = TabPlaylistRandom
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -3642,10 +3642,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
         object GrpBox_TabAudio2_ReplayGain: TGroupBox
-          Left = 12
+          Left = 8
           Top = 291
           Width = 439
           Height = 158
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'ReplayGain'
           TabOrder = 2
           object lblDefaultGainValue: TLabel

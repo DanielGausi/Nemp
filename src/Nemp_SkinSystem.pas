@@ -383,6 +383,8 @@ type
 
         procedure SetDefaultMenuImages;
 
+        procedure SetVSTHeaderSettings;
+
         //procedure DrawPreview(aPanel: TNempPanel);
 
         //procedure DrawAPanel(aPanel: TNempPanel; UseBackground: Boolean = True);
@@ -1206,6 +1208,37 @@ begin
         fSetATreeOffset(Nemp_MainForm.PlayListVST);
 end;
 
+procedure TNempSkin.SetVSTHeaderSettings;
+begin
+      if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
+      begin
+          Nemp_MainForm.ArtistsVST.Header.Options  := Nemp_MainForm.ArtistsVST.Header.Options - [hoOwnerDraw];
+          Nemp_MainForm.AlbenVST.Header.Options    := Nemp_MainForm.AlbenVST.Header.Options - [hoOwnerDraw];
+          Nemp_MainForm.PlaylistVST.Header.Options := Nemp_MainForm.PlaylistVST.Header.Options - [hoOwnerDraw];
+          Nemp_MainForm.VST.Header.Options         := Nemp_MainForm.VST.Header.Options - [hoOwnerDraw];
+      end else
+      begin
+          Nemp_MainForm.ArtistsVST.Header.Options  := Nemp_MainForm.ArtistsVST.Header.Options + [hoOwnerDraw];
+          Nemp_MainForm.AlbenVST.Header.Options    := Nemp_MainForm.AlbenVST.Header.Options + [hoOwnerDraw];
+          Nemp_MainForm.PlaylistVST.Header.Options := Nemp_MainForm.PlaylistVST.Header.Options + [hoOwnerDraw];
+          Nemp_MainForm.VST.Header.Options         := Nemp_MainForm.VST.Header.Options + [hoOwnerDraw];
+      end;
+
+      if UseAdvancedSkin and (not Nemp_MainForm.GlobalUseAdvancedSkin) then
+      begin
+          Nemp_MainForm.PlaylistVST.StyleElements := [seBorder];
+          Nemp_MainForm.VST.StyleElements         := [seBorder];
+          Nemp_MainForm.ArtistsVST.StyleElements  := [seBorder];
+          Nemp_MainForm.AlbenVST.StyleElements    := [seBorder];
+      end else
+      begin
+          Nemp_MainForm.PlaylistVST.StyleElements := [seClient, seBorder];
+          Nemp_MainForm.VST.StyleElements         := [seClient, seBorder];
+          Nemp_MainForm.ArtistsVST.StyleElements  := [seClient, seBorder];
+          Nemp_MainForm.AlbenVST.StyleElements    := [seClient, seBorder];
+      end;
+end;
+
 
 
 procedure TNempSkin.ActivateSkin(SetFlowColor: Boolean = True);
@@ -1474,12 +1507,8 @@ begin
           TagCustomizer.TagBlendColor := SkinColorScheme.Tree_SelectionRectangleBlendColor[1];
           TagCustomizer.TagBlendIntensity := BlendFaktorTagCloud; // as in the Trees (set in the Object-Inspector)
 
-
-      // Header
-      ArtistsVST.Header.Options := ArtistsVST.Header.Options + [hoOwnerDraw];
-      AlbenVST.Header.Options := AlbenVST.Header.Options + [hoOwnerDraw];
-      PlaylistVST.Header.Options := PlaylistVST.Header.Options + [hoOwnerDraw];
-      VST.Header.Options := VST.Header.Options + [hoOwnerDraw];
+      // VST-Header
+      SetVSTHeaderSettings;
 
       // Farben
       for idx := 1 to 4 do

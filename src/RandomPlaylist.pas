@@ -69,7 +69,6 @@ type
     LblConst_TitlesFrom: TLabel;
     Btn_Ok: TButton;
     Btn_Cancel: TButton;
-    Lbl_Preselection: TLabel;
     Btn_Save: TButton;
     cb_Preselection: TComboBox;
     CBWholeBib: TComboBox;
@@ -133,6 +132,8 @@ type
   public
     { Public-Deklarationen }
     //procedure ShowRating(Value: Integer);
+    procedure LoadStarGraphics;
+    procedure RefreshStarGraphics;
   end;
 
 
@@ -184,12 +185,52 @@ begin
     CheckList.Add(aString);
 end;
 
+procedure TRandomPlaylistForm.LoadStarGraphics;
+var s,h,u: TBitmap;
+    baseDir: String;
+begin
+    s := TBitmap.Create;
+    h := TBitmap.Create;
+    u := TBitmap.Create;
+
+    if Nemp_MainForm.NempSkin.isActive
+        and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
+        and Nemp_MainForm.NempSkin.UseAdvancedSkin
+        and Nemp_MainForm.GlobalUseAdvancedSkin
+    then
+        BaseDir := Nemp_MainForm.NempSkin.Path + '\'
+    else
+        // this Form is not skinned, use default images
+        BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+    try
+        s.Transparent := True;
+        h.Transparent := True;
+        u.Transparent := True;
+
+        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
+        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
+        Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
+
+        RandomRatingHelper.SetStars(s,h,u);
+    finally
+        s.Free;
+        h.Free;
+        u.Free;
+    end;
+end;
+
+procedure TRandomPlaylistForm.RefreshStarGraphics;
+begin
+    LoadStarGraphics;
+    RandomRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
+end;
+
 
 procedure TRandomPlaylistForm.FormCreate(Sender: TObject);
 var ini: TMemIniFile;
     genresCount, i, j, idx, rat: Integer;
-    BaseDir, aTag: String;
-    s,h,u: TBitmap;
+    aTag: String;
     ltmp, c: Integer;
 begin
   
@@ -197,26 +238,12 @@ begin
   TranslateComponent (self);
   RestoreComboboxes(self);
   cbGenres.Items.Clear;
-  // cbGenres.Items := Genres;
 
   RandomRatingHelper := TRatingHelper.Create;
   LocalTopTags := TObjectList.Create(False);
   LastCheckedTags := TStringList.Create;
 
-  s := TBitmap.Create;
-  h := TBitmap.Create;
-  u := TBitmap.Create;
-  BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
-  try
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
-      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
-      RandomRatingHelper.SetStars(s,h,u);
-  finally
-      s.Free;
-      h.Free;
-      u.Free;
-  end;
+  LoadStarGraphics;
 
   ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try
@@ -457,7 +484,7 @@ begin
   cbTagCountSelection.Enabled := cbRestrictTags.Checked;
   LblTagMatchType    .Enabled := cbRestrictTags.Checked;
   cbTagMatchType     .Enabled := cbRestrictTags.Checked;
-  Lbl_Preselection   .Enabled := cbRestrictTags.Checked;
+  // Lbl_Preselection   .Enabled := cbRestrictTags.Checked;
   cb_Preselection    .Enabled := cbRestrictTags.Checked;
 end;
 

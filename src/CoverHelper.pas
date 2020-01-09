@@ -1179,7 +1179,7 @@ begin
         result := GetCover_Fast(aAudioFile, aCoverbmp)
     else
     begin
-        if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
+        if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap, true) then
         begin
             result := True;
         end

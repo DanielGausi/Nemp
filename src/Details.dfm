@@ -249,17 +249,17 @@ object FDetails: TFDetails
         object Btn_Explore: TButton
           Left = 16
           Top = 131
-          Width = 81
-          Height = 21
+          Width = 102
+          Height = 25
           Caption = 'Explorer'
           TabOrder = 0
           OnClick = Btn_ExploreClick
         end
         object Btn_Properties: TButton
-          Left = 104
+          Left = 127
           Top = 131
-          Width = 81
-          Height = 21
+          Width = 102
+          Height = 25
           Caption = 'Properties'
           TabOrder = 1
           OnClick = Btn_PropertiesClick
@@ -623,8 +623,8 @@ object FDetails: TFDetails
           object BtnResetRating: TButton
             Left = 96
             Top = 191
-            Width = 81
-            Height = 21
+            Width = 102
+            Height = 25
             Hint = 'Set rating and playcounter to zero'
             Caption = 'Reset'
             ParentShowHint = False
@@ -643,10 +643,10 @@ object FDetails: TFDetails
             OnChange = EditLibraryChange
           end
           object BtnSynchRatingLibrary: TButton
-            Left = 183
+            Left = 207
             Top = 191
             Width = 142
-            Height = 21
+            Height = 25
             Hint = 
               'Synchronize rating/playcounter in the Metadata of the file with ' +
               'the rating/playcounter in the library'
@@ -666,9 +666,9 @@ object FDetails: TFDetails
           end
           object Btn_Refresh: TButton
             Left = 96
-            Top = 262
+            Top = 256
             Width = 102
-            Height = 21
+            Height = 25
             Caption = 'Refresh'
             TabOrder = 10
             OnClick = Btn_RefreshClick
@@ -726,7 +726,7 @@ object FDetails: TFDetails
             Left = 102
             Top = 236
             Width = 85
-            Height = 21
+            Height = 25
             Hint = 'Add Tags from LastFM'
             Anchors = [akTop, akRight]
             Caption = 'LastFM'
@@ -740,7 +740,7 @@ object FDetails: TFDetails
             Left = 8
             Top = 236
             Width = 85
-            Height = 21
+            Height = 25
             Hint = 'Add a new tag to the file'
             Caption = '[ + ]'
             TabOrder = 0
@@ -749,9 +749,9 @@ object FDetails: TFDetails
           object Btn_TagCloudEditor: TButton
             AlignWithMargins = True
             Left = 8
-            Top = 262
+            Top = 265
             Width = 179
-            Height = 21
+            Height = 25
             Hint = 'Open tag cloud editor'
             Anchors = [akLeft, akTop, akRight]
             Caption = 'Cloud editor'
@@ -896,7 +896,7 @@ object FDetails: TFDetails
               Left = 8
               Top = 51
               Width = 150
-              Height = 21
+              Height = 25
               Hint = 'Open the image with the default image viewer'
               Anchors = [akLeft, akTop, akRight]
               Caption = 'Open'
@@ -932,7 +932,7 @@ object FDetails: TFDetails
               Left = 8
               Top = 51
               Width = 150
-              Height = 21
+              Height = 25
               Hint = 'Add a cover art to the metadata'
               Caption = 'New'
               Enabled = False
@@ -944,9 +944,9 @@ object FDetails: TFDetails
             object Btn_DeletePicture: TButton
               AlignWithMargins = True
               Left = 8
-              Top = 78
+              Top = 81
               Width = 150
-              Height = 21
+              Height = 25
               Hint = 'Remove the selected cover art from the metadata'
               Caption = 'Delete'
               Enabled = False
@@ -958,9 +958,9 @@ object FDetails: TFDetails
             object Btn_SavePictureToFile: TButton
               AlignWithMargins = True
               Left = 8
-              Top = 105
+              Top = 111
               Width = 150
-              Height = 21
+              Height = 25
               Hint = 'Save the selected cover at into a file'
               Caption = 'Save to file'
               ParentShowHint = False
@@ -997,7 +997,7 @@ object FDetails: TFDetails
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 8
-          Top = 21
+          Top = 24
           Width = 240
           Height = 240
           Hint = 'The current cover art used in the media library'
@@ -1008,7 +1008,7 @@ object FDetails: TFDetails
         object BtnChangeCoverArtInLibrary: TButton
           AlignWithMargins = True
           Left = 8
-          Top = 312
+          Top = 301
           Width = 241
           Height = 25
           Hint = 'Use the currently selected image as cover art'
@@ -1023,7 +1023,7 @@ object FDetails: TFDetails
         object BtnRemoveUserCover: TButton
           AlignWithMargins = True
           Left = 8
-          Top = 343
+          Top = 332
           Width = 241
           Height = 25
           Hint = 
@@ -1037,23 +1037,10 @@ object FDetails: TFDetails
           WordWrap = True
           OnClick = BtnRemoveUserCoverClick
         end
-        object cbChangeUserIDForAll: TCheckBox
-          Left = 8
-          Top = 374
-          Width = 233
-          Height = 17
-          Hint = 
-            'Apply the new cover art to all files that use the former cover a' +
-            'rt'
-          Caption = 'Update all files with the former cover art'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 3
-        end
         object BtnLoadCoverArt: TButton
           AlignWithMargins = True
           Left = 8
-          Top = 281
+          Top = 270
           Width = 241
           Height = 25
           Hint = 'Load an image file for cover art'
@@ -1063,6 +1050,20 @@ object FDetails: TFDetails
           ShowHint = True
           TabOrder = 0
           OnClick = BtnLoadAnotherImageClick
+        end
+        object rgChangeCoverArt: TRadioGroup
+          Left = 8
+          Top = 363
+          Width = 241
+          Height = 94
+          Anchors = [akLeft, akTop, akRight, akBottom]
+          Caption = 'Update cover art ...'
+          ItemIndex = 0
+          Items.Strings = (
+            'just for this file'
+            'for all files with this cover art'
+            'for all files in the same directory')
+          TabOrder = 3
         end
       end
     end

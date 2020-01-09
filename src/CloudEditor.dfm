@@ -42,9 +42,9 @@ object CloudEditorForm: TCloudEditorForm
     ExplicitTop = 279
   end
   object BtnUpdateID3Tags: TButton
-    Left = 428
+    Left = 389
     Top = 432
-    Width = 107
+    Width = 138
     Height = 25
     Anchors = [akRight, akBottom]
     Caption = 'Update files now'
@@ -53,7 +53,7 @@ object CloudEditorForm: TCloudEditorForm
     OnClick = BtnUpdateID3TagsClick
   end
   object BtnBugFix: TButton
-    Left = 315
+    Left = 266
     Top = 432
     Width = 107
     Height = 25
@@ -184,10 +184,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_MergedTags: TTabSheet
       Caption = 'Rename rules'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)
@@ -246,10 +242,6 @@ object CloudEditorForm: TCloudEditorForm
     object TS_DeleteTags: TTabSheet
       Caption = 'Ignore rules'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         526
         390)

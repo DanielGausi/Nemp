@@ -617,6 +617,7 @@ type
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
         procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
         procedure GetTitelListFromCoverIDUnsorted(Target: TObjectlist; aCoverID: String);
+        procedure GetTitelListFromDirectoryUnsorted(Target: TObjectlist; aDirectory: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
         procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
         procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
@@ -4804,6 +4805,16 @@ begin
     for i := 0 to Mp3ListeArtistSort.Count - 1 do
     begin
         if TAudioFile(Mp3ListeArtistSort[i]).CoverID = aCoverID then
+            Target.Add(Mp3ListeArtistSort[i]);
+    end;
+end;
+
+procedure TMedienBibliothek.GetTitelListFromDirectoryUnsorted(Target: TObjectlist; aDirectory: String);
+var i: Integer;
+begin
+    for i := 0 to Mp3ListeArtistSort.Count - 1 do
+    begin
+        if TAudioFile(Mp3ListeArtistSort[i]).Ordner = aDirectory then
             Target.Add(Mp3ListeArtistSort[i]);
     end;
 end;

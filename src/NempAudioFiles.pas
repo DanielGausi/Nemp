@@ -529,7 +529,7 @@ type
         function GetUserCoverIDFromMetaData(TagFile: TGeneralAudioFile): String;
 
         // new in 4.12: Get Front-Cover for the Player from the Metadata.
-        function GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
+        function GetCoverFromMetaData(aCoverBmp: TBitmap; scaled: Boolean): boolean;
         function GetCoverStreamFromMetaData(aCoverStream: TMemoryStream; TagFile: TGeneralAudioFile): boolean;
 
         // save the data here in a ";"-separated string for csv-export
@@ -1258,10 +1258,10 @@ begin
                             + Format(Audiofile_PlayCounterHint, [PlayCounter]);
 
             if (Not IsZero(TrackGain)) and (Not isZero(AlbumGain)) then
-                result := result + #13#10 + Format(Audiofile_ReplayGain_Album, [TrackGain, AlbumGain])
+                result := result + #13#10 + ' ' +  Format(Audiofile_ReplayGain_Album, [TrackGain, AlbumGain])
             else
                 if (Not IsZero(TrackGain)) then
-                    result := result + #13#10 + Format(Audiofile_ReplayGain_Track, [TrackGain])
+                    result := result + #13#10 + ' ' +  Format(Audiofile_ReplayGain_Track, [TrackGain])
         end;
 
         at_Stream: begin
@@ -2112,8 +2112,9 @@ begin
 end;
 
 
-function TAudioFile.GetCoverFromMetaData(aCoverBmp: TBitmap): boolean;
+function TAudioFile.GetCoverFromMetaData(aCoverBmp: TBitmap; scaled: Boolean): boolean;
 var MainFile: TGeneralAudioFile;
+    tmpBmp: TBitmap;
 begin
     if not FileExists(Pfad) then
     begin
@@ -2125,18 +2126,19 @@ begin
         at_File: begin
             try
                 MainFile := TGeneralAudioFile.Create(Pfad);
+                tmpBmp := TBitmap.Create;
                 try
                     // get cover information (format-specific)
                     case MainFile.FileType of
-                        at_Mp3    : result := GetCoverFromMp3(MainFile.MP3File, aCoverBmp) ;
-                        at_Flac   : result := GetCoverFromFlac(MainFile.FlacFile, aCoverBmp) ;
-                        at_M4A    : result := GetCoverFromM4A(MainFile.M4aFile, aCoverBmp) ;
+                        at_Mp3    : result := GetCoverFromMp3(MainFile.MP3File, tmpBmp) ;
+                        at_Flac   : result := GetCoverFromFlac(MainFile.FlacFile, tmpBmp) ;
+                        at_M4A    : result := GetCoverFromM4A(MainFile.M4aFile, tmpBmp) ;
 
                         at_Monkey,
                         at_WavPack,
                         at_MusePack,
                         at_OptimFrog,
-                        at_TrueAudio: result := GetCoverFromApe(MainFile.BaseApeFile, aCoverBmp) ;
+                        at_TrueAudio: result := GetCoverFromApe(MainFile.BaseApeFile, tmpBmp) ;
 
                         at_Invalid,
                         at_Ogg,
@@ -2146,7 +2148,18 @@ begin
                         result := False;
                     end;
 
+                    if result then
+                    begin
+                        // copy the metadata-image into the destination bitmap
+                        // if wanted scaled, otherwise just as it is
+                        if scaled and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+                            FitBitmapIn(aCoverbmp, tmpBmp)
+                        else
+                            aCoverbmp.Assign(tmpBmp);
+                    end;
+
                 finally
+                    tmpBmp.Free;
                     MainFile.Free;
                 end;
             except

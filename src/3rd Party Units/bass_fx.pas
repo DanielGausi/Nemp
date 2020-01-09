@@ -38,7 +38,7 @@ const
 	BASS_FX_FREESOURCE = $10000;		// Free the source handle as well?
 
 	{$IFDEF MSWINDOWS}
-		bass_fxdll = 'bass_fx.dll';
+		bass_fxdll = 'bass\bass_fx.dll';
 	{$ELSE}
 		bass_fxdll = 'libbass_fx.so';
 	{$ENDIF}

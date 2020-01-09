@@ -181,7 +181,7 @@ type
 
 
 const
-  bassmididll = 'bassmidi.dll';
+  bassmididll = 'bass\bassmidi.dll';
 
 function BASS_MIDI_StreamCreate(channels,flags,freq:DWORD): HSTREAM; stdcall; external bassmididll;
 function BASS_MIDI_StreamCreateFile(mem:BOOL; fl:pointer; offset,length:QWORD; flags,freq:DWORD): HSTREAM; stdcall; external bassmididll;

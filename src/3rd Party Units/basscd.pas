@@ -150,7 +150,7 @@ type
 
 const
 {$IFDEF MSWINDOWS}
-  basscddll = 'basscd.dll';
+  basscddll = 'bass\basscd.dll';
 {$ENDIF}
 {$IFDEF LINUX}
   basscddll = 'libbasscd.so';

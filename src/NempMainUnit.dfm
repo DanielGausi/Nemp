@@ -55,6 +55,7 @@ object Nemp_MainForm: TNemp_MainForm
       MinSize = 150
       ParentColor = False
       ResizeStyle = rsUpdate
+      StyleElements = [seFont, seBorder]
       OnCanResize = SplitterFileOverviewCanResize
       OnMoved = MainSplitterMoved
       ExplicitWidth = 1047
@@ -77,6 +78,7 @@ object Nemp_MainForm: TNemp_MainForm
         Height = 240
         MinSize = 100
         ResizeStyle = rsUpdate
+        StyleElements = [seFont, seBorder]
         OnCanResize = SplitterFileOverviewCanResize
         OnMoved = SubSplitter1Moved
         ExplicitLeft = 385
@@ -240,6 +242,7 @@ object Nemp_MainForm: TNemp_MainForm
               Top = 0
               Width = 4
               Height = 140
+              StyleElements = [seFont, seBorder]
               OnMoved = SplitterBrowseMoved
               ExplicitHeight = 59
             end
@@ -271,7 +274,7 @@ object Nemp_MainForm: TNemp_MainForm
               ParentFont = False
               PopupMenu = Medialist_Browse_PopupMenu
               ScrollBarOptions.ScrollBars = ssVertical
-              StyleElements = [seBorder]
+              StyleElements = [seClient, seBorder]
               TabOrder = 0
               TextMargin = 2
               TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -323,7 +326,7 @@ object Nemp_MainForm: TNemp_MainForm
               ParentFont = False
               PopupMenu = Medialist_Browse_PopupMenu
               ScrollBarOptions.ScrollBars = ssVertical
-              StyleElements = [seBorder]
+              StyleElements = [seClient, seBorder]
               TabOrder = 1
               TextMargin = 2
               TreeOptions.AutoOptions = [toAutoDropExpand, toAutoTristateTracking, toAutoDeleteMovedNodes]
@@ -557,7 +560,7 @@ object Nemp_MainForm: TNemp_MainForm
             PopupMenu = PlayListPOPUP
             ScrollBarOptions.ScrollBars = ssVertical
             ShowHint = True
-            StyleElements = [seBorder]
+            StyleElements = [seClient, seBorder]
             TabOrder = 0
             TextMargin = 0
             TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScroll, toAutoScrollOnExpand, toAutoTristateTracking]
@@ -587,7 +590,6 @@ object Nemp_MainForm: TNemp_MainForm
             OnStartDrag = PlaylistVSTStartDrag
             Columns = <
               item
-                Margin = 0
                 Position = 0
                 Spacing = 0
                 Text = 'Title'
@@ -706,6 +708,7 @@ object Nemp_MainForm: TNemp_MainForm
         Align = alRight
         MinSize = 50
         ResizeStyle = rsUpdate
+        StyleElements = [seFont, seBorder]
         OnCanResize = SplitterFileOverviewCanResize
         OnMoved = SubSplitter2Moved
         ExplicitLeft = 720
@@ -873,7 +876,7 @@ object Nemp_MainForm: TNemp_MainForm
             ParentShowHint = False
             PopupMenu = Medialist_View_PopupMenu
             ShowHint = True
-            StyleElements = [seBorder]
+            StyleElements = [seClient, seBorder]
             TabOrder = 0
             TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSpanColumns, toAutoTristateTracking, toAutoDeleteMovedNodes]
             TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
@@ -1020,6 +1023,7 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 4
             Height = 377
             ResizeStyle = rsUpdate
+            StyleElements = [seFont, seBorder]
             OnCanResize = SplitterFileOverviewCanResize
             OnMoved = SplitterFileOverviewMoved
             ExplicitLeft = 250
@@ -1350,9 +1354,9 @@ object Nemp_MainForm: TNemp_MainForm
             609
             100)
           object SlideBarShape: TProgressShape
-            Left = 95
+            Left = 100
             Top = 78
-            Width = 456
+            Width = 451
             Height = 6
             Anchors = [akLeft, akTop, akRight]
             Brush.Color = clGradientActiveCaption
@@ -2682,13 +2686,6 @@ object Nemp_MainForm: TNemp_MainForm
         Caption = '&About Nemp'
         ImageIndex = 17
         OnClick = MM_H_AboutClick
-      end
-      object MM_H_ShowReadme: TMenuItem
-        Caption = '&Show readme'
-        OnClick = MM_H_ShowReadmeClick
-      end
-      object N19: TMenuItem
-        Caption = '-'
       end
       object MM_H_Help: TMenuItem
         Caption = 'Documentation and user guide'
@@ -4833,12 +4830,12 @@ object Nemp_MainForm: TNemp_MainForm
       'All supported files|*.m3u;*.m3u8;*.pls;*.npl;*.asx;*.wax|m3u-lis' +
       'ts|*.m3u|m3u8-lists (unicode-capable)|*.m3u8|pls-lists|*.pls|Nem' +
       'p playlists|*.npl|WindowsMedia|*.asx;*.wax'
-    Left = 913
+    Left = 961
     Top = 1
   end
   object PlaylistDateienOpenDialog: TOpenDialog
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
-    Left = 832
+    Left = 776
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'gmp'

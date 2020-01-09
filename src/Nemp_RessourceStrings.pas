@@ -121,7 +121,7 @@ DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
 Warning_FileNotFound = 'File not found';
 Warning_FileNotFound_Hint = 'The specified file can not be found. Maybe it is on an external drive which is not connected.';
 Warning_Coverbox_NoCover = 'No coverfile found';
-Error_CoverInvalid = 'The file cannot be displayed. The most common reason for this is an improper filename-extension (e.g. ".gif", but the file is actually a JPEG-file).';
+Error_CoverInvalid = 'Can''t open file.';
 
 Warning_ReadError = 'Read error';
 Warning_ReadError_Hint = 'The file could not be opened to get information. The file is maybe in use by another program.';

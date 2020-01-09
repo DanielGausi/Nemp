@@ -224,34 +224,34 @@ var
 //Changed calling convention and renaming of the imported DLL-Functions
 //OST, 01.05.2007
 function lgLcdEnumerate(connection,index:integer; var lgLcdDeviceDesc:lgLcdDeviceDesc): word; cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdEnumerateWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdEnumerateWrap';
 
 function lgLcdInit:dword; cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdInitWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdInitWrap';
 
 procedure lgLcdDeInit;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdDeInitWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdDeInitWrap';
 
 function lgLcdClose(device:integer):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdCloseWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdCloseWrap';
 
 function lgLcdConnectA(var lgLcdConnectContextA : lgLcdConnectContextA):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdConnectAWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdConnectAWrap';
 
 function lgLcdDisconnect(connection:integer):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdDisconnectWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdDisconnectWrap';
 
 function lgLcdOpen(var lgLcdOpenContext:lgLcdOpenContext):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdOpenWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdOpenWrap';
 
 function lgLcdUpdateBitmap(device:integer; lgLcdBitmapHeader:PlgLcdBitmapHeader;priority:dword):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdUpdateBitmapWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdUpdateBitmapWrap';
 
 function lgLcdReadSoftButtons(device:integer; var button:dword):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdReadSoftButtonsWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdReadSoftButtonsWrap';
 
 function lgLcdSetAsLCDForegroundApp(device:integer; foregroundYesNoFlag:integer):dword;cdecl;
-external 'lgLcdWrapper.dll' name 'lgLcdSetAsLCDForegroundAppWrap';
+external 'dll\lgLcdWrapper.dll' name 'lgLcdSetAsLCDForegroundAppWrap';
 
 {///************************************************************************ }
 {/// Delphi Helper Class  implementation}

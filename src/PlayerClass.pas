@@ -894,13 +894,12 @@ begin
 
     UpdateFlags;
     Filter := '|Standard formats (*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.aif)' + '|'
-                   + '*.mp3;*.mp2;*.mp1;*.ogg;*.wav*;*.aif';
-
+                    + '*.mp3;*.mp2;*.mp1;*.ogg;*.wav*;*.aif';
 
     // load MIDI plugin first (which is stored in the main directory now)
-    if FileExists(PChar(ExtractFilePath(ParamStr(0)) + 'bassmidi.dll')) then
+    if FileExists(PChar(ExtractFilePath(ParamStr(0)) + 'bass\bassmidi.dll')) then
     begin
-        plug := BASS_PluginLoad(PChar(ExtractFilePath(ParamStr(0)) + 'bassmidi.dll'), BASS_UNICODE);
+        plug := BASS_PluginLoad(PChar(ExtractFilePath(ParamStr(0)) + 'bass\bassmidi.dll'), BASS_UNICODE);
         if Plug <> 0 then
             ProcessPLugin(Plug);
     end;
@@ -928,8 +927,8 @@ begin
         tmpfilter := tmpfilter + ';*' + ValidExtensions[i];
 
     Filter := 'All supported files|' + tmpfilter
-                                       + Filter
-                                       + '|CD-Audio|*.cda' ;
+                                     + Filter;
+                                       // + '|CD-Audio|*.cda' ;
 end;
 
 procedure TNempPlayer.ReInitBassEngine;

@@ -2,11 +2,7 @@ program nemp;
 
 {.$R 'Nemp_Graphics.res' 'Nemp_Graphics.rc'}
 
-
-
 // dontTouchUses  <- this tells madExcept to not touch the uses clause
-// note to self: publish nemp.mes (this contains the MadExcept setting)
-
 
 {$I xe.inc}
 
@@ -95,24 +91,7 @@ uses
   Votings in 'Votings.pas',
   WebServerLog in 'WebServerLog.pas' {WebServerLogForm},
   SilenceDetection in 'SilenceDetection.pas',
-  NempApi in 'common\NempApi.pas' {,
-  bass in '3rd Party Units\bass.pas',
-  bass_fx in '3rd Party Units\bass_fx.pas',
-  basscd in '3rd Party Units\basscd.pas';
-
-uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
-  OneInst in '3rd Party Units\OneInst.pas',
-  gnuGettext,
-  Forms,
-  Windows,
-  SysUtils,
-  Graphics,
-  NempMainUnit in 'NempMainUnit.pas' {Nemp_MainForm},
+  NempApi in 'common\NempApi.pas',
   bass in '3rd Party Units\bass.pas',
   bass_fx in '3rd Party Units\bass_fx.pas',
   basscd in '3rd Party Units\basscd.pas',
@@ -149,23 +128,10 @@ var EVILHACKX, EVILHACKY: INTEGER;
 
 begin
 
-    ReportMemoryLeaksOnShutdown := True;
+    ReportMemoryLeaksOnShutdown := False;
 
     Application.Initialize;
 
-
-    //Application.MainFormOnTaskBar := True;
-{
-SetWindowLong mit Application.handle funktioniert, wenn MainFormOnTaskbar = False;
-Ist das True, funktioniert es mit MainForm.Handle
-Aber, mit "richtigem handle" funktioniert das Win7-Gedöns nicht mehr!!!!
-=> Unter WIN 7 die TASKLEISTE IN RUHE LASSEN!!!
-
-Mit MainForm.handle funktioniert das Splash- gedöns nicht mehr!! und Win 7
-
-suchen nach SetWindowLong
-ShowWindow
- }
 
   {$IFDEF USESTYLES}
     //TStyleManager.Engine.RegisterStyleHook(TNemp_MainForm, TFormStyleHookFix);
@@ -186,8 +152,6 @@ ShowWindow
     Nemp_MainForm.Top := 10000;
 
     Application.CreateForm(TFSplash, FSplash);
-//X//    FSplash.Show;
-//X//    FSplash.Update;
 
     Application.CreateForm(TPlaylistForm   , PlaylistForm   );
     Application.CreateForm(TAuswahlForm    , AuswahlForm    );

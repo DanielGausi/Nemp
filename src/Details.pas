@@ -200,7 +200,6 @@ type
     OpenDlgCoverArt: TOpenPictureDialog;
     BtnChangeCoverArtInLibrary: TButton;
     BtnRemoveUserCover: TButton;
-    cbChangeUserIDForAll: TCheckBox;
     BtnLoadCoverArt: TButton;
     PanelCoverArtFile: TPanel;
     gpBoxCurrentSelection: TGroupBox;
@@ -217,6 +216,7 @@ type
     Btn_RenameTag: TButton;
     Btn_RemoveTag: TButton;
     BtnRefreshCoverflow: TButton;
+    rgChangeCoverArt: TRadioGroup;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -388,6 +388,7 @@ type
     MetaTagType: TTagType;
 
     procedure LoadStarGraphics;
+    procedure RefreshStarGraphics;
     procedure BuildGetLyricButtonHint;
   end;
 
@@ -905,7 +906,7 @@ begin
         exit;
     end;
 
-    if (CoverArtHasChanged and cbChangeUserIDForAll.Checked)
+    if (CoverArtHasChanged and (rgChangeCoverArt.ItemIndex > 0))
         and
         (MedienBib.StatusBibUpdate <> 0)
     then
@@ -969,7 +970,7 @@ begin
             CurrentAudioFile.CoverID := NewLibraryCoverID;
             //  Change also all the files in the library
             //  Note: Setting the Value to CurrentAudioFile is still useful, as this file may be in the Playlist only
-            if cbChangeUserIDForAll.Checked then
+            if rgChangeCoverArt.ItemIndex > 0 then
             begin
                 ///  We don't need to do a InitCover for the currentAudioFile,
                 ///  but we may need it for the other files with the oldCoverID, as
@@ -978,7 +979,12 @@ begin
                 CoverArtSearcher.StartNewSearch;
                 CoverIDFiles := TObjectList.create(False);
                 try
-                    MedienBib.GetTitelListFromCoverIDUnsorted(CoverIDFiles, OldCoverID);
+                    // get the list of files which need to be changed
+                    case rgChangeCoverArt.ItemIndex of
+                        1: MedienBib.GetTitelListFromCoverIDUnsorted(CoverIDFiles, OldCoverID);
+                        2: MedienBib.GetTitelListFromDirectoryUnsorted(CoverIDFiles, CurrentAudioFile.Ordner);
+                    end;
+
                     for i := 0 to CoverIDFiles.Count - 1 do
                     begin
                         loopAudioFile := TAudioFile(CoverIDFiles[i]);
@@ -1131,6 +1137,12 @@ begin
         h.Free;
         u.Free;
     end;
+end;
+
+procedure TFDetails.RefreshStarGraphics;
+begin
+    LoadStarGraphics;
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
 end;
 
 {

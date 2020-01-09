@@ -663,7 +663,7 @@ type
     function ValidTime(aText: String): Boolean;
 
     procedure LoadDefaultCover;
-    procedure LoadStarGraphics;
+
 
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
@@ -678,6 +678,8 @@ type
     VorauswahlNode: pVirtualNode;
 
     procedure ShowSettings(ExtendedSettings: Boolean);
+    procedure LoadStarGraphics;
+    procedure RefreshStarGraphics;
 
   end;
 
@@ -765,6 +767,21 @@ begin
   end;
 end;
 
+procedure TOptionsCompleteForm.RefreshStarGraphics;
+begin
+    LoadStarGraphics;
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(51 + 1, RatingImage15.Picture.Bitmap, RatingImage15.Width, RatingImage15.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(51+26 + 1, RatingImage20.Picture.Bitmap, RatingImage20.Width, RatingImage20.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51 + 1, RatingImage25.Picture.Bitmap, RatingImage25.Width, RatingImage25.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(2*51+26 + 1, RatingImage30.Picture.Bitmap, RatingImage30.Width, RatingImage30.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51 + 1, RatingImage35.Picture.Bitmap, RatingImage35.Width, RatingImage35.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(3*51+26 + 1, RatingImage40.Picture.Bitmap, RatingImage40.Width, RatingImage40.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51 + 1, RatingImage45.Picture.Bitmap, RatingImage45.Width, RatingImage45.Height);
+    DetailRatingHelper.DrawRatingInStarsOnBitmap(4*51+26 + 1, RatingImage50.Picture.Bitmap, RatingImage50.Width, RatingImage50.Height);
+end;
+
 procedure TOptionsCompleteForm.FormCreate(Sender: TObject);
 var i, s, count: integer;
   BassInfo: BASS_DEVICEINFO;
@@ -778,7 +795,6 @@ begin
   //optionsVST.Font.Color := clred;
   //BtnOK.StyleElements := [];
   //UnSkinForm(self);
-
 
   BackUpComboBoxes(self);
   TranslateComponent (self);

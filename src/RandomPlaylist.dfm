@@ -93,32 +93,27 @@ object RandomPlaylistForm: TRandomPlaylistForm
     DesignSize = (
       492
       324)
-    object Lbl_Preselection: TLabel
-      Left = 16
-      Top = 159
-      Width = 58
+    object LblTagViewCount: TLabel
+      Left = 206
+      Top = 295
+      Width = 200
       Height = 13
       Alignment = taRightJustify
-      Caption = 'Preselection'
-    end
-    object LblTagViewCount: TLabel
-      Left = 16
-      Top = 43
-      Width = 108
-      Height = 13
+      Anchors = [akRight, akBottom]
+      AutoSize = False
       Caption = 'Number of shown tags'
     end
     object LblTagMatchType: TLabel
-      Left = 16
-      Top = 97
-      Width = 104
+      Left = 130
+      Top = 46
+      Width = 169
       Height = 13
-      Caption = 'Audiofiles must match'
+      Caption = 'required to be added to the playlist'
     end
     object cbRestrictTags: TCheckBox
       Left = 16
       Top = 20
-      Width = 104
+      Width = 461
       Height = 17
       Caption = 'Restrict tags'
       Checked = True
@@ -129,10 +124,10 @@ object RandomPlaylistForm: TRandomPlaylistForm
       OnClick = cbRestrictTagsClick
     end
     object cbGenres: TCheckListBox
-      Left = 132
-      Top = 20
-      Width = 348
-      Height = 293
+      Left = 16
+      Top = 70
+      Width = 461
+      Height = 214
       Anchors = [akLeft, akTop, akRight, akBottom]
       Columns = 4
       Enabled = False
@@ -141,31 +136,34 @@ object RandomPlaylistForm: TRandomPlaylistForm
       TabOrder = 2
     end
     object Btn_Save: TButton
-      Left = 54
-      Top = 205
+      Left = 130
+      Top = 290
       Width = 70
-      Height = 21
+      Height = 25
+      Anchors = [akLeft, akBottom]
       Caption = 'Save'
-      TabOrder = 3
+      TabOrder = 4
       OnClick = Btn_SaveClick
     end
     object cb_Preselection: TComboBox
       Left = 16
-      Top = 178
+      Top = 292
       Width = 108
       Height = 21
       Style = csDropDownList
-      TabOrder = 1
+      Anchors = [akLeft, akBottom]
+      TabOrder = 3
       OnChange = cb_PreselectionChange
     end
     object cbTagCountSelection: TComboBox
-      Left = 16
-      Top = 62
-      Width = 108
+      Left = 412
+      Top = 292
+      Width = 65
       Height = 21
       Style = csDropDownList
+      Anchors = [akRight, akBottom]
       ItemIndex = 5
-      TabOrder = 4
+      TabOrder = 5
       Text = '150'
       OnChange = cbTagCountSelectionChange
       Items.Strings = (
@@ -183,17 +181,17 @@ object RandomPlaylistForm: TRandomPlaylistForm
     end
     object cbTagMatchType: TComboBox
       Left = 16
-      Top = 116
+      Top = 43
       Width = 108
       Height = 21
       Style = csDropDownList
-      ItemIndex = 1
-      TabOrder = 5
-      Text = 'almost all tags'
+      ItemIndex = 4
+      TabOrder = 1
+      Text = 'one tag'
       Items.Strings = (
         'all tags'
         'almost all tags'
-        '50%'
+        '~50% of the tags'
         'some tags'
         'one tag')
     end
@@ -339,7 +337,7 @@ object RandomPlaylistForm: TRandomPlaylistForm
     object CBMinLength: TCheckBox
       Left = 16
       Top = 16
-      Width = 122
+      Width = 139
       Height = 17
       Caption = 'minimum length'
       TabOrder = 0

@@ -222,9 +222,7 @@ Party mode can be secured by a password, which has only an alibi function. It do
 
 Nemp is basically designed to support multiple languages. The original language is English for compatibility reasons. 
 
-Due to a lack of language skills, I cannot offer any other languages besides english and german myself. However, the system is designed so that theoretically everyone can produce a further translation. If you are interested, you can download the so-called Po-Editor from \texttt{https://poedit.net} for a first look, and decompile the file \texttt{default. mo} in the folder \emph{Languages{Languages}} (or the other subfolders) in the Nemp folder (via the Windows Explorer context menu), and then open the file \texttt{default.po}  with the Po-editor. In principle, you can then start right away and translate everything. Some translations must follow certain rules. For example, the number and sequence of certain strings such as \texttt{\%s} and \texttt{\%d} must remain the same, as they are filled by Nemp with matching pieces of text or numeric values.
-
-For more information please send me an e-mail and we'll see. But as a warning: This is a sh*** job. ; -)
+In the meantime translations into Dutch and Russian have been made for Nemp. These translations are made by third parties and may be incomplete - especially when a new version has just been released.
 
 
 \subsection{External drives and backups, portability}
@@ -727,7 +725,7 @@ A new role is assigned to the display of the image that Nemp currently uses for 
 \item \emph{Reset} deletes a previously manually set cover, and Nemp selects one on itself again.
 \end{itemize}
 
-Click on \emph{Apply} (at the bottom) to save the newly selected cover. If the \emph{Update all files with this cover} checkbox is checked, the new cover will be set for all files that previously used the old cover art.
+Click on \emph{Apply} (at the bottom) to save the newly selected cover. If a corresponding option is selected in the selection box \emph{Update cover art}, the newly set cover will be changed not only for the currently selected file, but for all files matching the condition.
 
 After that the coverflow may have to be updated. This does not happen automatically, but only after clicking on the button, which is then displayed at the bottom.
 
@@ -1570,6 +1568,31 @@ This is necessary so that skins created for Nemp 4.10 (or earlier) do not place 
 
 \newpage
 
+\section{Languages}
+
+Nemp is designed for multi-language support. Languages can be added by creating additional folders in the folder \texttt{Nemp\textbackslash Languages}. 
+
+The folder \texttt{\textbackslash Languages\textbackslash <LanguageCode>\textbackslash LC\_MESSAGES} must contain a file \texttt{default.mo} which contains all texts in this language. From the \emph{language code} Nemp generates a suitable menu entry at startup.
+
+To create a new language file you need a so-called \emph{PO-Editor}, e.g. the one from \texttt{http://poedit.net}. With this editor you can create a new translation file. The necessary template for this, i.e. the \gf{original texts}, are contained in the file \texttt{default.pot}. This file should be imported with the PO editor. It can be found in the source code folder \texttt{\textbackslash src\textbackslash} of the Nemp archive (not included in the installer).
+
+\subsection{syntax}
+
+Some texts contain placeholders that must appear in the translation, in the same order. These placeholders are replaced by Nemp at runtime by corresponding data. Their meaning is:
+\begin{itemize}
+\item \texttt{\%d } Placeholder for an integer, e.g. \gf{Played \%d times} to display the playback counter.
+\item \texttt{\%d } Placeholder for a character string, e.g. \gf{Refreshing information... \%s} to display the file (or folder) that is currently being updated.
+\item \texttt{\%\% } Escape symbol for the \% character, e.g. in \gf{Refreshing information (\%d\%\%)} to display the percentage progress while updating the media library.
+\end{itemize}
+
+\subsection{Required space}
+
+Some GUI elements automatically adapt (up to a certain limit) to the space required by the texts. For most elements, I make sure during development that more space is available than is needed in the generally compact english version.
+
+Nevertheless, it should be ensured during translation that it does not take up much more space than the original. Otherwise some parts might not be displayed completely. If this is not possible in individual cases because of lack of space, please contact me by e-mail. Then I'll have a look if I can modify the GUI a little bit at this point.
+
+
+\newpage
 \section{Nerd stuff}
 
 Nemp contains some more hidden and/or wacky features. Some of them have been requested  over time, others are historically determined, others are just for fun. I would like to draw your attention to a few things here.

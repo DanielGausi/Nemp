@@ -220,9 +220,11 @@ Der Party-Modus kann über ein Passwort gesichert werden, das aber nur eine Alibi
 
 Nemp ist prinzipiell dafür ausgelegt, mehrere Sprachen zu unterstützen. Die Originalsprache ist aus Kompatibilitätsgründen englisch. Die von (vermutlich) den meisten verwendete deutsche Version ist eine Übersetzung.
 
-Mangels Sprachkenntnissen kann ich selbst keine weiteren Sprachen anbieten. Das System ist aber dafür ausgelegt, dass theoretisch jeder eine weitere Übersetzung anfertigen kann. Wenn Sie daran Interesse haben, dann können Sie für einen ersten Einblick den sogenannten Po-Editor von \texttt{http://poedit.net} herunterladen, und im Ordner \texttt{Languages} (bzw. den weiteren Unterordnern) im Nemp-Ordner die Datei \texttt{default.mo} zuerst decompilieren (über das Kontextmenü des Windows-Explorers), und anschließend die \texttt{default.po} mit dem Editor öffnen. Prinzipiell können Sie dann direkt loslegen und alles Übersetzen. Einige Übersetzungen müssen dabei gewissen Regeln folgen. Z.B. muss die Anzahl und Reihenfolge von bestimmten Zeichenfolgen wie \texttt{\%s} und \texttt{\%d} gleich bleiben, da diese von Nemp mit passenden Textstücken oder Zahlenwerten befüllt werden.
+Mittlerweile wurden für Nemp auch Übersetzungen ins Niederländische und Russische angefertigt. Diese stammen von Dritten und können unter Umständen unvollständig sein - besonders dann, wenn eine neue Version  herausgekommen ist.
 
-Für weitere Informationen schicken Sei mir eine E-Mail, dann schauen wir weiter. Aber als Warnung: Das ist eine Sch***-Arbeit. ;-)
+%Mangels Sprachkenntnissen kann ich selbst keine weiteren Sprachen anbieten. Das System ist aber dafür ausgelegt, dass theoretisch jeder eine weitere Übersetzung anfertigen kann. Wenn Sie daran Interesse haben, dann können Sie für einen ersten Einblick den sogenannten Po-Editor von \texttt{http://poedit.net} herunterladen, und im Ordner \texttt{Languages} (bzw. den weiteren Unterordnern) im Nemp-Ordner die Datei \texttt{default.mo} zuerst decompilieren (über das Kontextmenü des Windows-Explorers), und anschließend die \texttt{default.po} mit dem Editor öffnen. Prinzipiell können Sie dann direkt loslegen und alles Übersetzen. Einige Übersetzungen müssen dabei gewissen Regeln folgen. Z.B. muss die Anzahl und Reihenfolge von bestimmten Zeichenfolgen wie \texttt{\%s} und \texttt{\%d} gleich bleiben, da diese von Nemp mit passenden Textstücken oder Zahlenwerten befüllt werden.
+
+%Für weitere Informationen schicken Sei mir eine E-Mail, dann schauen wir weiter. Aber als Warnung: Das ist eine Sch***-Arbeit. ;-)
 
 
 \subsection{Mobile Festplatten und Backups, Portabilität}
@@ -713,7 +715,7 @@ Neu ist nun die Anzeige des Bildes, das Nemp aktuell für die Anzeige im Hauptfen
 \item Per \emph{Zurücksetzen} wird ein vormals manuell gesetztes Cover gelöscht, und Nemp sucht sich wieder selbst eines aus.
 \end{itemize}
 
-Mit Klick auf \emph{Übernehmen} (ganz unten) wird das neu gewählte Cover gespeichert. Wenn die Checkbox \emph{Aktualisiere alle Dateien mit diesem Coverbild} aktiviert ist, wird das neue Cover bei allen Dateien gesetzt, die vorher das alte Cover hatten.
+Mit Klick auf \emph{Übernehmen} (ganz unten) wird das neu gewählte Cover gespeichert. Wenn in der Auswahlbox \emph{Cover aktualisieren} eine entsprechende Option gewählt wird, so wird das neu gesetzte Cover nicht nur bei der aktuell gewählten Datei geändert, sondern bei allen Dateien, auf die die Bedingung zutrifft.
 
 Im Anschluss muss unter Umständen der Coverflow aktualisiert werden. Das geschieht nicht automatisch, sondern erst nach Klick auf den Button, der dann unten eingeblendet wird.
 
@@ -1506,6 +1508,28 @@ Das ist notwendig, damit Skins, die für Nemp 4.10 (oder früher) erstellt worden 
 
 \newpage
 
+\section{Sprachen}
+
+Nemp ist für Mehrsprachigkeit ausgelegt. Es können beliebig Sprachen hinzugefügt werden, wenn im Ordner \texttt{Nemp\textbackslash Languages} passende weitere Ordner angelegt werden. Im Ordner \texttt{\textbackslash Languages\textbackslash <SprachCode>\textbackslash LC\_MESSAGES} muss eine Datei \texttt{default.mo} liegen, die sämtliche Texte in dieser Sprache enthält. Aus dem \emph{Sprachcode} heraus generiert Nemp beim Start einen passenden Menüeintrag.
+
+Zum Erstellen einer neuen Sprachdatei benötigt man einen sogenannten \emph{PO-Editor}, z.B. den von \texttt{http://poedit.net}. Mit diesem Editor kann man eine neue Übersetzungsdatei erstellen. Die notwendige Schablone dafür, d.h. die \gf{Original-Texte}, sind in der Datei \texttt{default.pot} enthalten. Diese sollte mit dem PO-Editor importiert werden. Die Datei findet man im Quellcode-Ordner \texttt{\textbackslash src\textbackslash} des Nemp-Archivs (wird nicht mit dem Installer mitgeliefert).
+
+\subsection{Syntax}
+
+Einige Texte enthalten Platzhalter, die unbedingt auch in der Übersetzung auftauchen müssen, und zwar in derselben Reihenfolge. Diese Platzhalter werden durch Nemp zur Laufzeit durch passende Daten ersetzt. Dabei bedeuten:
+\begin{itemize}
+\item \texttt{\%d } Platzhalter für eine ganze Zahl, z.B. \gf{Played \%d times} zur Anzeige des Abspielzählers.
+\item \texttt{\%d } Platzhalter für eine Zeichenkette, z.B. \gf{Refreshing information ... \%s} zur Anzeige der Datei (oder des Ordners), die gerade aktualisiert wird.
+\item \texttt{\%\% } Escape-Symbol für das \%-Zeichen, z.B. bei \gf{Refreshing information (\%d\%\%)} zur Anzeige des prozentualen Fortschritts während der Aktualisierung der Medienbibliothek.
+\end{itemize}
+
+\subsection{Platzbedarf}
+
+Einige GUI-Elemente passen sich (bis zu einer gewissen Grenze) automatisch an den Platzbedarf der Texte an. Bei den meisten Elementen achte ich während der Entwicklung darauf, dass mehr Platz zur Verfügung steht, als in der allgemein kompakten englischen Version benötigt wird.
+
+Dennoch sollte bei der Übersetzung darauf geachtet werden, dass diese nicht wesentlich mehr Platz als das Original benötigt. Andernfalls werden einige Teile ggf. nicht vollständig angezeigt. Sollte das im Einzelfall nicht möglich sein, weil der Platz zu knapp bemessen ist, kontaktieren Sie mich per E-Mail. Dann schau ich mir das mal an, ob man an der Stelle das GUI ein wenig modifizieren kann.
+
+\newpage
 \section{Nerd-Zeug}
 
 Nemp enthält einige weitere versteckte und/oder bekloppte Features. Einige sind im Laufe der Zeit gewünscht worden, andere sind historisch bedingt, wieder andere einfach nur so aus Spaß dabei. Der Vollständigkeit möchte ich hier auf ein paar Dinge hinweisen.

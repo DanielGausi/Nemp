@@ -49,7 +49,10 @@ implementation
 
 procedure TMainForm.BtnHideClick(Sender: TObject);
 begin
-    hide;
+  if (ParamCount = 0) then
+      close
+  else
+      hide;
 end;
 
 procedure TMainForm.Button1Click(Sender: TObject);

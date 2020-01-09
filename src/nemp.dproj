@@ -83,8 +83,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_AutoGenVersion>false</VerInfo_AutoGenVersion>
-        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.13.0.673;InternalName=;LegalCopyright=2005-2019, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.13;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_Build>673</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=;FileDescription=Noch ein Mp3-Player;FileVersion=4.13.0.677;InternalName=;LegalCopyright=2005-2019, Daniel Gaussmann;LegalTrademarks=;OriginalFilename=;ProductVersion=4.13;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Build>677</VerInfo_Build>
         <VerInfo_MinorVer>13</VerInfo_MinorVer>
         <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <DCC_MapFile>3</DCC_MapFile>
@@ -241,23 +241,25 @@
         <DCCReference Include="SilenceDetection.pas"/>
         <DCCReference Include="common\NempApi.pas">
             <Form>,
+
   bass in &apos;3rd Party Units\bass.pas&apos;,
   bass_fx in &apos;3rd Party Units\bass_fx.pas&apos;,
-  basscd in &apos;3rd Party Units\basscd.pas&apos;;
-
-uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
-  OneInst in &apos;3rd Party Units\OneInst.pas&apos;,
-  gnuGettext,
-  Forms,
-  Windows,
-  SysUtils,
-  Graphics,
-  NempMainUnit in &apos;NempMainUnit.pas&apos; {Nemp_MainForm</Form>
+  basscd in &apos;3rd Party Units\basscd.pas&apos;,
+  md5 in &apos;3rd Party Units\md5.pas&apos;,
+  MyDialogs in &apos;3rd Party Units\MyDialogs.pas&apos;,
+  unitFlyingCow in &apos;3rd Party Units\unitFlyingCow.pas&apos;,
+  dglOpenGL in &apos;3rd Party Units\dglOpenGL.pas&apos;,
+  fldbrows in &apos;3rd Party Units\fldbrows.pas&apos;,
+  SearchTool in &apos;3rd Party Units\SearchTool.pas&apos;,
+  filetypes in &apos;3rd Party Units\filetypes.pas&apos;,
+  WindowsVersionInfo in &apos;3rd Party Units\WindowsVersionInfo.pas&apos;,
+  Windows_Fragment in &apos;3rd Party Units\Windows_Fragment.pas&apos;,
+  gnugettext in &apos;3rd Party Units\gnugettext.pas&apos;,
+  languagecodes in &apos;3rd Party Units\languagecodes.pas&apos;,
+  PlayWebstream in &apos;PlayWebstream.pas&apos;,
+  bassmidi in &apos;3rd Party Units\bassmidi.pas&apos;,
+  unFastFileStream in &apos;3rd Party Units\unFastFileStream.pas&apos;,
+  PlayerLog in &apos;PlayerLog.pas&apos; {PlayerLogForm</Form>
         </DCCReference>
         <DCCReference Include="3rd Party Units\bass.pas"/>
         <DCCReference Include="3rd Party Units\bass_fx.pas"/>
@@ -281,15 +283,12 @@ uses
         </DCCReference>
         <DCCReference Include="ProgressUnit.pas">
             <Form>ProgressForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="EffectsAndEqualizer.pas">
             <Form>FormEffectsAndEqualizer</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="MainFormBuilderForm.pas">
             <Form>MainFormBuilder</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="NempFileUtils.pas"/>
         <DCCReference Include="ReplayGainProgress.pas">
@@ -299,7 +298,6 @@ uses
         <DCCReference Include="NempReplayGainCalculation.pas"/>
         <DCCReference Include="NewMetaFrame.pas">
             <Form>NewMetaFrameForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="MetaTagSorting.pas"/>
         <BuildConfiguration Include="Debug">

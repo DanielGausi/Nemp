@@ -191,8 +191,6 @@ type
     MM_T_DirectoriesData: TMenuItem;
     MM_Help: TMenuItem;
     MM_H_About: TMenuItem;
-    MM_H_ShowReadme: TMenuItem;
-    N19: TMenuItem;
     MM_H_Help: TMenuItem;
     MM_H_CheckForUpdates: TMenuItem;
     PM_ML_Play: TMenuItem;
@@ -743,7 +741,6 @@ type
     procedure PM_ML_PlayNextClick(Sender: TObject);
     procedure PM_ML_ExtendedShowAllFilesInDirClick(Sender: TObject);
     procedure NachDiesemDingSuchen1Click(Sender: TObject);
-    procedure MM_H_ShowReadmeClick(Sender: TObject);
     procedure MM_PL_DirectoryClick(Sender: TObject);
     procedure MM_PL_FilesClick(Sender: TObject);
     procedure MM_PL_AddPlaylistClick(Sender: TObject);
@@ -2909,9 +2906,9 @@ begin
         begin
             if NOT NempSkin.UseDefaultMenuImages then
                 NempSkin.SetDefaultMenuImages;
+            NempSkin.SetVSTHeaderSettings;
         end;
          CorrectSkinRegionsTimer.Enabled := True;
-        //CorrectSkinRegions;
     end else
     begin
         // refresh skin, if a skin is used, and it supports advanced skinning
@@ -2926,7 +2923,14 @@ begin
     //UpdateFormDesignNeu;     ??? 08.2018 warum war das hier???
 
     if assigned(FDetails) then
-        FDetails.LoadStarGraphics;
+        FDetails.RefreshStarGraphics;
+
+    if assigned(RandomPlaylistForm) then
+        RandomPlaylistForm.RefreshStarGraphics;
+
+    if assigned(OptionsCompleteForm) then
+      OptionsCompleteForm.RefreshStarGraphics;
+
     {$ENDIF}
 end;
 
@@ -5854,8 +5858,8 @@ begin
         if NempSkin.isActive then
             Pen.Color := NempSkin.SkinColorScheme.PlaylistPlayingFileColor
         else
-            Pen.Color := clGradientActiveCaption;
-        pen.Width := 2;//3;
+            Pen.Color := clWindowText; //clGradientActiveCaption;
+        pen.Width := 1;  //2 //3;  // 1 is enough, and looks better on some skins, imho.
 
         Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
               Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
@@ -8000,16 +8004,6 @@ begin
 end;
 
 
-procedure TNemp_MainForm.MM_H_ShowReadmeClick(Sender: TObject);
-begin
-  if NOT FileExists(ExtractFilePath(Paramstr(0)) + 'readme.txt') then
-    TranslateMessageDLG((Error_ReadmeFileNotFound), mtError, [mbOK], 0)
-  else
-    ShellExecute(Handle, 'open'
-                      ,PChar(ExtractFilePath(Paramstr(0)) + 'readme.txt')
-                      , nil, nil, SW_SHOWNORMAl);
-end;
-
 procedure TNemp_MainForm.MM_PL_DirectoryClick(Sender: TObject);
 var newdir: UnicodeString;
     FB: TFolderBrowser;
@@ -8462,13 +8456,15 @@ begin
         begin
             case Column of
               0:  begin  // main column
-                      if Sender.GetNodeLevel(Node) = 0 then
-                      begin
+                      //if Sender.GetNodeLevel(Node) = 0 then
+                      //begin
                           if Not Data.FAudioFile.FileIsPresent then
                               imageIndex := 5
                           else
                           begin
-                              if Node = NempPlayList.PlayingNode then
+                              if (Node = NempPlayList.PlayingNode)
+                                  or (Node = NempPlaylist.ActiveCueNode)
+                              then
                                   case NempPlayer.Status of
                                       PLAYER_ISPLAYING: ImageIndex := 2;
                                       PLAYER_ISPAUSED:  ImageIndex := 3;
@@ -8490,7 +8486,7 @@ begin
 
                               end;
                           end;
-                      end;
+                      //end;
                   end; // case Column 0
                   1: begin
                         if (Data.FAudioFile.AudioType = at_File)
