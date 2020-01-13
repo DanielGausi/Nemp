@@ -347,7 +347,7 @@ begin
     if fOperationCancelled then
     begin
         LblMain.Caption := Progressform_ReplayGain_Cancelled;
-        LogMemo.Lines.Add('Aborted')
+        LogMemo.Lines.Add(ReplayGain_Abort)
     end else
     begin
         LblMain.Caption := Progressform_ReplayGain_Complete;

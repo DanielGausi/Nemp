@@ -856,6 +856,7 @@ ReplayGain_CalculateMultipleAlbums = 'Calculating ReplayGain values for album "%
 ReplayGain_StartSynchronizing = 'Calculating complete, synchronizing %d files ...';
 ReplayGain_RemoveFromFiles = 'Removing ReplayGain values from %d files ...';
 ReplayGain_Complete = 'ReplayGain calculation complete' ;
+ReplayGain_Abort = 'ReplayGain calculation aborted by user' ;
 ReplayGain_AlbumComplete = 'Calculation AlbumGain complete.';
 ReplayGain_ScanningFile = 'Scanning file "%s"' ;
 ReplayGain_UnexpectedError = 'Some unexpected Error occured (Errorcode: %d)';
