@@ -3354,7 +3354,7 @@ var GenreIDX:byte;
     c: Integer;
     katold:byte;
     tmp: UnicodeString;
-    Id: Byte;
+    Id, byteTrack: Byte;
     // dummy: Integer;
     Wyear: word;
     DummyInt: Integer;
@@ -3392,7 +3392,10 @@ begin
             MP3DB_FILESIZE: aStream.Read(fFileSize,SizeOf(fFileSize));
             // new again in Nemp 4.0: FileAge
             MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
-            MP3DB_TRACK : aStream.Read(fTrack, SizeOf(fTrack));
+            MP3DB_TRACK : begin
+                              aStream.Read(byteTrack, SizeOf(byteTrack));
+                              fTrack := byteTrack;
+            end;
             MP3DB_CD    : CD := ReadTextFromStream_DEPRECATED(aStream);    // New in 4.5
 
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
@@ -3453,7 +3456,7 @@ var GenreIDX:byte;
     c, cuePresent: Integer;
     katold:byte;
     tmp: UnicodeString;
-    Id: Byte;
+    Id, trackByte: Byte;
     dummy: Integer;
     Wyear: word;
     DummyInt: Integer;
@@ -3488,7 +3491,10 @@ begin
             MP3DB_FILESIZE: aStream.Read(fFileSize,SizeOf(fFileSize));
             // new again in Nemp 4.0: FileAge
             MP3DB_DATUM : aStream.Read(fFileAge, SizeOf(fFileAge));
-            MP3DB_TRACK: aStream.Read(fTrack, SizeOf(fTrack));
+            MP3DB_TRACK: begin
+                    aStream.Read(trackByte, SizeOf(trackByte));
+                    ftrack := trackByte;
+            end;
             MP3DB_CD   : CD := ReadTextFromStream_DEPRECATED(aStream);
             MP3DB_KATEGORIE: aStream.Read(katold,SizeOf(katold));
             MP3DB_YEAR: begin
@@ -3578,9 +3584,9 @@ begin
     if Track >= 0 then
     begin
         if Track < 255 then
-            result := result + WriteByteToStream(aStream, MP3DB_TRACK, Track)
+            result := result + WriteByteToStream(aStream, MP3DB_TRACK, fTrack)
         else
-            result := result + WriteIntegerToStream(aStream, MP3DB_TRACK_INT, Track)
+            result := result + WriteIntegerToStream(aStream, MP3DB_TRACK_INT, fTrack)
     end;
 
     if CD <> ''          then result := result + WriteTextToStream(aStream, MP3DB_CD, CD);
