@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabPlaylistRandom
+      ActivePage = TabFiles2
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -1415,6 +1415,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 8
           Width = 431
           Height = 89
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Taskbar and/or tray'
           TabOrder = 0
           object LblTaskbarWin7: TLabel
@@ -2838,6 +2839,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 310
           Width = 439
           Height = 50
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'CD-Audio'
           TabOrder = 2
           object cb_UseCDDB: TCheckBox
@@ -2874,6 +2876,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 78
           Width = 439
           Height = 90
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Extended tags (for tag cloud)'
           TabOrder = 4
           object cb_AutoResolveInconsistencies: TCheckBox
@@ -2961,7 +2964,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Hint = 
               'Search for coverfiles in the specified subdirectory of the paren' +
               't directory.'
-            Caption = 'Sisterdirectory (name)'
+            Caption = 'Sister directory (name)'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 4
@@ -3015,10 +3018,11 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
         object GrpBox_Files_Cover_Default: TGroupBox
-          Left = 12
-          Top = 175
+          Left = 8
+          Top = 243
           Width = 439
           Height = 194
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Default cover'
           TabOrder = 2
           object lbl_DefaultCover: TLabel
@@ -3070,9 +3074,10 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBoxLyrcSettings: TGroupBox
           Left = 8
-          Top = 375
+          Top = 443
           Width = 439
           Height = 138
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Online search for Lyrics'
           TabOrder = 3
           object LblLyricPriorities: TLabel
@@ -3116,6 +3121,30 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Position = 50
             TabOrder = 1
             OnClick = BtnLyricPrioritiesClick
+          end
+        end
+        object GrpBox_Files_CoverSize: TGroupBox
+          Left = 8
+          Top = 176
+          Width = 439
+          Height = 64
+          Anchors = [akLeft, akTop, akRight]
+          Caption = 'Quality of the covers in the media library'
+          TabOrder = 4
+          object cb_CoverSize: TComboBox
+            Left = 16
+            Top = 24
+            Width = 201
+            Height = 21
+            Style = csDropDownList
+            ItemIndex = 1
+            TabOrder = 0
+            Text = 'Normal (500x500)'
+            Items.Strings = (
+              'Low (240x240)'
+              'Normal (500x500)'
+              'High (750x750)'
+              'Highest (1000x1000)')
           end
         end
       end
@@ -4084,6 +4113,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Top = 388
           Width = 439
           Height = 98
+          Anchors = [akLeft, akTop, akRight]
           Caption = 'Playlist Log'
           TabOrder = 3
           object LblLogDuration: TLabel

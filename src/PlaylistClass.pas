@@ -2186,7 +2186,7 @@ function TNempPlaylist.GetAnAudioFile: TPlaylistFile;
 var Node: PVirtualNode;
   Data: PTreeData;
 begin
-  if assigned(PlayingFile) then
+  if assigned(PlayingFile) and assigned(fPlayingNode) then
     result := PlayingFile
   else
   begin
@@ -2508,7 +2508,9 @@ begin
 
     // get the node, where it should be moved to
     GetInsertNodeFromPlayPosition;
-    iNode := InsertNode;
+    // bugfix 2020: Voted file was put *before* the currently playing file
+    // iNode := InsertNode
+    iNode := VST.GetNextSibling(InsertNode);
     if assigned(iNode) then
     begin
         iData := VST.GetNodeData(iNode);
@@ -2529,9 +2531,9 @@ begin
             if assigned(iNode) then
             begin
                 if aIndex < iNode.Index then
-                    newIdx := iNode.Index - 1
+                    newIdx := iNode.Index -1
                 else
-                    newIdx := iNode.Index;
+                    newIdx := iNode.Index ;
                 Playlist.Move(aIndex, newIdx);
                 VST.MoveTo(currentNode, iNode, amInsertBefore, false);
             end else
@@ -2555,8 +2557,6 @@ begin
             VST.MoveTo(currentNode, iNode, amInsertAfter, false);
         end
     end;
-
-
 
     // fPlayingIndex korrigieren
     ReInitPlaylist;

@@ -44,6 +44,14 @@ function setslider(data, textStatus, jqXHR){
 		}
 }
 
+function playercontrol_VolumeUp() {
+	$.ajax({url:"playercontrolJS?action=setvolume&value=1000", dataType:"html", success: checkVolume});	
+  }
+  
+function playercontrol_VolumeDown() {
+	$.ajax({url:"playercontrolJS?action=setvolume&value=-1000", dataType:"html", success: checkVolume});
+  }
+
 function loadplayercontrols(data, textStatus, jqXHR){			
 	var	$currentDOM = $("#playercontrol");			
 	$currentDOM.html(data);		

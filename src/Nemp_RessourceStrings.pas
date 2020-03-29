@@ -388,6 +388,7 @@ NempUpdate_PrivateVersion = 'It seems that you are using an experimental version
 
 NempUpdate_InfoNewVersionAvailable = 'New version available: %s';
 NempUpdate_InfoNewBetaVersionAvailable = 'New beta version available: %s';
+NempUpdate_InfoDeveloperVersion = 'Developer version (Latest release: %s)';
 NempUpdate_InfoYourVersion = 'Your current version: %s';
 // NempUpdate_InfoNewestVersion = 'Newest version: %s';
 NempUpdate_InfoLastBetaRelease = 'Latest release: %s (%s)';

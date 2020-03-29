@@ -15,8 +15,9 @@ $(document).ready(function() {
 	if ( $("#volume").length > 0 ){
 		$("#volume").slider( 
 				{ stop: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"});},
-				  slide: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"});}						
-				} );
+				  slide: function(event, ui){$.ajax({url:"playercontrolJS?action=setvolume&value="+ui.value, dataType:"html"}) }
+				} 
+			);
 		checkVolume();
 	}
 });
@@ -43,6 +44,16 @@ function setslider(data, textStatus, jqXHR){
 			t=setTimeout("checkProgress()",1000);
 		}
 }
+
+function playercontrol_VolumeUp() {
+	$.ajax({url:"playercontrolJS?action=setvolume&value=1000", dataType:"html", success: checkVolume});	
+  }
+  
+function playercontrol_VolumeDown() {
+	$.ajax({url:"playercontrolJS?action=setvolume&value=-1000", dataType:"html", success: checkVolume});
+  }
+  
+  
 
 function loadplayercontrols(data, textStatus, jqXHR){			
 	var	$currentDOM = $("#playercontrol");			

@@ -29,8 +29,7 @@ package NempKomponenten;
 
 requires
   rtl,
-  vcl,
-  GR32_R;
+  vcl;
 
 contains
   NempGroupBox in 'NempGroupBox.pas',

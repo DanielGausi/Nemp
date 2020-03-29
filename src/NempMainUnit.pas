@@ -1788,10 +1788,10 @@ begin
 
     DragDropList := TStringList.Create;
 
-    // Get Savepath for settings
-    if IsExeInProgramSubDir then
+    // Get Savepath for settings and other data
+    if UseUserAppData then
     begin
-        // Nemp liegt im System-Programmverzeichnis
+        // User DOES NOT want a portable storage of data - use the user directory
         SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
         try
             ForceDirectories(SavePath);
@@ -1800,18 +1800,11 @@ begin
         end;
     end else
     begin
-        // Nemp liegt woanders
+        // User DOES want a portable/locale storage of configuration and data - use program directory
         SavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
     end;
 
-    TCoverArtSearcher.SavePath := SavePath + 'Cover\';
-    try
-        ForceDirectories(TCoverArtSearcher.SavePath);
-    except
-        if not DirectoryExists(TCoverArtSearcher.SavePath) then
-            TCoverArtSearcher.SavePath := SavePath;
-    end;
-
+    TCoverArtSearcher.InitCoverArtCache(SavePath, 0);
 
     // Create additional controls
     CloudViewer           := TCloudViewer.Create(self);
@@ -1956,7 +1949,6 @@ begin
     // create WebServer
     NempWebServer := TNempWebServer.Create(FOwnMessageHandler);
     NempWebServer.SavePath := SavePath;
-    NempWebServer.CoverSavePath := TCoverArtSearcher.SavePath;
 
     // create Spectrum
     Spectrum := TSpectrum.Create(PaintFrame.Width, PaintFrame.Height);
@@ -2216,8 +2208,7 @@ var
     bmp: TBitmap;
     pic: TPicture;
     success: Boolean;
-    dummyAudioFile: TAudioFile;
-    afList: TObjectList;
+    newID: String;
 begin
   if NempIsClosing then exit;
 
@@ -2225,8 +2216,8 @@ begin
   bmp := TBitmap.Create;
   try
       bmp.PixelFormat := pf24bit;
-      bmp.Height := 240;
-      bmp.Width := 240;
+      // bmp.Height := 240;
+      // bmp.Width := 240;
 
       if MedienBib.CoverList.Count > msg.Index then
       begin
@@ -2244,40 +2235,16 @@ begin
           begin
               // file \coverSavepath\<id>.jpg is missing, even if it should exist (= it was manually deleted?)
               // try to recreate it from the image files already existing on the disc/id3Tag
-
-              dummyAudioFile := TAudioFile.Create;
-              try
-                  // We do not have an "Audiofile" with this coverID right now, so get one first.
-                  // this is needed, as otherwise we won't find the (now deleted) cover, if there's only cover art in
-                  // the ID3Tag, ond no jpg-files at all around the mp3-files
-                  afList := TObjectList.Create(False);
-                  try
-                      MedienBib.GetTitelListFromCoverID(afList, aCover.ID);
-                      if afList.Count = 0 then
-                          dummyAudioFile.Pfad := IncludeTrailingPathDelimiter(aCover.Directory) + 'foo.bar'
-                      else
-                          dummyAudioFile.GetAudioData(TAudioFile(afList[0]).Pfad)//, GAD_COVER)
-                  finally
-                      afList.Free;
-                  end;
-
-                  MedienBib.CoverArtSearcher.InitCover(dummyAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
-                  // try again getting the coverbitmap
-                  success := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(dummyAudioFile.CoverID, pic);
-                  // if we found an image, but the ID has changed: Change it on the other files with that ID as well
-                  if (dummyAudioFile.CoverID <> aCover.ID) then
-                  begin
-                      MedienBib.ChangeCoverID(aCover.ID, dummyAudioFile.CoverID);
-                      if  MedienBib.NewCoverFlow.CurrentCoverID = aCover.ID then
-                          MedienBib.NewCoverFlow.CurrentCoverID := dummyAudioFile.CoverID;
-                      aCover.ID := dummyAudioFile.CoverID;
-                  end;
-              finally
-                  dummyAudioFile.Free;
-              end;
+              success := RepairCoverFileVCL(aCover.ID, pic, newID);
+              if success then
+                  aCover.ID := newID;
           end;
 
+          bmp.Height := pic.Graphic.Height;
+          bmp.Width := pic.Graphic.Width;
+
           FitBitmapIn(bmp, pic.Graphic);
+          // bmp.Assign(pic.Graphic);
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
 
           if (not success) and (MedienBib.CoverSearchLastFM) then
@@ -5422,6 +5389,8 @@ begin
 end;
 
 procedure TNemp_MainForm.RefreshVSTCover(aAudioFile: TAudioFile);
+var CoverFileFound: Boolean;
+    originalID: String;
 begin
     if assigned(aAudioFile) then
     begin
@@ -5434,9 +5403,25 @@ begin
             ImgDetailCover.Picture.Bitmap.Width := ImgDetailCover.Width;
             ImgDetailCover.Picture.Bitmap.Height := ImgDetailCover.Height;
 
-            TCoverArtSearcher.GetCover_Fast(aAudioFile, ImgDetailCover.Picture);
-            // GetCover(aAudioFile, ImgDetailCover.Picture, False); // False: Only get the cover from the ID, nothing else
-            //                                       // or maybe more, if aAudioFile is in the Playlist??
+            CoverFileFound := TCoverArtSearcher.GetCover_Fast(aAudioFile, ImgDetailCover.Picture);
+
+            // if the CoverIDFile wasn't found, but should be present: create it again
+            // (just as it done in the coverflow as well)
+            // Note: This will probably remove a manually set Cover for the library
+            originalID := aAudioFile.CoverID;
+            if (not CoverFileFound) and PreviewGraphicShouldExist(originalID) then
+            begin
+                  MedienBib.CoverArtSearcher.InitCover(aAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
+                  // try again getting the coverbitmap
+                  MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aAudioFile.CoverID, ImgDetailCover.Picture);
+                  // if we found an image, but the ID has changed: Change it on the other files with that ID as well
+                  if (aAudioFile.CoverID <> originalID) then
+                  begin
+                      MedienBib.ChangeCoverIDUnsorted(originalID, aAudioFile.CoverID);
+                      if  MedienBib.NewCoverFlow.CurrentCoverID = originalID then
+                          MedienBib.NewCoverFlow.CurrentCoverID := aAudioFile.CoverID;
+                  end;
+            end;
 
             ImgDetailCover.Picture.Assign(ImgDetailCover.Picture);
             ImgDetailCover.Refresh;
@@ -5849,7 +5834,7 @@ end;
 
 procedure TNemp_MainForm.PlaylistVSTAfterItemPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
-var Data: PTreeData;
+// var Data: PTreeData;
 begin
   with TargetCanvas do
   begin
@@ -6489,9 +6474,14 @@ begin
   case Column of
     0: begin
           if Data^.FAudioFile.PrebookIndex = 0 then
-               cellText := Data^.FAudioFile.PlaylistTitle
+          begin
+              if Data^.FAudioFile.VoteCounter > 0 then
+                  cellText := Format ( '(%d)  %s',  [Data^.FAudioFile.VoteCounter, Data^.FAudioFile.PlaylistTitle])
+              else
+                  cellText := Data^.FAudioFile.PlaylistTitle
+          end
           else
-              cellText := Format('[ %d ]  %s' , [Data^.FAudioFile.PrebookIndex, Data^.FAudioFile.PlaylistTitle]);
+              cellText := Format('(%d)  %s' , [Data^.FAudioFile.PrebookIndex, Data^.FAudioFile.PlaylistTitle]);
     end;
     1:  begin
           if PlaylistVST.GetNodeLevel(Node) = 0 then
@@ -8473,6 +8463,8 @@ begin
                                   end// Case  NempPlayer.Status
                               else
                               begin
+                                  if Data.FAudioFile.VoteCounter > 0 then
+                                      ImageIndex := 20
                               {
                                   // don't show the music-note on ecery node any more
                                   // not the playing node

@@ -904,7 +904,7 @@ begin
                   ButtonTmp.Width := 14;
                   Buttontmp.Height := 14;
                   Nemp_MainForm.PlayListSkinImageList.Clear;
-                  for i := 0 to 18 do
+                  for i := 0 to 20 do
                   begin
                       ButtonTmp.Canvas.CopyRect(
                             rect(0,0,14,14), ListenCompletebmp.Canvas,

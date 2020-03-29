@@ -165,9 +165,9 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-      tmp1:= AnsiCompareText(TNempCover(item1).Artist, TNempCover(item2).Artist);
+      tmp1:= AnsiCompareText_Nemp(TNempCover(item1).Artist, TNempCover(item2).Artist);
       if tmp1=0 then
-        result := AnsiCompareText(TNempCover(item1).Album, TNempCover(item2).Album)
+        result := AnsiCompareText_Nemp(TNempCover(item1).Album, TNempCover(item2).Album)
       else
         result:= tmp1;
   end;
@@ -183,9 +183,9 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-    tmp1:= AnsiCompareText(TNempCover(item1).Album, TNempCover(item2).Album);
+    tmp1:= AnsiCompareText_Nemp(TNempCover(item1).Album, TNempCover(item2).Album);
     if tmp1=0 then
-      result := AnsiCompareText(TNempCover(item1).Artist, TNempCover(item2).Artist)
+      result := AnsiCompareText_Nemp(TNempCover(item1).Artist, TNempCover(item2).Artist)
     else
       result:= tmp1;
     end;
@@ -200,7 +200,7 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-    result := AnsiCompareText(TNempCover(item1).Genre, TNempCover(item2).Genre);
+    result := AnsiCompareText_Nemp(TNempCover(item1).Genre, TNempCover(item2).Genre);
     if result = 0 then
       result := CoverSort_Artist(item1, item2);
   end;
@@ -214,7 +214,7 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-    result := AnsiCompareText(TNempCover(item1).Genre, TNempCover(item2).Genre);
+    result := AnsiCompareText_Nemp(TNempCover(item1).Genre, TNempCover(item2).Genre);
     if result = 0 then
       result := CoverSort_Jahr(item1, item2);
   end;
@@ -270,7 +270,7 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-    result := AnsiCompareText(TNempCover(item1).Directory, TNempCover(item2).Directory);
+    result := AnsiCompareText_Nemp(TNempCover(item1).Directory, TNempCover(item2).Directory);
     if result = 0 then
       result := CoverSort_Artist(item1, item2);
   end;
@@ -284,7 +284,7 @@ begin
   if (TNempCover(item1).ID = '') and (TNempCover(item2).ID <> '') then result := -1 else
   if (TNempCover(item2).ID = '') and (TNempCover(item1).ID <> '') then result := 1 else
   begin
-    result := AnsiCompareText(TNempCover(item1).Directory, TNempCover(item2).Directory);
+    result := AnsiCompareText_Nemp(TNempCover(item1).Directory, TNempCover(item2).Directory);
     if result = 0 then
       result := CoverSort_Album(item1, item2);
   end;
@@ -467,11 +467,11 @@ end;
 
 function PlaylistSort_Pfad(item1,item2:pointer):integer;
 begin
-  result := AnsiCompareText(TJustaString(item1).DataString, TJustaString(item2).DataString);
+  result := AnsiCompareText_Nemp(TJustaString(item1).DataString, TJustaString(item2).DataString);
 end;
 function PlaylistSort_Name(item1,item2:pointer):integer;
 begin
-  result := AnsiCompareText(TJustaString(item1).AnzeigeString, TJustaString(item2).AnzeigeString);
+  result := AnsiCompareText_Nemp(TJustaString(item1).AnzeigeString, TJustaString(item2).AnzeigeString);
 end;
 
 function BinaerPlaylistSuche(Liste: TObjectlist; Filename: UnicodeString; l,r: integer):integer;
@@ -486,7 +486,7 @@ begin
     begin
         m := (l+r) DIV 2;
         strm := (Liste[m] as TJustaString).DataString;
-        c := AnsiCompareText(Filename, strm);
+        c := AnsiCompareText_Nemp(Filename, strm);
         if l = r then
         begin
             if c = 0 then result := l
@@ -509,26 +509,26 @@ var tmp, tmp1, tmp2: Integer;
 begin
   case SortOrder of
       SO_Pfad: begin
-          tmp := AnsiCompareText(A.Ordner, B.Ordner);
+          tmp := AnsiCompareText_Nemp(A.Ordner, B.Ordner);
           if tmp = 0 then
-            result := AnsiCompareText(A.Dateiname, B.Dateiname) < 0
+            result := AnsiCompareText_Nemp(A.Dateiname, B.Dateiname) < 0
           else
             result := tmp < 0;
       end;
       SO_ArtistAlbum: begin
           if SortArray[1] = siFileAge then
-              tmp1 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+              tmp1 := AnsiCompareText_Nemp(A.FileAgeSortString, B.FileAgeSortString)
           else
-              tmp1 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
+              tmp1 := AnsiCompareText_Nemp(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
 
           if tmp1=0 then
           begin
               if SortArray[2] = siFileAge then
-                  tmp2 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+                  tmp2 := AnsiCompareText_Nemp(A.FileAgeSortString, B.FileAgeSortString)
               else
-                  tmp2 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
+                  tmp2 := AnsiCompareText_Nemp(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
               if tmp2 = 0 then
-                  result := AnsiCompareText(A.Titel, B.Titel) < 0
+                  result := AnsiCompareText_Nemp(A.Titel, B.Titel) < 0
               else
                   result := tmp2 < 0;
           end
@@ -536,24 +536,24 @@ begin
       end;
       SO_AlbumArtist: begin
           if SortArray[2] = siFileAge then
-              tmp1 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+              tmp1 := AnsiCompareText_Nemp(A.FileAgeSortString, B.FileAgeSortString)
           else
-              tmp1 := AnsiCompareText(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
+              tmp1 := AnsiCompareText_Nemp(A.Strings[SortArray[2]], B.Strings[SortArray[2]]);
           if tmp1=0 then
           begin
               if SortArray[1] = siFileAge then
-                  tmp2 := AnsiCompareText(A.FileAgeSortString, B.FileAgeSortString)
+                  tmp2 := AnsiCompareText_Nemp(A.FileAgeSortString, B.FileAgeSortString)
               else
-                  tmp2 := AnsiCompareText(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
+                  tmp2 := AnsiCompareText_Nemp(A.Strings[SortArray[1]], B.Strings[SortArray[1]]);
               if tmp2 = 0 then
-                  result := AnsiCompareText(A.Titel, B.Titel) < 0
+                  result := AnsiCompareText_Nemp(A.Titel, B.Titel) < 0
               else
                   result := tmp2 < 0;
           end
           else result := tmp1 < 0;
       end;
       SO_Cover: begin
-         result := AnsiCompareText(A.CoverID, B.CoverID) <= 0;
+         result := AnsiCompareText_Nemp(A.CoverID, B.CoverID) <= 0;
       end;
       // Fehler ;-)
       else result := True;
@@ -610,7 +610,7 @@ begin
         if (idxA < SourceA.Count) AND (idxB < SourceB.Count) then
         begin
             // Noch was in beiden Source-Listen drin
-            if AnsiCompareText(TJustaString(SourceA[idxA]).DataString, TJustaString(SourceB[idxB]).DataString) < 0 then
+            if AnsiCompareText_Nemp(TJustaString(SourceA[idxA]).DataString, TJustaString(SourceB[idxB]).DataString) < 0 then
             begin
               Target.Add(SourceA[idxA]);
               inc(idxA);

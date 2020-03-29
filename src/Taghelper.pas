@@ -333,7 +333,7 @@ constructor TTagPostProcessor.Create;
 begin
     inherited create;
     // determine path for saving (and loading) files
-    if IsExeInProgramSubDir then
+    if UseUserAppData then
         fSavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\'
     else
         fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';

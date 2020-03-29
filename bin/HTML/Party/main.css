@@ -60,9 +60,7 @@ div.warning {
 	padding-bottom: 10px;
 }
 div.error {
-	color: red;	
-	margin-bottom: 5px;
-	margin-top: 5px;
+	color: red;
 }
 
 /*
@@ -142,7 +140,7 @@ div.playlistitem .cover {
 	vertical-align: top;
 }
 div.playlistitem .controls{
-	width: 25px;
+	width: 96px;
 }
 div.playlistitem .index{
 	width: 25px;
@@ -150,7 +148,7 @@ div.playlistitem .index{
 	text-align:right;	
 }
 div.playlistitem .title{
-	width: 241px;
+	width: 170px;
 	padding-left: 3px;
 }
 div.playlistitem .cover{
@@ -189,10 +187,10 @@ div.libraryitem .cover {
 	vertical-align: top;
 }
 div.libraryitem .controls{
-	width: 30px;
+	width: 74px;
 }
 div.libraryitem .title{
-	width: 265px;
+	width: 220px;
 	padding-left: 3px;
 }
 div.libraryitem .cover{
@@ -211,17 +209,34 @@ div.currentimage {
 	text-align: center;
 }
 div.progresscontainer{	
-	padding:10px 20px;
+	margin-top: 25px;	
+	padding: 25px 20px;
+	border-top: 1px solid #404040;
+}
+div.volumecontainer{
+	margin-left: 96px ;
+	margin-top: 10px;
+	margin-bottom: 10px;	
+}
+.volume {
+	float: left;	
+}
+#volume {
+	width: 100px;
+	margin-top: 7px;
+	
+}
+#playercontrol{
+		width: 200px;
+		margin: auto;		
+}
+.playercontrol {
+	text-align: center;
+	width: 360px;
+	position: relative;		
 }
 
-.playercontrol {
-	padding-bottom: 10px;	
-	text-align: center;
-	border-bottom: 1px solid #404040;
-	height: 40px;
-	width: 360px;
-	position: relative;	
-}
+
 .player .filecontrol{
 	text-align: center;
 	padding-top: 15px;

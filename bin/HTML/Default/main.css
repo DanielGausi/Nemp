@@ -209,28 +209,34 @@ div.currentimage {
 	text-align: center;
 }
 div.progresscontainer{	
-	padding:10px 20px;
+	margin-top: 25px;	
+	padding: 25px 20px;
+	border-top: 1px solid #404040;
 }
 div.volumecontainer{
-	width: 60px;
-	float: left;
-	height: 40px;
-	padding-left: 10px;
+	margin-left: 96px ;
+	margin-top: 10px;
+	margin-bottom: 10px;	
+}
+.volume {
+	float: left;	
+}
+#volume {
+	width: 100px;
+	margin-top: 7px;
+	
 }
 #playercontrol{
-		float: left;
-		height: 40px;
 		width: 200px;
-		margin-left: 30px;
+		margin: auto;		
 }
 .playercontrol {
-	padding-bottom: 10px;	
 	text-align: center;
-	border-bottom: 1px solid #404040;
-	height: 70px;
 	width: 360px;
-	position: relative;	
+	position: relative;		
 }
+
+
 .player .filecontrol{
 	text-align: center;
 	padding-top: 15px;

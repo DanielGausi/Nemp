@@ -106,6 +106,10 @@ const
     WS_IPC_GETVOLUME = 403;  // for webserver. Values between 0 and 100
     WS_IPC_SETVOLUME = 404;  // for webserver. Values between 0 and 100
 
+    WS_IPC_INCVOLUME = 405;  // for webserver. Increase Volume
+    WS_IPC_DECVOLUME = 406;  // for webserver. Decrease Volume
+
+
 
 
 
@@ -265,7 +269,7 @@ type
           // replace basic Insert-tags like {{artist}} in a given pattern
           function fSetBasicFileData(af: TAudioFile; aPattern, baseClass: String): String;
           // replace InsertTags for Buttons
-          function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean): String;
+          function fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean; IsPlayingFile: Boolean = False): String;
 
           function fSetControlButtons(aPattern: String; isPlaying, isAdmin: Boolean): String;
 
@@ -318,7 +322,6 @@ type
 
       public
           SavePath: UnicodeString;
-          CoverSavePath: UnicodeString;
 
           // Loglist logs all access to Webserver.
           // Note: Access this list only from VCL-Thread!
@@ -594,7 +597,7 @@ const
 
 implementation
 
-uses Nemp_RessourceStrings, AudioFileHelper, StringHelper;
+uses Nemp_RessourceStrings, AudioFileHelper, StringHelper, CoverHelper;
 
 function FileType2MimeType(const AFileName: string): string;
 var
@@ -1150,13 +1153,13 @@ begin
         result := StringReplace(result, '{{Warning}}' , '', [rfReplaceAll]);
 
 
-    if (af.CoverID <> '') and (FileExists(CoverSavePath + af.CoverID + '.jpg')) then
+    if (af.CoverID <> '') and (FileExists(TCoverArtSearcher.SavePath + af.CoverID + '.jpg')) then
         result := StringReplace(result, '{{CoverID}}'   , EscapeHTMLChars(af.CoverID), [rfReplaceAll])
     else
         result := StringReplace(result, '{{CoverID}}', '0', [rfReplaceAll]);
 end;
 
-function TNempWebServer.fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean): String;
+function TNempWebServer.fSetFileButtons(af: TAudioFile; aPattern: String; aPage: Integer; isAdmin: Boolean; IsPlayingFile: Boolean=False): String;
 var buttons, btnTmp: String;
 
     function replaceTag(btnPattern: String; aAction: String): String;
@@ -1194,8 +1197,13 @@ begin
         buttons := StringReplace(buttons, '{{BtnFileMoveUp}}', btnTmp, [rfReplaceAll]);
         btnTmp := replaceTag(PatternButtonFileMoveDown[isAdmin], 'file_movedown');
         buttons := StringReplace(buttons, '{{BtnFileMoveDown}}', btnTmp, [rfReplaceAll]);
-        btnTmp := replaceTag(PatternButtonFileDelete[isAdmin], 'file_delete');
-        buttons := StringReplace(buttons, '{{BtnFileDelete}}', btnTmp, [rfReplaceAll]);
+        if IsPlayingFile then
+            buttons := StringReplace(buttons, '{{BtnFileDelete}}', '', [rfReplaceAll])
+        else
+        begin
+            btnTmp := replaceTag(PatternButtonFileDelete[isAdmin], 'file_delete');
+            buttons := StringReplace(buttons, '{{BtnFileDelete}}', btnTmp, [rfReplaceAll]);
+        end;
         btnTmp := replaceTag(PatternButtonFilePlayNow[isAdmin], 'file_playnow');
         buttons := StringReplace(buttons, '{{BtnFilePlayNow}}', btnTmp, [rfReplaceAll]);
         btnTmp := replaceTag(PatternButtonFileAdd[isAdmin], 'file_add');
@@ -1353,7 +1361,7 @@ begin
 
             // replace tags
             Item := fSetBasicFileData(af, Item, aClass);
-            Item := fSetFileButtons(af, Item, 1, isAdmin);
+            Item := fSetFileButtons(af, Item, 1, isAdmin, af = aNempPlaylist.PlayingFile);
             Items := Items + Item;
         end;
         result := Items;
@@ -1376,7 +1384,7 @@ begin
 
             // replace tags
             Item := fSetBasicFileData(af, Item, aClass);
-            Item := fSetFileButtons(af, Item, 1, isAdmin);
+            Item := fSetFileButtons(af, Item, 1, isAdmin, af = aNempPlaylist.PlayingFile);
         end else
             Item := 'fail';
 
@@ -2626,7 +2634,15 @@ begin
           queriedValue := aRequestInfo.Params.Values['value'];
           aVolume := StrToIntDef(queriedValue, -1);
           if aVolume <> -1 then
-              SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETVolume, aVolume);
+          begin
+              if aVolume = 1000 then
+                  SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_INCVOLUME, 0)
+              else
+                  if aVolume = -1000 then
+                      SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_DECVOLUME, 0)
+                  else
+                      SendMessage(fMainWindowHandle, WM_WebServer, WS_IPC_SETVolume, aVolume);
+          end;
       end;
 
       result := ResponsePlayerJS(ARequestInfo, AResponseInfo, isAdmin);
@@ -2941,15 +2957,13 @@ begin
             requestDone := True;
             queriedID := StrToIntDef(aRequestInfo.Params.Values['ID'], 0);
             res := SendMessage(fMainWindowHandle, WM_WebServer, WS_PlaylistDelete, queriedID);
-            //if res > 0 then
-            //begin
-                // 0 : Invalid, reload playlist
-                // 1 : File deleted, hide item
-                // 2 : File removed from Prebooklist, reload Playlist
-                AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
-                result := qrPermit;
-            //end else
-            //    result := HandleError(AResponseInfo, qrInvalidParameter);
+
+            // possible values for "res"
+            // 0 : Invalid, reload playlist
+            // 1 : File deleted, just hide the item in browser
+            // 2 : File removed from Prebooklist, reload Playlist
+            AResponseInfo.ContentStream := BuildStream(UTF8String(IntTostr(res)));
+            result := qrPermit;
         end;
 
         if ((queriedAction = 'file_addnext')
@@ -3045,7 +3059,7 @@ var queriedCover: String;
     fn: UnicodeString;
 begin
     queriedCover := aRequestInfo.Params.Values['ID'];
-    fn := CoverSavePath + queriedCover + '.jpg';
+    fn := TCoverArtSearcher.SavePath + queriedCover + '.jpg';
     if not FileExists(fn) then
         fn := fLocalDir + 'default_cover.png';
     if not FileExists(fn) then
@@ -3054,6 +3068,7 @@ begin
     if FileExists(fn) then
     begin
         try
+            AResponseInfo.ContentType := FileType2MimeType(fn);
             AResponseInfo.ContentStream := TFileStream.Create(fn, fmOpenRead or fmShareDenyWrite);
             result := qrPermit;
         except

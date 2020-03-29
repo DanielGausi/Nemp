@@ -577,6 +577,8 @@ type
         procedure ChangeCoverID(oldID, newID: String);
         procedure HandleChangedCoverID;
 
+        procedure ChangeCoverIDUnsorted(oldID, newID: String);
+
         // even more stuff for file managing: Additional Tags
         function AddNewTagConsistencyCheck(aAudioFile: TAudioFile; newTag: String): TTagConsistencyError;
         function AddNewTag(aAudioFile: TAudioFile; newTag: String; IgnoreWarnings: Boolean; Threaded: Boolean = False): TTagError;
@@ -1237,6 +1239,9 @@ begin
         TCoverArtSearcher.UseSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
         TCoverArtSearcher.SubDirName     := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
         TCoverArtSearcher.SisterDirName  := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
+        TCoverArtSearcher.CoverSizeIndex := ini.ReadInteger('MedienBib', 'CoverSize', 1);
+        TCoverArtSearcher.InitCoverArtCache(Savepath, TCoverArtSearcher.CoverSizeIndex);
+
         CoverSearchLastFM        := ini.ReadBool('MedienBib', 'CoverSearchLastFM', False);
 
         HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
@@ -1364,8 +1369,10 @@ begin
         ini.Writebool('MedienBib','CoverSearchInParentDir', TCoverArtSearcher.UseParentDir);
         ini.Writebool('MedienBib','CoverSearchInSubDir', TCoverArtSearcher.UseSubDir);
         ini.Writebool('MedienBib', 'CoverSearchInSisterDir', TCoverArtSearcher.UseSisterDir);
-        ini.WriteString('MedienBib', 'CoverSearchSubDirName', (TCoverArtSearcher.SubDirName));
-        ini.WriteString('MedienBib', 'CoverSearchSisterDirName', (TCoverArtSearcher.SisterDirName));
+        ini.WriteString('MedienBib', 'CoverSearchSubDirName', TCoverArtSearcher.SubDirName);
+        ini.WriteString('MedienBib', 'CoverSearchSisterDirName', TCoverArtSearcher.SisterDirName);
+        ini.WriteInteger('MedienBib', 'CoverSize', TCoverArtSearcher.CoverSizeIndex);
+
         ini.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
         ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
         ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
@@ -3679,6 +3686,24 @@ begin
     Changed := True;
 end;
 
+procedure TMedienBibliothek.ChangeCoverIDUnsorted(oldID, newID: String);
+var afList: TObjectList;
+    i: Integer;
+begin
+    afList := TObjectList.Create(False);
+    try
+        GetTitelListFromCoverIDUnsorted(afList, oldID);
+        for i := 0 to afList.Count - 1 do
+            // set the new ID
+            TAudioFile(afList[i]).CoverID := NewID;
+    finally
+        afList.Free;
+    end;
+
+    // handle the Changes
+    HandleChangedCoverID;
+    Changed := True;
+end;
 
 {
     --------------------------------------------------------

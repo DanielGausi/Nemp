@@ -1190,14 +1190,19 @@ begin
                                   if (idx > -1) then
                                   begin
                                       af := TPlaylistFile(NempPlaylist.Playlist[idx]);
-                                      if af.PrebookIndex > 0 then
+
+                                      if af <> NempPlaylist.PlayingFile then
                                       begin
-                                          NempPlaylist.SetNewPrebookIndex(af, 0);
-                                          aMsg.Result := 2;
-                                      end else
-                                      begin
-                                          NempPlaylist.DeleteAFile(idx);
-                                          aMsg.Result := 1;
+
+                                          if af.PrebookIndex > 0 then
+                                          begin
+                                              NempPlaylist.SetNewPrebookIndex(af, 0);
+                                              aMsg.Result := 2;
+                                          end else
+                                          begin
+                                              NempPlaylist.DeleteAFile(idx);
+                                              aMsg.Result := 1;
+                                          end;
                                       end;
                                   end;
                               end;
@@ -1277,6 +1282,17 @@ begin
                                 CorrectVolButton;
                            end;
 
+        WS_IPC_INCVOLUME: if AcceptAPICommands then
+                          begin
+                                NempPlayer.Volume := NempPlayer.Volume + 5;
+                                CorrectVolButton;
+                          end;
+        WS_IPC_DECVOLUME: if AcceptAPICommands then
+                          begin
+                                NempPlayer.Volume := NempPlayer.Volume - 5;
+                                CorrectVolButton;
+                          end;
+
         WS_VoteID: begin
                   aMsg.Result := NempWebServer.VoteMachine.VCLDoVote(aMsg.Lparam, NempPlaylist);
         end;
@@ -1350,11 +1366,13 @@ begin
         // developer version, not published yet
         UPDATE_PRIVATE_VERSION: begin
                                     if NempUpdater.ManualCheck then
-                                         TranslateMessageDLG(
+                                        ShowUpdateForm;
+                                         {TranslateMessageDLG(
                                             NempUpdate_PrivateVersion + #13#10#13#10 +
                                             Format(NempUpdate_InfoLastStableRelease, [TNempUpdateInfo(aMsg.LParam).StableRelease]) + #13#10 +
                                             Format(NempUpdate_InfoYourVersion, [GetFileVersionString('')])
                                             , mtInformation, [mbOk], 0)
+                                         }
                                 end;
     end;
 end;

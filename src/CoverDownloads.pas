@@ -309,7 +309,7 @@ var n: DWord;
 begin
     // LoadCacheList
     fCacheList := TObjectList.Create;
-    if IsExeInProgramSubDir then
+    if UseUserAppData then
         fCacheFilename := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\CoverCache'
     else
         fCacheFilename := ExtractFilePath(ParamStr(0)) + 'Data\CoverCache';

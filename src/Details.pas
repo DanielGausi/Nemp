@@ -358,6 +358,8 @@ type
 
     CoverArtSearcher: TCoverArtSearcher;
 
+    procedure LoadPictureIntoImage(aFilename: String; aImage: TImage);
+
     // Show some information of the selected audiofile
     procedure ShowMetaDataFrames;
 
@@ -2948,20 +2950,14 @@ end;
     --------------------------------------------------------
 }
 
-procedure TFDetails.ShowSelectedImage_Files;
+procedure TFDetails.LoadPictureIntoImage(aFilename: String; aImage: TImage);
 var aCoverbmp: TBitmap;
     aPic: TPicture;
-    aFileName: String;
 begin
-    if cbCoverArtFiles.itemindex >= Coverpfade.Count then
-        exit;
-
-    CurrentCoverStream.Clear;
-    aFileName := Coverpfade[cbCoverArtFiles.itemindex];
     aCoverbmp := tBitmap.Create;
     try
-        aCoverbmp.Width := ImgCurrentSelection.Width;
-        aCoverbmp.Height := ImgCurrentSelection.Height;
+        aCoverbmp.Width := aImage.Width;
+        aCoverbmp.Height := aImage.Height;
         aPic := TPicture.Create;
         try
             try
@@ -2969,12 +2965,12 @@ begin
                 CurrentCoverStream.LoadFromFile(aFilename);
 
                 FitBitmapIn(aCoverbmp, aPic.Graphic);
-                ImgCurrentSelection.Picture.Bitmap.Assign(aCoverbmp);
+                aImage.Picture.Bitmap.Assign(aCoverbmp);
             except
                 on E: Exception do
                 begin
                     TCoverArtSearcher.GetDefaultCover(dcFile, aPic, 0);
-                    ImgCurrentSelection.Picture.Assign(aPic);
+                    aImage.Picture.Assign(aPic);
                     TranslateMessageDLG(Error_CoverInvalid + #13#10 + #13#10 + E.Message, mtError, [mbOK], 0);
                 end;
             end;
@@ -2984,6 +2980,17 @@ begin
     finally
         aCoverbmp.Free;
     end;
+end;
+
+procedure TFDetails.ShowSelectedImage_Files;
+var aCoverbmp: TBitmap;
+    aPic: TPicture;
+begin
+    if cbCoverArtFiles.itemindex >= Coverpfade.Count then
+        exit;
+
+    CurrentCoverStream.Clear;
+    LoadPictureIntoImage(Coverpfade[cbCoverArtFiles.itemindex], ImgCurrentSelection);
 end;
 
 procedure TFDetails.ShowSelectedImage_MetaData;
@@ -3259,7 +3266,7 @@ begin
     if (aNewID <> '') and FileExists(TCoverArtSearcher.SavePath + aNewID + '.jpg') then
     begin
         // display the current selection in Library-Image
-        CoverLibrary2.Picture.LoadFromFile(TCoverArtSearcher.SavePath + aNewID + '.jpg');
+        LoadPictureIntoImage(TCoverArtSearcher.SavePath + aNewID + '.jpg', CoverLibrary2);
         NewLibraryCoverID := aNewID;
     end
     else
@@ -3294,9 +3301,7 @@ begin
       // if this fails, there was something wrong with the image data :(
       if FileExists(TCoverArtSearcher.SavePath + newID + '.jpg')
          OR
-         TCoverArtSearcher.ScalePicStreamToFile(CurrentCoverStream, newID,
-                                    240, 240,
-                                    Nil)
+         TCoverArtSearcher.ScalePicStreamToFile_AllSizes(CurrentCoverStream, newID, Nil)
       then
           HandleCoverIDSetting(newID)
 end;
@@ -3319,9 +3324,7 @@ begin
             // if this fails, there was something wrong with the image data :(
             if FileExists(TCoverArtSearcher.Savepath + newID + '.jpg')
                OR
-               TCoverArtSearcher.ScalePicStreamToFile(fs, newID,
-                        240, 240,
-                        Nil)
+               TCoverArtSearcher.ScalePicStreamToFile_AllSizes(fs, newID, Nil)
             then
                 HandleCoverIDSetting(newID);
         finally

@@ -535,6 +535,8 @@ type
     lblRG_Preamp1: TLabel;
     lblRG_Preamp2: TLabel;
     BtnActivateBirthdayMode: TButton;
+    GrpBox_Files_CoverSize: TGroupBox;
+    cb_CoverSize: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1008,8 +1010,8 @@ begin
     s := GetColumnIDfromPosition(Nemp_MainForm.VST, i);
     CBSpalten[i].Caption := Nemp_MainForm.VST.Header.Columns[s].Text;
     CBSpalten[i].Checked := coVisible in Nemp_MainForm.VST.Header.Columns[s].Options;
-    CBSpalten[i].Top := 20 + (i mod 6)*16;
-    CBSpalten[i].Left := 16 + (i div 6) * 100;
+    CBSpalten[i].Top := 20 + (i mod 7)*16;
+    CBSpalten[i].Left := 16 + (i div 7) * 100;
   end;
 
   // cbCoverMode.ItemIndex := Nemp_MainForm.NempOptions.CoverMode;
@@ -1421,6 +1423,8 @@ begin
   EDTCoverSisterDirName.Text := TCoverArtSearcher.SisterDirName;
 
   CB_CoverSearch_LastFM.Checked := MedienBib.CoverSearchLastFM;
+
+  cb_CoverSize.ItemIndex := TCoverArtSearcher.CoverSizeIndex;
 
   cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
 
@@ -2565,6 +2569,9 @@ begin
   TCoverArtSearcher.SisterDirName := EDTCoverSisterDirName.Text;
   MedienBib.HideNACover := cbHideNACover.Checked;
 
+  TCoverArtSearcher.CoverSizeIndex := cb_CoverSize.ItemIndex;
+  TCoverArtSearcher.InitCoverArtCache(Savepath, TCoverArtSearcher.CoverSizeIndex);
+
 
   //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
   Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
@@ -3509,7 +3516,7 @@ begin
         fs := TFileStream.Create(OpenDlg_DefaultCover.FileName, fmOpenRead);
         try
             //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
-            if TCoverArtSearcher.ScalePicStreamToFile(fs, '_default_cover', 240, 240, Nil, True) then
+            if TCoverArtSearcher.ScalePicStreamToFile_DefaultSize(fs, '_default_cover', Nil, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
@@ -3532,7 +3539,7 @@ begin
     fs := TFileStream.Create(FileName, fmOpenRead);
     try
         //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
-        if TCoverArtSearcher.ScalePicStreamToFile(fs, '_default_cover', 240, 240, Nil, True) then
+        if TCoverArtSearcher.ScalePicStreamToFile_DefaultSize(fs, '_default_cover', Nil, True) then
             LoadDefaultCover
         else
             MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);

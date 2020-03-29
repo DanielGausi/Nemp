@@ -66,6 +66,7 @@ type
        ReleaseNotes_DE: TMemoryStream;
 
        ReleaseIsStable: Boolean;
+       DeveloperRelease: Boolean;
        constructor Create;
        destructor Destroy; override;
     end;
@@ -172,9 +173,12 @@ const
     // some RTF files with ReleaseNotes (new in 4.13)
     RELEASENOTES_URL = 'http://www.gausi.de/nemp/updates.rtf';
     RELEASENOTES_BETA_URL = 'http://www.gausi.de/nemp/updates_beta.rtf';
+    RELEASENOTES_DEV_URL = 'http://www.gausi.de/nemp/updates_dev.rtf';
 
     RELEASENOTES_URL_DE = 'http://www.gausi.de/nemp/updates_de.rtf';
     RELEASENOTES_BETA_URL_DE = 'http://www.gausi.de/nemp/updates_beta_de.rtf';
+    RELEASENOTES_DEV_URL_DE = 'http://www.gausi.de/nemp/updates_dev_de.rtf';
+
 
 Var
     NempUpdater: TNempUpdater;
@@ -348,6 +352,7 @@ begin
                 ini.SetStrings(sl);
                 NempUpdateInfo := TNempUpdateInfo.Create;
                 try
+                    NempUpdateInfo.DeveloperRelease := False;
                     // Get version information from the downloaded Update Summary
                     NempUpdateInfo.StableRelease := ini.ReadString('UpdateInfo', 'StableRelease', 'x.x.x.x');
                     NempUpdateInfo.BetaRelease   := ini.ReadString('UpdateInfo', 'BetaRelease', NempUpdateInfo.StableRelease);
@@ -389,6 +394,24 @@ begin
                             if Cancel then exit;
 
                             NempUpdateInfo.ReleaseIsStable := False;
+                        end else
+                        begin
+                            // current local version is a Developer Version
+                            // download developer notes (for testing before releasing them)
+                            // Download Release Information (Beta)
+                            aResponse := GetURLAsHttpResponse(RELEASENOTES_DEV_URL);
+                            if aResponse.StatusCode = 200 then
+                                NempUpdateInfo.ReleaseNotes.CopyFrom(aResponse.ContentStream, 0);
+                            if Cancel then exit;
+
+                            // Download Release Information (German, Beta)
+                            aResponse := GetURLAsHttpResponse(RELEASENOTES_DEV_URL_DE);
+                            if aResponse.StatusCode = 200 then
+                                NempUpdateInfo.ReleaseNotes_DE.CopyFrom(aResponse.ContentStream, 0);
+                            if Cancel then exit;
+
+                            NempUpdateInfo.ReleaseIsStable := False;
+                            NempUpdateInfo.DeveloperRelease := True;
                         end;
 
 
@@ -586,7 +609,14 @@ begin
     if UpdateInfo.ReleaseIsStable then
         lblNewVersion.Caption     := Format(NempUpdate_InfoNewVersionAvailable, [UpdateInfo.StableRelease] )
     else
-        lblNewVersion.Caption     := Format(NempUpdate_InfoNewBetaVersionAvailable, [UpdateInfo.BetaRelease] );
+    begin
+        if UpdateInfo.DeveloperRelease then
+            lblNewVersion.Caption     := Format(NempUpdate_InfoDeveloperVersion, [UpdateInfo.StableRelease] )
+        else
+            lblNewVersion.Caption     := Format(NempUpdate_InfoNewBetaVersionAvailable, [UpdateInfo.BetaRelease] );
+    end;
+
+    BtnDownload.Enabled := Not UpdateInfo.DeveloperRelease;
 
     lblCurrentVersion.Caption := Format(NempUpdate_InfoYourVersion        , [GetFileVersionString('')] );
 
@@ -611,6 +641,7 @@ constructor TNempUpdateInfo.Create;
 begin
     ReleaseNotes    := TMemoryStream.Create;
     ReleaseNotes_DE := TMemoryStream.Create;
+    DeveloperRelease := False;
 end;
 
 destructor TNempUpdateInfo.Destroy;

@@ -13,7 +13,11 @@ var
 function ParamBlobToStr(lpData: Pointer): Widestring;
 function ParamStrToBlob(out cbData: DWORD): Pointer;
 
-function IsExeInProgramSubDir: Boolean;
+///  function IsExeInProgramSubDir: Boolean; // deprecated, not used any more
+///  New method to determine the location of config files and data in version 4.14:
+///  If a file "UseLocalData.cfg" DOES exist, use the data in the program directory.
+///  If this file DOES NOT exist, use the data in the user directory
+function UseUserAppData: Boolean;
 
 
 implementation
@@ -197,6 +201,8 @@ begin
 end;
 
 
+(*
+/// deprecated, not used any more
 function IsExeInProgramSubDir: Boolean;
 var p1: String;
 begin
@@ -211,10 +217,17 @@ begin
             result := AnsiStartsText(IncludeTrailingPathDelimiter(p1), ParamStr(0));
     end;
 end;
-{
-ShowMessage(GetEnvironmentVariable('ProgramW6432'));
-ShowMessage(GetEnvironmentVariable('ProgramFiles'));
-}
+*)
+
+///  New method to determine the location of config files and data in version 4.14:
+///  If a file "UseLocalData.cfg" DOES exist, use the data in the program directory.
+///  If this file DOES NOT exist, use the data in the user directory
+function UseUserAppData: Boolean;
+begin
+    result := NOT FileExists(ExtractFilePath(Paramstr(0)) + 'UseLocalData.cfg');
+end;
+
+//UseLocalData.cfg
 
 function AllowOnlyOneInstance:boolean;
 var NEMP_NAME: WideString;
@@ -222,10 +235,9 @@ var NEMP_NAME: WideString;
   ini: TMeminiFile;
 begin
     NEMP_NAME := 'Nemp';
-    //if AnsiStartsText(GetShellFolder(CSIDL_PROGRAM_FILES), Paramstr(0)) then
-    if IsExeInProgramSubDir then
+    if UseUserAppData then
     begin
-        // Nemp liegt im System-Programmverzeichnis
+        // User DOES NOT want a portable storage of data - use the user directory
         SavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
         try
             ForceDirectories(SavePath);
@@ -235,7 +247,7 @@ begin
         end;
     end else
     begin
-        // Nemp liegt woanders
+        // User DOES want a portable/locale storage of configuration and data - use program directory
         SavePath := ExtractFilePath(Paramstr(0)) + 'Data\';
     end;
 
