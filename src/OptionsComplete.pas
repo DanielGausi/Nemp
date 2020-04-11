@@ -339,26 +339,6 @@ type
     CB_QuickSearchAllowErrorsWhileTyping: TCheckBox;
     CB_QuickSearchAllowErrorsOnEnter: TCheckBox;
     cb_ChangeCoverflowOnSearch: TCheckBox;
-    TabFiles4: TTabSheet;
-    GrpBox_TabMedia5_Charsets: TGroupBox;
-    LblConst_Arabic: TLabel;
-    LblConst_hebrew: TLabel;
-    LblConst_cyrillic: TLabel;
-    LblConst_Thai: TLabel;
-    LblConst_Korean: TLabel;
-    LblConst_Chinese: TLabel;
-    LblConst_Greek: TLabel;
-    LblConst_Japanese: TLabel;
-    CBArabic: TComboBox;
-    CBChinese: TComboBox;
-    CBHebrew: TComboBox;
-    CBJapanese: TComboBox;
-    CBGreek: TComboBox;
-    CBKorean: TComboBox;
-    CBCyrillic: TComboBox;
-    CBThai: TComboBox;
-    __XXX__CB_AutoSavePlaylist: TCheckBox;
-    cbOnlyLAN: TCheckBox;
     TabPlayer0: TTabSheet;
     GrpBox_Devices: TGroupBox;
     LblConst_MainDevice: TLabel;
@@ -537,6 +517,10 @@ type
     BtnActivateBirthdayMode: TButton;
     GrpBox_Files_CoverSize: TGroupBox;
     cb_CoverSize: TComboBox;
+    GrpBoxPortable: TGroupBox;
+    cb_EnableUSBMode: TCheckBox;
+    cb_EnableCloudMode: TCheckBox;
+    lblNempPortable: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -704,7 +688,7 @@ var
 implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
-  WebServerLog, MedienBibliothekClass;
+  WebServerLog, MedienBibliothekClass, DriveRepairTools;
 
 {$R *.dfm}
 
@@ -935,29 +919,6 @@ begin
   TabFiles1.TabVisible := False;
   TabFiles2.TabVisible := False;
   TabFiles3.TabVisible := False;
-  TabFiles4.TabVisible := False;
-
-
-
-  // Die Auswahlboxen mit den entsprechenden Zeichensätzen füllen
-  {
-  for i := 0 to High(ArabicEncodings) do
-    CBArabic.Items.Add(ArabicEncodings[i].Description);
-  for i := 0 to High(ChineseEncodings) do
-    CBChinese.Items.Add(ChineseEncodings[i].Description);
-  for i := 0 to High(CyrillicEncodings) do
-    CBCyrillic.Items.Add(CyrillicEncodings[i].Description);
-  for i := 0 to High(GreekEncodings) do
-    CBGreek.Items.Add(GreekEncodings[i].Description);
-  for i := 0 to High(HebrewEncodings) do
-    CBHebrew.Items.Add(HebrewEncodings[i].Description);
-  for i := 0 to High(JapaneseEncodings) do
-    CBJapanese.Items.Add(JapaneseEncodings[i].Description);
-  for i := 0 to High(KoreanEncodings) do
-    CBKorean.Items.Add(KoreanEncodings[i].Description);
-  for i := 0 to High(ThaiEncodings) do
-    CBThai.Items.Add(ThaiEncodings[i].Description);
-  }
 
   //----------------------------------
   count := 1;
@@ -1436,6 +1397,10 @@ begin
   CBAutoScanPlaylistFilesOnView.Checked := MedienBib.AutoScanPlaylistFilesOnView;
   CBShowHintsInMedialist.Checked := MedienBib.ShowHintsInMedialist;
 
+  cb_EnableUSBMode.Checked := TDrivemanager.EnableUSBMode;
+  cb_EnableCloudMode.Checked := TDrivemanager.EnableCloudMode;
+
+
   CBSortArray1.ItemIndex := integer(MedienBib.NempSortArray[1]);
   CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
   cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
@@ -1512,20 +1477,6 @@ begin
   SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
   SEArtistAlbenRowHeight.Value := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
 
-  // Zeichensätze
-  {
-  With MedienBib do
-  begin
-      CBArabic.ItemIndex   := NempCharCodeOptions.Arabic.Index;
-      CBChinese.ItemIndex  := NempCharCodeOptions.Chinese.Index;
-      CBCyrillic.ItemIndex := NempCharCodeOptions.Cyrillic.Index;
-      CBGreek.ItemIndex    := NempCharCodeOptions.Greek.Index;
-      CBHebrew.ItemIndex   := NempCharCodeOptions.Hebrew.Index;
-      CBJapanese.ItemIndex := NempCharCodeOptions.Japanese.Index;
-      CBKorean.ItemIndex   := NempCharCodeOptions.Korean.Index;
-      CBThai.ItemIndex     := NempCharCodeOptions.Thai.Index;
-  end;
-  }
 
   CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
   // Geburtstags-Optionen
@@ -2581,6 +2532,9 @@ begin
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
   MedienBib.ShowHintsInMedialist := CBShowHintsInMedialist.Checked;
+  TDrivemanager.EnableUSBMode   := cb_EnableUSBMode.Checked   ;
+  TDrivemanager.EnableCloudMode := cb_EnableCloudMode.Checked ;
+
   Nemp_MainForm.VST.ShowHint := MedienBib.ShowHintsInMedialist;
 
   NeedUpdate := False;

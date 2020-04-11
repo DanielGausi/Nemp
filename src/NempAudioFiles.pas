@@ -538,7 +538,7 @@ type
         // Load the data from a .gmp-file (medialib-format)
         function LoadSizeInfoFromStream_DEPRECATED(aStream: TStream): Integer;
 
-        procedure LoadDataFromStream(aStream: TStream; JustForPlaylist: Boolean);
+        procedure LoadDataFromStream(aStream: TStream; SearchForCueSheets: Boolean; Threaded: Boolean);
         procedure LoadDataFromStream_DEPRECATED(aStream: TStream);
         procedure LoadFromStream_DEPRECATED(aStream: TStream);
         // load the data from a .npl-file (Nemp-playlist-format)
@@ -3242,7 +3242,7 @@ end;
     --------------------------------------------------------
 }
 
-procedure TAudioFile.LoadDataFromStream(aStream: TStream; JustForPlaylist: Boolean);
+procedure TAudioFile.LoadDataFromStream(aStream: TStream; SearchForCueSheets: Boolean; Threaded: Boolean);
 var c: Integer;
     DataID: Byte;
     GenreIDX:byte;
@@ -3255,19 +3255,17 @@ begin
         inc(c);
         case DataID of
             MP3DB_PFAD:  begin
-                              if JustForPlaylist then
+                              ///  Changes with Nemp 4.14:
+                              ///  We may write Relative Paths in both Playlist and Library files
+                              ///  But: "ExpandFilename" SHOULD NOT be used in Threads, because of the global variable "CurrentDir"
+                              tmpStr := ReadTextFromStream(aStream);
+                              Pfad := tmpStr;  // this will set fAudioType!
+                              if fAudioType = at_File then
                               begin
-                                  // file is for the playlist. Use relative paths here
-                                  tmpStr := ReadTextFromStream(aStream);
-                                  Pfad := tmpStr;  // this will set fAudioType!
-                                  if fAudioType = at_File then
-                                      Pfad := ExpandFilename(tmpStr)
-                                  else
-                                      FileIsPresent := True;
-                              end
-                              else
-                                  // File is for the library
-                                  pfad   := ReadTextFromStream(aStream);
+                                  FileIsPresent := True;
+                                  if NOT Threaded then
+                                      Pfad := ExpandFilename(tmpStr);
+                              end;
                          end;
             MP3DB_ARTIST:  Artist     := ReadTextFromStream(aStream);
             MP3DB_TITEL:   Titel      := ReadTextFromStream(aStream);
@@ -3308,15 +3306,11 @@ begin
             MP3DB_COVERID:       CoverID  := ReadTextFromStream(aStream);
             MP3DB_RATING :       fRating  := ReadByteFromStream(aStream);
             MP3DB_CUEPRESENT :   begin
-                                      if JustForPlaylist then
-                                      begin
+                                      ReadIntegerFromStream(aStream);
+                                      if SearchForCueSheets then
                                           // MP3DB_CUEPRESENT: data is =1 if a cuesheet should be available
                                           // However, this field is only written iff there IS one, so we don't need the value
-                                          ReadIntegerFromStream(aStream);
                                           GetCueList;
-                                      end else
-                                          // No CUE-Support for the Library
-                                          ReadIntegerFromStream(aStream);
                                  end;
             MP3DB_FAVORITE :     fFavorite    := ReadByteFromStream(aStream);
             MP3DB_PLAYCOUNTER :  fPlayCounter := ReadCardinalFromStream(aStream);
@@ -3559,6 +3553,7 @@ begin
         // for the Playlist
         // write only the name in the parameter
         result := result + WriteTextToStream(aStream, MP3DB_PFAD, aPath);
+        result := result + WriteIntegerToStream(aStream, MP3DB_DRIVE_ID, fDriveID);
         // also for Playlistfiles: write whether cuesheet is present or not
         if Assigned(CueList) and (CueList.Count > 0) then
             result := result + WriteIntegerToStream(aStream, MP3DB_CUEPRESENT, 1);

@@ -57,7 +57,7 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
     Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
-    SplitForm_Hilfsfunktionen, Mp3FileUtils,
+    SplitForm_Hilfsfunktionen, Mp3FileUtils, DriveRepairTools,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
     WindowsVersionInfo;
@@ -102,6 +102,11 @@ begin
 
 
             ReadNempOptions(ini, NempOptions, NempFormBuildOptions);
+            // Read Portable settings
+            TDrivemanager.EnableUSBMode   := ini.ReadBool('Nemp Portable','EnableUSBMode'   , True);
+            TDrivemanager.EnableCloudMode := ini.ReadBool('Nemp Portable','EnableCloudMode' , True);
+
+
             if NempOptions.Language = '' then
                 // overwrite the default setting with the curent system language
                 NempOptions.Language := GetCurrentLanguage;
@@ -215,6 +220,7 @@ begin
         end;
         }
         SetRecentPlaylistsMenuItems;
+        SetPlaylistManagerMenuItems;
 
     end;
 end;

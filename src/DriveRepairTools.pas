@@ -39,13 +39,35 @@ unit DriveRepairTools;
 
 interface
 
-uses Windows, Messages, Classes, ContNrs, SysUtils, dialogs, Forms;
+uses Windows, Messages, Classes, ContNrs, SysUtils, dialogs, Forms, Generics.Collections, NempAudioFiles;
 
 
-const  DriveTypeTexts: array[DRIVE_UNKNOWN..DRIVE_RAMDISK] of String =
+const DriveTypeTexts: array[DRIVE_UNKNOWN..DRIVE_RAMDISK] of String =
    ('Unknown', 'No root', 'Removable drive', 'Harddisk', 'Shared directory', 'CDROM', 'RAMDisk');
 
+      GUID_DEVINTERFACE_USB_DEVICE: TGUID = '{A5DCBF10-6530-11D2-901F-00C04FB951ED}';
+      DBT_DEVICEARRIVAL          = $8000;          // system detected a new device
+      DBT_DEVICEREMOVECOMPLETE   = $8004;          // device is gone
+      DBT_CONFIGCHANGED          = $0018;
+
+      DBT_DEVTYP_DEVICEINTERFACE = $00000005;      // device interface class
+      DBT_DEVTYP_VOLUME          = $00000002;
+
+      MP3DB_DriveString   = 1; // string
+      MP3DB_DriveName     = 2; // String
+      MP3DB_DriveTyp      = 3; // String
+      MP3DB_DriveSerialNr = 4; // DWord
+      MP3DB_DriveID       = 5; // Integer, basically the index of the drive in the List
+
 type
+
+    // type used in WM_DEVICECHANGE Message
+    PDevBroadcastHdr  = ^DEV_BROADCAST_HDR;
+    DEV_BROADCAST_HDR = packed record
+      dbch_size: DWORD;
+      dbch_devicetype: DWORD;
+      dbch_reserved: DWORD;
+    end;
 
 
   // a little Class for Drives.
@@ -79,43 +101,84 @@ type
           procedure SaveToStream(aStream: TStream);
   end;
 
+  TDriveList = class(TObjectList<TDrive>);
 
-  // type used in WM_DEVICECHANGE Message
-  PDevBroadcastHdr  = ^DEV_BROADCAST_HDR;
-  DEV_BROADCAST_HDR = packed record
-    dbch_size: DWORD;
-    dbch_devicetype: DWORD;
-    dbch_reserved: DWORD;
+  TDriveManager = class
+      private
+          // a list of drives currently available on the computer
+          fPhysicalDrives: TDriveList;
+          // a List of Drives currently "in use" by the media library (or a playlist)
+          fManagedDrives: TDriveList;
+
+          class var fEnableUSBMode  : LongBool;
+          class var fEnableCloudMode: LongBool;
+
+          class function fGetEnableUSBMode   : LongBool;         static;
+          class function fGetEnableCloudMode : LongBool;         static;
+          class procedure fSetEnableUSBMode(aValue: LongBool)  ; static;
+          class procedure fSetEnableCloudMode(aValue: LongBool); static;
+
+          function fGetDriveByChar(aList: TDriveList; c: Char): TDrive;
+          function fGetDriveBySerialNr(aList: TDriveList; aSerial: DWord): TDrive;
+
+          function fGetDrivesHaveChanged: Boolean;
+          function fGetManagedDrivesCount: Integer;
+
+          // collect Data from all Drives currently available on the computer
+          // and store them in fPhysicalDrives
+          // // (in previous versions: "GetLogicalDrives")
+          procedure InitPhysicalDriveList;
+
+      public
+          class property EnableUSBMode  : LongBool read fGetEnableUSBMode    write fSetEnableUSBMode   ;
+          class property EnableCloudMode: LongBool read fGetEnableCloudMode  write fSetEnableCloudMode ;
+
+          constructor Create;
+          destructor Destroy; override;
+
+          property DrivesHaveChanged: Boolean read fGetDrivesHaveChanged;
+          property ManagedDrivesCount: Integer read fGetManagedDrivesCount;
+
+          procedure Clear;
+
+          procedure LoadDrivesFromStream(aStream: TStream; DestinationList: TDriveList);
+          procedure SaveDrivesToStream(aStream: TStream);
+
+
+          // Add Drives used by Audiofiles or PlaylistFiles to the list of ManaggedDrives
+          procedure AddDrivesFromAudioFiles(aList: TObjectList);
+          procedure AddDrivesFromPlaylistFiles(aList: TObjectList);
+
+          function GetPhysicalDriveBySerialNr(aSerial: DWord): TDrive;
+          function GetManagedDriveBySerialNr(aSerial: DWord): TDrive;
+          function GetPhysicalDriveByChar(c: Char): TDrive;
+          function GetManagedDriveByChar(c: Char): TDrive;
+          function GetManagedDriveByOldChar(c: Char): TDrive;
+          function GetManagedDriveByIndex(aIndex: Integer): TDrive;
+
+
+          // Merges a list of newDrives (loaded from a *.gmp or *.npl File) into
+          // the list of ManagedDrives
+          procedure SynchronizeDrives(newDrives: TDriveList);
+
+
+          // When a new Drive is connected to the Computer, the List of ManagedFiles
+          // should be rechecked again.
+          //  - A previous missing Drive could now be present (that's good!)
+          //    But: It may have not the correct Drive Letter assigned (we need to fix the AudioFiles then)
+          //  - A previously chosen alternate DriveLetter for a missing drive could now
+          //    collide with the new Drive (that's bad, as we need a new one)
+          procedure ReSynchronizeDrives;
+
+
+          procedure RepairDriveCharsAtAudioFiles(AudiFiles: TObjectList);
+          procedure RepairDriveCharsAtPlaylistFiles(Playlists: TObjectList);
+
   end;
 
-  {PDevBroadcastVolume = ^DEV_BROADCAST_VOLUME;
-  DEV_BROADCAST_VOLUME = packed record
-    dbcv_size       : DWORD;
-    dbcv_devicetype : DWORD;
-    dbcv_reserved   : DWORD;
-    dbcv_unitmask   : DWORD;
-    dbcv_flags      : WORD;
-  end;
-  // DEV_BROADCAST_VOLUME, *PDEV_BROADCAST_VOLUME;
-  }
-
-  const
-      GUID_DEVINTERFACE_USB_DEVICE: TGUID = '{A5DCBF10-6530-11D2-901F-00C04FB951ED}';
-      DBT_DEVICEARRIVAL          = $8000;          // system detected a new device
-      DBT_DEVICEREMOVECOMPLETE   = $8004;          // device is gone
-      DBT_CONFIGCHANGED          = $0018;
-
-      DBT_DEVTYP_DEVICEINTERFACE = $00000005;      // device interface class
-      DBT_DEVTYP_VOLUME          = $00000002;
-
-      MP3DB_DriveString   = 1; // string
-      MP3DB_DriveName     = 2; // String
-      MP3DB_DriveTyp      = 3; // String
-      MP3DB_DriveSerialNr = 4; // DWord
-      MP3DB_DriveID       = 5; // Integer, basically the index of the drive in the List
 
 
-
+ (*
   // some helpers
   // Get all Drives in the system and store them in the ObjectList
   procedure GetLogicalDrives(Drives: TObjectList);
@@ -124,13 +187,14 @@ type
   function GetDriveFromListBySerialNr(aList: TObjectList; aSerial: DWord): TDrive;
   function GetDriveFromListByChar(aList: TObjectList; c: Char): TDrive;
   function GetDriveFromListByOldChar(aList: TObjectList; c: Char): TDrive;
-
+  *)
   
 implementation
 
-uses NempFileUtils;
+uses NempFileUtils, BibHelper, Nemp_RessourceStrings;
 
 
+{$REGION 'TDrive, Class for handling a single Drive'}
 procedure TDrive.GetInfo(s: String);
 var t: Integer;
     dummy, srnNr: DWord;
@@ -228,24 +292,20 @@ end;
 
 procedure TDrive.SaveToStream(aStream: TStream);
 begin
-    WriteIntegerToStream(aStream, MP3DB_DriveID      , ID       );
-    WriteDWordToStream  (aStream, MP3DB_DriveSerialNr, SerialNr );
     WriteTextToStream   (aStream, MP3DB_DriveString  , Drive    );
     WriteTextToStream   (aStream, MP3DB_DriveName    , Name     );
     WriteTextToStream   (aStream, MP3DB_DriveTyp     , Typ      );
-
+    WriteIntegerToStream(aStream, MP3DB_DriveID      , ID       );
+    WriteDWordToStream  (aStream, MP3DB_DriveSerialNr, SerialNr );
     WriteDataEnd(aStream);
 end;
+{$ENDREGION}
 
 
-
-
-{
-    --------------------------------------------------------
-    Helpers
+(*
+{ Helpers
     - Used in MedienBibliothek to correct Drives.
-    --------------------------------------------------------
-}
+    ** Removed => TDriveManager.InitPhysicalDriveList; }
 procedure GetLogicalDrives(Drives: TObjectList);
 var
   FoundDrives, CurrentDrive  : PChar;
@@ -272,6 +332,7 @@ begin
     end;
 end;
 
+// ** remove => function TDriveManager.GetPhysicalDriveBySerialNr(aSerial: DWord): TDrive;
 function GetDriveFromListBySerialNr(aList: TObjectList; aSerial: DWord): TDrive;
 var i: Integer;
 begin
@@ -286,6 +347,7 @@ begin
     end;
 end;
 
+// ** remove => function TDriveManager.Get[Physical|Managed]DriveByChar
 function GetDriveFromListByChar(aList: TObjectList; c: Char): TDrive;
 var i: Integer;
 begin
@@ -300,6 +362,7 @@ begin
     end;
 end;
 
+// ** remove => function TDriveManager.GetManagedDriveByOldChar
 function GetDriveFromListByOldChar(aList: TObjectList; c: Char): TDrive;
 var i: Integer;
 begin
@@ -312,6 +375,536 @@ begin
             break;
         end;
     end;
+end;
+
+*)
+
+{ TDriveManager }
+
+constructor TDriveManager.Create;
+begin
+    fPhysicalDrives := TDriveList.Create(True);
+    fManagedDrives  := TDriveList.Create(True);
+    InitPhysicalDriveList;
+end;
+
+destructor TDriveManager.Destroy;
+begin
+    fPhysicalDrives.Free;
+    fManagedDrives .Free;
+
+    inherited;
+end;
+
+procedure TDriveManager.Clear;
+begin
+    fPhysicalDrives.Clear;
+    fManagedDrives.Clear;
+end;
+
+procedure TDriveManager.LoadDrivesFromStream(aStream: TStream; DestinationList: TDriveList);
+var DriveCount, i: Integer;
+    newDrive: TDrive;
+begin
+    aStream.Read(DriveCount, SizeOf(Integer));
+    for i := 0 to DriveCount - 1 do
+    begin
+        newDrive := TDrive.Create;
+        newDrive.LoadFromStream(aStream);
+        DestinationList.Add(newDrive);
+    end;
+end;
+
+procedure TDriveManager.SaveDrivesToStream(aStream: TStream);
+var i: Integer;
+begin
+    aStream.Write(fManagedDrives.Count, SizeOf(Integer));
+    for i := 0 to fManagedDrives.Count-1 do
+    begin
+        TDrive(fManagedDrives[i]).ID := i;
+        TDrive(fManagedDrives[i]).SaveToStream(aStream);
+    end;
+end;
+
+
+
+// *****************************************
+// *** Get a Drive specified by Char
+// *****************************************
+function TDriveManager.fGetDriveByChar(aList: TDriveList; c: Char): TDrive;
+var i: Integer;
+begin
+    result := NIL;
+    for i := 0 to aList.Count - 1 do
+    begin
+        if (length(aList[i].Drive) > 0) and (aList[i].Drive[1] = c) then
+        begin
+            result := TDrive(aList[i]);
+            break;
+        end;
+    end;
+end;
+function TDriveManager.GetPhysicalDriveByChar(c: Char): TDrive;
+begin
+    result := fGetDriveByChar(fPhysicalDrives, c);
+end;
+function TDriveManager.GetManagedDriveByChar(c: Char): TDrive;
+begin
+    result := fGetDriveByChar(fManagedDrives, c);
+end;
+
+
+
+// *****************************************
+// *** Get a Drive by SerialNumber
+// *****************************************
+function TDriveManager.fGetDriveBySerialNr(aList: TDriveList; aSerial: DWord): TDrive;
+var i: Integer;
+begin
+    result := NIL;
+    for i := 0 to aList.Count - 1 do
+    begin
+        if aList[i].SerialNr = aSerial then
+        begin
+            result := aList[i];
+            break;
+        end;
+    end;
+end;
+function TDriveManager.GetPhysicalDriveBySerialNr(aSerial: DWord): TDrive;
+begin
+    result := fGetDriveBySerialNr(fPhysicalDrives, aSerial);
+end;
+function TDriveManager.GetManagedDriveBySerialNr(aSerial: DWord): TDrive;
+begin
+    result := fGetDriveBySerialNr(fManagedDrives, aSerial);
+end;
+
+
+// *****************************************
+// *** Get a Drive by its previous Char
+// *** - used to fix AudioFiles
+// *****************************************
+function TDriveManager.GetManagedDriveByOldChar(c: Char): TDrive;
+var i: Integer;
+begin
+    result := NIL;
+    for i := 0 to fManagedDrives.Count - 1 do
+    begin
+        if fManagedDrives[i].OldChar = c then
+        begin
+            result := fManagedDrives[i];
+            break;
+        end;
+    end;
+end;
+
+
+function TDriveManager.GetManagedDriveByIndex(aIndex: Integer): TDrive;
+begin
+    if aIndex < fManagedDrives.Count then
+        result := fManagedDrives[aIndex]
+    else
+        result := Nil;
+end;
+
+
+
+// AddDrivesFromAudioFiles
+// Used after the user selected some files to be inserted into the MediaLibrary or Playlist.
+// The files are currently available on the PC, therefore the Drives are also existent
+// But: The may not be already in the list of ManagedDrives, so we may need to add some Drives to this list
+procedure TDriveManager.AddDrivesFromAudioFiles(aList: TObjectList);
+var i: Integer;
+    CurrentDrive: Char;
+    NewDrive: TDrive;
+begin
+    CurrentDrive := '-';
+    for i := 0 to aList.Count - 1 do
+    begin
+        if TAudioFile(aList[i]).Pfad[1] <> CurrentDrive then
+        begin
+            CurrentDrive := TAudioFile(aList[i]).Pfad[1];
+            if CurrentDrive <> '\' then
+            begin
+                // Search for a TDrive-Object for the CurrentDrive in ManagedDrives
+                // if it doesn't exist already: Create a new one and add it to the list of ManagedDrives
+                if not Assigned(GetManagedDriveByChar(CurrentDrive)) then
+                begin
+                    NewDrive := TDrive.Create;
+                    NewDrive.GetInfo(CurrentDrive + ':\');
+                    fManagedDrives.Add(NewDrive);
+                end;
+            end;
+        end;
+    end;
+end;
+// AddDrivesFromPlaylistFiles
+// The same as AddDrivesFromAudioFiles, but for PlaylistFiles
+// Used only by the MediaLibrary
+// Note: This has nothing to do with the files inside the Playlists,
+//       just with the location of the playlists itself (*.m3u, *.pls, or maybe even *.npl)
+procedure TDriveManager.AddDrivesFromPlaylistFiles(aList: TObjectList);
+var i: Integer;
+    CurrentDrive: Char;
+    NewDrive: TDrive;
+begin
+    CurrentDrive := '-';
+    for i := 0 to aList.Count - 1 do
+    begin
+        if TJustaString(aList[i]).DataString[1] <> CurrentDrive then
+        begin
+            CurrentDrive := TJustaString(aList[i]).DataString[1];
+            if CurrentDrive <> '\' then
+            begin
+                if not Assigned(GetManagedDriveByChar(CurrentDrive)) then
+                begin
+                    NewDrive := TDrive.Create;
+                    NewDrive.GetInfo(CurrentDrive + ':\');
+                    fManagedDrives.Add(NewDrive);
+                end;
+            end;
+        end;
+    end;
+end;
+
+
+// InitPhysicalDriveList
+// - Get all available Drives on the PC
+// - Store them into the list fPhysicalDrives
+procedure TDriveManager.InitPhysicalDriveList;
+var FoundDrives, CurrentDrive: PChar;
+    len: DWord;
+    NewDrive: TDrive;
+begin
+    fPhysicalDrives.Clear;
+    GetMem(FoundDrives, 255);
+    len := GetLogicalDriveStrings(255, FoundDrives);
+    if len > 0 then
+    begin
+      try
+          CurrentDrive := FoundDrives;
+          while CurrentDrive[0] <> #0 do
+          begin
+              NewDrive := TDrive.Create;
+              NewDrive.GetInfo(CurrentDrive);
+              fPhysicalDrives.Add(NewDrive);
+              CurrentDrive := PChar(@CurrentDrive[lstrlen(CurrentDrive) + 1]);
+          end;
+      finally
+          FreeMem(FoundDrives, len);
+      end;
+    end;
+end;
+
+
+
+// *****************************************
+// *** SynchronizeDrives
+// *** - after loading a list of Files from a *gmp or *.npl file,
+// ***   we need to synch these information with the Drives actually connected to the computer
+// ***   This is needed, as all AudioFiles-Object are stored with absolute Paths, including the leading "X:\"
+// *****************************************
+procedure TDriveManager.SynchronizeDrives(newDrives: TDriveList);
+var i: Integer;
+    currentNewDrive,
+    matchingDrive,
+    newManagedDrive: TDrive;
+    c, currentDriveChar, LastCheckedDriveChar: Char;
+begin
+
+    // first: Reset all "oldChars" in the TDrive objects.
+    //        We are looking for "new" changes now
+    //for i := 0 to fPhysicalDrives.Count - 1 do
+    //    if length(fPhysicalDrives[i].Drive) > 0 then
+    //        fPhysicalDrives[i].OldChar := fPhysicalDrives[i].Drive[1]
+    //    else
+    //        fPhysicalDrives[i].OldChar := '-';
+
+    for i := 0 to fManagedDrives.Count - 1 do
+        if length(fManagedDrives[i].Drive) > 0 then
+            fManagedDrives[i].OldChar := fManagedDrives[i].Drive[1]
+        else
+            fManagedDrives[i].OldChar := '-';
+
+
+    LastCheckedDriveChar := 'C';
+    for i := 0 to newDrives.Count-1 do
+    begin
+        currentNewDrive := newDrives[i];
+        currentDriveChar := currentNewDrive.Drive[1];
+
+        // 1.) Look for the new Drive in the list of already ManagedDrives
+        matchingDrive := GetManagedDriveBySerialNr(currentNewDrive.SerialNr);
+        if assigned(matchingDrive) then
+        begin
+            // we are already "managing" this Drive in the MediaLibrary
+            // but: The DriveChar of the "new Drive" could be different,
+            //      and Audiofiles contained in the File we just loaded need to
+            //      be fixed. Therefore
+            // Note: If It's the same, it doesn't matter when we set it here ;-)
+            matchingDrive.OldChar := currentNewDrive.Drive[1];
+
+            // For fixing Audiofiles later we use only the newDrives,
+            // - We use the "DriveID" of the AudioFiles for getting the correct Drive Letters,
+            //   which is just the Index of the Drive in the saved list.
+            // Note: This may change in a later version. It's not exactly elegant coding ...
+            currentNewDrive.Assign(matchingDrive);
+
+            // ... and we are done with this currentNewDrive
+            continue;
+        end;
+
+        // 2.) Look for the new Drive in the List of physicalDrives
+        matchingDrive := GetPhysicalDriveBySerialNr(currentNewDrive.SerialNr);
+        if assigned(matchingDrive) then
+        begin
+            // create a new TDrive object with the values of the matchingDrive
+            newManagedDrive := TDrive.Create;
+            newManagedDrive.Assign(matchingDrive);
+            // set the OldChar for fixing AudioFiles later (see comment above)
+            newManagedDrive.OldChar := currentNewDrive.Drive[1];
+            // add the newManagedDrive to the list of managed Drives
+            fManagedDrives.Add(newManagedDrive);
+
+            currentNewDrive.Assign(newManagedDrive);
+
+            // ... and we are done with this currentNewDrive
+            continue;
+        end;
+
+        // 3.) Now we have a TDrive Object, which is completely unknown so far.
+        //     We need to add it to the List of ManagedDrives, but we need
+        //     to be careful with the Drive Letter
+        c := currentNewDrive.Drive[1];
+        if (Not assigned(GetManagedDriveByChar(c))) AND
+           (Not assigned(GetPhysicalDriveByChar(c))) then
+        begin
+            // the Drive Letter of the currentNewDrive is not in use right now,
+            // therefore we can just add the currentNewDrive into the List of ManagedDrives
+            newManagedDrive := TDrive.Create;
+            newManagedDrive.Assign(currentNewDrive);
+            // Set the OldChar to the original one => no fixing of these AudioFiles needed
+            newManagedDrive.OldChar := c;
+            // add the newManagedDrive to the list of managed Drives
+            fManagedDrives.Add(newManagedDrive);
+
+            currentNewDrive.Assign(newManagedDrive);
+        end else
+        begin
+            // we don't have the currentNewDrive in our lists, but the
+            // Drive Letter is already in use. We need to find another letter for it
+            While ( assigned(GetManagedDriveByChar(LastCheckedDriveChar)) or
+                    assigned(GetPhysicalDriveByChar(LastCheckedDriveChar)))
+                      and (LastCheckedDriveChar <> 'Z')
+            do
+                // try next letter
+                LastCheckedDriveChar := Chr(Ord(LastCheckedDriveChar) + 1);
+
+            // create a new TDrive object
+            newManagedDrive := TDrive.Create;
+            newManagedDrive.Assign(currentNewDrive);
+            // set the substitute Drive Letter we have just found
+            newManagedDrive.Drive := LastCheckedDriveChar + ':\';
+            // set the OldChar for fixing AudioFiles later (see comment above)
+            newManagedDrive.OldChar := currentNewDrive.Drive[1];
+            // add the newManagedDrive to the list of managed Drives
+            fManagedDrives.Add(newManagedDrive);
+
+            currentNewDrive.Assign(newManagedDrive);
+        end;
+    end;
+end;
+
+procedure TDriveManager.ReSynchronizeDrives;
+var i: Integer;
+    currentDrive,
+    matchingDrive,
+    newManagedDrive: TDrive;
+    currentDriveChar, LastCheckedDriveChar: Char;
+begin
+    // clear the old List of PhysicalDrives and get the current one.
+    InitPhysicalDriveList;
+    // clear all OldChars information in the ManagedDrives
+    for i := 0 to fManagedDrives.Count - 1 do
+        if length(fManagedDrives[i].Drive) > 0 then
+            fManagedDrives[i].OldChar := fManagedDrives[i].Drive[1]
+        else
+            fManagedDrives[i].OldChar := '-';
+
+    LastCheckedDriveChar := 'C';
+    for i := 0 to fManagedDrives.Count-1 do
+    begin
+        currentDrive := fManagedDrives[i];
+        currentDriveChar := currentDrive.Drive[1];
+
+        matchingDrive := GetPhysicalDriveBySerialNr(currentDrive.SerialNr);
+
+        // 1.) Check, whether matchingDrive exists.
+        //     if not, we may need to change the DriveLetter of the currentDrive,
+        //     as it may collide with a new PhysicalDrive now.
+        if not assigned(matchingDrive) then
+        begin
+            matchingDrive := GetPhysicalDriveByChar(currentDriveChar);
+            if assigned(matchingDrive) then
+            begin
+                // we have a new collision here. We need to change the DriveLetter
+                // of the current Drive to a new unused Letter
+                While ( assigned(GetManagedDriveByChar(LastCheckedDriveChar)) or
+                        assigned(GetPhysicalDriveByChar(LastCheckedDriveChar)))
+                        and (LastCheckedDriveChar <> 'Z')
+                do
+                    // try next letter
+                    LastCheckedDriveChar := Chr(Ord(LastCheckedDriveChar) + 1);
+                // assign the unused Letter to the currentDrive
+                currentDrive.OldChar := currentDrive.Drive[1];
+                currentDrive.Drive := LastCheckedDriveChar + ':\';
+            end;
+
+            // anyway: we are done with currentDrive now
+            continue;
+        end;
+
+        // 2.) If the currentDrive equals a matchingDrive: Everything's ok so far
+        //     => no change needed here
+        if currentDrive.Drive = matchingDrive.Drive then
+            continue;
+
+        // 3.) If the DriveLetters doesn't match, we need to fix them
+        //     Note: This fix may collide with another ManagedDrive.
+        //           But that doesn't matter, because:
+        //           - the already handled Drives can't have the matchingDrive's letter, as it's a physicalDrive
+        //             and we only synch managedDrives during (1) to Letters that are not in use right now.
+        //           - if it collides with a following Drive, we will run the exact code here with that drive later.
+        if currentDrive.Drive <> matchingDrive.Drive then
+        begin
+            currentDrive.OldChar := currentDrive.Drive[1];
+            currentDrive.Drive := matchingDrive.Drive;
+        end;
+    end;
+end;
+
+
+procedure TDriveManager.RepairDriveCharsAtAudioFiles(AudiFiles: TObjectList);
+var i: Integer;
+    CurrentDriveChar, CurrentReplaceChar: WideChar;
+    aAudioFile: TAudioFile;
+    aDrive: TDrive;
+begin
+    CurrentDriveChar := '-';
+    CurrentReplaceChar := '-';
+    for i := 0 to AudiFiles.Count - 1 do
+    begin
+        aAudioFile := TAudioFile(AudiFiles[i]);
+        if (aAudioFile.Ordner[1] <> CurrentDriveChar) then
+        begin
+            if aAudioFile.Ordner[1] <> '\' then
+            begin
+                aDrive := GetManagedDriveByOldChar(aAudioFile.Ordner[1]);
+                if assigned(aDrive) and (aDrive.Drive <> '') then
+                begin
+                    // aktuelle Buchstaben merken
+                    // und replaceChar neu setzen
+                    CurrentDriveChar := aAudioFile.Ordner[1];
+                    CurrentReplaceChar := WideChar(aDrive.Drive[1]);
+                end else
+                begin
+                    MessageDLG((Medialibrary_DriveRepairError), mtError, [MBOK], 0);
+                    exit;
+                end;
+            end else
+            begin
+                CurrentDriveChar := '\';
+                CurrentReplaceChar := '\';
+            end;
+        end;
+        aAudioFile.SetNewDriveChar(CurrentReplaceChar);
+    end;
+end;
+
+
+procedure TDriveManager.RepairDriveCharsAtPlaylistFiles(Playlists: TObjectList);
+var i: Integer;
+    CurrentDriveChar, CurrentReplaceChar: WideChar;
+    aString: TJustaString;
+    aDrive: TDrive;
+begin
+    CurrentDriveChar := '-';
+    CurrentReplaceChar := '-';
+    for i := 0 to Playlists.Count - 1 do
+    begin
+        aString := TJustaString(Playlists[i]);
+        if (aString.DataString[1] <> CurrentDriveChar) then
+        begin
+            if (aString.DataString[1] <> '\') then
+            begin
+                // Neues Laufwerk - Infos dazwischenschieben
+                aDrive := self.GetManagedDriveByOldChar(aString.DataString[1]);
+                    // GetDriveFromListByOldChar(fUsedDrives, Char(aString.DataString[1]));
+                if assigned(aDrive) and (aDrive.Drive <> '') then
+                begin
+                    // aktuelle Buchstaben merken
+                    // und replaceChar neu setzen
+                    CurrentDriveChar := aString.DataString[1];
+                    CurrentReplaceChar := WideChar(aDrive.Drive[1]);
+                end else
+                begin
+                    MessageDLG((Medialibrary_DriveRepairError), mtError, [MBOK], 0);
+                    exit;
+                end;
+            end else
+            begin
+                CurrentDriveChar := '\';
+                CurrentReplaceChar := '\';
+            end;
+        end;
+        aString.DataString[1] := CurrentReplaceChar;
+    end;
+end;
+
+
+
+// *****************************************
+// *** After Synchronizing the DriveList, we need to fix all AudioFiles,
+// *** if there was a change in on of the Drive Letters
+// *****************************************
+function TDriveManager.fGetDrivesHaveChanged: Boolean;
+var i: Integer;
+begin
+    result := False;
+    for i := 0 to fManagedDrives.Count - 1 do
+    begin
+        if fManagedDrives[i].Drive[1] <> fManagedDrives[i].OldChar then
+        begin
+            result := True;
+            break;
+        end;
+    end;
+end;
+
+class function TDriveManager.fGetEnableCloudMode: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fEnableCloudMode));
+end;
+
+class function TDriveManager.fGetEnableUSBMode: LongBool;
+begin
+    InterLockedExchange(Integer(Result), Integer(fEnableUSBMode));
+end;
+
+function TDriveManager.fGetManagedDrivesCount: Integer;
+begin
+    result := fManagedDrives.Count;
+end;
+
+class procedure TDriveManager.fSetEnableCloudMode(aValue: LongBool);
+begin
+    InterLockedExchange(Integer(fEnableCloudMode), Integer(aValue));
+end;
+
+class procedure TDriveManager.fSetEnableUSBMode(aValue: LongBool);
+begin
+    InterLockedExchange(Integer(fEnableUSBMode), Integer(aValue));
 end;
 
 end.

@@ -37,10 +37,10 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
     Dialogs, MMSystem, oneinst, math, RatingCtrls,
     Hilfsfunktionen, Nemp_ConstantsAndTypes,
 
-    NempAudioFiles, AudioFileHelper, PlayerClass,
+    NempAudioFiles, AudioFileHelper, PlayerClass, Playlistmanagement,
     gnuGettext, Nemp_RessourceStrings, System.UITypes, System.Types,
 
-    MainFormHelper, CoverHelper;
+    MainFormHelper, CoverHelper, DriveRepairTools;
 
 type
   DWORD = cardinal;
@@ -124,6 +124,8 @@ type
       fOnCueChanged: TNotifyEvent;
       fOnDeleteAudiofile: TAudioFileEvent;
 
+      fDriveManager: TDriveManager;
+
       function fGetPreBookCount: Integer;
 
       procedure SetInsertNode(Value: PVirtualNode);
@@ -162,6 +164,8 @@ type
     public
       Playlist: TObjectlist;              // the list with the audiofiles
       Player: TNempPlayer;                // the player-object
+
+      PlaylistManager: TPlaylistManager;
 
       // Some settings for the playlist, stored in the Ini-File
       AutoPlayOnStart: Boolean;     // begin playback when Nemp starts
@@ -341,6 +345,8 @@ type
       procedure SearchAll(aString: String); 
       procedure Search(aString: String; SearchNext: Boolean = False);
 
+      procedure ReSynchronizeDrives;
+
   end;
 
 implementation
@@ -364,6 +370,8 @@ constructor TNempPlaylist.Create;
 begin
   inherited create;
   Playlist := TObjectList.Create;
+  fDriveManager := TDriveManager.Create;
+  PlaylistManager := TPlaylistManager.Create(fDriveManager);
   ST_Ordnerlist := TStringList.Create;
   PrebookList := TObjectList.Create(False);
   HistoryList := TObjectList.Create(False);
@@ -401,6 +409,8 @@ destructor TNempPlaylist.Destroy;
 begin
   HistoryList.Free;
   PrebookList.Free;
+  PlaylistManager.Free;
+  fDriveManager.Free;
   Playlist.Free;
   ST_Ordnerlist.Free;
   BufferStringList.Free;
@@ -414,6 +424,8 @@ end;
     --------------------------------------------------------
 }
 procedure TNempPlaylist.LoadFromIni(Ini: TMemIniFile);
+var ManagerCount, i: Integer;
+    fn, description: String;
 begin
   DefaultAction         := ini.ReadInteger('Playlist','DefaultAction',0);
   HeadSetAction         := ini.ReadInteger('Playlist','HeadSetAction',0);
@@ -453,10 +465,19 @@ begin
   RNGWeights[8]   := ini.ReadInteger('Playlist', 'RNGWeights40', 20 );
   RNGWeights[9]   := ini.ReadInteger('Playlist', 'RNGWeights45', 35 );
   RNGWeights[10]  := ini.ReadInteger('Playlist', 'RNGWeights50', 60 );
+
+  ManagerCount := ini.ReadInteger('PlaylistManager', 'Count', 0);
+  for i := 0 to ManagerCount-1 do
+  begin
+      description := ini.ReadString('PlaylistManager', 'Description' + IntToStr(i), 'Playlist' + IntToStr(i));
+      fn          := ini.ReadString('PlaylistManager', 'Filename' + IntToStr(i), '');
+      PlaylistManager.AddNewPlaylist(description, fn);
+  end;
+
 end;
 
 procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
-var idx: Integer;
+var idx, i: Integer;
 begin
   ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
   ini.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
@@ -504,6 +525,13 @@ begin
   ini.WriteInteger('Playlist', 'RNGWeights40', RNGWeights[8]  );
   ini.WriteInteger('Playlist', 'RNGWeights45', RNGWeights[9]  );
   ini.WriteInteger('Playlist', 'RNGWeights50', RNGWeights[10] );
+
+  ini.WriteInteger('PlaylistManager', 'Count', PlaylistManager.Count);
+  for i := 0 to PlaylistManager.Count - 1 do
+  begin
+      ini.WriteString('PlaylistManager', 'Description' + IntToStr(i), PlaylistManager.QuickLoadPlaylists[i].Description );
+      ini.WriteString('PlaylistManager', 'Filename'    + IntToStr(i), PlaylistManager.QuickLoadPlaylists[i].Filename    );
+  end;
 
 end;
 
@@ -1680,11 +1708,11 @@ end;
 }
 procedure TNempPlaylist.LoadFromFile(aFilename: UnicodeString);
 begin
-  LoadPlaylistFromFile(aFilename, Playlist, AutoScan);
-  FillPlaylistView;
-  fDauer := ShowPlayListSummary;
-  UpdatePlayListHeader(VST, Playlist.Count, fDauer);
-  fPlaylistHasChanged := True;
+    LoadPlaylistFromFile(aFilename, Playlist, AutoScan, fDriveManager);
+    FillPlaylistView;
+    fDauer := ShowPlayListSummary;
+    UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+    fPlaylistHasChanged := True;
 end;
 
 function TNempPlaylist.SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
@@ -1757,6 +1785,10 @@ var
   ini: TMemIniFile;
   tmpStream: TMemoryStream;
   tmp: AnsiString;
+
+  PlaylistSaveDriveChar: Char;
+  AudioFileSavePath: String;
+  aDrive: TDrive;
 begin
   if (AnsiLowerCase(ExtractFileExt(aFilename)) = '.m3u')
      or (AnsiLowerCase(ExtractFileExt(aFilename)) = '.m3u8') then
@@ -1849,8 +1881,19 @@ begin
           // VersionsInfo schreiben
           tmp := 'NempPlaylist';
           tmpStream.Write(tmp[1], length(tmp));
-          tmp := '5.0';
+          tmp := '5.1';
           tmpStream.Write(tmp[1], length(tmp));
+
+          ///  Since Nemp 4.14: Add List of ManagedDrives into the PlaylistFile
+          ///  But we have (so far) no proper DriveManagement in the TNempPlaylist-Class during runtime
+          ///  Therefore: Add ManagedDrives just here
+          fDrivemanager.AddDrivesFromAudioFiles(Playlist);
+          fDriveManager.SaveDrivesToStream(tmpStream);
+
+          PlaylistSaveDriveChar := aFilename[1];
+          if PlaylistSaveDriveChar = '\' then
+              PlaylistSaveDriveChar := '-';
+
           // FileCount
           c := Playlist.Count;
           tmpStream.Write(c, SizeOf(Integer));
@@ -1860,7 +1903,36 @@ begin
               aAudioFile := TAudioFile(Playlist[i]);
               case aAudioFile.AudioType of
                   at_File: begin
-                      aAudioFile.SaveToStream(tmpStream, ExtractRelativePathNew(aFilename, aAudioFile.Pfad ) );
+
+                        // if the AudioFile is located on the same Drive as the Playlist: Save relative Path
+                        if (aAudioFile.Ordner[1] = PlaylistSaveDriveChar) and TDrivemanager.EnableCloudMode then
+                        begin
+                            aAudioFile.DriveID := -5;
+                            AudioFileSavePath := ExtractRelativePath(aFilename, aAudioFile.Pfad );
+                        end else
+                        // otherwise save also a proper DriveID
+                        begin
+                                if aAudioFile.Ordner[1] <> '\' then
+                                begin
+                                    aDrive := fDriveManager.GetManagedDriveByChar(aAudioFile.Ordner[1]);
+                                    if assigned(aDrive) then
+                                    begin
+                                        aAudioFile.DriveID := aDrive.ID;
+                                        AudioFileSavePath := aAudioFile.Pfad;
+                                    end else
+                                    begin
+                                         // for now: No exception here, just don't use "letter fix"
+                                         aAudioFile.DriveID := -5;  
+                                         AudioFileSavePath := aAudioFile.Pfad;                                        
+                                    end;
+                                end else
+                                begin
+                                    aAudioFile.DriveID := -1;
+                                    AudioFileSavePath := aAudioFile.Pfad;
+                                end;
+                        end;        
+
+                        aAudioFile.SaveToStream(tmpStream, AudioFileSavePath);
                   end;
                   at_Stream: begin
                       aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
@@ -2561,6 +2633,16 @@ begin
     // fPlayingIndex korrigieren
     ReInitPlaylist;
     fPlaylistHasChanged := True;
+end;
+
+procedure TNempPlaylist.ReSynchronizeDrives;
+begin
+    if TDriveManager.EnableUSBMode then
+    begin
+        fDriveManager.ReSynchronizeDrives;
+        if fDriveManager.DrivesHaveChanged then
+            fDrivemanager.RepairDriveCharsAtAudioFiles(Playlist);
+    end;
 end;
 
 {

@@ -39,7 +39,8 @@ unit AudioFileHelper;
 interface
 
 uses Windows, Classes, Contnrs, SysUtils, StrUtils, Math, IniFiles, Dialogs,
-    Nemp_ConstantsAndTypes, Hilfsfunktionen, NempAudioFiles, DateUtils, System.UITypes;
+    Nemp_ConstantsAndTypes, Hilfsfunktionen, NempAudioFiles, DriveRepairTools,
+    DateUtils, System.UITypes;
 
 const SORT_MAX = 10;
 
@@ -82,10 +83,10 @@ procedure SynchNewFileWithBib(aNewFile: TAudioFile; WithCover: Boolean = True);
 procedure SynchAFileWithDisc(aNewFile: TAudioFile; WithCover: Boolean = True);
 
 
-procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
+procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean; aDriveManager: TDriveManager);
 procedure LoadPlaylistFromFileM3U8(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 procedure LoadPlaylistFromFilePLS(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
-procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
+procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean; aDriveManager: TDriveManager);
 procedure LoadPlaylistFromFileASX(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 
 
@@ -924,17 +925,23 @@ begin
 end;
 
 
-procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
+procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean; aDriveManager: TDriveManager);
 var aStream: TFileStream;
     NPLHeader: AnsiString;
     FileCount, i: Integer;
     NewAudioFile: TAudioFile;
     NPLVersion: AnsiString;
     FileIsCurrentVersion, SupportedFormat: Boolean;
+
+    SavedDriveList: TDriveList;
+    currentDriveID: Integer;
+    CurrentDriveChar: Char;
+
 const
   Check1: AnsiString = 'NempPlaylist';
-  Deprecatd_Version: AnsiString = '3.1';
-  Current_Version  : AnsiString = '5.0';  // like in the GMP, new in Nemp 4.13
+  Deprecatd_Version    : AnsiString = '3.1';
+  Current_Version      : AnsiString = '5.0';  // like in the GMP, new in Nemp 4.13
+  Current_Version_Ext  : AnsiString = '5.1';  // additional Drive-Information stored at the beginning of the File
 
 begin
       try
@@ -952,32 +959,79 @@ begin
               if (NPLVersion = Current_Version) then
                   FileIsCurrentVersion := True;
 
-              SupportedFormat := (NPLVersion = Deprecatd_Version) OR (NPLVersion = Current_Version);
+              SupportedFormat := (NPLVersion = Deprecatd_Version)
+                              or (NPLVersion = Current_Version)
+                              or (NPLVersion = Current_Version_Ext);
 
               if (NPLHeader = Check1) AND SupportedFormat then // file starts with "NempPlaylist"
               begin
+                  SavedDriveList := TDriveList.Create(True);
+                  try
+                      // new in Nemp 4.14: NPL-Files also contain Drive-Information about the used TDrives
+                      //                   These are used to fix Drive Letters just as the MediaLibrary does it for a long time now...
+                      if NPLVersion = Current_Version_Ext then
+                      begin
+                          aDriveManager.LoadDrivesFromStream(aStream, SavedDriveList);
+                          aDriveManager.SynchronizeDrives(SavedDriveList);
+                      end;
 
-                  aStream.Read(FileCount, SizeOf(Integer));
-                  for i := 1 to FileCount do
-                  begin
-                      NewAudioFile := TAudioFile.Create;
-                      if FileIsCurrentVersion then
-                          NewAudioFile.LoadDataFromStream(aStream, True)
-                      else
-                          NewAudioFile.LoadFromStreamForPlaylist_DEPRECATED(aStream);
+                      // initialise variables for fixing Drive Letters
+                      CurrentDriveChar := ' ';
+                      currentDriveID := -2;
 
-                      if NewAudioFile.isCDDA then
-                          SetCDDADefaultInformation(NewAudioFile);
+                      // Read the AudioFiles from the Stream
+                      aStream.Read(FileCount, SizeOf(Integer));
+                      for i := 1 to FileCount do
+                      begin
+                          NewAudioFile := TAudioFile.Create;
+                          if FileIsCurrentVersion then
+                              NewAudioFile.LoadDataFromStream(aStream, True, False)
+                          else
+                              NewAudioFile.LoadFromStreamForPlaylist_DEPRECATED(aStream);
 
-                      //if NewAudioFile.isStream then
-                      //  NewAudioFile.Description := NewAudioFile.Titel;
+                          if NewAudioFile.isCDDA then
+                              SetCDDADefaultInformation(NewAudioFile);
 
-                      if AutoScan then
-                          NewAudioFile.ReCheckExistence
-                      else
-                          NewAudioFile.FileIsPresent := True;
+                          // Nemp Version 4.14 or later:
+                          // NPL-Files contain TDrives-Information to fix Drive Letters
+                          if NPLVersion = Current_Version_Ext then
+                          begin
+                              if newAudioFile.DriveID <> -5 then
+                              begin
+                                    if currentDriveID <> newAudioFile.DriveID then
+                                    begin
+                                        // currentDriveChar does not match, we need to find the correct one
+                                        if newAudioFile.DriveID <= -1 then
+                                            CurrentDriveChar := '\'
+                                        else
+                                        begin
+                                            if newAudioFile.DriveID < SavedDriveList.Count then
+                                                CurrentDriveChar := SavedDriveList[newAudioFile.DriveID].Drive[1]
+                                            else // something is wrong with the file here
+                                            begin
+                                                MessageDlg('Invalid playlist: Invalid AudioData: DriveID not found.', mtError, [mbOK], 0);
+                                                break;
+                                            end;
+                                        end;
+                                        // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                                        currentDriveID := newAudioFile.DriveID;
+                                    end;
+                                    // now *actually* assign the proper drive letter ;-)
+                                    newAudioFile.SetNewDriveChar(CurrentDriveChar);
+                              end;
+                          end;
 
-                      TargetList.Add(NewAudioFile);
+                          // after that: scan the file (if wanted)
+                          if AutoScan then
+                              NewAudioFile.ReCheckExistence
+                          else
+                              NewAudioFile.FileIsPresent := True;
+
+                          TargetList.Add(NewAudioFile);
+                      end;
+
+                  finally
+                      SavedDriveList.Free;
                   end;
               end else
                   MessageDlg('Invalid playlist', mtError, [mbOK], 0);
@@ -1059,8 +1113,7 @@ begin
 end;
 
 
-
-procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
+procedure LoadPlaylistFromFile(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean; aDriveManager: TDriveManager);
 var ext: UnicodeString;
 begin
   // Evtl. Todo in Zukunft:
@@ -1069,6 +1122,9 @@ begin
 
   if Not FileExists(aFilename) then
       exit;
+
+  // !!! LoadPlaylistFromFile is called with aDriveManager=NIL from downloaded Shoutcast-Playlists
+  //     => Never use the DriveManager in files coming frome there (i.e. only for our own *.npl-files)
 
   SetCurrentDir(ExtractFilePath(aFileName));
 
@@ -1084,7 +1140,7 @@ begin
         LoadPlaylistFromFilePLS(aFilename, TargetList, AutoScan)
       else
         if ext = '.npl' then
-          LoadPlaylistFromFileNPL(aFilename, TargetList, AutoScan)
+          LoadPlaylistFromFileNPL(aFilename, TargetList, AutoScan, aDriveManager)
         else
           if (ext = '.asx') or (ext = '.wax') then
             LoadPlaylistFromFileASX(aFilename, TargetList, AutoScan);

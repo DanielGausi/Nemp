@@ -60,7 +60,7 @@ implementation
 
 
 uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
-    MainFormHelper, CoverHelper, AudioFileHelper,
+    MainFormHelper, CoverHelper, AudioFileHelper, CreateHelper,
     Nemp_RessourceStrings, ShoutCastUtils, WebServerClass,
     UpdateUtils, SystemHelper, ScrobblerUtils, OptionsComplete,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
@@ -549,6 +549,15 @@ begin
 
         end;
 
+        MB_FixAudioFilePaths: begin
+            LblEmptyLibraryHint.Caption := MediaLibrary_Preparing;
+            MedienBib.ProcessLoadedFilenames;
+        end;
+        MB_FixPlaylistFilePaths: begin
+             LblEmptyLibraryHint.Caption := MediaLibrary_Preparing;
+             MedienBib.ProcessLoadedPlaylists;
+        end;
+
         MB_Unblock: begin
             UnBlockGUI;
 
@@ -908,7 +917,7 @@ begin
                                                   FS.Free;
                                                   tmpPlaylist := TObjectList.Create(False); // False: Do NOT free the audiofiles therein!
                                                   try
-                                                      LoadPlaylistFromFile(filename, tmpPlaylist, False);
+                                                      LoadPlaylistFromFile(filename, tmpPlaylist, False, Nil);
                                                       HandleFiles(tmpPlaylist, WebRadioInsertMode);
                                                   finally
                                                       tmpPlaylist.Free;

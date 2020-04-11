@@ -187,10 +187,14 @@ begin
 end;
 
 
-// TODO: Event bei "neues Drive angeschlossen"
 procedure HandleNewConnectedDrive;
 begin
+    // new in Nemp 4.14: Handle the Playlist as well
+    // As the handling there is much simpler, we do the "RepairFiles" also in "ReSynchronizeDrives".
+    // We do not need to sort something after that, or rebuild some other structures, ...
+    NempPlaylist.ReSynchronizeDrives;
 
+  // main part: Fix the MediaLibrary
   with Nemp_MainForm do
     if MedienBib.StatusBibUpdate <> 0 then
     begin
@@ -199,6 +203,9 @@ begin
     begin
         // Starte Check
         NewDrivesNotificationCount := 0;
+
+        // ReSynchronizeDrives will return False, if no changes are necessary.
+        // This includes the case when TDriveManager.EnableUSBMode is set to "False"
         if MedienBib.ReSynchronizeDrives then
         begin
               // uhoh...es gab eine Änderung. Also:
@@ -241,6 +248,8 @@ begin
               Nemp_MainForm.SetFocus;
         end;
 
+        // if EnableUSBMode is set to false, we don't need to "Add Jobs" here,
+        // but it doesn't hurt neither
         if Medienbib.AutoScanDirs then
             Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
         if Medienbib.AutoDeleteFiles then

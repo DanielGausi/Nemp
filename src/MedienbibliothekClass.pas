@@ -127,7 +127,9 @@ type
         AlleAlben: TStringList;             // A list with all albums
         tmpAlleAlben: TStringList;          // (the list is shown in MainForm when selecting "All Artists")
 
-        fUsedDrives: TObjectList;           // The TDrives used by the Library
+        fDriveManager: TDriveManager; // managing the Drives used by the Library
+        fPlaylistDriveManager: TDriveManager; // Another one for the Playlistfiles. Probably not needed in most cases
+
 
         PlaylistFiles: TObjectList;         // temporarly AudioFiles, loaded from Playlists
 
@@ -249,7 +251,7 @@ type
         //    - Create other tmp-Lists and -stuff and sort them
         procedure PrepareNewFilesUpdate;
         // 1b. Update UsedDriveList
-        procedure AddUsedDrivesInformation(aList: TObjectlist; aPlaylistList: TObjectList);
+        // procedure AddUsedDrivesInformation(aList: TObjectlist; aPlaylistList: TObjectList);
         // 2. Swap Lists, used on update-process
         procedure SwapLists;
         // 3. Clean tmp-lists, which are not needed after an update
@@ -323,9 +325,9 @@ type
 
         // Synch a List of TDrives with the current situation on the PC
         // i.e. Search the Drive-IDs in the system and adjust the drive-letters
-        procedure SynchronizeDrives(Source: TObjectList);
+        // procedure SynchronizeDrives(Source: TObjectList);
         // Check whether drive has changed after a new device has been connected
-        function DrivesHaveChanged: Boolean;
+        // function DrivesHaveChanged: Boolean;
 
         // Saving/loading the *.gmp-File
         function LoadDrivesFromStream_DEPRECATED(aStream: TStream): Boolean;
@@ -334,11 +336,11 @@ type
 
         function LoadAudioFilesFromStream_DEPRECATED(aStream: TStream; MaxSize: Integer): Boolean;
         function LoadAudioFilesFromStream(aStream: TStream): Boolean;
-        procedure SaveAudioFilesToStream(aStream: TStream);
+        procedure SaveAudioFilesToStream(aStream: TStream; StreamFilename: String);
 
         function LoadPlaylistsFromStream_DEPRECATED(aStream: TStream): Boolean;
         function LoadPlaylistsFromStream(aStream: TStream): Boolean;
-        procedure SavePlaylistsToStream(aStream: TStream);
+        procedure SavePlaylistsToStream(aStream: TStream; StreamFilename: String);
 
         function LoadRadioStationsFromStream_DEPRECATED(aStream: TStream): Boolean;
         function LoadRadioStationsFromStream(aStream: TStream): Boolean;
@@ -407,8 +409,14 @@ type
         // und auch die Laderoutine
         UpdateList: TObjectlist;
 
-        // Sammelt während eines Updates die neuen Playlist-Dateien
+        ///  PlaylistUpdateList: With the new system since Nemp 4.14 we need 2 Lists
+        ///  for Playlists during the UpdateProcess
+        ///  PlaylistUpdateList_Playlist contains the PlaylistObjects with DriveID from the LibraryFile.
+        ///                              These objects need to be processed after Loading is complete
+        ///  PlaylistUpdateList: During processing these Objects, we create the "JustAString"-objects, we actually
+        ///                      use in the Library
         PlaylistUpdateList: TObjectList;
+        PlaylistUpdateList_Playlist: TObjectList;
 
         // Speichert die zu durchsuchenden Ordner für SearchTool
         ST_Ordnerlist: TStringList;
@@ -527,6 +535,7 @@ type
         property IgnoreLyrics     : Boolean read fIgnoreLyrics     write fSetIgnoreLyrics  ;
         property IgnoreLyricsFlag : Integer read fIgnoreLyricsFlag                         ;
 
+        property PlaylistDriveManager: TDriveManager read fPlaylistDriveManager;
 
         // Basic Operations. Create, Destroy, Clear, Copy
         constructor Create(aWnd: DWord; CFHandle: DWord);
@@ -578,6 +587,9 @@ type
         procedure HandleChangedCoverID;
 
         procedure ChangeCoverIDUnsorted(oldID, newID: String);
+
+        procedure ProcessLoadedFilenames;
+        procedure ProcessLoadedPlaylists;
 
         // even more stuff for file managing: Additional Tags
         function AddNewTagConsistencyCheck(aAudioFile: TAudioFile; newTag: String): TTagConsistencyError;
@@ -693,7 +705,7 @@ type
         function ChangeTags(oldTag, newTag: String): Integer;
         function CountFilesWithTag(aTag: String): Integer;
 
-        function GetDriveFromUsedDrives(aChar: Char): TDrive;
+        // function GetDriveFromUsedDrives(aChar: Char): TDrive;
 
         // note: When adding Jobs, ALWAYS add also a JOB_Finish job to finalize the process
         procedure AddStartJob(aJobtype: TJobType; aJobParam: String);
@@ -819,13 +831,15 @@ begin
   AutoScanDirList.Sorted := True;
   AutoScanToDoList := TStringList.Create;
 
-  fUsedDrives := TObjectList.Create;
+  fDriveManager := TDriveManager.Create;
+  fPlaylistDriveManager := TDriveManager.Create;
 
   PlaylistFiles := TObjectList.Create(True);
   tmpAllPlaylistsPfadSort := TObjectList.Create(False);
   AllPlaylistsPfadSort := TObjectList.Create(False);
   AllPlaylistsNameSort := TObjectList.Create(False);
   PlaylistUpdateList := TObjectList.Create(False);
+  PlaylistUpdateList_Playlist := TObjectList.Create(True);
 
   NempSortArray[1] := siOrdner;//Artist;
   NempSortArray[2] := siArtist;
@@ -902,7 +916,8 @@ begin
   AutoScanDirList.Free;
   AutoScanToDoList.Free;
       EnterCriticalSection(CSAccessDriveList);
-      fUsedDrives.Free;
+      fDriveManager.Free;
+      fPlaylistDriveManager.Free;
       LeaveCriticalSection(CSAccessDriveList);
   PlaylistFiles.Free;
   tmpAllPlaylistsPfadSort.Free;
@@ -924,6 +939,7 @@ begin
 
   UpdateList.Free;
   PlaylistUpdateList.Free;
+  PlaylistUpdateList_Playlist.Free;
   ST_Ordnerlist.Free;
   tmpCoverlist.Free;
   Coverlist.Free;
@@ -958,10 +974,12 @@ begin
 
   UpdateList.Clear;
   PlaylistUpdateList.Clear;
+  PlaylistUpdateList_Playlist.Clear;
   ST_Ordnerlist.Clear;
 
   EnterCriticalSection(CSAccessDriveList);
-  fUsedDrives.Clear;
+  fDriveManager.Clear;
+  fPlaylistDriveManager.Clear;
   LeaveCriticalSection(CSAccessDriveList);
 
   AlleAlben.Clear;
@@ -1688,7 +1706,11 @@ begin
   begin
       // i.e. new files, not from a *.gmp-File
       // Collect information of used Drives
-      AddUsedDrivesInformation(UpdateList, PlaylistUpdateList);
+      // AddUsedDrivesInformation(UpdateList, PlaylistUpdateList);
+      EnterCriticalSection(CSAccessDriveList);
+      fDriveManager.AddDrivesFromAudioFiles(UpdateList);
+      fDriveManager.AddDrivesFromPlaylistFiles(PlaylistUpdateList);
+      LeaveCriticalSection(CSAccessDriveList);
   end;
 
   // Build proper Browse-Lists
@@ -1806,6 +1828,7 @@ begin
 end;
 
 
+(*
 {
     --------------------------------------------------------
     AddUsedDrivesInformation
@@ -1856,6 +1879,7 @@ begin
     end;
     LeaveCriticalSection(CSAccessDriveList);
 end;
+*)
 {
     --------------------------------------------------------
     SwapLists
@@ -2136,7 +2160,7 @@ end;
 }
 procedure TMedienBibliothek.fPrepareUserInputDeadFiles(DeleteDataList: TObjectList);
 var i: Integer;
-    LogicalDrives: TObjectList;
+    // LogicalDrives: TObjectList;
     currentDir: String;
     currentLogicalDrive, currentLibraryDrive: TDrive;
     currentDriveChar: Char;
@@ -2196,8 +2220,10 @@ var i: Integer;
             DeleteDataList.Add(result);
             if isLocal then
             begin
-                fcurrentLogicalDrive := GetDriveFromListByChar(LogicalDrives, aDrive[1]);
-                fcurrentLibraryDrive := GetDriveFromListByChar(fUsedDrives, aDrive[1]);
+                fcurrentLogicalDrive := fDriveManager.GetPhysicalDriveByChar(aDrive[1]);
+                                        // GetDriveFromListByChar(LogicalDrives, aDrive[1]);
+                fcurrentLibraryDrive := fDriveManager.GetManagedDriveByChar(aDrive[1]);
+                                        // GetDriveFromListByChar(fUsedDrives, aDrive[1]);
                 if fcurrentLogicalDrive = NIL then
                 begin
                     // complete Drive is NOT there
@@ -2226,140 +2252,144 @@ var i: Integer;
     end;
 
 begin
+    EnterCriticalSection(CSAccessDriveList);
     // prepare data - check whether the drive of the issing files exists etc.
-    LogicalDrives := TObjectList.Create;
-    try
-        GetLogicalDrives(LogicalDrives); // get connected logical drives
+    //LogicalDrives := TObjectList.Create;
+    //try
+    // fDriveManager.InitPhysicalDriveList;
+    // GetLogicalDrives(LogicalDrives); // get connected logical drives
 
-        currentDriveChar  := ' ';    // invalid drive letter
-        currentPC         := 'XXX';  // invalid PC-Name
-        newDeleteData     := Nil;
+    currentDriveChar  := ' ';    // invalid drive letter
+    currentPC         := 'XXX';  // invalid PC-Name
+    newDeleteData     := Nil;
 
-        for i := 0 to DeadFiles.Count - 1 do
+    for i := 0 to DeadFiles.Count - 1 do
+    begin
+        currentDir := TAudioFile(DeadFiles[i]).Ordner;
+        if length(currentDir) > 0 then
         begin
-            currentDir := TAudioFile(DeadFiles[i]).Ordner;
-            if length(currentDir) > 0 then
+            if IsLocalDir(currentDir) then
             begin
-                if IsLocalDir(currentDir) then
+                // C:\, F:\, whatever - a LOCAL drive
+                if currentDriveChar <> currentDir[1] then
                 begin
-                    // C:\, F:\, whatever - a LOCAL drive
-                    if currentDriveChar <> currentDir[1] then
+                    // beginning of a ne drive - check for this drive
+                    currentDriveChar := currentDir[1];
+                    currentLogicalDrive := fDriveManager.GetPhysicalDriveByChar(currentDriveChar);
+                                           // GetDriveFromListByChar(LogicalDrives, currentDriveChar);
+                    currentLibraryDrive := fDriveManager.GetManagedDriveByChar(currentDriveChar);
+                                           // GetDriveFromListByChar(fUsedDrives, currentDriveChar);
+                    newDeleteData := TDeleteData.Create;
+                    newDeleteData.DriveString := currentDriveChar; // at first only the letter + ':\';
+                    if currentLogicalDrive = NIL then
                     begin
-                        // beginning of a ne drive - check for this drive
-                        currentDriveChar := currentDir[1];
-                        currentLogicalDrive := GetDriveFromListByChar(LogicalDrives, currentDriveChar);
-                        currentLibraryDrive := GetDriveFromListByChar(fUsedDrives, currentDriveChar);
-
-                        newDeleteData := TDeleteData.Create;
-                        newDeleteData.DriveString := currentDriveChar; // at first only the letter + ':\';
-                        if currentLogicalDrive = NIL then
-                        begin
-                            // complete logical Drive is NOT there
-                            newDeleteData.DoDelete       := False;
-                            newDeleteData.Hint           := dh_DriveMissing;
-
-                            // use the drivetype from the library
-                            if assigned(currentLibraryDrive) then
-                                newDeleteData.DriveType := currentLibraryDrive.typ
-                            else
-                                // fallback to "remote" (but this should not happen)
-                                newDeleteData.DriveType := DriveTypeTexts[DRIVE_REMOTE];
-                        end else
-                        begin
-                            // drive is there => just the file is not present
-                            newDeleteData.DoDelete       := True;
-                            newDeleteData.Hint           := dh_DivePresent;
-                            newDeleteData.DriveType      := currentLogicalDrive.Typ;
-                        end;
-                        DeleteDataList.Add(newDeleteData);
-                    end;
-                end else
-                begin
-                    // File on another pc in the network
-                    if not AnsiStartsText(currentPC, currentDir)  then
-                    begin
-                        currentPC := ExtractPCNameFromPath(currentDir);
-                        newDeleteData := TDeleteData.Create;
-                        newDeleteData.DriveString := currentPC ;
-                        // assume that its missing, further check after this loop
+                        // complete logical Drive is NOT there
                         newDeleteData.DoDelete       := False;
-                        newDeleteData.Hint           := dh_NetworkMissing;
-                        newDeleteData.DriveType  := DriveTypeTexts[DRIVE_REMOTE];
-                        DeleteDataList.Add(newDeleteData);
-                    end;
-                end;
-            end; // otherwise something is really wrong with the file. ;-)
-            // Add file to the DeleteData-Objects FileList
-            if assigned(newDeleteData) then
-                newDeleteData.Files.Add(DeadFiles[i]);
-        end;
+                        newDeleteData.Hint           := dh_DriveMissing;
 
-        // The same for playlists, but re-use the existing DeleteDataList-Objects
-        currentDeleteData := Nil;
-        currentDriveChar  := ' ';    // invalid drive letter
-        currentPC         := 'XXX';  // invalid PC-Name
-
-        for i := 0 to DeadPlaylists.Count - 1 do
-        begin
-            currentDir := TJustAString(DeadPlaylists[i]).DataString;
-            if length(currentDir) > 0 then
-            begin
-                if IsLocalDir(currentDir) then
-                begin
-                    if currentDriveChar <> currentDir[1] then
+                        // use the drivetype from the library
+                        if assigned(currentLibraryDrive) then
+                            newDeleteData.DriveType := currentLibraryDrive.typ
+                        else
+                            // fallback to "remote" (but this should not happen)
+                            newDeleteData.DriveType := DriveTypeTexts[DRIVE_REMOTE];
+                    end else
                     begin
-                        // beginning of a new drive - Get a matching DeleteData-Object from the already existing list
-                        // (or create a new one)
-                        currentDriveChar := currentDir[1];
-                        currentDeleteData := GetMatchingDeleteDataObject(currentDriveChar{ + ':\'}, True);
+                        // drive is there => just the file is not present
+                        newDeleteData.DoDelete       := True;
+                        newDeleteData.Hint           := dh_DivePresent;
+                        newDeleteData.DriveType      := currentLogicalDrive.Typ;
                     end;
-                end else
+                    DeleteDataList.Add(newDeleteData);
+                end;
+            end else
+            begin
+                // File on another pc in the network
+                if not AnsiStartsText(currentPC, currentDir)  then
                 begin
-                    // File on another pc in the network
-                    if not AnsiStartsText(currentPC, currentDir)  then
-                    begin
-                        currentPC := ExtractPCNameFromPath(currentDir);
-                        currentDeleteData := GetMatchingDeleteDataObject(currentPC, False);
-                    end;
+                    currentPC := ExtractPCNameFromPath(currentDir);
+                    newDeleteData := TDeleteData.Create;
+                    newDeleteData.DriveString := currentPC ;
+                    // assume that its missing, further check after this loop
+                    newDeleteData.DoDelete       := False;
+                    newDeleteData.Hint           := dh_NetworkMissing;
+                    newDeleteData.DriveType  := DriveTypeTexts[DRIVE_REMOTE];
+                    DeleteDataList.Add(newDeleteData);
                 end;
             end;
-            // Add file to the DeleteData-Objects Playlist-FileList
-            if assigned(currentDeleteData) then
-                currentDeleteData.PlaylistFiles.Add(DeadPlaylists[i]);
-        end;
-
-        // make the drivestrings a little bit nicer, add the name (from the library-drive)
-        for i := 0 to DeleteDataList.Count-1 do
-        begin
-            currentDeleteData := TDeleteData(DeleteDataList[i]);
-            if Length(currentDeleteData.DriveString) > 0 then
-            begin
-                currentLibraryDrive := GetDriveFromListByChar(fUsedDrives, currentDeleteData.DriveString[1]);
-
-                if assigned(currentLibraryDrive) then
-                    currentDeleteData.DriveString := currentDeleteData.DriveString
-                      + ':\ (' + currentLibraryDrive.Name + ')';
-            end;
-        end;
-
-        // Try to determine, whether network-ressources are online or not
-        for i := 0 to DeleteDataList.Count - 1 do
-        begin
-            if TDeleteData(DeleteDatalist[i]).DriveString[1] = '\' then
-            begin
-                if RessourceCount(TDeleteData(DeleteDatalist[i]).DriveString) >
-                   TDeleteData(DeleteDatalist[i]).Files.Count then
-                begin
-                    // some files on this ressource can be found
-                    TDeleteData(DeleteDatalist[i]).DoDelete       := True;
-                    TDeleteData(DeleteDatalist[i]).Hint           := dh_NetworkPresent;
-                end;
-            end;
-        end;
-    finally
-        LogicalDrives.Free;
+        end; // otherwise something is really wrong with the file. ;-)
+        // Add file to the DeleteData-Objects FileList
+        if assigned(newDeleteData) then
+            newDeleteData.Files.Add(DeadFiles[i]);
     end;
 
+    // The same for playlists, but re-use the existing DeleteDataList-Objects
+    currentDeleteData := Nil;
+    currentDriveChar  := ' ';    // invalid drive letter
+    currentPC         := 'XXX';  // invalid PC-Name
+
+    for i := 0 to DeadPlaylists.Count - 1 do
+    begin
+        currentDir := TJustAString(DeadPlaylists[i]).DataString;
+        if length(currentDir) > 0 then
+        begin
+            if IsLocalDir(currentDir) then
+            begin
+                if currentDriveChar <> currentDir[1] then
+                begin
+                    // beginning of a new drive - Get a matching DeleteData-Object from the already existing list
+                    // (or create a new one)
+                    currentDriveChar := currentDir[1];
+                    currentDeleteData := GetMatchingDeleteDataObject(currentDriveChar{ + ':\'}, True);
+                end;
+            end else
+            begin
+                // File on another pc in the network
+                if not AnsiStartsText(currentPC, currentDir)  then
+                begin
+                    currentPC := ExtractPCNameFromPath(currentDir);
+                    currentDeleteData := GetMatchingDeleteDataObject(currentPC, False);
+                end;
+            end;
+        end;
+        // Add file to the DeleteData-Objects Playlist-FileList
+        if assigned(currentDeleteData) then
+            currentDeleteData.PlaylistFiles.Add(DeadPlaylists[i]);
+    end;
+
+    // make the drivestrings a little bit nicer, add the name (from the library-drive)
+    for i := 0 to DeleteDataList.Count-1 do
+    begin
+        currentDeleteData := TDeleteData(DeleteDataList[i]);
+        if Length(currentDeleteData.DriveString) > 0 then
+        begin
+            currentLibraryDrive := fDriveManager.GetManagedDriveByChar(currentDeleteData.DriveString[1]);
+                      //GetDriveFromListByChar(fUsedDrives, currentDeleteData.DriveString[1]);
+
+            if assigned(currentLibraryDrive) then
+                currentDeleteData.DriveString := currentDeleteData.DriveString
+                  + ':\ (' + currentLibraryDrive.Name + ')';
+        end;
+    end;
+
+    // Try to determine, whether network-ressources are online or not
+    for i := 0 to DeleteDataList.Count - 1 do
+    begin
+        if TDeleteData(DeleteDatalist[i]).DriveString[1] = '\' then
+        begin
+            if RessourceCount(TDeleteData(DeleteDatalist[i]).DriveString) >
+               TDeleteData(DeleteDatalist[i]).Files.Count then
+            begin
+                // some files on this ressource can be found
+                TDeleteData(DeleteDatalist[i]).DoDelete       := True;
+                TDeleteData(DeleteDatalist[i]).Hint           := dh_NetworkPresent;
+            end;
+        end;
+    end;
+    //finally
+    //    LogicalDrives.Free;
+    //end;
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 {
     --------------------------------------------------------
@@ -4749,7 +4779,7 @@ begin
 
       if FileExists(Album) then
       begin
-          LoadPlaylistFromFile(Album, PlaylistFiles, AutoScanPlaylistFilesOnView);
+          LoadPlaylistFromFile(Album, PlaylistFiles, AutoScanPlaylistFilesOnView, fPlaylistDriveManager);
 
           AnzeigeShowsPlaylistFiles := True;
           DisplayContent := DISPLAY_BrowsePlaylist;
@@ -5359,91 +5389,6 @@ end;
 
 {
     --------------------------------------------------------
-    SynchronizeDrives
-    --------------------------------------------------------
-}
-procedure TMedienBibliothek.SynchronizeDrives(Source: TObjectList);
-var PCDrives: TObjectlist;
-    iSource: Integer;
-    CurrentDrive, syncPCDrive, newDrive: TDrive;
-    LastCheckedDriveChar: Char;
-begin
-    EnterCriticalSection(CSAccessDriveList);
-    PCDrives := TObjectList.Create;
-    try
-        GetLogicalDrives(PCDrives);
-        LastCheckedDriveChar := 'C';
-        fUsedDrives.Clear;
-        for iSource := 0 to Source.Count - 1 do
-        begin
-            CurrentDrive := tDrive(Source[iSource]);
-
-            // Seriennummer dieses Laufwerks in der PC-Liste suchen
-            syncPCDrive := GetDriveFromListBySerialNr(PCDrives, CurrentDrive.SerialNr);
-            if assigned(syncPCDrive) then
-            begin
-                // Laufwerk vorhanden
-                newDrive := TDrive.Create;
-                newDrive.Assign(syncPCDrive);
-                newDrive.OldChar := CurrentDrive.Drive[1];
-                fUsedDrives.Add(newDrive);
-            end else
-            begin
-                // Laufwerk nicht gefunden. Also nicht angeschlossen/nicht vorhanden
-                // jetzt: Schauen, ob der Laufwerksbuchstabe in Gebrauch ist.
-                if Not assigned(GetDriveFromListByChar(PCDrives, CurrentDrive.Drive[1])) then
-                begin
-                    // Laufwerksbuchstabe nicht am Rechner in Gebrauch -> weiterverwenden
-                    newDrive := TDrive.Create;
-                    newDrive.Assign(CurrentDrive);
-                    newDrive.OldChar := CurrentDrive.Drive[1];
-                    fusedDrives.Add(NewDrive);
-                end else
-                begin
-                    // Laufwerk mit der Seriennummer nicht da, aber Buchstabe am PC in Gebrauch
-                    // -> Ausweichplatz suchen
-                    While (assigned(GetDriveFromListByChar(PCDrives, LastCheckedDriveChar))
-                          OR assigned(GetDriveFromListByChar(Source, LastCheckedDriveChar)))
-                      and (LastCheckedDriveChar <> 'Z') do
-                          // nächsten Buchstaben probieren
-                          LastCheckedDriveChar := Chr(Ord(LastCheckedDriveChar) + 1);
-
-                    newDrive := TDrive.Create;
-                    newDrive.Assign(CurrentDrive);
-                    newDrive.Drive := LastCheckedDriveChar + ':\';
-                    newDrive.OldChar := CurrentDrive.Drive[1];
-                    fusedDrives.Add(NewDrive);
-               end;
-            end;
-        end;
-    finally
-        PCDrives.Free;
-    end;
-    LeaveCriticalSection(CSAccessDriveList);
-end;
-
-{
-    --------------------------------------------------------
-    DrivesHaveChanged
-    --------------------------------------------------------
-}
-function TMedienBibliothek.DrivesHaveChanged: Boolean;
-var i: Integer;
-begin
-    EnterCriticalSection(CSAccessDriveList);
-    result := False;
-    for i := 0 to fusedDrives.Count - 1 do
-    begin
-        if TDrive(fUsedDrives[i]).Drive[1] <> TDrive(fUsedDrives[i]).OldChar then
-        begin
-            result := True;
-            break;
-        end;
-    end;
-    LeaveCriticalSection(CSAccessDriveList);
-end;
-{
-    --------------------------------------------------------
     ReSynchronizeDrives
     - Resync drives when new devices connects to the PC
     Note: This method runs in VCL-Thread.
@@ -5454,27 +5399,19 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.ReSynchronizeDrives: Boolean;
-var CurrentUsedDrives: TObjectList;
-    i: Integer;
-    NewDrive: TDrive;
 begin
-    //result := False;
-    EnterCriticalSection(CSAccessDriveList);
-    CurrentUsedDrives := TObjectList.Create;
-    try
-        for i := 0 to fusedDrives.Count - 1 do
-        begin
-            NewDrive := TDrive.Create;
-            NewDrive.Assign(TDrive(fUsedDrives[i]));
-            CurrentUsedDrives.Add(NewDrive);
-        end;
-        // Laufwerke Neu synchronisieren
-        SynchronizeDrives(CurrentUsedDrives);
-        result := DrivesHaveChanged;
-    finally
-        CurrentUsedDrives.Free;
+    if Not TDriveManager.EnableUSBMode then
+        result := false
+    else
+    begin
+        EnterCriticalSection(CSAccessDriveList);
+        fDriveManager.ReSynchronizeDrives;
+        fPlaylistDriveManager.ReSynchronizeDrives;
+        // relavant is only the "main" DriveManager later.
+        // if a currently loaded PlaylistFile has changed: Just load it again by clicking it another time
+        result := fDriveManager.DrivesHaveChanged;
+        LeaveCriticalSection(CSAccessDriveList);
     end;
-    LeaveCriticalSection(CSAccessDriveList);
 end;
 {
     --------------------------------------------------------
@@ -5484,84 +5421,17 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.RepairDriveCharsAtAudioFiles;
-var i: Integer;
-    CurrentDriveChar, CurrentReplaceChar: WideChar;
-    aAudioFile: TAudioFile;
-    aDrive: TDrive;
 begin
     EnterCriticalSection(CSAccessDriveList);
-    CurrentDriveChar := '-';
-    CurrentReplaceChar := '-';
-    for i := 0 to Mp3ListePfadsort.Count - 1 do
-    begin
-        aAudioFile := TAudioFile(Mp3ListePfadsort[i]);
-        if (aAudioFile.Ordner[1] <> CurrentDriveChar) then
-        begin
-            if aAudioFile.Ordner[1] <> '\' then
-            begin
-                aDrive := GetDriveFromListByOldChar(fUsedDrives, Char(aAudioFile.Ordner[1]));
-                if assigned(aDrive) and (aDrive.Drive <> '') then
-                begin
-                    // aktuelle Buchstaben merken
-                    // und replaceChar neu setzen
-                    CurrentDriveChar := aAudioFile.Ordner[1];
-                    CurrentReplaceChar := WideChar(aDrive.Drive[1]);
-                end else
-                begin
-                    MessageDLG((Medialibrary_DriveRepairError), mtError, [MBOK], 0);
-                    exit;
-                end;
-            end else
-            begin
-                CurrentDriveChar := '\';
-                CurrentReplaceChar := '\';
-            end;
-        end;
-        aAudioFile.SetNewDriveChar(CurrentReplaceChar);
-    end;
+    fDrivemanager.RepairDriveCharsAtAudioFiles(Mp3ListePfadsort);
     LeaveCriticalSection(CSAccessDriveList);
-
     // am Ende die Pfadsort-Liste neu sortieren
     Mp3ListePfadsort.Sort(Sortieren_Pfad_asc);
 end;
 procedure TMedienBibliothek.RepairDriveCharsAtPlaylistFiles;
-var i: Integer;
-    CurrentDriveChar, CurrentReplaceChar: WideChar;
-    aString: TJustaString;
-    aDrive: TDrive;
 begin
-    CurrentDriveChar := '-';
-    CurrentReplaceChar := '-';
     EnterCriticalSection(CSAccessDriveList);
-    for i := 0 to AllPlaylistsPfadSort.Count - 1 do
-    begin
-        aString := TJustaString(AllPlaylistsPfadSort[i]);
-        if (aString.DataString[1] <> CurrentDriveChar) then
-        begin
-            if (aString.DataString[1] <> '\') then
-            begin
-                // Neues Laufwerk - Infos dazwischenschieben
-                aDrive := GetDriveFromListByOldChar(fUsedDrives, Char(aString.DataString[1]));
-                if assigned(aDrive) and (aDrive.Drive <> '') then
-                begin
-                    // aktuelle Buchstaben merken
-                    // und replaceChar neu setzen
-                    CurrentDriveChar := aString.DataString[1];
-                    CurrentReplaceChar := WideChar(aDrive.Drive[1]);
-                end else
-                begin
-                    MessageDLG((Medialibrary_DriveRepairError), mtError, [MBOK], 0);
-                    exit;
-                end;
-            end else
-            begin
-                CurrentDriveChar := '\';
-                CurrentReplaceChar := '\';
-            end;
-        end;
-        aString.DataString[1] := CurrentReplaceChar
-        //aAudioFile.SetNewDriveChar(CurrentReplaceChar);
-    end;
+    fDriveManager.RepairDriveCharsAtPlaylistFiles(AllPlaylistsPfadSort);
     LeaveCriticalSection(CSAccessDriveList);
     // am Ende die Pfadsort-Liste neu sortieren
     AllPlaylistsPfadSort.Sort(PlaylistSort_Name);
@@ -5742,47 +5612,50 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.LoadDrivesFromStream_DEPRECATED(aStream: TStream): Boolean;
-var SavedDriveList: TObjectList;
+var SavedDriveList: TDriveList;
     DriveCount, i: Integer;
     newDrive: TDrive;
 begin
     result := True;
-    SavedDriveList := TObjectList.Create;
-    aStream.Read(DriveCount, SizeOf(Integer));
-
-    for i := 0 to DriveCount - 1 do
-    begin
-        newDrive := TDrive.Create;
-        newDrive.LoadFromStream_DEPRECATED(aStream);
-        SavedDriveList.Add(newDrive);
+    SavedDriveList := TDriveList.Create;
+    try
+        aStream.Read(DriveCount, SizeOf(Integer));
+        for i := 0 to DriveCount - 1 do
+        begin
+            newDrive := TDrive.Create;
+            newDrive.LoadFromStream_DEPRECATED(aStream);
+            SavedDriveList.Add(newDrive);
+        end;
+        // Daten synchronisieren
+        EnterCriticalSection(CSAccessDriveList);
+            fDriveManager.SynchronizeDrives(SavedDriveList);
+        LeaveCriticalSection(CSAccessDriveList);
+        // SynchronizeDrives(SavedDriveList);
+    finally
+        SavedDriveList.Free;
     end;
-  // Daten synchronisieren
-  SynchronizeDrives(SavedDriveList);
-  SavedDriveList.Free;
 end;
 
 function TMedienBibliothek.LoadDrivesFromStream(aStream: TStream): Boolean;
-var SavedDriveList: TObjectList;
-    DriveCount, i: Integer;
-    newDrive: TDrive;
+var SavedDriveList: TDriveList;
 begin
     result := True;
-    SavedDriveList := TObjectList.Create;
-    aStream.Read(DriveCount, SizeOf(Integer));
-    for i := 0 to DriveCount - 1 do
-    begin
-        newDrive := TDrive.Create;
-        newDrive.LoadFromStream(aStream);
-        SavedDriveList.Add(newDrive);
+    EnterCriticalSection(CSAccessDriveList);
+    SavedDriveList := TDriveList.Create(True);
+    try
+        fDriveManager.LoadDrivesFromStream(aStream, SavedDriveList);
+        // we do not allow "add Library to Library", so we can just synch the Loaded Dirves into
+        // the (empty) list of ManagedDrives there
+        fDrivemanager.SynchronizeDrives(SavedDriveList);
+    finally
+        SavedDriveList.Free;
     end;
-  // Daten synchronisieren
-  SynchronizeDrives(SavedDriveList);
-  SavedDriveList.Free;
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 
 
 procedure TMedienBibliothek.SaveDrivesToStream(aStream: TStream);
-var i, len: Integer;
+var len: Integer;
     MainID: Byte;
     BytesWritten: LongInt;
     SizePosition, EndPosition: Int64;
@@ -5793,16 +5666,15 @@ begin
     SizePosition := aStream.Position;
     aStream.Write(len, SizeOf(Integer));
 
-    aStream.Write(fUsedDrives.Count, SizeOf(Integer));
-    for i := 0 to fUsedDrives.Count-1 do
-    begin
-        TDrive(fUsedDrives[i]).ID := i;
-        TDrive(fUsedDrives[i]).SaveToStream(aStream);
-    end;
+    // save the Drives from DriveManager into the Stream
+    EnterCriticalSection(CSAccessDriveList);
+    fDriveManager.SaveDrivesToStream(aStream);
+    LeaveCriticalSection(CSAccessDriveList);
 
     // correct the size information for this block
     EndPosition := aStream.Position;
     aStream.Position := SizePosition;
+
     BytesWritten := EndPosition - SizePosition;
     aStream.Write(BytesWritten, SizeOf(BytesWritten));
     // seek to the end position again
@@ -5818,50 +5690,69 @@ end;
 function TMedienBibliothek.LoadAudioFilesFromStream(aStream: TStream): Boolean;
 var FilesCount, i: Integer;
     newAudioFile: TAudioFile;
-    //ID: Byte;
-    currentDriveID: Integer;
-    CurrentDriveChar: Char;
 begin
     result := True;
-    CurrentDriveChar := ' ';
-    currentDriveID := -2;
-    aStream.Read(FilesCount, SizeOf(FilesCount));
 
+    aStream.Read(FilesCount, SizeOf(FilesCount));
     for i := 1 to FilesCount do
     begin
         // create a new Audiofile object and read the data from the stream
         newAudioFile := TAudioFile.Create;
-        newAudioFile.LoadDataFromStream(aStream, False);
-
-        // now assign a proper drive letter, according to the DriveID of the audiofile
-        if currentDriveID <> newAudioFile.DriveID then
-        begin
-            // currentDriveChar does not match, we need to find the correct one
-            if newAudioFile.DriveID <= -1 then
-                CurrentDriveChar := '\'
-            else
-            begin
-                if newAudioFile.DriveID < fUsedDrives.Count then
-                    CurrentDriveChar := TDrive(fUsedDrives[newAudioFile.DriveID]).Drive[1]
-                else // something is wrong with the file here
-                begin
-                    SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
-                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
-                                        #13#10 + 'invalid audiofile data, DriveID not found' )));
-                    result := False;
-                    exit;
-                end;
-
-            end;
-            // anyway, we've got a new ID here, and we can set the next drive with this ID faster
-            currentDriveID := newAudioFile.DriveID;
-        end;
-        // now *actually* assign the proper drive letter ;-)
-        newAudioFile.SetNewDriveChar(CurrentDriveChar);
-
+        newAudioFile.LoadDataFromStream(aStream, False, True);
         // add the file to the update list
         UpdateList.Add(newAudioFile);
     end;
+
+    // fix Paths for the AudioFiles. Needs to be done in VCL-Thread due to Relative Paths
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_FixAudioFilePaths, 0);
+end;
+
+procedure TMedienBibliothek.ProcessLoadedFilenames;
+var i: Integer;
+    newAudioFile: TAudioFile;
+    currentDriveID: Integer;
+    CurrentDriveChar: Char;
+begin
+    EnterCriticalSection(CSAccessDriveList);
+
+    CurrentDriveChar := ' ';
+    currentDriveID := -2;
+    if TDriveManager.EnableUSBMode then
+    begin
+        for i := 0 to UpdateList.Count-1 do
+        begin
+            newAudioFile := TAudioFile(UpdateList[i]);
+
+            if newAudioFile.AudioType = at_File then
+                newAudioFile.Pfad := ExpandFilename(newAudioFile.Pfad);
+
+            ///  New method since version 4.14
+            ///  Nemp will save only relative Paths, if LibrayrFile and AudioFile are on the same
+            ///  Drive. In that case, the DriveID is set to -5 during saving.
+            ///  TAudioFile.LoadDataFromStream will expand the Path, and we MUST NOT
+            ///  "fix" the Drive Letter
+            if newAudioFile.DriveID <> -5 then
+            begin
+                // now assign a proper drive letter, according to the DriveID of the audiofile
+                if currentDriveID <> newAudioFile.DriveID then
+                begin
+                    // currentDriveChar does not match, we need to find the correct one
+                    if newAudioFile.DriveID <= -1 then
+                        CurrentDriveChar := '\'
+                    else
+                    begin
+                        if newAudioFile.DriveID < fDriveManager.ManagedDrivesCount then
+                            CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(newAudioFile.DriveID).Drive[1]
+                    end;
+                    // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                    currentDriveID := newAudioFile.DriveID;
+                end;
+                // now *actually* assign the proper drive letter ;-)
+                newAudioFile.SetNewDriveChar(CurrentDriveChar);
+            end;
+        end;
+    end;
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 
 function TMedienBibliothek.LoadAudioFilesFromStream_DEPRECATED(aStream: TStream; MaxSize: Integer): Boolean;
@@ -5871,6 +5762,8 @@ var FilesCount, i, DriveID: Integer;
     CurrentDriveChar: WideChar;
 
 begin
+    EnterCriticalSection(CSAccessDriveList);
+
     result := True;
     CurrentDriveChar := 'C';
     aStream.Read(FilesCount, SizeOf(FilesCount));
@@ -5890,7 +5783,7 @@ begin
                 // LaufwerksID lesen, diese suchen, LW-Buchstaben auslesen.
                 aStream.Read(DriveID, SizeOf(DriveID));
                 // DriveID ist der index des Laufwerks in der fDrives-Liste
-                if DriveID < fUsedDrives.Count then
+                if DriveID < fDriveManager.ManagedDrivesCount then  // fUsedDrives.Count then
                 begin
                     aStream.Read(ID, SizeOf(ID));  // this  ID=0 is just the marker as ID=0 used in this CASE-loop
                     if ID <> 0 then
@@ -5900,12 +5793,14 @@ begin
                                         #13#10 + 'invalid audiofile data' +
                                         #13#10 + 'DriveID: ID <> 0' )));
                         result := False;
+                        LeaveCriticalSection(CSAccessDriveList);
                         exit;
                     end;
                     if DriveID = -1 then
                         CurrentDriveChar := '\'
                     else
-                        CurrentDriveChar := WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
+                        CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(DriveID).Drive[1];
+                        // CurrentDriveChar := WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
                     newAudioFile := TAudioFile.Create;
 
                     {audioSize := }newAudioFile.LoadSizeInfoFromStream_DEPRECATED(aStream);
@@ -5919,6 +5814,7 @@ begin
                                         #13#10 + 'invalid audiofile data' +
                                         #13#10 + 'invalid DriveID')));
                     result := False;
+                    LeaveCriticalSection(CSAccessDriveList);
                     exit;
                 end;
             end;
@@ -5928,13 +5824,16 @@ begin
                         #13#10 + 'invalid audiofile data' +
                         #13#10 + 'invalid ID' + IntToStr(ID))));
             result := False;
+            LeaveCriticalSection(CSAccessDriveList);
             exit;
         end;
     end;
+
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 
 
-procedure TMedienBibliothek.SaveAudioFilesToStream(aStream: TStream);
+procedure TMedienBibliothek.SaveAudioFilesToStream(aStream: TStream; StreamFilename: String);
 var i, len: Integer;
     CurrentDriveChar: WideChar;
     aAudioFile: TAudioFile;
@@ -5944,9 +5843,12 @@ var i, len: Integer;
     BytesWritten: LongInt;
     SizePosition, EndPosition: Int64;
     ERROROCCURRED, DoMessageShow: Boolean;
-
+    LibrarySaveDriveChar: Char;
+    AudioFileSavePath: String;
 
 begin
+    EnterCriticalSection(CSAccessDriveList);
+
     // write size info before writing actual data
     MainID := 1;
     aStream.Write(MainID, SizeOf(MainID));
@@ -5959,42 +5861,69 @@ begin
     BytesWritten := aStream.Write(FileCount, sizeOf(FileCount));
     CurrentDriveChar := '-';
     currentDriveID := -2;
+    // if Length(StreamFilename) > 0 then
+    LibrarySaveDriveChar := StreamFilename[1];
+    // when we save it on a network drive: Don't use relative paths at all
+    if LibrarySaveDriveChar = '\' then
+        LibrarySaveDriveChar := '-';
+
     DoMessageShow := True;
+
+    ///  New saving method since Nemp 4.14
+    ///  (1) If an AudioFile is on the same local Drive than the LibraryFile (parameter StreamFilename),
+    ///      then we save the RELATIVE path to the AudioFile. In that case, we also use an invalid DriveID
+    ///      for it, as the LoadFromStream method MUST NOT "fix" the Drive Letter later.
+    ///      (Possible situation: Nemp with the complete music collection is moved to another computer, on
+    ///       a different drive with a different ID, into a different base directory)
+    ///  (2) If the Audiofiles are on a different Drive, then we use the previous system with "DriveID"
+    ///      (= index of the Drive in the DriveList), so that Nemp can fix the DriveLetter after loading.
+    ///      Possible situation for this: External HardDrive with more than one partition used for the
+    ///      music collection
 
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
         ERROROCCURRED := False;
         aAudioFile := TAudioFile(MP3ListePfadSort[i]);
 
-        // get a Proper DriveID, if the Drive char is different from the previouos file
-        if aAudioFile.Ordner[1] <> CurrentDriveChar then
+        if (aAudioFile.Ordner[1] = LibrarySaveDriveChar) and TDrivemanager.EnableCloudMode then
         begin
-            if aAudioFile.Ordner[1] <> '\' then
-            begin
-                // Neues Laufwerk - Infos dazwischenschieben
-                aDrive := GetDriveFromListByChar(fUsedDrives, Char(aAudioFile.Ordner[1]));
-                if assigned(aDrive) then
-                begin
-                    currentDriveID := aDrive.ID;
-                    CurrentDriveChar := aAudioFile.Ordner[1];
-                end else
-                begin
-                    if DoMessageShow then
-                        MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                    DoMessageShow := False;
-                    ERROROCCURRED := True;
-                end;
-            end else
-            begin
-                currentDriveID := -1;
-                CurrentDriveChar := aAudioFile.Ordner[1];
-            end;
+            aAudioFile.DriveID := -5;
+            AudioFileSavePath := ExtractRelativePath(StreamFilename, aAudioFile.Pfad );
+        end else
+        begin
+              // get a Proper DriveID, if the Drive char is different from the previouos file
+              if aAudioFile.Ordner[1] <> CurrentDriveChar then
+              begin
+                  if aAudioFile.Ordner[1] <> '\' then
+                  begin
+                      // Neues Laufwerk - Infos dazwischenschieben
+                      aDrive := fDriveManager.GetManagedDriveByChar(aAudioFile.Ordner[1]);
+                              // GetDriveFromListByChar(fUsedDrives, Char(aAudioFile.Ordner[1]));
+                      if assigned(aDrive) then
+                      begin
+                          currentDriveID := aDrive.ID;
+                          CurrentDriveChar := aAudioFile.Ordner[1];
+                      end else
+                      begin
+                          if DoMessageShow then
+                              MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
+                          DoMessageShow := False;
+                          ERROROCCURRED := True;
+                      end;
+                  end else
+                  begin
+                      currentDriveID := -1;
+                      CurrentDriveChar := aAudioFile.Ordner[1];
+                  end;
+              end;
+              // set the DriveID properly
+              aAudioFile.DriveID := currentDriveID;
+              AudioFileSavePath := aAudioFile.Pfad;
         end;
-        // set the DriveID properly
-        aAudioFile.DriveID := currentDriveID;
         // write the audiofile data into the stream
         if not ERROROCCURRED then
-            BytesWritten := BytesWritten + aAudioFile.SaveToStream(aStream, '');
+            BytesWritten := BytesWritten + aAudioFile.SaveToStream(aStream, AudioFileSavePath);
+
     end;
 
     // correct the size information for this block
@@ -6003,6 +5932,8 @@ begin
     aStream.Write(BytesWritten, SizeOf(BytesWritten));
     // seek to the end position again
     aStream.Position := EndPosition;
+
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 
 {
@@ -6013,55 +5944,71 @@ end;
     --------------------------------------------------------
 }
 function TMedienBibliothek.LoadPlaylistsFromStream(aStream: TStream): Boolean;
-var FileCount, i, currentDriveID: Integer;
-    CurrentDriveChar: WideChar;
-    jas: TJustaString;
+var i, FileCount: Integer;
     NewLibraryPlaylist: TLibraryPlaylist;
 begin
     result := True;
-    CurrentDriveChar := ' ';
-    currentDriveID := -2;
     aStream.Read(FileCount, SizeOf(FileCount));
-
-    /// NewLibraryPlaylist:
-    ///  This system may look strange here, but this way it is more consistent with
-    ///  loading AudioFiles from the *.gmp Medialibrary file
-    NewLibraryPlaylist := TLibraryPlaylist.Create;
-    try
         for i := 1 to FileCount do
         begin
+            NewLibraryPlaylist := TLibraryPlaylist.Create;
             NewLibraryPlaylist.LoadFromStream(aStream);
+            PlaylistUpdateList_Playlist.Add(NewLibraryPlaylist);
+        end;
+        // fix Paths for the Playlists. Needs to be done in VCL-Thread due to Relative Paths
+        SendMessage(MainWindowHandle, WM_MedienBib, MB_FixPlaylistFilePaths, 0);
+end;
 
-            if currentDriveID <> NewLibraryPlaylist.DriveID then
+procedure TMedienBibliothek.ProcessLoadedPlaylists;
+var FileCount, i, currentDriveID: Integer;
+    CurrentDriveChar: WideChar;
+    jas: TJustaString;
+
+    NewLibraryPlaylist: TLibraryPlaylist;
+begin
+    EnterCriticalSection(CSAccessDriveList);
+
+    CurrentDriveChar := ' ';
+    currentDriveID := -2;
+
+    if TDriveManager.EnableUSBMode then
+    begin
+        for i := 1 to PlaylistUpdateList_Playlist.Count-1 do
+        begin
+            NewLibraryPlaylist := TLibraryPlaylist(PlaylistUpdateList_Playlist[i]);
+
+            if NewLibraryPlaylist.DriveID <> -5 then
             begin
-                // currentDriveChar does not match, we need to find the correct one
-                if NewLibraryPlaylist.DriveID <= -1 then
-                    CurrentDriveChar := '\'
-                else
-                begin
-                    if NewLibraryPlaylist.DriveID < fUsedDrives.Count then
-                        CurrentDriveChar := TDrive(fUsedDrives[NewLibraryPlaylist.DriveID]).Drive[1]
-                    else // something is wrong with the file here
-                    begin
-                        SendMessage(MainWindowHandle, WM_MedienBib, MB_InvalidGMPFile,
-                                    Integer(PWideChar(_(Medialibrary_InvalidLibFile) +
-                                        #13#10 + 'invalid playlist data, DriveID not found' )));
-                        result := False;
-                        exit;
-                    end;
-                end;
-                // anyway, we've got a new ID here, and we can set the next drive with this ID faster
-                currentDriveID := NewLibraryPlaylist.DriveID;
+                  if currentDriveID <> NewLibraryPlaylist.DriveID then
+                  begin
+                      // currentDriveChar does not match, we need to find the correct one
+                      if NewLibraryPlaylist.DriveID <= -1 then
+                          CurrentDriveChar := '\'
+                      else
+                      begin
+                          if NewLibraryPlaylist.DriveID < fDriveManager.ManagedDrivesCount then
+                              CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(NewLibraryPlaylist.DriveID).Drive[1];
+                      end;
+                      // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                      currentDriveID := NewLibraryPlaylist.DriveID;
+                  end;
+                  // set the proper drive char
+                  NewLibraryPlaylist.SetNewDriveChar(CurrentDriveChar);
             end;
-            // set the proper drive char
-            NewLibraryPlaylist.SetNewDriveChar(CurrentDriveChar);
-            // add a new item the the list of Playlists
+            // add a new item for the list of Playlists
             jas := TJustaString.create(NewLibraryPlaylist.Path, ExtractFileName(NewLibraryPlaylist.Path));
             PlaylistUpdateList.Add(jas);
         end;
-    finally
-        NewLibraryPlaylist.Free;
+    end else
+    begin
+        // don't adjust Drive Letters
+        jas := TJustaString.create(NewLibraryPlaylist.Path, ExtractFileName(NewLibraryPlaylist.Path));
+        PlaylistUpdateList.Add(jas);
     end;
+    // clear the Playlist-Objects from the File. We do not need them any longer.
+    PlaylistUpdateList_Playlist.Clear;
+
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 
 function TMedienBibliothek.LoadPlaylistsFromStream_DEPRECATED(aStream: TStream): Boolean;
@@ -6073,6 +6020,8 @@ var FilesCount, i, DriveID: Integer;
     tmpWs: UnicodeString;
     len: Integer;
 begin
+    EnterCriticalSection(CSAccessDriveList);
+
     result := True;
     CurrentDriveChar := 'C';
     aStream.Read(FilesCount, SizeOf(FilesCount));
@@ -6094,7 +6043,8 @@ begin
                 // LaufwerksID lesen, diese suchen, LW-Buchstaben auslesen.
                 aStream.Read(DriveID, SizeOf(DriveID));
                 // DriveID ist der index des Laufwerks in der fDrives-Liste
-                if DriveID < fUsedDrives.Count then
+                if DriveID < fDriveManager.ManagedDrivesCount then
+                      // fUsedDrives.Count then
                 begin
                     aStream.Read(ID, SizeOf(ID));
                     if ID <> 0 then
@@ -6105,12 +6055,14 @@ begin
                                         #13#10 + 'invalid playlist data' +
                                         #13#10 + 'DriveID: ID <> 0' )));
                         result := False;
+                        LeaveCriticalSection(CSAccessDriveList);
                         exit;
                     end;
                     if DriveID = -1 then
                         CurrentDriveChar := '\'
                     else
-                        CurrentDriveChar := WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
+                        CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(DriveID).Drive[1];
+                                // WideChar(TDrive(fUsedDrives[DriveID]).Drive[1]);
                     aStream.Read(len,sizeof(len));
                     setlength(tmputf8, len);
                     aStream.Read(PAnsiChar(tmputf8)^,len);
@@ -6127,6 +6079,7 @@ begin
                                         #13#10 + 'invalid playlist data' +
                                         #13#10 + 'invalid DriveID' )));
                     result := False;
+                    LeaveCriticalSection(CSAccessDriveList);
                     exit;
                 end;
             end;
@@ -6137,12 +6090,13 @@ begin
                                 #13#10 + 'invalid playlist data' +
                                 #13#10 + 'invalid ID' )));
             result := False;
+            LeaveCriticalSection(CSAccessDriveList);
             exit;
         end;
     end;
-
+    LeaveCriticalSection(CSAccessDriveList);
 end;
-procedure TMedienBibliothek.SavePlaylistsToStream(aStream: TStream);
+procedure TMedienBibliothek.SavePlaylistsToStream(aStream: TStream; StreamFilename: String);
 var i, len, FileCount: Integer;
     jas: TJustaString;
     aDrive: TDrive;
@@ -6150,7 +6104,11 @@ var i, len, FileCount: Integer;
     BytesWritten: LongInt;
     SizePosition, EndPosition: Int64;
     NewLibraryPlaylist: TLibraryPlaylist;
+
+    LibrarySaveDriveChar: Char;
 begin
+    EnterCriticalSection(CSAccessDriveList);
+
     // write block header, with dummy size (write the correct value at the end of this procedure)
     MainID := 3;
     aStream.Write(MainID, SizeOf(MainID));
@@ -6162,6 +6120,11 @@ begin
     FileCount := AllPlaylistsPfadSort.Count;
     BytesWritten := aStream.Write(FileCount, sizeOf(FileCount));
 
+    LibrarySaveDriveChar := StreamFilename[1];
+    // when we save it on a network drive: Don't use relative paths at all
+    if LibrarySaveDriveChar = '\' then
+        LibrarySaveDriveChar := '-';
+
     //----------------------------
     // write the actual data
     NewLibraryPlaylist := TLibraryPlaylist.Create;
@@ -6170,21 +6133,31 @@ begin
         begin
             jas := TJustaString(AllPlaylistsPfadSort[i]);
 
-            // we have only a "few" playlist files here (at least much less than audiofiles)
-            // so we do that without "currentDrive" here
-              NewLibraryPlaylist.Path := jas.DataString;
-
-            if jas.DataString[1] = '\' then
-                NewLibraryPlaylist.DriveID := -1
-            else
+            if (jas.DataString[1] = LibrarySaveDriveChar) and TDrivemanager.EnableCloudMode then
             begin
-                aDrive := GetDriveFromListByChar(fUsedDrives, Char(jas.DataString[1]));
-                if assigned(aDrive) then
-                    NewLibraryPlaylist.DriveID := aDrive.ID
+                // write Relative Path
+                NewLibraryPlaylist.DriveID := -5;
+                NewLibraryPlaylist.Path := ExtractRelativePath(StreamFilename, jas.DataString);
+            end else
+            begin
+                // write absolute Path
+                NewLibraryPlaylist.Path := jas.DataString;
+                if jas.DataString[1] = '\' then
+                    NewLibraryPlaylist.DriveID := -1
                 else
                 begin
-                    MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
-                    exit;
+                    aDrive := fDriveManager.GetManagedDriveByChar(jas.DataString[1]);
+                    if assigned(aDrive) then
+                        NewLibraryPlaylist.DriveID := aDrive.ID
+                    else
+                    begin
+                        //MessageDLG((Medialibrary_SaveException1), mtError, [MBOK], 0);
+
+
+                        //MessageDLG( 'unbekannte DriveID für ' +  jas.DataString, mtError, [MBOK], 0);
+                        //LeaveCriticalSection(CSAccessDriveList);
+                        //exit;
+                    end;
                 end;
             end;
 
@@ -6200,6 +6173,8 @@ begin
     aStream.Write(BytesWritten, SizeOf(BytesWritten));
     // seek to the end position again
     aStream.Position := EndPosition;
+
+    LeaveCriticalSection(CSAccessDriveList);
 end;
 {
     --------------------------------------------------------
@@ -6350,7 +6325,8 @@ var Dummy: Cardinal;
 begin
     StatusBibUpdate := 2;
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
-
+    // Nemp 4.14: We may use relative Paths in the Library as well
+    SetCurrentDir(ExtractFilePath(aFileName));
     if Threaded then
     begin
         fBibFilename := aFilename;
@@ -6416,11 +6392,11 @@ begin
                         end;
                         5: begin
                             // new format since Nemp 4.13, end of 2019
-                            if subversion <= 0 then
+                            if subversion <= 1 then
                             begin
-                                EnterCriticalSection(CSAccessDriveList);
+                                // EnterCriticalSection(CSAccessDriveList);
                                 LoadFromFile5(aStream, Subversion);
-                                LeaveCriticalSection(CSAccessDriveList);
+                                // LeaveCriticalSection(CSAccessDriveList);
                                 NewFilesUpdateBib(True);
                             end else
                             begin
@@ -6513,8 +6489,8 @@ begin
 
         SaveDrivesToStream(str); // 4.13: Done
 
-        SaveAudioFilesToStream(str);
-        SavePlaylistsToStream(str);
+        SaveAudioFilesToStream(str, aFileName);
+        SavePlaylistsToStream(str, aFileName);
         SaveRadioStationsToStream(str);
         str.Size := str.Position;
       finally
@@ -6529,10 +6505,11 @@ begin
   end;
 end;
 
-function TMedienBibliothek.GetDriveFromUsedDrives(aChar: Char): TDrive;
+{function TMedienBibliothek.GetDriveFromUsedDrives(aChar: Char): TDrive;
 begin
     result := GetDriveFromListByChar(fUsedDrives, aChar);
 end;
+}
 
 
 // this function should only be called after a check for StatusBibUpdate

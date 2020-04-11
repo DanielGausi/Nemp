@@ -118,7 +118,8 @@ uses
   ReplayGain in '3rd Party Units\ReplayGain.pas',
   NempReplayGainCalculation in 'NempReplayGainCalculation.pas',
   NewMetaFrame in 'NewMetaFrame.pas' {NewMetaFrameForm},
-  MetaTagSorting in 'MetaTagSorting.pas';
+  MetaTagSorting in 'MetaTagSorting.pas',
+  PlaylistManagement in 'PlaylistManagement.pas';
 
 {$R *.res}
 

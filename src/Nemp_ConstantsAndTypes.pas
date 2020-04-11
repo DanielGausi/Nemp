@@ -499,7 +499,12 @@ const
     // MP3DB_SUBVERSION_Old: Byte = 1; // Format 3.1 seit Nemp 2.5x3, bzw. seit Nemp3.0 ;-)
 
     MP3DB_VERSION   : Byte = 5;    //4;  // Dateiformat seit 4.13: "5.0"
-    MP3DB_SUBVERSION: Byte = 0;    //2;
+    MP3DB_SUBVERSION: Byte = 1;    //   4:13 0;    //2;
+    /// File Format since 4.14: "5.1"
+    /// Changes since 4.13: Filenames in Library (and npl-files) can be relative filenames
+    ///                     in that case, the DriveID stored at the audiofiles is "-somewhat"
+    ///                     to indicate that the Drive Letter MUST NOT be changed after loading
+
 
     //-------------
     // Zeug für die Anzeige:
@@ -677,6 +682,10 @@ const
 
     MB_AddNewLogEntry = 44;
     MB_EditLastLogEntry = 45;
+
+    MB_FixAudioFilePaths = 50;
+    MB_FixPlaylistFilePaths = 51;
+
 
     MB_MessageForLog = 98;
     MB_MessageForDialog = 99;
@@ -2591,62 +2600,6 @@ begin
         Language := Ini.ReadString('Allgemein', 'Language', '');
         maxDragFileCount := Ini.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
 
-        //NempFormRatios.VSTHeight      := Ini.ReadInteger('Fenster', 'VSTHeight'      , 50);
-        //NempFormRatios.BrowseWidth    := Ini.ReadInteger('Fenster', 'BrowseWidth'    , 60);
-        //NempFormRatios.VSTWidth       := Ini.ReadInteger('Fenster', 'VSTWidth'       , 30);
-        //NempFormRatios.VDTCoverWidth  := Ini.ReadInteger('Fenster', 'VDTCoverWidth'  , 50);
-        //NempFormRatios.VDTCoverHeight := Ini.ReadInteger('Fenster', 'VDTCoverHeight' , 20);
-        //NempFormRatios.ArtistWidth    := Ini.ReadInteger('Fenster', 'ArtistWidth'    , 50);
-
-        {
-        CheckValue(NempFormRatios.VSTHeight     , 10, 90);
-        CheckValue(NempFormRatios.BrowseWidth   , 10, 90);
-        CheckValue(NempFormRatios.VSTWidth      , 10, 90);
-        CheckValue(NempFormRatios.VDTCoverWidth , 10, 90);
-        //CheckValue(NempFormRatios.VDTCoverHeight, 10, 90);
-        CheckValue(NempFormRatios.ArtistWidth   , 10, 90);
-
-
-        NempEinzelFormOptions.PlaylistVisible           := ini.ReadBool('EinzelFenster','PlaylistVisible'   , True);
-        NempEinzelFormOptions.MedienlisteVisible        := ini.ReadBool('EinzelFenster','MedienlisteVisible', True);
-        NempEinzelFormOptions.AuswahlSucheVisible       := ini.ReadBool('EinzelFenster','AuswahlVisible'    , True);
-        NempEinzelFormOptions.ErweiterteControlsVisible := ini.ReadBool('EinzelFenster','ControlsVisible'   , True);
-
-        NempEinzelFormOptions.PlaylistDocked      := ini.ReadBool('EinzelFenster','PlaylistDocked'    , False);
-        NempEinzelFormOptions.MedienlisteDocked   := ini.ReadBool('EinzelFenster','MedienlisteDocked' , False);
-        NempEinzelFormOptions.AuswahlListeDocked  := ini.ReadBool('EinzelFenster','AuswahlListeDocked', False);
-        NempEinzelFormOptions.ExtendedControlsDocked := ini.ReadBool('EinzelFenster','ExtendedControlsDocked', False);
-
-        NempEinzelFormOptions.ExtendedControlsTop  := Ini.ReadInteger('Einzelfenster', 'ExtendedControlsTop'   , 166);
-        NempEinzelFormOptions.ExtendedControlsLeft := Ini.ReadInteger('Einzelfenster', 'ExtendedControlsLeft'  , 623);
-
-        NempEinzelFormOptions.PlaylistTop    := Ini.ReadInteger('Einzelfenster', 'PlaylistTop'   , 23);
-        NempEinzelFormOptions.PlaylistLeft   := Ini.ReadInteger('Einzelfenster', 'PlaylistLeft'  , 868);
-        NempEinzelFormOptions.PlaylistHeight := Ini.ReadInteger('Einzelfenster', 'PlaylistHeight', 391);
-        NempEinzelFormOptions.PlaylistWidth  := Ini.ReadInteger('Einzelfenster', 'PlaylistWidth' , 254);
-
-        NempEinzelFormOptions.MedienlisteTop    := Ini.ReadInteger('Einzelfenster', 'MedienlisteTop'   , 428);
-        NempEinzelFormOptions.MedienlisteLeft   := Ini.ReadInteger('Einzelfenster', 'MedienlisteLeft'  , 16);
-        NempEinzelFormOptions.MedienlisteHeight := Ini.ReadInteger('Einzelfenster', 'MedienlisteHeight', 330);
-        NempEinzelFormOptions.MedienlisteWidth  := Ini.ReadInteger('Einzelfenster', 'MedienlisteWidth' , 1108);
-
-        NempEinzelFormOptions.AuswahlSucheTop    := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheTop'   , 22);
-        NempEinzelFormOptions.AuswahlSucheLeft   := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheLeft'  , 18);
-        NempEinzelFormOptions.AuswahlSucheHeight := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheHeight', 391);
-        NempEinzelFormOptions.AuswahlSucheWidth  := Ini.ReadInteger('Einzelfenster', 'AuswahlSucheWidth' , 594);
-
-
-        NempFormAufteilung[0].FormMinHeight := 600;
-        NempFormAufteilung[0].FormMaxHeight := 0;
-        NempFormAufteilung[0].FormMinWidth  := 800;
-        NempFormAufteilung[0].FormMaxWidth  := 0;
-
-        NempFormAufteilung[1].FormMinHeight := 0;
-        NempFormAufteilung[1].FormMaxHeight := 0;
-        NempFormAufteilung[1].FormMinWidth  := 0;
-        NempFormAufteilung[1].FormMaxWidth  := 0;
-        }
-
         NempWindowView       := ini.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
         ShowDeskbandOnMinimize  := ini.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
         ShowDeskbandOnStart     := ini.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
@@ -2654,15 +2607,6 @@ begin
         HideDeskbandOnClose     := ini.ReadBool('Fenster', 'HideDeskbandOnClose', True);
 
         FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
-        // EditOnClick   := ini.ReadBool('Fenster', 'EditOnClick', True);
-
-        //ShowCoverAndDetails := ini.ReadBool('Fenster', 'ShowCoverAndDetails', True);
-        // CoverMode := ini.ReadInteger('Fenster', 'CoverMode', 2);
-        // if not CoverMode in [0,1,2] then CoverMode := 1;
-        //CoverWidth := ini.ReadInteger('Fenster', 'CoverWidth', 240);
-        //if (CoverWidth < 0) or (CoverWidth > 600) then CoverWidth := 450;
-        // DetailMode := ini.ReadInteger('Fenster', 'DetailMode', 1);
-        // if not DetailMode in [0,1,2] then DetailMode := 1;
 
         ReplaceNAArtistBy := ini.ReadInteger('Fenster', 'ReplaceNAArtistBy', 3);
         if not ReplaceNAArtistBy in [0,1,2,3,4,5] then ReplaceNAArtistBy := 3;

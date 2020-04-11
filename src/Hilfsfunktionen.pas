@@ -603,9 +603,6 @@ end;
 
 
 
-
-
-
 function StringToURLString(aUTF8String: UTF8String): AnsiString;
 var i: integer;
 begin
@@ -618,8 +615,6 @@ begin
             result := result + aUTF8String[i];
     end;
 end;
-
-
 
 function ExtractRelativePathNew(const BaseName, DestName: UnicodeString): UnicodeString;
 var
@@ -646,6 +641,7 @@ begin
   else
       Result := DestName;
 end;
+
 
 ///  Convert a ReplayGainString (from the Metatags of an Audiofile) into a Single value
 function GainStringToSingle(aGainString: String): Single;

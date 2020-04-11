@@ -621,9 +621,9 @@ object Nemp_MainForm: TNemp_MainForm
             28)
           object PlaylistFillPanel: TNempPanel
             Tag = 1
-            Left = 103
+            Left = 129
             Top = 2
-            Width = 443
+            Width = 417
             Height = 24
             Anchors = [akLeft, akTop, akRight]
             BevelInner = bvRaised
@@ -633,18 +633,19 @@ object Nemp_MainForm: TNemp_MainForm
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
-              443
+              417
               24)
             object PlayListStatusLBL: TLabel
               Left = 10
               Top = 5
-              Width = 426
+              Width = 400
               Height = 13
               Anchors = [akLeft, akTop, akRight]
               AutoSize = False
               ShowAccelChar = False
               Transparent = True
               StyleElements = [seClient, seBorder]
+              ExplicitWidth = 426
             end
           end
           object TabBtn_Playlist: TSkinButton
@@ -668,7 +669,7 @@ object Nemp_MainForm: TNemp_MainForm
             Color2 = clBlack
           end
           object EditPlaylistSearch: TEdit
-            Left = 32
+            Left = 58
             Top = 3
             Width = 65
             Height = 21
@@ -685,6 +686,22 @@ object Nemp_MainForm: TNemp_MainForm
             OnExit = EditPlaylistSearchExit
             OnKeyDown = EditPlaylistSearchKeyDown
             OnKeyPress = EditPlaylistSearchKeyPress
+          end
+          object SkinButton1: TSkinButton
+            Left = 30
+            Top = 2
+            Width = 24
+            Height = 24
+            TabOrder = 3
+            OnClick = SkinButton1Click
+            DrawMode = dm_Windows
+            NumGlyphsX = 5
+            NumGlyphsY = 1
+            GlyphLine = 0
+            CustomRegion = False
+            FocusDrawMode = fdm_Windows
+            Color1 = clBlack
+            Color2 = clBlack
           end
         end
       end
@@ -3337,7 +3354,7 @@ object Nemp_MainForm: TNemp_MainForm
     Enabled = False
     Interval = 300000
     OnTimer = AutoSavePlaylistTimerTimer
-    Left = 760
+    Left = 848
     Top = 56
   end
   object DragFilesSrc1: TDragFilesSrc
@@ -6711,5 +6728,9 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Just play the track (don'#39't change the playlist)'
       OnClick = InsertHeadsetToPlaylistClick
     end
+  end
+  object PlaylistManagerPopup: TPopupMenu
+    Left = 696
+    Top = 56
   end
 end

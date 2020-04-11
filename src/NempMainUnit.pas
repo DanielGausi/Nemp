@@ -604,6 +604,8 @@ type
     PM_ML_ReplayGain_Clear: TMenuItem;
     N27: TMenuItem;
     LblBibReplayGain: TLabel;
+    SkinButton1: TSkinButton;
+    PlaylistManagerPopup: TPopupMenu;
 
     procedure FormCreate(Sender: TObject);
 
@@ -854,6 +856,7 @@ type
     function DeleteFileFromRecentList(aIdx: Integer): boolean;
     function AddFileToRecentList(NewFile: UnicodeString): Boolean;
     Procedure SetRecentPlaylistsMenuItems;
+    procedure SetPlaylistManagerMenuItems;
 
     Function GeneratePlaylistSTFilter: string;
     function GenerateMedienBibSTFilter: String;
@@ -1168,6 +1171,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure BtnMinimizeClick(Sender: TObject);
     procedure PM_PL_ReplayGain_Click(Sender: TObject);
+    procedure SkinButton1Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -1880,6 +1884,8 @@ begin
     NempPlaylist.MainWindowHandle := FOwnMessageHandler;
     NempPlaylist.OnCueChanged := PlaylistCueChanged;
     NempPlaylist.OnDeleteAudiofile := PlaylistDeleteFile;
+    NempPlaylist.PlaylistManager.SavePath := SavePath;
+    ForceDirectories(IncludeTrailingPathDelimiter(SavePath) + 'Playlists\');
 
     BibRatingHelper := TRatingHelper.Create;
 
@@ -2047,6 +2053,9 @@ begin
         try
             ini.Encoding := TEncoding.UTF8;
             WriteNempOptions(ini, NempOptions, NempFormBuildOptions, AnzeigeMode);
+
+            ini.WriteBool('Nemp Portable','EnableUSBMode'   , TDrivemanager.EnableUSBMode  );
+            ini.WriteBool('Nemp Portable','EnableCloudMode' , TDrivemanager.EnableCloudMode);
 
             Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
             ini.WriteBool('Fenster', 'UseSkin', UseSkin);
@@ -2943,6 +2952,13 @@ end;
 
 
 
+procedure TNemp_MainForm.SkinButton1Click(Sender: TObject);
+var point: TPoint;
+begin
+    GetCursorPos(Point);
+    PlaylistManagerPopup.Popup(Point.X, Point.Y);
+end;
+
 function TNemp_MainForm.GetFocussedAudioFile:TAudioFile;
 var  OldNode: PVirtualNode;
   Data: PTreeData;
@@ -3462,7 +3478,7 @@ begin
 
           if (Artist = BROWSE_PLAYLISTS) and (Album <> BROWSE_ALL) then //(letzteres sollte immer so sein ;-))
           begin
-              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan);
+              LoadPlaylistFromFile(album, aList, Nempplaylist.AutoScan, MedienBib.PlaylistDriveManager);
               if OnlyTemporaryFiles then
                   DeleteAudioFilesAfterHandled := True;
                   // the AudioFiles loaded into aList are only used temporarily (e.g. to fill a DragDropList with proper Filenames)
@@ -4078,6 +4094,8 @@ begin
     end;
     MedienBib.Changed := True;
 end;
+
+
 
 
 
@@ -10320,6 +10338,47 @@ begin
         PM_PL_RecentPlaylists.Add(aMenuItem);
       end;
     end;
+end;
+
+procedure TNemp_MainForm.SetPlaylistManagerMenuItems;
+var i: Integer;
+    aMenuItem: TMenuItem;
+begin
+    // PlaylistManagerPopup.Items.Clear;
+    for i := 0 to NempPlaylist.PlaylistManager.QuickLoadPlaylists.Count - 1 do
+    begin
+        aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
+        aMenuItem.Caption := NempPlaylist.PlaylistManager.QuickLoadPlaylists[i].Description;
+        aMenuItem.Tag := i;
+        //aMenuItem.OnClick := todo ... LoadARecentPlaylist;
+        PlaylistManagerPopup.Items.Add(aMenuItem);
+    end;
+
+    aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
+    aMenuItem.Caption := 'Default';
+    aMenuItem.Tag := -1;
+    PlaylistManagerPopup.Items.Add(aMenuItem);
+
+
+
+    // add Separator
+    aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
+    aMenuItem.Caption := '-';
+    PlaylistManagerPopup.Items.Add(aMenuItem);
+
+    // Add Control Items
+    // New Playlist, Edit Playlists
+
+        aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
+        aMenuItem.Caption := 'Create a new Playlist';
+        PlaylistManagerPopup.Items.Add(aMenuItem);
+
+        aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
+        aMenuItem.Caption := 'Save current Playlist as';
+        PlaylistManagerPopup.Items.Add(aMenuItem);
+
+
+
 end;
 
 
