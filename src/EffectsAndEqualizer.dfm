@@ -614,6 +614,7 @@ object FormEffectsAndEqualizer: TFormEffectsAndEqualizer
     end
   end
   object WobbleTimer: TTimer
+    Enabled = False
     OnTimer = WobbleTimerTimer
     Left = 320
   end
