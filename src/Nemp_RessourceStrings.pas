@@ -624,6 +624,8 @@ MainForm_MenuCaptionsEnqueueAllDate        = 'Enqueue all tracks from this month
 MainForm_MenuCaptionsEnqueueAllPlaylist = 'Enqueue all tracks of this playlist (at the end of the playlist)';
 MainForm_MenuCaptionsEnqueueAllWebradio = 'Enqueue all tracks of this webradio station (at the end of the playlist)';
 
+MainForm_SavePlaylistAsExistingFavorite = 'Save playlist "%s"';
+MainForm_SavePlaylistNotAvailable = 'Save current playlist';
 
 
 MainForm_MenuCaptionsPlayAll   = 'Play (and clear current playlist)';
@@ -1072,6 +1074,19 @@ Playlist_SearchingNewFilesComplete = 'Searching for music files completed. The n
 HTTP_Connection_Error = 'Error connecting %s: %s';
 
 FormBuilder_SeparateWindowWarning = 'The form layout cannot be applied in separate window mode.';
+
+
+PlaylistManagerAutoSave_Caption = 'Confirmation';
+PlaylistManagerAutoSave_Text    = 'The current playlist "%s" has been changed since it has been saved.' +#13#10 + #13#10
+                                 + 'Do you want to save it now before loading another playlist?';
+
+PlaylistManagerAutoSave_ShowAgain = 'Save selection and do not show this dialog again.';
+
+PlaylistManager_ReloadPlaylist = 'The current playlist "%s" has been changed since it has been saved. ' +#13#10 + #13#10
+                                 + 'Do you want to reload it and go back to the previously saved version?';
+
+PlaylistManager_PlaylistNoFound = 'The playlist file does not exist.';
+
 
 implementation
 

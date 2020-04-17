@@ -3258,6 +3258,10 @@ begin
                               ///  Changes with Nemp 4.14:
                               ///  We may write Relative Paths in both Playlist and Library files
                               ///  But: "ExpandFilename" SHOULD NOT be used in Threads, because of the global variable "CurrentDir"
+                              ///       => Use the Thread-parameter while loading from the Library.
+                              ///          After loading, we have to expand all the paths at once within the VCL thread
+                              ///       => When loading from a playlistfile (done in VCL Thread), we can expand the paths
+                              ///          right here
                               tmpStr := ReadTextFromStream(aStream);
                               Pfad := tmpStr;  // this will set fAudioType!
                               if fAudioType = at_File then

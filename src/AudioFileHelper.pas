@@ -89,6 +89,7 @@ procedure LoadPlaylistFromFilePLS(aFilename: UnicodeString; TargetList: TObjectL
 procedure LoadPlaylistFromFileNPL(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean; aDriveManager: TDriveManager);
 procedure LoadPlaylistFromFileASX(aFilename: UnicodeString; TargetList: TObjectList; AutoScan: Boolean);
 
+procedure SavePlaylistToNPL(aFilename: UnicodeString; SourceList: TObjectList; aDriveManager: TDriveManager; Silent: Boolean = True);
 
 
 function AFCompareArtist(a1,a2: tAudioFile): Integer;
@@ -996,7 +997,7 @@ begin
                           // NPL-Files contain TDrives-Information to fix Drive Letters
                           if NPLVersion = Current_Version_Ext then
                           begin
-                              if newAudioFile.DriveID <> -5 then
+                              if TDriveManager.EnableUSBMode and (newAudioFile.DriveID <> -5) then
                               begin
                                     if currentDriveID <> newAudioFile.DriveID then
                                     begin
@@ -1147,5 +1148,92 @@ begin
 
 end;
 
+
+procedure SavePlaylistToNPL(aFilename: UnicodeString; SourceList: TObjectList; aDriveManager: TDriveManager; Silent: Boolean = True);
+var i, c: integer;
+    aAudiofile: TPlaylistfile;
+    tmpStream: TMemoryStream;
+    tmp: AnsiString;
+    PlaylistSaveDriveChar: Char;
+    AudioFileSavePath: String;
+    aDrive: TDrive;
+begin
+    tmpStream := TMemoryStream.Create;
+    try
+        // VersionsInfo schreiben
+        tmp := 'NempPlaylist';
+        tmpStream.Write(tmp[1], length(tmp));
+        tmp := '5.1';
+        tmpStream.Write(tmp[1], length(tmp));
+
+        ///  Since Nemp 4.14: Add List of ManagedDrives into the PlaylistFile
+        ///  But we have (so far) no proper DriveManagement in the TNempPlaylist-Class during runtime
+        ///  Therefore: Add ManagedDrives just here
+        aDrivemanager.AddDrivesFromAudioFiles(SourceList);
+        aDriveManager.SaveDrivesToStream(tmpStream);
+
+        PlaylistSaveDriveChar := aFilename[1];
+        if PlaylistSaveDriveChar = '\' then
+            PlaylistSaveDriveChar := '-';
+
+        // FileCount
+        c := SourceList.Count;
+        tmpStream.Write(c, SizeOf(Integer));
+        // actual Files
+        for i := 0 to SourceList.Count - 1 do
+        begin
+            aAudioFile := TAudioFile(SourceList[i]);
+            case aAudioFile.AudioType of
+                at_File: begin
+
+                      // if the AudioFile is located on the same Drive as the Playlist: Save relative Path
+                      if (aAudioFile.Ordner[1] = PlaylistSaveDriveChar) and TDrivemanager.EnableCloudMode then
+                      begin
+                          aAudioFile.DriveID := -5;
+                          AudioFileSavePath := ExtractRelativePath(aFilename, aAudioFile.Pfad );
+                      end else
+                      // otherwise save also a proper DriveID
+                      begin
+                              if aAudioFile.Ordner[1] <> '\' then
+                              begin
+                                  aDrive := aDriveManager.GetManagedDriveByChar(aAudioFile.Ordner[1]);
+                                  if assigned(aDrive) then
+                                  begin
+                                      aAudioFile.DriveID := aDrive.ID;
+                                      AudioFileSavePath := aAudioFile.Pfad;
+                                  end else
+                                  begin
+                                       // for now: No exception here, just don't use "letter fix"
+                                       aAudioFile.DriveID := -5;
+                                       AudioFileSavePath := aAudioFile.Pfad;
+                                  end;
+                              end else
+                              begin
+                                  aAudioFile.DriveID := -1;
+                                  AudioFileSavePath := aAudioFile.Pfad;
+                              end;
+                      end;
+
+                      aAudioFile.SaveToStream(tmpStream, AudioFileSavePath);
+                end;
+                at_Stream: begin
+                    aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
+                end;
+                at_CDDA: begin
+                    aAudioFile.SaveToStream(tmpStream, aAudioFile.Pfad)
+                end;
+            end;
+        end;
+        try
+            tmpStream.SaveToFile(aFilename);
+        except
+            on E: Exception do
+                if not Silent then
+                    MessageDLG(E.Message, mtError, [mbOK], 0);
+        end;
+    finally
+        tmpStream.Free;
+    end;
+end;
 
 end.

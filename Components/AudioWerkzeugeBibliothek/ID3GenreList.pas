@@ -166,6 +166,53 @@ initialization
   ID3Genres.Add('Anime');
   ID3Genres.Add('JPop');
   ID3Genres.Add('Synthpop');
+  // added by Winamp 5.6 (148-191)
+  // source: https://de.wikipedia.org/wiki/Liste_der_ID3v1-Genres
+  ID3Genres.Add('Abstract');
+  ID3Genres.Add('Art Rock');
+  ID3Genres.Add('Baroque');
+  ID3Genres.Add('Bhangra');
+  ID3Genres.Add('Big Beat');
+  ID3Genres.Add('Breakbeat');
+  ID3Genres.Add('Chillout');
+  ID3Genres.Add('Downtempo');
+  ID3Genres.Add('Dub');
+  ID3Genres.Add('EBM');
+  ID3Genres.Add('Eclectic');
+  ID3Genres.Add('Electro');
+  ID3Genres.Add('Electroclash');
+  ID3Genres.Add('Emo');
+  ID3Genres.Add('Experimental');
+  ID3Genres.Add('Garage');
+  ID3Genres.Add('Global');
+  ID3Genres.Add('IDM');
+  ID3Genres.Add('Illbient');
+  ID3Genres.Add('Industro-Goth');
+  ID3Genres.Add('Jam Band');
+  ID3Genres.Add('Krautrock');
+  ID3Genres.Add('Leftfield');
+  ID3Genres.Add('Lounge');
+  ID3Genres.Add('Math Rock');
+  ID3Genres.Add('New Romantic');
+  ID3Genres.Add('Nu-Breakz');
+  ID3Genres.Add('Post-Punk');
+  ID3Genres.Add('Post-Rock');
+  ID3Genres.Add('Psytrance');
+  ID3Genres.Add('Shoegaze');
+  ID3Genres.Add('Space Rock');
+  ID3Genres.Add('Trop Rock');
+  ID3Genres.Add('World Music');
+  ID3Genres.Add('Neoclassical');
+  ID3Genres.Add('Audiobook');
+  ID3Genres.Add('Audio Theatre');
+  ID3Genres.Add('Neue Deutsche Welle');
+  ID3Genres.Add('Podcast');
+  ID3Genres.Add('Indie-Rock');
+  ID3Genres.Add('G-Funk');
+  ID3Genres.Add('Dubstep');
+  ID3Genres.Add('Garage Rock');
+  ID3Genres.Add('Psybient');
+
 
 finalization
 

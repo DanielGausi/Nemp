@@ -2532,6 +2532,11 @@ begin
   MedienBib.SkipSortOnLargeLists := CBSkipSortOnLargeLists.Checked;
   MedienBib.AutoScanPlaylistFilesOnView := CBAutoScanPlaylistFilesOnView.Checked;
   MedienBib.ShowHintsInMedialist := CBShowHintsInMedialist.Checked;
+
+  // CloudMode affects how the MediaLibrary is saved into a gmp-File.
+  // If we Changed this setting, the library should be saved when Nemp is closed
+  if TDrivemanager.EnableCloudMode <> cb_EnableCloudMode.Checked then
+      MedienBib.Changed := True;
   TDrivemanager.EnableUSBMode   := cb_EnableUSBMode.Checked   ;
   TDrivemanager.EnableCloudMode := cb_EnableCloudMode.Checked ;
 

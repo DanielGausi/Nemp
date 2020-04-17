@@ -5703,7 +5703,7 @@ begin
         UpdateList.Add(newAudioFile);
     end;
 
-    // fix Paths for the AudioFiles. Needs to be done in VCL-Thread due to Relative Paths
+    // adjust paths of the AudioFiles. Needs to be done in VCL-Thread due to Relative Paths
     SendMessage(MainWindowHandle, WM_MedienBib, MB_FixAudioFilePaths, 0);
 end;
 
@@ -5717,41 +5717,39 @@ begin
 
     CurrentDriveChar := ' ';
     currentDriveID := -2;
-    if TDriveManager.EnableUSBMode then
+
+    for i := 0 to UpdateList.Count-1 do
     begin
-        for i := 0 to UpdateList.Count-1 do
+        newAudioFile := TAudioFile(UpdateList[i]);
+        if newAudioFile.AudioType = at_File then
+            newAudioFile.Pfad := ExpandFilename(newAudioFile.Pfad);
+
+        ///  New method since version 4.14
+        ///  Nemp will save only relative Paths, if LibrayrFile and AudioFile are on the same
+        ///  Drive.
+        ///  If USBMode is enabled, and the loaded PlaylistFile wasn't stored as a relative Path: DO adjust Drive letter
+        ///  Otherwise: DO NOT adjust the Drive Letter
+        if TDriveManager.EnableUSBMode and (newAudioFile.DriveID <> -5) then
         begin
-            newAudioFile := TAudioFile(UpdateList[i]);
-
-            if newAudioFile.AudioType = at_File then
-                newAudioFile.Pfad := ExpandFilename(newAudioFile.Pfad);
-
-            ///  New method since version 4.14
-            ///  Nemp will save only relative Paths, if LibrayrFile and AudioFile are on the same
-            ///  Drive. In that case, the DriveID is set to -5 during saving.
-            ///  TAudioFile.LoadDataFromStream will expand the Path, and we MUST NOT
-            ///  "fix" the Drive Letter
-            if newAudioFile.DriveID <> -5 then
+            // now assign a proper drive letter, according to the DriveID of the audiofile
+            if currentDriveID <> newAudioFile.DriveID then
             begin
-                // now assign a proper drive letter, according to the DriveID of the audiofile
-                if currentDriveID <> newAudioFile.DriveID then
+                // currentDriveChar does not match, we need to find the correct one
+                if newAudioFile.DriveID <= -1 then
+                    CurrentDriveChar := '\'
+                else
                 begin
-                    // currentDriveChar does not match, we need to find the correct one
-                    if newAudioFile.DriveID <= -1 then
-                        CurrentDriveChar := '\'
-                    else
-                    begin
-                        if newAudioFile.DriveID < fDriveManager.ManagedDrivesCount then
-                            CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(newAudioFile.DriveID).Drive[1]
-                    end;
-                    // anyway, we've got a new ID here, and we can set the next drive with this ID faster
-                    currentDriveID := newAudioFile.DriveID;
+                    if newAudioFile.DriveID < fDriveManager.ManagedDrivesCount then
+                        CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(newAudioFile.DriveID).Drive[1]
                 end;
-                // now *actually* assign the proper drive letter ;-)
-                newAudioFile.SetNewDriveChar(CurrentDriveChar);
+                // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                currentDriveID := newAudioFile.DriveID;
             end;
+            // now *actually* assign the proper drive letter ;-)
+            newAudioFile.SetNewDriveChar(CurrentDriveChar);
         end;
     end;
+
     LeaveCriticalSection(CSAccessDriveList);
 end;
 
@@ -5971,41 +5969,37 @@ begin
     CurrentDriveChar := ' ';
     currentDriveID := -2;
 
-    if TDriveManager.EnableUSBMode then
+    for i := 1 to PlaylistUpdateList_Playlist.Count-1 do
     begin
-        for i := 1 to PlaylistUpdateList_Playlist.Count-1 do
-        begin
-            NewLibraryPlaylist := TLibraryPlaylist(PlaylistUpdateList_Playlist[i]);
+        NewLibraryPlaylist := TLibraryPlaylist(PlaylistUpdateList_Playlist[i]);
+        NewLibraryPlaylist.Path := ExpandFilename(NewLibraryPlaylist.Path);
 
-            if NewLibraryPlaylist.DriveID <> -5 then
-            begin
-                  if currentDriveID <> NewLibraryPlaylist.DriveID then
+        // if USBMode is enabled, and the loaded PlaylistFile wasn't stored as a relative Path:
+        // adjust Drive letter
+        if TDriveManager.EnableUSBMode and (NewLibraryPlaylist.DriveID <> -5) then
+        begin
+              if currentDriveID <> NewLibraryPlaylist.DriveID then
+              begin
+                  // currentDriveChar does not match, we need to find the correct one
+                  if NewLibraryPlaylist.DriveID <= -1 then
+                      CurrentDriveChar := '\'
+                  else
                   begin
-                      // currentDriveChar does not match, we need to find the correct one
-                      if NewLibraryPlaylist.DriveID <= -1 then
-                          CurrentDriveChar := '\'
-                      else
-                      begin
-                          if NewLibraryPlaylist.DriveID < fDriveManager.ManagedDrivesCount then
-                              CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(NewLibraryPlaylist.DriveID).Drive[1];
-                      end;
-                      // anyway, we've got a new ID here, and we can set the next drive with this ID faster
-                      currentDriveID := NewLibraryPlaylist.DriveID;
+                      if NewLibraryPlaylist.DriveID < fDriveManager.ManagedDrivesCount then
+                          CurrentDriveChar := fDriveManager.GetManagedDriveByIndex(NewLibraryPlaylist.DriveID).Drive[1];
                   end;
-                  // set the proper drive char
-                  NewLibraryPlaylist.SetNewDriveChar(CurrentDriveChar);
-            end;
-            // add a new item for the list of Playlists
-            jas := TJustaString.create(NewLibraryPlaylist.Path, ExtractFileName(NewLibraryPlaylist.Path));
-            PlaylistUpdateList.Add(jas);
+                  // anyway, we've got a new ID here, and we can set the next drive with this ID faster
+                  currentDriveID := NewLibraryPlaylist.DriveID;
+              end;
+              // set the proper drive char
+              NewLibraryPlaylist.SetNewDriveChar(CurrentDriveChar);
         end;
-    end else
-    begin
-        // don't adjust Drive Letters
+        // add a new item for the list of Playlists
         jas := TJustaString.create(NewLibraryPlaylist.Path, ExtractFileName(NewLibraryPlaylist.Path));
         PlaylistUpdateList.Add(jas);
     end;
-    // clear the Playlist-Objects from the File. We do not need them any longer.
+
+    // clear the list of LibraryPlaylist-Objects. We do not need them any longer.
     PlaylistUpdateList_Playlist.Clear;
 
     LeaveCriticalSection(CSAccessDriveList);

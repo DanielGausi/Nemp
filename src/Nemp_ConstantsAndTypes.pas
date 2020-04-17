@@ -449,8 +449,8 @@ type
         HideDeskbandOnRestore : Boolean;
         HideDeskbandOnClose   : Boolean;
 
-        // "Die letzten 10"
-        RecentPlaylists: Array[1..10] of UnicodeString;
+        // "Die letzten 10" => moved to TPlaylistManager
+        //RecentPlaylists: Array[1..10] of UnicodeString;
 
         // Hotkey-Details
         InstallHotkey_Play        : Boolean;
@@ -2509,8 +2509,6 @@ begin
 end;
 
 procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions);
-var i: integer;
-
 begin
 
     with FormBuildOptions.WindowSizeAndPositions do
@@ -2637,9 +2635,6 @@ begin
         ChangeFontOnCbrVbr := ini.ReadBool('Font','ChangeFontOnCbrVbr',False);
         FontNameVBR := ini.ReadString('Font','FontNameVBR','Tahoma');
         FontNameCBR := ini.ReadString('Font','FontNameCBR','Courier');
-
-        for i := 1 to 10 do
-          RecentPlaylists[i] := Ini.ReadString('RecentPlaylists', 'Playlist'+ IntToStr(i), '');
     end;
 
 end;
@@ -2698,11 +2693,9 @@ begin
 end;
 
 procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
-var i: integer;
 begin
     SaveWindowPositons(ini, FormBuildOptions, aMode);
     FormBuildOptions.SaveToIni(ini);
-
 
   With Options do
   begin
@@ -2790,9 +2783,6 @@ begin
         ini.Writebool('Font','ChangeFontOnCbrVbr',ChangeFontOnCbrVbr);
         ini.WriteString('Font','FontNameVBR',FontNameVBR);
         ini.WriteString('Font','FontNameCBR',FontNameCBR);
-
-        for i := 1 to 10 do
-          Ini.WriteString('RecentPlaylists', 'Playlist'+ IntToStr(i), RecentPlaylists[i]);
   end;
 end;
 

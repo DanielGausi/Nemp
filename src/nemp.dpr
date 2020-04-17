@@ -119,7 +119,8 @@ uses
   NempReplayGainCalculation in 'NempReplayGainCalculation.pas',
   NewMetaFrame in 'NewMetaFrame.pas' {NewMetaFrameForm},
   MetaTagSorting in 'MetaTagSorting.pas',
-  PlaylistManagement in 'PlaylistManagement.pas';
+  PlaylistManagement in 'PlaylistManagement.pas',
+  NewFavoritePlaylist in 'NewFavoritePlaylist.pas' {NewFavoritePlaylistForm};
 
 {$R *.res}
 
@@ -142,6 +143,7 @@ begin
   Application.CreateForm(TProgressForm, ProgressFormPlaylist);
   Application.CreateForm(TProgressForm, ProgressFormLibrary);
   Application.CreateForm(TReplayGainProgressForm, ReplayGainProgressForm);
+  Application.CreateForm(TNewFavoritePlaylistForm, NewFavoritePlaylistForm);
   Graphics.DefFontData.Name := 'Tahoma';
 
     Application.Title := NEMP_NAME_TASK;

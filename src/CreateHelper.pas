@@ -219,9 +219,7 @@ begin
             ini.Free;
         end;
         }
-        SetRecentPlaylistsMenuItems;
-        SetPlaylistManagerMenuItems;
-
+        
     end;
 end;
 
@@ -634,6 +632,8 @@ begin
 
         //s := gettickcount;
         AutoLoadPlaylist(TmpLastExitWasOK);
+        NempPlaylist.PlaylistManager.InitPlaylistFilenames;
+
         //e := gettickcount;
         //ShowMessage('Loading Playlist: ' + IntToStr(e - s));
 

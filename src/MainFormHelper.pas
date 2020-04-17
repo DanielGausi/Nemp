@@ -248,8 +248,7 @@ begin
               Nemp_MainForm.SetFocus;
         end;
 
-        // if EnableUSBMode is set to false, we don't need to "Add Jobs" here,
-        // but it doesn't hurt neither
+        // Start the other tasks we may need to do after a new drive is connected to the computer
         if Medienbib.AutoScanDirs then
             Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
         if Medienbib.AutoDeleteFiles then

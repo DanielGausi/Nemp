@@ -37,6 +37,8 @@ uses Windows, Classes, SysUtils, StrUtils;
 //
 function IsValidFilenameFormat(aFormatString: String): Boolean;
 
+function IsValidFilename(aFilename: String): Boolean;
+
 // vergleicht die Strings zeichenweise und erlaubt dabei tolerance-viele Fehler
 function SameString(string1, string2: UnicodeString; tolerance: Integer; var Fehlstelle: Integer): Boolean;
 
@@ -44,6 +46,19 @@ function GetCommonString(Strings: TStringList; tolerance: Integer; var Fehlstell
 
 
 implementation
+
+function IsValidFilename(aFilename: String): Boolean;
+begin
+    result := (pos(':', aFilename) = 0) AND
+              (pos('/', aFilename) = 0) AND
+              (pos('\', aFilename) = 0) AND
+              (pos('*', aFilename) = 0) AND
+              (pos('?', aFilename) = 0) AND
+              (pos('"', aFilename) = 0) AND
+              (pos('<', aFilename) = 0) AND
+              (pos('>', aFilename) = 0) AND
+              (pos('|', aFilename) = 0);
+end;
 
 {
     --------------------------------------------------------

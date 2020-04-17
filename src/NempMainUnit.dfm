@@ -24,6 +24,7 @@ object Nemp_MainForm: TNemp_MainForm
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = TntFormDestroy
+  OnDeactivate = FormDeactivate
   OnKeyDown = FormKeyDown
   OnKeyUp = PlaylistVSTKeyUp
   OnResize = FormResize
@@ -6730,7 +6731,28 @@ object Nemp_MainForm: TNemp_MainForm
     end
   end
   object PlaylistManagerPopup: TPopupMenu
+    OnPopup = PlaylistManagerPopupPopup
     Left = 696
     Top = 56
+    object N19: TMenuItem
+      Caption = '-'
+    end
+    object PM_PLM_SaveAsExistingFavorite: TMenuItem
+      Caption = 'Save playlist ""'
+      OnClick = PM_PLM_SaveAsExistingFavoriteClick
+    end
+    object PM_PLM_SaveAsNewFavorite: TMenuItem
+      Caption = 'Save current playlist as new favorite'
+      OnClick = PM_PLM_SaveAsNewFavoriteClick
+    end
+    object N10: TMenuItem
+      Caption = '-'
+    end
+    object PM_PLM_RecentPlaylists: TMenuItem
+      Caption = 'Recent playlists'
+    end
+    object PM_PLM_EditFavourites: TMenuItem
+      Caption = 'Edit'
+    end
   end
 end
