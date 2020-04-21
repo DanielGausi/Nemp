@@ -110,7 +110,7 @@ begin
     TranslateComponent (self);
 
     VSTPlaylistFiles.NodeDataSize  := SizeOf(TStringTreeData);
-    VSTFiles.NodeDataSize  := SizeOf(TTreeData);
+    VSTFiles.NodeDataSize  := SizeOf(TAudioFile);
     VSTDrives.NodeDataSize := SizeOf(TDeleteTreeData);
 
     filename := ExtractFilePath(ParamStr(0)) + 'Images\alert.png';
@@ -306,13 +306,13 @@ end;
 procedure TDeleteSelection.VSTFilesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
-var Data: PTreeData;
+var //Data: PTreeData;
+    af: TAudioFile;
 begin
-    Data:=Sender.GetNodeData(Node);
-    if not assigned(Data) then exit;
-
+    //Data:=Sender.GetNodeData(Node);
+    af := Sender.GetNodeData<TAudioFile>(Node);
     case Column of
-        0: cellText := Data^.FAudioFile.Pfad;
+        0: cellText := af.Pfad;
     end;
 end;
 
@@ -366,7 +366,8 @@ begin
         VSTFiles.Clear;
         VSTFiles.BeginUpdate;
         for i := 0 to currentData.Files.Count-1 do
-            AddVSTMp3(VSTFiles,Nil,TAudioFile(currentData.Files.Items[i]));
+            VSTFiles.AddChild(Nil, currentData.Files.Items[i]);
+            //AddVSTMp3(VSTFiles,Nil, currentData.Files.Items[i]);
         VSTFiles.EndUpdate;
 
         // Fill Playlist Files

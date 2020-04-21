@@ -48,7 +48,7 @@ type
   public
     { Public declarations }
     AutoClose: Boolean;
-    procedure InitiateReplayGainCalculation(aFileList: TObjectList; aCalculationMode: TRGCalculationMode; CreateCopies: Boolean);
+    procedure InitiateReplayGainCalculation(aFileList: TAudioFileList; aCalculationMode: TRGCalculationMode; CreateCopies: Boolean);
 
   end;
 
@@ -141,7 +141,7 @@ begin
 end;
 
 procedure TReplayGainProgressForm.InitiateReplayGainCalculation(
-  aFileList: TObjectList; aCalculationMode: TRGCalculationMode; CreateCopies: Boolean);
+  aFileList: TAudioFileList; aCalculationMode: TRGCalculationMode; CreateCopies: Boolean);
 var i: Integer;
 begin
     if assigned(NempReplayGainCalculator) then
@@ -182,7 +182,7 @@ begin
 
           NempReplayGainCalculator.UseAudioFileCopies := CreateCopies;
           for i := 0 to aFileList.Count - 1 do
-              NempReplayGainCalculator.AddAudioFile(TAudioFile(aFileList[i]));
+              NempReplayGainCalculator.AddAudioFile(aFileList[i]);
 
           NempReplayGainCalculator.Start;
     end;
@@ -306,7 +306,7 @@ end;
 
 procedure TReplayGainProgressForm.OnAudioFileSynch(aFile: TAudioFile; aTrackGain,
   aAlbumGain, aTrackPeak, aAlbumPeak: Double);
-var ListOfFiles : TObjectList;
+var ListOfFiles : TAudioFileList;
     i: Integer;
     listFile: TAudioFile;
 begin
@@ -316,14 +316,14 @@ begin
     aFile.AlbumPeak := aAlbumPeak;
     MedienBib.Changed := True;
 
-    ListOfFiles := TObjectList.Create(False);
+    ListOfFiles := TAudioFileList.Create(False);
     try
         // get List of this AudioFile
         GetListOfAudioFileCopies(aFile, ListOfFiles);
         // edit all these files
         for i := 0 to ListOfFiles.Count - 1 do
         begin
-            listFile := TAudioFile(ListOfFiles[i]);
+            listFile := ListOfFiles[i];
             listFile.TrackGain := aTrackGain;
             listFile.AlbumGain := aAlbumGain;
             listFile.TrackPeak := aTrackPeak;

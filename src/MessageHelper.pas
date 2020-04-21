@@ -77,7 +77,7 @@ var aAudioFile: tAudioFile;
   resultString: AnsiString;
   resultStringW: UnicodeString;
   eq_idx, eq_value: integer;
-  aList: TObjectList;
+  aList: TAudioFileList;
   aStream: TMemoryStream;
   //Coverbmp: TBitmap;
   CoverPicture: TPicture;
@@ -144,7 +144,7 @@ begin
                       aList := MedienBib.BibSearcher.IPCSearchResults;
 
                     if assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
-                      aMsg.Result := TAudioFile(aList[aMsg.WParam]).Duration
+                      aMsg.Result := aList[aMsg.WParam].Duration
                     else
                       aMsg.Result := -1;
         end;
@@ -318,7 +318,7 @@ begin
 
                             If assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
                             begin
-                              aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
+                              aAudioFile := aList[aMsg.WParam];          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of
                                 IPC_GETPLAYLISTFILE,
                                 IPC_GETSEARCHLISTFILE: resultString := AnsiString(aAudiofile.Pfad);  // Ja.
@@ -394,7 +394,7 @@ begin
 
                             If assigned(aList) AND (aList.Count > Integer(aMsg.WParam)) then
                             begin
-                              aAudioFile := TAudioFile(aList[aMsg.WParam]);          // Stream/Datei Beahndlung i.O.??
+                              aAudioFile := aList[aMsg.WParam];          // Stream/Datei Beahndlung i.O.??
                               case aMsg.LParam of
                                 IPC_GETPLAYLISTFILE_W,
                                 IPC_GETSEARCHLISTFILE_W: resultStringW := aAudiofile.Pfad;  // Ja.
@@ -500,7 +500,8 @@ end;
 
 function Handle_MedienBibMessage(Var aMsg: TMessage): Boolean;
 var i: Integer;
-    TargetList, srList: TObjectList;
+    TargetList, srListAudio: TAudioFileList;
+    srListDeleteData: TObjectList;
     af: TAudiofile;
     aErr: TNempAudioError;
     ErrorLog : TErrorLog;
@@ -614,10 +615,10 @@ begin
 
             // fill the List with the srList in LParam
             TargetList.Clear;
-            srList := TObjectList(aMsg.LParam);
-            TargetList.Capacity := srList.Count + 1;
-            for i := 0 to srList.Count - 1 do
-                TargetList.Add(srList[i]);
+            srListAudio := TAudioFileList(aMsg.LParam);
+            TargetList.Capacity := srListAudio.Count + 1;
+            for i := 0 to srListAudio.Count - 1 do
+                TargetList.Add(srListAudio[i]);
 
             MedienBib.AnzeigeListe := TargetList;
             MedienBib.AnzeigeListIsCurrentlySorted := False;
@@ -820,21 +821,21 @@ begin
         end;
 
         MB_UserInputDeadFiles: begin
-            srList := TObjectList(aMsg.LParam);
+            srListDeleteData := TObjectList(aMsg.LParam);
             tmpString := '';
 
             if not assigned(DeleteSelection) then
                 Application.CreateForm(TDeleteSelection, DeleteSelection);
 
 
-            DeleteSelection.DataFromMedienBib := srList;
+            DeleteSelection.DataFromMedienBib := srListDeleteData;
 
             if DeleteSelection.showModal <> mrOK then
             begin
                 // the user cancelled the dialog - Do not delete any files
-                for i := 0 to srList.Count - 1 do
+                for i := 0 to srListDeleteData.Count - 1 do
                 begin
-                    delData := TDeleteData(srList[i]);
+                    delData := TDeleteData(srListDeleteData[i]);
                     delData.DoDelete := False;
                 end;
             end;
@@ -886,7 +887,7 @@ end;
 
 function Handle_ShoutcastQueryMessage(Var aMsg: TMessage): Boolean;
 var FS: TFileStream;
-    tmpPlaylist: TObjectList;
+    tmpPlaylist: TAudioFileList;
     tmpAudioFile: TAudioFile;
     filename: String;
     s: AnsiString;
@@ -915,7 +916,7 @@ begin
                                               if assigned(FS) then
                                               begin
                                                   FS.Free;
-                                                  tmpPlaylist := TObjectList.Create(False); // False: Do NOT free the audiofiles therein!
+                                                  tmpPlaylist := TAudioFileList.Create(False); // False: Do NOT free the audiofiles therein!
                                                   try
                                                       LoadPlaylistFromFile(filename, tmpPlaylist, False, Nil);
                                                       HandleFiles(tmpPlaylist, WebRadioInsertMode);
@@ -935,7 +936,7 @@ begin
                                   ShowSummary;
                                end;
         ST_PlaylistStreamLink: begin
-                                  tmpPlaylist  := TObjectList.Create(False); // False: Do NOT free the audiofiles therein!
+                                  tmpPlaylist  := TAudioFileList.Create(False); // False: Do NOT free the audiofiles therein!
                                   try
                                       tmpAudioFile := TAudioFile.Create;
                                       tmpAudioFile.Pfad := String(PChar(aMsg.LParam));
@@ -959,8 +960,6 @@ end;
 function Handle_WebServerMessage(Var aMsg: TMessage): Boolean;
 var idx: Integer;
     af, newAudioFile: TAudioFile;
-    newNode: PVirtualNode;
-    NodeData: pTreeData;
 begin
     result := True;
     with Nemp_MainForm do
@@ -969,7 +968,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := 0;
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   if idx > -1 then
                                   begin
                                       if NempPlaylist.Count > idx then
@@ -1002,9 +1001,9 @@ begin
                                   else
                                   begin
                                       // it is somewhere in the Playlist?
-                                      idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                      idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                       if (idx > -1) and (NempPlaylist.Count > idx) then
-                                          NempWebserver.QueriedPlaylistFilename := TAudioFile(NempPlaylist.Playlist[idx]).Pfad;
+                                          NempWebserver.QueriedPlaylistFilename := NempPlaylist.Playlist[idx].Pfad;
                                   end;
                               end;
 
@@ -1021,7 +1020,7 @@ begin
                                       if (idx > -1) then
                                       begin
                                           if NempPlaylist.Count > idx then
-                                              NempWebserver.QueriedPlaylistFilename := TAudioFile(NempPlaylist.Playlist[idx]).Pfad
+                                              NempWebserver.QueriedPlaylistFilename := T---AudioFile(NempPlaylist.Playlist[idx]).Pfad
                                           else NempWebserver.QueriedPlaylistFilename := '';
                                       end else NempWebserver.QueriedPlaylistFilename := '';
                                   end;
@@ -1033,20 +1032,16 @@ begin
                               if AcceptApiCommands then
                               begin
                                   af := TAudioFile(aMsg.LParam);
-                                  NempPlaylist.GetInsertNodeFromPlayPosition;
+                                  NempPlaylist.InitInsertIndexFromPlayPosition(True);
 
                                   newAudioFile := TAudioFile.Create;
                                   newAudioFile.Assign(af);
 
-                                  newNode := NempPlaylist.InsertFileToPlayList(newAudioFile);
-                                  // NempPlaylist.AddNodeToPrebookList(newNode);
+                                  NempPlaylist.InsertFileToPlayList(newAudioFile);
                                   if (NempPlayer.Mainstream = 0) then
-                                      InitPlayingFile(NempPlaylist.AutoplayOnStart);
+                                      NempPlaylist.InitPlayingFile;
 
-                                  NodeData := PlaylistVST.GetNodeData(newNode);
-                                  newAudioFile := NodeData^.FAudioFile;
                                   NempWebserver.EnsureFileHasID(newAudioFile);
-
                                   aMsg.Result := newAudioFile.WebServerID;
                                   //result: the ID of the new AudioFile-Object
                               end;
@@ -1058,12 +1053,10 @@ begin
                                   newAudioFile := TAudioFile.Create;
                                   newAudioFile.Assign(af);
 
-                                  newNode := NempPlaylist.AddFileToPlaylist(newAudioFile);
+                                  NempPlaylist.AddFileToPlaylist(newAudioFile);
                                   if (NempPlayer.Mainstream = 0) then
-                                      InitPlayingFile(NempPlaylist.AutoplayOnStart);
+                                      NempPlaylist.InitPlayingFile;
 
-                                  NodeData := PlaylistVST.GetNodeData(newNode);
-                                  newAudioFile := NodeData^.FAudioFile;
                                   NempWebserver.EnsureFileHasID(newAudioFile);
                                   aMsg.Result := newAudioFile.WebServerID;
                               end;
@@ -1072,7 +1065,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := -3;   // invalid
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   if (idx > -1) then
                                   begin
                                       af := TPlaylistFile(NempPlaylist.Playlist[idx]);
@@ -1086,7 +1079,7 @@ begin
                                       else
                                       begin
                                           if idx > 0 then
-                                              aMsg.Result := TAudioFile(NempPlaylist.Playlist[idx-1]).WebServerID
+                                              aMsg.Result := NempPlaylist.Playlist[idx-1].WebServerID
                                           else
                                           if idx = 0 then
                                               aMsg.Result := -2; // move up of the first title
@@ -1098,7 +1091,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := 0;
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
 
                                   if (idx > -1) then
                                   begin
@@ -1130,7 +1123,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := -3;   // invalid
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   if (idx > -1) then
                                   begin
                                       af := TPlaylistFile(NempPlaylist.Playlist[idx]);
@@ -1144,7 +1137,7 @@ begin
                                       else
                                       begin
                                           if (idx < NempPlaylist.Count - 1) then
-                                              aMsg.Result := TAudioFile(NempPlaylist.Playlist[idx+1]).WebServerID
+                                              aMsg.Result := NempPlaylist.Playlist[idx+1].WebServerID
                                           else
                                           if idx = NempPlaylist.Count - 1 then
                                               aMsg.Result := -2; // move down of the last title
@@ -1156,7 +1149,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := 0;
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
 
                                   if (idx > -1) then
                                   begin
@@ -1195,7 +1188,7 @@ begin
                               if AcceptApiCommands then
                               begin
                                   aMsg.Result := 0;
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   if (idx > -1) then
                                   begin
                                       af := TPlaylistFile(NempPlaylist.Playlist[idx]);
@@ -1209,7 +1202,7 @@ begin
                                               aMsg.Result := 2;
                                           end else
                                           begin
-                                              NempPlaylist.DeleteAFile(idx);
+                                              NempPlaylist.DeleteAudioFileFromPlaylist(idx);
                                               aMsg.Result := 1;
                                           end;
                                       end;
@@ -1242,7 +1235,7 @@ begin
                                   NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, False)
                               else
                               begin
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, False);
                               end;
                           end;
@@ -1252,23 +1245,23 @@ begin
                                   NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, -1, True)
                               else
                               begin
-                                  idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                  idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                   NempWebServer.GenerateHTMLfromPlaylistItem(NempPlaylist, idx, True);
                               end;
                           end;
         WS_QueryPlaylistDetail: begin
                                 // ID aus Lparam lesen
-                                idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                 if (idx > -1) then
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx, False)
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NempPlaylist.Playlist[idx], idx, False)
                                 else
                                     NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0, False);
                           end;
         WS_QueryPlaylistDetailAdmin: begin
                                 // ID aus Lparam lesen
-                                idx := NempPlaylist.GetPlaylistIndex(aMsg.LParam);
+                                idx := NempPlaylist.GetPlaylistIndexByWebServerID(aMsg.LParam);
                                 if (idx > -1) then
-                                    NempWebServer.GenerateHTMLfromPlaylist_Details(TAudioFile(NempPlaylist.Playlist[idx]), idx, True)
+                                    NempWebServer.GenerateHTMLfromPlaylist_Details(NempPlaylist.Playlist[idx], idx, True)
                                 else
                                     NempWebServer.GenerateHTMLfromPlaylist_Details(NIL, 0, True);
                           end;
@@ -1551,7 +1544,7 @@ begin
                 NempPlayer.JumpToPrevCue;
 
             // Anzeige in der Playlist aktualisieren
-            NempPlaylist.ActualizeCue;
+            NempPlaylist.RefreshCue;
             // N‰chsten Sync setzen
             NempPlayer.SetCueSyncs;
           end;
@@ -1666,7 +1659,7 @@ begin
                         //    NempPlayer.StartRecording;
                         NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
                         PlaylistVST.Invalidate;
-                        PlaylistCueChanged(NempPlayer);
+                        PlaylistCueChanged(NempPlaylist);
                     end;
 
     WM_PlayerStop, WM_PlayerPlay: begin
@@ -1753,6 +1746,8 @@ Var
   Filename: PChar;
   abspielen: Boolean;
   p: TPoint;
+  NodeTop: Integer;
+  aNode : PVirtualNode;
 Begin
   result := True;
   with Nemp_MainForm do
@@ -1766,20 +1761,38 @@ Begin
     if UseDefaultInsertMode then
     begin
         if NempPlaylist.DefaultAction = 2 then
-            NempPlaylist.GetInsertNodeFromPlayPosition
+            NempPlaylist.InitInsertIndexFromPlayPosition(True)
         else
-            NempPlaylist.InsertNode := NIL;
+            NempPlaylist.ResetInsertIndex;
     end else
     begin
         p := PlayListVST.ScreenToClient(Mouse.CursorPos);
-        NempPlaylist.InsertNode := PlayListVST.GetNodeAt(p.x,p.y);
+        aNode := PlayListVST.GetNodeAt(p.x, p.y, True,  NodeTop);
+        if not assigned(aNode) then
+            NempPlaylist.InsertIndex := -1
+        else
+        begin
+            if PlaylistVST.GetNodeLevel(aNode) = 0 then
+            begin
+                // DropTarget is an actual AudioFile
+                // Determine whether we want to insert new files before or after the DropNode
+                if p.y - NodeTop < (playlistVST.NodeHeight[aNode] Div 2) then
+                    NempPlaylist.InsertIndex := aNode.Index
+                else
+                    NempPlaylist.InsertIndex := aNode.Index + 1
+                    // (note: The Setter for InsertIndex will handle it, if it exceeds Playlist.Count)
+            end else
+            begin
+                // DropTarget is a CueSheet-Entry
+                // Insert new files always *after* it
+                aNode := aNode.Parent;
+                NempPlaylist.InsertIndex := aNode.Index + 1;
+            end;
+        end;
+
     end;
 
-
-    //if assigned(NempPlaylist.InsertNode) then
-    //    NempPlaylist.InsertNode := PlayListVST.GetNextSibling(NempPlaylist.InsertNode);
-
-    if (DragSource <> DS_VST) then    // Files kommen von Auﬂerhalb
+    if (DragSource <> DS_VST) and (DragSource <> DS_PLAYLIST) then    // Files kommen von Auﬂerhalb
     begin
         ST_Playlist.Mask := GeneratePlaylistSTFilter;
         FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
@@ -1830,15 +1843,15 @@ Begin
         end;
     end
     else
-    begin   // Quelle ist der VST -> in die Playlist einf¸gen
-        for idx := 0 to DragDropList.Count - 1 do
-            NempPlaylist.InsertFileToPlayList(DragDropList[idx]);
+        begin
+            for idx := 0 to DragDropList.Count - 1 do
+                NempPlaylist.InsertFileToPlayList(DragDropList[idx]);
 
-        DragDropList.Clear;
-        IMGMedienBibCover.EndDrag(true);
-        DragFinish (aMsg.WParam);
-        DragSource := DS_EXTERN;
-    end;
+            DragDropList.Clear;
+            IMGMedienBibCover.EndDrag(true);
+            DragFinish (aMsg.WParam);
+            DragSource := DS_EXTERN;
+        end;
 
     // play (change 2019: always, also when dropping from extern)
     if abspielen AND (NempPlaylist.Count > 0) then
@@ -2090,7 +2103,7 @@ begin
             NempPlaylist.FileSearchCounter := NempPlaylist.FileSearchCounter + 1;
 
             if (NempPlayer.Mainstream = 0) then
-                InitPlayingFile(NempPlaylist.AutoplayOnStart);
+                NempPlaylist.InitPlayingFile;
         end;
     end;
 end;

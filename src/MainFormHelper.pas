@@ -51,7 +51,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
     procedure HandleNewConnectedDrive;
 
-    procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
+    procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
     procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
 
     function GetDropWindowSection(aControl: TWinControl): TWindowSection;
@@ -82,7 +82,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function HandleIgnoreRule(aTag: String): Boolean;
     function HandleMergeRule(aTag: String; out newTag: String): Boolean;
     // Select all files with the same path as MedienBib.CurrentAudioFile
-    function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
+    function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList): Boolean;
     procedure CorrectVCLAfterAudioFileEdit(aFile: TAudioFile; CheckTrees: Boolean=True);
     procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
     procedure DoSyncStuffAfterTagEdit(aAudioFile: TAudiofile; backupTag: UTF8String);
@@ -100,7 +100,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleStopAfterTitleClick;
     procedure HandleStopNowClick;
 
-    procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
+    // procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TAudioFileList);
 
     function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
     // WritePlaylistForClipBoard: Create a temporary Playlist with the fileNAMES (EXcluding the path)
@@ -265,10 +265,10 @@ end;
 
 // Diese Prozedur soll aufgerufen werden, wenn die Liste nach einem
 // Sortieren neu gefüllt wurde. Es existiert ein Node mit Data=AudioFile!!!
-procedure FillTreeView(MP3Liste: TObjectlist; AudioFile:TAudioFile);
+procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
 var i: integer;
   NewNode:PVirtualNode;
-  Data:PTreeData;
+  // Data:PTreeData;
   tmpAudioFile: TAudioFile;
 
         function SameFile(File1, File2: TAudioFile): Boolean;
@@ -298,27 +298,29 @@ begin
         if (MP3Liste.Count = 0) then
         begin
             // just add a Dummyfile showing "No results"
-            AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
+            // AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
+            VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
             ShowVSTDetails(Nil);
         end else
         begin
             for i := 0 to MP3Liste.Count-1 do
-                AddVSTMp3(VST,Nil,TAudioFile(MP3Liste.Items[i]));
+                VST.AddChild(Nil, MP3Liste.Items[i]);
+                //AddVSTMp3(VST,Nil, MP3Liste.Items[i]);
 
             // Knoten mit AudioFile suchen und focussieren
             NewNode := VST.GetFirst;
             if assigned(Newnode) then
             begin
-                Data := VST.GetNodeData(NewNode);
-                tmpAudioFile := Data^.FAudioFile;
+                // Data := VST.GetNodeData(NewNode);
+                tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
 
                 if Not SameFile(tmpAudioFile, AudioFile) then
                 repeat
                     NewNode := VST.GetNext(NewNode);
                     if assigned(NewNode) then
                     begin
-                        Data := VST.GetNodeData(NewNode);
-                        tmpAudioFile := Data^.FAudioFile;
+                        // Data := VST.GetNodeData(NewNode);
+                        tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
                     end;
                 until SameFile(tmpAudioFile, AudioFile) OR (NewNode=NIL);
 
@@ -330,8 +332,8 @@ begin
                     // and get the corresponding AudioFile again
                     if assigned(NewNode) then
                     begin
-                        Data := VST.GetNodeData(NewNode);
-                        tmpAudioFile := Data^.FAudioFile;
+                        // Data := VST.GetNodeData(NewNode);
+                        tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
                     end;
                 end;
 
@@ -361,7 +363,9 @@ begin
 
         VST.BeginUpdate;
         VST.Clear;
-        AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
+        //AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
+        VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
+
         VST.EndUpdate;
         // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         ShowVSTDetails(Nil);
@@ -958,7 +962,7 @@ begin
         AlbenVST.Invalidate;
 
         // refill playlist headers
-        NempPlaylist.ShowPlayListSummary;
+        PlaylistPropertiesChanged(NempPlaylist);
 
         if Medienbib.BrowseMode = 1 then
             CoverScrollbarChange(Nil); // trigger redraw of label
@@ -1258,7 +1262,7 @@ end;
      - Medienbib.status <= 1  (searching for new files or GetTags should be ok)
        and MedienBib.CurrentThreadFilename
 }
-function GetListOfAudioFileCopies(Original: TAudioFile; Target:TObjectList): Boolean;
+function GetListOfAudioFileCopies(Original: TAudioFile; Target: TAudioFileList): Boolean;
 var bibFile: TAudioFile;
     originalPath: String;
 
@@ -1306,13 +1310,13 @@ end;
 
 procedure SyncAudioFilesWith(aAudioFile: TAudioFile);
 var i: Integer;
-    ListOfFiles: TObjectList;
+    ListOfFiles: TAudioFileList;
 begin
-    ListOfFiles := TObjectList.Create(False);
+    ListOfFiles := TAudioFileList.Create(False);
     try
         GetListOfAudioFileCopies(aAudioFile, ListOfFiles);
         for i := 0 to ListOfFiles.Count - 1 do
-            TAudioFile(ListOfFiles[i]).Assign(aAudioFile);
+            ListOfFiles[i].Assign(aAudioFile);
     finally
         ListOfFiles.Free;
     end;
@@ -1613,22 +1617,24 @@ begin
     end;
 end;
 
-procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TObjectList);
+(*
+procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TAudioFileList);
 var i: Integer;
-    Data: PTreeData;
+    // Data: PTreeData;
 begin
     for i := 0 to length(aSelection) - 1 do
     begin
-        Data := aTree.GetNodeData(aSelection[i]);
-        Target.Add(Data^.FAudioFile);
+        // Data := aTree.GetNodeData(aSelection[i]);
+        Target.Add(aTree.GetNodeData<TAudioFile>(aSelection[i]));
     end;
 end;
+*)
 
 function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
 var
   idx, maxC: integer;
   SelectedMP3s: TNodeArray;
-  Data: PTreeData;
+  af: TAudioFile;
 begin
     result := '';
     SelectedMP3s := aTree.GetSortedSelection(False);
@@ -1639,13 +1645,13 @@ begin
 
     for idx := 0 to maxC - 1 do
     begin
-        Data := aTree.GetNodeData(SelectedMP3s[idx]);
-        if FileExists(Data^.FAudioFile.Pfad) then
-            result := result + Data^.FAudioFile.Pfad + #0;
-        if (  (assigned(Data^.FAudioFile.CueList)) or (Data^.FAudioFile.Duration >  MIN_CUESHEET_DURATION)  )
-           AND FileExists(ChangeFileExt(Data^.FAudioFile.Pfad, '.cue'))
+        af := aTree.GetNodeData<TAudioFile>(SelectedMp3s[idx]);
+        if FileExists(af.Pfad) then
+            result := result + af.Pfad + #0;
+        if (  (assigned(af.CueList)) or (af.Duration >  MIN_CUESHEET_DURATION)  )
+           AND FileExists(ChangeFileExt(af.Pfad, '.cue'))
         then
-            result := result + ChangeFileExt(Data^.FAudioFile.Pfad, '.cue') + #0;
+            result := result + ChangeFileExt(af.Pfad, '.cue') + #0;
     end;
 end;
 
@@ -1655,7 +1661,6 @@ function WritePlaylistForClipBoard(aTree: TVirtualStringTree): String;
 var
     idx: integer;
     SelectedMP3s: TNodeArray;
-    Data: PTreeData;
     af: TAudioFile;
     tmpPlaylist: TStringList;
     m3u8Needed: Boolean;
@@ -1671,9 +1676,7 @@ begin
         tmpPlaylist.Add('#EXTM3U');
         for idx := 0 to length(SelectedMP3s)-1 do
         begin
-
-            Data := aTree.GetNodeData(SelectedMP3s[idx]);
-            af := Data^.FAudioFile;
+            af := aTree.GetNodeData<TAudioFile>(SelectedMp3s[idx]);
             if FileExists(af.Pfad) then
             begin
                 // Add File to Playlist

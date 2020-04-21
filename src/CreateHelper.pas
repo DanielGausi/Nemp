@@ -576,16 +576,11 @@ begin
         begin
             if trim(paramstr(1)) = '/minimized' then
                 NempOptions.StartMinimizedByParameter := True;
-            InitPlayingFile(NempPlaylist.AutoplayOnStart, True);
+            NempPlaylist.InitPlayingFile(True);
         end else
         begin
-            if NempPlaylist.AutoPlayNewTitle then
-            begin
-                // Letzten Index merken
-                BackupPlayingIndex := NempPlaylist.PlayingIndex;
-                // Index auf den neuen Titel setzen, der aber nicht nicht in der Liste drin ist!
-                NempPlaylist.PlayingIndex := NempPlaylist.Count; // Ja, nicht ..-1, es kommt ja wahrscheinlich einer dazu ;-)
-            end;
+            // Forget the Loaded fPlayingIndex from the Ini (if wanted)
+            NempPlaylist.OverwritePlayingIndexWithMaxCount;
 
             if ParamCount >= 2 then
             begin
@@ -703,7 +698,7 @@ begin
         ReadyForgetFileApiCommands := True;
         AcceptApiCommands := True;
         EditFastSearch.OnChange := EDITFastSearchChange;
-        NempPlaylist.UpdatePlayListHeader(PlaylistVST, NempPlaylist.Count, NempPlaylist.Dauer);
+        PlaylistPropertiesChanged(NempPlaylist);
 
         //LockWindowUpdate(0);
         {$IFDEF USESTYLES}

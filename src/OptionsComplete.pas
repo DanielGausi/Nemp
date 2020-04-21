@@ -2159,11 +2159,11 @@ end;
 
 
 procedure TOptionsCompleteForm.BtnCountRatingClick(Sender: TObject);
-var aList: TObjectList;
+var aList: TAudioFileList;
     i, rawRating: Integer;
     RatingCounts: Array[0..10] of Integer;
 begin
-    aList := TObjectList.Create(False);
+    aList := TAudioFileList.Create(False);
     try
         if cbCountRatingOnlyPlaylist.Checked then
         begin
@@ -2185,7 +2185,7 @@ begin
 
         for i := 0 to aList.Count-1 do
         begin
-            rawRating := TAudiofile(aList[i]).Rating;
+            rawRating := aList[i].Rating;
             if rawRating = 0 then
                 inc(RatingCounts[0]);
             // that one as well (always), because a rating of "0" is treated as "127" in general
@@ -2832,8 +2832,9 @@ begin
   if ReDrawMedienlistTree then FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
   if ReDrawPlaylistTree then
   begin
-    NempPlaylist.FillPlaylistView;
-    NempPlaylist.ReInitPlaylist;
+      // Call the EventHandler for "Fill PlaylistView again"
+      Nemp_MainForm.PlaylistChangedCompletely(NempPlaylist);
+      NempPlaylist.ReInitPlaylist;
   end;
 
   // Geburtstags-Optionen

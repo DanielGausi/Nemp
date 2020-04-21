@@ -118,8 +118,8 @@ type
 
             // for player-picture: Get proper Album-Information
             procedure CollectFiles(aList: TStringList);
-            procedure CollectAudioInformation(source: TStringList; Target: TObjectList);
-            function IsProperAlbum(aAudioFileList: TObjectList): Boolean;
+            procedure CollectAudioInformation(source: TStringList; Target: TAudioFileList);
+            function IsProperAlbum(aAudioFileList: TAudioFileList): Boolean;
             function CollectAlbumInformation: Boolean;
             function CollectCDInformation: Boolean;
 
@@ -558,7 +558,7 @@ end;
     --------------------------------------------------------
 }
 procedure TCoverDownloadWorkerThread.CollectAudioInformation(
-  source: TStringList; Target: TObjectList);
+  source: TStringList; Target: TAudioFileList);
 var i: Integer;
     newAudioFile: TAudioFile;
 
@@ -574,7 +574,7 @@ begin
         Target.Add(newAudioFile);
     end;
 end;
-function TCoverDownloadWorkerThread.IsProperAlbum(aAudioFileList: TObjectList): Boolean;
+function TCoverDownloadWorkerThread.IsProperAlbum(aAudioFileList: TAudioFileList): Boolean;
 var tmpCover: TNempCover;
 begin
     tmpCover := TNempCover.Create;
@@ -607,7 +607,7 @@ end;
 }
 function TCoverDownloadWorkerThread.CollectAlbumInformation: Boolean;
 var FileList: TStringList;
-    AudioFileList: TObjectList;
+    AudioFileList: TAudioFileList;
 
 begin
 
@@ -618,7 +618,7 @@ begin
 
         if FileList.Count <= 100 then
         begin
-            AudioFileList := TObjectList.Create;
+            AudioFileList := TAudioFileList.Create;
             try
                 CollectAudioInformation(FileList, AudioFileList);
                 // Check for a proper album-name (fCurrentDownloadItem-data is set there)

@@ -290,9 +290,9 @@ type
           procedure SaveToIni(Ini: TMemIniFile);
 
           // Build a Tag-Cloud for the AudioFiles given in Source
-          procedure BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
+          procedure BuildCloud(Source: TAudioFileList; aTag: TTag; FromScratch: Boolean);
 
-          procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TObjectList; Target: TObjectList; HideAutoTags: Boolean = False);
+          procedure GetTopTags(ResultCount: Integer; Offset: Integer; BibSource: TAudioFileList; Target: TObjectList; HideAutoTags: Boolean = False);
 
           // Show the Tags in the Cloud
           procedure ShowTags(Refocus: Boolean);
@@ -300,7 +300,7 @@ type
           // Backup/RestoreNavigation: Save the current Breadcrumbs and restore them after
           // a rebuild of the cloud (~RemarkOldNodes in Classic browsing)
           procedure BackUpNavigation;
-          procedure RestoreNavigation(aList: TObjectList);
+          procedure RestoreNavigation(aList: TAudioFileList);
           procedure NavigateCloud(aKey: Word; Shift: TShiftState);
 
           // Add a file to the TagCloud
@@ -1037,7 +1037,7 @@ end;
     --------------------------------------------------------
 }
 procedure TTagCloud.GetTopTags(ResultCount: Integer; Offset: Integer;
-    BibSource: TObjectList; Target: TObjectList; HideAutoTags: Boolean = False);
+    BibSource: TAudioFileList; Target: TObjectList; HideAutoTags: Boolean = False);
 var tmpList: TObjectList;
     i: Integer;
 begin
@@ -1085,9 +1085,9 @@ end;
     If the SourceList is aTag.AudioFiles, we need to backup these Files
     --------------------------------------------------------
 }
-procedure TTagCloud.BuildCloud(Source: TObjectList; aTag: TTag; FromScratch: Boolean);
+procedure TTagCloud.BuildCloud(Source: TAudioFileList; aTag: TTag; FromScratch: Boolean);
 var i: Integer;
-    properList: TObjectList;
+    properList: TAudioFileList;
 begin
     if FromScratch then
     begin
@@ -1100,7 +1100,7 @@ begin
         // clear all AudioFile.Tags
         for i := 0 to Source.Count - 1 do
             // we should use the (new) rawtags to rebuild the cloud
-            TAudioFile(Source[i]).Taglist.Clear;
+            Source[i].Taglist.Clear;
 
         InitHashMap;
     end else
@@ -1163,7 +1163,7 @@ begin
 
         // Insert Files into the new Cloud
         for i := 0 to properList.Count - 1 do
-            AddAudioFile(TAudioFile(properList[i]));
+            AddAudioFile(properList[i]);
 
         // Sort Tags by Count
         Tags.Sort(Sort_Count);
@@ -1215,7 +1215,7 @@ begin
     end;
 end;
 
-procedure TTagCloud.RestoreNavigation(aList: TObjectList);
+procedure TTagCloud.RestoreNavigation(aList: TAudioFileList);
 var i: Integer;
 begin
     // Initialisation done.
@@ -1460,7 +1460,7 @@ begin
                 // We do not want the file added to tags in the breadcrumblist, as
                 // it is already in these lists (as a go-back-navigation)
                 // But after an update, we MUST skip this first test
-                ((aTag.count = 0) or (TAudioFile(aTag.AudioFiles[aTag.count-1]) <> aAudioFile))
+                ((aTag.count = 0) or (aTag.AudioFiles[aTag.count-1] <> aAudioFile))
             then
             begin
 
@@ -1511,7 +1511,7 @@ begin
     // 2. Move all AudioFiles from OldTag to NewTag
     for i := 0 to oldTag.AudioFiles.Count - 1 do
     begin
-        af := TAudioFile(oldTag.AudioFiles[i]);
+        af := oldTag.AudioFiles[i];
         if af.Taglist.Count = 0 then
             // to be sure, but this should not happen
             AddAudioFileRAWTags(af);
@@ -1575,7 +1575,7 @@ var i, oi: Integer;
 begin
     for i := 0 to aTag.AudioFiles.Count - 1 do
     begin
-        af := TAudioFile(aTag.AudioFiles[i]);
+        af := aTag.AudioFiles[i];
         if af.Taglist.Count = 0 then
             // to be sure, but this should not happen
             AddAudioFileRAWTags(af);

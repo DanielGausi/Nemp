@@ -25,7 +25,7 @@ type
 
     TNempReplayGainCalculator = class;
 
-    TAudioFileList = class(TObjectList<TAudioFile>);
+    //TAudioFileList = class(TObjectList<TAudioFile>);
 
     TRGCalculationMode = (RG_Calculate_SingleTracks, RG_Calculate_SingleAlbum, RG_Calculate_MultiAlbums, RG_Delete_ReplayGainValues);
 

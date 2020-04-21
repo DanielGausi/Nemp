@@ -92,7 +92,7 @@ type
       procedure Assign(aCover: TNempCover);
 
       // Try to get some "Common Strings" from a list of audioFiles with the same coverfile
-      procedure GetCoverInfos(AudioFileList: TObjectlist);
+      procedure GetCoverInfos(AudioFileList: TAudioFileList);
     end;
 
     TCoverArtSearcher = class
@@ -342,7 +342,7 @@ begin
     end;
 end;
 
-procedure TNempCover.GetCoverInfos(AudioFileList: TObjectlist);
+procedure TNempCover.GetCoverInfos(AudioFileList: TAudioFileList);
 var str1: UnicodeString;
     maxidx, i, fehlstelle: Integer;
     aStringlist: TStringList;
@@ -364,8 +364,8 @@ begin
 
   aStringlist := TStringList.Create;
   for i := 0 to maxIdx do
-      if (TAudioFile(AudioFileList[i]).Artist <> '') then
-          aStringlist.Add(TAudioFile(AudioFileList[i]).Artist);
+      if (AudioFileList[i].Artist <> '') then
+          aStringlist.Add(AudioFileList[i].Artist);
 
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 0, fehlstelle);  // bei Test auf "String gleich?" keinen Fehler zulassen
@@ -384,8 +384,8 @@ begin
   aStringlist.Clear;
   // Dasselbe jetzt mit Album, aber mit Toleranz 1 bei den Strings
   for i := 0 to maxIdx do
-      if (TAudioFile(AudioFileList[i]).Album <> '') then
-          aStringlist.Add(TAudioFile(AudioFileList[i]).Album);
+      if (AudioFileList[i].Album <> '') then
+          aStringlist.Add(AudioFileList[i].Album);
 
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
@@ -406,7 +406,7 @@ begin
   aStringlist.Clear;
   // Dasselbe jetzt mit Genre
   for i := 0 to maxIdx do
-      aStringlist.Add(TAudioFile(AudioFileList[i]).Genre);
+      aStringlist.Add(AudioFileList[i].Genre);
   fehlstelle := 0;
   str1 := GetCommonString(aStringlist, 1, fehlstelle);  // bei Test auf "String gleich?" einen Fehler zulassen  (cd1/2...)
   if str1 = '' then
@@ -420,15 +420,15 @@ begin
       fDirectory := ' ';
   end else
   begin
-      AudioFileList.Sort(Sortieren_Jahr_asc);
-      fYear := StrToIntDef(TAudioFile(AudioFileList[AudioFileList.Count Div 2]).Year, 0);
-      fDirectory := IncludeTrailingPathDelimiter(TAudioFile(AudioFileList[0]).Ordner);
+      AudioFileList.Sort(Sort_Jahr_asc);
+      fYear := StrToIntDef(AudioFileList[AudioFileList.Count Div 2].Year, 0);
+      fDirectory := IncludeTrailingPathDelimiter(AudioFileList[0].Ordner);
   end;
 
   newestAge := 0;
   for i := 0 to AudioFileList.Count - 1 do
   begin
-      currentAge := TAudioFile(AudioFileList[i]).FileAge;
+      currentAge := AudioFileList[i].FileAge;
       if currentAge > newestAge then
           newestAge := currentAge;
   end;
@@ -716,7 +716,7 @@ end;
 
 function RepairCoverFileVCL(oldID: string; aPic: TPicture; out newID: String): Boolean;
 var dummyAudioFile: TAudioFile;
-    afList: TObjectList;
+    afList: TAudioFileList;
 begin
     result := false;
     newID := '';
@@ -725,12 +725,12 @@ begin
         // We do not have an "Audiofile" with the old coverID right now, so get one first.
         // this is needed, as otherwise we won't find the (now deleted) cover, if there's only cover art in
         // the ID3Tag, ond no jpg-files at all around the mp3-files
-        afList := TObjectList.Create(False);
+        afList := TAudioFileList.Create(False);
         try
             MedienBib.GetTitelListFromCoverID(afList, oldID);
             if afList.Count > 0 then
             begin
-                dummyAudioFile.GetAudioData(TAudioFile(afList[0]).Pfad);
+                dummyAudioFile.GetAudioData(afList[0].Pfad);
                 MedienBib.CoverArtSearcher.InitCover(dummyAudioFile, tm_VCL, INIT_COVER_FORCE_RESCAN);
                 // try again getting the coverbitmap
                 result := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(dummyAudioFile.CoverID, aPic);

@@ -117,8 +117,8 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Text = 'Playlists on the selected drive'
-          Width = 232
+          Width = 236
+          WideText = 'Playlists on the selected drive'
         end>
     end
     object VSTFiles: TVirtualStringTree
@@ -136,8 +136,8 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Text = 'Audio files on the selected drive'
-          Width = 425
+          Width = 429
+          WideText = 'Audio files on the selected drive'
         end>
     end
   end
@@ -212,8 +212,8 @@ object DeleteSelection: TDeleteSelection
       Columns = <
         item
           Position = 0
-          Text = 'Files'
-          Width = 189
+          Width = 193
+          WideText = 'Files'
         end>
     end
   end

@@ -33,7 +33,7 @@ unit PlaylistManagement;
 interface
 
 uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFiles,
-  Generics.Collections, DriveRepairTools, Dialogs, myDialogs;
+  Generics.Collections, DriveRepairTools, Dialogs, myDialogs, NempAudioFiles;
 
     const PLAYLIST_MANAGER_OK = 0;
           PLAYLIST_MANAGER_FILE_EXISTS = 1;
@@ -92,7 +92,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               function fGetCurrentPlaylistTrackPos: Integer;
               function fGetCurrentPlaylistIndex: Integer;
 
-              procedure BackupPlaylistFilenames(aList: TObjectList);
+              procedure BackupPlaylistFilenames(aList: TAudioFileList);
 
 
           public
@@ -126,7 +126,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               // Load a Playlist-File from Disk into DestinationPlaylist
               // Parameter Index: Index of the item in fQuickLoadPlaylists
               //                  (used by the OnClick-Event from the MenuItems)
-              function LoadPlaylist(aIndex: Integer; DestinationPlaylist: TObjectList; AutoScan: Boolean): Boolean;
+              function LoadPlaylist(aIndex: Integer; DestinationPlaylist: TAudioFileList; AutoScan: Boolean): Boolean;
 
               // Reset:
               // * Set the currentIndex back to -1,
@@ -136,7 +136,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               // SaveCurrentPlaylist
               // SaveCurrentPlaylistPosition
               // * Saves information about the current playlist
-              procedure SaveCurrentPlaylist(SourcePlaylist: TObjectList; Silent: Boolean = True);
+              procedure SaveCurrentPlaylist(SourcePlaylist: TAudioFileList; Silent: Boolean = True);
               procedure SaveCurrentPlaylistPosition(aIndex, aTrackPos: Integer);
 
               // Check, whether the PlaylistFile (*.npl) to a given Index exists
@@ -145,21 +145,21 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               // Initialise a list of filenames of the currently loaded playlist.
               // This list is used to check for changes before the user loads another playlist
               procedure InitPlaylistFilenames;
-              function CurrentPlaylistHasChanged(aPlaylist: TObjectList): Boolean;
+              function CurrentPlaylistHasChanged(aPlaylist: TAudioFileList): Boolean;
               // Check whether the user wants to save the (changed) playlist before loading another one
               function UserWantAutoSave: Integer;
               // Prepare the loading process.
               // if the user clicks "abort" in the Dialog shown (optionally) during UserWantAutoSave,
               // then the whole process is aborted, and the "OpenDialog" for selecting a new Playlist is not shown.
-              function PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TObjectList; aIndex, aTrackPos: Integer): Boolean;
+              function PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
 
-              function PrepareSamePlaylistLoading(aOldPlaylist: TObjectList; aIndex, aTrackPos: Integer): Boolean;
+              function PrepareSamePlaylistLoading(aOldPlaylist: TAudioFileList; aFilename: String; aTrackPos: Integer): Boolean;
 
 
               procedure ReadFromIni(aIni: TMemIniFile);
               procedure WriteToIni(aIni: TMemIniFile);
 
-              procedure AddNewPlaylist(aDescription, aFilename: String; aSource: TObjectList);
+              procedure AddNewPlaylist(aDescription, aFilename: String; aSource: TAudioFileList);
               procedure DeletePlaylist(aQuickLoadPlaylist: TQuickLoadPlaylist);
 
               // PlaylistExist, GetUnusedPlaylistFile
@@ -174,7 +174,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
 
 implementation
 
-uses NempAudioFiles, AudioFileHelper, Nemp_RessourceStrings, gnuGetText;
+uses AudioFileHelper, Nemp_RessourceStrings, gnuGetText;
 
 { TQuickLoadPlaylist }
 
@@ -336,12 +336,12 @@ end;
 ///  We will use this Stringlist to check, whether the list has changed when we load another one.
 ///  If Changes occurred, the User may want to save the favourite playlist before deleting them
 ///  And if no Changes occured, we'll save the current position (Index + TrackPos) in this managed playlist
-procedure TPlaylistManager.BackupPlaylistFilenames(aList: TObjectList);
+procedure TPlaylistManager.BackupPlaylistFilenames(aList: TAudioFileList);
 var i: Integer;
 begin
     fCurrentPlaylistFilenames.Clear;
     for i := 0 to aList.Count - 1 do
-        fCurrentPlaylistFilenames.Add(TAudioFile(aList[i]).Pfad);
+        fCurrentPlaylistFilenames.Add(aList[i].Pfad);
 end;
 
 ///  InitPlaylistFilenames
@@ -352,7 +352,7 @@ end;
 ///  But: When Nemp closes, only the nemp.npl is written again, not the "activePlaylist.npl" as well
 ///       => on next start, init the List of Filenames from the previous "activePlaylist.npl".
 procedure TPlaylistManager.InitPlaylistFilenames;
-var tmpPlaylist: TObjectList;
+var tmpPlaylist: TAudioFileList;
     fn: String;
 begin
     if (fCurrentIndex < 0) or (fCurrentIndex >= fQuickLoadPlaylists.Count) then
@@ -362,7 +362,7 @@ begin
         exit;
     end;
 
-    tmpPlaylist := TObjectList.Create(True);
+    tmpPlaylist := TAudioFileList.Create(True);
     try
         fn := fSavePathUserDefined + fQuickLoadPlaylists[fCurrentIndex].fFilenName;
         LoadPlaylistFromFile(fn, tmpPlaylist, false, fDrivemanager);
@@ -379,7 +379,7 @@ end;
 ///  Called when Loading a new Playlist before clearing the current one
 ///  If there are differences between these two lists, the user has changed something in the list,
 ///  and he may want to save it first.
-function TPlaylistManager.CurrentPlaylistHasChanged(aPlaylist: TObjectList): Boolean;
+function TPlaylistManager.CurrentPlaylistHasChanged(aPlaylist: TAudioFileList): Boolean;
 var i: Integer;
 begin
     result := False;
@@ -401,7 +401,7 @@ begin
     // if the number of items matches, then we need to check the filenames
     for i := 0 to aPlaylist.Count - 1 do
     begin
-        if fCurrentPlaylistFilenames[i] <> TAudioFile(aPlaylist[i]).Pfad then
+        if fCurrentPlaylistFilenames[i] <> aPlaylist[i].Pfad then
         begin
             result := True;
             // something has changed. No further testing necessary.
@@ -471,7 +471,7 @@ end;
 ///   * True: Preparation complete, Loading the new playlist should be ok
 ///   * False: The User aborted the MesseagDlg whether the current playlist
 ///            should be saved or discarded. Do not proceed loading
-function TPlaylistManager.PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TObjectList; aIndex, aTrackPos: Integer): Boolean;
+function TPlaylistManager.PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
 begin
     if not PlaylistFileExists(newPlaylistIndex) then
     begin
@@ -520,10 +520,9 @@ end;
 ///  If the current playlist has changed:
 ///  User has to confirm, that he wants to go back to the previously saved version of this playlist
 ///  But: Try to remain the current play position
-function TPlaylistManager.PrepareSamePlaylistLoading(aOldPlaylist: TObjectList;
-  aIndex, aTrackPos: Integer): Boolean;
+function TPlaylistManager.PrepareSamePlaylistLoading(aOldPlaylist: TAudioFileList; aFilename: String;
+    aTrackPos: Integer): Boolean;
 var i: Integer;
-    tmpFilename: String;
 begin
     if not PlaylistFileExists(fCurrentIndex) then
     begin
@@ -531,7 +530,6 @@ begin
         result := False;
         exit;
     end;
-
 
     if (not CurrentPlaylistHasChanged(aOldPlaylist)) or (fCurrentIndex = -1) then
     begin
@@ -544,18 +542,14 @@ begin
             // The user wants to reload this playlist.
             // Bonus Feature: Try to find the currently playing song in the List of Filenames
             //     (which equals the list we will load after this), so that the playlist continues ...
-            if (aIndex >= 0) and (aIndex < aOldPlaylist.Count) then
+            for i := 0 to fCurrentPlaylistFilenames.Count - 1 do
             begin
-                tmpFilename := TAudioFile(aOldPlaylist[aIndex]).Pfad;
-                for i := 0 to fCurrentPlaylistFilenames.Count - 1 do
+                if fCurrentPlaylistFilenames[i] = aFilename then
                 begin
-                    if fCurrentPlaylistFilenames[i] = tmpFilename then
-                    begin
-                        // we found our currently playing file!
-                        fQuickLoadPlaylists[fCurrentIndex].fPlayIndex := i;
-                        fQuickLoadPlaylists[fCurrentIndex].fPlayPositionInTrack := aTrackPos;
-                        break;
-                    end;
+                    // we found our currently playing file!
+                    fQuickLoadPlaylists[fCurrentIndex].fPlayIndex := i;
+                    fQuickLoadPlaylists[fCurrentIndex].fPlayPositionInTrack := aTrackPos;
+                    break;
                 end;
             end;
             result := True;
@@ -583,7 +577,7 @@ end;
 ///  ------------
 ///  Load a QuickLoadPlaylist into the DestinationList
 ///  And: Automatically call "BackupPlaylistFilenames"
-function TPlaylistManager.LoadPlaylist(aIndex: Integer; DestinationPlaylist: TObjectList; AutoScan: Boolean): Boolean;
+function TPlaylistManager.LoadPlaylist(aIndex: Integer; DestinationPlaylist: TAudioFileList; AutoScan: Boolean): Boolean;
 var fn: String;
 begin
 
@@ -612,7 +606,7 @@ end;
 ///  ------------
 ///  Saves a Playlist "SourcePlaylist" as a QuickLoadPlaylist
 ///  And: Automatically call "BackupPlaylistFilenames"
-procedure TPlaylistManager.SaveCurrentPlaylist(SourcePlaylist: TObjectList; Silent: Boolean = True);
+procedure TPlaylistManager.SaveCurrentPlaylist(SourcePlaylist: TAudioFileList; Silent: Boolean = True);
 var fn: String;
 begin
     if (fCurrentIndex < 0) or (fCurrentIndex >= fQuickLoadPlaylists.Count) then
@@ -626,7 +620,6 @@ begin
     SavePlaylistToNPL(fn, SourcePlaylist, fDriveManager, Silent);
     // Refresh Filenames-StringList
     BackupPlaylistFilenames(SourcePlaylist);
-    SourcePlaylist.Move();
 end;
 
 procedure TPlaylistManager.SaveCurrentPlaylistPosition(aIndex, aTrackPos: Integer);
@@ -686,7 +679,7 @@ begin
 end;
 
 
-procedure TPlaylistManager.AddNewPlaylist(aDescription, aFilename: String; aSource: TObjectList);
+procedure TPlaylistManager.AddNewPlaylist(aDescription, aFilename: String; aSource: TAudioFileList);
 var newQuickLoadPlaylist: TQuickLoadPlaylist;
 begin
     // Create the new QuickLoadPlaylist

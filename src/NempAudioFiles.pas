@@ -42,7 +42,7 @@ uses windows, classes, SysUtils, math, Contnrs, ComCtrls, forms,
   ComObj, graphics, variants, WmaFiles, WavFiles, AudioFiles,
   Apev2Tags, ApeTagItem, MusePackFiles,
   strUtils, md5, U_CharCode, Nemp_ConstantsAndTypes, Hilfsfunktionen, Inifiles,
-  DateUtils, RatingCtrls;
+  DateUtils, RatingCtrls, Generics.Collections;
 
 var
     NempCharCodeOptions: TConvertOptions;
@@ -196,9 +196,16 @@ type
     M4APlayCounter: AnsiString = 'NEMP PLAYCOUNTER';
     M4AUserCoverID: AnsiString = 'NEMP COVER ID';
 
+    // some temporary Flags for AudioFiles
+    // only(?) used for the Playlist
+    FLAG_SEARCHRESULT = 2;
+
 
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
+
+    TAudioFile = class;
+    TAudioFileList = class(TObjectList<TAudioFile>);
 
 
     // Class TTag: Used for the TagCloud
@@ -218,7 +225,7 @@ type
           fTranslate: Boolean;
       public
           // Stores all AudioFiles with this Tag.
-          AudioFiles: TObjectList;
+          AudioFiles: TAudioFileList;
           // The number of AudioFiles tagged with this Tag.
           property count: Integer read GetCount;
           property Key: String read fKey;
@@ -229,6 +236,7 @@ type
           constructor Create(aKey: String; aTranslate: Boolean);
           destructor Destroy; override;
     end;
+
 
 
 
@@ -255,9 +263,6 @@ type
         fFileAge: TDateTime;
         // CoverID: a md5-hash-like string
         fCoverID: String;
-
-        //fTrackGainStr: String;
-        //fAlbumGainStr: String;
 
         fTrackGain: Single;
         fAlbumGain: Single;
@@ -300,6 +305,10 @@ type
         // This List is managed in class TTagCloud
         fTagList: TObjectList;
 
+        // Some Flags marking the File (for example: matches the current search key words whil searching in the Playlist)
+        // Use constants FLAG_***
+        fFlags: Cardinal;
+
         function fGetTagList: TObjectList;
 
         // ChannelMode/Samplerate is used most times for displaying as a String
@@ -333,6 +342,9 @@ type
         function fGetIsLocalFile: Boolean;
 
         function fGetRoundedRating: Double;
+
+        function fGetIsSearchResult: Boolean;
+        procedure fSetIsSearchResult(aValue: Boolean);
 
         procedure GetMp3Info(aMp3File: TMp3File; filename: UnicodeString; Flags: Integer = 0);
         procedure GetFlacInfo(aFlacFile: TFlacFile; Flags: Integer = 0);
@@ -382,7 +394,7 @@ type
         // CueList: AudioFiles in the Playlist can have a Cuesheet.
         // Each entry in this sheet is realized as a TAudiofile, which are
         // stored in this list.
-        CueList: TObjectlist;
+        CueList: TAudioFileList;
 
         // some fields used quite often in several ways.
         FileIsPresent: Boolean;
@@ -492,6 +504,8 @@ type
         property TrackPeak: Single read fTrackPeak write fTrackPeak;
         property AlbumPeak: Single read fAlbumPeak write fAlbumPeak;
 
+        property IsSearchResult: Boolean read fGetIsSearchresult write fSetIsSearchResult;
+
         constructor Create;
         destructor Destroy; override;
 
@@ -599,7 +613,7 @@ type
         //function RenameTag(oldTag, newTag: String): Boolean;
 
         // creates a copy of the Audiofile and adds the copy to the list
-        procedure AddCopyToList(aList: TObjectList);
+        procedure AddCopyToList(aList: TAudioFileList);
 
 
     end;
@@ -610,17 +624,11 @@ type
     TPlaylistFile = TAudioFile;
 
     // Types used in the VirtualStringTrees
-    TTreeData = record
-      FAudioFile : TAudioFile;
-    end;
-    PTreeData = ^TTreeData;
+    //TTreeData = record
+    //  FAudioFile : TAudioFile;
+    //end;
+    //PTreeData = ^TTreeData;
 
-    // Note to self: This is maybe obsolete, when the bottom part of the
-    // mainwindow is changed
-    PCoverTreeData = ^TCoverTreeData;
-    TCoverTreeData = record
-        Image: TBitmap;
-    end;
 
     TErrorLog = class
         public
@@ -920,7 +928,7 @@ end;
 constructor TTag.Create(aKey: String; aTranslate: Boolean);
 begin
     inherited create;
-    AudioFiles := TObjectList.Create(False);
+    AudioFiles := TAudioFileList.Create(False);
     if aTranslate then
         fKey := aKey // for the default "your library"
     else
@@ -1028,7 +1036,7 @@ begin
   inherited destroy;
 end;
 
-procedure TAudioFile.AddCopyToList(aList: TObjectList);
+procedure TAudioFile.AddCopyToList(aList: TAudioFileList);
 var newFile: TAudioFile;
 begin
     newFile := TAudioFile.Create;
@@ -1271,7 +1279,7 @@ begin
         end;
 
         at_cue: begin
-            result := 'Cue-Sheet ' + #13#10 //+ Data^.FAudioFile.Dateiname + #13#10
+            result := 'Cue-Sheet ' + #13#10
                   + Format(' %s: %s'        , [(AudioFileProperty_Artist)    ,GetReplacedArtist(naArtist)]) + #13#10
                   + Format(' %s: %s'        , [(AudioFileProperty_Title)     ,GetReplacedTitle(naTitle)])+ #13#10
                   + Format(' %s: %s'        , [(AudioFileProperty_Directory) ,Ordner]) + #13#10
@@ -3000,6 +3008,19 @@ begin
     end;
 end;
 
+function TAudioFile.fGetIsSearchResult: Boolean;
+begin
+    result := (fFlags AND FLAG_SEARCHRESULT) = FLAG_SEARCHRESULT;
+end;
+procedure TAudioFile.fSetIsSearchResult(aValue: Boolean);
+begin
+    if aValue then
+        fFlags := fFlags OR FLAG_SEARCHRESULT
+    else
+        fFlags := fFlags AND (NOT FLAG_SEARCHRESULT);
+end;
+
+
 
 {
     --------------------------------------------------------
@@ -3091,7 +3112,7 @@ begin
 
   // Create CueList or Clear existing
   if not assigned(Cuelist) then
-    CueList := TObjectlist.Create(True)
+    CueList := TAudioFileList.Create(True)
   else
     CueList.Clear;
 

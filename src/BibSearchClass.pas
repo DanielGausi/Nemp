@@ -118,7 +118,7 @@ type
 
         // Current list. This is a pointer to another list (one of the SearchResults[1..10])
         // Used for "Better search"
-        CurrentList: TObjectList;
+        CurrentList: TAudioFileList;
 
         // Dummy-Audiofiles
         fDummyAudioFile: TAudioFile;
@@ -165,8 +165,8 @@ type
         function GetAccelerateLyricSearch: LongBool;
         procedure SetAccelerateLyricSearch(Value: LongBool);
 
-        procedure CalculateTotalStringLengths(FileList: TObjectList);
-        procedure CalculateLyricStringLengths(FileList: TObjectList);
+        procedure CalculateTotalStringLengths(FileList: TAudioFileList);
+        procedure CalculateLyricStringLengths(FileList: TAudioFileList);
 
          //Some sub-methods for searching
         //procedure DeleteNotMatchingFiles(KeyWords: TSearchKeyWords; UTF8SearchKeyWords: TUTF8SearchKeyWords);
@@ -190,23 +190,23 @@ type
 
       public
         // Main list. This is just a pointer to TMedienBibliothek.Mp3ListePfadSort
-        MainList: TObjectList;
+        MainList: TAudioFileList;
 
         // Contains the results of a quicksearch
-        QuickSearchResults: TObjectList;
+        QuickSearchResults: TAudioFileList;
         //QuickSearchAdditionalResults: TObjectList;
         // History of recent quicksearch queries
         QuickSearchHistory: TStringList;
 
         // The IPC-Search results for the Deskband. VCL only!!
-        IPCSearchResults: TObjectList;
+        IPCSearchResults: TAudioFileList;
 
         QuickSearchOptions: TQuickSearchOptions;
         SearchOptions: TSearchOptions;
 
         // SearchResultLists contain the last 10 Searchresults,
         // SearchKeyWords the corresponding keywords ans
-        SearchResultLists: Array[1..10] of TObjectlist;
+        SearchResultLists: Array[1..10] of TAudioFileList;
         SearchKeyWords: Array[1..10] of TSearchKeyWords;
 
         // some thread-safe properties
@@ -228,7 +228,7 @@ type
         // Deletes an AudioFile from the ObjectLists
         procedure RemoveAudioFileFromLists(aAudioFile: TAudioFile);
         // Deletes Files contained in aList from the SearchLists
-        procedure RemoveAudioFilesFromLists(aList: TObjectList);
+        procedure RemoveAudioFilesFromLists(aList: TAudioFileList);
 
         // Read/write some settings from IniFile
         procedure LoadFromIni(Ini: TMemIniFile);
@@ -246,11 +246,11 @@ type
 
         // generate the TotalStrings directly
         // Note: These run in the VCL-mainthread
-        procedure BuildTotalString(FileList: TObjectList);
-        procedure BuildTotalLyricString(FileList: TObjectList);
+        procedure BuildTotalString(FileList: TAudioFileList);
+        procedure BuildTotalLyricString(FileList: TAudioFileList);
         procedure ClearTotalLyricString;
 
-        procedure BuildTotalSearchStrings(FileList: TObjectList);
+        procedure BuildTotalSearchStrings(FileList: TAudioFileList);
 
         procedure InitNewSearch(Keywords: TSearchKeyWords);
         /// procedure InitBetterSearch(Keywords: TSearchKeyWords);
@@ -266,7 +266,7 @@ type
         procedure IPCQuickSearch(Keyword: UnicodeString);
 
         procedure EmptySearch(Mode: Integer);
-        procedure SearchMarker(aIndex: Byte; SearchList: TObjectList);
+        procedure SearchMarker(aIndex: Byte; SearchList: TAudioFileList);
 
     end;
 
@@ -362,11 +362,11 @@ var i: Integer;
 begin
     inherited Create;
     MainWindowHandle := aWnd;
-    QuickSearchResults := TObjectList.Create(False);
-    IPCSearchResults := TObjectList.Create(False);
+    QuickSearchResults := TAudioFileList.Create(False);
+    IPCSearchResults := TAudioFileList.Create(False);
     QuickSearchHistory := TStringList.Create;
     for i := 1 to 10 do
-        SearchResultLists[i] := TObjectlist.Create(False);
+        SearchResultLists[i] := TAudioFileList.Create(False);
 
     fDummyAudioFile := TAudioFile.Create;
 end;
@@ -404,11 +404,11 @@ begin
         SearchResultLists[i].Extract(aAudioFile);
 end;
 
-procedure TBibSearcher.RemoveAudioFilesFromLists(aList: TObjectList);
+procedure TBibSearcher.RemoveAudioFilesFromLists(aList: TAudioFileList);
 var i: Integer;
 begin
     for i := 0 to aList.Count - 1 do
-        RemoveAudioFileFromLists(TAudioFile(aList[i]));
+        RemoveAudioFileFromLists(aList[i]);
 end;
 
 {
@@ -494,7 +494,7 @@ end;
     --------------------------------------------------------
 }
 
-procedure TBibSearcher.CalculateTotalStringLengths(FileList: TObjectList);
+procedure TBibSearcher.CalculateTotalStringLengths(FileList: TAudioFileList);
 var aAudioFile: TAudioFile;
     aLengthAdditional, aLengthMinimal: Integer;
     i: Integer;
@@ -506,7 +506,7 @@ begin
     begin
         for i := 0 to Filelist.Count - 1 do
         begin
-            aAudioFile := TAudioFile(FileList[i]);
+            aAudioFile := FileList[i];
             aLengthMinimal := 4 + Length(Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) {+ #1}
                                      + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) {+ #1}
                                      + Utf8Encode(AnsiLowerCase(aAudioFile.Album)) {+ #13#10});
@@ -525,7 +525,7 @@ begin
     end;
 end;
 
-procedure TBibSearcher.CalculateLyricStringLengths(FileList: TObjectList);
+procedure TBibSearcher.CalculateLyricStringLengths(FileList: TAudioFileList);
 var aAudioFile: TAudioFile;
     i: Integer;
 begin
@@ -534,14 +534,14 @@ begin
     begin
         for i := 0 to Filelist.Count - 1 do
         begin
-            aAudioFile := TAudioFile(FileList[i]);
+            aAudioFile := FileList[i];
             fLyricStringLength := fLyricStringLength
                          + 2 + Length( Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics)))) {+ #13#10};
         end;
     end;
 end;
 
-procedure TBibSearcher.BuildTotalString(FileList: TObjectList);
+procedure TBibSearcher.BuildTotalString(FileList: TAudioFileList);
 var aAudioFile: TAudioFile;
     i, currentPos, maxLength: Integer;
     currentAudioString: UTF8String;
@@ -596,7 +596,7 @@ begin
             begin
                 TotalStringIndizes[i] := currentPos - 1; //before: Length(TotalString);
 
-                aAudioFile := TAudioFile(FileList[i]);
+                aAudioFile := FileList[i];
                 currentAudioString :=
                                Utf8Encode(AnsiLowerCase(aAudioFile.Artist)) + #1
                              + Utf8Encode(AnsiLowerCase(aAudioFile.Titel)) + #1
@@ -633,7 +633,7 @@ begin
 
 
 end;
-procedure TBibSearcher.BuildTotalLyricString(FileList: TObjectList);
+procedure TBibSearcher.BuildTotalLyricString(FileList: TAudioFileList);
 var aAudioFile: TAudioFile;
     i, currentPos, maxLength: Integer;
     currentAudioString: UTF8String;
@@ -665,7 +665,7 @@ begin
             for i := 0 to FileList.Count-1 do
             begin
                 TotalLyricStringIndizes[i] := currentPos - 1;
-                aAudioFile := TAudioFile(FileList[i]);
+                aAudioFile := FileList[i];
                 currentAudioString := Utf8Encode(AnsiLowerCase(UTF8ToString(aAudioFile.Lyrics))) + #13#10;
 
                 if currentPos + length(currentAudioString) <= maxLength then
@@ -702,7 +702,7 @@ end;
     runs in VCL-Mainthread
     --------------------------------------------------------
 }
-procedure TBibSearcher.BuildTotalSearchStrings(FileList: TObjectList);
+procedure TBibSearcher.BuildTotalSearchStrings(FileList: TAudioFileList);
 begin
     BuildTotalString(FileList);
     BuildTotalLyricString(FileList);
@@ -997,7 +997,7 @@ var i, lmax: integer;
     // tmpList stores the Not exact matching files, for a sorted result
     // (exact matchings first)
     tmpList //// , tmpList2
-    : TObjectlist;
+    : TAudioFileList;
 begin
 
   // Escape "\*", as we use "*" for a search for all files now (11.2018)
@@ -1025,7 +1025,7 @@ begin
   begin
       if AllowErr then
       begin
-            tmpList  := TObjectlist.Create(False);
+            tmpList  := TAudioFileList.Create(False);
             if AccelerateSearch then
             begin
                 k := 0;
@@ -1045,11 +1045,11 @@ begin
                         if NewIdx > 0 then dec(NewIdx);
 
                     // Check whether audiofile really matches the keywords
-                    if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                        QuickSearchResults.Add(TAudioFile(MainList[NewIdx]))
+                    if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
+                        QuickSearchResults.Add(MainList[NewIdx])
                     else
-                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
-                            tmpList.Add(TAudioFile(MainList[NewIdx]));
+                        if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
+                            tmpList.Add(MainList[NewIdx]);
 
                     // continue with next audiofile
                     if NewIdx < length(TotalStringIndizes) - 1 then
@@ -1064,11 +1064,11 @@ begin
                 for i := 0 to MainList.Count - 1 do
                 begin
                     // Add File to first List
-                    if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
-                        QuickSearchResults.Add(TAudioFile(MainList[i]))
+                    if AudioFileMatchesKeywords(MainList[i], Keywords) then
+                        QuickSearchResults.Add(MainList[i])
                     else
-                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
-                            tmpList.Add(TAudioFile(MainList[i]));
+                        if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
+                            tmpList.Add(MainList[i]);
                 end;
             end;
             // Exact matchings first, matchings with errors afterwards.
@@ -1094,8 +1094,8 @@ begin
                     if TotalStringIndizes[NewIdx] > k then
                         if NewIdx > 0 then dec(NewIdx);
 
-                    if OnlyOneWord or (AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords)) then
-                        QuickSearchResults.Add(TAudioFile(MainList[NewIdx]));
+                    if OnlyOneWord or (AudioFileMatchesKeywords(MainList[NewIdx], Keywords)) then
+                        QuickSearchResults.Add(MainList[NewIdx]);
 
                     if NewIdx < length(TotalStringIndizes) - 1 then
                         k := TotalStringIndizes[NewIdx + 1]
@@ -1105,8 +1105,8 @@ begin
             end else
             begin
                 for i := 0 to MainList.Count - 1 do
-                    if (AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords)) then
-                        QuickSearchResults.Add(TAudioFile(MainList[i]));
+                    if (AudioFileMatchesKeywords(MainList[i], Keywords)) then
+                        QuickSearchResults.Add(MainList[i]);
             end;
       end;
   end;
@@ -1127,7 +1127,7 @@ begin
     try
         for i := 0 to MainList.Count - 1 do
         begin
-            aAudioFile := TAudioFile(MainList[i]);
+            aAudioFile := MainList[i];
             if AnsiContainsText(String(aAudioFile.RawTagLastFM)      , KeyTag) then
             begin
                 // audiofile is possibly tagged with the KeyTag
@@ -1185,7 +1185,7 @@ var i, lmax: integer;
     NewIdx: Integer;
     // tmpList stores the Not exact matching files, for a sorted result
     // (exact matchings first)
-    tmpList: TObjectlist;
+    tmpList: TAudioFileList;
 begin
   fIPCSearchIsRunning := True;
 
@@ -1209,7 +1209,7 @@ begin
 
   if lmax > 0 then
   begin
-            tmpList  := TObjectlist.Create(False);
+            tmpList  := TAudioFileList.Create(False);
             if AccelerateSearch then
             begin
                 k := 0;
@@ -1229,11 +1229,11 @@ begin
                         if NewIdx > 0 then dec(NewIdx);
 
                     // Check whether audiofile really matches the keywords
-                    if AudioFileMatchesKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                        IPCSearchResults.Add(TAudioFile(MainList[NewIdx]))
+                    if AudioFileMatchesKeywords(MainList[NewIdx], Keywords) then
+                        IPCSearchResults.Add(MainList[NewIdx])
                     else
-                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[NewIdx]), KeywordsUTF8) then
-                            tmpList.Add(TAudioFile(MainList[NewIdx]));
+                        if AudioFileMatchesKeywordsApprox(MainList[NewIdx], KeywordsUTF8) then
+                            tmpList.Add(MainList[NewIdx]);
 
                     // continue with next audiofile
                     if NewIdx < length(TotalStringIndizes) - 1 then
@@ -1247,11 +1247,11 @@ begin
                 // Check every single object
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if AudioFileMatchesKeywords(TAudioFile(MainList[i]), Keywords) then
-                        IPCSearchResults.Add(TAudioFile(MainList[i]))
+                    if AudioFileMatchesKeywords(MainList[i], Keywords) then
+                        IPCSearchResults.Add(MainList[i])
                     else
-                        if AudioFileMatchesKeywordsApprox(TAudioFile(MainList[i]), KeywordsUTF8) then
-                            tmpList.Add(TAudioFile(MainList[i]));
+                        if AudioFileMatchesKeywordsApprox(MainList[i], KeywordsUTF8) then
+                            tmpList.Add(MainList[i]);
                 end;
             end;
             // Exact matchings first, matchings with errors afterwards.
@@ -1287,7 +1287,7 @@ var
     k, i, lmax: Integer;
     NewIdx, searchL, searchR: Integer;
     A: TBC_IntArray;
-    tmpList: TObjectlist;
+    tmpList: TAudioFileList;
 begin
     lMax := length(UTF8LongestKeyword);
 
@@ -1304,7 +1304,7 @@ begin
     searchL := 0;
     searchR := length(LocalStringIndizes) - 1;
 
-    tmpList := TObjectlist.Create(False);
+    tmpList := TAudioFileList.Create(False);
     try
         if SearchMode = smSlow then
         begin
@@ -1312,11 +1312,11 @@ begin
             // Check every single Audiofile
             for i := 0 to MainList.Count - 1 do
                 begin
-                    if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[i]), Keywords) then
-                        CurrentList.Add(TAudioFile(MainList[i]))
+                    if AudioFileMatchesCompleteKeywords(MainList[i], Keywords) then
+                        CurrentList.Add(MainList[i])
                     else
-                        if AudioFileMatchesCompleteKeywordsApprox(TAudioFile(MainList[i]), UTF8SearchKeywords) then
-                            tmpList.Add(TAudioFile(MainList[i]));
+                        if AudioFileMatchesCompleteKeywordsApprox(MainList[i], UTF8SearchKeywords) then
+                            tmpList.Add(MainList[i]);
                 end;
         end else
         begin
@@ -1332,11 +1332,11 @@ begin
                 if LocalStringIndizes[NewIdx] > k then
                     if NewIdx > 0 then dec(NewIdx);
 
-                if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                    CurrentList.Add(TAudioFile(MainList[NewIdx]))
+                if AudioFileMatchesCompleteKeywords(MainList[NewIdx], Keywords) then
+                    CurrentList.Add(MainList[NewIdx])
                 else
-                    if AudioFileMatchesCompleteKeywordsApprox(TAudioFile(MainList[NewIdx]), UTF8SearchKeywords) then
-                        tmpList.Add(TAudioFile(MainList[NewIdx]));
+                    if AudioFileMatchesCompleteKeywordsApprox(MainList[NewIdx], UTF8SearchKeywords) then
+                        tmpList.Add(MainList[NewIdx]);
 
                 if NewIdx < length(LocalStringIndizes) - 1 then
                     k := LocalStringIndizes[NewIdx + 1]
@@ -1386,8 +1386,8 @@ begin
     begin
         for i := 0 to MainList.Count - 1 do
         begin
-            if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[i]), Keywords) then
-                CurrentList.Add(TAudioFile(MainList[i]));
+            if AudioFileMatchesCompleteKeywords(MainList[i], Keywords) then
+                CurrentList.Add(MainList[i]);
         end;
     end else
     begin
@@ -1402,8 +1402,8 @@ begin
             if LocalStringIndizes[NewIdx] > k then
                 if NewIdx > 0 then dec(NewIdx);
 
-            if AudioFileMatchesCompleteKeywords(TAudioFile(MainList[NewIdx]), Keywords) then
-                CurrentList.Add(TAudioFile(MainList[NewIdx]));
+            if AudioFileMatchesCompleteKeywords(MainList[NewIdx], Keywords) then
+                CurrentList.Add(MainList[NewIdx]);
 
             if NewIdx < length(LocalStringIndizes) - 1 then
                 k := LocalStringIndizes[NewIdx + 1]
@@ -1492,8 +1492,8 @@ begin
     QuickSearchResults.Clear;
 
     for i := 0 to MainList.Count - 1 do
-        if AudioFileMatchesCompleteKeywordsNOSubStrings(TAudioFile(MainList[i]), Keywords) then
-            QuickSearchResults.Add(TAudioFile(MainList[i]));
+        if AudioFileMatchesCompleteKeywordsNOSubStrings(MainList[i], Keywords) then
+            QuickSearchResults.Add(MainList[i]);
 
     // show search results
     fDummyAudioFile.Titel := MainForm_NoSearchresults;
@@ -1516,30 +1516,30 @@ begin
             1: begin // Title
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if TAudioFile(MainList[i]).Titel = '' then
+                    if MainList[i].Titel = '' then
                         tmpList.Add(MainList[i]);
                 end;
             end;
             2: begin // Artist
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if TAudioFile(MainList[i]).Artist = '' then
+                    if MainList[i].Artist = '' then
                         tmpList.Add(MainList[i]);
                 end;
             end;
             3: begin // Album
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if TAudioFile(MainList[i]).Album = '' then
+                    if MainList[i].Album = '' then
                         tmpList.Add(MainList[i]);
                 end;
             end;
             42: begin
                 for i := 0 to MainList.Count - 1 do
                 begin
-                    if (TAudioFile(MainList[i]).Album = '')
-                      or (TAudioFile(MainList[i]).Artist = '')
-                      or (TAudioFile(MainList[i]).Titel = '')
+                    if (MainList[i].Album = '')
+                      or (MainList[i].Artist = '')
+                      or (MainList[i].Titel = '')
                     then
                         tmpList.Add(MainList[i]);
                 end;
@@ -1555,11 +1555,11 @@ end;
 
 
 
-procedure TBibSearcher.SearchMarker(aIndex: Byte; SearchList: TObjectList);
-var tmpList: TObjectList;
+procedure TBibSearcher.SearchMarker(aIndex: Byte; SearchList: TAudioFileList);
+var tmpList: TAudioFileList;
     i: Integer;
 begin
-    tmpList := TObjectList.Create(False);
+    tmpList := TAudioFileList.Create(False);
     try
         case aIndex  of
             0: begin
@@ -1572,7 +1572,7 @@ begin
                 // list all marked files
                 for i := 0 to SearchList.Count - 1 do
                 begin
-                    if TAudioFile(SearchList[i]).Favorite <> 0 then
+                    if SearchList[i].Favorite <> 0 then
                         tmpList.Add(SearchList[i]);
                 end;
             end;
@@ -1581,7 +1581,7 @@ begin
                 // list only files with marker = aIndex
                 for i := 0 to SearchList.Count - 1 do
                 begin
-                    if TAudioFile(SearchList[i]).Favorite = aIndex then
+                    if SearchList[i].Favorite = aIndex then
                         tmpList.Add(SearchList[i]);
                 end;
             end;

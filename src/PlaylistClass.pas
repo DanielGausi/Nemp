@@ -39,13 +39,18 @@ uses Windows, Forms, Contnrs, SysUtils,  VirtualTrees, IniFiles, Classes,
 
     NempAudioFiles, AudioFileHelper, PlayerClass, Playlistmanagement,
     gnuGettext, Nemp_RessourceStrings, System.UITypes, System.Types,
+    System.Generics.Defaults,
 
     MainFormHelper, CoverHelper, DriveRepairTools;
 
 type
   DWORD = cardinal;
 
-  TAudioFileEvent = procedure(Sender: TAudioFile) of object;
+  TNempPlaylist = class;
+
+  TPlaylistNotifyEvent = procedure(Sender: TNempPlaylist) of object;
+  TPlaylistAudioFileEvent = procedure(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer) of object;
+  TPlaylistAudioFileMoveEvent = procedure(Sender: TNempPlaylist; aFile: TAudioFile; oldIndex, newIndex: Integer) of object;
 
   TPreBookInsertMode = (pb_Beginning, pb_End);
 
@@ -55,10 +60,10 @@ type
     private
       fDauer: Int64;                      // Duration of the Playlist in seconds
       fPlayingFile: TPlaylistFile;        // the current Audiofile
+      fPlayingCue: TPlaylistFile;
       fBackupFile : TPlaylistFile;        // if we delete the playingfile from the playlist, we store a copy of it here
-      fPlayingIndex: Integer;             // ... its index in the list
-      fPlayingNode: PVirtualNode;         // ... and its node in the Treeview
-      fActiveCueNode: PVirtualNode;       // ... the active cuenode
+
+      fStartIndex: Integer;               // The Index of the PlayingFile. (v4.14: Used only for Saving/Loading)
 
       fPlayingFileUserInput: Boolean;     // True, after the user slides/paused/... the current audiofile.
                                           // Then the file should (depending on settings) not be deleted after playback
@@ -69,14 +74,11 @@ type
       fShowHintsInPlaylist: Boolean;
       fPlayCounter: Integer;              // used for a "better random" selection
 
-      fVST: TVirtualStringTree;           // the Playlist-VirtualStringTree
-      fInsertNode: PVirtualNode;          // InsertNode/-Index: used for insertion of Files
-      fInsertIndex: Integer;              //    (e.g. on DropFiles)
+      fInsertIndex: Integer;              // The Index where files are inserted during adding files (e.g. Drag&Drop)
 
       fErrorCount: Integer;               // Stop "nextfile" after one cycle if all files in the playlist could not be found
       fFirstAction: Boolean;              // used for inserting files (ProcessBufferStringlist). On Nemp-Start the playback should bes started.
                                           // see "AutoPlayNewTitle"
-
 
       fInterruptedPlayPosition: Double;   // the Position in the track that was played just before the
                                           // user played a title directly from the library
@@ -90,7 +92,7 @@ type
 
       // PrebookList: Stores the prebooked AudioFiles,
       // i.e. the files that are marked as "play next"
-      PrebookList: TObjectList;
+      PrebookList: TAudioFileList;
 
       /// History: When playing a new File, the file played before this file is added to the historylist
       /// and fCurrentHistoryFile points to this last played file.
@@ -100,9 +102,7 @@ type
       /// After this, GetNext/GetPreviousIndex will get the new index through the history (if needed)
       ///  or get a "New" index
       fCurrentHistoryFile: TAudioFile;
-      HistoryList: TObjectList;
-
-      fLastHighlightedSearchResultNode: PVirtualNode;
+      HistoryList: TAudioFileList;
 
       // for  weighted random
       fUseWeightedRNG: Boolean;
@@ -121,26 +121,35 @@ type
 
       // (new 4.11) ok, we'll get a mixture of SendMessages and Events by that, but
       // it's working, wo why not. maybe change the code to events anyway later ...
-      fOnCueChanged: TNotifyEvent;
-      fOnDeleteAudiofile: TAudioFileEvent;
+      // More events in 4.14, and existing events get more functionality
+      fOnCueChanged: TPlaylistNotifyEvent;
+      fOnUserChangedTitle: TPlaylistNotifyEvent;
+      fOnBeforeDeleteAudiofile: TPlaylistAudioFileEvent;
+      fOnAddAudioFile: TPlaylistAudioFileEvent;
+      // fOnFilePropertiesChanged: Some Properties of the AudioFiles in the Playlist have changed
+      fOnFilePropertiesChanged: TPlaylistNotifyEvent;
+      fOnPropertiesChanged: TPlaylistNotifyEvent;
+      fOnSearchResultsChanged: TPlaylistNotifyEvent;
+      fOnCueListFound: TPlaylistAudioFileEvent;
+      // todO: onMoveItems: TMoveEvent  (...Sender + two Index-Paramaters?)
+      fOnFileMoved: TPlaylistAudioFileMoveEvent;
+      fOnPlaylistChangedCompletely: TPlaylistNotifyEvent;
+      fOnPlaylistCleared: TPlaylistNotifyEvent;
+
 
       fDriveManager: TDriveManager;
 
       function fGetPreBookCount: Integer;
 
-      procedure SetInsertNode(Value: PVirtualNode);
+      procedure SetInsertIndex(Value: Integer);
       function GetAnAudioFile: TPlaylistFile;
       function GetNextAudioFileIndex: Integer;
       function GetPrevAudioFileIndex: Integer;
 
-      function GetNodeWithPlayingFile: PVirtualNode;
-      Procedure ScrollToPlayingNode;
-
-      procedure AddCueListNodes(aAudioFile: TAudioFile; aNode: PVirtualNode);
-      function GetActiveCueNode(aIndex: Integer): PVirtualNode;
       function GetCount: Integer;
 
       function GetPlayingIndex: Integer;
+      function GetPlayingFileName: String;
       function fGetPlayingTrackPos: Double;
 
       // Kapselungen der entsprechenden Player-Routinen
@@ -163,7 +172,7 @@ type
 
 
     public
-      Playlist: TObjectlist;              // the list with the audiofiles
+      Playlist: TAudioFileList;              // the list with the audiofiles
       Player: TNempPlayer;                // the player-object
 
       PlaylistManager: TPlaylistManager;
@@ -188,11 +197,8 @@ type
       AutoStopHeadsetSwitchTab: Boolean;
       AutoStopHeadsetAddToPlayist: Boolean;
 
-
-
       TNA_PlaylistCount: Integer; // number of files displayed in the TNA-menu
 
-      YMouseDown: Integer;      // Needed for dragging inside the playlist
       AcceptInput: Boolean;     // Block inputs after a successful beginning of playback for a short time.
                                 // Multimediakeys seems to do some weird things otherwise
 
@@ -219,13 +225,15 @@ type
       property Progress: Double read GetProgress write SetProgress;
 
       property PlayingFile: TPlaylistFile read fPlayingFile;
-      property PlayingIndex: Integer read GetPlayingIndex write fplayingIndex;
+      property PlayingFileName: string read GetPlayingFileName;
+      property PlayingIndex: Integer read GetPlayingIndex;
+
+      property PlayingCue: TPlaylistFile read fPlayingCue;
       // PlayingTrackPos: The Position in the current file.
       //      Note: That's not always Player.Time, as the Player may be playing something different (not part of the playlist)
       //      Used for the PlaylistManager
       property PlayingTrackPos: Double read fGetPlayingTrackPos;
-      property PlayingNode: PVirtualNode read fPlayingNode;
-      property ActiveCueNode: PVirtualNode read fActiveCueNode;
+
       property PlayingFileUserInput: Boolean read fPlayingFileUserInput write fPlayingFileUserInput;
       property WiedergabeMode: Integer read fWiedergabeMode write fWiedergabeMode;
       property AutoMix: Boolean read fAutoMix write fAutoMix;
@@ -236,16 +244,24 @@ type
       property ShowHintsInPlaylist: Boolean read fShowHintsInPlaylist write fShowHintsInPlaylist;
 
       property PlayCounter: Integer read fPlayCounter;
-      property VST: TVirtualStringTree read fVST write fVST;
-      property OnCueChanged: TNotifyEvent read fOnCueChanged write fOnCueChanged;
-      property OnDeleteAudiofile: TAudioFileEvent read fOnDeleteAudiofile write fOnDeleteAudiofile;
 
-      property InsertNode: PVirtualNode read fInsertNode write SetInsertNode;
-      property InsertIndex: Integer read fInsertIndex;
+      property OnCueChanged: TPlaylistNotifyEvent read fOnCueChanged write fOnCueChanged;
+      property OnUserChangedTitle: TPlaylistNotifyEvent read fOnUserChangedTitle write fOnUserChangedTitle;
+      property OnBeforeDeleteAudiofile: TPlaylistAudioFileEvent read fOnBeforeDeleteAudiofile write fOnBeforeDeleteAudiofile;
+      property OnAddAudioFile: TPlaylistAudioFileEvent read fOnAddAudioFile write fOnAddAudioFile;
+
+      property OnFilePropertiesChanged: TPlaylistNotifyEvent read fOnFilePropertiesChanged write fOnFilePropertiesChanged;
+      property OnPropertiesChanged: TPlaylistNotifyEvent read fOnPropertiesChanged write fOnPropertiesChanged;
+      property OnSearchResultsChanged: TPlaylistNotifyEvent read fOnSearchResultsChanged write fOnSearchResultsChanged;
+      property OnCueListFound: TPlaylistAudioFileEvent read fOnCueListFound write fOnCueListFound;
+      property OnFileMoved: TPlaylistAudioFileMoveEvent read fOnFileMoved write fOnFileMoved;
+      property OnPlaylistChangedCompletely: TPlaylistNotifyEvent read fOnPlaylistChangedCompletely write fOnPlaylistChangedCompletely;
+      property OnPlaylistCleared: TPlaylistNotifyEvent read fOnPlaylistCleared write fOnPlaylistCleared;
+
+      property InsertIndex: Integer read fInsertIndex write SetInsertIndex;
       property PrebookCount: Integer read fGetPreBookCount;
       property FileSearchCounter: Integer read fFileSearchCounter write fFileSearchCounter;
 
-      property LastHighlightedSearchResultNode: PVirtualNode read fLastHighlightedSearchResultNode;
       property UseWeightedRNG: Boolean read fUseWeightedRNG write SetUseWeightedRNG;
       property PlaylistHasChanged: Boolean read fPlaylistHasChanged write fPlaylistHasChanged;
 
@@ -255,6 +271,8 @@ type
       procedure LoadFromIni(Ini: TMemIniFile);
       procedure WriteToIni(Ini: TMemIniFile);
 
+      procedure OverwritePlayingIndexWithMaxCount;
+      procedure InitPlayingFile(StartAtOldPosition: Boolean = False);
       // the most important methods: Play, Playnext, ...
       procedure Play(aIndex: Integer; aInterval: Integer; Startplay: Boolean; Startpos: Double = 0);
       procedure PlayBibFile(aFile: TAudioFile; aInterval: Integer);
@@ -265,58 +283,48 @@ type
       procedure PlayNext(aUserinput: Boolean = False);
       procedure PlayPrevious(aUserinput: Boolean = False);
       procedure PlayPreviousFile(aUserinput: Boolean = False);
-      procedure PlayFocussed(aSelection: PVirtualNode = Nil);
+      procedure PlayFocussed(MainIndex, CueIndex: Integer);
       procedure PlayAgain(ForcePlay: Boolean = False);
       procedure Pause;
       procedure Stop;
 
-      procedure DeleteMarkedFiles;  // Delete selected files
       procedure ClearPlaylist(StopPlayer: Boolean = True);      // Delete whole playlist
       procedure DeleteDeadFiles;    // Delete dead (non existing) files
       procedure RemovePlayingFile;  // Remove the current file from the list
       procedure RemoveFileFromHistory(aFile: TAudioFile);
-      procedure RepairPlaylist(NewDriveMask: DWord); // repair the playlist when a new drive is connected
-                                                     // NewDriveMask is a Bitmask as in DEV_BROADCAST_VOLUME
 
-      //// Some GUI-Stuff
-      // Get the InsertNode from current playing position
-      // Note: The PlayingNode can be NIL, so this is a little bit more complicated. ;-)
-      procedure GetInsertNodeFromPlayPosition;
-      procedure FillPlaylistView;   // Fill the playist-Tree
+      function InitInsertIndexFromPlayPosition(ConsiderPrebookList: Boolean): Integer;
+      procedure ResetInsertIndex;
+
+
+
       // Set CueNode and invalidate TreeView
-      procedure ActualizeCue;
-      // Get Audiodata from the current selected Node and repaint it
-      // used e.g. in OnChange of the TreeView
-      procedure ActualizeNode(aNode: pVirtualNode; ReloadDataFromFile: Boolean);
-      procedure UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
-      function ShowPlayListSummary: Int64;
+      procedure RefreshCue;
 
-      //// Sorting the playlist
+      procedure RefreshAudioFile(aIndex: Integer; ReloadDataFromFile: Boolean);
+
+      function CalculateDuration: Int64;
+
       procedure ReInitPlaylist;     // correct the NodeIndex and stuff after a sorting of the playlist
-      procedure Sort(Compare: TListSortCompare);
+      procedure Sort(Compare: IComparer<TAudioFile>);
       Procedure ReverseSortOrder;
       Procedure Mix;
+      procedure GetSortOrderFromList(aList: TAudioFileList);
 
       // adding files into the playlist
       // return value: the new node in the treeeview. Used for scrolling to this node
-      function AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode; overload;
+      procedure AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''); overload;
       function AddFileToPlaylistWebServer(aAudiofile: TAudioFile; aCueName: UnicodeString = ''): TAudioFile;
-      function InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode; overload;
-      function AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode; overload;
-      function InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode; overload;
+      function InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''): TAudioFile; overload;
+      procedure AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = ''); overload;
+      procedure InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''); overload;
       procedure ProcessBufferStringlist;
 
-      // adding a node to the PrebookList.
-      // (not an Audiofile, so we can use this method directly from the Playlist-VST
-      //  and after adding a file from the library to the playlist)
-      procedure AddNodeToPrebookList(aNode: PVirtualnode);
+      procedure DeleteAudioFileFromPlaylist(aIndex: Integer);
+
       procedure ReIndexPrebookedFiles;
       procedure SetNewPrebookIndex(aFile: TAudioFile; NewIndex: Integer);
-      procedure ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
-      // Adding/removing selected Nodes form the PrebookList
-      // not used any more. Too confusing
-      // procedure AddSelectedNodesToPreBookList(Mode: TPreBookInsertMode);
-      // procedure RemoveSelectedNodesFromPreBookList;
+      procedure ProcessKeypress(aDigit: Byte; af: TAudioFile);
 
       function SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
       // load/save playlist
@@ -337,23 +345,21 @@ type
       // changed in the whole playlist. (It could be multiply times in the playlist!)
       procedure UnifyRating(aFilename: String; aRating: Byte; aCounter: Integer);
 
-      procedure CollectFilesWithSameFilename(aFilename: String; Target: TObjectList);
+      procedure CollectFilesWithSameFilename(aFilename: String; Target: TAudioFileList);
 
       // Search the Playlist for an ID. Used by Nemp Webserver
       // The links in the html-code will contain these IDs, so they will be valid
       // until the "real" Nemp-User deletes a file from the playlist.
-      function GetPlaylistIndex(aID: Int64): Integer;
+      function GetPlaylistIndexByWebServerID(aID: Int64): Integer;
       function SwapFiles(a, b: Integer): Boolean;   // a and b must be siblings!!
-      procedure DeleteAFile(aIdx: Integer); // delete a file (for WebServer)
+      procedure ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
 
-      procedure ResortVotedFile(aFile: TAudioFile; aIndex: Cardinal);
-
+      // Searching in the playlist (changed in 4.14, much simpler code now)
       procedure ClearSearch(complete: Boolean = False);
-      procedure SearchAll(aString: String); 
       procedure Search(aString: String; SearchNext: Boolean = False);
 
+      // new in 4.14: just as in the media library
       procedure ReSynchronizeDrives;
-
   end;
 
 implementation
@@ -376,40 +382,21 @@ end;
 constructor TNempPlaylist.Create;
 begin
   inherited create;
-  Playlist := TObjectList.Create;
+  Playlist := TAudioFileList.Create;
   fDriveManager := TDriveManager.Create;
   PlaylistManager := TPlaylistManager.Create(fDriveManager);
   ST_Ordnerlist := TStringList.Create;
-  PrebookList := TObjectList.Create(False);
-  HistoryList := TObjectList.Create(False);
+  PrebookList := TAudioFileList.Create(False);
+  HistoryList := TAudioFileList.Create(False);
   fCurrentHistoryFile := Nil;
   fPlayingFile := Nil;
+  fPlayingCue := Nil;
   fBackupFile := TPlayListFile.Create;
   AcceptInput := True;
   Status := 0;
   BufferStringList := TStringList.Create;
   ProcessingBufferlist := False;
   fFirstAction := True;
-  fLastHighlightedSearchResultNode := Nil;
-
-  //for i := 0 to 10 do
-  //    RNGWeights[i] := 1;
-
-  //tmp
-  {
-  self.fUseWeightedRNG := false;
-  RNGWeights[0]  := 0; // unused
-  RNGWeights[1]  := 0; // 0.5
-  RNGWeights[2]  := 0; // 1
-  RNGWeights[3]  := 1;
-  RNGWeights[4]  := 2;
-  RNGWeights[5]  := 4;
-  RNGWeights[6]  := 7;
-  RNGWeights[7]  := 12;
-  RNGWeights[8]  := 20;
-  RNGWeights[9]  := 35;
-  RNGWeights[10] := 60;
-  }
 end;
 
 destructor TNempPlaylist.Destroy;
@@ -452,7 +439,7 @@ begin
   fShowHintsInPlaylist  := Ini.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
   RandomRepeat          := Ini.ReadInteger('Playlist', 'RandomRepeat', 25);
   TNA_PlaylistCount     := ini.ReadInteger('Playlist','TNA_PlaylistCount',30);
-  fPlayingIndex         := ini.ReadInteger('Playlist','IndexinList',0);
+  fStartIndex         := ini.ReadInteger('Playlist','IndexinList',0);
   SavePositionInTrack   := ini.ReadBool('Playlist', 'SavePositionInTrack', True);
   PositionInTrack       := ini.ReadInteger('Playlist', 'PositionInTrack', 0);
   BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', True);
@@ -475,7 +462,6 @@ begin
 end;
 
 procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
-var idx: Integer;
 begin
   ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
   ini.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
@@ -484,15 +470,24 @@ begin
 
   ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
   ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
-  idx := fPlayingIndex;
-  ini.WriteInteger('Playlist','IndexinList',idx);
+
   ini.WriteBool('Playlist', 'SavePositionInTrack', SavePositionInTrack);
 
-  if (assigned(fPlayingFile)) and (idx = PlayList.IndexOf(fPlayingFile)) then
-      ini.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time))
+
+  if assigned(fPlayingFile) then
+  begin
+      ini.WriteInteger('Playlist','IndexinList', PlayList.IndexOf(fPlayingFile));
+      if fPlayingFile.PrebookIndex = 0 then
+          ini.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time))
+      else
+          // this should be the case when we play a bibfile right now
+          ini.WriteInteger('Playlist', 'PositionInTrack', Round(fInterruptedPlayPosition));
+  end
   else
-  // this should be the case when we play a bibfile right now
-      ini.WriteInteger('Playlist', 'PositionInTrack', Round(fInterruptedPlayPosition));
+  begin
+      ini.WriteInteger('Playlist','IndexinList', 0);
+      ini.WriteInteger('Playlist', 'PositionInTrack', 0);
+  end;
 
   ini.WriteBool('Playlist','AutoScan', AutoScan);
   ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
@@ -534,6 +529,33 @@ end;
     main methods. Play, Playnext, ...
     --------------------------------------------------------
 }
+
+///  In case Nemp starts by opening a file or playlist, the user may want
+///  to play the NEW inserted files on start - not the one where the playback
+///  ended in the last session.
+///  Index is Set to Count (not Count-1), as we will add some files after that
+procedure TNempPlaylist.OverwritePlayingIndexWithMaxCount;
+begin
+    if AutoPlayNewTitle then
+        fStartIndex := Playlist.Count;
+end;
+
+procedure TNempPlaylist.InitPlayingFile(StartAtOldPosition: Boolean = False);
+begin
+    if AutoPlayOnStart then
+        Player.LastUserWish := USER_WANT_PLAY
+    else
+        Player.LastUserWish := USER_WANT_STOP;
+    if (fStartIndex > -1) AND (fStartIndex <= PlayList.Count-1) then
+    begin
+        if SavePositionInTrack AND StartAtOldPosition then
+            Play(fStartIndex, Player.FadingInterval, AutoPlayOnStart, PositionInTrack)
+        else
+            Play(fStartIndex, Player.FadingInterval, AutoPlayOnStart);
+    end;
+end;
+
+
 procedure TNempPlaylist.Play(aIndex: Integer; aInterval: Integer; Startplay: Boolean; Startpos: Double = 0);
 var  NewFile: TPlaylistFile;
      OriginalLength: Int64;
@@ -552,16 +574,11 @@ begin
       begin
           // Playlist soll selbst entscheiden, was abgespielt werden soll - GetAnAudioFile!
           NewFile := GetAnAudioFile;
-          // Note GetAnAudioFile will return the "backupFile" from the medialibrary if it is set!
-          if NewFile <> fBackupFile then
-              fPlayingIndex := Playlist.IndexOf(NewFile);
           BackupFileIsPlayedAgain := NewFile = fBackupFile;
       end else
           if (aIndex < Playlist.Count) AND (Playlist.Count > 0) then
-          begin
               NewFile := TPlaylistFile(Playlist[aIndex]);
-              fplayingIndex := aIndex;
-          end;
+
   except
       MessageDlg((BadError_Play), mtError, [mbOK], 0) ;
   end;
@@ -597,13 +614,13 @@ begin
         if not BackupFileIsPlayedAgain then
             fInterruptedPlayPosition := 0;
 
-        fPlayingNode := GetNodeWithPlayingFile;
-        ScrollToPlayingNode;
+        // ScrollToPlayingNode;
         // Anzeige Im Baum aktualisieren
-        VST.Invalidate;
+        if assigned(OnFilePropertiesChanged) then
+            OnFilePropertiesChanged(self);
+
         // Knoten aktualisieren
-        ActualizeNode(fPlayingNode, false);
-        ActualizeCue;
+        RefreshCue;
       end;
 
   // Wenn was schiefgelaufen ist, d.h. der mainstream = 0 ist
@@ -613,21 +630,19 @@ begin
         if fErrorCount < Playlist.Count then
         begin
           AcceptInput := True;
-          if assigned(fPlayingNode) then VST.InvalidateNode(fPlayingNode);
           inc(fErrorCount);
-
           fDauer := fDauer  - OriginalLength;
-
           SendMessage(MainWindowHandle, WM_NextFile, 0, 0);
-          //PlayNext;
         end else
         begin
           AcceptInput := True;
-          if assigned(fPlayingNode) then VST.InvalidateNode(fPlayingNode);
           fDauer := fDauer  - OriginalLength;
           Stop;
-          VST.Header.Columns[1].Text := SekToZeitString(fDauer);
-          //showmessage(Inttostr(fDauer));
+
+          if assigned(fOnFilePropertiesChanged) then
+              fOnFilePropertiesChanged(self);
+          if assigned(fOnPropertiesChanged) then
+              fOnPropertiesChanged(self);
         end;
     except
         MessageDlg((BadError_Play1) + ' (2)', mtError, [mbOK], 0) ;
@@ -643,11 +658,13 @@ begin
         begin
           fPlayingFile.LastPlayed := fPlayCounter;
           inc(fPlayCounter);
-          //OldLength := fPlayingFile.Dauer;
           fPlayingFile.Duration := Round(Player.Dauer);
           fDauer := fDauer + (fPlayingFile.Duration - OriginalLength);
-          VST.Header.Columns[1].Text := SekToZeitString(fDauer);
-          VST.Invalidate;
+
+          if assigned(fOnFilePropertiesChanged) then
+              fOnFilePropertiesChanged(self);
+          if assigned(fOnPropertiesChanged) then
+              fOnPropertiesChanged(self);
         end;
     except
         MessageDlg((BadError_Play1) + ' (3).', mtError, [mbOK], 0) ;
@@ -662,11 +679,13 @@ begin
 end;
 
 procedure TNempPlaylist.PlayBibFile(aFile: TAudioFile; aInterval: Integer);
+var idx: Integer;
 begin
     if not AcceptInput then exit;
 
-    // increase fPlayingIndex, so we will play the next file in the playlist after this one // no
-    if assigned(fPlayingFile) and (fPlayingIndex = Playlist.IndexOf(fPlayingFile)) then
+
+    idx := Playlist.IndexOf(fPlayingFile);
+    if assigned(fPlayingFile) and (idx >= 0) then
     begin
         // we will backup the index AND the current playposition, so we can
         // start next playback right where we are NOW
@@ -677,14 +696,11 @@ begin
         PrebookList.Insert(0, fPlayingFile);
         if PrebookList.Count > 99 then
         begin
-            TAudioFile(PrebookList[PrebookList.Count-1]).PrebookIndex := 0;
+            PrebookList[PrebookList.Count-1].PrebookIndex := 0;
             PrebookList.Delete(PrebookList.Count-1);
         end;
         ReIndexPrebookedFiles;
     end;
-
-    if (not assigned(fPlayingFile)) and (fPlayingIndex = -1) then
-        fPlayingIndex := 0;
 
     // Eingaben kurzfristig blocken
     AcceptInput := False;
@@ -692,15 +708,16 @@ begin
     if Assigned(aFile) then
     begin
       fBackUpFile.Assign(aFile);
-      fPlayingFile := fBackUpFile;
+
+      // Change 4.14. We do NOT change fPlayingFile here
+      // fPlayingFile := fBackUpFile;
 
       fPlayingFileUserInput := False;
       // Player.play, not self.play!
-      Player.play(fPlayingFile, aInterval, True, 0);  // da wird die Dauer geändert
-
-      fPlayingNode := GetNodeWithPlayingFile;
+      Player.play(fBackUpFile, aInterval, True, 0);  // da wird die Dauer geändert
       // Anzeige Im Baum aktualisieren
-      VST.Invalidate;
+      if assigned(fOnFilePropertiesChanged) then
+          fOnFilePropertiesChanged(self);
     end;
 
   // Wenn was schiefgelaufen ist, d.h. der mainstream = 0 ist
@@ -719,23 +736,16 @@ end;
 
 procedure TNempPlaylist.PlayHeadsetFile(aFile: TAudioFile; aInterval: Integer; aPosition: Double);
 var i: Integer;
-    NewNode: PVirtualNode;
 begin
-    // Get InssertPosition
-    if fPlayingNode <> NIL then
-        InsertNode := fPlayingNode.NextSibling
-    else
-    begin
-        InsertNode := VST.GetFirst;
-        for i := 0 to fPlayingIndex-1 do
-        begin
-            if assigned(InsertNode) then
-                InsertNode := InsertNode.NextSibling;
-        end;
-    end;
-    // Add File to Playlist
-    NewNode := InsertFileToPlayList(aFile);
-    Play(NewNode.Index, Player.FadingInterval, True, aPosition);
+    InitInsertIndexFromPlayPosition(False);
+    InsertFileToPlayList(aFile);
+    // The actual position of the file may vary, therefore: BruteForce the actual Index here
+    i := Playlist.IndexOf(aFile);
+    Play(i, Player.FadingInterval, True, aPosition);
+
+    // Trigger Event (= ScrollIntoView)
+  if assigned(fOnUserChangedTitle) then
+      fOnUserChangedTitle(Self)
 end;
 
 procedure TNempPlaylist.PlayNext(aUserinput: Boolean = False);
@@ -748,7 +758,7 @@ begin
 
   if fJumpToNextCueOnNextClick and (Player.JumpToNextCue) then
   begin
-      ActualizeCue;  // nothing else todo. Jump complete :D
+      RefreshCue;  // nothing else todo. Jump complete :D
   end else
   begin
       Player.stop(Player.LastUserWish = USER_WANT_PLAY);
@@ -759,6 +769,10 @@ begin
       else
           Play(nextIdx, Player.FadingInterval, Player.LastUserWish = USER_WANT_PLAY, 0)
   end;
+
+  // Trigger Event (= ScrollIntoView)
+  if aUserinput and assigned(fOnUserChangedTitle) then
+      fOnUserChangedTitle(Self)
 end;
 
 procedure TNempPlaylist.PlayNextFile(aUserinput: Boolean = False);
@@ -783,6 +797,10 @@ begin
       Play(nextIdx, Player.FadingInterval, True, sPos)
   else
       Play(nextIdx, Player.FadingInterval, False, sPos);
+
+  // Trigger Event (= ScrollIntoView)
+  if aUserinput and assigned(fOnUserChangedTitle) then
+      fOnUserChangedTitle(Self)
 end;
 
 procedure TNempPlaylist.PlayPrevious(aUserinput: Boolean = False);
@@ -792,7 +810,7 @@ begin
     fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
   if fJumpToNextCueOnNextClick and (Player.JumpToPrevCue) then
   begin
-      ActualizeCue;   // nothing else todo. Jump complete :D
+      RefreshCue;   // nothing else todo. Jump complete :D
   end else
   begin
       if Player.Time > 5  then
@@ -806,6 +824,9 @@ begin
               Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
       end;
   end;
+  // Trigger Event (= ScrollIntoView)
+  if aUserinput and assigned(fOnUserChangedTitle) then
+      fOnUserChangedTitle(Self)
 end;
 
 procedure TNempPlaylist.PlayPreviousFile(aUserinput: Boolean = False);
@@ -825,54 +846,49 @@ begin
       else
           Play(GetPrevAudioFileIndex, Player.FadingInterval, False);
   end;
+  // Trigger Event (= ScrollIntoView)
+  if aUserinput and assigned(fOnUserChangedTitle) then
+      fOnUserChangedTitle(Self)
 end;
 
-procedure TNempPlaylist.PlayFocussed(aSelection: PVirtualNode = Nil);
-var Node, NewCueNode: PVirtualNode;
-    Data: PTreeData;
-    CueTime: Single;
+procedure TNempPlaylist.PlayFocussed(MainIndex, CueIndex: Integer);
+var CueTime: Single;
+    af: TAudioFile;
 begin
-  if not AcceptInput then exit;
-  if not assigned(aSelection) then
-      Node := VST.FocusedNode
-  else
-      Node := aSelection;
+    if (MainIndex < 0) or (MainIndex >= Playlist.Count) then
+        exit;
 
-  if Not Assigned(Node) then Exit;
-  if (Not VST.Selected[Node]) and (not assigned(aSelection)) then Exit;
+    // add the current title into the history
+    UpdateHistory;
+    // set flag "UserInput"
+    fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput;
 
-  // add the current title into the history
-  UpdateHistory;
+    if CueIndex = -1 then
+        // just play the new title
+        Play(MainIndex, Player.FadingInterval, True)
+    else
+    begin
+        // we want to play a specific CueEntry of the File
+        af := Playlist[MainIndex];
+        if assigned(af.CueList) then
+        begin
+            if (CueIndex > 0) and (CueIndex < Playlist[MainIndex].CueList.Count) then
+                CueTime := af.CueList[CueIndex].Index01
+            else
+                CueTime := 0;
+        end else
+            CueTime := 0;
 
-  if VST.GetNodeLevel(Node)=0 then
-  begin
-      Play(Node.Index, Player.FadingInterval, True);
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtTitleChange;
-  end else
-  begin
-      fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
-      Data := VST.GetNodeData(Node);
-      if assigned(Data) then
-          CueTime := Data^.FAudioFile.Index01
-      else CueTime := 0;
+        // if the AudioFile is the currently playing file: Just slide to the wanted position
+        // otherwise: play the new title and start at CueTime
+        if af = fPlayingFile then
+            Player.Time := CueTime
+        else
+            Play(MainIndex, Player.FadingInterval, True, CueTime );
+    end;
 
-      NewCueNode := Node;
-      node := VST.NodeParent[Node];
-      Data := VST.GetNodeData(Node);
-
-      if assigned(Data) and (Data^.FAudioFile = PlayingFile) then
-      begin
-          Player.Time := CueTime;
-          fActiveCueNode := NewCueNode;
-          VST.Invalidate;
-          if assigned(fOnCueChanged) then
-              fOnCueChanged(Self);
-      end else
-      begin
-          if assigned(Data) then
-              Play(Node.Index, Player.FadingInterval, True, CueTime );
-      end;
-  end;
+    if assigned(self.fOnFilePropertiesChanged) then
+        fOnFilePropertiesChanged(self);
 end;
 
 procedure TNempPlaylist.PlayAgain(ForcePlay: Boolean = False);
@@ -890,9 +906,9 @@ begin
   end else
   begin
       if (Player.Status = PLAYER_ISSTOPPED_MANUALLY) and not Forceplay then
-          Play(fPlayingIndex, Player.FadingInterval, False)
+          Play(0 {fPlayingIndex}, Player.FadingInterval, False)
       else
-          Play(fPlayingIndex, Player.FadingInterval, True);
+          Play(0 {fPlayingIndex}, Player.FadingInterval, True);
   end;
 end;
 
@@ -912,71 +928,51 @@ end;
 
 {
     --------------------------------------------------------
-    Deleteing files from the playlist
+    Delete files from the playlist
     --------------------------------------------------------
 }
-procedure TNempPlaylist.DeleteMarkedFiles;
-var i:integer;
-  Selectedmp3s: TNodeArray;
-  aData: PTreeData;
-  NewSelectNode: PVirtualNode;
-  allNodesDeleted: Boolean;
+
+procedure TNempPlaylist.DeleteAudioFileFromPlaylist(aIndex: Integer);
+var af: TAudioFile;
 begin
-  Selectedmp3s := VST.GetSortedSelection(False);
-  if length(SelectedMp3s) = 0 then exit;
+    if aIndex < 0 then
+        exit;
+    if aIndex >= Playlist.Count then
+        exit;
 
-        VST.BeginUpdate;
-        allNodesDeleted := True;
+    af := Playlist[aIndex];
 
-        NewSelectNode := VST.GetNextSibling(Selectedmp3s[length(Selectedmp3s)-1]);
-        if not Assigned(NewSelectNode) then
-          NewSelectNode := VST.GetPreviousSibling(Selectedmp3s[0]);
+    if af = fPlayingFile then
+    begin
+        // Backup playing file
+        fBackUpFile.Assign(fPlayingFile);
+        // Set the pointer to the backup-file
+        fPlayingFile := fBackUpFile;
+        Player.MainAudioFile := fBackUpFile;
+    end;
 
-        for i := 0 to length(Selectedmp3s)-1 do
-        begin
-          // Nodes mit Level 1 (CueInfos) werden nicht gelöscht
-          if VST.GetNodeLevel(Selectedmp3s[i])=0 then
-          begin
-              if Selectedmp3s[i] = fPlayingNode then fPlayingNode := Nil;
-              if Selectedmp3s[i] = fLastHighlightedSearchResultNode then fLastHighlightedSearchResultNode := Nil;
-              aData := VST.GetNodeData(Selectedmp3s[i]);
-              if (aData^.FAudioFile) = fPlayingFile then
-              begin
-                fPlayingIndex := Selectedmp3s[i].Index;
-                // Backup playing file
-                fBackUpFile.Assign(fPlayingFile);
-                // Set the pointer to the backup-file
-                fPlayingFile := fBackUpFile;
-                Player.MainAudioFile := fBackUpFile;
-              end;
-              if assigned(fOnDeleteAudiofile) then
-                  fOnDeleteAudiofile(aData^.FAudioFile);
+    // adjust Duration of the Playlist
+    fDauer := fDauer - af.Duration;
 
-              PrebookList.Remove(aData^.FAudioFile);
-              RemoveFileFromHistory(aData^.FAudioFile);
-              Playlist.Delete(Selectedmp3s[i].Index);
-              VST.DeleteNode(Selectedmp3s[i]);
-          end else
-            allNodesDeleted := False;
-        end;
+    // trigger event to remove the Node from the Treeview (and do some other stuff)
+    if assigned(fOnBeforeDeleteAudiofile) then
+        fOnBeforeDeleteAudiofile(self, af, aIndex);
 
-        if assigned(NewSelectNode) AND allNodesDeleted then
-        begin
-          VST.Selected[NewSelectNode] := True;
-          VST.FocusedNode := NewSelectNode;
-        end;
-        ReIndexPrebookedFiles;
+    // remove the file from other lists
+    PrebookList.Remove(af);
+    RemoveFileFromHistory(af);
+    // Renumber the Prebook files
+    ReIndexPrebookedFiles;
 
-        VST.EndUpdate;
-        VST.Invalidate;
+    // actually delete the file from the playlist
+    Playlist.Delete(aIndex);
 
-        fDauer := ShowPlayListSummary;
-        fPlaylistHasChanged := True;
+    if assigned(fOnPropertiesChanged)then
+        fOnPropertiesChanged(Self);
 end;
 
 
 procedure TNempPlaylist.ClearPlaylist(StopPlayer: Boolean = True);
-var i: Integer;
 begin
     if StopPlayer then
     begin
@@ -990,27 +986,20 @@ begin
         Player.MainAudioFile := fBackUpFile;
     end;
 
-    // call teh event-handler for removing audiofiles for every fils
-    // => set MedienBib-CurrentAudiofile := Nil, if necessary
-    if assigned(self.fOnDeleteAudiofile) then
-    begin
-        for i := 0 to Playlist.Count - 1 do
-            fOnDeleteAudiofile(TAudioFile(Playlist[i]))
-    end;
-
     HistoryList.Clear;
     PrebookList.Clear;
     Playlist.Clear;
-    fLastHighlightedSearchResultNode := Nil;
 
-    fLastHighlightedSearchResultNode := Nil;
-    fPlayingNode := Nil;
     fCurrentHistoryFile := Nil;
-
-    fPlayingIndex := 0;
-    FillPlaylistView;
-    fDauer := ShowPlayListSummary;
+    fStartIndex := 0;
+    fDauer := 0;
     fPlaylistHasChanged := True;
+
+    if assigned(fOnPlaylistCleared) then
+        fOnPlaylistCleared(self);
+    if assigned(fOnPropertiesChanged) then
+        fOnPropertiesChanged(Self);
+
     SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
 end;
 
@@ -1020,56 +1009,35 @@ var i: Integer;
 begin
   for i := Playlist.Count - 1 downto 0 do
   begin
-      if not TPlaylistFile(Playlist.Items[i]).ReCheckExistence then
+      if not Playlist.Items[i].ReCheckExistence then
       begin
-          if assigned(fOnDeleteAudiofile) then
-              fOnDeleteAudiofile(TPlaylistFile(Playlist.Items[i]));
+          if assigned(fOnBeforeDeleteAudiofile) then
+              fOnBeforeDeleteAudiofile(self, Playlist.Items[i], i);
 
-          PrebookList.Remove(TPlaylistFile(Playlist.Items[i]));
-          HistoryList.Remove(TPlaylistFile(Playlist.Items[i]));
-          RemoveFileFromHistory(TPlaylistFile(Playlist.Items[i]));
+          PrebookList.Remove(Playlist.Items[i]);
+          HistoryList.Remove(Playlist.Items[i]);
+          RemoveFileFromHistory(Playlist.Items[i]);
           Playlist.Delete(i);
       end;
   end;
   ReIndexPrebookedFiles;
-  FillPlaylistView;
-  fDauer := ShowPlayListSummary;
+  fDauer := CalculateDuration;
   fPlaylistHasChanged := True;
+
+  // Trigger events
+  if assigned(self.fOnPropertiesChanged) then
+      fOnPropertiesChanged(self);
+  if assigned(self.fOnFilePropertiesChanged) then
+      fOnFilePropertiesChanged(self);
 end;
 
 procedure TNempPlaylist.removePlayingFile;
-var aNode: PVirtualNode;
+var idx: Integer;
 begin
-  aNode := GetNodeWithPlayingFile;
-  if assigned(aNode) then
-  begin
-      if aNode = fLastHighlightedSearchResultNode then fLastHighlightedSearchResultNode := Nil;
-
-      if assigned(fOnDeleteAudiofile) then
-          fOnDeleteAudiofile(fPlayingFile);
-
-      PrebookList.Remove(fPlayingFile);
-      RemoveFileFromHistory(fPlayingFile);
-      Playlist.Remove(fPlayingfile);
-      VST.DeleteNode(aNode);
-      ReIndexPrebookedFiles;
-  end;
-  fDauer := ShowPlayListSummary;
-  fPlaylistHasChanged := True;
+    idx := Playlist.IndexOf(fPlayingFile);
+    if idx >= 0 then
+        DeleteAudioFileFromPlaylist(idx);
 end;
-
-{
-    --------------------------------------------------------
-    RepairPlaylist
-    Check Non-Existing files, whether the are on the new drive.
-    --------------------------------------------------------
-}
-procedure TNempPlaylist.RepairPlaylist(NewDriveMask: DWord);
-begin
-
-end;
-
-
 
 {
     --------------------------------------------------------
@@ -1086,13 +1054,13 @@ begin
         if aIdx < HistoryList.Count-1 then
         begin
             if aIdx >= 0 then
-                fCurrentHistoryFile := TAudioFile(HistoryList[aIdx])
+                fCurrentHistoryFile := HistoryList[aIdx]
             else
                 fCurrentHistoryFile := Nil;
         end
         else
             if aIdx - 1 >= 0 then
-                fCurrentHistoryFile := TAudioFile(HistoryList[aIdx - 1])
+                fCurrentHistoryFile := HistoryList[aIdx - 1]
             else
                 fCurrentHistoryFile := Nil;
     end;
@@ -1101,107 +1069,32 @@ end;
 
 
 procedure TNempPlaylist.ClearSearch(complete: Boolean = False);
-var currentNode: PVirtualNode;
+var i: Integer;
 begin
-    if not assigned(fVST) then exit;
-    currentNode := VST.GetFirst;
-    while assigned(currentNode) do
-    begin
-        fVst.Selected[currentNode] := False;
-        currentNode := fVST.GetNext(currentNode);
-    end;
-    if complete then    
-        fLastHighlightedSearchResultNode := Nil;
+    for i := 0 to Playlist.Count - 1 do
+        Playlist[i].IsSearchResult := False;
 
-    fVst.Invalidate;
+    if assigned(fOnFilePropertiesChanged) then
+        fOnFilePropertiesChanged(Self);
 end;
 
-// just select all hits. No ScrollIntoFocus needed here
-procedure TNempPlaylist.SearchAll(aString: String);
-var Keywords: TStringList;
-    currentFile: TAudioFile;
-    currentNode: PVirtualNode;
-    Data:PTreeData;
-begin
-    if not assigned(fVST) then exit;
-
-    Keywords := ExplodeWithQuoteMarks(' ', aString);
-    currentNode := VST.GetFirst;
-    while assigned(currentNode) do
-    begin
-          Data := VST.GetNodeData(currentNode);
-          currentFile := Data^.FAudioFile;
-          if AudioFileMatchesKeywordsPlaylist(currentFile, Keywords) then
-          begin
-              VST.Selected[currentNode] := true;
-              if (currentNode.Parent <> NIL) then
-                  VST.Expanded[currentNode.Parent] := true;
-          end 
-          else
-              VST.Selected[currentNode] := False;
-          currentNode := VST.GetNext(currentNode);                    
-    end;
-    fVst.Invalidate;
-    Keywords.Free;
-end;
 
 procedure TNempPlaylist.Search(aString: String; SearchNext: Boolean = False);
 var Keywords: TStringList;
-    currentFile: TAudioFile;
-    currentNode, TargetNode, startNode: PVirtualNode;
-    Data:PTreeData;
+    i: Integer;
 begin
-    if not assigned(fVST) then exit;
-
-    if assigned(fVst.FocusedNode) then
-        currentNode := VST.FocusedNode
-    else
-        currentNode := fVst.GetFirst;
-
-    if not assigned(currentNode) then exit;
-
-    // deselect this Node later (if needed)
-    // oldSelectedNode := currentNode;  
-    if SearchNext then
-    begin
-        if currentNode = fVst.GetLast then
-            currentNode := fVst.GetFirst
-        else
-            currentNode := fVst.GetNext(currentNode);
-    end else
-    begin
-        // we are searching a new keyword (probably)
-        // deselect all files
-        ClearSearch(False);
-    end;
-
     Keywords := ExplodeWithQuoteMarks(' ', aString);
-    TargetNode := Nil;
-    startNode := currentNode;
-    repeat
-        Data := fVST.GetNodeData(currentNode);
-        currentFile := Data^.FAudioFile;
-        
-        if AudioFileMatchesKeywordsPlaylist(currentFile, Keywords) then           
-            // found the next hit!
-            TargetNode := currentNode;
-            
-        // if not: try next node
-        currentNode := fVST.GetNext(currentNode);
-        // or start again at the beginning
-        if not assigned(currentNode) then
-            currentNode := fVST.GetFirst;               
-    until (assigned(TargetNode) or (currentNode = startNode));
+
+    for i := 0 to Playlist.Count - 1 do
+        Playlist[i].IsSearchResult := AudioFileMatchesKeywordsPlaylist(Playlist[i], Keywords);
+
     Keywords.Free;
 
-    fLastHighlightedSearchResultNode := TargetNode;
-    if assigned(fLastHighlightedSearchResultNode) then
-    begin
-        fVST.ScrollIntoView(fLastHighlightedSearchResultNode, True);
-        fVST.FocusedNode := fLastHighlightedSearchResultNode;
-    end;
-   
-    fVst.Invalidate;
+    if assigned(fOnFilePropertiesChanged) then
+        fOnFilePropertiesChanged(Self);
+
+    if assigned(fOnSearchResultsChanged) then
+        fOnSearchResultsChanged(Self);
 end;
 
 
@@ -1211,111 +1104,58 @@ end;
     Some GUI-stuff
     --------------------------------------------------------
 }
-// Setter for property InsertNode
-
-procedure TNempPlaylist.SetInsertNode(Value: PVirtualNode);
+procedure TNempPlaylist.SetInsertIndex(Value: Integer);
 begin
-  if Assigned(Value) then
-  begin
-    if VST.GetNodeLevel(Value) = 1 then
-      fInsertNode := Value.Parent
+    if Value < Playlist.Count then
+        fInsertIndex := Value
     else
-      fInsertNode := Value;
-  end
-  else fInsertNode := NIL;
-
-  if assigned(fInsertNode) then
-    fInsertIndex := fInsertNode.Index
-  else
-    fInsertindex := Playlist.Count;
+        fInsertIndex := -1;
 end;
 
-
-//Set fInsertNode/fInsertIndex from current position in the list
-procedure TNempPlaylist.GetInsertNodeFromPlayPosition;
-var i, PrebookIdx: Integer;
-    lastPrebookFile: TAudioFile;
+function TNempPlaylist.InitInsertIndexFromPlayPosition(ConsiderPrebookList: Boolean): Integer;
+var lastPrebookFile: TAudioFile;
 begin
-    if PrebookList.Count > 0 then
+    if (PrebookList.Count > 0) and ConsiderPrebookList then
     begin
-        lastPrebookFile := TAudioFile(PrebookList[PrebookList.Count - 1]);
-        PrebookIdx := Playlist.IndexOf(lastPrebookFile);
-        InsertNode := VST.GetFirst;
-        for i := 0 to PrebookIdx-1 do
-        begin
-            if assigned(InsertNode) then
-                InsertNode := {f}InsertNode.NextSibling;
-        end;
+        lastPrebookFile := PrebookList[PrebookList.Count - 1];
+        result := Playlist.IndexOf(lastPrebookFile) + 1;
     end else
     begin
-        // InsertIndex wird vom InsertNode-Setter (eine Proc weiter oben) entsprechend gesetzt
-        // d.h. PlayingNode ist noch in der Liste;
-        if fPlayingNode <> NIL then
-        begin
-          InsertNode := fPlayingNode;
-        end else
-        begin
-          // Playingfile gelöscht - Dateien an der Position einfügen, die
-          // GetNextAudioFile ermitteln wird.
-          // note 2019: with the change to insert AFTER the current title,
-          //            this is not 100% exact - there will be nother title played
-          //            before the new ones. This could be done by "-2", but then it would
-          //            be inconsistent, if fPlayingIndex = 0.
-          InsertNode := VST.GetFirst;
-          for i := 0 to fPlayingIndex-1 do
-          begin
-            if assigned(InsertNode) then
-              InsertNode := {f}InsertNode.NextSibling;
-          end;
-        end;
+        if assigned(fPlayingFile) then
+            result := Playlist.IndexOf(fPlayingFile) + 1
+        else
+          result := 0;
     end;
+    // if we are with playback at the end of the playlist, set InsertIndex to -1.
+    // This will switch to "add files at the end"
+    if result >= Playlist.Count then
+        result := -1;
+
+    fInsertIndex := result;
 end;
 
-procedure TNempPlaylist.FillPlaylistView;
-var i,c: integer;
-  aNode,CueNode: PVirtualNode;
-  aData: PTreeData;
+procedure TNempPlaylist.ResetInsertIndex;
 begin
-  if not assigned(fVST) then exit;
-
-  fLastHighlightedSearchResultNode := Nil;
-  fVST.BeginUpdate;
-  fVST.Clear;
-  for i:=0 to Playlist.Count-1 do
-  begin
-    aNode := VST.AddChild(Nil, TPlaylistFile(Playlist.Items[i]));
-    // ggf. Cuelist einfügen
-    if Assigned(TPlaylistFile(Playlist.Items[i]).CueList) AND (TPlaylistFile(Playlist.Items[i]).CueList.Count > 0) then
-            for c := 0 to TPlaylistFile(Playlist.Items[i]).CueList.Count - 1 do
-            begin
-              CueNode := fVST.AddChild(aNode);
-              fVST.ValidateNode(CueNode,false);
-              aData := fVST.GetNodeData(CueNode);
-              aData^.FAudioFile := TPlaylistFile(TPlaylistFile(Playlist.Items[i]).Cuelist[c]);
-            end;
-  end;
-  fVST.EndUpdate;
+    fInsertIndex := -1;
 end;
 
-procedure TNempPlaylist.ActualizeCue;
-var NewCueIndex: Integer;
+
+procedure TNempPlaylist.RefreshCue;
 begin
-    NewCueIndex := Player.GetActiveCue;
-    fActiveCueNode := GetActiveCueNode(NewCueIndex);
-    VST.Invalidate;
+    fPlayingCue := Player.GetActiveCue;
     if assigned(fOnCueChanged) then
         fOnCueChanged(Self);
 end;
 
-procedure TNempPlaylist.ActualizeNode(aNode: pVirtualNode; ReloadDataFromFile: Boolean);
-var Data: PTreeData;
-    AudioFile: TPlaylistFile;
+procedure TNempPlaylist.RefreshAudioFile(aIndex: Integer; ReloadDataFromFile: Boolean);
+var AudioFile: TAudioFile;
     OldLength: Int64;
 
 begin
-    if not assigned(aNode) then exit;
-    Data := VST.GetNodeData(aNode);
-    AudioFile := Data^.FAudioFile;
+    if (aIndex < 0) or (aIndex >= Playlist.Count)  then
+        exit;
+
+    AudioFile := Playlist[aIndex];
     OldLength := AudioFile.Duration;
 
     AudioFile.ReCheckExistence;
@@ -1327,14 +1167,16 @@ begin
 
             if ReloadDataFromFile then
                 SynchAFileWithDisc(AudioFile, True);
-                //SynchronizeAudioFile(AudioFile, AudioFile.Pfad, False);
 
             if not assigned(AudioFile.CueList) then
             begin
-              // nach einer Liste suchen und erstellen
-              // yes, always, also on short tracks
-              AudioFile.GetCueList;
-              AddCueListNodes(AudioFile, aNode);
+                // nach einer Liste suchen und erstellen
+                // yes, always, also on short tracks
+                if AudioFile.GetCueList then
+                begin
+                    if assigned(fOnCueListFound) then
+                        fOnCueListFound(self, AudioFile, aIndex);
+                end;
             end;
         end;
 
@@ -1351,88 +1193,90 @@ begin
                 else
                     AudioFile.GetAudioData(AudioFile.Pfad, 0);
             end;
-
-            // wenn synchfile, dann infos neu lesen. sonst nicht
-            // dabei Fallunterscheidung. Bei Nempotions.readCDDB mit cddb, sonst ohne
-            //       (geht über Flags bei GetAudioData)
         end;
     end;
-    fDauer := fDauer + (AudioFile.Duration - OldLength);
-    VST.Header.Columns[1].Text := SekToZeitString(fDauer);
-    VST.Invalidate;
+
+    // Trigger events to refresh the TreeView
+    if assigned(fOnFilePropertiesChanged) then
+        fOnFilePropertiesChanged(self);
+
+    if AudioFile.Duration <> OldLength then
+    begin
+        fDauer := fDauer + (AudioFile.Duration - OldLength);
+        if assigned(fOnPropertiesChanged) then
+            fOnPropertiesChanged(self)
+    end;
 end;
 
-procedure TNempPlaylist.UpdatePlayListHeader(aVST: TVirtualStringTree; Anzahl: Integer; Dauer: Int64);
-begin
-    if PlaylistManager.CurrentIndex = -1 then
-        aVST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Playlist.Count])
-    else
-        aVST.Header.Columns[0].Text := Format('%s - %s (%d)', [(TreeHeader_Playlist), PlaylistManager.CurrentPlaylistDescription,  Playlist.Count]);
-
-  aVST.Header.Columns[1].Text := SekToZeitString(fdauer);
-end;
-
-function TNempPlaylist.ShowPlayListSummary: Int64;
-var i: integer;
+function TNempPlaylist.CalculateDuration: Int64;
+var i: Integer;
 begin
     result := 0;
     for i:= 0 to PlayList.Count - 1 do
-        result := result + (PlayList[i] as TAudioFile).Duration;
-    //(TreeHeader_Titles)
-    if PlaylistManager.CurrentIndex = -1 then
-        VST.Header.Columns[0].Text := Format('%s (%d)', [(TreeHeader_Playlist), Playlist.Count])
-    else
-        VST.Header.Columns[0].Text := Format('%s - %s (%d)', [(TreeHeader_Playlist), PlaylistManager.CurrentPlaylistDescription,  Playlist.Count]);
-
-    VST.Header.Columns[1].Text := SekToZeitString(result);
+        result := result + PlayList[i].Duration;
 end;
-
-
 
 {
     --------------------------------------------------------
     Sorting/Mixing the playlist
     --------------------------------------------------------
 }
-// Diese Prozedur findet nach einem Neuaufbau der Playlist
-// den PlayingNode wieder und setzt PlayingIndex um
 procedure TNempPlaylist.ReInitPlaylist;
 begin
-  fPlayingNode := GetNodeWithPlayingFile;
-  if assigned(fPlayingNode) then
-    fPlayingIndex := fPlayingNode.Index
-  else
-    fPlayingIndex := -1;
-  ActualizeCue;
-  VST.Invalidate;
+  RefreshCue;
+
+  if assigned(fOnFilePropertiesChanged) then
+      fOnFilePropertiesChanged(self);
 end;
 
-procedure TNempPlaylist.Sort(Compare: TListSortCompare);
+procedure TNempPlaylist.Sort(Compare: IComparer<TAudioFile>);
 begin
-  Playlist.Sort(Compare);
-  FillPlayListView;
-  ReInitPlaylist;
-  fPlaylistHasChanged := True;
+    Playlist.Sort(Compare);
+    if assigned(fOnPlaylistChangedCompletely) then
+        fOnPlaylistChangedCompletely(self);
+
+    ReInitPlaylist;
+    fPlaylistHasChanged := True;
 end;
 
 Procedure TNempPlaylist.ReverseSortOrder;
 var i : integer;
 begin
-  for i := 0 to (Playlist.Count-1) DIV 2 do
-    Playlist.Exchange(i,Playlist.Count-1-i);
-  FillPlayListView;
-  ReInitPlaylist;
-  fPlaylistHasChanged := True;
+    for i := 0 to (Playlist.Count-1) DIV 2 do
+        Playlist.Exchange(i,Playlist.Count-1-i);
+    if assigned(fOnPlaylistChangedCompletely) then
+        fOnPlaylistChangedCompletely(self);
+
+    ReInitPlaylist;
+    fPlaylistHasChanged := True;
 end;
 
 Procedure TNempPlaylist.Mix;
 var i : integer;
 begin
-  for i := 0 to Playlist.Count-1 do
-    Playlist.Exchange(i,i + random(PlayList.Count-i));
-  FillPlayListView;
-  ReInitPlaylist;
-  fPlaylistHasChanged := True;
+    for i := 0 to Playlist.Count-1 do
+        Playlist.Exchange(i,i + random(PlayList.Count-i));
+    if assigned(fOnPlaylistChangedCompletely) then
+        fOnPlaylistChangedCompletely(self);
+
+    ReInitPlaylist;
+    fPlaylistHasChanged := True;
+end;
+
+///  GetSortOrderFromList
+///  after a Drag&Drop-Move-Operation in the Playlist, we need to adapt the "Tree-Sorting"
+///  Maybe that could be done more elegant, but this way it is more likely to be fail-proof
+///  Note: aList contains just the same AudioFiles as the "real" playlist
+procedure TNempPlaylist.GetSortOrderFromList(aList: TAudioFileList);
+var i: Integer;
+begin
+    // 1. Clear the Playlist without freeing the objects
+    Playlist.OwnsObjects := False;
+    Playlist.Clear;
+    Playlist.OwnsObjects := True;
+    // 2. Add them again
+    for i := 0 to aList.Count -1 do
+        Playlist.Add(aList[i]);
 end;
 
 
@@ -1441,126 +1285,88 @@ end;
     Adding Files to the playlist
     --------------------------------------------------------
 }
-function TNempPlaylist.AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode;
-var NewNode: PVirtualNode;
-    //newAudiofile: TAudioFile;
+procedure TNempPlaylist.AddFileToPlaylist(Audiofile: TAudioFile; aCueName: UnicodeString = '');
 begin
-  //newAudiofile := TAudioFile.Create;
-  //newAudiofile.Assign(AudioFile);
+    // Add the File to the Playlist
+    Playlist.Add(Audiofile);
+    // Search for a CueSheet
+    if (Audiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(Audiofile.CueList)) then
+        Audiofile.GetCueList(aCueName, Audiofile.Pfad);
 
-  Playlist.Add(Audiofile);
-  NewNode := VST.AddChild(Nil, Audiofile); // Am Ende einfügen
-  if (Audiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(Audiofile.CueList)) then
-  begin
-    // nach einer Liste suchen und erstellen
-    Audiofile.GetCueList(aCueName, Audiofile.Pfad);
-    AddCueListNodes(Audiofile, NewNode);
-  end;
+    fDauer := fDauer + Audiofile.Duration;
+    fPlaylistHasChanged := True;
 
-  VST.Invalidate;
-  Result := NewNode;
-  fDauer := fDauer + Audiofile.Duration;
-  UpdatePlayListHeader(VST, Playlist.Count, fDauer);
-  fPlaylistHasChanged := True;
+    // Trigger events
+    if assigned(fOnAddAudioFile) then
+        fOnAddAudioFile(self, AudioFile, -1); // -1 => Add Nodes at the End
+    if assigned(self.fOnPropertiesChanged) then
+        fOnPropertiesChanged(self);
 end;
 
 function TNempPlaylist.AddFileToPlaylistWebServer(aAudiofile: TAudioFile; aCueName: UnicodeString = ''): TAudioFile;
-var NewNode: PVirtualNode;
-    newAudiofile: TAudioFile;
 begin
-    newAudiofile := TAudioFile.Create;
-    newAudiofile.Assign(aAudioFile);
-
-    Playlist.Add(newAudiofile);
-    NewNode := VST.AddChild(Nil, newAudiofile); // Am Ende einfügen
-    if (newAudiofile.Duration > MIN_CUESHEET_DURATION) and (not assigned(newAudiofile.CueList)) then
-    begin
-        // nach einer Liste suchen und erstellen
-        newAudiofile.GetCueList(aCueName, newAudiofile.Pfad);
-        AddCueListNodes(newAudiofile, NewNode);
-    end;
-
-    VST.Invalidate;
-    Result := newAudiofile;
-    fDauer := fDauer + newAudiofile.Duration;
-    UpdatePlayListHeader(VST, Playlist.Count, fDauer);
-    fPlaylistHasChanged := True;
+    // Create a copy of the Audiofile ...
+    result := TAudioFile.Create;
+    result.Assign(aAudioFile);
+    // ... and add it to the playlist
+    AddFileToPlaylist(result, aCueName);
 end;
 
-function TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
-var NewFile: TPlaylistfile;
+procedure TNempPlaylist.AddFileToPlaylist(aAudiofileName: UnicodeString; aCueName: UnicodeString = '');
+var NewFile: TAudioFile;
 begin
-    NewFile := TPlaylistfile.Create;
+    // Create a new File for this aAudiofileName ...
+    NewFile := TAudioFile.Create;
     NewFile.Pfad := aAudiofileName;
-
+    // ... GetAudioData for this file ...
     case NewFile.AudioType of
-        at_File: //SynchronizeAudioFile(NewFile, aAudioFileName);
-                  SynchNewFileWithBib(newFile);
-        at_CDDA: begin
-            NewFile.GetAudioData(aAudioFileName, 0);
-        end;
-
+        at_File: SynchNewFileWithBib(newFile);
+        at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
     end;
-
-    result := AddFileToPlaylist(NewFile, aCueName);
-  // NewFile.Free;
+    // ... and add it to the playlist
+    AddFileToPlaylist(NewFile, aCueName);
 end;
 
-function TNempPlaylist.InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''):PVirtualNode;
-var NewNode: PVirtualNode;
-    // newAudiofile: TAudioFile;
+
+procedure TNempPlaylist.InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = '');
 begin
-  //newAudiofile := TAudioFile.Create;  // no, just insert the file in the parameter.
-  //newAudiofile.Assign(AudioFile);
+    if fInsertIndex = -1 then
+        AddFileToPlaylist(Audiofile, aCueName)
+    else
+    begin
+        // Insert the File into the Playlist
+        Playlist.Insert(fInsertIndex, Audiofile);
+        // Search for a CueSheet
+        if AudioFile.Duration > MIN_CUESHEET_DURATION then
+            Audiofile.GetCueList(aCueName, Audiofile.Pfad);
 
-  if InsertNode <> NIL then
-  begin
-      fInsertIndex := InsertNode.Index;
-      Inc(fInsertIndex);
+        fDauer := fDauer + Audiofile.Duration;
+        fPlaylistHasChanged := True;
 
-      Playlist.Insert(fInsertIndex, Audiofile);
+        // Trigger events
+        if assigned(fOnAddAudioFile) then
+            fOnAddAudioFile(self, AudioFile, fInsertIndex);
+        if assigned(fOnPropertiesChanged) then
+            fOnPropertiesChanged(self);
 
-      //NewNode := VST.InsertNode(fInsertNode, amInsertBefore, Audiofile);
-      NewNode := VST.InsertNode(fInsertNode, amInsertAfter, Audiofile);
-
-      if AudioFile.Duration > MIN_CUESHEET_DURATION then
-      begin
-          Audiofile.GetCueList(aCueName, Audiofile.Pfad);
-          AddCueListNodes(Audiofile, NewNode);
-      end;
-  end else
-  begin
-      Playlist.Add(Audiofile);
-      // indexnode ist NIL, also am Ende einfügen
-      NewNode := VST.AddChild(Nil, Audiofile);
-      if AudioFile.Duration > MIN_CUESHEET_DURATION then
-      begin
-          Audiofile.GetCueList(aCueName, Audiofile.Pfad);
-          AddCueListNodes(Audiofile, NewNode);
-      end;
-  end;
-  Result := NewNode;
-  InsertNode := NewNode;
-  fDauer := fDauer + Audiofile.Duration;
-  UpdatePlayListHeader(VST, Playlist.Count, fDauer);
-  fPlaylistHasChanged := True;
-  VST.Invalidate;
+        // increase FInsertIndex for correctly inserting the next file in the queue
+        Inc(fInsertIndex);
+    end;
 end;
 
-function TNempPlaylist.InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''):PVirtualNode;
-var NewFile: TPlaylistfile;
+function TNempPlaylist.InsertFileToPlayList(aAudiofileName: UnicodeString; aCueName: UnicodeString = ''): TAudioFile;
+var NewFile: TAudioFile;
 begin
-  NewFile := TPlaylistfile.Create;
+  NewFile := TAudioFile.Create;
   NewFile.Pfad := aAudiofileName;
 
   case NewFile.AudioType of
-      at_File: // SynchronizeAudioFile(NewFile, aAudioFileName);
-                SynchNewFileWithBib(NewFile);
+      at_File: SynchNewFileWithBib(NewFile);
       at_CDDA: NewFile.GetAudioData(aAudioFileName, 0);
   end;
+  InsertFileToPlayList(NewFile, aCueName);
 
-  result := InsertFileToPlayList(NewFile, aCueName);
-  // NewFile.Free; // no, do not free any longer (2019)
+  result := NewFile;
 end;
 
 
@@ -1569,50 +1375,27 @@ begin
     result := PrebookList.Count;
 end;
 
-procedure TNempPlaylist.AddNodeToPrebookList(aNode: PVirtualnode);
-var Data: PTreeData;
-    af: TAudioFile;
-begin
-    if assigned(aNode) and (VST.GetNodeLevel(aNode)=0) then
-    begin
-        Data := VST.GetNodeData(aNode);
-        af := Data^.FAudioFile;
-        if PrebookList.IndexOf(af) > -1 then
-        begin
-            PrebookList.Move(PrebookList.IndexOf(af), 0);
-            ReIndexPrebookedFiles;
-            VST.Invalidate;
-        end else
-        begin
-            if PrebookList.Count < 99 then
-            begin
-                PrebookList.Add(af);
-                af.PrebookIndex := PreBookList.Count;
-                VST.InvalidateNode(aNode);
-            end;
-        end;
-
-    end;
-end;
-
 procedure TNempPlaylist.ReIndexPrebookedFiles;
 var i:Integer;
 begin
     for i := 0 to PrebookList.Count - 1 do
-        TAudioFile(PrebookList[i]).PrebookIndex := i+1;
+        PrebookList[i].PrebookIndex := i+1;
+    // Refresh Treeview
+    if assigned(fOnFilePropertiesChanged) then
+        fOnFilePropertiesChanged(self);
 end;
 
-procedure TNempPlaylist.ProcessKeypress(aDigit: Byte; aNode: PVirtualNode);
-var Data: PTreeData;
-    oldIndex, newIndex: Integer;
-    af: TAudioFile;
+procedure TNempPlaylist.ProcessKeypress(aDigit: Byte; af: TAudioFile);
+var oldIndex, newIndex: Integer;
     tc: Int64;
 begin
+    // possible values for keys are 48..57, 96..105, which should be mapped to 0..9
+    // as 2*48=96 we can do this by
+    while aDigit >= 48 do
+        aDigit := aDigit - 48;
 
-    if assigned(aNode) and (VST.GetNodeLevel(aNode)=0) then
+    if assigned(af) then
     begin
-        Data := VST.GetNodeData(aNode);
-        af := Data^.FAudioFile;
         tc := GetTickCount;
         if (af = fLastEditedAudioFile) and (tc - fLastKeypressTick < 1000) then
         begin
@@ -1629,9 +1412,7 @@ begin
             newIndex := aDigit;
         end;
         fLastKeypressTick := tc;
-
         SetNewPrebookIndex(af, newIndex);
-        VST.Invalidate;
     end;
 end;
 
@@ -1711,19 +1492,29 @@ procedure TNempPlaylist.LoadFromFile(aFilename: UnicodeString);
 begin
     // Load the new Playlist and display it
     LoadPlaylistFromFile(aFilename, Playlist, AutoScan, fDriveManager);
-    FillPlaylistView;
-    fDauer := ShowPlayListSummary;
-    UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+    if assigned(fOnPlaylistChangedCompletely) then
+        fOnPlaylistChangedCompletely(self);
+
+    fDauer := CalculateDuration;
     fPlaylistHasChanged := True;
+
+    // Trigger events
+    if assigned(self.fOnPropertiesChanged) then
+        fOnPropertiesChanged(self);
 end;
 
 procedure TNempPlaylist.LoadManagedPlayList(aIndex: Integer);
 begin
     PlaylistManager.LoadPlaylist(aIndex, Playlist, AutoScan);
-    FillPlaylistView;
-    fDauer := ShowPlayListSummary;
-    UpdatePlayListHeader(VST, Playlist.Count, fDauer);
+    if assigned(fOnPlaylistChangedCompletely) then
+        fOnPlaylistChangedCompletely(self);
+
+    fDauer := CalculateDuration;
     fPlaylistHasChanged := True;
+
+    // Trigger events
+    if assigned(self.fOnPropertiesChanged) then
+        fOnPropertiesChanged(self);
 end;
 
 function TNempPlaylist.SuggestSaveLocation(out Directory: String; out Filename: String): Boolean;
@@ -1748,14 +1539,14 @@ begin
         OKDir    := True;
         OKArtist := True;
         OKAlbum  := True;
-        af := TAudioFile(Playlist[0]);
+        af := Playlist[0];
         aDir    := af.Ordner;
         aAlbum  := af.Album;
         aArtist := af.Artist;
 
         for i := 1 to iMax-1 do
         begin
-            af := TAudioFile(Playlist[i]);
+            af := Playlist[i];
             if af.Ordner <> aDir then
                 OKDir := False;
             if af.Artist <> aArtist then
@@ -1928,7 +1719,7 @@ begin
   Player.Time := Value;
   fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
   // Cue-Zeug neu setzen
-  ActualizeCue;
+  RefreshCue;
 end;
 
 
@@ -1942,7 +1733,7 @@ begin
   Player.Progress := Value;
   fPlayingFileUserInput := fPlayingFileUserInput OR DisableAutoDeleteAtUserInput; //DisableAutoDeleteAtSlide;
   // Cue-Zeug neu setzen
-  ActualizeCue;
+  RefreshCue;
 end;
 
 {
@@ -1950,95 +1741,33 @@ end;
     Some stuff for the nodes in the TreeView
     --------------------------------------------------------
 }
-function TNempPlaylist.GetNodeWithPlayingFile: PVirtualNode;
-var k: integer;
-    aData: PTreeData;
-    aNode: PVirtualNode;
-begin
-  result := Nil;
-  aNode := VST.GetFirst;
-  //result := aNode;
-  if assigned(aNode) then
-  begin
-      // Suche den Knoten, der das PlayingFile enthält
-      for k := 0 to Playlist.Count - 1 do
-      begin
-        if assigned(aNode) then
-        begin
-          aData := VST.GetNodeData(aNode);
-          if aData^.FAudioFile = fPlayingFile then
-          begin
-            result := aNode;
-            break;
-          end else
-            aNode := VST.GetNextSibling(aNode);
-        end;
-      end;
-  end;
-end;
 
 function TNempPlaylist.GetPlayingIndex: Integer;
-var aNode: PVirtualNode;
 begin
-  aNode := GetNodeWithPlayingFile;
-  if assigned(aNode) then
-    result := aNode.Index
-  else
-    result := fPlayingIndex;
+    if assigned(fPlayingFile) then
+        result := Playlist.IndexOf(fPlayingFile)
+    else
+        result := -1;
+end;
+function TNempPlaylist.GetPlayingFileName: String;
+begin
+    if assigned(fPlayingFile) then
+        result := fPlayingFile.Pfad
+    else
+        result := '';
 end;
 
 function TNempPlaylist.fGetPlayingTrackPos: Double;
 begin
   if (assigned(fPlayingFile)) and (PlayList.IndexOf(fPlayingFile) >= 0) then
-      result := Player.Time
+  begin
+      if fPlayingFile.PrebookIndex = 0 then
+          result := Player.Time
+      else
+          result := fInterruptedPlayPosition;
+  end
   else
       result := 0;
-end;
-
-
-procedure TNempPlaylist.ScrollToPlayingNode;
-var
-  nextnode:PVirtualnode;
-begin
-  if assigned(fplayingNode) then
-  begin
-      nextnode := VST.GetFirst;
-      While (nextnode <> NIL) AND (NOT (nextnode = fplayingNode)) do
-        nextnode := VST.GetNextSibling(nextnode);
-
-      if (nextnode <> Nil) and VST.ScrollIntoView(Nextnode,False) then
-        VST.ScrollIntoView(Nextnode,True);
-  end;
-  // else: No scrolling
-end;
-
-procedure TNempPlaylist.AddCueListNodes(aAudioFile: TAudioFile; aNode: PVirtualNode);
-var  i:integer;
-begin
-
-  if assigned(aNode) and assigned(aAudioFile.CueList) and
-    (VST.ChildCount[aNode]=0) then
-  begin
-      for i := 0 to aAudioFile.CueList.Count - 1 do
-        VST.AddChild(aNode, TAudiofile(aAudioFile.Cuelist[i]));
-  end;
-end;
-
-function TNempPlaylist.GetActiveCueNode(aIndex: Integer): PVirtualNode;
-var i: Integer;
-    aNode: PVirtualNode;
-begin
-  result := Nil;
-  aNode := fPlayingNode;
-
-  if assigned(aNode) then
-    result := VST.GetFirstChild(aNode);
-
-  for i := 1 to aIndex do
-  begin
-    if assigned(result) then
-      result := VST.GetNextSibling(result);
-  end;
 end;
 
 {
@@ -2102,7 +1831,7 @@ begin
     // fill the array
     for i := 0 to Playlist.Count-1 do
     begin
-        af := TAudioFile(Playlist[i]);
+        af := Playlist[i];
         curWeight := RNGWeights[RatingToArrayIndex(af.Rating)];
         if curWeight > 0 then
         begin
@@ -2193,25 +1922,16 @@ end;
     --------------------------------------------------------
 }
 function TNempPlaylist.GetAnAudioFile: TPlaylistFile;
-var Node: PVirtualNode;
-  Data: PTreeData;
 begin
-  if assigned(PlayingFile) and assigned(fPlayingNode) then
-    result := PlayingFile
+  if assigned(PlayingFile) and (Playlist.IndexOf(PlayingFile) >= 0) then
+      result := PlayingFile
   else
   begin
-    // liefert den fokussierten oder den ersten Titel zurück
-    result := NIL;
-    Node := VST.FocusedNode;
-    if not Assigned(Node) then
-      Node := VST.GetFirst;
-    if Assigned(Node) then
-    begin
-      Data := VST.GetNodeData(Node);
-      result := Data^.FAudioFile;
-    end;
+      if Playlist.Count > 0 then
+          result := Playlist[0]
+      else
+          result := Nil;
   end;
-
 end;
 
 function TNempPlaylist.GetNextAudioFileIndex: Integer;
@@ -2261,7 +1981,7 @@ begin
     begin
         if PrebookList.Count > 0 then
         begin
-            tmpAudioFile := TAudioFile(PrebookList[0]);
+            tmpAudioFile := PrebookList[0];
             // the new selected file IS NOT equal to the interrupted file
             // => set the interruptedPLayPosition to 0
             if fInterruptedFile <> tmpAudioFile then
@@ -2279,19 +1999,21 @@ begin
             begin
                 // Index auf aktuellen  + 1
                 if (fPlayingFile <> NIL) and (fPlayingFile <> fBackupFile) then
-                  result := PlayList.IndexOf(fPlayingFile) + 1
+                    result := PlayList.IndexOf(fPlayingFile) + 1
                 else
-                    result := fPlayingIndex ; // nicht um eins erhöhen !!
+                    result := 0; //fPlayingIndex ; // nicht um eins erhöhen !!
 
                 if result > PlayList.Count-1 then
                 begin
-                  result := 0;
-                  if fAutoMix then
-                  begin // Playlist neu durchmischen
-                    for i := 0 to Playlist.Count-1 do
-                      Playlist.Move(i,i + random(PlayList.Count-i));
-                    FillPlaylistView;
-                  end;
+                    result := 0;
+                    if fAutoMix then
+                    begin // Playlist neu durchmischen
+                        for i := 0 to Playlist.Count-1 do
+                          Playlist.Move(i,i + random(PlayList.Count-i));
+                        // Trigger Refill-Event
+                        if assigned(fOnPlaylistChangedCompletely) then
+                            fOnPlaylistChangedCompletely(self);
+                    end;
                 end
             end else
             // shufflemode
@@ -2369,7 +2091,7 @@ begin
         if (fPlayingFile <> NIL)  and (fPlayingFile <> fBackupFile) then
             result := PlayList.IndexOf(fPlayingFile) - 1
         else
-            result := fPlayingIndex-1;
+            result := 0; // fPlayingIndex-1;
         if (result < 0) then
             result := Playlist.Count - 1;
         if (result < 0) then
@@ -2393,9 +2115,9 @@ begin
   // BassEngine wieder herstellen
   Player.ReInitBassEngine;
   // Altes Lied wieder starten
-  if PlayingFile <> NIL then
+  if assigned(PlayingFile) then
   begin
-    Play(fPlayingIndex, 0, StartPlay, OldTime);
+    Play(PlayingIndex, 0, StartPlay, OldTime);
     Player.Time := OldTime;
   end
 end;
@@ -2407,15 +2129,13 @@ end;
     Used by the Nemp Webserver
     --------------------------------------------------------
 }
-function TNempPlaylist.GetPlaylistIndex(aID: Int64): Integer;
+function TNempPlaylist.GetPlaylistIndexByWebServerID(aID: Int64): Integer;
 var i: Integer;
-    af: TAudioFile;
 begin
     result := -1;
     for i := 0 to Playlist.Count - 1 do
     begin
-        af := TAudioFile(Playlist[i]);
-        if af.WebServerID = aID then
+        if Playlist[i].WebServerID = aID then
         begin
             result := i;
             break;
@@ -2423,53 +2143,11 @@ begin
     end;
 end;
 
-procedure TNempPlaylist.DeleteAFile(aIdx: Integer);
-var aNode: PVirtualNode;
-    i: Integer;
-    aData: PTreeData;
-begin
-    VST.BeginUpdate;
 
-    aNode := VST.GetFirst;
-    for i := 0 to aIdx-1 do
-        aNode := VST.GetNextSibling(aNode);
-
-    if aNode = fPlayingNode then
-        fPlayingNode := Nil;
-
-    aData := VST.GetNodeData(aNode);
-
-    if (aData^.FAudioFile) = fPlayingFile then
-    begin
-        fPlayingIndex := aNode.Index;
-        // Backup playing file
-        fBackUpFile.Assign(fPlayingFile);
-        // Set the pointer to the backup-file
-        fPlayingFile := fBackUpFile;
-        Player.MainAudioFile := fBackUpFile;
-    end;
-
-    if assigned(fOnDeleteAudiofile) then
-        fOnDeleteAudiofile(aData^.FAudioFile);
-
-    PrebookList.Remove(aData^.FAudioFile);
-    RemoveFileFromHistory(aData^.FAudioFile);
-    Playlist.Delete(aNode.Index);
-    VST.DeleteNode(aNode);
-
-    ReIndexPrebookedFiles;
-
-    VST.EndUpdate;
-    VST.Invalidate;
-
-    fDauer := ShowPlayListSummary;
-    fPlaylistHasChanged := True;
-end;
-
+///  SwapFiles is called By the Webserver when the User clicks on "MoveUp/MoveDown"
+///  a and b differs by exactly 1, =>  a = b +/- 1
 function TNempPlaylist.SwapFiles(a, b: Integer): Boolean;
-var tmp, i: Integer;
-    NodeA, NodeB: PVirtualNode;
-
+var tmp: Integer;
 begin
     if a > b then
     begin
@@ -2477,24 +2155,16 @@ begin
         a := b;
         b := tmp;
     end;
+    // now: a < b, with a+1 = b
 
     if (a > -1) and (b > -1) and (a < Playlist.Count) and (b < Playlist.Count) then
     begin
-        NodeA := VST.GetFirst;
-        for i := 0 to a-1 do
-            NodeA := VST.GetNextSibling(NodeA);
-        NodeB := NodeA;
-        for i := a to b-1 do
-            NodeB := VST.GetNextSibling(NodeB);
-        // change fPlayingIndex
-        if NodeA = fPlayingNode then
-            fPlayingIndex := NodeB.Index
-        else
-            if NodeB = fPlayingNode then
-                fPlayingIndex := NodeA.Index;
+        Playlist.Move(b, a);
+        // Trigger event to move the nodes in the TreeView
+        // we want Node [b] to move one position up, so before [a]
+        if assigned(fOnFileMoved) then
+            fOnFileMoved(self, Playlist[b], b, a);
 
-        Playlist.Move(a,b);
-        VST.MoveTo(NodeA, NodeB, amInsertAfter, false);
         result := True;
     end else
         result := False;
@@ -2502,74 +2172,38 @@ begin
     fPlaylistHasChanged := True;
 end;
 
-procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Cardinal);
-var i, newIdx: Integer;
-    currentNode, iNode: PVirtualNode;
-    iData: PTreeData;
-    iFile: TAudioFile;
+procedure TNempPlaylist.ResortVotedFile(aFile: TAudioFile; aIndex: Integer);
+var newIdx: Integer;
 begin
-    // get the node with the voted Audiofile
-    currentNode := VST.GetFirst;
-    for i := 0 to aIndex-1 do
-        currentNode := VST.GetNextSibling(currentNode);
+    // aFile: the AudioFile we want to move now
+    // aIndex: The index of this file in the Playlist
 
-    if currentNode = fPlayingNode then
-        exit; // no action required
+    // nothing to do if we voted for the current PlayingFile.
+    if aFile = fPlayingFile then
+        exit;
 
-    // get the node, where it should be moved to
-    GetInsertNodeFromPlayPosition;
-    // bugfix 2020: Voted file was put *before* the currently playing file
-    // iNode := InsertNode
-    iNode := VST.GetNextSibling(InsertNode);
-    if assigned(iNode) then
-    begin
-        iData := VST.GetNodeData(iNode);
-        iFile := iData.FAudioFile;
-        while assigned(iNode) and (iNode <> currentNode) and (iFile.VoteCounter >= aFile.VoteCounter) do
-        begin
-            iNode := VST.GetNextSibling(iNode);
-            if assigned(iNode) then
-            begin
-                iData := VST.GetNodeData(iNode);
-                iFile := iData.FAudioFile;
-            end;
-        end;
-        // votes of iFile are < aFile.VoteCounter now
-        // (or iNode = Nil)
-        if (iNode <> currentNode) then
-        begin
-            if assigned(iNode) then
-            begin
-                if aIndex < iNode.Index then
-                    newIdx := iNode.Index -1
-                else
-                    newIdx := iNode.Index ;
-                Playlist.Move(aIndex, newIdx);
-                VST.MoveTo(currentNode, iNode, amInsertBefore, false);
-            end else
-            begin
-                iNode := VST.GetLast;
-                if assigned(iNode) then
-                begin
-                    Playlist.Move(aIndex, Playlist.Count - 1);
-                    VST.MoveTo(currentNode, iNode, amInsertAfter, false);
-                end // else: Nothing to do, there is no Node in the Tree
-            end;
-        end;
+    newIDx := InitInsertIndexFromPlayPosition(True);
+    if newIDX < 0 then
+        newIDX := Playlist.Count;
 
-    end else
-    begin
-        // move aFile to the end of the playlist
-        iNode := VST.GetLast;
-        if assigned(iNode) then
-        begin
-            Playlist.Move(aIndex, Playlist.Count - 1);
-            VST.MoveTo(currentNode, iNode, amInsertAfter, false);
-        end
-    end;
+    while (newIdx < Playlist.Count) and (Playlist[newIdx].VoteCounter >= aFile.VoteCounter) do
+        inc(newIdx);
 
-    // fPlayingIndex korrigieren
-    ReInitPlaylist;
+    ///  now:     (newIdx = Playlist.Count) or (Playlist[newIdx]) has smaller VoteCounter
+    ///  => aFile should be moved *before* the File placed currently on Playlist[newIDX]
+    ///     (or at the very end of the playlist, if newIdx = Playlist.Count)
+
+    // Trigger event to move the nodes in the TreeView
+    if assigned(fOnFileMoved) then
+        fOnFileMoved(self, aFile, aIndex, newIdx);
+
+    // In the List, we don't want to place the file at a specific *index*.
+    // Instead, we want it before the entry with the newIdx. Therefore:
+    if aIndex < newIdx then
+        dec(newIdx);
+
+    // move the File in the list
+    Playlist.Move(aIndex, newIdx);
     fPlaylistHasChanged := True;
 end;
 
@@ -2595,7 +2229,7 @@ var i: Integer;
 begin
     for i := 0 to Playlist.Count - 1 do
     begin
-        af := TAudioFile(Playlist[i]);
+        af := Playlist[i];
         if af.Pfad = aFilename then
         begin
             af.Rating := aRating;
@@ -2607,13 +2241,13 @@ begin
 end;
 
 procedure TNempPlaylist.CollectFilesWithSameFilename(aFilename: String;
-  Target: TObjectList);
+  Target: TAudioFileList);
 var i: Integer;
     af: TAudioFile;
 begin
     for i := 0 to Playlist.Count - 1 do
     begin
-        af := TAudioFile(Playlist[i]);
+        af := Playlist[i];
         if af.Pfad = aFilename then
             Target.Add(af);
     end;

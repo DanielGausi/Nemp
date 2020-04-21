@@ -510,6 +510,7 @@ begin
   DetailRatingHelper := TRatingHelper.Create;
   LoadStarGraphics;
 
+  VST_MetaData.NodeDataSize := sizeOf(TTagEditItem);
   CoverArtSearcher := TCoverArtSearcher.Create;
 end;
 
@@ -889,7 +890,7 @@ procedure TFDetails.BtnApplyClick(Sender: TObject);
 var aErr: TNempAudioError;
     oldCoverID: String;
     i: Integer;
-    CoverIDFiles: TObjectList;
+    CoverIDFiles: TAudioFileList;
     loopAudioFile: TAudioFile;
 begin
 
@@ -979,7 +980,7 @@ begin
                 ///  they may have been grouped together by the same User-CoverID before.
                 ///  Now they should be separated again, if needed.
                 CoverArtSearcher.StartNewSearch;
-                CoverIDFiles := TObjectList.create(False);
+                CoverIDFiles := TAudioFileList.create(False);
                 try
                     // get the list of files which need to be changed
                     case rgChangeCoverArt.ItemIndex of
@@ -989,7 +990,7 @@ begin
 
                     for i := 0 to CoverIDFiles.Count - 1 do
                     begin
-                        loopAudioFile := TAudioFile(CoverIDFiles[i]);
+                        loopAudioFile := CoverIDFiles[i];
                         loopAudioFile.CoverID := NewLibraryCoverID;
 
                         aErr := loopAudioFile.WriteUserCoverIDToMetaData(AnsiString(NewLibraryCoverID), True);
@@ -1009,7 +1010,7 @@ begin
                 // But do not write the MetaTags again. That should have been done in the Library-Loop
                 for i := 0 to NempPlayList.Playlist.count - 1 do
                 begin
-                    loopAudioFile := TAudioFile(NempPlaylist.Playlist.Items[i]);
+                    loopAudioFile := NempPlaylist.Playlist.Items[i];
                     if loopAudioFile.IsFile and (loopAudioFile.CoverID = OldCoverID) then
                         loopAudioFile.CoverID := NewLibraryCoverID;
                 end;
@@ -1480,7 +1481,7 @@ end;
 {$ENDREGION}
 
 procedure TFDetails.ReloadDataAfterEdit(aERR: TNempAudioError);
-var ListOfFiles: TObjectList;
+var ListOfFiles: TAudioFileList;
     listFile: TAudioFile;
     i: Integer;
 begin
@@ -1494,12 +1495,12 @@ begin
     end;
 
     // Update other copies of this file
-    ListOfFiles := TObjectList.Create(False);
+    ListOfFiles := TAudioFileList.Create(False);
     try
         GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
         for i := 0 to ListOfFiles.Count - 1 do
         begin
-            listFile := TAudioFile(ListOfFiles[i]);
+            listFile := ListOfFiles[i];
             // copy Data from AktuellesAudioFile to the files in the list.
             listFile.Assign(CurrentAudioFile);
             // Set Rating/Playcounter to Bib-Values
@@ -2736,7 +2737,7 @@ end;
 
 
 procedure TFDetails.Btn_RefreshClick(Sender: TObject);
-var ListOfFiles: TObjectList;
+var ListOfFiles: TAudioFileList;
     listFile: TAudioFile;
     i: Integer;
 begin
@@ -2753,12 +2754,12 @@ begin
                 SynchAFileWithDisc(CurrentAudioFile, True);
 
                 // Generate a List of Files which should be updated now
-                ListOfFiles := TObjectList.Create(False);
+                ListOfFiles := TAudioFileList.Create(False);
                 try
                     GetListOfAudioFileCopies(CurrentAudioFile, ListOfFiles);
                     for i := 0 to ListOfFiles.Count - 1 do
                     begin
-                        listFile := TAudioFile(ListOfFiles[i]);
+                        listFile := ListOfFiles[i];
                         // copy Data from CurrentAudioFile to the files in the list.
                         listFile.Assign(CurrentAudioFile);
                     end;
@@ -2983,8 +2984,6 @@ begin
 end;
 
 procedure TFDetails.ShowSelectedImage_Files;
-var aCoverbmp: TBitmap;
-    aPic: TPicture;
 begin
     if cbCoverArtFiles.itemindex >= Coverpfade.Count then
         exit;

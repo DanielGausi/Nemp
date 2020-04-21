@@ -54,7 +54,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
      DeleteHelper, TagHelper, Generics.Collections, unFastFileStream, System.Types, System.UITypes,
-     Winapi.Wincodec, Winapi.ActiveX;
+     Winapi.Wincodec, Winapi.ActiveX, System.Generics.Defaults;
 
 const
     BUFFER_SIZE = 10 * 1024 * 1024;
@@ -113,15 +113,15 @@ type
         //     all lists beginning with "tmp" are temporary lists, which stores the library
         //     during a update-process, so that the Application is blocked only for a very
         //     short time.
-        Mp3ListePfadSort: TObjectlist;      // List of all files in the library. Sorted by Path.
-        tmpMp3ListePfadSort: TObjectlist;   // Used for saving, searching and checking for new files
+        Mp3ListePfadSort: TAudioFileList;      // List of all files in the library. Sorted by Path.
+        tmpMp3ListePfadSort: TAudioFileList;   // Used for saving, searching and checking for new files
 
-        Mp3ListeArtistSort:TObjectList;     // Two copies of the Mp3ListePfadSort, sorted by other criterias.
-        Mp3ListeAlbenSort: TObjectlist;     // used for fast browsing in the library.
-        tmpMp3ListeArtistSort:TObjectList;
-        tmpMp3ListeAlbenSort: TObjectlist;
+        Mp3ListeArtistSort:TAudioFileList;     // Two copies of the Mp3ListePfadSort, sorted by other criterias.
+        Mp3ListeAlbenSort: TAudioFileList;     // used for fast browsing in the library.
+        tmpMp3ListeArtistSort:TAudioFileList;
+        tmpMp3ListeAlbenSort: TAudioFileList;
 
-        DeadFiles: TObjectlist;             // Two lists, that collect dead files
+        DeadFiles: TAudioFileList;             // Two lists, that collect dead files
         DeadPlaylists: TObjectList;
 
         AlleAlben: TStringList;             // A list with all albums
@@ -131,7 +131,7 @@ type
         fPlaylistDriveManager: TDriveManager; // Another one for the Playlistfiles. Probably not needed in most cases
 
 
-        PlaylistFiles: TObjectList;         // temporarly AudioFiles, loaded from Playlists
+        PlaylistFiles: TAudioFileList;         // temporarly AudioFiles, loaded from Playlists
 
         AllPlaylistsPfadSort: TObjectList;     // Lists for Playlists.
         tmpAllPlaylistsPfadSort: TObjectList;  // Contain "TJustAString"-Objects
@@ -278,7 +278,7 @@ type
         procedure fGetDeadFilesSummary(DeleteDataList: TObjectList; var aSummary: TDeadFilesInfo);
 
         // Refreshing Library
-        procedure fRefreshFiles(aRefreshList: TObjectList);      // 1a. Refresh files OR
+        procedure fRefreshFiles(aRefreshList: TAudioFileList);      // 1a. Refresh files OR
         procedure fScanNewFiles;
         procedure fGetLyrics;         // 1b. get Lyrics
         procedure fPrepareGetTags;    // 1c. get tags, but at first make a copy of the Ignore/rename-Rules in VCL-Thread
@@ -295,9 +295,9 @@ type
         // "Artist" ist the primary property (left), "Album" the secondary (right)
 
         // Get all Artists from the Library
-        procedure GenerateArtistList(Source: TObjectlist; Target: TObjectlist);
+        procedure GenerateArtistList(Source: TAudioFileList; Target: TObjectlist);
         // Get all Albums from the Library
-        procedure InitAlbenlist(Source: TObjectlist; Target: TStringList);
+        procedure InitAlbenlist(Source: TAudioFileList; Target: TStringList);
         // Get a Name-Sorted list of all Playlists
         // Note: No source-target-Parameter, as these lists are rather small.
         // No threaded tmp-list stuff needed here.
@@ -306,15 +306,15 @@ type
 
         procedure SortCoverList(aList: TObjectList);
         // Get all Cover from the Library (TNempCover, used for browsing)
-        procedure GenerateCoverList(Source: TObjectlist; Target: TObjectlist);
+        procedure GenerateCoverList(Source: TAudioFileList; Target: TObjectlist);
 
-        procedure GenerateCoverListFromSearchResult(Source: TObjectlist; Target: TObjectlist);
+        procedure GenerateCoverListFromSearchResult(Source: TAudioFileList; Target: TObjectlist);
 
 
         // Helper for Browsing Between
         // "Start" and "Ende" are the files with the wanted "Name"
-        procedure GetStartEndIndex(Liste: TObjectlist; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
-        procedure GetStartEndIndexCover(Liste: TObjectlist; aCoverID: String; var Start: integer; var Ende: Integer);
+        procedure GetStartEndIndex(Liste: TAudioFileList; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
+        procedure GetStartEndIndexCover(Liste: TAudioFileList; aCoverID: String; var Start: integer; var Ende: Integer);
 
         // Helper for "FillRandomList"
         function CheckYearRange(Year: UnicodeString): Boolean;
@@ -385,12 +385,12 @@ type
         ///
         ///  maybe later: replace "AnzeigeShowsPlaylistFiles" by another "PlaylistFilesList" ??
         ///  ************************
-        LastBrowseResultList      : TObjectList;
-        LastQuickSearchResultList : TObjectList;
-        LastMarkFilterList        : TObjectList;
+        LastBrowseResultList      : TAudioFileList;
+        LastQuickSearchResultList : TAudioFileList;
+        LastMarkFilterList        : TAudioFileList;
         // virtual Lists, do NOT create/free. These are just links to one of three above (or "allFiles")
-        AnzeigeListe          : TObjectList;
-        BaseMarkerList        : TObjectList;
+        AnzeigeListe          : TAudioFileList;
+        BaseMarkerList        : TAudioFileList;
         // AnzeigeListe2: TObjectList; // Speichert zusätzliche QuickSearch-Resultate.
         // Flag, was für Dateien in der Playlist sind
         // Muss bei jeder Änderung der AnzeigeListe gesetzt werden
@@ -407,7 +407,7 @@ type
         // Liste, in die die neu einzupflegenden Dateien kommen
         // Auf diese Liste greift Searchtool zu, wenn die Platte durchsucht wird,
         // und auch die Laderoutine
-        UpdateList: TObjectlist;
+        UpdateList: TAudioFileList;
 
         ///  PlaylistUpdateList: With the new system since Nemp 4.14 we need 2 Lists
         ///  for Playlists during the UpdateProcess
@@ -545,7 +545,7 @@ type
         // Note: WebServer will run multiple threads, but read-access only.
         //       Sync with main program will be complicated, so the webserver uses
         //       a copy of the list.
-        procedure CopyLibrary(dest: TObjectlist; var CurrentMaxID: Integer);
+        procedure CopyLibrary(dest: TAudioFileList; var CurrentMaxID: Integer);
         // Load/Save options into IniFile
         procedure LoadFromIni(ini: TMemIniFile);
         procedure WriteToIni(ini: TMemIniFile);
@@ -605,7 +605,7 @@ type
         function PlaylistFileExists(aFilename: UnicodeString): Boolean;
 
         // 2018: new helper method to set the BaseMarkerList properly
-        procedure SetBaseMarkerList(aList: TObjectList);
+        procedure SetBaseMarkerList(aList: TAudioFileList);
 
         // Methods for Browsing in the Library
         // 1. Generate BrowseLists
@@ -613,7 +613,7 @@ type
         // 2. Regenerate BrowseLists
         Procedure ReBuildBrowseLists;     // Complete Rebuild
         procedure ReBuildCoverList(FromScratch: Boolean = True);       // -"- of CoverLists
-        procedure ReBuildCoverListFromList(aList: TObjectList);  // used to refresh coverflow on QuickSearch
+        procedure ReBuildCoverListFromList(aList: TAudioFileList);  // used to refresh coverflow on QuickSearch
         procedure ReBuildTagCloud;        // -"- of the TagCloud
 
         procedure GetTopTags(ResultCount: Integer; Offset: Integer; Target: TObjectList; HideAutoTags: Boolean = False);
@@ -623,18 +623,18 @@ type
         // 3. When Browsing the left tree, fill the right tree
         procedure GetAlbenList(Artist: UnicodeString);
         // 4. Get from a selected pair of "Artist"-"Album" the matching titles
-        Procedure GetTitelList(Target: TObjectlist; Artist: UnicodeString; Album: UnicodeString);
+        Procedure GetTitelList(Target: TAudioFileList; Artist: UnicodeString; Album: UnicodeString);
         // Ruft nur GetTitelList auf, mit Target = AnzeigeListe
         // NUR IM VCL_HAUPTTHREAD benutzen
         Procedure GenerateAnzeigeListe(Artist: UnicodeString; Album: UnicodeString);// UpdateQuickSearchList: Boolean = True);
         // wie oben, nur wirdf hier nur auf eine der großen Listen zugegriffen
         // und die Sortierung ist immer nach CoverID, kein zweites Kriterium möglich.
-        procedure GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
-        procedure GetTitelListFromCoverIDUnsorted(Target: TObjectlist; aCoverID: String);
-        procedure GetTitelListFromDirectoryUnsorted(Target: TObjectlist; aDirectory: String);
+        procedure GetTitelListFromCoverID(Target: TAudioFileList; aCoverID: String);
+        procedure GetTitelListFromCoverIDUnsorted(Target: TAudioFileList; aCoverID: String);
+        procedure GetTitelListFromDirectoryUnsorted(Target: TAudioFileList; aDirectory: String);
         procedure GenerateAnzeigeListeFromCoverID(aCoverID: String);
         procedure GenerateAnzeigeListeFromTagCloud(aTag: TTag; BuildNewCloud: Boolean);
-        procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
+        procedure GenerateDragDropListFromTagCloud(aTag: TTag; Target: TAudioFileList);
 
         procedure RestoreAnzeigeListeAfterQuicksearch;
 
@@ -669,10 +669,10 @@ type
         procedure SortAnzeigeListe;
 
         // Generating RandomList (Random Playlist)
-        procedure FillRandomList(aList: TObjectlist);
+        procedure FillRandomList(aList: TAudioFileList);
 
         // copy all files into another list (used for counting ratings)
-        procedure FillListWithMedialibrary(aList: TObjectList);
+        procedure FillListWithMedialibrary(aList: TAudioFileList);
 
         // Helper for AutoScan-Directories
         function ScanListContainsParentDir(NewDir: UnicodeString):UnicodeString;
@@ -786,14 +786,14 @@ begin
   CloseAfterUpdate := False;
   MainWindowHandle := aWnd;
 
-  Mp3ListePfadSort   := TObjectlist.Create(False);
-  Mp3ListeArtistSort := TObjectList.create(False);
-  Mp3ListeAlbenSort  := TObjectlist.create(False);
-  tmpMp3ListePfadSort   := TObjectlist.Create(False);
-  tmpMp3ListeArtistSort := TObjectList.create(False);
-  tmpMp3ListeAlbenSort  := TObjectlist.create(False);
+  Mp3ListePfadSort   := TAudioFileList.Create(False);
+  Mp3ListeArtistSort := TAudioFileList.create(False);
+  Mp3ListeAlbenSort  := TAudioFileList.create(False);
+  tmpMp3ListePfadSort   := TAudioFileList.Create(False);
+  tmpMp3ListeArtistSort := TAudioFileList.create(False);
+  tmpMp3ListeAlbenSort  := TAudioFileList.create(False);
 
-  DeadFiles := TObjectlist.create(False);
+  DeadFiles := TAudioFileList.create(False);
   DeadPlaylists := TObjectlist.create(False);
 
   AlleAlben := TStringList.Create;
@@ -811,9 +811,9 @@ begin
   Alben        := TObjectlist.create(False);
 
 
-  LastBrowseResultList      := TObjectList.create(False);
-  LastQuickSearchResultList := TObjectList.create(False);
-  LastMarkFilterList        := TObjectList.create(False);
+  LastBrowseResultList      := TAudioFileList.create(False);
+  LastQuickSearchResultList := TAudioFileList.create(False);
+  LastMarkFilterList        := TAudioFileList.create(False);
   // virtual Lists, do NOT create/free
   AnzeigeListe              := LastBrowseResultList;
   BaseMarkerList            := LastBrowseResultList;
@@ -825,7 +825,7 @@ begin
   BibSearcher.MainList := Mp3ListePfadSort;
 
   RadioStationList    := TObjectlist.Create;
-  UpdateList   := TObjectlist.create(False);
+  UpdateList   := TAudioFileList.create(False);
   ST_Ordnerlist := TStringList.Create;
   AutoScanDirList := TStringList.Create;
   AutoScanDirList.Sorted := True;
@@ -834,7 +834,7 @@ begin
   fDriveManager := TDriveManager.Create;
   fPlaylistDriveManager := TDriveManager.Create;
 
-  PlaylistFiles := TObjectList.Create(True);
+  PlaylistFiles := TAudioFileList.Create(True);
   tmpAllPlaylistsPfadSort := TObjectList.Create(False);
   AllPlaylistsPfadSort := TObjectList.Create(False);
   AllPlaylistsNameSort := TObjectList.Create(False);
@@ -884,7 +884,7 @@ begin
   CoverArtSearcher.Free;
 
   for i := 0 to Mp3ListePfadSort.Count - 1 do
-    TAudioFile(Mp3ListePfadSort[i]).Free;
+      Mp3ListePfadSort[i].Free;
 
   Mp3ListePfadSort.Free;
   Mp3ListeArtistSort.Free;
@@ -961,7 +961,7 @@ var i: Integer;
 begin
   fJobList.Clear;
   for i := 0 to Mp3ListePfadSort.Count - 1 do
-    TAudioFile(Mp3ListePfadSort[i]).Free;
+      Mp3ListePfadSort[i].Free;
 
   Mp3ListePfadSort.Clear;
   Mp3ListeArtistSort.Clear;
@@ -1032,7 +1032,7 @@ end;
     - Copy the list for use in Webserver
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.CopyLibrary(dest: TObjectlist; var CurrentMaxID: Integer);
+procedure TMedienBibliothek.CopyLibrary(dest: TAudioFileList; var CurrentMaxID: Integer);
 var i: Integer;
     newAF, AF: TAudioFile;
 begin
@@ -1042,7 +1042,7 @@ begin
       dest.Capacity := Mp3ListePfadSort.Count;
       for i := 0 to Mp3ListePfadSort.Count - 1 do
       begin
-          AF := TAudioFile(Mp3ListePfadSort[i]);
+          AF := Mp3ListePfadSort[i];
           newAF := TAudioFile.Create;
           newAF.AssignLight(AF); // d.h. ohne Lyrics!
           if AF.WebServerID = 0 then
@@ -1070,7 +1070,7 @@ var i, c: Integer;
 begin
     c := 0;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
-        if TAudioFile(Mp3ListePfadSort[i]).ID3TagNeedsUpdate then
+        if Mp3ListePfadSort[i].ID3TagNeedsUpdate then
             inc(c);
     result := c;
 end;
@@ -1087,7 +1087,7 @@ begin
     UpdateList.Clear;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
-        if TAudioFile(MP3ListePfadSort[i]).ID3TagNeedsUpdate then
+        if MP3ListePfadSort[i].ID3TagNeedsUpdate then
             UpdateList.Add(MP3ListePfadSort[i]);
     end;
 end;
@@ -1114,7 +1114,7 @@ begin
     if StatusBibUpdate >= 2 then exit;
     c := 0;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
-        if TAudioFile(Mp3ListePfadSort[i]).ChangeTag(oldTag, newTag) then
+        if Mp3ListePfadSort[i].ChangeTag(oldTag, newTag) then
             inc(c);
     result := c;
 end;
@@ -1126,7 +1126,7 @@ begin
     if StatusBibUpdate >= 2 then exit;
     c := 0;
     for i := 0 to Mp3ListePfadSort.Count - 1 do
-        if TAudioFile(Mp3ListePfadSort[i]).ContainsTag(aTag) then
+        if Mp3ListePfadSort[i].ContainsTag(aTag) then
             inc(c);
     result := c;
 end;
@@ -1465,7 +1465,7 @@ begin
         // the search for new files has beem cancelled by the user.
         // Discard files in the UpdateList and cleanUP Progress-GUI
         for i := 0 to UpdateList.Count - 1 do
-            TAudioFile(UpdateList[i]).Free;          
+            UpdateList[i].Free;
         UpdateList.Clear;
          
         // we are in the main VCL Thread here.
@@ -1519,7 +1519,7 @@ procedure TMedienBibliothek.fScanNewFiles;
 var i, freq, ges: Integer;
     AudioFile: TAudioFile;
     ct, nt: Cardinal;
-    ScanList: TObjectList;
+    ScanList: TAudioFileList;
 begin
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0); // Or better MB_BlockWriteAccess? - No, it should be ok so.
@@ -1538,12 +1538,12 @@ begin
   freq := Round(UpdateList.Count / 100) + 1;
   ct := GetTickCount;
 
-  ScanList := TObjectList.Create(False);
+  ScanList := TAudioFileList.Create(False);
   try
       // Transfer the items from the UpdateList into a temporary new List
       ScanList.Capacity := UpdateList.Count;
       for i := 0 to UpdateList.Count - 1 do
-          ScanList.Add(TAudioFile(UpdateList[i]));
+          ScanList.Add(UpdateList[i]);
       // Clear the original UpdateList
       UpdateList.Clear;
 
@@ -1554,10 +1554,10 @@ begin
           begin
               // Free the remaining AudioFiles in the ScanList, and
               // don't add them to the UpdateList, which is processed after this method
-              TAudioFile(ScanList[i]).Free;
+              ScanList[i].Free;
           end else
           begin
-              AudioFile := TAudioFile(ScanList[i]);
+              AudioFile := ScanList[i];
               if FileExists(AudioFile.Pfad) then
               begin
                   AudioFile.FileIsPresent:=True;
@@ -1697,7 +1697,8 @@ begin
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_Preparing)));
 
-  UpdateList.Sort(Sortieren_Pfad_asc);
+  UpdateList.Sort(Sort_Pfad_asc);
+
   Merge(UpdateList, Mp3ListePfadSort, tmpMp3ListePfadSort, SO_Pfad, NempSortArray);
   PlaylistUpdateList.Sort(PlaylistSort_Pfad);
   MergePlaylists(PlaylistUpdateList, AllPlaylistsPfadSort, tmpAllPlaylistsPfadSort);
@@ -1717,7 +1718,7 @@ begin
   case BrowseMode of
       0: begin
           // Classic Browsing: Artist-Album (or whatever the user wanted)
-          UpdateList.Sort(Sortieren_String1String2Titel_asc);
+          UpdateList.Sort(Sort_String1String2Titel_asc);
 
           if fBrowseListsNeedUpdate then
           begin
@@ -1728,19 +1729,23 @@ begin
           end;
 
           if fBrowseListsNeedUpdate then
-              Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+              Mp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
+              //(Sortieren_String1String2Titel_asc);
           Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_ArtistAlbum, NempSortArray);
 
           if fBrowseListsNeedUpdate then
-              Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
-          UpdateList.Sort(Sortieren_String2String1Titel_asc);
+              Mp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
+              //(Sortieren_String2String1Titel_asc);
+          UpdateList.Sort(Sort_String2String1Titel_asc);
+          //(Sortieren_String2String1Titel_asc);
           Merge(UpdateList, Mp3ListeAlbenSort, tmpMp3ListeAlbenSort, SO_AlbumArtist, NempSortArray);
 
           fBrowseListsNeedUpdate := False;
       end;
       1: begin
           // Coverflow
-          UpdateList.Sort(Sortieren_CoverID);
+          UpdateList.Sort(Sort_CoverID);
+          //(Sortieren_CoverID);
 
           if fBrowseListsNeedUpdate then
           begin
@@ -1752,8 +1757,10 @@ begin
 
           if fBrowseListsNeedUpdate then
           begin
-              Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-              Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+              Mp3ListeArtistSort.Sort(Sort_CoverID);
+              //(Sortieren_CoverID);
+              Mp3ListeAlbenSort.Sort(Sort_CoverID);
+              //(Sortieren_CoverID);
           end;
 
           Merge(UpdateList, Mp3ListeArtistSort, tmpMp3ListeArtistSort, SO_Cover, NempSortArray);
@@ -1782,10 +1789,10 @@ begin
   //       Probably the Sort and Binary-Search methods do not match then.
   for i := 0 to tmpMp3ListePfadSort.Count-2 do
   begin
-    if TAudioFile(tmpMp3ListePfadSort[i]).Pfad = TAudioFile(tmpMp3ListePfadSort[i+1]).Pfad then
+    if tmpMp3ListePfadSort[i].Pfad = tmpMp3ListePfadSort[i+1].Pfad then
     begin
       // Oops. Send Warning to MainWindow
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_DuplicateWarning, Integer(pWideChar(TAudioFile(tmpMp3ListePfadSort[i]).Pfad)));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_DuplicateWarning, Integer(pWideChar(tmpMp3ListePfadSort[i].Pfad)));
       ChangeAfterUpdate := True; // We need to save the changed library after the cleanup
 
       AnzeigeListe.Clear;
@@ -1794,9 +1801,9 @@ begin
       // Delete Duplicates
       for d := tmpMp3ListePfadSort.Count-1 downto 1 do
       begin
-        if TAudioFile(tmpMp3ListePfadSort[d-1]).Pfad = TAudioFile(tmpMp3ListePfadSort[d]).Pfad then
+        if tmpMp3ListePfadSort[d-1].Pfad = tmpMp3ListePfadSort[d].Pfad then
         begin
-          aAudioFile := TAudioFile(tmpMp3ListePfadSort[d]);
+          aAudioFile := tmpMp3ListePfadSort[d];
           tmpMp3ListePfadSort.Extract(aAudioFile);
           tmpMp3ListeArtistSort.Extract(aAudioFile);
           tmpMp3ListeAlbenSort.Extract(aAudioFile);
@@ -1844,9 +1851,9 @@ begin
     ActualDrive := '-';
     for i := 0 to aList.Count - 1 do
     begin
-        if TAudioFile(aList[i]).Pfad[1] <> ActualDrive then
+        if T---AudioFile(aList[i]).Pfad[1] <> ActualDrive then
         begin
-            ActualDrive := TAudioFile(aList[i]).Pfad[1];
+            ActualDrive := T--AudioFile(aList[i]).Pfad[1];
 
             if ActualDrive <> '\' then
             begin
@@ -1889,7 +1896,8 @@ end;
     --------------------------------------------------------
 }
 procedure TMedienBibliothek.SwapLists;
-var swaplist: TObjectlist;
+var swaplist: TAudioFileList;
+    swaplist2: TObjectList;
     swapstlist: TStringList;
 begin
   EnterCriticalSection(CSUpdate);
@@ -1912,21 +1920,21 @@ begin
   Mp3ListeAlbenSort := tmpMp3ListeAlbenSort;
   tmpMp3ListeAlbenSort := swaplist;
 
-  swaplist := AlleArtists;
+  swaplist2 := AlleArtists;
   AlleArtists := tmpAlleArtists;
-  tmpAlleArtists := swaplist;
+  tmpAlleArtists := swaplist2;
 
-  swaplist := Coverlist;
+  swaplist2 := Coverlist;
   Coverlist := tmpCoverlist;
-  tmpCoverlist := swaplist;
+  tmpCoverlist := swaplist2;
 
   swapstlist := AlleAlben;
   AlleAlben := tmpAlleAlben;
   tmpAlleAlben := swapstlist;
 
-  swapList := AllPlaylistsPfadSort;
+  swapList2 := AllPlaylistsPfadSort;
   AllPlaylistsPfadSort := tmpAllPlaylistsPfadSort;
-  tmpAllPlaylistsPfadSort := swapList;
+  tmpAllPlaylistsPfadSort := swapList2;
   InitPlayListsList;
 
   BibSearcher.BuildTotalSearchStrings(Mp3ListePfadSort);
@@ -2105,15 +2113,15 @@ begin
       ct := GetTickCount;
       for i := 0 to Mp3ListePfadSort.Count-1 do
       begin
-          if Not FileExists((Mp3ListePfadSort[i] as TAudioFile).Pfad) then
-            DeadFiles.Add(Mp3ListePfadSort[i] as TAudioFile);
+          if Not FileExists(Mp3ListePfadSort[i].Pfad) then
+            DeadFiles.Add(Mp3ListePfadSort[i]);
 
           nt := GetTickCount;
           if (i mod freq = 0) or (nt > ct + 500) or (nt < ct) then
           begin
                 ct := nt;
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead,
-                      Integer(PChar( (Mp3ListePfadSort[i] as TAudioFile).Ordner)) );
+                      Integer(PChar( Mp3ListePfadSort[i].Ordner)) );
 
                 SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, Round(i/ges * 100));
                 // SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressSearchDead, Round(i/ges * 100));
@@ -2192,7 +2200,7 @@ var i: Integer;
         c := 0;
         for j := 0 to mp3ListePfadSort.Count - 1 do
         begin
-            if AnsiStartsText(aPC, TAudioFile(Mp3ListePfadSort[j]).Ordner) then
+            if AnsiStartsText(aPC, Mp3ListePfadSort[j].Ordner) then
                 inc(c);
         end;
         result := c;
@@ -2265,7 +2273,7 @@ begin
 
     for i := 0 to DeadFiles.Count - 1 do
     begin
-        currentDir := TAudioFile(DeadFiles[i]).Ordner;
+        currentDir := DeadFiles[i].Ordner;
         if length(currentDir) > 0 then
         begin
             if IsLocalDir(currentDir) then
@@ -2460,7 +2468,8 @@ begin
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(DeleteSelect_DeletingFiles)));
 
-  DeadFiles.Sort(Sortieren_Pfad_asc);
+  DeadFiles.Sort(Sort_Pfad_asc);
+  //(Sortieren_Pfad_asc);
   AntiMerge(Mp3ListePfadSort, DeadFiles, tmpMp3ListePfadSort);
 
   AntiMergePlaylists(AllPlaylistsPfadSort, DeadPlaylists, tmpAllPlaylistsPfadSort);
@@ -2472,12 +2481,14 @@ begin
           tmpMp3ListeArtistSort.Clear;
           for i := 0 to tmpMp3ListePfadSort.Count - 1 do
             tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
-          tmpMp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
+          tmpMp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
+          //Sort(Sortieren_String1String2Titel_asc);
 
           tmpMp3ListeAlbenSort.Clear;
           for i := 0 to tmpMp3ListePfadSort.Count - 1 do
             tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
-          tmpMp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+          tmpMp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
+          //(Sortieren_String2String1Titel_asc);
 
           fBrowseListsNeedUpdate := False;
 
@@ -2494,8 +2505,10 @@ begin
             tmpMp3ListeArtistSort.Add(tmpMp3ListePfadSort[i]);
             tmpMp3ListeAlbenSort.Add(tmpMp3ListePfadSort[i]);
           end;
-          tmpMp3ListeArtistSort.Sort(Sortieren_CoverID);
-          tmpMp3ListeAlbenSort.Sort(Sortieren_CoverID);
+          tmpMp3ListeArtistSort.Sort(Sort_CoverID);
+          //(Sortieren_CoverID);
+          tmpMp3ListeAlbenSort.Sort(Sort_CoverID);
+          //(Sortieren_CoverID);
 
           // BrowseListen vorbereiten.
           GenerateCoverList(tmpMp3ListeArtistSort, tmpCoverList);
@@ -2527,9 +2540,9 @@ begin
     // Delete DeadFiles from AnzeigeListe (meaning: from the possible "real" lists behind this list)
     for i := 0 to DeadFiles.Count - 1 do
     begin
-        LastBrowseResultList      .Extract(TAudioFile(DeadFiles[i]));
-        LastQuickSearchResultList .Extract(TAudioFile(DeadFiles[i]));
-        LastMarkFilterList        .Extract(TAudioFile(DeadFiles[i]));
+        LastBrowseResultList      .Extract(DeadFiles[i]);
+        LastQuickSearchResultList .Extract(DeadFiles[i]);
+        LastMarkFilterList        .Extract(DeadFiles[i]);
     end;
     // Delete DeadFiles from BibSearcher
     BibSearcher.RemoveAudioFilesFromLists(DeadFiles);
@@ -2546,7 +2559,7 @@ var i: Integer;
 begin
   for i := 0 to DeadFiles.Count - 1 do
   begin
-     aAudioFile := TAudioFile(DeadFiles[i]);
+     aAudioFile := DeadFiles[i];
      FreeAndNil(aAudioFile);
   end;
   for i := 0 to DeadPlaylists.Count - 1 do
@@ -2629,7 +2642,7 @@ end;
     - Block read access for the VCL
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.fRefreshFiles(aRefreshList: TObjectList);
+procedure TMedienBibliothek.fRefreshFiles(aRefreshList: TAudioFileList);
 var i, freq, ges: Integer;
     AudioFile: TAudioFile;
     oldArtist, oldAlbum: UnicodeString;
@@ -2651,7 +2664,7 @@ begin
   ct := GetTickCount;
   for i := 0 to aRefreshList.Count - 1 do
   begin
-        AudioFile := TAudioFile(aRefreshList[i]);
+        AudioFile := aRefreshList[i];
         if FileExists(AudioFile.Pfad) then
         begin
             AudioFile.FileIsPresent:=True;
@@ -2703,17 +2716,16 @@ begin
 
       case BrowseMode of
           0: begin
-              Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-              Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+              Mp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
+              Mp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
               // BrowseListen neu füllen
-
               SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
               GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
               InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
           end;
           1: begin
-              Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-              Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+              Mp3ListeArtistSort.Sort(Sort_CoverID);
+              Mp3ListeAlbenSort.Sort(Sort_CoverID);
               SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 1);
               GenerateCoverList(Mp3ListeArtistSort, CoverList);
           end;
@@ -2877,7 +2889,7 @@ begin
             begin
                 if not UpdateFortsetzen then break;
 
-                aAudioFile := tAudioFile(UpdateList[i]);
+                aAudioFile := UpdateList[i];
                 if FileExists(aAudioFile.Pfad)
                     AND aAudioFile.HasSupportedTagFormat
                 then
@@ -3092,7 +3104,7 @@ begin
     begin
         if not UpdateFortsetzen then break;
 
-        af := TAudioFile(UpdateList[i]);
+        af := UpdateList[i];
 
         if FileExists(af.Pfad) AND af.HasSupportedTagFormat then
         begin
@@ -3289,7 +3301,7 @@ begin
     begin
         if not UpdateFortsetzen then break;
 
-        af := TAudioFile(UpdateList[i]);
+        af := UpdateList[i];
 
         if FileExists(af.Pfad) then
         begin
@@ -3445,7 +3457,7 @@ begin
                 break;
             end;
 
-            af := TAudioFile(UpdateList[i]);
+            af := UpdateList[i];
 
             if FileExists(af.Pfad) then
             begin
@@ -3660,8 +3672,8 @@ begin
   EnterCriticalSection(CSUpdate);
   for i := 0 to Mp3ListeArtistSort.Count - 1 do
   begin
-      (Mp3ListeArtistSort[i] as TAudioFile).Rating := 0;
-      (Mp3ListeArtistSort[i] as TAudioFile).PlayCounter := 0;
+      (Mp3ListeArtistSort[i] as T--AudioFile).Rating := 0;
+      (Mp3ListeArtistSort[i] as T--AudioFile).PlayCounter := 0;
   end;
   Changed := True;
   LeaveCriticalSection(CSUpdate);
@@ -3698,15 +3710,15 @@ begin
 end;
 
 procedure TMedienBibliothek.ChangeCoverID(oldID, newID: String);
-var afList: TObjectList;
+var afList: TAudioFileList;
     i: Integer;
 begin
-    afList := TObjectList.Create(False);
+    afList := TAudioFileList.Create(False);
     try
         GetTitelListFromCoverID(afList, oldID);
         for i := 0 to afList.Count - 1 do
             // set the new ID
-            TAudioFile(afList[i]).CoverID := NewID;
+            afList[i].CoverID := NewID;
     finally
         afList.Free;
     end;
@@ -3717,15 +3729,15 @@ begin
 end;
 
 procedure TMedienBibliothek.ChangeCoverIDUnsorted(oldID, newID: String);
-var afList: TObjectList;
+var afList: TAudioFileList;
     i: Integer;
 begin
-    afList := TObjectList.Create(False);
+    afList := TAudioFileList.Create(False);
     try
         GetTitelListFromCoverIDUnsorted(afList, oldID);
         for i := 0 to afList.Count - 1 do
             // set the new ID
-            TAudioFile(afList[i]).CoverID := NewID;
+            afList[i].CoverID := NewID;
     finally
         afList.Free;
     end;
@@ -3925,7 +3937,7 @@ begin
   if idx = -1 then
     result := Nil
   else
-    result := TAudioFile(Mp3ListePfadSort[idx]);
+    result := Mp3ListePfadSort[idx];
 end;
 
 
@@ -3936,7 +3948,7 @@ end;
     Used in the left of the two browse-trees
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GenerateArtistList(Source: TObjectlist; Target: TObjectlist);
+procedure TMedienBibliothek.GenerateArtistList(Source: TAudioFileList; Target: TObjectlist);
 var i: integer;
   aktualArtist, lastArtist: UnicodeString;
 begin
@@ -3951,48 +3963,48 @@ begin
   if Source.Count < 1 then exit;
 
   case NempSortArray[1] of
-      siFileAge: aktualArtist := (Source[0] as TAudioFile).FileAgeString;
-      siOrdner : aktualArtist := (Source[0] as TAudioFile).Ordner;// + '\';
+      siFileAge: aktualArtist := Source[0].FileAgeString;
+      siOrdner : aktualArtist := Source[0].Ordner;// + '\';
   else
-      aktualArtist := (Source[0] as TAudioFile).Strings[NempSortArray[1]];
+      aktualArtist := Source[0].Strings[NempSortArray[1]];
   end;
 
   // Copy current value for "artist" to key1
   if NempSortArray[1] = siFileAge then
-      (Source[0] as TAudioFile).Key1 := (Source[0] as TAudioFile).FileAgeSortString
+      Source[0].Key1 := Source[0].FileAgeSortString
   else
-      (Source[0] as TAudioFile).Key1 := aktualArtist;
+      Source[0].Key1 := aktualArtist;
 
   lastArtist := aktualArtist;
   if lastArtist = '' then
-      Target.Add(TJustastring.create((Source[0] as TAudioFile).Key1 , AUDIOFILE_UNKOWN))
+      Target.Add(TJustastring.create(Source[0].Key1 , AUDIOFILE_UNKOWN))
   else
-      Target.Add(TJustastring.create((Source[0] as TAudioFile).Key1 , lastArtist));
+      Target.Add(TJustastring.create(Source[0].Key1 , lastArtist));
 
   for i := 1 to Source.Count - 1 do
   begin
     //if NempSortArray[1] = siFileAge then
-    //    aktualArtist := (Source[i] as TAudioFile).FileAgeString
+    //    aktualArtist := (Source[i] as T--AudioFile).FileAgeString
     //else
-    //    aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+    //    aktualArtist := (Source[i] as T--AudioFile).Strings[NempSortArray[1]];
     case NempSortArray[1] of
-        siFileAge: aktualArtist := (Source[i] as TAudioFile).FileAgeString;
-        siOrdner : aktualArtist := (Source[i] as TAudioFile).Ordner;// + '\';
+        siFileAge: aktualArtist := Source[i].FileAgeString;
+        siOrdner : aktualArtist := Source[i].Ordner;// + '\';
     else
-        aktualArtist := (Source[i] as TAudioFile).Strings[NempSortArray[1]];
+        aktualArtist := Source[i].Strings[NempSortArray[1]];
     end;
 
     // Copy current value for "artist" to key1
     if NempSortArray[1] = siFileAge then
-        (Source[i] as TAudioFile).Key1 := (Source[i] as TAudioFile).FileAgeSortString
+        Source[i].Key1 := Source[i].FileAgeSortString
     else
-        (Source[i] as TAudioFile).Key1 := aktualArtist;
+        Source[i].Key1 := aktualArtist;
 
     if NOT AnsiSameText(aktualArtist, lastArtist) then
     begin
         lastArtist := aktualArtist;
         if lastArtist <> '' then
-            Target.Add(TJustastring.create((Source[i] as TAudioFile).Key1 , lastArtist));
+            Target.Add(TJustastring.create(Source[i].Key1 , lastArtist));
     end;
   end;
 
@@ -4024,7 +4036,7 @@ end;
     Used in the right of the two browse lists, if Artist=<All> is selected
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.InitAlbenlist(Source: TObjectlist; Target: TStringList);
+procedure TMedienBibliothek.InitAlbenlist(Source: TAudioFileList; Target: TStringList);
 var i: integer;
   aktualAlbum, lastAlbum: UnicodeString;
 begin
@@ -4034,15 +4046,15 @@ begin
   if Source.Count < 1 then exit;
 
   if NempSortArray[2] = siFileAge then
-      aktualAlbum := (Source[0] as TAudioFile).FileAgeString
+      aktualAlbum := Source[0].FileAgeString
   else
-      aktualAlbum := (Source[0] as TAudioFile).Strings[NempSortArray[2]];
+      aktualAlbum := Source[0].Strings[NempSortArray[2]];
 
   // Copy current value for "album" to key2
   if NempSortArray[2] = siFileAge then
-      (Source[0] as TAudioFile).Key2 := (Source[0] as TAudioFile).FileAgeSortString
+      Source[0].Key2 := Source[0].FileAgeSortString
   else
-      (Source[0] as TAudioFile).Key2 := aktualAlbum;
+      Source[0].Key2 := aktualAlbum;
 
 
   lastAlbum := aktualAlbum;
@@ -4056,15 +4068,15 @@ begin
   begin
     // check for "new album"
       if NempSortArray[2] = siFileAge then
-        aktualAlbum := (Source[i] as TAudioFile).FileAgeString
+        aktualAlbum := Source[i].FileAgeString
       else
-        aktualAlbum := (Source[i] as TAudioFile).Strings[NempSortArray[2]];
+        aktualAlbum := Source[i].Strings[NempSortArray[2]];
 
     // Copy current value for "album" to key2
       if NempSortArray[2] = siFileAge then
-          (Source[i] as TAudioFile).Key2 := (Source[i] as TAudioFile).FileAgeSortString
+          Source[i].Key2 := Source[i].FileAgeSortString
       else
-          (Source[i] as TAudioFile).Key2 := aktualAlbum;// (Source[i] as TAudioFile).Strings[NempSortArray[2]];
+          Source[i].Key2 := aktualAlbum;
 
     if NOT AnsiSameText(aktualAlbum, lastAlbum) then
     begin
@@ -4147,12 +4159,12 @@ end;
     Used for Coverflow
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GenerateCoverList(Source: TObjectlist; Target: TObjectlist);
+procedure TMedienBibliothek.GenerateCoverList(Source: TAudioFileList; Target: TObjectlist);
 var i: integer;
   aktualID, lastID: String;
   newCover: TNempCover;
   aktualAudioFile: tAudioFile;
-  AudioFilesWithSameCover: tObjectlist;
+  AudioFilesWithSameCover: TAudioFileList;
 
 begin
   for i := 0 to Target.Count - 1 do
@@ -4176,9 +4188,9 @@ begin
     exit;
   end;
 
-  AudioFilesWithSameCover := TObjectlist.Create(False);
+  AudioFilesWithSameCover := TAudioFileList.Create(False);
 
-  aktualAudioFile := (Source[0] as TAudioFile);
+  aktualAudioFile := Source[0];
   aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
   aktualID := aktualAudioFile.CoverID;
   lastID := aktualID;
@@ -4196,7 +4208,7 @@ begin
 
   for i := 1 to Source.Count - 1 do
   begin
-      aktualAudioFile := (Source[i] as TAudioFile);
+      aktualAudioFile := Source[i];
       aktualAudioFile.Key1 := aktualAudioFile.CoverID;   // copy ID to key1
       aktualID := aktualAudioFile.CoverID;
       if SameText(aktualID, lastID) then
@@ -4239,11 +4251,11 @@ begin
 
 end;
 
-procedure TMedienBibliothek.GenerateCoverListFromSearchResult(Source,
+procedure TMedienBibliothek.GenerateCoverListFromSearchResult(Source: TAudioFileList;
   Target: TObjectlist);
 var i: Integer;
     newCover: TNempCover;
-    AudioFilesWithSameCover: TObjectlist;
+    AudioFilesWithSameCover: TAudioFileList;
     currentAudioFile: TAudioFile;
     currentID, lastID: String;
 
@@ -4265,12 +4277,12 @@ begin
         exit;
     end;
 
-    AudioFilesWithSameCover := TObjectlist.Create(False);
+    AudioFilesWithSameCover := TAudioFileList.Create(False);
     try
         i := 0;
         while i <= Source.Count - 1 do
         begin
-            currentAudioFile := (Source[i] as TAudioFile);
+            currentAudioFile := Source[i];
             currentAudioFile.Key1 := currentAudioFile.CoverID;   // copy ID to key1
 
             // create cover with ID of the current AudioFile
@@ -4302,7 +4314,7 @@ begin
             // get index of first audiofile with a different CoverID
             repeat
                 inc (i);
-            until (i > Source.Count - 1) or ((Source[i] as TAudioFile).CoverID <> currentID);
+            until (i > Source.Count - 1) or (Source[i].CoverID <> currentID);
         end; // while
 
         // Coverliste sortieren
@@ -4316,7 +4328,7 @@ begin
 end;
 
 
-procedure TMedienBibliothek.SetBaseMarkerList(aList: TObjectList);
+procedure TMedienBibliothek.SetBaseMarkerList(aList: TAudioFileList);
 begin
     if limitMarkerToCurrentFiles then
         BaseMarkerList := aList
@@ -4333,8 +4345,8 @@ end;
 }
 Procedure TMedienBibliothek.ReBuildBrowseLists;
 begin
-  Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-  Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+  Mp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
+  Mp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
   GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
 
   InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
@@ -4356,8 +4368,8 @@ begin
   begin
       if FromScratch then
       begin
-          Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-          Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+          Mp3ListeArtistSort.Sort(Sort_CoverID);
+          Mp3ListeAlbenSort.Sort(Sort_CoverID);
       end;
       GenerateCoverList(Mp3ListeArtistSort, CoverList); // fBackupCoverlist is cleared there
   end
@@ -4379,8 +4391,8 @@ begin
   end;
 end;
 
-procedure TMedienBibliothek.ReBuildCoverListFromList(aList: TObjectList);
-var tmpList: TObjectList;
+procedure TMedienBibliothek.ReBuildCoverListFromList(aList: TAudioFileList);
+var tmpList: TAudioFileList;
     i: integer;
     newCover: TNempCover;
 begin
@@ -4399,14 +4411,12 @@ begin
     end;
 
     // copy Items, SourceList should not be sorted
-    tmpList := TObjectList.Create(False);
+    tmpList := TAudioFileList.Create(False);
     try
         for i := 0 to aList.Count - 1 do
             tmpList.Add(aList[i]);
-        ///for i := 0 to bList.Count - 1 do
-        ///    tmpList.Add(bList[i]);
 
-        tmpList.Sort(Sortieren_CoverID);
+        tmpList.Sort(Sort_CoverID);
 
         GenerateCoverListFromSearchResult(tmpList, CoverList);
     finally
@@ -4462,14 +4472,14 @@ Procedure TMedienBibliothek.RepairBrowseListsAfterChange;
 begin
   case BrowseMode of
       0: begin
-          Mp3ListeArtistSort.Sort(Sortieren_String1String2Titel_asc);
-          Mp3ListeAlbenSort.Sort(Sortieren_String2String1Titel_asc);
+          Mp3ListeArtistSort.Sort(Sort_String1String2Titel_asc);
+          Mp3ListeAlbenSort.Sort(Sort_String2String1Titel_asc);
           GenerateArtistList(Mp3ListeArtistSort, AlleArtists);
           InitAlbenList(Mp3ListeAlbenSort, AlleAlben);
       end;
       1: begin
-          Mp3ListeArtistSort.Sort(Sortieren_CoverID);
-          Mp3ListeAlbenSort.Sort(Sortieren_CoverID);
+          Mp3ListeArtistSort.Sort(Sort_CoverID);
+          Mp3ListeAlbenSort.Sort(Sort_CoverID);
           GenerateCoverList(Mp3ListeArtistSort, CoverList);
       end;
       2: ;// nothing to to
@@ -4482,7 +4492,7 @@ end;
     - Get the indices, where the wanted "name" can be found
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetStartEndIndex(Liste: TObjectlist; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
+procedure TMedienBibliothek.GetStartEndIndex(Liste: TAudioFileList; name: UnicodeString; Suchart: integer; var Start: integer; var Ende: Integer);
 var einIndex: integer;
   min, max:integer;
   NameWithoutSlash: String;
@@ -4509,15 +4519,15 @@ begin
 
                   if NempSortArray[1] = siOrdner then
                   begin
-                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Start-1] as TAudiofile).Key1 + '\') = 1) do
+                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),Liste[Start-1].Key1 + '\') = 1) do
                           dec(Start);
-                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Ende+1] as TAudiofile).Key1 + '\') = 1) do
+                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),Liste[Ende+1].Key1 + '\') = 1) do
                           inc(Ende);
                   end else begin
                       // note: AnsiSameText uses correct Unicode
-                      while (Start > min) AND (AnsiSameText(name,(Liste[Start-1] as TAudiofile).Key1)) do
+                      while (Start > min) AND (AnsiSameText(name, Liste[Start-1].Key1)) do
                           dec(Start);
-                      while (Ende < max) AND (AnsiSameText(name,(Liste[Ende+1] as TAudiofile).Key1)) do
+                      while (Ende < max) AND (AnsiSameText(name, Liste[Ende+1].Key1)) do
                           inc(Ende);
                   end;
                   //ShowMessage('Artists* ' +  InttoStr(Start) + ' - ' + Inttostr(Ende) + ': ' + Inttostr(Ende - Start));
@@ -4539,14 +4549,14 @@ begin
                   end;
                   if NempSortArray[2] = siOrdner then
                   begin
-                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Start-1] as TAudiofile).Key2 + '\') = 1) do
+                      while (Start > min) AND (Pos(IncludeTrailingPathDelimiter(name),Liste[Start-1].Key2 + '\') = 1) do
                           dec(Start);
-                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),(Liste[Ende+1] as TAudiofile).Key2 + '\') = 1) do
+                      while (Ende < max) AND (Pos(IncludeTrailingPathDelimiter(name),Liste[Ende+1].Key2 + '\') = 1) do
                           inc(Ende);
                   end else begin
-                      while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).Key2,name)) do
+                      while (Start > min) AND (AnsiSameText(Liste[Start-1].Key2,name)) do
                           dec(Start);
-                      while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key2,name)) do
+                      while (Ende < max) AND (AnsiSameText(Liste[Ende+1].Key2,name)) do
                           inc(Ende);
                   end;
 
@@ -4563,7 +4573,7 @@ end;
     - Get the indices, where the wanted "name" can be found
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetStartEndIndexCover(Liste: TObjectlist; aCoverID: String; var Start: integer; var Ende: Integer);
+procedure TMedienBibliothek.GetStartEndIndexCover(Liste: TAudioFileList; aCoverID: String; var Start: integer; var Ende: Integer);
 var einIndex: integer;
   min, max:integer;
 begin
@@ -4572,8 +4582,8 @@ begin
   einIndex := BinaerCoverIDSuche(Liste, aCoverID, Start, Ende);
   Start := EinIndex;
   Ende := EinIndex;
-  while (Start > min) AND (AnsiSameText((Liste[Start-1] as TAudiofile).Key1, aCoverID)) do dec(Start);
-  while (Ende < max) AND (AnsiSameText((Liste[Ende+1] as TAudiofile).Key1, aCoverID)) do inc(Ende);
+  while (Start > min) AND (AnsiSameText(Liste[Start-1].Key1, aCoverID)) do dec(Start);
+  while (Ende < max) AND (AnsiSameText(Liste[Ende+1].Key1, aCoverID)) do inc(Ende);
 end;
 
 {
@@ -4645,8 +4655,7 @@ begin
           tmpstrlist.Sorted := True;
           tmpstrlist.Duplicates := dupIgnore;
           for i:= Start to Ende do
-            //tmpstrlist.Add((Mp3ListeArtistSort[i] as TAudioFile).Strings[NempSortArray[2]]);
-            tmpstrlist.Add((Mp3ListeArtistSort[i] as TAudioFile).Key2);
+            tmpstrlist.Add(Mp3ListeArtistSort[i].Key2);
 
           for i := 0 to tmpstrlist.Count - 1 do
             Alben.Add(TJustastring.create(tmpstrlist[i]));
@@ -4655,10 +4664,10 @@ begin
       end else
       begin
             // Hier funktioniert das einfache EInfügen
-            aktualAlbum := (Mp3ListeArtistSort[start] as TAudioFile).Key2;
+            aktualAlbum := Mp3ListeArtistSort[start].Key2;
             lastAlbum := aktualAlbum;
             if NempSortArray[2] = siFileAge then
-                Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[start] as TAudioFile).FileAgeString ))
+                Alben.Add(TJustastring.create(lastAlbum, Mp3ListeArtistSort[start].FileAgeString ))
             else
             begin
                 if lastAlbum = '' then
@@ -4670,12 +4679,12 @@ begin
 
             for i := start+1 to Ende do
             begin
-              aktualAlbum := (Mp3ListeArtistSort[i] as TAudioFile).Key2;
+              aktualAlbum := Mp3ListeArtistSort[i].Key2;
               if NOT AnsiSameText(aktualAlbum, lastAlbum) then
               begin
                 lastAlbum := aktualAlbum;
                 if NempSortArray[2] = siFileAge then
-                    Alben.Add(TJustastring.create(lastAlbum, (Mp3ListeArtistSort[i] as TAudioFile).FileAgeString))
+                    Alben.Add(TJustastring.create(lastAlbum, Mp3ListeArtistSort[i].FileAgeString))
                 else
                 begin
                     if lastAlbum = '' then
@@ -4697,7 +4706,7 @@ end;
     - Get the matching titles for "Artist" and "Album"
     --------------------------------------------------------
 }
-Procedure TMedienBibliothek.GetTitelList(Target: TObjectlist; Artist: UnicodeString; Album: UnicodeString);
+Procedure TMedienBibliothek.GetTitelList(Target: TAudioFileList; Artist: UnicodeString; Album: UnicodeString);
 var i, Start, Ende: integer;
 begin
   Target.Clear;
@@ -4715,7 +4724,7 @@ begin
               // as we could have different sub-directories within the selected dir
               // so we need to do a linear search here
               for i := start to Ende do
-                  if AnsiSameText(TAudioFile(Mp3ListeAlbenSort[i]).Key1, Artist) then
+                  if AnsiSameText(Mp3ListeAlbenSort[i].Key1, Artist) then
                       Target.Add(Mp3ListeAlbenSort[i]);
           end else
           begin
@@ -4785,7 +4794,7 @@ begin
           DisplayContent := DISPLAY_BrowsePlaylist;
 
           for i := 0 to PlaylistFiles.Count - 1 do
-              LastBrowseResultList.Add(TAudioFile(PlaylistFiles[i]));
+              LastBrowseResultList.Add(PlaylistFiles[i]);
 
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0)
       end else
@@ -4823,7 +4832,7 @@ end;
     - Same as above, for Coverflow
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetTitelListFromCoverID(Target: TObjectlist; aCoverID: String);
+procedure TMedienBibliothek.GetTitelListFromCoverID(Target: TAudioFileList; aCoverID: String);
 var i, Start, Ende: integer;
 begin
   Target.Clear;
@@ -4854,22 +4863,22 @@ end;
     - Same result as above, but can be used when NOT in Coverflow mode by the DetailForm when changing Library-Cover
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.GetTitelListFromCoverIDUnsorted(Target: TObjectlist; aCoverID: String);
+procedure TMedienBibliothek.GetTitelListFromCoverIDUnsorted(Target: TAudioFileList; aCoverID: String);
 var i: Integer;
 begin
     for i := 0 to Mp3ListeArtistSort.Count - 1 do
     begin
-        if TAudioFile(Mp3ListeArtistSort[i]).CoverID = aCoverID then
+        if Mp3ListeArtistSort[i].CoverID = aCoverID then
             Target.Add(Mp3ListeArtistSort[i]);
     end;
 end;
 
-procedure TMedienBibliothek.GetTitelListFromDirectoryUnsorted(Target: TObjectlist; aDirectory: String);
+procedure TMedienBibliothek.GetTitelListFromDirectoryUnsorted(Target: TAudioFileList; aDirectory: String);
 var i: Integer;
 begin
     for i := 0 to Mp3ListeArtistSort.Count - 1 do
     begin
-        if TAudioFile(Mp3ListeArtistSort[i]).Ordner = aDirectory then
+        if Mp3ListeArtistSort[i].Ordner = aDirectory then
             Target.Add(Mp3ListeArtistSort[i]);
     end;
 end;
@@ -4947,7 +4956,7 @@ begin
   SendMessage(MainWindowHandle, WM_MedienBib, MB_ReFillAnzeigeList,  0);
 end;
 
-procedure TMedienBibliothek.GenerateDragDropListFromTagCloud(aTag: TTag; Target: TObjectList);
+procedure TMedienBibliothek.GenerateDragDropListFromTagCloud(aTag: TTag; Target: TAudioFileList);
 var i: Integer;
 begin
     if not assigned(aTag) then exit;
@@ -5091,7 +5100,7 @@ begin
           end;
 
           for i := 0 to MP3ListeArtistSort.Count-1 do
-              if (Mp3ListeArtistSort[i] as tAudiofile).Ordner = aDirectory then
+              if Mp3ListeArtistSort[i].Ordner = aDirectory then
                   tmpList.Add(Mp3ListeArtistSort[i]);
 
           SendMessage(MainWindowHandle, WM_MedienBib, MB_ShowSearchResults, lParam(tmpList));
@@ -5286,8 +5295,8 @@ end;
     - Generate a Random list from the library
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.FillRandomList(aList: TObjectlist);
-var sourceList, tmpFileList: TObjectlist;
+procedure TMedienBibliothek.FillRandomList(aList: TAudioFileList);
+var sourceList, tmpFileList: TAudioFileList;
     i: Integer;
     aAudioFile: TAudioFile;
 begin
@@ -5299,11 +5308,11 @@ begin
         SourceList := AnzeigeListe;
 
     // passende Stücke zusammensuchen
-    tmpFileList := TObjectlist.Create(False);
+    tmpFileList := TAudioFileList.Create(False);
     try
         for i := 0 to SourceList.Count - 1 do
         begin
-            aAudioFile := SourceList[i] as TAudioFile;
+            aAudioFile := SourceList[i];
             if CheckYearRange(aAudioFile.Year)
                 //and CheckGenrePL(aAudioFile.Genre)
                 and CheckRating(aAudioFile.Rating)
@@ -5321,7 +5330,7 @@ begin
 
         // eigentliche Zielliste mit Kopien füllen
         for i := 0 to tmpFileList.Count-1 do
-            TAudioFile(tmpFileList[i]).AddCopyToList(aList);
+            tmpFileList[i].AddCopyToList(aList);
     finally
         tmpFileList.Free;
     end;
@@ -5329,8 +5338,8 @@ begin
   LeaveCriticalSection(CSUpdate);
 end;
 
-procedure TMedienBibliothek.FillListWithMedialibrary(aList: TObjectList);
-var sourceList: TObjectlist;
+procedure TMedienBibliothek.FillListWithMedialibrary(aList: TAudioFileList);
+var sourceList: TAudioFileList;
     i: Integer;
 begin
     EnterCriticalSection(CSUpdate);
@@ -5426,7 +5435,7 @@ begin
     fDrivemanager.RepairDriveCharsAtAudioFiles(Mp3ListePfadsort);
     LeaveCriticalSection(CSAccessDriveList);
     // am Ende die Pfadsort-Liste neu sortieren
-    Mp3ListePfadsort.Sort(Sortieren_Pfad_asc);
+    Mp3ListePfadsort.Sort(Sort_Pfad_asc);
 end;
 procedure TMedienBibliothek.RepairDriveCharsAtPlaylistFiles;
 begin
@@ -5587,7 +5596,7 @@ begin
       tmpstrList.Capacity := Mp3ListeArtistSort.Count + 1;
       tmpstrList.Add('Artist;Title;Album;Genre;Year;Track;Filename;Directory;Filesize;Duration;Bitrate;Channelmode;Samplerate;Rating;Playcounter;vbr;Lyrics');
       for i:= 0 to Mp3ListeArtistSort.Count - 1 do
-        tmpstrList.Add((Mp3ListeArtistSort[i] as TAudioFile).GenerateCSVString);
+        tmpstrList.Add(Mp3ListeArtistSort[i].GenerateCSVString);
       try
           tmpStrList.SaveToFile(aFileName);
       except
@@ -5720,7 +5729,7 @@ begin
 
     for i := 0 to UpdateList.Count-1 do
     begin
-        newAudioFile := TAudioFile(UpdateList[i]);
+        newAudioFile := UpdateList[i];
         if newAudioFile.AudioType = at_File then
             newAudioFile.Pfad := ExpandFilename(newAudioFile.Pfad);
 
@@ -5881,7 +5890,7 @@ begin
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
         ERROROCCURRED := False;
-        aAudioFile := TAudioFile(MP3ListePfadSort[i]);
+        aAudioFile := MP3ListePfadSort[i];
 
         if (aAudioFile.Ordner[1] = LibrarySaveDriveChar) and TDrivemanager.EnableCloudMode then
         begin
@@ -6520,7 +6529,7 @@ begin
     EnterCriticalSection(CSUpdate);
     for i := 0 to Mp3ListePfadSort.Count - 1 do
     begin
-        aAudioFile := TAudioFile(Mp3ListePfadSort[i]);
+        aAudioFile := Mp3ListePfadSort[i];
         if aAudioFile.LyricsExisting then
         begin
             inc(result.FilesWithLyrics);
@@ -6541,7 +6550,7 @@ begin
 
     EnterCriticalSection(CSUpdate);
     for i := 0 to Mp3ListePfadSort.Count - 1 do
-        TAudioFile(Mp3ListePfadSort[i]).Lyrics := '';
+        Mp3ListePfadSort[i].Lyrics := '';
 
     BibSearcher.ClearTotalLyricString;
     LeaveCriticalSection(CSUpdate);

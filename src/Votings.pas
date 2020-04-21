@@ -45,7 +45,7 @@ type
             function getUserforIP(aIP: String): TUser;
         public
             Users: TObjectList;
-            LibraryList: TObjectList;
+            LibraryList: TAudioFileList;
 
             constructor Create(Hnd: DWord);
             destructor Destroy; override;
@@ -181,9 +181,9 @@ var i: Integer;
 begin
     result := Nil;
     for i := 0 to LibraryList.Count - 1 do
-        if TAudioFile(LibraryList[i]).WebServerID = aFileID then
+        if LibraryList[i].WebServerID = aFileID then
         begin
-            result := TAudioFile(LibraryList[i]);
+            result := LibraryList[i];
             break;
         end;
 end;
@@ -224,7 +224,7 @@ begin
     result := 0;  // fail
     for i := 0 to aPlaylist.Playlist.Count - 1 do
     begin
-        af := TAudioFile(aPlaylist.Playlist[i]);
+        af := aPlaylist.Playlist[i];
         if af.WebServerID = aFileID then
         begin
             af.VoteCounter := af.VoteCounter + 1;   // user clicked a "vote" on a playlist-Item   +1
@@ -245,7 +245,7 @@ begin
     result := 0;  // fail
     for i := 0 to aPlaylist.Playlist.Count - 1 do
     begin
-        af := TAudioFile(aPlaylist.Playlist[i]);
+        af := aPlaylist.Playlist[i];
         if af.Pfad = aFilename then
         begin
             case fCurrentUser.VoteAllowed(af.WebServerID) of

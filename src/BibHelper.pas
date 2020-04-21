@@ -126,13 +126,13 @@ Const SO_Pfad = 0;
 
   function AkleinerB(A,B: TAudioFile; SortOrder: Integer; SortArray: TNempSortArray): Boolean;
         //Fügt zwei gleichmäßig sortierte Listen zu einer zusammen
-        procedure Merge(SourceA, SourceB, Target: TObjectlist; SortOrder: Integer; SortArray: TNempSortArray);
+        procedure Merge(SourceA, SourceB, Target: TAudioFileList; SortOrder: Integer; SortArray: TNempSortArray);
         // Dasselbe, nur für PlaylistFiles. Sortorder ist da immer "Pfad"
-        procedure MergePlaylists(SourceA, SourceB, Target: TObjectlist);
+        procedure MergePlaylists(SourceA, SourceB, Target: TObjectList);
 
         // Baut eine neue Liste auf, die die Elemente enthält, die NICHT in Deletelist auftreten
-        Procedure AntiMerge(Source, DeleteList, Target: TObjectlist);
-        Procedure AntiMergePlaylists(Source, DeleteList, Target: TObjectlist);
+        Procedure AntiMerge(Source, DeleteList, Target: TAudioFileList);
+        Procedure AntiMergePlaylists(Source, DeleteList, Target: TObjectList);
 
 
 implementation
@@ -561,7 +561,7 @@ begin
 
 end;
 
-procedure Merge(SourceA, SourceB, Target: TObjectlist; SortOrder: Integer; SortArray: TNempSortArray);
+procedure Merge(SourceA, SourceB, Target: TAudioFileList; SortOrder: Integer; SortArray: TNempSortArray);
 var idxA, idxB: Integer;
 begin
 // Mische die beiden Source-Listen zu einer Target-Liste.
@@ -573,7 +573,7 @@ begin
         if (idxA < SourceA.Count) AND (idxB < SourceB.Count) then
         begin
             // Noch was in beiden Spource-Listen drin
-            if AkleinerB(TAudioFile(SourceA[idxA]), TAudioFile(SourceB[idxB]), SortOrder, SortArray) then
+            if AkleinerB(SourceA[idxA], SourceB[idxB], SortOrder, SortArray) then
             begin
               Target.Add(SourceA[idxA]);
               inc(idxA);
@@ -598,7 +598,7 @@ begin
   end; // While
 end;
 
-procedure MergePlaylists(SourceA, SourceB, Target: TObjectlist);
+procedure MergePlaylists(SourceA, SourceB, Target: TObjectList);
 var idxA, idxB: Integer;
 begin
 // Mische die beiden Source-Listen zu einer Target-Liste.
@@ -636,7 +636,7 @@ begin
 end;
 
 
-Procedure AntiMerge(Source, DeleteList, Target: TObjectlist);
+Procedure AntiMerge(Source, DeleteList, Target: TAudioFileList);
 var idxS, idxD, i: Integer;
 begin
   idxS := 0;
@@ -644,7 +644,7 @@ begin
   Target.Clear; // Sollte aber eh so sein ;-)
   while (idxS < Source.Count) AND (idxD < DeleteList.Count) do
   begin
-    if TAudioFile(Source[idxS]).Pfad = TAudioFile(DeleteList[idxD]).Pfad then
+    if Source[idxS].Pfad = DeleteList[idxD].Pfad then
     begin
       //nicht in die Targetliste einfügen
       inc(idxS);

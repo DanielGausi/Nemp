@@ -540,10 +540,7 @@ TagManagementDialogOnlyHint_ShowAgain = 'Do not show this dialog again.';
 
 
 MainForm_PlaylistSearch    = 'Search';
-MainForm_PlaylistSearchHint = 'Search in the playlist'
-                    + #13#10 + '- F3: step through'
-                    + #13#10 + '- Enter: mark all'
-                    + #13#10 + '- Shift+Enter: play';
+MainForm_PlaylistSearchHint = 'Search in the playlist';
 
 MainForm_RecentQuickSearchresults = 'Recent searches';
 MainForm_NoRecentQuickSearchresults = 'No recent searches';

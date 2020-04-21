@@ -635,7 +635,7 @@ end;
 
 procedure TRandomPlaylistForm.Btn_OkClick(Sender: TObject);
 var i: Integer;
-    DateiListe: TObjectList;
+    DateiListe: TAudioFileList;
     tmpTagList: TObjectList;
 
 begin
@@ -694,7 +694,7 @@ begin
       Medienbib.PlaylistFillOptions.MinLength     := SE_MinLength.Value;
       Medienbib.PlaylistFillOptions.MaxLength     := SE_MaxLength.Value;
 
-      DateiListe := TObjectList.Create(False);
+      DateiListe := TAudioFileList.Create(False);
       MedienBib.FillRandomList(DateiListe);
   finally
       tmpTagList.Free;

@@ -43,6 +43,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 41;
+      MAX_PLAYLIST_IMAGE_INDEX = 21;
 
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
@@ -904,7 +905,7 @@ begin
                   ButtonTmp.Width := 14;
                   Buttontmp.Height := 14;
                   Nemp_MainForm.PlayListSkinImageList.Clear;
-                  for i := 0 to 20 do
+                  for i := 0 to MAX_PLAYLIST_IMAGE_INDEX do
                   begin
                       ButtonTmp.Canvas.CopyRect(
                             rect(0,0,14,14), ListenCompletebmp.Canvas,

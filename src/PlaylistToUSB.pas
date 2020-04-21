@@ -618,8 +618,8 @@ begin
 
             // 1. fill Source-List
             for i := 0 to NempPlaylist.Count - 1 do
-                if FileExists( TAudioFile(NempPlaylist.Playlist[i]).Pfad) then
-                    Params.SourceFiles.Add(TAudioFile(NempPlaylist.Playlist[i]).Pfad);
+                if FileExists( NempPlaylist.Playlist[i].Pfad) then
+                    Params.SourceFiles.Add(NempPlaylist.Playlist[i].Pfad);
             // 2. Set Parameters
             Params.DestinationDirectoy := EditDirectory.Text;
             Params.Handle              := self.Handle;

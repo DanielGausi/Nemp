@@ -154,7 +154,7 @@ type
 
       fDefaultCoverIsLoaded: Boolean;
 
-      fPrescanFiles: TObjectList;  // a List of AudioFiles, marked for threaded Prescan.
+      fPrescanFiles: TAudioFileList;  // a List of AudioFiles, marked for threaded Prescan.
       fPrescanInProgress: Boolean; // Flag, whether Precan-Thread is already running
       ThreadedMainStream: DWord;
       ThreadedSlideStream: DWord;
@@ -519,7 +519,9 @@ type
         procedure RemoveABSyncs;
         procedure ClearABSyncs;
 
-        function GetActiveCue: integer;
+        function GetActiveCue: TAudioFile;
+        function GetActiveCueIndex: Integer;
+
         function JumpToNextCue: Boolean;
         function JumpToPrevCue: Boolean;
 
@@ -735,7 +737,7 @@ begin
     PreviewBackGround.Height := 145;
     fABRepeatActive := False;
 
-    fPrescanFiles := TObjectList.Create(True);
+    fPrescanFiles := TAudioFileList.Create(True);
     fPrescanInProgress := False;
 
     CoverArtSearcher := TCoverArtSearcher.create;
@@ -2246,7 +2248,7 @@ begin
                         // when playing a file with a cuesheet:
                         // "MainTitle + CueSheet-Title"
                         // note: there should be no issue with the cuesheet-index here, as GetIndex runs through the CueList
-                        result := TAudioFile(MainAudioFile.CueList[GetActiveCue]).PlaylistTitle
+                        result := MainAudioFile.CueList[GetActiveCueIndex].PlaylistTitle
                     else
                         // usual case: just the "Title"
                         result := MainAudioFile.NonEmptyTitle;
@@ -2671,7 +2673,7 @@ begin
   if assigned(MainAudioFile) AND assigned(MainAudioFile.CueList) AND (Mainstream <>0) then
   begin
       // Index des neuen Cues bestimmen
-      NewCueIdx := GetActiveCue;//(MainAudioFile, Bass_ChannelBytes2Seconds(NempPlayer.mainstream,Bass_ChannelGetPosition(NempPlayer.mainstream)) + 0.5 );
+      NewCueIdx := GetActiveCueIndex;//(MainAudioFile, Bass_ChannelBytes2Seconds(NempPlayer.mainstream,Bass_ChannelGetPosition(NempPlayer.mainstream)) + 0.5 );
 
       // altes Sync-Handle entfernen
       BASS_ChannelRemoveSync(mainstream, fCueSyncHandleM);
@@ -3010,7 +3012,7 @@ end;
     --------------------------------------------------------
 }
 // Get the active cue
-function TNempPlayer.GetActiveCue: Integer;
+function TNempPlayer.GetActiveCueIndex: Integer;
 var i:Integer;
     aPos: Double;
 begin
@@ -3019,17 +3021,24 @@ begin
   if assigned(MainAudioFile) AND assigned(MainAudioFile.CueList) AND ((MainAudioFile.CueList).Count > 0) then
   begin
       i := MainAudioFile.CueList.Count - 1;
-      while (i > 0) AND (TPlaylistFile(MainAudioFile.CueList[i]).Index01 >= aPos) do
+      while (i > 0) AND (MainAudioFile.CueList[i].Index01 >= aPos) do
           dec(i);
       result := i;
   end;
 end;
+
+function TNempPlayer.GetActiveCue: TAudioFile;
+begin
+  if assigned(MainAudioFile) AND assigned(MainAudioFile.CueList) AND ((MainAudioFile.CueList).Count > 0) then
+      result := MainAudioFile.CueList[GetActiveCueIndex]
+end;
+
 // jump to next/previous cue.
 // result = false: There is no next cue, so playlist should jump to the next track
 function TNempPlayer.JumpToNextCue: Boolean;
 var NextCueIdx: Integer;
 begin
-  NextCueIdx := GetActiveCue + 1;
+  NextCueIdx := GetActiveCueIndex + 1;
   if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) and (MainAudioFile.CueList.Count-1 >= NextCueIdx) then
   begin
       SetTime(TPlaylistFile(MainAudioFile.CueList[NextCueIdx]).Index01);
@@ -3046,7 +3055,7 @@ begin
     begin
         // we have a MainAudioFile and we have a (valid) cuelist
         // determine, where we are right now
-        CurrentCueIdx := GetActiveCue;
+        CurrentCueIdx := GetActiveCueIndex;
         startTime := TPlaylistFile(MainAudioFile.CueList[CurrentCueIdx]).Index01;
 
         // If last Cue is "far away": jump to the beginning of the current cue
@@ -3877,7 +3886,7 @@ begin
             EnterCriticalSection(CSPrescanList);
             c := aPlayer.fPrescanFiles.Count;
             if c > 0 then
-                aFile.Assign(TAudioFile(aPlayer.fPrescanFiles[c-1]));
+                aFile.Assign(aPlayer.fPrescanFiles[c-1]);
             aPlayer.fPrescanFiles.Clear;
             LeaveCriticalSection(CSPrescanList);
 

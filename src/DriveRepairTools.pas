@@ -146,7 +146,7 @@ type
 
 
           // Add Drives used by Audiofiles or PlaylistFiles to the list of ManaggedDrives
-          procedure AddDrivesFromAudioFiles(aList: TObjectList);
+          procedure AddDrivesFromAudioFiles(aList: TAudioFileList);
           procedure AddDrivesFromPlaylistFiles(aList: TObjectList);
 
           function GetPhysicalDriveBySerialNr(aSerial: DWord): TDrive;
@@ -171,7 +171,7 @@ type
           procedure ReSynchronizeDrives;
 
 
-          procedure RepairDriveCharsAtAudioFiles(AudiFiles: TObjectList);
+          procedure RepairDriveCharsAtAudioFiles(AudiFiles: TAudioFileList);
           procedure RepairDriveCharsAtPlaylistFiles(Playlists: TObjectList);
 
   end;
@@ -514,7 +514,7 @@ end;
 // Used after the user selected some files to be inserted into the MediaLibrary or Playlist.
 // The files are currently available on the PC, therefore the Drives are also existent
 // But: The may not be already in the list of ManagedDrives, so we may need to add some Drives to this list
-procedure TDriveManager.AddDrivesFromAudioFiles(aList: TObjectList);
+procedure TDriveManager.AddDrivesFromAudioFiles(aList: TAudioFileList);
 var i: Integer;
     CurrentDrive: Char;
     NewDrive: TDrive;
@@ -522,9 +522,9 @@ begin
     CurrentDrive := '-';
     for i := 0 to aList.Count - 1 do
     begin
-        if TAudioFile(aList[i]).Pfad[1] <> CurrentDrive then
+        if aList[i].Pfad[1] <> CurrentDrive then
         begin
-            CurrentDrive := TAudioFile(aList[i]).Pfad[1];
+            CurrentDrive := aList[i].Pfad[1];
             if CurrentDrive <> '\' then
             begin
                 // Search for a TDrive-Object for the CurrentDrive in ManagedDrives
@@ -785,7 +785,7 @@ begin
 end;
 
 
-procedure TDriveManager.RepairDriveCharsAtAudioFiles(AudiFiles: TObjectList);
+procedure TDriveManager.RepairDriveCharsAtAudioFiles(AudiFiles: TAudioFileList);
 var i: Integer;
     CurrentDriveChar, CurrentReplaceChar: WideChar;
     aAudioFile: TAudioFile;
@@ -795,7 +795,7 @@ begin
     CurrentReplaceChar := '-';
     for i := 0 to AudiFiles.Count - 1 do
     begin
-        aAudioFile := TAudioFile(AudiFiles[i]);
+        aAudioFile := AudiFiles[i];
         if (aAudioFile.Ordner[1] <> CurrentDriveChar) then
         begin
             if aAudioFile.Ordner[1] <> '\' then

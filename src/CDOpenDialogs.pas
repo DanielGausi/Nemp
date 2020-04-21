@@ -35,7 +35,7 @@ type
   private
     { Private-Deklarationen }
     CurrentDrive: Integer;
-    localAudioFiles: TObjectList;
+    localAudioFiles: TAudioFileList;
     procedure UpdateDriveListView;
     procedure UpdateTrackList(UseCddb: Boolean);
   public
@@ -60,7 +60,7 @@ begin
     BackupComboboxes(self);
     TranslateComponent (self);
     RestoreComboboxes(self);
-    localAudioFiles := TObjectList.Create(True);
+    localAudioFiles := TAudioFileList.Create(True);
     Files := TStringList.Create;
 end;
 
@@ -194,7 +194,7 @@ var i: Integer;
 begin
     for i := 0 to localAudioFiles.Count - 1 do
         if lbTracks.Selected[i] or (cbInsertMode.ItemIndex = 0) then
-            Files.Add(TAudioFile(localAudioFiles[i]).Pfad);
+            Files.Add(localAudioFiles[i].Pfad);
 
     Nemp_MainForm.NempOptions.UseCDDB := cb_AutoCddb.checked;
 end;

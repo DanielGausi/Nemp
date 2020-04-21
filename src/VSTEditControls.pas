@@ -272,7 +272,7 @@ begin
 end;
 
 function TRatingEditLink.PrepareEdit(Tree: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex): Boolean;
-var Data: PTreeData;
+var // Data: PTreeData;
     af: tAudioFile;
 begin
   Result := True;
@@ -281,10 +281,10 @@ begin
   FColumn := Column;
   fLastPaint := 0;
 
-  Data := FTree.GetNodeData(FNode);
-  if assigned(Data) then
+  // Data := FTree.GetNodeData(FNode);
+  af := FTree.GetNodeData<TAudioFile>(FNode);
+  if assigned(af) then
   begin
-      af := Data^.FAudioFile;
       fOriginalRating := af.Rating;
   end else
       fOriginalRating := 0;
@@ -325,15 +325,15 @@ end;
 
 function TRatingEditLink.EndEdit: Boolean;
 var
-  Data: PTreeData;
+  // Data: PTreeData;
   af: tAudioFile;
 begin
   Result := True;
   // Get the Audiofile
-  Data := FTree.GetNodeData(FNode);
-  if assigned(Data) then
+  // Data := FTree.GetNodeData(FNode);
+  af := FTree.GetNodeData<TAudioFile>(FNode);
+  if assigned(af) then
   begin
-      af := Data^.FAudioFile;
       // Set the rating
       // Note to self: This should be ok and Threadsafe.
       // If something goes wrong, the user will probably notice that directly

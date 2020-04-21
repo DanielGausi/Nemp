@@ -146,7 +146,7 @@ type
 
           fCurrentMaxID: Integer;
 
-          fWebMedienBib: TObjectlist;
+          fWebMedienBib: TAudioFileList;
 
           fHTML_Player: UTf8String;
           fHTML_PlaylistView: Utf8String;
@@ -383,7 +383,7 @@ type
           procedure Shutdown;
           procedure CopyLibrary(OriginalLib: TMedienBibliothek);
 
-          procedure SearchLibrary(Keyword: UnicodeString; DestList: TObjectlist);
+          procedure SearchLibrary(Keyword: UnicodeString; DestList: TAudioFileList);
           function GetAudioFileFromWebServerID(aID: Integer): TAudioFile;
 
           procedure EnsureFileHasID(af: tAudioFile);
@@ -679,7 +679,7 @@ begin
     fMainWindowHandle := aHandle;
     fCurrentMaxID  := 1;
     Active := False;
-    fWebMedienBib := TObjectlist.Create(False);
+    fWebMedienBib := TAudioFileList.Create(False);
     IdHTTPServer1 := TIdHTTPServer.Create(Nil);
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
@@ -719,7 +719,7 @@ begin
     Genres.Free;
 
     for i := 0 to fWebMedienBib.Count - 1 do
-        TAudioFile(fWebMedienBib[i]).Free;
+        fWebMedienBib[i].Free;
     fWebMedienBib.Free;
     LeaveCriticalSection(CS_AccessLibrary);
     IdHTTPServer1.Free;
@@ -1339,7 +1339,7 @@ begin
         Items := '';
         for i := 0 to aNempPlayList.Count - 1 do
         begin
-            af := TAudioFile(aNempPlayList.Playlist[i]);
+            af := aNempPlayList.Playlist[i];
             // ID generieren/setzen
             EnsureFileHasID(af);
 
@@ -1370,7 +1370,7 @@ begin
     begin
         if (aIdx >= 0) and (aIdx < aNempPlaylist.Count) then
         begin
-            af := TAudioFile(aNempPlayList.Playlist[aIdx]);
+            af := aNempPlayList.Playlist[aIdx];
             Item := PatternItemPlaylist[isAdmin];
             Item := StringReplace(Item, '{{Index}}'  , IntToStr(aIdx + 1)         , [rfReplaceAll]);
 
@@ -1421,7 +1421,7 @@ end;
 
 function TNempWebServer.GenerateHTMLMedienbibSearchFormular(aSearchString: UnicodeString;
     Start: Integer; isAdmin: Boolean): UTf8String;
-var ResultList: TObjectlist;
+var ResultList: TAudioFileList;
     af: TAudioFile;
     i, maxIdx: Integer;
     aClass, PageData, Pagination, menu, browsemenu, Item, Items, warning: String;
@@ -1442,7 +1442,7 @@ begin
         if Start < 0 then
             Start := 0;
 
-        ResultList := TObjectList.Create(False);
+        ResultList := TAudioFileList.Create(False);
         try
             SearchLibrary(aSearchString, ResultList);
             if ResultList.Count > 0 then
@@ -1453,7 +1453,7 @@ begin
 
                 for i := Start to maxIdx do
                 begin
-                    af := TAudioFile(ResultList[i]);
+                    af := ResultList[i];
                     // ID generieren/setzen
                     EnsureFileHasID(af);
                     Item := PatternItemSearchlist[isAdmin];
@@ -1670,7 +1670,7 @@ var PageData, menu, browsemenu: String;
     btnPrev, BtnNext, Pagination, Link: String;
     i,  maxIdx: Integer;
     af: TAudioFile;
-    ResultList: TObjectList;
+    ResultList: TAudioFileList;
 
     procedure AddItem(afile: TAudioFile);
     var aClass, Item: String;
@@ -1701,21 +1701,20 @@ begin
 
     EnterCriticalSection(CS_AccessLibrary);
 
-    ResultList := TObjectList.Create(False);
+    ResultList := TAudioFileList.Create(False);
     try
         if aMode='artist' then
             for i := 0 to fWebMedienBib.Count - 1 do
             begin
-                af := TAudioFile(fWebMedienBib[i]);
+                af := fWebMedienBib[i];
                 if AnsiSameText(af.Artist, aValue) then
                     ResultList.Add(af);
-                    //AddItem(af);
             end;
 
         if aMode='album' then
             for i := 0 to fWebMedienBib.Count - 1 do
             begin
-                af := TAudioFile(fWebMedienBib[i]);
+                af := fWebMedienBib[i];
                 if AnsiSameText(af.Album, aValue) then
                     ResultList.Add(af);
                     //AddItem(af);
@@ -1724,10 +1723,9 @@ begin
         if aMode='genre' then
             for i := 0 to fWebMedienBib.Count - 1 do
             begin
-                af := TAudioFile(fWebMedienBib[i]);
+                af := fWebMedienBib[i];
                 if AnsiSameText(af.genre, aValue) then
                     ResultList.Add(af);
-                    //AddItem(af);
             end;
 
         if Start < 0 then Start := 0;
@@ -1737,7 +1735,7 @@ begin
             maxIdx := ResultList.Count - 1;
 
         for i := Start to maxIdx do
-            AddItem(TAudioFile(ResultList[i]));
+            AddItem(ResultList[i]);
 
         // Build Pagination
         if (Start > 0) then
@@ -1844,16 +1842,16 @@ var i: Integer;
 begin
     EnterCriticalSection(CS_AccessLibrary);
     for i := 0 to fWebMedienBib.Count - 1 do
-        TAudioFile(fWebMedienBib[i]).Free;
+        fWebMedienBib[i].Free;
     fWebMedienBib.Clear;
     LeaveCriticalSection(CS_AccessLibrary);
 end;
 
 
-procedure TNempWebServer.SearchLibrary(Keyword: UnicodeString; DestList: TObjectlist);
+procedure TNempWebServer.SearchLibrary(Keyword: UnicodeString; DestList: TAudioFileList);
 var Keywords: TStringList;
     KeywordsUTF8: TUTF8Stringlist;
-    tmpList: TObjectlist;
+    tmpList: TAudioFileList;
     i: Integer;
 
 begin
@@ -1867,19 +1865,21 @@ begin
     for i := 0 to Keywords.Count - 1 do
         KeywordsUTF8[i] := UTF8Encode(AnsiLowerCase(Keywords[i]));
 
-    tmpList := TObjectlist.Create(False);
-    for i := 0 to fWebMedienBib.Count - 1 do
-    begin
-        if AudioFileMatchesKeywords(TAudioFile(fWebMedienBib[i]), Keywords) then
-            DestList.Add(TAudioFile(fWebMedienBib[i]))
-        else
-            if AudioFileMatchesKeywordsApprox(TAudioFile(fWebMedienBib[i]), KeywordsUTF8) then
-                tmpList.Add(TAudioFile(fWebMedienBib[i]));
+    tmpList := TAudioFileList.Create(False);
+    try
+        for i := 0 to fWebMedienBib.Count - 1 do
+        begin
+            if AudioFileMatchesKeywords(fWebMedienBib[i], Keywords) then
+                DestList.Add(fWebMedienBib[i])
+            else
+                if AudioFileMatchesKeywordsApprox(fWebMedienBib[i], KeywordsUTF8) then
+                    tmpList.Add(fWebMedienBib[i]);
+        end;
+        for i := 0 to tmpList.Count - 1 do
+            DestList.Add(tmpList[i]);
+    finally
+        tmpList.Free;
     end;
-    for i := 0 to tmpList.Count - 1 do
-        DestList.Add(tmpList[i]);
-
-    tmpList.Free;
     Keywords.Free;
 
     LeaveCriticalSection(CS_AccessLibrary);
@@ -2086,17 +2086,17 @@ var currentArtist, currentCoverID: String;
     newEntry: TCountedString;
 
 begin
-    fWebMedienBib.Sort(Sortieren_ArtistAlbumTrackTitel_asc);
+    fWebMedienBib.Sort(Sort_ArtistAlbumTrackTitel_asc);
 
     if fWebMedienBib.Count > 0 then
     begin
-        currentArtist := TAudioFile(fWebMedienBib[0]).Artist;
-        currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
+        currentArtist := fWebMedienBib[0].Artist;
+        currentCoverID := fWebMedienBib[0].CoverID;
         c := 1;
 
         for i := 1 to fWebMedienBib.Count - 1 do
         begin
-            if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Artist, currentArtist) then
+            if not AnsiSameText(fWebMedienBib[i].Artist, currentArtist) then
             begin
                 if trim(currentArtist) <> '' then
                 begin
@@ -2109,15 +2109,15 @@ begin
                         OtherArtists[idx].Add(newEntry);
                 end; // otherwise: Do not add this artist at all
                 // start counting again
-                currentArtist := TAudioFile(fWebMedienBib[i]).Artist;
-                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                currentArtist := fWebMedienBib[i].Artist;
+                currentCoverID := fWebMedienBib[i].CoverID;
                 c := 1;
             end else
             begin
                 // just count this file to the current-Artist-Count
                 inc(c);
                 if currentCoverID = '' then
-                    currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                    currentCoverID := fWebMedienBib[i].CoverID;
             end;
         end;
 
@@ -2152,19 +2152,19 @@ var currentAlbum, currentCoverID: String;
     tmpArtistStrings: TStringList;
 
 begin
-    fWebMedienBib.Sort(Sortieren_AlbumTrack_asc);
+    fWebMedienBib.Sort(Sort_AlbumTrack_asc);
     if fWebMedienBib.Count > 0 then
     begin
         tmpArtistStrings := TStringList.Create;
         try
-            currentAlbum := TAudioFile(fWebMedienBib[0]).Album;
-            currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
+            currentAlbum := fWebMedienBib[0].Album;
+            currentCoverID := fWebMedienBib[0].CoverID;
             c := 1;
-            tmpArtistStrings.Add(TAudioFile(fWebMedienBib[0]).Artist);
+            tmpArtistStrings.Add(fWebMedienBib[0].Artist);
             for i := 1 to fWebMedienBib.Count - 1 do
             begin
 
-                if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Album, currentAlbum) then
+                if not AnsiSameText(fWebMedienBib[i].Album, currentAlbum) then
                 begin
                     if (trim(currentAlbum) <> '') and (c >= GoodAlbum) then
                     begin
@@ -2180,16 +2180,16 @@ begin
                         Albums[idx].Add(newEntry);
                     end; // otherwise do not add this album
                     // start counting again
-                    currentAlbum := TAudioFile(fWebMedienBib[i]).Album;
-                    currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                    currentAlbum := fWebMedienBib[i].Album;
+                    currentCoverID := fWebMedienBib[i].CoverID;
                     c := 1;
                 end else
                 begin
                     // just count this file to the current-Artist-Count
                     inc(c);
                     if currentCoverID = '' then
-                        currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
-                    tmpArtistStrings.Add(TAudioFile(fWebMedienBib[i]).Artist);
+                        currentCoverID := fWebMedienBib[i].CoverID;
+                    tmpArtistStrings.Add(fWebMedienBib[i].Artist);
                 end;
             end;
 
@@ -2218,16 +2218,16 @@ var currentGenre, currentCoverID: String;
     c, i: Integer;
     newEntry: TCountedString;
 begin
-    fWebMedienBib.Sort(Sortieren_Genre_asc);
+    fWebMedienBib.Sort(Sort_Genre_asc);
     if fWebMedienBib.Count > 0 then
     begin
-        currentGenre := TAudioFile(fWebMedienBib[0]).Genre;
-        currentCoverID := TAudioFile(fWebMedienBib[0]).CoverID;
+        currentGenre := fWebMedienBib[0].Genre;
+        currentCoverID := fWebMedienBib[0].CoverID;
         c := 1;
 
         for i := 1 to fWebMedienBib.Count - 1 do
         begin
-            if not AnsiSameText(TAudioFile(fWebMedienBib[i]).Genre, currentGenre) then
+            if not AnsiSameText(fWebMedienBib[i].Genre, currentGenre) then
             begin
                 if (trim(currentGenre) <> '')
                   // and (currentGenre <> 'Other')
@@ -2239,15 +2239,15 @@ begin
                     Genres.Add(newEntry);
                 end;
                 // start counting again
-                currentGenre := TAudioFile(fWebMedienBib[i]).Genre;
-                currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                currentGenre := fWebMedienBib[i].Genre;
+                currentCoverID := fWebMedienBib[i].CoverID;
                 c := 1;
             end else
             begin
                 // just count this file to the current-Artist-Count
                 inc(c);
                 if currentCoverID = '' then
-                    currentCoverID := TAudioFile(fWebMedienBib[i]).CoverID;
+                    currentCoverID := fWebMedienBib[i].CoverID;
             end;
         end;
         newEntry := TCountedString.Create(currentGenre, c, '1');
@@ -2400,9 +2400,9 @@ begin
     result := Nil;
     for i := 0 to fWebMedienBib.Count - 1 do
     begin
-        if TAudioFile(fWebMedienBib[i]).WebServerID = aID then
+        if fWebMedienBib[i].WebServerID = aID then
         begin
-            result := TAudioFile(fWebMedienBib[i]);
+            result := fWebMedienBib[i];
             break;
         end;
     end;

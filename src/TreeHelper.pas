@@ -33,7 +33,7 @@ unit TreeHelper;
 interface
 
 uses Windows, Graphics, SysUtils, VirtualTrees, Forms, Controls, NempAudioFiles, Types, StrUtils,
-  Contnrs, Classes, Jpeg, PNGImage,
+  Contnrs, Classes, Jpeg, PNGImage, uDragFilesSrc, math,
   Mp3FileUtils, Id3v2Frames, dialogs, Hilfsfunktionen,
   Nemp_ConstantsAndTypes, CoverHelper, MedienbibliothekClass, BibHelper,
   gnuGettext, Nemp_RessourceStrings;
@@ -57,17 +57,25 @@ type
   function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
 
   function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
-  function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
+  // function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
 
   procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
   procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
 
   function GetOldNode(aString: UnicodeString; aTree: TVirtualStringTree): PVirtualNode;
 
+  function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
+  function GetNodeWithAudioFile(aTree: TVirtualStringTree; aAudioFile: TAudioFile): PVirtualNode;
+  function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;
+
+  procedure InitiateDragDrop(aTree: TVirtualStringTree; aList: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer);
+
+  function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
+
 
 implementation
 
-USes  NempMainUnit;
+Uses  NempMainUnit, PlayerClass,  MainFormHelper;
 
 // Diese Listen brauche ich bei der Ordner-Ansicht:
 // Da gibts ja u.U. mehr Knoten, als ich tatsächlich Ordner habe, um die Unterordner-Struktur mit aufzubauen
@@ -143,6 +151,7 @@ begin
       result := i;
 end;
 
+(*
 function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
 var Data: PTreeData;
 begin
@@ -152,7 +161,7 @@ begin
   Data^.FAudioFile:=aAudioFile;
 
   AVST.ValidateNode(Result,false); // validate at the end, as we check FAudioFile on InitNode
-end;
+end;*)
 
 
 function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
@@ -426,6 +435,97 @@ begin
             }
         end
     end;
+end;
+
+function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
+begin
+    result := aTree.GetNextSibling(aNode);
+    if not assigned(result) then
+        result := aTree.GetFirst;
+end;
+
+function GetNodeWithAudioFile(aTree: TVirtualStringTree; aAudioFile: TAudioFile): PVirtualNode;
+var aNode: PVirtualNode;
+begin
+    result := Nil;
+    aNode := aTree.GetFirst;
+
+    while assigned(aNode) and (Not assigned(result)) do
+    begin
+        if aTree.GetNodeData<TAudioFile>(aNode) = aAudioFile then
+            result := aNode
+        else
+            aNode := aTree.GetNextSibling(aNode);
+    end;
+end;
+
+function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;
+begin
+    if assigned(StartNode) and (StartNode.Index <= aIndex) then
+        result := StartNode
+    else
+        result := aTree.GetFirst;
+
+    while assigned(result) and (result.Index <> aIndex) do
+        result := aTree.GetNextSibling(result);
+end;
+
+function InitiateFocussedPlay(aTree: TVirtualStringTree): Boolean;
+var MainNode, CueNode: PVirtualNode;
+begin
+    MainNode := aTree.FocusedNode;
+    if not assigned(MainNode) then
+    begin
+          result := False;
+          exit;
+    end;
+
+    NempPlaylist.UserInput;
+    NempPlayer.LastUserWish := USER_WANT_PLAY;
+
+    result := True;
+    if aTree.GetNodeLevel(MainNode) = 0 then
+    begin
+        NempPlaylist.PlayFocussed(MainNode.Index, -1);
+    end else
+    begin
+        CueNode := MainNode;
+        MainNode := aTree.NodeParent[MainNode];
+        NempPlaylist.PlayFocussed(MainNode.Index, CueNode.Index);
+    end;
+end;
+
+
+procedure InitiateDragDrop(aTree: TVirtualStringTree; aList: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer);
+var i, maxC: Integer;
+    SelectedMp3s: TNodeArray;
+    af: TAudioFile;
+    cueFile: String;
+begin
+    // Add files selected to DragFilesSrc1 list
+    DragDrop.ClearFiles;
+    aList.Clear;
+    SelectedMp3s := aTree.GetSortedSelection(False);
+    maxC := min(maxFiles, length(SelectedMp3s));
+    if length(SelectedMp3s) > maxFiles then
+        AddErrorLog(Format(Warning_TooManyFiles, [maxFiles]));
+
+    for i := 0 to maxC - 1 do
+    begin
+        //Data := aVST.GetNodeData(SelectedMP3s[i]);
+        af := aTree.GetNodeData<TAudioFile>(SelectedMp3s[i]);
+        DragDrop.AddFile(af.Pfad);
+        aList.Add(af.Pfad);
+        if (af.Duration > MIN_CUESHEET_DURATION) then
+        begin
+            cueFile := ChangeFileExt(af.Pfad, '.cue');
+            if FileExists(ChangeFileExt(af.Pfad, '.cue')) then
+                // We dont need internal dragging of cue-Files, so only Addfile
+                DragDrop.AddFile(cueFile);
+        end;
+    end;
+    // This is the START of the drag (FROM) operation.
+    DragDrop.Execute;
 end;
 
 

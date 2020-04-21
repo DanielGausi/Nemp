@@ -609,7 +609,9 @@ begin
             FillStringTree(Medienbib.Alben, Nemp_MainForm.AlbenVST);
 
         FillTreeView(MedienBib.AnzeigeListe, Nil); //1);
-        NempPlaylist.FillPlaylistView;
+
+        // Call the eventHandler for "Fill PlaylistView again"
+        PlaylistChangedCompletely(NempPlaylist);
         NempPlaylist.ReInitPlaylist;
 
         CorrectVolButton;
