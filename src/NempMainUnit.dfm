@@ -691,6 +691,7 @@ object Nemp_MainForm: TNemp_MainForm
             Top = 2
             Width = 24
             Height = 24
+            Hint = 'Favorite playlists'
             TabOrder = 3
             OnClick = SkinButton1Click
             DrawMode = dm_Windows
@@ -6733,6 +6734,16 @@ object Nemp_MainForm: TNemp_MainForm
     OnPopup = PlaylistManagerPopupPopup
     Left = 696
     Top = 56
+    object PM_PLM_Default: TMenuItem
+      Tag = -1
+      AutoCheck = True
+      Caption = 'Default playlist'
+      RadioItem = True
+      OnClick = PM_PLM_SwitchToDefaultPlaylistClick
+    end
+    object N28: TMenuItem
+      Caption = '-'
+    end
     object N19: TMenuItem
       Caption = '-'
     end
@@ -6751,7 +6762,8 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Recent playlists'
     end
     object PM_PLM_EditFavourites: TMenuItem
-      Caption = 'Edit'
+      Caption = 'Edit favorites'
+      OnClick = PM_PLM_EditFavouritesClick
     end
   end
 end

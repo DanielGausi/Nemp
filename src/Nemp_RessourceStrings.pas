@@ -1075,15 +1075,26 @@ FormBuilder_SeparateWindowWarning = 'The form layout cannot be applied in separa
 
 PlaylistManagerAutoSave_Caption = 'Confirmation';
 PlaylistManagerAutoSave_Text    = 'The current playlist "%s" has been changed since it has been saved.' +#13#10 + #13#10
-                                 + 'Do you want to save it now before loading another playlist?';
+                                 + 'Do you want to save it now?';
 
 PlaylistManagerAutoSave_ShowAgain = 'Save selection and do not show this dialog again.';
 
 PlaylistManager_ReloadPlaylist = 'The current playlist "%s" has been changed since it has been saved. ' +#13#10 + #13#10
                                  + 'Do you want to reload it and go back to the previously saved version?';
 
+//PlaylistManager_SwitchToDefaultPlaylist = 'The current playlist "%s" has been changed since it has been saved. ' +#13#10 + #13#10
+//                                 + 'Do you want to save it now and switch to the default playlist?';
+
 PlaylistManager_PlaylistNoFound = 'The playlist file does not exist.';
 
+PlaylistManager_DeleteFavorite = 'This will delete the playlist "%s" from your favorites. This cannot be undone.' +#13#10 + #13#10
+                                + 'Are you sure you want to delete the list?';
+
+PlaylistManager_FileExists = 'Check: Fail. Filename already exists';
+PlaylistManager_NameExists = 'Check: Fail. Description already exists';
+PlaylistManager_EmptyFilename = 'Check: Fail: Empty or invalid filename';
+PlaylistManager_Duplicate  = 'Check: Fail. Duplicate description and filename';
+PlaylistManager_CheckOK    = 'Check: Ok';
 
 implementation
 

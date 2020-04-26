@@ -101,6 +101,8 @@
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_MajorVer>4</VerInfo_MajorVer>
         <VerInfo_MinorVer>13</VerInfo_MinorVer>
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
+        <DCC_MapFile>3</DCC_MapFile>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -275,6 +277,10 @@
         <DCCReference Include="PlaylistManagement.pas"/>
         <DCCReference Include="NewFavoritePlaylist.pas">
             <Form>NewFavoritePlaylistForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="PlaylistEditor.pas">
+            <Form>PlaylistEditorForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Debug">

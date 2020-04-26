@@ -989,6 +989,7 @@ begin
     HistoryList.Clear;
     PrebookList.Clear;
     Playlist.Clear;
+    fDriveManager.Clear;
 
     fCurrentHistoryFile := Nil;
     fStartIndex := 0;
@@ -1456,7 +1457,11 @@ procedure TNempPlaylist.ProcessBufferStringlist;
 var i, oldCount: Integer;
 begin
   ProcessingBufferlist := True;
-  if LastCommandWasPlay then ClearPlaylist;
+  if LastCommandWasPlay then
+  begin
+      NempPlaylist.PlaylistManager.Reset;
+      ClearPlaylist;
+  end;
 
   oldCount := Playlist.Count;
 
@@ -1469,7 +1474,7 @@ begin
 
   if fFirstAction then   // fFirstAction wird bei Play auf False gesetzt
   begin
-      NempPlaylist.Play(PlayingIndex, NempPlayer.FadingInterval, AutoPlayOnStart);
+      NempPlaylist.Play(fStartIndex, NempPlayer.FadingInterval, AutoPlayOnStart);
   end else
   begin
       if LastCommandWasPlay and (Playlist.Count  > 0) then

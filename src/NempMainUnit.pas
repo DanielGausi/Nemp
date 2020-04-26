@@ -612,10 +612,10 @@ type
     PM_PLM_SaveAsExistingFavorite: TMenuItem;
     N19: TMenuItem;
     PM_PLM_EditFavourites: TMenuItem;
+    PM_PLM_Default: TMenuItem;
+    N28: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
-
-    // procedure InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
 
     procedure Skinan1Click(Sender: TObject);
     procedure ActivateSkin(aName: String);
@@ -853,8 +853,6 @@ type
     procedure Schlafmodusdeaktivieren1Click(Sender: TObject);
 
     procedure LoadARecentPlaylist(Sender: TObject);
-    // function DeleteFileFromRecentList(aIdx: Integer): boolean;
-    // function AddFileToRecentList(NewFile: UnicodeString): Boolean;
     Procedure OnRecentPlaylistsChange(Sender: TObject);
     procedure OnFavouritePlaylistsChange(Sender: TObject);
 
@@ -862,7 +860,6 @@ type
     function GenerateMedienBibSTFilter: String;
 
     procedure RepairZOrder;
-    // procedure ActualizeVDTCover;
 
     procedure PM_ML_PlayNowClick(Sender: TObject);
     procedure PanelPaint(Sender: TObject);
@@ -1186,6 +1183,8 @@ type
     procedure PM_PLM_SaveAsNewFavoriteClick(Sender: TObject);
 
     procedure PM_PLM_LoadFavoritePlaylistClick(Sender: TObject);
+    procedure PM_PLM_SwitchToDefaultPlaylistClick(Sender: TObject);
+
     procedure PM_PLM_SaveAsExistingFavoriteClick(Sender: TObject);
     procedure PlaylistManagerPopupPopup(Sender: TObject);
 
@@ -1193,6 +1192,7 @@ type
     procedure FormDeactivate(Sender: TObject);
     procedure PlaylistVSTDragAllowed(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure PM_PLM_EditFavouritesClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1216,12 +1216,6 @@ type
     // a replacement for the PopupMenu.Tag, as we have two medialist popups now
     MediaListPopupTag: Integer;
 
-    // Setzt alle DragOver-Eventhandler auf das der Effekte-Groupbox
-    //procedure SetGroupboxEffectsDragover;
-    // ... der Equalizer-Groupbox
-    //procedure SetGroupboxEQualizerDragover;
-
-    //LastPaintedTimeString: String;
     LastPaintedTime: Integer;
 
     FormReadyAndActivated : Boolean;
@@ -1284,13 +1278,9 @@ type
     AutoShowDetailsTMP: Boolean;
     DragSource: Integer; // Woher kommen die Gedraggten Files?
 
-    // BackupPlayingIndex: Integer; // Beim Startvorgang mit Parameter den alten PlayingIndex merken,
-                                 // Falls mit den Parametern was nicht stimmt
-
     TaskBarDelay: integer;
 
     ContinueWithPlaylistAdding: Boolean;
-
     KeepOnWithLibraryProcess: Boolean;
 
     ReadyForGetFileApiCommands: Boolean;
@@ -1427,7 +1417,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
-  NewFavoritePlaylist, PlaylistManagement;
+  NewFavoritePlaylist, PlaylistManagement, PlaylistEditor;
 
 
 {$R *.dfm}
@@ -1480,7 +1470,8 @@ end;
 procedure TNemp_MainForm.DragDropTimerTimer(Sender: TObject);
 begin
     DragDropTimer.Enabled := False;
-    Nemp_MainForm.DragSource := DS_EXTERN;
+    DragSource := DS_EXTERN;
+    DragDropList.Clear;
 end;
 
 procedure TNemp_MainForm.VolTimerTimer(Sender: TObject);
@@ -1530,13 +1521,6 @@ begin
     ReallyDeletePlaylistTimer.Enabled := False;
 end;
 
-(*
-procedure TNemp_MainForm.InitPlayingFile(Startplay: Boolean; StartAtOldPosition: Boolean = False);
-begin
-    exit
-end;
-*)
-
 
 procedure TNemp_MainForm.PanelTagCloudBrowseClick(Sender: TObject);
 begin
@@ -1565,7 +1549,7 @@ begin
           Dateiliste := TAudioFileList.Create(False);
           try
               GenerateListForHandleFiles(DateiListe, 2, True);  // was: 4
-              DragSource := DS_VST;
+              DragSource := DS_INTERN;
               with DragFilesSrc1 do
               begin
                   // Add files selected to DragFilesSrc1 list
@@ -1688,7 +1672,6 @@ end;
 
 
 procedure TNemp_MainForm.FormCreate(Sender: TObject);
-//var c: Integer;
 begin
     FormReadyAndActivated := false;
 
@@ -2061,25 +2044,11 @@ begin
                   NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop := PosAndSize^.rcNormalPosition.Top;
                   NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft := PosAndSize^.rcNormalPosition.Left;
               end;
-            {
-            NempOptions.NempFormAufteilung[Tag].FormWidth := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
-            NempOptions.NempFormAufteilung[Tag].FormHeight := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
-            NempOptions.NempFormAufteilung[Tag].FormTop := PosAndSize^.rcNormalPosition.Top;
-            NempOptions.NempFormAufteilung[Tag].FormLeft := PosAndSize^.rcNormalPosition.Left;
-            }
-
           end;
         finally
           FreeMem(PosAndSize,SizeOf(TWindowPlacement))
         end;
         NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized := WindowState = wsMaximized;
-
-        {
-        NempOptions.NempFormAufteilung[Tag].TopMainPanelHeight := _TopMainPanel.Height;
-        NempOptions.NempFormAufteilung[Tag].AuswahlPanelWidth  := AuswahlPanel.Width;
-        NempOptions.NempFormAufteilung[Tag].ArtistWidth        := ArtistsVST.Width;
-        NempOptions.NempFormAufteilung[Tag].Maximized          := WindowState = wsMaximized;
-        }
 
         ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
         try
@@ -2499,8 +2468,6 @@ begin
   if filename = '' then exit;
 
   ReallyDeletePlaylistTimer.Enabled := False;
-
-
   //Weiter unten wieder starten...
 
   // Verzeichnisse rekursiv durchsuchen lassen.
@@ -2509,6 +2476,7 @@ begin
   begin
       if not Enqueue then
       begin
+        NempPlaylist.PlaylistManager.Reset;
         NempPlaylist.ClearPlaylist;
       end;
       NempPlaylist.Status := 1;
@@ -2542,8 +2510,8 @@ begin
                 // if multiple playlists are selected for "Play in Nemp": Play only one. Which one doesn't really matter
                 if not enqueue then
                 begin
-                    NempPlaylist.ClearPlaylist;
                     NempPlaylist.PlaylistManager.Reset;
+                    NempPlaylist.ClearPlaylist;
                 end;
                 NempPlaylist.LoadFromFile(filename);
                 if Startplay then
@@ -3002,14 +2970,11 @@ end;
 
 function TNemp_MainForm.GetFocussedAudioFile:TAudioFile;
 var  OldNode: PVirtualNode;
-  //Data: PTreeData;
 begin
     OldNode := VST.FocusedNode;
     if assigned(OldNode) then
-    begin
-      // Data := VST.GetNodeData(OldNode);
-      result :=  VST.GetNodeData<TAudioFile>(OldNode);
-    end else
+        result :=  VST.GetNodeData<TAudioFile>(OldNode)
+    else
       result := NIL;
 end;
 
@@ -3095,7 +3060,6 @@ end;
 
 procedure TNemp_MainForm.PM_ML_HideSelectedClick(Sender: TObject);
 var i:integer;
-    // Data: PTreeData;
     SelectedMp3s: TNodeArray;
     NewSelectNode: PVirtualNode;
 begin
@@ -3110,10 +3074,7 @@ begin
 
     begin
         for i:=0 to length(SelectedMP3s)-1 do
-        begin
-            // Data := VST.GetNodeData(SelectedMP3s[i]);
             MedienBib.AnzeigeListe.Extract(VST.GetNodeData<TAudioFile>(SelectedMp3s[i]));
-        end;
         VST.DeleteSelectedNodes;
     end;
 
@@ -3198,7 +3159,6 @@ begin
     if length(SelectedMP3s) = 0 then
         exit;
 
-    //VST.BeginUpdate;
     MedienBib.StatusBibUpdate := BIB_Status_ReadAccessBlocked;
     BlockGUI(3);
     KeepOnWithLibraryProcess := true;   // ok, apm is used
@@ -3403,10 +3363,8 @@ begin
     Abspielen := ((NempPlaylist.Count = 0) and (NempPlayer.MainStream = 0)) OR (How = PLAYER_PLAY_FILES);
 
     if How in [{PLAYER_PLAY_NOW, }PLAYER_PLAY_NEXT] then
-        //NempPlaylist.GetInsertNodeFromPlayPosition
         NempPlaylist.InitInsertIndexFromPlayPosition(True)
     else
-        //NempPlaylist.InsertNode := NIL;
         NempPlaylist.ResetInsertIndex;
 
     // Erste Datei einfügen und ggf. Abspielen
@@ -3437,19 +3395,13 @@ begin
     for i := 1 to iMax do
     begin
           if ContinueWithPlaylistAdding then
-              // tmp :=
               NempPlaylist.InsertFileToPlayList(aList[i])
           else
               // free the remaining Audiofiles. They are not needed any more
               aList[i].Free;
 
-          ///////////if (i Mod 100 = 0) and ContinueWithPlaylistAdding then
-         /////////// begin
-         ///////////     PlayListVST.ScrollIntoView( tmp, False, True);
-        //////////////      Application.ProcessMessages;
-         //////////// end;
-          // if Not ContinueWithPlaylistAdding then break;
-          // No, we have to free the rest of the list now (2019), so finish the loop completely
+          if (i Mod 100 = 0) and ContinueWithPlaylistAdding then
+              Application.ProcessMessages;
     end;
     ContinueWithPlaylistAdding := False;
 end;
@@ -3667,17 +3619,14 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_ML_PlayNowClick(Sender: TObject);
-var  OldNode: PVirtualNode;
-      // Data: PTreeData;
-      af: TAudioFile;
+var OldNode: PVirtualNode;
+    af: TAudioFile;
 begin
     OldNode := VST.FocusedNode;
     if assigned(OldNode) then
-    begin
-      // Data := VST.GetNodeData(OldNode);
-      af := VST.GetNodeData<TAudioFile>(OldNode)
-    end else
-      af := NIL;
+        af := VST.GetNodeData<TAudioFile>(OldNode)
+    else
+        af := NIL;
     if assigned(af) and FileExists(af.Pfad) then
         NempPlaylist.PlayBibFile(af, NempPlayer.FadingInterval);
 end;
@@ -4068,10 +4017,8 @@ begin
         detUpdate := SD_PLAYLIST;
 
     if Assigned(Node) then
-    begin
-        //Data := LocalTree.GetNodeData(Node);
-        AktualisiereDetailForm( LocalTree.GetNodeData<TAudioFile>(Node)  , detUpdate);
-    end else
+        AktualisiereDetailForm( LocalTree.GetNodeData<TAudioFile>(Node)  , detUpdate)
+    else
         AktualisiereDetailForm(NIL, detUpdate);
 end;
 
@@ -4158,12 +4105,11 @@ var
     datei_ordner: UnicodeString;
     Node: PVirtualNode;
     af: TAudioFile;
-    // Data: PTreeData;
 begin
     Node:=VST.FocusedNode;
     if not Assigned(Node) then
         Exit;
-    //Data := VST.GetNodeData(Node);
+
     af := VST.GetNodeData<TAudioFile>(Node);
     datei_ordner := af.Ordner;
 
@@ -4309,7 +4255,6 @@ end;
 procedure TNemp_MainForm.PM_ML_PropertiesClick(Sender: TObject);
 var AudioFile: TAudioFile;
     Node: PVirtualNode;
-    // Data: PTreeData;
 begin
     if NempSkin.NempPartyMode.DoBlockDetailWindow then
         exit;
@@ -4319,7 +4264,7 @@ begin
       Node := VST.GetFirstSelected;
     if not Assigned(Node) then
       exit;
-    // Data := VST.GetNodeData(Node);
+
     AudioFile := VST.GetNodeData<TAudioFile>(Node);
     AutoShowDetailsTMP := True;
 
@@ -4336,13 +4281,11 @@ end;
 
 procedure TNemp_MainForm.VSTGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
-var // Data: PTreeData;
-    af: TAudioFile;
+var af: TAudioFile;
 begin
 
     if (vsDisabled in Node.States) then
     begin
-        //Data:=Sender.GetNodeData(Node);
         af := Sender.GetNodeData<TAudioFile>(Node);
 
         if VST.Header.Columns[column].Position = 0 then
@@ -4351,8 +4294,6 @@ begin
             CellText := '';
     end else
     begin
-
-        // Data:=Sender.GetNodeData(Node);
         af := Sender.GetNodeData<TAudioFile>(Node);
 
         case VST.Header.Columns[column].Tag of
@@ -4404,11 +4345,9 @@ end;
 procedure TNemp_MainForm.VSTAfterCellPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; Column: TColumnIndex;
   CellRect: TRect);
-var //Data: PTreeData;
-    af: TAudioFile;
+var af: TAudioFile;
     st: Integer;
 begin
-  //Data:=Sender.GetNodeData(Node);
   af := Sender.GetNodeData<TAudioFile>(Node);
 
   if af = MedienBib.BibSearcher.DummyAudioFile then
@@ -4536,7 +4475,7 @@ end;
 procedure TNemp_MainForm.VSTStartDrag(Sender: TObject;
   var DragObject: TDragObject);
 begin
-    DragSource := DS_VST;
+    DragSource := DS_INTERN;
     InitiateDragDrop(VST, DragDropList, DragFilesSrc1, NempOptions.maxDragFileCount);
 end;
 
@@ -4672,13 +4611,11 @@ end;
 procedure TNemp_MainForm.VSTIncrementalSearch(Sender: TBaseVirtualTree;
   Node: PVirtualNode; const SearchText: string; var Result: Integer);
 var aString: String;
-    //Data: PTreeData;
     aAudioFile: TAudioFile;
 begin
     // Used for next Search with "F3"
     OldSelectionPrefix := SearchText;
 
-    //Data := Sender.GetNodeData(Node);
     aAudioFile := Sender.GetNodeData<TAudioFile>(Node);
 
     case VST.Header.Columns[VST.FocusedColumn].Tag of
@@ -4697,10 +4634,8 @@ end;
 
 procedure TNemp_MainForm.VSTInitNode(Sender: TBaseVirtualTree; ParentNode,
   Node: PVirtualNode; var InitialStates: TVirtualNodeInitStates);
-var //data: PTreeData;
-    af: TAudioFile;
+var af: TAudioFile;
 begin
-    //data := VST.GetNodeData(Node);
     af := Sender.GetNodeData<TAudioFile>(Node);
     if af = MedienBib.BibSearcher.DummyAudioFile then
         InitialStates := [ivsDisabled];
@@ -4724,7 +4659,6 @@ end;
 procedure TNemp_MainForm.VSTKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var Node,ScrollNode: PVirtualNode;
-  // Data: PTreeData;
   erfolg:boolean;
 
         function GetNodeWithPrefix(aVST: TVirtualStringTree; StartNode:PVirtualNode; FocussedAttribut:integer; Prefix: UnicodeString; var Erfolg:boolean):PVirtualNode;
@@ -4734,14 +4668,12 @@ var Node,ScrollNode: PVirtualNode;
         // entsprechenden Prefix.
         var
           nextnode:PVirtualnode;
-          // Data:PTreeData;
           AudioFile: TAudioFile;
           aString: String;
         begin
           erfolg := false;
           nextnode := startNode;
           repeat
-            //Data := aVST.GetNodeData(nextnode);
             AudioFile := aVST.GetNodeData<TAudioFile>(nextNode);
 
             case FocussedAttribut of
@@ -4808,7 +4740,6 @@ begin
         Node := VST.FocusedNode;
         if not Assigned(Node) then
           Exit;
-        // Data := VST.GetNodeData(Node);
         if  (VST.GetNodeData<TAudioFile>(Node)).AudioType = at_File then
             NempPlayer.PlayJingle(VST.GetNodeData<TAudioFile>(Node));
       end;
@@ -4869,7 +4800,6 @@ var c, i: Integer;
   groesse:int64;
   SelectedMP3s: TNodeArray;
   aNode: PVirtualNode;
-  // Data: PTreeData;
   AudioFile: TAudioFile;
 begin
 
@@ -4887,7 +4817,6 @@ begin
   for i:=0 to VST.SelectedCount-1 do
   begin
       aNode := SelectedMP3s[i];
-      // Data := VST.GetNodeData(aNode);
       AudioFile := VST.GetNodeData<TAudioFile>(aNode);
       dauer := dauer + AudioFile.Duration;
       groesse := groesse + AudioFile.Size;
@@ -4910,7 +4839,6 @@ begin
   aNode := VST.FocusedNode;
   if Assigned(aNode) then
   begin
-      // Data := VST.GetNodeData(aNode);
       AudioFile := VST.GetNodeData<TAudioFile>(aNode);
 
       if AudioFile.IsLocalFile then
@@ -5569,7 +5497,7 @@ begin
 
           if Assigned(af) then
           begin
-              DragSource := DS_VST;
+              DragSource := DS_INTERN;
               // Add files selected to DragFilesSrc1 list
               DragFilesSrc1.ClearFiles;
               DragDropList.Clear;
@@ -5808,35 +5736,10 @@ begin
             ItemColor := VST.Color;
           EraseAction := eaColor;
       end
-(*  else
-  begin
-      if (Node = NempPlaylist.LastHighlightedSearchResultNode) then
-      begin
-        if NempSkin.isActive then
-        begin
-            //ItemColor := NempSkin.SkinColorScheme.Tree_UnfocusedSelectionColor[3];
-            //EraseAction := eaColor;
-        end;
-        {else
-            Pen.Color := clGradientActiveCaption;
-        pen.Width := 1;//3;
-        pen.Style := psDot; // psDash;
-
-        Polyline([Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent) * Integer(PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1),
-              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Bottom-1),
-              Point(ItemRect.Right-1, ItemRect.Bottom-1),
-              Point(ItemRect.Right-1, ItemRect.Top+1),
-              Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
-              );
-              }
-      end;
-  end;
-  *)
 end;
 
 procedure TNemp_MainForm.PlaylistVSTAfterItemPaint(Sender: TBaseVirtualTree;
   TargetCanvas: TCanvas; Node: PVirtualNode; ItemRect: TRect);
-// var Data: PTreeData;
 var af: TAudioFile;
 begin
   with TargetCanvas do
@@ -5857,26 +5760,6 @@ begin
               Point(ItemRect.Left+1 + (Integer(PlaylistVST.Indent * PlaylistVST.GetNodeLevel(Node))), ItemRect.Top+1)]
               );
       end;
-
-
-      {
-      Data := PlaylistVST.GetNodeData(Node);
-      if assigned(Data) then
-      begin
-          if T---AudioFile(Data--^.FAudioFile).PrebookIndex > 0 then
-          begin
-              // Clear the area
-              //brush.Color := PlaylistVST.Color;
-              //Fillrect(Rect(ItemRect.Left+PlaylistVST.Indent, ItemRect.Top, ItemRect.Left+2*PlaylistVST.Indent, ItemRect.Bottom));
-              // Paint the Index of the file
-              Brush.Style := bsClear;
-              Font.Size := 8; // fixed size. Otherwise the Indent can be to small
-              Font.Style := [fsUnderline];
-              TextOut(ItemRect.Left + Integer(PlaylistVST.Indent), ItemRect.Top,
-                      IntTostr(T---AudioFile(Data--^.FAudioFile).PrebookIndex));
-          end;
-      end;
-      }
   end;
 end;
 
@@ -6497,7 +6380,7 @@ end;
 procedure TNemp_MainForm.PlaylistVSTStartDrag(Sender: TObject; var DragObject: TDragObject);
 var State: TKeyboardState;
 begin
-    DragSource := DS_PLAYLIST;
+    DragSource := DS_INTERN;
 
     GetKeyboardState(State);
     if (State[VK_CONTROL] and 128) <> 0 then
@@ -6536,7 +6419,7 @@ begin
     // have filled DragDropList with the dragged files.
     // In that case: Do not *move* the nodes, but insert new copies of these files
     // into the target location. This will be handled by WMDropFiles.
-    if (DragSource <> DS_PLAYLIST) or (DragDropList.Count > 0) then
+    if (DragSource = DS_EXTERN) or (DragDropList.Count > 0) then
         exit;
 
     // Translate the drop position into an node attach mode.
@@ -7273,8 +7156,8 @@ begin
     if GoOn and PlayListOpenDialog.Execute then
     begin
         restart := NempPlayer.Status = Player_ISPLAYING;
-        NempPlaylist.ClearPlaylist;
         NempPlaylist.PlaylistManager.Reset;
+        NempPlaylist.ClearPlaylist;
         NempPlaylist.LoadFromFile(PlayListOpenDialog.FileName);
         NempPlaylist.PlaylistManager.AddRecentPlaylist(PlayListOpenDialog.FileName);
 
@@ -7309,7 +7192,7 @@ begin
         // Wenn diese Datei existiert, dann Audiofile createn und in die Playlist einfügen
         // Sämtliches Einfügen wird in der Insert-Prozedur erledigt!
         if FileExists(AudioFilename) then
-          NempPlaylist.InsertFileToPlayList(AudioFilename, filename);
+          NempPlaylist.AddFileToPlaylist(AudioFilename, filename);
       end;
   end;
 
@@ -7328,7 +7211,6 @@ end;
 procedure TNemp_MainForm.PM_PL_PropertiesClick(Sender: TObject);
 var AudioFile:TAudioFile;
     Node: PVirtualNode;
-    // Data: PTreeData;
 begin
     if NempSkin.NempPartyMode.DoBlockDetailWindow then
         exit;
@@ -7341,7 +7223,6 @@ begin
     if PlaylistVST.GetNodeLevel(Node) = 1 then
       Node := Node.Parent;
 
-    //Data := PlaylistVST.GetNodeData(Node);
     AudioFile := PlaylistVST.GetNodeData<TAudioFile>(Node);
     AutoShowDetailsTMP := True;
     AktualisiereDetailForm(AudioFile, SD_Playlist, True);
@@ -7349,7 +7230,6 @@ end;
 
 procedure TNemp_MainForm.PM_PL_ReplayGain_Click(Sender: TObject);
 var aVST: TVirtualStringtree;
-    //Data: PTreeData;
     af: TAudioFile;
     SelectedMp3s: TNodeArray;
     i: Integer;
@@ -7395,7 +7275,6 @@ begin
         begin
             if aVST.GetNodeLevel(Selectedmp3s[i]) = 0 then
             begin
-                //Data := aVST.GetNodeData(SelectedMP3s[i]);
                 af := aVST.GetNodeData<TAudioFile>(SelectedMp3s[i]);
                 // only add actual files (no webradio, CDDA, ..)
                 if af.IsFile then
@@ -7424,7 +7303,6 @@ end;
 procedure TNemp_MainForm.PlaylistVSTChange(Sender: TBaseVirtualTree;
   Node: PVirtualNode);
 var aNode: PVirtualNode;
-  // Data: PTreeData;
   AudioFile: TAudioFile;
   c,i:integer;
   dauer:int64;
@@ -7448,7 +7326,6 @@ begin
   for i:=0 to length(SelectedMP3s) - 1 do
   begin
       aNode := SelectedMP3s[i];
-      //Data := PlaylistVST.GetNodeData(aNode);
       AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
       case AudioFile.AudioType of
           at_File: begin
@@ -7497,14 +7374,12 @@ begin
   if PlaylistVST.GetNodeLevel(aNode) > 0 then
   begin
       aNode := anode.Parent;
-      //Data := PlaylistVST.GetNodeData(aNode);
       AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
       ShowVSTDetails(AudioFile, SD_PLAYLIST);
   end else
   begin
       NempPlaylist.RefreshAudioFile(aNode.Index, false); // ActualizeNode(aNode, false);
 
-      //Data := PlaylistVST.GetNodeData(aNode);
       AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
       ShowVSTDetails(AudioFile, SD_PLAYLIST);
       AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
@@ -7705,10 +7580,6 @@ begin
         insertNode := GetNodeWithIndex(PlaylistVST, aIndex, MostRecentInsertNodeForPlaylist);
         NewNode := PlayListVST.InsertNode(InsertNode, amInsertBefore, aFile);
         MostRecentInsertNodeForPlaylist := NewNode;
-
-        if assigned(NewNode) then
-            caption := IntToStr(NewNode.Index);
-
     end;
     // insert CueNodes, if neccessary
     if assigned(aFile.CueList) then
@@ -8092,7 +7963,6 @@ end;
 procedure TNemp_MainForm.PM_ML_ExtendedShowAllFilesInDirClick(Sender: TObject);
 var
   aNode: pVirtualNode;
-  // Data: PTreeData;
   aPfad: UnicodeString;
 begin
   if Medienbib.StatusBibUpdate >= 2 then exit;
@@ -8100,7 +7970,6 @@ begin
   aNode := VST.FocusedNode;
   if not assigned(aNode) then exit;
 
-  // Data := VST.GetNodeData(aNode);
   aPfad := (VST.GetNodeData<TAudioFile>(aNode)).Ordner;
 
   MedienBib.GetFilesInDir(aPfad, Sender=PM_ML_ExtendedShowAllFilesInDir);
@@ -8108,7 +7977,6 @@ end;
 
 procedure TNemp_MainForm.NachDiesemDingSuchen1Click(Sender: TObject);
 var aNode: pVirtualNode;
-    //Data: PTreeData;
     af: TAudioFile;
     newComboBoxString: UnicodeString;
     KeyWords: TSearchKeyWords;
@@ -8128,7 +7996,6 @@ begin
     aNode := VST.FocusedNode;
     if not assigned(aNode) then exit;
 
-    //Data := VST.GetNodeData(aNode);
     af := VST.GetNodeData<TAudioFile>(aNode);
     case (Sender as TMenuItem).Tag of
         1: begin
@@ -8513,10 +8380,9 @@ begin
         JobList := NempPlaylist.ST_Ordnerlist;
         ST_PLaylist.Mask := GeneratePlaylistSTFilter;
         if assigned(PlaylistVST.FocusedNode) then
-            NempPlaylist.InsertIndex := PlaylistVST.FocusedNode.Index
+            NempPlaylist.InsertIndex := PlaylistVST.FocusedNode.Index + 1
         else
             NempPlaylist.ResetInsertIndex;
-        //InsertNode := PlaylistVST.FocusedNode;
   end else
   begin
         ///  even if we add files only to the playlist, we need to stop if the
@@ -8689,13 +8555,11 @@ end;
 procedure TNemp_MainForm.VSTGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
   var Ghosted: Boolean; var ImageIndex: TImageIndex);
-var //Data: PTreeData;
-    af: TAudioFile;
+var af: TAudioFile;
 begin
   case Kind of
     ikNormal, ikSelected:
       begin
-          //Data := Sender.GetNodeData(Node);
           af := Sender.GetNodeData<TAudioFile>(Node);
 
           if af = MedienBib.BibSearcher.DummyAudioFile then
@@ -8721,7 +8585,7 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_PL_ExtendedScanFilesClick(Sender: TObject);
-var i: Integer; //Node: PVirtualNode;
+var i: Integer;
 begin
   /// note (2019)
   ///  This may lead to a looong operation, that can't be cancelled, as here is no
@@ -8731,17 +8595,8 @@ begin
   ClearCDDBCache;
 
   NempPlayer.CoverArtSearcher.StartNewSearch;
-
   for i := 0 to NempPlaylist.Playlist.Count - 1 do
       NempPlaylist.RefreshAudioFile(i, True);
-
-(*  Node := PlaylistVST.GetFirst;
-  while assigned(Node) {and LangeAktionWeitermachen} do
-  begin
-      NempPlaylist.RefreshAudioFile(Node.Index, True);
-      // ActualizeNode(Node, True);
-      Node := PlaylistVST.GetNextSibling(Node);
-  end;*)
 end;
 
 procedure TNemp_MainForm.LyricsMemoKeyDown(Sender: TObject; var Key: Word;
@@ -9322,7 +9177,7 @@ begin
   Dateiliste := TAudioFileList.Create(False);
   try
       GenerateListForHandleFiles(DateiListe, 0, True);     // was: 1
-      DragSource := DS_VST;
+      DragSource := DS_INTERN;
       with DragFilesSrc1 do
       begin
           // Add files selected to DragFilesSrc1 list
@@ -9359,7 +9214,7 @@ begin
     Dateiliste := TAudioFileList.Create(False);
     try
         GenerateListForHandleFiles(Dateiliste, 100, true);  // was: 2
-        DragSource := DS_VST;
+        DragSource := DS_INTERN;
         with DragFilesSrc1 do
         begin
             // Add files selected to DragFilesSrc1 list
@@ -10486,10 +10341,10 @@ begin
     ///  Do not use PlaylistManagerPopup.Items.Clear; here,
     ///  as we want some of the menu items to be fixed
     ///  It's maybe not the fastest way, but we don't have THAT many Items anyway
-    while PlaylistManagerPopup.Items.Count > 5 do
-        PlaylistManagerPopup.Items.Delete(0);
+    while PlaylistManagerPopup.Items.Count > 8 do
+        PlaylistManagerPopup.Items.Delete(2);
 
-    aList := (Sender as TPlaylistManager).QuickLoadPlaylists;
+    aList := NempPlaylist.PlaylistManager.QuickLoadPlaylists;
 
     for i := 0 to aList.Count - 1 do
     begin
@@ -10503,23 +10358,29 @@ begin
             aMenuItem.Default := True;
             aMenuItem.Checked := True;
         end;
-
-        //aMenuItem.OnClick := todo ... LoadARecentPlaylist;
-        PlaylistManagerPopup.Items.Insert(i, aMenuItem);
+        PlaylistManagerPopup.Items.Insert(i+2, aMenuItem);
     end;
 
-    // finally: Add the "default Playlist" item at the top of the menu
+    if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
+        PM_PLM_Default.Checked := True;
+
+
+
+   { // finally: Add the "default Playlist" item at the top of the menu
     aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
     aMenuItem.Caption := 'Default';
     aMenuItem.Tag := -1;
     aMenuItem.RadioItem := True;
-    aMenuItem.OnClick := PM_PLM_LoadFavoritePlaylistClick;
+    aMenuItem.OnClick := PM_PLM_SwitchToDefaultPlaylistClick;
     if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
     begin
         aMenuItem.Default := True;
         aMenuItem.Checked := True;
     end;
     PlaylistManagerPopup.Items.Insert(0, aMenuItem);
+    }
+    // Refresh the Playlist-Header
+    PlaylistPropertiesChanged(NempPlaylist);
 end;
 
 procedure TNemp_MainForm.PlaylistManagerPopupPopup(Sender: TObject);
@@ -10550,6 +10411,7 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_PLM_SaveAsNewFavoriteClick(Sender: TObject);
+var newFav: TQuickLoadPlaylist;
 begin
     if not assigned(NewFavoritePlaylistForm) then
         Application.CreateForm(TNewFavoritePlaylistForm, NewFavoritePlaylistForm);
@@ -10557,13 +10419,45 @@ begin
     if NewFavoritePlaylistForm.ShowModal = mrOK then
     begin
         // create a new FavoritePlaylist and add it to the PlaylistManager
-        NempPlaylist.PlaylistManager.AddNewPlaylist(
-            NewFavoritePlaylistForm.edit_PlaylistName.Text,
+        newFav := NempPlaylist.PlaylistManager.AddNewPlaylist(
+            NewFavoritePlaylistForm.edit_PlaylistDescription.Text,
             NewFavoritePlaylistForm.edit_PlaylistFilename.Text,
-            NempPlaylist.Playlist );
+            NempPlaylist.Playlist, False);
+        NempPlaylist.PlaylistManager.SwitchToPlaylist(newFav);
 
         // Refresh the Header - show a new Playlist Description in it
         PlaylistPropertiesChanged(NempPlaylist);
+    end;
+end;
+
+procedure TNemp_MainForm.PM_PLM_EditFavouritesClick(Sender: TObject);
+begin
+    // PlaylistEditorForm
+    if not assigned(PlaylistEditorForm) then
+        Application.CreateForm(TPlaylistEditorForm, PlaylistEditorForm);
+
+    PlaylistEditorForm.Show;
+end;
+
+
+procedure TNemp_MainForm.PM_PLM_SwitchToDefaultPlaylistClick(Sender: TObject);
+var idx: Integer;
+begin
+    if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
+    // we are already in the "default playlist"
+        exit;
+
+    idx := (Sender as TMenuItem).Tag;
+    if NempPlaylist.PlaylistManager.PreparePlaylistLoading(
+                      idx,
+                      NempPlaylist.Playlist,
+                      NempPlaylist.PlayingIndex,
+                      Round(NempPlaylist.PlayingTrackPos) )
+    then
+    begin
+          NempPlaylist.PlaylistManager.Reset;
+          // Refresh the Header - show a new Playlist Description in it
+          PlaylistPropertiesChanged(NempPlaylist);
     end;
 end;
 
@@ -11588,7 +11482,7 @@ begin
         Dateiliste := TAudioFileList.Create(False);
         try
             GenerateListForHandleFiles(DateiListe, 1, true);
-            DragSource := DS_VST;
+            DragSource := DS_INTERN;
             with DragFilesSrc1 do
             begin
                 // Add files selected to DragFilesSrc1 list
@@ -11767,18 +11661,6 @@ begin
     ReTranslateNemp(newLanguage);
 end;
 
-
-
-(*
-procedure TNemp_MainForm.VST_ColumnPopupCoverClick(Sender: TObject);
-begin
-    if Sender is TMenuItem then
-    begin
-        Nemp_MainForm.NempOptions.ShowCoverAndDetails := (Sender as TMenuItem).Checked;
-        ActualizeVDTCover;
-    end;
-end;
-*)
 
 procedure TNemp_MainForm.VST_ColumnPopupOnClick(Sender: TObject);
 var s: Integer;

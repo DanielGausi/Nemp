@@ -570,8 +570,8 @@ begin
         // Anzeige oben links initialisieren
         SwitchBrowsePanel(MedienBib.BrowseMode);
 
-
         NempOptions.StartMinimizedByParameter := False;
+
         if (ParamCount = 0) or (trim(paramstr(1)) = '/minimized') or (trim(paramstr(1)) = '/safemode') then
         begin
             if trim(paramstr(1)) = '/minimized' then
@@ -597,6 +597,7 @@ begin
                     ProcessCommandline(paramstr(1), True, True);
             end;
         end;
+
     end;
 end;
 
@@ -625,6 +626,8 @@ begin
         SearchSkins;
         SearchLanguages;
 
+        ApplySettings;
+
         //s := gettickcount;
         AutoLoadPlaylist(TmpLastExitWasOK);
         NempPlaylist.PlaylistManager.InitPlaylistFilenames;
@@ -633,7 +636,7 @@ begin
         //ShowMessage('Loading Playlist: ' + IntToStr(e - s));
 
         //s := gettickcount;
-        ApplySettings;
+        //
         //e := gettickcount;
         //ShowMessage('Apply Settings: ' + IntToStr(e - s));
 

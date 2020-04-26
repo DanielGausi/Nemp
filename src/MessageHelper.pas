@@ -1792,7 +1792,7 @@ Begin
 
     end;
 
-    if (DragSource <> DS_VST) and (DragSource <> DS_PLAYLIST) then    // Files kommen von Auﬂerhalb
+    if (DragSource = DS_EXTERN) then    // Files kommen von Auﬂerhalb
     begin
         ST_Playlist.Mask := GeneratePlaylistSTFilter;
         FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
@@ -1882,7 +1882,7 @@ Begin
 
     with Nemp_MainForm do
     begin
-          if (DragSource <> DS_VST) then    // Files kommen von Auﬂerhalb
+          if (DragSource = DS_EXTERN) then    // Files kommen von Auﬂerhalb
           begin
               if MedienBib.StatusBibUpdate <> 0 then
               begin
@@ -1972,7 +1972,7 @@ begin
     result := True;
     with Nemp_MainForm do
     begin
-        if (DragSource <> DS_VST) then    // Files kommen von Auﬂerhalb
+        if (DragSource = DS_EXTERN) then    // Files kommen von Auﬂerhalb
         begin
             FileCount := DragQueryFile (aMsg.WParam, $FFFFFFFF, nil, 255);
 

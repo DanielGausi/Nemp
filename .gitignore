@@ -52,3 +52,5 @@ bin/Data/CoverCache
 /_unused
 _Unused
 /_web
+/bin/Data/Playlists
+/bin/Data/testmusik/*.mp3

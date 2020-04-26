@@ -787,8 +787,9 @@ const
       SD_MEDIENBIB = 1;
 
       DS_EXTERN = 0;
-      DS_VST = 10;
-      DS_PLAYLIST = 20;
+      DS_INTERN = 10;
+      //DS_VST = 10;
+      //DS_PLAYLIST = 20;
 
       PLAYER_INIT = 0;         // Beim Start. Ermöglicht AutoPlay beim ersten Einfügen
       PLAYER_ISPLAYING = 1;

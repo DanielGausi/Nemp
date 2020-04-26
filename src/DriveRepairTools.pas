@@ -398,7 +398,6 @@ end;
 
 procedure TDriveManager.Clear;
 begin
-    fPhysicalDrives.Clear;
     fManagedDrives.Clear;
 end;
 
