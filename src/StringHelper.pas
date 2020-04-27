@@ -39,6 +39,8 @@ function IsValidFilenameFormat(aFormatString: String): Boolean;
 
 function IsValidFilename(aFilename: String): Boolean;
 
+function ConvertToFileName(aString: String): String;
+
 // vergleicht die Strings zeichenweise und erlaubt dabei tolerance-viele Fehler
 function SameString(string1, string2: UnicodeString; tolerance: Integer; var Fehlstelle: Integer): Boolean;
 
@@ -84,6 +86,26 @@ begin
             (pos('<', aFormatString) = 0) AND
             (pos('>', aFormatString) = 0) AND
             (pos('|', aFormatString) = 0);
+end;
+
+function ConvertToFileName(aString: String): String;
+var i: Integer;
+begin
+    result := aString;
+    for i := 1 to Length(result) do
+    begin
+        if result[i] = ':' then result[i] := '-';
+        if result[i] = '/' then result[i] := '-';
+        if result[i] = '\' then result[i] := '-';
+        if result[i] = '*' then result[i] := '-';
+        if result[i] = '?' then result[i] := '-';
+        if result[i] = '"' then result[i] := '_';
+        if result[i] = '<' then result[i] := '-';
+        if result[i] = '>' then result[i] := '-';
+        if result[i] = '|' then result[i] := '_';
+        // "." is not forbidden in Filenames, but replacing it here seems to be a good idea
+        if result[i] = '.' then result[i] := '_';
+    end;
 end;
 
 function SameString(string1, string2: UnicodeString; tolerance: Integer; var Fehlstelle: Integer): Boolean;

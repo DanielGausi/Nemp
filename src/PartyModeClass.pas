@@ -280,8 +280,8 @@ procedure TNempPartyMode.BackupOriginalPositions;
 var i: Integer;
 begin
     // Store original positions of controls in an array
-    Setlength(fPositionArray, 45);  // 114
-    SetLength(fPartyControls, 44);
+    Setlength(fPositionArray, 46);  // 114
+    SetLength(fPartyControls, 46);
     i := 0;
     with Nemp_MainForm do
     begin
@@ -344,6 +344,8 @@ begin
         SetOriginalPosition(TabBtn_Playlist     , i);
         SetOriginalPosition(TabBtn_Medialib     , i);
         SetOriginalPosition(TabBtn_Marker       , i);
+        SetOriginalPosition(TabBtn_Favorites    , i);
+
 
         Setlength(fPositionArray, i);
         SetLength(fPartyControls, i);

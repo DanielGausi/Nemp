@@ -364,7 +364,7 @@ type
 
 implementation
 
-uses NempMainUnit, spectrum_vis, BibSearchClass;
+uses NempMainUnit, spectrum_vis, BibSearchClass, StringHelper;
 
 var tid      : Cardinal;
 
@@ -1581,6 +1581,9 @@ begin
             else
                 Filename := '';
         end;
+
+        // replace forbidden chars from the filename
+        Filename := ConvertToFileName(Filename);
     end;
 
 end;

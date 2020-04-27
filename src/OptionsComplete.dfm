@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabFiles0
+      ActivePage = TabSystem0
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -4968,7 +4968,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
         Caption = 'Player (Webserver)'
         ImageIndex = 18
         ExplicitLeft = 0
-        ExplicitTop = 0
+        ExplicitTop = 85
         ExplicitWidth = 0
         ExplicitHeight = 0
         DesignSize = (
@@ -5094,7 +5094,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 8
           Top = 365
           Width = 439
-          Height = 104
+          Height = 108
           Hint = 
             'Your IP-configuration. Tell your friends these IPs to access you' +
             'r library.'
@@ -5248,6 +5248,15 @@ object OptionsCompleteForm: TOptionsCompleteForm
             TabOrder = 1
             OnKeyPress = EdtPasswordKeyPress
           end
+        end
+        object BtnQRCode: TButton
+          Left = 272
+          Top = 488
+          Width = 159
+          Height = 25
+          Caption = 'Show QR-Codes'
+          TabOrder = 3
+          OnClick = BtnQRCodeClick
         end
       end
     end

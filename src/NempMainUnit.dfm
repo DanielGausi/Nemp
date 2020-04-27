@@ -686,15 +686,15 @@ object Nemp_MainForm: TNemp_MainForm
             OnKeyDown = EditPlaylistSearchKeyDown
             OnKeyPress = EditPlaylistSearchKeyPress
           end
-          object SkinButton1: TSkinButton
-            Left = 30
+          object TabBtn_Favorites: TSkinButton
+            Left = 28
             Top = 2
             Width = 24
             Height = 24
             Hint = 'Favorite playlists'
             TabOrder = 3
-            OnClick = SkinButton1Click
-            DrawMode = dm_Windows
+            OnClick = TabBtn_FavoritesClick
+            DrawMode = dm_Skin
             NumGlyphsX = 5
             NumGlyphsY = 1
             GlyphLine = 0
@@ -2484,6 +2484,10 @@ object Nemp_MainForm: TNemp_MainForm
         ImageIndex = 1
         ShortCut = 16467
         OnClick = PM_PL_SavePlaylistClick
+      end
+      object MM_PL_SaveAsPlaylist: TMenuItem
+        Caption = 'Save As'
+        OnClick = PM_PL_SaveAsPlaylistClick
       end
       object N18: TMenuItem
         Caption = '-'
@@ -5327,6 +5331,11 @@ object Nemp_MainForm: TNemp_MainForm
       ImageIndex = 1
       ShortCut = 16467
       OnClick = PM_PL_SavePlaylistClick
+    end
+    object PM_PL_SaveAsPlaylist: TMenuItem
+      Caption = 'Save as'
+      ShortCut = 24659
+      OnClick = PM_PL_SaveAsPlaylistClick
     end
     object N12: TMenuItem
       Caption = '-'

@@ -604,7 +604,7 @@ type
     PM_ML_ReplayGain_Clear: TMenuItem;
     N27: TMenuItem;
     LblBibReplayGain: TLabel;
-    SkinButton1: TSkinButton;
+    TabBtn_Favorites: TSkinButton;
     PlaylistManagerPopup: TPopupMenu;
     N10: TMenuItem;
     PM_PLM_RecentPlaylists: TMenuItem;
@@ -614,6 +614,8 @@ type
     PM_PLM_EditFavourites: TMenuItem;
     PM_PLM_Default: TMenuItem;
     N28: TMenuItem;
+    PM_PL_SaveAsPlaylist: TMenuItem;
+    MM_PL_SaveAsPlaylist: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1179,7 +1181,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure BtnMinimizeClick(Sender: TObject);
     procedure PM_PL_ReplayGain_Click(Sender: TObject);
-    procedure SkinButton1Click(Sender: TObject);
+    procedure TabBtn_FavoritesClick(Sender: TObject);
     procedure PM_PLM_SaveAsNewFavoriteClick(Sender: TObject);
 
     procedure PM_PLM_LoadFavoritePlaylistClick(Sender: TObject);
@@ -1193,6 +1195,7 @@ type
     procedure PlaylistVSTDragAllowed(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
     procedure PM_PLM_EditFavouritesClick(Sender: TObject);
+    procedure PM_PL_SaveAsPlaylistClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -2961,7 +2964,7 @@ end;
 
 
 
-procedure TNemp_MainForm.SkinButton1Click(Sender: TObject);
+procedure TNemp_MainForm.TabBtn_FavoritesClick(Sender: TObject);
 var point: TPoint;
 begin
     GetCursorPos(Point);
@@ -3686,8 +3689,10 @@ begin
     MM_PL_RecentPlaylists    .Enabled := PlaylistNotBlockedByPartymode ;
     MM_PL_ClearPlaylist      .Enabled := PlaylistNotBlockedByPartymode ; // no. just no. ;-)
     MM_PL_Webstream          .Enabled := PlaylistNotBlockedByPartymode ;
-
     MM_PL_ExtendedAddToMedialibrary.Enabled := LibraryIsIdle AND LibraryNotBlockedByPartymode;
+
+    MM_PL_Save           .Enabled := (NempPlaylist.Count > 0);
+    MM_PL_SaveAsPlaylist .Enabled := (NempPlaylist.Count > 0);
 end;
 
 procedure TNemp_MainForm.MM_OptionsClick(Sender: TObject);
@@ -7097,22 +7102,40 @@ end;
 
 procedure TNemp_MainForm.PlayListSaveDialogTypeChange(Sender: TObject);
 begin
+exit;
   case PlayListSaveDialog.FilterIndex of
     1: PlayListSaveDialog.DefaultExt := 'm3u';
     2: PlayListSaveDialog.DefaultExt := 'm3u8';
     3: PlayListSaveDialog.DefaultExt := 'pls';
     4: PlayListSaveDialog.DefaultExt := 'npl';
+  else
+      PlayListSaveDialog.DefaultExt := 'm3u8';
   end;
 end;
 
 
+///  PM_PL_SavePlaylistClick
+///  -------------------------
+///  Save the Playlist, but try to use the "current name"
 procedure TNemp_MainForm.PM_PL_SavePlaylistClick(Sender: TObject);
-var dir, name: String;
 begin
+  if NempPlaylist.PlaylistManager.CurrentIndex >= 0 then
+      // Quicksave current playlist
+      NempPlaylist.PlaylistManager.SaveCurrentPlaylist(NempPlaylist.Playlist, False)
+  else
+      // regular saving, show SaveDialog
+      PM_PL_SaveAsPlaylistClick(Sender);
+end;
 
-  if NempPlaylist.SuggestSaveLocation(dir, name) then
+///  PM_PL_SaveAsPlaylistClick
+///  ---------------------------
+///  Save the current Playlist under a new name
+procedure TNemp_MainForm.PM_PL_SaveAsPlaylistClick(Sender: TObject);
+var dir, newFileName: String;
+begin
+  if NempPlaylist.SuggestSaveLocation(dir, newFileName) then
       PlayListSaveDialog.InitialDir := Dir;
-  PlayListSaveDialog.FileName := name;
+  PlayListSaveDialog.FileName := newFileName;
 
   if PlayListSaveDialog.Execute then
   begin
@@ -7123,22 +7146,15 @@ end;
 
 
 procedure TNemp_MainForm.PM_PL_ShowInExplorerClick(Sender: TObject);
-var
-    datei_ordner: UnicodeString;
-    Node: PVirtualNode;
-    //Data: PTreeData;
+var Node: PVirtualNode;
     af: TAudioFile;
-
 begin
     Node := PlaylistVST.FocusedNode;
     if not Assigned(Node) then
         Exit;
-    // Data := PlaylistVST.GetNodeData(Node);
     af := PlaylistVST.GetNodeData<TAudioFile>(Node);
-    datei_ordner := af.Ordner;
 
-    // showmessage('/e,/select,"'+Data^.FAudioFile.Pfad+'"');
-    if DirectoryExists(datei_ordner) then
+    if DirectoryExists(af.Ordner) then
         ShellExecute(Handle, 'open' ,'explorer.exe'
                       , PChar('/e,/select,"'+af.Pfad+'"'), '', sw_ShowNormal);
 end;
@@ -7180,25 +7196,25 @@ begin
   if Not FileExists(filename) then exit;
 
   tmplist := TStringList.Create;
-  tmplist.LoadFromFile(filename);
-
-  for i:=0 to tmplist.Count - 1 do
-  begin
-      // nach einem "FILE"-Eintrag suchen
-      if (GetCueID(tmplist[i]) = CUE_ID_FILE) then
+  try
+      tmplist.LoadFromFile(filename);
+      for i:=0 to tmplist.Count - 1 do
       begin
-        // FILE-Eintrag gefunden.
-        AudioFilename := ExtractFilePath(filename) + GetFileNameFromCueString(tmplist[i]);
-        // Wenn diese Datei existiert, dann Audiofile createn und in die Playlist einfügen
-        // Sämtliches Einfügen wird in der Insert-Prozedur erledigt!
-        if FileExists(AudioFilename) then
-          NempPlaylist.AddFileToPlaylist(AudioFilename, filename);
+          // nach einem "FILE"-Eintrag suchen
+          if (GetCueID(tmplist[i]) = CUE_ID_FILE) then
+          begin
+            // FILE-Eintrag gefunden.
+            AudioFilename := ExtractFilePath(filename) + GetFileNameFromCueString(tmplist[i]);
+            // Wenn diese Datei existiert, dann Audiofile createn und in die Playlist einfügen
+            // Sämtliches Einfügen wird in der Insert-Prozedur erledigt!
+            if FileExists(AudioFilename) then
+              NempPlaylist.AddFileToPlaylist(AudioFilename, filename);
+          end;
       end;
+  finally
+      tmplist.Free;
   end;
-
-  FreeAndNil(tmplist);
 end;
-
 
 
 procedure TNemp_MainForm.MM_T_PlaylistLogClick(Sender: TObject);
@@ -8253,6 +8269,8 @@ begin
     PM_PL_GeneraterandomPlaylist.Enabled := PlaylistNotBlockedByPartymode;
     PM_PL_LoadPlaylist      .Enabled := PlaylistNotBlockedByPartymode;
     PM_PL_SavePlaylist      .Enabled := (NempPlaylist.Count > 0);
+    PM_PL_SaveAsPlaylist    .Enabled := (NempPlaylist.Count > 0);
+
     PM_PL_ClearPlaylist     .Enabled := PlaylistNotBlockedByPartymode;
     PM_PL_RecentPlaylists   .Enabled := PlaylistNotBlockedByPartymode ;
     PM_PL_DeleteSelected    .Enabled := (SomeFilesSelected AND PlaylistNotBlockedByPartymode) OR // a little bit too much to deny deleting at all

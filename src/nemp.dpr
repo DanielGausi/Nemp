@@ -121,7 +121,10 @@ uses
   MetaTagSorting in 'MetaTagSorting.pas',
   PlaylistManagement in 'PlaylistManagement.pas',
   NewFavoritePlaylist in 'NewFavoritePlaylist.pas' {NewFavoritePlaylistForm},
-  PlaylistEditor in 'PlaylistEditor.pas' {PlaylistEditorForm};
+  PlaylistEditor in 'PlaylistEditor.pas' {PlaylistEditorForm},
+  RedeemerInheritablePNG in '3rd Party Units\RedeemerInheritablePNG.pas',
+  RedeemerQR in '3rd Party Units\RedeemerQR.pas',
+  WebQRCodes in 'WebQRCodes.pas' {WebServerQRForm};
 
 {$R *.res}
 

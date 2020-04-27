@@ -98,23 +98,10 @@ end;
 
 procedure TNewFavoritePlaylistForm.edit_PlaylistDescriptionChange(Sender: TObject);
 var s: String;
-    i: Integer;
 begin
     if cb_AutoCreateFilename.Checked then
     begin
-        s := edit_PlaylistDescription.Text;
-        for i := 1 to Length(s) do
-        begin
-            if s[i] = ':' then s[i] := '-';
-            if s[i] = '/' then s[i] := '-';
-            if s[i] = '\' then s[i] := '-';
-            if s[i] = '*' then s[i] := '-';
-            if s[i] = '?' then s[i] := '-';
-            if s[i] = '"' then s[i] := '_';
-            if s[i] = '<' then s[i] := '-';
-            if s[i] = '>' then s[i] := '-';
-            if s[i] = '|' then s[i] := '_';
-        end;
+        s := ConvertToFileName(edit_PlaylistDescription.Text);
 
         edit_PlaylistFilename.OnChange := Nil;
         edit_PlaylistFilename.Text := s + '.npl';

@@ -43,7 +43,6 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     EditLabel.Caption = 'Playlist name'
     TabOrder = 0
     OnChange = edit_PlaylistDescriptionChange
-    ExplicitWidth = 377
   end
   object edit_PlaylistFilename: TLabeledEdit
     AlignWithMargins = True
@@ -58,7 +57,6 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     Enabled = False
     TabOrder = 1
     OnChange = edit_PlaylistFilenameChange
-    ExplicitWidth = 377
   end
   object cb_AutoCreateFilename: TCheckBox
     AlignWithMargins = True
@@ -72,7 +70,6 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     State = cbChecked
     TabOrder = 2
     OnClick = cb_AutoCreateFilenameClick
-    ExplicitWidth = 377
   end
   object BtnOK: TButton
     AlignWithMargins = True
@@ -85,8 +82,6 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     Default = True
     ModalResult = 1
     TabOrder = 3
-    ExplicitLeft = 331
-    ExplicitTop = 138
   end
   object BtnCancel: TButton
     AlignWithMargins = True
@@ -99,7 +94,5 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 4
-    ExplicitLeft = 237
-    ExplicitTop = 138
   end
 end

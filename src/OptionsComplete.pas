@@ -521,6 +521,7 @@ type
     cb_EnableUSBMode: TCheckBox;
     cb_EnableCloudMode: TCheckBox;
     lblNempPortable: TLabel;
+    BtnQRCode: TButton;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -633,6 +634,7 @@ type
     procedure tp_DefaultGain2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure BtnActivateBirthdayModeClick(Sender: TObject);
+    procedure BtnQRCodeClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -688,7 +690,7 @@ var
 implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
-  WebServerLog, MedienBibliothekClass, DriveRepairTools;
+  WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes;
 
 {$R *.dfm}
 
@@ -1988,6 +1990,7 @@ begin
   for i := 0 to CBPlaylistTypes.Count-1 do
     CBPlaylistTypes.Checked[i] := True;
 end;
+
 
 procedure TOptionsCompleteForm.BtnRefreshDevicesClick(Sender: TObject);
 var count: Integer;
@@ -3880,6 +3883,21 @@ begin
       EdtGlobalIP.Text := WebServer_GetIPFailedShort;
   end;
 end;
+
+procedure TOptionsCompleteForm.BtnQRCodeClick(Sender: TObject);
+begin
+    if not assigned(WebServerQRForm) then
+        Application.CreateForm(TWebServerQRForm, WebServerQRForm);
+
+    WebServerQRForm.cbURLs.Clear;
+    WebServerQRForm.cbURLs.Items.Assign(cbLANIPs.Items);
+    WebServerQRForm.cbURLs.ItemIndex := cbLANIPs.ItemIndex;
+
+    WebServerQRForm.sePort.Value := seWebServer_Port.Value;
+
+    WebServerQRForm.Show;
+end;
+
 
 
 { TLyricTreeData }
