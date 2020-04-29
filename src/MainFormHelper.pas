@@ -127,7 +127,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
-    ReplayGainProgress, NewMetaFrame;
+    ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist;
 
 procedure CorrectVolButton;
 begin
@@ -914,10 +914,19 @@ begin
 
         if assigned(FPlayWebstream) then ReTranslateComponent(FPlayWebstream);
 
+        if assigned(WebServerQRForm) then
+        begin
+            BackUpComboBoxes(WebServerQRForm);
+            ReTranslateComponent(WebServerQRForm);
+            RestoreComboboxes(WebServerQRForm);
+        end;
+
+        if assigned(PlaylistEditorForm) then ReTranslateComponent(PlaylistEditorForm);
+        if assigned(NewFavoritePlaylistForm) then ReTranslateComponent(NewFavoritePlaylistForm);
+
          // Todo:
         // - Alle Comboboxen auf ihren alten Itemindex zurücksetzen (also die, die schon zu Beginn gefüllt sind)
         // - Einige Comboboxen ggf. neu füllen ("Alte suchergebnisse")
-
 
         for i := 0 to Spaltenzahl - 1 do
            VST.Header.Columns[i].Text := _(DefaultSpalten[VST.Header.Columns[i].Tag].Bezeichnung);

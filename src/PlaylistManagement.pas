@@ -167,8 +167,8 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               function PlaylistExist(aDescription, aFilename: String): Integer;
               function GetUnusedPlaylistFile: String;
 
-              function AddRecentPlaylist(NewFile: UnicodeString): boolean;
-              function DeleteRecentPlaylist(aIdx: Integer): boolean;
+              procedure AddRecentPlaylist(NewFile: UnicodeString);
+              procedure DeleteRecentPlaylist(aIdx: Integer);
 
         end;
 
@@ -317,6 +317,10 @@ end;
 procedure TPlaylistManager.WriteToIni(aIni: TMemIniFile);
 var i: Integer;
 begin
+    // remove previous entries, in case the number of Playlists has been reduced
+    aIni.EraseSection('Playlistmanager');
+
+    // write new values
     if assigned(fCurrentQuickLoadPlaylist) then
         aIni.WriteInteger('PlaylistManager', 'CurrentIndex', fQuickLoadPlaylists.IndexOf(fCurrentQuickLoadPlaylist))
     else
@@ -752,7 +756,7 @@ end;
 ///  ---------------------------
 ///  For the list of "Recent Playlists"
 ///  (was part of NempOptions in before Nemp 4.14)
-function TPlaylistManager.AddRecentPlaylist(NewFile: UnicodeString): boolean;
+procedure TPlaylistManager.AddRecentPlaylist(NewFile: UnicodeString);
 var idx: integer;
 begin
     // Search for duplicates
@@ -772,7 +776,7 @@ begin
     if assigned(fOnRecentPlaylistChange) then
         fOnRecentPlaylistChange(Self);
 end;
-function TPlaylistManager.DeleteRecentPlaylist(aIdx: Integer): boolean;
+procedure TPlaylistManager.DeleteRecentPlaylist(aIdx: Integer);
 begin
     RecentPlaylists.Delete(aIdx);
 

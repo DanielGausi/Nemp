@@ -17,6 +17,7 @@ type
     lblPort: TLabel;
     procedure DataChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -30,7 +31,7 @@ var
 
 implementation
 
-uses RedeemerQR;
+uses RedeemerQR, gnuGettext, Hilfsfunktionen;
 
 {$R *.dfm}
 
@@ -39,6 +40,13 @@ uses RedeemerQR;
 procedure TWebServerQRForm.DataChange(Sender: TObject);
 begin
     RefreshQRCode;
+end;
+
+procedure TWebServerQRForm.FormCreate(Sender: TObject);
+begin
+    BackUpComboBoxes(self);
+    TranslateComponent (self);
+    RestoreComboboxes(self);
 end;
 
 procedure TWebServerQRForm.FormShow(Sender: TObject);

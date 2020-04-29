@@ -3,8 +3,8 @@ object WebServerQRForm: TWebServerQRForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp Webserver: QR-Codes'
-  ClientHeight = 615
-  ClientWidth = 551
+  ClientHeight = 466
+  ClientWidth = 400
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,20 +12,20 @@ object WebServerQRForm: TWebServerQRForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   OnShow = FormShow
-  DesignSize = (
-    551
-    615)
   PixelsPerInch = 96
   TextHeight = 13
   object imgQRCode: TImage
     Left = 0
     Top = 64
-    Width = 551
-    Height = 551
+    Width = 400
+    Height = 402
     Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Stretch = True
-    ExplicitTop = 70
+    ExplicitWidth = 401
+    ExplicitHeight = 388
   end
   object lblIPs: TLabel
     AlignWithMargins = True
@@ -57,9 +57,8 @@ object WebServerQRForm: TWebServerQRForm
     AlignWithMargins = True
     Left = 240
     Top = 25
-    Width = 289
+    Width = 145
     Height = 17
-    Anchors = [akLeft, akTop, akRight]
     Caption = 'Admin'
     TabOrder = 1
     OnClick = DataChange

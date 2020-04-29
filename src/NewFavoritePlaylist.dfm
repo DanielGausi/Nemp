@@ -12,6 +12,7 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     371
@@ -73,7 +74,7 @@ object NewFavoritePlaylistForm: TNewFavoritePlaylistForm
   end
   object BtnOK: TButton
     AlignWithMargins = True
-    Left = 288
+    Left = 284
     Top = 134
     Width = 75
     Height = 25

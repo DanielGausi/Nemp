@@ -18,6 +18,7 @@ type
     procedure edit_PlaylistDescriptionChange(Sender: TObject);
     procedure edit_PlaylistFilenameChange(Sender: TObject);
     procedure cb_AutoCreateFilenameClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     procedure CheckInput(aDescription, aFilename: String);
@@ -30,7 +31,7 @@ var
 
 implementation
 
-uses NempMainUnit, StringHelper, PlaylistClass, PlaylistManagement, Nemp_RessourceStrings;
+uses NempMainUnit, StringHelper, PlaylistClass, PlaylistManagement, Nemp_RessourceStrings, gnuGettext;
 
 {$R *.dfm}
 
@@ -76,6 +77,11 @@ begin
             end;
         end;
     end;
+end;
+
+procedure TNewFavoritePlaylistForm.FormCreate(Sender: TObject);
+begin
+    TranslateComponent (self);
 end;
 
 procedure TNewFavoritePlaylistForm.FormShow(Sender: TObject);

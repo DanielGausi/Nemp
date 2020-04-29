@@ -1208,8 +1208,6 @@ type
 
     CurrentTagToChange: String;
 
-    NewStringFromVSTEdit: String;
-
     PaintFrameDownX: Integer;
     PaintFrameDownY: Integer;
 
@@ -7120,8 +7118,11 @@ end;
 procedure TNemp_MainForm.PM_PL_SavePlaylistClick(Sender: TObject);
 begin
   if NempPlaylist.PlaylistManager.CurrentIndex >= 0 then
+  begin
       // Quicksave current playlist
-      NempPlaylist.PlaylistManager.SaveCurrentPlaylist(NempPlaylist.Playlist, False)
+      NempPlaylist.PlaylistManager.SaveCurrentPlaylist(NempPlaylist.Playlist, False);
+      PlayListStatusLBL.Caption := Format(PlaylistManager_Saved, [NempPlaylist.PlaylistManager.CurrentPlaylistDescription]);
+  end
   else
       // regular saving, show SaveDialog
       PM_PL_SaveAsPlaylistClick(Sender);
@@ -7141,6 +7142,7 @@ begin
   begin
       NempPlaylist.SaveToFile(PlayListSaveDialog.FileName, False);
       NempPlaylist.PlaylistManager.AddRecentPlaylist(PlayListSaveDialog.FileName);
+      PlayListStatusLBL.Caption := Playlist_Saved;
   end;
 end;
 
@@ -10382,21 +10384,6 @@ begin
     if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
         PM_PLM_Default.Checked := True;
 
-
-
-   { // finally: Add the "default Playlist" item at the top of the menu
-    aMenuItem := TMenuItem.Create(PlaylistManagerPopup);
-    aMenuItem.Caption := 'Default';
-    aMenuItem.Tag := -1;
-    aMenuItem.RadioItem := True;
-    aMenuItem.OnClick := PM_PLM_SwitchToDefaultPlaylistClick;
-    if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
-    begin
-        aMenuItem.Default := True;
-        aMenuItem.Checked := True;
-    end;
-    PlaylistManagerPopup.Items.Insert(0, aMenuItem);
-    }
     // Refresh the Playlist-Header
     PlaylistPropertiesChanged(NempPlaylist);
 end;
@@ -10668,27 +10655,17 @@ end;
 
 procedure TNemp_MainForm.VSTEdited(Sender: TBaseVirtualTree; Node: PVirtualNode;
   Column: TColumnIndex);
-var
-  // Data: PTreeData;
-  af: tAudioFile;
-  ListOfFiles: TAudioFileList;
-  listFile: TAudioFile;
-  i: Integer;
-  aErr: TNempAudioError;
-  newRating: Byte;
+var af: tAudioFile;
+    aErr: TNempAudioError;
+    newRating: Byte;
 begin
-    if (NempSkin.NempPartyMode.DoBlockTreeEdit)
-        // or (not NempOptions.AllowQuickAccessToMetadata)
-    then
+    if (NempSkin.NempPartyMode.DoBlockTreeEdit) then
         exit;
 
-    //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
     SetShortCuts;
     MedienBib.Changed := True;
 
-    //Data := VST.GetNodeData(Node);
     af := VST.GetNodeData<TAudioFile>(Node);
-
     if assigned(af)
         and (MedienBib.StatusBibUpdate <= 1)
         and (MedienBib.CurrentThreadFilename <> af.Pfad)
@@ -10696,51 +10673,24 @@ begin
     begin
         if (VST.Header.Columns[column].Tag = CON_RATING) then
         begin
+            // Bugfix 4.13.2 // 4.14:
+            // Only handle Rating here. Text information ist written in OnNewText
+
             // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
-            // for string-properties "GetAudioData" was called in VSTNewText to sync the library with the file
             newRating := af.Rating;
             af.GetAudioData(af.Pfad);
             af.Rating := newRating;
 
             aErr := af.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
-        end else
-        begin
-            aErr := af.WriteStringToMetaData(NewStringFromVSTEdit, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata )
 
-        end;
-        // aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
-
-        if (aErr = AUDIOERR_None) or (VST.Header.Columns[column].Tag = CON_RATING) then
-        begin
-            // Generate a List of Files which should be updated now
-            ListOfFiles := TAudioFileList.Create(False);
-            try
-                GetListOfAudioFileCopies(af, ListOfFiles);
-                for i := 0 to ListOfFiles.Count - 1 do
-                begin
-                    listFile := ListOfFiles[i];
-                    // Data of the af was set in VSTNewText or TRatingEditLink.EndEdit
-                    // copy Data from af to the files in the list.
-                    listFile.Assign(af);
-                end;
-            finally
-                ListOfFiles.Free;
-            end;        
-            MedienBib.Changed := True;
-            CorrectVCLAfterAudioFileEdit(af);
-        end;
-        if (aErr <> AUDIOERR_None) then
-        begin
-            // Read old Data again, if we edited something else than RATING
-            if VST.Header.Columns[column].Tag <> CON_RATING then
+            if (aErr = AUDIOERR_None) then
             begin
-                ///SynchronizeAudioFile(af, af.Pfad, True);
-                SynchAFileWithDisc(af, True);
-                TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
-                HandleError(afa_DirectEdit, af, aErr, True);
+                SyncAudioFilesWith(af);
+                MedienBib.Changed := True;
+                CorrectVCLAfterAudioFileEdit(af);
             end else
+                // on Rating-Edit error: Just an entry in the Error-Log
                 HandleError(afa_SaveRating, af, aErr);
-                // on Rating-Edit: Just an entry in the Error-Log
         end;
     end else
         TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
@@ -10748,11 +10698,10 @@ end;
 
 procedure TNemp_MainForm.VSTNewText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; NewText: string);
-var
-  // Data: PTreeData;
-  af: tAudioFile;
+var af: TAudioFile;
+    WriteNewStringData: Boolean;
+    aErr: TNempAudioError;
 begin
-    //Data := VST.GetNodeData(Node);
     af := VST.GetNodeData<TAudioFile>(Node);
 
     if assigned(af) then
@@ -10765,8 +10714,7 @@ begin
                 // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
                 af.GetAudioData(af.Pfad); // not needed any more .... ?
 
-                NewStringFromVSTEdit := NewText;
-
+                WriteNewStringData := True;
                 case VST.Header.Columns[column].Tag of
                     CON_ARTIST : af.Artist := NewText;
                     CON_TITEL  : af.Titel := NewText;
@@ -10778,13 +10726,27 @@ begin
                     CON_CD: af.CD := NewText;
                 else
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
-                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
+                    CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION, ... }
                     // Nothing to do. Something was wrong ;-)
+                    WriteNewStringData := false;
                 end;
-                // Note: Data will be written into the File in "VSTEdited"
-                // TabWarning is don in VSTEdited (CorrectVCLAfterAudioFileEdit)
-                // if Not MedienBib.ValidKeys(af) then
-                //    SetBrowseTabWarning(True);
+
+                if WriteNewStringData then
+                begin
+                    aErr := af.WriteStringToMetaData(NewText, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata );
+                    if (aErr = AUDIOERR_None) then
+                    begin
+                        SyncAudioFilesWith(af);
+                        MedienBib.Changed := True;
+                        CorrectVCLAfterAudioFileEdit(af);
+                    end else
+                    begin
+                        // Read old Data again, if we edited something else than RATING
+                        SynchAFileWithDisc(af, True);
+                        TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+                        HandleError(afa_DirectEdit, af, aErr, True);
+                    end;
+                end;
             end
             else
                 TranslateMessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);

@@ -1095,6 +1095,8 @@ PlaylistManager_NameExists = 'Check: Fail. Description already exists';
 PlaylistManager_EmptyFilename = 'Check: Fail: Empty or invalid filename';
 PlaylistManager_Duplicate  = 'Check: Fail. Duplicate description and filename';
 PlaylistManager_CheckOK    = 'Check: Ok';
+Playlist_Saved             = 'Playlist saved.';
+PlaylistManager_Saved      = 'Playlist saved: "%s"';
 
 implementation
 

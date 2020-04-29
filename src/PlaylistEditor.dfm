@@ -54,15 +54,21 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Indent = 4
       Margin = 2
       TabOrder = 0
+      TreeOptions.AutoOptions = [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoChangeScale]
       TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toInitOnSave, toToggleOnDblClick, toWheelPanning, toEditOnClick]
       TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
       TreeOptions.SelectionOptions = [toFullRowSelect]
+      OnDragAllowed = PlaylistSelectionVSTDragAllowed
+      OnDragOver = PlaylistSelectionVSTDragOver
+      OnDragDrop = PlaylistSelectionVSTDragDrop
       OnEdited = PlaylistSelectionVSTEdited
       OnEditing = PlaylistSelectionVSTEditing
+      OnEndDrag = PlaylistSelectionVSTEndDrag
       OnFocusChanged = PlaylistSelectionVSTFocusChanged
       OnFocusChanging = PlaylistSelectionVSTFocusChanging
       OnGetText = PlaylistSelectionVSTGetText
       OnNewText = PlaylistSelectionVSTNewText
+      OnStartDrag = PlaylistSelectionVSTStartDrag
       Columns = <
         item
           Position = 0

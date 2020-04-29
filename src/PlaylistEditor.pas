@@ -83,6 +83,18 @@ type
     procedure PlaylistFilesVSTGetHint(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex;
       var LineBreakStyle: TVTTooltipLineBreakStyle; var HintText: string);
+    procedure PlaylistSelectionVSTDragAllowed(Sender: TBaseVirtualTree;
+      Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
+    procedure PlaylistSelectionVSTDragOver(Sender: TBaseVirtualTree;
+      Source: TObject; Shift: TShiftState; State: TDragState; Pt: TPoint;
+      Mode: TDropMode; var Effect: Integer; var Accept: Boolean);
+    procedure PlaylistSelectionVSTEndDrag(Sender, Target: TObject; X,
+      Y: Integer);
+    procedure PlaylistSelectionVSTDragDrop(Sender: TBaseVirtualTree;
+      Source: TObject; DataObject: IDataObject; Formats: TFormatArray;
+      Shift: TShiftState; Pt: TPoint; var Effect: Integer; Mode: TDropMode);
+    procedure PlaylistSelectionVSTStartDrag(Sender: TObject;
+      var DragObject: TDragObject);
   private
     { Private declarations }
     currentQuickPlaylist: TQuickLoadPlaylist;
@@ -114,7 +126,7 @@ var
 implementation
 
 Uses NempMainUnit, Hilfsfunktionen, Nemp_ConstantsAndTypes, TreeHelper, Nemp_RessourceStrings,
-  NewFavoritePlaylist, MainFormHelper, SystemHelper;
+  NewFavoritePlaylist, MainFormHelper, SystemHelper, gnuGettext;
 
 {$R *.dfm}
 
@@ -141,6 +153,8 @@ begin
     OldLBWindowProc := PlaylistFilesVST.WindowProc;
     PlaylistFilesVST.WindowProc := LBWindowProc;
     DragAcceptFiles(PlaylistFilesVST.Handle, True);
+
+    TranslateComponent (self);
 end;
 
 procedure TPlaylistEditorForm.FormDestroy(Sender: TObject);
@@ -381,6 +395,8 @@ begin
     Allowed := True;
 end;
 
+
+
 ///  Set Description to the new Value
 procedure TPlaylistEditorForm.PlaylistSelectionVSTNewText(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
@@ -390,7 +406,8 @@ begin
     ql := PlaylistSelectionVST.GetNodeData<TQuickLoadPlaylist>(Node);
     ql.Description := NewText;
 end;
-///  Refresh MainForm (if needed)
+
+
 procedure TPlaylistEditorForm.PlaylistSelectionVSTEdited(
   Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex);
 var ql: TQuickLoadPlaylist;
@@ -592,6 +609,98 @@ begin
     Nemp_MainForm.DragSource := DS_EXTERN;
     PlaylistFilesVST.Invalidate;
 end;
+
+///  Drag&Drop Operations for Selection
+///  DragAllowed
+procedure TPlaylistEditorForm.PlaylistSelectionVSTDragAllowed(
+  Sender: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex;
+  var Allowed: Boolean);
+begin
+    Allowed := True;
+end;
+///  DragStart
+procedure TPlaylistEditorForm.PlaylistSelectionVSTStartDrag(Sender: TObject;
+  var DragObject: TDragObject);
+begin
+    Nemp_MainForm.DragSource := DS_INTERN;
+end;
+///  DragOver
+procedure TPlaylistEditorForm.PlaylistSelectionVSTDragOver(
+  Sender: TBaseVirtualTree; Source: TObject; Shift: TShiftState;
+  State: TDragState; Pt: TPoint; Mode: TDropMode; var Effect: Integer;
+  var Accept: Boolean);
+begin
+    if Source <> PlaylistSelectionVST then
+        exit;
+    Effect := DROPEFFECT_MOVE;
+    accept := True;
+end;
+// Mainmethod: DragDrop, move Nodes/Favorites
+procedure TPlaylistEditorForm.PlaylistSelectionVSTDragDrop(
+  Sender: TBaseVirtualTree; Source: TObject; DataObject: IDataObject;
+  Formats: TFormatArray; Shift: TShiftState; Pt: TPoint; var Effect: Integer;
+  Mode: TDropMode);
+var Attachmode: TVTNodeAttachMode;
+    Nodes: TNodeArray;
+    aNode: PVirtualNode;
+    i: Integer;
+begin
+    // Translate the drop position into an node attach mode.
+    case Mode of
+        dmAbove : AttachMode := amInsertBefore;
+        dmOnNode: AttachMode := amInsertAfter;
+        dmBelow : AttachMode := amInsertAfter;
+    else
+        AttachMode := amNowhere;
+    end;
+
+    // Get the selected Nodes
+    Nodes := PlaylistSelectionVST.GetSortedSelection(True);
+
+    // move the selected Nodes to Target
+    if not assigned(PlaylistSelectionVST.DropTargetNode) then
+    begin
+        // DropTarget is the empty space below the
+        // => Move files to the end of the Playlist
+        aNode := PlaylistSelectionVST.GetLastChild(Nil);
+        for i := High(Nodes) downto 0 do
+            PlaylistSelectionVST.MoveTo(Nodes[i], aNode, amInsertAfter, False)
+    end else
+    begin
+        if AttachMode = amInsertBefore then
+            for i := 0 to High(Nodes) do
+                PlaylistSelectionVST.MoveTo(Nodes[i], PlaylistSelectionVST.DropTargetNode, AttachMode, False)
+        else
+            for i := High(Nodes) downto 0 do
+                PlaylistSelectionVST.MoveTo(Nodes[i], PlaylistSelectionVST.DropTargetNode, AttachMode, False);
+    end;
+
+    // resort Datalists
+    LocalPlaylistManager.QuickLoadPlaylists.Clear;
+    NempPlaylist.PlaylistManager.QuickLoadPlaylists.OwnsObjects := False;
+    NempPlaylist.PlaylistManager.QuickLoadPlaylists.Clear;
+    NempPlaylist.PlaylistManager.QuickLoadPlaylists.OwnsObjects := True;
+
+    aNode := PlaylistSelectionVST.GetFirst;
+    while assigned(aNode)  do
+    begin
+        LocalPlaylistManager.QuickLoadPlaylists.Add(PlaylistSelectionVST.GetNodeData<TQuickLoadPlaylist>(aNode));
+        NempPlaylist.PlaylistManager.QuickLoadPlaylists.Add(PlaylistSelectionVST.GetNodeData<TQuickLoadPlaylist>(aNode));
+        aNode := PlaylistSelectionVST.GetNextSibling(aNode);
+    end;
+    // Change Menu Items in mainForm
+    Nemp_MainForm.OnFavouritePlaylistsChange(Self);
+
+    Nemp_MainForm.DragSource := DS_EXTERN;
+    PlaylistSelectionVST.Invalidate;
+end;
+///  DragEnd
+procedure TPlaylistEditorForm.PlaylistSelectionVSTEndDrag(Sender,
+  Target: TObject; X, Y: Integer);
+begin
+    DragDropTimer.Enabled := True;
+end;
+
 
 ///
 ///  Popup-Menu Operations
