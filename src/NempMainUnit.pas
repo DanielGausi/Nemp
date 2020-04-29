@@ -1180,8 +1180,6 @@ type
 
     CurrentTagToChange: String;
 
-    NewStringFromVSTEdit: String;
-
     PaintFrameDownX: Integer;
     PaintFrameDownY: Integer;
 
@@ -10518,6 +10516,8 @@ procedure TNemp_MainForm.VSTNewText(Sender: TBaseVirtualTree;
 var
   Data: PTreeData;
   af: tAudioFile;
+  WriteNewStringData: Boolean;
+  aErr: TNempAudioError;
 begin
     Data := VST.GetNodeData(Node);
     if assigned(Data) then
@@ -10535,8 +10535,7 @@ begin
                 // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
                 af.GetAudioData(af.Pfad); // not needed any more .... ?
 
-                NewStringFromVSTEdit := NewText;
-
+                WriteNewStringData := True;
                 case VST.Header.Columns[column].Tag of
                     CON_ARTIST : af.Artist := NewText;
                     CON_TITEL  : af.Titel := NewText;
@@ -10550,11 +10549,25 @@ begin
                     {CON_DAUER, CON_BITRATE, CON_CBR, CON_MODE, CON_SAMPLERATE, CON_FILESIZE,
                     CON_PFAD, CON_ORDNER, CON_DATEINAME, CON_LYRICSEXISTING, CON_EXTENSION }
                     // Nothing to do. Something was wrong ;-)
+                    WriteNewStringData := False;
                 end;
-                // Note: Data will be written into the File in "VSTEdited"
-                // TabWarning is don in VSTEdited (CorrectVCLAfterAudioFileEdit)
-                // if Not MedienBib.ValidKeys(af) then
-                //    SetBrowseTabWarning(True);
+
+                if WriteNewStringData then
+                begin
+                    aErr := af.WriteStringToMetaData(NewText, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata );
+                    if (aErr = AUDIOERR_None) then
+                    begin
+                        SyncAudioFilesWith(af);
+                        MedienBib.Changed := True;
+                        CorrectVCLAfterAudioFileEdit(af);
+                    end else
+                    begin
+                        // Read old Data again, if we edited something else than RATING
+                        SynchAFileWithDisc(af, True);
+                        TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+                        HandleError(afa_DirectEdit, af, aErr, True);
+                    end;
+                end;
             end
             else
                 TranslateMessageDLG(Warning_MedienBibBusyThread, mtWarning, [mbOK], 0);
