@@ -592,16 +592,16 @@ object Nemp_MainForm: TNemp_MainForm
               item
                 Position = 0
                 Spacing = 0
-                Text = 'Title'
                 Width = 250
+                WideText = 'Title'
               end
               item
                 Alignment = taRightJustify
                 Margin = 0
                 Position = 1
                 Spacing = 0
-                Text = 'Time'
                 Width = 40
+                WideText = 'Time'
               end>
           end
         end

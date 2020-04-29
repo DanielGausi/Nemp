@@ -9,7 +9,7 @@
       Programmiert mit CodeGear / Embarcadero Delphi 2009 bis 10.3
       Januar 2005 - April 2020
 
-      Version: 4.13.1
+      Version: 4.13.2
 
 
    -----------------------------------------------------------

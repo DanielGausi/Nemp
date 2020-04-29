@@ -10468,18 +10468,12 @@ procedure TNemp_MainForm.VSTEdited(Sender: TBaseVirtualTree; Node: PVirtualNode;
 var
   Data: PTreeData;
   af: tAudioFile;
-  ListOfFiles: TObjectList;
-  listFile: TAudioFile;
-  i: Integer;
   aErr: TNempAudioError;
   newRating: Byte;
 begin
-    if (NempSkin.NempPartyMode.DoBlockTreeEdit)
-        // or (not NempOptions.AllowQuickAccessToMetadata)
-    then
+    if (NempSkin.NempPartyMode.DoBlockTreeEdit) then
         exit;
 
-    //PM_ML_HideSelected.ShortCut := 46;    // 46=Entf;
     SetShortCuts;
     MedienBib.Changed := True;
 
@@ -10496,51 +10490,24 @@ begin
     begin
         if (VST.Header.Columns[column].Tag = CON_RATING) then
         begin
+            // Bugfix 4.13.2 // 4.14:
+            // Only handle Rating here. Text information ist written in OnNewText
+
             // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
-            // for string-properties "GetAudioData" was called in VSTNewText to sync the library with the file
             newRating := af.Rating;
             af.GetAudioData(af.Pfad);
             af.Rating := newRating;
 
             aErr := af.WriteRatingsToMetaData(newRating, NempOptions.AllowQuickAccessToMetadata);
-        end else
-        begin
-            aErr := af.WriteStringToMetaData(NewStringFromVSTEdit, VST.Header.Columns[column].Tag, NempOptions.AllowQuickAccessToMetadata )
-
-        end;
-        // aErr := af.SetAudioData(NempOptions.AllowQuickAccessToMetadata);
-
-        if (aErr = AUDIOERR_None) or (VST.Header.Columns[column].Tag = CON_RATING) then
-        begin
-            // Generate a List of Files which should be updated now
-            ListOfFiles := TObjectList.Create(False);
-            try
-                GetListOfAudioFileCopies(af, ListOfFiles);
-                for i := 0 to ListOfFiles.Count - 1 do
-                begin
-                    listFile := TAudioFile(ListOfFiles[i]);
-                    // Data of the af was set in VSTNewText or TRatingEditLink.EndEdit
-                    // copy Data from af to the files in the list.
-                    listFile.Assign(af);
-                end;
-            finally
-                ListOfFiles.Free;
-            end;        
-            MedienBib.Changed := True;
-            CorrectVCLAfterAudioFileEdit(af);
-        end;
-        if (aErr <> AUDIOERR_None) then
-        begin
-            // Read old Data again, if we edited something else than RATING
-            if VST.Header.Columns[column].Tag <> CON_RATING then
+            if (aErr = AUDIOERR_None) then
             begin
-                ///SynchronizeAudioFile(af, af.Pfad, True);
-                SynchAFileWithDisc(af, True);
-                TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
-                HandleError(afa_DirectEdit, af, aErr, True);
+                // Generate a List of Files which should be updated now
+                SyncAudioFilesWith(af);
+                MedienBib.Changed := True;
+                CorrectVCLAfterAudioFileEdit(af);
             end else
-                HandleError(afa_SaveRating, af, aErr);
                 // on Rating-Edit: Just an entry in the Error-Log
+                HandleError(afa_SaveRating, af, aErr);
         end;
     end else
         TranslateMessageDLG((Warning_MedienBibIsBusyCritical), mtWarning, [MBOK], 0);
