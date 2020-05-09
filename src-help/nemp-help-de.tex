@@ -59,7 +59,7 @@ citecolor = black] {hyperref}
 \begin{titlepage}
 	\centering
 	{\scshape\LARGE Nemp - Noch ein mp3-Player \par}
-	Version 4.13 \par
+	Version 4.14 \par
 	\vspace{1cm}
 	\includegraphics[width=0.5\textwidth]{nemp.jpg}\par
 	\vspace{1cm}
@@ -79,6 +79,24 @@ citecolor = black] {hyperref}
 Der Player Nemp ist aus eigenen Bedürfnissen heraus entstanden. Ich habe \emph{damals} keinen Player\footnote{eigentlich: kein \emph{Programm}, denn ein \emph{Player} war ursprünglich gar nicht geplant ...} gefunden, der meine Anforderungen erfüllte. Daher habe ich mich einfach mal hingesetzt, und das Programmieren angefangen. Im Laufe der Zeit kamen immer mehr und mehr Funktionen hinzu, ein großer Teil durch Feedback von einer kleinen Gruppe von Leuten, die den Player verwenden.
 
 Dabei habe ich immer versucht, die Bedienung der Basis-Funktionen so einfach wie möglich zu halten.
+
+\subsection{Installation und portable Installation}
+
+Von Anfang an musste Nemp nicht \gf{installiert} werden, sondern konnte \gf{einfach so} benutzt werden. Eine Frage, die sich dabei dann als Entwickler immer wieder stellt lautet: \emph{\gf{Wohin mit den Daten?}}
+
+Bis Version 4.13 wurde diese Frage anhand des Verzeichnisses geklärt, in das Nemp kopiert wurde. Wenn das Verzeichnis der Programme-Ordner war (z.B. \verb+c:\Programme+), dann wurden die Daten in das Benutzer-Verzeichnis geschrieben, wie es unter Windows allgemein üblich ist. Andernfalls wurden die Daten direkt ins Programmverzeichnis geschrieben. Diese Heuristik funktioniert auf einigen Geräten aber nicht mehr und sorgt damit für Fehler.
+
+Seit Version 4.14 gibt es daher eine Markierungs-Datei im Nemp-Verzeichnis: 
+
+\begin{itemize}
+\item Wenn die Datei \verb+UseLocalData.cfg+ vorhanden ist, werden die Daten lokal im Programmverzeichnis abgelegt. 
+\item Wenn die Datei \verb+UseLocalData.cfg+ \emph{nicht} vorhanden ist, kommen die Daten ins Benutzerverzeichnis.
+\end{itemize}
+Der Inhalt dieser Datei ist völlig egal - es geht nur darum, ob die Datei vorhanden ist oder nicht.
+
+Das Installationstool von Nemp fragt ab, ob Nemp portabel installiert werden soll und kopiert diese Datei ins Nemp-Verzeichis (oder eben nicht). Im Zip-Archiv ist diese Datei enthalten, dadurch wird Nemp also \gf{portabel} in diesem Sinne.
+
+Weitere Erläuterungen zur Portabilität von Nemp im Abschnitt \hyperref[sec_portable]{Mobile Festplatten und Backups, die Cloud und Portabilität}.
 
 \subsection{Grundlegende Einstellungen: Der Nemp Wizard}
 \label{sec_wizard}
@@ -156,9 +174,10 @@ Bei der Entwicklung von Nemp wurde versucht, viele Möglichkeiten zur Steuerung z
 \begin{itemize}
 \item Das Anklicken von Buttons.
 \item Das Durchtabben durch die Bedienelemente mit der \texttt{Tab}-Taste und aktivieren des fokussierten Elements mit \texttt{Enter}.
-\item Kontextmenüs. Die vier Bereiche (teilweise auch einige einzelne Elemente) haben eigene Kontextmenüs, über die verschiedene Funktionen aufgerufen werden können. Sie erreichen das Kontextmenü wie üblich über die rechte Maustaste oder zusätzlich über einen Klick auf einen der Nemp-Buttons. \includegraphics{TabBtnNemp.png}
+\item Kontextmenüs. Die vier Bereiche (teilweise auch einige einzelne Elemente) haben eigene Kontextmenüs, über die verschiedene Funktionen aufgerufen werden können. Sie erreichen das Kontextmenü wie üblich über die rechte Maustaste oder zusätzlich über einen Klick auf einen der Nemp-Buttons (in einigen Skins siht der ggf. anders, z.B. ähnlich der Hamburger-Menüs, die man von Webseiten kennt). \includegraphics{TabBtnNemp.png}
 \item Tastaturkürzel wie z.B. \texttt{Strg+F} für die Schnellsuche oder \texttt{Strg+D} für die Anzeige von Details zu einem markierten Titel.
 \item Für den Umgang mit Dateien stehen die unter Windows üblichen Methoden \emph{Drag\&Drop} und \emph{Copy\&Paste} zur Verfügung. Wenn Nemp das Ziel einer solchen Operation ist, wird dabei zwischen Playlist und Medienbibliothek unterschieden. Ein \emph{gedroppter} Ordner wird also entweder in die Playlist eingefügt, oder in die Medienbibliothek. Wenn Musikdateien aus Nemp heraus in andere Programme eingefügt werden sollen, ist das aus Performancegründen auf aktuell 2500 Dateien beschränkt.
+\item Seit Nemp 4.14 funktioniert Drag\&Drop auch aus der Playlist heraus. Dafür muss zusätzlich die Taste \texttt{Strg} gedrückt werden. Damit lassen sich dann auch Titel innerhalb der Playlist \emph{kopieren}, nicht wie normal üblich \emph{verschieben}.
 \item Multimediatastaturen werden ebenfalls unterstützt. Ein Druck auf eine dieser Spezialtasten sollte auch in Nemp die gewünschte Aktion bewirken.
 \item Optional können globale Hotkeys definiert werden, z.B. \texttt{Strg+Shift+P} für Play. Das kann aber unter Umständen unerwünschte Nebenwirkungen mit anderen Programmen haben.
 \item Ab Windows 7 werden in dem Taskleisteneintrag ein paar Kontrollelemente zur grundlegenden Steuerung eingefügt.
@@ -227,15 +246,28 @@ Mittlerweile wurden für Nemp auch Übersetzungen ins Niederländische und Russisch
 %Für weitere Informationen schicken Sei mir eine E-Mail, dann schauen wir weiter. Aber als Warnung: Das ist eine Sch***-Arbeit. ;-)
 
 
-\subsection{Mobile Festplatten und Backups, Portabilität}
+\subsection{Mobile Festplatten, die Cloud und Portabilität}
+\label{sec_portable}
+Eines der Hauptziele bei der Entwicklung von Nemp war die Portabilität. Nemp sollte nicht \emph{installiert} werden müssen, sondern sollte einfach so laufen - inklusive der Medienbibliothek. Auch dann, wenn Nemp mit der gesamten Musiksammlung auf einer externen Festplatte liegt, und beim Anschluss des Laufwerks die ganzen Daten mal auf \verb+D:\+ und mal auf \verb+E:\+ liegen. Nemp sollte also im Wortsinne \emph{portabel} sein.
 
-Eines der Hauptziele bei der Entwicklung von Nemp war die Portabilität. Nemp sollte nicht \emph{installiert} werden müssen, sondern sollte einfach so laufen - inklusive der Medienbibliothek. Auch dann, wenn Nemp mit der gesamten Musiksammlung auf einer externen Festplatte liegt, und beim Anschluss des Laufwerks die ganzen Daten mal auf \verb+D:\+ und mal auf \verb+E:\+ liegen.
+Mit Nemp 4.14 wurde die Grundeinstellung \emph{portabel} oder \emph{nicht portabel} anders gelöst - entscheidend ist nun die Existenz der Datei \verb+UseLocalData.cfg+ im Nemp-Verzeichnis (vgl. erstes Kapitel zur Installation).
 
-Dafür werden in der Medienbibliothek nicht nur die Pfade zu den einzelnen Musikdateien gespeichert, sondern zusätzlich Informationen zu den Laufwerken, auf denen die Daten liegen. Nemp untersucht die Laufwerke beim Start und korrigiert ggf. die Pfadinformationen. 
+In den Jahren seit der ersten Nemp-Version ist ein weiteres Szenario für \gf{portable Software} relevant geworden: Die Verwendung in Online-Laufwerken, die oft in einem bestimmten Verzeichnis eines Rechners synchronisiert werden. Seit Version 4.14 ist Nemp auch auf diesen Fall vorbereitet: Wenn Nemp mitsamt sämtlicher Musikdateien in so einem Verzeichnis liegt, dann funktioniert das auf allen Rechnern - egal wie das Verzeichnis auf dem jeweiligen Computer dann auch heißen mag.
+
+\subsubsection*{USB-Modus}
+Für den ersten Fall - die Verwendung auf externen Laufwerken - werden in der Medienbibliothek nicht nur die Pfade zu den einzelnen Musikdateien gespeichert, sondern zusätzlich Informationen zu den Laufwerken, auf denen die Daten liegen. Nemp untersucht die Laufwerke beim Start und korrigiert ggf. die Pfadinformationen. 
 
 Das funktioniert auch während Nemp läuft. Wenn sie z.B. vor dem Starten von Nemp vergessen haben, die externe Festplatte mit Ihrer Musiksammlung anzuschließen, dann macht das nichts. Sobald sie angeschlossen wird, merkt Nemp das und passt die Pfade während des Betriebs automatisch an.
 
-Diese Methode funktioniert in den allermeisten Fällen sehr gut, hat aber eine Lücke: Wenn Sie Ihre komplette Sammlung auf zwei verschiedenen Laufwerken haben, also ein Original und ein Backup, dann unterscheidet Nemp diese beiden Laufwerke, auch wenn beide immer unter dem gleichen Laufwerksbuchstaben im System erscheinen, und findet auf Grund der automatischen Laufwerksanpssung die Dateien nicht mehr - obwohl die Dateien da sind. Nemp \emph{korrigiert} die Pfade dann nicht, sondern macht sie \emph{kaputt}. Abhilfe dafür ist, immer die gleiche Platte anzuschließen, oder zwei Kopien der Medienbibliothek zu erstellen und je nach Festplatte die passende Medienbibliothek zu laden.
+\subsubsection*{Cloud-Modus}
+
+Für den zweiten Fall - die Cloud-Laufwerke - speichert Nemp nur relative Pfade in der Medienbibliothek. Diese werden beim Start bzw. beim Laden der Medienbibliothek passend ergänzt. Das funktioniert aber nur, solange nur ein Laufwerk für die Medienbibliothek genutzt wird. Sobald mehrere Laufwerke oder Partitionen im Spiel sind, nutze relative Pfade nichts mehr.
+
+Beide Varianten funktionieren in der Regel sehr gut, und stören sich auch nicht gegenseitig. In Einzelfällen können diese automatischen Korrekturverfahren aber auch unerwünschte Nebenwirkungen haben. Im ersten Fall werden z.B. zwei identische Backups der Musiksammlung auf zwei unterschiedlichen Laufwerken als \gf{verschieden} erkannt. Und bei relativen Pfaden kann die Datei mit der Medienbibliothek nicht beliebig verschoben werden. Ihre Position relativ zu den Musikdateien muss gleich bleiben.
+
+Daher können seit Nemp 4.14 beide Varianten in den \hyperref[sec-file-management]{Einstellungen - Datei-Management} ein- bzw. abgeschaltet werden.
+
+% Diese Methode funktioniert in den allermeisten Fällen sehr gut, hat aber eine Lücke: Wenn Sie Ihre komplette Sammlung auf zwei verschiedenen Laufwerken haben, also ein Original und ein Backup, dann unterscheidet Nemp diese beiden Laufwerke, auch wenn beide immer unter dem gleichen Laufwerksbuchstaben im System erscheinen, und findet auf Grund der automatischen Laufwerksanpssung die Dateien nicht mehr - obwohl die Dateien da sind. Nemp \emph{korrigiert} die Pfade dann nicht, sondern macht sie \emph{kaputt}. Abhilfe dafür ist, immer die gleiche Platte anzuschließen, oder zwei Kopien der Medienbibliothek zu erstellen und je nach Festplatte die passende Medienbibliothek zu laden.
 
 
 \section{Player und Playlist}
@@ -337,17 +369,57 @@ Kernstück eines jeden Players ist die Playlist, also die Liste mit Liedern, die 
 
 Sie können mit Nemp auch viele der gängigen \textbf{Webradio-Sender} abspielen. Wenn der Sender eine .pls-Datei anbietet, können Sie diese einfach mit Nemp öffnen. Ein paar andere Formate werden auch noch unterstützt. Ihre Lieblings-Sender können Sie unter \emph{Medienbibliohtek - Webradio verwalten} (Tastaturkürzel \texttt{Strg+W}) organisieren.
 
-Die \textbf{Abspielreihenfolge}, in der die Playlist abgearbeitet wird, können sie über den Button für den \hyperref[sec_anzeige]{Wiedergabemodus} beeinflussen. Außerdem können Sie die Playlist über das Menü sortieren lassen oder einzelne Titel per Drag\&Drop verschieben.
+Die \textbf{Abspielreihenfolge}, in der die Playlist abgearbeitet wird, können sie über den Button für den \hyperref[sec_anzeige]{Wiedergabemodus} beeinflussen. Außerdem können Sie die Playlist über das Menü sortieren lassen oder einzelne Titel per Drag\&Drop verschieben. Wenn Sie dabei die \texttt{Strg}-Taste gedrückt halten, können Sie Titel innerhalb der Playlist \emph{kopieren}.
 
 \begin{center}
 \includegraphics[width=0.4\textwidth]{playlist.jpg} 
 \end{center}
 
-Neu in Nemp 4.7 ist die \textbf{Suche in der Playlist}. Diese funktioniert ähnlich wie die Schnellsuche in der Medienbibliothek - einfach das Suchfeld fokussieren (geht auch mit der Tastenkombination \texttt{Strg+F}, wenn die Playlist den Fokus hat) und lostippen. Der jeweils erste Treffer wird in der Playlist markiert. Mit Druck auf die Taste \texttt{F3} wird der nächste Treffer markiert. Mit \texttt{Enter} werden alle Suchtreffer markiert, und können damit über Copy\&Paste (\texttt{Strg+C} oder \texttt{Strg+Shift+C}) in die Zwischenablage kopiert werden. Mit \texttt{Shift+Enter} wird der aktuell ausgewählte Titel abgespielt.
+Neu in Nemp 4.7 ist die \textbf{Suche in der Playlist}. Diese funktioniert ähnlich wie die Schnellsuche in der Medienbibliothek - einfach das Suchfeld fokussieren (geht auch mit der Tastenkombination \texttt{Strg+F}, wenn die Playlist den Fokus hat) und lostippen. 
 
-Seit Version 4.13 unterstützt Nemp \textbf{ReplayGain} zur automatischen Anpassung der Lautstärke. Titel mit Replay-Gain-Informationen werden in der Playlist durch ein Lautstärkepegel-Symbol gekennzeichnet. Wenn die automatische Lautstärkeanpassung in den Einstellungen deaktiviert ist, wird dieses Symbol in Graustufen angezeigt. Mehr dazu im nächsten Abschnitt.
+In Version 4.14 wurde die Suche etwas verändert. Beim Tippen werden nun alle Treffer mit einem Symbol markiert. Mit \texttt{F3} werden die Treffer nach und nach ausgewählt und fokussiert. Ein Druck auf die Entertaste spielt den aktuell fokussierten Titel ab. \texttt{ESC} löscht die Suche und alle Markierungen.
+
+%Der jeweils erste Treffer wird in der Playlist markiert. Mit Druck auf die Taste \texttt{F3} wird der nächste Treffer markiert. Mit \texttt{Enter} werden alle Suchtreffer markiert, und können damit über Copy\&Paste (\texttt{Strg+C} oder \texttt{Strg+Shift+C}) in die Zwischenablage kopiert werden. Mit \texttt{Shift+Enter} wird der aktuell ausgewählte Titel abgespielt.
+
+Seit Version 4.13 unterstützt Nemp \textbf{ReplayGain} zur automatischen Anpassung der Lautstärke. Titel mit Replay-Gain-Informationen werden in der Playlist durch ein Lautstärkepegel-Symbol gekennzeichnet. Wenn die automatische Lautstärkeanpassung in den Einstellungen deaktiviert ist, wird dieses Symbol in Graustufen angezeigt. Mehr dazu im Abschnitt \hyperref[sec_ReplayGain]{ReplayGain}.
 
 Ein verstecktes Feature ist die \textbf{Vormerkliste}. Sie können über die Zifferntasten 0..9 eine temporäre individuelle Reihenfolge festlegen. Markieren Sie einfach das Stück, dass Sie als nächstes hören wollen, und drücken sie die Taste \texttt{1}. Ein anderes markieren Sie mit \texttt{2} usw. Wenn sie die Reihenfolge ändern wollen, funktioniert das ebenso. Wenn Sie eine Markierung entfernen wollen, drücken Sie die \texttt{0}. In der Playlist erscheint dann ein Timer-Symbol mit der Angabe der Abspielreihenfolge dahinter.
+
+\subsection{Favoriten-Playlists}
+
+Seit Version 4.14 hat Nemp einen Schnellzugriff auf eine Liste von Favoriten-Playlists. Darüber kann schnell zwischen verschiedenen Playlists gewechselt werden, bei denen auch jeweils die Wiedergabeposition gespeichert wird.
+
+Zugriff auf die Favoriten erhält man über den neuen Button \inlinegraphics{TabBtnFavorites.png} im Kopfbereich der Playlist. Eine neue Favoriten-Liste kann über den Menüpunkt \emph{Aktuelle Playlist speichern als neuen Favoriten} erstellt werden. 
+
+Alternativ kann der Playlist-Editor verwendet werden. Dort können sämtliche Favoriten bearbeitet werden. Hier kann z.B. eine Playlist für die nächste Party vorbereitet werden, während man seine sonst übliche Playlist hört. Das ist so natürlich nur begrenzt sinnvoll - im Editor ist aktuell keine Wiedergabe möglich.  Zur Verfügung stehen die sonst auch üblichen Methoden Drag\&Drop, Copy\&Paste sowie das Einfügen über die Dateiauswahl.
+Der Playlist-Editor unterliegt dabei neben der fehlenden Wiedergabe einigen weiteren Einschränkungen:
+\begin{itemize}
+\item Es können zwar Audio-Dateien per Drag\&Drop vom Windows-Explorer eingefügt werden, jedoch keine Verzeichnisse.
+\item Es werden keine Cuesheets angezeigt.
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{playlist-editor.jpg} 
+\end{center}
+
+
+\subsubsection{Verhalten der Favoriten-Playlists}
+
+\begin{itemize}
+\item Wenn eine Favoritenliste geladen wird, erscheint der Name der Liste im Header der Playlist.
+\item Wenn eine Favoritenliste geändert wird, dann werden bei Aufruf von \emph{Playlist speichern} (auch per \texttt{Strg+S}) die Änderungen automatisch in dieser Datei gespeichert. Bei der Standard-Playlist erscheint immer ein \emph{Speichern-als}-Dialog.
+\item Ist eine Favoritenliste aktiv und Nemp wird beendet, dann werden diese Änderungen erstmal nur in der Standard-Playlist gespeichert. Beim nächsten Start wird diese Standard-Playlist als eben diese Favoritenliste geladen. Wenn man dann auf eine andere Liste wechseln möchte, erscheint ein Dialog, der auf die Änderungen hinweist und zum Speichern auffordert.
+
+Änderungen an den Favoriten werden also nicht automatisch gespeichert, solange man in dem Abfrage-Dialog nicht die passende Option wählt.
+\item Wenn im Menü eine andere Favoritenliste gewählt wird, so wird (sofern keine sonstigen Änderungen vorgenommen wurden) automatisch die aktuelle Wiedergabe-Position in der Liste gespeichert und beim nächsten Laden wiederhergestellt.
+\item Wenn im Menü die aktuell aktive Favoritenliste nach (nicht gespeicherten) Änderungen an der Liste erneut ausgewählt wird, dann wird (nach Abfrage) die zuletzt gespeicherte Version geladen. Wenn der aktuell abgespielte Titel auch in der zuletzt gespeicherten Version der Playlist enthalten ist, dann wird die Wiedergabe dort fortgeführt. Andernfalls startet die Wiedergabe beim ersten Titel.
+\item Beim Wechsel auf die \emph{Standard-Playlist} wird keine andere Playlist geladen. Es wird dann nur die aktuelle Playlist nicht mehr als \emph{Favoritenliste} behandelt, sondern als ganz normale Playlist - so wie Nemp bisher immer mit der Playlist umgegangen ist.
+\item Die Favoriten werden im Datenverzeichnis (Menü: \emph{Tools - Verzeichnisse - Daten}) im Unterordner \emph{Playlists} gespeichert. Dabei wird das Nemp-Playlist-Format \texttt{*.npl} verwendet, das die gleichen Portabilitäts-Einstellungen unterstützt wie die Medienbibliothek.
+\item Wenn eine Playlist über den Playlist-Editor aus den Favoriten gelöscht wird, dann wird die Playlist-Datei nicht sofort gelöscht, sondern zunächst in \texttt{*.npl.backup} umbenannt. Diese Datei kann ggf. wieder umbenannt werden, um sie in einer neu erstellten Favoriten-Playist wieder importieren zu können.
+\item Die Liste \emph{Zuletzt geladen} erscheint auch in dem Favoriten-Menü. Die Wiedergabelisten dort werden aber nicht so behandelt wie die Favoriten - es gibt z.B. kein Quicksave für diese Listen, und auch keine Speicherung der Wiedergabeposition.
+
+\end{itemize}
+
+
 
 \subsection{ReplayGain - automatische Lautstärke-Anpassung}
 \label{sec_ReplayGain}
@@ -889,7 +961,8 @@ Details zum Erstellen eigener Themes finden Sie in der seperaten Dokumentation.
 		\item \textbf{Zugriff auf die Medienbibliothek.} User können nach Titeln in der Medienbibliothek suchen und in die Playlist einfügen.
 		\item \textbf{Herunterladen von Dateien erlauben.} User können ausgewählte Titel auf ihr Gerät herunterladen.
 		\item \textbf{Fernsteuerung des Players erlauben.} User erhalten auch Zugriff auf den Player und können die Wiedergabe anhalten, starten, zum nächsten Titel springen und die Lautstärke verändern. Zusätzlich ist eine direkte Manipulation der Playlist möglich. Es können dann Titel verschoben oder entfernt werden.
-		\end{itemize}			
+		\end{itemize}	
+\item \textbf{QR-Codes.} Seit Version 4.14 kann Nemp QR-Codes generieren, die die URL zum Webserver enthalten. Damit ist der Zugriff auf den Webserver per Smartphone schneller möglich: Einfach den Code scannen und fertig.
 \end{itemize}
 
 \subsection{Tastatur-Display}
@@ -1070,6 +1143,9 @@ Stille am Anfang eines Stückes wird nicht erkannt und kann folglich auch nicht ü
 \item \textbf{Aktuellen Titel im Cue-Sheet wiederholen im Wiedergabemodus \gf{Wiederhole Titel}.} \emph{Standard: Ein.} Wiederholt im Wiedergabemodus \emph{Wiederhole Titel} nur den aktuellen Eintrag im Cue-Sheet, und nicht die gesamte Mp3-Datei.
 \item \textbf{Merke Position im aktuellen Titel beim Abspielen direkt aus der Medienbibliothek.} \emph{Standard: Ein.} Wenn ein Titel in der Medienbibliothek abgespielt wird, ohne ihn in die Playlist einzufügen, dann wird nach dem Ende dieses Titels mit der Playlist weitergemacht. Ist diese Option aktiviert, dann auch genau an der Stelle im Titel, an dem die Wiedergabe der Playlist zuvor unterbrochen wurde. Ansonsten wird das zuletzt gespielte Lied in der Playlist von vorne abgespielt.
 
+\item \textbf{Favoriten-Playlists automatisch speichern.} Speichert automatisch die Favoriten-Playlists. Falls die Option nicht gewünscht ist, kann bei Bedarf ein Dialog eingeblendet werden:
+\item \textbf{Individuell entscheiden.} Ist auch diese Option nicht gewählt, werden Änderungen an den Favoriten ggf. ohne Warnung verworfen.
+
 \item \textbf{Standard-Aktionen.} Beschreibt die Aktion, die bei einem Doppelklick auf einen Eintrag in der Medienliste ausgeführt wird, bzw. ob und wo der gewählte Titel in die Playlist eingefügt werden soll.
 \item \textbf{Kopfhörer-Wiedergabe anhalten bei Wechsel in anderes Tab.} \emph{Standard: Ein.} Mit einem \emph{anderen Tab} sind die anderen Elemente in diesem Bereich gemeint, also Cover, Liedtext, Effekte und Equalizer. Wechselt man zu einer anderen Anzeige, wird die Wiedergabe im Kopfhörer unterbrochen.
 
@@ -1164,6 +1240,8 @@ Wenn Sie die in diesen Archiven enthaltene sf2-Datei in den bass-Unterordner kop
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Datei-Management}
+\label{sec-file-management}
+
 Das ursprüngliche Kern-Feature von Nemp war die Dateiverwaltung, die immer noch ein zentrales Element ist.
 \begin{itemize}
 \item \textbf{Verzeichnisse.} Nemp kann eine Liste mit Verzeichnissen verwalten, die bei jedem Start auf neue Dateien untersucht wird. Das ist natürlich nur sinnvoll, wenn die Medienbibliothek regelmäßig wächst und oft neue Dateien hinzukommen. Bei eher statischen Musiksammlungen ist es sinnvoller, nur bei Bedarf die Suche nach neuen Dateien manuell anzustoßen.
@@ -1175,6 +1253,8 @@ Wenn Videos und Musik in unterschiedlichen Verzeichnissen liegen, ist das kein P
 \item \textbf{Dateien in Wiedergabelisten untersuchen.} \emph{Standard: Ein.} In die Medienbibliothek werden auch Wiedergabelisten aufgenommen, auch wenn diese nur in der \emph{Klassischen Ansicht} auswählbar sind. Die einzelnen Dateien darin werden nicht noch einmal separat in die Medienbibliothek aufgenommen. Für die Anzeige beim Stöbern in diesen Wiedergabelisten fehlen dann unter Umständen einige Metadaten. 
 
 Bei relativ kurzen Listen ist ein schnelles Scannen möglich. Wenn viele größere Wiedergabelisten erstellt worden sind, kann das zu spürbaren Verzögerungen in der Anzeige führen und kann daher deaktiviert werden.
+
+\item \textbf{Nemp portabel.} Einstellungen für verschiedene Varianten von \emph{Portabilität}. Je nach Art und Weise, wie Nemp als portable Software genutzt wird, sind ggf. diese Optionen sinnvoll oder nicht. Ein paar mehr Hinweise dazu im Abschnitt \hyperref[sec_portable]{Mobile Festplatten, die Cloud und Portabilität}.
 \end{itemize}
 
 
@@ -1306,6 +1386,24 @@ c:\EinSampler\
 Zusätzlich kann Nemp fehlende Cover im Internet bei last.fm suchen. Um nicht bei jeder Anzeige eines Covers erneut eine Internet-Abfrage zu starten, werden erfolglos gesuchte Cover gespeichert. Zunächst versucht Nemp nach einiger Zeit erneut, das Cover zu finden. Die Idee dahinter ist, dass bei neuen Alben unter Umständen die last.fm-Datenbank noch nicht auf dem neuesten Stand ist. Wenn über einen längeren Zeitraum das Cover nicht gefunden werden kann, wird die Suche nach diesem Cover komplett eingestellt.
 
 Über den Button \emph{Cache leeren} werden die Informationen über erfolglos gesuchte Cover gelöscht, und Nemp wird erneut mit der Suche beginnen.
+
+\item \textbf{Qualität der Cover} \emph{Standard: Normal.} Seit Version 4.14 kann die Qualität der Cover, die im Coverflow angezeigt werden, erhöht werden. Die Cover, die dort angezeigt werden, kommen aus dem Cover-Verzeichnis von Nemp.\footnote{Dieses wird beim Aufbau der Medienbibliothek erstellt, um (a) die Anzeige des Covers zu beschleunigen (es muss dann nicht jedes Mal ein passendes Cover gesucht werden) und (b) das Cover auch dann anzeigen zu können, wenn die Audiodatei gerade nicht vorhanden ist, weil z.B. eine mobile Festplatte nicht angeschlossen ist.} Bis Version 4.13 wurden die Cover in diesem Verzeichnis auf eine Auflösung von $240\times 240$ Pixel runter skaliert. Das war irgendwann mal die feste Größe des angezeigten Covers in Nemp. 
+
+Diese Ausmaße sind nicht unbedingt \emph{hochauflösend} zu nennen. Daher kann diese Skalierung seit Version 4.14 angepasst werden. Standard ist nun $500\times 500$ Pixel, maximal sind $1000\times 1000$ möglich. Eine Speicherung der Originalgröße im Cover-Verzeichnis ist auch weiterhin nicht vorgesehen.
+
+
+Einige Hinweise dazu:
+\begin{itemize}
+\item Es wird nicht hochskaliert. Wenn die Originaldatei eine geringere Auflösung hat, dann wird sie nicht künstlich aufgebläht.
+\item Eine maximale Auflösung bedeutet nicht unbedingt beste Qualität der angezeigten Bilder im Coverflow. Die (einfache) OpenGL-Skalierungsfunktion im Coverflow neigt nämlich eher zu Artefakten als die qualitativ bessere Skalierung beim Erstellen der Bild-Dateien für die Medienbibliothek.
+\item Der Wechsel der Qualitätsstufe wird nicht unmittelbar sichtbar, sondern erst beim Neuaufbau des Coverflows.
+\item Die Cover, die automatisch von last.fm heruntergeladen werden, haben in der Regel eine Auflösung von $300\times 300$ Pixeln. 
+\item Nach einem Wechsel der Qualitätseinstellung müssen die Cover in der neuen Auflösung erst generiert werden. Das passiert erst bei Bedarf, wenn im Coverflow ein Cover angezeigt werden soll.
+\item Manuell zugewiesene Cover (seit Version 4.13 möglich) müssen leider erneut manuell zugewiesen werden (aber nur einmal, nicht für alle Auflösungen einzeln).
+\end{itemize}
+
+
+
 
 \item \textbf{Standard-Cover.} Auswahl eines eigenen Standard-Covers für den Fall, dass Nemp zu einem Album bzw. Titel kein Cover finden kann. Bereits im Player angezeigte Cover werden erst dann aktualisiert, wenn das Cover erneut geladen wird, also beim Start eines neuen Titels oder beim durchscrollen des Coverflow.
 
@@ -1552,6 +1650,50 @@ Das alte Nemp-Deskband (für Windows XP, wird nicht mehr unterstützt) und auch di
 \section{Versionsgeschichte}
 
 Im Folgenden eine Zusammenfassung der Neuerungen in den einzelnen Versionen - von der aktuell vorliegenden bis hin zur allerersten Version dieses Programmes, das damals noch gar kein Player war. In diesem Abschnitt finden Sie die wesentlichen Neuerungen und nennenswerten Bugfixes, aber keine vollständige Liste aller Änderungen.
+
+\subsection*{Version 4.14.0, Mai 2020}
+\textbf{Wichtige Änderung}
+\begin{itemize}
+\item Die Entscheidung, ob die Einstellungen im Programmverzeichnis oder im Benutzerverzeichnis gespeichert werden, wird jetzt anders getroffen: Entscheidend ist die Existenz der Datei \verb+UseLocalData.cfg+ im Nemp-Ordner
+\end{itemize}
+
+\textbf{Neue Funktionen, Erweiterungen}
+\begin{itemize}
+\item Schnellzugriff auf Favoriten-Playlists, inklusive Editor bzw. Vorschau für diese Playlists. 
+\item Verbessertes Drag\&Drop in der Playlist. Kopieren der Dateien aus der Playlist heraus (oder innerhalb der Playlist) mit gedrückter \texttt{Strg}-Taste.
+\item Erweiterte Portabilität: Nemp unterstützt nun neben der Laufwerks-Buchstaben-Korrektur für externe Laufwerke auch die Installation in Cloud-Verzeichnissen durch Verwendung relativer Pfade in der Medienbibliothek (sofern möglich). Beide Varianten sind optional. Diese Techniken werden nun auch im Nemp-Playlist-Format voll unterstützt.
+\item Bessere Qualität für Cover im Coverflow (konfigurierbar).
+\item Sinnvollere Sortierung von z.B. Sampler-Serien. Jetzt 1,2,..,10 statt 1,10,..,2. In dem Kontext auch ein Bugfix bei \gf{-} in Verzeichnisnamen.
+\item ReplayGain-Information im CSV-Export hinzugefügt
+\item Erstellung von QR-Codes für die URL des Webservers, sowie einige kleine Verbesserungen, Änderungen und Bugfixes am Webserver
+\end{itemize}
+
+\textbf{Änderungen}
+\begin{itemize}
+\item Drag\&Drop innerhalb der Playlist von mehreren Titel gleichzeitig verschiebt nun alle ausgewählten Titel hintereinander an die ausgesuchte Stelle.
+\item Nemp verhält sich nun anders, wenn das aktuell abgespielte Stück aus der Playlist entfernt wird. Als nächstes wird nun immer der erste Eintrag der Playlist abgespielt
+\item Bedienung der Suche in der Playlist verändert. Beim Tippen werden immer alle Treffer mit einem Symbol in der Anzeige markiert, mit \texttt{F3} kann man die Treffer durchgehen, \texttt{Enter} spielt den fokussierten Eintrag ab. Als \gf{hidden feature} kann man mit \texttt{Shift+Enter} alle Treffer auswählen lassen, um sie an eine Stelle der Playlist zu verschieben.
+\end{itemize}
+
+\textbf{Bugfixes}
+\begin{itemize}
+\item Unter bestimmten Umständen konnte die Playlist nicht gespeichert werden.
+\item Unter seltenen Umständen führte das Anzeigen eines Covers zu einer Exception wegen skalierter Bitmaps mit Höhe Null.
+\item Exceptions im Coverflow nach Löschen der Datei \emph{default\_cover.jpg} behoben
+\end{itemize}
+
+
+\subsection*{Version 4.13.2, April 2020}
+\begin{itemize}
+\item kritischer Bugfix: Bearbeiten von Metadaten im Hauptfenster konnte zu Datenverlust (oder unsinnigen Daten) im ID3-Tag der Datei führen.
+\end{itemize}
+
+
+\subsection*{Version 4.13.1, April 2020}
+\begin{itemize}
+\item Bugfix: Verändern der Abspielgeschwindigkeit funktionierte nicht so wie beabsichtigt
+\end{itemize}
+
 
 \subsection*{Version 4.13.0, Januar 2020}
 \begin{itemize}

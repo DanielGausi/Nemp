@@ -52,7 +52,7 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure HandleNewConnectedDrive;
 
     procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
-    procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
+    procedure FillTreeViewQueryTooShort;
 
     function GetDropWindowSection(aControl: TWinControl): TWindowSection;
 
@@ -95,12 +95,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     procedure SetBrowseTabCloudWarning(ShowWarning: Boolean);
     procedure SetGlobalWarningID3TagUpdate;
 
-    // procedure CheckAndDoCoverDownloaderQuery;
-
     procedure HandleStopAfterTitleClick;
     procedure HandleStopNowClick;
-
-    // procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TAudioFileList);
 
     function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
     // WritePlaylistForClipBoard: Create a temporary Playlist with the fileNAMES (EXcluding the path)
@@ -268,7 +264,6 @@ end;
 procedure FillTreeView(MP3Liste: TAudioFileList; AudioFile:TAudioFile);
 var i: integer;
   NewNode:PVirtualNode;
-  // Data:PTreeData;
   tmpAudioFile: TAudioFile;
 
         function SameFile(File1, File2: TAudioFile): Boolean;
@@ -298,20 +293,17 @@ begin
         if (MP3Liste.Count = 0) then
         begin
             // just add a Dummyfile showing "No results"
-            // AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
             VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
             ShowVSTDetails(Nil);
         end else
         begin
             for i := 0 to MP3Liste.Count-1 do
                 VST.AddChild(Nil, MP3Liste.Items[i]);
-                //AddVSTMp3(VST,Nil, MP3Liste.Items[i]);
 
             // Knoten mit AudioFile suchen und focussieren
             NewNode := VST.GetFirst;
             if assigned(Newnode) then
             begin
-                // Data := VST.GetNodeData(NewNode);
                 tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
 
                 if Not SameFile(tmpAudioFile, AudioFile) then
@@ -331,10 +323,7 @@ begin
                     NewNode := VST.GetFirst;
                     // and get the corresponding AudioFile again
                     if assigned(NewNode) then
-                    begin
-                        // Data := VST.GetNodeData(NewNode);
                         tmpAudioFile := VST.GetNodeData<TAudioFile>(NewNode);
-                    end;
                 end;
 
                 if assigned(Newnode) then // Nur zur Sicherheit!
@@ -355,19 +344,15 @@ begin
 end;
 
 
-procedure FillTreeViewQueryTooShort;//(Dummy: TAudioFile);
+procedure FillTreeViewQueryTooShort;
 begin
     with Nemp_MainForm do
     begin
         MedienBib.BibSearcher.DummyAudioFile.Titel := MainForm_SearchQueryTooShort;
-
         VST.BeginUpdate;
         VST.Clear;
-        //AddVSTMp3(VST, NIL, MedienBib.BibSearcher.DummyAudioFile);
         VST.AddChild(Nil, MedienBib.BibSearcher.DummyAudioFile);
-
         VST.EndUpdate;
-        // AktualisiereDetailForm(NIL, SD_MEDIENBIB);
         ShowVSTDetails(Nil);
     end;
 end;
@@ -672,16 +657,6 @@ procedure SwitchBrowsePanel(NewMode: Integer);
 begin
     with Nemp_MainForm do
     begin
-        {if MedienBib.Count = 0 then
-        begin
-                PanelCoverBrowse.visible := False;
-                PanelStandardBrowse.Visible := False;
-                PanelTagCloudBrowse.Visible := False;
-        end
-
-        else }
-
-
 
         case Newmode of
             0: begin
@@ -818,9 +793,6 @@ begin
 
         if SleepTimer.Enabled then SleepTimerTimer(Nil);
         if BirthdayTimer.Enabled then BirthdayTimerTimer(Nil);
-
-
-        //RestoreComboboxes;
 
         ReTranslateComponent (PlaylistForm    );
         ReTranslateComponent (AuswahlForm     );
@@ -1626,18 +1598,6 @@ begin
     end;
 end;
 
-(*
-procedure VSTSelectionToAudiofileList(aTree: TVirtualStringTree; aSelection: TNodeArray; Target: TAudioFileList);
-var i: Integer;
-    // Data: PTreeData;
-begin
-    for i := 0 to length(aSelection) - 1 do
-    begin
-        // Data := aTree.GetNodeData(aSelection[i]);
-        Target.Add(aTree.GetNodeData<TAudioFile>(aSelection[i]));
-    end;
-end;
-*)
 
 function GetFileListForClipBoardFromTree(aTree: TVirtualStringTree): String;
 var

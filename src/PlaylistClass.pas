@@ -1456,13 +1456,23 @@ end;
 procedure TNempPlaylist.ProcessBufferStringlist;
 var i, oldCount: Integer;
 begin
-  ProcessingBufferlist := True;
+
   if LastCommandWasPlay then
   begin
-      NempPlaylist.PlaylistManager.Reset;
-      ClearPlaylist;
+      if PlaylistManager.PreparePlaylistLoading(
+                      -2,
+                      Playlist,
+                      PlayingIndex,
+                      Round(PlayingTrackPos) )
+      then
+      begin
+          PlaylistManager.Reset;
+          ClearPlaylist;
+      end else
+          exit;
   end;
 
+  ProcessingBufferlist := True;
   oldCount := Playlist.Count;
 
   for i := 0 to BufferStringList.Count - 1 do
@@ -1474,15 +1484,15 @@ begin
 
   if fFirstAction then   // fFirstAction wird bei Play auf False gesetzt
   begin
-      NempPlaylist.Play(fStartIndex, NempPlayer.FadingInterval, AutoPlayOnStart);
+      Play(fStartIndex, NempPlayer.FadingInterval, AutoPlayOnStart);
   end else
   begin
       if LastCommandWasPlay and (Playlist.Count  > 0) then
-          NempPlaylist.Play(0, NempPlayer.FadingInterval, true)
+          Play(0, NempPlayer.FadingInterval, true)
       else
       begin
           if AutoPlayEnqueuedTitle and (Playlist.Count > oldCount) then
-              NempPlaylist.Play(oldCount, NempPlayer.FadingInterval, true)
+              Play(oldCount, NempPlayer.FadingInterval, true)
       end;
   end;
 end;

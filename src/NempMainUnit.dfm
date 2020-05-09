@@ -6745,7 +6745,6 @@ object Nemp_MainForm: TNemp_MainForm
     Top = 56
     object PM_PLM_Default: TMenuItem
       Tag = -1
-      AutoCheck = True
       Caption = 'Default playlist'
       RadioItem = True
       OnClick = PM_PLM_SwitchToDefaultPlaylistClick

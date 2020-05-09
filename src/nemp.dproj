@@ -101,8 +101,8 @@
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_MajorVer>4</VerInfo_MajorVer>
         <VerInfo_MinorVer>14</VerInfo_MinorVer>
-        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
         <DCC_MapFile>3</DCC_MapFile>
+        <DCC_Define>madExcept;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

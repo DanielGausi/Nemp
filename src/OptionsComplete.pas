@@ -522,6 +522,8 @@ type
     cb_EnableCloudMode: TCheckBox;
     lblNempPortable: TLabel;
     BtnQRCode: TButton;
+    cb_PlaylistManagerAutoSave: TCheckBox;
+    cb_PlaylistManagerAutoSaveUserInput: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -635,6 +637,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure BtnActivateBirthdayModeClick(Sender: TObject);
     procedure BtnQRCodeClick(Sender: TObject);
+    procedure cb_PlaylistManagerAutoSaveClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -1283,6 +1286,13 @@ begin
   CB_JumpToNextCue.Checked          := NempPlaylist.JumpToNextCueOnNextClick;
   cb_ReplayCue.Checked              := NempPlaylist.RepeatCueOnRepeatTitle;
   CB_RememberInterruptedPlayPosition.Checked := NempPlaylist.RememberInterruptedPlayPosition;
+
+  // Settings for favorite Playlists
+  cb_PlaylistManagerAutoSave.Checked := NempPlaylist.PlaylistManager.AutoSaveOnPlaylistChange;
+  cb_PlaylistManagerAutoSaveUserInput.Checked := NempPlaylist.PlaylistManager.UserInputOnPlaylistChange;
+
+  cb_PlaylistManagerAutoSaveUserInput.Enabled := NOT cb_PlaylistManagerAutoSave.Checked;
+
 
   cbSaveLogToFile.Checked      := NempPlayer.NempLogFile.DoLogToFile;
   seLogDuration.Value          := NempPlayer.NempLogFile.KeepLogRangeInDays;
@@ -1936,6 +1946,12 @@ begin
               //MedienBib.IgnoreLyrics := cb_IgnoreLyrics.Checked;
 end;
 
+procedure TOptionsCompleteForm.cb_PlaylistManagerAutoSaveClick(Sender: TObject);
+begin
+    //
+    cb_PlaylistManagerAutoSaveUserInput.Enabled := NOT cb_PlaylistManagerAutoSave.Checked;
+end;
+
 procedure TOptionsCompleteForm.cb_RatingActiveClick(Sender: TObject);
 begin
   cb_RatingIgnoreShortFiles             .Enabled := cb_RatingActive.Checked;
@@ -2439,6 +2455,11 @@ begin
   NempPlaylist.JumpToNextCueOnNextClick        := CB_JumpToNextCue.Checked;
   NempPlaylist.RepeatCueOnRepeatTitle          := cb_ReplayCue.Checked;
   NempPlaylist.RememberInterruptedPlayPosition := CB_RememberInterruptedPlayPosition.Checked;
+
+  // Settings for favorite Playlists
+  NempPlaylist.PlaylistManager.AutoSaveOnPlaylistChange  := cb_PlaylistManagerAutoSave.Checked;
+  NempPlaylist.PlaylistManager.UserInputOnPlaylistChange := cb_PlaylistManagerAutoSaveUserInput.Checked ;
+
   NempPlaylist.ShowHintsInPlaylist := CB_ShowHintsInPlaylist.Checked;
   Nemp_MainForm.PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
 
@@ -3478,12 +3499,10 @@ begin
     begin
         fs := TFileStream.Create(OpenDlg_DefaultCover.FileName, fmOpenRead);
         try
-            //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
-            if TCoverArtSearcher.ScalePicStreamToFile_DefaultSize(fs, '_default_cover', Nil, True) then
+            if TCoverArtSearcher.ScalePicStreamToFile_AllSizes(fs, '_default_cover', Nil, True) then
                 LoadDefaultCover
             else
                 MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
-
         finally
             fs.Free;
         end;
@@ -3494,21 +3513,24 @@ procedure TOptionsCompleteForm.btn_DefaultCoverResetClick(Sender: TObject);
 var FileName: UnicodeString;
     fs: TFileStream;
 begin
-    FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
+    FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
     if not FileExists(FileName) then
-        FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.jpg';
+        FileName := ExtractFilePath(ParamStr(0)) + 'Images\default_cover.png';
 
+    if Not FileExists(FileName) then
+        MessageDLG((OptionsForm_DefaultCoverResetFailed), mtWarning, [MBOK], 0)
+    else
+    begin
+        fs := TFileStream.Create(FileName, fmOpenRead);
+        try
+            if TCoverArtSearcher.ScalePicStreamToFile_AllSizes(fs, '_default_cover', Nil, True) then
+                LoadDefaultCover
+            else
+                MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
 
-    fs := TFileStream.Create(FileName, fmOpenRead);
-    try
-        //if ScalePicStreamToFile(fs, TCoverArtSearcher.SavePath + '_default_cover.jpg', 240, 240, Nil, True) then
-        if TCoverArtSearcher.ScalePicStreamToFile_DefaultSize(fs, '_default_cover', Nil, True) then
-            LoadDefaultCover
-        else
-            MessageDLG((OptionsForm_DefaultCoverChangeFailed), mtWarning, [MBOK], 0);
-
-    finally
-        fs.Free;
+        finally
+            fs.Free;
+        end;
     end;
 end;
 

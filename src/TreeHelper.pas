@@ -57,7 +57,6 @@ type
   function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
 
   function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
-  // function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
 
   procedure FillStringTree(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
   procedure FillStringTreeWithSubNodes(Liste: TObjectList; aTree: TVirtualStringTree; Playlist: Boolean = False);
@@ -151,18 +150,6 @@ begin
       result := i;
 end;
 
-(*
-function AddVSTMp3(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
-var Data: PTreeData;
-begin
-  Result:= AVST.AddChild(aNode); // meistens wohl Nil
-
-  Data:=AVST.GetNodeData(Result);
-  Data^.FAudioFile:=aAudioFile;
-
-  AVST.ValidateNode(Result,false); // validate at the end, as we check FAudioFile on InitNode
-end;*)
-
 
 function AddVSTString(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aString: TJustaString): PVirtualNode;
 var Data: PStringTreeData;
@@ -202,11 +189,8 @@ begin
         rn := NIL; // Das sollte aber niemals auftreten!!
   end;
 
-
   for i := startIdx to Liste.Count-1 do
     AddVSTString(aTree, rn, TJustaString(Liste[i]));
-
-
 
   if (MedienBib.CurrentArtist = BROWSE_PLAYLISTS) and (aTree.Tag = 2) then // d.h. es ist der alben-Tree
   begin
@@ -292,7 +276,6 @@ begin
         Ordnerstruktur[2] := '\\' + Ordnerstruktur[2];
         Ordnerstruktur.Delete(0); // die beiden ersten wieder löschen
         Ordnerstruktur.Delete(0); // die beiden ersten wieder löschen
-        //showmessage(Ordnerstruktur[0]);
     end;
 
     max := Ordnerstruktur.Count - 1;

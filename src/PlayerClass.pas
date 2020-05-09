@@ -1252,17 +1252,9 @@ begin
       OR (extension = '.mp2')
       OR (extension = '.mp1')  )
   then
-  begin
-      flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable;
-      //showmessage('prescan');
-  end
+      flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable
   else
-  begin
       flags :=  BASS_UNICODE OR fSoftwareFlag or fFloatable;
-      //showmessage('KEIN Scan');
-  end;
-
-  //flags := BASS_STREAM_PRESCAN OR BASS_UNICODE OR fSoftwareFlag or fFloatable;
 
   // zunächst nur Decode?
   if aReverse OR aNoMickyMaus then

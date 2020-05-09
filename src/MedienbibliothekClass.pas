@@ -5594,7 +5594,7 @@ begin
   tmpStrList := TStringList.Create;
   try
       tmpstrList.Capacity := Mp3ListeArtistSort.Count + 1;
-      tmpstrList.Add('Artist;Title;Album;Genre;Year;Track;Filename;Directory;Filesize;Duration;Bitrate;Channelmode;Samplerate;Rating;Playcounter;vbr;Lyrics');
+      tmpstrList.Add('Artist;Title;Album;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;TrackGain;AlbumGain;TrackPeak;AlbumPeak');
       for i:= 0 to Mp3ListeArtistSort.Count - 1 do
         tmpstrList.Add(Mp3ListeArtistSort[i].GenerateCSVString);
       try

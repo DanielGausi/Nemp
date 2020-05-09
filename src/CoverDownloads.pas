@@ -1164,8 +1164,8 @@ begin
         aBmp.Width := NEMP_PLAYER_COVERSIZE;
     end else
     begin
-        aBmp.Height := 240;
-        aBmp.Width := 240;
+        aBmp.Height := TCoverArtSearcher.CoverSize;
+        aBmp.Width := TCoverArtSearcher.CoverSize;
     end;
 end;
 

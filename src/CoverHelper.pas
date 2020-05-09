@@ -216,7 +216,7 @@ type
         // Get the Default-Cover
         // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
         //      OR the customized cover file from the Medialibrary-settings.
-        class procedure GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
+        class procedure GetDefaultCover(aType: TDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
 
         // GetCoverBitmapFromID:
         // Get the Bitmap for a specified Cover-ID
@@ -531,19 +531,26 @@ procedure FitBitmapIn(Bounds: TBitmap; Source: TGraphic);
 var xfactor, yfactor:double;
     tmpBmp: TBitmap;
 begin
-  if Source = NIL then exit;
-  if (Source.Width = 0) or (Source.Height=0) then exit;
-  xfactor:= (Bounds.Width) / Source.Width;
-  yfactor:= (Bounds.Height) / Source.Height;
-  if xfactor > yfactor then
-  begin
-      Bounds.Width := round(Source.Width*yfactor);
-      Bounds.Height := round(Source.Height*yfactor);
-  end else
-  begin
-      Bounds.Width := round(Source.Width*xfactor);
-      Bounds.Height := round(Source.Height*xfactor);
-  end;
+    if Source = NIL then
+        exit;
+    if (Source.Width = 0) or (Source.Height=0) then
+        exit;
+
+    xfactor:= (Bounds.Width) / Source.Width;
+    yfactor:= (Bounds.Height) / Source.Height;
+    if xfactor > yfactor then
+    begin
+        Bounds.Width := round(Source.Width*yfactor);
+        Bounds.Height := round(Source.Height*yfactor);
+    end else
+    begin
+        Bounds.Width := round(Source.Width*xfactor);
+        Bounds.Height := round(Source.Height*xfactor);
+    end;
+
+    // fix zero-sized images
+    if Bounds.Width = 0 then Bounds.Width := 1;
+    if Bounds.Height = 0 then Bounds.Height := 1;
 
     tmpbmp := tBitmap.Create;
     try
@@ -566,144 +573,31 @@ var scale: IWICBitmapScaler;
     newHeight, newWidth:Integer;
     xfactor, yfactor:double;
 begin
-    if Assigned(aWICImage) then
+    if not Assigned(aWICImage) then
+        exit;
+
+    xfactor:= (aWidth) / aWICImage.Width;
+    yfactor:= (aHeight) / aWICImage.Height;
+    if xfactor > yfactor then
     begin
-        xfactor:= (aWidth) / aWICImage.Width;
-        yfactor:= (aHeight) / aWICImage.Height;
-        if xfactor > yfactor then
-        begin
-            newWidth := round(aWICImage.Width*yfactor);
-            newHeight := round(aWICImage.Height*yfactor);
-        end else
-        begin
-            newWidth := round(aWICImage.Width*xfactor);
-            newHeight := round(aWICImage.Height*xfactor);
-        end;
-
-        aWICImage.ImagingFactory.CreateBitmapScaler(scale);
-        scale.Initialize(aWICImage.Handle, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
-        aWICImage.ImagingFactory.CreateBitmapFromSourceRect(scale, 0, 0, NewWidth, NewHeight, wicBitmap);
-        if Assigned(wicBitmap) then
-            aWICImage.Handle := wicBitmap;
+        newWidth := round(aWICImage.Width*yfactor);
+        newHeight := round(aWICImage.Height*yfactor);
+    end else
+    begin
+        newWidth := round(aWICImage.Width*xfactor);
+        newHeight := round(aWICImage.Height*xfactor);
     end;
+
+    // fix zero-sized images
+    if newWidth = 0 then newWidth := 1;
+    if newHeight = 0 then newHeight := 1;
+
+    aWICImage.ImagingFactory.CreateBitmapScaler(scale);
+    scale.Initialize(aWICImage.Handle, NewWidth, NewHeight, WICBitmapInterpolationModeFant);
+    aWICImage.ImagingFactory.CreateBitmapFromSourceRect(scale, 0, 0, NewWidth, NewHeight, wicBitmap);
+    if Assigned(wicBitmap) then
+        aWICImage.Handle := wicBitmap;
 end;
-
-
-
-
-(*
-function GetCover(aAudioFile: TAudioFile; aCoverbmp: TPicture; CompleteCoverSearch: Boolean): boolean;
-var coverliste: TStringList;
-    aGraphic: TPicture;
-    baseName, completeName: String;
-    CoverArtSearcher: TCoverArtSearcher;
-
-begin
-  result := false;
-  try
-      case aAudioFile.AudioType of
-          at_Stream: begin
-              TCoverArtSearcher.GetDefaultCover(dcWebRadio, aCoverbmp, 0);
-              result := True;
-          end;
-          at_File: begin
-              if (aAudioFile.CoverID <> '') And FileExists(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg') then
-              begin
-                  aGraphic := TPicture.Create;
-                  try
-                      aGraphic.LoadFromFile(TCoverArtSearcher.Savepath + aAudioFile.CoverID + '.jpg');
-
-                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
-                      else
-                          //AssignBitmap(aCoverBmp, aGraphic);
-                          aCoverbmp.Assign(aGraphic);
-                      result := True;
-                  finally
-                      aGraphic.Free;
-                  end;
-              end else
-              begin
-                  if CompleteCoverSearch then
-                  begin
-                      // first: Check Metadata
-                      // Bugfix 4.12: Also consider Non-MP3-Files (like Flac)
-
-                      if aAudioFile.GetCoverFromMetaData(aCoverbmp.Bitmap) then
-                      begin
-                          result := True;
-                      end
-                      else
-                      begin // in Dateien rund um das Audiofile nach nem Bild suchen
-
-                          // ------------------------
-
-                          CoverArtSearcher := TCoverArtSearcher.create;
-                          try
-                              coverliste := TStringList.Create;
-                              CoverArtSearcher.GetCandidateFilelist(aAudioFile,coverliste);
-                              try
-                                  if Not CoverArtSearcher.GetCoverFromList(CoverListe, aCoverbmp) then
-                                  begin
-                                      CoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
-                                      result := False;
-                                  end else
-                                      result := True;
-                              except
-                                  CoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
-                                  result := false;
-                              end;
-                              coverliste.free;
-                          finally
-                              CoverArtSearcher.free;
-                          end;
-
-                          // ------------------------
-
-                      end;
-
-                  end else
-                  begin
-                      TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
-                      result := False;
-                  end;
-              end;
-          end;
-          at_CDDA: begin
-              // get a Covername from cddb-id
-              baseName := CoverFilenameFromCDDA(aAudioFile.Pfad);
-              completeName := '';
-              if FileExists(TCoverArtSearcher.Savepath + baseName + '.jpg') then
-                  completeName := TCoverArtSearcher.Savepath + baseName + '.jpg'
-              else if FileExists(TCoverArtSearcher.Savepath + baseName + '.png') then
-                  completeName := TCoverArtSearcher.Savepath + baseName + '.png';
-
-              if completeName <> '' then
-              begin
-                  aGraphic := TPicture.Create;
-                  try
-                      aGraphic.LoadFromFile(completeName);
-                      if (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
-                          FitPictureIn(aCoverbmp, aGraphic.Graphic)
-                      else
-                          aCoverBmp.Assign(aGraphic);
-                      result := True;
-                  finally
-                      aGraphic.Free;
-                  end;
-              end else
-              begin
-                  TCoverArtSearcher.GetDefaultCover(dcCDDA, aCoverbmp, 0);
-                  result := false;
-              end;
-          end;
-      end;
-  except
-      TCoverArtSearcher.GetDefaultCover(dcFile, aCoverbmp, 0);
-      result := false;
-  end;
-end;
-*)
 
 
 
@@ -932,7 +826,7 @@ begin
         2: CoverSize := 750;
         3: CoverSize := 1000;
     else
-        CoverSize := 240;
+        CoverSize := 500;
     end;
 
     // Try to create the Directory
@@ -970,7 +864,6 @@ begin
             // Denn sonst würde die Suche ja dasselbe Ergebnis liefern
             if (fCurrentPath <> aAudioFile.Ordner) or (ForceReScan) then
             begin
-                //fLastPath := ExtractFilePath(aAudioFile.Pfad);
                 fCurrentPath := aAudioFile.Ordner;
 
                 Coverliste := TStringList.Create;
@@ -1052,11 +945,7 @@ begin
                     newID := MD5DigestToStr(MD5Stream(CoverStream));
                     // try to save a resized JPG from the content of the stream
                     // if this fails, there was something wrong with the image data :(
-                    if ScalePicStreamToFile_DefaultSize(CoverStream, newID,
-                                            // SavePath + newID + '.jpg',
-                                            // self.Size, self.Size,      // 240, 240
-                                            GetProperImagingFactory(ScanMode))
-                    then
+                    if ScalePicStreamToFile_DefaultSize(CoverStream, newID, GetProperImagingFactory(ScanMode)) then
                     begin
                         aAudioFile.CoverID := newID;
                         result := newID;
@@ -1097,24 +986,17 @@ begin
         end;
     end;
 
-  result := '';
-
-  if newID <> '' then
-  begin
-      fs := TFileStream.Create(aFileName, fmOpenRead);
-      try
-          if ScalePicStreamToFile_DefaultSize(fs, newID,
-                                    // SavePath + newID + '.jpg',
-                                    // self.Size, self.Size, // 240, 240,
-                                    GetProperImagingFactory(ScanMode))
-            then
-            begin
-                result := newID;
-            end;
-      finally
-          fs.Free;
-      end;
-  end;
+    result := '';
+    if newID <> '' then
+    begin
+        fs := TFileStream.Create(aFileName, fmOpenRead);
+        try
+            if ScalePicStreamToFile_DefaultSize(fs, newID, GetProperImagingFactory(ScanMode)) then
+                result := newID
+        finally
+            fs.Free;
+        end;
+    end;
 end;
 
 function TCoverArtSearcher.GetFrontCoverIndex(CoverList:TStrings):integer;
@@ -1449,7 +1331,7 @@ begin
 end;
 
 
-class procedure TCoverArtSearcher.GetDefaultCover(aType: TDefaultCoverType; aCoverbmp: TPicture; Flags: Integer);
+class procedure TCoverArtSearcher.GetDefaultCover(aType: TDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
 var filename: UnicodeString;
     WPic: TWICImage;
     Stretch: Boolean;
@@ -1482,22 +1364,28 @@ begin
 
     if FileExists(filename) then
     begin
-
         WPic := TWICImage.Create;
         try
             WPic.LoadFromFile(filename);
-            if Stretch and (aCoverbmp.Width > 0) and (aCoverBmp.Height > 0) then
+            if Stretch and (aCoverPic.Width > 0) and (aCoverPic.Height > 0) then
             begin
-                FitWICImageIn(WPic, aCoverbmp.Width, aCoverbmp.Height);
-                aCoverBmp.Bitmap.Assign(WPic);
+                FitWICImageIn(WPic, aCoverPic.Width, aCoverPic.Height);
+                aCoverPic.Bitmap.Assign(WPic);
             end
             else
-                aCoverBmp.Bitmap.Assign(WPic);
+                aCoverPic.Bitmap.Assign(WPic);
         finally
             WPic.Free
         end;
+    end else
+    begin
+        // otherwise: just a blank image with some text.
+        aCoverPic.Bitmap := TBitmap.Create;
+        aCoverPic.Bitmap.Height := CoverSize;
+        aCoverPic.Bitmap.Width := CoverSize;
+        aCoverPic.Bitmap.Canvas.Font.Size := CoverSize Div 20;
+        aCoverPic.Bitmap.Canvas.TextOut(CoverSize Div 20, (CoverSize Div 2) - (CoverSize Div 40), 'Cover not available.');
     end;
-    // otherwise: just a blank image, do nothing.
 end;
 
 procedure TCoverArtSearcher.PrepareMainCover(SourceCoverlist: TObjectlist);
@@ -1585,8 +1473,7 @@ var i: Integer;
     aGraphic: TPicture;
     success: Boolean;
     newID: String;
-
-Const TileSize = 60;
+    TileSize: Integer;// = 60;
 begin
     EnterCriticalSection(CSAccessRandomCoverlist);
 
@@ -1596,6 +1483,8 @@ begin
         GetDefaultCover(dcFile, aCoverBmp, cmNoStretch);
     end else
     begin
+        TileSize := CoverSize Div 4;
+
         // At least one cover in the library
         smallbmp := TBitmap.Create;
         try

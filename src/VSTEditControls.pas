@@ -272,8 +272,7 @@ begin
 end;
 
 function TRatingEditLink.PrepareEdit(Tree: TBaseVirtualTree; Node: PVirtualNode; Column: TColumnIndex): Boolean;
-var // Data: PTreeData;
-    af: tAudioFile;
+var af: tAudioFile;
 begin
   Result := True;
   FTree := Tree as TVirtualStringTree;
@@ -281,7 +280,6 @@ begin
   FColumn := Column;
   fLastPaint := 0;
 
-  // Data := FTree.GetNodeData(FNode);
   af := FTree.GetNodeData<TAudioFile>(FNode);
   if assigned(af) then
   begin
@@ -324,13 +322,10 @@ begin
 end;
 
 function TRatingEditLink.EndEdit: Boolean;
-var
-  // Data: PTreeData;
-  af: tAudioFile;
+var af: tAudioFile;
 begin
   Result := True;
   // Get the Audiofile
-  // Data := FTree.GetNodeData(FNode);
   af := FTree.GetNodeData<TAudioFile>(FNode);
   if assigned(af) then
   begin
@@ -342,7 +337,6 @@ begin
       af.Rating := FEdit.Tag;
   end;
   FTree.InvalidateNode(FNode);
-  //FEdit.Hide;
   try
     FTree.SetFocus;
   except

@@ -79,6 +79,25 @@ The Player Nemp was developed out of my own needs. I didn't find any player\foot
 
 I have always tried to keep the basic handling as simple as possible.
 
+\subsection{Installation and portable installation}
+
+From the beginning Nemp did not need to be \gf{installed}, but could be used just like that. A question that comes up again and again as a developer is \emph{\gf{where to put the data files}}?
+
+Until version 4.13 this question was solved by looking at the directory where Nemp was copied into. If the directory was the programs folder (e.g. \verb+c:\Program Files+), then the data was written into the user directory, as it is common practice under Windows. Otherwise, the data was written directly into the program directory. However, this heuristic does not work on some devices anymore and therefore causes errors.
+
+Since version 4.14 there is therefore a marker file in the Nemp directory: 
+
+\begin{itemize}
+\item If the file \verb+UseLocalData.cfg+ exists, data will be written into the local program directoy.
+\item If the file \verb+UseLocalData.cfg+ \emph{does not} exists, the user directory will be used for data storage.
+\end{itemize}
+The content of this file doesn't matter at all - it is only a question of whether the file exists or not.
+
+The installation tool asks if you want to install Nemp as portable software and will copy this file into the Nemp-directory (or not). The zip-archive contains this file, so Nemp becomes \gf{portable} in this sense.
+
+For more information on the portability of Nemp, see the section \hyperref[sec_portable]{External drives and backups, the cloud and portability}.
+
+
 \subsection{Basic Settings: The Nemp Wizard}
 \label{sec_wizard}
 
@@ -161,6 +180,7 @@ During the development of Nemp I tried to offer as many possibilities for contro
 \item Context menus. The four areas (partly also some individual elements) have their own context menu, which can be used to call various functions. You can access the context menu by right-clicking on the right mouse button or by clicking on one of the Nemp buttons. \includegraphics{TabBtnNemp.png}
 \item Shortcut keys such as \texttt{Ctrl+F} for quick search or \texttt{Ctrl+D} for displaying details of a selected title.
 \item The usual Windows methods \emph{Drag\&Drop} and \emph{Copy\&Paste} are available for handling files. If Nemp is the target of such an operation, a distinction is made between playlist and media library. A \emph{dropped} folder is either inserted into the playlist or into the media library. If you want to insert music files into other programs from within Nemp, this is limited to 2500 files for performance reasons.
+\item Since Nemp 4.14 Drag\&Drop works from within the playlist as well. To do so you have to press the key \texttt{Ctrl} additionally. This allows you also to \emph{copy} titles within the playlist, not \emph{move} them as usual.
 \item Multimedia keyboards are also supported. Pressing one of these special keys should also effect the desired action in Nemp.
 \item Optionally global hotkeys can be defined, e.g. \texttt{Ctrl+Shift+P} for Play. However, this may have undesirable side effects with other programs.
 \item As of Windows 7, some basic controls are added to the taskbar entry for basic control.
@@ -225,15 +245,30 @@ Nemp is basically designed to support multiple languages. The original language 
 In the meantime translations into Dutch and Russian have been made for Nemp. These translations are made by third parties and may be incomplete - especially when a new version has just been released.
 
 
-\subsection{External drives and backups, portability}
+\subsection{USB drives, the cloud and portability}
+\label{sec_portable}
+One of the main goals in developing Nemp was portability. Nemp should not need to be \emph{installed}, but should simply run like this - including the media library. Even if Nemp resides on an external hard drive with the entire music collection. When connecting the drive, all the data is stored sometimes on \verb+D:\+ and sometimes on \verb+E:\+, for example - Nemp can fix that.
 
-One of the main goals in developing Nemp was portability. Nemp should not need to be \emph{installed}, but should simply run like this - including the media library. Even if Nemp resides on an external hard drive with the entire music collection, and when connecting the drive, all the data is stored sometimes on \verb+D:\+ and sometimes on \verb+E:\+.
+With Nemp 4.14 the default setting \emph{portable} or \emph{non-portable} was solved differently - the deciding factor now is the existence of the file \verb+UseLocalData.cfg+  in the Nemp directory
+(see first chapter on installation).
 
-For this purpose, the media library stores not only the paths to the individual music files, but also information about the drives on which the data resides. Nemp examines the drives at start and corrects the path information if necessary. 
+In the years since the first release, another scenario for \gf{portable software} has become relevant: The use of online drives, which are often synchronized in a specific directory on a computer. Since version 4.14 Nemp is prepared for this case as well: If Nemp (and all your music files) are stored in such a directory, it will work on all computers - no matter in which directory it is located on the different computers.
+
+\subsubsection*{USB mode}
+
+For the first case - the use on external drives - the media library stores not only the paths to the individual music files, but also information about the drives on which the data resides. Nemp examines the drives at start and corrects the path information if necessary. 
 
 This also works while Nemp is running. For example, if you forgot to connect the external hard drive with your music collection before starting Nemp, it doesn't matter. As soon as it is connected, Nemp notices this and automatically adjusts the paths.
 
-This method works very well in most cases, but has one gap: If you have your complete collection on two different drives, i. e. an original and a backup, then Nemp will differentiate between these two drives, even if both always appear under the same drive letter in the system. Because of the automatic drive adaption it will not find the files then when you connect the other drive - even though the files are there. Nemp \emph{does not} corrects the paths in that case, but makes them \emph{kaputt}. The workaround is to always connect the same disk, or to make two copies of the media library and load the appropriate media library, depending on the hard disk.
+\subsubsection*{Cloud mode}
+
+For the second case - the cloud drives - Nemp stores only \emph{relative paths} in the media library. These are completed at startup or when loading the media library. But this only works as long as only one drive is used for the media library. As soon as multiple drives or partitions are in use, relative paths are of no use. 
+
+Both variants usually work very well and do not interfere with each other. In some cases, however, these automatic correction methods can also have undesirable side effects. In the first case, for example, two identical backups of the music collection on two different drives are recognized as \gf{different}. And with relative paths, the file storing the media library information (\emph{nemp.gmp}) cannot be moved arbitrarily. Its position relative to the music files must remain the same.
+
+Therefore since Nemp 4.14 both variants can be switched on or off in the \hyperref[sec-file-management]{Settings - File management}.
+
+%This method works very well in most cases, but has one gap: If you have your complete collection on two different drives, i. e. an original and a backup, then Nemp will differentiate between these two drives, even if both always appear under the same drive letter in the system. Because of the automatic drive adaption it will not find the files then when you connect the other drive - even though the files are there. Nemp \emph{does not} corrects the paths in that case, but makes them \emph{kaputt}. The workaround is to always connect the same disk, or to make two copies of the media library and load the appropriate media library, depending on the hard disk.
 
 
 
@@ -894,6 +929,7 @@ Details on creating your own themes can be found in the separate documentation.
 		\item \textbf{Downloading files.} Users can download titles to their device.
 		\item \textbf{Remote control of the player.} Users can also access the player and pause, start, skip to the next track and change the volume. In addition, direct manipulation of the playlist is possible. You can then move or delete titles.	
 		\end{itemize}			
+\item \textbf{QR codes.} Since version 4.14 Nemp can generate QR codes containing the webserver URL. Scan this code with your mobile phone and get access to the webserver more easily.
 \end{itemize}
 
 \subsection{Keyboard display}
@@ -1119,6 +1155,10 @@ Silence at the beginning of a piece is not recognized and therefore cannot be sk
 
 \item \textbf{Remember track position when playing a song directly from the library.} \emph{Default: On.} If a song is played back in the library without inserting it into the playlist, the playlist will continue playing after the end of that song. If this option is activated, then it will also be at the exact position in the title where the playlist was previously interrupted. Otherwise, the last played song will be played in the playlist from the beginning.
 
+
+\item \textbf{Autosave favorite playlists.} Automatically save favorite playlist when changing them. If this is not wanted, a dialog can be displayed:
+\item \textbf{Decide individually when loading a new playlist.} If this option is also not selected, then changes to the lists are discarded when switching to another playlist.
+
 \item \textbf{Default actions.} 
 Specifies the action to be performed when double-clicking an entry in the media list, or whether and where the selected title is to be inserted in the playlist.
 
@@ -1215,6 +1255,7 @@ If you copy the sf2 file contained in these archives to the bass-subfolder and r
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{File management}
+\label{sec-file-management}
 The original core feature of Nemp was the file management, which is still a central element.
 
 \begin{itemize}
@@ -1229,6 +1270,8 @@ If movies and music are stored in different directories, this is no problem. Oth
 Playlists are also included in the media library, even if they are only vidibld in the \emph{classic view}. The individual files in it are not added to the media library separately again. Some metadata may be missing for viewing these playlists when you browse them. 
 
 For rather short lists, fast scanning is possible. If many large playlists have been created, this can cause noticeable delays in the display and can therefore be deactivated.
+
+\item \textbf{Nemp portable.} Settings for different variants of portability. Depending on how Nemp is used as \emph{portable software}, these options may or may not be useful. A few more details about this in the section \hyperref[sec_portable]{USB drives, the cloud and portability}.
 \end{itemize}
 
 
@@ -1370,6 +1413,23 @@ The button \emph{Clear cache} deletes the information about unsuccessfully searc
 \item \textbf{Default cover.} Selection of a custom default cover in case Nemp cannot find a cover for an album or title. Covers already displayed in the player are not updated until the cover is reloaded, i. e. when a new song is started or when the coverflow is scrolled through.
 
 \item \textbf{Online search for lyrics.} Here you can configure which online sources with which priority should be used for the search for lyrics. Standard is LyricWiki, optionally ChartLyrics can be used as fallback. In most cases, however, LyricWiki will achieve better results.
+
+\item \textbf{Quality of the covers in the media library.} \emph{Default: Normal.} Since version 4.14 the quality of the covers displayed in the coverflow can be increased. The covers that are displayed there are taken from the cover directory of Nemp.\footnote{This is created when building up the media library to (a) speed up the display of the cover (you don't have to search for a suitable cover every time) and (b) to be able to display the cover even if the audio file is currently not available, e.g. because a mobile harddisk is not connected.} Until version 4.13 the covers in this directory were scaled down to a resolution of $240\times 240$ pixels. This was the fixed size of the displayed cover in Nemp at some point. 
+
+These dimensions are not exactly \emph{high-resolution}. Therefore this scaling can be adjusted now. Standard is now $500\times 500$ pixels, maximum is $1000\times 1000$. Storing the original size in the cover directory is still not supported.
+
+Some remarks about this:
+
+\begin{itemize}
+\item There' s no upscaling. If the original file has a lower resolution, it is not unnecessarily enlarged.
+\item A maximum resolution does not necessarily mean the best quality of the displayed images in coverflow. This is because the (simple) OpenGL scaling function in Coverflow is more prone to artifacts than the higher quality scaling when creating the image files for the media library.
+\item The change of the quality level is not immediately visible, but only when the coverflow is rebuilt.
+\item The covers that are automatically downloaded from last.fm usually have a resolution of $300\times 300$ pixels. 
+\item After changing the quality setting the covers have to be generated in the new resolution first. This is only done when a cover should be displayed in the coverflow.
+\item Manually assigned covers (possible since version 4.13) must be reassigned manually (but only once, not for all resolutions individually).
+\end{itemize}
+
+
 \end{itemize}
 
 \subsubsection{Search settings}
@@ -1615,6 +1675,49 @@ The Nemp Deskband for Windows XP and the display app for the Logitech G15 includ
 \section{Version history}
 
 The following is a summary of the new features in the individual versions - from the current version to the very first version of this program, which at that time was not even a player. In this section you will find the main new features and noteworthy bugfixes, but not a complete list of all changes.
+
+
+\subsection*{Version 4.14.0, Mai 2020}
+\textbf{Significant change}
+\begin{itemize}
+\item The decision whether the settings are saved in the program directory or in the user directory is now made in a different way: Decisive is now the existence of the file \verb+UseLocalData.cfg+ in the Nemp folder
+\end{itemize}
+
+\textbf{New features, enhancements}
+\begin{itemize}
+\item Quick access to favourite playlists, including an editor and preview for these playlists. 
+\item Improved drag\&drop in the playlist. Copying files out of (or within) the playlist by holding down the \texttt{Ctrl} key.
+\item Enhanced portability: Nemp now supports besides drive letter correction for external drives also installation in cloud directories by using relative paths in the media library (if possible). Both variants are optional. Both techniques are also fully supported in Nemp playlist format.
+\item Better quality for covers in coverflow (configurable).
+\item More reasonable sorting of e.g. sampler series. Now 1,2,...,10 instead of 1,10,...,2. In this context also a bugfix with \gf{-} in directory names.
+\item ReplayGain information added to CSV export
+\item Creation of QR codes for the URL of the web server, as well as some small improvements, changes and bugfixes on the web server
+\end{itemize}
+
+\textbf{Changes}
+\begin{itemize}
+\item Drag\&Drop within the playlist of several titles simultaneously now moves all selected titles one after the other to the selected position.
+\item Nemp now behaves differently if the currently playing track is removed from the playlist. Next track is now the first entry of the playlist in this case.
+\item Handling of the search in the playlist changed. When typing, all hits are always marked with a symbol in the display, with \texttt{F3} you can go through the hits, \texttt{Enter} plays the focused entry. As \gf{hidden feature} you can use \texttt{Shift+Enter} to select all hits and move them to a certain position in the playlist.
+\end{itemize}
+
+\textbf{Bug fixes}
+\begin{itemize}
+\item Under certain circumstances the playlist could not be saved.
+\item Under rare circumstances display of cover art caused an exception due to scaled bitmaps with height zero
+\end{itemize}
+
+
+\subsection*{Version 4.13.2, April 2020}
+\begin{itemize}
+\item Critical bugfix: Editing metadata in the main window could lead to data loss (or nonsense data) in the ID3-Tag of a file
+\end{itemize}
+
+\subsection*{Version 4.13.1, April 2020}
+\begin{itemize}
+\item Bugfix: Changing the playback speed did not work as intended
+\end{itemize}
+
 
 \subsection*{Version 4.13.0, January 2020}
 \begin{itemize}

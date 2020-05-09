@@ -260,6 +260,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_MediabibSearch    = 'Search options';
     OptionsTree_MediabibUnicode   = 'Unicode';
 
+    OptionsForm_DefaultCoverResetFailed = 'The default cover cannot be restored because the original file "default_cover.jpg" was not found.';
     OptionsForm_DefaultCoverChangeFailed = 'Sorry, some error occured while saving the new default cover art in the Nemp cover archive.';
     OptionsForm_InvalidTime = 'Invalid time. Try something between 00:00 and 23:59.';
 

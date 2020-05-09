@@ -371,18 +371,8 @@ type
         function GetCoverStreamFromM4A (aM4AFile: TM4aFile   ; var aPicStream: TMemoryStream): Boolean;
         function GetCoverStreamFromAPE (aBaseApeFile: TBaseApeFile; var aPicStream: TMemoryStream): Boolean;
 
-
-
         // no tags found - set default values
         procedure SetUnknown;
-
-        (*
-        procedure SetMp3Data(aMp3File: TMp3File);
-        procedure SetOggVorbisData(aOggFile: TOggVorbisFile);
-        procedure SetFlacData(aFlacFile: TFlacFile);
-        procedure SetM4AData(aM4AFile: TM4AFile);
-        procedure SetExoticInfo(aBaseApeFile: TBaseApeFile);
-        *)
 
         // reading text information from a stream. This method is only used for reading files created
         // by Nemp 4.12 or earlier.
@@ -425,9 +415,7 @@ type
 
         // RawTags: #13#10-separated Tags
         // Management of these Strings (except loading/saving) is done in Class TTagCloud
-        // RawTagAuto: UTF8String;
         RawTagLastFM: UTF8String;
-        // RawTagUserDefined: UTF8String; // Never used this
         // Used in TagEditor/CloudTag.RenameTag
         // True indicates that the ID3Tag of the file should be rewritten
         ID3TagNeedsUpdate: Boolean;
@@ -479,7 +467,6 @@ type
         property Key2: UnicodeString read fKey2 write fKey2;
 
         property Taglist: TObjectList read fgetTagList;
-        // property TagDisplayString: String read fGetTagDisplayString;
         property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
 
         property AudioType: TAudioType read fAudioType write fAudioType;
@@ -495,12 +482,8 @@ type
 
         property DriveID: Integer read fDriveID write fDriveID;
 
-        //property TrackGainStr: String read fTrackGainStr write fTrackGainStr;
-        //property AlbumGainStr: String read fAlbumGainStr write fAlbumGainStr;
-
         property TrackGain: Single read fTrackGain write fTrackGain;
         property AlbumGain: Single read fAlbumGain write fAlbumGain;
-
         property TrackPeak: Single read fTrackPeak write fTrackPeak;
         property AlbumPeak: Single read fAlbumPeak write fAlbumPeak;
 
@@ -527,9 +510,6 @@ type
         function GetCueList(aCueFilename: UnicodeString =''; aAudioFilename: UnicodeString = ''): boolean; // Rückgabewert: Liste erstellt/nicht erstellt
 
         // Write the Meta-Data back to the file
-        // This method will call a proper sub-methode like SetMp3Info
-        // function SetAudioData(allowChange: Boolean): TNempAudioError;
-
         function PreparingWriteChecks(allowChange: Boolean): TNempAudioError;
         procedure EnsureID3v2Exists(aMp3File: TMp3File);
         function WriteStringToMetaData(aValue: String; ColumnIndex: Integer; allowChange: Boolean): TNempAudioError;
@@ -592,7 +572,6 @@ type
         function GetReplacedTitle (ReplaceValue: Integer): String;
         function GetReplacedAlbum (ReplaceValue: Integer): String;
 
-        // function GetTagDisplayString(allowEdit: Boolean): String;
 
         // for the Double-Click Action in the VTS-Details.
         // check for values that "make sense"
@@ -609,7 +588,6 @@ type
         function ContainsTag(aTag: String): Boolean;
         function RemoveTag(aTag: String): Boolean;
 
-        //function RemoveTag(aTag: String): Boolean;
         //function RenameTag(oldTag, newTag: String): Boolean;
 
         // creates a copy of the Audiofile and adds the copy to the list
@@ -622,12 +600,6 @@ type
     // TAudiofile here, as some properties are only used by the playlist.
     // But all i coded was this re-definition...
     TPlaylistFile = TAudioFile;
-
-    // Types used in the VirtualStringTrees
-    //TTreeData = record
-    //  FAudioFile : TAudioFile;
-    //end;
-    //PTreeData = ^TTreeData;
 
 
     TErrorLog = class
@@ -1544,26 +1516,6 @@ begin
     result := fTagList;
 end;
 
-(*
-function TAudioFile.GetTagDisplayString(allowEdit: Boolean): String;
-begin
-    if trim(String(RawTagLastFM)) <> '' then
-        result := StringReplace(Trim(String(RawTagLastFM)), #13#10, ', ', [rfreplaceAll])
-    else
-    begin
-        if HasSupportedTagFormat then
-        begin
-            if allowEdit then
-                result := Tags_AddTags
-            else
-                result := ''; // Tags_NoTagsAccessDenied;
-        end
-        else
-            result := ''; //Tags_AddTagsNotPossible;
-    end;
-end;
-*)
-
 {
     --------------------------------------------------------
     Getter for ChannelMode
@@ -1830,12 +1782,8 @@ begin
     end;
 
     // Get ReplayGain Information
-    //fTrackGainStr :=  aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_GAIN);
-    //fAlbumGainStr :=  aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_GAIN);
-
     TrackGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_GAIN));
     AlbumGain := GainStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_GAIN));
-
     TrackPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_TRACK_PEAK));
     AlbumPeak := PeakStringToSingle(aMp3File.id3v2tag.GetUserText(REPLAYGAIN_ALBUM_PEAK));
 end;
@@ -2072,7 +2020,6 @@ end;
 }
 
 function TAudioFile.GetCoverStreamFromMetaData(aCoverStream: TMemoryStream; TagFile: TGeneralAudioFile): boolean;
-// var MainFile: TGeneralAudioFile;
 begin
     if not FileExists(Pfad) then
     begin
@@ -2083,31 +2030,25 @@ begin
     case fAudioType of
         at_File: begin
             try
-                //MainFile := TGeneralAudioFile.Create(Pfad);
-                //try
-                    // get cover information (format-specific)
-                    case TagFile.FileType of
-                        at_Mp3    : result := GetCoverStreamFromMp3(TagFile.MP3File, aCoverStream) ;
-                        at_Flac   : result := GetCoverStreamFromFlac(TagFile.FlacFile, aCoverStream) ;
-                        at_M4A    : result := GetCoverStreamFromM4A(TagFile.M4aFile, aCoverStream) ;
+                // get cover information (format-specific)
+                case TagFile.FileType of
+                    at_Mp3    : result := GetCoverStreamFromMp3(TagFile.MP3File, aCoverStream) ;
+                    at_Flac   : result := GetCoverStreamFromFlac(TagFile.FlacFile, aCoverStream) ;
+                    at_M4A    : result := GetCoverStreamFromM4A(TagFile.M4aFile, aCoverStream) ;
 
-                        at_Monkey,
-                        at_WavPack,
-                        at_MusePack,
-                        at_OptimFrog,
-                        at_TrueAudio: result := GetCoverStreamFromApe(TagFile.BaseApeFile, aCoverStream) ;
+                    at_Monkey,
+                    at_WavPack,
+                    at_MusePack,
+                    at_OptimFrog,
+                    at_TrueAudio: result := GetCoverStreamFromApe(TagFile.BaseApeFile, aCoverStream) ;
 
-                        at_Invalid,
-                        at_Ogg,
-                        at_Wma,
-                        at_wav: result := False;
-                    else
-                        result := False;
-                    end;
-
-                //finally
-                //    MainFile.Free;
-                //end;
+                    at_Invalid,
+                    at_Ogg,
+                    at_Wma,
+                    at_wav: result := False;
+                else
+                    result := False;
+                end;
             except
                 result := False;
             end;
@@ -2899,17 +2840,6 @@ begin
                                 end;
                           end;
                           // at_Invalid: ;at_Wma: ; at_Wav: ;
-
-                          {
-                          at_Ogg : MainFile.OggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
-                        at_Flac: MainFile.FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, StrCounter);
-                        at_M4A : MainFile.M4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, StrCounter);
-                        ...
-                        ...
-                        MainFile.BaseApeFile.SetValueByKey(APE_PLAYCOUNT  , StrCounter);
-
-                          }
-
                       end;
 
                 result := AudioToNempAudioError(MainFile.UpdateFile);
@@ -3203,17 +3133,23 @@ begin
     StringReplace(Genre, ';', ',', [rfReplaceAll]) + ';' +
     StringReplace(Year, ';', ',', [rfReplaceAll]) + ';' +
     IntToStr(Track) + ';' +
-    StringReplace(Dateiname, ';', ',', [rfReplaceAll]) + ';' +
+    StringReplace(CD, ';', ',', [rfReplaceAll]) + ';' +
     StringReplace(Ordner, ';', ',', [rfReplaceAll]) + ';' +
+    StringReplace(Dateiname, ';', ',', [rfReplaceAll]) + ';' +
+    StringReplace(Extension, ';', ',', [rfReplaceAll]) + ';' +
     IntToStr(fFileSize) + ';' +
     IntToStr(Duration) + ';' +
     IntToStr(fBitrate) + ';' +
+    vbrstr + ';' +
     ChannelMode + ';' +
     SamplerateShort + ';' +
     IntToStr(Rating) + ';' +
     IntToStr(PlayCounter) + ';' +
-    vbrstr + ';' +
-    Lyricsstr  ;
+    Lyricsstr + ';' +
+    GainValueToString(TrackGain) + ';' +
+    GainValueToString(AlbumGain) + ';' +
+    PeakValueToString(TrackPeak) + ';' +
+    PeakValueToString(AlbumPeak) + ';' ;
 end;
 
 {

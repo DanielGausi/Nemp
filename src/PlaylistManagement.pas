@@ -6,7 +6,7 @@
 
     ---------------------------------------------------------------
     Nemp - Noch ein Mp3-Player
-    Copyright (C) 2005-2019, Daniel Gaussmann
+    Copyright (C) 2005-2020, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
     ---------------------------------------------------------------
@@ -149,6 +149,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               function CurrentPlaylistHasChanged(aPlaylist: TAudioFileList): Boolean;
               // Check whether the user wants to save the (changed) playlist before loading another one
               function UserWantAutoSave: Integer;
+
               // Prepare the loading process.
               // if the user clicks "abort" in the Dialog shown (optionally) during UserWantAutoSave,
               // then the whole process is aborted, and the "OpenDialog" for selecting a new Playlist is not shown.
@@ -431,25 +432,29 @@ function TPlaylistManager.UserWantAutoSave: Integer;
 var asknomore: Boolean;
     dlgResult: Integer;
 begin
-    if not UserInputOnPlaylistChange then
-    begin
-        if AutoSaveOnPlaylistChange then
-            result := mrYes
-        else
-            result := mrNo;
-    end
+    if AutoSaveOnPlaylistChange then
+        // AutoSave is True
+        result := mrYes
     else
     begin
-        asknomore := Not UserInputOnPlaylistChange;
-        dlgResult := MessageDlgWithNoMorebox
-              ((PlaylistManagerAutoSave_Caption),
-               Format( (PlaylistManagerAutoSave_Text), [CurrentPlaylistDescription]),
-               mtConfirmation, [mbYes, mbNo, mbCancel], mrYes, 0, asknomore,
-              (PlaylistManagerAutoSave_ShowAgain));
-        // apply User Input
-        AutoSaveOnPlaylistChange := dlgResult = mrYes;
-        UserInputOnPlaylistChange := not asknomore;
-        result := dlgResult;
+        // AutoSave is False
+        if not UserInputOnPlaylistChange then
+            // No AutoSave, no User Dialog wanted
+            result := mrNo
+        else
+        begin
+            // No AutoSave, but User Dialog *IS* wanted
+            asknomore := Not UserInputOnPlaylistChange;
+            dlgResult := MessageDlgWithNoMorebox
+                  ((PlaylistManagerAutoSave_Caption),
+                   Format( (PlaylistManagerAutoSave_Text), [CurrentPlaylistDescription]),
+                   mtConfirmation, [mbYes, mbNo, mbCancel], mrYes, 0, asknomore,
+                  (PlaylistManagerAutoSave_ShowAgain));
+            // apply User Input
+            AutoSaveOnPlaylistChange := dlgResult = mrYes;
+            UserInputOnPlaylistChange := not asknomore;
+            result := dlgResult;
+        end;
     end;
 end;
 
@@ -508,7 +513,8 @@ begin
 
             mrNo: begin
                 // User do NOT want to save the playlist.
-                // no saving, and also not saving the current position (as it doesn't make sense for a different Playlist)
+                // no saving, and also not saving the current position
+                // (as it doesn't make sense, as the playlist has changed)
                 // However, preparation is complete
                 result := True;
             end;
@@ -552,6 +558,8 @@ begin
             // The user wants to reload this playlist.
             // Bonus Feature: Try to find the currently playing song in the List of Filenames
             //     (which equals the list we will load after this), so that the playlist continues ...
+            fCurrentQuickLoadPlaylist.PlayIndex := 0;
+            fCurrentQuickLoadPlaylist.PlayPositionInTrack := 0;
             for i := 0 to fCurrentPlaylistFilenames.Count - 1 do
             begin
                 if fCurrentPlaylistFilenames[i] = aFilename then

@@ -306,10 +306,8 @@ end;
 procedure TDeleteSelection.VSTFilesGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: string);
-var //Data: PTreeData;
-    af: TAudioFile;
+var af: TAudioFile;
 begin
-    //Data:=Sender.GetNodeData(Node);
     af := Sender.GetNodeData<TAudioFile>(Node);
     case Column of
         0: cellText := af.Pfad;
@@ -355,7 +353,6 @@ end;
 
 procedure TDeleteSelection.FillTreeViews(currentData: TDeleteData);
 var i: Integer;
-
 begin
     VSTFiles.Clear;
     VSTPlaylistFiles.Clear;
@@ -367,7 +364,6 @@ begin
         VSTFiles.BeginUpdate;
         for i := 0 to currentData.Files.Count-1 do
             VSTFiles.AddChild(Nil, currentData.Files.Items[i]);
-            //AddVSTMp3(VSTFiles,Nil, currentData.Files.Items[i]);
         VSTFiles.EndUpdate;
 
         // Fill Playlist Files

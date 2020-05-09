@@ -1,6 +1,7 @@
 object ProgressForm: TProgressForm
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Nemp: Work in progress ...'
   ClientHeight = 241
   ClientWidth = 503
