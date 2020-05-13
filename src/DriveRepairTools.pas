@@ -609,7 +609,7 @@ var i: Integer;
     currentNewDrive,
     matchingDrive,
     newManagedDrive: TDrive;
-    c, currentDriveChar, LastCheckedDriveChar: Char;
+    c,  LastCheckedDriveChar: Char;
 begin
 
     // first: Reset all "oldChars" in the TDrive objects.
@@ -631,7 +631,6 @@ begin
     for i := 0 to newDrives.Count-1 do
     begin
         currentNewDrive := newDrives[i];
-        currentDriveChar := currentNewDrive.Drive[1];
 
         // 1.) Look for the new Drive in the list of already ManagedDrives
         matchingDrive := GetManagedDriveBySerialNr(currentNewDrive.SerialNr);
@@ -718,8 +717,7 @@ end;
 procedure TDriveManager.ReSynchronizeDrives;
 var i: Integer;
     currentDrive,
-    matchingDrive,
-    newManagedDrive: TDrive;
+    matchingDrive: TDrive;
     currentDriveChar, LastCheckedDriveChar: Char;
 begin
     // clear the old List of PhysicalDrives and get the current one.

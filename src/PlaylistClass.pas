@@ -136,7 +136,6 @@ type
       fOnPlaylistChangedCompletely: TPlaylistNotifyEvent;
       fOnPlaylistCleared: TPlaylistNotifyEvent;
 
-
       fDriveManager: TDriveManager;
 
       function fGetPreBookCount: Integer;
@@ -552,6 +551,9 @@ begin
             Play(fStartIndex, Player.FadingInterval, AutoPlayOnStart, PositionInTrack)
         else
             Play(fStartIndex, Player.FadingInterval, AutoPlayOnStart);
+
+        if assigned(fOnUserChangedTitle) then
+            fOnUserChangedTitle(Self)
     end;
 end;
 
@@ -2226,12 +2228,22 @@ begin
 end;
 
 procedure TNempPlaylist.ReSynchronizeDrives;
+var i: Integer;
 begin
     if TDriveManager.EnableUSBMode then
     begin
         fDriveManager.ReSynchronizeDrives;
         if fDriveManager.DrivesHaveChanged then
+            // repair the files
             fDrivemanager.RepairDriveCharsAtAudioFiles(Playlist);
+
+        // recheck file existence anyway
+        // A new drive with the "orignal" letter could have been connected right now!
+        for i := 0 to Playlist.Count-1 do
+        begin
+            if not Playlist[i].FileIsPresent then
+                Playlist[i].FileIsPresent := FileExists(Playlist[i].Pfad);
+        end;
     end;
 end;
 

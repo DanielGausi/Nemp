@@ -5,6 +5,12 @@
 *.local
 *.identcache
 *.drc
+*.log
+*.toc
+*.aux
+*.out
+*.gz
+*.yml
 /bin/Data/tag_ignore
 /bin/Data/tag_merge
 /bin/Data/Hotkeys.ini
@@ -12,7 +18,6 @@
 /bin/Data/Nemp_EQ.ini
 /bin/Data/NempWebServer.ini
 bin/Data/000-Playlist.m3u
-bin/Data/Nemp-PlayerLog.log
 bin/Data/RandomPlaylist.ini
 bin/Data/Cover/
 bin/Data/CoverCache
@@ -27,24 +32,12 @@ bin/Data/CoverCache
 /bin/Skins/NewYork
 /bin/Skins/Blue/__unused
 /bin/Skins/Dark/_Unused
-/help/nemp-help-de.synctex.gz
-/help/nemp-help-en.synctex.gz
 /src/*.stat
 /src/__history/
 /src/__recovery/
 /src/common/__history
 /src/G15App/__history
 /src/3rd Party Units/__history/
-/src-help/nemp-help-de.out
-/src-help/nemp-help-de.synctex.gz
-/src-help/nemp-help-de.toc
-/src-help/nemp-help-en.aux
-/src-help/nemp-help-en.log
-/src-help/nemp-help-en.out
-/src-help/nemp-help-en.synctex.gz
-/src-help/nemp-help-en.toc
-/src-help/nemp-help-de.aux
-/src-help/nemp-help-de.log
 /bin64
 /bin/Skins/Classic/_unused
 /src-help/_unused

@@ -44,6 +44,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
     function APIEQToPlayer(Value: Integer): Single;
     function VCLVolToPlayer: Integer;
 
+    procedure PlayerScrollIntoView;
+
     procedure SetProgressButtonPosition(aProgress: Double);
     function ProgressButtonPositionToProgress: Double;
 
@@ -183,79 +185,106 @@ begin
 end;
 
 
+///  Scroll into the PlaylistVST to the current PlayingFile.
+///  But only when it is ensured, that this automatic scrolling does not interfere
+///  with a current user interaction.
+procedure PlayerScrollIntoView;
+var aNode: PVirtualNode;
+begin
+    // if the left mouse button is held down, we will NOT scroll into the PlayingFile
+    // The user may be dragging some files now ...
+    if (GetKeyState(VK_LBUTTON) < 0) then
+        exit;
+
+    aNode := GetNodeWithAudioFile(Nemp_MainForm.PlaylistVST, NempPlaylist.PlayingFile);
+    if (Not Nemp_MainForm.Active) and (not PlaylistForm.Active) then
+        Nemp_MainForm.PlaylistVST.ScrollIntoView(aNode, False)
+    else
+    begin
+        // MainForm/PlaylistForm is the active one
+        if (not Nemp_MainForm.PlaylistVST.Focused)          // not in the treeview
+        and not (Nemp_MainForm.EditPlaylistSearch.Focused)  // not searching
+        then
+            Nemp_MainForm.PlaylistVST.ScrollIntoView(aNode, False)
+    end;
+end;
+
 procedure HandleNewConnectedDrive;
 begin
+
     // new in Nemp 4.14: Handle the Playlist as well
     // As the handling there is much simpler, we do the "RepairFiles" also in "ReSynchronizeDrives".
     // We do not need to sort something after that, or rebuild some other structures, ...
     NempPlaylist.ReSynchronizeDrives;
 
-  // main part: Fix the MediaLibrary
-  with Nemp_MainForm do
-    if MedienBib.StatusBibUpdate <> 0 then
-    begin
-        inc(NewDrivesNotificationCount);
-    end else
-    begin
-        // Starte Check
-        NewDrivesNotificationCount := 0;
+    Nemp_MainForm.PlaylistVST.Invalidate;
 
-        // ReSynchronizeDrives will return False, if no changes are necessary.
-        // This includes the case when TDriveManager.EnableUSBMode is set to "False"
-        if MedienBib.ReSynchronizeDrives then
+    // main part: Fix the MediaLibrary
+    with Nemp_MainForm do
+        if MedienBib.StatusBibUpdate <> 0 then
         begin
-              // uhoh...es gab eine Änderung. Also:
-              // Mehr Arbeit nötig - alle Dateien ändern
-              // die nötigen Infos stecken in der UsedDrive-Liste der Bib drin
+            inc(NewDrivesNotificationCount);
+        end else
+        begin
+            // Starte Check
+            NewDrivesNotificationCount := 0;
 
-              Nemp_MainForm.Enabled := False;
+            // ReSynchronizeDrives will return False, if no changes are necessary.
+            // This includes the case when TDriveManager.EnableUSBMode is set to "False"
+            if MedienBib.ReSynchronizeDrives then
+            begin
+                  // uhoh...es gab eine Änderung. Also:
+                  // Mehr Arbeit nötig - alle Dateien ändern
+                  // die nötigen Infos stecken in der UsedDrive-Liste der Bib drin
 
-              If Not assigned(FSplash) then
-                  Application.CreateForm(TFSplash, FSplash);
-              FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected);
-              FSplash.Show;
-              SetWindowPos(FSplash.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
-              FSplash.Update;
+                  Nemp_MainForm.Enabled := False;
 
-                  // Dateien reparieren
-                  MedienBib.RepairDriveCharsAtAudioFiles;
-                  MedienBib.RepairDriveCharsAtPlaylistFiles;
-
-                  FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
+                  If Not assigned(FSplash) then
+                      Application.CreateForm(TFSplash, FSplash);
+                  FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected);
+                  FSplash.Show;
+                  SetWindowPos(FSplash.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
                   FSplash.Update;
 
-                  // Anzeige aktualisieren
-                  case MedienBib.BrowseMode of
-                      0 : MedienBib.ReBuildBrowseLists;
+                      // Dateien reparieren
+                      MedienBib.RepairDriveCharsAtAudioFiles;
+                      MedienBib.RepairDriveCharsAtPlaylistFiles;
 
-                      1: begin
-                          MedienBib.ReBuildCoverList;
-                          If MedienBib.Coverlist.Count > 3 then
-                            CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
-                          else
-                            CoverScrollbar.Max := 3;
-                          CoverScrollbarChange(Nil);
+                      FSplash.StatusLBL.Caption := (SplashScreen_NewDriveConnected2);
+                      FSplash.Update;
+
+                      // Anzeige aktualisieren
+                      case MedienBib.BrowseMode of
+                          0 : MedienBib.ReBuildBrowseLists;
+
+                          1: begin
+                              MedienBib.ReBuildCoverList;
+                              If MedienBib.Coverlist.Count > 3 then
+                                CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
+                              else
+                                CoverScrollbar.Max := 3;
+                              CoverScrollbarChange(Nil);
+                          end;
+
                       end;
 
-                  end;
+                  FSplash.Close;
+                  Nemp_MainForm.Enabled := True;
+                  Nemp_MainForm.SetFocus;
+            end;
 
-              FSplash.Close;
-              Nemp_MainForm.Enabled := True;
-              Nemp_MainForm.SetFocus;
+            // Start the other tasks we may need to do after a new drive is connected to the computer
+            if Medienbib.AutoScanDirs then
+                Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
+            if Medienbib.AutoDeleteFiles then
+                Medienbib.AddStartJob(JOB_AutoScanMissingFiles, '');
+            //Finalization
+            MedienBib.AddStartJob(JOB_Finish, '');
+
+            // Start the work
+            // status should be still = 0 here, so it's save to start the jobs now
+            MedienBib.ProcessNextStartJob;
         end;
-
-        // Start the other tasks we may need to do after a new drive is connected to the computer
-        if Medienbib.AutoScanDirs then
-            Medienbib.AddStartJob(JOB_AutoScanNewFiles, '');
-        if Medienbib.AutoDeleteFiles then
-            Medienbib.AddStartJob(JOB_AutoScanMissingFiles, '');
-        //Finalization
-        MedienBib.AddStartJob(JOB_Finish, '');
-
-        // Start the work
-        // status should be still = 0 here, so it's save to start the jobs now
-        MedienBib.ProcessNextStartJob;
-    end;
 end;
 
 

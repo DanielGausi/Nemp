@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Nemp - Noch ein MP3-Player"
-#define MyAppVersion "4.13.0"
+#define MyAppVersion "4.14.0"
 #define MyAppPublisher "Daniel Gauﬂmann"
 #define MyAppURL "http://www.gausi.de"
 #define MyAppExeName "nemp.exe"
@@ -32,6 +32,11 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 
+[InstallDelete]
+Type: files; Name: "{app}\UseLocalData.cfg"
+Type: files; Name: "{app}\DONT_UseLocalData.cfg"
+
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"; LicenseFile: "licence_DE.txt"
@@ -41,7 +46,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "bin\nemp.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "bin\UseLocalData.cfg"; DestDir: "{app}"; DestName:"UseLocalData.cfg"; Check: IsModeSelected(1)
+Source: "bin\UseLocalData.cfg"; DestDir: "{app}"; DestName:"DONT_UseLocalData.cfg"; Check: IsModeSelected(0)
+Source: "bin\*"; Excludes: "UseLocalData.cfg"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -50,6 +57,51 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+var
+  UsagePage: TInputOptionWizardPage;
+  UsagePageID: Integer; 
+
+function IsModeSelected(Mode: Integer): Boolean;
+begin
+  Result := (UsagePage.SelectedValueIndex = Mode);
+end;
+
+function NextButtonClick(apage: Integer): boolean;
+begin
+  if  aPage=wpSelectDir then 
+  begin     
+    if (pos(ExpandConstant('{autopf}'), WizardDirValue) = 1) then  
+      UsagePage.SelectedValueIndex := 0       
+    else
+      UsagePage.SelectedValueIndex := 1; 
+  end;    
+  result := True;
+end;
+
+procedure InitializeWizard();
+begin 
+  UsagePage :=
+    CreateInputOptionPage(
+      wpSelectDir, 'Installationsart ausw‰hlen', 'Select Installation Mode', '', True, False);
+  UsagePage.Add('Install in Programme');
+  UsagePage.Add('Install in Lokal');
+  UsagePageID := UsagePage.ID;
+end;
+
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+    result := False;
+    if PageID = UsagePageID then
+    begin
+        if (pos(ExpandConstant('{autopf}'), WizardDirValue) = 1) then
+        begin
+            UsagePage.SelectedValueIndex := 0
+            result := true;
+        end;
+    end;
+end;	        
 
 [UninstallDelete]
 Type: files; Name: "{userappdata}\Gausi\Nemp\Nemp.ini"

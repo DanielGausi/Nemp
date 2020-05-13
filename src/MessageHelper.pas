@@ -1557,6 +1557,7 @@ begin
                       case NempPlaylist.WiedergabeMode of
                           0,2: begin
                                   NempPlaylist.PlayNext;
+                                  PlayerScrollIntoView;
                           end;
                           1: NempPlaylist.PlayAgain;
                           3: begin
@@ -1565,6 +1566,7 @@ begin
                               then
                               begin
                                   NempPlaylist.PlayNext;
+                                  PlayerScrollIntoView;
                               end
                               else
                               begin

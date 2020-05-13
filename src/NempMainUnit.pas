@@ -2248,8 +2248,8 @@ begin
                   aCover.ID := newID;
           end;
 
-          bmp.Height := TCoverArtSearcher.CoverSize; // pic.Graphic.Height;
-          bmp.Width := TCoverArtSearcher.CoverSize; // pic.Graphic.Width;
+          bmp.Height := TCoverArtSearcher.CoverSize;
+          bmp.Width := TCoverArtSearcher.CoverSize;
           FitBitmapIn(bmp, pic.Graphic);
 
           Medienbib.NewCoverFlow.SetPreview (msg.Index, bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
@@ -5231,11 +5231,6 @@ begin
     baseLeft := 8;
     currentLeft := baseleft;
 
-    //if NempOptions.AllowQuickAccessToMetadata then
-    //    VDTCover.PopupMenu := PopupEditExtendedTags;
-    //else
-    //    VDTCover.PopupMenu := Nil;
-
     if assigned(aAudioFile) then
     begin
         case aAudioFile.AudioType of
@@ -5268,8 +5263,8 @@ begin
                             newLabel.StyleElements :=  [seClient, seBorder];
                         end;
 
-                        newWidth := newLabel.Width;   //newLabel.Canvas.TextWidth(tmpTagList[i]);
-                        newHeight:= newLabel.Height;  //newLabel.Canvas.TextHeight(tmpTagList[i]);
+                        newWidth := newLabel.Width;
+                        newHeight:= newLabel.Height;
 
                         if currentLeft + newWidth < DetailID3TagPanel.Width then
                         begin

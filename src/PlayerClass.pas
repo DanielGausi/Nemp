@@ -3023,6 +3023,8 @@ function TNempPlayer.GetActiveCue: TAudioFile;
 begin
   if assigned(MainAudioFile) AND assigned(MainAudioFile.CueList) AND ((MainAudioFile.CueList).Count > 0) then
       result := MainAudioFile.CueList[GetActiveCueIndex]
+  else
+      result := Nil;
 end;
 
 // jump to next/previous cue.
