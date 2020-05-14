@@ -5967,7 +5967,7 @@ begin
 end;
 
 procedure TMedienBibliothek.ProcessLoadedPlaylists;
-var FileCount, i, currentDriveID: Integer;
+var i, currentDriveID: Integer;
     CurrentDriveChar: WideChar;
     jas: TJustaString;
 
