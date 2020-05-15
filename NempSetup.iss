@@ -38,8 +38,8 @@ Type: files; Name: "{app}\DONT_UseLocalData.cfg"
 
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "german"; MessagesFile: "compiler:Languages\German.isl"; LicenseFile: "licence_DE.txt"
+Name: "english"; MessagesFile: "compiler:Default.isl,nemp_en.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl,nemp_ger.isl"; LicenseFile: "licence_DE.txt"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -72,7 +72,7 @@ function NextButtonClick(apage: Integer): boolean;
 begin
   if  aPage=wpSelectDir then 
   begin     
-    if (pos(ExpandConstant('{autopf}'), WizardDirValue) = 1) then  
+    if (pos(ExpandConstant('{commonpf}'), WizardDirValue) = 1) then  
       UsagePage.SelectedValueIndex := 0       
     else
       UsagePage.SelectedValueIndex := 1; 
@@ -84,9 +84,9 @@ procedure InitializeWizard();
 begin 
   UsagePage :=
     CreateInputOptionPage(
-      wpSelectDir, 'Installationsart auswählen', 'Select Installation Mode', '', True, False);
-  UsagePage.Add('Install in Programme');
-  UsagePage.Add('Install in Lokal');
+      wpSelectDir, CustomMessage('InstallMode'), CustomMessage('InstallModeHint'), CustomMessage('InstallModeSubCaption'), True, False);
+  UsagePage.Add(CustomMessage('DontUseLocalData'));
+  UsagePage.Add(CustomMessage('UseLocalData'));
   UsagePageID := UsagePage.ID;
 end;
 
@@ -95,7 +95,7 @@ begin
     result := False;
     if PageID = UsagePageID then
     begin
-        if (pos(ExpandConstant('{autopf}'), WizardDirValue) = 1) then
+        if (pos(ExpandConstant('{commonpf}'), WizardDirValue) = 1) then
         begin
             UsagePage.SelectedValueIndex := 0
             result := true;
