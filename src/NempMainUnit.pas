@@ -613,7 +613,6 @@ type
     N19: TMenuItem;
     PM_PLM_EditFavourites: TMenuItem;
     PM_PLM_Default: TMenuItem;
-    N28: TMenuItem;
     PM_PL_SaveAsPlaylist: TMenuItem;
     MM_PL_SaveAsPlaylist: TMenuItem;
 
@@ -10286,36 +10285,25 @@ procedure TNemp_MainForm.LoadARecentPlaylist(Sender: TObject);
 var idx: integer;
     restart: Boolean;
 begin
-  idx := (Sender as TMenuItem).Tag;
+    idx := (Sender as TMenuItem).Tag;
 
-  if NempPlaylist.PlaylistManager.PreparePlaylistLoading(
-                  idx,
-                  NempPlaylist.Playlist,
-                  NempPlaylist.PlayingIndex,
-                  Round(NempPlaylist.PlayingTrackPos) )
-  then
-  begin
-      if (idx >= 0) and (idx < NempPlaylist.PlaylistManager.RecentPlaylists.Count) then
-      begin
-
-          if FileExists(NempPlaylist.PlaylistManager.RecentPlaylists[idx]) then
-          begin
-             restart := NempPlayer.Status = Player_ISPLAYING;
-             NempPlaylist.ClearPlaylist;
-             NempPlaylist.PlaylistManager.Reset;
-             NempPlaylist.LoadFromFile(NempPlaylist.PlaylistManager.RecentPlaylists[idx]);
-             If restart then
-             begin
-                NempPlayer.LastUserWish := USER_WANT_PLAY;
-                NempPlaylist.Play(0,0, True);
-             end
-          end else
-          begin
-              if TranslateMessageDLG((Playlist_FileNotFound), mtWarning, [MBYES, MBNO, MBABORT], 0) = mrYes then
-                  NempPlaylist.PlaylistManager.DeleteRecentPlaylist(idx);
-          end;
-      end;
-  end;
+    if NempPlaylist.PlaylistManager.PrepareRecentPlaylistLoading(
+                    idx,
+                    NempPlaylist.Playlist,
+                    NempPlaylist.PlayingIndex,
+                    Round(NempPlaylist.PlayingTrackPos) )
+    then
+    begin
+        restart := NempPlayer.Status = Player_ISPLAYING;
+        NempPlaylist.ClearPlaylist;
+        NempPlaylist.PlaylistManager.Reset;
+        NempPlaylist.LoadFromFile(NempPlaylist.PlaylistManager.RecentPlaylists[idx]);
+        if restart then
+        begin
+          NempPlayer.LastUserWish := USER_WANT_PLAY;
+          NempPlaylist.Play(0,0, True);
+        end
+    end;
 end;
 
 
@@ -10349,24 +10337,24 @@ begin
         aMenuItem.Caption := IntToStr(i) + ' - ' + FileList[i];
         aMenuItem.Tag := i;
         PM_PLM_RecentPlaylists.Add(aMenuItem);
+    end;
 
-        if PM_PL_RecentPlaylists.Count = 0 then
-        begin
-            aMenuItem := TMenuItem.Create(Nemp_MainForm);
-            aMenuItem.Caption := (Playlist_NoRecentlists);
-            aMenuItem.Enabled := False;
-            MM_PL_RecentPlaylists.Add(aMenuItem);
+    if PM_PL_RecentPlaylists.Count = 0 then
+    begin
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.Caption := (Playlist_NoRecentlists);
+        aMenuItem.Enabled := False;
+        MM_PL_RecentPlaylists.Add(aMenuItem);
 
-            aMenuItem := TMenuItem.Create(Nemp_MainForm);
-            aMenuItem.Caption := (Playlist_NoRecentlists);
-            aMenuItem.Enabled := False;
-            PM_PL_RecentPlaylists.Add(aMenuItem);
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.Caption := (Playlist_NoRecentlists);
+        aMenuItem.Enabled := False;
+        PM_PL_RecentPlaylists.Add(aMenuItem);
 
-            aMenuItem := TMenuItem.Create(Nemp_MainForm);
-            aMenuItem.Caption := (Playlist_NoRecentlists);
-            aMenuItem.Enabled := False;
-            PM_PLM_RecentPlaylists.Add(aMenuItem);
-        end;
+        aMenuItem := TMenuItem.Create(Nemp_MainForm);
+        aMenuItem.Caption := (Playlist_NoRecentlists);
+        aMenuItem.Enabled := False;
+        PM_PLM_RecentPlaylists.Add(aMenuItem);
     end;
 end;
 
@@ -10378,8 +10366,11 @@ begin
     ///  Do not use PlaylistManagerPopup.Items.Clear; here,
     ///  as we want some of the menu items to be fixed
     ///  It's maybe not the fastest way, but we don't have THAT many Items anyway
-    while PlaylistManagerPopup.Items.Count > 8 do
-        PlaylistManagerPopup.Items.Delete(2);
+    for i := PlaylistManagerPopup.Items.Count - 1 downto 0 do
+    begin
+        if PlaylistManagerPopup.Items[i].Tag <> -1 then
+            PlaylistManagerPopup.Items.Delete(i);
+    end;
 
     aList := NempPlaylist.PlaylistManager.QuickLoadPlaylists;
 
@@ -10390,12 +10381,12 @@ begin
         aMenuItem.Tag := i;
         aMenuItem.RadioItem := True;
         aMenuItem.OnClick := PM_PLM_LoadFavoritePlaylistClick;
+        PlaylistManagerPopup.Items.Insert(i+1, aMenuItem);
         if NempPlaylist.PlaylistManager.CurrentIndex = i then
         begin
             aMenuItem.Default := True;
             aMenuItem.Checked := True;
         end;
-        PlaylistManagerPopup.Items.Insert(i+2, aMenuItem);
     end;
 
     if NempPlaylist.PlaylistManager.CurrentIndex = -1 then
@@ -10412,19 +10403,19 @@ procedure TNemp_MainForm.PlaylistManagerPopupPopup(Sender: TObject);
 var i: Integer;
     EnableElements: Boolean;
 begin
+    EnableElements := Not NempSkin.NempPartyMode.Active;
+    for i := 0 to PlaylistManagerPopup.Items.Count - 1 do
+        PlaylistManagerPopup.Items[i].Enabled := EnableElements;
+
     if NempPlaylist.PlaylistManager.CurrentIndex >= 0 then
     begin
         PM_PLM_SaveAsExistingFavorite.Caption := Format(MainForm_SavePlaylistAsExistingFavorite, [NempPlaylist.PlaylistManager.CurrentPlaylistDescription]);
-        PM_PLM_SaveAsExistingFavorite.Enabled := True;
+        PM_PLM_SaveAsExistingFavorite.Enabled := EnableElements;
     end else
     begin
         PM_PLM_SaveAsExistingFavorite.Caption := MainForm_SavePlaylistNotAvailable;
         PM_PLM_SaveAsExistingFavorite.Enabled := False;
     end;
-
-    EnableElements := Not NempSkin.NempPartyMode.Active;
-    for i := 0 to PlaylistManagerPopup.Items.Count - 1 do
-        PlaylistManagerPopup.Items[i].Enabled := EnableElements;
 end;
 
 procedure TNemp_MainForm.PM_PLM_SaveAsExistingFavoriteClick(Sender: TObject);
@@ -10455,6 +10446,7 @@ begin
             NewFavoritePlaylistForm.edit_PlaylistDescription.Text,
             NewFavoritePlaylistForm.edit_PlaylistFilename.Text,
             NempPlaylist.Playlist, False);
+
         NempPlaylist.PlaylistManager.SwitchToPlaylist(newFav);
 
         // Refresh the Header - show a new Playlist Description in it

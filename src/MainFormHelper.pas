@@ -509,13 +509,25 @@ procedure SetTabStopsTabs;
 begin
     with Nemp_MainForm do
     begin
+        // the 3 menu buttons
+        TabBtn_Preselection .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Playlist     .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Medialib     .TabStop := NempOptions.TabStopAtTabs;
+        // browse-section
         TabBtn_Browse   .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_CoverFlow.TabStop := NempOptions.TabStopAtTabs;
         TabBtn_TagCloud .TabStop := NempOptions.TabStopAtTabs;
+        // playlist
+        TabBtn_Favorites.TabStop := NempOptions.TabStopAtTabs;
+        // media list
+        TabBtn_Marker   .TabStop := NempOptions.TabStopAtTabs;
+        // file details
         TabBtn_Cover    .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_Lyrics   .TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_Equalizer.TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_MainPlayerControl  .TabStop := NempOptions.TabStopAtTabs;
+        // player
+        TabBtn_Equalizer        .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_Headset          .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_MainPlayerControl.TabStop := NempOptions.TabStopAtTabs;
     end;
 end;
 

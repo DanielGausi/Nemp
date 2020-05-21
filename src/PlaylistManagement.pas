@@ -143,6 +143,7 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               // Check, whether the PlaylistFile (*.npl) to a given Index exists
               // (should always be the case, unless the user fiddled in the Data-Directory
               function PlaylistFileExists(aIndex: Integer): Boolean;
+              function RecentPlaylistFileExists(aIndex: Integer): Boolean;
               // Initialise a list of filenames of the currently loaded playlist.
               // This list is used to check for changes before the user loads another playlist
               procedure InitPlaylistFilenames;
@@ -153,6 +154,8 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               // Prepare the loading process.
               // if the user clicks "abort" in the Dialog shown (optionally) during UserWantAutoSave,
               // then the whole process is aborted, and the "OpenDialog" for selecting a new Playlist is not shown.
+              function CheckSaveSettings(aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
+              function PrepareRecentPlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
               function PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
               function PrepareSamePlaylistLoading(aOldPlaylist: TAudioFileList; aFilename: String; aTrackPos: Integer): Boolean;
 
@@ -476,24 +479,22 @@ begin
             result := false;
     end;
 end;
-
-
-///  PreparePlaylistLoading
-///  -------------------------
-///  Called before loading a new playlist (and clearing the current one)
-///  Return Value:
-///   * True: Preparation complete, Loading the new playlist should be ok
-///   * False: The User aborted the MesseagDlg whether the current playlist
-///            should be saved or discarded. Do not proceed loading
-function TPlaylistManager.PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
+function TPlaylistManager.RecentPlaylistFileExists(aIndex: Integer): Boolean;
 begin
-    if not PlaylistFileExists(newPlaylistIndex) then
-    begin
-        TranslateMessageDLG((PlaylistManager_PlaylistNoFound), mtWarning, [MBOK], 0);
-        result := False;
-        exit;
-    end;
+    if (aIndex >= 0) and (aIndex < RecentPlaylists.Count) then
+        result := FileExists(RecentPlaylists[aIndex])
+    else
+        // Index is Out of Range
+        result := false;
+end;
 
+
+///  CheckSaveSettings
+///  -------------------------
+///  Sub-procedure of the following Prepare*PlaylistLoading
+///
+function TPlaylistManager.CheckSaveSettings(aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
+begin
     if not CurrentPlaylistHasChanged(aOldPlaylist) then
     begin
         // Current playlist has not changed
@@ -528,6 +529,39 @@ begin
     end;
 end;
 
+///  PrepareRecentPlaylistLoading
+///  -------------------------
+///  Called before loading a new *recent* playlist (and clearing the current one)
+///  Return Value:
+///   * True: Preparation complete, Loading the new playlist should be ok
+///   * False: The User aborted the MesseagDlg whether the current playlist
+///            should be saved or discarded. Do not proceed loading
+function TPlaylistManager.PrepareRecentPlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
+begin
+    if not RecentPlaylistFileExists(newPlaylistIndex) then
+    begin
+        if TranslateMessageDLG((Playlist_FileNotFound), mtWarning, [MBYES, MBNO, MBABORT], 0) = mrYes then
+            DeleteRecentPlaylist(newPlaylistIndex);
+        result := false;
+        exit;
+    end;
+    result := CheckSaveSettings(aOldPlaylist, aIndex, aTrackPos);
+end;
+
+///  PreparePlaylistLoading
+///  -------------------------
+///  Called before loading a new *favorite* playlist (and clearing the current one)
+///  Return Value: same as in PrepareRecentPlaylistLoading
+function TPlaylistManager.PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
+begin
+    if not PlaylistFileExists(newPlaylistIndex) then
+    begin
+        TranslateMessageDLG((PlaylistManager_PlaylistNoFound), mtWarning, [MBOK], 0);
+        result := False;
+        exit;
+    end;
+    result := CheckSaveSettings(aOldPlaylist, aIndex, aTrackPos);
+end;
 
 ///  PrepareSamePlaylistLoading
 ///  ---------------------------------
@@ -574,7 +608,6 @@ begin
         end else
             result := False;
     end;
-
 end;
 
 ///  Reset
@@ -588,7 +621,6 @@ begin
     if assigned(fOnReset) then
         fOnReset(self);
 end;
-
 
 ///  LoadPlaylist
 ///  ------------
@@ -715,8 +747,8 @@ begin
     SavePlaylist(newQuickLoadPlaylist, aSource, False);
 
     // after that: GUI should be renewed (unless SwitchToPlaylist is called right after)
-    if RefreshGUI and assigned(fOnFavouritePlaylistChange) then
-        fOnFavouritePlaylistChange(Self);
+    if RefreshGUI and assigned(OnFavouritePlaylistChange) then
+        OnFavouritePlaylistChange(Self);
 end;
 ///  SwitchToPlaylist
 ///  -----------------------
@@ -727,8 +759,8 @@ begin
     fCurrentQuickLoadPlaylist := aQuickLoadPlaylist;
 
     // after that: GUI should be renewed:
-    if assigned(fOnFavouritePlaylistChange) then
-        fOnFavouritePlaylistChange(Self);
+    if assigned(OnFavouritePlaylistChange) then
+        OnFavouritePlaylistChange(Self);
 end;
 
 ///  DeletePlaylist

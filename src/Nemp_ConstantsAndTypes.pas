@@ -2569,7 +2569,7 @@ begin
         RegisterMediaHotkeys := ini.ReadBool('Allgemein', 'RegisterMediaHotkeys', True);
         IgnoreVolumeUpDownKeys  := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
-        TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', False);
+        TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', True);
 
         DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', 'NempG15App.exe');
         UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', false);

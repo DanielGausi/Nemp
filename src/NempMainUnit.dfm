@@ -628,7 +628,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvRaised
             BevelOuter = bvLowered
             PopupMenu = PlayListPOPUP
-            TabOrder = 1
+            TabOrder = 3
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -655,7 +655,7 @@ object Nemp_MainForm: TNemp_MainForm
             Hint = 'Show context menu'
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 2
+            TabOrder = 0
             TabStop = False
             OnClick = TabPanelPlaylistClick
             DrawMode = dm_Skin
@@ -679,7 +679,7 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
-            TabOrder = 0
+            TabOrder = 2
             Text = 'Search'
             OnEnter = EditPlaylistSearchEnter
             OnExit = EditPlaylistSearchExit
@@ -692,7 +692,8 @@ object Nemp_MainForm: TNemp_MainForm
             Width = 24
             Height = 24
             Hint = 'Favorite playlists'
-            TabOrder = 3
+            TabOrder = 1
+            TabStop = False
             OnClick = TabBtn_FavoritesClick
             DrawMode = dm_Skin
             NumGlyphsX = 5
@@ -770,7 +771,7 @@ object Nemp_MainForm: TNemp_MainForm
             Font.Style = []
             ParentFont = False
             PopupMenu = QuickSearchHistory_PopupMenu
-            TabOrder = 0
+            TabOrder = 2
             OnEnter = EDITFastSearchEnter
             OnExit = EDITFastSearchExit
             OnKeyPress = EDITFastSearchKeyPress
@@ -785,7 +786,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvRaised
             BevelOuter = bvLowered
             PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 1
+            TabOrder = 3
             OnPaint = TABPanelPaint
             OwnerDraw = False
             DesignSize = (
@@ -812,7 +813,7 @@ object Nemp_MainForm: TNemp_MainForm
             Hint = 'Show context menu'
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 2
+            TabOrder = 0
             TabStop = False
             OnClick = TabPanelMedienlisteClick
             DrawMode = dm_Skin
@@ -831,7 +832,7 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 24
             ParentShowHint = False
             ShowHint = True
-            TabOrder = 3
+            TabOrder = 1
             TabStop = False
             OnClick = TabBtn_MarkerClick
             OnKeyPress = TabBtn_MarkerKeyPress
@@ -1269,7 +1270,7 @@ object Nemp_MainForm: TNemp_MainForm
             BevelInner = bvRaised
             BevelOuter = bvLowered
             PopupMenu = Medialist_View_PopupMenu
-            TabOrder = 0
+            TabOrder = 2
             StyleElements = [seClient, seBorder]
             OnPaint = TABPanelPaint
             OwnerDraw = False
@@ -1292,7 +1293,7 @@ object Nemp_MainForm: TNemp_MainForm
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
-            TabOrder = 1
+            TabOrder = 0
             OnClick = PlayerTabsClick
             OnMouseMove = TabBtn_CoverMouseMove
             DrawMode = dm_Skin
@@ -1314,7 +1315,7 @@ object Nemp_MainForm: TNemp_MainForm
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
-            TabOrder = 2
+            TabOrder = 1
             OnClick = PlayerTabsClick
             OnMouseMove = TabBtn_CoverMouseMove
             DrawMode = dm_Windows
@@ -1797,7 +1798,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 0
+          TabOrder = 1
           OnPaint = ControlPanelPaint
           OwnerDraw = False
           object CoverImage: TImage
@@ -1824,9 +1825,10 @@ object Nemp_MainForm: TNemp_MainForm
           BevelInner = bvRaised
           BevelOuter = bvLowered
           PopupMenu = PlayListPOPUP
-          TabOrder = 2
+          TabOrder = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
+          ExplicitTop = 4
           object TabBtn_MainPlayerControl: TSkinButton
             Tag = 4
             Left = 8
@@ -1903,7 +1905,7 @@ object Nemp_MainForm: TNemp_MainForm
           Align = alLeft
           BevelInner = bvRaised
           BevelOuter = bvLowered
-          TabOrder = 1
+          TabOrder = 2
           OnClick = PlayerControlPanelClick
           OnDragOver = GRPBOXControlDragOver
           OnPaint = ControlPanelPaint
@@ -3385,8 +3387,8 @@ object Nemp_MainForm: TNemp_MainForm
   end
   object MenuImages: TImageList
     ShareImages = True
-    Left = 32
-    Top = 248
+    Left = 24
+    Top = 280
     Bitmap = {
       494C01012A00300B040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000040000000B0000000010020000000000000B0
@@ -6749,27 +6751,30 @@ object Nemp_MainForm: TNemp_MainForm
       RadioItem = True
       OnClick = PM_PLM_SwitchToDefaultPlaylistClick
     end
-    object N28: TMenuItem
-      Caption = '-'
-    end
     object N19: TMenuItem
+      Tag = -1
       Caption = '-'
     end
     object PM_PLM_SaveAsExistingFavorite: TMenuItem
+      Tag = -1
       Caption = 'Save playlist ""'
       OnClick = PM_PLM_SaveAsExistingFavoriteClick
     end
     object PM_PLM_SaveAsNewFavorite: TMenuItem
+      Tag = -1
       Caption = 'Save current playlist as new favorite'
       OnClick = PM_PLM_SaveAsNewFavoriteClick
     end
     object N10: TMenuItem
+      Tag = -1
       Caption = '-'
     end
     object PM_PLM_RecentPlaylists: TMenuItem
+      Tag = -1
       Caption = 'Recent playlists'
     end
     object PM_PLM_EditFavourites: TMenuItem
+      Tag = -1
       Caption = 'Edit favorites'
       OnClick = PM_PLM_EditFavouritesClick
     end

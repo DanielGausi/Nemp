@@ -80,8 +80,8 @@ begin
             and (not FileExists(NempPlayList.PlaylistManager.UserSavePath + aFilename));
 
     PlaylistInfoOK := NempPlaylist.PlaylistManager.PlaylistExist(
-        edit_PlaylistDescription.Text,
-        edit_PlaylistFilename.Text);
+        trim(edit_PlaylistDescription.Text),
+        trim(edit_PlaylistFilename.Text)  );
 
     if (PlaylistInfoOK = PLAYLIST_MANAGER_OK) and FileOK then
     begin
@@ -139,7 +139,7 @@ var s: String;
 begin
     if cb_AutoCreateFilename.Checked then
     begin
-        s := ConvertToFileName(edit_PlaylistDescription.Text);
+        s := ConvertToFileName(trim(edit_PlaylistDescription.Text));
 
         edit_PlaylistFilename.OnChange := Nil;
         edit_PlaylistFilename.Text := s + '.npl';

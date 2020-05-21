@@ -1086,7 +1086,7 @@ PlaylistManager_ReloadPlaylist = 'The current playlist "%s" has been changed sin
 //PlaylistManager_SwitchToDefaultPlaylist = 'The current playlist "%s" has been changed since it has been saved. ' +#13#10 + #13#10
 //                                 + 'Do you want to save it now and switch to the default playlist?';
 
-PlaylistManager_PlaylistNoFound = 'The playlist file does not exist.';
+PlaylistManager_PlaylistNoFound = 'The playlist file could not be found.';
 
 PlaylistManager_DeleteFavorite = 'This will delete the playlist "%s" from your favorites. This cannot be undone.' +#13#10 + #13#10
                                 + 'Are you sure you want to delete the list?';

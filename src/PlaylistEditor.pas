@@ -370,7 +370,7 @@ procedure TPlaylistEditorForm.PlaylistSelectionVSTFocusChanging(
   NewColumn: TColumnIndex; var Allowed: Boolean);
 begin
     Allowed := True; // default
-    if currentPlaylistChanged then
+    if currentPlaylistChanged and (OldNode <> NewNode) then
     begin
         // ToDo: Ask User to Save/Discard changes
          if  assigned(currentQuickPlaylist) then
@@ -896,8 +896,8 @@ begin
 
         // create a new FavoritePlaylist and add it to the Nemp PlaylistManager
         newQuickLoadPlaylist := NempPlaylist.PlaylistManager.AddNewPlaylist(
-            NewFavoritePlaylistForm.edit_PlaylistDescription.Text,
-            NewFavoritePlaylistForm.edit_PlaylistFilename.Text,
+            trim(NewFavoritePlaylistForm.edit_PlaylistDescription.Text),
+            trim(NewFavoritePlaylistForm.edit_PlaylistFilename.Text),
             EditorPlaylist, True);
 
         // add the same to the editor

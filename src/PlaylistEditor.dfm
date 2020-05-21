@@ -169,7 +169,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Hint = 'Save current playlist'
       Anchors = [akLeft, akBottom]
       Caption = 'Save'
-      TabOrder = 1
+      TabOrder = 3
       OnClick = PM_PL_SaveClick
     end
     object BtnImport: TButton
@@ -193,7 +193,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Hint = 'Add files to the current playlist'
       Anchors = [akLeft, akBottom]
       Caption = 'Add'
-      TabOrder = 3
+      TabOrder = 1
       OnClick = PM_PL_AddFilesClick
     end
   end
