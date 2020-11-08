@@ -36,8 +36,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Mp3FileUtils, id3v2Frames, ExtDlgs, JPEG,
-  PNGImage, gnuGettext,  CoverHelper, AudioFiles, M4aAtoms,
+  Dialogs, StdCtrls, ExtCtrls,  id3v2Frames, ExtDlgs, JPEG,
+  PNGImage, gnuGettext,  CoverHelper,  M4aAtoms,
   Nemp_RessourceStrings, System.UITypes;
 
 type
@@ -98,7 +98,8 @@ const picKeys: Array [0..20] of String =
 
 implementation
 
-uses Details;
+uses Details, AudioFiles.Base, AudioFiles.Declarations, Mp3Files, FlacFiles,
+  M4AFiles, BaseApeFiles;
 
 {$R *.dfm}
 
@@ -125,7 +126,7 @@ end;
 function TFNewPicture.CheckDescription:boolean;
 begin
     case FDetails.CurrentTagObject.FileType of
-        at_mp3: result := FDetails.CurrentTagObject.MP3File.ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
+        at_mp3: result := TMP3File(FDetails.CurrentTagObject).ID3v2Tag.ValidNewPictureFrame(EdtPictureDescription.Text);
         at_Flac: result := True;
         at_M4a: result := True;
         at_Monkey,
@@ -199,23 +200,23 @@ begin
           end;
 
           case FDetails.CurrentTagObject.FileType of
-              at_mp3: FDetails.CurrentTagObject.Mp3File.ID3v2Tag.SetPicture(mime,
+              at_mp3: TMp3File(FDetails.CurrentTagObject).ID3v2Tag.SetPicture(mime,
                                        cbPicturetype.Itemindex,
                                        EdtPictureDescription.Text,
                                        str);
 
-              at_Flac: FDetails.CurrentTagObject.FlacFile.AddPicture(str,
+              at_Flac: TFlacFile(FDetails.CurrentTagObject).AddPicture(str,
                                        cbPicturetype.Itemindex,
                                        mime,
                                        EdtPictureDescription.Text);
 
-              at_M4a: FDetails.CurrentTagObject.M4aFile.SetPicture(str, m4aPictype);
+              at_M4a: TM4aFile(FDetails.CurrentTagObject).SetPicture(str, m4aPictype);
 
               at_Monkey,
               at_WavPack,
               at_MusePack,
               at_OptimFrog,
-              at_TrueAudio: FDetails.CurrentTagObject.BaseApeFile.SetPicture(
+              at_TrueAudio: TBaseApeFile(FDetails.CurrentTagObject).ApeTag.SetPicture(
                                       AnsiString(cbPictureType.Text),
                                       EdtPictureDescription.Text,
                                       str) ;

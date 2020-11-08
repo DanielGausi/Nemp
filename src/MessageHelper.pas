@@ -66,7 +66,8 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, NempAPI, NempAudioFiles, Details,
     DriveRepairTools, ShutDown, Spectrum_Vis, PlayerClass, BirthdayShow,
     SearchTool, MMSystem, BibHelper, fspTaskbarMgr, CloudEditor,
     DeleteSelect, GnuGetText, MedienbibliothekClass, PlayerLog,
-    PostProcessorUtils, ProgressUnit, EffectsAndEqualizer;
+    PostProcessorUtils, ProgressUnit, EffectsAndEqualizer,
+    AudioDisplayUtils;
 
 var NEMP_API_InfoString: Array[0..500] of AnsiChar;
     NEMP_API_InfoStringW: Array[0..500] of WideChar;
@@ -175,9 +176,9 @@ begin
                     else
                     begin
                       case aMsg.WParam of
-                        IPC_MODE_SAMPLERATE : aMsg.Result := Nemp_Samplerates_Int[NempPlaylist.PlayingFile.SamplerateInt];
+                        IPC_MODE_SAMPLERATE : aMsg.Result := Nemp_Samplerates_Int[NempPlaylist.PlayingFile.SampleRateIdx];
                         IPC_MODE_BITRATE    : aMsg.Result := NempPlaylist.PlayingFile.Bitrate;
-                        IPC_MODE_CHANNELS   : aMsg.Result := Nemp_Modes_Int[NempPlaylist.PlayingFile.ChannelModeInt];
+                        IPC_MODE_CHANNELS   : aMsg.Result := Nemp_Modes_Int[NempPlaylist.PlayingFile.ChannelModeIdx];
                       else aMsg.Result := -1;
                       end;
                     end;
@@ -248,7 +249,7 @@ begin
                             begin
                                 case aMsg.WParam of
                                     IPC_CF_FILENAME : resultString := AnsiString(NempPlayer.MainAudioFile.Pfad);
-                                    IPC_CF_TITLE    : resultString := AnsiString(NempPlayer.MainAudioFile.PlaylistTitle);
+                                    IPC_CF_TITLE    : resultString := AnsiString(NempDisplay.PlaylistTitle(NempPlayer.MainAudioFile));
                                     IPC_CF_ARTIST   : resultString := AnsiString(NempPlayer.MainAudioFile.Artist);
                                     IPC_CF_TITLEONLY: resultString := AnsiString(NempPlayer.MainAudioFile.Titel);
                                     IPC_CF_ALBUM    : resultString := AnsiString(NempPlayer.MainAudioFile.Album);
@@ -272,7 +273,7 @@ begin
                             begin
                                 case aMsg.WParam of
                                     IPC_CF_FILENAME : resultStringW := NempPlayer.MainAudioFile.Pfad;
-                                    IPC_CF_TITLE    : resultStringW := NempPlayer.MainAudioFile.PlaylistTitle;
+                                    IPC_CF_TITLE    : resultStringW := NempDisplay.PlaylistTitle(NempPlayer.MainAudioFile);
                                     IPC_CF_ARTIST   : resultStringW := NempPlayer.MainAudioFile.Artist;
                                     IPC_CF_TITLEONLY: resultStringW := NempPlayer.MainAudioFile.Titel;
                                     IPC_CF_ALBUM    : resultStringW := NempPlayer.MainAudioFile.Album;
@@ -324,7 +325,7 @@ begin
                                 IPC_GETSEARCHLISTFILE: resultString := AnsiString(aAudiofile.Pfad);  // Ja.
 
                                 IPC_GETPLAYLISTTITLE,
-                                IPC_GETSEARCHLISTTITLE: resultString := AnsiString(aAudioFile.PlaylistTitle) ;// Ja.
+                                IPC_GETSEARCHLISTTITLE: resultString := AnsiString(NempDisplay.PlaylistTitle(aAudioFile)) ;// Ja.
 
                                 IPC_GETPLAYLISTARTIST,
                                 IPC_GETSEARCHLISTARTIST: begin if aAudioFile.isStream then
@@ -400,7 +401,7 @@ begin
                                 IPC_GETSEARCHLISTFILE_W: resultStringW := aAudiofile.Pfad;  // Ja.
 
                                 IPC_GETPLAYLISTTITLE_W,
-                                IPC_GETSEARCHLISTTITLE_W: resultStringW := aAudioFile.PlaylistTitle; // Ja.
+                                IPC_GETSEARCHLISTTITLE_W: resultStringW := NempDisplay.PlaylistTitle(aAudioFile); // Ja.
 
                                 IPC_GETPLAYLISTARTIST_W,
                                 IPC_GETSEARCHLISTARTIST_W: begin if aAudioFile.isStream then
@@ -735,6 +736,7 @@ begin
                 NempWebServer.LoadfromIni;
                 // 2.) Medialib kopieren
                 NempWebServer.CopyLibrary(MedienBib);
+                NempWebServer.CopyDisplayHelper;
                 NempWebServer.Active := True;
                 // Control: Is it Active now?
                 if NempWebServer.Active  then
@@ -1654,11 +1656,8 @@ begin
                             end;
     end;
 
-    WM_NewMetaData: //DoMeta(PChar(Message.wParam));
-                    begin
+    WM_NewMetaData: begin
                         Application.Title := NempPlayer.GenerateTaskbarTitel;
-                        //if NempPlayer.StreamRecording AND (oldTitel<> NempPlayer.PlayingTitel) AND NempPlayer.AutoSplitFiles then
-                        //    NempPlayer.StartRecording;
                         NempTrayIcon.Hint := StringReplace(NempPlaylist.PlayingFile.Titel, '&', '&&&', [rfReplaceAll]);
                         PlaylistVST.Invalidate;
                         PlaylistCueChanged(NempPlaylist);

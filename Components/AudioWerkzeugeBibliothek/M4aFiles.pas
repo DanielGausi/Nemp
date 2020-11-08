@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -50,7 +50,7 @@ unit M4aFiles;
 interface
 
 uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
- AudioFileBasics, M4aAtoms;
+ AudioFiles.Base, AudioFiles.Declarations, M4aAtoms;
 
 
 const DEFAULT_MEAN: AnsiString = 'com.apple.iTunes';
@@ -124,6 +124,9 @@ type
             function __fGetEncodedBy          : UnicodeString;
             function __fGetKeywords           : UnicodeString;
 
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
+
 
         public
             FTYP: TBaseAtom;
@@ -150,7 +153,7 @@ type
             property EncodedBy          : UnicodeString read __fGetEncodedBy        write  __fSetEncodedBy      ;
             property Keywords           : UnicodeString read __fGetKeywords         write  __fSetKeywords       ;
 
-            constructor Create;
+            constructor Create; override;
             destructor Destroy; override;
             procedure Clear;
             function ReadFromFile(aFilename: UnicodeString): TAudioError;    override;
@@ -181,6 +184,7 @@ implementation
 
 constructor TM4AFile.Create;
 begin
+    inherited;
     MOOV := TMoovAtom.Create('moov');
     FTYP := TBaseAtom.Create('ftyp');
     PADDING := TBaseAtom.Create('free');
@@ -194,6 +198,16 @@ begin
     MOOV.Free;
     PADDING.Free;
     inherited;
+end;
+
+function TM4AFile.fGetFileType: TAudioFileType;
+begin
+    result := at_M4A;
+end;
+
+function TM4AFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_M4A];
 end;
 
 procedure TM4AFile.Clear;
@@ -215,6 +229,7 @@ function TM4AFile.fGetFileSize: Int64;
 begin
     result := fFileSize;
 end;
+
 
 function TM4AFile.fGetSamplerate: Integer;
 begin
@@ -399,6 +414,7 @@ var fs: TAudioFileStream;
     AtomSize: DWord;
     AtomName: TAtomName;
 begin
+    inherited ReadFromFile(aFilename);
     Clear;
     // result := FileErr_None;
 
@@ -478,6 +494,7 @@ end;
 
 function TM4AFile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
+    inherited RemoveFromFile(aFilename);
     result := M4aErr_RemovingNotSupported;
 end;
 
@@ -579,6 +596,7 @@ var ExistingTag: TM4AFile;
 
 begin
     // result := FileErr_None;
+    inherited WriteToFile(aFilename);;
 
     ExistingTag := TM4AFile.Create;
     try
@@ -765,5 +783,6 @@ procedure TM4AFile.__fSetKeywords(aValue: UnicodeString);
 begin
     MOOV.UdtaAtom.SetTextData('keyw', aValue);
 end;
+
 
 end.

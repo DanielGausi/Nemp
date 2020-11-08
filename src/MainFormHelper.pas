@@ -125,7 +125,8 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
-    ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist;
+    ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
+    AudioDisplayUtils;
 
 procedure CorrectVolButton;
 begin
@@ -523,7 +524,7 @@ begin
         TabBtn_Marker   .TabStop := NempOptions.TabStopAtTabs;
         // file details
         TabBtn_Cover    .TabStop := NempOptions.TabStopAtTabs;
-        TabBtn_Lyrics   .TabStop := NempOptions.TabStopAtTabs;
+        TabBtn_SummaryLock.TabStop := NempOptions.TabStopAtTabs;
         // player
         TabBtn_Equalizer        .TabStop := NempOptions.TabStopAtTabs;
         TabBtn_Headset          .TabStop := NempOptions.TabStopAtTabs;
@@ -809,7 +810,6 @@ begin
         ReTranslateComponent (Nemp_MainForm);
         //Nemp_MainForm.CBHeadSetControlInsertMode.ItemIndex := c;
 
-        NempPlayer.RefreshPlayingTitel;
         DisplayPlayerMainTitleInformation(True);
         DisplayHeadsetTitleInformation(True);
 
@@ -1369,7 +1369,7 @@ begin
     begin
         aAudioFile.RawTagLastFM := backupTag;
         HandleError(afa_EditingDetails, aAudioFile, aErr);
-        TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+        TranslateMessageDLG(NempAudioErrorString[aErr], mtWarning, [MBOK], 0);
     end;
 end;
 
@@ -1403,12 +1403,9 @@ begin
     begin
         //Nemp_MainForm.ShowPlayerDetails(NempPlayer.MainAudioFile);
         Nemp_MainForm.DisplayPlayerMainTitleInformation(True);
-        NempPlayer.RefreshPlayingTitel;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         Spectrum.DrawRating(NempPlayer.MainAudioFile.Rating);
-        Nemp_MainForm.PaintFrame.Hint := NempPlayer.MainAudioFile.GetHint(Nemp_MainForm.NempOptions.ReplaceNAArtistBy,
-                           Nemp_MainForm.NempOptions.ReplaceNATitleBy,
-                           Nemp_MainForm.NempOptions.ReplaceNAAlbumBy);
+        Nemp_MainForm.PaintFrame.Hint := NempDisplay.HintText(NempPlayer.MainAudioFile);
     end;
 
     // ... VST-Details
@@ -1770,7 +1767,7 @@ begin
         s := s + aFile;
 
         s := s + #13#10;
-        s := s + 'Errormessage: ' + AudioErrorString[aErr] + #13#10
+        s := s + 'Errormessage: ' + NempAudioErrorString[aErr] + #13#10
            + '------';
 
         case aErr of

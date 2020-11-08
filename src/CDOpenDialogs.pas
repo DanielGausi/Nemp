@@ -50,7 +50,7 @@ const MAXDRIVES = 10; // maximum number of drives
 
 implementation
 
-uses Nemp_RessourceStrings, NempMainUnit, Hilfsfunktionen;
+uses Nemp_RessourceStrings, NempMainUnit, Hilfsfunktionen, AudioDisplayUtils;
 
 {$R *.dfm}
 
@@ -183,7 +183,7 @@ begin
             else
                 newAudioFile.GetAudioData(newAudioFile.Pfad, 0);
 
-            lbTracks.Items.Add(IntToStr(newAudioFile.Track) + ' - ' + newAudioFile.PlaylistTitle);
+            lbTracks.Items.Add(IntToStr(newAudioFile.Track) + ' - ' + NempDisplay.PlaylistTitle(newAudioFile));
         end;
     end;
 end;

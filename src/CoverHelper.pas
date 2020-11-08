@@ -42,9 +42,8 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage, math,
-  //MP3FileUtils, ID3v2Frames, // not used anymore here
   NempAudioFiles, Nemp_ConstantsAndTypes,
-  cddaUtils, basscd, oneinst, md5, Audiofiles,
+  cddaUtils, basscd, oneinst, md5, AudioFiles.Base, AudioFiles.Declarations, AudioFiles.Factory,
   Winapi.Wincodec, Winapi.ActiveX;
 
 const
@@ -169,7 +168,7 @@ type
 
         /// Threadsafe resizing of coverart:
         ///  Since Nemp 4.12 the Windows Imaging Component WIC is used
-        ///  This uses a IWICImagingFactory, and we need one for eaach thread
+        ///  This uses a IWICImagingFactory, and we need one for each thread
         ///  Creating a new IWICImagingFactory everytime a scaling is needed, would be too much overhead
         ///  Therefore:
         ///       WICImagingFactory_VCL is created, when it is needed, and released at the Library-destructor
@@ -914,46 +913,50 @@ function TCoverArtSearcher.InitCoverFromMetaData(aAudioFile: tAudioFile;
   ScanMode: CoverScanThreadMode; Flags: Integer): String;
 var CoverStream: TMemoryStream;
     newID: String;
-    MainFile: TGeneralAudioFile;
+    MainFile: TBaseAudioFile;
 
 begin
     result := '';
     aAudioFile.CoverID := '';
     CoverStream := TMemoryStream.Create;
     try
-        MainFile := TGeneralAudioFile.Create(aAudioFile.Pfad);
-        try
-            // first: Check for a User-CoverID
-            // this can happen, if the user refreshes the medialibrar and has set a specials CoverID through the Detail-Window
-            // (possible since Nemp 4.13)
-            if ( Flags and INIT_COVER_IGNORE_USERID) = 0 then
-                newID := aAudioFile.GetUserCoverIDFromMetaData(MainFile);
+        MainFile := AudioFileFactory.CreateAudioFile(aAudioFile.Pfad);
+        if assigned(MainFile) then
+        begin
+            try
+                MainFile.ReadFromFile(aAudioFile.Pfad);
+                // first: Check for a User-CoverID
+                // this can happen, if the user refreshes the medialibrar and has set a specials CoverID through the Detail-Window
+                // (possible since Nemp 4.13)
+                if ( Flags and INIT_COVER_IGNORE_USERID) = 0 then
+                    newID := aAudioFile.GetUserCoverIDFromMetaData(MainFile);
 
-            if  (newID <> '') and FileExists(SavePath + newID + '.jpg') then
-            begin
-                aAudioFile.CoverID := newID;
-                result := newID;
-            end else
-            begin
-                ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
-                ///  we need to check for regular CoverArt information in the MetaData
-                if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
+                if  (newID <> '') and FileExists(SavePath + newID + '.jpg') then
                 begin
-                    // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
-                    CoverStream.Seek(0, soFromBeginning);
-                    // compute a new ID from the stream data
-                    newID := MD5DigestToStr(MD5Stream(CoverStream));
-                    // try to save a resized JPG from the content of the stream
-                    // if this fails, there was something wrong with the image data :(
-                    if ScalePicStreamToFile_DefaultSize(CoverStream, newID, GetProperImagingFactory(ScanMode)) then
+                    aAudioFile.CoverID := newID;
+                    result := newID;
+                end else
+                begin
+                    ///  However, if the "UserID.jpg" does not exist (or, more probably, the UserCover is not set),
+                    ///  we need to check for regular CoverArt information in the MetaData
+                    if aAudioFile.GetCoverStreamFromMetaData(CoverStream, MainFile) then
                     begin
-                        aAudioFile.CoverID := newID;
-                        result := newID;
+                        // there is a Picture-Tag in the Metadata, and its content is now stored in Coverstream
+                        CoverStream.Seek(0, soFromBeginning);
+                        // compute a new ID from the stream data
+                        newID := MD5DigestToStr(MD5Stream(CoverStream));
+                        // try to save a resized JPG from the content of the stream
+                        // if this fails, there was something wrong with the image data :(
+                        if ScalePicStreamToFile_DefaultSize(CoverStream, newID, GetProperImagingFactory(ScanMode)) then
+                        begin
+                            aAudioFile.CoverID := newID;
+                            result := newID;
+                        end;
                     end;
                 end;
+            finally
+                MainFile.Free;
             end;
-        finally
-            MainFile.Free;
         end;
 
     finally

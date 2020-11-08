@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -57,7 +57,8 @@ unit TrueAudioFiles;
 
 interface
 
-uses Windows, Messages, SysUtils,  Classes, Apev2Tags, Dialogs;
+uses Windows, Messages, SysUtils,  Classes, BaseApeFiles, Dialogs,
+     AudioFiles.Base, AudioFiles.Declarations;
 
 type
 
@@ -81,14 +82,34 @@ type
             procedure fResetData;
         protected
             function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
+
         public
             property Bits       : Cardinal read fBits;
             property AudioFormat: Cardinal read fAudioFormat;
+
+            constructor Create; override;
     end;
 
 implementation
 
 { TTrueAudioFile }
+
+constructor TTrueAudioFile.Create;
+begin
+    inherited;
+end;
+
+function TTrueAudioFile.fGetFileType: TAudioFileType;
+begin
+    result := at_TrueAudio;
+end;
+
+function TTrueAudioFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_TrueAudio];
+end;
 
 procedure TTrueAudioFile.fResetData;
 begin
@@ -134,5 +155,6 @@ begin
         Result := True;
     end;
 end;
+
 
 end.

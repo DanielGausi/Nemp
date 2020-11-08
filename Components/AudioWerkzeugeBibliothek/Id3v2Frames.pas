@@ -52,21 +52,9 @@ unit ID3v2Frames;
 interface
 
 uses
-  SysUtils, Classes, Windows, dialogs, U_CharCode
-  {$IFDEF USE_TNT_COMPOS}, TntSysUtils, TntClasses{$ENDIF};
-
+  SysUtils, Classes, Windows, dialogs, U_CharCode, AudioFiles.Declarations;
 
 type
-
-  {$IFDEF USE_TNT_COMPOS}
-      TMPFUFileStream = TTNTFileStream;
-  {$ELSE}
-      TMPFUFileStream = TFileStream;
-  {$ENDIF}
-
-  {$IFNDEF UNICODE}
-      UnicodeString = WideString;
-  {$ENDIF}
 
   TID3v2FrameTypes = (FT_INVALID, FT_UNKNOWN,
                       FT_TextFrame,
@@ -424,7 +412,6 @@ const  ID3v2KnownFrames : Array[TFrameIDs] of TID3v2FrameDescriptionData =
 
 
 function UnSyncStream(Source, Target: TStream): Boolean;
-procedure SetStreamEnd(aStream: TStream);
 
 implementation
 
@@ -495,19 +482,6 @@ begin
         end;
     end;
 end;
-
-//--------------------------------------------------------------------
-// Set end of Stream
-//--------------------------------------------------------------------
-procedure SetStreamEnd(aStream: TStream);
-begin
-  if aStream is THandleStream then
-    SetEndOfFile((aStream as THandleStream).Handle)
-  else
-    if aStream is TMemoryStream then
-      TMemoryStream(aStream).SetSize(aStream.Position);
-end;
-
 
 
 constructor TID3v2Frame.Create(aID: AnsiString; aVersion: TID3v2FrameVersions);

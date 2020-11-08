@@ -15,9 +15,11 @@
         Copyright (c) 2003-2005 by The MAC Team
     -----------------------------------
 
-    Unit WavFiles
+    Unit DummyFiles
 
-    Get audio information from Wav Files (*.wav)
+    A Dummy file class for "not supported" audiotypes
+    Can be created by the Factory to simplify the handling for files that are supported by a player
+    but not by this library.
     (read only)
 
     ---------------------------------------------------------------------------
@@ -54,7 +56,7 @@
     ---------------------------------------------------------------------------
 }
 
-unit WavFiles;
+unit DummyFiles;
 
 interface
 
@@ -63,7 +65,7 @@ uses Classes, SysUtils, AudioFiles.Base, AudioFiles.Declarations;
 
 type
 
-    Twavfile = class(TBaseAudioFile)
+    TDummyFile = class(TBaseAudioFile)
         private
             procedure fResetData;
         protected
@@ -100,24 +102,24 @@ type
 
 implementation
 
-constructor TWavfile.Create;
+constructor TDummyFile.Create;
 begin
     inherited;
     fResetData;
 end;
 
-function Twavfile.fGetFileType: TAudioFileType;
+function TDummyFile.fGetFileType: TAudioFileType;
 begin
-    result := at_Wav;
+    result := at_Invalid;
 
 end;
 
-function Twavfile.fGetFileTypeDescription: String;
+function TDummyFile.fGetFileTypeDescription: String;
 begin
-    result := TAudioFileNames[at_Wav];
+    result := TAudioFileNames[at_Invalid];
 end;
 
-procedure TWavfile.FResetData;
+procedure TDummyFile.FResetData;
 begin
     // Reset variables
     fValid := false;
@@ -128,37 +130,37 @@ begin
     fBitRate := 0;
 end;
 
-procedure TWavfile.fSetAlbum(aValue: UnicodeString);
+procedure TDummyFile.fSetAlbum(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
 end;
 
-procedure TWavfile.fSetArtist(aValue: UnicodeString);
+procedure TDummyFile.fSetArtist(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
 end;
 
-procedure TWavfile.fSetGenre(aValue: UnicodeString);
+procedure TDummyFile.fSetGenre(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
 end;
 
-procedure TWavfile.fSetTitle(aValue: UnicodeString);
+procedure TDummyFile.fSetTitle(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
 end;
 
-procedure TWavfile.fSetTrack(aValue: UnicodeString);
+procedure TDummyFile.fSetTrack(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
 end;
 
-procedure TWavfile.fSetYear(aValue: UnicodeString);
+procedure TDummyFile.fSetYear(aValue: UnicodeString);
 begin
   inherited;
   // nothing. This Unit is read-Only
@@ -166,111 +168,76 @@ end;
 
 { --------------------------------------------------------------------------- }
 
-function TWavfile.fGetAlbum: UnicodeString;
+function TDummyFile.fGetAlbum: UnicodeString;
 begin
     result := '';
 end;
 
-function TWavfile.fGetArtist: UnicodeString;
+function TDummyFile.fGetArtist: UnicodeString;
 begin
     result := '';
 end;
 
-function TWavfile.fGetBitrate: Integer;
+function TDummyFile.fGetBitrate: Integer;
 begin
-    result := fBitrate;
+    result := 0;
 end;
 
-function TWavfile.fGetChannels: Integer;
+function TDummyFile.fGetChannels: Integer;
 begin
-    result := fChannels;
+    result := 0;
 end;
 
-function TWavfile.fGetDuration: Integer;
+function TDummyFile.fGetDuration: Integer;
 begin
-    result := fDuration;
+    result := 0;
 end;
 
-function TWavfile.fGetFileSize: Int64;
+function TDummyFile.fGetFileSize: Int64;
 begin
     result := fFileSize;
 end;
 
-function TWavfile.fGetGenre: UnicodeString;
+function TDummyFile.fGetGenre: UnicodeString;
 begin
     result := '';
 end;
 
-function TWavfile.fGetSamplerate: Integer;
+function TDummyFile.fGetSamplerate: Integer;
 begin
-    result := fSamplerate;
+    result := 0;
 end;
 
-function TWavfile.fGetTitle: UnicodeString;
-begin
-    result := '';
-end;
-
-function TWavfile.fGetTrack: UnicodeString;
+function TDummyFile.fGetTitle: UnicodeString;
 begin
     result := '';
 end;
 
-function TWavfile.fGetValid: Boolean;
-begin
-    result := fValid;
-end;
-
-function TWavfile.fGetYear: UnicodeString;
+function TDummyFile.fGetTrack: UnicodeString;
 begin
     result := '';
 end;
 
-{ ********************** Public functions & procedures ********************** }
+function TDummyFile.fGetValid: Boolean;
+begin
+    result := false;
+end;
+
+function TDummyFile.fGetYear: UnicodeString;
+begin
+    result := '';
+end;
 
 
 { --------------------------------------------------------------------------- }
 
-function TWavfile.ReadFromFile(aFilename: UnicodeString): TAudioError;
+function TDummyFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
 var fs: TAudioFileStream;
-    groupID: array[0..3] of AnsiChar;
-    riffType: array[0..3] of AnsiChar;
-    BytesPerSec: Integer;
-    dataSize: Integer;
-    wChannels: WORD;
-    dwSamplesPerSec: LongInt;
-    BytesPerSample:Word;
-    BitsPerSample: Word;
-
-    function GotoChunk(ID: AnsiString): Integer;
-    var chunkID: array[0..3] of AnsiChar;
-        chunkSize: Integer;
-    begin
-        Result := -1;
-        // index of first chunk
-        fs.Position := 12;
-        repeat
-            // read next chunk
-            fs.Read(chunkID, 4);
-            fs.Read(chunkSize, 4);
-            if chunkID <> ID then
-                // skip chunk
-                fs.Position := fs.Position + chunkSize;
-        until (chunkID = ID) or (fs.Position >= fs.Size);
-
-        if chunkID = ID then
-            // chunk found,
-            // return chunk size
-            Result := chunkSize
-    end;
-
-
 begin
     inherited ReadFromFile(aFilename);
 
-    // Reset variables and load file data
     fResetData;
-    result := FileErr_None;
+    result := FileErr_NotSupportedFileType;
 
     if AudioFileExists(aFilename) then
     begin
@@ -278,40 +245,6 @@ begin
             fs := TAudioFileStream.Create(aFilename, fmOpenRead or fmShareDenyWrite);
             try
                 fFileSize := fs.Size;
-
-                fs.Read(groupID, 4);
-                fs.Position := fs.Position + 4; // skip four bytes (file size)
-                fs.Read(riffType, 4);
-                if (groupID = 'RIFF') and (riffType = 'WAVE') then
-                begin
-                    // search for format chunk
-                    if GotoChunk('fmt ') <> -1 then
-                    begin
-                        // found it
-                        fs.Position := fs.Position + 2;
-                        fs.Read(wChannels,2);
-                        fChannels := wChannels;
-
-                        fs.Read(dwSamplesPerSec,4);
-                        fSampleRate := dwSamplesPerSec;
-
-                        fs.Read(BytesPerSec,4);
-                        fs.Read(BytesPerSample,2);
-                        fs.Read(BitsPerSample,2);
-                        fBitrate := wChannels * BitsPerSample * dwSamplesPerSec ;
-                        // search for data chunk
-                        dataSize := GotoChunk('data');
-
-                        if dataSize <> -1 then
-                            // found it
-                            if BytesPerSec <> 0 then
-                                fDuration := dataSize DIV BytesPerSec
-                            else
-                                fDuration := 0;
-                    end
-                end
-
-
             finally
                 fs.Free;
             end;
@@ -321,26 +254,18 @@ begin
     end
     else
         result := FileErr_NoFile;
-
-
-    if result = FileErr_None then
-    begin
-        // Process data if loaded and valid
-        fValid := true;
-
-    end;
 end;
 
-function TWavfile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
+function TDummyFile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited RemoveFromFile(aFilename);
-    result := WavErr_WritingNotSupported;
+    result := FileErr_NotSupportedFileType;
 end;
 
-function TWavfile.WriteToFile(aFilename: UnicodeString): TAudioError;
+function TDummyFile.WriteToFile(aFilename: UnicodeString): TAudioError;
 begin
     inherited WriteToFile(aFilename);
-    result := WavErr_WritingNotSupported;
+    result := FileErr_NotSupportedFileType;
 end;
 
 

@@ -5,8 +5,9 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   System.Contnrs,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, NempAudioFiles, AudioFiles,
-  Mp3FileUtils, ID3v2Frames, M4aAtoms;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, NempAudioFiles, AudioFiles.Base, AudioFiles.Declarations,
+  Mp3Files, FlacFiles, OggVorbisFiles, M4AFiles, BaseApeFiles, ID3v2Tags, Apev2Tags,
+  ID3v2Frames, M4aAtoms;
 
 type
   TNewMetaFrameForm = class(TForm)
@@ -31,13 +32,15 @@ type
     ///  For Oggg/Flac/Ape this is not neccessary, as we store the "FrameKey" directly in the Combobox,
     ///  as OggVorbis-Keas are more descriptive from the beginning ...
     fFrameTypList: TList;
+    procedure PrepareID3FramesSelection(ID3v2Tag: TID3v2Tag);
+    procedure PrepareAPEFramesSelection(ApeTag: TApeTag);
 
   public
     { Public declarations }
     TagType: TTagType;
 
     // The Tag-Object currently displayed in FormDetails
-    CurrentTagObject: TGeneralAudioFile;
+    CurrentTagObject: TBaseAudioFile;
 
     function PrepareFrameSelection: Integer;
 
@@ -52,10 +55,119 @@ uses gnugettext;
 
 {$R *.dfm}
 
-function TNewMetaFrameForm.PrepareFrameSelection: Integer;
+procedure TNewMetaFrameForm.PrepareID3FramesSelection(ID3v2Tag: TID3v2Tag);
 var TextList, URLList: TList;
     FrameList: TObjectList;
-    CommentExists, AtomExists, AtomFixed: Boolean;
+    i: Integer;
+    CommentExists: Boolean;
+begin
+    TextList := TList.Create;
+    URLList  := TList.Create;
+    try
+        ID3v2Tag.GetAllowedTextFrames(TextList);
+        ID3v2Tag.GetAllowedURLFrames(URLList);
+
+        CommentExists := False;
+        FrameList := TObjectList.Create(False);
+        try
+            ID3v2Tag.GetAllFrames(FrameList);
+            for i := 0 to FrameList.Count - 1 do
+                if TID3v2Frame(FrameList[i]).FrameType = FT_CommentFrame then
+                begin
+                    CommentExists := True;
+                    break;
+                end;
+        finally
+            FrameList.Free;
+        end;
+
+        // add possible TextFrames
+        for i := 0 to TextList.Count - 1 do
+        begin
+            fFrameTypList.Add(TextList[i]);
+
+            cbFrameType.Items.Add(
+                ID3v2KnownFrames[ TFrameIDs(TextList[i])].Description
+                + ' ('
+                + String(ID3v2KnownFrames[ TFrameIDs(TextList[i])].IDs[
+                  TID3v2FrameVersions(Id3v2Tag.Version.Major)])+ ') ');
+        end;
+
+        // add Comment-Frame (if it doesn't exist already)
+        if not CommentExists then
+        begin
+            fFrameTypList.Add(Pointer(IDv2_COMMENT));
+
+            cbFrameType.Items.Add(
+                ID3v2KnownFrames[IDv2_COMMENT].Description
+                + ' ('
+                + String(ID3v2KnownFrames[IDv2_COMMENT].IDs[
+                  TID3v2FrameVersions(Id3v2Tag.Version.Major)])+ ') ');
+        end;
+
+        // add possible URLFrames
+        for i := 0 to URLList.Count - 1 do
+        begin
+            fFrameTypList.Add(URLList[i]);
+
+            cbFrameType.Items.Add(
+                ID3v2KnownFrames[ TFrameIDs(URLList[i])].Description
+                + ' ('
+                + String(ID3v2KnownFrames[ TFrameIDs(URLList[i])].IDs[
+                  TID3v2FrameVersions(Id3v2Tag.Version.Major)])+ ') ');
+        end;
+
+    finally
+        TextList.Free;
+        URLList.Free;
+    end;
+end;
+
+procedure TNewMetaFrameForm.PrepareAPEFramesSelection(ApeTag: TApeTag);
+var CommentList: TStringList;
+begin
+    CommentList := TStringList.Create;
+    try
+        CommentList.CaseSensitive := False;
+        ApeTag.GetAllFrames(CommentList);
+
+        if CommentList.IndexOf('Artist')           = -1 then cbFrameType.Items.Add('Artist');
+        if CommentList.IndexOf('Title')            = -1 then cbFrameType.Items.Add('Title');
+        if CommentList.IndexOf('Album')            = -1 then cbFrameType.Items.Add('Album');
+        if CommentList.IndexOf('Genre')            = -1 then cbFrameType.Items.Add('Genre');
+        if CommentList.IndexOf('Track')            = -1 then cbFrameType.Items.Add('Track');
+        if CommentList.IndexOf('Year')             = -1 then cbFrameType.Items.Add('Year');
+        if CommentList.IndexOf('Abstract')         = -1 then cbFrameType.Items.Add('Abstract');
+        if CommentList.IndexOf('Bibliography')     = -1 then cbFrameType.Items.Add('Bibliography');
+        if CommentList.IndexOf('Catalog')          = -1 then cbFrameType.Items.Add('Catalog');
+        if CommentList.IndexOf('Comment')          = -1 then cbFrameType.Items.Add('Comment');
+        if CommentList.IndexOf('Composer')         = -1 then cbFrameType.Items.Add('Composer');
+        if CommentList.IndexOf('Conductor')        = -1 then cbFrameType.Items.Add('Conductor');
+        if CommentList.IndexOf('Copyright')        = -1 then cbFrameType.Items.Add('Copyright');
+        if CommentList.IndexOf('Debut album')      = -1 then cbFrameType.Items.Add('Debut album');
+        if CommentList.IndexOf('EAN/UBC')          = -1 then cbFrameType.Items.Add('EAN/UBC');
+        if CommentList.IndexOf('File')             = -1 then cbFrameType.Items.Add('File');
+        if CommentList.IndexOf('Index')            = -1 then cbFrameType.Items.Add('Index');
+        if CommentList.IndexOf('Introplay')        = -1 then cbFrameType.Items.Add('Introplay');
+        if CommentList.IndexOf('ISBN')             = -1 then cbFrameType.Items.Add('ISBN');
+        if CommentList.IndexOf('ISRC')             = -1 then cbFrameType.Items.Add('ISRC');
+        if CommentList.IndexOf('Language')         = -1 then cbFrameType.Items.Add('Language');
+        if CommentList.IndexOf('LC')               = -1 then cbFrameType.Items.Add('LC');
+        if CommentList.IndexOf('Media')            = -1 then cbFrameType.Items.Add('Media');
+        if CommentList.IndexOf('Publicationright') = -1 then cbFrameType.Items.Add('Publicationright');
+        if CommentList.IndexOf('Publisher')        = -1 then cbFrameType.Items.Add('Publisher');
+        if CommentList.IndexOf('Record Date')      = -1 then cbFrameType.Items.Add('Record Date');
+        if CommentList.IndexOf('Record Location')  = -1 then cbFrameType.Items.Add('Record Location');
+        if CommentList.IndexOf('Related')          = -1 then cbFrameType.Items.Add('Related');
+        if CommentList.IndexOf('Subtitle')         = -1 then cbFrameType.Items.Add('Subtitle');
+    finally
+        CommentList.Free;
+    end;
+end;
+
+function TNewMetaFrameForm.PrepareFrameSelection: Integer;
+var FrameList: TObjectList;
+    AtomExists, AtomFixed: Boolean;
     CommentList: TStringList;
     i, idx: Integer;
 begin
@@ -65,61 +177,7 @@ begin
 
     case TagType of
         TT_ID3v2:  begin
-              TextList := CurrentTagObject.MP3File.ID3v2Tag.GetAllowedTextFrames;
-              URLList  := CurrentTagObject.MP3File.ID3v2Tag.GetAllowedURLFrames;
-
-              CommentExists := False;
-              FrameList := TObjectList.Create(False);
-              try
-                  CurrentTagObject.MP3File.ID3v2Tag.GetAllFrames(FrameList);
-                  for i := 0 to FrameList.Count - 1 do
-                      if TID3v2Frame(FrameList[i]).FrameType = FT_CommentFrame then
-                      begin
-                          CommentExists := True;
-                          break;
-                      end;
-              finally
-                  FrameList.Free;
-              end;
-
-              // add possible TextFrames
-              for i := 0 to TextList.Count - 1 do
-              begin
-                  fFrameTypList.Add(TextList[i]);
-
-                  cbFrameType.Items.Add(
-                      ID3v2KnownFrames[ TFrameIDs(TextList[i])].Description
-                      + ' ('
-                      + String(ID3v2KnownFrames[ TFrameIDs(TextList[i])].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
-              end;
-
-              // add Comment-Frame (if it doesn't exist already)
-              if not CommentExists then
-              begin
-                  fFrameTypList.Add(Pointer(IDv2_COMMENT));
-
-                  cbFrameType.Items.Add(
-                      ID3v2KnownFrames[IDv2_COMMENT].Description
-                      + ' ('
-                      + String(ID3v2KnownFrames[IDv2_COMMENT].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
-              end;
-
-              // add possible URLFrames
-              for i := 0 to URLList.Count - 1 do
-              begin
-                  fFrameTypList.Add(URLList[i]);
-
-                  cbFrameType.Items.Add(
-                      ID3v2KnownFrames[ TFrameIDs(URLList[i])].Description
-                      + ' ('
-                      + String(ID3v2KnownFrames[ TFrameIDs(URLList[i])].IDs[
-                        TID3v2FrameVersions(CurrentTagObject.MP3File.Id3v2Tag.Version.Major)])+ ') ');
-              end;
-
-              TextList.Free;
-              URLList.Free;
+              PrepareID3FramesSelection(TMP3File(CurrentTagObject).ID3v2Tag);
         end;
 
         TT_OggVorbis,
@@ -128,9 +186,9 @@ begin
               try
                   CommentList.CaseSensitive := False;
                   if TagType = TT_OggVorbis then
-                      CurrentTagObject.oggFile.GetAllFields(CommentList)
+                      TOggVorbisFile(CurrentTagObject).GetAllFields(CommentList)
                   else
-                      CurrentTagObject.flacFile.GetAllFields(CommentList);
+                      TFlacFile(CurrentTagObject).GetAllFields(CommentList);
 
                   if CommentList.IndexOf('artist')       = -1 then cbFrameType.Items.Add('artist');
                   if CommentList.IndexOf('title')        = -1 then cbFrameType.Items.Add('title');
@@ -157,49 +215,20 @@ begin
         end;
 
         TT_Ape: begin
-              CommentList := TStringList.Create;
-              try
-                  CommentList.CaseSensitive := False;
-                  CurrentTagObject.BaseApeFile.GetAllFrames(CommentList);
-
-                  if CommentList.IndexOf('Artist')           = -1 then cbFrameType.Items.Add('Artist');
-                  if CommentList.IndexOf('Title')            = -1 then cbFrameType.Items.Add('Title');
-                  if CommentList.IndexOf('Album')            = -1 then cbFrameType.Items.Add('Album');
-                  if CommentList.IndexOf('Genre')            = -1 then cbFrameType.Items.Add('Genre');
-                  if CommentList.IndexOf('Track')            = -1 then cbFrameType.Items.Add('Track');
-                  if CommentList.IndexOf('Year')             = -1 then cbFrameType.Items.Add('Year');
-                  if CommentList.IndexOf('Abstract')         = -1 then cbFrameType.Items.Add('Abstract');
-                  if CommentList.IndexOf('Bibliography')     = -1 then cbFrameType.Items.Add('Bibliography');
-                  if CommentList.IndexOf('Catalog')          = -1 then cbFrameType.Items.Add('Catalog');
-                  if CommentList.IndexOf('Comment')          = -1 then cbFrameType.Items.Add('Comment');
-                  if CommentList.IndexOf('Composer')         = -1 then cbFrameType.Items.Add('Composer');
-                  if CommentList.IndexOf('Conductor')        = -1 then cbFrameType.Items.Add('Conductor');
-                  if CommentList.IndexOf('Copyright')        = -1 then cbFrameType.Items.Add('Copyright');
-                  if CommentList.IndexOf('Debut album')      = -1 then cbFrameType.Items.Add('Debut album');
-                  if CommentList.IndexOf('EAN/UBC')          = -1 then cbFrameType.Items.Add('EAN/UBC');
-                  if CommentList.IndexOf('File')             = -1 then cbFrameType.Items.Add('File');
-                  if CommentList.IndexOf('Index')            = -1 then cbFrameType.Items.Add('Index');
-                  if CommentList.IndexOf('Introplay')        = -1 then cbFrameType.Items.Add('Introplay');
-                  if CommentList.IndexOf('ISBN')             = -1 then cbFrameType.Items.Add('ISBN');
-                  if CommentList.IndexOf('ISRC')             = -1 then cbFrameType.Items.Add('ISRC');
-                  if CommentList.IndexOf('Language')         = -1 then cbFrameType.Items.Add('Language');
-                  if CommentList.IndexOf('LC')               = -1 then cbFrameType.Items.Add('LC');
-                  if CommentList.IndexOf('Media')            = -1 then cbFrameType.Items.Add('Media');
-                  if CommentList.IndexOf('Publicationright') = -1 then cbFrameType.Items.Add('Publicationright');
-                  if CommentList.IndexOf('Publisher')        = -1 then cbFrameType.Items.Add('Publisher');
-                  if CommentList.IndexOf('Record Date')      = -1 then cbFrameType.Items.Add('Record Date');
-                  if CommentList.IndexOf('Record Location')  = -1 then cbFrameType.Items.Add('Record Location');
-                  if CommentList.IndexOf('Related')          = -1 then cbFrameType.Items.Add('Related');
-                  if CommentList.IndexOf('Subtitle')         = -1 then cbFrameType.Items.Add('Subtitle');
-              finally
-                  CommentList.Free;
-              end;
+            case CurrentTagObject.FileType of
+                at_Mp3: PrepareAPEFramesSelection(TMP3File(CurrentTagObject).ApeTag);
+                at_Monkey,
+                at_WavPack,
+                at_MusePack,
+                at_OptimFrog,
+                at_TrueAudio: PrepareAPEFramesSelection(TBaseApeFile(CurrentTagObject).ApeTag);
+            end;
         end;
 
         TT_M4A: begin
               FrameList := TObjectList.Create(False);
               try
-                  CurrentTagObject.m4aFile.GetAllAtoms(FrameList);
+                  Tm4aFile(CurrentTagObject).GetAllAtoms(FrameList);
 
                   // special case: track and disk
                   // -----------------------------
@@ -291,7 +320,7 @@ begin
     case TagType of
         TT_ID3v2:  begin
 
-            NewFrame := CurrentTagObject.MP3File.Id3v2Tag.AddFrame(
+            NewFrame := TMP3File(CurrentTagObject).Id3v2Tag.AddFrame(
                 TFrameIDS(fFrameTypList[cbFrameType.ItemIndex]) );
 
             case newFrame.FrameType of
@@ -312,26 +341,39 @@ begin
         end;
 
         TT_OggVorbis: begin
-            CurrentTagObject.OggFile.SetPropertyByFieldname(cbFrameType.Text, edt_FrameValue.Text);
+            TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(cbFrameType.Text, edt_FrameValue.Text);
             ModalResult := MROK;
         end;
 
         TT_Flac: begin
-            CurrentTagObject.FlacFile.SetPropertyByFieldname(cbFrameType.Text, edt_FrameValue.Text);
+            TFlacFile(CurrentTagObject).SetPropertyByFieldname(cbFrameType.Text, edt_FrameValue.Text);
             ModalResult := MROK;
         end;
 
         TT_Ape: begin
-            CurrentTagObject.BaseApeFile.SetValueByKey(AnsiString(cbFrameType.Text), edt_FrameValue.Text);
+            case CurrentTagObject.FileType of
+                at_Mp3: begin
+                    TMP3File(CurrentTagObject).ApeTag.SetValueByKey(AnsiString(cbFrameType.Text), edt_FrameValue.Text);
+                    // Note: By now, Nemp does not allow to initiate an APE-Tag in an mp3File.
+                    //       So, if we get here, the APETag already exists
+                    //       For later changes however it could be better to explicitly set the existence to True now.
+                    // TMP3File(CurrentTagObject).ApeTag.Exists := True;
+                end;
+                at_Monkey,
+                at_WavPack,
+                at_MusePack,
+                at_OptimFrog,
+                at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(AnsiString(cbFrameType.Text), edt_FrameValue.Text);
+            end;
             ModalResult := MROK;
         end;
 
         TT_M4A: begin
             case Integer(fFrameTypList[cbFrameType.ItemIndex]) of
-                1042: CurrentTagObject.M4aFile.MOOV.UdtaAtom.SetTrackNumber(edt_FrameValue.Text);
-                1043: CurrentTagObject.M4aFile.MOOV.UdtaAtom.SetDiscNumber(edt_FrameValue.Text);
+                1042: TM4aFile(CurrentTagObject).MOOV.UdtaAtom.SetTrackNumber(edt_FrameValue.Text);
+                1043: TM4aFile(CurrentTagObject).MOOV.UdtaAtom.SetDiscNumber(edt_FrameValue.Text);
             else
-                CurrentTagObject.M4aFile.MOOV.UdtaAtom.SetTextData(
+                TM4aFile(CurrentTagObject).MOOV.UdtaAtom.SetTextData(
                       KnownMetaAtoms[
                           Integer(fFrameTypList[cbFrameType.ItemIndex])
                       ].AtomName

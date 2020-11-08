@@ -535,8 +535,8 @@ object Nemp_MainForm: TNemp_MainForm
             Height = 208
             Align = alClient
             BevelEdges = []
-            BevelInner = bvSpace
-            BevelOuter = bvSpace
+            BevelInner = bvNone
+            BevelOuter = bvNone
             BorderStyle = bsNone
             Ctl3D = True
             DefaultPasteMode = amInsertAfter
@@ -552,7 +552,6 @@ object Nemp_MainForm: TNemp_MainForm
             Header.Options = [hoDrag, hoVisible]
             HintMode = hmHint
             Images = PlayListImageList
-            Indent = 20
             Margin = 0
             ParentCtl3D = False
             ParentFont = False
@@ -1128,7 +1127,7 @@ object Nemp_MainForm: TNemp_MainForm
             object LblBibAlbum: TLabel
               Tag = 2
               Left = 8
-              Top = 40
+              Top = 42
               Width = 54
               Height = 13
               Caption = '                  '
@@ -1140,7 +1139,7 @@ object Nemp_MainForm: TNemp_MainForm
             end
             object LblBibArtist: TLabel
               Left = 8
-              Top = 6
+              Top = 8
               Width = 54
               Height = 13
               Caption = '                  '
@@ -1158,7 +1157,7 @@ object Nemp_MainForm: TNemp_MainForm
             end
             object LblBibDuration: TLabel
               Left = 8
-              Top = 91
+              Top = 93
               Width = 54
               Height = 13
               Caption = '                  '
@@ -1199,7 +1198,7 @@ object Nemp_MainForm: TNemp_MainForm
             object LblBibTitle: TLabel
               Tag = 1
               Left = 8
-              Top = 21
+              Top = 25
               Width = 54
               Height = 13
               Caption = '                  '
@@ -1227,7 +1226,7 @@ object Nemp_MainForm: TNemp_MainForm
             end
             object Bevel1: TBevel
               Left = 8
-              Top = 166
+              Top = 206
               Width = 209
               Height = 5
               Anchors = [akLeft, akTop, akRight]
@@ -1241,6 +1240,31 @@ object Nemp_MainForm: TNemp_MainForm
               Hint = 'ReplayGain values'
               Caption = '                  '
               StyleElements = [seClient, seBorder]
+            end
+            object lblBibFilename: TLabel
+              Left = 8
+              Top = 174
+              Width = 54
+              Height = 13
+              Caption = '                  '
+              StyleElements = [seClient, seBorder]
+            end
+            object lblBibDirectory: TLabel
+              Tag = 6
+              Left = 8
+              Top = 189
+              Width = 54
+              Height = 13
+              Caption = '                  '
+              StyleElements = [seClient, seBorder]
+            end
+            object Bevel2: TBevel
+              Left = 9
+              Top = 165
+              Width = 209
+              Height = 5
+              Anchors = [akLeft, akTop, akRight]
+              Shape = bsBottomLine
             end
           end
         end
@@ -1284,12 +1308,11 @@ object Nemp_MainForm: TNemp_MainForm
             end
           end
           object TabBtn_Cover: TSkinButton
-            Tag = 1
             Left = 2
             Top = 2
             Width = 24
             Height = 24
-            Hint = 'Show cover'
+            Hint = 'Toggle Cover/Lyrics'
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
@@ -1299,24 +1322,24 @@ object Nemp_MainForm: TNemp_MainForm
             DrawMode = dm_Skin
             NumGlyphsX = 5
             NumGlyphsY = 2
-            GlyphLine = 1
+            GlyphLine = 0
             CustomRegion = False
             FocusDrawMode = fdm_Windows
             Color1 = clBlack
             Color2 = clBlack
           end
-          object TabBtn_Lyrics: TSkinButton
+          object TabBtn_SummaryLock: TSkinButton
             Tag = 2
             Left = 28
             Top = 2
             Width = 24
             Height = 24
-            Hint = 'Show lyrics'
+            Hint = 'Toggle File Overview (player only vs. selected file)'
             ParentShowHint = False
             PopupMenu = Player_PopupMenu
             ShowHint = True
             TabOrder = 1
-            OnClick = PlayerTabsClick
+            OnClick = TabBtn_SummaryLockClick
             OnMouseMove = TabBtn_CoverMouseMove
             DrawMode = dm_Windows
             NumGlyphsX = 5
@@ -1828,7 +1851,6 @@ object Nemp_MainForm: TNemp_MainForm
           TabOrder = 0
           OnPaint = ControlPanelPaint
           OwnerDraw = False
-          ExplicitTop = 4
           object TabBtn_MainPlayerControl: TSkinButton
             Tag = 4
             Left = 8

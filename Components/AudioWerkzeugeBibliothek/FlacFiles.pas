@@ -53,8 +53,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, ContNrs, Classes
-  {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF}
-  , AudioFileBasics, VorbisComments, Id3Basics , winsock;
+  {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF},
+  AudioFiles.Base, AudioFiles.Declarations,
+  VorbisComments, Id3Basics , winsock;
 
 const
     FLAC_MARKER = 'fLaC';
@@ -245,6 +246,9 @@ type
         protected
             //function fGetDuration: Integer; override
 
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
+
             function fGetFileSize   : Int64;    override;
             function fGetDuration   : Integer;  override;
             function fGetBitrate    : Integer;  override;
@@ -285,7 +289,7 @@ type
             property Contact     : UnicodeString read fGetContact      write fSetContact     ;
             property ISRC        : UnicodeString read fGetISRC         write fSetISRC        ;
 
-            constructor Create;
+            constructor Create; override;
             destructor Destroy; override;
 
             function ReadFromStream(fs: TStream): TAudioError;
@@ -667,6 +671,7 @@ end;
 
 constructor TFlacFile.Create;
 begin
+    //fFileType := at_Flac;
     fMetaBlocks := TObjectList.Create;
     fUsePadding := True;
     ClearData;
@@ -677,6 +682,17 @@ begin
     fMetaBlocks.Free;
     inherited;
 end;
+
+function TFlacFile.fGetFileType: TAudioFileType;
+begin
+    result := at_Flac;
+end;
+
+function TFlacFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_Flac];
+end;
+
 
 function TFlacFile.fGetAlbum: UnicodeString;
 begin
@@ -1060,6 +1076,7 @@ function TFlacFile.fGetFileSize   : Int64;
 begin
     result := fFileSize;
 end;
+
 function TFlacFile.fGetDuration: Integer;
 begin
     if (fIsValid) and (fSampleRate > 0) then
@@ -1164,6 +1181,7 @@ end;
 function TFlacFile.ReadFromFile(aFilename: UnicodeString): TAudioError;
 var fs: TAudioFileStream;
 begin
+    inherited ReadFromFile(aFilename);
     // Clear Data, Metablocks, ...
     ClearData;
     if AudioFileExists(aFilename) then
@@ -1373,6 +1391,7 @@ var fs: TAudioFileStream;
     tmpFlacFile: TFlacFile;
     AvailableSize: Integer;
 begin
+    inherited WriteToFile(aFilename);
     if AudioFileExists(aFilename) then
     begin
         try
@@ -1444,9 +1463,9 @@ end;
 
 function TFlacFile.RemoveFromFile(aFilename: UnicodeString): TAudioError;
 begin
+    inherited RemoveFromFile(aFilename);
     result := FlacErr_RemovingNotSupported;
 end;
-
 
 
 end.

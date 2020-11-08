@@ -47,9 +47,9 @@ interface
 
 uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      dialogs, Messages, JPEG, PNGImage, MD5, Graphics,  Lyrics,
-     AudioFileBasics, NempFileUtils, AudioFiles,
+     AudioFiles.Base, NempFileUtils,
      NempAudioFiles, AudioFileHelper, Nemp_ConstantsAndTypes, Hilfsfunktionen,
-     HtmlHelper, Mp3FileUtils, ID3v2Frames,
+     HtmlHelper, ID3v2Tags, ID3v2Frames,
      U_CharCode, gnuGettext, oneInst, StrUtils,  CoverHelper, BibHelper, StringHelper,
      Nemp_RessourceStrings, DriveRepairTools, ShoutcastUtils, BibSearchClass,
      NempCoverFlowClass, TagClouds, ScrobblerUtils, CustomizedScrobbler,
@@ -57,7 +57,7 @@ uses Windows, Contnrs, Sysutils,  Classes, Inifiles, RTLConsts,
      Winapi.Wincodec, Winapi.ActiveX, System.Generics.Defaults;
 
 const
-    BUFFER_SIZE = 10 * 1024 * 1024;
+    BUFFER_SIZE = 10 * 1024;// * 1024;
 
 type
 
@@ -743,7 +743,7 @@ type
 
 implementation
 
-uses fspTaskBarMgr;
+uses fspTaskBarMgr, AudioDisplayUtils;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -3475,12 +3475,13 @@ begin
                 af.FileIsPresent := True;
 
                 id3 := TID3v2Tag.Create;
+                FrameList := TObjectList.Create(False);
                 try
                     // Read the tag from the file
                     id3.ReadFromFile(af.Pfad);
 
                     // Get all private Frames in the ID3Tag
-                    FrameList := id3.GetAllPrivateFrames; // List is Created in this method
+                    id3.GetAllPrivateFrames(FrameList);
 
                     // delete everything except the 'NEMP/Tags'-Private Frames
                     // (from this list only, not from the ID3Tag ;-) )
@@ -3524,8 +3525,9 @@ begin
                         LogList.Add('...fixed');
                         LogList.Add('');
                     end;
-                    FrameList.Free;
+
                 finally
+                    FrameList.Free;
                     id3.Free;
                 end;
                 Changed := True;
@@ -5594,11 +5596,13 @@ begin
   tmpStrList := TStringList.Create;
   try
       tmpstrList.Capacity := Mp3ListeArtistSort.Count + 1;
-      tmpstrList.Add('Artist;Title;Album;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;TrackGain;AlbumGain;TrackPeak;AlbumPeak');
+      // tmpstrList.Add('Artist;Title;Album;Genre;Year;Track;CD;Directory;Filename;Type;Filesize;Duration;Bitrate;vbr;Channelmode;Samplerate;Rating;Playcounter;Lyrics;TrackGain;AlbumGain;TrackPeak;AlbumPeak');
+      tmpStrList.Add(cCSVHeader);
       for i:= 0 to Mp3ListeArtistSort.Count - 1 do
-        tmpstrList.Add(Mp3ListeArtistSort[i].GenerateCSVString);
+        //tmpstrList.Add(Mp3ListeArtistSort[i].GenerateCSVString);
+        tmpstrList.Add(NempDisplay.CSVLine(Mp3ListeArtistSort[i]));
       try
-          tmpStrList.SaveToFile(aFileName);
+          tmpStrList.SaveToFile(aFileName, TEnCoding.UTF8);
       except
           on E: Exception do
           begin

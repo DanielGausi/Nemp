@@ -237,11 +237,11 @@ begin
 end;
 function AFCompareChannelMode(a1,a2: tAudioFile): Integer;
 begin
-    result := CompareValue(a1.ChannelModeInt, a2.ChannelModeInt);
+    result := CompareValue(a1.ChannelModeIdx, a2.ChannelModeIdx);
 end;
 function AFCompareSamplerate(a1,a2: tAudioFile): Integer;
 begin
-    result := CompareValue(a1.SampleRateInt, a2.SampleRateInt);
+    result := CompareValue(a1.SampleRateIdx, a2.SampleRateIdx);
 end;
 function AFCompareFilesize(a1,a2: tAudioFile): Integer;
 begin
@@ -975,7 +975,7 @@ begin
                           // NPL-Files contain TDrives-Information to fix Drive Letters
                           if NPLVersion = Current_Version_Ext then
                           begin
-                              if TDriveManager.EnableUSBMode and (newAudioFile.DriveID <> -5) then
+                              if (not NewAudioFile.isStream) and TDriveManager.EnableUSBMode and (newAudioFile.DriveID <> -5) then
                               begin
                                     if currentDriveID <> newAudioFile.DriveID then
                                     begin

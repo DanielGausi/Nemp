@@ -36,7 +36,7 @@ interface
 uses
   Windows, Messages, SysUtils,  Classes, Graphics,
   Dialogs, StrUtils, ContNrs, Jpeg, PNGImage,  math, DateUtils,
-  CoverHelper, MP3FileUtils, ID3v2Frames, NempAudioFiles, cddaUtils,
+  CoverHelper, ID3v2Tags, ID3v2Frames, NempAudioFiles, cddaUtils,
   Nemp_ConstantsAndTypes, SyncObjs, System.Types,
   // new method for downloading stuff
   System.Net.URLClient, System.Net.HttpClient;

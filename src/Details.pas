@@ -40,8 +40,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage,
   ShellApi, ComCtrls, U_CharCode, myDialogs,
-  AudioFileBasics, Mp3FileUtils, ID3v2Frames, ID3GenreList, Mp3Files, FlacFiles, OggVorbisFiles,
-  VorbisComments, AudioFiles, Apev2Tags, ApeTagItem, MusePackFiles, cddaUtils,
+  AudioFiles.Base, AudioFiles.Declarations, AudioFiles.Factory, ID3v1Tags, ID3v2Tags, MpegFrames, ID3v2Frames, ID3GenreList, Mp3Files, FlacFiles, OggVorbisFiles,
+  VorbisComments, BaseApeFiles, Apev2Tags, ApeTagItem, MusePackFiles, cddaUtils,
   M4AFiles, M4AAtoms, md5,
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
@@ -217,6 +217,7 @@ type
     Btn_RemoveTag: TButton;
     BtnRefreshCoverflow: TButton;
     rgChangeCoverArt: TRadioGroup;
+    cbFrameTypeSelection: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -363,6 +364,14 @@ type
     // Show some information of the selected audiofile
     procedure ShowMetaDataFrames;
 
+    procedure FillTagWithID3v1Values(Dest: TID3v2Tag); Overload;
+    procedure FillTagWithID3v1Values(Dest: TApeTag); Overload;
+
+    procedure Fillv1TagWithTagValues(Source: TID3v2Tag; Dest: TID3v1Tag); Overload;
+    procedure Fillv1TagWithTagValues(Source: TApeTag; Dest: TID3v1Tag); Overload;
+
+
+
     procedure ApplyLyricsToTagObject;
     procedure ApplyEditsToTagObject;
     procedure ApplyTagListToTagObject;
@@ -370,20 +379,20 @@ type
 
     procedure ShowMediaBibDetails;
     procedure ShowMPEGDetails(mp3: TMp3File);
-    procedure ShowID3v1Details(mp3: TMp3File);
+    procedure ShowID3v1Details(ID3v1Tag: TID3v1Tag);
     procedure ShowCoverArt_MetaTag;
     procedure ShowCoverArt_Files;
     procedure ShowLyrics;
 
     // Save information to ID3-Tag
-    function UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
+    function UpdateID3v1InFile(ID3v1Tag: TID3v1Tag): TAudioError;
     procedure HandleCoverIDSetting(aNewID: String);
 
     procedure ReloadDataAfterEdit(aERR: TNempAudioError);
     function CurrentFileHasBeenChanged: Boolean;
 
   public
-    CurrentTagObject: TGeneralAudioFile;
+    CurrentTagObject: TBaseAudioFile;
     CurrentTagObjectWriteAccessPossible: Boolean;
     CurrentAudioFile : TAudioFile;
     NewLibraryCoverID: String;
@@ -402,7 +411,7 @@ var
 implementation
 
 Uses NempMainUnit, NewPicture, Clipbrd, MedienbibliothekClass, MainFormHelper, TagHelper,
-    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math;
+    AudioFileHelper, CloudEditor, NewMetaFrame, MetaTagSorting, math, AudioDisplayUtils;
 
 {$R *.dfm}
 
@@ -438,10 +447,12 @@ begin
       TT_Ape: begin
             fEditable := True;
             if SameText(KeyDescription, 'CATEGORIES') or
-               SameText(KeyDescription, 'REPLAYGAIN_TRACK_GAIN') OR
-               SameText(KeyDescription, 'REPLAYGAIN_ALBUM_GAIN') OR
-               SameText(KeyDescription, 'REPLAYGAIN_TRACK_PEAK') OR
-               SameText(KeyDescription, 'REPLAYGAIN_ALBUM_PEAK') OR
+               //SameText(KeyDescription, 'REPLAYGAIN_TRACK_GAIN') OR
+               //SameText(KeyDescription, 'REPLAYGAIN_ALBUM_GAIN') OR
+               //SameText(KeyDescription, 'REPLAYGAIN_TRACK_PEAK') OR
+               //SameText(KeyDescription, 'REPLAYGAIN_ALBUM_PEAK') OR
+               AnsiStartsText('REPLAYGAIN', KeyDescription) OR
+               AnsiStartsText('MP3GAIN', KeyDescription) OR
                SameText(KeyDescription, 'UNSYNCEDLYRICS') OR
                SameText(KeyDescription, 'CATEGORIES')
             then
@@ -608,7 +619,7 @@ begin
     // for mp3Files:
     // - Show additional Controls for ID3v1-Tags and some more detailed data about MPEG
     if CurrentTagObject.Valid and (CurrentTagObject.filetype = at_mp3) then
-        ShowMPEGDetails(CurrentTagObject.MP3File);
+        ShowMPEGDetails(TMP3File(CurrentTagObject));
 
     if MainPageControl.ActivePage = Tab_Pictures then
     begin
@@ -646,25 +657,25 @@ begin
               if Trim(Memo_Lyrics.Text) <> '' then
               begin
                   // Ensure that ID3v2Tag exists and set "PARTOFASET"
-                  CurrentAudioFile.EnsureID3v2Exists(CurrentTagObject.Mp3File);
-                  CurrentTagObject.Mp3File.ID3v2Tag.Lyrics := Trim(Memo_Lyrics.Text)
+                  CurrentAudioFile.EnsureID3v2Exists(TMP3File(CurrentTagObject));
+                  TMP3File(CurrentTagObject).ID3v2Tag.Lyrics := Trim(Memo_Lyrics.Text)
               end else
               begin
                   // If ID3v2Tag exists, remove Lyrics, if it is set to '' by the User
-                  if CurrentTagObject.Mp3File.ID3v2Tag.Exists then
-                      CurrentTagObject.Mp3File.ID3v2Tag.Lyrics := '';
+                  if TMP3File(CurrentTagObject).ID3v2Tag.Exists then
+                      TMP3File(CurrentTagObject).ID3v2Tag.Lyrics := '';
               end;
         end;
 
-        at_Ogg:  CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
-        at_Flac: CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
-        at_M4A:  CurrentTagObject.M4aFile.Lyrics := Trim(Memo_Lyrics.Text);
+        at_Ogg:  TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
+        at_Flac: TFlacFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_LYRICS, Trim(Memo_Lyrics.Text));
+        at_M4A:  TM4aFile(CurrentTagObject).Lyrics := Trim(Memo_Lyrics.Text);
 
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio:  CurrentTagObject.BaseApeFile.SetValueByKey(APE_LYRICS, Trim(Memo_Lyrics.Text));
+        at_TrueAudio:  TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(APE_LYRICS, Trim(Memo_Lyrics.Text));
 
         at_Wma: ;
         at_Wav: ;
@@ -674,6 +685,11 @@ end;
 
 
 procedure TFDetails.ApplyEditsToTagObject;
+var mp3File: TMP3File;
+    oggFile: TOggVorbisFile;
+    flacFile: TFlacFile;
+    m4aFile: TM4aFile;
+    apeFile: TBaseApeFile;
 begin
     // Apply the Changes made in the Edits
     // (and save them into the Metadata of the AudioFile after this)
@@ -689,63 +705,67 @@ begin
 
     case CurrenttagObject.FileType of
         at_Mp3: begin
-                    CurrentTagObject.Mp3File.Comment := Edit_LibraryComment.Text;
+                    mp3File := TMP3File(CurrentTagObject);
+                    mp3File.Comment := Edit_LibraryComment.Text;
                     if Edit_LibraryCD.Text <> '' then
                     begin
                         // Ensure that ID3v2Tag exists and set "PARTOFASET"
-                        CurrentAudioFile.EnsureID3v2Exists(CurrentTagObject.Mp3File);
-                        CurrentTagObject.Mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, Edit_LibraryCD.Text);
+                        CurrentAudioFile.EnsureID3v2Exists(mp3File);
+                        mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, Edit_LibraryCD.Text);
                     end else
                     begin
                         // If ID3v2Tag exists, remove the PARTOFASET, if it is set to '' by the User
-                        if CurrentTagObject.Mp3File.ID3v2Tag.Exists then
-                            CurrentTagObject.Mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, Edit_LibraryCD.Text);
+                        if mp3File.ID3v2Tag.Exists then
+                            mp3File.ID3v2Tag.SetText(IDv2_PARTOFASET, Edit_LibraryCD.Text);
                     end;
                     if currentTagRatingChanged then
                     begin
-                        CurrentAudioFile.EnsureID3v2Exists(CurrentTagObject.Mp3File);
+                        CurrentAudioFile.EnsureID3v2Exists(mp3File);
                         // User input: Set the new rating
-                        CurrentTagObject.Mp3File.ID3v2Tag.Rating := CurrentTagRating;
+                        mp3File.ID3v2Tag.Rating := CurrentTagRating;
                         CurrentBibRating  := CurrentTagRating;
                         // Set Playcounter as well to "TagValue"?
                         // No: The Playcounter was not edited (unless the user clicked "reset")
                         //     Therefore, the "library-counter" should have priority, if there is a difference
-                        CurrentTagObject.Mp3File.ID3v2Tag.PlayCounter := CurrentBibCounter;
+                        mp3File.ID3v2Tag.PlayCounter := CurrentBibCounter;
                         CurrentTagCounter := CurrentBibCounter;
                     end;
         end;
 
         at_Ogg: begin
-                    CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_COMMENT, Edit_LibraryComment.Text);
-                    CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edit_LibraryCD.Text);
+                    oggFile := TOggVorbisFile(CurrentTagObject);
+                    oggFile.SetPropertyByFieldname(VORBIS_COMMENT, Edit_LibraryComment.Text);
+                    oggFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edit_LibraryCD.Text);
                     if currentTagRatingChanged then
                     begin
-                        CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStr(CurrentTagRating) );
-                        CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentBibCounter));
+                        oggFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStr(CurrentTagRating) );
+                        oggFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentBibCounter));
                         CurrentBibRating  := CurrentTagRating;
                         CurrentTagCounter := CurrentBibCounter;
                     end;
         end;
 
         at_Flac: begin
-                    CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edit_LibraryComment.Text);
-                    CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edit_LibraryCD.Text);
+                    flacFile := TFlacFile(CurrentTagObject);
+                    flacFile.SetPropertyByFieldname(VORBIS_COMMENT, Edit_LibraryComment.Text);
+                    flacFile.SetPropertyByFieldname(VORBIS_DISCNUMBER, Edit_LibraryCD.Text);
                     if currentTagRatingChanged then
                     begin
-                        CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStr(CurrentTagRating) );
-                        CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentBibCounter));
+                        flacFile.SetPropertyByFieldname(VORBIS_RATING   , IntToStr(CurrentTagRating) );
+                        flacFile.SetPropertyByFieldname(VORBIS_PLAYCOUNT, IntToStr(CurrentBibCounter));
                         CurrentBibRating  := CurrentTagRating;
                         CurrentTagCounter := CurrentBibCounter;
                     end;
         end;
 
         at_M4A: begin
-                    CurrentTagObject.M4aFile.Comment := Edit_LibraryComment.Text;
-                    CurrentTagObject.M4aFile.Disc := Edit_LibraryCD.Text;
+                    m4aFile := TM4aFile(CurrentTagObject);
+                    m4aFile.Comment := Edit_LibraryComment.Text;
+                    m4aFile.Disc := Edit_LibraryCD.Text;
                     if currentTagRatingChanged then
                     begin
-                        CurrentTagObject.M4AFile.SetSpecialData(DEFAULT_MEAN, M4ARating     , IntToStr(CurrentTagRating));
-                        CurrentTagObject.M4AFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, IntToStr(CurrentBibCounter));
+                        m4aFile.SetSpecialData(DEFAULT_MEAN, M4ARating     , IntToStr(CurrentTagRating));
+                        m4aFile.SetSpecialData(DEFAULT_MEAN, M4APlayCounter, IntToStr(CurrentBibCounter));
                     end;
         end;
 
@@ -754,12 +774,13 @@ begin
         at_MusePack,
         at_OptimFrog,
         at_TrueAudio: begin
-                    CurrentTagObject.BaseApeFile.SetValueByKey(APE_COMMENT, Edit_LibraryComment.Text);
-                    CurrentTagObject.BaseApeFile.SetValueByKey(APE_DISCNUMBER, Edit_LibraryCD.Text);
+                    apeFile := TBaseApeFile(CurrentTagObject);
+                    apeFile.ApeTag.SetValueByKey(APE_COMMENT, Edit_LibraryComment.Text);
+                    apeFile.ApeTag.SetValueByKey(APE_DISCNUMBER, Edit_LibraryCD.Text);
                     if currentTagRatingChanged then
                     begin
-                        CurrentTagObject.BaseApeFile.SetValueByKey(APE_RATING   , IntToStr(CurrentTagRating) );
-                        CurrentTagObject.BaseApeFile.SetValueByKey(APE_PLAYCOUNT, IntToStr(CurrentBibCounter));
+                        apeFile.ApeTag.SetValueByKey(APE_RATING   , IntToStr(CurrentTagRating) );
+                        apeFile.ApeTag.SetValueByKey(APE_PLAYCOUNT, IntToStr(CurrentBibCounter));
                         CurrentBibRating  := CurrentTagRating;
                         CurrentTagCounter := CurrentBibCounter;
                     end;
@@ -776,41 +797,41 @@ var s: UTF8String;
 begin
     case CurrenttagObject.FileType of
         at_Mp3: begin
-                    CurrentTagObject.Mp3File.Comment := Edit_LibraryComment.Text;
+                    TMP3File(CurrentTagObject).Comment := Edit_LibraryComment.Text;
 
                     if self.lb_Tags.Items.Count > 0 then
                     begin
                         // Ensure that ID3v2Tag exists and set ProvateFrame with "Tags"
-                        CurrentAudioFile.EnsureID3v2Exists(CurrentTagObject.Mp3File);
+                        CurrentAudioFile.EnsureID3v2Exists(TMP3File(CurrentTagObject));
                         s := Utf8String(Trim(lb_Tags.Items.Text));
                         if length(s) > 0 then
                         begin
                             ms := TMemoryStream.Create;
                             try
                                 ms.Write(s[1], length(s));
-                                CurrentTagObject.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
+                                TMP3File(CurrentTagObject).ID3v2Tag.SetPrivateFrame('NEMP/Tags', ms);
                             finally
                                 ms.Free;
                             end;
                         end else
                             // delete Tags-Frame, if there are none
-                            CurrentTagObject.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+                            TMP3File(CurrentTagObject).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
                     end else
                     begin
                         // If ID3v2Tag exists, remove "Tags", if the user removed all of them
-                        if CurrentTagObject.Mp3File.ID3v2Tag.Exists then
-                            CurrentTagObject.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
+                        if TMP3File(CurrentTagObject).ID3v2Tag.Exists then
+                            TMP3File(CurrentTagObject).ID3v2Tag.SetPrivateFrame('NEMP/Tags', NIL);
                     end;
         end;
 
-        at_Ogg:     CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
-        at_Flac:    CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
-        at_M4A:     CurrentTagObject.M4aFile.Keywords := Trim(lb_Tags.Items.Text);
+        at_Ogg:     TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
+        at_Flac:    TFlacFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_CATEGORIES, Trim(lb_Tags.Items.Text));
+        at_M4A:     TM4aFile(CurrentTagObject).Keywords := Trim(lb_Tags.Items.Text);
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: CurrentTagObject.BaseApeFile.SetValueByKey(APE_CATEGORIES, Trim(lb_Tags.Items.Text));
+        at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(APE_CATEGORIES, Trim(lb_Tags.Items.Text));
         at_Wma: ;
         at_Wav: ;
         at_Invalid: ;
@@ -841,10 +862,10 @@ begin
                 nextNode := VST_MetaData.GetNext(aNode);
 
                 if CurrentTagObject.FileType = at_Mp3 then
-                    CurrentTagObject.MP3File.ID3v2Tag.DeleteFrame(aTagEdititem.ID3v2Frame);
+                    TMP3File(CurrentTagObject).ID3v2Tag.DeleteFrame(aTagEdititem.ID3v2Frame);
 
                 if CurrentTagObject.FileType = at_M4A then
-                    CurrentTagObject.M4aFile.RemoveMetaAtom(aTagEditItem.MetaAtom);
+                    TM4aFile(CurrentTagObject).RemoveMetaAtom(aTagEditItem.MetaAtom);
 
                 VST_MetaData.DeleteNode(aNode);
                 aNode := nextNode;
@@ -860,7 +881,7 @@ end;
     - Save information to id3v1-tag
     --------------------------------------------------------
 }
-function TFDetails.UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
+function TFDetails.UpdateID3v1InFile(ID3v1Tag: TID3v1Tag): TAudioError;
 
     function v1TagEditsAreEmpty: Boolean;
     begin
@@ -874,15 +895,15 @@ function TFDetails.UpdateID3v1InFile(mp3: TMp3File): TMp3Error;
     end;
 
 begin
-    result := MP3ERR_None;
+    result := FileErr_None;
     if not CurrentTagObject.Valid then
         exit;
 
-    if mp3.ID3v1Tag.Exists and v1TagEditsAreEmpty then
-        result := mp3.id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad);
+    if ID3v1Tag.Exists and v1TagEditsAreEmpty then
+        result := id3v1Tag.RemoveFromFile(CurrentAudioFile.pfad);
 
     if not v1TagEditsAreEmpty then
-        result := mp3.id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
+        result := id3v1Tag.WriteToFile(CurrentAudioFile.Pfad);
 end;
 
 
@@ -892,6 +913,8 @@ var aErr: TNempAudioError;
     i: Integer;
     CoverIDFiles: TAudioFileList;
     loopAudioFile: TAudioFile;
+    ApeFile: TBaseApeFile;
+    mp3File: TMp3File;
 begin
 
     if not CurrentTagObject.Valid then
@@ -940,29 +963,60 @@ begin
         if LibraryPropertyChanged or CurrentTagRatingChanged then
             ApplyEditsToTagObject;
 
-
         aErr := AUDIOERR_None;
-        if currenttagObject.FileType <> at_Mp3 then
-            // just call the generic UpdateFile-Method
-            aErr := AudioToNempAudioError(CurrentTagObject.UpdateFile)
+
+        case currenttagObject.FileType of
+            ///  Apetags are now supported in mp3Files
+            ///  However, Lyrics and Pictures are only stored in ID3v2. There will be no duplicates
+            ///  of these in the APETag.
+            at_Mp3: begin
+                  mp3File := TMP3File(CurrentTagObject);
+                  // we need to take care of ID3v1 vs. ID3v2 vs. APEv2 here.
+                  if ID3v1HasChanged or (LibraryPropertyChanged and mp3File.ID3v1Tag.Exists) then
+                      // this will also remove the ID3v1-Tag, if all Edits are empty
+                      aErr := AudioToNempAudioError(UpdateID3v1InFile(mp3File.ID3v1Tag));
+
+                  // New in 4.15.: ApeTags are supported as well for mp3-files
+                  // (but only rudimentary)
+                  if  (LibraryPropertyChanged AND mp3File.ApeTag.Exists)
+                      or MetaFramesHasChanged
+                  then
+                      // if ApeTag contains no data any more, it will be removed by "WriteToFile".
+                      aErr := AudioToNempAudioError(mp3File.ApeTag.WriteToFile(CurrentAudioFile.Pfad));
+
+                  if  (LibraryPropertyChanged AND mp3File.ID3v2Tag.Exists)
+                      or CurrentTagRatingChanged or MetaFramesHasChanged or LyricsHasChanged
+                      or TagCloudTagsChanged or PictureHasChanged or CoverArtHasChanged
+                  then
+                      // write the ID3v2-MetaFrames into the file now
+                      aErr := AudioToNempAudioError(mp3File.ID3v2Tag.WriteToFile(CurrentAudioFile.Pfad));
+            end;
+
+            at_Monkey,
+            at_WavPack,
+            at_MusePack,
+            at_OptimFrog,
+            at_TrueAudio: begin
+                  ApeFile := TBaseApeFile(CurrentTagObject);
+                  if ID3v1HasChanged or (LibraryPropertyChanged and ApeFile.ID3v1Tag.Exists) then
+                      // this will also remove the ID3v1-Tag, if all Edits are empty
+                      aErr := AudioToNempAudioError(UpdateID3v1InFile(ApeFile.ID3v1Tag));
+
+                  if  (LibraryPropertyChanged AND ApeFile.ApeTag.Exists)
+                      or CurrentTagRatingChanged or MetaFramesHasChanged or LyricsHasChanged
+                      or TagCloudTagsChanged or PictureHasChanged or CoverArtHasChanged
+                  then
+                      // write the Apev2-Tag into the file
+                      aErr := AudioToNempAudioError(ApeFile.ApeTag.WriteToFile(CurrentAudioFile.Pfad));
+            end;
+
         else
-        begin
-            // we need to take care of ID3v1 vs. ID3v2 here.
-            if ID3v1HasChanged or (LibraryPropertyChanged and CurrentTagObject.MP3File.ID3v1Tag.Exists) then
-                // this will also remove the ID3v1-Tag, if all Edits are empty
-                aErr := Mp3ToAudioError(UpdateID3v1InFile(CurrentTagObject.MP3File));
-
-            if  (LibraryPropertyChanged AND CurrentTagObject.MP3File.ID3v2Tag.Exists)
-                or CurrentTagRatingChanged or
-                MetaFramesHasChanged or LyricsHasChanged or TagCloudTagsChanged or PictureHasChanged or CoverArtHasChanged then
-                // just write the MetaFrames into the file now
-                aErr := Mp3ToAudioError(CurrentTagObject.MP3File.ID3v2Tag.WriteToFile(CurrentAudioFile.Pfad));
+            aErr := AudioToNempAudioError(CurrentTagObject.UpdateFile);
         end;
-
 
         if aErr <> AUDIOERR_None then
         begin
-            TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+            TranslateMessageDLG(NempAudioErrorString[aErr], mtWarning, [MBOK], 0);
             HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
         end;
 
@@ -1332,15 +1386,15 @@ begin
     end;
 
     case CurrentTagObject.FileType of
-        at_Mp3: Memo_Lyrics.Text := CurrentTagObject.MP3File.ID3v2Tag.Lyrics;
-        at_Ogg: Memo_Lyrics.Text := CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_LYRICS);
-        at_Flac: Memo_Lyrics.Text := CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_LYRICS);
-        at_M4A: Memo_Lyrics.Text := CurrentTagObject.M4aFile.Lyrics;
+        at_Mp3: Memo_Lyrics.Text := TMP3File(CurrentTagObject).ID3v2Tag.Lyrics;
+        at_Ogg: Memo_Lyrics.Text := TOggVorbisFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_LYRICS);
+        at_Flac: Memo_Lyrics.Text := TFlacFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_LYRICS);
+        at_M4A: Memo_Lyrics.Text := TM4aFile(CurrentTagObject).Lyrics;
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: Memo_Lyrics.Text := CurrentTagObject.BaseApeFile.GetValueByKey(APE_LYRICS);
+        at_TrueAudio: Memo_Lyrics.Text := TBaseApeFile(CurrentTagObject).ApeTag.GetValueByKey(APE_LYRICS);
         at_Invalid,
         at_Wma,
         at_Wav: Memo_Lyrics.Text := '';
@@ -1355,19 +1409,19 @@ procedure TFDetails.Btn_DeleteLyricFrameClick(Sender: TObject);
 begin
     case CurrentTagObject.FileType of
         at_Mp3: begin
-                    CurrentTagObject.MP3File.ID3v2Tag.Lyrics := '';
+                    TMP3File(CurrentTagObject).ID3v2Tag.Lyrics := '';
                     LyricsHasChanged := True;
                 end;
         at_Ogg: begin
-                    CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_LYRICS, '');
+                    TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_LYRICS, '');
                     LyricsHasChanged := True;
                 end;
         at_Flac: begin
-                    CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_LYRICS, '');
+                    TFlacFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_LYRICS, '');
                     LyricsHasChanged := True;
                 end;
         at_M4A: begin
-                    CurrentTagObject.M4aFile.Lyrics := '';
+                    TM4aFile(CurrentTagObject).Lyrics := '';
                     LyricsHasChanged := True;
                 end;
         at_Monkey,
@@ -1375,7 +1429,7 @@ begin
         at_MusePack,
         at_OptimFrog,
         at_TrueAudio: begin
-                    CurrentTagObject.BaseApeFile.SetValueByKey(APE_LYRICS, '');
+                    TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(APE_LYRICS, '');
                     LyricsHasChanged := True;
                 end;
 
@@ -1489,7 +1543,7 @@ begin
 
     if aErr <> AUDIOERR_None then
     begin
-        TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+        TranslateMessageDLG(NempAudioErrorString[aErr], mtWarning, [MBOK], 0);
         HandleError(afa_EditingDetails, CurrentAudioFile, aErr, True);
         exit;
     end;
@@ -1522,6 +1576,7 @@ end;
 
 
 procedure TFDetails.InitCurrentTagObject;
+var aErr: TAudioError;
 begin
 
     BtnApply.Enabled := CurrentAudioFile.IsFile AND FileExists(CurrentAudioFile.Pfad);
@@ -1533,7 +1588,8 @@ begin
         if assigned(CurrentTagObject) then
             FreeAndNil(CurrentTagObject);
         // set default values
-        CurrentTagObject := TGeneralAudioFile.Create(CurrentAudioFile.Pfad);
+        CurrentTagObject := AudioFileFactory.CreateAudioFile(CurrentAudioFile.Pfad, True);
+        aErr := FileErr_NoFile; //CurrentTagObject.ReadFromFile(CurrentAudioFile.Pfad)
         CurrentTagRatingChanged := False;
         CurrentTagObjectWriteAccessPossible := False;
         CurrentTagRating := 0;
@@ -1545,35 +1601,36 @@ begin
             FreeAndNil(CurrentTagObject);
 
         // initialise the CurrentTagObject from Filename
-        CurrentTagObject := TGeneralAudioFile.Create(CurrentAudioFile.Pfad);
+        CurrentTagObject := AudioFileFactory.CreateAudioFile(CurrentAudioFile.Pfad, True);
+        aErr := CurrentTagObject.ReadFromFile(CurrentAudioFile.Pfad);
+
         CurrentTagRatingChanged := False;
+        PnlWarnung.Visible := (not assigned(CurrentTagObject)) or (not CurrentTagObject.Valid);
 
-        PnlWarnung.Visible := not CurrentTagObject.Valid;
-
-        if CurrentTagObject.Valid then
+        if assigned(CurrentTagObject) and CurrentTagObject.Valid then
         begin
             case CurrentTagObject.FileType of
                     at_Mp3: begin
-                                CurrentTagRating := CurrentTagObject.MP3File.Id3v2Tag.Rating;
-                                CurrentTagCounter:= CurrentTagObject.MP3File.Id3v2Tag.PlayCounter;
+                                CurrentTagRating := TMp3File(CurrentTagObject).Id3v2Tag.Rating;
+                                CurrentTagCounter:= TMp3File(CurrentTagObject).Id3v2Tag.PlayCounter;
                                 CurrentTagObjectWriteAccessPossible := True;
                             end;
 
                     at_Ogg: begin
-                                CurrentTagRating := StrToIntDef(CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                                CurrentTagCounter:= StrToIntDef(CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                                CurrentTagRating := StrToIntDef(TOggVorbisFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_RATING),0);
+                                CurrentTagCounter:= StrToIntDef(TOggVorbisFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
                                 CurrentTagObjectWriteAccessPossible := True;
                             end;
 
                     at_Flac: begin
-                                CurrentTagRating := StrToIntDef(CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                                CurrentTagCounter:= StrToIntDef(CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                                CurrentTagRating := StrToIntDef(TFlacFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_RATING),0);
+                                CurrentTagCounter:= StrToIntDef(TFlacFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
                                 CurrentTagObjectWriteAccessPossible := True;
                               end;
 
                     at_M4a: begin
-                                CurrentTagCounter := StrToIntDef(CurrentTagObject.M4aFile.GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
-                                CurrentTagRating  := StrToIntDef(CurrentTagObject.M4aFile.GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
+                                CurrentTagCounter := StrToIntDef(TM4aFile(CurrentTagObject).GetSpecialData(DEFAULT_MEAN, M4APlayCounter),0);
+                                CurrentTagRating  := StrToIntDef(TM4aFile(CurrentTagObject).GetSpecialData(DEFAULT_MEAN, M4ARating), 0);
                                 CurrentTagObjectWriteAccessPossible := True;
                             end;
 
@@ -1582,8 +1639,8 @@ begin
                     at_MusePack,
                     at_OptimFrog,
                     at_TrueAudio: begin
-                                  CurrentTagRating := StrToIntDef(CurrentTagObject.BaseApeFile.GetValueByKey(APE_RATING),0);
-                                  CurrentTagCounter:= StrToIntDef(CurrentTagObject.BaseApeFile.GetValueByKey(APE_PLAYCOUNT),0);
+                                  CurrentTagRating := StrToIntDef(TBaseApeFile(CurrentTagObject).ApeTag.GetValueByKey(APE_RATING),0);
+                                  CurrentTagCounter:= StrToIntDef(TBaseApeFile(CurrentTagObject).ApeTag.GetValueByKey(APE_PLAYCOUNT),0);
                                   CurrentTagObjectWriteAccessPossible := True;
                               end;
 
@@ -1597,7 +1654,7 @@ begin
             end;
         end;
 
-        if not CurrentTagObject.Valid then
+        if (not CurrentTagObject.Valid) then
         begin
             CurrentTagRating := 0;
             CurrentTagCounter := 0;
@@ -1608,15 +1665,15 @@ begin
                                     Lbl_Warnings.Hint    := (Warning_InvalidMp3file_Hint);
                             end;
                     at_Ogg: begin
-                                    Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(CurrentTagObject.LastError)];
+                                    Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
                                     Lbl_Warnings.Hint := (Warning_ReadError_Hint);
                             end;
                     at_Flac: begin
-                                    Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(CurrentTagObject.LastError)];
+                                    Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
                                     Lbl_Warnings.Hint := (Warning_ReadError_Hint);
                               end;
                     at_M4a: begin
-                                    Lbl_Warnings.Caption := AudioErrorString[AudioToNempAudioError(CurrentTagObject.LastError)];
+                                    Lbl_Warnings.Caption := NempAudioErrorString[AudioToNempAudioError(aErr)];
                                     Lbl_Warnings.Hint := (Warning_ReadError_Hint);
                             end;
                     at_Monkey,
@@ -1627,7 +1684,10 @@ begin
                                     Lbl_Warnings.Caption := (Warning_InvalidBaseApefile); //AudioErrorString[AudioToNempAudioError(CurrentTagObject.LastError)];
                                     Lbl_Warnings.Hint := (Warning_InvalidBaseApefile_Hint);
                               end;
-                    at_Invalid,
+                    at_Invalid: begin
+                                  Lbl_Warnings.Caption := (Warning_NotSupportedFileType);
+                                  Lbl_Warnings.Hint    := (Warning_NotSupportedFileType_Hint);
+                    end;
                     at_Wma,
                     at_Wav: ; // nothing to do
                 end;
@@ -1736,7 +1796,7 @@ var mbAudioFile: TAudioFile;
     end;
 
 begin
-  if CurrentAudioFile = Nil then
+  if (CurrentAudioFile = Nil) then
   begin
         CoverLibrary1.Picture.Bitmap.Assign(NIL);
 
@@ -1807,7 +1867,8 @@ begin
                     // Size, Duration, Samplerate
                     LBLSize      .Caption := Format('%4.2f MB (%d Bytes)', [CurrentAudioFile.Size / 1024 / 1024, CurrentAudioFile.Size]);
                     LblDuration  .Caption := SekToZeitString(CurrentAudioFile.Duration);
-                    LBLSamplerate.Caption := Format('%s, %s', [CurrentAudioFile.Samplerate, CurrentAudioFile.ChannelMode]);
+                    LBLSamplerate.Caption := NempDisplay.DetailSummarySamplerate(CurrentAudioFile);
+                    // Format('%s, %s', [CurrentAudioFile.Samplerate, CurrentAudioFile.ChannelMode]);
 
                     // Bitrate
                     if CurrentAudioFile.vbr then
@@ -1819,7 +1880,7 @@ begin
                     if CurrentTagObject.FileType = at_Invalid then
                         LblFormat.Caption := CurrentAudioFile.Extension
                     else
-                        LblFormat.Caption := CurrentTagObject.FileTypeName;
+                        LblFormat.Caption := CurrentTagObject.FileTypeDescription;
 
                     // Additional Tags for TagCloud
                     lb_Tags.Items.Text := String(CurrentAudioFile.RawTagLastFM);
@@ -1844,24 +1905,24 @@ begin
                             // use data from the metatag
                             case CurrentTagObject.FileType of
                                 at_Mp3: begin
-                                            CurrentBibRating := CurrentTagObject.MP3File.ID3v2Tag.Rating;
-                                            CurrentBibCounter:= CurrentTagObject.MP3File.ID3v2Tag.PlayCounter;
+                                            CurrentBibRating := TMp3File(CurrentTagObject).ID3v2Tag.Rating;
+                                            CurrentBibCounter:= TMp3File(CurrentTagObject).ID3v2Tag.PlayCounter;
                                         end;
                                 at_Ogg: begin
-                                            CurrentBibRating := StrToIntDef(CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                                            CurrentBibCounter:= StrToIntDef(CurrentTagObject.OggFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                                            CurrentBibRating := StrToIntDef(TOggVorbisFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_RATING),0);
+                                            CurrentBibCounter:= StrToIntDef(TOggVorbisFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
                                         end;
                                 at_Flac: begin
-                                            CurrentBibRating := StrToIntDef(CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_RATING),0);
-                                            CurrentBibCounter:= StrToIntDef(CurrentTagObject.FlacFile.GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
+                                            CurrentBibRating := StrToIntDef(TFlacFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_RATING),0);
+                                            CurrentBibCounter:= StrToIntDef(TFlacFile(CurrentTagObject).GetPropertyByFieldname(VORBIS_PLAYCOUNT),0);
                                          end;
                                 at_Monkey,
                                 at_WavPack,
                                 at_MusePack,
                                 at_OptimFrog,
                                 at_TrueAudio: begin
-                                            CurrentBibRating := StrToIntDef(CurrentTagObject.BaseApeFile.GetValueByKey(APE_RATING),0);
-                                            CurrentBibCounter:= StrToIntDef(CurrentTagObject.BaseApeFile.GetValueByKey(APE_PLAYCOUNT),0);
+                                            CurrentBibRating := StrToIntDef(TBaseApeFile(CurrentTagObject).ApeTag.GetValueByKey(APE_RATING),0);
+                                            CurrentBibCounter:= StrToIntDef(TBaseApeFile(CurrentTagObject).ApeTag.GetValueByKey(APE_PLAYCOUNT),0);
                                         end;
                                 at_Invalid: ;
                                 at_Wma: ;
@@ -1920,13 +1981,13 @@ begin
                 LblReplayGainTitle  .Caption := 'N/A'
             else
                 LblReplayGainTitle  .Caption :=
-                    Format((Audiofile_ReplayGain_Track_WithPeak), [currentAudioFile.TrackGain, currentAudioFile.TrackPeak]);
+                    Format((rsFormatReplayGainTrack_WithPeak), [currentAudioFile.TrackGain, currentAudioFile.TrackPeak]);
 
             if currentAudioFile.AlbumGain = 0 then
                 LblReplayGainAlbum  .Caption := 'N/A'
             else
                 LblReplayGainAlbum  .Caption :=
-                    Format((Audiofile_ReplayGain_Album_WithPeak), [currentAudioFile.AlbumGain, currentAudioFile.AlbumPeak]);
+                    Format((rsFormatReplayGainAlbum_WithPeak), [currentAudioFile.AlbumGain, currentAudioFile.AlbumPeak]);
         end else
         begin
             Edit_LibraryArtist   .Text := '';
@@ -2126,7 +2187,7 @@ end;
 procedure TFDetails.VST_MetaDataEditing(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
 begin
-    Allowed := (Column = 2) AND (VST_MetaData.GetNodeData<TTagEditItem>(Node).Editable);
+    Allowed := (Column = 3) AND (VST_MetaData.GetNodeData<TTagEditItem>(Node).Editable);
 end;
 
 procedure TFDetails.VST_MetaDataNewText(Sender: TBaseVirtualTree;
@@ -2177,21 +2238,38 @@ begin
 
         end;
         TT_OggVorbis: begin
-            self.CurrentTagObject.OggFile.SetPropertyByFieldname(
+            TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(
                 VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription,
                 NewText);
         end;
 
         TT_Flac: begin
-            self.CurrentTagObject.FlacFile.SetPropertyByFieldname(
+            TFlacFile(CurrentTagObject).SetPropertyByFieldname(
                 VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription,
                 NewText);
         end;
 
         TT_Ape: begin
-            self.CurrentTagObject.BaseApeFile.SetValueByKey(
-                AnsiString(VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription),
-                NewText);
+            case currenttagObject.FileType of
+              at_Invalid: ;
+              at_Mp3: TMp3File(CurrentTagObject).ApeTag.SetValueByKey(
+                    AnsiString(VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription),
+                    NewText);
+              at_Ogg: ;
+              at_Flac: ;
+              at_M4A: ;
+              at_Monkey,
+              at_WavPack,
+              at_MusePack,
+              at_OptimFrog,
+              at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(
+                    AnsiString(VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription),
+                    NewText);
+              at_Wma: ;
+              at_Wav: ;
+              at_AbstractApe: ;
+            end;
+
         end;
 
         TT_M4A: begin
@@ -2218,7 +2296,15 @@ begin
     if not assigned(NewMetaFrameForm) then
         Application.CreateForm(TNewMetaFrameForm, NewMetaFrameForm);
 
-    NewMetaFrameForm.TagType := self.MetaTagType;
+    if CurrentTagObject.FileType = at_Mp3 then
+    begin
+        if cbFrameTypeSelection.ItemIndex = 1 then
+            NewMetaFrameForm.TagType := TT_APE
+        else
+            NewMetaFrameForm.TagType := TT_ID3v2
+    end else
+        NewMetaFrameForm.TagType := self.MetaTagType;
+
     NewMetaFrameForm.CurrentTagObject := self.CurrentTagObject;
 
     if NewMetaFrameForm.PrepareFrameSelection = 0 then
@@ -2246,9 +2332,10 @@ procedure TFDetails.VST_MetaDataGetText(Sender: TBaseVirtualTree;
   var CellText: string);
 begin
     case Column of
-        0: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Key;
-        1: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription;
-        2: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Value;
+        0: Celltext := TagTypeDescriptions[VST_MetaData.GetNodeData<TTagEditItem>(Node).TagType];
+        1: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Key;
+        2: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).KeyDescription;
+        3: CellText := VST_MetaData.GetNodeData<TTagEditItem>(Node).Value;
     end;
 end;
 
@@ -2276,6 +2363,31 @@ var mp3File: TMP3File;
     aAtom: TMetaAtom;
     CommentList: TStringList;
 
+    procedure FillApeFrames(aApetag: TApetag);
+    var j: Integer;
+    begin
+        CommentList := TStringList.Create;
+        try
+            aApeTag.GetAllFrames(CommentList);
+            for j := 0 to CommentList.Count - 1 do
+            begin
+                NewTagEditItem := TTagEditItem.Create; //
+
+                NewTagEditItem.TagType := TT_APE;
+                NewTagEditItem.Key     := '';
+                NewTagEditItem.KeyDescription := CommentList[j];
+                NewTagEditItem.Value   := aApeTag.GetValueByKey(AnsiString(CommentList[j]));
+                NewTagEditItem.ID3v2Frame := NIL;
+                NewTagEditItem.MetaAtom   := Nil;
+                NewTagEditItem.InitEditability;
+
+                VST_MetaData.AddChild(Nil, NewTagEditItem);
+            end;
+        finally
+            CommentList.Free;
+        end;
+    end;
+
 begin
     VST_MetaData.Clear;
 
@@ -2287,37 +2399,55 @@ begin
         exit;
 
     // show the ID3v1-Box only for MP3-Files
-    Pnl_ID3v1_MPEG.Visible := CurrentTagObject.FileType = at_Mp3;
+    Pnl_ID3v1_MPEG.Visible := CurrentTagObject.FileType in [at_Mp3, at_Monkey, at_WavPack, at_MusePack, at_OptimFrog, at_TrueAudio];
+    GrpBox_Mpeg.Visible := (CurrentTagObject.FileType = at_Mp3);
+
+    // FrameTypeSelection only for mp3Files, and only if there is already an APEv2Tag
+    // if not: Nemp should not try to push Aoe-Tags into mp3Files. It's not standard.
+    cbFrameTypeSelection.Visible := (CurrentTagObject.FileType = at_Mp3)
+                          AND (TMp3File(CurrentTagObject).ApeTag.ContainsData);
 
     case CurrentTagObject.FileType of
           at_Mp3: begin
-                      mp3File := CurrentTagObject.MP3File;
+                      mp3File := TMp3File(CurrentTagObject);
                       MetaTagType := TT_ID3v2;
-                      GrpBox_TextFrames.Caption := Format('ID3v2-Tag, Version 2.%d.%d', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor]);
+
+                      if mp3File.ApeTag.Exists then
+                        GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d), APE-Tag (Version %d.000)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor, mp3File.ApeTag.Version])
+                      else
+                        GrpBox_TextFrames.Caption := Format('ID3v2-Tag (Version 2.%d.%d)', [mp3File.id3v2Tag.Version.Major, mp3File.id3v2Tag.Version.Minor]);
 
                       mp3File.ID3v1Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
                       mp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
 
-                      ShowID3v1Details(CurrentTagObject.MP3File);
+                      ShowID3v1Details(mp3File.ID3v1Tag);
 
                       if CurrentTagObject.Valid then
                       begin
-                          FrameList := MP3File.ID3v2Tag.GetAllFrames;
-                          for i := 0 to FrameList.Count - 1 do
-                          begin
-                              aFrame := (FrameList[i] as TID3v2Frame);
-                              NewTagEditItem := TTagEditItem.Create; //
-                              NewTagEditItem.TagType := TT_ID3v2;
-                              NewTagEditItem.Key     := String(aFrame.FrameIDString);
-                              NewTagEditItem.Value   := ID3v2FrameAsString(aFrame);
-                              NewTagEditItem.ID3v2Frame := aFrame;
-                              NewTagEditItem.MetaAtom   := Nil;
-                              NewTagEditItem.KeyDescription := aFrame.FrameTypeDescription;
-                              NewTagEditItem.InitEditability;
+                          FrameList := TObjectList.Create(False);
+                          try
+                            MP3File.ID3v2Tag.GetAllFrames(FrameList);
+                            for i := 0 to FrameList.Count - 1 do
+                            begin
+                                aFrame := (FrameList[i] as TID3v2Frame);
+                                NewTagEditItem := TTagEditItem.Create; //
+                                NewTagEditItem.TagType := TT_ID3v2;
+                                NewTagEditItem.Key     := String(aFrame.FrameIDString);
+                                NewTagEditItem.Value   := ID3v2FrameAsString(aFrame);
+                                NewTagEditItem.ID3v2Frame := aFrame;
+                                NewTagEditItem.MetaAtom   := Nil;
+                                NewTagEditItem.KeyDescription := aFrame.FrameTypeDescription;
+                                NewTagEditItem.InitEditability;
 
-                              VST_MetaData.AddChild(Nil, NewTagEditItem);
+                                VST_MetaData.AddChild(Nil, NewTagEditItem);
+                            end;
+                          finally
+                              FrameList.Free;
                           end;
-                          FrameList.Free;
+
+                          //if Mp3File.ApeTag.Exists then
+                          FillApeFrames(Mp3File.ApeTag);
+
                       end else
                       begin
                           Lbl_Warnings.Caption := (Warning_InvalidMp3file);
@@ -2334,7 +2464,7 @@ begin
                       mp3File.ID3v2Tag.AutoCorrectCodepage := NempCharCodeOptions.AutoDetectCodePage;
                   end;
           at_Ogg: begin
-                      oggFile := CurrentTagObject.OggFile;
+                      oggFile := TOggVorbisFile(CurrentTagObject);
                       MetaTagType := TT_OggVorbis;
                       GrpBox_TextFrames.Caption := 'Vorbis-Comments';
 
@@ -2365,7 +2495,7 @@ begin
                       end;
                   end;
           at_Flac: begin
-                        flacFile := CurrentTagObject.FlacFile;
+                        flacFile := TFlacFile(CurrentTagObject);
                         MetaTagType := TT_Flac;
                         GrpBox_TextFrames.Caption := 'Vorbis-Comments';
 
@@ -2395,7 +2525,7 @@ begin
                         end;
                     end;
           at_M4a: begin
-                        m4aFile := CurrentTagObject.M4aFile;
+                        m4aFile := TM4aFile(CurrentTagObject);
                         MetaTagType := TT_M4A;
                         GrpBox_TextFrames.Caption := 'iTunes-Tags';
 
@@ -2442,33 +2572,13 @@ begin
           at_MusePack,
           at_OptimFrog,
           at_TrueAudio: begin
-                        apeFile := CurrentTagObject.BaseApeFile;
+                        apeFile := TBaseApeFile(CurrentTagObject);
                         MetaTagType := TT_APE;
                         GrpBox_TextFrames.Caption := 'APEv2-Tags';
 
+                        ShowID3v1Details(apeFile.ID3v1Tag);
                         if CurrentTagObject.Valid then
-                        begin
-                            CommentList := TStringList.Create;
-                            try
-                                apeFile.GetAllFrames(CommentList);
-                                for i := 0 to CommentList.Count - 1 do
-                                begin
-                                    NewTagEditItem := TTagEditItem.Create; //
-
-                                    NewTagEditItem.TagType := TT_APE;
-                                    NewTagEditItem.Key     := '';
-                                    NewTagEditItem.KeyDescription := CommentList[i];
-                                    NewTagEditItem.Value   := apeFile.GetValueByKey(AnsiString(CommentList[i]));
-                                    NewTagEditItem.ID3v2Frame := NIL;
-                                    NewTagEditItem.MetaAtom   := Nil;
-                                    NewTagEditItem.InitEditability;
-
-                                    VST_MetaData.AddChild(Nil, NewTagEditItem);
-                                end;
-                            finally
-                                CommentList.Free;
-                            end;
-                        end;
+                            FillApeFrames(apeFile.ApeTag);
                     end;
 
           at_Invalid,
@@ -2482,10 +2592,15 @@ begin
       ID3v1HasChanged := False;
       MetaFramesHasChanged := False;
 
-      BtnCopyFromV1.Visible := CurrentTagObject.FileType = at_Mp3;
-
-      if CurrentTagObject.FileType = at_Mp3 then
-          BtnCopyFromV1.Enabled := CurrentTagObject.MP3File.ID3v1Tag.TagExists;
+      BtnCopyFromV1.Visible := CurrentTagObject.FileType in [at_Mp3, at_Monkey, at_WavPack, at_MusePack, at_OptimFrog, at_TrueAudio];
+      case CurrentTagObject.FileType of
+        at_Mp3: BtnCopyFromV1.Enabled := TMp3File(CurrentTagObject).ID3v1Tag.TagExists;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: BtnCopyFromV1.Enabled := TBaseApeFile(CurrentTagObject).ID3v1Tag.TagExists;
+      end;
 end;
 
 procedure TFDetails.VST_MetaDataCompareNodes(Sender: TBaseVirtualTree; Node1,
@@ -2551,43 +2666,150 @@ end;
     --------------------------------------------------------
 }
 
+procedure TFDetails.FillTagWithID3v1Values(Dest: TID3v2Tag);
+begin
+    Dest.Title   := Lblv1Titel.Text   ;
+    Dest.Artist  := Lblv1Artist.Text  ;
+    Dest.Album   := Lblv1Album.Text   ;
+    Dest.Comment := Lblv1Comment.Text ;
+    Dest.Year    := Lblv1Year.Text    ;
+    Dest.Track   := Lblv1Track.Text   ;
+    // special case genre: do not copy it always to prevent data loss
+    if Dest.Genre = '' then
+      // Genre is NOT set in ID3v2: use value from v1
+      Dest.Genre := cbIDv1Genres.Text
+    else
+    begin
+        // If genre IS set in ID3v2, and it is a "standard" genre: Overwrite it
+        if ID3Genres.IndexOf(Dest.Genre) >= 0 then
+          Dest.Genre := cbIDv1Genres.Text;
+        // if v2-Genre is a "unknown" genre (index = -1): do NOT use value from v1
+    end;
+end;
+procedure TFDetails.FillTagWithID3v1Values(Dest: TApeTag);
+begin
+    Dest.Title   := Lblv1Titel.Text   ;
+    Dest.Artist  := Lblv1Artist.Text  ;
+    Dest.Album   := Lblv1Album.Text   ;
+    Dest.Comment := Lblv1Comment.Text ;
+    Dest.Year    := Lblv1Year.Text    ;
+    Dest.Track   := Lblv1Track.Text   ;
+    // special case genre: do not copy it always to prevent data loss
+    if Dest.Genre = '' then
+      // Genre is NOT set in ApeTag: use value from v1
+      Dest.Genre := cbIDv1Genres.Text
+    else
+    begin
+        // If genre IS set in ApeTag, and it is a "standard" genre: Overwrite it
+        if ID3Genres.IndexOf(Dest.Genre) >= 0 then
+          Dest.Genre := cbIDv1Genres.Text;
+        // if v2-Genre is a "unknown" genre (index = -1): do NOT use value from v1
+    end;
+end;
+
 
 procedure TFDetails.BtnCopyFromV1Click(Sender: TObject);
+var success: Boolean;
 begin
-    if (not CurrentTagObject.Valid) or (CurrentTagObject.FileType <> at_mp3) then
+    if (not CurrentTagObject.Valid) then
         exit;
-    CurrenttagObject.MP3File.ID3v2Tag.Title   := Lblv1Titel.Text   ;
-    CurrenttagObject.MP3File.ID3v2Tag.Artist  := Lblv1Artist.Text  ;
-    CurrenttagObject.MP3File.ID3v2Tag.Album   := Lblv1Album.Text   ;
-    CurrenttagObject.MP3File.ID3v2Tag.Comment := Lblv1Comment.Text ;
-    CurrenttagObject.MP3File.ID3v2Tag.Year    := Lblv1Year.Text    ;
-    CurrenttagObject.MP3File.ID3v2Tag.Track   := Lblv1Track.Text   ;
-    CurrenttagObject.MP3File.ID3v2Tag.Genre   := cbIDv1Genres.Text ;
-    // add/edit the List of MetaFrames
-    ShowMetaDataFrames;
-    MetaFramesHasChanged := True;
+
+    case CurrentTagObject.FileType of
+        at_Mp3: begin
+            success := True;
+            FillTagWithID3v1Values(TMp3File(CurrentTagObject).ID3v2Tag);
+            if TMp3File(CurrentTagObject).ApeTag.ContainsData then
+                FillTagWithID3v1Values(TMp3File(CurrentTagObject).ApeTag);
+        end;
+
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: begin
+            success := True;
+            FillTagWithID3v1Values(TBaseApeFile(CurrentTagObject).ApeTag);
+        end;
+    else
+        success := False;
+    end;
+    if success then
+    begin
+        // add/edit the List of MetaFrames
+        ShowMetaDataFrames;
+        MetaFramesHasChanged := True;
+    end;
 end;
-procedure TFDetails.BtnCopyFromV2Click(Sender: TObject);
+
+procedure TFDetails.Fillv1TagWithTagValues(Source: TID3v2Tag; Dest: TID3v1Tag);
+var idx: Integer;
 begin
-    if (not CurrentTagObject.Valid) or (CurrentTagObject.FileType <> at_mp3) then
-        exit;
     // Apply values to the TagObject
-    CurrentTagObject.MP3File.Id3v1Tag.Title   :=  CurrenttagObject.MP3File.ID3v2Tag.Title   ;
-    CurrentTagObject.MP3File.Id3v1Tag.Artist  :=  CurrenttagObject.MP3File.ID3v2Tag.Artist  ;
-    CurrentTagObject.MP3File.Id3v1Tag.Album   :=  CurrenttagObject.MP3File.ID3v2Tag.Album   ;
-    CurrentTagObject.MP3File.Id3v1Tag.Comment :=  CurrenttagObject.MP3File.ID3v2Tag.Comment ;
-    CurrentTagObject.MP3File.Id3v1Tag.Genre   :=  CurrenttagObject.MP3File.ID3v2Tag.Genre   ;
-    CurrentTagObject.MP3File.Id3v1Tag.Track   :=  CurrenttagObject.MP3File.ID3v2Tag.Track   ;
-    CurrentTagObject.MP3File.Id3v1Tag.Year    :=  AnsiString(CurrenttagObject.MP3File.ID3v2Tag.Year) ;
+    Dest.Title   :=  Source.Title   ;
+    Dest.Artist  :=  Source.Artist  ;
+    Dest.Album   :=  Source.Album   ;
+    Dest.Comment :=  Source.Comment ;
+    Dest.Genre   :=  Source.Genre   ;
+    Dest.Track   :=  Source.Track   ;
+    Dest.Year    :=  AnsiString(Source.Year) ;
     // Change the Edits
-    Lblv1Titel.Text   :=  CurrenttagObject.MP3File.ID3v2Tag.Title   ;
-    Lblv1Artist.Text  :=  CurrenttagObject.MP3File.ID3v2Tag.Artist  ;
-    Lblv1Album.Text   :=  CurrenttagObject.MP3File.ID3v2Tag.Album   ;
-    Lblv1Comment.Text :=  CurrenttagObject.MP3File.ID3v2Tag.Comment ;
-    Lblv1Year.Text    :=  CurrenttagObject.MP3File.ID3v2Tag.Year    ;
-    Lblv1Track.Text   :=  CurrenttagObject.MP3File.ID3v2Tag.Track   ;
-    cbIDv1Genres.Text :=  CurrenttagObject.MP3File.ID3v2Tag.Genre   ;
+    Lblv1Titel.Text   :=  Source.Title   ;
+    Lblv1Artist.Text  :=  Source.Artist  ;
+    Lblv1Album.Text   :=  Source.Album   ;
+    Lblv1Comment.Text :=  Source.Comment ;
+    Lblv1Year.Text    :=  Source.Year    ;
+    Lblv1Track.Text   :=  Source.Track   ;
+
+    idx := cbIDv1Genres.Items.IndexOf(Dest.Genre);
+    if idx >= 0 then
+        cbIDv1Genres.ItemIndex := idx
+    else
+        cbIDv1Genres.ItemIndex := 0;
+
     ID3v1HasChanged := True;
+end;
+procedure TFDetails.Fillv1TagWithTagValues(Source: TApeTag; Dest: TID3v1Tag);
+begin
+    // Apply values to the TagObject
+    Dest.Title   :=  Source.Title   ;
+    Dest.Artist  :=  Source.Artist  ;
+    Dest.Album   :=  Source.Album   ;
+    Dest.Comment :=  Source.Comment ;
+    Dest.Genre   :=  Source.Genre   ;
+    Dest.Track   :=  Source.Track   ;
+    Dest.Year    :=  AnsiString(Source.Year) ;
+    // Change the Edits
+    Lblv1Titel.Text   :=  Source.Title   ;
+    Lblv1Artist.Text  :=  Source.Artist  ;
+    Lblv1Album.Text   :=  Source.Album   ;
+    Lblv1Comment.Text :=  Source.Comment ;
+    Lblv1Year.Text    :=  Source.Year    ;
+    Lblv1Track.Text   :=  Source.Track   ;
+    cbIDv1Genres.Text :=  Source.Genre   ;
+    ID3v1HasChanged := True;
+end;
+
+procedure TFDetails.BtnCopyFromV2Click(Sender: TObject);
+var mp3: TMp3File;
+    ApeFile: TBaseApeFile;
+begin
+    if (not CurrentTagObject.Valid) then
+        exit;
+
+    case CurrentTagObject.FileType of
+        at_Mp3: begin
+            mp3 := TMp3File(CurrentTagObject);
+            Fillv1TagWithTagValues(mp3.ID3v2Tag, mp3.ID3v1Tag);
+        end;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: begin
+            ApeFile := TBaseApeFile(CurrentTagObject);
+            Fillv1TagWithTagValues(ApeFile.ApeTag, ApeFile.ID3v1Tag);
+        end;
+    end;
 end;
 {
     --------------------------------------------------------
@@ -2597,24 +2819,35 @@ end;
     --------------------------------------------------------
 }
 procedure TFDetails.Lblv1Change(Sender: TObject);
+var ID3v1Tag: TID3v1Tag;
 begin
-    ID3v1HasChanged := True;
-
     if not CurrentTagObject.Valid then
         exit;
 
-    if CurrentTagObject.FileType <> at_mp3 then
-        exit;
+    case CurrentTagObject.FileType of
+        at_Mp3: ID3v1Tag := TMP3File(CurrentTagObject).ID3v1Tag;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: ID3v1Tag := TBaseApeFile(CurrentTagObject).ID3v1Tag;
+    else
+        ID3v1Tag := Nil;
+    end;
 
-    // Apply the values
-    case (Sender as TWinControl).Tag of
-        1: CurrentTagObject.MP3File.Id3v1Tag.Artist  := Lblv1Artist.Text  ;
-        2: CurrentTagObject.MP3File.Id3v1Tag.Title   := Lblv1Titel.Text   ;
-        3: CurrentTagObject.MP3File.Id3v1Tag.Album   := Lblv1Album.Text   ;
-        4: CurrentTagObject.MP3File.Id3v1Tag.Comment := Lblv1Comment.Text ;
-        5: CurrentTagObject.MP3File.Id3v1Tag.Track   := Lblv1Track.Text   ;
-        6: CurrentTagObject.MP3File.Id3v1Tag.Genre   := cbIDv1Genres.Text ;
-        7: CurrentTagObject.MP3File.Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
+    if assigned(ID3v1Tag) then
+    begin
+        ID3v1HasChanged := True;
+        // Apply the values
+        case (Sender as TWinControl).Tag of
+            1: Id3v1Tag.Artist  := Lblv1Artist.Text  ;
+            2: Id3v1Tag.Title   := Lblv1Titel.Text   ;
+            3: Id3v1Tag.Album   := Lblv1Album.Text   ;
+            4: Id3v1Tag.Comment := Lblv1Comment.Text ;
+            5: Id3v1Tag.Track   := Lblv1Track.Text   ;
+            6: Id3v1Tag.Genre   := cbIDv1Genres.Text ;
+            7: Id3v1Tag.Year    := AnsiString(Lblv1Year.Text);
+        end;
     end;
 end;
 
@@ -2629,8 +2862,15 @@ begin
       else
         Lblv1Track.Font.Color := clred;
 
-      if CurrentTagObject.FileType = at_mp3 then
-          CurrentTagObject.MP3File.Id3v1Tag.Track   := Lblv1Track.Text   ;
+      case CurrentTagObject.FileType of
+        at_Invalid: ;
+        at_Mp3: TMp3File(CurrentTagObject).Id3v1Tag.Track := Lblv1Track.Text;
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: TBaseApeFile(CurrentTagObject).Id3v1Tag.Track := Lblv1Track.Text;
+      end;
     end;
     ID3v1HasChanged := True;
   end;
@@ -2646,8 +2886,16 @@ begin
         Lblv1Year.Font.Color := clWindowText
       else
         Lblv1Year.Font.Color := clRed;
-      if CurrentTagObject.FileType = at_mp3 then
-          CurrentTagObject.MP3File.Id3v1Tag.Year   := AnsiString(Lblv1Track.Text)   ;
+
+      case CurrentTagObject.FileType of
+        at_Invalid: ;
+        at_Mp3: TMp3File(CurrentTagObject).Id3v1Tag.Year := AnsiString(Lblv1Year.Text);
+        at_Monkey,
+        at_WavPack,
+        at_MusePack,
+        at_OptimFrog,
+        at_TrueAudio: TBaseApeFile(CurrentTagObject).Id3v1Tag.Year := AnsiString(Lblv1Year.Text)
+      end;
     end;
     ID3v1HasChanged := True;
   end;
@@ -2697,18 +2945,18 @@ end;
     ShowID3v1Details
     --------------------------------------------------------
 }
-procedure TFDetails.ShowID3v1Details(mp3: TMp3File);
+procedure TFDetails.ShowID3v1Details(ID3v1Tag: TID3v1Tag);
 begin
-    if mp3.ID3v1Tag.exists and CurrentTagObject.Valid then // then
+    if ID3v1Tag.exists and CurrentTagObject.Valid then // then
     begin
-        Lblv1Artist.Text := mp3.Id3v1Tag.Artist;
-        Lblv1Album.Text  := mp3.Id3v1Tag.Album;
-        Lblv1Titel.Text  := mp3.Id3v1Tag.Title;
-        Lblv1Year.Text   := UnicodeString(mp3.Id3v1Tag.year);
+        Lblv1Artist.Text := ID3v1Tag.Artist;
+        Lblv1Album.Text  := ID3v1Tag.Album;
+        Lblv1Titel.Text  := ID3v1Tag.Title;
+        Lblv1Year.Text   := UnicodeString(ID3v1Tag.year);
         // hier den Itemindex nehmen - id3v1Genre kann nicht beliebig sein
-        cbIDv1Genres.ItemIndex := cbIDv1Genres.Items.IndexOf(mp3.Id3v1Tag.genre);
-        Lblv1Comment.Text := mp3.Id3v1Tag.Comment;
-        Lblv1Track.Text   := mp3.Id3v1Tag.Track;
+        cbIDv1Genres.ItemIndex := cbIDv1Genres.Items.IndexOf(ID3v1Tag.genre);
+        Lblv1Comment.Text := ID3v1Tag.Comment;
+        Lblv1Track.Text   := ID3v1Tag.Track;
         if IsValidV1TrackString(Lblv1Track.Text) then
             Lblv1Track.Font.Color := clWindowText
         else
@@ -2810,7 +3058,10 @@ begin
     case CurrentTagObject.FileType of
         at_Invalid: ;
         at_Mp3: begin
-                      PictureFrames := CurrentTagObject.MP3File.ID3v2Tag.GetAllPictureFrames;
+                      if not assigned(PictureFrames) then
+                          PictureFrames := TObjectList.Create(False);
+
+                      TMp3File(CurrentTagObject).ID3v2Tag.GetAllPictureFrames(PictureFrames);
 
                       stream := TMemoryStream.Create;
                       try
@@ -2834,7 +3085,7 @@ begin
         at_Flac: begin
                       if not assigned(PictureFrames) then
                           PictureFrames := TObjectList.Create(False);
-                      CurrentTagObject.FlacFile.GetAllPictureBlocks(PictureFrames);
+                      TFlacFile(CurrentTagObject).GetAllPictureBlocks(PictureFrames);
 
                       for i := 0 to PictureFrames.Count - 1 do
                       begin
@@ -2850,7 +3101,7 @@ begin
                       stream := TMemoryStream.Create;
                       try
                           // Only one Image supprted in M4A-Files
-                          if CurrentTagObject.M4aFile.GetPictureStream(stream, m4aPictype) then
+                          if TM4aFile(CurrentTagObject).GetPictureStream(stream, m4aPictype) then
                               cbCoverArtMetadata.Items.Add(DetailForm_OnlyOneM4ACover);
                       finally
                           stream.Free;
@@ -2861,7 +3112,7 @@ begin
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: CurrentTagObject.BaseApeFile.GetAllPictureFrames(cbCoverArtMetadata.Items);
+        at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.GetAllPictureFrames(cbCoverArtMetadata.Items);
 
         at_Wma: ;
         at_Wav: ;
@@ -3027,7 +3278,7 @@ begin
             at_M4A: begin
                   // Load *the* M4A-Image
                   // do it, as this method is also called on "OnEnter"
-                  if CurrentTagObject.M4aFile.GetPictureStream(stream, m4aPictype) then
+                  if TM4aFile(CurrentTagObject).GetPictureStream(stream, m4aPictype) then
                   begin
                       case m4aPictype of
                         M4A_JPG: mime := 'image/jpeg';
@@ -3048,7 +3299,7 @@ begin
             at_OptimFrog,
             at_TrueAudio: begin
                   // Load APE-Image
-                  if CurrentTagObject.BaseApeFile.GetPicture(AnsiString(cbCoverArtMetadata.Text), Stream, Description) then
+                  if TBaseApeFile(CurrentTagObject).ApeTag.GetPicture(AnsiString(cbCoverArtMetadata.Text), Stream, Description) then
                   begin
                       CurrentCoverStream.CopyFrom(stream, 0);
                       if not PicStreamToBitmap(Stream, 'image/jpeg', ImgCurrentSelection.Picture.Bitmap) then
@@ -3102,14 +3353,14 @@ end;
 procedure TFDetails.Btn_DeletePictureClick(Sender: TObject);
 begin
     case CurrentTagObject.FileType of
-        at_Mp3: CurrentTagObject.MP3File.Id3v2Tag.DeleteFrame(PictureFrames[cbCoverArtMetadata.ItemIndex] as TID3v2Frame );
-        at_Flac: CurrentTagObject.FlacFile.DeletePicture(TFlacPictureBlock(PictureFrames[cbCoverArtMetadata.ItemIndex]));
-        at_M4A: CurrentTagObject.M4aFile.SetPicture(Nil, M4A_Invalid);
+        at_Mp3: TMp3File(CurrentTagObject).Id3v2Tag.DeleteFrame(PictureFrames[cbCoverArtMetadata.ItemIndex] as TID3v2Frame );
+        at_Flac: TFlacFile(CurrentTagObject).DeletePicture(TFlacPictureBlock(PictureFrames[cbCoverArtMetadata.ItemIndex]));
+        at_M4A: TM4aFile(CurrentTagObject).SetPicture(Nil, M4A_Invalid);
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: CurrentTagObject.BaseApeFile.SetPicture(AnsiString(cbCoverArtMetadata.Text), '', NIL );
+        at_TrueAudio: TBaseApeFile(CurrentTagObject).ApeTag.SetPicture(AnsiString(cbCoverArtMetadata.Text), '', NIL );
         // at_Invalid: ;at_Ogg: ; at_Wma: ; at_Wav: ; // nothing to do, not supported.
     end;
     ShowCoverArt_MetaTag;
@@ -3149,7 +3400,7 @@ begin
             end;
 
             at_M4A: begin
-                  if CurrentTagObject.M4aFile.GetPictureStream(stream, m4aPictype) then
+                  if TM4aFile(CurrentTagObject).GetPictureStream(stream, m4aPictype) then
                   begin
                       case m4aPictype of
                         M4A_JPG: mime := 'image/jpeg';
@@ -3164,7 +3415,7 @@ begin
             at_MusePack,
             at_OptimFrog,
             at_TrueAudio: begin
-                  if CurrentTagObject.BaseApeFile.GetPicture(AnsiString(cbCoverArtMetadata.Text), Stream, Description) then
+                  if TBaseApeFile(CurrentTagObject).ApeTag.GetPicture(AnsiString(cbCoverArtMetadata.Text), Stream, Description) then
                   begin
                       // try to get the MimeType
                       tmpBmp := TBitmap.Create;
@@ -3238,27 +3489,27 @@ begin
               AnsiID := AnsiString(aNewID);
               if length(AnsiID) > 0 then
               begin
-                  CurrentAudioFile.EnsureID3v2Exists(CurrentTagObject.Mp3File);
+                  CurrentAudioFile.EnsureID3v2Exists(TMp3File(CurrentTagObject));
                   ms := TMemoryStream.Create;
                   try
                       ms.Write(AnsiID[1], length(AnsiID));
-                      CurrentTagObject.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', ms);
+                      TMp3File(CurrentTagObject).ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', ms);
                   finally
                       ms.Free;
                   end;
               end else
                   // delete UserCoverID-Frame
-                  CurrentTagObject.Mp3File.ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', NIL);
+                  TMp3File(CurrentTagObject).ID3v2Tag.SetPrivateFrame('NEMP/UserCoverID', NIL);
         end;
 
-        at_Ogg : CurrentTagObject.OggFile.SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
-        at_Flac: CurrentTagObject.FlacFile.SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
-        at_M4A : CurrentTagObject.M4AFile.SetSpecialData(DEFAULT_MEAN, M4AUserCoverID, aNewID);
+        at_Ogg : TOggVorbisFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
+        at_Flac: TFlacFile(CurrentTagObject).SetPropertyByFieldname(VORBIS_USERCOVERID, aNewID);
+        at_M4A : TM4aFile(CurrentTagObject).SetSpecialData(DEFAULT_MEAN, M4AUserCoverID, aNewID);
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio:  CurrentTagObject.BaseApeFile.SetValueByKey(APE_USERCOVERID  , aNewID);
+        at_TrueAudio:  TBaseApeFile(CurrentTagObject).ApeTag.SetValueByKey(APE_USERCOVERID  , aNewID);
         //at_Wma: ; at_Invalid: ; at_Wav: ;
     end;
 

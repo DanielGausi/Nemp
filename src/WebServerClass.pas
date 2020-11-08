@@ -55,9 +55,10 @@ interface
 uses Windows, Classes, Messages, ContNrs, SysUtils,  dialogs,
   IniFiles,  StrUtils, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdCustomHTTPServer, IdHTTPServer, IdContext,
-  MP3FileUtils, NempAudioFiles, Hilfsfunktionen, HtmlHelper,
+  NempAudioFiles, Hilfsfunktionen, HtmlHelper,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
-  MedienbibliothekClass, BibSearchClass, Votings;
+  MedienbibliothekClass, BibSearchClass, Votings,
+  AudioDisplayUtils;
 
 const
     // Messages für WebServer:
@@ -147,6 +148,7 @@ type
           fCurrentMaxID: Integer;
 
           fWebMedienBib: TAudioFileList;
+          fWebDisplay: TAudioDisplay;
 
           fHTML_Player: UTf8String;
           fHTML_PlaylistView: Utf8String;
@@ -382,6 +384,7 @@ type
 
           procedure Shutdown;
           procedure CopyLibrary(OriginalLib: TMedienBibliothek);
+          procedure CopyDisplayHelper;
 
           procedure SearchLibrary(Keyword: UnicodeString; DestList: TAudioFileList);
           function GetAudioFileFromWebServerID(aID: Integer): TAudioFile;
@@ -680,6 +683,7 @@ begin
     fCurrentMaxID  := 1;
     Active := False;
     fWebMedienBib := TAudioFileList.Create(False);
+    fWebDisplay := TAudioDisplay.Create;
     IdHTTPServer1 := TIdHTTPServer.Create(Nil);
     IdHTTPServer1.OnCommandGet := IdHTTPServer1CommandGet;
 
@@ -720,6 +724,7 @@ begin
 
     for i := 0 to fWebMedienBib.Count - 1 do
         fWebMedienBib[i].Free;
+    fWebDisplay.Free;
     fWebMedienBib.Free;
     LeaveCriticalSection(CS_AccessLibrary);
     IdHTTPServer1.Free;
@@ -1077,7 +1082,7 @@ begin
             quality := inttostr(af.Bitrate) + ' kbit/s (vbr), '
         else
             quality := inttostr(af.Bitrate) + ' kbit/s, ';
-        quality := quality + af.SampleRate;
+        quality := quality + fWebDisplay.TreeSamplerate(af);
     end;
 
     // Set filesize
@@ -1104,7 +1109,7 @@ begin
     // Replace Insert-Tags in Pattern
     result := StringReplace(result, '{{Class}}'        , aClass, [rfReplaceAll]);
 
-    result := StringReplace(result, '{{PlaylistTitle}}', EscapeHTMLChars(af.PlaylistTitle), [rfReplaceAll]);
+    result := StringReplace(result, '{{PlaylistTitle}}', EscapeHTMLChars(fWebDisplay.PlaylistTitle(af)), [rfReplaceAll]);
     result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.NonEmptyTitle) , [rfReplaceAll]);
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
@@ -1822,6 +1827,12 @@ begin
     result := UTF8String(StringReplace(PatternBody[isAdmin], '{{Content}}', PageData, [rfReplaceAll]));
 end;
 
+procedure TNempWebServer.CopyDisplayHelper;
+begin
+  // copy the Main NempDisplay, as the Webserver works with Threads. This way, changing settings is possible
+  // (but it has no effect on the webserver until it is restarted).
+  fWebDisplay.Assign(NempDisplay);
+end;
 
 procedure TNempWebServer.CopyLibrary(OriginalLib: TMedienBibliothek);
 begin

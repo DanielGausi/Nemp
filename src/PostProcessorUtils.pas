@@ -40,8 +40,8 @@ interface
 uses Windows, Classes, SysUtils, Contnrs, DateUtils,
       ShellApi, IniFiles,  Dialogs,   math,
       NempAudioFiles, Nemp_ConstantsAndTypes,
-      AudioFileBasics,
-      MP3FileUtils, gnuGettext, Nemp_RessourceStrings,
+      AudioFiles.Base,
+      gnuGettext, Nemp_RessourceStrings,
       ScrobblerUtils, CustomizedScrobbler;
 
 // same as in Player.pas

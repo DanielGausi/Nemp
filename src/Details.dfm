@@ -27,7 +27,7 @@ object FDetails: TFDetails
     Top = 3
     Width = 615
     Height = 500
-    ActivePage = Tab_Pictures
+    ActivePage = Tab_Lyrics
     Align = alClient
     DoubleBuffered = False
     ParentDoubleBuffered = False
@@ -38,6 +38,10 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
@@ -764,6 +768,10 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -841,6 +849,10 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -1072,6 +1084,10 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
@@ -1091,7 +1107,7 @@ object FDetails: TFDetails
           Height = 256
           Anchors = [akLeft, akTop, akBottom]
           Header.AutoSizeIndex = 0
-          Header.MainColumn = 2
+          Header.MainColumn = 3
           Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
           Indent = 0
           TabOrder = 0
@@ -1107,19 +1123,23 @@ object FDetails: TFDetails
           OnNodeDblClick = VST_MetaDataNodeDblClick
           Columns = <
             item
-              Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
               Position = 0
+              WideText = 'Type'
+            end
+            item
+              Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
+              Position = 1
               Width = 47
               WideText = 'Key'
             end
             item
               Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAllowFocus, coStyleColor]
-              Position = 1
-              Width = 146
+              Position = 2
+              Width = 105
               WideText = 'Description'
             end
             item
-              Position = 2
+              Position = 3
               Width = 220
               WideText = 'Value'
             end>
@@ -1137,16 +1157,31 @@ object FDetails: TFDetails
         end
         object BtnCopyFromV1: TButton
           Left = 465
-          Top = 46
+          Top = 247
           Width = 130
           Height = 25
           Hint = 'Copy data from the ID3v1-Tag'
-          Anchors = [akTop, akRight]
+          Anchors = [akRight, akBottom]
           Caption = 'Copy from ID3 v1'
           ParentShowHint = False
           ShowHint = True
           TabOrder = 2
           OnClick = BtnCopyFromV1Click
+        end
+        object cbFrameTypeSelection: TComboBox
+          AlignWithMargins = True
+          Left = 465
+          Top = 47
+          Width = 130
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akTop, akRight]
+          ItemIndex = 0
+          TabOrder = 3
+          Text = 'ID3v2-Frame'
+          Items.Strings = (
+            'ID3v2-Frame'
+            'Apev2-Frame')
         end
       end
       object Pnl_ID3v1_MPEG: TPanel

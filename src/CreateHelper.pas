@@ -57,10 +57,10 @@ uses NempMainUnit, Splash, gnugettext, PlaylistClass, PlayerClass,
     MedienbibliothekClass, Nemp_SkinSystem, Spectrum_vis,
     Nemp_ConstantsAndTypes, NempApi, NempAudioFiles, Nemp_RessourceStrings,
     MainFormHelper, UpdateUtils, SystemHelper, TreeHelper, languagecodes,
-    SplitForm_Hilfsfunktionen, Mp3FileUtils, DriveRepairTools,
+    SplitForm_Hilfsfunktionen, DriveRepairTools,
 
     MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, PlaylistUnit,
-    WindowsVersionInfo;
+    WindowsVersionInfo, AudioDisplayUtils;
 
 
 procedure UpdateSplashScreen(status: String);
@@ -106,6 +106,7 @@ begin
             TDrivemanager.EnableUSBMode   := ini.ReadBool('Nemp Portable','EnableUSBMode'   , True);
             TDrivemanager.EnableCloudMode := ini.ReadBool('Nemp Portable','EnableCloudMode' , True);
 
+            NempDisplay.LoadFromIni(Ini);
 
             if NempOptions.Language = '' then
                 // overwrite the default setting with the curent system language
@@ -569,6 +570,9 @@ begin
 
         // Anzeige oben links initialisieren
         SwitchBrowsePanel(MedienBib.BrowseMode);
+
+        TabBtn_SummaryLock.Tag       := NempOptions.VSTDetailsLock;
+        TabBtn_SummaryLock.GlyphLine := NempOptions.VSTDetailsLock;
 
         NempOptions.StartMinimizedByParameter := False;
 

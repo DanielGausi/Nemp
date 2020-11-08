@@ -62,7 +62,7 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, AudioFiles, ReplayGain, gnugettext, Nemp_RessourceStrings;
+uses NempMainUnit, MainFormHelper, ReplayGain, gnugettext, Nemp_RessourceStrings;
 
 {$R *.dfm}
 

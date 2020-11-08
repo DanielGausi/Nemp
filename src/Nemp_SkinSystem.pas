@@ -523,7 +523,7 @@ begin
   //ControlButtons[ctrlMenuBtn         ] :=  Nemp_MainForm.BtnMenu         ;
 
   TabButtons[0].Button    :=  Nemp_MainForm.TabBtn_Cover         ;
-  TabButtons[1].Button    :=  Nemp_MainForm.TabBtn_Lyrics        ;
+  TabButtons[1].Button    :=  Nemp_MainForm.TabBtn_SummaryLock   ;
   TabButtons[2].Button    :=  Nemp_MainForm.TabBtn_Equalizer     ;
   TabButtons[3].Button    :=  Nemp_MainForm.TabBtn_MainPlayerControl    ; // main playback // Headset playback
   TabButtons[4].Button    :=  Nemp_MainForm.TabBtn_Playlist      ;
@@ -537,7 +537,7 @@ begin
   TabButtons[12].Button   :=  Nemp_mainForm.TabBtn_Favorites     ;
 
   TabButtons[0].GlyphFile := 'TabBtnCover'       ;
-  TabButtons[1].GlyphFile := 'TabBtnLyrics'      ;
+  TabButtons[1].GlyphFile := 'TabBtnSummaryLock' ;
   TabButtons[2].GlyphFile := 'TabBtnEqualizer'   ; // ...
   TabButtons[3].GlyphFile := 'TabBtnMainPlayerControl'     ;//'TabBtnEffects'     ;
   TabButtons[4].GlyphFile := 'TabBtnNemp'        ;

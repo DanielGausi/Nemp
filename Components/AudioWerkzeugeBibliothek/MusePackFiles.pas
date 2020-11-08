@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -58,7 +58,8 @@ unit MusePackFiles;
 
 interface
 
-uses Windows, Messages, SysUtils,  Classes, Apev2Tags, Dialogs;
+uses Windows, Messages, SysUtils,  Classes, BaseApeFiles, Dialogs,
+     AudioFiles.Base,  AudioFiles.Declarations;
 
 const
 
@@ -113,12 +114,17 @@ type
 
         function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
 
+        function fGetFileType            : TAudioFileType; override;
+        function fGetFileTypeDescription : String;         override;
+
     public
         { Public declarations }
 
         property ChannelMode: String read fGetChannelMode;
         property ChannelModeID: Byte read fGetChannelModeID;
         property VersionString: String read fGetVersionString;
+
+        constructor Create; override;
 
     end;
 
@@ -245,6 +251,22 @@ begin
         result := 2;
 end;
 
+constructor TMusePackFile.Create;
+begin
+    inherited;
+end;
+
+function TMusePackFile.fGetFileType: TAudioFileType;
+begin
+    result := at_MusePack;
+end;
+
+function TMusePackFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_MusePack];
+end;
+
+
 function TMusePackFile.fGetChannelMode: string;
 begin
     result := MPP_MODE[FChannelModeID];
@@ -343,7 +365,7 @@ begin
         else
             fBitrate := 0;
     end;
-
 end;
+
 
 end.

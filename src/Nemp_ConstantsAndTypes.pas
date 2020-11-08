@@ -372,6 +372,7 @@ type
 
         TabStopAtPlayerControls: Boolean;
         TabStopAtTabs: Boolean;
+        VSTDetailsLock: Integer;
 
         UseDisplayApp: Boolean;
         DisplayApp: String;
@@ -427,10 +428,6 @@ type
         ArtistAlbenFontStyle: Integer;
         DefaultFontStyles: TFontStyles;
         ArtistAlbenFontStyles: TFontStyles;
-
-        ReplaceNAArtistBy  : Integer;
-        ReplaceNATitleBy   : Integer;
-        ReplaceNAAlbumBy   : Integer;
 
         WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
@@ -785,6 +782,7 @@ const
       // Anzeige der Details: AudioFile aus der Playlist oder der MedienBib?
       SD_PLAYLIST = 0;
       SD_MEDIENBIB = 1;
+      SD_PLAYER = 2;
 
       DS_EXTERN = 0;
       DS_INTERN = 10;
@@ -2570,6 +2568,7 @@ begin
         IgnoreVolumeUpDownKeys  := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
         TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
         TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', True);
+        VSTDetailsLock:= ini.ReadInteger('Allgemein', 'VSTDetailsLock', 0);
 
         DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', 'NempG15App.exe');
         UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', false);
@@ -2606,13 +2605,6 @@ begin
         HideDeskbandOnClose     := ini.ReadBool('Fenster', 'HideDeskbandOnClose', True);
 
         FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
-
-        ReplaceNAArtistBy := ini.ReadInteger('Fenster', 'ReplaceNAArtistBy', 3);
-        if not ReplaceNAArtistBy in [0,1,2,3,4,5] then ReplaceNAArtistBy := 3;
-        ReplaceNATitleBy  := ini.ReadInteger('Fenster', 'ReplaceNATitleBy' , 2);
-        if not ReplaceNATitleBy in [0,1,2,3,4,5] then ReplaceNATitleBy := 2;
-        ReplaceNAAlbumBy  := ini.ReadInteger('Fenster', 'ReplaceNAAlbumBy' , 4);
-        if not ReplaceNAAlbumBy in [0,1,2,3,4,5] then ReplaceNAAlbumBy := 4;
 
         ArtistAlbenFontSize   := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
         ArtistAlbenRowHeight  := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
@@ -2712,6 +2704,7 @@ begin
         ini.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
         ini.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
         ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
+        ini.WriteInteger('Allgemein', 'VSTDetailsLock', VSTDetailsLock);
 
         Ini.WriteBool('Allgemein', 'UseDisplayApp', UseDisplayApp);
         // Note: The Display-App-String is written by the G15-App only
@@ -2761,10 +2754,6 @@ begin
         ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
         //ini.WriteBool('Fenster', 'ShowCoverAndDetails', ShowCoverAndDetails);
         //ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
-
-        ini.WriteInteger('Fenster', 'ReplaceNAArtistBy', ReplaceNAArtistBy);
-        ini.WriteInteger('Fenster', 'ReplaceNATitleBy' , ReplaceNATitleBy );
-        ini.WriteInteger('Fenster', 'ReplaceNAAlbumBy' , ReplaceNAAlbumBy );
 
         ini.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
         ini.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);

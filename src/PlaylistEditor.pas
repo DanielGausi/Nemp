@@ -158,7 +158,7 @@ var
 implementation
 
 Uses NempMainUnit, Hilfsfunktionen, Nemp_ConstantsAndTypes, TreeHelper, Nemp_RessourceStrings,
-  NewFavoritePlaylist, MainFormHelper, SystemHelper, gnuGettext;
+  NewFavoritePlaylist, MainFormHelper, SystemHelper, gnuGettext, AudioDisplayUtils;
 
 {$R *.dfm}
 
@@ -322,8 +322,8 @@ var af: TAudioFile;
 begin
     af := Sender.GetNodeData<TAudioFile>(Node);
     case column of
-      0: CellText := af.PlaylistTitle;
-      1: CellText := af.GetDurationForVST;
+      0: CellText := NempDisplay.PlaylistTitle(af);
+      1: CellText := NempDisplay.TreeDuration(af); // af.GetDurationForVST;
     end;
 end;
 ///  * put some more detailed file information into the Hint
@@ -334,7 +334,7 @@ var af: TAudioFile;
 begin
   af := Sender.GetNodeData<TAudioFile>(Node);
   if assigned(af) then
-      HintText := af.GetHint(0, 0, 0);
+      HintText := NempDisplay.HintText(af);
 end;
 ///  * strike out non existing files
 procedure TPlaylistEditorForm.PlaylistFilesVSTPaintText(

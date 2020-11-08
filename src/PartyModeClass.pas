@@ -331,7 +331,7 @@ begin
 
         // "Tab"-Buttons
         SetOriginalPosition(TabBtn_Cover        , i);
-        SetOriginalPosition(TabBtn_Lyrics       , i);
+        SetOriginalPosition(TabBtn_SummaryLock  , i);
         SetOriginalPosition(TabBtn_Equalizer    , i);
         SetOriginalPosition(TabBtn_MainPlayerControl , i);
         SetOriginalPosition(TabBtn_Headset      , i);

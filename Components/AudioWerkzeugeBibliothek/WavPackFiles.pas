@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -57,7 +57,8 @@ unit WavPackFiles;
 
 interface
 
-uses Windows, Messages, SysUtils,  Classes, Apev2Tags, Dialogs;
+uses Windows, Messages, SysUtils,  Classes, BaseApeFiles, Dialogs,
+     AudioFiles.Base, AudioFiles.Declarations;
 
 type
     TWavPackFile = class(TBaseApeFile)
@@ -78,6 +79,8 @@ type
 
         protected
             function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
 
         public
             property FormatTag: integer	read FFormatTag;
@@ -88,6 +91,8 @@ type
             property Ratio: Double read FGetRatio;
             property Encoder: string read FEncoder;
             property Bits   : Integer read fBits;
+
+            constructor Create; override;
     end;
 
 	  wavpack_header3 = record
@@ -354,6 +359,21 @@ begin
     end;
 end;
 
+constructor TWavPackFile.Create;
+begin
+    inherited;
+end;
+
+function TWavPackFile.fGetFileType: TAudioFileType;
+begin
+    result := at_WavPack;
+end;
+
+function TWavPackFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_WavPack];
+end;
+
 function TWavPackFile.fGetChannelMode: string;
 begin
     case fChannels of
@@ -364,6 +384,7 @@ begin
     end;
 end;
 
+
 function TWavPackFile.fGetRatio: Double;
 begin
     // Get compression ratio
@@ -372,5 +393,6 @@ begin
     else
         Result := 0;
 end;
+
 
 end.

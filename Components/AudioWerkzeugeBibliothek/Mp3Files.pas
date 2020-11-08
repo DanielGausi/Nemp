@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -10,6 +10,9 @@
     Unit MP3Files
 
     Manipulate mp3-Files
+    * Read MPEG information (bitrate, samplerate, ...)
+    * Read/Write ID3v1-Tags
+    * Read/Write ID3v2-Tags
 
     ---------------------------------------------------------------------------
 
@@ -50,28 +53,67 @@ unit Mp3Files;
 interface
 
 uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
-     AudioFileBasics, Mp3FileUtils, ID3v2Frames, dialogs;
+     AudioFiles.Base, AudioFiles.Declarations,
+     ID3v1Tags, ID3v2Tags, MpegFrames, ID3v2Frames, Apev2Tags;
 
 type
-    TTagWriteMode = (id3_both, id3_v1, id3_v2, id3_existing);
-    TTagDefaultMode = (id3_def_both, id3_def_v1, id3_def_v2);
-    TTagDeleteMode = (id3_del_both, id3_del_v1, id3_del_v2);
+
+    ///  TTagScanMode
+    ///  Purpose is to speed up reading file information while building up a media library (or something like that)
+    ///  Often the ID3v1Tag is not needed, as everything is already covered by the ID3v2Tag.
+    ///  I assume that file access is the bottleneck, so NOT searching for some more data at the very end of the file
+    ///  may increase the overall speed.
+    ///  * id3_read_complete : Always check for both versions
+    ///  * id3_read_smart    : Check for ID3v2Tag first. If some "relevant data" is missing, try ID3v1tag as well
+    ///  * id3_read_v2_only  : read only v2
+    ///    (note: only v1 doesn't make much sense for faster reading)
+    TTagScanMode = (id3_read_complete, id3_read_smart, id3_read_v2_only );
+
+    ///  Notes:
+    ///  - Defining what "relevant data" for "id3_read_smart" means
+    ///    All possible fields in the ID3v1-Tag are rather useful and could add something
+    ///    useful. However, "Comment" is rarely used. If this is not contained in the v2Tag,
+    ///    we should not look for it on v1.
+    ///    * use property "SmartRead_IgnoreComment" (default: True)
+    ///  - Avoiding inconsistent data
+    ///    When reading only one Tag from the file, the internal Tag-Objects for the others
+    ///    remains empty. But when we want to change the meta data in the file, it should be
+    ///    ensured that these data remains consistently.
+    ///    * use private field "v1Processed" , whether we've looked for that Tag in the file.
+    ///      The Setter-Methods should check for that, and look after the v1Tag in the file
+    ///      by re-reading it
+    ///    * To deactivate this feature, use property "SmartRead_AvoidInconsistentData" (default: True)
 
     TMP3File = class (TBaseAudioFile)
         private
             fID3v1Tag: TID3v1Tag;
             fID3v2Tag: TID3v2Tag;
+            fApeTag  : TApeTag;
             fMpegInfo: TMpegInfo;
 
-            fTagWriteMode: TTagWriteMode;
-            fTagDefaultMode: TTagDefaultMode;
-            fTagDeleteMode : TTagDeleteMode;
+            fTagScanMode   : TTagScanMode;
 
-            function Mp3ErrorToAudioError(aErr: TMP3Error): TAudioError;
+            fTagsToBeWritten : TMetaTagSet;
+            fDefaultTags     : TMetaTagSet;
+            fTagsToBeDeleted : TMetaTagSet;
+
+            fSmartRead_IgnoreComment         : Boolean;
+            fSmartRead_AvoidInconsistentData : Boolean;
+            fSecondaryTagsProcessed                 : Boolean;
+
+            // a private field for performing a complete analysis in ReadFromFile,
+            // including storing all the MPEG-Frames in the fMpegInfo
+            ReadWithCompleteAnalysis: Boolean;
 
             function fGetID3v1Size: Integer;
             function fGetID3v2Size: Integer;
+            function fGetApeSize: Integer;
 
+            procedure EnforceSecondaryTagsAreProcessed;
+            function SecondaryTagsAreNeeded: Boolean;
+
+            function GetMpegScanMode: TMpegScanMode;
+            procedure SetMpegScanMode(const Value: TMpegScanMode);
 
         protected
 
@@ -97,46 +139,71 @@ type
             function fGetTrack            : UnicodeString; override;
             function fGetGenre            : UnicodeString; override;
             function fGetComment          : UnicodeString;
+
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
+
         public
 
             property ID3v1Tag: TID3v1Tag read fID3v1Tag;
             property ID3v2Tag: TID3v2Tag read fID3v2Tag;
+            property ApeTag  : TApeTag   read fApeTag  ;
             property MpegInfo: TMpegInfo read fMpegInfo;
 
             property ID3v1TagSize: Integer read fGetID3v1Size;
             property ID3v2TagSize: Integer read fGetID3v2Size;
+            property ApeTagSize  : Integer read fGetApeSize  ;
 
-            // WriteMode: Define which Tag should be Updated in the file when writing
-            //           (Both, only v1, only v2, only existing)
-            property TagWriteMode: TTagWriteMode read fTagWriteMode write fTagWriteMode;
-            // DefaultMode: Define which Tag should be written in "Only Existing Mode"
-            //              in case NO Tag exists
-            //              (Both, only v1, only v2)
-            property TagDefaultMode: TTagDefaultMode read fTagDefaultMode write fTagDefaultMode;
-            // DeleteMode: define which tag should be removed
-            //              (Both, only v1, only v2)
-            property TagDeleteMode : TTagDeleteMode read fTagDeleteMode write fTagDeleteMode;
+            // Properties for "smart reading"
+            property TagScanMode   : TTagScanMode read fTagScanMode write fTagScanMode;
+            property SmartRead_IgnoreComment         : Boolean read fSmartRead_IgnoreComment          write fSmartRead_IgnoreComment;
+            property SmartRead_AvoidInconsistentData : Boolean read fSmartRead_AvoidInconsistentData  write fSmartRead_AvoidInconsistentData;
+            property SecondaryTagsProcessed          : Boolean read fSecondaryTagsProcessed;
+
+            ///  MpegScanMode: "Fast", "Complete" or "Smart" scan of the file to get Bitrate and Duration
+            ///  * MPEG_SCAN_Fast: Scan the first two MPEG-Frames of a file.
+            ///        For VBR: Trust in the existence of a valid XING-Header.
+            ///  * MPEG_SCAN_Complete: Process to whole file Frame by Frame
+            ///  * MPEG_SCAN_Smart: Try a fast scan first. If the result for Bitrate is unusual low
+            ///        (i.e. 32 kbit/s or even lower), a complete scan is performed
+            property MpegScanMode: TMpegScanMode read GetMpegScanMode write SetMpegScanMode;
+
+            ///  Set of [mt_Existing, mt_ID3v1, mt_ID3v2, mt_APE]
+            ///  TagsToBeWritten: Define which Tag(s) should be updated in the file when writing
+            ///  DefaultTags: Define which Tag(s) should be written when only [mt_Existing] is selected
+            ///               and NO Tag exists at all
+            ///  TagsToBeDeleted: define which Tag should be removed by RemoveFromFile
+            property TagsToBeWritten : TMetaTagSet read fTagsToBeWritten write fTagsToBeWritten ;
+            property DefaultTags     : TMetaTagSet read fDefaultTags     write fDefaultTags     ;
+            property TagsToBeDeleted : TMetaTagSet read fTagsToBeDeleted write fTagsToBeDeleted ;
 
             property Comment: UnicodeString read fGetComment write fSetComment;
 
-            constructor Create;
+            constructor Create; override;
             destructor Destroy; override;
 
             procedure Clear;
             function ReadFromFile(aFilename: UnicodeString): TAudioError;    override;
             function WriteToFile(aFilename: UnicodeString): TAudioError;     override;
             function RemoveFromFile(aFilename: UnicodeString): TAudioError;  override;
+
+            ///  AnalyseFile: This is only for a low level analysis of the file
+            ///               It is mainly used by myself to have a closer look on "odd" mp3 files
+            ///               which some properties leading to wrong results in bitrate, duration and stuff.
+            function AnalyseFile(aFilename: UnicodeString): TAudioError;
+
     end;
 
 
 implementation
 
-{ TBaseApeFile }
+{ TMP3File }
 
 procedure TMP3File.Clear;
 begin
     fID3v2Tag.Clear;
     fID3v1Tag.Clear;
+    ApeTag.Clear;
 
     FFileSize := 0;
 
@@ -145,6 +212,7 @@ begin
     fSamplerate := 0;
     fChannels   := 0;
     fValid      := False;
+    fSecondaryTagsProcessed := False;
 end;
 
 constructor TMP3File.Create;
@@ -152,11 +220,17 @@ begin
     fID3v1Tag := TID3v1Tag.Create;
     fID3v2Tag := TID3v2Tag.Create;
     fMpegInfo := TMpegInfo.create;
+    fApeTag   := TApeTag.Create;
 
-    // fTagWriteMode   := id3_both;
-    fTagWriteMode   := id3_existing;
-    fTagDefaultMode := id3_def_both;
-    fTagDeleteMode  := id3_del_both;
+    fTagsToBeWritten := [mt_Existing];
+    fDefaultTags     := [mt_ID3v1, mt_ID3v2];
+    fTagsToBeDeleted := [mt_Existing];
+
+    fTagScanMode :=    id3_read_complete; //id3_read_smart
+    fSecondaryTagsProcessed          := False;
+    fSmartRead_IgnoreComment         := True;
+    fSmartRead_AvoidInconsistentData := True;
+    ReadWithCompleteAnalysis         := False;
 end;
 
 destructor TMP3File.Destroy;
@@ -164,10 +238,92 @@ begin
     fID3v1Tag.Free;
     fID3v2Tag.Free;
     fMpegInfo.Free;
+    fApeTag.Free;
 
     inherited;
 end;
 
+procedure TMP3File.EnforceSecondaryTagsAreProcessed;
+var fs: TAudioFileStream;
+    tmp1: TAudioError;
+begin
+  if SmartRead_AvoidInconsistentData and (not fSecondaryTagsProcessed) then
+  begin
+    // try to read the v1Tag from the file
+    if AudioFileExists(self.Filename) then
+    begin
+      try
+        fs := TAudioFileStream.Create(self.Filename, fmOpenRead or fmShareDenyWrite);
+        try
+          tmp1 := ApeTag.ReadFromStream(fs);
+          if ApeTag.ID3v1Present then
+              fID3v1Tag.CopyFromRawTag(ApeTag.ID3v1TagRaw);
+          // if nothing wrong happens there, we will consider the ID3v1Tag "processed"
+          fSecondaryTagsProcessed := (tmp1 = FileErr_None);
+
+
+        finally
+          fs.Free;
+        end;
+      except
+        ; //nothing to do. Reading failed (again)
+      end;
+    end
+  end;
+end;
+
+function TMP3File.SecondaryTagsAreNeeded: Boolean;
+var BasePropertyMissing, CommentMissing: Boolean;
+begin
+    case fTagScanMode of
+
+        id3_read_complete: result := True;
+
+        id3_read_v2_only: result := False;
+
+        id3_read_smart: begin
+            if not ID3v2tag.Exists then
+                result := True
+            else
+            begin
+                BasePropertyMissing := (ID3v2tag.Artist = '')
+                                OR (ID3v2tag.Title = '')
+                                OR (ID3v2tag.Album = '')
+                                OR (ID3v2tag.Track = '')
+                                OR (ID3v2tag.Year = '')
+                                OR (ID3v2tag.Genre = '');
+                CommentMissing := (ID3v2tag.Comment = '');
+
+                if fSmartRead_IgnoreComment then
+                    result :=  BasePropertyMissing
+                else
+                  result := BasePropertyMissing or CommentMissing;
+            end;
+        end;
+    else
+        result := False;
+    end;
+end;
+
+function TMP3File.GetMpegScanMode: TMpegScanMode;
+begin
+    result := fMpegInfo.MpegScanMode;
+end;
+
+procedure TMP3File.SetMpegScanMode(const Value: TMpegScanMode);
+begin
+    fMpegInfo.MpegScanMode := Value;
+end;
+
+function TMP3File.fGetFileType: TAudioFileType;
+begin
+    result := at_Mp3;
+end;
+
+function TMP3File.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_Mp3];
+end;
 
 function TMP3File.fGetFileSize: Int64;
 begin
@@ -196,6 +352,8 @@ begin
     result := fID3v2tag.Comment;
     if result = '' then
         result := fID3v1Tag.Comment;
+    if result = '' then
+        result := fApeTag.Comment;
 end;
 
 function TMP3File.fGetAlbum: UnicodeString;
@@ -203,108 +361,111 @@ begin
     result := fID3v2Tag.Album;
     if result = '' then
         result := fID3v1Tag.Album;
+    if result = '' then
+        result := fApeTag.Album;
 end;
 function TMP3File.fGetArtist: UnicodeString;
 begin
     result := fID3v2Tag.Artist;
     if result = '' then
         result := fID3v1Tag.Artist;
+    if result = '' then
+        result := fApeTag.Artist;
 end;
 function TMP3File.fGetGenre: UnicodeString;
 begin
     result := fID3v2Tag.Genre;
     if result = '' then
         result := fID3v1Tag.Genre;
+    if result = '' then
+        result := fApeTag.Genre;
 end;
 function TMP3File.fGetTitle: UnicodeString;
 begin
     result := fID3v2Tag.Title;
     if result = '' then
         result := fID3v1Tag.Title;
+    if result = '' then
+        result := fApeTag.Title;
 end;
 function TMP3File.fGetTrack: UnicodeString;
 begin
     result := fID3v2Tag.Track;
     if result = '' then
         result := fID3v1Tag.Track;
+    if result = '' then
+        result := fApeTag.Track;
 end;
 function TMP3File.fGetYear: UnicodeString;
 begin
     result := fID3v2Tag.Year;
     if result = '' then
         result := UnicodeString(fID3v1Tag.Year);
+    if result = '' then
+        result := fApeTag.Year;
 end;
-
 
 
 procedure TMP3File.fSetAlbum(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Album := aValue;
   fID3v2Tag.Album := aValue;
+  fApeTag.Album := aValue;
 end;
 
 procedure TMP3File.fSetArtist(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Artist := aValue;
   fID3v2Tag.Artist := aValue;
+  fApeTag.Artist := aValue;
 end;
 
 procedure TMP3File.fSetComment(aValue: UnicodeString);
 begin
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Comment := aValue;
   fID3v2Tag.Comment := aValue;
+  fApeTag.Comment := aValue;
 end;
 
 procedure TMP3File.fSetGenre(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Genre := aValue;
   fID3v2Tag.Genre := aValue;
+  fApeTag.Genre := aValue;
 end;
 
 procedure TMP3File.fSetTitle(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Title := aValue;
   fID3v2Tag.Title := aValue;
+  fApeTag.Title := aValue;
 end;
 
 procedure TMP3File.fSetTrack(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Track := aValue;
   fID3v2Tag.Track := aValue;
+  fApeTag.Track := aValue;
 end;
 
 procedure TMP3File.fSetYear(aValue: UnicodeString);
 begin
   inherited;
+  EnforceSecondaryTagsAreProcessed;
   fID3v1Tag.Year := ShortString(aValue);
   fID3v2Tag.Year := aValue;
-end;
-
-function TMP3File.Mp3ErrorToAudioError(aErr: TMP3Error): TAudioError;
-begin
-    case aErr of
-        MP3ERR_None     : result := FileErr_None;
-        MP3ERR_NoFile   : result := FileErr_NoFile;
-        MP3ERR_FOpenCrt : result := FileErr_FileCreate;
-        MP3ERR_FOpenR   : result := FileErr_FileOpenR;
-        MP3ERR_FOpenRW,
-        MP3ERR_FOpenW   : result := FileErr_FileOpenRW;
-        MP3ERR_SRead    : result := MP3ERR_StreamRead;
-        MP3ERR_SWrite   : result := MP3ERR_StreamWrite;
-        ID3ERR_Cache    : result := MP3ERR_Cache;
-        ID3ERR_NoTag    : result := MP3ERR_NoTag;
-        ID3ERR_Invalid_Header : result := MP3ERR_Invalid_Header;
-        ID3ERR_Compression    : result := MP3ERR_Compression;
-        ID3ERR_Unclassified   : result := MP3ERR_Unclassified;
-        MPEGERR_NoFrame       : result := MP3ERR_NoMpegFrame;
-    else
-        result := MP3ERR_Unclassified;
-    end;
+  fApeTag.Year := aValue;
 end;
 
 function TMP3File.fGetID3v1Size: Integer;
@@ -321,6 +482,14 @@ begin
     else
         result := 0;
 end;
+function TMP3File.fGetApeSize: Integer;
+begin
+    if fApeTag.Exists then
+        result := fApeTag.Apev2TagSize
+    else
+        result := 0;
+end;
+
 
 function TMP3File.fGetValid: Boolean;
 begin
@@ -330,8 +499,10 @@ end;
 
 function TMP3File.ReadFromFile(aFilename: UnicodeString): TAudioError;
 var fs: TAudioFileStream;
-    tmp1, tmp2, tmpMpeg: TMP3Error;
+    tmp1, tmp2, tmpMpeg: TAudioError;
 begin
+    inherited ReadFromFile(aFilename);
+
     Clear;
     if AudioFileExists(aFilename) then
     begin
@@ -339,28 +510,39 @@ begin
             fs := TAudioFileStream.Create(aFilename, fmOpenRead or fmShareDenyWrite);
             try
                 fFileSize := fs.Size;
-                tmp1 := fID3v1Tag.ReadFromStream(fs);
 
-                fs.Seek(0, sobeginning);
+                // Read ID3v2-Tag
                 tmp2 := id3v2tag.ReadFromStream(fs);
                 if fID3v2Tag.exists then
                     fs.Seek(id3v2tag.size, soBeginning)
                 else
                     fs.Seek(0, sobeginning);
 
-                tmpMpeg := fMpegInfo.LoadFromStream(fs);
-                result := Mp3ErrorToAudioError(tmpMpeg);
+                // Read MPEG-Information
+                if ReadWithCompleteAnalysis then
+                    tmpMpeg := fMpegInfo.StoreFrames(fs)
+                else
+                    tmpMpeg := fMpegInfo.LoadFromStream(fs);
 
-                if result = FileErr_None then
+                // Read ID3v1-Tag and APE
+                if SecondaryTagsAreNeeded or ReadWithCompleteAnalysis then
                 begin
-                    if (tmp1 = ID3Err_NoTag) and (tmp2 = ID3Err_NoTag) then
-                        result := MP3Err_NoTag
-                    else
-                        result := Mp3ErrorToAudioError(tmp2);
-                end else
-                    result := Mp3ErrorToAudioError(tmp2);  // Error on ID3v2Tag has higher priority
+                    tmp1 := ApeTag.ReadFromStream(fs);
+                    if ApeTag.ID3v1Present then
+                        fID3v1Tag.CopyFromRawTag(ApeTag.ID3v1TagRaw);
+                    fSecondaryTagsProcessed := True;
+                end
+                else
+                    tmp1 := FileErr_None;
 
-                fValid := tmpMpeg = MP3Err_None;
+                // summarize
+                result := tmpMpeg;
+                if result = FileErr_None then
+                    result := tmp2;
+                if result = FileErr_None then
+                    result := tmp1;
+
+                fValid := tmpMpeg = FileErr_None;
                 if fValid then
                 begin
                     fDuration    := fMpegInfo.Duration;
@@ -386,66 +568,70 @@ begin
         result := FileErr_NoFile;
 end;
 
-function TMP3File.RemoveFromFile(aFilename: UnicodeString): TAudioError;
-var tmp: TMP3Error;
+
+function TMP3File.AnalyseFile(aFilename: UnicodeString): TAudioError;
 begin
-    tmp := MP3ERR_None;
-    if fTagDeleteMode in [id3_del_both, id3_del_v1] then
-        tmp := fId3v1Tag.RemoveFromFile(aFilename);
-    if fTagDeleteMode in [id3_del_both, id3_del_v2] then
-        tmp := fId3v2Tag.RemoveFromFile(aFilename);
-    result := Mp3ErrorToAudioError(tmp);
+    ReadWithCompleteAnalysis := True;
+    result := ReadFromFile(aFileName);
+    ReadWithCompleteAnalysis := False;
+end;
+
+
+function TMP3File.RemoveFromFile(aFilename: UnicodeString): TAudioError;
+begin
+    inherited RemoveFromFile(aFilename);
+    result := FileErr_None;
+
+    if (mt_Existing in fTagsToBeDeleted) or (mt_ID3v1 in fTagsToBeDeleted) then
+      result := fId3v1Tag.RemoveFromFile(aFilename);
+    if (mt_Existing in fTagsToBeDeleted) or (mt_APE in fTagsToBeDeleted) then
+      result := fApeTag.RemoveFromFile(aFilename);
+    if (mt_Existing in fTagsToBeDeleted) or (mt_ID3v2 in fTagsToBeDeleted) then
+      result := fId3v2Tag.RemoveFromFile(aFilename);
 end;
 
 function TMP3File.WriteToFile(aFilename: UnicodeString): TAudioError;
-var tmp: TMP3Error;
-    TagWritten: Boolean;
+var TagWritten: Boolean;
+  DoWriteV1, DoWriteV2, DoWriteApe: Boolean;
 begin
-    tmp := MP3ERR_None;
+    inherited WriteToFile(aFilename);
+    result := FileErr_None;
 
-    case fTagWriteMode of
-        id3_both: begin
-            tmp := fId3v1Tag.WriteToFile(aFilename);
-            if tmp = MP3ERR_None then
-                tmp := fId3v2Tag.WriteToFile(aFilename);
-        end;
+    TagWritten := False;
+    DoWriteV1  := (mt_ID3v1 in fTagsToBeWritten) or ((mt_Existing in fTagsToBeWritten) and fId3v1Tag.Exists);
+    DoWriteV2  := (mt_ID3v2 in fTagsToBeWritten) or ((mt_Existing in fTagsToBeWritten) and fId3v2Tag.Exists);
+    DoWriteApe := (mt_APE in fTagsToBeWritten)   or ((mt_Existing in fTagsToBeWritten) and fApeTag.Exists);
 
-        id3_v1: tmp := fId3v1Tag.WriteToFile(aFilename);
-
-        id3_v2: tmp := fId3v2Tag.WriteToFile(aFilename);
-
-        id3_existing: begin
-            TagWritten := False;
-            if fId3v1Tag.Exists then
-            begin
-                tmp := fId3v1Tag.WriteToFile(aFilename);
-                TagWritten := True;
-            end;
-            if fId3v2Tag.Exists then
-            begin
-                tmp := fId3v2Tag.WriteToFile(aFilename);
-                TagWritten := True;
-            end;
-
-            if Not TagWritten then
-            begin
-                // Create Tag(s)
-                case fTagDefaultMode of
-                  id3_def_both: begin
-                      tmp := fId3v1Tag.WriteToFile(aFilename);
-                      if tmp = MP3ERR_None then
-                          tmp := fId3v2Tag.WriteToFile(aFilename);
-                  end;
-                  id3_def_v1: tmp := fId3v1Tag.WriteToFile(aFilename);
-                  id3_def_v2: tmp := fId3v2Tag.WriteToFile(aFilename);
-                end;
-            end;
-        end;
+    if DoWriteApe then
+    begin
+        result := fApeTag.WriteToFile(aFileName);
+        TagWritten := True;
+    end;
+    if DoWriteV1 then
+    begin
+        result := fId3v1Tag.WriteToFile(aFileName);
+        TagWritten := True;
+    end;
+    if DoWriteV2 then
+    begin
+        result := fId3v2Tag.WriteToFile(aFileName);
+        TagWritten := True;
     end;
 
-    result := Mp3ErrorToAudioError(tmp);
-end;
+    if not TagWritten then
+    begin
+        DoWriteV1  := mt_ID3v1 in fDefaultTags;
+        DoWriteV2  := mt_ID3v2 in fDefaultTags;
+        DoWriteApe := mt_APE in fDefaultTags  ;
 
+        if DoWriteApe then
+            result := fApeTag.WriteToFile(aFileName);
+        if DoWriteV1 then
+            result := fId3v1Tag.WriteToFile(aFileName);
+        if DoWriteV2 then
+            result := fId3v2Tag.WriteToFile(aFileName);
+    end;
+end;
 
 
 end.

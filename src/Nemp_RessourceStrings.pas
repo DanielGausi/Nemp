@@ -132,6 +132,9 @@ Warning_InvalidMp3file_Hint = 'The specified file with the extension ".mp3" is n
 Warning_InvalidBaseApefile = 'Invalid audiofile';
 Warning_InvalidBaseApefile_Hint = 'The specified file is not a valid audiofile.';
 
+Warning_NotSupportedFileType = 'No information available';
+Warning_NotSupportedFileType_Hint = 'Nemp can''t gather any further information from the file, as metadata for this type of file is not supported.';
+
 
 Warning_DownloadDirNotFound   = 'The download directory could not be found.';
 Warning_RecordingDirNotFound  = 'The recording directory for webstreams could not be found.';
@@ -486,6 +489,7 @@ MainForm_DoublClickToSearchTitle  = 'Doubleclick to show all files with the titl
 MainForm_DoublClickToSearchAlbum  = 'Doubleclick to show all files from the album "%s"';
 MainForm_DoublClickToSearchYear   = 'Doubleclick to show all files from the year "%s"';
 MainForm_DoublClickToSearchGenre  = 'Doubleclick to show all files from the genre "%s"';
+MainForm_DoublClickToSearchDirectory = 'Doubleclick to show all files in this directory';
 MainForm_DoublClickToAddTagHint   = 'Doubleclick to add a new tag';
 MainForm_DoublClickToAddTag       = '[Add a tag]';
 MainForm_AddTagQueryCaption = 'Nemp: Add tags';
@@ -838,17 +842,9 @@ AudioFileProperty_Year        = 'Year';
 AudioFileProperty_Genre       = 'Genre';
 AudioFileProperty_Lyrics      = 'Lyrics';
 AudioFileProperty_Track       = 'Track';
-Audiofile_PlayCounterHint     = 'Played %d times';
+//Audiofile_PlayCounterHint     = 'Played %d times';
 //Audiofile_RatingHintNoRating  = 'Rating: N/A';
-Audiofile_RatingHint          = 'Rating: %s of 5 stars';
-Audiofile_ReplayGain_Track    = 'ReplayGain: %6.2f dB';
-Audiofile_ReplayGain_Album    = 'ReplayGain: %6.2f dB (Album %6.2f dB)';
 
-Audiofile_ReplayGain_Track_Short    = '%6.2f dB';
-Audiofile_ReplayGain_Album_Short    = '%6.2f dB (Album %6.2f dB)';
-
-Audiofile_ReplayGain_Track_WithPeak    = 'Title: %.2f dB, Peak: %.6f';
-Audiofile_ReplayGain_Album_WithPeak    = 'Album: %.2f dB, Peak: %.6f';
 
 ReplayGain_CalculateSingleTracks = 'Calculating ReplayGain values (TrackGain only) for %d files ...';
 ReplayGain_CalculateSingleAlbum  = 'Calculating ReplayGain values (with AlbumGain) for %d files ...';

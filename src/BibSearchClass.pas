@@ -61,6 +61,7 @@ type
         Album: UnicodeString;
         Titel: UnicodeString;
         Pfad: UnicodeString;
+        Ordner: UnicodeString;
         Kommentar: UnicodeString;
         Lyric: UnicodeString;
         ComboBoxString: UnicodeString;
@@ -73,6 +74,7 @@ type
         Album: UTF8String;
         Titel: UTF8String;
         Pfad: UTF8String;
+        Ordner: UTF8String;
         Kommentar: UTF8String;
         Lyric: UTF8String;
     end;
@@ -792,6 +794,7 @@ begin
           AND IsOk(Keywords.Titel, aAudioFile.Titel)
           AND IsOk(Keywords.Album, aAudioFile.Album)
           AND IsOk(Keywords.Pfad, aAudioFile.Pfad)
+          AND IsOk(Keywords.Ordner, aAudioFile.Ordner)
           AND IsOk(Keywords.Kommentar, aAudioFile.Comment)
           AND CheckGenre(aAudioFile.Genre)
           AND CheckYear(aAudioFile.Year)
@@ -815,6 +818,7 @@ begin
           AND IsOKNoSubStrings(Keywords.Titel, aAudioFile.Titel)
           AND IsOKNoSubStrings(Keywords.Album, aAudioFile.Album)
           AND IsOKNoSubStrings(Keywords.Pfad, aAudioFile.Pfad)
+          AND IsOKNoSubStrings(Keywords.Ordner, aAudioFile.Ordner)
           AND IsOKNoSubStrings(Keywords.Kommentar, aAudioFile.Comment)
           AND CheckGenre(aAudioFile.Genre)
           AND CheckYear(aAudioFile.Year);
@@ -941,6 +945,8 @@ begin
         SearchKeyWords[i+1].Artist   := SearchKeyWords[i].Artist;
         SearchKeyWords[i+1].Titel    := SearchKeyWords[i].Titel;
         SearchKeyWords[i+1].Album    := SearchKeyWords[i].Album;
+        SearchKeyWords[i+1].Pfad    := SearchKeyWords[i].Pfad;
+        SearchKeyWords[i+1].Ordner    := SearchKeyWords[i].Ordner;
         SearchKeyWords[i+1].Kommentar:= SearchKeyWords[i].Kommentar;
         SearchKeyWords[i+1].Lyric    := SearchKeyWords[i].Lyric;
         SearchKeyWords[i+1].ComboBoxString := SearchKeyWords[i].ComboBoxString;
@@ -951,6 +957,8 @@ begin
     SearchKeyWords[1].Artist         := Keywords.Artist        ;
     SearchKeyWords[1].Kommentar      := Keywords.Kommentar     ;
     SearchKeyWords[1].Album          := Keywords.Album         ;
+    SearchKeyWords[1].Pfad           := Keywords.Pfad          ;
+    SearchKeyWords[1].Ordner         := Keywords.Ordner        ;
     SearchKeyWords[1].Lyric          := Keywords.Lyric         ;
     SearchKeyWords[1].ComboBoxString := Keywords.ComboBoxString;
 
@@ -1434,6 +1442,7 @@ begin
     UTF8SearchKeywords.Titel    := Utf8Encode(AnsiLowerCase(Keywords.Titel    ));
     UTF8SearchKeywords.Album    := Utf8Encode(AnsiLowerCase(Keywords.Album    ));
     UTF8SearchKeywords.Pfad     := Utf8Encode(AnsiLowerCase(Keywords.Pfad     ));
+    UTF8SearchKeywords.Ordner   := Utf8Encode(AnsiLowerCase(Keywords.Ordner   ));
     UTF8SearchKeywords.Kommentar:= Utf8Encode(AnsiLowerCase(Keywords.Kommentar));
     UTF8SearchKeywords.Lyric    := Utf8Encode(AnsiLowerCase(Keywords.Lyric  ));
 

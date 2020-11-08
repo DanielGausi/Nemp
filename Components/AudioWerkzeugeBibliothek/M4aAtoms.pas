@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -52,7 +52,7 @@ unit M4aAtoms;
 interface
 
 uses Windows, Messages, SysUtils, StrUtils, Variants, ContNrs, Classes,
-     AudioFileBasics {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF};
+     AudioFiles.Declarations {$IFDEF USE_SYSTEM_TYPES}, System.Types{$ENDIF};
 
 
 type

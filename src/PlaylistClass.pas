@@ -889,6 +889,9 @@ begin
             Play(MainIndex, Player.FadingInterval, True, CueTime );
     end;
 
+    if CueIndex >= 0 then
+      RefreshCue;
+
     if assigned(self.fOnFilePropertiesChanged) then
         fOnFilePropertiesChanged(self);
 end;

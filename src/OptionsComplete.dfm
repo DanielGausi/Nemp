@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabFiles2
+      ActivePage = TabView4
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -2395,16 +2395,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Width = 125
             Height = 21
             Style = csDropDownList
-            ItemIndex = 3
+            ItemIndex = 2
             TabOrder = 0
-            Text = 'Directory (last part)'
+            Text = 'Filename'
             Items.Strings = (
               '(Empty string)'
               #39'N/A'#39
               'Filename'
               'Directory (last part)'
               'Directory'
-              'Complete path')
+              'Complete path'
+              'Filename(with extension)')
           end
           object cbReplaceTitleBy: TComboBox
             Left = 153
@@ -2421,7 +2422,8 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'Filename'
               'Directory (last part)'
               'Directory'
-              'Complete path')
+              'Complete path'
+              'Filename(with extension)')
           end
           object cbReplaceAlbumBy: TComboBox
             Left = 297
@@ -2429,16 +2431,17 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Width = 125
             Height = 21
             Style = csDropDownList
-            ItemIndex = 4
+            ItemIndex = 3
             TabOrder = 2
-            Text = 'Directory'
+            Text = 'Directory (last part)'
             Items.Strings = (
               '(Empty string)'
               #39'N/A'#39
               'Filename'
               'Directory (last part)'
               'Directory'
-              'Complete path')
+              'Complete path'
+              'Filename(with extension)')
           end
         end
         object GrpBox_ViewExt_Hints: TGroupBox
@@ -2478,7 +2481,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
         end
         object GrpBox_ViewVis_CoverFlow: TGroupBox
-          Left = 8
+          Left = 3
           Top = 325
           Width = 439
           Height = 71
@@ -2563,6 +2566,142 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'Normal'
               'Faster'
               'Very fast')
+          end
+        end
+        object grpBox_PlaylistFormat: TGroupBox
+          Left = 3
+          Top = 402
+          Width = 439
+          Height = 145
+          Caption = 'Playlist formatting'
+          TabOrder = 4
+          object lblPlaylistTitle: TLabel
+            Left = 16
+            Top = 27
+            Width = 131
+            Height = 13
+            AutoSize = False
+            Caption = 'Regular title'
+          end
+          object lblPlaylistTitleFB: TLabel
+            Left = 16
+            Top = 49
+            Width = 131
+            Height = 13
+            AutoSize = False
+            Caption = 'Regular title (fallback)'
+          end
+          object lblPlaylistTitleCueAlbum: TLabel
+            Left = 16
+            Top = 71
+            Width = 131
+            Height = 13
+            AutoSize = False
+            Caption = 'Cue (Album)'
+          end
+          object lblPlaylistTitleCueTitle: TLabel
+            Left = 16
+            Top = 93
+            Width = 131
+            Height = 13
+            AutoSize = False
+            Caption = 'Cue (Title)'
+          end
+          object lblPlaylistWebradioTitle: TLabel
+            Left = 16
+            Top = 115
+            Width = 131
+            Height = 13
+            AutoSize = False
+            Caption = 'Webradio'
+          end
+          object cbPlaylistTitle: TComboBox
+            Left = 153
+            Top = 24
+            Width = 272
+            Height = 21
+            ItemIndex = 0
+            TabOrder = 0
+            Text = '<artist> - <title>'
+            Items.Strings = (
+              '<artist> - <title>'
+              '<artist> - <title> (<year>)'
+              '<artist> - <title> (<album>)'
+              '<artist> - <title> (<album>, Track <track>)'
+              '<artist> - <title> (Track <track>)'
+              '<artist> - <album>'
+              '<filename>'
+              '<subdir>\<filename>'
+              '<fullpath>')
+          end
+          object cbPlaylistTitleFB: TComboBox
+            Left = 153
+            Top = 46
+            Width = 272
+            Height = 21
+            ItemIndex = 0
+            TabOrder = 1
+            Text = '<artist> - <title>'
+            Items.Strings = (
+              '<artist> - <title>'
+              '<artist> - <title> (<year>)'
+              '<artist> - <title> (<album>)'
+              '<artist> - <title> (<album>, Track <track>)'
+              '<artist> - <title> (Track <track>)'
+              '<artist> - <album>'
+              '<filename>'
+              '<subdir>\<filename>'
+              '<fullpath>')
+          end
+          object cbPlaylistTitleCueAlbum: TComboBox
+            Left = 153
+            Top = 68
+            Width = 272
+            Height = 21
+            ItemIndex = 5
+            TabOrder = 2
+            Text = '<artist> - <album>'
+            Items.Strings = (
+              '<artist> - <title>'
+              '<artist> - <title> (<year>)'
+              '<artist> - <title> (<album>)'
+              '<artist> - <title> (<album>, Track <track>)'
+              '<artist> - <title> (Track <track>)'
+              '<artist> - <album>'
+              '<filename>'
+              '<subdir>\<filename>'
+              '<fullpath>')
+          end
+          object cbPlaylistTitleCueTitle: TComboBox
+            Left = 153
+            Top = 90
+            Width = 272
+            Height = 21
+            ItemIndex = 4
+            TabOrder = 3
+            Text = '<artist> - <title> (Track <track>)'
+            Items.Strings = (
+              '<artist> - <title>'
+              '<artist> - <title> (<year>)'
+              '<artist> - <title> (<album>)'
+              '<artist> - <title> (<album>, Track <track>)'
+              '<artist> - <title> (Track <track>)'
+              '<artist> - <album>'
+              '<filename>'
+              '<subdir>\<filename>'
+              '<fullpath>')
+          end
+          object cbPlaylistWebradioTitle: TComboBox
+            Left = 153
+            Top = 112
+            Width = 272
+            Height = 21
+            ItemIndex = 0
+            TabOrder = 4
+            Text = '<station>: <title>'
+            Items.Strings = (
+              '<station>: <title>'
+              '<title>')
           end
         end
       end

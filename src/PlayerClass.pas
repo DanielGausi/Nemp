@@ -1,3 +1,4 @@
+
 {
 
     Unit PlayerClass
@@ -37,7 +38,7 @@ uses  Windows, Classes,  Controls, StdCtrls, ExtCtrls, Buttons, SysUtils, Contnr
       ShellApi, IniFiles, Dialogs, Graphics, cddaUtils, math, CoverHelper,
       bass, bass_fx, basscd, spectrum_vis, DateUtils, bassmidi,
       NempAudioFiles,  Nemp_ConstantsAndTypes, NempAPI, ShoutCastUtils, PostProcessorUtils,
-      Hilfsfunktionen, MP3FileUtils, gnuGettext, Nemp_RessourceStrings, OneINst,
+      Hilfsfunktionen, gnuGettext, Nemp_RessourceStrings, OneINst,
       Easteregg, ScrobblerUtils, CustomizedScrobbler, SilenceDetection, System.UITypes;
 
 const USER_WANT_PLAY = 1;
@@ -70,7 +71,9 @@ type
       fEchoTime: single;
       fReverbMix: single; // 0..96
 
-      fPlayingTitel: UnicodeString; // the title of the current file, i.e. "interpret - title"
+      // fPlayingTitel: UnicodeString; // the title of the current file, i.e. "interpret - title"
+      // fPlayingTitle is not used any more, only for Metadata stuff on Streams therefor:
+      fCurrentStreamMetaData: String;
 
       fIsURLStream: Boolean;
       fHeadsetIsURLStream: Boolean;
@@ -238,6 +241,8 @@ type
       function fGetPlayerLine1: UnicodeString;
       function fGetPlayerLine2: UnicodeString;
 
+      function GetCurrentAudioFile: TPlaylistFile;
+
 
     public
         MainAudioFile: TPlaylistFile;
@@ -383,9 +388,8 @@ type
         property EchoTime: single       read fEchoTime      write SetEchoTime;
         property ReverbMix: single      read fReverbMix     write SetReverbMix  ;
 
-        property PlayingTitel: UnicodeString read fPlayingTitel;
-        property PlayerLine1: UnicodeString read fGetPlayerLine1;
-        property PlayerLine2: UnicodeString read fGetPlayerLine2;
+        //property PlayerLine1: UnicodeString read fGetPlayerLine1;
+        //property PlayerLine2: UnicodeString read fGetPlayerLine2;
 
         property URLStream: Boolean read fIsUrlStream;
 
@@ -393,6 +397,8 @@ type
         property StopStatus: Integer read fStopStatus;
         property BassStatus: DWord read GetBassStatus;
         property BassHeadSetStatus: DWord read GetBassHeadSetStatus;
+
+        property CurrentFile: TPlaylistFile read GetCurrentAudioFile;
 
         property LastUserWish: Integer read fLastUserWish write fLastUserWish;
 
@@ -486,7 +492,6 @@ type
         property HeadsetDauer: Double read GetHeadsetLength;
 
         // Aktualisiert den String, der in der Anzeige durchläuft
-        procedure RefreshPlayingTitel;
         function GenerateTaskbarTitel: UnicodeString;
 
         // Aktualisiert den Text, die Zeit und das Spectrum in der Anzeige
@@ -568,7 +573,7 @@ Const
 
 implementation
 
-Uses NempMainUnit, AudioFileHelper;
+Uses NempMainUnit, AudioFileHelper, ID3v2Tags, AudioDisplayUtils;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -622,29 +627,30 @@ end;
 procedure DoMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
 var
   p: Integer;
-  oldTitel: UnicodeString;
-  meta: String;
+  newStreamMetadata: String;
+  newDataReceived: Boolean;
 begin
-  oldTitel := '';
-  meta := String(BASS_ChannelGetTags(channel, BASS_TAG_META));
-
-
+  newStreamMetadata := String(BASS_ChannelGetTags(channel, BASS_TAG_META));
+  newDataReceived := newStreamMetadata <> TNempPlayer(User).fCurrentStreamMetadata;
   // DetectUTF8Encoding ?? somehow ?
 
-
-  if (meta <> '') AND (TNempPlayer(User).MainAudioFile <> NIL) then
+  if (newStreamMetadata <> '') AND (TNempPlayer(User).MainAudioFile <> NIL) then
   begin
-        oldTitel := TNempPlayer(User).PlayingTitel;
-        p := Pos('StreamTitle=', meta);
+        p := Pos('StreamTitle=', newStreamMetadata);
         if (p > 0) then
         begin
               p := p + 13;
-              TNempPlayer(User).MainAudioFile.Titel := Copy(meta, p, Pos(';', meta) - p - 1);
+              TNempPlayer(User).MainAudioFile.Titel := Copy(newStreamMetadata, p, Pos(';', newStreamMetadata) - p - 1);
         end;
 
-        TNempPlayer(User).RefreshPlayingTitel;
-        if TNempPlayer(User).StreamRecording AND (oldTitel<> TNempPlayer(User).PlayingTitel) AND TNempPlayer(User).AutoSplitByTitle then
+        if TNempPlayer(User).StreamRecording
+            AND newDataReceived
+            AND TNempPlayer(User).AutoSplitByTitle
+        then
             TNempPlayer(User).StartRecording;
+
+        if newDataReceived then
+            TNempPlayer(User).fCurrentStreamMetadata := newStreamMetadata;
 
         SendMessage(TNempPlayer(User).MainWindowHandle, WM_NewMetaData, 0, 0);
   end;
@@ -652,23 +658,24 @@ end;
 
 procedure DoOggMeta(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
 var
-  oldTitel: UnicodeString;
   meta: PAnsiChar;
   metaStr: String;
+  newStreamMetadata: String;
+  newDataReceived: Boolean;
 begin
-  oldTitel := '';
+  newStreamMetadata := ''; // Concatenation of all the 0-terminated metaStr
 
   meta := BASS_ChannelGetTags(channel, BASS_TAG_OGG);
 
   if (meta <> nil) AND (TNempPlayer(User).MainAudioFile <> NIL) then
   begin
-      oldTitel := TNempPlayer(User).PlayingTitel;
       // nach Ogg-Daten suchen
       if (meta <> nil) then
           try
               while (meta^ <> #0) do
               begin
                   metaStr := String(meta);
+                  newStreamMetadata := newStreamMetadata + metaStr;
                   if (AnsiUppercase(Copy(metaStr, 1, 7)) = 'ARTIST=') then
                   begin
                     TNempPlayer(User).MainAudioFile.Artist := Copy(metaStr, 8, Length(metaStr) - 7);
@@ -683,9 +690,16 @@ begin
             // Wenn was schief gelaufen ist: Dann gibts halt keine Tags...
           end;
 
-      TNempPlayer(User).RefreshPlayingTitel;
-      if TNempPlayer(User).StreamRecording AND (oldTitel<> TNempPlayer(User).PlayingTitel) AND TNempPlayer(User).AutoSplitByTitle then
+      newDataReceived := newStreamMetadata <> TNempPlayer(User).fCurrentStreamMetadata;
+
+      if TNempPlayer(User).StreamRecording
+          AND newDataReceived
+          AND TNempPlayer(User).AutoSplitByTitle
+      then
           TNempPlayer(User).StartRecording;
+
+      if newDataReceived then
+          TNempPlayer(User).fCurrentStreamMetadata := newStreamMetadata;
 
       SendMessage(TNempPlayer(User).MainWindowHandle, WM_NewMetaData, 0, 0);
   end;
@@ -2200,7 +2214,7 @@ begin
                     begin
                         // when playing a file with a cuesheet:
                         // MainTitle + CueSheet-Title
-                        result := MainAudioFile.PlaylistTitle;
+                        result := NempDisplay.PlaylistTitle(MainAudioFile);//.PlaylistTitle;
                     end else
                     begin
                         // usual case: just the "Artist"
@@ -2240,7 +2254,7 @@ begin
                         // when playing a file with a cuesheet:
                         // "MainTitle + CueSheet-Title"
                         // note: there should be no issue with the cuesheet-index here, as GetIndex runs through the CueList
-                        result := MainAudioFile.CueList[GetActiveCueIndex].PlaylistTitle
+                        result := NempDisplay.PlaylistTitle(MainAudioFile.CueList[GetActiveCueIndex])
                     else
                         // usual case: just the "Title"
                         result := MainAudioFile.NonEmptyTitle;
@@ -2253,6 +2267,16 @@ begin
             result := '';
         end;
     end;
+end;
+
+function TNempPlayer.GetCurrentAudioFile: TPlaylistFile;
+begin
+  result := Nil;
+  if assigned(MainAudioFile) and assigned(MainAudioFile.CueList) then
+    result := self.GetActiveCue;
+
+  if not assigned(result) then
+    result := MainAudioFile;
 end;
 
 // Zur angegebenen Zeit im Stream springen
@@ -3086,18 +3110,6 @@ end;
     Stuff for the GUI. Set Playingtitle, Mode, Taskbartitle, Play/Pause-Buttons, ...
     --------------------------------------------------------
 }
-procedure TNempPlayer.RefreshPlayingTitel;
-begin
-    if not assigned(MainAudioFile) then
-        fPlayingTitel := '...'
-    else
-    begin
-        if UnKownInformation(MainAudioFile.Artist) then
-            fPlayingTitel := MainAudioFile.NonEmptyTitle
-        else
-            fPlayingTitel := MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle;
-    end;
-end;
 
 function TNempPlayer.GenerateTaskbarTitel: UnicodeString;
 begin
@@ -3105,7 +3117,7 @@ begin
       result := NEMP_NAME_TASK
   else
   begin
-      result := MainAudioFile.PlaylistTitle;
+      result := NempDisplay.PlaylistTitle(MainAudioFile);
       if length(Result) < 10 then
           result := NEMP_NAME_TASK_LONG + ' - ' + result + ' - '
       else

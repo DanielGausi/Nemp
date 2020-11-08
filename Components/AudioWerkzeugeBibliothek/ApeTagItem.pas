@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -49,7 +49,7 @@ unit ApeTagItem;
 
 interface
 
-uses Windows, Messages, SysUtils, Variants, ContNrs, Classes, AudioFileBasics;
+uses Windows, Messages, SysUtils, Variants, ContNrs, Classes, AudioFiles.Declarations;
 
 type
     TApePictureTypes = (

@@ -124,7 +124,8 @@ uses
   PlaylistEditor in 'PlaylistEditor.pas' {PlaylistEditorForm},
   RedeemerInheritablePNG in '3rd Party Units\RedeemerInheritablePNG.pas',
   RedeemerQR in '3rd Party Units\RedeemerQR.pas',
-  WebQRCodes in 'WebQRCodes.pas' {WebServerQRForm};
+  WebQRCodes in 'WebQRCodes.pas' {WebServerQRForm},
+  AudioDisplayUtils in 'AudioDisplayUtils.pas';
 
 {$R *.res}
 

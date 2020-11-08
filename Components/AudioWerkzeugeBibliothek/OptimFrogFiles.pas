@@ -2,7 +2,7 @@
     -----------------------------------
     Audio Werkzeuge Bibliothek
     -----------------------------------
-    (c) 2012, Daniel Gaussmann
+    (c) 2012-2020, Daniel Gaussmann
               Website : www.gausi.de
               EMail   : mail@gausi.de
     -----------------------------------
@@ -57,7 +57,8 @@ unit OptimFrogFiles;
 
 interface
 
-uses Windows, Messages, SysUtils,  Classes, Apev2Tags, Dialogs;
+uses Windows, Messages, SysUtils,  Classes, BaseApeFiles, Dialogs,
+     AudioFiles.Base, AudioFiles.Declarations;
 
 const
     OFR_COMPRESSION: array [0..9] of String = ('fast', 'normal', 'high', 'extra',
@@ -93,11 +94,15 @@ type
 
         protected
             function ReadAudioDataFromStream(aStream: TStream): Boolean; override;
+            function fGetFileType            : TAudioFileType; override;
+            function fGetFileTypeDescription : String;         override;
 
         public
             property Version    : String read fGetVersion;
             property Compression: String read fGetCompression;
             property Bits       : ShortInt read fGetBits;
+
+            constructor Create; override;
     end;
 
 implementation
@@ -128,6 +133,21 @@ begin
       result := OFR_COMPRESSION[c]
   else
       result := 'unknown';
+end;
+
+constructor TOptimFrogFile.Create;
+begin
+    inherited;
+end;
+
+function TOptimFrogFile.fGetFileType: TAudioFileType;
+begin
+    result := at_OptimFrog;
+end;
+
+function TOptimFrogFile.fGetFileTypeDescription: String;
+begin
+    result := TAudioFileNames[at_OptimFrog];
 end;
 
 function TOptimFrogFile.FGetBits: ShortInt;
@@ -179,5 +199,6 @@ begin
             fBitrate := 0;
     end;
 end;
+
 
 end.

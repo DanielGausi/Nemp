@@ -2,9 +2,11 @@
 {
   Compatibilty to older Delphi Versions:
   Undef USE_SYSTEM_TYPES to not use System.Types
+  Undef USE_DICTIONARY to use a regular TObjectList instead of TDictionary for registering audiotypes
 }
 
 {$DEFINE USE_SYSTEM_TYPES}
+{$DEFINE USE_DICTIONARY}
 
 {
   Compiler-Switch-TNT:
@@ -16,15 +18,12 @@
   (in Delphi 2007 or earlier).  
 }
 
-{.$DEFINE USE_TNT_COMPOS}
-
-
+{$DEFINE USE_TNT_COMPOS}
 
 {
   Delphi 2009: Unicode-capable by default. TNTs ar not needed.
                => Deactivate use of TNTs
 }
-
 
 {$IFDEF UNICODE}
     {$UNDEF USE_TNT_COMPOS}

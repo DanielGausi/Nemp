@@ -37,7 +37,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Spin, CheckLst,  iniFiles, ContNrs, MyDialogs,
   Menus,   Hilfsfunktionen, NempAudioFiles,
-  MP3FileUtils, Nemp_ConstantsAndTypes,
+  Nemp_ConstantsAndTypes,
   gnuGettext, Nemp_RessourceStrings, ExtCtrls, ImgList, RatingCtrls, System.UITypes;
 
 type

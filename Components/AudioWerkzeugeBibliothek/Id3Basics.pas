@@ -50,9 +50,14 @@ unit Id3Basics;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes;
+   Classes;
+
+  function GetID3Size(Source: TStream): Integer;
+
+implementation
 
 type
+  // local copies of some stuff from the Unit ID3v2
 
   TInt28 = array[0..3] of Byte;   // Sync-Safe Integer
 
@@ -65,10 +70,6 @@ type
     Flags: Byte;
     TagSize: TInt28;
   end;
-
-  function GetID3Size(Source: TStream): Integer;
-
-implementation
 
 //--------------------------------------------------------------------
 // Convert a 28bit-integer to a 32bit-integer

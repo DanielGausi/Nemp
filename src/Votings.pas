@@ -4,7 +4,7 @@ interface
 
 uses Windows, Classes, Messages, ContNrs, SysUtils, IniFiles,  StrUtils,
   DateUtils, VirtualTrees, System.Types,
-  MP3FileUtils, NempAudioFiles, Hilfsfunktionen,
+  NempAudioFiles, Hilfsfunktionen,
   Playlistclass, PlayerClass, Nemp_ConstantsAndTypes,
   MedienbibliothekClass;
 

@@ -43,7 +43,7 @@ uses
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst, //madexcept,
   Buttons,  VirtualTrees, VSTEditControls,
   jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
-   Mp3FileUtils, spectrum_vis,
+    spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
       fldbrows, MainFormHelper, MessageHelper, BibSearchClass,
@@ -509,7 +509,7 @@ type
     MedienBibDetailHeaderPanel: TNempPanel;
     MedienBibDetailFillPanel: TNempPanel;
     TabBtn_Cover: TSkinButton;
-    TabBtn_Lyrics: TSkinButton;
+    TabBtn_SummaryLock: TSkinButton;
     SplitterFileOverview: TSplitter;
     DetailCoverLyricsPanel: TNempPanel;
     LyricsMemo: TMemo;
@@ -615,6 +615,9 @@ type
     PM_PLM_Default: TMenuItem;
     PM_PL_SaveAsPlaylist: TMenuItem;
     MM_PL_SaveAsPlaylist: TMenuItem;
+    lblBibFilename: TLabel;
+    lblBibDirectory: TLabel;
+    Bevel2: TBevel;
 
     procedure FormCreate(Sender: TObject);
 
@@ -885,6 +888,9 @@ type
     procedure ShowProgress(aProgress: Double; aSeconds: Integer; MainPlayer: Boolean);// aTimeString: String);
     procedure ReCheckAndSetProgressChangeGUIStatus;
     procedure ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
+
+    procedure DisplayTitleInformation(ShowMainFile, GetCoverWasSuccessful: Boolean);
+
     procedure DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
     procedure DisplayHeadsetTitleInformation(GetCoverWasSuccessful: Boolean);
 
@@ -1195,6 +1201,7 @@ type
       Node: PVirtualNode; Column: TColumnIndex; var Allowed: Boolean);
     procedure PM_PLM_EditFavouritesClick(Sender: TObject);
     procedure PM_PL_SaveAsPlaylistClick(Sender: TObject);
+    procedure TabBtn_SummaryLockClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1418,7 +1425,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
-  NewFavoritePlaylist, PlaylistManagement, PlaylistEditor;
+  NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils;
 
 
 {$R *.dfm}
@@ -2064,6 +2071,7 @@ begin
             ini.WriteString('Fenster','SkinName', SkinName);
             ini.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
 
+            NempDisplay.WriteToIni(Ini);
             NempPlayer.WriteToIni(Ini);
             NempPlaylist.WriteToIni(Ini);
             MedienBib.WriteToIni(Ini);
@@ -4311,35 +4319,32 @@ begin
         af := Sender.GetNodeData<TAudioFile>(Node);
 
         case VST.Header.Columns[column].Tag of
-          CON_ARTIST    : CellText := af.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
-          CON_TITEL     : CellText := af.GetTitleForVST(NempOptions.ReplaceNATitleBy);
-          CON_ALBUM     : CellText := af.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
-          CON_DAUER     : CellText := af.GetDurationForVST;
-          CON_BITRATE   : CellText := af.GetBitrateForVST;
+          CON_ARTIST    : CellText := NempDisplay.TreeArtist(af);// af.GetArtistForVST(NempOptions.ReplaceNAArtistBy);
+          CON_TITEL     : CellText := NempDisplay.TreeTitle(af); // af.GetTitleForVST(NempOptions.ReplaceNATitleBy);
+          CON_ALBUM     : CellText := NempDisplay.TreeAlbum(af); // af.GetAlbumForVST(NempOptions.ReplaceNAAlbumBy);
+          CON_DAUER     : CellText := NempDisplay.TreeDuration(af); //  af.GetDurationForVST;
+          CON_BITRATE   : CellText := NempDisplay.TreeBitrate(af); //  af.GetBitrateForVST;
           CON_CBR       : if af.vbr then CellText := 'vbr'
                           else CellText := 'cbr';
-          CON_MODE            : CellText := af.ChannelModeShort;
-          CON_SAMPLERATE      : CellText := af.Samplerate;
+          CON_MODE            : CellText := NempDisplay.TreeChannelmode(af);
+          CON_SAMPLERATE      : CellText := NempDisplay.TreeSamplerate(af);
           CON_STANDARDCOMMENT : CellText := af.Comment;
-          CON_FILESIZE  : CellText := FloatToStrF((af.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
+          CON_FILESIZE  : CellText :=  NempDisplay.TreeFileSize(af);
           CON_FILEAGE   : Celltext := af.FileAgeString;
           CON_PFAD      : CellText := af.Pfad;
           CON_ORDNER    : CellText := af.Ordner;
           CON_DATEINAME : CellText := af.Dateiname;
           CON_YEAR      : CellText := af.Year;
           CON_GENRE     : CellText := af.genre;
-          CON_LYRICSEXISTING : if af.LyricsExisting then CellText := ''
-                               else CellText := ' ';
+          CON_LYRICSEXISTING : CellText := ' ';
           CON_EXTENSION : CellText := af.Extension;
           CON_TRACKNR   : CellText := IntToStr(af.Track);
           CON_CD        : CellText := af.CD;
           CON_RATING    : CellText := '     ';
           CON_PLAYCOUNTER : CellText := IntToStr(af.PlayCounter);
 
-          CON_FAVORITE :  if af.Favorite <> 0 then CellText := ' ' // fav
-                          else CellText := ' '; // noFav
-
-          CON_LASTFMTAGS : CellText := ' ';
+          CON_FAVORITE  : CellText := ' '; // noFav
+          CON_LASTFMTAGS: CellText := ' ';
 
           CON_TRACKGAIN : Celltext := GainValueToString(af.TrackGain);
           CON_ALBUMGAIN : Celltext := GainValueToString(af.AlbumGain);
@@ -4572,7 +4577,7 @@ begin
         end;
 
         if NempOptions.ChangeFontStyleOnMode then
-            font.Style := ModeToStyle(AudioFile.ChannelmodeInt)
+            font.Style := ModeToStyle(AudioFile.ChannelModeIdx)
         else
             font.Style := Nemp_MainForm.NempOptions.DefaultFontStyles;
 
@@ -4864,7 +4869,7 @@ begin
 end;
 
 procedure TNemp_MainForm.FillBibDetailLabels(aAudioFile: TAudioFile);
-var tmp: String;
+
     function SetString(aString: String; add: String = ''): String;
     begin
         if Trim(aString) = '' then
@@ -4886,67 +4891,53 @@ var tmp: String;
             aLabel.OnMouseLeave := Nil;
         end;
     end;
+
 begin
     if assigned(aAudioFile) then
     begin
-        SetLabelMouseActions(LblBibArtist, (aAudioFile.IsValidArtist) AND ((aAudioFile.AudioType = at_File) or (aAudioFile.AudioType = at_CDDA)));
-        SetLabelMouseActions(LblBibTitle , (aAudioFile.IsValidTitle)  AND ((aAudioFile.AudioType = at_File) or (aAudioFile.AudioType = at_CDDA)));
-        SetLabelMouseActions(LblBibAlbum , (aAudioFile.IsValidAlbum)  AND ((aAudioFile.AudioType = at_File) or (aAudioFile.AudioType = at_CDDA)));
-        SetLabelMouseActions(LblBibYear  , (aAudioFile.IsValidYear)   AND ((aAudioFile.AudioType = at_File) or (aAudioFile.AudioType = at_CDDA)));
-        SetLabelMouseActions(LblBibGenre , (aAudioFile.IsValidGenre)  AND ((aAudioFile.AudioType = at_File) or (aAudioFile.AudioType = at_CDDA)));
+        SetLabelMouseActions(LblBibArtist, (aAudioFile.IsValidArtist) AND (aAudioFile.AudioType in [at_File, at_CDDA]));
+        SetLabelMouseActions(LblBibTitle , (aAudioFile.IsValidTitle)  AND (aAudioFile.AudioType in [at_File, at_CDDA]));
+        SetLabelMouseActions(LblBibAlbum , (aAudioFile.IsValidAlbum)  AND (aAudioFile.AudioType in [at_File, at_CDDA]));
+        SetLabelMouseActions(LblBibYear  , (aAudioFile.IsValidYear)   AND (aAudioFile.AudioType in [at_File, at_CDDA]));
+        SetLabelMouseActions(LblBibGenre , (aAudioFile.IsValidGenre)  AND (aAudioFile.AudioType in [at_File, at_CDDA]));
+        SetLabelMouseActions(LblBibDirectory, (aAudioFile.AudioType in [at_File, at_CDDA]));
 
         case aAudioFile.AudioType of
+
             at_Undef  : LblBibArtist    .Caption := 'ERROR: UNDEFINED AUDIOTYPE'; // should never happen
+            at_Cue,
             at_File,
             at_CDDA : begin
-                LblBibArtist.Caption := SetString(aAudioFile.GetReplacedArtist(NempOptions.ReplaceNAArtistBy),AudioFileProperty_Artist);
-                LblBibTitle .Caption := SetString(aAudioFile.GetReplacedTitle(NempOptions.ReplaceNATitleBy), AudioFileProperty_Title);
+                LblBibArtist.Caption := NempDisplay.SummaryArtist(aAudioFile);
+                LblBibTitle .Caption := NempDisplay.SummaryTitle(aAudioFile);
+                LblBibAlbum.Caption  := NempDisplay.SummaryAlbum(aAudioFile);
+                LblBibYear.Caption   := NempDisplay.SummaryYear(aAudioFile);
+                LblBibGenre.Caption  := NempDisplay.SummaryGenre(aAudioFile);
+                lblBibFilename.Caption  := aAudioFile.Dateiname;
+                lblBibDirectory.Caption := aAudioFile.Ordner;
 
-                tmp := SetString(aAudioFile.GetReplacedAlbum(NempOptions.ReplaceNAAlbumBy), AudioFileProperty_Album);
-                if aAudioFile.Track <> 0 then
-                    tmp := tmp + Format(', Track %d', [aAudioFile.Track]);
-                LblBibAlbum .Caption := tmp;
-
-                tmp := SetString(aAudioFile.Year, AudioFileProperty_Year);
-                if tmp <> '0' then
-                    LblBibYear  .Caption := tmp
-                else
-                    LblBibYear  .Caption := AudioFileProperty_Year + ' N/A';
-                LblBibGenre .Caption := SetString(aAudioFile.Genre, AudioFileProperty_Genre);
-
-                if aAudioFile.IsValidArtist then
-                    LblBibArtist  .Hint := Format(MainForm_DoublClickToSearchArtist ,[aAudioFile.Artist])
-                else LblBibArtist .Hint := '';
-
-                if aAudioFile.IsValidTitle then
-                    LblBibTitle  .Hint := Format(MainForm_DoublClickToSearchTitle  ,[aAudioFile.Titel])
-                else LblBibTitle .Hint := '';
-
-                if aAudioFile.IsValidAlbum then
-                    LblBibAlbum   .Hint := Format(MainForm_DoublClickToSearchAlbum  ,[aAudioFile.Album])
-                else LblBibAlbum  .Hint := '';
-
-                if aAudioFile.IsValidYear then
-                    LblBibYear    .Hint := Format(MainForm_DoublClickToSearchYear   ,[aAudioFile.Year])
-                else LblBibYear   .Hint := '';
-
-                if aAudioFile.IsValidGenre then
-                    LblBibGenre   .Hint := Format(MainForm_DoublClickToSearchGenre  ,[aAudioFile.Genre])
-                else LblBibGenre  .Hint := '';
-
+                lblBibDirectory.Hint := MainForm_DoublClickToSearchDirectory;
+                LblBibArtist.Hint := NempDisplay.SummaryHintArtist(aAudioFile);
+                LblBibTitle.Hint  := NempDisplay.SummaryHintTitle(aAudioFile);
+                LblBibAlbum.Hint  := NempDisplay.SummaryHintAlbum(aAudioFile);
+                LblBibYear.Hint   := NempDisplay.SummaryHintYear(aAudioFile);
+                LblBibGenre.Hint  := NempDisplay.SummaryHintGenre(aAudioFile);
             end;
             at_Stream : begin
                 LblBibArtist.Caption := SetString(aAudioFile.Description, AudioFileProperty_Name);
-                LblBibTitle .Caption := SetString(aAudioFile.Ordner, AudioFileProperty_URL);
-                LblBibAlbum .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
-                LblBibYear  .Caption := inttostr(aAudioFile.Bitrate) + ' kbit/s';
-                LblBibGenre .Caption := '(' + AudioFileProperty_Webstream + ')';;
+                LblBibTitle .Caption := SetString(aAudioFile.Titel, AudioFileProperty_Title);
+                LblBibAlbum .Caption := SetString(aAudioFile.Ordner, AudioFileProperty_URL);
+                LblBibYear  .Caption := NempDisplay.SummaryBitrate(aAudioFile);
+                LblBibGenre .Caption := NempDisplay.SummaryGenre(aAudioFile);
+                lblBibFilename.Caption := '';
+                lblBibDirectory.Caption := '';
 
                 LblBibArtist.Hint := '';
                 LblBibTitle .Hint := '';
                 LblBibAlbum .Hint := '';
                 LblBibYear  .Hint := '';
                 LblBibGenre .Hint := '';
+                lblBibDirectory.Hint := '';
             end;
         end;
     end;
@@ -5170,6 +5161,7 @@ begin
     KeyWords.Album     := '';
     KeyWords.Titel     := '';
     KeyWords.Pfad      := '';
+    KeyWords.Ordner    := '';
     KeyWords.Kommentar := '';
     KeyWords.Lyric     := '';
 
@@ -5213,6 +5205,11 @@ begin
                 tmpGenreList.Free;
             end;
         end;
+        6: begin // new: Directory
+          KeyWords.Ordner := MedienBib.CurrentAudioFile.Ordner;
+          MedienBib.CompleteSearchNoSubStrings(Keywords);
+
+        end;
     end;
 end;
 
@@ -5225,7 +5222,8 @@ var newLabel: TLabel;
 begin
 
     TagLabelList.Clear;
-    currentTop := LblBibReplayGain.Top + LblBibReplayGain.Height + 12;
+    currentTop := LblBibDirectory.Top + LblBibDirectory.Height + 12;
+      // LblBibReplayGain.Top + LblBibReplayGain.Height + 12;
 
     baseLeft := 8;
     currentLeft := baseleft;
@@ -5382,10 +5380,28 @@ begin
 end;
 
 procedure TNemp_MainForm.ShowVSTDetails(aAudioFile: TAudioFile; Source: Integer = SD_MEDIENBIB);
-var
-    tmp: String;
+var DoShowDetails, SameFile: Boolean;
+    MainFile: TAudioFile;
 begin
-  MedienBib.CurrentAudioFile := aAudioFile;
+  if assigned(aAudioFile) and assigned(aAudioFile.Parent) then
+    MainFile := aAudioFile.Parent
+  else
+    MainFile :=  aAudioFile;
+
+  SameFile := MedienBib.CurrentAudioFile = MainFile;
+
+  case Source of
+      -1: DoShowDetails := True;
+      SD_PLAYLIST, SD_MEDIENBIB: DoShowDetails := (NempOptions.VSTDetailsLock = 0) or SameFile;
+      SD_PLAYER:                 DoShowDetails := (NempOptions.VSTDetailsLock = 1) or SameFile;
+  else
+      DoShowDetails := False;
+  end;
+
+  if not DoShowDetails then
+    exit;
+
+  MedienBib.CurrentAudioFile := MainFile; //aAudioFile;
   if Source <> - 1 then
       pm_TagDetails.Tag := Source;
 
@@ -5394,7 +5410,8 @@ begin
   LblBibAlbum   .Visible :=  assigned(aAudioFile);
   LblBibYear    .Visible :=  assigned(aAudioFile);
   LblBibGenre   .Visible :=  assigned(aAudioFile);
-
+  lblBibDirectory.Visible :=  assigned(aAudioFile);
+  lblBibFilename .Visible :=  assigned(aAudioFile);
   LblBibDuration    .Visible :=  assigned(aAudioFile);
   LblBibPlayCounter .Visible :=  assigned(aAudioFile);
   LblBibQuality     .Visible :=  assigned(aAudioFile);
@@ -5403,50 +5420,48 @@ begin
   ImgBibRating  .Visible :=  assigned(aAudioFile);
 
 
-  if assigned(aAudioFile) and (aAudioFile.isCDDA) then
+  if assigned(MainFile) and (MainFile.isCDDA) then
   begin
       // check, whether the current cd is valid for the AudioFile-Object
       // this is VERY important for the cover-downloading:
       // if album-Artist-data does not match the cddb-id, a wrong cover will be downloaded
       // and displayed permanently
-      if (CddbIDFromCDDA(aAudioFile.Pfad) <> aAudioFile.Comment) then
-          aAudioFile.GetAudioData(aAudioFile.Pfad, 0);
+      if (CddbIDFromCDDA(MainFile.Pfad) <> MainFile.Comment) then
+          MainFile.GetAudioData(MainFile.Pfad, 0);
   end;
 
   FillBibDetailLabels(aAudioFile);
-  CreateTagLabels(aAudioFile);
+  CreateTagLabels(MainFile);
 
   // Get Cover
-  RefreshVSTCover(aAudiofile);
+  RefreshVSTCover(MainFile);
 
-  if assigned(aAudioFile) and (trim(String(aAudioFile.Lyrics)) <> '') then   // put this into RefreshVSTCover-Method???
-      LyricsMemo.Text := String(aAudioFile.Lyrics)
+  if assigned(MainFile) and (trim(String(MainFile.Lyrics)) <> '') then   // put this into RefreshVSTCover-Method???
+      LyricsMemo.Text := String(MainFile.Lyrics)
   else
       LyricsMemo.Text := MainForm_Lyrics_NoLyrics;
 
-  if not assigned(aAudiofile) then
+  if not assigned(MainFile) then
        exit;
 
   case aAudioFile.AudioType of
       at_File: begin
-          LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration)
-                                    + ', ' + FloatToStrF((aAudioFile.Size / 1024 / 1024),ffFixed,4,2) + ' MB';
-          if aAudioFile.vbr then
-              tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s (vbr), '
-          else
-              tmp := inttostr(aAudioFile.Bitrate) + ' kbit/s, ';
-          LblBibQuality.Caption := tmp + aAudioFile.SampleRate + ', ' + aAudioFile.ChannelMode;
           ImgBibRating.Visible := True;
-          BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
-          LblBibPlayCounter.Caption := Format(DetailForm_PlayCounter, [aAudioFile.PlayCounter]);
+          LblBibDuration   .Caption := NempDisplay.SummaryDurationSize(aAudioFile);
+          LblBibQuality    .Caption := NempDisplay.SummaryQuality(aAudioFile);
+          LblBibPlayCounter.Caption := NempDisplay.SummaryPlayCounter(aAudioFile);
+          LblBibReplayGain .Caption := NempDisplay.SummaryReplayGain(aAudioFile);
 
-          if (Not IsZero(aAudioFile.TrackGain)) and (Not isZero(aAudioFile.AlbumGain)) then
-              LblBibReplayGain.Caption := Format(Audiofile_ReplayGain_Album_Short, [aAudioFile.TrackGain, aAudioFile.AlbumGain])
-          else
-              if (Not IsZero(aAudioFile.TrackGain)) then
-                  LblBibReplayGain.Caption := Format(Audiofile_ReplayGain_Track_Short, [aAudioFile.TrackGain])
-              else
-                  LblBibReplayGain.Caption := '';
+          BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
+      end;
+
+      at_Cue: begin
+            ImgBibRating.Visible := False;
+            LblBibDuration  .Caption := NempDisplay.SummaryDurationSizeCue(aAudioFile, MainFile);
+            LblBibQuality   .Caption := NempDisplay.SummaryQuality(MainFile);
+            LblBibReplayGain.Caption := NempDisplay.SummaryReplayGain(MainFile);
+            LblBibPlayCounter.Caption := '';
+            // BibRatingHelper.DrawRatingInStarsOnBitmap(aAudioFile.Rating, ImgBibRating.Picture.Bitmap, ImgBibRating.Width, ImgBibRating.Height);
       end;
 
       at_Stream: begin
@@ -5458,9 +5473,9 @@ begin
       end;
 
       at_CDDA: begin
-          LblBibDuration  .Caption := SekToZeitString(aAudioFile.Duration) ;
-          LblBibQuality.Caption := 'CD-Audio';
           ImgBibRating.Visible := False;
+          LblBibDuration  .Caption := NempDisplay.SummaryDuration(MainFile) ;
+          LblBibQuality.Caption := 'CD-Audio';
           LblBibPlayCounter.Caption := '';
           LblBibReplayGain.Caption := '';
       end;
@@ -6332,7 +6347,6 @@ begin
     end;
 end;
 
-
 procedure TNemp_MainForm.PlaylistVSTGetText(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Column: TColumnIndex; TextType: TVSTTextType;
   var CellText: String);
@@ -6342,23 +6356,9 @@ begin
   if not assigned(af) then exit;
 
   case Column of
-    0: begin
-          if af.PrebookIndex = 0 then
-          begin
-              if af.VoteCounter > 0 then
-                  cellText := Format ( '(%d)  %s',  [af.VoteCounter, af.PlaylistTitle])
-              else
-                  cellText := af.PlaylistTitle
-          end
-          else
-              cellText := Format('(%d)  %s' , [af.PrebookIndex, af.PlaylistTitle]);
-    end;
-    1:  begin
-          if PlaylistVST.GetNodeLevel(Node) = 0 then
-              CellText := af.GetDurationForVST
-          else
-              CellText := '@' + SekIntToMinStr(Round(af.Index01));// Da steht der INdex drin
-        end;
+    0: CellText := NempDisplay.PlaylistTitle(af, True);
+    1: CellText := NempDisplay.TreeDuration(af)
+    // the NempDisplay methods will handle PrebookIndex/VoteCounter and start times for Cue-Entries
   end;
 end;
 
@@ -7389,7 +7389,7 @@ begin
 
   if PlaylistVST.GetNodeLevel(aNode) > 0 then
   begin
-      aNode := anode.Parent;
+      // aNode := anode.Parent;
       AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
       ShowVSTDetails(AudioFile, SD_PLAYLIST);
   end else
@@ -7561,8 +7561,11 @@ begin
     begin
         if assigned(NempPlayer.MainAudioFile) then
         begin
-            PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
-            PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
+            PlayerArtistLabel.Caption := NempDisplay.PlayerLine1(NempPlayer.MainAudioFile, NempPlayer.GetActiveCue);  // NempPlayer.PlayerLine1;
+            PlayerTitleLabel.Caption  := NempDisplay.PlayerLine2(NempPlayer.MainAudioFile, NempPlayer.GetActiveCue); // NempPlayer.PlayerLine2;
+            ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
+
+            // NempPlayer.GetActiveCue
         end;
     end;
 end;
@@ -7736,11 +7739,110 @@ begin
 end;
 
 
+procedure TNemp_MainForm.DisplayTitleInformation(ShowMainFile, GetCoverWasSuccessful: Boolean);
+var fn, aHint: String;
+    af, cueFile: TAudioFile;
+    aPic: TPicture;
+begin
+
+
+  if ShowMainFile = MainPlayerControlsActive then
+  begin
+
+            if ShowMainFile then
+            begin
+              af := NempPlayer.MainAudioFile;
+              cueFile := NempPlayer.GetActiveCue;
+              aPic := NempPlayer.MainPlayerPicture;
+              fn := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_MainPlayer.png';
+            end else
+            begin
+              af := NempPlayer.HeadSetAudioFile;
+              cueFile := Nil;
+              aPic := NempPlayer.HeadsetPicture;
+              fn := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_headphone.png';
+            end;
+
+            CoverImage.Picture.Assign(Nil);
+            CoverImage.Refresh;
+            if assigned(af) then
+            begin
+                PlayerArtistLabel.Caption := NempDisplay.PlayerLine1(af, cueFile); //'TODO Line1' ;//NempPlayer.PlayerLine1;
+                PlayerTitleLabel.Caption  := NempDisplay.PlayerLine2(af, cueFile); //'TODO Line2' ;// NempPlayer.PlayerLine2;
+
+                aHint := NempDisplay.HintText(af);
+
+                // Rating
+                Spectrum.DrawRating(af.Rating);
+                // Cover
+                CoverImage.Picture.Assign(aPic);
+                CoverImage.Hint := aHint;
+
+                // initiate Cover Download, if necessary (and allowed by User)
+                // no Cover-Download for Headset-Playback
+                if (NOT GetCoverWasSuccessful) and ShowMainFile  then
+                begin
+                    if MedienBib.CoverSearchLastFM then
+                        Medienbib.NewCoverFlow.DownloadPlayerCover(af);
+                end;
+
+                // Progress and Vis
+                PaintFrame.Hint := aHint;
+                if ShowMainFile then
+                begin
+                  ShowProgress(NempPlayer.Progress, NempPlayer.TimeInSec, True);
+                  NempPlayer.DrawHeadsetVisualisation;
+                end
+                else
+                begin
+                  ShowProgress(NempPlayer.HeadsetProgress, NempPlayer.TimeInSecHeadset, False);
+                  NempPlayer.DrawHeadsetVisualisation;
+                end;
+                ReCheckAndSetProgressChangeGUIStatus;
+
+                HeadSetTimer.Enabled := (NempPlayer.BassHeadSetStatus = BASS_ACTIVE_PLAYING) and (not ShowMainFile);
+                BassTimer.Enabled    := (NempPlayer.BassStatus = BASS_ACTIVE_PLAYING) and (ShowMainFile);
+
+            end else
+            begin
+              // default information
+              PlayerArtistLabel.Caption := Player_NoTitleLoaded;
+              PlayerTitleLabel.Caption := '';
+
+              // rating
+              Spectrum.DrawRating(0);
+
+              // Cover
+              if FileExists(fn) then
+                CoverImage.Picture.LoadFromFile(fn);
+              CoverImage.Hint := '';
+
+              // zero progress
+              SetProgressButtonPosition(0);
+              SlideBarShape.Progress := 0;
+              // disable Slidebar
+              ReCheckAndSetProgressChangeGUIStatus;
+
+              // clear vis
+              PaintFrame.Hint := '';
+              if ShowMainFile then
+                NempPlayer.DrawMainPlayerVisualisation
+              else
+                NempPlayer.DrawHeadsetVisualisation;
+            end;
+  end;
+
+
+
+end;
 
 procedure TNemp_MainForm.DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
 var fn, aHint: String;
     af: TAudioFile;
 begin
+  DisplayTitleInformation(True, GetCoverWasSuccessful);
+  exit;
+  (*
     if MainPlayerControlsActive then
     begin
           CoverImage.Picture.Assign(Nil);
@@ -7751,9 +7853,7 @@ begin
               PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
               PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
 
-              aHint := af.GetHint(NempOptions.ReplaceNAArtistBy,
-                                   NempOptions.ReplaceNATitleBy,
-                                   NempOptions.ReplaceNAAlbumBy);
+              aHint := NempDisplay.HintText(af);
 
               // Rating
               Spectrum.DrawRating(af.Rating);
@@ -7802,6 +7902,7 @@ begin
               PaintFrame.Hint := '';
           end;
     end;
+    *)
 
 end;
 
@@ -7809,6 +7910,9 @@ procedure TNemp_MainForm.DisplayHeadsetTitleInformation(GetCoverWasSuccessful: B
 var fn, aHint: String;
     af: TAudioFile;
 begin
+    DisplayTitleInformation(False, GetCoverWasSuccessful);
+    (*exit;
+
     if not MainPlayerControlsActive then
     begin
         CoverImage.Picture.Assign(Nil);
@@ -7817,9 +7921,7 @@ begin
             // display information about the Headset Title
             af := NempPlayer.HeadSetAudioFile;
 
-            aHint := af.GetHint(NempOptions.ReplaceNAArtistBy,
-                                   NempOptions.ReplaceNATitleBy,
-                                   NempOptions.ReplaceNAAlbumBy);
+            aHint := NempDisplay.HintText(af);
 
             // artist + title
             if NempPlayer.HeadSetAudioFile.Artist <> '' then
@@ -7872,7 +7974,7 @@ begin
             PaintFrame.Hint := '';
         end;
 
-    end;
+    end;   *)
 end;
 
 procedure TNemp_MainForm.ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
@@ -7899,8 +8001,10 @@ begin
     end else
     begin
         Application.Title := NempPlayer.GenerateTaskbarTitel;
-        NempTrayIcon.Hint := StringReplace(NempPlayer.MainAudioFile.PlaylistTitle, '&', '&&&', [rfReplaceAll]);
+        NempTrayIcon.Hint := StringReplace(NempDisplay.PlaylistTitle(NempPlayer.MainAudioFile), '&', '&&&', [rfReplaceAll]);
     end;
+
+    ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
 
     DisplayPlayerMainTitleInformation(GetCoverWasSuccessful);
     DisplayHeadsetTitleInformation(GetCoverWasSuccessful);
@@ -9041,20 +9145,23 @@ end;
 
 procedure TNemp_MainForm.PlayerTabsClick(Sender: TObject);
 begin
-    Case (Sender as TControl).Tag of
-        1: begin
-            TabBtn_Cover.GlyphLine  := 1;
-            TabBtn_Lyrics.GlyphLine := 0;
-            LyricsMemo.Visible     := False;
-            ImgDetailCover.Visible := True;
-        end;
-        2: begin
-            TabBtn_Cover.GlyphLine  := 0;
-            TabBtn_Lyrics.GlyphLine := 1;
-            LyricsMemo.Visible := True;
-            ImgDetailCover.Visible := False;
-        end;
-    end;
+  TabBtn_Cover.Tag       := (TabBtn_Cover.Tag + 1) mod 2;
+  TabBtn_Cover.GlyphLine := TabBtn_Cover.Tag;
+
+  LyricsMemo.Visible     := TabBtn_Cover.Tag = 1;
+  ImgDetailCover.Visible := TabBtn_Cover.Tag = 0;
+end;
+
+procedure TNemp_MainForm.TabBtn_SummaryLockClick(Sender: TObject);
+begin
+  TabBtn_SummaryLock.Tag       := (TabBtn_SummaryLock.Tag + 1) mod 2;
+  TabBtn_SummaryLock.GlyphLine := TabBtn_SummaryLock.Tag;
+
+  NempOptions.VSTDetailsLock := TabBtn_SummaryLock.Tag;
+
+  if NempOptions.VSTDetailsLock = 1 then
+    ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
+
 end;
 
 
@@ -9593,9 +9700,10 @@ var af: TAudioFile;
 begin
   af := Sender.GetNodeData<TAudioFile>(Node);
   if assigned(af) then
-      HintText := af.GetHint(NempOptions.ReplaceNAArtistBy,
-                           NempOptions.ReplaceNATitleBy,
-                           NempOptions.ReplaceNAAlbumBy);
+  begin
+      HintText := NempDisplay.HintText(af);
+      //LineBreakStyle := hlbForceSingleLine;
+  end;
 end;
 
 
@@ -10766,7 +10874,7 @@ begin
         begin
             // Read old Data again, if we edited something else than RATING
             SynchAFileWithDisc(af, True);
-            TranslateMessageDLG(AudioErrorString[aErr], mtWarning, [MBOK], 0);
+            TranslateMessageDLG(NempAudioErrorString[aErr], mtWarning, [MBOK], 0);
             HandleError(afa_DirectEdit, af, aErr, True);
         end;
     end;
@@ -11090,7 +11198,7 @@ begin
         aMenuItem.Checked := (i=centerIdx) AND (NempPlaylist.PlayingFile = NempPlaylist.Playlist[i]);
         aMenuItem.OnClick := TNA_PlaylistClick;
         aMenuItem.Tag := i;
-        aMenuItem.Caption := EscapeAmpersAnd(  NempPlaylist.Playlist[i].PlaylistTitle);
+        aMenuItem.Caption := EscapeAmpersAnd(NempDisplay.PlaylistTitle(NempPlaylist.Playlist[i]));
         PM_TNA_Playlist.Add(aMenuItem);
     end;
   end;
@@ -11230,7 +11338,7 @@ begin
         exit;
 
     ExtraSpace := 16 * AnzeigeMode;
-    MedienBibDetailFillPanel.Left := TabBtn_Lyrics.Left + TabBtn_Lyrics.Width + 6;
+    MedienBibDetailFillPanel.Left := TabBtn_SummaryLock.Left + TabBtn_SummaryLock.Width + 6;
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
     MedienBibDetailStatusLbl.Width := MedienBibDetailFillPanel.Width - 16;
 
@@ -11550,7 +11658,6 @@ begin
     minIdx := maxIdx - NempPlaylist.TNA_PlaylistCount;
     if minIdx < 0 then minIdx := 0;
 
-
     for i := MaxIdx downto MinIdx do
     begin
         aMenuItem := TMenuItem.Create(Nemp_MainForm);
@@ -11560,7 +11667,7 @@ begin
         aMenuItem.Checked := (i=centerIdx) AND (NempPlaylist.PlayingFile = NempPlaylist.Playlist[i]);
         aMenuItem.OnClick := TNA_PlaylistClick;
         aMenuItem.Tag := i;
-        aMenuItem.Caption := EscapeAmpersAnd( NempPlaylist.Playlist[i].PlaylistTitle);
+        aMenuItem.Caption := EscapeAmpersAnd(NempDisplay.PlaylistTitle(NempPlaylist.Playlist[i]));
         Win7TaskBarPopup.Items.Insert(0, aMenuItem);
     end;
   end;
@@ -11825,6 +11932,7 @@ begin
   Medialist_Browse_PopupMenu.Popup(Point.X, Point.Y+10);
 end;
 
+
 procedure TNemp_MainForm.TabBtn_CoverMouseMove(Sender: TObject;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -11989,6 +12097,7 @@ begin
         NempWebServer.LoadfromIni;
         // 2.) Medialib kopieren
         NempWebServer.CopyLibrary(MedienBib);
+        NempWebServer.CopyDisplayHelper;
         NempWebServer.Active := True;
         // Control: Is it Active now?
         if NempWebServer.Active  then

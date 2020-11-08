@@ -524,6 +524,17 @@ type
     BtnQRCode: TButton;
     cb_PlaylistManagerAutoSave: TCheckBox;
     cb_PlaylistManagerAutoSaveUserInput: TCheckBox;
+    grpBox_PlaylistFormat: TGroupBox;
+    lblPlaylistTitle: TLabel;
+    cbPlaylistTitle: TComboBox;
+    cbPlaylistTitleFB: TComboBox;
+    cbPlaylistTitleCueAlbum: TComboBox;
+    cbPlaylistTitleCueTitle: TComboBox;
+    lblPlaylistTitleFB: TLabel;
+    lblPlaylistTitleCueAlbum: TLabel;
+    lblPlaylistTitleCueTitle: TLabel;
+    lblPlaylistWebradioTitle: TLabel;
+    cbPlaylistWebradioTitle: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -693,7 +704,8 @@ var
 implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
-  WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes;
+  WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
+  AudioDisplayUtils;
 
 {$R *.dfm}
 
@@ -1417,10 +1429,15 @@ begin
   CBSortArray2.ItemIndex := integer(MedienBib.NempSortArray[2]);
   cbCoverSortOrder.ItemIndex := MedienBib.CoverSortOrder - 1;
 
-  cbReplaceArtistBy.ItemIndex := Nemp_MainForm.NempOptions.ReplaceNAArtistBy;
-  cbReplaceTitleBy .ItemIndex := Nemp_MainForm.NempOptions.ReplaceNATitleBy ;
-  cbReplaceAlbumBy .ItemIndex := Nemp_MainForm.NempOptions.ReplaceNAAlbumBy ;
+  cbReplaceArtistBy.ItemIndex := Integer(NempDisplay.ArtistSubstitute); //Nemp_MainForm.NempOptions.ReplaceNAArtistBy;
+  cbReplaceTitleBy .ItemIndex := Integer(NempDisplay.TitleSubstitute) ; //Nemp_MainForm.NempOptions.ReplaceNATitleBy ;
+  cbReplaceAlbumBy .ItemIndex := Integer(NempDisplay.AlbumSubstitute) ; //Nemp_MainForm.NempOptions.ReplaceNAAlbumBy ;
 
+  cbPlaylistTitle.Text         := NempDisplay.PlaylistTitleFormat;
+  cbPlaylistTitleFB.Text       := NempDisplay.PlaylistTitleFormatFB;
+  cbPlaylistTitleCueAlbum.Text := NempDisplay.PlaylistCueAlbumFormat;
+  cbPlaylistTitleCueTitle.Text := NempDisplay.PlaylistCueTitleFormat;
+  cbPlaylistWebradioTitle.Text := NempDisplay.PlaylistWebradioFormat;
 
   CBAutoScan.Checked := MedienBib.AutoScanDirs;
   LBAutoScan.Enabled := MedienBib.AutoScanDirs;
@@ -2610,9 +2627,15 @@ begin
           MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
           MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
 
-          Nemp_MainForm.NempOptions.ReplaceNAArtistBy := cbReplaceArtistBy.ItemIndex;
-          Nemp_MainForm.NempOptions.ReplaceNATitleBy := cbReplaceTitleBy .ItemIndex;
-          Nemp_MainForm.NempOptions.ReplaceNAAlbumBy := cbReplaceAlbumBy .ItemIndex;
+          NempDisplay.ArtistSubstitute := TSubstituteValue(cbReplaceArtistBy.ItemIndex);
+          NempDisplay.TitleSubstitute  := TSubstituteValue(cbReplaceTitleBy .ItemIndex);
+          NempDisplay.AlbumSubstitute  := TSubstituteValue(cbReplaceAlbumBy .ItemIndex);
+
+          NempDisplay.PlaylistTitleFormat    := cbPlaylistTitle.Text         ;
+          NempDisplay.PlaylistTitleFormatFB  := cbPlaylistTitleFB.Text       ;
+          NempDisplay.PlaylistCueAlbumFormat := cbPlaylistTitleCueAlbum.Text ;
+          NempDisplay.PlaylistCueTitleFormat := cbPlaylistTitleCueTitle.Text ;
+          NempDisplay.PlaylistWebradioFormat := cbPlaylistWebradioTitle.Text ;
 
           MedienBib.BibSearcher.QuickSearchOptions.WhileYouType       := CB_QuickSearchWhileYouType          .Checked;
           MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow    := cb_ChangeCoverflowOnSearch          .Checked;
@@ -3799,6 +3822,7 @@ begin
         NempWebServer.AllowVotes := cbPermitVote.Checked;
         // 2.) Medialib kopieren
         NempWebServer.CopyLibrary(MedienBib);
+        NempWebServer.CopyDisplayHelper;
         NempWebServer.Active := True;
         // Control: Is it Active now?
         if NempWebServer.Active  then

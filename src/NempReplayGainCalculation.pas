@@ -218,7 +218,7 @@ type
       property CalculationMode: TRGCalculationMode read fCalculationMode write fCalculationMode;
 
       // The MediaLibrary can be blocked, so we can work with the actual files from there
-      // The Playlist has no blocking ability, so we have to work wth copies of the playlist-files here
+      // The Playlist has no blocking ability, so we have to work with copies of the playlist-files here
       // (to avoid AccessViolations and stuff when the user deletes files from the playlist...)
       // NOTE: This MUST be set before adding any audiofiles to the List!
       property UseAudioFileCopies: boolean read fUseAudioFileCopies write fUseAudioFileCopies;
