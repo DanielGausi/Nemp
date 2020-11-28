@@ -138,6 +138,7 @@ begin
     ReportMemoryLeaksOnShutdown := False;
 
     Application.Initialize;
+    Application.MainFormOnTaskbar := True;
 
 
   {$IFDEF USESTYLES}

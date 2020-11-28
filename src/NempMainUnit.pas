@@ -6,7 +6,7 @@
     The MainForm of Nemp
 
     ---------------------------------------------------------------
-    Nemp - Noch ein Mp3-Player
+    Nemp - Noch efin Mp3-Player
     Copyright (C) 2005-2020, Daniel Gaussmann
     http://www.gausi.de
     mail@gausi.de
@@ -57,8 +57,9 @@ uses
   UpdateUtils, uDragFilesSrc, PlayWebstream,
   ClassicCoverFlowClass,
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
-  fspTaskbarMgr, fspTaskbarPreviews, Lyrics, pngimage, ExPopupList, SilenceDetection,
-  System.ImageList, System.Types, System.UITypes, ProgressShape
+  Lyrics, pngimage, ExPopupList, SilenceDetection,
+  System.ImageList, System.Types, System.UITypes, ProgressShape,
+  System.Win.TaskbarCore, Vcl.Taskbar
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -327,8 +328,6 @@ type
     MM_O_PartyMode: TMenuItem;
     PanelTagCloudBrowse: TNempPanel;
     PM_ML_GetTags: TMenuItem;
-    fspTaskbarManager: TfspTaskbarMgr;
-    fspTaskbarPreviews1: TfspTaskbarPreviews;
     PM_ML_CloudEditor: TMenuItem;
     TaskBarImages: TImageList;
     Win7TaskBarPopup: TPopupMenu;
@@ -618,6 +617,7 @@ type
     lblBibFilename: TLabel;
     lblBibDirectory: TLabel;
     Bevel2: TBevel;
+    NempTaskbarManager: TTaskbar;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1202,6 +1202,8 @@ type
     procedure PM_PLM_EditFavouritesClick(Sender: TObject);
     procedure PM_PL_SaveAsPlaylistClick(Sender: TObject);
     procedure TabBtn_SummaryLockClick(Sender: TObject);
+    procedure NempTaskbarManagerThumbPreviewRequest(Sender: TObject; APreviewHeight,
+      APreviewWidth: Integer; PreviewBitmap: TBitmap);
 
   private
     { Private declarations }
@@ -1251,6 +1253,9 @@ type
 
     procedure PlaylistSelectNextSearchresult;
     procedure PlaylistSelectAllSearchresults;
+
+    procedure InitTaskBarIcons;
+
 
   public
     { Public declarations }
@@ -1345,6 +1350,7 @@ type
     procedure RefreshCurrentSearchDirPlayist(Sender: TObject);
     procedure RefreshCurrentSearchDirMediaLibrary(Sender: TObject);
 
+    procedure ReInitTaskbarManager(TryAgainOnException: Boolean);
     //procedure CorrectSkinRegions;
     //procedure ResetVolSteps;
   protected
@@ -1421,7 +1427,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
    PlaylistUnit,  AuswahlUnit,  MedienlisteUnit, ShutDown, Details,
   BirthdayShow, RandomPlaylist, BasicSettingsWizard,
   NewPicture, ShutDownEdit, NewStation, BibSearch, BassHelper,
-  ExtendedControlsUnit, fspControlsExt, CloudEditor,
+  ExtendedControlsUnit, CloudEditor,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
@@ -1495,8 +1501,8 @@ begin
     MedienBib.NewCoverFlow.SetNewHandle(Nemp_MainForm.PanelCoverBrowse.Handle);
     ReAcceptDragFiles;
 
-    // NempSkin.AssignOtherGraphics;
-    //UpdateFormDesignNeu;      // really necessary??? (july 2019)
+    if NempTaskbarManager.Tag = 0 then
+      ReInitTaskbarManager(False);
 end;
 
 // Refresh the CurrentDir information on the ProgreessForms
@@ -1964,6 +1970,8 @@ begin
 
     // ------------------------------------
 
+    InitTaskBarIcons;
+
     // Create Updater
     NempUpdater := TNempUpdater.Create(FOwnMessageHandler);
 
@@ -1989,6 +1997,7 @@ begin
 
     MostRecentInsertNodeForPlaylist := Nil;
 
+
 end;
 
 procedure TNemp_MainForm.FormDeactivate(Sender: TObject);
@@ -2002,8 +2011,80 @@ begin
   // Nothing to do here. Will be done in nemp.dpr
   if assigned(FSplash) then
       FSplash.Close;
+end;
+
+procedure TNemp_MainForm.InitTaskBarIcons;
+var aIcon: TIcon;
+begin
+  aIcon := TIcon.Create;
+  try
+    TaskBarImages.GetIcon(0, aIcon); // prev
+    NemptaskbarManager.TaskBarButtons[0].Icon.Assign(aIcon);
+
+    if NempPlayer.BassStatus = BASS_ACTIVE_PLAYING then
+      TaskBarImages.GetIcon(2, aIcon) // play/pause
+    else
+      TaskBarImages.GetIcon(1, aIcon); // play/pause
+
+    NemptaskbarManager.TaskBarButtons[1].Icon.Assign(aIcon);
+
+    TaskBarImages.GetIcon(3, aIcon); // next
+    NemptaskbarManager.TaskBarButtons[2].Icon.Assign(aIcon);
+
+    TaskBarImages.GetIcon(6, aIcon); // menu
+    NemptaskbarManager.TaskBarButtons[3].Icon.Assign(aIcon);
+
+    TaskBarImages.GetIcon(4, aIcon); //vol down
+    NemptaskbarManager.TaskBarButtons[4].Icon.Assign(aIcon);
+
+    TaskBarImages.GetIcon(5, aIcon); // vol up
+    NemptaskbarManager.TaskBarButtons[5].Icon.Assign(aIcon);
+
+    NemptaskbarManager.ApplyButtonsChanges;
+  finally
+    aIcon.Free;
+  end;
+end;
+
+procedure TNemp_MainForm.ReInitTaskbarManager(TryAgainOnException: Boolean);
+var progressValue: Int64;
+    progressState: TTaskbarProgressState;
+    i: Integer;
+begin
+  Application.ProcessMessages;
+  try
+      progressState := NempTaskbarManager.ProgressState;
+      progressValue := NempTaskbarManager.ProgressValue;
+      NempTaskbarManager.Free;
+
+      NempTaskbarManager := TTaskBar.Create(self);
+      NempTaskbarManager.TabProperties := [TThumbTabProperty.CustomizedPreview];
+
+      for i := 1 to 6 do
+        NempTaskbarManager.TaskBarButtons.Add;
+      NempTaskbarManager.TaskBarButtons[3].ButtonState := [TThumbButtonState.Enabled, TThumbButtonState.NoBackGround];
+
+      NempTaskbarManager.OnThumbButtonClick := fspTaskbarManagerThumbButtonClick;
+      NempTaskbarManager.OnThumbPreviewRequest := NempTaskbarManagerThumbPreviewRequest;
+
+      NempTaskbarManager.ProgressMaxValue := 100;
+      NempTaskbarManager.ProgressValue := progressValue;
+      NempTaskbarManager.ProgressState := progressState;
+      //if self.Visible then
+        NempTaskbarManager.Initialize;
+
+      //if self.Visible then
+        InitTaskBarIcons;
+
+      NempTaskbarManager.Tag := 1; // successfully initiated
+  except
+    if TryAgainOnException then
+      CorrectSkinRegionsTimer.Enabled := True;
+  end;
 
 end;
+
+
 
 procedure TNemp_MainForm.CatchAllExceptionsOnShutDown(Sender: TObject; E: Exception);
 begin
@@ -2909,6 +2990,7 @@ begin
     if Not Nemp_MainForm.GlobalUseAdvancedSkin then
     begin
         TStyleManager.SetStyle('Windows');
+        ReInitTaskbarManager(True);
         if UseSkin then
         begin
             if NOT NempSkin.UseDefaultMenuImages then
@@ -3947,8 +4029,8 @@ begin
     MedienBib.StatusBibUpdate := 3;
     BlockGUI(3);
     KeepOnWithLibraryProcess := true; // ok, apm is used
-    fspTaskbarManager.ProgressState := fstpsNormal;
-    fspTaskbarManager.ProgressValue := 0;
+    NempTaskbarManager.ProgressState := TTaskBarProgressState.Normal;
+    NempTaskbarManager.ProgressValue := 0;
 
     TagMod100 := (Sender as TMenuItem).Tag Mod 100;
     if (Sender as TMenuItem).Tag >= 100 then
@@ -4006,7 +4088,7 @@ begin
                 if (nt > ct + 250) or (nt < ct) then
                 begin
                     ct := nt;
-                    fspTaskbarManager.ProgressValue := Round(iSel/iGes * 100);
+                    NempTaskbarManager.ProgressValue := Round(iSel/iGes * 100);
                     ProgressFormLibrary.lblSuccessCount.Caption := IntToStr(iSel);
                     ProgressFormLibrary.MainProgressBar.Position := Round(iSel/iGes * 100);
                     ProgressFormLibrary.Update;
@@ -4031,7 +4113,7 @@ begin
     KeepOnWithLibraryProcess := False;
     MedienBib.StatusBibUpdate := 0;
     ShowSummary;
-    fspTaskbarManager.ProgressState := fstpsNoProgress;
+    NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
     Node := LocalTree.FocusedNode;
     if LocalTree = VST then
         detUpdate := SD_MEDIENBIB
@@ -7447,6 +7529,12 @@ procedure TNemp_MainForm.ShowProgress(aProgress: Double; aSeconds: Integer; Main
 begin
     SlidebarShape.Progress := aProgress;
 
+    // during testing ....
+    NempTaskBarManager.ProgressState := TTaskBarProgressState.None;
+    NempTaskBarManager.ProgressState := TTaskBarProgressState.Normal;
+    NempTaskBarManager.ProgressValue := round(aProgress*100);
+    NempTaskBarManager.ApplyProgressChanges;
+
     if (SlideBarButton.Tag = 0) then // d.h. der Button wird grade nicht gedraggt
     begin
         if LastPaintedTime <> aSeconds then
@@ -7457,7 +7545,8 @@ begin
                 playerTimeLbl.Caption := NempPlayer.TimeStringHeadset;
             LastPaintedTime := aSeconds;
             // Refresh Win7 preview
-            fspTaskbarPreviews1.InvalidatePreview;
+            //xx fspTaskbarPreviews1.InvalidatePreview;
+            NempTaskbarManager.InvalidateThumbPreview;
         end;
         if (SlideBarButton.Visible) then
             SetProgressButtonPosition(aProgress);
@@ -7745,7 +7834,6 @@ var fn, aHint: String;
     aPic: TPicture;
 begin
 
-
   if ShowMainFile = MainPlayerControlsActive then
   begin
 
@@ -7832,149 +7920,17 @@ begin
             end;
   end;
 
-
-
 end;
 
 procedure TNemp_MainForm.DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
-var fn, aHint: String;
-    af: TAudioFile;
 begin
   DisplayTitleInformation(True, GetCoverWasSuccessful);
-  exit;
-  (*
-    if MainPlayerControlsActive then
-    begin
-          CoverImage.Picture.Assign(Nil);
-          CoverImage.Refresh;
-          if assigned(NempPlayer.MainAudioFile) then
-          begin
-              af := NempPlayer.MainAudioFile;
-              PlayerArtistLabel.Caption := NempPlayer.PlayerLine1;
-              PlayerTitleLabel.Caption  := NempPlayer.PlayerLine2;
-
-              aHint := NempDisplay.HintText(af);
-
-              // Rating
-              Spectrum.DrawRating(af.Rating);
-
-              // Cover
-              CoverImage.Picture.Assign(NempPlayer.MainPlayerPicture);
-              CoverImage.Hint := aHint;
-
-              // initiate Cover Download, if necessary (and allowed by User)
-              if NOT GetCoverWasSuccessful then
-              begin
-                  if MedienBib.CoverSearchLastFM then
-                      Medienbib.NewCoverFlow.DownloadPlayerCover(af);
-              end;
-
-              // Progress
-              ShowProgress(NempPlayer.Progress, NempPlayer.TimeInSec, True);
-              ReCheckAndSetProgressChangeGUIStatus;
-
-              // vis
-              NempPlayer.DrawMainPlayerVisualisation;
-              PaintFrame.Hint := aHint;
-
-          end else
-          begin
-              PlayerArtistLabel.Caption := Player_NoTitleLoaded;
-              PlayerTitleLabel.Caption := '';  //Player_NoTitleLoadedDropHereToStart;
-
-              // rating
-              Spectrum.DrawRating(0);
-
-              // cover
-              fn := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_MainPlayer.png';
-              if FileExists(fn) then
-                  CoverImage.Picture.LoadFromFile(fn);
-              CoverImage.Hint := '';
-
-              // zero progress
-              SetProgressButtonPosition(0);
-              SlideBarShape.Progress := 0;
-              // disable Slidebar
-              ReCheckAndSetProgressChangeGUIStatus;
-
-              // clear vis
-              NempPlayer.DrawMainPlayerVisualisation;
-              PaintFrame.Hint := '';
-          end;
-    end;
-    *)
-
 end;
 
 procedure TNemp_MainForm.DisplayHeadsetTitleInformation(GetCoverWasSuccessful: Boolean);
-var fn, aHint: String;
-    af: TAudioFile;
+
 begin
-    DisplayTitleInformation(False, GetCoverWasSuccessful);
-    (*exit;
-
-    if not MainPlayerControlsActive then
-    begin
-        CoverImage.Picture.Assign(Nil);
-        if assigned(NempPlayer.HeadSetAudioFile) then
-        begin
-            // display information about the Headset Title
-            af := NempPlayer.HeadSetAudioFile;
-
-            aHint := NempDisplay.HintText(af);
-
-            // artist + title
-            if NempPlayer.HeadSetAudioFile.Artist <> '' then
-                PlayerArtistLabel.Caption := af.Artist
-            else
-                PlayerArtistLabel.Caption := Player_UnkownArtist;
-            PlayerTitleLabel.Caption := af.NonEmptyTitle;
-
-            // Rating
-            Spectrum.DrawRating(af.Rating);
-
-            // Cover //no cover download for headset
-            CoverImage.Picture.Assign(NempPlayer.HeadsetPicture);
-            CoverImage.Hint := aHint;
-
-            // Progress
-            ShowProgress(NempPlayer.HeadsetProgress, NempPlayer.TimeInSec, False);
-
-            // visualisation
-            NempPlayer.DrawHeadsetVisualisation;
-            Paintframe.Hint := aHint;
-
-            // enable/disable slidebar
-            ReCheckAndSetProgressChangeGUIStatus;
-
-            HeadSetTimer.Enabled := NempPlayer.BassHeadSetStatus = BASS_ACTIVE_PLAYING;
-        end else
-        begin
-            // default information
-            PlayerArtistLabel.Caption := Player_NoTitleLoaded;
-            PlayerTitleLabel.Caption := '';
-
-            // rating
-            Spectrum.DrawRating(0);
-
-            // Cover
-            CoverImage.Hint := '';
-            fn := ExtractFilePath(ParamStr(0)) + 'Images\default_cover_headphone.png';
-            if FileExists(fn) then
-                CoverImage.Picture.LoadFromFile(fn);
-
-            // zero progress
-            SetProgressButtonPosition(0);
-            SlideBarShape.Progress := 0;
-            // disable Slidebar
-            ReCheckAndSetProgressChangeGUIStatus;
-
-            // clear vis
-            NempPlayer.DrawHeadsetVisualisation;
-            PaintFrame.Hint := '';
-        end;
-
-    end;   *)
+  DisplayTitleInformation(False, GetCoverWasSuccessful);
 end;
 
 procedure TNemp_MainForm.ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
@@ -8423,7 +8379,7 @@ begin
       ST_Playlist.Break;
       ST_Medienliste.Break;
 
-      fspTaskbarManager.ProgressState := fstpsNoProgress;
+      NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
       // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
       NempPlaylist.AcceptInput := True;
       KeepOnWithLibraryProcess := False;  // CancelButton
@@ -9161,7 +9117,6 @@ begin
 
   if NempOptions.VSTDetailsLock = 1 then
     ShowVSTDetails(NempPlayer.CurrentFile, SD_PLAYER);
-
 end;
 
 
@@ -9201,8 +9156,9 @@ end;
 
 procedure TNemp_MainForm.FormActivate(Sender: TObject);
 begin
-    fspTaskbarManager.Active := True;
+    //XXXNempTaskbarManager.Active := True;
     FormReadyAndActivated := True;
+
     Application.OnDeactivate := FormDeactivate;
 end;
 
@@ -9230,7 +9186,7 @@ begin
                   ST_Playlist.Break;
                   ST_Medienliste.Break;
                   MedienBib.Abort;
-                  fspTaskbarManager.ProgressState := fstpsNoProgress;
+                  NempTaskbarManager.ProgressState := TTaskBarProgressState.None;
                   // kann sein, dass der Player ab und zu mal blockiert - hier dann umsetzen ;-)
                   NempPlaylist.AcceptInput := True;
                   KeepOnWithLibraryProcess := False;
@@ -10052,38 +10008,12 @@ end;
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_BrowseClick(
   Sender: TObject);
-var reactivate: Boolean;
 begin
   NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
   PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
   MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
 
-
-                      {$IFDEF USESTYLES}
-                      reactivate := False;
-                      if  (GlobalUseAdvancedSkin) AND
-                          (UseSkin AND NempSkin.UseAdvancedSkin)
-                      then
-                      begin
-                          // deactivate advanced skin temporary
-                      //    TStyleManager.SetStyle('Windows');    //???
-                      //    reactivate := True;                   //???
- /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
-
-                      end;
-                      {$ENDIF}
-
   AuswahlForm.Visible := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-
-
-                      {$IFDEF USESTYLES}
-                      if reactivate then
-                      begin
-                          TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
-                          CorrectSkinRegionsTimer.Enabled := True;
-                          //CorrectSkinRegions;
-                      end;
-                      {$ENDIF}
 
   if AuswahlForm.Visible then
   begin
@@ -11693,6 +11623,8 @@ begin
 end;
 
 
+
+
 procedure TNemp_MainForm.PM_P_DirectoriesRecordingsClick(Sender: TObject);
 begin
 
@@ -11839,8 +11771,8 @@ begin
     case ButtonID of
         0: PlayPrevBTNIMGClick(Nil);
         1: PlayPauseBTNIMGClick(Nil);
-        2: StopBTNIMGClick(Nil);
-        3: PlayNextBTNIMGClick(NIL);
+        502: StopBTNIMGClick(Nil);
+        2: PlayNextBTNIMGClick(NIL);
         4: begin
             NempPlayer.Volume := NempPlayer.Volume - 10;
             CorrectVolButton;
@@ -11849,7 +11781,7 @@ begin
             NempPlayer.Volume := NempPlayer.Volume + 10;
             CorrectVolButton;
         end;
-        42: begin
+        3: begin
             if Win7TaskBarPopup.Tag = 0 then
             begin
                 GetCursorPos(Point);
@@ -11868,6 +11800,12 @@ procedure TNemp_MainForm.fspTaskbarPreviews1NeedIconicBitmap(Sender: TObject;
   Width, Height: Integer; var Bitmap: HBITMAP);
 begin
     Bitmap := NempPlayer.DrawPreview(Width,Height, NempSkin.isActive);
+end;
+
+procedure TNemp_MainForm.NempTaskbarManagerThumbPreviewRequest(Sender: TObject;
+  APreviewHeight, APreviewWidth: Integer; PreviewBitmap: TBitmap);
+begin
+    NempPlayer.DrawPreviewNew(APreviewHeight, APreviewWidth, PreviewBitmap, NempSkin.isActive);
 end;
 
 

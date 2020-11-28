@@ -743,7 +743,7 @@ type
 
 implementation
 
-uses fspTaskBarMgr, AudioDisplayUtils;
+uses System.Win.TaskbarCore, AudioDisplayUtils;
 
 function GetProperMenuString(aIdx: Integer): UnicodeString;
 begin
@@ -1523,7 +1523,7 @@ var i, freq, ges: Integer;
 begin
 
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0); // Or better MB_BlockWriteAccess? - No, it should be ok so.
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
   
   SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_ScanNewFiles));
 
@@ -2105,7 +2105,7 @@ var i, ges, freq: Integer;
     nt, ct: Cardinal;
 begin
       SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockUpdateStart, 0);
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
       SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_CleanUp));
 
       ges := Mp3ListePfadSort.Count + AllPlaylistsPfadSort.Count  + 1;
@@ -2157,7 +2157,7 @@ begin
 
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressShowHint, Integer(PChar(MediaLibrary_SearchingMissingFilesComplete_AnalysingData)));
       SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
-      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+      SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 end;
 {
     --------------------------------------------------------
@@ -2653,7 +2653,7 @@ var i, freq, ges: Integer;
 begin
   // AudioFiles will be changed. Block everything.
   SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockReadAccess, 0); //
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
   SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_RefreshFiles));
 
   einUpdate := False;
@@ -2779,7 +2779,7 @@ begin
 
   // Status zurücksetzen, Unblock library
   SendMessage(MainWindowHandle, WM_MedienBib, MB_UnBlock, 0);
-  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+  SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 
   // Changed Setz. Ja...IMMER. Eine Abfrage, ob sich _irgendwas_ an _irgendeinem_ File
   // geändert hat, führe ich nicht durch.
@@ -2869,7 +2869,7 @@ begin
 
     done := 0;
     failed := 0;
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
     SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_Searchlyrics));
 
     ErrorOcurred := False;
@@ -2971,7 +2971,7 @@ begin
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 
     // Build TotalStrings
     SendMessage(MainWindowHandle, WM_MedienBib, MB_BlockWriteAccess, 0);
@@ -3095,7 +3095,7 @@ begin
     failed := 0;
     ErrorOcurred := false;
 
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
 
     // if UpdateList.Count > 1 then
         SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_SearchTags));
@@ -3193,7 +3193,7 @@ begin
         SendMessage(MainWindowHandle, WM_MedienBib, MB_TagsSetTabWarning, 0);
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 
     // clear thread-used filename
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ThreadFileUpdate, Integer(PWideChar('')));
@@ -3287,7 +3287,7 @@ var i, freq, ges: Integer;
     errCount, inconCount: Integer;
     newTags: UTF8String;
 begin
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
     SendMessage(MainWindowHandle, WM_MedienBib, MB_StartLongerProcess, Integer(pa_UpdateMetadata));
 
     ErrorOcurred := False;
@@ -3353,7 +3353,7 @@ begin
     end;
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_ProgressRefreshJustProgressbar, 100);
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 
     // this will reset the status of the MenuItem indicating the warning for inconsistent files
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
@@ -3439,7 +3439,7 @@ var i, f: Integer;
     privateOwner: AnsiString;
     LogList: TStringList;
 begin
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNormal));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.Normal));
 
     LogList := TStringList.Create;
     try
@@ -3539,7 +3539,7 @@ begin
         LogList.Free;
     end;
 
-    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(fstpsNoProgress));
+    SendMessage(MainWindowHandle, WM_MedienBib, MB_SetWin7TaskbarProgress, Integer(TTaskBarProgressState.None));
 
     SendMessage(MainWindowHandle, WM_MedienBib, MB_RefreshTagCloudFile, Integer(PWideChar('')));
 

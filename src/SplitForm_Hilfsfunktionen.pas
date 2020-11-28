@@ -639,22 +639,22 @@ end;
 
 
 procedure SwapWindowMode(newMode: Integer);
-var reactivate: boolean;
+var //X reactivate: boolean;
     ini:TMemIniFile;
 begin
     with Nemp_MainForm do
     begin
                       {$IFDEF USESTYLES}
-                      reactivate := False;
-                      if  (GlobalUseAdvancedSkin) AND
-                          (UseSkin AND NempSkin.UseAdvancedSkin)
-                      then
-                      begin
+                      //X reactivate := False;
+                      //X if  (GlobalUseAdvancedSkin) AND
+                      //X     (UseSkin AND NempSkin.UseAdvancedSkin)
+                      //X then
+                      //X begin
                           // deactivate advanced skin temporary
                       //    TStyleManager.SetStyle('Windows');
                       //    reactivate := True;
                       /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
-                      end;
+                      //X end;
                       {$ENDIF}
 
                       // save current settings
@@ -681,11 +681,11 @@ begin
                       UpdateFormDesignNeu(newMode);
 
                       {$IFDEF USESTYLES}
-                      if reactivate then
-                      begin
-                          TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
+                      //X if reactivate then
+                      //X begin
+                      //X     TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
                           //CorrectSkinRegionsTimer.Enabled := True;   Now in UpdateFormDesignNeu
-                      end;
+                      //X end;
                       {$ENDIF}
     end;
 

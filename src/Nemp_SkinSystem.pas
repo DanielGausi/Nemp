@@ -398,8 +398,8 @@ type
 
 
         Procedure UpdateSpectrumGraphics;
-        procedure ActivateSkin(SetFlowColor: Boolean = True);
-        procedure DeActivateSkin(SetFlowColor: Boolean = True);
+        procedure ActivateSkin(NotTheFirstActivation: Boolean = True);
+        procedure DeActivateSkin(NotTheFirstActivation: Boolean = True);
         procedure SetRegionsAgain;
 
         procedure TileGraphic(const ATile: TBitmap; aDoTile: Boolean; const ATarget: TCanvas; X, Y: Integer; Stretch: Boolean = False);
@@ -1244,7 +1244,7 @@ end;
 
 
 
-procedure TNempSkin.ActivateSkin(SetFlowColor: Boolean = True);
+procedure TNempSkin.ActivateSkin(NotTheFirstActivation: Boolean = True);
 var i, idx: integer;
   DestVST: TVirtualStringTree;
   j: TControlButtons;
@@ -1581,7 +1581,7 @@ begin
   with Nemp_MainForm do
   begin
 
-    if SetFlowColor then
+    if NotTheFirstActivation then
         // Dont do this on startup. On some systems the complete Desktop is painted
         MedienBib.NewCoverFlow.SetColor(SkinColorScheme.FormCL);
 
@@ -1637,9 +1637,15 @@ begin
   if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
   begin
       TStylemanager.TrySetStyle(self.AdvancedStyleName);
+      //if NotTheFirstActivation then
+        Nemp_MainForm.ReInitTaskbarManager(True);
   end
   else
+  begin
       TStyleManager.TrySetStyle('Windows');
+      if NotTheFirstActivation then
+        Nemp_MainForm.ReInitTaskbarManager(True);
+  end;
   {$ENDIF}
 
   Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
@@ -1695,7 +1701,7 @@ begin
 end;
 
 
-procedure TNempSkin.DeActivateSkin(SetFlowColor: Boolean = True);
+procedure TNempSkin.DeActivateSkin(NotTheFirstActivation: Boolean = True);
 var i, idx: integer;
   DestVST: TVirtualStringTree;
 
@@ -1878,7 +1884,7 @@ begin
       end
   end;
 
-  if SetFlowColor then
+  if NotTheFirstActivation then
       // Dont do this on startup. On some systems the complete Desktop is painted white
       MedienBib.NewCoverFlow.SetColor(clWhite);
   
@@ -1921,6 +1927,8 @@ begin
 
     {$IFDEF USESTYLES}
     TStyleManager.TrySetStyle('Windows');
+    if NotTheFirstActivation then
+      Nemp_MainForm.ReInitTaskbarManager(True);
     {$ENDIF}
     Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
   end;

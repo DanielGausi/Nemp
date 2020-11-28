@@ -5893,66 +5893,6 @@ object Nemp_MainForm: TNemp_MainForm
     Left = 992
     Top = 448
   end
-  object fspTaskbarManager: TfspTaskbarMgr
-    Active = False
-    ProgressValue = 0
-    ProgressValueMax = 100
-    ProgressState = fstpsNoProgress
-    Images = TaskBarImages
-    ThumbButtons = <
-      item
-        ImageIndex = 0
-        Id = 0
-        Hint = 'Play previous'
-        ShowHint = True
-        Flags = []
-      end
-      item
-        ImageIndex = 1
-        Id = 1
-        Hint = 'Play/Pause'
-        ShowHint = True
-        Flags = []
-      end
-      item
-        ImageIndex = 3
-        Id = 3
-        Hint = 'Play next'
-        ShowHint = True
-        Flags = []
-      end
-      item
-        ImageIndex = 6
-        Id = 42
-        Hint = 'Show playlist menu'
-        ShowHint = True
-        Flags = [fsttfNoBackground]
-      end
-      item
-        ImageIndex = 4
-        Id = 4
-        Hint = 'Volume down'
-        ShowHint = True
-        Flags = []
-      end
-      item
-        ImageIndex = 5
-        Id = 5
-        Hint = 'Volume up'
-        ShowHint = True
-        Flags = []
-      end>
-    OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
-    Left = 1008
-    Top = 288
-  end
-  object fspTaskbarPreviews1: TfspTaskbarPreviews
-    Active = True
-    CustomLiveView = False
-    OnNeedIconicBitmap = fspTaskbarPreviews1NeedIconicBitmap
-    Left = 1000
-    Top = 336
-  end
   object TaskBarImages: TImageList
     Left = 1008
     Top = 248
@@ -6800,5 +6740,28 @@ object Nemp_MainForm: TNemp_MainForm
       Caption = 'Edit favorites'
       OnClick = PM_PLM_EditFavouritesClick
     end
+  end
+  object NempTaskbarManager: TTaskbar
+    Tag = 1
+    TaskBarButtons = <
+      item
+      end
+      item
+      end
+      item
+      end
+      item
+        ButtonState = [Enabled, NoBackground]
+      end
+      item
+      end
+      item
+      end>
+    ProgressMaxValue = 100
+    TabProperties = [CustomizedPreview]
+    OnThumbPreviewRequest = NempTaskbarManagerThumbPreviewRequest
+    OnThumbButtonClick = fspTaskbarManagerThumbButtonClick
+    Left = 824
+    Top = 164
   end
 end

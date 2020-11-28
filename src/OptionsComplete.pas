@@ -87,8 +87,6 @@ type
     cb_ShowSplashScreen: TCheckBox;
     CB_StartMinimized: TCheckBox;
     cb_StayOnTop: TCheckBox;
-    grpBoxUseAdvancedSkin: TGroupBox;
-    cbUseAdvancedSkin: TCheckBox;
     TabSystem1: TTabSheet;
     GrpBox_Hotkeys: TGroupBox;
     CB_Activate_Play: TCheckBox;
@@ -1608,8 +1606,6 @@ begin
   CB_AutoCheck.Checked := NempUpdater.AutoCheck;
   CB_AutoCheckNotifyOnBetas.Checked := NempUpdater.NotifyOnBetas;
 
-  cbUseAdvancedSkin.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
-
   CBBOX_UpdateInterval.Enabled := CB_AutoCheck.Checked;
   case NempUpdater.CheckInterval of
       0: CBBOX_UpdateInterval.ItemIndex := 0;
@@ -3107,36 +3103,6 @@ begin
   end;
   if assigned(FDetails) then
       fDetails.BuildGetLyricButtonHint;
-
-
-  if Nemp_MainForm.GlobalUseAdvancedSkin <> cbUseAdvancedSkin.Checked then
-  begin
-      Nemp_MainForm.GlobalUseAdvancedSkin := cbUseAdvancedSkin.Checked;
-
-      Nemp_MainForm.MM_O_Skin_UseAdvanced.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
-      Nemp_MainForm.PM_P_Skin_UseAdvancedSkin.Checked := Nemp_MainForm.GlobalUseAdvancedSkin;
-
-      {$IFDEF USESTYLES}
-      // deactivate it immediately
-      if Not Nemp_MainForm.GlobalUseAdvancedSkin then
-      begin
-          TStyleManager.SetStyle('Windows');
-           Nemp_MainForm.CorrectSkinRegionsTimer.Enabled := True;
-          // Nemp_MainForm.CorrectSkinRegions;
-      end else
-      begin
-          // refresh skin, if a skin is used, and it supports advanced skinning
-          if Nemp_MainForm.UseSkin then
-          begin
-              if Nemp_MainForm.NempSkin.UseAdvancedSkin then
-                  Nemp_MainForm.ActivateSkin(GetSkinDirFromSkinName(Nemp_MainForm.SkinName))
-              else
-                  TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
-          end;
-      end;
-      {$ENDIF}
-  end;
-
 
   ReArrangeToolImages;
 end;

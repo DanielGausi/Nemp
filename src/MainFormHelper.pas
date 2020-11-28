@@ -120,7 +120,7 @@ implementation
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     PlayListUnit, AuswahlUnit, MedienListeUnit, Details,
     NewPicture, NewStation, OptionsComplete, RandomPlaylist,
-    Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow, fspTaskbarMgr,
+    Shutdown, ShutDownEdit, StreamVerwaltung, BirthdayShow,
     spectrum_vis, PlayerClass, PartymodePassword, CloudEditor, PlaylistToUSB,
     ErrorForm, CoverHelper, BasicSettingsWizard, DeleteSelect, CDSelection,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
@@ -1627,7 +1627,8 @@ begin
           //Spectrum.DrawText(NempPlayer.PlayingTitel,False);
           PlaylistCueChanged(NempPlaylist);
           PlayerTimeLbl.Caption := '00:00'; //Spectrum.DrawTime('00:00');
-          fspTaskbarPreviews1.InvalidatePreview;
+          //xxx fspTaskbarPreviews1.InvalidatePreview;
+          NempTaskbarManager.InvalidateThumbPreview;
         end;
         Application.Title := NempPlayer.GenerateTaskbarTitel;
         PlaylistVST.Invalidate;

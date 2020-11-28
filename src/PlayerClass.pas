@@ -238,8 +238,9 @@ type
       function GetTimeString: String;
       function GetTimeStringHeadset: String;
 
-      function fGetPlayerLine1: UnicodeString;
+      {function fGetPlayerLine1: UnicodeString;
       function fGetPlayerLine2: UnicodeString;
+      }
 
       function GetCurrentAudioFile: TPlaylistFile;
 
@@ -508,6 +509,9 @@ type
 
         function DrawPreview( DestWidth : Integer; DestHeight : Integer;
                             SkinActive : Boolean = True) : HBITMAP;
+
+        procedure DrawPreviewNew( DestWidth : Integer; DestHeight : Integer;
+                            destBitmap: TBitmap; SkinActive : Boolean = True);
 
         procedure SetCueSyncs;
 
@@ -2197,7 +2201,7 @@ begin
     end;
 end;
 
-
+(*
 function TNempPlayer.fGetPlayerLine1: UnicodeString;
 begin
     if not assigned(MainAudioFile) then
@@ -2268,6 +2272,7 @@ begin
         end;
     end;
 end;
+*)
 
 function TNempPlayer.GetCurrentAudioFile: TPlaylistFile;
 begin
@@ -3290,6 +3295,132 @@ begin
         result := False;
     end;
     }
+end;
+
+procedure TNempPlayer.DrawPreviewNew( DestWidth : Integer; DestHeight : Integer;
+                            destBitmap: TBitmap; SkinActive : Boolean = True);
+var
+  h,pw  : Integer;
+  s: String;
+  r: TRect;
+begin
+
+        destBitmap.Width := 200; // DestWidth; // 200;
+        destBitmap.Height := 100; // DestHeight; // 100;
+
+        destBitmap.PixelFormat := pf32bit;
+
+        destBitmap.Canvas.Pen.Color := clBtnFace;
+        destBitmap.Canvas.Brush.Style := bsSolid;
+        destBitmap.Canvas.Brush.Color := clBtnFace;
+        destBitmap.Canvas.Rectangle(0, 0, destBitmap.Width, destBitmap.Height);
+
+        if SkinActive then
+        begin
+            //destBitmap.Canvas.Draw(0,0, PreviewBackGround);
+
+            SetStretchBltMode(destBitmap.Canvas.Handle, HALFTONE);
+            StretchBlt(destBitmap.Canvas.Handle, 0, 0, //5 + 45 - (MainPlayerPicture.Height Div 4),
+                  //MainPlayerPicture.Width Div 2, MainPlayerPicture.Height Div 2,
+                  PreviewBackGround.Width , PreviewBackGround.Height ,
+                  PreviewBackGround.Canvas.Handle, 0,0 ,
+                  PreviewBackGround.Width, PreviewBackGround.Height,
+                  SRCCOPY);
+        end;
+
+        if (not assigned(MainAudioFile)) and (not fDefaultCoverIsLoaded) then
+        begin
+            fDefaultCoverIsLoaded := True;
+            RefreshCoverBitmap;
+        end;
+
+        SetStretchBltMode(destBitmap.Canvas.Handle, HALFTONE);
+        StretchBlt(destBitmap.Canvas.Handle, 6, 6, //5 + 45 - (MainPlayerPicture.Height Div 4),
+                  //MainPlayerPicture.Width Div 2, MainPlayerPicture.Height Div 2,
+                  MainPlayerPicture.Bitmap.Width , MainPlayerPicture.Bitmap.Height ,
+                  MainPlayerPicture.Bitmap.Canvas.Handle, 0,0 ,
+                  MainPlayerPicture.Bitmap.Width, MainPlayerPicture.Bitmap.Height,
+                  SRCCOPY);
+
+        if assigned(MainAudioFile) then
+        begin
+            fDefaultCoverIsLoaded := False;
+            destBitmap.Canvas.Brush.Style := bsClear;
+            destBitmap.Canvas.Font.Size := 8;
+            destBitmap.Canvas.Font.Style := [];
+
+            if Not UnKownInformation(MainAudioFile.Artist) then
+            begin
+                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                r := Rect(102, 4, 198, 70);
+                destBitmap.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
+                // get needed Height of the Artist-String
+                h := r.Bottom - r.Top;
+                if h > 39 then
+                    h := 39;
+
+                // but draw 3 lines maximum
+                destBitmap.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                r := Rect(102, 4, 198, 43);
+                destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
+
+                s := StringReplace(MainAudioFile.Artist,'&','&&',[rfReplaceAll]);
+                destBitmap.Canvas.Font.Color := Spectrum.PreviewArtistColor;
+                r := Rect(102, 4 + h, 198, 70);
+                destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
+               // b.Canvas.TextOut(102,6, MainAudioFile.Artist);
+               // b.Canvas.TextOut(102,20, MainAudioFile.Titel);
+               destBitmap.Canvas.Font.Color := Spectrum.PreviewTimeColor;
+               if MainAudioFile.isStream then
+                  destBitmap.Canvas.TextOut(102,72, '(Webradio)')
+               else
+                   destBitmap.Canvas.TextOut(102,72, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+
+            end else
+            begin
+                // just the title
+                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                destBitmap.Canvas.Font.Color := Spectrum.PreviewTitleColor;
+                r := Rect(102, 4, 198, 70);
+                destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
+                destBitmap.Canvas.Font.Color := Spectrum.PreviewTimeColor;
+                if MainAudioFile.isStream then
+                    destBitmap.Canvas.TextOut(102,72, '(Webradio)')
+                else
+                    destBitmap.Canvas.TextOut(102,72, SecToStr(Time) + ' (' + SecToStr(MainAudioFile.Duration) + ')'   );
+            end;
+
+            // Draw progress
+            if MainAudioFile.isStream then
+            begin
+                {
+                b.canvas.Pen.color := Spectrum.PreviewShapePenColor;
+                b.Canvas.Pen.Width := 1;
+                b.Canvas.Brush.Color := Spectrum.PreviewShapeBrushColor;
+                b.Canvas.Brush.Style := bsSolid;
+                pw := 88;
+                b.Canvas.Rectangle(102, 80, 102+pw, 86 );
+                }
+            end else
+            begin
+
+                destBitmap.canvas.Pen.color := Spectrum.PreviewShapePenColor;
+                destBitmap.Canvas.Pen.Width := 1;
+                destBitmap.Canvas.Brush.Color := Spectrum.PreviewShapeBrushColor;
+                destBitmap.Canvas.Brush.Style := bsSolid;
+                pw := 88;
+                destBitmap.Canvas.Rectangle(102, 87, 102+pw, 93 );
+                destBitmap.canvas.Pen.color :=   Spectrum.PreviewShapeProgressPenColor;
+                destBitmap.Canvas.Brush.Color := Spectrum.PreviewShapeProgressBrushColor;
+                destBitmap.Canvas.Rectangle(102, 87, 102 + round(Progress*pw), 93 );
+
+            end;
+
+        end else
+        begin
+
+        end;
+
 end;
 
 

@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 462
       Height = 632
-      ActivePage = TabView4
+      ActivePage = TabSystem0
       Align = alClient
       MultiLine = True
       TabOrder = 1
@@ -198,12 +198,12 @@ object OptionsCompleteForm: TOptionsCompleteForm
         end
         object GrpBox_StartingExtended: TGroupBox
           Left = 8
-          Top = 333
+          Top = 274
           Width = 439
           Height = 135
           Anchors = [akLeft, akTop, akRight]
           Caption = 'Extended start settings'
-          TabOrder = 3
+          TabOrder = 2
           DesignSize = (
             439
             135)
@@ -253,23 +253,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'window-mode.'
             Caption = 'Stay on top (not in compact view)'
             TabOrder = 2
-          end
-        end
-        object grpBoxUseAdvancedSkin: TGroupBox
-          Left = 8
-          Top = 274
-          Width = 439
-          Height = 53
-          Anchors = [akLeft, akTop, akRight]
-          Caption = 'Advanced Skinning'
-          TabOrder = 2
-          object cbUseAdvancedSkin: TCheckBox
-            Left = 16
-            Top = 20
-            Width = 393
-            Height = 17
-            Caption = 'Use advanced skinning sytem'
-            TabOrder = 0
           end
         end
       end
