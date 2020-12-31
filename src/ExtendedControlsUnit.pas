@@ -48,10 +48,10 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Nemp_ConstantsAndTypes, SplitForm_Hilfsfunktionen, gnuGettext,
-  StdCtrls, Buttons, SkinButtons, ExtCtrls, NempPanel, System.Types;
+  StdCtrls, Buttons, SkinButtons, ExtCtrls, NempPanel, System.Types, BaseForms;
 
 type
-  TExtendedControlForm = class(TNempForm)
+  TExtendedControlForm = class(TNempSubForm)
     ContainerPanelExtendedControlsForm: TNempPanel;
     CloseImageE: TSkinButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -75,12 +75,7 @@ type
     procedure FormResize(Sender: TObject);
   private
     { Private-Deklarationen }
-    DownX: Integer;
-    DownY: Integer;
-    BLeft: Integer;
-    BTop: Integer;
-    BWidth: Integer;
-    BHeight: Integer;
+
     ResizeFlag: Cardinal;
 
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
@@ -89,7 +84,6 @@ type
     { Public-Deklarationen }
     Resizing: Boolean;
     procedure SetPartySize(w,h: Integer);
-    procedure InitForm;
     procedure RepaintForm;
   end;
 
@@ -107,9 +101,9 @@ procedure TExtendedControlForm.CloseImageEClick(Sender: TObject);
 begin
     with Nemp_MainForm do
     begin
-      NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-      PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-      MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+      NempOptions.FormPositions[fNempFormID].Visible := False;
+      PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+      MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[fNempFormID].Visible;
     end;
     close;
 end;
@@ -165,29 +159,6 @@ begin
   BHeight := Height;
   BWidth  := Width ;
   CloseImageE.Parent := ExtendedControlForm.ContainerPanelExtendedControlsForm;
-end;
-
-procedure TExtendedControlForm.InitForm;
-begin
-  TranslateComponent (self);
-  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsTop;
-  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsLeft;
-  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsHeight;
-  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsWidth;
-
-  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsTop;
-  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsLeft;
-  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsHeight;
-  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsWidth;
-
-  // BHeight := Height;
-  // BWidth := Width;
-
-  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.ExtendedControlsDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
-
-  Caption := NEMP_CAPTION;
 end;
 
 

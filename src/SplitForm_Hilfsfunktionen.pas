@@ -35,7 +35,7 @@ unit SplitForm_Hilfsfunktionen;
 interface
 
 uses Windows, forms, Classes, Controls, StdCtrls, ExtCtrls, Graphics, Nemp_ConstantsAndTypes, Messages, dialogs, ShellApi
-  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types;
+  {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF} , sysutils, System.Types, BaseForms;
 
   procedure SetRegion(GrpBox: TPanel; aForm: TForm; var NempRegionsDistance: TNempRegionsDistance;  aHandle: hWnd);
   function IntervalOverlap(left1, right1, left2, right2: integer): boolean;
@@ -489,34 +489,34 @@ begin
     aForm.NempRegionsDistance.docked := False;
   end;
 
-  aForm.NempRegionsDistance.RelativPositionX := aForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-  aForm.NempRegionsDistance.RelativPositionY := aForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+  aForm.NempRegionsDistance.RelativPositionX := aForm.Left - NempOptions.FormPositions[nfMainMini].Left;
+  aForm.NempRegionsDistance.RelativPositionY := aForm.Top - NempOptions.FormPositions[nfMainMini].Top;
 end;
 
 Procedure ReInitRelativePositions;
 begin
   if PlaylistForm.Visible then
   begin
-    PlaylistForm.NempRegionsDistance.RelativPositionX := PlaylistForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-    PlaylistForm.NempRegionsDistance.RelativPositionY := PlaylistForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+    PlaylistForm.NempRegionsDistance.RelativPositionX := PlaylistForm.Left - NempOptions.FormPositions[nfMainMini].Left;
+    PlaylistForm.NempRegionsDistance.RelativPositionY := PlaylistForm.Top - NempOptions.FormPositions[nfMainMini].Top;
   end;
 
   if MedienlisteForm.Visible then
   begin
-    MedienlisteForm.NempRegionsDistance.RelativPositionX := MedienlisteForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-    MedienlisteForm.NempRegionsDistance.RelativPositionY := MedienlisteForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+    MedienlisteForm.NempRegionsDistance.RelativPositionX := MedienlisteForm.Left - NempOptions.FormPositions[nfMainMini].Left;
+    MedienlisteForm.NempRegionsDistance.RelativPositionY := MedienlisteForm.Top - NempOptions.FormPositions[nfMainMini].Top;
   end;
 
   if AuswahlForm.Visible then
   begin
-    AuswahlForm.NempRegionsDistance.RelativPositionX := AuswahlForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-    AuswahlForm.NempRegionsDistance.RelativPositionY := AuswahlForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+    AuswahlForm.NempRegionsDistance.RelativPositionX := AuswahlForm.Left - NempOptions.FormPositions[nfMainMini].Left;
+    AuswahlForm.NempRegionsDistance.RelativPositionY := AuswahlForm.Top - NempOptions.FormPositions[nfMainMini].Top;
   end;
 
   if ExtendedControlForm.Visible then
   begin
-    ExtendedControlForm.NempRegionsDistance.RelativPositionX := ExtendedControlForm.Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-    ExtendedControlForm.NempRegionsDistance.RelativPositionY := ExtendedControlForm.Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
+    ExtendedControlForm.NempRegionsDistance.RelativPositionX := ExtendedControlForm.Left - NempOptions.FormPositions[nfMainMini].Left;
+    ExtendedControlForm.NempRegionsDistance.RelativPositionY := ExtendedControlForm.Top - NempOptions.FormPositions[nfMainMini].Top;
   end;
 
 end;
@@ -639,54 +639,27 @@ end;
 
 
 procedure SwapWindowMode(newMode: Integer);
-var //X reactivate: boolean;
-    ini:TMemIniFile;
 begin
     with Nemp_MainForm do
     begin
-                      {$IFDEF USESTYLES}
-                      //X reactivate := False;
-                      //X if  (GlobalUseAdvancedSkin) AND
-                      //X     (UseSkin AND NempSkin.UseAdvancedSkin)
-                      //X then
-                      //X begin
-                          // deactivate advanced skin temporary
-                      //    TStyleManager.SetStyle('Windows');
-                      //    reactivate := True;
-                      /// ok, (2018). Why deactivate the skin here temporarily? Coverflow-Stuff? OlderStill needed in Tokyo?
-                      //X end;
-                      {$ENDIF}
+        // save current settings
+        SaveWindowPosition(NempOptions.AnzeigeMode);
+        if NempOptions.AnzeigeMode = 1 then
+        begin
+          AuswahlForm.SaveWindowPosition;
+          ExtendedControlForm.SaveWindowPosition;
+          MedienlisteForm.SaveWindowPosition;
+          PlaylistForm.SaveWindowPosition;
+        end;
+        // write current settings to disk
+        NempSettingsManager.WriteToDisk;
 
-                      // save current settings
-                      ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-                      try
-                          ini.Encoding := TEncoding.UTF8;
-                          SaveWindowPositons(ini, NempFormBuildOptions, AnzeigeMode);
-                          Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
-                          try
-                              Ini.UpdateFile;
-                          except
-                              // Silent Exception
-                          end;
-                      finally
-                          ini.Free
-                      end;
+        newMode := newMode mod 2;
+        if newMode = 1 then
+            // Party-mode in Separate-Window-Mode is not allowed.
+            NempSkin.NempPartyMode.Active := False;
 
-                      newMode := newMode mod 2;
-
-                      if newMode = 1 then
-                          // Party-mode in Separate-Window-Mode is not allowed.
-                          NempSkin.NempPartyMode.Active := False;
-
-                      UpdateFormDesignNeu(newMode);
-
-                      {$IFDEF USESTYLES}
-                      //X if reactivate then
-                      //X begin
-                      //X     TStylemanager.SetStyle(NempSkin.AdvancedStyleName);
-                          //CorrectSkinRegionsTimer.Enabled := True;   Now in UpdateFormDesignNeu
-                      //X end;
-                      {$ENDIF}
+        UpdateFormDesignNeu(newMode);
     end;
 
     if (newMode = 1) and assigned(MainFormBuilder) then
@@ -726,14 +699,17 @@ begin
         _VSTPanel.Visible := False;
         _TopMainPanel.Visible := False;
         MainSplitter.Visible := False;
+    end;
 
         // Set Size/position of the Mini-MainForm
         Nemp_MainForm.Borderstyle := bsNone;
-        Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
-        Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-        Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormWidth;
-        Height  := _ControlPanel.Height + 4;
+        Nemp_MainForm.Top     := NempOptions.FormPositions[nfMainMini].Top;
+        Nemp_MainForm.Left    := NempOptions.FormPositions[nfMainMini].Left;
+        Nemp_MainForm.Width   := NempOptions.FormPositions[nfMainMini].Width;
+        Nemp_MainForm.Height  := Nemp_MainForm._ControlPanel.Height + 4;
 
+    with Nemp_MainForm do
+    begin
         // Set Size and Position of the ControlPanel
         _ControlPanel.Parent := __MainContainerPanel;
         _ControlPanel.Align := alNone;
@@ -745,16 +721,15 @@ begin
         // Constraints
         Constraints.MaxHeight := Height;
         Constraints.MinHeight := Height;
-        if Nemp_MainForm.NempFormBuildOptions.ControlPanelTwoRows then
+        if NempFormBuildOptions.ControlPanelTwoRows then
             Constraints.MinWidth := 214
         else
             Constraints.MinWidth := 400;
 
         FixScrollbar;
 
-
         // show other forms
-        if NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible then
+        if NempOptions.FormPositions[nfPlaylist].Visible then
             PlaylistForm.Show
         else
             PlaylistForm.Hide;
@@ -769,7 +744,7 @@ begin
         PlaylistForm.FormShow(Nil);
 
 
-        if NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible then
+        if NempOptions.FormPositions[nfBrowse].Visible then
             AuswahlForm.Show
         else
             AuswahlForm.Hide;
@@ -784,7 +759,7 @@ begin
         AuswahlForm.FormShow(Nil);
 
 
-        if NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible then
+        if NempOptions.FormPositions[nfMediaLibrary].Visible then
             MedienlisteForm.Show
         else
             MedienlisteForm.Hide;
@@ -798,7 +773,7 @@ begin
         MedienlisteForm.FormResize(Nil);
         MedienlisteForm.FormShow(Nil);
 
-        if NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible then
+        if NempOptions.FormPositions[nfExtendedControls].Visible then
             ExtendedControlForm.Show
         else
             ExtendedControlForm.Hide;
@@ -1000,21 +975,21 @@ begin
       //02.2017 // Bug mit MAXIMIZED-Over Taskleiste????
       if Tag in [0,1] then
       begin
-          NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized := WindowState=wsMaximized;
+          NempOptions.MainFormMaximized := WindowState=wsMaximized;
           WindowState := wsNormal;
           // aktuelle Aufteilung speichern
           if Tag = 0 then
           begin
-              NempFormBuildOptions.WindowSizeAndPositions.MainFormTop   := Top ;
-              NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft  := Left;
-              NempFormBuildOptions.WindowSizeAndPositions.MainFormHeight:= Height;
-              NempFormBuildOptions.WindowSizeAndPositions.MainFormWidth := Width;
+              NempOptions.FormPositions[nfMain].Top   := Top ;
+              NempOptions.FormPositions[nfMain].Left  := Left;
+              NempOptions.FormPositions[nfMain].Height:= Height;
+              NempOptions.FormPositions[nfMain].Width := Width;
           end else
           begin
-              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop   := Top ;
-              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft  := Left;
-              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormHeight:= Height;
-              NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormWidth := Width;
+              NempOptions.FormPositions[nfMainMini].Top   := Top ;
+              NempOptions.FormPositions[nfMainMini].Left  := Left;
+              NempOptions.FormPositions[nfMainMini].Height:= Height;
+              NempOptions.FormPositions[nfMainMini].Width := Width;
           end;
       end;
 
@@ -1049,9 +1024,9 @@ begin
       // temporary for this procedure
       PanelCoverBrowse.OnResize := Nil;
 
-      Anzeigemode := NewMode;  // here ok?? (2019 rework, tmp comment
+      NempOptions.Anzeigemode := NewMode;  // here ok?? (2019 rework, tmp comment
 
-      case AnzeigeMode of
+      case NempOptions.AnzeigeMode of
         0: begin
             // Compact view, all in one window
             if (Tag in [0,1]) then
@@ -1066,10 +1041,10 @@ begin
             NempFormBuildOptions.ApplyRatios;
             NempFormBuildOptions.EndUpdate;
 
-            Top    := NempFormBuildOptions.WindowSizeAndPositions.MainFormTop ;
-            Left   := NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft;
-            Height := NempFormBuildOptions.WindowSizeAndPositions.MainFormHeight;
-            Width  := NempFormBuildOptions.WindowSizeAndPositions.MainFormWidth;
+            Top    := NempOptions.FormPositions[nfMain].Top ;
+            Left   := NempOptions.FormPositions[nfMain].Left;
+            Height := NempOptions.FormPositions[nfMain].Height;
+            Width  := NempOptions.FormPositions[nfMain].Width;
         end;
 
         1: begin
@@ -1105,7 +1080,8 @@ begin
       Constraints.MinWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMinWidth;
       Constraints.MaxWidth  := NempOptions.NempFormAufteilung[AnzeigeMode].FormMaxWidth;
       }
-      if AnzeigeMode = 0 then
+
+      if NempOptions.AnzeigeMode = 0 then
       begin
           //2019 _TopMainPanel.Constraints.MaxHeight := Height - 160;
           NempRegionsDistance.Top := 0;
@@ -1130,7 +1106,6 @@ begin
           ReInitRelativePositions;
       end;
 
-
       {// Größenkorrekturen
       if (ArtistsVST.Width > AuswahlPanel.width - 40)
           OR (ArtistsVST.Width < 40) then
@@ -1143,14 +1118,14 @@ begin
       begin
           // Note:  WindowState := wsMaximized; MUST be set AFTER this!
 
-          if AnzeigeMode = 0 then
+          if NempOptions.AnzeigeMode = 0 then
           begin
-              Top := NempFormBuildOptions.WindowSizeAndPositions.MainFormTop;
-              Left := NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft;
+              Top := NempOptions.FormPositions[nfMain].Top;
+              Left := NempOptions.FormPositions[nfMain].Left;
           end else
           begin
-              Top := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
-              Left := NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
+              Top := NempOptions.FormPositions[nfMainMini].Top;
+              Left := NempOptions.FormPositions[nfMainMini].Left;
           end;
 
           FormPosAndSizeCorrect(Nemp_MainForm);
@@ -1159,7 +1134,7 @@ begin
           FormPosAndSizeCorrect(MedienlisteForm);
           FormPosAndSizeCorrect(ExtendedControlForm);
           ReInitRelativePositions;
-
+          { removed december 2020
           if NempOptions.FixCoverFlowOnStart then
           begin
               // this is somehow needed on XP (or only in my virtual machine??)
@@ -1168,10 +1143,11 @@ begin
               else
                   _TopMainPanel.Height := _TopMainPanel.Height - 1  ;
           end;
+          }
       end;
 
       //02.2017 // MAXIMIZED-OVer TAskleiste????
-      if (AnzeigeMode = 0) AND NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized then
+      if (NempOptions.AnzeigeMode = 0) AND NempOptions.MainFormMaximized then
           WindowState := wsMaximized;
 
       if NempSkin.isActive then
@@ -1181,15 +1157,15 @@ begin
       // evtl. Form neu zeichnen. Stichwort "Schwarze Ecken"
 
       // teilweise auskommentiert für Windows 7
-      if (AnzeigeMode = 0) AND (Tag in [0,1]) then
+      if (NempOptions.AnzeigeMode = 0) AND (Tag in [0,1]) then
       begin
           SetWindowRgn( handle, 0, Not _IsThemeActive );
           InvalidateRect(handle, NIL, TRUE);
       end;
 
 
-      MM_O_ViewCompactComplete.Checked := AnzeigeMode = 0;
-      PM_P_ViewCompactComplete.Checked := AnzeigeMode = 0;
+      MM_O_ViewCompactComplete.Checked := NempOptions.AnzeigeMode = 0;
+      PM_P_ViewCompactComplete.Checked := NempOptions.AnzeigeMode = 0;
 
       CorrectSkinRegionsTimer.Enabled := True;
       //Nemp_MainForm.CorrectSkinRegions;
@@ -1198,7 +1174,7 @@ begin
       // necessary on advanced skins
       ReAcceptDragFiles;
 
-      Tag := AnzeigeMode;
+      Tag := NempOptions.AnzeigeMode;
 
 
       //CoverScrollbar.WindowProc := NewScrollBarWndProc;
@@ -1219,8 +1195,6 @@ begin
       DragAcceptFiles (ExtendedControlForm.Handle, True);
       DragAcceptFiles (Nemp_MainForm.Handle, True);
 end;
-
-
 
 
 

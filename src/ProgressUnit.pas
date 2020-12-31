@@ -78,7 +78,7 @@ type
     AutoClose: Boolean;
 
     procedure FinishProcess(aJobType: TJobType);
-    procedure InitiateProcess(ShowImages: Boolean; aAction: TProgressActions);
+    procedure InitiateProcess(ShowImages: Boolean; aAction: TEProgressActions);
 
     procedure ShowWarning;
   end;
@@ -153,11 +153,11 @@ begin
 
 
     cbAutoClose.OnClick := Nil;
-    self.cbAutoClose.Checked := Nemp_MainForm.NempOptions.AutoCloseProgressWindow or AutoClose;
+    self.cbAutoClose.Checked := NempOptions.AutoCloseProgressWindow or AutoClose;
     cbAutoClose.OnClick := cbAutoCloseClick;
 end;
 
-procedure TProgressForm.InitiateProcess(ShowImages: Boolean; aAction: TProgressActions);
+procedure TProgressForm.InitiateProcess(ShowImages: Boolean; aAction: TEProgressActions);
 
     procedure SetLabelWithHint(aCaption: String);
     begin
@@ -292,7 +292,7 @@ end;
 procedure TProgressForm.cbAutoCloseClick(Sender: TObject);
 begin
     // if actual User-Input: Overwrite autoclose
-    Nemp_MainForm.NempOptions.AutoCloseProgressWindow := cbAutoClose.Checked;
+    NempOptions.AutoCloseProgressWindow := cbAutoClose.Checked;
     self.AutoClose := cbAutoClose.Checked;
     // deactivate Timer
     CloseTimer.Enabled := False;

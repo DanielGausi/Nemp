@@ -83,7 +83,7 @@ begin
   NempPlayer.FadeOut(30);
   // Bei Abbruch: Wieder Fade-In und Syncs wieder setzen
 
-    case Nemp_MainForm.NempOptions.ShutDownMode of
+    case NempOptions.ShutDownMode of
         SHUTDOWNMODE_StopNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepStopNemp.png';
         SHUTDOWNMODE_ExitNemp  : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepCloseNemp.png';
         SHUTDOWNMODE_Suspend   : Filename := ExtractFilePath(ParamStr(0)) + 'Images\SleepSuspend.png';
@@ -94,7 +94,7 @@ begin
         ImgShutDown.Picture.LoadFromFile(filename);
 
 
-  case Nemp_MainForm.NempOptions.ShutDownMode of
+  case NempOptions.ShutDownMode of
         SHUTDOWNMODE_StopNemp  : LblHinweis.Caption := (NempShutDown_StopNemp  );
         SHUTDOWNMODE_ExitNemp  : LblHinweis.Caption := (NempShutDown_CloseNemp );
         SHUTDOWNMODE_Suspend   : LblHinweis.Caption := (NempShutdown_Suspend);
@@ -119,10 +119,10 @@ begin
     Timer1.Enabled := False;
 
     // Set Shutdownmode back to "disabled"
-    Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := False;
+    NempOptions.ShutDownAtEndOfPlaylist := False;
     ReArrangeToolImages;
 
-    case Nemp_MainForm.NempOptions.ShutDownMode of
+    case NempOptions.ShutDownMode of
         SHUTDOWNMODE_StopNemp : NempPlayer.stop;
         SHUTDOWNMODE_ExitNemp : Nemp_MainForm.Close;
         SHUTDOWNMODE_Suspend   : SetSuspendState(False);

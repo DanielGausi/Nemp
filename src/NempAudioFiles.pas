@@ -334,8 +334,8 @@ type
         function GetPath: UnicodeString;
         procedure SetPath(const Value: UnicodeString);
 
-        function fGetNonEmptyTitle: UnicodeString;
-        function fGetProperFilename: UnicodeString;
+        // function fGetNonEmptyTitle: UnicodeString;
+        // function fGetProperFilename: UnicodeString;
 
         function fGetIsFile: Boolean;
         function fGetIsStream: Boolean;
@@ -457,13 +457,13 @@ type
         property FileAge: TDateTime read fFileAge;
 
         property Pfad: UnicodeString read GetPath write SetPath;
-        property FilenameForUSBCopy: UnicodeString read fGetProperFilename;
+        // property FilenameForUSBCopy: UnicodeString read fGetProperFilename;
 
         property Key1: UnicodeString read fKey1 write fKey1;
         property Key2: UnicodeString read fKey2 write fKey2;
 
         property Taglist: TObjectList read fgetTagList;
-        property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
+        // property NonEmptyTitle: UnicodeString read fGetNonEmptyTitle;
 
         property AudioType: TAudioType read fAudioType write fAudioType;
 
@@ -1154,7 +1154,7 @@ begin
     result := FormatDateTime('yyyymm', fFileAge);
 end;
 
-
+(*
 {
     --------------------------------------------------------
     fGetNonEmptyTitle
@@ -1183,6 +1183,7 @@ begin
     end;
 end;
 
+
 {
     --------------------------------------------------------
     fGetProperFilename
@@ -1192,6 +1193,7 @@ end;
 }
 function TAudioFile.fGetProperFilename: UnicodeString;
 begin
+  result := '';
     case fAudioType of
         at_Undef,
         at_Stream,
@@ -1201,14 +1203,14 @@ begin
               if UnKownInformation(Artist) then
               begin
                   //if NonEmptyTitle <> Dateiname then
-                      result := NonEmptyTitle + '.' + self.Extension
+//                      result := NonEmptyTitle + '.' + self.Extension
                   //else
                   //    result := Dateiname;
               end
               else
               begin
                   //if NonEmptyTitle <> Dateiname then
-                      result := Artist + ' - ' + NonEmptyTitle + '.' + self.Extension
+//                      result := Artist + ' - ' + NonEmptyTitle + '.' + self.Extension
                   //else
                   //    result := Artist + ' - ' + NonEmptyTitle;
               end;
@@ -1218,6 +1220,7 @@ begin
     if result = '' then
         result := ReplaceForbiddenFilenameChars(Dateiname);
 end;
+*)
 
 function TAudioFile.fGetTagList: TObjectList;
 begin

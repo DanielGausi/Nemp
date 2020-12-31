@@ -267,8 +267,8 @@ type
       constructor Create;
       destructor Destroy; override;
 
-      procedure LoadFromIni(Ini: TMemIniFile);
-      procedure WriteToIni(Ini: TMemIniFile);
+      procedure LoadSettings;
+      procedure SaveSettings;
 
       procedure OverwritePlayingIndexWithMaxCount;
       procedure InitPlayingFile(StartAtOldPosition: Boolean = False);
@@ -280,6 +280,10 @@ type
 
       procedure PlayNextFile(aUserinput: Boolean = False);
       procedure PlayNext(aUserinput: Boolean = False);
+      // PreparePlayNext will be called automatically at the end of a Track if the user wants a little break between two tracks
+      // There is no user interaction reasonable here. If the User does interact, he couldd alos use "pause" as well
+      procedure PreparePlayNext;
+
       procedure PlayPrevious(aUserinput: Boolean = False);
       procedure PlayPreviousFile(aUserinput: Boolean = False);
       procedure PlayFocussed(MainIndex, CueIndex: Integer);
@@ -416,110 +420,108 @@ end;
     Load/Save Inifile
     --------------------------------------------------------
 }
-procedure TNempPlaylist.LoadFromIni(Ini: TMemIniFile);
+procedure TNempPlaylist.LoadSettings;
 begin
-  DefaultAction         := ini.ReadInteger('Playlist','DefaultAction',0);
-  HeadSetAction         := ini.ReadInteger('Playlist','HeadSetAction',0);
-  AutoStopHeadsetSwitchTab       := ini.ReadBool('Playlist','AutoStopHeadset',True);
-  AutoStopHeadsetAddToPlayist    := ini.ReadBool('Playlist','AutoStopHeadsetAddToPlayist',False);
+  DefaultAction         := NempSettingsManager.ReadInteger('Playlist','DefaultAction',0);
+  HeadSetAction         := NempSettingsManager.ReadInteger('Playlist','HeadSetAction',0);
+  AutoStopHeadsetSwitchTab       := NempSettingsManager.ReadBool('Playlist','AutoStopHeadset',True);
+  AutoStopHeadsetAddToPlayist    := NempSettingsManager.ReadBool('Playlist','AutoStopHeadsetAddToPlayist',False);
 
-  WiedergabeMode        := ini.ReadInteger('Playlist','WiedergabeModus',0);
-  AutoScan              := ini.ReadBool('Playlist','AutoScan', True);
-  AutoPlayOnStart       := ini.ReadBool('Playlist','AutoPlayOnStart', True);
-  AutoPlayNewTitle      := ini.ReadBool('Playlist','AutoPlayNewTitle', True);
-  AutoPlayEnqueuedTitle := ini.ReadBool('Playlist','AutoPlayEnqueuedTitle', False);
+  WiedergabeMode        := NempSettingsManager.ReadInteger('Playlist','WiedergabeModus',0);
+  AutoScan              := NempSettingsManager.ReadBool('Playlist','AutoScan', True);
+  AutoPlayOnStart       := NempSettingsManager.ReadBool('Playlist','AutoPlayOnStart', True);
+  AutoPlayNewTitle      := NempSettingsManager.ReadBool('Playlist','AutoPlayNewTitle', True);
+  AutoPlayEnqueuedTitle := NempSettingsManager.ReadBool('Playlist','AutoPlayEnqueuedTitle', False);
   // AutoSave              := ini.ReadBool('Playlist','AutoSave', True);
-  AutoDelete            := ini.ReadBool('Playlist','AutoDelete', False);
-  DisableAutoDeleteAtUserInput    := ini.ReadBool('Playlist','DisableAutoDeleteAtUserInput', True);
-  fAutoMix                        := ini.ReadBool('Playlist','AutoMix', False);
-  fJumpToNextCueOnNextClick       := Ini.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
-  fRepeatCueOnRepeatTitle         := Ini.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
-  fRememberInterruptedPlayPosition:= Ini.ReadBool('Playlist', 'RememberInterruptedPlayPosition', True);
-  fShowHintsInPlaylist  := Ini.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
-  RandomRepeat          := Ini.ReadInteger('Playlist', 'RandomRepeat', 25);
-  TNA_PlaylistCount     := ini.ReadInteger('Playlist','TNA_PlaylistCount',30);
-  fStartIndex         := ini.ReadInteger('Playlist','IndexinList',0);
-  SavePositionInTrack   := ini.ReadBool('Playlist', 'SavePositionInTrack', True);
-  PositionInTrack       := ini.ReadInteger('Playlist', 'PositionInTrack', 0);
-  BassHandlePlaylist    := Ini.ReadBool('Playlist', 'BassHandlePlaylist', True);
-  InitialDialogFolder   := Ini.ReadString('Playlist', 'InitialDialogFolder', '');
+  AutoDelete            := NempSettingsManager.ReadBool('Playlist','AutoDelete', False);
+  DisableAutoDeleteAtUserInput    := NempSettingsManager.ReadBool('Playlist','DisableAutoDeleteAtUserInput', True);
+  fAutoMix                        := NempSettingsManager.ReadBool('Playlist','AutoMix', False);
+  fJumpToNextCueOnNextClick       := NempSettingsManager.ReadBool('Playlist', 'JumpToNextCueOnNextClick', True);
+  fRepeatCueOnRepeatTitle         := NempSettingsManager.ReadBool('Playlist', 'RepeatCueOnRepeatTitle', True);
+  fRememberInterruptedPlayPosition:= NempSettingsManager.ReadBool('Playlist', 'RememberInterruptedPlayPosition', True);
+  fShowHintsInPlaylist  := NempSettingsManager.ReadBool('Playlist', 'ShowHintsInPlaylist', True);
+  RandomRepeat          := NempSettingsManager.ReadInteger('Playlist', 'RandomRepeat', 25);
+  TNA_PlaylistCount     := NempSettingsManager.ReadInteger('Playlist','TNA_PlaylistCount',30);
+  fStartIndex         := NempSettingsManager.ReadInteger('Playlist','IndexinList',0);
+  SavePositionInTrack   := NempSettingsManager.ReadBool('Playlist', 'SavePositionInTrack', True);
+  PositionInTrack       := NempSettingsManager.ReadInteger('Playlist', 'PositionInTrack', 0);
+  BassHandlePlaylist    := NempSettingsManager.ReadBool('Playlist', 'BassHandlePlaylist', True);
+  InitialDialogFolder   := NempSettingsManager.ReadString('Playlist', 'InitialDialogFolder', '');
 
 
-  fUseWeightedRNG := ini.ReadBool   ('Playlist', 'UseWeightedRNG', False);
-  RNGWeights[1]   := ini.ReadInteger('Playlist', 'RNGWeights05', 0  );
-  RNGWeights[2]   := ini.ReadInteger('Playlist', 'RNGWeights10', 0  );
-  RNGWeights[3]   := ini.ReadInteger('Playlist', 'RNGWeights15', 1  );
-  RNGWeights[4]   := ini.ReadInteger('Playlist', 'RNGWeights20', 2  );
-  RNGWeights[5]   := ini.ReadInteger('Playlist', 'RNGWeights25', 4  );
-  RNGWeights[6]   := ini.ReadInteger('Playlist', 'RNGWeights30', 7  );
-  RNGWeights[7]   := ini.ReadInteger('Playlist', 'RNGWeights35', 12 );
-  RNGWeights[8]   := ini.ReadInteger('Playlist', 'RNGWeights40', 20 );
-  RNGWeights[9]   := ini.ReadInteger('Playlist', 'RNGWeights45', 35 );
-  RNGWeights[10]  := ini.ReadInteger('Playlist', 'RNGWeights50', 60 );
+  fUseWeightedRNG := NempSettingsManager.ReadBool   ('Playlist', 'UseWeightedRNG', False);
+  RNGWeights[1]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights05', 0  );
+  RNGWeights[2]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights10', 0  );
+  RNGWeights[3]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights15', 1  );
+  RNGWeights[4]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights20', 2  );
+  RNGWeights[5]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights25', 4  );
+  RNGWeights[6]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights30', 7  );
+  RNGWeights[7]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights35', 12 );
+  RNGWeights[8]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights40', 20 );
+  RNGWeights[9]   := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights45', 35 );
+  RNGWeights[10]  := NempSettingsManager.ReadInteger('Playlist', 'RNGWeights50', 60 );
 
-  PlaylistManager.ReadFromIni(ini);
+  PlaylistManager.LoadSettings;
 end;
 
-procedure TNempPlaylist.WriteToIni(Ini: TMemIniFile);
+procedure TNempPlaylist.SaveSettings;
 begin
-  ini.WriteInteger('Playlist','DefaultAction', DefaultAction);
-  ini.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
-  ini.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadsetSwitchTab);
-  ini.WriteBool('Playlist','AutoStopHeadsetAddToPlayist',AutoStopHeadsetAddToPlayist);
+  NempSettingsManager.WriteInteger('Playlist','DefaultAction', DefaultAction);
+  NempSettingsManager.WriteInteger('Playlist','HeadSetAction',HeadSetAction);
+  NempSettingsManager.WriteBool('Playlist','AutoStopHeadset',AutoStopHeadsetSwitchTab);
+  NempSettingsManager.WriteBool('Playlist','AutoStopHeadsetAddToPlayist',AutoStopHeadsetAddToPlayist);
 
-  ini.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
-  ini.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
+  NempSettingsManager.WriteInteger('Playlist','WiedergabeModus',WiedergabeMode);
+  NempSettingsManager.WriteInteger('Playlist','TNA_PlaylistCount',TNA_PlaylistCount);
 
-  ini.WriteBool('Playlist', 'SavePositionInTrack', SavePositionInTrack);
-
+  NempSettingsManager.WriteBool('Playlist', 'SavePositionInTrack', SavePositionInTrack);
 
   if assigned(fPlayingFile) then
   begin
-      ini.WriteInteger('Playlist','IndexinList', PlayList.IndexOf(fPlayingFile));
+      NempSettingsManager.WriteInteger('Playlist','IndexinList', PlayList.IndexOf(fPlayingFile));
       if fPlayingFile.PrebookIndex = 0 then
-          ini.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time))
+          NempSettingsManager.WriteInteger('Playlist', 'PositionInTrack', Round(Player.Time))
       else
           // this should be the case when we play a bibfile right now
-          ini.WriteInteger('Playlist', 'PositionInTrack', Round(fInterruptedPlayPosition));
+          NempSettingsManager.WriteInteger('Playlist', 'PositionInTrack', Round(fInterruptedPlayPosition));
   end
   else
   begin
-      ini.WriteInteger('Playlist','IndexinList', 0);
-      ini.WriteInteger('Playlist', 'PositionInTrack', 0);
+      NempSettingsManager.WriteInteger('Playlist','IndexinList', 0);
+      NempSettingsManager.WriteInteger('Playlist', 'PositionInTrack', 0);
   end;
 
-  ini.WriteBool('Playlist','AutoScan', AutoScan);
-  ini.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
-  ini.WriteBool('Playlist','AutoPlayNewTitle', AutoPlayNewTitle);
-  ini.WriteBool('Playlist','AutoPlayEnqueuedTitle', AutoPlayEnqueuedTitle);
+  NempSettingsManager.WriteBool('Playlist','AutoScan', AutoScan);
+  NempSettingsManager.WriteBool('Playlist','AutoPlayOnStart', AutoPlayOnStart);
+  NempSettingsManager.WriteBool('Playlist','AutoPlayNewTitle', AutoPlayNewTitle);
+  NempSettingsManager.WriteBool('Playlist','AutoPlayEnqueuedTitle', AutoPlayEnqueuedTitle);
 
-  Ini.WriteBool('Playlist','AutoDelete', AutoDelete);
-  ini.WriteBool('Playlist','DisableAutoDeleteAtUserInput', DisableAutoDeleteAtUserInput);
+  NempSettingsManager.WriteBool('Playlist','AutoDelete', AutoDelete);
+  NempSettingsManager.WriteBool('Playlist','DisableAutoDeleteAtUserInput', DisableAutoDeleteAtUserInput);
 
-  Ini.WriteBool('Playlist','AutoMix', fAutoMix);
-  Ini.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
-  Ini.WriteBool('Playlist', 'RepeatCueOnRepeatTitle', fRepeatCueOnRepeatTitle);
-  Ini.WriteBool('Playlist', 'RememberInterruptedPlayPosition', fRememberInterruptedPlayPosition);
+  NempSettingsManager.WriteBool('Playlist','AutoMix', fAutoMix);
+  NempSettingsManager.WriteBool('Playlist', 'JumpToNextCueOnNextClick', fJumpToNextCueOnNextClick);
+  NempSettingsManager.WriteBool('Playlist', 'RepeatCueOnRepeatTitle', fRepeatCueOnRepeatTitle);
+  NempSettingsManager.WriteBool('Playlist', 'RememberInterruptedPlayPosition', fRememberInterruptedPlayPosition);
 
-  Ini.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
-  Ini.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
-  Ini.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
-  Ini.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);
+  NempSettingsManager.WriteBool('Playlist', 'ShowHintsInPlaylist', fShowHintsInPlaylist);
+  NempSettingsManager.WriteInteger('Playlist', 'RandomRepeat', RandomRepeat);
+  NempSettingsManager.WriteBool('Playlist', 'BassHandlePlaylist', BassHandlePlaylist);
+  NempSettingsManager.WriteString('Playlist', 'InitialDialogFolder', InitialDialogFolder);
 
-  ini.WriteBool   ('Playlist', 'UseWeightedRNG', fUseWeightedRNG);
-  ini.WriteInteger('Playlist', 'RNGWeights05', RNGWeights[1]  );
-  ini.WriteInteger('Playlist', 'RNGWeights10', RNGWeights[2]  );
-  ini.WriteInteger('Playlist', 'RNGWeights15', RNGWeights[3]  );
-  ini.WriteInteger('Playlist', 'RNGWeights20', RNGWeights[4]  );
-  ini.WriteInteger('Playlist', 'RNGWeights25', RNGWeights[5]  );
-  ini.WriteInteger('Playlist', 'RNGWeights30', RNGWeights[6]  );
-  ini.WriteInteger('Playlist', 'RNGWeights35', RNGWeights[7]  );
-  ini.WriteInteger('Playlist', 'RNGWeights40', RNGWeights[8]  );
-  ini.WriteInteger('Playlist', 'RNGWeights45', RNGWeights[9]  );
-  ini.WriteInteger('Playlist', 'RNGWeights50', RNGWeights[10] );
+  NempSettingsManager.WriteBool   ('Playlist', 'UseWeightedRNG', fUseWeightedRNG);
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights05', RNGWeights[1]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights10', RNGWeights[2]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights15', RNGWeights[3]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights20', RNGWeights[4]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights25', RNGWeights[5]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights30', RNGWeights[6]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights35', RNGWeights[7]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights40', RNGWeights[8]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights45', RNGWeights[9]  );
+  NempSettingsManager.WriteInteger('Playlist', 'RNGWeights50', RNGWeights[10] );
 
-
-  PlaylistManager.WriteToIni(ini);
+  PlaylistManager.SaveSettings;
 end;
 
 
@@ -776,6 +778,18 @@ begin
   if aUserinput and assigned(fOnUserChangedTitle) then
       fOnUserChangedTitle(Self)
 end;
+
+procedure TNempPlaylist.PreparePlayNext;
+var nextIdx: Integer;
+begin
+  if not AcceptInput then exit;
+
+  Player.stop(Player.LastUserWish = USER_WANT_PLAY);
+  // GetNextAudioFileIndex can modify fInterruptedPlayPosition
+  nextIdx := GetNextAudioFileIndex;
+  Play(nextIdx, Player.FadingInterval, false, 0);
+end;
+
 
 procedure TNempPlaylist.PlayNextFile(aUserinput: Boolean = False);
 var sPos: Double;
@@ -1194,7 +1208,7 @@ begin
             // todo
             if ReloadDataFromFile then
             begin
-                if Nemp_MainForm.NempOptions.UseCDDB then
+                if NempOptions.UseCDDB then
                     AudioFile.GetAudioData(AudioFile.Pfad, GAD_CDDB)
                 else
                     AudioFile.GetAudioData(AudioFile.Pfad, 0);
@@ -2126,6 +2140,8 @@ end;
 procedure TNempPlaylist.UserInput;
 begin
   fErrorCount := 0;
+  // cancel the delayed "play next" timer
+  Player.StopPauseBetweenTracksTimer;
 end;
 
 procedure TNempPlaylist.RepairBassEngine(StartPlay: Boolean);

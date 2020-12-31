@@ -51,6 +51,9 @@ const
  // WM_FC_NEEDMORE = WM_FLYINGCOW + 2;
   WM_FLYINGCOWTEST = WM_FLYINGCOW + 3;
 
+  // FirstGap = 1.5;
+  // OtherGaps = 1.0;
+
 type
   TWMFCMessage = packed record
     Msg : Cardinal;
@@ -59,11 +62,74 @@ type
     Result : Longint;
   end;
 
+  TCoverFlowSettings = record
+    // All Integers are divided by 100 before usage. (except Angles: /180)
+    // Planes in which the cover will be displayed
+    zMain,
+    zLeft,
+    zRight: Integer;
+    xCenter: Integer;  // unused so far
+    // Gap between two covers
+    GapLeft,
+    GapFirstLeft,
+    GapFirstRight,
+    GapRight: Integer;
+    // Angles, -180 ... +180
+    AngleMain,
+    AngleLeft,
+    AngleRight: Integer;
+    // Reflexion
+    UseReflection: Boolean;
+    ReflexionBlendFaktor: Integer;
+    GapReflexion: Integer;
+    // Position
+    ViewPosX: Integer;
+    ViewDirX: Integer;
+    //
+    MaxTextures: Integer;
+  end;
+
+const
+  DefaultCoverFlowSettings: TCoverFlowSettings =
+  ( zMain: 100;
+    zLeft: -90;
+    zRight: -90;
+    xCenter: 0;
+    // Gap between two covers
+    GapLeft: 50;
+    GapFirstLeft: 180;
+    GapFirstRight: 180;
+    GapRight: 50;
+    // Angles
+    AngleMain: 0;
+    AngleLeft: -85;
+    AngleRight: 85;
+    UseReflection: True;
+    ReflexionBlendFaktor: 15;
+    GapReflexion: 20;
+    ViewPosX: 0;
+    ViewDirX: 0;
+    MaxTextures: 100;
+  );
+
+type
   TWMFCNeedPreview = TWMFCMessage;
 
   TWMFCSelect = TWMFCMessage;
 
   TFlyingCow = class;
+
+  TRenderItem = record
+      x,  r,  z  : Single;
+      nx, nr, nz : Single;
+      texture : record
+        handle : Integer;
+        w, h : Single;
+        su, sv : Single;
+        tu, tv : Single;
+        age : Integer;
+      end;
+    end;
 
   TRenderThread = class(TThread)
   private
@@ -71,7 +137,6 @@ type
     fSemaphore: THandle;
     fDC : HDC;
     fRC : TRect;
-
     glrc : HGLRC;
 
     fNewHandleNeeded: Boolean;
@@ -84,40 +149,43 @@ type
     fAllowItemAccess: Boolean;
     fFrameDone : Boolean;
     fTimer : Cardinal;
-    fItem : array of record
-      x,  r,  z  : Single;
-      nx, nr, nz : Single;
-      texture : record
-        handle : Integer;
-        w, h : Single;
-        su, sv : Single;
-        tu, tv : Single;
-        age : Integer;
-      end;
-    end;
+    fMainPickItem: TRenderItem;
+    fItem : array of TRenderItem;
     fCurrentItem : Integer;
     fSelectedItem : Integer;
     fQueryDeleteTexture : Integer;
+
     fQueryUpdateTexture : Integer;
     fQueryUpdateTexture_pixels : PByteArray;
     fQueryUpdateTexture_width : Integer;
     fQueryUpdateTexture_height : Integer;
+
+    fQueryUpdateTexturePick : Integer;
+    fQueryUpdateTexturePick_pixels : PByteArray;
+    fQueryUpdateTexturePick_width : Integer;
+    fQueryUpdateTexturePick_height : Integer;
+
+
     fPendingPreview : Boolean;
     fEventsWindow : HWND;
     fCaptionCS : Integer;
     fr: single;
     fg: single;
     fb: single;
+    BL_Cover,
+    BL_Reflexion: Single;
 
-    // New Caption-Stuff
-    //fTextBitmap: tBitmap;
-    //fCaptionTexture: Integer;
-    //fTextureChanged: Boolean;
-    //procedure DrawCaption;
+    // fBlendTextureHandle: GLuint;
+
+    //fMainCoverTextureHandle: GLuint;
+
+    Settings: TCoverFlowSettings;
 
     procedure DrawScene;
+    function DrawHitScene(x,y: Integer): Cardinal;
 
-    function WinPosTo3DPos(X, Y: Integer): TGLVectord3;
+    // procedure PrepareBlendTexture(r,g,b: Byte);
+    procedure PrepareMainPickCover;
 
     procedure InitRendering;
     procedure ReInitHandles;
@@ -132,7 +200,9 @@ type
     procedure UpdateItems;
     procedure DeleteTexture (index : Integer);
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
-    procedure RenderPass (check_missings : Boolean; rc : TRect);
+    procedure SetMainPickCoverPreview(aWidth, aHeight : Integer; pixels : PByteArray);
+    procedure RenderPass (check_missings : Boolean; rc : TRect; RenderReflexion: Boolean);
+    procedure RenderClick(check_missings : Boolean; rc: TRect);
     ////procedure SetCaption (caption, subcaption : String);
   end;
 
@@ -166,6 +236,8 @@ type
     procedure DoSomeDrawing(value: Integer);
     property CurrentItem : Integer read getCurrentItem write setCurrentItem;
     procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
+
+    procedure SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
 //    function NeedsPreview (var index : Integer) : Boolean;
     procedure SelectItemAt(X,Y: Integer);
     procedure BeginUpdate;
@@ -173,6 +245,8 @@ type
 
     procedure SetNewHandle(aWnd: HWND);
     procedure SetColor(r,g,b: Integer);
+
+    procedure ApplySettings(aSettings: TCoverFlowSettings);
 
     destructor Destroy; override;
 
@@ -352,10 +426,6 @@ begin
   fThread.fSelectedItem := -1;
   fThread.fCurrentItem := index;
   fThread.UpdateItems;
-  //if (index >= 0) and (index < fItem.Count ) then
-  // try
-  //fThread.SetCaption (Item[index].Name, Item[index].Kind);
-  //except end;
   fThread.ResumeRender;
 end;
 
@@ -391,16 +461,32 @@ begin
     fThread.fb := b / 255;
 
     fThread.fNewHandleNeeded := True;
-
+    // fThread.PrepareBlendTexture(r,g,b);
     fThread.ResumeRender;
     DoSomeDrawing(20);
 end;
+
 procedure TFlyingCow.SetPreview(index, width, height: Integer;
   pixels: PByteArray);
 begin
   fThread.SetPreview (index, width, height, pixels);
 end;
 
+procedure TFlyingCow.ApplySettings(aSettings: TCoverFlowSettings);
+begin
+  fThread.PauseRender;
+  fThread.Settings := aSettings;
+  fThread.BL_Cover := -0.75;
+  fThread.BL_Reflexion := -0.75 - (aSettings.GapReflexion / 100);
+  fThread.UpdateItems;
+  fThread.ResumeRender;
+  DoSomeDrawing(50);
+end;
+
+procedure TFlyingCow.SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
+begin
+  fThread.SetMainPickCoverPreview(width, height, pixels);
+end;
 
 
 { TFlyingCowItem }
@@ -434,6 +520,7 @@ begin
   fSelectedItem := -1;
   fQueryDeleteTexture := -1;
   fQueryUpdateTexture := -1;
+  fQueryUpdateTexturePick := -1;
   fPendingPreview := False;
   fEventsWindow := events_window;
   fCaptionCS := 0;
@@ -442,6 +529,9 @@ begin
   fr := 0.0;
   fg := 0.0;
   fb := 0.0;
+  BL_Cover := -0.75;
+  BL_Reflexion := -0.85;
+
   // resume;
   // start;
 end;
@@ -484,6 +574,43 @@ begin
   fPendingPreview := False;
 end;
 
+(*
+//deprecated method, was one trial to make reflexion working
+// not to self: didnt work, partly because of it should have been done in the RenderThread, not in VCL
+procedure TRenderThread.PrepareBlendTexture(r,g,b: Byte);
+var
+  temp : PByteArray;
+  pd : PByteArray;
+  px, py : Integer;
+const
+  texSize:Integer=32;
+begin
+    // if needed, get a new Name for the blending texture
+    if fBlendTextureHandle = 0 then
+      glGenTextures (1, @fBlendTextureHandle);
+
+    glBindTexture (GL_TEXTURE_2D, fBlendTextureHandle);
+    GetMem (temp, texSize*texSize*4);
+
+    pd := @temp[texSize*texSize*4 - texSize*4];
+    FillChar (temp^, texSize*texSize*4, $0F);
+    for py := 0 to texSize-1 do
+    begin
+        for px := 0 to texSize-1 do
+        begin
+            pd[px*4+0] := 100; //r;
+            pd[px*4+1] := 200; //g;
+            pd[px*4+2] := 50;  //b;
+        end;
+        pd := @pd[-texSize*4];
+    end;
+    glTexImage2D (GL_TEXTURE_2D, 0, 4, texSize, texSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp);
+    FreeMem (temp);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+end;
+*)
+
 procedure TRenderThread.Execute;
 var
   delta_t : Cardinal;
@@ -503,21 +630,27 @@ var
   //bmp : TBitmap;
   //////////////////font : TGLFont;
   MoreNeeded: Boolean;
-  NewSelectedItem: Integer;
+  NewSelectedItem: Cardinal;
+  diff: Double;
+  localDoRender: Boolean;
 
-  vec: TGLVectord3;
-  vec0: TGLDouble;
 begin
   // Iniciar OpenGL
   InitRendering;
+  localDoRender := True;
 
+
+  glGenTextures (1, @fMainPickItem.texture.handle);
+
+  diff := 0.005;
   // Cargar fuente de letras
-  //////////////////gltLoadFont(font);
   // Oki doki, a laburar se ha dicho
   fTimer := GetTickCount;
   While Not Terminated do
   begin
      if (WaitforSingleObject(fSemaphore, 1000) = WAIT_OBJECT_0) then
+
+     //WaitforSingleObject(fSemaphore, 500);
     //  WaitforSingleObject(fSemaphore, 2000) ;
     //if True then
       if not Terminated then
@@ -527,6 +660,7 @@ begin
                     // The Panel-Handle has Changed.
                     ReInitHandles;
                     fNewHandleNeeded := False;
+                    localDoRender := True;
                 end;
 
                 MoreNeeded := False;
@@ -536,10 +670,19 @@ begin
                     glDeleteTextures (1, @fItem[fQueryDeleteTexture].texture.handle);
                     fItem[fQueryDeleteTexture].texture.handle := 0;
                     fQueryDeleteTexture := -1;
+                    localDoRender := True;
                 end;
+
+                if fQueryUpdateTexturePick >= 0 then
+                begin
+                  PrepareMainPickCover;
+                  fQueryUpdateTexturePick := -1;
+                end;
+
                 // Petición de actualizar una textura
                 If fQueryUpdateTexture >= 0 Then
                 begin
+                  localDoRender := True;
                   If fItem[fQueryUpdateTexture].texture.handle = 0 Then
                       glGenTextures (1, @fItem[fQueryUpdateTexture].texture.handle);
                   glBindTexture (GL_TEXTURE_2D, fItem[fQueryUpdateTexture].texture.handle);
@@ -555,10 +698,10 @@ begin
                   end;
                   pw := Pow2(fQueryUpdateTexture_width);
                   ph := Pow2(fQueryUpdateTexture_height);
-                  fItem[fQueryupdateTexture].texture.su :=  0.5/pw;
-                  fItem[fQueryupdateTexture].texture.sv := (1.0 - fQueryUpdateTexture_height/ph) + 0.5/ph;
-                  fItem[fQueryupdateTexture].texture.tu := fQueryUpdateTexture_width/pw - 0.5/pw;
-                  fItem[fQueryupdateTexture].texture.tv := 1.0 - 0.5/ph;
+                  fItem[fQueryupdateTexture].texture.su :=  0.5/pw + diff;
+                  fItem[fQueryupdateTexture].texture.sv := (1.0 - fQueryUpdateTexture_height/ph) + 0.5/ph + diff;
+                  fItem[fQueryupdateTexture].texture.tu := fQueryUpdateTexture_width/pw - 0.5/pw - diff;
+                  fItem[fQueryupdateTexture].texture.tv := 1.0 - 0.5/ph - diff;
                   fItem[fQueryupdateTexture].texture.age := 0;
                   GetMem (temp, pw*ph*4);
                   ps := @fQueryUpdateTexture_pixels[(fQueryUpdateTexture_height-1)*Align4(fQueryUpdateTexture_width*3)];
@@ -603,7 +746,7 @@ begin
                                     oldest_index := i;
                         end;
                     end;
-                    If texture_count > 100 Then
+                    If texture_count > settings.MaxTextures Then
                     begin
                         glDeleteTextures (1, @fItem[oldest_index].texture.handle);
                         fItem[oldest_index].texture.handle := 0;
@@ -624,61 +767,43 @@ begin
                     // Mostrar las imágenes
                     //glClear (GL_DEPTH_BUFFER_BIT);
                     //glClear (GL_COLOR_BUFFER_BIT);
+
                     glMatrixMode (GL_PROJECTION);
                     glLoadIdentity;
                     GetClientRect (fWindow, fRC);
                     glViewport (0, 0, fRC.Right-fRC.Left, fRC.Bottom-fRC.Top);
                     gluPerspective (45.0, (fRC.Right-fRC.Left) / (fRC.Bottom-fRC.Top), 0.1, 100.0);
 
+                    gluLookAt(-Settings.ViewPosX/100, 0, 1.0, // position
+                              -Settings.ViewPosX/100,0,-1,  // viewing direction = position (for now)
+                              0,1,0);                      // vector upwards
+
                     if self.fXClicked <> -1  then
                     begin
-                        vec := WinPosTo3DPos(fXClicked, fYClicked);
-                        vec0 := vec[0]*1000;
+                        localDoRender := True;
+                        NewSelectedItem := DrawHitScene(fXClicked, (fRC.Bottom-fRC.Top)-fYClicked);
 
-                        case abs(round(vec0)) of
-                            0..33 : NewSelectedItem := 0;
-                            34..52 : NewSelectedItem := 1;
-                            53..65 : NewSelectedItem := 2;
-                            66..77 : NewSelectedItem := 3;
-                            78..90 : NewSelectedItem := 4;
-                            91..103: NewSelectedItem := 5;
-                            104..116:NewSelectedItem := 6;
-                            117..128:NewSelectedItem := 7;
-                            // ---------- added 2019
-                            129..140:NewSelectedItem := 8;
-                            141..152:NewSelectedItem := 9;
-                            153..164:NewSelectedItem := 10;
-                            165..176:NewSelectedItem := 11;
-                            177..188:NewSelectedItem := 12;
-                            189..200:NewSelectedItem := 13;
-                            201..211:NewSelectedItem := 14;
-                        else
-                            NewSelectedItem :=15;
-                        end;
+                        if NewSelectedItem <> $00ffffff then
+                        begin
+                          fCurrentItem := NewSelectedItem;
 
-                        if vec0 > 0 then
-                            fCurrentItem := fCurrentItem + NewSelectedItem
-                        else
-                            fCurrentItem := fCurrentItem - NewSelectedItem;
+                          if fCurrentItem < 0 then
+                              fCurrentItem := 0;
+                          if fCurrentItem > High(fItem)  then
+                              fCurrentItem := High(fItem);
 
-                        if fCurrentItem < 0 then
-                            fCurrentItem := 0;
-                        if fCurrentItem > High(fItem)  then
-                            fCurrentItem := High(fItem);
-
-                        if not Terminated then
+                          if not Terminated then
                             PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
+                        end;
 
                         fSelectedItem := -1;
                         UpdateItems;
-                        {case round(vec[1]) of
-                          0:;
-                        end; }
                         fXClicked := -1;
                         fYClicked := -1;
-                        //DrawScene;
                     end else
                     begin
+                      if localDoRender then
+                        //DrawHitScene(0,0);
                         DrawScene;
                     end;
 
@@ -700,11 +825,10 @@ begin
                    (Abs(fItem[fCurrentItem].x) < 0.001) AND
                    (not MoreNeeded) Then
                 begin
- //////////////////XXXX
                     if not terminated then
                         PostMessage (fEventsWindow, WM_FC_SELECT, fCurrentItem, 0);
                     fSelectedItem := fCurrentItem;
-                    fDoRender := False;
+                    localDoRender := False;  // ??? 2020
                     ///////////////////////////////sleep(1);
               //      while (WaitforSingleObject(fSemaphore, 1) = WAIT_OBJECT_0) do
               //      ;    ///sleep(1);
@@ -713,8 +837,9 @@ begin
                     // We need more to do. Release Semaphore, so this
                     // will be done again.
                    ///////////////////////////////sleep(1);
+                   localDoRender := True;
                    if (fSelectedItem <> fCurrentItem) or (MoreNeeded) then
-                        ReleaseSemaphore(fSemaphore, 1, Nil);
+                      ReleaseSemaphore(fSemaphore, 1, Nil);
                 end;
 
                 fFrameDone := True;
@@ -730,141 +855,78 @@ begin
 end;
 
 
-      (*
-procedure TRenderThread.DrawCaption;
+function TRenderThread.DrawHitScene(x,y: Integer): Cardinal;
+var PixelData: Cardinal;
 begin
+  glClearColor(1, 1, 1, 0.0);
 
-end;    *)
+  glMatrixMode (GL_MODELVIEW);
+  glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity;
+  glTranslatef (0.0, -0.1, -3.0);
+  glInitNames;
+  glPushName(0);
+
+  // Filling
+  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+
+  glEnable (GL_POLYGON_OFFSET_FILL);
+  glPolygonOffset (1.0, 1.0);
+  RenderClick(True, fRC);
+  glDisable (GL_POLYGON_OFFSET_FILL);
+
+  glFlush();
+  glFinish();
+
+  // Get PixelData
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, @PixelData);
+  PixelData := PixelData and $00FFFFFF;
+  result := PixelData;
+
+  //for testing only
+  //if not terminated and (x*y <> 0)then
+  //   PostMessage (fEventsWindow, WM_FLYINGCOWTEST, WParam(PixelData), 0);
+  SwapBuffers (fDC);
+end;
 
 procedure TRenderThread.DrawScene;
 begin
+    glClearColor(fr, fg, fb, 0.0);
     glMatrixMode (GL_MODELVIEW);
-
     glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT);
-
     glLoadIdentity;
     glTranslatef (0.0, -0.1, -3.0);
-
     glInitNames;
     glPushName(0);
 
     // Filling
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+    glEnable (GL_Blend);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
 
     glEnable (GL_POLYGON_OFFSET_FILL);
     glPolygonOffset (1.0, 1.0);
-    RenderPass (True, fRC);
+    RenderPass (True, fRC, True);
+    glDisable (GL_BLEND);
+
     glDisable (GL_POLYGON_OFFSET_FILL);
 
     // Antialiasing
+    glEnable (GL_BLEND);
     glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
     glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-
-
     glDepthMask (False);
     glDepthFunc (GL_LEQUAL);
-    RenderPass (False, fRC);
+    RenderPass (False, fRC, False);
     glDepthMask (True);
     glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+    glDisable (GL_BLEND);
 
- (*
-    {$IF CompilerVersion > 15.0}
-        If InterlockedCompareExchange (LongInt(fCaptionCS), 1, 0) = 0 Then
-    {$ELSE}
-        If InterlockedCompareExchange (Pointer(fCaptionCS), Pointer(1), Pointer(0)) = Pointer(0) Then
-    {$IFEND}
-
-    begin
-
-        if fTextureChanged then
-        begin
-            // Textur neu zeichnen
-            fTextBitmap := TBitmap.Create;
-            fTextBitmap.Width := 400;
-            fTextBitmap.Height := 100;
-
-            fTextBitmap.Canvas.Font.Size := 16;
-            fTextBitmap.Canvas.Font.Color := clWhite;
-            fTextBitmap.Canvas.Brush.Color := clBlack;
-            fTextBitmap.Canvas.FillRect(Rect(0,0, fTextBitmap.Width, fTextBitmap.Height));
-
-            //fTextBitmap.Canvas.Brush.Color := #101010;
-            fTextBitmap.Canvas.TextOut(10, 10, fCaption);
-            fTextBitmap.Canvas.TextOut(10, 70, fSubCaption);
-
-            glGenTextures (1, @fCaptionTexture);
-  glBindTexture (GL_TEXTURE_2D, fCaptionTexture);
-  glTexImage2D (GL_TEXTURE_2D, 0, 4, fTextBitmap.Width, fTextBitmap.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, fTextBitmap.Scanline[fTextBitmap.height-1]);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-           fTextBitmap.Free;
-           fTextureChanged := False;
-        end;
-
-        glEnable (GL_TEXTURE_2D);
-        glEnable (GL_BLEND);
-        glDisable (GL_DEPTH_TEST);
-        //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBlendFunc (GL_One, GL_ONE_MINUS_SRC_ALPHA);
-
-        glBindTexture (GL_TEXTURE_2D, fCaptionTexture);
-        glColor3f (1.0, 1.0, 1.0);
-        glBegin (GL_QUADS);
-        glTexCoord2f (0.0, 1.0);
-        glVertex3f (-1.0, -0.75+1+ 0.25, 0.0);
-
-        glTexCoord2f (1.0, 1.0);
-        glVertex3f ( 1.0, -0.75+1+ 0.25, 0.0);
-
-        glTexCoord2f (1.0, 0.0);
-        glVertex3f ( 1.0, -0.75+1- 0.25, 0.0);
-
-        glTexCoord2f (0.0, 0.0);
-        glVertex3f (-1.0, -0.75+1- 0.25, 0.0);
-
-        glEnd;
-        glDisable (GL_BLEND);
-        glEnable (GL_DEPTH_TEST);
-
-
-
-        //gltDrawText (font, fCaption, (rc.Right+rc.Left)div 2-gltTextWidth(font,fCaption)div 2, rc.Bottom-50);
-        //gltDrawText (font, fSubCaption, (rc.Right+rc.Left)div 2-gltTextWidth(font,fSubCaption)div 2, rc.Bottom-30);
-        fCaptionCS := 0;
-    end;
-    *)
     SwapBuffers (fDC);
 end;
 
-function TRenderThread.WinPosTo3DPos(X, Y: Integer): TGLVectord3;
-var
-  viewport  : TGLVectori4;
-  modelview : TGLMatrixd4;
-  projection: TGLMatrixd4;
-  //Z         : TGLFloat;
-  Y_new     : Integer;
-begin
-  glGetDoublev(GL_MODELVIEW_MATRIX, @modelview ); //Aktuelle Modelview Matrix in einer Variable ablegen
-  glGetDoublev(GL_PROJECTION_MATRIX, @projection ); //Aktuelle Projection[s] Matrix in einer Variable ablegen
-  glGetIntegerv(GL_VIEWPORT, @viewport ); // Aktuellen Viewport in einer Variable ablegen
-  Y_new := viewport[3] - y; // In OpenGL steigt Y von unten (0) nach oben
-
-  // Auslesen des Tiefenpuffers an der Position (X/Y_new)
-  ///glReadPixels(X, Y_new, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, @Z );
-
-  //z := 0;
-
-  // Errechnen des Punktes, welcher mit den beiden Matrizen multipliziert (X/Y_new/Z) ergibt:
-  gluUnProject(X, Y_new, 0.0, modelview, projection, viewport, @Result[0], @Result[1], @Result[2]);
-
-  if not terminated then
-     PostMessage (fEventsWindow, WM_FLYINGCOWTEST, WParam(Round(1000 * Result[0])), LParam(Round(1000*Result[1])));
-
-end;
 
 {
     --------------------------------------------------------
@@ -874,6 +936,7 @@ end;
 }
 procedure TRenderThread.InitRendering;
 var pfd : TPixelFormatDescriptor;
+
 begin
     fDC := GetDC (fWindow);
     FillChar (pfd, sizeof(pfd), 0);
@@ -889,11 +952,16 @@ begin
     SetPixelFormat (fDC, ChoosePixelFormat (fDC, @pfd), @pfd);
     glrc := wglCreateContext (fDC);
     wglMakeCurrent (fDC, glrc);
+
+
+
     glClearColor(fr, fg, fb, 0.0);
     glLineWidth (1.0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_LINE_SMOOTH);
+    // Settings := DefaultCoverFlowSettings;
+
 end;
 
 {
@@ -916,7 +984,7 @@ begin
     InitRendering;
 end;
 
-procedure TRenderThread.RenderPass(check_missings: Boolean; rc : TRect);
+procedure TRenderThread.RenderPass(check_missings: Boolean; rc : TRect; RenderReflexion: Boolean);
 var
   modelMatrix, projMatrix : TGLMatrixd4;
   viewport : TGLVectori4;
@@ -926,18 +994,145 @@ var
   vx, vy, vz : GLDouble;
   w, h : Single;
   msg : TMSG;
+
+  procedure DoItem;
+  begin
+      // Determinar si el item cae dentro de la pantalla
+    If fItem[i].x > -2.0 Then
+        gluProject (fItem[i].x+Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
+    else If fItem[i].x < 2.0 Then
+        gluProject (fItem[i].x-Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
+    else
+        vx := (rc.Right - rc.Left) / 2.0;
+    //If (vx >= (rc.Right-rc.Left) div 8) And (vx < (rc.Right-rc.Left)*7 div 8) Then
+    If (vx >= -(rc.Right-rc.Left) {div 2}) And (vx < (rc.Right-rc.Left)*3 div 2) Then
+    begin
+      If fItem[i].texture.handle = 0 Then
+      begin
+        If check_missings Then
+        begin
+          // El item no tiene preview
+          If fItem[i].nx < -2.0 Then
+              gluProject (fItem[i].nx+Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
+          else If fItem[i].nx > 2.0 Then
+              gluProject (fItem[i].nx-Cos(fItem[i].nr), 0.0, -Abs(Sin(fItem[i].nr))-Abs(2.0*Sin(fItem[i].nr)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
+          else
+              vx := (rc.Right - rc.Left) / 2.0;
+
+          If (vx_index = -1) Or (Abs(vx-(rc.Right-rc.Left) div 2) < vx_nearest) Then
+          begin
+              vx_index := i;
+              vx_nearest := Abs(vx-(rc.Right-rc.Left) div 2);
+          end;
+        end;
+      end
+      else
+      begin
+        // Item preview
+        glEnable (GL_TEXTURE_2D);
+        glBindTexture (GL_TEXTURE_2D, fItem[i].texture.handle);
+
+        fItem[i].texture.age := 0;
+        w := fItem[i].texture.w;
+        h := fItem[i].texture.h;
+        //-----------------------------
+        // reflexion
+        if Settings.UseReflection and RenderReflexion then
+        begin
+            glColor4f(1,1,1, settings.ReflexionBlendFaktor/100);
+            glBegin (GL_QUADS);
+            glTexCoord2f (fItem[i].texture.su, fItem[i].texture.tv);
+            glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion-h*2, -w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.tv);
+            glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion-h*2, w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.sv);
+            glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion, w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (fItem[i].texture.su, fItem[i].texture.sv);
+            glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion, -w*Sin(fItem[i].r) + fItem[i].z);
+            glEnd;
+        end;
+        //-----------------------------
+
+        //-----------------------------
+        // item itself
+        glColor3f(1,1,1);
+        glBegin (GL_QUADS);
+        glTexCoord2f ( fItem[i].texture.tu, fItem[i].texture.sv);
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover, w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( fItem[i].texture.su, fItem[i].texture.sv);
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover, -w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( fItem[i].texture.su, fItem[i].texture.tv);
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover+h*2, -w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( fItem[i].texture.tu, fItem[i].texture.tv);
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover+h*2, w*Sin(fItem[i].r) + fItem[i].z);
+        glEnd;
+        //-----------------------------
+      end;
+    end
+    else
+    begin
+      If fItem[i].texture.handle <> 0 Then
+        inc (fItem[i].texture.age);
+    end;
+  end;
+
 begin
   glGetDoublev (GL_MODELVIEW_MATRIX, @modelMatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, @projMatrix);
   glGetIntegerv (GL_VIEWPORT, @viewport);
   vx_index := -1;
   vx_nearest := 0;
+
+  i := fCurrentItem;
+  if (fCurrentItem >= 0) and (fCurrentItem <= High(fitem)) then
+    DoItem;
+  for i := fCurrentItem + 1 to High(fItem) do
+    DoItem;
+  for i := fCurrentItem - 1 downTo 0 do
+    DoItem;
+
+
+  // Pedir algún preview que aún no tenemos
+  If check_missings and (not Terminated) Then
+  begin
+    If (vx_index >= 0) And (Not fPendingPreview) Then
+    begin
+      fPendingPreview := True;
+      SendMessageCallback (fEventsWindow, WM_FC_NEEDPREVIEW, vx_index, 0, @previewCallback, Cardinal(@self.fPendingPreview));
+    end
+    else
+    begin
+      // The callback function is called only when the thread that called SendMessageCallback also calls GetMessage, PeekMessage, or WaitMessage.
+      PeekMessage (msg, 0, 0, 0, PM_NOREMOVE);
+    end;
+  end;
+end;
+
+procedure TRenderThread.RenderClick(check_missings : Boolean; rc: TRect);
+var
+  modelMatrix, projMatrix : TGLMatrixd4;
+  viewport : TGLVectori4;
+  vx_nearest : Single;
+  vx_index : Integer;
+  i : Integer;
+  vx, vy, vz : GLDouble;
+  w, h : Single;
+  msg : TMSG;
+  aRenderItem: TRenderItem;
+
+begin
+  glGetDoublev (GL_MODELVIEW_MATRIX, @modelMatrix);
+  glGetDoublev (GL_PROJECTION_MATRIX, @projMatrix);
+  glGetIntegerv (GL_VIEWPORT, @viewport);
+
+  vx_index := -1;
+  vx_nearest := 0;
   For i := 0 To High(fItem) do
   begin
     // Determinar si el item cae dentro de la pantalla
-    If fItem[i].x < -2.0 Then
+    If fItem[i].x > -2.0 Then
         gluProject (fItem[i].x+Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
-    else If fItem[i].x > 2.0 Then
+    else If fItem[i].x < 2.0 Then
         gluProject (fItem[i].x-Cos(fItem[i].r), 0.0, -Abs(Sin(fItem[i].r))-Abs(2.0*Sin(fItem[i].r)), modelMatrix, projMatrix, viewport, @vx, @vy, @vz)
     else
         vx := (rc.Right - rc.Left) / 2.0;
@@ -967,84 +1162,86 @@ begin
       else
       begin
         // Item preview
-        glEnable (GL_TEXTURE_2D);
-        glBindTexture (GL_TEXTURE_2D, fItem[i].texture.handle);
+        if i = 0 then
+        begin
+          glEnable(GL_Blend);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // for transparent Object
-       // glEnable (GL_Blend);
+          aRenderItem := fMainPickItem;
+          glEnable(GL_TEXTURE_2D);
+          glBindTexture (GL_TEXTURE_2D, aRenderItem.texture.handle);
+
+          glColor3f(1,1,1);
+        end else
+        begin
+          aRenderItem := fItem[i];
+          glDisable(GL_TEXTURE_2D);
+          glDisable(GL_Blend);
+
+          glColor3f(
+          (i and $000000FF) / 255,
+          ((i and $0000FF00) shr 8) / 255,
+          ((i and $00FF0000) shr 16) / 255
+        );
+        end;
 
 
-        fItem[i].texture.age := 0;
-        w := fItem[i].texture.w;
-        h := fItem[i].texture.h;
+        // fMainCoverTextureHandle
+
+        aRenderItem.texture.age := 0;
+        w := aRenderItem.texture.w;
+        h := aRenderItem.texture.h;
+
+        //if check_missings then
+        //  glLoadName(i);
 
 
-        // reflexion
-       { glColor3f (0.85-Abs(fItem[i].x)/7.0*1.5,
-                   0.85-Abs(fItem[i].x)/7.0*1.5,
-                   0.85-Abs(fItem[i].x)/7.0*1.5);   }
-
-
-  //      glColor3f (Abs(fItem[i].x)/7.0*0.5,
-  //                 Abs(fItem[i].x)/7.0*0.5,
-   //                Abs(fItem[i].x)/7.0*0.5);
-
-        glColor3f ((0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fr)+fr,
-                   (0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fg)+fg,
-                   (0.85-Abs(fItem[i].x)/10.0*1.5)*(1-fb)+fb);
-
-          //           glColor3f(0.9,0.9,1.0);
         glBegin (GL_QUADS);
-        glTexCoord2f (fItem[i].texture.su, fItem[i].texture.tv);
-        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75-h*2, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.tv);
-        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75-h*2, w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.sv);
-        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75, w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-        glTexCoord2f (fItem[i].texture.su, fItem[i].texture.sv);
-        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
+        glTexCoord2f ( aRenderItem.texture.tu, aRenderItem.texture.sv);
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover, w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( aRenderItem.texture.su, aRenderItem.texture.sv);
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover, -w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( aRenderItem.texture.su, aRenderItem.texture.tv);
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover+h*2, -w*Sin(fItem[i].r) + fItem[i].z);
+        glTexCoord2f ( aRenderItem.texture.tu, aRenderItem.texture.tv);
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover+h*2, w*Sin(fItem[i].r) + fItem[i].z);
         glEnd;
-
-
-        // item itsself
-       { glColor3f (1.0-Abs(fItem[i].x)/7.0,
-                   1.0-Abs(fItem[i].x)/7.0,
-                   1.0-Abs(fItem[i].x)/7.0);    }
-
-        glColor3f ((1.0-Abs(fItem[i].x)/10.0)*(1-fr)+fr,
-                   (1.0-Abs(fItem[i].x)/10.0)*(1-fg)+fg,
-                   (1.0-Abs(fItem[i].x)/10.0)*(1-fb)+fb);
-
-        //glColor3f(1.9,1.9,0.0);
-
-        if check_missings then
-            glLoadName(i);
-
+        {
         glBegin (GL_QUADS);
-        glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.sv);
-        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75,
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover,
                     w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-
-        glTexCoord2f (fItem[i].texture.su, fItem[i].texture.sv);
-        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75,
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover,
                     -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-
-        glTexCoord2f (fItem[i].texture.su, fItem[i].texture.tv);
-        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), -0.75+h*2,
+        glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Cover+h*2,
                   -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-
-        glTexCoord2f (fItem[i].texture.tu, fItem[i].texture.tv);
-        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), -0.75+h*2,
+        glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Cover+h*2,
                  w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
-
         glEnd;
+        }
+
+        if Settings.UseReflection then
+        begin
+            glBegin (GL_QUADS);
+            glTexCoord2f (aRenderItem.texture.su, aRenderItem.texture.tv);
+            glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion-h*2, -w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (aRenderItem.texture.tu, aRenderItem.texture.tv);
+            glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion-h*2, w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (aRenderItem.texture.tu, aRenderItem.texture.sv);
+            glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion, w*Sin(fItem[i].r) + fItem[i].z);
+            glTexCoord2f (aRenderItem.texture.su, aRenderItem.texture.sv);
+            glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion, -w*Sin(fItem[i].r) + fItem[i].z);
+            glEnd;
+         {
+          glBegin (GL_QUADS);
+          glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion-h*2, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
+          glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion-h*2, w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
+          glVertex3f (fItem[i].x+w*Cos(fItem[i].r), BL_Reflexion, w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
+          glVertex3f (fItem[i].x-w*Cos(fItem[i].r), BL_Reflexion, -w*Sin(fItem[i].r)-w+Abs(w*Sin(fItem[i].r))-2.0+3.0*fItem[i].z);
+          glEnd;
+          }
+        end;
       end;
     end
-    else
-    begin
-      If fItem[i].texture.handle <> 0 Then
-        inc (fItem[i].texture.age);
-    end;
   end;
 
   // Pedir algún preview que aún no tenemos
@@ -1107,6 +1304,81 @@ begin
     Sleep (1);
 end;
 
+procedure TRenderThread.PrepareMainPickCover;
+var
+  pw, ph : Integer;
+  px, py : Integer;
+  ps, pd : PByteArray;
+  temp : PByteArray;
+begin
+  glBindTexture (GL_TEXTURE_2D, fMainPickItem.texture.handle);
+  // prepare Pixeldata for TextureData
+  If fQueryUpdateTexturePick_Width > fQueryUpdateTexturePick_Height Then
+  begin
+      fMainPickItem.texture.w := 1.0;
+      fMainPickItem.texture.h := fQueryUpdateTexturePick_Height / fQueryUpdateTexturePick_Width;
+  end
+  else
+  begin
+      fMainPickItem.texture.w := fQueryUpdateTexturePick_Width / fQueryUpdateTexturePick_Height;
+      fMainPickItem.texture.h := 1.0;
+  end;
+
+  pw := Pow2(fQueryUpdateTexturePick_Width);
+  ph := Pow2(fQueryUpdateTexturePick_Height);
+  fMainPickItem.texture.su :=  0.5/pw ;
+  fMainPickItem.texture.sv := (1.0 - fQueryUpdateTexturePick_Height/ph) + 0.5/ph ;
+  fMainPickItem.texture.tu := fQueryUpdateTexturePick_Width/pw - 0.5/pw;
+  fMainPickItem.texture.tv := 1.0 - 0.5/ph ;
+  fMainPickItem.texture.age := 0;
+
+  GetMem (temp, pw*ph*4);
+  ps := @fQueryUpdateTexturePick_pixels[(fQueryUpdateTexturePick_Height-1)*Align4(fQueryUpdateTexturePick_Width*3)];
+  pd := @temp[pw*ph*4-pw*4];
+  FillChar (temp^, pw*ph*4, $FF);
+  For py := 0 To fQueryUpdateTexturePick_Height-1 do
+  begin
+      For px := 0 To fQueryUpdateTexturePick_Width-1 do
+      begin
+          pd[px*4+0] := ps[px*3+2];
+          pd[px*4+1] := ps[px*3+1];
+          pd[px*4+2] := ps[px*3+0];
+      end;
+      ps := @ps[-Align4(fQueryUpdateTexturePick_Width*3)];
+      pd := @pd[-pw*4];
+  end;
+  glTexImage2D (GL_TEXTURE_2D, 0, 4, pw, ph, 0, GL_RGBA, GL_UNSIGNED_BYTE, temp);
+  FreeMem (temp);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  //PostMessage (fEventsWindow, WM_FLYINGCOWTEST, WParam(fQueryUpdateTexturePick_Width), 0);
+end;
+
+procedure TRenderThread.SetMainPickCoverPreview(aWidth, aHeight : Integer; pixels : PByteArray);
+var index: Integer;
+begin
+    ReleaseSemaphore(fSemaphore, 1, Nil);
+    index := 0;
+
+  While fQueryUpdateTexturePick <> index do
+
+   {$IF CompilerVersion > 15.0}
+    InterlockedCompareExchange (Longint(fQueryUpdateTexturePick), index, -1);
+   {$ELSE}
+    InterlockedCompareExchange (Pointer(fQueryUpdateTexturePick), Pointer(index), Pointer(-1));
+   {$IFEND}
+
+  fQueryUpdateTexturePick_width := aWidth;
+  fQueryUpdateTexturePick_height := aHeight;
+  fQueryUpdateTexturePick_pixels := pixels;
+  fQueryUpdateTexturePick := index;
+
+  ReleaseSemaphore(fSemaphore, 1, Nil);
+  While fQueryUpdateTexturePick >= 0 do
+    Sleep (1);
+end;
+
 // x,r,z: Aktuelle x/y-Position und Winkel
 // nx,nr,nz: Position, wo es hinsoll (next x, next y, next r (?))
 
@@ -1137,49 +1409,26 @@ begin
   begin
     If i < fCurrentItem Then
     begin
-      fItem[i].nx := -1.5 - (fCurrentItem - i) * 0.5;
-      fItem[i].nr := -85/180.0*PI;
-      fItem[i].nz := 0.0;
+      fItem[i].nx := Settings.xCenter/100 - (Settings.GapFirstLeft/100) - (fCurrentItem - i-1) * Settings.GapLeft/100;
+      fItem[i].nr := Settings.AngleLeft/180.0*PI;
+      fItem[i].nz := Settings.zLeft/100;
     end else
     If i > fCurrentItem Then
     begin
-      fItem[i].nx := 1.5 + (i - fCurrentItem) * 0.5;
-      fItem[i].nr := 85.0/180.0*PI;
-      fItem[i].nz := 0;
+      fItem[i].nx := Settings.xCenter/100 + Settings.GapFirstRight/100 + (i-1 - fCurrentItem) * Settings.GapRight/100;
+      fItem[i].nr := Settings.AngleRight/180.0*PI;
+      fItem[i].nz := Settings.zRight/100;
     end else
     begin
-      fItem[i].nx := 0.0;
-      fItem[i].nr := 0.0;
-      fItem[i].nz := 1.0;
+      fItem[i].nx := Settings.xCenter/100;
+      fItem[i].nr := Settings.AngleMain/180.0*PI;
+      fItem[i].nz := Settings.zMain/100;
     end;
   end;
 end;
-        (*
-procedure TRenderThread.SetCaption(caption, subcaption: String);
-begin
 
-  ReleaseSemaphore(fSemaphore, 1, Nil);
-  While
-    {$IF CompilerVersion > 15.0}
-      InterlockedCompareExchange (LongInt(fCaptionCS), 1, 0) <> 0
-    {$ELSE}
-      InterlockedCompareExchange (Pointer(fCaptionCS), Pointer(1), Pointer(0)) <> Pointer(0)
-    {$IFEND}
-     do
-     Sleep (1);
-
-  fCaption := caption;
-  fSubCaption := subcaption;
-  fTextureChanged := True;
-
-  fCaptionCS := 0;
-end;                   *)
 
 initialization
   OPENGL_InitOK := InitOpenGL;
 end.
-
-
-
-
 

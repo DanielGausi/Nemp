@@ -42,7 +42,7 @@ uses
   Dialogs, StdCtrls, NempAudioFiles, AudioFileHelper, ComCtrls, Grids, Contnrs, ShellApi,
   Menus, ImgList, ExtCtrls, StrUtils, Inifiles, CheckLst, //madexcept,
   Buttons,  VirtualTrees, VSTEditControls,
-  jpeg, activeX, XPMan, DateUtils, cddaUtils, MyDialogs,
+  jpeg, activeX, DateUtils, cddaUtils, MyDialogs,
     spectrum_vis,
   Hilfsfunktionen, Systemhelper, CoverHelper, TreeHelper ,
   ComObj, ShlObj, clipbrd, Spin,  U_CharCode,
@@ -59,7 +59,7 @@ uses
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   Lyrics, pngimage, ExPopupList, SilenceDetection,
   System.ImageList, System.Types, System.UITypes, ProgressShape,
-  System.Win.TaskbarCore, Vcl.Taskbar
+  System.Win.TaskbarCore, Vcl.Taskbar, BaseForms
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -77,7 +77,7 @@ type
   *)
   {$ENDIF}
 
-  TNemp_MainForm = class(TNempForm)
+  TNemp_MainForm = class(TNempCustomMainForm)
     _TopMainPanel: TPanel;
     BassTimer: TTimer;
     SubSplitter1: TSplitter;
@@ -621,6 +621,7 @@ type
 
     procedure FormCreate(Sender: TObject);
 
+    procedure RefreshStarGraphicsAllForms;
     procedure Skinan1Click(Sender: TObject);
     procedure ActivateSkin(aName: String);
 
@@ -889,6 +890,7 @@ type
     procedure ReCheckAndSetProgressChangeGUIStatus;
     procedure ReInitPlayerVCL(GetCoverWasSuccessful: Boolean);
 
+    procedure RefreshPaintFrameHint(ShowDelayExplanation: Boolean);
     procedure DisplayTitleInformation(ShowMainFile, GetCoverWasSuccessful: Boolean);
 
     procedure DisplayPlayerMainTitleInformation(GetCoverWasSuccessful: Boolean);
@@ -1224,15 +1226,10 @@ type
 
     // a replacement for the PopupMenu.Tag, as we have two medialist popups now
     MediaListPopupTag: Integer;
-
     LastPaintedTime: Integer;
-
     FormReadyAndActivated : Boolean;
-
     DeleteAudioFilesAfterHandled: Boolean;
-
     MostRecentInsertNodeForPlaylist: PVirtualNode;
-
 
     procedure OwnMessageProc(var msg: TMessage);
     procedure NewScrollBarWndProc(var Message: TMessage);
@@ -1281,9 +1278,6 @@ type
     DragDropList: TStringList;  // Liste mir interne gedraggten Dateien, da der normale
                                    // Drag&Drop bei WS nicht so richtig klappt.
 
-    NempOptions: TNempOptions; // Viele viele Optionen, die in der ini stehen
-    NempFormBuildOptions: TNempFormBuildOptions;
-
     NempDockedForms: Array [1..3] of Boolean;
     NempSkin: TNempSkin;
 
@@ -1311,32 +1305,17 @@ type
     IncrementalCoverSearchTimer : TTimer;
 
     Nemp_VersionString: String;
-
     Saved8087CW: Word;
-
     SelectedPlayListMp3s: TNodeArray;
-
     NempWindowDefault: DWord;
-
-    AnzeigeMode: Integer;
-    UseSkin: Boolean;
-    GlobalUseAdvancedSkin: Boolean;
-    SkinName: UnicodeString;
-
     MainPlayerControlsActive: Boolean;
-
     AlphaBlendBMP: TBitmap;
-
     BibRatingHelper: TRatingHelper;
-
     TagLabelList: TObjectList;
 
     // reference to AB1 and AB2, needed for assigning the correct graphics
     ABRepeatStartImg, ABRepeatEndImg: TImage;
-
     Resizing: Boolean;
-
-    //procedure EmptyScrollBarWndProc(var Message: TMessage);
 
     procedure MinimizeNemp(Sender: TObject);
     procedure DeactivateNemp(Sender: TObject);
@@ -1377,6 +1356,9 @@ type
     procedure WMEndSession(var M: TWMEndSession); message WM_ENDSESSION;
 
     procedure NeedPreview (var msg : TWMFCNeedPreview); message WM_FC_NEEDPREVIEW;
+    procedure NeedPreviewMainPicker;
+
+    procedure FCtest(var msg : TMessage); message WM_FLYINGCOWTEST;
 
     procedure NewSelected (Var Msg: TMessage); message WM_FC_SELECT;
 
@@ -1394,7 +1376,6 @@ type
         class procedure DoFreeControlHooks;
     end;
     {$ENDIF}
-
 
 var
 
@@ -1692,7 +1673,7 @@ begin
     FOwnMessageHandler := AllocateHWND( OwnMessageProc );
     TagLabelList := TObjectList.Create(True);
 
-    NempFormBuildOptions := Nil;
+
 
     ABRepeatStartImg := ab1;
     ABRepeatEndImg   := ab2;
@@ -1843,7 +1824,6 @@ begin
     //NewPlayerPanel.DoubleBuffered := True;
 
     // create and initialize FormBuilder
-    NempFormBuildOptions := TNempFormBuildOptions.Create;
 
     NempFormBuildOptions.NewLayout := Layout_TwoRows;
 
@@ -2051,6 +2031,7 @@ var progressValue: Int64;
     progressState: TTaskbarProgressState;
     i: Integer;
 begin
+
   Application.ProcessMessages;
   try
       progressState := NempTaskbarManager.ProgressState;
@@ -2092,10 +2073,7 @@ begin
 end;
 
 procedure TNemp_MainForm.TntFormClose(Sender: TObject; var Action: TCloseAction);
-    var i:integer;
-    ini:TMemIniFile;
-    s:integer;
-    PosAndSize : PWindowPlacement;
+var PosAndSize : PWindowPlacement;
 begin
     NempIsClosing := True;
     //PauseMadExcept(True);
@@ -2104,8 +2082,8 @@ begin
 
         NempTrayIcon.Visible := False;
 
-        UnInstallHotKeys(FOwnMessageHandler);
-        UninstallMediakeyHotkeys(FOwnMessageHandler);
+        NempOptions.UnInstallHotKeys;
+        NempOptions.UninstallMediakeyHotkeys;
 
         NempWebServer.Free;
 
@@ -2121,64 +2099,48 @@ begin
               if Tag = 0 then
               begin
                   // one Window
-                  NempFormBuildOptions.WindowSizeAndPositions.MainFormWidth := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
-                  NempFormBuildOptions.WindowSizeAndPositions.MainFormHeight := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
-                  NempFormBuildOptions.WindowSizeAndPositions.MainFormTop := PosAndSize^.rcNormalPosition.Top;
-                  NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft := PosAndSize^.rcNormalPosition.Left;
+                  NempOptions.FormPositions[nfMain].Width := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
+                  NempOptions.FormPositions[nfMain].Height := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
+                  NempOptions.FormPositions[nfMain].Top := PosAndSize^.rcNormalPosition.Top;
+                  NempOptions.FormPositions[nfMain].Left := PosAndSize^.rcNormalPosition.Left;
               end else
               begin
                   // seperate Windows
-                  NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormWidth := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
-                  NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormHeight := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
-                  NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop := PosAndSize^.rcNormalPosition.Top;
-                  NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft := PosAndSize^.rcNormalPosition.Left;
+                  NempOptions.FormPositions[nfMainMini].Width := PosAndSize^.rcNormalPosition.Right - PosAndSize^.rcNormalPosition.Left;
+                  NempOptions.FormPositions[nfMainMini].Height := PosAndSize^.rcNormalPosition.Bottom - PosAndSize^.rcNormalPosition.Top;
+                  NempOptions.FormPositions[nfMainMini].Top := PosAndSize^.rcNormalPosition.Top;
+                  NempOptions.FormPositions[nfMainMini].Left := PosAndSize^.rcNormalPosition.Left;
               end;
           end;
         finally
           FreeMem(PosAndSize,SizeOf(TWindowPlacement))
         end;
-        NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized := WindowState = wsMaximized;
+        NempOptions.MainFormMaximized := WindowState = wsMaximized;
 
-        ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-        try
-            ini.Encoding := TEncoding.UTF8;
-            WriteNempOptions(ini, NempOptions, NempFormBuildOptions, AnzeigeMode);
+        NempOptions.SaveSettings;
+        NempFormBuildOptions.SaveSettings;
 
-            ini.WriteBool('Nemp Portable','EnableUSBMode'   , TDrivemanager.EnableUSBMode  );
-            ini.WriteBool('Nemp Portable','EnableCloudMode' , TDrivemanager.EnableCloudMode);
+        AuswahlForm.SaveWindowPosition;
+        ExtendedControlForm.SaveWindowPosition;
+        MedienlisteForm.SaveWindowPosition;
+        PlaylistForm.SaveWindowPosition;
+        self.SaveWindowPosition(NempOptions.AnzeigeMode);
 
-            Ini.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
-            ini.WriteBool('Fenster', 'UseSkin', UseSkin);
-            ini.WriteString('Fenster','SkinName', SkinName);
-            ini.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
+        TDrivemanager.SaveSettings;
+        NempDisplay.SaveSettings;
 
-            NempDisplay.WriteToIni(Ini);
-            NempPlayer.WriteToIni(Ini);
-            NempPlaylist.WriteToIni(Ini);
-            MedienBib.WriteToIni(Ini);
-            NempUpdater.WriteToIni(Ini);
+        NempPlayer.SaveSettings;
+        NempPlaylist.SaveSettings;
+        MedienBib.SaveSettings;
+        NempUpdater.SaveSettings;
 
-            NempSkin.NempPartyMode.WriteToIni(ini);
+        NempSkin.NempPartyMode.SaveSettings;
 
-            for i:=0 to Spaltenzahl-1 do
-            begin
-                s := GetColumnIDfromPosition(VST, i);
-                ini.WriteInteger('Spalten', 'Inhalt' + IntToStr(i), VST.Header.Columns[s].Tag);
-                ini.Writebool('Spalten', 'visible'  + IntToStr(i), (coVisible in VST.Header.Columns[s].Options));
-                ini.WriteInteger('Spalten', 'Breite' + IntToStr(i), VST.Header.Columns[s].Width);
-            end;
+        VSTColumns_SaveSettings(VST);
 
-            ini.WriteBool('Allgemein', 'LastExitOK', True);
-
-            ini.Encoding := TEncoding.UTF8;
-            try
-                Ini.UpdateFile;
-            except
-                // Silent Exception
-            end;
-        finally
-            ini.Free
-        end;
+        NempSettingsManager.LastExitOK := True;
+        // finally save settings into the file on the disk
+        NempSettingsManager.WriteToDisk;
 
         // PlayList abspeichern
         NempPlaylist.SaveToFile(SavePath + NEMP_NAME + '.npl', True);
@@ -2302,6 +2264,28 @@ begin
 end;
 
 
+procedure TNemp_MainForm.FCtest(var msg : TMessage);
+begin
+    Caption := IntTostr(Cardinal(msg.WParam)) + ' - ' + IntTostr(Integer(msg.LParam));
+end;
+
+procedure TNemp_MainForm.NeedPreviewMainPicker;
+var
+  bmp: TBitmap;
+begin
+  if NempIsClosing then
+    exit;
+
+  bmp := TBitmap.Create;
+  try
+    bmp.PixelFormat := pf24bit;
+    MedienBib.CoverArtSearcher.PaintMainPickCover(bmp, MedienBib.Coverlist);
+    Medienbib.NewCoverFlow.SetMainPickCoverPreview( bmp.Width, bmp.Height, bmp.Scanline[bmp.Height-1]);
+  finally
+    bmp.Free;
+  end;
+end;
+
 procedure TNemp_MainForm.NeedPreview (var msg : TWMFCNeedPreview);
 var aCover: TNempCover;
     bmp: TBitmap;
@@ -2319,10 +2303,13 @@ begin
       if MedienBib.CoverList.Count > msg.Index then
       begin
           aCover := TNempCover(MedienBib.CoverList[msg.Index]);
-
           case MedienBib.NewCoverFlow.Mode of
               cm_Classic: success := False; // we already failed during the painting process
-              cm_OpenGL : success := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, pic);
+              cm_OpenGL : begin
+                  if (aCover.ID = 'all') or (aCover.ID = 'searchresult') then
+                    NeedPreviewMainPicker;
+                  success := MedienBib.CoverArtSearcher.GetCoverBitmapFromID(aCover.ID, pic);
+              end
           else
               success := True; // we are not in CoverflowMode at all, should not happen
           end;
@@ -2980,18 +2967,18 @@ end;
 
 procedure TNemp_MainForm.MM_O_Skin_UseAdvancedClick(Sender: TObject);
 begin
-    GlobalUseAdvancedSkin := NOT GlobalUseAdvancedSkin;
+    NempOptions.GlobalUseAdvancedSkin := NOT NempOptions.GlobalUseAdvancedSkin;
 
-    MM_O_Skin_UseAdvanced.Checked := GlobalUseAdvancedSkin;
-    PM_P_Skin_UseAdvancedSkin.Checked := GlobalUseAdvancedSkin;
+    MM_O_Skin_UseAdvanced.Checked := NempOptions.GlobalUseAdvancedSkin;
+    PM_P_Skin_UseAdvancedSkin.Checked := NempOptions.GlobalUseAdvancedSkin;
 
     {$IFDEF USESTYLES}
     // deactivate it immediately
-    if Not Nemp_MainForm.GlobalUseAdvancedSkin then
+    if Not NempOptions.GlobalUseAdvancedSkin then
     begin
         TStyleManager.SetStyle('Windows');
         ReInitTaskbarManager(True);
-        if UseSkin then
+        if NempOptions.UseSkin then
         begin
             if NOT NempSkin.UseDefaultMenuImages then
                 NempSkin.SetDefaultMenuImages;
@@ -3001,10 +2988,10 @@ begin
     end else
     begin
         // refresh skin, if a skin is used, and it supports advanced skinning
-        if UseSkin then
+        if NempOptions.UseSkin then
         begin
             if NempSkin.UseAdvancedSkin then
-                ActivateSkin(GetSkinDirFromSkinName(SkinName))
+                ActivateSkin(GetSkinDirFromSkinName(NempOptions.SkinName))
             else
                 TranslateMessageDLG((AdvancedSkinActivateHint), mtInformation, [MBOK], 0);
         end;
@@ -3021,6 +3008,16 @@ begin
       OptionsCompleteForm.RefreshStarGraphics;
 
     {$ENDIF}
+end;
+
+procedure TNemp_MainForm.RefreshStarGraphicsAllForms;
+begin
+  if assigned(FDetails) then
+    FDetails.RefreshStarGraphics;
+  if assigned(RandomPlaylistForm) then
+    RandomPlaylistForm.RefreshStarGraphics;
+  if assigned(OptionsCompleteForm) then
+    OptionsCompleteForm.RefreshStarGraphics;
 end;
 
 
@@ -3046,7 +3043,7 @@ procedure TNemp_MainForm.WindowsStandardClick(Sender: TObject);
 begin
   NempSkin.DeActivateSkin;
   SetSkinRadioBox('');
-  UseSkin := False;
+  NempOptions.UseSkin := False;
   // RePaintPanels;
   RepaintOtherForms;
   RepaintAll;
@@ -3056,10 +3053,10 @@ end;
 // Ein paar Routinen, die das Skinnen erleichtren
 procedure TNemp_MainForm.Skinan1Click(Sender: TObject);
 begin
-  UseSkin := True;
-  SkinName := StringReplace((Sender as TMenuItem).Caption,'&&','&',[rfReplaceAll]);
-  ActivateSkin(GetSkinDirFromSkinName(SkinName));
-  SetSkinRadioBox(SkinName);
+  NempOptions.UseSkin := True;
+  NempOptions.SkinName := StringReplace((Sender as TMenuItem).Caption,'&&','&',[rfReplaceAll]);
+  ActivateSkin(GetSkinDirFromSkinName(NempOptions.SkinName));
+  SetSkinRadioBox(NempOptions.SkinName);
  // CorrectSkinRegionsTimer.Enabled := True;
 end;
 
@@ -3090,8 +3087,8 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if assigned(NempFormBuildOptions) then
-        NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
+    if Assigned_NempFormBuildOptions then
+      NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
 
     LblEmptyLibraryHint.Width := (GRPBOXArtistsAlben.Width - 50);
     LblEmptyLibraryHint.Left := 25;
@@ -3808,7 +3805,7 @@ begin
     MM_O_Wizard      .Enabled := PartyModeNotActive;
     MM_O_View        .Enabled := PartyModeNotActive;
 
-    MM_O_FormBuilder.Enabled := Nemp_MainForm.AnzeigeMode = 0;
+    MM_O_FormBuilder.Enabled := NempOptions.AnzeigeMode = 0;
 end;
 
 
@@ -4661,7 +4658,7 @@ begin
         if NempOptions.ChangeFontStyleOnMode then
             font.Style := ModeToStyle(AudioFile.ChannelModeIdx)
         else
-            font.Style := Nemp_MainForm.NempOptions.DefaultFontStyles;
+            font.Style := NempOptions.DefaultFontStyles;
 
         if NempOptions.ChangeFontOnCbrVbr then
         begin
@@ -4704,6 +4701,7 @@ procedure TNemp_MainForm.MM_O_PreferencesClick(Sender: TObject);
 begin
   if Not Assigned(OptionsCompleteForm) then
     Application.CreateForm(TOptionsCompleteForm, OptionsCompleteForm);
+
   OptionsCompleteForm.Show;
   OptionsCompleteForm.BringToFront;
 end;
@@ -4885,7 +4883,7 @@ begin
 
     VK_F7: begin
             if NOT NempSkin.NempPartyMode.Active then
-                SwapWindowMode(AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
+                SwapWindowMode(NempOptions.AnzeigeMode + 1); // "mod 2" is done in this SwapWindowMode
            end;
 
     VK_F8: NempPlayer.PlayJingle(Nil);
@@ -6014,7 +6012,7 @@ procedure TNemp_MainForm.ArtistsVSTPaintText(Sender: TBaseVirtualTree;
   TextType: TVSTTextType);
 begin
 
-  TargetCanvas.font.Style := Nemp_MainForm.NempOptions.ArtistAlbenFontStyles;
+  TargetCanvas.font.Style := NempOptions.ArtistAlbenFontStyles;
 
   if Sender = ArtistsVST then
       if (Node.Index <= 2) And (Node.Parent = (Sender as TBaseVirtualTree).RootNode) then
@@ -6306,7 +6304,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if not assigned(NempFormBuildOptions) then
+    if not Assigned_NempFormBuildOptions then
         exit;
 
     //NempOptions.NempFormRatios.VSTHeight := Round(_TopMainPanel.Height / Height * 100);    
@@ -6326,7 +6324,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.OnSplitterMoved(Sender);
 
     if NempSkin.isActive then
@@ -6345,7 +6343,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.BrowseArtistRatio := Round(ArtistsVST.Width / AuswahlPanel.Width * 100);
 end;
 
@@ -6361,7 +6359,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if not assigned(NempFormBuildOptions) then
+    if not Assigned_NempFormBuildOptions then
         exit;
             
     NempFormBuildOptions.OnSplitterMoved(Sender);     
@@ -7667,6 +7665,9 @@ procedure TNemp_MainForm.PlaylistUserChangedTitle(Sender: TNempPlaylist);
 var aNode: PVirtualNode;
 begin
     aNode := GetNodeWithAudioFile(PlaylistVST, NempPlaylist.PlayingFile);
+    // if there is a CueList attached: scroll into the active CueNode
+    if assigned(NempPlaylist.PlayingFile.CueList) then
+      aNode := GetNodeWithCueFile(PlaylistVST, aNode, NempPlayer.GetActiveCue);
     PlaylistVST.ScrollIntoView(aNode, True);
 end;
 
@@ -7827,6 +7828,26 @@ begin
     PlaylistVST.EndUpdate;
 end;
 
+procedure TNemp_MainForm.RefreshPaintFrameHint(ShowDelayExplanation: Boolean);
+var af: TAudioFile;
+begin
+  if ShowDelayExplanation then
+  begin
+    if MainPlayerControlsActive then
+      PaintFrame.Hint := _(PlaylistAutoDelay);
+  end else
+  begin
+    if MainPlayerControlsActive then
+      af := NempPlayer.MainAudioFile
+    else
+      af := NempPlayer.HeadSetAudioFile;
+
+    if assigned(af) then
+      PaintFrame.Hint := NempDisplay.HintText(af)
+    else
+      PaintFrame.Hint := '';
+  end;
+end;
 
 procedure TNemp_MainForm.DisplayTitleInformation(ShowMainFile, GetCoverWasSuccessful: Boolean);
 var fn, aHint: String;
@@ -8839,11 +8860,11 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if not assigned(NempFormBuildOptions) then
+    if not Assigned_NempFormBuildOptions then
         exit;
     
   AlbenVST.Header.Columns[0].Width := AlbenVST.Width;
-  if NempSkin.isActive and (AnzeigeMode = 0) then
+  if NempSkin.isActive and (NempOptions.AnzeigeMode = 0) then
   begin
     NempSkin.RepairSkinOffset;
     NempSkin.SetArtistAlbumOffsets;
@@ -8981,15 +9002,15 @@ begin
   begin
       if Tag = 0 then
       begin
-          NempFormBuildOptions.WindowSizeAndPositions.MainFormMaximized := WindowState=wsMaximized;
+          NempOptions.MainFormMaximized := WindowState=wsMaximized;
           // aktuelle Aufteilung speichern
-          NempFormBuildOptions.WindowSizeAndPositions.MainFormTop   := Top ;
-          NempFormBuildOptions.WindowSizeAndPositions.MainFormLeft  := Left;
+          NempOptions.FormPositions[nfMain].Top   := Top ;
+          NempOptions.FormPositions[nfMain].Left  := Left;
       end;
       if Tag = 1 then
       begin
-          NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop   := Top ;
-          NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft  := Left;
+          NempOptions.FormPositions[nfMainMini].Top   := Top ;
+          NempOptions.FormPositions[nfMainMini].Left  := Left;
           // (maximized doesnt make sense in seperate-window-mode)
       end;
   end;
@@ -9035,8 +9056,8 @@ begin
     if NempSkin.NempPartyMode.Active then
         exit;
 
-    if (Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
-        SwapWindowMode(Anzeigemode + 1);
+    if (NempOptions.Anzeigemode <> ((Sender as TMenuItem).Tag mod 2)) then
+        SwapWindowMode(NempOptions.Anzeigemode + 1);
 end;
 
 procedure TNemp_MainForm.MM_O_WizardClick(Sender: TObject);
@@ -9075,7 +9096,7 @@ begin
 
         if TranslateMessageDLG(MessageString, mtInformation, [mbOK, mbCancel], 0) = mrOK then
         begin
-            if Anzeigemode = 1 then
+            if NempOptions.Anzeigemode = 1 then
             begin
                 // Set Compact Mode
                 // Party-mode in Separate-Window-Mode is not allowed.
@@ -9347,7 +9368,7 @@ begin
 end;
 procedure TNemp_MainForm.FormResize(Sender: TObject);
 begin
-    if AnzeigeMode = 1 then
+    if NempOptions.AnzeigeMode = 1 then
         SetRegion(__MainContainerPanel , self, NempRegionsDistance, handle);
 end;
 
@@ -9845,7 +9866,7 @@ end;
 procedure TNemp_MainForm.AuswahlPanelResize(Sender: TObject);
 var ExtraSpace: Integer;
 begin
-    ExtraSpace := 16 * AnzeigeMode;
+    ExtraSpace := 16 * NempOptions.AnzeigeMode;
     AuswahlFillPanel.Left := TabBtn_TagCloud.Left + TabBtn_TagCloud.Width + 6;
     AuswahlFillPanel.Width := AuswahlPanel.Width - AuswahlFillPanel.Left - ExtraSpace;
 
@@ -9859,7 +9880,6 @@ begin
     FreeAllControlStyleHooks;
     {$ENDIF}
     try
-        NempFormBuildOptions.Free;
         TagLabelList.Free;
         CoverScrollbar.WindowProc := OldScrollbarWindowProc;
         LyricsMemo.WindowProc := OldLyricMemoWindowProc;
@@ -9976,12 +9996,14 @@ begin
 end;
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_PlaylistClick(Sender: TObject);
+var newVisible: Boolean;
 begin
-  NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
-  PM_P_ViewSeparateWindows_Playlist.Checked := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
-  MM_O_ViewSeparateWindows_Playlist.Checked := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
+  newVisible := NOT NempOptions.FormPositions[nfPlaylist].Visible;
+  NempOptions.FormPositions[nfPlaylist].Visible := newVisible;
+  PM_P_ViewSeparateWindows_Playlist.Checked := newVisible;
+  MM_O_ViewSeparateWindows_Playlist.Checked := newVisible;
 
-  PlaylistForm.Visible := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
+  PlaylistForm.Visible := newVisible;
   if PlaylistForm.Visible then
   begin
       FormPosAndSizeCorrect(PlaylistForm);
@@ -9992,12 +10014,14 @@ end;
 
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_MedialistClick(Sender: TObject);
+var newVisible: Boolean;
 begin
-  NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-  PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-  MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+  newVisible := NOT NempOptions.FormPositions[nfMediaLibrary].Visible;
+  NempOptions.FormPositions[nfMediaLibrary].Visible := newVisible;
+  PM_P_ViewSeparateWindows_Medialist.Checked := newVisible;
+  MM_O_ViewSeparateWindows_Medialist.Checked := newVisible;
 
-  MedienListeForm.Visible := NempFormBuildOptions.WindowSizeAndPositions.MedienListeVisible;
+  MedienListeForm.Visible := newVisible;
   if MedienListeForm.Visible then
   begin
       FormPosAndSizeCorrect(MedienListeForm);
@@ -10008,13 +10032,14 @@ end;
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_BrowseClick(
   Sender: TObject);
+var newVisible: Boolean;
 begin
-  NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-  PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-  MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+  newVisible := NOT NempOptions.FormPositions[nfBrowse].Visible;
+  NempOptions.FormPositions[nfBrowse].Visible := newVisible;
+  PM_P_ViewSeparateWindows_Browse.Checked := newVisible;
+  MM_O_ViewSeparateWindows_Browse.Checked := newVisible;
 
-  AuswahlForm.Visible := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-
+  AuswahlForm.Visible := newVisible;
   if AuswahlForm.Visible then
   begin
       FormPosAndSizeCorrect(AuswahlForm);
@@ -10025,13 +10050,14 @@ end;
 
 procedure TNemp_MainForm.PM_P_ViewSeparateWindows_EqualizerClick(
   Sender: TObject);
+var newVisible: Boolean;
 begin
-  NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-  PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-  MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+  newVisible := NOT NempOptions.FormPositions[nfExtendedControls].Visible;
+  NempOptions.FormPositions[nfExtendedControls].Visible := newVisible;
+  PM_P_ViewSeparateWindows_Equalizer.Checked := newVisible;
+  MM_O_ViewSeparateWindows_Equalizer.Checked := newVisible;
 
-
-  ExtendedControlForm.Visible := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+  ExtendedControlForm.Visible := newVisible;
   if ExtendedControlForm.Visible then
   begin
       FormPosAndSizeCorrect(ExtendedControlForm);
@@ -10066,7 +10092,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if not assigned(NempFormBuildOptions) then
+    if not Assigned_NempFormBuildOptions then
         exit;
 
     if NempFormBuildOptions.ControlPanelTwoRows then
@@ -10104,7 +10130,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.OnMainContainerResize(Sender);
 end;
 
@@ -10113,7 +10139,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempFormBuildOptions.OnSuperContainerResize(Sender);
 end;
 
@@ -10226,7 +10252,7 @@ begin
     MM_T_ShutdownInfo.Caption := CaptionString;
     PM_P_ShutdownInfo.Caption := CaptionString;
 
-    PM_P_FormBuilder.Enabled := Nemp_MainForm.AnzeigeMode = 0;
+    PM_P_FormBuilder.Enabled := NempOptions.AnzeigeMode = 0;
 end;
 
 
@@ -10817,7 +10843,7 @@ procedure TNemp_MainForm.RepairZOrder;
 begin
   ///02.2017
 
-  if (NempOptions.MiniNempStayOnTop) AND (AnzeigeMode = 1) then
+  if (NempOptions.MiniNempStayOnTop) AND (NempOptions.AnzeigeMode = 1) then
   begin
     // Fenster in den Vordergrund setzen.
     SetWindowPos(Nemp_MainForm.Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
@@ -11086,9 +11112,11 @@ begin
   begin
     if not assigned(FDetails) then
       Application.CreateForm(TFDetails, FDetails);
+
     FDetails.ShowDetails(aAudioFile, Source);
+    fDetails.BringToFront;
     if ForeGround then
-        SetForeGroundWindow(FDetails.Handle);
+      SetForeGroundWindow(FDetails.Handle);
   end;
 end;
 
@@ -11252,12 +11280,12 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    ExtraSpace := 16 * AnzeigeMode;
+    ExtraSpace := 16 * NempOptions.AnzeigeMode;
     MedienlisteFillPanel.Left := EditFastSearch.Left + EditFastSearch.Width + 6;
     MedienlisteFillPanel.Width := MedialistPanel.Width - MedienlisteFillPanel.Left - ExtraSpace;// - 8;
     MedienListeStatusLBL.Width := MedienlisteFillPanel.Width - 16;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempSkin.SetVSTOffsets;
 end;
 
@@ -11267,12 +11295,12 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    ExtraSpace := 16 * AnzeigeMode;
+    ExtraSpace := 16 * NempOptions.AnzeigeMode;
     MedienBibDetailFillPanel.Left := TabBtn_SummaryLock.Left + TabBtn_SummaryLock.Width + 6;
     MedienBibDetailFillPanel.Width := MedienBibDetailPanel.Width - MedienBibDetailFillPanel.Left - ExtraSpace;
     MedienBibDetailStatusLbl.Width := MedienBibDetailFillPanel.Width - 16;
 
-    if assigned(NempFormBuildOptions) and ( NOT NempFormBuildOptions.HideFileOverviewPanel) then
+    if Assigned_NempFormBuildOptions and ( NOT NempFormBuildOptions.HideFileOverviewPanel) then
          NempFormBuildOptions.ResizeSubPanel(MedienBibDetailPanel, DetailCoverLyricsPanel, NempFormBuildOptions.FileOverviewCoverRatio);
 end;
 
@@ -11303,7 +11331,7 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    if not assigned(NempFormBuildOptions) then
+    if not Assigned_NempFormBuildOptions then
         exit;
 
     if MedienBibDetailPanel.Width > 0 then
@@ -11319,12 +11347,12 @@ begin
     if not FormReadyAndActivated then
         exit;
 
-    ExtraSpace := 16 * AnzeigeMode;
+    ExtraSpace := 16 * NempOptions.AnzeigeMode;
     PlaylistFillPanel.Left := EditplaylistSearch.Left + EditplaylistSearch.Width + 6;
     PlaylistFillPanel.Width := PlaylistPanel.Width - PlaylistFillPanel.Left - ExtraSpace;
     PlayListStatusLBL.Width := PlaylistFillPanel.Width - 16;
 
-    if assigned(NempFormBuildOptions) then
+    if Assigned_NempFormBuildOptions then
         NempSkin.SetPlaylistOffsets;
 end;
 
@@ -11375,7 +11403,6 @@ begin
         MedienBib.NewCoverFlow.CurrentItem := CoverScrollbar.Position;
         aCover := TNempCover(MedienBib.CoverList[CoverScrollbar.Position]);
         MedienBib.GenerateAnzeigeListeFromCoverID(aCover.key);
-
         Lbl_CoverFlow.Caption := aCover.InfoString;
     end;
 end;

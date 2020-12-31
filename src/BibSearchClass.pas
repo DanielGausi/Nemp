@@ -135,6 +135,7 @@ type
         fAccelerateLyricSearch: LongBool;
         fAccelerateSearchIncludePath: LongBool;
         fAccelerateSearchIncludeComment: LongBool;
+        fAccelerateSearchIncludeGenre: LongBool;
 
         fTotalStringLengthSetting   : Integer;  // The length of the total string, according to the curent settings
         fTotalStringLengthMinimized : Integer;  //  The length of the total string, without filenames and without comments
@@ -164,6 +165,8 @@ type
         function GetAccelerateSearchIncludePath: LongBool;
         procedure SetAccelerateSearchIncludeComment(Value: LongBool);
         function GetAccelerateSearchIncludeComment: LongBool;
+        procedure SetAccelerateSearchIncludeGenre(Value: LongBool);
+        function GetAccelerateSearchIncludeGenre: LongBool;
         function GetAccelerateLyricSearch: LongBool;
         procedure SetAccelerateLyricSearch(Value: LongBool);
 
@@ -215,6 +218,7 @@ type
         property AccelerateSearch: LongBool read GetAccelerateSearch write SetAccelerateSearch;
         property AccelerateSearchIncludePath: LongBool read GetAccelerateSearchIncludePath write SetAccelerateSearchIncludePath;
         property AccelerateSearchIncludeComment: LongBool read GetAccelerateSearchIncludeComment write SetAccelerateSearchIncludeComment;
+        property AccelerateSearchIncludeGenre: LongBool read GetAccelerateSearchIncludeGenre write SetAccelerateSearchIncludeGenre;
         property AccelerateLyricSearch: LongBool read GetAccelerateLyricSearch write SetAccelerateLyricSearch;
 
         property DummyAudioFile: TAudioFile read fDummyAudioFile;
@@ -426,6 +430,7 @@ begin
     AccelerateSearch               := Ini.ReadBool('MedienBib', 'AccelerateSearch', True);
     AccelerateSearchIncludePath    := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludePath', True);
     AccelerateSearchIncludeComment := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeComment', False);
+    AccelerateSearchIncludeGenre   := Ini.ReadBool('MedienBib', 'AccelerateSearchIncludeGenre', False);
     AccelerateLyricSearch          := Ini.ReadBool('MedienBib', 'AccelerateLyricSearch', False);
 
     QuickSearchOptions.WhileYouType       := Ini.ReadBool('MedienBib', 'QSWhileYouType', True);
@@ -438,6 +443,7 @@ begin
     Ini.WriteBool('MedienBib', 'AccelerateSearch', AccelerateSearch);
     Ini.WriteBool('MedienBib', 'AccelerateSearchIncludePath', AccelerateSearchIncludePath);
     Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeComment', AccelerateSearchIncludeComment);
+    Ini.WriteBool('MedienBib', 'AccelerateSearchIncludeGenre', AccelerateSearchIncludeGenre);
     Ini.WriteBool('MedienBib', 'AccelerateLyricSearch', AccelerateLyricSearch);
 
     Ini.WriteBool('MedienBib', 'QSWhileYouType', QuickSearchOptions.WhileYouType);
@@ -477,6 +483,14 @@ end;
 function TBibSearcher.GetAccelerateSearchIncludeComment: LongBool;
 begin
   InterLockedExchange(Integer(Result), Integer(fAccelerateSearchIncludeComment));
+end;
+procedure TBibSearcher.SetAccelerateSearchIncludeGenre(Value: LongBool);
+begin
+  InterLockedExchange(Integer(fAccelerateSearchIncludeGenre), Integer(Value));
+end;
+function TBibSearcher.GetAccelerateSearchIncludeGenre: LongBool;
+begin
+  InterLockedExchange(Integer(Result), Integer(fAccelerateSearchIncludeGenre));
 end;
 function TBibSearcher.GetAccelerateLyricSearch: LongBool;
 begin
@@ -520,6 +534,10 @@ begin
             if AccelerateSearchIncludeComment then
                 aLengthAdditional := 1 + aLengthAdditional
                                        + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Comment)));
+
+            if AccelerateSearchIncludeGenre then
+                aLengthAdditional := 1 + aLengthAdditional
+                                       + length({#1 + }Utf8Encode(AnsiLowerCase(aAudioFile.Genre)));
 
             fTotalStringLengthSetting   := fTotalStringLengthSetting + aLengthMinimal + aLengthAdditional;
             fTotalStringLengthMinimized := fTotalStringLengthMinimized + aLengthMinimal;
@@ -609,6 +627,9 @@ begin
                 if AccelerateSearchIncludeComment and BuildSettings then
                     currentAudioString := currentAudioString + #1
                                 + Utf8Encode(AnsiLowerCase(aAudioFile.Comment));
+                if AccelerateSearchIncludeGenre and BuildSettings then
+                    currentAudioString := currentAudioString + #1
+                                + Utf8Encode(AnsiLowerCase(aAudioFile.Genre));
                 currentAudioString := currentAudioString + #13#10;
 
                 if currentPos + length(currentAudioString) <= maxLength then
@@ -1462,6 +1483,7 @@ begin
         if AccelerateSearchIncludeComment
            AND (Length(UTF8SearchKeywords.Kommentar) > length(UTF8LongestKeyword)) then
             UTF8LongestKeyword := UTF8SearchKeywords.Kommentar;
+
         if length(UTF8LongestKeyword) > 1 then
         begin
             SearchMode := smQuick;

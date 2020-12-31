@@ -136,6 +136,9 @@ type
           constructor Create;
           destructor Destroy; override;
 
+          class procedure LoadSettings;
+          class procedure SaveSettings;
+
           property DrivesHaveChanged: Boolean read fGetDrivesHaveChanged;
           property ManagedDrivesCount: Integer read fGetManagedDrivesCount;
 
@@ -191,7 +194,7 @@ type
   
 implementation
 
-uses NempFileUtils, BibHelper, Nemp_RessourceStrings;
+uses NempFileUtils, BibHelper, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
 
 
 {$REGION 'TDrive, Class for handling a single Drive'}
@@ -400,6 +403,18 @@ procedure TDriveManager.Clear;
 begin
     fManagedDrives.Clear;
 end;
+
+class procedure TDriveManager.LoadSettings;
+begin
+  EnableUSBMode   := NempSettingsManager.ReadBool('Nemp Portable','EnableUSBMode'   , True);
+  EnableCloudMode := NempSettingsManager.ReadBool('Nemp Portable','EnableCloudMode' , True);
+end;
+class procedure TDriveManager.SaveSettings;
+begin
+  NempSettingsManager.WriteBool('Nemp Portable','EnableUSBMode'   , EnableUSBMode  );
+  NempSettingsManager.WriteBool('Nemp Portable','EnableCloudMode' , EnableCloudMode);
+end;
+
 
 procedure TDriveManager.LoadDrivesFromStream(aStream: TStream; DestinationList: TDriveList);
 var DriveCount, i: Integer;

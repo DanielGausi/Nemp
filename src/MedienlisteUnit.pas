@@ -47,10 +47,10 @@ uses
   ShellApi, VirtualTrees,
   Dialogs, ExtCtrls, ImgList, Nemp_ConstantsAndTypes, NempAudioFiles, Hilfsfunktionen,
   Menus,gnuGettext,
-  Nemp_RessourceStrings,  StdCtrls, Buttons, SkinButtons, NempPanel;
+  Nemp_RessourceStrings,  StdCtrls, Buttons, SkinButtons, NempPanel, BaseForms;
 
 type
-  TMedienlisteForm = class(TNempForm)
+  TMedienlisteForm = class(TNempSubForm)
     ContainerPanelMedienBibForm: TNempPanel;
     CloseImageM: TSkinButton;
     procedure FormShow(Sender: TObject);
@@ -77,12 +77,7 @@ type
     procedure FormHide(Sender: TObject);
   private
     { Private-Deklarationen }
-    DownX: Integer;
-    DownY: Integer;
-    BLeft: Integer;
-    BTop: Integer;
-    BWidth: Integer;
-    BHeight: Integer;
+
     ResizeFlag: Cardinal;
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
     Procedure WMDropFiles (Var aMsg: tMessage);  message WM_DROPFILES;
@@ -91,7 +86,6 @@ type
     // Resizing-Flag: On WMWindowPosChanging the RelativPositions must be changed
     Resizing: Boolean;
     //NempRegionsDistance: TNempRegionsDistance;
-    procedure InitForm;
 
     procedure RepaintForm;
 
@@ -106,30 +100,6 @@ uses NempMainUnit, SplitForm_Hilfsfunktionen, AuswahlUnit,
   PlaylistUnit, MessageHelper, ExtendedControlsUnit;
 
 {$R *.dfm}
-
-procedure TMedienlisteForm.InitForm;
-begin
-  TranslateComponent (self);
-  DragAcceptFiles (Handle, True);
-  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteTop;
-  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteLeft;
-  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteHeight;
-  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteWidth;
-
-  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteTop;
-  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteLeft;
-  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteHeight;
-  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteWidth;
-
-  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MedienlisteDocked;
-  //NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormLeft;
-  //NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempOptions.NempFormAufteilung[1].FormTop;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
-
-  Caption := NEMP_CAPTION;
-end;
-
 
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
@@ -230,9 +200,9 @@ procedure TMedienlisteForm.CloseImageMClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin
-    NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible := False;
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+    NempOptions.FormPositions[fNempFormID].Visible := False;
+    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

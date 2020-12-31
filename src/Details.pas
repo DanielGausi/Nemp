@@ -36,6 +36,8 @@ unit Details;
 
 interface
 
+{$I xe.inc}
+
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms, Contnrs,
   Dialogs, NempAudioFiles, StdCtrls, ExtCtrls, StrUtils, JPEG, PNGImage,
@@ -46,7 +48,7 @@ uses
 
   CoverHelper, Buttons, ExtDlgs, ImgList,  Hilfsfunktionen, Systemhelper, HtmlHelper,
   Nemp_ConstantsAndTypes, gnuGettext, Lyrics, TagClouds,
-  Nemp_RessourceStrings, Menus, RatingCtrls, Spin, VirtualTrees, Vcl.Themes;
+  Nemp_RessourceStrings, Menus, RatingCtrls, Spin, VirtualTrees, Vcl.Themes, vcl.styles;
 
 type
 
@@ -117,7 +119,6 @@ type
     LblConst_Duration: TLabel;
     LblDuration: TLabel;
     GrpBox_TextFrames: TGroupBox;
-    VST_MetaData: TVirtualStringTree;
     CoverLibrary1: TImage;
     Btn_NewMetaFrame: TButton;
     BtnCopyFromV1: TButton;
@@ -218,6 +219,7 @@ type
     BtnRefreshCoverflow: TButton;
     rgChangeCoverArt: TRadioGroup;
     cbFrameTypeSelection: TComboBox;
+    VST_MetaData: TVirtualStringTree;
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -321,6 +323,8 @@ type
     procedure BtnRefreshCoverflowClick(Sender: TObject);
     procedure VST_MetaDataCompareNodes(Sender: TBaseVirtualTree; Node1,
       Node2: PVirtualNode; Column: TColumnIndex; var Result: Integer);
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
 
   private
     Coverpfade : TStringList;
@@ -541,8 +545,8 @@ end;
 
 procedure TFDetails.FormShow(Sender: TObject);
 begin
-    MainPageControl.ActivePageIndex := 0;
-    MainPageControl.ActivePage := Tab_General;
+//    MainPageControl.ActivePageIndex := 0;
+//    MainPageControl.ActivePage := Tab_General;
     BuildGetLyricButtonHint;
     // refresh;
 end;
@@ -1172,7 +1176,7 @@ begin
     if Nemp_MainForm.NempSkin.isActive
         and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
         and Nemp_MainForm.NempSkin.UseAdvancedSkin
-        and Nemp_MainForm.GlobalUseAdvancedSkin
+        and NempOptions.GlobalUseAdvancedSkin
     then
         BaseDir := Nemp_MainForm.NempSkin.Path + '\'
     else
@@ -2348,6 +2352,7 @@ begin
         TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clWindowText)
     else
         TargetCanvas.Font.Color := TStyleManager.ActiveStyle.GetSystemColor(clGrayText);
+
 end;
 
 procedure TFDetails.ShowMetaDataFrames;
@@ -3019,7 +3024,7 @@ begin
 
             at_CDDA: begin
                 ClearCDDBCache;
-                if Nemp_MainForm.NempOptions.UseCDDB then
+                if NempOptions.UseCDDB then
                     CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, gad_CDDB)
                 else
                     CurrentAudioFile.GetAudioData(CurrentAudioFile.Pfad, 0);
@@ -3603,6 +3608,12 @@ begin
         ShellExecute(Handle, 'open', PChar(TCoverArtSearcher.Savepath + currentAudioFile.CoverID + '.jpg'), nil, nil, SW_SHOWNORMAl);
 end;
 
+
+procedure TFDetails.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.WndParent := Application.Handle;
+end;
 
 {
     --------------------------------------------------------

@@ -308,7 +308,7 @@ end;
 
 procedure TMainFormBuilder.FormShow(Sender: TObject);
 begin
-    LocalBuildOptions.Assign(Nemp_MainForm.NempFormBuildOptions);
+    LocalBuildOptions.Assign(NempFormBuildOptions);
     FixAllButtons;
     FixSettingsGUI;
 end;
@@ -318,7 +318,7 @@ end;
 
 procedure TMainFormBuilder.BtnUndoClick(Sender: TObject);
 begin
-    LocalBuildOptions.Assign(Nemp_MainForm.NempFormBuildOptions);
+    LocalBuildOptions.Assign(NempFormBuildOptions);
     FixAllButtons;
     FixSettingsGUI;
 end;
@@ -334,16 +334,16 @@ end;
 
 procedure TMainFormBuilder.BtnApplyClick(Sender: TObject);
 begin
-    if Nemp_MainForm.AnzeigeMode = 1 then
+    if NempOptions.AnzeigeMode = 1 then
     begin
         TranslateMessageDLG(FormBuilder_SeparateWindowWarning, mtWarning, [MBOK], 0);
     end else
     begin
         LockWindowUpdate(Nemp_MainForm.Handle);
 
-        Nemp_MainForm.NempFormBuildOptions.BeginUpdate;
-        Nemp_MainForm.NempFormBuildOptions.assign (LocalBuildOptions);
-        Nemp_MainForm.NempFormBuildOptions.EndUpdate;
+        NempFormBuildOptions.BeginUpdate;
+        NempFormBuildOptions.assign (LocalBuildOptions);
+        NempFormBuildOptions.EndUpdate;
 
         LockWindowUpdate(0);
 

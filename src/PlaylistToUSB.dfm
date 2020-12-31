@@ -4,7 +4,7 @@ object PlaylistCopyForm: TPlaylistCopyForm
   BorderStyle = bsSingle
   Caption = 'Nemp: Copy playlist to USB'
   ClientHeight = 388
-  ClientWidth = 419
+  ClientWidth = 415
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,38 +17,51 @@ object PlaylistCopyForm: TPlaylistCopyForm
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
+  DesignSize = (
+    415
+    388)
   PixelsPerInch = 96
   TextHeight = 13
   object BtnCopyFiles: TButton
-    Left = 301
-    Top = 351
+    AlignWithMargins = True
+    Left = 300
+    Top = 350
     Width = 107
     Height = 25
     Hint = 'Start copying the files into the specified directory'
+    Anchors = [akRight, akBottom]
     Caption = 'Copy files'
     ParentShowHint = False
     ShowHint = True
     TabOrder = 0
     OnClick = BtnCopyFilesClick
+    ExplicitLeft = 304
   end
   object cbCloseWindow: TCheckBox
-    Left = 24
-    Top = 327
-    Width = 241
+    AlignWithMargins = True
+    Left = 8
+    Top = 322
+    Width = 374
     Height = 17
     Hint = 'Close this window when the copy process is completed'
+    Anchors = [akLeft, akTop, akRight]
     Caption = 'Close this window after copying'
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
   end
   object GrpboxSettings: TGroupBox
-    Left = 8
-    Top = 8
-    Width = 400
+    AlignWithMargins = True
+    Left = 3
+    Top = 3
+    Width = 409
     Height = 185
+    Align = alTop
     Caption = 'Settings'
     TabOrder = 2
+    ExplicitLeft = 8
+    ExplicitTop = 8
+    ExplicitWidth = 403
     object LblRenameSetting: TLabel
       Left = 16
       Top = 65
@@ -74,17 +87,15 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Width = 265
       Height = 21
       Hint = 'Choose how the files should be renamed'
-      Style = csDropDownList
-      ItemIndex = 3
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      Text = '<No.> - <Artist> - <Title>'
+      Text = '<index> - <filename>'
       Items.Strings = (
-        'Do not rename files'
-        '<No.> - <Original filename>'
-        '<Artist> - <Title>'
-        '<No.> - <Artist> - <Title>')
+        '<filename>'
+        '<index> - <filename>'
+        '<index> - <artist> - <title>'
+        '<index> - <artist> - <title> - (<album>)')
     end
     object EditDirectory: TLabeledEdit
       Left = 16
@@ -139,12 +150,17 @@ object PlaylistCopyForm: TPlaylistCopyForm
     end
   end
   object GrpboxStatus: TGroupBox
-    Left = 8
-    Top = 199
-    Width = 400
+    AlignWithMargins = True
+    Left = 3
+    Top = 194
+    Width = 409
     Height = 122
+    Align = alTop
     Caption = 'Status'
     TabOrder = 3
+    ExplicitLeft = 8
+    ExplicitTop = 199
+    ExplicitWidth = 403
     object LblProgressFile: TLabel
       Left = 18
       Top = 20
@@ -173,5 +189,16 @@ object PlaylistCopyForm: TPlaylistCopyForm
       Height = 17
       TabOrder = 1
     end
+  end
+  object BtnClose: TButton
+    Left = 194
+    Top = 350
+    Width = 87
+    Height = 25
+    Anchors = [akRight, akBottom]
+    Caption = 'Close'
+    TabOrder = 4
+    OnClick = BtnCloseClick
+    ExplicitLeft = 198
   end
 end

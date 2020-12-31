@@ -161,10 +161,10 @@ uses NempMainUnit, Nemp_ConstantsAndTypes, SystemHelper, Nemp_RessourceStrings,
 
 procedure RunWizard;
 begin
-    if Nemp_MainForm.NempOptions.LastKnownVersion < WIZ_CURRENT_VERSION then
+    if NempOptions.LastKnownVersion < WIZ_CURRENT_VERSION then
     begin
         // Show Wizard only if Writeaccess is possible (i.e. dont show it everytime when starting from CD/DVD)
-        if Nemp_MainForm.NempOptions.WriteAccessPossible then
+        if NempSettingsManager.WriteAccessPossible then
         begin
             if not assigned(Wizard) then
                 Application.CreateForm(TWizard, Wizard);
@@ -172,16 +172,16 @@ begin
         end;
     end;
 
-    if Nemp_MainForm.NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION then
+    if NempOptions.LastKnownVersion < WIZ_CURRENT_SKINVERSION then
     begin
-        if (Nemp_MainForm.SkinName <> '<public> Dark') and  Nemp_MainForm.NempOptions.WriteAccessPossible then
+        if (NempOptions.SkinName <> '<public> Dark') and  NempSettingsManager.WriteAccessPossible then
         begin
           if TranslateMessageDLG((Wizard_NewSkin), mtInformation, [MBYES, MBNO], 0) = mrYES then
           begin
-              Nemp_MainForm.UseSkin := True;
-              Nemp_MainForm.SkinName := '<public> Dark';
+              NempOptions.UseSkin := True;
+              NempOptions.SkinName := '<public> Dark';
               Nemp_MainForm.ActivateSkin(ExtractFilePath(ParamStr(0)) + 'Skins\Dark');
-              SetSkinRadioBox(Nemp_MainForm.SkinName);
+              SetSkinRadioBox(NempOptions.SkinName);
           end;
         end;
     end;
@@ -353,7 +353,7 @@ begin
         NempUpdater.LastCheck := 0;
     end;
 
-    Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := Answers.MetaData;
+    NempOptions.AllowQuickAccessToMetadata  := Answers.MetaData;
     NempPlayer.PostProcessor.WriteToFiles                 := Answers.MetaData;
 
     NempPlayer.PostProcessor.Active := Answers.Rating;

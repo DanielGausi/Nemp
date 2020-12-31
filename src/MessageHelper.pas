@@ -630,7 +630,6 @@ begin
 
         MB_SetWin7TaskbarProgress: begin
             NempTaskbarManager.ProgressState := TTaskBarProgressState(aMsg.LParam);
-            Caption := Inttostr(Random(1000));
         end;
 
         MB_ProgressRefreshJustProgressbar: begin
@@ -705,7 +704,7 @@ begin
         end;
 
         MB_StartLongerProcess: begin
-                              ProgressFormLibrary.InitiateProcess(True, TProgressActions(aMsg.LParam));
+                              ProgressFormLibrary.InitiateProcess(True, TEProgressActions(aMsg.LParam));
         end;
 
         MB_StartAutoScanDirs: begin
@@ -1597,6 +1596,19 @@ begin
                           end;
                       end;
                  end;
+
+    WM_PrepareNextFile: begin
+      NempPlaylist.PreparePlayNext;
+      RefreshPaintFrameHint(True);
+      NempPlayer.StartPauseBetweenTracksTimer;
+    end;
+
+    WM_PlayerDelayedPlayNext: NempPlayer.ProgressDelayedPlayNext;
+
+    WM_PlayerDelayCompleted: begin
+      RefreshPaintFrameHint(False);
+    end;
+
     WM_StopPlaylist : begin
                         StopBTNIMGClick(Nil);
                       end;
@@ -1740,6 +1752,8 @@ begin
     end;
 
     WM_PlayerAcceptInput: NempPlaylist.AcceptInput := True;
+
+
 
     // wird in der BirthdayShowForm initialisiert
     WM_COUNTDOWN_FINISH: NempPlayer.PlayBirthday;

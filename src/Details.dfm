@@ -1,19 +1,18 @@
 object FDetails: TFDetails
   Left = 220
   Top = 125
-  BorderStyle = bsDialog
   Caption = 'File properties'
-  ClientHeight = 542
-  ClientWidth = 621
+  ClientHeight = 532
+  ClientWidth = 611
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  KeyPreview = True
   OldCreateOrder = False
   Position = poDesigned
+  ShowHint = True
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -25,12 +24,10 @@ object FDetails: TFDetails
     AlignWithMargins = True
     Left = 3
     Top = 3
-    Width = 615
-    Height = 500
-    ActivePage = Tab_Lyrics
+    Width = 605
+    Height = 490
+    ActivePage = Tab_General
     Align = alClient
-    DoubleBuffered = False
-    ParentDoubleBuffered = False
     TabOrder = 0
     OnChange = MainPageControlChange
     OnChanging = MainPageControlChanging
@@ -38,14 +35,10 @@ object FDetails: TFDetails
       Caption = 'Summary'
       DoubleBuffered = False
       ParentDoubleBuffered = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GrpBox_File: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
+        Width = 597
         Height = 169
         Align = alTop
         Caption = 'File'
@@ -53,7 +46,7 @@ object FDetails: TFDetails
         ParentColor = False
         TabOrder = 0
         DesignSize = (
-          607
+          597
           169)
         object LBLName: TLabel
           Left = 103
@@ -242,13 +235,14 @@ object FDetails: TFDetails
         end
         object CoverLibrary1: TImage
           AlignWithMargins = True
-          Left = 449
+          Left = 439
           Top = 13
           Width = 150
           Height = 150
           Anchors = [akTop, akRight]
           Center = True
           OnDblClick = CoverIMAGEDblClick
+          ExplicitLeft = 449
         end
         object Btn_Explore: TButton
           Left = 16
@@ -358,8 +352,8 @@ object FDetails: TFDetails
       object PnlLibraryMetadata: TPanel
         Left = 0
         Top = 169
-        Width = 607
-        Height = 303
+        Width = 597
+        Height = 293
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -367,7 +361,7 @@ object FDetails: TFDetails
           Left = 0
           Top = 0
           Width = 409
-          Height = 303
+          Height = 293
           Align = alLeft
           Caption = 'Metadata'
           DoubleBuffered = False
@@ -705,19 +699,19 @@ object FDetails: TFDetails
         object GrpBox_TagCloud: TGroupBox
           Left = 409
           Top = 0
-          Width = 198
-          Height = 303
+          Width = 188
+          Height = 293
           Align = alClient
           Caption = 'Tag cloud'
           TabOrder = 1
           DesignSize = (
-            198
-            303)
+            188
+            293)
           object lb_Tags: TListBox
             AlignWithMargins = True
             Left = 8
             Top = 24
-            Width = 179
+            Width = 183
             Height = 206
             Anchors = [akLeft, akTop, akRight]
             ItemHeight = 13
@@ -727,7 +721,7 @@ object FDetails: TFDetails
           end
           object Btn_GetTagsLastFM: TButton
             AlignWithMargins = True
-            Left = 102
+            Left = 92
             Top = 236
             Width = 85
             Height = 25
@@ -754,7 +748,7 @@ object FDetails: TFDetails
             AlignWithMargins = True
             Left = 8
             Top = 265
-            Width = 179
+            Width = 183
             Height = 25
             Hint = 'Open tag cloud editor'
             Anchors = [akLeft, akTop, akRight]
@@ -770,21 +764,22 @@ object FDetails: TFDetails
       ImageIndex = 2
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 0
+      ExplicitWidth = 398
       ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
-        Height = 472
+        Width = 597
+        Height = 462
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
+        ExplicitWidth = 398
         DesignSize = (
-          607
-          472)
+          597
+          462)
         object Btn_DeleteLyricFrame: TButton
-          Left = 451
+          Left = 441
           Top = 168
           Width = 144
           Height = 25
@@ -793,9 +788,10 @@ object FDetails: TFDetails
           Enabled = False
           TabOrder = 4
           OnClick = Btn_DeleteLyricFrameClick
+          ExplicitLeft = 242
         end
         object BtnLyricWiki: TButton
-          Left = 451
+          Left = 441
           Top = 22
           Width = 144
           Height = 25
@@ -805,9 +801,10 @@ object FDetails: TFDetails
           ShowHint = True
           TabOrder = 1
           OnClick = BtnLyricWikiClick
+          ExplicitLeft = 242
         end
         object BtnLyricWikiManual: TButton
-          Left = 451
+          Left = 441
           Top = 108
           Width = 144
           Height = 25
@@ -815,13 +812,14 @@ object FDetails: TFDetails
           Caption = 'Manual search'
           TabOrder = 3
           OnClick = BtnLyricWikiManualClick
+          ExplicitLeft = 242
         end
         object Memo_Lyrics: TMemo
           AlignWithMargins = True
           Left = 8
           Top = 24
-          Width = 437
-          Height = 434
+          Width = 427
+          Height = 424
           Anchors = [akLeft, akTop, akRight, akBottom]
           Enabled = False
           ReadOnly = True
@@ -829,9 +827,10 @@ object FDetails: TFDetails
           TabOrder = 0
           OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
+          ExplicitWidth = 228
         end
         object cbLyricOptions: TComboBox
-          Left = 451
+          Left = 441
           Top = 81
           Width = 144
           Height = 21
@@ -851,63 +850,69 @@ object FDetails: TFDetails
       ImageIndex = 3
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 0
+      ExplicitWidth = 398
       ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
         Top = 3
-        Width = 333
-        Height = 466
+        Width = 323
+        Height = 456
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 124
         object gpBoxCurrentSelection: TGroupBox
           Left = 0
           Top = 159
-          Width = 333
-          Height = 307
+          Width = 323
+          Height = 297
           Align = alClient
           Caption = 'Current selection'
           TabOrder = 1
+          ExplicitWidth = 124
           DesignSize = (
-            333
-            307)
+            323
+            297)
           object ImgCurrentSelection: TImage
             Left = 16
             Top = 24
-            Width = 299
-            Height = 265
+            Width = 289
+            Height = 255
             Anchors = [akLeft, akTop, akRight, akBottom]
             Center = True
             Proportional = True
             Stretch = True
+            ExplicitWidth = 299
+            ExplicitHeight = 265
           end
         end
         object PanelCoverArtSelection: TPanel
           Left = 0
           Top = 0
-          Width = 333
+          Width = 323
           Height = 159
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 124
           object GrpBox_Cover: TGroupBox
             Left = 167
             Top = 0
-            Width = 166
+            Width = 156
             Height = 159
             Align = alClient
             Caption = 'Existing cover art (Files)'
             TabOrder = 1
+            ExplicitWidth = 29
             DesignSize = (
-              166
+              156
               159)
             object Btn_OpenImage: TButton
               AlignWithMargins = True
               Left = 8
               Top = 51
-              Width = 150
+              Width = 140
               Height = 25
               Hint = 'Open the image with the default image viewer'
               Anchors = [akLeft, akTop, akRight]
@@ -916,12 +921,13 @@ object FDetails: TFDetails
               ShowHint = True
               TabOrder = 1
               OnClick = Btn_OpenImageClick
+              ExplicitWidth = 13
             end
             object cbCoverArtFiles: TComboBox
               AlignWithMargins = True
               Left = 8
               Top = 24
-              Width = 150
+              Width = 140
               Height = 21
               AutoComplete = False
               Style = csDropDownList
@@ -996,16 +1002,17 @@ object FDetails: TFDetails
       end
       object GrpBox_CoverLibrary: TGroupBox
         AlignWithMargins = True
-        Left = 342
+        Left = 332
         Top = 3
         Width = 262
-        Height = 466
+        Height = 456
         Align = alRight
         Caption = 'Cover art (Media library)'
         TabOrder = 1
+        ExplicitLeft = 133
         DesignSize = (
           262
-          466)
+          456)
         object CoverLibrary2: TImage
           AlignWithMargins = True
           Left = 8
@@ -1069,7 +1076,7 @@ object FDetails: TFDetails
           Left = 8
           Top = 363
           Width = 241
-          Height = 94
+          Height = 84
           Anchors = [akLeft, akTop, akRight, akBottom]
           Caption = 'Update cover art ...'
           ItemIndex = 0
@@ -1086,33 +1093,76 @@ object FDetails: TFDetails
       ImageIndex = 1
       ExplicitLeft = 0
       ExplicitTop = 0
-      ExplicitWidth = 0
+      ExplicitWidth = 398
       ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
-        Width = 607
-        Height = 283
+        Width = 597
+        Height = 273
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
+        ExplicitWidth = 398
         DesignSize = (
-          607
-          283)
-        object VST_MetaData: TVirtualStringTree
+          597
+          273)
+        object Btn_NewMetaFrame: TButton
           AlignWithMargins = True
+          Left = 455
+          Top = 16
+          Width = 130
+          Height = 25
+          Anchors = [akTop, akRight]
+          Caption = 'New frame'
+          TabOrder = 0
+          OnClick = Btn_NewMetaFrameClick
+          ExplicitLeft = 256
+        end
+        object BtnCopyFromV1: TButton
+          Left = 455
+          Top = 237
+          Width = 130
+          Height = 25
+          Hint = 'Copy data from the ID3v1-Tag'
+          Anchors = [akRight, akBottom]
+          Caption = 'Copy from ID3 v1'
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+          OnClick = BtnCopyFromV1Click
+          ExplicitLeft = 256
+        end
+        object cbFrameTypeSelection: TComboBox
+          AlignWithMargins = True
+          Left = 455
+          Top = 47
+          Width = 130
+          Height = 21
+          Style = csDropDownList
+          Anchors = [akTop, akRight]
+          ItemIndex = 0
+          TabOrder = 2
+          Text = 'ID3v2-Frame'
+          Items.Strings = (
+            'ID3v2-Frame'
+            'Apev2-Frame')
+        end
+        object VST_MetaData: TVirtualStringTree
           Left = 8
           Top = 16
           Width = 434
-          Height = 256
+          Height = 252
           Anchors = [akLeft, akTop, akBottom]
+          BorderStyle = bsNone
+          BorderWidth = 1
           Header.AutoSizeIndex = 0
           Header.MainColumn = 3
-          Header.Options = [hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible]
+          Header.Options = [hoColumnResize, hoDrag, hoVisible]
           Indent = 0
-          TabOrder = 0
+          TabOrder = 3
           TreeOptions.MiscOptions = [toAcceptOLEDrop, toEditable, toFullRepaintOnResize, toGridExtensions, toInitOnSave, toWheelPanning, toEditOnClick, toEditOnDblClick]
-          TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages]
+          TreeOptions.PaintOptions = [toShowBackground, toShowRoot, toThemeAware, toUseBlendedImages]
           TreeOptions.SelectionOptions = [toFullRowSelect]
           OnCompareNodes = VST_MetaDataCompareNodes
           OnEditing = VST_MetaDataEditing
@@ -1144,54 +1194,16 @@ object FDetails: TFDetails
               WideText = 'Value'
             end>
         end
-        object Btn_NewMetaFrame: TButton
-          AlignWithMargins = True
-          Left = 465
-          Top = 16
-          Width = 130
-          Height = 25
-          Anchors = [akTop, akRight]
-          Caption = 'New frame'
-          TabOrder = 1
-          OnClick = Btn_NewMetaFrameClick
-        end
-        object BtnCopyFromV1: TButton
-          Left = 465
-          Top = 247
-          Width = 130
-          Height = 25
-          Hint = 'Copy data from the ID3v1-Tag'
-          Anchors = [akRight, akBottom]
-          Caption = 'Copy from ID3 v1'
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 2
-          OnClick = BtnCopyFromV1Click
-        end
-        object cbFrameTypeSelection: TComboBox
-          AlignWithMargins = True
-          Left = 465
-          Top = 47
-          Width = 130
-          Height = 21
-          Style = csDropDownList
-          Anchors = [akTop, akRight]
-          ItemIndex = 0
-          TabOrder = 3
-          Text = 'ID3v2-Frame'
-          Items.Strings = (
-            'ID3v2-Frame'
-            'Apev2-Frame')
-        end
       end
       object Pnl_ID3v1_MPEG: TPanel
         Left = 0
-        Top = 283
-        Width = 607
+        Top = 273
+        Width = 597
         Height = 189
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitWidth = 398
         object GrpBox_ID3v1: TGroupBox
           Left = 0
           Top = 0
@@ -1202,7 +1214,7 @@ object FDetails: TFDetails
           TabOrder = 0
           object LblConst_ID3v1Artist: TLabel
             Left = 8
-            Top = 19
+            Top = 17
             Width = 83
             Height = 13
             Alignment = taRightJustify
@@ -1401,13 +1413,14 @@ object FDetails: TFDetails
           end
         end
         object GrpBox_Mpeg: TGroupBox
-          Left = 369
+          Left = 359
           Top = 0
           Width = 238
           Height = 189
           Align = alRight
           Caption = 'MPEG'
           TabOrder = 1
+          ExplicitLeft = 160
           object LblConst_MpegBitrate: TLabel
             Left = 8
             Top = 48
@@ -1675,17 +1688,17 @@ object FDetails: TFDetails
   object Panel1: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 509
-    Width = 615
+    Top = 499
+    Width = 605
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      615
+      605
       30)
     object Btn_Close: TButton
-      Left = 370
+      Left = 360
       Top = 0
       Width = 75
       Height = 25
@@ -1696,7 +1709,7 @@ object FDetails: TFDetails
       OnClick = Btn_CloseClick
     end
     object BtnUndo: TButton
-      Left = 451
+      Left = 441
       Top = 0
       Width = 75
       Height = 25
@@ -1706,7 +1719,7 @@ object FDetails: TFDetails
       OnClick = BtnUndoClick
     end
     object BtnApply: TButton
-      Left = 532
+      Left = 522
       Top = 0
       Width = 75
       Height = 25

@@ -62,7 +62,7 @@ var
 
 implementation
 
-uses NempMainUnit, MainFormHelper, ReplayGain, gnugettext, Nemp_RessourceStrings;
+uses NempMainUnit, MainFormHelper, ReplayGain, gnugettext, Nemp_RessourceStrings, Nemp_ConstantsAndTypes;
 
 {$R *.dfm}
 
@@ -97,7 +97,7 @@ end;
 procedure TReplayGainProgressForm.cbAutoCloseClick(Sender: TObject);
 begin
     // if actual User-Input: Overwrite autoclose
-    Nemp_MainForm.NempOptions.AutoCloseProgressWindow := cbAutoClose.Checked;
+    NempOptions.AutoCloseProgressWindow := cbAutoClose.Checked;
     self.AutoClose := cbAutoClose.Checked;
     // deactivate Timer
     CloseTimer.Enabled := False;
@@ -134,7 +134,7 @@ begin
     Left := MainMonitor.WorkareaRect.Right - width;
 
     cbAutoClose.OnClick := Nil;
-    self.cbAutoClose.Checked := Nemp_MainForm.NempOptions.AutoCloseProgressWindow or AutoClose;
+    self.cbAutoClose.Checked := NempOptions.AutoCloseProgressWindow or AutoClose;
     cbAutoClose.OnClick := cbAutoCloseClick;
 
     LblMain.Caption := Progressform_ReplayGain;

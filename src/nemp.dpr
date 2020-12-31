@@ -125,7 +125,9 @@ uses
   RedeemerInheritablePNG in '3rd Party Units\RedeemerInheritablePNG.pas',
   RedeemerQR in '3rd Party Units\RedeemerQR.pas',
   WebQRCodes in 'WebQRCodes.pas' {WebServerQRForm},
-  AudioDisplayUtils in 'AudioDisplayUtils.pas';
+  AudioDisplayUtils in 'AudioDisplayUtils.pas',
+  BaseForms in 'BaseForms.pas',
+  DuplicateFilesDialogs in 'DuplicateFilesDialogs.pas' {DuplicateFilesDialog};
 
 {$R *.res}
 
@@ -166,7 +168,7 @@ begin
     Application.CreateForm(TMedienlisteForm, MedienlisteForm);
     Application.CreateForm(TExtendedControlForm, ExtendedControlForm);
 
-    Application.CreateForm(TFDetails, FDetails);
+
 
 
     StuffToDoAfterCreate ;
@@ -181,7 +183,7 @@ begin
     // for some reasons, there are some controls "unpainted" on startup on some skins
     Nemp_MainForm.RepaintAll;
 
-    if (Nemp_MainForm.NempOptions.StartMinimized) or (Nemp_MainForm.NempOptions.StartMinimizedByParameter) then
+    if (NempOptions.StartMinimized) or (NempOptions.StartMinimizedByParameter) then
     begin
         // DAS HIER DIENT DEM VERSTECKEN, NICHT DEM ANZEIGEN
        PostMessage(FOwnMessageHandler, WM_Command, COMMAND_RESTORE, 0);

@@ -50,7 +50,7 @@ const MAXDRIVES = 10; // maximum number of drives
 
 implementation
 
-uses Nemp_RessourceStrings, NempMainUnit, Hilfsfunktionen, AudioDisplayUtils;
+uses Nemp_RessourceStrings, Nemp_ConstantsAndTypes, NempMainUnit, Hilfsfunktionen, AudioDisplayUtils;
 
 {$R *.dfm}
 
@@ -73,7 +73,7 @@ end;
 procedure TCDOpenDialog.FormShow(Sender: TObject);
 begin
     cb_AutoCddb.OnClick := Nil;
-    cb_AutoCddb.checked := Nemp_MainForm.NempOptions.UseCDDB;
+    cb_AutoCddb.checked := NempOptions.UseCDDB;
     cb_AutoCddb.OnClick := cb_AutoCddbClick;
     // Get list of available drives
     EnsureDriveListIsFilled;     // from cddaUtils
@@ -196,7 +196,7 @@ begin
         if lbTracks.Selected[i] or (cbInsertMode.ItemIndex = 0) then
             Files.Add(localAudioFiles[i].Pfad);
 
-    Nemp_MainForm.NempOptions.UseCDDB := cb_AutoCddb.checked;
+    NempOptions.UseCDDB := cb_AutoCddb.checked;
 end;
 
 end.

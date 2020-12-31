@@ -53,8 +53,8 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               property PlayIndex           : Integer  read fPlayIndex           write fPlayIndex          ;
               property PlayPositionInTrack : Integer  read fPlayPositionInTrack write fPlayPositionInTrack;
 
-              procedure ReadFromIni(aIni: TMemIniFile; aListIndex: Integer);
-              procedure WriteToIni(aIni: TMemIniFile; aListIndex: Integer);
+              procedure LoadSettings(aListIndex: Integer);
+              procedure SaveSettings(aListIndex: Integer);
         end;
 
         TQuickLoadPlaylistCollection= class(TObjectList<TQuickLoadPlaylist>);
@@ -159,8 +159,8 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
               function PreparePlaylistLoading(newPlaylistIndex: Integer; aOldPlaylist: TAudioFileList; aIndex, aTrackPos: Integer): Boolean;
               function PrepareSamePlaylistLoading(aOldPlaylist: TAudioFileList; aFilename: String; aTrackPos: Integer): Boolean;
 
-              procedure ReadFromIni(aIni: TMemIniFile);
-              procedure WriteToIni(aIni: TMemIniFile);
+              procedure LoadSettings;
+              procedure SaveSettings;
 
               function AddNewPlaylist(aDescription, aFilename: String; aSource: TAudioFileList; RefreshGUI: Boolean): TQuickLoadPlaylist;
               procedure SwitchToPlaylist(aQuickLoadPlaylist: TQuickLoadPlaylist);
@@ -178,25 +178,24 @@ uses Windows, SysUtils, Classes, StrUtils, System.Contnrs, System.UITypes, IniFi
 
 implementation
 
-uses AudioFileHelper, Nemp_RessourceStrings, gnuGetText;
+uses AudioFileHelper, Nemp_RessourceStrings, gnuGetText, Nemp_ConstantsAndTypes;
 
 { TQuickLoadPlaylist }
 
-procedure TQuickLoadPlaylist.ReadFromIni(aIni: TMemIniFile;
-  aListIndex: Integer);
+procedure TQuickLoadPlaylist.LoadSettings(aListIndex: Integer);
 begin
-    description := aIni.ReadString('PlaylistManager', 'Description' + IntToStr(aListIndex), 'Playlist' + IntToStr(aListIndex));
-    Filename    := aIni.ReadString('PlaylistManager', 'Filename' + IntToStr(aListIndex), '');
-    PlayIndex           := aIni.ReadInteger('PlaylistManager', 'PlayIndex' + IntToStr(aListIndex)          , 0);
-    PlayPositionInTrack := aIni.ReadInteger('PlaylistManager', 'PlayPositionInTrack' + IntToStr(aListIndex), 0);
+    description := NempSettingsManager.ReadString('PlaylistManager', 'Description' + IntToStr(aListIndex), 'Playlist' + IntToStr(aListIndex));
+    Filename    := NempSettingsManager.ReadString('PlaylistManager', 'Filename' + IntToStr(aListIndex), '');
+    PlayIndex           := NempSettingsManager.ReadInteger('PlaylistManager', 'PlayIndex' + IntToStr(aListIndex)          , 0);
+    PlayPositionInTrack := NempSettingsManager.ReadInteger('PlaylistManager', 'PlayPositionInTrack' + IntToStr(aListIndex), 0);
 end;
 
-procedure TQuickLoadPlaylist.WriteToIni(aIni: TMemIniFile; aListIndex: Integer);
+procedure TQuickLoadPlaylist.SaveSettings(aListIndex: Integer);
 begin
-    aIni.WriteString('PlaylistManager', 'Description' + IntToStr(aListIndex), Description );
-    aIni.WriteString('PlaylistManager', 'Filename'    + IntToStr(aListIndex), Filename    );
-    aIni.WriteInteger('PlaylistManager', 'PlayIndex' + IntToStr(aListIndex)          , PlayIndex           );
-    aIni.WriteInteger('PlaylistManager', 'PlayPositionInTrack' + IntToStr(aListIndex), PlayPositionInTrack );
+    NempSettingsManager.WriteString('PlaylistManager', 'Description' + IntToStr(aListIndex), Description );
+    NempSettingsManager.WriteString('PlaylistManager', 'Filename'    + IntToStr(aListIndex), Filename    );
+    NempSettingsManager.WriteInteger('PlaylistManager', 'PlayIndex' + IntToStr(aListIndex)          , PlayIndex           );
+    NempSettingsManager.WriteInteger('PlaylistManager', 'PlayPositionInTrack' + IntToStr(aListIndex), PlayPositionInTrack );
 end;
 
 
@@ -281,21 +280,21 @@ end;
 ///  -----------
 ///  Read/Write settings from the IniFile
 ///  This includes all QuickLoadPlaylists, including their PlayIndex/Trackpos
-procedure TPlaylistManager.ReadFromIni(aIni: TMemIniFile);
+procedure TPlaylistManager.LoadSettings;
 var ManagerCount, i: Integer;
     newQuickLoadPlaylist: TQuickLoadPlaylist;
     tmpString: String;
 begin
     fQuickLoadPlaylists.Clear;
-    fStartIndex := aIni.ReadInteger('PlaylistManager', 'CurrentIndex', -1);
-    fAutoSaveOnPlaylistChange  := aIni.ReadBool('PlaylistManager', 'AutoSaveOnPlaylistChange' , False );
-    fUserInputOnPlaylistChange := aIni.ReadBool('PlaylistManager', 'UserInputOnPlaylistChange', True  );
+    fStartIndex := NempSettingsManager.ReadInteger('PlaylistManager', 'CurrentIndex', -1);
+    fAutoSaveOnPlaylistChange  := NempSettingsManager.ReadBool('PlaylistManager', 'AutoSaveOnPlaylistChange' , False );
+    fUserInputOnPlaylistChange := NempSettingsManager.ReadBool('PlaylistManager', 'UserInputOnPlaylistChange', True  );
 
-    ManagerCount := aIni.ReadInteger('PlaylistManager', 'Count', 0);
+    ManagerCount := NempSettingsManager.ReadInteger('PlaylistManager', 'Count', 0);
     for i := 0 to ManagerCount-1 do
     begin
         newQuickLoadPlaylist := TQuickLoadPlaylist.Create;
-        newQuickLoadPlaylist.ReadFromIni(aIni, i);
+        newQuickLoadPlaylist.LoadSettings(i);
         fQuickLoadPlaylists.Add(newQuickLoadPlaylist);
     end;
     // Set the CurrentQuickLoadPlaylist properly to the stored settings
@@ -306,7 +305,7 @@ begin
     // That was part of "nempOptions" before Nemp 4.14, but is located better here, I think
     for i := 1 to 10 do
     begin
-        tmpString := aIni.ReadString('RecentPlaylists', 'Playlist'+ IntToStr(i), '');
+        tmpString := NempSettingsManager.ReadString('RecentPlaylists', 'Playlist'+ IntToStr(i), '');
         if tmpString <> '' then
             RecentPlaylists.Add(tmpString);
     end;
@@ -318,30 +317,29 @@ begin
         fOnFavouritePlaylistChange(Self);
 end;
 
-procedure TPlaylistManager.WriteToIni(aIni: TMemIniFile);
+procedure TPlaylistManager.SaveSettings;
 var i: Integer;
 begin
     // remove previous entries, in case the number of Playlists has been reduced
-    aIni.EraseSection('Playlistmanager');
+    NempSettingsManager.EraseSection('Playlistmanager');
 
     // write new values
     if assigned(fCurrentQuickLoadPlaylist) then
-        aIni.WriteInteger('PlaylistManager', 'CurrentIndex', fQuickLoadPlaylists.IndexOf(fCurrentQuickLoadPlaylist))
+        NempSettingsManager.WriteInteger('PlaylistManager', 'CurrentIndex', fQuickLoadPlaylists.IndexOf(fCurrentQuickLoadPlaylist))
     else
-        aIni.WriteInteger('PlaylistManager', 'CurrentIndex', -1);
+        NempSettingsManager.WriteInteger('PlaylistManager', 'CurrentIndex', -1);
 
-    aIni.WriteBool('PlaylistManager', 'AutoSaveOnPlaylistChange' , fAutoSaveOnPlaylistChange  );
-    aIni.WriteBool('PlaylistManager', 'UserInputOnPlaylistChange', fUserInputOnPlaylistChange );
+    NempSettingsManager.WriteBool('PlaylistManager', 'AutoSaveOnPlaylistChange' , fAutoSaveOnPlaylistChange  );
+    NempSettingsManager.WriteBool('PlaylistManager', 'UserInputOnPlaylistChange', fUserInputOnPlaylistChange );
 
-    aIni.WriteInteger('PlaylistManager', 'Count', Count);
+    NempSettingsManager.WriteInteger('PlaylistManager', 'Count', Count);
     for i := 0 to fQuickLoadPlaylists.Count - 1 do
-        fQuickLoadPlaylists[i].WriteToIni(aIni, i);
+        fQuickLoadPlaylists[i].SaveSettings(i);
 
     // Write RecentPlaylists
+    NempSettingsManager.EraseSection('RecentPlaylists');
     for i := 0 to RecentPlaylists.Count - 1 do
-        aIni.WriteString('RecentPlaylists', 'Playlist'+ IntToStr(i+1), RecentPlaylists[i]);
-    for i := RecentPlaylists.Count to 10 do
-        aIni.WriteString('RecentPlaylists', 'Playlist'+ IntToStr(i+1), '');
+        NempSettingsManager.WriteString('RecentPlaylists', 'Playlist'+ IntToStr(i+1), RecentPlaylists[i]);
 end;
 
 

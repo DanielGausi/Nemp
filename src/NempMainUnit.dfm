@@ -1239,6 +1239,7 @@ object Nemp_MainForm: TNemp_MainForm
               Height = 13
               Hint = 'ReplayGain values'
               Caption = '                  '
+              ShowAccelChar = False
               StyleElements = [seClient, seBorder]
             end
             object lblBibFilename: TLabel
@@ -1247,6 +1248,7 @@ object Nemp_MainForm: TNemp_MainForm
               Width = 54
               Height = 13
               Caption = '                  '
+              ShowAccelChar = False
               StyleElements = [seClient, seBorder]
             end
             object lblBibDirectory: TLabel
@@ -1256,6 +1258,7 @@ object Nemp_MainForm: TNemp_MainForm
               Width = 54
               Height = 13
               Caption = '                  '
+              ShowAccelChar = False
               StyleElements = [seClient, seBorder]
             end
             object Bevel2: TBevel

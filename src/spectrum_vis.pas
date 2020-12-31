@@ -124,6 +124,8 @@ interface
         fScrollDelay: Integer;
         fDelayCounter: Integer;
 
+        procedure DrawZeroPeaks;
+
     public
         MainImage: TImage;
         StarImage: TImage;
@@ -134,6 +136,7 @@ interface
         procedure Draw(FFTData : TFFTData);
         procedure DrawRating(aRating: Integer);
         procedure DrawClear;
+        procedure DrawWaitingProgress(aValue: Integer);
 
         procedure SetBackGround (Active : Boolean);
         procedure SetStarBackGround (Active: Boolean);
@@ -401,6 +404,7 @@ begin
 
 
     VisBuff.Canvas.Pen.Color := PenColor;
+    VisBuff.Canvas.Pen.Width := 1;
     //for i := 0 to 30 do
     for i := 0 to 24 do
     begin
@@ -477,21 +481,12 @@ begin
     // MainImage.Refresh;      ??? commented out 2019
 end;
 
-
-procedure TSpectrum.DrawClear;
-var i: integer;
+procedure TSpectrum.DrawZeroPeaks;
+var
+  i: Integer;
 begin
-
-    VisBuff.Canvas.Pen.Color := BkgColor;
-    VisBuff.Canvas.Brush.Color := BkgColor;
-    VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
-    if UseBkg then
-        VisBuff.Canvas.CopyRect(Rect(0, 0, BackBmp.Width, BackBmp.Height),
-              BackBmp.Canvas,
-              Rect(0, 0, BackBmp.Width, BackBmp.Height));
-
-
-    for i := 0 to 30 do
+  VisBuff.Canvas.Pen.Width := 1;
+  for i := 0 to 30 do
     begin
         FFTPeacks[i] := 1;
         FFTFallOff[i] := 0;
@@ -503,9 +498,111 @@ begin
         end;
     end;
 
+end;
+
+
+procedure TSpectrum.DrawClear;
+begin
+    VisBuff.Canvas.Pen.Width := 1;
+    VisBuff.Canvas.Pen.Color := BkgColor;
+    VisBuff.Canvas.Brush.Color := BkgColor;
+    VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
+    if UseBkg then
+        VisBuff.Canvas.CopyRect(Rect(0, 0, BackBmp.Width, BackBmp.Height),
+              BackBmp.Canvas,
+              Rect(0, 0, BackBmp.Width, BackBmp.Height));
+
+    DrawZeroPeaks;
+
     //BitBlt(MainImage.Canvas.Handle, 0, 0, VisBuff.Width, VisBuff.Height, VisBuff.Canvas.Handle, 0, 0, srccopy);
     MainImage.Picture.Assign(VisBuff);
     MainImage.Refresh;
+end;
+
+procedure TSpectrum.DrawWaitingProgress(aValue: Integer);
+var
+  xCenter, yCenter: Integer;
+  alpha: Double;
+  DoubleBMP: TBitmap;
+
+begin
+  if (aValue = 0) or (aValue = 100) then
+    exit;
+
+  if FrmClear then
+  begin
+      VisBuff.Canvas.Pen.Color := BkgColor;
+      VisBuff.Canvas.Brush.Style := bsSolid;
+      VisBuff.Canvas.Brush.Color := BkgColor;
+      VisBuff.Canvas.Rectangle(0, 0, VisBuff.Width, VisBuff.Height);
+
+      if UseBkg then
+      begin
+          VisBuff.Canvas.CopyRect(
+              Rect(0, 0, BackBmp.Width, BackBmp.Height),
+              BackBmp.Canvas,
+              Rect(0, 0, BackBmp.Width, BackBmp.Height));
+      end;
+  end;
+
+
+
+  DoubleBMP := TBitmap.Create;
+  try
+    DoubleBMP.PixelFormat := pf24bit;
+    DoubleBMP.Height := 4 * VisBuff.Height;
+    DoubleBMP.Width  := 4 * VisBuff.Width;
+
+    SetStretchBltMode(DoubleBMP.Canvas.Handle, HALFTONE);
+    StretchBlt(DoubleBMP.Canvas.Handle, 0, 0, DoubleBMP.Width, DoubleBMP.Height,
+               VisBuff.Canvas.Handle,0,0, VisBuff.Width, VisBuff.Height,
+               SRCCopy);
+
+    DoubleBMP.Canvas.Pen.Color := PeakColor;
+    DoubleBMP.Canvas.Pen.Width := 8;
+
+    alpha := 2*pi - (2*pi/100 * aValue);
+    xCenter := DoubleBMP.Width Div 2;
+    yCenter := DoubleBMP.Height Div 2;
+
+    DoubleBMP.Canvas.Arc( xCenter - 30,
+                        yCenter - 30,
+                        xCenter + 30,
+                        yCenter + 30, // surrounding Rect so far
+                        round(xCenter - 100*sin(alpha)), round(yCenter - 100*cos(alpha)),
+                        xCenter, 0
+                        );
+
+    if PeakColor <> PenColor then
+    begin
+      DoubleBMP.Canvas.Pen.Color := PenColor;
+      DoubleBMP.Canvas.Arc( xCenter - 30,
+                          yCenter - 30,
+                          xCenter + 30,
+                          yCenter + 30, // surrounding Rect so far
+                          xCenter, 0,
+                          round(xCenter - 100*sin(alpha)), round(yCenter - 100*cos(alpha))
+                          );
+    end;
+
+    SetStretchBltMode(VisBuff.Canvas.Handle, HALFTONE);
+    StretchBlt(
+          VisBuff.Canvas.Handle,0,0, VisBuff.Width, VisBuff.Height,
+          DoubleBMP.Canvas.Handle, 0, 0, DoubleBMP.Width, DoubleBMP.Height,
+          SRCCopy);
+  finally
+    DoubleBMP.Free;
+  end;
+  {
+  VisBuff.Canvas.Brush.Style := bsClear;
+  VisBuff.Canvas.Font.Color := PeakColor;
+  VisBuff.Canvas.TextOut(0,10, 'Delaying ...');
+  }
+  DrawZeroPeaks;
+
+  MainImage.Picture.Assign(VisBuff);
+  MainImage.Refresh;
+
 end;
 
 procedure TSpectrum.DrawRating(aRating: Integer);

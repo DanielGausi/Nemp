@@ -196,7 +196,7 @@ begin
     if Nemp_MainForm.NempSkin.isActive
         and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
         and Nemp_MainForm.NempSkin.UseAdvancedSkin
-        and Nemp_MainForm.GlobalUseAdvancedSkin
+        and NempOptions.GlobalUseAdvancedSkin
     then
         BaseDir := Nemp_MainForm.NempSkin.Path + '\'
     else

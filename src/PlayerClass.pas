@@ -92,6 +92,8 @@ type
       fFileNearEndSyncHandleM: DWord; // for fading into the next track
       fFileNearEndSyncHandleS: DWord; // (x seconds before file end OR SilenceBegin)
 
+      fTrackDelayStartTime: Cardinal;
+      fTrackDelayTimer: THandle;
       fSoundfont  : HSOUNDFONT;
       fSoundfontFilename : String;
 
@@ -113,6 +115,9 @@ type
 
       fDoSilenceDetection: Boolean;
       fSilenceThreshold: Integer;
+
+      fDoPauseBetweenTracks: Boolean;
+      fPauseBetweenTracks: Integer;
 
       fApplyReplayGain      : Boolean;
       fPreferAlbumGain      : Boolean;
@@ -244,7 +249,6 @@ type
 
       function GetCurrentAudioFile: TPlaylistFile;
 
-
     public
         MainAudioFile: TPlaylistFile;
         HeadSetAudioFile: TPlaylistFile;
@@ -289,7 +293,6 @@ type
         IgnoreFadingOnShortTracks: Boolean;
         IgnoreFadingOnPause: Boolean;
         IgnoreFadingOnStop: Boolean;
-
 
         UseDefaultEffects: Boolean;
         UseDefaultEqualizer: Boolean;
@@ -419,6 +422,9 @@ type
         property DoSilenceDetection: Boolean read fDoSilenceDetection write fDoSilenceDetection;
         property SilenceThreshold: Integer read fSilenceThreshold write fSilenceThreshold;
 
+        property DoPauseBetweenTracks: Boolean read fDoPauseBetweenTracks write fDoPauseBetweenTracks;
+        property PauseBetweenTracksDuration  : Integer read fPauseBetweenTracks   write fPauseBetweenTracks  ;
+
         property ApplyReplayGain     : Boolean read fApplyReplayGain      write fApplyReplayGain     ;
         property PreferAlbumGain     : Boolean read fPreferAlbumGain      write fPreferAlbumGain     ;
         property DefaultGainWithoutRG: Single  read fDefaultGainWithoutRG write fDefaultGainWithoutRG;
@@ -445,8 +451,8 @@ type
         procedure ReInitBassEngine;
         procedure UpdateFlags;
 
-        procedure LoadFromIni(Ini: TMemIniFile);
-        procedure WriteToIni(Ini: TMemIniFile);
+        procedure LoadSettings;
+        procedure SaveSettings;
 
         // Play: Spielt ein Audiofile ab.
         procedure play(aAudioFile: TPlaylistFile; Interval: Integer; StartPlay: Boolean; StartPos: Double = 0);
@@ -458,7 +464,7 @@ type
         // if the player stops current playback to start a new one, there should be fading!
         procedure stop(StartPlayAfterStop: Boolean = False);
         // Setzt eine angehaltene Wiedergabe wieder fort
-        procedure resume;
+        procedure resume(ResumeAfterBreakBetweenTracks: Boolean = False);
         // Langsam ausfaden bei einem ShutDown. Keine neuen Titel anfangen. Max. Fade-Zeit aTime in Sekunden
         procedure FadeOut(aTime: Integer);
         // FadeOut Abbrechen
@@ -559,6 +565,10 @@ type
         procedure StartSilenceDetection;
         procedure ProcessSilenceDetection(aSilenceDetector: TSilenceDetector);
 
+        procedure ProgressDelayedPlayNext;
+        procedure StopPauseBetweenTracksTimer;
+        function StartPauseBetweenTracksTimer: Boolean;
+
         function SwapStreams(ScannedFile: TAudioFile): Integer;
   end;
 
@@ -581,10 +591,16 @@ Uses NempMainUnit, AudioFileHelper, ID3v2Tags, AudioDisplayUtils;
 
 
 procedure EndFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+var aPlayer: TNempPlayer;
 begin
-    // If this is called, the file is on its end.
-    TNempPlayer(User).EndFileProcReached := True;
-    SendMessage(TNempPlayer(User).MainWindowHandle, WM_NextFile, 0, 0);
+  aPlayer := TNempPlayer(User);
+  // If this is called, the file is on its end.
+  aPlayer.EndFileProcReached := True;
+
+  if aPlayer.DoPauseBetweenTracks then
+      SendMessage(aPlayer.MainWindowHandle, WM_PrepareNextFile, 0, 0)
+  else
+    SendMessage(aPlayer.MainWindowHandle, WM_NextFile, 0, 0);
 end;
 
 procedure EndHeadSetFileProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -603,12 +619,14 @@ begin
 end;
 
 procedure EndSlideProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
+var aPlayer: TNempPlayer;
 begin
-    SendMessage(TNempPlayer(User).MainWindowHandle, WM_SlideComplete, 0, 0);
+  aPlayer := TNempPlayer(User);
+  SendMessage(aPlayer.MainWindowHandle, WM_SlideComplete, 0, 0);
 
-    if TNempPlayer(User).fSlideIsStopSlide then
-        SendMessage(TNempPlayer(User).MainWindowHandle, WM_PlayerStop, 0, 0);
-    TNempPlayer(User).fSlideIsStopSlide := False;
+  if aPlayer.fSlideIsStopSlide then
+      SendMessage(aPlayer.MainWindowHandle, WM_PlayerStop, 0, 0);
+  aPlayer.fSlideIsStopSlide := False;
 end;
 
 procedure ABRepeatProc(handle: HWND; Channel, Data: DWord; User: Pointer); stdcall;
@@ -759,6 +777,59 @@ begin
     fPrescanInProgress := False;
 
     CoverArtSearcher := TCoverArtSearcher.create;
+    fTrackDelayTimer := 0;
+end;
+
+procedure DelayedPlayNext(lpParameter: Pointer; TimerOrWaitFired: Boolean); stdcall;
+begin
+  //postMessage(aPlayer.MainWindowHandle, WM_PlayerDelayedPlayNext, 0, 0);
+  SendMessage(Integer(lpParameter), WM_PlayerDelayedPlayNext, 0, 0);
+end;
+
+procedure TNempPlayer.ProgressDelayedPlayNext;
+var
+  timeElapsed: Integer;
+begin
+  timeElapsed := getTickCount - fTrackDelayStartTime;
+  if (PauseBetweenTracksDuration = 0) or (timeElapsed > PauseBetweenTracksDuration) then
+  begin
+    resume(True);
+    SendMessage(MainWindowHandle, WM_PlayerPlay, 0, 0);
+    SendMessage(MainWindowHandle, WM_PlayerDelayCompleted, 0, 0);
+  end
+  else
+  begin
+     Spectrum.DrawWaitingProgress(round(timeElapsed/PauseBetweenTracksDuration * 100));
+  end;
+end;
+
+procedure TNempPlayer.StopPauseBetweenTracksTimer;
+begin
+  if fTrackDelayTimer <> 0 then
+  begin
+    DeleteTimerQueueTimer(0, fTrackDelayTimer, 0);
+    fTrackDelayTimer := 0;
+  end;
+end;
+
+function TNempPlayer.StartPauseBetweenTracksTimer: Boolean;
+begin
+  // clear old timer, if there is one
+  StopPauseBetweenTracksTimer;
+  fTrackDelayStartTime := GetTickCount;
+  // start a new timer
+  result := CreateTimerQueueTimer(
+      fTrackDelayTimer,
+      0,
+      DelayedPlayNext,
+      Pointer(MainWindowHandle),
+      25,  // 25ms should be ok here
+      // PauseBetweenTracksDuration,
+      25,
+      0
+      );
+  if not result then
+    fTrackDelayTimer := 0;
 end;
 
 destructor TNempPlayer.Destroy;
@@ -1023,87 +1094,90 @@ end;
     Load/Save settings into Inifile
     --------------------------------------------------------
 }
-procedure TNempPlayer.LoadFromIni(Ini: TMemIniFile);
+procedure TNempPlayer.LoadSettings;
 var i: Integer;
 begin
-  MainDevice := ini.ReadInteger('Player','MainDevice',1);
-  HeadsetDevice := ini.ReadInteger('Player','HeadsetDevice',2);
-  fMainVolume := ini.ReadInteger('Player','MainVolume',50);
+  MainDevice := NempSettingsManager.ReadInteger('Player','MainDevice',1);
+  HeadsetDevice := NempSettingsManager.ReadInteger('Player','HeadsetDevice',2);
+  fMainVolume := NempSettingsManager.ReadInteger('Player','MainVolume',50);
   fMainVolume := fMainVolume / 100;
-  fHeadsetVolume := ini.ReadInteger('Player','HeadsetVolume',50);
+  fHeadsetVolume := NempSettingsManager.ReadInteger('Player','HeadsetVolume',50);
   fHeadsetVolume := fHeadsetVolume / 100;
 
-  fSoundfontFilename := ini.ReadString('Player', 'SoundfontFilename', '');
+  fSoundfontFilename := NempSettingsManager.ReadString('Player', 'SoundfontFilename', '');
 
-  fUseFloatingPointChannels := Ini.ReadInteger('Player', 'FloatingPointChannels', 0);// 0: Auto-Detect, 1: Aus, 2: An
+  fUseFloatingPointChannels := NempSettingsManager.ReadInteger('Player', 'FloatingPointChannels', 0);// 0: Auto-Detect, 1: Aus, 2: An
   if fUseFloatingPointChannels > 2 then fUseFloatingPointChannels := 0;
   if fUseFloatingPointChannels < 0 then fUseFloatingPointChannels := 0;
 
-  fUseHardwareMixing := Ini.ReadBool('Player', 'HardwareMixing', True);  // False: OR BASS_SAMPLE_SOFTWARE
-  fSafePlayback := ini.ReadBool('Player', 'SafePlayback', False);
+  fUseHardwareMixing := NempSettingsManager.ReadBool('Player', 'HardwareMixing', True);  // False: OR BASS_SAMPLE_SOFTWARE
+  fSafePlayback := NempSettingsManager.ReadBool('Player', 'SafePlayback', False);
 
-  UseFading             := ini.ReadBool('Player','UseFading',True);
-  FadingInterval        := ini.ReadInteger('Player','FadingInterval',2000);
-  SeekFadingInterval    := ini.ReadInteger('Player','SeekFadingInterval',300);
-  IgnoreFadingOnShortTracks := ini.ReadBool('Player', 'IgnoreOnShortTracks', True);
-  IgnoreFadingOnPause   := ini.ReadBool('Player', 'IgnoreOnPause', True);
-  IgnoreFadingOnStop    := ini.ReadBool('Player', 'IgnoreOnStop', True);
+  UseFading             := NempSettingsManager.ReadBool('Player','UseFading',True);
+  FadingInterval        := NempSettingsManager.ReadInteger('Player','FadingInterval',2000);
+  SeekFadingInterval    := NempSettingsManager.ReadInteger('Player','SeekFadingInterval',300);
+  IgnoreFadingOnShortTracks := NempSettingsManager.ReadBool('Player', 'IgnoreOnShortTracks', True);
+  IgnoreFadingOnPause   := NempSettingsManager.ReadBool('Player', 'IgnoreOnPause', True);
+  IgnoreFadingOnStop    := NempSettingsManager.ReadBool('Player', 'IgnoreOnStop', True);
 
-  DoSilenceDetection    := ini.ReadBool('Player', 'DoSilenceDetection', True);
-  SilenceThreshold      := Ini.ReadInteger('Player', 'SilenceThreshold', -40);
+  DoSilenceDetection    := NempSettingsManager.ReadBool('Player', 'DoSilenceDetection', True);
+  SilenceThreshold      := NempSettingsManager.ReadInteger('Player', 'SilenceThreshold', -40);
 
-  ApplyReplayGain       := ini.ReadBool('Player', 'ApplyReplayGain', True);
-  PreferAlbumGain       := ini.ReadBool('Player', 'PreferAlbumGain', True);
-  PreventClipping       := ini.ReadBool('Player', 'PreventClipping', True);
-  DefaultGainWithoutRG  := ini.ReadFloat('Player', 'DefaultGain', 0);
-  DefaultGainWithRG     := ini.ReadFloat('Player', 'DefaultGainWithRG', 0);
+  DoPauseBetweenTracks  :=  NempSettingsManager.ReadBool('Player', 'DoPauseBetweenTracks', True);
+  PauseBetweenTracksDuration :=  NempSettingsManager.ReadInteger('Player', 'PauseBetweenTracksDuration', 2000);
+
+  ApplyReplayGain       := NempSettingsManager.ReadBool('Player', 'ApplyReplayGain', True);
+  PreferAlbumGain       := NempSettingsManager.ReadBool('Player', 'PreferAlbumGain', True);
+  PreventClipping       := NempSettingsManager.ReadBool('Player', 'PreventClipping', True);
+  DefaultGainWithoutRG  := NempSettingsManager.ReadFloat('Player', 'DefaultGain', 0);
+  DefaultGainWithRG     := NempSettingsManager.ReadFloat('Player', 'DefaultGainWithRG', 0);
 
 
-  UseVisualization      := ini.ReadBool('Player','UseVisual',True);
-  VisualizationInterval := ini.ReadInteger('Player','Visualinterval',40);
-  TimeMode              := Ini.ReadInteger('Player', 'ShowTime', 0);
-  ScrollTaskbarTitel    := ini.ReadBool('Player','ScrollTaskbarTitel',False);
-  ScrollTaskbarDelay    := ini.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
+  UseVisualization      := NempSettingsManager.ReadBool('Player','UseVisual',True);
+  VisualizationInterval := NempSettingsManager.ReadInteger('Player','Visualinterval',40);
+  TimeMode              := NempSettingsManager.ReadInteger('Player', 'ShowTime', 0);
+  ScrollTaskbarTitel    := NempSettingsManager.ReadBool('Player','ScrollTaskbarTitel',False);
+  ScrollTaskbarDelay    := NempSettingsManager.ReadInteger('Player', 'ScrollTaskbarDelay', 10);
   if ScrollTaskbarDelay < 5 then ScrollTaskbarDelay := 5;
 
-  ReInitAfterSuspend    := ini.ReadBool('Player','ReInitAfterSuspend',False);
-  PauseOnSuspend        := ini.ReadBool('Player','PauseOnSuspend',True);
+  ReInitAfterSuspend    := NempSettingsManager.ReadBool('Player','ReInitAfterSuspend',False);
+  PauseOnSuspend        := NempSettingsManager.ReadBool('Player','PauseOnSuspend',True);
 
-  PlayBufferSize        := ini.ReadInteger('Player','PlayBufferSize',500);
+  PlayBufferSize        := NempSettingsManager.ReadInteger('Player','PlayBufferSize',500);
 
-  AvoidMickyMausEffect  := ini.ReadBool('Player', 'KeinMickyMausEffekt', False);
-  UseDefaultEffects   := ini.ReadBool('Player', 'UseDefaultEffects', True);
-  UseDefaultEqualizer := ini.ReadBool('Player', 'UseDefaultEqualizer', False);
+  AvoidMickyMausEffect  := NempSettingsManager.ReadBool('Player', 'KeinMickyMausEffekt', False);
+  UseDefaultEffects   := NempSettingsManager.ReadBool('Player', 'UseDefaultEffects', True);
+  UseDefaultEqualizer := NempSettingsManager.ReadBool('Player', 'UseDefaultEqualizer', False);
 
-  ReduceMainVolumeOnJingle      := ini.ReadBool('Player','ReduceMainVolumeOnJingle', True);
-  ReduceMainVolumeOnJingleValue := ini.ReadInteger('Player','ReduceMainVolumeOnJingleValue',50);
-  JingleVolume                  := ini.ReadInteger('Player','JingleVolume',100);
-  UseWalkmanMode                := ini.ReadBool('Player','WalkmanMode',True);
+  ReduceMainVolumeOnJingle      := NempSettingsManager.ReadBool('Player','ReduceMainVolumeOnJingle', True);
+  ReduceMainVolumeOnJingleValue := NempSettingsManager.ReadInteger('Player','ReduceMainVolumeOnJingleValue',50);
+  JingleVolume                  := NempSettingsManager.ReadInteger('Player','JingleVolume',100);
+  UseWalkmanMode                := NempSettingsManager.ReadBool('Player','WalkmanMode',True);
 
-  DownloadDir    := (IncludeTrailingPathDelimiter(ini.ReadString('Player', 'WebradioDownloadDir', Savepath + 'Webradio\')));
+  DownloadDir    := (IncludeTrailingPathDelimiter(NempSettingsManager.ReadString('Player', 'WebradioDownloadDir', Savepath + 'Webradio\')));
 
 
-  FilenameFormat := ini.ReadString('Player', 'WebRadioFilenameFormat', '<date>, <time> - <title>');
-  UseStreamnameAsDirectory := ini.ReadBool('Player', 'UseStreamnameAsDirectory', False);
-  AutoSplitByTitle := ini.ReadBool('Player', 'WebRadioAutoSplitFiles', True);
-  AutoSplitByTime  := ini.ReadBool('Player', 'WebRadioAutoSplitByTime', False);
-  AutoSplitBySize  := ini.ReadBool('Player', 'WebRadioAutoSplitBySize', False);
+  FilenameFormat := NempSettingsManager.ReadString('Player', 'WebRadioFilenameFormat', '<date>, <time> - <title>');
+  UseStreamnameAsDirectory := NempSettingsManager.ReadBool('Player', 'UseStreamnameAsDirectory', False);
+  AutoSplitByTitle := NempSettingsManager.ReadBool('Player', 'WebRadioAutoSplitFiles', True);
+  AutoSplitByTime  := NempSettingsManager.ReadBool('Player', 'WebRadioAutoSplitByTime', False);
+  AutoSplitBySize  := NempSettingsManager.ReadBool('Player', 'WebRadioAutoSplitBySize', False);
 
-  AutoSplitMaxTime := Ini.ReadInteger('Player', 'WebRadioAutoSplitMaxTime', 30);
+  AutoSplitMaxTime := NempSettingsManager.ReadInteger('Player', 'WebRadioAutoSplitMaxTime', 30);
   if (AutoSplitMaxTime < 0) or (AutoSplitMaxTime > 1440) then AutoSplitMaxTime := 30;
 
-  AutoSplitMaxSize := Ini.ReadInteger('Player', 'WebRadioAutoSplitMaxSize', 10);
+  AutoSplitMaxSize := NempSettingsManager.ReadInteger('Player', 'WebRadioAutoSplitMaxSize', 10);
   if (AutoSplitMaxSize < 0) or (AutoSplitMaxSize > 2000) then AutoSplitMaxSize := 10;
 
   if Not UseDefaultEffects then
   begin
-      ReverbMix     := Ini.ReadFloat('Player','Hall', -96);
+      ReverbMix     := NempSettingsManager.ReadFloat('Player','Hall', -96);
       if Reverbmix > 0 then Reverbmix := -96;
-      EchoWetDryMix := Ini.ReadFloat('Player','EchoMix',0);
+      EchoWetDryMix := NempSettingsManager.ReadFloat('Player','EchoMix',0);
       if EchoWetDryMix > 50 then EchoWetDryMix := 0;
-      EchoTime      := Ini.ReadFloat('Player','EchoTime',100);
+      EchoTime      := NempSettingsManager.ReadFloat('Player','EchoTime',100);
       if EchoTime < 100 then EchoTime := 100;
-      fSampleRateFaktor := Ini.ReadFloat('Player','Samplerate', 1);
+      fSampleRateFaktor := NempSettingsManager.ReadFloat('Player','Samplerate', 1);
       if abs(1-fSampleRateFaktor) > 0.4 then fSampleRateFaktor := 1;
   end else
   begin
@@ -1117,11 +1191,11 @@ begin
   begin
     for i := 0 to 9 do
     begin                                                                  // 111111
-      fxGain[i] := ini.ReadInteger('Player','EQ' + IntToStr(i+1), 0) / EQ_NEW_FACTOR;
+      fxGain[i] := NempSettingsManager.ReadInteger('Player','EQ' + IntToStr(i+1), 0) / EQ_NEW_FACTOR;
       // Vorsicht. In den Inis hatte ich früher immer Button.Top (sogar ohne - Shape.Top!!) gespeichert -- Korrektur erforderlich!
       if fxgain[i] > 15 then fxGain[i] := 0;
     end;
-    EQSettingName := ini.ReadString('Player', 'EQ-Settings', 'Auswahl');
+    EQSettingName := NempSettingsManager.ReadString('Player', 'EQ-Settings', 'Auswahl');
   end else
   begin
     for i := 0 to 9 do fxgain[i] := 0;
@@ -1129,115 +1203,117 @@ begin
   end;
 
   // hidden feature: user agent
-  fNemp_BassUserAgent := ini.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
+  fNemp_BassUserAgent := NempSettingsManager.ReadString('Player', 'UserAgent', NEMP_BASS_DEFAULT_USERAGENT);
 
-  NempBirthdayTimer.UseCountDown := Ini.ReadBool('Event', 'UseCountDown', True);
-  NempBirthdayTimer.StartTime := Ini.ReadTime('Event', 'StartTime', 0 );
+  NempBirthdayTimer.UseCountDown := NempSettingsManager.ReadBool('Event', 'UseCountDown', True);
+  NempBirthdayTimer.StartTime := NempSettingsManager.ReadTime('Event', 'StartTime', 0 );
   // NempBirthdayTimer.StartCountDownTime := Ini.ReadTime('Event', 'StartCountDownTime',0);
-  NempBirthdayTimer.BirthdaySongFilename := (Ini.ReadString('Event', 'BirthdaySongFilename', ''));
-  NempBirthdayTimer.CountDownFileName := (Ini.ReadString('Event', 'CountDownFileName', ''));
-  NempBirthdayTimer.ContinueAfter :=Ini.ReadBool('Event', 'ContinueAfter', True);
+  NempBirthdayTimer.BirthdaySongFilename := (NempSettingsManager.ReadString('Event', 'BirthdaySongFilename', ''));
+  NempBirthdayTimer.CountDownFileName := (NempSettingsManager.ReadString('Event', 'CountDownFileName', ''));
+  NempBirthdayTimer.ContinueAfter :=NempSettingsManager.ReadBool('Event', 'ContinueAfter', True);
 
-  NempScrobbler.LoadFromIni(Ini);
-  NempLogFile.LoadFromIni(Ini);
-  PostProcessor.LoadFromIni(Ini);
+  NempScrobbler.LoadFromIni(NempSettingsManager);
+  NempLogFile.LoadFromIni(NempSettingsManager);
+  PostProcessor.LoadFromIni(NempSettingsManager);
 end;
 
-procedure TNempPlayer.WriteToIni(Ini: TMemIniFile);
+procedure TNempPlayer.SaveSettings;
 begin
-  ini.WriteInteger('Player','HeadsetDevice',HeadsetDevice);
-  ini.WriteInteger('Player','MainDevice',MainDevice);
-  ini.WriteInteger('Player','MainVolume',Round(fMainVolume * 100));
-  ini.WriteInteger('Player','HeadsetVolume',Round(fHeadsetVolume * 100));
+  NempSettingsManager.WriteInteger('Player','HeadsetDevice',HeadsetDevice);
+  NempSettingsManager.WriteInteger('Player','MainDevice',MainDevice);
+  NempSettingsManager.WriteInteger('Player','MainVolume',Round(fMainVolume * 100));
+  NempSettingsManager.WriteInteger('Player','HeadsetVolume',Round(fHeadsetVolume * 100));
 
-  ini.WriteString('Player', 'SoundfontFilename', fSoundfontFilename);
+  NempSettingsManager.WriteString('Player', 'SoundfontFilename', fSoundfontFilename);
 
-  Ini.WriteInteger('Player', 'FloatingPointChannels', fUseFloatingPointChannels);
-  Ini.WriteBool('Player', 'HardwareMixing', fUseHardwareMixing);
-  Ini.WriteBool('Player', 'SafePlayback', fSafePlayback);
+  NempSettingsManager.WriteInteger('Player', 'FloatingPointChannels', fUseFloatingPointChannels);
+  NempSettingsManager.WriteBool('Player', 'HardwareMixing', fUseHardwareMixing);
+  NempSettingsManager.WriteBool('Player', 'SafePlayback', fSafePlayback);
 
-  ini.WriteBool('Player','UseFading',UseFading);
-  ini.WriteInteger('Player','FadingInterval',FadingInterval);
-  ini.WriteInteger('Player','SeekFadingInterval',SeekFadingInterval);
-  ini.WriteBool('Player', 'IgnoreOnShortTracks', IgnoreFadingOnShortTracks);
-  ini.WriteBool('Player', 'IgnoreOnPause', IgnoreFadingOnPause);
-  ini.WriteBool('Player', 'IgnoreOnStop', IgnoreFadingOnStop);
+  NempSettingsManager.WriteBool('Player','UseFading',UseFading);
+  NempSettingsManager.WriteInteger('Player','FadingInterval',FadingInterval);
+  NempSettingsManager.WriteInteger('Player','SeekFadingInterval',SeekFadingInterval);
+  NempSettingsManager.WriteBool('Player', 'IgnoreOnShortTracks', IgnoreFadingOnShortTracks);
+  NempSettingsManager.WriteBool('Player', 'IgnoreOnPause', IgnoreFadingOnPause);
+  NempSettingsManager.WriteBool('Player', 'IgnoreOnStop', IgnoreFadingOnStop);
 
-  ini.WriteBool('Player', 'DoSilenceDetection', DoSilenceDetection);
-  ini.WriteInteger('Player', 'SilenceThreshold', SilenceThreshold);
+  NempSettingsManager.WriteBool('Player', 'DoSilenceDetection', DoSilenceDetection);
+  NempSettingsManager.WriteInteger('Player', 'SilenceThreshold', SilenceThreshold);
+  NempSettingsManager.WriteBool('Player', 'DoPauseBetweenTracks', DoPauseBetweenTracks);
+  NempSettingsManager.WriteInteger('Player', 'PauseBetweenTracksDuration', PauseBetweenTracksDuration);
 
-  ini.WriteBool('Player', 'ApplyReplayGain', ApplyReplayGain);
-  ini.WriteBool('Player', 'PreferAlbumGain', PreferAlbumGain);
-  ini.WriteBool('Player', 'PreventClipping', PreventClipping);
-  ini.WriteFloat('Player', 'DefaultGainWithRG', DefaultGainWithRG);
-  ini.WriteFloat('Player', 'DefaultGain', DefaultGainWithoutRG);
+  NempSettingsManager.WriteBool('Player', 'ApplyReplayGain', ApplyReplayGain);
+  NempSettingsManager.WriteBool('Player', 'PreferAlbumGain', PreferAlbumGain);
+  NempSettingsManager.WriteBool('Player', 'PreventClipping', PreventClipping);
+  NempSettingsManager.WriteFloat('Player', 'DefaultGainWithRG', DefaultGainWithRG);
+  NempSettingsManager.WriteFloat('Player', 'DefaultGain', DefaultGainWithoutRG);
 
-  ini.WriteBool('Player','UseVisual', UseVisualization);
-  ini.WriteInteger('Player','Visualinterval', VisualizationInterval);
-  Ini.WriteInteger('Player', 'ShowTime', TimeMode);
-  ini.WriteBool('Player','ScrollTaskbarTitel', ScrollTaskbarTitel);
-  ini.WriteInteger('Player', 'ScrollTaskbarDelay', ScrollTaskbarDelay);
+  NempSettingsManager.WriteBool('Player','UseVisual', UseVisualization);
+  NempSettingsManager.WriteInteger('Player','Visualinterval', VisualizationInterval);
+  NempSettingsManager.WriteInteger('Player', 'ShowTime', TimeMode);
+  NempSettingsManager.WriteBool('Player','ScrollTaskbarTitel', ScrollTaskbarTitel);
+  NempSettingsManager.WriteInteger('Player', 'ScrollTaskbarDelay', ScrollTaskbarDelay);
 
 
-  ini.WriteBool('Player','ReInitAfterSuspend',ReInitAfterSuspend);
-  ini.WriteBool('Player','PauseOnSuspend',PauseOnSuspend);
+  NempSettingsManager.WriteBool('Player','ReInitAfterSuspend',ReInitAfterSuspend);
+  NempSettingsManager.WriteBool('Player','PauseOnSuspend',PauseOnSuspend);
 
-  ini.WriteInteger('Player','PlayBufferSize',PlayBufferSize);
+  NempSettingsManager.WriteInteger('Player','PlayBufferSize',PlayBufferSize);
 
-  ini.WriteBool('Player', 'KeinMickyMausEffekt', AvoidMickyMausEffect);
-  Ini.WriteBool('Player', 'UseDefaultEffects', UseDefaultEffects);
-  Ini.WriteBool('Player', 'UseDefaultEqualizer', UseDefaultEqualizer);
+  NempSettingsManager.WriteBool('Player', 'KeinMickyMausEffekt', AvoidMickyMausEffect);
+  NempSettingsManager.WriteBool('Player', 'UseDefaultEffects', UseDefaultEffects);
+  NempSettingsManager.WriteBool('Player', 'UseDefaultEqualizer', UseDefaultEqualizer);
 
-  Ini.WriteBool('Player','ReduceMainVolumeOnJingle', ReduceMainVolumeOnJingle);
-  Ini.WriteInteger('Player','ReduceMainVolumeOnJingleValue', ReduceMainVolumeOnJingleValue);
-  Ini.WriteInteger('Player','JingleVolume', JingleVolume);
-  Ini.WriteBool('Player','WalkmanMode', UseWalkmanMode);
+  NempSettingsManager.WriteBool('Player','ReduceMainVolumeOnJingle', ReduceMainVolumeOnJingle);
+  NempSettingsManager.WriteInteger('Player','ReduceMainVolumeOnJingleValue', ReduceMainVolumeOnJingleValue);
+  NempSettingsManager.WriteInteger('Player','JingleVolume', JingleVolume);
+  NempSettingsManager.WriteBool('Player','WalkmanMode', UseWalkmanMode);
 
-  ini.WriteString('Player', 'WebradioDownloadDir', (DownloadDir));
-  ini.WriteBool('Player', 'UseStreamnameAsDirectory', UseStreamnameAsDirectory);
-  ini.WriteString('Player', 'WebRadioFilenameFormat', FilenameFormat);
-  ini.WriteBool('Player', 'WebRadioAutoSplitFiles', AutoSplitByTitle);
+  NempSettingsManager.WriteString('Player', 'WebradioDownloadDir', (DownloadDir));
+  NempSettingsManager.WriteBool('Player', 'UseStreamnameAsDirectory', UseStreamnameAsDirectory);
+  NempSettingsManager.WriteString('Player', 'WebRadioFilenameFormat', FilenameFormat);
+  NempSettingsManager.WriteBool('Player', 'WebRadioAutoSplitFiles', AutoSplitByTitle);
 
-  Ini.WriteBool('Player', 'WebRadioAutoSplitByTime', AutoSplitByTime);
-  Ini.WriteBool('Player', 'WebRadioAutoSplitBySize', AutoSplitBySize);
-  Ini.WriteInteger('Player', 'WebRadioAutoSplitMaxTime', AutoSplitMaxTime);
-  Ini.WriteInteger('Player', 'WebRadioAutoSplitMaxSize', AutoSplitMaxSize);
+  NempSettingsManager.WriteBool('Player', 'WebRadioAutoSplitByTime', AutoSplitByTime);
+  NempSettingsManager.WriteBool('Player', 'WebRadioAutoSplitBySize', AutoSplitBySize);
+  NempSettingsManager.WriteInteger('Player', 'WebRadioAutoSplitMaxTime', AutoSplitMaxTime);
+  NempSettingsManager.WriteInteger('Player', 'WebRadioAutoSplitMaxSize', AutoSplitMaxSize);
 
 
   if Not UseDefaultEffects then
   begin
-      ini.WriteFloat('Player','Hall',ReverbMix);
-      ini.WriteFloat('Player','EchoMix',EchoWetDryMix);
-      ini.WriteFloat('Player','EchoTime',EchoTime);
-      Ini.WriteFloat('Player','Samplerate', fSampleRateFaktor);
+      NempSettingsManager.WriteFloat('Player','Hall',ReverbMix);
+      NempSettingsManager.WriteFloat('Player','EchoMix',EchoWetDryMix);
+      NempSettingsManager.WriteFloat('Player','EchoTime',EchoTime);
+      NempSettingsManager.WriteFloat('Player','Samplerate', fSampleRateFaktor);
   end;
 
   if NOT UseDefaultEqualizer then
   begin                                            // 111111
-      ini.WriteInteger('Player','EQ1',Round(fxGain[0] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ2',Round(fxGain[1] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ3',Round(fxGain[2] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ4',Round(fxGain[3] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ5',Round(fxGain[4] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ6',Round(fxGain[5] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ7',Round(fxGain[6] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ8',Round(fxGain[7] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ9',Round(fxGain[8] * EQ_NEW_FACTOR));
-      ini.WriteInteger('Player','EQ10',Round(fxGain[9] * EQ_NEW_FACTOR));
-      ini.WriteString('Player', 'EQ-Settings', EQSettingName);
+      NempSettingsManager.WriteInteger('Player','EQ1',Round(fxGain[0] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ2',Round(fxGain[1] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ3',Round(fxGain[2] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ4',Round(fxGain[3] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ5',Round(fxGain[4] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ6',Round(fxGain[5] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ7',Round(fxGain[6] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ8',Round(fxGain[7] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ9',Round(fxGain[8] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteInteger('Player','EQ10',Round(fxGain[9] * EQ_NEW_FACTOR));
+      NempSettingsManager.WriteString('Player', 'EQ-Settings', EQSettingName);
   end;
 
-  Ini.WriteBool('Event', 'UseCountDown', NempBirthdayTimer.UseCountDown);
-  Ini.WriteTime('Event', 'StartTime'            , NempBirthdayTimer.StartTime);
+  NempSettingsManager.WriteBool('Event', 'UseCountDown', NempBirthdayTimer.UseCountDown);
+  NempSettingsManager.WriteTime('Event', 'StartTime'            , NempBirthdayTimer.StartTime);
   // StartCountDownTime will be calculated when the event is activated
   // Ini.WriteTime('Event', 'StartCountDownTime'   , NempBirthdayTimer.StartCountDownTime);
-  Ini.WriteString('Event', 'BirthdaySongFilename' , (NempBirthdayTimer.BirthdaySongFilename));
-  Ini.WriteString('Event', 'CountDownFileName'    , (NempBirthdayTimer.CountDownFileName));
-  Ini.WriteBool('Event', 'ContinueAfter'        , NempBirthdayTimer.ContinueAfter);
+  NempSettingsManager.WriteString('Event', 'BirthdaySongFilename' , (NempBirthdayTimer.BirthdaySongFilename));
+  NempSettingsManager.WriteString('Event', 'CountDownFileName'    , (NempBirthdayTimer.CountDownFileName));
+  NempSettingsManager.WriteBool('Event', 'ContinueAfter'        , NempBirthdayTimer.ContinueAfter);
 
-  NempScrobbler.SaveToIni(Ini);
-  NempLogFile.WriteToIni(Ini);
-  PostProcessor.WriteToIni(Ini);
+  NempScrobbler.SaveToIni(NempSettingsManager);
+  NempLogFile.WriteToIni(NempSettingsManager);
+  PostProcessor.WriteToIni(NempSettingsManager);
 end;
 
 
@@ -1415,6 +1491,7 @@ begin
   //                and SameDrive(MainAudioFile.Pfad, aAudioFile.Pfad); // both on the same drive
 
   //JustCDChange := False;
+  StopPauseBetweenTracksTimer;
 
   //if not JustCDChange then
       StopAndFree(StartPlay);
@@ -1735,15 +1812,16 @@ end;
     Resume a paused stream
     --------------------------------------------------------
 }
-procedure TNempPlayer.resume;
+procedure TNempPlayer.resume(ResumeAfterBreakBetweenTracks: Boolean = False);
 begin
   if mainstream = 0 then exit;
+  StopPauseBetweenTracksTimer;
   // Ende-Syncs wieder setzen
   SetEndSyncs(MainStream);
   SetEndSyncs(SlideStream);
   if UseFading AND fReallyUseFading
       AND NOT (IgnoreFadingOnShortTracks AND (Bass_ChannelBytes2Seconds(MainStream,Bass_ChannelGetLength(MainStream, BASS_POS_BYTE)) < FadingInterval DIV 200))
-      And NOT IgnoreFadingOnPause
+      And ((NOT IgnoreFadingOnPause) or ResumeAfterBreakBetweenTracks)
   then
   begin
     // Wegen "Piep/Klick" bei Resume...?   Mal auf PC testen....
@@ -3195,6 +3273,7 @@ end;
 procedure TNempPlayer.DrawMainPlayerVisualisation; //(IncludingTime: Boolean = True);
 var FFTFata : TFFTData;
 begin
+
     if UseVisualization then
     begin
         if BassStatus = BASS_ACTIVE_PLAYING then
@@ -3202,7 +3281,9 @@ begin
             BASS_ChannelGetData(MainStream, @FFTFata, BASS_DATA_FFT1024);
             Spectrum.Draw (FFTFata);
         end else
+        begin
             Spectrum.DrawClear;
+        end;
     end;
 end;
 
@@ -3351,7 +3432,7 @@ begin
 
             if Not UnKownInformation(MainAudioFile.Artist) then
             begin
-                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                s := StringReplace(NempDisplay.GetNonEmptyTitle(MainAudioFile),'&','&&',[rfReplaceAll]);
                 r := Rect(102, 4, 198, 70);
                 destBitmap.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
                 // get needed Height of the Artist-String
@@ -3379,7 +3460,7 @@ begin
             end else
             begin
                 // just the title
-                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                s := StringReplace(NempDisplay.GetNonEmptyTitle(MainAudioFile),'&','&&',[rfReplaceAll]);
                 destBitmap.Canvas.Font.Color := Spectrum.PreviewTitleColor;
                 r := Rect(102, 4, 198, 70);
                 destBitmap.Canvas.TextRect(r, s, [tfWordBreak]);
@@ -3475,7 +3556,7 @@ begin
 
             if Not UnKownInformation(MainAudioFile.Artist) then
             begin
-                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                s := StringReplace(NempDisplay.GetNonEmptyTitle(MainAudioFile),'&','&&',[rfReplaceAll]);
                 r := Rect(102, 4, 198, 70);
                 b.Canvas.TextRect(r, s, [tfWordBreak, tfCalcRect]);
                 // get needed Height of the Artist-String
@@ -3503,7 +3584,7 @@ begin
             end else
             begin
                 // just the title
-                s := StringReplace(MainAudioFile.NonEmptyTitle,'&','&&',[rfReplaceAll]);
+                s := StringReplace(NempDisplay.GetNonEmptyTitle(MainAudioFile),'&','&&',[rfReplaceAll]);
                 b.Canvas.Font.Color := Spectrum.PreviewTitleColor;
                 r := Rect(102, 4, 198, 70);
                 b.Canvas.TextRect(r, s, [tfWordBreak]);
@@ -3802,9 +3883,9 @@ begin
   if assigned(MainAudioFile) then
   begin
      if UnKownInformation(MainAudioFile.Artist) then
-        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.NonEmptyTitle)
+        aTitel := ReplaceForbiddenFilenameChars(NempDisplay.GetNonEmptyTitle(MainAudioFile))
      else
-        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Artist + ' - ' + MainAudioFile.NonEmptyTitle);
+        aTitel := ReplaceForbiddenFilenameChars(MainAudioFile.Artist + ' - ' + NempDisplay.GetNonEmptyTitle(MainAudioFile));
 
     aStreamName := ReplaceForbiddenFilenameChars(MainAudioFile.Description);
   end

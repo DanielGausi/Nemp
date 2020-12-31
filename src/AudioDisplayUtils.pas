@@ -86,6 +86,8 @@ const
   phGenre    =    '<genre>';
   phStation  =   '<station>';
   phFileName = '<filename>';
+  phFileNameExt = '<filenameExt>';
+  phExtension=      '<ext>';
   phSubDir   =   '<subdir>';
   phDir      =      '<dir>';
   phFullPath = '<fullpath>';
@@ -118,19 +120,19 @@ type
   5: result := Pfad;
   *)
 
-  TSubstituteValue = (svEmpty, svNA, svFileName, svSubDirectory, svDirectory, svFullPath, svFileNameWithExtension);
+  TESubstituteValue = (svEmpty, svNA, svFileName, svSubDirectory, svDirectory, svFullPath, svFileNameWithExtension);
 
   // ??? Das nutzen? TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
-  TAudioProperty = (cpArtist, cpTitle, cpAlbum, cpTrack, cpYear, cpGenre,
-      cpFileName, cpSubDir, cpDir, cpFullPath, cpStation );
+  TEAudioProperty = (cpArtist, cpTitle, cpAlbum, cpTrack, cpYear, cpGenre,
+      cpFileName, cpFileNameExt, cpExtension, cpSubDir, cpDir, cpFullPath, cpStation );
 
-  TSetOfAudioProperties = set of TAudioProperty;
+  TSetOfAudioProperties = set of TEAudioProperty;
 
 const
-  PlaceHolders: Array[TAudioProperty] of String = (
+  PlaceHolders: Array[TEAudioProperty] of String = (
         phArtist, phTitle, phAlbum, phTrack, phYear, phGenre,
-        phFileName, phSubDir, phDir, phFullPath, phStation);
+        phFileName, phFileNameExt, phExtension, phSubDir, phDir, phFullPath, phStation);
 
 type
 
@@ -154,9 +156,9 @@ type
     private
 
       // Substitute Vales for artist/Title/Album in Treeview
-      fArtistSubstitute: TSubstituteValue;
-      fAlbumSubstitute : TSubstituteValue;
-      fTitleSubstitute : TSubstituteValue;
+      fArtistSubstitute: TESubstituteValue;
+      fAlbumSubstitute : TESubstituteValue;
+      fTitleSubstitute : TESubstituteValue;
 
       // for displaying a proper Title in the Playlist
       // including Fallback, if some wanted information is missing
@@ -196,16 +198,15 @@ type
       function HintLineWebRadioURL(af: TAudioFile): String;
 
       // default Playlist-Title (as in previous Nemp versions)
-      function GetNonEmptyTitle(af: TAudioFile): String;
       function GetDefaultPlaylistTitle(af: TAudioFile): String;
 
-      function getSubstitute(af: TAudioFile; substitute: TSubstituteValue): String;
+      function getSubstitute(af: TAudioFile; substitute: TESubstituteValue): String;
 
     public
       // substitute values for the MediaLibrary VST
-      property ArtistSubstitute: TSubstituteValue read fArtistSubstitute write fArtistSubstitute;
-      property AlbumSubstitute : TSubstituteValue read fAlbumSubstitute  write fAlbumSubstitute ;
-      property TitleSubstitute : TSubstituteValue read fTitleSubstitute  write fTitleSubstitute ;
+      property ArtistSubstitute: TESubstituteValue read fArtistSubstitute write fArtistSubstitute;
+      property AlbumSubstitute : TESubstituteValue read fAlbumSubstitute  write fAlbumSubstitute ;
+      property TitleSubstitute : TESubstituteValue read fTitleSubstitute  write fTitleSubstitute ;
       // templates for parsing the "combined title information"
       property PlaylistTitleFormat  : String read fGetPlaylistTitleFormat   write fSetPlaylistTitleFormat  ;
       property PlaylistTitleFormatFB: String read fGetPlaylistTitleFormatFB write fSetPlaylistTitleFormatFB;
@@ -217,8 +218,8 @@ type
       destructor Destroy; Override;
       procedure Assign(aSourceDisplay: TAudioDisplay);
 
-      procedure LoadFromIni(aIniFile: TMemIniFile);
-      procedure WriteToIni(aIniFile: TMemIniFile);
+      procedure LoadSettings;
+      procedure SaveSettings;
 
       // main methods
       // Some columns may be filled with substitute values, if they're not set
@@ -259,6 +260,8 @@ type
 
       function CSVLine(af: tAudioFile): String;
 
+      function GetNonEmptyTitle(af: TAudioFile): String;
+
       // build a proper title for the playlist (a combination of different porperties)
       function PlaylistTitle(af: TAudioFile; ShowCounter: Boolean = False): String; //
       function PlaylistCueAlbum(af: TAudioFile): String;
@@ -278,7 +281,7 @@ function NempDisplay: TAudioDisplay;
 implementation
 
 uses
-  Nemp_RessourceStrings, HilfsFunktionen, Math;
+  Nemp_RessourceStrings, Nemp_ConstantsAndTypes, HilfsFunktionen, Math;
 
 var
   flocalNempDisplay: TAudioDisplay;
@@ -309,11 +312,11 @@ begin
 end;
 
 procedure TAudioFormatString.fSetNeededProperties(aValue: String);
-var i: TAudioProperty;
+var i: TEAudioProperty;
 begin
   fContainedProperties := [];
   // fill the set of needed properties
-  for i := Low(TAudioProperty) to High(TAudioProperty) do
+  for i := Low(TEAudioProperty) to High(TEAudioProperty) do
     if AnsiContainsText(aValue, PlaceHolders[i]) then
       fContainedProperties := fContainedProperties + [i];
 end;
@@ -330,9 +333,9 @@ end;
 // ParsedTitle: returns the parsed Title for the AudioFile
 function TAudioFormatString.ParsedTitle(aAudioFile: TAudioFile): String;
 var tmp: String;
-  i: TAudioProperty;
+  i: TEAudioProperty;
 
-  function GetAudioProperty(aProp: TAudioProperty): string;
+  function GetAudioProperty(aProp: TEAudioProperty): string;
   begin
     case aProp of
       cpArtist  : result := aAudioFile.Artist;
@@ -341,7 +344,9 @@ var tmp: String;
       cpTrack   : result := IntToStr(aAudioFile.Track);
       cpYear    : result := aAudioFile.Year;
       cpGenre   : result := aAudioFile.Genre;
-      cpFileName: result := aAudioFile.Dateiname;
+      cpFileName: result := ChangeFileExt(aAudioFile.Dateiname, '');
+      cpFileNameExt: result := aAudioFile.Dateiname;
+      cpExtension: result := aAudioFile.Extension;
       cpSubDir  : result := ExtractFileName(ExcludeTrailingPathDelimiter(aAudioFile.Ordner));
       cpDir     : result := aAudioFile.Ordner;
       cpFullPath: result := aAudioFile.Pfad;
@@ -350,6 +355,10 @@ var tmp: String;
                 else
                   result := aAudioFile.Description;
     end;
+    // note: Trim is needed, especially for property "year" in PlaylistToUSB
+    // otherwise there may be some "#0" in the string, which will lead to invalid filenames and
+    // erroneous behaviour
+    result := trim(result);
   end;
 
 begin
@@ -412,44 +421,44 @@ begin
   //
 end;
 
-procedure TAudioDisplay.LoadFromIni(aIniFile: TMemIniFile);
+procedure TAudioDisplay.LoadSettings;
 
-  function ReadSV(aSection, aKey: String; aDefault: TSubstituteValue): TSubstituteValue;
+  function ReadSV(aSection, aKey: String; aDefault: TESubstituteValue): TESubstituteValue;
   var
     tmpInt: Integer;
   begin
-    tmpInt := aIniFile.ReadInteger(aSection, aKey , Integer(aDefault));
-    if (tmpInt >= Integer(low(TSubstituteValue))) and
-       (tmpInt <= Integer(high(TSubstituteValue)))
+    tmpInt := NempSettingsManager.ReadInteger(aSection, aKey , Integer(aDefault));
+    if (tmpInt >= Integer(low(TESubstituteValue))) and
+       (tmpInt <= Integer(high(TESubstituteValue)))
     then
-      result := TSubstituteValue(tmpInt)
+      result := TESubstituteValue(tmpInt)
     else
       result := aDefault;
   end;
 
 begin
-  fPlaylistTitleFormat   .parseString := aIniFile.ReadString('AudioDisplay', 'PlaylistTitleFormat', cFormatArtistTitle);
-  fPlaylistTitleFormatFB .parseString := aIniFile.ReadString('AudioDisplay', 'PlaylistTitleFormatFB', phTitle);
-  fPlaylistCueAlbumFormat.parseString := aIniFile.ReadString('AudioDisplay', 'PlaylistCueAlbumFormat', cFormatArtistAlbum);
-  fPlaylistCueTitleFormat.parseString := aIniFile.ReadString('AudioDisplay', 'PlaylistCueTitleFormat', cFormatArtistTitle);
-  fPlaylistWebradioFormat.parseString := aIniFile.ReadString('AudioDisplay', 'PlaylistWebradioFormat', cFormatWebradio);
+  fPlaylistTitleFormat   .parseString := NempSettingsManager.ReadString('AudioDisplay', 'PlaylistTitleFormat', cFormatArtistTitle);
+  fPlaylistTitleFormatFB .parseString := NempSettingsManager.ReadString('AudioDisplay', 'PlaylistTitleFormatFB', phTitle);
+  fPlaylistCueAlbumFormat.parseString := NempSettingsManager.ReadString('AudioDisplay', 'PlaylistCueAlbumFormat', cFormatArtistAlbum);
+  fPlaylistCueTitleFormat.parseString := NempSettingsManager.ReadString('AudioDisplay', 'PlaylistCueTitleFormat', cFormatArtistTitle);
+  fPlaylistWebradioFormat.parseString := NempSettingsManager.ReadString('AudioDisplay', 'PlaylistWebradioFormat', cFormatWebradio);
 
   fArtistSubstitute := ReadSV('AudioDisplay', 'ArtistSubstitute', svFileName    );
   fTitleSubstitute  := ReadSV('AudioDisplay', 'TitleSubstitute' , svFileName    );
   fAlbumSubstitute  := ReadSV('AudioDisplay', 'AlbumSubstitute' , svSubDirectory);
 end;
 
-procedure TAudioDisplay.WriteToIni(aIniFile: TMemIniFile);
+procedure TAudioDisplay.SaveSettings;
 begin
-  aIniFile.WriteString('AudioDisplay', 'PlaylistTitleFormat'  , fPlaylistTitleFormat.parseString  );
-  aIniFile.WriteString('AudioDisplay', 'PlaylistTitleFormatFB', fPlaylistTitleFormatFB.parseString);
-  aIniFile.WriteString('AudioDisplay', 'PlaylistCueAlbumFormat', fPlaylistCueAlbumFormat.parseString);
-  aIniFile.WriteString('AudioDisplay', 'PlaylistCueTitleFormat', fPlaylistCueTitleFormat.parseString);
-  aIniFile.WriteString('AudioDisplay', 'PlaylistWebradioFormat', fPlaylistWebradioFormat.parseString);
+  NempSettingsManager.WriteString('AudioDisplay', 'PlaylistTitleFormat'  , fPlaylistTitleFormat.parseString  );
+  NempSettingsManager.WriteString('AudioDisplay', 'PlaylistTitleFormatFB', fPlaylistTitleFormatFB.parseString);
+  NempSettingsManager.WriteString('AudioDisplay', 'PlaylistCueAlbumFormat', fPlaylistCueAlbumFormat.parseString);
+  NempSettingsManager.WriteString('AudioDisplay', 'PlaylistCueTitleFormat', fPlaylistCueTitleFormat.parseString);
+  NempSettingsManager.WriteString('AudioDisplay', 'PlaylistWebradioFormat', fPlaylistWebradioFormat.parseString);
 
-  aIniFile.WriteInteger('AudioDisplay', 'ArtistSubstitute', Integer(fArtistSubstitute));
-  aIniFile.WriteInteger('AudioDisplay', 'TitleSubstitute' , Integer(fTitleSubstitute) );
-  aIniFile.WriteInteger('AudioDisplay', 'AlbumSubstitute' , Integer(fAlbumSubstitute) );
+  NempSettingsManager.WriteInteger('AudioDisplay', 'ArtistSubstitute', Integer(fArtistSubstitute));
+  NempSettingsManager.WriteInteger('AudioDisplay', 'TitleSubstitute' , Integer(fTitleSubstitute) );
+  NempSettingsManager.WriteInteger('AudioDisplay', 'AlbumSubstitute' , Integer(fAlbumSubstitute) );
 end;
 
 
@@ -617,7 +626,7 @@ begin
     result := GetDefaultPlaylistTitle(af);
 end;
 
-function TAudioDisplay.getSubstitute(af: TAudioFile; substitute: TSubstituteValue): String;
+function TAudioDisplay.getSubstitute(af: TAudioFile; substitute: TESubstituteValue): String;
 begin
   case substitute of
     svEmpty: result := '';
@@ -1133,7 +1142,7 @@ begin
                         result := PlaylistTitle(CueFile)
                     else
                         // usual case: just the "Title"
-                        result := MainFile.NonEmptyTitle;
+                        result := GetNonEmptyTitle(MainFile); // MainFile.NonEmptyTitle;
             end;
             at_Stream : begin
                         result := MainFile.Titel

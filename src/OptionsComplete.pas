@@ -125,9 +125,6 @@ type
     CB_TabStopAtPlayerControls: TCheckBox;
     CB_TabStopAtTabs: TCheckBox;
     TabSystem2: TTabSheet;
-    Label3: TLabel;
-    Label4: TLabel;
-    BtnRegistryUpdate: TButton;
     GrpBox_FileFormats: TGroupBox;
     lbl_AudioFormats: TLabel;
     lbl_PlaylistFormats: TLabel;
@@ -249,7 +246,7 @@ type
     SERowHeight: TSpinEdit;
     SEFontSize: TSpinEdit;
     cb_Medialist_FontStyle: TComboBox;
-    TabView4: TTabSheet;
+    TabView5: TTabSheet;
     GrpBox_ViewExt_NoMetadata: TGroupBox;
     LblReplaceArtistBy: TLabel;
     LblReplaceTitletBy: TLabel;
@@ -261,9 +258,6 @@ type
     CBShowHintsInMedialist: TCheckBox;
     CB_ShowHintsInPlaylist: TCheckBox;
     CBFullRowSelect: TCheckBox;
-    GrpBox_ViewVis_CoverFlow: TGroupBox;
-    cb_UseClassicCoverflow: TCheckBox;
-    cbFixCoverFlowOnStart: TCheckBox;
     GrpBox_ViewVis_Scrolling: TGroupBox;
     Lbl_Framerate: TLabel;
     CB_visual: TCheckBox;
@@ -338,28 +332,6 @@ type
     CB_QuickSearchAllowErrorsOnEnter: TCheckBox;
     cb_ChangeCoverflowOnSearch: TCheckBox;
     TabPlayer0: TTabSheet;
-    GrpBox_Devices: TGroupBox;
-    LblConst_MainDevice: TLabel;
-    LblConst_Headphones: TLabel;
-    HeadphonesDeviceCB: TComboBox;
-    MainDeviceCB: TComboBox;
-    BtnRefreshDevices: TButton;
-    GrpBox_TabAudio2_Fading: TGroupBox;
-    LblConst_TitleChange: TLabel;
-    LblConst_Titlefade: TLabel;
-    LblConst_ms1: TLabel;
-    LblConst_ms2: TLabel;
-    CB_Fading: TCheckBox;
-    SE_SeekFade: TSpinEdit;
-    SE_Fade: TSpinEdit;
-    CB_IgnoreFadingOnShortTracks: TCheckBox;
-    CB_IgnoreFadingOnPause: TCheckBox;
-    CB_IgnoreFadingOnStop: TCheckBox;
-    GrpBox_TabAudio2_Silence: TGroupBox;
-    Lbl_SilenceThreshold: TLabel;
-    Lbl_SilenceDB: TLabel;
-    CB_SilenceDetection: TCheckBox;
-    SE_SilenceThreshold: TSpinEdit;
     TabPlayer1: TTabSheet;
     GrpBox_ExtendedAudio: TGroupBox;
     LblConst_Buffersize: TLabel;
@@ -501,24 +473,9 @@ type
     BtnLyricPriorities: TUpDown;
     LblLyricPriorities: TLabel;
     cb_AutoStopHeadsetAddToPlayist: TCheckBox;
-    GrpBox_TabAudio2_ReplayGain: TGroupBox;
-    cb_ApplyReplayGain: TCheckBox;
-    cb_PreferAlbumGain: TCheckBox;
-    tp_DefaultGain: TNempTrackBar;
-    lblDefaultGainValue: TLabel;
-    lblReplayGainDefault: TLabel;
-    tp_DefaultGain2: TNempTrackBar;
-    lblDefaultGainValue2: TLabel;
-    cb_ReplayGainPreventClipping: TCheckBox;
-    lblRG_Preamp1: TLabel;
-    lblRG_Preamp2: TLabel;
     BtnActivateBirthdayMode: TButton;
     GrpBox_Files_CoverSize: TGroupBox;
     cb_CoverSize: TComboBox;
-    GrpBoxPortable: TGroupBox;
-    cb_EnableUSBMode: TCheckBox;
-    cb_EnableCloudMode: TCheckBox;
-    lblNempPortable: TLabel;
     BtnQRCode: TButton;
     cb_PlaylistManagerAutoSave: TCheckBox;
     cb_PlaylistManagerAutoSaveUserInput: TCheckBox;
@@ -533,6 +490,87 @@ type
     lblPlaylistTitleCueTitle: TLabel;
     lblPlaylistWebradioTitle: TLabel;
     cbPlaylistWebradioTitle: TComboBox;
+    GrpBox_Devices: TGroupBox;
+    LblConst_MainDevice: TLabel;
+    LblConst_Headphones: TLabel;
+    HeadphonesDeviceCB: TComboBox;
+    MainDeviceCB: TComboBox;
+    BtnRefreshDevices: TButton;
+    GrpBox_TabAudio2_Fading: TGroupBox;
+    LblConst_TitleChange: TLabel;
+    LblConst_Titlefade: TLabel;
+    LblConst_ms1: TLabel;
+    LblConst_ms2: TLabel;
+    CB_Fading: TCheckBox;
+    SE_SeekFade: TSpinEdit;
+    SE_Fade: TSpinEdit;
+    CB_IgnoreFadingOnShortTracks: TCheckBox;
+    CB_IgnoreFadingOnPause: TCheckBox;
+    CB_IgnoreFadingOnStop: TCheckBox;
+    GrpBox_TabAudio2_Silence: TGroupBox;
+    Lbl_SilenceThreshold: TLabel;
+    Lbl_SilenceDB: TLabel;
+    CB_SilenceDetection: TCheckBox;
+    SE_SilenceThreshold: TSpinEdit;
+    GrpBox_TabAudio2_ReplayGain: TGroupBox;
+    lblDefaultGainValue: TLabel;
+    lblReplayGainDefault: TLabel;
+    lblDefaultGainValue2: TLabel;
+    lblRG_Preamp1: TLabel;
+    lblRG_Preamp2: TLabel;
+    cb_ApplyReplayGain: TCheckBox;
+    cb_PreferAlbumGain: TCheckBox;
+    tp_DefaultGain: TNempTrackBar;
+    tp_DefaultGain2: TNempTrackBar;
+    cb_ReplayGainPreventClipping: TCheckBox;
+    PnlFileRegHints: TPanel;
+    Label3: TLabel;
+    Label4: TLabel;
+    BtnRegistryUpdate: TButton;
+    cb_AddBreakBetweenTracks: TCheckBox;
+    SE_BreakBetweenTracks: TSpinEdit;
+    lblBreakBetweenTracks: TLabel;
+    GrpBoxPortable: TGroupBox;
+    lblNempPortable: TLabel;
+    cb_EnableUSBMode: TCheckBox;
+    cb_EnableCloudMode: TCheckBox;
+    TabView4: TTabSheet;
+    grpBox_CoverFlowPositions: TGroupBox;
+    tbCoverZMain: TNempTrackBar;
+    lblCoverZMain: TLabel;
+    LblCoverZLeft: TLabel;
+    tbCoverZLeft: TNempTrackBar;
+    LblCoverZRight: TLabel;
+    tbCoverZRight: TNempTrackBar;
+    grpBox_CoverFlowGaps: TGroupBox;
+    tbCoverGapFirstLeft: TNempTrackBar;
+    tbCoverGapFirstRight: TNempTrackBar;
+    tbCoverGapLeft: TNempTrackBar;
+    tbCoverGapRight: TNempTrackBar;
+    lblCoverFlowGapLeft: TLabel;
+    lblCoverFlowGapRight: TLabel;
+    grpBox_CoverFlowAngles: TGroupBox;
+    lblCoverFlowAngleLeft: TLabel;
+    tbCoverAngleLeft: TNempTrackBar;
+    lblCoverFlowAngleRight: TLabel;
+    tbCoverAngleRight: TNempTrackBar;
+    grpBox_CoverFlowReflection: TGroupBox;
+    cbCoverFlowUseReflection: TCheckBox;
+    lblCoverFlowIntensity: TLabel;
+    tbCoverReflexionIntensity: TNempTrackBar;
+    lblCoverflowReflexionGap: TLabel;
+    tbCoverReflexionGap: TNempTrackBar;
+    tbCoverAngleMain: TNempTrackBar;
+    grpBox_CoverFlowViewPosition: TGroupBox;
+    tbCoverViewPosition: TNempTrackBar;
+    lblCoverFlowAngleMain: TLabel;
+    PnlCoverFlowControl: TPanel;
+    BtnUndoCoverFlowSettings: TButton;
+    BtnCoverFlowDefault: TButton;
+    GrpBoxCoverFlowMixed: TGroupBox;
+    cb_UseClassicCoverflow: TCheckBox;
+    lblCoverflowTextures: TLabel;
+    seCoverflowTextureCache: TSpinEdit;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -647,6 +685,10 @@ type
     procedure BtnActivateBirthdayModeClick(Sender: TObject);
     procedure BtnQRCodeClick(Sender: TObject);
     procedure cb_PlaylistManagerAutoSaveClick(Sender: TObject);
+    procedure cb_AddBreakBetweenTracksClick(Sender: TObject);
+    procedure tbCoverZMainChange(Sender: TObject);
+    procedure BtnUndoCoverFlowSettingsClick(Sender: TObject);
+    procedure BtnCoverFlowDefaultClick(Sender: TObject);
 
   private
     { Private-Deklarationen }
@@ -664,9 +706,14 @@ type
 
     procedure LoadDefaultCover;
 
+    procedure ApplyCoverFlowSettingsToGUI;
+    procedure SetCoverFlowSettingsFromGUI;
+
+
 
   protected
     Procedure ScrobblerMessage(Var aMsg: TMessage); message WM_Scrobbler;
+    procedure CreateParams(var Params: TCreateParams); override;
   public
     { Public-Deklarationen }
 
@@ -703,17 +750,18 @@ implementation
 
 uses NempMainUnit, Details, SplitForm_Hilfsfunktionen, WindowsVersionInfo,
   WebServerLog, MedienBibliothekClass, DriveRepairTools, WebQRCodes,
-  AudioDisplayUtils;
+  AudioDisplayUtils, unitFlyingCow;
 
 {$R *.dfm}
 
 var
  OptionsArraySystem : array[0..2] of TOptionData;
- OptionsArrayAnzeige: array[0..3] of TOptionData;
+ OptionsArrayAnzeige: array[0..4] of TOptionData;
  OptionsArrayAudio  : array[0..8] of TOptionData;
  OptionsArrayFiles  : Array[0..4] of TOptionData;
  Testskin: TNempSkin;
 
+ BackUpCoverFlowSettings: TCoverFlowSettings;
 
 
 function AddVSTOptions(AVST: TCustomVirtualStringTree; aNode: PVirtualNode; aOption: TOptionData): PVirtualNode;
@@ -727,6 +775,10 @@ end;
 
 procedure TOptionsCompleteForm.BTNCancelClick(Sender: TObject);
 begin
+  MedienBib.NewCoverFlow.Settings := BackUpCoverFlowSettings;
+  ApplyCoverFlowSettingsToGUI;
+  MedienBib.NewCoverFlow.ApplySettings;
+
   close;
 end;
 
@@ -744,7 +796,7 @@ begin
   if Nemp_MainForm.NempSkin.isActive
       and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
       and Nemp_MainForm.NempSkin.UseAdvancedSkin
-      and Nemp_MainForm.GlobalUseAdvancedSkin
+      and NempOptions.GlobalUseAdvancedSkin
   then
       BaseDir := Nemp_MainForm.NempSkin.Path + '\'
   else
@@ -858,8 +910,11 @@ begin
       OptionsArrayAnzeige[2].Eintrag := OptionsTree_ViewFonts;
       OptionsArrayAnzeige[2].TabSheet:= TabView3;
 
-      OptionsArrayAnzeige[3].Eintrag  := OptionsTree_ViewExtended;//'[leer]'; //OptionsTree_PlayerMedialibrary
+      OptionsArrayAnzeige[3].Eintrag  := OptionsTree_CoverFlow;
       OptionsArrayAnzeige[3].TabSheet := TabView4;
+
+      OptionsArrayAnzeige[4].Eintrag  := OptionsTree_ViewExtended;//'[leer]'; //OptionsTree_PlayerMedialibrary
+      OptionsArrayAnzeige[4].TabSheet := TabView5;
 
   // PLAYER
   OptionsArrayAudio[0].Eintrag  := OptionsTree_PlayerMain;
@@ -906,34 +961,17 @@ begin
   // Fill Tree
   ShowSettings(True);
 
-  OptionsVST.FullExpand(Nil);
+  for i := Low(OptionsArraySystem) to High(OptionsArraySystem) do
+    OptionsArraySystem[i].TabSheet.TabVisible := False;
 
-  TabSystem0.TabVisible := False;
-  TabSystem1.TabVisible := False;
-  TabSystem2.TabVisible := False;
-  TabSystem3.TabVisible := False;
-  //TabSystem4.TabVisible := False;
+  for i := Low(OptionsArrayAnzeige) to High(OptionsArrayAnzeige) do
+    OptionsArrayAnzeige[i].TabSheet.TabVisible := False;
 
-  TabView0.TabVisible := False;
-  TabView1.TabVisible := False;
-  TabView3.TabVisible := False;
-  TabView4.TabVisible := False;
+  for i := Low(OptionsArrayAudio) to High(OptionsArrayAudio) do
+    OptionsArrayAudio[i].TabSheet.TabVisible := False;
 
-
-  TabPlayer0.TabVisible := False;
-  TabPlayer1.TabVisible := False;
-  TabPlayer2.TabVisible := False;
-  TabPlaylistRandom.TabVisible := False;
-  TabPlayer4.TabVisible := False;
-  TabPlayer5.TabVisible := False;
-  TabPlayer6.TabVisible := False;
-  TabPlayer7.TabVisible := False;
-  TabPlayer8.TabVisible := False;
-
-  TabFiles0.TabVisible := False;
-  TabFiles1.TabVisible := False;
-  TabFiles2.TabVisible := False;
-  TabFiles3.TabVisible := False;
+  for i := Low(OptionsArrayFiles) to High(OptionsArrayFiles) do
+    OptionsArrayFiles[i].TabSheet.TabVisible := False;
 
   //----------------------------------
   count := 1;
@@ -1040,7 +1078,10 @@ begin
     GrpBox_TabulatorOptions.Visible := ExtendedSettings;
     GrpBox_PlayerExt_SafePlayback.Visible := ExtendedSettings;
 
+
     OptionsVST.Clear;
+
+    OptionsVST.BeginUpdate;
 
     // MAIN
     MainNode := AddVSTOptions(OptionsVST, NIL, OptionsArraySystem[0]);
@@ -1076,10 +1117,11 @@ begin
 
     OptionsVST.FullExpand(Nil);
 
+    OptionsVST.EndUpdate;
+
     OptionsVST.FocusedNode := Firstnode;
     PageControl1.ActivePage := TabSystem0;
 end;
-
 
 
 procedure TOptionsCompleteForm.OptionsVSTBeforeItemErase(
@@ -1147,10 +1189,6 @@ end;
 
 procedure TOptionsCompleteForm.FormShow(Sender: TObject);
 var i,s: integer;
-    Ini: TMemIniFile;
-    hMod: Cardinal;
-    hKey: Byte;
-    //aBmp: TBitmap;
     ftr: TFileTypeRegistration;
     tmpIPs, tmpThemes: TStrings;
 begin
@@ -1158,7 +1196,7 @@ begin
 //  cb_BetaDontUseThreadedUpdate.Checked := MedienBib.BetaDontUseThreadedUpdate;
 
   cb_UseClassicCoverflow.Checked := MedienBib.NewCoverFlow.Mode = cm_Classic;
-  cbFixCoverFlowOnStart.Checked := Nemp_MainForm.NempOptions.FixCoverFlowOnStart;
+  // cbFixCoverFlowOnStart.Checked := NempOptions.FixCoverFlowOnStart;
 
   //---PLAYER----
   GrpBox_DefaultAction.ItemIndex := NempPlaylist.DefaultAction;
@@ -1222,6 +1260,11 @@ begin
   Lbl_SilenceThreshold.Enabled := NempPlayer.DoSilenceDetection;
   SE_SilenceThreshold.Enabled  := NempPlayer.DoSilenceDetection;
   Lbl_SilenceDB.Enabled        := NempPlayer.DoSilenceDetection;
+
+  cb_AddBreakBetweenTracks.Checked := NempPlayer.DoPauseBetweenTracks;
+  SE_BreakBetweenTracks.Value      := NempPlayer.PauseBetweenTracksDuration;
+  SE_BreakBetweenTracks.Enabled := NempPlayer.DoPauseBetweenTracks;
+  lblBreakBetweenTracks.Enabled := NempPlayer.DoPauseBetweenTracks;
 
   cb_ApplyReplayGain.Checked   := NempPlayer.ApplyReplayGain;
       cb_PreferAlbumGain.Enabled   := NempPlayer.ApplyReplayGain;
@@ -1364,20 +1407,20 @@ begin
 
   //----------ALLGEMEIN_:______________
 
-  OldFontSize := Nemp_MainForm.NempOptions.DefaultFontSize;
-  CBChangeFontColorOnBitrate.Checked := Nemp_MainForm.NempOptions.ChangeFontColorOnBitrate;
-  CBChangeFontSizeOnLength.Checked := Nemp_MainForm.NempOptions.ChangeFontSizeOnLength;
+  OldFontSize := NempOptions.DefaultFontSize;
+  CBChangeFontColorOnBitrate.Checked := NempOptions.ChangeFontColorOnBitrate;
+  CBChangeFontSizeOnLength.Checked := NempOptions.ChangeFontSizeOnLength;
 
-  CBChangeFontStyleOnMode.Checked := Nemp_MainForm.NempOptions.ChangeFontStyleOnMode;
-  CBChangeFontOnCbrVbr.Checked := Nemp_MainForm.NempOptions.ChangeFontOnCbrVbr;
-  SEFontSize.Value := Nemp_MainForm.NempOptions.DefaultFontSize;
-  SERowHeight.Value := Nemp_MainForm.NempOptions.RowHeight;
+  CBChangeFontStyleOnMode.Checked := NempOptions.ChangeFontStyleOnMode;
+  CBChangeFontOnCbrVbr.Checked := NempOptions.ChangeFontOnCbrVbr;
+  SEFontSize.Value := NempOptions.DefaultFontSize;
+  SERowHeight.Value := NempOptions.RowHeight;
 
-  cb_Medialist_FontStyle.ItemIndex := Nemp_MainForm.NempOptions.DefaultFontStyle ;
-  cb_Browselist_FontStyle.ItemIndex := Nemp_MainForm.NempOptions.ArtistAlbenFontStyle ;
+  cb_Medialist_FontStyle.ItemIndex := NempOptions.DefaultFontStyle ;
+  cb_Browselist_FontStyle.ItemIndex := NempOptions.ArtistAlbenFontStyle ;
 
-  CBFontNameCBR.ItemIndex := CBFontNameCBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameCBR);
-  CBFontNameVBR.ItemIndex := CBFontNameVBR.Items.IndexOf(Nemp_MainForm.NempOptions.FontNameVBR);
+  CBFontNameCBR.ItemIndex := CBFontNameCBR.Items.IndexOf(NempOptions.FontNameCBR);
+  CBFontNameVBR.ItemIndex := CBFontNameVBR.Items.IndexOf(NempOptions.FontNameVBR);
   LblConst_FontVBR.Enabled := CBChangeFontOnCbrVbr.Checked;
   LblConst_FontCBR.Enabled := CBChangeFontOnCbrVbr.Checked;
   CBFontNameVBR.Enabled := CBChangeFontOnCbrVbr.Checked;
@@ -1409,7 +1452,7 @@ begin
 
   cb_CoverSize.ItemIndex := TCoverArtSearcher.CoverSizeIndex;
 
-  cbFullRowSelect.Checked := Nemp_MainForm.NempOptions.FullRowSelect;
+  cbFullRowSelect.Checked := NempOptions.FullRowSelect;
 
   cbAlwaysSortAnzeigeList.Checked := MedienBib.AlwaysSortAnzeigeList;
   cb_limitMarkerToCurrentFiles.Checked := MedienBib.limitMarkerToCurrentFiles;
@@ -1454,19 +1497,19 @@ begin
 
   BtnAutoScanNow.Enabled := cb_AutoDeleteFiles.Checked or CBAutoScan.Checked;
 
-  cb_ShowSplashScreen.Checked := Nemp_MainForm.NempOptions.ShowSplashScreen;
-  CB_AllowMultipleInstances.Checked := Not Nemp_MainForm.NempOptions.AllowOnlyOneInstance;
-  CB_StartMinimized.Checked := Nemp_MainForm.NempOptions.StartMinimized;
-  CBRegisterHotKeys.Checked := Nemp_MainForm.NempOptions.RegisterHotKeys;
+  cb_ShowSplashScreen.Checked := NempOptions.ShowSplashScreen;
+  CB_AllowMultipleInstances.Checked := Not NempOptions.AllowOnlyOneInstance;
+  CB_StartMinimized.Checked := NempOptions.StartMinimized;
+  CBRegisterHotKeys.Checked := NempOptions.RegisterHotKeys;
 
-  cb_RegisterMediaHotkeys.Checked := Nemp_MainForm.NempOptions.RegisterMediaHotkeys;
-  CB_IgnoreVolume.Checked := Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys;
-  cb_UseG15Display.Checked := Nemp_MainForm.NempOptions.UseDisplayApp;
+  cb_RegisterMediaHotkeys.Checked := NempOptions.RegisterMediaHotkeys;
+  CB_IgnoreVolume.Checked := NempOptions.IgnoreVolumeUpDownKeys;
+  cb_UseG15Display.Checked := NempOptions.UseDisplayApp;
 
   cb_SafePlayback.Checked := NempPlayer.SafePlayback;
 
-  CB_TabStopAtPlayerControls.Checked := Nemp_MainForm.NempOptions.TabStopAtPlayerControls;
-  CB_TabStopAtTabs          .Checked := Nemp_MainForm.NempOptions.TabStopAtTabs;
+  CB_TabStopAtPlayerControls.Checked := NempOptions.TabStopAtPlayerControls;
+  CB_TabStopAtTabs          .Checked := NempOptions.TabStopAtTabs;
 
   cbIncludeAll.Checked := MedienBib.IncludeAll;
   cbIncludeFiles.Enabled := NOT cbIncludeAll.Checked;
@@ -1489,20 +1532,20 @@ begin
   CB_QuickSearchAllowErrorsOnEnter    .Checked := MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnEnter;
   CB_QuickSearchAllowErrorsWhileTyping.Checked := MedienBib.BibSearcher.QuickSearchOptions.AllowErrorsOnType;
 
-  cb_TaskTray.ItemIndex := Nemp_MainForm.NempOptions.NempWindowView;
+  cb_TaskTray.ItemIndex := NempOptions.NempWindowView;
 
-  CBShowDeskbandOnMinimize.Checked := Nemp_MainForm.NempOptions.ShowDeskbandOnMinimize;
-  CBShowDeskbandOnStart.Checked    := Nemp_MainForm.NempOptions.ShowDeskbandOnStart;
-  CBHideDeskbandOnRestore.Checked  := Nemp_MainForm.NempOptions.HideDeskbandOnRestore;
-  CBHideDeskbandOnClose.Checked    := Nemp_MainForm.NempOptions.HideDeskbandOnClose;
+  CBShowDeskbandOnMinimize.Checked := NempOptions.ShowDeskbandOnMinimize;
+  CBShowDeskbandOnStart.Checked    := NempOptions.ShowDeskbandOnStart;
+  CBHideDeskbandOnRestore.Checked  := NempOptions.HideDeskbandOnRestore;
+  CBHideDeskbandOnClose.Checked    := NempOptions.HideDeskbandOnClose;
 
   // hide this option in most cases now (for new users)
   GrpBox_Deskband.Visible := FileExists(ExtractFilePath(ParamStr(0)) + 'NempDeskband.dll');
 
 
   // Artist/alben-Größen
-  SEArtistAlbenSIze.Value := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
-  SEArtistAlbenRowHeight.Value := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
+  SEArtistAlbenSIze.Value := NempOptions.ArtistAlbenFontSize;
+  SEArtistAlbenRowHeight.Value := NempOptions.ArtistAlbenRowHeight;
 
 
   CBAutoDetectCharCode.Checked := NempCharCodeOptions.AutoDetectCodePage;
@@ -1537,7 +1580,45 @@ begin
       BtnActivateBirthdayMode.Caption := MenuItem_Activate;
 
 
-  // Hotkeys setzen
+  // Hotkeys-Controls setzen
+  // hkPlay, hkStop, hkNext, hkPrev, hkSlideForward, hkSlideBack, hkIncVol, hkDecVol, hk Mute
+  CB_Activate_Play.Checked := NempOptions.HotKeys[hkPlay].Activate;
+  CB_Mod_Play.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkPlay].Modifier);
+  CB_Key_Play.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkPlay].Key);
+
+  CB_Activate_Stop.Checked := NempOptions.HotKeys[hkStop].Activate;
+  CB_Mod_Stop.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkStop].Modifier);
+  CB_Key_Stop.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkStop].Key);
+
+  CB_Activate_Next.Checked := NempOptions.HotKeys[hkNext].Activate;
+  CB_Mod_Next.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkNext].Modifier);
+  CB_Key_Next.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkNext].Key);
+
+  CB_Activate_Prev.Checked := NempOptions.HotKeys[hkPrev].Activate;
+  CB_Mod_Prev.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkPrev].Modifier);
+  CB_Key_Prev.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkPrev].Key);
+
+  CB_Activate_JumpForward.Checked := NempOptions.HotKeys[hkSlideForward].Activate;
+  CB_Mod_JumpForward.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkSlideForward].Modifier);
+  CB_Key_JumpForward.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkSlideForward].Key);
+
+  CB_Activate_JumpBack.Checked := NempOptions.HotKeys[hkSlideBack].Activate;
+  CB_Mod_JumpBack.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkSlideBack].Modifier);
+  CB_Key_JumpBack.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkSlideBack].Key);
+
+  CB_Activate_IncVol.Checked := NempOptions.HotKeys[hkIncVol].Activate;
+  CB_Mod_IncVol.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkIncVol].Modifier);
+  CB_Key_IncVol.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkIncVol].Key);
+
+  CB_Activate_DecVol.Checked := NempOptions.HotKeys[hkDecVol].Activate;
+  CB_Mod_DecVol.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkDecVol].Modifier);
+  CB_Key_DecVol.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkDecVol].Key);
+
+  CB_Activate_Mute.Checked := NempOptions.HotKeys[hkMute].Activate;
+  CB_Mod_Mute.ItemIndex    := ModToIndex(NempOptions.HotKeys[hkMute].Modifier);
+  CB_Key_Mute.ItemIndex    := KeyToIndex(NempOptions.HotKeys[hkMute].Key);
+
+  {
   ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
   try
        ini.Encoding := TEncoding.UTF8;
@@ -1597,10 +1678,11 @@ begin
   finally
     ini.Free;
   end;
+  }
   CBRegisterHotKeysClick(Nil);
 
 
-  cb_StayOnTop.Checked := Nemp_MainForm.NempOptions.MiniNempStayOnTop;
+  cb_StayOnTop.Checked := NempOptions.MiniNempStayOnTop;
 
   // Update-Optionen
   CB_AutoCheck.Checked := NempUpdater.AutoCheck;
@@ -1688,12 +1770,12 @@ begin
 
 
  // quick access to metadata
-  cb_AccessMetadata                     .checked := Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata;
+  cb_AccessMetadata                     .checked := NempOptions.AllowQuickAccessToMetadata;
   // Ignore Lyrics (for HUGE collections, saves RAM)
   cb_IgnoreLyrics                       .checked := MedienBib.IgnoreLyrics;
 
 
-  cb_UseCDDB                            .checked := Nemp_MainForm.NempOptions.UseCDDB;
+  cb_UseCDDB                            .checked := NempOptions.UseCDDB;
   cb_AutoResolveInconsistencies         .checked := MedienBib.AutoResolveInconsistencies          ;
   cb_AskForAutoResolveInconsistencies   .checked := MedienBib.AskForAutoResolveInconsistencies    ;
   cb_ShowAutoResolveInconsistenciesHints.checked := MedienBib.ShowAutoResolveInconsistenciesHints ;
@@ -1718,6 +1800,11 @@ begin
   ChangeWebserverLinks(Nil);
 
   LoadDefaultCover;
+
+  // CoverFlow Settings
+
+  BackUpCoverFlowSettings := MedienBib.NewCoverFlow.Settings;
+  ApplyCoverFlowSettingsToGUI;
 
   //SetWindowPos(Handle,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE+SWP_NOMOVE);
 end;
@@ -1834,7 +1921,7 @@ begin
 
 
 
-  if Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
+  if NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY then
   begin
     ShowWindow( Application.Handle, SW_HIDE );
     {SetWindowLong( Nemp_MainForm.Handle, GWL_EXSTYLE,
@@ -1886,6 +1973,12 @@ begin
   Lbl_SilenceThreshold.Enabled := CB_SilenceDetection.Checked;
   SE_SilenceThreshold.Enabled  := CB_SilenceDetection.Checked;
   Lbl_SilenceDB.Enabled        := CB_SilenceDetection.Checked;
+end;
+
+procedure TOptionsCompleteForm.cb_AddBreakBetweenTracksClick(Sender: TObject);
+begin
+  SE_BreakBetweenTracks.Enabled := cb_AddBreakBetweenTracks.Checked;
+  lblBreakBetweenTracks.Enabled := cb_AddBreakBetweenTracks.Checked;
 end;
 
 procedure TOptionsCompleteForm.cb_ApplyReplayGainClick(Sender: TObject);
@@ -2259,6 +2352,7 @@ begin
     end;
 end;
 
+
 procedure TOptionsCompleteForm.BtnBirthdaySongClick(Sender: TObject);
 begin
   If OpenDlg_CountdownSongs.Execute then
@@ -2360,7 +2454,11 @@ begin
           MedienBib.NewCoverFlow.Mode := cm_OpenGL;
   end;
 
-  Nemp_MainForm.NempOptions.FixCoverFlowOnStart := cbFixCoverFlowOnStart.Checked;
+  SetCoverFlowSettingsFromGUI;
+  MedienBib.NewCoverFlow.ApplySettings;
+  BackUpCoverFlowSettings := MedienBib.NewCoverFlow.Settings;
+
+  // NempOptions.FixCoverFlowOnStart := cbFixCoverFlowOnStart.Checked;
 
 
 // ----------------------Player------------------------------
@@ -2410,6 +2508,9 @@ begin
 
   NempPlayer.DoSilenceDetection := CB_SilenceDetection.Checked ;
   NempPlayer.SilenceThreshold   := SE_SilenceThreshold.Value   ;
+
+  NempPlayer.DoPauseBetweenTracks       := cb_AddBreakBetweenTracks.Checked;
+  NempPlayer.PauseBetweenTracksDuration := SE_BreakBetweenTracks.Value;
 
   NempPlayer.ApplyReplayGain  := cb_ApplyReplayGain.Checked;
   NempPlayer.PreferAlbumGain  := cb_PreferAlbumGain.Checked;
@@ -2512,18 +2613,18 @@ begin
   NempPlaylist.BassHandlePlaylist := (RGroup_Playlist.ItemIndex = 1);
 
 //----------------------allgemein---------------------
-  Nemp_MainForm.NempOptions.ChangeFontColorOnBitrate := CBChangeFontColorOnBitrate.Checked;
-  Nemp_MainForm.NempOptions.ChangeFontSizeOnLength := CBChangeFontSizeOnLength.Checked;
-  Nemp_MainForm.NempOptions.ChangeFontStyleOnMode := CBChangeFontStyleOnMode.Checked;
-  Nemp_MainForm.NempOptions.ChangeFontOnCbrVbr := CBChangeFontOnCbrVbr.Checked;
+  NempOptions.ChangeFontColorOnBitrate := CBChangeFontColorOnBitrate.Checked;
+  NempOptions.ChangeFontSizeOnLength := CBChangeFontSizeOnLength.Checked;
+  NempOptions.ChangeFontStyleOnMode := CBChangeFontStyleOnMode.Checked;
+  NempOptions.ChangeFontOnCbrVbr := CBChangeFontOnCbrVbr.Checked;
 
 
-  Nemp_MainForm.NempOptions.DefaultFontSize := SEFontSize.Value;
-  Nemp_MainForm.NempOptions.DefaultFontStyle      := cb_Medialist_FontStyle.ItemIndex ;
-  Nemp_MainForm.NempOptions.ArtistAlbenFontStyle  := cb_Browselist_FontStyle.ItemIndex;
+  NempOptions.DefaultFontSize := SEFontSize.Value;
+  NempOptions.DefaultFontStyle      := cb_Medialist_FontStyle.ItemIndex ;
+  NempOptions.ArtistAlbenFontStyle  := cb_Browselist_FontStyle.ItemIndex;
   // translate into actual font styles
-  Nemp_MainForm.NempOptions.DefaultFontStyles     := FontSelectorItemIndexToStyle(Nemp_MainForm.NempOptions.DefaultFontStyle);
-  Nemp_MainForm.NempOptions.ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(Nemp_MainForm.NempOptions.ArtistAlbenFontStyle);
+  NempOptions.DefaultFontStyles     := FontSelectorItemIndexToStyle(NempOptions.DefaultFontStyle);
+  NempOptions.ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(NempOptions.ArtistAlbenFontStyle);
 
 
 
@@ -2538,8 +2639,8 @@ begin
       Nemp_MainForm.VST.Header.Columns[s].Options := Nemp_MainForm.VST.Header.Columns[s].Options - [coVisible];
   end;
 
-  Nemp_MainForm.NempOptions.FontNameCBR := CBFontNameCBR.Items[CBFontNameCBR.itemindex];
-  Nemp_MainForm.NempOptions.FontNameVBR := CBFontNameVBR.Items[CBFontNameVBR.itemindex];
+  NempOptions.FontNameCBR := CBFontNameCBR.Items[CBFontNameCBR.itemindex];
+  NempOptions.FontNameVBR := CBFontNameVBR.Items[CBFontNameVBR.itemindex];
 
   TCoverArtSearcher.UseDir       := CB_CoverSearch_inDir.Checked;
   TCoverArtSearcher.UseParentDir := CB_CoverSearch_inParentDir.Checked;
@@ -2562,7 +2663,7 @@ begin
 
 
   //Nemp_MainForm.NempOptions.DenyId3Edit := cbDenyId3Edit.Checked;
-  Nemp_MainForm.NempOptions.FullRowSelect := cbFullRowSelect.Checked;
+  NempOptions.FullRowSelect := cbFullRowSelect.Checked;
   // Nemp_MainForm.NempOptions.EditOnClick   := CB_EditOnClick.Checked;
   MedienBib.AlwaysSortAnzeigeList := cbAlwaysSortAnzeigeList.Checked;
   MedienBib.limitMarkerToCurrentFiles := cb_limitMarkerToCurrentFiles.Checked;
@@ -2623,9 +2724,9 @@ begin
           MedienBib.CoverSortOrder := cbCoverSortOrder.ItemIndex + 1;
           MedienBib.MissingCoverMode := cbMissingCoverMode.ItemIndex;
 
-          NempDisplay.ArtistSubstitute := TSubstituteValue(cbReplaceArtistBy.ItemIndex);
-          NempDisplay.TitleSubstitute  := TSubstituteValue(cbReplaceTitleBy .ItemIndex);
-          NempDisplay.AlbumSubstitute  := TSubstituteValue(cbReplaceAlbumBy .ItemIndex);
+          NempDisplay.ArtistSubstitute := TESubstituteValue(cbReplaceArtistBy.ItemIndex);
+          NempDisplay.TitleSubstitute  := TESubstituteValue(cbReplaceTitleBy .ItemIndex);
+          NempDisplay.AlbumSubstitute  := TESubstituteValue(cbReplaceAlbumBy .ItemIndex);
 
           NempDisplay.PlaylistTitleFormat    := cbPlaylistTitle.Text         ;
           NempDisplay.PlaylistTitleFormatFB  := cbPlaylistTitleFB.Text       ;
@@ -2664,31 +2765,31 @@ begin
   MedienBib.AutoDeleteFiles         := cb_AutoDeleteFiles        .checked ;
   MedienBib.AutoDeleteFilesShowInfo := cb_AutoDeleteFilesShowInfo.checked ;
 
-  if Nemp_MainForm.NempOptions.FullRowSelect then
+  if NempOptions.FullRowSelect then
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions + [toFullRowSelect]
   else
     Nemp_MainForm.VST.TreeOptions.SelectionOptions := Nemp_MainForm.VST.TreeOptions.SelectionOptions - [toFullRowSelect];
 
-  Nemp_MainForm.NempOptions.ShowSplashScreen := cb_ShowSplashScreen.Checked;
-  Nemp_MainForm.NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
-  Nemp_MainForm.NempOptions.StartMinimized  := CB_StartMinimized.Checked;
-  Nemp_MainForm.NempOptions.RegisterHotKeys := CBRegisterHotKeys.Checked;
+  NempOptions.ShowSplashScreen := cb_ShowSplashScreen.Checked;
+  NempOptions.AllowOnlyOneInstance := Not CB_AllowMultipleInstances.Checked;
+  NempOptions.StartMinimized  := CB_StartMinimized.Checked;
+  NempOptions.RegisterHotKeys := CBRegisterHotKeys.Checked;
 
-  Nemp_MainForm.NempOptions.TabStopAtPlayerControls := CB_TabStopAtPlayerControls.Checked;
-  Nemp_MainForm.NempOptions.TabStopAtTabs           := CB_TabStopAtTabs          .Checked;
+  NempOptions.TabStopAtPlayerControls := CB_TabStopAtPlayerControls.Checked;
+  NempOptions.TabStopAtTabs           := CB_TabStopAtTabs          .Checked;
   SetTabStopsPlayer;
   SetTabStopsTabs;
 
-  Nemp_MainForm.NempOptions.RegisterMediaHotkeys   := cb_RegisterMediaHotkeys.Checked;
-  Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
+  NempOptions.RegisterMediaHotkeys   := cb_RegisterMediaHotkeys.Checked;
+  NempOptions.IgnoreVolumeUpDownKeys := CB_IgnoreVolume.Checked;
 
-  if cb_UseG15Display.Checked and (NOT Nemp_MainForm.NempOptions.UseDisplayApp) then
+  if cb_UseG15Display.Checked and (NOT NempOptions.UseDisplayApp) then
   begin
       // G15 App is not currently active -> activate it!
-      if Nemp_MainForm.NempOptions.DisplayApp = '' then
+      if NempOptions.DisplayApp = '' then
             tmp := 'NempG15App.exe'
         else
-            tmp := Nemp_MainForm.NempOptions.DisplayApp;
+            tmp := NempOptions.DisplayApp;
 
         tmp := ExtractFilepath(paramStr(0)) + tmp;
         if FileExists(tmp) then
@@ -2697,7 +2798,7 @@ begin
             TranslateMessageDLG((StartG15AppNotFound), mtWarning, [mbOK], 0)
   end;
 
-  Nemp_MainForm.NempOptions.UseDisplayApp          := cb_UseG15Display.Checked;
+  NempOptions.UseDisplayApp          := cb_UseG15Display.Checked;
 
   NempPlayer.SafePlayback := cb_SafePlayback.Checked;
 
@@ -2723,11 +2824,11 @@ begin
   MedienBib.AutoLoadMediaList := CBAutoLoadMediaList.Checked;
   MedienBib.AutoSaveMediaList := CBAutoSaveMediaList.Checked;
 
-  if not assigned(FDetails) then
-      Application.CreateForm(TFDetails, FDetails);
+  //if not assigned(FDetails) then
+  //  Application.CreateForm(TFDetails, FDetails);
 
   // Fensterverhalten:
-  if Nemp_MainForm.NempOptions.NempWindowView <> cb_TaskTray.ItemIndex then
+  if NempOptions.NempWindowView <> cb_TaskTray.ItemIndex then
   begin
       // Hide Taskbar-entry
 
@@ -2738,7 +2839,7 @@ begin
     NEMPWINDOW_BOTH_MIN_TRAY = 4;}
 
       if      (cb_TaskTray.ItemIndex = NEMPWINDOW_TRAYONLY) // user want no taskbar-entry at all ...
-          and (Nemp_MainForm.NempOptions.NempWindowView in
+          and (NempOptions.NempWindowView in
                [  NEMPWINDOW_ONLYTASKBAR,
                   NEMPWINDOW_TASKBAR_MIN_TRAY,
                   NEMPWINDOW_BOTH,
@@ -2754,7 +2855,7 @@ begin
                      );
           ShowWindow( Application.Handle, SW_SHOW );
       end else
-          if (Nemp_MainForm.NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY)   // user has no entry
+          if (NempOptions.NempWindowView = NEMPWINDOW_TRAYONLY)   // user has no entry
               and (cb_TaskTray.ItemIndex in
                   [ NEMPWINDOW_ONLYTASKBAR,
                     NEMPWINDOW_TASKBAR_MIN_TRAY,
@@ -2769,7 +2870,7 @@ begin
               ShowWindow( Application.Handle, SW_SHOW );
           end;
       // Set new value
-      Nemp_MainForm.NempOptions.NempWindowView := cb_TaskTray.ItemIndex;
+      NempOptions.NempWindowView := cb_TaskTray.ItemIndex;
 
         // TrayIcon erzeugen, behalten oder löschen
       if cb_TaskTray.ItemIndex in [NEMPWINDOW_TRAYONLY, NEMPWINDOW_BOTH, NEMPWINDOW_BOTH_MIN_TRAY] then
@@ -2783,20 +2884,20 @@ begin
       end;
   end;
 
-  Nemp_MainForm.NempOptions.ShowDeskbandOnMinimize := CBShowDeskbandOnMinimize.Checked;
-  Nemp_MainForm.NempOptions.ShowDeskbandOnStart    := CBShowDeskbandOnStart.Checked;
-  Nemp_MainForm.NempOptions.HideDeskbandOnRestore  := CBHideDeskbandOnRestore.Checked;
-  Nemp_MainForm.NempOptions.HideDeskbandOnClose    := CBHideDeskbandOnClose.Checked;
+  NempOptions.ShowDeskbandOnMinimize := CBShowDeskbandOnMinimize.Checked;
+  NempOptions.ShowDeskbandOnStart    := CBShowDeskbandOnStart.Checked;
+  NempOptions.HideDeskbandOnRestore  := CBHideDeskbandOnRestore.Checked;
+  NempOptions.HideDeskbandOnClose    := CBHideDeskbandOnClose.Checked;
 
   ReDrawVorauswahlTrees := (Nemp_MainForm.ArtistsVST.DefaultNodeHeight <> Cardinal(SEArtistAlbenRowHeight.Value));
 
-  Nemp_MainForm.NempOptions.ArtistAlbenFontSize := SEArtistAlbenSIze.Value;
-  Nemp_MainForm.NempOptions.ArtistAlbenRowHeight := SEArtistAlbenRowHeight.Value;
+  NempOptions.ArtistAlbenFontSize := SEArtistAlbenSIze.Value;
+  NempOptions.ArtistAlbenRowHeight := SEArtistAlbenRowHeight.Value;
 
-  Nemp_MainForm.ArtistsVST.DefaultNodeHeight := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
-  Nemp_MainForm.AlbenVST.DefaultNodeHeight := Nemp_MainForm.NempOptions.ArtistAlbenRowHeight;
-  Nemp_MainForm.ArtistsVST.Font.Size := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
-  Nemp_MainForm.AlbenVST.Font.Size := Nemp_MainForm.NempOptions.ArtistAlbenFontSize;
+  Nemp_MainForm.ArtistsVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
+  Nemp_MainForm.AlbenVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
+  Nemp_MainForm.ArtistsVST.Font.Size := NempOptions.ArtistAlbenFontSize;
+  Nemp_MainForm.AlbenVST.Font.Size := NempOptions.ArtistAlbenFontSize;
 
   if NeedTotalLyricStringUpdate then Medienbib.BuildTotalLyricString;
   if NeedTotalStringUpdate then MedienBib.BuildTotalString;
@@ -2842,17 +2943,17 @@ begin
     end;
   end;
 
-  Nemp_MainForm.NempOptions.RowHeight := SERowHeight.Value;
-  if Nemp_MainForm.NempOptions.ChangeFontSizeOnLength then
-      maxFont := MaxFontSize(Nemp_MainForm.NempOptions.DefaultFontSize)
+  NempOptions.RowHeight := SERowHeight.Value;
+  if NempOptions.ChangeFontSizeOnLength then
+      maxFont := MaxFontSize(NempOptions.DefaultFontSize)
   else
-      maxFont := Nemp_MainForm.NempOptions.DefaultFontSize;
+      maxFont := NempOptions.DefaultFontSize;
 
-  ReDrawPlaylistTree := Nemp_MainForm.PlaylistVST.DefaultNodeHeight <> Cardinal(Nemp_MainForm.NempOptions.RowHeight);
-  ReDrawMedienlistTree := Nemp_MainForm.VST.DefaultNodeHeight <> Cardinal(Nemp_MainForm.NempOptions.RowHeight);
+  ReDrawPlaylistTree := Nemp_MainForm.PlaylistVST.DefaultNodeHeight <> Cardinal(NempOptions.RowHeight);
+  ReDrawMedienlistTree := Nemp_MainForm.VST.DefaultNodeHeight <> Cardinal(NempOptions.RowHeight);
 
-  Nemp_MainForm.VST.DefaultNodeHeight := Nemp_MainForm.NempOptions.RowHeight;
-  Nemp_MainForm.PlaylistVST.DefaultNodeHeight := Nemp_MainForm.NempOptions.RowHeight;
+  Nemp_MainForm.VST.DefaultNodeHeight := NempOptions.RowHeight;
+  Nemp_MainForm.PlaylistVST.DefaultNodeHeight := NempOptions.RowHeight;
 
   with Nemp_MainForm do
   begin
@@ -2910,55 +3011,22 @@ begin
   end; //else
        // just ignore it
 
-  // Hotkeys neu setzen, Ini Speichern
-  UnInstallHotKeys(Nemp_MainForm.Handle);
-  UninstallMediakeyHotkeys(Nemp_MainForm.Handle);
+  // Hotkeys neu setzen
+  NempOptions.UnInstallHotKeys;
+  NempOptions.UninstallMediakeyHotkeys;
+  //
+  NempOptions.DefineHotKey(hkPlay,         CB_Activate_Play.Checked, IndexToMod(CB_Mod_Play.ItemIndex), IndexToKey(CB_Key_Play.ItemIndex));
+  NempOptions.DefineHotKey(hkStop,         CB_Activate_Stop.Checked, IndexToMod(CB_Mod_Stop.ItemIndex), IndexToKey(CB_Key_Stop.ItemIndex));
+  NempOptions.DefineHotKey(hkNext,         CB_Activate_Next.Checked, IndexToMod(CB_Mod_Next.ItemIndex), IndexToKey(CB_Key_Next.ItemIndex));
+  NempOptions.DefineHotKey(hkPrev,         CB_Activate_Prev.Checked, IndexToMod(CB_Mod_Prev.ItemIndex), IndexToKey(CB_Key_Prev.ItemIndex));
+  NempOptions.DefineHotKey(hkSlideForward, CB_Activate_JumpForward.Checked, IndexToMod(CB_Mod_JumpForward.ItemIndex), IndexToKey(CB_Key_JumpForward.ItemIndex));
+  NempOptions.DefineHotKey(hkSlideBack,    CB_Activate_JumpBack.Checked, IndexToMod(CB_Mod_JumpBack.ItemIndex), IndexToKey(CB_Key_JumpBack.ItemIndex));
+  NempOptions.DefineHotKey(hkIncVol,       CB_Activate_IncVol.Checked, IndexToMod(CB_Mod_IncVol.ItemIndex), IndexToKey(CB_Key_IncVol.ItemIndex));
+  NempOptions.DefineHotKey(hkDecVol,       CB_Activate_DecVol.Checked, IndexToMod(CB_Mod_DecVol.ItemIndex), IndexToKey(CB_Key_DecVol.ItemIndex));
+  NempOptions.DefineHotKey(hkMute,         CB_Activate_Mute.Checked, IndexToMod(CB_Mod_Mute.ItemIndex), IndexToKey(CB_Key_Mute.ItemIndex));
 
-  ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
+{  ini := TMeminiFile.Create(SavePath + 'Hotkeys.ini', TEncoding.UTF8);
   try
-        ini.Encoding := TEncoding.UTF8;
-        Ini.WriteBool('HotKeys','InstallHotkey_Play'       , CB_Activate_Play.Checked);
-          hMod := IndexToMod(CB_Mod_Play.ItemIndex);
-          hKey := IndexToKey(CB_Key_Play.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_Play', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_Play', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_Stop'       , CB_Activate_Stop.Checked);
-          hMod := IndexToMod(CB_Mod_Stop.ItemIndex);
-          hKey := IndexToKey(CB_Key_Stop.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_Stop', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_Stop', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_Next'       , CB_Activate_Next.Checked);
-          hMod := IndexToMod(CB_Mod_Next.ItemIndex);
-          hKey := IndexToKey(CB_Key_Next.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_Next', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_Next', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_Prev'       , CB_Activate_Prev.Checked);
-          hMod := IndexToMod(CB_Mod_Prev.ItemIndex);
-          hKey := IndexToKey(CB_Key_Prev.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_Prev', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_Prev', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_JumpForward', CB_Activate_JumpForward.Checked);
-          hMod := IndexToMod(CB_Mod_JumpForward.ItemIndex);
-          hKey := IndexToKey(CB_Key_JumpForward.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_JumpForward', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_JumpForward', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_JumpBack'   , CB_Activate_JumpBack.Checked);
-          hMod := IndexToMod(CB_Mod_JumpBack.ItemIndex);
-          hKey := IndexToKey(CB_Key_JumpBack.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_JumpBack', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_JumpBack', hKey);
-
-        Ini.WriteBool('HotKeys','InstallHotkey_IncVol'     , CB_Activate_IncVol.Checked);
-          hMod := IndexToMod(CB_Mod_IncVol.ItemIndex);
-          hKey := IndexToKey(CB_Key_IncVol.ItemIndex);
-          Ini.WriteInteger('HotKeys', 'HotkeyMod_IncVol', hMod);
-          Ini.WriteInteger('HotKeys', 'HotkeyKey_IncVol', hKey);
-
         Ini.WriteBool('HotKeys','InstallHotkey_DecVol'     , CB_Activate_DecVol.Checked);
           hMod := IndexToMod(CB_Mod_DecVol.ItemIndex);
           hKey := IndexToKey(CB_Key_DecVol.ItemIndex);
@@ -2978,27 +3046,27 @@ begin
   finally
     Ini.Free;
   end;
-
-  if Nemp_MainForm.NempOptions.RegisterHotKeys then
-      InstallHotkeys(SavePath, Nemp_MainForm.Handle);
-  if Nemp_MainForm.NempOptions.RegisterMediaHotkeys then
-      InstallMediakeyHotkeys(Nemp_MainForm.NempOptions.IgnoreVolumeUpDownKeys, Nemp_MainForm.Handle);
+ }
+  if NempOptions.RegisterHotKeys then
+      NempOptions.InstallHotkeys;
+  if NempOptions.RegisterMediaHotkeys then
+      NempOptions.InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys);
 
 
   //========================================================
 
-  Nemp_MainForm.NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
+  NempOptions.MiniNempStayOnTop := cb_StayOnTop.Checked;
 
   with Nemp_MainForm do
   begin
-    PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-    MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
+    PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
+    MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible;
 
-    PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[nfBrowse].Visible;
+    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[nfBrowse].Visible;
 
-    PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-    MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
+    PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
+    MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible;
   end;
 
   Nemp_MainForm.RepairZOrder;
@@ -3078,8 +3146,8 @@ begin
   Nemp_MainForm.NempSkin.NempPartyMode.ShowPasswordOnActivate  := cb_PartyMode_ShowPasswordOnActivate .Checked;
   Nemp_MainForm.NempSkin.NempPartyMode.password := Edt_PartyModePassword.Text;
 
-  Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
-  Nemp_MainForm.NempOptions.UseCDDB                     := cb_UseCDDB                            .checked;
+  NempOptions.AllowQuickAccessToMetadata  := cb_AccessMetadata                     .checked;
+  NempOptions.UseCDDB                     := cb_UseCDDB                            .checked;
 
 
   MedienBib.AutoResolveInconsistencies          := cb_AutoResolveInconsistencies         .checked ;
@@ -3102,8 +3170,10 @@ begin
       MedienBib.LyricPriorities[fLyricTreeDataList[i].SearchMethod] := fLyricTreeDataList[i].Priority;
   end;
   if assigned(FDetails) then
-      fDetails.BuildGetLyricButtonHint;
+    fDetails.BuildGetLyricButtonHint;
 
+  NempOptions.SaveSettings;
+  NempSettingsManager.WriteToDisk;
   ReArrangeToolImages;
 end;
 
@@ -3259,6 +3329,12 @@ begin
     LblWebserverAdminURL.Caption := newURL + '/admin'
 end;
 
+
+procedure TOptionsCompleteForm.CreateParams(var Params: TCreateParams);
+begin
+  inherited CreateParams(Params);
+  Params.WndParent := Application.Handle;
+end;
 
 procedure TOptionsCompleteForm.LblWebserverUserURLClick(Sender: TObject);
 begin
@@ -3842,6 +3918,8 @@ begin
     WebServerLogForm.Show;
 end;
 
+
+
 procedure TOptionsCompleteForm.EdtUsernameAdminKeyPress(Sender: TObject;
   var Key: Char);
 begin
@@ -4040,6 +4118,126 @@ begin
 end;
 
 
+// new december 2020:
+// customizable coverflow
+procedure TOptionsCompleteForm.ApplyCoverFlowSettingsToGUI;
+begin
+  tbCoverZMain.OnChange := Nil;
+  tbCoverZLeft.OnChange := Nil;
+  tbCoverZRight.OnChange := Nil;
+  tbCoverGapRight.OnChange := Nil;
+  tbCoverGapLeft.OnChange := Nil;
+  tbCoverGapFirstRight.OnChange := Nil;
+  tbCoverGapFirstLeft.OnChange := Nil;
+  tbCoverAngleRight.OnChange := Nil;
+  tbCoverAngleLeft.OnChange := Nil;
+  tbCoverAngleMain.OnChange := Nil;
+
+  cbCoverFlowUseReflection.OnClick := Nil;
+	tbCoverReflexionIntensity.OnChange := Nil;
+	tbCoverReflexionGap.OnChange := Nil;
+  tbCoverViewPosition.OnChange := Nil;
+  //tbCoverViewDirection.OnChange := Nil;
+
+  // z-axis
+  tbCoverZMain.Position := MedienBib.NewCoverFlow.Settings.zMain;
+  tbCoverZLeft.Position := MedienBib.NewCoverFlow.Settings.zLeft;
+  tbCoverZRight.Position := MedienBib.NewCoverFlow.Settings.zRight;
+  // gaps
+  tbCoverGapRight      .Position := MedienBib.NewCoverFlow.Settings.GapRight;
+  tbCoverGapLeft       .Position := MedienBib.NewCoverFlow.Settings.GapLeft;
+  tbCoverGapFirstRight .Position := MedienBib.NewCoverFlow.Settings.GapFirstRight;
+  tbCoverGapFirstLeft  .Position := MedienBib.NewCoverFlow.Settings.GapFirstLeft;
+  // Angles
+  tbCoverAngleRight    .Position := MedienBib.NewCoverFlow.Settings.AngleRight;
+  tbCoverAngleLeft     .Position := MedienBib.NewCoverFlow.Settings.AngleLeft;
+  tbCoverAngleMain     .Position := MedienBib.NewCoverFlow.Settings.AngleMain;
+  // view
+  tbCoverViewPosition.Position  := MedienBib.NewCoverFlow.Settings.ViewPosX;
+  // tbCoverViewDirection.Position := MedienBib.NewCoverFlow.Settings.ViewDirX;
+  // Reflexion
+  cbCoverFlowUseReflection .Checked := MedienBib.NewCoverFlow.Settings.UseReflection;
+	tbCoverReflexionIntensity.Position := MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor;
+	tbCoverReflexionGap      .Position := MedienBib.NewCoverFlow.Settings.GapReflexion;
+  // reflexion, Enabled/Disabled
+  lblCoverFlowIntensity.Enabled      := MedienBib.NewCoverFlow.Settings.UseReflection;
+	lblCoverflowReflexionGap.Enabled   := MedienBib.NewCoverFlow.Settings.UseReflection;
+	tbCoverReflexionIntensity.Enabled  := MedienBib.NewCoverFlow.Settings.UseReflection;
+	tbCoverReflexionGap.Enabled        := MedienBib.NewCoverFlow.Settings.UseReflection;
+  // mixed settings
+  seCoverflowTextureCache.Value := MedienBib.NewCoverFlow.Settings.MaxTextures;
+
+  tbCoverZMain.OnChange := tbCoverZMainChange;
+  tbCoverZLeft.OnChange := tbCoverZMainChange;
+  tbCoverZRight.OnChange := tbCoverZMainChange;
+  tbCoverGapRight.OnChange := tbCoverZMainChange;
+  tbCoverGapLeft.OnChange := tbCoverZMainChange;
+  tbCoverGapFirstRight.OnChange := tbCoverZMainChange;
+  tbCoverGapFirstLeft.OnChange := tbCoverZMainChange;
+  tbCoverAngleRight.OnChange := tbCoverZMainChange;
+  tbCoverAngleLeft.OnChange := tbCoverZMainChange;
+  tbCoverAngleMain.OnChange := tbCoverZMainChange;
+  cbCoverFlowUseReflection.OnClick := tbCoverZMainChange;
+	tbCoverReflexionIntensity.OnChange := tbCoverZMainChange;
+	tbCoverReflexionGap.OnChange := tbCoverZMainChange;
+  tbCoverViewPosition.OnChange := tbCoverZMainChange;
+  // tbCoverViewDirection.OnChange := tbCoverZMainChange;
+
+end;
+
+procedure TOptionsCompleteForm.SetCoverFlowSettingsFromGUI;
+begin
+  MedienBib.NewCoverFlow.Settings.zMain  := tbCoverZMain.Position ;
+  MedienBib.NewCoverFlow.Settings.zLeft  := tbCoverZLeft.Position ;
+  MedienBib.NewCoverFlow.Settings.zRight := tbCoverZRight.Position;
+  // gaps
+  MedienBib.NewCoverFlow.Settings.GapRight      := tbCoverGapRight      .Position;
+  MedienBib.NewCoverFlow.Settings.GapLeft       := tbCoverGapLeft       .Position;
+  MedienBib.NewCoverFlow.Settings.GapFirstRight := tbCoverGapFirstRight .Position;
+  MedienBib.NewCoverFlow.Settings.GapFirstLeft  := tbCoverGapFirstLeft  .Position;
+  // Angles
+  MedienBib.NewCoverFlow.Settings.AngleRight    := tbCoverAngleRight    .Position;
+  MedienBib.NewCoverFlow.Settings.AngleLeft     := tbCoverAngleLeft     .Position;
+  MedienBib.NewCoverFlow.Settings.AngleMain     := tbCoverAngleMain     .Position;
+  // View
+  MedienBib.NewCoverFlow.Settings.ViewPosX := tbCoverViewPosition.Position  ;
+  // MedienBib.NewCoverFlow.Settings.ViewDirX := tbCoverViewDirection.Position ;
+  // Reflexion
+  MedienBib.NewCoverFlow.Settings.UseReflection        := cbCoverFlowUseReflection .Checked;
+	MedienBib.NewCoverFlow.Settings.ReflexionBlendFaktor := tbCoverReflexionIntensity.Position;
+	MedienBib.NewCoverFlow.Settings.GapReflexion         := tbCoverReflexionGap      .Position;
+
+  lblCoverFlowIntensity.Enabled      := MedienBib.NewCoverFlow.Settings.UseReflection;
+	lblCoverflowReflexionGap.Enabled   := MedienBib.NewCoverFlow.Settings.UseReflection;
+	tbCoverReflexionIntensity.Enabled  := MedienBib.NewCoverFlow.Settings.UseReflection;
+	tbCoverReflexionGap.Enabled        := MedienBib.NewCoverFlow.Settings.UseReflection;
+
+  // mixed settings
+  MedienBib.NewCoverFlow.Settings.MaxTextures := seCoverflowTextureCache.Value;
+end;
+
+
+procedure TOptionsCompleteForm.tbCoverZMainChange(Sender: TObject);
+begin
+  SetCoverFlowSettingsFromGUI;
+  MedienBib.NewCoverFlow.ApplySettings;
+end;
+
+procedure TOptionsCompleteForm.BtnUndoCoverFlowSettingsClick(Sender: TObject);
+begin
+  MedienBib.NewCoverFlow.Settings := BackUpCoverFlowSettings;
+  ApplyCoverFlowSettingsToGUI;
+
+  MedienBib.NewCoverFlow.ApplySettings;
+end;
+
+procedure TOptionsCompleteForm.BtnCoverFlowDefaultClick(Sender: TObject);
+begin
+  MedienBib.NewCoverFlow.Settings := DefaultCoverFlowSettings;
+  ApplyCoverFlowSettingsToGUI;
+
+  MedienBib.NewCoverFlow.ApplySettings;
+end;
 
 
 end.

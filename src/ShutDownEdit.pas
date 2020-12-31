@@ -89,29 +89,29 @@ begin
 
 
     // set current settings as the new settings for NempOptions // IniFile
-    Nemp_MainForm.NempOptions.ShutDownModeIniIdx     := cbIntendedAction  .ItemIndex  ;
-    Nemp_MainForm.NempOptions.ShutDownTimeIniIdx     := cbCountdownLength .ItemIndex  ;
-    Nemp_MainForm.NempOptions.ShutDownTimeIniHours   := SE_Hours.Value  ;
-    Nemp_MainForm.NempOptions.ShutDownTimeIniMinutes := SE_Minutes.Value;
+    NempOptions.ShutDownModeIniIdx     := cbIntendedAction  .ItemIndex  ;
+    NempOptions.ShutDownTimeIniIdx     := cbCountdownLength .ItemIndex  ;
+    NempOptions.ShutDownTimeIniHours   := SE_Hours.Value  ;
+    NempOptions.ShutDownTimeIniMinutes := SE_Minutes.Value;
 
     // Start the actual Countdown timer
 
     // SHUTDOWNMODE_StopNemp, SHUTDOWNMODE_ExitNemp, SHUTDOWNMODE_Suspend, SHUTDOWNMODE_Hibernat, SHUTDOWNMODE_Shutdown
-    Nemp_MainForm.NempOptions.ShutDownMode := cbIntendedAction.ItemIndex;
+    NempOptions.ShutDownMode := cbIntendedAction.ItemIndex;
 
     case cbCountdownLength.ItemIndex of
-        0: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 5);
-        1: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 15);
-        2: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 30);
-        3: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 45);
-        4: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 60);
-        5: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 90);
-        6: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 120);
-        7: Nemp_MainForm.NempOptions.ShutDownTime := IncMinute(Now, 60 * SE_Hours.Value + SE_Minutes.Value);
+        0: NempOptions.ShutDownTime := IncMinute(Now, 5);
+        1: NempOptions.ShutDownTime := IncMinute(Now, 15);
+        2: NempOptions.ShutDownTime := IncMinute(Now, 30);
+        3: NempOptions.ShutDownTime := IncMinute(Now, 45);
+        4: NempOptions.ShutDownTime := IncMinute(Now, 60);
+        5: NempOptions.ShutDownTime := IncMinute(Now, 90);
+        6: NempOptions.ShutDownTime := IncMinute(Now, 120);
+        7: NempOptions.ShutDownTime := IncMinute(Now, 60 * SE_Hours.Value + SE_Minutes.Value);
         8: ; // special case, shut down after end of playlist
     end;
 
-    Nemp_MainForm.NempOptions.ShutDownAtEndOfPlaylist := (cbCountdownLength.ItemIndex = 8);
+    NempOptions.ShutDownAtEndOfPlaylist := (cbCountdownLength.ItemIndex = 8);
 
 end;
 
@@ -139,13 +139,13 @@ begin
     cbCountdownLength.OnChange := cbCountdownLengthChange;
 
     // set settings from the NempOptions // IniFile
-    cbIntendedAction  .ItemIndex := Nemp_MainForm.NempOptions.ShutDownModeIniIdx ;
-    cbCountdownLength .ItemIndex := Nemp_MainForm.NempOptions.ShutDownTimeIniIdx ;
+    cbIntendedAction  .ItemIndex := NempOptions.ShutDownModeIniIdx ;
+    cbCountdownLength .ItemIndex := NempOptions.ShutDownTimeIniIdx ;
 
-    SE_Hours.Value   := Nemp_MainForm.NempOptions.ShutDownTimeIniHours   ;
-    SE_Minutes.Value := Nemp_MainForm.NempOptions.ShutDownTimeIniMinutes ;
+    SE_Hours.Value   := NempOptions.ShutDownTimeIniHours   ;
+    SE_Minutes.Value := NempOptions.ShutDownTimeIniMinutes ;
 
-    ShowProperImage(Nemp_MainForm.NempOptions.ShutDownModeIniIdx) ;
+    ShowProperImage(NempOptions.ShutDownModeIniIdx) ;
 end;
 
 procedure TShutDownEditForm.FormShow(Sender: TObject);

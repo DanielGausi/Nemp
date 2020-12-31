@@ -335,6 +335,7 @@ type
 
         // XE2:
         UseAdvancedSkin: Boolean;
+        TreeClientPaintedBySkin: Boolean;
         AdvancedStyleFilename: String;
         AdvancedStyleName: String;
         RegisteredStyles: TStringList;
@@ -676,8 +677,9 @@ begin
         {$IFDEF USESTYLES}
             UseAdvancedSkin  := Ini.ReadBool('Options','UseAdvancedSkin'  , False);
             AdvancedStyleFilename := Ini.ReadString('Options','AdvancedStyleFilename'  , name);
+            TreeClientPaintedBySkin := Ini.ReadBool('Options','TreeClientPaintedBySkin', False);
             StyleFilename := path + '\' + AdvancedStyleFilename + '.vsf';
-            if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
+            if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin and FileExists(StyleFilename) then
             begin
                 if TStyleManager.IsValidStyle(StyleFilename, StyleInfo) then
                 begin
@@ -698,6 +700,7 @@ begin
             end;
         {$ELSE}
             UseAdvancedSkin := False;
+            TreeClientPaintedBySkin := True;
             AdvancedStyleFilename := '';
             AdvancedStyleName := '';
         {$ENDIF}
@@ -925,7 +928,7 @@ begin
       end;
   end;
 
-  if UseDefaultMenuImages or (Not Nemp_MainForm.GlobalUseAdvancedSkin) then
+  if UseDefaultMenuImages or (Not NempOptions.GlobalUseAdvancedSkin) then
   begin
       SetDefaultMenuImages;
   end else
@@ -1213,7 +1216,7 @@ end;
 
 procedure TNempSkin.SetVSTHeaderSettings;
 begin
-      if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
+      if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin and not (TreeClientPaintedBySkin) then
       begin
           Nemp_MainForm.ArtistsVST.Header.Options  := Nemp_MainForm.ArtistsVST.Header.Options - [hoOwnerDraw];
           Nemp_MainForm.AlbenVST.Header.Options    := Nemp_MainForm.AlbenVST.Header.Options - [hoOwnerDraw];
@@ -1227,7 +1230,7 @@ begin
           Nemp_MainForm.VST.Header.Options         := Nemp_MainForm.VST.Header.Options + [hoOwnerDraw];
       end;
 
-      if UseAdvancedSkin and (not Nemp_MainForm.GlobalUseAdvancedSkin) then
+      if UseAdvancedSkin and (TreeClientPaintedBySkin or (not NempOptions.GlobalUseAdvancedSkin))  then
       begin
           Nemp_MainForm.PlaylistVST.StyleElements := [seBorder];
           Nemp_MainForm.VST.StyleElements         := [seBorder];
@@ -1322,6 +1325,7 @@ begin
         AssignStarGraphics;
         AssignABGraphics;
         AssignOtherGraphics;
+        RefreshStarGraphicsAllForms;
 
         case ButtonMode of
             0: begin
@@ -1612,7 +1616,7 @@ begin
     Spectrum.Pen2 := SkinColorScheme.SpecPen2CL;
     Spectrum.Peak := SkinColorScheme.SpecPeakCL;
 
-    if (HideMainMenu) or (Nemp_MainForm.AnzeigeMode = 1) then
+    if (HideMainMenu) or (NempOptions.AnzeigeMode = 1) then
       Menu := NIL
     else
       Menu := Nemp_MainMenu;
@@ -1634,7 +1638,7 @@ begin
   Nemp_MainForm.RepaintVisOnPause;
 
   {$IFDEF USESTYLES}
-  if UseAdvancedSkin and Nemp_MainForm.GlobalUseAdvancedSkin then
+  if UseAdvancedSkin and NempOptions.GlobalUseAdvancedSkin then
   begin
       TStylemanager.TrySetStyle(self.AdvancedStyleName);
       //if NotTheFirstActivation then
@@ -1658,7 +1662,7 @@ var i: Integer;
 begin
     with Nemp_MainForm do
     begin
-        if AnzeigeMode = 1 then
+        if NempOptions.AnzeigeMode = 1 then
             UpdateSmallMainForm;
 
         case SlideButtonMode of
@@ -1747,6 +1751,7 @@ begin
         AssignStarGraphics;
         AssignABGraphics;
         AssignOtherGraphics;
+        RefreshStarGraphicsAllForms;
 
         for i := 0 to High(SlideButtons) do
         begin
@@ -1922,7 +1927,7 @@ begin
     Spectrum.DrawRating(RatingImage.Tag);
     RepaintVisOnPause;
 
-    if Nemp_MainForm.AnzeigeMode = 0 then
+    if NempOptions.AnzeigeMode = 0 then
         Menu := Nemp_MainMenu;
 
     {$IFDEF USESTYLES}

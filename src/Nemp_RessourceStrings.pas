@@ -240,6 +240,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_ViewFonts         = 'Fonts';
     OptionsTree_PartyMode         = 'Party-Mode';
     OptionsTree_ViewExtended      = 'Extended viewing settings';
+    OptionsTree_CoverFlow         = 'Coverflow';
 
     OptionsTree_PlayerMain        = 'Player settings';
     OptionsTree_PlayerPlaylist    = 'Playlist';
@@ -247,7 +248,7 @@ FloatingPointChannels_Off = 'Current status: Off';
     OptionsTree_PlayerMedialibrary= 'Media library';
     OptionsTree_PlayerMetaDataAccess = 'Metadata (e.g. ID3Tags)';
     OptionsTree_PlayerWebradio    = 'Web radio';
-    OptionsTree_PlayerEffects     = 'Effects';
+    OptionsTree_PlayerEffects     = 'Effects and ReplayGain';
     OptionsTree_PlayerEvents      = 'Birthday mode';
     OptionsTree_PlayerScrobbler   = 'LastFM (scrobble)';
     OptionsTree_PlayerWebServer   = 'WebServer';
@@ -1094,6 +1095,8 @@ PlaylistManager_Duplicate  = 'Check: Fail. Duplicate description and filename';
 PlaylistManager_CheckOK    = 'Check: Ok';
 Playlist_Saved             = 'Playlist saved.';
 PlaylistManager_Saved      = 'Playlist saved: "%s"';
+
+PlaylistAutoDelay = 'A little break before the next track starts.' + #13#10#13#10 + 'You can change this behavior in the player settings.';
 
 implementation
 

@@ -88,7 +88,7 @@ type
             fManualCheck: Boolean;
             fNotifyOnBetas: Boolean;
 
-            fWriteAccessPossible: Boolean;
+            //fWriteAccessPossible: Boolean;
 
             procedure fCheckForUpdates;
             function fGetUpdateType(aString: String): TUpdateType;
@@ -122,7 +122,7 @@ type
             property ManualCheck: Boolean read fManualCheck;
 
             // Is writeaccess to the inifile possible? If not: Dont show Dialog, Dont search for Updates
-            property WriteAccessPossible: Boolean read fWriteAccessPossible write fWriteAccessPossible;
+            // property WriteAccessPossible: Boolean read fWriteAccessPossible write fWriteAccessPossible;
 
             constructor Create(aHandle: HWnd);
             destructor Destroy; override;
@@ -130,8 +130,8 @@ type
             procedure CheckForUpdatesManually;
             procedure CheckForUpdatesAutomatically;
 
-            procedure LoadFromIni(ini: TMemIniFile);
-            procedure WriteToIni(ini: TMemIniFile);
+            procedure LoadSettings;
+            procedure SaveSettings;
     end;
 
     TUpdateForm = class(TForm)
@@ -189,7 +189,7 @@ Var
 implementation
 
 uses
-  Dialogs, NempMainUnit;
+  Dialogs, NempMainUnit, Nemp_ConstantsAndTypes;
 
   {$R *.dfm}
 
@@ -565,20 +565,20 @@ end;
 
 
 
-procedure TNempUpdater.LoadFromIni(ini: TMemIniFile);
+procedure TNempUpdater.LoadSettings;
 begin
-    LastCheck      := Ini.ReadDateTime('Updater', 'LastCheck', 0);
-    fCheckInterval := Ini.ReadInteger('Updater', 'Interval', 7);
-    fAutoCheck     := Ini.ReadBool('Updater', 'AutoCheck', False);
-    fNotifyOnBetas := Ini.ReadBool('Updater', 'NotifyOnBetas', False);
+    LastCheck      := NempSettingsManager.ReadDateTime('Updater', 'LastCheck', 0);
+    fCheckInterval := NempSettingsManager.ReadInteger('Updater', 'Interval', 7);
+    fAutoCheck     := NempSettingsManager.ReadBool('Updater', 'AutoCheck', False);
+    fNotifyOnBetas := NempSettingsManager.ReadBool('Updater', 'NotifyOnBetas', False);
 end;
 
-procedure TNempUpdater.WriteToIni(ini: TMemIniFile);
+procedure TNempUpdater.SaveSettings;
 begin
-    Ini.WriteDateTime('Updater', 'LastCheck', LastCheck);
-    Ini.WriteInteger('Updater', 'Interval', fCheckInterval);
-    Ini.WriteBool('Updater', 'AutoCheck', fAutoCheck);
-    Ini.WriteBool('Updater', 'NotifyOnBetas', fNotifyOnBetas);
+    NempSettingsManager.WriteDateTime('Updater', 'LastCheck', LastCheck);
+    NempSettingsManager.WriteInteger('Updater', 'Interval', fCheckInterval);
+    NempSettingsManager.WriteBool('Updater', 'AutoCheck', fAutoCheck);
+    NempSettingsManager.WriteBool('Updater', 'NotifyOnBetas', fNotifyOnBetas);
 end;
 
 procedure TUpdateForm.BtnCloseClick(Sender: TObject);
@@ -588,7 +588,7 @@ end;
 
 procedure TUpdateForm.BtnDownloadClick(Sender: TObject);
 begin
-    if (LeftStr(Nemp_MainForm.NempOptions.Language,2) = 'de') then
+    if (LeftStr(NempOptions.Language,2) = 'de') then
         ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp.html', nil, nil, SW_SHOW)
     else
         ShellExecute(Handle, 'open', 'http://www.gausi.de/nemp-en.html', nil, nil, SW_SHOW);
@@ -623,7 +623,7 @@ begin
     UpdateInfo.ReleaseNotes_DE.Position := 0;
     UpdateInfo.ReleaseNotes.Position := 0;
 
-    if (LeftStr(Nemp_MainForm.NempOptions.Language,2) = 'de') then
+    if (LeftStr(NempOptions.Language,2) = 'de') then
     begin
         if UpdateInfo.ReleaseNotes_DE.Size = 0 then
             // If the german release notes are empty: Show the regular ones

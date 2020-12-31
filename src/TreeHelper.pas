@@ -52,6 +52,8 @@ type
 
   function FontSelectorItemIndexToStyle(m: Integer):TFontstyles;
 
+  procedure VSTColumns_SaveSettings(aVST: TVirtualStringTree);
+  procedure VSTColumns_LoadSettings(aVST: TVirtualStringTree);
 
   function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
   function GetColumnIDfromContent(aVST:TVirtualStringTree; content:integer):integer;
@@ -65,6 +67,7 @@ type
 
   function GetNextNodeOrFirst(aTree: TVirtualStringTree; aNode: PVirtualNode): PVirtualNode;
   function GetNodeWithAudioFile(aTree: TVirtualStringTree; aAudioFile: TAudioFile): PVirtualNode;
+  function GetNodeWithCueFile(aTree: TVirtualStringTree; aRootNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
   function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;
 
   procedure InitiateDragDrop(aTree: TVirtualStringTree; aList: TStringList; DragDrop: TDragFilesSrc; maxFiles: Integer);
@@ -131,6 +134,116 @@ begin
     end;
 end;
 
+procedure VSTColumns_SaveSettings(aVST: TVirtualStringTree);
+var
+  i, contentID: Integer;
+  rawVisible, rawContent, rawWidth: String;
+
+begin
+  contentID := GetColumnIDfromPosition(aVST, 0);
+
+  rawContent := IntToStr(aVST.Header.Columns[contentID].Tag);
+  rawWidth :=   IntToStr(aVST.Header.Columns[contentID].Width);
+  if (coVisible in aVST.Header.Columns[contentID].Options) then
+    rawVisible := '1'
+  else
+    rawVisible := '0';
+
+  for i := 1 to Spaltenzahl-1 do begin
+    contentID := GetColumnIDfromPosition(aVST, i);
+
+    rawContent := rawContent + ';' + IntToStr(aVST.Header.Columns[contentID].Tag);
+    rawWidth   := rawWidth   + ';' + IntToStr(aVST.Header.Columns[contentID].Width);
+    if (coVisible in aVST.Header.Columns[contentID].Options) then
+      rawVisible := rawVisible + ';1'
+    else
+      rawVisible := rawVisible + ';0';
+  end;
+  NempSettingsManager.WriteString('Columns', 'Content', rawContent);
+  NempSettingsManager.WriteString('Columns', 'Width', rawWidth);
+  NempSettingsManager.WriteString('Columns', 'Visible', rawVisible);
+
+  // remove depecated ini section
+  NempSettingsManager.EraseSection('Spalten');
+end;
+
+procedure VSTColumns_LoadSettings(aVST: TVirtualStringTree);
+var
+  i, s, contentID: Integer;
+  rawVisible, rawContent, rawWidth: String;
+  VisibleList, ContentList, WidthList: TStringList;
+begin
+  if NempSettingsManager.SectionExists('Columns') then
+  begin
+    // load newer configuration style
+    rawContent := NempSettingsManager.ReadString('Columns', 'Content', '');
+    rawWidth := NempSettingsManager.ReadString('Columns', 'Width', '');
+    rawVisible := NempSettingsManager.ReadString('Columns', 'Visible', '');
+    ContentList := TStringList.Create;
+    WidthList := TStringList.Create;
+    VisibleList := TStringList.Create;
+    try
+      Explode(';', rawContent, ContentList);
+      Explode(';', rawWidth, WidthList);
+      Explode(';', rawVisible, VisibleList);
+      if (ContentList.Count <= Spaltenzahl) and (ContentList.Count = WidthList.Count) and (WidthList.Count = VisibleList.Count) then
+      begin
+        for i := 0 to ContentList.Count - 1 do
+        begin
+          contentID := StrToIntDef(ContentList[i], DefaultSpalten[i].Inhalt);
+          aVST.Header.Columns[i].Tag := contentID ;
+          aVST.Header.Columns[i].Text := _(DefaultSpalten[contentID].Bezeichnung);
+          aVST.Header.Columns[i].Width := StrToIntDef(WidthList[i], DefaultSpalten[i].width);
+          if VisibleList[i] = '1' then
+            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+          else
+            aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible];
+        end;
+
+        // if there are more Columns than defined in the Inifile (due to a new version): Set Default values
+        for i := ContentList.Count to Spaltenzahl-1 do
+        begin
+          contentID := i;
+          aVST.Header.Columns[i].Tag := i;
+          aVST.Header.Columns[i].Text := _(DefaultSpalten[i].Bezeichnung);
+          aVST.Header.Columns[i].Width := DefaultSpalten[i].width;
+          aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+        end;
+      end else
+      begin
+        // set default values for all columns
+        for i := 0 to Spaltenzahl-1 do
+        begin
+          contentID := DefaultSpalten[i].Inhalt;
+          aVST.Header.Columns[i].Tag := contentID;
+          aVST.Header.Columns[i].Text := _(DefaultSpalten[contentID].Bezeichnung);
+          aVST.Header.Columns[i].Width := DefaultSpalten[i].width;
+          aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+        end;
+      end;
+    finally
+      ContentList.Free;
+      WidthList.Free;
+      VisibleList.Free;
+    end;
+  end else
+  begin
+    // load old configuration style
+    for i:=0 to Spaltenzahl-1 do
+    begin
+      s := NempSettingsManager.ReadInteger('Spalten','Inhalt' + IntToStr(i), DefaultSpalten[i].Inhalt);
+      aVST.Header.Columns[i].Text := _(DefaultSpalten[s].Bezeichnung);
+      aVST.Header.Columns[i].Tag := s;
+
+      if NempSettingsManager.readbool('Spalten','visible' + IntToStr(i), DefaultSpalten[i].visible) then
+        aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options + [coVisible]
+      else
+        aVST.Header.Columns[i].Options := aVST.Header.Columns[i].Options - [coVisible];
+
+      aVST.Header.Columns[i].Width := NempSettingsManager.ReadInteger('Spalten','Breite' + IntToStr(i), DefaultSpalten[i].width);
+    end;
+  end;
+end;
 
 function GetColumnIDfromPosition(aVST:TVirtualStringTree; position:LongWord):integer;
 var i:integer;
@@ -440,6 +553,20 @@ begin
         else
             aNode := aTree.GetNextSibling(aNode);
     end;
+end;
+
+function GetNodeWithCueFile(aTree: TVirtualStringTree; aRootNode: PVirtualNode; aAudioFile: TAudioFile): PVirtualNode;
+var aNode: PVirtualNode;
+begin
+  result := Nil;
+  aNode := aRootNode.FirstChild;
+  while assigned(aNode) and (not assigned(result)) do
+  begin
+    if aTree.GetNodeData<TAudioFile>(aNode) = aAudioFile then
+      result := aNode
+    else
+      aNode := aNode.NextSibling;
+  end;
 end;
 
 function GetNodeWithIndex(aTree: TVirtualStringTree; aIndex: Cardinal; StartNode: PVirtualNode): PVirtualNode;

@@ -1353,7 +1353,7 @@ begin
     // Sync with ID3tags (to be sure, that no ID3Tags are deleted)
     aAudioFile.GetAudioData(aAudioFile.Pfad);
     aAudioFile.RawTagLastFM := newTags;
-    aErr := aAudioFile.WriteRawTagsToMetaData(aAudioFile.RawTagLastFM, Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
+    aErr := aAudioFile.WriteRawTagsToMetaData(aAudioFile.RawTagLastFM, NempOptions.AllowQuickAccessToMetadata);
     //aErr := aAudioFile.SetAudioData(Nemp_MainForm.NempOptions.AllowQuickAccessToMetadata);
     if aErr = AUDIOERR_None then
     begin
@@ -1647,9 +1647,9 @@ begin
     result := '';
     SelectedMP3s := aTree.GetSortedSelection(False);
 
-    maxC := min(Nemp_MainForm.NempOptions.maxDragFileCount, length(SelectedMp3s));
-    if length(SelectedMp3s) > Nemp_MainForm.NempOptions.maxDragFileCount then
-        AddErrorLog(Format(Warning_TooManyFiles, [Nemp_MainForm.NempOptions.maxDragFileCount]));
+    maxC := min(NempOptions.maxDragFileCount, length(SelectedMp3s));
+    if length(SelectedMp3s) > NempOptions.maxDragFileCount then
+        AddErrorLog(Format(Warning_TooManyFiles, [NempOptions.maxDragFileCount]));
 
     for idx := 0 to maxC - 1 do
     begin

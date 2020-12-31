@@ -46,9 +46,6 @@ object CDOpenDialog: TCDOpenDialog
     Align = alTop
     Caption = 'CD/DVD drives'
     TabOrder = 2
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 353
     object BtnRefresh: TButton
       Left = 263
       Top = 24

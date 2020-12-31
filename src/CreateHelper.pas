@@ -73,154 +73,83 @@ begin
 end;
 
 function LoadSettings: Boolean;
-var i, s: Integer;
-    ini: TMemIniFile;
+var i: Integer;
     aMenuItem: TMenuItem;
     tmpwstr, g15path: UnicodeString;
-    defaultAdvanced: Boolean;
+    // defaultAdvanced: Boolean;
     {$IFDEF USESTYLES}
-        WinVersionInfo: TWindowsVersionInfo;
+    WinVersionInfo: TWindowsVersionInfo;
     {$ENDIF}
 
 begin
     UpdateSplashScreen(SplashScreen_LoadingPreferences);
     with Nemp_MainForm do
     begin
-        ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-        try
-            ini.Encoding := TEncoding.UTF8;
+        // result is the lastExit-Value
+        result := NempSettingsManager.LastExitOK;
 
-            // result is the lastExit-Value
-            result := ini.ReadBool('Allgemein', 'LastExitOK', True);
+        NempOptions.LoadSettings(FOwnMessageHandler);
+        if NempOptions.ShowSplashScreen then
+        begin
+            FSplash.Show;
+            FSplash.Update;
+        end;
+        LoadWindowPosition; // Nemp_MainForm
 
-            NempOptions.ShowSplashScreen := ini.ReadBool('Allgemein', 'ShowSplashScreen', True);
-            if NempOptions.ShowSplashScreen then
-            begin
-                FSplash.Show;
-                FSplash.Update;
-            end;
+        NempFormBuildOptions.LoadSettings;
 
+        TDrivemanager.LoadSettings;
+        NempDisplay.LoadSettings;
 
-            ReadNempOptions(ini, NempOptions, NempFormBuildOptions);
-            // Read Portable settings
-            TDrivemanager.EnableUSBMode   := ini.ReadBool('Nemp Portable','EnableUSBMode'   , True);
-            TDrivemanager.EnableCloudMode := ini.ReadBool('Nemp Portable','EnableCloudMode' , True);
+        if NempOptions.Language = '' then
+            // overwrite the default setting with the curent system language
+            NempOptions.Language := GetCurrentLanguage;
 
-            NempDisplay.LoadFromIni(Ini);
+        if (NempOptions.Language <> GetCurrentLanguage) then // and (NempOptions.Language <> '') and
+            Uselanguage(NempOptions.Language);
 
-            if NempOptions.Language = '' then
-                // overwrite the default setting with the curent system language
-                NempOptions.Language := GetCurrentLanguage;
+        g15path := ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp;
+        if NempOptions.UseDisplayApp and (NempOptions.DisplayApp <> '') and FileExists(g15Path) then
+            shellexecute(Handle,'open',pchar('"' + g15Path + '"'),'autostart', Nil, sw_hide);
 
-            if (NempOptions.Language <> GetCurrentLanguage) then // and (NempOptions.Language <> '') and
-                Uselanguage(NempOptions.Language);
+        //Player-Einstellungen lesen
+        NempPlayer.LoadSettings;
+        // Copy AllowQuickAccessToMetadata-Setting to the PostProcessor
+        NempPlayer.PostProcessor.WriteToFiles := NempOptions.AllowQuickAccessToMetadata;
 
-            g15path := ExtractFilepath(paramStr(0)) + NempOptions.DisplayApp;
-            if NempOptions.UseDisplayApp and (NempOptions.DisplayApp <> '') and FileExists(g15Path) then
-                shellexecute(Handle,'open',pchar('"' + g15Path + '"'),'autostart', Nil, sw_hide);
+        //Player initialisieren, Load Plugins.
+        NempPlayer.InitBassEngine(FOwnMessageHandler, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
+        // VCL an den Player anpassen
+        PlaylistDateienOpenDialog.Filter := tmpwstr;
 
-            //Player-Einstellungen lesen
-            NempPlayer.LoadFromIni(Ini);
-            // Copy AllowQuickAccessToMetadata-Setting to the PostProcessor
-            NempPlayer.PostProcessor.WriteToFiles := NempOptions.AllowQuickAccessToMetadata;
+        //Playlist-Einstellungen laden
+        NempPlaylist.LoadSettings;
+        // MedienBib-Einstellungen laden
+        MedienBib.NewCoverFlow.InitList(MedienBib.Coverlist);
+        MedienBib.LoadSettings;
 
-            //Player initialisieren, Load Plugins.
-            NempPlayer.InitBassEngine(FOwnMessageHandler, ExtractFilePath(ParamStr(0)) + 'Bass\', tmpwstr);
-            // VCL an den Player anpassen
-            PlaylistDateienOpenDialog.Filter := tmpwstr;
+        VSTColumns_LoadSettings(VST);
 
-            //Playlist-Einstellungen laden
-            NempPlaylist.LoadFromIni(Ini);
-            // MedienBib-Einstellungen laden
-            //MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist);
-            MedienBib.NewCoverFlow.InitList(MedienBib.Coverlist);
-
-            MedienBib.LoadFromIni(Ini);
-            // MedienBib.AllowQuickAccessToMetadata := NempOptions.AllowQuickAccessToMetadata;
-
-            NempFormBuildOptions.LoadFromIni(Ini);
-
-            UseSkin             := ini.ReadBool('Fenster', 'UseSkin', True);
-            SkinName            := ini.ReadString('Fenster','SkinName','<public> Dark');
-
-            {$IFDEF USESTYLES}
-                WinVersionInfo := TWindowsVersionInfo.Create;
-                try
-                    // use advanced Skin on Windows Vista and above (6)
-                    // but not on XP and below (5)
-                    defaultAdvanced := WinVersionInfo.MajorVersion >= 6;
-                finally
-                    WinVersionInfo.Free;
-                end;
-                GlobalUseAdvancedSkin     := ini.ReadBool('Fenster', 'UseAdvancedSkin', defaultAdvanced);
-            {$ELSE}
-                GlobalUseAdvancedSkin := False;
-            {$ENDIF}
-
-
-
-            for i:=0 to Spaltenzahl-1 do
-            begin
-                s := ini.ReadInteger('Spalten','Inhalt' + IntToStr(i), DefaultSpalten[i].Inhalt);
-                VST.Header.Columns[i].Text := _(DefaultSpalten[s].Bezeichnung);
-                VST.Header.Columns[i].Tag := s;
-
-                if ini.readbool('Spalten','visible' + IntToStr(i), DefaultSpalten[i].visible) then
-                    VST.Header.Columns[i].Options := VST.Header.Columns[i].Options + [coVisible]
-                else
-                    VST.Header.Columns[i].Options := VST.Header.Columns[i].Options - [coVisible];
-
-                VST.Header.Columns[i].Width := ini.ReadInteger('Spalten','Breite' + IntToStr(i), DefaultSpalten[i].width);
-
-                aMenuItem := TMenuItem.Create(Nemp_MainForm);
-                aMenuItem.AutoHotkeys := maManual;
-                aMenuItem.AutoCheck := True;
-                aMenuItem.Tag := i;
-                aMenuItem.OnClick := VST_ColumnPopupOnClick;
-                aMenuItem.Caption := _(DefaultSpalten[s].Bezeichnung);
-                VST_ColumnPopup.Items.Insert(i, aMenuItem);
-            end;
-
-            NempUpdater.LoadFromIni(Ini);
-            NempSkin.NempPartyMode.LoadFromIni(ini);
-
-            // AnzeigeModus (Das "i" in der NempFormAufteilung)
-            AnzeigeMode := (Ini.ReadInteger('Fenster', 'Anzeigemode', 0)) Mod 2; // 0 oder 1, was anderes gibts nicht mehr.
-
-            Tag := -1;
-
-            // Jetzt: False reinschreiben
-            // Das wird erst am Ende wieder "gut gemacht" ;-)
-            ini.WriteBool('Allgemein', 'LastExitOK', False);
-            ini.Encoding := TEncoding.UTF8;
-            try
-                Ini.UpdateFile;
-                NempOptions.WriteAccessPossible := True;
-            except
-                // Silent Exception
-                NempOptions.WriteAccessPossible := False;
-            end;
-
-            NempUpdater.WriteAccessPossible := NempOptions.WriteAccessPossible;
-        finally
-            ini.Free
+        for i:=0 to Spaltenzahl-1 do
+        begin
+            aMenuItem := TMenuItem.Create(Nemp_MainForm);
+            aMenuItem.AutoHotkeys := maManual;
+            aMenuItem.AutoCheck := True;
+            aMenuItem.Tag := i;
+            aMenuItem.OnClick := VST_ColumnPopupOnClick;
+            aMenuItem.Caption := VST.Header.Columns[i].Text; // _(DefaultSpalten[s].Bezeichnung);
+            VST_ColumnPopup.Items.Insert(i, aMenuItem);
         end;
 
-        {// Now: Get LastExitOK from the file (test for writeaccess)
-        ini := TMeminiFile.Create(SavePath + NEMP_NAME + '.ini', TEncoding.Utf8);
-        try
-            NempOptions.WriteAccessPossible := Not (Ini.ReadBool('Allgemein', 'LastExitOK', True));
+        NempUpdater.LoadSettings;
+        NempSkin.NempPartyMode.LoadSettings;
 
-            if NempOptions.WriteAccessPossible then
-                showmessage('ok')
-            else
-                showmessage('nicht ok');
+        Tag := -1;
 
-        finally
-            ini.Free;
-        end;
-        }
-        
+        // Jetzt: False in die Ini reinschreiben
+        // Das wird erst am Ende wieder "gut gemacht" ;-)
+        NempSettingsManager.LastExitOK := False;
+        NempSettingsManager.WriteToDisk;
     end;
 end;
 
@@ -232,8 +161,8 @@ begin
     UpdateSplashScreen(SplashScreen_SearchSkins);
     with Nemp_MainForm do
     begin
-        MM_O_Skin_UseAdvanced.Checked := GlobalUseAdvancedSkin;
-        PM_P_Skin_UseAdvancedSkin.Checked := GlobalUseAdvancedSkin;
+        MM_O_Skin_UseAdvanced.Checked := NempOptions.GlobalUseAdvancedSkin;
+        PM_P_Skin_UseAdvancedSkin.Checked := NempOptions.GlobalUseAdvancedSkin;
         // Skin-MenuItems setzen
         if (FindFirst(GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\'+'*',faDirectory,SR)=0) then
         repeat
@@ -422,6 +351,13 @@ procedure ApplySettings;
 var maxFont: integer;
 begin
     UpdateSplashScreen(SplashScreen_InitPlayer);
+
+    AuswahlForm.InitForm(nfBrowse, Nemp_MainForm);
+    ExtendedControlForm.InitForm(nfExtendedControls, Nemp_MainForm);
+    MedienlisteForm.InitForm(nfMediaLibrary, Nemp_MainForm);
+    PlaylistForm.InitForm(nfPlaylist, Nemp_MainForm);
+
+
     with Nemp_MainForm do
     begin
         CorrectVolButton;
@@ -451,15 +387,15 @@ begin
         AutoShowDetailsTMP := False; /// NempOptions.AutoShowDetails;
 
         // Menüeinträge checken//unchecken
-        PM_P_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-        PM_P_ViewSeparateWindows_Playlist.Checked  := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
-        PM_P_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-        PM_P_ViewSeparateWindows_Browse.Checked    := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+        PM_P_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible; // .ErweiterteControlsVisible;
+        PM_P_ViewSeparateWindows_Playlist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible; //.PlaylistVisible;
+        PM_P_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible; //.MedienlisteVisible;
+        PM_P_ViewSeparateWindows_Browse.Checked    := NempOptions.FormPositions[nfBrowse].Visible; //.AuswahlSucheVisible;
 
-        MM_O_ViewSeparateWindows_Equalizer.Checked := NempFormBuildOptions.WindowSizeAndPositions.ErweiterteControlsVisible;
-        MM_O_ViewSeparateWindows_Playlist.Checked  := NempFormBuildOptions.WindowSizeAndPositions.PlaylistVisible;
-        MM_O_ViewSeparateWindows_Medialist.Checked := NempFormBuildOptions.WindowSizeAndPositions.MedienlisteVisible;
-        MM_O_ViewSeparateWindows_Browse.Checked    := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+        MM_O_ViewSeparateWindows_Equalizer.Checked := NempOptions.FormPositions[nfExtendedControls].Visible; //.ErweiterteControlsVisible;
+        MM_O_ViewSeparateWindows_Playlist.Checked  := NempOptions.FormPositions[nfPlaylist].Visible; //.PlaylistVisible;
+        MM_O_ViewSeparateWindows_Medialist.Checked := NempOptions.FormPositions[nfMediaLibrary].Visible; //.MedienlisteVisible;
+        MM_O_ViewSeparateWindows_Browse.Checked    := NempOptions.FormPositions[nfBrowse].Visible; //.AuswahlSucheVisible;
 
         if NempOptions.FullRowSelect then
             VST.TreeOptions.SelectionOptions := VST.TreeOptions.SelectionOptions + [toFullRowSelect]
@@ -471,7 +407,6 @@ begin
         //else
         //    VST.TreeOptions.MiscOptions := VST.TreeOptions.MiscOptions - [toEditOnClick];
 
-
         VST.ShowHint := MedienBib.ShowHintsInMedialist;
         PlaylistVST.ShowHint := NempPlaylist.ShowHintsInPlaylist;
         ArtistsVST.DefaultNodeHeight := NempOptions.ArtistAlbenRowHeight;
@@ -481,7 +416,7 @@ begin
         VST.DefaultNodeHeight         := NempOptions.RowHeight;
         PlaylistVST.DefaultNodeHeight := NempOptions.RowHeight;
         if NempOptions.ChangeFontSizeOnLength then
-            maxFont := MaxFontSize(Nemp_MainForm.NempOptions.DefaultFontSize)
+            maxFont := MaxFontSize(NempOptions.DefaultFontSize)
         else
             maxFont := NempOptions.DefaultFontSize;
 
@@ -508,9 +443,9 @@ begin
         AutoSavePlaylistTimer.Interval := 5 * 60000;
 
         if NempOptions.RegisterHotKeys then
-            InstallHotkeys (SavePath, FOwnMessageHandler);
+            NempOptions.InstallHotkeys;
         if NempOptions.RegisterMediaHotkeys then
-            InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys, FOwnMessageHandler);
+            NempOptions.InstallMediakeyHotkeys(NempOptions.IgnoreVolumeUpDownKeys);
 
         Spectrum.Mode := 1;
         Spectrum.LineFallOff := 7;
@@ -520,11 +455,7 @@ begin
         Spectrum.BackColor := clBtnFace;
         // Spectrum.ScrollDelay := NempPlayer.ScrollAnzeigeDelay;
         Spectrum.DrawClear;
-
-        AuswahlForm.InitForm;
-        ExtendedControlForm.InitForm;
-        MedienlisteForm.InitForm;
-        PlaylistForm.InitForm;
+        MedienBib.NewCoverFlow.ApplySettings;
     end;
 end;
 
@@ -551,10 +482,10 @@ begin
         if NempOptions.ShowDeskbandOnStart then
             NotifyDeskband(NempDeskbandActivateMessage);
 
-        if Useskin then
+        if NempOptions.Useskin then
         begin
-            SetSkinRadioBox(SkinName);
-            tmpstr := StringReplace(SkinName,
+            SetSkinRadioBox(NempOptions.SkinName);
+            tmpstr := StringReplace(NempOptions.SkinName,
                     '<public> ', ExtractFilePath(Paramstr(0)) + 'Skins\', []);
             tmpstr := StringReplace(tmpstr,
                     '<private> ', GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\Skins\',[]);
@@ -609,19 +540,17 @@ procedure StuffToDoAfterCreate;
 var TmpLastExitWasOK: Boolean;
 begin
     Formatsettings.LongTimeFormat := 'HH:mm';
-    //s1 := gettickcount;
     with Nemp_MainForm do
     begin
         //LockWindowUpdate(Handle);
 
-        //s := gettickcount;
         TmpLastExitWasOK := LoadSettings;
 
         {$IFDEF USESTYLES}
         //this seems to solve some issues with HINT-Windows in the VST
         // in single-window-mode
         // !!!! another call MUST be done at the end of this procedure !!!
-        if UseSkin AND GlobalUseAdvancedSkin {and (Anzeigemode = 0)} then
+        if NempOptions.UseSkin AND NempOptions.GlobalUseAdvancedSkin {and (Anzeigemode = 0)} then
         begin
             SendMessage( Handle, WM_SETREDRAW, 0, 0);
         end;
@@ -632,21 +561,11 @@ begin
 
         ApplySettings;
 
-        //s := gettickcount;
         AutoLoadPlaylist(TmpLastExitWasOK);
         NempPlaylist.PlaylistManager.InitPlaylistFilenames;
 
-        //e := gettickcount;
-        //ShowMessage('Loading Playlist: ' + IntToStr(e - s));
-
-        //s := gettickcount;
-        //
-        //e := gettickcount;
-        //ShowMessage('Apply Settings: ' + IntToStr(e - s));
-
         ApplyLayout;
 
-        //s := gettickcount;
         UpdateSplashScreen(SplashScreen_GenerateWindows);
 
         _TopMainPanel.Constraints.MinHeight := NempFormBuildOptions.MainPanelMinHeight;
@@ -655,41 +574,13 @@ begin
         GRPBOXArtistsAlben.Height := GRPBOXPlaylist.Height;
         GRPBOXArtistsAlben.Anchors := [akleft, aktop, akright, akBottom];
 
-       { ArtistsVST.BorderWidth := 0;
-        AlbenVST.BorderWidth := 0;
-        PlaylistVST.BorderWidth := 0;
-        VST.BorderWidth := 0;
-        }
-
-        //------------
-
-            // ??
-
-            // ??NempFormBuildOptions.RefreshBothRowsOrColumns(False);
-            // ??NempFormBuildOptions.SwapMainLayout;
-            // ??NempFormBuildOptions.ApplyRatios;
-
-            UpdateFormDesignNeu(AnzeigeMode);
-            //??
-
-        //NempFormBuildOptions.EndUpdate;
-        //------------
+        UpdateFormDesignNeu(NempOptions.AnzeigeMode);
         NempFormBuildOptions.ResizeSubPanel(AuswahlPanel, ArtistsVST, NempFormBuildOptions.BrowseArtistRatio);
-
-        {newWidth := Round(NempFormBuildOptions.BrowseArtistRatio / 100 * (AuswahlPanel.Width));
-        if newWidth < 50 then
-            newWidth := 50;
-        ArtistsVST.Width := newWidth;}
-
-
-        //------------
 
         if NempSkin.isActive then
             MedienBib.NewCoverFlow.SetColor(NempSkin.SkinColorScheme.FormCL)
         else
             MedienBib.NewCoverFlow.SetColor(clWhite);
-
-        // ActualizeVDTCover; will be done by FormBuilder now
 
         ReTranslateNemp(GetCurrentLanguage);
 
@@ -709,25 +600,15 @@ begin
 
         //LockWindowUpdate(0);
         {$IFDEF USESTYLES}
-        if UseSkin AND GlobalUseAdvancedSkin {and (Anzeigemode = 1)} then
+        if NempOptions.UseSkin AND NempOptions.GlobalUseAdvancedSkin {and (Anzeigemode = 1)} then
         begin
             SendMessage(Handle, WM_SETREDRAW, 1, 0);
             Refresh;
         end;
         {$ENDIF}
 
-
-        //s := gettickcount;
         AutoLoadBib;
-        //e := gettickcount;
-        //ShowMessage('Bib Load: ' + IntToStr(e - s));
-
-        //LblEmptyLibraryHint.Refresh;
     end;
-
-    //e1 := gettickcount;
-    //ShowMessage('Complete: ' + IntToStr(e1 - s1));
-
 end;
 
 

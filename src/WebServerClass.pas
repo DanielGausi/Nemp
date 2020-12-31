@@ -1110,7 +1110,7 @@ begin
     result := StringReplace(result, '{{Class}}'        , aClass, [rfReplaceAll]);
 
     result := StringReplace(result, '{{PlaylistTitle}}', EscapeHTMLChars(fWebDisplay.PlaylistTitle(af)), [rfReplaceAll]);
-    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(af.NonEmptyTitle) , [rfReplaceAll]);
+    result := StringReplace(result, '{{Title}}'    , EscapeHTMLChars(fWebDisplay.GetNonEmptyTitle(af)) , [rfReplaceAll]);
     result := StringReplace(result, '{{Artist}}'   , EscapeHTMLChars(af.Artist), [rfReplaceAll]);
     result := StringReplace(result, '{{Album}}'    , EscapeHTMLChars(af.Album) , [rfReplaceAll]);
 

@@ -215,7 +215,7 @@ type
         // Get the Default-Cover
         // i.e. one of the ugly Nemp-Covers like "no cover", "webradio"
         //      OR the customized cover file from the Medialibrary-settings.
-        class procedure GetDefaultCover(aType: TDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
+        class procedure GetDefaultCover(aType: TEDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
 
         // GetCoverBitmapFromID:
         // Get the Bitmap for a specified Cover-ID
@@ -223,6 +223,9 @@ type
 
         // Randomly select some covers from the list and store it in the RandomCoverList
         procedure PrepareMainCover(SourceCoverlist: TObjectlist);
+
+        // Paint a customized cover "Your Library", but using only ColorIDs for the picking algorithm
+        procedure PaintMainPickCover(aCoverBmp: TBitmap; MainCoverList: TObjectList);
 
         // Save a Graphic in a resized file. Used for all the little md5-named jpgs
         // in <NempDir>\Cover
@@ -1334,7 +1337,7 @@ begin
 end;
 
 
-class procedure TCoverArtSearcher.GetDefaultCover(aType: TDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
+class procedure TCoverArtSearcher.GetDefaultCover(aType: TEDefaultCoverType; aCoverPic: TPicture; Flags: Integer);
 var filename: UnicodeString;
     WPic: TWICImage;
     Stretch: Boolean;
@@ -1468,6 +1471,105 @@ begin
 end;
 
 
+procedure TCoverArtSearcher.PaintMainPickCover(aCoverBmp: TBitmap; MainCoverList: TObjectList);
+var
+  i: Integer;
+  TileSize: Integer;
+  x1,y1: Integer;
+const
+  PickCoverSize = 256;
+
+    procedure SetColorByID(aCanvas: TCanvas; aID: Cardinal);
+    var
+      aColor: TColor;
+    begin
+          aColor := aID;
+          aCanvas.Brush.Color := aColor;
+          aCanvas.Pen.Color := aColor;
+    end;
+
+    function GetCoverIndexByID(aCoverID: String): Integer;
+    var j: Integer;
+    begin
+      result := 0;
+      for j := 0 to MainCoverList.Count -1 do
+      begin
+        if TNempCover(MainCoverList[j]).ID = aCoverID then
+        begin
+          result := j;
+          break;
+        end;
+      end;
+    end;
+
+begin
+    EnterCriticalSection(CSAccessRandomCoverlist);
+    aCoverBmp.Canvas.Brush.Style := bsSolid;
+
+    if RandomCoverList.Count = 0 then
+    begin
+        // No Cover in the library. Just paint the "zero" Cover
+        aCoverBmp.Width  := PickCoverSize;
+        aCoverBmp.Height := PickCoverSize;
+        SetColorByID(aCoverBmp.Canvas, 0);
+        aCoverBmp.Canvas.Rectangle(0,0, aCoverBmp.Width, aCoverBmp.Height);
+    end else
+    begin
+        //TileSize := PickCoverSize Div 4;
+        // At least one cover in the library
+
+            // first: Set size of Target-Bitmap
+            // and Tile size
+            case RandomCoverList.Count of
+                1: begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize;
+                    TileSize := PickCoverSize;
+                end;
+                2: begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize Div 2;
+                    TileSize := PickCoverSize Div 2;
+                end;
+                4: begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize;
+                    TileSize := PickCoverSize Div 2;
+                end;
+                8: begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize Div 2;
+                    TileSize := PickCoverSize Div 4;
+                end;
+                16: begin
+                    aCoverBmp.Width  := PickCoverSize;
+                    aCoverBmp.Height := PickCoverSize;
+                    TileSize := PickCoverSize Div 4;
+                end;
+            end;
+
+            for i := 0 to min(15, RandomCoverList.Count - 1) do
+            begin
+              SetColorByID(aCoverBmp.Canvas, GetCoverIndexByID(RandomCoverList[i]) );
+              case RandomCoverList.Count of
+                  1: begin
+                    x1 := 0;
+                    y1 := 0;
+                  end;
+                  2,4: begin
+                    x1 := ((i mod 2) * 2*TileSize);
+                    y1 := ((i Div 2) * 2*TileSize);
+                  end;
+                  8,16: begin
+                    x1 := ((i mod 4) * TileSize);
+                    y1 := ((i Div 4) * TileSize);
+                  end;
+              end;
+              aCoverBmp.Canvas.Rectangle(x1, y1, x1+TileSize, y1+TileSize);
+            end; // for
+    end;
+    LeaveCriticalSection(CSAccessRandomCoverlist);
+end;
 
 
 procedure TCoverArtSearcher.PaintMainCover(aCoverBmp: TPicture);

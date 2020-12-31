@@ -31,12 +31,14 @@
 }
 unit Nemp_ConstantsAndTypes;
 
+{$I xe.inc}
+
 interface
 
 uses Windows, Messages, Graphics, IniFiles, Forms,  Classes, Controls,
-      Vcl.ExtCtrls, Generics.Collections,
+      Vcl.ExtCtrls, Generics.Collections, oneInst, SystemHelper,
      SysUtils, Contnrs, ShellApi, VirtualTrees,  Hilfsfunktionen,
-
+     WindowsVersionInfo,
      dialogs;
 
 
@@ -62,9 +64,9 @@ type
     TAudioFileStringIndex = (siArtist, siAlbum, siOrdner, siGenre, siJahr, siFileAge, siDateiname);
 
     // pa_default is used only for putting files from the playlist into the media library
-    TProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
+    TEProgressActions = (pa_Default, pa_SearchFiles, pa_SearchFilesForPlaylist, pa_RefreshFiles, pa_CleanUp, pa_Searchlyrics, pa_SearchTags, pa_UpdateMetaData, pa_DeleteFiles, pa_ScanNewFiles);
 
-    TDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
+    TEDefaultCoverType = (dcFile, dcWebRadio, dcCDDA, dcNoCover_deprecated, dcError);
 
     TNempSortArray = Array[1..2] of TAudioFileStringIndex;
 
@@ -77,50 +79,54 @@ type
     end;
 
 
-    TNempWindowSizeAndPositions = record
-        // MiniForms visible
-        PlaylistVisible,
-        MedienlisteVisible,
-        AuswahlSucheVisible,
-        ErweiterteControlsVisible: Boolean;
+    TENempFormIDs = (nfMain, nfMainMini, nfPlaylist, nfMediaLibrary, nfBrowse, nfExtendedControls);
 
-        // MiniForms docked
-        PlaylistDocked,
-        MedienlisteDocked,
-        AuswahlListeDocked,
-        ExtendedControlsDocked: Boolean;
+    TFormData = record
+      Key: String;
+      Top,
+      Left,
+      Width,
+      Height: Integer;
+      Docked,
+      Visible: Boolean;
+    end;
+    TFormDataArray = array[TENempFormIDs] of TFormData;
 
-        MainFormMaximized: Boolean;
+  const
+      cDefaultWindowData: TFormDataArray = (
+        (Key: 'Main'; Top: 0; Left: 0; Width: 1200; Height: 750; Docked: False; Visible: True),
+        (Key: 'MiniMain'; Top: 410; Left: 180; Width: 800; Height: 100; Docked: False; Visible: True), //height: ignored here
+        (Key: 'Playlist'; Top: 0; Left: 780; Width: 400; Height: 390; Docked: False; Visible: True),
+        (Key: 'MediaList'; Top: 530; Left: 0; Width: 840; Height: 330; Docked: False; Visible: True),
+        (Key: 'BrowseList'; Top: 0; Left: 0; Width: 760; Height: 390; Docked: False; Visible: True),
+        (Key: 'Extended'; Top: 530; Left: 860; Width: 330; Height: 330; Docked: False; Visible: True)
+      );
 
-        MainFormTop,      // position/size of the Mainform (compact mode)
-        MainFormLeft,
-        MainFormHeight,
-        MainFormWidth: Integer;
+  type
 
-        MiniMainFormTop,  // position/size of the Mainform (multi window mode)
-        MiniMainFormLeft,
-        MiniMainFormHeight,
-        MiniMainFormWidth: Integer;
+    TNempFormData = class
+    private
+        fNempForm : TENempFormIDs;
+        fTop,
+        fLeft,
+        fWidth,
+        fHeight  : Integer;
+        fDocked,
+        fVisible: Boolean;
 
-        PlaylistTop,
-        PlaylistLeft,
-        PlaylistHeight,
-        PlaylistWidth: Integer;
+      public
+        property Top    : Integer read fTop     write fTop    ;
+        property Left   : Integer read fLeft    write fLeft   ;
+        property Width  : Integer read fWidth   write fWidth  ;
+        property Height : Integer read fHeight  write fHeight ;
+        property Docked : Boolean read fDocked  write fDocked ;
+        property Visible: Boolean read fVisible write fVisible;
 
-        MedienlisteTop,
-        MedienlisteLeft,
-        MedienlisteHeight,
-        MedienlisteWidth: Integer;
+        constructor create(aNempForm: TENempFormIDs);
 
-        AuswahlSucheTop,
-        AuswahlSucheLeft,
-        AuswahlSucheHeight,
-        AuswahlSucheWidth: Integer;
-
-        ExtendedControlsTop,
-        ExtendedControlsLeft,
-        ExtendedControlsHeight,
-        ExtendedControlsWidth: Integer;
+        function SetDataToString: String;
+        procedure GetDataFromString(aString: String);
+        procedure SetData(aFormData: TFormData);
     end;
 
 
@@ -142,7 +148,6 @@ type
             fHeader : TPanel;  // the small header Panel inside the Block
             fContent: TPanel; // the actual content-panel of the Block
             fName   : String; // for a nicer display in a combobox or something
-
             fRatio  : Integer;
 
             // some temporary variables for loading from the inifile
@@ -268,8 +273,6 @@ type
             ChildPanelMinHeight: Integer;
             NewLayout: TMainLayout;
 
-            WindowSizeAndPositions: TNempWindowSizeAndPositions;
-
             BrowseArtistRatio     ,
             FileOverviewCoverRatio,
             TopPanelRatio          : Integer;
@@ -288,9 +291,8 @@ type
 
             constructor Create;
             destructor Destroy; override;
-
-            procedure LoadFromIni(aIni: TMemIniFile);
-            procedure SaveToIni(aIni: TMemIniFile);
+            procedure LoadSettings;
+            procedure SaveSettings;
 
             procedure BeginUpdate;
             procedure EndUpdate;
@@ -359,9 +361,79 @@ type
       Height      : Integer;
     end;
 
+    TEHotKeyTypes = (hkPlay, hkStop, hkNext, hkPrev, hkSlideForward, hkSlideBack, hkIncVol, hkDecVol, hkMute);
+    THotKeyInfo = record
+      Activate: Boolean;
+      Modifier: Cardinal;
+      Key: Byte;
+    end;
+
+const
+    cHotKeyTypeNames: Array[TEHotKeyTypes] of String =
+        ( 'Play', 'Stop', 'Next', 'Prev', 'SlideForward', 'SlideBack', 'IncVol', 'DecVol', 'Mute');
+    cHotKeyDefaults: Array[TEHotKeyTypes] of THotKeyInfo =
+    ( (Activate: True; Modifier: 6; Key: 80),  // 'P'
+      (Activate: True; Modifier: 6; Key: 83),  // 'S'
+      (Activate: True; Modifier: 6; Key: 78),  // 'N'
+      (Activate: True; Modifier: 6; Key: 66),  // 'B'
+      (Activate: True; Modifier: 6; Key: 77),  // 'M'
+      (Activate: True; Modifier: 6; Key: 86),  // 'V'
+      (Activate: True; Modifier: 6; Key: 187), // '+'
+      (Activate: True; Modifier: 6; Key: 189), // '-'
+      (Activate: True; Modifier: 6; Key: 48)   // '0'
+    );
+
+type
+    TNempHotKey = class
+      private
+        fHotKeyType : TEHotKeyTypes;
+        fActivate : Boolean;
+        fModifier : Cardinal;
+        fKey      : Byte;
+        fID       : Integer;
+        function SetDataToString: String;
+        procedure GetDataFromString(aString: String);
+        procedure SetData(aActivate: Boolean; aModifier: Cardinal; aKey: Byte);
+      public
+        property Activate : Boolean  read fActivate write fActivate;
+        property Modifier : Cardinal read fModifier write fModifier;
+        property Key      : Byte     read fKey      write fKey     ;
+        property ID       : Integer  read fID;
+        constructor create(HotKeyType: TEHotKeyTypes);
+    end;
+
+    THotKeyArray = Array[TEHotKeyTypes] of TNempHotKey;
+
+    // TNempSettingsManager: A global IniFile for settings storage
+    TNempSettingsManager = class(TMemIniFile)
+      private
+        fSavePath: String;
+        fWriteAccessPossible: Boolean;
+
+        function GetLastExitOk: Boolean;
+        procedure SetLastExitOk(value: Boolean);
+
+        procedure InitiateSavePath;
+      public
+        property SavePath: String read fSavePath;
+        property LastExitOK: Boolean read GetLastExitOk write SetLastExitOk;
+        property WriteAccessPossible: boolean read fWriteAccessPossible;
+
+        constructor create;
+        destructor Destroy; override;
+        procedure WriteToDisk;
+    end;
 
 
-    TNempOptions = record
+    TNempOptions = class
+      private
+        fHotKeys: THotKeyArray;
+        fMainFormHandle: HWND;
+
+        procedure LoadHotKeys;
+        function LoadHotKeys_Deprecated: Boolean;
+
+      public
         // etaws Kleinkram und allgemeine Optionen
         //DenyID3Edit: Boolean;
         LastKnownVersion: Integer;
@@ -381,13 +453,12 @@ type
         ShowSplashScreen: Boolean;
         MiniNempStayOnTop: Boolean;
         FullRowSelect: Boolean;
-        // EditOnClick: Boolean;
         TippSpeed: Integer;
 
         NempWindowView: Word;
         StartMinimized: Boolean;
         StartMinimizedByParameter: Boolean;
-        FixCoverFlowOnStart: Boolean;
+        // FixCoverFlowOnStart: Boolean;
 
         //Sprache
         Language: String;
@@ -404,15 +475,7 @@ type
         ShutDownTimeIniHours,
         ShutDownTimeIniMinutes : Integer;
 
-
-        // Optionen für die Darstellung der Playliste/Medienliste
-        // MinFontColor: TColor;          // not editable in Nemp 4.0 any longer
-        // MaxFontColor: TColor;
-        // MiddleFontColor: TColor;
-        // MiddleToMinComputing: Byte;
-        // MiddleToMaxComputing: Byte;
         MaxDauer: Array[1..4] of Integer;
-        /// FontSize: Array[1..5] of Integer;
         RowHeight: Integer;
         ChangeFontColorOnBitrate:boolean;
         ChangeFontSizeOnLength:boolean;
@@ -429,7 +492,7 @@ type
         DefaultFontStyles: TFontStyles;
         ArtistAlbenFontStyles: TFontStyles;
 
-        WriteAccessPossible: Boolean;
+        /// MOVED WriteAccessPossible: Boolean;
         AllowQuickAccessToMetadata: Boolean;
         UseCDDB: Boolean;
 
@@ -446,45 +509,28 @@ type
         HideDeskbandOnRestore : Boolean;
         HideDeskbandOnClose   : Boolean;
 
-        // "Die letzten 10" => moved to TPlaylistManager
-        //RecentPlaylists: Array[1..10] of UnicodeString;
+        AnzeigeMode: Integer;
+        UseSkin: Boolean;
+        GlobalUseAdvancedSkin: Boolean;
+        SkinName: UnicodeString;
 
-        // Hotkey-Details
-        InstallHotkey_Play        : Boolean;
-        InstallHotkey_Stop        : Boolean;
-        InstallHotkey_Next        : Boolean;
-        InstallHotkey_Prev        : Boolean;
-        InstallHotkey_JumpForward : Boolean;
-        InstallHotkey_JumpBack    : Boolean;
-        InstallHotkey_IncVol      : Boolean;
-        InstallHotkey_DecVol      : Boolean;
-        InstallHotkey_Mute        : Boolean;
+        FormPositions: array[TENempFormIDs] of TNempFormData;
+        MainFormMaximized: Boolean;
 
-        HotkeyMod_Play        : Cardinal;
-        HotkeyMod_Stop        : Cardinal;
-        HotkeyMod_Next        : Cardinal;
-        HotkeyMod_Prev        : Cardinal;
-        HotkeyMod_JumpForward : Cardinal;
-        HotkeyMod_JumpBack    : Cardinal;
-        HotkeyMod_IncVol      : Cardinal;
-        HotkeyMod_DecVol      : Cardinal;
-        HotkeyMod_Mute        : Cardinal;
+        property HotKeys: THotKeyArray read fHotKeys;
 
-        HotkeyKey_Play        : Byte;
-        HotkeyKey_Stop        : Byte;
-        HotkeyKey_Next        : Byte;
-        HotkeyKey_Prev        : Byte;
-        HotkeyKey_JumpForward : Byte;
-        HotkeyKey_JumpBack    : Byte;
-        HotkeyKey_IncVol      : Byte;
-        HotkeyKey_DecVol      : Byte;
-        HotkeyKey_Mute        : Byte;
-    end;
+        constructor create;
+        destructor Destroy; override;
 
+        procedure LoadSettings(aHandle: HWND);
+        procedure SaveSettings;
+        procedure SaveHotKeys;
 
-    TNempForm = class(TForm)
-    public
-      NempRegionsDistance: TNempRegionsDistance;
+        procedure DefineHotKey(aHotKey: TEHotKeyTypes; aActivate: Boolean; aModifier: Cardinal; aKey: Byte);
+        procedure UnInstallHotKeys;
+        procedure UninstallMediakeyHotkeys;
+        procedure InstallHotkeys;
+        procedure InstallMediakeyHotkeys(IgnoreVolume: Boolean);
     end;
 
 
@@ -548,17 +594,16 @@ const
 
     // Wird von den SetEndSyncs gesendet, mit Zusatzparameter, ob am Ende neue Datei gespielt wird, oder gestoppt wird.
     WM_ChangeStopBtn = WM_USER + 513;
-
     WM_StopPlaylist = WM_USER + 514;
-
     WM_PlayerHeadSetEnd = WM_USER + 515;
-
     WM_PlayerSilenceDetected = WM_USER + 516;
-
     WM_PlayerPrescanComplete = WM_USER + 517;
 
-    //---------------------------------------
+    WM_PrepareNextFile = WM_USER + 518;
+    WM_PlayerDelayedPlayNext = WM_USER + 519;
+    WM_PlayerDelayCompleted = WM_USER + 520;
 
+    //---------------------------------------
     // Messages der Medienbibliothek
     //---------------------------------------
     // Irgendwer oder irgendwas fängt an, die Updateliste zu bearbeiten.
@@ -970,23 +1015,49 @@ const
       REPLAYGAIN_ALBUM_PEAK = 'REPLAYGAIN_ALBUM_PEAK';
 
 
-procedure SaveWindowPositons(ini: TMemIniFile; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
-procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions);
-procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
-
-procedure UnInstallHotKeys(Handle: HWND);
-procedure UninstallMediakeyHotkeys(Handle: HWND);
-
-procedure InstallHotkeys(aIniPath: UnicodeString; Handle: HWND);
-procedure InstallMediakeyHotkeys(IgnoreVolume: Boolean; Handle: HWND);
-
-
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
+
+function NempOptions: TNempOptions;
+function NempFormBuildOptions: TNempFormBuildOptions;
+function NempSettingsManager: TNempSettingsManager;
+
+function Assigned_NempFormBuildOptions: Boolean;
 
 
 implementation
 
 uses PlaylistUnit, MedienListeUnit, AuswahlUnit, ExtendedControlsUnit, BasicSettingsWizard, Treehelper;
+
+var fNempOptions: TNempOptions;
+    fNempSettingsManager: TNempSettingsManager;
+    fNempFormBuildOptions: TNempFormBuildOptions;
+
+function Assigned_NempFormBuildOptions: Boolean;
+begin
+  result := assigned(fNempFormBuildOptions);
+end;
+
+function NempSettingsManager: TNempSettingsManager;
+begin
+  if not assigned(fNempSettingsManager) then
+    fNempSettingsManager := TNempSettingsManager.create;
+  result := fNempSettingsManager;
+end;
+
+function NempOptions: TNempOptions;
+begin
+  if not assigned(fNempOptions) then
+    fNempOptions := TNempOptions.create;
+  result := fNempOptions;
+end;
+
+function NempFormBuildOptions: TNempFormBuildOptions;
+begin
+  if not assigned(fNempFormBuildOptions) then
+    fNempFormBuildOptions := TNempFormBuildOptions.create;
+  result := fNempFormBuildOptions;
+end;
+
 
 
 procedure CheckValue(var x: Integer; minValue, maxValue: Integer);
@@ -1499,48 +1570,48 @@ begin
 end;
 
 
-procedure TNempFormBuildOptions.LoadFromIni(aIni: TMemIniFile);
+procedure TNempFormBuildOptions.LoadSettings;
 var ControlPanelSubParentIdx: Integer;
-begin
 
-    NewLayout                 := TMainLayout(aIni.ReadInteger('FormBuilder', 'MainLayout', 1) mod 2);
-    HideFileOverviewPanel     := aIni.ReadBool('FormBuilder', 'HideFileOverviewPanel', False  );
+begin
+    NewLayout                 := TMainLayout(NempSettingsManager.ReadInteger('FormBuilder', 'MainLayout', 1) mod 2);
+    HideFileOverviewPanel     := NempSettingsManager.ReadBool('FormBuilder', 'HideFileOverviewPanel', False  );
 
     // settings for ControlPanel
-    ControlPanelPosition      := TControlPanelPosition(aIni.ReadInteger('FormBuilder', 'ControlPanelPosition', 3) mod 4);
-    ControlPanelSubPosition   := TControlPanelSubPosition(aIni.ReadInteger('FormBuilder', 'ControlPanelSubPosition', 1) mod 2);
-    ControlPanelSubParentIdx  := aIni.ReadInteger('FormBuilder', 'ControlPanelSubParentIdx', 2) mod 4 ;
+    ControlPanelPosition      := TControlPanelPosition(NempSettingsManager.ReadInteger('FormBuilder', 'ControlPanelPosition', 3) mod 4);
+    ControlPanelSubPosition   := TControlPanelSubPosition(NempSettingsManager.ReadInteger('FormBuilder', 'ControlPanelSubPosition', 1) mod 2);
+    ControlPanelSubParentIdx  := NempSettingsManager.ReadInteger('FormBuilder', 'ControlPanelSubParentIdx', 2) mod 4 ;
     case ControlPanelSubParentIdx of
         0: ControlPanelSubParent := BlockBrowse;
         1: ControlPanelSubParent := BlockPlaylist;
         2: ControlPanelSubParent := BlockMediaList;
         3: ControlPanelSubParent := BlockFileOverview;
     end;
-    ControlPanelTwoRows           := aIni.ReadBool('FormBuilder', 'ControlPanelTwoRows'          , False );
-    ControlPanelShowCover         := aIni.ReadBool('FormBuilder', 'ControlPanelShowCover'        , True  );
+    ControlPanelTwoRows           := NempSettingsManager.ReadBool('FormBuilder', 'ControlPanelTwoRows'          , False );
+    ControlPanelShowCover         := NempSettingsManager.ReadBool('FormBuilder', 'ControlPanelShowCover'        , True  );
     // ControlPanelShowVisualisation := aIni.ReadBool('FormBuilder', 'ControlPanelShowVisualisation', True  );
 
     // position and sizes of the 4 blocks
-    BlockBrowse.fParentIndex      := aIni.ReadInteger('FormBuilder', 'BlockBrowseParent'      , 0);
-    BlockBrowse.fSortIndex        := aIni.ReadInteger('FormBuilder', 'BlockBrowseSort'        , 0);
-    BlockBrowse.fRatio            := aIni.ReadInteger('FormBuilder', 'BlockBrowseRatio'       , 50);
+    BlockBrowse.fParentIndex      := NempSettingsManager.ReadInteger('FormBuilder', 'BlockBrowseParent'      , 0);
+    BlockBrowse.fSortIndex        := NempSettingsManager.ReadInteger('FormBuilder', 'BlockBrowseSort'        , 0);
+    BlockBrowse.fRatio            := NempSettingsManager.ReadInteger('FormBuilder', 'BlockBrowseRatio'       , 50);
 
-    BlockPlaylist.fParentIndex    := aIni.ReadInteger('FormBuilder', 'BlockPlaylistParent'    , 1);
-    BlockPlaylist.fSortIndex      := aIni.ReadInteger('FormBuilder', 'BlockPlaylistSort'      , 0);
-    BlockPlaylist.fRatio          := aIni.ReadInteger('FormBuilder', 'BlockPlaylistRatio'     , 50);
+    BlockPlaylist.fParentIndex    := NempSettingsManager.ReadInteger('FormBuilder', 'BlockPlaylistParent'    , 1);
+    BlockPlaylist.fSortIndex      := NempSettingsManager.ReadInteger('FormBuilder', 'BlockPlaylistSort'      , 0);
+    BlockPlaylist.fRatio          := NempSettingsManager.ReadInteger('FormBuilder', 'BlockPlaylistRatio'     , 50);
 
-    BlockMediaList.fParentIndex   := aIni.ReadInteger('FormBuilder', 'BlockMediaListParent'   , 0);
-    BlockMediaList.fSortIndex     := aIni.ReadInteger('FormBuilder', 'BlockMediaListSort'     , 1);
-    BlockMediaList.fRatio         := aIni.ReadInteger('FormBuilder', 'BlockMediaListRatio'    , 70);
+    BlockMediaList.fParentIndex   := NempSettingsManager.ReadInteger('FormBuilder', 'BlockMediaListParent'   , 0);
+    BlockMediaList.fSortIndex     := NempSettingsManager.ReadInteger('FormBuilder', 'BlockMediaListSort'     , 1);
+    BlockMediaList.fRatio         := NempSettingsManager.ReadInteger('FormBuilder', 'BlockMediaListRatio'    , 70);
 
-    BlockFileOverview.fParentIndex:= aIni.ReadInteger('FormBuilder', 'BlockFileOverviewParent', 1);
-    BlockFileOverview.fSortIndex  := aIni.ReadInteger('FormBuilder', 'BlockFileOverviewSort'  , 1);
-    BlockFileOverview.fRatio      := aIni.ReadInteger('FormBuilder', 'BlockFileOverviewRatio' , 30);
+    BlockFileOverview.fParentIndex:= NempSettingsManager.ReadInteger('FormBuilder', 'BlockFileOverviewParent', 1);
+    BlockFileOverview.fSortIndex  := NempSettingsManager.ReadInteger('FormBuilder', 'BlockFileOverviewSort'  , 1);
+    BlockFileOverview.fRatio      := NempSettingsManager.ReadInteger('FormBuilder', 'BlockFileOverviewRatio' , 30);
 
     // main Ratio and some special ratios
-    TopPanelRatio          := aIni.ReadInteger('FormBuilder', 'RatioTopPanel'         , 60);
-    BrowseArtistRatio      := aIni.ReadInteger('FormBuilder', 'RatioBrowseArtist'     , 50);
-    FileOverviewCoverRatio := aIni.ReadInteger('FormBuilder', 'RatioFileOverviewCover', 50);
+    TopPanelRatio          := NempSettingsManager.ReadInteger('FormBuilder', 'RatioTopPanel'         , 60);
+    BrowseArtistRatio      := NempSettingsManager.ReadInteger('FormBuilder', 'RatioBrowseArtist'     , 50);
+    FileOverviewCoverRatio := NempSettingsManager.ReadInteger('FormBuilder', 'RatioFileOverviewCover', 50);
 
     CheckValue(BlockBrowse.fRatio       , 10, 90);
     CheckValue(BlockPlaylist.fRatio     , 10, 90);
@@ -1564,24 +1635,24 @@ begin
     if BlockFileOverview.fParentIndex = 0 then PanelAChilds.Add(BlockFileOverview) else PanelBChilds.Add(BlockFileOverview);
     // sort the PanelLists
     fSortChilds;
-
 end;
 
-procedure TNempFormBuildOptions.SaveToIni(aIni: TMemIniFile);
+
+procedure TNempFormBuildOptions.SaveSettings;
 var i, ControlPanelSubParentIdx: Integer;
 begin
 
     if newLayout <> MainLayout then   // needed when we start in seprate mode and do not enter compact mode at all
-        aIni.WriteInteger('FormBuilder', 'MainLayout', Integer(newLayout))
+        NempSettingsManager.WriteInteger('FormBuilder', 'MainLayout', Integer(newLayout))
     else
-        aIni.WriteInteger('FormBuilder', 'MainLayout', Integer(MainLayout));
+        NempSettingsManager.WriteInteger('FormBuilder', 'MainLayout', Integer(MainLayout));
 
 
-    aIni.WriteBool('FormBuilder', 'HideFileOverviewPanel', HideFileOverviewPanel);
+    NempSettingsManager.WriteBool('FormBuilder', 'HideFileOverviewPanel', HideFileOverviewPanel);
 
     // settings for ControlPanel
-    aIni.WriteInteger('FormBuilder', 'ControlPanelPosition', Integer(ControlPanelPosition));
-    aIni.WriteInteger('FormBuilder', 'ControlPanelSubPosition', Integer(ControlPanelSubPosition));
+    NempSettingsManager.WriteInteger('FormBuilder', 'ControlPanelPosition', Integer(ControlPanelPosition));
+    NempSettingsManager.WriteInteger('FormBuilder', 'ControlPanelSubPosition', Integer(ControlPanelSubPosition));
     ControlPanelSubParentIdx := 0;
     if ControlPanelSubParent = BlockBrowse then
         ControlPanelSubParentIdx := 0
@@ -1594,10 +1665,10 @@ begin
             else
                 if ControlPanelSubParent = BlockFileOverview then
                     ControlPanelSubParentIdx := 3;
-    aIni.WriteInteger('FormBuilder', 'ControlPanelSubParentIdx', ControlPanelSubParentIdx);
+    NempSettingsManager.WriteInteger('FormBuilder', 'ControlPanelSubParentIdx', ControlPanelSubParentIdx);
 
-    aIni.WriteBool('FormBuilder', 'ControlPanelTwoRows'          , ControlPanelTwoRows           );
-    aIni.WriteBool('FormBuilder', 'ControlPanelShowCover'        , ControlPanelShowCover         );
+    NempSettingsManager.WriteBool('FormBuilder', 'ControlPanelTwoRows'          , ControlPanelTwoRows           );
+    NempSettingsManager.WriteBool('FormBuilder', 'ControlPanelShowCover'        , ControlPanelShowCover         );
     // aIni.WriteBool('FormBuilder', 'ControlPanelShowVisualisation', ControlPanelShowVisualisation );
 
     // make sure the temporary index variables are set correctly
@@ -1606,32 +1677,34 @@ begin
     for i := 0 to PanelBChilds.Count - 1 do PanelBChilds[i].fParentIndex := 1;
     for i := 0 to PanelBChilds.Count - 1 do PanelBChilds[i].fSortIndex := i;
 
-    aIni.WriteInteger('FormBuilder', 'BlockBrowseParent'      , BlockBrowse.fParentIndex);
-    aIni.WriteInteger('FormBuilder', 'BlockBrowseSort'        , BlockBrowse.fSortIndex  );
-    aIni.WriteInteger('FormBuilder', 'BlockBrowseRatio'       , BlockBrowse.fRatio      );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockBrowseParent'      , BlockBrowse.fParentIndex);
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockBrowseSort'        , BlockBrowse.fSortIndex  );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockBrowseRatio'       , BlockBrowse.fRatio      );
 
-    aIni.WriteInteger('FormBuilder', 'BlockPlaylistParent'    , BlockPlaylist.fParentIndex );
-    aIni.WriteInteger('FormBuilder', 'BlockPlaylistSort'      , BlockPlaylist.fSortIndex   );
-    aIni.WriteInteger('FormBuilder', 'BlockPlaylistRatio'     , BlockPlaylist.fRatio       );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockPlaylistParent'    , BlockPlaylist.fParentIndex );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockPlaylistSort'      , BlockPlaylist.fSortIndex   );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockPlaylistRatio'     , BlockPlaylist.fRatio       );
 
-    aIni.WriteInteger('FormBuilder', 'BlockMediaListParent'   , BlockMediaList.fParentIndex);
-    aIni.WriteInteger('FormBuilder', 'BlockMediaListSort'     , BlockMediaList.fSortIndex  );
-    aIni.WriteInteger('FormBuilder', 'BlockMediaListRatio'    , BlockMediaList.fRatio      );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockMediaListParent'   , BlockMediaList.fParentIndex);
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockMediaListSort'     , BlockMediaList.fSortIndex  );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockMediaListRatio'    , BlockMediaList.fRatio      );
 
-    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewParent', BlockFileOverview.fParentIndex);
-    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewSort'  , BlockFileOverview.fSortIndex  );
-    aIni.WriteInteger('FormBuilder', 'BlockFileOverviewRatio' , BlockFileOverview.fRatio      );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockFileOverviewParent', BlockFileOverview.fParentIndex);
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockFileOverviewSort'  , BlockFileOverview.fSortIndex  );
+    NempSettingsManager.WriteInteger('FormBuilder', 'BlockFileOverviewRatio' , BlockFileOverview.fRatio      );
 
     // main Ratio and some special ratios
-     aIni.WriteInteger('FormBuilder', 'RatioBrowseArtist'     , BrowseArtistRatio     );
-     aIni.WriteInteger('FormBuilder', 'RatioFileOverviewCover', FileOverviewCoverRatio);
-     aIni.WriteInteger('FormBuilder', 'RatioTopPanel'         , TopPanelRatio         );
+    NempSettingsManager.WriteInteger('FormBuilder', 'RatioBrowseArtist'     , BrowseArtistRatio     );
+    NempSettingsManager.WriteInteger('FormBuilder', 'RatioFileOverviewCover', FileOverviewCoverRatio);
+    NempSettingsManager.WriteInteger('FormBuilder', 'RatioTopPanel'         , TopPanelRatio         );
 
+    // delete deprecated windows section, replaced by section [NempForms]
+    if NempSettingsManager.SectionExists('Windows') then
+      NempSettingsManager.EraseSection('Windows');
 end;
 
 procedure TNempFormBuildOptions.NilConstraints;
 begin
-
     MainSplitter.MinSize := 1; // 0 is not possible
     SubSplitter1.MinSize := 1;
     SubSplitter2.MinSize := 1;
@@ -2507,379 +2580,6 @@ begin
     end;
 end;
 
-procedure ReadNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions);
-begin
-
-    with FormBuildOptions.WindowSizeAndPositions do
-    begin
-        MainFormTop            := ini.ReadInteger('Windows', 'MainTop'     ,0   );
-        MainFormLeft           := ini.ReadInteger('Windows', 'MainLeft'    ,0   );
-        MainFormWidth          := ini.ReadInteger('Windows', 'MainWidth'   ,1200);
-        MainFormHeight         := ini.ReadInteger('Windows', 'MainHeight'  ,750 );
-        MainFormMaximized         := ini.ReadBool('Windows', 'maximiert_0' ,False);
-
-        MiniMainFormTop            := ini.ReadInteger('Windows', 'MiniTop'   , 0 );
-        MiniMainFormLeft           := ini.ReadInteger('Windows', 'MiniLeft'  , 616 );
-        MiniMainFormWidth          := ini.ReadInteger('Windows', 'MiniWidth' , 800 );
-        //MiniMainFormWidth          := 234 + 2 * GetSystemMetrics(SM_CXFrame);
-        MiniMainFormHeight         := 560;
-
-        PlaylistVisible           := ini.ReadBool('Windows','PlaylistVisible'   , True);
-        MedienlisteVisible        := ini.ReadBool('Windows','MedienlisteVisible', True);
-        AuswahlSucheVisible       := ini.ReadBool('Windows','AuswahlVisible'    , True);
-        ErweiterteControlsVisible := ini.ReadBool('Windows','ControlsVisible'   , True);
-
-        PlaylistDocked            := ini.ReadBool('Windows','PlaylistDocked'    , False);
-        MedienlisteDocked         := ini.ReadBool('Windows','MedienlisteDocked' , False);
-        AuswahlListeDocked        := ini.ReadBool('Windows','AuswahlListeDocked', False);
-        ExtendedControlsDocked    := ini.ReadBool('Windows','ExtendedControlsDocked', False);
-
-        ExtendedControlsTop       := Ini.ReadInteger('Windows', 'ExtendedControlsTop'   , 166);
-        ExtendedControlsLeft      := Ini.ReadInteger('Windows', 'ExtendedControlsLeft'  , 623);
-        ExtendedControlsHeight    := Ini.ReadInteger('Windows', 'ExtendedControlsHeight' , 330);
-        ExtendedControlsWidth     := Ini.ReadInteger('Windows', 'ExtendedControlsWidth'  , 400);
-
-        PlaylistTop               := Ini.ReadInteger('Windows', 'PlaylistTop'   , 23);
-        PlaylistLeft              := Ini.ReadInteger('Windows', 'PlaylistLeft'  , 868);
-        PlaylistHeight            := Ini.ReadInteger('Windows', 'PlaylistHeight', 391);
-        PlaylistWidth             := Ini.ReadInteger('Windows', 'PlaylistWidth' , 254);
-
-        MedienlisteTop            := Ini.ReadInteger('Windows', 'MedienlisteTop'   , 428);
-        MedienlisteLeft           := Ini.ReadInteger('Windows', 'MedienlisteLeft'  , 16);
-        MedienlisteHeight         := Ini.ReadInteger('Windows', 'MedienlisteHeight', 330);
-        MedienlisteWidth          := Ini.ReadInteger('Windows', 'MedienlisteWidth' , 1108);
-
-        AuswahlSucheTop           := Ini.ReadInteger('Windows', 'AuswahlSucheTop'   , 22);
-        AuswahlSucheLeft          := Ini.ReadInteger('Windows', 'AuswahlSucheLeft'  , 18);
-        AuswahlSucheHeight        := Ini.ReadInteger('Windows', 'AuswahlSucheHeight', 391);
-        AuswahlSucheWidth         := Ini.ReadInteger('Windows', 'AuswahlSucheWidth' , 594);
-    end;
-
-
-    With Options do
-    begin
-        LastKnownVersion     := ini.ReadInteger('Allgemein','LastKnownVersion',0 );
-
-        AutoCloseProgressWindow := ini.ReadBool('Allgemein', 'AutoCloseProgressWindow', False);
-        StartMinimized       := ini.ReadBool('Allgemein', 'StartMinimized', False);
-        AllowOnlyOneInstance := ini.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
-        RegisterHotKeys      := ini.ReadBool('Allgemein', 'RegisterHotKeys', False);
-        RegisterMediaHotkeys := ini.ReadBool('Allgemein', 'RegisterMediaHotkeys', True);
-        IgnoreVolumeUpDownKeys  := ini.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
-        TabStopAtPlayerControls := ini.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
-        TabStopAtTabs := ini.ReadBool('Allgemein', 'TabStopAtTabs', True);
-        VSTDetailsLock:= ini.ReadInteger('Allgemein', 'VSTDetailsLock', 0);
-
-        DisplayApp := Ini.ReadString('Allgemein', 'DisplayApp', 'NempG15App.exe');
-        UseDisplayApp := Ini.ReadBool('Allgemein', 'UseDisplayApp', false);
-        // "Kill" relative Paths
-        DisplayApp := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
-
-        AllowQuickAccessToMetadata := Ini.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
-        UseCDDB                    := Ini.ReadBool('Allgemein', 'UseCDDB', False);
-
-        MiniNempStayOnTop := ini.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
-        FixCoverFlowOnStart := ini.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
-
-        //ShutdownMode := Ini.ReadInteger('Allgemein', 'ShutDownMode', SHUTDOWNMODE_Shutdown);
-        ShutDownModeIniIdx     := Ini.ReadInteger('Allgemein',  'ShutDownModeIniIdx'    , 4);
-        ShutDownTimeIniIdx     := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniIdx'    , 3);
-        ShutDownTimeIniHours   := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniHours'  , 2);
-        ShutDownTimeIniMinutes := Ini.ReadInteger('Allgemein',  'ShutDownTimeIniMinutes', 0);
-
-        CheckValue(ShutDownModeIniIdx      , 0, 4);  // 5 different ShutDown-Modes
-        CheckValue(ShutDownTimeIniIdx      , 0, 8);  // 9 different preselections for countdown-length
-        CheckValue(ShutDownTimeIniHours    , 0, 24);
-        CheckValue(ShutDownTimeIniMinutes  , 0, 59);
-
-
-        // ShutDownAtEndOfPlaylist initialisieren
-        ShutDownAtEndOfPlaylist := False;
-        Language := Ini.ReadString('Allgemein', 'Language', '');
-        maxDragFileCount := Ini.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
-
-        NempWindowView       := ini.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
-        ShowDeskbandOnMinimize  := ini.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
-        ShowDeskbandOnStart     := ini.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
-        HideDeskbandOnRestore   := ini.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
-        HideDeskbandOnClose     := ini.ReadBool('Fenster', 'HideDeskbandOnClose', True);
-
-        FullRowSelect := ini.ReadBool('Fenster', 'FullRowSelect', True);
-
-        ArtistAlbenFontSize   := ini.ReadInteger('Font','ArtistAlbenFontSize',8);
-        ArtistAlbenRowHeight  := ini.ReadInteger('Font','ArtistAlbenRowHeight',14);
-        RowHeight             := Ini.ReadInteger('Font', 'RowHeight', 16 );
-        DefaultFontSize       := ini.ReadInteger('Font', 'DefaultFontSize', 8);
-        DefaultFontStyle      := ini.ReadInteger('Font', 'DefaultFontStyle', 0);
-        ArtistAlbenFontStyle  := ini.ReadInteger('Font', 'ArtistAlbenFontStyle', 0);
-        // translate into actual font styles
-        DefaultFontStyles     := FontSelectorItemIndexToStyle(DefaultFontStyle);
-        ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(ArtistAlbenFontStyle);
-
-        ChangeFontColorOnBitrate := ini.ReadBool('Font','ChangeFontColorOnBitrate',False);
-        ChangeFontSizeOnLength := ini.ReadBool('Font','ChangeFontSizeOnLength',False);
-
-        MaxDauer[1] := Ini.ReadInteger('Font', 'Maxdauer1',  60);
-        MaxDauer[2] := Ini.ReadInteger('Font', 'Maxdauer2', 150);
-        MaxDauer[3] := Ini.ReadInteger('Font', 'Maxdauer3', 360);
-        MaxDauer[4] := Ini.ReadInteger('Font', 'Maxdauer4', 900);
-
-        ChangeFontStyleOnMode := ini.ReadBool('Font','ChangeFontStyleOnMode',False);
-        ChangeFontOnCbrVbr := ini.ReadBool('Font','ChangeFontOnCbrVbr',False);
-        FontNameVBR := ini.ReadString('Font','FontNameVBR','Tahoma');
-        FontNameCBR := ini.ReadString('Font','FontNameCBR','Courier');
-    end;
-
-end;
-
-procedure SaveWindowPositons(ini: TMemIniFile; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
-begin
-
-
-    with FormBuildOptions.WindowSizeAndPositions do
-    begin
-        if aMode = 1 then
-        begin
-
-            ini.WriteInteger('Windows', 'MiniTop'  , MiniMainFormTop   );
-            ini.WriteInteger('Windows', 'MiniLeft' , MiniMainFormLeft  );
-            ini.WriteInteger('Windows', 'MiniWidth' , MiniMainFormWidth );
-
-            ini.WriteBool('Windows','PlaylistVisible'   , PlaylistVisible           );
-            ini.WriteBool('Windows','MedienlisteVisible', MedienlisteVisible        );
-            ini.WriteBool('Windows','AuswahlVisible'    , AuswahlSucheVisible       );
-            ini.WriteBool('Windows','ControlsVisible'   , ErweiterteControlsVisible );
-
-            ini.WriteBool('Windows','PlaylistDocked'    , PlaylistForm.NempRegionsDistance.docked   );
-            ini.WriteBool('Windows','MedienlisteDocked' , MedienlisteForm.NempRegionsDistance.docked);
-            ini.WriteBool('Windows','AuswahlListeDocked', AuswahlForm.NempRegionsDistance.docked    );
-            ini.WriteBool('Windows','ExtendedControlsDocked', ExtendedControlForm.NempRegionsDistance.docked );
-
-            Ini.WriteInteger('Windows', 'ExtendedControlsTop'    , ExtendedControlForm.Top);
-            Ini.WriteInteger('Windows', 'ExtendedControlsLeft'   , ExtendedControlForm.Left);
-            Ini.WriteInteger('Windows', 'ExtendedControlsHeight' , ExtendedControlForm.Height);
-            Ini.WriteInteger('Windows', 'ExtendedControlsWidth'  , ExtendedControlForm.Width);
-
-            Ini.WriteInteger('Windows', 'PlaylistTop'   , PlaylistForm.Top   );
-            Ini.WriteInteger('Windows', 'PlaylistLeft'  , PlaylistForm.Left  );
-            Ini.WriteInteger('Windows', 'PlaylistHeight', PlaylistForm.Height);
-            Ini.WriteInteger('Windows', 'PlaylistWidth' , PlaylistForm.Width );
-
-            Ini.WriteInteger('Windows', 'MedienlisteTop'   , MedienlisteForm.Top   );
-            Ini.WriteInteger('Windows', 'MedienlisteLeft'  , MedienlisteForm.Left  );
-            Ini.WriteInteger('Windows', 'MedienlisteHeight', MedienlisteForm.Height);
-            Ini.WriteInteger('Windows', 'MedienlisteWidth' , MedienlisteForm.Width );
-
-            Ini.WriteInteger('Windows', 'AuswahlSucheTop'   , AuswahlForm.Top   );
-            Ini.WriteInteger('Windows', 'AuswahlSucheLeft'  , AuswahlForm.Left  );
-            Ini.WriteInteger('Windows', 'AuswahlSucheHeight', AuswahlForm.Height);
-            Ini.WriteInteger('Windows', 'AuswahlSucheWidth' , AuswahlForm.Width );
-        end else
-        begin
-            ini.WriteInteger('Windows', 'MainTop'     , MainFormTop     );
-            ini.WriteInteger('Windows', 'MainLeft'    , MainFormLeft    );
-            ini.WriteInteger('Windows', 'MainWidth'   , MainFormWidth   );
-            ini.WriteInteger('Windows', 'MainHeight'  , MainFormHeight  );
-            ini.WriteBool('Windows', 'maximiert_0' ,MainFormMaximized);
-        end;
-    end;
-end;
-
-procedure WriteNempOptions(ini: TMemIniFile; var Options: TNempOptions; var FormBuildOptions: TNempFormBuildOptions; aMode: Integer);
-begin
-    SaveWindowPositons(ini, FormBuildOptions, aMode);
-    FormBuildOptions.SaveToIni(ini);
-
-  With Options do
-  begin
-        //ini.WriteBool('Allgemein','DenyID3Edit',DenyID3Edit);
-        ini.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
-
-        ini.WriteBool('Allgemein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
-        ini.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
-        ini.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
-        ini.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
-        ini.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
-        ini.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);
-        ini.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
-        ini.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
-        ini.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
-        ini.WriteInteger('Allgemein', 'VSTDetailsLock', VSTDetailsLock);
-
-        Ini.WriteBool('Allgemein', 'UseDisplayApp', UseDisplayApp);
-        // Note: The Display-App-String is written by the G15-App only
-
-        Ini.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
-        Ini.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
-
-        ini.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
-        ini.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
-
-        Ini.WriteInteger('Allgemein',  'ShutDownModeIniIdx'    , ShutDownModeIniIdx    );
-        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniIdx'    , ShutDownTimeIniIdx    );
-        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniHours'  , ShutDownTimeIniHours  );
-        Ini.WriteInteger('Allgemein',  'ShutDownTimeIniMinutes', ShutDownTimeIniMinutes);
-
-        Ini.WriteString('Allgemein', 'Language', Language);
-        Ini.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
-
-
-        {
-        ini.WriteInteger('Fenster', 'Splitter1_0'          , NempFormAufteilung[0].TopMainPanelHeight);
-        ini.WriteInteger('Fenster', 'BrowseListenWeite_0'  , NempFormAufteilung[0].AuswahlPanelWidth );
-        ini.WriteInteger('Fenster', 'ArtisListenWeite_0'   , NempFormAufteilung[0].ArtistWidth       );
-        ini.WriteBool('Fenster', 'maximiert_0', NempFormAufteilung[0].Maximized);
-
-        ini.WriteInteger('Fenster', 'Splitter1_1'          ,NempFormAufteilung[1].TopMainPanelHeight);//391;
-        ini.WriteInteger('Fenster', 'BrowseListenWeite_1'  ,NempFormAufteilung[1].AuswahlPanelWidth);//303;
-        ini.WriteInteger('Fenster', 'ArtisListenWeite_1'   ,NempFormAufteilung[1].ArtistWidth);//73;
-
-        ini.WriteInteger('Fenster', 'Top_1'                , NempFormAufteilung[1].FormTop           );
-        ini.WriteInteger('Fenster', 'Left_1'               , NempFormAufteilung[1].FormLeft          );
-
-
-        Ini.WriteInteger('Fenster', 'VSTHeight'      , NempFormRatios.VSTHeight    );
-        Ini.WriteInteger('Fenster', 'BrowseWidth'    , NempFormRatios.BrowseWidth  );
-        Ini.WriteInteger('Fenster', 'VSTWidth'       , NempFormRatios.VSTWidth     );
-        Ini.WriteInteger('Fenster', 'VDTCoverWidth'  , NempFormRatios.VDTCoverWidth);
-        //Ini.WriteInteger('Fenster', 'VDTCoverHeight' , NempFormRatios.VDTCoverHeight);
-        Ini.WriteInteger('Fenster', 'ArtistWidth'    , NempFormRatios.ArtistWidth  );
-          }
-
-        Ini.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
-        ini.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
-        ini.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
-        ini.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
-        ini.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
-        ini.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
-        //ini.WriteBool('Fenster', 'ShowCoverAndDetails', ShowCoverAndDetails);
-        //ini.WriteInteger('Fenster', 'CoverWidth', CoverWidth);
-
-        ini.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
-        ini.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);
-        Ini.WriteInteger('Font', 'RowHeight', RowHeight  );
-        ini.WriteInteger('Font','DefaultFontSize',DefaultFontSize);
-        ini.WriteInteger('Font', 'DefaultFontStyle', DefaultFontStyle);
-        ini.WriteInteger('Font', 'ArtistAlbenFontStyle', ArtistAlbenFontStyle);
-
-        ini.Writebool('Font','ChangeFontSizeOnLength',ChangeFontSizeOnLength);
-        ini.Writebool('Font','ChangeFontColorOnBitrate',ChangeFontColorOnBitrate);
-        Ini.WriteInteger('Font', 'Maxdauer1', MaxDauer[1]);
-        Ini.WriteInteger('Font', 'Maxdauer2', MaxDauer[2]);
-        Ini.WriteInteger('Font', 'Maxdauer3', MaxDauer[3]);
-        Ini.WriteInteger('Font', 'Maxdauer4', MaxDauer[4]);
-
-        ini.Writebool('Font','ChangeFontStyleOnMode',ChangeFontStyleOnMode);
-        ini.Writebool('Font','ChangeFontOnCbrVbr',ChangeFontOnCbrVbr);
-        ini.WriteString('Font','FontNameVBR',FontNameVBR);
-        ini.WriteString('Font','FontNameCBR',FontNameCBR);
-  end;
-end;
-
-procedure UnInstallHotKeys(Handle: HWND);
-var i: Integer;
-begin
-    for i := 0 to 9 do
-        UnRegisterHotkey(Handle, i);
-end;
-
-procedure UninstallMediakeyHotkeys(Handle: HWND);
-var i: Integer;
-begin
-    for i := 11 to 17 do
-        UnRegisterHotkey(Handle, i);
-end;
-
-procedure InstallMediakeyHotkeys(IgnoreVolume: Boolean; Handle: HWND);
-begin
-    if not IgnoreVolume then
-    begin
-        RegisterHotkey(Handle, 11, 0, VK_VOLUME_MUTE     );
-        RegisterHotkey(Handle, 12, 0, VK_VOLUME_DOWN     );
-        RegisterHotkey(Handle, 13, 0, VK_VOLUME_UP       );
-    end;
-
-    RegisterHotkey(Handle, 14, 0, VK_MEDIA_NEXT_TRACK);
-    RegisterHotkey(Handle, 15, 0, VK_MEDIA_PREV_TRACK);
-    RegisterHotkey(Handle, 16, 0, VK_MEDIA_STOP      );
-    RegisterHotkey(Handle, 17, 0, VK_MEDIA_PLAY_PAUSE);
-end;
-
-procedure InstallHotkeys(aIniPath: UnicodeString; Handle: HWND);
-var Ini: TMemIniFile;
-    hMod: Cardinal;
-    hKey: Byte;
-begin
-  ini := TMeminiFile.Create(aIniPath + 'Hotkeys.ini', TEncoding.UTF8);
-  try
-       ini.Encoding := TEncoding.UTF8;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_Play'       , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Play' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Play', ord('P'));
-         RegisterHotkey(Handle, 1, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_Stop'       , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Stop' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Stop', ord('S'));
-         RegisterHotkey(Handle, 2, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_Next'       , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Next' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Next', ord('N'));
-         RegisterHotkey(Handle, 3, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_Prev'       , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Prev' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Prev', ord('B'));
-         RegisterHotkey(Handle, 4, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_JumpForward', True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpForward' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpForward', ord('M'));
-         RegisterHotkey(Handle, 5, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_JumpBack'   , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpBack' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpBack', ord('V'));
-         RegisterHotkey(Handle, 6, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_IncVol'     , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_IncVol' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_IncVol', $BB);
-         RegisterHotkey(Handle, 7, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_DecVol'     , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_DecVol' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_DecVol', $BD);
-         RegisterHotkey(Handle, 8, HMod, hKey);
-       end;
-
-       If Ini.ReadBool('HotKeys','InstallHotkey_Mute'       , True) then
-       begin
-         hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Mute' , 6);
-         hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Mute', ord('0'));
-         RegisterHotkey(Handle, 9, HMod, hKey);
-       end;
-  finally
-    ini.Free;
-  end;
-end;
 
 function GetDefaultEqualizerIndex(aEQSettingsName: String): Integer;
 var i: Integer;
@@ -2897,7 +2597,530 @@ end;
 
 
 
+{ TNempOptions }
 
+constructor TNempOptions.create;
+var
+  idxKey: TEHotKeyTypes;
+  idxForm: TENempFormIDs;
+begin
+  inherited;
+
+  for idxKey := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+    fHotKeys[idxKey] := TNempHotKey.create(idxKey);
+
+  for idxForm := Low(TENempFormIDs) to High(TENempFormIDs) do
+    FormPositions[idxForm] := TNempFormData.create(idxForm);
+
+end;
+
+destructor TNempOptions.Destroy;
+var
+  idxKey: TEHotKeyTypes;
+  idxForm: TENempFormIDs;
+begin
+  for idxKey := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+    fHotKeys[idxKey].Free;
+  for idxForm := Low(TENempFormIDs) to High(TENempFormIDs) do
+    FormPositions[idxForm].Free;
+  inherited;
+end;
+
+
+procedure TNempOptions.SaveHotKeys;
+var i: TEHotKeyTypes;
+begin
+  // delete deprecated Hotkeys.ini (not used any longer)
+  if FileExists(NempSettingsManager.SavePath + 'Hotkeys.ini') then
+    DeleteFile(NempSettingsManager.SavePath + 'Hotkeys.ini');
+
+  // remove deprecated ini entries
+  NempSettingsManager.DeleteKey('Allgemein', 'RegisterHotKeys');
+  NempSettingsManager.DeleteKey('Allgemein', 'RegisterMediaHotkeys');
+  NempSettingsManager.DeleteKey('Allgemein', 'IgnoreVolumeUpDownKeys');
+  // write new entries
+  NempSettingsManager.WriteBool('Hotkeys', 'RegisterHotKeys', RegisterHotKeys);
+  NempSettingsManager.WriteBool('Hotkeys', 'RegisterMediaHotkeys', RegisterMediaHotkeys);
+  NempSettingsManager.WriteBool('Hotkeys', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
+
+  for i := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+    NempSettingsManager.WriteString('Hotkeys', cHotKeyTypeNames[i], fHotKeys[i].SetDataToString);
+end;
+
+procedure TNempOptions.LoadHotKeys;
+var i: TEHotKeyTypes;
+begin
+  if NempSettingsManager.SectionExists('Hotkeys') then
+  begin
+    RegisterHotKeys         := NempSettingsManager.ReadBool('Hotkeys', 'RegisterHotKeys', False);
+    RegisterMediaHotkeys    := NempSettingsManager.ReadBool('Hotkeys', 'RegisterMediaHotkeys', True);
+    IgnoreVolumeUpDownKeys  := NempSettingsManager.ReadBool('Hotkeys', 'IgnoreVolumeUpDownKeys', True);
+
+    for i := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+      fHotKeys[i].GetDataFromString(NempSettingsManager.ReadString('Hotkeys', cHotKeyTypeNames[i], ''));
+  end else
+  begin
+    if not LoadHotKeys_Deprecated then
+      for i := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+        fHotKeys[i].GetDataFromString(NempSettingsManager.ReadString('Hotkeys', cHotKeyTypeNames[i], ''));
+  end;
+end;
+
+function TNempOptions.LoadHotKeys_Deprecated: Boolean;
+var Ini: TMemIniFile;
+    hMod: Cardinal;
+    hKey: Byte;
+    Activate: Boolean;
+begin
+  RegisterHotKeys         := NempSettingsManager.ReadBool('Allgemein', 'RegisterHotKeys', False);
+  RegisterMediaHotkeys    := NempSettingsManager.ReadBool('Allgemein', 'RegisterMediaHotkeys', True);
+  IgnoreVolumeUpDownKeys  := NempSettingsManager.ReadBool('Allgemein', 'IgnoreVolumeUpDownKeys', True);
+
+  if not FileExists(NempSettingsManager.SavePath + 'Hotkeys.ini') then
+  begin
+    result := False;
+    exit;
+  end;
+
+  result := True;
+  ini := TMeminiFile.Create(NempSettingsManager.SavePath + 'Hotkeys.ini', TEncoding.UTF8);
+  try
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_Play'       , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Play' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Play', ord('P'));
+       fHotKeys[hkPlay].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_Stop'       , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Stop' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Stop', ord('S'));
+       fHotKeys[hkStop].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_Next'       , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Next' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Next', ord('N'));
+       fHotKeys[hkNext].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_Prev'       , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Prev' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Prev', ord('B'));
+       fHotKeys[hkPrev].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_JumpForward', True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpForward' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpForward', ord('M'));
+       fHotKeys[hkSlideForward].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_JumpBack'   , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_JumpBack' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_JumpBack', ord('V'));
+       fHotKeys[hkSlideBack].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_IncVol'     , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_IncVol' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_IncVol', $BB);
+       fHotKeys[hkIncVol].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_DecVol'     , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_DecVol' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_DecVol', $BD);
+       fHotKeys[hkDecVol].SetData(Activate, hMod, hKey);
+
+       Activate := Ini.ReadBool('HotKeys','InstallHotkey_Mute'       , True);
+       hMod := ini.ReadInteger('HotKeys', 'HotkeyMod_Mute' , 6);
+       hKey := Ini.ReadInteger('HotKeys', 'HotkeyKey_Mute', ord('0'));
+       fHotKeys[hkMute].SetData(Activate, hMod, hKey);
+  finally
+    ini.Free;
+  end;
+end;
+
+
+procedure TNempOptions.UninstallMediakeyHotkeys;
+var i: Integer;
+begin
+    for i := 11 to 17 do
+      UnRegisterHotkey(fMainFormHandle, i);
+end;
+
+procedure TNempOptions.InstallMediakeyHotkeys(IgnoreVolume: Boolean);
+begin
+    if not IgnoreVolume then
+    begin
+        RegisterHotkey(fMainFormHandle, 11, 0, VK_VOLUME_MUTE     );
+        RegisterHotkey(fMainFormHandle, 12, 0, VK_VOLUME_DOWN     );
+        RegisterHotkey(fMainFormHandle, 13, 0, VK_VOLUME_UP       );
+    end;
+
+    RegisterHotkey(fMainFormHandle, 14, 0, VK_MEDIA_NEXT_TRACK);
+    RegisterHotkey(fMainFormHandle, 15, 0, VK_MEDIA_PREV_TRACK);
+    RegisterHotkey(fMainFormHandle, 16, 0, VK_MEDIA_STOP      );
+    RegisterHotkey(fMainFormHandle, 17, 0, VK_MEDIA_PLAY_PAUSE);
+end;
+
+procedure TNempOptions.DefineHotKey(aHotKey: TEHotKeyTypes; aActivate: Boolean; aModifier: Cardinal; aKey: Byte);
+begin
+  fHotkeys[aHotKey].Activate := aActivate;
+  fHotkeys[aHotKey].Modifier := aModifier;
+  fHotkeys[aHotKey].Key := aKey;
+end;
+
+procedure TNempOptions.UnInstallHotKeys;
+var iKey: TEHotKeyTypes;
+begin
+  for iKey := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+    UnRegisterHotkey(fMainFormHandle, fHotKeys[iKey].ID);
+end;
+
+procedure TNempOptions.InstallHotkeys;
+var iKey: TEHotKeyTypes;
+begin
+  for iKey := Low(TEHotKeyTypes) to High(TEHotKeyTypes) do
+  begin
+    if fHotkeys[iKey].fActivate then
+      RegisterHotkey(fMainFormHandle, fHotkeys[iKey].ID, fHotkeys[iKey].Modifier, fHotkeys[iKey].Key )
+  end;
+end;
+
+
+procedure TNempOptions.LoadSettings(aHandle: HWND);
+var
+  WinVersionInfo: TWindowsVersionInfo;
+  defaultAdvanced: Boolean;
+begin
+  fMainFormHandle := aHandle;
+
+  LastKnownVersion := NempSettingsManager.ReadInteger('Allgemein','LastKnownVersion',0 );
+  ShowSplashScreen := NempSettingsManager.ReadBool('Allgemein', 'ShowSplashScreen', True);
+
+  AutoCloseProgressWindow := NempSettingsManager.ReadBool('Allgemein', 'AutoCloseProgressWindow', False);
+  StartMinimized          := NempSettingsManager.ReadBool('Allgemein', 'StartMinimized', False);
+  AllowOnlyOneInstance    := NempSettingsManager.ReadBool('Allgemein', 'AllowOnlyOneInstance', True);
+
+  TabStopAtPlayerControls := NempSettingsManager.ReadBool('Allgemein', 'TabStopAtPlayerControls', True);
+  TabStopAtTabs := NempSettingsManager.ReadBool('Allgemein', 'TabStopAtTabs', True);
+  VSTDetailsLock:= NempSettingsManager.ReadInteger('Allgemein', 'VSTDetailsLock', 0);
+
+  DisplayApp    := NempSettingsManager.ReadString('Allgemein', 'DisplayApp', 'NempG15App.exe');
+  DisplayApp    := Stringreplace(DisplayApp, '\', '', [rfReplaceAll]);
+  UseDisplayApp := NempSettingsManager.ReadBool('Allgemein', 'UseDisplayApp', false);
+
+  AllowQuickAccessToMetadata := NempSettingsManager.ReadBool('Allgemein', 'AllowQuickAccessToMetadata', False);
+  UseCDDB                    := NempSettingsManager.ReadBool('Allgemein', 'UseCDDB', False);
+
+  MiniNempStayOnTop := NempSettingsManager.ReadBool('Allgemein', 'MiniNempStayOnTop', False);
+  // FixCoverFlowOnStart := NempSettingsManager.ReadBool('Allgemein', 'FixCoverFlowOnStart', False);
+
+  ShutDownModeIniIdx     := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownModeIniIdx'    , 4);
+  ShutDownTimeIniIdx     := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownTimeIniIdx'    , 3);
+  ShutDownTimeIniHours   := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownTimeIniHours'  , 2);
+  ShutDownTimeIniMinutes := NempSettingsManager.ReadInteger('Allgemein',  'ShutDownTimeIniMinutes', 0);
+  CheckValue(ShutDownModeIniIdx    , 0, 4);  // 5 different ShutDown-Modes
+  CheckValue(ShutDownTimeIniIdx    , 0, 8);  // 9 different preselections for countdown-length
+  CheckValue(ShutDownTimeIniHours  , 0, 24);
+  CheckValue(ShutDownTimeIniMinutes, 0, 59);
+
+  ShutDownAtEndOfPlaylist := False;
+  Language := NempSettingsManager.ReadString('Allgemein', 'Language', '');
+  maxDragFileCount := NempSettingsManager.ReadInteger('Allgemein', 'maxDragFileCount', 2500);
+
+  NempWindowView          := NempSettingsManager.ReadInteger('Fenster', 'NempWindowView', NEMPWINDOW_ONLYTASKBAR);
+  ShowDeskbandOnMinimize  := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnMinimize', False);
+  ShowDeskbandOnStart     := NempSettingsManager.ReadBool('Fenster', 'ShowDeskbandOnStart', True);
+  HideDeskbandOnRestore   := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnRestore', False);
+  HideDeskbandOnClose     := NempSettingsManager.ReadBool('Fenster', 'HideDeskbandOnClose', True);
+
+  FullRowSelect := NempSettingsManager.ReadBool('Fenster', 'FullRowSelect', True);
+
+  ArtistAlbenFontSize  := NempSettingsManager.ReadInteger('Font','ArtistAlbenFontSize',8);
+  ArtistAlbenRowHeight := NempSettingsManager.ReadInteger('Font','ArtistAlbenRowHeight',14);
+  RowHeight            := NempSettingsManager.ReadInteger('Font', 'RowHeight', 16 );
+  DefaultFontSize      := NempSettingsManager.ReadInteger('Font', 'DefaultFontSize', 8);
+  DefaultFontStyle     := NempSettingsManager.ReadInteger('Font', 'DefaultFontStyle', 0);
+  ArtistAlbenFontStyle := NempSettingsManager.ReadInteger('Font', 'ArtistAlbenFontStyle', 0);
+  DefaultFontStyles     := FontSelectorItemIndexToStyle(DefaultFontStyle     );
+  ArtistAlbenFontStyles := FontSelectorItemIndexToStyle(ArtistAlbenFontStyle );
+
+  ChangeFontColorOnBitrate := NempSettingsManager.ReadBool('Font','ChangeFontColorOnBitrate',False);
+  ChangeFontSizeOnLength   := NempSettingsManager.ReadBool('Font','ChangeFontSizeOnLength',False);
+
+  MaxDauer[1] := NempSettingsManager.ReadInteger('Font', 'Maxdauer1',  60);
+  MaxDauer[2] := NempSettingsManager.ReadInteger('Font', 'Maxdauer2', 150);
+  MaxDauer[3] := NempSettingsManager.ReadInteger('Font', 'Maxdauer3', 360);
+  MaxDauer[4] := NempSettingsManager.ReadInteger('Font', 'Maxdauer4', 900);
+
+  ChangeFontStyleOnMode := NempSettingsManager.ReadBool('Font','ChangeFontStyleOnMode',False);
+  ChangeFontOnCbrVbr    := NempSettingsManager.ReadBool('Font','ChangeFontOnCbrVbr',False);
+  FontNameVBR := NempSettingsManager.ReadString('Font','FontNameVBR','Tahoma');
+  FontNameCBR := NempSettingsManager.ReadString('Font','FontNameCBR','Courier');
+
+  // AnzeigeModus (Das "i" in der NempFormAufteilung)
+  AnzeigeMode := (NempSettingsManager.ReadInteger('Fenster', 'Anzeigemode', 0)) Mod 2; // 0 oder 1, was anderes gibts nicht mehr.
+
+  UseSkin  := NempSettingsManager.ReadBool('Fenster', 'UseSkin', True);
+  SkinName := NempSettingsManager.ReadString('Fenster','SkinName','<public> Dark');
+  {$IFDEF USESTYLES}
+      WinVersionInfo := TWindowsVersionInfo.Create;
+      try
+          // use advanced Skin on Windows Vista and above (6), but NOT on XP and below (5)
+          defaultAdvanced := WinVersionInfo.MajorVersion >= 6;
+      finally
+          WinVersionInfo.Free;
+      end;
+      GlobalUseAdvancedSkin := NempSettingsManager.ReadBool('Fenster', 'UseAdvancedSkin', defaultAdvanced);
+  {$ELSE}
+      GlobalUseAdvancedSkin := False;
+  {$ENDIF}
+
+  LoadHotKeys;
+end;
+
+procedure TNempOptions.SaveSettings;
+begin
+
+  NempSettingsManager.WriteBool('Allgemein', 'StartMinimized', StartMinimized);
+
+  NempSettingsManager.WriteBool('Allgemein', 'AutoCloseProgressWindow', AutoCloseProgressWindow);
+  NempSettingsManager.WriteBool('Allgemein', 'ShowSplashScreen', ShowSplashScreen);
+  NempSettingsManager.WriteInteger('Allgemein','LastKnownVersion', WIZ_CURRENT_SKINVERSION);
+  NempSettingsManager.WriteBool('Allgemein', 'AllowOnlyOneInstance', AllowOnlyOneInstance);
+  NempSettingsManager.WriteBool('Allgemein', 'RegisterHotKeys', RegisterHotKeys);
+  NempSettingsManager.WriteBool('Allgemein', 'RegisterMediaHotkeys', RegisterMediaHotkeys);
+  NempSettingsManager.WriteBool('Allgemein', 'IgnoreVolumeUpDownKeys', IgnoreVolumeUpDownKeys);
+  NempSettingsManager.WriteBool('Allgemein', 'TabStopAtPlayerControls', TabStopAtPlayerControls);
+  NempSettingsManager.WriteBool('Allgemein', 'TabStopAtTabs', TabStopAtTabs);
+  NempSettingsManager.WriteInteger('Allgemein', 'VSTDetailsLock', VSTDetailsLock);
+
+  NempSettingsManager.WriteBool('Allgemein', 'UseDisplayApp', UseDisplayApp);
+  // Note: The Display-App-String is written by the G15-App only
+
+  NempSettingsManager.WriteBool('Allgemein', 'AllowQuickAccessToMetadata', AllowQuickAccessToMetadata);
+  NempSettingsManager.WriteBool('Allgemein', 'UseCDDB', UseCDDB);
+
+  NempSettingsManager.WriteBool('Allgemein', 'MiniNempStayOnTop', MiniNempStayOnTop);
+  // NempSettingsManager.WriteBool('Allgemein', 'FixCoverFlowOnStart', FixCoverFlowOnStart);
+
+  NempSettingsManager.WriteInteger('Allgemein',  'ShutDownModeIniIdx'    , ShutDownModeIniIdx    );
+  NempSettingsManager.WriteInteger('Allgemein',  'ShutDownTimeIniIdx'    , ShutDownTimeIniIdx    );
+  NempSettingsManager.WriteInteger('Allgemein',  'ShutDownTimeIniHours'  , ShutDownTimeIniHours  );
+  NempSettingsManager.WriteInteger('Allgemein',  'ShutDownTimeIniMinutes', ShutDownTimeIniMinutes);
+
+  NempSettingsManager.WriteString('Allgemein', 'Language', Language);
+  NempSettingsManager.WriteInteger('Allgemein', 'maxDragFileCount', maxDragFileCount);
+
+  NempSettingsManager.WriteInteger('Fenster', 'Anzeigemode', AnzeigeMode);
+  NempSettingsManager.WriteBool('Fenster', 'UseSkin', UseSkin);
+  NempSettingsManager.WriteString('Fenster','SkinName', SkinName);
+  NempSettingsManager.WriteBool('Fenster', 'UseAdvancedSkin', GlobalUseAdvancedSkin);
+
+  NempSettingsManager.WriteInteger('Fenster', 'NempWindowView', NempWindowView);
+  NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnMinimize', ShowDeskbandOnMinimize);
+  NempSettingsManager.WriteBool('Fenster', 'ShowDeskbandOnStart', ShowDeskbandOnStart);
+  NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnRestore', HideDeskbandOnRestore);
+  NempSettingsManager.WriteBool('Fenster', 'HideDeskbandOnClose', HideDeskbandOnClose);
+  NempSettingsManager.WriteBool('Fenster', 'FullRowSelect', FullRowSelect);
+
+  NempSettingsManager.WriteInteger('Font','ArtistAlbenFontSize',ArtistAlbenFontSize);
+  NempSettingsManager.WriteInteger('Font','ArtistAlbenRowHeight',ArtistAlbenRowHeight);
+  NempSettingsManager.WriteInteger('Font', 'RowHeight', RowHeight  );
+  NempSettingsManager.WriteInteger('Font','DefaultFontSize',DefaultFontSize);
+  NempSettingsManager.WriteInteger('Font', 'DefaultFontStyle', DefaultFontStyle);
+  NempSettingsManager.WriteInteger('Font', 'ArtistAlbenFontStyle', ArtistAlbenFontStyle);
+
+  NempSettingsManager.Writebool('Font','ChangeFontSizeOnLength',ChangeFontSizeOnLength);
+  NempSettingsManager.Writebool('Font','ChangeFontColorOnBitrate',ChangeFontColorOnBitrate);
+  NempSettingsManager.WriteInteger('Font', 'Maxdauer1', MaxDauer[1]);
+  NempSettingsManager.WriteInteger('Font', 'Maxdauer2', MaxDauer[2]);
+  NempSettingsManager.WriteInteger('Font', 'Maxdauer3', MaxDauer[3]);
+  NempSettingsManager.WriteInteger('Font', 'Maxdauer4', MaxDauer[4]);
+
+  NempSettingsManager.Writebool('Font','ChangeFontStyleOnMode',ChangeFontStyleOnMode);
+  NempSettingsManager.Writebool('Font','ChangeFontOnCbrVbr',ChangeFontOnCbrVbr);
+  NempSettingsManager.WriteString('Font','FontNameVBR',FontNameVBR);
+  NempSettingsManager.WriteString('Font','FontNameCBR',FontNameCBR);
+
+  SaveHotKeys;
+
+end;
+
+{ TNempHotKey }
+
+constructor TNempHotKey.create(HotKeyType: TEHotKeyTypes);
+begin
+  fHotKeyType := HotKeyType;
+  fID := Integer(HotKeyType) + 1;
+end;
+
+procedure TNempHotKey.GetDataFromString(aString: String);
+var
+  HotKeyData: TStringList;
+begin
+  HotKeyData := TStringList.Create;
+  try
+    Explode(';', aString, HotKeyData);
+    if HotKeyData.Count = 3 then
+    begin
+      fActivate := HotKeyData[0] = '1';
+      fModifier := StrToIntDef(HotKeyData[1], cHotKeyDefaults[fHotKeyType].Modifier );
+      fKey      := StrToIntDef(HotKeyData[2], cHotKeyDefaults[fHotKeyType].Key      );
+    end else
+    begin
+      fActivate := cHotKeyDefaults[fHotKeyType].Activate;
+      fModifier := cHotKeyDefaults[fHotKeyType].Modifier;
+      fKey      := cHotKeyDefaults[fHotKeyType].Key     ;
+    end;
+  finally
+    HotKeyData.Free;
+  end;
+end;
+
+procedure TNempHotKey.SetData(aActivate: Boolean; aModifier: Cardinal; aKey: Byte);
+begin
+  fActivate := aActivate;
+  fModifier := aModifier;
+  fKey := aKey;
+end;
+
+function TNempHotKey.SetDataToString: String;
+begin
+  if fActivate then
+    result := '1' + ';' + IntToStr(fModifier) + ';' + IntToStr(fKey)
+  else
+    result := '0' + ';' + IntToStr(fModifier) + ';' + IntToStr(fKey);
+end;
+
+
+{ TNempSettingsManager }
+
+constructor TNempSettingsManager.create;
+begin
+  InitiateSavePath;
+  fWriteAccessPossible := True;
+  inherited create(fSavePath + 'Nemp.ini', TEncoding.UTF8);
+end;
+
+destructor TNempSettingsManager.Destroy;
+begin
+
+  inherited;
+end;
+
+function TNempSettingsManager.GetLastExitOk: Boolean;
+begin
+  result := ReadBool('Allgemein', 'LastExitOK', True);
+end;
+
+procedure TNempSettingsManager.SetLastExitOk(value: Boolean);
+begin
+  WriteBool('Allgemein', 'LastExitOK', value);
+end;
+
+procedure TNempSettingsManager.InitiateSavePath;
+begin
+  if UseUserAppData then
+  begin
+    // User DOES NOT want a portable storage of data - use the user directory
+    fSavePath := GetShellFolder(CSIDL_APPDATA) + '\Gausi\Nemp\';
+    try
+      ForceDirectories(fSavePath);
+    except
+      fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+    end;
+  end else
+  begin
+    // User DOES want a portable/locale storage of configuration and data - use program directory
+    fSavePath := ExtractFilePath(ParamStr(0)) + 'Data\';
+  end;
+end;
+
+procedure TNempSettingsManager.WriteToDisk;
+begin
+  try
+    UpdateFile;
+    fWriteAccessPossible := True;
+  except
+    // Silent Exception
+    fWriteAccessPossible := False;
+  end;
+end;
+
+
+{ TNempFormData }
+
+constructor TNempFormData.create(aNempForm: TENempFormIDs);
+begin
+  fNempForm := aNempForm;
+end;
+
+procedure TNempFormData.GetDataFromString(aString: String);
+var
+  WindowDataStrings: TStringList;
+begin
+  WindowDataStrings := TStringList.Create;
+  try
+    Explode(';', aString, WindowDataStrings);
+    if WindowDataStrings.Count = 6 then
+    begin
+      fTop     := StrToIntDef(WindowDataStrings[0], cDefaultWindowData[fNempForm].Top);
+      fLeft    := StrToIntDef(WindowDataStrings[1], cDefaultWindowData[fNempForm].Left);
+      fWidth   := StrToIntDef(WindowDataStrings[2], cDefaultWindowData[fNempForm].Width);
+      fHeight  := StrToIntDef(WindowDataStrings[3], cDefaultWindowData[fNempForm].Height);
+      fDocked  := WindowDataStrings[4] = '1';
+      fVisible := WindowDataStrings[5] = '1';
+    end else
+    begin
+      fTop     := cDefaultWindowData[fNempForm].Top;
+      fLeft    := cDefaultWindowData[fNempForm].Left;
+      fWidth   := cDefaultWindowData[fNempForm].Width;
+      fHeight  := cDefaultWindowData[fNempForm].Height;
+      fDocked  := cDefaultWindowData[fNempForm].Docked;
+      fVisible := cDefaultWindowData[fNempForm].Visible;
+    end;
+  finally
+    WindowDataStrings.Free;
+  end;
+end;
+
+procedure TNempFormData.SetData(aFormData: TFormData);
+begin
+  fTop     := aFormData.Top      ;
+  fLeft    := aFormData.Left     ;
+  fWidth   := aFormData.Width    ;
+  fHeight  := aFormData.Height   ;
+  fDocked  := aFormData.Docked   ;
+  fVisible := aFormData.Visible  ;
+end;
+
+function TNempFormData.SetDataToString: String;
+  function BoolToStr(b: Boolean): String;
+  begin
+    if b then
+      result := '1'
+    else
+      result := '0';
+  end;
+begin
+  result := IntToStr(fTop   ) + ';' +
+            IntToStr(fLeft  ) + ';' +
+            IntToStr(fWidth ) + ';' +
+            IntToStr(fHeight) + ';' +
+            BoolToStr(fDocked ) + ';' +
+            BoolToStr(fVisible)
+end;
+
+initialization
+  fNempOptions := Nil;
+  fNempSettingsManager := Nil;
+  fNempFormBuildOptions := Nil;
+
+finalization
+  if assigned(fNempOptions) then
+    fNempOptions.Free;
+
+  if assigned(fNempSettingsManager) then
+    fNempSettingsManager.Free;
+
+  if assigned(fNempFormBuildOptions) then
+    fNempFormBuildOptions.Free;
 
 
 end.

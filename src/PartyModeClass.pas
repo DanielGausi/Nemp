@@ -103,8 +103,8 @@ type
           property password: String read fPassword write fPassword;
           constructor Create;
 
-          procedure LoadFromIni(Ini: TMemIniFile);
-          procedure WriteToIni(Ini: TMemIniFile);
+          procedure LoadSettings;
+          procedure SaveSettings;
           // FactorToIndex: Transform the 0, 1.5, 2, 2.5 into 0, 1, 2, 3
           // These Integers are used for the ComboBox in the OptionsDialog and in the Inifile.
           function FactorToIndex: Integer;
@@ -169,31 +169,28 @@ begin
     result := fActive and fBlockTreeEdit;
 end;
 
-procedure TNempPartyMode.LoadFromIni(Ini: TMemIniFile);
+procedure TNempPartyMode.LoadSettings;
 var tmp: Integer;
 begin
-    tmp := Ini.ReadInteger('PartyMode', 'Factor', 1);
+    tmp := NempSettingsManager.ReadInteger('PartyMode', 'Factor', 1);
     fResizeFactor := IndexToFactor(tmp);
 
-    fBlockTreeEdit            := Ini.ReadBool('PartyMode', 'BlockTreeEdit'          , True);
-    fBlockCurrentTitleRating  := Ini.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
-    fBlockTools               := Ini.ReadBool('PartyMode', 'BlockTools'             , True);
-    fPassword                 := Ini.ReadString('PartyMode', 'Password'             , 'nemp');
-    fShowPasswordOnActivate   := Ini.ReadBool('PartyMode', 'fShowPasswordOnActivate', True);
-
-
+    fBlockTreeEdit            := NempSettingsManager.ReadBool('PartyMode', 'BlockTreeEdit'          , True);
+    fBlockCurrentTitleRating  := NempSettingsManager.ReadBool('PartyMode', 'BlockCurrentTitleRating', True);
+    fBlockTools               := NempSettingsManager.ReadBool('PartyMode', 'BlockTools'             , True);
+    fPassword                 := NempSettingsManager.ReadString('PartyMode', 'Password'             , 'nemp');
+    fShowPasswordOnActivate   := NempSettingsManager.ReadBool('PartyMode', 'fShowPasswordOnActivate', True);
 end;
 
 
-procedure TNempPartyMode.WriteToIni(Ini: TMemIniFile);
+procedure TNempPartyMode.SaveSettings;
 begin
-    Ini.WriteInteger('PartyMode', 'Factor', FactorToIndex);
-    Ini.WriteBool('PartyMode', 'BlockTreeEdit'          , fBlockTreeEdit          );
-    Ini.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
-    Ini.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
-    Ini.WriteString('PartyMode', 'Password'             , fPassword               );
-    Ini.WriteBool('PartyMode', 'fShowPasswordOnActivate', fShowPasswordOnActivate );
-
+    NempSettingsManager.WriteInteger('PartyMode', 'Factor', FactorToIndex);
+    NempSettingsManager.WriteBool('PartyMode', 'BlockTreeEdit'          , fBlockTreeEdit          );
+    NempSettingsManager.WriteBool('PartyMode', 'BlockCurrentTitleRating', fBlockCurrentTitleRating);
+    NempSettingsManager.WriteBool('PartyMode', 'BlockTools'             , fBlockTools             );
+    NempSettingsManager.WriteString('PartyMode', 'Password'             , fPassword               );
+    NempSettingsManager.WriteBool('PartyMode', 'fShowPasswordOnActivate', fShowPasswordOnActivate );
 end;
 
 

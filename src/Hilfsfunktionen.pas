@@ -62,8 +62,9 @@ function GetStreamExtension(aStream: DWord): String;
 
 function ReplaceForbiddenFilenameChars(aString: UnicodeString): UnicodeString;
 
-function Explode(const Separator, S: String): TStringList;
-function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;
+procedure Explode(const Separator, S: String; aStrings: TStrings);  overload;
+function Explode(const Separator, S: String): TStringList;  overload; Deprecated;
+function ExplodeWithQuoteMarks(const Separator, S: String): TStringList;  Deprecated;
 
 procedure Delay(dwMillSec: DWord);
 
@@ -245,6 +246,33 @@ end;
   Arguments : const Separator, S: string;
   Result    : TStringList
 -----------------------------------------------------------------------------}
+
+procedure Explode(const Separator, S: String; aStrings: TStrings);
+var
+  SepLen: Integer;
+  F, P: PChar;
+  tmpstr: String;
+begin
+  aStrings.Clear;
+  if (S = '') then exit;
+  if Separator = '' then
+  begin
+    aStrings.Add(S);
+    exit;
+  end;
+  SepLen := Length(Separator);
+  P := PChar(S);
+  while P^ <> #0 do
+  begin
+    F := P;
+    P := StrPos(P, PChar(Separator));
+    if (P = nil) then P := StrEnd(F);
+    SetString(tmpstr, F, P - F);
+    aStrings.Add(tmpstr);
+    if P^ <> #0 then Inc(P, SepLen);
+  end;
+
+end;
 
 function Explode(const Separator, S: String): TStringList;
 var

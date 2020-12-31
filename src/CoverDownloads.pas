@@ -152,7 +152,7 @@ type
             // Get next job, i.e. information about the next queried cover
             procedure SyncGetFirstJob; // VCL
             // Update the Cover in Coverflow (or: in Player?)
-            procedure GetDefaultPic(aDCType: TDefaultCoverType; aBitmap: TBitmap);
+            procedure GetDefaultPic(aDCType: TEDefaultCoverType; aBitmap: TBitmap);
             procedure SyncUpdateCover; // VCL
             procedure SyncUpdateCoverCacheBlocked; // VCL
             procedure SyncUpdateInvalidCover; // VCL
@@ -1177,7 +1177,7 @@ end;
     --------------------------------------------------------
 }
 
-procedure TCoverDownloadWorkerThread.GetDefaultPic(aDCType: TDefaultCoverType; aBitmap: TBitmap);
+procedure TCoverDownloadWorkerThread.GetDefaultPic(aDCType: TEDefaultCoverType; aBitmap: TBitmap);
 var pic: TPicture;
 begin
     pic := TPicture.Create;

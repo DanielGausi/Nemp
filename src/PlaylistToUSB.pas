@@ -45,11 +45,9 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, ComCtrls, IniFiles, MyDialogs, System.Contnrs,
-
-  Nemp_ConstantsAndTypes, gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
-  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen
-
-  ;
+  System.StrUtils,
+  gnuGettext, Nemp_RessourceStrings, DriveRepairTools,
+  SystemHelper, fldBrows, NempAudioFiles, Hilfsfunktionen, AudioDisplayUtils;
 
 type
   TPlaylistCopyForm = class(TForm)
@@ -68,25 +66,24 @@ type
     PBComplete: TProgressBar;
     cbIncludeCuesheets: TCheckBox;
     cbConvertSpaces: TCheckBox;
+    BtnClose: TButton;
     procedure FormCreate(Sender: TObject);
     procedure BtnSelectDirectoryClick(Sender: TObject);
     procedure BtnCopyFilesClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure BtnCloseClick(Sender: TObject);
   private
     { Private-Deklarationen }
   public
     { Public-Deklarationen }
+    procedure LoadSettings;
+    procedure SaveSettings;
 
     procedure WndProc(var Msg: TMessage); override;
   end;
 
-  TReplacePattern = (
-      rp_NoRename = 0,
-      rp_OriginalNumbered,
-      rp_Playlist,
-      rp_Numbered );
 
 var
   PlaylistCopyForm: TPlaylistCopyForm;
@@ -95,22 +92,52 @@ var
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Nemp_ConstantsAndTypes, math, DuplicateFilesDialogs;
 
 {$R *.dfm}
 
 type
-  TCopyEx = class
-      public
-          SourceFiles: TStringList;
-          DestinationDirectoy: String;
-          Handle: THandle;
-          ReplacePattern: TReplacePattern;
-          CreatePlaylistFile: Boolean;
-          IncludeCuesheets: Boolean;
-          ConvertSpaces: Boolean;
-          constructor Create;
-          destructor Destroy; Override;
+
+  TCopyExThread = class (TThread)
+    private
+      FCurrentAudioFile: TAudioFile;
+      FM3UPlaylist: TStringList;
+
+      fCurrentDuplicateFilename: String;
+      fApplyForAll: Boolean;
+      fLastCopyAction: TECopyAction;
+
+      procedure PrepareCurrentAudioFile(aFilename: String);
+      function DoCopyFile(Source: String; var Dest: String): Boolean;
+      function DoCopyCueSheet(Source, Dest: String): Boolean;
+      procedure DoAddPlaylistEntry(aFilename: String);
+
+      procedure InitPlaylist;
+      procedure DoSavePlaylist;
+
+      function FindUniqueFilename(aExistingFilename: String): String;
+      function IntToStrLeadingZeros(aInt, maxCount: Integer): String;
+      function RenameFile(originalFilename: String; newIndex: Integer): String;
+
+      procedure SyncDuplicateFiles;
+
+    protected
+      procedure Execute; override;
+
+    public
+      Formater: TAudioFormatString;
+
+      SourceFiles: TStringList;
+      DestinationDirectoy: String;
+      Handle: THandle;
+      ReplacePatternString: String;
+
+      CreatePlaylistFile: Boolean;
+      IncludeCuesheets: Boolean;
+      ConvertSpaces: Boolean;
+
+      constructor Create;
+      destructor Destroy; override;
   end;
 
 
@@ -128,21 +155,6 @@ const
 var
   CancelCopy     : Boolean = False;
   ThreadIsActive : Boolean = False;
-
-
-{ TCopyEx }
-
-constructor TCopyEx.Create;
-begin
-    SourceFiles := TStringList.Create;
-end;
-
-destructor TCopyEx.Destroy;
-begin
-    SourceFiles.Free;
-    inherited;
-end;
-
 
 
 function GetUSBDrive: String;
@@ -241,169 +253,11 @@ begin
   end;
 end;
 
-function CopyExThread(p: TCopyEx): Integer;
-var
-  Source, Dest, BaseDir: String;
-  Handle : THandle;
-  Cancel : PBool;
-  i : integer;
-  af: TAudioFile;
-  NumberLength: Integer;
-  tmpPlaylist: TStringList;
-  m3u8Needed: Boolean;
-  tmpAnsi: AnsiString;
-  tmpUnicode: UnicodeString;
-  LastError: Cardinal;
-  fn: String;
-
-      function MakeEnoughDigits(aInt: Integer): String;
-      begin
-          result := IntToStr(aInt);
-          while length(result) < NumberLength do
-              result := '0' + result;
-      end;
-
-      // rename a File, input: Complete Path. output: NO PATH, just the filename
-      function RenameFile(oldFile: String; Index: Integer; rp: TReplacePattern; replaceSpaces: Boolean): String;
-      begin
-          case rp of
-            rp_NoRename: result := ExtractFilename(oldFile);
-            rp_OriginalNumbered: result := MakeEnoughDigits(Index) + ' - ' + ExtractFilename(oldFile);
-            rp_Playlist: begin
-                            af := TAudioFile.Create;
-                            try
-                                af.GetAudioData(oldFile);
-                                result := af.FilenameForUSBCopy;
-                            finally
-                                af.Free;
-                            end;
-                         end;
-            rp_Numbered: begin
-                            af := TAudioFile.Create;
-                            try
-                                af.GetAudioData(oldFile);
-                                result := MakeEnoughDigits(Index) + ' - ' + af.FilenameForUSBCopy;
-                            finally
-                                af.Free;
-                            end;
-                         end;
-          end;
-
-          if replaceSpaces then
-              result := StringReplace(result, ' ', '_', [rfReplaceAll]);
-      end;
-begin
-    ThreadIsActive := True;
-    BaseDir := IncludeTrailingPathDelimiter(p.DestinationDirectoy);
-
-    NumberLength := Length(IntToStr(p.SourceFiles.Count));
-
-    tmpPlaylist := TStringList.Create;   // always create the playlist-stringlist, even if its not needed
-    try
-        tmpPlaylist.Add('#EXTM3U');      // Add header to m3u-list
-        for i := 0 to p.SourceFiles.Count - 1 do
-        begin
-            if CancelCopy then
-                break;
-            // Send Message to GUI
-            SendMessage(p.Handle, CEXM_FILEINDEX, wparam(i), lParam(p.SourceFiles[i]));
-
-            // Set CopyEx-parameters
-            Source := p.SourceFiles[i];
-            Dest   := BaseDir + RenameFile(p.SourceFiles[i], i+1, p.ReplacePattern, p.ConvertSpaces);
-            Handle := p.Handle;
-            Cancel := PBOOL(False);
-
-            // copy the audiofile with progress
-            if not CopyFileEx(PChar(Source), PChar(Dest), @CopyFileProgress, Pointer(Handle), Cancel, 0) then
-            begin
-                // some error occurred
-                LastError := GetLastError;
-                if SendMessage(p.Handle, CEXM_ERROR, wParam(LastError), 0) = 0 then
-                begin
-                    CancelCopy := True;
-                    break;
-                end;
-            end;
-
-            // check for a matching Cuesheet
-            if p.IncludeCuesheets then
-            begin
-                if FileExists(ChangeFileExt(Source, '.cue')) then
-                begin
-                    // just copy the (very small) cuesheetfile - no use for CopyEx
-                    CopyFile(PChar(ChangeFileExt(Source, '.cue')), PChar(ChangeFileExt(Dest, '.cue')), False);
-                    // repair the cuesheet, i.e. change the File-Entry in it
-                    RepairCueSheet(ChangeFileExt(Dest, '.cue'), ExtractFileName(Source));
-                end;
-            end;
-
-            // add file to playlist (if needed)
-            if p.CreatePlaylistFile then
-            begin
-                af := TAudioFile.Create;
-                try
-                    af.GetAudioData(Dest);
-                    // Add File to Playlist
-                    tmpPlaylist.add('#EXTINF:' + IntTostr(af.Duration) + ','
-                            + af.Artist + ' - ' + af.Titel);
-                    // only the filename here
-                    tmpPlaylist.Add(af.Dateiname);
-                finally
-                    af.Free;
-                end;
-            end;
-        end; // for i := 0 to p.SourceFiles.Count - 1 do
-
-        // save Playlist
-        if (Not CancelCopy) and p.CreatePlaylistFile then
-        begin
-            tmpUnicode := tmpPlaylist.Text;
-            tmpAnsi := AnsiString(tmpUnicode);
-            m3u8Needed := (tmpUnicode <> UnicodeString(tmpAnsi));
-
-            try
-                if m3u8Needed then
-                begin
-                    if p.ConvertSpaces then
-                        fn := BaseDir + MakeEnoughDigits(0) +  '_-_Playlist.m3u8'
-                    else
-                        fn := BaseDir + MakeEnoughDigits(0) +  ' - Playlist.m3u8';
-
-                    tmpPlaylist.SaveToFile(fn, TEncoding.UTF8);
-                end
-                else
-                begin
-                    if p.ConvertSpaces then
-                        fn := BaseDir + MakeEnoughDigits(0) +  '_-_Playlist.m3u'
-                    else
-                        fn := BaseDir + MakeEnoughDigits(0) +  ' - Playlist.m3u';
-
-                    tmpPlaylist.SaveToFile(fn, TEncoding.Default);
-                end;
-            except
-                on E: Exception do
-                    SendMessage(p.Handle, CEXM_PLAYLISTFAILED, wParam(E.Message), 0);
-            end;
-        end;
-
-    finally
-        tmpPlaylist.Free;
-    end;
-    // free the Copy-Job
-    p.Free;
-    result := 0;
-
-    ThreadIsActive := False;
-    SendMessage(p.Handle, CEXM_COPYCOMPLETE, wParam(CancelCopy), 0);
-end;
 
 
 { TPlaylistCopyForm }
 
 procedure TPlaylistCopyForm.FormCreate(Sender: TObject);
-var Ini: TMeminiFile;
-    tmpPattern: Integer;
 begin
     BackupComboboxes(self);
     TranslateComponent (self);
@@ -411,25 +265,7 @@ begin
 
     EditDirectory.Text := GetUSBDrive;
 
-    Ini := TMeminiFile.Create(SavePath + 'PlaylistCopy.ini', TEncoding.Utf8);
-    try
-        Ini.Encoding := TEncoding.UTF8;
-
-        EditDirectory.Text := Ini.ReadString ('CopySettings', 'DestinationDirectoy', GetUSBDrive);
-        tmpPattern         := Ini.ReadInteger('CopySettings', 'ReplacePattern'     , 3);
-        if tmpPattern in [0..3] then
-            cbRenameSetting.ItemIndex := tmpPattern
-        else
-            cbRenameSetting.ItemIndex := 3;
-
-        cbCreatePlaylistFile.Checked := Ini.ReadBool('CopySettings', 'CreatePlaylistFile'  , True);
-        cbIncludeCuesheets  .Checked := Ini.ReadBool('CopySettings', 'IncludeCuesheets'    , True);
-        cbConvertSpaces     .Checked := Ini.ReadBool('CopySettings', 'ConvertSpaces'       , False);
-        cbCloseWindow       .Checked := Ini.ReadBool('CopySettings', 'CloseWindowAfterCopy', False);
-
-    finally
-        Ini.Free;
-    end;
+    LoadSettings;
 end;
 
 
@@ -441,8 +277,33 @@ begin
     PBCurrentFile.Position := 0;
     BtnCopyFiles.Caption := CopyToUSB_Copy;
     BtnCopyFiles.Tag := 0;
+    BtnClose.Enabled := True;
 end;
 
+
+procedure TPlaylistCopyForm.LoadSettings;
+begin
+  EditDirectory.Text           := NempSettingsManager.ReadString ('PlaylistCopy', 'DestinationDirectoy', GetUSBDrive);
+  cbRenameSetting.Text         := NempSettingsManager.ReadString ('PlaylistCopy', 'ReplacePattern', '<index> - <filename>');
+  cbCreatePlaylistFile.Checked := NempSettingsManager.ReadBool('PlaylistCopy', 'CreatePlaylistFile'  , True);
+  cbIncludeCuesheets  .Checked := NempSettingsManager.ReadBool('PlaylistCopy', 'IncludeCuesheets'    , True);
+  cbConvertSpaces     .Checked := NempSettingsManager.ReadBool('PlaylistCopy', 'ConvertSpaces'       , False);
+  cbCloseWindow       .Checked := NempSettingsManager.ReadBool('PlaylistCopy', 'CloseWindowAfterCopy', False);
+end;
+
+procedure TPlaylistCopyForm.SaveSettings;
+begin
+  NempSettingsManager.WriteString ('PlaylistCopy', 'DestinationDirectoy' , EditDirectory.Text          );
+  NempSettingsManager.WriteString ('PlaylistCopy', 'ReplacePattern', cbRenameSetting.Text);
+  NempSettingsManager.WriteBool   ('PlaylistCopy', 'CreatePlaylistFile'  , cbCreatePlaylistFile.Checked);
+  NempSettingsManager.WriteBool   ('PlaylistCopy', 'IncludeCuesheets'    , cbIncludeCuesheets  .Checked);
+  NempSettingsManager.WriteBool   ('PlaylistCopy', 'ConvertSpaces'       , cbConvertSpaces     .Checked);
+  NempSettingsManager.WriteBool   ('PlaylistCopy', 'CloseWindowAfterCopy', cbCloseWindow       .Checked);
+  NempSettingsManager.WriteToDisk;
+
+  if FileExists(NempSettingsManager.SavePath + 'PlaylistCopy.ini') then
+    DeleteFile(NempSettingsManager.SavePath + 'PlaylistCopy.ini');
+end;
 
 procedure TPlaylistCopyForm.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
@@ -464,41 +325,18 @@ end;
 
 procedure TPlaylistCopyForm.FormClose(Sender: TObject;
   var Action: TCloseAction);
-var Ini: TMemIniFile;
 begin
-    Ini := TMeminiFile.Create(SavePath + 'PlaylistCopy.ini', TEncoding.Utf8);
-    try
-        Ini.Encoding := TEncoding.UTF8;
-        Ini.WriteString ('CopySettings', 'DestinationDirectoy' , EditDirectory.Text          );
-        Ini.WriteInteger('CopySettings', 'ReplacePattern'      , cbRenameSetting.ItemIndex   );
-        Ini.WriteBool   ('CopySettings', 'CreatePlaylistFile'  , cbCreatePlaylistFile.Checked);
-        Ini.WriteBool   ('CopySettings', 'IncludeCuesheets'    , cbIncludeCuesheets  .Checked);
-        Ini.WriteBool   ('CopySettings', 'ConvertSpaces'       , cbConvertSpaces     .Checked);
-        Ini.WriteBool   ('CopySettings', 'CloseWindowAfterCopy', cbCloseWindow       .Checked);
-    finally
-        Ini.UpdateFile;
-        Ini.Free;
-    end;
+  SaveSettings;
 end;
 
 procedure TPlaylistCopyForm.WndProc(var Msg: TMessage);
 begin
   inherited;
   case Msg.Msg of
-    CEXM_MAXBYTES:
-      begin
-        PBCurrentFile.Max := (Msg.LParam shl 32) + Integer(Msg.WParam);
-      end;
-    CEXM_CONTINUE:
-      begin
-        PBCurrentFile.Position := (Int64(Msg.LParam) shl 32) + Msg.WParam;
-        // Caption := IntToStr(Msg.WParam + Msg.LParam);
-      end;
-    CEXM_CANCEL:
-    begin
-      PBCurrentFile.Position := 0;
-      // Caption := '0';
-    end;
+    CEXM_MAXBYTES: PBCurrentFile.Max := (Msg.LParam shl 32) + Integer(Msg.WParam);
+
+    CEXM_CONTINUE: PBCurrentFile.Position := (Int64(Msg.LParam) shl 32) + Msg.WParam;
+    CEXM_CANCEL: PBCurrentFile.Position := 0;
 
     CEXM_FILEINDEX:
     begin
@@ -517,16 +355,15 @@ begin
         PBCurrentFile.Position := PBCurrentFile.Max;
         BtnCopyFiles.Caption := CopyToUSB_Copy;
         BtnCopyFiles.Tag := 0;
+        BtnClose.Enabled := True;
 
         if (not Boolean(Msg.wParam)) and (cbCloseWindow.Checked) then
             close;
     end;
-    CEXM_PLAYLISTFAILED: begin
-        TranslateMessageDLG(Format((CopyToUSB_SavingPlaylistFailed), [pChar(Msg.wParam)] ), mtWarning, [mbOk], 0);
-    end;
+    CEXM_PLAYLISTFAILED: TranslateMessageDLG(Format((CopyToUSB_SavingPlaylistFailed), [pChar(Msg.wParam)] ), mtWarning, [mbOk], 0);
 
     CEXM_ERROR: begin
-        // display sme known errors that might occur
+        // display some known errors that might occur
         case Integer(Msg.wParam) of
             ERROR_FILE_NOT_FOUND:
                 Msg.Result := Integer(TranslateMessageDLG((CopyToUSB_ERROR_FILE_NOT_FOUND), mtError, [mbOk, mbCancel], 0) = mrOK);
@@ -547,11 +384,9 @@ begin
         end;
     end;
 
-
     CEXM_TEST: begin
         // test test
     end;
-
   end;
 end;
 
@@ -561,27 +396,29 @@ end;
 }
 procedure TPlaylistCopyForm.BtnSelectDirectoryClick(Sender: TObject);
 var
-    FB: TFolderBrowser;
+  FB: TFolderBrowser;
 begin
-    FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, EditDirectory.Text);
-    try
-        fb.NewFolderButton := True;
-        if fb.Execute then
-        begin
-            EditDirectory.Text := FB.SelectedItem;
-        end;
-    finally
-        fb.Free;
-    end;
+  FB := TFolderBrowser.Create(self.Handle, SelectDirectoryDialog_BibCaption, EditDirectory.Text);
+  try
+    fb.NewFolderButton := True;
+    if fb.Execute then
+      EditDirectory.Text := FB.SelectedItem;
+  finally
+    fb.Free;
+  end;
 end;
 
 
 
+procedure TPlaylistCopyForm.BtnCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TPlaylistCopyForm.BtnCopyFilesClick(Sender: TObject);
 var
-    Params: TCopyEx;
-    ThreadID: Cardinal;
-    i: Integer;
+  newCopyThread: TCopyExThread;
+  i: Integer;
 begin
     case (Sender as TButton).Tag of
         0: begin
@@ -611,41 +448,293 @@ begin
             (Sender as TButton).Tag := 1;
             // Start the Copy-process
             BtnCopyFiles.Caption := CopyToUSB_Abort;
+            BtnClose.Enabled := False;
 
             cancelCopy := False;
-
-            Params := TCopyEx.Create; // Params will be freed by the Thread
+            newCopyThread := TCopyExThread.Create;
 
             // 1. fill Source-List
             for i := 0 to NempPlaylist.Count - 1 do
-                if FileExists( NempPlaylist.Playlist[i].Pfad) then
-                    Params.SourceFiles.Add(NempPlaylist.Playlist[i].Pfad);
+                if FileExists(NempPlaylist.Playlist[i].Pfad) then
+                    newCopyThread.SourceFiles.Add(NempPlaylist.Playlist[i].Pfad);
             // 2. Set Parameters
-            Params.DestinationDirectoy := EditDirectory.Text;
-            Params.Handle              := self.Handle;
-            Params.ReplacePattern      := TReplacePattern(cbRenameSetting.ItemIndex);
-            Params.CreatePlaylistFile  := cbCreatePlaylistFile.Checked;
-            Params.IncludeCuesheets    := cbIncludeCuesheets.Checked;
-            Params.ConvertSpaces       := cbConvertSpaces.Checked;
+            newCopyThread.DestinationDirectoy := IncludeTrailingPathDelimiter(EditDirectory.Text);
+            newCopyThread.Handle              := self.Handle;
+            newCopyThread.ReplacePatternString:= cbRenameSetting.Text;
+            newCopyThread.CreatePlaylistFile  := cbCreatePlaylistFile.Checked;
+            newCopyThread.IncludeCuesheets    := cbIncludeCuesheets.Checked;
+            newCopyThread.ConvertSpaces       := cbConvertSpaces.Checked;
 
             // Set GUI
-            PBComplete.Max := Params.SourceFiles.Count;
+            PBComplete.Max := newCopyThread.SourceFiles.Count;
             PBComplete.Position := 0;
             PBCurrentFile.Position := 0;
 
-            // Start copying in secondary thread
-            CloseHandle(BeginThread(nil, 0, @CopyExThread, Params, 0, ThreadID));
+            // Start copying
+            newCopyThread.Start;
         end;
         1: begin
             (Sender as TButton).Tag := 0;
             // Cancel copying
             BtnCopyFiles.Caption := CopyToUSB_Copy;
             CancelCopy := True;
-
+            BtnClose.Enabled := True;
         end;
     end;
 end;
 
+
+{ TCopyExTHread }
+
+constructor TCopyExThread.Create;
+begin
+  inherited create(True);
+
+  SourceFiles := TStringList.Create;
+  FM3UPlaylist := TStringList.Create;
+  Formater := TAudioFormatString.Create('');
+  FCurrentAudioFile := Nil;
+
+  FreeOnTerminate := True;
+end;
+
+destructor TCopyExThread.Destroy;
+begin
+  if Assigned(FCurrentAudioFile) then
+    FCurrentAudioFile.Free;
+  FM3UPlaylist.Free;
+  SourceFiles.Free;
+  Formater.Free;
+  inherited;
+end;
+
+procedure TCopyExThread.PrepareCurrentAudioFile(aFilename: String);
+begin
+  // destroy existing object
+  if assigned(FCurrentAudioFile) then
+    FCurrentAudioFile.Free;
+  // create a new one and read metadata from it
+  FCurrentAudioFile := TAudioFile.Create;
+  FCurrentAudioFile.GetAudioData(aFilename);
+end;
+
+
+function TCopyExThread.IntToStrLeadingZeros(aInt, maxCount: Integer): String;
+begin
+  result := IntToStr(aInt);
+  while length(result) <= log10(maxCount) do
+    result := '0' + result;
+end;
+
+
+function TCopyExThread.RenameFile(originalFilename: String;
+  newIndex: Integer): String;
+begin
+  if not assigned(FCurrentAudioFile) then
+    result := originalFilename // this should never happen ...
+  else
+  begin
+    result := Formater.ParsedTitle(FCurrentAudioFile);
+
+    if not AnsiEndsText(FCurrentAudioFile.Extension, result) then
+      result := result + '.' + FCurrentAudioFile.Extension;
+
+    // a little bit more formating
+    result := Stringreplace(result, '<Index>', IntToStrLeadingZeros(newIndex, SourceFiles.count), [rfIgnoreCase, rfReplaceAll]);
+    result := ReplaceForbiddenFilenameChars(result);
+    if ConvertSpaces then
+      result := StringReplace(result, ' ', '_', [rfReplaceAll]);
+  end;
+end;
+
+procedure TCopyExThread.SyncDuplicateFiles;
+begin
+  if fApplyForAll then // no change needed
+    exit;
+
+  if Not Assigned(DuplicateFilesDialog) then
+    Application.CreateForm(TDuplicateFilesDialog, DuplicateFilesDialog);
+
+  DuplicateFilesDialog.Filename := fCurrentDuplicateFilename;
+
+  DuplicateFilesDialog.ApplyForAll := False;
+  DuplicateFilesDialog.CopyAction := fLastCopyAction;
+
+  case DuplicateFilesDialog.ShowModal of
+    mrOK: begin
+      fApplyForAll := DuplicateFilesDialog.ApplyForAll;
+      fLastCopyAction := DuplicateFilesDialog.CopyAction;
+    end;
+    mrCancel: begin
+      fLastCopyAction := caCancel;
+    end;
+  else
+    fLastCopyAction := caCancel;
+  end;
+end;
+
+function TCopyExThread.FindUniqueFilename(aExistingFilename: String): String;
+var
+  aPath, aExt, aFileName, newName: String;
+  i: Integer;
+begin
+  aExt := ExtractFileExt(aExistingFilename);
+  aPath := ExtractFilePath(aExistingFilename);
+  aFileName := ChangeFileExt(ExtractFilename(aExistingFilename), '');
+  i := 0;
+  repeat
+    inc(i);
+    newName := aPath + aFileName + '('+ IntToStr(i)+ ')' + aExt;
+  until not FileExists(newName);
+
+  result := newName;
+end;
+
+
+function TCopyExThread.DoCopyFile(Source: String; var Dest: String): Boolean;
+var
+  Cancel: PBool;
+  LastError: Cardinal;
+  p: String;
+begin
+  Cancel := PBOOL(False);
+  result := True;
+
+  if FileExists(Dest) then
+  begin
+    fCurrentDuplicateFilename := Dest;
+    Synchronize(SyncDuplicateFiles);
+
+    case self.fLastCopyAction of
+      caSkip: result := False;
+      caRename: Dest := FindUniqueFilename(Dest);
+      caOverwrite: ; // nothing to do, just overwrite the file
+      caCancel: begin
+        result := False;
+        CancelCopy := True;
+      end;
+    end;
+  end;
+
+  p := dest;
+  // copy the audiofile with progress
+  if result and (not CopyFileEx(PChar(Source), PChar(p), @CopyFileProgress, Pointer(Handle), Cancel, 0)) then
+  begin
+    // some error occurred
+    LastError := GetLastError;
+    if SendMessage(Handle, CEXM_ERROR, wParam(LastError), 0) = 0 then
+    begin
+      CancelCopy := True;
+      result := False;
+    end;
+  end;
+end;
+
+
+function TCopyExThread.DoCopyCueSheet(Source, Dest: String): Boolean;
+begin
+  if FileExists(ChangeFileExt(Source, '.cue')) then
+  begin
+    // just copy the (very small) cuesheetfile - no use for CopyEx
+    CopyFile(PChar(ChangeFileExt(Source, '.cue')), PChar(ChangeFileExt(Dest, '.cue')), False);
+    // repair the cuesheet, i.e. change the file-entry in it
+    RepairCueSheet(ChangeFileExt(Dest, '.cue'), ExtractFileName(Source));
+    result := True;
+  end else
+    result := False;
+end;
+
+procedure TCopyExThread.InitPlaylist;
+begin
+  FM3UPlaylist.Clear;
+  FM3UPlaylist.Add('#EXTM3U');
+end;
+
+procedure TCopyExThread.DoAddPlaylistEntry(aFilename: String);
+begin
+  // Add File to Playlist
+  FM3UPlaylist.add('#EXTINF:' + IntTostr(FCurrentAudioFile.Duration) + ','
+          + FCurrentAudioFile.Artist + ' - ' + FCurrentAudioFile.Titel);
+  // only the filename here
+  FM3UPlaylist.Add(ExtractFilename(aFilename));
+end;
+
+procedure TCopyExThread.DoSavePlaylist;
+var
+  m3u8Needed: Boolean;
+  tmpAnsi: AnsiString;
+  tmpUnicode: UnicodeString;
+  fn: String;
+begin
+  tmpUnicode := FM3UPlaylist.Text;
+  tmpAnsi := AnsiString(tmpUnicode);
+  m3u8Needed := (tmpUnicode <> UnicodeString(tmpAnsi));
+
+  fn := IncludeTrailingPathDelimiter(DestinationDirectoy) + IntToStrLeadingZeros(0, SourceFiles.Count) + '_Playlist';
+  try
+    if m3u8Needed then
+    begin
+      fn := fn + '.m3u8';
+      FM3UPlaylist.SaveToFile(fn, TEncoding.UTF8);
+    end else
+    begin
+      fn := fn + '.m3u';
+      FM3UPlaylist.SaveToFile(fn, TEncoding.Default);
+    end;
+  except
+    on E: Exception do
+      SendMessage(Handle, CEXM_PLAYLISTFAILED, wParam(E.Message), 0);
+  end;
+end;
+
+procedure TCopyExThread.Execute;
+var
+  i, CurrentFileNumber: Integer;
+  DestFile: String;
+
+begin
+  inherited;
+  ThreadIsActive := True;
+  // re-init copy-actions
+  fApplyForAll := False;      // Ask again, if there are duplicate files
+  fLastCopyAction := caSkip;  // default: Skip
+
+  Formater.parseString := ReplacePatternString;
+  // clear Playlist and add header
+  InitPlaylist;
+  CurrentFileNumber := 0;
+  for i := 0 to SourceFiles.Count - 1 do
+  begin
+    if CancelCopy then
+      break;
+
+    // Send status message to GUI
+    SendMessage(Handle, CEXM_FILEINDEX, wparam(i), lParam(SourceFiles[i]));
+
+    // Read Audiofile information from the current File
+    // this imformation will be used by RenameFile and DoAddPlaylistEntry
+    PrepareCurrentAudioFile(SourceFiles[i]);
+    DestFile := DestinationDirectoy + RenameFile(SourceFiles[i], CurrentFileNumber+1);
+
+    // Copy the file. Note: the filename "DestFile" may be changed during this operation
+    if DoCopyFile(SourceFiles[i], DestFile) then
+    begin
+      inc(CurrentFileNumber);
+      if IncludeCueSheets then
+        DoCopyCueSheet(SourceFiles[i], DestFile);
+
+      if CreatePlaylistFile then
+        DoAddPlaylistEntry(DestFile);
+    end;
+  end;
+
+  if not CancelCopy and CreatePlaylistFile then
+    DoSavePlaylist;
+
+  // Finish Thread
+  ThreadIsActive := False;
+  SendMessage(Handle, CEXM_COPYCOMPLETE, wParam(CancelCopy), 0);
+end;
 
 
 

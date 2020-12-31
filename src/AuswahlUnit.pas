@@ -47,10 +47,10 @@ uses
   ImgList, VirtualTrees, 
   Dialogs, ExtCtrls, StdCtrls, Buttons,  Nemp_ConstantsAndTypes,
   NempAudioFiles, Hilfsfunktionen, Menus,
-  gnuGettext, Nemp_RessourceStrings, SkinButtons, NempPanel;
+  gnuGettext, Nemp_RessourceStrings, SkinButtons, NempPanel, BaseForms;
 
 type
-  TAuswahlForm = class(TNempForm)
+  TAuswahlForm = class(TNempSubForm)
     ContainerPanelAuswahlform: TNempPanel;
     CloseImageA: TSkinButton;
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
@@ -78,12 +78,6 @@ type
 
   private
     { Private-Deklarationen }
-    DownX: Integer;
-    DownY: Integer;
-    BLeft: Integer;
-    BTop: Integer;
-    BWidth: Integer;
-    BHeight: Integer;
 
     ResizeFlag: Cardinal;
     procedure WMWindowPosChanging(var Message: TWMWINDOWPOSCHANGING); message WM_WINDOWPOSCHANGING;
@@ -93,7 +87,6 @@ type
     // Resizing-Flag: On WMWindowPosChanging the RelativPositions must be changed
     Resizing: Boolean;
 
-    procedure InitForm;
     procedure RepaintForm;
   end;
 
@@ -106,28 +99,6 @@ implementation
 
 uses NempMainUnit, SplitForm_Hilfsfunktionen, MedienlisteUnit,
   PlaylistUnit, MessageHelper, ExtendedControlsUnit;
-
-procedure TAuswahlForm.InitForm;
-begin
-  TranslateComponent (self);
-  DragAcceptFiles (Handle, True);
-  Top     := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheTop;
-  Left    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheLeft;
-  Height  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheHeight;
-  Width   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheWidth;
-
-  BTop    := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheTop;
-  BLeft   := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheLeft;
-  BHeight := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheHeight;
-  BWidth  := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheWidth;
-
-
-  NempRegionsDistance.docked := Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.AuswahlListeDocked;
-  NempRegionsDistance.RelativPositionX := Left - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormLeft;
-  NempRegionsDistance.RelativPositionY := Top - Nemp_MainForm.NempFormBuildOptions.WindowSizeAndPositions.MiniMainFormTop;
-  Caption := NEMP_CAPTION;
-end;
-
 
 
 // Zur Zeit wird das nicht automatisch aufgerufen!!!!
@@ -236,6 +207,7 @@ begin
   if (Nemp_MainForm.ArtistsVST.Width > Nemp_MainForm.AuswahlPanel.width - 40)
       OR (Nemp_MainForm.ArtistsVST.Width < 40) then
           Nemp_MainForm.ArtistsVST.Width := Nemp_MainForm.AuswahlPanel.width DIV 2;
+
   SetRegion(ContainerPanelAuswahlForm, self, NempRegionsDistance, handle);
   If Nemp_MainForm.NempSkin.isActive then
   begin
@@ -248,9 +220,9 @@ procedure TAuswahlForm.CloseImageAClick(Sender: TObject);
 begin
   with Nemp_MainForm do
   begin
-    NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible := NOT NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-    PM_P_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
-    MM_O_ViewSeparateWindows_Browse.Checked := NempFormBuildOptions.WindowSizeAndPositions.AuswahlSucheVisible;
+    NempOptions.FormPositions[fNempFormID].Visible := False;
+    PM_P_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[fNempFormID].Visible;
+    MM_O_ViewSeparateWindows_Browse.Checked := NempOptions.FormPositions[fNempFormID].Visible;
   end;
   close;
 end;

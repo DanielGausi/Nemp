@@ -75,6 +75,8 @@ type
             MainImage: TImage;
             ScrollImage: TImage;
 
+            Settings: TCoverFlowSettings;
+
             // Needed for FlyingCow
             window: HWND;
             events_window: HWND;
@@ -88,6 +90,10 @@ type
             Destructor Destroy; override;
             procedure Clear;
 
+            Procedure LoadSettings;
+            Procedure SaveSettings;
+            procedure ApplySettings;
+
             // After a reinit of the library (swapping lists)
             // we need to correct the CoverList-Pointer
             procedure SetNewList(aList: TObjectList; FallBackToZero: Boolean = False);
@@ -99,6 +105,8 @@ type
             // Setpreview is only needed by FlyingCow.
             // In ClassicMode this will do nothing
             procedure SetPreview (index : Integer; width, height : Integer; pixels : PByteArray);
+
+            procedure SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
 
             // After a sorting of the Coverlist, the current selected cover should be selected
             // again. FindCurrentItemAgain finds it in the List and Set the CurrentItem properly
@@ -126,7 +134,7 @@ type
 
 implementation
 
-uses NempMainUnit;
+uses NempMainUnit, Nemp_ConstantsAndTypes;
 
 { TNempCoverFlow }
 
@@ -282,6 +290,63 @@ begin
     inherited Destroy;
 end;
 
+procedure TNempCoverFlow.SaveSettings;
+begin
+    NempSettingsManager.WriteInteger('CoverFlow', 'zMain'         , Settings.zMain            );
+    NempSettingsManager.WriteInteger('CoverFlow', 'zLeft'         , Settings.zLeft            );
+    NempSettingsManager.WriteInteger('CoverFlow', 'zRight'        , Settings.zRight           );
+
+    NempSettingsManager.WriteInteger('CoverFlow', 'GapLeft'       , Settings.GapLeft          );
+    NempSettingsManager.WriteInteger('CoverFlow', 'GapFirstLeft'  , Settings.GapFirstLeft     );
+    NempSettingsManager.WriteInteger('CoverFlow', 'GapFirstRight' , Settings.GapFirstRight    );
+    NempSettingsManager.WriteInteger('CoverFlow', 'GapRight'      , Settings.GapRight         );
+
+    NempSettingsManager.WriteInteger('CoverFlow', 'AngleMain'     , Settings.AngleMain        );
+    NempSettingsManager.WriteInteger('CoverFlow', 'AngleLeft'     , Settings.AngleLeft        );
+    NempSettingsManager.WriteInteger('CoverFlow', 'AngleRight'    , Settings.AngleRight       );
+
+    NempSettingsManager.WriteBool('CoverFlow', 'UseReflection'    , Settings.UseReflection  );
+    NempSettingsManager.WriteInteger('CoverFlow', 'ReflexionBlendFaktor', Settings.ReflexionBlendFaktor  );
+    NempSettingsManager.WriteInteger('CoverFlow', 'MaxTextures', Settings.MaxTextures  );
+    NempSettingsManager.WriteInteger('CoverFlow', 'GapReflexion', Settings.GapReflexion  );
+    NempSettingsManager.WriteInteger('CoverFlow', 'ViewPosX', Settings.ViewPosX);
+    NempSettingsManager.WriteInteger('CoverFlow', 'ViewDirX', Settings.ViewDirX);
+end;
+
+procedure TNempCoverFlow.LoadSettings;
+begin
+    Settings.zMain         := NempSettingsManager.ReadInteger('CoverFlow', 'zMain'         , DefaultCoverFlowSettings.zMain       );
+    Settings.zLeft         := NempSettingsManager.ReadInteger('CoverFlow', 'zLeft'         , DefaultCoverFlowSettings.zLeft       );
+    Settings.zRight        := NempSettingsManager.ReadInteger('CoverFlow', 'zRight'        , DefaultCoverFlowSettings.zRight      );
+    // Gap between two covers
+    Settings.GapLeft       := NempSettingsManager.ReadInteger('CoverFlow', 'GapLeft'       , DefaultCoverFlowSettings.GapLeft     );
+    Settings.GapFirstLeft  := NempSettingsManager.ReadInteger('CoverFlow', 'GapFirstLeft'  , DefaultCoverFlowSettings.GapFirstLeft);
+    Settings.GapFirstRight := NempSettingsManager.ReadInteger('CoverFlow', 'GapFirstRight' , DefaultCoverFlowSettings.GapFirstRight);
+    Settings.GapRight      := NempSettingsManager.ReadInteger('CoverFlow', 'GapRight'      , DefaultCoverFlowSettings.GapRight    );
+    // Angles, -180 ... +180
+    Settings.AngleMain     := NempSettingsManager.ReadInteger('CoverFlow', 'AngleMain'     , DefaultCoverFlowSettings.AngleMain   );
+    Settings.AngleLeft     := NempSettingsManager.ReadInteger('CoverFlow', 'AngleLeft'     , DefaultCoverFlowSettings.AngleLeft   );
+    Settings.AngleRight    := NempSettingsManager.ReadInteger('CoverFlow', 'AngleRight'    , DefaultCoverFlowSettings.AngleRight  );
+    // Reflection
+    Settings.UseReflection := NempSettingsManager.ReadBool('CoverFlow', 'UseReflection'    , DefaultCoverFlowSettings.UseReflection  );
+    Settings.ReflexionBlendFaktor := NempSettingsManager.ReadInteger('CoverFlow', 'ReflexionBlendFaktor', DefaultCoverFlowSettings.ReflexionBlendFaktor  );
+    Settings.MaxTextures := NempSettingsManager.ReadInteger('CoverFlow', 'MaxTextures', DefaultCoverFlowSettings.MaxTextures  );
+    Settings.GapReflexion := NempSettingsManager.ReadInteger('CoverFlow', 'GapReflexion', DefaultCoverFlowSettings.GapReflexion  );
+
+    Settings.ViewPosX := NempSettingsManager.ReadInteger('CoverFlow', 'ViewPosX', DefaultCoverFlowSettings.ViewPosX);
+    Settings.ViewDirX := NempSettingsManager.ReadInteger('CoverFlow', 'ViewDirX', DefaultCoverFlowSettings.ViewDirX);
+end;
+
+procedure TNempCoverFlow.ApplySettings;
+begin
+  case fMode of
+        cm_Classic : ; // nothing to do here
+        cm_OpenGL  : begin
+            fFlyingCow.ApplySettings(Settings);
+        end;
+    end;
+end;
+
 procedure TNempCoverFlow.DownloadCover(aCover: TNempCover; aIdx: Integer);
 begin
     if (aCover.Album <> 'Unknown compilation')
@@ -338,6 +403,8 @@ begin
             //fCurrentCoverID := 'all';
     end;
 end;
+
+
 
 procedure TNempCoverFlow.SelectItemAt(x, y: Integer);
 begin
@@ -434,6 +501,14 @@ begin
         cm_Classic : ; // Nothing to do here.
         cm_OpenGL  : fFlyingCow.SetPreview(index, width, height, pixels);
     end;
+end;
+
+procedure TNempCoverFlow.SetMainPickCoverPreview(width, height : Integer; pixels : PByteArray);
+begin
+  case fMode of
+    cm_Classic : ; // Nothing to do here.
+    cm_OpenGL  : fFlyingCow.SetMainPickCoverPreview(width, height, pixels);
+  end;
 end;
 
 end.

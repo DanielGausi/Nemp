@@ -547,8 +547,8 @@ type
         //       a copy of the list.
         procedure CopyLibrary(dest: TAudioFileList; var CurrentMaxID: Integer);
         // Load/Save options into IniFile
-        procedure LoadFromIni(ini: TMemIniFile);
-        procedure WriteToIni(ini: TMemIniFile);
+        procedure LoadSettings;
+        procedure SaveSettings;
 
         // Managing the Library
         // - Merging new Files into the library (Param NewBib=True on loading a new library
@@ -1214,7 +1214,7 @@ end;
     Load/Save the settings into the IniFile
     --------------------------------------------------------
 }
-procedure TMedienBibliothek.LoadFromIni(ini: TMemIniFile);
+procedure TMedienBibliothek.LoadSettings;
 var tmpcharcode, dircount, i: integer;
     tmp: UnicodeString;
     so, sd: Integer;
@@ -1222,10 +1222,10 @@ begin
         //BetaDontUseThreadedUpdate := Ini.ReadBool('Beta', 'DontUseThreadedUpdate', False);
 
         // temporary, maybe add an option later (or remove it completely, so use it always)
-        UseNewFileScanMethod := ini.ReadBool('MedienBib', 'UseNewFileScanMethod', True);
+        UseNewFileScanMethod := NempSettingsManager.ReadBool('MedienBib', 'UseNewFileScanMethod', True);
 
-        NempSortArray[1] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl1', integer(siArtist)));
-        NempSortArray[2] := TAudioFileStringIndex(Ini.ReadInteger('MedienBib', 'Vorauswahl2', integer(siAlbum)));
+        NempSortArray[1] := TAudioFileStringIndex(NempSettingsManager.ReadInteger('MedienBib', 'Vorauswahl1', integer(siArtist)));
+        NempSortArray[2] := TAudioFileStringIndex(NempSettingsManager.ReadInteger('MedienBib', 'Vorauswahl2', integer(siAlbum)));
 
         if (NempSortArray[1] > siFileAge) OR (NempSortArray[2] > siFileAge) or
            (NempSortArray[1] < siArtist) OR (NempSortArray[2] < siArtist)then
@@ -1234,107 +1234,107 @@ begin
           NempSortArray[2] := siAlbum;
         end;
 
-        AlwaysSortAnzeigeList := ini.ReadBool('MedienBib', 'AlwaysSortAnzeigeList', False);
-        limitMarkerToCurrentFiles := ini.ReadBool('MedienBib', 'limitMarkerToCurrentFiles', True);
-        SkipSortOnLargeLists  := ini.ReadBool('MedienBib', 'SkipSortOnLargeLists', True);
-        AutoScanPlaylistFilesOnView := ini.ReadBool('MedienBib', 'AutoScanPlaylistFilesOnView', True);
-        ShowHintsInMedialist := ini.ReadBool('Medienbib', 'ShowHintsInMedialist', True);
+        AlwaysSortAnzeigeList := NempSettingsManager.ReadBool('MedienBib', 'AlwaysSortAnzeigeList', False);
+        limitMarkerToCurrentFiles := NempSettingsManager.ReadBool('MedienBib', 'limitMarkerToCurrentFiles', True);
+        SkipSortOnLargeLists  := NempSettingsManager.ReadBool('MedienBib', 'SkipSortOnLargeLists', True);
+        AutoScanPlaylistFilesOnView := NempSettingsManager.ReadBool('MedienBib', 'AutoScanPlaylistFilesOnView', True);
+        ShowHintsInMedialist := NempSettingsManager.ReadBool('Medienbib', 'ShowHintsInMedialist', True);
 
         for i := SORT_MAX downto 0 do
         begin
-            so := Ini.ReadInteger('MedienBib', 'Sortorder' + IntToStr(i), CON_PFAD);
+            so := NempSettingsManager.ReadInteger('MedienBib', 'Sortorder' + IntToStr(i), CON_PFAD);
             self.AddSorter(so, False);
-            sd := Ini.ReadInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(sd_Ascending));
+            sd := NempSettingsManager.ReadInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(sd_Ascending));
             if sd = Integer(sd_Ascending) then
                 SortParams[i].Direction := sd_Ascending
             else
                 SortParams[i].Direction := sd_Descending;
         end;
 
-        TCoverArtSearcher.UseDir         := ini.ReadBool('MedienBib','CoverSearchInDir', True);
-        TCoverArtSearcher.UseParentDir   := ini.ReadBool('MedienBib','CoverSearchInParentDir', True);
-        TCoverArtSearcher.UseSubDir      := ini.ReadBool('MedienBib','CoverSearchInSubDir', True);
-        TCoverArtSearcher.UseSisterDir   := ini.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
-        TCoverArtSearcher.SubDirName     := ini.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
-        TCoverArtSearcher.SisterDirName  := ini.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
-        TCoverArtSearcher.CoverSizeIndex := ini.ReadInteger('MedienBib', 'CoverSize', 1);
+        TCoverArtSearcher.UseDir         := NempSettingsManager.ReadBool('MedienBib','CoverSearchInDir', True);
+        TCoverArtSearcher.UseParentDir   := NempSettingsManager.ReadBool('MedienBib','CoverSearchInParentDir', True);
+        TCoverArtSearcher.UseSubDir      := NempSettingsManager.ReadBool('MedienBib','CoverSearchInSubDir', True);
+        TCoverArtSearcher.UseSisterDir   := NempSettingsManager.ReadBool('MedienBib', 'CoverSearchInSisterDir', True);
+        TCoverArtSearcher.SubDirName     := NempSettingsManager.ReadString('MedienBib', 'CoverSearchSubDirName', 'cover');
+        TCoverArtSearcher.SisterDirName  := NempSettingsManager.ReadString('MedienBib', 'CoverSearchSisterDirName', 'cover');
+        TCoverArtSearcher.CoverSizeIndex := NempSettingsManager.ReadInteger('MedienBib', 'CoverSize', 1);
         TCoverArtSearcher.InitCoverArtCache(Savepath, TCoverArtSearcher.CoverSizeIndex);
 
-        CoverSearchLastFM        := ini.ReadBool('MedienBib', 'CoverSearchLastFM', False);
+        CoverSearchLastFM        := NempSettingsManager.ReadBool('MedienBib', 'CoverSearchLastFM', False);
 
-        HideNACover := ini.ReadBool('MedienBib', 'HideNACover', False);
-        MissingCoverMode := ini.ReadInteger('MedienBib', 'MissingCoverMode', 1);
+        HideNACover := NempSettingsManager.ReadBool('MedienBib', 'HideNACover', False);
+        MissingCoverMode := NempSettingsManager.ReadInteger('MedienBib', 'MissingCoverMode', 1);
         if (MissingCoverMode < 0) OR (MissingCoverMode > 2) then
             MissingCoverMode := 1;
 
-        IgnoreLyrics := ini.ReadBool('MedienBib', 'IgnoreLyrics', False);
+        IgnoreLyrics := NempSettingsManager.ReadBool('MedienBib', 'IgnoreLyrics', False);
 
-        BrowseMode     := Ini.ReadInteger('MedienBib', 'BrowseMode', 1);
+        BrowseMode     := NempSettingsManager.ReadInteger('MedienBib', 'BrowseMode', 1);
         if (BrowseMode < 0) OR (BrowseMode > 2) then
           BrowseMode := 1;
-        CoverSortOrder := Ini.ReadInteger('MedienBib', 'CoverSortOrder', 8);
+        CoverSortOrder := NempSettingsManager.ReadInteger('MedienBib', 'CoverSortOrder', 8);
         if (CoverSortOrder < 1) OR (CoverSortOrder > 9) then
           CoverSortorder := 1;
 
-        IncludeAll := ini.ReadBool('MedienBib', 'other', True);
-        IncludeFilter := Ini.ReadString('MedienBib', 'includefilter', '*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.wma;*.ape;*.flac');
-        AutoLoadMediaList := ini.ReadBool('MedienBib', 'autoload', True);
-        AutoSaveMediaList := ini.ReadBool('MedienBib', 'autosave', AutoLoadMediaList);
+        IncludeAll := NempSettingsManager.ReadBool('MedienBib', 'other', True);
+        IncludeFilter := NempSettingsManager.ReadString('MedienBib', 'includefilter', '*.mp3;*.mp2;*.mp1;*.ogg;*.wav;*.wma;*.ape;*.flac');
+        AutoLoadMediaList := NempSettingsManager.ReadBool('MedienBib', 'autoload', True);
+        AutoSaveMediaList := NempSettingsManager.ReadBool('MedienBib', 'autosave', AutoLoadMediaList);
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetGreek', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetGreek', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 1) then tmpcharcode := 0;
         NempCharCodeOptions.Greek := GreekEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetCyrillic', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetCyrillic', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 2) then tmpcharcode := 0;
         NempCharCodeOptions.Cyrillic := CyrillicEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetHebrew', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetHebrew', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 2) then tmpcharcode := 0;
         NempCharCodeOptions.Hebrew := HebrewEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetArabic', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetArabic', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 2) then tmpcharcode := 0;
         NempCharCodeOptions.Arabic := ArabicEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetThai', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetThai', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 0) then tmpcharcode := 0;
         NempCharCodeOptions.Thai := ThaiEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetKorean', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetKorean', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 0) then tmpcharcode := 0;
         NempCharCodeOptions.Korean := KoreanEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetChinese', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetChinese', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 1) then tmpcharcode := 0;
         NempCharCodeOptions.Chinese := ChineseEncodings[tmpcharcode];
 
-        tmpcharcode := ini.ReadInteger('MedienBib', 'CharSetJapanese', 0);
+        tmpcharcode := NempSettingsManager.ReadInteger('MedienBib', 'CharSetJapanese', 0);
         if (tmpcharcode < 0) or (tmpcharcode > 0) then tmpcharcode := 0;
         NempCharCodeOptions.Japanese := JapaneseEncodings[tmpcharcode];
 
-        NempCharCodeOptions.AutoDetectCodePage := ini.ReadBool('MedienBib', 'AutoDetectCharCode', True);
+        NempCharCodeOptions.AutoDetectCodePage := NempSettingsManager.ReadBool('MedienBib', 'AutoDetectCharCode', True);
 
-        InitialDialogFolder := Ini.ReadString('MedienBib', 'InitialDialogFolder', '');
+        InitialDialogFolder := NempSettingsManager.ReadString('MedienBib', 'InitialDialogFolder', '');
 
-        AutoScanDirs := Ini.ReadBool('MedienBib', 'AutoScanDirs', True);
-        AskForAutoAddNewDirs  := Ini.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
-        AutoAddNewDirs        := Ini.ReadBool('MedienBib', 'AutoAddNewDirs', True);
-        AutoDeleteFiles         := Ini.ReadBool('MedienBib', 'AutoDeleteFiles', False);
-        AutoDeleteFilesShowInfo := Ini.ReadBool('MedienBib', 'AutoDeleteFilesShowInfo', False);
+        AutoScanDirs := NempSettingsManager.ReadBool('MedienBib', 'AutoScanDirs', True);
+        AskForAutoAddNewDirs  := NempSettingsManager.ReadBool('MedienBib', 'AskForAutoAddNewDirs', True);
+        AutoAddNewDirs        := NempSettingsManager.ReadBool('MedienBib', 'AutoAddNewDirs', True);
+        AutoDeleteFiles         := NempSettingsManager.ReadBool('MedienBib', 'AutoDeleteFiles', False);
+        AutoDeleteFilesShowInfo := NempSettingsManager.ReadBool('MedienBib', 'AutoDeleteFilesShowInfo', False);
 
-        AutoResolveInconsistencies          := Ini.ReadBool('MedienBib', 'AutoResolveInconsistencies'      , True);
-        AskForAutoResolveInconsistencies    := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistencies', True);
-        ShowAutoResolveInconsistenciesHints := Ini.ReadBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', True);
+        AutoResolveInconsistencies          := NempSettingsManager.ReadBool('MedienBib', 'AutoResolveInconsistencies'      , True);
+        AskForAutoResolveInconsistencies    := NempSettingsManager.ReadBool('MedienBib', 'AskForAutoResolveInconsistencies', True);
+        ShowAutoResolveInconsistenciesHints := NempSettingsManager.ReadBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', True);
 
-        AskForAutoResolveInconsistenciesRules := Ini.ReadBool('MedienBib', 'AskForAutoResolveInconsistenciesRules', True);
-        AutoResolveInconsistenciesRules       := Ini.ReadBool('MedienBib', 'AutoResolveInconsistenciesRules'      , True);
+        AskForAutoResolveInconsistenciesRules := NempSettingsManager.ReadBool('MedienBib', 'AskForAutoResolveInconsistenciesRules', True);
+        AutoResolveInconsistenciesRules       := NempSettingsManager.ReadBool('MedienBib', 'AutoResolveInconsistenciesRules'      , True);
 
 
-        dircount := Ini.ReadInteger('MedienBib', 'dircount', 0);
+        dircount := NempSettingsManager.ReadInteger('MedienBib', 'dircount', 0);
         for i := 1 to dircount do
         begin
-            tmp := Ini.ReadString('MedienBib', 'ScanDir' + IntToStr(i), '');
+            tmp := NempSettingsManager.ReadString('MedienBib', 'ScanDir' + IntToStr(i), '');
             if trim(tmp) <> '' then
             begin
                 AutoScanDirList.Add(IncludeTrailingPathDelimiter(tmp));
@@ -1342,112 +1342,115 @@ begin
             end;
         end;
 
-        AutoActivateWebServer := Ini.ReadBool('MedienBib', 'AutoActivateWebServer', False);
+        AutoActivateWebServer := NempSettingsManager.ReadBool('MedienBib', 'AutoActivateWebServer', False);
 
         if (ParamCount >= 1) and (ParamStr(1) = '/safemode') then
             NewCoverFlow.Mode := cm_Classic
         else
-            NewCoverFlow.Mode := TCoverFlowMode(ini.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL))); // cm_OpenGL; //cm_Classic; //cm_OpenGL; //
+            NewCoverFlow.Mode := TCoverFlowMode(NempSettingsManager.ReadInteger('MedienBib', 'CoverFlowMode', Integer(cm_OpenGL))); // cm_OpenGL; //cm_Classic; //cm_OpenGL; //
 
-        CurrentArtist := Ini.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);
-        CurrentAlbum := Ini.ReadString('MedienBib','SelectedAlbum', BROWSE_ALL);
-        NewCoverFlow.CurrentCoverID := Ini.ReadString('MedienBib','SelectedCoverID', 'all');
-        NewCoverFlow.CurrentItem    := ini.ReadInteger('MedienBib', 'SelectedCoverIDX', 0);
+        NewCoverFlow.LoadSettings;
+        CurrentArtist := NempSettingsManager.ReadString('MedienBib','SelectedArtist', BROWSE_ALL);
+        CurrentAlbum := NempSettingsManager.ReadString('MedienBib','SelectedAlbum', BROWSE_ALL);
+        NewCoverFlow.CurrentCoverID := NempSettingsManager.ReadString('MedienBib','SelectedCoverID', 'all');
+        NewCoverFlow.CurrentItem    := NempSettingsManager.ReadInteger('MedienBib', 'SelectedCoverIDX', 0);
 
         // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
         LyricPriorities[LYR_NONE]        := 100;
-        LyricPriorities[LYR_LYRICWIKI]   := Ini.ReadInteger('MedienBib', 'PriorityLyricWiki'  , 1);
-        LyricPriorities[LYR_CHARTLYRICS] := Ini.ReadInteger('MedienBib', 'PriorityChartLyrics', 2);
+        LyricPriorities[LYR_LYRICWIKI]   := NempSettingsManager.ReadInteger('MedienBib', 'PriorityLyricWiki'  , 1);
+        LyricPriorities[LYR_CHARTLYRICS] := NempSettingsManager.ReadInteger('MedienBib', 'PriorityChartLyrics', 2);
 
-        BibSearcher.LoadFromIni(ini);
-        TagCloud.LoadFromIni(ini);
+        BibSearcher.LoadFromIni(NempSettingsManager);
+        TagCloud.LoadFromIni(NempSettingsManager);
 end;
-procedure TMedienBibliothek.WriteToIni(ini: TMemIniFile);
+procedure TMedienBibliothek.SaveSettings;
 var i: Integer;
 begin
         //Ini.WriteBool('Beta', 'DontUseThreadedUpdate', BetaDontUseThreadedUpdate);
 
-        Ini.WriteInteger('MedienBib', 'Vorauswahl1', integer(NempSortArray[1]));
-        Ini.WriteInteger('MedienBib', 'Vorauswahl2', integer(NempSortArray[2]));
-        ini.WriteBool('MedienBib', 'AlwaysSortAnzeigeList', AlwaysSortAnzeigeList);
-        ini.WriteBool('MedienBib', 'limitMarkerToCurrentFiles', limitMarkerToCurrentFiles);
+        NempSettingsManager.WriteInteger('MedienBib', 'Vorauswahl1', integer(NempSortArray[1]));
+        NempSettingsManager.WriteInteger('MedienBib', 'Vorauswahl2', integer(NempSortArray[2]));
+        NempSettingsManager.WriteBool('MedienBib', 'AlwaysSortAnzeigeList', AlwaysSortAnzeigeList);
+        NempSettingsManager.WriteBool('MedienBib', 'limitMarkerToCurrentFiles', limitMarkerToCurrentFiles);
 
-        ini.WriteBool('MedienBib', 'SkipSortOnLargeLists', SkipSortOnLargeLists);
+        NempSettingsManager.WriteBool('MedienBib', 'SkipSortOnLargeLists', SkipSortOnLargeLists);
 
-        ini.WriteBool('MedienBib', 'AutoScanPlaylistFilesOnView', AutoScanPlaylistFilesOnView);
-        ini.WriteBool('Medienbib', 'ShowHintsInMedialist', ShowHintsInMedialist);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoScanPlaylistFilesOnView', AutoScanPlaylistFilesOnView);
+        NempSettingsManager.WriteBool('Medienbib', 'ShowHintsInMedialist', ShowHintsInMedialist);
 
         for i := SORT_MAX downto 0 do
         begin
-            Ini.WriteInteger('MedienBib', 'Sortorder' + IntToStr(i), SortParams[i].Tag);
-            Ini.WriteInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(SortParams[i].Direction));
+            NempSettingsManager.WriteInteger('MedienBib', 'Sortorder' + IntToStr(i), SortParams[i].Tag);
+            NempSettingsManager.WriteInteger('MedienBib', 'SortMode' + IntToStr(i), Integer(SortParams[i].Direction));
         end;
 
-        ini.Writebool('MedienBib','CoverSearchInDir', TCoverArtSearcher.UseDir);
-        ini.Writebool('MedienBib','CoverSearchInParentDir', TCoverArtSearcher.UseParentDir);
-        ini.Writebool('MedienBib','CoverSearchInSubDir', TCoverArtSearcher.UseSubDir);
-        ini.Writebool('MedienBib', 'CoverSearchInSisterDir', TCoverArtSearcher.UseSisterDir);
-        ini.WriteString('MedienBib', 'CoverSearchSubDirName', TCoverArtSearcher.SubDirName);
-        ini.WriteString('MedienBib', 'CoverSearchSisterDirName', TCoverArtSearcher.SisterDirName);
-        ini.WriteInteger('MedienBib', 'CoverSize', TCoverArtSearcher.CoverSizeIndex);
+        NempSettingsManager.Writebool('MedienBib','CoverSearchInDir', TCoverArtSearcher.UseDir);
+        NempSettingsManager.Writebool('MedienBib','CoverSearchInParentDir', TCoverArtSearcher.UseParentDir);
+        NempSettingsManager.Writebool('MedienBib','CoverSearchInSubDir', TCoverArtSearcher.UseSubDir);
+        NempSettingsManager.Writebool('MedienBib', 'CoverSearchInSisterDir', TCoverArtSearcher.UseSisterDir);
+        NempSettingsManager.WriteString('MedienBib', 'CoverSearchSubDirName', TCoverArtSearcher.SubDirName);
+        NempSettingsManager.WriteString('MedienBib', 'CoverSearchSisterDirName', TCoverArtSearcher.SisterDirName);
+        NempSettingsManager.WriteInteger('MedienBib', 'CoverSize', TCoverArtSearcher.CoverSizeIndex);
 
-        ini.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
-        ini.WriteBool('MedienBib', 'HideNACover', HideNACover);
-        ini.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
+        NempSettingsManager.WriteBool('MedienBib', 'CoverSearchLastFM', CoverSearchLastFM);
+        NempSettingsManager.WriteBool('MedienBib', 'HideNACover', HideNACover);
+        NempSettingsManager.WriteInteger('MedienBib', 'MissingCoverMode', MissingCoverMode);
 
-        ini.WriteBool('MedienBib', 'IgnoreLyrics', IgnoreLyrics);
+        NempSettingsManager.WriteBool('MedienBib', 'IgnoreLyrics', IgnoreLyrics);
 
-        ini.WriteBool('MedienBib', 'other', IncludeAll);
-        ini.WriteString('MedienBib', 'includefilter', IncludeFilter);
-        ini.WriteBool('MedienBib', 'autoload', AutoLoadMediaList);
-        ini.WriteBool('MedienBib', 'autosave', AutoSaveMediaList);
+        NempSettingsManager.WriteBool('MedienBib', 'other', IncludeAll);
+        NempSettingsManager.WriteString('MedienBib', 'includefilter', IncludeFilter);
+        NempSettingsManager.WriteBool('MedienBib', 'autoload', AutoLoadMediaList);
+        NempSettingsManager.WriteBool('MedienBib', 'autosave', AutoSaveMediaList);
 
-        ini.WriteInteger('MedienBib', 'CharSetGreek', NempCharCodeOptions.Greek.Index);
-        ini.WriteInteger('MedienBib', 'CharSetCyrillic', NempCharCodeOptions.Cyrillic.Index);
-        ini.WriteInteger('MedienBib', 'CharSetHebrew', NempCharCodeOptions.Hebrew.Index);
-        ini.WriteInteger('MedienBib', 'CharSetArabic', NempCharCodeOptions.Arabic.Index);
-        ini.WriteInteger('MedienBib', 'CharSetThai', NempCharCodeOptions.Thai.Index);
-        ini.WriteInteger('MedienBib', 'CharSetKorean', NempCharCodeOptions.Korean.Index);
-        ini.WriteInteger('MedienBib', 'CharSetChinese', NempCharCodeOptions.Chinese.Index);
-        ini.WriteInteger('MedienBib', 'CharSetJapanese', NempCharCodeOptions.Japanese.Index);
-        ini.WriteBool('MedienBib', 'AutoDetectCharCode', NempCharCodeOptions.AutoDetectCodePage);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetGreek', NempCharCodeOptions.Greek.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetCyrillic', NempCharCodeOptions.Cyrillic.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetHebrew', NempCharCodeOptions.Hebrew.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetArabic', NempCharCodeOptions.Arabic.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetThai', NempCharCodeOptions.Thai.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetKorean', NempCharCodeOptions.Korean.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetChinese', NempCharCodeOptions.Chinese.Index);
+        NempSettingsManager.WriteInteger('MedienBib', 'CharSetJapanese', NempCharCodeOptions.Japanese.Index);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoDetectCharCode', NempCharCodeOptions.AutoDetectCodePage);
 
-        Ini.WriteString('MedienBib', 'InitialDialogFolder', InitialDialogFolder);
-        Ini.WriteBool('MedienBib', 'AutoScanDirs', AutoScanDirs);
-        Ini.WriteBool('MedienBib', 'AutoDeleteFiles', AutoDeleteFiles);
-        Ini.WriteBool('MedienBib', 'AutoDeleteFilesShowInfo', AutoDeleteFilesShowInfo);
-        Ini.WriteInteger('MedienBib', 'dircount', AutoScanDirList.Count);
-        Ini.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);
-        Ini.WriteBool('MedienBib', 'AutoAddNewDirs', AutoAddNewDirs);
-        Ini.WriteBool('MedienBib', 'AutoActivateWebServer', AutoActivateWebServer);
+        NempSettingsManager.WriteString('MedienBib', 'InitialDialogFolder', InitialDialogFolder);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoScanDirs', AutoScanDirs);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoDeleteFiles', AutoDeleteFiles);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoDeleteFilesShowInfo', AutoDeleteFilesShowInfo);
+        NempSettingsManager.WriteInteger('MedienBib', 'dircount', AutoScanDirList.Count);
+        NempSettingsManager.WriteBool('MedienBib', 'AskForAutoAddNewDirs', AskForAutoAddNewDirs);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoAddNewDirs', AutoAddNewDirs);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoActivateWebServer', AutoActivateWebServer);
 
-        Ini.WriteBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', ShowAutoResolveInconsistenciesHints);
-        Ini.WriteBool('MedienBib', 'AskForAutoResolveInconsistencies', AskForAutoResolveInconsistencies);
-        Ini.WriteBool('MedienBib', 'AutoResolveInconsistencies'      , AutoResolveInconsistencies);
-        Ini.WriteBool('MedienBib', 'AskForAutoResolveInconsistenciesRules' , AskForAutoResolveInconsistenciesRules);
-        Ini.WriteBool('MedienBib', 'AutoResolveInconsistenciesRules'       , AutoResolveInconsistenciesRules);
+        NempSettingsManager.WriteBool('MedienBib', 'ShowAutoResolveInconsistenciesHints', ShowAutoResolveInconsistenciesHints);
+        NempSettingsManager.WriteBool('MedienBib', 'AskForAutoResolveInconsistencies', AskForAutoResolveInconsistencies);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoResolveInconsistencies'      , AutoResolveInconsistencies);
+        NempSettingsManager.WriteBool('MedienBib', 'AskForAutoResolveInconsistenciesRules' , AskForAutoResolveInconsistenciesRules);
+        NempSettingsManager.WriteBool('MedienBib', 'AutoResolveInconsistenciesRules'       , AutoResolveInconsistenciesRules);
 
-        ini.WriteInteger('MedienBib', 'BrowseMode', fBrowseMode);
-        ini.WriteInteger('MedienBib', 'CoverSortOrder', fCoverSortOrder);
+        NempSettingsManager.WriteInteger('MedienBib', 'BrowseMode', fBrowseMode);
+        NempSettingsManager.WriteInteger('MedienBib', 'CoverSortOrder', fCoverSortOrder);
 
         for i := 0 to AutoScanDirList.Count -1  do
-            Ini.WriteString('MedienBib', 'ScanDir' + IntToStr(i+1), AutoScanDirList[i]);
+            NempSettingsManager.WriteString('MedienBib', 'ScanDir' + IntToStr(i+1), AutoScanDirList[i]);
 
-        Ini.WriteString('MedienBib','SelectedArtist', CurrentArtist);
-        Ini.WriteString('MedienBib','SelectedAlbum', CurrentAlbum);
-        Ini.WriteString('MedienBib','SelectedCoverID', NewCoverFlow.CurrentCoverID);
-        Ini.WriteInteger('MedienBib', 'SelectedCoverIDX', NewCoverFlow.CurrentItem);
+        NempSettingsManager.WriteString('MedienBib','SelectedArtist', CurrentArtist);
+        NempSettingsManager.WriteString('MedienBib','SelectedAlbum', CurrentAlbum);
+        NempSettingsManager.WriteString('MedienBib','SelectedCoverID', NewCoverFlow.CurrentCoverID);
+        NempSettingsManager.WriteInteger('MedienBib', 'SelectedCoverIDX', NewCoverFlow.CurrentItem);
 
-        Ini.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
+        NempSettingsManager.WriteInteger('MedienBib', 'CoverFlowMode', Integer(NewCoverFlow.Mode));
 
         // LYR_NONE, LYR_LYRICWIKI, LYR_CHARTLYRICS
-        Ini.WriteInteger('MedienBib', 'PriorityLyricWiki'  , LyricPriorities[LYR_LYRICWIKI]   );
-        Ini.WriteInteger('MedienBib', 'PriorityChartLyrics', LyricPriorities[LYR_CHARTLYRICS] );
+        NempSettingsManager.WriteInteger('MedienBib', 'PriorityLyricWiki'  , LyricPriorities[LYR_LYRICWIKI]   );
+        NempSettingsManager.WriteInteger('MedienBib', 'PriorityChartLyrics', LyricPriorities[LYR_CHARTLYRICS] );
 
-        BibSearcher.SaveToIni(Ini);
-        TagCloud.SaveToIni(Ini);
+        BibSearcher.SaveToIni(NempSettingsManager);
+        TagCloud.SaveToIni(NempSettingsManager);
 
-        Ini.WriteBool('MedienBib', 'UseNewFileScanMethod', UseNewFileScanMethod);
+        NempSettingsManager.WriteBool('MedienBib', 'UseNewFileScanMethod', UseNewFileScanMethod);
+
+        NewCoverFlow.SaveSettings;
 end;
 
 
