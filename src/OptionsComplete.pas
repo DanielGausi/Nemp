@@ -571,6 +571,7 @@ type
     cb_UseClassicCoverflow: TCheckBox;
     lblCoverflowTextures: TLabel;
     seCoverflowTextureCache: TSpinEdit;
+    CB_AccelerateSearchIncludeGenre: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure OptionsVSTFocusChanged(Sender: TBaseVirtualTree;
       Node: PVirtualNode; Column: TColumnIndex);
@@ -1523,9 +1524,11 @@ begin
   CB_AccelerateSearch                 .Checked := MedienBib.BibSearcher.AccelerateSearch;
           CB_AccelerateSearchIncludePath.Enabled    := CB_AccelerateSearch.Checked;
           CB_AccelerateSearchIncludeComment.Enabled := CB_AccelerateSearch.Checked;
+          CB_AccelerateSearchIncludeGenre.Enabled := CB_AccelerateSearch.Checked;
           LblConst_AccelerateSearchNote2.Enabled    := CB_AccelerateSearch.Checked;
   CB_AccelerateSearchIncludePath      .Checked := MedienBib.BibSearcher.AccelerateSearchIncludePath;
   CB_AccelerateSearchIncludeComment   .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeComment;
+  CB_AccelerateSearchIncludeGenre     .Checked := MedienBib.BibSearcher.AccelerateSearchIncludeGenre;
   CB_AccelerateLyricSearch            .Checked := MedienBib.BibSearcher.AccelerateLyricSearch;
   CB_QuickSearchWhileYouType          .Checked := MedienBib.BibSearcher.QuickSearchOptions.WhileYouType;
   cb_ChangeCoverflowOnSearch          .Checked := MedienBib.BibSearcher.QuickSearchOptions.ChangeCoverFlow;
@@ -1715,7 +1718,7 @@ begin
 
   // Webserver-Daten auslesen und Controls setzen
 
-  NempWebServer.LoadfromIni;
+  NempWebServer.LoadSettings;
   tmpThemes := tStringList.Create;
   try
       NempWebServer.GetThemes(tmpThemes);
@@ -2709,7 +2712,8 @@ begin
                   or ((cb_IgnoreLyrics.Checked) AND (NOT MedienBib.IgnoreLyrics)) ;
       NeedTotalStringUpdate := (MedienBib.BibSearcher.AccelerateSearch <> CB_AccelerateSearch.Checked)
                              or (MedienBib.BibSearcher.AccelerateSearchIncludePath <> CB_AccelerateSearchIncludePath.Checked)
-                             or (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked);
+                             or (MedienBib.BibSearcher.AccelerateSearchIncludeComment <> CB_AccelerateSearchIncludeComment.Checked)
+                             or (MedienBib.BibSearcher.AccelerateSearchIncludeGenre <> CB_AccelerateSearchIncludeGenre.Checked);
 
       if (MedienBib.StatusBibUpdate <> 0)
           AND (NeedUpdate or NeedCoverFlowSearchUpdate or NeedTotalLyricStringUpdate or NeedTotalStringUpdate) then
@@ -2750,6 +2754,7 @@ begin
           MedienBib.BibSearcher.AccelerateSearch               := CB_AccelerateSearch                 .Checked;
           MedienBib.BibSearcher.AccelerateSearchIncludePath    := CB_AccelerateSearchIncludePath      .Checked;
           MedienBib.BibSearcher.AccelerateSearchIncludeComment := CB_AccelerateSearchIncludeComment   .Checked;
+          MedienBib.BibSearcher.AccelerateSearchIncludeGenre   := CB_AccelerateSearchIncludeGenre     .Checked;
           MedienBib.BibSearcher.AccelerateLyricSearch          := CB_AccelerateLyricSearch            .Checked;
 
       end;
@@ -3135,7 +3140,7 @@ begin
   MedienBib.AutoActivateWebServer     := CBAutoStartWebServer.Checked;
   NempWebServer.AllowVotes            := cbPermitVote.Checked;
 
-  NempWebServer.SaveToIni;
+  NempWebServer.SaveSettings;
 
   oldfactor := Nemp_MainForm.NempSkin.NempPartyMode.ResizeFactor;
 
@@ -3535,6 +3540,7 @@ procedure TOptionsCompleteForm.CB_AccelerateSearchClick(Sender: TObject);
 begin
     CB_AccelerateSearchIncludePath.Enabled    := CB_AccelerateSearch.Checked;
     CB_AccelerateSearchIncludeComment.Enabled := CB_AccelerateSearch.Checked;
+    CB_AccelerateSearchIncludeGenre.Enabled   := CB_AccelerateSearch.Checked;
     LblConst_AccelerateSearchNote2.Enabled    := CB_AccelerateSearch.Checked;
 end;
 
@@ -3872,7 +3878,8 @@ begin
             // Ok, Activation complete
             ReArrangeToolImages;
             // Save current settings
-            NempWebServer.SaveToIni;
+            NempWebServer.SaveSettings;
+            NempSettingsManager.WriteToDisk;
             // Anzeige setzen
             BtnServerActivate.Caption := WebServer_DeActivateServer;
             EdtUsername.Enabled := False;

@@ -76,6 +76,8 @@ type
     cb_ExtendedSearchPeriod: TComboBox;
     Panel3: TPanel;
     CB_SearchHistory: TComboBox;
+    LblConst_SearchGenre: TLabel;
+    GenreEdit: TEdit;
     procedure Btn_ExtendedSearchClick(Sender: TObject);
     procedure cbIgnoreGenresClick(Sender: TObject);
     procedure cbIgnoreYearClick(Sender: TObject);
@@ -161,6 +163,7 @@ begin
     TitelEDIT                  .Enabled := AllowSearch;
     AlbumEDIT                  .Enabled := AllowSearch;
     KommentarEDIT              .Enabled := AllowSearch;
+    GenreEdit                  .Enabled := AllowSearch;
     PathEDIT                   .Enabled := AllowSearch;
     GeneralEdit                .Enabled := AllowSearch;
     LyricEdit                  .Enabled := AllowSearch;
@@ -221,6 +224,7 @@ begin
     TitelEDIT.Text      := '';
     PathEDIT.Text       := '';
     KommentarEDIT.Text  := '';
+    GenreEdit.Text      := '';
     LyricEdit.Text      := '';
 end;
 
@@ -253,6 +257,7 @@ begin
     KeyWords.Titel     := Trim(TitelEDIT.Text);
     KeyWords.Pfad      := Trim(PathEDIT.Text);
     KeyWords.Kommentar := Trim(KommentarEDIT.Text);
+    KeyWords.Genre     := Trim(GenreEDIT.Text);
     KeyWords.Lyric     := Trim(LyricEdit.Text);
 
     newComboBoxString := '';
@@ -262,6 +267,7 @@ begin
     StringAdd(newComboBoxString, KeyWords.Titel    );
     StringAdd(newComboBoxString, KeyWords.Pfad     );
     StringAdd(newComboBoxString, KeyWords.Kommentar);
+    StringAdd(newComboBoxString, KeyWords.Genre    );
     StringAdd(newComboBoxString, KeyWords.Lyric    );
 
     ///case Medienbib.BibSearcher.SearchOptions.SearchParam of
@@ -274,10 +280,7 @@ begin
         newComboBoxString := (MainForm_NoSearchKeywords);
     KeyWords.ComboBoxString := newComboBoxString;
 
-    ///if Medienbib.BibSearcher.SearchOptions.SearchParam = 0 then
-        Medienbib.BibSearcher.InitNewSearch(KeyWords);
-    ///else
-    ///    Medienbib.BibSearcher.InitBetterSearch(KeyWords);
+    Medienbib.BibSearcher.InitNewSearch(KeyWords);
 
     FillSuchComboBox;
 

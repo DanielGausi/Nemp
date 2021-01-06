@@ -115,6 +115,36 @@ const
 
 
 type
+  TWebServerSettings = record
+    AllowFileDownload,  //   := True;
+    AllowLibraryAccess, //= True;
+    AllowVotes,         // := True;
+    AllowRemoteControl: Boolean;//  := True;
+    Port: Word;               //Word; //                := 80;
+    Theme,               //:= 'Default';
+    UsernameU,          // := '' ;
+    PasswordU,          // := '';
+    UsernameA,          // := 'master';
+    PasswordA: String;//           := 'key';
+  end;
+
+const
+  cDefaultServerSettings: TWebServerSettings =
+  (
+    AllowFileDownload : True;
+    AllowLibraryAccess: True;
+    AllowVotes        : True;
+    AllowRemoteControl: True;
+    Port: 80;
+    Theme     : 'Default';
+    UsernameU : '' ;
+    PasswordU : '';
+    UsernameA : 'master';
+    PasswordA : 'key';
+  );
+
+
+type
   TQueryResult = (qrPermit, qrDeny, qrRemoteControlDenied,
                   qrDownloadDenied, qrLibraryAccessDenied,
                   qrFileNotFound, qrInvalidParameter, qrError);
@@ -321,6 +351,8 @@ type
           procedure PrepareAlbums;
           procedure PrepareGenres;
 
+          function LoadSettingsDeprecated: Boolean;
+          procedure LoadDefaultSettings;
 
       public
           SavePath: UnicodeString;
@@ -359,8 +391,8 @@ type
 
           constructor Create(aHandle: DWord);
           destructor Destroy; override;
-          procedure LoadfromIni;
-          procedure SaveToIni;
+          procedure LoadSettings;
+          procedure SaveSettings;
 
           procedure GetThemes(out Themes: TStrings);
 
@@ -732,59 +764,86 @@ begin
     LogList.Free;
     inherited;
 end;
-                                                              
-procedure TNempWebServer.LoadfromIni;                         
-var ini:TMemIniFile;
-begin
-    ini := TMeminiFile.Create(SavePath + 'NempWebServer.ini', TEncoding.UTF8);
-    try
-        ini.Encoding := TEncoding.UTF8;
-        // aus der Ini lesen
-        // OnlyLAN             := True; //Ini.ReadBool('Remote', 'OnlyLAN'               , True);
-        AllowFileDownload   := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , True);
-        AllowLibraryAccess  := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , True);
-        AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , True);
-        AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl'    , True);
-        Port                := Ini.ReadInteger('Remote', 'Port', 80);
-        Theme               := Ini.ReadString('Remote', 'Theme' , 'Default');
-        UsernameU           := Ini.ReadString('Remote', 'UsernameU', ''  );
-        PasswordU           := Ini.ReadString('Remote', 'PasswordU', ''   );
-        UsernameA           := Ini.ReadString('Remote', 'UsernameA', 'master'  );
-        PasswordA           := Ini.ReadString('Remote', 'PasswordA', 'key'   );
-    finally
-        ini.Free;
-    end;
-end;
 
-
-procedure TNempWebServer.SaveToIni;
-var ini:TMemIniFile;
+function TNempWebServer.LoadSettingsDeprecated: Boolean;
+var ini: TMemIniFile;
 begin
+  result := FileExists(NempSettingsManager.SavePath + 'NempWebServer.ini');
+  if not result then
+    exit;
+
   ini := TMeminiFile.Create(SavePath + 'NempWebServer.ini', TEncoding.UTF8);
   try
-      Ini.Encoding := TEncoding.UTF8;
-      // Ini.WriteBool('Remote', 'OnlyLAN'               , OnlyLAN);
-      Ini.WriteBool('Remote', 'AllowPlaylistDownload' , AllowFileDownload);
-      Ini.WriteBool('Remote', 'AllowLibraryAccess'    , AllowLibraryAccess);
-      Ini.WriteBool('Remote', 'AllowRemoteControl'    , AllowRemoteControl);
-      Ini.WriteBool('Remote', 'AllowVotes'            , AllowVotes);
-      Ini.WriteInteger('Remote', 'Port', Port);
-      Ini.WriteString('Remote', 'Theme' , Theme);
-      Ini.WriteString('Remote', 'UsernameU', UsernameU);
-      Ini.WriteString('Remote', 'PasswordU', PasswordU);
-      Ini.WriteString('Remote', 'UsernameA', UsernameA);
-      Ini.WriteString('Remote', 'PasswordA', PasswordA);
-      try
-          Ini.UpdateFile;
-      except
-            // Silent Exception
-      end;
+    ini.Encoding := TEncoding.UTF8;
+    // aus der Ini lesen
+    // OnlyLAN             := True; //Ini.ReadBool('Remote', 'OnlyLAN'               , True);
+    AllowFileDownload   := Ini.ReadBool('Remote', 'AllowPlaylistDownload' , cDefaultServerSettings.AllowFileDownload);
+    AllowLibraryAccess  := Ini.ReadBool('Remote', 'AllowLibraryAccess'    , cDefaultServerSettings.AllowLibraryAccess);
+    AllowVotes          := Ini.ReadBool('Remote', 'AllowVotes'            , cDefaultServerSettings.AllowVotes);
+    AllowRemoteControl  := Ini.ReadBool('Remote', 'AllowRemoteControl'    , cDefaultServerSettings.AllowRemoteControl);
+    Port                := Ini.ReadInteger('Remote', 'Port', cDefaultServerSettings.Port);
+    Theme               := Ini.ReadString('Remote', 'Theme' , cDefaultServerSettings.Theme);
+    UsernameU           := Ini.ReadString('Remote', 'UsernameU', cDefaultServerSettings.UsernameU  );
+    PasswordU           := Ini.ReadString('Remote', 'PasswordU', cDefaultServerSettings.PasswordU  );
+    UsernameA           := Ini.ReadString('Remote', 'UsernameA', cDefaultServerSettings.UsernameA  );
+    PasswordA           := Ini.ReadString('Remote', 'PasswordA', cDefaultServerSettings.PasswordA  );
   finally
-      ini.Free;
+    ini.Free;
   end;
 end;
 
+procedure TNempWebServer.LoadDefaultSettings;
+begin
+  AllowFileDownload   := cDefaultServerSettings.AllowFileDownload ;
+  AllowLibraryAccess  := cDefaultServerSettings.AllowLibraryAccess;
+  AllowVotes          := cDefaultServerSettings.AllowVotes        ;
+  AllowRemoteControl  := cDefaultServerSettings.AllowRemoteControl;
+  Port                := cDefaultServerSettings.Port              ;
+  Theme               := cDefaultServerSettings.Theme             ;
+  UsernameU           := cDefaultServerSettings.UsernameU         ;
+  PasswordU           := cDefaultServerSettings.PasswordU         ;
+  UsernameA           := cDefaultServerSettings.UsernameA         ;
+  PasswordA           := cDefaultServerSettings.PasswordA         ;
+end;
 
+procedure TNempWebServer.LoadSettings;
+begin
+  if NempSettingsManager.SectionExists('Webserver') then
+  begin
+    AllowFileDownload   := NempSettingsManager.ReadBool('Webserver', 'AllowPlaylistDownload' , cDefaultServerSettings.AllowFileDownload );
+    AllowLibraryAccess  := NempSettingsManager.ReadBool('Webserver', 'AllowLibraryAccess'    , cDefaultServerSettings.AllowLibraryAccess);
+    AllowVotes          := NempSettingsManager.ReadBool('Webserver', 'AllowVotes'            , cDefaultServerSettings.AllowVotes        );
+    AllowRemoteControl  := NempSettingsManager.ReadBool('Webserver', 'AllowRemoteControl'    , cDefaultServerSettings.AllowRemoteControl);
+    Port                := NempSettingsManager.ReadInteger('Webserver', 'Port', cDefaultServerSettings.Port);
+    Theme               := NempSettingsManager.ReadString('Webserver', 'Theme'    , cDefaultServerSettings.Theme    );
+    UsernameU           := NempSettingsManager.ReadString('Webserver', 'UsernameU', cDefaultServerSettings.UsernameU);
+    PasswordU           := NempSettingsManager.ReadString('Webserver', 'PasswordU', cDefaultServerSettings.PasswordU);
+    UsernameA           := NempSettingsManager.ReadString('Webserver', 'UsernameA', cDefaultServerSettings.UsernameA);
+    PasswordA           := NempSettingsManager.ReadString('Webserver', 'PasswordA', cDefaultServerSettings.PasswordA);
+  end else
+  begin
+    if not LoadSettingsDeprecated then
+      LoadDefaultSettings;
+  end;
+end;
+
+procedure TNempWebServer.SaveSettings;
+begin
+  NempSettingsManager.WriteBool('Webserver', 'AllowPlaylistDownload' , AllowFileDownload );
+  NempSettingsManager.WriteBool('Webserver', 'AllowLibraryAccess'    , AllowLibraryAccess);
+  NempSettingsManager.WriteBool('Webserver', 'AllowVotes'            , AllowVotes        );
+  NempSettingsManager.WriteBool('Webserver', 'AllowRemoteControl'    , AllowRemoteControl);
+  NempSettingsManager.WriteInteger('Webserver', 'Port'               , Port              );
+  NempSettingsManager.WriteString('Webserver', 'Theme'               , Theme             );
+  NempSettingsManager.WriteString('Webserver', 'UsernameU'           , UsernameU         );
+  NempSettingsManager.WriteString('Webserver', 'PasswordU'           , PasswordU         );
+  NempSettingsManager.WriteString('Webserver', 'UsernameA'           , UsernameA         );
+  NempSettingsManager.WriteString('Webserver', 'PasswordA'           , PasswordA         );
+
+  // delete deprecated Hotkeys.ini (not used any longer)
+  if FileExists(NempSettingsManager.SavePath + 'NempWebServer.ini') then
+    DeleteFile(NempSettingsManager.SavePath + 'NempWebServer.ini');
+end;
 
 
 function TNempWebServer.fGetUsernameU: String;

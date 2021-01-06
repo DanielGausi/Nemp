@@ -786,6 +786,7 @@ begin
                 CoverScrollbar.Max := MedienBib.Coverlist.Count - 1
             else
                 CoverScrollbar.Max := 3;
+
             CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
 
             if (CoverScrollbar.Position > 0) and (CoverScrollbar.Position < MedienBib.CoverList.Count) then

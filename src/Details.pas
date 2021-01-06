@@ -2599,12 +2599,20 @@ begin
 
       BtnCopyFromV1.Visible := CurrentTagObject.FileType in [at_Mp3, at_Monkey, at_WavPack, at_MusePack, at_OptimFrog, at_TrueAudio];
       case CurrentTagObject.FileType of
-        at_Mp3: BtnCopyFromV1.Enabled := TMp3File(CurrentTagObject).ID3v1Tag.TagExists;
+        at_Mp3: begin
+            BtnCopyFromV1.Enabled := TMp3File(CurrentTagObject).ID3v1Tag.TagExists;
+            BtnCopyFromV2.Caption := DetailForm_CopyFromID3v2;
+        end;
+
         at_Monkey,
         at_WavPack,
         at_MusePack,
         at_OptimFrog,
-        at_TrueAudio: BtnCopyFromV1.Enabled := TBaseApeFile(CurrentTagObject).ID3v1Tag.TagExists;
+        at_TrueAudio: begin
+          BtnCopyFromV1.Enabled := TBaseApeFile(CurrentTagObject).ID3v1Tag.TagExists;
+          BtnCopyFromV2.Caption := DetailForm_CopyFromAPE;
+        end;
+
       end;
 end;
 

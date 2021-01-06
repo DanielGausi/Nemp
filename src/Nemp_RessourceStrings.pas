@@ -116,6 +116,8 @@ DetailForm_NoNewFramesPossible = 'All supported meta frames are already set. The
 DetailForm_CurrentLibraryCover = 'Current cover art';
 DetailForm_CoverflowNotActive = 'The Coverflow will update automatically when you activate it';
 DetailForm_NoPictureInOggMetaDataSuppotred = 'Not supported';
+DetailForm_CopyFromID3v2 = 'Copy from ID3 v2';
+DetailForm_CopyFromAPE = 'Copy from APE';
 
 
 Warning_FileNotFound = 'File not found';

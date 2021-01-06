@@ -185,12 +185,13 @@ begin
                 fFlyingCow := tFlyingCow.Create(window, events_Window);
             end;
                 fFlyingCow.BeginUpdate;
-                for i := 0 to fCoverList.Count - 1 do
+                fFlyingCow.AddItems(fCoverList.Count);
+                {for i := 0 to fCoverList.Count - 1 do
                 begin
                     fFlyingCow.Add(TFlyingCowItem.Create(TNempCover(fCoverList[i]).ID,
                                       TNempCover(fCoverList[i]).Artist,
                                       TNempCover(fCoverList[i]).Album));
-                end;
+                end; }
                 fFlyingCow.EndUpdate;
 
 
@@ -415,6 +416,7 @@ begin
         end;
         cm_OpenGL  : begin
                   fFlyingCow.SelectItemAt(x, y);
+                  // ?? 2020 Hier steckt u.U. eine unnötige Doppelung drin
                   CurrentItem := fFlyingCow.CurrentItem;
         end;
     end;
@@ -462,15 +464,17 @@ begin
         cm_OpenGL  : begin
               fFlyingCow.BeginUpdate;
               fFlyingCow.Clear;
-              fFlyingCow.Cleartextures;
-              for i := 0 to aList.Count - 1 do
+              //fFlyingCow.Cleartextures;
+              fFlyingCow.AddItems(aList.Count);
+
+              {for i := 0 to aList.Count - 1 do
               begin
                   fFlyingCow.Add(TFlyingCowItem.Create(//'' , '' , ''
                                       TNempCover(aList[i]).ID,
                                       TNempCover(aList[i]).Artist,
                                       TNempCover(aList[i]).Album
                                       ));
-              end;
+              end;}
               fFlyingCow.EndUpdate;
 
               fFlyingCow.DoSomeDrawing(10);

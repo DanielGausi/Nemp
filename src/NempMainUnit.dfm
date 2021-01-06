@@ -176,7 +176,7 @@ object Nemp_MainForm: TNemp_MainForm
               ExplicitWidth = 297
             end
             object CoverScrollbar: TScrollBar
-              Left = 6
+              Left = 8
               Top = 156
               Width = 159
               Height = 17

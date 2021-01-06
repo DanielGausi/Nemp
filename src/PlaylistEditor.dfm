@@ -72,7 +72,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Columns = <
         item
           Position = 0
-          Width = 210
+          Width = 214
           WideText = 'Favorite playlists'
         end>
     end
@@ -148,7 +148,7 @@ object PlaylistEditorForm: TPlaylistEditorForm
       Columns = <
         item
           Position = 0
-          Width = 257
+          Width = 261
           WideText = 'Title'
         end
         item

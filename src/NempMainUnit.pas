@@ -2243,6 +2243,7 @@ procedure TNemp_MainForm.NewSelected (Var Msg: TMessage);
 var aCover: tNempCover;
 begin
     CoverScrollBar.OnChange := Nil;
+
     if CoverScrollbar.Position <> Integer(Msg.WParam) then
     begin
         CoverScrollbar.Position := Msg.WParam;
@@ -6004,6 +6005,8 @@ begin
 
     MedienBib.NewCoverFlow.SetNewList(MedienBib.Coverlist, True);
     CoverScrollbar.OnChange := CoverScrollbarChange;
+
+    CoverScrollbar.Position := MedienBib.NewCoverFlow.CurrentItem;
     MedienBib.NewCoverFlow.Paint(10);
 end;
 
@@ -9644,6 +9647,7 @@ begin
   begin
       if Trim(EDITFastSearch.Text)= '' then
       begin
+          RefreshCoverFlowTimer.Enabled := False;
           MedienBib.RestoreAnzeigeListeAfterQuicksearch;
           RestoreCoverFlowAfterSearch;
       end
@@ -9662,10 +9666,13 @@ begin
               end;
           end
           else
+          begin
+              RefreshCoverFlowTimer.Enabled := False;
               if Trim(EDITFastSearch.Text) = '*' then
                   MedienBib.QuickSearchShowAllFiles
               else
                   FillTreeViewQueryTooShort;
+          end;
   end;
 end;
 
@@ -11114,9 +11121,9 @@ begin
       Application.CreateForm(TFDetails, FDetails);
 
     FDetails.ShowDetails(aAudioFile, Source);
-    fDetails.BringToFront;
-    if ForeGround then
-      SetForeGroundWindow(FDetails.Handle);
+    //fDetails.BringToFront;
+    //if ForeGround then
+    //  SetForeGroundWindow(FDetails.Handle);
   end;
 end;
 
@@ -11441,7 +11448,8 @@ end;
 procedure TNemp_MainForm.PanelCoverBrowseMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-    if CoverFlowRefreshViewTimer.Enabled then exit;
+    //if CoverFlowRefreshViewTimer.Enabled then exit;
+    CoverFlowRefreshViewTimer.Enabled := False;
     MedienBib.NewCoverFlow.CurrentItem := MedienBib.NewCoverFlow.CurrentItem + 1;
     CoverFlowRefreshViewTimer.Enabled := True;
 end;
@@ -11449,7 +11457,8 @@ end;
 procedure TNemp_MainForm.PanelCoverBrowseMouseWheelUp(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-    if CoverFlowRefreshViewTimer.Enabled then exit;
+    //if CoverFlowRefreshViewTimer.Enabled then exit;
+    CoverFlowRefreshViewTimer.Enabled := False;
     MedienBib.NewCoverFlow.CurrentItem := MedienBib.NewCoverFlow.CurrentItem - 1;
     CoverFlowRefreshViewTimer.Enabled := True;
 end;
@@ -12059,7 +12068,7 @@ begin
     begin
         // Server aktivieren
         // 1. Einstellungen laden
-        NempWebServer.LoadfromIni;
+        NempWebServer.LoadSettings;
         // 2.) Medialib kopieren
         NempWebServer.CopyLibrary(MedienBib);
         NempWebServer.CopyDisplayHelper;

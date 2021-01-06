@@ -66,7 +66,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
       Top = 3
       Width = 454
       Height = 612
-      ActivePage = TabView4
+      ActivePage = TabFiles3
       Align = alClient
       TabOrder = 1
       TabStop = False
@@ -3331,13 +3331,13 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Left = 3
           Top = 3
           Width = 440
-          Height = 178
+          Height = 198
           Align = alTop
           Caption = 'Global search options'
           TabOrder = 0
           DesignSize = (
             440
-            178)
+            198)
           object LblConst_AccelerateSearchNote: TLabel
             Left = 36
             Top = 37
@@ -3353,7 +3353,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object LblConst_AccelerateSearchNote2: TLabel
             Left = 53
-            Top = 109
+            Top = 135
             Width = 380
             Height = 33
             Anchors = [akLeft, akTop, akRight]
@@ -3362,7 +3362,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
               'Note: This will affect the search results of "Quick search" and ' +
               '"General search".'
             WordWrap = True
-            ExplicitWidth = 371
           end
           object CB_AccelerateSearch: TCheckBox
             Left = 16
@@ -3387,7 +3386,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_AccelerateSearchIncludeComment: TCheckBox
             Left = 34
-            Top = 91
+            Top = 94
             Width = 400
             Height = 17
             Hint = 'Include comments to the accelerated search algorithms.'
@@ -3397,7 +3396,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
           end
           object CB_AccelerateLyricSearch: TCheckBox
             Left = 16
-            Top = 148
+            Top = 173
             Width = 416
             Height = 17
             Hint = 'Use some tricky algorithms to accelerate the search for lyrics.'
@@ -3405,16 +3404,27 @@ object OptionsCompleteForm: TOptionsCompleteForm
             Caption = 'Accelerate lyrics search'
             TabOrder = 3
           end
+          object CB_AccelerateSearchIncludeGenre: TCheckBox
+            Left = 34
+            Top = 114
+            Width = 400
+            Height = 17
+            Hint = 'Include genres to the accelerated search algorithms.'
+            Anchors = [akLeft, akTop, akRight]
+            Caption = 'Including genre'
+            TabOrder = 4
+          end
         end
         object GrpBox_TabMedia4_QuickSearchOptions: TGroupBox
           AlignWithMargins = True
           Left = 3
-          Top = 187
+          Top = 207
           Width = 440
           Height = 161
           Align = alTop
           Caption = 'Quicksearch options'
           TabOrder = 1
+          ExplicitTop = 187
           DesignSize = (
             440
             161)
@@ -5730,7 +5740,6 @@ object OptionsCompleteForm: TOptionsCompleteForm
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 6
-          ExplicitTop = 497
           DesignSize = (
             446
             30)
@@ -5790,7 +5799,7 @@ object OptionsCompleteForm: TOptionsCompleteForm
             MaxValue = 200
             MinValue = 20
             TabOrder = 1
-            Value = 0
+            Value = 20
           end
         end
       end

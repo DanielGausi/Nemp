@@ -1483,9 +1483,10 @@ const
     var
       aColor: TColor;
     begin
-          aColor := aID;
-          aCanvas.Brush.Color := aColor;
-          aCanvas.Pen.Color := aColor;
+      // note: This method only works up to ~4 million covers
+      aColor := aID + (1 shl 23);
+      aCanvas.Brush.Color := aColor;
+      aCanvas.Pen.Color := aColor;
     end;
 
     function GetCoverIndexByID(aCoverID: String): Integer;

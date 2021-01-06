@@ -733,7 +733,7 @@ begin
             begin
                 // Server aktivieren
                 // 1. Einstellungen laden
-                NempWebServer.LoadfromIni;
+                NempWebServer.LoadSettings;
                 // 2.) Medialib kopieren
                 NempWebServer.CopyLibrary(MedienBib);
                 NempWebServer.CopyDisplayHelper;
@@ -795,6 +795,7 @@ begin
                 OutOfMemory_DataReduced: begin
                       MedienBib.BibSearcher.AccelerateSearchIncludePath := False;
                       MedienBib.BibSearcher.AccelerateSearchIncludeComment := False;
+                      MedienBib.BibSearcher.AccelerateSearchIncludeGenre := False;
                       AddErrorLog(MediaLibrary_OutOfMemoryAccelerateSearchReduced);
                 end;
                 OutOfMemory_DataDisabled: begin

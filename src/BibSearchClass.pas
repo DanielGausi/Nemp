@@ -63,6 +63,7 @@ type
         Pfad: UnicodeString;
         Ordner: UnicodeString;
         Kommentar: UnicodeString;
+        Genre: UnicodeString;
         Lyric: UnicodeString;
         ComboBoxString: UnicodeString;
     end;
@@ -76,6 +77,7 @@ type
         Pfad: UTF8String;
         Ordner: UTF8String;
         Kommentar: UTF8String;
+        Genre: UTF8String;
         Lyric: UTF8String;
     end;
 
@@ -316,14 +318,15 @@ end;
 function AudioFileMatchesKeywords(aAudioFile: TAudioFile; Keywords: TStringList): Boolean;
 var i: Integer;
 begin
- result := true;
- for i := 0 to Keywords.Count - 1 do
- begin
+  result := true;
+  for i := 0 to Keywords.Count - 1 do
+  begin
      if        (AnsiContainsText(aAudioFile.Pfad      , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Artist    , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Album     , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Titel     , Keywords[i]))
             or (AnsiContainsText(aAudioFile.Comment   , Keywords[i]))
+            or (AnsiContainsText(aAudioFile.Genre     , Keywords[i]))
      then  // nothing. Audiofile is valid (til here)
      else
      begin
@@ -332,7 +335,7 @@ begin
         result := False;
         break;
      end;
- end;
+  end;
 end;
 
 function AudioFileMatchesKeywordsApprox(aAudioFile: TAudioFile; Keywords: TUTF8StringList): Boolean;
@@ -346,6 +349,7 @@ begin
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Titel)),  Keywords[i],  length(Keywords[i]) Div 4) > 0)
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Album)),  Keywords[i],  length(Keywords[i]) Div 4) > 0)
           or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Comment)),Keywords[i],  length(Keywords[i]) Div 4) > 0)
+          or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Genre  )),Keywords[i],  length(Keywords[i]) Div 4) > 0)
       then // nothing. Audiofile is valid (til here)
       else
       begin
@@ -817,6 +821,7 @@ begin
           AND IsOk(Keywords.Pfad, aAudioFile.Pfad)
           AND IsOk(Keywords.Ordner, aAudioFile.Ordner)
           AND IsOk(Keywords.Kommentar, aAudioFile.Comment)
+          AND IsOk(Keywords.Genre, aAudioFile.Genre)
           AND CheckGenre(aAudioFile.Genre)
           AND CheckYear(aAudioFile.Year)
           AND (
@@ -829,6 +834,7 @@ begin
             or (AnsiContainsText(aAudioFile.Album     , Keywords.General))
             or (AnsiContainsText(aAudioFile.Titel     , Keywords.General))
             or (AnsiContainsText(aAudioFile.Comment   , Keywords.General))
+            or (AnsiContainsText(aAudioFile.Genre     , Keywords.General))
             or (AnsiContainsText(UTF8ToString(aAudioFile.Lyrics), Keywords.General))
           );
 end;
@@ -841,6 +847,7 @@ begin
           AND IsOKNoSubStrings(Keywords.Pfad, aAudioFile.Pfad)
           AND IsOKNoSubStrings(Keywords.Ordner, aAudioFile.Ordner)
           AND IsOKNoSubStrings(Keywords.Kommentar, aAudioFile.Comment)
+          AND IsOKNoSubStrings(Keywords.Genre, aAudioFile.Genre)
           AND CheckGenre(aAudioFile.Genre)
           AND CheckYear(aAudioFile.Year);
 end;
@@ -852,6 +859,7 @@ begin
           AND IsOKApprox(Keywords.Titel,  aAudioFile.Titel )
           AND IsOKApprox(Keywords.Album,  aAudioFile.Album )
           AND IsOKApprox(Keywords.Kommentar, aAudioFile.Comment)
+          AND IsOKApprox(Keywords.Genre, aAudioFile.Genre)
           And ((Keywords.Pfad = '') or (SearchDP(UTF8Encode(AnsiLowerCase(aAudioFile.Pfad)), Keywords.Pfad, Length(Keywords.Pfad) Div 4) > 0))
           AND CheckGenre(aAudioFile.Genre)
           AND CheckYear(aAudioFile.Year)
@@ -969,6 +977,7 @@ begin
         SearchKeyWords[i+1].Pfad    := SearchKeyWords[i].Pfad;
         SearchKeyWords[i+1].Ordner    := SearchKeyWords[i].Ordner;
         SearchKeyWords[i+1].Kommentar:= SearchKeyWords[i].Kommentar;
+        SearchKeyWords[i+1].Genre    := SearchKeyWords[i].Genre;
         SearchKeyWords[i+1].Lyric    := SearchKeyWords[i].Lyric;
         SearchKeyWords[i+1].ComboBoxString := SearchKeyWords[i].ComboBoxString;
     end;
@@ -977,6 +986,7 @@ begin
     SearchKeyWords[1].Titel          := Keywords.Titel         ;
     SearchKeyWords[1].Artist         := Keywords.Artist        ;
     SearchKeyWords[1].Kommentar      := Keywords.Kommentar     ;
+    SearchKeyWords[1].Genre          := Keywords.Genre         ;
     SearchKeyWords[1].Album          := Keywords.Album         ;
     SearchKeyWords[1].Pfad           := Keywords.Pfad          ;
     SearchKeyWords[1].Ordner         := Keywords.Ordner        ;
@@ -1465,24 +1475,29 @@ begin
     UTF8SearchKeywords.Pfad     := Utf8Encode(AnsiLowerCase(Keywords.Pfad     ));
     UTF8SearchKeywords.Ordner   := Utf8Encode(AnsiLowerCase(Keywords.Ordner   ));
     UTF8SearchKeywords.Kommentar:= Utf8Encode(AnsiLowerCase(Keywords.Kommentar));
+    UTF8SearchKeywords.Genre    := Utf8Encode(AnsiLowerCase(Keywords.Genre    ));
     UTF8SearchKeywords.Lyric    := Utf8Encode(AnsiLowerCase(Keywords.Lyric  ));
 
     Searchmode := smSlow;
     UTF8LongestKeyword := '';
     if AccelerateSearch then
     begin
-        UTF8LongestKeyword := UTF8SearchKeywords.Artist;
+        UTF8LongestKeyword := UTF8SearchKeywords.General;
+        if Length(UTF8SearchKeywords.Artist) > length(UTF8LongestKeyword) then
+            UTF8LongestKeyword := UTF8SearchKeywords.Artist;
         if Length(UTF8SearchKeywords.Titel) > length(UTF8LongestKeyword) then
             UTF8LongestKeyword := UTF8SearchKeywords.Titel;
         if Length(UTF8SearchKeywords.Album) > length(UTF8LongestKeyword) then
             UTF8LongestKeyword := UTF8SearchKeywords.Album;
-
         if AccelerateSearchIncludePath
            AND (Length(UTF8SearchKeywords.Pfad) > length(UTF8LongestKeyword)) then
             UTF8LongestKeyword := UTF8SearchKeywords.Pfad;
         if AccelerateSearchIncludeComment
            AND (Length(UTF8SearchKeywords.Kommentar) > length(UTF8LongestKeyword)) then
             UTF8LongestKeyword := UTF8SearchKeywords.Kommentar;
+        if AccelerateSearchIncludeGenre
+           AND (Length(UTF8SearchKeywords.Genre) > length(UTF8LongestKeyword)) then
+            UTF8LongestKeyword := UTF8SearchKeywords.Genre;
 
         if length(UTF8LongestKeyword) > 1 then
         begin

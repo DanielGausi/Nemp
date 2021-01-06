@@ -3,7 +3,7 @@ object FormBibSearch: TFormBibSearch
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Nemp: Search in the library'
-  ClientHeight = 418
+  ClientHeight = 449
   ClientWidth = 595
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,23 +15,30 @@ object FormBibSearch: TFormBibSearch
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
+  DesignSize = (
+    595
+    449)
   PixelsPerInch = 96
   TextHeight = 13
   object Btn_ExtendedSearch: TButton
-    Left = 492
-    Top = 384
+    AlignWithMargins = True
+    Left = 495
+    Top = 418
     Width = 90
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = 'Search'
     Default = True
     TabOrder = 0
     OnClick = Btn_ExtendedSearchClick
   end
   object BtnCancel: TButton
-    Left = 396
-    Top = 384
+    AlignWithMargins = True
+    Left = 399
+    Top = 418
     Width = 90
     Height = 25
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     TabOrder = 1
@@ -42,7 +49,7 @@ object FormBibSearch: TFormBibSearch
     Left = 3
     Top = 44
     Width = 589
-    Height = 334
+    Height = 365
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
@@ -51,7 +58,7 @@ object FormBibSearch: TFormBibSearch
       Left = 0
       Top = 0
       Width = 353
-      Height = 334
+      Height = 365
       Align = alLeft
       Caption = 'Keywords'
       ParentShowHint = False
@@ -59,7 +66,7 @@ object FormBibSearch: TFormBibSearch
       TabOrder = 0
       DesignSize = (
         353
-        334)
+        365)
       object LblConst_SearchArtist: TLabel
         Left = 14
         Top = 76
@@ -103,11 +110,18 @@ object FormBibSearch: TFormBibSearch
         Caption = 'General search for'
       end
       object LblConst_LyricSearchHint: TLabel
-        Left = 12
-        Top = 217
+        Left = 14
+        Top = 258
         Width = 27
         Height = 13
         Caption = 'Lyrics'
+      end
+      object LblConst_SearchGenre: TLabel
+        Left = 14
+        Top = 211
+        Width = 29
+        Height = 13
+        Caption = 'Genre'
       end
       object ArtistEDIT: TEdit
         Left = 82
@@ -159,7 +173,7 @@ object FormBibSearch: TFormBibSearch
       end
       object LyricEdit: TMemo
         Left = 82
-        Top = 217
+        Top = 255
         Width = 260
         Height = 96
         Anchors = [akLeft, akTop, akRight]
@@ -188,12 +202,20 @@ object FormBibSearch: TFormBibSearch
         TabOrder = 8
         OnClick = BtnClearClick
       end
+      object GenreEdit: TEdit
+        Left = 82
+        Top = 210
+        Width = 260
+        Height = 21
+        Anchors = [akLeft, akTop, akRight]
+        TabOrder = 9
+      end
     end
     object Panel2: TPanel
       Left = 353
       Top = 0
       Width = 236
-      Height = 334
+      Height = 365
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -202,15 +224,20 @@ object FormBibSearch: TFormBibSearch
         Left = 0
         Top = 0
         Width = 236
-        Height = 224
+        Height = 255
         Align = alClient
         Caption = 'Genres'
         TabOrder = 0
+        DesignSize = (
+          236
+          255)
         object cbGenres: TCheckListBox
+          AlignWithMargins = True
           Left = 8
           Top = 40
-          Width = 195
-          Height = 136
+          Width = 217
+          Height = 186
+          Anchors = [akLeft, akTop, akRight, akBottom]
           Columns = 2
           Enabled = False
           ItemHeight = 13
@@ -231,11 +258,13 @@ object FormBibSearch: TFormBibSearch
           OnClick = cbIgnoreGenresClick
         end
         object cbIncludeUnkownGenres: TCheckBox
+          AlignWithMargins = True
           Left = 8
-          Top = 182
-          Width = 185
+          Top = 232
+          Width = 209
           Height = 17
           Hint = 'Include titles with unknown genre'
+          Anchors = [akLeft, akBottom]
           Caption = 'N/A, unknown'
           Enabled = False
           ParentShowHint = False
@@ -246,7 +275,7 @@ object FormBibSearch: TFormBibSearch
       object GrpBox_ExtendedSearchDate: TGroupBox
         Tag = 2
         Left = 0
-        Top = 224
+        Top = 255
         Width = 236
         Height = 110
         Align = alBottom
@@ -351,9 +380,9 @@ object FormBibSearch: TFormBibSearch
       41)
     object CB_SearchHistory: TComboBox
       AlignWithMargins = True
-      Left = 85
+      Left = 8
       Top = 11
-      Width = 507
+      Width = 573
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]

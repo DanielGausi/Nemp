@@ -762,10 +762,6 @@ object FDetails: TFDetails
     object Tab_Lyrics: TTabSheet
       Caption = 'Lyrics'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 398
-      ExplicitHeight = 0
       object GrpBox_Lyrics: TGroupBox
         Left = 0
         Top = 0
@@ -774,7 +770,6 @@ object FDetails: TFDetails
         Align = alClient
         Caption = 'Lyrics'
         TabOrder = 0
-        ExplicitWidth = 398
         DesignSize = (
           597
           462)
@@ -788,7 +783,6 @@ object FDetails: TFDetails
           Enabled = False
           TabOrder = 4
           OnClick = Btn_DeleteLyricFrameClick
-          ExplicitLeft = 242
         end
         object BtnLyricWiki: TButton
           Left = 441
@@ -801,7 +795,6 @@ object FDetails: TFDetails
           ShowHint = True
           TabOrder = 1
           OnClick = BtnLyricWikiClick
-          ExplicitLeft = 242
         end
         object BtnLyricWikiManual: TButton
           Left = 441
@@ -812,7 +805,6 @@ object FDetails: TFDetails
           Caption = 'Manual search'
           TabOrder = 3
           OnClick = BtnLyricWikiManualClick
-          ExplicitLeft = 242
         end
         object Memo_Lyrics: TMemo
           AlignWithMargins = True
@@ -827,7 +819,6 @@ object FDetails: TFDetails
           TabOrder = 0
           OnChange = Memo_LyricsChange
           OnKeyDown = Memo_LyricsKeyDown
-          ExplicitWidth = 228
         end
         object cbLyricOptions: TComboBox
           Left = 441
@@ -848,10 +839,6 @@ object FDetails: TFDetails
     object Tab_Pictures: TTabSheet
       Caption = 'Pictures (cover art)'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 398
-      ExplicitHeight = 0
       object PanelCoverArtFile: TPanel
         AlignWithMargins = True
         Left = 3
@@ -861,7 +848,6 @@ object FDetails: TFDetails
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 124
         object gpBoxCurrentSelection: TGroupBox
           Left = 0
           Top = 159
@@ -870,7 +856,6 @@ object FDetails: TFDetails
           Align = alClient
           Caption = 'Current selection'
           TabOrder = 1
-          ExplicitWidth = 124
           DesignSize = (
             323
             297)
@@ -895,7 +880,6 @@ object FDetails: TFDetails
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitWidth = 124
           object GrpBox_Cover: TGroupBox
             Left = 167
             Top = 0
@@ -904,7 +888,6 @@ object FDetails: TFDetails
             Align = alClient
             Caption = 'Existing cover art (Files)'
             TabOrder = 1
-            ExplicitWidth = 29
             DesignSize = (
               156
               159)
@@ -921,7 +904,6 @@ object FDetails: TFDetails
               ShowHint = True
               TabOrder = 1
               OnClick = Btn_OpenImageClick
-              ExplicitWidth = 13
             end
             object cbCoverArtFiles: TComboBox
               AlignWithMargins = True
@@ -1009,7 +991,6 @@ object FDetails: TFDetails
         Align = alRight
         Caption = 'Cover art (Media library)'
         TabOrder = 1
-        ExplicitLeft = 133
         DesignSize = (
           262
           456)
@@ -1091,10 +1072,6 @@ object FDetails: TFDetails
     object Tab_MetaData: TTabSheet
       Caption = 'Metadata'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 398
-      ExplicitHeight = 0
       object GrpBox_TextFrames: TGroupBox
         Left = 0
         Top = 0
@@ -1103,7 +1080,6 @@ object FDetails: TFDetails
         Align = alClient
         Caption = 'Metadata frames'
         TabOrder = 0
-        ExplicitWidth = 398
         DesignSize = (
           597
           273)
@@ -1117,7 +1093,6 @@ object FDetails: TFDetails
           Caption = 'New frame'
           TabOrder = 0
           OnClick = Btn_NewMetaFrameClick
-          ExplicitLeft = 256
         end
         object BtnCopyFromV1: TButton
           Left = 455
@@ -1131,7 +1106,6 @@ object FDetails: TFDetails
           ShowHint = True
           TabOrder = 1
           OnClick = BtnCopyFromV1Click
-          ExplicitLeft = 256
         end
         object cbFrameTypeSelection: TComboBox
           AlignWithMargins = True
@@ -1203,7 +1177,6 @@ object FDetails: TFDetails
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitWidth = 398
         object GrpBox_ID3v1: TGroupBox
           Left = 0
           Top = 0
@@ -1420,7 +1393,6 @@ object FDetails: TFDetails
           Align = alRight
           Caption = 'MPEG'
           TabOrder = 1
-          ExplicitLeft = 160
           object LblConst_MpegBitrate: TLabel
             Left = 8
             Top = 48
