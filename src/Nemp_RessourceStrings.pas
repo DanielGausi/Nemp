@@ -1100,6 +1100,23 @@ PlaylistManager_Saved      = 'Playlist saved: "%s"';
 
 PlaylistAutoDelay = 'A little break before the next track starts.' + #13#10#13#10 + 'You can change this behavior in the player settings.';
 
+PlaylistDuplicates_NoFileSelected = 'No file selected';
+PlaylistDuplicates_BetweenTracksCaption = 'Between these tracks:';
+PlaylistDuplicates_NoDuplicateInformation = 'No duplicate information available';
+
+PlaylistDuplicates_WarningArtistTitle = 'Same artist and title';
+PlaylistDuplicates_WarningFilename = 'Same filename (but different directories)';
+PlaylistDuplicates_WarningPath = 'Same file';
+
+PlaylistDuplicates_TracksBetween  = '%d tracks';
+PlaylistDuplicates_TracksBetweenZero = 'Direct repetition - no pause in between';
+//PlaylistDuplicates_TrackBeforeOriginal = 'The selected duplicate comes %d tracks before the original track.';
+PlaylistDuplicates_TimeBetween = '%s play time';
+PlaylistDuplicates_TimeBetweenStream = 'At least %s play time (+ webstream)';
+PlaylistDuplicates_TimeBetweenOnlyStream = 'Unknown play time (only webstream)';
+PlaylistDuplicates_PositionInPlaylist = 'Position in playlist: %d';
+
+
 implementation
 
 end.

@@ -35,7 +35,7 @@ interface
 
 uses Windows, Classes, Controls, StdCtrls, Forms, SysUtils, ContNrs, VirtualTrees,
     NempAudioFiles, Nemp_ConstantsAndTypes, Nemp_RessourceStrings, dialogs,
-    MyDialogs, System.UITypes, math, Vcl.ExtCtrls;
+    MyDialogs, System.UITypes, math, Vcl.ExtCtrls, Vcl.Graphics, RatingCtrls;
 
 type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
@@ -115,6 +115,8 @@ type TWindowSection = (ws_none, ws_Library, ws_Playlist, ws_Controls);
 
     procedure SetSkinRadioBox(aName: String);
 
+    procedure LoadStarGraphics(aRatingHelper: TRatingHelper);
+
 implementation
 
 uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
@@ -126,7 +128,7 @@ uses NempMainUnit, Splash, BibSearch, TreeHelper,  GnuGetText,
     CDOpenDialogs, LowBattery, PlayWebstream, Taghelper, MedienbibliothekClass,
     PlayerLog, progressUnit, Hilfsfunktionen, EffectsAndEqualizer, MainFormBuilderForm,
     ReplayGainProgress, NewMetaFrame, WebQRCodes, PlaylistEditor, NewFavoritePlaylist,
-    AudioDisplayUtils;
+    AudioDisplayUtils, PlaylistDuplicates;
 
 procedure CorrectVolButton;
 begin
@@ -862,6 +864,12 @@ begin
         begin
             ReTranslateComponent(FormEffectsAndEqualizer);
             FormEffectsAndEqualizer.ResetEffectButtons;
+        end;
+
+        if assigned(FormPlaylistDuplicates) then
+        begin
+          RetranslateComponent(FormPlaylistDuplicates);
+          FormPlaylistDuplicates.RefreshAnalysisView;
         end;
 
         if assigned(MainFormBuilder) then
@@ -1877,6 +1885,44 @@ begin
             end;
         end;
     end;
+end;
+
+procedure LoadStarGraphics(aRatingHelper: TRatingHelper);
+var s,h,u: TBitmap;
+    baseDir: String;
+
+begin
+  // exit;
+  s := TBitmap.Create;
+  h := TBitmap.Create;
+  u := TBitmap.Create;
+
+
+  if Nemp_MainForm.NempSkin.isActive
+      and (not Nemp_MainForm.NempSkin.UseDefaultStarBitmaps)
+      and Nemp_MainForm.NempSkin.UseAdvancedSkin
+      and NempOptions.GlobalUseAdvancedSkin
+  then
+      BaseDir := Nemp_MainForm.NempSkin.Path + '\'
+  else
+      // Detail-Form is not skinned, use default images
+      BaseDir := ExtractFilePath(ParamStr(0)) + 'Images\';
+
+  try
+      s.Transparent := True;
+      h.Transparent := True;
+      u.Transparent := True;
+
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(s, BaseDir + 'starset')    ;
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(h, BaseDir + 'starhalfset');
+      Nemp_MainForm.NempSkin.LoadGraphicFromBaseName(u, BaseDir + 'starunset')  ;
+
+      aRatingHelper.SetStars(s,h,u);
+  finally
+      s.Free;
+      h.Free;
+      u.Free;
+  end;
 end;
 
 

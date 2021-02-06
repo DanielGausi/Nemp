@@ -51,6 +51,7 @@ uses
    Nemp_SkinSystem, NempPanel, SkinButtons, math, PlayerLog,
 
   PlayerClass, PlaylistClass, MedienbibliothekClass, BibHelper, deleteHelper,
+  PlaylistDuplicates,
 
   gnuGettext, Nemp_RessourceStrings, languageCodes,
   OneInst, DriveRepairTools, ShoutcastUtils, WebServerClass, ScrobblerUtils,
@@ -59,7 +60,7 @@ uses
   unitFlyingCow, dglOpenGL, NempCoverFlowClass, PartyModeClass, RatingCtrls, tagClouds,
   Lyrics, pngimage, ExPopupList, SilenceDetection,
   System.ImageList, System.Types, System.UITypes, ProgressShape,
-  System.Win.TaskbarCore, Vcl.Taskbar, BaseForms
+  System.Win.TaskbarCore, Vcl.Taskbar, BaseForms, Vcl.VirtualImageList
   {$IFDEF USESTYLES}, vcl.themes, vcl.styles{$ENDIF}
   ;
 
@@ -618,6 +619,7 @@ type
     lblBibDirectory: TLabel;
     Bevel2: TBevel;
     NempTaskbarManager: TTaskbar;
+    PM_PL_ScanForDuplicates: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
 
@@ -1163,6 +1165,10 @@ type
 
     procedure PlaylistCueChanged(Sender: TNempPlaylist);
     procedure PlaylistUserChangedTitle(Sender: TNempPlaylist);
+    procedure OnDeletePlaylistDuplicate(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+    procedure OnDeletePlaylistDuplicateOriginal(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+    procedure OnAfterLastDuplicateDeleted(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+    procedure OnAfterRefreshDuplicateScan(Sender: TObject);
     procedure PlaylistDeleteFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
     procedure PlaylistAddFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
     procedure PlaylistFilePropertiesChanged(Sender: TNempPlaylist);
@@ -1206,6 +1212,7 @@ type
     procedure TabBtn_SummaryLockClick(Sender: TObject);
     procedure NempTaskbarManagerThumbPreviewRequest(Sender: TObject; APreviewHeight,
       APreviewWidth: Integer; PreviewBitmap: TBitmap);
+    procedure PM_PL_ScanForDuplicatesClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -1412,7 +1419,7 @@ uses   Splash, About, OptionsComplete, StreamVerwaltung,
   TagHelper, PartymodePassword, CreateHelper, PlaylistToUSB, ErrorForm,
   CDOpenDialogs, WebServerLog, Lowbattery, ProgressUnit, EffectsAndEqualizer,
   MainFormBuilderForm, ReplayGainProgress, NempReplayGainCalculation,
-  NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils;
+  NewFavoritePlaylist, PlaylistManagement, PlaylistEditor, AudioDisplayUtils ;
 
 
 {$R *.dfm}
@@ -3019,6 +3026,8 @@ begin
     RandomPlaylistForm.RefreshStarGraphics;
   if assigned(OptionsCompleteForm) then
     OptionsCompleteForm.RefreshStarGraphics;
+  if assigned(FormPlaylistDuplicates) then
+    FormPlaylistDuplicates.RefreshStarGraphics
 end;
 
 
@@ -6439,7 +6448,7 @@ begin
   if not assigned(af) then exit;
 
   case Column of
-    0: CellText := NempDisplay.PlaylistTitle(af, True);
+    0: CellText := IntToStr(Node.Index) +   NempDisplay.PlaylistTitle(af, True);
     1: CellText := NempDisplay.TreeDuration(af)
     // the NempDisplay methods will handle PrebookIndex/VoteCounter and start times for Cue-Entries
   end;
@@ -7209,6 +7218,49 @@ begin
       PM_PL_SaveAsPlaylistClick(Sender);
 end;
 
+procedure TNemp_MainForm.PM_PL_ScanForDuplicatesClick(Sender: TObject);
+var
+  aPlaylistDuplicateCollector: TPlaylistDuplicateCollector;
+  firstDuplicateNode: PVirtualNode;
+begin
+  aPlaylistDuplicateCollector := TPlaylistDuplicateCollector.Create;
+  try
+    aPlaylistDuplicateCollector.ScanForDuplicates(NempPlaylist.Playlist);
+
+    if aPlaylistDuplicateCollector.Count > 0 then
+    begin
+      if not assigned(FormPlaylistDuplicates) then
+      begin
+        Application.CreateForm(TFormPlaylistDuplicates, FormPlaylistDuplicates);
+        FormPlaylistDuplicates.OnDeleteAudioFile := OnDeletePlaylistDuplicate;
+        FormPlaylistDuplicates.OnDeleteOriginalAudioFile   := OnDeletePlaylistDuplicateOriginal;
+
+        FormPlaylistDuplicates.OnAfterLastDuplicateDeleted := OnAfterLastDuplicateDeleted;
+        FormPlaylistDuplicates.OnAfterRefreshDuplicateScan := OnAfterRefreshDuplicateScan;
+      end;
+
+      // FormPlaylistDuplicates will free the Collector OnClose
+      FormPlaylistDuplicates.PlaylistDuplicateCollector := aPlaylistDuplicateCollector;
+
+      firstDuplicateNode := GetNodeWithAudioFile(PlaylistVST, aPlaylistDuplicateCollector.DuplicateFiles[0]);
+      if assigned(firstDuplicateNode) then
+      begin
+        PlaylistVST.ClearSelection;
+        PlaylistVST.Selected[firstDuplicateNode] := True;
+        PlaylistVST.ScrollIntoView(firstDuplicateNode, True);
+        PlaylistVST.FocusedNode := firstDuplicateNode;
+      end;
+      FormPlaylistDuplicates.Show;
+      FormPlaylistDuplicates.ShowDuplicateAnalysis(aPlaylistDuplicateCollector.DuplicateFiles[0]);
+
+    end else
+      showmessage('keine Duplikate');
+  finally
+    if aPlaylistDuplicateCollector.Count = 0 then
+      aPlaylistDuplicateCollector.Free;
+  end;
+end;
+
 ///  PM_PL_SaveAsPlaylistClick
 ///  ---------------------------
 ///  Save the current Playlist under a new name
@@ -7482,6 +7534,12 @@ begin
       AudioFile := PlaylistVST.GetNodeData<TAudioFile>(aNode);
       ShowVSTDetails(AudioFile, SD_PLAYLIST);
       AktualisiereDetailForm(AudioFile, SD_PLAYLIST);
+
+      if assigned(FormPlaylistDuplicates)
+        and FormPlaylistDuplicates.Visible
+      then
+        FormPlaylistDuplicates.ShowDuplicateAnalysis(AudioFile);
+
   end;
 end;
 
@@ -7684,12 +7742,85 @@ begin
     if MedienBib.CurrentAudioFile = aFile then
         MedienBib.CurrentAudioFile := Nil;
 
+    // Todo: remove aFile from the DuplicateCollector (if needed)
+    if assigned(FormPlaylistDuplicates) and FormPlaylistDuplicates.Visible then
+      FormPlaylistDuplicates.RemoveAudioFile(aFile);
+
     aNode := GetNodeWithAudioFile(PlaylistVST, aFile);
     if assigned(aNode) then
         PlaylistVST.DeleteNode(aNode);
 
     PlaylistVST.Invalidate;
 end;
+
+// OnDeletePlaylistDuplicate:
+// Some Duplicate should be deleted. No re-selection in the PlaylistVST is needed
+procedure TNemp_MainForm.OnDeletePlaylistDuplicate(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+begin
+  NempPlaylist.DeleteAudioFileFromPlaylist(aFile);
+end;
+
+// OnDeletePlaylistDuplicateOriginal
+// the "original" of some duplicates should be deleted (= the currently focussed file)
+// after that: Select the next duplicate
+procedure TNemp_MainForm.OnDeletePlaylistDuplicateOriginal(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+var currentNode, newSelectedNode: PVirtualNode;
+begin
+  currentNode := GetNodeWithAudioFile(PlaylistVST, aFile);
+
+  // determine a Node we want to select after removing the selected files
+  newSelectedNode := PlaylistVST.GetNextSibling(currentNode);
+  if not Assigned(newSelectedNode) then
+    newSelectedNode := PlaylistVST.GetPreviousSibling(currentNode);
+
+  NempPlaylist.DeleteAudioFileFromPlaylist(aFile);
+
+  // Select the next node
+  if assigned(newSelectedNode)  then
+  begin
+    PlaylistVST.Selected[newSelectedNode] := True;
+    PlaylistVST.FocusedNode := newSelectedNode;
+  end;
+  PlaylistVSTChange(PlaylistVST, Nil);
+end;
+
+procedure TNemp_MainForm.OnAfterLastDuplicateDeleted(Sender: TPlaylistDuplicateCollector; aFile: TAudioFile);
+var af: TAudioFile;
+    currentNode, StartNode: PVirtualNode;
+begin
+  // Select a new Node marked as "Duplicate"
+  // Begin with the node storing "aFile" (which should be the focused node!), or the first node in the playlist
+  if assigned(PlaylistVst.FocusedNode) then
+    StartNode := PlaylistVst.FocusedNode
+  else
+    StartNode := PlaylistVst.GetFirst;
+  PlaylistVST.Selected[StartNode] := False;
+  // we want the *next* Duplicate
+  // => begin with the next node (or the first one, if the current node is the last one in the playlist)
+  currentNode := GetNextNodeOrFirst(PlaylistVST, StartNode);
+  repeat
+    // get an AudioFile which is marked as a "Duplicate"
+    af := PlaylistVST.GetNodeData<TAudioFile>(currentNode);
+    if not (af.FlaggedWith(FLAG_DUPLICATE) or af.FlaggedWith(FLAG_EXACTDUPLICATE)) then
+    begin
+      PlaylistVST.Selected[currentNode] := False;
+      currentNode := GetNextNodeOrFirst(PlaylistVST, currentNode);
+    end;
+  until af.FlaggedWith(FLAG_DUPLICATE) or af.FlaggedWith(FLAG_EXACTDUPLICATE) or (currentNode = StartNode);
+
+  PlaylistVST.Selected[currentNode] := true;
+  PlaylistVST.ScrollIntoView(currentNode, True);
+  PlaylistVST.FocusedNode := currentNode;
+
+  PlaylistVSTChange(PlaylistVST, Nil);
+end;
+
+procedure TNemp_MainForm.OnAfterRefreshDuplicateScan(Sender: TObject);
+begin
+  PlaylistVST.Invalidate;
+end;
+
+
 
 procedure TNemp_MainForm.PlaylistAddFile(Sender: TNempPlaylist; aFile: TAudioFile; aIndex: Integer);
 var NewNode, InsertNode: PVirtualNode;
@@ -7792,6 +7923,9 @@ end;
 procedure TNemp_MainForm.PlaylistCleared(Sender: TNempPlaylist);
 begin
     PlaylistVST.Clear;
+    if assigned(FormPlaylistDuplicates) and FormPlaylistDuplicates.Visible
+    then
+      FormPlaylistDuplicates.Clear;
 end;
 ///  We can assume that the currently focussed Node is still there (in some way)
 ///  after we are done with refilling the tree
@@ -8636,6 +8770,12 @@ begin
                               if af.IsSearchResult then
                                   ImageIndex := 21;
 
+                              if af.FlaggedWith(FLAG_DUPLICATE) then
+                                ImageIndex := 22;
+                              if af.FlaggedWith(FLAG_EXACTDUPLICATE) then
+                                ImageIndex := 23;
+
+
                               // play indicator: Highest priority
                               if (af = NempPlayList.PlayingFile)
                                   or (af = NempPlaylist.PlayingCue)
@@ -8835,13 +8975,14 @@ begin
   if not FormReadyAndActivated then
         exit;
 
-  if (NempSkin.isActive and Nempskin.DisablePlaylistScrollbar)
+ { if (NempSkin.isActive and Nempskin.DisablePlaylistScrollbar)
        OR // Oder Scrollbar unsichtbar
      (PlaylistVST.Height > Integer(playlistVST.RootNode.TotalHeight))
   then
     PlaylistVST.Header.Columns[0].Width := PlayListVST.Width - PlaylistVST.Header.Columns[1].Width - 4 // - 12;
   else
     PlaylistVST.Header.Columns[0].Width := PlayListVST.Width - PlaylistVST.Header.Columns[1].Width - 22;// - 12;
+  }
 end;
 procedure TNemp_MainForm.PlaylistVSTCollapsAndExpanded(Sender: TBaseVirtualTree;
   Node: PVirtualNode);

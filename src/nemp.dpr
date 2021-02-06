@@ -127,7 +127,8 @@ uses
   WebQRCodes in 'WebQRCodes.pas' {WebServerQRForm},
   AudioDisplayUtils in 'AudioDisplayUtils.pas',
   BaseForms in 'BaseForms.pas',
-  DuplicateFilesDialogs in 'DuplicateFilesDialogs.pas' {DuplicateFilesDialog};
+  DuplicateFilesDialogs in 'DuplicateFilesDialogs.pas' {DuplicateFilesDialog},
+  PlaylistDuplicates in 'PlaylistDuplicates.pas' {FormPlaylistDuplicates};
 
 {$R *.res}
 

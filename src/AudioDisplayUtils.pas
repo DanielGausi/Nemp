@@ -14,8 +14,8 @@ resourcestring
 
   rsFormatTreeBitrate     = '%d kbit/s';
   rsFormatTreeBitrateVBR  = '%d kbit/s (vbr)';
-  rsFormatTreeCuePosition = '»%d:%.2d';
-  rsFormatTreeDuration    = '%d:%.2d';
+  rsFormatTreeCuePosition = '»%d:%.2d ';
+  rsFormatTreeDuration    = '%d:%.2d ';
   rsFormatTreeFileSize    = '%.2f MB';
   rsFormatTreeSamplerate  = '%s kHz';
 
@@ -68,7 +68,7 @@ resourcestring
   rsTreeUnknownBitrate = '-?-';
   rsTreeWebStreamDummy = '(Webstream)';
   rsTreeUnkownDuration = '-?-'; // only used if Type is "at_Undef", should never happen
-  rsTreeUnlimitedDuration = '∞';
+  rsTreeUnlimitedDuration = '∞ ';
 
   //rsFormatReplayGainTrack_Short = '%6.2f dB';
   //rsFormatReplayGainAlbum_Short = '%6.2f dB (Album %6.2f dB)';

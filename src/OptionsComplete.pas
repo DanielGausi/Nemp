@@ -726,7 +726,7 @@ type
     VorauswahlNode: pVirtualNode;
 
     procedure ShowSettings(ExtendedSettings: Boolean);
-    procedure LoadStarGraphics;
+    //procedure LoadStarGraphics;
     procedure RefreshStarGraphics;
 
   end;
@@ -782,7 +782,7 @@ begin
 
   close;
 end;
-
+(*
 procedure TOptionsCompleteForm.LoadStarGraphics;
 var s,h,u: TBitmap;
     baseDir: String;
@@ -820,10 +820,11 @@ begin
       u.Free;
   end;
 end;
+*)
 
 procedure TOptionsCompleteForm.RefreshStarGraphics;
 begin
-    LoadStarGraphics;
+    LoadStarGraphics(DetailRatingHelper);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(51 + 1, RatingImage15.Picture.Bitmap, RatingImage15.Width, RatingImage15.Height);
@@ -855,7 +856,7 @@ begin
   RestoreComboboxes(self);
 
   DetailRatingHelper := TRatingHelper.Create;
-  LoadStarGraphics;
+  LoadStarGraphics(DetailRatingHelper);
 
   DetailRatingHelper.DrawRatingInStarsOnBitmap(1, RatingImage05.Picture.Bitmap, RatingImage05.Width, RatingImage05.Height);
   DetailRatingHelper.DrawRatingInStarsOnBitmap(36 + 1, RatingImage10.Picture.Bitmap, RatingImage10.Width, RatingImage10.Height);

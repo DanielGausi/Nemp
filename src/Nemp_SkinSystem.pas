@@ -43,7 +43,7 @@ iniFiles, jpeg, NempPanel, Classes, oneinst, SkinButtons, PNGImage, ProgressShap
 Nemp_ConstantsAndTypes, PartyModeClass{$IFDEF USESTYLES}, vcl.themes, vcl.styles, Vcl.CheckLst {$ENDIF};
 
 const MAX_MENUIMAGE_INDEX = 41;
-      MAX_PLAYLIST_IMAGE_INDEX = 21;
+      MAX_PLAYLIST_IMAGE_INDEX = 23;
 
 type
   // Achtung: Reihenfolge hier jetzt so lassen!!
@@ -2642,8 +2642,8 @@ begin
 
     PlayerRatingGraphics.SetStars(SetStarBitmap, HalfStarBitmap, UnSetStarBitmap);
 
-    if assigned(FDetails) then
-        FDetails.LoadStarGraphics;
+    //if assigned(FDetails) then
+    //    FDetails.LoadStarGraphics;
 end;
 
 procedure TNempSkin.AssignWindowsGlyphs(UseSkinGraphics: Boolean);

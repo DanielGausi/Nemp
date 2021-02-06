@@ -402,7 +402,6 @@ type
     NewLibraryCoverID: String;
     MetaTagType: TTagType;
 
-    procedure LoadStarGraphics;
     procedure RefreshStarGraphics;
     procedure BuildGetLyricButtonHint;
   end;
@@ -523,7 +522,7 @@ begin
       CB_LibraryGenre.Items.Add(ID3Genres[i]);
 
   DetailRatingHelper := TRatingHelper.Create;
-  LoadStarGraphics;
+  LoadStarGraphics(DetailRatingHelper);
 
   VST_MetaData.NodeDataSize := sizeOf(TTagEditItem);
   CoverArtSearcher := TCoverArtSearcher.Create;
@@ -1164,7 +1163,7 @@ end;
 
 {$REGION 'Small Supporting methods, little QoL-Features'}
 
-
+(*
 procedure TFDetails.LoadStarGraphics;
 var s,h,u: TBitmap;
     baseDir: String;
@@ -1199,10 +1198,11 @@ begin
         u.Free;
     end;
 end;
+*)
 
 procedure TFDetails.RefreshStarGraphics;
 begin
-    LoadStarGraphics;
+    LoadStarGraphics(DetailRatingHelper);
     DetailRatingHelper.DrawRatingInStarsOnBitmap(CurrentBibRating, IMG_LibraryRating.Picture.Bitmap, IMG_LibraryRating.Width, IMG_LibraryRating.Height);
 end;
 

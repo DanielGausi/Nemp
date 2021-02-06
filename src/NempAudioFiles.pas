@@ -208,8 +208,11 @@ type
 
     // some temporary Flags for AudioFiles
     // only(?) used for the Playlist
-    FLAG_SEARCHRESULT = 2;
-
+    FLAG_SEARCHRESULT = 1;
+    FLAG_DUPLICATE = 2;
+    FLAG_EXACTDUPLICATE = 4;
+    FLAG_CURRENTDUPLICATE = 8;
+    FLAG_DUPLICATEGENERAL = 6; // 2+4 (??)
 
  type
     TAudioType = (at_Undef, at_File, at_Stream, at_CDDA, at_CUE);
@@ -563,6 +566,9 @@ type
         function RemoveTag(aTag: String): Boolean;
 
         //function RenameTag(oldTag, newTag: String): Boolean;
+        procedure SetFlag(aFlag: Integer);
+        procedure UnSetFlag(aFlag: Integer);
+        function FlaggedWith(aFlag: Integer): Boolean;
 
         // creates a copy of the Audiofile and adds the copy to the list
         procedure AddCopyToList(aList: TAudioFileList);
@@ -2636,6 +2642,20 @@ begin
     else
         fFlags := fFlags AND (NOT FLAG_SEARCHRESULT);
 end;
+
+procedure TAudioFile.SetFlag(aFlag: Integer);
+begin
+  fFlags := fFlags OR aFlag
+end;
+procedure TAudioFile.UnSetFlag(aFlag: Integer);
+begin
+  fFlags := fFlags AND (NOT aFlag);
+end;
+function TAudioFile.FlaggedWith(aFlag: Integer): Boolean;
+begin
+  result := (fFlags AND aFlag) = aFlag;
+end;
+
 
 
 

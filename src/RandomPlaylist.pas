@@ -132,7 +132,7 @@ type
   public
     { Public-Deklarationen }
     //procedure ShowRating(Value: Integer);
-    procedure LoadStarGraphics;
+    // procedure LoadStarGraphics;
     procedure RefreshStarGraphics;
   end;
 
@@ -159,7 +159,7 @@ implementation
 
 {$R *.dfm}
 
-Uses NempMainUnit, TagClouds;
+Uses NempMainUnit, TagClouds, MainFormHelper;
 
 
 Constructor TTagSetting.Create;
@@ -185,6 +185,7 @@ begin
     CheckList.Add(aString);
 end;
 
+(*
 procedure TRandomPlaylistForm.LoadStarGraphics;
 var s,h,u: TBitmap;
     baseDir: String;
@@ -219,10 +220,11 @@ begin
         u.Free;
     end;
 end;
+*)
 
 procedure TRandomPlaylistForm.RefreshStarGraphics;
 begin
-    LoadStarGraphics;
+    LoadStarGraphics(RandomRatingHelper);
     RandomRatingHelper.DrawRatingInStarsOnBitmap(ActualRating, RatingImage.Picture.Bitmap, RatingImage.Width, RatingImage.Height);
 end;
 
@@ -243,7 +245,7 @@ begin
   LocalTopTags := TObjectList.Create(False);
   LastCheckedTags := TStringList.Create;
 
-  LoadStarGraphics;
+  LoadStarGraphics(RandomRatingHelper);
 
   ini := TMeminiFile.Create(SavePath + 'RandomPlaylist.ini', TEncoding.UTF8);
   try

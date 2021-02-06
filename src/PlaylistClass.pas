@@ -323,7 +323,8 @@ type
       procedure InsertFileToPlayList(Audiofile: TAudioFile; aCueName: UnicodeString = ''); overload;
       procedure ProcessBufferStringlist;
 
-      procedure DeleteAudioFileFromPlaylist(aIndex: Integer);
+      procedure DeleteAudioFileFromPlaylist(aIndex: Integer); overload;
+      procedure DeleteAudioFileFromPlaylist(af: TAudioFile); overload;
 
       procedure ReIndexPrebookedFiles;
       procedure SetNewPrebookIndex(aFile: TAudioFile; NewIndex: Integer);
@@ -950,6 +951,12 @@ end;
     Delete files from the playlist
     --------------------------------------------------------
 }
+procedure TNempPlaylist.DeleteAudioFileFromPlaylist(af: TAudioFile);
+begin
+  if assigned(af) then
+    DeleteAudioFileFromPlaylist(Playlist.IndexOf(af));
+end;
+
 
 procedure TNempPlaylist.DeleteAudioFileFromPlaylist(aIndex: Integer);
 var af: TAudioFile;
@@ -988,6 +995,7 @@ begin
 
     if assigned(fOnPropertiesChanged)then
         fOnPropertiesChanged(Self);
+
 end;
 
 
@@ -1022,6 +1030,7 @@ begin
 
     SendMessage(MainWindowHandle, WM_PlayerStop, 0, 0);
 end;
+
 
 
 procedure TNempPlaylist.DeleteDeadFiles;
